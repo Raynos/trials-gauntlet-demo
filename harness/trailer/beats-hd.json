@@ -1,0 +1,16 @@
+[
+  { "id": "cold",    "recording": "harness/out/trailer/recordings/b1-first-ride.json",       "startTick": 96,   "endTick": 700,  "countdown": true },
+  { "id": "flow",    "recording": "harness/out/trailer/recordings/e2-rear-wheel-first.json", "startTick": 1020, "endTick": 1400 },
+  { "id": "kicker",  "recording": "harness/out/trailer/recordings/e2-rear-wheel-first.json", "startTick": 2580, "endTick": 2960 },
+  { "id": "seesaw",  "recording": "harness/out/trailer/recordings/m3-see-saw.json",          "startTick": 300,  "endTick": 680 },
+  { "id": "drums",   "recording": "harness/out/trailer/recordings/m2-drum-roll.json",        "startTick": 2850, "endTick": 3200 },
+  { "id": "crash",   "recording": "harness/out/trailer/recordings/x1-vertical-limit.json",   "startTick": 396,  "endTick": 1080 },
+  { "id": "fire",    "recording": "harness/out/trailer/recordings/h3-fire-line.json",        "startTick": 1524, "endTick": 1900 },
+  { "id": "night",   "recording": "harness/out/trailer/recordings/h1-wheelie-wire.json",     "startTick": 2664, "endTick": 3040 },
+  { "id": "climb",   "recording": "harness/out/trailer/recordings/e1-uphill-weight.json",    "startTick": 468,  "endTick": 780 },
+  { "id": "stairs",  "recording": "harness/out/trailer/recordings/e3-stairway.json",         "startTick": 396,  "endTick": 660 },
+  { "id": "loopout", "recording": "harness/out/trailer/recordings/b2-lean-back-crash.json","startTick": 816,  "endTick": 1080 },
+  { "id": "hop",     "recording": "harness/out/trailer/recordings/m1-hop-up.json",           "startTick": 1464, "endTick": 1620 },
+  { "id": "chain",   "recording": "harness/out/trailer/recordings/h2-gap-chain.json",        "startTick": 2736, "endTick": 2900 },
+  { "id": "finish",  "recording": "harness/out/trailer/recordings/h1-wheelie-wire.json",     "startTick": 3996, "endTick": 4520 }
+]

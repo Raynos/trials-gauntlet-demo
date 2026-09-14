@@ -8,3 +8,5 @@ reference/*/clips/
 .DS_Store
 .vite/
 assets/art/raw/
+!harness/out/trailer/
+!harness/out/timelapse/
