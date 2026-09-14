@@ -22,7 +22,8 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
       break;
     case 'land': {
       if (scratch.justReset) break;
-      const gain = clamp(e.impulse / CHASSIS.landingImpulseRef, CHASSIS.landingMinGain, 1);
+      if (e.impulse < CHASSIS.landingMinImpulse) break; // a wheel settling, not a landing
+      const gain = Math.pow(clamp(e.impulse / CHASSIS.landingImpulseRef, 0, 1), CHASSIS.landingCurve);
       pushTransient(out, TK.landing, gain, surfaceIndex(e.surface) / 8, e.wheel === 'rear' ? -0.15 : 0.15);
       if (gain >= 0.5) scratch.duckImpactUntil = now + DUCK.impactHoldS * 0.5;
       break;
@@ -61,6 +62,7 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
     case 'restart':
       resetScratch(scratch, true);
       pushTransient(out, TK.restart, 1);
+      pushTransient(out, TK.starter, 1, 0, 0, 0.02);
       break;
     case 'finish':
       scratch.finishAt = now;

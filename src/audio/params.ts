@@ -45,6 +45,8 @@ export const TRANSIENT_KINDS = [
   'crowd', // 16 crowd swell
   'hazard', // 17 fire/water whoosh on hazard fault
   'kill', // 18 hard stop only (no click); used by dispose/mute
+  'starter', // 19 starter whir + catch on respawn / track load
+  'plank', // 20 board-joint thud (wood decks), pitch = speed/20
 ] as const;
 export type TransientKind = (typeof TRANSIENT_KINDS)[number];
 export const TK: Record<TransientKind, number> = Object.fromEntries(TRANSIENT_KINDS.map((k, i) => [k, i])) as Record<
@@ -97,6 +99,12 @@ export interface AudioParams {
   ambientGain: number;
   /** Requested game-bus attenuation in dB (>= 0); the synth smooths it. */
   duckDb: number;
+  /** 0..1 auto-clutch slipping (engine held at clutchRpm under throttle while the wheel lags). */
+  clutch: number;
+  /** 0..1 crashed bike scrubbing along the ground on its frame. */
+  scrape: number;
+  /** 0..1 ground speed / 20 m/s (engine presence winds up with speed). */
+  speed: number;
   transients: Transient[];
   transientCount: number;
 }
@@ -118,6 +126,9 @@ export function createParams(): AudioParams {
     biome: 0,
     ambientGain: 1,
     duckDb: 0,
+    clutch: 0,
+    scrape: 0,
+    speed: 0,
     transients,
     transientCount: 0,
   };
@@ -151,8 +162,11 @@ export const P_AIRBORNE = 11;
 export const P_BIOME = 12;
 export const P_AMBIENT_GAIN = 13;
 export const P_DUCK_DB = 14;
-export const P_TRANSIENT_COUNT = 15;
-export const P_HEADER = 16;
+export const P_CLUTCH = 15;
+export const P_SCRAPE = 16;
+export const P_SPEED = 17;
+export const P_TRANSIENT_COUNT = 18;
+export const P_HEADER = 20;
 export const P_TRANSIENT_STRIDE = 5;
 export const PACKED_LENGTH = P_HEADER + MAX_TRANSIENTS * P_TRANSIENT_STRIDE;
 
@@ -172,6 +186,9 @@ export function packParams(p: AudioParams, out: Float32Array): Float32Array {
   out[P_BIOME] = p.biome;
   out[P_AMBIENT_GAIN] = p.ambientGain;
   out[P_DUCK_DB] = p.duckDb;
+  out[P_CLUTCH] = p.clutch;
+  out[P_SCRAPE] = p.scrape;
+  out[P_SPEED] = p.speed;
   out[P_TRANSIENT_COUNT] = p.transientCount;
   for (let i = 0; i < p.transientCount; i++) {
     const t = p.transients[i]!;
@@ -193,8 +210,12 @@ export const ENGINE = {
   /** Physics owns these (CONTRACT §2.3); listed for scaling only. */
   idleRpm: 1500,
   redlineRpm: 10000,
-  /** Crash: engine gain ramps to 0 over this many seconds (bike is debris). */
-  crashFadeS: 0.35,
+  /** Crash: the engine stalls — gain ramps to 0 and the audible pitch sags by `stallDrop` over this long. */
+  crashFadeS: 0.45,
+  stallDrop: 0.55,
+  /** Physics' slipping auto-clutch holds the crank here under throttle (tuning.engine.clutchRpm). */
+  clutchRpm: 3500,
+  clutchThrottle: 0.25,
 } as const;
 
 export const WHEEL_RADIUS = 0.34;
@@ -204,16 +225,23 @@ export const WIND_SPEED_REF = 14;
 export const TYRE_MIN_SPEED = 0.15;
 
 /** Distance ticks per surface, metres of travel between ticks (0 = none). */
-export const TICK_SPACING: readonly number[] = [0, 1.2, 0.31, 0, 0, 0, 0, 0];
+/** Wood: 0.22 m boards + 2 cm gaps (rendering.md) → a joint every 0.24 m; metal drums: ridge every 0.31 m. */
+export const TICK_SPACING: readonly number[] = [0, 0.24, 0.31, 0, 0, 0, 0, 0];
 
 export const CHASSIS = {
   /** compression/s above which a grounded wheel emits a thunk. */
   thunkVel: 6,
   thunkMinGapS: 0.08,
+  /** Crashed bike: suspension hits become sparse metal clatter at most this often per wheel. */
+  crashClatterGapS: 0.25,
   bottomOut: 0.97,
-  /** land.impulse (N·s) that maps to gain 1. */
-  landingImpulseRef: 900,
-  landingMinGain: 0.15,
+  /**
+   * land.impulse is the normal impulse of the touchdown tick (N·s). Bot corpus at 1.4 g:
+   * p50 ≈ 10, p75 ≈ 30–60, max ≈ 210; ≤ 5 is a wheel settling. gain = (impulse/ref)^0.6.
+   */
+  landingImpulseRef: 120,
+  landingMinImpulse: 5,
+  landingCurve: 0.6,
   skidChirpSlip: 0.6,
 } as const;
 

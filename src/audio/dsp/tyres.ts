@@ -41,6 +41,8 @@ export class TyreVoice {
   private grainDecay = 0;
   private hissGain = 0;
   private noiseKind = 0; // 0 white 1 pink 2 brown
+  private whineHz = 0;
+  private whinePh = 0;
 
   constructor(sr: number, seed: number) {
     this.sr = sr;
@@ -67,6 +69,7 @@ export class TyreVoice {
     this.gainTarget = dbToGain(BASE_DB[surface] ?? -20) * Math.pow(v / 10, 0.7);
     this.hissGain = 0;
     this.noiseKind = 0;
+    this.whineHz = 0;
     switch (surface) {
       case 0: // dirt
         this.noiseKind = 2;
@@ -80,7 +83,7 @@ export class TyreVoice {
         break;
       case 2: // metal
         this.f1.highpass(700, 0.7);
-        this.f2.peaking(1850, 8, 4);
+        this.f2.peaking(1850, 6, 2);
         break;
       case 3: // concrete
         this.noiseKind = 1;
@@ -96,6 +99,7 @@ export class TyreVoice {
         this.f1.peaking(2400, 8, 6);
         this.f2.bypass();
         this.grateDelay = clamp(Math.round((0.05 / Math.max(v, 0.5)) * this.sr), 8, GRATE_MAX - 1);
+        this.whineHz = v / 0.05; // bar-crossing rate → the grate whine
         break;
       case 6: // stone
         this.noiseKind = 1;
@@ -149,6 +153,11 @@ export class TyreVoice {
         x += this.grainBp.process(g) * 1.5;
       }
       if (this.hissGain > 0) x += this.hiss.process(w) * this.hissGain;
+      if (this.whineHz > 0) {
+        this.whinePh += this.whineHz / this.sr;
+        if (this.whinePh >= 1) this.whinePh -= 1;
+        x += (Math.sin(this.whinePh * TWO_PI) + 0.5 * Math.sin(this.whinePh * 2 * TWO_PI)) * 0.35;
+      }
       out[off + i] = out[off + i]! + x * this.gain;
     }
   }
@@ -157,6 +166,7 @@ export class TyreVoice {
 export class SkidVoice {
   private readonly rng: NoiseRng;
   private readonly bp: Biquad;
+  private readonly bp2: Biquad;
   private gainTarget = 0;
   private gain = 0;
   private readonly kGain: number;
@@ -164,9 +174,12 @@ export class SkidVoice {
   constructor(sr: number, seed: number) {
     this.rng = new NoiseRng(seed);
     this.bp = new Biquad(sr);
+    this.bp2 = new Biquad(sr);
+    this.bp2.bypass();
     this.kGain = smoothCoef(0.01, sr);
   }
 
+  /** Rear tyre skid: white → BP 1200 + 1400·slip Hz Q 3, −30 + 22·slip dB above slip 0.25. */
   set(slip: number): void {
     if (slip < 0.25) {
       this.gainTarget = 0;
@@ -176,11 +189,22 @@ export class SkidVoice {
     this.gainTarget = dbToGain(-30 + 22 * slip);
   }
 
+  /** Crashed frame scrubbing the ground: gritty 400 Hz–3 kHz noise, −24 + 10·scrape dB. */
+  setScrape(scrape: number): void {
+    if (scrape < 0.02) {
+      this.gainTarget = 0;
+      return;
+    }
+    this.bp.highpass(400, 0.7);
+    this.bp2.lowpass(3000 + 2000 * scrape, 0.7);
+    this.gainTarget = dbToGain(-24 + 10 * scrape);
+  }
+
   process(out: Float32Array, off: number, n: number): void {
     if (this.gain < 1e-5 && this.gainTarget < 1e-5) return;
     for (let i = 0; i < n; i++) {
       this.gain += (this.gainTarget - this.gain) * this.kGain;
-      out[off + i] = out[off + i]! + this.bp.process(this.rng.n()) * this.gain;
+      out[off + i] = out[off + i]! + this.bp2.process(this.bp.process(this.rng.n())) * this.gain;
     }
   }
 }

@@ -4,7 +4,7 @@
  * and measure loudness. Nobody can hear this machine — look at the pictures.
  *
  *   npx tsx src/audio/tools/renderDemo.ts <outDir> [--solo engine|tyres|chassis|ambient|ui]
- *                                          [--recording harness/inputs/flat-test-clear.json --seconds 12]
+ *                                          [--recording harness/inputs/flat-test-clear.json --seconds 12 --physics bike|mock]
  *                                          [--biome canyon]
  */
 import { createHash } from 'node:crypto';
@@ -12,6 +12,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { MockPhysics } from '../../game/mockPhysics';
+import { bikePhysicsFactory } from '../../physics';
 import { BIOMES } from '../params';
 import { encodeWav16, renderRecording, renderScript, type OfflineOptions, type OfflineResult } from '../offline';
 import { GAUNTLET, gauntletScript } from './fixture';
@@ -63,10 +64,10 @@ async function main(): Promise<void> {
   if (recording) {
     const json = fs.readFileSync(recording, 'utf8');
     const seconds = Number(arg('seconds') ?? 12);
-    const make = (hz: number): MockPhysics => new MockPhysics(hz);
+    const make = arg('physics') === 'mock' ? (hz: number): MockPhysics => new MockPhysics(hz) : bikePhysicsFactory;
     a = await renderRecording(json, seconds, make, { ...opts, countdown: true });
     b = await renderRecording(json, seconds, make, { ...opts, countdown: true });
-    name = path.basename(recording).replace(/\.\w+$/, '');
+    name = recording.replace(/^.*harness\/inputs\//, '').replace(/\.\w+$/, '').replace(/\//g, '.');
   } else {
     const script = gauntletScript(60);
     const seed = biome ? BIOMES.indexOf(biome as (typeof BIOMES)[number]) : 1;

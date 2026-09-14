@@ -29,7 +29,7 @@ describe('mapParams (pure model)', () => {
     const a = runGauntlet();
     const b = runGauntlet();
     expect(a.hash).toBe(b.hash);
-    expect(a.hash).toBe('630345ed50a2834b');
+    expect(a.hash).toBe('eea714701daae4d1');
   });
 
   it('emits every transient family across the gauntlet in causal order', () => {
@@ -42,8 +42,10 @@ describe('mapParams (pure model)', () => {
     expect(first(TK.landing)).toBeLessThan(first(TK.bottomOut));
     expect(first(TK.bottomOut)).toBeLessThan(first(TK.impact));
     expect(first(TK.impact)).toBeLessThan(first(TK.restart));
-    expect(first(TK.restart)).toBeLessThan(first(TK.tick));
-    expect(first(TK.tick)).toBeLessThan(first(TK.checkpoint));
+    expect(first(TK.restart)).toBeLessThan(first(TK.starter));
+    expect(first(TK.starter)).toBeLessThan(first(TK.plank)); // wood deck joints after the respawn
+    expect(first(TK.plank)).toBeLessThan(first(TK.checkpoint));
+    expect(first(TK.checkpoint)).toBeLessThan(first(TK.tick)); // metal ridges after the checkpoint
     expect(first(TK.checkpoint)).toBeLessThan(first(TK.finishTick));
     expect(kinds.filter((k) => k === TK.fanfare)).toHaveLength(4);
     expect(kinds.filter((k) => k === TK.firework)).toHaveLength(5);
@@ -100,23 +102,74 @@ describe('mapParams (pure model)', () => {
     expect(kinds.filter((k) => k === TK.bottomOut)).toHaveLength(1);
   });
 
-  it('fades the engine to silence within 350 ms of a crash and restores it on restart', () => {
+  it('stalls the engine within 450 ms of a crash (gain → 0, pitch sags) and restores it on restart', () => {
     const out = createParams();
     const scratch = createScratch();
     const rng = new Rng(9);
     const s = blankState();
     mapParams(out, s, undefined, 1 / 60, scratch, rng);
     applyEvent(out, { type: 'fault', reason: 'crash', tick: 0, time: 0 }, scratch, rng);
-    for (let i = 1; i <= 24; i++) {
+    s.time = 12 / 60;
+    mapParams(out, s, undefined, 1 / 60, scratch, rng);
+    expect(out.engineGain).toBeGreaterThan(0.3);
+    expect(out.rpm).toBeLessThan(1500); // sagging while it dies
+    for (let i = 13; i <= 30; i++) {
       s.time = i / 60;
       mapParams(out, s, undefined, 1 / 60, scratch, rng);
     }
     expect(out.engineGain).toBe(0);
-    expect(out.duckDb).toBe(0); // 400 ms > 300 ms hold
+    expect(out.rpm).toBeCloseTo(1500 * (1 - 0.55));
+    expect(out.duckDb).toBe(0); // 500 ms > 300 ms hold
     applyEvent(out, { type: 'restart', checkpoint: -1, tick: 0 }, scratch, rng);
     s.time = 0;
     mapParams(out, s, undefined, 1 / 60, scratch, rng);
     expect(out.engineGain).toBe(1);
+    expect(out.rpm).toBe(1500);
+  });
+
+  it('flags the slipping auto-clutch and the crashed-frame scrape', () => {
+    const out = createParams();
+    const scratch = createScratch();
+    const rng = new Rng(5);
+    const s = blankState();
+    s.engine = { rpm: 3500, throttleEff: 1, limiter: false };
+    for (let i = 0; i < 30; i++) {
+      s.time = i / 60;
+      mapParams(out, s, undefined, 1 / 60, scratch, rng);
+    }
+    expect(out.clutch).toBeGreaterThan(0.9);
+    s.wheels.rear.spinVel = 10 / 0.34; // wheel caught up → engaged
+    for (let i = 30; i < 60; i++) {
+      s.time = i / 60;
+      mapParams(out, s, undefined, 1 / 60, scratch, rng);
+    }
+    expect(out.clutch).toBeLessThan(0.05);
+    expect(out.scrape).toBe(0);
+    s.faulted = 'crash';
+    s.ragdoll = [];
+    s.bike.vel.x = 4;
+    s.time = 61 / 60;
+    mapParams(out, s, undefined, 1 / 60, scratch, rng);
+    expect(out.scrape).toBeCloseTo(0.5);
+  });
+
+  it('scales landings by the 1.4 g impulse distribution and ignores wheel settling', () => {
+    const out = createParams();
+    const scratch = createScratch();
+    const rng = new Rng(6);
+    const s = blankState();
+    mapParams(out, s, undefined, 1 / 60, scratch, rng);
+    const gainFor = (impulse: number): number => {
+      out.transientCount = 0;
+      applyEvent(out, { type: 'land', impulse, wheel: 'rear', surface: 'dirt', tick: 0 }, scratch, rng);
+      return out.transientCount ? out.transients[0]!.gain : 0;
+    };
+    expect(gainFor(3)).toBe(0);
+    expect(gainFor(10)).toBeGreaterThan(0.15);
+    expect(gainFor(10)).toBeLessThan(0.35);
+    expect(gainFor(60)).toBeGreaterThan(0.6);
+    expect(gainFor(60)).toBeLessThan(0.75);
+    expect(gainFor(210)).toBe(1);
   });
 
   it('requests -6 dB ducking for 300 ms after a crash and -3 dB after UI beats', () => {
@@ -133,6 +186,36 @@ describe('mapParams (pure model)', () => {
     s.time = 2 / 60;
     mapParams(out, s, undefined, 1 / 60, scratch, rng);
     expect(out.duckDb).toBe(9);
+  });
+
+  it('emits one plank thud per 0.24 m board joint on wood, sample-placed inside the update', () => {
+    const out = createParams();
+    const scratch = createScratch();
+    const rng = new Rng(8);
+    const s = blankState();
+    s.contacts = { rear: 'wood', front: 'wood' };
+    s.wheels.rear.spinVel = 10 / 0.34;
+    s.wheels.front.spinVel = 10 / 0.34;
+    s.bike.vel.x = 10;
+    let planks = 0;
+    let maxDelay = 0;
+    for (let i = 0; i < 61; i++) {
+      s.time = i / 60;
+      out.transientCount = 0;
+      mapParams(out, s, undefined, 1 / 60, scratch, rng);
+      for (let k = 0; k < out.transientCount; k++) {
+        const t = out.transients[k]!;
+        if (t.kind === TK.plank) {
+          planks++;
+          maxDelay = Math.max(maxDelay, t.delay);
+        }
+      }
+    }
+    // two wheels × 10 m/s ÷ 0.24 m ≈ 83 joints per second
+    expect(planks).toBeGreaterThan(78);
+    expect(planks).toBeLessThan(88);
+    expect(maxDelay).toBeGreaterThan(0);
+    expect(maxDelay).toBeLessThanOrEqual(1 / 60);
   });
 
   it('is allocation-stable: the transient pool identity never changes', () => {

@@ -44,6 +44,7 @@ export class WebAudioSystem implements AudioSystem {
   private disposed = false;
   private track: CompiledTrack | null = null;
   private seed = 0;
+  private onVisibility: (() => void) | null = null;
   readonly renderOffline: ((recordingJson: string, seconds: number) => Promise<Float32Array>) | undefined;
 
   constructor(private readonly opts: WebAudioOptions = {}) {
@@ -77,9 +78,19 @@ export class WebAudioSystem implements AudioSystem {
         return Promise.resolve();
       }
       const ctx = this.ctx;
-      ctx.onstatechange = () => {
+      const kick = (): void => {
+        if (this.disposed || this.ctx !== ctx) return;
         if ((ctx.state as string) === 'interrupted' || ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
       };
+      // Safari suspends/interrupts on phone calls, tab switches and the lock screen; resume
+      // when the state flips and again when the page becomes visible (iOS needs the latter).
+      ctx.onstatechange = kick;
+      if (typeof document !== 'undefined') {
+        this.onVisibility = () => {
+          if (document.visibilityState === 'visible') kick();
+        };
+        document.addEventListener('visibilitychange', this.onVisibility);
+      }
     }
     const ctx = this.ctx;
     // Kick resume() synchronously inside the gesture as well.
@@ -149,6 +160,8 @@ export class WebAudioSystem implements AudioSystem {
 
   dispose(): void {
     this.disposed = true;
+    if (this.onVisibility && typeof document !== 'undefined') document.removeEventListener('visibilitychange', this.onVisibility);
+    this.onVisibility = null;
     const b = this.backend;
     if (b?.kind === 'worklet') {
       b.node.port.postMessage({ stop: true });

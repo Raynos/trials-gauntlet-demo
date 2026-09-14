@@ -15,6 +15,9 @@ import {
   P_AIRBORNE,
   P_AMBIENT_GAIN,
   P_BIOME,
+  P_CLUTCH,
+  P_SCRAPE,
+  P_SPEED,
   P_CHAIN_HZ,
   P_DUCK_DB,
   P_ENGINE_GAIN,
@@ -42,7 +45,7 @@ export const TRIMS = {
   tyres: dbToGain(-5),
   chassis: dbToGain(0),
   ambient: dbToGain(-4),
-  ui: dbToGain(-4),
+  ui: dbToGain(0),
   master: dbToGain(0),
   reverbUi: 0.3,
   reverbChassis: 0.15,
@@ -62,6 +65,7 @@ export class TrialsSynth {
   readonly engine: EngineVoice;
   readonly tyres: [TyreVoice, TyreVoice];
   readonly skid: SkidVoice;
+  readonly scrape: SkidVoice;
   readonly chain: ChainVoice;
   readonly pool: VoicePool;
   readonly ambience: Ambience;
@@ -101,6 +105,7 @@ export class TrialsSynth {
     this.engine = new EngineVoice(sampleRate, seed ^ 0x1111);
     this.tyres = [new TyreVoice(sampleRate, seed ^ 0x2222), new TyreVoice(sampleRate, seed ^ 0x3333)];
     this.skid = new SkidVoice(sampleRate, seed ^ 0x4444);
+    this.scrape = new SkidVoice(sampleRate, seed ^ 0x4445);
     this.chain = new ChainVoice(sampleRate, seed ^ 0x5555);
     this.pool = new VoicePool(sampleRate, seed ^ 0x6666);
     this.ambience = new Ambience(sampleRate, seed ^ 0x7777);
@@ -124,10 +129,11 @@ export class TrialsSynth {
 
   /** Apply one packed AudioParams frame; transients are queued immediately. */
   setParams(p: Float32Array): void {
-    this.engine.set(p[P_RPM]!, p[P_LOAD]!, p[P_LIMITER]! > 0.5, p[P_ENGINE_GAIN]!);
+    this.engine.set(p[P_RPM]!, p[P_LOAD]!, p[P_LIMITER]! > 0.5, p[P_ENGINE_GAIN]!, p[P_CLUTCH]!, p[P_SPEED]!);
     this.tyres[0].set(p[P_TYRE_SPEED]!, p[P_TYRE_SURFACE]!);
     this.tyres[1].set(p[P_TYRE_SPEED + 1]!, p[P_TYRE_SURFACE + 1]!);
     this.skid.set(p[P_SKID]!);
+    this.scrape.setScrape(p[P_SCRAPE]!);
     const airborne = p[P_AIRBORNE]! > 0.5;
     this.chain.set(p[P_CHAIN_HZ]!, airborne);
     const biome = Math.round(p[P_BIOME]!);
@@ -178,6 +184,8 @@ export class TrialsSynth {
     this.tyres[0].process(bR, 0, n);
     this.tyres[1].process(bF, 0, n);
     this.skid.process(bR, 0, n);
+    this.scrape.process(this.bChassis[0], 0, n);
+    this.scrape.process(this.bChassis[1], 0, n);
     this.chain.process(bC, 0, n);
     this.ambience.process(this.bAmbient[0], this.bAmbient[1], 0, n, this.pool);
     this.pool.process(this.buses, 0, n);

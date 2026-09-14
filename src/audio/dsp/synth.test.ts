@@ -186,7 +186,7 @@ describe('TrialsSynth (offline, node)', () => {
     expect(Math.abs(before - after)).toBeLessThan(1);
   });
 
-  it('restart hard-stops chassis voices: ≤ -60 dBFS within 10 ms, no leaked tails', () => {
+  it('restart hard-stops chassis voices within 10 ms; only the starter blip follows, no leaked tails', () => {
     const crashAt = 1.0;
     const restartAt = 1.3;
     const r = renderScript(
@@ -200,7 +200,9 @@ describe('TrialsSynth (offline, node)', () => {
     );
     const x = mono(r);
     expect(rmsDb(x, (restartAt - 0.1) * SR, restartAt * SR)).toBeGreaterThan(-50); // crash ring was audible
-    for (let t = restartAt + 0.01; t < 2.4; t += 0.1) {
+    expect(rmsDb(x, (restartAt + 0.01) * SR, (restartAt + 0.02) * SR)).toBeLessThanOrEqual(-60); // cut
+    expect(rmsDb(x, (restartAt + 0.05) * SR, (restartAt + 0.25) * SR)).toBeGreaterThan(-50); // starter whir
+    for (let t = restartAt + 0.7; t < 2.4; t += 0.1) {
       expect(rmsDb(x, t * SR, (t + 0.1) * SR)).toBeLessThanOrEqual(-60);
     }
   });
@@ -224,6 +226,23 @@ describe('TrialsSynth (offline, node)', () => {
       expect(db, `biome ${b}`).toBeGreaterThan(-45);
       expect(db, `biome ${b}`).toBeLessThan(-20);
     }
+  });
+
+  it('grate whines at the bar-crossing rate v / 0.05 m', () => {
+    const v = 8; // → 160 Hz
+    const r = renderScript(
+      steady((s) => {
+        s.engine.rpm = 1500;
+        s.wheels.rear.spinVel = v / 0.34;
+        s.wheels.front.spinVel = v / 0.34;
+        s.contacts = { rear: 'grate', front: 'grate' };
+      }),
+      2.0,
+      { solo: 'tyres' },
+    );
+    const x = mono(r);
+    const got = fundamentalHz(x, 1.0 * SR, 1.5 * SR, 100, 260);
+    expect(Math.abs(got - v / 0.05) / (v / 0.05)).toBeLessThan(0.03);
   });
 
   it('tyre roll is silent at rest and grows with speed on every surface', () => {

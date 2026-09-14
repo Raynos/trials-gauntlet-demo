@@ -391,6 +391,35 @@ export class VoicePool {
       case 18: // kill
         this.killBuses(true, true, true);
         break;
+      case 19: {
+        // starter: whir (chattering 90 Hz saw → LP) then the catch (a low thump)
+        const v = this.alloc();
+        this.partial(v, 1, 95, 140, 0.25, 0.3, 1);
+        v.gateHz = 14;
+        v.gateDuty = 0.55;
+        v.formant = true;
+        v.f1.peaking(300, 2, 4);
+        v.f2.peaking(900, 2, 2);
+        v.f3.bypass();
+        v.flp.lowpass(1600, 0.7);
+        this.env(v, 0.02, 0.22, 0.06, 0.4);
+        this.finish(v, -22, gain, pan, delay, BUS_CHASSIS, 0.1);
+        const c = this.alloc();
+        this.partial(c, 1, 140, 60, 0.08, 0.16);
+        this.noise(c, 0.5, 0.04, 2, 1, 500, 0.7);
+        this.env(c, 0.002, 0, 0.18, 0.35);
+        this.finish(c, -16, gain, pan, delay + 0.26, BUS_CHASSIS, 0.1);
+        break;
+      }
+      case 20: {
+        // plank: board-joint thud — low knock + short click; brighter/harder with speed (pitch)
+        const v = this.alloc();
+        this.partial(v, 1, 210 + 40 * pitch, 150, 0.03, 0.05);
+        this.noise(v, 0.5 + 0.5 * pitch, 0.006, 0, 2, 1200 + 1500 * pitch, 1.5);
+        this.env(v, 0.0005, 0, 0.05, 0.1);
+        this.finish(v, -21, gain, pan, delay, BUS_CHASSIS, 0.05);
+        break;
+      }
       // -- internal ambience events (>= 100) ------------------------------------
       case 100: {
         // metal creak

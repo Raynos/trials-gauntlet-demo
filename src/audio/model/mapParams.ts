@@ -43,6 +43,7 @@ export interface ModelScratch {
   airborneFor: number;
   wind: number;
   prevSkid: number;
+  clutch: number;
   duckImpactUntil: number;
   duckUiUntil: number;
   /** Time the crash happened (engine fades), or -1. */
@@ -68,6 +69,7 @@ export function createScratch(): ModelScratch {
     airborneFor: 0,
     wind: 0,
     prevSkid: 0,
+    clutch: 0,
     duckImpactUntil: -1,
     duckUiUntil: -1,
     crashAt: -1,
@@ -120,8 +122,12 @@ export function mapParams(
   out.load = clamp(state.engine.throttleEff, 0, 1);
   out.limiter = state.engine.limiter ? 1 : 0;
   if (scratch.crashAt >= 0) {
-    out.engineGain = clamp(1 - (now - scratch.crashAt) / ENGINE.crashFadeS, 0, 1);
+    // Stall: the crank sags and dies while the ragdoll flies (physics parks rpm at idle).
+    const k = clamp((now - scratch.crashAt) / ENGINE.crashFadeS, 0, 1);
+    out.engineGain = 1 - k;
+    out.rpm = state.engine.rpm * (1 - ENGINE.stallDrop * k);
     out.load = 0;
+    out.limiter = 0;
   } else {
     out.engineGain = 1;
   }
@@ -143,6 +149,20 @@ export function mapParams(
   out.tyreSurface[0] = rearGround ? surfaceIndex(rearSurf) : -1;
   out.tyreSurface[1] = frontGround ? surfaceIndex(frontSurf) : -1;
 
+  out.speed = clamp(speed / 20, 0, 1);
+  // auto-clutch slipping: crank parked at clutchRpm under throttle while the wheel lags
+  const clutchOn =
+    scratch.crashAt < 0 &&
+    out.load >= ENGINE.clutchThrottle &&
+    Math.abs(state.engine.rpm - ENGINE.clutchRpm) < 80 &&
+    rearRoll < 6;
+  const kClutch = step > 0 ? 1 - Math.exp(-step / 0.06) : 0;
+  scratch.clutch += ((clutchOn ? 1 : 0) - scratch.clutch) * kClutch;
+  out.clutch = scratch.clutch < 0.01 ? 0 : scratch.clutch;
+  // crashed bike scrubbing along the ground on its frame
+  const scraping = state.faulted === 'crash' && state.ragdoll !== null && (rear.grounded || front.grounded) && speed > 0.8;
+  out.scrape = scraping ? clamp(speed / 8, 0, 1) : 0;
+
   // skid: normalised rear slip
   const slip = rearGround ? clamp(Math.abs(state.rearSlip) / Math.max(2, speed), 0, 1) : 0;
   out.skid = slip;
@@ -161,10 +181,18 @@ export function mapParams(
     const spacing = si >= 0 ? TICK_SPACING[si] ?? 0 : 0;
     const v = out.tyreSpeed[w as 0 | 1];
     if (spacing > 0 && v > 0) {
-      scratch.travel[w as 0 | 1] += v * step;
-      if (scratch.travel[w as 0 | 1] >= spacing) {
+      const before = scratch.travel[w as 0 | 1];
+      scratch.travel[w as 0 | 1] = before + v * step;
+      // every joint crossed inside this update, sample-placed by its sub-frame delay
+      let n = 0;
+      while (scratch.travel[w as 0 | 1] >= spacing && n < 4) {
         scratch.travel[w as 0 | 1] -= spacing;
-        pushTransient(out, TK.tick, clamp(v / 12, 0.2, 1), si / 8, w === 0 ? -0.15 : 0.15);
+        n++;
+        const crossed = n * spacing - before;
+        const delay = v > 0 ? clamp(crossed / v, 0, step) : 0;
+        const pan = w === 0 ? -0.15 : 0.15;
+        if (si === 1) pushTransient(out, TK.plank, clamp(0.35 + v / 20, 0.35, 1), clamp(v / 20, 0, 1), pan, delay);
+        else pushTransient(out, TK.tick, clamp(v / 12, 0.2, 1), si / 8, pan, delay);
       }
     } else {
       scratch.travel[w as 0 | 1] = 0;
@@ -173,19 +201,23 @@ export function mapParams(
 
   // -- chassis edges -------------------------------------------------------
   const wheels = [rear, front] as const;
+  const crashed = state.faulted === 'crash' || state.faulted === 'hazard';
   for (let w = 0; w < 2; w++) {
     const wh = wheels[w]!;
     const i = w as 0 | 1;
     const c = clamp(wh.compression, 0, 1);
     const cv = step > 0 ? (c - scratch.prevCompression[i]) / step : 0;
     if (!scratch.justReset && wh.grounded && scratch.prevGrounded[i]) {
-      if (cv > CHASSIS.thunkVel && now - scratch.lastThunkAt[i] >= CHASSIS.thunkMinGapS) {
+      // a tumbling wreck clatters (sparse metal ticks over the scrape), it does not thunk like a landing
+      const gap = crashed ? CHASSIS.crashClatterGapS : CHASSIS.thunkMinGapS;
+      if (cv > CHASSIS.thunkVel && now - scratch.lastThunkAt[i] >= gap) {
         scratch.lastThunkAt[i] = now;
-        pushTransient(out, TK.thunk, clamp((cv - CHASSIS.thunkVel) / 12 + 0.3, 0.3, 1), 0, w === 0 ? -0.15 : 0.15);
+        if (crashed) pushTransient(out, TK.tick, 0.6, 2 / 8, w === 0 ? -0.3 : 0.3);
+        else pushTransient(out, TK.thunk, clamp((cv - CHASSIS.thunkVel) / 12 + 0.3, 0.3, 1), 0, w === 0 ? -0.15 : 0.15);
       }
     }
     const bottom = c >= CHASSIS.bottomOut;
-    if (bottom && !scratch.bottomedOut[i] && !scratch.justReset) {
+    if (bottom && !scratch.bottomedOut[i] && !scratch.justReset && !crashed) {
       pushTransient(out, TK.bottomOut, 1, 0, w === 0 ? -0.2 : 0.2);
     }
     scratch.bottomedOut[i] = bottom;

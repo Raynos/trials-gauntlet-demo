@@ -22,6 +22,11 @@ export interface OfflineOptions {
   solo?: SynthOptions['solo'];
   /** Emit 3-2-1-GO before the first tick (adds 3 s); default false: `go` at t = 0. */
   countdown?: boolean;
+  /**
+   * Mirror the game rule (CONTRACT §2.8): reset to the last checkpoint this many seconds after a
+   * crash/hazard fault unless the recording restarts first. Default 1.0; 0 disables.
+   */
+  autoRestartS?: number;
   /** Called per update with the state (tests use it to log rpm etc.). */
   onUpdate?: (u: number, state: PhysicsState, driver: ModelDriver) => void;
   /** Called for every event the physics emitted (after the model saw it). */
@@ -109,6 +114,8 @@ export async function renderRecording(
     opts.onEvent?.(0, e);
   }
   let lastState = physics.getState();
+  const autoRestart = opts.autoRestartS ?? 1.0;
+  let crashedAt = -1;
   for (let u = 0; u < updates; u++) {
     if (u < preroll) {
       if (u % updateHz === 0) {
@@ -123,9 +130,27 @@ export async function renderRecording(
         for (const e of physics.drainEvents()) {
           driver.onEvent(e);
           opts.onEvent?.(u, e);
+          if (e.type === 'fault' && (e.reason === 'crash' || e.reason === 'hazard')) crashedAt = u;
+          if (e.type === 'restart') crashedAt = -1;
         }
       }
       lastState = physics.getState();
+      if (crashedAt >= 0 && autoRestart > 0 && u - crashedAt >= autoRestart * updateHz) {
+        crashedAt = -1;
+        physics.reset(lastState.checkpoint);
+        let sawRestart = false;
+        for (const e of physics.drainEvents()) {
+          if (e.type === 'restart') sawRestart = true;
+          driver.onEvent(e);
+          opts.onEvent?.(u, e);
+        }
+        if (!sawRestart) {
+          const e: GameEvent = { type: 'restart', checkpoint: lastState.checkpoint, tick: 0 };
+          driver.onEvent(e);
+          opts.onEvent?.(u, e);
+        }
+        lastState = physics.getState();
+      }
     }
     const packed = driver.update(lastState, 1 / updateHz, current);
     opts.onUpdate?.(u, lastState, driver);

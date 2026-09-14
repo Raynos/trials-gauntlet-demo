@@ -1,6 +1,6 @@
 # Audio design — procedural Web Audio for the trials gauntlet
 
-Status: **round 1 implemented** (`src/audio/**`). Owner paths: `src/audio/**`, this file.
+Status: **round 2 implemented** (`src/audio/**`; retuned to physics 2bdd175: auto-clutch launch, 1.4 g impulses, rebounding suspension, stalling crash). Owner paths: `src/audio/**`, this file.
 Binding contract: `docs/design/CONTRACT.md` §2.3 (audio consumes `state.engine`, never
 re-derives rpm), §2.7 (`AudioSystem.update(state, dt, input)` + optional `renderOffline`),
 §2.8 (unlock on first touch/key). Where this file and CONTRACT disagree, CONTRACT wins.
@@ -28,10 +28,11 @@ single-cylinder trials engine that carries the mix, dry chassis thunks, tiny UI,
    countdown/GO from the game's events. The model only smooths, edge-detects and scales.
 4. **Restart is instant.** The `restart` event hard-stops every chassis/UI voice within
    5 ms, drops pending delayed one-shots, mutes and clears the reverb, and the engine is
-   back at its live level on the next block. Measured: chassis bus −34.6 dBFS before →
-   −200 dBFS (digital silence) 10 ms after.
-5. **Budget.** Whole mix ≈ 0.33 ms of CPU per 60 Hz frame in node (51× realtime);
-   main-thread `update()` 0.044 ms/frame in Chromium; worklet chunk 8.4 KB gz.
+   back at its live level on the next block (a 0.3 s starter whir + catch plays over it).
+   Measured: chassis bus −34.6 dBFS before → ≤ −60 dBFS at +10 ms; nothing but the
+   starter follows.
+5. **Budget.** Whole mix ≈ 0.28 ms of CPU per 60 Hz frame in node (59× realtime);
+   main-thread `update()` 0.03–0.04 ms/frame in Chromium; worklet chunk 8.4 KB gz.
 
 ## 1. Integration (what the core-game owner wires)
 
@@ -95,7 +96,9 @@ src/audio/
 
 ```ts
 interface AudioParams {
-  rpm; load; limiter; engineGain;          // physics engine + crash fade (1 → 0 over 350 ms)
+  rpm; load; limiter; engineGain;          // physics engine; on a crash the engine stalls: gain 1 → 0 and the
+                                           // audible rpm sags 55 % over 450 ms (physics parks rpm at idle)
+  clutch; scrape; speed;                   // auto-clutch slipping (0..1), crashed frame scrubbing (0..1), speed/20
   tyreSpeed: [rear, front]; tyreSurface: [rear, front];   // m/s, surface index or -1 airborne
   skid;                                   // 0..1 = clamp(|rearSlip| / max(2, speed))
   chainHz;                                // rear spinVel/2π · 42 teeth, 0 below 1.5 m/s
@@ -105,44 +108,50 @@ interface AudioParams {
   transients[24]: { kind, gain, pitch, pan, delay }; transientCount;
 }
 ```
-Packed as a 136-float `Float32Array` (`packParams`) — one `postMessage` per frame. Transient
+Packed as a 140-float `Float32Array` (`packParams`) — one `postMessage` per frame. Transient
 kinds (`TRANSIENT_KINDS`): landing, thunk, bottomOut, impact, debris, grunt, fault, tick,
-skidChirp, countdown, go, checkpoint, restart, finishTick, fanfare, firework, crowd, hazard, kill.
+skidChirp, countdown, go, checkpoint, restart, finishTick, fanfare, firework, crowd, hazard, kill,
+starter, plank.
 `delay` lets one event schedule a whole cue (stamp +200 ms, fanfare 80 ms apart, fireworks
 over 1.2 s) sample-accurately; a restart discards anything still pending.
 
 ## 4. Sources
 
-### 4.1 Engine (`dsp/engine.ts`) — single-cylinder 4-stroke
+### 4.1 Engine (`dsp/engine.ts`) — 250 cc single-cylinder 4-stroke trials engine
 
-`fFire = rpm / 120` (one power stroke per two revs): 12.5 Hz at idle, 83.3 Hz at redline.
-rpm/load are de-zippered per block (τ 8 ms / 4 ms) — physics already owns the dynamics.
+What a 4T trials engine (Montesa 4RT / Beta Evo 4T) sounds like, and how the model gets there:
 
-- **Exhaust pulse** per firing cycle: `A·exp(−t/4.5 ms)·(0.6·sin(2π·(190+60·load)·t) + 0.4·noise)`,
-  `A = 0.35 + 0.65·load` ±8 % seeded jitter; overrun pop (load < 0.08, rpm > 3200,
-  P = 0.12 per cycle) ×2.2 with τ 9 ms; through body resonance peaking 110 Hz Q 8 +4 dB.
-- **Harmonic bank**: partials 1..10 at n·fFire, gain n^−k, k = 1.4 − 0.7·load, even ×0.8.
-- **Chamber formants** (series): peaking 240 Hz Q 5 +9 dB, 620 Hz Q 4 +6 dB, lowpass
-  2600 + 3800·load Hz, highpass 45 Hz.
-- **Intake**: white → bandpass 900 + 1800·load Hz Q 0.9, −22 + 10·load dB.
-- **Limiter**: every 3rd cycle emits nothing while `limiter` (2/3 duty; measured −1.8 dB stutter).
-- Level dB = −19 + 12·load + 2·(rpm−1500)/8500, × `engineGain`; centre-panned.
+| real engine | model |
+|---|---|
+| low, soft "putt-putt" idle at ~1500 rpm — each power stroke is a rounded thump, 12.5/s, energy 50–250 Hz, almost no top end | exhaust pulse `A·exp(−t/τ)·(0.7·sin(2π·fp·t) + noise)` with τ = 10 ms and fp = 120 Hz at idle, through muffler resonances 130 Hz Q 3 +6 dB / 380 Hz Q 2.5 +3 dB and a lowpass at 1400 Hz; the noise share of the pulse is only 0.15 at idle |
+| a hard, throaty bark the instant the throttle opens; the note gets shorter and harder | τ → 4 ms and fp → 210 Hz at load 1; pulse amplitude 0.5 → 1.0; lowpass opens to 4600 Hz; harmonic-bank tilt k = 1.6 → 0.8 |
+| the airbox "honk" under load (intake resonance ~400–700 Hz) — the thing that says *4T*, absent at idle | the same pulse train excites a resonator BP 380 + 300·load Hz Q 5 with gain ∝ load² (silent at idle) |
+| mechanical ticking (valve train) under the idle | 1 ms clicks at 2·fFire (cam), −34 dB |
+| no two-stroke ring, no 2–3 kHz whistle | no resonance above 380 Hz; intake noise is a broad BP 700 + 1200·load Hz at −26 + 12·load dB |
+| the slipping auto-clutch off the line: the crank parks at ~3500 while the wheel catches up | `clutch` from the model (load ≥ 0.25, rpm within 80 of 3500, rear roll < 6 m/s, τ 60 ms) adds a gated 2.8 kHz whine with 30 Hz chatter at −30 dB — the distinct held note is physics' 3500 hold itself |
+| rev limiter stutter | every 3rd cycle emits nothing while `limiter` (2/3 duty, −1.8 dB measured) |
+| overrun pops on a closed throttle | load < 0.08 and rpm > 3200: P 0.12 per cycle ×2 amplitude, τ ×1.6 |
+| the engine dies in a crash | model: gain 1 → 0 and audible rpm sags 55 % over 450 ms; a `starter` whir (chattering 95 → 140 Hz saw, 14 Hz gate, 0.25 s) + catch thump plays on every respawn / track load |
 
-Measured: fundamental tracks rpm/120 with ≤ 0.05 % error from 1500 to 10 000 rpm
-(autocorrelation on the engine solo); throttle step 0 → 1 adds +19.8 dB and reaches 50 %
-of that within the first 5 ms window after the update (< 20 ms end-to-end incl. the
-16.7 ms update interval).
+`fFire = rpm / 120`; rpm/load de-zippered per block (τ 8 / 4 ms) — physics owns the dynamics.
+Level dB = −18 + 12·load + 2·(rpm−1500)/8500 + 2·speed/20, × `engineGain`; centre-panned.
+
+Measured: fundamental tracks rpm/120 with ≤ 0.07 % error from 1500 to 10 000 rpm
+(autocorrelation on the engine solo); throttle step 0 → 1 adds +13 dB and reaches 50 % of that
+inside the first 5 ms window after the update (< 20 ms end-to-end incl. the 16.7 ms update).
+On the flat-test recording the launch reads as: idle comb → 0.25 s climb → a held comb at
+29 Hz firing (3500 rpm) for ~0.45 s with the clutch whine on top → the climb to the limiter.
 
 ### 4.2 Tyres, skid, chain (`dsp/tyres.ts`)
 
 | surface | noise → filter (v m/s) | extras | base @10 m/s |
 |---|---|---|---|
 | dirt | brown → LP 900+60v Q 0.6 | crackle grains 25+6v /s, 3 ms, BP 1.8 kHz Q 2 | −18 dB |
-| wood | pink → BP 300+25v Q 1.2 → peak 220 Hz Q 6 +8 | joint tick every 1.2 m (model) | −20 dB |
-| metal | white → HP 700 → peak 1850 Hz Q 8 +4 | ridge tick every 0.31 m (model) | −22 dB |
+| wood | pink → BP 300+25v Q 1.2 → peak 220 Hz Q 6 +8 | **plank thud** per board joint every 0.24 m (0.22 m boards + 2 cm gaps): 210 Hz knock + click, harder/brighter with speed, sample-placed by sub-frame delay, up to 4 per update per wheel (≈ 42/s per wheel at 10 m/s) | −20 dB |
+| metal | white → HP 700 → peak 1850 Hz Q 6 +2 | ridge tick every 0.31 m (model), each ringing 1.85 kHz briefly | −22 dB |
 | concrete | pink → HP 250 → LP 4 kHz | — | −20 dB |
 | rubber | brown → LP 500 → peak 95 Hz Q 4 +6 | — | −24 dB |
-| grate | white → comb (delay 0.05 m / v, fb 0.6) → peak 2.4 kHz Q 8 +6 | — | −19 dB |
+| grate | white → comb (delay 0.05 m / v, fb 0.6) → peak 2.4 kHz Q 8 +6 | **grate whine**: sine + 2nd harmonic at the bar-crossing rate v/0.05 Hz (160 Hz at 8 m/s, tested ±3 %) | −19 dB |
 | stone | pink → HP 200 → LP 3 kHz | clatter grains 12+4v /s, 2 ms, BP 2.5 kHz Q 3 | −19 dB |
 | snow | brown → LP 700 | crunch grains 50+12v /s, 4 ms, BP 1.2 kHz Q 1.5; hiss HP 6 kHz −20 dB | −20 dB |
 
@@ -154,11 +163,18 @@ crosses 0.6 upward. Chain: sines at chainHz and 2·chainHz (−8 dB), 0.3 % seed
 
 ### 4.3 Chassis (`model/mapParams.ts` edges → `dsp/voices.ts` recipes)
 
-- **landing**: from `land` events; gain = clamp(impulse/900, 0.15, 1); pitch = surface.
+- **landing**: from `land` events. `impulse` is the touchdown tick's normal impulse (N·s); the
+  bot corpus at 1.4 g gives p50 ≈ 10, p75 ≈ 30–60, max ≈ 210, with ≤ 5 being a wheel settling.
+  gain = (impulse/120)^0.6, ignored below 5 → 10 N·s ≈ 0.22, 60 ≈ 0.66, ≥ 120 = 1; pitch = surface.
   Recipe: sine 180 → 55 Hz over 60 ms D 140 ms + body 92 Hz D 260 ms + brown LP 600 Hz
   40 ms, −12 dB·gain; dirt/snow: more noise, less sine; metal/grate: + ring 1.85 kHz D 200 ms.
 - **thunk**: grounded wheel with d(compression)/dt > 6 /s → landing at ×0.5, ≥ 80 ms apart.
-- **bottomOut**: compression ≥ 0.97 rising edge → sines 2.2/3.1/4.7 kHz D 180/120/80 ms −16 dB + landing.
+- **bottomOut**: compression ≥ 0.97 rising edge → sines 2.2/3.1/4.7 kHz D 180/120/80 ms −16 dB + landing
+  (the suspension now cycles through 0.9+ on hard landings, so this fires for real; rebound re-arms it).
+- **crashed bike**: while `faulted === 'crash'` with the ragdoll out, the frame scrubbing the ground
+  gives `scrape` = speed/8 → gritty noise HP 400 Hz / LP 3–5 kHz at −24 + 10·scrape dB (chassis bus);
+  suspension hits become sparse metal clatter ticks (≥ 250 ms apart) instead of landing thunks, and
+  bottom-outs are muted — a wreck rattles, it does not thump like a landing.
 - **crash** (`fault: crash`): impact ×2 (thud 95 → 40 Hz + crunch BP 800 Hz + frame ring
   1.32/2.07/3.41 kHz, second layer +35 ms pan +0.3 −3 dB); 6 seeded debris grains over 0.4 s
   (−3 dB/grain); **grunt** at +40 ms: sawtooth glottal source f0 130 → 95 Hz (3 % seeded
@@ -215,8 +231,11 @@ Bus trims (dB): engine −6, tyres −5, chassis 0, ambient −4, ui −4, maste
 `setMasterVolume(v)` applies `v²`. Ducking: `duckDb` from the model, smoothed in the synth
 (attack 15 ms, release 120 ms). Measured on the engine solo: −6.1 dB during a hard landing.
 
-Gauntlet render (17 s, all sources): **−16.7 LUFS integrated, −4.5 dBTP, LRA 14 LU**;
-solos: engine −16.2, tyres −29.2, chassis −29.8, ambient −28.8, ui −28.9 LUFS.
+Gauntlet render (17 s, all sources): **−17.3 LUFS integrated, −4.2 dBTP, LRA 12 LU**;
+solos: engine −17.5, tyres −29.3, chassis −30, ambient −28.9, ui −25 LUFS (GO peaks −9 dBFS,
+fault stamp −12, checkpoint −16: the cues sit on top of the engine, plus the 3 dB UI duck).
+Real recordings through the bike physics: flat-test-clear (flat out) −14.3 LUFS, b3-kicker-row
+bot-3 −17.6, e3-stairway bot-3 −18.2, x2-pipe-dream bot-3 −18.3; every peak −4.2..−4.5 dBTP.
 
 ## 6. Offline rendering & headless verification (`offline.ts`, `tools/renderDemo.ts`)
 
@@ -224,7 +243,10 @@ solos: engine −16.2, tyres −29.2, chassis −29.8, ambient −28.8, ui −28
 (2 physics ticks each), feeds every drained event to the model, packs, and lets the synth
 render exactly 800 samples per update — sample-aligned, seeded, byte-identical. Optional
 `countdown: true` prepends 3-2-1-GO (3 s); otherwise `go` fires at t = 0 so the WAV lines up
-with the replay's tick clock. `renderScript(script, seconds, opts)` does the same from a
+with the replay's tick clock. `autoRestartS` (default 1.0, mirroring CONTRACT §2.8) resets physics
+to the last checkpoint one second after a crash/hazard fault — what the player hears — unless the
+recording restarts first; 0 disables. Recording renders default to the real `bikePhysicsFactory`
+(`--physics mock` for the mock). `renderScript(script, seconds, opts)` does the same from a
 `StateScript` (no physics) — this is how the tests and the gauntlet WAV are made.
 
 ```
@@ -236,8 +258,9 @@ writes `<name>.wav`, `<name>.spectrogram.png` (`showspectrumpic`, log/log 20 Hz�
 samplePeakDbfs, realtimeRatio}`. A harness stage can call `__trials.audio.renderOffline`
 in the page instead; it is the same code path.
 
-**Vitest (node, no AudioContext)** — 17 tests: golden `mapParams` stream hash
-(`630345ed50a2834b` over the gauntlet), transient causality, physics passthrough, surface
+**Vitest (node, no AudioContext)** — 21 tests: golden `mapParams` stream hash
+(`eea714701daae4d1` over the gauntlet), clutch/scrape flags, landing impulse curve, plank-joint
+rate, grate whine pitch, crash stall + starter, transient causality, physics passthrough, surface
 mapping, first-frame-after-restart suppression, crash fade/restore, duck request levels,
 allocation stability; DSP: byte-identical double render under −1 dBTP, pitch ≤ 3 % (actual
 ≤ 0.05 %), blip < 20 ms, limiter duty, countdown onsets ±8 ms / 1.000 ± 0.002 s, duck −6 ± 1 dB,
@@ -247,14 +270,21 @@ silent at rest and louder with speed.
 ## 7. Mobile / browser behaviour (`graph/webAudio.ts`)
 
 - iOS Safari: `AudioContext` constructed synchronously inside `unlock()` (call from the
-  gesture); `resume()` fired synchronously as well; `statechange` → auto-resume when
-  `interrupted`/`suspended`. The device sample rate (44.1 or 48 kHz) is passed to the synth.
+  gesture — verified: the context exists and is `running` before `unlock()`'s promise settles);
+  `resume()` fired synchronously as well; `statechange` and `visibilitychange` (page visible
+  again) → auto-resume when `interrupted`/`suspended` (verified: suspended → running after a
+  synthetic visibilitychange). The device sample rate (44.1 or 48 kHz) is passed to the synth.
 - AudioWorklet (iOS ≥ 14.5, all evergreen): `addModule(workletUrl)` with a 4 s timeout;
   on failure → `FallbackGraph` (native oscillators: saw 4·fFire + square 2·fFire → lowpass,
   looped seeded-noise tyres/wind, oscillator/noise one-shots for the main cues). Same
   packed params; `backendKind` reports which is live.
-- Verified in headless Chromium: worklet backend unlocks in 131 ms, context running at
-  48 kHz, main-thread `update()` 0.044 ms/frame; fallback backend also runs.
+- Verified in headless Chromium: worklet backend unlocks in 113–164 ms, context running at
+  48 kHz, main-thread `update()` 0.03–0.04 ms/frame; fallback backend unlocks in 3 ms.
+- Fallback determinism: the fallback's *parameter stream* is the same deterministic model output,
+  and a static fallback graph renders bit-identically in `OfflineAudioContext`; with per-frame
+  `setTargetAtTime` automation Chromium's native AudioParam evaluation differs by ≤ 1.5e-8
+  (1 float ulp, ~2 % of samples) between two renders. Byte-exact evidence therefore always
+  comes from `renderOffline` (the worklet synth run directly), never from a native graph.
 - Size: worklet chunk 24.3 KB min / **8.4 KB gz**; main-thread audio code ≲ 10 KB gz
   (well under the 40 KB budget). No node allocation per frame (one `Float32Array` copy).
 
@@ -264,9 +294,10 @@ silent at rest and louder with speed.
   `?audio=0` opt-out), call `unlock()` from the first gesture, pass `this.input` in
   `Game.render`, call `audio.setTrack(compiled, seed)` from `loadTrack`, and expose
   `hook.audio = { renderOffline }`. Until then the game runs `NullAudio`.
-- `MockPhysics` keeps `engine.rpm` at 1500 / `throttleEff` 0 and emits no `land` events, so
-  recording renders through it are idle-only; the gauntlet fixture stands in until the real
-  `PhysicsWorld` lands.
+- Physics at 2bdd175 reports `engine.rpm` = 1500 (not 0) while ragdolling; the stall is audio's
+  presentation (gain + pitch sag). If physics later drives rpm → 0 the sag simply follows it.
+- The bot recordings under `harness/inputs/*/bot-*.json` were being regenerated for the frozen
+  physics while this round ran (several replay to an early crash); renders above use them as-is.
 - Live per-frame timing jitter means a live capture is not bit-identical to the offline
   render (accepted; offline is the reference artefact).
 - The worklet's parameter delivery is per-frame `postMessage`; if the harness ever needs

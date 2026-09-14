@@ -98,10 +98,15 @@ export function gauntletScript(updateHz = 60, marks: GauntletMarks = GAUNTLET): 
     let slip = 0;
 
     if (t >= marks.throttleStart && t < marks.limiterStart) {
-      const k = (t - marks.throttleStart) / (marks.limiterStart - marks.throttleStart);
+      // physics launch: crank 1500 → 3500 in 0.25 s, auto-clutch holds 3500 until the wheel
+      // catches up (~0.7 s), then the revs climb to the limiter with speed
+      const dtL = t - marks.throttleStart;
+      const k = dtL / (marks.limiterStart - marks.throttleStart);
       load = 1;
-      rpm = lerp(1500, 10000, Math.pow(k, 0.7));
-      vx = lerp(0, 18, k);
+      if (dtL < 0.25) rpm = lerp(1500, 3500, dtL / 0.25);
+      else if (dtL < 0.7) rpm = 3500;
+      else rpm = lerp(3500, 10000, Math.pow((dtL - 0.7) / (marks.limiterStart - marks.throttleStart - 0.7), 0.8));
+      vx = dtL < 0.7 ? lerp(0, 5, dtL / 0.7) : lerp(5, 18, (dtL - 0.7) / (marks.limiterStart - marks.throttleStart - 0.7));
       slip = k < 0.15 ? 4 : 0;
     } else if (t >= marks.limiterStart && t < marks.takeoff) {
       load = 1;
@@ -124,14 +129,14 @@ export function gauntletScript(updateHz = 60, marks: GauntletMarks = GAUNTLET): 
       const k = (t - marks.landing) / 0.12;
       compression = k < 1 ? lerp(0.2, 1.0, k) : lerp(1.0, 0.3, (t - marks.landing - 0.12) / 0.3);
       once('land', () => {
-        emit({ type: 'land', impulse: 900, wheel: 'rear', surface: 'dirt', tick: u * 2 });
-        emit({ type: 'land', impulse: 500, wheel: 'front', surface: 'dirt', tick: u * 2 + 2 });
+        emit({ type: 'land', impulse: 150, wheel: 'rear', surface: 'dirt', tick: u * 2 });
+        emit({ type: 'land', impulse: 60, wheel: 'front', surface: 'dirt', tick: u * 2 + 2 });
       });
     } else if (t >= marks.crash && t < marks.restart) {
       once('crash', () => emit({ type: 'fault', reason: 'crash', tick: u * 2, time: t }));
-      rpm = 2500;
-      vx = 0;
-      grounded = false;
+      rpm = 1500;
+      vx = lerp(9, 0, (t - marks.crash) / 0.8);
+      grounded = t - marks.crash > 0.15;
       compression = 0;
     } else if (t >= marks.restart && t < marks.finish) {
       once('restart', () => {
@@ -177,7 +182,9 @@ export function gauntletScript(updateHz = 60, marks: GauntletMarks = GAUNTLET): 
     s.contacts.rear = grounded ? surface : null;
     s.contacts.front = grounded ? surface : null;
     s.rearSlip = slip;
-    s.faulted = t >= marks.crash && t < marks.restart ? 'crash' : null;
+    const crashed = t >= marks.crash && t < marks.restart;
+    s.faulted = crashed ? 'crash' : null;
+    s.ragdoll = crashed ? [] : null;
     s.finished = t >= marks.finish;
     if (t >= marks.restart && t < marks.restart + dt) fired = { ...fired, land: false };
     return s;
