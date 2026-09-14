@@ -1,0 +1,5 @@
+# Caches and intermediates (hundreds of MB, rebuildable by `npx tsx harness/timelapse/index.mts`).
+# The deliverables stay: progress-stills.mp4, progress-clips.mp4, progress.gif, commits.json, render.json.
+builds/
+captures/
+render/
