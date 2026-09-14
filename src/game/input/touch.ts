@@ -22,9 +22,8 @@
  * A pointer only ever leaves the Map through its own end event, the raw
  * stream saying zero fingers, focus loss, or the watchdog.
  *
- * Coordinates: `clientX/Y` are physical; every hit-test goes through
- * `toLogical` (src/ui/orientation.ts) so the zones sit in the game's frame
- * when the page is rotated for forced landscape.
+ * Coordinates: every hit-test goes through `toLogical` (src/ui/orientation.ts),
+ * an identity today (rotate-to-play; forced landscape was abandoned, game.md §11).
  */
 import type { InputFrame } from '../../core/types';
 import { isForcedLandscape, logicalRect, toLogical, type Point } from '../../ui/orientation';

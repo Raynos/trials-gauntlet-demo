@@ -51,18 +51,8 @@ export const TOKENS_CSS = /* css */ `
   --sar: env(safe-area-inset-right, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
-  /* Viewport units go through these so forced landscape (src/ui/orientation.ts) can point them at the logical size. */
+  /* Viewport units go through these tokens (one place to redefine them). */
   --vw: 1vw; --vh: 1vh;
-}
-/* Forced landscape: a portrait touch viewport is rotated 90° clockwise into a landscape game (orientation.ts sets
-   --lw/--lh/--vw/--vh and the class). The game's top edge lies on the phone's physical right edge, its left edge on the
-   physical top (notch): held notch-left / home-indicator-right it reads upright. Safe-area insets rotate with it. */
-html.forced-landscape #app { position: fixed; inset: auto; top: 0; left: 0; width: var(--lw); height: var(--lh); transform-origin: top left; transform: rotate(90deg) translateY(-100%); will-change: transform; backface-visibility: hidden; }
-html.forced-landscape {
-  --sat: env(safe-area-inset-right, 0px);
-  --sar: env(safe-area-inset-bottom, 0px);
-  --sab: env(safe-area-inset-left, 0px);
-  --sal: env(safe-area-inset-top, 0px);
 }
 html { font-size: clamp(13px, calc(1.25 * var(--vw)) + 4px, 18px); }
 #ui, #ui * { box-sizing: border-box; }
@@ -367,6 +357,16 @@ export const HUD_CSS = /* css */ `
 .tz-pause { left: calc(.8rem + var(--sal)); }
 .hud.touch .hud-top { padding-left: calc(4.8rem + var(--sal)); padding-right: calc(4.8rem + var(--sar)); }
 .hud.touch .hints { bottom: calc(3.6rem + var(--sab)); }
+
+/* ---- landscape prompt (rotate-to-play) ------------------------------- */
+.rotate { position: absolute; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; flex-direction: column; gap: var(--s5); background: radial-gradient(120% 90% at 50% 30%, #1a1409 0%, var(--bg) 70%); color: var(--ink); text-align: center; padding: calc(var(--s6) + var(--sat)) var(--s5) calc(var(--s6) + var(--sab)); pointer-events: auto; }
+.rotate .wordmark { font-size: clamp(3rem, 16vw, 5rem); text-align: center; }
+.rotate .msg { font-size: 1rem; font-weight: 700; letter-spacing: .34em; text-transform: uppercase; color: var(--ink-dim); }
+.rotate i { display: block; width: 3rem; height: 5.2rem; border: 3px solid var(--amber); border-radius: var(--r2); box-shadow: 0 0 24px -6px var(--amber); animation: rot 1.6s var(--ease) infinite; }
+.rotate .btn.reload { min-height: 56px; padding: 0 var(--s6); font-size: 1rem; margin-top: var(--s3); }
+.rotate .build { position: absolute; bottom: calc(var(--s4) + var(--sab)); left: 0; right: 0; font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; opacity: .4; }
+@keyframes rot { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
+@media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate.armed { display: flex; } }
 
 /* Short landscape phones (844×390): tighter type, single-row menus above the fold. html.short = logical height ≤ 500 px (orientation.ts). */
 html.short .title-screen .wordmark { font-size: clamp(3rem, calc(9.5 * var(--vw)), 5.2rem); bottom: calc(24% + var(--sab)); }

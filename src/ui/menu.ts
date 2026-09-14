@@ -1,13 +1,12 @@
 /**
- * Pause overlay (same list + amber bar as the main menu) and spatial focus
- * navigation for button grids (results panel). No rotate prompt: a portrait
- * viewport is rotated into landscape instead (src/ui/orientation.ts).
+ * Pause overlay (same list + amber bar as the main menu), spatial focus
+ * navigation for button grids (results panel), and the rotate prompt.
  * Every target ≥ 44 px; mouse, touch, keyboard and pad via `confirm()`/`move()`.
  */
 import type { QualityTier } from '../core/types';
 import type { ModelChoice } from './best';
 import { formatTime } from './format';
-import { FocusList, escapeHtml, hardReload } from './front';
+import { BUILD_STAMP, FocusList, GAME_NAME, escapeHtml, hardReload } from './front';
 import { logicalRect } from './orientation';
 import type { UiSfx } from './sfx';
 
@@ -160,4 +159,23 @@ export class PauseMenu {
     this.list.setSegment('rider', MODEL_OPTIONS, cur.rider);
     this.list.setSegment('bike', MODEL_OPTIONS, cur.bike);
   }
+}
+
+/**
+ * Full-screen portrait prompt (CSS decides when it shows: portrait + coarse pointer). A designed
+ * screen in the menu tokens: wordmark, rotating phone glyph, a "Reload game" button (home-screen /
+ * standalone iOS has no browser chrome to reload with), build stamp. Rotate-to-play is the rule:
+ * forced landscape was tried and abandoned (round 3, docs/design/game.md §11).
+ */
+export function mountRotatePrompt(parent: HTMLElement): HTMLDivElement {
+  const d = document.createElement('div');
+  d.className = 'rotate armed';
+  d.innerHTML = `<div class="wordmark">${GAME_NAME.split(' ')[0]}<br>${GAME_NAME.split(' ').slice(1).join(' ')}</div>
+    <i></i>
+    <div class="msg">Rotate to landscape</div>
+    <button type="button" class="btn primary reload">⟳ Reload game</button>
+    <div class="build">${escapeHtml(BUILD_STAMP)}</div>`;
+  d.querySelector('button')!.addEventListener('click', () => void hardReload());
+  parent.appendChild(d);
+  return d;
 }

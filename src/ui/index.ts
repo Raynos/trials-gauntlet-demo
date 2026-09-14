@@ -26,7 +26,7 @@ export interface Hud {
 
 export { formatTime, formatDelta } from './format';
 export { DomHud } from './hud';
-export { PauseMenu, spatialMove, type PauseCallbacks, type QualityChoice } from './menu';
+export { PauseMenu, mountRotatePrompt, spatialMove, type PauseCallbacks, type QualityChoice } from './menu';
 export { TitleScreen, MainMenuScreen, TrackSelectScreen, SettingsScreen, CreditsScreen, FocusList, GAME_NAME, controlsReferenceHtml, type FrontCallbacks, type FrontScreen, type FrontState } from './front';
 export { ArtManifest, BIOME_TINT, type ArtEntry } from './art';
 export { UiSfx } from './sfx';

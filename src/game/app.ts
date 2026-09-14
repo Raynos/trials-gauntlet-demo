@@ -26,6 +26,7 @@ import {
   loadQualityOverride,
   loadSoundEnabled,
   loadVolume,
+  mountRotatePrompt,
   saveGhostEnabled,
   saveModelChoice,
   saveQualityOverride,
@@ -39,7 +40,7 @@ import {
   type ModelChoice,
   type QualityChoice,
 } from '../ui';
-import { applyOrientation, isForcedLandscape } from '../ui/orientation';
+import { applyOrientation } from '../ui/orientation';
 import { BACKDROP_TRACK } from './flow';
 import type { Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
@@ -122,7 +123,6 @@ export class App {
   private rideSeconds = 0;
   private settled = false;
   private screenAt = 0;
-  private forced = false;
 
   constructor(private readonly o: AppOptions) {
     this.game = o.game;
@@ -245,6 +245,7 @@ export class App {
           }
         : {}),
     });
+    mountRotatePrompt(o.uiRoot);
     this.menu.setTracks(shipTracks(this.tracks, o.dev ?? false));
 
     this.hud.onAction = (a) => {
@@ -493,22 +494,9 @@ export class App {
     }
   }
 
-  /**
-   * Viewport → renderer size. A portrait touch viewport is rotated into a
-   * landscape game (forced landscape, src/ui/orientation.ts): the renderer then
-   * gets the logical `{ w: innerHeight, h: innerWidth }` at the same DPR cap.
-   */
+  /** Viewport → renderer size (+ the short/narrow layout classes, src/ui/orientation.ts). Rotate-to-play: portrait shows the prompt. */
   private fit(): void {
     const size = applyOrientation();
-    if (size.forced !== this.forced) {
-      this.forced = size.forced;
-      this.touch.setEnabled(this.screen === 'run' && !this.pause.visible); // drops any pointer mid-rotation
-    }
     this.o.resize(size.w, size.h, dprCap());
-  }
-
-  /** True while the page is rotated 90° inside a portrait viewport (tests / debug). */
-  forcedLandscape(): boolean {
-    return isForcedLandscape();
   }
 }

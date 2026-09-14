@@ -1,14 +1,15 @@
 /**
- * Forced landscape (docs/design/game.md §11).
+ * Viewport → logical size and layout classes (docs/design/game.md §11).
  *
- * A home-screen web app cannot declare "landscape only" the way YouTube or
- * Netflix do: iOS has no `screen.orientation.lock()` outside fullscreen video,
- * so with the rotation lock on the viewport stays portrait whichever way the
- * phone is held. The web answer is to rotate the *page*: when a touch device
- * reports a portrait viewport, `#app` (canvas + every DOM layer) is laid out at
- * the landscape size `{ w: innerHeight, h: innerWidth }` and turned 90° inside
- * the portrait viewport. The player turns the phone and sees a correct
- * landscape game regardless of the lock.
+ * Forced landscape (rotating `#app` 90° inside a portrait viewport so the game
+ * plays under iOS rotation lock) was built and abandoned in round 3: on the
+ * phone the system edge gestures sit on the wrong side and screenshots come
+ * out portrait. The game is rotate-to-play again (portrait prompt, menu.ts).
+ * `applyOrientation` therefore never sets `forced`; the mapping helpers below
+ * stay as identity-by-default utilities (the touch layer and `spatialMove`
+ * route through them, and the tests exercise the rotated branch).
+ *
+ * What the rotation WOULD be, kept for the record:
  *
  * Rotation direction: **clockwise** (`rotate(90deg)` with `transform-origin:
  * top left`, then `translateY(-100%)` to bring the box back on screen). The
@@ -82,18 +83,17 @@ export function isForcedLandscape(): boolean {
 }
 
 /**
- * Re-evaluate the viewport: rotate on a portrait touch viewport, undo it
- * otherwise. Sets `html.forced-landscape`, `--lw/--lh/--vw/--vh` and the
- * `short`/`narrow` layout classes. Returns the logical size the renderer must
- * use (`game.resize`). Call on resize / orientationchange / visualViewport
- * resize and once at start.
+ * Re-evaluate the viewport: sets the `short`/`narrow` layout classes from the
+ * viewport size and returns the size the renderer must use (`game.resize`).
+ * Call on resize / orientationchange / visualViewport resize and once at start.
  */
 export function applyOrientation(opts: { touch?: boolean; width?: number; height?: number } = {}): LogicalSize {
   const html = document.documentElement;
   physW = Math.round(opts.width ?? window.innerWidth);
   physH = Math.round(opts.height ?? window.innerHeight);
-  const touch = opts.touch ?? isTouchDevice();
-  forced = touch && physH > physW && physW > 0;
+  // Rotate-to-play: never rotate. (`opts.touch` is accepted for call compatibility / tests.)
+  void opts.touch;
+  forced = false;
   const w = forced ? physH : physW;
   const h = forced ? physW : physH;
   html.classList.toggle('forced-landscape', forced);
