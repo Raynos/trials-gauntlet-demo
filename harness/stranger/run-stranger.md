@@ -11,6 +11,10 @@ read its calls while it plays.
 ```
 cd /Users/raynos/projects/game-demos/trials-gauntlet-demo
 pnpm harness:stranger start --track <trackId> --agent <name>     # prints `session <id>`; optional — the stranger can also run start itself
+# or, for a whole round at once (2 strangers x 6 tracks):
+pnpm harness:stranger prep --tracks b1-first-ride,b2-lean-back,b3-kicker-row,e1-uphill-weight,e2-rear-wheel-first,e3-stairway --agents s1,s2 --round r3
+#   -> harness/out/stranger/rounds/r3/spawn.md : one paste-ready block per session (below, with the ids filled in)
+#   -> harness/out/stranger/rounds/r3/manifest.json
 ```
 
 Creating the session yourself pins the track and the session id; the stranger then never
@@ -44,6 +48,7 @@ with the single word DONE followed by one sentence on what the hardest part was.
 
 ```
 pnpm harness:stranger report <trackId>          # aggregates every session -> harness/out/metrics/<trackId>.stranger.{json,md}
+pnpm harness:stranger report b1-first-ride b2-lean-back b3-kicker-row e1-uphill-weight e2-rear-wheel-first e3-stairway   # + one summary table
 pnpm harness:replay harness/inputs/<trackId>/stranger-<sessionId>.json     # browser replay of the whole session (proves the log)
 ```
 

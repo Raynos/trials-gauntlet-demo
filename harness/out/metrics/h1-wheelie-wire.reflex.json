@@ -4,9 +4,9 @@
   "trackId": "h1-wheelie-wire",
   "tier": "hard",
   "technique": "sustained wheelie and the lip climb",
-  "updatedAt": "2026-09-14T14:01:14.340Z",
+  "updatedAt": "2026-09-14T16:25:48.810Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "52950b2d",
+  "srcFingerprint": "9d316566",
   "attemptsBand": [
     10,
     18
@@ -17,15 +17,18 @@
       "skill": "average",
       "seeds": [
         1831771780,
-        1831771781
+        1831771781,
+        1831771782
       ],
       "attempts": [
         38,
-        42
+        42,
+        41
       ],
-      "medianAttempts": 40,
+      "medianAttempts": 41,
       "clears": 0,
       "finishTimes": [
+        null,
         null,
         null
       ],
@@ -35,19 +38,40 @@
         {
           "obstacle": "wall @ 175.8 m",
           "x": 175.8,
-          "count": 25,
+          "count": 47,
           "reasons": {
-            "crash": 13,
-            "restart": 12
+            "crash": 20,
+            "restart": 27
           },
           "rules": {
-            "nose-high": 6,
-            "climbing": 1,
-            "stuck-restart": 5,
-            "nose-low": 4,
+            "nose-high": 7,
+            "climbing": 3,
+            "stuck-restart": 11,
+            "nose-low": 11,
             "air-gas-nose-up": 3,
-            "cruise": 2,
-            "air-brake-nose-down": 4
+            "cruise": 4,
+            "air-brake-nose-down": 5,
+            "steep-ahead": 1,
+            "hop-preload": 1,
+            "hop-snap": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 172.8 m",
+          "x": 172.8,
+          "count": 28,
+          "reasons": {
+            "crash": 8,
+            "restart": 20
+          },
+          "rules": {
+            "air-brake-nose-down": 6,
+            "stuck-restart": 12,
+            "nose-low": 1,
+            "cruise": 6,
+            "nose-high": 1,
+            "steep-ahead": 1,
+            "hop-preload": 1
           }
         },
         {
@@ -66,21 +90,6 @@
             "air-gas-nose-up": 2,
             "hop-preload": 1,
             "cruise": 2
-          }
-        },
-        {
-          "obstacle": "ramp @ 172.8 m",
-          "x": 172.8,
-          "count": 12,
-          "reasons": {
-            "crash": 5,
-            "restart": 7
-          },
-          "rules": {
-            "air-brake-nose-down": 4,
-            "stuck-restart": 6,
-            "nose-low": 1,
-            "cruise": 1
           }
         },
         {
@@ -152,6 +161,17 @@
           }
         },
         {
+          "obstacle": "gap @ 56.0 m",
+          "x": 56,
+          "count": 1,
+          "reasons": {
+            "hazard": 1
+          },
+          "rules": {
+            "hop-preload": 1
+          }
+        },
+        {
           "obstacle": "gap @ 61.0 m",
           "x": 61,
           "count": 1,
@@ -171,6 +191,17 @@
           },
           "rules": {
             "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 190.8 m",
+          "x": 190.8,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
           }
         },
         {
@@ -197,8 +228,9 @@
         }
       ],
       "runs": [
-        "20260914-090113-fcdc2d",
-        "20260914-090114-9f96b1"
+        "20260914-112548-eed3a3",
+        "20260914-112548-835e24",
+        "20260914-112548-745bc7"
       ]
     }
   ]

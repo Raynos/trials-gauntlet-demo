@@ -108,7 +108,9 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
 - **Count from the ruler.** At `vx` m/s you cover `vx / 8` m per slot, so the ruler tells you how
   many slots reach the next obstacle.
 - Leaning in the air changes your pitch, not your path.
-- If a call says `finished: true`, you are done: call `done`.
+- If a call says `finished: true`, you are done: call `done`. Past the line the game takes the
+  controls (no gas, no lean, gentle brake) and rolls you to a stop on the run-out; the summary's
+  `runOut` says where you stopped. Nothing after the line can cost a fault.
 
 ## Example session
 

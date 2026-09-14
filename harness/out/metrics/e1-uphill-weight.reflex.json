@@ -4,9 +4,9 @@
   "trackId": "e1-uphill-weight",
   "tier": "easy",
   "technique": "lean forward on steep climbs",
-  "updatedAt": "2026-09-14T14:01:13.231Z",
+  "updatedAt": "2026-09-14T16:25:47.167Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "52950b2d",
+  "srcFingerprint": "9d316566",
   "attemptsBand": [
     2,
     4
@@ -17,24 +17,40 @@
       "skill": "average",
       "seeds": [
         847839319,
-        847839320
+        847839320,
+        847839321
       ],
       "attempts": [
         1,
-        1
+        1,
+        2
       ],
       "medianAttempts": 1,
-      "clears": 2,
+      "clears": 3,
       "finishTimes": [
         61.541666666666664,
-        60.958333333333336
+        60.958333333333336,
+        67.8
       ],
-      "medianFinishTime": 61.25,
-      "bestX": 543.7177649400963,
-      "deaths": [],
+      "medianFinishTime": 61.541666666666664,
+      "bestX": 543.4449902833518,
+      "deaths": [
+        {
+          "obstacle": "ramp @ 445.0 m",
+          "x": 445.006136,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        }
+      ],
       "runs": [
-        "20260914-090113-7a8206",
-        "20260914-090113-180fae"
+        "20260914-112547-1e7070",
+        "20260914-112547-4cfbc5",
+        "20260914-112547-7cc237"
       ]
     }
   ]

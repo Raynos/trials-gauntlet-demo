@@ -87,6 +87,90 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 6 status — the mirror through the finish line, goldens on the re-authored tracks, stranger round 3 plumbing
+
+**Finding.** Commit cfb02ab made the game own the input after the finish line (`Game.stepFinishCoast`:
+throttle 0, lean 0, brake `round(0.6 · min(1, t/120) · 255)/255`, a post-line fault undoes the tick and
+freezes the world). `harness/lib/rules.ts` still stepped the player's frames, so every node replay diverged
+from the page **one tick after the finish** — invisible to the gate because a golden ends on the finish tick,
+visible to anything that runs past it (stranger sessions, clip tails, live reflex recordings). Negative
+control on the old mirror: `harness:determinism harness/inputs/flat-test/bot-3.json --tail-s 3` →
+`FAIL D3 first divergent tick 851: bike.pos.x, bike.pos.y, bike.vel.x, bike.vel.y, bike.angle, bike.angVel`.
+Same command on the new mirror: `PASS D3 35a12a5fea84e694 == 35a12a5fea84e694` over 1211 ticks (the final
+hash differs from the finish-tick hash `d2b08250…` — the bike really coasts 3 s past the line, in node and in
+the page alike). A second proof on a recording with a hold-restart, a crash and the coast: the stranger smoke
+session on flat-test, 1401 ticks, D1/D3/D5/D7 all `c7edfbb740c5131a`.
+
+| piece | as built |
+|---|---|
+| **rules mirror** (`lib/rules.ts`) | `finished` phase = `Game.tick()`'s: `resultsTicks++`, `stepFinishCoast()` unless `finishFrozen` — same quantised brake ramp, `physics.snapshot()` before the step, restore + `drainEvents()` + freeze on a `fault` event, every other physics event processed as usual. `RulesCounters` is now `GameCounters` itself (import type from `src/game/game.ts`), so a node snapshot and `hook.snapshot()` carry the same fields; `determinism.ts` D4 no longer casts. Two older drifts fixed on the way: `holdFired` starts **true** at GO (the game's `beginRun`: the key that triggered a hold must be released before it can fire again) and a full restart **keeps** `holdTicks`/`restartLatch` (the key is still down) instead of zeroing them — the old mirror re-fired an edge on the very next tick of a held key. |
+| **`harness:determinism --tail-s N`** | appends N s of throttle 1 / lean 1 after the recording's last tick — the noisiest legal input the finished game must ignore. The round's D3 proof; cheap enough to run on every golden. |
+| **goldens** | all 17 tracks re-run at skill 3, sequentially, each browser-verified (node hash == page hash, 1 attempt on 14 tracks, 2 on m2/x2/x3, m3 timed out at 600 s wall at 209 m — the tracks owner found the wedge, re-authored m3 in 94ecb43 and committed its own golden). That commit moved the src fingerprint under the run (e10f2cfe → 9d316566) and un-stamped the 12 goldens already written: `pnpm harness:bot --refresh-goldens` (new, `lib/golden.ts refreshGoldens`) re-proves each `bot-*.json` on the working tree — node replay must finish and hash like the browser — and only then rewrites its stamp (`src=<new> restamped-from=<old>`); anything else stays put and is reported STALE. Result: 13 restamped, 5 fresh, 21 stale lower-skill leftovers (bot-0/1/2/oracle from older physics; the picker never chooses them while a bot-3 matches), **17/17 tracks with a proven skill-3 golden**. Gate re-pinned (`--pin`): flat-test golden `d2b082502561bc00`, canonical-1200 re-pinned on the new physics. m3 re-run by the bot on the re-authored track afterwards: 2 attempts, finish 37.275 s (the same finish the tracks owner's golden carries), browser-verified. The fingerprint moved a second time before the round closed (uncommitted physics/tracks/core edits by other builders, 9d316566 → b8b2e23f at ~11:33); a second `--refresh-goldens` re-proved all 17 on it — identical finish times, node hash == the browser hash of the 11:20 build, i.e. the edits in flight are behaviour-neutral for these recordings. `expected.json` and `ship-gate.json` are from the 9d316566 build. |
+| **stranger CLI** (`stranger/cli.ts`, `view.ts`, `PROTOCOL.md`) | a finish now plays the run-out coast **in-call** (COAST frames while `finished` and moving, ≤ 4 s): the play summary gets `runOut {seconds, stoppedAt, stopped, frozen}`, the note says where the game braked you to a stop, the screen is printed after a finish too and `look` keeps the finish `F` column in frame beside the stopped bike (`asciiView(..., anchorX)`). `runTime`/`finishTime` are the game's run clock (frozen at the line, reset by a full restart — what the results panel shows), not the session tick count. `reset` prefixes one coast tick when `holdFired` is set so the hold fires deterministically as the first call of a session. Smoke on flat-test: crossed at 120 m, stopped at 131.6 m (11.6 m of the 30 m run-out), `vx` 0.02, D3 on the session recording PASS. |
+| **stranger round 3 plumbing** | `pnpm harness:stranger prep --tracks b1-first-ride,b2-lean-back,b3-kicker-row,e1-uphill-weight,e2-rear-wheel-first,e3-stairway --agents s1,s2 --round r3` creates the 12 sessions (ids `<track>-r3-<agent>-<stamp>`) and writes `out/stranger/rounds/r3/spawn.md` — one paste-ready prompt per session, the `run-stranger.md` block with track + session id filled — plus `manifest.json`. `pnpm harness:stranger report <a> <b> …` aggregates several tracks and ends with one summary table (band, sessions, completed fresh, cleared, medians, pass). All round-1/2 sessions are stale on src 9d316566 (b1: 5 on disk, 0 fresh). `start`/`look`/`play` checked on the re-authored b1 (finish 583 m, checkpoints 66 / 235.6 / 412.4). |
+| **clip camera assertion** (`capture.ts`, `clip.ts`) | every rendered frame reads `hook.camera()`: bike screen x/y inside the central [0.2, 0.8] box while riding, \|roll\| < 1e-6, frames the rig **clamped** to the track's camera bounds (count + %), frames per rig state, min/max of the bike's screen position, first offenders (frame, tick, x, y, state). Printed as the `camera:` line in the clip report, stored in `clip.json.camera`, exit 1 after writing the clip when it fails (`--no-camera-assert` to ignore, `--no-camera-check` to skip). A windowed clip (`--at-x`, `--from-tick`) starts the rig cold, so its first 0.5 s are counted as `settleExcluded` and not judged — the flat-test 60 m window otherwise fails on frame 0 alone (bike at x 0.191). Full gap-test clip (314 frames, 5.23 s incl. the 1 s tail — the tail now shows the game braking the bike after the line): `PASS bike x 0.283..0.789 y 0.49..0.616, out 0, clamped 10 (3.2 %), max|roll| 1e-17, states fast:167 riding:78 finish:60 idle:9`. |
+
+### Ship gate (`pnpm harness:gate --pin`, flat-test, src 9d316566, dist rebuilt, loadavg 5 → 18 during the run)
+
+18/22 on both runs (the second, after the reflex sweep, is the committed `ship-gate.json`). The four
+failures: `boot.firstFrameMs` 4680 / 4555 ms (SwiftShader limit 4000; 7543 last round), `restart.frameMsP95`
+204 / 249 ms (150; 602 last round), `perf.renderSyncedMsP95` 3560 / 3424 ms (250; 5964 last round) — the three
+SwiftShader-relative render numbers, better than last round but over the local limits under a loadavg that
+climbed from 5 to 18 while each gate ran — and **`heap.growthMBPer60s` 9.63 / 9.50 MB (limit 5)**, the first
+full 60 s heap measurements since the art pack (last round's `--quick` 10 s sample read 4.87 MB), repeatable:
+a render-owner item. G10 second row is armed for the first time on this src: reflex `average` medians
+b1 1/1.5 · b2 2/3 · b3 2/3 · e1 1/6, all within band. Everything the harness owns passes: `clear.*` on the new golden, `determinism.pass` 8/8
+(D8 re-pinned), `restart.ticks` 1, `restart.noCountdown` 2 ticks, `fault.toControlMs` 41.7 ms,
+`perf.physicsUsPerTickP95` 27.5 µs (97.5 last round, which was measured at loadavg 22).
+
+### Reflex bot, all tracks, 3 seeds, `average` (`pnpm harness:reflex --all-tracks --seeds 3`, 5 s wall)
+
+Beginner/easy/medium and h3 clear on every seed; h1, h2, x1, x2, x3 clear on none within the 300 s sim
+cap. The deaths name the same places the tracks round 6 notes call the technique gates: h1 wall @ 175.8 m
+(`stuck-restart` ×47 — the wheelie wire), h2 ramp @ 265.8 m (`air-gas-nose-up` ×43), x1 ramp/plank @
+527–530 m, x2 drums @ 366–369 m, x3 ramp/plank @ 465–467 m. Full table in `out/metrics/reflex.md` and below.
+
+| track | tier | band | attempts (seeds) | median | clears | time to clear (median) | best % | where it died (count · rule) |
+|---|---|---|---|---:|---|---:|---:|---|
+| flat-test | beginner | — | 1, 1, 1 | 1 | 3/3 | 11.1 s | 100% | — |
+| gap-test | beginner | 1–3 | 1, 1, 1 | 1 | 3/3 | 6.6 s | 100% | — |
+| b1-first-ride | beginner | 1–1 | 1, 1, 1 | 1 | 3/3 | 55.3 s | 100% | — |
+| b2-lean-back | beginner | 1–2 | 1, 2, 2 | 2 | 3/3 | 65.9 s | 100% | ground @ 45 m ×1 (air-brake-nose-down); ground @ 450 m ×1 (nose-high) |
+| b3-kicker-row | beginner | 1–2 | 2, 3, 2 | 2 | 3/3 | 64.5 s | 100% | ground @ 240 m ×1 (nose-low); gap @ 305.8 m ×1 (air-gas-nose-up); gap @ 325.8 m ×1 (drop-ahead-lean-back) |
+| e1-uphill-weight | easy | 2–4 | 1, 1, 2 | 1 | 3/3 | 61.5 s | 100% | ramp @ 445.0 m ×1 (air-brake-nose-down) |
+| e2-rear-wheel-first | easy | 3–5 | 3, 5, 1 | 3 | 3/3 | 88.8 s | 100% | ramp @ 66.0 m ×2 (air-gas-nose-up); ramp @ 57.0 m ×1 (air-gas-nose-up); ramp @ 265.2 m ×1 (nose-high) |
+| e3-stairway | easy | 3–6 | 3, 4, 9 | 4 | 3/3 | 73.8 s | 100% | stair @ 164.2 m ×6 (air-brake-nose-down); gap @ 418.4 m ×3 (nose-high); stair @ 402.3 m ×2 (air-brake-nose-down) |
+| m1-hop-up | medium | 5–9 | 9, 14, 10 | 10 | 3/3 | 114.5 s | 100% | ledge @ 309.3 m ×6 (nose-high); ledge @ 21.0 m ×4 (nose-high); ledge @ 280.3 m ×4 (air-brake-nose-down) |
+| m2-drum-roll | medium | 6–12 | 10, 3, 7 | 7 | 3/3 | 94.6 s | 100% | ramp @ 311.2 m ×4 (nose-low); logpile @ 425.4 m ×3 (nose-high); ramp @ 430.8 m ×3 (air-brake-nose-down) |
+| m3-see-saw | medium | 8–12 | 25, 6, 8 | 8 | 3/3 | 106.1 s | 100% | box @ 423.9 m ×7 (air-gas-nose-up); ramp @ 416.4 m ×6 (air-level); seesaw @ 390.4 m ×3 (climbing) |
+| h1-wheelie-wire | hard | 10–18 | 38, 42, 41 | 41 | 0/3 | — | 92% | wall @ 175.8 m ×47 (stuck-restart); ramp @ 172.8 m ×28 (stuck-restart); wall @ 530.2 m ×18 (stuck-restart) |
+| h2-gap-chain | hard | 14–22 | 48, 46, 45 | 46 | 0/3 | — | 69% | ramp @ 265.8 m ×43 (air-gas-nose-up); ramp @ 275.8 m ×19 (air-gas-nose-up); ramp @ 427.6 m ×18 (air-gas-nose-up) |
+| h3-fire-line | hard | 18–25 | 13, 5, 31 | 13 | 3/3 | 139.2 s | 100% | gap @ 489.2 m ×10 (hop-preload); ramp @ 467.2 m ×6 (air-brake-nose-down); ground @ 470 m ×6 (air-brake-nose-down) |
+| x1-vertical-limit | extreme | 30–45 | 30, 30, 32 | 30 | 0/3 | — | 79% | ramp @ 527.6 m ×38 (stuck-restart); plank @ 530.0 m ×34 (air-brake-nose-down); ramp @ 235.2 m ×4 (air-brake-nose-down) |
+| x2-pipe-dream | extreme | 40–60 | 51, 46, 48 | 48 | 0/3 | — | 72% | drum @ 366.1 m ×63 (air-gas-nose-up); drum @ 369.4 m ×25 (air-gas-nose-up); drum @ 250.7 m ×18 (air-gas-nose-up) |
+| x3-gauntlet | extreme | 60–80 | 28, 38, 33 | 33 | 0/3 | — | 94% | ramp @ 465.5 m ×36 (stuck-restart); plank @ 466.7 m ×15 (air-brake-nose-down); wall @ 277.0 m ×9 (nose-high) |
+
+## Calibration against the stranger sessions
+
+| track | band | stranger median attempts (sessions, src) | reflex average median (seeds) | ratio | stranger time to clear | reflex time to clear | stranger deaths (top) | reflex deaths (top) |
+|---|---|---|---|---:|---:|---:|---|---|
+| b1-first-ride | 1–1 | 2 (5, d698717f/73762476/c83b6ca8) | 1 (1, 1, 1) | 0.50 | 54.8 s | 55.3 s | — | — |
+| b2-lean-back | 1–2 | 3 (2, 73762476) | 2 (1, 2, 2) | 0.67 | 49.0 s | 65.9 s | drum @ 36.0 m ×1; ramp @ 314.2 m ×1; ramp @ 322.2 m ×1 | ground @ 45 m ×1; ground @ 450 m ×1 |
+| b3-kicker-row | 1–2 | 8 (4, 73762476/c83b6ca8) | 2 (2, 3, 2) | 0.25 | 77.8 s | 64.5 s | ground ×4; ramp @ 384.0 m ×1; ramp @ 178.0 m ×1 | ground @ 240 m ×1; gap @ 305.8 m ×1; gap @ 325.8 m ×1 |
+| e1-uphill-weight | 2–4 | 8 (4, 73762476/c83b6ca8) | 1 (1, 1, 2) | 0.13 | 99.9 s | 61.5 s | ramp @ 445.0 m ×4; plank @ 436.0 m ×2; ground ×1 | ramp @ 445.0 m ×1 |
+
+### Open
+
+- `heap.growthMBPer60s` 9.63 MB over 60 s (limit 5) — render/art owner; re-measure on an idle machine before
+  treating it as a leak (GC timing under loadavg 18 is part of it).
+- Lower-skill goldens (`bot-0/1/2`, `bot-oracle`) on 12 tracks are stale leftovers of older physics. They are
+  never picked while a `bot-3` matches; a `harness:bot <track> --all` pass would replace them, ~10 min per track.
+- h1/h2/x1/x2/x3 do not clear for the `average` reflex player (0/3 each, 300 s cap); the `good` rows and the
+  browser calibration were not re-run this round.
+- Gate G10 still judges b1/b2/b3/e1; e2/e3 join the stranger round but not the gate row until §3 says so.
+- The src fingerprint is one hash over all of `src/tracks`: one track edit un-stamps every golden. `--refresh-goldens`
+  makes that a 10 s re-proof instead of a 45 min bot pass, but a per-track fingerprint would be the real fix.
+
 ## Round 5 status — the reflex bot: a person holding keys
 
 The two measurement players so far were a beam-search bot (15-tick macros with snapshot lookahead — superhuman
@@ -550,6 +634,10 @@ alongside the gate result.
 
 On mismatch the tool bisects over `step` with hashes (<= 11 extra runs for 1200 ticks), prints
 `firstDivergentTick` and `diffState()` paths, exits 1. Output `out/gate/determinism.json`.
+
+`--tail-s N` (round 6) appends N s of throttle 1 / lean 1 after the recording's last tick before running
+D1–D8. Goldens end on the finish tick, so without it the post-finish coast (`Game.stepFinishCoast`, mirrored in
+`lib/rules.ts`) is never compared; with it D3 proves node and page agree through and after the line.
 
 ## 7. Metric summary
 

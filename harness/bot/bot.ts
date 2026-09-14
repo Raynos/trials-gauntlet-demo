@@ -5,6 +5,9 @@
  *                    [--max-attempts 50] [--max-sim-seconds 300] [--track-wall-s 120] [--no-verify] [--crash-probe]
  *                    [--dev] [--build] [--verbose]
  *   pnpm harness:bot --all-tracks [--skill 2 | --skill 2,3] [--seeds 2] [--track-wall-s 120]   -> out/metrics/sweep.json + sweep.md
+ *   pnpm harness:bot --refresh-goldens [--tracks a,b] [--build]   re-prove every inputs/<track>/bot-*.json on the
+ *                    working tree (node replay finishes, node hash == browser hash) and re-stamp it; goldens that
+ *                    no longer finish are reported STALE and need a bot run (lib/golden.ts refreshGoldens)
  *   (a skill list runs one sweep per skill and writes one table per skill into sweep.md; sweep.json holds `sweeps[]`)
  *
  * Writes per run  harness/out/bot/<trackId>/<runId>.json          (BotRunReport)
@@ -24,6 +27,7 @@ import { HARNESS_DIR } from '../lib/paths';
 import { saveRecording } from '../lib/recording';
 import { fail, writeJson } from '../lib/report';
 import type { Blocker, BotRunReport, Skill, SweepReport, SweepRow, TrackBotMetrics } from '../lib/schema';
+import { refreshGoldens } from '../lib/golden';
 import { createSim, listSimTracks, type Sim } from '../lib/sim';
 import { BrowserVerifier } from '../lib/verify';
 import { formatActions } from './actions';
@@ -409,8 +413,25 @@ async function main(): Promise<void> {
   const { positional, flags } = parseArgs();
   const allTracks = flagBool(flags, 'all-tracks');
   const trackId = positional[0];
-  if (!trackId && !allTracks) fail('usage: harness/bot/bot.ts <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] | --all-tracks');
+  if (!trackId && !allTracks && !flagBool(flags, 'refresh-goldens')) fail('usage: harness/bot/bot.ts <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] | --all-tracks | --refresh-goldens [--tracks a,b]');
   const seeds = Math.max(1, flagNum(flags, 'seeds', 1));
+  if (flagBool(flags, 'refresh-goldens')) {
+    const ids = typeof flags['tracks'] === 'string' ? (flags['tracks'] as string).split(',').map((x) => x.trim()).filter(Boolean) : listSimTracks();
+    const verifier = new BrowserVerifier({ dev: flagBool(flags, 'dev'), build: flagBool(flags, 'build'), verbose: flagBool(flags, 'verbose') });
+    try {
+      console.log(`refresh-goldens: src=${srcFingerprint()} tracks=${ids.length}`);
+      const rows = await refreshGoldens(ids, (rec) => verifier.run(rec), (l) => console.log(`  ${l}`));
+      const n = (r: string): number => rows.filter((x) => x.result === r).length;
+      // A track is covered when at least one of its goldens is proven on this src; stale lower-skill
+      // files are leftovers of older physics (the picker ignores them), not a failure by themselves.
+      const uncovered = ids.filter((id) => !rows.some((x) => x.trackId === id && x.result !== 'stale'));
+      console.log(`refresh-goldens: fresh ${n('fresh')}, restamped ${n('restamped')}, stale ${n('stale')}; tracks with a proven golden ${ids.length - uncovered.length}/${ids.length}${uncovered.length ? ` — re-run pnpm harness:bot <track> for: ${uncovered.join(', ')}` : ''}`);
+      if (uncovered.length) process.exitCode = 1;
+    } finally {
+      await verifier.close();
+    }
+    return;
+  }
   if (allTracks) {
     await sweepAll(flags, seeds);
     return;

@@ -2,9 +2,12 @@
  * Node mirror of the game's run-rule layer (src/game/game.ts `tick()` for the
  * riding / crashed / finished phases, starting at GO — exactly what
  * `hook.runRecording` does in the browser). Physics alone does not know about
- * the 1.0 s auto-respawn, the restart edge, the 0.6 s hold-for-full-restart or
- * the run clock; without this layer node and browser replays diverge at the
- * first crash (determinism D3 caught exactly that).
+ * the 1.0 s auto-respawn, the restart edge, the 0.6 s hold-for-full-restart,
+ * the run clock or the post-finish coast (the game feeds throttle 0 / lean 0 /
+ * a quantised 0 → 0.6 brake ramp after the line, undoes and freezes a post-line
+ * fault — `Game.stepFinishCoast`, commit cfb02ab); without this layer node and
+ * browser replays diverge at the first crash or one tick after the finish
+ * (determinism D3 caught both).
  *
  * Kept deliberately tiny and data-only so it can be snapshotted next to the
  * physics snapshot. REQUESTED src change: core-game exports this state
@@ -14,21 +17,15 @@
  */
 import { NEUTRAL_INPUT, type GameEvent, type GamePhase, type InputFrame } from '../../src/core/types';
 import type { PhysicsWorld } from '../../src/physics';
-import { ruleTicks, type RuleTicks } from '../../src/game/rules';
+import type { GameCounters } from '../../src/game/game';
+import { FINISH_BRAKE, ruleTicks, type RuleTicks } from '../../src/game/rules';
 
-export interface RulesCounters {
-  phase: GamePhase;
-  runTicks: number;
-  finishRunTicks: number;
-  faults: number;
-  countdownTick: number;
-  crashTicks: number;
-  holdTicks: number;
-  holdFired: boolean;
-  restartLatch: boolean;
-  resultsTicks: number;
-  resultsShown: boolean;
-}
+/**
+ * The same shape the page's `hook.snapshot()` carries (`Game.counters()`), so a
+ * node snapshot and a page snapshot are interchangeable (determinism D4).
+ * `finishFrozen` is optional there for older snapshots; the mirror always writes it.
+ */
+export type RulesCounters = GameCounters;
 
 export class RunRules {
   readonly T: RuleTicks;
@@ -43,6 +40,11 @@ export class RunRules {
     this.T = ruleTicks(hz);
   }
 
+  /**
+   * Counters right after `loadTrack` + GO in harness mode (`Game.beginRun()` → `go()`):
+   * `holdFired` starts **true** — the press that triggered a hold (or that was down at
+   * load) must be released before a hold can fire again.
+   */
   static atGo(): RulesCounters {
     return {
       phase: 'riding',
@@ -52,14 +54,15 @@ export class RunRules {
       countdownTick: 0,
       crashTicks: 0,
       holdTicks: 0,
-      holdFired: false,
+      holdFired: true,
       restartLatch: false,
       resultsTicks: 0,
       resultsShown: false,
+      finishFrozen: false,
     };
   }
 
-  /** Mirror of Game.go(): physics at the start line, run clock 0, riding. */
+  /** Mirror of Game.loadTrack() → beginRun() → go(): physics at the start line, run clock 0, riding. */
   go(): void {
     this.physics.reset(-1);
     this.physics.drainEvents();
@@ -72,7 +75,7 @@ export class RunRules {
   }
 
   restoreCounters(c: RulesCounters): void {
-    this.c = { ...c };
+    this.c = { ...c, finishFrozen: c.finishFrozen ?? false };
     this.pending = [];
   }
 
@@ -106,14 +109,60 @@ export class RunRules {
     this.emit({ type: 'restart', checkpoint, tick: 0 });
   }
 
-  /** Harness mode: a full restart goes straight to GO (no countdown). */
+  /**
+   * Harness mode: a full restart goes straight to GO (no countdown). Mirrors
+   * Game.restartFromStart() → beginRun() → go(): faults, run clock, crash/results
+   * counters and the finish freeze reset; `holdFired` becomes true; the restart
+   * latch and hold count are **kept** (the key is still down).
+   */
   private restartFromStart(): void {
     this.physics.reset(-1);
     this.physics.drainEvents();
     this.emit({ type: 'restart', checkpoint: -1, tick: 0 });
-    const faults = 0;
-    this.c = { ...RunRules.atGo(), faults };
+    const { holdTicks, restartLatch } = this.c;
+    this.c = { ...RunRules.atGo(), faults: 0, holdTicks, restartLatch };
     this.emit({ type: 'go' });
+  }
+
+  /**
+   * Mirror of Game.stepFinishCoast(): after the line the game owns the input —
+   * throttle 0, lean 0, brake ramping 0 → FINISH_BRAKE over `finishBrake` ticks,
+   * quantised to u8 exactly as the game does. A fault past the line undoes the
+   * tick (physics restored to the pre-step snapshot) and freezes the world;
+   * every other physics event is processed as usual.
+   */
+  private stepFinishCoast(): void {
+    const c = this.c;
+    const k = Math.min(1, c.resultsTicks / this.T.finishBrake);
+    const f = this.fwd;
+    f.throttle = 0;
+    f.brake = Math.round(FINISH_BRAKE * k * 255) / 255;
+    f.lean = 0;
+    f.hop = false;
+    f.restart = false;
+    const before = this.physics.snapshot();
+    this.physics.step(f);
+    const events = this.physics.drainEvents();
+    let faulted = false;
+    for (const e of events) {
+      if (e.type === 'fault') faulted = true;
+      else this.processPhysicsEvent(e);
+    }
+    if (faulted) {
+      this.physics.restore(before);
+      this.physics.drainEvents();
+      c.finishFrozen = true;
+    }
+  }
+
+  /** Input the world is actually driven with (the player's frame, or the game's post-finish coast). */
+  effectiveInput(input: InputFrame): Readonly<InputFrame> {
+    return this.c.phase === 'finished' ? this.fwd : input;
+  }
+
+  /** Post-finish: the bike faulted on the run-out and physics is frozen at the tick before. */
+  finishFrozen(): boolean {
+    return this.c.finishFrozen === true;
   }
 
   private stepPhysics(input: InputFrame): void {
@@ -206,7 +255,7 @@ export class RunRules {
         }
         c.resultsTicks++;
         if (!c.resultsShown && c.resultsTicks >= T.resultsDelay) c.resultsShown = true;
-        this.stepPhysics(input);
+        if (!c.finishFrozen) this.stepFinishCoast();
         return;
       }
     }

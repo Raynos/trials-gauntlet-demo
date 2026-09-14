@@ -4,9 +4,9 @@
   "trackId": "e3-stairway",
   "tier": "easy",
   "technique": "stairs: gas up, brake down",
-  "updatedAt": "2026-09-14T14:01:13.468Z",
+  "updatedAt": "2026-09-14T16:25:47.497Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "52950b2d",
+  "srcFingerprint": "9d316566",
   "attemptsBand": [
     3,
     6
@@ -17,21 +17,53 @@
       "skill": "average",
       "seeds": [
         3073702004,
-        3073702005
+        3073702005,
+        3073702006
       ],
       "attempts": [
         3,
-        4
+        4,
+        9
       ],
-      "medianAttempts": 3.5,
-      "clears": 2,
+      "medianAttempts": 4,
+      "clears": 3,
       "finishTimes": [
         68.59166666666667,
-        73.85
+        73.85,
+        106.85
       ],
-      "medianFinishTime": 71.22083333333333,
-      "bestX": 531.0800328043899,
+      "medianFinishTime": 73.85,
+      "bestX": 531.0437849007815,
       "deaths": [
+        {
+          "obstacle": "stair @ 164.2 m",
+          "x": 164.2,
+          "count": 6,
+          "reasons": {
+            "crash": 5,
+            "restart": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "air-brake-nose-down": 2,
+            "nose-low": 1,
+            "steep-ahead": 1,
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 418.4 m",
+          "x": 418.45,
+          "count": 3,
+          "reasons": {
+            "hazard": 3
+          },
+          "rules": {
+            "nose-high": 1,
+            "cruise": 1,
+            "air-gas-nose-up": 1
+          }
+        },
         {
           "obstacle": "stair @ 402.3 m",
           "x": 402.25,
@@ -57,17 +89,6 @@
           }
         },
         {
-          "obstacle": "stair @ 164.2 m",
-          "x": 164.2,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
-          }
-        },
-        {
           "obstacle": "stair @ 171.2 m",
           "x": 171.2,
           "count": 1,
@@ -80,8 +101,9 @@
         }
       ],
       "runs": [
-        "20260914-090113-415455",
-        "20260914-090113-9b377e"
+        "20260914-112547-98551b",
+        "20260914-112547-661e77",
+        "20260914-112547-535659"
       ]
     }
   ]

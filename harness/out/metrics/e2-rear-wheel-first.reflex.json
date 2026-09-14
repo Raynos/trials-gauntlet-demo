@@ -4,9 +4,9 @@
   "trackId": "e2-rear-wheel-first",
   "tier": "easy",
   "technique": "rear-wheel-first gap landing",
-  "updatedAt": "2026-09-14T14:01:13.355Z",
+  "updatedAt": "2026-09-14T16:25:47.323Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "52950b2d",
+  "srcFingerprint": "9d316566",
   "attemptsBand": [
     3,
     5
@@ -17,20 +17,23 @@
       "skill": "average",
       "seeds": [
         2125781358,
-        2125781359
+        2125781359,
+        2125781360
       ],
       "attempts": [
         3,
-        5
+        5,
+        1
       ],
-      "medianAttempts": 4,
-      "clears": 2,
+      "medianAttempts": 3,
+      "clears": 3,
       "finishTimes": [
         88.81666666666666,
-        91.6
+        91.6,
+        69.375
       ],
-      "medianFinishTime": 90.20833333333333,
-      "bestX": 621.5152008480352,
+      "medianFinishTime": 88.81666666666666,
+      "bestX": 621.2848494360693,
       "deaths": [
         {
           "obstacle": "ramp @ 66.0 m",
@@ -90,8 +93,9 @@
         }
       ],
       "runs": [
-        "20260914-090113-d561fc",
-        "20260914-090113-7ba380"
+        "20260914-112547-991bce",
+        "20260914-112547-4f25c3",
+        "20260914-112547-314b71"
       ]
     }
   ]

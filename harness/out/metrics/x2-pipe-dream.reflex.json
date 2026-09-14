@@ -4,9 +4,9 @@
   "trackId": "x2-pipe-dream",
   "tier": "extreme",
   "technique": "spinning drums with gaps and see-saw drops",
-  "updatedAt": "2026-09-14T14:01:15.657Z",
+  "updatedAt": "2026-09-14T16:25:50.742Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "52950b2d",
+  "srcFingerprint": "9d316566",
   "attemptsBand": [
     40,
     60
@@ -17,15 +17,18 @@
       "skill": "average",
       "seeds": [
         2290459156,
-        2290459157
+        2290459157,
+        2290459158
       ],
       "attempts": [
         51,
-        46
+        46,
+        48
       ],
-      "medianAttempts": 48.5,
+      "medianAttempts": 48,
       "clears": 0,
       "finishTimes": [
+        null,
         null,
         null
       ],
@@ -35,85 +38,138 @@
         {
           "obstacle": "drum @ 366.1 m",
           "x": 366.1,
-          "count": 46,
+          "count": 63,
           "reasons": {
-            "crash": 46
+            "crash": 63
           },
           "rules": {
-            "hop-snap": 4,
-            "air-gas-nose-up": 20,
-            "climbing": 5,
-            "hop-preload": 5,
-            "drop-ahead-lean-back": 4,
-            "cruise": 5,
+            "hop-snap": 6,
+            "air-gas-nose-up": 27,
+            "climbing": 7,
+            "hop-preload": 7,
+            "drop-ahead-lean-back": 6,
+            "cruise": 6,
             "air-brake-nose-down": 1,
-            "pit-lip": 2
+            "pit-lip": 3
           }
         },
         {
           "obstacle": "drum @ 369.4 m",
           "x": 369.4,
-          "count": 18,
+          "count": 25,
           "reasons": {
-            "crash": 18
+            "crash": 25
           },
           "rules": {
-            "air-gas-nose-up": 10,
+            "air-gas-nose-up": 13,
             "nose-high": 1,
             "cruise": 1,
-            "hop-preload": 5,
-            "hop-snap": 1
+            "hop-preload": 6,
+            "hop-snap": 1,
+            "drop-ahead-lean-back": 2,
+            "air-level": 1
           }
         },
         {
           "obstacle": "drum @ 250.7 m",
           "x": 250.7,
-          "count": 11,
+          "count": 18,
           "reasons": {
-            "crash": 7,
-            "hazard": 4
+            "crash": 9,
+            "hazard": 9
           },
           "rules": {
-            "air-gas-nose-up": 8,
-            "air-brake-nose-down": 1,
-            "climbing": 1,
-            "hop-snap": 1
+            "air-gas-nose-up": 11,
+            "air-brake-nose-down": 3,
+            "climbing": 2,
+            "hop-snap": 2
           }
         },
         {
           "obstacle": "gap @ 364.6 m",
           "x": 364.6,
-          "count": 6,
+          "count": 8,
           "reasons": {
-            "crash": 6
+            "crash": 8
           },
           "rules": {
             "climbing": 1,
             "nose-high": 1,
-            "nose-low": 1,
+            "nose-low": 2,
             "air-level": 1,
             "hop-snap": 1,
-            "drop-ahead-lean-back": 1
+            "drop-ahead-lean-back": 1,
+            "air-brake-nose-down": 1
           }
         },
         {
           "obstacle": "gap @ 367.9 m",
           "x": 367.9,
-          "count": 6,
+          "count": 8,
           "reasons": {
-            "crash": 6
+            "crash": 8
           },
           "rules": {
             "air-gas-nose-up": 1,
             "air-brake-nose-down": 1,
             "nose-low": 1,
             "cruise": 1,
-            "hop-preload": 2
+            "hop-preload": 3,
+            "hop-snap": 1
+          }
+        },
+        {
+          "obstacle": "drum @ 362.8 m",
+          "x": 362.8,
+          "count": 6,
+          "reasons": {
+            "crash": 6
+          },
+          "rules": {
+            "air-gas-nose-up": 3,
+            "air-brake-nose-down": 1,
+            "hop-preload": 1,
+            "air-level": 1
+          }
+        },
+        {
+          "obstacle": "logpile @ 65.6 m",
+          "x": 65.6,
+          "count": 4,
+          "reasons": {
+            "crash": 4
+          },
+          "rules": {
+            "air-gas-nose-up": 3,
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "box @ 227.2 m",
+          "x": 227.2,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "air-brake-nose-down": 1
           }
         },
         {
           "obstacle": "ground @ 255 m",
           "x": 255,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 2
+          }
+        },
+        {
+          "obstacle": "gap @ 361.3 m",
+          "x": 361.3,
           "count": 2,
           "reasons": {
             "crash": 2
@@ -134,17 +190,6 @@
           }
         },
         {
-          "obstacle": "logpile @ 65.6 m",
-          "x": 65.6,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
-          }
-        },
-        {
           "obstacle": "ramp @ 74.0 m",
           "x": 74,
           "count": 1,
@@ -156,25 +201,14 @@
           }
         },
         {
-          "obstacle": "gap @ 361.3 m",
-          "x": 361.3,
+          "obstacle": "ramp @ 222.2 m",
+          "x": 222.2,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "drum @ 362.8 m",
-          "x": 362.8,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
+            "air-brake-nose-down": 1
           }
         },
         {
@@ -190,8 +224,9 @@
         }
       ],
       "runs": [
-        "20260914-090115-bbed7c",
-        "20260914-090115-df777c"
+        "20260914-112550-660907",
+        "20260914-112550-434112",
+        "20260914-112550-767cf6"
       ]
     }
   ]

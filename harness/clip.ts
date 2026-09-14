@@ -4,7 +4,7 @@
  *
  *   pnpm harness:clip <trackId> [--recording <path> | --fresh [--skill 3] [--track-wall-s 120]]
  *                     [--at-x <m> [--before 1.5] [--after 3]] [--from-tick N] [--to-tick N]
- *                     [--fps 60] [--quality high] [--tail 1] [--build]
+ *                     [--fps 60] [--quality high] [--tail 1] [--build] [--no-camera-check] [--no-camera-assert]
  *   pnpm harness:clip --tile a,b,c,d [--recapture | --fresh [--skill 3]] [--out harness/out/capture/tile.jpg]
  *
  * Writes harness/out/capture/<trackId>/{clip.mp4,sheet.jpg,clip.json}. The recording is
@@ -17,6 +17,13 @@
  * `--tile` samples 4 frames from
  * each track's clip.mp4 (capturing it first when missing) into one 4x4 sheet, one row per
  * track, for the parent to judge in a single image.
+ *
+ * Camera assertion (on by default): every rendered frame reads `hook.camera()` — the bike's
+ * screen position must stay inside the central [0.2, 0.8] box while riding, |roll| < 1e-6,
+ * and the count of frames the rig clamped to the track's camera bounds is reported. The
+ * line is printed in the clip report and stored in clip.json (`camera`); a failure exits 1
+ * after writing the clip (`--no-camera-assert` keeps the exit code 0, `--no-camera-check`
+ * skips the per-frame read).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,7 +32,7 @@ import { expandFrames, frameCount, type InputRecording } from '../src/core/repla
 import type { QualityTier } from '../src/core/types';
 import { build } from 'vite';
 import { runOnce } from './bot/bot';
-import { captureClip } from './capture';
+import { captureClip, describeCamera, type CameraCheck } from './capture';
 import { extractFrames } from './compare/ffrun';
 import { flagBool, flagNum, flagStr, parseArgs } from './lib/args';
 import { contactSheet, probeVideo } from './lib/ffmpeg';
@@ -120,6 +127,8 @@ export interface ClipOptions {
   fps?: number;
   quality?: QualityTier;
   tailSeconds?: number;
+  /** Per-frame camera() box / roll / clamped check (default on; `--no-camera-check` turns it off). */
+  cameraCheck?: boolean;
   atX?: number;
   beforeS?: number;
   afterS?: number;
@@ -146,6 +155,8 @@ export interface ClipReport {
   size: string;
   srcFingerprint: string;
   wallMs: number;
+  /** Per-frame camera() assertion over the rendered frames (capture.ts CameraCheck); null without a renderer camera(). */
+  camera: CameraCheck | null;
 }
 
 export async function makeClip(o: ClipOptions): Promise<ClipReport> {
@@ -199,7 +210,9 @@ export async function makeClip(o: ClipOptions): Promise<ClipReport> {
     build: (o.build ?? false) && !built,
     sheetCols: 4,
     sheetRows: 2,
+    cameraCheck: o.cameraCheck ?? true,
   });
+  log(describeCamera(res.camera));
   const report: ClipReport = {
     trackId: o.trackId,
     recording: path.relative(REPO_ROOT, summary.file),
@@ -216,6 +229,7 @@ export async function makeClip(o: ClipOptions): Promise<ClipReport> {
     size: '1280x720',
     srcFingerprint: srcFingerprint(),
     wallMs: res.wallMs,
+    camera: res.camera,
   };
   if (endTick === null && res.finishTime !== null && summary.finishTime !== null && Math.abs(res.finishTime - summary.finishTime) > 1e-9) {
     log(`WARNING browser finish ${res.finishTime} != node finish ${summary.finishTime}: node and page disagree (stale dist? pass --build)`);
@@ -285,6 +299,7 @@ async function main(): Promise<void> {
   if (flags['from-tick'] !== undefined) opts.fromTick = flagNum(flags, 'from-tick', 0);
   if (flags['to-tick'] !== undefined) opts.toTick = flagNum(flags, 'to-tick', 0);
   if (typeof flags['out'] === 'string') opts.outDir = path.resolve(flags['out']);
+  if (flagBool(flags, 'no-camera-check')) opts.cameraCheck = false;
   console.log(`clip ${trackId}: candidates under harness/inputs/${trackId}/`);
   const r = await makeClip(opts);
   printKV('clip', {
@@ -297,7 +312,12 @@ async function main(): Promise<void> {
     'browser finish': r.finishTime,
     quality: r.quality,
     'wall s': (r.wallMs / 1000).toFixed(1),
+    camera: r.camera ? `${r.camera.pass ? 'PASS' : 'FAIL'} out-of-box ${r.camera.outOfBox}/${r.camera.frames} (riding ${r.camera.outOfBoxRiding}), clamped ${r.camera.clamped} (${r.camera.clampedPct}%), max|roll| ${r.camera.maxAbsRoll.toExponential(1)}` : 'n/a',
   });
+  if (r.camera && !r.camera.pass && !flagBool(flags, 'no-camera-assert')) {
+    console.error(`camera assertion FAILED: ${describeCamera(r.camera)} (clip written; pass --no-camera-assert to ignore)`);
+    process.exitCode = 1;
+  }
 }
 
 const isEntry = process.argv[1] !== undefined && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

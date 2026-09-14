@@ -11,7 +11,13 @@
  *   restart                                 give up a live attempt: back to the last checkpoint (an attempt)
  *   reset                                   back to the start line (an attempt)
  *   done                                    finalize session.json + metrics
- *   report <trackId>                        (parent) aggregate all sessions -> out/metrics/<track>.stranger.{json,md}
+ *   report <trackId> [<trackId>...] [--tracks a,b] [--stale]
+ *                                           (parent) aggregate all sessions -> out/metrics/<track>.stranger.{json,md};
+ *                                           several tracks print one summary table at the end
+ *   prep --tracks a,b [--agents s1,s2] [--round r3]
+ *                                           (parent) create agents x tracks fresh sessions and write
+ *                                           out/stranger/rounds/<round>/{manifest.json,spawn.md}: one paste-ready
+ *                                           stranger prompt per session (PROTOCOL block + track + session id)
  *
  * Exit codes: 0 ok, 1 error ({error} JSON), 2 budget exhausted ({budget:'exhausted'}).
  * See PROTOCOL.md (what the stranger is told) and docs/design/harness-metrics.md §3.
@@ -22,12 +28,13 @@ import type { GameEvent, InputFrame, PhysicsState } from '../../src/core/types';
 import { encodeJSON } from '../../src/core/replay';
 import { ACTIONS, COAST, HOLD, RESTART_FRAME, formatActions, framesOf, parseSlots } from '../bot/actions';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
-import { attemptsFromEvents, countedFaults, faultsByCheckpoint, runMeta } from '../lib/metrics';
+import { attemptsFromEvents, countedFaults, faultsByCheckpoint, runMeta, srcFingerprint } from '../lib/metrics';
 import { REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
 import type { BestAttempt, StrangerSession } from '../lib/schema';
 import { report as strangerReport } from './report';
 import {
+  STRANGER_OUT,
   appendLog,
   beginAttempt,
   budgetLeft,
@@ -37,6 +44,7 @@ import {
   resolveSessionDir,
   round,
   saveSession,
+  stampId,
   wallMs,
   type LoadedSession,
   type PersistedEvent,
@@ -65,6 +73,8 @@ interface Numbers {
   distanceToFinish: number;
   cleared: boolean;
   finishTime: number | null;
+  /** After the line: the game owns the input and the bike coasts/brakes to a stop on the run-out. */
+  runOut?: { x: number; stopped: boolean; frozen: boolean };
   budget: { callsLeft: number; secondsLeft: number };
 }
 
@@ -82,13 +92,45 @@ function numbers(s: LoadedSession): Numbers {
     checkpointCount: s.sim.track.checkpoints.length,
     faults,
     attempt: 1 + faults,
-    runTime: round(s.state.runTicks / s.state.physicsHz, 3),
+    // The run clock freezes at the line (Game.runTime): the coast ticks after it do not count.
+    runTime: s.state.cleared && s.state.finishTime !== null ? s.state.finishTime : round(s.state.runTicks / s.state.physicsHz, 3),
     finishX: s.sim.track.finishX,
     distanceToFinish: round(s.sim.track.finishX - st.bike.pos.x, 2),
     cleared: s.state.cleared,
     finishTime: s.state.finishTime,
+    ...(s.state.cleared ? { runOut: { x: round(st.bike.pos.x, 2), stopped: isStopped(st), frozen: s.sim.rules.finishFrozen() } } : {}),
     budget: { callsLeft: b.callsLeft, secondsLeft: b.secondsLeft },
   };
+}
+
+function isStopped(st: PhysicsState): boolean {
+  return Math.abs(st.bike.vel.x) < 0.05 && Math.abs(st.bike.vel.y) < 0.05 && (st.wheels.rear.grounded || st.wheels.front.grounded);
+}
+
+/** Longest the finish coast is played out per call (the bike normally stops well inside it). */
+const FINISH_COAST_MAX_S = 4;
+
+/**
+ * Mirror of what the player watches after the line: the game feeds throttle 0 / lean 0 and a
+ * 0 → 0.6 brake ramp (`Game.stepFinishCoast`, via `lib/rules.ts`), the bike rolls out and stops
+ * on the run-out; a post-line fault is undone and the world freezes. The frames recorded here
+ * are ignored by the finished game, so the replay hashes the same in the browser whatever they
+ * hold; COAST keeps the recording honest about what the player did (let go).
+ */
+function finishCoast(s: LoadedSession): { seconds: number; stoppedAt: number; stopped: boolean; frozen: boolean } {
+  const max = Math.round(FINISH_COAST_MAX_S * s.state.physicsHz);
+  let n = 0;
+  while (n < max && s.sim.phase() === 'finished' && !s.sim.rules.finishFrozen() && !isStopped(s.sim.state())) {
+    tick(s, COAST);
+    n++;
+  }
+  const st = s.sim.state();
+  return { seconds: round(n / s.state.physicsHz, 2), stoppedAt: round(st.bike.pos.x, 2), stopped: isStopped(st), frozen: s.sim.rules.finishFrozen() };
+}
+
+/** The side-view; once the run is over the finish line stays in frame beside the stopped bike. */
+function view(s: LoadedSession): string {
+  return asciiView(s.sim.compiled, s.sim.state(), undefined, undefined, s.state.cleared ? s.sim.track.finishX : undefined);
 }
 
 /**
@@ -108,7 +150,7 @@ function trackCard(s: LoadedSession): string {
 
 /** The screen: numbers + side-view. Printed by look/start and after every play. */
 function screen(s: LoadedSession): string {
-  return `${JSON.stringify(numbers(s))}\n${asciiView(s.sim.compiled, s.sim.state())}`;
+  return `${JSON.stringify(numbers(s))}\n${view(s)}`;
 }
 
 function brief(st: PhysicsState): { x: number; vx: number; angle_deg: number } {
@@ -145,7 +187,8 @@ function tick(s: LoadedSession, frame: InputFrame): PersistedEvent[] {
     if (event.type === 'checkpoint' && s.state.firstCheckpointCalls === null) s.state.firstCheckpointCalls = s.state.calls;
     if (event.type === 'finish' && !s.state.cleared) {
       s.state.cleared = true;
-      s.state.finishTime = round(s.state.runTicks / s.state.physicsHz, 4);
+      // The game's run clock (reset by a full restart, frozen at the line) — what the results panel shows.
+      s.state.finishTime = round(s.sim.runTime(), 4);
     }
   }
   return out;
@@ -202,6 +245,8 @@ interface PlayResult {
   events: CompactEvent[];
   faulted?: { reason: string; at: number; respawnedAt: number; respawnAfterS: number; forcedReset?: true };
   finished?: true;
+  /** Played out in-call after the line: how far the bike rolled before it stopped (or froze on a post-line fault). */
+  runOut?: { seconds: number; stoppedAt: number; stopped: boolean; frozen: boolean };
   checkpoint: number;
   grounded: boolean;
   faults: number;
@@ -220,6 +265,7 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
   let played = 0;
   let faulted: PlayResult['faulted'] | undefined;
   let finished = false;
+  let runOut: PlayResult['runOut'] | undefined;
   let note: string | undefined;
 
   outer: for (const id of ids) {
@@ -245,7 +291,12 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
     trace.push(
       `${String(played).padStart(2, '0')} ${code.padEnd(3)} x=${st.bike.pos.x.toFixed(1).padStart(6)} vx=${st.bike.vel.x.toFixed(1).padStart(5)} ang=${((st.bike.angle * 180) / Math.PI).toFixed(0).padStart(4)} ${g ? 'ground' : 'AIR'}${marks.length ? `  <- ${marks.join(', ')}` : ''}`,
     );
-    if (finished) break outer; // the successful attempt is not an ended one: strangerAttempts = 1 + faults
+    if (finished) {
+      // The successful attempt is not an ended one: strangerAttempts = 1 + faults. The game
+      // now owns the input: play the run-out coast so the screen (and the clip) show the stop.
+      runOut = finishCoast(s);
+      break outer;
+    }
     if (slotFault && slotFault.event.type === 'fault') {
       const reason = slotFault.event.reason;
       const cp = st.checkpoint;
@@ -283,7 +334,9 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
   if (faulted) result.faulted = faulted;
   if (finished) {
     result.finished = true;
-    result.note = `FINISHED at run time ${s.state.finishTime}s. Call 'done'.`;
+    if (runOut) result.runOut = runOut;
+    result.runTime = s.state.finishTime ?? result.runTime;
+    result.note = `FINISHED at run time ${s.state.finishTime}s${runOut ? ` (the game then ${runOut.frozen ? 'froze the bike on a post-line tumble' : runOut.stopped ? 'braked you to a stop' : 'is still braking you'} at x=${runOut.stoppedAt.toFixed(1)} m on the run-out, ${runOut.seconds.toFixed(1)} s after the line)` : ''}. Call 'done'.`;
   } else if (note) result.note = note;
   return { result, trace };
 }
@@ -318,6 +371,9 @@ function reset(s: LoadedSession): Record<string, unknown> {
   // restart edge (checkpoint respawn, counted as the fault), the hold then triggers the
   // full restart to the start line. Fully expressed in the recording, so replays agree.
   const events: PersistedEvent[] = [];
+  // Game rule: the hold cannot fire until the restart key has been released once since GO /
+  // the last full restart (`holdFired` starts true). One coast tick releases it when needed.
+  if (s.sim.rules.counters().holdFired) events.push(...tick(s, COAST));
   for (let i = 0; i < s.sim.rules.T.holdRestart; i++) events.push(...tick(s, RESTART_FRAME));
   events.push(...tick(s, COAST));
   beginAttempt(s);
@@ -408,21 +464,95 @@ async function done(s: LoadedSession): Promise<{ session: StrangerSession; metri
 
 const MUTATING = new Set(['play', 'restart', 'reset']);
 
+/** The block of run-stranger.md the parent pastes, with the placeholders filled. */
+function spawnBlock(trackId: string, sessionId: string): string {
+  return [
+    'You are playing a 2D motorbike trials track through a command-line tool. Your only briefing is',
+    'the file below; read it in full, then follow its Setup section. Do not read, list or edit any',
+    'other file in that folder, do not look at its source code or git history, and do not search',
+    'the web: the track is meant to be discovered by riding it.',
+    '',
+    `Briefing: \`${path.join(REPO_ROOT, 'harness', 'stranger', 'PROTOCOL.md')}\``,
+    '',
+    `Track id: \`${trackId}\``,
+    `Session id: \`${sessionId}\` (already created for you — skip \`start\`; pass \`--session ${sessionId}\` on every command)`,
+    '',
+    'Play until you cross the finish or you are out of ideas or budget, then run `done` and reply',
+    'with the single word DONE followed by one sentence on what the hardest part was.',
+  ].join('\n');
+}
+
+/**
+ * Parent side: one fresh session per agent x track (so the stranger never picks a track or
+ * an id), plus the exact prompt per session. Nothing here counts as a call.
+ */
+async function prep(tracks: string[], agents: string[], round: string): Promise<{ dir: string; sessions: Array<{ trackId: string; sessionId: string; agent: string }> }> {
+  const dir = path.join(STRANGER_OUT, 'rounds', round);
+  fs.mkdirSync(dir, { recursive: true });
+  const sessions: Array<{ trackId: string; sessionId: string; agent: string; seed: number; attemptsBand: [number, number] | null }> = [];
+  const stamp = stampId(new Date());
+  for (const trackId of tracks) {
+    for (const agent of agents) {
+      const sessionId = `${trackId}-${round}-${agent}-${stamp}`;
+      const s = await createSession({ trackId, agent, sessionId });
+      saveSession(s);
+      sessions.push({ trackId, sessionId, agent, seed: s.state.seed, attemptsBand: s.sim.track.meta?.attemptsBand ?? null });
+    }
+  }
+  const md = [
+    `# Stranger round ${round} — ${sessions.length} sessions (${agents.length} per track), created ${new Date().toISOString()}, src ${srcFingerprint()}`,
+    '',
+    'One fresh agent per block, no other context (harness/stranger/run-stranger.md). After each replies DONE:',
+    '',
+    '```',
+    `pnpm harness:stranger report ${tracks.join(' ')}`,
+    '```',
+    '',
+    ...sessions.flatMap((x) => [`## ${x.trackId} · ${x.agent} · \`${x.sessionId}\``, '', '---', '', spawnBlock(x.trackId, x.sessionId), '', '---', '']),
+  ].join('\n');
+  fs.writeFileSync(path.join(dir, 'spawn.md'), md);
+  writeJson(path.join(dir, 'manifest.json'), { round, createdAt: new Date().toISOString(), srcFingerprint: srcFingerprint(), tracks, agents, sessions, report: `pnpm harness:stranger report ${tracks.join(' ')}` });
+  return { dir, sessions };
+}
+
 async function main(): Promise<number> {
   const { positional, flags } = parseArgs();
   const cmd = positional[0];
   if (!cmd || flags['help'] === true) {
-    console.log('usage: cli.ts <start|look|status|play "<slots>"|restart|reset|done> [--track id] [--session id] [--agent name] [--seed N]\n       cli.ts report <trackId>   (parent side: aggregate every session of a track)');
+    console.log('usage: cli.ts <start|look|status|play "<slots>"|restart|reset|done> [--track id] [--session id] [--agent name] [--seed N]\n       cli.ts report <trackId> [<trackId>...] [--stale]   (parent side: aggregate every session of each track)\n       cli.ts prep --tracks a,b [--agents s1,s2] [--round r3]   (parent side: fresh sessions + paste-ready prompts)');
     return cmd ? 0 : 1;
   }
   const trackFlag = typeof flags['track'] === 'string' ? flags['track'] : undefined;
+  const listFlag = (name: string): string[] => (typeof flags[name] === 'string' ? (flags[name] as string).split(',').map((x) => x.trim()).filter(Boolean) : []);
   if (cmd === 'report') {
     // Parent-side aggregation; touches no session and counts as no call.
-    const id = positional[1] ?? trackFlag;
-    if (!id) throw new Error('usage: report <trackId>');
-    const r = await strangerReport(id, { fresh: !flagBool(flags, 'stale') });
-    console.log(r.markdown);
-    console.log(`report: ${r.jsonFile} (+ .md) sessions=${r.metrics.sessions.length} completed=${r.metrics.completed} median attempts=${r.metrics.medianAttempts ?? '-'} pass=${r.metrics.pass ?? 'n/a'}`);
+    const ids = [...positional.slice(1), ...listFlag('tracks'), ...(trackFlag ? [trackFlag] : [])];
+    if (ids.length === 0) throw new Error('usage: report <trackId> [<trackId>...] [--tracks a,b] [--stale]');
+    const rows: string[] = [];
+    for (const id of ids) {
+      const r = await strangerReport(id, { fresh: !flagBool(flags, 'stale') });
+      console.log(r.markdown);
+      console.log(`report: ${r.jsonFile} (+ .md) sessions=${r.metrics.sessions.length} completed=${r.metrics.completed} median attempts=${r.metrics.medianAttempts ?? '-'} pass=${r.metrics.pass ?? 'n/a'}`);
+      const m = r.metrics;
+      const band = m.attemptsBand ? `${m.attemptsBand[0]}–${m.attemptsBand[1]}` : '—';
+      rows.push(`| ${id} | ${band} | ${m.sessions.length} | ${m.completed} | ${m.clearedCount} | ${m.medianAttempts ?? '—'} | ${m.medianFinishTime === null ? '—' : `${m.medianFinishTime.toFixed(1)} s`} | ${m.medianCalls ?? '—'} | ${m.pass === null ? 'n/a' : m.pass ? 'PASS' : 'FAIL'} |`);
+    }
+    if (ids.length > 1) {
+      console.log(`\n## Stranger summary — ${ids.length} tracks, src ${srcFingerprint()}${flagBool(flags, 'stale') ? ' (incl. stale)' : ''}\n`);
+      console.log('| track | band | sessions | completed (fresh) | cleared | median attempts | median time | median calls | pass (≤ 1.5 × band top, all cleared) |');
+      console.log('| --- | --- | --- | --- | --- | --- | --- | --- | --- |');
+      for (const row of rows) console.log(row);
+    }
+    return 0;
+  }
+  if (cmd === 'prep') {
+    const tracks = [...listFlag('tracks'), ...positional.slice(1)];
+    if (tracks.length === 0) throw new Error('usage: prep --tracks a,b [--agents s1,s2] [--round r3]');
+    const agents = listFlag('agents');
+    const round = flagStr(flags, 'round', `r${stampId(new Date())}`);
+    const r = await prep(tracks, agents.length ? agents : ['s1', 's2'], round);
+    for (const x of r.sessions) console.log(`${x.trackId.padEnd(20)} ${x.agent.padEnd(4)} ${x.sessionId}`);
+    console.log(`prep: ${r.sessions.length} sessions; paste blocks in ${path.join(r.dir, 'spawn.md')}; manifest ${path.join(r.dir, 'manifest.json')}`);
     return 0;
   }
   const sessionFlag = typeof flags['session'] === 'string' ? flags['session'] : process.env['TRIALS_STRANGER_SESSION'];
@@ -487,8 +617,9 @@ async function main(): Promise<number> {
         saveSession(s);
         console.log(JSON.stringify(result));
         console.log(trace.join('\n'));
-        // The screen after the move, as a player sees it: no `look` call needed.
-        if (!result.finished) console.log(asciiView(s.sim.compiled, s.sim.state()));
+        // The screen after the move, as a player sees it: no `look` call needed (after the
+        // finish: the bike stopped on the run-out, the line still in frame).
+        console.log(view(s));
         break;
       }
       case 'restart': {
@@ -496,7 +627,7 @@ async function main(): Promise<number> {
         appendLog(s, `-> ${JSON.stringify({ ...r, budget: undefined })}`);
         saveSession(s);
         console.log(JSON.stringify(r));
-        console.log(asciiView(s.sim.compiled, s.sim.state()));
+        console.log(view(s));
         break;
       }
       case 'reset': {
@@ -504,7 +635,7 @@ async function main(): Promise<number> {
         appendLog(s, `-> ${JSON.stringify({ ...r, budget: undefined })}`);
         saveSession(s);
         console.log(JSON.stringify(r));
-        console.log(asciiView(s.sim.compiled, s.sim.state()));
+        console.log(view(s));
         break;
       }
       case 'done': {

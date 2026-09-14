@@ -14,10 +14,14 @@ export const VIEW_ROWS = 16;
 export const VIEW_METERS = 40;
 export const VIEW_BEHIND = 5;
 
-export function asciiView(compiled: CompiledTrack, st: PhysicsState, cols = VIEW_COLS, rows = VIEW_ROWS): string {
+/**
+ * `anchorX`: keep this x in frame too (the finish line once the bike is on the run-out past
+ * it), so the window starts at the smaller of bike − 5 m and anchor − 5 m.
+ */
+export function asciiView(compiled: CompiledTrack, st: PhysicsState, cols = VIEW_COLS, rows = VIEW_ROWS, anchorX?: number): string {
   const bx = st.bike.pos.x;
   const by = st.bike.pos.y;
-  const x0 = bx - VIEW_BEHIND;
+  const x0 = Math.min(bx, anchorX ?? bx) - VIEW_BEHIND;
   const x1 = x0 + VIEW_METERS;
   const cellW = VIEW_METERS / cols;
 

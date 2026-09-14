@@ -1,7 +1,13 @@
 /**
  * Determinism gate (harness-metrics.md §6).
  *
- *   pnpm harness:determinism <recording> [--loads 3] [--pin] [--dev] [--build]
+ *   pnpm harness:determinism <recording> [--loads 3] [--pin] [--tail-s 3] [--dev] [--build]
+ *
+ *   --tail-s N  append N s of full-throttle / full-lean frames after the recording's last
+ *               tick: a golden ends on the finish tick, so this is what proves the
+ *               post-finish coast (throttle 0 / lean 0 / quantised brake ramp, post-line
+ *               fault undone and frozen — `Game.stepFinishCoast`) is mirrored in node
+ *               (`harness/lib/rules.ts`). The finished game must ignore the appended input.
  *
  *   D1  cross-load       same recording in N fresh page loads: identical hash / finishTime / tick
  *   D2  cross-encoding   .json vs .bin decode to identical frames and hash (node)
@@ -18,7 +24,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Page } from 'playwright';
-import { decodeBinary, encodeBinary, encodeJSON, expandFrames, frameCount, type InputRecording } from '../../src/core/replay';
+import { InputRecorder, decodeBinary, encodeBinary, encodeJSON, expandFrames, frameCount, quantizeInput, type InputRecording } from '../../src/core/replay';
 import type { InputFrame, PhysicsState } from '../../src/core/types';
 import { decodeSnapshot, encodeSnapshot } from '../../src/game/hook';
 import { flagBool, flagNum, parseArgs } from '../lib/args';
@@ -128,6 +134,17 @@ async function bisectNodeVsBrowser(page: Page, rec: InputRecording): Promise<{ f
   return { firstDivergentTick: first, diffPaths: diffState(nodeStates[first], browserState) };
 }
 
+/** The recording plus `seconds` of full-throttle / full-lean frames (the noisiest legal input) after its last tick. */
+export function withTail(rec: InputRecording, seconds: number): InputRecording {
+  const n = Math.round(seconds * rec.header.physicsHz);
+  if (n <= 0) return rec;
+  const r = new InputRecorder({ ...rec.header, note: `${rec.header.note ?? ''} tail=${seconds}s`.trim() });
+  for (const f of expandFrames(rec)) r.push(f);
+  const tail = quantizeInput({ throttle: 1, brake: 0, lean: 1, hop: false, restart: false });
+  for (let i = 0; i < n; i++) r.push(tail);
+  return r.toRecording();
+}
+
 export interface DeterminismOptions {
   loads?: number;
   pin?: boolean;
@@ -207,7 +224,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
     for (let i = 0; i < m; i++) sim.step(drive(k + i));
     const h2 = sim.hash();
     const dec = decodeSnapshot(b64);
-    sim.restore({ physics: dec.physics, counters: (dec.counters as typeof snap.counters | null) ?? snap.counters });
+    sim.restore({ physics: dec.physics, counters: dec.counters ?? snap.counters });
     for (let i = 0; i < m; i++) sim.step(drive(k + i));
     const h3 = sim.hash();
     d4Hashes.push(h1);
@@ -341,7 +358,9 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
 async function main(): Promise<void> {
   const { positional, flags } = parseArgs();
   const file = positional[0] ?? path.join(HARNESS_DIR, 'inputs', 'flat-test', 'bot-oracle.json');
-  const rec = loadRecording(file);
+  const tailS = flagNum(flags, 'tail-s', 0);
+  const rec = withTail(loadRecording(file), tailS);
+  if (tailS > 0) console.log(`tail: +${tailS} s of throttle 1 / lean 1 after tick ${frameCount(rec) - Math.round(tailS * rec.header.physicsHz)} (the finished game must ignore it)`);
   const verifier = new BrowserVerifier({ dev: flagBool(flags, 'dev'), build: flagBool(flags, 'build'), verbose: flagBool(flags, 'verbose') });
   try {
     const report = await runDeterminism(rec, file, { loads: flagNum(flags, 'loads', 3), pin: flagBool(flags, 'pin'), verifier });

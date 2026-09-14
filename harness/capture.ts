@@ -49,7 +49,52 @@ export interface CaptureOptions {
   /** Contact sheet grid (default 4x2). */
   sheetCols?: number;
   sheetRows?: number;
+  /** Per-frame `camera()` check (default on): bike inside the CAMERA_BOX, |roll| < 1e-6, clamped-frame count. */
+  cameraCheck?: boolean;
 }
+
+/** The screen-space band the followed bike must stay in (rig.ts: "the bike stays inside the central [0.2, 0.8] box"). */
+export const CAMERA_BOX = { min: 0.2, max: 0.8 } as const;
+export const CAMERA_ROLL_MAX = 1e-6;
+
+export interface CameraFrameViolation {
+  frame: number;
+  tick: number;
+  x: number;
+  y: number;
+  roll: number;
+  state: string | null;
+  clamped: boolean;
+}
+
+/** Aggregate of `camera()` over every rendered frame of a clip. */
+export interface CameraCheck {
+  frames: number;
+  box: { min: number; max: number };
+  /** Frames whose bike centre left the box (any phase). */
+  outOfBox: number;
+  /** ... of which while riding (the ones that matter; crash/finish hold states are reported separately). */
+  outOfBoxRiding: number;
+  rollViolations: number;
+  maxAbsRoll: number;
+  /** Frames the rig had to clamp its position to the track's camera bounds. */
+  clamped: number;
+  clampedPct: number;
+  /** Frames per rig state name. */
+  states: Record<string, number>;
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  /** First few offending frames. */
+  violations: CameraFrameViolation[];
+  /** Windowed clips (startTick > 0) start the rig cold: the first 0.5 s of frames are counted here and not judged. */
+  settleExcluded: number;
+  pass: boolean;
+}
+
+/** Rig settle time excluded from the assertion when a clip starts mid-recording (the prefix ran without rendering). */
+export const CAMERA_SETTLE_S = 0.5;
 
 export interface CaptureResult {
   mp4: string;
@@ -62,6 +107,64 @@ export interface CaptureResult {
   finishTime: number | null;
   probe: Awaited<ReturnType<typeof probeVideo>>;
   wallMs: number;
+  /** Null when the renderer has no `camera()` or the check was turned off. */
+  camera: CameraCheck | null;
+}
+
+type CamSample = { bikeScreenX: number; bikeScreenY: number; roll?: number | undefined; state?: string | undefined; clamped?: boolean | undefined; phase?: string | undefined } | null;
+
+function newCameraCheck(): CameraCheck {
+  return { frames: 0, box: { ...CAMERA_BOX }, outOfBox: 0, outOfBoxRiding: 0, rollViolations: 0, maxAbsRoll: 0, clamped: 0, clampedPct: 0, states: {}, minX: 1, maxX: 0, minY: 1, maxY: 0, violations: [], settleExcluded: 0, pass: true };
+}
+
+function accumulateCamera(c: CameraCheck, s: NonNullable<CamSample>, frame: number, tick: number, settle: boolean): void {
+  c.frames++;
+  if (settle) {
+    c.settleExcluded++;
+    return;
+  }
+  const x = s.bikeScreenX;
+  const y = s.bikeScreenY;
+  const roll = Math.abs(s.roll ?? 0);
+  const state = s.state ?? null;
+  c.states[state ?? 'n/a'] = (c.states[state ?? 'n/a'] ?? 0) + 1;
+  if (x < c.minX) c.minX = x;
+  if (x > c.maxX) c.maxX = x;
+  if (y < c.minY) c.minY = y;
+  if (y > c.maxY) c.maxY = y;
+  if (roll > c.maxAbsRoll) c.maxAbsRoll = roll;
+  if (s.clamped) c.clamped++;
+  const out = x < CAMERA_BOX.min || x > CAMERA_BOX.max || y < CAMERA_BOX.min || y > CAMERA_BOX.max;
+  const rollBad = roll >= CAMERA_ROLL_MAX;
+  if (out) {
+    c.outOfBox++;
+    if (s.phase === 'riding') c.outOfBoxRiding++;
+  }
+  if (rollBad) c.rollViolations++;
+  if ((out || rollBad) && c.violations.length < 12) c.violations.push({ frame, tick, x: +x.toFixed(3), y: +y.toFixed(3), roll: +roll.toExponential(2), state, clamped: s.clamped === true });
+}
+
+function finishCamera(c: CameraCheck | null): CameraCheck | null {
+  if (!c || c.frames === 0) return null;
+  c.clampedPct = +((100 * c.clamped) / c.frames).toFixed(1);
+  c.minX = +c.minX.toFixed(3);
+  c.maxX = +c.maxX.toFixed(3);
+  c.minY = +c.minY.toFixed(3);
+  c.maxY = +c.maxY.toFixed(3);
+  // Pass = the bike never left the box while riding and the camera never rolled. Crash / finish
+  // hold states may frame the tumble differently; they are counted, not failed.
+  c.pass = c.outOfBoxRiding === 0 && c.rollViolations === 0;
+  return c;
+}
+
+/** One line for reports: `camera: PASS 312 frames, box x 0.41..0.52 y 0.46..0.61, clamped 0 (0%), roll<1e-6, states side:300 finish:12`. */
+export function describeCamera(c: CameraCheck | null): string {
+  if (!c) return 'camera: n/a (renderer has no camera() or check off)';
+  const states = Object.entries(c.states)
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, v]) => `${k}:${v}`)
+    .join(' ');
+  return `camera: ${c.pass ? 'PASS' : 'FAIL'} ${c.frames} frames${c.settleExcluded ? ` (${c.settleExcluded} settle excluded)` : ''}, bike x ${c.minX}..${c.maxX} y ${c.minY}..${c.maxY} (box ${c.box.min}..${c.box.max}; out ${c.outOfBox}, riding ${c.outOfBoxRiding}), clamped ${c.clamped} (${c.clampedPct}%), max|roll| ${c.maxAbsRoll.toExponential(1)}${c.rollViolations ? ` ROLL x${c.rollViolations}` : ''}, states ${states}${c.violations.length ? `; first: ${c.violations.slice(0, 3).map((v) => `f${v.frame}@t${v.tick} (${v.x},${v.y}) ${v.state ?? ''}`).join(', ')}` : ''}`;
 }
 
 export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
@@ -111,6 +214,8 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
     const framePaths: string[] = [];
     let finishedAt = -1;
     let lastState: PhysicsState | null = null;
+    const cameraCheck = o.cameraCheck ?? true;
+    let camera: CameraCheck | null = cameraCheck ? newCameraCheck() : null;
     const firstVideoFrame = startTick / ticksPerFrame;
     const totalVideoFrames = Math.ceil(endTick / ticksPerFrame);
     // Run the recording to its end; when the run finishes early (and
@@ -121,7 +226,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
       const slice: InputFrame[] = frames.slice(k * ticksPerFrame, (k + 1) * ticksPerFrame);
       // Step this frame's ticks and render in one round trip.
       const res = await page.evaluate(
-        ([inputs, n, grab]) => {
+        ([inputs, n, grab, cam]) => {
           const t = window.__trials!;
           for (const f of inputs) {
             t.setInput(f);
@@ -131,11 +236,18 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
           t.render();
           const state = t.getState();
           const dataUrl = grab ? (document.querySelector('canvas') as HTMLCanvasElement).toDataURL('image/png') : null;
-          return { state, dataUrl };
+          let camera: CamSample = null;
+          if (cam && typeof t.camera === 'function') {
+            const c = t.camera() as { bikeScreenX: number; bikeScreenY: number; roll?: number; state?: string; clamped?: boolean };
+            camera = { bikeScreenX: c.bikeScreenX, bikeScreenY: c.bikeScreenY, roll: c.roll ?? 0, state: c.state ?? 'n/a', clamped: c.clamped === true, phase: t.phase() };
+          }
+          return { state, dataUrl, camera };
         },
-        [slice, ticksPerFrame, mode === 'canvas'] as const,
+        [slice, ticksPerFrame, mode === 'canvas', cameraCheck] as const,
       );
       lastState = res.state;
+      if (camera && res.camera) accumulateCamera(camera, res.camera, k - firstVideoFrame, res.state.tick, startTick > 0 && k - firstVideoFrame < Math.round(CAMERA_SETTLE_S * fps));
+      else if (camera && cameraCheck && k === firstVideoFrame) camera = null; // renderer without camera(): nothing to assert
       const file = path.join(framesDir, `frame-${String(k - firstVideoFrame).padStart(5, '0')}.png`);
       if (mode === 'canvas' && res.dataUrl) {
         fs.writeFileSync(file, Buffer.from(res.dataUrl.split(',')[1]!, 'base64'));
@@ -165,6 +277,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
       finishTime: lastState?.finishTime ?? null,
       probe,
       wallMs: performance.now() - t0,
+      camera: finishCamera(camera),
     };
   } finally {
     await launched.close();
