@@ -1,0 +1,283 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "e1-uphill-weight",
+  "attemptsBand": [
+    2,
+    4
+  ],
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "73762476",
+  "updatedAt": "2026-09-14T10:36:47.060Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "e1-uphill-weight-20260914-051942",
+      "agent": "s1",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "73762476",
+      "strangerAttempts": 9,
+      "cleared": true,
+      "finishTime": 126.5167,
+      "calls": 97,
+      "wallMs": 1005936,
+      "firstCheckpointCalls": 4,
+      "faultsByCheckpoint": [
+        1,
+        2,
+        0,
+        1,
+        4
+      ],
+      "bestAttempt": {
+        "n": 9,
+        "cleared": true,
+        "x": 365.416,
+        "startTick": 12733,
+        "endTick": 15182,
+        "recordingFile": "harness/inputs/e1-uphill-weight/stranger-e1-uphill-weight-20260914-051942.json"
+      },
+      "recordingFile": "harness/inputs/e1-uphill-weight/stranger-e1-uphill-weight-20260914-051942.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 26.086,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 3
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 62.392,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 7
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 83.754,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 88.2 m",
+          "calls": 15
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 215.728,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 221.8 m",
+          "calls": 34
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 297.731,
+          "checkpoint": 3,
+          "obstacle": "box @ 296.0 m",
+          "calls": 49
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 298.443,
+          "checkpoint": 3,
+          "obstacle": "plank @ 302.0 m",
+          "calls": 66
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 291.616,
+          "checkpoint": 3,
+          "obstacle": "ramp @ 291.8 m",
+          "calls": 71
+        },
+        {
+          "n": 8,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 305.788,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 81
+        }
+      ]
+    },
+    {
+      "sessionId": "e1-uphill-weight-20260914-051951",
+      "agent": "s2",
+      "status": "in-progress",
+      "stale": false,
+      "srcFingerprint": null,
+      "strangerAttempts": 10,
+      "cleared": false,
+      "finishTime": null,
+      "calls": 82,
+      "wallMs": 1015765,
+      "firstCheckpointCalls": 4,
+      "faultsByCheckpoint": [],
+      "bestAttempt": null,
+      "recordingFile": null,
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 26.086,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 3
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 61.899,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 7
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 158.552,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 20
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 210.511,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 210.8 m",
+          "calls": 28
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 215.974,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 221.8 m",
+          "calls": 36
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 205.225,
+          "checkpoint": 2,
+          "obstacle": "box @ 204.8 m",
+          "calls": 40
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 303.783,
+          "checkpoint": 3,
+          "obstacle": "plank @ 302.0 m",
+          "calls": 67
+        },
+        {
+          "n": 8,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 299.115,
+          "checkpoint": 3,
+          "obstacle": "plank @ 302.0 m",
+          "calls": 72
+        },
+        {
+          "n": 9,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 301.941,
+          "checkpoint": 3,
+          "obstacle": "plank @ 302.0 m",
+          "calls": 80
+        }
+      ]
+    }
+  ],
+  "completed": 1,
+  "clearedCount": 1,
+  "medianAttempts": 9,
+  "medianFinishTime": 126.5167,
+  "medianCalls": 97,
+  "medianWallMs": 1005936,
+  "pass": false,
+  "deaths": {
+    "total": 8,
+    "byReason": {
+      "crash": 8
+    },
+    "byObstacle": [
+      {
+        "obstacle": "ground",
+        "count": 3,
+        "xs": [
+          26.1,
+          62.4,
+          305.8
+        ]
+      },
+      {
+        "obstacle": "ramp @ 88.2 m",
+        "count": 1,
+        "xs": [
+          83.8
+        ]
+      },
+      {
+        "obstacle": "ramp @ 221.8 m",
+        "count": 1,
+        "xs": [
+          215.7
+        ]
+      },
+      {
+        "obstacle": "box @ 296.0 m",
+        "count": 1,
+        "xs": [
+          297.7
+        ]
+      },
+      {
+        "obstacle": "plank @ 302.0 m",
+        "count": 1,
+        "xs": [
+          298.4
+        ]
+      },
+      {
+        "obstacle": "ramp @ 291.8 m",
+        "count": 1,
+        "xs": [
+          291.6
+        ]
+      }
+    ],
+    "byCheckpoint": [
+      1,
+      2,
+      0,
+      1,
+      4
+    ]
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "b2-lean-back",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "73762476",
+  "updatedAt": "2026-09-14T10:36:46.550Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "b2-lean-back-20260914-051941",
+      "agent": "s1",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "73762476",
+      "strangerAttempts": 4,
+      "cleared": true,
+      "finishTime": 52.8417,
+      "calls": 66,
+      "wallMs": 611867,
+      "firstCheckpointCalls": 18,
+      "faultsByCheckpoint": [
+        1,
+        0,
+        0,
+        2,
+        0
+      ],
+      "bestAttempt": {
+        "n": 4,
+        "cleared": true,
+        "x": 414.2,
+        "startTick": 4701,
+        "endTick": 6341,
+        "recordingFile": "harness/inputs/b2-lean-back/stranger-b2-lean-back-20260914-051941.json"
+      },
+      "recordingFile": "harness/inputs/b2-lean-back/stranger-b2-lean-back-20260914-051941.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 35.78,
+          "checkpoint": -1,
+          "obstacle": "drum @ 36.0 m",
+          "calls": 7
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 311.645,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 314.2 m",
+          "calls": 48
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 321.72,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 322.2 m",
+          "calls": 53
+        }
+      ]
+    },
+    {
+      "sessionId": "b2-lean-back-20260914-051950",
+      "agent": "s2",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "73762476",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 45.2,
+      "calls": 56,
+      "wallMs": 606453,
+      "firstCheckpointCalls": 8,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 414.2,
+        "startTick": 703,
+        "endTick": 5424,
+        "recordingFile": "harness/inputs/b2-lean-back/stranger-b2-lean-back-20260914-051950.json"
+      },
+      "recordingFile": "harness/inputs/b2-lean-back/stranger-b2-lean-back-20260914-051950.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 57.437,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 10
+        }
+      ]
+    }
+  ],
+  "completed": 2,
+  "clearedCount": 2,
+  "medianAttempts": 3,
+  "medianFinishTime": 49.02085,
+  "medianCalls": 61,
+  "medianWallMs": 609160,
+  "pass": true,
+  "deaths": {
+    "total": 4,
+    "byReason": {
+      "crash": 4
+    },
+    "byObstacle": [
+      {
+        "obstacle": "drum @ 36.0 m",
+        "count": 1,
+        "xs": [
+          35.8
+        ]
+      },
+      {
+        "obstacle": "ramp @ 314.2 m",
+        "count": 1,
+        "xs": [
+          311.6
+        ]
+      },
+      {
+        "obstacle": "ramp @ 322.2 m",
+        "count": 1,
+        "xs": [
+          321.7
+        ]
+      },
+      {
+        "obstacle": "ground",
+        "count": 1,
+        "xs": [
+          57.4
+        ]
+      }
+    ],
+    "byCheckpoint": [
+      1,
+      1,
+      0,
+      2,
+      0
+    ]
+  }
+}
