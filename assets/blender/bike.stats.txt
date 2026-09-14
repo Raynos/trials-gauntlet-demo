@@ -1,0 +1,6 @@
+tris_per_object={'frame': 3092, 'bodywork': 1400, 'engine': 2120, 'exhaust': 1132, 'swingarm': 960, 'shock_body': 272, 'shock_spring': 1264, 'fork_upper': 812, 'fork_lower': 560, 'handlebar': 1520, 'pegs': 544, 'wheel_rear': 7412, 'wheel_front': 6884, 'sprocket_rear': 392, 'sprocket_front': 144, 'chain': 848}
+total_tris=29356
+glb_bytes=1348068
+shock_len=0.6027
+fork_rake_deg=23.75
+gltf={'bytes': 1348068, 'triangles': 29356, 'nodes': ['bodywork', 'chain', 'engine', 'exhaust', 'fork_lower', 'fork_upper', 'frame', 'handlebar', 'pegs', 'shock_body', 'shock_spring', 'sprocket_front', 'swingarm', 'wheel_front', 'sprocket_rear', 'wheel_rear', 'bike'], 'meshes': ['bodywork', 'chain', 'engine', 'exhaust', 'fork_lower', 'fork_upper', 'frame', 'handlebar', 'pegs', 'shock_body', 'shock_spring', 'sprocket_front', 'swingarm', 'wheel_front', 'sprocket_rear', 'wheel_rear'], 'materials': ['bike_atlas', 'chain_links'], 'images': [('image/jpeg', 'bike_normal'), ('image/jpeg', 'bike_albedo'), ('image/jpeg', 'bike_orm'), ('image/png', 'chain_links')], 'animations': [], 'skins': [], 'extensions': ['EXT_meshopt_compression']}
