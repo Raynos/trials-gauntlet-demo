@@ -396,3 +396,74 @@ User (3G, round 3): white then black for many seconds. Now:
   2.8 MB of background world art contending for the link (≈ 30 s of 3G on its own) plus SwiftShader frames.
   Recommendation for the render owner: defer / trim world art until after the title, or load the showcase
   biome only.
+
+## 13. Garage and the two bikes (wave 1, MEGA_PLAN P1/P4)
+
+- `BikeClass = 'rookie' | 'pro'` lives in `src/core/types.ts` (`BIKE_CLASSES`, `DEFAULT_BIKE = 'rookie'`).
+  Physics owns the presets (`BIKE_PRESETS`, physics round 11) and takes the class at
+  `loadTrack(track, seed, { bike })`; the game passes `Game.currentBike` on every load (`Game.setBike`
+  reloads the world in place while nothing races — menu backdrop, countdown — so the Garage preview and the
+  countdown show the chosen bike). The ghost world loads with the PB recording's own `header.bike`.
+- **Garage** (`src/ui/garage.ts`, main menu item between Play and Settings, note = current bike): two cards
+  (`BIKE_SPECS`: name, one-line character, stat strip power / grip / weight feel, rule note; Rookie amber,
+  Pro `--blue`) on the left, the live 3D bike on the right is the preview (`#app.garage canvas` scales the
+  idle camera 1.25× and carries the bike right of the cards; the renderer gets `setBikeClass(bike)` when it
+  exports one — until then the card tint is the only colour). Focus previews (`previewBike`, the backdrop
+  reloads with that class), confirm commits (`trials.bikeClass`), Esc previews back to the committed class.
+- **Default rule** (`defaultBikeForTier`, tested): beginner / easy → Rookie, hard / extreme → Pro, medium →
+  the last bike ridden this session (else Rookie). The default applies only until the player has picked once
+  in the Garage; a stored choice persists across every track.
+- **Medal targets per class** (`targetForBike`): Pro rides against `0.9 × meta.targetTimeS`
+  (`PRO_TARGET_SCALE`); `RunResult.targetTimeS` is the effective target and `RunResult.bike` the class.
+  The results stats line reads `PB · TARGET · BIKE Rookie|Pro`; the NEXT TRACK tile carries the next track's
+  name (`DomHud.setNextEnabled(on, name)`).
+- **PB per bike class per track** (`src/ui/best.ts`): Rookie keeps the legacy key `trials.best.<id>` (pre-garage
+  PBs read back as Rookie), Pro is `trials.best.<id>@pro`. `BestTimes.get(id, bike)` is that class's entry
+  (ghost, splits, PB delta); `get(id)` is the track's best across classes — higher medal, then time — which is
+  what cards, tier locks and the career line read. Cards show a `Pro` tag when the best is a Pro PB.
+- Recording header gains `bike?: BikeClass` (`RecordingHeader`); `runRecording` loads the header's class.
+  `hook.info().bike` reports the class, `hook.setBike(b)` picks it (harness: Pro runs).
+- Locked track cards state the rule on the card itself (`Locked · medal every <prev tier> track`), not only in
+  the row head.
+- **Onboarding** (`src/ui/cards.ts` `OnboardingCard`): first launch only (`trials.onboarded`), shown over the
+  first countdown with the game paused — gas / brake / lean in the active device's vocabulary, the no-hop-button
+  line, one button. Any confirm / back / gas edge dismisses it.
+
+## 14. Telemetry (local run log) and `?perf=1`
+
+- `RunTelemetry` (`src/core/types.ts`): `{ at, track, bike, attempts, faults, time, timeToClear, medal,
+  deaths: [{ x, reason, checkpoint }], device, quality, qualityWhy, fps: { p50, p95 }, frameMs: { p50, p95 },
+  build }`. `RunLog` (`src/game/telemetry.ts`) appends one per finished run to `localStorage['trials.runlog']`,
+  bounded to 200 entries; `RunCollector` gathers the run (deaths at the fault tick's bike x, frame-time
+  percentiles over the run, the quality tier and why). `timeToClear` = wall seconds from the first GO on that
+  track load to the results panel (full restarts stay inside the window; launching another track abandons it).
+- Default ON; Settings → **Run log** On/Off (`trials.telemetry`), **Export run log** Copy (clipboard JSON,
+  `{ kind: 'trials-runlog', v: 1, build, exportedAt, runs }`) / Share (Web Share API text — iOS share sheet;
+  the button is hidden where `navigator.share` is absent). Nothing leaves the device otherwise.
+- `?perf=1` (`src/ui/perf.ts`): a monospace box top-left under the pause button, repainted 4×/s: `FPS · frame
+  ms p50/p95`, `PHYS µs/tick p50/p95` (`Game.perfTiming` times each `physics.step` only with the flag on —
+  no per-tick `performance.now` otherwise), `DRAW calls · tris · MB tex` from `stats()`, `TIER · dpr · why`
+  (`manual (settings)` / `probe median 16.6 ms` / `pending probe`). Hidden under pause / results / menus.
+  Headless note: `--disable-frame-rate-limit` makes RAF fire back-to-back so headless FPS reads are not evidence;
+  the phone capture (WebKit iPhone 14: 60 fps, 16.6 / 18.7 ms, PHYS 20 / 60 µs at 5 µs resolution) is.
+
+## 15. PWA: manifest, icons, service worker, update toast
+
+- `public/manifest.webmanifest`: `standalone`, `orientation: landscape`, `background #07080a`, `theme #0b0d10`,
+  icons from the art owner's `public/art/icons/` (`icon-192/512/1024` any, `maskable-192/512`), `og.jpg` as
+  the wide screenshot. `index.html`: `<link rel=manifest>`, `apple-touch-icon` (180), SVG + 32/16 favicons,
+  `apple-mobile-web-app-title`, OG / Twitter card metas pointing at `https://trials-gauntlet-demo.vercel.app/art/og.jpg`.
+- Service worker source is `src/pwa/sw.js`; the `trials:pwa` Vite plugin emits `dist/sw.js` with the build id
+  baked into the cache name (`trials-<sha>-<stamp>`), so every deploy is a byte-different worker. Install
+  precaches the load manifest's `core` + `title` phases (+ index, manifest); fetch is cache-first for
+  `/assets/*-<hash>.*`, fonts, art, models; network-first with cache fallback for `index.html`,
+  `load-manifest.json`, `sw.js`, the web manifest; `?harness=1` requests and cross-origin are untouched.
+  `activate` drops every other cache and claims clients.
+- Registration (`src/game/pwa.ts`) only in production builds, never in harness mode, `?sw=0` opts out; it
+  re-checks on every return to the foreground. A worker that reaches `installed` behind a controlled page →
+  `App.showUpdate(reload)` → the **Update available → ⟳ Reload** toast (`UpdateToast`); Reload posts
+  `SKIP_WAITING`, `controllerchange` reloads once. `?updatetoast=1` shows the toast for QA. Verified
+  end-to-end against the frozen preview: install → 54 precached entries → controlled after reload → byte-different
+  `sw.js` → toast → Reload → new worker active, old cache gone.
+- Storage keys added: `trials.bikeClass`, `trials.telemetry`, `trials.runlog`, `trials.onboarded`,
+  `trials.best.<id>@pro`. Reset progress clears `trials.best.*` (both classes) only.

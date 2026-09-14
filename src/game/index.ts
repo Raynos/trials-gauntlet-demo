@@ -1,4 +1,5 @@
-export { Game, type GameOptions, type GameCounters, type BestTimeStore } from './game';
+export { Game, Percentiles, type GameOptions, type GameCounters, type BestTimeStore, type BikeLoadOptions } from './game';
+export { RunLog, RunCollector, describeDevice, RUNLOG_KEY, RUNLOG_MAX } from './telemetry';
 export { MockPhysics } from './mockPhysics';
 export { installHook, GAME_VERSION, encodeSnapshot, decodeSnapshot, type HookExtras } from './hook';
 export { App, dprCap, isPhone, type AppOptions } from './app';

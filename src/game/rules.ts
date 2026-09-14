@@ -3,8 +3,24 @@
  * are expressed in seconds and converted to ticks at the game's physics rate
  * so every timer is an integer count advanced only inside `Game.tick()`.
  */
-import type { Medal, TrackDef } from '../core/types';
+import type { BikeClass, Medal, TrackDef, TrackTier } from '../core/types';
 export type { Medal, RunResult } from '../core/types';
+
+/** Pro rides against a target 10 % tighter than the authored `meta.targetTimeS`. */
+export const PRO_TARGET_SCALE = 0.9;
+
+/** Per-tier default bike when the player has never picked one in the Garage (medium = last used, i.e. the stored choice). */
+export function defaultBikeForTier(tier: TrackTier, lastUsed: BikeClass | null): BikeClass {
+  if (tier === 'beginner' || tier === 'easy') return 'rookie';
+  if (tier === 'hard' || tier === 'extreme') return 'pro';
+  return lastUsed ?? 'rookie';
+}
+
+/** Effective medal target for a bike class (null when the track has none). */
+export function targetForBike(targetTimeS: number | null | undefined, bike: BikeClass | undefined): number | null {
+  if (targetTimeS === undefined || targetTimeS === null || !(targetTimeS > 0)) return null;
+  return bike === 'pro' ? Math.round(targetTimeS * PRO_TARGET_SCALE * 1000) / 1000 : targetTimeS;
+}
 
 /** 3-2-1-GO at 1.0 s cadence: GO lands at 3 * this. */
 export const COUNTDOWN_BEAT_S = 1.0;
@@ -44,8 +60,9 @@ export function ruleTicks(physicsHz: number): RuleTicks {
  * Medal vs `meta.targetTimeS` (T). Without a target every clear is bronze
  * except a fault-free one, which is gold (there is nothing to beat on time).
  */
-export function medalFor(time: number, faults: number, targetTimeS: number | null | undefined): Medal {
-  if (targetTimeS === undefined || targetTimeS === null || !(targetTimeS > 0)) {
+export function medalFor(time: number, faults: number, targetTimeS: number | null | undefined, bike?: BikeClass): Medal {
+  targetTimeS = targetForBike(targetTimeS, bike);
+  if (targetTimeS === null) {
     return faults === 0 ? 'gold' : 'bronze';
   }
   if (faults === 0 && time <= targetTimeS * 0.85) return 'platinum';

@@ -3,12 +3,14 @@
  * quality override (`trials.quality`). Every access is try/catch'd: private
  * mode, blocked storage and the headless harness must all just work.
  */
-import type { Medal, QualityTier, RunResult } from '../core/types';
+import type { BikeClass, Medal, QualityTier, RunResult } from '../core/types';
 
 export interface BestEntry {
   time: number;
   faults: number;
   medal: Medal;
+  /** Bike class the PB was set on (absent in pre-garage entries = rookie). */
+  bike?: BikeClass;
   /** Run clock at each checkpoint of the PB run. */
   splits?: number[];
   /** JSON InputRecording of the PB run (GO → finish) for the ghost. */
@@ -17,6 +19,12 @@ export interface BestEntry {
 
 const PREFIX = 'trials.best.';
 const QUALITY_KEY = 'trials.quality';
+const MEDAL_RANK: Record<Medal, number> = { bronze: 1, silver: 2, gold: 3, platinum: 4 };
+
+/** Storage key per track and bike class: rookie keeps the legacy key so pre-garage PBs survive; pro gets a suffix. */
+export function bestKey(trackId: string, bike: BikeClass): string {
+  return bike === 'pro' ? `${PREFIX}${trackId}@pro` : PREFIX + trackId;
+}
 
 function store(): Storage | null {
   try {
@@ -26,23 +34,42 @@ function store(): Storage | null {
   }
 }
 
+/**
+ * PB per track **per bike class**. `get(id, bike)` is that class's entry; `get(id)` is the
+ * track's best across classes (higher medal wins, then time) — what cards, tier locks and
+ * the career line read. The ghost and splits always come from the class being ridden.
+ */
 export class BestTimes {
-  private readonly cache = new Map<string, BestEntry>();
+  private readonly cache = new Map<string, BestEntry | null>();
 
-  get(trackId: string): BestEntry | null {
-    const c = this.cache.get(trackId);
-    if (c) return c;
+  get(trackId: string, bike?: BikeClass): BestEntry | null {
+    if (bike) return this.read(trackId, bike);
+    const a = this.read(trackId, 'rookie');
+    const b = this.read(trackId, 'pro');
+    if (!a) return b;
+    if (!b) return a;
+    const ra = MEDAL_RANK[a.medal];
+    const rb = MEDAL_RANK[b.medal];
+    return rb > ra || (rb === ra && b.time < a.time) ? b : a;
+  }
+
+  private read(trackId: string, bike: BikeClass): BestEntry | null {
+    const key = bestKey(trackId, bike);
+    if (this.cache.has(key)) return this.cache.get(key) ?? null;
     const s = store();
     if (!s) return null;
     try {
-      const raw = s.getItem(PREFIX + trackId);
-      if (!raw) return null;
+      const raw = s.getItem(key);
+      if (!raw) {
+        this.cache.set(key, null);
+        return null;
+      }
       const o = JSON.parse(raw) as Partial<BestEntry>;
       if (typeof o.time !== 'number' || typeof o.faults !== 'number') return null;
-      const entry: BestEntry = { time: o.time, faults: o.faults, medal: (o.medal as Medal | undefined) ?? 'bronze' };
+      const entry: BestEntry = { time: o.time, faults: o.faults, medal: (o.medal as Medal | undefined) ?? 'bronze', bike };
       if (Array.isArray(o.splits) && o.splits.every((x) => typeof x === 'number')) entry.splits = o.splits;
       if (typeof o.recording === 'string' && o.recording.length > 0) entry.recording = o.recording;
-      this.cache.set(trackId, entry);
+      this.cache.set(key, entry);
       return entry;
     } catch {
       return null;
@@ -55,17 +82,74 @@ export class BestTimes {
   }
 
   put(trackId: string, r: RunResult, run?: { splits: number[]; recording: string | null }): void {
-    const entry: BestEntry = { time: r.time, faults: r.faults, medal: r.medal };
+    const bike: BikeClass = r.bike ?? 'rookie';
+    const entry: BestEntry = { time: r.time, faults: r.faults, medal: r.medal, bike };
     if (run) {
       entry.splits = run.splits;
       if (run.recording) entry.recording = run.recording;
     }
-    this.cache.set(trackId, entry);
+    const key = bestKey(trackId, bike);
+    this.cache.set(key, entry);
     try {
-      store()?.setItem(PREFIX + trackId, JSON.stringify(entry));
+      store()?.setItem(key, JSON.stringify(entry));
     } catch {
       /* storage unavailable */
     }
+  }
+}
+
+const BIKE_KEY = 'trials.bikeClass';
+const TELEMETRY_KEY = 'trials.telemetry';
+const ONBOARDED_KEY = 'trials.onboarded';
+
+/** The Garage choice, or null when the player has never picked (then the per-tier default applies, rules.ts). */
+export function loadBikeChoice(): BikeClass | null {
+  try {
+    const v = store()?.getItem(BIKE_KEY);
+    return v === 'pro' || v === 'rookie' ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveBikeChoice(b: BikeClass): void {
+  try {
+    store()?.setItem(BIKE_KEY, b);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** Local run log: default ON, opt-out in Settings. */
+export function loadTelemetryEnabled(): boolean {
+  try {
+    return store()?.getItem(TELEMETRY_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
+
+export function saveTelemetryEnabled(on: boolean): void {
+  try {
+    store()?.setItem(TELEMETRY_KEY, on ? '1' : '0');
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+export function loadOnboarded(): boolean {
+  try {
+    return store()?.getItem(ONBOARDED_KEY) === '1';
+  } catch {
+    return true; // no storage: never nag
+  }
+}
+
+export function saveOnboarded(): void {
+  try {
+    store()?.setItem(ONBOARDED_KEY, '1');
+  } catch {
+    /* storage unavailable */
   }
 }
 
@@ -74,12 +158,13 @@ const MODEL_KEYS = { rider: 'trials.riderModel', bike: 'trials.bikeModel' } as c
 
 export type ModelChoice = 'proc' | 'gltf';
 
+/** glTF hero is the default (MEGA_PLAN P1: procedural retired from the UI, kept as the load-failure fallback and a stored 'proc' choice). */
 export function loadModelChoice(which: 'rider' | 'bike'): ModelChoice {
   try {
     const v = store()?.getItem(MODEL_KEYS[which]);
-    return v === 'gltf' ? 'gltf' : 'proc';
+    return v === 'proc' ? 'proc' : 'gltf';
   } catch {
-    return 'proc';
+    return 'gltf';
   }
 }
 

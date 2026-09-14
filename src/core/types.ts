@@ -322,6 +322,17 @@ export interface RunInfo {
 
 export type Medal = 'platinum' | 'gold' | 'silver' | 'bronze';
 
+/**
+ * Bike class (MEGA_PLAN P1 / P4). `rookie` = soft, wheelie assist on, forgiving; `pro` = raw
+ * (no assist, real CdA drag, sharper throttle). Physics owns the presets; the game passes the
+ * class to `loadTrack(track, seed, { bike })`, stores it with best times (PB per class per
+ * track), records it in the recording header and shows it on the results panel. Medal targets
+ * on Pro are 10 % tighter (`src/game/rules.ts`).
+ */
+export type BikeClass = 'rookie' | 'pro';
+export const BIKE_CLASSES: readonly BikeClass[] = ['rookie', 'pro'];
+export const DEFAULT_BIKE: BikeClass = 'rookie';
+
 /** Outcome of one finished run (results panel, best-time store). */
 export interface RunResult {
   trackId: string;
@@ -333,7 +344,39 @@ export interface RunResult {
   personalBest: boolean;
   /** Previous best time, or null on the first clear. */
   previousBest: number | null;
+  /** Effective medal target for this run (already tightened for Pro); null when the track has none. */
   targetTimeS: number | null;
+  /** Bike class the run was ridden on (absent in pre-garage results / harness mirrors = rookie). */
+  bike?: BikeClass;
+}
+
+/**
+ * One entry of the local, opt-in run log (MEGA_PLAN P3: attempts-per-track and death-x
+ * histograms from the user's own sessions). Appended by the app on every finished run
+ * (`src/game/telemetry.ts`), bounded, exported via Settings → Copy / Share run log.
+ */
+export interface RunTelemetry {
+  /** ISO time the run finished. */
+  at: string;
+  track: string;
+  bike: BikeClass;
+  /** 1 + faults (CONTRACT §3). */
+  attempts: number;
+  faults: number;
+  /** Run clock at the line (s). */
+  time: number;
+  /** Wall seconds from the first GO on this track load to the results panel (includes pauses). */
+  timeToClear: number;
+  medal: Medal;
+  deaths: { x: number; reason: FaultReason; checkpoint: number }[];
+  device: string;
+  quality: QualityTier;
+  /** Why the tier was chosen: `manual`, `probe median 16.4 ms`, `pending`. */
+  qualityWhy: string;
+  fps: { p50: number; p95: number };
+  /** Frame ms p50 / p95 over the run. */
+  frameMs: { p50: number; p95: number };
+  build: string;
 }
 
 export type InputDevice = 'keyboard' | 'gamepad' | 'touch';
@@ -389,6 +432,8 @@ export interface HookInfo {
   physicsHz: number;
   trackId: string;
   seed: number;
+  /** Bike class the loaded track is riding (`rookie` until the garage / harness picks otherwise). */
+  bike?: BikeClass;
   /** True when the game is not running its own clock (harness mode). */
   harness: boolean;
   /** Page time (performance.now) at which the hook was installed and `ready` became true. */
@@ -413,8 +458,13 @@ export interface TrialsHook {
   /** Set the input applied on subsequent ticks (quantized on entry). */
   setInput(frame: Partial<InputFrame>): void;
   getState(): PhysicsState;
-  /** Load a track by id and reset. Returns false when the id is unknown. */
-  loadTrack(id: string, seed?: number): boolean;
+  /**
+   * Load a track by id and reset (synchronously: physics, HUD and the renderer's world are up on return).
+   * Returns false when the id is unknown; when the renderer exposes `whenReady()` (art + hero model still
+   * streaming) a promise that resolves to the same boolean once frame 0 is art-complete — `await` it before
+   * a capture. `step` / `render` stay synchronous.
+   */
+  loadTrack(id: string, seed?: number): boolean | Promise<boolean>;
   /** Reset to the last checkpoint (or start). */
   restart(): void;
   /** Finish time in seconds, or null while running. */
@@ -458,4 +508,6 @@ export interface TrialsHook {
   ghost(): PhysicsState | null;
   /** True iff the current segment crossed the finish line (`finishTime !== null`). Faults never set this. */
   cleared(): boolean;
+  /** Pick the bike class for the next `loadTrack` (also reloads in place while nothing is racing). */
+  setBike?(bike: BikeClass): void;
 }

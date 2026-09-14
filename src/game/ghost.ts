@@ -31,7 +31,8 @@ export class GhostRunner {
     const rec = decodeAny(recordingJson);
     if (rec.header.physicsHz !== world.physicsHz) throw new Error(`ghost hz ${rec.header.physicsHz} != ${world.physicsHz}`);
     this.frames = expandFrames(rec);
-    world.loadTrack(track, rec.header.seed >>> 0);
+    // Same bike class the PB was ridden on (header.bike; pre-garage recordings = rookie).
+    world.loadTrack(track, rec.header.seed >>> 0, { bike: rec.header.bike ?? 'rookie' });
     world.reset(-1);
     world.drainEvents();
   }

@@ -9,6 +9,7 @@
  * See docs/design/game.md.
  */
 import {
+  DEFAULT_BIKE,
   DEFAULT_PHYSICS_HZ,
   FixedStepLoop,
   InputRecorder,
@@ -18,6 +19,7 @@ import {
   hashPhysicsState,
   iterateFrames,
   quantizeInput,
+  type BikeClass,
   type CameraDebug,
   type CompiledTrack,
   type GameEvent,
@@ -37,7 +39,37 @@ import type { GameRenderer } from '../render';
 import { DEFAULT_TRACK_ID, compileTrack, getTrack } from '../tracks';
 import type { Hud } from '../ui';
 import { GhostRunner } from './ghost';
-import { COUNTDOWN_BEATS, FINISH_BRAKE, medalFor, ruleTicks, targetTimeOf, type RunResult } from './rules';
+import { COUNTDOWN_BEATS, FINISH_BRAKE, medalFor, ruleTicks, targetForBike, targetTimeOf, type RunResult } from './rules';
+
+/** `loadTrack(track, seed, { bike })` — physics picks the tuning preset (`BIKE_PRESETS`, physics round 11); `rookie` is the round-10 bike to the byte. */
+export type BikeLoadOptions = { bike: BikeClass };
+
+/** Ring of the last N samples with p50 / p95 (perf overlay). Wall-clock only; never feeds the sim. */
+export class Percentiles {
+  private readonly buf: Float64Array;
+  private n = 0;
+  private i = 0;
+  constructor(size = 240) {
+    this.buf = new Float64Array(size);
+  }
+  push(v: number): void {
+    this.buf[this.i] = v;
+    this.i = (this.i + 1) % this.buf.length;
+    if (this.n < this.buf.length) this.n++;
+  }
+  get count(): number {
+    return this.n;
+  }
+  reset(): void {
+    this.n = 0;
+    this.i = 0;
+  }
+  stats(): { p50: number; p95: number } {
+    if (this.n === 0) return { p50: 0, p95: 0 };
+    const a = Array.from(this.buf.subarray(0, this.n)).sort((x, y) => x - y);
+    return { p50: a[Math.min(this.n - 1, Math.floor(this.n * 0.5))]!, p95: a[Math.min(this.n - 1, Math.floor(this.n * 0.95))]! };
+  }
+}
 
 export interface BestRecord {
   time: number;
@@ -49,7 +81,8 @@ export interface BestRecord {
 }
 
 export interface BestTimeStore {
-  get(trackId: string): BestRecord | null;
+  /** Entry for a bike class; without `bike` the track's best across classes. */
+  get(trackId: string, bike?: BikeClass): BestRecord | null;
   put(trackId: string, result: RunResult, run: { splits: number[]; recording: string | null }): void;
 }
 
@@ -123,6 +156,10 @@ export class Game {
   private readonly fwd: InputFrame = { ...NEUTRAL_INPUT };
   private track: TrackDef | null = null;
   private seed = 0;
+  private bike: BikeClass = DEFAULT_BIKE;
+  /** `?perf=1`: time each physics step (µs) for the overlay. Off by default — no per-tick `performance.now`. */
+  perfTiming = false;
+  readonly physicsUs = new Percentiles(240);
   private recorder: InputRecorder | null = null;
   private readonly listeners = new Set<GameEventListener>();
   private lastState: PhysicsState | null = null;
@@ -212,15 +249,36 @@ export class Game {
   /** Wall ms of the last loadTrack (reported through hook.info for the boot gate). */
   lastLoadMs = 0;
 
-  loadTrack(id: string = DEFAULT_TRACK_ID, seed?: number): boolean {
+  /** Bike class in effect for the next `loadTrack` (Garage choice / per-tier default; App sets it before loading). */
+  get currentBike(): BikeClass {
+    return this.bike;
+  }
+
+  /**
+   * Choose the bike class. Takes effect on the next load; when a track is already up and
+   * nothing is racing (menu backdrop, countdown) the world is reloaded in place so the
+   * Garage preview and the countdown show the chosen bike.
+   */
+  setBike(bike: BikeClass): void {
+    if (bike === this.bike) return;
+    this.bike = bike;
+    if (this.track && (this.phaseValue === 'menu' || this.phaseValue === 'countdown')) {
+      const phase = this.phaseValue;
+      this.loadTrack(this.track.id, this.seed);
+      if (phase === 'menu') this.toMenu();
+    }
+  }
+
+  loadTrack(id: string = DEFAULT_TRACK_ID, seed?: number, bike?: BikeClass): boolean {
     const track = getTrack(id);
     if (!track) return false;
     const t0 = performance.now();
     this.track = track;
     this.seed = (seed ?? track.seed) >>> 0;
+    if (bike) this.bike = bike;
     const compiled = compileTrack(track);
     this.compiled = compiled;
-    this.physics.loadTrack(compiled, this.seed);
+    this.physics.loadTrack(compiled, this.seed, { bike: this.bike });
     this.renderer.setTrack(compiled);
     (this.audio as Partial<{ setTrack(t: CompiledTrack, seed: number): void }> | undefined)?.setTrack?.(compiled, this.seed);
     this.hud?.setTrack(track);
@@ -230,6 +288,12 @@ export class Game {
     this.beginRun();
     this.lastLoadMs = performance.now() - t0;
     return true;
+  }
+
+  /** Renderer art / hero model for the loaded track are in (frame 0 final); resolves at once when the renderer has no `whenReady`. */
+  whenReady(): Promise<void> | null {
+    const r = this.renderer as Partial<{ whenReady(): Promise<void> }>;
+    return typeof r.whenReady === 'function' ? r.whenReady.call(this.renderer) : null;
   }
 
   /** Back to the menu phase: nothing ticks until the next loadTrack/startRun. */
@@ -276,7 +340,7 @@ export class Game {
     this.runTicks = 0;
     this.splits = [];
     this.pbJson = null;
-    this.pbRecorder = this.autoRecord && this.track ? new InputRecorder({ version: 1, trackId: this.track.id, seed: this.seed, physicsHz: this.physicsHz }) : null;
+    this.pbRecorder = this.autoRecord && this.track ? new InputRecorder({ version: 1, trackId: this.track.id, seed: this.seed, physicsHz: this.physicsHz, bike: this.bike }) : null;
     this.setPhase('riding');
     this.emit({ type: 'go' });
     this.spawnGhost();
@@ -289,7 +353,7 @@ export class Game {
     this.ghost = null;
     this.lastGhostState = null;
     if (!this.ghostEnabled || !this.physicsFactory || !this.track || !this.compiled) return;
-    const rec = this.bestTimes?.get(this.track.id)?.recording;
+    const rec = this.bestTimes?.get(this.track.id, this.bike)?.recording;
     if (!rec) return;
     try {
       this.ghost = new GhostRunner(this.physicsFactory(this.physicsHz), this.compiled, rec, this.ticks.autoRespawn);
@@ -511,7 +575,11 @@ export class Game {
     f.lean = input.lean;
     f.hop = false;
     f.restart = false;
-    this.physics.step(f);
+    if (this.perfTiming) {
+      const t0 = performance.now();
+      this.physics.step(f);
+      this.physicsUs.push((performance.now() - t0) * 1000);
+    } else this.physics.step(f);
     this.lastState = null;
     const events = this.physics.drainEvents();
     for (let i = 0; i < events.length; i++) this.processPhysicsEvent(events[i]!);
@@ -529,7 +597,7 @@ export class Game {
         if (this.phaseValue === 'riding') {
           const t = this.runTicks / this.physicsHz;
           this.splits[e.index] = t;
-          const pb = this.track ? this.bestTimes?.get(this.track.id) : null;
+          const pb = this.track ? this.bestTimes?.get(this.track.id, this.bike) : null;
           const ref = pb?.splits?.[e.index];
           if (typeof ref === 'number') this.hud?.showSplit(e.index, t - ref);
         }
@@ -557,15 +625,16 @@ export class Game {
     const track = this.track;
     if (!track) return;
     const time = this.finishRunTicks / this.physicsHz;
-    const prev = this.bestTimes?.get(track.id) ?? null;
+    const prev = this.bestTimes?.get(track.id, this.bike) ?? null;
     const result: RunResult = {
       trackId: track.id,
       time,
       faults: this.faultCount,
-      medal: medalFor(time, this.faultCount, targetTimeOf(track)),
+      medal: medalFor(time, this.faultCount, targetTimeOf(track), this.bike),
       personalBest: prev === null || time < prev.time,
       previousBest: prev ? prev.time : null,
-      targetTimeS: targetTimeOf(track),
+      targetTimeS: targetForBike(targetTimeOf(track), this.bike),
+      bike: this.bike,
     };
     this.lastResult = result;
     if (result.personalBest) this.bestTimes?.put(track.id, result, { splits: [...this.splits], recording: this.pbJson });
@@ -760,6 +829,7 @@ export class Game {
       trackId: this.track.id,
       seed: this.seed,
       physicsHz: this.physicsHz,
+      bike: this.bike,
     };
     if (note) header.note = note;
     this.recorder = new InputRecorder(header);
@@ -781,7 +851,7 @@ export class Game {
     if (rec.header.physicsHz !== this.physicsHz) {
       throw new Error(`recording hz ${rec.header.physicsHz} != game hz ${this.physicsHz}`);
     }
-    if (!this.loadTrack(rec.header.trackId, rec.header.seed)) {
+    if (!this.loadTrack(rec.header.trackId, rec.header.seed, rec.header.bike ?? DEFAULT_BIKE)) {
       throw new Error(`unknown track ${rec.header.trackId}`);
     }
     this.skipCountdown();

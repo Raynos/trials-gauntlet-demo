@@ -7,11 +7,14 @@
  *   ?physics=mock   force the scaffold MockPhysics even when the real bike physics exists
  *   ?audio=0        NullAudio (the hook then has no renderOffline)
  *   ?ghost=1        run the PB ghost world in harness mode too (off by default there: one world per µs/tick)
- *   ?rider=gltf|proc, ?bike=gltf|proc   rider / bike model (default proc; stored choice from the settings menu otherwise)
+ *   ?rider=gltf|proc, ?bike=gltf|proc   rider / bike model (default gltf; a stored settings choice otherwise)
  *   ?touchdebug=1   overlay showing active touch pointers and the live InputFrame
  *   ?track=<id>     start straight into a track (skips the title / menu)
  *   ?dev=1          unlock every tier in track select and list the harness test strips
  *   ?hz=<n>         physics rate (default 120)
+ *   ?perf=1         fps / frame ms / physics µs / draw-call overlay (top-left, under the pause button)
+ *   ?sw=0           do not register the service worker (production builds register it; harness never does)
+ *   ?updatetoast=1  show the "Update available" toast at once (capture / QA of the PWA reload path)
  */
 import { DEFAULT_PHYSICS_HZ } from './core';
 import * as audioMod from './audio';
@@ -22,6 +25,7 @@ import type { PhysicsWorld } from './physics';
 import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, installHook, type HookExtras } from './game';
 import { resolveBoot } from './game/flow';
+import { registerServiceWorker } from './game/pwa';
 import { getTrack } from './tracks';
 import { ArtManifest, BestTimes, DomHud, injectStyles, loadModelChoice, type ModelChoice } from './ui';
 import { fontsReady, getLoader, nextPaint, streamBytes } from './ui/loader';
@@ -247,8 +251,16 @@ function boot(): void {
           return true;
         },
         art,
+        perf: params.get('perf') === '1',
+        // Per-class livery when the render owner exports it (`setBikeClass(bike)`); otherwise the garage card carries the colour.
+        onBikeChange: (bike) => {
+          const r = renderer as Partial<{ setBikeClass(b: 'rookie' | 'pro'): void }>;
+          if (typeof r.setBikeClass === 'function') r.setBikeClass(bike);
+        },
       });
       installHook(game, false, extras);
+      if (import.meta.env.PROD && params.get('sw') !== '0') registerServiceWorker((reload) => shell.showUpdate(reload));
+      if (params.get('updatetoast') === '1') setTimeout(() => shell.showUpdate(() => location.reload()), 1500);
       const trackName = getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track';
       loader.step(`Track: ${trackName}`);
       await nextPaint();

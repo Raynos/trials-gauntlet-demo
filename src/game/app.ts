@@ -9,28 +9,39 @@
  * `run` (countdown…) → pause overlay → results. The title and menu render
  * over the live 3D scene with `BACKDROP_TRACK` loaded in the `menu` phase.
  */
-import type { InputDevice, QualityTier, TrackDef } from '../core/types';
+import type { BikeClass, InputDevice, QualityTier, RunResult, TrackDef } from '../core/types';
 import type { AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
 import {
   ArtManifest,
+  BUILD_STAMP,
   CreditsScreen,
+  GarageScreen,
   MainMenuScreen,
+  OnboardingCard,
   PauseMenu,
+  PerfOverlay,
   SettingsScreen,
   TitleScreen,
   TrackSelectScreen,
   UiSfx,
+  UpdateToast,
+  loadBikeChoice,
   loadGhostEnabled,
   loadModelChoice,
+  loadOnboarded,
   loadQualityOverride,
   loadSoundEnabled,
+  loadTelemetryEnabled,
   loadVolume,
   mountRotatePrompt,
+  saveBikeChoice,
   saveGhostEnabled,
   saveModelChoice,
+  saveOnboarded,
   saveQualityOverride,
   saveSoundEnabled,
+  saveTelemetryEnabled,
   saveVolume,
   shipTracks,
   tierUnlocked,
@@ -43,8 +54,10 @@ import {
 } from '../ui';
 import { applyOrientation } from '../ui/orientation';
 import { BACKDROP_TRACK } from './flow';
-import type { Game } from './game';
+import { Percentiles, type Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
+import { defaultBikeForTier } from './rules';
+import { RunCollector, RunLog } from './telemetry';
 
 export interface AppOptions {
   game: Game;
@@ -70,6 +83,10 @@ export interface AppOptions {
   touchDebug?: boolean | undefined;
   /** Injected manifest (tests); default fetches `art/manifest.json`. */
   art?: ArtManifest | undefined;
+  /** `?perf=1`: fps / frame ms / physics µs / draw calls overlay top-left. */
+  perf?: boolean | undefined;
+  /** Bike class changed (garage preview or track launch): the renderer may repaint the hero (`setBikeClass`). */
+  onBikeChange?: ((bike: BikeClass) => void) | undefined;
 }
 
 const PROBE_FRAMES = 60;
@@ -106,6 +123,19 @@ export class App {
   private readonly settings: SettingsScreen;
   private readonly credits: CreditsScreen;
   private readonly pause: PauseMenu;
+  private readonly garage: GarageScreen;
+  private readonly onboard: OnboardingCard;
+  private readonly toast: UpdateToast;
+  private readonly perf: PerfOverlay | null;
+  private readonly frameMs = new Percentiles(120);
+  private readonly runLog = new RunLog();
+  private readonly collector = new RunCollector();
+  private telemetryOn: boolean;
+  /** Garage choice (null = never picked: the per-tier default applies). */
+  private bikeChoice: BikeClass | null;
+  /** Bike class of the last launched track (medium's default, and what the Garage opens on). */
+  private lastRidden: BikeClass | null = null;
+  private qualityWhy: string;
   private readonly bestTimes: BestTimes;
   private readonly tracks: TrackDef[];
   private screen: AppScreen = 'title';
@@ -149,6 +179,9 @@ export class App {
     this.soundOn = loadSoundEnabled();
     this.volume = loadVolume();
     this.ghostOn = loadGhostEnabled();
+    this.telemetryOn = loadTelemetryEnabled();
+    this.bikeChoice = loadBikeChoice();
+    this.qualityWhy = this.qualityChoice === 'auto' ? 'pending probe' : 'manual (settings)';
     this.sfx = new UiSfx(this.audio as { context?: AudioContext | null } | undefined);
     this.sfx.setEnabled(this.soundOn);
     this.sfx.setVolume(this.volume);
@@ -173,6 +206,10 @@ export class App {
       dev: o.dev ?? false,
       lastPlayed: this.lastTrackId,
       models: o.modelsSupported ?? false,
+      bikeClass: this.bikeInEffect(),
+      telemetry: this.telemetryOn,
+      runlog: this.runLog.summary(),
+      canShare: typeof navigator !== 'undefined' && typeof navigator.share === 'function',
     });
     const cb = {
       play: (id: string) => this.play(id),
@@ -212,6 +249,12 @@ export class App {
           location.replace(url.toString());
         }
       },
+      setTelemetry: (on: boolean) => {
+        this.telemetryOn = on;
+        saveTelemetryEnabled(on);
+      },
+      copyRunLog: () => this.copyRunLog(),
+      shareRunLog: () => this.shareRunLog(),
       resetProgress: () => {
         this.bestTimes.clear();
         this.lastTrackId = null;
@@ -229,6 +272,19 @@ export class App {
     this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
     this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb);
+    this.garage = new GarageScreen(o.uiRoot, this.sfx, {
+      previewBike: (b) => this.applyBike(b, false),
+      setBike: (b) => this.applyBike(b, true),
+      back: () => this.goto('menu'),
+    });
+    this.onboard = new OnboardingCard(o.uiRoot, () => {
+      saveOnboarded();
+      this.game.setPaused(false);
+      this.lastNow = performance.now();
+    });
+    this.toast = new UpdateToast(o.uiRoot, () => this.reloadForUpdate?.());
+    this.perf = o.perf ? new PerfOverlay(o.uiRoot) : null;
+    if (o.perf) this.game.perfTiming = true;
     this.pause = new PauseMenu(o.uiRoot, this.sfx, {
       resume: () => this.resume(),
       restartTrack: () => {
@@ -254,6 +310,13 @@ export class App {
     });
     mountRotatePrompt(o.uiRoot);
     this.menu.setTracks(shipTracks(this.tracks, o.dev ?? false));
+
+    // Telemetry: every fault is a death at the bike's x (the state after the faulting step).
+    this.game.onEvent((e) => {
+      if (e.type !== 'fault') return;
+      const st = this.game.getState();
+      this.collector.death(st.bike.pos.x, e.reason, st.checkpoint);
+    });
 
     this.hud.onAction = (a) => {
       if (a === 'retry') this.game.restartFromStart();
@@ -283,14 +346,17 @@ export class App {
     window.visualViewport?.addEventListener('resize', () => this.fit());
     this.fit();
 
-    this.game.onPhase = (phase) => {
+    this.game.onPhase = (phase, prev) => {
       if (phase === 'riding' && !this.probeDone) this.probeArmed = true; // probe the first 60 frames after GO
       if (phase !== 'finished' && !this.pause.visible) this.touch.setOverlay(false); // retry / next out of the results frame
+      // First GO on this track load starts the run's telemetry window (full restarts keep it: time-to-clear is per track visit).
+      if (phase === 'riding' && prev === 'countdown' && this.screen === 'run' && !this.collector.running) this.collector.begin();
     };
     // Results: NEXT TRACK is live only when the next track is unlocked (this clear may have unlocked it).
-    this.game.onResults = () => {
-      this.hud.setNextEnabled(this.nextTrackEnabled());
+    this.game.onResults = (r) => {
+      this.hud.setNextEnabled(this.nextTrackEnabled(), this.nextTrackName());
       this.touch.setOverlay(true);
+      this.logRun(r);
     };
   }
 
@@ -345,14 +411,19 @@ export class App {
     this.tracksScreen.hide();
     this.settings.hide();
     this.credits.hide();
+    this.garage.hide();
     const scene = this.o.sceneRoot;
     scene?.classList.toggle('drift', screen === 'title' || screen === 'menu');
-    scene?.classList.toggle('dim', screen !== 'title');
+    scene?.classList.toggle('dim', screen !== 'title' && screen !== 'garage');
+    scene?.classList.toggle('garage', screen === 'garage');
     const dev = this.mux.activeDevice();
     if (screen === 'title') this.title.show();
     else if (screen === 'menu') {
       this.menu.setDevice(dev);
       this.menu.show();
+    } else if (screen === 'garage') {
+      this.garage.setDevice(dev);
+      this.garage.show(this.bikeInEffect());
     } else if (screen === 'tracks') {
       this.tracksScreen.build(this.tracks);
       this.tracksScreen.setDevice(dev);
@@ -364,7 +435,14 @@ export class App {
   }
 
   private play(id: string): void {
-    if (!this.game.loadTrack(id)) return;
+    const def = getTrack(id);
+    if (!def) return;
+    // Bike: the Garage choice when the player has made one, else the tier default (medium = last ridden).
+    const bike = this.bikeChoice ?? defaultBikeForTier(def.tier, this.lastRidden);
+    this.collector.abandon();
+    if (!this.game.loadTrack(id, undefined, bike)) return;
+    if (bike !== this.lastRidden) this.o.onBikeChange?.(bike);
+    this.lastRidden = bike;
     this.screen = 'run';
     this.screenAt = performance.now();
     this.lastTrackId = id;
@@ -373,9 +451,10 @@ export class App {
     } catch {
       /* storage unavailable */
     }
-    this.o.sceneRoot?.classList.remove('drift', 'dim');
+    this.o.sceneRoot?.classList.remove('drift', 'dim', 'garage');
     this.title.hide();
     this.menu.hide();
+    this.garage.hide();
     this.settings.hide();
     this.credits.hide();
     // Track select hides itself after its fly-up (same-scene handoff).
@@ -385,7 +464,99 @@ export class App {
     this.game.setPaused(false);
     this.touch.setEnabled(true);
     this.touch.setOverlay(false);
-    this.hud.setNextEnabled(this.nextTrackEnabled());
+    this.hud.setNextEnabled(this.nextTrackEnabled(), this.nextTrackName());
+    // First launch ever: one card (gas / brake / lean), the countdown waits behind it.
+    if (!loadOnboarded()) {
+      this.game.setPaused(true);
+      this.onboard.show(this.mux.activeDevice());
+    }
+  }
+
+  // -- garage / bike ------------------------------------------------------------
+
+  /** Class the next launch would ride: the Garage choice, else the tier default of the last-played (or first) track. */
+  private bikeInEffect(): BikeClass {
+    if (this.bikeChoice) return this.bikeChoice;
+    const t = this.tracks.find((x) => x.id === this.lastTrackId) ?? shipTracks(this.tracks, this.o.dev ?? false)[0];
+    return defaultBikeForTier(t?.tier ?? 'beginner', this.lastRidden);
+  }
+
+  /**
+   * Garage: focusing a card previews it (the menu backdrop reloads with that class, renderer
+   * repaints), confirming commits it (`trials.bikeClass`). Leaving without confirming previews back.
+   */
+  private applyBike(b: BikeClass, commit: boolean): void {
+    if (commit) {
+      this.bikeChoice = b;
+      saveBikeChoice(b);
+    }
+    if (this.game.currentBike !== b) {
+      const vol = this.soundOn ? this.volume : 0;
+      this.audio?.setMasterVolume(0);
+      this.game.setBike(b);
+      if (this.screen !== 'run') this.hud.hideNow();
+      setTimeout(() => this.audio?.setMasterVolume(vol), 60);
+    }
+    this.o.onBikeChange?.(b);
+  }
+
+  // -- telemetry ------------------------------------------------------------------
+
+  private logRun(r: RunResult): void {
+    if (!this.collector.running) return;
+    const entry = this.collector.finish({
+      track: r.trackId,
+      bike: r.bike ?? 'rookie',
+      faults: r.faults,
+      time: r.time,
+      medal: r.medal,
+      quality: this.game.qualityTier,
+      qualityWhy: this.qualityWhy,
+      build: BUILD_STAMP.replace(/^build /, ''),
+    });
+    if (this.telemetryOn) this.runLog.append(entry);
+  }
+
+  private async copyRunLog(): Promise<boolean> {
+    const json = this.runLog.exportJson(BUILD_STAMP);
+    try {
+      await navigator.clipboard.writeText(json);
+      return true;
+    } catch {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = json;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  private async shareRunLog(): Promise<boolean> {
+    if (typeof navigator.share !== 'function') return this.copyRunLog();
+    try {
+      await navigator.share({ title: 'Trials Gauntlet run log', text: this.runLog.exportJson(BUILD_STAMP) });
+      return true;
+    } catch {
+      return false; // AbortError (sheet dismissed) or unsupported payload
+    }
+  }
+
+  // -- service-worker update toast -----------------------------------------------
+
+  private reloadForUpdate: (() => void) | null = null;
+
+  /** A newer build is installed and waiting: show "Update available → Reload"; `reload` activates it. */
+  showUpdate(reload: () => void): void {
+    this.reloadForUpdate = reload;
+    this.toast.show();
   }
 
   /**
@@ -414,7 +585,7 @@ export class App {
   }
 
   private togglePause(): void {
-    if (!this.inRun()) return;
+    if (!this.inRun() || this.onboard.visible) return;
     if (this.game.paused()) this.resume();
     else {
       this.game.setPaused(true);
@@ -460,9 +631,16 @@ export class App {
     return ship[(i + 1) % ship.length]?.id ?? ship[0]!.id;
   }
 
+  private nextTrackName(): string | null {
+    const ship = shipTracks(this.tracks, this.o.dev ?? false);
+    const i = ship.findIndex((t) => t.id === this.lastTrackId);
+    return ship[i + 1]?.name ?? null;
+  }
+
   // -- per frame ----------------------------------------------------------------
 
   private tickFrame(elapsed: number): void {
+    if (this.perf) this.perf.root.hidden = !(this.screen === 'run' && !this.pause.visible && this.game.phase() !== 'finished' && !this.onboard.visible);
     const { frame, meta } = this.mux.poll();
     const restartEdge = frame.restart === true && !this.prevRestart;
     const throttleEdge = frame.throttle > 0 && !this.prevThrottle;
@@ -471,11 +649,19 @@ export class App {
       meta.confirm = meta.back = meta.pause = false;
       meta.navX = meta.navY = 0;
     }
+    if (this.onboard.visible) {
+      // First-launch card: any confirm / back / gas edge dismisses it; nothing reaches the game meanwhile.
+      if (meta.confirm || meta.back || meta.pause || throttleEdge || restartEdge) this.onboard.dismiss();
+      this.prevRestart = frame.restart === true;
+      this.prevThrottle = frame.throttle > 0;
+      this.game.advance(0);
+      return;
+    }
     if (this.screen === 'title') {
       // Any key / pad button / touch (the title root also listens to pointerdown).
       if (meta.active || meta.confirm || meta.pause || meta.back || frame.throttle > 0 || frame.brake > 0 || frame.lean !== 0) this.title.anyInput();
     } else if (this.screen !== 'run') {
-      const s = this.screen === 'menu' ? this.menu : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.credits;
+      const s = this.screen === 'menu' ? this.menu : this.screen === 'garage' ? this.garage : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.credits;
       if (meta.navX || meta.navY) s.nav(meta.navX, meta.navY);
       if (meta.confirm) s.confirm();
       else if (meta.back || meta.pause) s.back();
@@ -506,6 +692,26 @@ export class App {
     this.game.advance(elapsed);
     if (this.probeArmed && !this.probeDone && !this.game.paused()) this.recordProbe(elapsed * 1000);
     this.settleTouch(elapsed);
+    if (this.inRun() && !this.game.paused()) {
+      this.collector.frame(elapsed * 1000);
+      this.frameMs.push(elapsed * 1000);
+    }
+    this.perf?.update(performance.now(), () => ({
+      frameMs: this.frameMs.stats(),
+      physicsUs: this.game.physicsUs.stats(),
+      stats: this.safeStats(),
+      quality: this.game.qualityTier,
+      qualityWhy: this.qualityWhy,
+      dpr: dprCap(),
+    }));
+  }
+
+  private safeStats(): ReturnType<Game['stats']> | null {
+    try {
+      return this.game.stats();
+    } catch {
+      return null;
+    }
   }
 
   /** Zone labels at full strength for the first 3 s after GO, then ~30 %; re-armed by every countdown / menu. */
@@ -525,6 +731,8 @@ export class App {
     this.touch.setVisible(d === 'touch');
     this.hud.setDevice(d, true);
     for (const s of [this.menu, this.tracksScreen, this.settings]) s.setDevice(d);
+    this.garage.setDevice(d);
+    this.onboard.setDevice(d);
     this.pause.setDevice(d);
   }
 
@@ -538,7 +746,10 @@ export class App {
     const sorted = [...this.probe].sort((a, b) => a - b);
     const median = sorted[sorted.length >> 1] ?? 0;
     const tier: QualityTier = median <= 17.5 ? 'high' : median <= 34 ? 'medium' : 'low';
-    if (this.qualityChoice === 'auto') this.game.setQuality(tier);
+    if (this.qualityChoice === 'auto') {
+      this.game.setQuality(tier);
+      this.qualityWhy = `probe median ${median.toFixed(1)} ms`;
+    }
     this.probe = [];
     this.probeArmed = false;
   }
@@ -550,9 +761,11 @@ export class App {
       this.probeDone = false;
       this.probe = [];
       this.probeArmed = this.game.phase() === 'riding';
+      this.qualityWhy = 'pending probe';
     } else {
       this.probeDone = true;
       this.game.setQuality(q);
+      this.qualityWhy = 'manual (settings)';
     }
   }
 

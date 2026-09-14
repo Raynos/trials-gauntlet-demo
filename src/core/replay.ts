@@ -10,7 +10,7 @@
  *   - JSON  (human readable, `{ header, runs: [[count, t, b, l, flags], ...] }`)
  *   - binary (magic "TRIN", little-endian; see encodeBinary)
  */
-import type { InputFrame } from './types';
+import type { BikeClass, InputFrame } from './types';
 
 export const RECORDING_VERSION = 1;
 const MAGIC = 'TRIN';
@@ -22,6 +22,8 @@ export interface RecordingHeader {
   physicsHz: number;
   /** Optional free-form note (who/what produced it). */
   note?: string;
+  /** Bike class the inputs were recorded on (absent = rookie, the pre-garage physics). */
+  bike?: BikeClass;
 }
 
 /** [count, throttle u8, brake u8, lean i8, flags u8] */

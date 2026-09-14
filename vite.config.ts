@@ -79,6 +79,10 @@ function publicItems(root: string): LoadItem[] {
   } catch {
     /* no art pack */
   }
+  for (const f of ['manifest.webmanifest', 'art/icons/icon-192.png', 'art/icons/apple-touch-icon.png', 'art/icons/favicon-32.png', 'art/icons/favicon.svg']) {
+    const b = stat(f);
+    if (b) items.push({ path: `./${f}`, bytes: b, gz: b, phase: 'title', label: f });
+  }
   const models = path.join(pub, 'models');
   if (fs.existsSync(models)) {
     const walk = (dir: string, rel: string): void => {
@@ -154,6 +158,24 @@ function loadManifest(): Plugin {
 }
 
 /**
+ * PWA: emit `sw.js` from `src/pwa/sw.js` with the build id baked in, so every deploy is a
+ * byte-different worker (that is what makes the browser install the update and the page show
+ * "Update available → Reload"). Static `public/` copies would never change between builds.
+ */
+function pwa(id: string): Plugin {
+  return {
+    name: 'trials:pwa',
+    apply: 'build',
+    generateBundle() {
+      const src = fs.readFileSync(path.join(process.cwd(), 'src', 'pwa', 'sw.js'), 'utf8');
+      const stamp = `${id}-${Date.now().toString(36)}`;
+      this.emitFile({ type: 'asset', fileName: 'sw.js', source: src.replaceAll('__BUILD_ID__', stamp) });
+      this.info(`sw.js emitted (cache trials-${stamp})`);
+    },
+  };
+}
+
+/**
  * Cross-origin isolation gives `performance.now()` 5 µs resolution instead of
  * Chromium's default 100 µs coarsening, which is what the harness needs to time
  * a handful of 2–3 µs physics ticks. Every asset is same-origin, so COEP costs
@@ -178,7 +200,7 @@ export default defineConfig({
   // Relative base so the built bundle also works when served from a subpath
   // (Vercel preview folders, file listings, the harness preview server).
   base: './',
-  plugins: [bundleBudget(), loadManifest()],
+  plugins: [bundleBudget(), loadManifest(), pwa(buildId())],
   build: {
     target: 'es2022',
     sourcemap: true,

@@ -35,6 +35,7 @@ export function installHook(source: Game | (() => Game), harness: boolean, extra
       physicsHz: g().physicsHz,
       trackId: g().currentTrack?.id ?? '',
       seed: g().currentSeed,
+      bike: g().currentBike,
       harness,
       readyAtMs: Math.round(readyAtMs * 10) / 10,
       loadTrackMs: Math.round(g().lastLoadMs * 10) / 10,
@@ -44,7 +45,11 @@ export function installHook(source: Game | (() => Game), harness: boolean, extra
     step: (n = 1) => g().step(n),
     setInput: (frame: Partial<InputFrame>) => g().setInput(frame),
     getState: () => g().getState(),
-    loadTrack: (id: string, seed?: number) => g().loadTrack(id, seed),
+    loadTrack: (id: string, seed?: number) => {
+      const ok = g().loadTrack(id, seed);
+      const ready = ok ? g().whenReady() : null;
+      return ready ? ready.then(() => ok, () => ok) : ok;
+    },
     restart: () => g().restart(),
     finishTime: () => g().finishTime(),
     hashState: () => g().hashState(),
@@ -79,6 +84,7 @@ export function installHook(source: Game | (() => Game), harness: boolean, extra
     skipCountdown: () => g().skipCountdown(),
     ghost: () => g().ghostState(),
     cleared: () => g().cleared(),
+    setBike: (b) => g().setBike(b),
   };
   if (extras.renderOffline) {
     const renderOffline = extras.renderOffline;

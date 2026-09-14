@@ -275,6 +275,79 @@ export const FRONT_CSS = /* css */ `
 .overlay.leaving .tile, .overlay.leaving .visuals, .overlay.leaving .ov-foot { animation: none; }
 @supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) { html:not(.short) .pause-overlay.show { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); } }
 
+/* ---- garage (two bike cards left, the live 3D bike is the preview on the right) ---- */
+.garage-screen { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.86) 38%, rgba(6,7,9,.25) 62%, rgba(6,7,9,.1) 100%); }
+#app.garage canvas { transform: scale(1.25) translate(28%, -2%); transform-origin: 45% 58%; transition: transform var(--t3) var(--ease); }
+.garage-head { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat)); display: flex; flex-direction: column; gap: var(--s1); }
+.garage-head h1 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.2rem; line-height: .9; text-transform: uppercase; letter-spacing: .01em; }
+.garage-head h1 small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .34em; color: var(--amber); margin-bottom: .35em; }
+.garage-sub { font-size: .82rem; letter-spacing: .08em; color: var(--ink-mute); }
+.garage-cards { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat) + 5.6rem); bottom: calc(var(--s6) + var(--sab)); width: min(40rem, calc(50 * var(--vw))); display: flex; gap: var(--s4); align-items: flex-start; }
+.bike-card { position: relative; flex: 1 1 0; min-width: 0; max-height: 100%; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4) var(--s4) var(--s3); border-radius: var(--r3); border: 1px solid var(--line-2); background: linear-gradient(180deg, rgba(16,19,25,.96), rgba(9,11,15,.92)); box-shadow: var(--plate); color: var(--ink); text-align: left; cursor: pointer; overflow: hidden; transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease), border-color var(--t1); }
+.bike-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--tint); opacity: .55; transition: opacity var(--t1); }
+.bike-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(80% 60% at 100% 0%, color-mix(in srgb, var(--tint) 22%, transparent), transparent 70%); opacity: 0; transition: opacity var(--t2); }
+.bike-card.on { transform: scale(1.03); border-color: var(--tint); box-shadow: 0 0 0 2px var(--tint), 0 14px 30px rgba(0,0,0,.6); }
+.bike-card.on::before, .bike-card.on::after { opacity: 1; }
+.bc-top { display: flex; justify-content: space-between; align-items: center; font-size: .68rem; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-dim); font-weight: 700; }
+.bc-sel { visibility: hidden; color: var(--amber-ink); background: var(--amber); border-radius: 3px; padding: 2px 8px; letter-spacing: .14em; }
+.bike-card.selected .bc-sel { visibility: visible; }
+.bc-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.6rem; line-height: .9; text-transform: uppercase; color: var(--tint); text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+.bc-line { font-size: .92rem; line-height: 1.35; color: var(--ink-dim); min-height: 2.7em; }
+.bc-stats { display: flex; flex-direction: column; gap: 6px; margin-top: var(--s2); }
+.bc-stats .stat { display: grid; grid-template-columns: 4.2em 1fr 4.6em; align-items: center; gap: var(--s2); font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-dim); font-weight: 700; }
+.bc-stats .stat i { display: block; height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
+.bc-stats .stat b { display: block; height: 100%; width: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--tint) 70%, #000), var(--tint)); transition: width var(--t3) var(--ease); }
+.bc-stats .stat em { font-style: normal; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.bc-note { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); padding-top: var(--s2); border-top: 1px solid var(--line-2); }
+.bike-card.on .bc-note { color: var(--ink-dim); }
+.card .top em.bike { font-style: normal; color: #0b1a2e; background: var(--blue); border-radius: 3px; padding: 1px 6px; margin-right: 2.1rem; letter-spacing: .1em; font-weight: 700; }
+.card .top em.ghost + em.bike { margin-left: -1.9rem; }
+.card .lockline { position: absolute; left: var(--s3); right: var(--s3); top: 42%; transform: translateY(-50%); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 700; text-shadow: var(--outline); display: flex; align-items: center; gap: .5em; }
+.card .lockline::before { content: ""; flex: 0 0 auto; width: 1em; height: 1em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.ov-stats b.bike-pro { color: var(--blue); }
+.tile span small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .68rem; letter-spacing: .14em; margin-top: 4px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.setting .btns { display: inline-flex; gap: var(--s2); }
+.setting .btns .btn[hidden] { display: none; }
+
+/* ---- perf overlay (?perf=1): top-left under the pause button, never over the bike ---- */
+.perf[hidden] { display: none; }
+.perf { position: absolute; left: calc(.8rem + var(--sal)); top: calc(4.4rem + var(--sat)); margin: 0; padding: .35rem .55rem; z-index: 6; pointer-events: none; font: 11px/1.4 var(--mono); color: #cfe; background: rgba(0,0,0,.72); border: 1px solid var(--line-2); border-radius: var(--r1); white-space: pre; text-shadow: none; }
+
+/* ---- update toast (service worker has a newer build) ---- */
+.toast { position: absolute; left: 50%; bottom: calc(var(--s5) + var(--sab)); transform: translate(-50%, 140%); z-index: 30; display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s2) var(--s2) var(--s4); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--plate), 0 18px 40px rgba(0,0,0,.6); opacity: 0; pointer-events: none; transition: transform var(--t3) var(--ease), opacity var(--t3) var(--ease); white-space: nowrap; }
+.toast.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.toast-dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: pulse 1.6s ease-in-out infinite; }
+.toast-text { display: flex; flex-direction: column; line-height: 1.15; }
+.toast-text b { font-weight: 700; letter-spacing: .04em; }
+.toast-text small { font-size: .74rem; color: var(--ink-mute); }
+
+/* ---- onboarding card (first launch, over the first countdown, game paused) ---- */
+.onboard { position: absolute; inset: 0; z-index: 25; display: flex; align-items: center; justify-content: center; background: rgba(6,7,9,.55); opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease); padding: var(--s4); }
+.onboard.show { opacity: 1; pointer-events: auto; }
+.ob-card { width: min(34rem, 100%); display: flex; flex-direction: column; gap: var(--s3); padding: var(--s5); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r3); box-shadow: var(--plate), 0 24px 60px rgba(0,0,0,.6); }
+.ob-card h2 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.4rem; line-height: .9; text-transform: uppercase; }
+.ob-lines { display: flex; flex-direction: column; gap: var(--s2); font-size: .98rem; color: var(--ink-dim); line-height: 1.35; }
+.ob-lines b { color: var(--ink); }
+.ob-lines kbd { font-family: var(--font); font-weight: 700; color: var(--ink); background: rgba(255,255,255,.1); border: 1px solid var(--line); border-bottom-width: 2px; padding: .02em .45em; border-radius: var(--r1); font-size: .9em; min-width: 1.6em; display: inline-block; text-align: center; }
+.ob-hop { font-size: .82rem; color: var(--ink-mute); border-top: 1px solid var(--line-2); padding-top: var(--s3); }
+.ob-card .btn { align-self: flex-end; min-height: 48px; }
+html.short .garage-cards { top: calc(var(--s3) + var(--sat) + 3.4rem); bottom: calc(var(--s4) + var(--sab)); width: min(32rem, calc(54 * var(--vw))); gap: var(--s2); }
+html.short #app.garage canvas { transform: scale(1.3) translate(30%, -4%); }
+html.short .garage-head { top: calc(var(--s3) + var(--sat)); }
+html.short .garage-head h1 { font-size: 1.6rem; }
+html.short .garage-sub { display: none; }
+html.short .bike-card { padding: var(--s3) var(--s3) var(--s2); gap: var(--s1); }
+html.short .bc-name { font-size: 1.8rem; }
+html.short .bc-line { font-size: .78rem; min-height: 0; }
+html.short .bc-note { display: none; }
+html.short .bc-stats { gap: 3px; }
+html.short .ob-card { padding: var(--s4); gap: var(--s2); }
+html.short .ob-card h2 { font-size: 1.6rem; }
+html.short .ob-lines { font-size: .82rem; gap: var(--s1); }
+html.short .ob-hop { display: none; }
+html.short .tile span small { display: none; }
+html.short .perf { top: calc(3.6rem + var(--sat)); font-size: 10px; }
+
 /* ---- countdown scene handoff --------------------------------------------- */
 .iris { position: absolute; inset: 0; pointer-events: none; background: var(--bg); opacity: 0; transition: opacity var(--t2) var(--ease); }
 .iris.on { opacity: 1; }

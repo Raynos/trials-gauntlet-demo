@@ -5,7 +5,7 @@
  * exposes `nav / confirm / back` for the app shell. Targets ≥ 44 px, safe-area
  * aware, tokens from styles.ts only.
  */
-import type { BiomeId, Medal, TrackDef, TrackTier } from '../core/types';
+import type { BikeClass, BiomeId, Medal, TrackDef, TrackTier } from '../core/types';
 import { BIOME_TINT, type ArtManifest } from './art';
 import type { BestEntry, ModelChoice } from './best';
 import { formatTime } from './format';
@@ -13,7 +13,7 @@ import type { QualityChoice } from './menu';
 import { medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
 
-export type FrontScreen = 'title' | 'menu' | 'tracks' | 'settings' | 'credits';
+export type FrontScreen = 'title' | 'menu' | 'garage' | 'tracks' | 'settings' | 'credits';
 
 export interface FrontCallbacks {
   /** Track select confirmed a card (called ≈180 ms into the card's fly-up so the scene swaps under it). */
@@ -27,6 +27,10 @@ export interface FrontCallbacks {
   setGhost(on: boolean): void;
   setModel(which: 'rider' | 'bike', v: ModelChoice): void;
   resetProgress(): void;
+  /** Local run log (docs/design/game.md §13). */
+  setTelemetry(on: boolean): void;
+  copyRunLog(): Promise<boolean>;
+  shareRunLog(): Promise<boolean>;
 }
 
 export interface FrontState {
@@ -40,7 +44,15 @@ export interface FrontState {
   lastPlayed: string | null;
   /** Renderer exports `setModels`: only then are the Rider / Bike rows offered. */
   models: boolean;
+  /** Garage choice in effect (per-tier default resolved). */
+  bikeClass: BikeClass;
+  telemetry: boolean;
+  runlog: { runs: number; tracks: number };
+  /** `navigator.share` exists (iOS / Android share sheet). */
+  canShare: boolean;
 }
+
+export const BIKE_NAME: Record<BikeClass, string> = { rookie: 'Rookie', pro: 'Pro' };
 
 export const GAME_NAME = 'Trials Gauntlet';
 declare const __BUILD_ID__: string | undefined;
@@ -326,11 +338,13 @@ export class MainMenuScreen extends Screen {
     this.root.append(this.side);
     this.list.setItems([
       { id: 'play', label: 'Play' },
+      { id: 'garage', label: 'Garage' },
       { id: 'settings', label: 'Settings' },
       { id: 'credits', label: 'Credits' },
     ]);
     this.list.onPick = (id) => {
       if (id === 'play') this.cb.goto('tracks');
+      else if (id === 'garage') this.cb.goto('garage');
       else if (id === 'settings') this.cb.goto('settings');
       else if (id === 'credits') this.cb.goto('credits');
     };
@@ -348,6 +362,7 @@ export class MainMenuScreen extends Screen {
     const next = nextTrack(this.tracks, medalOf, s.dev, s.lastPlayed);
     // One quiet line of career state under the list; no panel, no buttons.
     this.side.textContent = next ? `${totals.cleared} of ${totals.total} tracks cleared · next up ${next.name}` : '';
+    this.list.setNote('garage', `${BIKE_NAME[s.bikeClass]} bike`);
     this.list.focusId('play');
     requestAnimationFrame(() => this.list.render(false));
   }
@@ -465,9 +480,13 @@ export class TrackSelectScreen extends Screen {
     const medal = best?.medal;
     const ahead = best && target ? best.time <= target : false;
     const ghost = best?.recording && this.state().ghost ? '<em class="ghost">PB ghost</em>' : '';
+    const prev = TIER_ORDER[TIER_ORDER.indexOf(t.tier) - 1];
+    const bikeTag = best?.bike === 'pro' ? '<em class="bike">Pro</em>' : '';
+    // Locked: the card itself states the unlock rule (the row head says it too, but a thumb lands on the card).
+    const lockLine = locked && prev ? `<div class="lockline">Locked · medal every ${TIER_LABEL[prev]} track</div>` : '';
     el.innerHTML = `<div class="tint" data-badge="${TIER_LABEL[t.tier]}"></div><div class="art"></div><div class="veil"></div>
-      <div class="top"><span>${escapeHtml(t.id.split('-')[0]!.toUpperCase())}</span>${ghost}</div>
-      <div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>
+      <div class="top"><span>${escapeHtml(t.id.split('-')[0]!.toUpperCase())}</span>${ghost}${bikeTag}</div>
+      <div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>${lockLine}
       <div class="body"><div class="name">${escapeHtml(t.name)}</div><div class="tech">${escapeHtml(t.meta?.technique ?? '')}</div>
       <div class="times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div></div>`;
     const artEl = el.querySelector<HTMLDivElement>('.art')!;
@@ -563,7 +582,7 @@ export class TrackSelectScreen extends Screen {
 // Settings
 // ---------------------------------------------------------------------------
 
-type SettingId = 'quality' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'reset' | 'reload';
+type SettingId = 'quality' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'telemetry' | 'runlog' | 'reset' | 'reload';
 
 interface SettingRow {
   id: SettingId;
@@ -578,6 +597,7 @@ export class SettingsScreen extends Screen {
   private rows: SettingRow[] = [];
   private index = 0;
   private resetArmed = 0;
+  private runlogPaint: (() => void) | null = null;
 
   constructor(
     parent: HTMLElement,
@@ -657,6 +677,45 @@ export class SettingsScreen extends Screen {
       seg('bike', 'Bike', 'Applies on the next track load', [{ v: 'proc', l: 'Procedural' }, { v: 'gltf', l: 'Modelled' }], () => s().bike, (v) => this.cb.setModel('bike', v as ModelChoice));
     }
 
+    seg('telemetry', 'Run log', 'Keeps attempts, faults and crash spots on this device only', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().telemetry ? 'on' : 'off'), (v) => this.cb.setTelemetry(v === 'on'));
+
+    // Run log export: Copy (clipboard JSON) · Share (Web Share API, text) — never leaves the device otherwise.
+    {
+      const el = h('div', 'setting');
+      el.innerHTML = `<div class="lab">Export run log<small></small></div><div class="btns"><button type="button" class="btn" data-a="copy">Copy</button><button type="button" class="btn" data-a="share">Share</button></div>`;
+      const small = el.querySelector('small')!;
+      const copyBtn = el.querySelector<HTMLButtonElement>('[data-a="copy"]')!;
+      const shareBtn = el.querySelector<HTMLButtonElement>('[data-a="share"]')!;
+      const paint = (): void => {
+        const r = s().runlog;
+        small.textContent = r.runs ? `${r.runs} ${r.runs === 1 ? 'run' : 'runs'} · ${r.tracks} ${r.tracks === 1 ? 'track' : 'tracks'} · JSON` : 'No runs logged yet';
+        shareBtn.hidden = !s().canShare;
+      };
+      const flash = (btn: HTMLButtonElement, label: string, text: string): void => {
+        btn.textContent = text;
+        setTimeout(() => (btn.textContent = label), 1600);
+      };
+      const act = (a: 'copy' | 'share'): void => {
+        if (a === 'copy') {
+          void this.cb.copyRunLog().then((ok) => flash(copyBtn, 'Copy', ok ? 'Copied ✓' : 'Failed'));
+        } else {
+          void this.cb.shareRunLog().then((ok) => flash(shareBtn, 'Share', ok ? 'Shared ✓' : 'Cancelled'));
+        }
+        this.sfx.confirm();
+      };
+      el.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-a]');
+        if (!b) return;
+        this.focusRow(this.rows.findIndex((r) => r.el === el), false);
+        act(b.dataset['a'] as 'copy' | 'share');
+      });
+      el.addEventListener('pointerenter', () => this.focusRow(this.rows.findIndex((r) => r.el === el), true));
+      paint();
+      this.rows.push({ id: 'runlog', el, step: () => undefined, activate: () => act('copy') });
+      this.runlogPaint = paint;
+      list.appendChild(el);
+    }
+
     // Reset progress: two presses within 3 s.
     {
       const el = h('div', 'setting');
@@ -727,6 +786,7 @@ export class SettingsScreen extends Screen {
   override show(): void {
     super.show();
     this.resetArmed = 0;
+    this.runlogPaint?.();
     this.focusRow(0, false);
     // Segments repaint from state without emitting.
     this.rows.forEach((r) => {
@@ -765,6 +825,8 @@ function currentValue(id: SettingId, s: FrontState): string {
       return s.rider;
     case 'bike':
       return s.bike;
+    case 'telemetry':
+      return s.telemetry ? 'on' : 'off';
     default:
       return '';
   }

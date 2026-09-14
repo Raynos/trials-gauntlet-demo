@@ -32,6 +32,11 @@ export default tseslint.config(
     rules: { 'no-console': 'off' },
   },
   {
+    // Service worker source (emitted by the trials:pwa Vite plugin with the build id baked in).
+    files: ['src/pwa/sw.js'],
+    languageOptions: { globals: { ...globals.serviceworker } },
+  },
+  {
     files: DETERMINISTIC_PATHS,
     ignores: ['**/*.test.ts', 'src/core/loop.ts'],
     rules: {

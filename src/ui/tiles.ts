@@ -68,6 +68,16 @@ export class TileRow {
     this.render();
   }
 
+  /** Relabel a tile (results: "Next track · Lean Back"); `sub` is a quieter second line (already escaped). */
+  setLabel(id: string, label: string, sub?: string): void {
+    const i = this.tiles.findIndex((t) => t.id === id);
+    if (i < 0) return;
+    this.tiles[i]!.label = label;
+    const b = this.root.children[i] as HTMLButtonElement | undefined;
+    const span = b?.querySelector('span');
+    if (span) span.innerHTML = `${label}${sub ? `<small>${sub}</small>` : ''}`;
+  }
+
   setDisabled(id: string, disabled: boolean): void {
     const i = this.tiles.findIndex((t) => t.id === id);
     if (i < 0) return;

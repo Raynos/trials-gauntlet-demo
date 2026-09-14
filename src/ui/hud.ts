@@ -398,7 +398,8 @@ export class DomHud implements Hud {
     this.resKicker.className = `ov-kicker ${earned ? 'green' : ''}`;
     this.resName.textContent = name;
     const T = r.targetTimeS;
-    this.resStats.innerHTML = `<span>PB <b>${r.previousBest !== null ? formatTime(Math.min(r.previousBest, r.time)) : '—'}</b></span>${T ? `<i>·</i><span>Target <b>${formatTime(T)}</b></span>` : ''}`;
+    const bike = r.bike === 'pro' ? 'Pro' : 'Rookie';
+    this.resStats.innerHTML = `<span>PB <b>${r.previousBest !== null ? formatTime(Math.min(r.previousBest, r.time)) : '—'}</b></span>${T ? `<i>·</i><span>Target <b>${formatTime(T)}</b></span>` : ''}<i>·</i><span>Bike <b class="bike-${r.bike ?? 'rookie'}">${bike}</b></span>`;
     const text = formatTime(r.time);
     const dot = text.indexOf('.');
     this.resTime.innerHTML = `${text.slice(0, dot)}<span class="ms">${text.slice(dot)}</span>`;
@@ -428,9 +429,10 @@ export class DomHud implements Hud {
     for (const b of this.banners) if (b.kind === 'finish') this.retire(b); // the panel restates it
   }
 
-  /** NEXT TRACK is disabled when the next track is locked / this is the last one (App decides). */
-  setNextEnabled(on: boolean): void {
+  /** NEXT TRACK is disabled when the next track is locked / this is the last one (App decides); `name` labels the tile with the track ahead. */
+  setNextEnabled(on: boolean, name?: string | null): void {
     this.nextEnabled = on;
+    this.resTiles.setLabel('next', 'Next track', on && name ? escapeHtml(name) : undefined);
     this.resTiles.setDisabled('next', !on);
     if (this.resultsAt >= 0) this.resTiles.focusId(on ? 'next' : 'retry');
   }
