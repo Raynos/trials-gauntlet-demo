@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260914-020739-cdd9f2",
-  "startedAt": "2026-09-14T07:07:39.011Z",
-  "wallMs": 86069,
-  "git": "c9c7735",
-  "srcFingerprint": "f38f0f86",
+  "runId": "20260914-031620-0bd1d3",
+  "startedAt": "2026-09-14T08:16:20.350Z",
+  "wallMs": 96846,
+  "git": "eb6be42",
+  "srcFingerprint": "e082a61a",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
   "trackId": "flat-test",
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": true,
   "build": {
-    "distBytes": 5511287,
-    "jsGzipBytes": 301838,
+    "distBytes": 5604477,
+    "jsGzipBytes": 307531,
     "buildMs": 0
   },
   "browser": {
@@ -24,15 +24,15 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 41.06141600000001,
+      "value": 262.22529199999997,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 41/331/36"
+      "note": "runs 262/369/35 min 35 loadavg 11.22/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 4635.5,
+      "value": 4280.400000095367,
       "limit": 4000,
       "pass": false,
       "unit": "ms",
@@ -42,28 +42,28 @@
     },
     {
       "id": "clear.golden",
-      "value": false,
+      "value": true,
       "limit": true,
-      "pass": false,
-      "note": "bot-oracle.json finish=null run=undefined faults=2"
+      "pass": true,
+      "note": "bot-2.json finish=7.733333333333333 run=7.733 faults=0"
     },
     {
       "id": "clear.finishTimeBitEqual",
-      "value": true,
+      "value": false,
       "limit": true,
-      "pass": true,
-      "note": "expected null"
+      "pass": false,
+      "note": "expected 7.491666666666666"
     },
     {
       "id": "clear.hashOk",
-      "value": true,
+      "value": false,
       "limit": true,
-      "pass": true,
-      "note": "c67529bcbbfd0fd7 vs pinned c67529bcbbfd0fd7"
+      "pass": false,
+      "note": "097dceec2c967683 vs pinned d93600e5d7c68be2"
     },
     {
       "id": "crash.faultWithinS",
-      "value": 0.7583333333333333,
+      "value": 0.85,
       "limit": 8,
       "pass": true,
       "unit": "s",
@@ -93,7 +93,7 @@
     },
     {
       "id": "restart.frameMsP95",
-      "value": 190.5,
+      "value": 274.2999999523163,
       "limit": 150,
       "pass": false,
       "unit": "ms",
@@ -110,7 +110,7 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": -7.8867950439453125,
+      "value": 2.2791099548339844,
       "limit": 5,
       "pass": true,
       "unit": "MB",
@@ -118,40 +118,40 @@
     },
     {
       "id": "perf.drawCallsMax",
-      "value": 239,
+      "value": 203,
       "limit": 300,
       "pass": true
     },
     {
       "id": "perf.trianglesMax",
-      "value": 256070,
+      "value": 301720,
       "limit": 500000,
       "pass": true
     },
     {
       "id": "perf.texturesMBMax",
-      "value": 35.897904968261706,
+      "value": 38.33479559326171,
       "limit": 96,
       "pass": true,
       "unit": "MB"
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 50.00007152557373,
+      "value": 99.99990463256836,
       "limit": 60,
-      "pass": true,
+      "pass": false,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 1.4000000953674316,
+      "value": 1.7999999523162842,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 2276.5999999046326,
+      "value": 2584.5,
       "limit": 250,
       "pass": false,
       "unit": "ms",
@@ -161,103 +161,107 @@
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 294.763671875,
+      "value": 300.3232421875,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 5382 KB raw"
+      "note": "dist 5473 KB raw"
     },
     {
       "id": "determinism.pass",
-      "value": true,
+      "value": false,
       "limit": true,
-      "pass": true,
-      "note": "8/8 checks"
+      "pass": false,
+      "note": "7/8 checks"
     },
     {
       "id": "stranger.medianAttempts",
-      "value": 2,
+      "value": 6,
       "limit": null,
       "pass": true,
       "note": "no attemptsBand on track meta (informational)"
     }
   ],
-  "failed": 4,
+  "failed": 7,
   "pass": false,
   "boot": {
     "runs": [
-      41.06141600000001,
-      331.4215829999994,
-      35.706458000000566
+      262.22529199999997,
+      368.90129199999956,
+      34.88029199999983
     ],
-    "p50": 41.06141600000001,
-    "max": 331.4215829999994,
+    "p50": 262.22529199999997,
+    "min": 34.88029199999983,
+    "max": 368.90129199999956,
     "firstFrameMs": [
-      5906.700000047684,
-      4635.5,
-      4371.599999904633
-    ]
+      6043.5,
+      4280.400000095367,
+      4216.599999904633
+    ],
+    "loadavg1": 11.22,
+    "cores": 18,
+    "retried": false
   },
   "clear": {
-    "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-oracle.json",
-    "finishTime": null,
-    "expected": null,
-    "hash": "c67529bcbbfd0fd7",
-    "expectedHash": "c67529bcbbfd0fd7",
-    "faults": 2,
-    "hashOk": true
+    "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-2.json",
+    "finishTime": 7.733333333333333,
+    "expected": 7.491666666666666,
+    "hash": "097dceec2c967683",
+    "expectedHash": "d93600e5d7c68be2",
+    "faults": 0,
+    "hashOk": false
   },
   "crash": {
     "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/crash.json",
-    "faultTick": 91,
-    "faultTime": 0.7583333333333333,
+    "faultTick": 102,
+    "faultTime": 0.85,
     "reason": "crash"
   },
   "restart": {
     "ticks": 1,
     "wallMs": [
       0.09999990463256836,
+      0.20000004768371582,
+      0,
+      0,
+      0,
+      0,
+      0,
       0.09999990463256836,
+      0,
+      0,
       0.10000014305114746,
       0,
-      0.09999990463256836,
+      0,
+      0,
+      0,
       0,
       0.09999990463256836,
       0,
-      0.09999990463256836,
-      0.09999990463256836,
       0.10000014305114746,
-      0,
-      0,
-      0.09999990463256836,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+      0.09999990463256836
     ],
     "frameMs": [
-      606,
-      162.29999995231628,
-      124.30000019073486,
-      184.60000014305115,
-      124.59999990463257,
-      189.10000014305115,
-      126.09999990463257,
-      182.20000004768372,
-      132.5,
-      190.5,
-      129.20000004768372,
-      182.90000009536743,
-      123.59999990463257,
-      147.59999990463257,
-      146.40000009536743,
-      140.19999980926514,
-      167.20000004768372,
-      139.20000004768372,
-      175.40000009536743,
-      127.40000009536743
+      671.7000000476837,
+      182.40000009536743,
+      213.40000009536743,
+      154.79999995231628,
+      262.2999999523163,
+      154.39999985694885,
+      237.60000014305115,
+      174.89999985694885,
+      231,
+      182.89999985694885,
+      208.60000014305115,
+      201.29999995231628,
+      164.20000004768372,
+      274.2999999523163,
+      157.19999980926514,
+      251.29999995231628,
+      183,
+      235.5,
+      190.60000014305115,
+      176.90000009536743
     ],
     "noCountdown": true,
     "movesOnFirstTick": true
@@ -269,50 +273,50 @@
     "autoRespawnMs": 1016.6666666666666
   },
   "heap": {
-    "beforeMB": 17.021835327148438,
-    "afterMB": 9.135040283203125,
-    "growthMB": -7.8867950439453125,
+    "beforeMB": 7.212486267089844,
+    "afterMB": 9.491596221923828,
+    "growthMB": 2.2791099548339844,
     "seconds": 10
   },
   "perf": {
-    "drawCalls": 239,
-    "triangles": 256070,
-    "texturesMB": 35.897904968261706,
-    "physicsUsPerTickP95": 50.00007152557373,
-    "renderSubmitMsP95": 1.4000000953674316,
-    "renderSyncedMsP95": 2276.5999999046326
+    "drawCalls": 203,
+    "triangles": 301720,
+    "texturesMB": 38.33479559326171,
+    "physicsUsPerTickP95": 99.99990463256836,
+    "renderSubmitMsP95": 1.7999999523162842,
+    "renderSyncedMsP95": 2584.5
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260914-020858-8ae8b1",
-    "startedAt": "2026-09-14T07:08:58.403Z",
-    "wallMs": 6649,
-    "git": "c9c7735",
-    "srcFingerprint": "f38f0f86",
+    "runId": "20260914-031748-0a422b",
+    "startedAt": "2026-09-14T08:17:48.243Z",
+    "wallMs": 8939,
+    "git": "eb6be42",
+    "srcFingerprint": "e082a61a",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
     "physics": "bikePhysicsFactory",
-    "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-oracle.json",
-    "ticks": 927,
+    "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-2.json",
+    "ticks": 928,
     "checks": [
       {
         "id": "D1",
         "name": "cross-load",
         "pass": true,
         "hashes": [
-          "c67529bcbbfd0fd7",
-          "c67529bcbbfd0fd7"
+          "097dceec2c967683",
+          "097dceec2c967683"
         ],
-        "note": "2 loads, finish=null"
+        "note": "2 loads, finish=7.733333333333333"
       },
       {
         "id": "D2",
         "name": "cross-encoding",
         "pass": true,
         "hashes": [
-          "c67529bcbbfd0fd7",
-          "c67529bcbbfd0fd7"
+          "097dceec2c967683",
+          "097dceec2c967683"
         ]
       },
       {
@@ -320,8 +324,8 @@
         "name": "node-vs-browser",
         "pass": true,
         "hashes": [
-          "c67529bcbbfd0fd7",
-          "c67529bcbbfd0fd7"
+          "097dceec2c967683",
+          "097dceec2c967683"
         ],
         "note": "physics=bikePhysicsFactory"
       },
@@ -330,10 +334,10 @@
         "name": "snapshot-node",
         "pass": true,
         "hashes": [
-          "e832e6e21c3e1966",
-          "e959fd8327726cd6",
-          "e8dba4a0e86058f7",
-          "bff02b614c189d09"
+          "e9568a2f199eb278",
+          "02ab94d7983003b8",
+          "215e14ce4bde4a82",
+          "37a71ef590d6c4e2"
         ]
       },
       {
@@ -341,9 +345,9 @@
         "name": "snapshot-browser",
         "pass": true,
         "hashes": [
-          "e832e6e21c3e1966",
-          "e959fd8327726cd6",
-          "e8dba4a0e86058f7"
+          "e9568a2f199eb278",
+          "02ab94d7983003b8",
+          "215e14ce4bde4a82"
         ]
       },
       {
@@ -351,11 +355,11 @@
         "name": "chunking",
         "pass": true,
         "hashes": [
-          "c67529bcbbfd0fd7",
-          "c67529bcbbfd0fd7",
-          "c67529bcbbfd0fd7",
-          "c67529bcbbfd0fd7",
-          "c67529bcbbfd0fd7"
+          "097dceec2c967683",
+          "097dceec2c967683",
+          "097dceec2c967683",
+          "097dceec2c967683",
+          "097dceec2c967683"
         ],
         "note": "chunks 1,7,15,120 + runRecording"
       },
@@ -364,20 +368,21 @@
         "name": "no-state-leak",
         "pass": true,
         "hashes": [
-          "c67529bcbbfd0fd7",
-          "c67529bcbbfd0fd7"
+          "097dceec2c967683",
+          "097dceec2c967683"
         ]
       },
       {
         "id": "D8",
         "name": "pinned-hash",
-        "pass": true,
+        "pass": false,
         "hashes": [
+          "c87ab34121eac7ee",
           "1b77c919b99399fc"
         ],
-        "note": "re-pinned (--pin)"
+        "note": "physics changed since pin (bikePhysicsFactory); re-pin deliberately with --pin"
       }
     ],
-    "pass": true
+    "pass": false
   }
 }
