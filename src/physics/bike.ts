@@ -48,6 +48,8 @@ export interface PhysicsDebug {
   suspension: { rear: SuspDebug; front: SuspDebug };
   rider: { anchor: Vec2; offset: Vec2; tetherForce: number; hopPhase: HopPhase; crouch: number; hopExt: number };
   balancePitch: number;
+  /** The drawn rider chain in world space (7.7): the crash sensors and the ragdoll spawn live on it. */
+  riderChain: { hips: Vec2; shoulders: Vec2; head: Vec2; elbow: Vec2; hand: Vec2; knee: Vec2; foot: Vec2; torsoDir: Vec2; headDir: Vec2 };
   /** Why the last crash fired: 'sensor' (head/torso hit), 'tetherDist', 'tetherForce', 'oob', 'hazard' or null. */
   crashCause: 'sensor' | 'tetherDist' | 'tetherForce' | 'oob' | 'hazard' | null;
 }
@@ -165,18 +167,47 @@ const RAG_LIMBS: RagLimb[] = [
   { len: 0.2, r: 0.12, mass: 12 }, // pelvis
   { len: 0.3, r: 0.06, mass: 5 }, // upperArm
   { len: 0.28, r: 0.05, mass: 3 }, // forearm
-  { len: 0.42, r: 0.08, mass: 12 }, // thigh
-  { len: 0.42, r: 0.06, mass: 8 }, // shin
+  { len: 0.44, r: 0.08, mass: 12 }, // thigh (render L.thigh)
+  { len: 0.43, r: 0.06, mass: 8 }, // shin (render L.shin)
 ];
-/** [parent, child, parentLocalY, childLocalY, angularRange] — anchors are on the local y axis. */
+/**
+ * [parent, child, parentLocalY, childLocalY, angularRange] — anchors are on the local y axis (+y runs
+ * distal -> proximal, i.e. from the far end of the limb toward the body). The anchors are where the
+ * drawn chain's joints are: torso centre is 0.25 above the hips, so the neck (shoulders) is +0.25 and
+ * the spine (hips) -0.25 on the torso; the head hangs 0.158 (render L.head + 0.05) beyond the
+ * shoulders; the pelvis centre is 0.1 below the hips.
+ */
 const RAG_JOINTS: [number, number, number, number, number][] = [
-  [1, 0, 0.2, -0.12, 0.7], // neck
-  [1, 2, -0.2, 0.1, 0.6], // spine
-  [1, 3, 0.15, 0.15, 2.5], // shoulder
+  [1, 0, 0.25, -0.158, 0.7], // neck
+  [1, 2, -0.25, 0.1, 0.6], // spine
+  [1, 3, 0.25, 0.15, 2.5], // shoulder
   [3, 4, -0.15, 0.14, 1.6], // elbow
-  [2, 5, -0.1, 0.21, 1.4], // hip
-  [5, 6, -0.21, 0.21, 1.4], // knee
+  [2, 5, -0.1, 0.22, 1.4], // hip
+  [5, 6, -0.22, 0.215, 1.4], // knee
 ];
+/** Frame-local grip (render barCentre - (0.04, 0.07)) and foot-on-peg (render pegs + (0.03, 0.03)) points. */
+const GRIP_X = 0.32;
+const GRIP_Y = 0.79;
+const FOOT_X = -0.07;
+const FOOT_Y = 0.01;
+/** Two-bone IK, the render's (`riderModel.ts` ik): joint between a and b for bone lengths l1, l2, bending to `side`. */
+function ik2(ax: number, ay: number, bx: number, by: number, l1: number, l2: number, side: number): [number, number] {
+  let dx = bx - ax;
+  let dy = by - ay;
+  let d = Math.sqrt(dx * dx + dy * dy);
+  const max = (l1 + l2) * 0.995;
+  if (d > max) {
+    dx *= max / d;
+    dy *= max / d;
+    d = max;
+  }
+  if (d < 1e-4) return [ax + l1, ay];
+  const a = (l1 * l1 - l2 * l2 + d * d) / (2 * d);
+  const h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+  const ux = dx / d;
+  const uy = dy / d;
+  return [ax + ux * a - uy * h * side, ay + uy * a + ux * h * side];
+}
 
 // ---------------------------------------------------------------------------
 // World
@@ -186,6 +217,8 @@ class BikeWorld implements BikePhysicsWorld {
   readonly physicsHz: number;
   readonly tuning: Readonly<BikeTuning>;
   private readonly dt: number;
+  /** Effective gravity: tuning.gravity * tuning.gravityScale. */
+  private readonly g: number;
 
   private track: CompiledTrack | null = null;
   private col: CollisionWorld | null = null;
@@ -275,6 +308,7 @@ class BikeWorld implements BikePhysicsWorld {
     this.physicsHz = physicsHz;
     this.dt = 1 / physicsHz;
     this.tuning = Object.freeze(mergeTuning(DEFAULT_TUNING, tuning));
+    this.g = this.tuning.gravity * this.tuning.gravityScale;
     this.bindViews();
   }
 
@@ -486,7 +520,7 @@ class BikeWorld implements BikePhysicsWorld {
   balancePitch(lean: number, accel = 0): number {
     const { d, h } = this.comDH(lean);
     // forward acceleration lifts the nose (pseudo-force at the COM), so the balance pitch drops with accel
-    return HALF_PI - atan2(h, d) - atan(accel / this.tuning.gravity);
+    return HALF_PI - atan2(h, d) - atan(accel / this.g);
   }
 
   teleport(pose: TeleportPose): void {
@@ -531,8 +565,15 @@ class BikeWorld implements BikePhysicsWorld {
         hopExt: F[S_HOP_EXT]!,
       },
       balancePitch: this.balancePitch(F[S_LEAN_EFF]!, 0),
+      riderChain: this.chainDebug(),
       crashCause: CAUSES[this.U[U_CRASH_CAUSE]!] ?? null,
     };
+  }
+
+  private chainDebug(): PhysicsDebug['riderChain'] {
+    this.riderChain();
+    const p = (i: number): Vec2 => ({ x: this.chX[i]!, y: this.chY[i]! });
+    return { hips: p(0), shoulders: p(1), head: p(2), elbow: p(3), hand: p(4), knee: p(5), foot: p(6), torsoDir: { x: this.chDx, y: this.chDy }, headDir: { x: this.chHx, y: this.chHy } };
   }
 
   // -- setup ----------------------------------------------------------------
@@ -586,7 +627,7 @@ class BikeWorld implements BikePhysicsWorld {
     const t = this.tuning;
     const L = t.wheel.wheelbase;
     const M = t.frame.mass + 2 * t.wheel.mass + t.rider.mass;
-    const W = M * t.gravity;
+    const W = M * this.g;
     // COM x relative to rear axle at zero compression
     const cx = (t.wheel.mass * L + t.rider.mass * (t.rider.anchor.x - t.suspension.rear.axle.x) + t.frame.mass * -t.suspension.rear.axle.x) / M;
     const nf = (W * cx) / L;
@@ -703,11 +744,14 @@ class BikeWorld implements BikePhysicsWorld {
     };
   }
 
-  // rider body chain scratch (world): 0 hips, 1 shoulders, 2 head centre; (chDx, chDy) torso unit dir
-  private readonly chX = new Float64Array(3);
-  private readonly chY = new Float64Array(3);
+  // rider body chain scratch (world): 0 hips, 1 shoulders, 2 head centre, 3 elbow, 4 hand (grip),
+  // 5 knee, 6 foot (peg); (chDx, chDy) torso unit dir, (chHx, chHy) head unit dir (shoulders -> head)
+  private readonly chX = new Float64Array(7);
+  private readonly chY = new Float64Array(7);
   private chDx = 0;
   private chDy = 1;
+  private chHx = 0;
+  private chHy = 1;
 
   /**
    * The rider body as the renderer draws it (`src/render/rider/riderModel.ts` poseRider, standing):
@@ -730,20 +774,32 @@ class BikeWorld implements BikePhysicsWorld {
     const sx = hx + dxl * 0.5;
     const sy = hy + dyl * 0.5;
     const headA = A * 0.45 - 0.1;
-    const hdx = sx + sin(headA) * 0.195;
-    const hdy = sy + cos(headA) * 0.195;
+    const hsx = sin(headA);
+    const hsy = cos(headA);
+    const hdx = sx + hsx * 0.158;
+    const hdy = sy + hsy * 0.158;
+    // arms: shoulders -> grips, elbows up and out; legs: hips -> pegs, knees forward (render IK)
+    const [ex, ey] = ik2(sx, sy, GRIP_X, GRIP_Y, RAG_LIMBS[3]!.len, RAG_LIMBS[4]!.len, 1);
+    const [kx, ky] = ik2(hx, hy, FOOT_X, FOOT_Y, RAG_LIMBS[5]!.len, RAG_LIMBS[6]!.len, 1);
     const c = cos(this.an[FRAME]!);
     const s = sin(this.an[FRAME]!);
     const fx = this.px[FRAME]!;
     const fy = this.py[FRAME]!;
-    this.chX[0] = fx + hx * c - hy * s;
-    this.chY[0] = fy + hx * s + hy * c;
-    this.chX[1] = fx + sx * c - sy * s;
-    this.chY[1] = fy + sx * s + sy * c;
-    this.chX[2] = fx + hdx * c - hdy * s;
-    this.chY[2] = fy + hdx * s + hdy * c;
+    const put = (i: number, lx: number, ly: number): void => {
+      this.chX[i] = fx + lx * c - ly * s;
+      this.chY[i] = fy + lx * s + ly * c;
+    };
+    put(0, hx, hy);
+    put(1, sx, sy);
+    put(2, hdx, hdy);
+    put(3, ex, ey);
+    put(4, GRIP_X, GRIP_Y);
+    put(5, kx, ky);
+    put(6, FOOT_X, FOOT_Y);
     this.chDx = dxl * c - dyl * s;
     this.chDy = dxl * s + dyl * c;
+    this.chHx = hsx * c - hsy * s;
+    this.chHy = hsx * s + hsy * c;
   }
 
   // -- step phases ----------------------------------------------------------
@@ -860,7 +916,7 @@ class BikeWorld implements BikePhysicsWorld {
     const F = this.F;
     const t = this.tuning;
     const dt = this.dt;
-    const g = t.gravity;
+    const g = this.g;
     const px = this.px;
     const py = this.py;
     const vx = this.vx;
@@ -1419,7 +1475,12 @@ class BikeWorld implements BikePhysicsWorld {
           const relx = vx[wb]! - (vx[FRAME]! - av[FRAME]! * ry);
           const rely = vy[wb]! - (vy[FRAME]! + av[FRAME]! * rx);
           const rate = -(relx * ax + rely * ay);
-          const vnMin = room > 0 ? -room / dt : (bj * -room) / dt;
+          let vnMin = room > 0 ? -room / dt : (bj * -room) / dt;
+          // bottom-out buck: a bump stop hit hard returns part of the closing rate as extension
+          // (sRate is this tick's pre-impulse compression rate, > 0 closing)
+          const closing = this.sRate[w]!;
+          // (the speculative limit would otherwise stop the wheel dead over the approach tick)
+          if (closing > st.stopBounceRate && room - closing * dt < 0.002) vnMin = Math.max(vnMin, st.stopRestitution * closing);
           let lambda = -massA * (rate - vnMin);
           const old = this.sLimHi[w]!;
           const acc = Math.max(0, old + lambda);
@@ -1612,7 +1673,7 @@ class BikeWorld implements BikePhysicsWorld {
             // the rider modulates the front: feed-forward cap at the torque that keeps `rearLoadMin`
             // of the weight on the rear for the COM geometry of the current lean (load transfer
             // a*h/L against the static split), plus a feedback fade if the rear still unloads
-            const W = (t.frame.mass + 2 * t.wheel.mass + t.rider.mass) * t.gravity;
+            const W = (t.frame.mass + 2 * t.wheel.mass + t.rider.mass) * this.g;
             const rearN = this.F[S_REAR_LN]! / dt;
             const { d, h } = this.comDH(this.F[S_LEAN_EFF]!);
             const L = t.wheel.wheelbase;
@@ -1884,82 +1945,70 @@ class BikeWorld implements BikePhysicsWorld {
     }
   }
 
+  /**
+   * The ragdoll spawns ON the drawn rider (7.7): every body's centre and axis is a segment of the
+   * chain the renderer poses (hips -> shoulders -> head, shoulder -> elbow -> grip, hip -> knee ->
+   * peg), so the crash tick shows the same figure as the tick before (no pop; `world.test.ts`
+   * RAGDOLL continuity: < 1 cm / 1 deg against the chain of the previous tick). Velocities are the
+   * frame's rigid field at each body plus the rider mass's motion relative to the frame; the rng
+   * spread is on the limbs' spin only, so the figure carries the bike's speed without jitter.
+   */
   private spawnRagdoll(): void {
     const t = this.tuning;
     const U = this.U;
     this.riderChain();
-    // torso axis from the drawn body: u points hips -> head
-    const ux = this.chDx;
-    const uy = this.chDy;
-    const fx = uy;
-    const fy = -ux;
-    // rider "centre" 0.15 above the hips along the torso (the ragdoll torso/pelvis join)
-    const rx = this.chX[0]! + ux * 0.1;
-    const ry = this.chY[0]! + uy * 0.1;
-    // velocity of that point on the frame plus the point mass's relative motion along the frame
+    const X = this.chX;
+    const Y = this.chY;
     const fw = this.av[FRAME]!;
-    const ox0 = rx - this.px[FRAME]!;
-    const oy0 = ry - this.py[FRAME]!;
-    const rvx = this.vx[FRAME]! - fw * oy0 + 0.5 * (this.vx[RIDER]! - this.vx[FRAME]!);
-    const rvy = this.vy[FRAME]! + fw * ox0 + 0.5 * (this.vy[RIDER]! - this.vy[FRAME]!);
+    const fpx = this.px[FRAME]!;
+    const fpy = this.py[FRAME]!;
+    const relx = this.vx[RIDER]! - this.vx[FRAME]!;
+    const rely = this.vy[RIDER]! - this.vy[FRAME]!;
     const spread = t.ragdoll.spread;
-    // body placement: [centre offset along u, offset along fwd, axis direction (dx, dy) distal->proximal]
-    const place = (i: number, cx: number, cy: number, dirx: number, diry: number): void => {
+    // body i centred at (cx, cy) with local +y (distal -> proximal) along the unit vector (uy_x, uy_y)
+    const place = (i: number, cx: number, cy: number, uyx: number, uyy: number): void => {
       const b = RAG0 + i;
       const limb = RAG_LIMBS[i]!;
       this.px[b] = cx;
       this.py[b] = cy;
-      // local +y points from distal to proximal: (-sin a, cos a) = (dirx, diry)
-      this.an[b] = limb.len === 0 ? atan2(-ux, uy) : atan2(-dirx, diry);
-      const ox = cx - this.px[FRAME]!;
-      const oy = cy - this.py[FRAME]!;
-      this.vx[b] = rvx - fw * oy * 0.5 + (this.rng.next() * 2 - 1) * spread;
-      this.vy[b] = rvy + fw * ox * 0.5 + (this.rng.next() * 2 - 1) * spread;
-      this.av[b] = fw * 0.5 + (this.rng.next() * 2 - 1) * 2;
+      // local +y = (-sin a, cos a)
+      this.an[b] = atan2(-uyx, uyy);
+      const ox = cx - fpx;
+      const oy = cy - fpy;
+      this.vx[b] = this.vx[FRAME]! - fw * oy + relx;
+      this.vy[b] = this.vy[FRAME]! + fw * ox + rely;
+      this.av[b] = fw + (this.rng.next() * 2 - 1) * spread;
       this.im[b] = 1 / limb.mass;
       const I = limb.len === 0 ? 0.4 * limb.mass * limb.r * limb.r : (limb.mass * limb.len * limb.len) / 12 + 0.5 * limb.mass * limb.r * limb.r;
       this.ii[b] = 1 / I;
     };
-    // torso spans -0.05..0.35 along u, pelvis -0.25..-0.05, head centre at 0.47
-    place(1, rx + ux * 0.15, ry + uy * 0.15, ux, uy);
-    place(2, rx - ux * 0.15, ry - uy * 0.15, ux, uy);
-    place(0, rx + ux * 0.47, ry + uy * 0.47, ux, uy);
-    // arm from the shoulder (0.30 along u) forward-down
-    {
-      const sx = rx + ux * 0.3;
-      const sy = ry + uy * 0.3;
-      let dx = fx * 0.7 - ux * 0.7;
-      let dy = fy * 0.7 - uy * 0.7;
-      let l = Math.sqrt(dx * dx + dy * dy);
-      dx /= l;
-      dy /= l;
-      place(3, sx + dx * 0.15, sy + dy * 0.15, -dx, -dy);
-      const ex = sx + dx * 0.3;
-      const ey = sy + dy * 0.3;
-      dx = fx * 0.9 + ux * 0.2;
-      dy = fy * 0.9 + uy * 0.2;
-      l = Math.sqrt(dx * dx + dy * dy);
-      dx /= l;
-      dy /= l;
-      place(4, ex + dx * 0.14, ey + dy * 0.14, -dx, -dy);
-    }
-    // leg from the hip (-0.25 along u): thigh forward-down, shin down
-    {
-      const hx = rx - ux * 0.25;
-      const hy = ry - uy * 0.25;
-      let dx = fx * 0.6 - ux * 0.6;
-      let dy = fy * 0.6 - uy * 0.6;
-      let l = Math.sqrt(dx * dx + dy * dy);
-      dx /= l;
-      dy /= l;
-      place(5, hx + dx * 0.21, hy + dy * 0.21, -dx, -dy);
-      const kx = hx + dx * 0.42;
-      const ky = hy + dy * 0.42;
-      dx = -ux;
-      dy = -uy;
-      l = Math.sqrt(dx * dx + dy * dy);
-      place(6, kx + dx * 0.21, ky + dy * 0.21, -dx, -dy);
-    }
+    // a segment from the distal joint (ax, ay) to the proximal joint (bx, by): centre at the midpoint
+    const seg = (i: number, ax: number, ay: number, bx: number, by: number): void => {
+      let dx = bx - ax;
+      let dy = by - ay;
+      const l = Math.sqrt(dx * dx + dy * dy);
+      if (l > 1e-9) {
+        dx /= l;
+        dy /= l;
+      } else {
+        dx = this.chDx;
+        dy = this.chDy;
+      }
+      place(i, 0.5 * (ax + bx), 0.5 * (ay + by), dx, dy);
+    };
+    const ux = this.chDx;
+    const uy = this.chDy;
+    // torso: hips -> shoulders; pelvis: 0.2 below the hips along the torso, centre 0.1 below the hips
+    seg(1, X[0]!, Y[0]!, X[1]!, Y[1]!);
+    place(2, X[0]! - ux * 0.1, Y[0]! - uy * 0.1, ux, uy);
+    // head: centre on the chain, axis along the shoulders -> head direction
+    place(0, X[2]!, Y[2]!, this.chHx, this.chHy);
+    // arm: upper arm elbow -> shoulder, forearm grip -> elbow
+    seg(3, X[3]!, Y[3]!, X[1]!, Y[1]!);
+    seg(4, X[4]!, Y[4]!, X[3]!, Y[3]!);
+    // leg: thigh knee -> hip, shin foot -> knee
+    seg(5, X[5]!, Y[5]!, X[0]!, Y[0]!);
+    seg(6, X[6]!, Y[6]!, X[5]!, Y[5]!);
     for (let j = 0; j < RAG_JOINTS.length; j++) {
       const [pi, ci] = RAG_JOINTS[j]!;
       this.F[S_RAG_REST + j] = wrapAngle(this.an[RAG0 + ci]! - this.an[RAG0 + pi]!);

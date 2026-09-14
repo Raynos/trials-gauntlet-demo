@@ -300,6 +300,81 @@ describe('ragdoll feel (round 4, blind critic: "slides off as a stiff plank")', 
   });
 });
 
+describe('ragdoll spawn continuity (round 6, blind critic: "limbs pop at the crash tick")', () => {
+  /**
+   * Step to the crash; the chain the renderer poses (`debug().riderChain`) one tick before the fault
+   * against `state.ragdoll` on the crash tick: every body centre must sit on its chain segment and every
+   * axis along it. The tick of motion in between is bounded by the bike's speed (< 8 m/s * 1/120 s = 7 cm).
+   */
+  function continuity(setup: (w: BikePhysicsWorld) => void, input: Partial<InputFrame>): { maxPos: number; maxAng: number; velErr: number; cause: string | null } {
+    const w = createBikePhysics(HZ);
+    w.loadTrack(makeTrack(), 3);
+    stepN(w, {}, 60);
+    setup(w);
+    const q = quantizeInput(input);
+    let prev = w.debug();
+    let prevState = w.getState();
+    for (let i = 0; i < HZ * 6; i++) {
+      w.step(q);
+      const s = w.getState();
+      if (s.ragdoll) {
+        const c = prev.riderChain;
+        const mid = (a: { x: number; y: number }, b: { x: number; y: number }): { x: number; y: number } => ({ x: 0.5 * (a.x + b.x), y: 0.5 * (a.y + b.y) });
+        const dir = (a: { x: number; y: number }, b: { x: number; y: number }): number => Math.atan2(-(b.x - a.x), b.y - a.y);
+        const expected: Record<string, { pos: { x: number; y: number }; angle: number }> = {
+          head: { pos: c.head, angle: Math.atan2(-c.headDir.x, c.headDir.y) },
+          torso: { pos: mid(c.hips, c.shoulders), angle: dir(c.hips, c.shoulders) },
+          pelvis: { pos: { x: c.hips.x - c.torsoDir.x * 0.1, y: c.hips.y - c.torsoDir.y * 0.1 }, angle: dir(c.hips, c.shoulders) },
+          upperArm: { pos: mid(c.elbow, c.shoulders), angle: dir(c.elbow, c.shoulders) },
+          forearm: { pos: mid(c.hand, c.elbow), angle: dir(c.hand, c.elbow) },
+          thigh: { pos: mid(c.knee, c.hips), angle: dir(c.knee, c.hips) },
+          shin: { pos: mid(c.foot, c.knee), angle: dir(c.foot, c.knee) },
+        };
+        let maxPos = 0;
+        let maxAng = 0;
+        // the frame moved and turned one tick since the chain was read: carry the chain with the frame
+        const dth = s.bike.angle - prevState.bike.angle;
+        const cr = Math.cos(dth);
+        const sr = Math.sin(dth);
+        for (const b of s.ragdoll) {
+          const e = expected[b.id]!;
+          const ox = e.pos.x - prevState.bike.pos.x;
+          const oy = e.pos.y - prevState.bike.pos.y;
+          const ex = s.bike.pos.x + ox * cr - oy * sr;
+          const ey = s.bike.pos.y + ox * sr + oy * cr;
+          maxPos = Math.max(maxPos, Math.hypot(b.pos.x - ex, b.pos.y - ey));
+          const da = Math.atan2(Math.sin(b.angle - e.angle - dth), Math.cos(b.angle - e.angle - dth));
+          maxAng = Math.max(maxAng, Math.abs(da));
+        }
+        // velocity continuity: the torso body's velocity vs the frame's rigid field at its centre (what is
+        // left is the rider mass's motion relative to the bike, which the ragdoll inherits on purpose)
+        const d = w.debug();
+        const torso = d.bodies.find((x) => x.id === 'rag:torso')!;
+        const rx = torso.pos.x - s.bike.pos.x;
+        const ry = torso.pos.y - s.bike.pos.y;
+        const velErr = Math.hypot(torso.vel.x - (s.bike.vel.x - s.bike.angVel * ry), torso.vel.y - (s.bike.vel.y + s.bike.angVel * rx));
+        return { maxPos, maxAng, velErr, cause: d.crashCause };
+      }
+      prev = w.debug();
+      prevState = s;
+    }
+    throw new Error('no crash');
+  }
+  it('loop-out crash at 7 m/s and a nose-plant: every ragdoll body sits on the drawn chain of the previous tick (< 2 cm / 5 deg after the frame\'s one-tick motion) and carries the bike\'s velocity', () => {
+    const loop = continuity((w) => w.teleport({ pos: { x: 0, y: R }, angle: 0.6, vel: { x: 7, y: 0 } }), { throttle: 1, lean: -1 });
+    const plant = continuity((w) => w.teleport({ pos: { x: 0, y: R + 0.2 }, angle: 1.9, vel: { x: 7, y: 0 } }), { throttle: 0.3 });
+    for (const [name, r] of [
+      ['loop', loop],
+      ['plant', plant],
+    ] as const) {
+      console.log(`RAGDOLL spawn continuity (${name}, ${r.cause}): max body offset ${(r.maxPos * 100).toFixed(2)} cm, max axis error ${((r.maxAng * 180) / Math.PI).toFixed(2)} deg, torso velocity vs the frame's rigid field ${r.velErr.toFixed(2)} m/s (= rider mass relative motion)`);
+      expect(r.maxPos).toBeLessThan(0.02);
+      expect(r.maxAng).toBeLessThan((5 * Math.PI) / 180);
+      expect(r.velErr).toBeLessThan(4);
+    }
+  });
+});
+
 describe('dynamic colliders', () => {
   it('a seesaw tips under the bike, within its angle limit, and is reported in state', () => {
     const w = createBikePhysics(HZ);

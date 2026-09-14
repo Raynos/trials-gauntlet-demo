@@ -18,10 +18,26 @@ export interface SuspensionTuning {
   /** Bump-stop stiffness engaged above stopStart*travel. */
   kStop: number;
   stopStart: number;
+  /**
+   * Bottom-out buck: when the travel limit is hit while closing faster than `stopBounceRate` (m/s)
+   * the stop returns `stopRestitution` of the closing rate as extension (a rubber bump stop under a
+   * hard landing kicks the chassis back up; 0 = the old inelastic stop).
+   */
+  stopRestitution: number;
+  stopBounceRate: number;
 }
 
 export interface BikeTuning {
+  /** Physical g; the solver uses `gravity * gravityScale`. */
   gravity: number;
+  /**
+   * Trials-style physics runs heavier than 9.81: the same jump has less hang, a hop of the same
+   * height is over sooner, a drop hits harder. Every force the rider and engine can produce is
+   * tuned below at this scale (thrust, brakes, hop, legs, springs), so changing it alone changes
+   * only how the bike falls. Round 6: 1.0 -> 1.4 (blind critics: "2.2 s of airtime with frozen
+   * pitch off a 45 deg ramp", reference big jumps ~1.0 s, stationary hop ~0.6 s).
+   */
+  gravityScale: number;
   frame: {
     mass: number;
     inertia: number;
@@ -159,6 +175,7 @@ const norm = (x: number, y: number): Vec2 => {
 
 const DEFAULTS: BikeTuning = {
   gravity: 9.81,
+  gravityScale: 1.4,
   frame: {
     mass: 56,
     inertia: 14.0,
@@ -173,27 +190,37 @@ const DEFAULTS: BikeTuning = {
   },
   wheel: { radius: 0.34, mass: 7, inertiaRear: 0.7, inertiaFront: 0.5, wheelbase: 1.3 },
   suspension: {
+    // Round 6: sag 25-30 % of travel (was 10 % rear / 24 % front), damping ratios ~0.3 compression /
+    // ~0.4 rebound (was 0.6 / 1.0: critically damped, so a landing never rebounded visibly), bump
+    // stop with restitution (the hard-landing buck). Rates at 1.4 g.
     rear: {
       axle: { x: -0.585, y: -0.21 },
+      // wheel moves up-and-BACK when compressing: thrust at the axle then extends the slider (anti-squat,
+      // like chain pull on a swingarm). Was (0.17, 0.985), pro-squat, which with a soft rear pitched the
+      // frame 9 deg nose-up in the first 0.1 s of a launch and looped the lean-0 stranger in 1.0 s at 1.4 g.
       axis: norm(0.17, 0.985),
       travel: 0.22,
       k: 12000,
-      cComp: 650,
-      cReb: 1100,
-      preload: 0.02,
+      cComp: 400,
+      cReb: 600,
+      preload: 0.0,
       kStop: 60000,
       stopStart: 0.8,
+      stopRestitution: 0.3,
+      stopBounceRate: 1.0,
     },
     front: {
       axle: { x: 0.715, y: -0.215 },
       axis: norm(-0.42, 0.91),
       travel: 0.2,
-      k: 10500,
-      cComp: 550,
-      cReb: 950,
+      k: 13700,
+      cComp: 400,
+      cReb: 520,
       preload: 0.02,
       kStop: 60000,
       stopStart: 0.8,
+      stopRestitution: 0.3,
+      stopBounceRate: 1.0,
     },
   },
   tyre: {
@@ -209,14 +236,15 @@ const DEFAULTS: BikeTuning = {
     clutchRpm: 3500,
     limiterRpm: 10000,
     limiterResetRpm: 9500,
-    peakTorqueNm: 38,
+    peakTorqueNm: 52, // ~38 x 1.4 (gravityScale): the 60 deg plank needs m g sin 60 = 1725 N at the rim; 53 loops the lean-0 stranger at 1.3 s, 51.5 never
     curve: [
+      // flat from the clutch to 6500 (was 0.85 @5000, 1.0 @6500): the lean-0 stranger loop diverges in the
+      // 3500-6500 window, and the mid-range rise was what took it over; the pipe comes on at 8000
       [1500, 0.68],
       [3500, 0.8],
-      [5000, 0.85],
-      [6500, 1.0],
-      [8000, 0.95],
-      [9500, 0.85],
+      [6500, 0.8],
+      [8000, 1.0],
+      [9500, 0.9],
       [10000, 0.8],
     ],
     gearRatio: 17.5,
@@ -225,32 +253,32 @@ const DEFAULTS: BikeTuning = {
     throttleRise: 40,
     throttleFall: 60,
   },
-  brakes: { frontMaxNm: 640, rearMaxNm: 500, antiEndo: 0.05, antiEndoFloor: 0.8, rearLoadMin: 0.04, rise: 60, fall: 40 },
+  brakes: { frontMaxNm: 900, rearMaxNm: 700, antiEndo: 0.05, antiEndoFloor: 0.7, rearLoadMin: 0.04, rise: 60, fall: 40 },
   rider: {
     mass: 75,
     anchor: { x: 0.33, y: 0.38 },
     torso: { inertia: 20, swing: 1.5, maxRate: 7, maxTorque: 400 },
     leanCrouch: 0.2,
     leanCrouchFwd: 0.5,
-    k: 6000,
-    c: 740,
-    kAlong: 20000,
-    cAlong: 1800,
-    shiftForce: 2000,
-    kLanding: 40000,
+    k: 8400,
+    c: 875,
+    kAlong: 28000,
+    cAlong: 2130,
+    shiftForce: 2800,
+    kLanding: 56000,
     leanBack: 0.6,
     leanFwd: 0.73,
     leanRate: 6,
     crouch: 0.3,
     hopExtend: 0.15,
-    hopForce: 3200,
+    hopForce: 4500,
     hopPegX: 0.08,
     kPush: 500,
     crouchTime: 0.25,
     preloadSlack: 0.85,
-    armPull: 300,
+    armPull: 420,
     legSlack: 0.05,
-    hopMaxForce: 3800,
+    hopMaxForce: 5300,
     hopPreloadMin: 0.12,
     hopPreloadMax: 1.5,
     hopPushTime: 0.35,
@@ -259,12 +287,12 @@ const DEFAULTS: BikeTuning = {
     hopThrottle: 0.3,
     hopSnapRate: 4,
     tetherMax: 0.5,
-    ejectForce: 16000,
+    ejectForce: 22400,
     headRadius: 0.15,
     torsoRadius: 0.13,
     torsoFollow: 0.5,
   },
-  aero: { dragCoef: 3.2 },
+  aero: { dragCoef: 4.2 },
   solver: { velocityIters: 8, slop: 0.005, baumgarte: 0.2, jointBaumgarte: 0.3, speculativeMargin: 0.02 },
   ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },
   drum: { density: 60 },

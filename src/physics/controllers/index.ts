@@ -225,7 +225,13 @@ export function climber(slopeDeg: number, baseX = -Infinity, opts: { hover?: num
     if (opts.topX !== undefined && frontX > opts.topX - 0.2) {
       // front at the lip: keep it pinned so the bike carries over the edge instead of hanging on
       // the bash plate (the front carries weight now, no loop risk), then settle the nose and ride on
-      if (rearX < opts.topX + 0.1) return { throttle: o.pitchDeg > o.balanceAt(1) - 4 ? 0 : 1, lean: 1, brake: o.pitchDeg > o.balanceAt(1) ? 1 : 0 };
+      if (rearX < opts.topX + 0.1) {
+        // feather the throttle when the rear spins up (round 6: at 1.4 g a chopped-then-floored throttle
+        // spun the tyre at 20 m/s of slip on the last half metre of the 60 deg face and hung the plate)
+        const slipHere = o.state.rearSlip;
+        const thr = o.pitchDeg > o.balanceAt(1) - 4 ? 0 : slipHere > 1.5 ? 0.4 : 1;
+        return { throttle: thr, lean: 1, brake: o.pitchDeg > o.balanceAt(1) ? 1 : 0 };
+      }
       // over the lip: stay over the bars until the nose is down (a lean change here swings the torso
       // and kicks the nose up while the spinning rear grabs the edge), brake if it keeps rising
       if (o.pitchDeg > 25) return { throttle: 0, lean: 1, brake: o.pitchDeg > 35 || o.pitchRateDeg > 40 ? 1 : 0 };
@@ -245,7 +251,7 @@ export function climber(slopeDeg: number, baseX = -Infinity, opts: { hover?: num
       // nose comes up past the balance point while the rear is still in the corner, chop it.
       const balT = o.balanceAt(1);
       if (o.pitchDeg > balT - 2) return { throttle: 0, lean: 1, brake: o.pitchDeg > balT + 2 ? 1 : 0 };
-      const hold = Math.max(0.2, Math.min(1, 0.4 + 0.3 * ((opts.cornerSpeed ?? 1.8) - o.speed)));
+      const hold = Math.max(0.2, Math.min(1, 0.4 + 0.3 * ((opts.cornerSpeed ?? 2.5) - o.speed)));
       return { throttle: hold, lean: Math.max(0.6, Math.min(1, o.pitchDeg / 40)) };
     }
     // climb: pick the lean whose balance pitch sits `margin` above the slope (front hovering, rear
