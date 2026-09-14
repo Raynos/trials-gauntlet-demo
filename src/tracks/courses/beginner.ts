@@ -9,7 +9,7 @@ export const B1 = course('b1-first-ride', 'First Ride', 'beginner')
   .meta({
     biome: 'industrial',
     technique: 'throttle control',
-    demands: 'brake after the descent and crawl over the drum bump',
+    demands: 'slow down after the descent for a speed hump and a low tabletop',
     attemptsBand: [1, 1],
     targetTimeS: 18,
   })
@@ -29,9 +29,9 @@ export const B1 = course('b1-first-ride', 'First Ride', 'beginner')
   .hint('SLOW DOWN')
   .slope(10, -2.0) // 11 deg descent builds speed
   .flat(8) // brake zone: measured 4.66 m from 10 m/s, authored 8
-  .drum({ radius: 0.5, depth: 0.25 }) // speed bump: roll it slowly, fly it at speed
+  .hump(0.3, 3) // speed hump: rolls at any speed, a small hop if you keep the gas on
   .flat(6)
-  .ledge({ height: 0.3, length: 6 }) // rollable kerb (wheel r 0.34)
+  .tabletop(3, 4, 0.5) // low tabletop: throttle to climb it, that is all
   .flat(8)
   .finish();
 
@@ -51,7 +51,7 @@ export const B2 = course('b2-lean-back', 'Lean Back', 'beginner')
   .flat(4)
   .logpile({ radius: 0.3, count: 1 })
   .flat(4)
-  .logpile({ radius: 0.3, count: 2, spacing: 0.4 }) // two logs, front lifts twice
+  .logpile({ radius: 0.3, count: 2 }) // two logs touching: a 1.2 m double bump
   .checkpoint()
   .flat(4)
   .ramp({ length: 4, height: 0.5 })

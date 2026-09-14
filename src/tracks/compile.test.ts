@@ -96,7 +96,7 @@ describe('compileTrack merge', () => {
       { x: 12.95, y: -2 },
       { x: 13, y: 0 },
     ]);
-    expect(c.hazards).toEqual([{ id: 0, kind: 'water', min: { x: 10, y: -2 }, max: { x: 13, y: -0.3 } }]);
+    expect(c.hazards).toEqual([{ id: 0, kind: 'water', min: { x: 10, y: -2 }, max: { x: 13, y: -0.6 } }]);
     expect(c.oobY).toBe(-8);
   });
 
@@ -140,16 +140,18 @@ describe('compileTrack merge', () => {
     const def = course('t-barrel', 't', 'beginner').meta(meta).flat(10).barrel({ count: 2, spacing: 0.8 }).flat(2).barrel({ burning: false }).flat(10).finish();
     const c = compileTrack(def);
     expect(c.hazards.map((h) => h.kind)).toEqual(['fire', 'fire']);
-    expect(c.hazards[0]).toMatchObject({ min: { x: 10, y: 0.9 }, max: { x: 10.6, y: 1.7 } });
+    expect(c.hazards[0]).toMatchObject({ min: { x: 10, y: 0.9 }, max: { x: 10.6, y: 1.5 } });
     expect(c.colliders.filter((k) => k.kind === 'box')).toHaveLength(3);
   });
 
   it('seesaw max angle lets an end touch the ground, capped at 30 deg', () => {
-    const def = course('t-seesaw', 't', 'beginner').meta(meta).flat(10).seesaw({ length: 6, height: 1 }).flat(2).seesaw({ length: 6, height: 2.5 }).flat(10).finish();
+    const def = course('t-seesaw', 't', 'beginner').meta(meta).flat(10).seesaw({ length: 6, height: 1 }).flat(2).seesaw({ length: 6, height: 2.5, angleDeg: 40 }).flat(10).finish();
     const ss = compileTrack(def).colliders.filter((c): c is ColliderSeesaw => c.kind === 'seesaw');
     expect(ss[0]?.pivot).toEqual({ x: 13, y: 1 });
     expect(ss[0]?.maxAngle).toBeCloseTo(Math.asin((1 - 0.06) / 3), 5);
-    expect(ss[1]?.maxAngle).toBeCloseTo(Math.PI / 6, 5);
+    expect(ss[1]?.maxAngle).toBeCloseTo((40 * Math.PI) / 180, 5);
+    // the auto angle is capped at 30 deg, so the DSL refuses a resting end that hangs in the air
+    expect(() => course('t-s2', 't', 'beginner').meta(meta).flat(10).seesaw({ length: 6, height: 2.5 })).toThrow(/resting end/);
   });
 
   it('drum rolls flag and logpile pyramid count', () => {

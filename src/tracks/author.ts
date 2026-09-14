@@ -239,6 +239,40 @@ export class CourseBuilder {
     return this.plank({ angleDeg: p.angleDeg, rise: p.rise - fh }, { base: base + fh });
   }
 
+  /** Speed bump: convex ramp up and down, `height` <= 0.3 rolls at any speed. */
+  hump(height = 0.3, length = 3): this {
+    return this.ramp({ length: length / 2, height, curve: -0.5 }).ramp({ length: length / 2, height, curve: -0.5, direction: 'down' });
+  }
+
+  /**
+   * Drum with an approach kicker so the front wheel reaches the drum top at low speed
+   * (physics round 2: bare drums are a wall below ~5 m/s). Kicker height 0.6 r capped 0.5.
+   */
+  kickerDrum(p: Partial2<KindParams['drum']>, o?: ObstacleOpts): this {
+    const r = p.radius ?? 0.8;
+    const h = Math.min(0.5, 0.6 * r);
+    return this.ramp({ length: 1.5, height: h, curve: 0.5 }, o).drum(p, o);
+  }
+
+  /**
+   * See-saw with a fillet ramp flush with the resting near end (the board rests tipped
+   * toward the rider with its end on the ground; the fillet covers the board-thickness lip).
+   */
+  seesawEntry(p: Partial2<KindParams['seesaw']>, o?: ObstacleOpts): this {
+    const t = p.thickness ?? 0.12;
+    return this.ramp({ length: 0.8, height: t + 0.03, curve: 0.5 }, o).seesaw(p, o);
+  }
+
+  /**
+   * Gap-chain platform: a box whose last `kickerLength` metres are a kicker ramp on top, so
+   * every launch has an angle and the landing can be level with or above the take-off.
+   */
+  platform(width: number, height: number, kicker: { length?: number; height?: number } = {}): this {
+    const kl = kicker.length ?? 1.5;
+    const kh = kicker.height ?? 0.4;
+    return this.box({ width: width - kl, height }).ramp({ length: kl, height: kh, curve: 0.3 }, { base: height });
+  }
+
   /** ramp up + box top + ramp down, all one height. */
   tabletop(up: number, top: number, height: number, down = up): this {
     return this.ramp({ length: up, height }).box({ width: top, height }).ramp({ length: down, height, direction: 'down' });
@@ -257,6 +291,14 @@ export class CourseBuilder {
         }
       }
       if (!this.groundLevel(x0, x1)) throw new Error(`[${this.id}] ${kind} at x=${x0} must stand on level ground`);
+    }
+    if (kind === 'seesaw') {
+      const sp = rec as Partial2<KindParams['seesaw']>;
+      const half = (sp.length ?? 6) / 2;
+      const h = (sp.height ?? 1) - (sp.thickness ?? 0.12) / 2;
+      if ((sp.angleDeg ?? 0) <= 0 && h > half * Math.sin(Math.PI / 6) + 1e-9) {
+        throw new Error(`[${this.id}] seesaw at x=${x0}: height ${sp.height} leaves the resting end ${(h - half / 2).toFixed(2)} m off the ground (30 deg cap); use length >= ${(4 * h).toFixed(1)} or pass angleDeg`);
+      }
     }
     this.footprints.push({ x0, x1, kind });
     const base = o?.base ?? 0;

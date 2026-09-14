@@ -141,7 +141,7 @@ export interface PoleParams extends BaseParams {
   spacing: number;
   surface: SurfaceKind;
 }
-/** Oil drum(s) standing on end. `burning` adds a fire hazard 0.8 m tall above each barrel. */
+/** Oil drum(s) standing on end. `burning` adds a fire hazard 0.6 m tall above each barrel. */
 export interface BarrelParams extends BaseParams {
   radius: number;
   height: number;
@@ -280,11 +280,15 @@ export interface GroundQuery {
 }
 
 const CURVE_SEGMENTS = 12;
-const FIRE_HEIGHT = 0.8;
+/** Fire above a barrel top. Physics tests every body incl. wheels against hazards, so this is what a jump must clear. */
+const FIRE_HEIGHT = 0.6;
 /** Pit walls lean in by this much so the ground chain stays x-monotone (no perfectly vertical profile). */
 export const GAP_WALL_LEAN = 0.05;
-/** Hazard top sits this far below the lip so a wheel skimming the edge does not fault; torso does. */
-export const GAP_HAZARD_MARGIN = 0.3;
+/**
+ * Hazard top sits this far below the lip. Physics tests wheels (r 0.34) too, so 0.6 means a
+ * wheel faults only when it is wholly below the lip; a wheel catching the far wall bounces.
+ */
+export const GAP_HAZARD_MARGIN = 0.6;
 
 function deg(d: number): number {
   return (d * Math.PI) / 180;

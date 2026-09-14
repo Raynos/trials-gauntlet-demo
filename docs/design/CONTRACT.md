@@ -164,7 +164,7 @@ Tracks guarantees the ground under both wheels at a spawn is a single flat polyl
 | stationary bunny hop | rear-wheel apex 0.55–0.75 m above take-off; with 5 m/s run-up a 0.9 m ledge is makeable |
 | climb | sustained on ≤ 60° with lean forward; 65° stalls and rolls back; > 70° needs a hop |
 | wheelie balance | balance pitch 40–50° at lean 0; PD controller holds indefinitely; open-loop diverges in 1–2 s |
-| crash | head or torso contacts any collider, or hazard zone, or `y < oobY`. Over-rotation alone is NOT a crash |
+| crash | head or torso contacts any collider; ANY body incl. wheels enters a hazard zone (fire/water/kill); `y < oobY`. Over-rotation alone is NOT a crash |
 | restart → riding | one physics tick; one rendered frame (hard cut, no fade) |
 
 Tracks' section 0 must be regenerated from physics' F-tests once physics M2 lands; until then

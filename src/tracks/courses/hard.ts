@@ -17,7 +17,7 @@ export const H1 = (() => {
     .meta({
       biome: 'nightCity',
       technique: 'sustained wheelie and the lip climb',
-      demands: '1.6 m lip climb straight into 5 rail slots and a 3 m gap from the rear wheel',
+      demands: '1.4 m lip climb from a 6 m run-up straight into 5 rail slots and a 3 m gap from the rear wheel',
       attemptsBand: [10, 18],
       targetTimeS: 62,
     })
@@ -28,11 +28,11 @@ export const H1 = (() => {
     .rollers(16, 0.15, 6) // front wheel DOWN over rollers: throttle modulation warm-up
     .flat(4);
   slots(b, 8, 2.5); // wheelie section 1
-  b.flat(6).checkpoint().flat(3).wall({ height: 1.2, width: 6, lip: 0.15 }).flat(4); // front wheel onto the lip at ~5 m/s, hop the rear up
+  b.flat(6).checkpoint().flat(3).flat(5).wall({ height: 1.0, width: 6, lip: 0.15 }).flat(4); // front wheel onto the lip at ~5 m/s, hop the rear up
   slots(b, 6, 3.0);
-  b.flat(6).checkpoint().flat(3).wall({ height: 1.4, width: 5, lip: 0.15 }).flat(3);
+  b.flat(6).checkpoint().flat(3).flat(5).wall({ height: 1.2, width: 5, lip: 0.15 }).flat(3);
   slots(b, 6, 2.5);
-  b.flat(6).checkpoint().flat(3).camera({ mode: 'low', cut: true }).wall({ height: 1.6, width: 4, lip: 0.15 }).flat(2);
+  b.flat(6).checkpoint().flat(3).flat(6).camera({ mode: 'low', cut: true }).wall({ height: 1.4, width: 4, lip: 0.2 }).flat(2);
   slots(b, 5, 2.0);
   return b.gap({ width: 3 }).camera({ mode: 'side' }).flat(12).finish();
 })();
@@ -42,7 +42,7 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
   .meta({
     biome: 'nightCity',
     technique: 'gap chains: read the width, set the speed',
-    demands: '7 gaps on 3 m platforms, last one launched from a see-saw',
+    demands: '7 gaps on 3.5 m kicker platforms, last one launched from a see-saw',
     attemptsBand: [14, 22],
     targetTimeS: 72,
   })
@@ -50,51 +50,52 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
   .flat(28)
   .checkpoint()
   .flat(3)
-  // chain A: speeds ~8, 6, 9, 5 m/s
+  // chain A: every platform ends in a 1.5 x 0.4 kicker; speeds ~8, 6, 9, 5 m/s
+  .flat(6)
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 4 })
-  .box({ width: 5, height: 0.8 })
+  .platform(5, 0.8)
   .gap({ width: 3 })
-  .box({ width: 4, height: 1.2 })
+  .platform(4.5, 1.2)
   .gap({ width: 5 })
-  .box({ width: 5, height: 1.0 })
+  .platform(5, 1.0)
   .gap({ width: 2 })
   .flat(8)
   .checkpoint()
   .flat(3)
   .flat(8)
-  // chain B: landing above launch every time -> rear first mandatory
+  // chain B: landing 0.3 above launch every time -> rear first mandatory
   .ramp({ length: 5, height: 1.2 })
-  .gap({ width: 5 })
-  .box({ width: 5, height: 1.2 })
-  .gap({ width: 3 })
-  .box({ width: 5, height: 1.6 })
-  .gap({ width: 6 })
-  .box({ width: 5, height: 2.0 })
-  .gap({ width: 2 })
-  .box({ width: 5, height: 2.4 })
   .gap({ width: 4 })
-  .box({ width: 5, height: 2.8 })
-  .ramp({ length: 8, height: 2.8, curve: 0.3, direction: 'down' })
+  .platform(6, 1.2)
+  .gap({ width: 3 })
+  .platform(6, 1.5)
+  .gap({ width: 4 })
+  .platform(6, 1.8)
+  .gap({ width: 2 })
+  .platform(6, 2.1)
+  .gap({ width: 3 })
+  .box({ width: 5, height: 2.4 })
+  .ramp({ length: 8, height: 2.4, curve: 0.3, direction: 'down' })
   .flat(6)
   .checkpoint()
   .flat(3)
   .flat(8)
-  // chain C: 3 m platforms, one bike length of slack
+  // chain C: 3.5 m platforms (1.5 of it kicker), one bike length of slack
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 4 })
-  .box({ width: 3, height: 1.0 })
-  .gap({ width: 6 })
-  .box({ width: 3, height: 1.0 })
-  .gap({ width: 3 })
-  .box({ width: 3, height: 1.0 })
+  .platform(3.5, 1.0)
   .gap({ width: 5 })
-  .box({ width: 3, height: 1.0 })
-  .gap({ width: 2 })
-  .box({ width: 3, height: 1.0 })
-  .gap({ width: 6 })
-  .seesaw({ length: 5, height: 1.0 }) // tips as you ride out: launch angle depends on timing
+  .platform(3.5, 1.0)
+  .gap({ width: 3 })
+  .platform(3.5, 1.0)
   .gap({ width: 4 })
+  .platform(3.5, 1.0)
+  .gap({ width: 2 })
+  .platform(3.5, 1.0)
+  .gap({ width: 5 })
+  .seesaw({ length: 5, height: 1.0 }) // land on the resting end; it tips as you ride out
+  .gap({ width: 3 })
   .camera({ mode: 'side', cut: true })
   .flat(12)
   .finish();
@@ -104,7 +105,7 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .meta({
     biome: 'foundry',
     technique: 'commit at speed over fire, then stop hard',
-    demands: 'kicker over a gap and six burning barrels, brake to walking pace in 8 m, hop a 0.7 m kerb',
+    demands: '20 m run-up, kicker over a gap and six burning barrels, brake to walking pace in 8 m, hop a 0.7 m kerb',
     attemptsBand: [18, 25],
     targetTimeS: 78,
   })
@@ -112,15 +113,16 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .flat(28)
   .checkpoint()
   .flat(3)
-  .flat(12) // ~11 m/s
-  .ramp({ length: 5, height: 1.5, curve: 0.3 })
-  .barrel({ count: 4, spacing: 0.8 }) // 3.0 m of fire: torso through it = hazard fault
+  .flat(20) // ~13 m/s: the 22 deg lip at 11 m/s clears 2.0 m of fire for 8 m
+  .ramp({ length: 5, height: 2.0, curve: 0.3 })
+  .flat(1)
+  .barrel({ count: 4, spacing: 0.8 }) // 3.0 m of fire, 0.9-1.5 m: any body part in it = hazard fault
   .flat(8)
   .smooth(8, -1.0)
   .flat(6)
   .checkpoint()
   .flat(3)
-  .flat(14) // ~12 m/s
+  .flat(20)
   .ramp({ length: 5, height: 2.0, curve: 0.3 })
   .flat(1)
   .barrel({ count: 6, spacing: 0.8 })
@@ -131,16 +133,16 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .flat(6)
   .checkpoint()
   .flat(3)
-  .flat(16) // ~13 m/s
+  .flat(20)
   .camera({ mode: 'high34', zoomBias: 0.4 })
   .ramp({ length: 5, height: 2.0, curve: 0.3 })
-  .gap({ width: 3 })
+  .gap({ width: 2 })
   .barrel({ count: 6, spacing: 0.8 })
   .flat(2)
   .ramp({ length: 6, height: 2.0, direction: 'down' })
   .camera({ mode: 'side-tight' })
   .flat(8) // brake zone
-  .drum({ radius: 0.6, depth: 0.2 }) // speed bump at the end of the brake zone
+  .hump(0.3, 3) // speed hump at the end of the brake zone
   .flat(3)
   .gap({ width: 2, depth: 2 }) // low-speed hop
   .flat(3)

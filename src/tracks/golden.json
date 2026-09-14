@@ -14,18 +14,18 @@
     "finishX": 57
   },
   "b1-first-ride": {
-    "hash": "36030f957061b046",
-    "colliders": 8,
+    "hash": "871dcac730b61117",
+    "colliders": 12,
     "hazards": 0,
-    "obstacles": 5,
-    "finishX": 133
+    "obstacles": 8,
+    "finishX": 139
   },
   "b2-lean-back": {
-    "hash": "6fc08a44dbf4fa7e",
+    "hash": "1475fb632df08def",
     "colliders": 18,
     "hazards": 0,
     "obstacles": 12,
-    "finishX": 128.2
+    "finishX": 127.8
   },
   "b3-kicker-row": {
     "hash": "9b013d75f7f9fdf2",
@@ -56,66 +56,66 @@
     "finishX": 94.1
   },
   "m1-hop-up": {
-    "hash": "1db570b319a74e82",
-    "colliders": 17,
-    "hazards": 3,
-    "obstacles": 12,
-    "finishX": 100.789014
+    "hash": "7840767a123be93a",
+    "colliders": 14,
+    "hazards": 2,
+    "obstacles": 9,
+    "finishX": 103
   },
   "m2-drum-roll": {
-    "hash": "ee8e98230b8e123e",
-    "colliders": 29,
+    "hash": "62537340955a5586",
+    "colliders": 36,
     "hazards": 1,
-    "obstacles": 13,
-    "finishX": 114.2
+    "obstacles": 18,
+    "finishX": 119.1
   },
   "m3-see-saw": {
-    "hash": "d378514d27e52e88",
-    "colliders": 14,
+    "hash": "be2c5dc14caf1607",
+    "colliders": 22,
     "hazards": 4,
-    "obstacles": 14,
-    "finishX": 135.5
+    "obstacles": 18,
+    "finishX": 141.9
   },
   "h1-wheelie-wire": {
-    "hash": "16d87efcedf87296",
+    "hash": "eca4b3a64e73b3bf",
     "colliders": 10,
     "hazards": 26,
     "obstacles": 29,
-    "finishX": 180
+    "finishX": 196
   },
   "h2-gap-chain": {
-    "hash": "51dc8dc0fac3ace1",
-    "colliders": 35,
+    "hash": "99332ef192ae83d7",
+    "colliders": 47,
     "hazards": 16,
-    "obstacles": 34,
-    "finishX": 223
+    "obstacles": 46,
+    "finishX": 228
   },
   "h3-fire-line": {
-    "hash": "8bda06a40eaebd76",
-    "colliders": 32,
+    "hash": "edd8d3ec092fd29d",
+    "colliders": 34,
     "hazards": 18,
-    "obstacles": 13,
-    "finishX": 199.4
+    "obstacles": 14,
+    "finishX": 219.2
   },
   "x1-vertical-limit": {
-    "hash": "94ec5dbaacf5b1aa",
+    "hash": "26ac863d241ae24c",
     "colliders": 59,
     "hazards": 1,
-    "obstacles": 34,
-    "finishX": 181.728923
+    "obstacles": 35,
+    "finishX": 186.728923
   },
   "x2-pipe-dream": {
-    "hash": "5ecca418c0b81f19",
-    "colliders": 33,
+    "hash": "07e3defde0e9e3d0",
+    "colliders": 43,
     "hazards": 8,
-    "obstacles": 27,
-    "finishX": 156.5
+    "obstacles": 33,
+    "finishX": 162.3
   },
   "x3-gauntlet": {
-    "hash": "5a6a91ae16424384",
-    "colliders": 78,
+    "hash": "8e90d5506f9d6103",
+    "colliders": 88,
     "hazards": 29,
-    "obstacles": 67,
-    "finishX": 410.39653
+    "obstacles": 74,
+    "finishX": 426.99653
   }
 }
