@@ -24,9 +24,9 @@ import type {
   Vec2,
 } from '../core/types';
 import { Rng } from '../core/rng';
-import type { PhysicsWorld } from './index';
+import type { LoadTrackOptions, PhysicsWorld } from './index';
 import { CollisionWorld, circleVsPrim, PrimKind, type Manifold, type Prim } from './collision';
-import { DEFAULT_TUNING, mergeTuning, SURFACES, type BikeTuning, type PartialTuning, type SuspensionTuning } from './tuning';
+import { bikeTuning, SURFACES, type BikeClass, type BikeTuning, type PartialTuning, type SuspensionTuning } from './tuning';
 import { atan, atan2, clamp, cos, sin, wrapAngle, HALF_PI, PI, QUARTER_PI } from './dmath';
 
 // ---------------------------------------------------------------------------
@@ -66,7 +66,10 @@ export interface TeleportPose {
 }
 
 export interface BikePhysicsWorld extends PhysicsWorld {
+  /** The tuning table in force: the loaded track's bike class preset under the constructor's partial. */
   readonly tuning: Readonly<BikeTuning>;
+  /** The bike class of the loaded track ('rookie' | 'pro'). */
+  readonly bike: BikeClass;
   debug(): PhysicsDebug;
   /** Wheelie balance pitch (rad) for a lean and an assumed longitudinal acceleration. */
   balancePitch(lean: number, accel?: number): number;
@@ -84,6 +87,9 @@ const RIDER = 3;
 const RAG0 = 4;
 const NRAG = 7;
 const FIRST_DYN = RAG0 + NRAG; // 11
+
+/** Max upward correction rate (m/s) for a wheel straddling a one-way board (round 11, collision.ts Manifold.straddle). */
+const STRADDLE_LIFT = 2.5;
 
 const RAG_IDS: RagdollBody['id'][] = ['head', 'torso', 'pelvis', 'upperArm', 'forearm', 'thigh', 'shin'];
 
@@ -322,10 +328,13 @@ function ik3(ax: number, ay: number, az: number, bx: number, by: number, bz: num
 
 class BikeWorld implements BikePhysicsWorld {
   readonly physicsHz: number;
-  readonly tuning: Readonly<BikeTuning>;
+  private _tuning: Readonly<BikeTuning>;
+  /** The constructor's partial, re-applied over every class preset. */
+  private readonly override: PartialTuning | undefined;
+  private _bike: BikeClass = 'rookie';
   private readonly dt: number;
   /** Effective gravity: tuning.gravity * tuning.gravityScale. */
-  private readonly g: number;
+  private g: number;
 
   private track: CompiledTrack | null = null;
   private col: CollisionWorld | null = null;
@@ -417,10 +426,29 @@ class BikeWorld implements BikePhysicsWorld {
   constructor(physicsHz: number, tuning: PartialTuning | undefined) {
     this.physicsHz = physicsHz;
     this.dt = 1 / physicsHz;
-    this.tuning = Object.freeze(mergeTuning(DEFAULT_TUNING, tuning));
-    this.g = this.tuning.gravity * this.tuning.gravityScale;
+    this.override = tuning;
+    this._tuning = Object.freeze(bikeTuning('rookie', tuning));
+    this.g = this._tuning.gravity * this._tuning.gravityScale;
     this.axleOrigin();
     this.bindViews();
+  }
+
+  get tuning(): Readonly<BikeTuning> {
+    return this._tuning;
+  }
+
+  /** The bike class the loaded track runs ('rookie' until a loadTrack says otherwise). */
+  get bike(): BikeClass {
+    return this._bike;
+  }
+
+  /** Swap the tuning table for a class (round 11): the preset under the constructor's override; g and the axle origin follow. */
+  private selectBike(cls: BikeClass): void {
+    if (cls === this._bike && this.track !== null) return;
+    this._bike = cls;
+    this._tuning = Object.freeze(bikeTuning(cls, this.override));
+    this.g = this._tuning.gravity * this._tuning.gravityScale;
+    this.axleOrigin();
   }
 
   private bindViews(): void {
@@ -438,7 +466,8 @@ class BikeWorld implements BikePhysicsWorld {
 
   // -- PhysicsWorld ---------------------------------------------------------
 
-  loadTrack(track: CompiledTrack, seed: number): void {
+  loadTrack(track: CompiledTrack, seed: number, opts?: LoadTrackOptions): void {
+    this.selectBike(opts?.bike ?? 'rookie');
     this.track = track;
     this.col = new CollisionWorld(track, FIRST_DYN);
     this.nSeesaw = this.col.seesawBodies.length;
@@ -1110,10 +1139,15 @@ class BikeWorld implements BikePhysicsWorld {
     // angular momentum is the in-air nose-up). A beginner holding the gas at neutral lean lifts the
     // front into a wheelie that self-limits; looping the bike takes a deliberate lean back.
     this.driveFrac = 1;
-    if (torque > 0 && U[U_FRONT_GND] === 0) {
+    if (torque > 0 && U[U_FRONT_GND] === 0 && e.wheelieControl.enabled) {
       const wc = e.wheelieControl;
       const gate = clamp((nle - wc.leanOff) / (wc.leanOn - wc.leanOff), 0, 1);
       if (gate > 0) {
+        // the steeper of the two wheels' remembered ground slopes (round 11: both memories now relax at
+        // 1.5 rad/s, not 0.7 - at a crest the lifted front's remembered uphill hid the wheelie for the
+        // 0.5 s its memory took to relax, and that is where the b1 strangers looped; the 60 deg plank's
+        // base corner, where the front hovers off the face for ~0.15 s with the rear still on the flat,
+        // keeps 47 of its 60 deg through the hover)
         const ground = Math.max(F[S_REAR_SLOPE]!, F[S_FRONT_SLOPE]!);
         const rel = wrapAngle(this.an[FRAME]! - ground);
         // the rate lead fades in over the first `rateLeadFrom` degrees of nose-up: a frame rotating up
@@ -1121,8 +1155,24 @@ class BikeWorld implements BikePhysicsWorld {
         const lead = wc.rateLead * this.av[FRAME]! * clamp(((rel * 180) / PI) / wc.rateLeadFrom, 0, 1);
         const relDeg = ((rel + lead) * 180) / PI;
         const w = 1 - clamp((relDeg - wc.pitchFull) / (wc.pitchMin - wc.pitchFull), 0, 1);
-        const frac = wc.minFrac + (1 - wc.minFrac) * w;
+        // minFrac from pitchMin, then to nothing at pitchCut (round 11: past the balance point 30 % of
+        // the drive was still nose-up, and a kicker landing at 52 deg walked over backwards on it)
+        const frac = (wc.minFrac + (1 - wc.minFrac) * w) * (1 - clamp((relDeg - wc.pitchMin) / (wc.pitchCut - wc.pitchMin), 0, 1));
         this.driveFrac = 1 - gate * (1 - frac);
+        // rear in the air for airDelay ticks (a skip at a lip is not flight; a hop is a technique): the
+        // drive may spin it at most `airSpin` m/s past road speed (round 11: off a
+        // kicker lip the rear spun to the limiter and its reaction rotated the bike +57 deg/s all the
+        // way to the landing; a rider matches the wheel to the ground he is about to meet)
+        if (F[S_REAR_AIR]! >= r.airDelay && U[U_HOP] !== 2 && U[U_HOP] !== 3) {
+          const a = this.an[FRAME]!;
+          const vG = this.vx[FRAME]! * cos(a) + this.vy[FRAME]! * sin(a);
+          const over = wheelFwd * t.wheel.radius - vG;
+          const spinFrac = clamp(1 - over / wc.airSpin, 0, 1);
+          // only with the nose already past pitchFull: a blip on a nose-down flight is a technique
+          // (F9: throttle +15 deg in 0.5 s at 8 m/s), full gas off a lip at 33 deg is the loop
+          const nosed = clamp((relDeg - wc.pitchFull) / (wc.pitchMin - wc.pitchFull), 0, 1);
+          this.driveFrac *= 1 - gate * nosed * (1 - spinFrac);
+        }
         torque *= this.driveFrac;
       }
     }
@@ -1442,7 +1492,7 @@ class BikeWorld implements BikePhysicsWorld {
     minX: 0,
     maxX: 0,
   };
-  private readonly bikeManifold: Manifold = { px: 0, py: 0, nx: 0, ny: 0, sep: 0, prim: null as unknown as Prim };
+  private readonly bikeManifold: Manifold = { px: 0, py: 0, nx: 0, ny: 0, sep: 0, prim: null as unknown as Prim, straddle: false };
 
   /**
    * Ragdoll limbs collide with the bike (tyres and frame hard points) so the rider does not fall
@@ -1513,7 +1563,9 @@ class BikeWorld implements BikePhysicsWorld {
     this.qWheel = wheel;
     this.qSensor = false;
     this.qRag = rag;
-    this.col!.queryCircle(cx, cy, r, margin, this.bodyAngle, this.onManifold);
+    // wheels decide a one-way board's side by the frame origin (a straddled board lifts the wheel, round 11)
+    if (wheel === 1) this.col!.queryCircle(cx, cy, r, margin, this.bodyAngle, this.onManifold, this.px[FRAME]!, this.py[FRAME]!);
+    else this.col!.queryCircle(cx, cy, r, margin, this.bodyAngle, this.onManifold);
   }
   private qRag = false;
 
@@ -1598,6 +1650,9 @@ class BikeWorld implements BikePhysicsWorld {
     if (m.sep > 0) vnMin = -m.sep / dt;
     else vnMin = (t.solver.baumgarte * Math.max(-m.sep - t.solver.slop, 0)) / dt;
     if (this.qRag && vn < -1) vnMin = Math.max(vnMin, -t.ragdoll.restitution * vn);
+    // a wheel through a one-way board is lifted onto it at no more than STRADDLE_LIFT (the Baumgarte
+    // bias on a penetration of up to 2 R would be 10 m/s: a launch, not a landing)
+    if (m.straddle) vnMin = Math.min(vnMin, STRADDLE_LIFT);
     this.cVnMin[i] = vnMin;
     if (this.qWheel === 1) {
       // slip ratio from the previous tick's RESOLVED slip: the pre-solve contact velocity already
@@ -1926,6 +1981,9 @@ class BikeWorld implements BikePhysicsWorld {
           const wb = wheelB[w]!;
           let maxNm = w === 0 ? t.brakes.rearMaxNm : t.brakes.frontMaxNm;
           if (!riding) maxNm *= w === 0 ? t.ragdoll.crashRearBrake : t.ragdoll.crashFrontBrake;
+          // a wheel off the ground (last derive) is dragged, not locked (round 11, brakes.airNm): the
+          // lock's whole dump takes 0.06 s, so the cap cannot wait for the airborne blend
+          else if ((w === 0 ? this.U[U_REAR_GND] : this.U[U_FRONT_GND]) === 0) maxNm = Math.min(maxNm, t.brakes.airNm);
           if (riding && w === 1 && t.brakes.antiEndo > 0) {
             // the rider modulates the front: feed-forward cap at the torque that keeps `rearLoadMin`
             // of the weight on the rear for the COM geometry of the current lean (load transfer
@@ -2085,6 +2143,7 @@ class BikeWorld implements BikePhysicsWorld {
     let frontSlope = F[S_FRONT_SLOPE]!;
     let frontSlopeSet = false;
     let frameGnd = 0;
+    const maxSlope = (t.engine.wheelieControl.maxSlopeDeg * PI) / 180;
     for (let i = 0; i < this.nC; i++) {
       const A = this.cA[i]!;
       const ln = this.cLn[i]!;
@@ -2102,10 +2161,14 @@ class BikeWorld implements BikePhysicsWorld {
           // the steepest surface the wheel is pushing on: the ground the bike is on, for the wheelie
           // control (in a plank's base corner the front is on the face while the rear is still on the
           // flat, and the frame sits at the face angle - no wheelie, and the push into the corner
-          // must not be starved)
+          // must not be starved). Round 11: a face steeper than maxSlopeDeg (a kicker lip's drop, a
+          // wall the tyre brushed) is not ground - it read a 4 x 0.8 kicker's lip as a 90 deg climb
+          // and the control fed full gas into the flight
           const sl = atan2(-this.cGx[i]!, this.cGy[i]!);
-          if (!rearSlopeSet || sl > rearSlope) rearSlope = sl;
-          rearSlopeSet = true;
+          if (Math.abs(sl) <= maxSlope && (!rearSlopeSet || sl > rearSlope)) {
+            rearSlope = sl;
+            rearSlopeSet = true;
+          }
         }
       } else if (A === FRONT) {
         frontLn += ln;
@@ -2126,6 +2189,9 @@ class BikeWorld implements BikePhysicsWorld {
     F[S_REAR_LT] = rearLt;
     F[S_FRONT_LT] = frontLt;
     F[S_REAR_MU] = rearMu;
+    // an unloaded rear's remembered ground relaxes toward level (round 11: it held a ramp's slope, or a
+    // crest's uphill, through the whole flight and the control never saw the wheelie)
+    if (!rearSlopeSet && F[S_REAR_AIR]! >= t.rider.airDelay) rearSlope -= clamp(rearSlope, -t.engine.wheelieControl.airRelax * dt, t.engine.wheelieControl.airRelax * dt);
     F[S_REAR_SLOPE] = rearSlope;
     // a lifted front wheel's ground fades toward the rear's (a wheelie that started off a ramp is soon a
     // wheelie on whatever the rear is rolling on); slow enough that the ~0.15 s the front hovers off a

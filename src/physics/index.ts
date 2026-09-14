@@ -5,11 +5,18 @@
  */
 import type { CompiledTrack, GameEvent, InputFrame, PhysicsSnapshot, PhysicsState } from '../core/types';
 
+import type { BikeClass } from './tuning';
+
+/** Per-load options (round 11): which bike the track is ridden on. Default 'rookie' (the round-10 bike to the byte). */
+export interface LoadTrackOptions {
+  bike?: BikeClass;
+}
+
 export interface PhysicsWorld {
   /** Hz the world was configured for (dt = 1 / hz). */
   readonly physicsHz: number;
-  /** Load a compiled track and reset to its start. */
-  loadTrack(track: CompiledTrack, seed: number): void;
+  /** Load a compiled track and reset to its start; `opts.bike` picks the tuning preset (Rookie / Pro). */
+  loadTrack(track: CompiledTrack, seed: number, opts?: LoadTrackOptions): void;
   /** Reset to the given checkpoint index (-1 = track start). */
   reset(checkpoint: number): void;
   /** Advance exactly one tick with the given (already quantized) input. */
@@ -28,5 +35,5 @@ export type PhysicsFactory = (physicsHz: number) => PhysicsWorld;
 
 export { createBikePhysics, bikePhysicsFactory } from './bike';
 export type { BikePhysicsWorld, PhysicsDebug, TeleportPose, SuspDebug, HopPhase } from './bike';
-export { DEFAULT_TUNING, mergeTuning } from './tuning';
-export type { BikeTuning, PartialTuning } from './tuning';
+export { DEFAULT_TUNING, mergeTuning, BIKE_PRESETS, BIKE_CLASSES, bikeTuning } from './tuning';
+export type { BikeTuning, PartialTuning, BikeClass } from './tuning';

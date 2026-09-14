@@ -5,7 +5,64 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
-Status: **round 10 complete** (tenth physics owner). Three asks: airborne lean authority, the pose couplings the
+Status: **round 11 — wave 1 of the mega build** (eleventh physics owner; P1 of `docs/MEGA_PLAN.md`). Shipped:
+(1) **Two bikes** as tuning presets: `BikeClass = 'rookie' | 'pro'`, `BIKE_PRESETS`, `bikeTuning(cls, over?)` in `tuning.ts`;
+`loadTrack(track, seed, opts?: { bike?: BikeClass })` (additive on `PhysicsWorld`, default `'rookie'`; `BikePhysicsWorld.bike`
+reports it). **Rookie** is the round-10 table (ECU wheelie control, the 4.2 kg/m drag governor, soft clutch): the flat-test
+golden `d2b082502561bc00` replays byte-identical. **Pro** differs in five numbers: `aero.dragCoef` **0.45** (CdA 0.75 m², 180 N at
+20 m/s, still the uniform field through the combined COM), `gearRatio` **16.2** (limiter at **22.0 m/s**), `peakTorqueNm` **56.2**
+and `clutchRpm` **3240** (both scaled by 17.5/16.2 so the rim thrust at the clutch — the 60 deg plank's 1970 N — and at every road
+speed below 16 m/s is Rookie's; at 3500 the taller gear cost the low-speed wheelie 20 % of its thrust), a flatter curve
+(`[1500,.68] [3240,.8] [6020,.8] [7400,.86] [9500,.8] [10000,.72]`: the 8000-rpm 1.0 was the governor's counterpart — with the drag
+gone it is 17 m/s² at 16 m/s and lean 0 looped at 1.6 s), and `wheelieControl.enabled` **false**. No governor: thr 0.3 reaches the
+limiter (Rookie 11 m/s) — on the Pro speed is the rider's. Measured (`classes.test.ts`, table in 12): 0 → 16 **1.40 s** (fullThrottle
+controller 1.93), top 22.07, lean 0.4 / 0.2 full gas never lift past 7.5 / 8.9 deg and finish, **lean 0 loops at 1.47 s** (the
+skill), 55 / 60 deg planks top in **1.02 / 2.27 s**, 65 stalls at 0.26 m, hop **0.687 m**, the 0.9 m ledge at 5 m/s made (10 of 36
+hopper combos; Rookie 12), landing 2 m at 6 m/s rides away −30..+45 (Rookie ..+50), air control identical to Rookie (the field has
+no moment). **The wheelie PD hold is the finding**: the throttle-only PD (60 Hz / 100 ms, `wheeliePD`) is a 0/1 bang-bang whose
+mean thrust accelerates — Rookie "holds 12 s" because the drag parks it at 11 m/s; the Pro runs to the limiter at 22 m/s in 4.2 s
+and the cut drops the nose. Neither bike holds 10 s at a *held* speed with any gain pair (`scratch pdsweep2/3/4`: throttle ceiling
+closing with speed ≤ 8.7 s on Rookie, ≤ 4.9 s on Pro; the rear brake as the negative half 0.6 s; a lean-actuated PD 2.2 s — the lean
+is non-minimum-phase, the mass shift nose-dives first). The CONTRACT's "PD holds indefinitely" was measured against the governor;
+the honest Pro number is 4.2 s to the limiter (12.4 (0)). (2) **Rookie wheelie control on crests, bumps and lips** (coordinator,
+three strangers on b1/b2/b3): the control's ground reference stays max(rear, front memories) but a face steeper than
+`maxSlopeDeg` 66 never becomes the reference (a 4×0.8 kicker's drop face read as a 90 deg climb and the control fed full gas into
+the flight), an unloaded rear's memory relaxes toward level at `airRelax` 1.5 rad/s once off for `airDelay` 12 ticks (a skip at a
+lip is not flight), the taper continues from `minFrac` at `pitchMin` 40 to **zero at `pitchCut` 50** (an ECU past the balance
+point cuts), and with the rear airborne ≥ 12 ticks, the nose past `pitchFull` and no hop in progress the drive may spin the rear
+at most `airSpin` 1 m/s over road speed (off the lip the rear spun to the limiter and its reaction rotated the bike +57 deg/s to
+the landing; a blip on a nose-down flight is untouched: F9 throttle +14.8). Full gas at lean 0: 20×2 m cosine crest **42 deg
+max, no fault** (43 before, with the 60–120 the strangers saw on b1's real crest not reproduced here), 4×0.8 kicker at 8 / 11 m/s
+**lands at 65 deg peak and rides away** (was 128 deg loops); the 65 is the ballistic launch attitude off a 4 m ramp ridden in a
+wheelie and is not ≤ 45 (open). The 0.3 m-proud drum row at full gas is a **nose-over at 13–17 m/s in both builds** (the rear
+kicked off the bump), not a wheelie-control case — reported. Flat table, hop, climbs, PD unchanged to the digit; **Rookie goldens
+other than flat-test change** (m3, e3, h2, x3, b3, gap-test: the bots brake and gas in the air) — regenerate. Naive sweep: equal
+or better on every track (e2 92 → 97 %, m2 42 → 50, h2 42 → 87). (3) **One-way plank straddle** (tracks.md 6.1): the hang was not
+the edge — a rear wheel whose centre arrived below the board's surface passed under the leading edge (the one-way test rejects a
+centre on the back side), the frame came to rest on the board on its plate / tail with the rear wheel *through* the board, v 0, no
+contact, no fault. Fix in `collision.ts`: a wheel decides a one-way segment's side by the **frame origin** (`queryCircle` /
+`circleVsPrim` take a reference point); a wheel centre on the back side within one radius of the surface and within the segment's
+extent ± R, with the frame on the front side, is a **straddle**: the manifold is the board's plane (normal up, separation through
+the board, `Manifold.straddle`) and bike.ts caps its Baumgarte lift at `STRADDLE_LIFT` 2.5 m/s. 45 pitched arrivals at 9 m/s (rear
+0.7 m below to 0.4 above the board, 0.6–1.2 m back): **0 hang** (was 9), 34 on / 11 fell. A 2R-deep two-sided end cap was built
+first and rejected: the rear pressed against the cap with the front on top and hung there (20 of 45), and its top corner duplicated
+the board's vertex contact and moved m3 / x3. Residual at 3–5 m/s: the bike beaches on its plate on the board's end with the rear
+wheel short of it (rim < board start) — a real beaching, not the wedge. Every golden byte-identical to this change alone.
+(4) **Air brake** `brakes.airNm` 60: a wheel off the ground (last derive) is dragged, not locked. Brake at 8 / 14 / 20 m/s, 0.5 s:
+**−13.5 / −18.6 / −20.5** (was −15.6 / −26.2 / −36.3; asked −15..−25 at ≥ 14). Cost: the brake-grabbed nose-down 3.5 m landing
+dives to −15 / −34 at −20 / −40 deg and rides away (round 9: −40 / endo) — the front meets the ground spinning and the anti-endo
+cap has a rear load to read. (5) `wheeliePD` gained `ks / bias / kv / kb` (defaults byte-identical) and `wheelieLean` (the
+reference's lean-actuated balance, measured and not usable at 100 ms); `trackSweep.ts` takes `TRIALS_BIKE=pro`. **Not done: the
+rear-wheel bounce / drum pump** (deliverable 2). Analysis before building: the hop push and the legs-straight stop act along
+**frame-up**; at a 60–70 deg rear-wheel stand frame-up is 60–70 deg from vertical, so a push there is mostly a horizontal pair
+(rider back, bike forward) — the drawn chain's hip → peg line at hang_back is 37 deg forward of frame-down, i.e. ~28 deg past
+vertical at 65 deg pitch, which is the honest axis; making the leg axis follow the chain (or blend toward world-up past ~45 deg
+pitch) is the plant change the pump needs, and it moves every hop. A round of its own (12.4 (7)). 70 tests green (10 new in
+`classes.test.ts`: presets, Pro envelope, PD finding, crest / kicker / drum row, straddle sweep, per-class golden hashes
+`d2b082502561bc00` / `32a467457c497e2c` on flat-test bot-3); snapshot / foreign-snapshot / determinism untouched (no new state:
+the class is a table swap at `loadTrack`, the straddle reads this tick's positions, the control reads existing `F` slots).
+
+Round 10 (tenth physics owner). Three asks: airborne lean authority, the pose couplings the
 rider-pose owner documented, and the crash/ragdoll chain re-matched to the drawn rider. (1) **Air lean.** Decomposed by
 switching subsystems off at 14 m/s (`scratch decomp`): the torso store alone gives **+32.5 / −33.8 deg** in 0.5 s for lean
 −1 / +1 — the asked band exactly — and the lean's **mass shift** eats it: the 75 kg point mass translating 0.6 m back /
@@ -370,8 +427,9 @@ tyre    muPeak 2.1 kappaPeak 0.15 slideFrac 0.92 vRef 1.0 rollRes 0.012 (kappa f
 engine  idle 1500 clutch 3500 limiter 10000/9500 peak 52 Nm [38] gear 17.5 eff 0.92 engineBrake 0.08 (engineBrakeAir 0, round 10) slew 40/60
         curve [1500,.68] [3500,.80] [6500,.80] [8000,1] [9500,.9] [10000,.8]  (flat from the clutch to 6500; was .85 @5000, 1.0 @6500)
         crankSpinUp 8000 rpm/s  crankSpinDown 2000  clutchCap 0.8  clutchThrottle 0.25   (round 7: soft clutch off idle)
-        wheelieControl pitchFull 25 deg pitchMin 40 minFrac 0.3 rateLead 0.35 s rateLeadFrom 10 deg groundRelax 0.7 rad/s leanOn -0.3 leanOff -0.5  (round 8)
-brakes  front 900 [640] rear 700 [500] antiEndo 0.05 antiEndoFloor 0.7 [0.8] rearLoadMin 0.04 rise 60/s fall 40/s
+        wheelieControl enabled pitchFull 25 deg pitchMin 40 minFrac 0.3 rateLead 0.35 s rateLeadFrom 10 deg groundRelax 0.7 rad/s leanOn -0.3 leanOff -0.5  (round 8)
+                       maxSlopeDeg 66 airRelax 1.5 rad/s airSpin 1.0 m/s pitchCut 50 deg  (round 11; Pro: enabled false)
+brakes  front 900 [640] rear 700 [500] antiEndo 0.05 antiEndoFloor 0.7 [0.8] rearLoadMin 0.04 rise 60/s fall 40/s airNm 60 (round 11: a wheel off the ground is dragged, not locked)
 rider   mass 75 anchor (+0.33,+0.38) k 8400 [6000] c 875 [740] kAlong 28000 [20000] cAlong 2130 [1800] shiftForce 2800 [2000] kLanding 56000 [40000] cLanding 8000 (round 7)
         armPull 420 [300]
         leanBack 0.60 leanFwd 0.73 leanRate 6 leanCrouch 0.20 (back) leanCrouchFwd 0.50
@@ -383,6 +441,7 @@ rider   mass 75 anchor (+0.33,+0.38) k 8400 [6000] c 875 [740] kAlong 28000 [200
         headRadius 0.15 torsoRadius 0.13 torsoFollow 0.5
         torso inertia 20 swing 1.5 maxRate 7 maxTorque 400 (motor; NOT scaled: 560 breaks the wheelie PD hold, 12 s -> 3 s)
 aero    dragCoef 4.2 [3.2]  (round 9: a uniform field over frame + wheels + rider; was on the frame alone)
+Pro preset (round 11, BIKE_PRESETS.pro): dragCoef 0.45  gearRatio 16.2  peakTorqueNm 56.2  clutchRpm 3240  curve [1500,.68] [3240,.8] [6020,.8] [7400,.86] [9500,.8] [10000,.72]  wheelieControl.enabled false
 solver  velocityIters 8 slop 0.005 baumgarte 0.2 jointBaumgarte 0.3 speculativeMargin 0.02
 ragdoll sleepAfter 3.0 restitution 0.15 mu 0.6 spread 0.3 (limb spin only since round 6) jointDamping 3 Nm s crashRearBrake 1 crashFrontBrake 0.5
 drum    density 60
@@ -874,7 +933,45 @@ Everything but the thr 1 / lean −0.3 and 0 cells is byte-identical to round 7 
 whatever the pitch band; rateLead 0.2-0.5 with pitchMin 40 → 34-37 deg max, finishes; pitchMin 50 → 42-50 (over the
 42 band); minFrac 0.15 → 29-34 deg but a deeper cut; leanOn −0.2 leaves lean −0.3 looping at 3.3 s, −0.3 holds it.
 
+### 12.6 Rookie vs Pro (round 11; `classes.test.ts`, `scratch envelope.ts`)
+
+| quantity | Rookie (round-10 table) | Pro |
+|--|--|--|
+| drag / gear / limiter speed | 4.2 kg/m governor / 17.5 / 20.4 m/s | 0.45 kg/m (CdA 0.75) / 16.2 / 22.0 m/s |
+| wheelie control | on (crest / lip rules, round 11) | off |
+| 0 → 16 m/s (fullThrottle ctrl / thr 1 lean 0.4) | 2.19 / 1.68 s | 1.93 / 1.40 s |
+| top speed | 20.35 | 22.07 |
+| thr 1 lean 0 from rest | 38 deg self-limiting wheelie, finishes 120 m in 9.3 s | **loops at 1.47 s** |
+| thr 1 lean −0.3 / 0.2 / 0.4 / 1 | 39 deg wheelie / 8.8 / 7.4 / 2.9 deg | 12.5 / 8.9 / 7.5 / 2.9 deg, all finish |
+| thr 1 lean −0.5 / −1 | loop 1.37 / 2.49 s | loop 1.35 s / **no loop** (limiter at 1.4 s, before the preload times out) |
+| thr 0.3 / 0.6 top | 11.0 / 17.8 (governor) | 22.0 / 22.0 (no governor) |
+| brake from 10 m/s, lean −1 / 0 | 3.30 / 5.30 m | 3.66 / 6.10 m |
+| brake from 20 m/s, lean −1 / 0 | 9.95 / 15.5 m | 13.2 / 24.0 m (no drag to help) |
+| stationary hop / 0.9 m ledge at 5 | 0.676 m / made (12 of 36) | 0.687 m / made (10 of 36) |
+| climb 55 / 60 / 65 | 1.77 s / 2.91 s / stalls 0.35 m | 1.02 s / 2.27 s / stalls 0.26 m |
+| PD hold 44 deg, kp 0.1 kd 0.03 | 12 s (accelerating to the drag limit, 11 m/s) | 4.2 s (accelerating to the limiter, 22 m/s) |
+| landing 2 m at 6 m/s rides away | −30..+50 deg | −30..+45 |
+| air 0.5 s at 8 / 14 / 20: lean −1 | +26.8 / +25.6 / +24.4 | +26.9 / +25.7 / +24.6 |
+| air: lean +1 | −20.8 / −21.6 / −22.5 | −20.7 / −21.5 / −22.3 |
+| air: throttle | +14.6 / +8.9 / +1.9 | +16.6 / +10.7 / +1.8 |
+| air: brake (round 11, `airNm` 60) | −13.5 / −18.6 / −20.5 | same |
+| crest 20×2 full gas lean 0 | 42 deg, no fault | loops |
+| kicker 4×0.8 at 8 / 11 full gas lean 0 | 65 / 65 deg peak, rides away | loops |
+| naive sweep clears | b1, b3, m3 (e2 97 %, h2 87 %) | b1, b3, e2 (h2 88 %, m3 42 %) |
+
 ### 12.4 Open list, in order
+
+(0, round 11) **Wheelie PD hold is an acceleration, not a hold** — see the status block: 12 s on Rookie is the drag limit, 4.2 s on
+Pro is the limiter; no throttle-only PD at 100 ms holds ≥ 10 s at a held speed on either bike (best 8.7 s Rookie / 4.9 s Pro with a
+speed-closing throttle ceiling). A rear-brake-modulated or lean-modulated hold needs a better rider model than a PD (the lean is
+non-minimum-phase through the mass shift). The CONTRACT row should read "balanceable by a PD while accelerating".
+(7, round 11) **Rear-wheel bounce / drum pump** not built: the leg axis is frame-up (status block); the pump needs the leg line to
+follow the drawn chain (hip → peg) or blend toward world-up past ~45 deg of pitch, and that moves every hop's numbers.
+(8, round 11) **Kicker launch attitude at full gas**: the Rookie control keeps the 4×0.8 lip from looping (65 deg peak, rides away)
+but the asked ≤ 45 is the ramp wheelie's ballistic attitude — the control would have to taper on the ramp by absolute pitch, which
+starves the 55–60 deg faces unless keyed on ground slope < 30 deg. The 0.3 m-proud drum row at full gas from rest is a nose-over at
+13–17 m/s (both builds), and b2's real geometry was not reproduced. (9, round 11) Rookie goldens other than flat-test moved
+(brake / gas in the air) — regenerate; the m3 straddle residual at 3–5 m/s is a beaching on the plate, not the wedge.
 
 (0) **Wheelie PD hold** — closed in round 8 for the 44 deg / lean −0.5 case (12 s, RMS 6.9). What remains: at
 lean ≤ −0.65 (balance ≤ 42 deg) the throttle-only PD still drops the front in 0.6 s — the round-7 crank-lag finding

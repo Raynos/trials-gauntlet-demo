@@ -54,6 +54,12 @@ export interface Manifold {
   /** Signed separation between circle rim and surface (negative = penetrating). */
   sep: number;
   prim: Prim;
+  /**
+   * Round 11: a wheel straddling a one-way board — its centre under the surface while the bike's
+   * reference point (the frame origin) is above it. The manifold is the board's plane (normal up,
+   * separation through the board) so the wheel is lifted onto it; bike.ts caps that lift's rate.
+   */
+  straddle: boolean;
 }
 
 export const CELL = 2;
@@ -239,6 +245,8 @@ export class CollisionWorld {
     margin: number,
     bodyAngle: (body: number) => number,
     out: (m: Manifold) => void,
+    refX = cx,
+    refY = cy,
   ): void {
     const c0 = this.cellOf(cx - r - margin);
     const c1 = this.cellOf(cx + r + margin);
@@ -254,29 +262,59 @@ export class CollisionWorld {
         const firstCell = this.cellOf(p.minX);
         if (c !== (firstCell > c0 ? firstCell : c0)) continue;
         if (p.maxX < cx - r - margin || p.minX > cx + r + margin) continue;
-        if (circleVsPrim(cx, cy, r, p, p.body >= 0 ? bodyAngle(p.body) : p.angle, m) && m.sep < margin) out(m);
+        if (circleVsPrim(cx, cy, r, p, p.body >= 0 ? bodyAngle(p.body) : p.angle, m, refX, refY) && m.sep < margin) out(m);
       }
     }
   }
 
-  private readonly manifold: Manifold = { px: 0, py: 0, nx: 0, ny: 0, sep: 0, prim: null as unknown as Prim };
+  private readonly manifold: Manifold = { px: 0, py: 0, nx: 0, ny: 0, sep: 0, prim: null as unknown as Prim, straddle: false };
 
   surfaceName(idx: number): SurfaceKind {
     return SURFACES[idx] ?? 'dirt';
   }
 }
 
-/** Fill `m` with the closest-feature manifold; returns false when the prim cannot touch (one-way from behind). */
-export function circleVsPrim(cx: number, cy: number, r: number, p: Prim, angle: number, m: Manifold): boolean {
+/**
+ * Fill `m` with the closest-feature manifold; returns false when the prim cannot touch (one-way from
+ * behind). `refX/refY` (round 11) is the point whose side of a one-way segment decides acceptance —
+ * the wheel centre by default; bike.ts passes the frame origin for the wheels, so a wheel whose
+ * centre is under a board the bike is on top of is a straddle (lifted onto the board), not a pass.
+ */
+export function circleVsPrim(cx: number, cy: number, r: number, p: Prim, angle: number, m: Manifold, refX = cx, refY = cy): boolean {
   m.prim = p;
+  m.straddle = false;
   switch (p.kind) {
     case PrimKind.Segment: {
       const abx = p.bx - p.ax;
       const aby = p.by - p.ay;
       const acx = cx - p.ax;
       const acy = cy - p.ay;
-      if (p.oneWay && acx * p.nx + acy * p.ny < 0) return false;
       const l2 = abx * abx + aby * aby;
+      if (p.oneWay) {
+        const sideC = acx * p.nx + acy * p.ny;
+        if (sideC < 0) {
+          // centre on the back side. Today's rule: no contact. Round 11: unless the bike's reference
+          // point is on the front side and the centre is within one radius under the surface and within
+          // the segment's extent — a wheel through a one-way board with the bike on top (the m3 wedge,
+          // tracks.md 6.1: the frame rested on the board with the rear wheel dangling through it)
+          if (refX === cx && refY === cy) return false;
+          if ((refX - p.ax) * p.nx + (refY - p.ay) * p.ny <= 0) return false;
+          if (-sideC > r) return false;
+          // within the segment's extent, or within one radius before either end: the rim is already
+          // in the board's end; the lift is the tyre catching the edge instead of the frame beaching on it
+          const tu = (acx * abx + acy * aby) / l2;
+          const tr = r / Math.sqrt(l2);
+          if (tu < -tr || tu > 1 + tr) return false;
+          const tc = tu < 0 ? 0 : tu > 1 ? 1 : tu;
+          m.px = p.ax + abx * tc;
+          m.py = p.ay + aby * tc;
+          m.nx = p.nx;
+          m.ny = p.ny;
+          m.sep = sideC - r;
+          m.straddle = true;
+          return true;
+        }
+      }
       let t = (acx * abx + acy * aby) / l2;
       t = t < 0 ? 0 : t > 1 ? 1 : t;
       const qx = p.ax + abx * t;

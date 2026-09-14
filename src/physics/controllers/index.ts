@@ -293,7 +293,7 @@ export function climber(slopeDeg: number, baseX = -Infinity, opts: { hover?: num
  * is the whole fast loop: nose low -> gas (acceleration lifts the nose), nose high -> off (and
  * rear brake when it is really getting away). Holds indefinitely at 60 Hz with 100 ms latency.
  */
-export function wheeliePD(targetDeg: number, targetSpeed: number, kp = 0.08, kd = 0.03): Controller {
+export function wheeliePD(targetDeg: number, targetSpeed: number, kp = 0.08, kd = 0.03, ks = 0.05, bias = 0.2, kv = 0, kb = 0): Controller {
   return (o) => {
     const err = targetDeg - o.pitchDeg;
     const rate = o.pitchRateDeg;
@@ -304,7 +304,48 @@ export function wheeliePD(targetDeg: number, targetSpeed: number, kp = 0.08, kd 
         break;
       }
     }
-    let throttle = 0.2 + kp * err - kd * rate + 0.05 * (targetSpeed - o.speed);
+    let throttle = bias + kp * err - kd * rate + ks * (targetSpeed - o.speed);
+    // kv > 0: the rider's throttle ceiling closes as the bike runs past the target speed (a wheelie
+    // held at constant speed on a bike with no drag governor: the throttle balances, it does not
+    // accelerate; round 11, the Pro bike)
+    const ceil = kv > 0 ? Math.max(0.1, 1 - kv * (o.speed - targetSpeed)) : 1;
+    const raw = throttle;
+    throttle = Math.max(0, Math.min(ceil, throttle));
+    // kb > 0: the rear brake is the throttle's negative half (a rider covers the rear brake in a
+    // wheelie: the correction is symmetric and the mean thrust is zero, so the speed holds)
+    const brake = kb > 0 ? Math.max(0, Math.min(1, -raw * kb)) : err < -8 && rate > 0 ? Math.min(1, (-err - 8) / 10) : 0;
+    return { lean, throttle, brake };
+  };
+}
+
+/**
+ * Wheelie hold the way the reference rider does it (techniques obs 8, 11): the LEAN is the balance
+ * actuator (sit back = nose up, over the bars = nose down, through the mass shift and the torso
+ * store), parked where the static balance equals the target and driven by a PD on the pitch error;
+ * the throttle is a slow speed loop around `throttle` with a small pitch term, and the rear brake
+ * catches a nose past the target and still rising. Round 11: the throttle-only `wheeliePD` is a
+ * bang-bang on a bike with no drag governor (its mean thrust runs the Pro to the limiter and the
+ * plant gain with it); a rider balances with his body.
+ */
+export function wheelieLean(targetDeg: number, targetSpeed: number, opts: { kl?: number; kdl?: number; kp?: number; kd?: number; ks?: number; throttle?: number } = {}): Controller {
+  const kl = opts.kl ?? 0.05;
+  const kdl = opts.kdl ?? 0.01;
+  const kp = opts.kp ?? 0.01;
+  const kd = opts.kd ?? 0.005;
+  const ks = opts.ks ?? 0.08;
+  const thr0 = opts.throttle ?? 0.25;
+  return (o) => {
+    const err = targetDeg - o.pitchDeg;
+    const rate = o.pitchRateDeg;
+    let leanBal = 1;
+    for (let l = -1; l <= 1; l += 0.05) {
+      if (o.balanceAt(l) >= targetDeg) {
+        leanBal = l;
+        break;
+      }
+    }
+    const lean = Math.max(-1, Math.min(1, leanBal - kl * err + kdl * rate));
+    let throttle = thr0 + kp * err - kd * rate + ks * (targetSpeed - o.speed);
     throttle = Math.max(0, Math.min(1, throttle));
     const brake = err < -8 && rate > 0 ? Math.min(1, (-err - 8) / 10) : 0;
     return { lean, throttle, brake };

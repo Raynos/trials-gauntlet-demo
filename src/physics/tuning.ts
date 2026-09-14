@@ -101,6 +101,8 @@ export interface BikeTuning {
      * out as the rider sits back: at lean <= leanOff a deliberate loop is the rider's.
      */
     wheelieControl: {
+      /** false: no pitch-aware drive at all (the Pro bike). */
+      enabled: boolean;
       pitchFull: number;
       pitchMin: number;
       minFrac: number;
@@ -109,6 +111,19 @@ export interface BikeTuning {
       rateLeadFrom: number;
       /** rad/s at which a lifted front wheel's remembered ground slope relaxes toward the rear's. */
       groundRelax: number;
+      /**
+       * Round 11 (strangers on b1/b2/b3: full gas loops at a crest, over the drum bumps, off a kicker
+       * lip). The reference is the ground under the REAR wheel; a surface steeper than `maxSlopeDeg`
+       * (a lip's drop face, a wall) never becomes the reference; while the rear is unloaded its
+       * remembered slope relaxes toward level at `airRelax` rad/s (a wheelie that left a ramp is soon
+       * a wheelie over flat ground); and in the air the drive may spin the rear at most `airSpin` m/s
+       * faster than the bike is moving (no nose-up reaction from spinning the rear to the limiter).
+       */
+      maxSlopeDeg: number;
+      airRelax: number;
+      airSpin: number;
+      /** Degrees of ground-relative pitch (+ lead) past which the drive is cut to zero (an ECU past the balance point cuts, it does not hold 30 %). */
+      pitchCut: number;
       leanOn: number;
       leanOff: number;
     };
@@ -131,6 +146,12 @@ export interface BikeTuning {
     /** Brake input slew, 1/s (lever squeeze / release). */
     rise: number;
     fall: number;
+    /**
+     * Brake torque cap (Nm) on a wheel that is off the ground (round 11). A rider in the air drags the brake, he does not lock the wheel: the full 700 Nm dumped the
+     * rear's 41 N m s at 20 m/s into the frame in 0.06 s (-36 deg in 0.5 s, -26 at 14 m/s; the asked
+     * band is -15..-25), and the dump scaled with speed. The cap makes the air brake a rate, not a dump.
+     */
+    airNm: number;
   };
   rider: {
     mass: number;
@@ -337,9 +358,9 @@ const DEFAULTS: BikeTuning = {
     clutchCap: 0.8,
     // round 8: the ECU-style wheelie control (full torque to 25 deg above the ground under the rear,
     // 30 % at 50 deg; off when the rider sits back past -0.5, off while the front is on the ground)
-    wheelieControl: { pitchFull: 25, pitchMin: 40, minFrac: 0.3, rateLead: 0.35, rateLeadFrom: 10, groundRelax: 0.7, leanOn: -0.3, leanOff: -0.5 },
+    wheelieControl: { enabled: true, pitchFull: 25, pitchMin: 40, minFrac: 0.3, rateLead: 0.35, rateLeadFrom: 10, groundRelax: 0.7, maxSlopeDeg: 66, airRelax: 1.5, airSpin: 1.0, pitchCut: 50, leanOn: -0.3, leanOff: -0.5 },
   },
-  brakes: { frontMaxNm: 900, rearMaxNm: 700, antiEndo: 0.05, antiEndoFloor: 0.7, rearLoadMin: 0.04, rise: 60, fall: 40 },
+  brakes: { frontMaxNm: 900, rearMaxNm: 700, antiEndo: 0.05, antiEndoFloor: 0.7, rearLoadMin: 0.04, rise: 60, fall: 40, airNm: 60 },
   rider: {
     mass: 75,
     anchor: { x: 0.33, y: 0.38 },
@@ -390,6 +411,51 @@ const DEFAULTS: BikeTuning = {
 };
 
 export const DEFAULT_TUNING: Readonly<BikeTuning> = Object.freeze(DEFAULTS);
+
+/**
+ * The two bikes (round 11, MEGA_PLAN P1). **Rookie** is the shipped round-10 tuning to the byte:
+ * the ECU wheelie control, the 4.2 kg/m drag governor and the soft clutch — beginner / easy default.
+ * **Pro** is the honest bike: real CdA (0.45 kg/m = 180 N at 20 m/s, still a uniform field through
+ * the combined COM), no speed governor (a third of the throttle still reaches the limiter, as on a
+ * real bike: speed is the rider's), no pitch-aware wheelie control (full gas at neutral lean loops
+ * after ~2 s — that is the skill), a taller gear (limiter at 22 m/s) with the peak torque raised so
+ * the rim thrust at the clutch — the 60 deg plank's number — is unchanged, and a flatter curve
+ * (the round-8 torque peak at 8000 rpm was the drag governor's counterpart: with the drag gone the
+ * same rim thrust at 16 m/s is 17 m/s2, and 1.0 there looped lean 0 at 1.6 s). Everything the two
+ * share — solver, rider, suspension, hop, brakes, tyre — is the same table.
+ */
+export type BikeClass = 'rookie' | 'pro';
+
+export const BIKE_CLASSES: readonly BikeClass[] = ['rookie', 'pro'];
+
+export const BIKE_PRESETS: Readonly<Record<BikeClass, PartialTuning>> = Object.freeze({
+  rookie: {},
+  pro: {
+    engine: {
+      peakTorqueNm: 56.2, // 52 x 17.5 / 16.2: the rim thrust at the clutch (1970 N) and at every road speed is Rookie's
+      gearRatio: 16.2, // limiter at 22.0 m/s (Rookie 20.4)
+      clutchRpm: 3240, // 3500 x 16.2 / 17.5: the auto-clutch locks at the same road speed (7.1 m/s) — at 3500 the taller gear cost the low-speed wheelie 20 % of its thrust and the PD hold
+      curve: [
+        // knots scaled by the gear so the rim thrust is Rookie's at every road speed up to 16 m/s; the
+        // 8000-rpm peak is 0.86 not 1.0 (the drag governor's counterpart: at 1.0 with no drag the
+        // lean-0 loop came at 1.6 s and the lean-0.2 rider lifted the front at speed)
+        [1500, 0.68],
+        [3240, 0.8],
+        [6020, 0.8],
+        [7400, 0.86],
+        [9500, 0.8],
+        [10000, 0.72],
+      ],
+      wheelieControl: { enabled: false }, // no ECU on the Pro: the loop is the rider's at every lean
+    },
+    aero: { dragCoef: 0.45 }, // CdA 0.75 m2 at rho 1.225: 180 N at 20 m/s, 1.2 m/s2 in the air
+  },
+});
+
+/** The full tuning for a bike class with an optional override on top (the constructor's partial). */
+export function bikeTuning(cls: BikeClass, over?: PartialTuning): BikeTuning {
+  return mergeTuning(Object.freeze(mergeTuning(DEFAULT_TUNING, BIKE_PRESETS[cls])), over);
+}
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? (T[K] extends unknown[] ? T[K] : DeepPartial<T[K]>) : T[K] };
 export type PartialTuning = DeepPartial<BikeTuning>;

@@ -12,6 +12,10 @@ import type { CompiledTrack, PhysicsState, TrackDef } from '../../core/types';
 import { compileTrack } from '../../tracks/compile';
 import { CURRICULUM } from '../../tracks/courses';
 import { createBikePhysics, type BikePhysicsWorld } from '../bike';
+import type { BikeClass } from '../tuning';
+
+/** Bike class to sweep (round 11): `TRIALS_BIKE=pro npx tsx src/physics/tools/trackSweep.ts`. */
+const BIKE: BikeClass = process.env.TRIALS_BIKE === 'pro' ? 'pro' : 'rookie';
 import { cruise, fullThrottle, runController, type Controller, type Observation } from '../controllers';
 
 const HZ = 120;
@@ -95,7 +99,7 @@ export function sweepTrack(def: TrackDef, seconds = 40): SweepRow[] {
   const rows: SweepRow[] = [];
   for (const [name, ctrl] of CONTROLLERS) {
     const w: BikePhysicsWorld = createBikePhysics(HZ);
-    w.loadTrack(track, 1);
+    w.loadTrack(track, 1, { bike: BIKE });
     let reachX = -Infinity;
     let prev: PhysicsState | null = null;
     let last: PhysicsState | null = null;

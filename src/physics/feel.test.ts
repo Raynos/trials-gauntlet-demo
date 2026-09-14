@@ -511,14 +511,15 @@ describe('nose-down landings (round 4)', () => {
       const free = drop(p, 8, 0);
       const braked = drop(p, 8, 1);
       feel(`landing.noseDown.${p}.free`, `${free.fault ?? 'rides away'} pitch ${free.minPitch.toFixed(0)}..${free.maxPitch.toFixed(0)} rate ${free.maxRate.toFixed(0)}`, 'rides away (vertical impulse ahead of the COM pitches nose-up)');
-      feel(`landing.noseDown.${p}.brake`, `${braked.fault ?? 'rides away'} pitch ${braked.minPitch.toFixed(0)}..${braked.maxPitch.toFixed(0)}`, p <= -40 ? 'crash (endo)' : 'dives past -30, rides away (round 9)');
+      feel(`landing.noseDown.${p}.brake`, `${braked.fault ?? 'rides away'} pitch ${braked.minPitch.toFixed(0)}..${braked.maxPitch.toFixed(0)}`, p <= -40 ? 'dives past -30 (round 11: the air-dragged front meets the ground spinning; round 9 endoed)' : 'dives past -15, rides away (round 11; -40 in round 9)');
       expect(free.fault).toBeNull();
       // round 9 (drag as a field through the COM, no rider-brace couple on the frame): the brake-grabbed
-      // -20 deg landing dives to -40 and rides away; -40 still endos
-      if (p <= -40) {
-        expect(braked.fault).toBe('crash');
-        expect(braked.minPitch).toBeLessThan(-90);
-      } else expect(braked.minPitch).toBeLessThan(-30);
+      // -20 deg landing dives to -40 and rides away; -40 still endos. Round 11 (brakes.airNm: a wheel in
+      // the air is dragged, not locked): the front meets the ground still spinning and the -20 landing
+      // dives to -19 instead of -40 (the anti-endo cap has a rear load to read); -40 still endos
+      // the -40 brake-grabbed landing no longer endos either: it dives to -34 and rides away (12.1)
+      if (p <= -40) expect(braked.minPitch).toBeLessThan(-30);
+      else expect(braked.minPitch).toBeLessThan(-15);
     }
   });
 });
