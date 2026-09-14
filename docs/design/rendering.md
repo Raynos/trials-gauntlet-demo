@@ -595,6 +595,8 @@ back inside the [0.2, 0.8] band, and if that is not enough the pitch tilts so th
 band edge. `camera()` now reports `clamped`, `posZ`, `fovBoostDeg`. The hall's roof and floor are
 planes, so the plane clamp *is* the geometry test; a sloped roof would need the segment test.
 Evidence: scratch `camcheck.mts` over the b3 bot + stranger recordings (numbers in §12 table).
+**Note (round 9):** the reframe step never ran until the depth-sign fix in §11d — the round-8
+numbers only show the clamp, not the widen.
 
 **Industrial key-art pass.** High-bay lamps carry the city kit's additive volumetric cone
 (`lightConeGeometry`, now in `props.ts`) from the shade to the floor, a dark glossy puddle
@@ -748,6 +750,15 @@ scales with the landing impulse (0.35 at 1.5 → 0.9 at 4+), `extend` 0.5 → 0.
 **Snow.** The near pine silhouette strip (flat `0x2c3a34` plane at z −40) is gone when the plate is
 present; a sparse row of 1.25–1.9× conifers at z −27…−38 gives the mid-ground step and the
 mountain plate reads between them (`render6/snow-m2b.png`).
+
+**Camera-bound reframe (post-commit fix, trailer shoot on b3's 1.0 s kicker).** The round-8 reframe
+that widens / tilts when the position clamp binds was dead code: it took `zv = −v·dir` (the negated
+view depth) and gated on `zv > 0.5`, so `fovBoostDeg` stayed 0 and the bike left the top of the frame
+(`bikeScreenY` −0.26 for ≈ 0.9 s at t 13.6–14.6 s, z clamp bound at 29). With the sign fixed the
+order is as designed: FOV +≤ 12° first, then the pitch tilts so the bike sits on the 0.2 band edge.
+Per-frame box check `[0.15, 0.85]²` on the trailer goldens (`render6/camcheck.mts`, 60 fps):
+**b3-kicker-row 0 / 1733 frames out** (clamped on 390, boost reaches the 12° cap, min screen y
+0.200), h2-gap-chain 0 / 2517, e2-rear-wheel-first 0 / 2264 (never clamped; unchanged).
 
 **Evidence.** Finish: `render6/finish/b1-finish-6s.mp4` (+ `finish-sheet.jpg`). Hero:
 `render6/hero-grid-r9.jpg` (top proc, bottom glTF: idle / riding / wheelie ; crouch / lean-fwd /

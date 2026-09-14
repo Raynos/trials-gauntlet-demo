@@ -398,8 +398,10 @@ export class CameraRig {
         this.clamped = true;
         cp.set(cx, cy, cz);
         // Reframe from the clamped position: where does the bike centre land now?
+        // (Round 9 fix: the depth was negated — `-v·dir` — so this block never ran and a
+        // z-clamped camera on b3's kicker let the bike leave the top of the frame.)
         const v = this.bikeView.set(f.bikeX - cx, f.bikeY + 0.45 - cy, -cz);
-        const zv = -v.dot(this.dir);
+        const zv = v.dot(this.dir);
         const yv = v.dot(this.up);
         const xv = v.dot(this.right);
         if (zv > 0.5) {
