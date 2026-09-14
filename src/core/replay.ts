@@ -160,6 +160,7 @@ function validateHeader(h: unknown): RecordingHeader {
     physicsHz: o.physicsHz,
   };
   if (typeof o.note === 'string') header.note = o.note;
+  if (o.bike === 'rookie' || o.bike === 'pro') header.bike = o.bike;
   return header;
 }
 
@@ -176,6 +177,7 @@ function validateHeader(h: unknown): RecordingHeader {
 //  13      n     trackId (utf-8)
 //  ..      4     run count (u32 LE)
 //  ..      6*k   runs: count u16, throttle u8, brake u8, lean i8, flags u8
+//  ..      0|1   bike class (u8: 0 rookie, 1 pro) — optional trailer; absent = rookie
 
 export function encodeBinary(rec: InputRecording): Uint8Array {
   const trackBytes = new TextEncoder().encode(rec.header.trackId);
@@ -189,7 +191,8 @@ export function encodeBinary(rec: InputRecording): Uint8Array {
       remaining -= c;
     }
   }
-  const size = 13 + trackBytes.length + 4 + runs.length * 6;
+  const bikeByte = rec.header.bike === 'pro' ? 1 : rec.header.bike === 'rookie' ? 0 : -1;
+  const size = 13 + trackBytes.length + 4 + runs.length * 6 + (bikeByte >= 0 ? 1 : 0);
   const buf = new ArrayBuffer(size);
   const dv = new DataView(buf);
   const u8 = new Uint8Array(buf);
@@ -210,6 +213,7 @@ export function encodeBinary(rec: InputRecording): Uint8Array {
     dv.setUint8(o + 5, flags);
     o += 6;
   }
+  if (bikeByte >= 0) dv.setUint8(o, bikeByte);
   return u8;
 }
 
@@ -233,7 +237,9 @@ export function decodeBinary(bytes: Uint8Array): InputRecording {
     runs.push([dv.getUint16(o, true), dv.getUint8(o + 2), dv.getUint8(o + 3), dv.getInt8(o + 4), dv.getUint8(o + 5)]);
     o += 6;
   }
-  return { header: { version, trackId, seed, physicsHz }, runs };
+  const header: RecordingHeader = { version, trackId, seed, physicsHz };
+  if (o < bytes.length) header.bike = bytes[o] === 1 ? 'pro' : 'rookie';
+  return { header, runs };
 }
 
 /** Detect encoding by sniffing the first bytes. */

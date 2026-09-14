@@ -73,6 +73,19 @@ describe('recording encodings', () => {
     expect(expandFrames(decodeAny(new TextEncoder().encode(encodeJSON(rec))))).toEqual(expandFrames(rec));
   });
 
+  it('carries header.bike through both encodings (harness r7: Pro replays were running on Rookie)', () => {
+    const base = sample();
+    for (const bike of ['rookie', 'pro'] as const) {
+      const rec: InputRecording = { ...base, header: { ...base.header, bike } };
+      expect(decodeJSON(encodeJSON(rec)).header.bike).toBe(bike);
+      expect(decodeBinary(encodeBinary(rec)).header.bike).toBe(bike);
+      expect(decodeAny(encodeBinary(rec)).header.bike).toBe(bike);
+    }
+    // Pre-garage recordings carry no class in either encoding and stay that way (callers default to rookie).
+    expect(decodeJSON(encodeJSON(base)).header.bike).toBeUndefined();
+    expect(decodeBinary(encodeBinary(base)).header.bike).toBeUndefined();
+  });
+
   it('splits runs longer than u16 in binary', () => {
     const rec = new InputRecorder({ version: 1, trackId: 't', seed: 1, physicsHz: 120 });
     const f = quantizeInput({ throttle: 1 });
