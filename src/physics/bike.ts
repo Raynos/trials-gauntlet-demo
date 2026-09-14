@@ -119,7 +119,13 @@ const S_REAR_MU = 32;
 const S_FRONT_SLIP = 33;
 const S_RAG_REST = 34; // 6 slots
 const S_BRAKE_EFF = 40;
-const NSCALAR = 44;
+// rider geometry of the LAST force pass, read by the next tick's hop state machine (`riderExt`) and by
+// debug(): state, not scratch — round 5's play/replay divergence was these four living on the instance
+const S_LEG_STOP_X = 41;
+const S_LEG_STOP_Y = 42;
+const S_ANCHOR_X = 43;
+const S_ANCHOR_Y = 44;
+const NSCALAR = 48;
 
 // flag slots in U
 const U_FINISHED = 0;
@@ -142,6 +148,9 @@ const HOPS: HopPhase[] = ['idle', 'preload', 'push', 'recover'];
 const CAUSES: PhysicsDebug['crashCause'][] = [null, 'sensor', 'tetherDist', 'tetherForce', 'oob', 'hazard'];
 
 const MAX_CONTACTS = 128;
+// shared frozen empties for tracks without dynamic bodies (a state is plain data; nobody may mutate it)
+const EMPTY_SEESAWS: PhysicsState['seesaws'] = Object.freeze([]) as unknown as PhysicsState['seesaws'];
+const EMPTY_DRUMS: PhysicsState['drums'] = Object.freeze([]) as unknown as PhysicsState['drums'];
 const WHEEL_BODIES = [REAR, FRONT];
 const RPM_PER_RADS = 60 / (2 * PI);
 
@@ -229,6 +238,10 @@ class BikeWorld implements BikePhysicsWorld {
   private readonly sLimLo = new Float64Array(2);
   private readonly sLimHi = new Float64Array(2);
   private readonly sBrake = new Float64Array(2);
+  // INVARIANT (CONTRACT 2.3): every field below is written inside the same step() before it is read
+  // (solve() zeroes the accumulated impulses; applyForces() sets the rider points) so nothing here
+  // survives a tick. Anything read across ticks belongs in F/U (see S_LEG_STOP_*), or `restore()`
+  // resumes a different world than `snapshot()` saw (`snapshot.test.ts`).
   private tetherLambda = 0;
   private tetherActive = false;
   private legLambda = 0;
@@ -237,17 +250,12 @@ class BikeWorld implements BikePhysicsWorld {
   private tetherNx = 0;
   private tetherNy = 0;
   private tetherSep = 0;
-  private anchorX = 0;
-  private anchorY = 0;
   private legX = 0;
   private legY = 0;
-  private legStopX = 0;
-  private legStopY = 0;
   private braceX = 0;
   private braceY = 0;
   private readonly ragLambda = new Float64Array(RAG_JOINTS.length * 3);
   private seesawLambda = new Float64Array(0);
-  private brakeIn = 0;
   private torsoLambda = 0;
   private torsoRate = 0;
   private readonly rng = new Rng(0);
@@ -353,7 +361,6 @@ class BikeWorld implements BikePhysicsWorld {
     else {
       F[S_THROTTLE_EFF] = 0;
       F[S_ENGINE_TQ] = 0;
-      this.brakeIn = 0;
       F[S_RPM] = this.tuning.engine.idleRpm;
       U[U_LIMITER] = 0;
     }
@@ -369,51 +376,56 @@ class BikeWorld implements BikePhysicsWorld {
     this.advanceRng();
   }
 
+  /**
+   * Fresh plain-data copy every call (consumers hold on to states across ticks: ghost, renderer
+   * interpolation, the harness). Allocation is the output tree only, sized up front: ~14 small objects
+   * riding, +15 when ragdolling; nothing is computed here that step() did not already leave in F/U.
+   */
   getState(): PhysicsState {
     const F = this.F;
     const U = this.U;
-    const wheel = (i: number, comp: number, gnd: number): PhysicsState['wheels']['rear'] => ({
-      pos: { x: this.px[i]!, y: this.py[i]! },
-      spin: -this.an[i]!,
-      spinVel: -this.av[i]!,
-      compression: comp,
-      grounded: gnd === 1,
-    });
-    const angle = this.an[FRAME]!;
+    const px = this.px;
+    const py = this.py;
+    const an = this.an;
+    const av = this.av;
     const pose = this.riderPose();
     const fault = FAULTS[U[U_FAULT]!] ?? null;
     let ragdoll: RagdollBody[] | null = null;
     if (U[U_RAGDOLL] === 1) {
-      ragdoll = [];
+      ragdoll = new Array<RagdollBody>(NRAG);
       for (let i = 0; i < NRAG; i++) {
         const b = RAG0 + i;
-        ragdoll.push({ id: RAG_IDS[i]!, pos: { x: this.px[b]!, y: this.py[b]! }, angle: this.an[b]! });
+        ragdoll[i] = { id: RAG_IDS[i]!, pos: { x: px[b]!, y: py[b]! }, angle: an[b]! };
       }
     }
-    const seesaws: PhysicsState['seesaws'] = [];
     const col = this.col!;
-    for (let i = 0; i < this.nSeesaw; i++) {
+    const nS = this.nSeesaw;
+    const nD = this.nDrum;
+    const seesaws: PhysicsState['seesaws'] = nS === 0 ? EMPTY_SEESAWS : new Array(nS);
+    for (let i = 0; i < nS; i++) {
       const b = FIRST_DYN + i;
-      seesaws.push({ id: col.seesawBodies[i]!.collider.id, angle: this.an[b]!, angVel: this.av[b]! });
+      seesaws[i] = { id: col.seesawBodies[i]!.collider.id, angle: an[b]!, angVel: av[b]! };
     }
-    const drums: PhysicsState['drums'] = [];
-    for (let i = 0; i < this.nDrum; i++) {
-      const b = FIRST_DYN + this.nSeesaw + i;
-      drums.push({ id: col.drumBodies[i]!.collider.id, spin: this.an[b]! });
+    const drums: PhysicsState['drums'] = nD === 0 ? EMPTY_DRUMS : new Array(nD);
+    for (let i = 0; i < nD; i++) {
+      const b = FIRST_DYN + nS + i;
+      drums[i] = { id: col.drumBodies[i]!.collider.id, spin: an[b]! };
     }
     const ft = F[S_FINISH_TIME]!;
+    const rs = U[U_REAR_SURF]!;
+    const fs = U[U_FRONT_SURF]!;
     return {
       tick: F[S_TICK]!,
       time: F[S_TIME]!,
       bike: {
-        pos: { x: this.px[FRAME]!, y: this.py[FRAME]! },
+        pos: { x: px[FRAME]!, y: py[FRAME]! },
         vel: { x: this.vx[FRAME]!, y: this.vy[FRAME]! },
-        angle,
-        angVel: this.av[FRAME]!,
+        angle: an[FRAME]!,
+        angVel: av[FRAME]!,
       },
       wheels: {
-        rear: wheel(REAR, F[S_REAR_COMP]!, U[U_REAR_GND]!),
-        front: wheel(FRONT, F[S_FRONT_COMP]!, U[U_FRONT_GND]!),
+        rear: { pos: { x: px[REAR]!, y: py[REAR]! }, spin: -an[REAR]!, spinVel: -av[REAR]!, compression: F[S_REAR_COMP]!, grounded: U[U_REAR_GND] === 1 },
+        front: { pos: { x: px[FRONT]!, y: py[FRONT]! }, spin: -an[FRONT]!, spinVel: -av[FRONT]!, compression: F[S_FRONT_COMP]!, grounded: U[U_FRONT_GND] === 1 },
       },
       rider: pose,
       checkpoint: F[S_CHECKPOINT]!,
@@ -423,8 +435,8 @@ class BikeWorld implements BikePhysicsWorld {
       input: { throttle: F[S_IN_T]!, brake: F[S_IN_B]!, lean: F[S_IN_L]! },
       engine: { rpm: F[S_RPM]!, throttleEff: F[S_THROTTLE_EFF]!, limiter: U[U_LIMITER] === 1 },
       contacts: {
-        rear: U[U_REAR_SURF]! > 0 ? SURFACES[U[U_REAR_SURF]! - 1]! : null,
-        front: U[U_FRONT_SURF]! > 0 ? SURFACES[U[U_FRONT_SURF]! - 1]! : null,
+        rear: rs > 0 ? SURFACES[rs - 1]! : null,
+        front: fs > 0 ? SURFACES[fs - 1]! : null,
       },
       rearSlip: F[S_REAR_SLIP]!,
       hopPhase: HOPS[U[U_HOP]!]!,
@@ -511,8 +523,8 @@ class BikeWorld implements BikePhysicsWorld {
         front: { compression: this.sComp[1]!, rate: this.sRate[1]!, force: this.sForce[1]! },
       },
       rider: {
-        anchor: { x: this.anchorX, y: this.anchorY },
-        offset: { x: this.px[RIDER]! - this.anchorX, y: this.py[RIDER]! - this.anchorY },
+        anchor: { x: F[S_ANCHOR_X]!, y: F[S_ANCHOR_Y]! },
+        offset: { x: this.px[RIDER]! - F[S_ANCHOR_X]!, y: this.py[RIDER]! - F[S_ANCHOR_Y]! },
         tetherForce: F[S_TETHER_F]!,
         hopPhase: HOPS[this.U[U_HOP]!]!,
         crouch: F[S_CROUCH]!,
@@ -655,8 +667,8 @@ class BikeWorld implements BikePhysicsWorld {
   private riderExt(): number {
     const c = cos(this.an[FRAME]!);
     const s = sin(this.an[FRAME]!);
-    const dx = this.px[RIDER]! - this.legStopX;
-    const dy = this.py[RIDER]! - this.legStopY;
+    const dx = this.px[RIDER]! - this.F[S_LEG_STOP_X]!;
+    const dy = this.py[RIDER]! - this.F[S_LEG_STOP_Y]!;
     return -dx * s + dy * c;
   }
 
@@ -763,7 +775,6 @@ class BikeWorld implements BikePhysicsWorld {
       let nbe = be + clamp(input.brake - be, -t.brakes.fall * dt, t.brakes.rise * dt);
       if (Math.abs(nbe - input.brake) < 1e-9) nbe = input.brake;
       F[S_BRAKE_EFF] = nbe;
-      this.brakeIn = nbe;
     }
 
     // hop state machine (technique, no button)
@@ -908,13 +919,15 @@ class BikeWorld implements BikePhysicsWorld {
       const aly = r.anchor.y - eased * r.crouch + F[S_HOP_EXT]! * r.hopExtend - (lean > 0 ? lean * r.leanCrouchFwd : -lean * r.leanCrouch);
       const axw = fx + alx * c - aly * s;
       const ayw = fy + alx * s + aly * c;
-      this.anchorX = axw;
-      this.anchorY = ayw;
+      F[S_ANCHOR_X] = axw;
+      F[S_ANCHOR_Y] = ayw;
       // legs-straight stop: fixed leg length above the pegs (neutral height + hop extension); the
       // crouch and the lean crouch lower the target, not the limit, so a crouch cannot yank the bike
       const sly = r.anchor.y + F[S_HOP_EXT]! * r.hopExtend;
-      this.legStopX = fx + alx * c - sly * s;
-      this.legStopY = fy + alx * s + sly * c;
+      const lsx = fx + alx * c - sly * s;
+      const lsy = fy + alx * s + sly * c;
+      F[S_LEG_STOP_X] = lsx;
+      F[S_LEG_STOP_Y] = lsy;
       rax = axw - fx;
       ray = ayw - fy;
       const wf = av[FRAME]!;
@@ -951,7 +964,7 @@ class BikeWorld implements BikePhysicsWorld {
       // dropping the anchor at 1.2 m/s lifted the bike by ~1.2 kN through the leg damper.
       if (!hop && fUp < -r.armPull) fUp = -r.armPull;
       // the leg actuator pushes until the legs are straight (rider at the leg stop), not merely to the anchor
-      const extStop = (px[RIDER]! - this.legStopX) * upx + (py[RIDER]! - this.legStopY) * upy;
+      const extStop = (px[RIDER]! - lsx) * upx + (py[RIDER]! - lsy) * upy;
       if (hop && extStop < 0) fUp += r.hopForce;
       const maxUp = hop ? r.hopMaxForce : r.ejectForce * 1.5;
       fUp = clamp(fUp, -maxUp, maxUp);
@@ -1326,8 +1339,10 @@ class BikeWorld implements BikePhysicsWorld {
       const acc = (0.8 * ts.maxTorque) / ts.inertia;
       const mag = Math.min(ts.maxRate, Math.sqrt(2 * acc * Math.abs(err)), Math.abs(err) / dt);
       this.torsoRate = err < 0 ? -mag : mag;
-      const dx = this.px[RIDER]! - this.anchorX;
-      const dy = this.py[RIDER]! - this.anchorY;
+      const ax0 = this.F[S_ANCHOR_X]!;
+      const ay0 = this.F[S_ANCHOR_Y]!;
+      const dx = this.px[RIDER]! - ax0;
+      const dy = this.py[RIDER]! - ay0;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const max = t.rider.tetherMax;
       if (dist > max - 0.05 && dist > 1e-9) {
@@ -1339,7 +1354,7 @@ class BikeWorld implements BikePhysicsWorld {
       // legs straight: the rider cannot rise more than legSlack above the leg-stop point along frame-up
       const c0 = cos(this.an[FRAME]!);
       const s0 = sin(this.an[FRAME]!);
-      const ext = -(this.px[RIDER]! - this.legStopX) * s0 + (this.py[RIDER]! - this.legStopY) * c0;
+      const ext = -(this.px[RIDER]! - this.F[S_LEG_STOP_X]!) * s0 + (this.py[RIDER]! - this.F[S_LEG_STOP_Y]!) * c0;
       const sep = t.rider.legSlack - ext;
       if (sep < 0.05) {
         this.legActive = true;
@@ -1422,8 +1437,8 @@ class BikeWorld implements BikePhysicsWorld {
       if (this.tetherActive) {
         const nx = this.tetherNx;
         const ny = this.tetherNy;
-        const rax = this.anchorX - fx;
-        const ray = this.anchorY - fy;
+        const rax = this.F[S_ANCHOR_X]! - fx;
+        const ray = this.F[S_ANCHOR_Y]! - fy;
         const rn = rax * ny - ray * nx;
         const mass = 1 / (im[RIDER]! + im[FRAME]! + ii[FRAME]! * rn * rn);
         const relx = vx[RIDER]! - (vx[FRAME]! - av[FRAME]! * ray);
@@ -1587,7 +1602,7 @@ class BikeWorld implements BikePhysicsWorld {
       // --- brakes: lock wheel spin to the frame, torque-limited. A crashed bike keeps its rear wheel
       // locked (stalled engine in gear) and half a front brake (lever pinned), so it scrubs to a stop
       // on its tyres instead of free-wheeling away from the rider
-      const brakeIn = riding ? this.brakeIn : 1;
+      const brakeIn = riding ? this.F[S_BRAKE_EFF]! : 1;
       if (brakeIn > 0) {
         for (let w = 0; w < 2; w++) {
           const wb = wheelB[w]!;
@@ -1816,8 +1831,8 @@ class BikeWorld implements BikePhysicsWorld {
         fault = 1;
         cause = 1;
       } else {
-        const dx = this.px[RIDER]! - this.anchorX;
-        const dy = this.py[RIDER]! - this.anchorY;
+        const dx = this.px[RIDER]! - F[S_ANCHOR_X]!;
+        const dy = this.py[RIDER]! - F[S_ANCHOR_Y]!;
         if (dx * dx + dy * dy > t.rider.tetherMax * t.rider.tetherMax * 1.69) {
           fault = 1;
           cause = 2;

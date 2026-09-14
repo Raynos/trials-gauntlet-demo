@@ -5,7 +5,31 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
-Status: **round 4 complete** (fourth physics owner). The round built the drum and seesaw test cases the
+Status: **round 5 complete** (fifth physics owner). The round fixed the harness's blocking finding: beam
+search restored a snapshot and resumed a *different* world than the one `snapshot()` saw, so the bot's
+committed play diverged from a replay of its own recording (`playReplayDivergence`, flat-test tick 346, e1
+tick 376). Finding: the divergence was not the brake filter, the seesaw warm start or a contact cache (those
+are recomputed or zeroed inside every `step()`); it was the **legs-straight stop** (`legStopX/Y`), written by
+`applyForces()` and read by the *next* tick's hop state machine (`riderExt()`, the push -> recover edge) — an
+instance field, so `restore()` left the previous world's value in place and the first tick after a restore
+during a hop `push` forked. Shipped: (1) `legStop` and the rider `anchor` moved into `F` (`S_LEG_STOP_*`,
+`S_ANCHOR_*`, NSCALAR 44 -> 48), the redundant `brakeIn` mirror removed (the solver reads `S_BRAKE_EFF`);
+every remaining instance scalar is documented as write-before-read within one step (section 2); (2)
+`snapshot.test.ts`: the harness probe's access pattern in-process (root snapshot, 7 macro-action rollouts,
+restore, compare every tick) over a 2600-tick trajectory that covers brake, hop preload/push/recover, seesaw,
+drum, crash, ragdoll-to-sleep and restart; a foreign-snapshot test (run to k, restore snapshots from other
+trajectories/worlds and step them, restore k, 400 ticks hash-equal to the straight run) at 13 segment ticks;
+and a used-world test (other track, crash, restart, snapshot/restore, then `loadTrack` of the same track
+replays hash-equal to a fresh world, and `reset(-1)` equals a fresh load); (3) `getState()` allocation
+trimmed (no closure, arrays sized up front, shared frozen empties for tracks without dynamic bodies): GC
+scavenges per 2M calls 87 -> 71 riding, 101 -> 78 ragdolling; 0.29 -> 0.11 us/call riding. The browser's
+100 us/tick p95 is measured through `Game.stepTicks` (rules, ghost, hashing, audio) on a stale `dist/`,
+not through `physics.step()`, which is 1.4 us p50 in node with `getState()` included; hashing a state costs
+~3 us, twice the physics. `harness:snapshot-probe` flat-test/bot-2 and e1-uphill-weight/bot-3 PASS; the bot
+on e1 skill 3 reports `playReplayDivergence: null` (every earlier run had one). 52 physics tests green; no
+feel number changed (the move is byte-preserving on a straight run: `feel.test.ts` untouched).
+
+Round 4 (fourth physics owner) built the drum and seesaw test cases the
 bot sweep asked for and found that the "bike parks against the drum" is geometry, not the solver: a drum
 of radius r standing on the ground is 2r tall and meets the 0.34 m wheel at `acos((R-r)/(R+r))` from
 vertical (86 deg for a 0.3 m log), so every bare drum is a wall to a constant lean; a 0.3 m log crosses
@@ -45,15 +69,24 @@ Custom 2D sequential-impulse solver (`src/physics/bike.ts`, ~1.4 kLOC).
 Semi-implicit Euler, 8 velocity iterations per tick in a fixed order, Baumgarte
 position correction (β 0.2 contacts with 5 mm slop, 0.3 joints), speculative
 contacts (margin 2 cm + |v|·dt) so a 20 m/s wheel never tunnels a plank edge.
-No warm starting, so there are no contact caches to snapshot. Rapier/planck
+No warm starting, so there are no contact caches to snapshot: every accumulated
+impulse (`tetherLambda`, `legLambda`, `torsoLambda`, `ragLambda`, `seesawLambda`)
+is zeroed at the top of `solve()`, and every rider geometry point the forces need
+is recomputed in `applyForces()`. **Invariant:** an instance field is written
+before it is read inside the same `step()`, or it lives in `F`/`U`. The one
+cross-tick read — the hop state machine's `riderExt()` uses the legs-straight
+stop of the *last* force pass — is why `S_LEG_STOP_X/Y` and `S_ANCHOR_X/Y` are
+in `F` (round 5; `snapshot.test.ts` is the audit). Rapier/planck
 were rejected for bundle size, async wasm init and the lack of a first-class
 tyre model; see the git history of this file for the comparison table.
 
-All mutable state lives in one `Float64Array F` (40 scalars + SoA bodies:
+All mutable state lives in one `Float64Array F` (48 scalars + SoA bodies:
 `px py vx vy angle angVel invMass invInertia`) and one `Uint8Array U` (16
 flags/enums). `snapshot()` is two typed-array copies; `restore()` is bit-exact
 by construction (`world.test.ts` forks at ticks 200, crash-5, crash, crash+1,
-crash+200 and compares 500-tick hash traces).
+crash+200 and compares 500-tick hash traces; `snapshot.test.ts` does the same
+under beam-search load and from foreign snapshots). `restore()` does not touch
+the event queue: drain after restoring (the harness `Sim.restore` does).
 
 ### 2.1 Bodies
 
@@ -421,8 +454,8 @@ From `pnpm test src/physics` (`FEEL …` lines in `feel.test.ts`, `LAND …` lan
 | crash rules | head/torso, hazard, oobY | all three tested on the drawn body; over-rotation alone never faults | PASS |
 | ragdoll vs bike | (visible in clips) | limbs rest on tyres/frame | PASS |
 | restart → riding | 1 tick | `reset()` is one call, `tick = 0` | PASS |
-| determinism | two runs equal; restore(snapshot()) equal | equal over 3000 ticks incl. crash+restart; forks at 5 points × 500 ticks equal | PASS |
-| µs/tick p95 | ≤ 60 riding, ≤ 80 ragdoll | 3.1 riding, 14.7 ragdolling (node, 20k ticks) | PASS |
+| determinism | two runs equal; restore(snapshot()) equal | equal over 3000 ticks incl. crash+restart; forks at 5 points × 500 ticks equal; search-load probe 2600 ticks × 7 rollouts every 15 ticks equal; 13 foreign-snapshot forks × 400 ticks equal | PASS |
+| µs/tick p95 | ≤ 60 riding, ≤ 80 ragdoll | 2.9 riding, 13.9 ragdolling (node, 20k ticks, vitest); step+getState 1.4 p50 / 1.8 p95 isolated, hashing the state +3 | PASS |
 
 ### 12.1 Landing envelope audit (`LAND` rows; drop h at speed v and pitch p onto flat dirt, throttle 0.2)
 
@@ -496,6 +529,11 @@ the bike leaves the board before it finishes tipping. The one stall in the 60-ca
 board at 3 m/s with the rider sitting back on 0.2 throttle over the pivot — a stall, not a wall.
 
 ### 12.4 Open list, in order
+
+(0) Browser tick cost: the harness's 100 us p95 is `Game.stepTicks` on a stale `dist/` (the bot warned
+`dist/ is older than src/`); rebuild and split the measurement into physics / rules / hash before touching
+the solver — in node the physics is 1.4 us p50 and the hash 3 us. The physics side that remained was
+`getState()`'s output tree (~14 objects; now sized up front, 0.11 us/call).
 
 (1) Rider pose lag 0.28 s vs the 0.10-0.15 s + overshoot the critic asked for: a faster shift needs a
 higher `shiftForce` cap or a lower `cAlong`, both of which move the launch/hop/climb envelope; try a
