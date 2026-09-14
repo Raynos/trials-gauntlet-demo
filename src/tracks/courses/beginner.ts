@@ -75,12 +75,22 @@ export const B1 = course('b1-first-ride', 'First Ride', 'beginner')
   .flat(10)
   .finish();
 
-/** B2 — TEACHES weight shift: lean back on bumps and drops. DEMANDS a 1.8 m drop onto a downhill landing. */
+/**
+ * B2 — TEACHES weight shift: lean back on bumps and drops. DEMANDS a 1.8 m drop onto a landing ramp.
+ * Round 5 (reflex `average` 4/8/5 against band 1-2, deaths at 6-9 m/s with the bike fully flipped:
+ * the 0.3 m convex hump row at 123 right after 5 m-pitch rollers (x3, nose-low), the 7 deg ramp
+ * onto the first kerb (x2), a loop on the 14 deg cascade ramp at 240, the 12.7 deg set-piece ramp
+ * at 354 from a standing start, rollers 8 m after the 1.8 m drop): every up-ramp is <= 6 deg
+ * (5.7 deg kink at 8-10 m/s is a 0.1 m skip, not a flight), every drop lands on a straight
+ * down-ramp of 8 x height (the reflex probe: box -> down-ramp 1,1,1 at 0.5 / 1.0 / 1.8 m against
+ * 1,2,4 onto flat), flow is `bumpRow` / grounded waves / 6.7 m-pitch rollers like B1, and no rise
+ * starts within 12 m of a drop exit.
+ */
 export const B2 = course('b2-lean-back', 'Lean Back', 'beginner')
   .meta({
     biome: 'industrial',
     technique: 'weight shift on drops',
-    demands: '1.8 m drop onto a downslope: lean back or nose in',
+    demands: '1.8 m drop onto a landing ramp: lean back or nose in',
     attemptsBand: [1, 2],
     targetTimeS: 50,
   })
@@ -91,63 +101,61 @@ export const B2 = course('b2-lean-back', 'Lean Back', 'beginner')
   .camera({ mode: 'side' })
   .flat(18)
   .bumpDrum(0.5, 0.3) // round speed bump, 0.3 m proud (rolls at any speed; the old bare 0.3 m logs needed a front lift)
-  .flat(5)
+  .flat(8)
   .bumpDrum(0.5, 0.3)
-  .flat(5)
-  .hump(0.3, 3)
-  .flat(3)
-  .bumpDrum(0.5, 0.3)
-  .flat(4)
-  .checkpoint() // ~42 m
-  .flat(4)
-  .ramp({ length: 4, height: 0.5 })
-  .ledge({ height: 0.5, length: 10 }) // first drop: 0.5, onto a gentle downslope (a flat landing at speed endoed the skill-1 bot, sweep 3)
-  .slope(4, -0.4)
-  .flat(10) // land and settle before the next ramp: an up-ramp 6 m after a drop is a rising landing = endo (sweep 3)
-  .ramp({ length: 5, height: 1.0 })
-  .box({ width: 10, height: 1.0 }) // drop 1.0 onto a downslope
-  .slope(6, -0.6)
-  .flat(10)
+  .flat(8)
+  .bumpRow(1, 0.3, 16) // was a 1.5 m convex hump between two drums 3-5 m apart: a 200 ms player got out of phase and looped at 40 m
+  .flat(6)
+  .checkpoint() // ~52 m
+  .flat(6)
+  .ramp({ length: 8, height: 0.5 }) // 3.6 deg (was 4 x 0.5 = 7 deg: nose-low endo on the ramp at 7 m/s)
+  .ledge({ height: 0.5, length: 10 }) // first drop: 0.5
+  .ramp({ length: 4, height: 0.5, direction: 'down' }) // 7 deg landing ramp under the drop
+  .flat(12) // land and settle before the next ramp: an up-ramp 6 m after a drop is a rising landing = endo (sweep 3)
+  .ramp({ length: 10, height: 1.0 }) // 5.7 deg
+  .box({ width: 10, height: 1.0 }) // drop 1.0
+  .ramp({ length: 8, height: 1.0, direction: 'down' }) // 7 deg landing ramp
+  .flat(12)
   // flow
-  .rollers(15, 0.3, 3)
-  .flat(4)
-  .humpRow(2, 0.3, 8)
+  .rollers(20, 0.25, 3) // B1's rollers (6.7 m pitch): the 5 m-pitch 0.3 m rollers launched at 7 m/s
   .flat(6)
-  .wave(20, 2.0)
-  .flat(4)
-  .rollers(20, 0.3, 4)
+  .bumpRow(2, 0.3, 16)
   .flat(6)
-  .checkpoint() // ~180 m
+  .wave(28, 1.5, 16)
   .flat(4)
-  .ramp({ length: 6, height: 1.2 })
+  .rollers(20, 0.25, 3)
+  .flat(8)
+  .checkpoint() // ~215 m
+  .flat(6)
+  .ramp({ length: 12, height: 1.2 }) // 5.7 deg (was 6 x 1.2 = 11.3 deg: looped at the box lip at 6 m/s)
   .box({ width: 4, height: 1.2 })
   .stair({ count: 4, height: 0.3, length: 0.6, direction: 'down' }) // lean back, no brake
-  .flat(10)
-  .wave(16, 1.2)
-  .flat(4)
-  .stepDowns(6, 6, [1.5, 1.0, 0.5]) // cascade: three 0.5 m drops in a row
-  .flat(8)
-  .rollers(15, 0.3, 3)
+  .flat(12)
+  .wave(26, 1.2, 16)
   .flat(6)
-  .checkpoint() // ~215 m
-  .flat(4)
-  .ramp({ length: 5, height: 1.0 })
+  .stepDowns(15, 6, [1.5, 1.0, 0.5]) // cascade: three 0.5 m drops in a row (was a 14 deg ramp up: looped on the face at 8 m/s)
+  .flat(12)
+  .rollers(20, 0.25, 3)
+  .flat(8)
+  .checkpoint() // ~330 m
+  .flat(6)
+  .ramp({ length: 10, height: 1.0 })
   .box({ width: 8, height: 1.0 })
   .stair({ count: 3, height: 0.33, length: 0.6, direction: 'down' })
+  .flat(12)
+  .bumpRow(2, 0.3, 16)
   .flat(6)
-  .humpRow(2, 0.3, 8)
-  .flat(6)
-  .wave(16, 1.5)
-  .flat(6)
-  .checkpoint() // ~340 m
-  .flat(4)
-  .camera({ mode: 'low' })
-  .ramp({ length: 8, height: 1.8 }) // 12.7 deg: the set piece
-  .box({ width: 10, height: 1.8 })
-  .slope(6, -1.0) // downhill landing under the drop
-  .camera({ mode: 'side' })
+  .wave(28, 1.5, 16)
   .flat(8)
-  .rollers(15, 0.3, 3)
+  .checkpoint() // ~445 m
+  .flat(6)
+  .camera({ mode: 'low' })
+  .ramp({ length: 18, height: 1.8 }) // 5.7 deg (was 8 x 1.8 = 12.7 deg from a standing start 4 m past the checkpoint: looped on the face)
+  .box({ width: 10, height: 1.8 }) // the set piece: the 1.8 m drop
+  .ramp({ length: 14, height: 1.8, direction: 'down' }) // 7.3 deg landing ramp under the drop
+  .camera({ mode: 'side' })
+  .flat(12) // was 8 m then 5 m-pitch rollers: a nose-down landing on rising ground
+  .rollers(20, 0.25, 3)
   .flat(10)
   .finish();
 

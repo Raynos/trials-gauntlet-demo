@@ -92,7 +92,7 @@ export interface DrumParams extends BaseParams {
 export interface GapParams extends BaseParams {
   width: number;
   depth: number;
-  hazard: 'water' | 'kill';
+  hazard: 'water' | 'kill' | 'fire';
 }
 /** Solid slab, not rollable. `lip` adds a one-way ledge projecting back from the top front edge (front-wheel grab). */
 export interface WallParams extends BaseParams {

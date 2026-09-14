@@ -114,10 +114,22 @@ export const CHECKPOINT_RULE = {
   launchCarry: 6,
   /** Bumps this low (humps, rollers, sunk drums) are flow: they neither block a run-up nor count as features. */
   flowHeight: 0.35,
-  /** Walls / ledges above this need a rolling hop, i.e. speed (stationary hop apex 0.74 x 0.8). */
-  hopHeight: 0.6,
+  /**
+   * Walls / ledges at least this tall want the run-up. Round 4: 0.6 (stationary hop apex 0.74 x 0.8); round 5:
+   * 0.45 — the reflex player's practised hop is a rolling one (M1: a 0.55 ledge 3 m past a checkpoint was 85
+   * stuck-restarts, the same ledge from 16 m 5).
+   */
+  hopHeight: 0.45,
   /** Free-standing up-ramps at least this tall are kickers a stranger treats as a jump. */
   kickerHeight: 1.0,
+  /**
+   * Round 5 (reflex bot): a stair flight up whose risers are at least this tall is a speed obstacle
+   * (E3: 6 x 0.4 m risers 2.5 m past a checkpoint were 95 stuck-restarts in 3 seeds; a standing-start
+   * riser is not a novice technique; 0.35 m reads as a face; 0.25 m risers at a 0.5 m run clear from 16 m for every seed).
+   */
+  stairRiser: 0.25,
+  /** A rail slot row (kill pits) this close after a wall / ledge top is entered from that top by design (H1's demand). */
+  slotAfterWall: 3,
 } as const;
 
 export interface CheckpointViolation {
@@ -156,7 +168,7 @@ interface Feature {
   /** Bumps <= flowHeight: humps, rollers, sunk drums. */
   flow: boolean;
   /** Needs speed from the spawn: gap, kicker, hop wall, steep plank. */
-  speed: false | 'gap' | 'kicker' | 'wall' | 'ledge' | 'steep plank' | 'fire' | 'pole';
+  speed: false | 'gap' | 'kicker' | 'wall' | 'ledge' | 'steep plank' | 'fire' | 'pole' | 'stair' | 'logs' | 'drum' | 'slot';
   /** Leaves the bike airborne: a kicker, a gap, a drop off a raised exit. */
   launch: boolean;
   /**
@@ -243,8 +255,19 @@ function features(def: TrackDef): Feature[] {
         // <= 2 m straight off a ledge / box / drum top is a standing hop across (M1's lesson; M2 / X2 drum
         // top to drum top, physics 12.3: a spinning top cannot be pumped, so 2 m is the whole envelope)
         const hopAcross = w <= 2 && adjacentBefore && (prev?.kind === 'ledge' || prev?.kind === 'box' || prev?.kind === 'drum');
-        // a slot narrower than a wheel (H1's wheelie wire, 0.7 m) is crossed with the front up at any speed, not jumped
-        const slot = w <= 1.0;
+        // a slot narrower than a wheel (H1's wheelie wire, 0.7 m) is crossed with the front up, not jumped, but
+        // round 5 (hazards under the checkpoint rule) it still wants the run-up unless the row starts at the foot of
+        // a wall / ledge the rider has just come over (H1 / X3 demand: lip climb straight into the rails, by design)
+        const slotRow = w <= 1.0 && ((rp['hazard'] ?? 'water') === 'kill');
+        const prevSolidTop = !!prev && (prev.kind === 'wall' || prev.kind === 'ledge') && x0 - (prev.pos.x + footprint(prev.kind as ObstacleKind, prev.params ?? {})) <= R.slotAfterWall + 1e-6;
+        const prevSlot = !!prev && prev.kind === 'gap' && num(prev.params?.['width'], 3) <= 1.0;
+        const slot = slotRow && (prevSolidTop || prevSlot);
+        if (slotRow && !slot) {
+          speed = 'slot';
+          launch = false;
+          blocks = false;
+          break;
+        }
         // a pole-cap pit entered from a box / wall top is hopped cap to cap at walking pace (X1's demand)
         const polePit = !!next && nextKind === 'pole' && Math.abs(next.pos.x - x0) < 1e-3;
         const capsFromTop = polePit && adjacentBefore && (prev?.kind === 'box' || prev?.kind === 'wall');
@@ -267,7 +290,10 @@ function features(def: TrackDef): Feature[] {
       case 'ledge': {
         const h = num(rp['height'], 0.5);
         exitHeight = base + h;
-        if (h >= R.hopHeight) speed = 'ledge';
+        // the hop is the rise from the surface the rider arrives on: a ledge behind a ramp / step is a smaller hop
+        // (B2's ramp -> 0.5 m kerb is a drop-off, M1's 0.3 / 0.6 / 0.9 steps are three 0.3 m hops)
+        const arriveAt = adjacentBefore ? (out[out.length - 1]?.exitHeight ?? 0) : 0;
+        if (exitHeight - arriveAt >= R.hopHeight - 1e-9) speed = 'ledge';
         launch = !adjacentSolid && !adjacentGap;
         break;
       }
@@ -277,11 +303,14 @@ function features(def: TrackDef): Feature[] {
         blocks = !adjacentBefore; // a box entered from flat ground is a wall; one on a ramp / after a gap is ridden over
         break;
       case 'stair': {
-        const rise = num(rp['count'], 5) * num(rp['height'], 0.3);
+        const riser = num(rp['height'], 0.3);
+        const rise = num(rp['count'], 5) * riser;
         const up = (rp['direction'] ?? 'up') === 'up';
         exitHeight = up ? base + rise : base;
         launch = up && !adjacentSolid;
         blocks = up;
+        // round 5: a flight up is ridden at speed (the wheel bounces up each riser); from a standing start it is a wall
+        if (up && riser >= R.stairRiser - 1e-9) speed = 'stair';
         break;
       }
       case 'drum': {
@@ -289,6 +318,10 @@ function features(def: TrackDef): Feature[] {
         const proud = 2 * r - num(rp['depth'], 0);
         exitHeight = base;
         flow = proud <= R.flowHeight && base === 0;
+        // round 5: a big drum (from its shelf or another drum top) is rolled on momentum; M2's shelf 3 m past a
+        // checkpoint was 21 stuck-restarts. A drum that is the exit of the previous feature (shelf, drum-top gap)
+        // is measured at the shelf ramp, which blocks; a bare sunk drum > flowHeight wants the run-up itself
+        if (!flow) speed = 'drum';
         break;
       }
       case 'seesaw':
@@ -297,6 +330,9 @@ function features(def: TrackDef): Feature[] {
         break;
       case 'logpile':
         exitHeight = base;
+        // round 5: a log pyramid is climbed on momentum from its entry ramp (M2: 38 stuck-restarts at a pyramid
+        // 3 m past a checkpoint); the pyramid, not the 3 m entry ramp, is measured (the ramp blocks)
+        speed = 'logs';
         break;
       case 'pole':
         // a cap is balance, not speed; a `poleRow` stands in a kill pit whose gap is the speed obstacle
@@ -326,6 +362,15 @@ function launchPoint(def: TrackDef, feats: Feature[], f: Feature): { at: Feature
     return { at: prev, y: profileY(def.profile, prev.x0) + prev.base };
   }
   if (f.kind === 'gap' && f.adjacentBefore && prev) return { at: f, y: profileY(def.profile, f.x0) + prev.exitHeight };
+  // round 5: a drum on its shelf / a log pyramid behind its entry ramp / a ledge or wall behind its step is
+  // measured at the foot of the chain that carries the rider onto it (drumStep ramp, logStep ramp, drum-top gap
+  // chain, M1's 0.45 m step in front of the 0.9 m ledge, H1's steppedWall ramp)
+  if (f.kind === 'drum' || f.kind === 'logpile' || f.kind === 'ledge' || f.kind === 'wall') {
+    let j = i;
+    while (j > 0 && (feats[j] as Feature).adjacentBefore) j--;
+    const at = feats[j] as Feature;
+    return { at, y: profileY(def.profile, at.x0) + at.base };
+  }
   return { at: f, y: profileY(def.profile, f.x0) + f.base };
 }
 
@@ -640,13 +685,28 @@ export class CourseBuilder {
   }
 
   /**
-   * Log pyramid with a 0.3 m entry ramp so the wheel meets the first log at its centre height
-   * (contact normal <= 58 deg) instead of the 86 deg wall a bare 0.3 m log is (physics 12.3;
-   * sweep 3: the skill-2 bot failed a bare log 50 times).
+   * Log pyramid behind an entry ramp. Round 3 put the ramp at the first log's centre (contact
+   * normal <= 58 deg); round 5 (reflex bot: M2's 2-row pyramid was 38 stuck-restarts, X2's 3-row
+   * pyramid 107 nose-high deaths) raises it to the first log's TOP (2r, 3 m at curve 0.3) so the
+   * wheel rolls onto the bottom row and the upper rows are 0.22-0.52 m bumps: 2-row 1,1,1 /
+   * 3-row 2,2,5 for the average reflex player against 3,3,3 / walled from the centre-height ramp.
    */
   logStep(p: Partial2<KindParams['logpile']>, o?: ObstacleOpts): this {
     const r = p.radius ?? 0.3;
-    return this.ramp({ length: 1.5, height: r, curve: 0.5 }, o).logpile(p, o);
+    return this.ramp({ length: 3, height: 2 * r, curve: 0.3 }, o).logpile(p, o);
+  }
+
+  /**
+   * Wall with a B line (round 5, hard tier): a ramp in front that leaves `step` m of wall above
+   * its top, so the wall is either a lip climb from the ground at speed (the A line, the lip stays)
+   * or a ramp-then-hop of `step` m that costs time and not a fault. H1's 1.0 m lip wall 15 m past a
+   * checkpoint was 137 identical deaths for the average reflex player; the reflex hop clears 0.45-0.55.
+   */
+  steppedWall(p: Partial2<KindParams['wall']>, step = 0.5, o?: ObstacleOpts): this {
+    const h = p.height ?? 1;
+    const rise = h - step;
+    if (rise > 1e-6) this.ramp({ length: Math.max(3, Math.round(rise * 5 * 10) / 10), height: rise }, o);
+    return this.wall(p, o);
   }
 
   /**
@@ -757,11 +817,31 @@ export class CourseBuilder {
   /**
    * Gap-chain platform: a box whose last `kickerLength` metres are a kicker ramp on top, so
    * every launch has an angle and the landing can be level with or above the take-off.
+   * `landing` (round 5) puts a 2 m ramp at the front edge rising the last `landing` m to the top: a
+   * short jump meets an 11 deg incline instead of the box face (H2's box edges were 50 + 36 deaths
+   * for the good reflex player; with lips and 8 m platforms chain A clears in 1-14).
    */
-  platform(width: number, height: number, kicker: { length?: number; height?: number } = {}): this {
+  platform(width: number, height: number, kicker: { length?: number; height?: number; landing?: number; landingLength?: number } = {}): this {
     const kl = kicker.length ?? 1.5;
     const kh = kicker.height ?? 0.4;
-    return this.box({ width: width - kl, height }).ramp({ length: kl, height: kh, curve: 0.3 }, { base: height });
+    const lip = kicker.landing ?? 0;
+    if (lip > 0) {
+      const ll = kicker.landingLength ?? 2;
+      this.ramp({ length: ll, height: lip }, { base: height - lip });
+      this.box({ width: width - kl - ll, height });
+    } else {
+      this.box({ width: width - kl, height });
+    }
+    return this.ramp({ length: kl, height: kh, curve: 0.3 }, { base: height });
+  }
+
+  /**
+   * Gap landing that forgives the speed window (round 5): an up-ramp whose foot is at the far lip
+   * (a short jump meets a <= 10 deg incline, not a box face), a top and a long down-ramp. E2's
+   * 6 m gap onto a 1.0 m box was 16 deaths for the average reflex player; onto this shape 1,1,1.
+   */
+  gapLanding(height: number, top = 6, up = 8, down = 10): this {
+    return this.ramp({ length: up, height }).box({ width: top, height }).ramp({ length: down, height, direction: 'down' });
   }
 
   /**

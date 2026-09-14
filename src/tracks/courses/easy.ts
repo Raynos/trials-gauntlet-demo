@@ -86,12 +86,22 @@ export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .flat(12)
   .finish();
 
-/** E2 — TEACHES rear-wheel-first landings over gaps. DEMANDS two gaps in a row off a 6 m platform. */
+/**
+ * E2 — TEACHES rear-wheel-first landings over gaps. DEMANDS two gaps in a row off a kicker platform.
+ * Round 5 (reflex `average` 23/45/13 against band 3-5): 28 deaths at the far lip of the demand's
+ * second 6 m gap (a short 3 m platform after an uphill landing, then a 6 m gap onto flat: no speed),
+ * 16 at the 1.0 m box edge after the 6 m gap at 143 (under-speed hits the face, on-speed needs the
+ * rear-first landing the track is meant to teach), 12 at the demand's first box edge. Every gap now
+ * lands on an up-ramp whose foot is at the far lip (`gapLanding`: the rear-first landing IS an uphill
+ * landing; a short jump meets a 7-10 deg incline, not a face — reflex probe 1,1,1 against 1,5,14),
+ * the demand platform is 8 m behind a 5 m landing ramp and the second gap is 5 m (probe 1,2,1
+ * against 14,1,walled at 6 m), the hump rows are grounded `bumpRow`s >= 12 m past a landing.
+ */
 export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .meta({
     biome: 'canyon',
     technique: 'rear-wheel-first gap landing',
-    demands: 'gap onto a 6 m box, immediately a second gap from a ramp on the box',
+    demands: 'gap onto a landing ramp and an 8 m platform, immediately a second gap from a kicker on the platform',
     attemptsBand: [3, 5],
     targetTimeS: 65,
   })
@@ -109,128 +119,135 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .box({ width: 4, height: 1.0 })
   .ramp({ length: 4, height: 1.0, direction: 'down' })
   .camera({ mode: 'side' })
-  .flat(6)
-  .rollers(15, 0.3, 3)
+  .flat(12)
+  .rollers(20, 0.25, 3)
   .flat(4)
-  .humpRow(2, 0.3, 8)
+  .bumpRow(2, 0.3, 16)
   .flat(6)
-  .checkpoint() // ~115 m
-  .flat(3)
-  .flat(13) // run-up: ~11 m/s
+  .checkpoint() // ~125 m
+  .flat(16) // run-up: ~11 m/s
   .camera({ mode: 'high34' })
   .ramp({ length: 5, height: 1.5 }) // 16.7 deg; 6 m gap needs ~9 m/s
   .gap({ width: 6 })
-  .box({ width: 10, height: 1.0 }) // landing above the launch
-  .ramp({ length: 5, height: 1.0, direction: 'down' })
+  .gapLanding(1.0, 8, 8, 10) // was a 1.0 m box edge: 16 deaths; a 16 m/s launch lands on the top, 8 m/s on the ramp foot
   .camera({ mode: 'side' })
   .flat(12)
-  .wave(16, 1.5)
+  .wave(28, 1.5, 16)
   .flat(4)
   .smallGap(4, 1.0, 3)
-  .flat(10)
+  .flat(12)
   .smallGap(4, 1.0, 3)
   .flat(14) // >= 8 m past the landing zone before the checkpoint
-  .checkpoint() // ~215 m
-  .flat(3)
-  .flat(13)
+  .checkpoint() // ~245 m
+  .flat(16)
   .camera({ mode: 'high34' })
   .ramp({ length: 5, height: 1.2 })
   .gap({ width: 4 })
-  .box({ width: 8, height: 0.8 })
-  .ramp({ length: 4, height: 0.8, direction: 'down' })
+  .gapLanding(0.8, 6, 6, 8)
   .camera({ mode: 'side' })
-  .flat(6)
-  .rollers(15, 0.3, 3)
+  .flat(12)
+  .rollers(20, 0.25, 3)
   .flat(4)
   .tabletop(6, 8, 1.0)
-  .flat(6)
-  .wave(20, 2.0)
+  .flat(12)
+  .wave(28, 1.5, 16)
   .flat(4)
-  .humpRow(3, 0.3, 8)
+  .bumpRow(2, 0.3, 16)
   .flat(6)
-  .checkpoint() // ~350 m
-  .flat(3)
-  .flat(13)
+  .checkpoint() // ~390 m
+  .flat(16)
   .camera({ mode: 'high34' })
   .ramp({ length: 5, height: 1.5 }) // the demand
   .gap({ width: 5 })
-  .box({ width: 6, height: 0.6 }) // short platform: a nose-in here kills the speed for gap 2
+  .ramp({ length: 5, height: 0.6 }) // landing ramp onto the platform (was a 0.6 m box edge: 12 deaths)
+  .box({ width: 8, height: 0.6 }) // 8 m to settle and gas (was 6 with the kicker on it: 3 m of platform)
   .ramp({ length: 3, height: 1.0 }, { base: 0.6 })
-  .gap({ width: 6 })
+  .gap({ width: 5 }) // was 6 onto flat: 28 deaths short of the far lip
+  .gapLanding(1.0, 6, 8, 10)
   .camera({ mode: 'side' })
-  .flat(8)
-  .humpRow(2, 0.3, 8)
+  .flat(12)
+  .bumpRow(2, 0.3, 16)
   .flat(6)
-  .rollers(15, 0.3, 3)
+  .rollers(20, 0.25, 3)
   .flat(12)
   .finish();
 
-/** E3 — TEACHES stairs: throttle pulses up (front-wheel taps), braking down without a stoppie. DEMANDS 0.45 m steps then a descent into a 2 m gap. */
+/**
+ * E3 — TEACHES stairs: throttle up (the wheel bounces up each riser at speed), brake down without
+ * a stoppie. DEMANDS an 8-step flight up at speed and a 9-step descent into a 2 m gap. Round 5
+ * (reflex `average` 0 of 3, best 28 %: 95 stuck-restarts at the 6 x 0.4 m flight 2.5 m past
+ * checkpoint 1, 52 at the 5 x 0.3 flight 3 m past checkpoint 0): a riser >= 0.35 m reads as a face
+ * and a standing-start riser is not a novice technique (reflex probe: 0.25 / 0.3 risers from a
+ * 16 m run-up clear in 1-2, 0.35 and up are walled from any run-up). Every flight is now 0.25 m
+ * risers (6-seed probe: 0.25 / 0.5 flights 1,1,1,1,1,1, 0.3 / 0.45 up to 11 for a slow seed) with >= 15 m
+ * of run-up (the checkpoint rule counts stairs up as a speed obstacle), the
+ * first flight is 3 x 0.25, and the demand's descent is 8 x 0.25.
+ */
 export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .meta({
     biome: 'canyon',
-    technique: 'stairs: pulse up, brake down',
-    demands: '7 x 0.45 m steps up, 9 steps down ending at a 2 m gap',
+    technique: 'stairs: gas up, brake down',
+    demands: '8 x 0.25 m steps up at speed, 8 steps down ending at a 2 m gap',
     attemptsBand: [3, 6],
     targetTimeS: 70,
   })
   .camera({ mode: 'side' })
   .flat(20)
-  .rollers(15, 0.3, 3)
+  .rollers(20, 0.25, 3)
   .flat(6)
-  .checkpoint() // ~41 m
-  .flat(3)
+  .checkpoint() // ~46 m
+  .flat(16) // checkpoint rule: 15 m before a flight up
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 5, height: 0.3, length: 0.45 })
-  .box({ width: 6, height: 1.5 })
-  .stair({ count: 5, height: 0.3, length: 0.45, direction: 'down' })
-  .flat(6)
+  .stair({ count: 3, height: 0.25, length: 0.5 }) // the first flight: 0.75 m (was 5 x 0.3 from 3 m)
+  .box({ width: 6, height: 0.75 })
+  .stair({ count: 3, height: 0.25, length: 0.5, direction: 'down' })
+  .flat(12)
   .camera({ mode: 'side' })
-  .wave(16, 1.5)
+  .wave(28, 1.5, 16)
   .flat(4)
-  .humpRow(2, 0.3, 8)
+  .bumpRow(2, 0.3, 16)
   .flat(6)
-  .checkpoint() // ~105 m
-  .flat(3)
+  .checkpoint() // ~135 m
+  .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 6, height: 0.4, length: 0.45 }) // 42 deg envelope, 2.4 m
-  .box({ width: 4, height: 2.4 })
-  .stair({ count: 8, height: 0.3, length: 0.4, direction: 'down' })
+  .stair({ count: 6, height: 0.25, length: 0.5 }) // 26.6 deg, 1.5 m (was 6 x 0.4 from 3 m: 95 deaths; 6 x 0.3 from 16 m still 52 for a 215 ms player)
+  .box({ width: 4, height: 1.5 })
+  .stair({ count: 6, height: 0.25, length: 0.45, direction: 'down' })
   .barrel({ count: 2, spacing: 0.7, burning: false })
-  .flat(6)
+  .flat(12)
   .camera({ mode: 'side' })
   .tabletop(6, 8, 1.0)
   .flat(6)
-  .rollers(15, 0.3, 3)
+  .rollers(20, 0.25, 3)
   .flat(6)
-  .checkpoint() // ~175 m
-  .flat(3)
+  .checkpoint() // ~215 m
+  .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 4, height: 0.4, length: 0.45 }) // a short flight at speed
-  .box({ width: 6, height: 1.6 })
-  .stair({ count: 5, height: 0.32, length: 0.45, direction: 'down' })
-  .flat(6)
+  .stair({ count: 6, height: 0.25, length: 0.5 }) // a flight at speed
+  .box({ width: 6, height: 1.5 })
+  .stair({ count: 5, height: 0.3, length: 0.45, direction: 'down' })
+  .flat(12)
   .camera({ mode: 'side' })
-  .humpRow(3, 0.3, 8)
+  .bumpRow(3, 0.3, 16)
   .flat(4)
-  .wave(20, 2.0)
+  .wave(28, 1.5, 16)
   .flat(4)
-  .rollers(20, 0.3, 4)
+  .rollers(20, 0.25, 3)
   .flat(6)
-  .checkpoint() // ~275 m
-  .flat(3)
+  .checkpoint() // ~330 m
+  .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 7, height: 0.45, length: 0.4 }) // 48 deg envelope: a wheelie tap on every step
-  .box({ width: 3, height: 3.15 })
-  .stair({ count: 9, height: 0.35, length: 0.4, direction: 'down' })
+  .stair({ count: 8, height: 0.25, length: 0.5 }) // the demand: 2.0 m, eight risers at speed (was 7 x 0.45)
+  .box({ width: 3, height: 2.0 })
+  .stair({ count: 8, height: 0.25, length: 0.4, direction: 'down' })
   .flat(6) // checkpoint rule: the stair descent + 6 m is 15 m of effective run-up for the gap
   .gap({ width: 2 }) // brake on the stairs, release before the lip
   .camera({ mode: 'side' })
-  .flat(8)
-  .wave(16, 1.5)
+  .flat(12)
+  .wave(28, 1.5, 16)
   .flat(4)
   .tabletop(6, 8, 1.0)
   .flat(6)
-  .rollers(15, 0.3, 3)
+  .rollers(20, 0.25, 3)
   .flat(12)
   .finish();

@@ -3,80 +3,85 @@
   "kind": "track-reflex-metrics",
   "trackId": "e3-stairway",
   "tier": "easy",
-  "technique": "stairs: pulse up, brake down",
-  "updatedAt": "2026-09-14T13:17:47.499Z",
+  "technique": "stairs: gas up, brake down",
+  "updatedAt": "2026-09-14T14:01:13.468Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "e20969c7",
+  "srcFingerprint": "52950b2d",
   "attemptsBand": [
     3,
     6
   ],
-  "finishX": 366.15,
+  "finishX": 526.45,
   "bySkill": [
     {
       "skill": "average",
       "seeds": [
         3073702004,
-        3073702005,
-        3073702006
+        3073702005
       ],
       "attempts": [
-        51,
-        49,
-        50
+        3,
+        4
       ],
-      "medianAttempts": 50,
-      "clears": 0,
+      "medianAttempts": 3.5,
+      "clears": 2,
       "finishTimes": [
-        null,
-        null,
-        null
+        68.59166666666667,
+        73.85
       ],
-      "medianFinishTime": null,
-      "bestX": 102.04517501441804,
+      "medianFinishTime": 71.22083333333333,
+      "bestX": 531.0800328043899,
       "deaths": [
         {
-          "obstacle": "stair @ 100.5 m",
-          "x": 100.5,
-          "count": 95,
+          "obstacle": "stair @ 402.3 m",
+          "x": 402.25,
+          "count": 2,
           "reasons": {
-            "crash": 14,
-            "restart": 81
+            "crash": 1,
+            "restart": 1
           },
           "rules": {
-            "air-brake-nose-down": 4,
-            "stuck-restart": 48,
-            "nose-high": 9,
-            "climbing": 1,
-            "cruise": 25,
-            "air-gas-nose-up": 1,
-            "hop-snap": 4,
-            "hop-preload": 2,
-            "nose-low": 1
+            "air-brake-nose-down": 1,
+            "stuck-restart": 1
           }
         },
         {
-          "obstacle": "stair @ 44.0 m",
-          "x": 44,
-          "count": 52,
+          "obstacle": "ground @ 85 m",
+          "x": 85,
+          "count": 1,
           "reasons": {
-            "crash": 4,
-            "restart": 48
+            "crash": 1
           },
           "rules": {
-            "air-brake-nose-down": 2,
-            "nose-high": 3,
-            "nose-low": 1,
-            "climbing": 3,
-            "steep-ahead": 23,
-            "stuck-restart": 20
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "stair @ 164.2 m",
+          "x": 164.2,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "stair @ 171.2 m",
+          "x": 171.2,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
           }
         }
       ],
       "runs": [
-        "20260914-081746-50a524",
-        "20260914-081747-46206c",
-        "20260914-081747-8cc022"
+        "20260914-090113-415455",
+        "20260914-090113-9b377e"
       ]
     }
   ]

@@ -4,78 +4,106 @@
   "trackId": "x1-vertical-limit",
   "tier": "extreme",
   "technique": "near-vertical planks and pole-top hops",
-  "updatedAt": "2026-09-14T13:17:52.491Z",
+  "updatedAt": "2026-09-14T14:01:15.257Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "e20969c7",
+  "srcFingerprint": "52950b2d",
   "attemptsBand": [
     30,
     45
   ],
-  "finishX": 439.173772,
+  "finishX": 704.145108,
   "bySkill": [
     {
       "skill": "average",
       "seeds": [
         2756386537,
-        2756386538,
-        2756386539
+        2756386538
       ],
       "attempts": [
         43,
-        40,
-        41
+        40
       ],
-      "medianAttempts": 41,
+      "medianAttempts": 41.5,
       "clears": 0,
       "finishTimes": [
-        null,
         null,
         null
       ],
       "medianFinishTime": null,
-      "bestX": 48.2908234866976,
+      "bestX": 88.81837404019039,
       "deaths": [
         {
           "obstacle": "ramp @ 44.0 m",
           "x": 44,
-          "count": 91,
+          "count": 59,
           "reasons": {
-            "crash": 36,
-            "restart": 55
+            "restart": 42,
+            "crash": 17
           },
           "rules": {
-            "nose-high": 15,
-            "air-gas-nose-up": 7,
-            "air-brake-nose-down": 3,
-            "nose-low": 17,
-            "stuck-restart": 30,
-            "cruise": 12,
-            "steep-ahead": 6,
-            "climbing": 1
+            "stuck-restart": 22,
+            "air-brake-nose-down": 5,
+            "nose-high": 11,
+            "cruise": 9,
+            "steep-ahead": 3,
+            "nose-low": 5,
+            "air-gas-nose-up": 1,
+            "climbing": 1,
+            "air-level": 2
           }
         },
         {
           "obstacle": "plank @ 45.2 m",
           "x": 45.2,
-          "count": 30,
+          "count": 19,
           "reasons": {
-            "crash": 8,
-            "restart": 22
+            "crash": 11,
+            "restart": 8
           },
           "rules": {
-            "nose-high": 4,
-            "climbing": 3,
-            "stuck-restart": 15,
-            "hop-snap": 2,
-            "air-brake-nose-down": 4,
-            "air-level": 2
+            "nose-high": 5,
+            "air-brake-nose-down": 8,
+            "climbing": 1,
+            "stuck-restart": 5
+          }
+        },
+        {
+          "obstacle": "ramp @ 52.1 m",
+          "x": 52.094894,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 86.1 m",
+          "x": 86.094894,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "plank @ 87.3 m",
+          "x": 87.294894,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
           }
         }
       ],
       "runs": [
-        "20260914-081751-547c08",
-        "20260914-081752-b7e8a0",
-        "20260914-081752-0a764b"
+        "20260914-090114-dd9a25",
+        "20260914-090115-ae8ae9"
       ]
     }
   ]

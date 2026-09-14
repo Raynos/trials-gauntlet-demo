@@ -4,9 +4,9 @@
   "trackId": "b3-kicker-row",
   "tier": "beginner",
   "technique": "jump and level in the air",
-  "updatedAt": "2026-09-14T13:17:46.198Z",
+  "updatedAt": "2026-09-14T14:01:13.138Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "e20969c7",
+  "srcFingerprint": "52950b2d",
   "attemptsBand": [
     1,
     2
@@ -17,84 +17,36 @@
       "skill": "average",
       "seeds": [
         4115132233,
-        4115132234,
-        4115132235
+        4115132234
       ],
       "attempts": [
         2,
-        3,
-        3
+        2
       ],
-      "medianAttempts": 3,
-      "clears": 3,
+      "medianAttempts": 2,
+      "clears": 2,
       "finishTimes": [
-        57.875,
-        65.65833333333333,
-        65.86666666666666
+        58.075,
+        53.78333333333333
       ],
-      "medianFinishTime": 65.65833333333333,
-      "bestX": 431.1514426299041,
+      "medianFinishTime": 55.92916666666667,
+      "bestX": 430.09986994253336,
       "deaths": [
         {
-          "obstacle": "ramp @ 58.0 m",
-          "x": 58,
-          "count": 1,
+          "obstacle": "box @ 368.0 m",
+          "x": 368,
+          "count": 2,
           "reasons": {
-            "crash": 1
+            "hazard": 2
           },
           "rules": {
-            "air-brake-nose-down": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 75 m",
-          "x": 75,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "ramp @ 186.0 m",
-          "x": 186,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-high": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 195 m",
-          "x": 195,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 300 m",
-          "x": 300,
-          "count": 1,
-          "reasons": {
-            "hazard": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
+            "air-gas-nose-up": 2
           }
         }
       ],
       "runs": [
-        "20260914-081746-442314",
-        "20260914-081746-a32f10",
-        "20260914-081746-912d64"
+        "20260914-090113-9efe9f",
+        "20260914-090113-43b8ef"
       ]
     }
   ]

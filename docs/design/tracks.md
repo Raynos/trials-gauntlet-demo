@@ -1,6 +1,6 @@
 # Track system and curriculum
 
-Status: round 4 (authored to the stranger: checkpoint rule, no-launch beginner, E1 run-ups). Owner: tracks. Consumers: physics, render, audio, harness, game.
+Status: round 5 (authored to the reflex bot: forgiving landings, 0.25 m risers, staged hops, B lines on hard walls, momentum features under the checkpoint rule). Owner: tracks. Consumers: physics, render, audio, harness, game.
 `docs/design/CONTRACT.md` wins over this file; the executable form is `src/core/types.ts`
 (`TrackDef`, `TrackMeta`, `CameraKey`, `CompiledTrack`, `Collider`, `HazardZone`,
 `PlacedObstacle`) and `src/tracks/index.ts`. Metres, seconds, radians unless a param is
@@ -38,6 +38,8 @@ replaces the contract one:
 | rider pose lag | **0.28 s** t90 | a hint names the technique one obstacle early (the HUD shows hints in order) |
 | restart -> riding | one tick, one frame | every checkpoint has >= 3 m of flat run-in, and the **checkpoint rule** (round 4, `CHECKPOINT_RULE`, validated in `finish()` and the test suite): >= 15 m of flat-or-descending run-up from every spawn (start and checkpoints) to the first obstacle after it that needs speed (gap, free kicker >= 1 m, wall / ledge >= 0.6 m, burning barrels; a plank >= 45 deg on the ground needs 20 m; one stacked on a wall top is climbed from the top by design), descent credited at 2 m per metre dropped, a gap measured at the foot of the kicker that launches it, a gap <= 2 m straight off a ledge / box / drum top exempt (a standing hop), a pole-cap pit entered from a box top and the gap off the last cap exempt (X1: cap-to-cap hops at walking pace), a slot <= 1 m exempt (H1's wire is crossed front-up, not jumped), a lip wall exempt (the lip climb is a ~5 m/s technique: the skill-3 bot clears X1's 1.2 m lip wall + 56 deg plank from 3 m and stalls from 16 m); and no checkpoint within 8 m after a feature's landing zone (feature end + 6 m when it launches). Stranger round 1: 8 of 21 B3 deaths and 9 of 20 E1 deaths were at the first feature 3-4 m past a checkpoint |
 | crest launch (round 4) | a crest of radius R leaves the ground above sqrt(g R) | **B1 cannot launch at top speed (20 m/s)**: every rise and fall is a cosine whose crest radius >= v^2/g = 41 m (`FEEL.smoothLengthFor(dy, v)`: half-length >= pi v sqrt(dy / 2g), so a 1 m plateau rises over >= 14.2 m at 20 m/s, a 2 m wave is >= 40 m long); `plateau`, `descent`, `bumpRow` and `wave(..., v)` assert it; B3 / E1 waves are grounded at 16 m/s. Physics round 8 (flat-out lean 0 + full gas holds a 37 deg wheelie and reaches 18.5 m/s on B1): a 0.25 m convex `humpRow` noses the bike down at that speed, a cosine bump does not. B1 stranger deaths: the 8.5 deg tabletop lip at 16 m/s (a 7 m flight, nose-down at 199) and the 20 m x 2.0 m wave crest (radius 10 m, airborne above 10 m/s, 303) |
+| reflex player (round 5, harness-metrics.md "Round 5": a 200 ms, 25 Hz, binary-key player, the primary attempts instrument) | **measured with a scratch probe (one feature 16 m past a spawn, 3-6 seeds, `average` unless noted)**: the practised hop clears a 0.45-0.5 m ledge in 1-2, 0.55 in 2-14 with one wall, 0.6 and up walled for most seeds, a bare 0.9 walled for every skill; a step 0.45 + ledge 0.9 1-4, steps 0.3 / 0.6 / 0.9 1,1,2,1,1,1; stairs: 0.25 m risers at a 0.5 m run 1,1,1,1,1,1 (up to 8 steps), 0.3 risers up to 11 for a slow seed, >= 0.35 reads as a face and is walled; a gap onto a box edge 1,5,14, the same gap onto an up-ramp landing 1,1,1; a double gap needs an 8 m platform and a 5 m second gap (1,2,1; 6 m walled on one seed); a box drop onto a straight down-ramp 1,1,1 at 0.5 / 1.0 / 1.8 m, onto flat 1,2,4; a 22 deg fire kicker landing on flat 2 / walled / 4, onto an 8 x 2.0 ramp 1,1,1; lip walls 1.0 / 1.2 / 1.4 walled even for `good`, a 0.5 m step in front 2,2,2; planks (`good`) 50 deg 2,1,1, 55 2,6,6, 60 7,walled,7; a pole-cap row walled for every skill; `logStep` at 2r 2-row 1,1,1 / 3-row 2,2,5 (centre-height ramp 3,3,3 / walled); a see-saw then a 3 m gap onto a plank at 2.0 walled, a see-saw then 10 m then a 14 deg kicker onto a plank 1-2. Its one systematic weakness: nose-down in the air -> gas + lean back -> loop (`air-gas-nose-up`), so every landing shape is an incline it can meet nose-down | hop lessons <= 0.5, demands staged in <= 0.45 steps; risers 0.25 up; every gap lands on an up-ramp (`gapLanding`) or a lipped platform; every drop and fire line lands on a down-ramp; hard walls get a `steppedWall` B line; pole rows sit in the last third of their tracks |
+| checkpoint rule, round 5 | stairs up (`stairRiser` 0.25), log pyramids, shelf / sunk drums > 0.35 m proud and kill-slot rows are speed / momentum features (E3: 95 stuck-restarts at a flight 2.5 m past a checkpoint; M2: 38 at a pyramid and 21 at a shelf 3 m past one); `hopHeight` 0.45 (a 0.55 ledge 3 m past a checkpoint: 85 stuck-restarts, from 16 m: 5); a ledge / wall / drum / pyramid behind an adjacent step, ramp or gap chain is measured at the chain's foot, and a ledge's hop is its rise above the surface it is entered from; a slot row is exempt only within 3 m of a wall / ledge top (H1 / X3: lip climb straight into the rails) | every track passes `auditCheckpoints` (validated in `finish()` and the test suite) |
 
 Jump sizing uses `FEEL.jumpRange(v, angleDeg, drop)` (flat-landing ballistic range) at the
 margin speed for the run-up available: a 4 x 1.2 kicker (17 deg) at 9 m/s reaches ~5 m; a
@@ -128,7 +130,11 @@ ramp with `exit`), the measured box -> drum line (physics 12.3), replacing the r
 0.8 m fillet flush with the resting board end + see-saw; `platform(width, height)` = box
 whose last 1.5 m is a 0.4 m kicker on top (gap chains: a flat launch can never land level,
 so every platform launches at an angle); `steepPlank({angleDeg, rise})` = fillet + plank.
-Flow vocabulary (round 3, no new technique, keeps speed): `humpRow(count, h, pitch)`,
+Round 5 (authored to the reflex bot): `gapLanding(height, top, up, down)` = up-ramp whose foot is at
+the far lip + top + long down-ramp (every E2 / H2 / X3 gap lands on one); `platform(w, h, { landing,
+landingLength })` puts a landing lip (2-3 m ramp rising the last 0.4 m) at the platform's front
+edge; `steppedWall(wall, step)` = ramp in front leaving `step` m of wall (the B line; the lip stays
+for the A line); `logStep` ramps to the first log's top (3 x 2r, curve 0.3). Flow vocabulary (round 3, no new technique, keeps speed): `humpRow(count, h, pitch)`,
 `wave(length, dy)` = smooth rise and fall, `stepDowns(up, top, heights[])` = ramp onto a
 cascade of shelves each a drop, `smallGap(rampLen, rampH, gap)` = kicker + gap onto flat.
 Consecutive flats merge into one profile segment.
@@ -207,15 +213,16 @@ of the 20 m x 2.0 wave: "full throttle on the face pitched the bike nose-up and 
 the crest"); the 24 m start-line loop is physics'. The naive full-throttle controller
 (`trackSweep`) now rides 98 % of B1 without a fault. Target 1 attempt, 45 s.
 
-**B2 `b2-lean-back` Lean Back** — TEACHES weight shift on bumps and drops. Hints "Lean back
-over the bumps" / "Lean back off the drop" / "No brakes down the stairs" / "Lean back, gas
-off the big drop". 414 m, CP 41 / 190 / 289 / 353. Three sunk drums (0.3 m proud) and a hump
-(the round-2 bare logs needed a front lift, which is not a beginner input); ramp onto a
-0.5 m kerb (drop 0.5 onto a 5.7 deg downslope), 10 m to settle; ramp onto a 1.0 m box (drop
-1.0 onto a downslope); flow; ramp + box +
-4-step stair down, a wave, a 1.5/1.0/0.5 cascade of shelves; ramp + 1.0 box + 3 steps; flow;
-DEMANDS: 8 x 1.8 ramp onto a 10 m box with a 1.8 m drop onto a downslope (camera `low`).
-Target 1-2, 50 s.
+**B2 `b2-lean-back` Lean Back** — TEACHES weight shift on bumps and drops. Hints unchanged.
+592 m, CP 55 / 254 / 395 / 502. Round 5 (reflex `average` 4 / 8 / 5 against band 1-2; every death
+at 6-9 m/s with the bike fully flipped: the convex hump row right after 5 m-pitch rollers at 123
+x3, the 7 deg ramp onto the first kerb x2, a loop on the 14 deg cascade ramp, the 12.7 deg set-piece
+ramp from a standing start, rollers 8 m after the 1.8 m drop): two sunk drums 8 m apart and a
+grounded bump; every up-ramp <= 6 deg (8 x 0.5, 10 x 1.0, 12 x 1.2, 15 x 1.5, 18 x 1.8); every drop
+(0.5 kerb, 1.0 box, 4- and 3-step stairs, the 1.5/1.0/0.5 cascade, the 1.8 set piece) lands on a
+straight down-ramp of ~8 x height (reflex probe: box -> down-ramp 1,1,1 at 0.5 / 1.0 / 1.8 m against
+1,2,4 onto flat); flow is B1's (6.7 m-pitch 0.25 rollers, `bumpRow`, waves grounded at 16 m/s) and no
+rise starts within 12 m of a drop exit. Reflex `average` 1 / 2 / 2, `novice` 4 / 2 / 7. Target 1-2, 50 s.
 
 **B3 `b3-kicker-row` Kicker Row** — TEACHES the jump: gas to the ramp, off the gas at the
 lip, lean forward to level, land rear first. Hints "Gas to the ramp, off at the lip" / "Lean
@@ -250,104 +257,145 @@ launch landed nose-down at the pipe's foot), 1 at the -40 deg plank's foot (306)
 stairs, the quarter-pipes, the plank descent.** Target 2-4, 60 s.
 
 **E2 `e2-rear-wheel-first` Rear Wheel First** — TEACHES rear-wheel-first gap landings.
-468 m, CP 24 / 122 / 234 / 375 (round 4: 16 m of flat after every checkpoint, 14 m after the second small gap). 4 x 0.8 ramp / 3 m gap; 5 x 1.2 / 4 m gap onto an uphill
-landing ramp; rollers + hump row; 12 m run-up, 5 x 1.5 / 6 m gap onto a 1.0 m box; wave, two
-3 m small gaps; 5 x 1.2 / 4 m gap onto a 0.8 box, rollers, tabletop, 2 m wave, humps; DEMANDS: 5 x 1.5 / 5 m
-gap onto a 6 m x 0.6 box carrying a 3 x 1.0 ramp straight into a 6 m gap; flow home.
+617 m, CP 24 / 149 / 286 / 468. Round 5 (reflex `average` 23 / 45 / 13 against band 3-5: 28 deaths at
+the far lip of the demand's second 6 m gap, 16 at the 1.0 m box edge after the 6 m gap, 12 at the
+demand's 0.6 m box edge): every gap lands on an up-ramp whose foot is at the far lip (`gapLanding`;
+the rear-first landing IS an uphill landing, and a short jump meets a 7-10 deg incline instead of a
+face — probe 1,1,1 against 1,5,14 onto a box), the demand platform is 8 m behind a 5 x 0.6 landing
+ramp and its second gap is 5 m onto a `gapLanding` (probe 1,2,1 against 14 / 1 / walled at 6 m onto
+flat). 4 x 0.8 / 3 m; 5 x 1.2 / 4 m onto a 6 x 1.0 ramp; 5 x 1.5 / 6 m onto `gapLanding` 1.0; two
+3 m small gaps; 5 x 1.2 / 4 m onto `gapLanding` 0.8; tabletop, waves; DEMANDS 5 x 1.5 / 5 m /
+landing ramp + 8 m platform / 3 x 1.0 kicker / 5 m / `gapLanding` 1.0. Reflex `average` 3 / 5 / 1.
 Target 3-5, 65 s.
 
-**E3 `e3-stairway` Stairway** — TEACHES stairs: throttle pulses up, brake down without a
-stoppie. 366 m, CP 41 / 98 / 169 / 261 (round 4: 6 m of flat between the demand's stair descent and its gap). 5 x (0.30/0.45) up, box, 5 down; wave + humps;
-6 x (0.40/0.45) up, 8 down past unlit barrels; tabletop, rollers; 4 x 0.4 up, 5 down at speed;
-hump row, 2 m wave, rollers; DEMANDS: 7 x (0.45/0.40) up (48 deg envelope), 9 x (0.35/0.40)
-down into a 2 m gap; wave, tabletop, rollers home. Target 3-6, 70 s.
+**E3 `e3-stairway` Stairway** — TEACHES stairs: gas up (the wheel bounces up each riser at
+speed), brake down without a stoppie. 524 m, CP 46 / 148 / 242 / 385. Round 5 (reflex `average` 0 of
+3 at 28 %: 95 stuck-restarts at 6 x 0.4 risers 2.5 m past a checkpoint, 52 at 5 x 0.3 risers 3 m
+past one; probe: a 0.35 m riser reads as a face and is walled from any run-up, 0.3 risers from 16 m
+clear for most seeds but a 215 ms player still stalls (up to 11), 0.25 risers at a 0.5 m run clear
+1,1,1,1,1,1): every flight up is 0.25 m risers at a 0.5 m run (26.6 deg) with 16 m of run-up (the
+checkpoint rule now counts a flight up as a speed obstacle, `stairRiser` 0.25): 3 x 0.25, 6 x 0.25,
+6 x 0.25, DEMANDS 8 x 0.25 up at speed and 8 x 0.25 down into the 2 m gap. Reflex `average`
+3 / 4 / 9. Target 3-6, 70 s.
 
 ### Medium
 
-**M1 `m1-hop-up` Hop Up** — TEACHES the bunny hop onto ledges (preload lean back +
-throttle, snap forward; there is no hop button). 361 m, CP 18 / 84 / 207 / 269 (round 4: 16 m run-ups to the 0.7 and 0.9 m ledges). Kerbs 0.45,
-0.5 (stationary apex 0.62); rollers, wave; 0.55, a 0.55 kerb into a 1.5 m gap; hump row,
-tabletop, 2 m wave, rollers; 6 m run-up, 0.7 m kerb (the rolling hop at a rideable height), 0.6 kerb into a 2 m
-gap; rollers; DEMANDS: 10 m run-up, 0.9 m ledge (the rolling-hop envelope: a 1.45 m rear
-lift), 2 m hop across to a 0.9 m box (camera `side-tight` cut); 12 m to land, humps, 2 m wave
-home. Target 5-9,
-80 s.
+**M1 `m1-hop-up` Hop Up** — TEACHES the bunny hop onto ledges. 439 m, CP 41 / 120 / 255 / 340.
+Round 5 (reflex `average` 0 of 3 at 79 %: 67 stuck-restarts at the 0.7 m ledge, 35 at the 0.9; 6-seed
+probe from 16 m: 0.45-0.5 clear in 1-2, 0.55 in 2-14 with one wall, 0.6 and up walled for most seeds,
+a bare 0.9 walled for every skill, 0.45 step + 0.9 ledge 1-4, steps 0.3 / 0.6 / 0.9 1,1,2,1,1,1; a
+hop-up 1.5 m before a hop-across was 17 + 8 deaths): eight hops, every ledge >= 0.45 with 16 m of
+run-up (`hopHeight` 0.45, the first one 21 m from the start line): 0.45; 0.5 (4 m) then a 1.5 m hop
+across; a 0.45 + 0.45 two-stage to 0.9; 0.5 (4 m) then a 2 m hop across; DEMANDS the 0.9 m rise as
+0.3 / 0.6 / 0.9 steps 4 m apart (hop the 0.6 rolling, or three 0.3s — a bare 0.9 m ledge has no line
+for a player whose practised hop is 0.5) then the 2 m hop across to the 0.9 box. Reflex `average`
+8 / 14 / 22 (6 seeds: median 13.5, the 1.5 x band edge). Target 5-9, 80 s.
 
-**M2 `m2-drum-roll` Drum Roll** — TEACHES logs and drums: lean back over half-buried logs,
-roll a big drum from its shelf, balance on a spinning one. Hints "Lean back over the logs" /
-"Roll the drum from the shelf" / "Gas off on the spinning drum" (the HUD shows hints for
-beginner only today; see open items). 353 m, CP 24 / 120 / 193 / 281. Sunk 0.5 drum (0.3
-proud), sunk 0.8 drum (0.5 proud), two half-buried logs, a touching half-buried pair;
-rollers, 2 m wave, humps; 2-row log pyramid behind a 0.3 m entry ramp (`logStep`),
-`drumStep` 0.6 with exit shelf; hump row, wave; `drumStep` 0.8 / 2 m gap / 0.8 drum (drum
-top to drum top), `drumStep` spinning 0.8 with exit; tabletop, rollers; DEMANDS: ramp to a
-1.2 m box -> spinning 0.8 drum (top 1.6) -> box, 3-row log pyramid (`logStep`), see-saw exit;
-12 m, wave home. Target 6-12, 85 s.
+**M2 `m2-drum-roll` Drum Roll** — TEACHES logs and drums. 488 m, CP 24 / 155 / 279 / 385. Round 5
+(reflex `average` 47 / 9 / 37: 38 stuck-restarts at the log pyramid 3 m past checkpoint 1, 21 at the
+demand's ramp 3 m past checkpoint 3): pyramids, shelf drums and the 0.5 m-proud drum are momentum
+features under the checkpoint rule (16 m from every spawn); `logStep` ramps to the first log's TOP
+(3 x 2r, curve 0.3) so the upper rows are 0.22-0.52 m bumps (probe: 2-row 1,1,1, 3-row 2,2,5 against
+3,3,3 / walled from the centre-height ramp). Obstacles otherwise as round 4. Reflex `average`
+10 / 3 / 7. Target 6-12, 85 s.
 
-**M3 `m3-see-saw` See-Saw** — TEACHES see-saw timing and thin landings. 396 m,
-CP 28 / 145 / 238 / 313 (round 4: 15-16 m from every checkpoint to its kicker). Filleted see-saws 6/0.8 and 8/1.2 (camera `low`); rollers, humps,
-2 m wave, rollers;
-see-saw 6/1.5, ramp / 3 m gap / 4 m plank at 1.5 / ramp down; wave, tabletop; ramp / 3 m gap /
-plank at 1.0, see-saw 8/1.5; rollers; DEMANDS: ramp / 3 m gap landing on the resting end of a
-see-saw 8/2.0, 3 m gap to a 3 m plank at 2.0, 2.5 m gap to a 2.0 m box, curved roll-out; humps
-home. Target 8-12, 90 s.
+**M3 `m3-see-saw` See-Saw** — TEACHES see-saw timing and thin landings. 482 m, CP 28 / 174 / 288 /
+363. Round 5 (reflex `average` 40 / 2 / 45: 24 deaths on the demand's see-saw, 19 + 15 at the 20 deg
+kicker / plank 3 m after the 6/1.5 board; probe: the old demand — a 3 m gap off the tipping board onto
+a plank at 2.0 — walled 99 x 3): a board leaves ~5 m/s, so every kicker after one has 10 m to build
+speed; thin landings are 4-5 m planks at 1.0-1.5 from <= 17 deg kickers (8-12 m/s window, probe
+1-2); DEMANDS 4 x 1.0 / 3 m gap onto the resting end of the 8/2.0 see-saw (it dips, you roll up, it
+tips), 10 m, 5 x 1.5 kicker / 3 m / 4 m plank at 1.5 / 2.5 m / 1.5 box. Reflex `average` 4 / 11 / 8.
+Target 8-12, 90 s.
 
 ### Hard
 
-**H1 `h1-wheelie-wire` Wheelie Wire** — TEACHES sustained wheelie / rear-wheel balance
-across slotted rails (0.7 m kill pits a grounded front wheel drops into) and the lip climb.
-482 m, CP 28 / 122 / 267 / 353 / 416 (round 4: 15 m run-up to every wall and to the long wire). Rollers with the front down; 8 slots at 2.5 m; wave +
-humps; 5 m run-up, wall 1.0 with lip -> 6 slots at 3.0; rollers, tabletop, 2 m wave, humps;
-wall 1.2 -> 6 slots
-at 2.5; 2 m wave, humps; the long wire: 10 slots at 2.0; rollers; DEMANDS: 6 m run-up, wall
-1.4 with a 0.2 lip straight into 5 slots at 2.0 and a 3 m gap from the rear wheel (camera
-`low` cut); humps home. Target 10-18, 110 s.
+**H1 `h1-wheelie-wire` Wheelie Wire** — TEACHES the sustained wheelie across slotted rails and
+the lip climb. 597 m, CP 28 / 157 / 328 / 442 / 510. Round 5 (reflex `average` 0 of 3 at 29 %: 137
+identical stuck-restarts at the 1.0 m lip wall — a wall of one death means the feature has no
+fallback line; probe: lip walls 1.0 / 1.2 / 1.4 walled even for `good`, a 0.5 m step in front 2,2,2):
+every wall is a `steppedWall` — the lip stays for the A line (front wheel onto the lip at speed, hop
+the rear) and a ramp in front leaves a 0.5 m hop from its top as the slower B line; slot rows start
+<= 3 m after each wall (the checkpoint rule now counts a kill-slot row as a hazard wanting the run-up
+unless it is entered off a wall top). Reflex `good` 41 / 41 / 5 (one clear, best 100 %); `average`
+best 92 %: the stepped 1.0 wall still takes 47 + 28 deaths (the reflex hop from a ramp top is its
+weakest hop). Target 10-18, 110 s.
 
-**H2 `h2-gap-chain` Gap Chain** — TEACHES precision gaps with speed control on kicker
-platforms (camera `high34`). 495 m, CP 28 / 173 / 308 / 396 (round 4: 15 m run-up into every chain). Chain A: gaps 4/3/5/2 onto
-5-4.5-5 m platforms; rollers, wave, humps, 2 m wave; chain B: gaps 4/3/4/2/3 with platforms stepping up 0.3 m
-each (rear first mandatory), curved roll-out; humps, tabletop; chain D: gaps 5/4/5 on 5 m
-platforms at 1.2, fast and wide; rollers; DEMANDS chain C: gaps 4/5/3/4/2 on 3.5 m platforms,
-then a 5 m gap onto a see-saw and a 3 m gap off it; humps home. Target 14-22, 120 s.
+**H2 `h2-gap-chain` Gap Chain** — TEACHES precision gaps on kicker platforms. 634 m, CP 28 / 233 /
+405 / 510. Round 5 (reflex `average` capped at 44 %: 50 + 36 deaths at chain A's first two box edges;
+`good` probe: chain A as authored walled, 8 m platforms with landing lips 1,14,8, chain B with lips
+11-15): every platform has a landing lip at its front edge (`platform` with `landing` /
+`landingLength`: a short jump meets a 6-11 deg incline, not a face); chain A 8 m platforms, 3 m
+lips, gaps 3 / 3 / 3 / 2; chain B 7 m platforms stepping up 0.3 with 3 m lips; chain D 6 m platforms,
+gaps 5 / 4 / 5 onto a `gapLanding`; DEMANDS chain C: 5.5 m platforms with 2 m lips, gaps 4 / 4 / 3 /
+4 / 2 / 4, a see-saw and a 3 m gap. Reflex `good` best 71 % (walled at chain B's 3rd lip and chain D
+by the air rule: nose-down in the air -> gas + lean back -> loop). Target 14-22, 120 s.
 
-**H3 `h3-fire-line` Fire Line** — TEACHES speed commitment (clear a row of burning
-barrels from a 2.0 m kicker: any body part through the fire is a hazard fault) and the hard
-stop after. 473 m, CP 28 / 172 / 286 / 376 (round 4: 8 m past each tabletop before the checkpoint). 20 m run-up, kicker over 4 barrels; rollers,
-humps, 2 m wave, tabletop; 20 m run-up, kicker over 6 barrels onto a landing ramp, 8 m brake zone, 0.7 m kerb
-hop; wave, tabletop; kicker over 5 barrels, brake, hump, 0.5 kerb (the stop-and-hop at half
-stakes); rollers; DEMANDS: 20 m run-up, kicker over a 2 m gap AND 6 barrels, landing ramp,
-brake to walking pace, 0.3 hump, 2 m low-speed hop gap, 0.7 kerb; humps home. Target 18-25,
-125 s.
+**H3 `h3-fire-line` Fire Line** — TEACHES speed commitment over burning barrels, then the hard
+stop. 553 m, CP 28 / 201 / 333 / 432. Round 5 (reflex `average` capped 51 x 3: 84 deaths landing
+past the first barrel row on flat ground, 15 at the demand's 18 deg landing ramp; `good` probe:
+kicker + 4 barrels onto flat 2 / walled / 4, onto an 8 x 2.0 landing ramp 2 m past the barrels
+1,1,1; then 111 hazard deaths at the demand's "2 m gap + 6 barrels" = 6.6 m of fire from a 23 m
+run-up at ~11 m/s, with or without the pit): every fire line lands on a 14 deg ramp whose top is 2 m
+past the last barrel; rows 4 / 6 / 5 / 6 barrels (the gap is gone: the demand is the stop after the
+fire — brake zone, hump, 2 m low-speed hop, 0.5 + 0.7 stepped kerb); kerbs 0.5. Reflex `average`
+13 / 5 / 31, `good` 19 / 11 / 17. Target 18-25, 125 s.
 
 ### Extreme
 
-**X1 `x1-vertical-limit` Vertical Limit** — TEACHES near-vertical planks (hang over the
-bars, tap throttle) and pole-top rear-wheel hops. 439 m, CP 24 / 170 / 288 / 360 (round 4: 20 m before each steep plank, 15 m before the pole pit; the lip climb keeps its 3 m run-in, see the checkpoint rule). All planks
-filleted. Planks 50 and 55 deg onto boxes; rollers, wave, humps, 2 m wave; poles 1.2 -> 2.4 at 1.8 m pitch;
-plank 58 deg onto a 3.6 box; humps, tabletop; wall 1.2 + plank 56 deg from its top, poles
-descending 4.4 -> 2.0; rollers, wave; DEMANDS: 8 m run-in, plank 60 deg (rise 4.5), three
-pole caps at 4.5, 4 m gap onto a 3 m plank at -30 deg; humps home. Target 30-45, 140 s.
+**X1 `x1-vertical-limit` Vertical Limit** — TEACHES near-vertical planks and pole-top hops. 704 m,
+CP 24 / 232 / 369 / 477 / 608. Round 5 (reflex 0 of 3 at 11-13 %: 91 + 30 deaths at the 50 deg plank;
+probe `good`: planks 50 / 55 / 60 deg 2,1,1 / 2,6,6 / 7,walled,7, a pole-cap row walled for every
+skill — the cap hop is the one technique with no slower line): planks 50 -> 55 -> 55 -> lip wall +
+56 -> 60 with 20-24 m down-ramps (was a -40 deg plank) and flow between; both pole rows sit in the
+last third after the 60 deg plank (1.2 -> 1.8 over a kill pit, then three caps at 2.0 from a 2.0 box
+with a 4 m gap onto a -30 deg plank). Reflex `good` still 13 %: the 50 deg fillet 20 m past the
+first checkpoint is a stuck-restart wall for this player (67 + 43) even though the same plank
+cleared in the probe from a longer first run-up; open. Target 30-45, 140 s.
 
-**X2 `x2-pipe-dream` Pipe Dream** — TEACHES spinning drums as slippery platforms with
-gaps and see-saw drops. 367 m, CP 24 / 141 / 237 / 292 (round 4: every drum-top gap is 2 m, the 4 m gap launches from a 15 m platform, 15 m before the kerb). `drumStep` spinning 0.8 / 3 m gap /
-box (the round-2 first obstacle was a bare 1.6 m drum behind a 0.5 m kicker: unrideable by
-geometry); log pyramid (`logStep`); `drumStep` spinning 0.8 with exit; rollers, 2 m wave,
-humps; see-saw 8/2.0, 2 m,
-`drumStep` 1.0 (shelf 1.4), pole 1.5, 1.8 box with a kicker, 4 m gap onto a spinning 1.0;
-humps, wave; the pipe run: `drumStep` spinning 0.9 then four 0.9 spinning drums with 1.5 m
-gaps (camera `high34`); rollers; DEMANDS: see-saw 8/2.0, `drumStep` spinning 1.0, 2 m gap
-onto a spinning 0.8, 2.5 m gap off it, 0.7 kerb (3 m / 4 m gaps were a 34-attempt wall: a
-spinning top cannot be pumped and the see-saw leaves ~5 m/s); humps home. Target 40-60, 150 s.
+**X2 `x2-pipe-dream` Pipe Dream** — TEACHES spinning drums with gaps and see-saw drops. 515 m,
+CP 24 / 195 / 339 / 407. Round 5 (reflex 0 of 3 at 31 %: 107 nose-high deaths at the 3-row pyramid
+behind a centre-height ramp, 10 at the first drum-top gap 3 m past the start): `logStep` 2r, 16 m
+from every checkpoint to its shelf drum, the 1.5 m pole between the 2.0 m drum and the 15 m platform
+is gone (the drum top steps 0.2 m down onto the box), the closing kerb 0.5. Reflex `good` best 72 %
+(the pipe run's drum-top gaps: air rule). Target 40-60, 150 s.
 
-**X3 `x3-gauntlet` The Gauntlet** — DEMANDS everything in curriculum order, no teaching
-zone. 596 m, CP 28 / 145 / 224 / 295 / 370 / 439 / 522 (round 4: 15 / 20 m run-ups, 14 m past every landing before a checkpoint, drum-top gaps 2 m). B3 kicker gap, rollers, E1 48 deg
-plank, E2 double gap | E3 stairs into a gap, M1 0.55 kerb hop + gap, M2 `drumStep` spinning
-drum, wave | M3 see-saw landing + plank, H1 lip climb + 4 slots | H2 four-gap chain on 3.5 m
-platforms, humps | H3 fire over a gap + brake + kerb | X1 60 deg plank + three 4.5 poles, X2
-see-saw -> `drumStep` spinning 1.0 -> 2 m gap -> spinning 0.8 -> 2.5 m gap | finale (unseen):
-6 x 2.5 kicker over a 6 m gap landing on a see-saw 8/1.0 at ~12 m/s, `drumStep` spinning 1.0,
-2 m gap onto three pole caps at 1.8 (0.2 under the drum top), 3 m gap onto a 4 m plank at
--25 deg. Target 60-80, 200 s.
+**X3 `x3-gauntlet` The Gauntlet** — DEMANDS everything in curriculum order. 773 m, CP 28 / 209 / 328
+/ 431 / 535 / 606 / 699. Round 5: every section carries its parent's round-5 shape (E2 `gapLanding`
+double, E3 8 x 0.25 stairs, M1 hop + 16 m to the shelf drum, M3 see-saw landing then the 1.0 plank
+shape, H1 `steppedWall` 1.4 + rails, H2 lipped 5.5 m chain, H3 6 barrels onto a landing ramp, X1 60
+deg plank + caps, X2 chain, finale). Reflex `good` best 63 % (walled at the H2 chain, 464 m).
+Target 60-80, 200 s.
+
+### Round 5 acceptance matrix (reflex bot, physics b426bcc + 42af392, 3 seeds, cap 50 attempts / 300 s; search bot skill 3)
+
+Acceptance per tier: beginner / easy — reflex `average` median inside `attemptsBand` (beginner also
+`novice` <= 2 x band top); medium — `average` <= 1.5 x band top; hard / extreme — search bot clears at
+skill 3 AND reflex `good` reaches >= 60 % of finishX. Attempts are per seed; "best" is the furthest
+x reached as a fraction of finishX.
+
+| track | band | reflex novice | reflex average | reflex good | search bot skill 3 | verdict |
+|---|---|---|---|---|---|---|
+| b1-first-ride | 1-1 | 1, 1, 4 -> 1 | 1, 1, 1 -> **1** | 1, 1, 1 | (round 4: 1, 1 at skill 1) | pass |
+| b2-lean-back | 1-2 | 4, 2, 7 -> 4 | 1, 2, 2 -> **2** | 1, 3, 2 | — | pass (novice 4 = 2 x band) |
+| b3-kicker-row | 1-2 | 11, 11, 1 -> 11 | 2, 2, 3 -> **2** | 2, 1, 1 | — | pass average; **novice 11 > 4** (box @ 368 after the demand gap, air-gas-nose-up; unchanged this round) |
+| e1-uphill-weight | 2-4 | 7, 10, 3 -> 7 | 1, 1, 2 -> **1** | 5, 1, 1 | — | pass (under band) |
+| e2-rear-wheel-first | 3-5 | 10, 33, 11 -> 11 | 3, 5, 1 -> **3** | 3, 2, 7 | — | pass |
+| e3-stairway | 3-6 | 22, 8, 16 -> 16 | 3, 4, 9 -> **4** | 8, 14, 6 | — | pass |
+| m1-hop-up | 5-9 | 2, 24, 23 -> 23 | 8, 14, 22 -> **14** (6 seeds 13.5) | 4, 3, 9 | — | at the edge (<= 13.5) |
+| m2-drum-roll | 6-12 | 10, 16, 15 -> 15 | 10, 3, 7 -> **7** | 7, 15, 11 | — | pass |
+| m3-see-saw | 8-12 | 15, 28, 14 -> 15 | 4, 11, 8 -> **8** | 4, 7, 4 | — | pass |
+| h1-wheelie-wire | 10-18 | 37, 35, 28 (1 clear) | 38, 42, 41 (best 92 %) | 41, 41, 5 (1 clear, **best 100 %**) | 1 attempt, 91 % at the 180 s wall (6 bots in parallel) | good >= 60 % pass; bot see below |
+| h2-gap-chain | 14-22 | 43, 43, 44 (47 %) | 48, 46, 45 (69 %) | 50, 49, 51 (**best 71 %**) | 1 attempt, 89 % at the 180 s wall | good >= 60 % pass; bot see below |
+| h3-fire-line | 18-25 | 45, 46, 41 (85 %) | 13, 5, 31 -> **13** | 19, 11, 17 -> **17** | **1 attempt, finished 35.0 s** | pass |
+| x1-vertical-limit | 30-45 | 41 x3 (36 %) | 43, 40, 42 (13 %) | 41, 40, 39 (**13 %**) | 2 attempts, 73 % at the 180 s wall | **fail** (good 13 %: the 50 deg fillet) |
+| x2-pipe-dream | 40-60 | 36, 28, 51 (72 %) | 51, 46, 48 (72 %) | 51, 35, 31 (**best 72 %**) | **2 attempts, finished 40.1 s** | pass |
+| x3-gauntlet | 60-80 | 31, 23, 25 (22 %) | 38, 28, 25 (62 %) | 47, 40, 27 (**best 63 %**) | 2 attempts, 64 % at the 180 s wall | good >= 60 % pass; bot see below |
+
+Search-bot note: the 180 s wall was run with all six bots in parallel on one machine (47-58 M
+ticks each in 180 s); the tracks are now 550-770 m, so h1 / h2 / x1 / x3 hit the wall on their first
+attempt at 64-91 %. A sequential run at a 420 s wall is recorded in the round-5 report; the
+round-4 table below (180 s, single process, 360-600 m tracks) is the last full bot sweep.
 
 ### Curriculum summary (round 4 sweep; physics 2df0b0d, tier skill, 2 seeds, wall 180 s, browser-verified after `--build`)
 
@@ -438,6 +486,21 @@ the thresholds and the ship gate are all owned by harness and specified in
   (a flat-out 20 m/s rider crashes at any steep plank foot) — the 20 m flat after checkpoint 3
   is its brake zone; B2's first `bumpDrum` endos a constant-lean full-throttle rider at 12 m/s
   (`trackSweep`). Next: stranger round 2 on b1 / b3 / e1.
-- **Round 5** — hard/extreme bot-clean times are still under the 90-150 s corpus band: another
+- **Round 5 (done)** — authored to the reflex bot (harness-metrics.md "Round 5": `average` was walled
+  on e3 / m1 / m3 / h1 / h2 / h3 / x1 / x2 / x3 and 4-8x over band on b2 / e2). Every death cluster
+  in `reflex.md` was reproduced with a one-feature probe and re-authored to the shape that probe
+  cleared: grounded flow and <= 6 deg ramps with down-ramp drop landings (B2), `gapLanding` up-ramp
+  landings and an 8 m double-gap platform (E2), 0.25 m risers with 16 m run-ups (E3), staged hops
+  and hops separated from hop-acrosses (M1), 16 m to every momentum feature and `logStep` at 2r
+  (M2), 10 m after every see-saw and 1.0-1.5 planks (M3), `steppedWall` B lines (H1), lipped
+  platforms (H2), landing ramps after every fire row and a 6-barrel demand (H3), pole rows moved
+  into the last third (X1), the drum -> pole -> box cap hop removed (X2), all of it in X3. The
+  checkpoint rule covers stairs, pyramids, drums, slots and 0.45 m ledges. Matrix above. Open: x1
+  (the 50 deg fillet 20 m past a checkpoint is a stuck-restart wall for the reflex player although
+  the probe clears it from a longer first run-up — a shallower first plank or a longer run-in),
+  m1 at the 1.5 x edge, b3 `novice` 11 at the demand's 16 m box, h2 / x3 `good` stop at the lipped
+  chains on the air rule (nose-down -> gas + back -> loop; physics' next air-lean round should move
+  this), the search bot needs a longer wall than 180 s for 600-770 m tracks.
+- **Round 6** — hard/extreme bot-clean times are still under the 90-150 s corpus band: another
   flow pass or a second set piece per hard track once render confirms the triangle budget at
   400-600 m.
