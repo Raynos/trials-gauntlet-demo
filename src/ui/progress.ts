@@ -17,10 +17,19 @@ export const TIER_BLURB: Record<TrackTier, string> = {
 
 export type MedalOf = (trackId: string) => Medal | null;
 
-/** Authored tracks only, tier order, stable within a tier. */
+/** Lab tracks (`lab-*`, src/tracks `isLabTrackId`): listed last under "Lab", outside progression, medals and the career line. */
+export function isLabTrack(t: TrackDef): boolean {
+  return t.id.startsWith('lab-');
+}
+
+export function labTracks(tracks: readonly TrackDef[]): TrackDef[] {
+  return tracks.filter(isLabTrack);
+}
+
+/** Authored tracks only (no lab tracks), tier order, stable within a tier. */
 export function shipTracks(tracks: readonly TrackDef[], includeTest = false): TrackDef[] {
   return tracks
-    .filter((t) => includeTest || !t.id.endsWith('-test'))
+    .filter((t) => !isLabTrack(t) && (includeTest || !t.id.endsWith('-test')))
     .slice()
     .sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier) || Number(a.id.endsWith('-test')) - Number(b.id.endsWith('-test')));
 }

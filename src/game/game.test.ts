@@ -440,3 +440,195 @@ describe('PB ghost and splits', () => {
     expect(hashPhysicsState(b.ghostState()!)).toBe(ghostAt350);
   });
 });
+
+describe('replay viewer playback (docs/design/game.md §16)', () => {
+  class MemStore {
+    rec: { time: number; faults: number; splits?: number[]; recording?: string } | null = null;
+    get(): { time: number; faults: number; splits?: number[]; recording?: string } | null {
+      return this.rec;
+    }
+    put(_id: string, r: { time: number; faults: number }, run: { splits: number[]; recording: string | null }): void {
+      this.rec = { time: r.time, faults: r.faults, splits: run.splits, ...(run.recording ? { recording: run.recording } : {}) };
+    }
+  }
+  const makeGame = (store: MemStore): Game =>
+    new Game({ physics: new MockPhysics(120), renderer: new StubRenderer(), autoSkipCountdown: true, autoRecord: true, physicsFactory: (hz) => new MockPhysics(hz), bestTimes: store });
+
+  /** A run with a restart tap and a crash (auto-respawn) so the replay has every rule to reproduce. */
+  const ride = (g: Game, hashes?: Map<number, string>): void => {
+    const script: Array<[number, Partial<InputFrame>]> = [
+      [400, { throttle: 1 }],
+      [1, { throttle: 1, restart: true }],
+      [150, { throttle: 1 }],
+      [300, { throttle: 1, lean: -1 }],
+      [4000, { throttle: 1 }],
+    ];
+    let t = 0;
+    for (const [n, f] of script) {
+      g.setInput(f);
+      for (let i = 0; i < n && g.phase() !== 'finished'; i++) {
+        g.step(1);
+        t++;
+        if (hashes && t % 100 === 0) hashes.set(t, g.hashState());
+      }
+    }
+  };
+
+  it('every finished run is kept as the last run (PB or not) with its time and faults', () => {
+    const store = new MemStore();
+    const g = makeGame(store);
+    g.loadTrack('flat-test');
+    expect(g.lastRunRecording()).toBeNull();
+    ride(g);
+    expect(g.phase()).toBe('finished');
+    g.step(48);
+    const first = g.lastRunRecording();
+    expect(first).not.toBeNull();
+    expect(first!.trackId).toBe('flat-test');
+    expect(first!.faults).toBe(g.faults());
+    expect(first!.time).toBe(g.runTime());
+    expect(first!.json).toBe(store.rec?.recording);
+    // A slower second run is not a PB but is still the last run.
+    g.restartFromStart();
+    g.setInput({ throttle: 0.4 });
+    let guard = 0;
+    while (g.phase() !== 'finished' && guard++ < 20000) g.step(1);
+    g.step(48);
+    const second = g.lastRunRecording();
+    expect(second!.json).not.toBe(first!.json);
+    expect(store.rec?.recording).toBe(first!.json); // PB untouched
+  });
+
+  it('playback drives the same tick(): the replayed run hashes like the live run at every 100 ticks, and seeks re-simulate deterministically', () => {
+    const store = new MemStore();
+    const live = makeGame(store);
+    live.loadTrack('flat-test');
+    const hashes = new Map<number, string>();
+    ride(live, hashes);
+    const liveFinal = live.hashState(); // at the finish tick, before the coast
+    const liveTime = live.runTime();
+    const liveFaults = live.faults();
+    live.step(48);
+    const rec = live.lastRunRecording()!;
+
+    const g = makeGame(store);
+    g.loadTrack('flat-test');
+    let results = 0;
+    g.onResults = () => results++;
+    expect(g.startPlayback(rec.json, { ghost: false })).toBe(true);
+    expect(g.inPlayback()).toBe(true);
+    expect(g.phase()).toBe('riding');
+    expect(g.playbackInfo()!.tick).toBe(0);
+    expect(g.playbackLength()).toBeGreaterThan(800);
+    // Wall-driven playback at 1×: 100 ticks per 100/120 s.
+    let ticks = 0;
+    for (const [k, h] of hashes) {
+      while (ticks < k) {
+        g.advance(1 / 120);
+        ticks++;
+      }
+      expect(g.playbackInfo()!.tick).toBe(k);
+      expect(g.hashState()).toBe(h);
+    }
+    while (g.phase() !== 'finished' && ticks++ < 8000) g.advance(1 / 120);
+    expect(g.phase()).toBe('finished');
+    expect(g.runTime()).toBe(liveTime);
+    expect(g.faults()).toBe(liveFaults);
+    expect(g.hashState()).toBe(liveFinal);
+    // No results panel / store write from a replay.
+    for (let i = 0; i < 400; i++) g.advance(1 / 120);
+    expect(results).toBe(0);
+    expect(g.playbackInfo()!.ended).toBe(true);
+    expect(g.paused()).toBe(true);
+
+    // Scrub: GO → tick N is byte-identical to the straight run at N, in any order.
+    const keys = [...hashes.keys()];
+    for (const k of [keys[3]!, keys[0]!, keys[5]!, keys[2]!]) {
+      g.seekPlayback(k);
+      expect(g.playbackInfo()!.tick).toBe(k);
+      expect(g.hashState()).toBe(hashes.get(k));
+      expect(g.playbackInfo()!.ended).toBe(false);
+    }
+    // 0.5×: half the ticks per wall second.
+    g.seekPlayback(0);
+    g.setPaused(false);
+    g.playbackSpeed = 0.5;
+    for (let i = 0; i < 120; i++) g.advance(1 / 120);
+    expect(g.playbackInfo()!.tick).toBe(60);
+    g.stopPlayback();
+    expect(g.inPlayback()).toBe(false);
+  });
+
+  it('the PB ghost rides alongside a replayed non-PB run and is rewound (same world) on every seek', () => {
+    const store = new MemStore();
+    const a = makeGame(store);
+    a.loadTrack('flat-test');
+    ride(a);
+    a.step(48);
+    expect(store.rec?.recording).toBeTruthy();
+    a.restartFromStart();
+    a.setInput({ throttle: 0.5 });
+    let guard = 0;
+    while (a.phase() !== 'finished' && guard++ < 20000) a.step(1);
+    a.step(48);
+    const slow = a.lastRunRecording()!;
+    expect(slow.json).not.toBe(store.rec!.recording);
+    const g = makeGame(store);
+    g.loadTrack('flat-test');
+    g.startPlayback(slow.json);
+    expect(g.ghostState()).not.toBeNull();
+    for (let i = 0; i < 300; i++) g.advance(1 / 120);
+    const ghostAt300 = hashPhysicsState(g.ghostState()!);
+    g.seekPlayback(100);
+    g.seekPlayback(300);
+    expect(hashPhysicsState(g.ghostState()!)).toBe(ghostAt300);
+    // A replay of the PB itself gets no ghost (it would sit on the bike).
+    const h = makeGame(store);
+    h.loadTrack('flat-test');
+    h.startPlayback(store.rec!.recording!, { ghost: false });
+    expect(h.ghostState()).toBeNull();
+  });
+
+  it('recentInput() is the last ≤ 1 s of quantized frames, oldest first, RLE-packed', () => {
+    const { game } = make({ harness: true });
+    expect(game.recentInput()).toEqual([]);
+    game.setInput({ throttle: 1 });
+    game.step(200);
+    expect(game.recentInput()).toEqual([[120, 255, 0, 0, 0]]);
+    game.setInput({ throttle: 0.5, lean: -1 });
+    game.step(30);
+    const runs = game.recentInput();
+    expect(runs.length).toBe(2);
+    expect(runs[0]).toEqual([90, 255, 0, 0, 0]);
+    expect(runs[1]).toEqual([30, 128, 0, -127, 0]);
+    expect(runs.reduce((n, r) => n + r[0], 0)).toBe(120);
+  });
+
+  it('lab mode: the ghost slot shows the previous attempt from its own spawn, and attempts() = 1 + faults', () => {
+    const g = new Game({ physics: new MockPhysics(120), renderer: new StubRenderer(), autoSkipCountdown: true, physicsFactory: (hz) => new MockPhysics(hz) });
+    g.loadTrack('flat-test');
+    g.setLabMode(true);
+    expect(g.lab).toBe(true);
+    expect(g.attempts()).toBe(1);
+    expect(g.ghostState()).toBeNull(); // nothing to show before a first attempt ends
+    g.setInput({ throttle: 1 });
+    g.step(500);
+    const xBeforeTap = g.getState().bike.pos.x;
+    g.setInput({ throttle: 1, restart: true });
+    g.step(1); // attempt 1 ends (restart tap); attempt 2 begins at the checkpoint
+    g.setInput({ throttle: 1 });
+    expect(g.attempts()).toBe(2);
+    const ghost = g.ghostState();
+    expect(ghost).not.toBeNull();
+    // The ghost starts where attempt 1 started (the last checkpoint at that time: the start line) and rides its frames.
+    expect(ghost!.bike.pos.x).toBeLessThan(xBeforeTap);
+    g.step(500);
+    expect(g.ghostState()!.bike.pos.x).toBeCloseTo(xBeforeTap, 6);
+    g.step(1); // the tap tick itself was the attempt's last frame
+    const xEnd = g.ghostState()!.bike.pos.x;
+    g.step(200); // recording exhausted: the ghost holds
+    expect(g.ghostState()!.bike.pos.x).toBe(xEnd);
+    g.setLabMode(false);
+    expect(g.ghostState()).toBeNull(); // no PB store → no PB ghost
+  });
+});

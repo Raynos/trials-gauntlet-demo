@@ -228,6 +228,18 @@ export interface RiderPose {
   armExtend: number;
 }
 
+/**
+ * Physics v2 (docs/design/physics-v2.md §16.6): the simulated rider body — world position of its COM,
+ * angle ψ_R, velocities. Lives at `PhysicsState.riderBody` rather than `rider.body`: `RiderPose` is
+ * iterated as four numbers by render's `PoseFollower`, so a nested object there is not additive.
+ */
+export interface RiderBody {
+  pos: Vec2;
+  angle: number;
+  vel: Vec2;
+  angVel: number;
+}
+
 export type FaultReason = 'crash' | 'out-of-bounds' | 'restart' | 'timeout' | 'hazard';
 
 /**
@@ -251,6 +263,8 @@ export interface PhysicsState {
     front: WheelState;
   };
   rider: RiderPose;
+  /** Physics v2 only (additive, optional): the simulated rider body. Absent on v1 / mock physics. */
+  riderBody?: RiderBody;
   /** Index of the last checkpoint crossed, -1 when none. */
   checkpoint: number;
   /**
@@ -355,6 +369,35 @@ export interface RunResult {
  * histograms from the user's own sessions). Appended by the app on every finished run
  * (`src/game/telemetry.ts`), bounded, exported via Settings → Copy / Share run log.
  */
+/**
+ * One packed run of identical input frames: `[count, throttle u8, brake u8, lean i8, flags u8]` —
+ * the recording's RLE layout (`src/core/replay.ts` `InputRun`), reused for the death trace.
+ */
+export type InputTraceRun = [count: number, throttle: number, brake: number, lean: number, flags: number];
+
+export interface DeathRecord {
+  x: number;
+  reason: FaultReason;
+  checkpoint: number;
+  /** The last second (120 ticks) of quantized input before the fault, oldest first, RLE-packed. */
+  trace?: InputTraceRun[];
+}
+
+/** Replay viewer camera (docs/design/game.md §16). `fixed` holds the camera where it was when chosen; the viewer re-anchors when the bike leaves the frame. */
+export type ReplayCameraMode = 'game' | 'follow-wide' | 'fixed';
+
+/**
+ * Optional renderer hook for the replay viewer (`GameRenderer.setCameraOverride?(o | null)`): null = the
+ * game camera. Until the render owner implements it, the viewer drives the rig's public `bounds` /
+ * `setKeys` through `renderer.debug.rig` (src/game/replay.ts).
+ */
+export interface CameraOverride {
+  mode: ReplayCameraMode;
+  /** `fixed`: world x/y the camera holds. */
+  x?: number;
+  y?: number;
+}
+
 export interface RunTelemetry {
   /** ISO time the run finished. */
   at: string;
@@ -368,7 +411,7 @@ export interface RunTelemetry {
   /** Wall seconds from the first GO on this track load to the results panel (includes pauses). */
   timeToClear: number;
   medal: Medal;
-  deaths: { x: number; reason: FaultReason; checkpoint: number }[];
+  deaths: DeathRecord[];
   device: string;
   quality: QualityTier;
   /** Why the tier was chosen: `manual`, `probe median 16.4 ms`, `pending`. */
@@ -510,4 +553,13 @@ export interface TrialsHook {
   cleared(): boolean;
   /** Pick the bike class for the next `loadTrack` (also reloads in place while nothing is racing). */
   setBike?(bike: BikeClass): void;
+  /** Last finished run's recording (GO → finish, JSON) — what "Watch replay" plays; null before a clear. */
+  lastRun?(): string | null;
+  /** Replay viewer (front-end page only): open the viewer on a recording (default: the last run), read its transport, or close it. */
+  replay?: {
+    open(recordingJson?: string): boolean;
+    seek(tick: number): void;
+    info(): { tick: number; length: number; playing: boolean; speed: number; camera: ReplayCameraMode } | null;
+    close(): void;
+  };
 }

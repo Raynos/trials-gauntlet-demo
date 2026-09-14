@@ -7,7 +7,7 @@
  * The app owns the collection (`RunCollector`): deaths with the bike x at the fault tick,
  * frame-time percentiles from the RAF loop, the quality tier and the reason it was chosen.
  */
-import type { BikeClass, FaultReason, Medal, QualityTier, RunTelemetry } from '../core/types';
+import type { BikeClass, FaultReason, InputTraceRun, Medal, QualityTier, RunTelemetry } from '../core/types';
 import { Percentiles } from './game';
 
 export const RUNLOG_KEY = 'trials.runlog';
@@ -105,9 +105,10 @@ export class RunCollector {
     this.active = false;
   }
 
-  death(x: number, reason: FaultReason, checkpoint: number): void {
+  /** A fault: bike x after the faulting step, plus the last ≤ 1 s of quantized input (RLE) so a death can be read back as a technique failure. */
+  death(x: number, reason: FaultReason, checkpoint: number, trace?: InputTraceRun[]): void {
     if (!this.active) return;
-    if (this.deaths.length < 500) this.deaths.push({ x: Math.round(x * 10) / 10, reason, checkpoint });
+    if (this.deaths.length < 500) this.deaths.push({ x: Math.round(x * 10) / 10, reason, checkpoint, ...(trace && trace.length > 0 ? { trace } : {}) });
   }
 
   frame(ms: number): void {

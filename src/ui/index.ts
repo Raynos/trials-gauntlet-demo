@@ -5,7 +5,7 @@
  */
 import type { GameEvent, InputDevice, PhysicsState, RunInfo, RunResult, TrackDef } from '../core/types';
 
-export type HudAction = 'retry' | 'next' | 'menu' | 'pause';
+export type HudAction = 'retry' | 'next' | 'menu' | 'pause' | 'replay';
 
 export interface Hud {
   /** Per rendered frame, after `setRun`. `ghost` is the PB ghost's state when one is running. */
@@ -21,6 +21,8 @@ export interface Hud {
   /** Checkpoint split vs the stored PB: negative = ahead. Kinetic label by the timer for 1.5 s. */
   showSplit(checkpoint: number, deltaSeconds: number): void;
   setDevice(device: InputDevice, visible: boolean): void;
+  /** Drop every transient (banners, flashes, split label) — after a replay scrub re-simulated a stretch of run in one frame. */
+  clearBanners?(): void;
   dispose(): void;
 }
 
@@ -30,10 +32,13 @@ export { PauseMenu, mountRotatePrompt, spatialMove, type PauseCallbacks, type Qu
 export { TitleScreen, MainMenuScreen, TrackSelectScreen, SettingsScreen, CreditsScreen, FocusList, GAME_NAME, BIKE_NAME, BUILD_STAMP, hardReload, controlsReferenceHtml, type FrontCallbacks, type FrontScreen, type FrontState } from './front';
 export { GarageScreen, BIKE_SPECS, BIKE_LABEL, type BikeSpec, type GarageCallbacks } from './garage';
 export { PerfOverlay, type PerfSample } from './perf';
+export { ReplayBar, type ReplayBarState, type ReplayBarCallbacks } from './replay';
+export { LabPanel, type LabSample } from './lab';
+export { TraceBars } from './trace';
 export { UpdateToast, OnboardingCard } from './cards';
 export { ArtManifest, BIOME_TINT, type ArtEntry } from './art';
 export { UiSfx } from './sfx';
-export { TIER_ORDER, TIER_LABEL, shipTracks, tierUnlocked, tierComplete, nextTrack, medalTotals } from './progress';
+export { TIER_ORDER, TIER_LABEL, shipTracks, tierUnlocked, tierComplete, nextTrack, medalTotals, labTracks, isLabTrack } from './progress';
 export {
   BestTimes,
   loadQualityOverride,
@@ -54,6 +59,8 @@ export {
   saveTelemetryEnabled,
   loadOnboarded,
   saveOnboarded,
+  LastRuns,
+  type LastRunEntry,
   type BestEntry,
   type ModelChoice,
 } from './best';

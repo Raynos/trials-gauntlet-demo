@@ -10,7 +10,7 @@ import { BIOME_TINT, type ArtManifest } from './art';
 import type { BestEntry, ModelChoice } from './best';
 import { formatTime } from './format';
 import type { QualityChoice } from './menu';
-import { medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
+import { labTracks, medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
 
 export type FrontScreen = 'title' | 'menu' | 'garage' | 'tracks' | 'settings' | 'credits';
@@ -31,6 +31,10 @@ export interface FrontCallbacks {
   setTelemetry(on: boolean): void;
   copyRunLog(): Promise<boolean>;
   shareRunLog(): Promise<boolean>;
+  /** Track card "Watch PB" (replay viewer on the stored PB recording). */
+  watchPb(trackId: string): void;
+  /** Hidden dev row: reload with `?physics=v1|v2` (or without the param). */
+  setPhysics?(v: 'default' | 'v1' | 'v2'): void;
 }
 
 export interface FrontState {
@@ -50,6 +54,8 @@ export interface FrontState {
   runlog: { runs: number; tracks: number };
   /** `navigator.share` exists (iOS / Android share sheet). */
   canShare: boolean;
+  /** `?dev=1` only: physics solver in effect (`default` = whatever `createBikePhysics` is) and which are exported. */
+  physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[] };
 }
 
 export const BIKE_NAME: Record<BikeClass, string> = { rookie: 'Rookie', pro: 'Pro' };
@@ -123,6 +129,8 @@ abstract class Screen {
   abstract nav(dx: number, dy: number): void;
   abstract confirm(): void;
   abstract back(): void;
+  /** Secondary action (`V` / pad Y); screens without one ignore it. */
+  alt(): void {}
 }
 
 // ---------------------------------------------------------------------------
@@ -421,7 +429,8 @@ export class TrackSelectScreen extends Screen {
       const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.card');
       if (!b) return;
       this.focusCard(Number(b.dataset['r']), Number(b.dataset['c']), false);
-      this.confirm();
+      if ((e.target as HTMLElement).closest('.watch')) this.alt(); // "Watch PB" tag: the replay viewer, not a launch
+      else this.confirm();
     });
   }
 
@@ -451,6 +460,23 @@ export class TrackSelectScreen extends Screen {
       this.tiers.appendChild(rowEl);
       this.rows.push({ tier, el: rowEl, cards, locked });
     }
+    // Lab (MEGA_PLAN P0 §3): the physics test levels, last, always open, outside medals and progression.
+    const lab = labTracks(tracks);
+    if (lab.length > 0) {
+      const rowEl = h('div', 'tier-row lab-row');
+      rowEl.innerHTML = `<div class="tier-head"><b>Lab</b><span>Physics proving ground · live physics HUD · no medals</span></div>`;
+      const car = h('div', 'carousel');
+      const cards: CardRef[] = [];
+      const r = this.rows.length;
+      lab.forEach((t, c) => {
+        const el = this.card(t, false, r, c, true);
+        car.appendChild(el);
+        cards.push({ el, track: t, locked: false });
+      });
+      rowEl.appendChild(car);
+      this.tiers.appendChild(rowEl);
+      this.rows.push({ tier: lab[0]!.tier, el: rowEl, cards, locked: false });
+    }
     this.col = this.rows.map(() => 0);
     const totals = medalTotals(ship, medalOf);
     const dot = (m: Medal, n: number): string => `<span style="color:var(--${m === 'platinum' ? 'plat' : m})"><i></i>${n}</span>`;
@@ -467,7 +493,7 @@ export class TrackSelectScreen extends Screen {
     this.applyFocus(false);
   }
 
-  private card(t: TrackDef, locked: boolean, r: number, c: number): HTMLButtonElement {
+  private card(t: TrackDef, locked: boolean, r: number, c: number, lab = false): HTMLButtonElement {
     const best = this.bestOf(t.id);
     const target = t.meta?.targetTimeS;
     const biome: BiomeId = t.meta?.biome ?? 'industrial';
@@ -479,14 +505,16 @@ export class TrackSelectScreen extends Screen {
     el.style.setProperty('--tint', BIOME_TINT[biome]);
     const medal = best?.medal;
     const ahead = best && target ? best.time <= target : false;
-    const ghost = best?.recording && this.state().ghost ? '<em class="ghost">PB ghost</em>' : '';
+    // A stored PB recording: the ghost tag doubles as the "Watch PB" control (click / V / pad Y opens the replay viewer).
+    const ghost = best?.recording ? `<em class="ghost watch" title="Watch the personal best">${this.state().ghost ? 'PB ghost' : 'PB'} · ▶ Watch</em>` : '';
     const prev = TIER_ORDER[TIER_ORDER.indexOf(t.tier) - 1];
     const bikeTag = best?.bike === 'pro' ? '<em class="bike">Pro</em>' : '';
     // Locked: the card itself states the unlock rule (the row head says it too, but a thumb lands on the card).
     const lockLine = locked && prev ? `<div class="lockline">Locked · medal every ${TIER_LABEL[prev]} track</div>` : '';
-    el.innerHTML = `<div class="tint" data-badge="${TIER_LABEL[t.tier]}"></div><div class="art"></div><div class="veil"></div>
-      <div class="top"><span>${escapeHtml(t.id.split('-')[0]!.toUpperCase())}</span>${ghost}${bikeTag}</div>
-      <div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>${lockLine}
+    if (lab) el.classList.add('lab-card');
+    el.innerHTML = `<div class="tint" data-badge="${lab ? 'Physics test' : TIER_LABEL[t.tier]}"></div><div class="art"></div><div class="veil"></div>
+      <div class="top"><span>${lab ? 'LAB' : escapeHtml(t.id.split('-')[0]!.toUpperCase())}</span>${ghost}${bikeTag}</div>
+      ${lab ? '<div class="labtag">physics test</div>' : `<div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>`}${lockLine}
       <div class="body"><div class="name">${escapeHtml(t.name)}</div><div class="tech">${escapeHtml(t.meta?.technique ?? '')}</div>
       <div class="times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div></div>`;
     const artEl = el.querySelector<HTMLDivElement>('.art')!;
@@ -576,13 +604,22 @@ export class TrackSelectScreen extends Screen {
     this.sfx.back();
     this.cb.goto('menu');
   }
+
+  /** `V` / pad Y / the card's watch tag: replay viewer on the focused card's PB (no-op without a recording). */
+  override alt(): void {
+    const cur = this.current();
+    if (!cur || this.launching || cur.locked) return;
+    if (!this.bestOf(cur.track.id)?.recording) return;
+    this.sfx.confirm();
+    this.cb.watchPb(cur.track.id);
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Settings
 // ---------------------------------------------------------------------------
 
-type SettingId = 'quality' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'telemetry' | 'runlog' | 'reset' | 'reload';
+type SettingId = 'quality' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'telemetry' | 'runlog' | 'reset' | 'reload' | 'physics';
 
 interface SettingRow {
   id: SettingId;
@@ -678,6 +715,12 @@ export class SettingsScreen extends Screen {
     }
 
     seg('telemetry', 'Run log', 'Keeps attempts, faults and crash spots on this device only', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().telemetry ? 'on' : 'off'), (v) => this.cb.setTelemetry(v === 'on'));
+    const phys = s().physics;
+    if (s().dev && phys && phys.available.length > 0 && this.cb.setPhysics) {
+      // Hidden dev row (physics v2 A/B, docs/design/physics-v2.md §16.2): reloads the page with `?physics=`.
+      const opts = [{ v: 'default', l: 'Default' }, ...phys.available.map((v) => ({ v, l: v.toUpperCase() }))];
+      seg('physics', 'Physics', 'Dev: solver A/B — reloads the page', opts, () => phys.current, (v) => this.cb.setPhysics?.(v as 'default' | 'v1' | 'v2'));
+    }
 
     // Run log export: Copy (clipboard JSON) · Share (Web Share API, text) — never leaves the device otherwise.
     {

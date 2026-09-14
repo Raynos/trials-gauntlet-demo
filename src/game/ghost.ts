@@ -8,9 +8,17 @@
  * (A PB recording always starts at GO and ends at the finish, so a hold-
  * restart never occurs inside one.)
  */
-import { NEUTRAL_INPUT, type CompiledTrack, type InputFrame, type PhysicsState } from '../core/types';
+import { NEUTRAL_INPUT, type BikeClass, type CompiledTrack, type InputFrame, type PhysicsState } from '../core/types';
 import { decodeAny, expandFrames } from '../core/replay';
 import type { PhysicsWorld } from '../physics';
+
+/** Lab "ghost of the last attempt": dense frames from a checkpoint spawn (−1 = start) to the fault. */
+export interface AttemptSource {
+  frames: InputFrame[];
+  seed: number;
+  bike: BikeClass;
+  checkpoint: number;
+}
 
 export class GhostRunner {
   private readonly frames: InputFrame[];
@@ -21,19 +29,28 @@ export class GhostRunner {
   private restartLatch = false;
   private finished = false;
   private cached: PhysicsState | null = null;
+  /** Spawn the recording starts from (−1 = the start line; a lab attempt starts at its checkpoint). */
+  private readonly startCheckpoint: number;
 
   constructor(
     private readonly world: PhysicsWorld,
     track: CompiledTrack,
-    recordingJson: string,
+    source: string | AttemptSource,
     private readonly autoRespawnTicks: number,
   ) {
-    const rec = decodeAny(recordingJson);
-    if (rec.header.physicsHz !== world.physicsHz) throw new Error(`ghost hz ${rec.header.physicsHz} != ${world.physicsHz}`);
-    this.frames = expandFrames(rec);
-    // Same bike class the PB was ridden on (header.bike; pre-garage recordings = rookie).
-    world.loadTrack(track, rec.header.seed >>> 0, { bike: rec.header.bike ?? 'rookie' });
-    world.reset(-1);
+    if (typeof source === 'string') {
+      const rec = decodeAny(source);
+      if (rec.header.physicsHz !== world.physicsHz) throw new Error(`ghost hz ${rec.header.physicsHz} != ${world.physicsHz}`);
+      this.frames = expandFrames(rec);
+      this.startCheckpoint = -1;
+      // Same bike class the PB was ridden on (header.bike; pre-garage recordings = rookie).
+      world.loadTrack(track, rec.header.seed >>> 0, { bike: rec.header.bike ?? 'rookie' });
+    } else {
+      this.frames = source.frames;
+      this.startCheckpoint = source.checkpoint;
+      world.loadTrack(track, source.seed >>> 0, { bike: source.bike });
+    }
+    world.reset(this.startCheckpoint);
     world.drainEvents();
   }
 
@@ -77,7 +94,7 @@ export class GhostRunner {
   /** Fast-forward to `ticks` steps from GO (after a snapshot restore). */
   seek(ticks: number): void {
     if (ticks < this.index) {
-      this.world.reset(-1);
+      this.world.reset(this.startCheckpoint);
       this.world.drainEvents();
       this.index = 0;
       this.crashed = false;

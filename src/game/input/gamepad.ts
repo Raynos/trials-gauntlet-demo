@@ -10,6 +10,7 @@ import { clearMeta, type InputSource, type MetaButtons } from './types';
 const DEADZONE = 0.18;
 const BTN_A = 0;
 const BTN_B = 1;
+const BTN_Y = 3;
 const BTN_LT = 6;
 const BTN_RT = 7;
 const BTN_START = 9;
@@ -21,12 +22,13 @@ const NAV_THRESHOLD = 0.6;
 
 export class GamepadInput implements InputSource {
   readonly device = 'gamepad' as const;
-  private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false };
+  private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false, alt: false };
   private prevNavX = 0;
   private prevNavY = 0;
   private prevStart = false;
   private prevA = false;
   private prevB = false;
+  private prevY = false;
   private readonly nav: Navigator;
 
   constructor(nav: Navigator = navigator) {
@@ -72,6 +74,9 @@ export class GamepadInput implements InputSource {
     if (start && !this.prevStart) this.meta.pause = true;
     if (a && !this.prevA) this.meta.confirm = true;
     if (b && !this.prevB) this.meta.back = true;
+    const yBtn = pressed(p, BTN_Y);
+    if (yBtn && !this.prevY) this.meta.alt = true;
+    this.prevY = yBtn;
     if (rt > 0.05 || lt > 0.05 || lean !== 0 || b || a || start) this.meta.active = true;
     // Menu navigation edges from d-pad or left stick.
     const y = p.axes[1] ?? 0;

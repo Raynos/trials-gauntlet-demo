@@ -467,3 +467,55 @@ User (3G, round 3): white then black for many seconds. Now:
   `sw.js` → toast → Reload → new worker active, old cache gone.
 - Storage keys added: `trials.bikeClass`, `trials.telemetry`, `trials.runlog`, `trials.onboarded`,
   `trials.best.<id>@pro`. Reset progress clears `trials.best.*` (both classes) only.
+
+## 16. Replay viewer (wave 2, MEGA_PLAN P4)
+
+- **Entry**: results panel → fourth tile `WATCH REPLAY` (disabled when the run has no recording); track card →
+  the PB tag reads `PB ghost · ▶ Watch` (click, `V`, pad Y) and plays the stored PB. `window.__trials.replay`
+  (`open(json?)`, `seek(tick)`, `info()`, `close()`) and `__trials.lastRun()` drive it headless.
+- **Playback = the live `Game`** (`src/game/game.ts` `startPlayback / seekPlayback / stopPlayback`): the
+  recording is the player — `tick()` takes `frames[runTicks]` as its input, so restart taps, crashes, the
+  auto-respawn and the finish coast reproduce through the same code as live play. `publishResults` is a
+  no-op in playback (nothing stored, logged or shown); the HUD timer / faults / strip read the replayed run.
+  **Scrub = re-simulation**: `seekPlayback(n)` rewinds to GO (`resetToGo`: the same `physics.reset(-1)` as
+  `go()`) and steps n ticks — ≈ 3 µs/tick, ghost world included, never interpolated. Test: hashes equal the
+  live run at every 100 ticks and after seeks in any order (`game.test.ts` "replay viewer playback").
+- **Ghost**: the PB rides alongside unless the recording *is* the PB (`isPb`), and the ghost world is reused
+  across seeks (`ghostSource`; `GhostRunner.seek(0)`), so a scrub never rebuilds a world.
+- **Transport** (`src/ui/replay.ts` `ReplayBar`, `src/game/replay.ts` `ReplaySession`): play/pause, restart,
+  scrub track (pointer capture; live seeks while down, paused meanwhile, resumes on release), `¼× ½× 1×`
+  (`Game.playbackSpeed` scales the wall seconds fed to the loop), cameras, exit. Keyboard: Space/Enter
+  play-pause, held ←/→ scrub at 2.5 s/s, ↑/↓ speed, `V` camera, `R` restart, Esc/Backspace exit; pad: A,
+  stick/d-pad, Y, B. Scrub re-simulations are muted (`App.replayMuted`) and their banners dropped
+  (`Hud.clearBanners`). The replay ends when the finish coast has settled (1 s past the brake ramp): playback
+  pauses, the play button reads ↺.
+- **Cameras**: `game` (the rig as is), `follow-wide` (a full-track `CameraKey` with `zoomBias: 0.4` — more
+  puts the camera at the hall's roof / z clamp, 30 m out, where the fog washes the frame), `fixed` (the rig's
+  `bounds` clamped to the camera's current x/y; when `bikeScreenX` leaves [0.06, 0.94] the clamp releases for
+  one frame and re-locks — a cut, like TV coverage). Both drive the rig's public `bounds` / `setKeys` through
+  `renderer.debug.rig`; a renderer that exports `setCameraOverride(o | null)` (`CameraOverride` in types) is
+  preferred when present — request to the render owner.
+- **Exit** restores what it interrupted: from results, the finished run's physics snapshot + game counters
+  come back and the results panel re-shows (`App.replayReturn`); from a card, the menu backdrop and track
+  select. **Last run**: `Game.lastRunRecording()` (every finished run, PB or not) is stored per track in
+  `trials.lastrun.<id>` (`LastRuns`, `src/ui/best.ts`); Reset progress leaves it alone.
+
+## 17. Physics lab HUD, input trace, physics switch
+
+- **Lab** (`lab-*` tracks or `?lab=1`; `src/ui/lab.ts`, physics-v2.md §15): bottom-right monospace panel (the bike rides at x ≈ 30 %; the left third stays clear) —
+  pitch / rate / speed / rear slip, compression %, COM (`rider.lean` / crouch), hop phase, airtime, attempt
+  (`1 + faults`); gauges: rear / front compression with the bump-stop zone (`tuning.stopStart`, default 0.8)
+  marked, `τ_att` signed bar, gas / brake bars, balance bar `d/h` vs `a/g` (red once a/g passes d/h), a side
+  schematic with the COM dot and pose-target (hollow) vs body (filled) markers; last-hop stats held 3 s after
+  a landing; a 3 s trace of pitch (±90°) and both compressions. Samples come per tick from `Game.tickTap`
+  (120 Hz, rings), drawn decimated ×2 at ≤ 30 Hz; the text repaints at 10 Hz. `debug()` fields (`attTorque`,
+  `poseTarget`, `comDH`, `lastHop`) are read defensively — missing = grey gauge. **Ghost of the last attempt**:
+  in lab mode the ghost slot shows the previous attempt from its own spawn (`GhostRunner` with an
+  `AttemptSource`), started when the live bike respawns; the PB ghost is not shown on lab tracks.
+- **`?trace=1`** (`src/ui/trace.ts`): three bars under the timer (gas amber, brake red, lean bipolar) fed
+  `Game.effectiveInput()` each frame; hidden under pause. **Telemetry**: every death now carries `trace` —
+  the last ≤ 120 ticks of quantized input before the fault, RLE like a recording (`Game.recentInput()`,
+  `DeathRecord.trace`), so a run log reads back as technique failures, not just x positions.
+- **`?physics=v1|v2`** picks `createBikePhysicsV1` / `createBikePhysicsV2` from the physics barrel when
+  exported (else `createBikePhysics`); `?dev=1` shows a Physics row in Settings that reloads with the choice.
+  `hook.info().modules.physics` names the factory used.

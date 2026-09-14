@@ -16,8 +16,10 @@ import {
   NEUTRAL_INPUT,
   decodeAny,
   encodeJSON,
+  expandFrames,
   hashPhysicsState,
   iterateFrames,
+  packFrame,
   quantizeInput,
   type BikeClass,
   type CameraDebug,
@@ -26,6 +28,7 @@ import {
   type GameEventListener,
   type GamePhase,
   type InputFrame,
+  type InputTraceRun,
   type PhysicsSnapshot,
   type PhysicsState,
   type QualityTier,
@@ -121,6 +124,8 @@ export interface GameCounters {
 }
 
 const EVENT_QUEUE_MAX = 256;
+/** Ticks of input kept for the death trace / `?trace=1` (1 s at 120 Hz). */
+export const TRACE_TICKS = 120;
 
 /** Optional renderer methods from CONTRACT §2.7 the scaffold renderer may not have yet. */
 type RendererExtras = Partial<{
@@ -150,6 +155,30 @@ export class Game {
   private ghost: GhostRunner | null = null;
   private ghostEnabled = true;
   private lastGhostState: PhysicsState | null = null;
+  /** Recording the current PB ghost was built from (reused across playback seeks instead of rebuilding the world). */
+  private ghostSource: string | null = null;
+
+  // -- last run / playback (replay viewer, docs/design/game.md §16) --------
+  private lastRunJson: string | null = null;
+  private lastRunMeta: { time: number; faults: number; bike: BikeClass; trackId: string } | null = null;
+  private playbackFrames: InputFrame[] | null = null;
+  private playbackGhost = true;
+  /** Wall → sim rate while a replay plays (0.25 / 0.5 / 1). */
+  playbackSpeed = 1;
+  private playbackEnded = false;
+
+  // -- input trace: the last second of quantized frames (telemetry deaths, `?trace=1`) --
+  private readonly traceRing = new Int16Array(TRACE_TICKS * 4);
+  private traceN = 0;
+  private traceI = 0;
+
+  // -- physics lab (`lab-*` tracks / `?lab=1`): ghost of the last attempt, per-tick tap --
+  private labMode = false;
+  private attemptFrames: InputFrame[] = [];
+  private attemptCp = -1;
+  private lastAttempt: { checkpoint: number; frames: InputFrame[] } | null = null;
+  /** Called after every riding / crashed tick with the fresh state (lab trace sampling); off by default. */
+  tickTap: ((state: PhysicsState, runTick: number) => void) | null = null;
 
   private input: InputFrame = { ...NEUTRAL_INPUT };
   /** Reused frame forwarded to physics: the player's frame minus `restart`. */
@@ -285,6 +314,9 @@ export class Game {
     this.loop.reset();
     this.input = { ...NEUTRAL_INPUT };
     this.lastResult = null;
+    this.lastAttempt = null;
+    this.ghostSource = null;
+    this.ghost = null;
     this.beginRun();
     this.lastLoadMs = performance.now() - t0;
     return true;
@@ -343,23 +375,78 @@ export class Game {
     this.pbRecorder = this.autoRecord && this.track ? new InputRecorder({ version: 1, trackId: this.track.id, seed: this.seed, physicsHz: this.physicsHz, bike: this.bike }) : null;
     this.setPhase('riding');
     this.emit({ type: 'go' });
+    this.beginAttempt(-1);
     this.spawnGhost();
+  }
+
+  // -- physics lab: ghost of the last attempt ------------------------------------
+
+  /** `lab-*` tracks / `?lab=1`: the ghost slot shows the previous attempt (from its spawn to its fault) instead of the PB. */
+  setLabMode(on: boolean): void {
+    if (on === this.labMode) return;
+    this.labMode = on;
+    this.lastAttempt = null;
+    if (this.phaseValue === 'riding' || this.phaseValue === 'crashed') {
+      this.spawnGhost();
+      this.ghost?.seek(this.runTicks);
+    }
+  }
+
+  get lab(): boolean {
+    return this.labMode;
+  }
+
+  /** Attempts on this run: 1 + faults (CONTRACT §3). */
+  attempts(): number {
+    return 1 + this.faultCount;
+  }
+
+  private beginAttempt(checkpoint: number): void {
+    if (!this.labMode) return;
+    if (this.attemptFrames.length > 0) this.lastAttempt = { checkpoint: this.attemptCp, frames: this.attemptFrames };
+    this.attemptFrames = [];
+    this.attemptCp = checkpoint;
   }
 
   // -- PB ghost ---------------------------------------------------------------
 
   /** Build the ghost for the current track from the stored PB recording (if any). */
   private spawnGhost(): void {
-    this.ghost = null;
     this.lastGhostState = null;
-    if (!this.ghostEnabled || !this.physicsFactory || !this.track || !this.compiled) return;
+    if (!this.ghostEnabled || !this.physicsFactory || !this.track || !this.compiled) {
+      this.ghost = null;
+      return;
+    }
+    if (this.labMode) {
+      // Lab: the previous attempt, from its own spawn point; it starts when the live bike respawns.
+      this.ghost = null;
+      this.ghostSource = null;
+      const a = this.lastAttempt;
+      if (!a) return;
+      this.ghost = new GhostRunner(this.physicsFactory(this.physicsHz), this.compiled, { frames: a.frames, seed: this.seed, bike: this.bike, checkpoint: a.checkpoint }, this.ticks.autoRespawn);
+      return;
+    }
+    if (this.playbackFrames && !this.playbackGhost) {
+      this.ghost = null;
+      return;
+    }
     const rec = this.bestTimes?.get(this.track.id, this.bike)?.recording;
-    if (!rec) return;
+    if (!rec) {
+      this.ghost = null;
+      this.ghostSource = null;
+      return;
+    }
+    if (this.ghost && this.ghostSource === rec) {
+      this.ghost.seek(0); // same PB: rewind the existing world (playback seeks do this per scrub frame)
+      return;
+    }
     try {
       this.ghost = new GhostRunner(this.physicsFactory(this.physicsHz), this.compiled, rec, this.ticks.autoRespawn);
+      this.ghostSource = rec;
     } catch (e) {
       console.warn('[trials] ghost recording unusable', e);
       this.ghost = null;
+      this.ghostSource = null;
     }
   }
 
@@ -423,6 +510,10 @@ export class Game {
     this.crashTicks = 0;
     this.setPhase('riding');
     this.emit({ type: 'restart', checkpoint, tick: 0 });
+    if (this.labMode) {
+      this.beginAttempt(checkpoint);
+      this.spawnGhost();
+    }
   }
 
   /** Full restart: faults and run clock reset, countdown again. */
@@ -451,9 +542,25 @@ export class Game {
   // -- simulation -----------------------------------------------------------
 
   private tick(): void {
+    if (this.playbackFrames) {
+      // Replay viewer: the recording is the player. Frame index == ticks since GO (what the recorder counted).
+      const f = this.phaseValue === 'riding' || this.phaseValue === 'crashed' ? this.playbackFrames[this.runTicks] : undefined;
+      this.input = f ?? NEUTRAL_INPUT;
+    }
     const input = this.input;
     this.recorder?.push(input);
     const T = this.ticks;
+    if (this.phaseValue === 'riding' || this.phaseValue === 'crashed') {
+      const [pt, pb, pl, pf] = packFrame(input);
+      const o = this.traceI * 4;
+      this.traceRing[o] = pt;
+      this.traceRing[o + 1] = pb;
+      this.traceRing[o + 2] = pl;
+      this.traceRing[o + 3] = pf;
+      this.traceI = (this.traceI + 1) % TRACE_TICKS;
+      if (this.traceN < TRACE_TICKS) this.traceN++;
+      if (this.labMode && this.phaseValue === 'riding' && this.attemptFrames.length < 120 * 600) this.attemptFrames.push(input);
+    }
 
     // Restart edge + hold tracking is phase-independent.
     const pressed = input.restart === true;
@@ -502,6 +609,7 @@ export class Game {
           return;
         }
         this.stepPhysics(input);
+        this.tickTap?.(this.getState(), this.runTicks);
         return;
       }
       case 'crashed': {
@@ -512,6 +620,7 @@ export class Game {
           return;
         }
         this.stepPhysics(input);
+        this.tickTap?.(this.getState(), this.runTicks);
         return;
       }
       case 'finished': {
@@ -624,7 +733,12 @@ export class Game {
   private publishResults(): void {
     const track = this.track;
     if (!track) return;
+    if (this.playbackFrames) return; // a replay never stores, logs or shows results; the viewer reads `playbackInfo()`
     const time = this.finishRunTicks / this.physicsHz;
+    if (this.pbJson) {
+      this.lastRunJson = this.pbJson;
+      this.lastRunMeta = { time, faults: this.faultCount, bike: this.bike, trackId: track.id };
+    }
     const prev = this.bestTimes?.get(track.id, this.bike) ?? null;
     const result: RunResult = {
       trackId: track.id,
@@ -691,7 +805,143 @@ export class Game {
       this.loop.renderOnce();
       return;
     }
+    if (this.playbackFrames) {
+      this.loop.advance(elapsedSeconds * this.playbackSpeed);
+      // The run is over and the finish coast has settled: hold the last frame (the transport shows ↺).
+      if (this.phaseValue === 'finished' && this.resultsTicks >= this.ticks.finishBrake + this.physicsHz) {
+        this.pausedFlag = true;
+        this.playbackEnded = true;
+      }
+      return;
+    }
     this.loop.advance(elapsedSeconds);
+  }
+
+  // -- replay viewer (docs/design/game.md §16) --------------------------------------
+
+  /** JSON recording of the last finished run (GO → finish), regardless of PB; null before a clear on this page. */
+  lastRunRecording(): { json: string; time: number; faults: number; bike: BikeClass; trackId: string } | null {
+    return this.lastRunJson && this.lastRunMeta ? { json: this.lastRunJson, ...this.lastRunMeta } : null;
+  }
+
+  /**
+   * Enter playback: the recording drives every tick through the same `tick()` as live play (restart
+   * taps, crashes and auto-respawns reproduce). Loads the recording's track / seed / bike when they
+   * differ from what is up, else rewinds in place (renderer world kept). Starts at GO, playing.
+   * `ghost` = PB ghost alongside (default on; off when the recording *is* the PB).
+   */
+  startPlayback(json: string, opts: { ghost?: boolean } = {}): boolean {
+    const rec = decodeAny(json);
+    if (rec.header.physicsHz !== this.physicsHz) return false;
+    const bike = rec.header.bike ?? DEFAULT_BIKE;
+    const seed = rec.header.seed >>> 0;
+    this.playbackFrames = expandFrames(rec);
+    this.playbackGhost = opts.ghost ?? true;
+    this.playbackSpeed = 1;
+    this.playbackEnded = false;
+    this.pausedFlag = false;
+    if (!this.track || this.track.id !== rec.header.trackId || this.seed !== seed || this.bike !== bike) {
+      if (!this.loadTrack(rec.header.trackId, seed, bike)) {
+        this.playbackFrames = null;
+        return false;
+      }
+    }
+    this.resetToGo();
+    return true;
+  }
+
+  /** Leave playback: the world stays where it is (the app restores its own state or reloads a track). */
+  stopPlayback(): void {
+    this.playbackFrames = null;
+    this.playbackEnded = false;
+    this.playbackSpeed = 1;
+    this.pausedFlag = false;
+  }
+
+  /** Scrub: deterministic re-simulation from GO to `tick` (≈ 3 µs/tick, ghost world included). Never interpolates. */
+  seekPlayback(tick: number): void {
+    if (!this.playbackFrames) return;
+    const n = Math.max(0, Math.min(this.playbackLength(), Math.floor(tick)));
+    this.resetToGo();
+    this.loop.stepTicks(n);
+    this.playbackEnded = false;
+    this.hud?.clearBanners?.(); // the banners of the whole re-simulated stretch would all pop on the next frame
+  }
+
+  playbackLength(): number {
+    return this.playbackFrames?.length ?? 0;
+  }
+
+  playbackInfo(): { tick: number; length: number; ended: boolean; finished: boolean } | null {
+    if (!this.playbackFrames) return null;
+    return { tick: this.phaseValue === 'finished' ? this.finishRunTicks : this.runTicks, length: this.playbackFrames.length, ended: this.playbackEnded, finished: this.phaseValue === 'finished' };
+  }
+
+  inPlayback(): boolean {
+    return this.playbackFrames !== null;
+  }
+
+  /** Rewind to GO without a countdown (playback start / scrub): the same physics reset as `go()`. */
+  private resetToGo(): void {
+    this.physics.reset(-1);
+    this.physics.drainEvents();
+    this.lastState = null;
+    this.emit({ type: 'restart', checkpoint: -1, tick: 0 });
+    this.faultCount = 0;
+    this.finishRunTicks = 0;
+    this.crashTicks = 0;
+    this.resultsTicks = 0;
+    this.resultsShown = false;
+    this.finishFrozen = false;
+    this.holdTicks = 0;
+    this.holdFired = true;
+    this.restartLatch = false;
+    this.go();
+  }
+
+  /** The last ≤ 1 s of quantized input (oldest first), RLE-packed like a recording — telemetry death trace. */
+  recentInput(): InputTraceRun[] {
+    const out: InputTraceRun[] = [];
+    const n = this.traceN;
+    for (let k = 0; k < n; k++) {
+      const i = ((this.traceI - n + k + TRACE_TICKS) % TRACE_TICKS) * 4;
+      const t = this.traceRing[i]!;
+      const b = this.traceRing[i + 1]!;
+      const l = this.traceRing[i + 2]!;
+      const f = this.traceRing[i + 3]!;
+      const last = out[out.length - 1];
+      if (last && last[1] === t && last[2] === b && last[3] === l && last[4] === f) last[0]++;
+      else out.push([1, t, b, l, f]);
+    }
+    return out;
+  }
+
+  /** The physics world's `debug()` when it has one (lab HUD reads it defensively); null otherwise. Allocates — call only with the lab on. */
+  physicsDebug(): unknown {
+    const p = this.physics as Partial<{ debug(): unknown }>;
+    try {
+      return typeof p.debug === 'function' ? p.debug.call(this.physics) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Suspension bump-stop start as a fraction of travel per wheel (physics `tuning`, default 0.8) — the lab HUD marks the zone. */
+  bumpStopStart(): { rear: number; front: number } {
+    const t = (this.physics as Partial<{ tuning: { rear?: { stopStart?: number }; front?: { stopStart?: number } } }>).tuning;
+    const r = t?.rear?.stopStart;
+    const f = t?.front?.stopStart;
+    return { rear: typeof r === 'number' ? r : 0.8, front: typeof f === 'number' ? f : 0.8 };
+  }
+
+  /** Drop HUD banners / flashes (replay open + scrub). */
+  clearHudTransients(): void {
+    this.hud?.clearBanners?.();
+  }
+
+  /** The renderer the game draws with (the replay viewer's camera modes talk to it; duck-typed). */
+  get rendererRef(): GameRenderer {
+    return this.renderer;
   }
 
   setPaused(p: boolean): void {

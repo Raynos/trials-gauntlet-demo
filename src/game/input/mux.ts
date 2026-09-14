@@ -38,7 +38,7 @@ export class InputMux {
     m.throttle = m.brake = m.lean = 0;
     m.hop = false;
     m.restart = false;
-    const meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false };
+    const meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false, alt: false };
     this.frameIndex++;
     for (let i = 0; i < this.sources.length; i++) {
       const s = this.sources[i]!;
@@ -61,6 +61,7 @@ export class InputMux {
       meta.confirm ||= sm.confirm;
       meta.back ||= sm.back;
       meta.active ||= sm.active;
+      if (sm.alt) meta.alt = true;
       if (sm.navX) meta.navX = sm.navX;
       if (sm.navY) meta.navY = sm.navY;
     }

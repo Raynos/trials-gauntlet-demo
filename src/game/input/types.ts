@@ -19,11 +19,13 @@ export interface MetaButtons {
   navY: number;
   /** Any activity at all this frame (for device indicator + audio unlock). */
   active: boolean;
+  /** Secondary action, edge-triggered: `V` / pad Y (track card "Watch PB", replay camera cycle). */
+  alt?: boolean;
 }
 
-export const NO_META: Readonly<MetaButtons> = Object.freeze({ pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false });
+export const NO_META: Readonly<MetaButtons> = Object.freeze({ pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false, alt: false });
 
 export function clearMeta(m: MetaButtons): void {
-  m.pause = m.confirm = m.back = m.active = false;
+  m.pause = m.confirm = m.back = m.active = m.alt = false;
   m.navX = m.navY = 0;
 }

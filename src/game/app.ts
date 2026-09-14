@@ -9,20 +9,24 @@
  * `run` (countdown…) → pause overlay → results. The title and menu render
  * over the live 3D scene with `BACKDROP_TRACK` loaded in the `menu` phase.
  */
-import type { BikeClass, InputDevice, QualityTier, RunResult, TrackDef } from '../core/types';
+import type { BikeClass, InputDevice, QualityTier, ReplayCameraMode, RunResult, TrackDef } from '../core/types';
 import type { AudioSystem } from '../audio';
-import { getTrack, listTrackIds } from '../tracks';
+import { getTrack, isLabTrackId, listTrackIds } from '../tracks';
 import {
   ArtManifest,
   BUILD_STAMP,
   CreditsScreen,
   GarageScreen,
+  LabPanel,
+  LastRuns,
   MainMenuScreen,
   OnboardingCard,
   PauseMenu,
   PerfOverlay,
+  ReplayBar,
   SettingsScreen,
   TitleScreen,
+  TraceBars,
   TrackSelectScreen,
   UiSfx,
   UpdateToast,
@@ -56,6 +60,7 @@ import { applyOrientation } from '../ui/orientation';
 import { BACKDROP_TRACK } from './flow';
 import { Percentiles, type Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
+import { ReplaySession, type ReplaySource } from './replay';
 import { defaultBikeForTier } from './rules';
 import { RunCollector, RunLog } from './telemetry';
 
@@ -87,6 +92,12 @@ export interface AppOptions {
   perf?: boolean | undefined;
   /** Bike class changed (garage preview or track launch): the renderer may repaint the hero (`setBikeClass`). */
   onBikeChange?: ((bike: BikeClass) => void) | undefined;
+  /** `?trace=1`: live InputFrame bars under the HUD timer (filming the phone). */
+  trace?: boolean | undefined;
+  /** `?lab=1`: the physics lab HUD on every track (it is automatic on `lab-*` tracks). */
+  lab?: boolean | undefined;
+  /** Solver in effect + exported versions (hidden dev Settings row, `?physics=v1|v2`). */
+  physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[] } | undefined;
 }
 
 const PROBE_FRAMES = 60;
@@ -107,7 +118,12 @@ export function dprCap(): number {
   return Math.min(dpr, isPhone() ? 1.5 : 2);
 }
 
-export type AppScreen = FrontScreen | 'run';
+export type AppScreen = FrontScreen | 'run' | 'replay';
+
+/** Physics lab HUD + ghost of the last attempt: every `lab-*` track (MEGA_PLAN P0 §3), or any track with `?lab=1`. */
+export function isLabTrack(id: string, force = false): boolean {
+  return force || isLabTrackId(id) || getTrack(id)?.meta?.hints?.[0] === 'physics';
+}
 
 export class App {
   private readonly game: Game;
@@ -127,6 +143,14 @@ export class App {
   private readonly onboard: OnboardingCard;
   private readonly toast: UpdateToast;
   private readonly perf: PerfOverlay | null;
+  private readonly lastRuns = new LastRuns();
+  private readonly replayBar: ReplayBar;
+  private readonly replay: ReplaySession;
+  private readonly labPanel: LabPanel;
+  private readonly traceBars: TraceBars | null;
+  /** Where the viewer returns to on exit, and the finished run it interrupted (restored so the results panel comes back). */
+  private replayReturn: { from: 'results'; snap: ReturnType<Game['snapshot']>; counters: ReturnType<Game['counters']>; result: RunResult | null } | { from: 'tracks' } | null = null;
+  private replayMuted = false;
   private readonly frameMs = new Percentiles(120);
   private readonly runLog = new RunLog();
   private readonly collector = new RunCollector();
@@ -210,6 +234,7 @@ export class App {
       telemetry: this.telemetryOn,
       runlog: this.runLog.summary(),
       canShare: typeof navigator !== 'undefined' && typeof navigator.share === 'function',
+      ...(o.physics ? { physics: o.physics } : {}),
     });
     const cb = {
       play: (id: string) => this.play(id),
@@ -255,6 +280,16 @@ export class App {
       },
       copyRunLog: () => this.copyRunLog(),
       shareRunLog: () => this.shareRunLog(),
+      setPhysics: (v: 'default' | 'v1' | 'v2') => {
+        const url = new URL(location.href);
+        if (v === 'default') url.searchParams.delete('physics');
+        else url.searchParams.set('physics', v);
+        location.replace(url.toString());
+      },
+      watchPb: (id: string) => {
+        const pb = this.bestTimes.get(id);
+        if (pb?.recording) this.enterReplay({ json: pb.recording, kind: 'pb', isPb: true }, { from: 'tracks' });
+      },
       resetProgress: () => {
         this.bestTimes.clear();
         this.lastTrackId = null;
@@ -285,6 +320,17 @@ export class App {
     this.toast = new UpdateToast(o.uiRoot, () => this.reloadForUpdate?.());
     this.perf = o.perf ? new PerfOverlay(o.uiRoot) : null;
     if (o.perf) this.game.perfTiming = true;
+    this.labPanel = new LabPanel(o.uiRoot, this.game.physicsHz);
+    this.traceBars = o.trace ? new TraceBars(o.uiRoot) : null;
+    this.replayBar = new ReplayBar(o.uiRoot, {
+      toggle: () => this.replay.toggle(),
+      restart: () => this.replay.restart(),
+      seek: (f, live) => this.replay.seekFrac(f, live),
+      setSpeed: (v) => this.replay.setSpeed(v),
+      setCamera: (m: ReplayCameraMode) => this.replay.setCamera(m),
+      exit: () => this.replay.exit(),
+    });
+    this.replay = new ReplaySession(this.game, this.replayBar, () => this.leaveReplay());
     this.pause = new PauseMenu(o.uiRoot, this.sfx, {
       resume: () => this.resume(),
       restartTrack: () => {
@@ -311,11 +357,11 @@ export class App {
     mountRotatePrompt(o.uiRoot);
     this.menu.setTracks(shipTracks(this.tracks, o.dev ?? false));
 
-    // Telemetry: every fault is a death at the bike's x (the state after the faulting step).
+    // Telemetry: every fault is a death at the bike's x (the state after the faulting step) with the last second of input.
     this.game.onEvent((e) => {
-      if (e.type !== 'fault') return;
+      if (e.type !== 'fault' || this.game.inPlayback()) return;
       const st = this.game.getState();
-      this.collector.death(st.bike.pos.x, e.reason, st.checkpoint);
+      this.collector.death(st.bike.pos.x, e.reason, st.checkpoint, this.game.recentInput());
     });
 
     this.hud.onAction = (a) => {
@@ -323,6 +369,7 @@ export class App {
       else if (a === 'next') this.play(this.nextTrackId());
       else if (a === 'menu') this.quit();
       else if (a === 'pause') this.togglePause();
+      else if (a === 'replay') this.watchLastRun();
     };
 
     this.game.setGhostEnabled(this.ghostOn);
@@ -340,6 +387,7 @@ export class App {
     window.addEventListener('keydown', unlock);
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && this.inRun() && !this.game.paused()) this.togglePause();
+      if (document.hidden && this.screen === 'replay') this.game.setPaused(true);
     });
     window.addEventListener('resize', () => this.fit());
     window.addEventListener('orientationchange', () => this.fit());
@@ -357,7 +405,110 @@ export class App {
       this.hud.setNextEnabled(this.nextTrackEnabled(), this.nextTrackName());
       this.touch.setOverlay(true);
       this.logRun(r);
+      // "Last run" storage (replay viewer): every finished run, PB or not.
+      const last = this.game.lastRunRecording();
+      if (last) this.lastRuns.put(r.trackId, { time: last.time, faults: last.faults, bike: last.bike, at: new Date().toISOString(), recording: last.json });
+      this.hud.setReplayEnabled(last !== null);
     };
+  }
+
+  // -- replay viewer (docs/design/game.md §16) ------------------------------------------
+
+  /** Results → "Watch replay": the run that just finished, in the same scene, PB ghost alongside unless this run is the PB. */
+  private watchLastRun(): void {
+    const last = this.game.lastRunRecording();
+    if (!last) return;
+    const pb = this.bestTimes.get(last.trackId, last.bike);
+    const isPb = !!pb?.recording && pb.recording === last.json;
+    this.enterReplay({ json: last.json, kind: isPb ? 'pb' : 'last', isPb }, { from: 'results' });
+  }
+
+  private enterReplay(src: ReplaySource, ret: { from: 'results' } | { from: 'tracks' }): void {
+    if (this.replay.active) return;
+    const fromResults = ret.from === 'results';
+    this.replayReturn = fromResults ? { from: 'results', snap: this.game.snapshot(), counters: this.game.counters(), result: this.game.result() } : { from: 'tracks' };
+    this.hud.hideResults();
+    this.pause.hide();
+    this.title.hide();
+    this.menu.hide();
+    this.garage.hide();
+    this.settings.hide();
+    this.credits.hide();
+    this.tracksScreen.hide();
+    this.setOverlay(false);
+    this.touch.setEnabled(false);
+    this.touch.setOverlay(false);
+    this.o.sceneRoot?.classList.remove('drift', 'dim', 'garage');
+    const vol = this.soundOn ? this.volume : 0;
+    this.audio?.setMasterVolume(0); // the load / rewind cues stay silent
+    const name = getTrack(JSON.parse(src.json).header?.trackId as string)?.name ?? this.game.currentTrack?.name ?? '';
+    if (!this.replay.open(src, name)) {
+      this.audio?.setMasterVolume(vol);
+      this.replayReturn = null;
+      if (fromResults && this.game.result()) this.hud.showResults(this.game.result()!);
+      return;
+    }
+    this.screen = 'replay';
+    this.screenAt = performance.now();
+    this.hud.setReplay(true);
+    this.replayBar.setDevice(this.mux.activeDevice() ?? 'keyboard');
+    this.setLab(this.game.currentTrack?.id ?? '');
+    setTimeout(() => {
+      if (this.screen === 'replay' && !this.replayMuted) this.audio?.setMasterVolume(vol);
+    }, 60);
+  }
+
+  /** Exit: back to the results panel of the interrupted run (state restored), or to track select. */
+  private leaveReplay(): void {
+    const ret = this.replayReturn;
+    this.replayReturn = null;
+    this.replayMuted = false;
+    this.hud.setReplay(false);
+    this.audio?.setMasterVolume(this.soundOn ? this.volume : 0);
+    if (ret?.from === 'results') {
+      this.game.restore(ret.snap);
+      this.game.restoreCounters(ret.counters);
+      this.game.clearHudTransients();
+      this.screen = 'run';
+      this.screenAt = performance.now();
+      this.touch.setEnabled(true);
+      if (ret.result) {
+        this.hud.setNextEnabled(this.nextTrackEnabled(), this.nextTrackName());
+        this.hud.setReplayEnabled(true);
+        this.hud.showResults(ret.result);
+        this.touch.setOverlay(true);
+      }
+      return;
+    }
+    this.hud.hideNow();
+    this.loadBackdrop(BACKDROP_TRACK, true);
+    this.goto('tracks');
+  }
+
+  /** Harness / QA surface (`window.__trials.replay`). */
+  replayApi(): { open(json?: string): boolean; seek(tick: number): void; info(): ReturnType<ReplaySession['info']>; close(): void } {
+    return {
+      open: (json) => {
+        if (json) {
+          this.enterReplay({ json, kind: 'last', isPb: false }, { from: 'tracks' });
+        } else this.watchLastRun();
+        return this.replay.active;
+      },
+      seek: (tick) => this.replay.seekTick(tick),
+      info: () => this.replay.info(),
+      close: () => this.replay.exit(),
+    };
+  }
+
+  // -- physics lab HUD (MEGA_PLAN P0 §3) ---------------------------------------------------
+
+  /** Lab tracks (`lab-*`, or `?lab=1`): panel on, ghost slot = last attempt, per-tick sampling tap. */
+  private setLab(trackId: string): void {
+    const on = isLabTrack(trackId, this.o.lab ?? false);
+    this.game.setLabMode(on);
+    this.labPanel.root.hidden = !on;
+    if (on) this.labPanel.stopStart = this.game.bumpStopStart();
+    this.game.tickTap = on ? (st, t) => this.labPanel.sample(st, t, this.game.attempts(), this.game.physicsDebug()) : null;
   }
 
   // -- flow -------------------------------------------------------------------
@@ -402,6 +553,7 @@ export class App {
   }
 
   goto(screen: FrontScreen): void {
+    if (this.replay.active) this.replay.close();
     this.screen = screen;
     this.screenAt = performance.now();
     this.touch.setEnabled(false);
@@ -440,6 +592,8 @@ export class App {
     // Bike: the Garage choice when the player has made one, else the tier default (medium = last ridden).
     const bike = this.bikeChoice ?? defaultBikeForTier(def.tier, this.lastRidden);
     this.collector.abandon();
+    if (this.replay.active) this.replay.close();
+    this.setLab(id);
     if (!this.game.loadTrack(id, undefined, bike)) return;
     if (bike !== this.lastRidden) this.o.onBikeChange?.(bike);
     this.lastRidden = bike;
@@ -649,6 +803,27 @@ export class App {
       meta.confirm = meta.back = meta.pause = false;
       meta.navX = meta.navY = 0;
     }
+    if (this.screen === 'replay') {
+      // Replay viewer: the recording drives the game; the devices drive the transport.
+      this.replay.handleInput(frame, meta, restartEdge && !meta.confirm, elapsed);
+      this.prevRestart = frame.restart === true;
+      this.prevThrottle = frame.throttle > 0;
+      const dev = this.mux.activeDevice();
+      if (dev) this.replayBar.setDevice(dev);
+      const scrub = this.replay.scrubbing;
+      if (scrub !== this.replayMuted) {
+        // Scrubs re-simulate whole stretches in one frame: their crash / checkpoint cues stay silent.
+        this.replayMuted = scrub;
+        this.audio?.setMasterVolume(scrub || !this.soundOn ? 0 : this.volume);
+      }
+      this.game.advance(elapsed);
+      if (this.screen === 'replay') {
+        this.replay.afterFrame();
+        this.traceBars?.update(this.game.effectiveInput());
+        this.labPanel.update(performance.now());
+      }
+      return;
+    }
     if (this.onboard.visible) {
       // First-launch card: any confirm / back / gas edge dismisses it; nothing reaches the game meanwhile.
       if (meta.confirm || meta.back || meta.pause || throttleEdge || restartEdge) this.onboard.dismiss();
@@ -665,6 +840,7 @@ export class App {
       if (meta.navX || meta.navY) s.nav(meta.navX, meta.navY);
       if (meta.confirm) s.confirm();
       else if (meta.back || meta.pause) s.back();
+      else if (meta.alt && 'alt' in s) s.alt();
     } else if (this.pause.visible) {
       if (meta.navX || meta.navY) this.pause.move(meta.navX, meta.navY);
       if (meta.pause || meta.back) this.resume();
@@ -696,6 +872,12 @@ export class App {
       this.collector.frame(elapsed * 1000);
       this.frameMs.push(elapsed * 1000);
     }
+    if (this.traceBars) {
+      const show = this.screen === 'run' && !this.pause.visible;
+      this.traceBars.setVisible(show);
+      if (show) this.traceBars.update(this.game.effectiveInput());
+    }
+    this.labPanel.update(performance.now());
     this.perf?.update(performance.now(), () => ({
       frameMs: this.frameMs.stats(),
       physicsUs: this.game.physicsUs.stats(),
@@ -732,6 +914,7 @@ export class App {
     this.hud.setDevice(d, true);
     for (const s of [this.menu, this.tracksScreen, this.settings]) s.setDevice(d);
     this.garage.setDevice(d);
+    this.replayBar.setDevice(d);
     this.onboard.setDevice(d);
     this.pause.setDevice(d);
   }

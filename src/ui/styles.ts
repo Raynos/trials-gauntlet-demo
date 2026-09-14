@@ -275,6 +275,72 @@ export const FRONT_CSS = /* css */ `
 .overlay.leaving .tile, .overlay.leaving .visuals, .overlay.leaving .ov-foot { animation: none; }
 @supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) { html:not(.short) .pause-overlay.show { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); } }
 
+/* ---- replay viewer (docs/design/game.md §16): kicker top-left, transport bar in the lower band ---- */
+.replay { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity var(--t2) var(--ease); z-index: 5; }
+.replay.show { opacity: 1; }
+.replay .rp-head { position: absolute; left: calc(var(--s5) + var(--sal)); top: calc(var(--s5) + var(--sat)); display: flex; flex-direction: column; gap: 2px; }
+.replay .ov-kicker { color: var(--amber); }
+.replay .ov-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.6rem; line-height: 1; text-transform: uppercase; }
+.replay .ov-stats { color: var(--ink-dim); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; }
+.rp-bar { position: absolute; left: 50%; bottom: calc(var(--s5) + var(--sab)); transform: translateX(-50%); display: flex; align-items: center; gap: var(--s2); width: min(1080px, calc(100vw - 2 * var(--s5) - var(--sal) - var(--sar))); padding: var(--s2) var(--s3); border-radius: var(--r2); background: rgba(9,11,15,.82); border: 1px solid var(--line); box-shadow: var(--plate); pointer-events: auto; }
+.rp-bar button { -webkit-appearance: none; appearance: none; border: 1px solid var(--line); background: var(--slab-3); color: var(--ink); border-radius: var(--r1); min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; padding: 0 var(--s2); transition: background var(--t1), color var(--t1), border-color var(--t1); }
+.rp-bar button svg { width: 22px; height: 22px; }
+.rp-bar button.on, .rp-bar .rp-play.on { background: var(--amber); color: var(--amber-ink); border-color: transparent; }
+.rp-bar .rp-time { font-family: var(--font); font-weight: 700; font-variant-numeric: tabular-nums; font-size: .95rem; color: var(--ink); min-width: 4.6em; text-align: right; }
+.rp-bar .rp-time.end { text-align: left; color: var(--ink-dim); }
+.rp-scrub { position: relative; flex: 1 1 auto; height: 44px; cursor: pointer; touch-action: none; }
+.rp-scrub .rp-track { position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px; border-radius: 3px; background: var(--slab-3); border: 1px solid var(--line); }
+.rp-scrub .rp-fill { position: absolute; left: 0; top: 50%; height: 6px; margin-top: -3px; border-radius: 3px; background: var(--amber); width: 0; }
+.rp-scrub .rp-knob { position: absolute; top: 50%; left: 0; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 3px rgba(9,11,15,.85), 0 0 18px -4px var(--amber); }
+.rp-seg { display: inline-flex; gap: 2px; }
+.rp-seg button { min-width: 44px; }
+.rp-bar .rp-exit span { margin-left: 6px; }
+.replay .rp-legend { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--s5) + var(--sab) + 72px); white-space: nowrap; }
+.hud.replay-on .hud-track, .hud.replay-on .hud-device, .hud.replay-on .hints { opacity: 0; }
+.replay.touch .rp-legend { display: none; }
+html.short .rp-bar { bottom: calc(var(--s3) + var(--sab)); padding: var(--s1) var(--s2); gap: var(--s1); }
+html.short .rp-bar button { min-height: 40px; min-width: 40px; font-size: .75rem; }
+html.short .rp-bar .rp-time { font-size: .8rem; min-width: 4.2em; }
+html.short .rp-bar .rp-exit span { display: none; }
+html.short .replay .rp-head { top: calc(var(--s3) + var(--sat)); }
+html.short .replay .rp-legend { display: none; }
+html.short .replay .ov-name { font-size: 1.2rem; }
+html.narrow .rp-seg.cams button { padding: 0 6px; min-width: 40px; }
+
+/* ---- physics lab HUD (MEGA_PLAN P0 §3): bottom-left, monospace, live trace ---- */
+.lab[hidden] { display: none; }
+.lab { position: absolute; right: calc(.8rem + var(--sar)); bottom: calc(.8rem + var(--sab)); z-index: 6; pointer-events: none; display: flex; flex-direction: column; gap: 4px; padding: .4rem .55rem; background: rgba(0,0,0,.72); border: 1px solid var(--line-2); border-radius: var(--r1); }
+.lab .lab-text { margin: 0; font: 11px/1.45 var(--mono); color: #cfe; white-space: pre; text-shadow: none; }
+.lab .lab-trace { display: block; width: 360px; height: 112px; background: rgba(255,255,255,.03); border-radius: 4px; }
+.lab .lab-gauges { display: block; width: 360px; height: 150px; }
+.lab .lab-hop { color: var(--amber); }
+.lab .lab-hop[hidden] { display: none; }
+html.short .lab .lab-gauges { width: 300px; height: 125px; }
+html.short .lab { bottom: calc(.5rem + var(--sab)); padding: .3rem .45rem; }
+html.short .lab .lab-text { font-size: 10px; line-height: 1.35; }
+html.short .lab .lab-trace { width: 300px; height: 84px; }
+.replay ~ .lab, .hud.results-on ~ .lab { opacity: .9; }
+
+/* ---- ?trace=1 input bars under the HUD timer ---- */
+.trace { position: absolute; left: 50%; top: calc(4.9rem + var(--sat)); transform: translateX(-50%); width: 200px; display: none; flex-direction: column; gap: 3px; z-index: 6; pointer-events: none; }
+.trace.show { display: flex; }
+.trace .tr-row { display: grid; grid-template-columns: 2.4em 1fr; align-items: center; gap: 6px; font: 700 10px/1 var(--font); letter-spacing: .12em; color: var(--ink-dim); }
+.trace .tr-bar { position: relative; height: 8px; border-radius: 4px; background: rgba(9,11,15,.7); border: 1px solid var(--line); overflow: hidden; }
+.trace .tr-bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--amber); }
+.trace .tr-bar i.b { background: #ff5b4a; }
+.trace .tr-bar.lean i { background: #7fd1ff; }
+.trace .tr-bar.lean i.back { background: #b8ff7f; }
+.trace .tr-bar.lean s { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,.5); }
+.hud.touch ~ .trace { top: calc(4.9rem + var(--sat)); }
+html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
+
+/* ---- track card: the PB ghost tag doubles as "Watch PB" ---- */
+.card .top em.watch { cursor: pointer; pointer-events: auto; }
+.tier-row.lab-row .tier-head b { color: #7fd1ff; }
+.card.lab-card { --tint: #1e3a4a; }
+.card .labtag { position: absolute; left: var(--s3); top: calc(var(--s3) + 1.45rem); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: #0b1a2e; background: #7fd1ff; border-radius: 3px; padding: 2px 6px; font-weight: 700; }
+.card .top em.watch:hover { color: var(--amber-ink); background: var(--amber); }
+
 /* ---- art plates behind a screen (garage / credits): cover, masked clear where the live scene should show ---- */
 .plate-bg { position: absolute; inset: 0; pointer-events: none; background-size: cover; background-position: 50% 50%; opacity: 0; transition: opacity var(--t3) var(--ease); }
 .plate-bg.loaded { opacity: .55; }

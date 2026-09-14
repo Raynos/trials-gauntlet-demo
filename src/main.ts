@@ -5,6 +5,7 @@
  *   ?harness=1      no real-time driver; the headless harness owns the clock via window.__trials
  *   ?countdown=1    keep the 3-2-1-GO in harness mode (captures of the countdown)
  *   ?physics=mock   force the scaffold MockPhysics even when the real bike physics exists
+ *   ?physics=v1|v2  pick `createBikePhysicsV1` / `createBikePhysicsV2` from the physics barrel when exported (A/B during the v2 migration); default = `createBikePhysics`
  *   ?audio=0        NullAudio (the hook then has no renderOffline)
  *   ?ghost=1        run the PB ghost world in harness mode too (off by default there: one world per µs/tick)
  *   ?rider=gltf|proc, ?bike=gltf|proc   rider / bike model (default gltf; a stored settings choice otherwise)
@@ -15,6 +16,8 @@
  *   ?perf=1         fps / frame ms / physics µs / draw-call overlay (top-left, under the pause button)
  *   ?sw=0           do not register the service worker (production builds register it; harness never does)
  *   ?updatetoast=1  show the "Update available" toast at once (capture / QA of the PWA reload path)
+ *   ?trace=1        live InputFrame bars (gas / brake / lean) under the HUD timer — for filming the phone
+ *   ?lab=1          physics lab HUD + ghost of the last attempt on every track (automatic on `lab-*` tracks)
  */
 import { DEFAULT_PHYSICS_HZ } from './core';
 import * as audioMod from './audio';
@@ -34,11 +37,21 @@ type AnyModule = Record<string, unknown>;
 
 type PhysicsFactoryFn = (hz: number) => PhysicsWorld;
 
-/** Real bike physics when the physics owner has exported a factory; mock otherwise. */
-function physicsFactory(forceMock: boolean): { make: PhysicsFactoryFn; kind: string } {
+/** Solver versions the physics barrel exports today (`createBikePhysicsV1` / `createBikePhysicsV2`). */
+function physicsVersions(): ('v1' | 'v2')[] {
   const m = physicsMod as AnyModule;
-  if (!forceMock) {
-    for (const name of ['createBikePhysics', 'bikePhysicsFactory', 'createPhysics']) {
+  const out: ('v1' | 'v2')[] = [];
+  if (typeof m['createBikePhysicsV1'] === 'function') out.push('v1');
+  if (typeof m['createBikePhysicsV2'] === 'function') out.push('v2');
+  return out;
+}
+
+/** Real bike physics when the physics owner has exported a factory; mock otherwise. `?physics=v1|v2` picks a versioned factory when it exists. */
+function physicsFactory(choice: string | null): { make: PhysicsFactoryFn; kind: string } {
+  const m = physicsMod as AnyModule;
+  if (choice !== 'mock') {
+    const names = choice === 'v1' ? ['createBikePhysicsV1'] : choice === 'v2' ? ['createBikePhysicsV2'] : [];
+    for (const name of [...names, 'createBikePhysics', 'bikePhysicsFactory', 'createPhysics']) {
       const f = m[name];
       if (typeof f === 'function') return { make: f as PhysicsFactoryFn, kind: name };
     }
@@ -130,7 +143,7 @@ function boot(): void {
     const t0 = performance.now();
     const { renderer, kind: renderKind } = makeRenderer(app, harness, models);
     const tRender = performance.now();
-    const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics') === 'mock');
+    const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics'));
     const physics = makePhysics(physicsHz);
     const tPhysics = performance.now();
     const audioParts = makeAudio(makePhysics, params.get('audio') === '0');
@@ -200,7 +213,7 @@ function boot(): void {
       const { renderer, kind: renderKind } = makeRenderer(appRoot, false, models);
       loader.step('Physics world');
       await nextPaint();
-      const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics') === 'mock');
+      const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics'));
       const physics = makePhysics(physicsHz);
       loader.step('Audio');
       await nextPaint();
@@ -252,13 +265,18 @@ function boot(): void {
         },
         art,
         perf: params.get('perf') === '1',
+        trace: params.get('trace') === '1',
+        lab: params.get('lab') === '1',
+        physics: { current: params.get('physics') === 'v1' ? 'v1' : params.get('physics') === 'v2' ? 'v2' : 'default', available: physicsVersions() },
         // Per-class livery when the render owner exports it (`setBikeClass(bike)`); otherwise the garage card carries the colour.
         onBikeChange: (bike) => {
           const r = renderer as Partial<{ setBikeClass(b: 'rookie' | 'pro'): void }>;
           if (typeof r.setBikeClass === 'function') r.setBikeClass(bike);
         },
       });
-      installHook(game, false, extras);
+      const hook = installHook(game, false, extras);
+      hook.lastRun = () => game.lastRunRecording()?.json ?? null;
+      hook.replay = shell.replayApi();
       if (import.meta.env.PROD && params.get('sw') !== '0') registerServiceWorker((reload) => shell.showUpdate(reload));
       if (params.get('updatetoast') === '1') setTimeout(() => shell.showUpdate(() => location.reload()), 1500);
       const trackName = getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track';

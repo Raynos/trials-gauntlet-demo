@@ -172,6 +172,7 @@ export class DomHud implements Hud {
     this.resTiles.setTiles([
       { id: 'retry', label: 'Retry', icon: 'restart' },
       { id: 'next', label: 'Next track', icon: 'next' },
+      { id: 'replay', label: 'Watch replay', icon: 'play' },
       { id: 'menu', label: 'Menu', icon: 'door' },
     ]);
     this.resTiles.onPick = (id) => this.onAction?.(id as HudAction);
@@ -466,6 +467,27 @@ export class DomHud implements Hud {
     for (const b of this.banners) this.retire(b);
     this.pendingCrashAt = -1;
     this.hideResults();
+  }
+
+  /** Replay scrub: every banner / flash / split of the re-simulated stretch is dropped before the next frame. */
+  clearBanners(): void {
+    for (const b of this.banners) this.retire(b);
+    this.crashBanner = null;
+    this.pendingCrashAt = -1;
+    this.flashStart = -1;
+    this.flashEl.style.opacity = '0';
+    this.splitStart = -1;
+    this.splitEl.style.opacity = '0';
+  }
+
+  /** Replay viewer: the REPLAY tile is meaningless on a run with no recording (harness-driven runs, storage off). */
+  setReplayEnabled(on: boolean): void {
+    this.resTiles.setDisabled('replay', !on);
+  }
+
+  /** Replay viewer up: the track plate / device pill give way to the viewer's kicker; timer, faults and strip stay (they read the replayed run). */
+  setReplay(on: boolean): void {
+    this.root.classList.toggle('replay-on', on);
   }
 
   /** Pause overlay up: the whole HUD top band hides (SPEC §6); banners stay. */

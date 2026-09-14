@@ -61,6 +61,9 @@ export function hashPhysicsState(s: PhysicsState): string {
     h.number(w.compression).bool(w.grounded);
   }
   h.number(s.rider.lean).number(s.rider.crouch).number(s.rider.torsoPitch).number(s.rider.armExtend);
+  // Physics v2 rider body: hashed only when present, so v1 / mock goldens are untouched.
+  const rb = s.riderBody;
+  if (rb) h.number(rb.pos.x).number(rb.pos.y).number(rb.angle).number(rb.vel.x).number(rb.vel.y).number(rb.angVel);
   h.number(s.checkpoint).bool(s.finished).string(s.faulted);
   h.number(s.finishTime ?? Number.NaN);
   h.number(s.input.throttle).number(s.input.brake).number(s.input.lean);

@@ -170,6 +170,21 @@ Tracks guarantees the ground under both wheels at a spawn is a single flat polyl
 Tracks' section 0 must be regenerated from physics' F-tests once physics M2 lands; until then
 author with 20 % margin against this table. The bot, not the author, decides whether a track is clearable.
 
+**v2 proposed** (physics-v2.md §16.6; binding once the physics owner tags `physics-v2` — until then v1's rows
+above stand and the harness gates against them). Nothing is removed; rows not listed keep their v1 value.
+
+| quantity | v2 value |
+|---|---|
+| COM height | 0.45 m above the axle line at neutral lean (kept) |
+| 0 → 16 m/s on flat dirt | ≤ 4.2 s at the launch pose (lean +0.25). v1's 1.4–2.2 s was a/g ≈ 1 and the loop-out cause |
+| stationary bunny hop | 0.45–0.65 m rear apex on flat ground, 0.35–0.6 s both-wheels-off; a rear-wheel hop at 60° rises ≥ 1.0 m in ≥ 0.8 s (clip 04) |
+| wheelie balance | a constant-input lean-back wheelie holds ≥ 3 s; a lean-actuated controller holds indefinitely; open-loop diverges |
+| brake from 10 m/s, dirt | ≤ 5.0 m hard-back; ≤ 7 m neutral with a settling stoppie; hard-forward endos |
+| climb | v1 rows kept |
+| `PhysicsState` | gains `riderBody?: { pos, angle, vel, angVel }` (the simulated rider; optional, hashed when present). Placed beside `rider`, not inside `RiderPose`, because render's `PoseFollower` iterates `RiderPose` as four numbers |
+| `debug()` | gains `attTorque` (signed N·m), `poseTarget` (world pos / angle), `comDH` (`{ d, h, ag }`), optionally `lastHop` (`{ preload, snapMs, apex, airtime, landedPitchDeg, at }`) — read by the lab HUD (`src/ui/lab.ts`) field by field; a missing field greys its gauge |
+| factories | `createBikePhysics` = v2 once tagged; `createBikePhysicsV1` stays exported two rounds for A/B (`?physics=v1|v2`, hidden dev Settings row) |
+
 ### 2.6 Track meta consumers (C13, C14, C15)
 
 Render and audio read `def.meta.biome` (5 biomes, render adds `foundry`). Render reads

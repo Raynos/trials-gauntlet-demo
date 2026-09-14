@@ -85,6 +85,7 @@ export function installHook(source: Game | (() => Game), harness: boolean, extra
     ghost: () => g().ghostState(),
     cleared: () => g().cleared(),
     setBike: (b) => g().setBike(b),
+    lastRun: () => g().lastRunRecording()?.json ?? null,
   };
   if (extras.renderOffline) {
     const renderOffline = extras.renderOffline;

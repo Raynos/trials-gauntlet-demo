@@ -264,3 +264,57 @@ export function saveQualityOverride(v: QualityTier | 'auto'): void {
     /* storage unavailable */
   }
 }
+
+// ---------------------------------------------------------------------------
+// Last run per track (replay viewer, docs/design/game.md §16)
+// ---------------------------------------------------------------------------
+
+const LAST_RUN_PREFIX = 'trials.lastrun.';
+
+export interface LastRunEntry {
+  time: number;
+  faults: number;
+  bike: BikeClass;
+  /** ISO time the run finished. */
+  at: string;
+  /** JSON InputRecording, GO → finish. */
+  recording: string;
+}
+
+/**
+ * `trials.lastrun.<trackId>`: the most recent *finished* run on a track, any bike class, whatever
+ * its time — "Watch replay" after a run that was not a PB, and the track card's second watch option.
+ * Reset progress leaves these alone (they are not progress); a full storage clear drops them.
+ */
+export class LastRuns {
+  private readonly cache = new Map<string, LastRunEntry | null>();
+
+  get(trackId: string): LastRunEntry | null {
+    const key = LAST_RUN_PREFIX + trackId;
+    if (this.cache.has(key)) return this.cache.get(key) ?? null;
+    const s = store();
+    if (!s) return null;
+    try {
+      const raw = s.getItem(key);
+      const o = raw ? (JSON.parse(raw) as Partial<LastRunEntry>) : null;
+      const entry =
+        o && typeof o.time === 'number' && typeof o.faults === 'number' && typeof o.recording === 'string' && o.recording.length > 0
+          ? { time: o.time, faults: o.faults, bike: o.bike === 'pro' ? 'pro' : 'rookie', at: typeof o.at === 'string' ? o.at : '', recording: o.recording } satisfies LastRunEntry
+          : null;
+      this.cache.set(key, entry);
+      return entry;
+    } catch {
+      return null;
+    }
+  }
+
+  put(trackId: string, entry: LastRunEntry): void {
+    const key = LAST_RUN_PREFIX + trackId;
+    this.cache.set(key, entry);
+    try {
+      store()?.setItem(key, JSON.stringify(entry));
+    } catch {
+      /* quota / unavailable: the in-memory entry still serves this session */
+    }
+  }
+}
