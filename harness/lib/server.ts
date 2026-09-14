@@ -17,6 +17,28 @@ export interface GameServer {
 export interface ServerOptions {
   dev?: boolean;
   forceBuild?: boolean;
+  /**
+   * Serve a frozen copy of dist/ so a rebuild by another builder mid-run
+   * (one shared checkout) cannot change the page under a long gate.
+   */
+  freeze?: boolean;
+}
+
+/** Newest mtime under src/ vs dist/index.html: true when dist predates a source edit. */
+export function distIsStale(): { stale: boolean; distMtime: number; srcMtime: number } {
+  const indexPath = path.join(DIST_DIR, 'index.html');
+  const distMtime = fs.existsSync(indexPath) ? fs.statSync(indexPath).mtimeMs : 0;
+  let srcMtime = 0;
+  const walk = (dir: string): void => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else srcMtime = Math.max(srcMtime, fs.statSync(p).mtimeMs);
+    }
+  };
+  const src = path.join(REPO_ROOT, 'src');
+  if (fs.existsSync(src)) walk(src);
+  return { stale: distMtime < srcMtime, distMtime, srcMtime };
 }
 
 export async function startServer(options: ServerOptions = {}): Promise<GameServer> {
@@ -32,7 +54,13 @@ export async function startServer(options: ServerOptions = {}): Promise<GameServ
   if (options.forceBuild || !fs.existsSync(indexPath)) {
     await build({ ...common, logLevel: 'error' });
   }
-  const server: PreviewServer = await preview({ ...common, preview: { host: '127.0.0.1', port: 0 } });
+  let outDir = DIST_DIR;
+  if (options.freeze) {
+    outDir = path.join(REPO_ROOT, 'harness', 'out', '.dist-frozen', String(process.pid));
+    fs.rmSync(outDir, { recursive: true, force: true });
+    fs.cpSync(DIST_DIR, outDir, { recursive: true });
+  }
+  const server: PreviewServer = await preview({ ...common, build: { outDir }, preview: { host: '127.0.0.1', port: 0 } });
   const url = server.resolvedUrls?.local[0];
   if (!url) throw new Error('vite preview: no local url');
   return {
@@ -40,7 +68,11 @@ export async function startServer(options: ServerOptions = {}): Promise<GameServ
     mode: 'preview',
     close: () =>
       new Promise<void>((resolve, reject) => {
-        server.httpServer.close((err) => (err ? reject(err) : resolve()));
+        server.httpServer.close((err) => {
+          if (options.freeze) fs.rmSync(outDir, { recursive: true, force: true });
+          if (err) reject(err);
+          else resolve();
+        });
       }),
   };
 }

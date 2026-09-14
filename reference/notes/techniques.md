@@ -34,8 +34,15 @@ Paths: `reference/techniques/clips/`, `reference/techniques/sheets/`,
 | 13 | `13-wheelie-countdown-launch` | Wheelie skill game, 10.0-17.0 s | wheelie start | 3-2-1-GO countdown at 1.0 s cadence, tip text hides at GO, front wheel up immediately, camera widens with speed. |
 | 14 | `14-wheelie-sustain-over-bumps` | Wheelie skill game, 20.0-27.0 s | wheelie balance | Sustained wheelie through the 50 m gate; HUD 36.0 m to 62.7 m in 6.5 s (~4.1 m/s), pitch 30-45 deg with visible corrections. |
 | 15 | `15-wheelie-bomb-fail-finish` | Wheelie skill game, 48.5-55.0 s | fail + finish | Stationary wheelie on a steep ramp for ~3.4 s, front wheel touches, bomb detonates at +3.75 s, `CRASH!` then `TRACK FINISHED!` banner 0.4 s later. |
+| 16 | `16-seesaw-tip-and-exit` | Inferno IV first-checkpoint tutorial (Fusion), 48.0-55.5 s | seesaw | Drop from the start ledge onto the raised end of a plank seesaw at +1.5 s, crawl up the pinned plank to the pivot (+2.5..+5.5 s), plank tips over in ~0.5 s at +5.8 s, ride down the far side, bail and hard-cut reset at +7.0 s. Cropped to the game viewport (see source note). |
+| 17 | `17-seesaw-approach-and-commit` | Inferno IV first-checkpoint tutorial (Fusion), 56.5-64.0 s | seesaw approach | Two starts: rear-wheel hop on the ledge, drop onto the seesaw at +2.5 s, drive up to the pivot, plank tips at +5.5 s, reset at +6.0 s (timer 00:00.000), second drop at +7.3 s. |
+| 18 | `18-stairs-drop-in-first-steps` | Impossible Stairs (Fusion custom track), 4.5-12.0 s | stairs / big steps | Launch off the checkpoint platform, ~1.5 s airtime with the camera at its widest, land two steps down at +2.0 s, then rear-wheel hops from tread to tread with a headlight bloom each time the bike pitches back. |
+| 19 | `19-stairs-step-by-step-descent` | Impossible Stairs (Fusion custom track), 12.0-19.5 s | stairs cadence | Sustained hop-down, timer 01:36.2 to 01:43.2, about one step every 1.5-2 s: short rear-wheel hop, front wheel dropped onto the next tread, ~0.5 s settle, repeat. |
 
 Source videos (all YouTube, downloaded 720p via yt-dlp `web_embedded` client):
+
+- Inferno IV first-checkpoint tutorial: https://www.youtube.com/watch?v=5EtbE9r9L5k (UniversityOfTrials, Trials Fusion, 307 s). Stream capture with sidebar, banner and facecam; clips 16-17 are cropped to the top-left 1000x562 game viewport and upscaled 1.28x, so the in-game HUD (fault count + timer) is visible and pixel scale is not comparable with the other clips. Accepted anyway because it is the only clean side-on seesaw footage found in three candidate rounds.
+- Impossible Stairs: https://www.youtube.com/watch?v=LjKeTJ4ptrc (Rob The Magical Banana, Trials Fusion custom track, PS4 share capture, 204 s). Clean full-frame capture, HUD top-left.
 
 - Bunny Hop lesson 7: https://www.youtube.com/watch?v=-a_ulossbyc (UniversityOfTrials, 96 s)
 - Rear Wheel Bounce lesson 11: https://www.youtube.com/watch?v=ohfMjoJvDV0 (UniversityOfTrials, 104 s)
@@ -47,6 +54,74 @@ Source videos (all YouTube, downloaded 720p via yt-dlp `web_embedded` client):
 A seventh download (Pipe Phobia II tutorial, Trials Fusion, R_uOi4FByOQ) was
 rejected: stream overlay and facecam cover ~30% of the frame and the challenge
 is "don't touch the pipes", not riding them. Deleted from raw/.
+
+Rejected in the seesaw/stairs round (still in raw/, not clipped): Ubisoft
+"Trials Evolution - University of Trials - Class 4" (6MHIJ1ucY6o; extreme-track
+tips with RL TV watermark and controller overlay, the staircase at 124-134 s
+is scenery next to a plank hop, never ridden) and "Trials Evolution - Impossible
+Stairs Completed" (vmLl2NT5KGA; a phone filming a TV). No Trials Rising or
+Evolution seesaw footage was found by title search; the University of Trials
+Rising lesson list has no seesaw lesson.
+
+## Seesaw / stairs observations
+
+Clips 16-19, Trials Fusion. Timings from the 2 fps sheets and the in-game
+timer, so +/-0.25 s.
+
+### Seesaw (clips 16, 17)
+
+1. **The plank rests pinned at ~35 deg nose-up, near end down.** It is a
+   single flat plank on a post with a visible pin, and it does not move at all
+   under the bike until the front axle passes the pivot: in clip 16 the rider
+   spends 3 s (+2.5..+5.5 s) crawling up the tilted plank and the angle stays
+   fixed throughout. The seesaw is a two-state object, not a spring.
+2. **Tip-over is fast once it goes: ~0.5 s from +35 deg to -35 deg** (clip 16
+   +5.8..+6.3 s, clip 17 +5.5..+5.8 s). There is no visible damping bounce at
+   the end stop in these frames; the plank hits the far stop and stays.
+3. **The rider commits weight only after the tip.** On the way up the rider
+   stands and hangs over the bars (front wheel hovering, throttle blips, same
+   posture as the steep-climb clips 06/07). The moment the plank starts to
+   fall the rider sits back and lets the bike roll; the pitch change of the
+   bike lags the plank by roughly 0.2-0.3 s because the suspension unloads
+   first.
+4. **Landing on the raised end is rear-wheel first from a ~2 bike-height
+   drop** (clip 16 +1.5 s, clip 17 +2.5 s), bike pitched ~30 deg nose-up
+   relative to the plank, and the plank does not move on impact. The approach
+   in clip 17 is preceded by a rear-wheel hop on the start ledge while the
+   blue respawn shader is still fading (0-1.3 s), which is the same "hop on
+   the spot to load the suspension" idiom as clip 12.
+5. **Camera on the seesaw stays in the normal riding state** (bike ~24% of
+   frame height) even while the rider is crawling, because the plank is
+   angled and the camera treats the slow climb like a hill; it only widens on
+   the drop-in. The reset is again a single-frame hard cut (clip 16 +7.0 s,
+   clip 17 +6.0 s) with the in-game timer snapping to 00:00.000.
+
+### Stairs / big steps (clips 18, 19)
+
+6. **Steps are cleared one at a time by a rear-wheel hop, not rolled.** Each
+   tread is ~1 bike length deep and ~1 bike height tall, so the wheelbase
+   never spans two treads. The cycle is: rear wheel settles on the tread
+   (~0.5 s), rider pre-loads and lifts the front (bike 40-60 deg nose-up,
+   headlight bloom flares toward the camera at the apex), rear wheel leaves,
+   front wheel drops onto the next tread edge, rear follows. One step every
+   1.5-2 s in clip 19 (timer 01:36.2 to 01:43.2 for roughly four steps).
+7. **Pitch is strongly nose-up going down.** Descending, the bike is never
+   nose-down: the rider keeps the front high so the rear wheel takes the
+   step edge first, and the front comes down last. A nose-first drop of one
+   tread would loop the rider over the bars, which is what the video's other
+   attempts (crashes at 24-30 s in the source) show.
+8. **Drop-in onto the stairs is a long flight**: clip 18 launch at +0.3 s,
+   touchdown at +2.0 s (~1.5 s airtime), the camera pulls out to its widest
+   state during the flight and comes back in over ~1 s after landing.
+9. **The camera does not re-frame per step.** It tracks the bike smoothly
+   with the tread edges running as a straight diagonal line across the frame;
+   the discrete steps are readable from the parallax of the background pylons
+   (left by about a third of the frame across clip 19), not from camera
+   motion. Bike stays near x = 30%, y = 45-55%.
+10. **HUD in Fusion is a single top-left pill: fault count in a circle plus
+    the running timer**, nothing else; the fault count (5) never changes across
+    both stairs clips even though the rider stalls on treads, confirming that
+    a stall or a foot-down is not a fault, only a crash is.
 
 ## Observations: what makes the real thing look and feel AAA
 

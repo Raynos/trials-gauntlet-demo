@@ -17,6 +17,25 @@ Corpus numbers this design is calibrated against (see `reference/notes/*.md`):
 | Big-jump airtime | 2.4-3.2 s | beam lookahead must exceed one airtime (>= 3.5 s) |
 | Timer never pauses across a fault | 16.95 -> 18.55 through respawn | `finishTime` is wall-of-run; faults cost real time |
 
+## Round 1 status — what is built and where it differs from the design below
+
+Everything under `harness/` in this document exists and runs on whichever physics `src/physics`
+exports (`bikePhysicsFactory`/`createBikePhysics`, else the scaffold `MockPhysics`). Reconciled
+to CONTRACT.md; where the sections below still describe the original plan, this list wins:
+
+| topic | as built |
+|---|---|
+| physics API | `snapshot()/restore()` return `{v:1, f64, u8}`; `compileTrack(def)` from `src/tracks` is what the sim loads. `hook.snapshot()` base64 also carries the game counters. |
+| **rule layer** (new) | `harness/lib/rules.ts` mirrors `Game.tick()` (riding / crashed / finished, restart edge, 0.6 s hold = full restart, 1.0 s auto-respawn, run clock, fault counter). `Sim.step()` is a *game* tick, not a bare physics tick; `SimSnapshot = {physics, counters}`. Without it node and browser replays diverge at the first crash (D3 caught it). **Requested src change:** core-game exports this state machine renderer-free so the harness imports instead of mirroring. |
+| attempts | `1 + fault events` exactly as the game counts (`hook.faults()`); the restart mash after a crash is a free respawn in the rule layer and emits no fault. The bot's browser verification warns when node attempts−1 ≠ browser faults. |
+| actions | 13 macro-actions × 15 ticks, **no hop button** (CONTRACT §2.8): `c g gb gf hg hgb hgf b bf bb lb lf t`. Hop = `gb` then `gf`. Same vocabulary for bot and stranger. |
+| bot | `harness/bot/{actions,score,beam,play,bot}.ts`; `pnpm harness:bot <track> [--skill N] [--oracle] [--all] [--seeds N] [--budget ms] [--crash-probe]`. Committed play has *player memory*: a fault bans the action prefix that led to it from that state (keyed by state hash), so attempts are not identical repeats. Golden recordings are written only when the browser hash equals the node hash. Output `harness/out/metrics/<track>.json` (curve, par, shaped, singleWall) — committed. |
+| stranger | **node CLI, one-shot commands, state persisted between calls** (`harness/stranger/cli.ts`, `session.ts`); no long-lived page/socket. `look` renders an ASCII side-view of the next 40 m from the compiled colliders plus the numbers a player sees; `play` prints a per-slot trace instead of a contact sheet. Recordings replay in the browser. Metrics `harness/out/metrics/<track>.stranger.json`. Full reset uses the 0.6 s hold rule so it stays replayable. |
+| compare | 640×360@30 (not 1280×720), `pair.ts` writes `pair-<id>.mp4` (hstack + label bar: 1 square = A, 2 squares = B; no drawtext in this ffmpeg), `pair-<id>-sheet.jpg` 2×8, sealed `pair-<id>.answer.json` (chmod 000). `log.ts` unmasks and appends `out/metrics/compare.jsonl`. The critic is a separate agent the parent runs with `RUBRIC.md`; there is no `critic.ts`. `--mask` blacks out HUD regions (our capture carries a debug HUD strip that would give the side away). |
+| gate | `pnpm harness:gate` → `harness/out/metrics/ship-gate.json`, exit code = failed checks. Thresholds are the CONTRACT §3 numbers in `gate/thresholds.json` (below). G7 capture-sanity is not in the gate (capture is its own command). `fault.toControlMs` is the *manual* path (restart mash on the tick after the crash); the auto-respawn path is reported next to it (~1008 ms per CONTRACT §2.8). Pins in `gate/expected.json` are per physics implementation and re-pin automatically when the implementation name changes; a tuning change with the same name fails `clear.*`/D8 on purpose until `harness:bot` is re-run. |
+| determinism | D1–D5, D7, D8 as designed plus D4b (snapshot round trip through the page's base64 hook). D6 (live-vs-replay under frame jitter) not built. |
+| infra | `BrowserVerifier` serves a **frozen copy of `dist/`** so another builder's rebuild mid-gate cannot change the page, and warns when `dist/` predates `src/`. Corpus: seesaw (16, 17) and stairs (18, 19) clips added to `reference/techniques/` (Trials Fusion; no Rising/Evolution seesaw footage exists). |
+
 ## 0. Principles
 
 1. **Search runs in node, verification runs in the browser.** `src/physics` is platform-neutral (plain data,
@@ -36,107 +55,97 @@ Corpus numbers this design is calibrated against (see `reference/notes/*.md`):
 ```
 harness/
   lib/                        (existing) args browser ffmpeg hook paths recording report server synth
-  lib/sim.ts                  node-side PhysicsWorld factory + snapshot/restore + event drain   [new]
-  lib/metrics.ts              attempt counting, latency extraction from event streams          [new]
-  lib/schema.ts               TS types for every JSON written under out/ (section 8)           [new]
+  lib/sim.ts                  node-side createSim: physics factory (resolved at runtime) + compileTrack + rule layer
+  lib/rules.ts                mirror of Game.tick(): phases, restart edge/hold, auto-respawn, run clock, faults
+  lib/metrics.ts              attempt counting, diffState, percentiles, run ids
+  lib/schema.ts               TS types for every JSON written under out/ (section 8)
+  lib/verify.ts               BrowserVerifier: frozen-dist server + browser, runRecording per fresh page
   bot/
-    actions.ts                macro-action vocabulary (2.1)
+    actions.ts                13 macro-actions × HOLD=15 ticks, stranger slot codes, parseSlots
     score.ts                  progress heuristic (2.2)
     beam.ts                   beam search core (2.3)
-    play.ts                   committed-play driver: search -> commit -> fault -> restart (2.4)
-    bot.ts                    CLI: pnpm harness:bot <trackId> [--skill 0..3] [--oracle] [--seeds 3]
+    play.ts                   committed play with player memory; oracle rewinds (2.4)
+    bot.ts                    CLI: pnpm harness:bot <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] [--crash-probe]
   stranger/
-    cli.ts                    the ONLY tool a stranger sub-agent gets (3.2)
-    session.ts                long-lived page + append-only attempt log + recording assembly
     PROTOCOL.md               text handed verbatim to the stranger
-    run-stranger.ts           parent-side: spawns the sub-agent, enforces budget, collects session.json
+    cli.ts session.ts view.ts one-shot commands, persisted session state, ASCII look
+    README.md                 how the parent spawns a stranger and reads results
   compare/
-    normalize.ts              trim/scale/pad both clips to 1280x720 @30fps, same duration
-    mask.ts                   seeded L/R shuffle, hstack mp4 + 2xN contact sheet, key file
-    critic.ts                 builds the critic prompt, parses/validates the verdict JSON
-    compare.ts                CLI: pnpm harness:compare --ours a.mp4 --ref b.mp4 --manoeuvre <tag> [--n 4]
-    RUBRIC.md                 criteria per manoeuvre handed to the critic (4.3)
+    normalize.ts mask.ts      640x360@30 letterbox, HUD masking
+    pair.ts                   CLI: pnpm harness:pair <ours.mp4> <ref.mp4> --tag <manoeuvre> [--seed N] [--mask] [--align a:b]
+    log.ts                    CLI: pnpm harness:log-verdict <pair-id> --verdict '<json>' [--critic name]
+    RUBRIC.md README.md       what the critic answers, in motion terms
   gate/
-    thresholds.json           every number in 5.2, one place
-    expected.json             pinned finish times + hashes per track (bumped deliberately)
-    ship-gate.ts              CLI: pnpm harness:gate [--track flat-test] [--all-tracks]
-    determinism.ts            CLI: pnpm harness:determinism <input> [--loads 3]
-  inputs/
-    <trackId>/bot-oracle.json           0-fault reference replay (bot, unlimited rewinds)
-    <trackId>/bot-skill<k>.json         committed-play replays, k = 0..3
-    <trackId>/stranger-<sessionId>.json what the stranger actually played
-    <trackId>/crash.json                deterministic crash for the gate
-  out/                        (gitignored)
-    bot/<trackId>/<runId>.json
-    stranger/<trackId>/<sessionId>/{session.json,attempts/NNN.json,sheets/NNN.jpg}
-    compare/<manoeuvre>/<runId>/{ab.mp4,ab-sheet.jpg,verdict-<i>.json,key.json,compare.json}
-    gate/gate.json  gate/determinism.json  summary.json
+    thresholds.json           every threshold, one place (CONTRACT §3)
+    expected.json             pinned golden finish/hash + canonical 1200-tick hash, per physics implementation
+    determinism.ts            CLI: pnpm harness:determinism <recording> [--loads 3] [--pin]
+    ship-gate.ts              CLI: pnpm harness:gate [--track flat-test] [--build] [--quick] [--pin]
+  inputs/<trackId>/
+    bot-<0..3>.json bot-oracle.json   browser-verified golden recordings per skill
+    crash.json                        earliest scripted crash (bot --crash-probe)
+    stranger-<sessionId>.json         what a stranger actually played
+  out/metrics/                (committed) <trackId>.json <trackId>.stranger.json compare.jsonl ship-gate.json
+  out/                        (gitignored) bot/ stranger/ compare/ gate/ boot/ replay/ capture/ perf/
 ```
 
-New package scripts: `harness:bot harness:stranger harness:stranger-cli harness:compare harness:gate
-harness:determinism`. `harness:all` becomes an alias of `harness:gate`.
+Package scripts: `harness:bot harness:stranger harness:pair harness:log-verdict harness:determinism harness:gate`
+(plus the scaffold's `boot replay capture perf gen-input all`).
 
 ## 2. Bot player
 
-### 2.0 Sim contract additions (owned by physics, required by the bot)
+### 2.0 Sim contract (physics per CONTRACT §2.3; rule layer per §2.8)
 
 ```ts
-// src/physics/index.ts (additions)
-export interface PhysicsWorld {
-  // ...existing loadTrack / reset / step / getState / drainEvents
-  /** Opaque, plain-data, structured-cloneable. Must include RNG state, latches, contact caches. */
-  snapshot(): PhysicsSnapshot;
-  restore(s: PhysicsSnapshot): void;
-}
+// src/physics (CONTRACT §2.3): snapshot()/restore() are plain data
 export type PhysicsSnapshot = { v: 1; f64: Float64Array; u8: Uint8Array };
-```
 
-Contract test (section 6, D4): `restore(snapshot())` then `step x m` hashes identically to the straight
-run. `TrialsHook` gains `snapshot(): string` (base64) / `restore(b64: string)` / `drainEvents(): GameEvent[]`
-so the stranger CLI and gate can use them from the browser too. `hash.ts` gains
-`diffState(a, b): string[]` (dotted paths of differing fields) for failure reports.
-
-```ts
 // harness/lib/sim.ts
+export interface SimSnapshot { physics: PhysicsSnapshot; counters: RulesCounters }   // rules = harness/lib/rules.ts
 export interface Sim {
-  world: PhysicsWorld; track: TrackDef; hz: number;
-  step(input: InputFrame): GameEvent[];        // one tick, returns drained events
-  run(frames: Iterable<InputFrame>): { state: PhysicsState; events: GameEvent[]; hash: string };
-  snap(): PhysicsSnapshot; restore(s: PhysicsSnapshot): void;
-  hash(): string;                              // hashPhysicsState(world.getState())
+  world: PhysicsWorld; rules: RunRules; track: TrackDef; compiled: CompiledTrack; hz: number; seed: number;
+  physicsName: string;                          // 'bikePhysicsFactory' | 'createBikePhysics' | 'MockPhysics'
+  step(input: InputFrame): GameEvent[];         // one GAME tick (rule layer + physics), returns the game events
+  run(frames: Iterable<InputFrame>): { state: PhysicsState; events: GameEvent[]; hash: string; ticks: number };
+  snap(): SimSnapshot; restore(s: SimSnapshot): void;
+  hash(): string; state(): PhysicsState; phase(): GamePhase; faults(): number;
+  runTicks(): number; runTime(): number;        // run clock, frozen at finish (== hook.runTime())
+  totalTicks(): number; reload(): void;
 }
-export function createSim(trackId: string, seed: number, hz = DEFAULT_PHYSICS_HZ): Sim;
+export function createSim(trackId: string, seed?: number, hz = DEFAULT_PHYSICS_HZ): Promise<Sim>;
 ```
+
+The factory is resolved at runtime: `bikePhysicsFactory` or `createBikePhysics` from `src/physics/index.ts` when
+exported, else `MockPhysics` (`TRIALS_PHYSICS=mock` forces the mock). `createSim` == the page's `loadTrack` +
+`skipCountdown`: physics `loadTrack` then `reset(-1)`, run clock 0, phase `riding`. Contract test (section 6, D3/D4):
+`createSim().run(rec).hash` equals the browser's `runRecording` hash, and `restore(snap())` + step×m equals the
+straight run. `hashPhysicsState` is the hash; `diffState()` (harness/lib/metrics.ts) names the differing paths.
 
 ### 2.1 Action vocabulary
 
 Physics runs at 120 Hz; searching per tick is hopeless. The bot searches over **macro-actions**: one
-quantized `InputFrame` held for `HOLD` ticks. Vocabulary `A` (13 actions):
+quantized `InputFrame` held for `HOLD` ticks. There is **no hop button** (CONTRACT §2.8); the hop is
+`gas-back` (preload) then `gas-fwd` (snap). Vocabulary `A` (13 actions), `harness/bot/actions.ts`:
 
-```ts
-// harness/bot/actions.ts
-export interface Macro { id: number; name: string; frame: InputFrame; holdTicks: number }
-export const HOLD = 15;                                   // 125 ms; 8 decisions per second
-export const ACTIONS: Macro[] = [
-  m('coast',         { throttle: 0,   brake: 0, lean: 0    }),
-  m('gas',           { throttle: 1,   brake: 0, lean: 0    }),
-  m('gas-back',      { throttle: 1,   brake: 0, lean: -1   }),   // wheelie launch
-  m('gas-fwd',       { throttle: 1,   brake: 0, lean: 1    }),   // climb, nose down
-  m('half-gas',      { throttle: 0.5, brake: 0, lean: 0    }),
-  m('half-gas-back', { throttle: 0.5, brake: 0, lean: -0.5 }),
-  m('brake',         { throttle: 0,   brake: 1, lean: 0    }),
-  m('brake-fwd',     { throttle: 0,   brake: 1, lean: 1    }),
-  m('lean-back',     { throttle: 0,   brake: 0, lean: -1   }),
-  m('lean-fwd',      { throttle: 0,   brake: 0, lean: 1    }),
-  m('hop',           { throttle: 0.6, brake: 0, lean: -0.6, hop: true }, 6),  // 6 ticks hop edge, 9 coast
-  m('gas-hop',       { throttle: 1,   brake: 0, lean: 0,    hop: true }, 6),
-  m('tap-gas',       { throttle: 1,   brake: 0, lean: 0    }, 4),             // 33 ms blip, 11 coast
-];
-```
+| id | name | code | throttle | brake | lean | hold |
+|---|---|---|---|---|---|---|
+| 0 | coast | `c` | 0 | 0 | 0 | 15 |
+| 1 | gas | `g` | 1 | 0 | 0 | 15 |
+| 2 | gas-back | `gb` | 1 | 0 | −1 | 15 |
+| 3 | gas-fwd | `gf` | 1 | 0 | +1 | 15 |
+| 4 | half-gas | `hg` | 0.5 | 0 | 0 | 15 |
+| 5 | half-gas-back | `hgb` | 0.5 | 0 | −0.5 | 15 |
+| 6 | half-gas-fwd | `hgf` | 0.5 | 0 | +0.5 | 15 |
+| 7 | brake | `b` | 0 | 1 | 0 | 15 |
+| 8 | brake-fwd | `bf` | 0 | 1 | +1 | 15 |
+| 9 | brake-back | `bb` | 0 | 1 | −1 | 15 |
+| 10 | lean-back | `lb` | 0 | 0 | −1 | 15 |
+| 11 | lean-fwd | `lf` | 0 | 0 | +1 | 15 |
+| 12 | tap-gas | `t` | 1 | 0 | 0 | 4 (+11 coast) |
 
-Every action expands to exactly `HOLD` ticks (short ones padded with `coast`) so the tree is uniform:
-depth d = 125 ms * d. Values are on the u8/i8 quantization grid (`quantizeInput` is identity on them),
-so recordings round-trip exactly and node and browser see identical bytes.
+Every action expands to exactly `HOLD = 15` ticks (125 ms; 8 decisions per second), so the tree is
+uniform: depth d = 125 ms × d. Values are on the u8/i8 quantization grid (`quantizeInput` is identity on
+them), so recordings round-trip exactly and node and browser see identical bytes. The `code` column is the
+stranger's slot code (`parseSlots("g8 gb4 c2")`), so bot and stranger attempts are comparable.
 
 ### 2.2 Progress score
 
@@ -234,16 +243,17 @@ can" tracks.
 
 ```
 You are playing a 2D motorbike trials track. Controls per 1/8 s slot: throttle 0..1, brake 0..1,
-lean -1..1 (negative = lean back), hop. The bike starts stationary at x=0 facing +x.
+lean -1..1 (negative = lean back). No hop button: preload (gb) then snap (gf). The bike starts stationary facing +x.
 Cross the finish without crashing. A crash returns you to the last checkpoint; the clock keeps running.
-Tool: `pnpm harness:stranger-cli <cmd>`
-  status              -> JSON: x, vx, angle_deg, grounded, checkpoint, faults, time, finishX
-  play "<slots>"      -> apply slots, e.g. "g8 gb4 c2 h1 g6"   (g gas, gb gas+lean back, gf gas+lean fwd,
-                         hg half gas, c coast, b brake, bf brake+lean fwd, lb lean back, lf lean fwd,
-                         h hop, gh gas+hop, t tap gas; number = slots of 125 ms, max 40 per call)
-                         returns summary + events + path of an 8-frame contact sheet of what happened
+Tool: `pnpm harness:stranger <cmd> --session <id>`   (the real text is harness/stranger/PROTOCOL.md)
+  look                -> ASCII side-view of the next 40 m + JSON: x, vx, angle_deg, grounded, checkpoint, faults, time, finishX
+  status              -> the JSON only
+  play "<slots>"      -> apply slots, e.g. "g8 gb4 c2 gf1 g6"  (g gas, gb gas+lean back, gf gas+lean fwd,
+                         hg/hgb/hgf half gas, c coast, b brake, bf/bb brake+lean, lb lean back, lf lean fwd,
+                         t tap gas; number = slots of 125 ms, max 40 per call)
+                         returns summary + events + a per-slot trace (x, vx, angle, ground/air); stops at a crash
   restart             -> back to last checkpoint (counts as an attempt)
-  reset               -> back to the start line (counts as an attempt)
+  reset               -> back to the start line (counts as an attempt; the 0.6 s hold rule, replayable)
   done                -> end the session
 There is no undo. Time only goes forward. Budget: 150 calls or 25 minutes. Say DONE when finished or stuck.
 ```
@@ -361,23 +371,36 @@ One command, one JSON, exit code = number of failed checks (0 = ship). Runs agai
 
 ### 5.2 Thresholds (`gate/thresholds.json`)
 
+The file is the source of truth (CONTRACT §3); this is a copy:
+
 ```json
 {
-  "boot.p50Ms": 800,            "boot.maxMs": 1500,          "boot.firstFrameMs": 400,
-  "clear.finishTimeBitEqual": true, "clear.hashOk": true,
+  "$comment": "Single source of truth for ship-gate thresholds (CONTRACT.md §3). Units in the key suffix. Changing a number here is a design decision; the gate reports value vs limit for every check.",
+  "boot.readyP50Ms": 300,
+  "boot.firstFrameMs": 900,
+  "clear.golden": true,
+  "clear.finishTimeBitEqual": true,
+  "clear.hashOk": true,
   "crash.faultWithinS": 8,
   "fault.toControlMs": 500,
-  "restart.ticks": 1,           "restart.wallMsP95": 5,      "restart.frameMsP95": 50,
+  "restart.ticks": 1,
+  "restart.wallMsP95": 5,
+  "restart.frameMsP95": 33,
   "restart.noCountdown": true,
-  "capture.framesOk": true,     "capture.hashOk": true,
-  "perf.drawCallsMax": 400,     "perf.trianglesMax": 600000, "perf.texturesMBMax": 96,
-  "perf.heapGrowthMBPer10s": 4, "perf.physicsUsPerTickP95": 60, "perf.renderSubmitMsP95": 4,
-  "determinism.pass": true
+  "heap.growthMBPer60s": 5,
+  "bundle.jsGzipKB": 600,
+  "perf.drawCallsMax": 300,
+  "perf.trianglesMax": 500000,
+  "perf.texturesMBMax": 96,
+  "perf.physicsUsPerTickP95": 60,
+  "perf.physicsUsPerTickP95Ragdoll": 80,
+  "perf.renderSubmitMsP95": 4,
+  "determinism.pass": true,
+  "stranger.attemptsBandFactor": 1.5
 }
 ```
 
-`fault.toControlMs 500` sits between Evolution's 350 ms hard cut and Rising's 750 ms (which includes the
-player's reaction). Scaffold measurements (boot 39-80 ms, restart 0.2 ms, restart -> frame 11.5 ms,
+`fault.toControlMs 500` is the manual-restart path (crash tick → restart mash → bike moving); it sits between Evolution's 350 ms hard cut and Rising's 750 ms (which includes the player's reaction). The auto-respawn path is reported alongside (CONTRACT §2.8 fixes it at 1.0 s). Scaffold measurements (boot 39-80 ms, restart 0.2 ms, restart -> frame 11.5 ms,
 physics 6 us/tick, 9 draw calls) are far inside; the thresholds are where the finished game must still be.
 Render `submit` ms is gated; synced ms is reported only, because SwiftShader inflates it ~10x.
 

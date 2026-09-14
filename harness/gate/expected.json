@@ -1,0 +1,15 @@
+{
+  "flat-test": {
+    "canonical1200": {
+      "hash": "6b758241feca3292",
+      "physics": "bikePhysicsFactory"
+    },
+    "golden": {
+      "file": "bot-oracle.json",
+      "finishTime": 6.983333333333333,
+      "hash": "2ceb3e3f3d673985",
+      "ticks": 838,
+      "physics": "bikePhysicsFactory"
+    }
+  }
+}

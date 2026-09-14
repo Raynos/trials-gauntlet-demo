@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "stranger-metrics",
+  "trackId": "flat-test",
+  "attemptsBand": null,
+  "sessions": [
+    {
+      "sessionId": "flat-test-20260914-002749",
+      "agent": "fake",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 12.3833,
+      "calls": 8,
+      "wallMs": 76814
+    },
+    {
+      "sessionId": "flat-test-20260914-010849",
+      "agent": "smoke",
+      "strangerAttempts": 2,
+      "cleared": false,
+      "finishTime": null,
+      "calls": 6,
+      "wallMs": 1321
+    }
+  ],
+  "medianAttempts": 2,
+  "pass": null,
+  "updatedAt": "2026-09-14T06:08:51.083Z"
+}
