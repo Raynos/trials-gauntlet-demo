@@ -130,6 +130,10 @@ export class GarageScreen {
     }
     this.legend = h('div', 'legend', `<span><kbd>←→</kbd>Bike</span><span><kbd>Enter</kbd>Select</span><span><kbd>Esc</kbd>Back</span>`);
     this.root.append(h('div', 'grain'), head, row, this.legend);
+    const backBtn = h('button', 'backbtn', '<span>‹</span>Menu');
+    backBtn.type = 'button';
+    backBtn.addEventListener('click', () => this.back());
+    this.root.appendChild(backBtn);
     parent.appendChild(this.root);
     this.paint();
   }

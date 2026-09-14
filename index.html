@@ -41,11 +41,15 @@
       #loader .wm { font-weight: 900; font-style: italic; font-size: clamp(28px, 7vmin, 44px); line-height: .95; letter-spacing: -.01em; text-transform: uppercase; color: #ffb020; text-shadow: 0 2px 0 #6b3a05, 0 0 24px rgba(255,150,30,.35); margin: 0 0 20px; }
       #loader .bar { position: relative; height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; max-width: 560px; }
       #loader .bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, #ff8a1f, #ffb020); border-radius: 3px; transition: width 120ms linear; }
-      #loader .bar b { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(255,255,255,.14); border-radius: 3px; }
-      #loader .top { display: flex; justify-content: space-between; align-items: baseline; max-width: 560px; margin: 10px 0 4px; font-variant-numeric: tabular-nums; }
-      #loader .top .pct { font-size: 26px; font-weight: 700; color: #ffb020; }
-      #loader .top .kb { color: rgba(243,245,248,.7); text-align: right; }
-      #loader .status { color: rgba(243,245,248,.85); min-height: 1.4em; max-width: 560px; font-variant-numeric: tabular-nums; }
+      #loader .bar.setup i { background: linear-gradient(90deg, #4ab8ff, #7fd1ff); }
+      /* Two honest bars: DOWNLOAD = bytes needed to start (core + title art + models) over bytes received; SETUP = boot steps
+         (weighted) with the current step's own progress. Neither borrows from the other. */
+      #loader .top { display: flex; justify-content: space-between; align-items: baseline; max-width: 560px; margin: 12px 0 4px; font-variant-numeric: tabular-nums; }
+      #loader .top .lbl { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: rgba(243,245,248,.55); }
+      #loader .top .lbl em { font-style: normal; color: rgba(243,245,248,.85); margin-left: 8px; letter-spacing: 0; text-transform: none; font-size: 12px; }
+      #loader .top .pct { font-size: 22px; font-weight: 700; color: #ffb020; line-height: 1; }
+      #loader .top.setup .pct { color: #7fd1ff; }
+      #loader .status { color: rgba(243,245,248,.85); min-height: 1.4em; max-width: 560px; font-variant-numeric: tabular-nums; margin-top: 8px; font-size: 13px; }
       #loader ol { list-style: none; margin: 14px 0 0; padding: 0; max-width: 560px; max-height: 40vh; overflow: hidden; font-size: 12px; font-variant-numeric: tabular-nums; color: rgba(243,245,248,.62); }
       #loader li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; white-space: nowrap; }
       #loader li span:first-child { overflow: hidden; text-overflow: ellipsis; }
@@ -63,8 +67,10 @@
     <div id="app"></div>
     <div id="loader" data-entry="/src/main.ts" data-manifest="./load-manifest.json">
       <div class="wm">Trials<br>Gauntlet</div>
-      <div class="bar"><b></b><i></i></div>
-      <div class="top"><span class="pct">0%</span><span class="kb">connecting…</span></div>
+      <div class="top dl"><span class="lbl">Download<em class="kb">connecting…</em></span><span class="pct">0%</span></div>
+      <div class="bar dl"><i></i></div>
+      <div class="top setup"><span class="lbl">Setup<em class="st">waiting for the core</em></span><span class="pct">0%</span></div>
+      <div class="bar setup"><i></i></div>
       <div class="status">Loading</div>
       <ol></ol>
       <div class="err"><span></span><button type="button">⟳ Retry</button></div>
@@ -74,10 +80,11 @@
       /* Trials loader (≤ 6 KB): byte-accurate download of the core bundle, then boot steps from main.ts via window.__loader. */
       (function () {
         var root = document.getElementById('loader'), q = function (s) { return root.querySelector(s); };
-        var bar = q('.bar i'), ghost = q('.bar b'), pct = q('.pct'), kbEl = q('.kb'), statusEl = q('.status'), list = q('ol'), tEl = q('.t'), netEl = q('.net'), errEl = q('.err span');
+        var bar = q('.bar.dl i'), pct = q('.top.dl .pct'), kbEl = q('.kb'), bar2 = q('.bar.setup i'), pct2 = q('.top.setup .pct'), stEl = q('.st'), statusEl = q('.status'), list = q('ol'), tEl = q('.t'), netEl = q('.net'), errEl = q('.err span');
         var t0 = performance.now(), rows = {}, order = [], failed = false, finished = false, cur = null, steps = [], dlDoneAt = 0;
         var dl = { done: 0, total: 0, gz: 0, samples: [] };
-        var boot = { done: 0, total: 0 };
+        /* Setup bar: weighted boot steps (`plan(total)`, `step(name, weight)`), `frac` = the current step's own progress. */
+        var boot = { done: 0, total: 0, w: 1, frac: 0 };
         var KB = function (b) { return b >= 1048576 ? (b / 1048576).toFixed(2) + ' MB' : Math.round(b / 1024) + ' KB'; };
         function row(name) {
           var r = rows[name];
@@ -97,16 +104,22 @@
           r.b.textContent = text || '';
           if (state) { r.li.className = state; }
         }
+        /* Bytes needed before play: the streamed core plus the title / models phases (Resource Timing, per file). */
+        function needBytes() {
+          var d = dl.done, t = dl.total;
+          for (var ph in bg) { if (bg[ph].need) { d += bg[ph].done; t += bg[ph].total; } }
+          return { done: d, total: t };
+        }
         function paint() {
-          var frac = dl.total ? dl.done / dl.total : 0;
-          /* Download = first 70 % of the bar, boot steps the remaining 30 %. */
-          var p = dl.total ? 0.7 * Math.min(1, frac) : 0;
-          if (boot.total) p += 0.3 * Math.min(1, boot.done / boot.total);
-          if (finished) p = 1;
+          var nb = needBytes();
+          var p = nb.total ? Math.min(1, nb.done / nb.total) : 0;
           bar.style.width = (p * 100).toFixed(1) + '%';
-          ghost.style.width = dl.total ? '70%' : '0';
           pct.textContent = Math.round(p * 100) + '%';
-          if (dl.total) kbEl.textContent = (dlDoneAt ? 'Core ' + KB(dl.total) + ' in ' + ((dlDoneAt - t0) / 1000).toFixed(1) + ' s' : 'Downloading ' + KB(dl.done) + ' / ' + KB(dl.total)) + (dl.gz ? ' (≈ ' + KB(dl.gz) + ' gz on the wire)' : '');
+          if (nb.total) kbEl.textContent = KB(Math.min(nb.done, nb.total)) + ' / ' + KB(nb.total) + (dlDoneAt ? '' : (dl.gz ? ' · core ≈ ' + KB(dl.gz) + ' gz' : ''));
+          var p2 = boot.total ? Math.min(1, (boot.done + boot.frac * boot.w) / boot.total) : 0;
+          if (finished) p2 = 1;
+          bar2.style.width = (p2 * 100).toFixed(1) + '%';
+          pct2.textContent = Math.round(p2 * 100) + '%';
           var now = performance.now();
           tEl.textContent = ((now - t0) / 1000).toFixed(1) + ' s';
           var s = dl.samples; while (s.length && now - s[0][0] > 1500) s.shift();
@@ -142,25 +155,38 @@
 
         var api = window.__loader = {
           longTasks: longTasks,
-          step: function (name) {
+          step: function (name, weight) {
             if (cur && rows[cur] && !rows[cur].li.classList.contains('ok')) { var r = rows[cur]; setRow(cur, Math.round(performance.now() - r.at) + ' ms', r.li.classList.contains('slow') ? 'ok slow' : 'ok'); }
+            if (cur) boot.done += boot.w;
             cur = name;
+            boot.w = weight || 1; boot.frac = 0;
             var nr = row(name); nr.at = performance.now();
             steps.push({ name: name, at: nr.at });
             setRow(name, '…', 'on');
             statusEl.textContent = name;
-            boot.done++;
+            stEl.textContent = name;
             paint();
           },
           plan: function (n) { boot.total = n; },
+          /* `name` = the current step (or "<step> · <detail>"): the detail and fraction update that step's row and the
+             setup bar; any other name is its own row (background phases). Fractions are shown as whole numbers. */
           progress: function (name, done, total, unit) {
-            var text = unit === 'B' ? KB(done) + ' / ' + KB(total) : done + ' / ' + total + (unit ? ' ' + unit : '');
-            setRow(name, text, done >= total ? 'ok' : 'on');
-            if (name === cur) statusEl.textContent = name + ' · ' + text;
+            var sub = cur && (name === cur || name.indexOf(cur + ' · ') === 0);
+            var detail = sub && name !== cur ? name.slice(cur.length + 3) : '';
+            var text = unit === 'B' ? KB(done) + ' / ' + KB(total) : total === 100 ? Math.round(done) + ' %' : Math.round(done) + ' / ' + Math.round(total) + (unit ? ' ' + unit : '');
+            if (sub) {
+              boot.frac = total ? Math.max(0, Math.min(1, done / total)) : 0;
+              setRow(cur, (detail ? detail + ' · ' : '') + text, 'on');
+              statusEl.textContent = cur + (detail ? ' · ' + detail : '') + ' · ' + text;
+              stEl.textContent = cur + (detail ? ' · ' + detail : '');
+              paint();
+            } else {
+              setRow(name, text, done >= total ? 'ok' : 'on');
+            }
           },
           done: function () {
             if (finished) return;
-            api.step('Ready');
+            api.step('Ready', 0);
             setRow('Ready', ((performance.now() - t0) / 1000).toFixed(1) + ' s', 'ok');
             finished = true;
             paint();
@@ -203,7 +229,8 @@
         var bg = {}, byTail = {};
         function watchBackground(items) {
           var labels = { world: 'World art (renderer, background)', menu: 'Menu art (background)', models: 'Models (background)', title: 'Title art (background)' };
-          items.forEach(function (i) { if (i.phase in labels) { byTail[i.path.replace(/^\.?\//, '')] = i; var g = bg[i.phase] || (bg[i.phase] = { label: labels[i.phase], done: 0, total: 0, seen: {} }); g.total += i.bytes; } });
+          var need = { title: 1, models: 1 }; /* the title screen and the glTF hero wait for these; menu / world art hot-swap in */
+          items.forEach(function (i) { if (i.phase in labels) { byTail[i.path.replace(/^\.?\//, '')] = i; var g = bg[i.phase] || (bg[i.phase] = { label: labels[i.phase], done: 0, total: 0, seen: {}, need: !!need[i.phase] }); g.total += i.bytes; } });
           function take(list) { list.forEach(function (e) { var tail = e.name.replace(/^[a-z]+:\/\/[^/]+\//, '').split('?')[0]; var i = byTail[tail]; if (!i || bg[i.phase].seen[tail]) return; bg[i.phase].seen[tail] = 1; bg[i.phase].done += i.bytes; }); }
           try { take(performance.getEntriesByType('resource')); new PerformanceObserver(function (l) { take(l.getEntries()); }).observe({ type: 'resource', buffered: true }); } catch (e) {}
         }
@@ -246,8 +273,7 @@
             statusEl.textContent = 'Starting';
             dlDoneAt = performance.now();
             /* Through the api so the row is `cur` and the module's first step() closes it with its ms. */
-            api.step('Script parse + evaluate');
-            boot.done--; /* not one of the planned boot steps */
+            api.step('Script parse + evaluate', 0);
             insertEntry();
           });
         }).catch(function (e) { fail('Download failed: ' + (e && e.message || e)); });

@@ -110,7 +110,7 @@ const LAST_TRACK_KEY = 'trials.lastTrack';
 const TOUCH_SETTLE_S = 3;
 
 /** Grace after a screen change during which menu buttons (confirm/back/nav) are ignored: the edge that changed screens must not act twice. */
-const SCREEN_GRACE_MS = 150;
+const SCREEN_GRACE_MS = 250;
 
 export function isPhone(): boolean {
   const coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
@@ -207,6 +207,21 @@ export class App {
       this.lastTrackId = null;
     }
 
+    // One gesture, one screen: a click that arrives within SCREEN_GRACE_MS of a screen change is the
+    // tail of the tap that caused the change (pointerdown on the old screen, click delivered to whatever
+    // is under the finger on the new one). Swallow it at the capture phase, for every screen alike.
+    o.uiRoot.addEventListener(
+      'click',
+      (e) => {
+        if (performance.now() - this.screenAt >= SCREEN_GRACE_MS) return;
+        const t = e.target as HTMLElement | null;
+        if (t && t.closest('.screen')) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      },
+      { capture: true },
+    );
     this.touch = new TouchInput(o.uiRoot, { debug: o.touchDebug ?? false });
     this.mux.add(new KeyboardInput()).add(new GamepadInput()).add(this.touch);
     this.mux.onDeviceChange = (d) => this.onDevice(d);

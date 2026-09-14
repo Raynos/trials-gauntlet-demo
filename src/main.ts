@@ -211,7 +211,7 @@ function boot(): void {
    */
   async function bootFront(): Promise<void> {
     const loader = getLoader();
-    loader.plan(10);
+    loader.plan(14); // 10 steps, World textures weighs 4 and Title art 2 (SETUP bar weights)
     try {
       loader.step('WebGL renderer');
       await nextPaint();
@@ -295,15 +295,24 @@ function boot(): void {
       await nextPaint();
       await nextPaint();
       const prep = (renderer as Preparable).prepare;
-      loader.step('World textures');
+      loader.step('World textures', 4);
       await nextPaint();
       if (typeof prep === 'function') {
-        await prep.call(renderer, (done, total, label) => loader.progress(label ? `World textures · ${label}` : 'World textures', done, total));
+        // The renderer reports (done, total, label) per sub-step, each restarting at 0. Map the known
+        // sub-step order onto one monotone 0..100 so the SETUP bar never runs backwards.
+        const phases = ['Art pack', 'Hero meshes', 'Lighting', 'Post chain', 'Materials', 'Loading', 'Hero models', 'Shaders', 'First frame', 'Ready'];
+        let best = 0;
+        await prep.call(renderer, (done, total, label) => {
+          const idx = Math.max(0, phases.findIndex((ph) => (label ?? '').startsWith(ph)));
+          const frac = total > 0 ? Math.min(1, done / total) : 0;
+          best = Math.max(best, ((idx + frac) / phases.length) * 100);
+          loader.progress(label ? `World textures · ${label.replace(/\s*\d+(\.\d+)?\s*\/\s*\d+.*$/, '')}` : 'World textures', best, 100);
+        });
       }
       loader.step('Fonts');
       await nextPaint();
       await fontsReady();
-      loader.step('Title art');
+      loader.step('Title art', 2);
       await nextPaint();
       await Promise.race([artLoad, new Promise((r) => setTimeout(r, 3000))]);
       const key = art.keyart('industrial');

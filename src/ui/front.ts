@@ -130,6 +130,14 @@ abstract class Screen {
     this.legend.innerHTML = d === 'gamepad' ? LEGEND_PAD : d === 'touch' ? LEGEND_TOUCH : LEGEND_KB;
   }
 
+  /** Fixed "‹ Back" pill, top-right, never scrolls — touch has no Esc. */
+  protected addBackButton(label = 'Back'): void {
+    const b = h('button', 'backbtn', `<span>‹</span>${escapeHtml(label)}`);
+    b.type = 'button';
+    b.addEventListener('click', () => this.back());
+    this.root.appendChild(b);
+  }
+
   abstract nav(dx: number, dy: number): void;
   abstract confirm(): void;
   abstract back(): void;
@@ -424,6 +432,7 @@ export class TrackSelectScreen extends Screen {
     this.tiers = h('div', 'tiers');
     this.legend = h('div', 'legend', LEGEND_KB);
     this.root.append(h('div', 'grain'), head, this.tiers, this.legend);
+    this.addBackButton('Menu');
     this.tiers.addEventListener('pointermove', (e) => {
       if (e.pointerType === 'touch') return;
       const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.card');
@@ -655,6 +664,7 @@ export class SettingsScreen extends Screen {
     wrap.append(list, foot);
     this.legend = h('div', 'legend', `<span><kbd>↑↓</kbd>Row</span><span><kbd>←→</kbd>Change</span><span><kbd>Esc</kbd>Back</span>`);
     this.root.append(h('div', 'grain'), wrap, this.legend);
+    this.addBackButton('Menu');
 
     const s = this.state;
     const seg = <T extends string>(id: SettingId, label: string, sub: string, opts: { v: T; l: string }[], get: () => T, set: (v: T) => void): void => {
@@ -950,6 +960,7 @@ export class CreditsScreen extends Screen {
         <dt>Thanks</dt><dd>Trials Evolution and Trials Rising for the read-outs, the crash stamp and the checkpoint restart.</dd>
       </dl>`;
     this.root.append(h('div', 'grain'), wrap);
+    this.addBackButton('Menu');
     this.root.addEventListener('click', () => this.back());
   }
   nav(): void {}

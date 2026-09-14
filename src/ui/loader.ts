@@ -9,11 +9,14 @@
  * Absent loader (tests, harness) → no-ops.
  */
 export interface Loader {
-  /** Number of steps to expect (drives the boot part of the bar). */
+  /** Total step weight to expect (drives the SETUP bar). */
   plan(n: number): void;
-  /** Start a named step; the previous one is marked done with its wall ms. */
-  step(name: string): void;
-  /** Numeric progress inside a step; `unit` 'B' formats as KB / MB. */
+  /** Start a named step (weight defaults to 1); the previous one is marked done with its wall ms. */
+  step(name: string, weight?: number): void;
+  /**
+   * Numeric progress. `name` = the current step, or `"<step> · <detail>"`, updates that step's row and
+   * the SETUP bar fraction; any other name is its own row (background phases). `unit` 'B' = KB / MB.
+   */
   progress(name: string, done: number, total: number, unit?: string): void;
   /** Everything the title needs is ready: crossfade the loader away. */
   done(): void;

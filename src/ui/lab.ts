@@ -113,7 +113,7 @@ export class LabPanel {
     this.rear = new Float32Array(this.n);
     this.front = new Float32Array(this.n);
     this.root = document.createElement('div');
-    this.root.className = 'lab';
+    this.root.className = 'labhud'; // not `.lab`: that is the settings-row label class
     this.root.hidden = true;
     this.text = document.createElement('pre');
     this.text.className = 'lab-text';

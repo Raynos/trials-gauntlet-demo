@@ -74,8 +74,13 @@ html { font-size: clamp(13px, calc(1.25 * var(--vw)) + 4px, 18px); }
 
 export const FRONT_CSS = /* css */ `
 /* ---- shared front-end pieces ---------------------------------------- */
-.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease); }
-.screen.show { opacity: 1; pointer-events: auto; }
+/* Hidden screens are OUT of hit-testing and the accessibility tree, not merely transparent: visibility: hidden
+   (delayed until the fade-out ends) on top of pointer-events: none, so no tap, scroll, focus or click can reach a
+   screen that is not the current one. */
+.screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
+.screen.show { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity var(--t2) var(--ease), visibility 0s; }
+.screen:not(.show) *, .overlay:not(.show) *, .onboard:not(.show) *, .results:not(.show) * { pointer-events: none !important; }
+.overlay:not(.show), .onboard:not(.show), .results:not(.show) { visibility: hidden; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
 .screen.show .rise { animation: rise var(--t2) var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 .scrim { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 35%, rgba(6,7,9,.92)); }
@@ -87,6 +92,9 @@ export const FRONT_CSS = /* css */ `
 .wordmark { font-family: var(--display); font-style: italic; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; line-height: .86; color: var(--amber); text-shadow: var(--bevel); background: linear-gradient(180deg, #ffd98a 0%, #ffb020 42%, #ff8a1f 70%, #c9641a 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 .03em 0 #6b3a05) drop-shadow(0 .07em .05em rgba(0,0,0,.6)) drop-shadow(0 0 .5em rgba(255,150,30,.28)); }
 .wordmark small { display: block; font-size: .28em; letter-spacing: .48em; line-height: 1; margin: 0 0 .28em .08em; color: var(--ink); background: none; -webkit-text-fill-color: var(--ink); text-shadow: var(--outline); font-weight: 900; }
 .kicker { font-size: .78rem; letter-spacing: .34em; text-transform: uppercase; color: var(--amber); font-weight: 700; }
+.backbtn { position: absolute; right: calc(var(--s5) + var(--sar)); top: calc(var(--s4) + var(--sat)); z-index: 4; display: inline-flex; align-items: center; gap: .35em; min-height: 44px; padding: 0 1.1rem 0 .8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--slab); color: var(--ink); font: 700 .82rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; pointer-events: auto; cursor: pointer; }
+.backbtn span { font-size: 1.3em; line-height: 1; margin-top: -.1em; }
+.backbtn:active { background: rgba(255,255,255,.18); }
 .legend { position: absolute; right: calc(var(--s5) + var(--sar)); bottom: calc(var(--s4) + var(--sab)); display: flex; gap: var(--s4); font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; }
 .legend kbd { font-family: var(--font); font-weight: 700; color: var(--ink); background: rgba(255,255,255,.1); border: 1px solid var(--line); border-bottom-width: 2px; padding: .05em .45em; border-radius: var(--r1); margin-right: .4em; font-size: .9em; min-width: 1.6em; display: inline-block; text-align: center; }
 .legend .pad { display: inline-flex; align-items: center; justify-content: center; width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid var(--ink-dim); color: var(--ink); font-weight: 700; margin-right: .4em; font-size: .85em; }
@@ -308,18 +316,18 @@ html.short .replay .ov-name { font-size: 1.2rem; }
 html.narrow .rp-seg.cams button { padding: 0 6px; min-width: 40px; }
 
 /* ---- physics lab HUD (MEGA_PLAN P0 §3): bottom-left, monospace, live trace ---- */
-.lab[hidden] { display: none; }
-.lab { position: absolute; right: calc(.8rem + var(--sar)); bottom: calc(.8rem + var(--sab)); z-index: 6; pointer-events: none; display: flex; flex-direction: column; gap: 4px; padding: .4rem .55rem; background: rgba(0,0,0,.72); border: 1px solid var(--line-2); border-radius: var(--r1); }
-.lab .lab-text { margin: 0; font: 11px/1.45 var(--mono); color: #cfe; white-space: pre; text-shadow: none; }
-.lab .lab-trace { display: block; width: 360px; height: 112px; background: rgba(255,255,255,.03); border-radius: 4px; }
-.lab .lab-gauges { display: block; width: 360px; height: 186px; }
-.lab .lab-hop { color: var(--amber); }
-.lab .lab-hop[hidden] { display: none; }
-html.short .lab .lab-gauges { width: 300px; height: 125px; }
-html.short .lab { bottom: calc(.5rem + var(--sab)); padding: .3rem .45rem; }
-html.short .lab .lab-text { font-size: 10px; line-height: 1.35; }
-html.short .lab .lab-trace { width: 300px; height: 84px; }
-.replay ~ .lab, .hud.results-on ~ .lab { opacity: .9; }
+.labhud[hidden] { display: none; }
+.labhud { position: absolute; right: calc(.8rem + var(--sar)); bottom: calc(.8rem + var(--sab)); z-index: 6; pointer-events: none; display: flex; flex-direction: column; gap: 4px; padding: .4rem .55rem; background: rgba(0,0,0,.72); border: 1px solid var(--line-2); border-radius: var(--r1); }
+.labhud .lab-text { margin: 0; font: 11px/1.45 var(--mono); color: #cfe; white-space: pre; text-shadow: none; }
+.labhud .lab-trace { display: block; width: 360px; height: 112px; background: rgba(255,255,255,.03); border-radius: 4px; }
+.labhud .lab-gauges { display: block; width: 360px; height: 186px; }
+.labhud .lab-hop { color: var(--amber); }
+.labhud .lab-hop[hidden] { display: none; }
+html.short .labhud .lab-gauges { width: 300px; height: 125px; }
+html.short .labhud { bottom: calc(.5rem + var(--sab)); padding: .3rem .45rem; }
+html.short .labhud .lab-text { font-size: 10px; line-height: 1.35; }
+html.short .labhud .lab-trace { width: 300px; height: 84px; }
+.replay ~ .labhud, .hud.results-on ~ .labhud { opacity: .9; }
 
 /* ---- ?trace=1 input bars under the HUD timer ---- */
 .trace { position: absolute; left: 50%; top: calc(4.9rem + var(--sat)); transform: translateX(-50%); width: 200px; display: none; flex-direction: column; gap: 3px; z-index: 6; pointer-events: none; }
