@@ -250,7 +250,7 @@ describe('one-way plank straddle (round 11, tracks.md 6.1: the m3 wedge)', () =>
 });
 
 describe('golden hashes per class (round 11): flat-test bot-3 replayed straight through the physics', () => {
-  const GOLDEN: Record<BikeClass, string> = { rookie: 'd2b082502561bc00', pro: '32a467457c497e2c' };
+  const GOLDEN: Record<BikeClass, string> = { rookie: '468698322c4ed60d', pro: 'ff507f3cfe5bc77a' };
   for (const cls of BIKE_CLASSES) {
     it(`${cls}: flat-test/bot-3.json hash is pinned (${GOLDEN[cls]})`, () => {
       const rec = decodeJSON(fs.readFileSync(path.join(process.cwd(), 'harness/inputs/flat-test/bot-3.json'), 'utf8'));

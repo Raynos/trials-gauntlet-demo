@@ -325,17 +325,12 @@ describe('air control (§9.4, §14.2)', () => {
   });
 });
 
-describe('R2 rows (§14.2) - targets recorded, not yet measured', () => {
-  it.todo('stationary flat hop, best preload 0.25-0.45 s: rear apex 0.45-0.65 m, front 0.6-0.9 m, both-off 0.35-0.6 s (R1 measures rear 0.19 m at P 0.3, both-off 0.11 s)');
-  it.todo('front-wheel lift onto a ledge at 1.5-2.5 m/s: crouch 0.6-0.8 s, extension 0.3-0.5 s, front 18-25 deg at ~15 deg/s, rear pops <= 0.1 m and lands first, front down ~0.7 s later (clip 01)');
-  it.todo('rear-wheel hop at 60 deg onto a platform: pre-load 0.25-0.4 s, airtime >= 0.8 s, rear-axle rise >= 1.0 m with pitch held 55-65 deg (clip 04)');
-  it.todo('hop monotonicity: apex increases with snap speed (1 -> 4 m/s) and magnitude (0 -> +1); one tick late/early changes apex <= 5 %');
-  it.todo('rolling hop at 5 m/s onto a 0.9 m ledge: makeable with a held wheelie + snap; lands <= 30 deg nose-down (CONTRACT)');
-  it.todo('rear-wheel pogo at 65 deg: >= 3 consecutive hops >= 0.15 m at 0.7-1.2 s cadence with a scripted -1/+1 rhythm');
-  it.todo('rear-wheel balance, scripted lean only, throttle 0.3: holds 30-45 deg >= 3 s with corrections every 0.8-1.0 s (clips 03, 14)');
-  it.todo('plank-to-plank: 49 deg plank at 4.5 m/s with a throttle blip: nose drops ~10 deg in the last 0.15 s, airtime 0.5-0.75 s, lands front-first within +-10 deg of level, no rebound (clip 07)');
-  it.todo('drop-in ~2.5 m with a ~9 m/s vertical launch: airtime 2.0-2.3 s, rear-first at 35-45 deg, front down within 0.15 s (clip 18)');
-  it.todo('30 deg 1 m kicker at 10 m/s: airtime 0.9-1.2 s, launch pitch 30-40 deg, lands rear-first with lean 0');
-  it.todo('landing from 2 m at 6 m/s: rides away for pitch -20..+40; rider sinks 0.10-0.25 m, back in 0.3-0.5 s');
-  it.todo('climb 55 / 60 / 65 deg wood: sustained / sustained (~1 wheelbase/s) / stalls and rolls back without a fault');
+describe('R2 rows (§14.2): measured in r2.test.ts; what is still open', () => {
+  it.todo('front-wheel lift onto a ledge at 1.5-2.5 m/s: crouch 0.6-0.8 s, extension 0.3-0.5 s, front 18-25 deg at ~15 deg/s, rear pops <= 0.1 m and lands first, front down ~0.7 s later (clip 01) - R3');
+  it.todo('rear-wheel hop at 60 deg onto a platform: pre-load 0.25-0.4 s, airtime >= 0.8 s, rear-axle rise >= 1.0 m with pitch held 55-65 deg (clip 04) - R3 (needs the wheelie hold first)');
+  it.todo('rolling hop at 5 m/s onto a 0.9 m ledge: makeable with a held wheelie + snap; lands <= 30 deg nose-down (CONTRACT) - R3');
+  it.todo('rear-wheel pogo at 65 deg: >= 3 consecutive hops >= 0.15 m at 0.7-1.2 s cadence with a scripted -1/+1 rhythm - R3 (the coasting balance is 50 deg at lean 0; 65 needs lean +0.7 and a hold controller)');
+  it.todo('rear-wheel balance, scripted lean only, throttle 0.3: holds 30-45 deg >= 3 s with corrections every 0.8-1.0 s (clips 03, 14) - R3');
+  it.todo('plank-to-plank: 49 deg plank at 4.5 m/s with a throttle blip: nose drops ~10 deg in the last 0.15 s, airtime 0.5-0.75 s, lands front-first within +-10 deg of level, no rebound (clip 07) - R3');
+  it.todo('drop-in ~2.5 m with a ~9 m/s vertical launch: airtime 2.0-2.3 s, rear-first at 35-45 deg, front down within 0.15 s (clip 18) - R3');
 });

@@ -39,10 +39,17 @@ function script(i: number): InputFrame {
   if (i === 16 * HZ) return quantizeInput({ restart: true });
   if (t >= 12) return quantizeInput({ throttle: 1, lean: -1 });
   const ph = t % 2;
-  let lean = Math.sin(t * 0.9) * 0.3;
-  let throttle = 0.75;
-  if (t > 1 && ph >= 0.9 && ph < 1.2) lean = -1;
-  else if (t > 1 && ph >= 1.2 && ph < 1.4) lean = 1;
+  let lean = 0.2 + Math.sin(t * 0.9) * 0.2; // R2: never below 0 while riding - a lean -0.25 at 0.75 throttle over the seesaw's tip looped on the v2 plant
+  let throttle = 0.5; // R2: 0.75 with lean +0.2 loops off the tipping seesaw's far end at 8 m/s on the v2 plant (the rear's lighter rebound lets the tip kick it)
+  // R2: the hop is real now (0.5 m); a preload at throttle 0.75 from 8 m/s looped the bike at 5 s and the
+  // trajectory never reached the drum - the hop is scripted at the technique's throttle and only on the flat before the seesaw (a hop landing on the seesaw's tip looped too)
+  if (t > 1 && t < 4 && ph >= 0.3 && ph < 0.6) {
+    lean = -1;
+    throttle = 0.4;
+  } else if (t > 1 && t < 4 && ph >= 0.6 && ph < 0.8) {
+    lean = 1;
+    throttle = 0.3;
+  }
   const brake = ph > 1.7 && ph < 1.85 ? 1 : 0;
   if (brake) throttle = 0;
   return quantizeInput({ throttle, brake, lean });

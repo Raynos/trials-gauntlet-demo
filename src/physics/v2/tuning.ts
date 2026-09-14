@@ -82,6 +82,9 @@ export interface TuningV2 {
     kp: number;
     kd: number;
     Fmax: number;
+    /** Force-velocity of the servo (R2): the cap on |F| falls from F_max at zero closing speed to servoMinFrac * F_max at servoCloseV0 m/s. */
+    servoCloseV0: number;
+    servoMinFrac: number;
     kpsi: number;
     cpsi: number;
     tauMax: number;
@@ -124,8 +127,8 @@ const MID: TuningV2 = {
   },
   wheel: { radius: 0.34, rearMass: 8, rearInertia: 0.55, frontMass: 7, frontInertia: 0.45, wheelbase: 1.3 },
   suspension: {
-    rear: { axle: { x: -0.585, y: -0.21 }, axis: { x: 0.12, y: 0.99 }, travel: 0.26, k: 8500, preload: 0.02, cComp: 650, cReb: 950, kStop: 250e3, stopStart: 0.85 },
-    front: { axle: { x: 0.715, y: -0.215 }, axis: { x: -0.4, y: 0.92 }, travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 800, kStop: 250e3, stopStart: 0.85 },
+    rear: { axle: { x: -0.585, y: -0.21 }, axis: { x: 0.12, y: 0.99 }, travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85 },
+    front: { axle: { x: 0.715, y: -0.215 }, axis: { x: -0.4, y: 0.92 }, travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85 },
   },
   tyre: {
     Cs: 9000,
@@ -162,11 +165,16 @@ const MID: TuningV2 = {
       { lean: 1, x: 0.06, y: 0.67, psi: -0.24 },
     ],
     comFromHips: { x: 0.03, y: 0.1 },
-    targetRateLin: 3.0,
+    targetRateLin: 5.0,
     targetRateAng: 6.0,
     kp: 45000,
     kd: 4200,
-    Fmax: 2600,
+    Fmax: 3200,
+    // R2: OFF (minFrac 1). A closing-speed cap tames the landing pogo (a 2 m flat drop at lean 0 rebounds 0.6 m,
+    // 2.5-3 m loops) but the hop's push is the same motion (body closing on a target 0.3 m above it at 3-4 m/s)
+    // and any cap that fixes the landing halves the hop; needs an intent signal - R3 (physics.md v2 status R2)
+    servoCloseV0: 3.0,
+    servoMinFrac: 1,
     kpsi: 2500,
     cpsi: 180,
     tauMax: 300,

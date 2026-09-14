@@ -16,7 +16,7 @@ import { Rng } from '../../core/rng';
 import type { PhysicsWorld } from '../index';
 import { CollisionWorld, circleVsPrim, PrimKind, type Manifold, type Prim } from '../collision';
 import { SURFACES } from '../tuning';
-import { atan, atan2, clamp, cos, sin, wrapAngle, HALF_PI } from '../dmath';
+import { atan2, clamp, cos, sin, wrapAngle, HALF_PI } from '../dmath';
 import { bikeTuningV2, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
 import { driveTorque, lag, limiterLatch, reportRpm, thrustFrac } from './engine';
 import { brushImpulse, tyreMu } from './tyre';
@@ -45,7 +45,7 @@ export interface PhysicsDebugV2 {
   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
   /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
-  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2 };
+  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number };
   /** The declared attitude torque applied this tick (N m). */
   attTorque: number;
   /** Pose target in the chassis frame. */
@@ -282,6 +282,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private dServoFx = 0;
   private dServoFy = 0;
   private dServoTq = 0;
+  private dLegLen = 0;
+  private dLegFrac = 1;
   private dAtt = 0;
   private dTgtWx = 0;
   private dTgtWy = 0;
@@ -534,9 +536,37 @@ class WorldV2 implements BikePhysicsWorldV2 {
     return { d: cx - rear.x, h: cy - (rear.y - R) };
   }
 
+  /**
+   * Pitch at which the bike balances on its rear wheel at this lean and forward acceleration. The chassis
+   * pivots about the rear AXLE (the wheel rolls; it does not tilt with the frame), so the combined COM
+   * swings on a circle of radius r_a = |(d, h - R)| about the axle, not about the contact patch: the
+   * moment balance about the COM is `-M g d(th) + M a (h_a(th) + R) - K_att lean = 0` (the `M a R` is the
+   * chain torque's reaction on the chassis, which is why the lift threshold at th = 0 is still a/g = d/h
+   * with h from the ground). R2 finding: R1 wrote `atan(d/h)` (pivot at the contact patch) and put the
+   * zero-thrust balance at 34 deg; it is atan(d / (h - R)) = 49 deg at lean 0 on the mid row, and the
+   * always-on attitude torque (§9.4) moves it by +-asin(K_att / (M g r_a)) ~ +-18 deg, so the coasting
+   * balance spans ~27 deg (lean -1) to ~71 deg (lean +1). Solved by bisection (monotone in th over the
+   * bracket); not part of the tick.
+   */
   balancePitch(lean: number, accel = 0): number {
     const { d, h } = this.comDH(lean);
-    return HALF_PI - atan2(h, d) - atan(accel / this.g);
+    const R = this.tuning.wheel.radius;
+    const ha = h - R;
+    const ra = Math.sqrt(d * d + ha * ha);
+    const phi = atan2(d, ha);
+    const g = this.g;
+    const k = (this.tuning.rider.Katt * lean) / this.totalMass();
+    const f = (th: number): number => -g * ra * sin(phi - th) + accel * (ra * cos(phi - th) + R) - k;
+    let lo = phi - HALF_PI;
+    let hi = phi + HALF_PI;
+    if (f(lo) > 0) return lo;
+    if (f(hi) < 0) return hi;
+    for (let i = 0; i < 48; i++) {
+      const mid = 0.5 * (lo + hi);
+      if (f(mid) < 0) lo = mid;
+      else hi = mid;
+    }
+    return 0.5 * (lo + hi);
   }
 
   teleport(pose: TeleportPose): void {
@@ -585,6 +615,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
         body: { pos: { x: this.px[RIDER]!, y: this.py[RIDER]! }, vel: { x: this.vx[RIDER]!, y: this.vy[RIDER]! }, angle: this.an[RIDER]!, angVel: this.av[RIDER]! },
         servoForce: { x: this.dServoFx, y: this.dServoFy },
         servoTorque: this.dServoTq,
+        legLen: this.dLegLen,
+        legFrac: this.dLegFrac,
         poseTargetWorld: { x: this.dTgtWx, y: this.dTgtWy },
         lag: { x: this.px[RIDER]! - this.dTgtWx, y: this.py[RIDER]! - this.dTgtWy },
       },
@@ -1012,10 +1044,21 @@ class WorldV2 implements BikePhysicsWorldV2 {
       const det = m11 * m22 - m12 * m21;
       let Fx = r.kp * ex + (bx * m22 - m12 * by) / det;
       let Fy = r.kp * ey + (m11 * by - m21 * bx) / det;
+      // force-velocity (R2, Hill-like): the servo can pull the body toward its target at full F_max only
+      // while the gap is opening or closing slowly; the cap falls linearly with the closing speed to
+      // `servoMinFrac` F_max at `servoCloseV0`. The hop's push is an opening gap (the target runs ahead of
+      // the body) and keeps F_max; a big landing drives the body 0.3 m below a static target and would
+      // otherwise fire it (and the bike) back up at F_max - the 0.6 m pogo rebound of R2's first 2 m drop.
+      const el = Math.sqrt(ex * ex + ey * ey);
+      const vClose = el > 1e-6 ? (vrx * ex + vry * ey) / el : 0;
+      const fl = clamp(1 - vClose / r.servoCloseV0, r.servoMinFrac, 1);
+      const fmax = r.Fmax * fl;
+      this.dLegLen = ul;
+      this.dLegFrac = fl;
       const fm = Math.sqrt(Fx * Fx + Fy * Fy);
-      if (fm > r.Fmax) {
-        Fx *= r.Fmax / fm;
-        Fy *= r.Fmax / fm;
+      if (fm > fmax) {
+        Fx *= fmax / fm;
+        Fy *= fmax / fm;
       }
       this.dServoFx = Fx;
       this.dServoFy = Fy;

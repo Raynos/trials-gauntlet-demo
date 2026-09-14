@@ -126,7 +126,8 @@ export function airPitch(targetDeg: number): Controller {
 /**
  * Bunny hop as a scripted technique: preload (lean back + throttle) for
  * `preloadS`, then snap the lean forward. `throttle` during the preload keeps
- * the bike still (rear brake holds it) or rolling when `roll` is set.
+ * the bike still (rear brake holds it) or rolling when `roll` is set. (v1's
+ * rows are measured with this one; the v2 technique is `hopperV2`.)
  */
 export function hopper(startT: number, preloadS = 0.3, roll = false): Controller {
   return (o) => {
@@ -135,6 +136,99 @@ export function hopper(startT: number, preloadS = 0.3, roll = false): Controller
     if (t < preloadS) return { throttle: roll ? 0.6 : 0.35, lean: -1, brake: roll ? 0 : 1 };
     if (t < preloadS + 0.35) return { throttle: roll ? 0.4 : 0.3, lean: 1 };
     return { throttle: 0.2, lean: 0 };
+  };
+}
+
+/**
+ * The v2 hop (physics-v2 §9.5, R2): preload (lean back, a little throttle) for `preloadS`, snap the lean
+ * forward and hold it `snapS` (the legs' push + the arms' pull), then a quick lean back for `tuckS` (the
+ * third movement of Lesson 7: the body drops toward the bike and pulls the rear up under the rider), then
+ * neutral. `roll` keeps the bike moving through the preload instead of holding it on the rear brake.
+ */
+export function hopperV2(startT: number, preloadS = 0.3, roll = false, snapS = 0.22, tuckS = 0.1): Controller {
+  return (o) => {
+    const t = o.t - startT;
+    if (t < 0) return roll ? { throttle: 0.35, lean: 0 } : { brake: 1, lean: 0 };
+    if (t < preloadS) return { throttle: roll ? 0.5 : 0.3, lean: -1 };
+    if (t < preloadS + snapS) return { throttle: 0.3, lean: 1 };
+    if (t < preloadS + snapS + tuckS) return { throttle: 0.2, lean: -1 };
+    if (!o.airborne && o.pitchDeg > 15) return { throttle: 0.1, lean: 1 };
+    return { throttle: 0.2, lean: 0 };
+  };
+}
+
+/**
+ * The same hop keyed to a lip at `lipX` for a rolling approach at `speed` (the lab level's take-off):
+ * hold the speed, start the preload `preloadS` before the front wheel reaches the lip and snap as it
+ * passes it, tuck, then fly neutral and lean into the landing (nose high: forward; nose low: back).
+ */
+export function lipHopper(lipX: number, speed = 8.5, preloadS = 0.3, snapS = 0.22, tuckS = 0.1, hop = true, o: { preLean?: number; thrPre?: number; snapLead?: number; snapLean?: number; thrSnap?: number } = {}): Controller {
+  const preLean = o.preLean ?? -0.8;
+  const snapLean = o.snapLean ?? 1;
+  const thrSnap = o.thrSnap ?? 0.5;
+  const snapLead = o.snapLead ?? 1.0; // the REAR wheel this far before the lip's edge: the push leaves the ramp through the rear
+  let snapT = NaN;
+  let preT = NaN;
+  return (ob) => {
+    const rearX = ob.state.wheels.rear.pos.x;
+    const v = Math.max(1, ob.speed);
+    const hold = Math.max(0, Math.min(1, 0.15 + 0.3 * (speed - ob.speed)));
+    if (!hop) {
+      if (rearX < lipX) return { throttle: hold, lean: 0 };
+      return { throttle: 0.25, lean: ob.pitchDeg < -10 ? -0.8 : 0 };
+    }
+    if (Number.isNaN(preT) && rearX >= lipX - snapLead - preloadS * v) preT = ob.t;
+    if (Number.isNaN(preT)) return { throttle: hold, lean: 0 };
+    if (Number.isNaN(snapT) && (rearX >= lipX - snapLead || ob.t - preT >= preloadS + 0.15)) snapT = ob.t;
+    if (Number.isNaN(snapT)) return { throttle: o.thrPre ?? hold, lean: preLean };
+    const t = ob.t - snapT;
+    if (t < snapS) return { throttle: thrSnap, lean: snapLean };
+    if (t < snapS + tuckS) return { throttle: 0.3, lean: -1 };
+    // fly it: hold the lean back (K_att nose-up) while the nose is dropping, forward against a rising nose
+    if (ob.airborne) return { throttle: 0.3, lean: ob.pitchRateDeg < -30 || ob.pitchDeg < -5 ? -1 : ob.pitchDeg > 25 || ob.pitchRateDeg > 60 ? 0.6 : 0 };
+    return { throttle: 0.3, lean: ob.pitchDeg > 15 ? 0.8 : 0 };
+  };
+}
+
+/**
+ * Wheelie hold for the v2 plant (R2). The chassis balances about the rear axle at `balanceAt(lean)`
+ * (attitude torque included), so the lean is PARKED where the coasting balance sits `park` deg above
+ * the target and barely moves (every lean change kicks the pitch through the torso swing and K_att);
+ * the throttle (nose up) and the rear brake (nose down) are the fast loop, a slow integral on the
+ * throttle removes the proportional offset, and a small speed term keeps it from running away.
+ * The entry is not this controller's job: start it from a wheelie (the tests teleport into one).
+ */
+export function wheelieHoldV2(targetDeg: number, targetSpeed: number, o: { park?: number; kp?: number; kd?: number; ki?: number; kb?: number; kdb?: number; ks?: number; bias?: number; leanRate?: number } = {}): Controller {
+  const park = o.park ?? 1;
+  const kp = o.kp ?? 0.03;
+  const kd = o.kd ?? 0.012;
+  const ki = o.ki ?? 0;
+  const kb = o.kb ?? 0.08;
+  const kdb = o.kdb ?? 0.015;
+  const ks = o.ks ?? 0.02;
+  const bias = o.bias ?? 0.1;
+  const leanRate = o.leanRate ?? 2;
+  let leanCmd = NaN;
+  let lastT = NaN;
+  let integ = 0;
+  return (ob) => {
+    let leanPark = 1;
+    for (let l = -1; l <= 1.001; l += 0.01) {
+      if (ob.balanceAt(l) >= targetDeg + park) {
+        leanPark = l;
+        break;
+      }
+    }
+    if (Number.isNaN(leanCmd)) leanCmd = leanPark;
+    const dtc = Number.isNaN(lastT) ? 0 : ob.t - lastT;
+    lastT = ob.t;
+    const err = targetDeg - ob.pitchDeg;
+    const rate = ob.pitchRateDeg;
+    integ = Math.max(-0.3, Math.min(0.3, integ + ki * err * dtc));
+    leanCmd += Math.max(-leanRate * dtc, Math.min(leanRate * dtc, leanPark - leanCmd));
+    const throttle = Math.max(0, Math.min(1, bias + integ + kp * err - kd * rate + ks * (targetSpeed - ob.speed)));
+    const brake = err < 0 ? Math.max(0, Math.min(1, -(kb * err + kdb * rate))) : 0;
+    return { throttle, lean: leanCmd, brake };
   };
 }
 

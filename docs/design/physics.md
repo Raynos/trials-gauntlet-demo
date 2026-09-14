@@ -5,6 +5,133 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R2 (of three, physics-v2.md §16.7)
+
+**Finding.** The hop is real: from a standing start on flat dirt, a 0.3 s preload (lean −1, throttle 0.3), a
+full-travel snap held 0.22 s and a 0.1 s lean-back give a **rear apex of 0.47 m** (0.19 in R1), front leaves first,
+lands at +3°, identical on dirt / wood / metal / concrete, continuous (0.4 cm per lean quantum), monotone in preload
+depth and in snap speed, peaking when the snap comes at the rear's maximum load (0.55 m at a 0.4 s preload). Four
+levers did it, in the spec's order: `F_max` 2 600 → 3 200, `targetRateLin` 3 → 5, rear `k` 8 500 → 10 500 (preload 0,
+sag 29 %), and — the one the spec did not list — **rear rebound damping 950 → 250** (front 800 → 250): at 950 the
+8 kg wheel is overdamped (ζ 1.8) and is dragged off the ground at 57 % compression, spending the spring's energy in
+the air. The second finding corrects R1: **the coasting rear-wheel balance is about the axle, not the contact
+patch** — atan(d/(h−R)) = 50° at lean 0, not atan(d/h) = 34° — and the always-on attitude torque moves it by
+±asin(K_att/(M g r_a)) ≈ ±18°, so the balance spans 24° (lean −1) to 69° (lean +1). `balancePitch()` now solves the
+real moment balance (gravity, inertial, K_att, the chain torque's M·a·R) by bisection; R1's controllers parked the
+lean 13–25° off the true equilibrium, which is why the lean-only hold looped. With the park right, a 60 Hz / 100 ms
+throttle + rear-brake controller keeps the front up ~10 s (mean 31°, ±9° limit cycle, speed drifting up); the 40 ± 8°
+for 10 s row is not met. Open-loop divergence from the balance: 1.34 s. The parent's decision (a) — neutral full gas
+lifts to 15–25° and settles — is refuted: any lift under a sustained a/g above d/h(θ) is a loop (the equilibrium is
+unstable at every pitch), so the honest launch has two regimes, no lift (a/g < d/h(0) = 0.64) or loop; a peaked
+low-speed curve (0.75 g to 2–3 m/s) loops lean 0 at 1.4–1.5 s even with the pose table shifted 0.11 m forward
+(measured); the mid row keeps 880 N. Decision (c)'s 45° crawl is 0.75 g and the same knife: the mid crawls 35°, tops 40
+with 6 m/s, stalls 45 at 62 %; 50–60 are not made on 6 m/s (the Pro's thrust, R3). Landing: a 1.5 m drop compresses
+100 %, the rider sinks (crouch 0.95) and returns, no fault; a 3 m drop with the rider forward bottoms and rides away
+(pitch −28..+14); **at lean 0 a 2 m drop rebounds 0.2 m and 2.5–3 m loops** — the rider's re-extension at F_max after a
+0.3 m crouch fires the bike like a pogo stick, and the hop's push is the same motion (body closing on a target 0.3 m
+above it at 3–4 m/s), so every cap that fixes the landing halves the hop (tried force-length on the hip→peg distance
+and a Hill closing-speed cap; the latter is left in `tuning.rider.servoCloseV0 / servoMinFrac`, off). Kickers 17–22° at
+8–11 m/s land within ±20° with the lean released in the air; **held at +0.25 they nose-dive** (K_att −75 N m over a
+1–2 s flight: −25° at 11 m/s, −50..−80 and a crash at 14) — decision (e)'s "constant lean +0.25" fights the declared air
+control. The lab level: a hop keyed to the rear wheel 1.0 m before the lip (preload −0.8, held speed, snap +1, tuck)
+gets onto the ledge at 8–9 m/s and rides on, but the rear meets the ledge corner and rolls over it (−0.06 m, the
+corner geometry) rather than clearing it by 0.1 m; rolling it off is an endo on the vertical face at 7–8 m/s, not the
+survivable miss §15 assumed. Barrel unchanged: `createBikePhysics` = v1, v2 = `createBikePhysicsV2` (`?physics=v2`).
+
+### Files (R2)
+
+- `src/physics/v2/tuning.ts` — mid row: `F_max` 3 200, `targetRateLin` 5, rear `k` 10 500 / `preload` 0 / `cReb` 250,
+  front `cReb` 250; `servoCloseV0` 3 / `servoMinFrac` 1 (the landing lever, off).
+- `src/physics/v2/bike.ts` — `balancePitch()` about the axle with K_att (bisection); the servo cap carries the (off)
+  closing-speed factor; `debug().rider.legLen / legFrac` (hips→pegs distance, cap fraction) for the HUD.
+- `src/physics/controllers/index.ts` — `hopper` is v1's (its rows depend on it); new `hopperV2` (preload / snap /
+  tuck), `lipHopper` (the lab take-off, keyed to the rear wheel at the lip), `wheelieHoldV2` (parked lean, throttle +
+  rear brake, PI, speed term).
+- `src/physics/v2/r2.test.ts` — the R2 rows (hop matrix, wheelie, landing, climbs, kickers, lab); `feel.test.ts` keeps
+  the R1 rows and the remaining `it.todo`s; `property.test.ts` half-rate row is measured (55 % at 2.5 m/s);
+  `snapshot.test.ts` gauntlet script re-timed (the real hop looped the old script off the seesaw's tip).
+
+### R2 FEEL table (mid row; old → new; `npx vitest run src/physics/v2` prints every row)
+
+| row | band | R1 | R2 | verdict |
+|--|--|--|--|--|
+| static sag rear / front | 28–32 / 24–28 % | 28.5 / 16.9 | 29.3 / 17.0 | rear pass, front fail (unchanged, spring inconsistency) |
+| coasting balance by lean −1 / −0.5 / 0 / +0.5 / +1 | (info) | 29.3 / 31.6 / 33.6 / 35.4 / 37.2 (contact-patch formula) | **24.2 / 39.4 / 49.9 / 59.6 / 68.6** (axle + K_att; verified by teleport: 40° falls, 60° rises) | R1's numbers were wrong |
+| 0 → 16 lean +0.25 / top | 3.5–4.2 s / 20 ± 0.5 | 4.47 / 20.03 | 4.47 / 20.03 | unchanged |
+| full gas lean +0.25 / +0.5 / +1 max pitch | ≤ 10 | 6.1 / 5.7 / 5.6 | 5.5 / 5.2 / 6.0 | pass |
+| full gas lean 0 | parent (a): lift 15–25° then settle | 6.8°, no loop | 7.3°, no loop | (a) refuted: lift ⇒ loop; no-lift kept |
+| full gas lean −0.25 / −0.5 / −1 loop time | (a): 2–3 s / — / ≤ 1.2 s | 1.60 / 1.25 / 1.13 | 1.46 / 1.23 / 1.09 | −1 pass; −0.25 is a log knife (critical lean ≈ −0.05) |
+| open-loop divergence from the balance | 1–2 s (CONTRACT) | — | **1.34 s** | pass |
+| wheelie hold 60 Hz / 100 ms, target 40 | ≥ 10 s in 40 ± 8 | lean-only looped 1.6 s | front up 9.9 s of 12, 5.9 s in band, mean 31°, v → 18 m/s | fail (honest); limit cycle ±9° at 100 ms |
+| snap-forward from 20° throttle held | < 15 at 0.5 s | 9.6 | 3.2 | pass |
+| brake hard-back / neutral | ≤ 5.0 / ≤ 7 m | 5.54 / 6.74 | 5.64 / 6.84 | as R1 (hard-back it.fails) |
+| air control 0.5 s lean −1 / +1 / thr / brake @8 | 25–40 / −25..−40 / 8–15 / −12..−40 | 35 / −39 / 9 / −12 | 35 / −39 / 9 / −12 | pass |
+| **hop** rear apex / front / both-off / first / land | 0.45–0.65 / 0.6–0.9 / 0.35–0.6 s / front / level | 0.19 / 0.12 / 0.11 / rear | **0.47 / 0.65 / 0.29 s / front / +3°** | apex, order, landing pass; both-off short (the nose drops in flight) |
+| hop tuck gain / throttle-through | +0.1–0.2 / continuous | — | +0.105 / 0.50 → 0.41 (thr 0 → 1, falls) | pass (throttle lowers the apex: the rear spins, the nose rises) |
+| hop by preload time 0.15 … 0.5 s | peak at max load | — | 0.35 0.38 0.43 0.47 0.52 **0.55** 0.52 | pass (max load at 0.4 s) |
+| hop quantum jump / 1-tick late / surfaces | < 3 cm / ≥ 85 % / identical | 1.8 cm (2 q) | **0.4 cm** / 102 % / identical ×4 | pass |
+| hop seated | ≤ 0.1 m | — | 0.20 m, both-off 0.04 s | fail as stated; it is a front-wheel pivot, not a hop |
+| half-rate snap (2.5 of 5 m/s) | 55–75 % | 7 % (1.5 of 3) | **55 %** (1.5 m/s: 7 %) | pass |
+| landing 1.5 m @6 | rear ≥ 80 %, returns | — | 100 %, crouch 0.95, settles 32 %, no fault | pass |
+| landing 3 m @6 | bottoms, bounded buck | — | lean +0.5: 91 %, no rebound, −28..+14, rides away; lean 0: loop | half; R3 |
+| climb 4 m wood, crawl / 6 m/s | (c): ≤ 45 crawl; 50–60 with speed | R1 sweep: 35 / 45 | crawl tops 35, 40 stalls 50 %; 6 m/s tops 40, 45 stalls 62 %, 50 faults, 55–65 stall at the base | (c) not met at 0.61 g |
+| kickers 17–22° @8 / 11 / 14, lean +0.25 held | land ±20 | — | −20..+19 / −25..−42 / crash | fail above 8 m/s (K_att) |
+| kickers, lean released in the air | land ±20 | — | 8: −9..+11; 11: −1..+4; 14: −5 / −21 (crash) / −24 | pass at 8–11 |
+| lab hop @8 / @9 | clears ledge ≥ 0.1 m | — | on the ledge, margin −0.06 (corner roll), land −4° / +12° | half |
+| lab roll @8 / @9 | survivable miss | — | endo on the face | §15's assumption fails |
+| µs/tick | ≤ 10 riding | 2.25 | (perf test unchanged, green) | pass |
+
+### Hop matrix (rear apex m; preload depth × snap rate, lean units per s)
+
+| preload lean | 4 /s (0.5 s traverse) | 8 /s | 16 /s | one tick |
+|--|--|--|--|--|
+| −0.25 | 0.07 | 0.30 | 0.34 | 0.35 |
+| −0.5 | 0.11 | 0.39 | 0.46 | 0.48 |
+| −0.75 | 0.28 | 0.44 | 0.51 | 0.47 |
+| −1 | 0.08 | 0.43 | 0.50 | 0.47 |
+
+Monotone in depth at ≥ 8 /s and in rate at every depth up to 16 /s; the one-tick snap is 0–7 % below the 16 /s ramp
+(the target rate cap makes them nearly the same input); a 0.5 s snap is no hop ("the timing is crucial").
+
+### Further deviations (R2)
+
+14. **Rear / front rebound damping 950 / 800 → 250** (§13). Wheel-side ζ 1.8 → 0.5: the spring returns its energy to the
+    ground instead of carrying the wheel off at 57 % compression. Consequence: the seesaw's tipping end can kick the
+    bike at 8 m/s under 0.75 throttle (the snapshot gauntlet script rides it at 0.5 now) — the tracks owner should
+    re-measure seesaws.
+15. **Rear `k` 8 500 → 10 500, preload 0** (the spec's fourth lever); sag 29 %.
+16. **`balancePitch` pivots at the axle and includes K_att** (was atan(d/h)). `debug().balancePitch` and every
+    controller's `balanceAt` moved 15–30°. v1's formula is untouched.
+17. **`targetRateLin` 5** (spec 3 → 4 lever, one step further): the body, not the target, limits the push at 3 200 N.
+18. The seated snap pops the rear 0.2 m: K_att (300 N m nose-down at lean +1 on the ground) plus the arm reaction at
+    the grip unload the rear; both-off 0.04 s.
+
+### Spec / parent claims refuted or amended by the built model (R2)
+
+- (a) A visible lift-and-settle at neutral full gas needs a thrust that falls with *pitch* (an ECU rule), not with
+  speed: the rear-wheel equilibrium under thrust is unstable at every angle. Honest options: no lift (mid) or the
+  Mantis (lifts and loops unless leaned forward: a peak of 0.75 g does exactly that, measured).
+- (b) 35–45° holds live at lean −0.7…−0.4 (coasting balance 32–41°), not at lean +0.5…+1 as the contact-patch formula
+  said; 40 ± 8 for 10 s needs less latency or anticipation than a PD at 100 ms gives.
+- (c) 45° from a crawl is 0.75 g; at 0.61 g the crawl limit is 35°.
+- (d) both-off 0.35–0.6 s conflicts with "front leaves first" under a nose-down snap: the front lands first at 0.29 s.
+- (e) "constant lean +0.25" through a 1–2 s flight is a front-flip input with K_att 300; kickers are ridden with the
+  lean released. The lab's rolled miss is an endo, not a fall into the pit (a chamfer on the far wall would make it one).
+
+### What R3 must do
+
+1. Classes as parameter rows: the Pro (1 000 N, k 12 000 / 9 500, K_att 360) carries the 50–60° momentum climbs and
+   loops at neutral; the Rookie does neither. Re-measure this table per class.
+2. Landing pogo: an intent signal that separates a landing recovery from a hop push (candidates: the target's own
+   velocity remembered for ~0.2 s — one §12 slot — or a lower servo cap while the *input* lean is not moving forward),
+   then the 2–3 m rows at lean 0.
+3. The remaining rows: rear-wheel pogo at the true balance (~50° at lean 0), the 0.9 m ledge at 5 m/s, front-wheel
+   lift (clip 01), plank-to-plank (clip 07), drop-in (clip 18); a wheelie controller with anticipation (or 50 ms).
+4. Goldens: every v2 replay golden changes (§16.3); v1's `classes.test.ts` still fails on the harness's in-flight
+   `bot-3.json`, not on v2. Lab level: ask the tracks owner for the far-wall chamfer and re-measure the hop margin.
+
+---
+
 ## v2 status — R1 (of three, physics-v2.md §16.7)
 
 **Finding.** The v2 plant is built to `physics-v2.md` (§1–13) in `src/physics/v2/{bike,rider,tyre,engine,tuning}.ts`
