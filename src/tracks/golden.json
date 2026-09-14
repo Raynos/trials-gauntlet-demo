@@ -70,11 +70,11 @@
     "finishX": 487.6
   },
   "m3-see-saw": {
-    "hash": "97f20bbc10b3d54a",
-    "colliders": 39,
+    "hash": "14ced004e8f89a32",
+    "colliders": 45,
     "hazards": 5,
-    "obstacles": 30,
-    "finishX": 486.1
+    "obstacles": 33,
+    "finishX": 489.1
   },
   "h1-wheelie-wire": {
     "hash": "24700ed6342cf961",

@@ -221,7 +221,8 @@ export const M3 = course('m3-see-saw', 'See-Saw', 'medium')
   .flat(10) // was 3: a board leaves ~5 m/s and the kicker wants 8
   .ramp({ length: 5, height: 1.5 }) // 16.7 deg (was 4 x 1.5 = 20 deg 3 m after the board: 19 nose-high + 15 short)
   .gap({ width: 3 })
-  .plank({ length: 5, height: 1.5 }) // thin landing at 1.5
+  .ramp({ length: 2, height: 0.25 }, { base: 1.25 }) // round 6.1: landing lip — a rear wheel arriving at plank height slipped under the one-way board's leading edge and hung there (front on top, no fault: the skill-3 bot sat at 209 m for 600 s); the lip catches it
+  .plank({ length: 4, height: 1.5 }) // thin landing at 1.5
   .ramp({ length: 4, height: 1.5, direction: 'down' })
   .flat(12)
   .camera({ mode: 'side' })
@@ -234,7 +235,8 @@ export const M3 = course('m3-see-saw', 'See-Saw', 'medium')
   .camera({ mode: 'low' })
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 3 })
-  .plank({ length: 5, height: 1.0 }) // thin landing, lower and faster
+  .ramp({ length: 2, height: 0.25 }, { base: 0.75 }) // landing lip (round 6.1)
+  .plank({ length: 4, height: 1.0 }) // thin landing, lower and faster
   .ramp({ length: 3, height: 1.0, direction: 'down' })
   .flat(4)
   .seesawEntry({ length: 8, height: 1.5 })
@@ -251,7 +253,8 @@ export const M3 = course('m3-see-saw', 'See-Saw', 'medium')
   .flat(10) // ride the tip down, then build speed for the thin landings (was a 3 m gap off the tipping board onto a plank at 2.0: walled)
   .ramp({ length: 5, height: 1.5 })
   .gap({ width: 3 })
-  .plank({ length: 4, height: 1.5 })
+  .ramp({ length: 2, height: 0.25 }, { base: 1.25 }) // landing lip (round 6.1)
+  .plank({ length: 3, height: 1.5 })
   .gap({ width: 2.5 })
   .box({ width: 6, height: 1.5 })
   .ramp({ length: 8, height: 1.5, curve: 0.3, direction: 'down' })

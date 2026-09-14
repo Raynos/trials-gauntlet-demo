@@ -314,8 +314,18 @@ kicker / plank 3 m after the 6/1.5 board; probe: the old demand — a 3 m gap of
 a plank at 2.0 — walled 99 x 3): a board leaves ~5 m/s, so every kicker after one has 10 m to build
 speed; thin landings are 4-5 m planks at 1.0-1.5 from <= 17 deg kickers (8-12 m/s window, probe
 1-2); DEMANDS 4 x 1.0 / 3 m gap onto the resting end of the 8/2.0 see-saw (it dips, you roll up, it
-tips), 10 m, 5 x 1.5 kicker / 3 m / 4 m plank at 1.5 / 2.5 m / 1.5 box. Reflex `average` 4 / 11 / 8.
-Target 8-12, 90 s.
+tips), 10 m, 5 x 1.5 kicker / 3 m / lip + 3 m plank at 1.5 / 2.5 m / 1.5 box. Round 6.1 (the fresh
+skill-3 sweep on df7185f walled at 209 m, 43 %, on a 300 s and a 600 s run with ONE attempt and no fault:
+a rear wheel arriving at exactly plank height slid under the one-way board's leading edge and hung
+there with the front wheel on top — no body part touches anything, so no fault, no restart; reproduced
+with a 9 m/s cruise controller from CP1, `m3probe`): every thin plank now has a 2 m landing lip rising
+the last 0.25 m at its near end (a solid ramp, base h - 0.25, the `platform({ landing })` shape), so a
+low rear wheel meets a 7 deg incline instead of the board's edge; planks 5 -> 4 m and 4 -> 3 m behind
+the lips. Probe: cruise 8-13 m/s clears, 7 m/s is a pit fault (was: 9 m/s wedged for ever). Bot skill 3:
+2 attempts, finished 37.3 s (both seeds, 300 s wall, sequential; the one fault is a pit short at the
+first lip). Reflex `average` 25 / 6 / 8 -> 8 (round 5: 4 / 11 / 8). 489 m, CP 28 / 174 / 291 / 367. For
+physics: a one-way polyline's open end lets a wheel whose centre crosses the surface level at the edge
+pass through and hang under it. Target 8-12, 90 s.
 
 ### Hard
 
@@ -413,7 +423,7 @@ x reached as a fraction of finishX.
 | e3-stairway | 3-6 | 22, 8, 16 -> 16 | 3, 4, 9 -> **4** | 8, 14, 6 | — | pass |
 | m1-hop-up | 5-9 | round 6: 3, 21, 25 -> 21 | round 6: 9, 14, 10, 6, 7, 9 -> **9** (6 seeds; was 13.5) | round 6: 3, 5, 11 | — | pass (inside band) |
 | m2-drum-roll | 6-12 | 10, 16, 15 -> 15 | 10, 3, 7 -> **7** | 7, 15, 11 | — | pass |
-| m3-see-saw | 8-12 | 15, 28, 14 -> 15 | 4, 11, 8 -> **8** | 4, 7, 4 | — | pass |
+| m3-see-saw | 8-12 | 15, 28, 14 -> 15 | round 6.1: 25, 6, 8 -> **8** | 4, 7, 4 | round 6.1: **2 attempts, finished 37.3 s** (x2 seeds, 300 s wall; was 1 attempt walled at 209 m without a fault) | pass |
 | h1-wheelie-wire | 10-18 | 37, 35, 28 (1 clear) | 38, 42, 41 (best 92 %) | 41, 41, 5 (1 clear, **best 100 %**) | 1 attempt, 91 % at the 180 s wall (6 bots in parallel) | good >= 60 % pass; bot see below |
 | h2-gap-chain | 14-22 | 43, 43, 44 (47 %) | 48, 46, 45 (69 %) | 50, 49, 51 (**best 71 %**) | 1 attempt, 89 % at the 180 s wall | good >= 60 % pass; bot see below |
 | h3-fire-line | 18-25 | 45, 46, 41 (85 %) | 13, 5, 31 -> **13** | 19, 11, 17 -> **17** | **1 attempt, finished 35.0 s** | pass |
