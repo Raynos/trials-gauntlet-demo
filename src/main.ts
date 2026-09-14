@@ -23,7 +23,8 @@ import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, installHook, type HookExtras } from './game';
 import { resolveBoot } from './game/flow';
 import { getTrack } from './tracks';
-import { BestTimes, DomHud, injectStyles, loadModelChoice, type ModelChoice } from './ui';
+import { ArtManifest, BestTimes, DomHud, injectStyles, loadModelChoice, type ModelChoice } from './ui';
+import { fontsReady, getLoader, nextPaint, streamBytes } from './ui/loader';
 
 type AnyModule = Record<string, unknown>;
 
@@ -104,6 +105,9 @@ interface Composed {
   renderer: GameRenderer;
 }
 
+/** Renderer-side startup work the render owner may expose (texture generation that yields between jobs). */
+type Preparable = Partial<{ prepare(report: (done: number, total: number, label?: string) => void): Promise<void> | void }>;
+
 function boot(): void {
   const params = new URLSearchParams(location.search);
   const route = resolveBoot(params, (id) => getTrack(id) !== undefined);
@@ -174,31 +178,122 @@ function boot(): void {
     return;
   }
 
-  const { game, hud, bestTimes, audio, renderer } = compose();
-  const shell = new App({
-    game,
-    hud,
-    bestTimes,
-    audio,
-    uiRoot: document.getElementById('ui')!,
-    sceneRoot: app,
-    dev: route.dev,
-    resize: (w, h, dpr) => renderer.resize(w, h, dpr),
-    initialTrack,
-    models: { rider: models.riderModel, bike: models.bikeModel },
-    touchDebug: params.get('touchdebug') === '1',
-    modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
-    applyModels: (m) => {
-      const r = renderer as Partial<{ setModels(o: ModelChoices): void }>;
-      if (typeof r.setModels !== 'function') return false;
-      r.setModels({ riderModel: m.rider, bikeModel: m.bike });
-      return true;
-    },
-  });
-  installHook(game, false, extras);
-  // The App's constructor already sized the renderer through its orientation-aware fit()
-  // (forced landscape hands the renderer the rotated logical size); nothing overrides it here.
-  shell.start();
+  const appRoot: HTMLElement = app;
+  void bootFront();
+  return;
+
+  /**
+   * Normal play: staged boot reported to the inline loader (index.html), one
+   * yield per step so the page repaints between the CPU-heavy pieces
+   * (renderer + WebGL context, physics, audio, track compile, texture prep).
+   */
+  async function bootFront(): Promise<void> {
+    const loader = getLoader();
+    loader.plan(10);
+    try {
+      loader.step('WebGL renderer');
+      await nextPaint();
+      const { renderer, kind: renderKind } = makeRenderer(appRoot, false, models);
+      loader.step('Physics world');
+      await nextPaint();
+      const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics') === 'mock');
+      const physics = makePhysics(physicsHz);
+      loader.step('Audio');
+      await nextPaint();
+      const audioParts = makeAudio(makePhysics, params.get('audio') === '0');
+      if (audioParts.extras.renderOffline) extras.renderOffline = audioParts.extras.renderOffline;
+      loader.step('Game + HUD');
+      await nextPaint();
+      const ui = document.createElement('div');
+      ui.id = 'ui';
+      appRoot.appendChild(ui);
+      const bestTimes = new BestTimes();
+      const hud = new DomHud(ui, (id) => bestTimes.get(id));
+      const game = new Game({
+        physicsHz,
+        physics,
+        renderer,
+        hud,
+        audio: audioParts.audio,
+        bestTimes,
+        autoSkipCountdown: false,
+        physicsFactory: makePhysics,
+        autoRecord: true,
+        ghostEnabled: true,
+      });
+      extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind, rider: models.riderModel, bike: models.bikeModel };
+      console.info(`[trials] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=false`);
+      const art = new ArtManifest();
+      const artLoad = art.load();
+      loader.step('Front end + first resize');
+      await nextPaint();
+      const shell = new App({
+        game,
+        hud,
+        bestTimes,
+        audio: audioParts.audio,
+        uiRoot: ui,
+        sceneRoot: appRoot,
+        dev: route.dev,
+        resize: (w, h, dpr) => renderer.resize(w, h, dpr),
+        initialTrack,
+        models: { rider: models.riderModel, bike: models.bikeModel },
+        touchDebug: params.get('touchdebug') === '1',
+        modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
+        applyModels: (m) => {
+          const r = renderer as Partial<{ setModels(o: ModelChoices): void }>;
+          if (typeof r.setModels !== 'function') return false;
+          r.setModels({ riderModel: m.rider, bikeModel: m.bike });
+          return true;
+        },
+        art,
+      });
+      installHook(game, false, extras);
+      const trackName = getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track';
+      loader.step(`Track: ${trackName}`);
+      await nextPaint();
+      shell.start(); // loads the track (compile + physics + renderer world) and shows the title
+      console.info(`[trials] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
+      // The first WebGL frame (shader compile, texture upload) is the biggest single task of boot: give it its own row.
+      loader.step('First frame (shaders)');
+      await nextPaint();
+      await nextPaint();
+      const prep = (renderer as Preparable).prepare;
+      loader.step('World textures');
+      await nextPaint();
+      if (typeof prep === 'function') {
+        await prep.call(renderer, (done, total, label) => loader.progress(label ? `World textures · ${label}` : 'World textures', done, total));
+      }
+      loader.step('Fonts');
+      await nextPaint();
+      await fontsReady();
+      loader.step('Title art');
+      await nextPaint();
+      await Promise.race([artLoad, new Promise((r) => setTimeout(r, 3000))]);
+      const key = art.keyart('industrial');
+      if (key) {
+        const item = (await loadManifestItem(key.src)) ?? null;
+        await streamBytes(key.src, (done, total) => loader.progress('Title art', done, total, 'B'), item?.bytes ?? 0);
+      }
+      loader.done();
+    } catch (e) {
+      console.error('[trials] boot failed', e);
+      loader.fail(`Startup failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+}
+
+/** Expected byte count for a URL from the build's load manifest (null in dev / on a miss). */
+let loadManifestCache: Promise<Array<{ path: string; bytes: number }> | null> | null = null;
+async function loadManifestItem(url: string): Promise<{ path: string; bytes: number } | null> {
+  loadManifestCache ??= fetch('./load-manifest.json', { cache: 'force-cache' })
+    .then((r) => (r.ok ? (r.json() as Promise<{ items: Array<{ path: string; bytes: number }> }>) : null))
+    .then((m) => m?.items ?? null)
+    .catch(() => null);
+  const items = await loadManifestCache;
+  if (!items) return null;
+  const tail = url.replace(/^\.?\//, '');
+  return items.find((i) => i.path.replace(/^\.?\//, '') === tail) ?? null;
 }
 
 boot();

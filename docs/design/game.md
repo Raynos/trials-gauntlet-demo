@@ -319,3 +319,43 @@ only).
 - The multi-touch gesture fix (§3) and the run → menu cold-boot path (§10) are kept.
 - Native-style landscape lock is not available to a web app on iOS (no `screen.orientation.lock()` outside
   fullscreen video); if it is ever wanted again, the whole rotation lives in orientation.ts + one CSS rule.
+
+## 12. Loading screen (`index.html` inline loader, `src/ui/loader.ts`, `vite.config.ts` `loadManifest`)
+
+User (3G, round 3): white then black for many seconds. Now:
+
+- **Inline first paint.** `index.html` carries `<style>` + `<div id="loader">` (dark ground, wordmark as plain text
+  in the system font, amber bar, KB counter, item list, elapsed s, throughput) and a ≤ 6 KB classic script
+  (5.6 KB minified at build by the plugin) — no webfont, no bundle, no art. Verified in WebKit iPhone at
+  DOMContentLoaded (≈ 320 ms on the LAN) and Chromium 3G at 0.5 s.
+- **Byte-accurate download.** The plugin emits `dist/load-manifest.json`: every chunk/asset + the public files the
+  first screens need, with raw and gzip bytes and a `phase` (`core` = entry + three + fonts; `title` = key art,
+  wordmark plate, art manifest; `menu` = cards/medals; `world` = renderer plates/skies/stencils; `models`;
+  `audio-worklet`). The loader fetches it (`no-cache`), streams the `core` set (4 in flight) with
+  `fetch` + `ReadableStream`, counting decoded bytes against the manifest and estimating wire bytes with each
+  file's gzip ratio ("Downloading 345 KB / 1.29 MB (≈ 407 KB gz on the wire)", "≈ 715 kbps on the wire"), then
+  inserts the entry `<script type="module">`. The build strips Vite's own module/modulepreload tags and puts the
+  entry URL in `#loader[data-entry]`; the preview server marks hashed assets immutable like the production host,
+  so the module request is a cache hit — measured wire bytes per core file ≈ one gzip copy (three 188 KB vs
+  192 KB gz, index 176 vs 178, fonts 15–16). Dev server (no manifest): straight boot. `?harness=1`: loader removed
+  before anything else, entry inserted at once.
+- **Boot steps** (`main.ts` `bootFront`, `window.__loader.step/progress/done/fail`): WebGL renderer · Physics
+  world · Audio · Game + HUD · Front end + first resize · Track: First Ride · First frame (shaders) · World
+  textures (`renderer.prepare(report)` when the render owner exports it — forwarded as numeric progress) · Fonts
+  (`document.fonts.ready`, 4 s cap) · Title art (key art streamed with KB progress) → `done()` = 240 ms
+  crossfade. One `nextPaint()` (rAF + macrotask) between steps so the loader repaints. Background phases
+  (`world`, `menu`, `models`) are counted from Resource Timing against the manifest totals as their files
+  complete ("World art (renderer, background) 1.2 / 2.77 MB").
+- **Freeze detection.** `PerformanceObserver('longtask')` (Chromium) attributes each long task by start time to
+  the running step; > 50 ms is logged, > 100 ms puts a red mark on the step. Measured headless (SwiftShader,
+  so GPU-bound numbers are inflated): WebGL renderer 125–176 ms, Game + HUD / front end ≈ 0.6–1.0 s (renderer
+  resize + post buffers), Track: First Ride 73–101 ms, **First frame (shaders) 8–10 s** under SwiftShader. Those
+  freezes are inside other owners' constructors / the GPU driver and cannot be chunked from this layer — the
+  red marks are the hand-off to the render / physics owners (`renderer.prepare` yielding between texture jobs).
+- **Failure.** Manifest/core fetch error, module error or an unhandled rejection during boot → error text + a
+  "⟳ Retry" button (reload); never a blank page.
+- **3G measurement** (Chromium, CDP 750 kbps / 100 ms RTT, preview build): loader with numbers at 0.5 s; core
+  1.29 MB (407 KB on the wire) done at 4.8 s; title at ≈ 67–73 s in headless — dominated by the renderer's
+  2.8 MB of background world art contending for the link (≈ 30 s of 3G on its own) plus SwiftShader frames.
+  Recommendation for the render owner: defer / trim world art until after the title, or load the showcase
+  biome only.

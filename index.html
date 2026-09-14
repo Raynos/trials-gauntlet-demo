@@ -9,18 +9,229 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Trials Gauntlet</title>
-    <link rel="preload" href="./fonts/BarlowCondensed-BlackItalic.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="./fonts/BarlowCondensed-Bold.woff2" as="font" type="font/woff2" crossorigin />
     <style>
       html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #07080a; overscroll-behavior: none; touch-action: none; -webkit-text-size-adjust: 100%; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
       body { position: fixed; inset: 0; }
       #app { position: fixed; inset: 0; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
       canvas { display: block; width: 100%; height: 100%; touch-action: none; }
       #app { background: radial-gradient(120% 90% at 40% 45%, #1a1409 0%, #07080a 70%); }
+      /* Inline loader: paints with the first HTML bytes — system font, no webfont, no bundle, no art. */
+      #loader { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; padding: calc(24px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) calc(24px + env(safe-area-inset-left, 0px)); background: radial-gradient(120% 90% at 50% 30%, #1a1409 0%, #07080a 70%); color: #f3f5f8; font: 500 14px/1.4 -apple-system, "Helvetica Neue", Arial, system-ui, sans-serif; opacity: 1; transition: opacity 240ms cubic-bezier(.2,.8,.2,1); pointer-events: auto; }
+      #loader.out { opacity: 0; pointer-events: none; }
+      #loader .wm { font-weight: 900; font-style: italic; font-size: clamp(28px, 7vmin, 44px); line-height: .95; letter-spacing: -.01em; text-transform: uppercase; color: #ffb020; text-shadow: 0 2px 0 #6b3a05, 0 0 24px rgba(255,150,30,.35); margin: 0 0 20px; }
+      #loader .bar { position: relative; height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; max-width: 560px; }
+      #loader .bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, #ff8a1f, #ffb020); border-radius: 3px; transition: width 120ms linear; }
+      #loader .bar b { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(255,255,255,.14); border-radius: 3px; }
+      #loader .top { display: flex; justify-content: space-between; align-items: baseline; max-width: 560px; margin: 10px 0 4px; font-variant-numeric: tabular-nums; }
+      #loader .top .pct { font-size: 26px; font-weight: 700; color: #ffb020; }
+      #loader .top .kb { color: rgba(243,245,248,.7); text-align: right; }
+      #loader .status { color: rgba(243,245,248,.85); min-height: 1.4em; max-width: 560px; font-variant-numeric: tabular-nums; }
+      #loader ol { list-style: none; margin: 14px 0 0; padding: 0; max-width: 560px; max-height: 40vh; overflow: hidden; font-size: 12px; font-variant-numeric: tabular-nums; color: rgba(243,245,248,.62); }
+      #loader li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; white-space: nowrap; }
+      #loader li span:first-child { overflow: hidden; text-overflow: ellipsis; }
+      #loader li.on { color: #f3f5f8; }
+      #loader li.ok::after { content: "✓"; color: #4ae37f; }
+      #loader li.slow span:first-child::before { content: "■ "; color: #ff3d3d; }
+      #loader .err { display: none; margin-top: 16px; color: #ff6b6b; max-width: 560px; }
+      #loader .err button { display: block; margin-top: 12px; min-height: 48px; padding: 0 28px; border: 0; border-radius: 10px; background: #ffb020; color: #1a1206; font: 700 15px system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+      #loader.failed .err { display: block; }
+      #loader .foot { position: absolute; left: 24px; right: 24px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: rgba(243,245,248,.4); font-variant-numeric: tabular-nums; }
+      @media (max-height: 500px) { #loader { justify-content: flex-start; padding-top: calc(16px + env(safe-area-inset-top, 0px)); } #loader .wm { font-size: 24px; margin-bottom: 8px; } #loader ol { max-height: 34vh; } }
     </style>
   </head>
   <body>
     <div id="app"></div>
+    <div id="loader" data-entry="/src/main.ts" data-manifest="./load-manifest.json">
+      <div class="wm">Trials<br>Gauntlet</div>
+      <div class="bar"><b></b><i></i></div>
+      <div class="top"><span class="pct">0%</span><span class="kb">connecting…</span></div>
+      <div class="status">Loading</div>
+      <ol></ol>
+      <div class="err"><span></span><button type="button">⟳ Retry</button></div>
+      <div class="foot"><span class="t">0.0 s</span><span class="net"></span></div>
+    </div>
+    <script>
+      /* Trials loader (≤ 6 KB): byte-accurate download of the core bundle, then boot steps from main.ts via window.__loader. */
+      (function () {
+        var root = document.getElementById('loader'), q = function (s) { return root.querySelector(s); };
+        var bar = q('.bar i'), ghost = q('.bar b'), pct = q('.pct'), kbEl = q('.kb'), statusEl = q('.status'), list = q('ol'), tEl = q('.t'), netEl = q('.net'), errEl = q('.err span');
+        var t0 = performance.now(), rows = {}, order = [], failed = false, finished = false, cur = null, steps = [], dlDoneAt = 0;
+        var dl = { done: 0, total: 0, gz: 0, samples: [] };
+        var boot = { done: 0, total: 0 };
+        var KB = function (b) { return b >= 1048576 ? (b / 1048576).toFixed(2) + ' MB' : Math.round(b / 1024) + ' KB'; };
+        function row(name) {
+          var r = rows[name];
+          if (!r) {
+            var li = document.createElement('li');
+            li.innerHTML = '<span></span><span></span>';
+            list.appendChild(li);
+            r = rows[name] = { li: li, a: li.children[0], b: li.children[1], done: 0, total: 0, at: performance.now() };
+            order.push(name);
+            if (list.children.length > 14) { var old = order.shift(); list.removeChild(rows[old].li); delete rows[old]; }
+          }
+          return r;
+        }
+        function setRow(name, text, state) {
+          var r = row(name);
+          r.a.textContent = name;
+          r.b.textContent = text || '';
+          if (state) { r.li.className = state; }
+        }
+        function paint() {
+          var frac = dl.total ? dl.done / dl.total : 0;
+          /* Download = first 70 % of the bar, boot steps the remaining 30 %. */
+          var p = dl.total ? 0.7 * Math.min(1, frac) : 0;
+          if (boot.total) p += 0.3 * Math.min(1, boot.done / boot.total);
+          if (finished) p = 1;
+          bar.style.width = (p * 100).toFixed(1) + '%';
+          ghost.style.width = dl.total ? '70%' : '0';
+          pct.textContent = Math.round(p * 100) + '%';
+          if (dl.total) kbEl.textContent = (dlDoneAt ? 'Core ' + KB(dl.total) + ' in ' + ((dlDoneAt - t0) / 1000).toFixed(1) + ' s' : 'Downloading ' + KB(dl.done) + ' / ' + KB(dl.total)) + (dl.gz ? ' (≈ ' + KB(dl.gz) + ' gz on the wire)' : '');
+          var now = performance.now();
+          tEl.textContent = ((now - t0) / 1000).toFixed(1) + ' s';
+          var s = dl.samples; while (s.length && now - s[0][0] > 1500) s.shift();
+          if (s.length > 1) { var bytes = 0; for (var i = 1; i < s.length; i++) bytes += s[i][1]; var sec = (s[s.length - 1][0] - s[0][0]) / 1000; if (sec > 0.2) netEl.textContent = '≈ ' + (bytes * 8 / sec / 1000).toFixed(0) + ' kbps on the wire'; }
+          for (var ph in bg) { var g = bg[ph]; if (g.done) setRow(g.label, KB(g.done) + ' / ' + KB(g.total), g.done >= g.total ? 'ok' : 'on'); }
+        }
+        setInterval(function () { if (!finished) paint(); }, 100);
+        function fail(msg) {
+          if (failed) return;
+          failed = true;
+          root.className = 'failed';
+          errEl.textContent = msg;
+          statusEl.textContent = 'Could not start';
+        }
+        q('.err button').addEventListener('click', function () { location.reload(); });
+        window.addEventListener('error', function (e) { if (!finished && e.message) fail('Script error: ' + e.message); });
+        window.addEventListener('unhandledrejection', function (e) { if (!finished) fail('Startup failed: ' + (e.reason && e.reason.message || e.reason)); });
+
+        /* Long tasks (Chromium): attributed by start time to the boot step that was running (entries arrive late);
+           a step that froze the page > 100 ms gets a red mark, > 50 ms is logged. */
+        var longTasks = [];
+        function stepAt(t) { var n = null; for (var i = 0; i < steps.length; i++) if (steps[i].at <= t) n = steps[i].name; return n; }
+        try {
+          new PerformanceObserver(function (l) {
+            l.getEntries().forEach(function (e) {
+              var st = stepAt(e.startTime);
+              longTasks.push({ t: Math.round(e.startTime), ms: Math.round(e.duration), step: st });
+              if (e.duration > 50) console.warn('[loader] long task ' + Math.round(e.duration) + ' ms during "' + st + '"');
+              if (e.duration > 100 && st && rows[st]) rows[st].li.classList.add('slow');
+            });
+          }).observe({ type: 'longtask', buffered: true });
+        } catch (e) {}
+
+        var api = window.__loader = {
+          longTasks: longTasks,
+          step: function (name) {
+            if (cur && rows[cur] && !rows[cur].li.classList.contains('ok')) { var r = rows[cur]; setRow(cur, Math.round(performance.now() - r.at) + ' ms', r.li.classList.contains('slow') ? 'ok slow' : 'ok'); }
+            cur = name;
+            var nr = row(name); nr.at = performance.now();
+            steps.push({ name: name, at: nr.at });
+            setRow(name, '…', 'on');
+            statusEl.textContent = name;
+            boot.done++;
+            paint();
+          },
+          plan: function (n) { boot.total = n; },
+          progress: function (name, done, total, unit) {
+            var text = unit === 'B' ? KB(done) + ' / ' + KB(total) : done + ' / ' + total + (unit ? ' ' + unit : '');
+            setRow(name, text, done >= total ? 'ok' : 'on');
+            if (name === cur) statusEl.textContent = name + ' · ' + text;
+          },
+          done: function () {
+            if (finished) return;
+            api.step('Ready');
+            setRow('Ready', ((performance.now() - t0) / 1000).toFixed(1) + ' s', 'ok');
+            finished = true;
+            paint();
+            root.classList.add('out');
+            setTimeout(function () { root.remove(); }, 300);
+          },
+          fail: fail,
+        };
+
+        var entry = root.getAttribute('data-entry');
+        function insertEntry() {
+          var s = document.createElement('script');
+          s.type = 'module';
+          s.crossOrigin = 'anonymous';
+          s.src = entry;
+          s.onerror = function () { fail('Could not load ' + entry + ' — check the connection and retry.'); };
+          document.head.appendChild(s);
+        }
+        /* The harness owns the clock and expects the hook at once: no loader in its way. */
+        if (/[?&]harness=1/.test(location.search)) { root.remove(); insertEntry(); return; }
+
+        function stream(item, onBytes) {
+          return fetch(item.path).then(function (res) {
+            if (!res.ok) throw new Error(res.status + ' ' + item.path);
+            var len = +res.headers.get('content-length') || 0, enc = res.headers.get('content-encoding');
+            var total = (len && !enc) ? len : item.bytes;
+            if (!res.body || !res.body.getReader) return res.arrayBuffer().then(function (b) { onBytes(b.byteLength, total, true); });
+            var reader = res.body.getReader();
+            return (function pump() {
+              return reader.read().then(function (c) {
+                if (c.done) { onBytes(0, total, true); return; }
+                onBytes(c.value.byteLength, total, false);
+                return pump();
+              });
+            })();
+          });
+        }
+        /* Background downloads other modules start (renderer world art, menu cards, models): counted per phase
+           from Resource Timing as each file completes, against the manifest's totals. */
+        var bg = {}, byTail = {};
+        function watchBackground(items) {
+          var labels = { world: 'World art (renderer, background)', menu: 'Menu art (background)', models: 'Models (background)', title: 'Title art (background)' };
+          items.forEach(function (i) { if (i.phase in labels) { byTail[i.path.replace(/^\.?\//, '')] = i; var g = bg[i.phase] || (bg[i.phase] = { label: labels[i.phase], done: 0, total: 0, seen: {} }); g.total += i.bytes; } });
+          function take(list) { list.forEach(function (e) { var tail = e.name.replace(/^[a-z]+:\/\/[^/]+\//, '').split('?')[0]; var i = byTail[tail]; if (!i || bg[i.phase].seen[tail]) return; bg[i.phase].seen[tail] = 1; bg[i.phase].done += i.bytes; }); }
+          try { take(performance.getEntriesByType('resource')); new PerformanceObserver(function (l) { take(l.getEntries()); }).observe({ type: 'resource', buffered: true }); } catch (e) {}
+        }
+        var manifestUrl = root.getAttribute('data-manifest');
+        statusEl.textContent = 'Fetching load manifest';
+        fetch(manifestUrl, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (m) {
+          if (!m || !m.items) {
+            /* Dev server / no manifest: nothing to count, boot straight away. */
+            setRow('core bundle', 'dev', 'on');
+            statusEl.textContent = 'Starting (dev)';
+            insertEntry();
+            return;
+          }
+          watchBackground(m.items);
+          var core = m.items.filter(function (i) { return i.phase === 'core'; });
+          dl.total = 0; dl.gz = 0;
+          core.forEach(function (i) { dl.total += i.bytes; dl.gz += i.gz || i.bytes; });
+          statusEl.textContent = 'Downloading core (' + core.length + ' files)';
+          var running = 0, idx = 0, doneN = 0;
+          return new Promise(function (resolve, reject) {
+            function next() {
+              while (running < 4 && idx < core.length) {
+                (function (item) {
+                  running++;
+                  var got = 0, label = item.label || item.path.replace(/^.*\//, '');
+                  setRow(label, '0 / ' + KB(item.bytes), 'on');
+                  var wire = item.gz && item.bytes ? item.gz / item.bytes : 1; /* served gzipped: estimate bytes on the wire from the manifest ratio */
+                  stream(item, function (n, total, end) {
+                    got += n; dl.done += n; dl.samples.push([performance.now(), n * wire]);
+                    setRow(label, end ? KB(got) : KB(got) + ' / ' + KB(total), end ? 'ok' : 'on');
+                  }).then(function () {
+                    running--; doneN++;
+                    if (doneN === core.length) resolve(); else next();
+                  }, reject);
+                })(core[idx++]);
+              }
+            }
+            next();
+          }).then(function () {
+            statusEl.textContent = 'Starting';
+            dlDoneAt = performance.now();
+            steps.push({ name: 'Script parse + evaluate', at: dlDoneAt });
+            setRow('Script parse + evaluate', '…', 'on');
+            insertEntry();
+          });
+        }).catch(function (e) { fail('Download failed: ' + (e && e.message || e)); });
+      })();
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
