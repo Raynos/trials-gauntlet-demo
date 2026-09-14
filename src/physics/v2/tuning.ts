@@ -67,6 +67,17 @@ export interface TuningV2 {
     /** Reported (audio only) slipping-clutch rpm at full throttle below `clutchSpeed`. */
     clutchRpm: number;
     clutchSpeed: number;
+    /**
+     * R4 Rookie assist (MEGA_PLAN P1 "Rookie = wheelie assist on, Pro = raw"): an ECU wheelie control. The drive
+     * thrust is trimmed by `gain * unload * ramp(pitchRate, rate0 -> rate1)`, where `unload` ramps 0 -> 1 as the
+     * front spring extends from `topOut` metres of compression to fully topped out (the front is leaving the
+     * ground), OR by the loop margin (the live combined COM's horizontal lead over the rear axle, `margin1` -> `margin0`
+     * m: gravity's righting moment about the rear axle is M g d, so d is the honest "about to loop" quantity on any
+     * slope). Memoryless (this tick's chassis pitch rate, front compression and body positions), declared on the HUD
+     * (`debug().engine.assist`), linear, the same on the ground and in the air (in the air the front is topped out
+     * and the trim bounds the throttle's nose-up). `gain` 0 = raw (the Pro).
+     */
+    wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number };
   };
   brakes: { totalNm: number; frontFrac: number; brakeTau: number };
   aero: { cda: number; rho: number; chassisShare: number };
@@ -154,6 +165,7 @@ const ROOKIE: TuningV2 = {
     gear: 17.8,
     clutchRpm: 3500,
     clutchSpeed: 7,
+    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 },
   },
   brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03 },
   aero: { cda: 0.75, rho: 1.225, chassisShare: 0.6 },
@@ -245,7 +257,7 @@ export const BIKE_PRESETS_V2: Readonly<Record<BikeClassV2, PartialTuningV2>> = O
     chassis: { mass: 54 },
     wheel: { wheelbase: 1.28 },
     suspension: { rear: { axle: { x: -0.575, y: -0.21 }, k: 12000 }, front: { axle: { x: 0.705, y: -0.215 }, k: 9000 } },
-    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21) },
+    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 0, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 } },
     rider: { Katt: 260, cAtt: 29 },
   },
 });

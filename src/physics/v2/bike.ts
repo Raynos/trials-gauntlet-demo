@@ -18,7 +18,7 @@ import { CollisionWorld, circleVsPrim, PrimKind, type Manifold, type Prim } from
 import { SURFACES } from '../tuning';
 import { atan2, clamp, cos, sin, wrapAngle, HALF_PI } from '../dmath';
 import { bikeTuningV2, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
-import { driveTorque, lag, limiterLatch, reportRpm, thrustFrac } from './engine';
+import { driveTorque, lag, limiterLatch, reportRpm, thrustFrac, wheelieTrim } from './engine';
 import { brushImpulse, tyreMu } from './tyre';
 import { advanceTarget, buildChain, canonicalPose, GRIP_X, GRIP_Y, leanFromX, PEG_X, PEG_Y, poseAt, type ChainOut } from './rider';
 
@@ -42,7 +42,7 @@ export interface BodyDebug {
 export interface PhysicsDebugV2 {
   bodies: ({ id: string } & BodyDebug)[];
   contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; mu: number; surface: SurfaceKind }[];
-  engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number };
+  engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
   /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
   rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number };
@@ -280,6 +280,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private readonly rng = new Rng(0);
   // debug scratch of the last force pass
   private dEngineTq = 0;
+  private dAssist = 0;
   private dThrust = 0;
   private dServoFx = 0;
   private dServoFy = 0;
@@ -616,7 +617,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     return {
       bodies,
       contacts,
-      engine: { rpm: reportRpm(t.engine, R, vRim, F[S_THROTTLE_EFF]!), torqueNm: this.dEngineTq, thrustN: this.dThrust, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]!, brakeEff: F[S_BRAKE_EFF]! },
+      engine: { rpm: reportRpm(t.engine, R, vRim, F[S_THROTTLE_EFF]!), torqueNm: this.dEngineTq, thrustN: this.dThrust, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]!, brakeEff: F[S_BRAKE_EFF]!, assist: this.dAssist },
       suspension: {
         rear: { compression: this.sComp[0]!, rate: this.sRate[0]!, force: this.sForce[0]! },
         front: { compression: this.sComp[1]!, rate: this.sRate[1]!, force: this.sForce[1]! },
@@ -951,6 +952,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
 
     if (!riding) {
       this.dEngineTq = 0;
+      this.dAssist = 0;
       this.dThrust = 0;
       this.dServoFx = 0;
       this.dServoFy = 0;
@@ -964,9 +966,22 @@ class WorldV2 implements BikePhysicsWorldV2 {
       const vRim = -av[REAR]! * R;
       U[U_LIMITER] = limiterLatch(t.engine, R, vRim, U[U_LIMITER] === 1) ? 1 : 0;
       const te = F[S_THROTTLE_EFF]!;
-      const tq = driveTorque(t.engine, R, vRim, te, U[U_LIMITER] === 1);
+      // R4 Rookie assist: the ECU wheelie control trims the drive thrust when the front is topped out and the
+      // nose is rising (this tick's pitch rate and front compression; nothing remembered). gain 0 on the Pro.
+      const wc = t.engine.wheelieControl;
+      let dLive = 1;
+      if (wc.gain > 0) {
+        const mc = t.chassis.mass;
+        const mr = t.wheel.rearMass;
+        const mf = t.wheel.frontMass;
+        const mR = t.rider.mass;
+        dLive = (mc * px[CHASSIS]! + mr * px[REAR]! + mf * px[FRONT]! + mR * px[RIDER]!) / (mc + mr + mf + mR) - px[REAR]!;
+      }
+      const trim = wheelieTrim(wc, wC0, this.sComp[1]!, dLive, F[S_IN_L]!);
+      this.dAssist = trim;
+      const tq = driveTorque(t.engine, R, vRim, te, U[U_LIMITER] === 1, trim);
       this.dEngineTq = tq;
-      this.dThrust = U[U_LIMITER] === 1 ? 0 : te * t.engine.Fpeak * thrustFrac(t.engine, vRim);
+      this.dThrust = U[U_LIMITER] === 1 ? 0 : (1 - trim) * te * t.engine.Fpeak * thrustFrac(t.engine, vRim);
       av[REAR] = av[REAR]! - tq * dt * ii[REAR]!;
       av[CHASSIS] = av[CHASSIS]! + tq * dt * ii[CHASSIS]!;
     }

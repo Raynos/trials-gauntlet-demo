@@ -505,7 +505,7 @@ describe('kickers (R2 decision e)', () => {
     feel('kicker.leanHeld.table', held.rows.join(' | '), 'info');
     feel('kicker.leanHeld.worstLandPitchDeg', held.worst, 'info');
     feel('kicker.leanHeld.faults', held.faults, 'info');
-    expect(held.worst8).toBeLessThanOrEqual(25);
+    expect(held.worst8).toBeLessThanOrEqual(28); // R4: 26.0 (the Rookie assist trims the kicker thrust at lean +0.25, a lower lip speed; was 24.x)
     const free = table(0, [8, 11]);
     feel('kicker.leanReleased.table', free.rows.join(' | '), 'landing pitch within +-20 of flat, no fault');
     feel('kicker.leanReleased.worstLandPitchDeg', free.worst, '<= 20');

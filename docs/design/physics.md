@@ -5,6 +5,144 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R4 (the round-8 reflex finding, the Rookie assist)
+
+**Finding.** Neither of the round-8 deaths is a solver artefact. Replaying the reflex traces tick by tick
+(`scratchpad/physics-r4/trace.mts`, fresh `average` recordings on the r7 tracks) and isolating each input on a bench:
+**a throttle tap in the air is 20 °/s peak and +6° in 0.5 s** (Rookie; Pro 23 / +7.7: the 320 N m reaction of a wheel that
+reaches the limiter in ~0.05 s, §7 as designed) and a brake tap −42 °/s / −15°. The 200–400 °/s step is the **rider
+pose swing**: the reflex rules flip the lean by a whole unit in the tick they tap the gas, and a −1 → 0 release in free air
+kicks the chassis **+245 °/s within 0.07 s (43 °/s per tick = F_max 3 200 N × the 0.58 m grip lever / I_chassis 11 kg m²)**
+and +31° by 0.3 s; a 0 → −1 press first dips the nose −144 °/s (the body pushes off the bars), then K_att lifts it at a
+constant 265 °/s² to 171 °/s at 0.5 s. That is honest two-body dynamics (m_rider · v_rel · h / I_chassis with a
+3 m/s rider — the same throw the hop is made of: every servo lever that bounds it kills the hop, table below), and its
+sign structure is what a 0.2 s human cannot drive: pressing back dips first, releasing back pops the nose up another
+30°, and the held-lean rate never saturates. A rear touchdown pitched 20° above a 20° ramp at 1–2 m/s steps the rate by
+40–58 °/s per tick — sin 20° of a 3–6 kN normal impulse passed rigidly through the slider (a landing, not a spike). The
+on-ramp lift is geometry: **a 20° slope lowers the front-lift threshold from ≈ 0.6 g to 0.22 g** (front load ∝ d cos θ −
+h sin θ), so the Rookie's 0.53 g at 10 m/s lifts the front at *any* lean — 43° over the slope at lean 0, 24° at +0.4,
+5° at +0.8 — and leaves a 6 m lip at 66° rotating 163 °/s. The Rookie now carries the **declared wheelie control** MEGA_PLAN
+P1 names (`engine.wheelieControl`, `debug().engine.assist` on the HUD): the drive thrust is trimmed by this tick's pitch rate
+(0.5 → 1.2 rad/s) or loop margin (the live combined COM's horizontal lead over the rear axle, 0.40 → 0.20 m — gravity's
+righting moment is M g d on any slope) while the front spring is within 3 cm of topped out, faded out by the lean (back
+−0.2 → −0.5, forward +0.6 → +0.9: leaning is the rider taking over — the wheelie hold at −0.5, the throw and the hop
+snap at +1 are untouched). Memoryless, linear, class row; **the Pro's gain is 0** and its numbers are R3's. Rookie on the
+20° kicker at 10 m/s full gas, lean 0: **11.7° over the slope, off the lip at 16.7° with the nose already coming down
+(−62 °/s), no brake**; lean +0.4: 8.7 / 18.2 / −59. Cost: the cut takes the lip speed from 9.8 to 7.8 m/s at lean 0
+(8.4 at +0.4; a +1 rider keeps 8.5 with the assist off) — the Rookie's ramp exit is now bounded by the assist, not the loop.
+R3 tables held (deltas below). Reflex `average`, Rookie, seeds 1000–1002, before → after: b1 3 → **1** (band 1–1), b2 8 → 4
+(1–2), e1 34 with 0/3 clears → 21 with 2/3 (2–4), e3 44 → 30 (3–6), e2 36 → 36, gap 1 → 1, **b3 5 → 14** (1–2): b3 is
+authored speed-sensitive and the reflex ramp rule (thr 0.8, lean +0.3) now leaves every kicker 1–2 m/s slower; its deaths
+are the mirror of the finding — lean +1 held in the air dives the nose at −200 °/s for a second. Target not met on b2–e3;
+the air swing is the next lever and it is a K_att/c_att decision, not a solver bug.
+
+### Files (R4)
+
+- `src/physics/v2/engine.ts` — `wheelieTrim(wc, w, frontComp, loopMargin, lean)`; `driveTorque(..., trim)`.
+- `src/physics/v2/bike.ts` — the trim in the engine block (live COM lead over the rear axle, `sComp[1]`, `S_IN_L`);
+  `debug().engine.assist`. No new state; snapshot round-trip through a ramp asserted.
+- `src/physics/v2/tuning.ts` — `engine.wheelieControl` (Rookie gain 1, rate 0.5 → 1.2 rad/s, margin 0.40 → 0.20 m, topOut
+  0.03 m, lean fade −0.2/−0.5 and +0.6/+0.9; Pro gain 0).
+- `src/physics/v2/r4.test.ts` — 7 rows: air throttle / brake / swing per class, the touchdown step, raw vs assisted ramp,
+  the lean fade (−0.5 still loops), snapshot through the assist. `r2.test.ts` lean-held kicker row re-pinned 25 → 28 (26.0).
+
+### Air and ramp per class (free air 10 m/s, 0.5 s; kicker 20°, 6 m, 10 m/s, full gas)
+
+| input | Rookie R3 | Rookie R4 | Pro (raw, = R3) |
+|--|--|--|--|
+| throttle tap in the air: peak rate / angle 0.5 s | 20 °/s / +6.1° | same | 23 / +7.7 |
+| brake tap: peak / angle | −42 / −15.2 | same | −41 / −15.8 |
+| lean 0 → −1 held: first dip / peak / rate at 0.5 s / angle | −144 / 171 / 171 / +33 | same | −130 / 150 / 150 / +26 |
+| lean 0 → +1 held: peak / angle | −174 / −41 | same | −158 / −37 |
+| release −1 → 0: peak / per tick / angle 0.3 s | +245 / 43 / +31 | same | +234 / 42 / +29 |
+| release + gas | 246 / +43° at 0.5 s | same | 249 / +49 |
+| ramp lean 0: over slope / lip pitch / lip rate / lip v | 43° / 66° / +163 / 9.8 | **11.7 / 16.7 / −62 / 7.8** | 53 / 76 / +178 / 9.8 |
+| ramp lean +0.4 | 24 / 44 / +46 / 9.6 | 8.7 / 18.2 / −59 / 8.4 | 42 / 64 / +160 / 10.5 |
+| ramp lean +0.8 (R3) / +1 (R4, assist off) | 5 / 17 / — / 8.9 | 3.5 / 15.1 / −67 / 8.5 | — |
+| ramp lean 0, throttle 0.3 | 10 / 8.8 / −122 | — | 10 / 19 / −94 |
+| rear touchdown 20° over a 20° ramp, 1–2 m/s | 42–58 °/s per tick | same | 40–58 |
+
+**Rookie air rules in one sentence:** *gas and brake in the air are small nudges (+6° / −15° per half second); the lean is
+the control and it accelerates the bike, so hold it briefly and release early — a full press builds 170 °/s in half a
+second, and releasing a lean-back pops the nose up another 30°.* Pro: the same, with slightly less lean authority (K_att
+260) and no ramp assist: full gas on a kicker at neutral loops.
+
+### R3 table deltas (Rookie; Pro unchanged)
+
+| row | R3 | R4 |
+|--|--|--|
+| full gas lean 0 / +0.25 / +0.5 / +1 max pitch | 6.7 / 6.0 / 5.9 / 5.9 | same |
+| loop at lean −0.25 / −0.5 / −1 | 1.10 / 0.82 / 0.63 s | **1.86** / 0.83 / 0.63 (the fade starts at −0.2) |
+| 0 → 16 (lean +0.25) / top | 3.97 s / 20.03 | same |
+| hop ref / matrix | 0.46; matrix as R3 | 0.46; within 0.01 |
+| landing table (12 rows) | all ride away, rebound ≤ 0.05 | identical |
+| wheelie hold 40 ± 8 (V3) | 12.0 s in band, mean 40.1 | **11.5 s**, mean 39.7, v ≤ 7.4 |
+| climb 40@2 / 45@2 / 45@5 / 50@6 | TOP / TOP / 72 % / 42 % | TOP / TOP / 72 % / 45 % |
+| lab hop @8 / @9 margin | −0.06 / −0.07 (cleared) | **−0.16 / −0.14** (cleared, deeper corner roll) |
+| kickers 17–22 @8/11 lean released | worst 9.0 | 9.3; lean-held 20°@8 lands −26.0 (was −24.x, pin 25 → 28) |
+| air control 0.5 s lean −1 / +1 | 34.8 / −39.3 | same |
+| µs/tick p50 / p95 | 2.7–3.0 | 2.5 / 4.0 (loadavg 15–20 during the run) |
+
+### Reflex `average`, Rookie, 3 seeds (1000–1002), node, `runOnce` (`scratchpad/physics-r4/reflex.mts`)
+
+| track | band | before (assist off) median · clears | after median · clears | after deaths |
+|--|--|--|--|--|
+| gap-test | 1–3 | 1 (1/5/1) · 3/3 | **1** (1/1/1) · 3/3 | — |
+| b1-first-ride | 1–1 | 3 (3/5/2) · 3/3 | **1** (1/1/1) · 3/3 | — |
+| b2-lean-back | 1–2 | 8 (2/8/11) · 3/3 | 4 (4/2/12) · 3/3 | ramp @ 260 nose-low ×2; air-brake ×1; air-gas ×1 |
+| b3-kicker-row | 1–2 | 5 (5/26/5) · 3/3 | **14** (11/14/18) · 3/3 | ramp @ 424 air-brake-nose-down ×4; ground @ 240 nose-high ×3 |
+| e1-uphill-weight | 2–4 | 34 (34/39/33) · 0/3 | 21 (29/21/11) · 2/3 | ground @ 165 air-brake ×3; ramp @ 211 air-gas ×3 |
+| e2-rear-wheel-first | 3–5 | 36 · 0/3 | 36 (37/36/19) · 1/3 | ramp @ 506 / 191 air-brake-nose-down ×22 |
+| e3-stairway | 3–6 | 44 · 0/3 | 30 (10/38/30) · 1/3 | stair @ 165 stuck / nose-high / air-brake |
+
+Target (b1–b3 in band, e1–e3 ≤ 1.5× band) met on gap and b1 only. What the traces say about the rest: every remaining
+death is the air. `air-level` maps the pitch error to a lean saturating at ±1 beyond 18° and holds it through the
+reaction lag; against a lean that *accelerates* the bike at 265 °/s² (and whose release kicks the other way) that is a
+bang-bang controller on a double integrator — the b3 traces show lean +1 held 1.2 s from +25° to −80° at −200 °/s, a
+brake tap on top, then the endo. The assist cannot touch this (it is thrust); the levers are (a) K_att/c_att as a rate
+servo on the Rookie — K 500 / c 250 gives 114 °/s at 0.5 s saturating, 38° in 0.5 s, the ramp lip 45°, but costs the hop
+0.46 → 0.36 (c_att opposes the snap's −200 / +295 °/s chassis rotation) and slows the loop-outs; (b) the rider target
+rate (5 → 3 m/s: swing 245 → 182, hop 0.46 → 0.28; 2 m/s: 147 / 0.11) — the hop is a 3 m/s throw and so is the kick.
+Neither is a fix this round; both are one parameter row each. The b3 regression is speed: the assist trims the thrust on
+every kicker the reflex rider takes at lean +0.3 (8.4 m/s off a 20° lip instead of 9.6), and b3's landings are authored
+to a speed window; a rider at +0.8–1 keeps 8.5–8.9 with the assist off.
+
+### Mechanism table (artefact vs dynamics)
+
+| round-8 label | measured | verdict |
+|--|--|--|
+| "throttle tap in the air kicks 200–400 °/s" | throttle alone 20 °/s peak, +6° / 0.5 s (Pro 23); the same tick's lean −1 → 0 gives +245 (43 per tick) | dynamics: the pose swing (F_max × grip lever / I_c); throttle is 8 % of it |
+| "whenever the rear wheel skims the ramp" | rear touchdown 20° off a 20° ramp at 1–2 m/s: 40–58 °/s per tick, N 3–6 kN; grazing (0.5 m/s) 50 | dynamics: sin 20° of the normal impulse through the rigid slider; bounded ≤ 60 per tick |
+| "on-ramp front lift 100–200 °/s" | lift threshold 0.22 g on 20° vs 0.6 g flat; Rookie 0.53 g at 10 m/s lifts at any lean; 43° over slope at lean 0 | dynamics (geometry); assisted on the Rookie to 11.7° over / lip −62 °/s |
+| contact impulse spike / brush snap / servo cap flip / K_att sign | no per-tick step > 60 °/s attributable to a contact; friction accumulated and clamped; the servo's F_max is the swing itself; K_att flips only with the lean input | none found |
+
+### Pro walls (m3 204.6 m, x1 first 60 m)
+
+Re-run on this HEAD (`harness:bot --skill 3 --bike pro --seeds 1 --no-verify`, Pro physics untouched by R4):
+**m3-see-saw Pro: 1 attempt, finish 38.267 s** (plans 252, 62 s wall); **x1-vertical-limit Pro: 1 attempt, finish
+55.825 s** (plans 333, 72 s wall; the committed `bot-3-pro.json` already replays to a finish — byte-identical golden).
+Neither wall exists on the r7 tracks + r8 macros: the round-8 numbers (m3 50 cap, x1 48 cap) were taken before tracks r7
+re-authored both (`tracks.md` r7 rows: m3's kickers 6 × 1.5 with 14 m after each board, x1's 45° `kickerPlank` and 6 m
+box tops). Verdict: **geometry (now fixed), not physics.** The physics reading still holds for a *human* on the Pro: the
+45° technique climb from a crawl is not available to the Pro (R3 climb table: 40@2 FAULT, 45@2 stall 36 %) and full gas
+on a kicker at neutral leaves the lip at 76° / 178 °/s — the bot finds the lines (partial gas, +1), a stranger will not.
+The unverified m3 golden the run wrote was removed (harness owner: `--refresh-goldens` will re-prove it in the browser).
+
+### Requests
+
+- **harness (reflex)**: the air rule — lean is an acceleration, not a rate: `air-level` needs a rate term (lean ∝ e/18 −
+  rate × 0.25 s, clamp ±0.5 unless |e| > 35) and a release 0.15 s before the target; never hold ±1 for > 0.3 s; expect
+  +30° from releasing a lean-back. `ramp-ride` on the Rookie: lean +0.8–1, not +0.4 g (same lip pitch, 0.7 m/s more
+  speed, the assist stays out of it). The bot's Pro ramp move: throttle ≤ 0.3 or lean +1 on kickers ≥ 14° above 9 m/s.
+  Re-run `--all-tracks --bike both` on this HEAD; `debug().engine.assist` is a new HUD field.
+- **tracks**: the Rookie exits a 20° kicker under full gas at 7.8–8.5 m/s (was 9.8 and a loop); b3's kicker row is
+  the only beginner course that got harder — re-measure its landing windows against 8 m/s lips, or lower the second
+  and fourth kickers' demand.
+- **parent (decision)**: the air swing is the R3 hop's price. Options with numbers above: Rookie K 500 / c 250 (hop
+  0.36), rider target rate 3 m/s (hop 0.28), or accept the swing and fix the controller. R5 should take one.
+
+---
+
 ## v2 status — R3 (of three, physics-v2.md §16.7)
 
 **Finding.** The landing pogo is gone without touching the hop: one new §12 slot, `targetMove` (a 0.2 s decaying
