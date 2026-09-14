@@ -117,5 +117,19 @@
     "hazards": 18,
     "obstacles": 51,
     "finishX": 499.610434
+  },
+  "lab-physics-test": {
+    "hash": "44323a6289134cf2",
+    "colliders": 9,
+    "hazards": 0,
+    "obstacles": 5,
+    "finishX": 100
+  },
+  "lab-flat-200": {
+    "hash": "a5372af3c4fbcb76",
+    "colliders": 4,
+    "hazards": 0,
+    "obstacles": 2,
+    "finishX": 200
   }
 }

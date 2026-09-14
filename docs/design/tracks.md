@@ -1,6 +1,6 @@
 # Track system and curriculum
 
-Status: mega build wave 1 (round 7) — DESIGN wave: `docs/design/tracks-storyboards.md` storyboards h1-h3 / x1-x3 as designed courses (premise, technique story, set piece, pacing, checkpoints, attempts band, ASCII elevation) and sanity-passes m1-m3; the vocabulary gains the collider-free decor kinds `arch` / `tunnel` and `meta.setPieces` markers (§1.2, §1.4) so render can dress set pieces; no course changes (every golden and the round-6 acceptance matrix stand); §5 is the wave 2 plan. Round 6 for the record: X3 trimmed to one feature per lesson at 500 m, X1 re-sequenced around a 45 deg opener with 40 m plank run-ins, B3 / M1 demand landings on inclines, and the finish run-out + catch on every track. Owner: tracks. Consumers: physics, render, audio, harness, game.
+Status: physics-v2 P0 (round 8) — the two lab tracks (§6: `lab-physics-test` authored to physics-v2 §15 to the metre, `lab-flat-200` for the envelope rows), registered last under `lab-`, with the `gap` kind gaining default-preserving `hazard: 'none'` / `rise` / `floor` (§1.2) so a dry pit can land on a higher ledge over a rubber mattress; every existing golden stands. Previous: mega build wave 1 (round 7) — DESIGN wave: `docs/design/tracks-storyboards.md` storyboards h1-h3 / x1-x3 as designed courses (premise, technique story, set piece, pacing, checkpoints, attempts band, ASCII elevation) and sanity-passes m1-m3; the vocabulary gains the collider-free decor kinds `arch` / `tunnel` and `meta.setPieces` markers (§1.2, §1.4) so render can dress set pieces; no course changes (every golden and the round-6 acceptance matrix stand); §5 is the wave 2 plan. Round 6 for the record: X3 trimmed to one feature per lesson at 500 m, X1 re-sequenced around a 45 deg opener with 40 m plank run-ins, B3 / M1 demand landings on inclines, and the finish run-out + catch on every track. Owner: tracks. Consumers: physics, render, audio, harness, game.
 `docs/design/CONTRACT.md` wins over this file; the executable form is `src/core/types.ts`
 (`TrackDef`, `TrackMeta`, `CameraKey`, `CompiledTrack`, `Collider`, `HazardZone`,
 `PlacedObstacle`) and `src/tracks/index.ts`. Metres, seconds, radians unless a param is
@@ -8,8 +8,10 @@ named `*Deg`. +x is track direction, +y up, +z toward the camera.
 
 Code map (`src/tracks/`): `kinds.ts` vocabulary + defaults + per-kind lowering,
 `geometry.ts` shared-face cancellation, `compile.ts` `compileTrack`, `author.ts` DSL + feel
-helpers + spawn validation, `describe.ts` text summaries, `courses/*.ts` the tracks,
-`golden.json` per-track collider hashes, `tracks.test.ts` / `compile.test.ts`.
+helpers + spawn validation, `describe.ts` text summaries, `courses/*.ts` the tracks
+(`courses/lab.ts` the `lab-*` physics tracks, §6), `golden.json` per-track collider hashes,
+`tracks.test.ts` / `compile.test.ts`. Registry order: fixtures, curriculum, lab tracks last
+(`isLabTrackId(id)` = `id.startsWith('lab-')`; core-game lists those under "Lab").
 
 ## 0. Numbers the tracks are authored to (CONTRACT §2.5, with 20 % margin)
 
@@ -71,7 +73,7 @@ touches colliders. Render reads `thickness width length radius variant surface` 
 | `ramp` | length 4, height 1, curve 0 (+concave/kicker, -convex), direction up/down, surface wood | solid wedge; curve != 0 bakes a 12-segment quadratic arc | length |
 | `plank` | length 4, angleDeg 0, height 0 (elevation of near end), thickness 0.12, oneWay true, surface wood | ONE polyline, the top surface, `oneWay` (landable from above, pass-through from below); thickness is a render param | length * cos(angle) |
 | `drum` | radius 0.8, width 1.2 (visual depth along z), depth 0 (sunk), rolls false, surface metal | circle; `rolls` spins about its centre under the tyre, never translates | 2 r |
-| `gap` | width 3, depth 3, hazard water/kill | pit cut into the ground chain (walls lean in 0.05 m so x stays monotone) + hazard zone [lip - depth, lip - 0.6] | width |
+| `gap` | width 3, depth 3, hazard water/kill/fire/**none**, rise 0, floor dirt | pit cut into the ground chain (walls lean in 0.05 m so x stays monotone) + hazard zone [lip - depth, lip - 0.6]. Lab extensions (physics-v2 §15, defaults leave every course and golden unchanged): `hazard: 'none'` is a dry pit (no hazard zone: a fall in is not a fault); `floor` other than dirt makes the floor edge the gap's OWN polyline (`obstacleIndex` = the gap, its `colliderIds`; render draws it as a ribbon of that surface: the rubber mattress); `rise` puts the far lip `rise` m above the near one, the far wall vertical from the floor to the ledge — the DSL steps the ground up across the pit (that segment is never ridden, so the 40 deg ground limit does not apply) and compile refuses a profile whose rise across the pit is not `rise` | width |
 | `wall` | height 1, width 0.4, lip 0, surface concrete | solid slab; `lip` adds a one-way overhang polyline projecting back from the top front edge (front-wheel grab) | width |
 | `seesaw` | length 6, height 1 (pivot), thickness 0.12, angleDeg 0 (auto), mass 60, surface wood | `ColliderSeesaw`; auto maxAngle = asin((height - t/2) / half) capped 30 deg. Physics rests the board tipped toward the rider, so the DSL refuses an auto see-saw whose resting end would hang in the air (height - t/2 > half * sin 30) unless `angleDeg` is explicit | length |
 | `logpile` | radius 0.3, count 3 (bottom row), rows 1, spacing 0, surface wood | circles in a pyramid, row pitch r*sqrt3 | count * 2r + (count-1) spacing |
@@ -155,7 +157,7 @@ edge; `steppedWall(wall, step)` = ramp in front leaving `step` m of wall (the B 
 for the A line); `logStep` ramps to the first log's top (3 x 2r, curve 0.3). Flow vocabulary (round 3, no new technique, keeps speed): `humpRow(count, h, pitch)`,
 `wave(length, dy)` = smooth rise and fall, `stepDowns(up, top, heights[])` = ramp onto a
 cascade of shelves each a drop, `smallGap(rampLen, rampH, gap)` = kicker + gap onto flat.
-Consecutive flats merge into one profile segment.
+Consecutive flats merge into one profile segment. `gap({ rise })` (lab pits, §1.2 / §6) steps the ground up by `rise` across the pit: the cursor leaves the far lip `rise` m higher and everything after is authored at the ledge height.
 Obstacles pin the profile at both ends so a slope after a box starts after the box.
 `plank({ angleDeg, rise })` computes the board length; `steepPlank({ angleDeg, rise })` puts a
 1.2 x 0.35 concave ramp fillet under the foot and climbs the remaining rise. The cursor is
@@ -163,7 +165,7 @@ kept on the 1e-6 grid so computed footprint ends and the next `pos.x` quantise i
 `checkpoint()` records the spawn
 (rear-wheel contact at cursor + 0.5, angle 0); `camera(key)` opens a `CameraKey` that runs
 to the next key or the finish; `hint(text)` adds a HUD hint; `finish(runout = 30)` sets
-`finishX` at the cursor, adds the run-out (round 6: `runout` is raised to `FINISH_RUNOUT.flat` = 30 m of flat at the finish height, then the catch — a 3 m x 0.75 ramp into a 2.5 m container — then the 35 deg end bank; `validateFinishRunout` checks flat, catch and that nothing stands on the run-out) and validates. Round 4 (authored to the stranger): `plateau(up, top, height)` = cosine rise, flat top, cosine fall with every crest grounded at 16 m/s (B1's tabletops), `descent(length, drop)` = a smooth descent whose top cannot launch, `bumpRow(count, h, groundedAt)` = cosine speed bumps grounded at that speed (B1's hump rows), `wave(length, dy, groundedAt)` asserts the same. `finish(runout, { checkpointRule: false })` opts a harness fixture out of the checkpoint rule; `{ catch: false }` opts a compile-test snippet out of the catch (fixtures keep it: `flat-test` carries the catch at 150 m by hand). Round 6: `steepPlank` takes `filletLength` / `filletHeight` — a 2.4 x 0.8 fillet in front of a >= 48 deg plank spreads the pitch-up over ~0.2 s (X1's 50 deg plank went from a 78-death stuck-restart wall to 3 deaths for reflex `good`; the 1.2 x 0.35 default stays on the <= 48 deg planks of E1).
+`finishX` at the cursor, adds the run-out (round 6: `runout` is raised to `FINISH_RUNOUT.flat` = 30 m of flat at the finish height, then the catch — a 3 m x 0.75 ramp into a 2.5 m container — then the 35 deg end bank; `validateFinishRunout` checks flat, catch and that nothing stands on the run-out) and validates. Round 4 (authored to the stranger): `plateau(up, top, height)` = cosine rise, flat top, cosine fall with every crest grounded at 16 m/s (B1's tabletops), `descent(length, drop)` = a smooth descent whose top cannot launch, `bumpRow(count, h, groundedAt)` = cosine speed bumps grounded at that speed (B1's hump rows), `wave(length, dy, groundedAt)` asserts the same. `finish(runout, { checkpointRule: false })` opts a harness fixture — or a lab track whose checkpoints physics-v2 §15 fixes, §6 — out of the checkpoint rule; `{ catch: false }` opts a compile-test snippet out of the catch (fixtures keep it: `flat-test` carries the catch at 150 m by hand). Round 6: `steepPlank` takes `filletLength` / `filletHeight` — a 2.4 x 0.8 fillet in front of a >= 48 deg plank spreads the pitch-up over ~0.2 s (X1's 50 deg plank went from a 78-death stuck-restart wall to 3 deaths for reflex `good`; the 1.2 x 0.35 default stays on the <= 48 deg planks of E1).
 
 **Set pieces (wave 1).** `setPiece(kind, label?)` opens an x range at the cursor; `endSetPiece()`
 or the next `setPiece()` closes it and `finish()` closes an open one ON the finish line. Kinds
@@ -658,3 +660,104 @@ bot, 600 s wall):
   (`UPDATE_GOLDEN=1`) only for the track in the commit;
 - stranger median inside `attemptsBand` after the stranger round, else the TRACK is edited, never
   the band (§3 tuning rule); tier medians non-decreasing.
+
+## 6. Lab tracks (`src/tracks/courses/lab.ts`; physics-v2 §15 / §16.4, MEGA_PLAN P0)
+
+Two tracks with `lab-` ids, registered LAST (`ALL_TRACKS = [fixtures, ...CURRICULUM, ...LAB_TRACKS]`,
+`LAB_TRACKS`, `isLabTrackId`). Core-game shows them under a "Lab" section; `meta.hints = ['physics']`
+on both turns on the physics HUD (physics-v2 §15 "HUD on this level only"). They are the proving
+ground for every physics change: physics-v2 §16.4 — "`lab-physics-test` is authored first and gates
+every later physics round". Geometry is frozen by golden hash (`44323a6289134cf2` / `a5372af3c4fbcb76`)
+AND pinned to the metre in `tracks.test.ts` ("lab-physics-test (physics-v2 §15)"), so a drift from the
+spec fails with a number. Both compile deterministically and `describeTrack` prints them with the suite.
+
+### 6.1 `lab-physics-test` — "Physics Test" (tier medium, biome industrial, technique "the bunny hop", attemptsBand [3, 8], targetTimeS 25)
+
+Authored to physics-v2 §15 with the DSL (`ramp` + `box` + `gap` + ground; 100 m, 3 course obstacles):
+
+```
+x   0 - 40    run-up, flat dirt (ground polyline #0: (-10,0)-(40,0)); start spawn at x = 0 (CONTRACT §2.4)
+x  40 - 46    take-off: ramp 6 x 1.2, wood (#4, obstacle 0: (40,0)-(46,1.2), 11.31 deg)
+x  46 - 46.3  lip: box 0.3 x 1.2, wood (#5, obstacle 1: (46,1.2)-(46.3,1.2)-(46.3,0)); its back face and the
+              pit's near wall (#1: (46.3,0)-(46.35,-1.5)) are one vertical drop from +1.2 to -1.5
+x  46.3-49.3  pit: gap width 3, depth 1.5, rise 1.6, hazard none, floor rubber (obstacle 2). Floor at -1.5 m on the
+              rubber mattress (#6, owned by the gap: (46.35,-1.5)-(49.25,-1.5)). No hazard zone: landing short is a
+              fall onto the mattress, not a fault (bounds.minY -1.5, oobY -7.5)
+x  49.3       landing ledge: the far wall is vertical from -1.5 to +1.6 ((49.25,-1.5)-(49.3,1.6), start of #2);
+              the ledge top is 0.4 m above the lip
+x  49.3-100   run-out, flat dirt at +1.6 (ground #2) with the 20 x 0.6 m cosine crest at 70-90 (peak 2.2 m at
+              x = 80; crest radius 33.8 m: leaves the ground above sqrt(g R) = 18.2 m/s — the "full gas over a
+              crest" check, deliberately NOT grounded at 20 m/s); finish at x = 100
+x 100 - 143   the standard finish run-out: 30 m flat at +1.6, catch ramp 3 x 0.75 wood at 130 (obstacle 3), 2.4 x
+              2.5 box at 133 (obstacle 4), end bank to +5.6
+checkpoints:  30 (spawn 30.5, before the ramp), 62 (spawn 62.5, after the ledge)
+```
+
+Compiled obstacle list (`describeTrack`): `#0 ramp @40.0 y=0 length=6 height=1.2` · `#1 box @46.0 y=0
+width=0.3 height=1.2` · `#2 gap @46.3 y=0 width=3 depth=1.5 hazard=none rise=1.6 floor=rubber` · `#3 ramp
+@130.0 y=1.6 length=3 height=0.75` · `#4 box @133.0 y=1.6 width=2.4 height=2.5`; 9 colliders, 0 hazards.
+
+**Deviations from the §15 text, and why (all cosmetic to the physics being measured):**
+
+- *Ledge surface.* §15 says a 12 m concrete ledge; here the ledge and the whole run-out are the ground
+  (dirt) at +1.6 (`gap.rise`). A solid's top is not ground: the run-out, the crest and the 62 m spawn
+  have to sit at the ledge height, and a 12 m box followed by ground at 0 would put a 1.6 m drop and a
+  40 deg climb behind it. The parent's surface list ("dirt run-up, wood lip, rubber mattress, dirt
+  ledge") is what is built.
+- *Return ramp.* §15's "ride back up a 15 deg return ramp to the run-up" is not authored: the world is
+  a heightfield (x monotone) so nothing can run back under the take-off, and the bike has no reverse.
+  A rider on the mattress is not faulted; he restarts at the 30 m checkpoint (one tick, one frame).
+- *Start.* §15 says "start at x = 2"; the builder spawns at x = 0 on the same flat (CONTRACT §2.4). The
+  run-up to the take-off foot is 40 m either way (§15's own header says 40 m).
+- *Ledge length.* §15 says 12 m long and "61-100 run-out"; the ledge here IS the run-out from 49.3 on,
+  so the second checkpoint at 62 sits 12.7 m onto it.
+
+**Checkpoint-rule opt-outs (`finish(30, { checkpointRule: false })`; the test pins exactly these two
+violations and nothing else):**
+
+1. cp0 at x = 30: 9.5 m from the spawn (30.5) to the take-off foot (40); the rule wants 15 m for a gap.
+   §15 fixes the checkpoint at 30 "before the ramp" on purpose — the hop's working arrival speed is
+   6-9 m/s (`FEEL.speedAfter(9.5)` = 7.5 m/s; from the start line the same rider arrives at ~15 m/s and
+   has to modulate). (`auditCheckpoints` reports 0.3 m because it measures a ramp -> box -> gap chain at
+   the gap; the honest figure is 9.5 m.)
+2. cp1 at x = 62: 6.7 m after the pit's landing zone (49.3 + 6 m carry); the rule wants 8. §15 fixes it at
+   62 "after the ledge"; the landing on the ledge top is over by ~55 m at any hop speed, and 62 leaves
+   8 m of flat at +1.6 before the crest.
+
+The finish run-out validator, spawn validation and every other suite check apply unchanged.
+
+**What is measured here (physics-v2 §15, §14.2 rows; the physics-v2 engineer runs them, the lab HUD shows
+them, the harness records them):**
+
+| probe | where | reads (from `PhysicsState` + `debug()`) | pass band (physics-v2) |
+|---|---|---|---|
+| roll it (no hop) at 8-9 m/s | lip 46.3 | flight ~0.4 s, drop ~0.5 m, front meets the far wall ~0.3 m below +1.6 | fails, survivably: no fault, bike ends on the mattress at -1.5 |
+| hop from the lip at 6-9 m/s | lip 46.3 -> ledge 49.3 | preload depth, snap duration, rear apex, airtime, landed pitch (HUD "last hop") | rear apex >= 0.45 m clears the 0.4 m step with >= 0.1 m margin; bot skill 2 clears; strangers median <= 4 attempts (band [3, 8]) |
+| late / weak hop | ledge edge 49.3 | rear on the edge: fender-grab save with throttle, or drop onto the mattress | survivable either way, never a fault |
+| body-on-face | far wall 49.25-49.3, -1.5..+1.6 | head / torso contact with the wall polyline | the ONLY fault on the feature (CONTRACT crash rule) |
+| full gas over the crest | 70-90, peak at 80 | pitch, pitch rate, both-wheels-off, `comDH` vs a/g | neutral lean + full gas does not loop (A§2.5, P7); lean-back wheelie over the crest is the fun line; > 18.2 m/s leaves the ground by design |
+| restart | cp0 30.5 / cp1 62.5 | restart -> riding latency | one tick, one frame; spawn on one flat segment (validated) |
+| determinism | whole track | a recorded input replays to a byte-identical finish time | required (AGENTS.md) |
+
+### 6.2 `lab-flat-200` — "Flat 200" (tier beginner, biome industrial, technique "envelope measurement", attemptsBand [1, 1], targetTimeS 14)
+
+200 m of flat dirt, nothing on it before the finish, checkpoints at 50 / 100 / 150 (spawns +0.5),
+finish at 200, then the standard 30 m run-out + catch (ramp at 230, box at 233) and end bank. 4
+colliders, 0 hazards, 0 checkpoint violations. `hints = ['physics']` so the HUD is on. It exists so
+every flat-ground FEEL number in §0 is measured on a track that is in the registry (not a scratch
+profile), with the same restart path as a course:
+
+| row (§0 / physics-v2 §14.2) | how | current authored-against value |
+|---|---|---|
+| 0 -> 16 m/s | full gas from the start spawn, lean per class | <= 3.5 s (v2 asks "<= 4.2 s at the launch pose") |
+| top speed | full gas, 200 m | 20 m/s |
+| brake distance | from 10 / 16 / 20 m/s at cp1 / cp2 / cp3, hard-back / neutral / hard-forward | <= 4.5 m from 10 (measured 4.66; v2: <= 5.0 hard-back, <= 7 neutral with a settling stoppie) |
+| partial throttle cruise | 0.3 throttle, 200 m | 11.3 m/s |
+| stationary hop | from a spawn, no roll | rear apex 0.55-0.75 m (v2: 0.45-0.65, 0.35-0.6 s both wheels off) |
+| rolling hop | at 5 m/s | 0.9 m ledge equivalent |
+| loop-out | full gas, lean 0 / +0.25 / -0.4 | lean >= 0.4 never loops on flat; v2: neutral never loops at a/g < d/h |
+| wheelie hold | lean back + throttle | v2: a constant-input wheelie holds >= 3 s |
+| rider pose lag | step lean, read `torsoPitch` | 0.28 s t90 |
+
+When physics-v2 §14 passes, the tracks owner re-measures §0 from these two tracks (physics-v2 §16.4)
+and re-authors the kickers built for the 1.4 g plant.

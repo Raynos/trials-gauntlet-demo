@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { Collider, ColliderPolyline, CompiledTrack, TrackDef, TrackObstacle, Vec2 } from '../core/types';
-import { ALL_TRACKS, CURRICULUM, compileTrack, describeTrack, getTrack, listTrackIds } from './index';
+import { ALL_TRACKS, CURRICULUM, LAB_FLAT_200, LAB_PHYSICS_TEST, LAB_TRACKS, compileTrack, describeTrack, getTrack, isLabTrackId, listTrackIds } from './index';
 import { CHECKPOINT_RULE, FEEL, FINISH_RUNOUT, SPAWN_CLEAR_AHEAD, SPAWN_CLEAR_BEHIND, auditCheckpoints, validateFinishRunout } from './author';
 import { cancelSharedEdges, segmentsCross, type OwnedEdge } from './geometry';
 import { OBSTACLE_KINDS, footprint, type ObstacleKind } from './kinds';
@@ -93,8 +93,17 @@ describe('registry', () => {
     ]);
     expect(listTrackIds()).toContain('flat-test');
     expect(listTrackIds()).toContain('gap-test');
-    expect(listTrackIds()).toHaveLength(17);
+    expect(listTrackIds()).toHaveLength(19);
     for (const id of listTrackIds()) expect(getTrack(id)?.id).toBe(id);
+  });
+
+  it('lists the lab tracks last (physics-v2 §15: core-game shows `lab-*` under "Lab")', () => {
+    const ids = listTrackIds();
+    expect(ids.slice(-2)).toEqual(['lab-physics-test', 'lab-flat-200']);
+    expect(ids.filter(isLabTrackId)).toEqual(['lab-physics-test', 'lab-flat-200']);
+    expect(LAB_TRACKS.map((t) => t.id)).toEqual(['lab-physics-test', 'lab-flat-200']);
+    expect(CURRICULUM.some((t) => isLabTrackId(t.id))).toBe(false);
+    for (const t of LAB_TRACKS) expect(t.meta?.hints).toEqual(['physics']);
   });
 
   it('tiers escalate: attempts bands and target times are non-decreasing through the curriculum', () => {
@@ -252,7 +261,7 @@ describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
 
   it('ground profile is strictly increasing in x and every gap has a hazard', () => {
     for (let i = 1; i < def.profile.length; i++) expect((def.profile[i] as Vec2).x).toBeGreaterThan((def.profile[i - 1] as Vec2).x);
-    const gaps = def.obstacles.filter((o) => o.kind === 'gap').length;
+    const gaps = def.obstacles.filter((o) => o.kind === 'gap' && (o.params?.['hazard'] ?? 'water') !== 'none').length; // a lab pit is dry by design
     const pits = track.hazards.filter((h) => h.kind === 'water' || h.kind === 'kill').length;
     expect(pits).toBe(gaps);
     const barrels = def.obstacles.filter((o) => o.kind === 'barrel').reduce((n, o) => n + ((o.params?.burning ?? true) ? Number(o.params?.count ?? 1) : 0), 0);
@@ -263,6 +272,77 @@ describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
     const text = describeTrack(track);
     expect(text).toContain(def.id);
     console.log(text);
+  });
+});
+
+/**
+ * Lab tracks (physics-v2 §15, tracks.md "Lab tracks"): the geometry is pinned to the metre here as well as by
+ * the golden hash, so a re-author that drifts from the spec fails with a number, not a hash.
+ */
+describe('lab-physics-test (physics-v2 §15)', () => {
+  const def = LAB_PHYSICS_TEST;
+  const track = compiled.get(def.id) as CompiledTrack;
+  const poly = (i: number): ColliderPolyline => track.colliders[i] as ColliderPolyline;
+
+  it('is the §15 geometry: 40 m run-up, 6 x 1.2 wood take-off + 0.3 m lip, 3 m dry pit on a rubber mattress at -1.5, ledge at +1.6, crest 70-90, finish 100', () => {
+    expect(def.finishX).toBe(100);
+    expect(def.checkpoints.map((c) => c.x)).toEqual([30, 62]);
+    expect(def.meta).toMatchObject({ biome: 'industrial', technique: 'the bunny hop', hints: ['physics'], attemptsBand: [3, 8], targetTimeS: 25 });
+    const course = def.obstacles.slice(0, 3).map((o) => [o.kind, o.pos.x, o.pos.y]);
+    expect(course).toEqual([
+      ['ramp', 40, 0],
+      ['box', 46, 0],
+      ['gap', 46.3, 0],
+    ]);
+    // run-up: one flat dirt segment from the start to the take-off foot
+    expect(poly(0)).toMatchObject({ surface: 'dirt', obstacleIndex: -1, points: [{ x: -10, y: 0 }, { x: 40, y: 0 }] });
+    // take-off: 11.31 deg wood ramp, then the wood lip whose back face drops to the run-up level
+    expect(poly(4)).toMatchObject({ surface: 'wood', obstacleIndex: 0, points: [{ x: 40, y: 0 }, { x: 46, y: 1.2 }] });
+    expect(Math.atan2(1.2, 6) * (180 / Math.PI)).toBeCloseTo(11.31, 2);
+    expect(poly(5)).toMatchObject({ surface: 'wood', obstacleIndex: 1, points: [{ x: 46, y: 1.2 }, { x: 46.3, y: 1.2 }, { x: 46.3, y: 0 }] });
+    // pit: near wall continues the lip face down to -1.5; rubber mattress owned by the gap; far wall -1.5 -> +1.6
+    expect(poly(1)).toMatchObject({ surface: 'dirt', obstacleIndex: -1, points: [{ x: 46.3, y: 0 }, { x: 46.35, y: -1.5 }] });
+    expect(poly(6)).toMatchObject({ surface: 'rubber', obstacleIndex: 2, points: [{ x: 46.35, y: -1.5 }, { x: 49.25, y: -1.5 }] });
+    expect(poly(2).points.slice(0, 3)).toEqual([
+      { x: 49.25, y: -1.5 },
+      { x: 49.3, y: 1.6 },
+      { x: 70, y: 1.6 },
+    ]);
+    expect(track.placed[2]?.colliderIds).toEqual([6]);
+    expect(track.hazards).toEqual([]);
+    // run-out: flat at +1.6 with the 20 x 0.6 cosine crest at 70-90 (peak 2.2 at 80) and flat to the catch
+    const runout = poly(2).points;
+    const peak = runout.reduce((a, b) => (b.y > a.y ? b : a));
+    expect(peak).toEqual({ x: 80, y: 2.2 });
+    expect(runout.filter((p) => p.x > 70 && p.x < 90).every((p) => p.y > 1.6)).toBe(true);
+    expect(runout[runout.length - 1]).toEqual({ x: 130, y: 1.6 });
+    expect(profileYAt(def.profile, 100)).toBeCloseTo(1.6, 9);
+    expect(track.bounds.minY).toBe(-1.5);
+    expect(track.oobY).toBe(-7.5);
+  });
+
+  it('opts out of the checkpoint rule exactly where §15 fixes the checkpoints: 30 (9.5 m to the take-off) and 62 (6.7 m after the pit landing zone)', () => {
+    const { violations } = auditCheckpoints(def);
+    expect(violations.map((v) => [v.spawn, v.kind, v.obstacleX])).toEqual([
+      ['cp0', 'runup', 46.3],
+      ['cp1', 'after-landing', 46.3],
+    ]);
+    expect(40 - (def.checkpoints[0] as TrackDef['checkpoints'][number]).spawn.pos.x).toBeCloseTo(9.5, 9);
+    expect(violations[1]?.have).toBeCloseTo(6.7, 9);
+    expect(validateFinishRunout(def)).toEqual([]);
+  });
+});
+
+describe('lab-flat-200', () => {
+  const def = LAB_FLAT_200;
+  const track = compiled.get(def.id) as CompiledTrack;
+  it('is 200 m of flat dirt with checkpoints every 50 m, nothing on it before the finish', () => {
+    expect(def.finishX).toBe(200);
+    expect(def.checkpoints.map((c) => c.x)).toEqual([50, 100, 150]);
+    expect(def.obstacles.filter((o) => o.pos.x < def.finishX)).toEqual([]);
+    expect(track.colliders[0]).toMatchObject({ surface: 'dirt', obstacleIndex: -1, points: [{ x: -10, y: 0 }, { x: 230, y: 0 }] });
+    expect(track.hazards).toEqual([]);
+    expect(auditCheckpoints(def).violations).toEqual([]);
   });
 });
 

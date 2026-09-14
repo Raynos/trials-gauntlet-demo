@@ -136,6 +136,47 @@ describe('compileTrack merge', () => {
     expect(c.placed[0]?.params).toMatchObject({ variant: 2, width: 4, height: 1, surface: 'metal' });
   });
 
+  it('lab pit (physics-v2 §15): hazard none is dry, floor rubber is the gap\'s own polyline, rise lifts the far lip', () => {
+    const def = course('t-lab-pit', 't', 'beginner').meta(meta).flat(10).gap({ width: 3, depth: 1.5, rise: 1.6, hazard: 'none', floor: 'rubber' }).flat(10).finish(10, { checkpointRule: false, catch: false });
+    expect(def.profile).toEqual([
+      { x: -10, y: 0 },
+      { x: 10, y: 0 },
+      { x: 13, y: 1.6 },
+      { x: 53, y: 1.6 },
+      { x: 58.712592, y: 5.6 },
+    ]);
+    const c = compileTrack(def);
+    expect(c.hazards).toEqual([]);
+    expect(c.colliders.map((k) => [k.obstacleIndex, k.surface])).toEqual([
+      [-1, 'dirt'],
+      [-1, 'dirt'],
+      [0, 'rubber'],
+    ]);
+    expect((c.colliders[0] as ColliderPolyline).points).toEqual([
+      { x: -10, y: 0 },
+      { x: 10, y: 0 },
+      { x: 10.05, y: -1.5 },
+    ]);
+    expect((c.colliders[2] as ColliderPolyline).points).toEqual([
+      { x: 10.05, y: -1.5 },
+      { x: 12.95, y: -1.5 },
+    ]);
+    expect((c.colliders[1] as ColliderPolyline).points.slice(0, 3)).toEqual([
+      { x: 12.95, y: -1.5 },
+      { x: 13, y: 1.6 },
+      { x: 53, y: 1.6 },
+    ]);
+    expect(c.placed[0]?.colliderIds).toEqual([2]);
+    expect(c.oobY).toBe(-7.5);
+    // the profile must rise exactly `rise` across the pit
+    const bad = { ...def, obstacles: def.obstacles.map((o) => ({ ...o, params: { ...o.params, rise: 1.0 } })) };
+    expect(() => compileTrack(bad)).toThrow(/rises 1.600 m across the gap, params.rise is 1/);
+    // a dirt floor with a hazard is unchanged: one ground chain, one hazard (every curriculum golden stands)
+    const plain = compileTrack(course('t-gap2', 't', 'beginner').meta(meta).flat(10).gap({ width: 3, depth: 2 }).flat(10).finish(10, { checkpointRule: false, catch: false }));
+    expect(plain.colliders).toHaveLength(1);
+    expect(plain.hazards).toHaveLength(1);
+  });
+
   it('burning barrels carry a fire hazard; unlit ones do not', () => {
     const def = course('t-barrel', 't', 'beginner').meta(meta).flat(10).barrel({ count: 2, spacing: 0.8 }).flat(2).barrel({ burning: false }).flat(10).finish(10, { checkpointRule: false, catch: false });
     const c = compileTrack(def);

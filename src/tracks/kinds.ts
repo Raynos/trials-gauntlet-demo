@@ -102,11 +102,21 @@ export interface DrumParams extends BaseParams {
   rolls: boolean;
   surface: SurfaceKind;
 }
-/** Pit punched out of the ground, `depth` deep, with a water/kill hazard filling it. Ground must be flat across it. */
+/**
+ * Pit punched out of the ground, `depth` deep below the NEAR lip, with a water/kill/fire hazard filling it.
+ * Lab tracks (physics-v2 §15): `hazard: 'none'` is a dry pit (a fall in is not a fault), `floor` is the pit
+ * floor's surface (the rubber mattress; the floor becomes a polyline owned by the gap when it is not dirt),
+ * and `rise` lifts the FAR lip `rise` m above the near one (the far wall is vertical from the floor to the
+ * landing ledge). The authored profile must be level across a gap with rise 0 and rise exactly `rise` otherwise.
+ */
 export interface GapParams extends BaseParams {
   width: number;
   depth: number;
-  hazard: 'water' | 'kill' | 'fire';
+  hazard: 'water' | 'kill' | 'fire' | 'none';
+  /** Far lip height above the near lip (default 0: level). */
+  rise: number;
+  /** Surface of the pit floor (default dirt, part of the ground chain). */
+  floor: SurfaceKind;
 }
 /** Solid slab, not rollable. `lip` adds a one-way ledge projecting back from the top front edge (front-wheel grab). */
 export interface WallParams extends BaseParams {
@@ -220,7 +230,7 @@ export const KIND_DEFAULTS: { readonly [K in TrackKind]: Readonly<KindParams[K]>
   ramp: { length: 4, height: 1, curve: 0, direction: 'up', surface: 'wood', variant: 0 },
   plank: { length: 4, angleDeg: 0, height: 0, thickness: 0.12, oneWay: true, surface: 'wood', variant: 0 },
   drum: { radius: 0.8, width: 1.2, depth: 0, rolls: false, surface: 'metal', variant: 0 },
-  gap: { width: 3, depth: 3, hazard: 'water', variant: 0 },
+  gap: { width: 3, depth: 3, hazard: 'water', rise: 0, floor: 'dirt', variant: 0 },
   wall: { height: 1, width: 0.4, lip: 0, surface: 'concrete', variant: 0 },
   seesaw: { length: 6, height: 1, thickness: 0.12, angleDeg: 0, mass: 60, surface: 'wood', variant: 0 },
   logpile: { radius: 0.3, count: 3, rows: 1, spacing: 0, surface: 'wood', variant: 0 },
@@ -435,9 +445,10 @@ const compileDrum: Compiler<'drum'> = (pos, p) => {
   return g;
 };
 
-/** Gap: only the hazard here; the pit itself is cut into the ground chain by compileTrack. */
+/** Gap: only the hazard here (none for a dry lab pit); the pit itself is cut into the ground chain by compileTrack. */
 const compileGap: Compiler<'gap'> = (pos, p) => {
   const g = empty();
+  if (p.hazard === 'none') return g;
   g.hazards.push({
     kind: p.hazard,
     min: { x: pos.x, y: pos.y - p.depth },
@@ -605,7 +616,7 @@ export const SUMMARY_KEYS: { readonly [K in TrackKind]: readonly (keyof KindPara
   ramp: ['length', 'height', 'curve', 'direction'],
   plank: ['length', 'angleDeg', 'height'],
   drum: ['radius', 'depth', 'rolls'],
-  gap: ['width', 'depth', 'hazard'],
+  gap: ['width', 'depth', 'hazard', 'rise', 'floor'],
   wall: ['height', 'width', 'lip'],
   seesaw: ['length', 'height'],
   logpile: ['radius', 'count', 'rows'],

@@ -11,7 +11,7 @@
  * Hazards are numbered in obstacle order. Decor kinds (`arch`, `tunnel`) get a `placed`
  * entry with no colliders and contribute nothing to bounds or the hash.
  */
-import type { Collider, CompiledTrack, HazardZone, PlacedObstacle, TrackDef, Vec2 } from '../core/types';
+import type { Collider, CompiledTrack, HazardZone, PlacedObstacle, SurfaceKind, TrackDef, Vec2 } from '../core/types';
 import { StateHasher } from '../core/hash';
 import { chainEdges, mergeSolids, polygonEdges, quantize, quantizeVec, type OwnedEdge } from './geometry';
 import {
@@ -68,7 +68,13 @@ interface GapCut {
   x0: number;
   x1: number;
   depth: number;
+  /** Near lip height; the floor is `lipY - depth`. */
   lipY: number;
+  /** Far lip height (= lipY + params.rise; lab pits land on a higher ledge). */
+  lipY1: number;
+  /** Pit floor surface; when not dirt the floor edge is owned by the gap (obstacle index) so it compiles as its own polyline. */
+  floor: SurfaceKind;
+  owner: number;
 }
 
 /** Ground chain with gap pits punched in. Near-vertical walls keep x monotone. */
@@ -80,7 +86,7 @@ function groundWithGaps(profile: readonly Vec2[], gaps: readonly GapCut[]): Vec2
     out.push({ x: g.x0, y: g.lipY });
     out.push({ x: g.x0 + GAP_WALL_LEAN, y: g.lipY - g.depth });
     out.push({ x: g.x1 - GAP_WALL_LEAN, y: g.lipY - g.depth });
-    out.push({ x: g.x1, y: g.lipY });
+    out.push({ x: g.x1, y: g.lipY1 });
   };
   for (const p of profile) {
     while (gi < sorted.length && (sorted[gi] as GapCut).x1 <= p.x + 1e-9) {
@@ -117,10 +123,16 @@ export function compileTrack(def: TrackDef): CompiledTrack {
     if (o.kind === 'gap') {
       const p = resolveParams('gap', o.params);
       const lipY = ground.y(o.pos.x);
-      if (Math.abs(ground.y(o.pos.x + p.width) - lipY) > 1e-6) {
-        throw new TrackCompileError(def.id, `gap ${i} at x=${o.pos.x}: ground is not level across the gap`);
+      const lipY1 = ground.y(o.pos.x + p.width);
+      if (Math.abs(lipY1 - lipY - p.rise) > 1e-6) {
+        throw new TrackCompileError(
+          def.id,
+          p.rise === 0
+            ? `gap ${i} at x=${o.pos.x}: ground is not level across the gap`
+            : `gap ${i} at x=${o.pos.x}: ground rises ${(lipY1 - lipY).toFixed(3)} m across the gap, params.rise is ${p.rise}`,
+        );
       }
-      gaps.push({ x0: o.pos.x, x1: o.pos.x + p.width, depth: p.depth, lipY });
+      gaps.push({ x0: o.pos.x, x1: o.pos.x + p.width, depth: p.depth, lipY, lipY1, floor: p.floor, owner: i });
     }
   });
   for (let i = 1; i < gaps.length; i++) {
@@ -131,6 +143,17 @@ export function compileTrack(def: TrackDef): CompiledTrack {
 
   // 2. Merge ground + solids
   const edges: OwnedEdge[] = chainEdges(groundWithGaps(def.profile, gaps), -1, 'dirt');
+  // A non-dirt pit floor (the lab mattress) is the gap's own polyline: same geometry, its surface, its obstacle index.
+  for (const g of gaps) {
+    if (g.floor === 'dirt') continue;
+    const fy = g.lipY - g.depth;
+    for (const e of edges) {
+      if (Math.abs(e.a.x - (g.x0 + GAP_WALL_LEAN)) < 1e-9 && Math.abs(e.b.x - (g.x1 - GAP_WALL_LEAN)) < 1e-9 && Math.abs(e.a.y - fy) < 1e-9 && Math.abs(e.b.y - fy) < 1e-9) {
+        e.owner = g.owner;
+        e.surface = g.floor;
+      }
+    }
+  }
   geoms.forEach((g, i) => {
     for (const s of g.solids) edges.push(...polygonEdges(s.points, i, s.surface));
   });

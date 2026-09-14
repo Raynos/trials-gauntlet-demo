@@ -1012,6 +1012,9 @@ export class CourseBuilder {
     // next obstacle's pos.x quantise to the same value in compile.
     this.pin();
     this.x = round(x1);
+    // a lab pit (physics-v2 §15) lands on a ledge `rise` m above the take-off lip: the ground steps up across the
+    // pit (the segment inside it is replaced by the pit walls in compile, so the 40 deg ground limit does not apply)
+    if (kind === 'gap') this.y = round(this.y + num(rec['rise'], 0));
     this.pin();
     return this;
   }
