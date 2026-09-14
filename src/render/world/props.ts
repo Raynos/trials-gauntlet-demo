@@ -7,6 +7,38 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { fogify } from '../lighting/environment';
 import { canvas, tex } from './canvasTex';
 
+/** World detail at build time (round 12): `low` skips the art decals; `low`/`medium` hide the scatter batches (`tierHides`). */
+export type WorldDetail = 'low' | 'medium' | 'high';
+
+/**
+ * Round 12 mobile budget — what each tier hides at runtime (reversible; `ThreeRenderer.applyTierVisibility`).
+ * `low`: the additive / transparent volumetrics (lamp + street cones, par-can beams, lamp streaks,
+ * puddles, oil stains, the hall's light shafts) — each is a screen-sized layer of overdraw on a
+ * tile GPU. `low` and `medium`: the deck scatter (gravel, bolts, paper, plank ends, leaves) —
+ * 6–8 calls of sub-pixel detail at the riding zoom.
+ */
+const HIDE_LOW = /^(props:(lampcone|lightcone|lampstreak|parbeam-[mc]|puddle|oilstain|decal:(poster|sign|graffiti|tyremark)[^:]*)(:|$)|fx:)/;
+const HIDE_LEAN = /^props:(gravel|bolt|paper|plankend|leaf)(:|$)/;
+export function tierHides(name: string, tier: WorldDetail): boolean {
+  if (tier === 'high') return false;
+  if (HIDE_LEAN.test(name)) return true;
+  return tier === 'low' && HIDE_LOW.test(name);
+}
+/** True when the name is one the tier rules ever touch (so `applyTierVisibility` never flips anything else). */
+export function tierManaged(name: string): boolean {
+  return HIDE_LOW.test(name) || HIDE_LEAN.test(name);
+}
+/**
+ * Shadow casters on `medium` (one 1024² map): the hero, the deck and the deck-level volumes the
+ * reference frames show shadowed — containers, drums, pallets, crates, tyres, vehicles. Every
+ * other prop batch (lamps, chains, rails, trusses, scatter, cards) stops casting: it was one
+ * shadow draw per chunk for shadows a 1024² map over 28 m cannot resolve.
+ */
+const CAST_MEDIUM = /^props:(container\d*|support-(container|crate|stack)|crate|drum|drum-far|drumlying|setdrum|pallet|pallet-far|stack|tyres|tyres-far|boxtruck|policecar|forklift|slagpot|ladle|furnace|mould)(:|$)/;
+export function tierCasts(name: string, tier: WorldDetail): boolean {
+  return tier === 'high' || !name.startsWith('props:') || CAST_MEDIUM.test(name);
+}
+
 export class PropBatch {
   private readonly items: { m: THREE.Matrix4; c: THREE.Color | null }[] = [];
   constructor(
@@ -67,8 +99,10 @@ export class PropBatch {
   }
 
   /** World-x extent of one instanced chunk (round 9): frustum culling works per chunk, so a
-   *  600 m track draws (and shadows) only the ≈ 100 m in view instead of every instance. */
-  static readonly CHUNK_M = 40;
+   *  600 m track draws (and shadows) only the ≈ 100 m in view instead of every instance.
+   *  Round 12: 80 m when the world is built on `low` (`ThreeRenderer` sets it before the build) —
+   *  a riding frame straddles one boundary less often, ≈ 25 fewer draws on the foundry tracks. */
+  static CHUNK_M = 40;
 
   /**
    * One `InstancedMesh` per 40 m of x, each with a computed bounding sphere and frustum

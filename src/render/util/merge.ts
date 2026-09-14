@@ -6,6 +6,64 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
+/**
+ * Round 12: split one big static geometry into per-x-range chunks so three's frustum culling
+ * works on it like it does on the instanced prop chunks (the merged ride surfaces spanned the
+ * whole track: `deck:rustSteel` 51 k + `deck:plywood` 45 k + `deck:ao` 28 k tris on b1 were drawn
+ * in every frame). Triangles are bucketed by centroid x; every chunk keeps every attribute.
+ * Returns `[geometry]` unchanged when it would not split.
+ */
+export function chunkByX(geo: THREE.BufferGeometry, chunkM = 40, minTris = 6000): THREE.BufferGeometry[] {
+  const pos = geo.getAttribute('position');
+  if (!pos) return [geo];
+  const index = geo.index;
+  const triCount = (index ? index.count : pos.count) / 3;
+  if (triCount < minTris) return [geo];
+  const vi = (t: number, c: number): number => (index ? index.getX(3 * t + c) : 3 * t + c);
+  const buckets = new Map<number, number[]>();
+  for (let t = 0; t < triCount; t++) {
+    const cx = (pos.getX(vi(t, 0)) + pos.getX(vi(t, 1)) + pos.getX(vi(t, 2))) / 3;
+    const k = Math.floor(cx / chunkM);
+    let list = buckets.get(k);
+    if (!list) buckets.set(k, (list = []));
+    list.push(t);
+  }
+  if (buckets.size < 2) return [geo];
+  const names = Object.keys(geo.attributes);
+  const out: THREE.BufferGeometry[] = [];
+  for (const [, tris] of [...buckets.entries()].sort((a, b) => a[0] - b[0])) {
+    const g = new THREE.BufferGeometry();
+    // Re-index: old vertex → new vertex, only the vertices this chunk touches.
+    const remap = new Map<number, number>();
+    const order: number[] = [];
+    const idx = new Uint32Array(tris.length * 3);
+    for (let i = 0; i < tris.length; i++) {
+      for (let c = 0; c < 3; c++) {
+        const v = vi(tris[i]!, c);
+        let n = remap.get(v);
+        if (n === undefined) {
+          n = order.length;
+          remap.set(v, n);
+          order.push(v);
+        }
+        idx[3 * i + c] = n;
+      }
+    }
+    for (const name of names) {
+      const src = geo.getAttribute(name) as THREE.BufferAttribute;
+      const size = src.itemSize;
+      const Ctor = src.array.constructor as new (n: number) => typeof src.array;
+      const arr = new Ctor(order.length * size);
+      for (let n = 0; n < order.length; n++) for (let c = 0; c < size; c++) (arr as unknown as number[])[n * size + c] = src.getComponent(order[n]!, c);
+      g.setAttribute(name, new THREE.BufferAttribute(arr, size, src.normalized));
+    }
+    g.setIndex(new THREE.BufferAttribute(order.length > 65535 ? idx : Uint16Array.from(idx), 1));
+    out.push(g);
+  }
+  geo.dispose();
+  return out;
+}
+
 export function mergeStaticChildren(group: THREE.Object3D, keep: ReadonlySet<THREE.Object3D> = new Set()): void {
   const byMat = new Map<THREE.Material, { geos: THREE.BufferGeometry[]; cast: boolean }>();
   const remove: THREE.Object3D[] = [];

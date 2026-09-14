@@ -10,7 +10,7 @@ import type { BikeClass, CameraDebug, CompiledTrack, GameEvent, GamePhase, Physi
 import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
-import { HERO_URLS, loadGltf, type ModelChoice, type ModelChoices } from './hero/gltf';
+import { HERO_URLS, loadGltf, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -19,9 +19,10 @@ import { FrameBuilder } from './frame';
 import { LightingRig, fogify } from './lighting/environment';
 import { MaterialLibrary } from './materials/library';
 import { Emitters } from './particles/emitters';
-import { PostChain } from './post/chain';
+import { PostChain, tierPixelRatio, type PassWrite } from './post/chain';
 import { RiderModel } from './rider/riderModel';
 import { buildBiomeKit } from './world/biomeKit';
+import { PropBatch, tierCasts, tierHides, tierManaged } from './world/props';
 import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
 import { groundFloorY, profileY } from './world/track';
@@ -148,9 +149,13 @@ export class ThreeRenderer implements GameRenderer {
   private booted = false;
   private biome: Biome = biomeFor('industrial');
   private frameCount = 0;
-  private tier: QualityTier;
+  private tier: QualityTier = 'high';
   private height = 720;
+  /** Effective canvas pixel ratio = `tierPixelRatio(tier, devicePixelRatio, width)` (round 12: the tier owns the resolution). */
   private pixelRatio: number;
+  /** What the host handed `resize()` (its own DPR cap); the tier caps it further. */
+  private devicePixelRatio: number;
+  private readonly bikeUV = { x: 0.3, y: 0.55 };
   private phase: GamePhase = 'riding';
   private runTime = 0;
   private flashT = -1;
@@ -177,10 +182,14 @@ export class ThreeRenderer implements GameRenderer {
       powerPreference: 'high-performance',
       preserveDrawingBuffer: options.preserveDrawingBuffer ?? false,
     });
-    this.pixelRatio = options.pixelRatio ?? Math.min(window.devicePixelRatio || 1, 2);
+    this.tier = options.quality ?? 'high';
+    this.devicePixelRatio = options.pixelRatio ?? Math.min(window.devicePixelRatio || 1, 2);
+    this.pixelRatio = tierPixelRatio(this.tier, this.devicePixelRatio, this.width);
     this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.toneMapping = THREE.NoToneMapping; // ACES lives in the composite pass
+    // ACES + the biome grade live in the composite pass on the HDR tiers; three applies `toneMapping`
+    // only to canvas draws, so this is the `low` (direct-to-canvas) path's grade — see `gradeUniforms`.
+    this.renderer.toneMapping = THREE.CustomToneMapping;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     const gl = this.renderer.getContext();
@@ -189,7 +198,7 @@ export class ThreeRenderer implements GameRenderer {
 
     this.lib = new MaterialLibrary(0x7a1a15);
     this.scene.add(this.emitters.group);
-    this.tier = options.quality ?? 'high';
+    this.emitters.ambientEnabled = this.tier !== 'low';
     this.lazyBoot = !(options.preserveDrawingBuffer ?? false);
     // Round 9: the constructor is the WebGL context only. Lighting (sky PMREM), the hero
     // meshes, the post chain, the procedural textures and the art pack are built by
@@ -343,6 +352,7 @@ export class ThreeRenderer implements GameRenderer {
     let changed = false;
     if (this.kindOfBike(this.bike) !== wantBike) {
       const next = this.makeBike(wantBike);
+      if (this.tier === 'low') shrinkTextures(next.root, 512, 256);
       next.setLivery(this.bikeClass);
       const old = this.bike;
       next.placer.copyFrom(old.placer);
@@ -360,6 +370,7 @@ export class ThreeRenderer implements GameRenderer {
       this.scene.remove(old.root);
       const next = this.makeRider(wantRider);
       next.attach(this.bike);
+      if (this.tier === 'low') shrinkTextures(this.bike.root, 512, 256); // after attach: the glTF rider hangs under the bike frame
       this.scene.add(next.root);
       this.rider = next;
       old.dispose();
@@ -631,10 +642,11 @@ export class ThreeRenderer implements GameRenderer {
 
     const group = new THREE.Group();
     group.name = 'world';
+    PropBatch.CHUNK_M = this.tier === 'low' ? 80 : 40; // round 12: fewer chunk draws per riding frame on the phone tier
     const ribbons = buildRideSurfaces(track, this.biome, this.lib);
     const obstacles = buildObstacles(track, this.lib);
     const gates = buildGates(track, this.biome, this.lib, art);
-    const kit = buildBiomeKit(track, this.biome, this.lib, art);
+    const kit = buildBiomeKit(track, this.biome, this.lib, art, this.tier);
     group.add(ribbons.group, ribbons.supports, obstacles.group, gates.group, kit.group);
     // One program variant for the whole world: every standard material gets the full map set.
     group.traverse((o) => {
@@ -643,7 +655,9 @@ export class ThreeRenderer implements GameRenderer {
       for (const m of mats) if ((m as THREE.MeshStandardMaterial).isMeshStandardMaterial) this.lib.complete(m as THREE.MeshStandardMaterial);
     });
     harmonizeUv1(group);
+    if (this.tier === 'low') shrinkTextures(group, 512, 256);
     this.scene.add(group);
+    this.applyTierVisibility();
     this.world = {
       group,
       obstacles,
@@ -781,7 +795,12 @@ export class ThreeRenderer implements GameRenderer {
     this.postRef?.setQuality(tier);
     this.lightingRig?.setQuality(tier);
     this.emitters.countScale = tier === 'low' ? 0.5 : 1;
-    // Shadows off on low: materials must recompile to drop the shadow sampling.
+    this.emitters.ambientEnabled = tier !== 'low';
+    // Round 12: the tier owns the canvas resolution (low ≤ 1.0 DPR / 1600 px, medium ≤ 1.25, high ≤ 2).
+    this.resize(this.width, this.height);
+    this.applyTierVisibility();
+    // Shadows off on low: materials must recompile to drop the shadow sampling. (The tone-mapping
+    // variant swap of the direct-to-canvas tier needs no flag: three re-keys programs on it.)
     const shadows = tier !== 'low';
     if (this.renderer.shadowMap.enabled !== shadows) {
       this.renderer.shadowMap.enabled = shadows;
@@ -790,6 +809,29 @@ export class ThreeRenderer implements GameRenderer {
         for (const mat of Array.isArray(m) ? m : m ? [m] : []) mat.needsUpdate = true;
       });
     }
+    if (tier === 'low') {
+      // Texture budget on low (≤ 40 MB): halve the hero atlases and the world's art / skins in
+      // place. Not undone by a later step-up — the phone's medium runs on the same bitmaps, and a
+      // desktop that probed down keeps them until the next track load / hero swap.
+      // (`bikeRef`, not the getter: a phone sets `low` before `prepare()` has built the hero — that build must stay in the loader's chunked tasks.)
+      if (this.bikeRef) shrinkTextures(this.bikeRef.root, 512, 256);
+      if (this.riderRef) shrinkTextures(this.riderRef.root, 512, 256);
+      if (this.world) shrinkTextures(this.world.group, 512, 256);
+    }
+  }
+
+  /** Round 12: per-tier visibility of the volumetric / scatter batches (`world/props.ts tierHides`). Reversible; only touches names the rules manage. */
+  private applyTierVisibility(): void {
+    this.scene.traverse((o) => {
+      if (!o.name) return;
+      if (tierManaged(o.name)) o.visible = !tierHides(o.name, this.tier);
+      // Medium shadow casters (`tierCasts`): remember the built flag so `high` restores it.
+      if (o.name.startsWith('props:') && (o as THREE.Mesh).isMesh) {
+        const ud = o.userData as { castHigh?: boolean };
+        if (ud.castHigh === undefined) ud.castHigh = o.castShadow;
+        o.castShadow = ud.castHigh && tierCasts(o.name, this.tier);
+      }
+    });
   }
 
   camera(): CameraDebug {
@@ -900,17 +942,17 @@ export class ThreeRenderer implements GameRenderer {
     this.post.setTime(f.tSim);
     // Particles.
     this.bike.toWorld(this.bike.exhaustTip.x, this.bike.exhaustTip.y, this.bike.exhaustTip.z, this.tmp);
-    this.emitters.setViewport(this.height * Math.min(this.pixelRatio, this.tier === 'low' ? 1 : this.tier === 'medium' ? 1.5 : 2), (cam.fov * Math.PI) / 180);
+    this.emitters.setViewport(this.height * this.pixelRatio, (cam.fov * Math.PI) / 180);
     this.emitters.update(f, this.tmp, this.rig.targetX);
 
     // Post dynamics: smear only above 9 m/s, along the screen-space travel direction. After the
     // line (round 9) speed effects are off: no smear, no chromatic aberration on the coasting hold.
-    const dbg = this.rig.debug();
+    this.rig.bikeScreen(this.bikeUV); // round 12: no per-frame `debug()` object
     const speedFx = f.finished ? 0 : f.speed;
     const smear = Math.min(8, Math.max(0, (speedFx - 9) * 1.1));
     const dl = Math.hypot(f.velX, f.velY) || 1;
     const flash = this.flashT >= 0 ? Math.max(0, 1 - (f.tSim - this.flashT) / 0.2) : 0;
-    this.post.setDynamics(speedFx, dbg.bikeScreenX, dbg.bikeScreenY, smear, f.velX / dl, -f.velY / dl, flash);
+    this.post.setDynamics(speedFx, this.bikeUV.x, this.bikeUV.y, smear, f.velX / dl, -f.velY / dl, flash);
 
     this.renderer.info.autoReset = false;
     this.renderer.info.reset();
@@ -958,12 +1000,17 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   resize(width: number, height: number, pixelRatio?: number): void {
-    if (pixelRatio !== undefined) {
-      this.pixelRatio = pixelRatio;
-      this.renderer.setPixelRatio(pixelRatio);
-    }
+    if (pixelRatio !== undefined) this.devicePixelRatio = pixelRatio;
     this.width = width;
     this.height = height;
+    // Round 12: the tier caps the host's ratio — low ≤ 1.0 and ≤ 1600 px wide, medium ≤ 1.25,
+    // high ≤ 2 — and the canvas itself is sized by it (the browser upscales the canvas; the
+    // composite no longer writes a full-DPR frame).
+    const pr = tierPixelRatio(this.tier, this.devicePixelRatio, width);
+    if (pr !== this.pixelRatio) {
+      this.pixelRatio = pr;
+      this.renderer.setPixelRatio(pr);
+    }
     this.renderer.setSize(width, height, false);
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
@@ -1024,13 +1071,56 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   /** Extra diagnostics for the harness / perf report. */
-  debugInfo(): { biome: string; zoom: string; phase: GamePhase; tier: QualityTier; trackCalls: number; trackTris: number; textureGenMs: number; passes: number; art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean; trackComplete: boolean; trackIds: number; builtAtFrame: number; frames: number }; prepare: { step: string; ms: number; bytes: number }[] } {
+  debugInfo(): {
+    biome: string;
+    zoom: string;
+    phase: GamePhase;
+    tier: QualityTier;
+    /** Round 12 (`?perf=1` budget row): effective canvas pixel ratio, what the host passed, drawing-buffer size. */
+    dpr: number;
+    devicePixelRatio: number;
+    canvasW: number;
+    canvasH: number;
+    /** Last frame's draw calls / triangles (all passes, `info.autoReset = false`). */
+    calls: number;
+    tris: number;
+    /** Render-target pixels written per frame (Mpx) and the same in MB (colour + depth), shadow map included; `rtPasses` lists them. */
+    rtMpx: number;
+    rtMB: number;
+    rtPasses: string;
+    shadowMap: number;
+    trackCalls: number;
+    trackTris: number;
+    textureGenMs: number;
+    passes: number;
+    art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean; trackComplete: boolean; trackIds: number; builtAtFrame: number; frames: number };
+    prepare: { step: string; ms: number; bytes: number }[];
+  } {
+    const writes: PassWrite[] = this.postRef ? this.postRef.passWrites() : [];
+    const shadowMap = this.renderer.shadowMap.enabled && this.lightingRig ? this.lightingRig.shadowMapSize : 0;
+    if (shadowMap) writes.unshift({ name: 'shadow', width: shadowMap, height: shadowMap, bytesPerPixel: 8 });
+    let px = 0;
+    let bytes = 0;
+    for (const w of writes) {
+      px += w.width * w.height;
+      bytes += w.width * w.height * w.bytesPerPixel;
+    }
     return {
       prepare: this.prepareTimeline,
       biome: this.biome.id,
       zoom: this.rig.zoomState,
       phase: this.phase,
       tier: this.tier,
+      dpr: +this.pixelRatio.toFixed(3),
+      devicePixelRatio: this.devicePixelRatio,
+      canvasW: this.renderer.domElement.width,
+      canvasH: this.renderer.domElement.height,
+      calls: this.renderer.info.render.calls,
+      tris: this.renderer.info.render.triangles,
+      rtMpx: +(px / 1e6).toFixed(2),
+      rtMB: +(bytes / 1048576).toFixed(1),
+      rtPasses: writes.map((w) => `${w.name} ${w.width}×${w.height}`).join(' | '),
+      shadowMap,
       trackCalls: this.world?.trackCalls ?? 0,
       trackTris: Math.round(this.world?.trackTris ?? 0),
       textureGenMs: this.textureGenMs,

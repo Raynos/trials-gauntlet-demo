@@ -477,6 +477,13 @@ export class CameraRig {
     return this.fy.x;
   }
 
+  /** Bike anchor in screen UV (0..1, y down) without allocating — `render()` reads this every frame for the post uniforms. */
+  bikeScreen(out: { x: number; y: number }): void {
+    this.proj.set(this.lastBikeX, this.lastBikeY + 0.45, 0).project(this.camera);
+    out.x = (this.proj.x + 1) / 2;
+    out.y = (1 - this.proj.y) / 2;
+  }
+
   debug(): CameraDebug {
     const cam = this.camera;
     this.proj.set(this.lastBikeX, this.lastBikeY + 0.45, 0).project(cam);

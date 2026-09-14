@@ -17,6 +17,24 @@ export const fogUniforms = {
   uFogFloor: { value: new THREE.Vector4(0, 1, 0, 60) },
 };
 
+/**
+ * Round 12 (mobile budget): on `low` the scene draws straight to the canvas — no HDR target, no
+ * composite pass — and the composite's grade runs inside every material as three's
+ * `CustomToneMapping` (renderer.toneMapping; three applies it only when the render target is the
+ * canvas, so the HDR tiers are untouched and the composite keeps doing the grade there). The
+ * per-biome grade travels through these shared uniforms, attached by `fogify()` next to the fog
+ * one. Values are *deltas from neutral* so a material that misses the hook (three's own
+ * background material) still gets plain ACES + exposure instead of a black frame.
+ */
+export const gradeUniforms = {
+  /** lift.rgb, saturation − 1 */
+  uGradeA: { value: new THREE.Vector4(0, 0, 0, 0) },
+  /** gain.rgb − 1, contrast − 1 */
+  uGradeB: { value: new THREE.Vector4(0, 0, 0, 0) },
+  /** vignette, 1 / drawing-buffer width, 1 / height, flash */
+  uGradeC: { value: new THREE.Vector4(0, 1 / 1280, 1 / 720, 0) },
+};
+
 let fogInstalled = false;
 export function installFogChunks(): void {
   if (fogInstalled) return;
@@ -47,32 +65,71 @@ export function installFogChunks(): void {
     uniform float fogNear;
     uniform float fogFar;
   #endif
+  float trialsFogFactor() {
+    #ifdef FOG_EXP2
+      return 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
+    #else
+      // Three stops: 0 at near, 0.5 at mid, 0.85 at far, → 1 beyond 1.6*far.
+      float fMid = uFogFloor.w;
+      float f0 = smoothstep( fogNear, fMid, vFogDepth ) * 0.5;
+      float f1 = smoothstep( fMid, fogFar, vFogDepth ) * 0.35;
+      float f2 = smoothstep( fogFar, fogFar * 1.6, vFogDepth ) * 0.15;
+      float fogFactor = f0 + f1 + f2;
+      // Floor fog: density falls off exponentially with height above h0.
+      float floorF = uFogFloor.z * exp( - max( 0.0, vFogWorldY - uFogFloor.x ) / uFogFloor.y );
+      floorF *= 1.0 - exp( - vFogDepth / fMid );
+      return clamp( fogFactor + floorF, 0.0, 1.0 );
+    #endif
+  }
 #endif`;
+  // HDR tiers (render target, no tone mapping): fog where three puts it. Direct-to-canvas tier:
+  // the fog is folded in *before* the tone map (below) so the two paths see the same linear mix.
   THREE.ShaderChunk.fog_fragment = /* glsl */ `
-#ifdef USE_FOG
-  #ifdef FOG_EXP2
-    float fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
-  #else
-    // Three stops: 0 at near, 0.5 at mid, 0.85 at far, → 1 beyond 1.6*far.
-    float fMid = uFogFloor.w;
-    float f0 = smoothstep( fogNear, fMid, vFogDepth ) * 0.5;
-    float f1 = smoothstep( fMid, fogFar, vFogDepth ) * 0.35;
-    float f2 = smoothstep( fogFar, fogFar * 1.6, vFogDepth ) * 0.15;
-    float fogFactor = f0 + f1 + f2;
-    // Floor fog: density falls off exponentially with height above h0.
-    float floorF = uFogFloor.z * exp( - max( 0.0, vFogWorldY - uFogFloor.x ) / uFogFloor.y );
-    floorF *= 1.0 - exp( - vFogDepth / fMid );
-    fogFactor = clamp( fogFactor + floorF, 0.0, 1.0 );
-  #endif
-  gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+#if defined( USE_FOG ) && !defined( TONE_MAPPING )
+  gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, trialsFogFactor() );
 #endif`;
+  THREE.ShaderChunk.tonemapping_fragment = /* glsl */ `
+#if defined( TONE_MAPPING )
+  #ifdef USE_FOG
+    gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, trialsFogFactor() );
+  #endif
+  gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );
+#endif`;
+  // The composite pass's ACES fit + grade, as the CustomToneMapping body (drawn to the canvas only).
+  THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment.replace(
+    'vec3 CustomToneMapping( vec3 color ) { return color; }',
+    /* glsl */ `
+uniform vec4 uGradeA;
+uniform vec4 uGradeB;
+uniform vec4 uGradeC;
+vec3 trialsAces( vec3 x ) {
+  const float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14;
+  return clamp( ( x * ( a * x + b ) ) / ( x * ( c * x + d ) + e ), 0.0, 1.0 );
+}
+vec3 CustomToneMapping( vec3 color ) {
+  vec3 col = trialsAces( color * toneMappingExposure );
+  col = 0.18 * pow( max( col, vec3( 0.0 ) ) / 0.18, vec3( 1.0 + uGradeB.w ) );
+  col = col * ( 1.0 + uGradeB.rgb ) + uGradeA.rgb * ( 1.0 - col );
+  float l = dot( col, vec3( 0.2126, 0.7152, 0.0722 ) );
+  col = mix( vec3( l ), col, 1.0 + uGradeA.w );
+  vec2 c = gl_FragCoord.xy * uGradeC.yz - 0.5;
+  col *= 1.0 - uGradeC.x * smoothstep( 0.45, 1.1, length( c ) * 1.4142 );
+  col = mix( col, vec3( 1.0 ), uGradeC.w );
+  float n = fract( sin( dot( gl_FragCoord.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
+  col += ( n - 0.5 ) / 255.0;
+  return clamp( col, 0.0, 1.0 );
+}`,
+  );
 }
 
-/** Attach the shared floor-fog uniform to a material (idempotent). */
+/** Attach the shared floor-fog + grade uniforms to a material (idempotent). */
 export function fogify<T extends THREE.Material>(m: T): T {
   const prev = m.onBeforeCompile;
   m.onBeforeCompile = (shader, renderer) => {
     shader.uniforms.uFogFloor = fogUniforms.uFogFloor;
+    shader.uniforms.uGradeA = gradeUniforms.uGradeA;
+    shader.uniforms.uGradeB = gradeUniforms.uGradeB;
+    shader.uniforms.uGradeC = gradeUniforms.uGradeC;
     prev?.call(m, shader, renderer);
   };
   return m;
@@ -195,6 +252,10 @@ export class LightingRig {
   private envRT: THREE.WebGLRenderTarget | null = null;
   private readonly pmrem: THREE.PMREMGenerator;
   private shadowSize = 2048;
+  /** Current shadow map edge (px); 0 when the renderer's shadow map is off. */
+  get shadowMapSize(): number {
+    return this.shadowSize;
+  }
   private frustumW = 28;
   private readonly sunDir = new THREE.Vector3(0, 1, 0);
   biome: Biome | null = null;
@@ -228,14 +289,14 @@ export class LightingRig {
   }
 
   setQuality(tier: 'low' | 'medium' | 'high'): void {
-    const size = tier === 'low' ? 1024 : 2048;
+    const size = tier === 'high' ? 2048 : 1024; // round 12: medium is the phone step-up tier — one 1024² cascade
     if (size !== this.shadowSize) {
       this.shadowSize = size;
       this.sun.shadow.mapSize.set(size, size);
       this.sun.shadow.map?.dispose();
       this.sun.shadow.map = null;
     }
-    this.sun.shadow.radius = tier === 'low' ? 1.5 : 3;
+    this.sun.shadow.radius = tier === 'high' ? 3 : 1.5;
   }
 
   apply(b: Biome): void {

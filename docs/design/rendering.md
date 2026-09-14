@@ -211,13 +211,15 @@ length `clamp((speed−9)·1.1, 0, 8)` px, masked to zero within 0.12–0.34 of 
 position so bike and rider stay sharp) → exposure → ACES → lift/gain grade + saturation →
 vignette → chromatic aberration `0.006·smoothstep(8,16,speed)` → flash → 1/255 dither → sRGB.
 
-| Tier | Bloom | Bloom res | Shadows | Internal resolution | Particles | SwiftShader synced p50 (1280×720) |
-|---|---|---|---|---|---|---|
-| low | off | — | **off** (materials recompiled) | 0.75× (composite upscales) | ½ counts | 60 ms |
-| medium | on | 480×270 | 2048² | ≤ 1.5× DPR | full | 125 ms |
-| high | on | 640×360 | 2048² | ≤ 2× DPR | full | 95–137 ms |
+| Tier | Chain | Bloom mips from | Shadows | Canvas pixel ratio | Particles |
+|---|---|---|---|---|---|
+| low | **none** — scene straight to the canvas, grade as `CustomToneMapping` (round 12, §11g) | — | **off** (materials recompiled) | ≤ 1.0 and ≤ 1600 px wide | ½ counts, no ambient |
+| medium | HDR composer, no SSAO | ¼ frame | 1024², deck-level casters | ≤ 1.25 | full |
+| high | HDR composer + SSAO | ½ frame | 2048² | ≤ 2 | full |
 
-Smear is off on `low`. Contact: no SSAO yet; instead each tyre carries a projected contact-shadow
+Smear, chroma and heat haze are off on `low`. The bloom result is sampled by the composite (`tBloom`),
+not blended back over the HDR buffer (round 12). Round-11 SwiftShader synced p50 at 1280×720 were
+low 60 / medium 125 / high 95–137 ms; those are not phone numbers (§11g). Contact: no SSAO yet; instead each tyre carries a projected contact-shadow
 blob (radial-gradient plane at the ground point, opacity 0.55 + 0.3·compression, fading over 0.6 m
 of hover using the profile height under the wheel) and the tyre torus squashes toward the ground by
 `5.5 % · (0.4 + compression)` inside a non-rotating parent group so the contact patch flattens.
@@ -984,6 +986,163 @@ attribute value). `harmonizeUv1`, `pruneStalePrograms` as above.
 frames from a recording at given ticks + stats), `programs.mts` (program census), `texseq.mts`
 (session texture tally), `budget.mts`, `twoup.py`, `withlock.sh` (serial captures on the shared host).
 
+## 11g. Round 12 — mobile budget (`low` draws to the canvas, the tier owns the resolution)
+
+**Finding:** the phone's frame was fill-rate, not geometry — at 2000×920 CSS px / DPR 1.5 every tier
+wrote the composite to a **3000×1380 canvas** (`low` rendered the scene at 0.75× and upscaled *into*
+that), `medium`'s "480×270" bloom really ran at **1500×690** (`EffectComposer.setSize` hands
+`UnrealBloomPass` the full frame and it halves it; `setQuality` calls `setSize` last, so the
+`resolution` it was built with never applied), UnrealBloom's last step is a full-resolution HalfFloat
+additive blend back over the scene, and the merged ride surfaces (`deck:rustSteel` 51 k, `deck:plywood`
+45 k, `deck:ao` 28 k tris on b1) had no frustum culling. `low` on that phone wrote **5.2 Mpx / 27.6 MB**
+of render targets per frame; it now writes **1.18 Mpx / 9 MB** (4.4× / 3.1× less), draws 100 calls /
+106 k tris on b1 with 37 MB of textures, and renders through one pass.
+
+Numbers are headless (Playwright + SwiftShader). **SwiftShader ms are not phone ms**: the budget is the
+pixel / draw / triangle / texture counts and the CPU submit time (three's command encoding, which *is*
+the same work on the phone's main thread); the GPU cost is inferred from pixels written. Host load
+average 4–12 during the before runs, 10–20 during the after runs (another owner's headless Chromium).
+
+### What each tier is now (`post/chain.ts tierPixelRatio`, `setQuality`, `world/props.ts tierHides / tierCasts`)
+
+| | `low` (phone default) | `medium` (phone step-up) | `high` (desktop) |
+|---|---|---|---|
+| canvas pixel ratio | ≤ 1.0 **and ≤ 1600 px wide** (that phone: 0.8 → 1600×736) | ≤ 1.25 (2500×1150) | ≤ 2 |
+| scene target | **the canvas** (RGBA8 + depth; no HDR target, no composer) | HalfFloat + depth | HalfFloat + depth texture |
+| tone map + grade | three `CustomToneMapping` inside every material: the composite's ACES fit → contrast → lift / gain → saturation → vignette → flash → dither, per-biome values through `gradeUniforms` (deltas; a material without the hook gets plain ACES) — fog is folded in *before* the tone map (`tonemapping_fragment` override) so the mix stays linear like the HDR path | composite pass | composite pass |
+| bloom | off | mips from **¼ frame** (625×288 on the phone); result sampled by the composite (`tBloom`) | mips from ½ frame; `tBloom` |
+| SSAO | off | off | half-res, as before |
+| shadow map | off | **1024²**, casters = hero + deck + deck-level volumes only (`tierCasts`: containers, drums, pallets, crates, tyres, vehicles, foundry pots) | 2048², every caster |
+| smear / chroma / heat haze | off | on | on |
+| volumetrics (lamp + street cones, par-can beams, lamp streaks, puddles, oil stains, hall light shafts `fx:shaft`) | **hidden** | on | on |
+| deck scatter (gravel, bolts, paper, plank ends, leaves) | hidden | hidden | on |
+| art decals (posters, signs, graffiti, tyre marks) | **not built** (world built on low) / hidden | on | on |
+| textures | hero albedo 512², normal / ORM 256²; container skins 512×256; every canvas / art map halved (`shrinkTextures` on the world group) | as built | as built |
+| prop chunk | 80 m | 40 m | 40 m |
+| ambient motes / snow / embers | off | on | on |
+| particle systems | drawn only while something is alive (`ParticleSystem.cull`) — all tiers | | |
+
+**Deleted overdraw on the HDR tiers too:** `BloomPass` (a subclass) stops after the mip composite; the
+composite shader adds `tBloom` inside `scene()` (also under the smear taps), so the maths is the
+addon's — one full-frame HalfFloat read + write fewer on `medium` and `high` (on the phone geometry:
+2500×1150×8 B ≈ 22 MB / frame on medium, 3000×1380×8 B ≈ 32 MB on high).
+
+**Ride surfaces chunked** (`util/merge.ts chunkByX`, `deck.ts`): every merged deck material and the
+under-deck AO skirt are split per 40 m of x by triangle centroid (re-indexed, all attributes kept), so
+three's frustum cull applies. `trackCalls` / `trackTris` stay the whole-track figures (the contract
+budget); the riding frame draws 2–3 chunks of each. b1 high went **348 k → 172 k tris** with no visual
+change; the round-10 gap "deck:rustSteel is one unchunked 51 k-tri mesh" is closed.
+
+**Determinism:** `render()` allocates nothing per frame now (`rig.bikeScreen(out)` replaced the
+per-frame `debug()` object). Two low captures of the b1 bot-3 golden (frames every 100 ticks to 1500,
+canvas PNG md5): all 15 hashes identical, `t700` md5 `3b1ae20c27fe325da0d1ace7fec39b52` both runs.
+
+### Before → after, riding frame on the phone geometry (2000×920 CSS @ DPR 1.5; b1 t700, e1 t600, m2 t600, h1 t1200, h3 t700; glTF hero; one track per session)
+
+RT = render-target pixels written per frame, all passes incl. the shadow map; MB counts colour + depth
+bytes (HalfFloat 8 + depth 4 for the HDR target, 8 per bloom mip, 4 + 4 for the canvas, 8 for the
+shadow map). Submit = CPU ms of `render()` without a sync (median of 20).
+
+**low**
+
+| track | calls | tris | programs | texMB | RT Mpx | RT MB | submit ms | canvas |
+|---|---|---|---|---|---|---|---|---|
+| b1 | 157 → **100** | 234 k → **106 k** | 21 → 15 | 70.5 → **37.0** | 5.17 → **1.18** | 27.6 → **9.0** | 1.19 → 0.52 | 3000×1380 → **1600×736** |
+| e1 | 104 → **86** | 148 k → **94 k** | 18 → 17 | 52.5 → **31.0** | 5.17 → **1.18** | 27.6 → **9.0** | 0.47 → 0.38 | ″ |
+| m2 | 135 → **105** | 189 k → **109 k** | 18 → 16 | 40.2 → **24.6** | 5.17 → **1.18** | 27.6 → **9.0** | 0.59 → 0.48 | ″ |
+| h1 | 109 → **73** | 92 k → **70 k** | 22 → 19 | 60.0 → **38.4** | 5.17 → **1.18** | 27.6 → **9.0** | 0.58 → 0.41 | ″ |
+| h3 | 235 → **162** | 197 k → **159 k** | 22 → 16 | 72.2 → **38.7** | 5.17 → **1.18** | 27.6 → **9.0** | 1.49 → 0.71 | ″ |
+
+Targets: pixels ≤ 1.0 DPR-equivalent ✓ (0.8 on that phone), textures ≤ 40 MB ✓ on all five, calls ≤ 110
+✓ except **h3 162** (foundry: 64 pallet stacks + 16 containers under the deck in one 80 m chunk plus the
+melt kit; the census is in `render6/after/census-h3-low.txt`), tris ≤ 150 k ✓ except **h3 159 k**. The
+h3 frame's remaining cost is the hero (≈ 45 k tris — the glTF rider is 11.7 k, each wheel 7 k) and the
+support stacks (11.5 k); a low-LOD hero is the next cut, not more world culling.
+
+**medium**
+
+| track | calls | tris | programs | texMB | RT Mpx | RT MB | submit ms | canvas |
+|---|---|---|---|---|---|---|---|---|
+| b1 | 232 → **207** | 348 k → **164 k** | 37 → 36 | 70.5 | 21.44 → **7.64** | 163.6 → **58.3** | 1.40 → 1.31 | 3000×1380 → **2500×1150** |
+| e1 | 181 → **150** | 253 k → **146 k** | 34 → 33 | 52.5 | ″ | ″ | 0.68 → 0.64 | ″ |
+| m2 | 192 → **169** | 288 k → **151 k** | 34 → 33 | 40.2 | ″ | ″ | 0.80 → 0.72 | ″ |
+| h1 | 172 → **134** | 141 k → **110 k** | 38 → 37 | 60.0 | ″ | ″ | 0.90 → 0.80 | ″ |
+| h3 | 314 → **287** | 312 k → **209 k** | 38 → 37 | 72.2 | ″ | ″ | 2.08 → 1.60 | ″ |
+
+(The RT figures are `debugInfo().rtMpx / rtMB`, which count the bloom blend as gone; the scratch probe's
+own walker still adds UnrealBloom's blend pass and reads 10.51 / 80.2 — the table above is the real
+frame. Medium textures are the built set; on a phone that stepped up from `low` the world keeps the
+halved bitmaps until the next `setTrack`.)
+
+**high** (desktop; unchanged by design except the chunked decks and the bloom blend)
+
+| track | calls | tris | programs | texMB | RT Mpx | RT MB | submit ms |
+|---|---|---|---|---|---|---|---|
+| b1 | 234 → 231 | 348 k → **172 k** | 39 → 38 | 70.5 | 23.51 → **19.37** | 171.5 → **139.9** | 1.56 → 1.34 |
+| e1 | 183 → 178 | 253 k → **172 k** | 36 → 35 | 52.5 | ″ | ″ | 0.75 → 0.67 |
+| m2 | 194 → 194 | 288 k → **161 k** | 36 → 35 | 40.2 | ″ | ″ | 0.85 → 0.77 |
+| h1 | 174 → 170 | 141 k → **117 k** | 40 → 39 | 60.0 | ″ | ″ | 0.88 → 0.82 |
+| h3 | 316 → 321 | 312 k → **218 k** | 40 → 39 | 72.2 | ″ | ″ | 2.12 → 1.40 |
+
+**Heap** (b1, 1280×720, 60 s of simulated play at 30 fps through `Game.renderOnce`, GC forced before
+and after): low +1.52 MB, high +2.09 MB, physics-only +0.09 MB; **1800 direct `renderer.render()`
+calls on a frozen state: +0.04 MB** — the renderer allocates nothing per frame; the 1.2–2 MB over a
+minute is the game layer's `renderOnce` path (`lastRender` / loop bookkeeping) and under the 5 MB cap.
+
+### What each cut costs visually (stills: `render6/after/still-{b1-first-ride,e1-uphill-weight}-{low,medium,high}.png`, sheets `tiers-*.jpg`)
+
+- **Low, no HDR / bloom**: bulbs and the sun clip to white instead of blooming; lamps lose their halo.
+  The grade (lift / gain / saturation / contrast / vignette) matches the composite's numbers; the
+  frame reads brighter (b1 riding p50 **0.302 vs 0.224** on high, `<0.08` 5.1 % vs 3.1 %) because
+  the shadow pass and the SSAO darkening are gone, not because of the tone map. `scene.background`
+  (three's own material, no hook) gets plain ACES — visible only as a slightly more saturated sky on
+  the exterior biomes.
+- **Low, no volumetrics**: the hall loses its window shafts and lamp cones (the warm haze around each
+  bulb); the city loses the street-lamp cones and wet-street reflections; the pools on the deck stay
+  (they are real spots). This is the largest single look change and the largest overdraw saving.
+- **Low, half textures**: container skins and the hero atlas soften at the riding zoom (≈ 180 px
+  hero); the 1600 px canvas hides most of it. Posters / signs / graffiti are gone from the wall.
+- **Low, 80 m chunks / no scatter**: none at the riding zoom; the near ledge keeps its props (b1 riding
+  frame still counts 114 lit props within 60 m).
+- **Medium**: bloom at ¼ frame is softer around the bulbs (the blur radius in screen space doubles);
+  1024² shadows over 28 m are 2.7 cm texels — soft but not blocky (PCF radius 1.5); chains, rails,
+  trusses and lamps no longer cast, which the phone frame does not miss.
+- **High**: the bloom now enters through the composite — no visible change (same maths, sampled at the
+  same mip); deck chunking is invisible.
+
+### `?perf=1` fields (`renderer.debugInfo()`, round 12)
+
+`dpr` (effective canvas pixel ratio), `devicePixelRatio` (what the host passed), `canvasW` / `canvasH`
+(drawing-buffer px), `calls`, `tris` (last frame, all passes), `rtMpx`, `rtMB` (render-target pixels /
+MB written per frame incl. the shadow map), `rtPasses` (the list, e.g. `shadow 1024×1024 | scene:hdr
+2500×1150 | bloom:bright 625×288 | … | composite→canvas 2500×1150`), `shadowMap` (edge px, 0 when
+off), plus the existing `tier`, `passes`, `trackCalls`, `trackTris`. A phone screenshot of the overlay
+with `tier`, `dpr`, `canvasW×H`, `calls`, `tris`, `rtMpx` tells us the budget the frame ran.
+
+### What still costs the most on a phone, and the next cut
+
+1. **The hero at 45 k tris** (glTF rider 11.7 k, each wheel 7 k with spokes, frame 3 k) is 40 % of a low
+   frame's triangles on b1 and the only skinned draw. A 12 k LOD from the art owner (or decimating the
+   wheels' spokes to a card at the riding zoom) is the next triangle cut.
+2. **h3 / the foundry** still draws 160 calls on low: 64 pallet stacks + containers as deck supports in
+   one chunk and the melt kit. Merging `support-*` into the deck chunks would take it under 110.
+3. **Medium's 2500×1150 HDR scene** is still 2.9 Mpx × 12 B; a 2023 phone can fill it at 30 fps but with
+   little headroom under bloom + shadows. If the FPS meter says medium drops, cap medium at 1.0 DPR
+   (`tierPixelRatio`) before touching anything else.
+4. The probe can only step *up*; there is no step *down* from medium if a later track (h3) is heavier
+   than the probe's first 60 frames — `app.ts` owner.
+5. `texturesMB` on medium is still the 70 MB set on the hall tracks; the container skins (8 × 1024×512)
+   are the bulk. A 512×256 skin set for medium too would put every phone tier under 40 MB.
+
+### Evidence (scratch `render6/`)
+
+`before/table.jsonl`, `before/census-b1-low.txt` (per-draw + texture census, old low), `after/table.jsonl`,
+`after/table-medium2.jsonl`, `after/table-720.jsonl`, `after/census-{b1-low,b1-medium,h3-low}.txt`,
+`after/phone-<track>-<tier>.png` (15 riding frames at the phone geometry), `after/still-*` + `tiers-*.jpg`
+(1280×720 per-tier stills, b1 and e1), `after/twoup-b1-low-high.jpg`, `after/det-a`, `det-b` (hash lists +
+t700 PNGs), tooling `budget12.mts` (the budget probe), `census.mts` (renderBufferDirect census), `det.mts`
+(determinism pair), `withlock.sh` (serial captures).
+
 ## 12. Known gaps after round 11 (what still reads non-AAA)
 
 - **Industrial mids / highlights**: p50 0.20 vs 0.284, p99 0.53 vs 0.876 — with the high camera the
@@ -1006,6 +1165,7 @@ frames from a recording at given ticks + stats), `programs.mts` (program census)
   FOV boost widens those frames; a lower `maxY` bias for kicker tracks or an authored `low` key would
   hold the tight frame. The `fast` pull-back (hf 0.15–0.16) still shrinks the near kit to specks; the
   riding-state frames are where the density reads.
+- ~~(round 12)~~ Under-deck `deck:rustSteel` unchunked / ride surfaces span the whole track — chunked per 40 m (`chunkByX`).
 - **Programs**: 39 per track with the glTF hero; a session that visits several biomes accumulates (61
   after four loads across three biomes) because each biome's one-off materials add live variants. The
   post chain is 12–13 of the 39 (UnrealBloom's five blur kernels): a two-program bloom is the next cut

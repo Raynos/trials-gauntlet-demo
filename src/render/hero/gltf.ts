@@ -55,14 +55,16 @@ export function shrinkTextures(root: THREE.Object3D, albedoMax = 1024, otherMax 
     const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const mat of mats) {
       const std = mat as THREE.MeshStandardMaterial;
-      if (!std.isMeshStandardMaterial) continue;
-      for (const key of ['map', 'emissiveMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap'] as const) {
-        const t = std[key];
+      // Round 12: also the basic-material maps (the far backdrop plates, decal quads).
+      if (!std.isMeshStandardMaterial && !(mat as THREE.MeshBasicMaterial).isMeshBasicMaterial) continue;
+      for (const key of ['map', 'emissiveMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'alphaMap'] as const) {
+        const t = std[key] as THREE.Texture | null | undefined;
         if (!t || done.has(t)) continue;
         done.add(t);
-        const img = t.image as { width?: number; height?: number } | undefined;
-        const w = img?.width ?? 0;
-        const h = img?.height ?? 0;
+        const img = t.image as { width?: number; height?: number; data?: unknown } | undefined;
+        if (!img || img.data) continue; // DataTextures (procedural 512² sets) are not canvas-drawable
+        const w = img.width ?? 0;
+        const h = img.height ?? 0;
         const max = key === 'map' || key === 'emissiveMap' ? albedoMax : otherMax;
         if (!w || !h || Math.max(w, h) <= max) continue;
         const k = max / Math.max(w, h);

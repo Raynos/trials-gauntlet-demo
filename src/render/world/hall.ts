@@ -20,6 +20,7 @@ import { canvas, tex } from './canvasTex';
 import { profileY } from './track';
 import { SUPPORT_SLOT, supportLedgeY } from './deck';
 import { drawArt, pickId, tintMask, type ArtLibrary } from '../art/library';
+import type { WorldDetail } from './props';
 import {
   PropBatch,
   bakeAO,
@@ -355,7 +356,7 @@ function roofTexture(foundry: boolean): THREE.CanvasTexture {
   return tex(rc);
 }
 
-export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, rng: Rng, floorY: number, x0: number, x1: number, art: ArtLibrary | null = null): HallOut {
+export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, rng: Rng, floorY: number, x0: number, x1: number, art: ArtLibrary | null = null, detail: WorldDetail = 'high'): HallOut {
   const keepOut = foregroundKeepOut(track);
   const foundry = biome.id === 'foundry';
   const out: HallOut = { meshes: [], singles: [], batches: [], flicker: [], lights: [], scroll: [], fountains: [], lamps: [], textureBytes: 0 };
@@ -762,7 +763,8 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
 
   // --- Wall decals from the art pack: posters and safety signs low on the back wall between
   // the bays, graffiti pieces on the far container row and the wall. One batch per texture.
-  if (art) {
+  // Round 12: not built on `low` detail (12 textures ≈ 15 MB and 9–12 calls for 2-tri quads).
+  if (art && detail !== 'low') {
     const decal = (id: string, w: number, h: number, alpha: boolean): PropBatch | null => {
       const t = art.texture(id, true, false);
       if (!t) return null;
@@ -808,6 +810,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     q.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), sunDir);
     q.rotateY(0.3);
     q.renderOrder = 5;
+    q.name = 'fx:shaft'; // round 12: hidden on `low` (8 additive full-height quads = the hall's biggest overdraw)
     out.singles.push(q);
   }
 

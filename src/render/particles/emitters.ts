@@ -100,6 +100,9 @@ export class Emitters {
     return this.rng;
   }
 
+  /** Round 12: ambient motes / snow / embers off on `low` (a 1024-point transparent layer over the whole frame). */
+  ambientEnabled = true;
+
   update(f: RenderFrame, exhaustTip: THREE.Vector3, camX: number): void {
     const t = f.tSim;
     for (const s of this.systems) s.setTime(t);
@@ -147,7 +150,7 @@ export class Emitters {
     }
 
     // Ambient: motes / snow / embers around the camera.
-    if (this.biome && this.biome.ambient !== 'none' && t - this.lastAmbientT > 0.1) {
+    if (this.ambientEnabled && this.biome && this.biome.ambient !== 'none' && t - this.lastAmbientT > 0.1) {
       this.lastAmbientT = t;
       const rng = this.reseed(f.tick, 3);
       const kind = this.biome.ambient;
@@ -180,6 +183,7 @@ export class Emitters {
         this.sparks.emit(b, t, rng);
       }
     }
+    for (const s of this.systems) s.cull(t);
   }
 
   private landing(f: RenderFrame, wheel: 'rear' | 'front', impulse: number, surface: SurfaceKind): void {

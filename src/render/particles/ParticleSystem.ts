@@ -74,6 +74,9 @@ void main() {
   float a = smoothstep(0.0, uFadeIn, vU) * pow(1.0 - vU, 1.4) * tex.a * uOpacity;
   if (a < 0.003) discard;
   gl_FragColor = vec4(vColor * tex.rgb, a);
+  // Round 12: on the direct-to-canvas tier three tone-maps + sRGB-encodes here (no-ops into the HDR target).
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }`;
 
 export function puffTexture(kind: 'soft' | 'spark' | 'flake'): THREE.CanvasTexture {
@@ -181,10 +184,18 @@ export class ParticleSystem {
   clear(): void {
     (this.birth.array as Float32Array).fill(-1e9);
     this.birth.needsUpdate = true;
+    this.lastDeath = -1e9;
+  }
+
+  /** Hide the points while nothing is alive (pure function of simulated time). */
+  cull(tSim: number): void {
+    this.points.visible = tSim <= this.lastDeath;
   }
 
   /** Multiplies burst counts (quality tiers). */
   countScale = 1;
+  /** Simulated time after which every emitted particle is dead — the draw is skipped past it (round 12: six idle 2048-point draws per frame were free on desktop, not on a phone). */
+  private lastDeath = -1e9;
 
   emit(b: Burst, tSim: number, rng: Rng): void {
     const base = this.tmpColor.set(b.color as THREE.ColorRepresentation);
@@ -198,7 +209,9 @@ export class ParticleSystem {
       const s = b.spread;
       this.vel0.setXYZ(k, b.vx + rng.range(-s, s), b.vy + rng.range(-s, s), b.vz + rng.range(-s, s) * 0.7);
       this.birth.setX(k, tSim + rng.range(0, 0.02));
-      this.life.setX(k, rng.range(b.life[0], b.life[1]));
+      const lifeK = rng.range(b.life[0], b.life[1]);
+      this.life.setX(k, lifeK);
+      if (tSim + 0.02 + lifeK > this.lastDeath) this.lastDeath = tSim + 0.02 + lifeK;
       const sz = rng.range(0.8, 1.2);
       this.size.setXY(k, b.size[0] * sz, b.size[1] * sz);
       const l = 1 + rng.range(-cj, cj);

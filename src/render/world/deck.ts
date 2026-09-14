@@ -25,6 +25,7 @@ import { fogify } from '../lighting/environment';
 import { PropBatch, bakeAO, containerGeometry, palletLowGeometry, palletStackGeometry, rockGeometry, triCount } from './props';
 import { groundFloorY, profileY, ribbonGeometry, resample, type TrackMeshes } from './track';
 import { canvas, tex } from './canvasTex';
+import { chunkByX } from '../util/merge';
 
 const DECK_W = 3.0;
 const BOARD_W = 0.22;
@@ -487,11 +488,13 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     }
     const merged = mergeGeometries(geos, false);
     if (merged) {
-      const m = new THREE.Mesh(merged, aoMat);
-      m.renderOrder = 1;
-      m.frustumCulled = false;
-      m.name = 'deck:ao';
-      group.add(m);
+      // Round 12: chunked per 40 m like the props (it was one unculled 28 k-tri transparent ribbon on b1).
+      chunkByX(merged).forEach((g, k) => {
+        const m = new THREE.Mesh(g, aoMat);
+        m.renderOrder = 1;
+        m.name = `deck:ao:${k}`;
+        group.add(m);
+      });
     }
   }
 
@@ -505,13 +508,17 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     const mat = lib.derive(matName);
     mat.vertexColors = true;
     fogify(mat);
-    const mesh = new THREE.Mesh(merged, mat);
-    mesh.receiveShadow = true;
-    mesh.castShadow = matName !== 'dirt' && matName !== 'concrete' && matName !== 'snow' && matName !== 'rustSteel'; // round 11: the under-deck frames (rustSteel, 51 k tris on b1) live in the deck's own shadow — no caster
-    mesh.name = `deck:${matName}`;
-    group.add(mesh);
+    // Round 12: one mesh per 40 m chunk (frustum-culled) — `drawCalls` / `triangles` stay the
+    // whole-track figures; a riding frame draws 2–3 chunks of each material.
     triangles += triCount(merged);
     drawCalls++;
+    chunkByX(merged).forEach((g, k) => {
+      const mesh = new THREE.Mesh(g, mat);
+      mesh.receiveShadow = true;
+      mesh.castShadow = matName !== 'dirt' && matName !== 'concrete' && matName !== 'snow' && matName !== 'rustSteel'; // round 11: the under-deck frames (rustSteel, 51 k tris on b1) live in the deck's own shadow — no caster
+      mesh.name = `deck:${matName}:${k}`;
+      group.add(mesh);
+    });
   }
   for (const b of [rocks, pallets, stacks, crates, containers]) {
     const im = b.build();

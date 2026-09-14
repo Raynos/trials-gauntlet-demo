@@ -56,6 +56,7 @@ import {
   waterTowerGeometry,
   windmillGeometry,
 } from './props';
+import type { WorldDetail } from './props';
 
 export interface BiomeKit {
   group: THREE.Group;
@@ -753,7 +754,7 @@ function citySilhouette(rng: Rng): THREE.CanvasTexture {
 // Builders
 // ---------------------------------------------------------------------------
 
-export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, art: ArtLibrary | null = null): BiomeKit {
+export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, art: ArtLibrary | null = null, detail: WorldDetail = 'high'): BiomeKit {
   const group = new THREE.Group();
   const keepOut = foregroundKeepOut(track);
   group.name = `biome:${biome.id}`;
@@ -844,7 +845,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
   }
 
   if (biome.interior) {
-    const hall = buildHall(track, biome, lib, rng, floorY, x0, x1, art);
+    const hall = buildHall(track, biome, lib, rng, floorY, x0, x1, art, detail);
     meshes.push(...hall.meshes);
     singles.push(...hall.singles);
     batches.push(...hall.batches);
@@ -1966,8 +1967,8 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
   }
 
   // Tyre marks on the deck (art pack): the burnout arc and the straight print as alpha-masked
-  // dark decals on flat stretches, avoiding spawns; one batch per texture.
-  if (art) {
+  // dark decals on flat stretches, avoiding spawns; one batch per texture. Not on `low` (round 12).
+  if (art && detail !== 'low') {
     const marks: PropBatch[] = [];
     for (const [id, w, h, op] of [['tyremark-arc', 1.6, 1.6, 0.55], ['tyremark-straight', 0.55, 2.2, 0.4]] as const) {
       const t = art.texture(id, false, false);
