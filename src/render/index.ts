@@ -428,10 +428,13 @@ export class ThreeRenderer implements GameRenderer {
    * The per-track art beyond the boot set is requested by `setTrack` and reported through the
    * same callback as a background phase.
    */
-  prepare(report: (done: number, total: number, label?: string) => void = () => undefined): Promise<void> {
+  prepare(reportArg: (done: number, total: number, label?: string) => void = () => undefined): Promise<void> {
+    // The first menu frame may have started prepare() with the no-op reporter before main.ts
+    // called it with the loader's; rebind so the running steps report to the newest callback.
+    this.report = reportArg;
     if (this.prepared) return this.prepared;
     this.preparing = true;
-    this.report = report;
+    const report = (done: number, total: number, label?: string): void => this.report?.(done, total, label);
     const yieldFrame = (): Promise<void> => new Promise((r) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => r()) : setTimeout(r, 0)));
     const mb = (b: number): string => `${(b / (1024 * 1024)).toFixed(2)} MB`;
     const timeline = this.prepareTimeline;
@@ -492,10 +495,13 @@ export class ThreeRenderer implements GameRenderer {
         report(1, 1, 'Hero models');
         mark('hero:gltf');
       }
-      // 7. The boot art (usually already in by now; on 3G this is the wait that shows bytes).
-      await artP;
+      // 7. The boot art: wait briefly, never block the title on it — on LTE the pack (MB) arrives
+      //    long after the shaders are ready; it hot-swaps in when it lands (`whenReady()` guards
+      //    the first run and the harness captures).
+      const artWait = Promise.race([artP.then(() => true), new Promise<boolean>((r) => setTimeout(() => r(false), 1500))]);
+      const artIn = await artWait;
       stepBytes = this.art.bytesDelivered;
-      report(1, 1, `Art pack ${this.art.progress.done}/${this.art.progress.total} (${mb(this.art.bytesDelivered)})`);
+      report(1, 1, artIn ? `Art pack ${this.art.progress.done}/${this.art.progress.total} (${mb(this.art.bytesDelivered)})` : `Art pack ${this.art.progress.done}/${this.art.progress.total} (${mb(this.art.bytesDelivered)}) · continues in the background`);
       mark('art:settled');
       await yieldFrame();
       // 8. Shaders: compile what is in the scene (hero + the world if a track is set) in chunks.

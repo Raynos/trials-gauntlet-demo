@@ -338,7 +338,6 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 .card .top em.watch { cursor: pointer; pointer-events: auto; }
 .tier-row.lab-row .tier-head b { color: #7fd1ff; }
 .card.lab-card { --tint: #1e3a4a; }
-.card .labtag { position: absolute; left: var(--s3); top: calc(var(--s3) + 1.45rem); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: #0b1a2e; background: #7fd1ff; border-radius: 3px; padding: 2px 6px; font-weight: 700; }
 .card .top em.watch:hover { color: var(--amber-ink); background: var(--amber); }
 
 /* ---- art plates behind a screen (garage / credits): cover, masked clear where the live scene should show ---- */

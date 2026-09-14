@@ -514,7 +514,7 @@ export class TrackSelectScreen extends Screen {
     if (lab) el.classList.add('lab-card');
     el.innerHTML = `<div class="tint" data-badge="${lab ? 'Physics test' : TIER_LABEL[t.tier]}"></div><div class="art"></div><div class="veil"></div>
       <div class="top"><span>${lab ? 'LAB' : escapeHtml(t.id.split('-')[0]!.toUpperCase())}</span>${ghost}${bikeTag}</div>
-      ${lab ? '<div class="labtag">physics test</div>' : `<div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>`}${lockLine}
+      ${lab ? '' : `<div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>`}${lockLine}
       <div class="body"><div class="name">${escapeHtml(t.name)}</div><div class="tech">${escapeHtml(t.meta?.technique ?? '')}</div>
       <div class="times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div></div>`;
     const artEl = el.querySelector<HTMLDivElement>('.art')!;

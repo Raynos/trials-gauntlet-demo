@@ -245,8 +245,9 @@
           }).then(function () {
             statusEl.textContent = 'Starting';
             dlDoneAt = performance.now();
-            steps.push({ name: 'Script parse + evaluate', at: dlDoneAt });
-            setRow('Script parse + evaluate', '…', 'on');
+            /* Through the api so the row is `cur` and the module's first step() closes it with its ms. */
+            api.step('Script parse + evaluate');
+            boot.done--; /* not one of the planned boot steps */
             insertEntry();
           });
         }).catch(function (e) { fail('Download failed: ' + (e && e.message || e)); });

@@ -515,6 +515,10 @@ export class App {
   // -- flow -------------------------------------------------------------------
 
   start(): void {
+    // The mux presumes touch on coarse-pointer devices before any input; apply that device to the
+    // screens and the touch layer now (onDeviceChange only fires on a change).
+    const d0 = this.mux.activeDevice();
+    if (d0) this.onDevice(d0);
     if (this.o.initialTrack && getTrack(this.o.initialTrack)) this.play(this.o.initialTrack);
     else {
       this.loadBackdrop(BACKDROP_TRACK);

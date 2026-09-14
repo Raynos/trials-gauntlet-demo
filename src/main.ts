@@ -309,7 +309,12 @@ function boot(): void {
       const key = art.keyart('industrial');
       if (key) {
         const item = (await loadManifestItem(key.src)) ?? null;
-        await streamBytes(key.src, (done, total) => loader.progress('Title art', done, total, 'B'), item?.bytes ?? 0);
+        // Prefetch the key art with live bytes, but never hold the title on it past 2.5 s — the
+        // title's CSS background finishes the download on its own.
+        await Promise.race([
+          streamBytes(key.src, (done, total) => loader.progress('Title art', done, total, 'B'), item?.bytes ?? 0),
+          new Promise((r) => setTimeout(r, 2500)),
+        ]);
       }
       loader.done();
     } catch (e) {
