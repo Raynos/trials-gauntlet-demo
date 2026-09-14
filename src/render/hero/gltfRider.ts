@@ -65,7 +65,7 @@ export class GltfRider {
   readonly root = new THREE.Group();
   readonly triangles: number;
   readonly materials: THREE.MeshStandardMaterial[];
-  readonly debug = { armStretch: [1, 1], legStretch: [1, 1], handOnGrip: [true, true], ragdollResidual: -1, ragdollBlend: 0, ragdollDetail: [] as string[], bones: 0, clips: [] as string[] };
+  readonly debug = { armStretch: [1, 1], legStretch: [1, 1], handOnGrip: [true, true], wristErr: [0, 0], armLen: [0, 0], ragdollResidual: -1, ragdollBlend: 0, ragdollDetail: [] as string[], bones: 0, clips: [] as string[] };
   private readonly scene: THREE.Object3D;
   private readonly bones = new Map<string, THREE.Bone>();
   private readonly q0 = new Map<string, THREE.Quaternion>();
@@ -74,6 +74,13 @@ export class GltfRider {
   private readonly worldQ = new Map<string, THREE.Quaternion>();
   private readonly restLocalQ = new Map<string, THREE.Quaternion>();
   private readonly restLocalP = new Map<string, THREE.Vector3>();
+  /** Rig bone lengths (file space) per side: upper arm, forearm — the IK works in these, not the chain's. */
+  private readonly armLen: [number, number][] = [
+    [0.3, 0.28],
+    [0.3, 0.28],
+  ];
+  /** Ragdoll hand-over (round 9): last posed bone-local quaternions + pelvis world pose, blended out over 2–5 frames. */
+  private readonly handover = { q: new Map<string, THREE.Quaternion>(), pelvisQ: new THREE.Quaternion(), pelvisP: new THREE.Vector3(), t0: -1, dur: 0, active: false };
   private armQ = new THREE.Quaternion();
   private readonly armInv = new THREE.Matrix4();
   private readonly chain = newChain();
@@ -82,6 +89,7 @@ export class GltfRider {
   private inRagdoll = false;
   private readonly lead = { lean: 0, leanV: 0, torso: 0, torsoV: 0, arm: 0, armV: 0, crouch: 0, crouchV: 0 };
   private landT = -1;
+  private landW = 0.45;
   private pushT = -1;
   private lastHop: RenderFrame['hopPhase'] = 'idle';
   // scratch
@@ -90,6 +98,10 @@ export class GltfRider {
   private readonly qc = new THREE.Quaternion();
   private readonly va = new THREE.Vector3();
   private readonly vb = new THREE.Vector3();
+  private readonly vc = new THREE.Vector3();
+  private readonly vd = new THREE.Vector3();
+  private readonly ve = new THREE.Vector3();
+  private readonly vf = new THREE.Vector3();
   private readonly ID = new THREE.Quaternion();
 
   constructor(gltf: GLTF, lib: MaterialLibrary) {
@@ -135,6 +147,21 @@ export class GltfRider {
       pelvis.parent.getWorldQuaternion(this.armQ);
       this.armInv.copy(pelvis.parent.matrixWorld).invert();
     }
+    // Arm bone lengths from the bind pose (world distances, so the armature scale is included).
+    for (let i = 0; i < 2; i++) {
+      const sd = i === 0 ? 'L' : 'R';
+      const ua = this.bones.get(`upperArm.${sd}`);
+      const fa = this.bones.get(`forearm.${sd}`);
+      const hd = this.bones.get(`hand.${sd}`);
+      if (ua && fa && hd) {
+        const a = ua.getWorldPosition(new THREE.Vector3());
+        const b = fa.getWorldPosition(new THREE.Vector3());
+        const c = hd.getWorldPosition(new THREE.Vector3());
+        this.armLen[i] = [a.distanceTo(b), b.distanceTo(c)];
+        this.debug.armLen[i] = +(this.armLen[i]![0] + this.armLen[i]![1]).toFixed(3);
+      }
+    }
+    for (const name of ORDER) this.handover.q.set(name, new THREE.Quaternion());
     holder.remove(this.scene);
     this.scene.position.set(-SHIFT, 0, 0);
     this.debug.bones = this.bones.size;
@@ -179,14 +206,37 @@ export class GltfRider {
     }
     if (f.ragdoll && f.ragdoll.length > 0) {
       if (!this.inRagdoll) {
+        // Hand-over (round 9): snapshot the last posed pose — bone-local quaternions (frame
+        // independent) and the pelvis' world pose (its parent changes frame) — before the
+        // re-parent, then blend it out over 2–5 frames by the pelvis residual.
+        const H = this.handover;
+        for (const name of ORDER) {
+          const b = this.bones.get(name);
+          if (b) H.q.get(name)!.copy(b.quaternion);
+        }
+        const pelvis = this.bones.get('pelvis');
+        if (pelvis && !f.cut) {
+          pelvis.updateWorldMatrix(true, false);
+          pelvis.getWorldQuaternion(H.pelvisQ);
+          pelvis.getWorldPosition(H.pelvisP);
+          const pb = f.ragdoll.find((b) => b.id === 'pelvis');
+          const residual = pb ? Math.hypot(pb.pos.x - H.pelvisP.x, pb.pos.y - H.pelvisP.y) : 0;
+          this.debug.ragdollResidual = +residual.toFixed(3);
+          const frames = residual < 0.1 ? 2 : residual < 0.2 ? 3 : residual < 0.3 ? 4 : 5;
+          H.dur = frames / 60;
+          H.t0 = f.tSim;
+          H.active = true;
+        } else H.active = false;
         this.root.add(this.scene);
         this.scene.position.set(0, 0, 0);
         this.inRagdoll = true;
       }
       this.poseRagdoll(f.ragdoll);
+      this.blendHandover(f.tSim);
       return;
     }
     if (this.inRagdoll && this.bike) this.attach(this.bike);
+    this.handover.active = false;
     const r = {
       lean: this.spring('lean', f.rider.lean, f.dt, f.cut),
       torsoPitch: this.spring('torso', f.rider.torsoPitch, f.dt, f.cut),
@@ -196,7 +246,10 @@ export class GltfRider {
     const c = solveChain(r, this.chain);
     this.poseFromChain(c);
     // Additive clips.
-    if (f.justLanded && f.landImpulse > 1.5) this.landT = f.tSim;
+    if (f.justLanded && f.landImpulse > 1.5) {
+      this.landT = f.tSim;
+      this.landW = Math.min(0.9, 0.35 + 0.22 * (f.landImpulse - 1.5));
+    }
     if (f.hopPhase === 'push' && this.lastHop !== 'push') this.pushT = f.tSim;
     this.lastHop = f.hopPhase;
     const rest = Math.max(0, Math.min(1, (1.5 - f.speed) / 1.1)) * Math.max(0, 1 - Math.abs(r.lean) * 2) * Math.max(0, 1 - r.crouch * 2);
@@ -204,13 +257,14 @@ export class GltfRider {
     if (this.landT >= 0) {
       const t = f.tSim - this.landT;
       const s = this.clips.get('land_absorb');
-      if (s && t < s.duration) this.additive('land_absorb', t, 0.45 * Math.sin(Math.PI * Math.min(1, t / s.duration)) + 0.0, false);
+      // Round 9: weight scales with the landing impulse (0.35 at 1.5 → 0.9 at 4+), half-sine over the clip.
+      if (s && t < s.duration) this.additive('land_absorb', t, this.landW * Math.sin(Math.PI * Math.min(1, t / s.duration)), false);
       else this.landT = -1;
     }
     if (this.pushT >= 0) {
       const t = f.tSim - this.pushT;
       const s = this.clips.get('extend');
-      if (s && t < s.duration) this.additive('extend', t, 0.5 * Math.sin(Math.PI * Math.min(1, t / s.duration)), false);
+      if (s && t < s.duration) this.additive('extend', t, 0.7 * Math.sin(Math.PI * Math.min(1, t / s.duration)), false);
       else this.pushT = -1;
     }
   }
@@ -273,8 +327,41 @@ export class GltfRider {
     for (let i = 0; i < 2; i++) {
       const s = i === 0 ? 'L' : 'R';
       this.rigid(`shoulder.${s}` as BoneName);
-      this.aim(`upperArm.${s}` as BoneName, this.vb.subVectors(c.elbow[i]!, c.shoulder[i]!));
-      this.aim(`forearm.${s}` as BoneName, this.vb.subVectors(c.hand[i]!, c.elbow[i]!));
+      // Arms (round 9): two-bone IK in the RIG's bone lengths from the rig's posed shoulder
+      // joint to the chain's grip point, with the chain's elbow as the pole — the wrist lands
+      // on the grip whenever it is reachable (round 8 aimed the fixed-length bones along the
+      // chain's segments, which left the wrist up to 3.5 cm off at mid-lean).
+      const ua = this.bones.get(`upperArm.${s}`);
+      const grip = c.hand[i]!;
+      let S: THREE.Vector3 | null = null;
+      if (ua && this.bike) {
+        ua.updateWorldMatrix(true, false);
+        S = this.vc.setFromMatrixPosition(ua.matrixWorld);
+        this.bike.frame.worldToLocal(S); // axle coords (the chain's frame)
+      }
+      if (S) {
+        const [L1, L2] = this.armLen[i]!;
+        const d = Math.max(1e-4, S.distanceTo(grip));
+        const dir = this.vd.subVectors(grip, S).multiplyScalar(1 / d);
+        // Pole: the chain elbow's component perpendicular to shoulder→grip.
+        const pole = this.ve.subVectors(c.elbow[i]!, S);
+        pole.addScaledVector(dir, -pole.dot(dir));
+        if (pole.lengthSq() < 1e-6) pole.set(0, 1, i === 0 ? 0.3 : -0.3);
+        pole.normalize();
+        const reach = L1 + L2;
+        const cosA = d >= reach ? 1 : Math.max(-1, Math.min(1, (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d)));
+        const sinA = Math.sqrt(Math.max(0, 1 - cosA * cosA));
+        const elbow = this.vf.copy(S).addScaledVector(dir, L1 * cosA).addScaledVector(pole, L1 * sinA);
+        this.aim(`upperArm.${s}` as BoneName, this.vb.subVectors(elbow, S));
+        this.aim(`forearm.${s}` as BoneName, this.vb.subVectors(grip, elbow));
+        const err = d > reach ? d - reach : 0;
+        this.debug.wristErr[i] = +err.toFixed(4);
+        this.debug.handOnGrip[i] = err < 0.01;
+        this.debug.armStretch[i] = +(d / reach).toFixed(3);
+      } else {
+        this.aim(`upperArm.${s}` as BoneName, this.vb.subVectors(c.elbow[i]!, c.shoulder[i]!));
+        this.aim(`forearm.${s}` as BoneName, this.vb.subVectors(c.hand[i]!, c.elbow[i]!));
+      }
       this.rigid(`hand.${s}` as BoneName);
       this.aim(`thigh.${s}` as BoneName, this.vb.subVectors(c.knee[i]!, c.hip[i]!));
       this.aim(`shin.${s}` as BoneName, this.vb.subVectors(c.ankle[i]!, c.knee[i]!));
@@ -304,6 +391,36 @@ export class GltfRider {
       const v = p.interp.evaluate(tt) as Float32Array;
       p.out.set(v[0]!, v[1]!, v[2]!).sub(p.rest).multiplyScalar(w);
       b.position.add(p.out);
+    }
+  }
+
+  /** Slerp every bone from the hand-over snapshot toward the ragdoll pose while the blend runs. */
+  private blendHandover(tSim: number): void {
+    const H = this.handover;
+    if (!H.active) return;
+    const k = H.dur > 0 ? Math.min(1, (tSim - H.t0) / H.dur) : 1;
+    this.debug.ragdollBlend = +k.toFixed(3);
+    if (k >= 1) {
+      H.active = false;
+      return;
+    }
+    const w = 1 - k * k * (3 - 2 * k); // weight of the snapshot
+    const pelvis = this.bones.get('pelvis');
+    for (const name of ORDER) {
+      const b = this.bones.get(name);
+      if (!b || b === pelvis) continue;
+      b.quaternion.slerp(H.q.get(name)!, w);
+    }
+    if (pelvis && pelvis.parent) {
+      // The pelvis' parent changed frame (bike → world): blend in world space.
+      pelvis.parent.updateWorldMatrix(true, false);
+      pelvis.parent.getWorldQuaternion(this.qc);
+      this.qa.copy(this.qc).multiply(pelvis.quaternion); // current world
+      this.qa.slerp(H.pelvisQ, w);
+      pelvis.quaternion.copy(this.qc).invert().multiply(this.qa);
+      this.va.copy(pelvis.position).applyMatrix4(pelvis.parent.matrixWorld); // current world position
+      this.va.lerp(H.pelvisP, w);
+      pelvis.position.copy(pelvis.parent.worldToLocal(this.va));
     }
   }
 

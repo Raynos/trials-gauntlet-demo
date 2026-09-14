@@ -7,7 +7,7 @@
  */
 import * as THREE from 'three';
 import type { CameraDebug, CompiledTrack, GameEvent, GamePhase, PhysicsState, QualityTier, RenderStats } from '../core/types';
-import { ArtLibrary } from './art/library';
+import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
 import { HERO_URLS, loadGltf, type ModelChoice, type ModelChoices } from './hero/gltf';
@@ -46,6 +46,10 @@ export interface GameRenderer {
   setRunInfo(info: { runTime: number; phase: GamePhase }): void;
   /** PB ghost: translucent desaturated bike+rider following `state`; null hides it. */
   setGhost?(state: PhysicsState | null): void;
+  /** Resolves when the current track's art and any requested hero model are in (frame 0 is then final). */
+  whenReady?(): Promise<void>;
+  /** Cooperative startup for a loading screen: chunked ≤ 16 ms tasks, `report(done, total, label)`. */
+  prepare?(report: (done: number, total: number, label?: string) => void): Promise<void>;
 }
 
 export interface ThreeRendererOptions {
@@ -80,6 +84,8 @@ interface World {
   trackTris: number;
   /** Built with the art pack present (false → rebuilt once the pack settles, if nothing was drawn yet). */
   withArt: boolean;
+  /** Loaded art ids the build used (a later settle with more of them rebuilds an undrawn world). */
+  artKey: string;
   /** Melt sources (foundry): the two follow lights snap to the nearest ones each frame. */
   fountains: { x: number; y: number; z: number }[];
   meltLights: THREE.PointLight[];
@@ -92,23 +98,38 @@ export class ThreeRenderer implements GameRenderer {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
   private readonly lib: MaterialLibrary;
-  private readonly lighting: LightingRig;
+  private lightingRig: LightingRig | null = null;
   private readonly rig = new CameraRig();
-  private bike: HeroBike;
-  private rider: HeroRider;
+  private bikeRef: HeroBike | null = null;
+  private riderRef: HeroRider | null = null;
   private models: ModelChoices = { riderModel: 'proc', bikeModel: 'proc' };
   private readonly gltf: { bike: GLTF | null; rider: GLTF | null } = { bike: null, rider: null };
   /** In-flight setModels (glTF load + swap); `whenReady` waits for it. */
   private heroPending: Promise<void> = Promise.resolve();
   private heroLoading = 0;
   private readonly emitters = new Emitters();
-  private readonly post: PostChain;
+  private postRef: PostChain | null = null;
   private readonly frames = new FrameBuilder();
   private world: World | null = null;
   private track: CompiledTrack | null = null;
-  /** Round 8: the generated art pack; loading starts in the constructor, `ready` waits for it. */
+  /** Round 8/9: the generated art pack, loaded in tiers (boot set in `prepare`, the rest per track in `setTrack`). */
   readonly art = new ArtLibrary('art/');
+  /** The current track's art request (awaited by `whenReady`). */
+  private artRequest: Promise<void> = Promise.resolve();
+  private artIds: string[] = [];
   private artBackground: THREE.Texture | null = null;
+  /** Loader callback kept after `prepare` for the background phases (per-track art). */
+  private report: (done: number, total: number, label?: string) => void = () => undefined;
+  private lightingApplied = false;
+  private width = 1280;
+  /**
+   * Play mode (no `preserveDrawingBuffer`, i.e. not the harness): the front end's frame loop
+   * starts rendering the menu backdrop before `main.ts` calls `prepare()`, so a frame drawn
+   * before the core is built paints a placeholder and (if nobody has yet) starts `prepare()`
+   * itself — never the synchronous build. Harness mode keeps the synchronous first frame.
+   */
+  private readonly lazyBoot: boolean;
+  private booted = false;
   private biome: Biome = biomeFor('industrial');
   private frameCount = 0;
   private tier: QualityTier;
@@ -151,29 +172,102 @@ export class ThreeRenderer implements GameRenderer {
     this.rendererString = describeRenderer(gl);
 
     this.lib = new MaterialLibrary(0x7a1a15);
-    this.lighting = new LightingRig(this.renderer, this.scene);
-    this.bike = new BikeModel(this.lib);
-    this.rider = new RiderModel(this.lib);
-    this.rider.attach(this.bike);
-    this.scene.add(this.bike.root, this.rider.root, this.emitters.group);
-    this.post = new PostChain(this.renderer, this.scene, this.rig.camera);
+    this.scene.add(this.emitters.group);
     this.tier = options.quality ?? 'high';
-    this.post.setQuality(this.tier);
-    this.lighting.setQuality(this.tier);
-    this.lighting.apply(this.biome);
-    this.post.applyBiome(this.biome);
-    // Art pack: fetch + decode off the main thread now; when it settles, a world that was built
-    // without it is rebuilt once (before the first frame in normal play — the menu is up).
-    void this.art.load();
+    this.lazyBoot = !(options.preserveDrawingBuffer ?? false);
+    // Round 9: the constructor is the WebGL context only. Lighting (sky PMREM), the hero
+    // meshes, the post chain, the procedural textures and the art pack are built by
+    // `prepare()` in ≤ 16 ms tasks (or lazily by the first call that needs them).
     if (options.riderModel === 'gltf' || options.bikeModel === 'gltf') this.setModels({ riderModel: options.riderModel ?? 'proc', bikeModel: options.bikeModel ?? 'proc' });
-    this.art.onSettled(() => {
+    // Art progress goes to whatever loader callback `prepare` installed (per-track requests
+    // after boot show as a background phase: "World art · canyon 3/4 (0.12 / 0.20 MB)").
+    const mb = (b: number): string => `${(b / (1024 * 1024)).toFixed(2)} MB`;
+    this.art.onProgress = (d, t, label, bytes, bytesTotal) => this.report(d, t, `${label === 'art pack' ? 'Art pack' : `World art · ${label}`} ${d}/${t} (${mb(bytes)} / ${mb(bytesTotal)})`);
+    this.art.onRequestSettled = () => {
       // Determinism: a world that has already been drawn is never swapped mid-run (a capture is
       // all-art or all-procedural); the next setTrack picks the pack up. Callers that need the
       // art-complete first frame await `whenReady()` before rendering.
       const w = this.world;
-      if (this.track && w && !w.withArt && this.art.ok && w.builtAtFrame === this.frameCount) this.setTrack(this.track);
-    });
+      if (this.track && w && this.art.ok && w.builtAtFrame === this.frameCount && w.artKey !== this.artKey()) this.setTrack(this.track);
+    };
     (window as unknown as { __render?: ThreeRenderer }).__render = this; // debug handle for the harness
+    performance.mark?.('render:ctor');
+  }
+
+  // -- lazy core (round 9) ----------------------------------------------------
+
+  private get lighting(): LightingRig {
+    if (!this.lightingRig) {
+      this.lightingRig = new LightingRig(this.renderer, this.scene);
+      this.lightingRig.setQuality(this.tier);
+    }
+    return this.lightingRig;
+  }
+
+  /** Sky + PMREM for the current biome (GPU work; once per biome change). */
+  private ensureLighting(): void {
+    if (this.lightingApplied) return;
+    this.lightingApplied = true;
+    this.lighting.apply(this.biome);
+  }
+
+  private get post(): PostChain {
+    if (!this.postRef) {
+      this.postRef = new PostChain(this.renderer, this.scene, this.rig.camera);
+      this.postRef.setQuality(this.tier);
+      this.postRef.setSize(this.width, this.height, this.pixelRatio);
+      this.postRef.applyBiome(this.biome);
+    }
+    return this.postRef;
+  }
+
+  private get bike(): HeroBike {
+    this.ensureHero();
+    return this.bikeRef!;
+  }
+
+  private set bike(b: HeroBike) {
+    this.bikeRef = b;
+  }
+
+  private get rider(): HeroRider {
+    this.ensureHero();
+    return this.riderRef!;
+  }
+
+  private set rider(r: HeroRider) {
+    this.riderRef = r;
+  }
+
+  /** Build the procedural hero once (≈ 30 k + 20 k tris of lathe/tube geometry). */
+  private ensureHero(): void {
+    if (this.bikeRef && this.riderRef) return;
+    if (!this.bikeRef) {
+      this.bikeRef = new BikeModel(this.lib);
+      this.scene.add(this.bikeRef.root);
+      if (this.track) this.bindGround(this.track);
+    }
+    if (!this.riderRef) {
+      this.riderRef = new RiderModel(this.lib);
+      this.riderRef.attach(this.bikeRef);
+      this.scene.add(this.riderRef.root);
+    }
+  }
+
+  private bindGround(track: CompiledTrack): void {
+    const profile = track.def.profile;
+    const bike = this.bikeRef;
+    if (!bike) return;
+    bike.ground = (x) => {
+      const y = profileY(profile, x);
+      const dy = profileY(profile, x + 0.3) - profileY(profile, x - 0.3);
+      return { y, angle: Math.atan2(dy, 0.6) };
+    };
+  }
+
+  /** Art ids the current track's biome draws, for change detection on a settle. */
+  private artKey(): string {
+    return this.art.ok && this.art.requested(this.artIds) ? this.artIds.filter((id) => this.art.has(id)).join(',') : '';
   }
 
   /** Debug access for harness scripts (not part of the contract). */
@@ -270,51 +364,108 @@ export class ThreeRenderer implements GameRenderer {
    * least one lit frame has been drawn — the frame after that is the final look.
    */
   get ready(): boolean {
-    return this.lib.hasTextures && this.art.settled && this.heroLoading === 0 && this.frameCount > 0;
+    return this.lib.hasTextures && this.art.settled && this.art.requested(this.artIds) && this.heroLoading === 0 && this.frameCount > 0;
   }
 
-  /** Resolves when the art pack has settled and any requested glTF hero is in (the first capturable frame is final after this). */
+  /**
+   * Resolves when the boot art, the current track's art request and any requested glTF hero
+   * are in — the first frame drawn after this is final (`hook.loadTrack` awaits it so frame 0
+   * is art-complete). Nothing here reads the wall clock.
+   */
   whenReady(): Promise<void> {
-    return Promise.all([this.art.whenSettled, this.heroPending]).then(() => undefined);
+    const req = this.artRequest;
+    return Promise.all([this.art.whenSettled, req, this.heroPending]).then(() => (this.artRequest !== req ? this.whenReady() : undefined));
   }
 
   private prepared: Promise<void> | null = null;
+  private preparing = false;
+  /** `prepare()` timeline: [label, ms, bytes] per step (diagnostic; `debugInfo().prepare`). */
+  readonly prepareTimeline: { step: string; ms: number; bytes: number }[] = [];
 
   /**
-   * Cooperative startup for the loading screen (round 8, P0): every heavy step yields to the
-   * frame loop between units of ≤ one texture job / one shader batch, and reports a
-   * human-readable step. Idempotent. `render()` before this resolves still draws (a dark,
-   * flat-shaded frame; the synchronous texture fallback only runs if prepare() was never
-   * started). Steps: art pack decode (off-thread), procedural materials (one job per yield),
-   * hero glTF (if requested), shader compile (`compileAsync`, per material chunk).
+   * Cooperative startup for the loading screen (round 9). The constructor made only the WebGL
+   * context; this builds everything else in tasks of ≤ 16 ms (or one GPU call) and reports
+   * `(done, total, label)` for the loader's row. Idempotent. `render()` before this resolves
+   * still draws (lazy builds + a synchronous texture fallback; the harness path never calls
+   * prepare). Steps: art pack boot set (fetch + createImageBitmap off-thread, bytes reported) ·
+   * hero meshes (bike, rider as two tasks) · lighting (sky → PMREM) · post chain · procedural
+   * materials (painters in row bands, 12 ms budget) · hero glTF (if requested) · shaders
+   * (`compileAsync`, two materials per task) · one warm-up frame through the post chain.
+   * The per-track art beyond the boot set is requested by `setTrack` and reported through the
+   * same callback as a background phase.
    */
-  prepare(report: (name: string, done: number, total: number) => void = () => undefined): Promise<void> {
+  prepare(report: (done: number, total: number, label?: string) => void = () => undefined): Promise<void> {
     if (this.prepared) return this.prepared;
     this.preparing = true;
+    this.report = report;
     const yieldFrame = (): Promise<void> => new Promise((r) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => r()) : setTimeout(r, 0)));
+    const mb = (b: number): string => `${(b / (1024 * 1024)).toFixed(2)} MB`;
+    const timeline = this.prepareTimeline;
+    let stepT0 = performance.now();
+    let stepBytes = 0;
+    const mark = (step: string): void => {
+      const now = performance.now();
+      timeline.push({ step, ms: Math.round((now - stepT0) * 10) / 10, bytes: stepBytes });
+      performance.mark?.(`render:prepare:${step}`);
+      stepT0 = now;
+      stepBytes = 0;
+    };
     const run = async (): Promise<void> => {
-      // 1. Art pack (fetch + createImageBitmap are off the main thread; only bookkeeping runs here).
+      // 1. Art pack boot set: the showcase biome's plate, container skins, banners, crowd
+      //    (fetch + decode are off the main thread; only bookkeeping runs here).
       const artP = this.art.load();
-      this.art.onProgress = (d, t) => report(`Loading art pack ${d}/${t}`, d, t);
-      report('Loading art pack', 0, Math.max(1, this.art.progress.total));
-      // 2. Procedural materials, one job per frame.
+      report(0, 1, 'Art pack');
+      await yieldFrame();
+      mark('art:start');
+      // 2. Hero meshes: two tasks (each is one procedural kit's geometry).
+      report(0, 2, 'Hero meshes · bike');
+      if (!this.bikeRef) {
+        this.bikeRef = new BikeModel(this.lib);
+        this.scene.add(this.bikeRef.root);
+        if (this.track) this.bindGround(this.track);
+      }
+      await yieldFrame();
+      mark('hero:bike');
+      report(1, 2, 'Hero meshes · rider');
+      this.ensureHero();
+      await yieldFrame();
+      mark('hero:rider');
+      // 3. Lighting: sky texture + PMREM (GPU; the first shader compile on software GL is long).
+      report(0, 1, 'Lighting · sky environment');
+      this.ensureLighting();
+      await yieldFrame();
+      mark('lighting');
+      // 4. Post chain (targets + shader materials; compiled by the warm-up frame below).
+      report(0, 1, 'Post chain');
+      void this.post;
+      await yieldFrame();
+      mark('post:create');
+      // 5. Procedural materials in 12 ms slices (a 512² painter is 50–65 ms whole on a slow host).
       const n = this.lib.jobCount;
       while (this.lib.jobsDone < n) {
-        report(`Generating materials ${this.lib.jobsDone + 1}/${n}`, this.lib.jobsDone, n);
-        this.lib.generateStep();
+        report(this.lib.generateProgress * 100, 100, `Materials · ${this.lib.currentJobName} ${this.lib.jobsDone + 1}/${n}`);
+        this.lib.generateStep(12);
         await yieldFrame();
       }
-      report(`Generating materials ${n}/${n}`, n, n);
+      report(100, 100, `Materials ${n}/${n}`);
       this.textureGenMs = this.lib.generateMs;
-      await artP;
-      // 3. Hero models (only when requested).
+      stepBytes = this.lib.textureBytes;
+      mark('materials');
+      // 6. Hero glTF (only when requested).
       if (this.models.bikeModel === 'gltf' || this.models.riderModel === 'gltf') {
-        report(`Loading ${this.models.riderModel === 'gltf' ? 'rider' : 'bike'} model`, 0, 1);
+        report(0, 1, `Loading ${this.models.riderModel === 'gltf' ? 'rider' : 'bike'} model`);
         await this.heroPending;
-        report('Loading hero models', 1, 1);
+        report(1, 1, 'Hero models');
+        mark('hero:gltf');
       }
-      // 4. Shaders: compile what is in the scene (hero + the world if a track is set) in chunks.
-      report('Compiling shaders', 0, 1);
+      // 7. The boot art (usually already in by now; on 3G this is the wait that shows bytes).
+      await artP;
+      stepBytes = this.art.bytesDelivered;
+      report(1, 1, `Art pack ${this.art.progress.done}/${this.art.progress.total} (${mb(this.art.bytesDelivered)})`);
+      mark('art:settled');
+      await yieldFrame();
+      // 8. Shaders: compile what is in the scene (hero + the world if a track is set) in chunks.
+      report(0, 1, 'Shaders');
       const mats: THREE.Material[] = [];
       const seen = new Set<THREE.Material>();
       this.scene.traverse((o) => {
@@ -326,7 +477,8 @@ export class ThreeRenderer implements GameRenderer {
       });
       const r = this.renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
       if (r.compileAsync) {
-        // Chunk by hiding everything but ~8 materials per call so no single compile batch is long.
+        // Two materials per call: on a real driver each call is a handful of ms; software GL
+        // compiles the first standard program synchronously (seconds) — not splittable from JS.
         const chunk = 2;
         for (let i = 0; i < mats.length; i += chunk) {
           const keep = new Set(mats.slice(i, i + chunk));
@@ -341,37 +493,72 @@ export class ThreeRenderer implements GameRenderer {
             }
           });
           try {
+            // Bind the HDR scene target: program parameters include the output colour space, and a
+            // compile against the canvas would build a second (sRGB) variant of every material.
+            this.renderer.setRenderTarget(this.post.sceneTarget);
             await r.compileAsync(this.scene, this.rig.camera);
           } finally {
+            this.renderer.setRenderTarget(null);
             for (const o of hidden) o.visible = true;
           }
-          report(`Compiling shaders ${Math.min(mats.length, i + chunk)}/${mats.length}`, Math.min(mats.length, i + chunk), mats.length);
+          const d = Math.min(mats.length, i + chunk);
+          report(d, mats.length, `Shaders ${d}/${mats.length} programs`);
           await yieldFrame();
         }
       }
-      // 5. Post chain + shadow programs: one warm-up frame through the composer (these are
-      // screen-quad shaders compileAsync cannot reach). Nothing is captured from it.
-      report('Warming up the post chain', 0, 1);
+      mark('shaders');
+      // 9. First frame, two rows: the plain scene (shadow-depth programs + the GPU's first
+      // draw of every pipeline) and then the composer (screen-quad shaders compileAsync cannot
+      // reach). Nothing is captured from either. On software GL (SwiftShader) these are the
+      // seconds-long tasks — the driver JITs each pipeline at its first draw; no JS split exists.
+      report(0, 2, 'First frame · world + shadows');
       this.renderer.info.autoReset = false;
+      this.post.renderSceneOnly();
+      await yieldFrame();
+      mark('firstframe:world');
+      report(1, 2, 'First frame · post chain');
       this.post.render();
       await yieldFrame();
-      report('Ready', 1, 1);
+      mark('firstframe:post');
+      report(2, 2, 'Ready');
     };
     this.prepared = run().finally(() => {
       this.preparing = false;
+      this.booted = true;
     });
     return this.prepared;
   }
-  private preparing = false;
+
+  /** A cheap clear in the biome's fog colour while `prepare()` is still building the core. */
+  private placeholderFrame(): void {
+    this.renderer.setRenderTarget(null);
+    this.renderer.setClearColor(this.biome.fogColor, 1);
+    this.renderer.clear(true, true, false);
+  }
 
   // -- contract -------------------------------------------------------------
 
   setTrack(track: CompiledTrack): void {
     this.clearWorld();
     this.track = track;
-    this.biome = biomeFor(track.def.meta?.biome);
-    this.lighting.apply(this.biome);
-    const art = this.art.settled && this.art.ok ? this.art : null;
+    const biome = biomeFor(track.def.meta?.biome);
+    if (biome !== this.biome || !this.lightingApplied) {
+      this.biome = biome;
+      this.lightingApplied = true;
+      this.lighting.apply(biome);
+    }
+    // Per-track art (round 9): request what this biome draws beyond the boot set (other
+    // plates + skies, wall decals, the night crowd). `whenReady()` waits for it; if it lands
+    // before the first frame the world is rebuilt with it (`onRequestSettled`).
+    this.artIds = idsFor(biome.id);
+    void this.art.load();
+    if (!this.art.requested(this.artIds)) {
+      const pending = this.art.pendingBytes(this.artIds);
+      this.artRequest = this.art.request(this.artIds, `${biome.id} (${(pending / (1024 * 1024)).toFixed(2)} MB)`).catch(() => undefined);
+    }
+    // All-or-nothing (determinism): the world uses the pack only once this biome's whole set has
+    // settled; a partial set would make two captures differ by which files had landed.
+    const art = this.art.ok && this.art.requested(this.artIds) ? this.art : null;
     // Sky panorama as the background for exterior biomes (the kit also draws it as a far quad).
     this.artBackground?.dispose();
     this.artBackground = null;
@@ -427,6 +614,7 @@ export class ThreeRenderer implements GameRenderer {
       trackCalls: ribbons.drawCalls + obstacles.drawCalls,
       trackTris: ribbons.triangles + obstacles.triangles,
       withArt: art !== null,
+      artKey: this.artKey(),
       builtAtFrame: this.frameCount,
       fountains: kit.fountains,
       meltLights: [],
@@ -442,11 +630,8 @@ export class ThreeRenderer implements GameRenderer {
     }
     const profile = track.def.profile;
     this.rig.ground = (x) => profileY(profile, x);
-    this.bike.ground = (x) => {
-      const y = profileY(profile, x);
-      const dy = profileY(profile, x + 0.3) - profileY(profile, x - 0.3);
-      return { y, angle: Math.atan2(dy, 0.6) };
-    };
+    this.rig.finishX = track.def.finishX;
+    this.bindGround(track);
     const fy = track.def.profile.length ? track.def.profile[track.def.profile.length - 1]!.y : 0;
     this.emitters.setTrack(track.def.seed, gates.jets, track.def.finishX, fy, this.biome, kit.fountains);
     this.frames.invalidate();
@@ -527,8 +712,8 @@ export class ThreeRenderer implements GameRenderer {
   setQuality(tier: QualityTier): void {
     if (tier === this.tier) return;
     this.tier = tier;
-    this.post.setQuality(tier);
-    this.lighting.setQuality(tier);
+    this.postRef?.setQuality(tier);
+    this.lightingRig?.setQuality(tier);
     this.emitters.countScale = tier === 'low' ? 0.5 : 1;
     // Shadows off on low: materials must recompile to drop the shadow sampling.
     const shadows = tier !== 'low';
@@ -547,12 +732,22 @@ export class ThreeRenderer implements GameRenderer {
 
   render(state: PhysicsState, alpha: number): number {
     const t0 = performance.now();
-    // Procedural textures are generated synchronously on the first render (after
-    // installHook), so the frame they appear on is identical in every capture.
-    if (!this.lib.hasTextures && !this.preparing) {
-      // No loader in front of us (harness path): one synchronous, deterministic step.
-      this.lib.generateTextures();
-      this.textureGenMs = this.lib.generateMs;
+    if (!this.booted) {
+      if (this.lazyBoot) {
+        // Play mode: the loader owns the wait; draw a placeholder until `prepare()` is done.
+        if (!this.prepared) void this.prepare();
+        this.placeholderFrame();
+        return performance.now() - t0;
+      }
+      // Harness path (no loader): the core is built here, once, synchronously — the textures
+      // appear on the same frame in every capture.
+      this.ensureHero();
+      this.ensureLighting();
+      if (!this.lib.hasTextures) {
+        this.lib.generateTextures();
+        this.textureGenMs = this.lib.generateMs;
+      }
+      if (!this.preparing) this.booted = true;
     }
     const f = this.frames.build(state, alpha);
     this.lastTSim = f.tSim;
@@ -640,12 +835,14 @@ export class ThreeRenderer implements GameRenderer {
     this.emitters.setViewport(this.height * Math.min(this.pixelRatio, this.tier === 'low' ? 1 : this.tier === 'medium' ? 1.5 : 2), (cam.fov * Math.PI) / 180);
     this.emitters.update(f, this.tmp, this.rig.targetX);
 
-    // Post dynamics: smear only above 9 m/s, along the screen-space travel direction.
+    // Post dynamics: smear only above 9 m/s, along the screen-space travel direction. After the
+    // line (round 9) speed effects are off: no smear, no chromatic aberration on the coasting hold.
     const dbg = this.rig.debug();
-    const smear = Math.min(8, Math.max(0, (f.speed - 9) * 1.1));
+    const speedFx = f.finished ? 0 : f.speed;
+    const smear = Math.min(8, Math.max(0, (speedFx - 9) * 1.1));
     const dl = Math.hypot(f.velX, f.velY) || 1;
     const flash = this.flashT >= 0 ? Math.max(0, 1 - (f.tSim - this.flashT) / 0.2) : 0;
-    this.post.setDynamics(f.speed, dbg.bikeScreenX, dbg.bikeScreenY, smear, f.velX / dl, -f.velY / dl, flash);
+    this.post.setDynamics(speedFx, dbg.bikeScreenX, dbg.bikeScreenY, smear, f.velX / dl, -f.velY / dl, flash);
 
     this.renderer.info.autoReset = false;
     this.renderer.info.reset();
@@ -665,12 +862,13 @@ export class ThreeRenderer implements GameRenderer {
       this.pixelRatio = pixelRatio;
       this.renderer.setPixelRatio(pixelRatio);
     }
+    this.width = width;
     this.height = height;
     this.renderer.setSize(width, height, false);
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
     this.rig.setAspect(width / height);
-    this.post.setSize(width, height, this.pixelRatio);
+    this.postRef?.setSize(width, height, this.pixelRatio);
   }
 
   stats(): RenderStats {
@@ -683,15 +881,16 @@ export class ThreeRenderer implements GameRenderer {
       geometries: info.memory.geometries,
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
-      texturesMB: estimateTextureMB(this.scene) + this.lighting.textureBytes / (1024 * 1024),
+      texturesMB: estimateTextureMB(this.scene) + (this.lightingRig?.textureBytes ?? 0) / (1024 * 1024),
       renderer: this.rendererString,
       contextKind: this.contextKind,
     };
   }
 
   /** Extra diagnostics for the harness / perf report. */
-  debugInfo(): { biome: string; zoom: string; phase: GamePhase; tier: QualityTier; trackCalls: number; trackTris: number; textureGenMs: number; passes: number; art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean } } {
+  debugInfo(): { biome: string; zoom: string; phase: GamePhase; tier: QualityTier; trackCalls: number; trackTris: number; textureGenMs: number; passes: number; art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean; trackComplete: boolean; trackIds: number }; prepare: { step: string; ms: number; bytes: number }[] } {
     return {
+      prepare: this.prepareTimeline,
       biome: this.biome.id,
       zoom: this.rig.zoomState,
       phase: this.phase,
@@ -699,15 +898,15 @@ export class ThreeRenderer implements GameRenderer {
       trackCalls: this.world?.trackCalls ?? 0,
       trackTris: Math.round(this.world?.trackTris ?? 0),
       textureGenMs: this.textureGenMs,
-      passes: this.post.info.passes,
-      art: { settled: this.art.settled, ok: this.art.ok, loadMs: Math.round(this.art.loadMs), deliveredMB: +(this.art.bytesDelivered / (1024 * 1024)).toFixed(2), inWorld: this.world?.withArt ?? false },
+      passes: this.postRef?.info.passes ?? 0,
+      art: { settled: this.art.settled, ok: this.art.ok, loadMs: Math.round(this.art.loadMs), deliveredMB: +(this.art.bytesDelivered / (1024 * 1024)).toFixed(2), inWorld: this.world?.withArt ?? false, trackComplete: this.art.requested(this.artIds), trackIds: this.artIds.length },
     };
   }
 
   dispose(): void {
     this.clearWorld();
-    this.post.dispose();
-    this.lighting.dispose();
+    this.postRef?.dispose();
+    this.lightingRig?.dispose();
     this.lib.dispose();
     this.art.dispose();
     this.artBackground?.dispose();

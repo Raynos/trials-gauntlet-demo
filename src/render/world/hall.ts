@@ -32,12 +32,12 @@ import {
   lampBulbGeometry,
   lampGeometry,
   lightConeGeometry,
-  palletGeometry,
   pipeGeometry,
   rackGeometry,
   reflectionMaskTexture,
   trussGeometry,
   tyreStackGeometry,
+  palletLowGeometry,
 } from './props';
 
 export interface HallOut {
@@ -212,6 +212,9 @@ function warehouseWall(rng: Rng, paneColor: string, brick: string, foundry = fal
  * screen-blended) and the rust / grime come from the grime masks tinted rust-brown; the
  * procedural streaks stay as the fallback. Only fictional owners (brands audit).
  */
+/** Tinted grime masks by (mask id, colour, strength) — the bitmaps never change once decoded. */
+const tintCache = new Map<string, HTMLCanvasElement>();
+
 function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: boolean; stripe: boolean }, art: ArtLibrary | null): THREE.CanvasTexture {
   const [c, g] = canvas(1024, 512);
   g.fillStyle = '#e6e6e2';
@@ -247,7 +250,14 @@ function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: bool
     const put = (id: string | null, color: string, strength: number, x: number, y: number, w: number, h: number): void => {
       const bmp = id ? art!.bitmap(id) : null;
       if (!bmp) return;
-      g.drawImage(tintMask(bmp, 512, 512, color, strength), x, y, w, h);
+      // Memoised per (mask, colour, strength): 8 skins share 4 tints (round 9: the art rebuild was a 0.9 s task on the loaded host).
+      const key = `${id}|${color}|${strength.toFixed(3)}`;
+      let tinted = tintCache.get(key);
+      if (!tinted || tinted.width !== 512) {
+        tinted = tintMask(bmp, 512, 512, color, strength);
+        tintCache.set(key, tinted);
+      }
+      g.drawImage(tinted, x, y, w, h);
     };
     put(masks.includes('mask-edge-grime') ? 'mask-edge-grime' : null, '#2a1e14', 0.35 + 0.2 * v.rust, 0, 0, 1024, 512);
     if (v.rust >= 1) {
@@ -543,9 +553,18 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
 
   // --- Racks, catwalk under the windows, floor clutter, foreground occluders.
   const racks = new PropBatch('rack', bakeAO(rackGeometry(), 4, 0.35), vc('rustSteel'), false); // against the wall: shadow-culled (z −28)
-  const pallets = new PropBatch('pallet', bakeAO(palletGeometry(), 0.144, 0.3), vc('pallet'));
-  const drums = new PropBatch('drum', bakeAO(drumGeometry(), 0.88, 0.4), vc('barrelRed'));
-  const tyres = new PropBatch('tyres', bakeAO(tyreStackGeometry(), 0.9, 0.4), vc('tyre'));
+  // Round 9 (tri budget: foundry 743 k, b1 765 k with the shadow pass): the mid-hall clutter at
+  // z < −4 (3 m below the deck, behind it) is drawn in shadow-culled batches with the low
+  // pallet; only the foreground clutter (z > 4) casts.
+  const palletGeo = bakeAO(palletLowGeometry(), 0.144, 0.3);
+  const drumGeo = bakeAO(drumGeometry(), 0.88, 0.4);
+  const tyreGeo = bakeAO(tyreStackGeometry(), 0.9, 0.4);
+  const pallets = new PropBatch('pallet', palletGeo, vc('pallet'));
+  const drums = new PropBatch('drum', drumGeo, vc('barrelRed'));
+  const tyres = new PropBatch('tyres', tyreGeo, vc('tyre'));
+  const palletsFar = new PropBatch('pallet-far', palletGeo, pallets.material, false);
+  const drumsFar = new PropBatch('drum-far', drumGeo, drums.material, false);
+  const tyresFar = new PropBatch('tyres-far', tyreGeo, tyres.material, false);
   const cones = new PropBatch('cone', coneGeometry(), fogify(new THREE.MeshStandardMaterial({ color: 0xff6a1a, roughness: 0.6 })));
   const railTape = new PropBatch('rail', new THREE.BoxGeometry(1, 0.05, 0.05), lib.get('hazardTape'), false);
   const railPost = new PropBatch('railpost', new THREE.BoxGeometry(0.05, 1.1, 0.05).translate(0, 0.55, 0), steel, false);
@@ -564,13 +583,13 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     } else if (r < 0.45) {
       const z = rng.range(-12, -5);
       const n = rng.int(2, 6);
-      for (let k = 0; k < n; k++) pallets.add(x + rng.range(-0.3, 0.3), floorY + k * 0.144, z + rng.range(-0.1, 0.1), rng.range(-0.1, 0.1));
+      for (let k = 0; k < n; k++) palletsFar.add(x + rng.range(-0.3, 0.3), floorY + k * 0.144, z + rng.range(-0.1, 0.1), rng.range(-0.1, 0.1));
     } else if (r < 0.7) {
       const z = rng.range(-11, -5);
       const n = rng.int(2, 5);
-      for (let k = 0; k < n; k++) drums.add(x + k * 0.62, floorY, z + rng.range(-0.3, 0.3), rng.range(0, 6), 1, k % 3 === 1 ? 0xd8d2c4 : k % 3 === 2 ? 0x244d8a : 0xa42a1e);
+      for (let k = 0; k < n; k++) drumsFar.add(x + k * 0.62, floorY, z + rng.range(-0.3, 0.3), rng.range(0, 6), 1, k % 3 === 1 ? 0xd8d2c4 : k % 3 === 2 ? 0x244d8a : 0xa42a1e);
     } else if (r < 0.85) {
-      tyres.add(x, floorY, rng.range(-9, -4.5), rng.range(0, 6));
+      tyresFar.add(x, floorY, rng.range(-9, -4.5), rng.range(0, 6));
     } else {
       cones.add(x + rng.range(-2, 2), floorY, rng.range(-6, -4), rng.range(0, 6));
     }
@@ -625,7 +644,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     else if (r < 0.8) forklifts.add(x, floorY, rng.range(-9, -5), rng.range(-0.5, 0.5) + (rng.next() < 0.5 ? Math.PI : 0));
     else signs.add(x, floorY, wallZ + 2.2, 0);
   }
-  out.batches.push(racks, pallets, drums, tyres, cones, railTape, railPost, catwalk, reels, scaffolds, tarps, forklifts, signs);
+  out.batches.push(racks, pallets, drums, tyres, palletsFar, drumsFar, tyresFar, cones, railTape, railPost, catwalk, reels, scaffolds, tarps, forklifts, signs);
 
   // --- Wall decals from the art pack: posters and safety signs low on the back wall between
   // the bays, graffiti pieces on the far container row and the wall. One batch per texture.

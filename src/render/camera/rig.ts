@@ -111,6 +111,8 @@ export class CameraRig {
   private primed = false;
   /** Ground height sampler (profile) for the airborne framing; set by the renderer per track. */
   ground: ((x: number) => number) | null = null;
+  /** Finish line x (set per track): the finish hold frames the gate and the coasting bike together. */
+  finishX = 0;
 
   constructor() {
     this.camera = new THREE.PerspectiveCamera(34, 16 / 9, 0.2, 900);
@@ -232,11 +234,32 @@ export class CameraRig {
       this.fy.halfLife = 0.18;
     }
     if (f.finished) {
+      // Finish hold (round 9; user frame: smear after the line, camera still chasing). The game
+      // cuts throttle and auto-brakes, so the bike coasts to a stop on the run-out: ease out of
+      // the forward follow over 1.5 s onto the midpoint between the gate and the bike, widen so
+      // both stay in frame (confetti + fireworks burst at the gate posts), and dolly slowly for
+      // 3 s (yaw 15° → 28°, pitch 11° → 7°, a gentle pull-back), then hold. A crash past the
+      // line freezes physics at the tick before (`f.crashed` stays false), so the same hold runs.
       if (this.finishT < 0 || cut) this.finishT = t;
       const since = t - this.finishT;
-      this.fx.halfLife = lerp(0.12, 1.5, Math.min(1, since));
-      p.pitch -= 15 * DEG * Math.min(1, since);
-      p.heightFrac = Math.max(p.heightFrac, 0.2);
+      const ease = smoothstep(0, 1.5, since);
+      const dolly = smoothstep(0, 3.0, since);
+      this.fx.halfLife = lerp(0.12, 1.0, ease);
+      this.fy.halfLife = 0.18; // the run-out often slopes: keep the vertical follow snappy so the bike does not sink to the frame edge
+      const gateX = this.finishX;
+      const midX = lerp(f.bikeX, (f.bikeX + gateX) / 2, ease);
+      followTarget = { x: midX, y: f.bikeY };
+      // Width the frame needs for gate + bike + a margin, as a height fraction at this fov.
+      const need = Math.abs(f.bikeX - gateX) + 6;
+      const visibleH = need / this.aspect;
+      const hfFit = RIDER_HEIGHT / visibleH;
+      const hfHold = lerp(0.24, 0.17, dolly);
+      p.heightFrac = lerp(p.heightFrac, Math.max(0.13, Math.min(hfHold, hfFit)), ease);
+      p.screenX = lerp(p.screenX, 0.5, ease);
+      p.screenY = lerp(p.screenY, 0.58, ease);
+      p.yaw = lerp(p.yaw, moving * lerp(15, 28, dolly) * DEG, ease);
+      p.pitch = lerp(p.pitch, lerp(11, 7, dolly) * DEG, ease);
+      p.fov = lerp(p.fov, 34 * DEG, ease);
       this.state = 'finish';
     } else {
       this.finishT = -1;
@@ -246,7 +269,7 @@ export class CameraRig {
     }
 
     // --- Followed point: lookahead in x, dead-zone in y.
-    const lookTarget = Math.min(2.5, Math.max(-1.5, f.velX * 0.15));
+    const lookTarget = f.finished ? 0 : Math.min(2.5, Math.max(-1.5, f.velX * 0.15));
     const fxT = followTarget.x;
     // In the air (round 5, critic: "ground leaves the frame"): aim between the bike and the
     // landing zone and pull back with height, so the ground line stays in the bottom third.
@@ -277,7 +300,7 @@ export class CameraRig {
     } else {
       this.fx.follow(fxT, dt);
       const dy = fyT - this.fy.x;
-      const dead = f.airborne || f.crashed ? 0 : 0.6;
+      const dead = f.airborne || f.crashed || f.finished ? 0 : 0.6;
       // Airborne: the y follow and the pull-back tighten (a 0.35 s half-life lags an 8 m/s launch by 3 m).
       const airDt = f.airborne && !f.crashed ? dt * 2.5 : dt;
       if (Math.abs(dy) > dead) this.fy.follow(fyT - Math.sign(dy) * dead, airDt);

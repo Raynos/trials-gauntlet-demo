@@ -240,6 +240,10 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   const rocks = new PropBatch('edge-rock', rockGeometry(track.def.seed ^ 77, 1), lib.get('rock'));
   const pallets = new PropBatch('support-pallet', bakeAO(palletLowGeometry(), 0.144, 0.25), lib.get('pallet'), false);
   const stacks = new PropBatch('support-stack', palletStackGeometry(3), lib.get('pallet'), false);
+  // Round 9 (b1 read 1 920 stack instances = 346 k tris: a 2.5 m remainder was 18 pallets high):
+  // heights of 0.45–1.3 m get one plywood crate (12 tris), 1.3–2.5 m a steel frame, pallets
+  // only for the last < 0.45 m.
+  const crates = new PropBatch('support-crate', bakeAO(new THREE.BoxGeometry(2.2, 1, 2.2).translate(0, 0.5, 0), 1, 0.3), lib.get('plywood'), false);
   const containers = new PropBatch('support-container', bakeAO(containerGeometry(), 2.59, 0.4), lib.get('container'));
   const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a];
 
@@ -321,6 +325,22 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   if (interior) {
     const prof = track.def.profile;
     const deckBottom = 0.12;
+    // Fill `h` metres above `base` at slot `x` with the cheapest thing that reads as a support.
+    const fill = (x: number, base: number, h: number): void => {
+      if (h < 0.1) return;
+      if (h >= 1.3) {
+        for (const dx of [-0.9, 0.9]) {
+          for (const z of [-1.2, 1.2]) push(buckets, 'darkSteel', tint(box(0.08, h, 0.08, x + dx, base + h / 2, z, 0), 0.7, 0.7, 0.7));
+          push(buckets, 'darkSteel', tint(box(0.08, 0.08, 2.5, x + dx, base + h - 0.04, 0, 0), 0.7, 0.7, 0.7));
+        }
+      } else if (h >= 0.45) {
+        crates.add(x + rng.range(-0.02, 0.02), base, rng.range(-0.04, 0.04), rng.range(-0.02, 0.02), 1, null, 0, h, 1);
+      } else {
+        // Two wide (2.05×) pallet stacks, y-scaled to the height.
+        const sy = h / (3 * 0.144);
+        for (const z of [-0.85, 0.85]) stacks.add(x, base, z, rng.range(-0.02, 0.02), 2.05, null, 0, sy, 1);
+      }
+    };
     for (let x = prof[0]!.x + 1.25; x < prof[prof.length - 1]!.x; x += 2.5) {
       const y = Math.min(profileY(prof, x - 1.2), profileY(prof, x), profileY(prof, x + 1.2));
       const h = y - deckBottom - floorY;
@@ -328,20 +348,8 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
       if (h >= 2.5) {
         const n = Math.floor(h / 2.59);
         for (let k = 0; k < n; k++) containers.add(x + rng.range(-0.02, 0.02), floorY + k * 2.59, rng.range(-0.05, 0.05), Math.PI / 2 + rng.range(-0.01, 0.01), 1, palette[rng.int(0, palette.length - 1)]!);
-        const rem = h - n * 2.59;
-        const np = Math.max(0, Math.round(rem / 0.144));
-        const top = floorY + n * 2.59;
-        // Round 8 (tri budget): 3-layer stacks instead of single pallets (÷3 instances); a partial top stack is y-scaled.
-        for (let k = 0; k < np; k += 3) for (const z of [-0.85, 0.85]) stacks.add(x, top + k * 0.144, z, rng.range(-0.02, 0.02), 2.05, null, 0, Math.min(1, (np - k) / 3), 1);
-      } else if (h >= 1.3) {
-        for (const dx of [-0.9, 0.9]) {
-          for (const z of [-1.2, 1.2]) push(buckets, 'darkSteel', tint(box(0.08, h, 0.08, x + dx, floorY + h / 2, z, 0), 0.7, 0.7, 0.7));
-          push(buckets, 'darkSteel', tint(box(0.08, 0.08, 2.5, x + dx, floorY + h - 0.04, 0, 0), 0.7, 0.7, 0.7));
-        }
-      } else {
-        const sy = h / (3 * 0.144);
-        for (const dx of [-0.65, 0.65]) for (const z of [-0.8, 0.8]) stacks.add(x + dx + rng.range(-0.03, 0.03), floorY, z + rng.range(-0.03, 0.03), rng.range(-0.05, 0.05), 1, null, 0, sy, 1);
-      }
+        fill(x, floorY + n * 2.59, h - n * 2.59);
+      } else fill(x, floorY, h);
     }
   }
 
@@ -437,7 +445,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     triangles += triCount(merged);
     drawCalls++;
   }
-  for (const b of [rocks, pallets, stacks, containers]) {
+  for (const b of [rocks, pallets, stacks, crates, containers]) {
     const im = b.build();
     if (!im) continue;
     supports.add(im);

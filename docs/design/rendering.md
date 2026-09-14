@@ -13,18 +13,19 @@ byte-identical (verified round 1: `md5` of the mp4 and `cmp` of PNG frames match
 Sources for the numbers: `reference/notes/{rising-visuals,techniques,evolution-gameplay,crash-restart-ui}.md`.
 three 0.186.0 addons used: `EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, BufferGeometryUtils`.
 
-## 0. Budgets and where they stand (round 4, flat-test, industrial, `high`; single-track session)
+## 0. Budgets and where they stand (round 9 figures in bold where re-measured; one track per session)
 
 | Budget | Cap | Round 1 | Where measured |
 |---|---|---|---|
 | Draw calls | 300 (400 with an AO pre-pass) | round 7 flat-test `high` 194 riding (set pieces +≈20, AO +2); e1 156, m2 146, h1 155, h3 217 — 202 idle / ≈215 riding (+62 with the ghost; round 5 added 8 skin batches + 5 prop types + deck AO) — bike frame and rider segments are merged per material (`util/merge.ts`) | `renderer.info.render.calls` (accumulated over all passes; `info.autoReset=false`) |
-| Triangles | 500 k | round 7: 332 k flat-test, 489 k e1, 250 k m2, 207 k h1, **639 k h3** (shadow pass counted; see gaps) — 326 k (deck on a continuous container + pallet base, three container rows, hall structure; shadow pass counted) | `renderer.info.render.triangles` |
+| Triangles | 500 k | **round 9: b1 290 k, e1 195 k, m2 266 k, h1 148 k, h3 230 k, x1 356 k** (shadow pass counted; instanced batches chunked per 40 m and frustum-culled — b1 read 1.05 M before) — round 7: 332 k flat-test, 489 k e1, 250 k m2, 207 k h1, 639 k h3 | `renderer.info.render.triangles` |
 | Texture memory | 96 MB | round 7: 44.0 industrial, 46.1 canyon, 41.8 snow, 59.4 nightCity (3 facades + shops + neon + masks), 46.0 foundry | `estimateTextureMB` (all maps incl. mips, env, canvas textures) |
 | Track + obstacles | 20 calls / 80 k tris | 11 calls / 5.1 k tris (12-kind synthetic track) | `debugInfo().trackCalls/trackTris` |
 | Texture generation | 400 ms desktop, after first frame | ≈330–400 ms in headless Chromium (SwiftShader host) | `debugInfo().textureGenMs` |
-| Shader programs | 40 (raised round 5) | round 7: 37 flat-test `high` (AO +2, crowd card +1), 32/29/34/37 on e1/m2/h1/h3, 19 on `low`; 34 on flat-test after the round-6 hero (riderCloth reuses the vertex-colour variant; +0 programs) | `info.programs` |
+| Shader programs | 40 (raised round 5) | **round 9, one track per session: b1 38, e1 35, m2 31, h1 37, h3 39** (the round-8 "50 / 53" were one session accumulating five tracks) — round 7: 37 flat-test `high`, 19 on `low` | `info.programs` (accumulates per session — measure one track per session) |
 | Restart → frame | 1 frame | 1 frame; no rebuild on restart | capture scene detector, scratch `restart.mts` |
-| Synced frame, SwiftShader | p95 250 ms | `high` p50 134 ms, `low` p50 75 ms (56 %) | scratch `timing.mts`, 24 frames after warm-up |
+| Boot (`prepare`) | no task > 50 ms except GPU compiles; boot art ≤ 1 MB | round 9: every JS task ≤ 42 ms (bike kit 42, rider 33, materials ≤ 12 ms slices, shaders 2 materials/task, art rebuild 380 ms → see gaps); boot art 0.99 MB (was 2.77) | scratch `render6/prepare.mts` (harness) and `boot.mts` (real loader) |
+| Synced frame, SwiftShader | p95 250 ms | round 9 (b1, load 17): `high` p50 160–175 / p95 247–257 ms, `low` p50 69–71 / p95 114–117 ms (**41–44 %**); round 6 (quiet): `high` p50 134 ms, `low` p50 75 ms (56 %) | scratch `timing.mts`, 24 frames after warm-up |
 | JS heap growth | 5 MB / 60 s | −1.8 MB | `harness:perf` |
 
 ## 1. Frame and cues (`frame.ts`)
@@ -73,6 +74,15 @@ src/render/
   post/chain.ts           EffectComposer: RenderPass (HalfFloat + depth tex on high) → AOPass (half-res SSAO, high only) → UnrealBloom → Composite (heat haze, AO, smear, ACES, grade, vignette, chroma, flash, dither, sRGB)
 ```
 
+**Boot (round 9).** The constructor makes the WebGL context, the material table (flat colours), the
+camera rig, the frame builder and the particle pools — nothing else. `prepare(report)` builds the
+rest in ≤ 16 ms tasks (art boot set · bike kit · rider kit · lighting · post chain · painters in
+12 ms row bands · glTF hero · shaders two materials per `compileAsync` · first frame in two rows);
+`render()` before that finishes paints a fog-colour placeholder in play mode (the loader covers the
+canvas; it also starts `prepare()` if nobody has) and builds everything synchronously in harness mode
+(`preserveDrawingBuffer`), so a capture's first frame is final. `debugInfo().prepare` is the
+timeline (step, ms, bytes).
+
 `render()` per frame: `frames.build` → (frame 2 only) `lib.generateTextures()` → `rig.update` →
 `lighting.follow(rig.target)` → `bike.update` → `rider.update` → ghost (`ghostFrames.build` + its own bike/rider) → seesaw/drum/lamp/flicker updates
 → `emitters.update` → `post.setDynamics` → `post.render()`. `renderer.info` is reset once per
@@ -117,8 +127,14 @@ round 1: idle 0.45 / 0.55 / 0.399; riding at 8.6 m/s 0.40 / 0.55 / 0.30; fast 0.
 
 Beats: **landing shake** `a = clamp(impulse·0.02, 0, 0.12) · e^(−t/0.18) · sin(2π·9t)` on y plus
 ±0.8° roll. **Crash**: target → ragdoll pelvis (or bike), follow half-lives ramp 0.12 → 1.0 over
-1 s, then `heightFrac` creeps 2.5 %/s; pitch 14°, yaw 12°, bike at x 0.45. **Finish**: follow
-half-life → 1.5 s, pitch drops 15° over 1 s, heightFrac ≥ 0.2. **Restart**: hard cut (every
+1 s, then `heightFrac` creeps 2.5 %/s; pitch 14°, yaw 12°, bike at x 0.45. **Finish** (round 9): the game cuts throttle and auto-brakes on a 30 m run-out; the x-follow
+half-life eases 0.12 → 1.0 s over 1.5 s onto the **midpoint between the finish gate and the bike**
+(the y-follow stays at 0.18 s with no dead-zone — run-outs slope), the frame widens so gate + bike +
+6 m fit (heightFrac `min(hold, 1.9·aspect / need)`, floor 0.13), screenX → 0.5, and a 3 s dolly runs
+yaw 15° → 28°, pitch 11° → 7°, hold 0.24 → 0.17, then everything holds. Lookahead is 0 after the
+line. `index.ts` passes speed 0 to the composite after the line: **no smear, no chromatic aberration**.
+A crash past the line freezes physics at the tick before (`f.crashed` stays false), so the same hold
+runs. Evidence: `scratchpad/render6/finish/b1-finish-6s.mp4` + `finish-sheet.jpg`. **Restart**: hard cut (every
 smoother snapped). **Countdown/menu** (`setRunInfo.phase`): idle params held.
 
 `meta.camera` keys: while `bikeX ∈ [x0, x1]` a per-key weight follows 1 (half-life `blend/3`,
@@ -648,27 +664,121 @@ limit 8.29 (never bound in y), z clamp bound on 31 frames at the hall front (z 2
 frames, 0 outside [0.15, 0.85]², worst offset 0.284; max bike apex 3.17 m. Stranger recordings not
 run (25 s wall per clip second on this host).
 
-## 12. Known gaps after round 8 (what still reads non-AAA, and what the coordinator asked for that is not done)
+## 11d. Round 9 — boot cost, finish camera, culling, glTF wrist / hand-over, snow mid-tier
 
-- **Finish camera** (user frame: motion-blur smear after the line): not done. Wanted: ease out of the
-  forward follow within 1.5 s, hold a medium-wide frame on the coasting bike, no smear after the
-  line, fireworks in frame, 3 s dolly; same hold on a crash past the line. `rig.ts` finish beat +
-  `post.setDynamics` smear gate on `f.finished`.
-- **Boot cost**: the constructor still starts the whole world/plate art fetch (2.8 MB) — should
-  load the showcase biome's assets first and the rest lazily on `setTrack`; `prepare()` exists and
-  chunks materials per job and shaders per two materials, but a 512² painter job is 50–65 ms on this
-  host (split the painter by rows to get under 16 ms) and the first shader compile is one task.
-- **Harness determinism gate not re-run this round** (two captures + `cmp`): every new effect is
-  clocked from tSim / seeded, and the art/hero loads are gated by `whenReady`, but the capture path
-  itself renders before the pack settles until the hook awaits `renderer.whenReady()` in
-  `loadTrack` (request to core-game).
-- glTF rider: limbs are direction-driven from the chain, so the wrist sits ≤ 3.5 cm off the grip at
-  mid-lean (bone lengths are fixed); no ragdoll hand-over blend; `idle_breathe`/`land_absorb`/`extend`
-  are additive deltas and untuned against the reference. The glTF bike's chain scroll direction is
-  unverified. GLTFLoader sanitises bone names (`shoulder.L` -> `shoulderL`): `boneName()` normalises.
-- Foundry tri count after the support-stack cut is not re-measured (was 591 k with shadow culls).
-- Snow: the near pine silhouette tier reads as white paper cut-outs in front of the art plate —
-  drop it when the plate is present.
+**Boot cost (user on 3G: title at ≈ 70 s).** Three causes, three fixes:
+
+1. *The constructor fetched the whole pack (2.77 MB).* `ArtLibrary` now loads in tiers: `load()` =
+   manifest + the **boot set** (`BOOT_IDS`: banners ×6, crowd-day, tyremark-arc, the six accepted
+   stencils, edge-grime + spatter masks, plate-industrial — **0.99 MB**, what the title's industrial
+   backdrop shows at the start gate); `request(ids, label)` fetches anything else on demand, queued
+   behind the boot set. `setTrack` requests `idsFor(biome)` (industrial adds the 12 back-wall decals
+   = 1.07 MB; canyon/snow/nightCity their plate + sky ≈ 0.05–0.09 MB; foundry/nightCity the night
+   crowd) and reports it through the loader callback as `World art · <biome> (n MB) k/n (a / b MB)`.
+   `whenReady()` waits for the boot set, the current track's request and the glTF hero, so frame 0 is
+   art-complete once `hook.loadTrack` awaits it. The five rejected assets (`stencil-apex/taro`,
+   `tyremark-straight`, `mask-rivet-drips/rust-streaks`) are never fetched. **All-or-nothing**: the
+   world uses the pack only once the biome's whole set has settled (a partial set made two captures
+   differ by which files had landed — found by the two-capture gate this round); an undrawn world is
+   rebuilt on settle. Skies for industrial/foundry are unused and never loaded.
+2. *The constructor built the hero, lighting (sky PMREM) and post chain, and the loader could not
+   split them.* They are lazy (`ensureHero / ensureLighting / post` getters) and `prepare()` builds
+   them as separate reported tasks. Painters run as `TexGenJob.step(budgetMs)` row bands (paint
+   pass then Sobel pass), so the 512² jobs that were 50–65 ms tasks are ≤ 12 ms slices with
+   identical output. The real front end renders the menu backdrop before `main.ts` calls
+   `prepare()`; a play-mode `render()` before boot paints a placeholder instead of doing the
+   synchronous build (that alone put the whole build into the first rAF and defeated the chunking).
+3. *Tinted grime masks were recomputed per skin* (16 × 512² `getImageData`): memoised per
+   (mask, colour, strength) — the art rebuild task 962 → 380 ms on the loaded host.
+
+Real-boot timeline (`boot.mts`, play mode, b1 backdrop, SwiftShader, **load average 29–36**; the JS
+numbers are the ones that transfer to a real GPU, the GPU ones do not):
+
+| step | ms | bytes | note |
+|---|---|---|---|
+| art:start | 3 | — | fetch kicked off |
+| hero:bike | 42 | — | procedural bike geometry |
+| hero:rider | 33 | — | procedural rider geometry |
+| lighting | 1 | — | sky + PMREM issued; SwiftShader compiles it at the next flush (a 6.0–6.7 s task landing in the materials phase) |
+| post:create | 1 | — | |
+| materials | 360 CPU (6.6–8.1 s wall incl. the PMREM flush) | 26.0 MB GPU | 11 jobs in 12 ms slices, ≈ 30 slices |
+| art:settled | 0 | 2.06 MB (boot 0.99 + industrial decals 1.07) | both sets in by then on the LAN |
+| shaders | 900–1200 | — | 93 materials, 2 per `compileAsync`; SwiftShader ≈ 20 ms/program |
+| firstframe:world | 9 945 | — | SwiftShader pipeline JIT for every program (real driver: tens of ms) |
+| firstframe:post | 711–796 | — | composer programs |
+
+Long tasks over the whole boot: module evaluate ≈ 1.0 s and compose ≈ 0.9 s (three.js parse, WebGL
+context — the loader's own rows), loadTrack 132 ms, the art rebuild 380 ms, and the three GPU
+compiles; **no other task > 50 ms**. The 3G title cost is now core JS + 0.99 MB instead of + 2.77 MB.
+Harness-path probe (`prepare.mts`, b1, load 16–17): constructor 151 ms (the WebGL context; 182 with
+everything in it before), loadTrack 64 ms, prepare 8.8 s of which 2.6 s (PMREM flush) + 4.5 s
+(first draw) are the SwiftShader compiles, long tasks = those two + one 274 ms (post first frame),
+`whenReady` wait after prepare 0 ms, 38 programs.
+
+**Culling (the real triangle bug).** `PropBatch.build()` returned one unculled `InstancedMesh` per
+batch, so a 600 m course drew every support, drum and catwalk instance every frame, twice with the
+shadow pass: b1 read **1 045 k** tris (346 k of it 1 920 support-pallet stacks — a 2.5 m remainder
+under the deck was filled 18 pallets high). Now: one `InstancedMesh` per 40 m of x with a computed
+bounding sphere and `frustumCulled = true` (three culls the shadow pass the same way); deck fills of
+0.45–1.3 m are one plywood crate, 1.3–2.5 m a steel frame, pallets only for the last 0.45 m; drums
+168 tris (was 280); hall floor clutter behind the deck (z < −4) in shadow-culled batches with the
+low pallet. Per-track numbers in §0 (b1 1 045 k → 290 k; h3 743 k → 230 k). The static `trackTris`
+(`debugInfo`) still counts the whole merged deck + supports (b1 136 k, h3 158 k): the ride surface
+meshes are one merged mesh per material and are not chunked yet.
+
+**Programs.** Fresh session per track: b1 38, e1 35, m2 31, h1 37, h3 39 — all ≤ 40. The round-8
+50 / 53 readings were one session accumulating five tracks (`info.programs` never shrinks). One real
+leak found: the pre-compile in `prepare()` ran `compileAsync` (and a plain warm-up draw) against
+the **canvas**, whose sRGB output is a program parameter, so every material got a second variant
+that the composer never uses (56–59 programs after a loader boot). Both now bind the composer's HDR
+scene target (`PostChain.sceneTarget`, `renderSceneOnly`) → 38 after boot, same as the direct path.
+
+**Determinism.** Two captures of `flat-test-clear` (90 frames, `high`): 0 differing frames, mp4 md5
+identical (`render6/determinism.mts`). The first run of the gate caught the partial-art race above.
+
+**glTF rider.** Arms are now a two-bone IK in the *rig's* bone lengths (bind-pose world distances:
+0.32 + 0.30 = 0.62, same reach as the chain) from the rig's posed shoulder joint to the chain's grip
+point, with the chain's elbow as the pole — `debug.wristErr` is 0.000 m in every pose of the hero
+grid (round 8: ≤ 3.5 cm). **Ragdoll hand-over**: on the ragdoll's first frame the last posed
+bone-local quaternions and the pelvis' world pose are snapshotted before the re-parent and slerped
+out over 2 / 3 / 4 / 5 frames for a pelvis residual < 0.1 / 0.2 / 0.3 / more m (measured 0.36–0.44 m
+on flat-test loop-outs → 5 frames; `debug.ragdollResidual / ragdollBlend`). `land_absorb` weight
+scales with the landing impulse (0.35 at 1.5 → 0.9 at 4+), `extend` 0.5 → 0.7 on the hop push.
+
+**Snow.** The near pine silhouette strip (flat `0x2c3a34` plane at z −40) is gone when the plate is
+present; a sparse row of 1.25–1.9× conifers at z −27…−38 gives the mid-ground step and the
+mountain plate reads between them (`render6/snow-m2b.png`).
+
+**Evidence.** Finish: `render6/finish/b1-finish-6s.mp4` (+ `finish-sheet.jpg`). Hero:
+`render6/hero-grid-r9.jpg` (top proc, bottom glTF: idle / riding / wheelie ; crouch / lean-fwd /
+crash), `render6/hero-proc/hero-proc-4s.mp4`, `render6/hero-gltf/hero-gltf-4s.mp4`.
+
+## 12. Known gaps after round 9 (what still reads non-AAA, and what the coordinator asked for that is not done)
+
+- **3G first run**: the title now waits for 0.99 MB of art, but an industrial run's `whenReady`
+  still waits for the 12 back-wall decals (1.07 MB, six 768² graffiti = 0.79 MB of it). Request to
+  the art owner: graffiti / posters re-encoded ≤ 40 KB each (lossy webp with alpha), or a 512²
+  variant for the pack — the render side needs no change.
+- **Loader `report` order**: `main.ts` calls `prepare((done, total, label) => …)`; the renderer now
+  reports in that order (round 8 reported `(name, done, total)` — the loader showed the name as the
+  count).
+- `setTrack` is still one synchronous task (contract): 132 ms procedural, 380 ms with the art
+  (container skins: 8 × 1024×512 canvases + decal batches) on the loaded host. Splitting it needs an
+  async `setTrack` or a pre-baked skin sheet from the art owner.
+- The merged ride-surface meshes span the whole track (`deck:plywood` 45 k, `deck:dirt` 24 k on
+  b1) — chunk them per 40 m like the props to bring `trackTris` per frame under the 80 k contract
+  figure on long courses.
+- SwiftShader's first-draw pipeline JIT (6–10 s tasks) cannot be split from JS; a real driver
+  compiles in parallel under `compileAsync`. The loader rows show it as `First frame · …`.
+- `low` = 41–44 % of `high` at load 17; a quiet-machine measurement (load < 8) has not been possible
+  this round (load average 17–36 all day).
+- Foundry / nightCity / canyon looks unchanged from round 8 (§12 items below still stand).
+
+- glTF rider: `idle_breathe`/`land_absorb`/`extend` are additive deltas tuned by eye, not against the
+  reference clips. The glTF bike's chain scroll direction is unverified. GLTFLoader sanitises bone
+  names (`shoulder.L` -> `shoulderL`): `boneName()` normalises. Harness captures still render before
+  the pack settles until `hook.loadTrack` awaits `renderer.whenReady()` (core-game; the renderer side
+  is done).
 - nightCity reflections are still the sign/lamp streak decals only; canyon far tier is the plate.
 - Perf numbers this round were taken at load 20–34; only within-run ratios are trustworthy.
 

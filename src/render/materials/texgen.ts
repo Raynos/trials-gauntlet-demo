@@ -138,70 +138,133 @@ function clamp01(x: number): number {
   return x < 0 ? 0 : x > 1 ? 1 : x;
 }
 
-/** Run a painter over a size x size tile and pack the three maps. */
+/**
+ * A painter job that can be run in slices (round 9: the loading screen must never block
+ * > 16 ms, and a 512² painter is 50–65 ms on a slow host). `step(budgetMs)` paints rows
+ * until the budget is spent — first the painter pass, then the Sobel normal pass — and
+ * returns true when the job is finished; `result` is then set. The output is identical to
+ * running it in one go (row order is the only thing the budget changes).
+ */
+export class TexGenJob {
+  readonly n: Noise;
+  private readonly albedo: Uint8Array;
+  private readonly orm: Uint8Array;
+  private readonly normal: Uint8Array;
+  private readonly height: Float32Array;
+  private row = 0;
+  private phase: 0 | 1 | 2 = 0;
+  result: TexSet | null = null;
+
+  constructor(readonly size: number, seed: number, private readonly paint: Painter, private readonly normalStrength = 1.5) {
+    this.n = new Noise(seed);
+    this.albedo = new Uint8Array(size * size * 4);
+    this.orm = new Uint8Array(size * size * 4);
+    this.normal = new Uint8Array(size * size * 4);
+    this.height = new Float32Array(size * size);
+  }
+
+  get done(): boolean {
+    return this.phase === 2;
+  }
+
+  /** Fraction of rows done over both passes. */
+  get progress(): number {
+    return this.phase === 2 ? 1 : (this.phase * this.size + this.row) / (2 * this.size);
+  }
+
+  /** Paint until `budgetMs` of wall time is spent (Infinity = run to completion). Returns true when done. */
+  step(budgetMs: number): boolean {
+    if (this.phase === 2) return true;
+    const t0 = budgetMs === Infinity ? 0 : performance.now();
+    const size = this.size;
+    const inv = 1 / size;
+    // Rows per time check: 8 rows of 512 (4 k pixels) is ≈ 1–2 ms on a slow host.
+    const band = size >= 512 ? 8 : 16;
+    while (this.phase === 0) {
+      const y1 = Math.min(size, this.row + band);
+      for (let y = this.row; y < y1; y++) {
+        for (let x = 0; x < size; x++) {
+          px.rough = 0.5;
+          px.metal = 0;
+          px.ao = 1;
+          this.paint((x + 0.5) * inv, (y + 0.5) * inv, this.n, px);
+          const i = (y * size + x) * 4;
+          this.albedo[i] = clamp01(px.r) * 255;
+          this.albedo[i + 1] = clamp01(px.g) * 255;
+          this.albedo[i + 2] = clamp01(px.b) * 255;
+          this.albedo[i + 3] = 255;
+          this.orm[i] = clamp01(px.ao) * 255;
+          this.orm[i + 1] = clamp01(px.rough) * 255;
+          this.orm[i + 2] = clamp01(px.metal) * 255;
+          this.orm[i + 3] = 255;
+          this.height[y * size + x] = px.h;
+        }
+      }
+      this.row = y1;
+      if (this.row >= size) {
+        this.phase = 1;
+        this.row = 0;
+      }
+      if (budgetMs !== Infinity && performance.now() - t0 >= budgetMs) return false;
+    }
+    // Sobel → tangent-space normal (periodic).
+    const height = this.height;
+    const H = (x: number, y: number): number => height[((y + size) % size) * size + ((x + size) % size)]!;
+    const k = this.normalStrength * size * 0.02;
+    const normal = this.normal;
+    while (this.phase === 1) {
+      const y1 = Math.min(size, this.row + band * 2);
+      for (let y = this.row; y < y1; y++) {
+        for (let x = 0; x < size; x++) {
+          const dx = H(x + 1, y - 1) + 2 * H(x + 1, y) + H(x + 1, y + 1) - H(x - 1, y - 1) - 2 * H(x - 1, y) - H(x - 1, y + 1);
+          const dy = H(x - 1, y + 1) + 2 * H(x, y + 1) + H(x + 1, y + 1) - H(x - 1, y - 1) - 2 * H(x, y - 1) - H(x + 1, y - 1);
+          let nx = -dx * k;
+          let ny = -dy * k;
+          let nz = 1;
+          const len = Math.hypot(nx, ny, nz);
+          nx /= len;
+          ny /= len;
+          nz /= len;
+          const i = (y * size + x) * 4;
+          normal[i] = (nx * 0.5 + 0.5) * 255;
+          normal[i + 1] = (ny * 0.5 + 0.5) * 255;
+          normal[i + 2] = (nz * 0.5 + 0.5) * 255;
+          normal[i + 3] = 255;
+        }
+      }
+      this.row = y1;
+      if (this.row >= size) {
+        this.phase = 2;
+        break;
+      }
+      if (budgetMs !== Infinity && performance.now() - t0 >= budgetMs) return false;
+    }
+    const mk = (data: Uint8Array, srgb: boolean): THREE.DataTexture => {
+      const t = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.generateMipmaps = true;
+      t.minFilter = THREE.LinearMipmapLinearFilter;
+      t.magFilter = THREE.LinearFilter;
+      t.anisotropy = 4;
+      if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+      t.needsUpdate = true;
+      return t;
+    };
+    this.result = {
+      map: mk(this.albedo, true),
+      normalMap: mk(this.normal, false),
+      ormMap: mk(this.orm, false),
+      bytes: size * size * 4 * 3 * 1.333,
+    };
+    return true;
+  }
+}
+
+/** Run a painter over a size x size tile and pack the three maps (in one go). */
 export function generate(size: number, seed: number, paint: Painter, normalStrength = 1.5): TexSet {
-  const n = new Noise(seed);
-  const albedo = new Uint8Array(size * size * 4);
-  const orm = new Uint8Array(size * size * 4);
-  const height = new Float32Array(size * size);
-  const inv = 1 / size;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      px.rough = 0.5;
-      px.metal = 0;
-      px.ao = 1;
-      paint((x + 0.5) * inv, (y + 0.5) * inv, n, px);
-      const i = (y * size + x) * 4;
-      albedo[i] = clamp01(px.r) * 255;
-      albedo[i + 1] = clamp01(px.g) * 255;
-      albedo[i + 2] = clamp01(px.b) * 255;
-      albedo[i + 3] = 255;
-      orm[i] = clamp01(px.ao) * 255;
-      orm[i + 1] = clamp01(px.rough) * 255;
-      orm[i + 2] = clamp01(px.metal) * 255;
-      orm[i + 3] = 255;
-      height[y * size + x] = px.h;
-    }
-  }
-  // Sobel → tangent-space normal (periodic).
-  const normal = new Uint8Array(size * size * 4);
-  const H = (x: number, y: number): number => height[((y + size) % size) * size + ((x + size) % size)]!;
-  const k = normalStrength * size * 0.02;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const dx = H(x + 1, y - 1) + 2 * H(x + 1, y) + H(x + 1, y + 1) - H(x - 1, y - 1) - 2 * H(x - 1, y) - H(x - 1, y + 1);
-      const dy = H(x - 1, y + 1) + 2 * H(x, y + 1) + H(x + 1, y + 1) - H(x - 1, y - 1) - 2 * H(x, y - 1) - H(x + 1, y - 1);
-      let nx = -dx * k;
-      let ny = -dy * k;
-      let nz = 1;
-      const len = Math.hypot(nx, ny, nz);
-      nx /= len;
-      ny /= len;
-      nz /= len;
-      const i = (y * size + x) * 4;
-      normal[i] = (nx * 0.5 + 0.5) * 255;
-      normal[i + 1] = (ny * 0.5 + 0.5) * 255;
-      normal[i + 2] = (nz * 0.5 + 0.5) * 255;
-      normal[i + 3] = 255;
-    }
-  }
-  const mk = (data: Uint8Array, srgb: boolean): THREE.DataTexture => {
-    const t = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
-    t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    t.generateMipmaps = true;
-    t.minFilter = THREE.LinearMipmapLinearFilter;
-    t.magFilter = THREE.LinearFilter;
-    t.anisotropy = 4;
-    if (srgb) t.colorSpace = THREE.SRGBColorSpace;
-    t.needsUpdate = true;
-    return t;
-  };
-  return {
-    map: mk(albedo, true),
-    normalMap: mk(normal, false),
-    ormMap: mk(orm, false),
-    bytes: size * size * 4 * 3 * 1.333,
-  };
+  const job = new TexGenJob(size, seed, paint, normalStrength);
+  job.step(Infinity);
+  return job.result!;
 }
 
 // ---------------------------------------------------------------------------

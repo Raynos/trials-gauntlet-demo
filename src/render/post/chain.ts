@@ -294,8 +294,8 @@ export class PostChain {
 
   constructor(
     private readonly renderer: THREE.WebGLRenderer,
-    scene: THREE.Scene,
-    camera: THREE.Camera,
+    private readonly scene: THREE.Scene,
+    private readonly camera: THREE.Camera,
   ) {
     // On `high` the scene target carries a depth texture so the AO pass needs no second
     // geometry pass (attached in setQuality: a depth-texture attachment costs ≈80 % more
@@ -376,6 +376,22 @@ export class PostChain {
 
   render(): void {
     this.composer.render();
+  }
+
+  /**
+   * Warm-up (round 9 `prepare`): the scene pass alone into the composer's HDR target — the
+   * same programs the real frame uses (a draw to the canvas would compile a second, sRGB-output
+   * variant of every material: +19 programs for nothing).
+   */
+  /** The composer's HDR scene target (bind it while pre-compiling so the programs match the real frame). */
+  get sceneTarget(): THREE.WebGLRenderTarget {
+    return this.composer.renderTarget1;
+  }
+
+  renderSceneOnly(): void {
+    this.renderer.setRenderTarget(this.composer.renderTarget1);
+    this.renderer.render(this.scene, this.camera);
+    this.renderer.setRenderTarget(null);
   }
 
   get info(): { passes: number } {

@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import type { SurfaceKind } from '../../core/types';
 import { fogify } from '../lighting/environment';
-import { flatSet, generate, painters, type PainterName, type TexSet } from './texgen';
+import { flatSet, painters, TexGenJob, type PainterName, type TexSet } from './texgen';
 
 interface TexJob {
   painter: PainterName;
@@ -205,14 +205,41 @@ export class MaterialLibrary {
     return this.nextJob;
   }
 
-  /** Run one texture job (≈ 20–80 ms of CPU). Returns false when all are done. */
-  generateStep(): boolean {
+  /** Job in progress (round 9: painters run in row bands so no loader task exceeds the budget). */
+  private current: TexGenJob | null = null;
+
+  /** Name of the job in progress / next up (for the loading screen). */
+  get currentJobName(): string {
+    const job = MaterialLibrary.JOBS[Math.min(this.nextJob, MaterialLibrary.JOBS.length - 1)];
+    return job ? `${job.painter} ${job.size}²` : '';
+  }
+
+  /** Fraction of all texture work done (whole jobs + the current job's rows). */
+  get generateProgress(): number {
+    const n = MaterialLibrary.JOBS.length;
+    return Math.min(1, (this.nextJob + (this.current?.progress ?? 0)) / n);
+  }
+
+  /**
+   * Run texture work for up to `budgetMs` of wall time (Infinity = one whole job, the
+   * synchronous path). Returns false when every job is done. A job that finishes inside the
+   * budget binds its maps at once; the next job starts on the next call.
+   */
+  generateStep(budgetMs = Infinity): boolean {
     const jobs = MaterialLibrary.JOBS;
     if (this.nextJob >= jobs.length) return false;
     const t0 = performance.now();
-    const idx = this.nextJob++;
+    const idx = this.nextJob;
     const job = jobs[idx]!;
-    const set = generate(job.size, (this.seed ^ Math.imul(idx + 1, 0x9e3779b9)) >>> 0, painters[job.painter], job.strength);
+    if (!this.current) this.current = new TexGenJob(job.size, (this.seed ^ Math.imul(idx + 1, 0x9e3779b9)) >>> 0, painters[job.painter], job.strength);
+    const finished = this.current.step(budgetMs);
+    if (!finished) {
+      this.generateMs += performance.now() - t0;
+      return true;
+    }
+    const set = this.current.result!;
+    this.current = null;
+    this.nextJob++;
     this.sets.push(set);
     this.textureBytes += set.bytes;
     if (job.rotate) {

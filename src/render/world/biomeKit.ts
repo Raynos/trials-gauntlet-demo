@@ -662,7 +662,10 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       plate.receiveShadow = false;
       plate.renderOrder = -2;
       // One near silhouette tier keeps the mid-ground depth step (fogged like the props).
-      const near = biome.id === 'canyon' ? { z: -45, h: 26, kind: 'mesa' as const, color: 0x5a3a2c, yOff: -3 } : biome.id === 'snow' ? { z: -40, h: 18, kind: 'pine' as const, color: 0x2c3a34, yOff: -2 } : { z: -45, h: 30, kind: 'city' as const, color: 0x14161c, yOff: -3 };
+      // Round 9: not for snow — the flat pine strip read as paper cut-outs in front of the
+      // plate; the snow kit puts a row of real conifers at z −30…−44 instead.
+      const near = biome.id === 'canyon' ? { z: -45, h: 26, kind: 'mesa' as const, color: 0x5a3a2c, yOff: -3 } : biome.id === 'snow' ? null : { z: -45, h: 30, kind: 'city' as const, color: 0x14161c, yOff: -3 };
+      if (near) {
       const st = silhouette(near.kind, rng);
       textureBytes += 2048 * 512 * 4 * 1.33;
       const w = span * 3 + Math.abs(near.z) * 2;
@@ -678,6 +681,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       fogify(mat);
       const m = addPlane(w, near.h, mat, midX, floorY + near.h / 2 + near.yOff, near.z);
       m.receiveShadow = false;
+      }
     } else {
     const tiers: { z: number; h: number; kind: 'mesa' | 'pine' | 'city' | 'girder' | 'hills'; color: number; yOff: number }[] =
       biome.id === 'canyon'
@@ -782,6 +786,18 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       for (let x = x0 + 2; x < x1; x += rng.range(2.2, 4.5)) {
         if (rng.next() > 0.25) banks.add(x, profileY(profile, x) - 0.55, rng.range(-4.2, -3.0), rng.range(0, 6), rng.range(1.4, 2.8), null, 0, rng.range(0.45, 0.9), rng.range(0.7, 1.1));
         if (rng.next() > 0.55 && !keepOut(x, 1.5)) banks.add(x, profileY(profile, x) - 0.6, rng.range(3.6, 4.6), rng.range(0, 6), rng.range(1.0, 2.0), null, 0, rng.range(0.3, 0.6), rng.range(0.5, 0.8));
+      }
+      // Mid-ground tier (round 9): larger conifers at z −27…−38, fogged by depth, in place of the
+      // painted silhouette strip when the plate is present.
+      if (art?.has('plate-snow')) {
+        for (let x = x0 - 40; x < x1 + 40; x += rng.range(10, 18)) {
+          const z = rng.range(-38, -27);
+          const sc = rng.range(1.25, 1.9);
+          const ry = rng.range(0, 6);
+          const gy = gyAt(x, Math.max(z, -28));
+          pines.add(x, gy - 0.6, z, ry, sc);
+          caps.add(x, gy - 0.6, z, ry, sc);
+        }
       }
       for (let x = x0 + 4; x < x1; x += rng.range(2.5, 6)) {
         const z = rng.range(-18, -4.5);

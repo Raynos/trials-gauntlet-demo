@@ -1,12 +1,18 @@
 /**
- * ArtLibrary (round 8): the generated art pack (`public/art/manifest.json`) for the
- * world — far plates + skies, container stencils + grime masks, posters / signs /
- * graffiti, sponsor banners, crowd sheets, tyre marks. Loading starts in the renderer
- * constructor; `whenSettled` resolves once every world/plate asset has either decoded or
- * failed (a failure just means the procedural fallback stays). The world is (re)built from
- * whatever is present, so a capture is either all-art or all-procedural, never a mix that
- * changes mid-run — `ThreeRenderer.ready` waits for `settled` so the first captured frame
- * is the final look.
+ * ArtLibrary (round 8, tiered in round 9): the generated art pack (`public/art/manifest.json`)
+ * for the world — far plates + skies, container stencils + grime masks, posters / signs /
+ * graffiti, sponsor banners, crowd sheets, tyre marks.
+ *
+ * Round 9 (user on 3G saw the title at ~70 s: the constructor fetched all 2.8 MB): the pack
+ * loads in tiers. `load()` fetches the manifest and the **boot set** — only what the showcase
+ * biome (industrial: the title's backdrop) shows near the start gate (plate, stencils, grime,
+ * banners, crowd, tyre mark; ≈ 0.9 MB). `request(ids)` fetches anything else on demand; the
+ * renderer asks for `idsFor(biome)` in `setTrack` (the other biomes' plates + skies, the wall
+ * decals, the night crowd) and `whenReady()` waits for that request, so frame 0 of a run is
+ * art-complete while the title never waits for canyon's sky. Every fetch is one `fetch` +
+ * `createImageBitmap` (decode off the main thread); a failure just keeps that item
+ * procedural. The world is (re)built from whatever is present, so a capture is either
+ * all-art or all-procedural, never a mix that changes mid-run.
  *
  * Bitmaps are decoded with `imageOrientation: 'flipY'` (three ignores `texture.flipY` for
  * ImageBitmap), so canvas compositing goes through `drawArt`, which flips back.
@@ -33,11 +39,44 @@ export interface ArtEntry {
 /** Entries the renderer never needs (menu art is the UI owner's). */
 const SKIP_PREFIX = 'art/menu/';
 
+/** Assets the art owner rejected in the manifest (`rejected[]`) — never fetched, never drawn. */
+const REJECTED = new Set(['stencil-apex', 'stencil-taro', 'tyremark-straight', 'mask-rivet-drips', 'mask-rust-streaks']);
+
+/** What every track shows near its start gate (barrier strips, flags, crowd, deck decals). */
+const COMMON_IDS = ['banner-vortex-oil', 'banner-kestrel-tyres', 'banner-nordvik', 'banner-apex-suspension', 'banner-bolt-energy', 'banner-ironworks-series', 'crowd-day', 'tyremark-arc'];
+/** The hall's container skins (industrial + foundry). */
+const HALL_SKIN_IDS = ['stencil-hkr', 'stencil-nordvik', 'stencil-weights', 'stencil-hazard', 'stencil-serial', 'stencil-arrows', 'mask-edge-grime', 'mask-grime-spatter'];
+/** Back-wall decals (industrial + foundry): not needed for the title, requested with the track. */
+const HALL_DECAL_IDS = ['poster-trials-night', 'poster-tyres', 'sign-hard-hat', 'sign-overhead-crane', 'sign-forklift', 'sign-exit', 'graffiti-rise', 'graffiti-grind', 'graffiti-nofear', 'graffiti-skull', 'graffiti-tag-wall', 'graffiti-wheel'];
+
+/** Ids a biome's world draws (loaded ones are used; missing ones fall back to procedural). */
+export function idsFor(biome: string): string[] {
+  switch (biome) {
+    case 'industrial':
+      return [...COMMON_IDS, ...HALL_SKIN_IDS, 'plate-industrial', ...HALL_DECAL_IDS];
+    case 'foundry':
+      return [...COMMON_IDS, 'crowd-night', ...HALL_SKIN_IDS, 'plate-foundry', ...HALL_DECAL_IDS];
+    case 'canyon':
+      return [...COMMON_IDS, 'plate-canyon', 'sky-canyon'];
+    case 'snow':
+      return [...COMMON_IDS, 'plate-snow', 'sky-snow'];
+    case 'nightCity':
+      return [...COMMON_IDS, 'crowd-night', 'plate-nightcity', 'sky-nightcity'];
+    default:
+      return [...COMMON_IDS];
+  }
+}
+
+/** The boot set: the showcase biome (industrial) minus its back-wall decals. */
+export const BOOT_IDS: readonly string[] = [...COMMON_IDS, ...HALL_SKIN_IDS, 'plate-industrial'];
+
 export class ArtLibrary {
   readonly entries = new Map<string, ArtEntry>();
   private readonly bitmaps = new Map<string, ImageBitmap>();
   private readonly textures = new Map<string, THREE.Texture>();
-  /** True once the manifest and every wanted asset has loaded or failed. */
+  /** In-flight or finished fetches by id (a failed fetch resolves too; it is not retried). */
+  private readonly fetches = new Map<string, Promise<void>>();
+  /** True once the manifest and the boot set have loaded or failed. */
   settled = false;
   /** True when the manifest parsed and at least one asset decoded. */
   ok = false;
@@ -45,37 +84,32 @@ export class ArtLibrary {
   bytesDelivered = 0;
   /** Wall ms from load() to settled (diagnostic only). */
   loadMs = 0;
+  /** Resolves when the manifest and the boot set have settled. */
   readonly whenSettled: Promise<void>;
   private resolveSettled: () => void = () => undefined;
   private started = false;
+  private manifestP: Promise<void> | null = null;
+  private manifestDone = false;
   private readonly listeners: (() => void)[] = [];
-  /** Progress: assets decoded / wanted (for the loading screen). */
-  progress = { done: 0, total: 0 };
-  onProgress: ((done: number, total: number) => void) | null = null;
+  /** Progress of the current phase: assets decoded / wanted, bytes delivered so far (for the loading screen). */
+  progress = { done: 0, total: 0, bytes: 0, bytesTotal: 0, label: 'art pack' };
+  onProgress: ((done: number, total: number, label: string, bytes: number, bytesTotal: number) => void) | null = null;
+  /** Fires after any request settles (the renderer rebuilds an undrawn world). */
+  onRequestSettled: (() => void) | null = null;
 
   constructor(private readonly base = 'art/') {
     this.whenSettled = new Promise<void>((r) => (this.resolveSettled = r));
   }
 
-  /** Called once when the library settles (the renderer rebuilds the world). */
+  /** Called once when the boot set settles (the renderer rebuilds the world). */
   onSettled(fn: () => void): void {
     if (this.settled) fn();
     else this.listeners.push(fn);
   }
 
-  /** Kick off the load (idempotent). */
-  load(): Promise<void> {
-    if (this.started) return this.whenSettled;
-    this.started = true;
-    const t0 = typeof performance !== 'undefined' ? performance.now() : 0;
-    const finish = (): void => {
-      this.loadMs = (typeof performance !== 'undefined' ? performance.now() : 0) - t0;
-      this.settled = true;
-      this.resolveSettled();
-      for (const fn of this.listeners) fn();
-      this.listeners.length = 0;
-    };
-    const run = async (): Promise<void> => {
+  private async loadManifest(): Promise<void> {
+    if (this.manifestP) return this.manifestP;
+    this.manifestP = (async () => {
       let manifest: { assets?: unknown[] } | null = null;
       try {
         const res = await fetch(this.base + 'manifest.json', { cache: 'force-cache' });
@@ -84,12 +118,11 @@ export class ArtLibrary {
         manifest = null;
       }
       const assets = Array.isArray(manifest?.assets) ? manifest!.assets! : [];
-      const wanted: ArtEntry[] = [];
       for (const raw of assets) {
         const o = raw as Record<string, unknown>;
         const path = typeof o['path'] === 'string' ? (o['path'] as string) : '';
         const id = typeof o['id'] === 'string' ? (o['id'] as string) : '';
-        if (!id || !path || path.startsWith(SKIP_PREFIX)) continue;
+        if (!id || !path || path.startsWith(SKIP_PREFIX) || REJECTED.has(id)) continue;
         const e: ArtEntry = {
           id,
           path,
@@ -105,34 +138,107 @@ export class ArtLibrary {
         if (o['time'] === 'day' || o['time'] === 'night') e.time = o['time'];
         if (typeof o['figures'] === 'number') e.figures = o['figures'] as number;
         this.entries.set(id, e);
-        wanted.push(e);
       }
-      this.progress.total = wanted.length;
-      const tick = (): void => {
-        this.progress.done++;
-        this.onProgress?.(this.progress.done, this.progress.total);
-      };
-      await Promise.all(
-        wanted.map(async (e) => {
-          try {
-            // Manifest paths are `art/...`; the base already ends in `art/`.
-            const url = e.path.startsWith('art/') ? this.base + e.path.slice(4) : this.base + e.path;
-            const res = await fetch(url, { cache: 'force-cache' });
-            if (!res.ok) return;
-            const blob = await res.blob();
-            const bmp = await createImageBitmap(blob, { imageOrientation: 'flipY', premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
-            this.bitmaps.set(e.id, bmp);
-            this.bytesDelivered += e.bytes || blob.size;
-            this.ok = true;
-          } catch {
-            /* missing asset → procedural fallback */
-          } finally {
-            tick();
-          }
-        }),
-      );
+      this.manifestDone = true;
+    })();
+    return this.manifestP;
+  }
+
+  /** Fetch + decode one asset (memoised; a failure resolves and leaves the item procedural). */
+  private fetchOne(e: ArtEntry): Promise<void> {
+    const had = this.fetches.get(e.id);
+    if (had) return had;
+    const p = (async () => {
+      try {
+        // Manifest paths are `art/...`; the base already ends in `art/`.
+        const url = e.path.startsWith('art/') ? this.base + e.path.slice(4) : this.base + e.path;
+        const res = await fetch(url, { cache: 'force-cache' });
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const bmp = await createImageBitmap(blob, { imageOrientation: 'flipY', premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
+        this.bitmaps.set(e.id, bmp);
+        this.bytesDelivered += e.bytes || blob.size;
+        this.ok = true;
+      } catch {
+        /* missing asset → procedural fallback */
+      } finally {
+        this.settledIds.add(e.id);
+      }
+    })();
+    this.fetches.set(e.id, p);
+    return p;
+  }
+
+  /**
+   * Fetch a set of ids (those not already in flight), reporting `label` progress with bytes.
+   * Resolves when every one has decoded or failed. Ids the manifest does not list are ignored.
+   */
+  async request(ids: readonly string[], label = 'art'): Promise<void> {
+    await this.loadManifest();
+    // Boot priority: a per-track request queues behind the boot set so the title's art is
+    // not contending with canyon's sky on a slow link.
+    if (this.started && label !== 'art pack' && !this.settled) await this.whenSettled;
+    const wanted: ArtEntry[] = [];
+    for (const id of ids) {
+      const e = this.entries.get(id);
+      if (e && !this.fetches.has(id)) wanted.push(e);
+    }
+    if (!wanted.length) return;
+    const total = wanted.length;
+    const bytesTotal = wanted.reduce((a, e) => a + e.bytes, 0);
+    let done = 0;
+    let bytes = 0;
+    this.progress = { done: 0, total, bytes: 0, bytesTotal, label };
+    this.onProgress?.(0, total, label, 0, bytesTotal);
+    await Promise.all(
+      wanted.map(async (e) => {
+        await this.fetchOne(e);
+        done++;
+        if (this.bitmaps.has(e.id)) bytes += e.bytes;
+        this.progress = { done, total, bytes, bytesTotal, label };
+        this.onProgress?.(done, total, label, bytes, bytesTotal);
+      }),
+    );
+    this.onRequestSettled?.();
+  }
+
+  /** True when the manifest is in and every listed id has either decoded or failed (nothing in flight). */
+  requested(ids: readonly string[]): boolean {
+    if (!this.manifestDone) return false;
+    for (const id of ids) {
+      if (!this.entries.has(id)) continue;
+      if (!this.settledIds.has(id)) return false;
+    }
+    return true;
+  }
+  /** Ids whose fetch has finished (decoded or failed). */
+  private readonly settledIds = new Set<string>();
+
+  /** Bytes the manifest lists for the ids that are not yet fetched (what a request would download). */
+  pendingBytes(ids: readonly string[]): number {
+    let b = 0;
+    for (const id of ids) {
+      const e = this.entries.get(id);
+      if (e && !this.fetches.has(id)) b += e.bytes;
+    }
+    return b;
+  }
+
+  /** Kick off the boot load: manifest + the showcase set (idempotent). */
+  load(): Promise<void> {
+    if (this.started) return this.whenSettled;
+    this.started = true;
+    const t0 = typeof performance !== 'undefined' ? performance.now() : 0;
+    const finish = (): void => {
+      this.loadMs = (typeof performance !== 'undefined' ? performance.now() : 0) - t0;
+      this.settled = true;
+      this.resolveSettled();
+      for (const fn of this.listeners) fn();
+      this.listeners.length = 0;
     };
-    return run().catch(() => undefined).then(finish);
+    return this.request(BOOT_IDS, 'art pack')
+      .catch(() => undefined)
+      .then(finish);
   }
 
   has(id: string): boolean {

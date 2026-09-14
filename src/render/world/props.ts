@@ -37,29 +37,45 @@ export class PropBatch {
     return this.items.length;
   }
 
-  build(): THREE.InstancedMesh | null {
+  /** World-x extent of one instanced chunk (round 9): frustum culling works per chunk, so a
+   *  600 m track draws (and shadows) only the ≈ 100 m in view instead of every instance. */
+  static readonly CHUNK_M = 40;
+
+  /**
+   * One `InstancedMesh` per 40 m of x, each with a computed bounding sphere and frustum
+   * culling on, under one group named `props:<name>`. (Round 8 drew one unculled mesh per
+   * batch: a 600 m course's supports / drums / catwalk were drawn in full every frame, twice
+   * with the shadow pass — b1 read 1.05 M tris.)
+   */
+  build(): THREE.Group | null {
     if (this.items.length === 0) return null;
-    const mesh = new THREE.InstancedMesh(this.geometry, this.material, this.items.length);
-    mesh.name = `props:${this.name}`;
-    let anyColor = false;
-    this.items.forEach((it, i) => {
-      mesh.setMatrixAt(i, it.m);
-      if (it.c) {
-        mesh.setColorAt(i, it.c);
-        anyColor = true;
-      }
-    });
-    if (anyColor) {
-      this.items.forEach((it, i) => {
-        if (!it.c) mesh.setColorAt(i, new THREE.Color(0xffffff));
-      });
-      mesh.instanceColor!.needsUpdate = true;
+    const group = new THREE.Group();
+    group.name = `props:${this.name}`;
+    const anyColor = this.items.some((it) => it.c !== null);
+    const chunks = new Map<number, { m: THREE.Matrix4; c: THREE.Color | null }[]>();
+    for (const it of this.items) {
+      const k = Math.floor(it.m.elements[12]! / PropBatch.CHUNK_M);
+      let list = chunks.get(k);
+      if (!list) chunks.set(k, (list = []));
+      list.push(it);
     }
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.castShadow = this.shadows;
-    mesh.receiveShadow = this.shadows;
-    mesh.frustumCulled = false;
-    return mesh;
+    const white = new THREE.Color(0xffffff);
+    for (const [k, items] of [...chunks.entries()].sort((a, b) => a[0] - b[0])) {
+      const mesh = new THREE.InstancedMesh(this.geometry, this.material, items.length);
+      mesh.name = `props:${this.name}:${k}`;
+      items.forEach((it, i) => {
+        mesh.setMatrixAt(i, it.m);
+        if (anyColor) mesh.setColorAt(i, it.c ?? white);
+      });
+      if (anyColor) mesh.instanceColor!.needsUpdate = true;
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = this.shadows;
+      mesh.receiveShadow = this.shadows;
+      mesh.computeBoundingSphere();
+      mesh.frustumCulled = true;
+      group.add(mesh);
+    }
+    return group;
   }
 }
 
@@ -147,11 +163,12 @@ export function palletStackGeometry(layers = 3): THREE.BufferGeometry {
 /** 200 l oil drum, origin bottom centre. */
 export function drumGeometry(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
-  const body = new THREE.CylinderGeometry(0.29, 0.29, 0.88, 14, 1, false);
+  // Round 9 (tri budget): 12 segments, 3-sided ribs — 168 tris (was 280) for a 0.6 m prop.
+  const body = new THREE.CylinderGeometry(0.29, 0.29, 0.88, 12, 1, false);
   body.translate(0, 0.44, 0);
   parts.push(body);
   for (const y of [0.3, 0.58]) {
-    const rib = new THREE.TorusGeometry(0.295, 0.016, 4, 14);
+    const rib = new THREE.TorusGeometry(0.295, 0.016, 3, 12);
     rib.rotateX(Math.PI / 2);
     rib.translate(0, y, 0);
     parts.push(rib);
