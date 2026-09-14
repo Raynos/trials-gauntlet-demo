@@ -1,8 +1,7 @@
 /**
- * Physics contract. Physics v2 (docs/design/physics-v2.md) is `createBikePhysicsV2`; until it passes
- * its acceptance suite (§14) the shipped default `createBikePhysics` remains v1 so tracks, goldens and
- * the live game are unaffected. `?physics=v2` opts in. The default flips to v2 at acceptance; v1 is
- * deleted in R3 (§16.2).
+ * Physics contract. Physics v2 (docs/design/physics-v2.md) is the shipped default from R3 on
+ * (`createBikePhysics` = `createBikePhysicsV2`); v1 stays importable as `createBikePhysicsV1` for two
+ * rounds so the harness can A/B (`?physics=v1`), then it is deleted (§16.2).
  */
 import type { CompiledTrack, GameEvent, InputFrame, PhysicsSnapshot, PhysicsState } from '../core/types';
 
@@ -36,15 +35,17 @@ export type PhysicsFactory = (physicsHz: number) => PhysicsWorld;
 
 import { createBikePhysicsV2 } from './v2/bike';
 import { createBikePhysics as createBikePhysicsV1Impl, bikePhysicsFactory as bikePhysicsFactoryV1Impl } from './bike';
-import type { BikePhysicsWorld as BikePhysicsWorldV1Type } from './bike';
-import type { PartialTuning as PartialTuningV1Type } from './tuning';
+import type { BikePhysicsWorldV2 as BikePhysicsWorldV2Type } from './v2/bike';
+import type { PartialTuningV2 as PartialTuningV2Type } from './v2/tuning';
 
-/** The shipped default until v2 acceptance: v1. */
-export function createBikePhysics(physicsHz: number, tuning?: PartialTuningV1Type): BikePhysicsWorldV1Type {
-  return createBikePhysicsV1Impl(physicsHz, tuning);
+/** The shipped default: v2 (flipped after R3, 2026-09-14). */
+export function createBikePhysics(physicsHz: number, tuning?: PartialTuningV2Type): BikePhysicsWorldV2Type {
+  return createBikePhysicsV2(physicsHz, tuning);
 }
-export const bikePhysicsFactory = (physicsHz: number): PhysicsWorld => bikePhysicsFactoryV1Impl(physicsHz);
-export const bikePhysicsFactoryV2 = (physicsHz: number): PhysicsWorld => createBikePhysicsV2(physicsHz);
+export const bikePhysicsFactory = (physicsHz: number): PhysicsWorld => createBikePhysicsV2(physicsHz);
+export const bikePhysicsFactoryV2 = bikePhysicsFactory;
+export const bikePhysicsFactoryV1 = (physicsHz: number): PhysicsWorld => bikePhysicsFactoryV1Impl(physicsHz);
+export { createBikePhysicsV1Impl as createBikePhysicsV1 };
 
 export { createBikePhysicsV2 } from './v2/bike';
 export type { BikePhysicsWorldV2 as BikePhysicsWorld, PhysicsDebugV2 as PhysicsDebug, TeleportPose, HopPhase, LoadTrackOptionsV2 } from './v2/bike';
@@ -52,7 +53,6 @@ export { DEFAULT_TUNING_V2 as DEFAULT_TUNING, mergeTuningV2 as mergeTuning, BIKE
 export type { TuningV2 as BikeTuning, PartialTuningV2 as PartialTuning, BikeClassV2 as BikeClass } from './v2/tuning';
 
 // v1 (rounds 1-11), kept importable for two rounds so the harness can A/B (§16.2)
-export { createBikePhysics as createBikePhysicsV1, bikePhysicsFactory as bikePhysicsFactoryV1 } from './bike';
 export type { BikePhysicsWorld as BikePhysicsWorldV1, PhysicsDebug as PhysicsDebugV1 } from './bike';
 export { DEFAULT_TUNING as DEFAULT_TUNING_V1, BIKE_PRESETS as BIKE_PRESETS_V1, bikeTuning as bikeTuningV1 } from './tuning';
 export type { BikeTuning as BikeTuningV1, PartialTuning as PartialTuningV1 } from './tuning';
