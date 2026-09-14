@@ -5,7 +5,7 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
-Status: **round 1 shipped** — `createBikePhysics(hz, tuning?)` /
+Status: **round 2 (partial)** — loop-out envelope and partial-throttle speed governor done (soft off-idle torque curve, aero governor 3.2 N s²/m²), 39 tests green; items 3-7 of the round-2 list remain (climb corner, brake 4.5 m, 0.9 m ledge, wheeliePD, ragdoll-vs-bike). Round 1 shipped — `createBikePhysics(hz, tuning?)` /
 `bikePhysicsFactory` in `src/physics/bike.ts`, 36 vitest tests green,
 measured envelope in section 12. Not yet wired into `src/main.ts` (core-game
 owner swaps `new MockPhysics(hz)` for `bikePhysicsFactory(hz)`).
@@ -84,16 +84,20 @@ rubber 1.1, grate 0.9, stone 1.0, snow 0.5. Rolling resistance 0.012·N·R.
 
 `rpm = max(idle + throttleEff·(clutchRpm − idle), ω_rear·gearRatio·60/2π)`
 — idle 1500, slipping auto-clutch 3500 under throttle, **limiter cuts at
-10 000 and re-arms below 9 500** (CONTRACT). Torque curve (rpm, fraction):
-`[1500,.9] [3000,1] [5000,1] [6500,.98] [8000,.9] [9500,.72] [10000,.62]`,
-peak 38 Nm × gear 17.5 × η 0.92 = 612 Nm at the wheel = 1800 N of thrust.
+10 000 and re-arms below 9 500** (CONTRACT). Torque curve (rpm, fraction), **soft off idle** so a full-throttle launch does
+not loop at neutral lean:
+`[1500,.55] [3500,.65] [5000,.85] [6500,1] [8000,.95] [9500,.85] [10000,.8]`,
+peak 38 Nm × gear 17.5 × η 0.92 = 612 Nm at the wheel = 1800 N of thrust
+(1170 N off the line through the slipping clutch).
 Engine braking 8 % of peak scaled by rpm off throttle. Throttle slews at 40/s
 up, 60/s down. Top speed is limiter-bound at 20.4 m/s (measured 20.45).
 Engine torque goes on the rear wheel and its reaction on the frame, so the
 pitch-up moment is F·h as it should be; in the air throttle pitches nose-up
 and brake nose-down through wheel angular momentum (section 12, F9).
 
-Brakes: front 640 Nm, rear 500 Nm. Aero drag F = −0.4·v|v| on the frame.
+Brakes: front 640 Nm, rear 500 Nm. Aero drag F = −3.2·v|v| on the frame — deliberately
+large: it is the speed governor that makes partial throttle top out (thr 0.3 → 11.3 m/s,
+0.6 → 17.1, 1.0 → limiter at 20.4).
 
 ## 4. Tuning table
 
@@ -107,7 +111,7 @@ wheel   radius 0.34  mass 7  inertiaRear 0.7  inertiaFront 0.5  wheelbase 1.30
 susp rear  axle (-0.585,-0.210) axis norm(0.17,0.985) travel 0.22 k 12000 cComp 650 cReb 1100 preload 0.02 kStop 60000 @0.8
 susp front axle (+0.715,-0.215) axis norm(-0.42,0.91) travel 0.20 k 10500 cComp 550 cReb 950  preload 0.02 kStop 60000 @0.8
 tyre    muPeak 2.0 kappaPeak 0.15 slideFrac 0.9 vRef 1.0 rollRes 0.012
-engine  idle 1500 clutch 3500 limiter 10000/9500 peak 38 Nm gear 17.5 eff 0.92 engineBrake 0.08 slew 40/60
+engine  idle 1500 clutch 3500 limiter 10000/9500 peak 38 Nm gear 17.5 eff 0.92 engineBrake 0.08 slew 40/60 (curve: section 3)
 brakes  front 640 rear 500 antiEndo 0.05
 rider   mass 75 anchor (+0.21,+0.50) k 6000 c 740 kLanding 40000
         leanBack 0.60 leanFwd 0.85 leanRate 6 leanCrouch 0.30
@@ -117,7 +121,7 @@ rider   mass 75 anchor (+0.21,+0.50) k 6000 c 740 kLanding 40000
         tetherMax 0.5 ejectForce 12000 legSlack 0.05 armFrac 0.3
         headRadius 0.15 torsoRadius 0.13 torsoFollow 0.5
         torso inertia 15 swing 1.2 k 4000 c 390 maxTorque 300
-aero    dragCoef 0.4
+aero    dragCoef 3.2
 solver  velocityIters 8 slop 0.005 baumgarte 0.2 jointBaumgarte 0.3 speculativeMargin 0.02
 ragdoll sleepAfter 3.0 restitution 0.15 mu 0.6 spread 0.3
 drum    density 60
@@ -284,10 +288,12 @@ From `pnpm test` (`FEEL …` lines in `feel.test.ts`, `PERF …` in `world.test.
 |--|--|--|--|
 | total mass / wheelbase / radius | 145 kg / 1.30 / 0.34 | 145 / 1.30 (1.28 at sag) / 0.34 | PASS |
 | COM above axle line, neutral | 0.45 m | 0.40 m (0.05 traded into lean crouch) | note |
-| 0 → 16 m/s, flat dirt | ≤ 3.5 s | 2.48 s (anti-loop launch, lean +0.2) | PASS |
-| top speed | 20 m/s | 20.45 m/s, limiter-bound | PASS |
-| brake from 10 m/s | ≤ 4.5 m | 5.2 m lean back (no endo), 8.0 m neutral | FAIL |
-| stationary hop rear apex | 0.55-0.75 m | 0.69 m, airtime 0.85 s | PASS |
+| 0 → 16 m/s, flat dirt | ≤ 3.5 s | 2.84 s anti-loop launch; 2.13 s at thr 1 / lean 1 | PASS |
+| loop-out envelope (round 2) | lean ≥ +0.4 never; lean 0 ≥ 1.5 s; lean −1 ~0.8 s | lean ≥ 0.4 finishes (7.4 s); lean 0.2 loops 3.4 s; lean 0 loops 1.98 s; lean −1 loops 1.67 s | PASS / PASS / partial |
+| speed governor (round 2) | thr 0.3 ≈ 11-13, 0.6 ≈ 16-17, 1.0 = 20 | 11.3 / 17.1 / 20.35 (limiter) | PASS |
+| top speed | 20 m/s | 20.35 m/s, limiter-bound | PASS |
+| brake from 10 m/s | ≤ 4.5 m | 4.66 m lean back (no endo) | FAIL (close) |
+| stationary hop rear apex | 0.55-0.75 m | 0.74 m, airtime 0.87 s | PASS |
 | 5 m/s run-up, 0.9 m ledge | makeable | rear reaches the top, run ends in a crash; 0.5 m ledge clean | FAIL |
 | climb 55 / 60 deg | sustained | rear wheel wedges at the base corner (no fault) | FAIL |
 | climb 65 deg | stalls, rolls back | stalls (0.4 m back) then loops and head-hits | FAIL |
@@ -295,12 +301,12 @@ From `pnpm test` (`FEEL …` lines in `feel.test.ts`, `PERF …` in `world.test.
 | balance pitch, lean 0 | 40-50 deg | 42.4 (32.4 back, 62.0 fwd, 59.5 at +3 m/s²) | PASS |
 | open-loop divergence | 1-2 s | 1.02 / 0.98 s | PASS |
 | PD hold | indefinitely | 1.7 s (controller, not physics: lean authority is slow, 100 ms latency) | FAIL |
-| landing recovery (2 m, 6 m/s) | design: −5..+40 | −30..+35 rides away | partial |
+| landing recovery (2 m, 6 m/s) | design: −5..+40 | −30..+45 rides away | PASS |
 | air control 0.5 s | — | brake −17, throttle +14, lean back +15 deg | PASS |
 | crash rules | head/torso, hazard, oobY | all three tested; over-rotation alone never faults | PASS |
 | restart → riding | 1 tick | `reset()` is one call, `tick = 0`, events `fault,restart` | PASS |
 | determinism | two runs equal; restore(snapshot()) equal | equal over 3000 ticks incl. crash+restart; forks at 5 points × 500 ticks equal | PASS |
-| µs/tick p95 | ≤ 60 riding, ≤ 80 ragdoll | 3.7 riding, 10.2 ragdolling (node, 20k ticks) | PASS |
+| µs/tick p95 | ≤ 60 riding, ≤ 80 ragdoll | 3.3 riding, 7.2 ragdolling (node, 20k ticks) | PASS |
 
 Known gaps for round 2, in order: (1) climb — the rear wheel sits in the
 concave flat/plank corner with two contacts and spins; needs either a

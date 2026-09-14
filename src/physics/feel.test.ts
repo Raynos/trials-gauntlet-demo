@@ -68,6 +68,54 @@ describe('launch and top speed (C2)', () => {
   });
 });
 
+describe('stranger launch and speed governor (round 2)', () => {
+  function constant(thr: number, lean: number, seconds = 15): { top: number; fault: string | null; finish: number | null; faultAt: number; t16: number } {
+    const w = createBikePhysics(HZ);
+    w.loadTrack(makeTrack({ finishX: 120 }), 1);
+    let top = 0;
+    let faultAt = -1;
+    let t16 = -1;
+    stepN(w, { throttle: thr, lean }, HZ * seconds, (s) => {
+      top = Math.max(top, s.bike.vel.x);
+      if (t16 < 0 && s.bike.vel.x >= 16) t16 = s.time;
+      if (s.faulted && faultAt < 0) faultAt = s.time;
+    });
+    const s = w.getState();
+    return { top, fault: s.faulted, finish: s.finishTime, faultAt, t16 };
+  }
+  it('thr=1 lean=+0.4 held constant finishes flat-test without a fault', () => {
+    const r = constant(1, 0.4);
+    feel('stranger.thr1.lean0.4.finish', r.finish ?? -1, '> 0, no fault');
+    expect(r.fault).toBeNull();
+    expect(r.finish).not.toBeNull();
+  });
+  it('thr=1 lean=0 loops only after >= 1.5 s; lean=-1 loops sooner', () => {
+    const l0 = constant(1, 0);
+    const lb = constant(1, -1);
+    feel('loop.thr1.lean0.at', l0.faultAt, '>= 1.5 s');
+    feel('loop.thr1.leanBack.at', lb.faultAt, '~0.8 s');
+    expect(l0.fault).toBe('crash');
+    expect(l0.faultAt).toBeGreaterThanOrEqual(1.5);
+    expect(lb.faultAt).toBeLessThan(l0.faultAt);
+  });
+  it('partial throttle tops out below the limiter: thr 0.3 ~ 11-13, thr 0.6 ~ 16-18, thr 1 ~ 20 m/s', () => {
+    const a = constant(0.3, 0.5);
+    const b = constant(0.6, 0.6);
+    const c = constant(1, 1);
+    feel('governor.thr0.3.top', a.top, '11-13 m/s');
+    feel('governor.thr0.6.top', b.top, '16-18 m/s');
+    feel('governor.thr1.top', c.top, '19.5-21 m/s');
+    feel('governor.thr1.lean1.t16', c.t16, '<= 3.5 s');
+    expect(a.top).toBeGreaterThan(10.5);
+    expect(a.top).toBeLessThan(13.5);
+    expect(b.top).toBeGreaterThan(15.5);
+    expect(b.top).toBeLessThan(18.5);
+    expect(c.top).toBeGreaterThan(19.5);
+    expect(c.top).toBeLessThan(21);
+    expect(c.t16).toBeLessThanOrEqual(3.5);
+  });
+});
+
 describe('brakes (C4)', () => {
   function brakeRun(lean: number): { dist: number; minPitch: number; fault: string | null } {
     const w = flatWorld();
