@@ -1,18 +1,29 @@
 /**
- * Audio contract. Engine, suspension, impacts and UI sounds are driven from
- * physics state + game events; the scaffold ships a silent implementation.
+ * Audio contract (CONTRACT.md §2.7). Engine, tyres, suspension, impacts,
+ * ambience and UI sounds are synthesised from physics state + game events;
+ * `NullAudio` is the silent implementation, `WebAudioSystem` the real one.
+ *
+ * Wiring (core-game owner):
+ *   const audio = new WebAudioSystem({ makePhysics: (hz) => new MockPhysics(hz) });
+ *   game = new Game({ ..., audio });
+ *   audio.setTrack(compiledTrack, seed);            // from Game.loadTrack (biome, seed)
+ *   firstGesture.addEventListener(() => { void audio.unlock(); });   // sync inside the handler
+ *   hook.audio = { renderOffline: audio.renderOffline! };            // harness
+ *   game.render(): this.audio?.update(state, dt, this.input);        // pass input
  */
-import type { GameEvent, PhysicsState } from '../core/types';
+import type { GameEvent, InputFrame, PhysicsState } from '../core/types';
 
 export interface AudioSystem {
   /** Must be called from a user gesture in browsers; no-op when already live. */
   unlock(): Promise<void>;
   /** Per rendered frame: continuous sources (engine pitch, wind, wheel roll). */
-  update(state: PhysicsState, dt: number): void;
+  update(state: PhysicsState, dt: number, input?: Readonly<InputFrame>): void;
   /** One-shots. */
   onEvent(event: GameEvent): void;
   setMasterVolume(v: number): void;
   dispose(): void;
+  /** Harness: replay a recording to interleaved stereo PCM (48 kHz), no clock. */
+  renderOffline?: ((recordingJson: string, seconds: number) => Promise<Float32Array>) | undefined;
 }
 
 export class NullAudio implements AudioSystem {
@@ -22,3 +33,16 @@ export class NullAudio implements AudioSystem {
   setMasterVolume(): void {}
   dispose(): void {}
 }
+
+export { WebAudioSystem, type WebAudioOptions } from './graph/webAudio';
+export {
+  OFFLINE_SAMPLE_RATE,
+  OFFLINE_UPDATE_HZ,
+  createOfflineRenderer,
+  encodeWav16,
+  renderRecording,
+  renderScript,
+  type OfflineOptions,
+  type OfflineResult,
+} from './offline';
+export type { AudioParams, Transient, TransientKind } from './params';
