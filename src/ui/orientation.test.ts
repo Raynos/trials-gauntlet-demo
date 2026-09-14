@@ -79,6 +79,6 @@ describe('orientation (rotate-to-play)', () => {
     expect(UI_CSS).toMatch(/@media \(orientation: portrait\) and \(pointer: coarse\)[^{]*\{ \.rotate\.armed \{ display: flex; \}/);
     expect(UI_CSS).toMatch(/--sat: env\(safe-area-inset-top/);
     expect(UI_CSS).not.toMatch(/@media \(max-height/);
-    expect(UI_CSS).toMatch(/html\.short \.pause-title/);
+    expect(UI_CSS).toMatch(/html\.short \.tile \{ width: 160px; height: 92px/);
   });
 });

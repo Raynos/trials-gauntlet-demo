@@ -37,7 +37,7 @@ import type { GameRenderer } from '../render';
 import { DEFAULT_TRACK_ID, compileTrack, getTrack } from '../tracks';
 import type { Hud } from '../ui';
 import { GhostRunner } from './ghost';
-import { COUNTDOWN_BEATS, medalFor, ruleTicks, targetTimeOf, type RunResult } from './rules';
+import { COUNTDOWN_BEATS, FINISH_BRAKE, medalFor, ruleTicks, targetTimeOf, type RunResult } from './rules';
 
 export interface BestRecord {
   time: number;
@@ -83,6 +83,8 @@ export interface GameCounters {
   restartLatch: boolean;
   resultsTicks: number;
   resultsShown: boolean;
+  /** Post-finish: the bike crashed on the run-out and physics is frozen at the tick before the fault. Optional so older snapshots / the harness mirror (`harness/lib/rules.ts`) still type. */
+  finishFrozen?: boolean;
 }
 
 const EVENT_QUEUE_MAX = 256;
@@ -142,6 +144,7 @@ export class Game {
   private restartLatch = false;
   private resultsTicks = 0;
   private resultsShown = false;
+  private finishFrozen = false;
 
   /** Fired once per finished run, 0.4 s after the finish line. */
   onResults: ((result: RunResult) => void) | null = null;
@@ -253,6 +256,7 @@ export class Game {
     this.crashTicks = 0;
     this.resultsTicks = 0;
     this.resultsShown = false;
+    this.finishFrozen = false;
     this.holdFired = true; // the press that triggered a hold must be released before it can fire again
     this.lastState = null;
     if (this.autoSkipCountdown) {
@@ -456,10 +460,48 @@ export class Game {
           this.resultsShown = true;
           this.publishResults();
         }
-        this.stepPhysics(input);
+        if (!this.finishFrozen) this.stepFinishCoast();
         return;
       }
     }
+  }
+
+  /**
+   * After the line the game owns the input (docs/design/game.md §1 Finish): throttle 0, lean 0, brake
+   * ramping 0 → 0.6 over 1.0 s so the bike coasts and stops on the run-out with the rider upright. A
+   * finish never shows a fault: if the bike still crashes past the line (no run-out), the tick is
+   * undone (physics restored to the tick before) and the world freezes there — no ✕, no ragdoll, no
+   * respawn, no camera cut. The pre-step snapshot is two typed-array copies, only while finished.
+   */
+  private stepFinishCoast(): void {
+    const k = Math.min(1, this.resultsTicks / this.ticks.finishBrake);
+    const f = this.fwd;
+    f.throttle = 0;
+    f.brake = Math.round(FINISH_BRAKE * k * 255) / 255;
+    f.lean = 0;
+    f.hop = false;
+    f.restart = false;
+    const before = this.physics.snapshot();
+    this.physics.step(f);
+    this.lastState = null;
+    const events = this.physics.drainEvents();
+    let faulted = false;
+    for (let i = 0; i < events.length; i++) {
+      const e = events[i]!;
+      if (e.type === 'fault') faulted = true;
+      else this.processPhysicsEvent(e);
+    }
+    if (faulted) {
+      this.physics.restore(before);
+      this.physics.drainEvents();
+      this.lastState = null;
+      this.finishFrozen = true;
+    }
+  }
+
+  /** Input the world is actually being driven with (the player's frame, or the game's post-finish coast). */
+  effectiveInput(): Readonly<InputFrame> {
+    return this.phaseValue === 'finished' ? this.fwd : this.input;
   }
 
   private stepPhysics(input: InputFrame): void {
@@ -548,7 +590,7 @@ export class Game {
     this.renderer.setGhost?.(this.ghostState());
     this.hud?.setRun(info);
     this.hud?.update(state, this.ghostState());
-    this.audio?.update(state, dt, this.input);
+    this.audio?.update(state, dt, this.effectiveInput());
     const tHud = performance.now();
     const ms = this.renderer.render(state, alpha);
     this.lastRender.hudMs = tHud - tStart;
@@ -625,6 +667,7 @@ export class Game {
       restartLatch: this.restartLatch,
       resultsTicks: this.resultsTicks,
       resultsShown: this.resultsShown,
+      finishFrozen: this.finishFrozen,
     };
   }
 
@@ -640,6 +683,7 @@ export class Game {
     this.restartLatch = c.restartLatch;
     this.resultsTicks = c.resultsTicks;
     this.resultsShown = c.resultsShown;
+    this.finishFrozen = c.finishFrozen ?? false;
     if (this.ghost) {
       this.ghost.seek(this.runTicks);
       this.lastGhostState = null;

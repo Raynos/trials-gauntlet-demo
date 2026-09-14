@@ -228,16 +228,52 @@ export const FRONT_CSS = /* css */ `
 .credits-wrap dd { margin: 0; color: var(--ink-dim); }
 .credits-wrap dd b { color: var(--ink); }
 
-/* ---- pause ------------------------------------------------------------- */
-.overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-start; background: linear-gradient(90deg, rgba(6,7,9,.92) 0%, rgba(6,7,9,.7) 45%, rgba(6,7,9,.25) 100%); opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease); padding: calc(var(--s4) + var(--sat)) calc(var(--s4) + var(--sar)) calc(var(--s4) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); }
+/* ---- overlay frame: pause + results (assets/design/pause/SPEC.md, direction A "low action bar") ----
+   Full-frame grid, flat scrim (no left-weighted gradient), safe-area padding; title block top-left,
+   Visuals chips top-right, free band, tile row centred on the viewport in the lower third, corners. */
+.overlay { position: absolute; inset: 0; z-index: 1; display: grid; grid-template-rows: auto 1fr auto auto; grid-template-columns: 100%; row-gap: var(--s3); background: rgba(6,7,9,.5); opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease); padding: calc(var(--s6) + var(--sat)) calc(calc(7 * var(--vw)) + var(--sar)) calc(var(--s5) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); }
 .overlay.show { opacity: 1; pointer-events: auto; }
-.overlay.show .pause-panel { animation: rise var(--t2) var(--ease) both; }
-.pause-panel { display: flex; flex-direction: column; gap: var(--s1); min-width: min(22rem, calc(70 * var(--vw))); }
-.pause-title { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 3rem; line-height: .9; text-transform: uppercase; margin: 0 0 var(--s4); }
-.pause-title small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .34em; color: var(--amber); margin-bottom: .4em; }
-.pause-panel .menu-item { font-size: 2rem; }
-.pause-stats { margin-top: var(--s5); display: flex; gap: var(--s5); font-size: .9rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; padding-left: var(--s5); }
-.pause-stats b { color: var(--ink); font-weight: 700; }
+.overlay.leaving { opacity: 0; pointer-events: none; transition: opacity var(--t1) var(--ease); }
+.ov-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s4); min-width: 0; }
+.ov-title { display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
+.ov-kicker { font-size: .72rem; letter-spacing: .34em; text-transform: uppercase; color: var(--amber); font-weight: 700; text-shadow: var(--outline); }
+.ov-kicker.red { color: var(--red); } .ov-kicker.green { color: var(--green); }
+.ov-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 3rem; line-height: .9; text-transform: uppercase; letter-spacing: .01em; color: var(--ink); text-shadow: var(--outline); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: min(40rem, calc(60 * var(--vw))); }
+.ov-stats { display: flex; align-items: baseline; gap: 0; font-size: .82rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; letter-spacing: .06em; text-transform: uppercase; text-shadow: var(--outline); white-space: nowrap; }
+.ov-stats b { color: var(--ink); font-weight: 700; }
+.ov-stats i { font-style: normal; margin: 0 .6em; opacity: .6; }
+.ov-free { min-height: 0; }
+.ov-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s4); min-height: 44px; }
+.ov-foot .legend { position: static; margin-left: auto; }
+.ov-foot .legend.hide { visibility: hidden; }
+.ov-reload { position: relative; min-height: 44px; min-width: 44px; padding: 0 var(--s2); margin-left: calc(-1 * var(--s2)); border: 0; background: transparent; cursor: pointer; font-weight: 700; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-mute); text-shadow: var(--outline); transition: color var(--t1); border-radius: var(--r1); }
+.ov-reload.focus, .ov-reload:hover { color: var(--ink); }
+.ov-reload.armed { color: var(--amber); }
+.overlay.focus-reload .ov-reload { box-shadow: inset 0 0 0 1px var(--line); }
+/* Visuals chip row (pause only): VISUALS · RIDER [seg] · BIKE [seg]; live preview behind the scrim. */
+.visuals { display: inline-flex; align-items: center; gap: var(--s3); padding: 6px 12px; background: var(--slab); border: 1px solid var(--line-2); border-radius: var(--r2); min-height: 44px; flex: 0 0 auto; }
+.visuals .vtitle { font-weight: 700; font-size: .66rem; letter-spacing: .3em; text-transform: uppercase; color: var(--amber); }
+.visuals .vlab { font-weight: 700; font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); }
+.visuals .vsep { width: 1px; height: 20px; background: var(--line); }
+.visuals .mini-seg { margin: 0; cursor: pointer; border-color: var(--line-2); transition: box-shadow var(--t1); }
+.visuals .mini-seg b { min-width: 44px; padding: 8px 10px; text-align: center; font-size: .66rem; }
+.visuals .mini-seg.focus { box-shadow: 0 0 0 2px var(--ink); }
+/* Action tiles: 240×128 desktop / 160×92 phone; exactly one is amber (the focused one). */
+.tiles { display: flex; justify-content: center; gap: var(--s4); width: 100%; }
+.tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 240px; height: 128px; min-height: 44px; padding: 0 var(--s3); border-radius: var(--r2); border: 1px solid var(--line); background: var(--slab-3); box-shadow: var(--plate); color: var(--ink); cursor: pointer; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.25rem; letter-spacing: .02em; text-transform: uppercase; line-height: 1; white-space: nowrap; transition: background var(--t1), color var(--t1), border-color var(--t1), box-shadow var(--t1), transform var(--t1) var(--ease); }
+.tile svg { width: 28px; height: 28px; color: var(--ink-dim); transition: color var(--t1); }
+.tile.on { background: var(--amber); color: var(--amber-ink); border-color: transparent; box-shadow: 0 0 24px -8px var(--amber), var(--plate); }
+.tile.on svg { color: var(--amber-ink); }
+.tile.on:focus-visible, .overlay.focus-tiles .tile.on { box-shadow: inset 0 0 0 2px var(--amber-ink), 0 0 24px -8px var(--amber); }
+.tile.pressed, .tile:active { transform: scale(.97); }
+.tile[disabled] { color: var(--ink-mute); border-color: transparent; background: rgba(9,11,15,.5); box-shadow: none; cursor: default; }
+.tile[disabled] svg { color: var(--ink-mute); }
+.overlay.show .tile { animation: rise var(--t2) var(--ease) both; }
+.overlay.show .tile:nth-child(2) { animation-delay: 40ms; } .overlay.show .tile:nth-child(3) { animation-delay: 80ms; }
+.overlay.show .visuals, .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) 120ms both; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+.overlay.leaving .tile, .overlay.leaving .visuals, .overlay.leaving .ov-foot { animation: none; }
+@supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) { html:not(.short) .pause-overlay.show { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); } }
 
 /* ---- countdown scene handoff --------------------------------------------- */
 .iris { position: absolute; inset: 0; pointer-events: none; background: var(--bg); opacity: 0; transition: opacity var(--t2) var(--ease); }
@@ -246,7 +282,8 @@ export const FRONT_CSS = /* css */ `
 
 export const HUD_CSS = /* css */ `
 /* ---- top band ------------------------------------------------------- */
-.hud { position: absolute; inset: 0; opacity: 1; transition: opacity var(--t2) var(--ease); }
+.hud { position: absolute; inset: 0; opacity: 1; transition: opacity var(--t2) var(--ease); z-index: 2; pointer-events: none; }
+.hud .results.show { pointer-events: auto; }
 .hud.hidden { opacity: 0; }
 .hud-top {
   position: absolute; left: 0; right: 0; top: 0;
@@ -268,9 +305,10 @@ export const HUD_CSS = /* css */ `
 .hud-faults .x { color: var(--red); font-size: .8em; font-weight: 900; }
 .hud-faults.flip .n { color: var(--amber); transform: scale(1.35); }
 .hud-faults .n { display: inline-block; transform-origin: 50% 70%; transition: transform .12s ease-out, color .12s; }
-.hud-delta { position: absolute; left: 50%; transform: translateX(-50%); top: calc(3.9rem + var(--sat)); font-size: .95rem; font-weight: 800; font-variant-numeric: tabular-nums; opacity: 0; transition: opacity .3s; text-shadow: var(--outline); padding: .1rem .5rem; background: var(--slab); border-radius: .3rem; }
-.hud-delta.show { opacity: 1; }
-.hud-delta.ahead { color: var(--green); } .hud-delta.behind { color: var(--red); }
+/* Finish: strip and track plate fade, the frozen green timer is the one thing left (delta lives in the results panel). */
+.hud .strip, .hud .hud-track { transition: opacity var(--t3) var(--ease); }
+.hud.finished .strip, .hud.finished .hud-track, .hud.finished .hud-device { opacity: .28; }
+.hud.finished .hud-split { opacity: 0 !important; }
 
 .hud-split { position: absolute; left: calc(100% + .7rem); top: 50%; margin-top: -.75em; font-size: 1.5rem; font-weight: 900; font-style: italic; font-variant-numeric: tabular-nums; white-space: nowrap; opacity: 0; transform-origin: 0 50%; text-shadow: var(--outline-heavy); pointer-events: none; }
 .hud-split.ahead { color: var(--green); } .hud-split.behind { color: var(--red); }
@@ -303,34 +341,45 @@ export const HUD_CSS = /* css */ `
 .hints.show { opacity: 1; }
 .hints kbd { font-family: var(--font); font-weight: 800; background: rgba(255,255,255,.12); border: 1px solid var(--line); border-bottom-width: 2px; padding: .05em .45em; border-radius: .25em; margin-right: .35em; font-size: .9em; }
 
-/* ---- results -------------------------------------------------------- */
-.results { position: absolute; top: 50%; left: 62%; transform: translate(-50%, -50%) scale(.96); width: min(30rem, calc(92 * var(--vw))); max-height: calc(100% - var(--s5)); background: var(--slab-2); border: 1px solid var(--line-2); border-left: 3px solid var(--amber); border-radius: var(--r3); padding: var(--s5) var(--s5) var(--s4); opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-.results.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-.results h2 { margin: 0 0 var(--s1); font-size: .72rem; letter-spacing: .34em; text-transform: uppercase; color: var(--amber); font-weight: 700; }
-.results .headline { display: flex; align-items: baseline; gap: var(--s4); flex-wrap: wrap; }
-.results .time { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 3.4rem; font-variant-numeric: tabular-nums; line-height: 1; }
-.results .faults { font-size: 1.2rem; font-weight: 700; color: var(--ink-dim); }
-.results .faults span { color: var(--red); }
-.results .pb { color: var(--green); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: .82rem; min-height: 1.2em; margin-top: var(--s1); }
-.results .medals { display: flex; gap: var(--s2); margin: var(--s4) 0 var(--s4); }
-.results .medal { flex: 1; text-align: center; padding: var(--s2) var(--s1) var(--s2); border-radius: var(--r2); border: 1px solid var(--line-2); opacity: .35; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: .72rem; }
-.results .medal i { display: block; width: 1.8rem; height: 1.8rem; margin: 0 auto var(--s1); border-radius: 50%; background: currentColor; box-shadow: inset 0 -3px 0 rgba(0,0,0,.35); background-size: cover; background-position: center; }
+/* ---- results: the same frame as pause (title block, headline centred in the free band, tiles) ---- */
+.results { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto auto; grid-template-columns: 100%; row-gap: var(--s3); padding: calc(var(--s6) + var(--sat)) calc(calc(7 * var(--vw)) + var(--sar)) calc(var(--s5) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); background: rgba(6,7,9,0); opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease), background var(--t3) var(--ease); }
+.results.show { opacity: 1; pointer-events: auto; }
+.results.stage-3, .results.stage-4, .results.stage-5 { background: rgba(6,7,9,.35); }
+.results .headline { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s2); text-align: center; min-height: 0; }
+.results .headline .row { display: flex; align-items: baseline; gap: var(--s4); }
+.results .time { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 6.6rem; font-variant-numeric: tabular-nums; line-height: 1; color: var(--ink); text-shadow: var(--outline-heavy); }
+.results .time .ms { font-size: .58em; }
+.results .faults { font-size: 1.4rem; font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: .04em; text-shadow: var(--outline); }
+.results .faults span { color: var(--red); font-weight: 900; }
+.results .pb { font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: .95rem; min-height: 1.2em; color: var(--ink-dim); text-shadow: var(--outline); }
+.results .pb.green { color: var(--green); }
+.results .pb em { font-style: normal; color: var(--red); }
+.results .medals { display: flex; gap: var(--s3); margin-top: var(--s2); }
+.results .medal { display: flex; flex-direction: column; align-items: center; gap: var(--s1); text-align: center; opacity: .35; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: .7rem; text-shadow: var(--outline); transition: opacity var(--t2); }
+.results .medal i { display: block; width: 56px; height: 56px; border-radius: 50%; background: currentColor; box-shadow: inset 0 -4px 0 rgba(0,0,0,.35); background-size: cover; background-position: center; }
 .results .medal i.img { background-color: transparent; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.results .medal b { color: var(--ink); font-weight: 700; }
 .results .medal.platinum { color: var(--plat); } .results .medal.gold { color: var(--gold); } .results .medal.silver { color: var(--silver); } .results .medal.bronze { color: var(--bronze); }
-.results .medal.earned { opacity: 1; border-color: currentColor; background: rgba(255,255,255,.06); box-shadow: 0 0 22px -6px currentColor; }
-.results .medal small { display: block; color: var(--ink-dim); letter-spacing: 0; text-transform: none; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 2px; }
-.results .actions { display: flex; gap: var(--s2); }
-/* staged reveal: each block pops in when its stage class arrives (state is sim-driven, easing is CSS) */
-.results .headline .time, .results .headline .faults, .results .medals, .results .pb, .results .actions { opacity: 0; transform: translateY(var(--s2)); transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); }
-.results.stage-0 .headline .time,
-.results.stage-1 .headline .time, .results.stage-1 .headline .faults,
-.results.stage-2 .headline .time, .results.stage-2 .headline .faults, .results.stage-2 .medals,
-.results.stage-3 .headline .time, .results.stage-3 .headline .faults, .results.stage-3 .medals,
-.results.stage-4 .headline .time, .results.stage-4 .headline .faults, .results.stage-4 .medals, .results.stage-4 .pb,
-.results.stage-5 .headline .time, .results.stage-5 .headline .faults, .results.stage-5 .medals, .results.stage-5 .pb, .results.stage-5 .actions { opacity: 1; transform: none; }
-.results .medal.earned { transition: transform var(--t3) var(--ease), box-shadow var(--t3); transform: scale(.85); box-shadow: none; }
-.results.stage-3 .medal.earned, .results.stage-4 .medal.earned, .results.stage-5 .medal.earned { transform: scale(1.08); box-shadow: 0 0 28px -4px currentColor, 0 0 0 1px currentColor inset; }
-.results.stage-2 .medal.earned { opacity: .35; }
+.results .medal.earned { opacity: 1; }
+.results .medal.earned i { box-shadow: 0 0 22px -6px currentColor, 0 0 0 1px currentColor, inset 0 -4px 0 rgba(0,0,0,.35); }
+.results .medal.earned i.img { box-shadow: 0 0 22px -6px currentColor, 0 0 0 1px currentColor; }
+.results .medal small { display: block; color: var(--ink-dim); letter-spacing: 0; text-transform: none; font-weight: 500; font-variant-numeric: tabular-nums; font-size: .68rem; white-space: nowrap; }
+/* Staged reveal (sim-clocked): title block 0 · time .15 · faults .35 · medals + tiles + scrim .6 · PB line + earned pop .9. */
+.results .time, .results .faults, .results .medals, .results .pb, .results .tiles, .results .ov-foot { opacity: 0; transform: translateY(var(--s2)); transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); }
+.results .tiles .tile { animation: none; }
+.results.stage-1 .time,
+.results.stage-2 .time, .results.stage-2 .faults,
+.results.stage-3 .time, .results.stage-3 .faults, .results.stage-3 .medals, .results.stage-3 .tiles, .results.stage-3 .ov-foot,
+.results.stage-4 .time, .results.stage-4 .faults, .results.stage-4 .medals, .results.stage-4 .tiles, .results.stage-4 .ov-foot, .results.stage-4 .pb,
+.results.stage-5 .time, .results.stage-5 .faults, .results.stage-5 .medals, .results.stage-5 .tiles, .results.stage-5 .ov-foot, .results.stage-5 .pb { opacity: 1; transform: none; }
+.results .medal.earned i { transition: transform var(--t3) var(--ease), box-shadow var(--t3); transform: scale(.85); }
+.results.stage-4 .medal.earned i, .results.stage-5 .medal.earned i { transform: scale(1.08); }
+.results.stage-3 .medal.earned { opacity: .35; }
+/* HUD while an overlay is up: the top band, hints and touch buttons hide; kinetic banners stay. */
+.hud .hud-top, .hud .hints { transition: opacity var(--t2) var(--ease); }
+.hud.under-overlay .hud-top, .hud.under-overlay .hints, .hud.results-on .hud-top, .hud.results-on .hints { opacity: 0; pointer-events: none; }
+.touch-layer.under-overlay, .touch-layer.under-overlay * { pointer-events: none !important; }
+.touch-layer.under-overlay .tz, .touch-layer.under-overlay .tz-btn { opacity: 0 !important; }
 
 /* ---- touch layer ------------------------------------------------------ */
 .touch-layer { position: absolute; inset: 0; pointer-events: none; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
@@ -393,11 +442,22 @@ html.short .setting .lab small { display: none; }
 html.short #app.drift canvas { animation-name: drift-phone; }
 html.short .legend { bottom: calc(var(--s2) + var(--sab)); font-size: .72rem; }
 html.short .corner-brand { bottom: calc(var(--s2) + var(--sab)); }
-html.short .pause-title { font-size: 2.2rem; margin-bottom: var(--s2); }
-html.short .pause-panel .menu-item { font-size: 1.6rem; padding-top: var(--s1); padding-bottom: var(--s1); }
-html.short .results { padding: var(--s3) var(--s4) var(--s3); left: 50%; }
-html.short .results .time { font-size: 2.4rem; }
-html.short .results .medals { margin: var(--s2) 0; }
+html.short .overlay, html.short .results { padding: calc(var(--s4) + var(--sat)) calc(var(--s5) + var(--sar)) calc(var(--s3) + var(--sab)) calc(var(--s5) + var(--sal)); row-gap: var(--s2); }
+html.short .ov-name { font-size: 2.2rem; }
+html.short .tile { width: 160px; height: 92px; gap: 8px; font-size: 1.05rem; }
+html.short .tile svg { width: 22px; height: 22px; }
+html.short .tiles { gap: var(--s3); }
+html.short .visuals { min-height: 40px; padding: 4px 10px; gap: var(--s2); }
+html.short .visuals .mini-seg b { padding: 6px 8px; }
+html.short .ov-foot { min-height: 36px; }
+html.short .results .time { font-size: 4.4rem; }
+html.short .results .faults { font-size: 1.05rem; }
+html.short .results .pb { font-size: .82rem; }
+html.short .results .medal i { width: 40px; height: 40px; }
+html.short .results .medal { font-size: .62rem; }
+html.short .results .medal small { display: none; }
+html.short .results .medals { gap: var(--s2); margin-top: var(--s1); }
+html.short .results .headline { gap: var(--s1); }
 /* Narrow: logical width ≤ 720 px. */
 html.narrow .hud-timer { font-size: 1.9rem; }
 html.narrow .hud-faults { font-size: 1.25rem; }
@@ -405,10 +465,11 @@ html.narrow .strip { width: calc(26 * var(--vw)); }
 html.narrow .banner.count { font-size: 6.5rem; }
 html.narrow .banner.go { font-size: 8rem; }
 html.narrow .banner.finish { font-size: 3rem; }
-html.narrow .results { left: 50%; }
 html.narrow .settings-wrap { grid-template-columns: 1fr; }
 @media (prefers-reduced-motion: reduce) {
   #app.drift canvas { animation: none; }
+  .overlay.show .tile, .overlay.show .visuals, .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) both; }
+  .results .time, .results .faults, .results .medals, .results .pb, .results .tiles, .results .ov-foot { transform: none; }
   .title-screen .press { animation: none; opacity: 1; }
 }
 `;

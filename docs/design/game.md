@@ -21,7 +21,7 @@ menu ──load──▶ countdown ──GO──▶ riding ◀──reset──
 | `countdown` | steps with `NEUTRAL_INPUT` (bike alive, settles at sag; throttle ignored) | 0 | tick 360 → GO |
 | `riding` | steps with the player's frame | +1/tick | `fault` event → `crashed`; `finish` event → `finished` |
 | `crashed` | steps with the frame minus `restart` (ragdoll keeps simulating) | +1/tick (Trials rule) | restart edge, or 120 ticks after the fault → `physics.reset(cp)` → `riding` |
-| `finished` | steps with the frame minus `restart` (bike keeps rolling under the results) | frozen at the finish tick | restart tap → full restart (`countdown`) |
+| `finished` | steps with the **game's** frame: throttle 0, lean 0, brake 0 → 0.6 over 1.0 s (`FINISH_BRAKE_S`); a post-line fault undoes that tick and freezes the world | frozen at the finish tick | restart tap → full restart (`countdown`) |
 
 **Countdown (fresh load / full restart).** Events `countdown n=3` at countdown tick 0, `n=2` at 120,
 `n=1` at 240, `go` at 360 (1.0 s cadence). On GO the game calls `physics.reset(-1)` and swallows the
@@ -46,7 +46,17 @@ press edge still fires first (Rising behaviour). Release re-arms.
 
 **Finish.** `finish` event: run clock stops at that tick (`runTime()` == `PhysicsState.finishTime` when the
 run had no restart, since both count ticks from GO/last reset). Results panel is shown 48 ticks (0.4 s)
-after the finish. Medal vs `meta.targetTimeS` (T): platinum ≤ 0.85·T & 0 faults, gold ≤ T & ≤ 1 fault,
+after the finish. **Finish flow (round 6; user: "going off the end and crashing — it goes absolutely nuts"):**
+from the line on the player's frame is ignored and the game drives the bike itself (`stepFinishCoast`):
+throttle 0, lean 0, brake ramping 0 → 0.6 over 1.0 s on the 1/255 grid, so it coasts and stops upright on
+the run-out the tracks add past every finish (flat-test, 13.8 m/s at the line: stopped at +11.5 m after 1.8 s;
+faster tracks roll further). Each finished tick snapshots physics first (two typed-array copies); if the step
+produces a `fault` (old track without run-out, a cliff) the snapshot is restored and `finishFrozen` is set —
+no fault event reaches the HUD / renderer / listeners, no ✕, no ragdoll, no respawn, no camera change, and
+physics is not stepped again until the restart. `effectiveInput()` (the coast frame while finished) is what
+the audio hears, so a pinned throttle does not rev under the results. Test: `game.test.ts` "finish: the game
+owns the input …" — timeline t=0 line · +0.5 s brake 0.3 · +1.0 s brake 0.6 · run-out fault swallowed, hash
+frozen, `faults()` 0, restart tap still works. Medal vs `meta.targetTimeS` (T): platinum ≤ 0.85·T & 0 faults, gold ≤ T & ≤ 1 fault,
 silver ≤ 1.25·T & ≤ 5 faults, bronze = finished. Best time per track in `localStorage`
 (`trials.best.<trackId>` → `{ time, faults, medal }`).
 
@@ -111,16 +121,20 @@ crisp at DPR 1–3 (DOM/CSS, no canvas text), min 12 px at phone width, 1 rem = 
 
 - **Top centre**: run timer `mm:ss.mmm` (tabular numerals, 2.6 rem, heavy italic) with the fault
   counter in a pill to its right (`✕ n`; flips orange for 0.3 s on the respawn frame, not the fault
-  frame — Evolution rule). Frozen and turned green at finish; a PB delta appears under the timer.
+  frame — Evolution rule). At the finish the timer freezes green, the strip / track plate fade to 28 %, no
+  split or delta floats under it (the old "+0:00.000" was the delta against the PB the run had just set);
+  the PB delta is stated once, in the results headline. When the results frame arrives (0.4 s) the whole top
+  band hides (`.hud.results-on`); the pause overlay hides it the same way (`.hud.under-overlay`).
 - **Top right**: checkpoint progress strip (Rising) — marks from `track.checkpoints`/`finishX`, rider
   pin from `bike.pos.x`, passed marks fill.
 - **Top left**: track name · tier; the active-device pill shows only when the device changes, for 1.5 s.
 - **Kinetic banners** (centre, y ≈ 32 %, never over the bike): 3 / 2 / 1 squash-pop, GO scale-out,
   CRASH! stamp 0.2 s after the fault (rotated −6°, red on dark slab), checkpoint flash (thin green
   line sweep + "CHECKPOINT n"), TRACK FINISHED! ribbon. Banners are DOM nodes recycled from a pool of 8.
-- **Results panel** (0.4 s after finish): time, faults, medal, PB flag, `Retry` / `Next` / `Menu`.
+- **Results frame** (0.4 s after finish) and **pause overlay**: one frame, `assets/design/pause/SPEC.md`
+  (direction A, "low action bar") — see §10 *Pause* / *Results*.
 - **Main menu**: title, tracks grouped by tier with best time + medal, quality tier selector
-  (auto/low/medium/high), audio toggle. **Pause**: resume / restart track / quit to menu.
+  (auto/low/medium/high), audio toggle.
 - **Countdown only**: one technique line (first of `meta.hints`, else `meta.technique`); nothing floats over play after GO (§10).
 
 ## 5. Quality tiers and mobile
@@ -248,9 +262,20 @@ can be removed stays.
   (two presses within 3 s). Up/down = row, left/right = value, confirm = cycle / fire. Footer: one quiet
   controls line (every device's bindings, hidden on short phones) and the build stamp. No diagrams, no
   dev switches (`physics=mock`, `audio=0`, `touchdebug`, `ghost`, `countdown` stay URL-only).
-- **Pause**: Resume / Restart track / [Rider ▸ Procedural | Modelled] / [Bike …] / Main menu, track name
-  + tier, live time and faults. The model rows exist only with `setModels`; left/right or confirm flips
-  them live (`applyModels` → `renderer.setModels`, persisted) so the scene behind the overlay updates.
+- **Pause** (round 6, `assets/design/pause/SPEC.md` — user: "too busy, all cramped on the left"): a
+  full-frame grid (`.overlay`: flat `rgba(6,7,9,.5)` scrim, no left gradient, safe-area padding, 4 px backdrop
+  blur on non-short only) — title block top-left (`PAUSED · TIER` kicker, track name, `TIME · FAULTS`;
+  `CRASHED` in red + `CHECKPOINT n OF m` when opened over a crash), **Visuals** chip row top-right
+  (`VISUALS · RIDER [Procedural|Modelled] · BIKE […]`, only with `renderer.setModels`, flips live behind the
+  scrim), three tiles `RESUME / RESTART / QUIT` (`src/ui/tiles.ts`, 240×128 desktop / 160×92 `html.short`,
+  centred on the viewport in the lower third for landscape-phone thumbs, exactly one amber = focused), Reload as
+  a two-press armed corner link bottom-left (`⟳ RELOAD` → `⟳ TAP/PRESS AGAIN TO RELOAD`, 2 s), device legend
+  bottom-right (hidden on touch). Focus rows: segs ⇅ tiles ⇅ reload; ←/→ moves tiles or flips a segment;
+  Enter/A picks; Esc/B/Start resume; `R` restarts. While up: HUD top band + hints hidden, touch layer inert
+  (`.touch-layer.under-overlay`), `#app.dim` on the canvas. In 240 ms (tiles rise with 0/40/80 ms stagger);
+  resume fades out over 120 ms while the HUD fades back over 240 ms; restart / quit are a hard cut.
+  Kinetic banners (CRASH!) stay crisp above the scrim (`.hud` stacks over `.overlay`; it takes no pointer
+  events itself).
 - **In-run HUD changes**: the floating hint strip is gone — one technique line shows during the countdown
   only (first authored hint, else `meta.technique`, else one device keycap pair) and is hidden at GO. The
   device pill shows only when the active device changes, for 1.5 s of sim time. Touch zone outlines drop
@@ -264,13 +289,25 @@ can be removed stays.
   tap's `click` can't land on the menu item that appears under the finger 200 ms later; and for 150 ms after
   any screen change the shell drops confirm/back/nav edges (`SCREEN_GRACE_MS`), so the key that changed
   screens never acts twice.
+- **Title first**: `loadBackdrop` calls `DomHud.hideNow()` after `toMenu()` — HUD hidden with no fade and the
+  countdown banner the backdrop load spawned retired — so neither the boot crossfade nor run → menu ever shows a
+  HUD frame under the title / menu (verified frame by frame: `.hud hidden` opacity 0 from the first HUD frame
+  through loader removal, title `.show` before the loader goes `out`; `?harness=1` still builds zero screens).
 - **Run → menu** (`quit`, from pause or the results panel): exactly the cold-boot path — `loadTrack(b1)`
   afresh (renderer `setTrack`: world rebuilt, particles / finish flash cleared, camera cut to the idle
   framing), `toMenu()`, HUD `hidden`, touch layer off (`.tz` outlines and buttons only render while the layer
   is `.on`, i.e. during a run). Re-arming the finished track in place (`startRun`) left its frozen finish state
   and the touch buttons under the menu (user screenshot, round 3).
-- **Results**: restyled to the tokens (display-face time, amber rule, staged reveal unchanged); medal art
-  from the manifest via `DomHud.setMedalArt`.
+- **Results**: the same frame as pause (`.results`, inside the HUD root): kicker `TRACK CLEARED · TIER`
+  (green when a medal above bronze was earned), track name, `PB · TARGET` stats; headline centred in the free
+  band — time 6.6 rem / 4.4 rem short, `✕ n FAULTS`, PB line (`−0:02.410 · NEW PERSONAL BEST` green /
+  `+0:01.120 · BEST 0:34.230` / `FIRST CLEAR`), four medal discs (art via `DomHud.setMedalArt`, thresholds
+  under each on desktop only); tiles `RETRY / NEXT TRACK / MENU` (NEXT disabled when the next track is locked
+  or there is none — `App.nextTrackEnabled`, recomputed in `onResults` since the clear may unlock it; default
+  focus NEXT when live, else RETRY). Staged, sim-clocked: title block 0 · time .15 · faults .35 · medals + tiles
+  + scrim .35 at .6 · PB line + earned pop .9 s. Keyboard / pad once the tiles are up (`resultsInteractive`):
+  ←/→ move, Enter/A pick, throttle *edge* = retry; Esc/Start = MENU from the line on; R / B / Backspace retry
+  through the game's own restart edge at any time. Retry / next / menu are a hard cut.
 - **Sound cues** (`src/ui/sfx.ts`): synthesised tick / confirm / back / launch through the audio system's
   `AudioContext` when it exposes one (single output graph), else a private context; obeys the Sound
   setting and volume; silent until the first gesture unlocks audio.

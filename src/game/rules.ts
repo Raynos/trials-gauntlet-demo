@@ -15,6 +15,9 @@ export const AUTO_RESPAWN_S = 1.0;
 export const HOLD_RESTART_S = 0.6;
 /** Finish → results panel. */
 export const RESULTS_DELAY_S = 0.4;
+/** After the line the game owns the input: throttle 0, lean 0, brake ramps 0 → FINISH_BRAKE over this long, so the bike coasts to a stop on the run-out. */
+export const FINISH_BRAKE_S = 1.0;
+export const FINISH_BRAKE = 0.6;
 
 export interface RuleTicks {
   countdownBeat: number;
@@ -22,6 +25,7 @@ export interface RuleTicks {
   autoRespawn: number;
   holdRestart: number;
   resultsDelay: number;
+  finishBrake: number;
 }
 
 export function ruleTicks(physicsHz: number): RuleTicks {
@@ -32,6 +36,7 @@ export function ruleTicks(physicsHz: number): RuleTicks {
     autoRespawn: Math.round(AUTO_RESPAWN_S * physicsHz),
     holdRestart: Math.round(HOLD_RESTART_S * physicsHz),
     resultsDelay: Math.round(RESULTS_DELAY_S * physicsHz),
+    finishBrake: Math.round(FINISH_BRAKE_S * physicsHz),
   };
 }
 

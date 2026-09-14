@@ -125,7 +125,12 @@ export class TouchInput implements InputSource {
     if (!on) this.releaseAll('disabled');
   }
 
-  /** Show the zone outlines (called when touch becomes the active device). */
+  /** An overlay (pause / results) is up: zones and buttons neither draw nor take pointers, and any held finger is released. */
+  setOverlay(on: boolean): void {
+    this.root.classList.toggle('under-overlay', on);
+    if (on) this.releaseAll('overlay');
+  }
+
   /** 3 s into a run the zone outlines/labels drop to ~30 % so play is not under a diagram. */
   setSettled(on: boolean): void {
     this.root.classList.toggle('settled', on);

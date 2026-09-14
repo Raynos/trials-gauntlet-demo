@@ -6,9 +6,9 @@
  * same frames and `animations: disabled` screenshots cannot hide a banner.
  */
 import type { GameEvent, InputDevice, Medal, PhysicsState, RunInfo, RunResult, TrackDef } from '../core/types';
-import type { BestEntry } from './best';
-import { MEDAL_LABEL, formatDelta, formatTime } from './format';
+import { formatDelta, formatTime } from './format';
 import type { Hud, HudAction } from './index';
+import { TileRow } from './tiles';
 
 type BannerKind = 'count' | 'go' | 'crash' | 'cp' | 'finish';
 
@@ -30,6 +30,12 @@ const DEFAULT_HINTS: Record<InputDevice, string[]> = {
   touch: ['Right thumb Gas / Brake', 'Left thumb Lean', '↻ Restart', 'Hold ↻ Restart track'],
 };
 
+const RESULTS_LEGEND: Record<InputDevice, string> = {
+  keyboard: `<span><kbd>Enter</kbd>Select</span><span><kbd>R</kbd>Retry</span><span><kbd>Esc</kbd>Menu</span>`,
+  gamepad: `<span><i class="pad a">A</i>Select</span><span><i class="pad b">B</i>Retry</span>`,
+  touch: '',
+};
+
 const easeOut = (t: number): number => 1 - (1 - t) * (1 - t);
 const clamp01 = (t: number): number => (t < 0 ? 0 : t > 1 ? 1 : t);
 
@@ -40,7 +46,6 @@ export class DomHud implements Hud {
   private readonly timerEl: HTMLDivElement;
   private readonly faultsEl: HTMLDivElement;
   private readonly faultsN: HTMLSpanElement;
-  private readonly deltaEl: HTMLDivElement;
   private readonly strip: HTMLDivElement;
   private readonly stripFill: HTMLDivElement;
   private readonly stripPin: HTMLDivElement;
@@ -51,6 +56,12 @@ export class DomHud implements Hud {
   private readonly banners: Banner[] = [];
   private readonly hintsEl: HTMLDivElement;
   private readonly results: HTMLDivElement;
+  private readonly resKicker: HTMLDivElement;
+  private readonly resName: HTMLDivElement;
+  private readonly resStats: HTMLDivElement;
+  private readonly resTiles: TileRow;
+  private readonly resLegend: HTMLDivElement;
+  private nextEnabled = true;
   private readonly resTime: HTMLDivElement;
   private readonly resFaults: HTMLDivElement;
   private readonly resPb: HTMLDivElement;
@@ -64,7 +75,6 @@ export class DomHud implements Hud {
   private resultsStage = -1;
 
   private track: TrackDef | null = null;
-  private best: BestEntry | null = null;
   private device: InputDevice = 'keyboard';
   private deviceShown = false;
   private deviceVisible = false;
@@ -92,7 +102,8 @@ export class DomHud implements Hud {
     }
   }
 
-  constructor(parent: HTMLElement, private readonly bestOf: (trackId: string) => BestEntry | null = () => null) {
+  /** `_bestOf` is kept for the composition signature; the PB delta is stated by the results panel (from `RunResult`), never floated under the timer. */
+  constructor(parent: HTMLElement, _bestOf?: (trackId: string) => unknown) {
     this.root = el('div', 'hud hidden');
 
     // Top band.
@@ -119,7 +130,6 @@ export class DomHud implements Hud {
     this.strip.append(bar, el('div', 'finish'), this.ghostPin, this.stripPin);
     right.appendChild(this.strip);
     top.append(left, center, right);
-    this.deltaEl = el('div', 'hud-delta');
 
     // Banners.
     this.bannersEl = el('div', 'banners');
@@ -131,23 +141,24 @@ export class DomHud implements Hud {
 
     this.hintsEl = el('div', 'hints');
 
-    // Results.
+    // Results (SPEC.md §4.2 / §4.3): full-frame overlay in the pause frame — title block top-left,
+    // headline centred in the free band, tile row in the lower third, legend bottom-right.
     this.results = el('div', 'results');
     this.results.innerHTML = `
-      <h2>Track finished</h2>
-      <div class="headline"><div class="time">0:00.000</div><div class="faults"><span>✕</span> 0 faults</div></div>
-      <div class="pb"></div>
-      <div class="medals">
-        <div class="medal bronze"><i></i>Bronze<small></small></div>
-        <div class="medal silver"><i></i>Silver<small></small></div>
-        <div class="medal gold"><i></i>Gold<small></small></div>
-        <div class="medal platinum"><i></i>Platinum<small></small></div>
-      </div>
-      <div class="actions">
-        <button class="btn primary" data-act="retry">Retry</button>
-        <button class="btn" data-act="next">Next track</button>
-        <button class="btn" data-act="menu">Menu</button>
+      <div class="ov-head"><div class="ov-title"><div class="ov-kicker"></div><div class="ov-name"></div><div class="ov-stats"></div></div></div>
+      <div class="ov-free headline">
+        <div class="row"><div class="time">0:00.000</div><div class="faults"><span>✕</span> 0 faults</div></div>
+        <div class="pb"></div>
+        <div class="medals">
+          <div class="medal bronze"><i></i><b>Bronze</b><small></small></div>
+          <div class="medal silver"><i></i><b>Silver</b><small></small></div>
+          <div class="medal gold"><i></i><b>Gold</b><small></small></div>
+          <div class="medal platinum"><i></i><b>Platinum</b><small></small></div>
+        </div>
       </div>`;
+    this.resKicker = this.results.querySelector('.ov-kicker') as HTMLDivElement;
+    this.resName = this.results.querySelector('.ov-name') as HTMLDivElement;
+    this.resStats = this.results.querySelector('.ov-stats') as HTMLDivElement;
     this.resTime = this.results.querySelector('.time') as HTMLDivElement;
     this.resFaults = this.results.querySelector('.faults') as HTMLDivElement;
     this.resPb = this.results.querySelector('.pb') as HTMLDivElement;
@@ -157,13 +168,21 @@ export class DomHud implements Hud {
       gold: this.results.querySelector('.medal.gold') as HTMLDivElement,
       platinum: this.results.querySelector('.medal.platinum') as HTMLDivElement,
     };
-    this.results.addEventListener('click', (e) => {
-      const act = (e.target as HTMLElement).closest('[data-act]')?.getAttribute('data-act') as HudAction | null;
-      if (act) this.onAction?.(act);
-    });
+    this.resTiles = new TileRow(this.results, null);
+    this.resTiles.setTiles([
+      { id: 'retry', label: 'Retry', icon: 'restart' },
+      { id: 'next', label: 'Next track', icon: 'next' },
+      { id: 'menu', label: 'Menu', icon: 'door' },
+    ]);
+    this.resTiles.onPick = (id) => this.onAction?.(id as HudAction);
+    const foot = el('div', 'ov-foot');
+    this.resLegend = el('div', 'legend');
+    this.resLegend.innerHTML = RESULTS_LEGEND.keyboard;
+    foot.appendChild(this.resLegend);
+    this.results.appendChild(foot);
 
     this.flashEl = el('div', 'flash');
-    this.root.append(this.flashEl, top, this.deltaEl, this.bannersEl, this.hintsEl, this.results);
+    this.root.append(this.flashEl, top, this.bannersEl, this.hintsEl, this.results);
     parent.appendChild(this.root);
   }
 
@@ -171,7 +190,6 @@ export class DomHud implements Hud {
 
   setTrack(track: TrackDef): void {
     this.track = track;
-    this.best = this.bestOf(track.id);
     this.trackEl.innerHTML = `<b>${escapeHtml(track.tier)}</b>${escapeHtml(track.name)}`;
     for (const m of this.stripMarks) m.remove();
     this.stripMarks = [];
@@ -199,6 +217,7 @@ export class DomHud implements Hud {
       this.device = device;
       this.deviceEl.innerHTML = `<i></i>${DEVICE_LABEL[device]}`;
       this.root.classList.toggle('touch', device === 'touch');
+      this.resLegend.innerHTML = RESULTS_LEGEND[device];
       this.deviceShowUntil = this.simTime + DEVICE_PILL_S;
       this.refreshHints();
     }
@@ -210,6 +229,15 @@ export class DomHud implements Hud {
     if (info.phase !== this.phase) {
       this.phase = info.phase;
       this.root.classList.toggle('hidden', info.phase === 'menu');
+      // Finish: the timer freezes green, the progress strip fades, no split / delta floats under the
+      // timer (the PB delta is stated once, inside the results panel).
+      const fin = info.phase === 'finished';
+      this.root.classList.toggle('finished', fin);
+      this.timerEl.classList.toggle('frozen', fin);
+      if (fin) {
+        this.splitStart = -1;
+        this.splitEl.style.opacity = '0';
+      }
       if (info.phase === 'countdown' || info.phase === 'menu') this.hideResults();
       // One technique line before GO only; nothing floats over play.
       this.hintsEl.classList.toggle('show', info.phase === 'countdown' && this.hintsEl.childElementCount > 0);
@@ -225,21 +253,11 @@ export class DomHud implements Hud {
       const dot = text.indexOf('.');
       this.timerEl.innerHTML = `${text.slice(0, dot)}<span class="ms">${text.slice(dot)}</span>`;
     }
-    this.timerEl.classList.toggle('frozen', info.phase === 'finished');
     if (info.faults !== this.lastFaults) {
       this.lastFaults = info.faults;
       this.faultsN.textContent = String(info.faults);
     }
     this.faultsEl.classList.toggle('flip', this.simTime < this.flipUntil);
-
-    // Delta vs best at the finish line only (no ghost yet).
-    if (info.phase === 'finished' && this.best) {
-      const d = info.runTime - this.best.time;
-      this.deltaEl.textContent = formatDelta(d);
-      this.deltaEl.className = `hud-delta show ${d <= 0 ? 'ahead' : 'behind'}`;
-    } else if (this.deltaEl.classList.contains('show')) {
-      this.deltaEl.className = 'hud-delta';
-    }
 
     this.animateSplit();
     this.animateFlash();
@@ -319,6 +337,7 @@ export class DomHud implements Hud {
   }
 
   showSplit(_checkpoint: number, delta: number): void {
+    if (this.phase === 'finished') return;
     this.splitEl.textContent = formatDelta(delta);
     this.splitEl.className = `hud-split ${delta <= 0 ? 'ahead' : 'behind'}`;
     this.splitStart = this.simTime;
@@ -372,16 +391,28 @@ export class DomHud implements Hud {
   showResults(r: RunResult): void {
     this.resultsAt = this.simTime;
     this.resultsStage = -1;
-    this.resTime.textContent = formatTime(r.time);
-    this.resFaults.innerHTML = `<span>✕</span> ${r.faults} ${r.faults === 1 ? 'fault' : 'faults'}`;
-    this.resPb.textContent = r.personalBest
-      ? r.previousBest === null
-        ? 'First clear'
-        : `New personal record  ${formatDelta(r.time - r.previousBest)}`
-      : r.previousBest !== null
-        ? `Best ${formatTime(r.previousBest)}`
-        : '';
+    const name = this.track?.name ?? '';
+    const tier = this.track?.tier ?? '';
+    const earned = r.medal !== 'bronze' || (r.targetTimeS === null && r.faults === 0);
+    this.resKicker.textContent = `Track cleared · ${tier}`;
+    this.resKicker.className = `ov-kicker ${earned ? 'green' : ''}`;
+    this.resName.textContent = name;
     const T = r.targetTimeS;
+    this.resStats.innerHTML = `<span>PB <b>${r.previousBest !== null ? formatTime(Math.min(r.previousBest, r.time)) : '—'}</b></span>${T ? `<i>·</i><span>Target <b>${formatTime(T)}</b></span>` : ''}`;
+    const text = formatTime(r.time);
+    const dot = text.indexOf('.');
+    this.resTime.innerHTML = `${text.slice(0, dot)}<span class="ms">${text.slice(dot)}</span>`;
+    this.resFaults.innerHTML = `<span>✕</span> ${r.faults} ${r.faults === 1 ? 'fault' : 'faults'}`;
+    if (r.personalBest) {
+      this.resPb.className = 'pb green';
+      this.resPb.textContent = r.previousBest === null ? 'First clear' : `${formatDelta(r.time - r.previousBest)} · New personal best`;
+    } else if (r.previousBest !== null) {
+      this.resPb.className = 'pb behind';
+      this.resPb.innerHTML = `<em>${formatDelta(r.time - r.previousBest)}</em> · Best ${formatTime(r.previousBest)}`;
+    } else {
+      this.resPb.className = 'pb';
+      this.resPb.textContent = '';
+    }
     const thresholds = T
       ? { platinum: `≤ ${formatTime(T * 0.85)} · 0✕`, gold: `≤ ${formatTime(T)} · ≤1✕`, silver: `≤ ${formatTime(T * 1.25)} · ≤5✕`, bronze: 'finish' }
       : { platinum: '—', gold: '0 faults', silver: '—', bronze: 'finish' };
@@ -390,14 +421,65 @@ export class DomHud implements Hud {
       m.classList.toggle('earned', k === r.medal);
       (m.querySelector('small') as HTMLElement).textContent = thresholds[k];
     }
-    this.results.querySelector('h2')!.textContent = `${MEDAL_LABEL[r.medal]} · ${this.track?.name ?? ''}`;
     this.results.className = 'results show stage-0';
-    this.best = this.bestOf(r.trackId);
+    this.root.classList.add('results-on');
+    this.resTiles.setDisabled('next', !this.nextEnabled);
+    this.resTiles.focusId(this.nextEnabled ? 'next' : 'retry');
     for (const b of this.banners) if (b.kind === 'finish') this.retire(b); // the panel restates it
   }
 
+  /** NEXT TRACK is disabled when the next track is locked / this is the last one (App decides). */
+  setNextEnabled(on: boolean): void {
+    this.nextEnabled = on;
+    this.resTiles.setDisabled('next', !on);
+    if (this.resultsAt >= 0) this.resTiles.focusId(on ? 'next' : 'retry');
+  }
+
+  /** Tiles are on screen (stage ≥ 3, 0.6 s after `showResults`): pad / keyboard may drive them. */
+  resultsInteractive(): boolean {
+    return this.resultsAt >= 0 && this.resultsStage >= 3;
+  }
+
+  resultsMove(dx: number): void {
+    if (this.resultsInteractive()) this.resTiles.move(dx);
+  }
+
+  resultsConfirm(): void {
+    if (!this.resultsInteractive()) return;
+    this.resTiles.press();
+    this.resTiles.pick();
+  }
+
+  /**
+   * Menu backdrop: hide the HUD on this frame, no fade, and drop the countdown banner the backdrop
+   * load spawned — the title / menu must be the first thing after the loader crossfade and after
+   * run → menu, never a fading timer or a "3" (docs/design/game.md §10).
+   */
+  hideNow(): void {
+    this.phase = 'menu';
+    this.root.style.transition = 'none';
+    this.root.classList.add('hidden');
+    void this.root.offsetHeight;
+    this.root.style.transition = '';
+    for (const b of this.banners) this.retire(b);
+    this.pendingCrashAt = -1;
+    this.hideResults();
+  }
+
+  /** Pause overlay up: the whole HUD top band hides (SPEC §6); banners stay. */
+  setOverlay(on: boolean): void {
+    this.root.classList.toggle('under-overlay', on);
+  }
+
   hideResults(): void {
-    this.results.className = 'results';
+    if (this.results.classList.contains('show')) {
+      // Hard cut on retry / next / menu: the frame is gone the same tick the world resets.
+      this.results.style.transition = 'none';
+      this.results.className = 'results';
+      void this.results.offsetHeight;
+      this.results.style.transition = '';
+    } else this.results.className = 'results';
+    this.root.classList.remove('results-on');
     this.resultsAt = -1;
     this.resultsStage = -1;
   }

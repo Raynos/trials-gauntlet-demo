@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { hashPhysicsState } from '../core/hash';
-import type { CameraDebug, CompiledTrack, GameEvent, PhysicsState, RenderStats } from '../core/types';
+import type { CameraDebug, CompiledTrack, GameEvent, InputFrame, PhysicsState, RenderStats } from '../core/types';
 import type { GameRenderer } from '../render';
 import type { Hud } from '../ui';
 import { Game } from './game';
@@ -179,6 +179,99 @@ describe('Game run state machine', () => {
     expect(result!.medal).toBe('gold');
     game.step(100);
     expect(game.runTime()).toBe(t);
+  });
+
+  it('finish: the game owns the input (throttle 0, lean 0, brake 0 → 0.6 over 1.0 s) and the run-out crash is swallowed and frozen', () => {
+    // Mock physics that keeps riding past the line (like the real bike) and crashes 200 ticks after it.
+    class RunOutPhysics extends MockPhysics {
+      fed: InputFrame[] = [];
+      crashAtTick = -1;
+      override step(input: InputFrame): void {
+        this.fed.push({ ...input });
+        const s = this.getState();
+        if (s.finished && !s.faulted) {
+          if (this.crashAtTick < 0) this.crashAtTick = s.tick + 200;
+          if (s.tick >= this.crashAtTick) {
+            // What the real world does on a cliff after the line: fault event + ragdoll.
+            (this as unknown as { crash(reason: 'crash' | 'out-of-bounds'): void }).crash('out-of-bounds');
+            s.tick++;
+            return;
+          }
+        }
+        super.step(input);
+      }
+    }
+    const physics = new RunOutPhysics(120);
+    const renderer = new StubRenderer();
+    const hudEvents: GameEvent[] = [];
+    const hud: Hud = {
+      setTrack() {},
+      setRun() {},
+      update() {},
+      onEvent(e: GameEvent) {
+        hudEvents.push(e);
+      },
+      showSplit() {},
+      showResults() {},
+      hideResults() {},
+      setDevice() {},
+    } as unknown as Hud;
+    const game = new Game({ physics, renderer, hud, autoSkipCountdown: true });
+    const events: GameEvent[] = [];
+    game.onEvent((e) => events.push(e));
+    game.loadTrack('flat-test');
+    game.setInput({ throttle: 1, lean: -0.5 }); // the player keeps the gas pinned and leans across the line
+    let guard = 0;
+    while (game.phase() !== 'finished' && guard++ < 6000) game.step(1);
+    expect(game.phase()).toBe('finished');
+    const finishTick = physics.fed.length;
+    const runTime = game.runTime();
+
+    // t = 0 … 1.0 s after the line: throttle 0, lean 0, brake ramps to 0.6 and holds.
+    game.step(1);
+    let f = physics.fed.at(-1)!;
+    expect(f.throttle).toBe(0);
+    expect(f.lean).toBe(0);
+    expect(f.brake).toBeGreaterThan(0);
+    expect(f.brake).toBeLessThan(0.01); // first step of the ramp, on the 1/255 grid
+    game.step(59); // +0.5 s
+    f = physics.fed.at(-1)!;
+    expect(f.brake).toBeCloseTo(0.3, 2);
+    game.step(60); // +1.0 s
+    f = physics.fed.at(-1)!;
+    expect(f.brake).toBeCloseTo(0.6, 3);
+    expect(game.effectiveInput().throttle).toBe(0);
+    game.step(30);
+    expect(physics.fed.at(-1)!.brake).toBeCloseTo(0.6, 3);
+    expect(physics.fed.length - finishTick).toBe(150);
+
+    // The run-out crash (200 ticks after the line): swallowed and frozen. No fault surfaces anywhere.
+    const hashBefore = game.hashState();
+    game.step(60);
+    expect(game.phase()).toBe('finished');
+    expect(game.faults()).toBe(0);
+    expect(game.counters().finishFrozen).toBe(true);
+    expect(game.getState().faulted).toBeNull(); // restored to the tick before the fault: no ragdoll either
+    expect(game.getState().finished).toBe(true);
+    expect(events.filter((e) => e.type === 'fault')).toEqual([]);
+    expect(events.filter((e) => e.type === 'restart')).toEqual([]);
+    expect(hudEvents.filter((e) => e.type === 'fault' || e.type === 'restart')).toEqual([]);
+    expect(renderer.events.filter((e) => e.type === 'fault' || e.type === 'restart')).toEqual([]);
+    // Frozen: physics is not stepped again, the hash holds.
+    const fedAtFreeze = physics.fed.length;
+    const frozenHash = game.hashState();
+    game.step(120);
+    expect(physics.fed.length).toBe(fedAtFreeze);
+    expect(game.hashState()).toBe(frozenHash);
+    expect(hashBefore).not.toBe(frozenHash); // it did coast between the line and the freeze
+    expect(game.runTime()).toBe(runTime);
+    // Results still published, and a restart tap still works out of the frozen state.
+    expect(game.result()).not.toBeNull();
+    game.setInput({ restart: true });
+    game.step(1);
+    expect(game.phase()).toBe('riding');
+    expect(game.counters().finishFrozen).toBe(false);
+    expect(game.getState().faulted).toBeNull();
   });
 
   it('a recording with restart edges and a crash replays to the same hash and run clock', () => {

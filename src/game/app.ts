@@ -33,6 +33,7 @@ import {
   saveSoundEnabled,
   saveVolume,
   shipTracks,
+  tierUnlocked,
   type BestTimes,
   type DomHud,
   type FrontScreen,
@@ -123,6 +124,8 @@ export class App {
   private rideSeconds = 0;
   private settled = false;
   private screenAt = 0;
+  private prevRestart = false;
+  private prevThrottle = false;
 
   constructor(private readonly o: AppOptions) {
     this.game = o.game;
@@ -229,7 +232,11 @@ export class App {
     this.pause = new PauseMenu(o.uiRoot, this.sfx, {
       resume: () => this.resume(),
       restartTrack: () => {
-        this.resume();
+        // Hard cut (SPEC §6): overlay gone on the same frame the world resets.
+        this.pause.hide();
+        this.setOverlay(false);
+        this.game.setPaused(false);
+        this.lastNow = performance.now();
         this.game.restartFromStart();
       },
       quit: () => this.quit(),
@@ -278,6 +285,12 @@ export class App {
 
     this.game.onPhase = (phase) => {
       if (phase === 'riding' && !this.probeDone) this.probeArmed = true; // probe the first 60 frames after GO
+      if (phase !== 'finished' && !this.pause.visible) this.touch.setOverlay(false); // retry / next out of the results frame
+    };
+    // Results: NEXT TRACK is live only when the next track is unlocked (this clear may have unlocked it).
+    this.game.onResults = () => {
+      this.hud.setNextEnabled(this.nextTrackEnabled());
+      this.touch.setOverlay(true);
     };
   }
 
@@ -318,7 +331,7 @@ export class App {
     if (!fresh && this.game.currentTrack?.id === id) this.game.startRun();
     else this.game.loadTrack(id);
     this.game.toMenu();
-    this.hud.hideResults();
+    this.hud.hideNow(); // no HUD frame (timer, "3" banner) under the title / menu
     setTimeout(() => this.audio?.setMasterVolume(vol), 60);
   }
 
@@ -368,8 +381,11 @@ export class App {
     // Track select hides itself after its fly-up (same-scene handoff).
     if (!this.tracksScreen.visible) this.tracksScreen.hide();
     this.pause.hide();
+    this.setOverlay(false);
     this.game.setPaused(false);
     this.touch.setEnabled(true);
+    this.touch.setOverlay(false);
+    this.hud.setNextEnabled(this.nextTrackEnabled());
   }
 
   /**
@@ -382,14 +398,17 @@ export class App {
   private quit(): void {
     this.game.setPaused(false);
     this.pause.hide();
+    this.setOverlay(false);
     this.hud.hideResults();
     this.touch.setEnabled(false);
     this.loadBackdrop(BACKDROP_TRACK, true);
     this.goto('menu');
   }
 
+  /** Resume: the game unpauses on this frame; the overlay fades over --t1 while the HUD fades back over --t2 (SPEC §6). */
   private resume(): void {
-    this.pause.hide();
+    this.pause.fadeOut();
+    this.setOverlay(false);
     this.game.setPaused(false);
     this.lastNow = performance.now();
   }
@@ -400,12 +419,39 @@ export class App {
     else {
       this.game.setPaused(true);
       const t = this.game.currentTrack;
-      this.pause.show({ trackName: t?.name ?? '', tier: t?.tier ?? '', runTime: this.game.runTime(), faults: this.game.faults() });
+      const st = this.game.getState();
+      this.pause.setDevice(this.mux.activeDevice() ?? 'keyboard');
+      this.pause.show({
+        trackName: t?.name ?? '',
+        tier: t?.tier ?? '',
+        runTime: this.game.runTime(),
+        faults: this.game.faults(),
+        phase: this.game.phase(),
+        checkpoint: st.checkpoint,
+        checkpointCount: t?.checkpoints.length ?? 0,
+      });
+      this.setOverlay(true);
     }
+  }
+
+  /** Pause overlay up: HUD top band hidden, touch layer inert (a tile tap must not rev), scene dimmed 50 %. */
+  private setOverlay(on: boolean): void {
+    this.hud.setOverlay(on);
+    this.touch.setOverlay(on);
+    this.o.sceneRoot?.classList.toggle('dim', on && this.screen === 'run');
   }
 
   private inRun(): boolean {
     return this.screen === 'run' && this.game.phase() !== 'menu';
+  }
+
+  /** The next ship track exists, is not this one, and its tier is unlocked (src/ui/progress.ts rule). */
+  private nextTrackEnabled(): boolean {
+    const ship = shipTracks(this.tracks, this.o.dev ?? false);
+    const i = ship.findIndex((t) => t.id === this.lastTrackId);
+    const next = ship[i + 1];
+    if (!next) return false;
+    return tierUnlocked(this.tracks, next.tier, (id) => this.bestTimes.get(id)?.medal ?? null, this.o.dev ?? false);
   }
 
   private nextTrackId(): string {
@@ -418,6 +464,8 @@ export class App {
 
   private tickFrame(elapsed: number): void {
     const { frame, meta } = this.mux.poll();
+    const restartEdge = frame.restart === true && !this.prevRestart;
+    const throttleEdge = frame.throttle > 0 && !this.prevThrottle;
     if (performance.now() - this.screenAt < SCREEN_GRACE_MS && this.screen !== 'run') {
       // The key / tap that just changed screens must not also act on the new one.
       meta.confirm = meta.back = meta.pause = false;
@@ -435,10 +483,23 @@ export class App {
       if (meta.navX || meta.navY) this.pause.move(meta.navX, meta.navY);
       if (meta.pause || meta.back) this.resume();
       else if (meta.confirm) this.pause.confirm();
+      else if (restartEdge) this.pause.restartShortcut(); // R (keyboard) = RESTART while paused; B is back → resume
+    } else if (this.game.phase() === 'finished') {
+      // Results (SPEC §5): Esc/Start = MENU from the line on; once the tiles are up (0.6 s) ←/→ move, Enter/A pick,
+      // a throttle *edge* is retry (never a held gas across the line); R / B / Backspace retry through the game's own
+      // restart edge at any time, so retry stays one press from the moment the timer freezes.
+      const live = this.hud.resultsInteractive();
+      if (live && meta.navX) this.hud.resultsMove(meta.navX);
+      if (meta.pause) this.quit();
+      else if (live && meta.confirm) this.hud.resultsConfirm();
+      else if (live && throttleEdge) this.game.restartFromStart();
+      else this.game.setInput(frame);
     } else {
       if (meta.pause) this.togglePause();
       this.game.setInput(frame);
     }
+    this.prevRestart = frame.restart === true;
+    this.prevThrottle = frame.throttle > 0;
     const dev = this.mux.activeDevice();
     if (dev) this.hud.setDevice(dev, this.mux.idleFrames() < DEVICE_SHOW_FRAMES);
 
@@ -464,6 +525,7 @@ export class App {
     this.touch.setVisible(d === 'touch');
     this.hud.setDevice(d, true);
     for (const s of [this.menu, this.tracksScreen, this.settings]) s.setDevice(d);
+    this.pause.setDevice(d);
   }
 
   // -- quality ------------------------------------------------------------------
