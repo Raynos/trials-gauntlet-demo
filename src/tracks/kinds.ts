@@ -24,6 +24,16 @@ import type { Collider, HazardZone, SurfaceKind, Vec2 } from '../core/types';
 // Param schemas + defaults
 // ---------------------------------------------------------------------------
 
+/**
+ * Every kind carries `variant` (integer, default 0): a deterministic look
+ * selector for render (crate vs container, plank grain, drum livery). It never
+ * affects colliders. Render reads `thickness width length radius variant surface`
+ * from `placed[].params`; those names are stable.
+ */
+export interface BaseParams {
+  variant: number;
+}
+
 export type ObstacleKind =
   | 'ramp'
   | 'plank'
@@ -54,7 +64,7 @@ export const OBSTACLE_KINDS: readonly ObstacleKind[] = [
 ];
 
 /** Solid wedge. `curve` 0 = straight, +1 = concave (quarter-pipe / kicker lip), -1 = convex roller. */
-export interface RampParams {
+export interface RampParams extends BaseParams {
   length: number;
   height: number;
   curve: number;
@@ -62,7 +72,7 @@ export interface RampParams {
   surface: SurfaceKind;
 }
 /** Thin board: a one-way top surface only. `height` = elevation of the near end above pos.y. */
-export interface PlankParams {
+export interface PlankParams extends BaseParams {
   length: number;
   angleDeg: number;
   height: number;
@@ -70,28 +80,29 @@ export interface PlankParams {
   oneWay: boolean;
   surface: SurfaceKind;
 }
-/** Cylinder lying across the course. `depth` sinks it into the ground. `rolls` = spins under the tyre (never translates). */
-export interface DrumParams {
+/** Cylinder lying across the course. `depth` sinks it into the ground. `rolls` = spins under the tyre (never translates). `width` = visual depth along z (render only). */
+export interface DrumParams extends BaseParams {
   radius: number;
+  width: number;
   depth: number;
   rolls: boolean;
   surface: SurfaceKind;
 }
 /** Pit punched out of the ground, `depth` deep, with a water/kill hazard filling it. Ground must be flat across it. */
-export interface GapParams {
+export interface GapParams extends BaseParams {
   width: number;
   depth: number;
   hazard: 'water' | 'kill';
 }
 /** Solid slab, not rollable. `lip` adds a one-way ledge projecting back from the top front edge (front-wheel grab). */
-export interface WallParams {
+export interface WallParams extends BaseParams {
   height: number;
   width: number;
   lip: number;
   surface: SurfaceKind;
 }
 /** Hinged board. `height` = pivot height. `angleDeg` 0 = auto: the tilt at which an end touches the ground (capped 30°). */
-export interface SeesawParams {
+export interface SeesawParams extends BaseParams {
   length: number;
   height: number;
   thickness: number;
@@ -100,7 +111,7 @@ export interface SeesawParams {
   surface: SurfaceKind;
 }
 /** Pyramid of logs: `count` on the bottom row, one fewer per row for `rows` rows. */
-export interface LogpileParams {
+export interface LogpileParams extends BaseParams {
   radius: number;
   count: number;
   rows: number;
@@ -108,7 +119,7 @@ export interface LogpileParams {
   surface: SurfaceKind;
 }
 /** Staircase. `height` = rise per step, `length` = run per step. 'down' starts at count*rise and descends. */
-export interface StairParams {
+export interface StairParams extends BaseParams {
   count: number;
   height: number;
   length: number;
@@ -116,13 +127,13 @@ export interface StairParams {
   surface: SurfaceKind;
 }
 /** Solid container / platform (metal by default). */
-export interface BoxParams {
+export interface BoxParams extends BaseParams {
   width: number;
   height: number;
   surface: SurfaceKind;
 }
 /** Thin post with a round cap; a rear-wheel hop target. `count`/`spacing` for a row of equal poles. */
-export interface PoleParams {
+export interface PoleParams extends BaseParams {
   height: number;
   radius: number;
   width: number;
@@ -131,7 +142,7 @@ export interface PoleParams {
   surface: SurfaceKind;
 }
 /** Oil drum(s) standing on end. `burning` adds a fire hazard 0.8 m tall above each barrel. */
-export interface BarrelParams {
+export interface BarrelParams extends BaseParams {
   radius: number;
   height: number;
   count: number;
@@ -140,7 +151,7 @@ export interface BarrelParams {
   surface: SurfaceKind;
 }
 /** Low concrete kerb / shelf: a hop-up or drop-off step, landable on top. */
-export interface LedgeParams {
+export interface LedgeParams extends BaseParams {
   height: number;
   length: number;
   surface: SurfaceKind;
@@ -162,18 +173,18 @@ export interface KindParams {
 }
 
 export const KIND_DEFAULTS: { readonly [K in ObstacleKind]: Readonly<KindParams[K]> } = {
-  ramp: { length: 4, height: 1, curve: 0, direction: 'up', surface: 'wood' },
-  plank: { length: 4, angleDeg: 0, height: 0, thickness: 0.12, oneWay: true, surface: 'wood' },
-  drum: { radius: 0.8, depth: 0, rolls: false, surface: 'metal' },
-  gap: { width: 3, depth: 3, hazard: 'water' },
-  wall: { height: 1, width: 0.4, lip: 0, surface: 'concrete' },
-  seesaw: { length: 6, height: 1, thickness: 0.12, angleDeg: 0, mass: 60, surface: 'wood' },
-  logpile: { radius: 0.3, count: 3, rows: 1, spacing: 0, surface: 'wood' },
-  stair: { count: 5, height: 0.3, length: 0.45, direction: 'up', surface: 'concrete' },
-  box: { width: 4, height: 1, surface: 'metal' },
-  pole: { height: 1.5, radius: 0.25, width: 0.16, count: 1, spacing: 1.8, surface: 'metal' },
-  barrel: { radius: 0.3, height: 0.9, count: 1, spacing: 0.7, burning: true, surface: 'metal' },
-  ledge: { height: 0.5, length: 4, surface: 'concrete' },
+  ramp: { length: 4, height: 1, curve: 0, direction: 'up', surface: 'wood', variant: 0 },
+  plank: { length: 4, angleDeg: 0, height: 0, thickness: 0.12, oneWay: true, surface: 'wood', variant: 0 },
+  drum: { radius: 0.8, width: 1.2, depth: 0, rolls: false, surface: 'metal', variant: 0 },
+  gap: { width: 3, depth: 3, hazard: 'water', variant: 0 },
+  wall: { height: 1, width: 0.4, lip: 0, surface: 'concrete', variant: 0 },
+  seesaw: { length: 6, height: 1, thickness: 0.12, angleDeg: 0, mass: 60, surface: 'wood', variant: 0 },
+  logpile: { radius: 0.3, count: 3, rows: 1, spacing: 0, surface: 'wood', variant: 0 },
+  stair: { count: 5, height: 0.3, length: 0.45, direction: 'up', surface: 'concrete', variant: 0 },
+  box: { width: 4, height: 1, surface: 'metal', variant: 0 },
+  pole: { height: 1.5, radius: 0.25, width: 0.16, count: 1, spacing: 1.8, surface: 'metal', variant: 0 },
+  barrel: { radius: 0.3, height: 0.9, count: 1, spacing: 0.7, burning: true, surface: 'metal', variant: 0 },
+  ledge: { height: 0.5, length: 4, surface: 'concrete', variant: 0 },
 };
 
 export type ParamRecord = Record<string, number | string | boolean>;

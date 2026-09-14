@@ -28,7 +28,7 @@ export const B1 = course('b1-first-ride', 'First Ride', 'beginner')
   .flat(6)
   .hint('SLOW DOWN')
   .slope(10, -2.0) // 11 deg descent builds speed
-  .flat(6)
+  .flat(8) // brake zone: measured 4.66 m from 10 m/s, authored 8
   .drum({ radius: 0.5, depth: 0.25 }) // speed bump: roll it slowly, fly it at speed
   .flat(6)
   .ledge({ height: 0.3, length: 6 }) // rollable kerb (wheel r 0.34)

@@ -33,10 +33,12 @@ export const FEEL = {
   /** Average acceleration on flat dirt (16 m/s in 3.5 s). */
   accel: 16 / 3.5,
   topSpeed: 20,
-  /** Brake from 10 m/s in <= 4.5 m => >= 11 m/s^2. */
-  brakeDecel: 11,
-  /** Stationary hop rear-wheel apex 0.55..0.75; with 5 m/s run-up a 0.9 m ledge is makeable. */
-  hopStationary: 0.55,
+  /** Physics round 2 measured: 0.3 throttle tops out at 11.3 m/s (partial-throttle cruise). */
+  cruiseSpeedAt30pct: 11.3,
+  /** Physics round 2 (e692bf2) measured: brake from 10 m/s = 4.66 m => 10.7 m/s^2 (contract asks <= 4.5). */
+  brakeDecel: 10.7,
+  /** Physics round 2 measured stationary hop apex 0.74 m (contract band 0.55..0.75); with 5 m/s run-up a 0.9 m ledge is makeable. */
+  hopStationary: 0.74,
   hopRolling: 0.9,
   climbSustainedDeg: 60,
   climbStallDeg: 65,
@@ -224,6 +226,19 @@ export class CourseBuilder {
     return this.place('ledge', p, o);
   }
 
+  /**
+   * Steep plank with a short concave ramp fillet at its foot, so the entry is a curve
+   * rather than a corner (physics round 2: 55-65 deg planks wedge at a sharp base).
+   * The fillet takes `filletHeight` of the rise; the plank climbs the rest at `angleDeg`.
+   */
+  steepPlank(p: { angleDeg: number; rise: number; filletHeight?: number; filletLength?: number }, o?: ObstacleOpts): this {
+    const fh = p.filletHeight ?? 0.35;
+    const fl = p.filletLength ?? 1.2;
+    const base = o?.base ?? 0;
+    this.ramp({ length: fl, height: fh, curve: 0.8 }, { base });
+    return this.plank({ angleDeg: p.angleDeg, rise: p.rise - fh }, { base: base + fh });
+  }
+
   /** ramp up + box top + ramp down, all one height. */
   tabletop(up: number, top: number, height: number, down = up): this {
     return this.ramp({ length: up, height }).box({ width: top, height }).ramp({ length: down, height, direction: 'down' });
@@ -247,8 +262,10 @@ export class CourseBuilder {
     const base = o?.base ?? 0;
     this.obstacles.push({ kind, pos: { x: x0, y: this.y + base }, params: { ...rec } });
     // Pin the profile at both ends so a later ground op starts here, not under the obstacle.
+    // The cursor stays on the 1e-6 grid so a computed footprint end (plank L*cos) and the
+    // next obstacle's pos.x quantise to the same value in compile.
     this.pin();
-    this.x = x1;
+    this.x = round(x1);
     this.pin();
     return this;
   }

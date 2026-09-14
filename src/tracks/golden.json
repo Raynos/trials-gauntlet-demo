@@ -14,11 +14,11 @@
     "finishX": 57
   },
   "b1-first-ride": {
-    "hash": "0965ba4b82c4fc88",
+    "hash": "36030f957061b046",
     "colliders": 8,
     "hazards": 0,
     "obstacles": 5,
-    "finishX": 131
+    "finishX": 133
   },
   "b2-lean-back": {
     "hash": "6fc08a44dbf4fa7e",
@@ -35,11 +35,11 @@
     "finishX": 142
   },
   "e1-uphill-weight": {
-    "hash": "8ffd3ce412d71b22",
-    "colliders": 13,
+    "hash": "7cd084658f6bd89d",
+    "colliders": 15,
     "hazards": 0,
-    "obstacles": 9,
-    "finishX": 107.227449
+    "obstacles": 10,
+    "finishX": 108.112307
   },
   "e2-rear-wheel-first": {
     "hash": "67c517119fffa689",
@@ -91,18 +91,18 @@
     "finishX": 223
   },
   "h3-fire-line": {
-    "hash": "05f4db58fe5fb5ca",
+    "hash": "8bda06a40eaebd76",
     "colliders": 32,
     "hazards": 18,
     "obstacles": 13,
-    "finishX": 195.4
+    "finishX": 199.4
   },
   "x1-vertical-limit": {
-    "hash": "bfb2723dcc0e4cb6",
-    "colliders": 50,
+    "hash": "94ec5dbaacf5b1aa",
+    "colliders": 59,
     "hazards": 1,
-    "obstacles": 29,
-    "finishX": 176.924534
+    "obstacles": 34,
+    "finishX": 181.728923
   },
   "x2-pipe-dream": {
     "hash": "5ecca418c0b81f19",
@@ -112,10 +112,10 @@
     "finishX": 156.5
   },
   "x3-gauntlet": {
-    "hash": "38eec400c7001454",
-    "colliders": 74,
+    "hash": "5a6a91ae16424384",
+    "colliders": 78,
     "hazards": 29,
-    "obstacles": 65,
-    "finishX": 406.513744
+    "obstacles": 67,
+    "finishX": 410.39653
   }
 }

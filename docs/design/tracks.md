@@ -13,9 +13,10 @@ helpers + spawn validation, `describe.ts` text summaries, `courses/*.ts` the tra
 
 ## 0. Numbers the tracks are authored to (CONTRACT §2.5, with 20 % margin)
 
-Physics owns every feel number. Until physics M2 lands and this section is regenerated
-from its F-tests, tracks are authored against the contract table with a 20 % margin, i.e.
-a track asks for at most 0.8 x what the envelope allows (`FEEL` in `author.ts`):
+Physics owns every feel number. Tracks are authored against the contract table with a
+20 % margin, i.e. a track asks for at most 0.8 x what the envelope allows (`FEEL` in
+`author.ts`). Where physics round 2 (e692bf2) has measured a number, the measured value
+replaces the contract one:
 
 | quantity | envelope | authored against |
 |---|---|---|
@@ -23,10 +24,12 @@ a track asks for at most 0.8 x what the envelope allows (`FEEL` in `author.ts`):
 | wheelbase / wheel radius | 1.30 m / 0.34 m | spawn clearance; 0.3 m kerbs are rollable |
 | 0 -> 16 m/s on flat dirt | <= 3.5 s (a ~= 4.6 m/s^2) | `speedAfter(d) = 0.8 * sqrt(2 a d)`: 10 m -> 7.7, 14 m -> 9.1, 20 m -> 10.8 |
 | top speed | 20 m/s | 16 m/s is the most any jump assumes |
-| brake from 10 m/s | <= 4.5 m | brake zones >= 5.6 m |
-| stationary bunny hop | rear-wheel apex 0.55-0.75 m | stationary ledges <= 0.44 m |
+| brake from 10 m/s | <= 4.5 m; **measured 4.66 m** (10.7 m/s^2) | brake zones >= 5.9 m; authored 8 m (B1, H3, X3) |
+| partial throttle | **measured: 0.3 throttle tops out at 11.3 m/s** | no course relies on a coasting speed; cruise sections are full-throttle-safe |
+| loop-out | **measured: full throttle with lean >= 0.4 never loops on flat** | beginner hints stay "hold throttle" |
+| stationary bunny hop | rear-wheel apex 0.55-0.75 m; **measured 0.74 m** | stationary ledges <= 0.59 m (authored 0.45) |
 | rolling hop (5 m/s run-up) | 0.9 m ledge | rolling ledges <= 0.72 m |
-| climb | sustained <= 60 deg, 65 stalls, > 70 needs a hop | planks <= 48 deg through Hard; Extreme runs 50-60 deg with no margin |
+| climb | sustained <= 60 deg, 65 stalls, > 70 needs a hop; **55-65 deg planks currently wedge at a sharp base corner (fix in progress)** | planks <= 48 deg through Hard; Extreme runs 50-60 deg with no margin; every plank >= 48 deg gets a concave ramp fillet at its foot (`steepPlank`) |
 | crash | head/torso touches a collider or hazard, or y < oobY; over-rotation alone is not a crash | pit hazards stop 0.3 m below the lip so a skimming wheel does not fault |
 | restart -> riding | one tick, one frame | every checkpoint has >= 3 m of flat run-in |
 
@@ -49,13 +52,16 @@ obstacle stands on a platform (a ramp launching off a box).
 
 ### 1.2 Obstacle vocabulary (CONTRACT §2.1) — `src/tracks/kinds.ts`
 
-12 kinds, `loop` cut. Full-word params; every default is in `KIND_DEFAULTS`.
+12 kinds, `loop` cut. Full-word params; every default is in `KIND_DEFAULTS`. Every kind also
+carries `variant` (integer, default 0): a deterministic look selector for render that never
+touches colliders. Render reads `thickness width length radius variant surface` from
+`placed[].params`; those names are stable.
 
 | kind | params (default) | lowers to | footprint |
 |---|---|---|---|
 | `ramp` | length 4, height 1, curve 0 (+concave/kicker, -convex), direction up/down, surface wood | solid wedge; curve != 0 bakes a 12-segment quadratic arc | length |
 | `plank` | length 4, angleDeg 0, height 0 (elevation of near end), thickness 0.12, oneWay true, surface wood | ONE polyline, the top surface, `oneWay` (landable from above, pass-through from below); thickness is a render param | length * cos(angle) |
-| `drum` | radius 0.8, depth 0 (sunk), rolls false, surface metal | circle; `rolls` spins about its centre under the tyre, never translates | 2 r |
+| `drum` | radius 0.8, width 1.2 (visual depth along z), depth 0 (sunk), rolls false, surface metal | circle; `rolls` spins about its centre under the tyre, never translates | 2 r |
 | `gap` | width 3, depth 3, hazard water/kill | pit cut into the ground chain (walls lean in 0.05 m so x stays monotone) + hazard zone [lip - depth, lip - 0.3] | width |
 | `wall` | height 1, width 0.4, lip 0, surface concrete | solid slab; `lip` adds a one-way overhang polyline projecting back from the top front edge (front-wheel grab) | width |
 | `seesaw` | length 6, height 1 (pivot), thickness 0.12, angleDeg 0 (auto), mass 60, surface wood | `ColliderSeesaw`; auto maxAngle = asin((height - t/2) / half) capped 30 deg so an end rests on the ground | length |
@@ -109,7 +115,10 @@ Cursor semantics: ground ops (`flat slope smooth rollers space`) extend the prof
 the cursor; obstacle ops place at the cursor and advance by the footprint; `tabletop(up,
 top, height, down)` = ramp + box + ramp. Consecutive flats merge into one profile segment.
 Obstacles pin the profile at both ends so a slope after a box starts after the box.
-`plank({ angleDeg, rise })` computes the board length. `checkpoint()` records the spawn
+`plank({ angleDeg, rise })` computes the board length; `steepPlank({ angleDeg, rise })` puts a
+1.2 x 0.35 concave ramp fillet under the foot and climbs the remaining rise. The cursor is
+kept on the 1e-6 grid so computed footprint ends and the next `pos.x` quantise identically.
+`checkpoint()` records the spawn
 (rear-wheel contact at cursor + 0.5, angle 0); `camera(key)` opens a `CameraKey` that runs
 to the next key or the finish; `hint(text)` adds a HUD hint; `finish(runout = 10)` sets
 `finishX` at the cursor, adds the run-out and a 35 deg end bank, and validates.
@@ -147,9 +156,9 @@ surface rather than riding a translating spool.
 ### Beginner
 
 **B1 `b1-first-ride` First Ride** — TEACHES throttle control. Hints "HOLD THROTTLE",
-"SLOW DOWN". 131 m, CP 42 / 88. Hill (8.5 deg) and smooth descent; 3 rollers (0.3 m);
-tabletop 6/8/1.0 m; DEMANDS: 11 deg descent, then a half-sunk 0.5 m drum bump you must
-brake for, and a rollable 0.3 m kerb. Target 1 attempt, 18 s.
+"SLOW DOWN". 133 m, CP 42 / 88. Hill (8.5 deg) and smooth descent; 3 rollers (0.3 m);
+tabletop 6/8/1.0 m; DEMANDS: 11 deg descent, 8 m brake zone, a half-sunk 0.5 m drum bump
+you must brake for, and a rollable 0.3 m kerb. Target 1 attempt, 18 s.
 
 **B2 `b2-lean-back` Lean Back** — TEACHES weight shift on bumps and drops. 128 m,
 CP 29 / 68 / 90. Single logs, a log pair; ramp onto a 0.5 m kerb (drop 0.5); ramp onto a
@@ -166,8 +175,8 @@ landing ramp (camera `high34`); DEMANDS: 10 m run-up, 5 x 2.0 kicker over a 5 m 
 
 **E1 `e1-uphill-weight` Uphill Weight** — TEACHES lean forward on steep planks. 107 m,
 CP 28 / 53 / 78. Plank 30 deg onto a 3.0 m box, 6 steps down; plank 40 deg onto 3.6 m,
-quarter-pipe roll-out; DEMANDS: plank 48 deg (rise 3.7) from a 3 m run-in, then a 40 deg
-plank descent. Target 2-4, 30 s.
+quarter-pipe roll-out; DEMANDS: filleted plank 48 deg (rise 3.7) from a 3 m run-in, then a
+40 deg plank descent. Target 2-4, 30 s.
 
 **E2 `e2-rear-wheel-first` Rear Wheel First** — TEACHES rear-wheel-first gap landings.
 172 m, CP 24 / 73 / 120. 4 x 0.8 ramp / 3 m gap; 5 x 1.2 / 4 m gap onto an uphill landing
@@ -215,15 +224,15 @@ see-saw launch over a 4 m gap. Target 14-22, 72 s.
 **H3 `h3-fire-line` Fire Line** — TEACHES speed commitment (clear a row of burning
 barrels from a kicker: the torso through the fire is a hazard fault) and the hard stop
 after. 195 m, CP 28 / 73 / 125. 12 m run-up, 5 x 1.5 kicker over 4 barrels; 14 m run-up,
-5 x 2.0 kicker over 6 barrels onto a landing ramp, 6 m brake zone, 0.7 m kerb hop;
+5 x 2.0 kicker over 6 barrels onto a landing ramp, 8 m brake zone, 0.7 m kerb hop;
 DEMANDS: 16 m run-up, kicker over a 3 m gap AND 6 barrels, landing ramp, brake to walking
 pace, sunk drum bump, 2 m low-speed hop gap, 0.7 kerb. Target 18-25, 78 s.
 
 ### Extreme
 
 **X1 `x1-vertical-limit` Vertical Limit** — TEACHES near-vertical planks (hang over the
-bars, tap throttle) and pole-top rear-wheel hops. 177 m, CP 24 / 64 / 104 / 129. Planks
-50 and 55 deg onto boxes; poles 1.2 -> 2.4 at 1.8 m pitch; plank 58 deg ending under a
+bars, tap throttle) and pole-top rear-wheel hops. 182 m, CP 24 / 65 / 107 / 133. All planks
+are filleted at the foot. Planks 50 and 55 deg onto boxes; poles 1.2 -> 2.4 at 1.8 m pitch; plank 58 deg ending under a
 1.0 wall with lip (front-wheel grab); wall 1.2 + plank 56 deg from its top, poles descending
 4.4 -> 2.0; DEMANDS: 8 m run-in, plank 60 deg (rise 4.5; hop at the foot), three pole caps
 at 4.5, 4 m gap onto a 3 m plank at -30 deg. Target 30-45, 95 s.
@@ -236,7 +245,7 @@ gap onto a spinning drum; the pipe run: five 0.9 spinning drums with 2 m gaps (c
 off it, 0.7 kerb. Target 40-60, 125 s.
 
 **X3 `x3-gauntlet` The Gauntlet** — DEMANDS everything in curriculum order, no teaching
-zone. 407 m, CP 28 / 112 / 145 / 231 / 284 / 338. B3 kicker gap, E1 48 deg plank, E2
+zone. 410 m, CP 28 / 113 / 146 / 232 / 287 / 342. B3 kicker gap, E1 48 deg plank, E2
 double gap | E3 stairs into a gap, M1 kerb hop + gap, M2 spinning drum | M3 see-saw landing
 + plank, H1 lip climb + 4 slots, H2 five-gap chain | H3 fire over a gap + brake + kerb | X1
 60 deg plank + three 4.5 poles, X2 see-saw -> spinning drums -> 4 m gap | finale (unseen):
@@ -247,10 +256,10 @@ gap onto three pole caps at 3.0, 3 m gap onto a 4 m plank at -35 deg. Target 60-
 
 | id | tier | technique | length m | obstacles | CPs | attempts | target s |
 |---|---|---|---:|---:|---:|---:|---:|
-| b1-first-ride | beginner | throttle control | 131 | 5 | 2 | 1 | 18 |
+| b1-first-ride | beginner | throttle control | 133 | 5 | 2 | 1 | 18 |
 | b2-lean-back | beginner | weight shift on drops | 128 | 12 | 3 | 1-2 | 22 |
 | b3-kicker-row | beginner | jump and level in the air | 142 | 11 | 3 | 1-2 | 26 |
-| e1-uphill-weight | easy | lean forward on steep climbs | 107 | 9 | 3 | 2-4 | 30 |
+| e1-uphill-weight | easy | lean forward on steep climbs | 108 | 10 | 3 | 2-4 | 30 |
 | e2-rear-wheel-first | easy | rear-wheel-first gap landing | 172 | 16 | 3 | 3-5 | 34 |
 | e3-stairway | easy | stairs: pulse up, brake down | 94 | 11 | 3 | 3-6 | 38 |
 | m1-hop-up | medium | bunny hop onto ledges | 101 | 12 | 3 | 5-9 | 42 |
@@ -258,10 +267,10 @@ gap onto three pole caps at 3.0, 3 m gap onto a 4 m plank at -35 deg. Target 60-
 | m3-see-saw | medium | see-saw timing and thin landings | 136 | 14 | 3 | 8-12 | 58 |
 | h1-wheelie-wire | hard | sustained wheelie and the lip climb | 180 | 29 | 4 | 10-18 | 62 |
 | h2-gap-chain | hard | gap chains: read the width, set the speed | 223 | 34 | 3 | 14-22 | 72 |
-| h3-fire-line | hard | commit at speed over fire, then stop hard | 195 | 13 | 3 | 18-25 | 78 |
-| x1-vertical-limit | extreme | near-vertical planks and pole-top hops | 177 | 29 | 4 | 30-45 | 95 |
+| h3-fire-line | hard | commit at speed over fire, then stop hard | 199 | 13 | 3 | 18-25 | 78 |
+| x1-vertical-limit | extreme | near-vertical planks and pole-top hops | 182 | 34 | 4 | 30-45 | 95 |
 | x2-pipe-dream | extreme | spinning drums with gaps and see-saw drops | 157 | 27 | 4 | 40-60 | 125 |
-| x3-gauntlet | extreme | everything, in order | 407 | 65 | 6 | 60-80 | 165 |
+| x3-gauntlet | extreme | everything, in order | 410 | 67 | 6 | 60-80 | 165 |
 
 Fixtures: `flat-test` (scaffold strip, unchanged) and `gap-test` (20 m run-up, 4 x 1.0
 ramp, 3 m gap, 20 m run-out) for harness-metrics.md M3.
@@ -287,9 +296,13 @@ the thresholds and the ship gate are all owned by harness and specified in
 ## 4. Round plan
 
 - **Round 1 (this)** — vocabulary, compiler, DSL, 15 courses + fixtures, tests, this doc.
-- **Round 2** — after physics M2: regenerate §0 from the F-tests, re-author run-ups and
-  gaps against measured accel / jump range, first bot attempts per checkpoint segment;
-  shorten or lengthen tracks toward the corpus clean times (beginner 16-19 s).
+- **Round 2a (done)** — render param names pinned (`variant`, drum `width`); §0 brake / hop /
+  partial-throttle numbers replaced by physics round 2 measurements, brake zones widened to
+  8 m; every plank >= 48 deg filleted at the foot.
+- **Round 2b** — after the bot/physics sweep names the physically impossible obstacles:
+  re-author run-ups and gaps against measured accel / jump range, first bot attempts per
+  checkpoint segment; shorten or lengthen tracks toward the corpus clean times (beginner
+  16-19 s).
 - **Round 3** — stranger medians for Beginner + Easy; fix the two worst segments per track;
   ship gate on `b1` and `x3`.
 - **Later** — camera keys tuned against the render clips; X3 trimmed under 400 m if the bot

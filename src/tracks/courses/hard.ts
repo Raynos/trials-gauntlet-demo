@@ -104,7 +104,7 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .meta({
     biome: 'foundry',
     technique: 'commit at speed over fire, then stop hard',
-    demands: 'kicker over a gap and six burning barrels, brake to walking pace in 6 m, hop a 0.7 m kerb',
+    demands: 'kicker over a gap and six burning barrels, brake to walking pace in 8 m, hop a 0.7 m kerb',
     attemptsBand: [18, 25],
     targetTimeS: 78,
   })
@@ -126,7 +126,7 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .barrel({ count: 6, spacing: 0.8 })
   .flat(2)
   .ramp({ length: 6, height: 2.0, direction: 'down' }) // landing ramp, short = its face
-  .flat(6) // brake zone: 10 m/s stops in 4.5, authored 6
+  .flat(8) // brake zone: measured 4.66 m from 10 m/s, authored 8
   .ledge({ height: 0.7, length: 4 }) // rolling hop
   .flat(6)
   .checkpoint()
@@ -139,7 +139,7 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .flat(2)
   .ramp({ length: 6, height: 2.0, direction: 'down' })
   .camera({ mode: 'side-tight' })
-  .flat(6)
+  .flat(8) // brake zone
   .drum({ radius: 0.6, depth: 0.2 }) // speed bump at the end of the brake zone
   .flat(3)
   .gap({ width: 2, depth: 2 }) // low-speed hop

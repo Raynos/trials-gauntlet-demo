@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { ColliderPolyline, ColliderSeesaw, TrackDef } from '../core/types';
+import type { ColliderPolyline, ColliderSeesaw, TrackDef, Vec2 } from '../core/types';
 import { course, FEEL } from './author';
 import { compileTrack, hashColliders, profileQuery } from './compile';
 import { describeAhead } from './describe';
@@ -20,7 +20,7 @@ describe('kinds', () => {
 
   it('fills defaults and keeps overrides', () => {
     const p = resolveParams('ramp', { height: 2 });
-    expect(p).toEqual({ length: 4, height: 2, curve: 0, direction: 'up', surface: 'wood' });
+    expect(p).toEqual({ length: 4, height: 2, curve: 0, direction: 'up', surface: 'wood', variant: 0 });
     expect(footprint('plank', { length: 4, angleDeg: 60 })).toBeCloseTo(2, 6);
     expect(footprint('pole', { count: 3, spacing: 2 })).toBeCloseTo(4.5, 6);
   });
@@ -111,6 +111,29 @@ describe('compileTrack merge', () => {
     expect(lip.points[0]?.x).toBeCloseTo(wallX - 0.2, 6);
     expect(lip.points[1]).toEqual({ x: wallX, y: 1 });
     expect(lip.points[0]?.y).toBe(1);
+  });
+
+  it('steepPlank puts a concave fillet under the plank foot and the plank starts on its top', () => {
+    const def = course('t-fillet', 't', 'beginner').meta(meta).flat(10).steepPlank({ angleDeg: 60, rise: 4.5 }).box({ width: 3, height: 4.5 }).flat(10).finish();
+    const ps = polys(def);
+    const fillet = ps.find((p) => p.obstacleIndex === 0) as ColliderPolyline;
+    const plank = ps.find((p) => p.obstacleIndex === 1) as ColliderPolyline;
+    expect(def.obstacles[0]).toMatchObject({ kind: 'ramp', params: { length: 1.2, height: 0.35, curve: 0.8 } });
+    expect(fillet.points.length).toBeGreaterThan(4); // curved
+    const filletTop = fillet.points.reduce((a, b) => (b.y > a.y ? b : a));
+    expect(plank.points[0]).toEqual(filletTop);
+    expect(plank.points[1]?.y).toBeCloseTo(4.5, 6);
+    // concave: the fillet surface stays below its chord
+    const a = fillet.points[0] as Vec2;
+    for (const p of fillet.points.slice(1, -1)) expect(p.y).toBeLessThanOrEqual(a.y + ((p.x - a.x) / 1.2) * 0.35 + 1e-9);
+  });
+
+  it('every kind resolves variant=0 and drums carry a visual width', () => {
+    for (const k of OBSTACLE_KINDS) expect(resolveParams(k, undefined)).toMatchObject({ variant: 0 });
+    expect(resolveParams('drum', undefined).width).toBe(1.2);
+    const def = course('t-variant', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1, variant: 2 }).flat(10).finish();
+    const c = compileTrack(def);
+    expect(c.placed[0]?.params).toMatchObject({ variant: 2, width: 4, height: 1, surface: 'metal' });
   });
 
   it('burning barrels carry a fire hazard; unlit ones do not', () => {
@@ -206,8 +229,8 @@ describe('feel helpers', () => {
   it('match the CONTRACT envelope with 20 % margin', () => {
     expect(FEEL.speedAfter(FEEL.runupFor(10))).toBeCloseTo(10, 6);
     expect(FEEL.speedAfter(1000)).toBeCloseTo(16, 6); // top speed 20 x 0.8
-    expect(FEEL.brakeDistance(10)).toBeCloseTo(100 / 22 / 0.8, 6);
-    expect(FEEL.hopLedge(false)).toBeCloseTo(0.44, 6);
+    expect(FEEL.brakeDistance(10)).toBeCloseTo(100 / 21.4 / 0.8, 6); // 5.84 m: measured 4.66 m plus margin
+    expect(FEEL.hopLedge(false)).toBeCloseTo(0.592, 6);
     expect(FEEL.hopLedge(true)).toBeCloseTo(0.72, 6);
     expect(FEEL.climbDeg()).toBe(48);
     expect(FEEL.jumpRange(10, 0, 0)).toBe(0);

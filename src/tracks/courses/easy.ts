@@ -12,7 +12,7 @@ export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .meta({
     biome: 'canyon',
     technique: 'lean forward on steep climbs',
-    demands: '48 deg plank from a 3 m run-in, then a 40 deg plank descent',
+    demands: '48 deg plank (filleted foot) from a 3 m run-in, then a 40 deg plank descent',
     attemptsBand: [2, 4],
     targetTimeS: 30,
   })
@@ -33,7 +33,7 @@ export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .flat(6)
   .checkpoint()
   .flat(3)
-  .plank({ angleDeg: 48, rise: 3.7 }) // ~5.0 m, the demand: ~1.5 wheelbase/s so ~2.5 s of climb
+  .steepPlank({ angleDeg: 48, rise: 3.7 }) // fillet + ~4.5 m board, the demand: ~1.5 wheelbase/s so ~2.5 s of climb
   .box({ width: 6, height: 3.7 })
   .plank({ angleDeg: -40, rise: 3.7 }, { base: 3.7 }) // roll the descent, brake
   .camera({ mode: 'side' })
