@@ -29,6 +29,8 @@ export interface BikeTuning {
     comHeight: number;
     /** Collision circles in frame space (bash plate, bars ...), radius each. */
     circles: { x: number; y: number; r: number }[];
+    /** Coulomb friction of the frame hard points against the track (alloy skid plate on steel/wood). */
+    mu: number;
   };
   wheel: { radius: number; mass: number; inertiaRear: number; inertiaFront: number; wheelbase: number };
   suspension: { rear: SuspensionTuning; front: SuspensionTuning };
@@ -135,7 +137,18 @@ export interface BikeTuning {
   };
   aero: { dragCoef: number };
   solver: { velocityIters: number; slop: number; baumgarte: number; jointBaumgarte: number; speculativeMargin: number };
-  ragdoll: { sleepAfter: number; restitution: number; mu: number; spread: number };
+  ragdoll: {
+    sleepAfter: number;
+    restitution: number;
+    mu: number;
+    spread: number;
+    /** Joint angular damping, Nm s (limbs flop and settle instead of spinning freely). */
+    jointDamping: number;
+    /** Extra impulse at the joint limits is not damped; limits are per joint in bike.ts. */
+    /** Rear brake fraction on the crashed bike (a stalled engine in gear locks the rear wheel) and front (lever pinned). */
+    crashRearBrake: number;
+    crashFrontBrake: number;
+  };
   drum: { density: number };
 }
 
@@ -151,11 +164,12 @@ const DEFAULTS: BikeTuning = {
     inertia: 14.0,
     comHeight: 0.55,
     circles: [
-      { x: -0.05, y: -0.3, r: 0.12 }, // bash plate
+      { x: -0.05, y: -0.14, r: 0.1 }, // bash plate: bottom 0.24 m below the frame origin, ~0.3 m ground clearance at sag (a trials bike; was -0.42 = 0.11 m, which hung on every edge)
       { x: -0.55, y: -0.12, r: 0.1 }, // tail
       { x: 0.55, y: -0.1, r: 0.1 }, // front lower / fork crown
       { x: 0.35, y: 0.38, r: 0.1 }, // bars
     ],
+    mu: 0.6,
   },
   wheel: { radius: 0.34, mass: 7, inertiaRear: 0.7, inertiaFront: 0.5, wheelbase: 1.3 },
   suspension: {
@@ -211,7 +225,7 @@ const DEFAULTS: BikeTuning = {
     throttleRise: 40,
     throttleFall: 60,
   },
-  brakes: { frontMaxNm: 640, rearMaxNm: 500, antiEndo: 0.05, antiEndoFloor: 0.8, rearLoadMin: 0.05, rise: 30, fall: 40 },
+  brakes: { frontMaxNm: 640, rearMaxNm: 500, antiEndo: 0.05, antiEndoFloor: 0.8, rearLoadMin: 0.04, rise: 60, fall: 40 },
   rider: {
     mass: 75,
     anchor: { x: 0.33, y: 0.38 },
@@ -252,7 +266,7 @@ const DEFAULTS: BikeTuning = {
   },
   aero: { dragCoef: 3.2 },
   solver: { velocityIters: 8, slop: 0.005, baumgarte: 0.2, jointBaumgarte: 0.3, speculativeMargin: 0.02 },
-  ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3 },
+  ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },
   drum: { density: 60 },
 };
 

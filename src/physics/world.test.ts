@@ -251,6 +251,55 @@ describe('crash, ragdoll, hazards, out of bounds', () => {
   });
 });
 
+describe('ragdoll feel (round 4, blind critic: "slides off as a stiff plank")', () => {
+  /** Crash at `speed` on the flat (nose planted so the head hits at once); track the bike and the limbs afterwards. */
+  function crash(speed: number): { bikeTravel: number; bikeStopT: number; limbAngleSpread: number; limbRelSwing: number; headTravel: number } {
+    const w = createBikePhysics(HZ);
+    w.loadTrack(makeTrack(), 3);
+    stepN(w, {}, 60);
+    w.teleport({ pos: { x: 0, y: R + 0.2 }, angle: 1.9, vel: { x: speed, y: 0 } });
+    let crashX = NaN;
+    let crashT = NaN;
+    let bikeStopT = -1;
+    let maxSpread = 0;
+    let maxRelSwing = 0;
+    let head0 = NaN;
+    let headX = 0;
+    let lastX = 0;
+    stepN(w, { throttle: 0.3 }, HZ * 4, (s) => {
+      if (s.faulted && Number.isNaN(crashX)) {
+        crashX = s.bike.pos.x;
+        crashT = s.time;
+        head0 = s.ragdoll![0]!.pos.x;
+      }
+      if (s.faulted) {
+        lastX = s.bike.pos.x;
+        const sp = Math.hypot(s.bike.vel.x, s.bike.vel.y);
+        if (bikeStopT < 0 && sp < 0.2 && s.time > crashT + 0.3) bikeStopT = s.time - crashT;
+        const angles = s.ragdoll!.map((b) => b.angle);
+        const torso = angles[1]!;
+        let spread = 0;
+        for (const a of angles) spread = Math.max(spread, Math.abs(Math.atan2(Math.sin(a - torso), Math.cos(a - torso))));
+        maxSpread = Math.max(maxSpread, spread);
+        // thigh vs pelvis (joint 'hip'): how far the leg has swung from its spawn pose
+        const hip = Math.abs(Math.atan2(Math.sin(angles[5]! - angles[2]!), Math.cos(angles[5]! - angles[2]!)));
+        maxRelSwing = Math.max(maxRelSwing, hip);
+        headX = s.ragdoll![0]!.pos.x;
+      }
+    });
+    return { bikeTravel: lastX - crashX, bikeStopT, limbAngleSpread: maxSpread, limbRelSwing: maxRelSwing, headTravel: headX - head0 };
+  }
+  it('crashed bike at 7 m/s scrubs to rest within 3.5 m (rear locked by the stalled engine); limbs tumble independently (spread > 60 deg) and the rider is thrown clear of the bike', () => {
+    const r = crash(7);
+    console.log(`RAGDOLL 7 m/s: bike travel ${r.bikeTravel.toFixed(2)} m, stopped after ${r.bikeStopT.toFixed(2)} s, limb angle spread ${((r.limbAngleSpread * 180) / Math.PI).toFixed(0)} deg, hip swing ${((r.limbRelSwing * 180) / Math.PI).toFixed(0)} deg, head travel ${r.headTravel.toFixed(2)} m`);
+    expect(r.bikeTravel).toBeGreaterThan(0.3);
+    expect(r.bikeTravel).toBeLessThan(3.5);
+    expect(r.bikeStopT).toBeGreaterThan(0);
+    expect(r.limbAngleSpread).toBeGreaterThan(1.0);
+    expect(r.limbRelSwing).toBeGreaterThan(0.3);
+  });
+});
+
 describe('dynamic colliders', () => {
   it('a seesaw tips under the bike, within its angle limit, and is reported in state', () => {
     const w = createBikePhysics(HZ);
@@ -309,7 +358,7 @@ describe('performance', () => {
   }
   it('riding: µs/tick p95 <= 60 over 20k ticks (node)', () => {
     const w = createBikePhysics(HZ);
-    w.loadTrack(makeTrack({ profile: Array.from({ length: 200 }, (_, i) => ({ x: -30 + i * 4, y: Math.sin(i * 0.3) * 0.4 })) }), 1);
+    w.loadTrack(makeTrack({ profile: Array.from({ length: 600 }, (_, i) => ({ x: -30 + i * 4, y: Math.sin(i * 0.3) * 0.4 })), finishX: 1e9 }), 1);
     // warm up JIT
     for (let i = 0; i < 3000; i++) w.step(quantizeInput({ throttle: 0.5, lean: Math.sin(i / 50) * 0.5 }));
     w.reset(-1);

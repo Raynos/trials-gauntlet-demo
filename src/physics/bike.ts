@@ -372,7 +372,6 @@ class BikeWorld implements BikePhysicsWorld {
   getState(): PhysicsState {
     const F = this.F;
     const U = this.U;
-    const t = this.tuning;
     const wheel = (i: number, comp: number, gnd: number): PhysicsState['wheels']['rear'] => ({
       pos: { x: this.px[i]!, y: this.py[i]! },
       spin: -this.an[i]!,
@@ -380,11 +379,8 @@ class BikeWorld implements BikePhysicsWorld {
       compression: comp,
       grounded: gnd === 1,
     });
-    const lean = F[S_LEAN_EFF]!;
     const angle = this.an[FRAME]!;
-    const wa = wrapAngle(angle);
-    const riderRelY = this.riderLocalY();
-    const crouch = clamp((t.rider.anchor.y - riderRelY) / t.rider.crouch, 0, 1);
+    const pose = this.riderPose();
     const fault = FAULTS[U[U_FAULT]!] ?? null;
     let ragdoll: RagdollBody[] | null = null;
     if (U[U_RAGDOLL] === 1) {
@@ -419,12 +415,7 @@ class BikeWorld implements BikePhysicsWorld {
         rear: wheel(REAR, F[S_REAR_COMP]!, U[U_REAR_GND]!),
         front: wheel(FRONT, F[S_FRONT_COMP]!, U[U_FRONT_GND]!),
       },
-      rider: {
-        lean,
-        crouch,
-        torsoPitch: clamp(-0.35 * lean - 0.15 * wa, -0.9, 0.9),
-        armExtend: clamp(Math.max(0, -lean) + 0.5 * Math.max(0, wa - 0.6), 0, 1),
-      },
+      rider: pose,
       checkpoint: F[S_CHECKPOINT]!,
       finished: U[U_FINISHED] === 1,
       faulted: fault,
@@ -669,12 +660,35 @@ class BikeWorld implements BikePhysicsWorld {
     return -dx * s + dy * c;
   }
 
-  private riderLocalY(): number {
+  /**
+   * The drawn rider comes from the rider MASS, not from the input: `lean` is the point mass's
+   * fore-aft offset from the neutral anchor in frame space (normalised by the lean travel), `crouch`
+   * its drop below the neutral height, `torsoPitch` the torso angular DOF's swing relative to the
+   * frame (the angular momentum store, 7.4) plus the frame pitch, `armExtend` from the lean pose and
+   * the pitch. The input slew, the 16 rad/s fore-aft brace and the torque-limited torso motor give
+   * the pose its lag and overshoot (`FEEL pose.*`), so the rider is never bolted to the bike. The
+   * crash sensors (`riderChain`) are built from the same pose, so what is drawn is what crashes.
+   */
+  private riderPose(): PhysicsState['rider'] {
+    const t = this.tuning;
+    const r = t.rider;
     const c = cos(this.an[FRAME]!);
     const s = sin(this.an[FRAME]!);
     const dx = this.px[RIDER]! - this.px[FRAME]!;
     const dy = this.py[RIDER]! - this.py[FRAME]!;
-    return -dx * s + dy * c;
+    const localX = dx * c + dy * s;
+    const localY = -dx * s + dy * c;
+    const along = localX - r.anchor.x;
+    const lean = clamp(along / (along >= 0 ? r.leanFwd : r.leanBack), -1, 1);
+    const crouch = clamp((r.anchor.y - localY) / r.crouch, 0, 1);
+    const wa = wrapAngle(this.an[FRAME]!);
+    const swing = clamp((this.an[RIDER]! - this.an[FRAME]!) / r.torso.swing, -1, 1);
+    return {
+      lean,
+      crouch,
+      torsoPitch: clamp(-0.35 * swing - 0.15 * wa, -0.9, 0.9),
+      armExtend: clamp(Math.max(0, -lean) + 0.5 * Math.max(0, wa - 0.6), 0, 1),
+    };
   }
 
   // rider body chain scratch (world): 0 hips, 1 shoulders, 2 head centre; (chDx, chDy) torso unit dir
@@ -689,14 +703,13 @@ class BikeWorld implements BikePhysicsWorld {
    * Crash sensors and the ragdoll spawn come from this chain, not from the dynamics point mass.
    */
   private riderChain(): void {
-    const t = this.tuning;
-    const lean = this.F[S_LEAN_EFF]!;
+    const pose = this.riderPose();
+    const lean = pose.lean;
     const back = Math.max(0, -lean);
     const fwd = Math.max(0, lean);
-    const crouch = clamp((t.rider.anchor.y - this.riderLocalY()) / t.rider.crouch, 0, 1);
-    const wa = wrapAngle(this.an[FRAME]!);
-    const torsoPitch = clamp(-0.35 * lean - 0.15 * wa, -0.9, 0.9);
-    const armExtend = clamp(back + 0.5 * Math.max(0, wa - 0.6), 0, 1);
+    const crouch = pose.crouch;
+    const torsoPitch = pose.torsoPitch;
+    const armExtend = pose.armExtend;
     const hx = -0.12 - 0.28 * back + 0.14 * fwd - 0.06 * crouch;
     const hy = 0.74 - 0.4 * crouch;
     const A = 0.62 + torsoPitch + 0.3 * fwd + 0.5 * crouch - 0.5 * back - 0.35 * armExtend;
@@ -1277,7 +1290,7 @@ class BikeWorld implements BikePhysicsWorld {
       const grip = t.tyre.grip[SURFACES[m.prim.surface] ?? 'dirt'] ?? 1;
       this.cMu[i] = ty2.muPeak * grip * shape;
     } else {
-      this.cMu[i] = this.qRag ? t.ragdoll.mu : 0.6;
+      this.cMu[i] = this.qRag ? t.ragdoll.mu : t.frame.mu;
     }
     this.nC = i + 1;
   }
@@ -1472,7 +1485,7 @@ class BikeWorld implements BikePhysicsWorld {
       }
 
       // --- ragdoll joints
-      if (rag) this.solveRagdollJoints();
+      if (rag) this.solveRagdollJoints(it === 0);
 
       // --- seesaw angle limits
       for (let sI = 0; sI < this.nSeesaw; sI++) {
@@ -1571,12 +1584,16 @@ class BikeWorld implements BikePhysicsWorld {
         }
       }
 
-      // --- brakes: lock wheel spin to the frame, torque-limited
-      if (riding && this.brakeIn > 0) {
+      // --- brakes: lock wheel spin to the frame, torque-limited. A crashed bike keeps its rear wheel
+      // locked (stalled engine in gear) and half a front brake (lever pinned), so it scrubs to a stop
+      // on its tyres instead of free-wheeling away from the rider
+      const brakeIn = riding ? this.brakeIn : 1;
+      if (brakeIn > 0) {
         for (let w = 0; w < 2; w++) {
           const wb = wheelB[w]!;
           let maxNm = w === 0 ? t.brakes.rearMaxNm : t.brakes.frontMaxNm;
-          if (w === 1 && t.brakes.antiEndo > 0) {
+          if (!riding) maxNm *= w === 0 ? t.ragdoll.crashRearBrake : t.ragdoll.crashFrontBrake;
+          if (riding && w === 1 && t.brakes.antiEndo > 0) {
             // the rider modulates the front: feed-forward cap at the torque that keeps `rearLoadMin`
             // of the weight on the rear for the COM geometry of the current lean (load transfer
             // a*h/L against the static split), plus a feedback fade if the rear still unloads
@@ -1590,7 +1607,7 @@ class BikeWorld implements BikePhysicsWorld {
             maxNm = Math.min(maxNm, Math.max(0, fFront) * t.wheel.radius);
             maxNm *= clamp(rearN / (t.brakes.antiEndo * W), t.brakes.antiEndoFloor, 1);
           }
-          const maxJ = this.brakeIn * maxNm * dt;
+          const maxJ = brakeIn * maxNm * dt;
           const rel = av[wb]! - av[FRAME]!;
           const mass = 1 / (ii[wb]! + ii[FRAME]!);
           let lambda = -mass * rel;
@@ -1605,7 +1622,7 @@ class BikeWorld implements BikePhysicsWorld {
     }
   }
 
-  private solveRagdollJoints(): void {
+  private solveRagdollJoints(damp: boolean): void {
     const dt = this.dt;
     const bj = this.tuning.solver.jointBaumgarte;
     const vx = this.vx;
@@ -1649,9 +1666,17 @@ class BikeWorld implements BikePhysicsWorld {
         vy[P] = vy[P]! - lambda * ny * im[P]!;
         av[P] = av[P]! - ii[P]! * rnP * lambda;
       }
+      // joint damping: a torque -c * relW between the two limbs (implicit: impulse = c*dt*relW / (1 + c*dt*(iiP+iiC)))
+      const massA = 1 / (ii[P]! + ii[C]!);
+      if (damp) {
+        const cd = this.tuning.ragdoll.jointDamping * dt;
+        const relW0 = av[C]! - av[P]!;
+        const lambda = (-cd * relW0) / (1 + cd / massA);
+        av[C] = av[C]! + lambda * ii[C]!;
+        av[P] = av[P]! - lambda * ii[P]!;
+      }
       // angular limit around the rest relative angle
       const rel = wrapAngle(this.an[C]! - this.an[P]! - this.F[S_RAG_REST + j]!);
-      const massA = 1 / (ii[P]! + ii[C]!);
       const relW = av[C]! - av[P]!;
       if (rel > range - 0.1) {
         const sep = range - rel;

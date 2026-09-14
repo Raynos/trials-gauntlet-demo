@@ -89,11 +89,15 @@ export function ledgeTrack(h: number, x0 = 20): CompiledTrack {
   });
 }
 
-/** Flat ground with a rolling drum (circle collider, rolls) resting on it at x0. */
-export function drumTrack(r = 0.6, x0 = 20): CompiledTrack {
+/**
+ * Flat ground with a drum (circle collider) of radius r centred at x0, sunk `depth` into the ground
+ * (M2's speed bump is r 0.5 sunk 0.7 = 0.3 m proud); `rolls` makes it spin under the tyre.
+ */
+export function drumTrack(r = 0.6, x0 = 20, rolls = true, depth = 0, surface: SurfaceKind = 'metal'): CompiledTrack {
   return makeTrack({
     id: 'drum',
-    extra: [{ kind: 'circle', id: 0, surface: 'rubber', obstacleIndex: 0, center: { x: x0, y: r }, radius: r, rolls: true }],
+    extra: [{ kind: 'circle', id: 0, surface, obstacleIndex: 0, center: { x: x0, y: r - depth }, radius: r, rolls }],
+    finishX: x0 + 40,
   });
 }
 

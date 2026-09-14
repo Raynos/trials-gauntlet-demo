@@ -6,8 +6,11 @@
  */
 import { describe, expect, it } from 'vitest';
 import { createBikePhysics, type BikePhysicsWorld } from './bike';
-import { climber, fullThrottle, hopper, ledgeHopper, runController, stepN, wheeliePD, airPitch } from './controllers';
-import { ledgeTrack, makeTrack, plankTrack } from './testTracks';
+import { climber, drumLifter, fullThrottle, hopper, ledgeHopper, runController, stepN, wheeliePD, airPitch, type Controller } from './controllers';
+import { drumTrack, ledgeTrack, makeTrack, plankTrack } from './testTracks';
+import { compileTrack } from '../tracks/compile';
+import { course } from '../tracks/author';
+import { cruise } from './controllers';
 
 const HZ = 120;
 const R = 0.34;
@@ -136,7 +139,7 @@ describe('brakes (C4)', () => {
     expect(r.minPitch).toBeGreaterThan(-30);
     expect(r.dist).toBeLessThan(7);
   });
-  it.fails('stops from 10 m/s in <= 4.5 m (lean back) [known gap: 4.54 m — the lean-back shove (75 kg moved 0.6 m in 0.17 s, reacting at the anchor) unloads the rear for ~0.15 s before the brakes bite]', () => {
+  it('stops from 10 m/s in <= 4.5 m (lean back) (round 4: lever squeeze 60/s, 4 % rear-load floor on the front cap: 4.47 m)', () => {
     const r = brakeRun(-1);
     expect(r.dist).toBeLessThanOrEqual(4.5);
   });
@@ -177,7 +180,7 @@ describe('bunny hop technique (C5)', () => {
     expect(airTicks / HZ).toBeGreaterThan(0.45);
   });
 
-  it('5 m/s run-up onto a 0.9 m ledge: wheelie held at 40 deg so the front meets the lip, snap 0.8 m out, rear follows, rides away', () => {
+  it('5 m/s run-up onto a 0.9 m ledge: wheelie held at 40 deg so the front meets the lip, snap 1.0 m out, rear follows, rides away', () => {
     const w = createBikePhysics(HZ);
     w.loadTrack(ledgeTrack(0.9, 20), 1);
     stepN(w, {}, 60);
@@ -185,15 +188,18 @@ describe('bunny hop technique (C5)', () => {
     let made = false;
     let landPitch = NaN;
     let rideAway = false;
-    runController(w, ledgeHopper(20, 5, 8, 0.8, 40), {
+    let maxRearLift = 0;
+    runController(w, ledgeHopper(20, 5, 8, 1.0, 40), {
       ticks: HZ * 6,
       onTick: (s) => {
+        if (s.wheels.rear.pos.x > 19 && s.wheels.rear.pos.x < 20.3) maxRearLift = Math.max(maxRearLift, s.wheels.rear.pos.y - R);
         if (s.wheels.rear.pos.x > 20.5 && s.wheels.rear.grounded && s.wheels.rear.pos.y > 0.9 && !s.faulted) made = true;
         if (Number.isNaN(landPitch) && s.wheels.rear.pos.x > 20.3 && (s.wheels.rear.grounded || s.wheels.front.grounded)) landPitch = deg(s.bike.angle);
         if (made && s.wheels.rear.pos.x > 23 && s.wheels.rear.grounded && s.wheels.front.grounded && !s.faulted) rideAway = true;
       },
     });
     feel('ledge.0.9.made', made ? 'yes' : 'no', 'yes');
+    feel('ledge.0.9.rearLiftAtWall', maxRearLift, 'info (>= 0.9 needed: the plate no longer hooks the edge)');
     feel('ledge.0.9.landPitchDeg', landPitch, 'info');
     feel('ledge.0.9.rideAway', rideAway ? 'yes' : 'no', 'yes');
     feel('ledge.0.9.fault', w.getState().faulted ?? 'none', 'none');
@@ -268,17 +274,14 @@ describe('climb (C6)', () => {
     expect(r.fault).toBeNull();
     expect(r.top).toBe(true);
   });
-  it('sustains a 60 deg plank with lean forward: the rear climbs >= 2.5 m of the 3.46 m face at ~3 m/s without stalling (torque-limited torso motor absorbs the corner hit; tyre grip judged on resolved slip)', () => {
+  it('sustains a 60 deg plank with lean forward and crests the lip (round 4: the bash plate sits at trials-bike clearance, so it no longer hooks the edge with the rear off the face)', () => {
     const r = climb(60);
     feel('climb.60.maxY', r.maxY, '>= 2.5 m of 3.46');
-    feel('climb.60.top', r.top ? 'yes' : 'no', 'yes (lip transition: known gap)');
+    feel('climb.60.top', r.top ? 'yes' : 'no', 'yes');
     feel('climb.60.time', r.climbTime, 'info (4 m plank)');
     feel('climb.60.fault', r.fault ?? 'none', 'none');
     expect(r.fault).toBeNull();
     expect(r.maxY).toBeGreaterThanOrEqual(2.5);
-  });
-  it.fails('tops a 60 deg plank [known gap: hangs on the lip with the front on top, bash plate on the edge, rear 0.2 m off the face]', () => {
-    const r = climb(60);
     expect(r.top).toBe(true);
   });
   it('stalls on a 65 deg plank and rolls back without a fault', () => {
@@ -426,6 +429,37 @@ describe('landing envelope audit (round 3)', () => {
   });
 });
 
+describe('nose-down landings (round 4)', () => {
+  function drop(p: number, v: number, brake: number): { fault: string | null; minPitch: number; maxPitch: number; maxRate: number } {
+    const w = flatWorld();
+    w.teleport({ pos: { x: 0, y: R + 3.5 }, angle: rad(p), vel: { x: v, y: 0 } });
+    let landed = false;
+    let minPitch = 99;
+    let maxPitch = -99;
+    let maxRate = 0;
+    stepN(w, { throttle: 0.2, brake }, HZ * 2.5, (s) => {
+      if (!landed && (s.wheels.rear.grounded || s.wheels.front.grounded)) landed = true;
+      if (landed) {
+        minPitch = Math.min(minPitch, deg(s.bike.angle));
+        maxPitch = Math.max(maxPitch, deg(s.bike.angle));
+        maxRate = Math.max(maxRate, Math.abs(deg(s.bike.angVel)));
+      }
+    });
+    return { fault: w.getState().faulted, minPitch, maxPitch, maxRate };
+  }
+  it('3.5 m at 8 m/s nose-down -20/-40: a free front wheel kicks the nose back up (rides away, ~400 deg/s whip); the brake grabbed on landing endos', () => {
+    for (const p of [-20, -40]) {
+      const free = drop(p, 8, 0);
+      const braked = drop(p, 8, 1);
+      feel(`landing.noseDown.${p}.free`, `${free.fault ?? 'rides away'} pitch ${free.minPitch.toFixed(0)}..${free.maxPitch.toFixed(0)} rate ${free.maxRate.toFixed(0)}`, 'rides away (vertical impulse ahead of the COM pitches nose-up)');
+      feel(`landing.noseDown.${p}.brake`, `${braked.fault ?? 'rides away'} pitch ${braked.minPitch.toFixed(0)}..${braked.maxPitch.toFixed(0)}`, 'crash (endo)');
+      expect(free.fault).toBeNull();
+      expect(braked.fault).toBe('crash');
+      expect(braked.minPitch).toBeLessThan(-90);
+    }
+  });
+});
+
 describe('air control (F9)', () => {
   it('brake pitches nose-down, throttle nose-up, lean back nose-up (0.5 s airborne)', () => {
     const run = (input: { throttle?: number; brake?: number; lean?: number }): number => {
@@ -455,5 +489,229 @@ describe('air control (F9)', () => {
     });
     feel('air.controlledLandingPitchDeg', landPitch, '15 +- 15');
     expect(Math.abs(landPitch - 15)).toBeLessThan(15);
+  });
+});
+
+describe('drums and logs (round 4)', () => {
+  type Tech = 'const' | 'back' | 'lift';
+  interface DrumResult {
+    over: boolean;
+    overT: number;
+    fault: string | null;
+    parkS: number;
+    minV: number;
+    maxSpin: number;
+  }
+  /** Drum of radius r sunk `depth`, approached at `speed`; `over` = rear wheel grounded past the far side, no fault. */
+  function drumRun(r: number, depth: number, rolls: boolean, speed: number, tech: Tech): DrumResult {
+    const x0 = 20;
+    const w = createBikePhysics(HZ);
+    w.loadTrack(drumTrack(r, x0, rolls, depth), 1);
+    stepN(w, {}, 60);
+    w.teleport({ pos: { x: x0 - 12, y: R }, angle: 0, vel: { x: speed, y: 0 } });
+    const ctrl: Controller = tech === 'const' ? () => ({ throttle: 0.6, lean: 0.4 }) : tech === 'back' ? () => ({ throttle: 0.5, lean: -1 }) : drumLifter(x0, r, speed);
+    let over = false;
+    let overT = -1;
+    let parkS = 0;
+    let minV = Infinity;
+    let maxSpin = 0;
+    runController(w, ctrl, {
+      ticks: HZ * 8,
+      decisionHz: 60,
+      latencyMs: 50,
+      onTick: (s) => {
+        const fx = s.wheels.front.pos.x;
+        if (fx > x0 - r - 1 && fx < x0 + r + 1) {
+          minV = Math.min(minV, s.bike.vel.x);
+          if (Math.abs(s.bike.vel.x) < 0.2) parkS += 1 / HZ;
+        }
+        if (s.drums[0]) maxSpin = Math.max(maxSpin, Math.abs(s.drums[0].spin));
+        if (!over && s.wheels.rear.pos.x > x0 + r + 0.3 && s.wheels.rear.grounded && !s.faulted) {
+          over = true;
+          overT = s.time;
+        }
+      },
+      stopWhen: (s) => s.faulted !== null || over || s.wheels.rear.pos.x > x0 + r + 10,
+    });
+    return { over, overT, fault: w.getState().faulted, parkS, minV, maxSpin };
+  }
+  const row = (label: string, o: DrumResult): string => `${label}: ${o.over ? `OVER @${o.overT.toFixed(1)}s` : 'no'} ${o.fault ?? '-'} minV ${o.minV.toFixed(1)} park ${o.parkS.toFixed(1)}s spin ${o.maxSpin.toFixed(1)}`;
+
+  it('a 0.3 m-proud sunk drum (M2 bump, r 0.5 depth 0.7) rolls over with constant lean 0.4 + throttle at 3/5/8 m/s', () => {
+    for (const v of [3, 5, 8]) {
+      const o = drumRun(0.5, 0.7, false, v, 'const');
+      console.log(`DRUM ${row(`sunk r0.5 d0.7 ${v}m/s const`, o)}`);
+      expect(o.over && o.fault === null, `${v} m/s`).toBe(true);
+    }
+  });
+
+  it('a 0.3 m log (0.6 m tall, b2) is a wall to a constant lean at any speed (parks or crashes, never climbs) and crosses with a front lift at 3/5/8 m/s', () => {
+    for (const v of [3, 5, 8]) {
+      const c = drumRun(0.3, 0, false, v, 'const');
+      const b = drumRun(0.3, 0, false, v, 'back');
+      const l = drumRun(0.3, 0, false, v, 'lift');
+      console.log(`DRUM ${row(`log r0.3 ${v}m/s const`, c)}`);
+      console.log(`DRUM ${row(`log r0.3 ${v}m/s lean-1`, b)}`);
+      console.log(`DRUM ${row(`log r0.3 ${v}m/s lift`, l)}`);
+      expect(c.over, `const ${v}`).toBe(false);
+      expect(l.over && l.fault === null, `lift ${v}`).toBe(true);
+    }
+  });
+
+  it('a rolling 0.3 m log spins under the tyre (> 1 rad) and still crosses with a front lift', () => {
+    for (const v of [3, 5]) {
+      const l = drumRun(0.3, 0, true, v, 'lift');
+      console.log(`DRUM ${row(`log r0.3 rolls ${v}m/s lift`, l)}`);
+      expect(l.over && l.fault === null, `lift ${v}`).toBe(true);
+      expect(l.maxSpin).toBeGreaterThan(1);
+    }
+  });
+
+  it('drums of r 0.45 / 0.6 / 0.9 standing on the ground: report (geometry: the face bulges into the frame underside, so a front lift hangs the bash plate on the face; these need a hop, a kicker or a sunk base)', () => {
+    for (const r of [0.45, 0.6, 0.9]) {
+      for (const v of [3, 5, 8]) {
+        for (const tech of ['const', 'lift'] as Tech[]) {
+          const o = drumRun(r, 0, false, v, tech);
+          console.log(`DRUM ${row(`drum r${r} ${v}m/s ${tech}`, o)}`);
+        }
+      }
+    }
+  });
+});
+
+describe('rider pose from the rider mass (round 4, blind critic: "rider bolted to bike")', () => {
+  function step(from: number, to: number): { t90: number; overshoot: number; torsoT90: number; settleLean: number } {
+    const w = flatWorld();
+    w.teleport({ pos: { x: 0, y: R }, angle: 0, vel: { x: 6, y: 0 } });
+    stepN(w, { throttle: 0.3, lean: from }, 120);
+    const l0 = w.getState().rider.lean;
+    const tp0 = w.getState().rider.torsoPitch;
+    let t90 = -1;
+    let torsoT90 = -1;
+    let peak = from;
+    let tpEnd = tp0;
+    stepN(w, { throttle: 0.3, lean: to }, 90, (s) => {
+      const l = s.rider.lean;
+      if (t90 < 0 && (l - l0) / (to - l0) >= 0.9) t90 = s.time;
+      if ((l - from) * Math.sign(to - from) > (peak - from) * Math.sign(to - from)) peak = l;
+      tpEnd = s.rider.torsoPitch;
+    });
+    // torso: 90 % of its own final swing
+    const w2 = flatWorld();
+    w2.teleport({ pos: { x: 0, y: R }, angle: 0, vel: { x: 6, y: 0 } });
+    stepN(w2, { throttle: 0.3, lean: from }, 120);
+    const t0 = w2.getState().time;
+    stepN(w2, { throttle: 0.3, lean: to }, 90, (s) => {
+      if (torsoT90 < 0 && Math.abs(s.rider.torsoPitch - tp0) >= 0.9 * Math.abs(tpEnd - tp0)) torsoT90 = s.time - t0;
+    });
+    const tStart = 120 / HZ + 60 / HZ;
+    return { t90: t90 - tStart, overshoot: (peak - to) * Math.sign(to - from), torsoT90, settleLean: w.getState().rider.lean };
+  }
+  it('a lean step 0 -> +1 reaches 90 % of the pose in 0.15-0.35 s (a 0.73 m shift of 75 kg under the 2 kN brace cap: 0.28 s, no overshoot); the torso swing lags further; the pose settles at the input', () => {
+    const f = step(0, 1);
+    const b = step(0, -1);
+    feel('pose.lean.t90.fwd', f.t90, '0.15-0.35 s (design asked 0.10-0.15; the brace cap sets it)');
+    feel('pose.lean.overshoot.fwd', f.overshoot, '0-0.1 (slight)');
+    feel('pose.lean.t90.back', b.t90, '0.15-0.35 s');
+    feel('pose.lean.overshoot.back', b.overshoot, '0-0.1');
+    feel('pose.torso.t90.fwd', f.torsoT90, 'info (torque-limited motor, slower than the mass)');
+    feel('pose.lean.settle.fwd', f.settleLean, '0.9-1');
+    expect(f.t90).toBeGreaterThan(0.15);
+    expect(f.t90).toBeLessThan(0.35);
+    expect(b.t90).toBeGreaterThan(0.15);
+    expect(b.t90).toBeLessThan(0.35);
+    expect(f.overshoot).toBeGreaterThanOrEqual(0);
+    expect(f.overshoot).toBeLessThan(0.15);
+    expect(f.settleLean).toBeGreaterThan(0.9);
+    expect(b.settleLean).toBeLessThan(-0.9);
+  });
+});
+
+describe('seesaw (round 4, the compiled `seesaw` kind)', () => {
+  interface SeesawResult {
+    over: boolean;
+    overT: number;
+    fault: string | null;
+    tipS: number;
+    movedBeforePivotDeg: number;
+    limitDeg: number;
+    minAngDeg: number;
+    parkS: number;
+    lipTop: number;
+  }
+  /** `flat(20) . seesaw({length, height}) . flat(20)` compiled by the tracks owner's compiler; cruise onto the resting end at `speed`. */
+  function seesawRun(length: number, height: number, speed: number, entry = false): SeesawResult {
+    const b = course('phys-seesaw', 'seesaw', 'medium').meta({ biome: 'industrial', technique: 'seesaw' }).flat(20);
+    const track = compileTrack((entry ? b.seesawEntry({ length, height }) : b.seesaw({ length, height })).flat(20).finish());
+    const ss = track.colliders.find((c) => c.kind === 'seesaw');
+    if (!ss || ss.kind !== 'seesaw') throw new Error('no seesaw collider');
+    const w = createBikePhysics(HZ);
+    w.loadTrack(track, 1);
+    stepN(w, {}, 60);
+    const x0 = ss.pivot.x - ss.halfLength;
+    w.teleport({ pos: { x: x0 - 12, y: R }, angle: 0, vel: { x: speed, y: 0 } });
+    const startAngle = w.getState().seesaws[0]!.angle;
+    let tipStart = -1;
+    let tipEnd = -1;
+    let minAng = 9;
+    let overT = -1;
+    let parkS = 0;
+    let moved = 0;
+    runController(w, cruise(speed, 0.3), {
+      ticks: HZ * 10,
+      decisionHz: 60,
+      latencyMs: 50,
+      onTick: (s) => {
+        const a = s.seesaws[0]!.angle;
+        minAng = Math.min(minAng, a);
+        if (tipStart < 0 && a < startAngle - 0.05) tipStart = s.time;
+        if (tipStart >= 0 && tipEnd < 0 && a < -ss.maxAngle + 0.05) tipEnd = s.time;
+        const fx = s.wheels.front.pos.x;
+        if (fx > x0 - 1 && fx < x0 + 1 && Math.abs(s.bike.vel.x) < 0.2) parkS += 1 / HZ;
+        if (fx < ss.pivot.x) moved = Math.max(moved, Math.abs(a - startAngle));
+        if (overT < 0 && s.wheels.rear.pos.x > ss.pivot.x + ss.halfLength + 0.5 && s.wheels.rear.grounded && !s.faulted) overT = s.time;
+      },
+      stopWhen: (s) => s.faulted !== null || overT > 0,
+    });
+    return {
+      over: overT > 0,
+      overT,
+      fault: w.getState().faulted,
+      tipS: tipEnd > 0 ? tipEnd - tipStart : -1,
+      movedBeforePivotDeg: deg(moved),
+      limitDeg: deg(ss.maxAngle),
+      minAngDeg: deg(minAng),
+      parkS,
+      lipTop: ss.pivot.y - ss.halfLength * Math.sin(ss.maxAngle) + ss.thickness / 2,
+    };
+  }
+  const row = (label: string, o: SeesawResult): string =>
+    `SEESAW ${label}: ${o.over ? `OVER @${o.overT.toFixed(1)}s` : 'no'} ${o.fault ?? '-'} tip ${o.tipS.toFixed(2)}s limit ${o.limitDeg.toFixed(0)} deg, reached ${o.minAngDeg.toFixed(0)}, moved before the pivot ${o.movedBeforePivotDeg.toFixed(2)} deg, lip ${o.lipTop.toFixed(2)} m park ${o.parkS.toFixed(1)}s`;
+
+  it('L6 h1.0: rides up the resting end (the 0.12 m board lip is a step, not a wall), the board does not move until the front passes the pivot, tips in 0.3-1.0 s (clips 16/17: ~0.5 s), rides off at 3/5/8 m/s', () => {
+    for (const v of [3, 5, 8]) {
+      const o = seesawRun(6, 1.0, v);
+      console.log(row(`L6 h1.0 ${v}m/s`, o));
+      expect(o.over && o.fault === null, `${v} m/s`).toBe(true);
+      expect(o.parkS).toBeLessThan(0.1);
+      expect(o.movedBeforePivotDeg).toBeLessThan(1);
+      if (v <= 5) {
+        expect(o.tipS).toBeGreaterThan(0.3);
+        expect(o.tipS).toBeLessThan(1.0);
+      }
+    }
+  });
+  it('the curriculum boards (L6 h0.8 entry, L8 h1.2 entry, L6 h1.5 entry, L8 h2.0 bare, L5 h1.0 bare) all ride over at 5 m/s', () => {
+    for (const [len, h, entry] of [
+      [6, 0.8, true],
+      [8, 1.2, true],
+      [6, 1.5, true],
+      [8, 2.0, false],
+      [5, 1.0, false],
+    ] as const) {
+      const o = seesawRun(len, h, 5, entry);
+      console.log(row(`L${len} h${h} ${entry ? 'entry' : 'bare'} 5m/s`, o));
+      expect(o.over && o.fault === null, `L${len} h${h}`).toBe(true);
+    }
   });
 });

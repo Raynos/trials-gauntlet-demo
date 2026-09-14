@@ -167,6 +167,42 @@ export function ledgeHopper(wallX: number, speed = 5, preloadDist = 4, snapDist 
 }
 
 /**
+ * Log / drum crossing by a front lift (techniques.md clips 10-12): hold `speed` on the approach,
+ * then from `leadDist` before the drum centre pop the front with throttle against a lean of -0.4
+ * (above `hopLeanBack`, so no preload starts: a snap here would fire a hop) to the pitch that puts
+ * the front wheel centre at the drum top (`asin(2r / wheelbase)` + a margin); once the front is on
+ * the drum hang over the bars and drive the rear into and up the face, then settle. Geometry bounds
+ * it: a drum of radius r standing on the ground is 2r tall and meets a 0.34 m wheel at
+ * `acos((R - r) / (R + r))` from vertical (86 deg for r 0.3), so without the lift every drum is a
+ * wall; and for r >= 0.45 the face bulges into the frame's underside, so the bash plate catches
+ * before the rear reaches the face and the bike hangs (see physics.md 12.3).
+ */
+export function drumLifter(centreX: number, r: number, speed = 5, opts: { popDeg?: number; leadDist?: number } = {}): Controller {
+  const R = 0.34;
+  const target = opts.popDeg ?? Math.min(45, (Math.asin(Math.min(1, (2 * r) / 1.3)) * 180) / Math.PI + 8);
+  const leadDist = opts.leadDist ?? 2.5;
+  let phase = 0;
+  return (o) => {
+    const fx = o.state.wheels.front.pos.x;
+    const rx = o.state.wheels.rear.pos.x;
+    const dist = centreX - fx;
+    const hold = Math.max(0, Math.min(1, 0.05 + 0.15 * (speed - o.speed)));
+    if (phase === 0 && dist > leadDist) return { throttle: hold, lean: 0 };
+    if (phase === 0 && (dist > r + 0.15 || (!o.frontGrounded && fx < centreX))) {
+      if (fx > centreX - r - 0.1 && o.state.wheels.front.pos.y > 2 * r + R - 0.05) phase = 1;
+      else {
+        const err = target - o.pitchDeg - 0.05 * o.pitchRateDeg;
+        return { throttle: Math.max(0.3, Math.min(1, 0.5 + 0.06 * err)), lean: -0.4 };
+      }
+    }
+    phase = 1;
+    if (rx < centreX + r * 0.3) return { throttle: o.pitchDeg > 50 ? 0.1 : 0.9, lean: 1 };
+    if (o.pitchDeg < -15) return { throttle: 0.6, lean: -0.5 };
+    return { throttle: 0.4, lean: 0.2 };
+  };
+}
+
+/**
  * Steep climb of a plank whose base is at `baseX`, three phases like the reference clips:
  * approach — neutral, pop the front a little so the wheel meets the plank face instead of its
  * base; transition — front on the plank, rear still on the flat: weight forward, drive the
