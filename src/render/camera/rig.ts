@@ -150,7 +150,7 @@ export class CameraRig {
       screenY: lerp(0.55, 0.56, zoomT) - 0.03 * airT,
       // Idle is a 3/4 view (reference start frames sit ≈20° round and ≈10° down), so depth reads before GO.
       yaw: moving * lerp(lerp(20, 15, zoomT), 17, wideT) * DEG,
-      pitch: lerp(lerp(10, 11, zoomT), 13, fastT) * DEG + 4 * DEG * airT,
+      pitch: lerp(lerp(10, 11, zoomT), 13, fastT) * DEG, // round 7: never tilt up in the air — pull back instead
       roll: 0,
       fov: lerp(28, 34, zoomT) * DEG,
     };
@@ -231,10 +231,14 @@ export class CameraRig {
     // landing zone and pull back with height, so the ground line stays in the bottom third.
     let fyT = followTarget.y + 0.45 - 0.3 * airT;
     if (f.airborne && !f.crashed && this.ground) {
+      // Round 7 (b3 kicker: the bike left the frame for 2.5 s of a 3.4 s flight): the pull-back
+      // follows the height immediately (0.2 s ramp, not 0.7), the floor drops to 0.3 so a 15 m
+      // apex still fits, and the aim point sits halfway to the landing zone.
+      const airQ = smoothstep(0, 0.2, f.airTime);
       const gy = this.ground(f.bikeX + Math.max(0, f.velX) * 0.6);
       const above = Math.max(0, f.bikeY - 0.55 - gy);
-      fyT -= 0.5 * above * airT;
-      p.heightFrac *= Math.max(0.45, 1.9 / (1.9 + 0.9 * above * airT));
+      fyT -= 0.5 * above * airQ;
+      p.heightFrac *= Math.max(0.3, 1.9 / (1.9 + 1.1 * above * airQ));
     }
     if (cut) {
       this.fx.snap(fxT);
@@ -253,9 +257,11 @@ export class CameraRig {
       this.fx.follow(fxT, dt);
       const dy = fyT - this.fy.x;
       const dead = f.airborne || f.crashed ? 0 : 0.6;
-      if (Math.abs(dy) > dead) this.fy.follow(fyT - Math.sign(dy) * dead, dt);
+      // Airborne: the y follow and the pull-back tighten (a 0.35 s half-life lags an 8 m/s launch by 3 m).
+      const airDt = f.airborne && !f.crashed ? dt * 2.5 : dt;
+      if (Math.abs(dy) > dead) this.fy.follow(fyT - Math.sign(dy) * dead, airDt);
       this.look.follow(lookTarget, dt);
-      this.heightFrac.follow(p.heightFrac, dt);
+      this.heightFrac.follow(p.heightFrac, airDt);
       this.screenX.follow(p.screenX, dt);
       this.screenY.follow(p.screenY, dt);
       this.yaw.follow(p.yaw, dt);
@@ -297,12 +303,44 @@ export class CameraRig {
     // Bike point we want on screen at (screenX, screenY).
     const bx = this.fx.x + this.look.x;
     const by = this.fy.x + shakeY;
-    const halfH = dist * Math.tan(fov / 2);
-    const halfW = halfH * this.aspect;
+    let halfH = dist * Math.tan(fov / 2);
+    let halfW = halfH * this.aspect;
+    // Hard constraint (round 7): the bike centre stays inside the central 70 % box on every
+    // frame. Estimate where it lands from the smoothed aim offset and, if it would leave
+    // [0.2, 0.8], move the followed point (and pull back) so it does not. Roll is 0, so world
+    // x maps to screen right by cos(yaw) and world y to screen up by cos(pitch).
+    if (!cut && this.primed) {
+      const bcx = f.bikeX;
+      const bcy = f.bikeY + 0.45;
+      let du = ((bcx - bx) * Math.cos(yaw)) / (2 * halfW);
+      let dv = ((bcy - by) * Math.cos(pitch)) / (2 * halfH);
+      let su = this.screenX.x + du;
+      let sv = this.screenY.x - dv;
+      // First widen: a bike more than 0.3 off the aim point wants a wider frame, not a slide.
+      const over = Math.max(Math.abs(su - 0.5), Math.abs(sv - 0.5)) - 0.3;
+      if (over > 0) {
+        const k = Math.min(2.5, 1 + over * 4);
+        this.heightFrac.snap(Math.max(0.03, hf / k));
+        halfH *= k;
+        halfW *= k;
+        du /= k;
+        dv /= k;
+        su = this.screenX.x + du;
+        sv = this.screenY.x - dv;
+      }
+      if (sv < 0.2) this.fy.snap(this.fy.x + ((0.2 - sv) * 2 * halfH) / Math.cos(pitch));
+      else if (sv > 0.8) this.fy.snap(this.fy.x - ((sv - 0.8) * 2 * halfH) / Math.cos(pitch));
+      if (su < 0.2) this.fx.snap(this.fx.x - ((0.2 - su) * 2 * halfW) / Math.cos(yaw));
+      else if (su > 0.8) this.fx.snap(this.fx.x + ((su - 0.8) * 2 * halfW) / Math.cos(yaw));
+    }
+    const bx2 = this.fx.x + this.look.x;
+    const by2 = this.fy.x + shakeY;
+    const dist2 = halfH / Math.tan(fov / 2);
+    this.dist = dist2;
     const ox = (2 * this.screenX.x - 1) * halfW;
     const oy = (1 - 2 * this.screenY.x) * halfH;
-    this.aim.set(bx, by, 0).addScaledVector(this.right, -ox).addScaledVector(this.up, -oy);
-    this.camera.position.copy(this.aim).addScaledVector(this.dir, -dist);
+    this.aim.set(bx2, by2, 0).addScaledVector(this.right, -ox).addScaledVector(this.up, -oy);
+    this.camera.position.copy(this.aim).addScaledVector(this.dir, -dist2);
     this.camera.quaternion.copy(this.q);
     if (Math.abs(this.camera.fov - fov / DEG) > 1e-3) {
       this.camera.fov = fov / DEG;

@@ -87,7 +87,8 @@ function hex(c: number): [number, number, number] {
   return [col.r, col.g, col.b];
 }
 
-/** Equirect HDR sky: zenith→horizon→ground gradient, sun disc, horizon haze. */
+const c0 = (y: number): number => y - 0.02; // cloud base shade helper (darker underside band)
+/** Equirect HDR sky: zenith→horizon→ground gradient, sun disc, horizon haze, a few clouds. */
 export function buildSkyTexture(b: Biome, width = 256, height = 128): THREE.DataTexture {
   const data = new Float32Array(width * height * 4);
   const zen = hex(b.skyZenith);
@@ -95,6 +96,17 @@ export function buildSkyTexture(b: Biome, width = 256, height = 128): THREE.Data
   const gnd = hex(b.skyGround);
   const sun = hex(b.sunColor);
   const [sx, sy, sz] = b.sunDir;
+  // A few cumulus near the horizon (deterministic placement), lit by the sun on the sunward side.
+  const clouds: { u: number; y: number; w: number; h: number; d: number }[] = [];
+  if (b.clouds) {
+    let st = 0x9e3779b9;
+    const rnd = (): number => {
+      st = (Math.imul(st, 1664525) + 1013904223) >>> 0;
+      return st / 4294967296;
+    };
+    const n = Math.round(9 * b.clouds);
+    for (let i = 0; i < n; i++) clouds.push({ u: rnd(), y: 0.05 + rnd() * 0.22, w: 0.03 + rnd() * 0.07, h: 0.02 + rnd() * 0.05, d: 0.5 + rnd() * 0.5 });
+  }
   for (let j = 0; j < height; j++) {
     const v = (j + 0.5) / height; // 0 = top
     // Row 0 of a DataTexture is v = 0 = nadir in three's equirect convention.
@@ -134,6 +146,27 @@ export function buildSkyTexture(b: Biome, width = 256, height = 128): THREE.Data
       r += sun[0] * s;
       g += sun[1] * s;
       bl += sun[2] * s;
+      if (y > 0 && clouds.length) {
+        let cov = 0;
+        for (const c of clouds) {
+          let du = Math.abs(u - c.u);
+          du = Math.min(du, 1 - du);
+          const dx = du / c.w;
+          const dy = (y - c.y) / c.h;
+          const q = dx * dx + dy * dy + 0.35 * Math.sin(u * 80 + y * 60) * Math.sin(u * 37);
+          cov = Math.max(cov, (1 - Math.min(1, Math.max(0, q))) * c.d);
+        }
+        if (cov > 0) {
+          const lit = 0.5 + 0.5 * Math.max(0, dx * sx + dz * sz + 0.3);
+          const cr = hor[0] * 0.9 + 0.35 * lit;
+          const cg = hor[1] * 0.9 + 0.35 * lit;
+          const cb = hor[2] * 0.95 + 0.4 * lit;
+          const under = 1 - 0.45 * (1 - Math.min(1, Math.max(0, (y - c0(y)) * 40)));
+          r = r + (cr * under - r) * cov;
+          g = g + (cg * under - g) * cov;
+          bl = bl + (cb * under - bl) * cov;
+        }
+      }
       const k = (j * width + i) * 4;
       data[k] = r;
       data[k + 1] = g;

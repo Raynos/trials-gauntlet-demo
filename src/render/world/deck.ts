@@ -38,6 +38,10 @@ const WIDE_SECTION: [number, number][] = [
 const BED_SECTION: [number, number][] = [
   [-1.62, -0.08], [-1.5, 0], [-0.3, 0], [0, -0.015], [0.3, 0], [1.5, 0], [1.62, -0.08],
 ];
+/** Canyon dirt: ruts at z ±0.4 sunk 3 cm, crown between. */
+const RUT_SECTION: [number, number][] = [
+  [-3.0, -0.42], [-1.75, -0.16], [-1.5, 0], [-0.9, 0], [-0.56, 0], [-0.4, -0.03], [-0.24, 0], [0, 0.005], [0.24, 0], [0.4, -0.03], [0.56, 0], [0.9, 0], [1.5, 0], [1.75, -0.16], [3.0, -0.42],
+];
 const OBSTACLE_SECTION: [number, number][] = [[-1.5, -0.05], [-1.42, 0], [0, 0], [1.42, 0], [1.5, -0.05]];
 
 const TILE: Record<SurfaceKind, number> = { dirt: 2.5, wood: 1.5, metal: 1.5, concrete: 3, rubber: 1, grate: 1, stone: 2.5, snow: 3 };
@@ -161,6 +165,48 @@ function edging(pl: ColliderPolyline, mat: string, w: number, h: number, zOff: n
   }
 }
 
+/** Concrete kerb stones (0.9 m blocks, per-block tint) along both edges of a road polyline. */
+function kerbs(pl: ColliderPolyline, rng: Rng, out: Bucket): void {
+  const pts = resample(pl.points, 0.9);
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1]!;
+    const b = pts[i]!;
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    if (len < 1e-4) continue;
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    const mx = (a.x + b.x) / 2;
+    const my = (a.y + b.y) / 2;
+    for (const side of [-1, 1]) {
+      const t = 0.78 + rng.next() * 0.2;
+      push(out, 'concrete', tint(box(len - 0.02, 0.12, 0.28, mx - Math.sin(ang) * 0.02, my + Math.cos(ang) * 0.02, side * 1.6, ang), t, t, t * 0.98));
+    }
+  }
+}
+
+/** Split logs laid end to end along both edges of a snow trail (dark bark, snow on top is the ribbon lip). */
+function logs(pl: ColliderPolyline, rng: Rng, out: Bucket): void {
+  const pts = resample(pl.points, 2.2);
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1]!;
+    const b = pts[i]!;
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    if (len < 1e-4) continue;
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    const mx = (a.x + b.x) / 2;
+    const my = (a.y + b.y) / 2;
+    for (const side of [-1, 1]) {
+      if (rng.next() < 0.15) continue;
+      const g = new THREE.CylinderGeometry(0.13, 0.15, len - 0.1, 8).rotateZ(Math.PI / 2);
+      const t = 0.3 + rng.next() * 0.15;
+      tint(g, t, t * 0.8, t * 0.65);
+      Q.setFromAxisAngle(ZAX, ang);
+      M.compose(P.set(mx - Math.sin(ang) * 0.02, my + Math.cos(ang) * 0.02, side * 1.72), Q, S.set(1, 1, 1));
+      g.applyMatrix4(M);
+      push(out, 'pallet', g);
+    }
+  }
+}
+
 function ribbonWithShade(pl: ColliderPolyline, section: [number, number][], tile: number, lift: number, shade: (z: number, drop: number) => number): THREE.BufferGeometry {
   const g = ribbonGeometry(pl.points, section, tile, lift);
   const pos = g.getAttribute('position');
@@ -191,9 +237,9 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   const interior = biome.interior;
   const floorY = groundFloorY(track.def.profile, interior);
 
-  const rocks = new PropBatch('edge-rock', rockGeometry(track.def.seed ^ 77), lib.get('rock'));
-  const pallets = new PropBatch('support-pallet', bakeAO(palletLowGeometry(), 0.144, 0.25), lib.get('pallet'));
-  const stacks = new PropBatch('support-stack', palletStackGeometry(3), lib.get('pallet'));
+  const rocks = new PropBatch('edge-rock', rockGeometry(track.def.seed ^ 77, 1), lib.get('rock'));
+  const pallets = new PropBatch('support-pallet', bakeAO(palletLowGeometry(), 0.144, 0.25), lib.get('pallet'), false);
+  const stacks = new PropBatch('support-stack', palletStackGeometry(3), lib.get('pallet'), false);
   const containers = new PropBatch('support-container', bakeAO(containerGeometry(), 2.59, 0.4), lib.get('container'));
   const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a];
 
@@ -201,7 +247,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     if (c.kind !== 'polyline' || c.points.length < 2) continue;
     const pl = c;
     const ground = pl.obstacleIndex < 0;
-    const surf = pl.surface;
+    const surf: SurfaceKind = pl.surface === 'dirt' && biome.id === 'snow' && pl.obstacleIndex < 0 ? 'snow' : pl.surface;
     const tile = TILE[surf] ?? 2;
     if (surf === 'wood') {
       boards(pl, rng, buckets);
@@ -214,12 +260,23 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
       continue;
     }
     if (surf === 'dirt') {
-      push(buckets, 'dirt', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.72 : 1) * (0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9)))));
+      const section = ground ? (biome.id === 'canyon' ? RUT_SECTION : WIDE_SECTION) : OBSTACLE_SECTION;
+      const rib = ribbonWithShade(pl, section, tile, ground ? 0 : 0.004, (z, drop) => {
+        // Canyon: two tyre ruts (z ±0.4) worn darker, a pale crown between them; elsewhere one worn line.
+        const wear = biome.id === 'canyon' ? (Math.abs(Math.abs(z) - 0.4) < 0.16 ? 0.7 : Math.abs(z) < 0.2 ? 1.1 : 1) : Math.abs(z) < 0.3 ? 0.72 : 1;
+        return wear * (0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9)));
+      });
+      if (biome.id === 'canyon') {
+        // Warm ochre over the shared dirt maps.
+        const col = rib.getAttribute('color') as THREE.BufferAttribute;
+        for (let i = 0; i < col.count; i++) col.setXYZ(i, col.getX(i) * 1.25, col.getY(i) * 1.02, col.getZ(i) * 0.8);
+      }
+      push(buckets, 'dirt', rib);
       if (biome.id === 'canyon' && ground) {
         const pts = resample(pl.points, 2.6);
         for (const p of pts) {
           for (const side of [-1, 1]) {
-            if (rng.next() < 0.7) rocks.add(p.x + rng.range(-0.5, 0.5), p.y - 0.1, side * rng.range(1.7, 2.3), rng.range(0, 6), rng.range(0.25, 0.6), null, rng.range(-0.3, 0.3));
+            if (rng.next() < 0.45) rocks.add(p.x + rng.range(-0.5, 0.5), p.y - 0.12, side * rng.range(1.7, 2.3), rng.range(0, 6), rng.range(0.25, 0.65), null, rng.range(-0.3, 0.3), rng.range(0.2, 0.45), rng.range(0.25, 0.65));
           }
         }
       }
@@ -227,17 +284,30 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     }
     if (surf === 'concrete') {
       push(buckets, biome.id === 'nightCity' ? 'asphaltWet' : 'concrete', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.85 : 1) * (0.6 + 0.4 * (1 - Math.min(1, -drop * 0.9)))));
-      // Painted edge lines.
+      // Painted edge lines + concrete kerb stones (nightCity).
       edging(pl, 'hazardTape', 0.1, 0.006, 1.32, 0.004, 1, 1, 1, buckets);
+      if (biome.id === 'nightCity' && ground) kerbs(pl, rng, buckets);
       continue;
     }
     if (surf === 'metal' || surf === 'grate') {
       push(buckets, SURFACE_MATERIAL[surf], ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.7 + 0.3 * (1 - Math.min(1, -drop))));
       edging(pl, 'darkSteel', 0.08, 0.08, 1.52, 0.03, 0.6, 0.6, 0.6, buckets);
+      // Foundry: grating strips along both edges of the plate (z 0.95–1.45), lifted 1 cm.
+      if (biome.id === 'foundry' && ground) edging(pl, 'grate', 0.5, 0.03, 1.2, 0.012, 0.8, 0.8, 0.8, buckets);
       continue;
     }
     if (surf === 'snow') {
-      push(buckets, 'snow', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.86 : 1) * (0.62 + 0.38 * (1 - Math.min(1, -drop * 1.2)))));
+      push(buckets, 'snow', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => {
+        // Packed trail: two faint ruts, dark trodden edges past |z| 1.35, blue-grey apron.
+        const a = Math.abs(z);
+        const wear = Math.abs(a - 0.38) < 0.14 ? 0.86 : a > 1.35 ? 0.7 : 1;
+        return wear * (0.62 + 0.38 * (1 - Math.min(1, -drop * 1.2)));
+      }));
+      if (ground) {
+        // Dark rock/dirt edge under the snow lip and split-log kerbs on both sides.
+        edging(pl, 'dirt', 0.5, 0.05, 1.68, -0.1, 0.35, 0.32, 0.3, buckets);
+        logs(pl, rng, buckets);
+      }
       continue;
     }
     push(buckets, SURFACE_MATERIAL[surf] ?? 'dirt', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9))));

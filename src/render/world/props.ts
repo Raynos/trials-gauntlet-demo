@@ -162,7 +162,7 @@ export function drumGeometry(): THREE.BufferGeometry {
 export function tyreStackGeometry(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
   for (let i = 0; i < 4; i++) {
-    const t = new THREE.TorusGeometry(0.26, 0.1, 8, 20);
+    const t = new THREE.TorusGeometry(0.26, 0.1, 6, 14);
     t.rotateX(Math.PI / 2);
     t.translate(0, 0.1 + i * 0.2, 0);
     parts.push(t);
@@ -321,8 +321,8 @@ export function fencePanelGeometry(): THREE.BufferGeometry {
 }
 
 /** Rock: displaced icosphere, radius 1, origin centre. */
-export function rockGeometry(seed: number): THREE.BufferGeometry {
-  const g = new THREE.IcosahedronGeometry(1, 2);
+export function rockGeometry(seed: number, detail = 2): THREE.BufferGeometry {
+  const g = new THREE.IcosahedronGeometry(1, detail);
   const p = g.getAttribute('position') as THREE.BufferAttribute;
   let s = seed >>> 0 || 7;
   const rnd = (): number => {

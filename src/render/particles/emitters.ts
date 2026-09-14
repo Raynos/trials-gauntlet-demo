@@ -45,6 +45,9 @@ export class Emitters {
   private finishX = 0;
   private finishY = 0;
   private biome: Biome | null = null;
+  /** Spark fountains (foundry): positions that spit sparks on a fixed cadence. */
+  private fountains: { x: number; y: number; z: number }[] = [];
+  private lastFountainT = -10;
   private readonly burst: Burst = {
     x: 0, y: 0, z: 0, count: 0, life: [0.5, 1], size: [0.2, 0.6], vx: 0, vy: 0, vz: 0, spread: 0.5, jitter: 0.05, color: 0xffffff,
   };
@@ -68,19 +71,20 @@ export class Emitters {
     return [this.dust, this.smoke, this.sparks, this.flame, this.confetti, this.ambient];
   }
 
-  setTrack(seed: number, jets: Emitters['jets'], finishX: number, finishY: number, biome: Biome): void {
+  setTrack(seed: number, jets: Emitters['jets'], finishX: number, finishY: number, biome: Biome, fountains: { x: number; y: number; z: number }[] = []): void {
     this.seed = seed >>> 0;
     this.jets = jets;
     this.finishX = finishX;
     this.finishY = finishY;
     this.biome = biome;
+    this.fountains = fountains;
     this.clear();
   }
 
   clear(): void {
     for (const s of this.systems) s.clear();
     this.pendingEvents = [];
-    this.lastExhaustT = this.lastDirtT = this.lastSparkT = this.lastAmbientT = -10;
+    this.lastExhaustT = this.lastDirtT = this.lastSparkT = this.lastAmbientT = this.lastFountainT = -10;
   }
 
   onEvent(e: GameEvent): void {
@@ -149,15 +153,32 @@ export class Emitters {
       const kind = this.biome.ambient;
       Object.assign(b, {
         x: camX + rng.range(-14, 22), y: f.bikeY + rng.range(-1, 9), z: rng.range(-12, 4),
-        count: kind === 'snow' ? 10 : 4,
-        life: kind === 'snow' ? [4, 7] : [3, 6],
-        size: kind === 'snow' ? [0.05, 0.05] : kind === 'embers' ? [0.04, 0.01] : [0.06, 0.06],
-        vx: kind === 'snow' ? -0.4 : 0.1, vy: kind === 'snow' ? -0.6 : kind === 'embers' ? 0.5 : 0.05, vz: 0,
-        spread: kind === 'snow' ? 0.25 : 0.12, jitter: 0.5,
-        color: kind === 'embers' ? 0xff8a30 : 0xffffff, colorJitter: 0.3, gravityScale: kind === 'snow' ? 0.4 : kind === 'embers' ? -0.6 : 0,
+        count: kind === 'snow' ? 10 : kind === 'dust' ? 3 : 4,
+        life: kind === 'snow' ? [4, 7] : kind === 'dust' ? [5, 9] : [3, 6],
+        size: kind === 'snow' ? [0.05, 0.05] : kind === 'embers' ? [0.04, 0.01] : kind === 'dust' ? [0.25, 0.8] : [0.06, 0.06],
+        vx: kind === 'snow' ? -0.4 : kind === 'dust' ? 0.9 : 0.1, vy: kind === 'snow' ? -0.6 : kind === 'embers' ? 0.5 : 0.05, vz: 0,
+        spread: kind === 'snow' ? 0.25 : kind === 'dust' ? 0.3 : 0.12, jitter: 0.5,
+        color: kind === 'embers' ? 0xff8a30 : kind === 'dust' ? 0xd8b890 : 0xffffff, colorJitter: 0.3, gravityScale: kind === 'snow' ? 0.4 : kind === 'embers' ? -0.6 : 0,
       });
+      if (kind === 'dust') {
+        // Canyon: big faint motes low over the ground, drifting with the wind.
+        b.y = f.bikeY + rng.range(-0.5, 3.5);
+        b.z = rng.range(-10, 3);
+      }
       if (kind === 'embers') this.sparks.emit(b, t, rng);
+      else if (kind === 'dust') this.dust.emit(b, t, rng);
       else this.ambient.emit(b, t, rng);
+    }
+    // Spark fountains: one fountain at a time, 60 ms cadence, only those near the camera.
+    if (this.fountains.length && t - this.lastFountainT > 0.06) {
+      this.lastFountainT = t;
+      const rng = this.reseed(f.tick, 9);
+      for (const fo of this.fountains) {
+        if (Math.abs(fo.x - camX) > 30) continue;
+        if (rng.next() > 0.45) continue;
+        Object.assign(b, { x: fo.x, y: fo.y, z: fo.z, count: 6, life: [0.5, 1.1], size: [0.05, 0.015], vx: 0, vy: 6.5, vz: 0, spread: 1.6, jitter: 0.08, color: 0xffc060, colorJitter: 0.25, gravityScale: 1 });
+        this.sparks.emit(b, t, rng);
+      }
     }
   }
 
@@ -191,12 +212,13 @@ export class Emitters {
     for (const j of jets) {
       // Column: fast bright core, then a slower yellow bloom. Staggered births make it burn ~0.9 s.
       // Thin fast column: many small sprites launched straight up over 0.7 s.
-      for (let k = 0; k < 10; k++) {
-        Object.assign(b, { x: j.x, y: j.y + 0.05, z: j.z, count: 9, life: [0.28, 0.5], size: [0.16, 0.3], vx: 0, vy: 7.5, vz: 0, spread: 0.25, jitter: 0.04, color: k % 2 ? 0xffc040 : 0xff7a18, colorJitter: 0.15, gravityScale: 0.6 });
-        this.flame.emit(b, f.tSim + k * 0.07, rng);
+      // Round 7 (reference obs. 13 / clip 02): thin 3–4 m columns that live 0.4 s, then a wisp of smoke.
+      for (let k = 0; k < 7; k++) {
+        Object.assign(b, { x: j.x, y: j.y + 0.05, z: j.z, count: 8, life: [0.2, 0.34], size: [0.1, 0.22], vx: 0, vy: 9.5, vz: 0, spread: 0.14, jitter: 0.03, color: k % 2 ? 0xffd060 : 0xff8a20, colorJitter: 0.12, gravityScale: 0.5 });
+        this.flame.emit(b, f.tSim + k * 0.055, rng);
       }
-      Object.assign(b, { x: j.x, y: j.y + 0.4, z: j.z, count: 10, life: [0.8, 1.4], size: [0.3, 0.9], vx: 0, vy: 2.5, vz: 0, spread: 0.4, jitter: 0.1, color: 0x2a2624, colorJitter: 0.2, gravityScale: 0.3 });
-      this.smoke.emit(b, f.tSim + 0.5, rng);
+      Object.assign(b, { x: j.x, y: j.y + 1.2, z: j.z, count: 6, life: [0.6, 1.1], size: [0.2, 0.7], vx: 0, vy: 2.0, vz: 0, spread: 0.3, jitter: 0.1, color: 0x2a2624, colorJitter: 0.2, gravityScale: 0.3 });
+      this.smoke.emit(b, f.tSim + 0.35, rng);
     }
   }
 
@@ -208,6 +230,18 @@ export class Emitters {
         Object.assign(b, { x: this.finishX, y: this.finishY + 1, z, count: 50, life: [1.6, 2.6], size: [0.09, 0.09], vx: rng.range(-1, 1), vy: 9, vz: -z * 0.8, spread: 2.5, jitter: 0.1, color: col, colorJitter: 0.1, gravityScale: 1 });
         this.confetti.emit(b, f.tSim, rng);
       }
+    }
+    // Fireworks: three shells over the gate, bursting 0.3 / 0.75 / 1.2 s after the line.
+    const shells = [0xffd040, 0x40a0ff, 0xff5080];
+    for (let k = 0; k < 3; k++) {
+      const t0 = f.tSim + 0.3 + k * 0.45;
+      const x = this.finishX + rng.range(-4, 4);
+      const y = this.finishY + 7 + k * 1.2;
+      const z = rng.range(-7, -3);
+      Object.assign(b, { x, y, z, count: 110, life: [0.9, 1.5], size: [0.09, 0.02], vx: 0, vy: 0, vz: 0, spread: 7.5, jitter: 0.05, color: shells[k]!, colorJitter: 0.15, gravityScale: 0.35 });
+      this.sparks.emit(b, t0, rng);
+      Object.assign(b, { x, y, z, count: 30, life: [0.25, 0.4], size: [0.6, 1.4], vx: 0, vy: 0, vz: 0, spread: 1.0, jitter: 0.05, color: 0xffffff, colorJitter: 0.0, gravityScale: 0 });
+      this.flame.emit(b, t0, rng);
     }
   }
 

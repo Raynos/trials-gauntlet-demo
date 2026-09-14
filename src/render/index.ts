@@ -62,6 +62,8 @@ interface World {
   gates: Gates;
   flicker: THREE.MeshStandardMaterial[];
   flickerBase: number[];
+  /** Textures whose offset scrolls with tSim (molten flow). */
+  scroll: { tex: THREE.Texture; vx: number; vy: number }[];
   textureBytes: number;
   trackCalls: number;
   trackTris: number;
@@ -86,6 +88,7 @@ export class ThreeRenderer implements GameRenderer {
   private height = 720;
   private pixelRatio: number;
   private phase: GamePhase = 'riding';
+  private runTime = 0;
   private flashT = -1;
   private lastTSim = 0;
   private readonly rendererString: string;
@@ -163,7 +166,7 @@ export class ThreeRenderer implements GameRenderer {
     group.name = 'world';
     const ribbons = buildRideSurfaces(track, this.biome, this.lib);
     const obstacles = buildObstacles(track, this.lib);
-    const gates = buildGates(track, this.lib);
+    const gates = buildGates(track, this.biome, this.lib);
     const kit = buildBiomeKit(track, this.biome, this.lib);
     group.add(ribbons.group, ribbons.supports, obstacles.group, gates.group, kit.group);
     // One program variant for the whole world: every standard material gets the full map set.
@@ -179,6 +182,7 @@ export class ThreeRenderer implements GameRenderer {
       gates,
       flicker: kit.flicker,
       flickerBase: kit.flicker.map((m) => m.emissiveIntensity),
+      scroll: kit.scroll,
       textureBytes: kit.textureBytes + gates.textureBytes,
       trackCalls: ribbons.drawCalls + obstacles.drawCalls,
       trackTris: ribbons.triangles + obstacles.triangles,
@@ -191,7 +195,7 @@ export class ThreeRenderer implements GameRenderer {
       return { y, angle: Math.atan2(dy, 0.6) };
     };
     const fy = track.def.profile.length ? track.def.profile[track.def.profile.length - 1]!.y : 0;
-    this.emitters.setTrack(track.def.seed, gates.jets, track.def.finishX, fy, this.biome);
+    this.emitters.setTrack(track.def.seed, gates.jets, track.def.finishX, fy, this.biome, kit.fountains);
     this.frames.invalidate();
     this.lastCheckpoint = -1;
     this.flashT = -1;
@@ -211,6 +215,7 @@ export class ThreeRenderer implements GameRenderer {
 
   setRunInfo(info: { runTime: number; phase: GamePhase }): void {
     this.phase = info.phase;
+    this.runTime = info.runTime;
     this.rig.setPhase(info.phase);
   }
 
@@ -333,11 +338,18 @@ export class ThreeRenderer implements GameRenderer {
           m.emissive.setHex(lit ? 0x22ff55 : 0x7a1010);
           m.emissiveIntensity = lit ? 4 : 1.5;
         });
+        w.gates.plaques.forEach((m, i) => m.emissive.setHex(i <= f.checkpoint ? 0x22ff55 : 0x000000));
       }
       for (let i = 0; i < w.flicker.length; i++) {
         w.flicker[i]!.emissiveIntensity = w.flickerBase[i]! * (1 + 0.15 * Math.sin(23 * f.tSim) * Math.sin(7.3 * f.tSim));
       }
+      for (const s of w.scroll) s.tex.offset.set((s.vx * f.tSim) % 1, (s.vy * f.tSim) % 1);
+      // Crowd: cheer for 3.5 s after GO and through the finish; sway otherwise.
+      const cheer = this.phase === 'finished' || f.finished || (this.phase === 'riding' && this.runTime < 3.5) ? 1 : 0;
+      w.gates.anim.uTime.value = f.tSim;
+      w.gates.anim.uCheer.value = cheer;
     }
+    this.post.setTime(f.tSim);
     // Particles.
     this.bike.toWorld(this.bike.exhaustTip.x, this.bike.exhaustTip.y, this.bike.exhaustTip.z, this.tmp);
     this.emitters.setViewport(this.height * Math.min(this.pixelRatio, this.tier === 'low' ? 1 : this.tier === 'medium' ? 1.5 : 2), (cam.fov * Math.PI) / 180);

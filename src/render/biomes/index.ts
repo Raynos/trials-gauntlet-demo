@@ -42,7 +42,12 @@ export interface Biome {
   /** Default ridden surface when a collider has none we know. */
   groundSurface: 'dirt' | 'concrete' | 'snow' | 'stone' | 'metal';
   /** Ambient particles. */
-  ambient: 'motes' | 'snow' | 'embers' | 'none';
+  ambient: 'motes' | 'snow' | 'embers' | 'dust' | 'none';
+  /** Heat-haze shimmer amplitude (screen uv) and the screen height (0 = bottom) where it fades in. */
+  heatHaze?: number;
+  heatHazeV?: number;
+  /** Sky clouds: 0 = none, 1 = a few cumulus near the horizon. */
+  clouds?: number;
   /** Floor-fog base height is relative to the ground floor (`groundFloorY`), set per track by the lighting rig. */
   /** Whether the scene is an interior (back wall + roof instead of a sky dome). */
   interior: boolean;
@@ -98,7 +103,10 @@ export const BIOMES: Record<BiomeId, Biome> = {
     vignette: 0.3,
     bloomStrength: 0.7,
     groundSurface: 'dirt',
-    ambient: 'none',
+    ambient: 'dust',
+    heatHaze: 0.0022,
+    heatHazeV: 0.38,
+    clouds: 1,
     interior: false,
   },
   snow: {
@@ -125,6 +133,7 @@ export const BIOMES: Record<BiomeId, Biome> = {
     bloomStrength: 0.6,
     groundSurface: 'snow',
     ambient: 'snow',
+    clouds: 0.6,
     interior: false,
   },
   nightCity: {
@@ -154,28 +163,34 @@ export const BIOMES: Record<BiomeId, Biome> = {
   },
   foundry: {
     id: 'foundry',
-    sunDir: [0.2, 0.75, 0.6],
-    sunColor: 0xffa060,
-    sunIntensity: 0.9,
-    hemiSky: 0x4a2418,
-    hemiGround: 0x1a0806,
-    hemiIntensity: 0.55,
-    skyZenith: 0x1a0806,
-    skyHorizon: 0x7a2a12,
-    skyGround: 0x2a0a04,
-    sunDiscIntensity: 10,
-    envIntensity: 0.4,
-    exposure: 0.8,
-    fogTiers: [14, 50, 110],
-    fogColor: 0x2e1008,
-    floorFog: { h0: 0.2, hs: 1.4, density: 0.09 },
-    gradeLift: [0.025, 0.0, 0.0],
-    gradeGain: [1.04, 0.95, 0.9],
+    // Round 7: the melt is the key. A steep orange sun (deep shadows under everything),
+    // near-black neutral fill, dark neutral fog instead of the red wash; the emissive
+    // channels, pours and furnace mouths carry the colour.
+    sunDir: [0.3, 0.8, 0.52],
+    sunColor: 0xffa860,
+    sunIntensity: 2.2,
+    hemiSky: 0x5a4038, // warm soot-lit roof
+    hemiGround: 0x7a2c10, // the melt's up-light on every underside (no GI)
+    hemiIntensity: 1.6,
+    skyZenith: 0x0a0806,
+    skyHorizon: 0x3a1a0c,
+    skyGround: 0x120806,
+    sunDiscIntensity: 8,
+    envIntensity: 0.3,
+    exposure: 1.45,
+    fogTiers: [20, 65, 140],
+    fogColor: 0x2a140c,
+    floorFog: { h0: 0.2, hs: 1.6, density: 0.08 },
+    gradeLift: [0.012, 0.003, 0.0],
+    gradeGain: [1.03, 0.98, 0.94],
     saturation: 1.0,
-    vignette: 0.45,
-    bloomStrength: 0.7,
+    contrast: 1.18,
+    vignette: 0.48,
+    bloomStrength: 0.8,
     groundSurface: 'metal',
     ambient: 'embers',
+    heatHaze: 0.0032,
+    heatHazeV: 0.42,
     interior: true,
   },
 };

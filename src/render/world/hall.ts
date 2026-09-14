@@ -43,13 +43,46 @@ export interface HallOut {
   batches: PropBatch[];
   flicker: THREE.MeshStandardMaterial[];
   lights: THREE.PointLight[];
+  scroll: { tex: THREE.Texture; vx: number; vy: number }[];
+  fountains: { x: number; y: number; z: number }[];
   textureBytes: number;
+}
+
+/** Molten flow tile: dark crust with bright streaks along x; used as albedo and emissive, scrolled along x (channels) or y (pours). */
+function moltenTexture(rng: Rng): THREE.CanvasTexture {
+  const W = 512;
+  const H = 256;
+  const [c, g] = canvas(W, H);
+  g.fillStyle = '#5a1a08';
+  g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 90; i++) {
+    const y = rng.range(0, H);
+    const w = rng.range(60, 400);
+    const h = rng.range(3, 14);
+    const x = rng.range(-w, W);
+    const gr = g.createLinearGradient(x, 0, x + w, 0);
+    const bright = rng.next() < 0.5 ? '#ffd070' : '#ff9030';
+    gr.addColorStop(0, 'rgba(255,120,40,0)');
+    gr.addColorStop(0.5, bright);
+    gr.addColorStop(1, 'rgba(255,120,40,0)');
+    g.fillStyle = gr;
+    g.fillRect(x, y, w, h);
+    if (x + w > W) g.fillRect(x - W, y, w, h); // wrap
+  }
+  // Crust islands.
+  for (let i = 0; i < 40; i++) {
+    g.fillStyle = `rgba(30,8,4,${rng.range(0.5, 0.9)})`;
+    g.beginPath();
+    g.ellipse(rng.range(0, W), rng.range(0, H), rng.range(8, 40), rng.range(3, 10), 0, 0, Math.PI * 2);
+    g.fill();
+  }
+  return tex(c);
 }
 
 export const HALL = { wallZ: -30, frontZ: 30, height: 16 };
 
 /** One 12 m × 16 m warehouse wall bay: brick, steel column, a 7 m tall window bank + clerestory. Returns albedo + emissive. */
-function warehouseWall(rng: Rng, paneColor: string, brick: string): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture; bytes: number } {
+function warehouseWall(rng: Rng, paneColor: string, brick: string, foundry = false): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture; bytes: number } {
   const W = 1024;
   const H = Math.round(1024 * (HALL.height / 12));
   const [c, g] = canvas(W, H);
@@ -119,8 +152,30 @@ function warehouseWall(rng: Rng, paneColor: string, brick: string): { map: THREE
     g.fillRect(wx - 16, wTop + wh + 8, ww + 32, 0.18 * px);
     g.fillRect(wx - 16, wTop - 0.22 * px, ww + 32, 0.14 * px);
   };
-  bank(2.0, 3.5, 8.0, 7.0, 5, 8); // main bank: 3.5 → 10.5 m
-  bank(2.0, 12.4, 8.0, 2.0, 5, 2); // clerestory: 12.4 → 14.4 m
+  if (foundry) {
+    // Foundry shell: riveted steel plate over the brick, one narrow sooty clerestory, vent louvres.
+    for (let y = 0; y < H - 2.2 * px; y += 2.4 * px) {
+      for (let x = 0; x < W; x += 3 * px) {
+        g.fillStyle = `rgba(${28 + rng.int(0, 10)},${24 + rng.int(0, 8)},${22 + rng.int(0, 6)},0.92)`;
+        g.fillRect(x + 3, y + 3, 3 * px - 6, 2.4 * px - 6);
+        g.fillStyle = 'rgba(0,0,0,0.5)';
+        for (let k = x + 12; k < x + 3 * px - 6; k += 24) {
+          g.fillRect(k, y + 8, 4, 4);
+          g.fillRect(k, y + 2.4 * px - 14, 4, 4);
+        }
+      }
+    }
+    for (let x = 1.2 * px; x < W; x += 4 * px) {
+      g.fillStyle = '#121010';
+      g.fillRect(x, H - 9.5 * px, 1.2 * px, 1.6 * px);
+      g.fillStyle = '#2a2622';
+      for (let k = 0; k < 6; k++) g.fillRect(x, H - 9.5 * px + k * 0.26 * px, 1.2 * px, 0.1 * px);
+    }
+    bank(2.0, 12.6, 8.0, 1.4, 8, 1); // clerestory only: 12.6 → 14 m
+  } else {
+    bank(2.0, 3.5, 8.0, 7.0, 5, 8); // main bank: 3.5 → 10.5 m
+    bank(2.0, 12.4, 8.0, 2.0, 5, 2); // clerestory: 12.4 → 14.4 m
+  }
   // Steel column at the bay edge + girts.
   g.fillStyle = '#26282c';
   g.fillRect(0, 0, 0.4 * px, H);
@@ -232,7 +287,7 @@ function roofTexture(foundry: boolean): THREE.CanvasTexture {
 
 export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, rng: Rng, floorY: number, x0: number, x1: number): HallOut {
   const foundry = biome.id === 'foundry';
-  const out: HallOut = { meshes: [], singles: [], batches: [], flicker: [], lights: [], textureBytes: 0 };
+  const out: HallOut = { meshes: [], singles: [], batches: [], flicker: [], lights: [], scroll: [], fountains: [], textureBytes: 0 };
   const span = x1 - x0;
   const midX = (x0 + x1) / 2;
   const roofY = floorY + HALL.height;
@@ -259,7 +314,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   };
 
   // --- Shell: back wall with window bays, side walls, roof.
-  const wall = warehouseWall(rng, foundry ? '#c8642a' : '#fff1d8', foundry ? '#2a1610' : '#4a2e24');
+  const wall = warehouseWall(rng, foundry ? '#ff9a40' : '#fff1d8', foundry ? '#1a1412' : '#4a2e24', foundry);
   out.textureBytes += wall.bytes;
   const bays = Math.ceil(span / 12);
   wall.map.repeat.set(bays, 1);
@@ -269,19 +324,19 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       map: wall.map,
       emissiveMap: wall.emissive,
       emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff0d8),
-      emissiveIntensity: foundry ? 0.7 : 0.95, // p99 of the frame must stay ≈0.92 after tonemap (round 5)
+      emissiveIntensity: foundry ? 0.6 : 0.95, // p99 of the frame must stay ≈0.92 after tonemap (round 5); foundry: sooty panes, the melt is the light
       roughness: 0.95,
     }),
   );
   addPlane(bays * 12, HALL.height, wallMat, x0 + (bays * 12) / 2, floorY + HALL.height / 2, wallZ);
-  const sideMat = fogify(new THREE.MeshStandardMaterial({ map: wall.map, emissiveMap: wall.emissive, emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff0d8), emissiveIntensity: foundry ? 0.5 : 1.2, roughness: 0.95, color: 0x8a8a8a }));
+  const sideMat = fogify(new THREE.MeshStandardMaterial({ map: wall.map, emissiveMap: wall.emissive, emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff0d8), emissiveIntensity: foundry ? 0.18 : 1.2, roughness: 0.95, color: 0x8a8a8a }));
   const depth = HALL.frontZ - wallZ;
   addPlane(depth, HALL.height, sideMat, x0 + 2, floorY + HALL.height / 2, (wallZ + HALL.frontZ) / 2, 0, Math.PI / 2);
   addPlane(depth, HALL.height, sideMat, x1 - 2, floorY + HALL.height / 2, (wallZ + HALL.frontZ) / 2, 0, -Math.PI / 2);
   const roofTex = roofTexture(foundry);
   roofTex.repeat.set(span / 12, depth / 12);
   out.textureBytes += 512 * 512 * 4 * 1.33;
-  const roofMat = fogify(new THREE.MeshStandardMaterial({ map: roofTex, emissiveMap: roofTex, emissive: 0xffffff, emissiveIntensity: foundry ? 0.5 : 0.9, roughness: 0.9, side: THREE.DoubleSide }));
+  const roofMat = fogify(new THREE.MeshStandardMaterial({ map: roofTex, emissiveMap: roofTex, emissive: 0xffffff, emissiveIntensity: foundry ? 0.15 : 0.9, roughness: 0.9, side: THREE.DoubleSide }));
   addPlane(span, depth, roofMat, midX, roofY, (wallZ + HALL.frontZ) / 2, Math.PI / 2);
 
   // --- Structure: trusses across the hall every 12 m, purlins along it, columns, crane rails.
@@ -377,19 +432,19 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       b.add(x + rng.range(-0.12, 0.12), floorY + k * 2.59, z + rng.range(-0.1, 0.1), ry + rng.range(-0.03, 0.03) + (rng.next() < 0.5 ? Math.PI : 0), 1, pick());
     }
   };
-  // Far row against the wall: 2–4 high, 25 % gaps.
+  // Far row against the wall: 2–4 high, 25 % gaps (foundry: stacks, chimneys and furnaces take the wall instead).
   for (let x = x0 + 6; x < x1 - 6; x += rng.range(6.6, 8.5)) {
-    if (rng.next() < 0.25) continue;
+    if (foundry || rng.next() < 0.25) continue;
     stack(x, -25 + rng.range(-0.8, 0.8), rng.int(2, 4), rng.next() < 0.2 ? Math.PI / 2 : 0);
   }
   // Mid row: 1–3 high, 35 % gaps, some turned.
   for (let x = x0 + 12; x < x1 - 8; x += rng.range(8, 13)) {
-    if (rng.next() < 0.35) continue;
+    if (rng.next() < (foundry ? 0.7 : 0.35)) continue;
     stack(x, -15.5 + rng.range(-1.5, 1.5), rng.int(1, 3), rng.next() < 0.35 ? Math.PI / 2 : rng.range(-0.2, 0.2));
   }
   // Near row: single containers, sparse, some turned end-on.
   for (let x = x0 + 20; x < x1 - 10; x += rng.range(14, 24)) {
-    if (rng.next() < 0.3) continue;
+    if (foundry || rng.next() < 0.3) continue;
     stack(x, -7.5 + rng.range(-1.0, 1.0), rng.next() < 0.3 ? 2 : 1, rng.next() < 0.5 ? Math.PI / 2 : rng.range(-0.3, 0.3));
   }
   out.batches.push(...skinBatches);
@@ -487,7 +542,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-    color: new THREE.Color(foundry ? 0xff5a1a : 0xffe8c8).multiplyScalar(foundry ? 0.1 : 0.075),
+    color: new THREE.Color(foundry ? 0xff5a1a : 0xffe8c8).multiplyScalar(foundry ? 0.03 : 0.075),
     side: THREE.DoubleSide,
     fog: false,
   });
@@ -508,30 +563,105 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   }
 
   if (foundry) {
-    const molten = fogify(new THREE.MeshStandardMaterial({ color: 0x1a0402, emissive: 0xff6a18, emissiveIntensity: 4.5, roughness: 0.6 }));
-    out.flicker.push(molten);
-    const pillars = new PropBatch('molten', new THREE.CylinderGeometry(0.7, 0.9, 1, 14).translate(0, 0.5, 0), molten, false);
-    const pipes = new PropBatch('pipe', pipeGeometry(), vc('rustSteel'));
-    const ladles = new PropBatch('ladle', bakeAO(new THREE.CylinderGeometry(1.1, 0.8, 1.6, 16, 1, true).translate(0, 0.8, 0), 1.6, 0.3), vc('darkSteel'));
-    const melt = new PropBatch('melt', new THREE.CylinderGeometry(1.0, 1.0, 0.1, 16).translate(0, 1.5, 0), molten, false);
-    for (let x = x0 + 14; x < x1; x += rng.range(16, 26)) {
-      pillars.add(x, floorY, rng.range(-14, -8), 0, 1, null, 0, rng.range(6, 11), 1);
+    // Round 7 foundry: molten channels with scrolling flow, pouring ladles under the crane
+    // rail with spark fountains where the stream lands, furnaces with glowing mouths at
+    // deck height, chimney stacks against the wall, more pipe runs and scaffold.
+    const flow = moltenTexture(rng);
+    out.textureBytes += 512 * 256 * 4 * 1.33;
+    const pourTex = flow.clone();
+    pourTex.rotation = Math.PI / 2;
+    pourTex.center.set(0.5, 0.5);
+    const molten = fogify(new THREE.MeshStandardMaterial({ map: flow, emissiveMap: flow, color: 0xffffff, emissive: 0xff7a22, emissiveIntensity: 4.0, roughness: 0.55 }));
+    const pourMat = fogify(new THREE.MeshStandardMaterial({ map: pourTex, emissiveMap: pourTex, color: 0xffffff, emissive: 0xffa040, emissiveIntensity: 5.0, roughness: 0.5 }));
+    const glow = fogify(new THREE.MeshStandardMaterial({ color: 0x1a0402, emissive: 0xff6a18, emissiveIntensity: 5.0, roughness: 0.6 }));
+    out.flicker.push(molten, pourMat, glow);
+    out.scroll.push({ tex: flow, vx: 0.07, vy: 0 }, { tex: pourTex, vx: 0, vy: -0.9 });
+    const rust = vc('rustSteel');
+    // Ladle: tapered bucket, trunnion bar, hanging block, pour lip.
+    const ladleGeo = bakeAO(
+      mergeGeometries(
+        [
+          new THREE.CylinderGeometry(1.15, 0.85, 1.9, 16, 1, true).translate(0, 0.95, 0),
+          new THREE.CylinderGeometry(0.85, 0.85, 0.08, 16).translate(0, 0.04, 0),
+          new THREE.TorusGeometry(1.15, 0.08, 6, 16).rotateX(Math.PI / 2).translate(0, 1.9, 0),
+          new THREE.CylinderGeometry(0.09, 0.09, 3.0, 8).rotateZ(Math.PI / 2).translate(0, 1.5, 0),
+          new THREE.BoxGeometry(0.5, 0.7, 0.3).translate(0, 3.3, 0),
+          new THREE.BoxGeometry(0.12, 1.5, 0.12).translate(-1.45, 2.3, 0),
+          new THREE.BoxGeometry(0.12, 1.5, 0.12).translate(1.45, 2.3, 0),
+          new THREE.BoxGeometry(0.4, 0.2, 0.5).translate(1.2, 1.85, 0),
+        ],
+        false,
+      )!,
+      1.9,
+      0.3,
+    );
+    const ladles = new PropBatch('ladle', ladleGeo, vc('darkSteel'));
+    const melt = new PropBatch('melt', new THREE.CylinderGeometry(1.05, 1.05, 0.1, 16).translate(0, 1.8, 0), molten, false);
+    const pours = new PropBatch('pour', new THREE.CylinderGeometry(0.24, 0.32, 1, 10).translate(0, -0.5, 0), pourMat, false);
+    const moulds = new PropBatch('mould', bakeAO(new THREE.BoxGeometry(2.2, 0.6, 1.6).translate(0, 0.3, 0), 0.6, 0.3), rust);
+    const mouldMelt = new PropBatch('mouldmelt', new THREE.BoxGeometry(1.8, 0.05, 1.2).translate(0, 0.62, 0), molten, false);
+    const cables = new PropBatch('ladlecable', chainGeometry(), steel, false);
+    // Furnace: dark block with a glowing mouth and a stack.
+    const furnace = new PropBatch('furnace', bakeAO(mergeGeometries([new THREE.BoxGeometry(5, 4.2, 4).translate(0, 2.1, 0), new THREE.CylinderGeometry(0.6, 0.7, 6, 12).translate(-1.2, 7.2, -0.8), new THREE.BoxGeometry(5.4, 0.3, 4.4).translate(0, 4.35, 0)], false)!, 4.2, 0.35), vc('darkSteel'));
+    const mouth = new PropBatch('furnacemouth', new THREE.BoxGeometry(1.8, 1.3, 0.1).translate(0, 1.3, 2.0), glow, false);
+    const mouthPool = new PropBatch('furnacepool', new THREE.BoxGeometry(2.4, 0.04, 1.6).translate(0, 0.04, 3.0), molten, false);
+    const plinth = new PropBatch('plinth', bakeAO(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), 1, 0.35), vc('darkSteel'));
+    const stacks = new PropBatch('stack', bakeAO(mergeGeometries([new THREE.CylinderGeometry(1.1, 1.4, 14, 14).translate(0, 7, 0), new THREE.TorusGeometry(1.25, 0.1, 6, 14).rotateX(Math.PI / 2).translate(0, 4, 0), new THREE.TorusGeometry(1.2, 0.1, 6, 14).rotateX(Math.PI / 2).translate(0, 9, 0)], false)!, 14, 0.3), rust);
+    const pipes = new PropBatch('pipe', pipeGeometry(), rust);
+    const pipeV = new PropBatch('pipev', new THREE.CylinderGeometry(0.35, 0.35, 1, 12).translate(0, 0.5, 0), rust);
+    const railY = floorY + 12.2;
+    for (let x = x0 + 8; x < x1; x += rng.range(9, 14)) {
+      const r = rng.next();
+      if (r < 0.45) {
+        // Pouring ladle hanging under the crane rail, stream into a mould on the floor.
+        const z = rng.range(-12, -7);
+        const ly = deckY + rng.range(1.2, 3.0);
+        cables.add(x, railY, z, 0, 1, null, 0, railY - (ly + 3.6), 1);
+        ladles.add(x, ly, z, 0, 1, null, rng.range(-0.15, 0.15));
+        melt.add(x, ly, z);
+        const px = x + 1.3;
+        const drop = ly + 1.85 - floorY - 0.62;
+        pours.add(px, ly + 1.85, z, 0, 1, null, 0, drop, 1);
+        moulds.add(px, floorY, z);
+        mouldMelt.add(px, floorY, z);
+        out.fountains.push({ x: px, y: floorY + 0.7, z });
+      } else if (r < 0.75) {
+        // Furnace on a plinth so the mouth glows at deck height.
+        const z = rng.range(-11, -7.5);
+        const py = deckY - 1.6;
+        plinth.add(x, floorY, z, 0, 5.4, null, 0, Math.max(0.3, py - floorY), 4.4);
+        furnace.add(x, py, z, 0);
+        mouth.add(x, py, z);
+        mouthPool.add(x, py, z);
+        out.fountains.push({ x, y: py + 1.0, z: z + 2.1 });
+      } else {
+        stacks.add(x, floorY, wallZ + rng.range(2, 4));
+        pipeV.add(x + 2, floorY, wallZ + 3, 0, 1, null, 0, 10, 1);
+      }
       pipes.add(x + 4, floorY + rng.range(4, 9), rng.range(-14, -6), rng.range(-0.2, 0.2));
-      if (rng.next() < 0.6) {
-        const lz = rng.range(-9, -5);
-        ladles.add(x + 8, floorY, lz);
-        melt.add(x + 8, floorY, lz);
+      if (rng.next() < 0.5) pipes.add(x - 3, floorY + rng.range(5, 10), rng.range(-20, -10), Math.PI / 2);
+    }
+    // Two molten channels: a wide one along the floor behind the track and a narrower one
+    // in the foreground, both with raised steel edges so the melt sits in a trough.
+    for (const [z, w, len] of [[-6.5, 2.0, span * 0.7], [6.2, 1.2, span * 0.5]] as const) {
+      const channel = new THREE.Mesh(new THREE.PlaneGeometry(len, w, Math.max(2, Math.round(len / 8)), 1), molten);
+      channel.rotation.x = -Math.PI / 2;
+      channel.position.set(midX, floorY + 0.03, z);
+      const uv = channel.geometry.getAttribute('uv') as THREE.BufferAttribute;
+      for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) * len) / 6, uv.getY(i));
+      out.meshes.push(channel);
+      for (const side of [-1, 1]) {
+        const edge = new THREE.Mesh(bakeAO(new THREE.BoxGeometry(len, 0.35, 0.3).translate(0, 0.175, 0), 0.35, 0.2), rust);
+        edge.position.set(midX, floorY, z + side * (w / 2 + 0.15));
+        out.meshes.push(edge);
       }
     }
-    // Molten channel along the floor behind the track: an emissive strip that under-lights the containers.
-    const channel = new THREE.Mesh(new THREE.PlaneGeometry(span * 0.6, 1.2), molten);
-    channel.rotation.x = -Math.PI / 2;
-    channel.position.set(midX, floorY + 0.02, -6.5);
-    out.meshes.push(channel);
-    out.batches.push(pillars, pipes, ladles, melt);
-    const pl = new THREE.PointLight(0xff5a10, 80, 34, 2);
-    pl.position.set(midX, floorY + 3, -7);
-    out.lights.push(pl);
+    out.batches.push(ladles, melt, pours, moulds, mouldMelt, cables, plinth, furnace, mouth, mouthPool, stacks, pipes, pipeV);
+    for (const fx of [0.3, 0.7]) {
+      const pl = new THREE.PointLight(0xff6a18, 90, 36, 2);
+      pl.position.set(x0 + span * fx, floorY + 2.5, -6);
+      out.lights.push(pl);
+    }
   }
   return out;
 }

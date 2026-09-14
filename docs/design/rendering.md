@@ -17,12 +17,12 @@ three 0.186.0 addons used: `EffectComposer, RenderPass, UnrealBloomPass, ShaderP
 
 | Budget | Cap | Round 1 | Where measured |
 |---|---|---|---|
-| Draw calls | 300 | 202 idle / ≈215 riding (+62 with the ghost; round 5 added 8 skin batches + 5 prop types + deck AO) — bike frame and rider segments are merged per material (`util/merge.ts`) | `renderer.info.render.calls` (accumulated over all passes; `info.autoReset=false`) |
-| Triangles | 500 k | 326 k (deck on a continuous container + pallet base, three container rows, hall structure; shadow pass counted) | `renderer.info.render.triangles` |
-| Texture memory | 96 MB | 38.3 MB industrial, 34.8–43.9 MB other biomes | `estimateTextureMB` (all maps incl. mips, env, canvas textures) |
+| Draw calls | 300 (400 with an AO pre-pass) | round 7 flat-test `high` 194 riding (set pieces +≈20, AO +2); e1 156, m2 146, h1 155, h3 217 — 202 idle / ≈215 riding (+62 with the ghost; round 5 added 8 skin batches + 5 prop types + deck AO) — bike frame and rider segments are merged per material (`util/merge.ts`) | `renderer.info.render.calls` (accumulated over all passes; `info.autoReset=false`) |
+| Triangles | 500 k | round 7: 332 k flat-test, 489 k e1, 250 k m2, 207 k h1, **639 k h3** (shadow pass counted; see gaps) — 326 k (deck on a continuous container + pallet base, three container rows, hall structure; shadow pass counted) | `renderer.info.render.triangles` |
+| Texture memory | 96 MB | round 7: 44.0 industrial, 46.1 canyon, 41.8 snow, 59.4 nightCity (3 facades + shops + neon + masks), 46.0 foundry | `estimateTextureMB` (all maps incl. mips, env, canvas textures) |
 | Track + obstacles | 20 calls / 80 k tris | 11 calls / 5.1 k tris (12-kind synthetic track) | `debugInfo().trackCalls/trackTris` |
 | Texture generation | 400 ms desktop, after first frame | ≈330–400 ms in headless Chromium (SwiftShader host) | `debugInfo().textureGenMs` |
-| Shader programs | 40 (raised round 5) | 34 on flat-test after the round-6 hero (riderCloth reuses the vertex-colour variant; +0 programs) | `info.programs` |
+| Shader programs | 40 (raised round 5) | round 7: 37 flat-test `high` (AO +2, crowd card +1), 32/29/34/37 on e1/m2/h1/h3, 19 on `low`; 34 on flat-test after the round-6 hero (riderCloth reuses the vertex-colour variant; +0 programs) | `info.programs` |
 | Restart → frame | 1 frame | 1 frame; no rebuild on restart | capture scene detector, scratch `restart.mts` |
 | Synced frame, SwiftShader | p95 250 ms | `high` p50 134 ms, `low` p50 75 ms (56 %) | scratch `timing.mts`, 24 frames after warm-up |
 | JS heap growth | 5 MB / 60 s | −1.8 MB | `harness:perf` |
@@ -59,7 +59,7 @@ src/render/
   world/track.ts          Ribbon geometry helpers (bevels, aprons, vertex shade) + profileY
   world/deck.ts           Built ride surfaces per collider.surface × biome (boards, dirt bed, kerbs, paint lines) + supports
   world/obstacles.ts      Bodies for the 12 placed kinds + unclaimed box/circle/seesaw colliders + hazards
-  world/gates.ts          Checkpoint gates (posts, beam, lamp, hanging zone plaque D1…A3), finish arch + checkered banner
+  world/gates.ts          Set pieces: start gate + crowd, checkpoint gates (numbered plaque lights green), finish arch, flags, sponsor barriers, crowd shader
   world/props.ts          PropBatch (InstancedMesh) + geometry recipes (container, pallet, drum, tyres, column, truss, lamp, rack, rock, pine, bale, cone, building, pipe)
   world/biomeKit.ts       Per-biome world: calls hall.ts for interiors; terrain + 3 parallax silhouette tiers + kits for canyon / snow / nightCity
   world/hall.ts           The industrial hall (industrial + foundry): shell, roof structure, crane, lamps on chains, three container rows, shafts, AO bakes
@@ -70,7 +70,7 @@ src/render/
   rider/riderModel.ts     Articulated rider (2-bone IK arms/legs) + ragdoll drawn from state.ragdoll
   particles/ParticleSystem.ts  GPU-integrated THREE.Points pools (ballistics + drag in the vertex shader from uTime = tSim)
   particles/emitters.ts   Cue/event → burst rules, seeded by track.seed ^ tick
-  post/chain.ts           EffectComposer: RenderPass (HalfFloat) → UnrealBloom → Composite (smear, ACES, grade, vignette, chroma, flash, dither, sRGB)
+  post/chain.ts           EffectComposer: RenderPass (HalfFloat + depth tex on high) → AOPass (half-res SSAO, high only) → UnrealBloom → Composite (heat haze, AO, smear, ACES, grade, vignette, chroma, flash, dither, sRGB)
 ```
 
 `render()` per frame: `frames.build` → (frame 2 only) `lib.generateTextures()` → `rig.update` →
@@ -432,10 +432,123 @@ Rng: `core/rng` sfc32 reseeded per burst with `track.seed ^ tick ^ salt`.
   needs a repro clip with the key list), ragdoll spawn pop (critic 5 — the posed rider and the physics
   ragdoll bodies have not been compared at the crash tick; a 2-frame blend is not implemented).
 
-## 12. Known gaps after round 5 (what still reads non-AAA)
+## 11b. Round 7 — the other four biomes, set pieces, SSAO, air camera
 
-- No SSAO (a pass would cost 3–4 programs against a 32 cap); contact is baked vertex AO on the kit,
-  tyre blobs and tyre squash. Corners between deck and containers still lack a proper AO gradient.
+**SSAO (`post/chain.ts` `AOPass`, `high` only).** No second geometry pass: on `high` the composer's
+scene targets carry a `DepthTexture` (attached/detached in `setQuality`; both composer buffers are
+disposed so three re-allocates them). The pass reconstructs view position from depth, the normal
+from the smaller-difference depth neighbours (no silhouette halos), takes 8 hemisphere taps
+(radius 0.7 m, strength 1.6, 4×4 interleaved rotation from `gl_FragCoord` — deterministic), then a
+depth-weighted 4×4 blur, all at half resolution; the composite multiplies it in before exposure.
+Fades out beyond 40–90 m. Cost on flat-test: +2 calls, +2 programs (37), no change to tris. Measured
+with/without (`scratchpad/render4/ao/diff.png`): contact under the tyres, the deck edge, container
+seams and the crowd's feet darken; mean frame luminance −1.6/255 (subtle by design).
+
+**Heat haze (composite).** `Biome.heatHaze / heatHazeV`: a two-frequency sine warp of the sample
+uv growing toward the bottom of the frame, clocked from `tSim` (`PostChain.setTime`). Canyon 0.0022
+from v 0.38, foundry 0.0032 from v 0.42.
+
+**Canyon.** Sandstone formations are `mesaGeometry` terraced mounds (16 rings × 12 layers, cliff /
+ledge rhythm per variant, per-column erosion noise, flat normals, banded vertex colour with base AO
+and under-ledge shade) in three variants at z −13 (2.4–5 m), z −27 (7–15 m) and low foreground
+outcrops; scrub is `scrubGeometry` (six lobes + twigs, olive→khaki, dark base); boulders sit in
+hollows; `dust` ambient (0.25–0.8 m tan motes low over the ground); sky gets a few sun-lit cumulus
+(`Biome.clouds`, painted into the equirect); the far mesa tier is 80 m tall / −18 m so sky shows
+above it; the ride surface is `RUT_SECTION` dirt (ruts at z ±0.4 sunk 3 cm, pale crown) with a warm
+ochre vertex tint and lighter, sparser rock edging (detail-1 icosahedra, 45 %); the terrain strip is a
+warm derived dirt.
+
+**Snow.** `conifer()` five-tier drooping cones with a snow load per tier (two batches, vertex-coloured,
+memoised per seed); `snowBankGeometry` lumpy half-ellipsoids (white top → blue-grey base) on the far
+side at z −3..−4.2 and small ones on the near side at z +3.6..+4.6 (the round-7a version put 2.6 m
+banks on the camera side and hid the track); a **dirt ground profile in the snow biome renders as
+the packed-snow trail** (physics surface untouched): two faint ruts, dark trodden edges past |z| 1.35,
+a dark dirt lip under the snow edge and split-log kerbs (`logs()`, `pallet` material) both sides.
+
+**nightCity.** Three facade textures (`facadeTexture`: office curtain wall / apartment with balconies /
+brick, 4 bays × 4 floors, 30–40 % lit windows, some cool) on three building batches (repeat 2.5×4),
+`rooftopGeometry` parapets + water tank + AC boxes + stair head on every block, ground-floor
+`shopfrontTexture` boxes (awning, lit window, coloured sign; two shops per box), streetlights carry a
+real additive **light cone** (`lightConeGeometry`, vertex alpha fading apex→ground) plus a wet-road
+streak on the asphalt, and every neon sign gets a **mirrored, stretched reflection** on the road: the
+sign's emissive texture flipped in v on a 9 m ground quad toward the camera, additive at 0.32, masked
+along the streak by `reflectionMaskTexture` through `uv1` (`alphaMap.channel = 1`). The terrain strip
+is `asphaltWet`; the ride surface adds 0.9 m concrete **kerb stones** with per-block tint.
+
+**Foundry.** Its own shell: riveted steel plate over the brick, vent louvres, one narrow sooty
+clerestory instead of the window banks (`warehouseWall(…, foundry)`), roof/side emissive 0.15–0.18,
+light shafts at 0.03; no container rows (a sparse mid row only). Emissive kit every 9–14 m:
+**pouring ladles** (tapered bucket, trunnions, block, cable to the crane rail) with a thick molten
+stream into a floor mould, **furnaces on plinths** so the mouth glows at deck height with a pool in
+front, **chimney stacks** and vertical pipe against the wall, more pipe runs; two molten channels
+(2 m behind, 1.2 m foreground) in steel troughs. The melt is `moltenTexture` (crust + bright streaks)
+as albedo and emissive, **scrolled from tSim** (`BiomeKit.scroll`: channels along x at 0.07/s, pours
+along y at −0.9/s; `index.ts` sets `offset` per frame). **Spark fountains** (`BiomeKit.fountains`) at
+every pour landing and furnace mouth: 6 sparks every 60 ms per fountain within 30 m of the camera,
+45 % duty, seeded by tick. Grade: steep warm sun `0xffa860 × 2.2`, hemi `0x5a4038 / 0x7a2c10 × 1.6`
+(the ground colour is the melt's up-light — there is no GI), fog `0x2a140c` 20/65/140, exposure 1.45,
+contrast 1.18; terrain strip is steel plate, the ride surface adds grating strips at z ±0.95–1.45.
+Still the weakest biome (see gaps).
+
+**Set pieces (`world/gates.ts`, every track).** Start gate at `start.x − 1` (posts, beam, blue START
+banner, three marshal lights) with a 30-person crowd; every checkpoint gets 7 spectators and a flag;
+the finish gets 34 people, four flags and two confetti cannons. **Crowd** = one `crowdAtlas`
+(8 painted figures × 2 poses, 64×256 cells) on instanced 0.62×1.9 m cards; the atlas cell rides in the
+instance's z-scale (a plane has no depth), the shader (`cardMaterial`, one `onBeforeCompile` shared by
+crowd and flags via `uMode`) switches to the arms-up pose and bobs each figure by 16 cm on
+`sin(7t + phase)` while `uCheer = 1` (3.5 s after GO and through the finish; `runTime` from
+`setRunInfo`), sways gently otherwise; flags are 2×2 team-flag cells waving with `uv.x`. Sponsor
+barriers (rail, posts, a 0.8 m board strip with 4 boards per 8 m) front every crowd zone; interior
+biomes put the crowd on a steel grandstand at deck height. Checkpoint plaques now read **CP n** with an
+emissive number map that lights green (`Gates.plaques`) when `state.checkpoint ≥ i`. Pyro: 7 bursts
+over 0.4 s, life 0.2–0.34 s, 9.5 m/s, spread 0.14 (thin 3–4 m columns) then one smoke wisp. Finish:
+confetti + three firework shells (110 sparks each, gold / blue / pink) at +0.3 / 0.75 / 1.2 s with a
+white pop. Cost on flat-test: +≈20 calls (crowd 1, flags 1, poles 1, barrier 2, stage 1, strips 1,
+start gate 7, cannons 2), +1 program (the card shader), +2.3 MB textures.
+
+**Air camera (coordinator, stranger b3 clips: only ceiling for 2.5 s of a 3.4 s flight).** (a) Hard
+constraint: after smoothing, the bike centre's screen position is estimated from the aim offset
+(roll is 0: world x → screen right by cos yaw, world y → screen up by cos pitch); more than 0.3 off
+centre first **widens** (heightFrac ÷ up to 2.5) and anything outside [0.2, 0.8] moves the followed
+point so it lands on the edge — so `camera().bikeScreenX/Y` stay inside the central 70 % box on every
+frame. (b) The airborne aim point still sits halfway to the landing zone (ground sampled 0.6 s ahead)
+so the ground line stays in the bottom third. (c) The +4° airborne pitch-up is gone; the pull-back
+now ramps in 0.2 s (was 0.7), floors at 0.3 (was 0.45) and the y-follow / heightFrac smoothers run
+2.5× faster in the air. Check: `scratchpad/render4/airrec.mts <recording> <dir>` replays a recording
+frame by frame and reports `outFrames` (bike outside [0.15, 0.85]²), longest flight, max height and
+the worst frame; full-throttle b3: 278 airborne frames, 0 out, worst offset 0.21.
+
+**Budget cuts.** Deck support pallets/stacks no longer cast shadows, tyre stacks 6×14 tori (was 8×20),
+canyon edge rocks detail 1 at 45 %, scrub lobes detail 0.
+
+## 12. Known gaps after round 7 (what still reads non-AAA)
+
+- **Foundry** is still dark-and-dim rather than the reference's warm, readable red-orange hall: the
+  emissive sources light nothing (no GI, two point lights per track), so the rust structure only shows
+  where the sun's steep key lands. It needs baked up-light in the vertex colours near every melt
+  source and/or a third/fourth point light attached to the two nearest sources as the camera moves.
+- **Crowd** figures are painted cards (flat colour, no shading); they read at riding distance but look
+  like paper at the start close-up. The art owner's imposter sheets (`public/art/`) should replace the
+  atlas — the card shader already takes any 16-cell strip.
+- **Art manifest not wired** (coordinator request, out of budget this round): `public/art/manifest.json`
+  (stencils, grime masks, posters, graffiti, banners/flags, tyre decals, crowd sheets, far backdrop +
+  sky plates) should load through one async `ArtLibrary` awaited before the first `render()` so the
+  first textured frame stays identical across captures, with the procedural versions as fallbacks;
+  targets: container skins, wall bays, barrier strips, flag atlas, crowd atlas, the far silhouette
+  tier and `scene.background`.
+- **Industrial key art** (`scratchpad/imgtest/keyart-test.png`): not matched this round — wants
+  sodium lamps as the key (warm volumetric cones like the nightCity ones, dust in the shafts), cooler
+  skylight fill, wet floor patches, deeper blacks (lift 0). The lamp cones exist in the city kit and can
+  be reused on the hall's high-bay lamps.
+- nightCity reflections are the sign/lamp streak decals only (no reflection of the buildings' windows).
+- Snow conifers are still cone stacks; canyon far tiers are silhouettes without strata.
+- Perf numbers this round were taken on a machine at load 20–25 (another owner's headless Chromium
+  at 13 cores) and are 1.8–2× the round-6 values on every tier; the within-run `low/high` ratio (48 %)
+  is the only trustworthy figure. Heap growth read 6.3 MB / 60 s under the same load (round 6: −1.8).
+- h3-fire-line (foundry) sits at ≈640 k tris with the shadow pass (500 k cap): the hall kit's pallets /
+  drums / tyres dominate; the fix is lower-poly deck supports and a shadow cull on props behind z −12.
+
+- ~~No SSAO~~ (round 7: depth-only AO on `high`).
 - The roof structure only enters the frame in the idle 3/4 view and on wide pull-backs; the riding
   frame tops out at the window heads (pitch 11°). The reference gets trusses in frame because its tracks
   hang higher in the hall; a track-authored `high34`/`low` key does the same here.
@@ -451,10 +564,7 @@ Rng: `core/rng` sfc32 reseeded per burst with `track.seed ^ tick ^ salt`.
 - Physics chain mismatch (request to physics): express the drawn chain in the render's axle-origin
   frame (`bike.pos` → axle midpoint offset (0.055, −0.144)), adopt the pinned-shoulder hang-off and the
   0.28 m / 0.35 rad crouch, and add the reach slide; then the hand-over residual drops to the 80 ms lead.
-- Canyon strata are boxes with a banded albedo (no erosion silhouette); heat haze is not implemented.
-  nightCity buildings are still boxes with a window texture; wet-asphalt reflections are env-only
-  (the neon does not reflect). Foundry remains a red wash in most frames — the hall's orange panes and the
-  red fog dominate; it needs its own shell (dark steel, fewer windows, more emissive sources).
+- ~~Canyon strata boxes / nightCity boxes / foundry red wash~~ (round 7, see §11b; foundry still weak).
 - Synced render time on SwiftShader `high` is ≈134 ms p50 (2048² shadow + bloom + HalfFloat 1280×720);
   under the 250 ms SwiftShader gate but the perf harness should still pin `low` for timing runs.
 - `renderer.ready` is true once textures exist and one frame was drawn; textures generate on the very

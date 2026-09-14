@@ -1,49 +1,77 @@
 /**
- * Checkpoint gates (steel posts, hanging plaque with the zone label, lamp that
- * turns green once armed) and the finish gate (arch + checkered banner).
+ * Trials set pieces (round 7): start gate with a spectator crowd behind
+ * sponsor barriers and team flags, checkpoint gates (steel posts, numbered
+ * plaque that lights green on pass, lamp, a small crowd cluster), and the
+ * finish arch (checkered banner, crowd, flags). The crowd is an instanced
+ * billboard kit: one atlas of 8 painted figures × 2 poses; the vertex shader
+ * picks the pose and bobs each figure on `uCheer` (GO / finish), clocked from
+ * simulated time so every capture is identical.
  */
 import * as THREE from 'three';
+import { Rng } from '../../core/rng';
 import type { CompiledTrack } from '../../core/types';
+import type { Biome } from '../biomes';
 import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
-import { profileY } from './track';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { canvas, tex } from './canvasTex';
+import { PropBatch, bakeAO, triCount } from './props';
+import { groundFloorY, profileY } from './track';
 
 export interface Gates {
   group: THREE.Group;
   lamps: THREE.MeshStandardMaterial[];
+  /** Plaque materials per checkpoint: emissive goes green once passed. */
+  plaques: THREE.MeshStandardMaterial[];
   finishLamp: THREE.MeshStandardMaterial;
   /** Flame jet emitter positions per checkpoint (world). */
   jets: { x: number; y: number; z: number }[][];
+  /** Shared animation uniforms (crowd bob / pose, flag wave). */
+  anim: { uTime: { value: number }; uCheer: { value: number } };
   drawCalls: number;
   triangles: number;
   textureBytes: number;
 }
 
-function labelTexture(text: string, w = 256, h = 128, ink = '#141416', paper = '#f2efe6'): THREE.CanvasTexture {
-  const c = document.createElement('canvas');
-  c.width = w;
-  c.height = h;
-  const g = c.getContext('2d')!;
-  g.fillStyle = paper;
+const TEAM = ['#2a5cc8', '#e0b83a', '#c8443a', '#3a9a68', '#e07a30', '#e8e6e0', '#7a4ab8', '#3aa8c0'];
+const SPONSORS = ['SQUADX', 'KBNI', 'FOX', 'TRIALS', 'REDLYNX', 'SX'];
+
+function plaqueTexture(n: number): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture } {
+  const [c, g] = canvas(256, 128);
+  const [ce, ge] = canvas(256, 128);
+  g.fillStyle = '#1c1d21';
+  g.fillRect(0, 0, 256, 128);
+  g.strokeStyle = '#f2efe6';
+  g.lineWidth = 6;
+  g.strokeRect(6, 6, 244, 116);
+  ge.fillStyle = '#000';
+  ge.fillRect(0, 0, 256, 128);
+  for (const [ctx, ink] of [[g, '#f2efe6'], [ge, '#ffffff']] as const) {
+    ctx.fillStyle = ink;
+    ctx.font = 'italic bold 88px Impact, "Arial Black", Helvetica, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(n), 150, 68);
+    ctx.font = 'bold 26px Impact, "Arial Black", Helvetica, sans-serif';
+    ctx.fillText('CP', 52, 68);
+  }
+  return { map: tex(c, true, false), emissive: tex(ce, true, false) };
+}
+
+function bannerTexture(text: string, fill: string, ink: string, w = 1024, h = 256): THREE.CanvasTexture {
+  const [c, g] = canvas(w, h);
+  g.fillStyle = fill;
   g.fillRect(0, 0, w, h);
   g.fillStyle = ink;
-  g.fillRect(0, 0, w, 6);
-  g.fillRect(0, h - 6, w, 6);
   g.font = `italic bold ${Math.floor(h * 0.62)}px Impact, "Arial Black", Helvetica, sans-serif`;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
-  g.fillText(text, w / 2, h / 2 + 4);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
-  return t;
+  g.fillText(text, w / 2, h / 2 + 6);
+  return tex(c, true, false);
 }
 
 function checkerTexture(): THREE.CanvasTexture {
-  const c = document.createElement('canvas');
-  c.width = 512;
-  c.height = 128;
-  const g = c.getContext('2d')!;
+  const [c, g] = canvas(512, 128);
   const n = 4;
   const s = c.height / n;
   for (let y = 0; y < n; y++) {
@@ -59,29 +87,346 @@ function checkerTexture(): THREE.CanvasTexture {
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   g.fillText('FINISH', 256, 66);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
+  return tex(c, true, false);
+}
+
+/** Sponsor strip for the crowd barriers: 4 boards per tile, repeats along x. */
+function sponsorStrip(rng: Rng): THREE.CanvasTexture {
+  const [c, g] = canvas(1024, 128);
+  for (let i = 0; i < 4; i++) {
+    const x = i * 256;
+    const dark = rng.next() < 0.5;
+    g.fillStyle = dark ? '#16171b' : '#f0ede4';
+    g.fillRect(x, 0, 256, 128);
+    g.fillStyle = TEAM[rng.int(0, TEAM.length - 1)]!;
+    g.fillRect(x, 0, 256, 14);
+    g.fillRect(x, 114, 256, 14);
+    g.fillStyle = dark ? '#f0ede4' : '#16171b';
+    g.font = 'italic bold 64px Impact, "Arial Black", Helvetica, sans-serif';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText(SPONSORS[rng.int(0, SPONSORS.length - 1)]!, x + 128, 66);
+  }
+  return tex(c, true, true);
+}
+
+/** 8 figures × 2 poses (arms down | arms up), 64×256 px per cell, transparent background. */
+function crowdAtlas(rng: Rng): THREE.CanvasTexture {
+  const W = 1024;
+  const H = 256;
+  const [c, g] = canvas(W, H);
+  g.clearRect(0, 0, W, H);
+  const skins = ['#e8b990', '#c98d63', '#8d5a3b', '#f0c9a8', '#5c3a26'];
+  const figs: { skin: string; shirt: string; pants: string; cap: string | null; w: number; h: number; hair: string }[] = [];
+  for (let i = 0; i < 8; i++) {
+    figs.push({
+      skin: skins[rng.int(0, skins.length - 1)]!,
+      shirt: TEAM[rng.int(0, TEAM.length - 1)]!,
+      pants: ['#22252c', '#2b3a5a', '#4a4640', '#1a1a1c'][rng.int(0, 3)]!,
+      cap: rng.next() < 0.5 ? TEAM[rng.int(0, TEAM.length - 1)]! : null,
+      w: rng.range(0.85, 1.15),
+      h: rng.range(0.9, 1.05),
+      hair: ['#2a1a10', '#4a3020', '#c8a060', '#101010'][rng.int(0, 3)]!,
+    });
+  }
+  for (let pose = 0; pose < 2; pose++) {
+    for (let i = 0; i < 8; i++) {
+      const f = figs[i]!;
+      const x0 = (pose * 8 + i) * 64 + 32;
+      const s = f.h;
+      const base = 250;
+      const legH = 92 * s;
+      const torsoH = 76 * s;
+      const headR = 13;
+      // Legs
+      g.fillStyle = f.pants;
+      g.fillRect(x0 - 13 * f.w, base - legH, 11 * f.w, legH);
+      g.fillRect(x0 + 2 * f.w, base - legH, 11 * f.w, legH);
+      // Shoes
+      g.fillStyle = '#111';
+      g.fillRect(x0 - 15 * f.w, base - 6, 14 * f.w, 6);
+      g.fillRect(x0 + 1 * f.w, base - 6, 14 * f.w, 6);
+      // Torso
+      const ty = base - legH - torsoH;
+      g.fillStyle = f.shirt;
+      g.beginPath();
+      g.roundRect(x0 - 17 * f.w, ty, 34 * f.w, torsoH + 4, 6);
+      g.fill();
+      // Arms
+      g.strokeStyle = f.shirt;
+      g.lineCap = 'round';
+      g.lineWidth = 9 * f.w;
+      g.beginPath();
+      if (pose === 0) {
+        g.moveTo(x0 - 19 * f.w, ty + 8);
+        g.lineTo(x0 - 24 * f.w, ty + torsoH - 4);
+        g.moveTo(x0 + 19 * f.w, ty + 8);
+        g.lineTo(x0 + 24 * f.w, ty + torsoH - 4);
+      } else {
+        g.moveTo(x0 - 19 * f.w, ty + 8);
+        g.lineTo(x0 - 27 * f.w, ty - 44);
+        g.moveTo(x0 + 19 * f.w, ty + 8);
+        g.lineTo(x0 + 27 * f.w, ty - 44);
+      }
+      g.stroke();
+      // Hands
+      g.fillStyle = f.skin;
+      for (const sx of [-1, 1]) {
+        g.beginPath();
+        g.arc(x0 + sx * (pose === 0 ? 24 : 27) * f.w, pose === 0 ? ty + torsoH - 2 : ty - 48, 5, 0, Math.PI * 2);
+        g.fill();
+      }
+      // Head + hair / cap
+      const hy = ty - headR - 3;
+      g.beginPath();
+      g.arc(x0, hy, headR, 0, Math.PI * 2);
+      g.fill();
+      if (f.cap) {
+        g.fillStyle = f.cap;
+        g.beginPath();
+        g.arc(x0, hy - 1, headR + 1, Math.PI, 0);
+        g.fill();
+        g.fillRect(x0 - headR - 6, hy - 3, headR * 2 + 6, 4);
+      } else {
+        g.fillStyle = f.hair;
+        g.beginPath();
+        g.arc(x0, hy - 2, headR, Math.PI * 1.05, Math.PI * 1.95);
+        g.fill();
+      }
+    }
+  }
+  const t = tex(c, true, false);
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.anisotropy = 4;
   return t;
 }
 
-const ZONE = ['D', 'C', 'B', 'A'];
+/** 2×2 team-flag atlas. */
+function flagAtlas(rng: Rng): THREE.CanvasTexture {
+  const [c, g] = canvas(512, 512);
+  for (let i = 0; i < 4; i++) {
+    const x = (i % 2) * 256;
+    const y = Math.floor(i / 2) * 256;
+    const a = TEAM[rng.int(0, TEAM.length - 1)]!;
+    let b = TEAM[rng.int(0, TEAM.length - 1)]!;
+    if (b === a) b = '#f2f2f2';
+    g.fillStyle = a;
+    g.fillRect(x, y, 256, 256);
+    g.fillStyle = b;
+    const kind = rng.int(0, 2);
+    if (kind === 0) g.fillRect(x, y + 96, 256, 64);
+    else if (kind === 1) {
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x + 256, y + 256);
+      g.lineTo(x + 256, y + 160);
+      g.lineTo(x + 96, y);
+      g.closePath();
+      g.fill();
+    } else {
+      g.beginPath();
+      g.arc(x + 128, y + 128, 70, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.fillStyle = kind === 2 ? a : b;
+    g.font = 'italic bold 72px Impact, "Arial Black", Helvetica, sans-serif';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText(SPONSORS[rng.int(0, SPONSORS.length - 1)]!, x + 128, y + 128);
+  }
+  return tex(c, true, false);
+}
 
-export function buildGates(track: CompiledTrack, lib: MaterialLibrary): Gates {
+/**
+ * Animated-card material: instanced planes whose atlas cell comes from the
+ * instance's z-scale (1..N) and whose motion is driven by uTime / uCheer.
+ * mode 0 = crowd (16-cell strip, pose switch + bob), 1 = flag (2×2 atlas, wave).
+ */
+function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim']): THREE.MeshStandardMaterial {
+  const m = new THREE.MeshStandardMaterial({ map, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide, vertexColors: true });
+  fogify(m);
+  const prev = m.onBeforeCompile;
+  m.onBeforeCompile = (shader, renderer) => {
+    prev?.call(m, shader, renderer);
+    shader.uniforms.uTime = anim.uTime;
+    shader.uniforms.uCheer = anim.uCheer;
+    shader.uniforms.uMode = { value: mode };
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform float uTime;
+        uniform float uCheer;
+        uniform float uMode;`,
+      )
+      .replace(
+        '#include <uv_vertex>',
+        `#include <uv_vertex>
+        float cardCell = floor(length(instanceMatrix[2].xyz) + 0.5) - 1.0;
+        float cardPh = instanceMatrix[3].x * 1.7 + instanceMatrix[3].z * 0.9;
+        float cardS = sin(uTime * 7.0 + cardPh);
+        #ifdef USE_MAP
+        if (uMode < 0.5) {
+          float up = step(0.0, cardS) * step(0.5, uCheer);
+          vMapUv.x = (vMapUv.x + cardCell + up * 8.0) / 16.0;
+        } else {
+          vMapUv = (vMapUv + vec2(mod(cardCell, 2.0), floor(cardCell / 2.0))) * 0.5;
+        }
+        #endif`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+        if (uMode < 0.5) {
+          transformed.y += uCheer * 0.16 * max(0.0, cardS) * step(0.01, uv.y);
+          transformed.x += 0.02 * sin(uTime * 1.3 + cardPh) * uv.y;
+        } else {
+          float wv = sin(uTime * 5.0 + uv.x * 7.0 + cardPh) * uv.x;
+          transformed.z += 0.12 * wv;
+          transformed.y += 0.03 * wv;
+        }`,
+      );
+  };
+  return m;
+}
+
+export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibrary): Gates {
   const group = new THREE.Group();
   group.name = 'gates';
   const profile = track.def.profile;
+  const rng = new Rng((track.def.seed ^ 0x51ed270b) >>> 0);
   const steel = fogify(lib.get('darkSteel'));
   const lamps: THREE.MeshStandardMaterial[] = [];
+  const plaques: THREE.MeshStandardMaterial[] = [];
   const jets: Gates['jets'] = [];
+  const anim: Gates['anim'] = { uTime: { value: 0 }, uCheer: { value: 0 } };
   let drawCalls = 0;
   let triangles = 0;
   let textureBytes = 0;
+  const interior = biome.interior;
+  const floorY = groundFloorY(profile, interior);
+  const gyAt = (x: number, z: number): number => (interior ? floorY : profileY(profile, x) - 0.42 - Math.min(1, (Math.abs(z) - 3) / 30) ** 2 * 2.5);
+
+  // --- Shared kit -----------------------------------------------------------
+  const crowdTex = crowdAtlas(rng);
+  textureBytes += 1024 * 256 * 4 * 1.33;
+  const flagTex = flagAtlas(rng);
+  textureBytes += 512 * 512 * 4 * 1.33;
+  const crowdMat = cardMaterial(crowdTex, 0, anim);
+  const flagMat = cardMaterial(flagTex, 1, anim);
+  const card = new THREE.PlaneGeometry(0.62, 1.9).translate(0, 0.95, 0);
+  const cardUV = card.getAttribute('uv') as THREE.BufferAttribute;
+  const cardCol = new Float32Array(cardUV.count * 3);
+  for (let i = 0; i < cardUV.count; i++) {
+    // Slight AO at the feet.
+    const v = cardUV.getY(i);
+    const s = 0.75 + 0.25 * Math.min(1, v * 3);
+    cardCol[i * 3] = cardCol[i * 3 + 1] = cardCol[i * 3 + 2] = s;
+  }
+  card.setAttribute('color', new THREE.BufferAttribute(cardCol, 3));
+  const crowd = new PropBatch('crowd', card, crowdMat, false);
+  const flagGeo = new THREE.PlaneGeometry(1.3, 0.85, 8, 3).translate(0.65, -0.425, 0);
+  {
+    const n = flagGeo.getAttribute('position').count;
+    const fc = new Float32Array(n * 3).fill(1);
+    flagGeo.setAttribute('color', new THREE.BufferAttribute(fc, 3));
+  }
+  const flags = new PropBatch('flag', flagGeo, flagMat, false);
+  const poles = new PropBatch('flagpole', new THREE.CylinderGeometry(0.03, 0.04, 1, 7).translate(0, 0.5, 0), steel, false);
+  const rails = new PropBatch('barrier', new THREE.BoxGeometry(1, 0.05, 0.05).translate(0, 1.0, 0), steel, false);
+  const railPosts = new PropBatch('barrierpost', new THREE.BoxGeometry(0.05, 1.05, 0.05).translate(0, 0.52, 0), steel, false);
+  const stage = new PropBatch('stage', bakeAO(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), 1, 0.35), fogify(lib.get('rustSteel')));
+  const stripTex = sponsorStrip(rng);
+  textureBytes += 1024 * 128 * 4 * 1.33;
+  const stripMat = fogify(new THREE.MeshStandardMaterial({ map: stripTex, roughness: 0.8, side: THREE.DoubleSide }));
+  const strips: THREE.BufferGeometry[] = [];
+
+  const yawToCam = 0.25; // the camera sits at +z, yawed ~15–20°: face the cards toward it
+  /** Crowd zone: `n` people in two rows behind a sponsor barrier, flags at the ends. */
+  const crowdZone = (xa: number, xb: number, n: number, withFlags: boolean): void => {
+    const zFront = -4.7;
+    const baseY = (x: number, z: number): number => (interior ? profileY(profile, x) - 0.35 : gyAt(x, z));
+    if (interior) {
+      // Grandstand: a steel stage from the hall floor to just under deck height.
+      const cx = (xa + xb) / 2;
+      const h = baseY(cx, zFront) - floorY;
+      if (h > 0.2) stage.add(cx, floorY, -5.6, 0, xb - xa + 1, null, 0, h, 3.0);
+    }
+    for (let i = 0; i < n; i++) {
+      const row = i % 2;
+      const x = xa + ((i + 0.5) / n) * (xb - xa) + rng.range(-0.25, 0.25);
+      const z = zFront - row * 0.9 - rng.range(0, 0.3);
+      const sc = rng.range(0.92, 1.08);
+      const fig = rng.int(1, 8);
+      // z-scale carries the atlas cell (1..8); the plane has no depth so it costs nothing.
+      crowd.add(x, baseY(x, z) + row * 0.25, z, yawToCam + rng.range(-0.15, 0.15), sc, null, 0, sc, fig);
+    }
+    // Barrier with sponsor boards along the front row.
+    const len = xb - xa;
+    rails.add((xa + xb) / 2, baseY((xa + xb) / 2, -4.1), -4.1, 0, len, null, 0, 1, 1);
+    for (let x = xa; x <= xb + 0.01; x += 2) railPosts.add(x, baseY(x, -4.1), -4.1);
+    const strip = new THREE.PlaneGeometry(len, 0.8, Math.max(2, Math.round(len / 2)), 1);
+    const p = strip.getAttribute('position') as THREE.BufferAttribute;
+    const u = strip.getAttribute('uv') as THREE.BufferAttribute;
+    for (let i = 0; i < p.count; i++) {
+      const x = (xa + xb) / 2 + p.getX(i);
+      p.setXYZ(i, x, baseY(x, -4.1) + 0.55 + p.getY(i), -4.12);
+      u.setX(i, (u.getX(i) * len) / 8);
+    }
+    strip.computeVertexNormals();
+    strips.push(strip);
+    if (withFlags) {
+      for (const x of [xa - 0.8, xa + len * 0.33, xa + len * 0.66, xb + 0.8]) {
+        const y = baseY(x, -6.2);
+        poles.add(x, y, -6.2, 0, 1, null, 0, 4.2, 1);
+        flags.add(x + 0.03, y + 4.15, -6.2, yawToCam, 1, null, 0, 1, rng.int(1, 4));
+      }
+    }
+  };
+
+  // --- Start gate + crowd ----------------------------------------------------
+  {
+    const sx = track.def.start.pos.x;
+    const sy = profileY(profile, sx);
+    const gate = new THREE.Group();
+    gate.position.set(sx - 1.0, sy, 0);
+    const post = new THREE.CylinderGeometry(0.1, 0.12, 4.6, 12);
+    for (const z of [-2.3, 2.3]) {
+      const p = new THREE.Mesh(post, steel);
+      p.position.set(0, 2.3, z);
+      p.castShadow = true;
+      gate.add(p);
+    }
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.18, 5.0), steel);
+    beam.position.set(0, 4.65, 0);
+    beam.castShadow = true;
+    gate.add(beam);
+    const bt = bannerTexture('START', '#1e5fe6', '#ffffff');
+    textureBytes += 1024 * 256 * 4;
+    const banner = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.1), fogify(new THREE.MeshStandardMaterial({ map: bt, roughness: 0.75, side: THREE.DoubleSide })));
+    banner.rotation.y = Math.PI / 2;
+    banner.position.set(0, 4.0, 0);
+    banner.castShadow = true;
+    gate.add(banner);
+    // Marshal lights on the beam.
+    const lightMat = fogify(new THREE.MeshStandardMaterial({ color: 0x202020, emissive: 0xff3020, emissiveIntensity: 3, roughness: 0.3 }));
+    for (const z of [-0.5, 0, 0.5]) {
+      const l = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), lightMat);
+      l.position.set(0.1, 4.85, z);
+      gate.add(l);
+    }
+    group.add(gate);
+    drawCalls += 7;
+    triangles += 1200;
+    crowdZone(sx - 9, sx + 7, 30, true);
+  }
+
+  // --- Checkpoints -------------------------------------------------------------
   const postGeo = new THREE.CylinderGeometry(0.06, 0.07, 3.4, 10);
   const beamGeo = new THREE.BoxGeometry(0.1, 0.12, 4.4);
   const lampGeo = new THREE.SphereGeometry(0.11, 12, 8);
   const plaqueGeo = new THREE.BoxGeometry(0.9, 0.45, 0.04);
   const chainGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.6, 5);
-
   track.def.checkpoints.forEach((cp, i) => {
     const gy = cp.spawn.pos.y;
     const x = cp.x;
@@ -97,22 +442,21 @@ export function buildGates(track: CompiledTrack, lib: MaterialLibrary): Gates {
     beam.position.set(0, 3.4, 0);
     beam.castShadow = true;
     g.add(beam);
-    // Lamp on the near post: dark red until armed, then green.
     const lampMat = fogify(new THREE.MeshStandardMaterial({ color: 0x220a0a, emissive: 0x7a1010, emissiveIntensity: 1.5, roughness: 0.3 }));
     const lamp = new THREE.Mesh(lampGeo, lampMat);
     lamp.position.set(0, 3.55, 2.0);
     g.add(lamp);
     lamps.push(lampMat);
-    // Hanging plaque with the zone label, offset toward the camera side.
-    const label = `${ZONE[Math.min(3, Math.floor(i / 3))]}${(i % 3) + 1}`;
-    const tex = labelTexture(label);
-    textureBytes += 256 * 128 * 4 * 1.33;
-    const plaqueMat = fogify(new THREE.MeshStandardMaterial({ map: tex, roughness: 0.55 }));
-    const plaque = new THREE.Mesh(plaqueGeo, [lib.get('plaque'), lib.get('plaque'), lib.get('plaque'), lib.get('plaque'), plaqueMat, plaqueMat]);
+    // Numbered plaque hanging toward the camera; emissive map lights the number green on pass.
+    const pt = plaqueTexture(i + 1);
+    textureBytes += 256 * 128 * 4 * 2;
+    const plaqueMat = fogify(new THREE.MeshStandardMaterial({ map: pt.map, emissiveMap: pt.emissive, emissive: 0x000000, emissiveIntensity: 2.5, roughness: 0.55 }));
+    const plaque = new THREE.Mesh(plaqueGeo, [lib.get('plaqueInk'), lib.get('plaqueInk'), lib.get('plaqueInk'), lib.get('plaqueInk'), plaqueMat, plaqueMat]);
     plaque.position.set(0, 2.55, 1.6);
     plaque.rotation.y = 0.25;
     plaque.castShadow = true;
     g.add(plaque);
+    plaques.push(plaqueMat);
     for (const dz of [-0.3, 0.3]) {
       const chain = new THREE.Mesh(chainGeo, lib.get('chrome'));
       chain.position.set(0, 3.08, 1.6 + dz);
@@ -127,9 +471,14 @@ export function buildGates(track: CompiledTrack, lib: MaterialLibrary): Gates {
     ]);
     drawCalls += 8;
     triangles += 900;
+    // A handful of spectators and two flags just past the gate.
+    crowdZone(x + 1.5, x + 6.5, 7, false);
+    const fy = interior ? profileY(profile, x + 7) - 0.35 : gyAt(x + 7, -6.2);
+    poles.add(x + 7, fy, -6.2, 0, 1, null, 0, 4.0, 1);
+    flags.add(x + 7.03, fy + 3.95, -6.2, yawToCam, 1, null, 0, 1, rng.int(1, 4));
   });
 
-  // Finish gate: two big posts, arch, checkered banner, white lamp.
+  // --- Finish gate + crowd -----------------------------------------------------
   const fx = track.def.finishX;
   const fy = profileY(profile, fx);
   const fin = new THREE.Group();
@@ -150,14 +499,38 @@ export function buildGates(track: CompiledTrack, lib: MaterialLibrary): Gates {
   banner.position.set(0, 4.15, 0);
   banner.castShadow = true;
   fin.add(banner);
-  textureBytes += 512 * 128 * 4 * 1.33;
+  textureBytes += 512 * 128 * 4;
   const finishLamp = fogify(new THREE.MeshStandardMaterial({ color: 0x222222, emissive: 0xffffff, emissiveIntensity: 2.0, roughness: 0.3 }));
   const fl = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 8), finishLamp);
   fl.position.set(0, 5.1, 0);
   fin.add(fl);
+  // Confetti cannons on both posts.
+  for (const z of [-2.3, 2.3]) {
+    const can = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 0.5, 10), lib.get('barrelWhite'));
+    can.position.set(-0.2, 1.1, z);
+    can.rotation.z = 0.35;
+    fin.add(can);
+  }
   group.add(fin);
-  drawCalls += 5;
-  triangles += 800;
+  drawCalls += 7;
+  triangles += 900;
+  crowdZone(fx - 7, fx + 9, 34, true);
 
-  return { group, lamps, finishLamp, jets, drawCalls, triangles, textureBytes };
+  // --- Build the batches -------------------------------------------------------
+  for (const b of [crowd, flags, poles, rails, railPosts, stage]) {
+    const im = b.build();
+    if (!im) continue;
+    group.add(im);
+    drawCalls++;
+    triangles += triCount(b.geometry) * b.count;
+  }
+  if (strips.length) {
+    const merged = strips.length === 1 ? strips[0]! : (mergeGeometries(strips, false) ?? strips[0]!);
+    const m = new THREE.Mesh(merged, stripMat);
+    m.name = 'gates:banners';
+    group.add(m);
+    drawCalls++;
+    triangles += triCount(merged);
+  }
+  return { group, lamps, plaques, finishLamp, jets, anim, drawCalls, triangles, textureBytes };
 }
