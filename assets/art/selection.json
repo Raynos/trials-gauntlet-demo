@@ -1,0 +1,22 @@
+{
+ "keyart": ["keyart-industrial", "keyart-canyon"],
+ "assets": {
+  "stencil-apex": { "src": "stencil-apex-v2" },
+  "stencil-taro": { "src": "stencil-taro-v2" },
+  "tyremark-straight": { "src": "tyremark-straight-v3" },
+  "mask-rivet-drips": { "src": "mask-rivet-drips-v2" },
+  "mask-rust-streaks": { "src": "mask-rust-streaks-v2" },
+  "sky-canyon": { "bandY": 256 },
+  "sky-nightcity": { "bandY": 256 },
+  "sky-foundry": { "bandY": 128 }
+ },
+ "rejected": [
+  { "src": "keyart-nightcity", "reason": "Strong image but the busiest of the three (no negative space for menu UI) and the bike reads as a seated motocross bike rather than a trials bike. Kept in assets/art/raw as a spare." },
+  { "src": "stencil-apex", "reason": "Lettering collapsed into a solid white triangle blob; no readable words." },
+  { "src": "stencil-taro", "reason": "Rounded-rectangle frame smeared over the letters; TARO barely legible, FREIGHT lost." },
+  { "src": "tyremark-straight", "reason": "Track rendered as a 40 px zipper down the middle; unusable as a decal." },
+  { "src": "tyremark-straight-v2", "reason": "Still a thin zipper and the background came out mid-grey instead of black." },
+  { "src": "mask-rivet-drips", "reason": "Rivets and drips too small (about 12 px at 1024) to read on a container side." },
+  { "src": "mask-rust-streaks", "reason": "Solid pure-white full-height stalactites with no tonal variation; would tint as hard stripes." }
+ ]
+}

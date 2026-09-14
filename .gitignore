@@ -7,3 +7,4 @@ reference/*/clips/
 *.log
 .DS_Store
 .vite/
+assets/art/raw/
