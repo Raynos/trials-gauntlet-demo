@@ -40,3 +40,5 @@ export function listTrackIds(): string[] {
 }
 
 export const DEFAULT_TRACK_ID = FLAT_TEST_TRACK.id;
+
+export { compileTrack, hashColliders } from './compile';

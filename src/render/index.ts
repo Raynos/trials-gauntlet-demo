@@ -6,11 +6,11 @@
  * The real art pipeline replaces the meshes; the interface and stats stay.
  */
 import * as THREE from 'three';
-import type { PhysicsState, RenderStats, TrackDef } from '../core/types';
+import type { CompiledTrack, PhysicsState, RenderStats } from '../core/types';
 
 export interface GameRenderer {
   readonly canvas: HTMLCanvasElement;
-  setTrack(track: TrackDef): void;
+  setTrack(track: CompiledTrack): void;
   /** Draw one frame. Returns render time in ms (performance.now delta). */
   render(state: PhysicsState, alpha: number): number;
   /** Block until the GPU has finished the last frame (1x1 readPixels). */
@@ -122,7 +122,8 @@ export class ThreeRenderer implements GameRenderer {
     return this.frames;
   }
 
-  setTrack(track: TrackDef): void {
+  setTrack(compiled: CompiledTrack): void {
+    const track = compiled.def;
     if (this.ground) {
       this.scene.remove(this.ground);
       this.ground.geometry.dispose();

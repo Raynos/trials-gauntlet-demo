@@ -87,6 +87,115 @@ export interface TrackDef {
   finishX: number;
   /** Author's target attempts-to-clear for a stranger, for the metric gate. */
   targetAttempts?: number;
+  /** Biome, technique, camera keys, attempt band. See CONTRACT.md §2. */
+  meta?: TrackMeta;
+}
+
+// ---------------------------------------------------------------------------
+// Surfaces, biomes, track meta (CONTRACT.md §2)
+// ---------------------------------------------------------------------------
+
+export type SurfaceKind = 'dirt' | 'wood' | 'metal' | 'concrete' | 'rubber' | 'grate' | 'stone' | 'snow';
+export type BiomeId = 'industrial' | 'canyon' | 'snow' | 'nightCity' | 'foundry';
+
+/** Authored camera key for a stretch of track; consumed by render only. */
+export interface CameraKey {
+  /** World x range this key applies to (blended outside). */
+  x0: number;
+  x1: number;
+  mode?: 'side' | 'side-tight' | 'high34' | 'low';
+  /** Radians / metres; override the mode defaults. */
+  yaw?: number;
+  pitch?: number;
+  dist?: number;
+  roll?: number;
+  /** -1..1, tighter / wider than the speed-driven default. */
+  zoomBias?: number;
+  /** Seconds to blend into this key (default 0.7). */
+  blend?: number;
+  /** Hard cut instead of blend. */
+  cut?: boolean;
+}
+
+export interface TrackMeta {
+  biome: BiomeId;
+  /** The one thing this track teaches. */
+  technique: string;
+  /** The thing it then demands. */
+  demands?: string;
+  camera?: CameraKey[];
+  /** Stranger attempts-to-clear target band [lo, hi]. */
+  attemptsBand?: [number, number];
+  targetTimeS?: number;
+  /** HUD button hints (beginner tier only). */
+  hints?: string[];
+}
+
+// ---------------------------------------------------------------------------
+// Compiled track (CONTRACT.md §2.2) — the only thing physics/render/audio read
+// ---------------------------------------------------------------------------
+
+export interface ColliderBase {
+  id: number;
+  surface: SurfaceKind;
+  /** Index into def.obstacles, or -1 for the ground profile. */
+  obstacleIndex: number;
+}
+export interface ColliderPolyline extends ColliderBase {
+  kind: 'polyline';
+  points: Vec2[];
+  oneWay?: boolean;
+}
+export interface ColliderCircle extends ColliderBase {
+  kind: 'circle';
+  center: Vec2;
+  radius: number;
+  /** Drum spins about its centre under the tyre (never translates). */
+  rolls?: boolean;
+}
+export interface ColliderBox extends ColliderBase {
+  kind: 'box';
+  center: Vec2;
+  halfW: number;
+  halfH: number;
+  angle: number;
+}
+export interface ColliderSeesaw extends ColliderBase {
+  kind: 'seesaw';
+  pivot: Vec2;
+  halfLength: number;
+  thickness: number;
+  maxAngle: number;
+  mass: number;
+}
+export type Collider = ColliderPolyline | ColliderCircle | ColliderBox | ColliderSeesaw;
+
+export interface HazardZone {
+  id: number;
+  kind: 'fire' | 'water' | 'kill';
+  min: Vec2;
+  max: Vec2;
+}
+
+export interface PlacedObstacle {
+  kind: string;
+  pos: Vec2;
+  /** Params with kind defaults filled in. */
+  params: Record<string, number | string | boolean>;
+  colliderIds: number[];
+}
+
+export interface CompiledTrack {
+  def: TrackDef;
+  /** Exact rideable geometry; render draws these surfaces. */
+  colliders: Collider[];
+  hazards: HazardZone[];
+  placed: PlacedObstacle[];
+  bounds: { minX: number; maxX: number; minY: number; maxY: number };
+  /** bounds.minY - 6; below this the run faults 'out-of-bounds'. */
+  oobY: number;
+  /** FNV-1a over colliders; golden-tested per track. */
+  hash: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -115,7 +224,7 @@ export interface RiderPose {
   armExtend: number;
 }
 
-export type FaultReason = 'crash' | 'out-of-bounds' | 'restart' | 'timeout';
+export type FaultReason = 'crash' | 'out-of-bounds' | 'restart' | 'timeout' | 'hazard';
 
 /**
  * Snapshot of everything the renderer / hasher needs. Plain data only, no
@@ -145,7 +254,26 @@ export interface PhysicsState {
   faulted: FaultReason | null;
   /** Finish time in seconds, or null while running. */
   finishTime: number | null;
+  /** The quantized input applied this tick. */
+  input: { throttle: number; brake: number; lean: number };
+  engine: { rpm: number; throttleEff: number; limiter: boolean };
+  contacts: { rear: SurfaceKind | null; front: SurfaceKind | null };
+  /** rear.spinVel*R - groundSpeed along bike x (m/s); > 0 = wheelspin. */
+  rearSlip: number;
+  hopPhase: 'idle' | 'preload' | 'push' | 'recover';
+  /** Non-null from the crash tick until reset; render draws exactly this. */
+  ragdoll: RagdollBody[] | null;
+  seesaws: { id: number; angle: number; angVel: number }[];
+  drums: { id: number; spin: number }[];
 }
+
+export interface RagdollBody {
+  id: 'head' | 'torso' | 'pelvis' | 'upperArm' | 'forearm' | 'thigh' | 'shin';
+  pos: Vec2;
+  angle: number;
+}
+
+export type PhysicsSnapshot = { v: 1; f64: Float64Array; u8: Uint8Array };
 
 // ---------------------------------------------------------------------------
 // Game events
@@ -155,7 +283,21 @@ export type GameEvent =
   | { type: 'checkpoint'; index: number; tick: number; time: number }
   | { type: 'fault'; reason: FaultReason; tick: number; time: number }
   | { type: 'finish'; tick: number; time: number }
-  | { type: 'restart'; checkpoint: number; tick: number };
+  | { type: 'restart'; checkpoint: number; tick: number }
+  | { type: 'countdown'; n: 3 | 2 | 1 }
+  | { type: 'go' }
+  | { type: 'land'; impulse: number; wheel: 'rear' | 'front'; surface: SurfaceKind; tick: number };
+
+export type GamePhase = 'menu' | 'countdown' | 'riding' | 'crashed' | 'finished';
+export type QualityTier = 'low' | 'medium' | 'high';
+
+export interface CameraDebug {
+  pos: Vec2;
+  dist: number;
+  bikeScreenX: number;
+  bikeScreenY: number;
+  bikeHeightFrac: number;
+}
 
 export type GameEventListener = (event: GameEvent) => void;
 
@@ -234,4 +376,18 @@ export interface TrialsHook {
   startRecording(): void;
   stopRecording(): string | null;
   listTracks(): string[];
+  // -- CONTRACT.md §2.9 additions --
+  snapshot(): string;
+  restore(b64: string): void;
+  drainEvents(): GameEvent[];
+  /** Run clock (seconds since GO, runs through restarts). */
+  runTime(): number;
+  faults(): number;
+  phase(): GamePhase;
+  marks(): { checkpoints: number[]; finishX: number; start: number };
+  camera(): CameraDebug;
+  setQuality(t: QualityTier): void;
+  audio?: { renderOffline(recordingJson: string, seconds: number): Promise<Float32Array> };
+  /** Harness convenience: jump straight to GO. */
+  skipCountdown(): void;
 }

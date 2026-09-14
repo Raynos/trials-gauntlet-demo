@@ -13,8 +13,12 @@ import {
   hashPhysicsState,
   iterateFrames,
   quantizeInput,
+  type CameraDebug,
   type GameEvent,
   type GameEventListener,
+  type GamePhase,
+  type PhysicsSnapshot,
+  type QualityTier,
   type InputFrame,
   type PhysicsState,
   type RenderStats,
@@ -23,7 +27,7 @@ import {
 import type { AudioSystem } from '../audio';
 import type { PhysicsWorld } from '../physics';
 import type { GameRenderer } from '../render';
-import { DEFAULT_TRACK_ID, getTrack } from '../tracks';
+import { DEFAULT_TRACK_ID, compileTrack, getTrack } from '../tracks';
 import type { Hud } from '../ui';
 
 export interface GameOptions {
@@ -47,6 +51,9 @@ export class Game {
   private recorder: InputRecorder | null = null;
   private readonly listeners = new Set<GameEventListener>();
   private lastState: PhysicsState | null = null;
+  private faultCount = 0;
+  private pending: GameEvent[] = [];
+  private quality: QualityTier = 'high';
 
   constructor(options: GameOptions) {
     this.physicsHz = options.physicsHz ?? DEFAULT_PHYSICS_HZ;
@@ -74,6 +81,10 @@ export class Game {
   }
 
   private emit(event: GameEvent): void {
+    if (event.type === 'fault') this.faultCount++;
+    if (event.type === 'restart' && event.checkpoint < 0) this.faultCount = 0;
+    this.pending.push(event);
+    if (this.pending.length > 256) this.pending.shift();
     this.hud?.onEvent(event);
     this.audio?.onEvent(event);
     for (const l of this.listeners) l(event);
@@ -94,8 +105,9 @@ export class Game {
     if (!track) return false;
     this.track = track;
     this.seed = (seed ?? track.seed) >>> 0;
-    this.physics.loadTrack(track, this.seed);
-    this.renderer.setTrack(track);
+    const compiled = compileTrack(track);
+    this.physics.loadTrack(compiled, this.seed);
+    this.renderer.setTrack(compiled);
     this.hud?.setTrackName(`${track.name} · ${track.tier}`);
     this.loop.reset();
     this.input = { ...NEUTRAL_INPUT };
@@ -176,6 +188,61 @@ export class Game {
 
   hashState(): string {
     return hashPhysicsState(this.getState());
+  }
+
+  // -- CONTRACT.md §2.9 (scaffold semantics; core-game owner replaces) -----
+
+  snapshot(): PhysicsSnapshot {
+    return this.physics.snapshot();
+  }
+
+  restore(s: PhysicsSnapshot): void {
+    this.physics.restore(s);
+    this.lastState = null;
+  }
+
+  /** Events since the last call (also delivered to listeners as they happen). */
+  drainEvents(): GameEvent[] {
+    const out = this.pending;
+    this.pending = [];
+    return out;
+  }
+
+  runTime(): number {
+    const s = this.getState();
+    return s.finishTime ?? s.time;
+  }
+
+  faults(): number {
+    return this.faultCount;
+  }
+
+  phase(): GamePhase {
+    const s = this.getState();
+    if (s.finished && !s.faulted) return 'finished';
+    if (s.faulted === 'crash') return 'crashed';
+    return 'riding';
+  }
+
+  camera(): CameraDebug {
+    const r = this.renderer as Partial<{ camera(): CameraDebug }>;
+    if (typeof r.camera === 'function') return r.camera();
+    const s = this.getState();
+    return { pos: { x: s.bike.pos.x, y: s.bike.pos.y }, dist: 14, bikeScreenX: 0.3, bikeScreenY: 0.55, bikeHeightFrac: 0.2 };
+  }
+
+  setQuality(t: QualityTier): void {
+    this.quality = t;
+    const r = this.renderer as Partial<{ setQuality(t: QualityTier): void }>;
+    if (typeof r.setQuality === 'function') r.setQuality(t);
+  }
+
+  get qualityTier(): QualityTier {
+    return this.quality;
+  }
+
+  skipCountdown(): void {
+    // Scaffold has no countdown yet.
   }
 
   finishTime(): number | null {

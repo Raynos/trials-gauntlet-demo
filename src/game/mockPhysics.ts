@@ -3,7 +3,7 @@
  * has a deterministic, hashable thing to drive and render. No suspension, no
  * rider dynamics — those belong to the real PhysicsWorld.
  */
-import type { GameEvent, InputFrame, PhysicsState, TrackDef, Vec2 } from '../core/types';
+import type { CompiledTrack, GameEvent, InputFrame, PhysicsSnapshot, PhysicsState, TrackDef, Vec2 } from '../core/types';
 import { Rng } from '../core/rng';
 import type { PhysicsWorld } from '../physics';
 
@@ -65,11 +65,19 @@ export class MockPhysics implements PhysicsWorld {
       finished: false,
       faulted: null,
       finishTime: null,
+      input: { throttle: 0, brake: 0, lean: 0 },
+      engine: { rpm: 1500, throttleEff: 0, limiter: false },
+      contacts: { rear: 'dirt', front: 'dirt' },
+      rearSlip: 0,
+      hopPhase: 'idle',
+      ragdoll: null,
+      seesaws: [],
+      drums: [],
     };
   }
 
-  loadTrack(track: TrackDef, seed: number): void {
-    this.track = track;
+  loadTrack(track: CompiledTrack, seed: number): void {
+    this.track = track.def;
     this.seed = seed >>> 0;
     this.reset(-1);
   }
@@ -197,6 +205,24 @@ export class MockPhysics implements PhysicsWorld {
     const out = this.events;
     this.events = [];
     return out;
+  }
+
+  /** Mock snapshot: JSON of the state + latches packed into u8, rng in f64. */
+  snapshot(): PhysicsSnapshot {
+    const f64 = new Float64Array([this.seed, ...this.rng.state()]);
+    const u8 = new TextEncoder().encode(
+      JSON.stringify({ s: this.state, h: this.hopLatch, r: this.restartLatch }),
+    );
+    return { v: 1, f64, u8 };
+  }
+
+  restore(snap: PhysicsSnapshot): void {
+    const o = JSON.parse(new TextDecoder().decode(snap.u8)) as { s: PhysicsState; h: boolean; r: boolean };
+    this.state = o.s;
+    this.hopLatch = o.h;
+    this.restartLatch = o.r;
+    this.seed = snap.f64[0]! >>> 0;
+    this.rng.setState([snap.f64[1]!, snap.f64[2]!, snap.f64[3]!, snap.f64[4]!]);
   }
 
   private requireTrack(): TrackDef {

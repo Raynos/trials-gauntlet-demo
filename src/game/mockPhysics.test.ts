@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { hashPhysicsState } from '../core/hash';
 import { quantizeInput } from '../core/replay';
-import { FLAT_TEST_TRACK } from '../tracks';
+import { FLAT_TEST_TRACK, compileTrack } from '../tracks';
+
+const COMPILED = compileTrack(FLAT_TEST_TRACK);
 import { MockPhysics } from './mockPhysics';
 
 function run(seed: number, ticks: number): { hash: string; finish: number | null; events: string[] } {
   const p = new MockPhysics(120);
-  p.loadTrack(FLAT_TEST_TRACK, seed);
+  p.loadTrack(COMPILED, seed);
   const events: string[] = [];
   for (let i = 0; i < ticks; i++) {
     const t = i / 120;
@@ -35,7 +37,7 @@ describe('MockPhysics', () => {
 
   it('restart edge resets to the last checkpoint and emits a fault', () => {
     const p = new MockPhysics(120);
-    p.loadTrack(FLAT_TEST_TRACK, 5);
+    p.loadTrack(COMPILED, 5);
     for (let i = 0; i < 900; i++) p.step(quantizeInput({ throttle: 1 }));
     const cp = p.getState().checkpoint;
     expect(cp).toBeGreaterThanOrEqual(0);
@@ -51,7 +53,7 @@ describe('MockPhysics', () => {
 
   it('getState returns a defensive copy', () => {
     const p = new MockPhysics(120);
-    p.loadTrack(FLAT_TEST_TRACK, 1);
+    p.loadTrack(COMPILED, 1);
     const s = p.getState();
     s.bike.pos.x = 999;
     expect(p.getState().bike.pos.x).not.toBe(999);

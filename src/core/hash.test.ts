@@ -14,6 +14,14 @@ function state(): PhysicsState {
     finished: false,
     faulted: null,
     finishTime: null,
+    input: { throttle: 0, brake: 0, lean: 0 },
+    engine: { rpm: 1500, throttleEff: 0, limiter: false },
+    contacts: { rear: 'dirt', front: 'dirt' },
+    rearSlip: 0,
+    hopPhase: 'idle',
+    ragdoll: null,
+    seesaws: [],
+    drums: [],
   };
 }
 

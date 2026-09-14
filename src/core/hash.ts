@@ -63,5 +63,13 @@ export function hashPhysicsState(s: PhysicsState): string {
   h.number(s.rider.lean).number(s.rider.crouch).number(s.rider.torsoPitch).number(s.rider.armExtend);
   h.number(s.checkpoint).bool(s.finished).string(s.faulted);
   h.number(s.finishTime ?? Number.NaN);
+  h.number(s.input.throttle).number(s.input.brake).number(s.input.lean);
+  h.number(s.engine.rpm).number(s.engine.throttleEff).bool(s.engine.limiter);
+  h.string(s.contacts.rear).string(s.contacts.front);
+  h.number(s.rearSlip).string(s.hopPhase);
+  if (s.ragdoll) for (const b of s.ragdoll) h.string(b.id).number(b.pos.x).number(b.pos.y).number(b.angle);
+  else h.string(null);
+  for (const w of s.seesaws) h.number(w.id).number(w.angle).number(w.angVel);
+  for (const d of s.drums) h.number(d.id).number(d.spin);
   return h.digest();
 }
