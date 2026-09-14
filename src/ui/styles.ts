@@ -389,6 +389,9 @@ html.short .bc-art { display: none; }
 .perf { position: absolute; left: calc(.8rem + var(--sal)); top: calc(4.4rem + var(--sat)); margin: 0; padding: .35rem .55rem; z-index: 6; pointer-events: none; font: 11px/1.4 var(--mono); color: #cfe; background: rgba(0,0,0,.72); border: 1px solid var(--line-2); border-radius: var(--r1); white-space: pre; text-shadow: none; }
 
 /* ---- update toast (service worker has a newer build) ---- */
+.fpsmeter { position: absolute; right: calc(.5rem + var(--sar)); top: calc(.15rem + var(--sat)); z-index: 7; pointer-events: none; font: 600 10px/1.4 var(--mono); letter-spacing: .04em; color: rgba(255,255,255,.55); text-shadow: 0 1px 2px rgba(0,0,0,.8); }
+.fpsmeter.bad { color: #ff7a5c; }
+.hud.touch ~ .fpsmeter, .touch-layer.on.visible ~ .fpsmeter { top: calc(4.2rem + var(--sat)); }
 .toast { position: absolute; left: 50%; bottom: calc(var(--s5) + var(--sab)); transform: translate(-50%, 140%); z-index: 30; display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s2) var(--s2) var(--s4); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--plate), 0 18px 40px rgba(0,0,0,.6); opacity: 0; pointer-events: none; transition: transform var(--t3) var(--ease), opacity var(--t3) var(--ease); white-space: nowrap; }
 .toast.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
 .toast-dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: pulse 1.6s ease-in-out infinite; }

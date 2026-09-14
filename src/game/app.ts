@@ -35,6 +35,9 @@ import {
   loadModelChoice,
   loadOnboarded,
   loadQualityOverride,
+  loadFpsChoice,
+  saveFpsChoice,
+  type FpsChoice,
   loadSoundEnabled,
   loadTelemetryEnabled,
   loadVolume,
@@ -165,6 +168,14 @@ export class App {
   private readonly tracks: TrackDef[];
   private screen: AppScreen = 'title';
   private qualityChoice: QualityChoice;
+  /** Frame cap (Settings · Frame rate). 'auto' = 30 on phones, 60 elsewhere; the RAF loop skips frames to match. */
+  private fpsChoice: FpsChoice;
+  private lastRenderAt = 0;
+  /** Lightweight FPS meter, top-right, always on: rendered frames per second and the quality tier letter. */
+  private readonly fpsEl: HTMLDivElement;
+  private fpsFrames = 0;
+  private fpsWindowAt = 0;
+  private fpsWorstMs = 0;
   private soundOn: boolean;
   private volume: number;
   private ghostOn: boolean;
@@ -201,6 +212,11 @@ export class App {
     this.mux.onDeviceChange = (d) => this.onDevice(d);
 
     this.qualityChoice = loadQualityOverride();
+    this.fpsChoice = loadFpsChoice();
+    this.fpsEl = document.createElement('div');
+    this.fpsEl.className = 'fpsmeter';
+    this.fpsEl.textContent = '-- fps';
+    o.uiRoot.appendChild(this.fpsEl);
     this.soundOn = loadSoundEnabled();
     this.volume = loadVolume();
     this.ghostOn = loadGhostEnabled();
@@ -223,6 +239,8 @@ export class App {
     const bestOf = (id: string) => this.playableBest(this.bestTimes.get(id));
     const state = (): FrontState => ({
       quality: this.qualityChoice,
+      fps: this.fpsChoice,
+      fpsInEffect: this.frameCapHz(),
       sound: this.soundOn,
       volume: this.volume,
       ghost: this.ghostOn,
@@ -245,6 +263,10 @@ export class App {
       },
       goto: (s: FrontScreen) => this.goto(s),
       setQuality: (q: QualityChoice) => this.chooseQuality(q),
+      setFps: (v: FpsChoice) => {
+        this.fpsChoice = v;
+        saveFpsChoice(v);
+      },
       setSound: (on: boolean) => {
         this.soundOn = on;
         saveSoundEnabled(on);
@@ -377,6 +399,11 @@ export class App {
     if (this.qualityChoice !== 'auto') {
       this.game.setQuality(this.qualityChoice);
       this.probeDone = true;
+    } else if (isPhone()) {
+      // Phones start on `low` and the probe may only step up (a 60 fps start line then bloom + SSAO
+      // + shadows at 3000 px wide was the "not 60, dropping frames" report); desktops probe from high.
+      this.game.setQuality('low');
+      this.qualityWhy = 'phone default (low), probe may step up';
     }
 
     const unlock = (): void => {
@@ -526,9 +553,20 @@ export class App {
     }
     this.lastNow = performance.now();
     const frame = (now: number): void => {
+      // Frame cap: skip RAF callbacks until the cap interval has elapsed (2 ms slack so a 60 Hz RAF
+      // renders every second frame and a 120 Hz one every fourth). Physics is fixed-step, so the
+      // skipped frames' time is simply consumed by the next advance.
+      const cap = this.frameCapHz();
+      if (now - this.lastRenderAt < 1000 / cap - 2) {
+        this.raf = requestAnimationFrame(frame);
+        return;
+      }
+      const sinceRender = this.lastRenderAt ? now - this.lastRenderAt : 0;
+      this.lastRenderAt = now;
       const elapsed = Math.min(0.25, Math.max(0, (now - this.lastNow) / 1000));
       this.lastNow = now;
       this.tickFrame(elapsed);
+      this.meterFrame(now, sinceRender);
       this.raf = requestAnimationFrame(frame);
     };
     this.raf = requestAnimationFrame(frame);
@@ -936,6 +974,29 @@ export class App {
     this.pause.setDevice(d);
   }
 
+  /** Cap in effect: the Settings choice, else 30 on phones and 60 elsewhere. */
+  private frameCapHz(): 30 | 60 {
+    if (this.fpsChoice === '30') return 30;
+    if (this.fpsChoice === '60') return 60;
+    return isPhone() ? 30 : 60;
+  }
+
+  /** FPS meter: rendered frames over the last 500 ms, the worst frame interval in that window, the tier letter. Two DOM writes per second. */
+  private meterFrame(now: number, sinceRender: number): void {
+    this.fpsFrames++;
+    if (sinceRender > this.fpsWorstMs) this.fpsWorstMs = sinceRender;
+    if (now - this.fpsWindowAt < 500) return;
+    if (this.fpsWindowAt) {
+      const fps = Math.round((this.fpsFrames * 1000) / (now - this.fpsWindowAt));
+      const cap = this.frameCapHz();
+      this.fpsEl.textContent = `${fps} fps · ${Math.round(this.fpsWorstMs)} ms · ${this.game.qualityTier[0]!.toUpperCase()}`;
+      this.fpsEl.classList.toggle('bad', fps < cap - 5 || this.fpsWorstMs > 1000 / cap + 12);
+    }
+    this.fpsWindowAt = now;
+    this.fpsFrames = 0;
+    this.fpsWorstMs = 0;
+  }
+
   // -- quality ------------------------------------------------------------------
 
   /** Median RAF interval over the first 60 frames after GO → tier (60 fps high, 30 fps medium, else low). */
@@ -945,10 +1006,15 @@ export class App {
     this.probeDone = true;
     const sorted = [...this.probe].sort((a, b) => a - b);
     const median = sorted[sorted.length >> 1] ?? 0;
-    const tier: QualityTier = median <= 17.5 ? 'high' : median <= 34 ? 'medium' : 'low';
+    const cap = this.frameCapHz();
+    const budget = 1000 / cap;
+    // Measured against the cap in effect: a phone capped at 30 that holds 33 ms is "medium"-worthy at
+    // most; it never probes into `high` (shadows + SSAO + bloom at full DPR).
+    let tier: QualityTier = median <= budget * 1.05 ? 'high' : median <= budget * 2 ? 'medium' : 'low';
+    if (isPhone() && tier === 'high') tier = 'medium';
     if (this.qualityChoice === 'auto') {
       this.game.setQuality(tier);
-      this.qualityWhy = `probe median ${median.toFixed(1)} ms`;
+      this.qualityWhy = `probe median ${median.toFixed(1)} ms at cap ${cap}`;
     }
     this.probe = [];
     this.probeArmed = false;

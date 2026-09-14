@@ -7,7 +7,7 @@
  */
 import type { BikeClass, BiomeId, Medal, TrackDef, TrackTier } from '../core/types';
 import { BIOME_TINT, type ArtManifest } from './art';
-import type { BestEntry, ModelChoice } from './best';
+import type { BestEntry, FpsChoice, ModelChoice } from './best';
 import { formatTime } from './format';
 import type { QualityChoice } from './menu';
 import { labTracks, medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
@@ -22,6 +22,7 @@ export interface FrontCallbacks {
   timeAttack(trackId: string): void;
   goto(screen: FrontScreen): void;
   setQuality(q: QualityChoice): void;
+  setFps(v: FpsChoice): void;
   setSound(on: boolean): void;
   setVolume(v: number): void;
   setGhost(on: boolean): void;
@@ -39,6 +40,9 @@ export interface FrontCallbacks {
 
 export interface FrontState {
   quality: QualityChoice;
+  /** Frame cap choice ('auto' = 30 on phones, 60 elsewhere) and the cap in effect. */
+  fps: FpsChoice;
+  fpsInEffect: 30 | 60;
   sound: boolean;
   volume: number;
   ghost: boolean;
@@ -619,7 +623,7 @@ export class TrackSelectScreen extends Screen {
 // Settings
 // ---------------------------------------------------------------------------
 
-type SettingId = 'quality' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'telemetry' | 'runlog' | 'reset' | 'reload' | 'physics';
+type SettingId = 'quality' | 'fps' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'telemetry' | 'runlog' | 'reset' | 'reload' | 'physics';
 
 interface SettingRow {
   id: SettingId;
@@ -679,6 +683,7 @@ export class SettingsScreen extends Screen {
     };
 
     seg('quality', 'Quality', 'Auto probes the first second of riding', [{ v: 'auto', l: 'Auto' }, { v: 'low', l: 'Low' }, { v: 'medium', l: 'Med' }, { v: 'high', l: 'High' }], () => s().quality, (v) => this.cb.setQuality(v as QualityChoice));
+    seg('fps', 'Frame rate', 'Auto = 30 on phones, 60 on desktop · the meter top-right shows what you get', [{ v: 'auto', l: `Auto (${s().fpsInEffect})` }, { v: '30', l: '30' }, { v: '60', l: '60' }], () => s().fps, (v) => this.cb.setFps(v as FpsChoice));
     seg('sound', 'Sound', 'Engine, impacts, menu cues', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().sound ? 'on' : 'off'), (v) => this.cb.setSound(v === 'on'));
 
     // Volume slider row.

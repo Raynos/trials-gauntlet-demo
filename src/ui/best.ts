@@ -19,6 +19,7 @@ export interface BestEntry {
 
 const PREFIX = 'trials.best.';
 const QUALITY_KEY = 'trials.quality';
+const FPS_KEY = 'trials.fps';
 const MEDAL_RANK: Record<Medal, number> = { bronze: 1, silver: 2, gold: 3, platinum: 4 };
 
 /** Storage key per track and bike class: rookie keeps the legacy key so pre-garage PBs survive; pro gets a suffix. */
@@ -251,6 +252,27 @@ export function loadQualityOverride(): QualityTier | 'auto' {
     return v === 'low' || v === 'medium' || v === 'high' ? v : 'auto';
   } catch {
     return 'auto';
+  }
+}
+
+/** Frame cap: 'auto' = 30 on phones, 60 elsewhere (`src/game/app.ts frameCapHz`). */
+export type FpsChoice = 'auto' | '30' | '60';
+export function loadFpsChoice(): FpsChoice {
+  try {
+    const v = store()?.getItem(FPS_KEY);
+    return v === '30' || v === '60' ? v : 'auto';
+  } catch {
+    return 'auto';
+  }
+}
+export function saveFpsChoice(v: FpsChoice): void {
+  try {
+    const s = store();
+    if (!s) return;
+    if (v === 'auto') s.removeItem(FPS_KEY);
+    else s.setItem(FPS_KEY, v);
+  } catch {
+    /* storage unavailable */
   }
 }
 
