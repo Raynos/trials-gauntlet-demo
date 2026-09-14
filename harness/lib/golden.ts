@@ -12,9 +12,26 @@ import { expandFrames, type InputRecording } from '../../src/core/replay';
 import { srcFingerprint } from './metrics';
 import { HARNESS_DIR } from './paths';
 import { loadRecording, saveRecording } from './recording';
-import { createSim } from './sim';
+import { createSimFor } from './sim';
+import { DEFAULT_BIKE, type BikeClass } from '../../src/core/types';
 
 export const GOLDEN_ORDER = ['bot-oracle.json', 'bot-3.json', 'bot-2.json', 'bot-1.json', 'bot-0.json'] as const;
+
+/** `bot-3.json` is the Rookie golden (as it always was); Pro goldens are `bot-3-pro.json` next to it. */
+export function goldenSuffix(bike: BikeClass | undefined): string {
+  return bike && bike !== DEFAULT_BIKE ? `-${bike}` : '';
+}
+
+/** Candidate golden file names for a class, best first. */
+export function goldenOrder(bike: BikeClass = DEFAULT_BIKE): string[] {
+  const sfx = goldenSuffix(bike);
+  return GOLDEN_ORDER.map((n) => n.replace(/\.json$/, `${sfx}.json`));
+}
+
+/** Class a golden file name encodes (`bot-3-pro.json` -> pro). */
+export function goldenBike(file: string): BikeClass {
+  return /-pro\.json$/.test(path.basename(file)) ? 'pro' : DEFAULT_BIKE;
+}
 
 /** `src=<8 hex>` from a recording's header note, or null when unstamped/unreadable. */
 export function recordingFingerprint(file: string): string | null {
@@ -39,9 +56,9 @@ export interface GoldenChoice {
  * With no match: the newest file by mtime, flagged `fresh: false` — the gate's
  * `clear.*` / D8 checks then fail on purpose until `harness:bot` is re-run.
  */
-export function chooseGolden(trackId: string): GoldenChoice | null {
+export function chooseGolden(trackId: string, bike: BikeClass = DEFAULT_BIKE): GoldenChoice | null {
   const dir = path.join(HARNESS_DIR, 'inputs', trackId);
-  const present = GOLDEN_ORDER.map((name) => path.join(dir, name)).filter((f) => fs.existsSync(f));
+  const present = goldenOrder(bike).map((name) => path.join(dir, name)).filter((f) => fs.existsSync(f));
   const fp = srcFingerprint();
   const stamped = present.map((file) => ({ file, stamp: recordingFingerprint(file) }));
   const match = stamped.find((s) => s.stamp === fp);
@@ -49,7 +66,7 @@ export function chooseGolden(trackId: string): GoldenChoice | null {
   const newest = [...stamped].sort((a, b) => fs.statSync(b.file).mtimeMs - fs.statSync(a.file).mtimeMs)[0];
   if (newest) return { file: newest.file, fresh: false, stamp: newest.stamp, candidates: present.length };
   const legacy = path.join(HARNESS_DIR, 'inputs', `${trackId}-clear.json`);
-  return fs.existsSync(legacy) ? { file: legacy, fresh: false, stamp: null, candidates: 1 } : null;
+  return bike === DEFAULT_BIKE && fs.existsSync(legacy) ? { file: legacy, fresh: false, stamp: null, candidates: 1 } : null;
 }
 
 export interface GoldenRefresh {
@@ -82,12 +99,13 @@ export async function refreshGoldens(
   const out: GoldenRefresh[] = [];
   for (const trackId of trackIds) {
     const dir = path.join(HARNESS_DIR, 'inputs', trackId);
-    for (const name of GOLDEN_ORDER) {
+    for (const name of [...goldenOrder('rookie'), ...goldenOrder('pro')]) {
       const file = path.join(dir, name);
       if (!fs.existsSync(file)) continue;
       const rec = loadRecording(file);
+      if (!rec.header.bike) rec.header.bike = goldenBike(file);
       const stamp = /\bsrc=([0-9a-f]{8})\b/.exec(rec.header.note ?? '')?.[1] ?? null;
-      const sim = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
+      const sim = await createSimFor(rec);
       const frames = expandFrames(rec);
       let faults = 0;
       for (const f of frames) for (const e of sim.step(f)) if (e.type === 'fault') faults++;
@@ -119,11 +137,11 @@ export async function refreshGoldens(
 }
 
 /** chooseGolden + one log line explaining the choice. */
-export function pickGolden(trackId: string, log: (l: string) => void = () => undefined): string | null {
-  const c = chooseGolden(trackId);
+export function pickGolden(trackId: string, log: (l: string) => void = () => undefined, bike: BikeClass = DEFAULT_BIKE): string | null {
+  const c = chooseGolden(trackId, bike);
   if (!c) return null;
   const fp = srcFingerprint();
-  if (c.fresh) log(`golden: ${path.basename(c.file)} (src=${fp} matches the working tree; ${c.candidates} candidate(s))`);
-  else log(`golden: WARNING nothing under harness/inputs/${trackId}/ is stamped src=${fp}; using newest ${path.basename(c.file)} (src=${c.stamp ?? 'unstamped'}) — re-run pnpm harness:bot ${trackId}`);
+  if (c.fresh) log(`golden: ${path.basename(c.file)} (${bike}; src=${fp} matches the working tree; ${c.candidates} candidate(s))`);
+  else log(`golden: WARNING nothing under harness/inputs/${trackId}/ is a ${bike} golden stamped src=${fp}; using newest ${path.basename(c.file)} (src=${c.stamp ?? 'unstamped'}) — re-run pnpm harness:bot ${trackId}${bike === DEFAULT_BIKE ? '' : ` --bike ${bike}`}`);
   return c.file;
 }

@@ -27,6 +27,7 @@
     "harness:round": "tsx harness/round.ts",
     "harness:clip": "tsx harness/clip.ts",
     "harness:snapshot-probe": "tsx harness/gate/snapshot-probe.ts",
+    "harness:physics-suite": "tsx harness/physics-suite.ts",
     "harness:critic-prompt": "tsx harness/compare/critic-prompt.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

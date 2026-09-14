@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { GameEvent, PhysicsState } from '../../src/core/types';
 import { InputRecorder, encodeJSON, iterateFrames, type InputRecording } from '../../src/core/replay';
+import type { BikeClass } from '../../src/core/types';
 import { createSim, type Sim, type SimSnapshot } from '../lib/sim';
 import type { RulesCounters } from '../lib/rules';
 import { srcFingerprint, type TimedEvent } from '../lib/metrics';
@@ -125,9 +126,11 @@ export async function createSession(opts: {
   seed?: number;
   sessionId?: string;
   agent: string;
+  /** Bike class (round 7); default rookie. Stored in the session recording's header. */
+  bike?: BikeClass;
 }): Promise<LoadedSession> {
   const now = new Date();
-  const sim = await createSim(opts.trackId, opts.seed);
+  const sim = await createSim(opts.trackId, opts.seed, undefined, { bike: opts.bike });
   const sessionId = opts.sessionId ?? `${opts.trackId}-${stampId(now)}`;
   const dir = sessionDir(opts.trackId, sessionId);
   if (fs.existsSync(path.join(dir, 'state.json'))) throw new Error(`session already exists: ${sessionId}`);
@@ -137,7 +140,8 @@ export async function createSession(opts: {
     trackId: opts.trackId,
     seed: sim.seed,
     physicsHz: sim.hz,
-    note: `stranger ${sessionId} agent=${opts.agent} src=${srcFingerprint()}`,
+    bike: sim.bike,
+    note: `stranger ${sessionId} agent=${opts.agent} bike=${sim.bike} src=${srcFingerprint()}`,
   });
   const state: PersistedState = {
     schema: 1,
@@ -198,7 +202,8 @@ export function resolveSessionDir(sessionId: string | undefined, trackId: string
 export async function loadSession(dir: string): Promise<LoadedSession> {
   const raw = JSON.parse(fs.readFileSync(path.join(dir, 'state.json'), 'utf8')) as PersistedState;
   if (raw.kind !== 'stranger-state' || raw.schema !== 1) throw new Error(`bad state file in ${dir}`);
-  const sim = await createSim(raw.trackId, raw.seed, raw.physicsHz);
+  // state.json keeps the header as an object (no decode), so `bike` survives there.
+  const sim = await createSim(raw.trackId, raw.seed, raw.physicsHz, { bike: raw.recording.header.bike });
   if (sim.physicsName !== raw.physics) {
     throw new Error(`physics changed since session start (${raw.physics} -> ${sim.physicsName}); start a new session`);
   }

@@ -2,11 +2,12 @@
   "schema": 1,
   "kind": "track-reflex-metrics",
   "trackId": "b3-kicker-row",
+  "bike": "rookie",
   "tier": "beginner",
   "technique": "jump and level in the air",
-  "updatedAt": "2026-09-14T16:25:47.040Z",
+  "updatedAt": "2026-09-14T19:20:11.458Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "9d316566",
+  "srcFingerprint": "4c6d9739",
   "attemptsBand": [
     1,
     2
@@ -22,55 +23,33 @@
       ],
       "attempts": [
         2,
-        3,
-        2
+        2,
+        1
       ],
       "medianAttempts": 2,
       "clears": 3,
       "finishTimes": [
-        57.19166666666667,
-        67.3,
-        64.54166666666667
+        62.46666666666667,
+        55.975,
+        50.516666666666666
       ],
-      "medianFinishTime": 64.54166666666667,
-      "bestX": 462.38755197774424,
+      "medianFinishTime": 55.975,
+      "bestX": 461.7378151782597,
       "deaths": [
         {
-          "obstacle": "ground @ 240 m",
-          "x": 240,
+          "obstacle": "ground @ 145 m",
+          "x": 145,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "nose-low": 1
+            "nose-high": 1
           }
         },
         {
-          "obstacle": "gap @ 305.8 m",
-          "x": 305.8,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "gap @ 325.8 m",
-          "x": 325.8,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "drop-ahead-lean-back": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 345 m",
-          "x": 345,
+          "obstacle": "ground @ 365 m",
+          "x": 365,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -81,9 +60,9 @@
         }
       ],
       "runs": [
-        "20260914-112546-8a2679",
-        "20260914-112546-89c3a4",
-        "20260914-112547-a3988c"
+        "20260914-142011-74f3c9",
+        "20260914-142011-03336e",
+        "20260914-142011-e93e34"
       ]
     }
   ]

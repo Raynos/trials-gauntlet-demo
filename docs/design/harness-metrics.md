@@ -87,6 +87,131 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 7 status — bike class through the harness, goldens per class, the physics-suite
+
+**Finding.** `header.bike` does not survive a decode: `validateHeader` in `src/core/replay.ts` copies `note` but not
+`bike`, and the binary layout has no field for it (`decodeAny(encodeJSON({bike:'pro'})).header.bike === undefined`, same
+for binary). `Game.runRecording` reads `rec.header.bike` *after* decoding, so through the game's own path every Pro
+recording replays on Rookie — the Pro flat-test golden then stops at x 86.7 m (rookie sim, `4e1b2c79…`) instead of
+finishing (pro sim, `1cbec09b…`). `src/game/ghost.ts` reads the same field for the PB ghost, so a PB set on Pro ghosts
+on Rookie today. The harness works around it (`loadRecording` re-reads `bike` from the raw JSON; `openGame` installs
+`window.__trialsRunAs(json)`, which parses the raw header and for `pro` does `setBike('pro')` + `loadTrack` +
+`skipCountdown` + the same per-tick `setInput`/`step(1)` loop `runRecording` runs; every browser path uses it), and every
+Pro golden below is node hash == page hash through that path. **Requested src change (core-game):** copy `bike` in
+`validateHeader`, add a class byte to the binary header; then `__trialsRunAs` collapses to `runRecording`.
+
+**Second finding (physics 42bdfe0 vs the round-6 goldens, tracks owner).** At skill 3 the Rookie bot no longer clears
+**x1** (50 attempts, walled at 399 m on open ground, 54 %; twice, once at loadavg 4) or **x3** (50 attempts, all at the
+gap @ 150.4 m, 30 %), both cleared in ≤ 2 attempts last round; the Pro bot clears both in **1 attempt** (x1 41.4 s, x3
+30.2 s). Conversely the Pro bot cannot clear **m2** (50 attempts at the logpile @ 425.4 m, 88 % — the same obstacle the
+Pro reflex player dies on ×30) or **m3** (50 attempts, 219 m, 45 %), which Rookie clears in 1. Every other track clears
+on both classes in 1–2 attempts; Pro is 6–8 s faster on every 30–40 s track (real CdA + sharper throttle).
+
+| piece | as built |
+|---|---|
+| **bike class** (`lib/sim.ts`) | `createSim(trackId, seed, hz, { bike })` → `world.loadTrack(compiled, seed, { bike })`; `Sim.bike`; `createSimFor(rec)` = the sim a recording's header names; `parseBike('--bike')`. `bot`, `reflex`, `stranger start/prep`, `--all-tracks` sweeps take `--bike rookie\|pro` (default rookie); every recording header carries `bike` (+ `bike=<cls>` in the note); every report/metrics file carries `bike`. Clip/capture pick the class from the recording (`hook.setBike` before `loadTrack`). `harness/trailer/**` untouched (rookie goldens only). |
+| **goldens per class** (`lib/golden.ts`) | `bot-<skill>.json` stays Rookie (no file was renamed); Pro is `bot-<skill>-pro.json`. `goldenOrder(bike)`, `chooseGolden(track, bike)`, `pickGolden(track, log, bike)`, `goldenBike(file)`; `--refresh-goldens` re-proves both sets. Metrics `out/metrics/<track>.json` / `<track>.pro.json`, reflex `<track>.reflex.json` / `<track>.pro.reflex.json`, crash `crash[-pro].json`. |
+| **determinism** (`gate/determinism.ts`) | all page evaluates `setBike` before `loadTrack`; D1/D3/D5/D7 replay through `__trialsRunAs`; D2 carries the class over the binary round trip (the binary has no field); D7 primes 600 ticks on the *other* class first (a Pro golden after Rookie play and vice versa); **D4c foreign snapshot** (new): a snapshot from sim A restored into a fresh sim B continues identically at 4 (k, m) pairs — the check physics v2 is accepted against, not only the same-instance D4; D8 pins per class (`expected.json` keys `<track>` / `<track>:pro`). `snapshot-probe.ts` exports `snapshotProbe()` and names the class. |
+| **gate** (`gate/ship-gate.ts`) | G2b `clear.pro.flat` + `clear.pro.b1`: the fingerprint-matched `bot-3-pro.json` of flat-test and b1 replayed in the page, finish bit-equal + hash vs `expected.json[<track>:pro]` (pinned with `--pin` / first run); G10 third row `reflex.medianAttempts.pro` (same tracks, from `<track>.pro.reflex.json`; informational by design — the band is authored for the tier's default bike — but every number is in `ship-gate.json.reflexPro`). 25 checks now. |
+| **`pnpm harness:physics-suite`** (`harness/physics-suite.ts`) | one command, one JSON + md, against whatever `src/physics` exports: identity → feel envelope (`vitest run src/physics`, every `FEEL <q> = <v> [band]` line parsed, band-checked when the band is `a-b`, `< x`, `<= x`, `|q| < x`, else info) → determinism D1–D8 + D4c + snapshot-probe per class → naive sweep (skill 2, 1 seed, 90 s/track) → bot skill-3 clears on b1/e1/m1/h1/x1 per class, each browser-verified → reflex `average` × 3 seeds on b1–e3 per class → camera box on the b3 golden clip (`harness:clip` as a child) → stranger CLI smoke (start/look/play/crash-respawn/restart/reset/status, recording node == browser, session removed afterwards). `--bike both`, `--quick`, `--skip …`, `--tag`; `ACCEPT`/`REJECT`, exit = FAIL count; output `out/physics-suite/<stamp>-<physics>-<tag>.{json,md}` + `latest.*`; the round's run is committed as `out/metrics/physics-suite.md`. To accept v2: run with `--tag v2`, diff against `…-v1-42bdfe0.json`. |
+| **timelapse** | ledger appended 54 → 79 commits (77 built + captured; 2 pre-package.json scaffolds skipped). `render.mts` now resolves `--out` absolutely (a relative `--out` doubled the path prefix inside ffmpeg's concat list — round-7 fix). Wave-1 montage `harness/out/timelapse/progress-wave1.mp4`: 94ecb43 (v0.1.0) → 1946a80 storyboards → 42bdfe0 physics r11 → ffe63dd render recipe → 8f4d67d art → ae92c9a garage/PWA → f468cb0 (latest, appended by the renderer), 30.0 s, **19.3 MiB** (crf 22 re-encode of the 26.1 MB render). |
+| **shared-checkout hygiene** | The Pro pass from h1 on hit `MISMATCH node ac178ce8 != browser 0f091653` (browser faults 15, node 0): `src/physics/bike.ts` was being edited in the working tree (physics v2 work in flight, `src/physics/v2/` untracked) while `dist/` was from 13:39. Everything from there on — Pro h1–x3, the Rookie x1/x3 re-runs, `--refresh-goldens`, the reflex matrix, the gate and the physics-suite — ran in a **`git archive HEAD` copy (46443e5) in the scratchpad with this round's `harness/` overlaid**, offline `pnpm install`, its own `vite build`, src fingerprint **4c6d9739**; results copied back (`inputs/`, `out/metrics/`, `gate/expected.json`, `out/physics-suite/`). Numbers below are that tree's. |
+
+### Goldens, skill 3, one seed, sequential, every clear browser-verified (node hash == page hash)
+
+| track | Rookie attempts | Rookie finish | Pro attempts | Pro finish | note |
+|---|---:|---:|---:|---:|---|
+| flat-test | 1 | 7.092 | 1 | 6.142 | gate G2 / G2b goldens |
+| gap-test | 1 | 4.275 | 1 | 3.533 | |
+| b1-first-ride | 1 | 33.933 | 1 | 27.325 | gate G2b |
+| b2-lean-back | 1 | 34.200 | 1 | 27.608 | |
+| b3-kicker-row | 1 | 28.667 | 2 | 29.492 | |
+| e1-uphill-weight | 1 | 36.250 | 1 | 29.492 | |
+| e2-rear-wheel-first | 1 | 37.492 | 1 | 29.800 | |
+| e3-stairway | 1 | 33.300 | 1 | 26.925 | |
+| m1-hop-up | 1 | 29.050 | 1 | 23.608 | |
+| m2-drum-roll | 1 | 34.233 | 50 (cap) | — 88 % | Pro walled at the logpile @ 425.4 m |
+| m3-see-saw | 1 | 33.358 | 50 (cap) | — 45 % | Pro walled at 219 m (open ground) |
+| h1-wheelie-wire | 1 | 38.575 | 2 | 32.958 | |
+| h2-gap-chain | 1 | 41.525 | 1 | 31.667 | |
+| h3-fire-line | 1 | 35.242 | 1 | 29.175 | |
+| x1-vertical-limit | 50 (cap) | — 54 % | 1 | 41.367 | Rookie walled at 399 m (open ground); old bot-3.json stale |
+| x2-pipe-dream | 1 | 35.492 | 2 | 32.858 | |
+| x3-gauntlet | 50 (cap) | — 30 % | 1 | 30.208 | Rookie dies at the gap @ 150.4 m; old bot-3.json stale |
+| lab-flat-200 (new, 46443e5) | 1 | 11.175 | 1 | 9.575 | |
+| lab-physics-test (new) | 1 | 6.467 | 1 | 5.475 | |
+
+`--refresh-goldens` on 4c6d9739: 6 fresh, 26 restamped (every round-6 Rookie skill-3 golden that still finishes re-proved
+node == browser), 23 stale (the old lower-skill leftovers plus x1/x3 `bot-3.json`, which no longer finish: 8.8 m / 88.9 m);
+17/19 tracks with a proven Rookie golden before the lab runs, 19/19 after; 17/19 Pro.
+
+### Ship gate (`harness:gate --pin`, frozen HEAD 46443e5, src 4c6d9739, loadavg 5 → 6)
+
+**21/25.** New rows: `clear.pro.flat` PASS (6.1417 s, `0b43233b0a69890a`), `clear.pro.b1` PASS (27.325 s, `6e9c13b78af852ff`),
+`reflex.medianAttempts.pro` informational (b1 1/1.5 · b2 5/3 · b3 6/3 · e1 33/6, 1/4 within the Rookie band). Rookie
+`clear.*` re-pinned on the 42bdfe0 physics (finish 7.0917, `468698322c4ed60d`; canonical-1200 `f687ce0364160cb0`),
+`determinism.pass` 9/9 (D4c included), G10 reflex Rookie armed and within band (b1 1/1.5 · b2 1/3 · b3 2/3 · e1 3/6),
+G10 stranger 0 fresh sessions on this src (round 3 strangers pending). Fails: the three SwiftShader render timings
+(`boot.firstFrameMs` 5276, `restart.frameMsP95` 208, `perf.renderSyncedMsP95` 4068) and `heap.growthMBPer60s` **5.65 MB**
+(limit 5; 9.6 last round). `fault.toControlMs` 41.7 ms, `restart.ticks` 1, `restart.noCountdown` 2 ticks, physics 27.5 µs/tick.
+
+### Reflex `average`, 3 seeds, both classes (`harness:reflex --all-tracks --bike both --seeds 3`, 10 s wall; full tables in `out/metrics/reflex.md`)
+
+| track | band | Rookie attempts → median (clears) | Pro attempts → median (clears) | Pro deaths (top) |
+|---|---|---|---|---|
+| flat-test | — | 1, 1, 1 → 1 (3/3) | 1, 1, 1 → 1 (3/3) | — |
+| gap-test | 1–3 | 2, 1, 1 → 1 (3/3) | 2, 1, 2 → 2 (3/3) | ground @ 40/50 m |
+| b1-first-ride | 1–1 | 1, 1, 2 → 1 (3/3) | 1, 3, 1 → 1 (3/3) | ground @ 95 / 265 m |
+| b2-lean-back | 1–2 | 1, 2, 1 → 1 (3/3) | 2, 5, 7 → 5 (3/3) | ground @ 435 m ×2 |
+| b3-kicker-row | 1–2 | 2, 2, 1 → 2 (3/3) | 7, 6, 3 → 6 (3/3) | ground @ 335 m ×2, ramps @ 387/396 m |
+| e1-uphill-weight | 2–4 | 3, 12, 1 → 3 (3/3) | 11, 33, 51 → 33 (2/3) | ground @ 80 m ×18, 315 m ×15 |
+| e2-rear-wheel-first | 3–5 | 1, 4, 12 → 4 (3/3) | 12, 22, 24 → 22 (3/3) | ramp @ 176.2 m ×23 |
+| e3-stairway | 3–6 | 1, 2, 3 → 2 (3/3) | 11, 10, 20 → 11 (3/3) | stair @ 402.3 m ×10 |
+| m1-hop-up | 5–9 | 3, 7, 7 → 7 (3/3) | 5, 17, 44 → 17 (2/3) | ledge @ 280.3 m ×19 |
+| m2-drum-roll | 6–12 | 11, 31, 31 → 31 (1/3) | 40, 19, 39 → 39 (1/3) | logpile @ 425.4 m ×30 |
+| m3-see-saw | 8–12 | 8, 7, 9 → 8 (3/3) | 32, 12, 30 → 30 (3/3) | box @ 423.9 m ×10 |
+| h1-wheelie-wire | 10–18 | 38, 12, 44 → 38 (1/3) | 48, 41, 24 → 41 (1/3) | ramp @ 172.8 / wall @ 175.8 m ×20 each |
+| h2-gap-chain | 14–22 | 43, 42, 50 → 43 (0/3, 88 %) | 48, 41, 47 → 47 (0/3, 92 %) | ramp @ 437.6 m ×37 |
+| h3-fire-line | 18–25 | 12, 11, 4 → 11 (3/3) | 22, 33, 7 → 22 (3/3) | ledge @ 252.8 m ×16 |
+| x1-vertical-limit | 30–45 | 29, 34, 28 → 29 (0/3, 79 %) | 31, 45, 33 → 33 (0/3, 92 %) | pole @ 675.9 m ×15 |
+| x2-pipe-dream | 40–60 | 51, 51, 43 → 51 (0/3, 72 %) | 41, 51, 47 → 47 (0/3, 78 %) | drum @ 369.4 m ×36 |
+| x3-gauntlet | 60–80 | 26, 33, 22 → 26 (0/3, 94 %) | 39, 45, 42 → 42 (0/3, 95 %) | ramp @ 56.2 m ×34 |
+
+Rookie vs round 6 on the same tracks: b1–e3 unchanged or better (e3 4 → 2, e2 3 → 4), **m2 7 → 31 and 1/3 clears**
+(logpile @ 425.4 m ×36 `stuck-restart` — the same obstacle that walls the Pro bot), h1 now clears on one seed (41 → 38),
+h3 13 → 11. Pro on beginner tracks is a 2–6× attempts multiplier for the average reflex player (b2 5, b3 6, e1 33 —
+`air-brake-nose-down` deaths on open ground: the raw bike over-rotates on the brake in the air where Rookie holds), which
+is the data behind "Pro is not the default below hard".
+
+### Physics-suite, v1 baseline (`pnpm harness:physics-suite --bike both --tag v1-42bdfe0`, frozen 46443e5, 2042 s wall, loadavg 18.7 → 10.7)
+
+`out/metrics/physics-suite.md` (copy of `out/physics-suite/20260914T192455Z-bikePhysicsFactory-v1-42bdfe0.md`). **REJECT: 20 pass,
+3 fail, 9 info** — the three fails are the baseline's own debts, which is what a side-by-side needs: `feel.vitest` (2 of 6 test
+files fail at HEAD), `feel.envelope` 41/45 in band + 70 info — out of band `governor.thr0.3.top` 10.96 [11–13 m/s],
+`wheelie.openLoopLeave.±0.5` 0.77 s [1–2 s], `air.brake0.5s.pitchDeg` −13.5 [−10..−30]; and **`camera.b3` FAIL**: 889 frames,
+bike y down to **0.20** with 37 riding frames out of the [0.2, 0.8] box and 193 frames (21.7 %) clamped to the track bounds —
+the kicker flights (render owner; the round-4 stranger clips already showed the sky during that flight). Everything else:
+determinism 9/9 + snapshot-probe PASS on both classes, sweep 17/19 at skill 2 (h2, x2 at 1 % in 90 s), skill-3 clears
+b1/e1/m1/h1 Rookie + all five Pro browser-verified, x1 Rookie maxAttempts, reflex b1–e3 Rookie all within band, stranger
+smoke 8/8 calls with the session recording node == browser.
+
+### Open
+
+- x1/x3 no longer clear for the Rookie bot at skill 3 (twice, low load) while Pro clears both in 1; m2/m3 the reverse.
+  The tracks owner's "Pro cannot clear" list is **m2, m3**; the "Rookie cannot clear" list is **x1, x3**. `x1/bot-3.json`
+  and `x3/bot-3.json` are stale (round-6 physics) until one of those is fixed; the gate does not use them.
+- `header.bike` dropped by decode (src/core/replay.ts) — the game's PB ghost and any in-game replay of a Pro run are
+  Rookie replays until fixed; the harness routes around it (`__trialsRunAs`).
+- The numbers above are from the frozen HEAD tree (4c6d9739); the working tree's fingerprint moves with the physics v2
+  edits in flight. After the next physics/tracks commit: `pnpm harness:bot --refresh-goldens`, then `harness:gate --pin`.
+- `heap.growthMBPer60s` 5.65 MB (limit 5) — down from 9.6 but still over; the three SwiftShader render timings stay
+  informational on this machine.
+- Camera box fails on the b3 golden at high quality (bike reaches the top edge on the kicker flights, 21.7 % clamped) —
+  first time the clip assertion runs on b3 through the suite; `harness:clip b3-kicker-row` reproduces it.
+- Strangers: 0 fresh sessions on this src (G10 first row informational); round-3 prep is in place (`stranger prep`,
+  `--bike` supported).
+- `harness:reflex --browser` drives the live game on its default bike only (no `setBike` before the countdown yet).
+
 ## Round 6 status — the mirror through the finish line, goldens on the re-authored tracks, stranger round 3 plumbing
 
 **Finding.** Commit cfb02ab made the game own the input after the finish line (`Game.stepFinishCoast`:

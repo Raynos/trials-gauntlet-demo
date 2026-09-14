@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-14T15:17:05.554Z",
+  "updatedAt": "2026-09-14T18:29:33.336Z",
   "commits": [
     {
       "sha": "bca9515abf20db18649a2fbdd5ba793106cd0840",
@@ -1331,6 +1331,631 @@
         "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/47aa67fe1be56aa7a9978013d39007f1d00d55ea/clip.mp4",
         "clipFrames": 120,
         "wallMs": 116683.05829099985,
+        "notes": []
+      }
+    },
+    {
+      "sha": "975e8c27b3d06ad2ac6bb80cc18380e0eefc2c7b",
+      "short": "975e8c2",
+      "date": "2026-09-14T09:12:04-05:00",
+      "subject": "Tracks: every reflex-bot wall was a shape (box edges after gaps, >= 0.35 m risers, hops > 0.5 m, flat landings after drops) — 12 courses re-authored; 13/15 inside band under a human-limited player",
+      "index": 55,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/975e8c27b3d06ad2ac6bb80cc18380e0eefc2c7b/dist",
+        "wallMs": 3396.901625
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/975e8c27b3d06ad2ac6bb80cc18380e0eefc2c7b/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/975e8c27b3d06ad2ac6bb80cc18380e0eefc2c7b/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/975e8c27b3d06ad2ac6bb80cc18380e0eefc2c7b/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/975e8c27b3d06ad2ac6bb80cc18380e0eefc2c7b/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 73813.263208,
+        "notes": []
+      }
+    },
+    {
+      "sha": "3c58a1d70f51954be25584571544fb599ce92d72",
+      "short": "3c58a1d",
+      "date": "2026-09-14T09:34:20-05:00",
+      "subject": "Game: real loading screen — inline first paint, byte-accurate streamed download against a build manifest, named boot steps with long-task red marks",
+      "index": 56,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/3c58a1d70f51954be25584571544fb599ce92d72/dist",
+        "wallMs": 4870.839749999999
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/3c58a1d70f51954be25584571544fb599ce92d72/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/3c58a1d70f51954be25584571544fb599ce92d72/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/3c58a1d70f51954be25584571544fb599ce92d72/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/3c58a1d70f51954be25584571544fb599ce92d72/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 93770.180875,
+        "notes": []
+      }
+    },
+    {
+      "sha": "17abb963e925cf2bda04a4c0ebd66c1ccaad9128",
+      "short": "17abb96",
+      "date": "2026-09-14T09:42:55-05:00",
+      "subject": "Render: art pack wired (banners, photo crowd, plates, skies, decals), glTF rider/bike with hot-swap, camera hard bounds + FOV widen, rider posed from pose.ts; brands gone",
+      "index": 57,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/17abb963e925cf2bda04a4c0ebd66c1ccaad9128/dist",
+        "wallMs": 5015.785917000001
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/17abb963e925cf2bda04a4c0ebd66c1ccaad9128/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/17abb963e925cf2bda04a4c0ebd66c1ccaad9128/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/17abb963e925cf2bda04a4c0ebd66c1ccaad9128/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/17abb963e925cf2bda04a4c0ebd66c1ccaad9128/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 87907.00979100002,
+        "notes": []
+      }
+    },
+    {
+      "sha": "fc337b09686f3a921a749a393197bc3e4b4718bc",
+      "short": "fc337b0",
+      "date": "2026-09-14T09:55:18-05:00",
+      "subject": "Design: pause/results direction chosen from 10 Codex mockups — low centred action bar for landscape thumbs, HUD hidden, Visuals chips, Reload tertiary; SPEC.md with pixel tables",
+      "index": 58,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/fc337b09686f3a921a749a393197bc3e4b4718bc/dist",
+        "wallMs": 4793.876540999976
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/fc337b09686f3a921a749a393197bc3e4b4718bc/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/fc337b09686f3a921a749a393197bc3e4b4718bc/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/fc337b09686f3a921a749a393197bc3e4b4718bc/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/fc337b09686f3a921a749a393197bc3e4b4718bc/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 80464.79025000002,
+        "notes": []
+      }
+    },
+    {
+      "sha": "df7185fc2fbdb6288b221ef0ff467f598ac0f1d2",
+      "short": "df7185f",
+      "date": "2026-09-14T09:59:21-05:00",
+      "subject": "Tracks: x3 trimmed 773 -> 500 m (bot clears in 2), x1 reflex good 13% -> 79%, b3 novice 11 -> 4, m1 13.5 -> 9; 30 m finish run-out with a catch on every track",
+      "index": 59,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/df7185fc2fbdb6288b221ef0ff467f598ac0f1d2/dist",
+        "wallMs": 5145.382082999975
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/df7185fc2fbdb6288b221ef0ff467f598ac0f1d2/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/df7185fc2fbdb6288b221ef0ff467f598ac0f1d2/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/df7185fc2fbdb6288b221ef0ff467f598ac0f1d2/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/df7185fc2fbdb6288b221ef0ff467f598ac0f1d2/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 69273.543833,
+        "notes": []
+      }
+    },
+    {
+      "sha": "58ab71a441764376b76a13a1209678c1b09eb7c9",
+      "short": "58ab71a",
+      "date": "2026-09-14T10:15:13-05:00",
+      "subject": "Trailer: capture/edit/music pipeline (beats from bot goldens, offline game audio, numpy music bed, PIL cards); first cut superseded — captured pre-art-pack with brand banners",
+      "index": 60,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/58ab71a441764376b76a13a1209678c1b09eb7c9/dist",
+        "wallMs": 3700.050125000009
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/58ab71a441764376b76a13a1209678c1b09eb7c9/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/58ab71a441764376b76a13a1209678c1b09eb7c9/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/58ab71a441764376b76a13a1209678c1b09eb7c9/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/58ab71a441764376b76a13a1209678c1b09eb7c9/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 57549.63020800002,
+        "notes": []
+      }
+    },
+    {
+      "sha": "f837365c7564438c6d88d5538b904e8e2243eedd",
+      "short": "f837365",
+      "date": "2026-09-14T10:21:14-05:00",
+      "subject": "Timelapse: 52 commits rebuilt from git archive and shot at the same moment; stills timelapse, milestone clip montage, gif; incremental re-run",
+      "index": 61,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/f837365c7564438c6d88d5538b904e8e2243eedd/dist",
+        "wallMs": 4315.966207999969
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/f837365c7564438c6d88d5538b904e8e2243eedd/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/f837365c7564438c6d88d5538b904e8e2243eedd/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/f837365c7564438c6d88d5538b904e8e2243eedd/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/f837365c7564438c6d88d5538b904e8e2243eedd/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 79167.98600000003,
+        "notes": []
+      }
+    },
+    {
+      "sha": "cfb02ab11e04213ba68eff58844a371bb695cd7c",
+      "short": "cfb02ab",
+      "date": "2026-09-14T10:31:59-05:00",
+      "subject": "Game: finish flow owns the input (coast, auto-brake, post-line fault undone and frozen); pause/results implement the chosen low-action-bar design",
+      "index": 62,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/cfb02ab11e04213ba68eff58844a371bb695cd7c/dist",
+        "wallMs": 4520.3770409999415
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/cfb02ab11e04213ba68eff58844a371bb695cd7c/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/cfb02ab11e04213ba68eff58844a371bb695cd7c/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/cfb02ab11e04213ba68eff58844a371bb695cd7c/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/cfb02ab11e04213ba68eff58844a371bb695cd7c/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 68527.74095799995,
+        "notes": []
+      }
+    },
+    {
+      "sha": "4035559f0198c6d1533c6dfcd79d6fb91b2bc81b",
+      "short": "4035559",
+      "date": "2026-09-14T10:54:46-05:00",
+      "subject": "Render: boot art 2.77 -> 0.99 MB and constructor to WebGL-only; unculled prop batches were drawing 1.0 M tris on b1 (now 290k); finish camera holds",
+      "index": 63,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/4035559f0198c6d1533c6dfcd79d6fb91b2bc81b/dist",
+        "wallMs": 4816.89383299998
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/4035559f0198c6d1533c6dfcd79d6fb91b2bc81b/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/4035559f0198c6d1533c6dfcd79d6fb91b2bc81b/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/4035559f0198c6d1533c6dfcd79d6fb91b2bc81b/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/4035559f0198c6d1533c6dfcd79d6fb91b2bc81b/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 51677.16533300001,
+        "notes": []
+      }
+    },
+    {
+      "sha": "a1dd0838e237c2b1f222d2c20c600d0bf6071a6f",
+      "short": "a1dd083",
+      "date": "2026-09-14T11:04:33-05:00",
+      "subject": "Trailer: 54 s cut re-rendered on the current build (fresh skill-3 goldens, art pack, camera bounds, 0 brand strings); 15 s social cut",
+      "index": 64,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/a1dd0838e237c2b1f222d2c20c600d0bf6071a6f/dist",
+        "wallMs": 4864.905374999973
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a1dd0838e237c2b1f222d2c20c600d0bf6071a6f/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a1dd0838e237c2b1f222d2c20c600d0bf6071a6f/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a1dd0838e237c2b1f222d2c20c600d0bf6071a6f/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a1dd0838e237c2b1f222d2c20c600d0bf6071a6f/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 52062.09795800003,
+        "notes": []
+      }
+    },
+    {
+      "sha": "a4cc50434269f88a78d869464a0cd43351c7d0dc",
+      "short": "a4cc504",
+      "date": "2026-09-14T11:15:22-05:00",
+      "subject": "Render: camera reframe was dead code — view depth negated in the clamp block; b3 kicker now 0/1733 frames out of box",
+      "index": 65,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/a4cc50434269f88a78d869464a0cd43351c7d0dc/dist",
+        "wallMs": 3935.54137500003
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a4cc50434269f88a78d869464a0cd43351c7d0dc/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a4cc50434269f88a78d869464a0cd43351c7d0dc/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a4cc50434269f88a78d869464a0cd43351c7d0dc/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a4cc50434269f88a78d869464a0cd43351c7d0dc/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 43726.838499999954,
+        "notes": []
+      }
+    },
+    {
+      "sha": "94ecb43ba287720ec1b26adab2d671097084cf0c",
+      "short": "94ecb43",
+      "date": "2026-09-14T11:16:53-05:00",
+      "subject": "Tracks: m3 wall at 209 m was a wedge, not a crash — rear wheel slid under a one-way plank's open edge and hung with no body contact; landing lips on every thin plank",
+      "index": 66,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/94ecb43ba287720ec1b26adab2d671097084cf0c/dist",
+        "wallMs": 3765.12508300005
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/94ecb43ba287720ec1b26adab2d671097084cf0c/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/94ecb43ba287720ec1b26adab2d671097084cf0c/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/94ecb43ba287720ec1b26adab2d671097084cf0c/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/94ecb43ba287720ec1b26adab2d671097084cf0c/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 60930.875541000045,
+        "notes": []
+      }
+    },
+    {
+      "sha": "1d2c7b4cf842f1435ea27be0f6bcb7b283728c03",
+      "short": "1d2c7b4",
+      "date": "2026-09-14T11:21:43-05:00",
+      "subject": "Release v0.1.0: pinned build before the mega build at https://trials-gauntlet-v0-1-0.vercel.app",
+      "index": 67,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/1d2c7b4cf842f1435ea27be0f6bcb7b283728c03/dist",
+        "wallMs": 4935.3944159999955
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/1d2c7b4cf842f1435ea27be0f6bcb7b283728c03/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/1d2c7b4cf842f1435ea27be0f6bcb7b283728c03/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/1d2c7b4cf842f1435ea27be0f6bcb7b283728c03/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/1d2c7b4cf842f1435ea27be0f6bcb7b283728c03/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 68500.03491699998,
+        "notes": []
+      }
+    },
+    {
+      "sha": "9f709b5eacdbfb9c9d761640f55078beff6278e4",
+      "short": "9f709b5",
+      "date": "2026-09-14T11:22:48-05:00",
+      "subject": "Mega plan: v0.1.0 -> v0.2.0 — five pillars (hero motion, world as place, clearable by people, complete game, evidence), three overnight waves",
+      "index": 68,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/9f709b5eacdbfb9c9d761640f55078beff6278e4/dist",
+        "wallMs": 5066.438874999993
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/9f709b5eacdbfb9c9d761640f55078beff6278e4/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/9f709b5eacdbfb9c9d761640f55078beff6278e4/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/9f709b5eacdbfb9c9d761640f55078beff6278e4/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/9f709b5eacdbfb9c9d761640f55078beff6278e4/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 53522.719124999945,
+        "notes": []
+      }
+    },
+    {
+      "sha": "ff48bad5abf0bb76c1d871e78f68d69805a314a3",
+      "short": "ff48bad",
+      "date": "2026-09-14T11:37:15-05:00",
+      "subject": "Harness: node rules mirror the finish coast (D3 diverged one tick after the line); 17 goldens regenerated and browser-verified; gate re-pinned 18/22; reflex row armed and in band on b1/b2/b3/e1",
+      "index": 69,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/ff48bad5abf0bb76c1d871e78f68d69805a314a3/dist",
+        "wallMs": 5266.321875000023
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ff48bad5abf0bb76c1d871e78f68d69805a314a3/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ff48bad5abf0bb76c1d871e78f68d69805a314a3/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ff48bad5abf0bb76c1d871e78f68d69805a314a3/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ff48bad5abf0bb76c1d871e78f68d69805a314a3/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 66687.04345900007,
+        "notes": []
+      }
+    },
+    {
+      "sha": "1946a80dcb3b3ac8193e8ad53a7463f2d498b656",
+      "short": "1946a80",
+      "date": "2026-09-14T11:43:40-05:00",
+      "subject": "Tracks: hard/extreme storyboards — same probe-cleared shapes reordered into climbs, hidden features and one named set piece each; decor kinds arch/tunnel and setPieces meta (hash-neutral)",
+      "index": 70,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/1946a80dcb3b3ac8193e8ad53a7463f2d498b656/dist",
+        "wallMs": 5146.731750000035
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/1946a80dcb3b3ac8193e8ad53a7463f2d498b656/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/1946a80dcb3b3ac8193e8ad53a7463f2d498b656/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/1946a80dcb3b3ac8193e8ad53a7463f2d498b656/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/1946a80dcb3b3ac8193e8ad53a7463f2d498b656/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 70898.162458,
+        "notes": []
+      }
+    },
+    {
+      "sha": "c1e2ff38991040bbd834cc17f92bf42f921e213a",
+      "short": "c1e2ff3",
+      "date": "2026-09-14T11:52:29-05:00",
+      "subject": "Strangers, round 3 (12 sessions): b1 1.5 / b2 3.5 / b3 3 / e1 8 / e2 4.5 / e3 8",
+      "index": 71,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/c1e2ff38991040bbd834cc17f92bf42f921e213a/dist",
+        "wallMs": 5344.887000000104
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/c1e2ff38991040bbd834cc17f92bf42f921e213a/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/c1e2ff38991040bbd834cc17f92bf42f921e213a/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/c1e2ff38991040bbd834cc17f92bf42f921e213a/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/c1e2ff38991040bbd834cc17f92bf42f921e213a/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 71014.6483750001,
+        "notes": []
+      }
+    },
+    {
+      "sha": "48243f598cd18ad9c761ad934dae4950b9cf07ad",
+      "short": "48243f5",
+      "date": "2026-09-14T11:57:04-05:00",
+      "subject": "Mega plan: P0 bike physics v2 — research, audit, ground-up design, reimplementation, physics test level; priority over everything",
+      "index": 72,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/48243f598cd18ad9c761ad934dae4950b9cf07ad/dist",
+        "wallMs": 5329.970166000072
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/48243f598cd18ad9c761ad934dae4950b9cf07ad/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/48243f598cd18ad9c761ad934dae4950b9cf07ad/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/48243f598cd18ad9c761ad934dae4950b9cf07ad/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/48243f598cd18ad9c761ad934dae4950b9cf07ad/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 71211.44987500017,
+        "notes": []
+      }
+    },
+    {
+      "sha": "42bdfe0aed3d3efd00bbced862f336f43513dad0",
+      "short": "42bdfe0",
+      "date": "2026-09-14T11:58:16-05:00",
+      "subject": "Physics: Rookie/Pro presets behind loadTrack opts; Rookie wheelie control holds on crests and kicker lips; one-way straddle rule ends the m3 wedge; air brake in band",
+      "index": 73,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/42bdfe0aed3d3efd00bbced862f336f43513dad0/dist",
+        "wallMs": 4528.835291000083
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/42bdfe0aed3d3efd00bbced862f336f43513dad0/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/42bdfe0aed3d3efd00bbced862f336f43513dad0/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/42bdfe0aed3d3efd00bbced862f336f43513dad0/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/42bdfe0aed3d3efd00bbced862f336f43513dad0/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 64516.16495899996,
+        "notes": []
+      }
+    },
+    {
+      "sha": "ffe63ddc11b016373860e4737c4ae9294ed1284d",
+      "short": "ffe63dd",
+      "date": "2026-09-14T12:03:53-05:00",
+      "subject": "Render: industrial recipe — density moved to deck level (37-74 props in frame, was ~10), windows above the eyeline, real sodium spots, key from the camera side; art library request bugs fixed (every prior hall capture had been procedural); glTF hero default",
+      "index": 74,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/ffe63ddc11b016373860e4737c4ae9294ed1284d/dist",
+        "wallMs": 4603.909125000006
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ffe63ddc11b016373860e4737c4ae9294ed1284d/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ffe63ddc11b016373860e4737c4ae9294ed1284d/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ffe63ddc11b016373860e4737c4ae9294ed1284d/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ffe63ddc11b016373860e4737c4ae9294ed1284d/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 56302.4267500001,
+        "notes": []
+      }
+    },
+    {
+      "sha": "8f4d67deeec236088567ddc681356d86b7376063",
+      "short": "8f4d67d",
+      "date": "2026-09-14T12:06:19-05:00",
+      "subject": "Art: app icon (wheelie silhouette, picked at 60 px from three candidates), iOS/maskable/favicon exports, OG card; garage bike renders; 15 track thumbnails from real renders; graffiti/posters cut to <= 40 KB; ribboned medals",
+      "index": 75,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/8f4d67deeec236088567ddc681356d86b7376063/dist",
+        "wallMs": 3715.500499999849
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/8f4d67deeec236088567ddc681356d86b7376063/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/8f4d67deeec236088567ddc681356d86b7376063/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/8f4d67deeec236088567ddc681356d86b7376063/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/8f4d67deeec236088567ddc681356d86b7376063/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 47676.42162499996,
+        "notes": []
+      }
+    },
+    {
+      "sha": "ae92c9af1fbaf5541f66d0902846f88be2b96e2c",
+      "short": "ae92c9a",
+      "date": "2026-09-14T12:08:03-05:00",
+      "subject": "Game: garage with Rookie/Pro plumbed into physics, PB per bike class, local run telemetry + ?perf=1, PWA (manifest, icons, service worker with a verified update->reload toast), onboarding card, lock lines",
+      "index": 76,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/ae92c9af1fbaf5541f66d0902846f88be2b96e2c/dist",
+        "wallMs": 4450.10079200007
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ae92c9af1fbaf5541f66d0902846f88be2b96e2c/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ae92c9af1fbaf5541f66d0902846f88be2b96e2c/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ae92c9af1fbaf5541f66d0902846f88be2b96e2c/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ae92c9af1fbaf5541f66d0902846f88be2b96e2c/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 70109.300208,
+        "notes": []
+      }
+    },
+    {
+      "sha": "6281428905a5a346c2578fe3b86e0e44051c7baf",
+      "short": "6281428",
+      "date": "2026-09-14T12:08:57-05:00",
+      "subject": "Trailer: drop unused marks (unblocks harness typecheck)",
+      "index": 77,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/6281428905a5a346c2578fe3b86e0e44051c7baf/dist",
+        "wallMs": 5230.388290999923
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/6281428905a5a346c2578fe3b86e0e44051c7baf/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/6281428905a5a346c2578fe3b86e0e44051c7baf/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/6281428905a5a346c2578fe3b86e0e44051c7baf/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/6281428905a5a346c2578fe3b86e0e44051c7baf/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 62542.448083000025,
+        "notes": []
+      }
+    },
+    {
+      "sha": "31d4f78ee5b26adb916d5767644ebb149a21543b",
+      "short": "31d4f78",
+      "date": "2026-09-14T12:12:31-05:00",
+      "subject": "Game: art round-2 wiring — real-render track thumbnails, garage bike renders + plate, credits plate; manifest icons incl. 1024",
+      "index": 78,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/31d4f78ee5b26adb916d5767644ebb149a21543b/dist",
+        "wallMs": 3846.777791999979
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/31d4f78ee5b26adb916d5767644ebb149a21543b/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/31d4f78ee5b26adb916d5767644ebb149a21543b/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/31d4f78ee5b26adb916d5767644ebb149a21543b/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/31d4f78ee5b26adb916d5767644ebb149a21543b/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 69187.43391699996,
+        "notes": []
+      }
+    },
+    {
+      "sha": "f468cb07bac2aaa7adaf49ab26ac030382240bc1",
+      "short": "f468cb0",
+      "date": "2026-09-14T12:43:13-05:00",
+      "subject": "Research: raw Trials techniques + bikes dossier (sub-agent output saved verbatim before the session-limit cut)",
+      "index": 79,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/f468cb07bac2aaa7adaf49ab26ac030382240bc1/dist",
+        "wallMs": 5152.177791999886
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/f468cb07bac2aaa7adaf49ab26ac030382240bc1/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/f468cb07bac2aaa7adaf49ab26ac030382240bc1/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/f468cb07bac2aaa7adaf49ab26ac030382240bc1/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/f468cb07bac2aaa7adaf49ab26ac030382240bc1/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 66893.09762499994,
         "notes": []
       }
     }

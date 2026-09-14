@@ -1,6 +1,7 @@
 /**
  * Browser-side verification of a recording: the same bytes through
- * `window.__trials.runRecording` must hash identically to the node sim.
+ * `window.__trials.runRecording` must hash identically to the node sim
+ * (`__trialsRunAs`, lib/hook.ts, routes a Pro recording onto the Pro bike).
  * Reuses one server + browser across calls.
  */
 import { encodeJSON, type InputRecording } from '../../src/core/replay';
@@ -48,7 +49,7 @@ export class BrowserVerifier {
         const t = window.__trials!;
         const t0 = performance.now();
         t.drainEvents();
-        const state = t.runRecording(j);
+        const state = (window.__trialsRunAs ?? t.runRecording)(j);
         const events = t.drainEvents();
         return {
           hash: t.hashState(),

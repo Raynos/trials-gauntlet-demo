@@ -2,11 +2,12 @@
   "schema": 1,
   "kind": "track-reflex-metrics",
   "trackId": "e1-uphill-weight",
+  "bike": "rookie",
   "tier": "easy",
   "technique": "lean forward on steep climbs",
-  "updatedAt": "2026-09-14T16:25:47.167Z",
+  "updatedAt": "2026-09-14T19:20:11.623Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "9d316566",
+  "srcFingerprint": "4c6d9739",
   "attemptsBand": [
     2,
     4
@@ -21,20 +22,42 @@
         847839321
       ],
       "attempts": [
-        1,
-        1,
-        2
+        3,
+        12,
+        1
       ],
-      "medianAttempts": 1,
+      "medianAttempts": 3,
       "clears": 3,
       "finishTimes": [
-        61.541666666666664,
-        60.958333333333336,
-        67.8
+        66.9,
+        119.875,
+        60.68333333333333
       ],
-      "medianFinishTime": 61.541666666666664,
-      "bestX": 543.4449902833518,
+      "medianFinishTime": 66.9,
+      "bestX": 543.2783342494696,
       "deaths": [
+        {
+          "obstacle": "ramp @ 308.8 m",
+          "x": 308.789782,
+          "count": 11,
+          "reasons": {
+            "crash": 11
+          },
+          "rules": {
+            "air-brake-nose-down": 11
+          }
+        },
+        {
+          "obstacle": "ground @ 380 m",
+          "x": 380,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
         {
           "obstacle": "ramp @ 445.0 m",
           "x": 445.006136,
@@ -48,9 +71,9 @@
         }
       ],
       "runs": [
-        "20260914-112547-1e7070",
-        "20260914-112547-4cfbc5",
-        "20260914-112547-7cc237"
+        "20260914-142011-392ba1",
+        "20260914-142011-c09309",
+        "20260914-142011-337ed5"
       ]
     }
   ]

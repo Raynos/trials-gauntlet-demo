@@ -34,7 +34,7 @@ import { HARNESS_DIR } from '../lib/paths';
 import { loadRecording } from '../lib/recording';
 import { ensureOut, writeJson } from '../lib/report';
 import type { DeterminismCheck, DeterminismReport } from '../lib/schema';
-import { createSim } from '../lib/sim';
+import { createSimFor } from '../lib/sim';
 import { synthesizeRecording } from '../lib/synth';
 import { BrowserVerifier } from '../lib/verify';
 
@@ -45,6 +45,11 @@ export interface ExpectedEntry {
   canonical1200?: { hash: string; physics: string };
 }
 export type Expected = Record<string, ExpectedEntry>;
+
+/** `expected.json` key: `<trackId>` for Rookie (unchanged from every earlier pin), `<trackId>:pro` for Pro. */
+export function expectedKey(trackId: string, bike?: string | undefined): string {
+  return bike && bike !== 'rookie' ? `${trackId}:${bike}` : trackId;
+}
 
 export function loadExpected(): Expected {
   if (!fs.existsSync(EXPECTED_FILE)) return {};
@@ -64,7 +69,7 @@ interface BrowserRunResult {
 async function runInPage(page: Page, json: string): Promise<BrowserRunResult> {
   return page.evaluate((j) => {
     const t = window.__trials!;
-    const state = t.runRecording(j);
+    const state = (window.__trialsRunAs ?? t.runRecording)(j);
     return { hash: t.hashState(), finishTime: state.finishTime, tick: state.tick, state };
   }, json);
 }
@@ -73,8 +78,9 @@ async function runInPage(page: Page, json: string): Promise<BrowserRunResult> {
 async function pageHashesRange(page: Page, rec: InputRecording, every: number, to: number): Promise<string[]> {
   const frames = expandFrames(rec).slice(0, to);
   return page.evaluate(
-    ([fr, ev, id, seed]) => {
+    ([fr, ev, id, seed, bike]) => {
       const t = window.__trials!;
+      if (t.setBike) t.setBike(bike);
       t.loadTrack(id, seed);
       const out: string[] = [];
       for (let i = 0; i < fr.length; i++) {
@@ -84,14 +90,14 @@ async function pageHashesRange(page: Page, rec: InputRecording, every: number, t
       }
       return out;
     },
-    [frames, every, rec.header.trackId, rec.header.seed] as const,
+    [frames, every, rec.header.trackId, rec.header.seed, rec.header.bike ?? 'rookie'] as const,
   );
 }
 
 async function bisectNodeVsBrowser(page: Page, rec: InputRecording): Promise<{ firstDivergentTick: number; diffPaths: string[] }> {
   const frames = expandFrames(rec);
   const n = frames.length;
-  const sim = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
+  const sim = await createSimFor(rec);
   const nodeHashes: string[] = [];
   const nodeStates: PhysicsState[] = [];
   for (let i = 0; i < n; i++) {
@@ -120,8 +126,9 @@ async function bisectNodeVsBrowser(page: Page, rec: InputRecording): Promise<{ f
   }
   if (first < 0) return { firstDivergentTick: -1, diffPaths: ['<no per-tick divergence found; final hash differs — check drainEvents/post-run state>'] };
   const browserState = await page.evaluate(
-    ([fr, id, seed, upto]) => {
+    ([fr, id, seed, upto, bike]) => {
       const t = window.__trials!;
+      if (t.setBike) t.setBike(bike);
       t.loadTrack(id, seed);
       for (let i = 0; i <= upto; i++) {
         t.setInput(fr[i]!);
@@ -129,7 +136,7 @@ async function bisectNodeVsBrowser(page: Page, rec: InputRecording): Promise<{ f
       }
       return t.getState();
     },
-    [frames.slice(0, first + 1), rec.header.trackId, rec.header.seed, first] as const,
+    [frames.slice(0, first + 1), rec.header.trackId, rec.header.seed, first, rec.header.bike ?? 'rookie'] as const,
   );
   return { firstDivergentTick: first, diffPaths: diffState(nodeStates[first], browserState) };
 }
@@ -183,9 +190,11 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
   });
 
   // D2 cross-encoding (node)
+  // The binary layout carries no bike field (src/core/replay.ts): D2 is a frame-encoding check, so the class is carried over.
   const viaBin = decodeBinary(encodeBinary(rec));
-  const simA = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
-  const simB = await createSim(viaBin.header.trackId, viaBin.header.seed, viaBin.header.physicsHz);
+  if (rec.header.bike) viaBin.header.bike = rec.header.bike;
+  const simA = await createSimFor(rec);
+  const simB = await createSimFor(viaBin);
   const hA = simA.run(frames).hash;
   const hB = simB.run(expandFrames(viaBin)).hash;
   push({ id: 'D2', name: 'cross-encoding', pass: hA === hB && frameCount(viaBin) === frames.length, hashes: [hA, hB] });
@@ -213,7 +222,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
   let d4Note = '';
   const drive = (i: number): InputFrame => frames[i % Math.max(1, frames.length)] ?? frames[frames.length - 1]!;
   for (const [k, m] of pairs) {
-    const sim = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
+    const sim = await createSimFor(rec);
     for (let i = 0; i < k; i++) sim.step(drive(i));
     const snap = sim.snap();
     const b64 = encodeSnapshot(snap.physics, snap.counters);
@@ -235,13 +244,44 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
   }
   push({ id: 'D4', name: 'snapshot-node', pass: d4Pass, hashes: d4Hashes, ...(d4Note ? { note: d4Note } : {}) });
 
+  // D4c foreign snapshot (round 7): a snapshot taken in sim A restored into a *fresh* sim B (never stepped,
+  // same track/seed/class) must continue exactly like A — the snapshot is the whole world, not a delta on
+  // an instance's private caches. Physics v2 is accepted against this, not only against the same-instance D4.
+  {
+    const hashes: string[] = [];
+    let pass = true;
+    let note = '';
+    for (const [k, m] of pairs) {
+      const A = await createSimFor(rec);
+      for (let i = 0; i < k; i++) A.step(drive(i));
+      const snap = A.snap();
+      const B = await createSimFor(rec);
+      B.restore(snap);
+      if (A.hash() !== B.hash()) {
+        pass = false;
+        note += `(${k}) restore into a fresh sim differs before any step: ${diffState(A.state(), B.state()).slice(0, 5).join(',')}; `;
+      }
+      for (let i = 0; i < m; i++) {
+        A.step(drive(k + i));
+        B.step(drive(k + i));
+      }
+      hashes.push(A.hash());
+      if (A.hash() !== B.hash()) {
+        pass = false;
+        note += `(${k},${m}) diverges after ${m} ticks: ${diffState(A.state(), B.state()).slice(0, 5).join(',')}; `;
+      }
+    }
+    push({ id: 'D4c', name: 'foreign-snapshot', pass, hashes, ...(note ? { note } : {}) });
+  }
+
   // D4b snapshot round trip in the browser through the hook's base64 path
   {
     const page = await launched.context.newPage();
     await openGame(page, server.url);
     const r = await page.evaluate(
-      ([fr, id, seed]) => {
+      ([fr, id, seed, bike]) => {
         const t = window.__trials!;
+        if (t.setBike) t.setBike(bike);
         const out: string[] = [];
         for (const [k, m] of [
           [0, 1],
@@ -268,7 +308,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
         }
         return out;
       },
-      [frames, rec.header.trackId, rec.header.seed] as const,
+      [frames, rec.header.trackId, rec.header.seed, rec.header.bike ?? 'rookie'] as const,
     );
     await page.close();
     let pass = true;
@@ -281,8 +321,9 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
     const page = await launched.context.newPage();
     await openGame(page, server.url);
     const r = await page.evaluate(
-      ([runs, id, seed, j]) => {
+      ([runs, id, seed, j, bike]) => {
         const t = window.__trials!;
+        if (t.setBike) t.setBike(bike);
         const out: string[] = [];
         for (const chunk of [1, 7, 15, 120]) {
           t.loadTrack(id, seed);
@@ -297,11 +338,11 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
           }
           out.push(t.hashState());
         }
-        t.runRecording(j);
+        (window.__trialsRunAs ?? t.runRecording)(j);
         out.push(t.hashState());
         return out;
       },
-      [rec.runs, rec.header.trackId, rec.header.seed, json] as const,
+      [rec.runs, rec.header.trackId, rec.header.seed, json, rec.header.bike ?? 'rookie'] as const,
     );
     await page.close();
     push({ id: 'D5', name: 'chunking', pass: r.every((h) => h === r[0]), hashes: r, note: 'chunks 1,7,15,120 + runRecording' });
@@ -312,15 +353,17 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
     const page = await launched.context.newPage();
     await openGame(page, server.url);
     const r = await page.evaluate(
-      ([id, seed, j]) => {
+      ([id, seed, j, bike]) => {
         const t = window.__trials!;
+        // Leak probe on the *other* class too: a Pro golden runs 600 ticks of Rookie first, and vice versa.
+        if (t.setBike) t.setBike(bike === 'pro' ? 'rookie' : 'pro');
         t.loadTrack(id, (seed + 1) >>> 0);
         t.setInput({ throttle: 1, lean: -0.5 });
         t.step(600);
-        t.runRecording(j);
+        (window.__trialsRunAs ?? t.runRecording)(j);
         return t.hashState();
       },
-      [rec.header.trackId, rec.header.seed, json] as const,
+      [rec.header.trackId, rec.header.seed, json, rec.header.bike ?? 'rookie'] as const,
     );
     await page.close();
     push({ id: 'D7', name: 'no-state-leak', pass: r === first.hash, hashes: [r, first.hash] });
@@ -328,11 +371,11 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
 
   // D8 pinned canonical hash (node): 1200 ticks of the synthesized wiggle input
   {
-    const sim = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
+    const sim = await createSimFor(rec);
     const canon = synthesizeRecording({ trackId: rec.header.trackId, seed: rec.header.seed, physicsHz: rec.header.physicsHz, seconds: 1200 / rec.header.physicsHz, style: 'wiggle' });
     const h = sim.run(expandFrames(canon)).hash;
     const expected = loadExpected();
-    const entry = (expected[rec.header.trackId] ??= {});
+    const entry = (expected[expectedKey(rec.header.trackId, rec.header.bike)] ??= {});
     const pinned = entry.canonical1200;
     if (!pinned || o.pin || pinned.physics !== sim.physicsName) {
       entry.canonical1200 = { hash: h, physics: sim.physicsName };

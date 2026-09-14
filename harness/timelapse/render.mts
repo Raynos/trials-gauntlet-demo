@@ -66,7 +66,9 @@ async function py(args: string[]): Promise<string> {
 }
 
 export async function render(o: RenderOptions = {}): Promise<RenderReport> {
-  const outDir = o.outDir ?? OUT_DIR;
+  // Absolute: ffmpeg's concat demuxer resolves relative `file` entries against the list's own directory, so a
+  // relative `--out` doubled the prefix (round 7).
+  const outDir = path.resolve(o.outDir ?? OUT_DIR);
   const width = o.width ?? 1280;
   const height = o.height ?? 720;
   const fps = o.fps ?? 30;

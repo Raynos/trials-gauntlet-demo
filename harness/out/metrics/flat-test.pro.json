@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "flat-test",
+  "bike": "pro",
+  "updatedAt": "2026-09-14T18:32:47.631Z",
+  "physics": "bikePhysicsFactory",
+  "attemptsBand": null,
+  "targetAttempts": 1,
+  "curve": [
+    {
+      "skill": 2,
+      "seeds": [
+        3277865877
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        6.191666666666666
+      ]
+    },
+    {
+      "skill": 3,
+      "seeds": [
+        3277865877
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        6.141666666666667
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260914-124754-993616",
+    "20260914-133239-09c902"
+  ]
+}

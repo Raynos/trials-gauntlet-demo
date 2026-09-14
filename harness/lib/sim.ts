@@ -10,8 +10,10 @@
  * restart edge and the run clock behave exactly as in the page.
  */
 import {
+  DEFAULT_BIKE,
   DEFAULT_PHYSICS_HZ,
   NEUTRAL_INPUT,
+  type BikeClass,
   type CompiledTrack,
   type GameEvent,
   type GamePhase,
@@ -20,6 +22,7 @@ import {
   type PhysicsState,
   type TrackDef,
 } from '../../src/core/types';
+import type { InputRecording } from '../../src/core/replay';
 import { hashPhysicsState } from '../../src/core/hash';
 import { compileTrack, getTrack, listTrackIds } from '../../src/tracks';
 import * as physicsModule from '../../src/physics';
@@ -38,6 +41,8 @@ export interface Sim {
   compiled: CompiledTrack;
   hz: number;
   seed: number;
+  /** Bike class the track was loaded with (`loadTrack(track, seed, { bike })`, physics round 11). */
+  bike: BikeClass;
   /** Which physics implementation was resolved ('bikePhysicsFactory' | 'createBikePhysics' | 'MockPhysics'). */
   physicsName: string;
   /** One game tick; returns the game events it produced. */
@@ -89,15 +94,32 @@ export function requireTrack(trackId: string): TrackDef {
   return def;
 }
 
-export async function createSim(trackId: string, seed?: number, hz: number = DEFAULT_PHYSICS_HZ): Promise<Sim> {
+export interface SimOptions {
+  /** Bike class (round 7): 'rookie' (default, the pre-garage bike to the byte) or 'pro'. */
+  bike?: BikeClass | undefined;
+}
+
+export function parseBike(v: unknown, fallback: BikeClass = DEFAULT_BIKE): BikeClass {
+  if (v === undefined || v === null || v === '' || v === true) return fallback;
+  if (v === 'rookie' || v === 'pro') return v;
+  throw new Error(`--bike: '${String(v)}' is not rookie|pro`);
+}
+
+/** A sim for a recording: its track, seed, hz and bike class (`header.bike`, absent = rookie). */
+export function createSimFor(rec: InputRecording): Promise<Sim> {
+  return createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz, { bike: rec.header.bike });
+}
+
+export async function createSim(trackId: string, seed?: number, hz: number = DEFAULT_PHYSICS_HZ, opts: SimOptions = {}): Promise<Sim> {
   const { factory, name } = await resolvePhysicsFactory();
   const track = requireTrack(trackId);
   const compiled = compileTrack(track);
   const world = factory(hz);
   const theSeed = (seed ?? track.seed) >>> 0;
+  const bike: BikeClass = opts.bike ?? DEFAULT_BIKE;
   const rules = new RunRules(world, hz);
   const load = (): void => {
-    world.loadTrack(compiled, theSeed);
+    world.loadTrack(compiled, theSeed, { bike });
     world.drainEvents();
     rules.go();
     rules.drainEvents();
@@ -118,6 +140,7 @@ export async function createSim(trackId: string, seed?: number, hz: number = DEF
     compiled,
     hz,
     seed: theSeed,
+    bike,
     physicsName: name,
     step,
     run(frames) {

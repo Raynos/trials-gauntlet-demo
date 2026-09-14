@@ -2,11 +2,12 @@
   "schema": 1,
   "kind": "track-reflex-metrics",
   "trackId": "b2-lean-back",
+  "bike": "rookie",
   "tier": "beginner",
   "technique": "weight shift on drops",
-  "updatedAt": "2026-09-14T16:25:46.924Z",
+  "updatedAt": "2026-09-14T19:20:11.350Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "9d316566",
+  "srcFingerprint": "4c6d9739",
   "attemptsBand": [
     1,
     2
@@ -23,45 +24,34 @@
       "attempts": [
         1,
         2,
-        2
+        1
       ],
-      "medianAttempts": 2,
+      "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        60.13333333333333,
-        65.925,
-        68.64166666666667
+        59.575,
+        69.94166666666666,
+        57.55
       ],
-      "medianFinishTime": 65.925,
-      "bestX": 596.9427642687884,
+      "medianFinishTime": 59.575,
+      "bestX": 596.725714149876,
       "deaths": [
         {
-          "obstacle": "ground @ 45 m",
-          "x": 45,
+          "obstacle": "ground @ 585 m",
+          "x": 585,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "air-brake-nose-down": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 450 m",
-          "x": 450,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-high": 1
+            "nose-low": 1
           }
         }
       ],
       "runs": [
-        "20260914-112546-7da44f",
-        "20260914-112546-257f37",
-        "20260914-112546-879e85"
+        "20260914-142011-543872",
+        "20260914-142011-2bd4aa",
+        "20260914-142011-47d1c6"
       ]
     }
   ]

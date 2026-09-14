@@ -21,7 +21,8 @@ import { HARNESS_DIR } from '../lib/paths';
 import { saveRecording } from '../lib/recording';
 import { fail, writeJson } from '../lib/report';
 import type { ReflexDeath, ReflexRunReport, ReflexSkill, ReflexTrackMetrics } from '../lib/schema';
-import { createSim, listSimTracks, type Sim } from '../lib/sim';
+import { createSim, listSimTracks, parseBike, type Sim } from '../lib/sim';
+import { DEFAULT_BIKE, type BikeClass } from '../../src/core/types';
 import { BrowserVerifier } from '../lib/verify';
 import { ReflexBrowser } from './browser';
 import { SKILLS, type SkillName } from './controller';
@@ -32,8 +33,17 @@ const OUT_DIR = path.join(HARNESS_DIR, 'out', 'reflex');
 /** The tracks the stranger round judges (gate G10); the calibration targets. */
 export const CALIBRATION_TRACKS = ['b1-first-ride', 'b2-lean-back', 'b3-kicker-row', 'e1-uphill-weight'] as const;
 
+/** `<track>.reflex.json` is the Rookie table (as always); Pro lands in `<track>.pro.reflex.json`. */
+export function reflexMetricsFile(trackId: string, bike: BikeClass = DEFAULT_BIKE): string {
+  return path.join(METRICS_DIR, `${trackId}${bike === DEFAULT_BIKE ? '' : `.${bike}`}.reflex.json`);
+}
+
+function bikeSuffix(bike: BikeClass): string {
+  return bike === DEFAULT_BIKE ? '' : `-${bike}`;
+}
+
 function recordingOf(sim: Sim, frames: InputFrame[], note: string): InputRecording {
-  const rec = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, note: `${note} src=${srcFingerprint()}` });
+  const rec = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, bike: sim.bike, note: `${note} bike=${sim.bike} src=${srcFingerprint()}` });
   for (const f of frames) rec.push(f);
   return rec.toRecording();
 }
@@ -47,9 +57,10 @@ export interface RunOnce {
   recording: InputRecording;
 }
 
-export async function runOnce(trackId: string, seed: number, skill: SkillName, o: { attemptsCap?: number; maxSimSeconds?: number; verbose?: boolean }): Promise<RunOnce> {
+export async function runOnce(trackId: string, seed: number, skill: SkillName, o: { attemptsCap?: number; maxSimSeconds?: number; verbose?: boolean; bike?: BikeClass }): Promise<RunOnce> {
   const started = new Date();
-  const sim = await createSim(trackId, seed);
+  const bike = o.bike ?? DEFAULT_BIKE;
+  const sim = await createSim(trackId, seed, undefined, { bike });
   const res = playReflex(sim, {
     skill,
     seed,
@@ -59,9 +70,9 @@ export async function runOnce(trackId: string, seed: number, skill: SkillName, o
   });
   const recording = recordingOf(sim, res.frames, `reflex skill=${skill} outcome=${res.outcome} attempts=${res.attempts} reaction=${(res.reactionS * 1000).toFixed(0)}ms`);
   // A fresh sim replaying the recording must land on the same state: the frames are the play.
-  const fresh = await createSim(trackId, seed);
+  const fresh = await createSim(trackId, seed, undefined, { bike });
   const replay = fresh.run(res.frames);
-  const meta = runMeta('reflex', started, { physics: sim.physicsName });
+  const meta = runMeta('reflex', started, { physics: sim.physicsName, bike });
   const runDir = path.join(OUT_DIR, trackId);
   const report: ReflexRunReport = {
     ...meta,
@@ -81,7 +92,7 @@ export async function runOnce(trackId: string, seed: number, skill: SkillName, o
     deaths: res.faults.map(toDeath),
     faultsByCheckpoint: faultsByCheckpoint(res.faults, sim.track.checkpoints.length),
     rules: res.rules,
-    recordingFile: path.join(runDir, `${meta.runId}-${skill}.rec.json`),
+    recordingFile: path.join(runDir, `${meta.runId}-${skill}${bikeSuffix(bike)}.rec.json`),
     playHash: res.finalHash,
     replayHash: replay.hash,
     replayFaithful: replay.hash === res.finalHash,
@@ -90,7 +101,7 @@ export async function runOnce(trackId: string, seed: number, skill: SkillName, o
   };
   if (!report.replayFaithful) console.error(`  [reflex] WARNING replay hash ${replay.hash} != play hash ${res.finalHash} (physics is not deterministic under a straight replay)`);
   saveRecording(report.recordingFile, recording);
-  writeJson(path.join(runDir, `${meta.runId}-${skill}.json`), report);
+  writeJson(path.join(runDir, `${meta.runId}-${skill}${bikeSuffix(bike)}.json`), report);
   return { report, recording };
 }
 
@@ -123,8 +134,8 @@ export function printRunLine(r: ReflexRunReport): void {
   );
 }
 
-export function loadTrackMetrics(trackId: string): ReflexTrackMetrics | null {
-  const f = path.join(METRICS_DIR, `${trackId}.reflex.json`);
+export function loadTrackMetrics(trackId: string, bike: BikeClass = DEFAULT_BIKE): ReflexTrackMetrics | null {
+  const f = reflexMetricsFile(trackId, bike);
   if (!fs.existsSync(f)) return null;
   try {
     return JSON.parse(fs.readFileSync(f, 'utf8')) as ReflexTrackMetrics;
@@ -134,7 +145,7 @@ export function loadTrackMetrics(trackId: string): ReflexTrackMetrics | null {
 }
 
 function updateTrackMetrics(sim: Sim, bySkill: Map<SkillName, ReflexRunReport[]>, browser?: ReflexRunReport[]): ReflexTrackMetrics {
-  const prev = loadTrackMetrics(sim.track.id);
+  const prev = loadTrackMetrics(sim.track.id, sim.bike);
   const fp = srcFingerprint();
   const rows = new Map<string, ReflexTrackMetrics['bySkill'][number]>();
   // Rows from an earlier run on the same physics + src survive; a src change starts over.
@@ -160,6 +171,7 @@ function updateTrackMetrics(sim: Sim, bySkill: Map<SkillName, ReflexRunReport[]>
     schema: 1,
     kind: 'track-reflex-metrics',
     trackId: sim.track.id,
+    bike: sim.bike,
     tier: sim.track.tier,
     technique: sim.track.meta?.technique ?? '',
     updatedAt: new Date().toISOString(),
@@ -182,7 +194,7 @@ function updateTrackMetrics(sim: Sim, bySkill: Map<SkillName, ReflexRunReport[]>
   } else if (prev?.browser && prev.physics === sim.physicsName && prev.srcFingerprint === fp) {
     metrics.browser = prev.browser;
   }
-  writeJson(path.join(METRICS_DIR, `${sim.track.id}.reflex.json`), metrics);
+  writeJson(reflexMetricsFile(sim.track.id, sim.bike), metrics);
   return metrics;
 }
 
@@ -281,10 +293,10 @@ async function browserRuns(trackId: string, skill: SkillName, n: number, flags: 
   return out;
 }
 
-async function runTrack(trackId: string, skills: SkillName[], seeds: number, flags: ReturnType<typeof parseArgs>['flags']): Promise<{ metrics: ReflexTrackMetrics; runs: RunOnce[] }> {
-  const probe = await createSim(trackId);
+async function runTrack(trackId: string, skills: SkillName[], seeds: number, flags: ReturnType<typeof parseArgs>['flags'], bike: BikeClass = DEFAULT_BIKE): Promise<{ metrics: ReflexTrackMetrics; runs: RunOnce[] }> {
+  const probe = await createSim(trackId, undefined, undefined, { bike });
   const baseSeed = flags.seed !== undefined ? flagNum(flags, 'seed', probe.seed) : probe.seed;
-  const o = { attemptsCap: flagNum(flags, 'attempts-cap', 50), maxSimSeconds: flagNum(flags, 'max-sim-seconds', 300), verbose: flagBool(flags, 'verbose') };
+  const o = { attemptsCap: flagNum(flags, 'attempts-cap', 50), maxSimSeconds: flagNum(flags, 'max-sim-seconds', 300), verbose: flagBool(flags, 'verbose'), bike };
   const bySkill = new Map<SkillName, ReflexRunReport[]>();
   const all: RunOnce[] = [];
   for (const skill of skills) {
@@ -306,8 +318,8 @@ async function runTrack(trackId: string, skills: SkillName[], seeds: number, fla
         const b = await v.run(best.recording);
         best.report.browserHash = b.hash;
         best.report.browserVerified = b.hash === best.report.playHash;
-        writeJson(path.join(OUT_DIR, trackId, `${best.report.runId}-${best.report.skill}.json`), best.report);
-        console.log(`verify: ${best.report.runId} skill=${best.report.skill} node ${best.report.playHash} browser ${b.hash} ${best.report.browserVerified ? 'IDENTICAL' : 'MISMATCH'} (browser faults=${b.faults}, attempts-1=${best.report.attempts - 1})`);
+        writeJson(path.join(OUT_DIR, trackId, `${best.report.runId}-${best.report.skill}${bikeSuffix(bike)}.json`), best.report);
+        console.log(`verify: ${best.report.runId} skill=${best.report.skill} bike=${bike} node ${best.report.playHash} browser ${b.hash} ${best.report.browserVerified ? 'IDENTICAL' : 'MISMATCH'} (browser faults=${b.faults}, attempts-1=${best.report.attempts - 1})`);
         if (!best.report.browserVerified) process.exitCode = 1;
       } finally {
         await v.close();
@@ -315,6 +327,7 @@ async function runTrack(trackId: string, skills: SkillName[], seeds: number, fla
     }
   }
   const nBrowser = flagNum(flags, 'browser', 0);
+  if (nBrowser > 0 && bike !== DEFAULT_BIKE) fail(`--browser drives the live game on its default bike; --bike ${bike} is node-only for now`);
   const browser = nBrowser > 0 ? await browserRuns(trackId, skills[0]!, nBrowser, flags) : undefined;
   const metrics = updateTrackMetrics(probe, bySkill, browser);
   return { metrics, runs: all };
@@ -369,35 +382,50 @@ async function main(): Promise<void> {
     console.log(calibrationMarkdown(CALIBRATION_TRACKS, skill));
     return;
   }
+  const bikeFlag = flags.bike;
+  const bikes: BikeClass[] = bikeFlag === 'both' || bikeFlag === 'rookie,pro' ? ['rookie', 'pro'] : [parseBike(bikeFlag)];
   if (flagBool(flags, 'all-tracks')) {
     const only = typeof flags.tracks === 'string' ? flags.tracks.split(',') : null;
     const ids = listSimTracks().filter((id) => !only || only.includes(id));
     const started = new Date();
-    const rows: ReflexTrackMetrics[] = [];
-    console.log(`reflex sweep: skill=${skill} seeds=${seeds} src=${srcFingerprint()} tracks=${ids.length}`);
-    for (const id of ids) rows.push((await runTrack(id, [skill], seeds, flags)).metrics);
+    const sections: string[] = [];
+    for (const bike of bikes) {
+      const rows: ReflexTrackMetrics[] = [];
+      const t0 = new Date();
+      console.log(`reflex sweep: bike=${bike} skill=${skill} seeds=${seeds} src=${srcFingerprint()} tracks=${ids.length}`);
+      for (const id of ids) rows.push((await runTrack(id, [skill], seeds, flags, bike)).metrics);
+      sections.push(
+        [
+          `## ${bike === 'pro' ? 'Pro' : 'Rookie'} bike — skill ${skill}, ${seeds} seed(s), physics ${rows[0]?.physics ?? '?'}, src ${srcFingerprint()}, ${t0.toISOString()}, wall ${((Date.now() - t0.getTime()) / 1000).toFixed(0)} s`,
+          '',
+          tableMarkdown(rows, skill),
+          '',
+        ].join('\n'),
+      );
+      console.log(`\n${tableMarkdown(rows, skill)}`);
+    }
     const md = [
-      `# Reflex bot — skill ${skill}, ${seeds} seed(s), physics ${rows[0]?.physics ?? '?'}, src ${srcFingerprint()}, ${started.toISOString()}, wall ${((Date.now() - started.getTime()) / 1000).toFixed(0)} s`,
+      `# Reflex bot — skill ${skill}, ${seeds} seed(s), bikes ${bikes.join(' + ')}, src ${srcFingerprint()}, ${started.toISOString()}, wall ${((Date.now() - started.getTime()) / 1000).toFixed(0)} s`,
       '',
-      `Reaction ${SKILLS[skill].reactionS.map((s) => `${(s * 1000).toFixed(0)}`).join('–')} ms, glances ${SKILLS[skill].perceiveHz} Hz, pitch noise ±${SKILLS[skill].pitchNoiseDeg}°, speed noise ±${(SKILLS[skill].speedNoiseFrac * 100).toFixed(0)}%, taps ${(SKILLS[skill].tapS * 1000).toFixed(0)} ms, lapses every ~${SKILLS[skill].lapseMeanS} s. attempts = 1 + faults (all reasons); cap ${flagNum(flags, 'attempts-cap', 50)}; sim cap ${flagNum(flags, 'max-sim-seconds', 300)} s.`,
+      `Reaction ${SKILLS[skill].reactionS.map((s) => `${(s * 1000).toFixed(0)}`).join('–')} ms, glances ${SKILLS[skill].perceiveHz} Hz, pitch noise ±${SKILLS[skill].pitchNoiseDeg}°, speed noise ±${(SKILLS[skill].speedNoiseFrac * 100).toFixed(0)}%, taps ${(SKILLS[skill].tapS * 1000).toFixed(0)} ms, lapses every ~${SKILLS[skill].lapseMeanS} s. attempts = 1 + faults (all reasons); cap ${flagNum(flags, 'attempts-cap', 50)}; sim cap ${flagNum(flags, 'max-sim-seconds', 300)} s. Rookie = \`<track>.reflex.json\`, Pro = \`<track>.pro.reflex.json\`; the band is authored for the tier's default bike.`,
       '',
-      tableMarkdown(rows, skill),
-      '',
-      `## Calibration against the stranger sessions`,
+      ...sections,
+      `## Calibration against the stranger sessions (Rookie)`,
       '',
       calibrationMarkdown(CALIBRATION_TRACKS, skill),
       '',
     ].join('\n');
     fs.writeFileSync(path.join(METRICS_DIR, 'reflex.md'), md);
-    console.log(`\n${tableMarkdown(rows, skill)}\n\nreflex sweep: harness/out/metrics/reflex.md wall=${((Date.now() - started.getTime()) / 1000).toFixed(0)}s`);
+    console.log(`\nreflex sweep: harness/out/metrics/reflex.md bikes=${bikes.join(',')} wall=${((Date.now() - started.getTime()) / 1000).toFixed(0)}s`);
     return;
   }
   const trackId = positional[0];
   if (!trackId) fail('usage: harness/reflex/reflex.ts <trackId> [--skill novice|average|good] [--seeds N] [--attempts-cap 50] [--browser N] | --all-tracks | --calibrate');
   const skills: SkillName[] = flagBool(flags, 'all-skills') ? ['novice', 'average', 'good'] : [skill];
-  const { metrics } = await runTrack(trackId, skills, seeds, flags);
+  const bike = bikes.length === 1 ? bikes[0]! : fail('--bike both is for --all-tracks; pick rookie or pro for one track');
+  const { metrics } = await runTrack(trackId, skills, seeds, flags, bike);
   console.log(`\n${tableMarkdown([metrics], skills[0]!)}`);
-  console.log(`metrics: harness/out/metrics/${trackId}.reflex.json ${metrics.bySkill.map((s) => `${s.skill}:${s.medianAttempts}`).join(' ')}${metrics.browser ? ` browser:${metrics.browser.medianAttempts} (fps ${metrics.browser.fps.map((f) => f.toFixed(0)).join('/')}, roundTrip ${metrics.browser.roundTrips.every(Boolean) ? 'all' : 'SOME FAIL'})` : ''}`);
+  console.log(`metrics: ${path.relative(process.cwd(), reflexMetricsFile(trackId, bike))} ${metrics.bySkill.map((s) => `${s.skill}:${s.medianAttempts}`).join(' ')}${metrics.browser ? ` browser:${metrics.browser.medianAttempts} (fps ${metrics.browser.fps.map((f) => f.toFixed(0)).join('/')}, roundTrip ${metrics.browser.roundTrips.every(Boolean) ? 'all' : 'SOME FAIL'})` : ''}`);
 }
 
 const isEntry = process.argv[1] !== undefined && path.resolve(process.argv[1]) === new URL(import.meta.url).pathname;

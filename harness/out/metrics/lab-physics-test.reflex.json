@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "lab-physics-test",
+  "bike": "rookie",
+  "tier": "medium",
+  "technique": "the bunny hop",
+  "updatedAt": "2026-09-14T19:20:15.530Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "4c6d9739",
+  "attemptsBand": [
+    3,
+    8
+  ],
+  "finishX": 100,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        3707397683,
+        3707397684,
+        3707397685
+      ],
+      "attempts": [
+        1,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        9.233333333333333,
+        9.066666666666666,
+        9.05
+      ],
+      "medianFinishTime": 9.066666666666666,
+      "bestX": 104.46781406511032,
+      "deaths": [],
+      "runs": [
+        "20260914-142015-9c53a3",
+        "20260914-142015-9adedf",
+        "20260914-142015-3f7e4e"
+      ]
+    }
+  ]
+}

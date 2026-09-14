@@ -2,11 +2,12 @@
   "schema": 1,
   "kind": "track-reflex-metrics",
   "trackId": "e2-rear-wheel-first",
+  "bike": "rookie",
   "tier": "easy",
   "technique": "rear-wheel-first gap landing",
-  "updatedAt": "2026-09-14T16:25:47.323Z",
+  "updatedAt": "2026-09-14T19:20:11.805Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "9d316566",
+  "srcFingerprint": "4c6d9739",
   "attemptsBand": [
     3,
     5
@@ -21,57 +22,59 @@
         2125781360
       ],
       "attempts": [
-        3,
-        5,
-        1
+        1,
+        4,
+        12
       ],
-      "medianAttempts": 3,
+      "medianAttempts": 4,
       "clears": 3,
       "finishTimes": [
-        88.81666666666666,
-        91.6,
-        69.375
+        67.01666666666667,
+        83.83333333333333,
+        134.66666666666666
       ],
-      "medianFinishTime": 88.81666666666666,
-      "bestX": 621.2848494360693,
+      "medianFinishTime": 83.83333333333333,
+      "bestX": 621.0513202223001,
       "deaths": [
         {
           "obstacle": "ramp @ 66.0 m",
           "x": 66,
-          "count": 2,
+          "count": 4,
           "reasons": {
-            "crash": 1,
-            "hazard": 1
+            "hazard": 4
           },
           "rules": {
-            "air-gas-nose-up": 2
+            "air-gas-nose-up": 3,
+            "air-level": 1
           }
         },
         {
-          "obstacle": "ramp @ 57.0 m",
-          "x": 57,
-          "count": 1,
+          "obstacle": "ramp @ 176.2 m",
+          "x": 176.2,
+          "count": 3,
           "reasons": {
-            "crash": 1
+            "hazard": 3
           },
           "rules": {
-            "air-gas-nose-up": 1
+            "air-gas-nose-up": 3
           }
         },
         {
-          "obstacle": "ramp @ 265.2 m",
-          "x": 265.2,
-          "count": 1,
+          "obstacle": "ramp @ 515.4 m",
+          "x": 515.4,
+          "count": 3,
           "reasons": {
-            "crash": 1
+            "hazard": 3
           },
           "rules": {
-            "nose-high": 1
+            "air-gas-nose-up": 1,
+            "hop-preload": 1,
+            "air-level": 1
           }
         },
         {
-          "obstacle": "ramp @ 302.2 m",
-          "x": 302.2,
+          "obstacle": "box @ 184.2 m",
+          "x": 184.2,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -81,21 +84,43 @@
           }
         },
         {
-          "obstacle": "ramp @ 515.4 m",
-          "x": 515.4,
+          "obstacle": "ground @ 205 m",
+          "x": 205,
           "count": 1,
           "reasons": {
-            "hazard": 1
+            "crash": 1
           },
           "rules": {
-            "air-gas-nose-up": 1
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 255 m",
+          "x": 255,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 494.4 m",
+          "x": 494.4,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
           }
         }
       ],
       "runs": [
-        "20260914-112547-991bce",
-        "20260914-112547-4f25c3",
-        "20260914-112547-314b71"
+        "20260914-142011-7c19da",
+        "20260914-142011-64d2e3",
+        "20260914-142011-521ed2"
       ]
     }
   ]

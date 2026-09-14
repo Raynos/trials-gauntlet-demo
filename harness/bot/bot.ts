@@ -20,15 +20,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { InputRecorder, quantizeInput, type InputRecording } from '../../src/core/replay';
-import type { InputFrame } from '../../src/core/types';
+import { DEFAULT_BIKE, type BikeClass, type InputFrame } from '../../src/core/types';
 import { flagBool, flagNum, parseArgs } from '../lib/args';
 import { faultsByCheckpoint, freshFingerprint, median, percentileOf, restartEdges, runMeta, srcFingerprint } from '../lib/metrics';
 import { HARNESS_DIR } from '../lib/paths';
 import { saveRecording } from '../lib/recording';
 import { fail, writeJson } from '../lib/report';
 import type { Blocker, BotRunReport, Skill, SweepReport, SweepRow, TrackBotMetrics } from '../lib/schema';
-import { refreshGoldens } from '../lib/golden';
-import { createSim, listSimTracks, type Sim } from '../lib/sim';
+import { goldenSuffix, refreshGoldens } from '../lib/golden';
+import { createSim, listSimTracks, parseBike, type Sim } from '../lib/sim';
 import { BrowserVerifier } from '../lib/verify';
 import { formatActions } from './actions';
 import { configFor, playTrack } from './play';
@@ -41,13 +41,19 @@ export function skillLabel(skill: Skill): string {
   return skill === 'oracle' ? 'oracle' : String(skill);
 }
 
-export function goldenFile(trackId: string, skill: Skill): string {
-  return path.join(INPUTS_DIR, trackId, `bot-${skillLabel(skill)}.json`);
+export function goldenFile(trackId: string, skill: Skill, bike: BikeClass = DEFAULT_BIKE): string {
+  return path.join(INPUTS_DIR, trackId, `bot-${skillLabel(skill)}${goldenSuffix(bike)}.json`);
+}
+
+/** Metrics file per class: `<track>.json` (rookie, as always) / `<track>.pro.json`. */
+export function metricsFile(trackId: string, bike: BikeClass = DEFAULT_BIKE): string {
+  return path.join(METRICS_DIR, `${trackId}${bike === DEFAULT_BIKE ? '' : `.${bike}`}.json`);
 }
 
 export function recordingFromFrames(sim: Sim, frames: InputFrame[], note: string): InputRecording {
-  // `src=<fingerprint>` lets the gate pick goldens recorded on this physics (ship-gate pickGolden).
-  const rec = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, note: `${note} src=${srcFingerprint()}` });
+  // `src=<fingerprint>` lets the gate pick goldens recorded on this physics (ship-gate pickGolden);
+  // `bike` = the class the frames were played on (header field + note, since decode drops the field).
+  const rec = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, bike: sim.bike, note: `${note} bike=${sim.bike} src=${srcFingerprint()}` });
   for (const f of frames) rec.push(f);
   return rec.toRecording();
 }
@@ -77,10 +83,11 @@ export async function runOnce(
   trackId: string,
   seed: number,
   skill: Skill,
-  o: { budgetMs?: number; maxAttempts?: number; maxSimSeconds?: number; maxWallMs?: number; verbose?: boolean },
+  o: { budgetMs?: number; maxAttempts?: number; maxSimSeconds?: number; maxWallMs?: number; verbose?: boolean; bike?: BikeClass },
 ): Promise<RunOnce> {
   const started = new Date();
-  const sim = await createSim(trackId, seed);
+  const bike = o.bike ?? DEFAULT_BIKE;
+  const sim = await createSim(trackId, seed, undefined, { bike });
   const config = configFor(skill, o.budgetMs);
   const limits: Partial<{ maxAttempts: number; maxSimSeconds: number; maxWallMs: number }> = {};
   if (o.maxAttempts !== undefined) limits.maxAttempts = o.maxAttempts;
@@ -95,7 +102,7 @@ export async function runOnce(
   });
   const recording = recordingFromFrames(sim, res.frames, `bot skill=${skillLabel(skill)} outcome=${res.outcome}`);
   // Node hash: replay the recording from a fresh sim so it is the recording's hash, not the search's.
-  const fresh = await createSim(trackId, seed);
+  const fresh = await createSim(trackId, seed, undefined, { bike });
   // Tick-by-tick: the replay must retrace the committed play exactly. A divergence means
   // the search's snapshot/restore left the world in a state a straight run never reaches
   // (physics snapshot() misses state) — the recording is then not evidence of the play.
@@ -112,7 +119,7 @@ export async function runOnce(
   }
   const planWall = res.plans.map((p) => p.wallMs);
   const runDir = path.join(HARNESS_DIR, 'out', 'bot', trackId);
-  const meta = runMeta('bot', started, { physics: sim.physicsName });
+  const meta = runMeta('bot', started, { physics: sim.physicsName, bike: sim.bike });
   const report: BotRunReport = {
     ...meta,
     kind: 'bot',
@@ -200,8 +207,8 @@ function bestOf(runs: RunOnce[]): RunOnce | null {
   return sorted[0] ?? null;
 }
 
-export function loadTrackMetrics(trackId: string): TrackBotMetrics | null {
-  const f = path.join(METRICS_DIR, `${trackId}.json`);
+export function loadTrackMetrics(trackId: string, bike: BikeClass = DEFAULT_BIKE): TrackBotMetrics | null {
+  const f = metricsFile(trackId, bike);
   if (!fs.existsSync(f)) return null;
   try {
     return JSON.parse(fs.readFileSync(f, 'utf8')) as TrackBotMetrics;
@@ -211,7 +218,7 @@ export function loadTrackMetrics(trackId: string): TrackBotMetrics | null {
 }
 
 function updateTrackMetrics(sim: Sim, bySkill: Map<Skill, RunOnce[]>): TrackBotMetrics {
-  const prev = loadTrackMetrics(sim.track.id);
+  const prev = loadTrackMetrics(sim.track.id, sim.bike);
   const curveMap = new Map<string, TrackBotMetrics['curve'][number]>();
   // A physics change invalidates the old curve: start over.
   if (prev && prev.physics === sim.physicsName) for (const c of prev.curve) curveMap.set(skillLabel(c.skill), c);
@@ -253,6 +260,7 @@ function updateTrackMetrics(sim: Sim, bySkill: Map<Skill, RunOnce[]>): TrackBotM
     schema: 1,
     kind: 'track-bot-metrics',
     trackId: sim.track.id,
+    bike: sim.bike,
     updatedAt: new Date().toISOString(),
     physics: sim.physicsName,
     attemptsBand: band,
@@ -263,7 +271,7 @@ function updateTrackMetrics(sim: Sim, bySkill: Map<Skill, RunOnce[]>): TrackBotM
     singleWall,
     runs: [...(prev && prev.physics === sim.physicsName ? prev.runs : []), ...[...bySkill.values()].flat().map((r) => r.report.runId)].slice(-40),
   };
-  writeJson(path.join(METRICS_DIR, `${sim.track.id}.json`), metrics);
+  writeJson(metricsFile(sim.track.id, sim.bike), metrics);
   return metrics;
 }
 
@@ -271,7 +279,7 @@ function updateTrackMetrics(sim: Sim, bySkill: Map<Skill, RunOnce[]>): TrackBotM
  * Crash probe: find the earliest non-restart fault within 8 s using
  * aggressive scripted inputs; write inputs/<track>/crash.json.
  */
-export async function crashProbe(trackId: string, seed: number): Promise<{ file: string; faultTick: number; reason: string } | null> {
+export async function crashProbe(trackId: string, seed: number, bike: BikeClass = DEFAULT_BIKE): Promise<{ file: string; faultTick: number; reason: string } | null> {
   const scripts: Array<{ name: string; frame: Partial<InputFrame> }> = [
     { name: 'gas-back', frame: { throttle: 1, lean: -1 } },
     { name: 'gas-fwd', frame: { throttle: 1, lean: 1 } },
@@ -280,7 +288,7 @@ export async function crashProbe(trackId: string, seed: number): Promise<{ file:
   ];
   let best: { name: string; tick: number; reason: string; frames: InputFrame[] } | null = null;
   for (const s of scripts) {
-    const sim = await createSim(trackId, seed);
+    const sim = await createSim(trackId, seed, undefined, { bike });
     const f = quantizeInput(s.frame);
     const frames: InputFrame[] = [];
     const maxTicks = 8 * sim.hz;
@@ -296,27 +304,28 @@ export async function crashProbe(trackId: string, seed: number): Promise<{ file:
     }
   }
   if (!best) return null;
-  const sim = await createSim(trackId, seed);
+  const sim = await createSim(trackId, seed, undefined, { bike });
   // Hold the crashing input a further 0.5 s so the ragdoll is visible, then coast.
   const tail = quantizeInput({});
   const frames = [...best.frames, ...new Array<InputFrame>(Math.round(sim.hz * 0.5)).fill(best.frames[0]!), ...new Array<InputFrame>(sim.hz).fill(tail)];
   const rec = recordingFromFrames(sim, frames, `crash probe ${best.name}: ${best.reason} at tick ${best.tick}`);
-  const file = path.join(INPUTS_DIR, trackId, 'crash.json');
+  const file = path.join(INPUTS_DIR, trackId, `crash${goldenSuffix(bike)}.json`);
   saveRecording(file, rec);
   return { file, faultTick: best.tick, reason: best.reason };
 }
 
 
 /** --all-tracks: budget-capped committed play on every registered track; one summary table per skill. */
-async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number, skill: Skill): Promise<{ report: SweepReport; md: string; fp0: string; started: Date }> {
+export async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number, skill: Skill): Promise<{ report: SweepReport; md: string; fp0: string; started: Date }> {
   const started = new Date();
   const trackWallS = flagNum(flags, 'track-wall-s', 120);
   const budget = flags.budget !== undefined ? flagNum(flags, 'budget', 0) : undefined;
   const only = typeof flags.tracks === 'string' ? flags.tracks.split(',') : null;
   const ids = listSimTracks().filter((id) => !only || only.includes(id));
   const rows: SweepRow[] = [];
-  const first = await createSim(ids[0]!);
-  console.log(`sweep: physics=${first.physicsName} src=${srcFingerprint()} skill=${skillLabel(skill)} seeds=${seeds} trackWall=${trackWallS}s tracks=${ids.length}`);
+  const bike = parseBike(flags.bike);
+  const first = await createSim(ids[0]!, undefined, undefined, { bike });
+  console.log(`sweep: physics=${first.physicsName} src=${srcFingerprint()} bike=${bike} skill=${skillLabel(skill)} seeds=${seeds} trackWall=${trackWallS}s tracks=${ids.length}`);
   const fp0 = srcFingerprint();
   for (const id of ids) {
     const sim = await createSim(id);
@@ -325,7 +334,7 @@ async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number
     if (freshFingerprint() !== fp0) console.error(`WARNING src/physics|tracks changed on disk during the sweep (${fp0} -> ${freshFingerprint()}); this process still runs the code it loaded at start. Re-run the sweep.`);
     for (let k = 0; k < seeds; k++) {
       const seed = (sim.seed + k) >>> 0;
-      const o: Parameters<typeof runOnce>[3] = { maxWallMs: trackWallS * 1000, verbose: flagBool(flags, 'verbose') };
+      const o: Parameters<typeof runOnce>[3] = { maxWallMs: trackWallS * 1000, verbose: flagBool(flags, 'verbose'), bike };
       if (budget !== undefined) o.budgetMs = budget;
       const r = await runOnce(id, seed, skill, o);
       runs.push(r);
@@ -369,7 +378,7 @@ async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number
     if (best && best.report.outcome === 'finished') saveRecording(goldenFile(id, skill), best.recording);
   }
   const report: SweepReport = {
-    ...runMeta('sweep', started, { physics: first.physicsName }),
+    ...runMeta('sweep', started, { physics: first.physicsName, bike: first.bike }),
     kind: 'sweep',
     skill,
     seeds,
@@ -445,18 +454,19 @@ async function main(): Promise<void> {
       ? ['oracle']
       : [Math.max(0, Math.min(3, Math.round(flagNum(flags, 'skill', 3)))) as 0 | 1 | 2 | 3];
   const track = trackId!;
-  const probe = await createSim(track);
+  const bike = parseBike(flags.bike);
+  const probe = await createSim(track, undefined, undefined, { bike });
   const baseSeed = flags.seed !== undefined ? flagNum(flags, 'seed', probe.seed) : probe.seed;
-  console.log(`bot ${track}: physics=${probe.physicsName} hz=${probe.hz} finishX=${probe.track.finishX} checkpoints=${probe.track.checkpoints.length} skills=[${skills.map(skillLabel).join(',')}] seeds=${seeds}`);
+  console.log(`bot ${track}: physics=${probe.physicsName} bike=${bike} hz=${probe.hz} finishX=${probe.track.finishX} checkpoints=${probe.track.checkpoints.length} skills=[${skills.map(skillLabel).join(',')}] seeds=${seeds}`);
 
   if (flagBool(flags, 'crash-probe')) {
-    const r = await crashProbe(track, baseSeed);
+    const r = await crashProbe(track, baseSeed, bike);
     if (r) console.log(`crash-probe: ${r.reason} at tick ${r.faultTick} (${(r.faultTick / probe.hz).toFixed(2)}s) -> ${r.file}`);
     else console.log(`crash-probe: no non-restart fault within 8 s on ${probe.physicsName} (no crash.json written)`);
   }
 
   const bySkill = new Map<Skill, RunOnce[]>();
-  const runOpts: Parameters<typeof runOnce>[3] = { verbose };
+  const runOpts: Parameters<typeof runOnce>[3] = { verbose, bike };
   if (budget !== undefined) runOpts.budgetMs = budget;
   if (flags['max-attempts'] !== undefined) runOpts.maxAttempts = flagNum(flags, 'max-attempts', 50);
   if (flags['max-sim-seconds'] !== undefined) runOpts.maxSimSeconds = flagNum(flags, 'max-sim-seconds', 300);
@@ -491,9 +501,9 @@ async function main(): Promise<void> {
           anyMismatch = true;
           console.error(`MISMATCH skill=${skillLabel(skill)}: node ${best.report.nodeHash} browser ${b.hash} (browser faults=${b.faults} finish=${b.finishTime})`);
         }
-        writeJson(path.join(HARNESS_DIR, 'out', 'bot', track, `${best.report.runId}-skill${skillLabel(skill)}.json`), best.report);
+        writeJson(path.join(HARNESS_DIR, 'out', 'bot', track, `${best.report.runId}-skill${skillLabel(skill)}${goldenSuffix(bike)}.json`), best.report);
       }
-      const golden = goldenFile(track, skill);
+      const golden = goldenFile(track, skill, bike);
       if (best.report.outcome === 'finished' && best.report.browserVerified !== false) {
         saveRecording(golden, best.recording);
         console.log(`golden: ${path.relative(process.cwd(), golden)} (attempts=${best.report.attempts} finish=${best.report.finishTime?.toFixed(3)} hash=${best.report.nodeHash} verified=${best.report.browserVerified ?? 'skipped'})`);
@@ -506,7 +516,7 @@ async function main(): Promise<void> {
   }
   const metrics = updateTrackMetrics(probe, bySkill);
   console.log(
-    `metrics: harness/out/metrics/${track}.json curve=[${metrics.curve.map((c) => `${skillLabel(c.skill)}:${c.median}`).join(' ')}] par=${metrics.botParTime ?? 'n/a'} shaped=${metrics.shaped ?? 'n/a'}`,
+    `metrics: ${path.relative(process.cwd(), metricsFile(track, bike))} curve=[${metrics.curve.map((c) => `${skillLabel(c.skill)}:${c.median}`).join(' ')}] par=${metrics.botParTime ?? 'n/a'} shaped=${metrics.shaped ?? 'n/a'}`,
   );
   if (anyMismatch) process.exitCode = 1;
 }

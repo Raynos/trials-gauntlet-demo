@@ -42,7 +42,7 @@ import { HARNESS_DIR, OUT_DIR, REPO_ROOT } from './lib/paths';
 import { loadRecording, saveRecording } from './lib/recording';
 import { fail, printKV, writeJson } from './lib/report';
 import type { Skill } from './lib/schema';
-import { createSim } from './lib/sim';
+import { createSim, createSimFor } from './lib/sim';
 
 export const CAPTURE_DIR = path.join(OUT_DIR, 'capture');
 
@@ -61,7 +61,7 @@ export interface RecordingSummary {
 /** Replay a recording in node: attempts, finish, hash (the same numbers the browser must reproduce). */
 export async function summarizeRecording(file: string): Promise<RecordingSummary> {
   const rec = loadRecording(file);
-  const sim = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
+  const sim = await createSimFor(rec);
   const frames = expandFrames(rec);
   const timed: TimedEvent[] = [];
   for (let i = 0; i < frames.length; i++) for (const event of sim.step(frames[i]!)) timed.push({ event, runTick: i + 1 });
@@ -110,7 +110,7 @@ export async function pickBestRecording(trackId: string, log: (l: string) => voi
 
 /** First tick at which bike.x >= x (or null). */
 export async function tickAtX(rec: InputRecording, x: number): Promise<number | null> {
-  const sim = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
+  const sim = await createSimFor(rec);
   const frames = expandFrames(rec);
   for (let i = 0; i < frames.length; i++) {
     sim.step(frames[i]!);

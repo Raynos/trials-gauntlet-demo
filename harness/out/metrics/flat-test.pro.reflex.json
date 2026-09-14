@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "flat-test",
+  "bike": "pro",
+  "tier": "beginner",
+  "technique": "",
+  "updatedAt": "2026-09-14T19:20:15.575Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "4c6d9739",
+  "attemptsBand": null,
+  "finishX": 120,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        3277865877,
+        3277865878,
+        3277865879
+      ],
+      "attempts": [
+        1,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        10.541666666666666,
+        10.141666666666667,
+        10.4
+      ],
+      "medianFinishTime": 10.4,
+      "bestX": 125.21865620556186,
+      "deaths": [],
+      "runs": [
+        "20260914-142015-37710a",
+        "20260914-142015-2c3213",
+        "20260914-142015-6b8300"
+      ]
+    }
+  ]
+}

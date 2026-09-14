@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260914-112616-99b24b",
-  "startedAt": "2026-09-14T16:26:16.270Z",
-  "wallMs": 251704,
-  "git": "9f709b5",
-  "srcFingerprint": "9d316566",
+  "runId": "20260914-142021-a8a52b",
+  "startedAt": "2026-09-14T19:20:21.581Z",
+  "wallMs": 273601,
+  "git": "1d7d448",
+  "srcFingerprint": "4c6d9739",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
   "trackId": "flat-test",
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": true,
   "build": {
-    "distBytes": 14747030,
-    "jsGzipBytes": 389119,
+    "distBytes": 15898009,
+    "jsGzipBytes": 401717,
     "buildMs": 0
   },
   "browser": {
@@ -24,15 +24,15 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 130.18933399999878,
+      "value": 79.06674999999996,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 78/442/146/130/130 min 78 loadavg 8.27/18"
+      "note": "runs 79/445/72/140/72 min 72 loadavg 6.27/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 4554.709999799728,
+      "value": 5275.6449999809265,
       "limit": 4000,
       "pass": false,
       "unit": "ms",
@@ -59,7 +59,21 @@
       "value": true,
       "limit": true,
       "pass": true,
-      "note": "d2b082502561bc00 vs pinned d2b082502561bc00"
+      "note": "468698322c4ed60d vs pinned 468698322c4ed60d"
+    },
+    {
+      "id": "clear.pro.flat",
+      "value": true,
+      "limit": true,
+      "pass": true,
+      "note": "bot-3-pro.json (src matches) finish=6.141666666666667 faults=0 hash 0b43233b0a69890a vs pinned 0b43233b0a69890a (expected finish 6.141666666666667)"
+    },
+    {
+      "id": "clear.pro.b1",
+      "value": true,
+      "limit": true,
+      "pass": true,
+      "note": "bot-3-pro.json (src matches) finish=27.325 faults=0 hash 6e9c13b78af852ff vs pinned 6e9c13b78af852ff (expected finish 27.325)"
     },
     {
       "id": "crash.faultWithinS",
@@ -86,14 +100,14 @@
     },
     {
       "id": "restart.wallMsP95",
-      "value": 0.07999992370605469,
+      "value": 0.09999990463256836,
       "limit": 5,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "restart.frameMsP95",
-      "value": 248.6449999809265,
+      "value": 207.87000012397766,
       "limit": 150,
       "pass": false,
       "unit": "ms",
@@ -111,7 +125,7 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": 9.500114440917969,
+      "value": 5.645267486572266,
       "limit": 5,
       "pass": false,
       "unit": "MB",
@@ -119,40 +133,40 @@
     },
     {
       "id": "perf.drawCallsMax",
-      "value": 228,
+      "value": 215,
       "limit": 300,
       "pass": true
     },
     {
       "id": "perf.trianglesMax",
-      "value": 158470,
+      "value": 159946,
       "limit": 500000,
       "pass": true
     },
     {
       "id": "perf.texturesMBMax",
-      "value": 44.33459735107421,
+      "value": 47.516085815429676,
       "limit": 96,
       "pass": true,
       "unit": "MB"
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 24.99997615814209,
+      "value": 27.500033378601074,
       "limit": 60,
       "pass": true,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 2.240000009536743,
+      "value": 2.1650002002716064,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 3424.0599999427795,
+      "value": 4067.7949998378754,
       "limit": 250,
       "pass": false,
       "unit": "ms",
@@ -162,69 +176,76 @@
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 379.9990234375,
+      "value": 392.3017578125,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 14401 KB raw"
+      "note": "dist 15525 KB raw"
     },
     {
       "id": "determinism.pass",
       "value": true,
       "limit": true,
       "pass": true,
-      "note": "8/8 checks"
+      "note": "9/9 checks"
     },
     {
       "id": "stranger.medianAttempts",
       "value": "b1 -/1.5 (0 fresh) · b2 -/3 (0 fresh) · b3 -/3 (0 fresh) · e1 -/6 (0 fresh)",
       "limit": 1.5,
       "pass": true,
-      "note": "median attempts / (1.5 x band top) on src 9d316566; informational until every track has >= 2 completed sessions on this src"
+      "note": "median attempts / (1.5 x band top) on src 4c6d9739; informational until every track has >= 2 completed sessions on this src"
     },
     {
       "id": "reflex.medianAttempts",
-      "value": "b1 1/1.5 · b2 2/3 · b3 2/3 · e1 1/6",
+      "value": "b1 1/1.5 · b2 1/3 · b3 2/3 · e1 3/6",
       "limit": 1.5,
       "pass": true,
-      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 9d316566; armed: all four within band"
+      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 4c6d9739; armed: all four within band"
+    },
+    {
+      "id": "reflex.medianAttempts.pro",
+      "value": "b1 1/1.5 · b2 5/3 · b3 6/3 · e1 33/6 (not all cleared)",
+      "limit": 1.5,
+      "pass": true,
+      "note": "reflex bot (average) on the Pro bike, same tracks and band; informational (the band is Rookie's): 1/4 within band"
     }
   ],
   "failed": 4,
   "pass": false,
   "boot": {
     "runs": [
-      77.63612499999999,
-      442.0436669999999,
-      146.31229200000053,
-      129.6545839999999,
-      130.18933399999878
+      79.06674999999996,
+      445.1068749999995,
+      71.93916600000011,
+      139.7970830000013,
+      72.11766699999862
     ],
-    "p50": 130.18933399999878,
-    "min": 77.63612499999999,
-    "max": 442.0436669999999,
+    "p50": 79.06674999999996,
+    "min": 71.93916600000011,
+    "max": 445.1068749999995,
     "firstFrameMs": [
-      6226.240000009537,
-      4554.709999799728,
-      4544.909999847412,
-      4552.964999914169,
-      4555.47000002861
+      6921.22000002861,
+      5392.010000228882,
+      5195.284999847412,
+      5275.6449999809265,
+      5262.365000009537
     ],
-    "loadavg1": 8.27,
+    "loadavg1": 6.27,
     "cores": 18,
     "retried": false
   },
   "clear": {
-    "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-3.json",
+    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness6/tree/harness/inputs/flat-test/bot-3.json",
     "finishTime": 7.091666666666667,
     "expected": 7.091666666666667,
-    "hash": "d2b082502561bc00",
-    "expectedHash": "d2b082502561bc00",
+    "hash": "468698322c4ed60d",
+    "expectedHash": "468698322c4ed60d",
     "faults": 0,
     "hashOk": true
   },
   "crash": {
-    "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/crash.json",
+    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness6/tree/harness/inputs/flat-test/crash.json",
     "faultTick": 299,
     "faultTime": 2.4916666666666667,
     "reason": "crash"
@@ -232,48 +253,48 @@
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0.09500002861022949,
+      0.09999990463256836,
       0.07999992370605469,
+      0.07500004768371582,
+      0.08000016212463379,
+      0.059999942779541016,
       0.06999993324279785,
-      0.06999993324279785,
-      0.04999995231628418,
-      0.05499982833862305,
-      0.04499983787536621,
-      0.04499983787536621,
-      0.034999847412109375,
+      0.039999961853027344,
+      0.039999961853027344,
+      0.029999971389770508,
       0.03500008583068848,
       0.029999971389770508,
-      0.029999971389770508,
-      0.02500009536743164,
-      0.029999971389770508,
-      0.03000020980834961,
-      0.02500009536743164,
-      0.02500009536743164,
+      0.02499985694885254,
       0.02499985694885254,
       0.02500009536743164,
-      0.02500009536743164
+      0.019999980926513672,
+      0.02500009536743164,
+      1.0150001049041748,
+      0.02499985694885254,
+      0.019999980926513672,
+      0.02499985694885254
     ],
     "frameMs": [
-      479.25999999046326,
-      186.84500002861023,
-      128.44000005722046,
-      127.53999996185303,
-      134.02500009536743,
-      134.21000003814697,
-      190.07999992370605,
-      248.6449999809265,
-      187.74000000953674,
-      172.66499996185303,
-      154.20499992370605,
-      127.6949999332428,
-      127.46499991416931,
-      128.97500014305115,
-      125.87000012397766,
-      131.02500009536743,
-      126,
-      129.5899999141693,
-      127.6100001335144,
-      133.59500002861023
+      529.0150001049042,
+      207.87000012397766,
+      152.1800000667572,
+      147.95500016212463,
+      151.91499996185303,
+      153.86500000953674,
+      150.75999999046326,
+      152.22499990463257,
+      147.16499996185303,
+      148.6800000667572,
+      151.125,
+      148.65499997138977,
+      155.49000000953674,
+      152.4650001525879,
+      149.09500002861023,
+      153.25999999046326,
+      173.55999994277954,
+      154.55999994277954,
+      149.94500017166138,
+      154.46999979019165
     ],
     "noCountdown": true,
     "movesOnFirstTick": false,
@@ -286,31 +307,31 @@
     "autoRespawnMs": 1033.3333333333333
   },
   "heap": {
-    "beforeMB": 9.72760009765625,
-    "afterMB": 19.22771453857422,
-    "growthMB": 9.500114440917969,
+    "beforeMB": 20.2977294921875,
+    "afterMB": 25.942996978759766,
+    "growthMB": 5.645267486572266,
     "seconds": 60
   },
   "perf": {
-    "drawCalls": 228,
-    "triangles": 158470,
-    "texturesMB": 44.33459735107421,
-    "physicsUsPerTickP95": 24.99997615814209,
-    "renderSubmitMsP95": 2.240000009536743,
-    "renderSyncedMsP95": 3424.0599999427795
+    "drawCalls": 215,
+    "triangles": 159946,
+    "texturesMB": 47.516085815429676,
+    "physicsUsPerTickP95": 27.500033378601074,
+    "renderSubmitMsP95": 2.1650002002716064,
+    "renderSyncedMsP95": 4067.7949998378754
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260914-113021-6a7562",
-    "startedAt": "2026-09-14T16:30:21.285Z",
-    "wallMs": 6674,
-    "git": "9f709b5",
-    "srcFingerprint": "9d316566",
+    "runId": "20260914-142449-ab6ea4",
+    "startedAt": "2026-09-14T19:24:49.603Z",
+    "wallMs": 5566,
+    "git": "1d7d448",
+    "srcFingerprint": "4c6d9739",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
     "physics": "bikePhysicsFactory",
-    "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-3.json",
+    "recordingFile": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness6/tree/harness/inputs/flat-test/bot-3.json",
     "ticks": 851,
     "checks": [
       {
@@ -318,8 +339,8 @@
         "name": "cross-load",
         "pass": true,
         "hashes": [
-          "d2b082502561bc00",
-          "d2b082502561bc00"
+          "468698322c4ed60d",
+          "468698322c4ed60d"
         ],
         "note": "2 loads, finish=7.091666666666667"
       },
@@ -328,8 +349,8 @@
         "name": "cross-encoding",
         "pass": true,
         "hashes": [
-          "d2b082502561bc00",
-          "d2b082502561bc00"
+          "468698322c4ed60d",
+          "468698322c4ed60d"
         ]
       },
       {
@@ -337,8 +358,8 @@
         "name": "node-vs-browser",
         "pass": true,
         "hashes": [
-          "d2b082502561bc00",
-          "d2b082502561bc00"
+          "468698322c4ed60d",
+          "468698322c4ed60d"
         ],
         "note": "physics=bikePhysicsFactory"
       },
@@ -349,8 +370,19 @@
         "hashes": [
           "5fae06557e1fc424",
           "05d65e6a6b900022",
-          "ebfc4f8e3a49647b",
-          "35a12a5fea84e694"
+          "3a9caa3b44a9b0dc",
+          "eccad019c8a35e0a"
+        ]
+      },
+      {
+        "id": "D4c",
+        "name": "foreign-snapshot",
+        "pass": true,
+        "hashes": [
+          "5fae06557e1fc424",
+          "05d65e6a6b900022",
+          "3a9caa3b44a9b0dc",
+          "eccad019c8a35e0a"
         ]
       },
       {
@@ -360,7 +392,7 @@
         "hashes": [
           "5fae06557e1fc424",
           "05d65e6a6b900022",
-          "ebfc4f8e3a49647b"
+          "3a9caa3b44a9b0dc"
         ]
       },
       {
@@ -368,11 +400,11 @@
         "name": "chunking",
         "pass": true,
         "hashes": [
-          "d2b082502561bc00",
-          "d2b082502561bc00",
-          "d2b082502561bc00",
-          "d2b082502561bc00",
-          "d2b082502561bc00"
+          "468698322c4ed60d",
+          "468698322c4ed60d",
+          "468698322c4ed60d",
+          "468698322c4ed60d",
+          "468698322c4ed60d"
         ],
         "note": "chunks 1,7,15,120 + runRecording"
       },
@@ -381,8 +413,8 @@
         "name": "no-state-leak",
         "pass": true,
         "hashes": [
-          "d2b082502561bc00",
-          "d2b082502561bc00"
+          "468698322c4ed60d",
+          "468698322c4ed60d"
         ]
       },
       {
@@ -390,16 +422,15 @@
         "name": "pinned-hash",
         "pass": true,
         "hashes": [
-          "c1f1ad8a954d312a",
-          "c1f1ad8a954d312a"
+          "f687ce0364160cb0"
         ],
-        "note": "pinned physics=bikePhysicsFactory"
+        "note": "re-pinned (--pin)"
       }
     ],
     "pass": true
   },
   "stranger": {
-    "srcFingerprint": "9d316566",
+    "srcFingerprint": "4c6d9739",
     "armed": false,
     "minSessions": 2,
     "rows": [
@@ -411,7 +442,7 @@
         ],
         "limit": 1.5,
         "completedFresh": 0,
-        "completedAny": 5,
+        "completedAny": 7,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -425,7 +456,7 @@
         ],
         "limit": 3,
         "completedFresh": 0,
-        "completedAny": 2,
+        "completedAny": 4,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -439,7 +470,7 @@
         ],
         "limit": 3,
         "completedFresh": 0,
-        "completedAny": 4,
+        "completedAny": 6,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -453,7 +484,7 @@
         ],
         "limit": 6,
         "completedFresh": 0,
-        "completedAny": 4,
+        "completedAny": 6,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -462,7 +493,7 @@
     ]
   },
   "reflex": {
-    "srcFingerprint": "9d316566",
+    "srcFingerprint": "4c6d9739",
     "armed": true,
     "minSeeds": 3,
     "rows": [
@@ -474,13 +505,13 @@
           1
         ],
         "limit": 1.5,
-        "srcFingerprint": "9d316566",
+        "srcFingerprint": "4c6d9739",
         "seedsFresh": 3,
         "medianAttempts": 1,
-        "medianFinishTime": 55.325,
+        "medianFinishTime": 55.06666666666667,
         "allCleared": true,
         "pass": true,
-        "deadliest": null
+        "deadliest": "ground @ 575 m ×1"
       },
       {
         "trackId": "b2-lean-back",
@@ -490,13 +521,13 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "9d316566",
+        "srcFingerprint": "4c6d9739",
         "seedsFresh": 3,
-        "medianAttempts": 2,
-        "medianFinishTime": 65.925,
+        "medianAttempts": 1,
+        "medianFinishTime": 59.575,
         "allCleared": true,
         "pass": true,
-        "deadliest": "ground @ 45 m ×1"
+        "deadliest": "ground @ 585 m ×1"
       },
       {
         "trackId": "b3-kicker-row",
@@ -506,13 +537,13 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "9d316566",
+        "srcFingerprint": "4c6d9739",
         "seedsFresh": 3,
         "medianAttempts": 2,
-        "medianFinishTime": 64.54166666666667,
+        "medianFinishTime": 55.975,
         "allCleared": true,
         "pass": true,
-        "deadliest": "ground @ 240 m ×1"
+        "deadliest": "ground @ 145 m ×1"
       },
       {
         "trackId": "e1-uphill-weight",
@@ -522,14 +553,107 @@
           4
         ],
         "limit": 6,
-        "srcFingerprint": "9d316566",
+        "srcFingerprint": "4c6d9739",
         "seedsFresh": 3,
-        "medianAttempts": 1,
-        "medianFinishTime": 61.541666666666664,
+        "medianAttempts": 3,
+        "medianFinishTime": 66.9,
         "allCleared": true,
         "pass": true,
-        "deadliest": "ramp @ 445.0 m ×1"
+        "deadliest": "ramp @ 308.8 m ×11"
       }
     ]
-  }
+  },
+  "reflexPro": {
+    "srcFingerprint": "4c6d9739",
+    "armed": true,
+    "minSeeds": 3,
+    "rows": [
+      {
+        "trackId": "b1-first-ride",
+        "skill": "average",
+        "attemptsBand": [
+          1,
+          1
+        ],
+        "limit": 1.5,
+        "srcFingerprint": "4c6d9739",
+        "seedsFresh": 3,
+        "medianAttempts": 1,
+        "medianFinishTime": 51.675,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ground @ 95 m ×1"
+      },
+      {
+        "trackId": "b2-lean-back",
+        "skill": "average",
+        "attemptsBand": [
+          1,
+          2
+        ],
+        "limit": 3,
+        "srcFingerprint": "4c6d9739",
+        "seedsFresh": 3,
+        "medianAttempts": 5,
+        "medianFinishTime": 76.075,
+        "allCleared": true,
+        "pass": false,
+        "deadliest": "ground @ 435 m ×2"
+      },
+      {
+        "trackId": "b3-kicker-row",
+        "skill": "average",
+        "attemptsBand": [
+          1,
+          2
+        ],
+        "limit": 3,
+        "srcFingerprint": "4c6d9739",
+        "seedsFresh": 3,
+        "medianAttempts": 6,
+        "medianFinishTime": 74.40833333333333,
+        "allCleared": true,
+        "pass": false,
+        "deadliest": "ground @ 335 m ×2"
+      },
+      {
+        "trackId": "e1-uphill-weight",
+        "skill": "average",
+        "attemptsBand": [
+          2,
+          4
+        ],
+        "limit": 6,
+        "srcFingerprint": "4c6d9739",
+        "seedsFresh": 3,
+        "medianAttempts": 33,
+        "medianFinishTime": 193.77499999999998,
+        "allCleared": false,
+        "pass": false,
+        "deadliest": "ground @ 80 m ×18"
+      }
+    ]
+  },
+  "clearPro": [
+    {
+      "trackId": "flat-test",
+      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness6/tree/harness/inputs/flat-test/bot-3-pro.json",
+      "finishTime": 6.141666666666667,
+      "expected": 6.141666666666667,
+      "hash": "0b43233b0a69890a",
+      "expectedHash": "0b43233b0a69890a",
+      "faults": 0,
+      "fresh": true
+    },
+    {
+      "trackId": "b1-first-ride",
+      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness6/tree/harness/inputs/b1-first-ride/bot-3-pro.json",
+      "finishTime": 27.325,
+      "expected": 27.325,
+      "hash": "6e9c13b78af852ff",
+      "expectedHash": "6e9c13b78af852ff",
+      "faults": 0,
+      "fresh": true
+    }
+  ]
 }

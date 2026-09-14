@@ -9,27 +9,34 @@
  * physics keeps state outside snapshot()/restore() (or the hash) — the committed play
  * the bot reports is then a trajectory no replay reproduces (bot.ts warns with
  * `playReplayDivergence`). Prints the first divergent tick, x, and the state paths.
- * Exit 1 on divergence.
+ * Exit 1 on divergence. `snapshotProbe()` is the same check as a function
+ * (harness:physics-suite runs it on the flat-test golden).
  */
-import { expandFrames } from '../../src/core/replay';
+import path from 'node:path';
+import { expandFrames, type InputRecording } from '../../src/core/replay';
 import { ACTIONS, framesOf } from '../bot/actions';
 import { flagNum, parseArgs } from '../lib/args';
 import { diffState } from '../lib/metrics';
 import { loadRecording } from '../lib/recording';
 import { fail } from '../lib/report';
-import { createSim } from '../lib/sim';
+import { createSimFor } from '../lib/sim';
 
-async function main(): Promise<void> {
-  const { positional, flags } = parseArgs();
-  const file = positional[0];
-  if (!file) fail('usage: snapshot-probe.ts <recording> [--every 15] [--max-ticks 600]');
-  const rec = loadRecording(file!);
+export interface SnapshotProbeResult {
+  pass: boolean;
+  ticks: number;
+  physics: string;
+  /** First tick at which the rollout sim differs from the straight one (null when it never does). */
+  divergedAt: number | null;
+  x: number;
+  diffPaths: string[];
+  note: string;
+}
+
+export async function snapshotProbe(rec: InputRecording, every = 15, maxTicksCap = 600): Promise<SnapshotProbeResult> {
   const frames = expandFrames(rec);
-  const every = Math.max(1, flagNum(flags, 'every', 15));
-  const maxTicks = Math.min(frames.length, flagNum(flags, 'max-ticks', 600));
-  const A = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
-  const B = await createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz);
-  console.log(`snapshot-probe ${rec.header.trackId} physics=${A.physicsName} ticks=${maxTicks} rollouts every ${every} ticks x ${ACTIONS.length} actions`);
+  const maxTicks = Math.min(frames.length, maxTicksCap);
+  const A = await createSimFor(rec);
+  const B = await createSimFor(rec);
   for (let t = 0; t < maxTicks; t++) {
     if (t % every === 0) {
       const root = B.snap();
@@ -39,24 +46,49 @@ async function main(): Promise<void> {
       }
       B.restore(root);
       if (A.hash() !== B.hash()) {
-        console.log(`FAIL restore(root) != root at tick ${t} x=${A.state().bike.pos.x.toFixed(2)}: ${JSON.stringify(diffState(A.state(), B.state()))}`);
-        process.exit(1);
+        const paths = diffState(A.state(), B.state());
+        return { pass: false, ticks: maxTicks, physics: A.physicsName, divergedAt: t, x: A.state().bike.pos.x, diffPaths: paths, note: `restore(root) != root at tick ${t}: ${paths.slice(0, 6).join(', ')}` };
       }
     }
     A.step(frames[t]!);
     B.step(frames[t]!);
     if (A.hash() !== B.hash()) {
       const s = A.state();
-      console.log(`FAIL diverge on the tick after a restore: tick ${t + 1} x=${s.bike.pos.x.toFixed(2)} grounded=${s.wheels.rear.grounded}/${s.wheels.front.grounded} faulted=${s.faulted}`);
-      console.log(`  state paths that differ (straight vs after-rollouts): ${JSON.stringify(diffState(A.state(), B.state()))}`);
-      console.log('  => physics keeps state outside snapshot()/restore(): a search that restores a snapshot does not resume the same world.');
-      process.exit(1);
+      const paths = diffState(A.state(), B.state());
+      return {
+        pass: false,
+        ticks: maxTicks,
+        physics: A.physicsName,
+        divergedAt: t + 1,
+        x: s.bike.pos.x,
+        diffPaths: paths,
+        note: `diverge on the tick after a restore: tick ${t + 1} x=${s.bike.pos.x.toFixed(2)} grounded=${s.wheels.rear.grounded}/${s.wheels.front.grounded}: ${paths.slice(0, 6).join(', ')} => physics keeps state outside snapshot()/restore()`,
+      };
     }
   }
-  console.log(`PASS ${maxTicks} ticks: rollouts + restore never change the next tick (x=${A.state().bike.pos.x.toFixed(1)})`);
+  return { pass: true, ticks: maxTicks, physics: A.physicsName, divergedAt: null, x: A.state().bike.pos.x, diffPaths: [], note: `${maxTicks} ticks: rollouts + restore never change the next tick (x=${A.state().bike.pos.x.toFixed(1)})` };
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+async function main(): Promise<void> {
+  const { positional, flags } = parseArgs();
+  const file = positional[0];
+  if (!file) fail('usage: snapshot-probe.ts <recording> [--every 15] [--max-ticks 600]');
+  const rec = loadRecording(file!);
+  const every = Math.max(1, flagNum(flags, 'every', 15));
+  const r = await snapshotProbe(rec, every, flagNum(flags, 'max-ticks', 600));
+  console.log(`snapshot-probe ${rec.header.trackId} bike=${rec.header.bike ?? 'rookie'} physics=${r.physics} ticks=${r.ticks} rollouts every ${every} ticks x ${ACTIONS.length} actions`);
+  if (!r.pass) {
+    console.log(`FAIL ${r.note}`);
+    console.log(`  state paths that differ (straight vs after-rollouts): ${JSON.stringify(r.diffPaths)}`);
+    process.exit(1);
+  }
+  console.log(`PASS ${r.note}`);
+}
+
+const isEntry = process.argv[1] !== undefined && path.resolve(process.argv[1]) === new URL(import.meta.url).pathname;
+if (isEntry) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

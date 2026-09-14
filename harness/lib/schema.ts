@@ -18,6 +18,8 @@ export interface RunMeta {
   chromium?: string;
   /** Physics implementation the run used (MockPhysics | bikePhysicsFactory | ...). */
   physics?: string;
+  /** Bike class the run was played on (round 7; absent in older reports = rookie). */
+  bike?: 'rookie' | 'pro';
 }
 
 export interface FaultEvent {
@@ -143,6 +145,8 @@ export interface TrackBotMetrics {
   trackId: string;
   updatedAt: string;
   physics: string;
+  /** Bike class (round 7): `<track>.json` is rookie, `<track>.pro.json` is pro. */
+  bike?: 'rookie' | 'pro';
   attemptsBand: [number, number] | null;
   targetAttempts: number | null;
   /** attempts per skill, median across seeds; index 0..3, then 'oracle'. */
@@ -249,7 +253,7 @@ export interface GateCheck {
 }
 
 export interface DeterminismCheck {
-  id: 'D1' | 'D2' | 'D3' | 'D4' | 'D4b' | 'D5' | 'D7' | 'D8';
+  id: 'D1' | 'D2' | 'D3' | 'D4' | 'D4b' | 'D4c' | 'D5' | 'D7' | 'D8';
   name: string;
   pass: boolean;
   hashes: string[];
@@ -304,6 +308,10 @@ export interface GateReport extends RunMeta {
   stranger?: { srcFingerprint: string; armed: boolean; minSessions: number; rows: GateStrangerRow[] };
   /** G10 second row: reflex-bot (average) medians on the same tracks (harness/reflex). */
   reflex?: { srcFingerprint: string; armed: boolean; minSeeds: number; rows: GateReflexRow[] };
+  /** G10 third row (round 7): the same reflex medians on the Pro bike (`<track>.pro.reflex.json`); informational, the band is authored for Rookie. */
+  reflexPro?: { srcFingerprint: string; armed: boolean; minSeeds: number; rows: GateReflexRow[] };
+  /** G2b (round 7): Pro-bike clears by golden replay (`bot-3-pro.json`) on flat-test and b1, pinned under `<track>:pro` in expected.json. */
+  clearPro?: Array<{ trackId: string; recording: string | null; finishTime: number | null; expected: number | null; hash: string | null; expectedHash: string | null; faults: number; fresh: boolean | null }>;
 }
 
 export interface GateReflexRow {
@@ -416,6 +424,8 @@ export interface ReflexTrackMetrics {
   technique: string;
   updatedAt: string;
   physics: string;
+  /** Bike class (round 7): `<track>.reflex.json` is rookie, `<track>.pro.reflex.json` is pro. */
+  bike?: 'rookie' | 'pro';
   srcFingerprint: string;
   attemptsBand: [number, number] | null;
   finishX: number;

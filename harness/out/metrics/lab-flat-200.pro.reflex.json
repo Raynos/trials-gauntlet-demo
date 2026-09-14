@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "lab-flat-200",
+  "bike": "pro",
+  "tier": "beginner",
+  "technique": "envelope measurement",
+  "updatedAt": "2026-09-14T19:20:21.005Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "4c6d9739",
+  "attemptsBand": [
+    1,
+    1
+  ],
+  "finishX": 200,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        2522286987,
+        2522286988,
+        2522286989
+      ],
+      "attempts": [
+        1,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        16.975,
+        16.9,
+        16.791666666666668
+      ],
+      "medianFinishTime": 16.9,
+      "bestX": 207.37320514322047,
+      "deaths": [],
+      "runs": [
+        "20260914-142020-e3eefe",
+        "20260914-142020-c524a0",
+        "20260914-142020-1a8a0e"
+      ]
+    }
+  ]
+}

@@ -24,7 +24,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import type { GameEvent, InputFrame, PhysicsState } from '../../src/core/types';
+import { DEFAULT_BIKE, type BikeClass, type GameEvent, type InputFrame, type PhysicsState } from '../../src/core/types';
+import { parseBike } from '../lib/sim';
 import { encodeJSON } from '../../src/core/replay';
 import { ACTIONS, COAST, HOLD, RESTART_FRAME, formatActions, framesOf, parseSlots } from '../bot/actions';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
@@ -486,7 +487,7 @@ function spawnBlock(trackId: string, sessionId: string): string {
  * Parent side: one fresh session per agent x track (so the stranger never picks a track or
  * an id), plus the exact prompt per session. Nothing here counts as a call.
  */
-async function prep(tracks: string[], agents: string[], round: string): Promise<{ dir: string; sessions: Array<{ trackId: string; sessionId: string; agent: string }> }> {
+async function prep(tracks: string[], agents: string[], round: string, bike: BikeClass = DEFAULT_BIKE): Promise<{ dir: string; sessions: Array<{ trackId: string; sessionId: string; agent: string }> }> {
   const dir = path.join(STRANGER_OUT, 'rounds', round);
   fs.mkdirSync(dir, { recursive: true });
   const sessions: Array<{ trackId: string; sessionId: string; agent: string; seed: number; attemptsBand: [number, number] | null }> = [];
@@ -494,7 +495,7 @@ async function prep(tracks: string[], agents: string[], round: string): Promise<
   for (const trackId of tracks) {
     for (const agent of agents) {
       const sessionId = `${trackId}-${round}-${agent}-${stamp}`;
-      const s = await createSession({ trackId, agent, sessionId });
+      const s = await createSession({ trackId, agent, sessionId, bike });
       saveSession(s);
       sessions.push({ trackId, sessionId, agent, seed: s.state.seed, attemptsBand: s.sim.track.meta?.attemptsBand ?? null });
     }
@@ -550,7 +551,7 @@ async function main(): Promise<number> {
     if (tracks.length === 0) throw new Error('usage: prep --tracks a,b [--agents s1,s2] [--round r3]');
     const agents = listFlag('agents');
     const round = flagStr(flags, 'round', `r${stampId(new Date())}`);
-    const r = await prep(tracks, agents.length ? agents : ['s1', 's2'], round);
+    const r = await prep(tracks, agents.length ? agents : ['s1', 's2'], round, parseBike(flags['bike']));
     for (const x of r.sessions) console.log(`${x.trackId.padEnd(20)} ${x.agent.padEnd(4)} ${x.sessionId}`);
     console.log(`prep: ${r.sessions.length} sessions; paste blocks in ${path.join(r.dir, 'spawn.md')}; manifest ${path.join(r.dir, 'manifest.json')}`);
     return 0;
@@ -560,7 +561,7 @@ async function main(): Promise<number> {
 
   let s: LoadedSession;
   if (cmd === 'start') {
-    const opts: Parameters<typeof createSession>[0] = { trackId: trackFlag ?? 'flat-test', agent };
+    const opts: Parameters<typeof createSession>[0] = { trackId: trackFlag ?? 'flat-test', agent, bike: parseBike(flags['bike']) };
     if (typeof flags['seed'] === 'string') opts.seed = flagNum(flags, 'seed', 0) >>> 0;
     if (sessionFlag) opts.sessionId = sessionFlag;
     s = await createSession(opts);

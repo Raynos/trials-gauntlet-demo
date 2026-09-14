@@ -2,11 +2,12 @@
   "schema": 1,
   "kind": "track-reflex-metrics",
   "trackId": "b1-first-ride",
+  "bike": "rookie",
   "tier": "beginner",
   "technique": "throttle control",
-  "updatedAt": "2026-09-14T16:25:46.776Z",
+  "updatedAt": "2026-09-14T19:20:11.218Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "9d316566",
+  "srcFingerprint": "4c6d9739",
   "attemptsBand": [
     1,
     1
@@ -23,22 +24,34 @@
       "attempts": [
         1,
         1,
-        1
+        2
       ],
       "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        54.94166666666667,
-        56.55833333333333,
-        55.325
+        55.06666666666667,
+        55.016666666666666,
+        72
       ],
-      "medianFinishTime": 55.325,
-      "bestX": 586.9675770861028,
-      "deaths": [],
+      "medianFinishTime": 55.06666666666667,
+      "bestX": 588.293329814989,
+      "deaths": [
+        {
+          "obstacle": "ground @ 575 m",
+          "x": 575,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        }
+      ],
       "runs": [
-        "20260914-112546-c964f4",
-        "20260914-112546-dbada9",
-        "20260914-112546-839408"
+        "20260914-142010-1f6b8b",
+        "20260914-142011-735a9d",
+        "20260914-142011-098a5c"
       ]
     }
   ]

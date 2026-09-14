@@ -26,10 +26,10 @@ import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { build } from 'vite';
 import { expandFrames, type InputRecording } from '../../src/core/replay';
-import type { FaultReason } from '../../src/core/types';
+import { DEFAULT_BIKE, type BikeClass, type FaultReason } from '../../src/core/types';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
 import { openGame, readHeap } from '../lib/hook';
-import { pickGolden } from '../lib/golden';
+import { chooseGolden, pickGolden } from '../lib/golden';
 import { percentileOf, runMeta, srcFingerprint } from '../lib/metrics';
 import { DIST_DIR, HARNESS_DIR, REPO_ROOT } from '../lib/paths';
 import { loadRecording } from '../lib/recording';
@@ -38,7 +38,7 @@ import type { DeterminismReport, GateCheck, GateReport, GateReflexRow, GateStran
 import { createSim } from '../lib/sim';
 import { synthesizeRecording } from '../lib/synth';
 import { BrowserVerifier } from '../lib/verify';
-import { loadExpected, runDeterminism, saveExpected } from './determinism';
+import { expectedKey, loadExpected, runDeterminism, saveExpected } from './determinism';
 
 export const THRESHOLDS_FILE = path.join(HARNESS_DIR, 'gate', 'thresholds.json');
 export type Thresholds = Record<string, number | boolean | string>;
@@ -57,11 +57,11 @@ export function loadThresholds(): { ship: Thresholds; swiftshader: Record<string
  * on the same four tracks — median attempts over the seeds recorded on the working tree's src fingerprint.
  * Informational until every track has >= minSeeds such seeds; then all four within factor x band top and cleared.
  */
-export function reflexRows(tracks: readonly string[], factor: number, skill: 'novice' | 'average' | 'good' = 'average'): GateReflexRow[] {
+export function reflexRows(tracks: readonly string[], factor: number, skill: 'novice' | 'average' | 'good' = 'average', bike: BikeClass = DEFAULT_BIKE): GateReflexRow[] {
   const fp = srcFingerprint();
   const rows: GateReflexRow[] = [];
   for (const trackId of tracks) {
-    const file = path.join(HARNESS_DIR, 'out', 'metrics', `${trackId}.reflex.json`);
+    const file = path.join(HARNESS_DIR, 'out', 'metrics', `${trackId}${bike === DEFAULT_BIKE ? '' : `.${bike}`}.reflex.json`);
     if (!fs.existsSync(file)) continue;
     const m = JSON.parse(fs.readFileSync(file, 'utf8')) as ReflexTrackMetrics;
     const row = m.bySkill.find((r) => r.skill === skill);
@@ -87,6 +87,9 @@ export function reflexRows(tracks: readonly string[], factor: number, skill: 'no
 
 /** The tracks a stranger round judges (harness-metrics.md §3). */
 export const STRANGER_TRACKS = ['b1-first-ride', 'b2-lean-back', 'b3-kicker-row', 'e1-uphill-weight'] as const;
+
+/** G2b: the tracks the gate clears on the Pro bike by golden replay (round 7). */
+export const PRO_CLEAR_TRACKS = ['flat-test', 'b1-first-ride'] as const;
 
 /**
  * One row per stranger metrics file: median attempts over the sessions completed on the
@@ -251,6 +254,37 @@ async function main(): Promise<void> {
       check({ id: 'clear.golden', value: cleared, limit: true, pass: cleared, note: `${path.basename(goldenFile)} finish=${r.finishTime} run=${finishRun?.toFixed(3)} faults=${r.faults}` });
       check({ id: 'clear.finishTimeBitEqual', value: r.finishTime === entry.golden.finishTime, limit: true, pass: r.finishTime === entry.golden.finishTime, note: `expected ${entry.golden.finishTime}` });
       check({ id: 'clear.hashOk', value: r.hash === entry.golden.hash, limit: true, pass: r.hash === entry.golden.hash, note: `${r.hash} vs pinned ${entry.golden.hash}` });
+    }
+
+    // G2b clear on the Pro bike: flat-test + b1 by their `bot-3-pro.json` goldens (fingerprint-matched), pinned under `<track>:pro`.
+    report.clearPro = [];
+    for (const proTrack of PRO_CLEAR_TRACKS) {
+      const id = `clear.pro.${proTrack.split('-')[0]}`;
+      const c = chooseGolden(proTrack, 'pro');
+      if (!c) {
+        report.clearPro.push({ trackId: proTrack, recording: null, finishTime: null, expected: null, hash: null, expectedHash: null, faults: 0, fresh: null });
+        check({ id, value: false, limit: true, pass: false, note: `no Pro golden under harness/inputs/${proTrack}/ — run pnpm harness:bot ${proTrack} --bike pro` });
+        continue;
+      }
+      const rec = loadRecording(c.file);
+      rec.header.bike = 'pro';
+      const r = await verifier.run(rec);
+      const expected = loadExpected();
+      const entry = (expected[expectedKey(proTrack, 'pro')] ??= {});
+      if (!entry.golden || flagBool(flags, 'pin') || entry.golden.file !== path.basename(c.file) || entry.golden.physics !== physicsName) {
+        entry.golden = { file: path.basename(c.file), finishTime: r.finishTime, hash: r.hash, ticks: r.state.tick, physics: physicsName };
+        saveExpected(expected);
+      }
+      const cleared = r.finishTime !== null && r.faults === 0;
+      const pinnedOk = r.finishTime === entry.golden.finishTime && r.hash === entry.golden.hash;
+      report.clearPro.push({ trackId: proTrack, recording: c.file, finishTime: r.finishTime, expected: entry.golden.finishTime, hash: r.hash, expectedHash: entry.golden.hash, faults: r.faults, fresh: c.fresh });
+      check({
+        id,
+        value: cleared && pinnedOk,
+        limit: true,
+        pass: cleared && pinnedOk,
+        note: `${path.basename(c.file)} (${c.fresh ? 'src matches' : `STALE src=${c.stamp ?? 'unstamped'}`}) finish=${r.finishTime} faults=${r.faults} hash ${r.hash} vs pinned ${entry.golden.hash} (expected finish ${entry.golden.finishTime})`,
+      });
     }
 
     // G3 crash + G4 fault -> control
@@ -509,6 +543,20 @@ async function main(): Promise<void> {
     });
     report.reflex = { srcFingerprint: srcFingerprint(), armed: reflexArmed, minSeeds, rows: reflex };
 
+    // G10, third row: the same reflex medians on the Pro bike. Informational by design — the attempts band is
+    // authored for the tier's default bike (Rookie on beginner/easy) — but reported per track so a Pro regression is visible.
+    const reflexPro = reflexRows(STRANGER_TRACKS, num('reflex.attemptsBandFactor') || 1.5, 'average', 'pro');
+    const reflexProArmed = reflexPro.length === STRANGER_TRACKS.length && reflexPro.every((r) => r.seedsFresh >= minSeeds);
+    const reflexProSummary = reflexPro.length ? reflexPro.map((r) => `${r.trackId.split('-')[0]} ${r.medianAttempts ?? '-'}/${r.limit ?? '-'}${r.seedsFresh < minSeeds ? ` (${r.seedsFresh} fresh)` : ''}${r.allCleared ? '' : ' (not all cleared)'}`).join(' · ') : 'no <track>.pro.reflex.json yet';
+    check({
+      id: 'reflex.medianAttempts.pro',
+      value: reflexProSummary,
+      limit: num('reflex.attemptsBandFactor') || 1.5,
+      pass: true,
+      note: `reflex bot (average) on the Pro bike, same tracks and band; informational (the band is Rookie's): ${reflexProArmed ? `${reflexPro.filter((r) => r.pass).length}/${reflexPro.length} within band` : `fewer than ${minSeeds} fresh seeds on some track (pnpm harness:reflex --all-tracks --bike pro --seeds 3)`}`,
+    });
+    report.reflexPro = { srcFingerprint: srcFingerprint(), armed: reflexProArmed, minSeeds, rows: reflexPro };
+
     const failed = checks.filter((c) => !c.pass).length;
     const full: GateReport = {
       ...runMeta('gate', started, { chromium: launched.browser.version() }),
@@ -531,6 +579,8 @@ async function main(): Promise<void> {
       determinism: det,
       stranger: report.stranger!,
       reflex: report.reflex!,
+      reflexPro: report.reflexPro!,
+      clearPro: report.clearPro ?? [],
     };
     if (goldenHash) full.clear.hash = goldenHash;
     const out = path.join(HARNESS_DIR, 'out', 'metrics', 'ship-gate.json');

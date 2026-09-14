@@ -191,6 +191,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
     const { page } = launched;
     await openGame(page, server.url);
     const hook = new HookClient(page);
+    if (o.recording.header.bike && o.recording.header.bike !== 'rookie') await hook.setBike(o.recording.header.bike);
     if (!(await hook.loadTrack(o.recording.header.trackId, o.recording.header.seed))) {
       throw new Error(`unknown track ${o.recording.header.trackId}`);
     }
