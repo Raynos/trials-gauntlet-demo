@@ -15,7 +15,9 @@
  *
  * Spawns (CONTRACT §2.4): `checkpoint()` records the rear-wheel contact point at
  * cursor + 0.5 with angle 0; `finish()` verifies both wheels sit on one flat
- * profile segment with clearance. Authors put a `flat(>= 3)` after each checkpoint.
+ * profile segment with clearance, and applies the round-4 checkpoint rule
+ * (`CHECKPOINT_RULE`): >= 15 m of flat-or-descending run-up from every spawn to the
+ * first obstacle that needs speed, and no checkpoint within 8 m of a landing zone.
  *
  * Feel envelope helpers (CONTRACT §2.5, authored with 20 % margin) live in `FEEL`.
  */
@@ -75,7 +77,377 @@ export const FEEL = {
   climbDeg(): number {
     return this.climbSustainedDeg * this.margin;
   },
+  /**
+   * Crest radius that keeps both wheels on the ground at `v` (centripetal g). A cosine
+   * `smooth(l, dy)` has crest curvature 0.5 * dy * (pi / l)^2, so it stays grounded at v when
+   * l >= pi * v * sqrt(dy / 2g): 16 m/s and 1 m needs 11.4 m per half, a 2 m wave 32 m in all.
+   * Round 4: B1's 20 m x 2.0 m wave (crest radius 10 m) launched every stranger above 10 m/s.
+   */
+  crestRadius(v: number): number {
+    return (v * v) / this.g;
+  },
+  /** Half-length a `smooth` rise/fall of `dy` needs so the crest never launches at `v`. */
+  smoothLengthFor(dy: number, v = 16): number {
+    return Math.PI * v * Math.sqrt(Math.abs(dy) / (2 * this.g));
+  },
 } as const;
+
+// ---------------------------------------------------------------------------
+// Checkpoint rule (round 4, authored to the stranger)
+// ---------------------------------------------------------------------------
+
+/**
+ * Round 4 stranger measurement: 8 of 21 B3 deaths were at a kicker 4 m past a checkpoint
+ * ("respawns 2-3 m before the kicker with no room to build speed"), 9 of 20 E1 deaths at a
+ * 48 deg plank 3 m past one. A respawn that cannot reach the speed its first obstacle needs
+ * turns one crash into a full-segment wall.
+ */
+export const CHECKPOINT_RULE = {
+  /** Flat-or-descending run-up a spawn needs before the first obstacle that needs speed. */
+  runupMin: 15,
+  /** Steep planks (>= steepPlankDeg) need more: E1's 48 deg wall wanted 20 m. */
+  steepRunupMin: 20,
+  steepPlankDeg: 45,
+  /** A checkpoint may not sit within this distance after a feature's landing zone. */
+  afterLanding: 8,
+  /** How far past a launch (kicker, gap, drop) the landing zone is taken to extend. */
+  launchCarry: 6,
+  /** Bumps this low (humps, rollers, sunk drums) are flow: they neither block a run-up nor count as features. */
+  flowHeight: 0.35,
+  /** Walls / ledges above this need a rolling hop, i.e. speed (stationary hop apex 0.74 x 0.8). */
+  hopHeight: 0.6,
+  /** Free-standing up-ramps at least this tall are kickers a stranger treats as a jump. */
+  kickerHeight: 1.0,
+} as const;
+
+export interface CheckpointViolation {
+  spawn: string;
+  spawnX: number;
+  kind: 'runup' | 'after-landing';
+  obstacle: string;
+  obstacleX: number;
+  /** Metres available (run-up) or metres after the landing zone. */
+  have: number;
+  need: number;
+  message: string;
+}
+
+export interface CheckpointAuditRow {
+  spawn: string;
+  spawnX: number;
+  /** First obstacle after the spawn that needs speed (or '-' when the segment has none). */
+  firstSpeedObstacle: string;
+  firstSpeedX: number | null;
+  runup: number | null;
+  runupNeed: number | null;
+  /** Distance from the previous feature's landing zone to this checkpoint (null for the start). */
+  afterLanding: number | null;
+  ok: boolean;
+}
+
+interface Feature {
+  index: number;
+  kind: ObstacleKind;
+  x0: number;
+  x1: number;
+  base: number;
+  /** Height of the riding surface above the local ground at the exit end (0 when it returns to ground). */
+  exitHeight: number;
+  /** Bumps <= flowHeight: humps, rollers, sunk drums. */
+  flow: boolean;
+  /** Needs speed from the spawn: gap, kicker, hop wall, steep plank. */
+  speed: false | 'gap' | 'kicker' | 'wall' | 'ledge' | 'steep plank' | 'fire' | 'pole';
+  /** Leaves the bike airborne: a kicker, a gap, a drop off a raised exit. */
+  launch: boolean;
+  /**
+   * Kills the run-up: a rise the bike has to climb (ramp / plank onto a box, wall, ledge,
+   * stair up) or something ridden slowly (drum, log pile, poles, barrels). Gaps, see-saws,
+   * boxes landed on and every descent are ridden at speed and do not block.
+   */
+  blocks: boolean;
+  /** Previous feature ends where this one starts (tabletop top, kicker -> gap, ledge -> gap). */
+  adjacentBefore: boolean;
+}
+
+function num(v: unknown, d: number): number {
+  return typeof v === 'number' ? v : d;
+}
+
+function profileY(profile: readonly Vec2[], x: number): number {
+  const first = profile[0] as Vec2;
+  if (x <= first.x) return first.y;
+  for (let i = 1; i < profile.length; i++) {
+    const b = profile[i] as Vec2;
+    if (x <= b.x + 1e-9) {
+      const a = profile[i - 1] as Vec2;
+      const t = b.x === a.x ? 0 : (x - a.x) / (b.x - a.x);
+      return a.y + (b.y - a.y) * t;
+    }
+  }
+  return (profile[profile.length - 1] as Vec2).y;
+}
+
+function features(def: TrackDef): Feature[] {
+  const obs = def.obstacles.map((o, index) => ({ o, index })).sort((a, b) => a.o.pos.x - b.o.pos.x || a.index - b.index);
+  const out: Feature[] = [];
+  const R = CHECKPOINT_RULE;
+  for (let k = 0; k < obs.length; k++) {
+    const { o, index } = obs[k] as { o: TrackObstacle; index: number };
+    const kind = o.kind as ObstacleKind;
+    const rp = o.params ?? {};
+    const x0 = o.pos.x;
+    const x1 = x0 + footprint(kind, rp);
+    const ground = profileY(def.profile, x0);
+    const base = o.pos.y - ground;
+    const next = obs[k + 1]?.o;
+    const prev = obs[k - 1]?.o;
+    const nextKind = next?.kind as ObstacleKind | undefined;
+    const touchesNext = !!next && Math.abs(next.pos.x - x1) < 1e-3;
+    // adjacent solid = the ride continues on top (tabletop top, drum shelf, platform)
+    const adjacentSolid = touchesNext && isSolidKind(nextKind as ObstacleKind);
+    const adjacentGap = touchesNext && (nextKind === 'gap' || nextKind === 'pole');
+    const adjacentBefore = !!prev && Math.abs(prev.pos.x + footprint(prev.kind as ObstacleKind, prev.params ?? {}) - x0) < 1e-3;
+    let exitHeight = 0;
+    let flow = false;
+    let speed: Feature['speed'] = false;
+    let launch = false;
+    let blocks = true;
+    switch (kind) {
+      case 'ramp': {
+        const h = num(rp['height'], 1);
+        const up = (rp['direction'] ?? 'up') === 'up';
+        exitHeight = up ? base + h : base;
+        flow = h <= R.flowHeight && base === 0;
+        if (!up) blocks = false;
+        if (up && !adjacentSolid && !flow) {
+          launch = true;
+          blocks = false;
+          // a free kicker into flat ground: a stranger jumps it; a kicker into a gap is measured as the gap
+          if (h >= R.kickerHeight && !adjacentGap) speed = 'kicker';
+        }
+        break;
+      }
+      case 'plank': {
+        const ang = num(rp['angleDeg'], 0);
+        const len = num(rp['length'], 4);
+        exitHeight = Math.max(0, base + num(rp['height'], 0) + len * Math.sin((ang * Math.PI) / 180));
+        // a steep plank on the ground wants speed (E1: 9 of 20 deaths at a 48 deg foot 3 m past a spawn); one
+        // stacked on a wall / box top is climbed from that top at walking pace by design (X1)
+        if (ang >= R.steepPlankDeg && base === 0) speed = 'steep plank';
+        if (ang <= 0) blocks = false;
+        launch = exitHeight > R.flowHeight && !adjacentSolid;
+        break;
+      }
+      case 'gap': {
+        const w = num(rp['width'], 3);
+        // <= 2 m straight off a ledge / box / drum top is a standing hop across (M1's lesson; M2 / X2 drum
+        // top to drum top, physics 12.3: a spinning top cannot be pumped, so 2 m is the whole envelope)
+        const hopAcross = w <= 2 && adjacentBefore && (prev?.kind === 'ledge' || prev?.kind === 'box' || prev?.kind === 'drum');
+        // a slot narrower than a wheel (H1's wheelie wire, 0.7 m) is crossed with the front up at any speed, not jumped
+        const slot = w <= 1.0;
+        // a pole-cap pit entered from a box / wall top is hopped cap to cap at walking pace (X1's demand)
+        const polePit = !!next && nextKind === 'pole' && Math.abs(next.pos.x - x0) < 1e-3;
+        const capsFromTop = polePit && adjacentBefore && (prev?.kind === 'box' || prev?.kind === 'wall');
+        // a gap off the last pole cap (X1: 4 m down 2.5 m onto a plank) is part of the cap-hop chain
+        const fromCaps = adjacentBefore && prev?.kind === 'pole';
+        speed = hopAcross || slot || capsFromTop || fromCaps ? false : 'gap';
+        launch = true;
+        blocks = false;
+        break;
+      }
+      case 'wall': {
+        const h = num(rp['height'], 1);
+        exitHeight = base + h;
+        // a lip climb (front wheel onto the lip at ~5 m/s, hop the rear) is a low-speed technique: the
+        // skill-3 bot clears X1's 1.2 m lip wall + 56 deg plank from a 3 m run-in and STALLS from 16 m
+        if (h >= R.hopHeight && num(rp['lip'], 0) <= 0) speed = 'wall';
+        launch = !adjacentSolid;
+        break;
+      }
+      case 'ledge': {
+        const h = num(rp['height'], 0.5);
+        exitHeight = base + h;
+        if (h >= R.hopHeight) speed = 'ledge';
+        launch = !adjacentSolid && !adjacentGap;
+        break;
+      }
+      case 'box':
+        exitHeight = base + num(rp['height'], 1);
+        launch = !adjacentSolid && !adjacentGap;
+        blocks = !adjacentBefore; // a box entered from flat ground is a wall; one on a ramp / after a gap is ridden over
+        break;
+      case 'stair': {
+        const rise = num(rp['count'], 5) * num(rp['height'], 0.3);
+        const up = (rp['direction'] ?? 'up') === 'up';
+        exitHeight = up ? base + rise : base;
+        launch = up && !adjacentSolid;
+        blocks = up;
+        break;
+      }
+      case 'drum': {
+        const r = num(rp['radius'], 0.8);
+        const proud = 2 * r - num(rp['depth'], 0);
+        exitHeight = base;
+        flow = proud <= R.flowHeight && base === 0;
+        break;
+      }
+      case 'seesaw':
+        exitHeight = base;
+        blocks = false;
+        break;
+      case 'logpile':
+        exitHeight = base;
+        break;
+      case 'pole':
+        // a cap is balance, not speed; a `poleRow` stands in a kill pit whose gap is the speed obstacle
+        exitHeight = base + num(rp['height'], 1.5);
+        launch = true;
+        break;
+      case 'barrel':
+        exitHeight = base;
+        if ((rp['burning'] ?? true) === true) speed = 'fire';
+        break;
+    }
+    if (flow) blocks = false;
+    out.push({ index, kind, x0, x1, base, exitHeight, flow, speed, launch, blocks, adjacentBefore });
+  }
+  return out;
+}
+
+/**
+ * Where a gap's run-up is measured: at the foot of the kicker that launches it when one touches
+ * it (the ramp face is not run-up), else at the gap lip itself (a ledge / box / drum top before
+ * it is ridden and counts). Returns the feature to measure at and the riding height there.
+ */
+function launchPoint(def: TrackDef, feats: Feature[], f: Feature): { at: Feature; y: number } {
+  const i = feats.indexOf(f);
+  const prev = i > 0 ? (feats[i - 1] as Feature) : null;
+  if (f.kind === 'gap' && f.adjacentBefore && prev && prev.kind === 'ramp' && prev.launch) {
+    return { at: prev, y: profileY(def.profile, prev.x0) + prev.base };
+  }
+  if (f.kind === 'gap' && f.adjacentBefore && prev) return { at: f, y: profileY(def.profile, f.x0) + prev.exitHeight };
+  return { at: f, y: profileY(def.profile, f.x0) + f.base };
+}
+
+/**
+ * Effective flat-or-descending run-up into `x`: walking back from `x`, the ground may not sit
+ * more than `flowHeight` below the highest ground seen (a forward rise ends the run-up), and
+ * any blocking feature ends it at its exit. Descent is credited at g/a ~= 2 m of flat per metre
+ * dropped (the exit height of a blocking feature counts: a stair descent off a box is run-up).
+ */
+function runup(def: TrackDef, feats: Feature[], x: number, yObs: number, floor: number): { start: number; effective: number } {
+  let start = floor;
+  let startHeight = 0;
+  for (const f of feats) {
+    if (f.blocks && f.x1 <= x + 1e-9 && f.x1 > start) {
+      start = f.x1;
+      startHeight = f.exitHeight;
+    }
+  }
+  let runningMax = profileY(def.profile, x);
+  for (let i = def.profile.length - 1; i >= 0; i--) {
+    const p = def.profile[i] as Vec2;
+    if (p.x >= x) continue;
+    if (p.x <= start) break;
+    if (p.y < runningMax - CHECKPOINT_RULE.flowHeight) {
+      const nxt = def.profile[i + 1] as Vec2;
+      start = Math.max(start, Math.min(nxt.x, x));
+      startHeight = 0;
+      break;
+    }
+    runningMax = Math.max(runningMax, p.y);
+  }
+  const drop = Math.max(0, profileY(def.profile, start) + startHeight - yObs);
+  return { start, effective: x - start + 2 * drop };
+}
+
+/**
+ * Checkpoint rule (round 4): every spawn (start and each checkpoint) has >= runupMin m of
+ * effective flat-or-descending run-up before the first obstacle after it that needs speed
+ * (gap, kicker >= 1 m into flat, wall / ledge >= 0.6 m, burning barrels, poles; a plank
+ * >= 45 deg needs steepRunupMin), or that obstacle lies past the next checkpoint. A gap is
+ * measured from the start of the kicker / ledge chain that launches it. And no checkpoint
+ * sits within afterLanding m of a feature's landing zone (feature end, + launchCarry when
+ * it launches).
+ */
+export function auditCheckpoints(def: TrackDef): { rows: CheckpointAuditRow[]; violations: CheckpointViolation[] } {
+  const feats = features(def);
+  const spawns = [{ label: 'start', x: def.start.pos.x, cpX: def.start.pos.x }, ...def.checkpoints.map((c, i) => ({ label: `cp${i}`, x: c.spawn.pos.x, cpX: c.x }))];
+  const rows: CheckpointAuditRow[] = [];
+  const violations: CheckpointViolation[] = [];
+  spawns.forEach((s, i) => {
+    const segEnd = i + 1 < spawns.length ? (spawns[i + 1] as { cpX: number }).cpX : def.finishX;
+    const first = feats.find((f) => f.speed && f.x0 >= s.x && f.x0 < segEnd);
+    let have: number | null = null;
+    let need: number | null = null;
+    let ok = true;
+    if (first) {
+      need = first.speed === 'steep plank' ? CHECKPOINT_RULE.steepRunupMin : CHECKPOINT_RULE.runupMin;
+      const { at, y: yObs } = launchPoint(def, feats, first);
+      have = runup(def, feats, at.x0, yObs, s.x).effective;
+      if (have < need - 1e-6) {
+        ok = false;
+        violations.push({
+          spawn: s.label,
+          spawnX: s.x,
+          kind: 'runup',
+          obstacle: `${first.kind} #${first.index} (${first.speed})`,
+          obstacleX: at.x0,
+          have,
+          need,
+          message: `[${def.id}] ${s.label} spawn at x=${s.x}: ${first.kind} #${first.index} (${first.speed}) launched at x=${at.x0.toFixed(1)} has ${have.toFixed(1)} m of flat-or-descending run-up, needs ${need}`,
+        });
+      }
+    }
+    let afterLanding: number | null = null;
+    if (i > 0) {
+      let worst = Infinity;
+      let worstF: Feature | null = null;
+      for (const f of feats) {
+        if (f.flow || f.x1 > s.cpX + 1e-9) continue;
+        const landingEnd = f.x1 + (f.launch ? CHECKPOINT_RULE.launchCarry : 0);
+        const d = s.cpX - landingEnd;
+        if (d < worst) {
+          worst = d;
+          worstF = f;
+        }
+      }
+      if (worstF) {
+        afterLanding = worst;
+        if (worst < CHECKPOINT_RULE.afterLanding - 1e-6) {
+          ok = false;
+          violations.push({
+            spawn: s.label,
+            spawnX: s.x,
+            kind: 'after-landing',
+            obstacle: `${worstF.kind} #${worstF.index}`,
+            obstacleX: worstF.x0,
+            have: worst,
+            need: CHECKPOINT_RULE.afterLanding,
+            message: `[${def.id}] checkpoint ${s.label} at x=${s.cpX} is ${worst.toFixed(1)} m after the landing zone of ${worstF.kind} #${worstF.index} at x=${worstF.x0.toFixed(1)} (needs ${CHECKPOINT_RULE.afterLanding})`,
+          });
+        }
+      }
+    }
+    rows.push({
+      spawn: s.label,
+      spawnX: s.x,
+      firstSpeedObstacle: first ? `${first.kind} #${first.index} (${first.speed})` : '-',
+      firstSpeedX: first ? first.x0 : null,
+      runup: have,
+      runupNeed: need,
+      afterLanding,
+      ok,
+    });
+  });
+  return { rows, violations };
+}
+
+/** Throws on the first checkpoint-rule violation (called from `finish()`; the test suite checks every track too). */
+export function validateCheckpoints(def: TrackDef): void {
+  const { violations } = auditCheckpoints(def);
+  if (violations.length) throw new Error(violations.map((v) => v.message).join('\n'));
+}
 
 // ---------------------------------------------------------------------------
 // Builder
@@ -309,9 +681,52 @@ export class CourseBuilder {
     return this;
   }
 
-  /** Flow: a smooth rise and fall (a berm roll) that keeps speed. */
-  wave(length: number, dy: number): this {
+  /**
+   * Flow: a smooth rise and fall (a berm roll) that keeps speed. `groundedAt` (m/s, default 0 =
+   * unchecked) asserts the crest cannot launch below that speed (FEEL.smoothLengthFor): the
+   * beginner tier passes 16 so a full-gas stranger stays on the ground.
+   */
+  wave(length: number, dy: number, groundedAt = 0): this {
+    if (groundedAt > 0) this.assertGrounded(length / 2, dy, groundedAt, 'wave');
     return this.smooth(length / 2, dy).smooth(length / 2, -dy);
+  }
+
+  /**
+   * Ground tabletop: a cosine rise onto a flat top and a cosine fall, with every crest radius
+   * >= v^2/g at `groundedAt` m/s so a full-gas beginner rides over instead of flying off. Round 4
+   * replaces B1's `tabletop` ramps (an 8.5 deg kink at 16 m/s is a 7 m flight) with this.
+   */
+  plateau(up: number, top: number, height: number, down = up, groundedAt = 16): this {
+    this.assertGrounded(up, height, groundedAt, 'plateau rise');
+    this.assertGrounded(down, height, groundedAt, 'plateau fall');
+    return this.smooth(up, height).flat(top).smooth(down, -height);
+  }
+
+  /**
+   * Row of grounded speed bumps: cosine bumps of `height` whose crest cannot launch at `groundedAt`
+   * m/s, `gap` m of flat between. Physics round 8: a flat-out beginner (lean 0, full gas) reaches
+   * 18.5 m/s on B1 and noses down through a 0.25 m convex `humpRow`; a cosine bump is rolled.
+   */
+  bumpRow(count: number, height = 0.25, groundedAt = 20, gap = 2): this {
+    const half = Math.ceil(FEEL.smoothLengthFor(height, groundedAt) * 10) / 10;
+    for (let i = 0; i < count; i++) {
+      this.wave(2 * half, height, groundedAt);
+      if (i < count - 1) this.flat(gap);
+    }
+    return this;
+  }
+
+  /** Smooth descent whose convex top cannot launch at `groundedAt` m/s. */
+  descent(length: number, drop: number, groundedAt = 16): this {
+    this.assertGrounded(length, drop, groundedAt, 'descent');
+    return this.smooth(length, -Math.abs(drop));
+  }
+
+  private assertGrounded(halfLength: number, dy: number, v: number, what: string): void {
+    const need = FEEL.smoothLengthFor(dy, v);
+    if (halfLength < need - 1e-6) {
+      throw new Error(`[${this.id}] ${what} of ${dy} m over ${halfLength} m at x=${this.x} launches below ${v} m/s; needs >= ${need.toFixed(1)} m`);
+    }
   }
 
   /**
@@ -419,8 +834,12 @@ export class CourseBuilder {
     return this;
   }
 
-  /** Finish line at the cursor, `runout` m of flat, then an end bank so nothing rides off the world. */
-  finish(runout = 10): TrackDef {
+  /**
+   * Finish line at the cursor, `runout` m of flat, then an end bank so nothing rides off the world.
+   * Validates spawns (CONTRACT §2.4) and the checkpoint rule (`CHECKPOINT_RULE`); harness fixtures
+   * and compile-test snippets that are not courses pass `{ checkpointRule: false }`.
+   */
+  finish(runout = 10, opts: { checkpointRule?: boolean } = {}): TrackDef {
     const finishX = this.x;
     this.flat(runout);
     // end bank: 35 deg rise of 4 m
@@ -444,6 +863,7 @@ export class CourseBuilder {
     };
     if (meta.attemptsBand) def.targetAttempts = meta.attemptsBand[1];
     validateSpawns(def);
+    if (opts.checkpointRule !== false) validateCheckpoints(def);
     return def;
   }
 

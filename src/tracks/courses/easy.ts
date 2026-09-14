@@ -9,70 +9,80 @@
  */
 import { course } from '../author';
 
-/** E1 — TEACHES uphill weight shift: lean forward and pulse throttle on steep planks. DEMANDS a 48 deg plank with a short run-in. */
+/**
+ * E1 — TEACHES uphill weight shift: lean forward and pulse throttle on steep planks. DEMANDS a
+ * 48 deg plank from a 20 m run-up. Round 4 (strangers: median 9 against band 2-4; 9 of 20
+ * deaths at the 48 deg wall 3 m past checkpoint 3 — "near-vertical wall right after the
+ * checkpoint with almost no run-up; front wheel slams the slope kink; slow full-gas climbs
+ * loop at the lip" — the rest at the foot of the 45 deg stair descent (62), the 16 m x 1.5 m
+ * wave crest (84), and the quarter-pipe roll-outs off the 3.6 / 2.4 m boxes (159, 205-216)):
+ * every plank now has >= 16 m of flat from its checkpoint (20 for the demand), every box
+ * descends on a straight 9.5 deg ramp a bike leaving the top at 16 m/s lands on, the waves
+ * are grounded at 16 m/s, and the -40 deg plank descent is gone.
+ */
 export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .meta({
     biome: 'canyon',
     technique: 'lean forward on steep climbs',
-    demands: '48 deg plank (filleted foot) from a 3 m run-in, then a 40 deg plank descent',
+    demands: '48 deg plank (filleted foot) from a 20 m run-up, then a long ramp descent',
     attemptsBand: [2, 4],
     targetTimeS: 60,
   })
   .camera({ mode: 'side' })
   .flat(20)
-  .rollers(15, 0.3, 3)
+  .rollers(20, 0.3, 3)
   .flat(6)
-  .checkpoint() // ~41 m
-  .flat(3)
+  .checkpoint() // ~46 m
+  .flat(16)
   .camera({ mode: 'side', zoomBias: -0.4 })
   .plank({ angleDeg: 30, rise: 3.0 }) // 6.0 m board
   .box({ width: 8, height: 3.0 })
-  .stair({ count: 6, height: 0.5, length: 0.5, direction: 'down' })
+  .ramp({ length: 18, height: 3.0, direction: 'down' }) // 9.5 deg: was 6 x 0.5 stairs (45 deg), two strangers endoed at their foot
   .flat(8)
   .camera({ mode: 'side' })
-  .wave(16, 1.5)
+  .wave(28, 1.5, 16)
   .flat(4)
   .humpRow(3, 0.3, 8)
   .flat(4)
   .rollers(20, 0.3, 4)
-  .flat(6)
-  .checkpoint() // ~135 m
-  .flat(3)
+  .flat(8)
+  .checkpoint() // ~175 m
+  .flat(16)
   .camera({ mode: 'side', zoomBias: -0.4 })
   .plank({ angleDeg: 40, rise: 3.6 }) // 5.6 m
   .box({ width: 6, height: 3.6 })
-  .ramp({ length: 6, height: 3.6, curve: 0.4, direction: 'down' }) // quarter-pipe roll-out: ~16 m/s at the bottom
-  .flat(6)
+  .ramp({ length: 22, height: 3.6, direction: 'down' }) // was a 6 m quarter-pipe: a 16 m/s launch off the box landed nose-down at its foot
+  .flat(8)
   .camera({ mode: 'side' })
-  .rollers(15, 0.3, 3) // no tabletop here: at 16+ m/s a 9.5 deg lip overshoots an 8 m top and lands nose-down on flat (sweep 3: 40 faults)
+  .rollers(20, 0.3, 3)
   .flat(4)
   .humpRow(2, 0.3, 8)
-  .flat(6)
-  .checkpoint() // ~180 m
-  .flat(3)
+  .flat(8)
+  .checkpoint() // ~275 m
+  .flat(16)
   .camera({ mode: 'side', zoomBias: -0.4 })
   .plank({ angleDeg: 36, rise: 2.4 }) // 4.1 m: the middle step, at speed
   .box({ width: 6, height: 2.4 })
-  .ramp({ length: 5, height: 2.4, curve: 0.4, direction: 'down' })
-  .flat(6)
+  .ramp({ length: 15, height: 2.4, direction: 'down' })
+  .flat(8)
   .camera({ mode: 'side' })
   .humpRow(2, 0.3, 8)
   .flat(6)
-  .wave(20, 2.0)
+  .wave(34, 2.0, 16)
   .flat(4)
   .rollers(20, 0.3, 4)
-  .flat(6)
-  .checkpoint() // ~285 m
-  .flat(3)
+  .flat(8)
+  .checkpoint() // ~400 m
+  .flat(20) // the demand's run-up: ~10.8 m/s from the spawn
   .camera({ mode: 'side', zoomBias: -0.4 })
-  .steepPlank({ angleDeg: 48, rise: 3.7 }) // fillet + ~4.5 m board, the demand: ~1.5 wheelbase/s so ~2.5 s of climb
+  .steepPlank({ angleDeg: 48, rise: 3.7 }) // fillet + ~4.5 m board, the demand: ~2.5 s of climb, hang over the bars
   .box({ width: 6, height: 3.7 })
-  .plank({ angleDeg: -40, rise: 3.7 }, { base: 3.7 }) // roll the descent, brake
+  .ramp({ length: 22, height: 3.7, direction: 'down' }) // was a -40 deg plank onto flat: a 40 deg kink at its foot
   .camera({ mode: 'side' })
   .flat(8)
-  .wave(20, 2.0)
+  .wave(28, 1.5, 16)
   .flat(4)
-  .rollers(15, 0.3, 3)
+  .rollers(20, 0.3, 3)
   .flat(12)
   .finish();
 
@@ -88,7 +98,7 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .camera({ mode: 'side' })
   .flat(24)
   .checkpoint() // 24 m
-  .flat(3)
+  .flat(16) // 15 m from the spawn (checkpoint rule): a 3 m gap needs ~8 m/s
   .camera({ mode: 'high34' })
   .ramp({ length: 4, height: 0.8 }) // 11 deg, ~8 m/s -> ~5 m range: 3 m gap
   .gap({ width: 3 })
@@ -106,7 +116,7 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .flat(6)
   .checkpoint() // ~115 m
   .flat(3)
-  .flat(12) // run-up: ~11 m/s
+  .flat(13) // run-up: ~11 m/s
   .camera({ mode: 'high34' })
   .ramp({ length: 5, height: 1.5 }) // 16.7 deg; 6 m gap needs ~9 m/s
   .gap({ width: 6 })
@@ -119,10 +129,10 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .smallGap(4, 1.0, 3)
   .flat(10)
   .smallGap(4, 1.0, 3)
-  .flat(10)
+  .flat(14) // >= 8 m past the landing zone before the checkpoint
   .checkpoint() // ~215 m
   .flat(3)
-  .flat(8)
+  .flat(13)
   .camera({ mode: 'high34' })
   .ramp({ length: 5, height: 1.2 })
   .gap({ width: 4 })
@@ -140,7 +150,7 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .flat(6)
   .checkpoint() // ~350 m
   .flat(3)
-  .flat(10)
+  .flat(13)
   .camera({ mode: 'high34' })
   .ramp({ length: 5, height: 1.5 }) // the demand
   .gap({ width: 5 })
@@ -213,6 +223,7 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .stair({ count: 7, height: 0.45, length: 0.4 }) // 48 deg envelope: a wheelie tap on every step
   .box({ width: 3, height: 3.15 })
   .stair({ count: 9, height: 0.35, length: 0.4, direction: 'down' })
+  .flat(6) // checkpoint rule: the stair descent + 6 m is 15 m of effective run-up for the gap
   .gap({ width: 2 }) // brake on the stairs, release before the lip
   .camera({ mode: 'side' })
   .flat(8)

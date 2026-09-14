@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "track-bot-metrics",
   "trackId": "e2-rear-wheel-first",
-  "updatedAt": "2026-09-14T11:01:01.793Z",
+  "updatedAt": "2026-09-14T11:46:52.663Z",
   "physics": "bikePhysicsFactory",
   "attemptsBand": [
     3,
@@ -70,6 +70,8 @@
     "20260914-045241-5a86d7",
     "20260914-045258-b5a528",
     "20260914-060005-e432da",
-    "20260914-060032-445cfc"
+    "20260914-060032-445cfc",
+    "20260914-064601-20a312",
+    "20260914-064625-c1565a"
   ]
 }

@@ -26,7 +26,8 @@ export function listTrackIds(): string[] {
 export const DEFAULT_TRACK_ID = FLAT_TEST_TRACK.id;
 
 export { compileTrack, hashColliders, TrackCompileError, profileQuery } from './compile';
-export { course, CourseBuilder, FEEL, validateSpawns } from './author';
+export { course, CourseBuilder, FEEL, CHECKPOINT_RULE, validateSpawns, validateCheckpoints, auditCheckpoints } from './author';
+export type { CheckpointAuditRow, CheckpointViolation } from './author';
 export { describeTrack, describeObstacles, describeAhead } from './describe';
 export {
   OBSTACLE_KINDS,

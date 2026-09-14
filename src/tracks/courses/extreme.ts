@@ -19,7 +19,7 @@ export const X1 = course('x1-vertical-limit', 'Vertical Limit', 'extreme')
   .camera({ mode: 'side-tight' })
   .flat(24)
   .checkpoint() // 24 m
-  .flat(3)
+  .flat(20) // checkpoint rule: 20 m before a steep plank
   .steepPlank({ angleDeg: 50, rise: 3.8 })
   .box({ width: 4, height: 3.8 })
   .plank({ angleDeg: -40, rise: 3.8 }, { base: 3.8 })
@@ -38,7 +38,7 @@ export const X1 = course('x1-vertical-limit', 'Vertical Limit', 'extreme')
   .wave(20, 2.0)
   .flat(6)
   .checkpoint() // ~165 m
-  .flat(3)
+  .flat(16) // checkpoint rule: 15 m before the kill pit
   .camera({ mode: 'low' })
   .poleRow([1.2, 1.35, 1.5, 1.65, 1.8], 1.1) // rear-wheel hops cap to cap (+0.15 m each) over a kill pit: a miss is a restart, not a stall (+0.3 m steps at 1.3 m: 50 faults)
   .space(0.5)
@@ -54,9 +54,9 @@ export const X1 = course('x1-vertical-limit', 'Vertical Limit', 'extreme')
   .humpRow(3, 0.3, 8)
   .flat(4)
   .tabletop(6, 8, 1.0)
-  .flat(6)
+  .flat(8)
   .checkpoint() // ~205 m
-  .flat(3)
+  .flat(3) // a lip climb is a ~5 m/s technique: from 16 m the skill-3 bot stalled at this wall, from 3 m it clears (round 4)
   .camera({ mode: 'side-tight' })
   .wall({ height: 1.2, width: 4, lip: 0.2 })
   .steepPlank({ angleDeg: 56, rise: 3.5 }, { base: 1.2 })
@@ -73,7 +73,7 @@ export const X1 = course('x1-vertical-limit', 'Vertical Limit', 'extreme')
   .checkpoint() // ~285 m
   .flat(3)
   .camera({ mode: 'side-tight' })
-  .flat(5) // 8 m run-in total: hop at the foot to carry speed up the face
+  .flat(18) // 20 m run-in (checkpoint rule): hop at the foot to carry speed up the face
   .steepPlank({ angleDeg: 60, rise: 4.5 })
   .box({ width: 3, height: 4.5 })
   .camera({ mode: 'low' })
@@ -102,7 +102,7 @@ export const X2 = course('x2-pipe-dream', 'Pipe Dream', 'extreme')
   .checkpoint() // 24 m
   .flat(3)
   .drumStep({ radius: 0.8, rolls: true }) // shelf 1.2 -> spinning 1.6 m drum (was a bare drum behind a 0.5 m kicker: unrideable)
-  .gap({ width: 3 })
+  .gap({ width: 2 }) // round 4: 2 m is the drum-top hop envelope (a spinning top cannot be pumped); 3 m from a checkpoint spawn had no run-up
   .box({ width: 4, height: 0.8 })
   .ramp({ length: 4, height: 0.8, direction: 'down' })
   .flat(4)
@@ -124,7 +124,7 @@ export const X2 = course('x2-pipe-dream', 'Pipe Dream', 'extreme')
   .flat(2)
   .drumStep({ radius: 1.0 }) // shelf 1.4 -> 2.0 m drum
   .pole({ height: 1.5 }) // step off the drum across a cap onto the box
-  .box({ width: 6, height: 1.8 })
+  .box({ width: 15, height: 1.8 }) // round 4: 15 m of platform is the run-up the 4 m gap needs (checkpoint rule)
   .ramp({ length: 1.5, height: 0.4, curve: 0.3 }, { base: 1.8 })
   .gap({ width: 4 })
   .drum({ radius: 1.0, rolls: true }) // land on a spinning top from the kicker
@@ -159,8 +159,8 @@ export const X2 = course('x2-pipe-dream', 'Pipe Dream', 'extreme')
   .drumStep({ radius: 1.0, rolls: true })
   .gap({ width: 2 }) // a spinning top cannot be pumped: at ~5 m/s off the see-saw a 3 m drum-to-drum gap was a 34-attempt wall (sweep 3)
   .drum({ radius: 0.8, rolls: true })
-  .gap({ width: 2.5 })
-  .flat(4)
+  .gap({ width: 2 }) // round 4: 2.5 m off a drum top is a speed gap with no run-up; 2 m is the hop envelope
+  .flat(13) // checkpoint rule: 15 m before the 0.7 m kerb hop
   .ledge({ height: 0.7, length: 4 })
   .camera({ mode: 'side' })
   .flat(8)
@@ -182,7 +182,7 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .checkpoint() // 28 m
   .flat(3)
   // B3 kicker + gap
-  .flat(8)
+  .flat(13) // checkpoint rule: 15 m
   .ramp({ length: 5, height: 2.0, curve: 0.3 })
   .gap({ width: 5 })
   .box({ width: 8, height: 0.4 })
@@ -200,13 +200,14 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .box({ width: 6, height: 0.6 })
   .ramp({ length: 3, height: 1.0 }, { base: 0.6 })
   .gap({ width: 6 })
-  .flat(6)
+  .flat(14) // checkpoint rule: >= 8 m past the landing zone
   .checkpoint() // ~135 m
   .flat(3)
   // E3 stairs
   .stair({ count: 7, height: 0.45, length: 0.4 })
   .box({ width: 3, height: 3.15 })
   .stair({ count: 9, height: 0.35, length: 0.4, direction: 'down' })
+  .flat(6) // checkpoint rule: descent + 6 m is 15 m of effective run-up
   .gap({ width: 2 })
   .flat(4)
   // M1 hops
@@ -219,7 +220,7 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .wave(16, 1.5)
   .flat(6)
   .checkpoint() // ~215 m
-  .flat(3)
+  .flat(16) // checkpoint rule: 15 m
   // M3 see-saw landing
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 3 })
@@ -238,10 +239,10 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .gap({ width: 0.7, depth: 1.5, hazard: 'kill' })
   .flat(1.3)
   .gap({ width: 0.7, depth: 1.5, hazard: 'kill' })
-  .flat(6)
+  .flat(14) // checkpoint rule: >= 8 m past the landing zone
   .checkpoint() // ~255 m
   .flat(3)
-  .flat(4)
+  .flat(13) // checkpoint rule: 15 m
   // H2 chain
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 4 })
@@ -268,12 +269,12 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .ramp({ length: 6, height: 2.0, direction: 'down' })
   .flat(8) // brake zone
   .ledge({ height: 0.7, length: 4 })
-  .flat(6)
+  .flat(14) // checkpoint rule: >= 8 m past the landing zone
   .camera({ mode: 'side-tight' })
   .checkpoint() // ~385 m
   .flat(3)
   // X1 plank + poles
-  .flat(5)
+  .flat(18) // checkpoint rule: 20 m before a steep plank
   .steepPlank({ angleDeg: 60, rise: 4.5 })
   .box({ width: 3, height: 4.5 })
   .poleRow([4.5, 4.5, 4.5], 1.7)
@@ -286,12 +287,12 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .drumStep({ radius: 1.0, rolls: true })
   .gap({ width: 2 })
   .drum({ radius: 0.8, rolls: true })
-  .gap({ width: 2.5 })
-  .flat(6)
+  .gap({ width: 2 }) // round 4: the drum-top hop envelope
+  .flat(14) // checkpoint rule: >= 8 m past the landing zone
   .checkpoint() // ~460 m
   .flat(3)
   // finale: unseen combination
-  .flat(12)
+  .flat(13) // checkpoint rule: 15 m
   .camera({ mode: 'low', cut: true })
   .ramp({ length: 6, height: 2.5, curve: 0.3 })
   .gap({ width: 6 })

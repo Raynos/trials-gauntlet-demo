@@ -11,12 +11,21 @@
  */
 import { course } from '../author';
 
-/** B1 — TEACHES throttle control: go / hold steady / slow down. DEMANDS a slow roll over a speed bump after a descent. */
+/**
+ * B1 — TEACHES throttle control: go / hold steady / slow down. DEMANDS a slow roll over a speed
+ * bump after a descent. Round 4 (strangers: median 3 against band 1-1; deaths at 199 = flying
+ * off the 8.5 deg tabletop lip at speed, 303 = launched off the crest of a 20 m x 2.0 m wave,
+ * "full throttle on the face pitched the bike nose-up and airborne over the crest"): nothing
+ * on B1 can leave the ground at top speed. Every rise and fall is a cosine with crest radius
+ * >= v^2/g at 20 m/s, top speed (`plateau`, `wave(..., 20)`, `descent`, `bumpRow`): no ramp kink
+ * anywhere, no convex hump (physics round 8: a flat-out rider at 18.5 m/s nosed down through one). Half
+ * gas and lean forward on the climbs clears it; there is no jump to level.
+ */
 export const B1 = course('b1-first-ride', 'First Ride', 'beginner')
   .meta({
     biome: 'industrial',
     technique: 'throttle control',
-    demands: 'slow down after the long descent for a speed hump and a low tabletop, then hold the gas home',
+    demands: 'slow down after the long descent for a speed hump and a low plateau, then hold the gas home',
     attemptsBand: [1, 1],
     targetTimeS: 45,
   })
@@ -26,52 +35,43 @@ export const B1 = course('b1-first-ride', 'First Ride', 'beginner')
   .hint('Brake before the hump')
   .camera({ mode: 'side' })
   .flat(20)
-  .slope(8, 1.2) // 8.5 deg: first hill, hold the gas
+  .smooth(16, 1.2) // first hill (peak 6.7 deg), grounded at 20 m/s: hold the gas
   .flat(8)
-  .smooth(6, -1.2)
-  .checkpoint() // ~42 m
+  .descent(16, 1.2, 20)
   .flat(6)
-  .rollers(15, 0.3, 3) // steady throttle; first suspension squash
+  .checkpoint() // ~62 m
+  .flat(6)
+  .rollers(20, 0.25, 3) // steady throttle; first suspension squash (a 0.25 m skip at most)
   .flat(5)
-  .tabletop(6, 8, 1.0) // 9.5 deg ramp, box, ramp down
+  .plateau(15, 8, 1.0, 15, 20) // the old 6/8/1.0 tabletop: an 8.5 deg lip is a 7 m flight at 16 m/s, a 15 m cosine is grounded at top speed
   .flat(6)
-  // flow: humps and a berm roll keep the speed up
-  .humpRow(3, 0.3, 8)
+  // flow: humps and a long berm roll keep the speed up
+  .bumpRow(3, 0.25, 20) // physics round 8: a flat-out rider at 18.5 m/s nosed down through a 0.25 m convex hump row here
   .flat(4)
-  .wave(20, 1.5)
-  .flat(4)
-  .rollers(20, 0.3, 4)
-  .flat(6)
-  .checkpoint() // ~160 m
-  .flat(6)
-  .tabletop(8, 10, 1.2) // 8.5 deg, longer top: a full-throttle launch still lands on it
+  .wave(36, 1.5, 20)
   .flat(8)
-  .humpRow(2, 0.3, 8)
+  .checkpoint() // ~225 m
   .flat(6)
-  .tabletop(6, 8, 1.0)
+  .plateau(16, 10, 1.2, 16, 20) // longer top, same crest rule
+  .flat(8)
+  .bumpRow(2, 0.25, 20)
   .flat(6)
-  .rollers(15, 0.3, 3)
-  .flat(6)
-  .wave(20, 2.0)
+  .wave(42, 2.0, 20) // was 20 x 2.0 (crest radius 10 m): the stranger death at 303
   .flat(4)
-  .humpRow(3, 0.3, 8)
+  .bumpRow(2, 0.25, 20)
+  .flat(8)
+  .checkpoint() // ~370 m
   .flat(6)
-  .checkpoint() // ~310 m
-  .flat(6)
-  .slope(10, -2.0) // 11 deg descent builds speed
+  .descent(21, 2.0, 20) // the long descent builds speed (peak 8.5 deg), grounded at 20 m/s
   .flat(8) // brake zone: measured 4.47 m from 10 m/s, authored 8
-  .hump(0.3, 3) // speed hump: rolls at any speed, a small hop if you keep the gas on
+  .bumpRow(1, 0.3, 20) // the speed bump: a 0.3 m cosine bump grounded at top speed
   .flat(6)
-  .tabletop(3, 4, 0.5) // low tabletop: throttle to climb it, that is all
+  .plateau(11, 4, 0.5, 11, 20) // low plateau: throttle to climb it, that is all
   .flat(8)
   // set piece: the long roller-coaster home
-  .wave(24, 2.5)
+  .wave(46, 2.5, 20)
   .flat(4)
-  .rollers(20, 0.3, 4)
-  .flat(4)
-  .tabletop(6, 8, 1.0)
-  .flat(10)
-  .wave(20, 2.0)
+  .rollers(20, 0.25, 4)
   .flat(10)
   .finish();
 
@@ -151,77 +151,72 @@ export const B2 = course('b2-lean-back', 'Lean Back', 'beginner')
   .flat(10)
   .finish();
 
-/** B3 — TEACHES the jump: full throttle off a kicker, level in the air, land rear first. DEMANDS a kicker over a 5 m gap. */
+/**
+ * B3 — TEACHES the jump: gas to the ramp, off the gas at the lip, lean forward to level, land
+ * rear first. DEMANDS a kicker over a 5 m gap. Round 4 (strangers: median 11.5 against band
+ * 1-2; 5 deaths at the first kicker 3 m past the checkpoint, 8 at the 5 x 2.0 kicker over a
+ * barrel pit into a 2 m wall: "checkpoint 1 respawns 2-3 m before the kicker with no room to
+ * build speed; full gas mid-ramp backflips"): every kicker is >= 16 m past its checkpoint and
+ * lands on flat or a ground downslope, so under-speed rolls off the lip and over-speed lands
+ * long; the pit-and-wall and the barrels are gone; the 22 deg kicker is 5 x 1.5.
+ */
 export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
   .meta({
     biome: 'industrial',
     technique: 'jump and level in the air',
-    demands: 'kicker over a 5 m gap: throttle to the lip',
+    demands: 'kicker over a 5 m gap: speed to the lip, off the gas in the air',
     attemptsBand: [1, 2],
     targetTimeS: 55,
   })
-  .hint('Full gas off the lip')
-  .hint('Level the bike in the air')
-  .hint('Off the gas before the landing')
-  .hint('Hold gas to clear the gap')
+  .hint('Gas to the ramp, off at the lip')
+  .hint('Lean forward to level')
+  .hint('Land rear wheel first')
+  .hint('Hold speed to clear the gap')
   .camera({ mode: 'side' })
-  .flat(28)
-  .checkpoint() // 28 m
-  .flat(3)
-  .ramp({ length: 4, height: 1.2, curve: 0.3 }) // ~17 deg kicker, ~9 m/s here: lands ~5 m out
+  .flat(20)
+  .checkpoint() // 20 m
+  .flat(16) // run-up: ~9.7 m/s from the spawn
+  .ramp({ length: 4, height: 0.8, curve: 0.3 }) // first kicker: a 14 deg hop onto flat, lands 4-12 m out
+  .flat(18)
+  .ramp({ length: 4, height: 1.0, curve: 0.3 })
+  .flat(8) // under-speed lands here
+  .slope(10, -1.0) // over-speed lands on the downslope
+  .flat(10)
+  .rollers(20, 0.25, 3)
+  .flat(8)
+  .checkpoint() // ~118 m
+  .flat(16)
+  .ramp({ length: 4, height: 1.2, curve: 0.3 }) // ~17 deg: level the bike in the air
+  .flat(8)
+  .slope(12, -1.2)
+  .flat(10)
+  .humpRow(2, 0.25, 8, 4)
+  .flat(6)
+  .camera({ mode: 'high34', zoomBias: 0.4 })
+  .ramp({ length: 5, height: 1.5, curve: 0.3 }) // ~22 deg exit, the biggest lip on B3
+  .flat(8)
+  .slope(12, -1.5)
+  .camera({ mode: 'side' })
+  .flat(10)
+  .wave(28, 1.5, 16)
+  .flat(8)
+  .checkpoint() // ~250 m
+  .flat(16)
+  .smallGap(4, 1.0, 2) // first gap: 2 m from a 14 deg kicker, 16 m of run-up
   .flat(14)
-  .ramp({ length: 4, height: 1.5, curve: 0.3 })
-  .flat(4)
-  .tabletop(3, 8, 0.8, 4) // uphill landing zone at 0.8
-  .flat(6)
-  // flow: rollers and two small kickers with room to land
-  .rollers(15, 0.3, 3)
-  .flat(4)
-  .ramp({ length: 4, height: 1.0, curve: 0.3 })
-  .flat(12)
-  .ramp({ length: 4, height: 1.0, curve: 0.3 })
-  .flat(12)
-  .checkpoint() // ~125 m
-  .flat(4)
-  .camera({ mode: 'high34', zoomBias: 0.4 })
-  .ramp({ length: 5, height: 2.0, curve: 0.3 }) // ~22 deg
-  .flat(3)
-  .barrel({ count: 3, spacing: 0.7, burning: false }) // decor row under the flight
-  .flat(2)
-  .ramp({ length: 6, height: 2.0, curve: -0.3, direction: 'down' }) // downslope landing
-  .flat(6)
-  .camera({ mode: 'side' })
-  .humpRow(2, 0.3, 8)
-  .flat(6)
-  .smallGap(4, 1.0, 2) // first gap: 2 m from a 14 deg kicker
-  .flat(10)
   .smallGap(4, 1.2, 3)
-  .flat(10)
-  .checkpoint() // ~205 m
-  .flat(4)
-  .wave(20, 2.0)
-  .flat(4)
-  .rollers(20, 0.3, 4)
-  .flat(4)
-  .humpRow(2, 0.3, 8)
-  .flat(6)
-  .wave(16, 1.2)
-  .flat(4)
-  .ramp({ length: 5, height: 1.5, curve: 0.3 })
-  .flat(4)
-  .tabletop(3, 8, 0.8, 4) // uphill landing again, at speed
-  .flat(6)
-  .smallGap(4, 1.2, 3)
-  .flat(10)
-  .checkpoint() // ~275 m
-  .flat(4)
-  .flat(10) // run-up: ~11 m/s available, 5 m gap from a 22 deg lip needs ~8
+  .flat(14)
+  .rollers(20, 0.25, 3)
+  .flat(8)
+  .checkpoint() // ~340 m
+  .flat(16) // run-up: ~9.7 m/s from the spawn; a 5 m gap from a 22 deg lip needs ~8
   .camera({ mode: 'high34', zoomBias: 0.4 })
-  .ramp({ length: 5, height: 2.0, curve: 0.3 }) // the set piece
+  .ramp({ length: 5, height: 1.5, curve: 0.3 }) // the set piece
   .gap({ width: 5 })
-  .box({ width: 10, height: 0.4 })
+  .box({ width: 16, height: 0.4 }) // long enough that a full-gas 16 m/s launch (~15 m) still lands on it
+  .ramp({ length: 4, height: 0.4, direction: 'down' })
   .camera({ mode: 'side' })
   .flat(8)
-  .rollers(15, 0.3, 3)
+  .rollers(20, 0.25, 3)
   .flat(10)
   .finish();

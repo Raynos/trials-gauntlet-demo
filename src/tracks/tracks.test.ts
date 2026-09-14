@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { Collider, ColliderPolyline, CompiledTrack, TrackDef, Vec2 } from '../core/types';
 import { ALL_TRACKS, CURRICULUM, compileTrack, describeTrack, getTrack, listTrackIds } from './index';
-import { FEEL, SPAWN_CLEAR_AHEAD, SPAWN_CLEAR_BEHIND } from './author';
+import { CHECKPOINT_RULE, FEEL, SPAWN_CLEAR_AHEAD, SPAWN_CLEAR_BEHIND, auditCheckpoints } from './author';
 import { cancelSharedEdges, segmentsCross, type OwnedEdge } from './geometry';
 import { OBSTACLE_KINDS, footprint, type ObstacleKind } from './kinds';
 
@@ -151,6 +151,19 @@ describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
       const seg = ground.flatMap(polylineEdges).find((e) => e.a.x <= x0 + 1e-9 && e.b.x >= x1 - 1e-9 && Math.abs(e.a.y - e.b.y) < 1e-9);
       expect(seg, `spawn at x=${s.pos.x} not on one flat ground segment`).toBeDefined();
       expect(Math.abs((seg as OwnedEdge).a.y - s.pos.y)).toBeLessThan(1e-9);
+    }
+  });
+
+  it('checkpoint rule (round 4): 15 m run-up before the first speed obstacle, no checkpoint within 8 m of a landing', () => {
+    // gap-test is a harness fixture with recorded inputs (10 m run-up by design): the rule is a curriculum rule
+    if (!CURRICULUM.some((t) => t.id === def.id)) return;
+    const { rows, violations } = auditCheckpoints(def);
+    expect(violations.map((v) => v.message)).toEqual([]);
+    expect(rows).toHaveLength(def.checkpoints.length + 1);
+    for (const r of rows) {
+      expect(r.ok).toBe(true);
+      if (r.runup !== null) expect(r.runup).toBeGreaterThanOrEqual(r.runupNeed as number);
+      if (r.afterLanding !== null) expect(r.afterLanding).toBeGreaterThanOrEqual(CHECKPOINT_RULE.afterLanding);
     }
   });
 

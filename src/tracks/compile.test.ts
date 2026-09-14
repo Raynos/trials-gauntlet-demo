@@ -28,7 +28,7 @@ describe('kinds', () => {
 
 describe('compileTrack merge', () => {
   it('ramp -> box -> ramp share no faces: only the exposed outline survives', () => {
-    const def = course('t-tabletop', 't', 'beginner').meta(meta).flat(10).tabletop(4, 6, 1.2, 4).flat(10).finish();
+    const def = course('t-tabletop', 't', 'beginner').meta(meta).flat(10).tabletop(4, 6, 1.2, 4).flat(10).finish(10, { checkpointRule: false });
     const ps = polys(def);
     const ramp = ps.find((p) => p.obstacleIndex === 0) as ColliderPolyline;
     const box = ps.find((p) => p.obstacleIndex === 1) as ColliderPolyline;
@@ -53,7 +53,7 @@ describe('compileTrack merge', () => {
   });
 
   it('a lower box after a taller ramp leaves exactly the step between them', () => {
-    const def = course('t-step', 't', 'beginner').meta(meta).flat(10).ramp({ length: 4, height: 1.2 }).box({ width: 4, height: 1.0 }).flat(10).finish();
+    const def = course('t-step', 't', 'beginner').meta(meta).flat(10).ramp({ length: 4, height: 1.2 }).box({ width: 4, height: 1.0 }).flat(10).finish(10, { checkpointRule: false });
     const ramp = polys(def).find((p) => p.obstacleIndex === 0) as ColliderPolyline;
     expect(ramp.points).toEqual([
       { x: 10, y: 0 },
@@ -63,7 +63,7 @@ describe('compileTrack merge', () => {
   });
 
   it('a box on a slope follows the ground exactly', () => {
-    const def = course('t-slope', 't', 'beginner').meta(meta).flat(10).slope(10, 1).flat(4).box({ width: 4, height: 1 }).flat(10).finish();
+    const def = course('t-slope', 't', 'beginner').meta(meta).flat(10).slope(10, 1).flat(4).box({ width: 4, height: 1 }).flat(10).finish(10, { checkpointRule: false });
     const ps = polys(def);
     const box = ps.find((p) => p.obstacleIndex === 0) as ColliderPolyline;
     expect(box.points).toEqual([
@@ -77,7 +77,7 @@ describe('compileTrack merge', () => {
   });
 
   it('stacked ramp (base) launches from the platform top and its near face cancels', () => {
-    const def = course('t-base', 't', 'beginner').meta(meta).flat(10).box({ width: 6, height: 0.6 }).ramp({ length: 3, height: 1 }, { base: 0.6 }).flat(10).finish();
+    const def = course('t-base', 't', 'beginner').meta(meta).flat(10).box({ width: 6, height: 0.6 }).ramp({ length: 3, height: 1 }, { base: 0.6 }).flat(10).finish(10, { checkpointRule: false });
     const ramp = polys(def).find((p) => p.obstacleIndex === 1) as ColliderPolyline;
     expect(ramp.points).toEqual([
       { x: 16, y: 0.6 },
@@ -87,7 +87,7 @@ describe('compileTrack merge', () => {
   });
 
   it('gap punches a pit into the ground and fills it with a hazard', () => {
-    const def = course('t-gap', 't', 'beginner').meta(meta).flat(10).gap({ width: 3, depth: 2 }).flat(10).finish();
+    const def = course('t-gap', 't', 'beginner').meta(meta).flat(10).gap({ width: 3, depth: 2 }).flat(10).finish(10, { checkpointRule: false });
     const c = compileTrack(def);
     const ground = c.colliders[0] as ColliderPolyline;
     expect(ground.points.slice(1, 5)).toEqual([
@@ -101,7 +101,7 @@ describe('compileTrack merge', () => {
   });
 
   it('plank is a one-way top surface; wall lip is a one-way overhang', () => {
-    const def = course('t-plank', 't', 'beginner').meta(meta).flat(10).plank({ angleDeg: 30, rise: 2 }).box({ width: 4, height: 2 }).flat(4).wall({ height: 1, width: 2, lip: 0.2 }).flat(10).finish();
+    const def = course('t-plank', 't', 'beginner').meta(meta).flat(10).plank({ angleDeg: 30, rise: 2 }).box({ width: 4, height: 2 }).flat(4).wall({ height: 1, width: 2, lip: 0.2 }).flat(10).finish(10, { checkpointRule: false });
     const ps = polys(def);
     const plank = ps.find((p) => p.obstacleIndex === 0) as ColliderPolyline;
     expect(plank.oneWay).toBe(true);
@@ -114,7 +114,7 @@ describe('compileTrack merge', () => {
   });
 
   it('steepPlank puts a concave fillet under the plank foot and the plank starts on its top', () => {
-    const def = course('t-fillet', 't', 'beginner').meta(meta).flat(10).steepPlank({ angleDeg: 60, rise: 4.5 }).box({ width: 3, height: 4.5 }).flat(10).finish();
+    const def = course('t-fillet', 't', 'beginner').meta(meta).flat(10).steepPlank({ angleDeg: 60, rise: 4.5 }).box({ width: 3, height: 4.5 }).flat(10).finish(10, { checkpointRule: false });
     const ps = polys(def);
     const fillet = ps.find((p) => p.obstacleIndex === 0) as ColliderPolyline;
     const plank = ps.find((p) => p.obstacleIndex === 1) as ColliderPolyline;
@@ -131,13 +131,13 @@ describe('compileTrack merge', () => {
   it('every kind resolves variant=0 and drums carry a visual width', () => {
     for (const k of OBSTACLE_KINDS) expect(resolveParams(k, undefined)).toMatchObject({ variant: 0 });
     expect(resolveParams('drum', undefined).width).toBe(1.2);
-    const def = course('t-variant', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1, variant: 2 }).flat(10).finish();
+    const def = course('t-variant', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1, variant: 2 }).flat(10).finish(10, { checkpointRule: false });
     const c = compileTrack(def);
     expect(c.placed[0]?.params).toMatchObject({ variant: 2, width: 4, height: 1, surface: 'metal' });
   });
 
   it('burning barrels carry a fire hazard; unlit ones do not', () => {
-    const def = course('t-barrel', 't', 'beginner').meta(meta).flat(10).barrel({ count: 2, spacing: 0.8 }).flat(2).barrel({ burning: false }).flat(10).finish();
+    const def = course('t-barrel', 't', 'beginner').meta(meta).flat(10).barrel({ count: 2, spacing: 0.8 }).flat(2).barrel({ burning: false }).flat(10).finish(10, { checkpointRule: false });
     const c = compileTrack(def);
     expect(c.hazards.map((h) => h.kind)).toEqual(['fire', 'fire']);
     expect(c.hazards[0]).toMatchObject({ min: { x: 10, y: 0.9 }, max: { x: 10.6, y: 1.5 } });
@@ -145,7 +145,7 @@ describe('compileTrack merge', () => {
   });
 
   it('seesaw max angle lets an end touch the ground, capped at 30 deg', () => {
-    const def = course('t-seesaw', 't', 'beginner').meta(meta).flat(10).seesaw({ length: 6, height: 1 }).flat(2).seesaw({ length: 6, height: 2.5, angleDeg: 40 }).flat(10).finish();
+    const def = course('t-seesaw', 't', 'beginner').meta(meta).flat(10).seesaw({ length: 6, height: 1 }).flat(2).seesaw({ length: 6, height: 2.5, angleDeg: 40 }).flat(10).finish(10, { checkpointRule: false });
     const ss = compileTrack(def).colliders.filter((c): c is ColliderSeesaw => c.kind === 'seesaw');
     expect(ss[0]?.pivot).toEqual({ x: 13, y: 1 });
     expect(ss[0]?.maxAngle).toBeCloseTo(Math.asin((1 - 0.06) / 3), 5);
@@ -155,7 +155,7 @@ describe('compileTrack merge', () => {
   });
 
   it('drum rolls flag and logpile pyramid count', () => {
-    const def = course('t-drum', 't', 'beginner').meta(meta).flat(10).drum({ radius: 1, rolls: true }).flat(2).logpile({ count: 3, rows: 3 }).flat(10).finish();
+    const def = course('t-drum', 't', 'beginner').meta(meta).flat(10).drum({ radius: 1, rolls: true }).flat(2).logpile({ count: 3, rows: 3 }).flat(10).finish(10, { checkpointRule: false });
     const c = compileTrack(def);
     const circles = c.colliders.filter((k) => k.kind === 'circle');
     expect(circles).toHaveLength(1 + 6);
@@ -164,8 +164,8 @@ describe('compileTrack merge', () => {
   });
 
   it('is pure: same def, same hash; different def, different hash', () => {
-    const a = course('t-a', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1 }).flat(10).finish();
-    const b = course('t-a', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1.01 }).flat(10).finish();
+    const a = course('t-a', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1 }).flat(10).finish(10, { checkpointRule: false });
+    const b = course('t-a', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1.01 }).flat(10).finish(10, { checkpointRule: false });
     expect(compileTrack(a).hash).toBe(compileTrack(a).hash);
     expect(compileTrack(a).hash).not.toBe(compileTrack(b).hash);
     expect(hashColliders([])).toMatch(/^[0-9a-f]{16}$/);
@@ -192,7 +192,7 @@ describe('authoring errors', () => {
   it('rejects overlapping solids', () => {
     expect(() =>
       compileTrack({
-        ...course('t-x', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1 }).flat(10).finish(),
+        ...course('t-x', 't', 'beginner').meta(meta).flat(10).box({ width: 4, height: 1 }).flat(10).finish(10, { checkpointRule: false }),
         obstacles: [
           { kind: 'box', pos: { x: 10, y: 0 }, params: { width: 4, height: 1 } },
           { kind: 'box', pos: { x: 12, y: 0 }, params: { width: 4, height: 1 } },
@@ -202,7 +202,7 @@ describe('authoring errors', () => {
   });
 
   it('rejects a gap on sloped ground', () => {
-    const base = course('t-x', 't', 'beginner').meta(meta).flat(10).slope(10, 1).flat(10).finish();
+    const base = course('t-x', 't', 'beginner').meta(meta).flat(10).slope(10, 1).flat(10).finish(10, { checkpointRule: false });
     expect(() => compileTrack({ ...base, obstacles: [{ kind: 'gap', pos: { x: 12, y: 0.2 }, params: { width: 3 } }] })).toThrow(/not level/);
     // overlapping pits are refused too
     expect(() =>
@@ -211,18 +211,18 @@ describe('authoring errors', () => {
   });
 
   it('rejects a spawn that is not on one flat segment', () => {
-    expect(() => course('t-x', 't', 'beginner').meta(meta).flat(10).checkpoint().slope(10, 1).flat(10).finish()).toThrow(/single flat/);
-    expect(() => course('t-x', 't', 'beginner').meta(meta).flat(10).checkpoint().box({ width: 4, height: 1 }).flat(10).finish()).toThrow(/sits on obstacle/);
+    expect(() => course('t-x', 't', 'beginner').meta(meta).flat(10).checkpoint().slope(10, 1).flat(10).finish(10, { checkpointRule: false })).toThrow(/single flat/);
+    expect(() => course('t-x', 't', 'beginner').meta(meta).flat(10).checkpoint().box({ width: 4, height: 1 }).flat(10).finish(10, { checkpointRule: false })).toThrow(/sits on obstacle/);
   });
 
   it('rejects unknown kinds and a non-monotone profile', () => {
-    const base = course('t-x', 't', 'beginner').meta(meta).flat(10).finish();
+    const base = course('t-x', 't', 'beginner').meta(meta).flat(10).finish(10, { checkpointRule: false });
     expect(() => compileTrack({ ...base, obstacles: [{ kind: 'loop', pos: { x: 5, y: 0 } }] })).toThrow(/unknown kind/);
     expect(() => compileTrack({ ...base, profile: [{ x: 0, y: 0 }, { x: 0, y: 1 }] })).toThrow(/strictly increasing/);
   });
 
   it('requires meta and rejects ground slopes steeper than 40 deg', () => {
-    expect(() => course('t-x', 't', 'beginner').flat(10).finish()).toThrow(/meta/);
+    expect(() => course('t-x', 't', 'beginner').flat(10).finish(10, { checkpointRule: false })).toThrow(/meta/);
     expect(() => course('t-x', 't', 'beginner').meta(meta).slope(1, 2)).toThrow(/too steep/);
   });
 });
@@ -242,7 +242,7 @@ describe('feel helpers', () => {
 
 describe('describeAhead', () => {
   it('lists what is coming in range', () => {
-    const def = course('t-d', 't', 'beginner').meta(meta).flat(10).ramp({ length: 4, height: 1 }).gap(3).checkpoint().flat(10).finish();
+    const def = course('t-d', 't', 'beginner').meta(meta).flat(10).ramp({ length: 4, height: 1 }).gap(3).checkpoint().flat(10).finish(10, { checkpointRule: false });
     const c = compileTrack(def);
     expect(describeAhead(c, 5, 20)).toBe('ramp 4x1 in 5.0 m, gap 3x3 in 9.0 m, checkpoint in 12.0 m');
     expect(describeAhead(c, 100, 5)).toBe('flat for 5 m');

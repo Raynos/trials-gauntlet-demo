@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "track-bot-metrics",
   "trackId": "b3-kicker-row",
-  "updatedAt": "2026-09-14T10:58:55.455Z",
+  "updatedAt": "2026-09-14T11:45:05.720Z",
   "physics": "bikePhysicsFactory",
   "attemptsBand": [
     1,
@@ -92,6 +92,8 @@
     "20260914-055219-d1b0b7",
     "20260914-055223-b2f38a",
     "20260914-055845-5c6119",
-    "20260914-055848-afbeae"
+    "20260914-055848-afbeae",
+    "20260914-064458-7c2e0d",
+    "20260914-064501-c06640"
   ]
 }

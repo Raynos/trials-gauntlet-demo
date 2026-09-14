@@ -30,16 +30,16 @@ export const H1 = (() => {
     .flat(4);
   slots(b, 8, 2.5); // wheelie section 1
   b.flat(6).wave(16, 1.5).flat(4).humpRow(3, 0.3, 8).flat(6).checkpoint(); // ~130 m
-  b.flat(3).flat(5).wall({ height: 1.0, width: 6, lip: 0.15 }).flat(4); // front wheel onto the lip at ~5 m/s, hop the rear up
+  b.flat(3).flat(13).wall({ height: 1.0, width: 6, lip: 0.15 }).flat(4); // 15 m run-up from the spawn (checkpoint rule), front wheel onto the lip/s, hop the rear up
   slots(b, 6, 3.0);
   b.flat(6).rollers(20, 0.3, 4).flat(4).tabletop(6, 8, 1.0).flat(6).wave(20, 2.0).flat(4).humpRow(2, 0.3, 8).flat(6).checkpoint(); // ~285 m
-  b.flat(3).flat(5).wall({ height: 1.2, width: 5, lip: 0.15 }).flat(3);
+  b.flat(3).flat(13).wall({ height: 1.2, width: 5, lip: 0.15 }).flat(3);
   slots(b, 6, 2.5);
   b.flat(6).wave(20, 2.0).flat(4).humpRow(2, 0.3, 8).flat(6).checkpoint(); // ~320 m
-  b.flat(3).flat(3);
+  b.flat(3).flat(13);
   slots(b, 10, 2.0); // the long wire: 10 slots at 2.0 m
   b.flat(6).rollers(15, 0.3, 3).flat(6).checkpoint(); // ~380 m
-  b.flat(3).flat(6).camera({ mode: 'low', cut: true }).wall({ height: 1.4, width: 4, lip: 0.2 }).flat(2);
+  b.flat(3).flat(13).camera({ mode: 'low', cut: true }).wall({ height: 1.4, width: 4, lip: 0.2 }).flat(3); // checkpoint rule: wall top + slots = 15 m to the closing 3 m gap
   slots(b, 5, 2.0);
   return b.gap({ width: 3 }).camera({ mode: 'side' }).flat(8).humpRow(2, 0.3, 8).flat(12).finish();
 })();
@@ -58,7 +58,7 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
   .checkpoint() // 28 m
   .flat(3)
   // chain A: every platform ends in a 1.5 x 0.4 kicker; speeds ~8, 6, 9, 5 m/s
-  .flat(6)
+  .flat(13) // 15 m from the spawn (checkpoint rule)
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 4 })
   .platform(5, 0.8)
@@ -79,7 +79,7 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
   .flat(6)
   .checkpoint() // ~175 m
   .flat(3)
-  .flat(8)
+  .flat(13)
   .camera({ mode: 'high34' })
   // chain B: landing 0.3 above launch every time -> rear first mandatory
   .ramp({ length: 5, height: 1.2 })
@@ -99,10 +99,10 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
   .humpRow(3, 0.3, 8)
   .flat(4)
   .tabletop(6, 8, 1.0)
-  .flat(6)
+  .flat(8)
   .checkpoint() // ~225 m
   .flat(3)
-  .flat(8)
+  .flat(13)
   .camera({ mode: 'high34' })
   // chain D: fast and wide, 5 m platforms, gaps 5/4/5
   .ramp({ length: 5, height: 1.5 })
@@ -119,7 +119,7 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
   .flat(6)
   .checkpoint() // ~305 m
   .flat(3)
-  .flat(8)
+  .flat(13)
   .camera({ mode: 'high34' })
   // chain C: 3.5 m platforms (1.5 of it kicker), one bike length of slack
   .ramp({ length: 4, height: 1.0 })
@@ -169,7 +169,7 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .wave(20, 2.0)
   .flat(4)
   .tabletop(6, 8, 1.0)
-  .flat(6)
+  .flat(8)
   .checkpoint() // ~190 m
   .flat(3)
   .flat(20)
@@ -184,7 +184,7 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .wave(16, 1.5)
   .flat(4)
   .tabletop(6, 8, 1.0)
-  .flat(6)
+  .flat(8)
   .checkpoint() // ~230 m
   .flat(3)
   .flat(20)

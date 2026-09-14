@@ -35,4 +35,4 @@ export const GAP_TEST_TRACK: TrackDef = course('gap-test', 'Gap Test', 'beginner
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 3 })
   .flat(20)
-  .finish();
+  .finish(10, { checkpointRule: false }); // harness fixture (recorded inputs): geometry frozen, the round-4 checkpoint rule is a curriculum rule
