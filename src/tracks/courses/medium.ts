@@ -27,14 +27,14 @@ export const M1 = course('m1-hop-up', 'Hop Up', 'medium')
   .meta({
     biome: 'industrial',
     technique: 'bunny hop onto ledges',
-    demands: '0.9 m rise from a 16 m run-up (0.3 / 0.6 / 0.9 steps: hop the 0.6 rolling, or three 0.3s), then a 2 m hop across to a 0.9 m platform',
+    demands: '0.9 m total rise from a 16 m run-up in 0.3 m steps (hop the 0.6 rolling, or three 0.3s), then a 2 m hop across to a 0.9 m platform',
     attemptsBand: [5, 9],
-    targetTimeS: 80,
+    targetTimeS: 70, // round 7 gold (physics v2): skill-3 bot 32.58 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .camera({ mode: 'side-tight' })
   .flat(21) // the first hop 21 m from the start line: the checkpoint rule now covers every ledge >= 0.45 (hopHeight), so the first hop is rolling, not standing
-  .ledge({ height: 0.45, length: 6 }) // the hop (measured stationary apex 0.62): feel the timing
-  .ramp({ length: 4, height: 0.45, direction: 'down' })
+  .ledge({ height: 0.4, length: 6 }) // the hop (round 7 / physics v2: standing apex 0.46, the gas-hop's >= 0.1 m clear-air band is 0.3-0.6 m at 5 m/s; lesson ledges 0.4, demands 0.45-0.5): feel the timing
+  .ramp({ length: 4, height: 0.4, direction: 'down' })
   .flat(10)
   .checkpoint() // 41 m
   .flat(4)
@@ -46,7 +46,7 @@ export const M1 = course('m1-hop-up', 'Hop Up', 'medium')
   .checkpoint() // ~120 m
   .flat(16)
   .camera({ mode: 'side-tight' })
-  .ledge({ height: 0.5, length: 4 }) // hop up, settle, hop across (was 0.55 + a 1.5 m ledge into the gap: 0.55 is the practised hop's edge, and two hops in 1.5 m were 17 + 8 deaths)
+  .ledge({ height: 0.45, length: 4 }) // hop up, settle, hop across (round 7: 0.45, was 0.5 — 116 v2 reflex deaths front-into-the-face here; before that 0.55 + a 1.5 m ledge into the gap)
   .gap({ width: 1.5, depth: 2 })
   .flat(6)
   .camera({ mode: 'side' })
@@ -62,10 +62,10 @@ export const M1 = course('m1-hop-up', 'Hop Up', 'medium')
   .flat(16) // 15 m from the spawn (checkpoint rule): the two-stage rise, 0.9 in two hops
   .camera({ mode: 'side-tight' })
   .ledge({ height: 0.45, length: 5 })
-  .ledge({ height: 0.9, length: 4 })
-  .ramp({ length: 8, height: 0.9, direction: 'down' })
+  .ledge({ height: 0.85, length: 4 }) // second stage: a 0.4 m rise (round 7: was 0.9 = 0.45)
+  .ramp({ length: 8, height: 0.85, direction: 'down' })
   .flat(12)
-  .ledge({ height: 0.5, length: 4 })
+  .ledge({ height: 0.45, length: 4 })
   .gap({ width: 2, depth: 2 })
   .flat(6)
   .camera({ mode: 'side' })
@@ -78,7 +78,7 @@ export const M1 = course('m1-hop-up', 'Hop Up', 'medium')
   .ledge({ height: 0.3, length: 6 }) // the steps: roll the 0.3, hop 0.3 (or 0.6 from speed) onto a landing ramp that carries you to 0.9 (round 6: 6 m of approach, was 4)
   .ledge({ height: 0.6, length: 1.5 })
   .ramp({ length: 3, height: 0.3 }, { base: 0.6 }) // round 6: the 0.6 stage lands on an incline, not a flat top then a third riser (average: 12 nose-down / loop deaths at the 0.6 riser, 4 at the 0.9)
-  .ledge({ height: 0.9, length: 6 })
+  .ledge({ height: 0.9, length: 6 }) // the demand: 0.9 m total, no single rise above 0.3 (the ramp carries 0.6 -> 0.9)
   .gap({ width: 2 }) // hop across from the ledge top
   .ramp({ length: 2, height: 0.25 }, { base: 0.65 }) // landing lip: a short hop meets a 7 deg incline, not the box face (9 deaths)
   .box({ width: 6, height: 0.9 })
@@ -104,9 +104,9 @@ export const M2 = course('m2-drum-roll', 'Drum Roll', 'medium')
   .meta({
     biome: 'snow',
     technique: 'logs and drums: roll the top from the shelf',
-    demands: 'hop from a 1.2 m box onto a spinning drum and off again, then a 3-row log pyramid',
+    demands: 'hop from a 1.2 m box onto a spinning drum and off again, then a five-log two-row pyramid',
     attemptsBand: [6, 12],
-    targetTimeS: 85,
+    targetTimeS: 70, // round 7 gold (physics v2): skill-3 bot 38.78 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .hint('Lean back over the logs')
   .hint('Roll the drum from the shelf')
@@ -118,7 +118,7 @@ export const M2 = course('m2-drum-roll', 'Drum Roll', 'medium')
   .camera({ mode: 'side-tight', zoomBias: -0.5 })
   .bumpDrum(0.5, 0.3) // sunk drum, 0.3 m proud: a round speed bump
   .flat(12) // checkpoint rule: 16 m to the 0.5 m-proud drum
-  .bumpDrum(0.8, 0.5) // 1.6 m drum sunk to 0.5 m proud: rolls with a lean back
+  .bumpDrum(0.8, 0.4) // 1.6 m drum sunk to 0.4 m proud: rolls with a lean back (round 7: was 0.5 — at the v2 arrival speed of 12 m/s the 0.5 m bump launched the reflex rider into its air rules: 25 + 23 + 23 deaths on the first three drums)
   .flat(6)
   .bumpDrum(0.3, 0.3, { surface: 'wood' }) // half-buried log: a bare 0.3 m log is an 86 deg wall (physics 12.3) that the skill-2 bot failed 50 times
   .flat(5)
@@ -169,7 +169,7 @@ export const M2 = course('m2-drum-roll', 'Drum Roll', 'medium')
   .box({ width: 3, height: 1.2 })
   .ramp({ length: 4, height: 1.2, direction: 'down' })
   .flat(6)
-  .logStep({ radius: 0.3, count: 4, rows: 3 }) // 1.34 m pyramid
+  .logStep({ radius: 0.3, count: 5, rows: 2 }) // 0.82 m pyramid, five logs long (round 7: was 4 x 3 rows = 1.34 m, a 50 deg climb from the entry ramp to the top row — on v2 nothing but the bot's hop tops 50 deg; 30-36 stuck-restarts per seed here on both classes)
   .flat(3)
   .seesawEntry({ length: 6, height: 1.0 }) // preview of M3
   .camera({ mode: 'side' })
@@ -192,9 +192,9 @@ export const M3 = course('m3-see-saw', 'See-Saw', 'medium')
   .meta({
     biome: 'foundry',
     technique: 'see-saw timing and thin landings',
-    demands: 'land on a see-saw from a 3 m gap, then a kicker onto a 4 m plank at 1.5 and a 2.5 m gap to a box',
+    demands: 'land on a 22 deg see-saw from a 3 m gap, then a kicker onto a 3 m plank at 1.5 and a 2.5 m gap to a box',
     attemptsBand: [8, 12],
-    targetTimeS: 90,
+    targetTimeS: 70, // round 7 gold (physics v2): skill-3 bot 40.71 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .camera({ mode: 'side' })
   .flat(28)
@@ -217,12 +217,12 @@ export const M3 = course('m3-see-saw', 'See-Saw', 'medium')
   .checkpoint() // ~170 m
   .flat(6) // see-saw + 10 m + kicker = 22 m from the spawn (checkpoint rule)
   .camera({ mode: 'low' })
-  .seesawEntry({ length: 6, height: 1.5 })
-  .flat(10) // was 3: a board leaves ~5 m/s and the kicker wants 8
-  .ramp({ length: 5, height: 1.5 }) // 16.7 deg (was 4 x 1.5 = 20 deg 3 m after the board: 19 nose-high + 15 short)
+  .seesawEntry({ length: 8, height: 1.5 }) // 21 deg (round 7 / physics v2: was 6 x 1.5 = 29 deg — every 29 deg board crashes every rider on both classes: the bike leaves the tipping board for 0.4 s and lands rear-first at 65 deg nose-up; <= 22 deg boards ride)
+  .flat(14) // round 7: 14 m after a board (was 10; before that 3): a board leaves ~4.5 m/s, the v2 rider reaches ~12 m/s here for the 3 m gap
+  .ramp({ length: 6, height: 1.5 }) // 14 deg (round 7: was 5 x 1.5 = 16.7; once 4 x 1.5 = 20 deg 3 m after the board: 19 nose-high + 15 short)
   .gap({ width: 3 })
   .ramp({ length: 2, height: 0.25 }, { base: 1.25 }) // round 6.1: landing lip — a rear wheel arriving at plank height slipped under the one-way board's leading edge and hung there (front on top, no fault: the skill-3 bot sat at 209 m for 600 s); the lip catches it
-  .plank({ length: 4, height: 1.5 }) // thin landing at 1.5
+  .plank({ length: 6, height: 1.5 }) // thin landing at 1.5 (round 7: 6 m, was 4 — from the 14 m run-up the bot flew past a 4 m board onto the down-ramp: crash at 212.5)
   .ramp({ length: 4, height: 1.5, direction: 'down' })
   .flat(12)
   .camera({ mode: 'side' })
@@ -249,12 +249,12 @@ export const M3 = course('m3-see-saw', 'See-Saw', 'medium')
   .camera({ mode: 'low', cut: true })
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 3 })
-  .seesaw({ length: 8, height: 2.0 }) // land rear-first on the resting near end: it dips, you roll up, it tips
-  .flat(10) // ride the tip down, then build speed for the thin landings (was a 3 m gap off the tipping board onto a plank at 2.0: walled)
-  .ramp({ length: 5, height: 1.5 })
+  .seesaw({ length: 8, height: 1.6 }) // 21.8 deg (round 7: was 8 x 2.0 = 29 deg, the crash board); land rear-first on the resting near end: it dips, you roll up, it tips
+  .flat(14) // ride the tip down, then build speed for the thin landings (round 7: 14 m, was 10; once a 3 m gap off the tipping board onto a plank at 2.0: walled)
+  .ramp({ length: 6, height: 1.5 }) // 14 deg (round 7)
   .gap({ width: 3 })
   .ramp({ length: 2, height: 0.25 }, { base: 1.25 }) // landing lip (round 6.1)
-  .plank({ length: 3, height: 1.5 })
+  .plank({ length: 4, height: 1.5 }) // round 7: 4 m (was 3)
   .gap({ width: 2.5 })
   .box({ width: 6, height: 1.5 })
   .ramp({ length: 8, height: 1.5, curve: 0.3, direction: 'down' })

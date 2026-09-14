@@ -60,37 +60,89 @@ export function setPiecesOf(def: TrackDef): SetPiece[] {
 // Feel envelope (CONTRACT §2.5) with 20 % authoring margin
 // ---------------------------------------------------------------------------
 
+/**
+ * Physics v2 (tracks round 7, measured on `physics-v2` 9b4275c with the physics owner's API at 120 Hz,
+ * Rookie unless noted; tracks.md §0 has the full tables and the v1 column). The v1 rule
+ * `0.8 * sqrt(2 * 4.57 * d)` under-predicted v2 by 2-3 m/s at 10-40 m: v2 is front-loaded (0.66 g
+ * off the line) and drag-limited above 14 m/s, so `speedAfter` interpolates the measured curve.
+ */
+const V2_RUNUP: ReadonlyArray<readonly [number, number]> = [
+  [0, 0],
+  [2.3, 5],
+  [6.0, 8],
+  [9.7, 10],
+  [15.4, 12],
+  [23.9, 14],
+  [36.3, 16],
+  [55.9, 18],
+  [93.5, 20],
+];
+
 export const FEEL = {
   wheelbase: 1.3,
   wheelRadius: 0.34,
-  /** Average acceleration on flat dirt (16 m/s in 3.5 s). */
-  accel: 16 / 3.5,
+  /** v2 Rookie average acceleration 0 -> 16 m/s (36.3 m in 3.97 s); the curve itself is `V2_RUNUP`. */
+  accel: 16 / 3.97,
   topSpeed: 20,
-  /** Physics round 2 measured: 0.3 throttle tops out at 11.3 m/s (partial-throttle cruise). */
+  /** Physics round 2 measured: 0.3 throttle tops out at 11.3 m/s (partial-throttle cruise; not re-measured on v2). */
   cruiseSpeedAt30pct: 11.3,
-  /** Physics round 2 (e692bf2) measured: brake from 10 m/s = 4.66 m => 10.7 m/s^2 (contract asks <= 4.5). */
-  brakeDecel: 10.7,
-  /** Physics round 2 measured stationary hop apex 0.74 m (contract band 0.55..0.75); with 5 m/s run-up a 0.9 m ledge is makeable. */
-  hopStationary: 0.74,
-  hopRolling: 0.9,
-  climbSustainedDeg: 60,
-  climbStallDeg: 65,
+  /** v2 measured: brake from 10.08 m/s hard-back = 5.92 m (8.6 m/s^2); neutral 7.06 m (7.4 m/s^2). v1 was 4.66 m. */
+  brakeDecel: 8.6,
+  /** v2 measured: standing hop rear apex 0.46 m (0.55 with a 0.4 s preload); v1 was 0.74. */
+  hopStationary: 0.46,
+  /**
+   * v2 measured: the tallest ledge a gas-hop clears with >= 0.1 m of air at 5 m/s is 0.6 m (window 0.22 s);
+   * 0.7 m has no margin, 0.8 m is the Rookie wall (0 of 22 timings), 0.9 m is gone (the Pro clears 0.8).
+   */
+  hopRolling: 0.6,
+  /** v2: the constant-speed climb limit is COM geometry, atan(d/h) at full forward lean = 37 deg. */
+  climbSustainedDeg: 37,
+  /** v2: 40-45 deg top with momentum (>= 8 m/s) over a `kickerPlank` foot; 50 deg+ is the bot's hop move. */
+  climbMomentumDeg: 45,
+  climbStallDeg: 50,
   margin: 0.8,
   g: 9.81,
-  /** Speed reachable from rest over `d` metres of flat run-up (capped at top speed), with margin. */
+  /** Speed reached from rest over `d` metres of flat run-up on v2 Rookie, no margin (the number the landing must survive). */
+  speedAfterRaw(d: number, v0 = 0): number {
+    let x = d;
+    if (v0 > 0) x += this.runupRaw(v0);
+    const t = V2_RUNUP;
+    if (x <= 0) return 0;
+    for (let i = 1; i < t.length; i++) {
+      const [d0, s0] = t[i - 1]!;
+      const [d1, s1] = t[i]!;
+      if (x <= d1) return s0 + ((s1 - s0) * (x - d0)) / (d1 - d0);
+    }
+    return this.topSpeed;
+  },
+  /** Flat run-up that reaches `v` on v2 Rookie, no margin. */
+  runupRaw(v: number): number {
+    const t = V2_RUNUP;
+    for (let i = 1; i < t.length; i++) {
+      const [d0, s0] = t[i - 1]!;
+      const [d1, s1] = t[i]!;
+      if (v <= s1) return d0 + ((d1 - d0) * (v - s0)) / (s1 - s0);
+    }
+    return t[t.length - 1]![0];
+  },
+  /** Speed a gap or kicker may ASSUME after `d` metres of flat run-up (measured curve x the 0.8 margin). */
   speedAfter(d: number, v0 = 0): number {
-    return Math.min(this.topSpeed, Math.sqrt(v0 * v0 + 2 * this.accel * d)) * this.margin;
+    return this.speedAfterRaw(d, v0) * this.margin;
   },
-  /** Run-up needed to reach v (before margin is applied to v). */
+  /** Run-up needed so that `speedAfter` reaches v. */
   runupFor(v: number): number {
-    const vv = v / this.margin;
-    return (vv * vv) / (2 * this.accel);
+    return this.runupRaw(v / this.margin);
   },
-  /** Braking distance from v, with margin. */
+  /** Braking distance from v (hard-back), with margin. */
   brakeDistance(v: number): number {
     return (v * v) / (2 * this.brakeDecel) / this.margin;
   },
-  /** Horizontal range of a jump launched at v along a ramp of `angleDeg`, landing `drop` m lower (negative = higher). */
+  /**
+   * Horizontal range of a jump launched at v along a ramp of `angleDeg`, landing `drop` m lower (negative = higher).
+   * v2 check: within +0.4 / -1.0 m of the rear-wheel touchdown when `v` is the LIP speed and the bike lands
+   * <= 20 deg nose-up; a rider who holds the gas up the ramp leaves 0.3-2.4 m/s faster, one who rolls it
+   * (0.3 throttle) 1.5-2.5 m/s slower.
+   */
   jumpRange(v: number, angleDeg: number, drop = 0): number {
     const th = (angleDeg * Math.PI) / 180;
     const vx = v * Math.cos(th);
@@ -104,9 +156,9 @@ export const FEEL = {
   hopLedge(rolling: boolean): number {
     return (rolling ? this.hopRolling : this.hopStationary) * this.margin;
   },
-  /** Max sustained climb angle to author (deg), with margin. */
+  /** Max plank angle to author from a crawl (deg), with margin; momentum planks go to `climbMomentumDeg` over a `kickerPlank` foot. */
   climbDeg(): number {
-    return this.climbSustainedDeg * this.margin;
+    return this.climbMomentumDeg * this.margin;
   },
   /**
    * Crest radius that keeps both wheels on the ground at `v` (centripetal g). A cosine
@@ -782,6 +834,23 @@ export class CourseBuilder {
     const base = o?.base ?? 0;
     this.ramp({ length: fl, height: fh, curve: 0.8 }, { base });
     return this.plank({ angleDeg: p.angleDeg, rise: p.rise - fh }, { base: base + fh });
+  }
+
+  /**
+   * Physics v2 (tracks round 7): a plank of 40-45 deg over a 0.3 m tall, 20 deg straight kicker at its foot,
+   * the plank stacked on the kicker's top edge. Measured on a 4 m wood plank: the naive rider (gas +
+   * lean +0.4) at 8 m/s tops 45 deg with this foot and faults without it on both classes (40 @ 5 m/s: F -> TOP),
+   * while the concave `steepPlank` fillet makes the crawl rows WORSE (its curve fires the "front on the face"
+   * throw early: Rookie 40 @ 2 m/s TOP -> 58 % stall). Use this for every momentum plank <= 45 deg; keep
+   * `steepPlank` for the 50 deg+ faces that only the bot's hop move tops.
+   */
+  kickerPlank(p: { angleDeg: number; rise: number; kickerHeight?: number; kickerDeg?: number }, o?: ObstacleOpts): this {
+    const kh = p.kickerHeight ?? 0.3;
+    const kd = p.kickerDeg ?? 20;
+    const kl = kh / Math.tan((kd * Math.PI) / 180);
+    const base = o?.base ?? 0;
+    this.ramp({ length: kl, height: kh, surface: 'wood' }, { base });
+    return this.plank({ angleDeg: p.angleDeg, rise: p.rise - kh }, { base: base + kh });
   }
 
   /** Speed bump: convex ramp up and down, `height` <= 0.3 rolls at any speed. */

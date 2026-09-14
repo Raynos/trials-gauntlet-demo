@@ -24,9 +24,9 @@ export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .meta({
     biome: 'canyon',
     technique: 'lean forward on steep climbs',
-    demands: '48 deg plank (filleted foot) from a 20 m run-up, then a long ramp descent',
+    demands: '45 deg plank over a 0.3 m kicker foot from a 20 m run-up (13 m/s: a momentum climb), then a long ramp descent',
     attemptsBand: [2, 4],
-    targetTimeS: 60,
+    targetTimeS: 70, // round 7 gold (physics v2): skill-3 bot 42.36 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .camera({ mode: 'side' })
   .flat(20)
@@ -49,7 +49,7 @@ export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .checkpoint() // ~175 m
   .flat(16)
   .camera({ mode: 'side', zoomBias: -0.4 })
-  .plank({ angleDeg: 40, rise: 3.6 }) // 5.6 m
+  .kickerPlank({ angleDeg: 40, rise: 3.6 }) // 5.1 m board over the 0.3 m kicker foot (round 7 / physics v2: the crawl limit is 37 deg, 40 tops from 8 m/s with this foot — naive rider F -> TOP at 5 m/s)
   .box({ width: 6, height: 3.6 })
   .ramp({ length: 22, height: 3.6, direction: 'down' }) // was a 6 m quarter-pipe: a 16 m/s launch off the box landed nose-down at its foot
   .flat(8)
@@ -61,7 +61,7 @@ export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .checkpoint() // ~275 m
   .flat(16)
   .camera({ mode: 'side', zoomBias: -0.4 })
-  .plank({ angleDeg: 36, rise: 2.4 }) // 4.1 m: the middle step, at speed
+  .kickerPlank({ angleDeg: 36, rise: 2.4 }) // 3.6 m board: the middle step, at speed (round 7: kicker foot)
   .box({ width: 6, height: 2.4 })
   .ramp({ length: 15, height: 2.4, direction: 'down' })
   .flat(8)
@@ -73,9 +73,9 @@ export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .rollers(20, 0.3, 4)
   .flat(8)
   .checkpoint() // ~400 m
-  .flat(20) // the demand's run-up: ~10.8 m/s from the spawn
+  .flat(20) // the demand's run-up: v2 13.2 m/s from the spawn
   .camera({ mode: 'side', zoomBias: -0.4 })
-  .steepPlank({ angleDeg: 48, rise: 3.7 }) // fillet + ~4.5 m board, the demand: ~2.5 s of climb, hang over the bars
+  .kickerPlank({ angleDeg: 45, rise: 3.7 }) // the demand (round 7 / physics v2: was steepPlank 48 — on v2 nothing but the bot's hop move tops 50 deg, the concave fillet made 40-45 worse, and 45 over a 0.3 m 20 deg kicker foot is TOP at 8 m/s for the naive rider on both classes)
   .box({ width: 6, height: 3.7 })
   .ramp({ length: 22, height: 3.7, direction: 'down' }) // was a -40 deg plank onto flat: a 40 deg kink at its foot
   .camera({ mode: 'side' })
@@ -103,7 +103,7 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
     technique: 'rear-wheel-first gap landing',
     demands: 'gap onto a landing ramp and an 8 m platform, immediately a second gap from a kicker on the platform',
     attemptsBand: [3, 5],
-    targetTimeS: 65,
+    targetTimeS: 70, // round 7 gold (physics v2): skill-3 bot 43.46 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .camera({ mode: 'side' })
   .flat(24)
@@ -127,8 +127,8 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .checkpoint() // ~125 m
   .flat(16) // run-up: ~11 m/s
   .camera({ mode: 'high34' })
-  .ramp({ length: 5, height: 1.5 }) // 16.7 deg; 6 m gap needs ~9 m/s
-  .gap({ width: 6 })
+  .ramp({ length: 5, height: 1.5 }) // 16.7 deg; a 5 m gap needs ~8 m/s at the lip (round 7: was 6 m — the v2 rider who rolls a lip at 0.3 throttle flies 6.0 m from 12 m/s)
+  .gap({ width: 5 })
   .gapLanding(1.0, 8, 8, 10) // was a 1.0 m box edge: 16 deaths; a 16 m/s launch lands on the top, 8 m/s on the ramp foot
   .camera({ mode: 'side' })
   .flat(12)
@@ -161,8 +161,8 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .gap({ width: 5 })
   .ramp({ length: 5, height: 0.6 }) // landing ramp onto the platform (was a 0.6 m box edge: 12 deaths)
   .box({ width: 8, height: 0.6 }) // 8 m to settle and gas (was 6 with the kicker on it: 3 m of platform)
-  .ramp({ length: 3, height: 1.0 }, { base: 0.6 })
-  .gap({ width: 5 }) // was 6 onto flat: 28 deaths short of the far lip
+  .ramp({ length: 4, height: 1.0 }, { base: 0.6 }) // 14 deg (round 7: was 3 x 1.0 = 18.4 deg; v2 loops the gas-held rider off lips >= 17 deg below 10 m/s)
+  .gap({ width: 4.5 }) // round 7: 4.5 from ~9 m/s on the platform (was 5; before that 6 onto flat: 28 deaths short of the far lip)
   .gapLanding(1.0, 6, 8, 10)
   .camera({ mode: 'side' })
   .flat(12)
@@ -187,9 +187,9 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .meta({
     biome: 'canyon',
     technique: 'stairs: gas up, brake down',
-    demands: '8 x 0.25 m steps up at speed, 8 steps down ending at a 2 m gap',
+    demands: '8 x 0.25 m steps up at speed (0.6 m runs), 8 steps down ending at a 2 m gap',
     attemptsBand: [3, 6],
-    targetTimeS: 70,
+    targetTimeS: 70, // round 7 gold (physics v2): skill-3 bot 41.44 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .camera({ mode: 'side' })
   .flat(20)
@@ -198,7 +198,7 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~46 m
   .flat(16) // checkpoint rule: 15 m before a flight up
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 3, height: 0.25, length: 0.5 }) // the first flight: 0.75 m (was 5 x 0.3 from 3 m)
+  .stair({ count: 3, height: 0.25, length: 0.6 }) // the first flight: 0.75 m at 22.6 deg (round 7: 0.6 m runs everywhere — a 26.6 deg flight lifted the v2 nose over the top: 59 nose-high deaths at the second flight)
   .box({ width: 6, height: 0.75 })
   .stair({ count: 3, height: 0.25, length: 0.5, direction: 'down' })
   .flat(12)
@@ -210,9 +210,9 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~135 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 6, height: 0.25, length: 0.5 }) // 26.6 deg, 1.5 m (was 6 x 0.4 from 3 m: 95 deaths; 6 x 0.3 from 16 m still 52 for a 215 ms player)
-  .box({ width: 4, height: 1.5 })
-  .stair({ count: 6, height: 0.25, length: 0.45, direction: 'down' })
+  .stair({ count: 6, height: 0.25, length: 0.6 }) // 22.6 deg, 1.5 m (round 7: was 0.5 runs; before that 6 x 0.4 from 3 m: 95 deaths)
+  .box({ width: 6, height: 1.5 }) // round 7: 6 m on top (was 4) so the nose settles before the descent
+  .stair({ count: 6, height: 0.25, length: 0.5, direction: 'down' })
   .barrel({ count: 2, spacing: 0.7, burning: false })
   .flat(12)
   .camera({ mode: 'side' })
@@ -223,9 +223,9 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~215 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 6, height: 0.25, length: 0.5 }) // a flight at speed
+  .stair({ count: 6, height: 0.25, length: 0.6 }) // a flight at speed
   .box({ width: 6, height: 1.5 })
-  .stair({ count: 5, height: 0.3, length: 0.45, direction: 'down' })
+  .stair({ count: 6, height: 0.25, length: 0.5, direction: 'down' })
   .flat(12)
   .camera({ mode: 'side' })
   .bumpRow(3, 0.3, 16)
@@ -237,9 +237,9 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~330 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 8, height: 0.25, length: 0.5 }) // the demand: 2.0 m, eight risers at speed (was 7 x 0.45)
-  .box({ width: 3, height: 2.0 })
-  .stair({ count: 8, height: 0.25, length: 0.4, direction: 'down' })
+  .stair({ count: 8, height: 0.25, length: 0.6 }) // the demand: 2.0 m, eight risers at speed (round 7: 0.6 runs; was 7 x 0.45 once)
+  .box({ width: 4, height: 2.0 })
+  .stair({ count: 8, height: 0.25, length: 0.5, direction: 'down' })
   .flat(6) // checkpoint rule: the stair descent + 6 m is 15 m of effective run-up for the gap
   .gap({ width: 2 }) // brake on the stairs, release before the lip
   .camera({ mode: 'side' })

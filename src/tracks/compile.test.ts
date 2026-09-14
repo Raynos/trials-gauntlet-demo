@@ -272,10 +272,14 @@ describe('feel helpers', () => {
   it('match the CONTRACT envelope with 20 % margin', () => {
     expect(FEEL.speedAfter(FEEL.runupFor(10))).toBeCloseTo(10, 6);
     expect(FEEL.speedAfter(1000)).toBeCloseTo(16, 6); // top speed 20 x 0.8
-    expect(FEEL.brakeDistance(10)).toBeCloseTo(100 / 21.4 / 0.8, 6); // 5.84 m: measured 4.66 m plus margin
-    expect(FEEL.hopLedge(false)).toBeCloseTo(0.592, 6);
-    expect(FEEL.hopLedge(true)).toBeCloseTo(0.72, 6);
-    expect(FEEL.climbDeg()).toBe(48);
+    expect(FEEL.speedAfterRaw(10)).toBeCloseTo(10.15, 1); // v2 measured: 10.15 m/s after 10 m (v1 rule said 7.65)
+    expect(Math.abs(FEEL.speedAfterRaw(20) - 13.19)).toBeLessThan(0.25); // linear between the 15.4 and 23.9 m knots
+    expect(Math.abs(FEEL.speedAfterRaw(40) - 16.48)).toBeLessThan(0.25);
+    expect(FEEL.speedAfterRaw(200)).toBe(20);
+    expect(FEEL.brakeDistance(10)).toBeCloseTo(100 / 17.2 / 0.8, 6); // 7.27 m: v2 measured 5.92 m hard-back plus margin
+    expect(FEEL.hopLedge(false)).toBeCloseTo(0.368, 6); // v2: 0.46 m standing hop
+    expect(FEEL.hopLedge(true)).toBeCloseTo(0.48, 6); // v2: 0.6 m is the tallest ledge with >= 0.1 m of air at 5 m/s
+    expect(FEEL.climbDeg()).toBe(36); // v2: 45 deg momentum over a kickerPlank foot, x 0.8
     expect(FEEL.jumpRange(10, 0, 0)).toBe(0);
     expect(FEEL.jumpRange(10, 45, 0)).toBeCloseTo(100 / 9.81, 3);
   });

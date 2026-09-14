@@ -27,30 +27,35 @@ export const H1 = (() => {
     .meta({
       biome: 'nightCity',
       technique: 'sustained wheelie and the lip climb',
-      demands: '1.4 m lip climb (or the 0.5 m hop off its ramp) straight into 5 rail slots and a 3 m gap from the rear wheel',
+      demands: '1.4 m lip climb (or the 0.4 m hop off its ramp) straight into 5 rail slots and a 3 m gap from the rear wheel',
       attemptsBand: [10, 18],
-      targetTimeS: 110,
+      targetTimeS: 75, // round 7 gold (physics v2): skill-3 bot 44.57 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
     })
     .camera({ mode: 'side', zoomBias: -0.3 })
-    .flat(28)
+    .setPiece('start', 'The Grid') // storyboard §1 beat 1: start gantry + crowd
+    .flat(6)
+    .arch({ style: 'girder' }) // the start gantry at x = 3 (an arch is centred 3 m behind the cursor)
+    .flat(22)
+    .endSetPiece()
     .checkpoint() // 28 m
     .flat(3)
     .rollers(16, 0.15, 6) // front wheel DOWN over rollers: throttle modulation warm-up
     .flat(4);
   slots(b, 8, 2.5); // wheelie section 1
   b.flat(6).wave(28, 1.5, 16).flat(4).bumpRow(3, 0.3, 16).flat(6).checkpoint(); // ~150 m
-  b.flat(16).steppedWall({ height: 1.0, width: 6, lip: 0.15 }).flat(3); // 16 m run-up from the spawn; lip climb, or ramp + 0.5 m hop
+  b.flat(16).steppedWall({ height: 1.0, width: 6, lip: 0.15 }, 0.4).flat(3); // 16 m run-up from the spawn; lip climb, or ramp + 0.4 m hop (round 7 / physics v2: the B-line step was 0.5 — the v2 gas-hop's >= 0.1 m band tops out at 0.6 and the 0.5 step was 97 nose-low deaths per seed for reflex `good`)
   slots(b, 6, 3.0);
   b.flat(6).rollers(20, 0.25, 3).flat(4).tabletop(6, 8, 1.0).flat(6).wave(28, 1.5, 16).flat(4).bumpRow(2, 0.3, 16).flat(6).checkpoint(); // ~300 m
-  b.flat(16).steppedWall({ height: 1.2, width: 5, lip: 0.15 }).flat(3);
+  b.flat(16).steppedWall({ height: 1.2, width: 5, lip: 0.15 }, 0.4).flat(3);
   slots(b, 6, 2.5);
   b.flat(6).wave(28, 1.5, 16).flat(4).bumpRow(2, 0.3, 16).flat(6).checkpoint(); // ~380 m
   b.flat(16);
   slots(b, 10, 2.0); // the long wire: 10 slots at 2.0 m
   b.flat(6).rollers(20, 0.25, 3).flat(6).checkpoint(); // ~440 m
-  b.flat(16).camera({ mode: 'low', cut: true }).steppedWall({ height: 1.4, width: 4, lip: 0.2 }).flat(3); // the demand: 1.4 m lip, or the ramp and a 0.5 m hop
+  b.flat(16).setPiece('balance', 'The Wire').camera({ mode: 'low', cut: true }).steppedWall({ height: 1.4, width: 4, lip: 0.2 }, 0.4).flat(3); // the demand: 1.4 m lip, or the ramp and a 0.4 m hop
   slots(b, 5, 2.0);
-  return b.gap({ width: 3 }).camera({ mode: 'side' }).flat(8).bumpRow(2, 0.3, 16).flat(12).finish();
+  b.arch({ style: 'crowd' }); // storyboard §1 beat 6: the crowd bridge over the last slots
+  return b.gap({ width: 3 }).endSetPiece().camera({ mode: 'side' }).flat(8).bumpRow(2, 0.3, 16).setPiece('finish').flat(12).arch({ style: 'finish' }).finish();
 })();
 
 /**
@@ -68,10 +73,14 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
     technique: 'gap chains: read the width, set the speed',
     demands: '6 gaps on 5.5 m kicker platforms with landing lips, last one launched from a see-saw',
     attemptsBand: [14, 22],
-    targetTimeS: 120,
+    targetTimeS: 75, // round 7 gold (physics v2): skill-3 bot 46.28 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .camera({ mode: 'high34' })
-  .flat(28)
+  .setPiece('start', 'Container Yard')
+  .flat(6)
+  .arch({ style: 'girder' }) // the start gantry at x = 3 (an arch is centred 3 m behind the cursor)
+  .flat(22)
+  .endSetPiece()
   .checkpoint() // 28 m
   .flat(16) // 15 m from the spawn (checkpoint rule)
   // chain A: 8 m platforms with landing lips, every one ending in a 1.5 x 0.4 kicker; gaps 4 / 3 / 4 / 2
@@ -134,6 +143,7 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
   .checkpoint() // ~430 m
   .flat(16)
   .camera({ mode: 'high34' })
+  .setPiece('air', 'Chain C') // storyboard §2: the set piece is the last chain into the see-saw
   // chain C: 5.5 m platforms (2 of lip, 1.5 of kicker), one bike length of slack
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 4 })
@@ -147,12 +157,15 @@ export const H2 = course('h2-gap-chain', 'Gap Chain', 'hard')
   .gap({ width: 2 })
   .platform(5.5, 1.0, { landing: 0.4 })
   .gap({ width: 4 })
-  .seesaw({ length: 5, height: 1.0 }) // land on the resting end; it tips as you ride out
+  .seesaw({ length: 5, height: 1.0 }) // 22 deg: land on the resting end; it tips as you ride out (v2: <= 22 deg boards ride at every speed with a cruise rider)
   .gap({ width: 3 })
+  .endSetPiece()
   .camera({ mode: 'side', cut: true })
   .flat(12)
   .bumpRow(2, 0.3, 16)
+  .setPiece('finish')
   .flat(12)
+  .arch({ style: 'finish' })
   .finish();
 
 /**
@@ -167,20 +180,26 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .meta({
     biome: 'foundry',
     technique: 'commit at speed over fire, then stop hard',
-    demands: '20 m run-up, kicker over six burning barrels onto a landing ramp, brake to walking pace in 8 m, hop a 2 m gap and a 0.7 m kerb',
+    demands: '20 m run-up, straight 22 deg kicker over six burning barrels onto a landing ramp, brake to walking pace in 8 m, hop a 2 m gap and a 0.45 + 0.25 m kerb',
     attemptsBand: [18, 25],
-    targetTimeS: 125,
+    targetTimeS: 75, // round 7 gold (physics v2): skill-3 bot 45.1 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .camera({ mode: 'side', zoomBias: 0.4 })
-  .flat(28)
+  .setPiece('start', 'The Pour')
+  .flat(6)
+  .arch({ style: 'girder' }) // the start gantry at x = 3 (an arch is centred 3 m behind the cursor)
+  .flat(22)
+  .endSetPiece()
   .checkpoint() // 28 m
   .flat(3)
-  .flat(20) // ~13 m/s: the 22 deg lip at 11 m/s clears 2.0 m of fire for 8 m
-  .ramp({ length: 5, height: 2.0, curve: 0.3 })
+  .flat(20) // v2: 13.5 m/s at the lip; the 22 deg lip at 12-14 m/s flies 9-11 m over 3-4.6 m of fire onto the down-ramp
+  .setPiece('fire', 'Ladle 1')
+  .ramp({ length: 5, height: 2.0 }) // straight 21.8 deg (round 7: the curve-0.3 lip is gone — v2 loops a rider who holds the gas through a curved 22 deg+ lip below 10 m/s; the straight lip is survivable from 12 m/s, which the 23 m run-up gives)
   .flat(1)
   .barrel({ count: 4, spacing: 0.8 }) // 3.0 m of fire, 0.9-1.5 m: any body part in it = hazard fault
   .flat(2)
   .ramp({ length: 8, height: 2.0, direction: 'down' }) // landing ramp (was 8 m of flat: 84 deaths)
+  .endSetPiece()
   .flat(12)
   .rollers(20, 0.25, 3)
   .flat(4)
@@ -193,13 +212,15 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .checkpoint() // ~200 m
   .flat(3)
   .flat(20)
-  .ramp({ length: 5, height: 2.0, curve: 0.3 })
+  .setPiece('fire', 'Ladle 2')
+  .ramp({ length: 5, height: 2.0 })
   .flat(1)
   .barrel({ count: 6, spacing: 0.8 })
   .flat(2)
   .ramp({ length: 8, height: 2.0, direction: 'down' }) // landing ramp (was 6 m = 18 deg)
-  .flat(8) // brake zone: measured 4.47 m from 10 m/s, authored 8
-  .ledge({ height: 0.5, length: 4 }) // the stop-and-hop (was 0.7: the reflex hop clears 0.45-0.55)
+  .endSetPiece()
+  .flat(8) // brake zone: v2 measured 5.9 m from 10 m/s hard-back (7.1 neutral), authored 8
+  .ledge({ height: 0.45, length: 4 }) // the stop-and-hop (round 7: 0.45, the v2 gas-hop's safe band is 0.3-0.6; was 0.5, once 0.7)
   .flat(12)
   .wave(28, 1.5, 16)
   .flat(4)
@@ -208,15 +229,17 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .checkpoint() // ~310 m
   .flat(3)
   .flat(20)
-  .ramp({ length: 5, height: 2.0, curve: 0.3 })
+  .setPiece('fire', 'Ladle 3')
+  .ramp({ length: 5, height: 2.0 })
   .flat(1)
   .barrel({ count: 5, spacing: 0.8 })
   .flat(2)
   .ramp({ length: 8, height: 2.0, direction: 'down' })
+  .endSetPiece()
   .flat(8) // brake zone
   .hump(0.3, 3)
   .flat(3)
-  .ledge({ height: 0.5, length: 4 }) // the stop-and-hop at half stakes
+  .ledge({ height: 0.45, length: 4 }) // the stop-and-hop at half stakes
   .flat(12)
   .rollers(20, 0.25, 3)
   .flat(6)
@@ -224,7 +247,8 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .flat(3)
   .flat(20)
   .camera({ mode: 'high34', zoomBias: 0.4 })
-  .ramp({ length: 5, height: 2.0, curve: 0.3 })
+  .setPiece('fire', 'The Pour')
+  .ramp({ length: 5, height: 2.0 })
   .flat(1)
   .barrel({ count: 6, spacing: 0.8 }) // 4.6 m of fire (was 6 barrels behind a 2 m pit = 6.6 m: from a 23 m run-up the reflex player launches at ~11 m/s and 6.2+ m of fire is a hazard death every time, 111 in 3 seeds; the demand is the stop after, not the row)
   .flat(2)
@@ -235,10 +259,13 @@ export const H3 = course('h3-fire-line', 'Fire Line', 'hard')
   .flat(3)
   .gap({ width: 2, depth: 2 }) // low-speed hop
   .flat(3)
-  .ledge({ height: 0.5, length: 3 }) // the B line: half the kerb now, half in 3 m
+  .ledge({ height: 0.45, length: 3 }) // the B line: 0.45 now, 0.25 in 3 m
   .ledge({ height: 0.7, length: 4 })
+  .endSetPiece()
   .camera({ mode: 'side' })
   .flat(12)
   .bumpRow(2, 0.3, 16)
+  .setPiece('finish')
   .flat(12)
+  .arch({ style: 'finish' })
   .finish();

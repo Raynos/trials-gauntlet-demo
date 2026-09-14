@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { quantizeInput } from '../../core/replay';
 import type { InputFrame, SurfaceKind } from '../../core/types';
 import { compileTrack } from '../../tracks/compile';
-import { LAB_PHYSICS_TEST, LAB_TAKEOFF } from '../../tracks/courses/lab';
+import { LAB_PHYSICS_TEST, LAB_PIT, LAB_TAKEOFF } from '../../tracks/courses/lab';
 import { createBikePhysicsV2 as createBikePhysics, type BikePhysicsWorldV2 } from './bike';
 import { makeTrack, plankTrack } from '../testTracks';
 import { lipHopper, runController, stepN, wheelieHoldV3, type Controller } from '../controllers';
@@ -526,7 +526,7 @@ describe('kickers (R2 decision e)', () => {
 describe('lab-physics-test (§15)', () => {
   const lipX = 40 + LAB_TAKEOFF.length + LAB_TAKEOFF.lip; // 46.3: the far edge of the lip
   const ledgeX = lipX + 3;
-  const ledgeY = 1.6;
+  const ledgeY = LAB_PIT.ledge;
 
   function labRun(hop: boolean, speed: number): { cleared: boolean; margin: number; fault: string | null; landPitch: number; apex: number; air: number; endX: number; endY: number } {
     const w = createBikePhysics(HZ);

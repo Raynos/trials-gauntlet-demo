@@ -1,6 +1,6 @@
 # Track system and curriculum
 
-Status: physics-v2 P0 (round 8) — the two lab tracks (§6: `lab-physics-test` authored to physics-v2 §15 to the metre, `lab-flat-200` for the envelope rows), registered last under `lab-`, with the `gap` kind gaining default-preserving `hazard: 'none'` / `rise` / `floor` (§1.2) so a dry pit can land on a higher ledge over a rubber mattress; every existing golden stands. Previous: mega build wave 1 (round 7) — DESIGN wave: `docs/design/tracks-storyboards.md` storyboards h1-h3 / x1-x3 as designed courses (premise, technique story, set piece, pacing, checkpoints, attempts band, ASCII elevation) and sanity-passes m1-m3; the vocabulary gains the collider-free decor kinds `arch` / `tunnel` and `meta.setPieces` markers (§1.2, §1.4) so render can dress set pieces; no course changes (every golden and the round-6 acceptance matrix stand); §5 is the wave 2 plan. Round 6 for the record: X3 trimmed to one feature per lesson at 500 m, X1 re-sequenced around a 45 deg opener with 40 m plank run-ins, B3 / M1 demand landings on inclines, and the finish run-out + catch on every track. Owner: tracks. Consumers: physics, render, audio, harness, game.
+Status: **tracks round 7 (physics v2)** — every §0 number re-measured on `physics-v2` (v1 column kept one round; the flip changed the envelope the courses were built on: run-ups are shorter not longer, 22 deg lips loop the gas-through-the-lip rider, the crawl climb limit is 37 deg with 45 only over a 0.3 m kicker foot, the hop-able ledge is 0.3-0.6 m, and every 29 deg see-saw crashes every rider); `FEEL` now interpolates the measured run-up curve; `kickerPlank` replaces `steepPlank` on every plank <= 45 deg; the lab ledge is 0.10 m lower; all 15 courses re-authored to those limits (§2 "Round 7" table), medal targets re-derived from the v2 skill-3 bot; hard / extreme carry the storyboard set pieces and gantries (markers + decor only — the roof climbs, tunnels and re-sequencing of §5 are still owed). The reflex bot is not yet a v2 instrument (§0 last row) and the harness owner is re-tuning it concurrently, so the attempts table is a same-controller before / after, not a band verdict. Previous: physics-v2 P0 (round 8) — the two lab tracks (§6); mega build wave 1 (round 7) — the storyboards and the `arch` / `tunnel` / `setPieces` vocabulary; round 6 — X3 at 500 m, X1 around a 45 deg opener, finish run-out + catch.
 `docs/design/CONTRACT.md` wins over this file; the executable form is `src/core/types.ts`
 (`TrackDef`, `TrackMeta`, `CameraKey`, `CompiledTrack`, `Collider`, `HazardZone`,
 `PlacedObstacle`) and `src/tracks/index.ts`. Metres, seconds, radians unless a param is
@@ -13,42 +13,40 @@ helpers + spawn validation, `describe.ts` text summaries, `courses/*.ts` the tra
 `tracks.test.ts` / `compile.test.ts`. Registry order: fixtures, curriculum, lab tracks last
 (`isLabTrackId(id)` = `id.startsWith('lab-')`; core-game lists those under "Lab").
 
-## 0. Numbers the tracks are authored to (CONTRACT §2.5, with 20 % margin)
+## 0. Numbers the tracks are authored to (physics v2, tracks round 7; v1 column kept one round)
 
-Physics owns every feel number. Tracks are authored against the contract table with a
-20 % margin, i.e. a track asks for at most 0.8 x what the envelope allows (`FEEL` in
-`author.ts`). Where physics round 2 (e692bf2) has measured a number, the measured value
-replaces the contract one:
+Physics owns every feel number. Tracks are authored against the MEASURED v2 envelope with a 20 % margin
+(`FEEL` in `author.ts`: `speedAfter` interpolates the measured run-up curve, `hopLedge`, `climbDeg`,
+`brakeDistance`, `jumpRange`). Every row below was re-measured on `physics-v2` (9b4275c) with the physics
+owner's API at 120 Hz, Rookie unless noted, on in-memory tracks built with the authoring DSL (scripts:
+scratch `tracks7/measure/*.ts`, tables `out/01..08.txt`; the numbers are reproduced in this table). Where a
+v2 number differs from what a v1 course assumed, the "authored against" column is what the courses now do.
 
-| quantity | envelope | authored against |
-|---|---|---|
-| total mass / COM | 145 kg, COM 0.45 m above axle line | - |
-| wheelbase / wheel radius | 1.30 m / 0.34 m | spawn clearance; 0.3 m kerbs are rollable |
-| 0 -> 16 m/s on flat dirt | <= 3.5 s (a ~= 4.6 m/s^2) | `speedAfter(d) = 0.8 * sqrt(2 a d)`: 10 m -> 7.7, 14 m -> 9.1, 20 m -> 10.8 |
-| top speed | 20 m/s | 16 m/s is the most any jump assumes |
-| brake from 10 m/s | <= 4.5 m; **measured 4.66 m** (10.7 m/s^2) | brake zones >= 5.9 m; authored 8 m (B1, H3, X3) |
-| partial throttle | **measured: 0.3 throttle tops out at 11.3 m/s** | no course relies on a coasting speed; cruise sections are full-throttle-safe |
-| loop-out | **measured: full throttle with lean >= 0.4 never loops on flat** | beginner hints stay "hold throttle" |
-| stationary bunny hop | rear-wheel apex 0.55-0.75 m; **measured 0.74 m** | stationary ledges <= 0.59 m (authored 0.45) |
-| rolling hop (5 m/s run-up) | 0.9 m ledge | rolling ledges <= 0.72 m |
-| climb | sustained <= 60 deg, 65 stalls, > 70 needs a hop; **55-65 deg planks currently wedge at a sharp base corner (fix in progress)** | planks <= 48 deg through Hard; Extreme runs 50-60 deg with no margin; every plank >= 48 deg gets a concave ramp fillet at its foot (`steepPlank`) |
-| crash | head/torso touches a collider or hazard, or y < oobY; over-rotation alone is not a crash. **Physics tests every body incl. wheels against hazards** | pit hazards stop 0.6 m below the lip (a wheel faults only when wholly in the pit); fire is 0.6 m above a barrel and a jump over fire must carry the wheels above barrel top + 0.6 + 0.34 |
-| drums and logs (physics round 4, physics.md 12.3) | **geometry, not speed**: a 0.34 m wheel meets a drum of radius r where the contact normal is `acos((R - r)/(R + r))` from vertical — 57 deg for r 0.1, 86 deg for a 0.3 m log, an overhang for r > 0.34. r <= 0.15 rolls; a bare 0.3 m log needs a front lift or a held lean-back at >= 5 m/s (never a constant lean); r 0.45 is a knife-edge hop; **r >= 0.6 on flat ground is unrideable in any technique**. Sunk r 0.5 showing 0.3 m rolls at 3/5/8 m/s with a constant lean; the 1.2 m box -> 0.8 m drum line is the measured way over a big drum | beginner tier has **no bare log or drum**: bumps are `hump` or `bumpDrum` (sunk, <= 0.3 m proud, contact normal 50 deg). Medium+: sunk drums show <= 0.5 m (56 deg), every big drum is entered from a `drumStep` shelf at centre + 0.4 (normal <= 56 deg for r <= 1.0) or from another drum's top across a gap. Bare 0.3 m logs are a Medium lesson (M2, with hints). `kickerDrum` is gone: a 0.5 m kicker against a 1.6 m drum still met the face below the centre |
-| see-saws (physics round 4) | every curriculum board (L6 h0.8/1.0/1.5, L8 h1.2/2.0, L5 h1.0) rides on, tips in 0.4-1.0 s and rides off; the 0.12 m end lip never parks the bike | `seesawEntry` fillet kept for the lesson boards; bare boards where the landing is the lesson |
-| lip climb (front wheel onto a ledge, hop the rear up) | front wheel reaches ~1.25 m at 45 deg pitch, ~1.45 m at 60; **the 0.9 m ledge needs a 1.45 m rear lift (29 of 300 hop combos)** | walls with a lip <= 1.4 m, always with >= 5 m run-up; the 0.9 m ledge is M1's demand only, after 0.45-0.7 m steps |
-| climb 60 deg | **crests in 2.95 s** (bash plate now at trials clearance) | X1 keeps 60 deg as its demand |
-| rider pose lag | **0.28 s** t90 | a hint names the technique one obstacle early (the HUD shows hints in order) |
-| restart -> riding | one tick, one frame | every checkpoint has >= 3 m of flat run-in, and the **checkpoint rule** (round 4, `CHECKPOINT_RULE`, validated in `finish()` and the test suite): >= 15 m of flat-or-descending run-up from every spawn (start and checkpoints) to the first obstacle after it that needs speed (gap, free kicker >= 1 m, wall / ledge >= 0.6 m, burning barrels; a plank >= 45 deg on the ground needs 20 m; one stacked on a wall top is climbed from the top by design), descent credited at 2 m per metre dropped, a gap measured at the foot of the kicker that launches it, a gap <= 2 m straight off a ledge / box / drum top exempt (a standing hop), a pole-cap pit entered from a box top and the gap off the last cap exempt (X1: cap-to-cap hops at walking pace), a slot <= 1 m exempt (H1's wire is crossed front-up, not jumped), a lip wall exempt (the lip climb is a ~5 m/s technique: the skill-3 bot clears X1's 1.2 m lip wall + 56 deg plank from 3 m and stalls from 16 m); and no checkpoint within 8 m after a feature's landing zone (feature end + 6 m when it launches). Stranger round 1: 8 of 21 B3 deaths and 9 of 20 E1 deaths were at the first feature 3-4 m past a checkpoint |
-| crest launch (round 4) | a crest of radius R leaves the ground above sqrt(g R) | **B1 cannot launch at top speed (20 m/s)**: every rise and fall is a cosine whose crest radius >= v^2/g = 41 m (`FEEL.smoothLengthFor(dy, v)`: half-length >= pi v sqrt(dy / 2g), so a 1 m plateau rises over >= 14.2 m at 20 m/s, a 2 m wave is >= 40 m long); `plateau`, `descent`, `bumpRow` and `wave(..., v)` assert it; B3 / E1 waves are grounded at 16 m/s. Physics round 8 (flat-out lean 0 + full gas holds a 37 deg wheelie and reaches 18.5 m/s on B1): a 0.25 m convex `humpRow` noses the bike down at that speed, a cosine bump does not. B1 stranger deaths: the 8.5 deg tabletop lip at 16 m/s (a 7 m flight, nose-down at 199) and the 20 m x 2.0 m wave crest (radius 10 m, airborne above 10 m/s, 303) |
-| reflex player (round 5, harness-metrics.md "Round 5": a 200 ms, 25 Hz, binary-key player, the primary attempts instrument) | **measured with a scratch probe (one feature 16 m past a spawn, 3-6 seeds, `average` unless noted)**: the practised hop clears a 0.45-0.5 m ledge in 1-2, 0.55 in 2-14 with one wall, 0.6 and up walled for most seeds, a bare 0.9 walled for every skill; a step 0.45 + ledge 0.9 1-4, steps 0.3 / 0.6 / 0.9 1,1,2,1,1,1; stairs: 0.25 m risers at a 0.5 m run 1,1,1,1,1,1 (up to 8 steps), 0.3 risers up to 11 for a slow seed, >= 0.35 reads as a face and is walled; a gap onto a box edge 1,5,14, the same gap onto an up-ramp landing 1,1,1; a double gap needs an 8 m platform and a 5 m second gap (1,2,1; 6 m walled on one seed); a box drop onto a straight down-ramp 1,1,1 at 0.5 / 1.0 / 1.8 m, onto flat 1,2,4; a 22 deg fire kicker landing on flat 2 / walled / 4, onto an 8 x 2.0 ramp 1,1,1; lip walls 1.0 / 1.2 / 1.4 walled even for `good`, a 0.5 m step in front 2,2,2; planks (`good`) 50 deg 2,1,1, 55 2,6,6, 60 7,walled,7; a pole-cap row walled for every skill; `logStep` at 2r 2-row 1,1,1 / 3-row 2,2,5 (centre-height ramp 3,3,3 / walled); a see-saw then a 3 m gap onto a plank at 2.0 walled, a see-saw then 10 m then a 14 deg kicker onto a plank 1-2. Its one systematic weakness: nose-down in the air -> gas + lean back -> loop (`air-gas-nose-up`), so every landing shape is an incline it can meet nose-down | hop lessons <= 0.5, demands staged in <= 0.45 steps; risers 0.25 up; every gap lands on an up-ramp (`gapLanding`) or a lipped platform; every drop and fire line lands on a down-ramp; hard walls get a `steppedWall` B line; pole rows sit in the last third of their tracks |
-| finish run-out (round 6, `FINISH_RUNOUT`, validated in `finish()` and the test suite) | a flat-out bike reaches 20 m/s on the run-out; the user's report: "going off the end and crashing, it goes absolutely nuts" | after `finishX` every track (fixtures included) has >= 30 m of flat at the finish height, then a soft catch — a 3 m x 0.75 up-ramp into a 2.5 m container — then the 35 deg end bank; bounds and `oobY` cover it. Measured (`fullThrottle` controller, gas held through the run-out, 20 m/s at the catch): the bike stops on the ramp in 3 of 5 runs and bounces back < 5 m with a crash in 2 (0.4 / 1.0 / 1.25 m ramps crash more); with the throttle released at the finish it stops well inside the 30 m |
-| checkpoint rule, round 5 | stairs up (`stairRiser` 0.25), log pyramids, shelf / sunk drums > 0.35 m proud and kill-slot rows are speed / momentum features (E3: 95 stuck-restarts at a flight 2.5 m past a checkpoint; M2: 38 at a pyramid and 21 at a shelf 3 m past one); `hopHeight` 0.45 (a 0.55 ledge 3 m past a checkpoint: 85 stuck-restarts, from 16 m: 5); a ledge / wall / drum / pyramid behind an adjacent step, ramp or gap chain is measured at the chain's foot, and a ledge's hop is its rise above the surface it is entered from; a slot row is exempt only within 3 m of a wall / ledge top (H1 / X3: lip climb straight into the rails) | every track passes `auditCheckpoints` (validated in `finish()` and the test suite) |
+| quantity | v1 (§0 rounds 2-6) | **v2 measured (round 7)** | authored against |
+|---|---|---|---|
+| total mass / COM | 145 kg, 0.45 m | kept | - |
+| wheelbase / wheel radius | 1.30 / 0.34 | kept | 0.3 m kerbs rollable |
+| 0 -> 16 m/s | rule 3.5 s (measured 1.4-2.2) | **3.97 s / 36.3 m** Rookie; Pro 3.25 s / 29.2 m (lean +0.5: the Pro loops at +0.25 from rest) | run-ups are not longer: v2 is front-loaded (0.66 g off the line) |
+| speed after d m of flat run-up (raw) | rule 10 m 7.7 / 14 m 9.1 / 20 m 10.8 / 40 m 15.3 | **10 m 10.2 / 14 m 11.6 / 20 m 13.2 / 30 m 15.1 / 40 m 16.5 / 60 m 18.3** (Pro +0.7..+1.2) | `FEEL.speedAfterRaw`; a 16 m run-up arrives at 12.4 m/s, the checkpoint-rule 15 m at 12 |
+| top speed | 20 | 20.03 Rookie / 21.03 Pro (drag-limited above 14) | - |
+| brake from 10 m/s | 4.66 m (10.7 m/s^2) | **5.92 m hard-back (8.6 m/s^2), 7.06 m neutral**; from 16: 13.5 / 17.5 m | brake zones stay 8 m (10 m/s hard-back + margin = 7.3) |
+| kicker flight (rear touchdown past the lip, landing at lip height) | `jumpRange` at 0.8 x run-up speed | **gas held through the lip at neutral loops the bike off every kicker at <= 10 m/s** (<= 12 Pro); rolled at 0.3 throttle / +0.25: 4x1.2 @12 6.0 m, @14 10.1, land -4..-7; gas + lean +0.5: 4x1.2 @12 8.1 m (+26), 3x0.8 @12 8.5, 6x1.2 @12 4.6 — rides away on <= 17 deg lips, **the 5x2 (22 deg) crashes <= 10 m/s** and lands -25 at 16 | `jumpRange(v_lip)` is within +0.4/-1.0 m when the bike lands <= 20 deg nose-up; beginner / easy / medium lips are straight and <= 17 deg (the curve-0.3 lips are gone below hard); 22 deg only on H3 / X3 fire rows from >= 12 m/s |
+| plank climb (4 m wood, naive rider gas + lean 0.4 / technique controller) | sustained 60, 65 stalls; planks <= 48 through Hard | **crawl limit 37 deg (COM geometry); naive rider loops on every plank >= 35 from 2-5 m/s, tops 40-45 only from 8 m/s; 45 @ 8 m/s: F plain / F with the concave fillet / TOP over a 0.3 m 20 deg kicker foot (both classes); 40 @ 5: F -> TOP with the foot; 50 deg+: nobody tops it (best 79-90 % stall), the skill-3 bot's hop-into-the-face move does; the `steepPlank` fillet makes crawl rows WORSE (Rookie 40 @ 2 TOP -> 58 % stall)** | `kickerPlank` (0.3 m 20 deg foot) for every plank 36-45 deg: E1 36 / 40 / demand 45, X1 face 1, X3 opener; `steepPlank` kept only on the 50 / 55 / 60 faces (bot technique, extreme) |
+| stationary hop | 0.74 m apex | **0.46 m** (0.55 with a 0.4 s preload) | `hopStationary` 0.46 |
+| hop-able ledge (gas-hop, >= 0.1 m of clear air) | 0.9 m rolling from 5 m/s | **0.3-0.6 m at 5 m/s (timing window 0.42 -> 0.22 s), 0.45-0.7 at 8 m/s; 0.7 has no margin, 0.8 is the Rookie wall (0 of 22 timings), 0.9 is gone; the Pro clears 0.8 at 3-5 and 0.9 once in 22 at 5.** A 0.15 s late hop at 5 m/s = stuck at the face (no fault); at 8 m/s = hung on the corner or a -93 deg nose-dive | lesson ledges 0.4, demands 0.45-0.5, B-line `steppedWall` step 0.4 (was 0.5); no single rise above 0.5 anywhere; the shipped `lipHopper` is a lip controller and only makes 0.3 m |
+| drops (box edge, throttle 0.2) | 1.8 m onto a ramp (B2) | **neutral rides every drop to 3 m at 6 and 12 m/s (front first, -19..-47 deg, rebound <= 0.07); a HELD +0.5 crashes >= 1.5 m @ 6 (nose -113); a held -0.5 loops >= 2 m @ 6 / 3 m @ 12**; the 8 m down-ramp is under the parabola at 12 m/s | drops unchanged (B2 1.8 max, X3 cascade 0.5 steps); the beginner hint stays "lean back, gas off" (a touch, not a hold) |
+| see-saws | every board tips in 0.4-1.0 s and rides off | **every 29 deg board (6x1.5, 8x2.0, with or without the entry fillet) crashes every rider on both classes at 3 / 5 / 8 m/s: the far end falls faster than the bike, both wheels leave the board for 0.4 s and it lands rear-first at 65 deg nose-up; <= 22 deg boards (6x0.8, 8x1.2, 8x1.5, 5x1.0) ride at every speed with a cruise rider, tip in 1.2-2.2 s, leave at 4.5-5 m/s; the rear rebound 250 adds no kick (slam dv -0.4..+0.3 m/s)** | no board steeper than 22 deg: M3 8x1.5 + 8x1.6 (were 6x1.5 / 8x2.0), X2 8x1.6 x2, X3 8x1.6; 14 m of flat after a board before a kicker |
+| stairs | 0.25 risers at a 0.5 m run (26.6 deg) | v2 lifts the nose over a 26.6 deg flight at 12 m/s (59 nose-high deaths at E3's second flight) | 0.25 risers at a 0.6 m run (22.6 deg), 6 m box tops before a down-flight |
+| drums / logs (physics 12.3) | geometry, not speed | not re-measured; a 0.5 m-proud drum at the v2 arrival speed of 12 m/s launched the reflex rider (M2: 25 + 23 + 23 deaths on the first three drums) | M2's second drum 0.4 m proud; log pyramids two rows (the 3-row 1.34 m pyramid is a 50 deg log climb) |
+| crest launch | radius >= v^2/g | kept (a cosine grounded at 16-20 m/s) | unchanged |
+| lab ledge (§6.1) | 0.4 m above the lip | `lipHopper` at 8-9 m/s: corner roll -0.06 m on all three variants (as is / -0.10 m / 45 deg chamfer), 7 m/s nose-dive; the chamfer is not expressible | ledge lowered 0.10 m (1.6 -> 1.5): the step is inside the 0.3-0.6 m band and the Pro's rolled miss lands on the mattress |
+| checkpoint rule / finish run-out / crest rule (rounds 4-6) | as before | unchanged, still validated in `finish()` | unchanged |
+| reflex player (harness) | round-5 probe numbers | **not a v2 instrument yet**: on the v2 flip the shipped controller looped the Rookie on flat flow (b1 median 5 on a 1-1 band, deaths "ground @ 95 m") because it allows lean -0.3 with the gas on the ground (v2 critical lean ~ -0.1) and holds gas + lean -1 through touchdown after a nose-down flight; on the Pro it loops at the start line (lab-flat-200 median 8-13). The harness owner is re-tuning it concurrently (v2 hop recipe, ramp-lip release, the climb throw) | attempts bands stand; the round-7 table below is a same-controller before / after on the harness owner's WIP controller (src 6714cf44) |
 
-Jump sizing uses `FEEL.jumpRange(v, angleDeg, drop)` (flat-landing ballistic range) at the
-margin speed for the run-up available: a 4 x 1.2 kicker (17 deg) at 9 m/s reaches ~5 m; a
-5 x 2.0 kicker (22 deg) at 11 m/s reaches ~8.5 m. Gaps are sized at <= 0.7 x that.
-**The bot, not the author, decides whether a track is clearable**; later rounds re-author
-against measured attempts.
+Jump sizing uses `FEEL.jumpRange(v_lip, angleDeg, drop)` at the margin speed for the run-up available
+(`FEEL.speedAfter`), and the landing must survive the raw speed (`speedAfterRaw`): a 4 x 1.2 kicker (17 deg)
+at 12 m/s flies 6-8 m, a 6 x 1.5 (14 deg) at 12.4 m/s ~7 m. Gaps are sized at <= 0.7 x that. **The bot, not the
+author, decides whether a track is clearable**; later rounds re-author against measured attempts.
 
 ## 1. Track definition
 
@@ -435,6 +433,67 @@ shape, H1 `steppedWall` 1.4 + rails, H2 lipped 5.5 m chain, H3 6 barrels onto a 
 deg plank + caps, X2 chain, finale). Reflex `good` best 63 % (walled at the H2 chain, 464 m).
 Target 60-80, 200 s.
 
+### Round 7 (physics v2) — what changed per course and the same-controller reflex before / after
+
+Physics `physics-v2` 9b4275c, 3 seeds, cap 50 / 300 s, Rookie unless "P"; "before" is the round-6 geometry
+and "after" the round-7 geometry, BOTH on the harness owner's work-in-progress v2 reflex controller (src
+6714cf44, run 22:08 UTC) — the shipped controller at the flip (src 955cce67) looped the Rookie on flat flow
+(b1 median 5 / 5 / 4 for novice / average / good on a 1-1 band) so those numbers are not a track verdict and
+are kept in the scratch logs only. Medians are attempts; (c/3) clears; % best progress. Skill-3 bot: v2 clear
+time before -> after where re-run (1 attempt each unless noted). Gold = provisional (bot x 1.6, the v1
+stranger / bot clean ratio on b1, rounded up to 5 s, non-decreasing through the tier); platinum = 0.85 x gold
+(core `rules.ts`) — a `platinumTimeS` meta field is requested so it can be pinned to bot x 1.10 instead.
+
+| track | round-7 change (why) | novice before -> after | average | good | band | top death after | bot-3 s | gold / plat s |
+|---|---|---|---|---|---|---|---|---|
+| b1-first-ride | none (naive full-throttle clears on v2); target only | 5 (3/3) -> 5 (3/3) | 4 -> 4 (3/3) | 1 -> 1 (3/3, 55.5 s) | 1-1 | ground @ 565 (air-brake) | 40.65 | 65 / 55 |
+| b2-lean-back | none (drops ride neutral to 3 m); target only | 30 (63 %) -> 30 | 27 (1/3) -> 27 | 24 (2/3) -> 24 | 1-2 | ground @ 305 (air-brake) | 38.13 | 65 / 55 |
+| b3-kicker-row | every kicker straight (curve 0.3 gone), the two 5x1.5 "22 deg" lips are 6x1.5 (14 deg), a 12 m landing slope under the first kicker | 38 (50 %) -> 35 (71 %); P 46 (26 %) -> 43 (51 %) | 37 (75 %) -> 36 (83 %) | 23 (2/3) -> 22 (3/3) | 1-2 | ramp @ 70 (air-gas-nose-up) | 33.44 | 65 / 55 |
+| e1-uphill-weight | 40 / 36 / demand 45 deg planks over the `kickerPlank` foot (was plain 40 / 36, steepPlank 48) | 33 (32 %) -> 33 (32 %) | 35 (66 %) -> 33 (77 %) | 31 (1/3) -> 35 (90 %) | 2-4 | ramp @ 75.2 (air-gas-nose-up: the first box's down-ramp, a controller flight habit) | 42.36 -> 42.13 | 70 / 60 |
+| e2-rear-wheel-first | 6 m gap -> 5 m; platform kicker 3x1.0 (18 deg) -> 4x1.0 (14); its gap 5 -> 4.5 | 37 (43 %) -> 36 (46 %) | 39 (45 %) -> 36 (53 %) | 30 (1/3) -> 30 (85 %) | 3-5 | box @ 72 (air-brake) | 43.46 | 70 / 60 |
+| e3-stairway | every up-flight 0.25 x 0.6 m run (22.6 deg, was 0.5 / 26.6); box tops 6 m; down-flights 0.5 runs, 0.25 risers | 43 (45 %) -> 43 (40 %) | 46 (46 %) -> 38 (79 %) | 45 (35 %) -> 44 (36 %) | 3-6 | stair @ 164.5 (stuck-restart: the WIP controller stalls on the flight at low speed) | 41.44 -> 42.19 | 70 / 60 |
+| m1-hop-up | lesson ledges 0.4 / 0.45, two-stage 0.45 + 0.85 (rises 0.45 / 0.4), demand stays 0.3-step 0.9 (no single rise > 0.5) | 51 (39 %) -> 51 (45 %) | 51 (65 %) -> 49 (71 %) | 32 (2/3) -> 46 (1/3) | 5-9 | ledge @ 119 (nose-low: the WIP hop's timing) | 32.58 -> 36.99 | 70 / 60 |
+| m2-drum-roll | second drum 0.4 m proud (was 0.5); demand pyramid 5 x 2 rows (was 4 x 3 = 1.34 m) | 39 (54 %) -> 40 (40 %) | 36 (31 %) -> 39 (40 %) | 36 (88 %) -> 38 (89 %) | 6-12 | drum @ 47.6 / 53.2 (air rules on the bumps at 12 m/s) | 38.78 | 70 / 60 |
+| m3-see-saw | 6x1.5 -> 8x1.5 (21 deg), demand 8x2.0 -> 8x1.6 (21.8), 14 m after each board before its kicker (was 10), those kickers 6x1.5 (14 deg, were 5x1.5) and the thin landings 6 / 4 m (were 4 / 3): with 14 m the bot flew a 4 m board and crashed 3.7 m onto it off the 16.7 deg lip | 47 (47 %) -> 47 (47 %) | 42 (52 %) -> 38 (70 %); P 45 (47 %) -> 42 (76 %) | 38 (87 %) -> 35 (1/3, 294 s) | 8-12 | ramp @ 202.6 / 211.6 (the 14 deg kicker and the plank lip after the 8x1.5 board: air rules at 12 m/s) | 51.08 (3 att.) -> **40.71 (1 att.)** | 70 / 60 |
+| h1-wheelie-wire (P) | B-line step 0.4 on all three walls (was 0.5); start / balance / finish set pieces + gantries | 50 (30 %) -> 44 (34 %); P 49 -> 48 | 43 (30 %) -> 43 (44 %); P 51 -> 46 (41 %) | 51 -> 50; P 51 -> 51 (32 %) | 10-18 | wall @ 175.8 (nose-low: 1.0 m lip / 0.4 hop) | 44.57 | 75 / 64 |
+| h2-gap-chain (P) | geometry unchanged (all lips <= 17 deg, board 22 deg); start / air / finish set pieces | 44 (14 %) -> 44 | 49 (17 %) -> 49 | 45 (27 %) -> 45; P 48 -> 48 | 14-22 | ramp @ 62 (air-gas-nose-up on the first 14 deg kicker: controller) | 46.28 | 75 / 64 |
+| h3-fire-line (P) | fire kickers straight 21.8 deg (curve 0.3 gone), ledges 0.45 (was 0.5); fire set pieces per row + gantries | 36 (53 %) -> 33 (50 %) | 34 (74 %) -> 33 (90 %) | 34 (90 %) -> 31 (1/3, 288 s); P 41 -> 43 (73 %) | 18-25 | ground @ 85-95 (air rules after the first landing ramp) | 45.10 | 75 / 64 |
+| x1-vertical-limit (P) | face 1 `kickerPlank` 45 (was steepPlank 45), faces 2-4 keep the 2.4 x 0.8 fillet (50 / 55 / 60: bot technique); every box top 6 m (was 4: the climb throw leaves the rider forward and a box edge 4 m later onto the 22 m ramp is the measured +0.5 / >= 1.5 m drop crash — bot 3 attempts at 58 m, then 32 at the 50 deg face's exit); side-tight keys at pitch 12 deg; climb set pieces; 798 m | 31 (54 %) -> 33 (34 %); P 42 -> 42 | 30 (72 %) -> 35 (34 %); P 40 -> 40 | 34 (63 %) -> 32 (53 %); P 38 -> 39 | 30-45 | ramp @ 227.9 / plank @ 230.3 (the 50 deg face: v2 has no stranger line up 50, the bot's hop move only) | 56.07 -> 62.56 (2 att., one crash at the 55 deg face's box top; gold keeps the ~56 s clean time) | 90 / 76 |
+| x2-pipe-dream (P) | both 8x2.0 boards -> 8x1.6; log pyramid 5 x 2 rows (was 4 x 3); balance set piece + gantries | 41 (24 %) -> 42 (21 %); P 45 -> 48 | 40 (15 %) -> 41 (22 %); P 45 -> 42 | 39 (45 %) -> 37 (44 %); P 40 -> 44 | 40-60 | ramp @ 62.6 / 74.6 (the log-step entry ramps: air rules) | 42.48 | 90 / 76 |
+| x3-gauntlet (P) | opener `kickerPlank` 45 (was steepPlank 48) with an 8 m top (was 4) before the cascade, stairs 0.6 runs, see-saw 8x1.6, B-line step 0.4, fire kicker straight, the exit plank's foot on the ground (height 1.5, was 2.0 = a 0.5 m step off a -30 deg plank: the WIP bot died there 15 times); set pieces; 507 m | 36 (27 %) -> 38 (28 %); P 46 -> 44 | 35 (25 %) -> 33 (28 %); P 46 -> 41 | 33 (27 %) -> 39 (27 %); P 46 -> 44 | 60-80 | ramp @ 60.2 (air-brake-nose-down: the 12 m down-ramp off the opener's box onto the cascade — riders now pass the opener; the cascade entry is the next feature to re-author, e.g. a grounded `smooth` descent instead of a box edge) | 45.08 -> 42.43 (1 att.; the WIP bot on the round-6 geometry: 2 att. 53.4 s) | 90 / 76 |
+| lab-physics-test | ledge 1.6 -> 1.5 (§6.1) | 1 -> 2 (3/3); P 9 -> 6 | 1 -> 2 (3/3); P 4 -> 4 | 1 -> 1 (9.2 s); P 2 -> 2 | 3-8 | ground @ 70-85 (the crest) | 8.13 -> 8.10 | 12 / 10 |
+
+Reading the table: where the top death was geometric the change moved it (b3, e3 average, m3 Pro, h3 good's
+first clear, x3's riders reach the cascade); where it is the controller's flight habit (`air-gas-nose-up` /
+`air-brake-nose-down` on flat ground and 14 deg kickers) nothing a course can do short of removing every jump
+helps, and those rows are flat before -> after by construction. Two rows went the wrong way: m1 `good` (32 -> 46,
+the deaths moved from the 0.5 m lesson ledge to the 0.85 stage — the WIP hop recipe lands 25-55 deg nose-up
+and the bot brakes in the air) and x3 `good` (33 -> 39: progress in x, not attempts — the opener is passed and
+the cascade behind it is the new wall). The
+bands are NOT re-judged this round: the instrument is being re-tuned under the tracks. Next round re-runs this
+table on the finished v2 reflex controller and edits the TRACK where a median lands outside the band (§3).
+
+**Round 7 requests.** *Harness:* the reflex controller is the round's blocker — on v2 it (a) allows lean -0.3 with
+the gas on the ground (v2 Rookie critical lean ~ -0.1: every flat-flow loop in the tables), (b) holds gas + lean -1
+through touchdown after a nose-down flight (`air-gas-nose-up` on 14 deg kickers and box-top drops), (c) launches the
+Pro at lean 0 from every spawn (lab-flat-200 median 8-13), (d) stalls on 22.6 deg stair flights (`stuck-restart` at
+e3 164.5); the tables above must be re-run on the finished controller before any band is judged; the search bot's
+attempts are chaotic under metre-level geometry shifts (x1: 3 -> 32 -> 2 attempts across three 4 m box-width
+edits), so a 3-seed median with a 600 s wall is the number to quote. *Physics:* the lab's >= 0.1 m margin is a
+controller question now (`lipHopper`'s 8 m/s apex equals the ledge height on all three geometries; the 7 m/s hop
+lands -26 deg) — a hop timed at the apex or a `ledgeHopper` that lands level is the next probe; the seesaw
+tip-air (0.4 s off a 29 deg board) is a physics fact the curriculum now avoids rather than a rebound artefact —
+if 29 deg boards are wanted back, the board's angular damping is the lever; the 0.9 m ledge row of CONTRACT §2.5
+is unreachable on the Rookie (0 of 22 timings) and should be re-stated as 0.6 m (0.8 Pro). *Core:* a
+`platinumTimeS` meta field so platinum can be pinned to bot x 1.10 (today 0.85 x gold = bot x 1.36). *Render:* the
+new `setPieces` / `arch` / `tunnel` markers on all six hard / extreme courses are live data now (start / finish
+gantries, H1 crowd bridge, fire rows, climbs, X2's pipe run); the X1 / X3 `side-tight` keys carry `pitch: 12 deg`
+(0.209 rad) — if the rig's inner band rejects it on the 4.5 m faces, say so and the key goes back to the default.
+
+**Camera (render r11):** every course keeps the mode defaults (`side` 16 / 21 deg is the reference frame);
+the only explicit override is `pitch: 12 deg` on the `side-tight` keys over X1's four faces and X3's opener and
+60 deg plank — a 3.6-4.5 m wall read as a floor at 19 deg. Nothing else asked for a different frame.
+
 ### Round 5 / 6 acceptance matrix (reflex bot, 3 seeds, cap 50 attempts / 300 s; search bot skill 3). Rows marked "round 6" were re-run on physics d98236a with the round-6 geometry (sequential, one process, bot wall 600 s); the other rows are round 5 (physics b426bcc + 42af392)
 
 Acceptance per tier: beginner / easy — reflex `average` median inside `attemptsBand` (beginner also
@@ -667,11 +726,24 @@ Two tracks with `lab-` ids, registered LAST (`ALL_TRACKS = [fixtures, ...CURRICU
 `LAB_TRACKS`, `isLabTrackId`). Core-game shows them under a "Lab" section; `meta.hints = ['physics']`
 on both turns on the physics HUD (physics-v2 §15 "HUD on this level only"). They are the proving
 ground for every physics change: physics-v2 §16.4 — "`lab-physics-test` is authored first and gates
-every later physics round". Geometry is frozen by golden hash (`44323a6289134cf2` / `a5372af3c4fbcb76`)
+every later physics round". Geometry is frozen by golden hash (`f99707f44193c58b` / `a5372af3c4fbcb76`; round 7 lowered the ledge 0.10 m to 1.5, see the note under the x table)
 AND pinned to the metre in `tracks.test.ts` ("lab-physics-test (physics-v2 §15)"), so a drift from the
 spec fails with a number. Both compile deterministically and `describeTrack` prints them with the suite.
 
-### 6.1 `lab-physics-test` — "Physics Test" (tier medium, biome industrial, technique "the bunny hop", attemptsBand [3, 8], targetTimeS 25)
+### 6.1 `lab-physics-test` — "Physics Test" (tier medium, biome industrial, technique "the bunny hop", attemptsBand [3, 8], targetTimeS 12 (round 7: skill-3 bot 8.1 s x 1.6))
+
+**Round 7 (physics v2):** the ledge is **+1.5** (0.3 m above the lip; was +1.6 / 0.4). Measured with the physics
+owner's `lipHopper` on v2 (both classes, 6-9 m/s) on three in-memory variants — as authored, the ledge 0.10 m
+lower, and a 45 deg chamfer on the far wall's top corner (a hand-edited polyline: the vocabulary cannot express
+it — a `ramp` inside the gap's footprint is rejected as an overlap and `gap` has no chamfer param) — NONE reaches
+physics-v2 §15's >= 0.1 m of clear air: the well-timed hop at 8-9 m/s rolls the rear over the corner at -0.06 m
+on all three (the hop's apex at 8 m/s is 1.6-1.8 m, the ledge height; the 7 m/s hop flies higher and lands -26
+deg into the face), and a 0.15 s late hop is a crash into the pit at 7-9 m/s on all three. The lower ledge was
+chosen because it is expressible, keeps the level a test (a clean hop clears at 8-9 on both classes; no hop at
+7-9 is still a crash on the Rookie), puts the step inside the v2 gas-hop's clear-air band (0.3-0.6 m at 5 m/s)
+and turns the Pro's rolled 8 m/s miss into a mattress landing. The margin the spec asks for is now a controller
+question (a hop timed at its apex, the -26 deg 7 m/s landing), raised with physics. Every 1.6 in the table
+below reads 1.5, the crest peak 2.1, and the finish run-out sits at +1.5.
 
 Authored to physics-v2 §15 with the DSL (`ramp` + `box` + `gap` + ground; 100 m, 3 course obstacles):
 

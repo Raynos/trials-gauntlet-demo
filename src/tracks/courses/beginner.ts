@@ -27,7 +27,7 @@ export const B1 = course('b1-first-ride', 'First Ride', 'beginner')
     technique: 'throttle control',
     demands: 'slow down after the long descent for a speed hump and a low plateau, then hold the gas home',
     attemptsBand: [1, 1],
-    targetTimeS: 45,
+    targetTimeS: 65, // round 7 gold (physics v2): skill-3 bot 40.65 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .hint('Hold the gas up the hill')
   .hint('Steady gas over the rollers')
@@ -92,7 +92,7 @@ export const B2 = course('b2-lean-back', 'Lean Back', 'beginner')
     technique: 'weight shift on drops',
     demands: '1.8 m drop onto a landing ramp: lean back or nose in',
     attemptsBand: [1, 2],
-    targetTimeS: 50,
+    targetTimeS: 65, // round 7 gold (physics v2): skill-3 bot 38.13 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .hint('Lean back over the bumps')
   .hint('Lean back off the drop')
@@ -174,7 +174,7 @@ export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
     technique: 'jump and level in the air',
     demands: 'kicker over a 5 m gap: speed to the lip, off the gas in the air',
     attemptsBand: [1, 2],
-    targetTimeS: 55,
+    targetTimeS: 65, // round 7 gold (physics v2): skill-3 bot 33.44 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .hint('Gas to the ramp, off at the lip')
   .hint('Lean forward to level')
@@ -183,10 +183,12 @@ export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
   .camera({ mode: 'side' })
   .flat(20)
   .checkpoint() // 20 m
-  .flat(16) // run-up: ~9.7 m/s from the spawn
-  .ramp({ length: 4, height: 0.8, curve: 0.3 }) // first kicker: a 14 deg hop onto flat, lands 4-12 m out
-  .flat(18)
-  .ramp({ length: 4, height: 1.0, curve: 0.3 })
+  .flat(16) // run-up: v2 12.4 m/s from the spawn (16.5 from the start line)
+  .ramp({ length: 4, height: 0.8 }) // first kicker: a straight 11 deg hop (round 7: the curve-0.3 lip is gone from every beginner kicker — on v2 a rider who holds the gas through a 22 deg lip loops at <= 10 m/s and a 17 deg lip at <= 8; straight 11-17 deg lips ride away)
+  .flat(6)
+  .slope(12, -0.8) // round 7: land on falling ground, not the flat (the naive v2 rider endoed at 54 m: nose -114 deg at 12 m/s)
+  .flat(12)
+  .ramp({ length: 4, height: 1.0 })
   .flat(8) // under-speed lands here
   .slope(14, -1.0) // over-speed lands on the downslope (round 6: 4 deg and long enough that a 12 m/s launch still lands on it)
   .flat(10)
@@ -194,14 +196,14 @@ export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
   .flat(8)
   .checkpoint() // ~118 m
   .flat(16)
-  .ramp({ length: 4, height: 1.2, curve: 0.3 }) // ~17 deg: level the bike in the air
+  .ramp({ length: 4, height: 1.2 }) // 17 deg: level the bike in the air
   .flat(8)
   .slope(16, -1.2)
   .flat(10)
   .bumpRow(2, 0.25, 16) // round 6: was a convex humpRow — the novice reflex player launched nose-down off it 10 m before the 1.5 kicker
   .flat(6)
   .camera({ mode: 'high34', zoomBias: 0.4 })
-  .ramp({ length: 5, height: 1.5, curve: 0.3 }) // ~22 deg exit, the biggest lip on B3
+  .ramp({ length: 6, height: 1.5 }) // 14 deg, the biggest lip on B3 (round 7: was 5 x 1.5 curve 0.3, a ~22 deg exit that loops the v2 gas-through-the-lip rider below 10 m/s)
   .flat(8)
   .slope(20, -1.5) // round 6: the 22 deg lip at 12 m/s flew past a 12 m slope and landed nose-down on the flat (novice: 4 deaths at 197-224)
   .camera({ mode: 'side' })
@@ -219,7 +221,7 @@ export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
   .checkpoint() // ~340 m
   .flat(16) // run-up: ~9.7 m/s from the spawn; a 5 m gap from a 22 deg lip needs ~8
   .camera({ mode: 'high34', zoomBias: 0.4 })
-  .ramp({ length: 5, height: 1.5, curve: 0.3 }) // the set piece
+  .ramp({ length: 6, height: 1.5 }) // the set piece: a straight 14 deg lip (round 7); FEEL.jumpRange(9.9, 14, 0) = 4.7 m at the margin speed, 8+ m at the v2 12.4 m/s arrival
   .gap({ width: 4 }) // round 6: was 5 m — the novice reflex player (9 m/s cruise) landed in the pit short of any landing shape
   .gapLanding(0.6, 8, 6, 10) // round 6: an up-ramp at the far lip, not a box edge (reflex `novice` 11 x2: air-gas-nose-up into the 0.4 m box face); 6 + 8 m before the down-ramp so a full-gas 16 m/s launch (~15 m) still lands on it
   .camera({ mode: 'side' })

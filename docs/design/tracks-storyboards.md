@@ -16,6 +16,23 @@ tunnels, crests), and they put a crowd, a gate or a pyro at every moment they wa
 remember. This document redesigns h1-h3 / x1-x3 to that grammar while keeping every shape the
 bots have cleared. Section 8 is the sanity pass on m1-m3.
 
+## Round 7 status (physics v2) — what of these storyboards is in the courses
+
+Tracks round 7 re-authored every course to the measured v2 envelope (`tracks.md` §0) and took the storyboard
+pieces that cost no geometry: `setPiece` markers (`start` / `finish` on all six, `balance` H1 wire, `air` H2
+chain C, `fire` on every H3 row and X3's, `climb` on X1's four faces and X3's opener / stack, `balance` X2's
+pipe run), start / finish gantries (`arch` girder / finish) and H1's crowd bridge, and the camera pitch 12 deg
+on the X1 / X3 faces. The v2 measurements moved several storyboard numbers: every 29 deg see-saw is a crash
+board (§5 X2's two 8x2.0 and X3's are 8x1.6), the 22 deg fire lips are straight (a curve-0.3 lip loops the
+gas-through-the-lip rider below 10 m/s), the lip-wall B line is a 0.4 m hop (0.5 is outside the v2 gas-hop
+band), 45 deg faces stand on a `kickerPlank` foot and 50 deg+ faces are the skill-3 bot's hop move only
+(`[Pro?]` rows: the Pro tops 50 @ 8 m/s over the 2.4 x 0.8 fillet, nothing tops 55-60 but the bot). Still
+owed from §5's order: H1's roof climbs (`smooth(28, 2)` height grammar) and the drop into the scaffold
+tunnel, H3's second tunnel row and re-sequencing, X1's summit cap probe, H2's apron jump, the validators
+(`maxRepeats`, `breatherAfterDemand`, `density`, `story`, `setPieces`, `heightBudget`, `lineB`,
+`checkpointSpacing`), and every `[wave 2 probe]` except the ones §0 now answers (the 40 deg roll-off + 7 deg
+descent at 6 / 10 / 13 m/s is measured as the drop table: neutral rides, a held +0.5 does not).
+
 ## 0. Conventions and constraints used below
 
 - Intended bike: **Pro** (no wheelie assist, real CdA, sharper throttle — MEGA_PLAN P1). Every

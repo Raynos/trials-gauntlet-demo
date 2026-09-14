@@ -284,10 +284,10 @@ describe('lab-physics-test (physics-v2 §15)', () => {
   const track = compiled.get(def.id) as CompiledTrack;
   const poly = (i: number): ColliderPolyline => track.colliders[i] as ColliderPolyline;
 
-  it('is the §15 geometry: 40 m run-up, 6 x 1.2 wood take-off + 0.3 m lip, 3 m dry pit on a rubber mattress at -1.5, ledge at +1.6, crest 70-90, finish 100', () => {
+  it('is the §15 geometry: 40 m run-up, 6 x 1.2 wood take-off + 0.3 m lip, 3 m dry pit on a rubber mattress at -1.5, ledge at +1.5 (round 7: was 1.6), crest 70-90, finish 100', () => {
     expect(def.finishX).toBe(100);
     expect(def.checkpoints.map((c) => c.x)).toEqual([30, 62]);
-    expect(def.meta).toMatchObject({ biome: 'industrial', technique: 'the bunny hop', hints: ['physics'], attemptsBand: [3, 8], targetTimeS: 25 });
+    expect(def.meta).toMatchObject({ biome: 'industrial', technique: 'the bunny hop', hints: ['physics'], attemptsBand: [3, 8], targetTimeS: 12 });
     const course = def.obstacles.slice(0, 3).map((o) => [o.kind, o.pos.x, o.pos.y]);
     expect(course).toEqual([
       ['ramp', 40, 0],
@@ -300,23 +300,23 @@ describe('lab-physics-test (physics-v2 §15)', () => {
     expect(poly(4)).toMatchObject({ surface: 'wood', obstacleIndex: 0, points: [{ x: 40, y: 0 }, { x: 46, y: 1.2 }] });
     expect(Math.atan2(1.2, 6) * (180 / Math.PI)).toBeCloseTo(11.31, 2);
     expect(poly(5)).toMatchObject({ surface: 'wood', obstacleIndex: 1, points: [{ x: 46, y: 1.2 }, { x: 46.3, y: 1.2 }, { x: 46.3, y: 0 }] });
-    // pit: near wall continues the lip face down to -1.5; rubber mattress owned by the gap; far wall -1.5 -> +1.6
+    // pit: near wall continues the lip face down to -1.5; rubber mattress owned by the gap; far wall -1.5 -> +1.5
     expect(poly(1)).toMatchObject({ surface: 'dirt', obstacleIndex: -1, points: [{ x: 46.3, y: 0 }, { x: 46.35, y: -1.5 }] });
     expect(poly(6)).toMatchObject({ surface: 'rubber', obstacleIndex: 2, points: [{ x: 46.35, y: -1.5 }, { x: 49.25, y: -1.5 }] });
     expect(poly(2).points.slice(0, 3)).toEqual([
       { x: 49.25, y: -1.5 },
-      { x: 49.3, y: 1.6 },
-      { x: 70, y: 1.6 },
+      { x: 49.3, y: 1.5 },
+      { x: 70, y: 1.5 },
     ]);
     expect(track.placed[2]?.colliderIds).toEqual([6]);
     expect(track.hazards).toEqual([]);
-    // run-out: flat at +1.6 with the 20 x 0.6 cosine crest at 70-90 (peak 2.2 at 80) and flat to the catch
+    // run-out: flat at +1.5 with the 20 x 0.6 cosine crest at 70-90 (peak 2.1 at 80) and flat to the catch
     const runout = poly(2).points;
     const peak = runout.reduce((a, b) => (b.y > a.y ? b : a));
-    expect(peak).toEqual({ x: 80, y: 2.2 });
-    expect(runout.filter((p) => p.x > 70 && p.x < 90).every((p) => p.y > 1.6)).toBe(true);
-    expect(runout[runout.length - 1]).toEqual({ x: 130, y: 1.6 });
-    expect(profileYAt(def.profile, 100)).toBeCloseTo(1.6, 9);
+    expect(peak).toEqual({ x: 80, y: 2.1 });
+    expect(runout.filter((p) => p.x > 70 && p.x < 90).every((p) => p.y > 1.5)).toBe(true);
+    expect(runout[runout.length - 1]).toEqual({ x: 130, y: 1.5 });
+    expect(profileYAt(def.profile, 100)).toBeCloseTo(1.5, 9);
     expect(track.bounds.minY).toBe(-1.5);
     expect(track.oobY).toBe(-7.5);
   });
