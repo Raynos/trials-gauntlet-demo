@@ -93,6 +93,25 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
 | `lb` | lean back (no gas) | rotate nose up in the air |
 | `lf` | lean forward (no gas) | rotate nose down in the air |
 | `t` | tap gas (a short blip, then coast for the rest of the slot) | inch forward, balance |
+| `h` | **the hop** (5 slots): light gas + lean back for 0.3 s, snap to lean forward for 0.22 s, tuck | onto a ledge or box about knee-high (rear wheel rises ~0.5 m); start it about a bike length before the face |
+| `wh` | **wheelie hold** (4 slots): holds the front wheel up at ~40 deg with the throttle, leaning a little back | after `gb` has lifted the front; chain `wh wh wh` to keep it up |
+| `ct` | **climb** (4 slots): base gas with neutral weight until the front wheel is on the face, then weight forward + gas | steep planks and steps around 40-45 deg; a front-heavy approach cannot climb them |
+
+`h`, `wh` and `ct` count as 5 / 4 / 4 slots of the 40.
+
+## How the bike feels
+
+- **It is not quick off the line.** 0 to 16 m/s takes about 4 s of full gas on the flat; top speed is
+  20 m/s. Give run-ups the slots they need (`g32` is 4 s) and count on the ruler.
+- **Full gas with the weight back lifts the front.** Neutral (`g`) does not loop; `gb` held for more
+  than ~1 s does. The balance point of a wheelie is about 50 deg nose up with no lean, ~40 deg leaning
+  back a little (that is what `wh` regulates).
+- **The hop is a move, not a button:** lean back on light gas to load the bike (~0.3 s), then snap the
+  weight forward. `h` is that recipe; `gb2 gf2 lb1` is the same thing by hand.
+- **Drops are safe.** A 3 m drop at speed lands and rides away; a nose-down landing dips the front hard,
+  so come off a ledge with a touch of `lb`.
+- **Climbs are geometry.** Weight forward holds ~37 deg at a crawl; 40-45 deg needs the front wheel on
+  the face first and then the throw (`ct`); anything steeper wants speed.
 
 ## Spending calls well
 

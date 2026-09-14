@@ -15,7 +15,8 @@ import { InputRecorder, encodeJSON, iterateFrames, type InputRecording } from '.
 import type { BikeClass } from '../../src/core/types';
 import { createSim, type Sim, type SimSnapshot } from '../lib/sim';
 import type { RulesCounters } from '../lib/rules';
-import { srcFingerprint, type TimedEvent } from '../lib/metrics';
+import { type TimedEvent } from '../lib/metrics';
+import { recordingHeader } from '../lib/recording';
 import type { AttemptLog } from '../lib/schema';
 import { OUT_DIR, REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
@@ -135,14 +136,7 @@ export async function createSession(opts: {
   const dir = sessionDir(opts.trackId, sessionId);
   if (fs.existsSync(path.join(dir, 'state.json'))) throw new Error(`session already exists: ${sessionId}`);
   fs.mkdirSync(path.join(dir, 'attempts'), { recursive: true });
-  const recorder = new InputRecorder({
-    version: 1,
-    trackId: opts.trackId,
-    seed: sim.seed,
-    physicsHz: sim.hz,
-    bike: sim.bike,
-    note: `stranger ${sessionId} agent=${opts.agent} bike=${sim.bike} src=${srcFingerprint()}`,
-  });
+  const recorder = new InputRecorder(recordingHeader(sim, `stranger ${sessionId} agent=${opts.agent}`));
   const state: PersistedState = {
     schema: 1,
     kind: 'stranger-state',

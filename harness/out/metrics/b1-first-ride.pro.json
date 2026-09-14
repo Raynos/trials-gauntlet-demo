@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "b1-first-ride",
   "bike": "pro",
-  "updatedAt": "2026-09-14T18:34:32.938Z",
-  "physics": "bikePhysicsFactory",
+  "updatedAt": "2026-09-14T22:58:40.916Z",
+  "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
     1
@@ -14,14 +14,20 @@
     {
       "skill": 3,
       "seeds": [
-        138717428
+        138717428,
+        138717429,
+        138717430
       ],
       "attempts": [
+        1,
+        1,
         1
       ],
       "median": 1,
       "finishTimes": [
-        27.325
+        37.733333333333334,
+        37.733333333333334,
+        37.733333333333334
       ]
     }
   ],
@@ -29,6 +35,8 @@
   "shaped": null,
   "singleWall": null,
   "runs": [
-    "20260914-133251-5fd767"
+    "20260914-175455-3a5a1e",
+    "20260914-175608-d48b73",
+    "20260914-175722-af5ca7"
   ]
 }

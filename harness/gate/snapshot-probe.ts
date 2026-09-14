@@ -14,7 +14,7 @@
  */
 import path from 'node:path';
 import { expandFrames, type InputRecording } from '../../src/core/replay';
-import { ACTIONS, framesOf } from '../bot/actions';
+import { ACTIONS, macroFrameAt, macroTicks, type MacroCtx } from '../bot/actions';
 import { flagNum, parseArgs } from '../lib/args';
 import { diffState } from '../lib/metrics';
 import { loadRecording } from '../lib/recording';
@@ -42,7 +42,8 @@ export async function snapshotProbe(rec: InputRecording, every = 15, maxTicksCap
       const root = B.snap();
       for (let a = 0; a < ACTIONS.length; a++) {
         B.restore(root);
-        for (const f of framesOf(a)) B.step(f);
+        const ctx: MacroCtx = {};
+        for (let i = 0; i < macroTicks(a); i++) B.step(macroFrameAt(a, i, B.state, ctx));
       }
       B.restore(root);
       if (A.hash() !== B.hash()) {

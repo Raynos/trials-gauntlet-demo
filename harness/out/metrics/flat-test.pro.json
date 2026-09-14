@@ -3,35 +3,28 @@
   "kind": "track-bot-metrics",
   "trackId": "flat-test",
   "bike": "pro",
-  "updatedAt": "2026-09-14T18:32:47.631Z",
-  "physics": "bikePhysicsFactory",
+  "updatedAt": "2026-09-14T22:54:54.866Z",
+  "physics": "bikePhysicsFactory-v2",
   "attemptsBand": null,
   "targetAttempts": 1,
   "curve": [
     {
-      "skill": 2,
-      "seeds": [
-        3277865877
-      ],
-      "attempts": [
-        1
-      ],
-      "median": 1,
-      "finishTimes": [
-        6.191666666666666
-      ]
-    },
-    {
       "skill": 3,
       "seeds": [
-        3277865877
+        3277865877,
+        3277865878,
+        3277865879
       ],
       "attempts": [
+        1,
+        1,
         1
       ],
       "median": 1,
       "finishTimes": [
-        6.141666666666667
+        8.041666666666666,
+        8.041666666666666,
+        8.041666666666666
       ]
     }
   ],
@@ -39,7 +32,8 @@
   "shaped": null,
   "singleWall": null,
   "runs": [
-    "20260914-124754-993616",
-    "20260914-133239-09c902"
+    "20260914-175437-885722",
+    "20260914-175443-44111f",
+    "20260914-175447-6c7248"
   ]
 }

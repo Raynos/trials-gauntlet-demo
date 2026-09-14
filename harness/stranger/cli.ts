@@ -27,7 +27,7 @@ import path from 'node:path';
 import { DEFAULT_BIKE, type BikeClass, type GameEvent, type InputFrame, type PhysicsState } from '../../src/core/types';
 import { parseBike } from '../lib/sim';
 import { encodeJSON } from '../../src/core/replay';
-import { ACTIONS, COAST, HOLD, RESTART_FRAME, formatActions, framesOf, parseSlots } from '../bot/actions';
+import { ACTIONS, COAST, RESTART_FRAME, formatActions, macroFrameAt, macroTicks, parseSlots, type MacroCtx } from '../bot/actions';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
 import { attemptsFromEvents, countedFaults, faultsByCheckpoint, runMeta, srcFingerprint } from '../lib/metrics';
 import { REPO_ROOT } from '../lib/paths';
@@ -270,12 +270,12 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
   let note: string | undefined;
 
   outer: for (const id of ids) {
-    const frames = framesOf(id);
     const code = ACTIONS[id]!.code;
+    const ctx: MacroCtx = {};
     let slotFault: PersistedEvent | null = null;
     const marks: string[] = [];
-    for (let i = 0; i < HOLD; i++) {
-      const evs = tick(s, frames[i]!);
+    for (let i = 0; i < macroTicks(id); i++) {
+      const evs = tick(s, macroFrameAt(id, i, () => s.sim.state(), ctx));
       events.push(...evs);
       for (const e of evs) {
         if (e.event.type === 'finish') finished = true;

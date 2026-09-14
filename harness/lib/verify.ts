@@ -43,7 +43,8 @@ export class BrowserVerifier {
     const { server, launched } = await this.open();
     const page = await launched.context.newPage();
     try {
-      await openGame(page, server.url);
+      // A recording stamped v1 is replayed on the page's v1 solver (`?physics=v1`, src/main.ts); everything else on the default.
+      await openGame(page, server.url, rec.header.physics === 'v1' ? { query: { physics: 'v1' } } : {});
       const json = encodeJSON(rec);
       return await page.evaluate((j) => {
         const t = window.__trials!;

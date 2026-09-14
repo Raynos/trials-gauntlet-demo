@@ -5,12 +5,98 @@
   "bike": "pro",
   "tier": "beginner",
   "technique": "",
-  "updatedAt": "2026-09-14T19:20:15.575Z",
-  "physics": "bikePhysicsFactory",
-  "srcFingerprint": "4c6d9739",
+  "updatedAt": "2026-09-14T22:50:19.487Z",
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "93e6caa5",
   "attemptsBand": null,
   "finishX": 120,
   "bySkill": [
+    {
+      "skill": "novice",
+      "seeds": [
+        3277865877,
+        3277865878,
+        3277865879
+      ],
+      "attempts": [
+        1,
+        5,
+        6
+      ],
+      "medianAttempts": 5,
+      "clears": 3,
+      "finishTimes": [
+        13.35,
+        32,
+        34.71666666666667
+      ],
+      "medianFinishTime": 32,
+      "bestX": 124.07823997938688,
+      "deaths": [
+        {
+          "obstacle": "ground @ 5 m",
+          "x": 5,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-brake-nose-down": 2
+          }
+        },
+        {
+          "obstacle": "ground @ 10 m",
+          "x": 10,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-brake-nose-down": 2
+          }
+        },
+        {
+          "obstacle": "ground @ 25 m",
+          "x": 25,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 115 m",
+          "x": 115,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-brake-nose-down": 1,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 90 m",
+          "x": 90,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-175004-b404f9",
+        "20260914-175004-58857c",
+        "20260914-175004-f997a1"
+      ]
+    },
     {
       "skill": "average",
       "seeds": [
@@ -19,24 +105,77 @@
         3277865879
       ],
       "attempts": [
-        1,
-        1,
-        1
+        2,
+        2,
+        2
       ],
-      "medianAttempts": 1,
+      "medianAttempts": 2,
       "clears": 3,
       "finishTimes": [
-        10.541666666666666,
-        10.141666666666667,
-        10.4
+        14.408333333333333,
+        14.058333333333334,
+        14.25
       ],
-      "medianFinishTime": 10.4,
-      "bestX": 125.21865620556186,
-      "deaths": [],
+      "medianFinishTime": 14.25,
+      "bestX": 125.80756236652577,
+      "deaths": [
+        {
+          "obstacle": "ground @ 10 m",
+          "x": 10,
+          "count": 3,
+          "reasons": {
+            "crash": 3
+          },
+          "rules": {
+            "nose-high": 2,
+            "air-brake-nose-down": 1
+          }
+        }
+      ],
       "runs": [
-        "20260914-142015-37710a",
-        "20260914-142015-2c3213",
-        "20260914-142015-6b8300"
+        "20260914-175012-8187f5",
+        "20260914-175012-f39751",
+        "20260914-175012-985ceb"
+      ]
+    },
+    {
+      "skill": "good",
+      "seeds": [
+        3277865877,
+        3277865878,
+        3277865879
+      ],
+      "attempts": [
+        4,
+        2,
+        2
+      ],
+      "medianAttempts": 2,
+      "clears": 3,
+      "finishTimes": [
+        18.933333333333334,
+        13.05,
+        13.016666666666667
+      ],
+      "medianFinishTime": 13.05,
+      "bestX": 126.14032198922423,
+      "deaths": [
+        {
+          "obstacle": "ground @ 10 m",
+          "x": 10,
+          "count": 5,
+          "reasons": {
+            "crash": 5
+          },
+          "rules": {
+            "nose-high": 5
+          }
+        }
+      ],
+      "runs": [
+        "20260914-175019-e3a396",
+        "20260914-175019-0f3f3b",
+        "20260914-175019-4b3cbd"
       ]
     }
   ]

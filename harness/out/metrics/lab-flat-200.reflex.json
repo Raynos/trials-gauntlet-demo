@@ -5,9 +5,9 @@
   "bike": "rookie",
   "tier": "beginner",
   "technique": "envelope measurement",
-  "updatedAt": "2026-09-14T19:20:15.555Z",
-  "physics": "bikePhysicsFactory",
-  "srcFingerprint": "4c6d9739",
+  "updatedAt": "2026-09-14T22:50:04.930Z",
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "93e6caa5",
   "attemptsBand": [
     1,
     1
@@ -15,7 +15,98 @@
   "finishX": 200,
   "bySkill": [
     {
+      "skill": "novice",
+      "seeds": [
+        2522286987,
+        2522286988,
+        2522286989
+      ],
+      "attempts": [
+        1,
+        3,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        21.516666666666666,
+        28.55,
+        21.433333333333334
+      ],
+      "medianFinishTime": 21.516666666666666,
+      "bestX": 204.48145713543158,
+      "deaths": [
+        {
+          "obstacle": "ground @ 10 m",
+          "x": 10,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 15 m",
+          "x": 15,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-174952-b19d8f",
+        "20260914-174952-b37f11",
+        "20260914-174952-a0423e"
+      ]
+    },
+    {
       "skill": "average",
+      "seeds": [
+        2522286987,
+        2522286988,
+        2522286989
+      ],
+      "attempts": [
+        2,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        23.016666666666666,
+        18,
+        18.1
+      ],
+      "medianFinishTime": 18.1,
+      "bestX": 205.3788162372809,
+      "deaths": [
+        {
+          "obstacle": "ground @ 25 m",
+          "x": 25,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-174958-6df57d",
+        "20260914-174958-017fbf",
+        "20260914-174958-f4eb7a"
+      ]
+    },
+    {
+      "skill": "good",
       "seeds": [
         2522286987,
         2522286988,
@@ -29,17 +120,17 @@
       "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        18.066666666666666,
-        18.016666666666666,
-        17.9
+        15.933333333333334,
+        15.9,
+        16.075
       ],
-      "medianFinishTime": 18.016666666666666,
-      "bestX": 204.54868543400684,
+      "medianFinishTime": 15.933333333333334,
+      "bestX": 206.35813682292462,
       "deaths": [],
       "runs": [
-        "20260914-142015-d55c10",
-        "20260914-142015-bcf9a1",
-        "20260914-142015-d21e4c"
+        "20260914-175004-f1fe17",
+        "20260914-175004-6a83a1",
+        "20260914-175004-d8871f"
       ]
     }
   ]

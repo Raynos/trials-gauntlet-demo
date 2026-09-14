@@ -153,8 +153,10 @@ export class ReflexController {
   private clearedBucket = -Infinity;
   private lastRule = 'start';
   /** A practised hop in progress: preload (gas + back) then snap (gas + forward). */
-  private hop: { phase: 'preload' | 'snap'; until: number } | null = null;
+  private hop: { phase: 'preload' | 'snap' | 'tuck'; until: number } | null = null;
   private lastHopT = -Infinity;
+  /** Run-clock time until which the landing rule keeps the weight off the back (set at touchdown). */
+  private landingUntil = -Infinity;
   ruleCounts = new Map<string, number>();
 
   constructor(o: ControllerOptions) {
@@ -214,6 +216,7 @@ export class ReflexController {
     this.thrAcc = 0;
     this.leanAcc = 0;
     this.hop = null;
+    this.landingUntil = -Infinity;
     this.intent = { throttle: 0, brake: 0, lean: 0, restart: false, rule: 'respawn' };
   }
 
@@ -341,16 +344,34 @@ export class ReflexController {
     let lean = clamp((err / 25) * g, -1, 1);
 
     if (a.steepDeg > 20 && timeTo(a.steepDist) < lead && a.faceDist === null) {
-      // Steep up ahead: gas and get the weight forward so the front does not loop at the lip.
-      thr = Math.max(thr, 0.9);
-      lean = Math.max(lean, 0.5 * g);
+      // Steep up ahead (v2 technique, physics R3): base gas and NEUTRAL weight so the front rolls up onto the
+      // face — a front-heavy bike cannot climb a 45 deg step; the weight is thrown forward once it is on.
+      thr = Math.max(thr, 0.7);
+      lean = clamp(lean, -0.2, 0.1);
       rule = 'steep-ahead';
     }
-    if (Math.max(o.slopeHereDeg, o.terrainPitchDeg) > 18 && grounded) {
-      // On the climb: weight forward, keep the throttle on.
-      thr = Math.max(thr, 0.8);
-      lean = Math.max(lean, 0.4 * g);
-      rule = 'climbing';
+    const slopeUnder = Math.max(o.slopeHereDeg, o.terrainPitchDeg);
+    if (slopeUnder > 18 && grounded) {
+      const overSlope = pp - slopeUnder;
+      // A kicker / ramp is LEFT, not climbed (v2 R3 "kickers 17-22 @8/11 lean released: land +-20"): the lip
+      // is where the ground ahead falls away relative to the ramp line; gas off and neutral weight before it,
+      // because a rear wheel driven off a lip keeps the nose rotating up (round-8 trace: 200 deg/s at the top).
+      // Stairs read as a 22° slope with the ground ahead alternating flat/steep: only a lip with NO steep ground behind
+      // it (or a real drop) is a lip (tracks r7: the rider stalled on the e3 stair flights, throttle chopped every step).
+      const lipSoon = (a.nextSlopeDeg < slopeUnder - 12 && a.steepDeg < 15) || (a.dropDist !== null && timeTo(a.dropDist) < 0.4);
+      if (v > 5.5 || slopeUnder < 30) {
+        // Ride the ramp with the weight forward and the throttle on (the v1 rule; a quarter throttle nose-dives
+        // the kicker on v2, measured round 8), release at the lip.
+        thr = lipSoon ? 0 : Math.max(thr, overSlope > 12 ? 0.3 : 0.8);
+        lean = lipSoon ? 0 : Math.max(lean, 0.4 * g);
+        rule = lipSoon ? 'ramp-lip-release' : 'ramp-ride';
+      } else {
+        // A steep plank from a crawl: the throw — weight to +1 and full gas, chopped when the nose lifts off the
+        // slope (the constant-speed limit is 37 deg at +1; 40-45 top only with the throw).
+        thr = overSlope > 25 ? 0 : overSlope > 15 ? 0.4 : 1;
+        lean = Math.max(lean, 1 * g);
+        rule = 'climbing';
+      }
     }
     if (a.dropDist !== null && timeTo(a.dropDist) < lead * 0.7 && a.dropDepth > 0.8) {
       // Drop ahead: weight back, ease the gas so the front does not dive off the edge.
@@ -369,20 +390,22 @@ export class ReflexController {
       brk = 0;
       rule = 'pit-run-up';
     }
-    // The hop: triggered when the face is about 0.3 s + a bike length away; preload then snap.
+    // The hop (v2 reference recipe, physics R2): 0.3 s preload at lean -1 on light gas, a 0.22 s snap to +1,
+    // a 0.1 s tuck; triggered when the face is about the preload + a bike length away. Rear apex 0.46 m.
     if (this.hop && t >= this.hop.until) {
-      if (this.hop.phase === 'preload') this.hop = { phase: 'snap', until: t + 0.12 };
+      if (this.hop.phase === 'preload') this.hop = { phase: 'snap', until: t + 0.22 };
+      else if (this.hop.phase === 'snap') this.hop = { phase: 'tuck', until: t + 0.1 };
       else this.hop = null;
     }
-    if (!this.hop && grounded && a.faceDist !== null && a.faceDist < v * 0.3 + 1.0 + mem.leadS * v && t - this.lastHopT > 1.0) {
-      this.hop = { phase: 'preload', until: t + 0.18 };
+    if (!this.hop && grounded && a.faceDist !== null && a.faceDist < v * 0.4 + 1.0 + mem.leadS * v && t - this.lastHopT > 1.2) {
+      this.hop = { phase: 'preload', until: t + 0.3 };
       this.lastHopT = t;
     }
     if (this.hop) {
-      thr = 1;
       brk = 0;
-      lean = this.hop.phase === 'preload' ? -1 : 1;
-      rule = this.hop.phase === 'preload' ? 'hop-preload' : 'hop-snap';
+      thr = this.hop.phase === 'preload' ? 0.4 : this.hop.phase === 'snap' ? 0.6 : 0.3;
+      lean = this.hop.phase === 'snap' ? 1 : -1;
+      rule = `hop-${this.hop.phase}`;
     }
     // Nose too high on the ground → forward and off the gas (the loop-out reflex).
     const over = pp - Math.max(0, o.terrainPitchDeg);
@@ -399,8 +422,16 @@ export class ReflexController {
     }
     // Everyone learns this first: gas + lean back on the ground is a loop-out. Only a
     // deliberate lift (pit lip, step, wall face) combines them.
-    const deliberateLift = rule === 'pit-lip' || rule === 'hop-preload';
-    if (grounded && !deliberateLift && thr > 0.5 && lean < -0.3) lean = -0.3;
+    const deliberateLift = rule === 'pit-lip' || rule === 'hop-preload' || rule === 'hop-tuck';
+    // v2: the Rookie's critical lean under gas is ~ -0.1 (loops at -0.25 in 1.1 s), the Pro loops at 0 — gas on the
+    // ground is ridden neutral or forward unless the lift is deliberate (v1 tolerated -0.3).
+    if (grounded && !deliberateLift && thr > 0.4 && lean < 0) lean = 0;
+    // (c) Launch pose: from a standstill (spawn / respawn) the gas goes on with the weight forward — the Pro loops at
+    // neutral in ~1 s, the Rookie's 0 -> 16 is quoted at lean +0.25 (physics.md R3).
+    if (grounded && v < 4 && thr > 0.4 && !deliberateLift && rule !== 'climbing') {
+      lean = Math.max(lean, 0.35);
+      if (rule === 'cruise') rule = 'launch';
+    }
 
     // --- in the air -----------------------------------------------------------
     if (airborne) {
@@ -410,17 +441,31 @@ export class ReflexController {
       thr = 0;
       brk = 0;
       rule = 'air-level';
-      if (e > 20 && o.pitchRateDeg > -30) {
+      // Touchdown: descending onto ground within ~0.25 s — hands off (no gas + lean back through the landing: on v2
+      // that is a loop the moment the rear grips), weight neutral-to-forward for the dip.
+      const landingSoon = o.vy < -0.5 && o.height / Math.max(1, -o.vy) < 0.25;
+      if (landingSoon) {
+        lean = clamp(Math.max(lean, 0), 0, 0.5);
+        rule = 'touchdown';
+        this.landingUntil = t + 0.15;
+      }
+      if (rule === 'touchdown') {
+        /* hands off through the landing */
+      } else if (e > 30 && o.pitchRateDeg > -30) {
         // Nose way up: a brake tap pulls it down hard.
         brk = 1;
         rule = 'air-brake-nose-down';
-      } else if (e < -18) {
-        // Nose down: gas spins the rear up and brings the nose back a little.
-        thr = 1;
+      } else if (e < -18 && o.pitchRateDeg < 40) {
+        // Nose down: on v2 a throttle tap in the air kicks the pitch rate by 200-400 deg/s the moment the rear
+        // wheel touches anything (round-8 trace), so the nose is brought back with the lean alone; the gas comes
+        // on only when the nose is far down and still falling.
+        thr = e < -35 && o.pitchRateDeg < -20 ? 0.5 : 0;
         lean = -1;
         rule = 'air-gas-nose-up';
       }
     }
+
+    if (grounded && t < this.landingUntil && lean < 0) lean = 0;
 
     // Section bias (memory) and caps.
     lean = clamp(lean + mem.leanBias, -1, 1);

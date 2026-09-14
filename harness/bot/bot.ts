@@ -24,7 +24,7 @@ import { DEFAULT_BIKE, type BikeClass, type InputFrame } from '../../src/core/ty
 import { flagBool, flagNum, parseArgs } from '../lib/args';
 import { faultsByCheckpoint, freshFingerprint, median, percentileOf, restartEdges, runMeta, srcFingerprint } from '../lib/metrics';
 import { HARNESS_DIR } from '../lib/paths';
-import { saveRecording } from '../lib/recording';
+import { recordingHeader, saveRecording } from '../lib/recording';
 import { fail, writeJson } from '../lib/report';
 import type { Blocker, BotRunReport, Skill, SweepReport, SweepRow, TrackBotMetrics } from '../lib/schema';
 import { goldenSuffix, refreshGoldens } from '../lib/golden';
@@ -52,8 +52,8 @@ export function metricsFile(trackId: string, bike: BikeClass = DEFAULT_BIKE): st
 
 export function recordingFromFrames(sim: Sim, frames: InputFrame[], note: string): InputRecording {
   // `src=<fingerprint>` lets the gate pick goldens recorded on this physics (ship-gate pickGolden);
-  // `bike` = the class the frames were played on (header field + note, since decode drops the field).
-  const rec = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, bike: sim.bike, note: `${note} bike=${sim.bike} src=${srcFingerprint()}` });
+  // `bike` + `physics` = the class and the solver the frames were played on (lib/recording.ts recordingHeader).
+  const rec = new InputRecorder(recordingHeader(sim, note));
   for (const f of frames) rec.push(f);
   return rec.toRecording();
 }

@@ -5,15 +5,124 @@
   "bike": "pro",
   "tier": "beginner",
   "technique": "envelope measurement",
-  "updatedAt": "2026-09-14T19:20:21.005Z",
-  "physics": "bikePhysicsFactory",
-  "srcFingerprint": "4c6d9739",
+  "updatedAt": "2026-09-14T22:50:26.057Z",
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "93e6caa5",
   "attemptsBand": [
     1,
     1
   ],
   "finishX": 200,
   "bySkill": [
+    {
+      "skill": "novice",
+      "seeds": [
+        2522286987,
+        2522286988,
+        2522286989
+      ],
+      "attempts": [
+        4,
+        5,
+        6
+      ],
+      "medianAttempts": 5,
+      "clears": 3,
+      "finishTimes": [
+        32.68333333333333,
+        35.59166666666667,
+        39.9
+      ],
+      "medianFinishTime": 35.59166666666667,
+      "bestX": 204.21495240480732,
+      "deaths": [
+        {
+          "obstacle": "ground @ 10 m",
+          "x": 10,
+          "count": 3,
+          "reasons": {
+            "crash": 3
+          },
+          "rules": {
+            "nose-high": 1,
+            "air-brake-nose-down": 2
+          }
+        },
+        {
+          "obstacle": "ground @ 55 m",
+          "x": 55,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "nose-high": 2
+          }
+        },
+        {
+          "obstacle": "ground @ 65 m",
+          "x": 65,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-brake-nose-down": 1,
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 110 m",
+          "x": 110,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-brake-nose-down": 1,
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 5 m",
+          "x": 5,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 80 m",
+          "x": 80,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 135 m",
+          "x": 135,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-175012-a66ab2",
+        "20260914-175012-202ab9",
+        "20260914-175012-6fd11d"
+      ]
+    },
     {
       "skill": "average",
       "seeds": [
@@ -22,24 +131,123 @@
         2522286989
       ],
       "attempts": [
-        1,
-        1,
-        1
+        6,
+        2,
+        2
       ],
-      "medianAttempts": 1,
+      "medianAttempts": 2,
       "clears": 3,
       "finishTimes": [
-        16.975,
-        16.9,
-        16.791666666666668
+        32.575,
+        21.05,
+        20.358333333333334
       ],
-      "medianFinishTime": 16.9,
-      "bestX": 207.37320514322047,
-      "deaths": [],
+      "medianFinishTime": 21.05,
+      "bestX": 205.20621666307719,
+      "deaths": [
+        {
+          "obstacle": "ground @ 60 m",
+          "x": 60,
+          "count": 3,
+          "reasons": {
+            "crash": 3
+          },
+          "rules": {
+            "nose-high": 2,
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 5 m",
+          "x": 5,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-brake-nose-down": 2
+          }
+        },
+        {
+          "obstacle": "ground @ 10 m",
+          "x": 10,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 55 m",
+          "x": 55,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        }
+      ],
       "runs": [
-        "20260914-142020-e3eefe",
-        "20260914-142020-c524a0",
-        "20260914-142020-1a8a0e"
+        "20260914-175019-a6eb96",
+        "20260914-175019-3f1f9d",
+        "20260914-175019-7819a7"
+      ]
+    },
+    {
+      "skill": "good",
+      "seeds": [
+        2522286987,
+        2522286988,
+        2522286989
+      ],
+      "attempts": [
+        2,
+        3,
+        3
+      ],
+      "medianAttempts": 3,
+      "clears": 3,
+      "finishTimes": [
+        18.675,
+        21.541666666666668,
+        21.683333333333334
+      ],
+      "medianFinishTime": 21.541666666666668,
+      "bestX": 206.23561077617617,
+      "deaths": [
+        {
+          "obstacle": "ground @ 10 m",
+          "x": 10,
+          "count": 4,
+          "reasons": {
+            "crash": 4
+          },
+          "rules": {
+            "touchdown": 1,
+            "air-brake-nose-down": 2,
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 15 m",
+          "x": 15,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-175026-89a824",
+        "20260914-175026-caf6b4",
+        "20260914-175026-ec234e"
       ]
     }
   ]

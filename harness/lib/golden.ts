@@ -113,9 +113,9 @@ export async function refreshGoldens(
       const finished = sim.phase() === 'finished';
       const finishTime = finished ? sim.runTime() : null;
       const row: GoldenRefresh = { trackId, file, stamp, result: 'stale', finishTime, attempts: 1 + faults, nodeHash, browserHash: null, note: '' };
-      if (stamp === fp) {
+      if (stamp === fp && rec.header.physics === sim.physicsVersion) {
         row.result = 'fresh';
-        row.note = 'already stamped with the working tree';
+        row.note = 'already stamped with the working tree (src + physics)';
       } else if (!finished) {
         row.note = `no longer finishes on src=${fp} (${(sim.state().bike.pos.x).toFixed(1)} m, ${row.attempts} attempts)`;
       } else {
@@ -124,7 +124,8 @@ export async function refreshGoldens(
         if (b.hash !== nodeHash) row.note = `node ${nodeHash} != browser ${b.hash} (stale dist? pass --build)`;
         else {
           const note = `${(rec.header.note ?? '').replace(/\s*\bsrc=[0-9a-f]{8}\b/, '').replace(/\s*\brestamped-from=[0-9a-f]{8}\b/, '')} src=${fp} restamped-from=${stamp ?? 'unstamped'}`.trim();
-          saveRecording(file, { ...rec, header: { ...rec.header, note } });
+          // A re-proved golden also gains the solver stamp it now demonstrably runs on (core r7 `header.physics`).
+          saveRecording(file, { ...rec, header: { ...rec.header, ...(sim.physicsVersion ? { physics: sim.physicsVersion } : {}), note } });
           row.result = 'restamped';
           row.note = `finish ${finishTime?.toFixed(3)} s, ${row.attempts} attempt(s), node == browser; ${stamp ?? 'unstamped'} -> ${fp}`;
         }

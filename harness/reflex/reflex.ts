@@ -12,13 +12,14 @@
  *        browser  harness/out/reflex/<trackId>/<runId>-browser-<skill>.json (+ .rec.json)   --browser N live runs
  */
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { InputRecorder, type InputRecording } from '../../src/core/replay';
 import type { InputFrame } from '../../src/core/types';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
 import { faultsByCheckpoint, median, runMeta, srcFingerprint } from '../lib/metrics';
 import { HARNESS_DIR } from '../lib/paths';
-import { saveRecording } from '../lib/recording';
+import { recordingHeader, saveRecording } from '../lib/recording';
 import { fail, writeJson } from '../lib/report';
 import type { ReflexDeath, ReflexRunReport, ReflexSkill, ReflexTrackMetrics } from '../lib/schema';
 import { createSim, listSimTracks, parseBike, type Sim } from '../lib/sim';
@@ -43,7 +44,7 @@ function bikeSuffix(bike: BikeClass): string {
 }
 
 function recordingOf(sim: Sim, frames: InputFrame[], note: string): InputRecording {
-  const rec = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, bike: sim.bike, note: `${note} bike=${sim.bike} src=${srcFingerprint()}` });
+  const rec = new InputRecorder(recordingHeader(sim, note));
   for (const f of frames) rec.push(f);
   return rec.toRecording();
 }
@@ -222,6 +223,7 @@ export function tableMarkdown(rows: ReflexTrackMetrics[], skill: ReflexSkill): s
 
 function parseSkill(flags: ReturnType<typeof parseArgs>['flags']): SkillName {
   const s = flagStr(flags, 'skill', 'average');
+  if (s === 'all' || s.includes(',')) return 'average'; // the --all-tracks matrix re-parses the list itself
   if (!(s in SKILLS)) fail(`--skill: '${s}' is not novice|average|good`);
   return s as SkillName;
 }
@@ -389,30 +391,39 @@ async function main(): Promise<void> {
     const ids = listSimTracks().filter((id) => !only || only.includes(id));
     const started = new Date();
     const sections: string[] = [];
+    // Round 8: `--skill novice,average,good` (or `all`) = the reflex matrix, one section per (bike, skill).
+    const skillFlag = typeof flags.skill === 'string' ? flags.skill : skill;
+    const skillList: SkillName[] = skillFlag === 'all' ? ['novice', 'average', 'good'] : skillFlag.split(',').map((x) => parseSkill({ skill: x.trim() }));
+    const paramsLine = (sk: SkillName): string =>
+      `Reaction ${SKILLS[sk].reactionS.map((s) => `${(s * 1000).toFixed(0)}`).join('–')} ms, glances ${SKILLS[sk].perceiveHz} Hz, pitch noise ±${SKILLS[sk].pitchNoiseDeg}°, speed noise ±${(SKILLS[sk].speedNoiseFrac * 100).toFixed(0)}%, taps ${(SKILLS[sk].tapS * 1000).toFixed(0)} ms, lapses every ~${SKILLS[sk].lapseMeanS} s.`;
     for (const bike of bikes) {
-      const rows: ReflexTrackMetrics[] = [];
-      const t0 = new Date();
-      console.log(`reflex sweep: bike=${bike} skill=${skill} seeds=${seeds} src=${srcFingerprint()} tracks=${ids.length}`);
-      for (const id of ids) rows.push((await runTrack(id, [skill], seeds, flags, bike)).metrics);
-      sections.push(
-        [
-          `## ${bike === 'pro' ? 'Pro' : 'Rookie'} bike — skill ${skill}, ${seeds} seed(s), physics ${rows[0]?.physics ?? '?'}, src ${srcFingerprint()}, ${t0.toISOString()}, wall ${((Date.now() - t0.getTime()) / 1000).toFixed(0)} s`,
-          '',
-          tableMarkdown(rows, skill),
-          '',
-        ].join('\n'),
-      );
-      console.log(`\n${tableMarkdown(rows, skill)}`);
+      for (const sk of skillList) {
+        const rows: ReflexTrackMetrics[] = [];
+        const t0 = new Date();
+        console.log(`reflex sweep: bike=${bike} skill=${sk} seeds=${seeds} src=${srcFingerprint()} tracks=${ids.length} loadavg=${os.loadavg().map((l) => l.toFixed(1)).join(' ')}`);
+        for (const id of ids) rows.push((await runTrack(id, [sk], seeds, flags, bike)).metrics);
+        sections.push(
+          [
+            `## ${bike === 'pro' ? 'Pro' : 'Rookie'} bike — skill ${sk}, ${seeds} seed(s), physics ${rows[0]?.physics ?? '?'}, src ${srcFingerprint()}, ${t0.toISOString()}, wall ${((Date.now() - t0.getTime()) / 1000).toFixed(0)} s`,
+            '',
+            paramsLine(sk),
+            '',
+            tableMarkdown(rows, sk),
+            '',
+          ].join('\n'),
+        );
+        console.log(`\n${tableMarkdown(rows, sk)}`);
+      }
     }
     const md = [
-      `# Reflex bot — skill ${skill}, ${seeds} seed(s), bikes ${bikes.join(' + ')}, src ${srcFingerprint()}, ${started.toISOString()}, wall ${((Date.now() - started.getTime()) / 1000).toFixed(0)} s`,
+      `# Reflex bot — skill ${skillList.join(' / ')}, ${seeds} seed(s), bikes ${bikes.join(' + ')}, src ${srcFingerprint()}, ${started.toISOString()}, wall ${((Date.now() - started.getTime()) / 1000).toFixed(0)} s`,
       '',
-      `Reaction ${SKILLS[skill].reactionS.map((s) => `${(s * 1000).toFixed(0)}`).join('–')} ms, glances ${SKILLS[skill].perceiveHz} Hz, pitch noise ±${SKILLS[skill].pitchNoiseDeg}°, speed noise ±${(SKILLS[skill].speedNoiseFrac * 100).toFixed(0)}%, taps ${(SKILLS[skill].tapS * 1000).toFixed(0)} ms, lapses every ~${SKILLS[skill].lapseMeanS} s. attempts = 1 + faults (all reasons); cap ${flagNum(flags, 'attempts-cap', 50)}; sim cap ${flagNum(flags, 'max-sim-seconds', 300)} s. Rookie = \`<track>.reflex.json\`, Pro = \`<track>.pro.reflex.json\`; the band is authored for the tier's default bike.`,
+      `attempts = 1 + faults (all reasons); cap ${flagNum(flags, 'attempts-cap', 50)}; sim cap ${flagNum(flags, 'max-sim-seconds', 300)} s. Rookie = \`<track>.reflex.json\`, Pro = \`<track>.pro.reflex.json\`; the band is authored for the tier's default bike (average). Death sites: nearest placed obstacle (name @ x) with the rule the rider was executing.`,
       '',
       ...sections,
       `## Calibration against the stranger sessions (Rookie)`,
       '',
-      calibrationMarkdown(CALIBRATION_TRACKS, skill),
+      calibrationMarkdown(CALIBRATION_TRACKS, skillList.includes('average') ? 'average' : skillList[0]!),
       '',
     ].join('\n');
     fs.writeFileSync(path.join(METRICS_DIR, 'reflex.md'), md);

@@ -20,6 +20,7 @@
  *
  * Every threshold lives in gate/thresholds.json. Output harness/out/metrics/ship-gate.json.
  */
+import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -511,6 +512,38 @@ async function main(): Promise<void> {
       check({ id: 'determinism.pass', value: det.pass, limit: true, pass: det.pass, note: `${det.checks.filter((c) => c.pass).length}/${det.checks.length} checks` });
     } else {
       check({ id: 'determinism.pass', value: null, limit: true, pass: false, note: 'no golden recording' });
+    }
+
+    // G9b camera box (round 8): the b3 golden rendered by the clip renderer in a child process; the bike must
+    // stay inside the central [0.2, 0.8] box on bikeScreenX/Y in the riding phase (settle excluded, |roll| < 1e-6);
+    // `clamped` (frames the rig hit the track's camera bounds) is reported, not gated. Skipped with --quick
+    // (a 30 s clip at 20 fps is ~3 min on SwiftShader).
+    if (quick) {
+      check({ id: 'camera.box', value: null, limit: 0, pass: true, note: 'skipped with --quick' });
+    } else {
+      const camTrack = 'b3-kicker-row';
+      const g = chooseGolden(camTrack, DEFAULT_BIKE);
+      const clipDir = path.join(HARNESS_DIR, 'out', 'gate', 'clip-' + camTrack);
+      const args = [path.join(HARNESS_DIR, 'clip.ts'), camTrack, '--out', clipDir, '--fps', '20', '--quality', 'low', ...(g ? ['--recording', g.file] : [])];
+      const t0 = performance.now();
+      const r = await new Promise<{ code: number | null; out: string }>((resolve) => {
+        const child = spawn(path.join(REPO_ROOT, 'node_modules', '.bin', 'tsx'), args, { cwd: REPO_ROOT, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
+        let out = '';
+        child.stdout.on('data', (d: Buffer) => (out += d.toString()));
+        child.stderr.on('data', (d: Buffer) => (out += d.toString()));
+        const timer = setTimeout(() => child.kill('SIGKILL'), 20 * 60_000);
+        child.on('close', (code) => {
+          clearTimeout(timer);
+          resolve({ code, out });
+        });
+      });
+      // clip.ts prints the assertion both as a `camera: ...` line and as the `camera  PASS/FAIL ...` row of its summary table.
+      const line = /^camera: .*$/m.exec(r.out)?.[0] ?? /camera\s+(?:PASS|FAIL) out-of-box[^\n]*/.exec(r.out)?.[0]?.replace(/^camera\s+/, 'camera: ') ?? null;
+      const riding = line ? Number(/riding (\d+)/.exec(line)?.[1] ?? NaN) : NaN;
+      const clampedPct = line ? Number(/clamped \d+ \(([\d.]+)%\)/.exec(line)?.[1] ?? NaN) : NaN;
+      const rollOk = line ? !/ROLL x/.test(line) : false;
+      const pass = line !== null && riding === 0 && rollOk;
+      check({ id: 'camera.box', value: Number.isFinite(riding) ? riding : null, limit: 0, pass, unit: 'frames out of box while riding', note: line ? `${g ? path.basename(g.file) : 'no golden'}; clamped ${Number.isFinite(clampedPct) ? clampedPct : '?'} % (reported); ${((performance.now() - t0) / 1000).toFixed(0)} s; ${line.slice(0, 200)}` : `no camera line; clip exit ${r.code}: ${r.out.trim().split('\n').slice(-2).join(' | ').slice(0, 200)}` });
     }
 
     // G10 stranger: the four judged tracks, on the physics in the working tree right now.

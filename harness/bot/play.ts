@@ -18,7 +18,7 @@ import type { InputFrame, PhysicsState } from '../../src/core/types';
 import type { BeamConfig, FaultEvent, Skill } from '../lib/schema';
 import { countedFaults, type TimedEvent } from '../lib/metrics';
 import type { Sim } from '../lib/sim';
-import { COAST, RESTART_FRAME, framesOf } from './actions';
+import { COAST, RESTART_FRAME, macroFrameAt, macroTicks, type MacroCtx } from './actions';
 import { plan, type Plan } from './beam';
 import { DEFAULT_WEIGHTS, type ScoreWeights } from './score';
 
@@ -151,11 +151,12 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
     for (const aid of toPlay) {
       committedSinceRoot.push(aid);
       if (oracle) history.push({ snap: sim.snap(), framesLen: frames.length, eventsLen: events.length, runTicks: sim.runTicks(), aid, rootHash: sim.hash() });
-      const macro = framesOf(aid);
-      for (let i = 0; i < macro.length && !replan; i++) {
+      const macroLen = macroTicks(aid);
+      const ctx: MacroCtx = {};
+      for (let i = 0; i < macroLen && !replan; i++) {
         const stateBefore = sim.state();
         if (stateBefore.bike.pos.x > maxX) maxX = stateBefore.bike.pos.x;
-        const { fault, finish } = stepPlay(macro[i]!);
+        const { fault, finish } = stepPlay(macroFrameAt(aid, i, () => stateBefore, ctx));
         if (finish && !fault) {
           const st = sim.state();
           finishTime = finish.runTick / hz;

@@ -111,6 +111,35 @@ flag byte) *before* physics sees them in both live play and replay. JSON and
 binary encodings decode to the same frames (gate D2). Replays start at GO; the
 restart flag is in-band, so attempts are countable from the recording alone.
 
+## Round 8 (physics v2 is the default): what changed in the harness
+
+- **Solver stamp.** Every recording the harness writes carries `header.physics` (`'v2'` since the flip; `'v1'` only from a
+  sim created with `{ physics: 'v1' }`) next to `bike`, and `physics=<v>` in the note (`lib/recording.ts recordingHeader`,
+  used by bot / reflex / stranger). `Sim.physicsVersion` and `Sim.physicsName` (`bikePhysicsFactory-v2`) name the solver;
+  `createSimFor(rec)` runs an explicit `physics: 'v1'` recording on `createBikePhysicsV1` and the verifier opens the page
+  with `?physics=v1` for it — anything else (unstamped = pre-flip) runs on the default and is reported **stale** by
+  `--refresh-goldens`, which also refuses to call a golden "fresh" unless its `physics` stamp matches (a node-only sweep's
+  file is re-proved in the browser and restamped). `gate/expected.json` pins carry the solver in `physics`.
+- **Technique macros** (`bot/actions.ts`): `h` hop (5 slots: 0.3 s preload at lean −1 / throttle 0.3, 0.22 s snap to +1
+  at 0.5, 0.1 s tuck — the R2 reference recipe), `wh` wheelie hold (4 slots, closed loop: `wheelieHoldV3`'s anticipating
+  regulator, `pitch + rate × 0.25 s` → throttle, rear brake on over-rotation, lean parked −0.5), `ct` climb-throw (4 slots,
+  closed loop: base gas at neutral until the front wheel is on the face, then weight +1 and gas, chopped 20–30° over the
+  slope — the `r3.test.ts plank` move). A macro may span several 125 ms slots and may decide its frame per tick from the
+  state (`macroFrameAt`, `macroTicks`, `MacroCtx`); the beam rolls a multi-slot macro **HOLD ticks per depth** as a
+  `pending` node that does not branch, so a depth stays 125 ms for every node and finishes are still compared on the run
+  clock (rolling whole macros per depth biased the search to slower finishes: flat-test 9.65 → 8.49 s after the fix).
+  The stranger CLI accepts the three codes (`PROTOCOL.md`, counted as 5/4/4 slots); `snapshot-probe` rolls them too.
+- **Reflex bot on v2** (`reflex/controller.ts`): the hop is the v2 recipe (preload 0.3 s / snap 0.22 s / tuck 0.1 s,
+  rules `hop-preload|snap|tuck`); a steep face ahead is approached **neutral** on base gas and thrown to +1 only on the
+  face (`steep-ahead` / `climbing`, faces ≥ 30° below 5.5 m/s), kickers and ramps are ridden with the weight forward
+  and **released at the lip** (`ramp-ride` / `ramp-lip-release`: throttle and lean 0 when the ground ahead falls away),
+  and the in-air gas tap stops once the nose is already rising (`air-gas-nose-up`, rate < 40°/s). `--all-tracks --skill
+  novice,average,good` (or `all`) writes the whole matrix into `out/metrics/reflex.md`, one section per (bike, skill),
+  with the loadavg in the sweep line.
+- **Gate row `camera.box`** (`gate/ship-gate.ts`): the b3 Rookie golden rendered by `clip.ts` (20 fps, low quality) in a
+  child process; pass = 0 riding frames outside the [0.2, 0.8] box on `bikeScreenX/Y` (settle excluded) and |roll| < 1e-6;
+  `clamped %` is reported in the note, not gated. Skipped with `--quick`.
+
 ## Notes / caveats
 
 - **`header.bike` does not survive `decodeJSON`/`decodeBinary`** (round 7 finding, `src/core/replay.ts`: `validateHeader`

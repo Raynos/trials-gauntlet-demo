@@ -1,6 +1,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { decodeAny, encodeBinary, encodeJSON, frameCount, type InputRecording } from '../../src/core/replay';
+import { srcFingerprint } from './metrics';
+import { decodeAny, encodeBinary, encodeJSON, frameCount, type InputRecording, type RecordingHeader } from '../../src/core/replay';
+import type { Sim } from './sim';
+
+/**
+ * The header every harness recording is written with (round 8): track/seed/hz from the sim, `bike` (the class the
+ * frames were played on) and `physics` (the solver stamp, core r7: 'v2' since the flip, 'v1' under `{ physics: 'v1' }`,
+ * absent on the mock) — both also in the note next to `src=<fingerprint>` so a stale file explains itself in `head -c`.
+ */
+export function recordingHeader(sim: Sim, note: string): RecordingHeader {
+  const stamp = `${note} bike=${sim.bike}${sim.physicsVersion ? ` physics=${sim.physicsVersion}` : ''} src=${srcFingerprint()}`;
+  return { version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, bike: sim.bike, ...(sim.physicsVersion ? { physics: sim.physicsVersion } : {}), note: stamp };
+}
 
 /**
  * `decodeJSON`/`decodeBinary` (src/core/replay.ts) drop `header.bike` (round 7 finding: `validateHeader`

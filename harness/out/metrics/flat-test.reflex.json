@@ -5,12 +5,40 @@
   "bike": "rookie",
   "tier": "beginner",
   "technique": "",
-  "updatedAt": "2026-09-14T19:20:10.928Z",
-  "physics": "bikePhysicsFactory",
-  "srcFingerprint": "4c6d9739",
+  "updatedAt": "2026-09-14T22:49:58.931Z",
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "93e6caa5",
   "attemptsBand": null,
   "finishX": 120,
   "bySkill": [
+    {
+      "skill": "novice",
+      "seeds": [
+        3277865877,
+        3277865878,
+        3277865879
+      ],
+      "attempts": [
+        1,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        13.75,
+        13.325,
+        13.216666666666667
+      ],
+      "medianFinishTime": 13.325,
+      "bestX": 124.31389898150132,
+      "deaths": [],
+      "runs": [
+        "20260914-174945-21f892",
+        "20260914-174945-cbd6cb",
+        "20260914-174945-f742a1"
+      ]
+    },
     {
       "skill": "average",
       "seeds": [
@@ -26,17 +54,68 @@
       "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        11.125,
-        11.308333333333334,
-        11.116666666666667
+        11.425,
+        11.566666666666666,
+        11.475
       ],
-      "medianFinishTime": 11.125,
-      "bestX": 124.58130423268713,
+      "medianFinishTime": 11.475,
+      "bestX": 125.17961403659639,
       "deaths": [],
       "runs": [
-        "20260914-142010-e79581",
-        "20260914-142010-bbd14c",
-        "20260914-142010-7e3a39"
+        "20260914-174952-771f98",
+        "20260914-174952-bacff0",
+        "20260914-174952-92f406"
+      ]
+    },
+    {
+      "skill": "good",
+      "seeds": [
+        3277865877,
+        3277865878,
+        3277865879
+      ],
+      "attempts": [
+        1,
+        2,
+        2
+      ],
+      "medianAttempts": 2,
+      "clears": 3,
+      "finishTimes": [
+        10.516666666666667,
+        13.466666666666667,
+        13.975
+      ],
+      "medianFinishTime": 13.466666666666667,
+      "bestX": 126.27675088604181,
+      "deaths": [
+        {
+          "obstacle": "ground @ 15 m",
+          "x": 15,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 20 m",
+          "x": 20,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-174958-a86c58",
+        "20260914-174958-a35857",
+        "20260914-174958-aaf640"
       ]
     }
   ]

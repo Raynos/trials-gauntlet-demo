@@ -11,7 +11,7 @@
 import type { PhysicsState } from '../../src/core/types';
 import type { BeamConfig } from '../lib/schema';
 import type { Sim, SimSnapshot } from '../lib/sim';
-import { ACTIONS, HOLD, framesOf } from './actions';
+import { ACTIONS, HOLD, macroFrameAt, macroTicks, type MacroCtx } from './actions';
 import { score, type ScoreWeights } from './score';
 
 export type { BeamConfig } from '../lib/schema';
@@ -37,6 +37,12 @@ interface Node {
   faulted: boolean;
   runTicks: number;
   state: PhysicsState;
+  /**
+   * A technique macro still in flight (round 8): multi-slot macros are rolled HOLD ticks per depth so a depth
+   * stays 125 ms of run time for every node and the dedup compares like with like; a pending node does not
+   * branch, it only advances its macro (the ctx carries the controller's scratch across depths).
+   */
+  pending?: { aid: number; at: number; ctx: MacroCtx };
 }
 
 export interface PlanOptions {
@@ -85,15 +91,20 @@ export function plan(sim: Sim, cfg: BeamConfig, w: ScoreWeights, opts: PlanOptio
     let anyClean = false;
     for (const node of frontier) {
       if (node.faulted) continue; // do not expand past a fault; the fault is real
-      for (const aid of allowed) {
-        const actions = [...node.actions, aid];
-        if (isBanned(actions, opts.banned)) continue;
+      const choices = node.pending ? [node.pending.aid] : allowed;
+      for (const aid of choices) {
+        const actions = node.pending ? node.actions : [...node.actions, aid];
+        if (!node.pending && isBanned(actions, opts.banned)) continue;
         sim.restore(node.snap);
-        const frames = framesOf(aid);
+        const total = macroTicks(aid);
+        const from = node.pending ? node.pending.at : 0;
+        const to = Math.min(total, from + HOLD);
+        const n = to - from;
+        const ctx: MacroCtx = node.pending ? { ...node.pending.ctx } : {};
         let faulted = false;
         let finishedAt = -1;
-        for (let i = 0; i < HOLD; i++) {
-          const ev = sim.step(frames[i]!);
+        for (let i = from; i < to; i++) {
+          const ev = sim.step(macroFrameAt(aid, i, sim.state, ctx));
           ticks++;
           for (const e of ev) {
             if (e.type === 'fault') faulted = true;
@@ -103,16 +114,17 @@ export function plan(sim: Sim, cfg: BeamConfig, w: ScoreWeights, opts: PlanOptio
         }
         expanded++;
         const st = sim.state();
-        const runTicks = node.runTicks + (finishedAt >= 0 ? finishedAt + 1 : HOLD);
+        const runTicks = node.runTicks + (finishedAt >= 0 ? finishedAt + 1 - from : n);
         const finished = finishedAt >= 0 && !faulted;
         const sc = faulted ? w.fault + st.bike.pos.x : score(st, w, runTicks, sim.hz);
         const child: Node = { snap: finished ? node.snap : sim.snap(), actions, score: sc, faulted, runTicks, state: st };
+        if (to < total && !finished && !faulted) child.pending = { aid, at: to, ctx };
         if (finished) {
           finishedChildren.push(child);
           continue;
         }
         if (!faulted) anyClean = true;
-        const key = `${Math.round(st.bike.pos.x / cx)}|${Math.round(st.bike.vel.x / cvx)}|${Math.round(st.bike.angle / ca)}|${st.wheels.rear.grounded || st.wheels.front.grounded ? 1 : 0}|${faulted ? 1 : 0}`;
+        const key = `${Math.round(st.bike.pos.x / cx)}|${Math.round(st.bike.vel.x / cvx)}|${Math.round(st.bike.angle / ca)}|${st.wheels.rear.grounded || st.wheels.front.grounded ? 1 : 0}|${faulted ? 1 : 0}${child.pending ? `|p${child.pending.aid}:${child.pending.at}` : ''}`;
         const prev = cells.get(key);
         if (!prev || child.score > prev.score) cells.set(key, child);
       }

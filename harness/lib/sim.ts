@@ -20,6 +20,7 @@ import {
   type InputFrame,
   type PhysicsSnapshot,
   type PhysicsState,
+  type PhysicsVersion,
   type TrackDef,
 } from '../../src/core/types';
 import type { InputRecording } from '../../src/core/replay';
@@ -43,8 +44,14 @@ export interface Sim {
   seed: number;
   /** Bike class the track was loaded with (`loadTrack(track, seed, { bike })`, physics round 11). */
   bike: BikeClass;
-  /** Which physics implementation was resolved ('bikePhysicsFactory' | 'createBikePhysics' | 'MockPhysics'). */
+  /** Which physics implementation was resolved ('bikePhysicsFactory' | 'createBikePhysics' | 'createBikePhysicsV1' | 'MockPhysics'). */
   physicsName: string;
+  /**
+   * Solver stamp for recordings written from this sim (`RecordingHeader.physics`, core r7): 'v2' = the shipped
+   * default since the R3 flip, 'v1' = `createBikePhysicsV1` (`{ physics: 'v1' }`, the `?physics=v1` A/B), undefined
+   * on the mock. Unstamped recordings are v1 by the core's definition (recorded before the flip).
+   */
+  physicsVersion: PhysicsVersion | undefined;
   /** One game tick; returns the game events it produced. */
   step(input: InputFrame): GameEvent[];
   /** Run a whole frame sequence from the current state. */
@@ -64,24 +71,41 @@ export interface Sim {
   reload(): void;
 }
 
-let resolved: { factory: PhysicsFactory; name: string } | null = null;
+interface ResolvedPhysics {
+  factory: PhysicsFactory;
+  name: string;
+  version: PhysicsVersion | undefined;
+}
+const resolvedByVersion = new Map<string, ResolvedPhysics>();
 
-/** Prefer the real physics when `src/physics` exports a factory; else the mock. */
-export async function resolvePhysicsFactory(): Promise<{ factory: PhysicsFactory; name: string }> {
-  if (resolved) return resolved;
+/**
+ * Prefer the real physics when `src/physics` exports a factory; else the mock. `version` picks a versioned
+ * factory the way `src/main.ts` does for `?physics=v1|v2` (`createBikePhysicsV1` / `createBikePhysicsV2`);
+ * the default is the barrel's `bikePhysicsFactory` / `createBikePhysics`, which is v2 since the R3 flip.
+ */
+export async function resolvePhysicsFactory(version?: PhysicsVersion): Promise<ResolvedPhysics> {
+  const key = version ?? 'default';
+  const hit = resolvedByVersion.get(key);
+  if (hit) return hit;
+  let out: ResolvedPhysics | null = null;
   if (process.env.TRIALS_PHYSICS !== 'mock') {
     const mod = physicsModule as unknown as Record<string, unknown>;
-    for (const name of ['bikePhysicsFactory', 'createBikePhysics']) {
+    const versioned = version === 'v1' ? ['createBikePhysicsV1'] : version === 'v2' ? ['createBikePhysicsV2'] : [];
+    for (const name of [...versioned, 'bikePhysicsFactory', 'createBikePhysics']) {
       const f = mod[name];
       if (typeof f === 'function') {
-        resolved = { factory: f as PhysicsFactory, name };
-        return resolved;
+        out = { factory: f as PhysicsFactory, name, version: name === 'createBikePhysicsV1' ? 'v1' : 'v2' };
+        break;
       }
     }
+    if (out && version && out.version !== version) throw new Error(`physics ${version} requested but src/physics exports no createBikePhysics${version.toUpperCase()}`);
   }
-  const { MockPhysics } = await import('../../src/game/mockPhysics');
-  resolved = { factory: (hz: number) => new MockPhysics(hz), name: 'MockPhysics' };
-  return resolved;
+  if (!out) {
+    const { MockPhysics } = await import('../../src/game/mockPhysics');
+    out = { factory: (hz: number) => new MockPhysics(hz), name: 'MockPhysics', version: undefined };
+  }
+  resolvedByVersion.set(key, out);
+  return out;
 }
 
 export function listSimTracks(): string[] {
@@ -97,6 +121,14 @@ export function requireTrack(trackId: string): TrackDef {
 export interface SimOptions {
   /** Bike class (round 7): 'rookie' (default, the pre-garage bike to the byte) or 'pro'. */
   bike?: BikeClass | undefined;
+  /** Solver (round 8): undefined = the barrel default (v2 since the flip); 'v1' = `createBikePhysicsV1` (A/B, stale goldens). */
+  physics?: PhysicsVersion | undefined;
+}
+
+export function parsePhysics(v: unknown): PhysicsVersion | undefined {
+  if (v === undefined || v === null || v === '' || v === true) return undefined;
+  if (v === 'v1' || v === 'v2') return v;
+  throw new Error(`--physics: '${String(v)}' is not v1|v2`);
 }
 
 export function parseBike(v: unknown, fallback: BikeClass = DEFAULT_BIKE): BikeClass {
@@ -105,13 +137,18 @@ export function parseBike(v: unknown, fallback: BikeClass = DEFAULT_BIKE): BikeC
   throw new Error(`--bike: '${String(v)}' is not rookie|pro`);
 }
 
-/** A sim for a recording: its track, seed, hz and bike class (`header.bike`, absent = rookie). */
+/**
+ * A sim for a recording: its track, seed, hz, bike class (`header.bike`, absent = rookie) and solver: an explicit
+ * `header.physics: 'v1'` runs on `createBikePhysicsV1` (the page needs `?physics=v1` for the same bytes); anything
+ * else runs on the barrel default, so an unstamped pre-flip recording simply fails to finish on v2 and is reported
+ * stale by `--refresh-goldens` instead of silently being replayed on a solver the page does not run.
+ */
 export function createSimFor(rec: InputRecording): Promise<Sim> {
-  return createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz, { bike: rec.header.bike });
+  return createSim(rec.header.trackId, rec.header.seed, rec.header.physicsHz, { bike: rec.header.bike, physics: rec.header.physics === 'v1' ? 'v1' : undefined });
 }
 
 export async function createSim(trackId: string, seed?: number, hz: number = DEFAULT_PHYSICS_HZ, opts: SimOptions = {}): Promise<Sim> {
-  const { factory, name } = await resolvePhysicsFactory();
+  const { factory, name, version } = await resolvePhysicsFactory(opts.physics);
   const track = requireTrack(trackId);
   const compiled = compileTrack(track);
   const world = factory(hz);
@@ -141,7 +178,8 @@ export async function createSim(trackId: string, seed?: number, hz: number = DEF
     hz,
     seed: theSeed,
     bike,
-    physicsName: name,
+    physicsName: version ? `${name}-${version}` : name,
+    physicsVersion: version,
     step,
     run(frames) {
       const events: GameEvent[] = [];
