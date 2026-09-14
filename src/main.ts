@@ -9,7 +9,8 @@
  *   ?ghost=1        run the PB ghost world in harness mode too (off by default there: one world per µs/tick)
  *   ?rider=gltf|proc, ?bike=gltf|proc   rider / bike model (default proc; stored choice from the settings menu otherwise)
  *   ?touchdebug=1   overlay showing active touch pointers and the live InputFrame
- *   ?track=<id>     start straight into a track (skips the menu)
+ *   ?track=<id>     start straight into a track (skips the title / menu)
+ *   ?dev=1          unlock every tier in track select and list the harness test strips
  *   ?hz=<n>         physics rate (default 120)
  */
 import { DEFAULT_PHYSICS_HZ } from './core';
@@ -20,6 +21,8 @@ import type { AudioSystem } from './audio';
 import type { PhysicsWorld } from './physics';
 import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, dprCap, installHook, type HookExtras } from './game';
+import { resolveBoot } from './game/flow';
+import { getTrack } from './tracks';
 import { BestTimes, DomHud, injectStyles, loadModelChoice, type ModelChoice } from './ui';
 
 type AnyModule = Record<string, unknown>;
@@ -103,13 +106,14 @@ interface Composed {
 
 function boot(): void {
   const params = new URLSearchParams(location.search);
-  const harness = params.get('harness') === '1';
+  const route = resolveBoot(params, (id) => getTrack(id) !== undefined);
+  const harness = route.mode === 'harness';
   const physicsHz = Number(params.get('hz')) || DEFAULT_PHYSICS_HZ;
   const app = document.getElementById('app');
   if (!app) throw new Error('#app missing');
   injectStyles();
   const extras: HookExtras = {};
-  const initialTrack = params.get('track') ?? undefined;
+  const initialTrack = route.track ?? undefined;
   const models = modelChoices(params);
 
   let composed: Composed | null = null;
@@ -177,10 +181,13 @@ function boot(): void {
     bestTimes,
     audio,
     uiRoot: document.getElementById('ui')!,
+    sceneRoot: app,
+    dev: route.dev,
     resize: (w, h, dpr) => renderer.resize(w, h, dpr),
     initialTrack,
     models: { rider: models.riderModel, bike: models.bikeModel },
     touchDebug: params.get('touchdebug') === '1',
+    modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
     applyModels: (m) => {
       const r = renderer as Partial<{ setModels(o: ModelChoices): void }>;
       if (typeof r.setModels !== 'function') return false;

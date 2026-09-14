@@ -1,4 +1,5 @@
 import { gzipSync } from 'node:zlib';
+import { execSync } from 'node:child_process';
 import { defineConfig, type Plugin } from 'vite';
 
 /** CONTRACT §3: JS bundle ≤ 600 KB gzipped. Fails the build when exceeded. */
@@ -36,7 +37,17 @@ const ISOLATION_HEADERS = {
   'Cross-Origin-Embedder-Policy': 'require-corp',
 };
 
+/** Short git sha for the title-screen build stamp; `dev` when git is unavailable. */
+function buildId(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() || 'dev';
+  } catch {
+    return 'dev';
+  }
+}
+
 export default defineConfig({
+  define: { __BUILD_ID__: JSON.stringify(buildId()), __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z') },
   // Relative base so the built bundle also works when served from a subpath
   // (Vercel preview folders, file listings, the harness preview server).
   base: './',

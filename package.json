@@ -18,6 +18,7 @@
     "harness:gen-input": "tsx harness/gen-input.ts",
     "harness:all": "tsx harness/all.ts",
     "harness:bot": "tsx harness/bot/bot.ts",
+    "harness:reflex": "tsx harness/reflex/reflex.ts",
     "harness:stranger": "tsx harness/stranger/cli.ts",
     "harness:pair": "tsx harness/compare/pair.ts",
     "harness:log-verdict": "tsx harness/compare/log.ts",

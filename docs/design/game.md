@@ -95,7 +95,7 @@ the sound toggle and the pause actions; confirm clicks the focused control.
 Touch: pointer events on a full-screen overlay with `touch-action: none`; each pointer id is tracked
 independently so lean + throttle + brake can all be down at once; zones are split at 50 % width and
 25 % / 75 % for the sub-zones, buttons carved out of the top edge respecting safe-area insets.
-Zone outlines fade in on first touch and stay at ~35 % opacity while touch is the active device; the HUD top band and hint strip shift to clear the two touch buttons.
+Zone outlines fade in on first touch, sit at ~35 % opacity while touch is the active device and drop to 30 % three seconds after GO (§10); the HUD top band shifts to clear the two touch buttons (top-left ❚❚ pause, top-right ↻ Restart).
 
 ## 4. HUD (`src/ui/`)
 
@@ -107,14 +107,14 @@ crisp at DPR 1–3 (DOM/CSS, no canvas text), min 12 px at phone width, 1 rem = 
   frame — Evolution rule). Frozen and turned green at finish; a PB delta appears under the timer.
 - **Top right**: checkpoint progress strip (Rising) — marks from `track.checkpoints`/`finishX`, rider
   pin from `bike.pos.x`, passed marks fill.
-- **Top left**: track name · tier, active device glyph (fades after 1.5 s of idle).
+- **Top left**: track name · tier; the active-device pill shows only when the device changes, for 1.5 s.
 - **Kinetic banners** (centre, y ≈ 32 %, never over the bike): 3 / 2 / 1 squash-pop, GO scale-out,
   CRASH! stamp 0.2 s after the fault (rotated −6°, red on dark slab), checkpoint flash (thin green
   line sweep + "CHECKPOINT n"), TRACK FINISHED! ribbon. Banners are DOM nodes recycled from a pool of 8.
 - **Results panel** (0.4 s after finish): time, faults, medal, PB flag, `Retry` / `Next` / `Menu`.
 - **Main menu**: title, tracks grouped by tier with best time + medal, quality tier selector
   (auto/low/medium/high), audio toggle. **Pause**: resume / restart track / quit to menu.
-- **Beginner tier**: bottom button-hint strip from `meta.hints` (glyph set follows the active device).
+- **Countdown only**: one technique line (first of `meta.hints`, else `meta.technique`); nothing floats over play after GO (§10).
 
 ## 5. Quality tiers and mobile
 
@@ -194,33 +194,89 @@ State is cloned lazily once per tick (`getState()` hands out the same object unt
 nothing hashes per tick, and events fan out synchronously per *event* (checkpoint/fault/land are
 rare) — those were the suspects and they are not on the profile.
 
-## 10. Front end (title → menu → track select → run) — spec for the next round
+## 10. Front end (title → menu → track select → run)
 
-Flow (`App` state): `title` → `menu` → `tracks` → `settings` | `credits`; `run` (countdown…) → `pause`
-→ `results`. `?harness=1` and `?track=` skip straight to the run; `?dev=1` unlocks every tier.
+Flow (`App.screen`): `title` → `menu` → `tracks` | `settings` | `credits`; `run` (countdown…) → pause
+overlay → results. Routing is pure (`src/game/flow.ts`, tested): `?harness=1` never builds the front end
+(hook-only; a track is loaded in the boot macrotask as before — verified in the built page: zero `.screen`
+nodes, `phase()==='riding'`), `?track=<id>` skips straight into that track, `?dev=1` unlocks every tier and
+lists the harness `*-test` strips. Everything else opens the title.
 
-- **Title**: live 3D scene as backdrop (bike idling at `b1-first-ride`'s start, camera drifting on a
-  slow 12 s ease, exhaust blips from the renderer's idle state, ambient audio after unlock). Key art
-  from `public/art/manifest.json` (`kind: 'keyart'`) sits *behind* the 3D canvas at 55 % opacity with a
-  bottom-up scrim `linear-gradient(180deg, transparent 35%, rgba(6,7,9,.92))`. Wordmark **TRIALS
-  GAUNTLET**: display face (bundled woff2 ≤ 60 KB, heavy italic condensed), amber bevel via layered
-  text-shadow + faint emissive glow, tracking −0.01em; one "PRESS ANY KEY · TAP TO START" line pulsing
-  at 1.6 s. No buttons. Any key/pad button/tap → menu (240 ms fade + 12 px rise).
-- **Main menu**: left-aligned vertical list, 2.4 rem items, amber selection bar sliding at 120 ms,
-  item rise 240 ms; Play, Time Attack (ghost info + last PB), Settings, Credits. Focus by keyboard /
-  d-pad / stick with tick sounds (`audio.onEvent`-adjacent UI cue), tap on touch, Esc/B back.
-- **Track select**: tier rows (Beginner → Extreme) as horizontal carousels; card = art
-  (`kind:'track', track:<id>`; fallback biome-tinted panel with the tier badge), medal icon
-  (`kind:'medal'`), best time + target, technique line; locked rows dimmed with a lock glyph until the
-  previous tier holds a medal per track. Selecting scales the card 1.06 → flies up 400 ms while the 3D
-  scene loads the track and the countdown begins in place (no reload feel).
-- **Settings panel**: Quality, Sound + volume slider, Ghost, Rider/Bike model, Controls reference
-  (device diagrams: keyboard keycaps, pad glyphs, touch zone map), Reset progress. Dev-only flags stay
-  URL-only.
-- **Tokens** (`src/ui/styles.ts`): colours (`--amber`, `--ink`, `--slab` …), spacing 4/8/12/16/24/40,
-  radii 6/10/16, motion 120/240/400 ms with `cubic-bezier(.2,.8,.2,1)`, display + UI faces.
-- **Budget**: title-critical art ≤ 2.5 MB (key art + wordmark + fonts); track cards, medal icons and
-  plates lazy-loaded on entering track select; missing manifest or asset → tinted fallback, never a
-  broken image.
-- **Evidence**: captures at 1280×720 and 844×390 for title, menu, track select, settings, pause,
-  results.
+Design rule (user): "less buttons, more design". Title = key art + wordmark + one pulse line. Menu = three
+items. Track select = the cards are the interface. Settings = one panel of segmented rows. No control that
+can be removed stays.
+
+- **Backdrop**: `b1-first-ride` loaded and held in the `menu` phase (nothing ticks, renderer's idle 3/4
+  camera) under title and menu. Entering the menu from a run (`quit`) calls `startRun()` (physics
+  `reset(-1)` + a `restart{-1}` event so the renderer cuts ragdoll/particles) then `toMenu()`, with the
+  master volume muted for 60 ms so the countdown cue the reset emits stays silent — the bike always sits
+  upright at the start line, never a frozen crash (verified: play → crash → pause → Main menu capture).
+  The renderer's menu camera is static, so the *canvas* drifts (`#app.drift canvas`, 12 s eased scale
+  1.06→1.14 with a +13 % x offset that carries the bike right of the wordmark; +20 % on short phones).
+- **Title** (`TitleScreen`): key art (`kind:'keyart'`, biome `industrial`, `2x` variant on DPR > 1.5 or
+  wide viewports) *over* the canvas at 55 % — the WebGL canvas is opaque so "behind" is impossible —
+  mirrored (`scaleX(-1)`) so its hero lands right of the wordmark, masked clear on the wordmark side,
+  bottom-up scrim `linear-gradient(180deg, transparent 35%, rgba(6,7,9,.92))`, faint SVG-noise grain (no
+  blend mode — `mix-blend-mode` doubled compositor cost). Wordmark **TRIALS GAUNTLET** (one name; the old
+  "Physics trials / Gauntlet" lockup is gone) in Barlow Condensed 900 italic (`public/fonts/*.woff2`,
+  15.5 + 14.9 + 14.7 KB latin subsets, OFL), amber gradient fill + `--bevel` + emissive drop-shadow,
+  tracking −0.01em. "PRESS ANY KEY · TAP TO START" pulses at 1.6 s. Build stamp (short git sha + build
+  time from Vite `define`) bottom-right at 40 %. No buttons. Any key / pad button / stick / tap → 200 ms
+  rise-out → menu.
+- **Main menu** (`MainMenuScreen` + `FocusList`): Play / Settings / Credits in the display face at 2.4 rem
+  (1.6 rem on short phones), amber selection bar sliding at `--t1`, items rising at `--t2` with 40 ms
+  stagger, one quiet career line under the list ("n of 15 tracks cleared · next up X"). Focus by arrows /
+  d-pad / stick edges / pointer hover with tick cues; confirm / back cues. Esc/B/Backspace → title.
+- **Track select** (`TrackSelectScreen`): tier rows as text headings (label, blurb, done/total, padlock
+  line when locked) over horizontal card carousels. Card = art (`kind:'track-card'`, fallback tier card,
+  fallback biome-tinted gradient with a ghosted tier badge), medal disc (manifest icon, tinted disc, or a
+  dashed empty ring), "PB ghost" tag when a recording exists and Ghost is on, name, technique, best vs
+  target (green under target). Focus = (row, column) with per-row memory; focused card scales 1.06 with an
+  amber ring; locked rows sit at 62 % grey; confirming a locked card shakes it. Lock rule
+  (`src/ui/progress.ts`, tested): a tier opens when every authored track of every earlier tier holds a
+  medal. Confirm: launch cue, card flies up 400 ms (`cardgo`), `play()` at 180 ms so the new track is
+  under the fading screen, screen gone at 420 ms — the countdown starts in the same scene.
+- **Settings** (`SettingsScreen`): one column of rows — Quality, Sound, Volume (−/+ 10 %), Ghost,
+  Rider / Bike (only when the renderer exports `setModels`; feature-detected in `main.ts`), Reset progress
+  (two presses within 3 s). Up/down = row, left/right = value, confirm = cycle / fire. Footer: one quiet
+  controls line (every device's bindings, hidden on short phones) and the build stamp. No diagrams, no
+  dev switches (`physics=mock`, `audio=0`, `touchdebug`, `ghost`, `countdown` stay URL-only).
+- **Pause**: Resume / Restart track / [Rider ▸ Procedural | Modelled] / [Bike …] / Main menu, track name
+  + tier, live time and faults. The model rows exist only with `setModels`; left/right or confirm flips
+  them live (`applyModels` → `renderer.setModels`, persisted) so the scene behind the overlay updates.
+- **In-run HUD changes**: the floating hint strip is gone — one technique line shows during the countdown
+  only (first authored hint, else `meta.technique`, else one device keycap pair) and is hidden at GO. The
+  device pill shows only when the active device changes, for 1.5 s of sim time. Touch zone outlines drop
+  to 30 % (55 % while held) 3 s after GO (`TouchInput.setSettled`), re-armed by every countdown. The
+  top-right touch button reads "↻ Restart" (tap = checkpoint, hold = track).
+- **Portrait prompt** (iOS): a designed screen — wordmark, rotating phone glyph, the game's **only**
+  "⟳ Reload game" button (home-screen standalone mode has no browser chrome; it clears SW caches +
+  sessionStorage and reloads with a cache-busting query), build stamp at 40 %. No reload control anywhere
+  else — the in-run top-right ↻ is restart and nothing else lives up there.
+- **Results**: restyled to the tokens (display-face time, amber rule, staged reveal unchanged); medal art
+  from the manifest via `DomHud.setMedalArt`.
+- **Sound cues** (`src/ui/sfx.ts`): synthesised tick / confirm / back / launch through the audio system's
+  `AudioContext` when it exposes one (single output graph), else a private context; obeys the Sound
+  setting and volume; silent until the first gesture unlocks audio.
+- **Tokens** (`src/ui/styles.ts` `TOKENS_CSS`): colours `--amber/--amber-2/--amber-ink/--ink/--ink-dim/
+  --ink-mute/--bg/--slab/--slab-2/--slab-3/--line/--line-2` + medal colours; spacing `--s1…--s6` =
+  4/8/12/16/24/40; radii `--r1…--r3` = 6/10/16; motion `--t1/--t2/--t3` = 120/240/400 ms with the single
+  easing `--ease: cubic-bezier(.2,.8,.2,1)`; faces `--display` (Trials Display = Barlow Condensed 900
+  italic) and `--font` (Trials UI = Barlow Condensed 500/700). Every front-end rule uses them.
+- **Storage**: `trials.sound`, `trials.volume`, `trials.lastTrack` join `trials.quality`, `trials.ghost`,
+  `trials.riderModel`, `trials.bikeModel`; Reset progress clears only `trials.best.*`.
+- **Art manifest** (`src/ui/art.ts`, tested against the shipped pack shape): `art/manifest.json`
+  fetched once at App construction; `{assets:[…]}`, an array, or an id map; an entry needs `kind` +
+  `path|file|url` (`src` in the pack is the generation name, used only when it looks like a URL) and
+  carries `track` / `tier` / `biome` / `medal` / `variant`. Every lookup is nullable and every image is
+  decoded before it is applied, so a 404 or a missing manifest leaves the tinted fallback — never a broken
+  image. Title-critical bytes: fonts 45 KB + key art 92 KB (`1x`) / 263 KB (`2x`) ≪ 2.5 MB; cards, medals
+  and plates are only fetched when track select / results need them.
+- **Caching**: `index.html` is served `no-store` (vercel.json `/` and `/index.html` rules; assets stay
+  immutable-hashed) so a home-screen install picks up new builds on reload.
+- **Phone**: `max-height: 500px` rules shrink the wordmark, list, cards and settings rows so each screen
+  fits 844×390 above the fold; every target ≥ 44 px; safe-area insets on every edge; DPR crisp (DOM text).
+- **Capture note**: with the free-running RAF, Playwright screenshots under SwiftShader take 1–30 s
+  (machine-load dependent). The evidence scripts run the page on a virtual clock (RAF, `performance.now`,
+  `setTimeout` advanced 100 ms per frame; CSS animations paused between frames via CDP
+  `Animation.setPlaybackRate`) — `?harness=1` is unaffected (no RAF).

@@ -5,7 +5,7 @@
  * simulated clock in `RunInfo.simTime`, so a capture at any cadence shows the
  * same frames and `animations: disabled` screenshots cannot hide a banner.
  */
-import type { GameEvent, InputDevice, PhysicsState, RunInfo, RunResult, TrackDef } from '../core/types';
+import type { GameEvent, InputDevice, Medal, PhysicsState, RunInfo, RunResult, TrackDef } from '../core/types';
 import type { BestEntry } from './best';
 import { MEDAL_LABEL, formatDelta, formatTime } from './format';
 import type { Hud, HudAction } from './index';
@@ -23,6 +23,7 @@ interface Banner {
 const BANNER_POOL = 8;
 const DEVICE_LABEL: Record<InputDevice, string> = { keyboard: 'Keyboard', gamepad: 'Gamepad', touch: 'Touch' };
 
+const DEVICE_PILL_S = 1.5;
 const DEFAULT_HINTS: Record<InputDevice, string[]> = {
   keyboard: ['↑ Gas', '↓ Brake', '← Lean back', '→ Lean forward', 'R Restart', 'Hold R Restart track'],
   gamepad: ['RT Gas', 'LT Brake', 'Stick Lean', 'B Restart', 'Hold B Restart track'],
@@ -67,6 +68,7 @@ export class DomHud implements Hud {
   private device: InputDevice = 'keyboard';
   private deviceShown = false;
   private deviceVisible = false;
+  private deviceShowUntil = -1;
   private simTime = 0;
   private lastTimerText = '';
   private lastFaults = -1;
@@ -78,6 +80,17 @@ export class DomHud implements Hud {
   private lastStripX = Number.NaN;
 
   onAction: ((action: HudAction) => void) | null = null;
+
+  /** Medal icons from the art manifest for the results panel (fallback: tinted discs). */
+  setMedalArt(src: Partial<Record<Medal, string>>): void {
+    for (const k of ['bronze', 'silver', 'gold', 'platinum'] as const) {
+      const i = this.resMedals[k].querySelector<HTMLElement>('i');
+      const url = src[k];
+      if (!i || !url) continue;
+      i.classList.add('img');
+      i.style.backgroundImage = `url("${url}")`;
+    }
+  }
 
   constructor(parent: HTMLElement, private readonly bestOf: (trackId: string) => BestEntry | null = () => null) {
     this.root = el('div', 'hud hidden');
@@ -180,16 +193,14 @@ export class DomHud implements Hud {
     this.trackEl.textContent = name;
   }
 
-  setDevice(device: InputDevice, visible: boolean): void {
+  /** The pill shows only when the active device changes (and on first detection), for 1.5 s of sim time. */
+  setDevice(device: InputDevice, _visible: boolean): void {
     if (device !== this.device || !this.deviceShown) {
       this.device = device;
       this.deviceEl.innerHTML = `<i></i>${DEVICE_LABEL[device]}`;
       this.root.classList.toggle('touch', device === 'touch');
+      this.deviceShowUntil = this.simTime + DEVICE_PILL_S;
       this.refreshHints();
-    }
-    if (visible !== this.deviceVisible) {
-      this.deviceVisible = visible;
-      this.deviceEl.classList.toggle('show', visible);
     }
     this.deviceShown = true;
   }
@@ -200,6 +211,13 @@ export class DomHud implements Hud {
       this.phase = info.phase;
       this.root.classList.toggle('hidden', info.phase === 'menu');
       if (info.phase === 'countdown' || info.phase === 'menu') this.hideResults();
+      // One technique line before GO only; nothing floats over play.
+      this.hintsEl.classList.toggle('show', info.phase === 'countdown' && this.hintsEl.childElementCount > 0);
+    }
+    const pillVisible = this.simTime < this.deviceShowUntil;
+    if (pillVisible !== this.deviceVisible) {
+      this.deviceVisible = pillVisible;
+      this.deviceEl.classList.toggle('show', pillVisible);
     }
     const text = formatTime(info.runTime);
     if (text !== this.lastTimerText) {
@@ -390,26 +408,27 @@ export class DomHud implements Hud {
 
   // -- internals ------------------------------------------------------------
 
+  /**
+   * Countdown-only technique line (the track-select card carries the full technique). The first
+   * authored hint wins; beginner tracks without one get a single device keycap pair. Never shown
+   * after GO.
+   */
   private refreshHints(): void {
     const t = this.track;
-    // Authored hints show on every track that has them; beginner tracks without any get the device defaults.
-    const authored = t?.meta?.hints;
-    const hints = authored?.length ? authored : t?.tier === 'beginner' ? DEFAULT_HINTS[this.device] : null;
-    if (!hints) {
+    const authored = t?.meta?.hints?.[0] ?? t?.meta?.technique;
+    const line = authored ?? (t?.tier === 'beginner' ? DEFAULT_HINTS[this.device][0] : undefined);
+    if (!line) {
+      this.hintsEl.innerHTML = '';
       this.hintsEl.classList.remove('show');
       return;
     }
-    const isDefault = !authored?.length;
-    this.hintsEl.innerHTML = hints
-      .map((h) => {
-        const sp = h.indexOf(' ');
-        // Device defaults are "Key action" pairs (key in a keycap); authored hints are sentences.
-        return isDefault && sp > 0
-          ? `<span><kbd>${escapeHtml(h.slice(0, sp))}</kbd>${escapeHtml(h.slice(sp + 1))}</span>`
-          : `<span>${escapeHtml(h)}</span>`;
-      })
-      .join('');
-    this.hintsEl.classList.add('show');
+    const isDefault = !authored;
+    const sp = line.indexOf(' ');
+    this.hintsEl.innerHTML =
+      isDefault && sp > 0
+        ? `<span><kbd>${escapeHtml(line.slice(0, sp))}</kbd>${escapeHtml(line.slice(sp + 1))}</span>`
+        : `<span>${escapeHtml(line)}</span>`;
+    this.hintsEl.classList.toggle('show', this.phase === 'countdown');
   }
 
   private spawn(kind: BannerKind, text: string, life: number): Banner {

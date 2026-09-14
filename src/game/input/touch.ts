@@ -69,7 +69,7 @@ export class TouchInput implements InputSource {
       brake: mk('tz-brake', 'BRAKE'),
       throttle: mk('tz-throttle', 'GAS'),
       pause: mk('tz-pause tz-btn', '❚❚'),
-      restart: mk('tz-restart tz-btn', '↻'),
+      restart: mk('tz-restart tz-btn', '↻<small>Restart</small>'),
     };
     this.debugEl = options.debug ? document.createElement('pre') : null;
     if (this.debugEl) {
@@ -111,6 +111,11 @@ export class TouchInput implements InputSource {
   }
 
   /** Show the zone outlines (called when touch becomes the active device). */
+  /** 3 s into a run the zone outlines/labels drop to ~30 % so play is not under a diagram. */
+  setSettled(on: boolean): void {
+    this.root.classList.toggle('settled', on);
+  }
+
   setVisible(on: boolean): void {
     this.root.classList.toggle('visible', on);
   }

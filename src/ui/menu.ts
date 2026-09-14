@@ -1,175 +1,31 @@
 /**
- * Main menu (track select by tier with best times, quality, audio) and the
- * pause overlay. Plain DOM; every target ≥ 44 px; works with mouse, touch,
- * keyboard (Enter / Esc) and the gamepad meta buttons via `confirm()`/`back()`.
+ * Pause overlay (same list + amber bar as the main menu), spatial focus
+ * navigation for button grids (results panel), and the rotate prompt.
+ * Every target ≥ 44 px; mouse, touch, keyboard and pad via `confirm()`/`move()`.
  */
-import type { QualityTier, TrackDef, TrackTier } from '../core/types';
-import type { BestEntry, ModelChoice } from './best';
+import type { QualityTier } from '../core/types';
+import type { ModelChoice } from './best';
 import { formatTime } from './format';
+import { BUILD_STAMP, FocusList, GAME_NAME, escapeHtml, hardReload } from './front';
+import type { UiSfx } from './sfx';
 
 export type QualityChoice = QualityTier | 'auto';
-
-export interface MenuCallbacks {
-  play(trackId: string): void;
-  setQuality(q: QualityChoice): void;
-  setAudio(on: boolean): void;
-  setGhost(on: boolean): void;
-  /** Rider / bike model choice; applies on the next load (the renderer is built once). */
-  setModel(which: 'rider' | 'bike', v: ModelChoice): void;
-}
 
 export interface PauseCallbacks {
   resume(): void;
   restartTrack(): void;
   quit(): void;
+  /** Live rider / bike model swap (renderer `setModels`); rows exist only when `models` is given. */
+  models?: {
+    get(): { rider: ModelChoice; bike: ModelChoice };
+    set(which: 'rider' | 'bike', v: ModelChoice): void;
+  };
 }
 
-const TIER_ORDER: TrackTier[] = ['beginner', 'easy', 'medium', 'hard', 'extreme'];
-
-export class MainMenu {
-  readonly root: HTMLDivElement;
-  private readonly list: HTMLDivElement;
-  private readonly qualitySeg: HTMLDivElement;
-  private readonly audioBtn: HTMLButtonElement;
-  private readonly ghostBtn: HTMLButtonElement;
-  private lastTrackId: string | null = null;
-  private audioOn = true;
-  private ghostOn = true;
-
-  constructor(
-    parent: HTMLElement,
-    private readonly cb: MenuCallbacks,
-    private readonly bestOf: (trackId: string) => BestEntry | null,
-  ) {
-    this.root = document.createElement('div');
-    this.root.className = 'overlay';
-    const panel = document.createElement('div');
-    panel.className = 'panel';
-    panel.innerHTML = `
-      <div class="head">
-        <div>
-          <h1 class="title"><small>Physics trials</small>Gauntlet</h1>
-          <p class="sub">Gas, brake, lean. The clock runs through every crash. Tap restart for the last checkpoint, hold it to restart the track.</p>
-        </div>
-        <div class="settings">
-          <span class="lbl">Quality</span>
-          <div class="seg quality">
-            <button data-q="auto">Auto</button><button data-q="low">Low</button><button data-q="medium">Med</button><button data-q="high">High</button>
-          </div>
-          <button class="btn audio">Sound on</button>
-          <button class="btn ghost">Ghost on</button>
-          <span class="lbl">Rider</span>
-          <div class="seg model" data-which="rider"><button data-m="proc">Procedural</button><button data-m="gltf">Modelled</button></div>
-          <span class="lbl">Bike</span>
-          <div class="seg model" data-which="bike"><button data-m="proc">Procedural</button><button data-m="gltf">Modelled</button></div>
-        </div>
-      </div>
-      <div class="list"></div>`;
-    this.list = panel.querySelector('.list') as HTMLDivElement;
-    this.qualitySeg = panel.querySelector('.seg.quality') as HTMLDivElement;
-    this.audioBtn = panel.querySelector('.btn.audio') as HTMLButtonElement;
-    this.qualitySeg.addEventListener('click', (e) => {
-      const q = (e.target as HTMLElement).closest('[data-q]')?.getAttribute('data-q') as QualityChoice | null;
-      if (!q) return;
-      this.setQuality(q);
-      this.cb.setQuality(q);
-    });
-    for (const seg of panel.querySelectorAll<HTMLDivElement>('.seg.model')) {
-      seg.addEventListener('click', (e) => {
-        const m = (e.target as HTMLElement).closest('[data-m]')?.getAttribute('data-m') as ModelChoice | null;
-        const which = seg.getAttribute('data-which') as 'rider' | 'bike';
-        if (!m) return;
-        this.setModel(which, m);
-        this.cb.setModel(which, m);
-      });
-    }
-    this.ghostBtn = panel.querySelector('.btn.ghost') as HTMLButtonElement;
-    this.ghostBtn.addEventListener('click', () => this.setGhost(!this.ghostOn, true));
-    this.audioBtn.addEventListener('click', () => {
-      this.audioOn = !this.audioOn;
-      this.audioBtn.textContent = this.audioOn ? 'Sound on' : 'Sound off';
-      this.cb.setAudio(this.audioOn);
-    });
-    this.list.addEventListener('click', (e) => {
-      const id = (e.target as HTMLElement).closest('[data-track]')?.getAttribute('data-track');
-      if (id) this.cb.play(id);
-    });
-    this.root.appendChild(panel);
-    parent.appendChild(this.root);
-  }
-
-  setTracks(tracks: TrackDef[], lastPlayed: string | null): void {
-    this.lastTrackId = lastPlayed ?? tracks[0]?.id ?? null;
-    const byTier = new Map<TrackTier, TrackDef[]>();
-    // Authored tracks first; the harness test strips (`*-test`) last within their tier.
-    const ordered = [...tracks].sort((a, b) => Number(a.id.endsWith('-test')) - Number(b.id.endsWith('-test')));
-    for (const t of ordered) {
-      const arr = byTier.get(t.tier) ?? [];
-      arr.push(t);
-      byTier.set(t.tier, arr);
-    }
-    let html = '';
-    for (const tier of TIER_ORDER) {
-      const arr = byTier.get(tier);
-      if (!arr?.length) continue;
-      html += `<div class="tier">${tier}</div><div class="tracks">`;
-      for (const t of arr) {
-        const best = this.bestOf(t.id);
-        const bestHtml = best
-          ? `<span>${formatTime(best.time)} · ${best.faults}✕</span><b class="${best.medal}">${best.medal}</b>`
-          : `<span>—</span><b></b>`;
-        const target = t.meta?.targetTimeS ? ` · target ${formatTime(t.meta.targetTimeS)}` : '';
-        html += `<button class="track" data-track="${t.id}"><span class="name">${escape(t.name)}</span><span class="best">${bestHtml}</span><span class="best"><span>${escape(t.meta?.technique ?? '')}${target}</span></span></button>`;
-      }
-      html += '</div>';
-    }
-    this.list.innerHTML = html;
-  }
-
-  setModel(which: 'rider' | 'bike', v: ModelChoice): void {
-    const seg = this.root.querySelector(`.seg.model[data-which="${which}"]`);
-    seg?.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-m') === v));
-  }
-
-  setGhost(on: boolean, notify = false): void {
-    this.ghostOn = on;
-    this.ghostBtn.textContent = on ? 'Ghost on' : 'Ghost off';
-    if (notify) this.cb.setGhost(on);
-  }
-
-  setQuality(q: QualityChoice): void {
-    for (const b of this.qualitySeg.querySelectorAll('button')) b.classList.toggle('on', b.getAttribute('data-q') === q);
-  }
-
-  show(): void {
-    this.root.classList.add('show');
-    const focus = this.list.querySelector<HTMLButtonElement>(`[data-track="${this.lastTrackId ?? ''}"]`) ?? this.list.querySelector('button');
-    focus?.focus({ preventScroll: true });
-  }
-
-  hide(): void {
-    this.root.classList.remove('show');
-  }
-
-  get visible(): boolean {
-    return this.root.classList.contains('show');
-  }
-
-  /** Gamepad A / Enter: activate the focused control (or play the last played track). */
-  confirm(): void {
-    const active = document.activeElement as HTMLElement | null;
-    if (active && this.root.contains(active) && active.tagName === 'BUTTON') {
-      active.click();
-      return;
-    }
-    if (this.lastTrackId) this.cb.play(this.lastTrackId);
-  }
-
-  /** D-pad / stick / arrows: move focus spatially. */
-  move(dx: number, dy: number): void {
-    spatialMove(this.root, dx, dy);
-  }
-}
+const MODEL_OPTIONS = [
+  { v: 'proc', l: 'Procedural' },
+  { v: 'gltf', l: 'Modelled' },
+];
 
 /**
  * Spatial focus navigation over the visible buttons of `root`: pick the nearest
@@ -214,31 +70,50 @@ export function spatialMove(root: HTMLElement, dx: number, dy: number): void {
 
 export class PauseMenu {
   readonly root: HTMLDivElement;
+  private readonly list: FocusList;
+  private readonly title: HTMLElement;
+  private readonly stats: HTMLDivElement;
 
-  constructor(parent: HTMLElement, cb: PauseCallbacks) {
+  constructor(parent: HTMLElement, sfx: UiSfx, private readonly cb: PauseCallbacks) {
     this.root = document.createElement('div');
     this.root.className = 'overlay';
-    this.root.innerHTML = `
-      <div class="panel" style="width:min(24rem,100%)">
-        <h2 class="pause-title">Paused</h2>
-        <div class="row" style="flex-direction:column;align-items:stretch">
-          <button class="btn primary" data-a="resume">Resume</button>
-          <button class="btn" data-a="restart">Restart track</button>
-          <button class="btn" data-a="quit">Quit to menu</button>
-        </div>
-      </div>`;
-    this.root.addEventListener('click', (e) => {
-      const a = (e.target as HTMLElement).closest('[data-a]')?.getAttribute('data-a');
-      if (a === 'resume') cb.resume();
-      else if (a === 'restart') cb.restartTrack();
-      else if (a === 'quit') cb.quit();
-    });
+    const panel = document.createElement('div');
+    panel.className = 'pause-panel';
+    this.title = document.createElement('h2');
+    this.title.className = 'pause-title';
+    this.title.innerHTML = '<small>Paused</small>Track';
+    panel.appendChild(this.title);
+    this.list = new FocusList(panel, sfx, 'menu-list-inline');
+    this.list.root.style.position = 'relative';
+    this.list.setItems([
+      { id: 'resume', label: 'Resume' },
+      { id: 'restart', label: 'Restart track' },
+      ...(cb.models ? [{ id: 'rider', label: 'Rider' }, { id: 'bike', label: 'Bike' }] : []),
+      { id: 'quit', label: 'Main menu' },
+    ]);
+    this.list.onPick = (id) => {
+      if (id === 'resume') cb.resume();
+      else if (id === 'restart') cb.restartTrack();
+      else if (id === 'quit') cb.quit();
+      else if (id === 'rider' || id === 'bike') this.cycleModel(id, 1);
+    };
+    this.paintModels();
+    this.stats = document.createElement('div');
+    this.stats.className = 'pause-stats';
+    panel.appendChild(this.stats);
+    this.root.appendChild(panel);
     parent.appendChild(this.root);
   }
 
-  show(): void {
+  show(info?: { trackName: string; tier: string; runTime: number; faults: number }): void {
+    if (info) {
+      this.title.innerHTML = `<small>Paused · ${escapeHtml(info.tier)}</small>${escapeHtml(info.trackName)}`;
+      this.stats.innerHTML = `<span>Time <b>${formatTime(info.runTime)}</b></span><span>Faults <b>${info.faults}</b></span>`;
+    }
     this.root.classList.add('show');
-    this.root.querySelector<HTMLButtonElement>('[data-a="resume"]')?.focus({ preventScroll: true });
+    this.paintModels();
+    this.list.focusId('resume');
+    requestAnimationFrame(() => this.list.render(false));
   }
 
   hide(): void {
@@ -250,24 +125,52 @@ export class PauseMenu {
   }
 
   confirm(): void {
-    const active = document.activeElement as HTMLElement | null;
-    if (active && this.root.contains(active) && active.tagName === 'BUTTON') active.click();
+    this.list.pick();
   }
 
+  /** Up/down moves; left/right flips the focused Rider / Bike row live (scene updates behind the overlay). */
   move(dx: number, dy: number): void {
-    spatialMove(this.root, dx, dy);
+    if (dy) this.list.move(dy);
+    else if (dx) {
+      const cur = this.list.current();
+      if (cur === 'rider' || cur === 'bike') this.cycleModel(cur, dx);
+    }
+  }
+
+  private cycleModel(which: 'rider' | 'bike', d: number): void {
+    const m = this.cb.models;
+    if (!m) return;
+    const cur = m.get()[which];
+    const i = MODEL_OPTIONS.findIndex((o) => o.v === cur);
+    const next = MODEL_OPTIONS[(i + d + MODEL_OPTIONS.length) % MODEL_OPTIONS.length]!.v as ModelChoice;
+    m.set(which, next);
+    this.paintModels();
+  }
+
+  private paintModels(): void {
+    const m = this.cb.models;
+    if (!m) return;
+    const cur = m.get();
+    this.list.setSegment('rider', MODEL_OPTIONS, cur.rider);
+    this.list.setSegment('bike', MODEL_OPTIONS, cur.bike);
   }
 }
 
-/** Full-screen "rotate your phone" prompt; CSS decides when it shows. */
+/**
+ * Full-screen portrait prompt (CSS decides when it shows: portrait + coarse pointer). A designed
+ * screen in the menu tokens: wordmark, rotating phone glyph, the game's one and only
+ * "Reload game" button (home-screen / standalone iOS has no browser chrome to reload with),
+ * build stamp. The in-run top-right ↻ stays restart-to-checkpoint and nothing else.
+ */
 export function mountRotatePrompt(parent: HTMLElement): HTMLDivElement {
   const d = document.createElement('div');
   d.className = 'rotate armed';
-  d.innerHTML = '<i></i><div>Rotate to landscape</div>';
+  d.innerHTML = `<div class="wordmark">${GAME_NAME.split(' ')[0]}<br>${GAME_NAME.split(' ').slice(1).join(' ')}</div>
+    <i></i>
+    <div class="msg">Rotate to landscape</div>
+    <button type="button" class="btn primary reload">⟳ Reload game</button>
+    <div class="build">${escapeHtml(BUILD_STAMP)}</div>`;
+  d.querySelector('button')!.addEventListener('click', () => void hardReload());
   parent.appendChild(d);
   return d;
-}
-
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
 }

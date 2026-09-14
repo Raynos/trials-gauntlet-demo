@@ -49,6 +49,11 @@ export class BestTimes {
     }
   }
 
+  clear(): void {
+    this.cache.clear();
+    clearAllBest();
+  }
+
   put(trackId: string, r: RunResult, run?: { splits: number[]; recording: string | null }): void {
     const entry: BestEntry = { time: r.time, faults: r.faults, medal: r.medal };
     if (run) {
@@ -100,6 +105,59 @@ export function saveGhostEnabled(on: boolean): void {
   } catch {
     /* storage unavailable */
   }
+}
+
+const SOUND_KEY = 'trials.sound';
+const VOLUME_KEY = 'trials.volume';
+
+export function loadSoundEnabled(): boolean {
+  try {
+    return store()?.getItem(SOUND_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
+
+export function saveSoundEnabled(on: boolean): void {
+  try {
+    store()?.setItem(SOUND_KEY, on ? '1' : '0');
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+export function loadVolume(): number {
+  try {
+    const v = Number(store()?.getItem(VOLUME_KEY));
+    return Number.isFinite(v) && v >= 0 && v <= 1 && store()?.getItem(VOLUME_KEY) !== null ? v : 0.8;
+  } catch {
+    return 0.8;
+  }
+}
+
+export function saveVolume(v: number): void {
+  try {
+    store()?.setItem(VOLUME_KEY, String(Math.max(0, Math.min(1, v))));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** Reset progress: every `trials.best.*` entry (medals, PBs, ghosts). Settings stay. */
+export function clearAllBest(): number {
+  const s = store();
+  if (!s) return 0;
+  const keys: string[] = [];
+  try {
+    for (let i = 0; i < s.length; i++) {
+      const k = s.key(i);
+      if (k && k.startsWith(PREFIX)) keys.push(k);
+    }
+    for (const k of keys) s.removeItem(k);
+  } catch {
+    /* storage unavailable */
+  }
+  return keys.length;
 }
 
 export function loadQualityOverride(): QualityTier | 'auto' {

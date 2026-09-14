@@ -1,0 +1,175 @@
+/**
+ * Art manifest consumer (`public/art/manifest.json`, written by the art
+ * owner). Tolerant of shape: an array of entries, `{ assets: [...] }`, or an
+ * id → entry map; each entry has a `kind` plus `src`/`file`/`url`/`path` and
+ * optional `track` / `tier` / `biome` / `medal` tags. Every lookup degrades
+ * to `null` — callers always have a tinted fallback and never show a broken
+ * image. Title-critical art is loaded first; cards/medals/plates lazily.
+ */
+import type { BiomeId, Medal, TrackTier } from '../core/types';
+
+export type ArtKind = 'keyart' | 'plate-menu' | 'tier-card' | 'track-card' | 'medal' | 'results-bg' | string;
+
+export interface ArtEntry {
+  id: string;
+  kind: ArtKind;
+  /** Resolved, base-relative URL. */
+  src: string;
+  track?: string;
+  tier?: TrackTier;
+  biome?: BiomeId;
+  medal?: Medal;
+  width?: number;
+  height?: number;
+  /** Bytes when the manifest reports it (title budget check). */
+  bytes?: number;
+  /** Resolution variant (`1x` / `2x`) when the pack ships more than one. */
+  variant?: string;
+}
+
+const ART_BASE = 'art/';
+
+function normalise(raw: unknown): ArtEntry[] {
+  const out: ArtEntry[] = [];
+  const list: unknown[] = Array.isArray(raw)
+    ? raw
+    : raw && typeof raw === 'object' && Array.isArray((raw as { assets?: unknown }).assets)
+      ? ((raw as { assets: unknown[] }).assets)
+      : raw && typeof raw === 'object'
+        ? Object.entries(raw as Record<string, unknown>).map(([id, v]) => (v && typeof v === 'object' ? { id, ...(v as object) } : null))
+        : [];
+  for (const item of list) {
+    if (!item || typeof item !== 'object') continue;
+    const o = item as Record<string, unknown>;
+    // `path`/`file`/`url` are URLs; `src` is only used when it looks like one (the art pack uses `src` for the generation name).
+    const looksLikeUrl = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && (/[./]/.test(v) || v.startsWith('data:'));
+    const src = [o['path'], o['file'], o['url'], o['href'], o['webp'], o['png'], o['src']].find(looksLikeUrl);
+    const id = typeof o['id'] === 'string' ? o['id'] : typeof o['name'] === 'string' ? o['name'] : src;
+    const kind = typeof o['kind'] === 'string' ? o['kind'] : undefined;
+    if (!src || !id || !kind) continue;
+    const e: ArtEntry = { id, kind, src: /^(https?:)?\/\//.test(src) || src.startsWith('/') || src.startsWith('data:') ? src : src.startsWith(ART_BASE) ? src : ART_BASE + src };
+    if (typeof o['track'] === 'string') e.track = o['track'];
+    if (typeof o['tier'] === 'string') e.tier = o['tier'] as TrackTier;
+    if (typeof o['biome'] === 'string') e.biome = o['biome'] as BiomeId;
+    if (typeof o['medal'] === 'string') e.medal = o['medal'] as Medal;
+    if (typeof o['width'] === 'number') e.width = o['width'];
+    if (typeof o['height'] === 'number') e.height = o['height'];
+    if (typeof o['bytes'] === 'number') e.bytes = o['bytes'];
+    if (typeof o['w'] === 'number') e.width = o['w'];
+    if (typeof o['h'] === 'number') e.height = o['h'];
+    if (typeof o['variant'] === 'string') e.variant = o['variant'];
+    out.push(e);
+  }
+  return out;
+}
+
+export class ArtManifest {
+  private entries: ArtEntry[] = [];
+  private loaded = false;
+  private readonly waiters: (() => void)[] = [];
+  private readonly probed = new Map<string, Promise<boolean>>();
+
+  /** Parse an already-fetched manifest (tests, or an inlined one). */
+  static from(raw: unknown): ArtManifest {
+    const m = new ArtManifest();
+    m.entries = normalise(raw);
+    m.loaded = true;
+    return m;
+  }
+
+  /** Fetch `art/manifest.json`; a missing or malformed file is an empty manifest. */
+  async load(url: string = ART_BASE + 'manifest.json'): Promise<this> {
+    if (this.loaded) return this;
+    try {
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (res.ok) this.entries = normalise(await res.json());
+    } catch {
+      this.entries = [];
+    }
+    this.loaded = true;
+    for (const w of this.waiters.splice(0)) w();
+    return this;
+  }
+
+  get ready(): boolean {
+    return this.loaded;
+  }
+
+  whenReady(cb: () => void): void {
+    if (this.loaded) cb();
+    else this.waiters.push(cb);
+  }
+
+  all(): readonly ArtEntry[] {
+    return this.entries;
+  }
+
+  find(pred: (e: ArtEntry) => boolean): ArtEntry | null {
+    return this.entries.find(pred) ?? null;
+  }
+
+  /** Key art for a biome (any biome as fallback); the `2x` variant on DPR > 1.5 or wide viewports, else `1x`. */
+  keyart(biome?: BiomeId): ArtEntry | null {
+    const all = this.entries.filter((e) => e.kind === 'keyart');
+    const pool = (biome && all.filter((e) => e.biome === biome)) || [];
+    const list = pool.length ? pool : all;
+    if (list.length === 0) return null;
+    const hi = typeof window !== 'undefined' && ((window.devicePixelRatio || 1) > 1.5 || window.innerWidth > 1400);
+    return list.find((e) => e.variant === (hi ? '2x' : '1x')) ?? list.find((e) => !e.variant) ?? list[0]!;
+  }
+
+  trackCard(trackId: string): ArtEntry | null {
+    return this.find((e) => (e.kind === 'track-card' || e.kind === 'track') && e.track === trackId);
+  }
+
+  tierCard(tier: TrackTier): ArtEntry | null {
+    return this.find((e) => e.kind === 'tier-card' && e.tier === tier);
+  }
+
+  medal(medal: Medal): ArtEntry | null {
+    return this.find((e) => e.kind === 'medal' && e.medal === medal);
+  }
+
+  plate(kind: 'plate-menu' | 'results-bg' | 'loading', biome?: BiomeId): ArtEntry | null {
+    return (biome && this.find((e) => e.kind === kind && e.biome === biome)) || this.find((e) => e.kind === kind);
+  }
+
+  /**
+   * Decode an image once; resolves false on error (404, corrupt) so the
+   * caller keeps its fallback. Cached per URL.
+   */
+  probe(src: string): Promise<boolean> {
+    let p = this.probed.get(src);
+    if (!p) {
+      p = new Promise<boolean>((resolve) => {
+        if (typeof Image === 'undefined') return resolve(false);
+        const img = new Image();
+        img.decoding = 'async';
+        img.onload = () => resolve(img.naturalWidth > 0);
+        img.onerror = () => resolve(false);
+        img.src = src;
+      });
+      this.probed.set(src, p);
+    }
+    return p;
+  }
+
+  /** Apply an image as a background once it has decoded; adds `loaded` so CSS can fade it in. */
+  applyBackground(el: HTMLElement, entry: ArtEntry | null): void {
+    if (!entry) return;
+    void this.probe(entry.src).then((ok) => {
+      if (!ok || !el.isConnected) return;
+      el.style.backgroundImage = `url("${entry.src}")`;
+      el.classList.add('loaded');
+    });
+  }
+}
+
+/** Biome-tinted fallback gradient for cards without art. */
+export const BIOME_TINT: Record<BiomeId, string> = {
+  industrial: 'linear-gradient(160deg, #5a3e16 0%, #2a1d0c 55%, #120d07 100%)',
+  canyon: 'linear-gradient(160deg, #a4552a 0%, #5a2a16 55%, #1c0f09 100%)',
+  snow: 'linear-gradient(160deg, #40607f 0%, #1f2f44 55%, #0d1219 100%)',
+  nightCity: 'linear-gradient(160deg, #4a2560 0%, #1c3550 55%, #0b0f18 100%)',
+  foundry: 'linear-gradient(160deg, #b0400f 0%, #4a1706 55%, #170804 100%)',
+};
