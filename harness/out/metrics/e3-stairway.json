@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "e3-stairway",
+  "updatedAt": "2026-09-14T06:52:15.943Z",
+  "physics": "bikePhysicsFactory",
+  "attemptsBand": [
+    3,
+    6
+  ],
+  "targetAttempts": 6,
+  "curve": [
+    {
+      "skill": 2,
+      "seeds": [
+        3073702004,
+        3073702005
+      ],
+      "attempts": [
+        1,
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        11.466666666666667,
+        11.466666666666667
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260914-012827-86f693",
+    "20260914-012834-06f0b3",
+    "20260914-015205-5c6d9e",
+    "20260914-015210-0d8b4b"
+  ]
+}

@@ -38,12 +38,17 @@ export interface PlayLimits {
   maxAttempts: number;
   maxSimSeconds: number;
   maxRewinds: number;
+  /** Wall-clock cap for the whole run (ms); exceeded -> outcome 'wallTimeout'. */
+  maxWallMs: number;
 }
-export const DEFAULT_LIMITS: PlayLimits = { maxAttempts: 50, maxSimSeconds: 300, maxRewinds: 200 };
+export const DEFAULT_LIMITS: PlayLimits = { maxAttempts: 50, maxSimSeconds: 300, maxRewinds: 200, maxWallMs: 600_000 };
 
 export interface PlayResult {
-  outcome: 'finished' | 'maxAttempts' | 'timeout' | 'stuck';
+  outcome: 'finished' | 'maxAttempts' | 'timeout' | 'wallTimeout' | 'stuck';
   frames: InputFrame[];
+  /** Furthest bike x reached during committed play (m). */
+  maxX: number;
+  wallMs: number;
   events: TimedEvent[];
   faults: FaultEvent[];
   attempts: number;
@@ -105,6 +110,8 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
   let rewindExtra = 0;
   let ticksSimulated = 0;
   const startTotal = sim.totalTicks();
+  const wall0 = performance.now();
+  let maxX = sim.state().bike.pos.x;
 
   const stepPlay = (f: InputFrame): { fault: TimedEvent | null; finish: TimedEvent | null } => {
     const ev = sim.step(f);
@@ -125,6 +132,10 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
       outcome = 'timeout';
       break;
     }
+    if (performance.now() - wall0 > limits.maxWallMs) {
+      outcome = 'wallTimeout';
+      break;
+    }
     const rootHash = sim.hash();
     const p = plan(sim, cfg, w, { banned: bannedByRoot.get(rootHash) ?? [] });
     plans.push(p);
@@ -139,6 +150,7 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
       const macro = framesOf(aid);
       for (let i = 0; i < macro.length && !replan; i++) {
         const stateBefore = sim.state();
+        if (stateBefore.bike.pos.x > maxX) maxX = stateBefore.bike.pos.x;
         const { fault, finish } = stepPlay(macro[i]!);
         if (finish && !fault) {
           const st = sim.state();
@@ -202,9 +214,13 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
 
   ticksSimulated = sim.totalTicks() - startTotal;
   const counted = countedFaults(events);
+  const last = sim.state();
+  if (last.bike.pos.x > maxX) maxX = last.bike.pos.x;
   return {
     outcome,
     frames,
+    maxX,
+    wallMs: performance.now() - wall0,
     events,
     faults,
     attempts: 1 + counted.length,

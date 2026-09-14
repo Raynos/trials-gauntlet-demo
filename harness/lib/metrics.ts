@@ -12,6 +12,8 @@
  * event streams (no rule layer) and is 0 by default.
  */
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import type { GameEvent, PhysicsState } from '../../src/core/types';
 import { FLAG_RESTART, type InputRecording } from '../../src/core/replay';
 import type { RunMeta } from './schema';
@@ -120,6 +122,45 @@ export function gitHead(): string {
   return cachedGit;
 }
 
+/**
+ * FNV-1a over the *working-tree* sources that decide a simulation result
+ * (src/physics, src/tracks, src/core, src/game/rules.ts). One shared checkout
+ * means HEAD alone does not identify what ran; two reports with different
+ * fingerprints are not comparable.
+ */
+let cachedFp: string | null = null;
+/** Recomputed every call (to detect edits while a long run is in flight). */
+export function freshFingerprint(): string {
+  cachedFp = null;
+  return srcFingerprint();
+}
+export function srcFingerprint(root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..')): string {
+  if (cachedFp) return cachedFp;
+  let h = 0x811c9dc5;
+  const mix = (buf: Uint8Array): void => {
+    for (let i = 0; i < buf.length; i++) {
+      h ^= buf[i]!;
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+  };
+  const walk = (dir: string): void => {
+    if (!fs.existsSync(dir)) return;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (/\.ts$/.test(e.name) && !/\.test\.ts$/.test(e.name)) {
+        mix(new TextEncoder().encode(path.relative(root, p)));
+        mix(fs.readFileSync(p));
+      }
+    }
+  };
+  for (const d of ['src/physics', 'src/tracks', 'src/core']) walk(path.join(root, d));
+  const rules = path.join(root, 'src/game/rules.ts');
+  if (fs.existsSync(rules)) mix(fs.readFileSync(rules));
+  cachedFp = (h >>> 0).toString(16).padStart(8, '0');
+  return cachedFp;
+}
+
 export function runMeta(kind: string, startedAt: Date, extra: Partial<RunMeta> = {}): RunMeta {
   return {
     schema: 1,
@@ -128,6 +169,7 @@ export function runMeta(kind: string, startedAt: Date, extra: Partial<RunMeta> =
     startedAt: startedAt.toISOString(),
     wallMs: Date.now() - startedAt.getTime(),
     git: gitHead(),
+    srcFingerprint: srcFingerprint(),
     node: process.version,
     ...extra,
   };

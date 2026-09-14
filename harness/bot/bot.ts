@@ -2,8 +2,9 @@
  * The one bot (CONTRACT §3).
  *
  *   pnpm harness:bot <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms]
- *                    [--max-attempts 50] [--max-sim-seconds 300] [--no-verify] [--crash-probe]
+ *                    [--max-attempts 50] [--max-sim-seconds 300] [--track-wall-s 120] [--no-verify] [--crash-probe]
  *                    [--dev] [--build] [--verbose]
+ *   pnpm harness:bot --all-tracks [--skill 2] [--seeds 2] [--track-wall-s 120]   -> out/metrics/sweep.json + sweep.md
  *
  * Writes per run  harness/out/bot/<trackId>/<runId>.json          (BotRunReport)
  *        summary  harness/out/metrics/<trackId>.json               (TrackBotMetrics, committed)
@@ -17,12 +18,12 @@ import path from 'node:path';
 import { InputRecorder, quantizeInput, type InputRecording } from '../../src/core/replay';
 import type { InputFrame } from '../../src/core/types';
 import { flagBool, flagNum, parseArgs } from '../lib/args';
-import { faultsByCheckpoint, median, percentileOf, restartEdges, runMeta } from '../lib/metrics';
+import { faultsByCheckpoint, freshFingerprint, median, percentileOf, restartEdges, runMeta, srcFingerprint } from '../lib/metrics';
 import { HARNESS_DIR } from '../lib/paths';
 import { saveRecording } from '../lib/recording';
 import { fail, writeJson } from '../lib/report';
-import type { BotRunReport, Skill, TrackBotMetrics } from '../lib/schema';
-import { createSim, type Sim } from '../lib/sim';
+import type { Blocker, BotRunReport, Skill, SweepReport, SweepRow, TrackBotMetrics } from '../lib/schema';
+import { createSim, listSimTracks, type Sim } from '../lib/sim';
 import { BrowserVerifier } from '../lib/verify';
 import { formatActions } from './actions';
 import { configFor, playTrack } from './play';
@@ -50,18 +51,35 @@ export interface RunOnce {
   recording: InputRecording;
 }
 
+/** Locate a fault against the placed obstacles: nearest one within [-2, +8] m ahead. */
+export function locateBlocker(sim: Sim, f: { reason: Blocker['reason']; x: number; checkpoint: number; runTime: number }): Blocker {
+  let best: Blocker['obstacle'] = null;
+  let bestD = Infinity;
+  sim.compiled.placed.forEach((o, index) => {
+    const d = o.pos.x - f.x;
+    if (d < -2 || d > 8) return;
+    const score = Math.abs(d);
+    if (score < bestD) {
+      bestD = score;
+      best = { kind: o.kind, x: o.pos.x, index };
+    }
+  });
+  return { reason: f.reason, x: f.x, checkpoint: f.checkpoint, runTime: f.runTime, obstacle: best };
+}
+
 export async function runOnce(
   trackId: string,
   seed: number,
   skill: Skill,
-  o: { budgetMs?: number; maxAttempts?: number; maxSimSeconds?: number; verbose?: boolean },
+  o: { budgetMs?: number; maxAttempts?: number; maxSimSeconds?: number; maxWallMs?: number; verbose?: boolean },
 ): Promise<RunOnce> {
   const started = new Date();
   const sim = await createSim(trackId, seed);
   const config = configFor(skill, o.budgetMs);
-  const limits: Partial<{ maxAttempts: number; maxSimSeconds: number }> = {};
+  const limits: Partial<{ maxAttempts: number; maxSimSeconds: number; maxWallMs: number }> = {};
   if (o.maxAttempts !== undefined) limits.maxAttempts = o.maxAttempts;
   if (o.maxSimSeconds !== undefined) limits.maxSimSeconds = o.maxSimSeconds;
+  if (o.maxWallMs !== undefined) limits.maxWallMs = o.maxWallMs;
   const res = playTrack(sim, {
     skill,
     config,
@@ -86,6 +104,9 @@ export async function runOnce(
     config,
     weights: DEFAULT_WEIGHTS,
     outcome: res.outcome,
+    maxX: res.maxX,
+    progress: sim.track.finishX > 0 ? Math.min(1, res.maxX / sim.track.finishX) : 0,
+    firstBlocker: res.faults[0] ? locateBlocker(sim, res.faults[0]) : null,
     attempts: res.attempts,
     faults: res.faults,
     faultsByCheckpoint: faultsByCheckpoint(res.faults, sim.track.checkpoints.length),
@@ -126,9 +147,25 @@ function fmtTicks(n: number): string {
 export function printRunLine(r: BotRunReport): void {
   const fin = r.finishTime === null ? 'none' : r.finishTime.toFixed(3);
   const ver = r.browserVerified === null ? 'skipped' : r.browserVerified ? 'yes' : 'NO';
+  const blk = r.firstBlocker ? ` blocker=${r.firstBlocker.reason}@${r.firstBlocker.x.toFixed(1)}m${r.firstBlocker.obstacle ? `(${r.firstBlocker.obstacle.kind}@${r.firstBlocker.obstacle.x.toFixed(1)})` : '(ground)'}` : '';
   console.log(
-    `bot ${r.trackId} skill=${skillLabel(r.skill)} seed=${r.seed} attempts=${r.attempts} outcome=${r.outcome} finish=${fin} plans=${r.search.plans} ticks=${fmtTicks(r.search.ticksSimulated)} wall=${(r.wallMs / 1000).toFixed(1)}s verified=${ver}`,
+    `bot ${r.trackId} skill=${skillLabel(r.skill)} seed=${r.seed} attempts=${r.attempts} outcome=${r.outcome} finish=${fin} maxX=${r.maxX.toFixed(1)} (${(r.progress * 100).toFixed(0)}%)${blk} plans=${r.search.plans} ticks=${fmtTicks(r.search.ticksSimulated)} wall=${(r.wallMs / 1000).toFixed(1)}s verified=${ver}`,
   );
+}
+
+export function sweepMarkdown(rep: SweepReport): string {
+  const lines = [
+    `| track | tier | technique | finishX | best m | best % | clear | attempts (seeds) | first blocker |`,
+    `|---|---|---|---:|---:|---:|---|---|---|`,
+  ];
+  for (const r of rep.rows) {
+    const b = r.firstBlocker;
+    const blocker = b ? `${b.reason} @ ${b.x.toFixed(1)} m${b.obstacle ? ` — ${b.obstacle.kind} @ ${b.obstacle.x.toFixed(1)} m` : ' — ground'}` : '—';
+    lines.push(
+      `| ${r.trackId} | ${r.tier} | ${r.technique} | ${r.finishX.toFixed(0)} | ${r.bestX.toFixed(1)} | ${(r.bestPct * 100).toFixed(0)}% | ${r.clears}/${r.seeds.length} | ${r.attemptsMedian} (${r.attempts.join(', ')}) | ${blocker} |`,
+    );
+  }
+  return lines.join('\n');
 }
 
 /** Pick the best run for a skill: finished > fewer attempts > faster. */
@@ -249,11 +286,92 @@ export async function crashProbe(trackId: string, seed: number): Promise<{ file:
   return { file, faultTick: best.tick, reason: best.reason };
 }
 
+
+/** --all-tracks: budget-capped committed play on every registered track; one summary table. */
+async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number): Promise<void> {
+  const started = new Date();
+  const skill = (flagBool(flags, 'oracle') ? 'oracle' : (Math.max(0, Math.min(3, Math.round(flagNum(flags, 'skill', 2)))) as 0 | 1 | 2 | 3)) as Skill;
+  const trackWallS = flagNum(flags, 'track-wall-s', 120);
+  const budget = flags.budget !== undefined ? flagNum(flags, 'budget', 0) : undefined;
+  const only = typeof flags.tracks === 'string' ? flags.tracks.split(',') : null;
+  const ids = listSimTracks().filter((id) => !only || only.includes(id));
+  const rows: SweepRow[] = [];
+  const first = await createSim(ids[0]!);
+  console.log(`sweep: physics=${first.physicsName} src=${srcFingerprint()} skill=${skillLabel(skill)} seeds=${seeds} trackWall=${trackWallS}s tracks=${ids.length}`);
+  const fp0 = srcFingerprint();
+  for (const id of ids) {
+    const sim = await createSim(id);
+    const runs: RunOnce[] = [];
+    const t0 = performance.now();
+    if (freshFingerprint() !== fp0) console.error(`WARNING src/physics|tracks changed on disk during the sweep (${fp0} -> ${freshFingerprint()}); this process still runs the code it loaded at start. Re-run the sweep.`);
+    for (let k = 0; k < seeds; k++) {
+      const seed = (sim.seed + k) >>> 0;
+      const o: Parameters<typeof runOnce>[3] = { maxWallMs: trackWallS * 1000, verbose: flagBool(flags, 'verbose') };
+      if (budget !== undefined) o.budgetMs = budget;
+      const r = await runOnce(id, seed, skill, o);
+      runs.push(r);
+      printRunLine(r.report);
+    }
+    const reps = runs.map((r) => r.report);
+    const bestX = Math.max(...reps.map((r) => r.maxX));
+    // First blocker: from the run that got least far (the wall), else the earliest fault.
+    const blockers = reps.map((r) => r.firstBlocker).filter((b): b is Blocker => b !== null).sort((a, b) => a.x - b.x);
+    // Never faulted, never finished: the bike is parked against something at maxX.
+    for (const r of reps) {
+      if (r.firstBlocker === null && r.outcome !== 'finished') {
+        blockers.push(locateBlocker(sim, { reason: 'stuck', x: r.maxX, checkpoint: -1, runTime: r.simSeconds }));
+      }
+    }
+    blockers.sort((a, b) => a.x - b.x);
+    rows.push({
+      trackId: id,
+      tier: sim.track.tier,
+      technique: sim.track.meta?.technique ?? '',
+      finishX: sim.track.finishX,
+      attemptsBand: sim.track.meta?.attemptsBand ?? null,
+      skill,
+      seeds: reps.map((r) => r.seed),
+      bestX,
+      bestPct: sim.track.finishX > 0 ? Math.min(1, bestX / sim.track.finishX) : 0,
+      clears: reps.filter((r) => r.outcome === 'finished').length,
+      attempts: reps.map((r) => r.attempts),
+      attemptsMedian: median(reps.map((r) => r.attempts)),
+      finishTimes: reps.map((r) => r.finishTime),
+      outcomes: reps.map((r) => r.outcome),
+      firstBlocker: blockers[0] ?? null,
+      wallMs: performance.now() - t0,
+      runs: reps.map((r) => r.runId),
+    });
+    updateTrackMetrics(sim, new Map([[skill, runs]]));
+    // Golden per track when it cleared (node-hash only; verify in the browser with harness:replay / gate).
+    const best = bestOf(runs);
+    if (best && best.report.outcome === 'finished') saveRecording(goldenFile(id, skill), best.recording);
+  }
+  const report: SweepReport = {
+    ...runMeta('sweep', started, { physics: first.physicsName }),
+    kind: 'sweep',
+    skill,
+    seeds,
+    budgetMs: budget ?? null,
+    trackWallS,
+    rows,
+  };
+  writeJson(path.join(METRICS_DIR, 'sweep.json'), report);
+  const md = sweepMarkdown(report);
+  fs.writeFileSync(path.join(METRICS_DIR, 'sweep.md'), `# Bot sweep — skill ${skillLabel(skill)}, ${seeds} seed(s), physics ${first.physicsName}, src ${fp0}, git ${report.git}, ${started.toISOString()}\n\n${md}\n`);
+  console.log(`\n${md}\nsweep: harness/out/metrics/sweep.json (+ sweep.md) wall=${((Date.now() - started.getTime()) / 1000).toFixed(0)}s`);
+}
+
 async function main(): Promise<void> {
   const { positional, flags } = parseArgs();
+  const allTracks = flagBool(flags, 'all-tracks');
   const trackId = positional[0];
-  if (!trackId) fail('usage: harness/bot/bot.ts <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms]');
+  if (!trackId && !allTracks) fail('usage: harness/bot/bot.ts <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] | --all-tracks');
   const seeds = Math.max(1, flagNum(flags, 'seeds', 1));
+  if (allTracks) {
+    await sweep(flags, seeds);
+    return;
+  }
   const budget = flags.budget !== undefined ? flagNum(flags, 'budget', 0) : undefined;
   const verify = !flagBool(flags, 'no-verify');
   const verbose = flagBool(flags, 'verbose');
@@ -262,12 +380,13 @@ async function main(): Promise<void> {
     : flagBool(flags, 'oracle')
       ? ['oracle']
       : [Math.max(0, Math.min(3, Math.round(flagNum(flags, 'skill', 3)))) as 0 | 1 | 2 | 3];
-  const probe = await createSim(trackId);
+  const track = trackId!;
+  const probe = await createSim(track);
   const baseSeed = flags.seed !== undefined ? flagNum(flags, 'seed', probe.seed) : probe.seed;
-  console.log(`bot ${trackId}: physics=${probe.physicsName} hz=${probe.hz} finishX=${probe.track.finishX} checkpoints=${probe.track.checkpoints.length} skills=[${skills.map(skillLabel).join(',')}] seeds=${seeds}`);
+  console.log(`bot ${track}: physics=${probe.physicsName} hz=${probe.hz} finishX=${probe.track.finishX} checkpoints=${probe.track.checkpoints.length} skills=[${skills.map(skillLabel).join(',')}] seeds=${seeds}`);
 
   if (flagBool(flags, 'crash-probe')) {
-    const r = await crashProbe(trackId, baseSeed);
+    const r = await crashProbe(track, baseSeed);
     if (r) console.log(`crash-probe: ${r.reason} at tick ${r.faultTick} (${(r.faultTick / probe.hz).toFixed(2)}s) -> ${r.file}`);
     else console.log(`crash-probe: no non-restart fault within 8 s on ${probe.physicsName} (no crash.json written)`);
   }
@@ -277,11 +396,12 @@ async function main(): Promise<void> {
   if (budget !== undefined) runOpts.budgetMs = budget;
   if (flags['max-attempts'] !== undefined) runOpts.maxAttempts = flagNum(flags, 'max-attempts', 50);
   if (flags['max-sim-seconds'] !== undefined) runOpts.maxSimSeconds = flagNum(flags, 'max-sim-seconds', 300);
+  if (flags['track-wall-s'] !== undefined) runOpts.maxWallMs = flagNum(flags, 'track-wall-s', 120) * 1000;
   for (const skill of skills) {
     const runs: RunOnce[] = [];
     for (let k = 0; k < seeds; k++) {
       const seed = (baseSeed + k) >>> 0;
-      const r = await runOnce(trackId, seed, skill, runOpts);
+      const r = await runOnce(track, seed, skill, runOpts);
       runs.push(r);
       printRunLine(r.report);
     }
@@ -307,9 +427,9 @@ async function main(): Promise<void> {
           anyMismatch = true;
           console.error(`MISMATCH skill=${skillLabel(skill)}: node ${best.report.nodeHash} browser ${b.hash} (browser faults=${b.faults} finish=${b.finishTime})`);
         }
-        writeJson(path.join(HARNESS_DIR, 'out', 'bot', trackId, `${best.report.runId}-skill${skillLabel(skill)}.json`), best.report);
+        writeJson(path.join(HARNESS_DIR, 'out', 'bot', track, `${best.report.runId}-skill${skillLabel(skill)}.json`), best.report);
       }
-      const golden = goldenFile(trackId, skill);
+      const golden = goldenFile(track, skill);
       if (best.report.outcome === 'finished' && best.report.browserVerified !== false) {
         saveRecording(golden, best.recording);
         console.log(`golden: ${path.relative(process.cwd(), golden)} (attempts=${best.report.attempts} finish=${best.report.finishTime?.toFixed(3)} hash=${best.report.nodeHash} verified=${best.report.browserVerified ?? 'skipped'})`);
@@ -322,7 +442,7 @@ async function main(): Promise<void> {
   }
   const metrics = updateTrackMetrics(probe, bySkill);
   console.log(
-    `metrics: harness/out/metrics/${trackId}.json curve=[${metrics.curve.map((c) => `${skillLabel(c.skill)}:${c.median}`).join(' ')}] par=${metrics.botParTime ?? 'n/a'} shaped=${metrics.shaped ?? 'n/a'}`,
+    `metrics: harness/out/metrics/${track}.json curve=[${metrics.curve.map((c) => `${skillLabel(c.skill)}:${c.median}`).join(' ')}] par=${metrics.botParTime ?? 'n/a'} shaped=${metrics.shaped ?? 'n/a'}`,
   );
   if (anyMismatch) process.exitCode = 1;
 }

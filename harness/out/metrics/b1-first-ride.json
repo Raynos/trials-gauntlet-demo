@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "b1-first-ride",
+  "updatedAt": "2026-09-14T07:07:33.261Z",
+  "physics": "bikePhysicsFactory",
+  "attemptsBand": [
+    1,
+    1
+  ],
+  "targetAttempts": 1,
+  "curve": [
+    {
+      "skill": 2,
+      "seeds": [
+        138717428,
+        138717429
+      ],
+      "attempts": [
+        1,
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        9.941666666666666,
+        9.941666666666666
+      ]
+    },
+    {
+      "skill": 3,
+      "seeds": [
+        138717428
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        9.608333333333333
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260914-012444-e20a3f",
+    "20260914-012447-c9133a",
+    "20260914-015120-5ebaf5",
+    "20260914-015124-3bb06c",
+    "20260914-020716-a511c9"
+  ]
+}

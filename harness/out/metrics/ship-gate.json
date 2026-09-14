@@ -1,17 +1,19 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260914-011749-3c3b71",
-  "startedAt": "2026-09-14T06:17:49.221Z",
-  "wallMs": 172812,
-  "git": "e692bf2",
+  "runId": "20260914-020739-cdd9f2",
+  "startedAt": "2026-09-14T07:07:39.011Z",
+  "wallMs": 86069,
+  "git": "c9c7735",
+  "srcFingerprint": "f38f0f86",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
   "trackId": "flat-test",
   "thresholdsFile": "harness/gate/thresholds.json",
+  "softwareGL": true,
   "build": {
-    "distBytes": 5388868,
-    "jsGzipBytes": 293767,
+    "distBytes": 5511287,
+    "jsGzipBytes": 301838,
     "buildMs": 0
   },
   "browser": {
@@ -22,44 +24,46 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 182.75462499999958,
+      "value": 41.06141600000001,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 200/177/183"
+      "note": "runs 41/331/36"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 3039.9000000953674,
-      "limit": 900,
+      "value": 4635.5,
+      "limit": 4000,
       "pass": false,
       "unit": "ms",
-      "note": "ready -> first synced frame (SwiftShader)"
+      "note": "ready -> first synced frame; SwiftShader limit; ship target 900ms NOT met (informational on this machine)",
+      "shipLimit": 900,
+      "shipPass": false
     },
     {
       "id": "clear.golden",
-      "value": true,
+      "value": false,
       "limit": true,
-      "pass": true,
-      "note": "bot-oracle.json finish=6.983333333333333 run=6.983 faults=0"
+      "pass": false,
+      "note": "bot-oracle.json finish=null run=undefined faults=2"
     },
     {
       "id": "clear.finishTimeBitEqual",
       "value": true,
       "limit": true,
       "pass": true,
-      "note": "expected 6.983333333333333"
+      "note": "expected null"
     },
     {
       "id": "clear.hashOk",
       "value": true,
       "limit": true,
       "pass": true,
-      "note": "2ceb3e3f3d673985 vs pinned 2ceb3e3f3d673985"
+      "note": "c67529bcbbfd0fd7 vs pinned c67529bcbbfd0fd7"
     },
     {
       "id": "crash.faultWithinS",
-      "value": 1.0833333333333333,
+      "value": 0.7583333333333333,
       "limit": 8,
       "pass": true,
       "unit": "s",
@@ -89,11 +93,13 @@
     },
     {
       "id": "restart.frameMsP95",
-      "value": 74.40000009536743,
-      "limit": 33,
+      "value": 190.5,
+      "limit": 150,
       "pass": false,
       "unit": "ms",
-      "note": "restart -> synced frame (SwiftShader raster included)"
+      "note": "restart -> synced frame; SwiftShader limit; ship target 33ms NOT met (informational on this machine)",
+      "shipLimit": 33,
+      "shipPass": false
     },
     {
       "id": "restart.noCountdown",
@@ -104,27 +110,27 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": 2.08074951171875,
+      "value": -7.8867950439453125,
       "limit": 5,
       "pass": true,
       "unit": "MB",
-      "note": "over 60s of play"
+      "note": "over 10s of play (--quick: shorter than the 60 s the threshold is written for)"
     },
     {
       "id": "perf.drawCallsMax",
-      "value": 165,
+      "value": 239,
       "limit": 300,
       "pass": true
     },
     {
       "id": "perf.trianglesMax",
-      "value": 76210,
+      "value": 256070,
       "limit": 500000,
       "pass": true
     },
     {
       "id": "perf.texturesMBMax",
-      "value": 35.81454669189452,
+      "value": 35.897904968261706,
       "limit": 96,
       "pass": true,
       "unit": "MB"
@@ -138,26 +144,35 @@
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 1.2000000476837158,
+      "value": 1.4000000953674316,
       "limit": 4,
       "pass": true,
+      "unit": "ms"
+    },
+    {
+      "id": "perf.renderSyncedMsP95",
+      "value": 2276.5999999046326,
+      "limit": 250,
+      "pass": false,
       "unit": "ms",
-      "note": "synced p95 1757.2 ms reported only (SwiftShader)"
+      "note": "render + readPixels sync; SwiftShader limit; ship target 16ms NOT met (informational on this machine)",
+      "shipLimit": 16,
+      "shipPass": false
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 286.8818359375,
+      "value": 294.763671875,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 5263 KB raw"
+      "note": "dist 5382 KB raw"
     },
     {
       "id": "determinism.pass",
-      "value": false,
+      "value": true,
       "limit": true,
-      "pass": false,
-      "note": "7/8 checks"
+      "pass": true,
+      "note": "8/8 checks"
     },
     {
       "id": "stranger.medianAttempts",
@@ -167,82 +182,82 @@
       "note": "no attemptsBand on track meta (informational)"
     }
   ],
-  "failed": 3,
+  "failed": 4,
   "pass": false,
   "boot": {
     "runs": [
-      199.883375,
-      176.89512500000092,
-      182.75462499999958
+      41.06141600000001,
+      331.4215829999994,
+      35.706458000000566
     ],
-    "p50": 182.75462499999958,
-    "max": 199.883375,
+    "p50": 41.06141600000001,
+    "max": 331.4215829999994,
     "firstFrameMs": [
-      3797,
-      3039.9000000953674,
-      2830.7999999523163
+      5906.700000047684,
+      4635.5,
+      4371.599999904633
     ]
   },
   "clear": {
     "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-oracle.json",
-    "finishTime": 6.983333333333333,
-    "expected": 6.983333333333333,
-    "hash": "2ceb3e3f3d673985",
-    "expectedHash": "2ceb3e3f3d673985",
-    "faults": 0,
+    "finishTime": null,
+    "expected": null,
+    "hash": "c67529bcbbfd0fd7",
+    "expectedHash": "c67529bcbbfd0fd7",
+    "faults": 2,
     "hashOk": true
   },
   "crash": {
     "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/crash.json",
-    "faultTick": 130,
-    "faultTime": 1.0833333333333333,
+    "faultTick": 91,
+    "faultTime": 0.7583333333333333,
     "reason": "crash"
   },
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0,
+      0.09999990463256836,
+      0.09999990463256836,
       0.10000014305114746,
       0,
-      0.10000014305114746,
-      0.10000014305114746,
+      0.09999990463256836,
+      0,
+      0.09999990463256836,
+      0,
+      0.09999990463256836,
+      0.09999990463256836,
       0.10000014305114746,
       0,
       0,
-      0.10000014305114746,
-      0,
-      0.10000014305114746,
       0.09999990463256836,
       0,
       0,
       0,
       0,
-      0.09999990463256836,
-      0.10000014305114746,
       0,
-      0.10000014305114746
+      0
     ],
     "frameMs": [
-      388.09999990463257,
-      74.40000009536743,
-      73.09999990463257,
-      66.70000004768372,
-      67.10000014305115,
-      73.70000004768372,
-      71.30000019073486,
-      66.70000004768372,
-      65.80000019073486,
-      69.39999985694885,
-      66.5,
-      63.299999952316284,
-      63.90000009536743,
-      67.59999990463257,
-      65.79999995231628,
-      66.39999985694885,
-      64.29999995231628,
-      65.90000009536743,
-      66.60000014305115,
-      65.5
+      606,
+      162.29999995231628,
+      124.30000019073486,
+      184.60000014305115,
+      124.59999990463257,
+      189.10000014305115,
+      126.09999990463257,
+      182.20000004768372,
+      132.5,
+      190.5,
+      129.20000004768372,
+      182.90000009536743,
+      123.59999990463257,
+      147.59999990463257,
+      146.40000009536743,
+      140.19999980926514,
+      167.20000004768372,
+      139.20000004768372,
+      175.40000009536743,
+      127.40000009536743
     ],
     "noCountdown": true,
     "movesOnFirstTick": true
@@ -254,90 +269,71 @@
     "autoRespawnMs": 1016.6666666666666
   },
   "heap": {
-    "beforeMB": 12.80160903930664,
-    "afterMB": 14.88235855102539,
-    "growthMB": 2.08074951171875,
-    "seconds": 60
+    "beforeMB": 17.021835327148438,
+    "afterMB": 9.135040283203125,
+    "growthMB": -7.8867950439453125,
+    "seconds": 10
   },
   "perf": {
-    "drawCalls": 165,
-    "triangles": 76210,
-    "texturesMB": 35.81454669189452,
+    "drawCalls": 239,
+    "triangles": 256070,
+    "texturesMB": 35.897904968261706,
     "physicsUsPerTickP95": 50.00007152557373,
-    "renderSubmitMsP95": 1.2000000476837158,
-    "renderSyncedMsP95": 1757.2000000476837
+    "renderSubmitMsP95": 1.4000000953674316,
+    "renderSyncedMsP95": 2276.5999999046326
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260914-012018-421621",
-    "startedAt": "2026-09-14T06:20:18.586Z",
-    "wallMs": 23434,
-    "git": "e692bf2",
+    "runId": "20260914-020858-8ae8b1",
+    "startedAt": "2026-09-14T07:08:58.403Z",
+    "wallMs": 6649,
+    "git": "c9c7735",
+    "srcFingerprint": "f38f0f86",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
     "physics": "bikePhysicsFactory",
     "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-oracle.json",
-    "ticks": 838,
+    "ticks": 927,
     "checks": [
       {
         "id": "D1",
         "name": "cross-load",
         "pass": true,
         "hashes": [
-          "2ceb3e3f3d673985",
-          "2ceb3e3f3d673985"
+          "c67529bcbbfd0fd7",
+          "c67529bcbbfd0fd7"
         ],
-        "note": "2 loads, finish=6.983333333333333"
+        "note": "2 loads, finish=null"
       },
       {
         "id": "D2",
         "name": "cross-encoding",
         "pass": true,
         "hashes": [
-          "bb28b29a64190a45",
-          "bb28b29a64190a45"
+          "c67529bcbbfd0fd7",
+          "c67529bcbbfd0fd7"
         ]
       },
       {
         "id": "D3",
         "name": "node-vs-browser",
-        "pass": false,
+        "pass": true,
         "hashes": [
-          "bb28b29a64190a45",
-          "2ceb3e3f3d673985"
+          "c67529bcbbfd0fd7",
+          "c67529bcbbfd0fd7"
         ],
-        "note": "first divergent tick 0: bike.pos.x, bike.pos.y, bike.vel.x, bike.vel.y, bike.angle, bike.angVel",
-        "firstDivergentTick": 0,
-        "diffPaths": [
-          "bike.pos.x",
-          "bike.pos.y",
-          "bike.vel.x",
-          "bike.vel.y",
-          "bike.angle",
-          "bike.angVel",
-          "wheels.rear.pos.x",
-          "wheels.rear.spin",
-          "wheels.rear.spinVel",
-          "wheels.rear.compression",
-          "wheels.front.pos.x",
-          "wheels.front.spin",
-          "wheels.front.spinVel",
-          "wheels.front.compression",
-          "rider.crouch",
-          "rider.torsoPitch",
-          "rearSlip"
-        ]
+        "note": "physics=bikePhysicsFactory"
       },
       {
         "id": "D4",
         "name": "snapshot-node",
         "pass": true,
         "hashes": [
-          "034e378fd91e2913",
-          "355d0dace93db103",
-          "4d38cb97eee785cc",
-          "5916f1e43d02c5ee"
+          "e832e6e21c3e1966",
+          "e959fd8327726cd6",
+          "e8dba4a0e86058f7",
+          "bff02b614c189d09"
         ]
       },
       {
@@ -345,9 +341,9 @@
         "name": "snapshot-browser",
         "pass": true,
         "hashes": [
-          "271e6e3770b164cf",
-          "aea15468d1a1dda9",
-          "c7fa14930dc84a55"
+          "e832e6e21c3e1966",
+          "e959fd8327726cd6",
+          "e8dba4a0e86058f7"
         ]
       },
       {
@@ -355,11 +351,11 @@
         "name": "chunking",
         "pass": true,
         "hashes": [
-          "2ceb3e3f3d673985",
-          "2ceb3e3f3d673985",
-          "2ceb3e3f3d673985",
-          "2ceb3e3f3d673985",
-          "2ceb3e3f3d673985"
+          "c67529bcbbfd0fd7",
+          "c67529bcbbfd0fd7",
+          "c67529bcbbfd0fd7",
+          "c67529bcbbfd0fd7",
+          "c67529bcbbfd0fd7"
         ],
         "note": "chunks 1,7,15,120 + runRecording"
       },
@@ -368,8 +364,8 @@
         "name": "no-state-leak",
         "pass": true,
         "hashes": [
-          "2ceb3e3f3d673985",
-          "2ceb3e3f3d673985"
+          "c67529bcbbfd0fd7",
+          "c67529bcbbfd0fd7"
         ]
       },
       {
@@ -377,11 +373,11 @@
         "name": "pinned-hash",
         "pass": true,
         "hashes": [
-          "6b758241feca3292"
+          "1b77c919b99399fc"
         ],
         "note": "re-pinned (--pin)"
       }
     ],
-    "pass": false
+    "pass": true
   }
 }

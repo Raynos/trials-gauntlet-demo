@@ -12,6 +12,8 @@ export interface RunMeta {
   startedAt: string;
   wallMs: number;
   git: string;
+  /** FNV over src/physics, src/tracks, src/core, src/game/rules.ts in the working tree (see metrics.ts). */
+  srcFingerprint?: string;
   node: string;
   chromium?: string;
   /** Physics implementation the run used (MockPhysics | bikePhysicsFactory | ...). */
@@ -32,6 +34,47 @@ export interface FaultEvent {
 }
 
 export type Skill = 0 | 1 | 2 | 3 | 'oracle';
+
+/** The first fault of a run, located against the track's placed obstacles. */
+export interface Blocker {
+  /** A fault reason, or 'stuck' when the run never faulted and never finished (parked against something). */
+  reason: FaultReason | 'stuck';
+  x: number;
+  checkpoint: number;
+  runTime: number;
+  /** Nearest placed obstacle within [-2, +8] m ahead of the fault, or 'ground'. */
+  obstacle: { kind: string; x: number; index: number } | null;
+}
+
+/** `harness/out/metrics/sweep.json`: one row per track, the tracks/physics owners' first input. */
+export interface SweepRow {
+  trackId: string;
+  tier: string;
+  technique: string;
+  finishX: number;
+  attemptsBand: [number, number] | null;
+  skill: Skill;
+  seeds: number[];
+  /** Best distance over seeds (m) and as % of finishX. */
+  bestX: number;
+  bestPct: number;
+  clears: number;
+  attempts: number[];
+  attemptsMedian: number;
+  finishTimes: (number | null)[];
+  outcomes: string[];
+  firstBlocker: Blocker | null;
+  wallMs: number;
+  runs: string[];
+}
+export interface SweepReport extends RunMeta {
+  kind: 'sweep';
+  skill: Skill;
+  seeds: number;
+  budgetMs: number | null;
+  trackWallS: number;
+  rows: SweepRow[];
+}
 
 export interface BeamConfig {
   width: number;
@@ -59,7 +102,11 @@ export interface BotRunReport extends RunMeta {
   skill: Skill;
   config: BeamConfig;
   weights: ScoreWeights;
-  outcome: 'finished' | 'maxAttempts' | 'timeout' | 'stuck';
+  outcome: 'finished' | 'maxAttempts' | 'timeout' | 'wallTimeout' | 'stuck';
+  /** Furthest x reached (m) and as a fraction of finishX. */
+  maxX: number;
+  progress: number;
+  firstBlocker: Blocker | null;
   /** 1 + faults (CONTRACT §3). */
   attempts: number;
   faults: FaultEvent[];
@@ -169,8 +216,12 @@ export interface PairAnswer {
 export interface GateCheck {
   id: string;
   value: number | boolean | string | null;
+  /** The limit applied (SwiftShader override on this machine when one exists). */
   limit: number | boolean | null;
   pass: boolean;
+  /** Real-hardware ship target when it differs from `limit`, and whether the value meets it. */
+  shipLimit?: number;
+  shipPass?: boolean;
   unit?: string;
   note?: string;
 }
@@ -197,6 +248,8 @@ export interface GateReport extends RunMeta {
   kind: 'gate';
   trackId: string;
   thresholdsFile: string;
+  /** True when the renderer is SwiftShader/software GL and the scaled limits applied. */
+  softwareGL: boolean;
   build: { distBytes: number; jsGzipBytes: number; buildMs: number };
   browser: { version: string; renderer: string; flagSet: string };
   checks: GateCheck[];

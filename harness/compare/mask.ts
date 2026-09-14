@@ -25,6 +25,8 @@ export interface HudRegion {
 export const DEFAULT_HUD_REGIONS: readonly HudRegion[] = [
   { x: 0, y: 0, w: 1, h: 0.12 },
   { x: 0.72, y: 0, w: 0.28, h: 0.22 },
+  // Our build draws a control-hint strip along the bottom edge (beginner tier); a giveaway.
+  { x: 0, y: 0.92, w: 1, h: 0.08 },
 ];
 
 function frac(n: number, name: string): number {

@@ -23,6 +23,8 @@
     "harness:log-verdict": "tsx harness/compare/log.ts",
     "harness:determinism": "tsx harness/gate/determinism.ts",
     "harness:gate": "tsx harness/gate/ship-gate.ts",
+    "harness:round": "tsx harness/round.ts",
+    "harness:critic-prompt": "tsx harness/compare/critic-prompt.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"

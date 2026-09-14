@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "m1-hop-up",
+  "updatedAt": "2026-09-14T06:53:25.338Z",
+  "physics": "bikePhysicsFactory",
+  "attemptsBand": [
+    5,
+    9
+  ],
+  "targetAttempts": 9,
+  "curve": [
+    {
+      "skill": 2,
+      "seeds": [
+        1909798049,
+        1909798050
+      ],
+      "attempts": [
+        50,
+        50
+      ],
+      "median": 50,
+      "finishTimes": [
+        null,
+        null
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": {
+    "checkpoint": 1,
+    "share": 1
+  },
+  "runs": [
+    "20260914-012841-e63cb7",
+    "20260914-012845-87bf40",
+    "20260914-015215-e386c4",
+    "20260914-015252-fe27d5"
+  ]
+}

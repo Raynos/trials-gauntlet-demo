@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "stranger-metrics",
+  "trackId": "b1-first-ride",
+  "attemptsBand": [
+    1,
+    1
+  ],
+  "sessions": [
+    {
+      "sessionId": "b1-first-ride-20260914-013710",
+      "agent": "harness-smoke",
+      "strangerAttempts": 5,
+      "cleared": false,
+      "finishTime": null,
+      "calls": 19,
+      "wallMs": 169316
+    }
+  ],
+  "medianAttempts": 5,
+  "pass": false,
+  "updatedAt": "2026-09-14T06:39:59.395Z"
+}

@@ -13,6 +13,9 @@ stranger** (AGENTS.md). Everything below produces numbers or clips for that.
 | command | what it proves | output |
 | --- | --- | --- |
 | `pnpm harness:bot <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] [--crash-probe] [--no-verify]` | attempts-to-clear per skill (beam search in node, committed play with in-band restarts), 0-fault oracle par, browser-verified golden recordings, a deterministic crash recording | `out/metrics/<trackId>.json` (committed), `out/bot/<trackId>/<runId>-skill<k>.json`, `inputs/<trackId>/bot-<skill>.json`, `inputs/<trackId>/crash.json` |
+| `pnpm harness:bot --all-tracks [--skill 2] [--seeds 2] [--track-wall-s 90] [--tracks a,b]` | **track sweep**: budget-capped committed play on every registered track; best distance (m, % of finishX), clears, attempts, first blocker (fault reason + x + nearest placed obstacle) | `out/metrics/sweep.json` + `sweep.md` (committed), goldens for cleared tracks |
+| `pnpm harness:round [--build] [--quick] [--pin] [--tracks flat-test,gap-test,b1-first-ride]` | **per-round check**: bot on three tracks (+ crash probe), determinism, ship gate; exit = failed steps | all of the below |
+| `pnpm harness:critic-prompt <pair-id>` | the exact, self-contained prompt for a blind critic (tag, sheet + mp4 paths, RUBRIC sections, JSON shape); hand to a fresh agent unchanged | `out/compare/pair-<id>.prompt.md` |
 | `pnpm harness:stranger <start\|look\|play "<slots>"\|restart\|reset\|status\|done> [--track id] [--session id]` | attempts-to-clear for a fresh agent that knows only `stranger/PROTOCOL.md`; 150 calls / 25 min budget; pass = median ≤ 1.5 × `meta.attemptsBand[1]` | `out/stranger/<track>/<session>/{state,session}.json`, `out/metrics/<trackId>.stranger.json` (committed), `inputs/<trackId>/stranger-<session>.json` |
 | `pnpm harness:pair <ours.mp4> <ref.mp4> --tag <manoeuvre> [--seed N] [--mask] [--align a:b]` | blind side-by-side: both clips to 640×360@30, seeded L/R coin, `hstack` mp4 + 2×8 sheet, sealed answer (chmod 000) | `out/compare/pair-<id>.mp4`, `pair-<id>-sheet.jpg`, `pair-<id>.answer.json` |
 | `pnpm harness:log-verdict <pair-id> --verdict '<json>' [--critic name]` | validates a critic verdict, unmasks, appends; running oursWinRate / positionBias per tag | `out/metrics/compare.jsonl` (committed) |
@@ -32,7 +35,9 @@ first), `--json`, `--verbose`. Thresholds live **only** in
 ## Round workflow (what the parent runs)
 
 ```
-pnpm harness:bot <track> --all --seeds 3 --crash-probe   # goldens + curve + crash.json, browser-verified
+pnpm harness:round --build                               # bot flat-test/gap-test/b1 + determinism + gate
+pnpm harness:bot --all-tracks --skill 2 --seeds 2        # the sweep table for tracks/physics owners
+pnpm harness:bot <track> --all --seeds 3 --crash-probe   # full curve on one track, browser-verified
 pnpm harness:gate --build                                # numbers vs thresholds -> out/metrics/ship-gate.json
 pnpm harness:capture harness/inputs/<track>/bot-oracle.json
 pnpm harness:pair harness/out/capture/bot-oracle/clip.mp4 reference/techniques/clips/13-*.mp4 --tag wheelie-launch --mask
@@ -78,6 +83,13 @@ restart flag is in-band, so attempts are countable from the recording alone.
   gate runs. `BrowserVerifier` serves a **frozen copy** of `dist/` and warns
   when `dist/` is older than `src/` (node and browser would run different
   code — pass `--build`). D3 catches the rest.
+- Every report carries `srcFingerprint` (FNV over `src/physics`, `src/tracks`, `src/core`,
+  `src/game/rules.ts` in the working tree) next to `git`: in a shared checkout HEAD does not
+  say what ran. The sweep warns when the fingerprint changes under it; re-run it then.
+- Thresholds: `gate/thresholds.json` top level = real-hardware ship targets; the `swiftshader`
+  block overrides `boot.firstFrameMs`, `restart.frameMsP95`, `perf.renderSyncedMsP95` when the
+  renderer string says SwiftShader. The check line prints both, and `ship-gate.json` keeps
+  `shipLimit`/`shipPass` per affected check.
 - Timing precision inside headless Chromium is 0.1 ms; sub-0.1 ms prints as 0.
 - SwiftShader is a CPU rasterizer: synced render ms (and everything downstream
   of a synced frame: `boot.firstFrameMs`, `restart.frameMsP95`) are pessimistic

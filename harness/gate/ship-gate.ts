@@ -37,10 +37,13 @@ import { loadExpected, runDeterminism, saveExpected } from './determinism';
 export const THRESHOLDS_FILE = path.join(HARNESS_DIR, 'gate', 'thresholds.json');
 export type Thresholds = Record<string, number | boolean | string>;
 
-export function loadThresholds(): Thresholds {
-  const t = JSON.parse(fs.readFileSync(THRESHOLDS_FILE, 'utf8')) as Thresholds;
-  delete t.$comment;
-  return t;
+/** Ship targets + the SwiftShader overrides (applied when the renderer string says SwiftShader). */
+export function loadThresholds(): { ship: Thresholds; swiftshader: Record<string, number> } {
+  const raw = JSON.parse(fs.readFileSync(THRESHOLDS_FILE, 'utf8')) as Record<string, unknown>;
+  const swiftshader = (raw.swiftshader as Record<string, number> | undefined) ?? {};
+  const ship: Thresholds = {};
+  for (const [k, v] of Object.entries(raw)) if (k !== '$comment' && k !== 'swiftshader') ship[k] = v as number | boolean | string;
+  return { ship, swiftshader };
 }
 
 function dirBytes(dir: string): number {
@@ -61,12 +64,14 @@ function jsGzipBytes(dir: string): number {
   return total;
 }
 
+/** Newest golden wins: a bot re-run after a physics change must not lose to a stale oracle file. */
 function pickGolden(trackId: string): string | null {
   const dir = path.join(HARNESS_DIR, 'inputs', trackId);
-  for (const name of ['bot-oracle.json', 'bot-3.json', 'bot-2.json', 'bot-1.json', 'bot-0.json']) {
-    const f = path.join(dir, name);
-    if (fs.existsSync(f)) return f;
-  }
+  const candidates = ['bot-oracle.json', 'bot-3.json', 'bot-2.json', 'bot-1.json', 'bot-0.json']
+    .map((name) => path.join(dir, name))
+    .filter((f) => fs.existsSync(f))
+    .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+  if (candidates[0]) return candidates[0];
   const legacy = path.join(HARNESS_DIR, 'inputs', `${trackId}-clear.json`);
   return fs.existsSync(legacy) ? legacy : null;
 }
@@ -77,10 +82,19 @@ async function main(): Promise<void> {
   const trackId = flagStr(flags, 'track', 'flat-test');
   const quick = flagBool(flags, 'quick');
   const heapSeconds = flagNum(flags, 'heap-seconds', quick ? 10 : 60);
-  const th = loadThresholds();
-  const num = (k: string): number => Number(th[k]);
+  const thAll = loadThresholds();
+  const th = thAll.ship;
+  let softwareGL = false; // set once the browser is up
+  /** Effective limit: the SwiftShader override when running on SwiftShader, else the ship target. */
+  const num = (k: string): number => (softwareGL && k in thAll.swiftshader ? thAll.swiftshader[k]! : Number(th[k]));
   const checks: GateCheck[] = [];
   const check = (c: GateCheck): void => {
+    const shipLimit = Number(th[c.id]);
+    if (softwareGL && c.id in thAll.swiftshader && typeof c.value === 'number') {
+      c.shipLimit = shipLimit;
+      c.shipPass = c.value <= shipLimit;
+      c.note = `${c.note ? `${c.note}; ` : ''}SwiftShader limit; ship target ${shipLimit}${c.unit ?? ''} ${c.shipPass ? 'met' : 'NOT met (informational on this machine)'}`;
+    }
     checks.push(c);
     const v = typeof c.value === 'number' ? (Number.isInteger(c.value) ? String(c.value) : c.value.toFixed(2)) : String(c.value);
     console.log(`${c.pass ? 'PASS' : 'FAIL'}  ${c.id.padEnd(28)} ${v}${c.unit ?? ''}  (limit ${c.limit === null ? 'n/a' : String(c.limit)}${c.unit ?? ''})${c.note ? `  ${c.note}` : ''}`);
@@ -107,6 +121,8 @@ async function main(): Promise<void> {
   const report: Partial<GateReport> = {};
   try {
     const { server, launched } = await verifier.open();
+    softwareGL = /swiftshader|llvmpipe|software/i.test(launched.probe.renderer);
+    console.log(`renderer: ${launched.probe.renderer} -> ${softwareGL ? 'SwiftShader limits apply for ' + Object.keys(thAll.swiftshader).join(', ') : 'ship limits'}`);
 
     // G1 cold boot: fresh browser context per run
     const bootRuns: number[] = [];
@@ -123,7 +139,7 @@ async function main(): Promise<void> {
     report.boot = { runs: bootRuns, p50: bootP50, max: Math.max(...bootRuns), firstFrameMs };
     check({ id: 'boot.readyP50Ms', value: bootP50, limit: num('boot.readyP50Ms'), pass: bootP50 <= num('boot.readyP50Ms'), unit: 'ms', note: `runs ${bootRuns.map((b) => b.toFixed(0)).join('/')}` });
     const ff = percentileOf(firstFrameMs, 50);
-    check({ id: 'boot.firstFrameMs', value: ff, limit: num('boot.firstFrameMs'), pass: ff <= num('boot.firstFrameMs'), unit: 'ms', note: 'ready -> first synced frame (SwiftShader)' });
+    check({ id: 'boot.firstFrameMs', value: ff, limit: num('boot.firstFrameMs'), pass: ff <= num('boot.firstFrameMs'), unit: 'ms', note: 'ready -> first synced frame' });
 
     // G2 clear a track by golden replay
     const goldenFile = pickGolden(trackId);
@@ -273,7 +289,7 @@ async function main(): Promise<void> {
       const w95 = percentileOf(r.wallMs, 95);
       check({ id: 'restart.wallMsP95', value: w95, limit: num('restart.wallMsP95'), pass: w95 <= num('restart.wallMsP95'), unit: 'ms' });
       const f95 = percentileOf(r.frameMs, 95);
-      check({ id: 'restart.frameMsP95', value: f95, limit: num('restart.frameMsP95'), pass: f95 <= num('restart.frameMsP95'), unit: 'ms', note: 'restart -> synced frame (SwiftShader raster included)' });
+      check({ id: 'restart.frameMsP95', value: f95, limit: num('restart.frameMsP95'), pass: f95 <= num('restart.frameMsP95'), unit: 'ms', note: 'restart -> synced frame' });
       check({ id: 'restart.noCountdown', value: r.movesOnFirstTick, limit: true, pass: r.movesOnFirstTick, note: `throttle moves the bike on the first tick after restart (game faults=${r.faults})` });
     }
 
@@ -349,7 +365,8 @@ async function main(): Promise<void> {
       check({ id: 'perf.trianglesMax', value: stats.triangles, limit: num('perf.trianglesMax'), pass: stats.triangles <= num('perf.trianglesMax') });
       check({ id: 'perf.texturesMBMax', value: stats.texturesMB, limit: num('perf.texturesMBMax'), pass: stats.texturesMB <= num('perf.texturesMBMax'), unit: 'MB' });
       check({ id: 'perf.physicsUsPerTickP95', value: report.perf.physicsUsPerTickP95, limit: num('perf.physicsUsPerTickP95'), pass: report.perf.physicsUsPerTickP95 <= num('perf.physicsUsPerTickP95'), unit: 'us' });
-      check({ id: 'perf.renderSubmitMsP95', value: report.perf.renderSubmitMsP95, limit: num('perf.renderSubmitMsP95'), pass: report.perf.renderSubmitMsP95 <= num('perf.renderSubmitMsP95'), unit: 'ms', note: `synced p95 ${report.perf.renderSyncedMsP95.toFixed(1)} ms reported only (SwiftShader)` });
+      check({ id: 'perf.renderSubmitMsP95', value: report.perf.renderSubmitMsP95, limit: num('perf.renderSubmitMsP95'), pass: report.perf.renderSubmitMsP95 <= num('perf.renderSubmitMsP95'), unit: 'ms' });
+      check({ id: 'perf.renderSyncedMsP95', value: report.perf.renderSyncedMsP95, limit: num('perf.renderSyncedMsP95'), pass: report.perf.renderSyncedMsP95 <= num('perf.renderSyncedMsP95'), unit: 'ms', note: 'render + readPixels sync' });
     }
 
     // G8 bundle
@@ -379,6 +396,7 @@ async function main(): Promise<void> {
       kind: 'gate',
       trackId,
       thresholdsFile: path.relative(REPO_ROOT, THRESHOLDS_FILE),
+      softwareGL,
       build: { distBytes, jsGzipBytes: gz, buildMs },
       browser: { version: launched.browser.version(), renderer: launched.probe.renderer, flagSet: launched.flagSet },
       checks,

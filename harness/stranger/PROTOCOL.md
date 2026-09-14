@@ -14,6 +14,20 @@ Rules of the game:
   as calls too. When the budget is gone, `play`/`restart`/`reset` answer `{"budget":"exhausted"}`;
   call `done` at that point.
 
+## Setup (do this first, once)
+
+Everything runs from the game's folder. Open a shell there and start your session:
+
+```
+cd /Users/raynos/projects/game-demos/trials-gauntlet-demo
+pnpm harness:stranger start --track b1-first-ride --agent <your-name>
+```
+
+(If whoever handed you this file named a different track, use that id instead of `b1-first-ride`.)
+The output begins with a JSON object whose `sessionId` is **your session id** for every later
+command, followed by your first `look`. Nothing else needs installing; do not read or edit any other
+file in that folder — the track is meant to be discovered by riding it.
+
 ## The tool
 
 One shell command per action. Always pass your session id.
@@ -24,6 +38,7 @@ pnpm harness:stranger <cmd> [args] --session <id>
 
 | command | what it does |
 | --- | --- |
+| `start --track <id> --agent <name>` | create your session (once). Prints the session id and a first `look`. |
 | `look` | JSON numbers + an ASCII side-view of the next ~40 m of track (`B` = you, `\|` = checkpoint, `F` = finish, `_ / \` = ground and ramps, `#` = block, `o` = drum, `~` = seesaw plank, `x` = hazard, a ruler with x in metres underneath). |
 | `status` | the JSON numbers only. |
 | `play "<slots>"` | drive for up to 40 slots of 1/8 s each. Returns a JSON summary, then one trace line per slot (`x`, `vx`, angle, ground/AIR). Stops early at a crash or the finish. |
@@ -80,3 +95,8 @@ DONE
 
 When you have finished the track, or you are stuck and out of ideas or budget, run `done` and then
 reply with the single word **DONE** followed by one sentence on what the hardest part was.
+
+Reading the side-view: the ground is drawn with `_` (flat), `/` (uphill) and `\` (downhill); a `#`
+block or `/` ramp ahead means you need speed and/or a lifted front wheel; a gap in the ground line is
+a hole you must jump. The ruler underneath gives x in metres so you can count how many slots of riding
+(at your current `vx`) reach it. When in doubt, `play` short strings (4–8 slots), `look`, adjust.

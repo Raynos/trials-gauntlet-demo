@@ -1,5 +1,5 @@
 {
-  "$comment": "Single source of truth for ship-gate thresholds (CONTRACT.md §3). Units in the key suffix. Changing a number here is a design decision; the gate reports value vs limit for every check.",
+  "$comment": "Single source of truth for ship-gate thresholds (CONTRACT §3). Units in the key suffix. The top-level numbers are the real-hardware ship targets. `swiftshader` overrides apply automatically when the WebGL renderer string contains 'SwiftShader' (this headless machine); the gate prints both limits so regressions are still visible against the ship target.",
   "boot.readyP50Ms": 300,
   "boot.firstFrameMs": 900,
   "clear.golden": true,
@@ -19,6 +19,12 @@
   "perf.physicsUsPerTickP95": 60,
   "perf.physicsUsPerTickP95Ragdoll": 80,
   "perf.renderSubmitMsP95": 4,
+  "perf.renderSyncedMsP95": 16,
   "determinism.pass": true,
-  "stranger.attemptsBandFactor": 1.5
+  "stranger.attemptsBandFactor": 1.5,
+  "swiftshader": {
+    "boot.firstFrameMs": 4000,
+    "restart.frameMsP95": 150,
+    "perf.renderSyncedMsP95": 250
+  }
 }

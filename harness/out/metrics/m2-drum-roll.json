@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "m2-drum-roll",
+  "updatedAt": "2026-09-14T06:55:25.444Z",
+  "physics": "bikePhysicsFactory",
+  "attemptsBand": [
+    6,
+    12
+  ],
+  "targetAttempts": 12,
+  "curve": [
+    {
+      "skill": 2,
+      "seeds": [
+        3505190447,
+        3505190448
+      ],
+      "attempts": [
+        2,
+        2
+      ],
+      "median": 2,
+      "finishTimes": [
+        null,
+        null
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": {
+    "checkpoint": 0,
+    "share": 1
+  },
+  "runs": [
+    "20260914-012849-cb6c3a",
+    "20260914-013019-1da9a2",
+    "20260914-015325-4c4cda",
+    "20260914-015425-36970e"
+  ]
+}
