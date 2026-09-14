@@ -12,7 +12,13 @@ export class InputMux {
   private readonly sources: InputSource[] = [];
   private readonly scratch: InputFrame = { ...NEUTRAL_INPUT };
   private readonly merged: InputFrame = { ...NEUTRAL_INPUT };
-  private active: InputDevice | null = null;
+  /**
+   * Before any device has produced input, a coarse-pointer device (phone, tablet) is presumed to be
+   * touch so the menus never show the keyboard legend (the phone's track select read "ENTER SELECT
+   * · ESC BACK" until the first swipe); a keyboard or pad takes over on its first press as usual.
+   */
+  private active: InputDevice | null =
+    typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches ? 'touch' : null;
   private activeChangedAt = 0;
   private frameIndex = 0;
   /** Called when the active device changes. */

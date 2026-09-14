@@ -6,7 +6,15 @@
  */
 export function registerServiceWorker(onUpdate: (reload: () => void) => void): void {
   if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
-  const arm = (w: ServiceWorker): void => onUpdate(() => w.postMessage({ type: 'SKIP_WAITING' }));
+  // Only a user-requested update may reload the page. `clients.claim()` in a freshly installed
+  // worker also fires `controllerchange` on the very first visit (and whenever iOS has evicted
+  // the worker) — reloading there is the "loads twice back to back" bug.
+  let requested = false;
+  const arm = (w: ServiceWorker): void =>
+    onUpdate(() => {
+      requested = true;
+      w.postMessage({ type: 'SKIP_WAITING' });
+    });
   const run = async (): Promise<void> => {
     try {
       const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
@@ -20,7 +28,7 @@ export function registerServiceWorker(onUpdate: (reload: () => void) => void): v
       });
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
+        if (refreshing || !requested) return;
         refreshing = true;
         location.reload();
       });
