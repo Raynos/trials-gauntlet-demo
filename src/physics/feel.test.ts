@@ -829,41 +829,44 @@ describe('drums and logs (round 4)', () => {
 });
 
 describe('rider pose from the rider mass (round 4, blind critic: "rider bolted to bike")', () => {
-  function step(from: number, to: number): { t90: number; overshoot: number; torsoT90: number; settleLean: number } {
+  function step(from: number, to: number): { t90: number; overshoot: number; torsoPeak: number; torsoSettleT: number; settleLean: number; settleTorso: number; maxCrouch: number } {
     const w = flatWorld();
     w.teleport({ pos: { x: 0, y: R }, angle: 0, vel: { x: 6, y: 0 } });
     stepN(w, { throttle: 0.3, lean: from }, 120);
     const l0 = w.getState().rider.lean;
-    const tp0 = w.getState().rider.torsoPitch;
     let t90 = -1;
-    let torsoT90 = -1;
     let peak = from;
-    let tpEnd = tp0;
+    let torsoPeak = 0;
+    let torsoSettleT = -1;
+    let maxCrouch = 0;
+    const t0 = w.getState().time;
     stepN(w, { throttle: 0.3, lean: to }, 90, (s) => {
       const l = s.rider.lean;
       if (t90 < 0 && (l - l0) / (to - l0) >= 0.9) t90 = s.time;
       if ((l - from) * Math.sign(to - from) > (peak - from) * Math.sign(to - from)) peak = l;
-      tpEnd = s.rider.torsoPitch;
-    });
-    // torso: 90 % of its own final swing
-    const w2 = flatWorld();
-    w2.teleport({ pos: { x: 0, y: R }, angle: 0, vel: { x: 6, y: 0 } });
-    stepN(w2, { throttle: 0.3, lean: from }, 120);
-    const t0 = w2.getState().time;
-    stepN(w2, { throttle: 0.3, lean: to }, 90, (s) => {
-      if (torsoT90 < 0 && Math.abs(s.rider.torsoPitch - tp0) >= 0.9 * Math.abs(tpEnd - tp0)) torsoT90 = s.time - t0;
+      // torsoPitch is the torso store's transient (round 10): it peaks while the swing lags the lean and returns to ~0
+      if (Math.abs(s.rider.torsoPitch) > Math.abs(torsoPeak)) torsoPeak = s.rider.torsoPitch;
+      if (Math.abs(s.rider.torsoPitch) > 0.02) torsoSettleT = s.time - t0;
+      maxCrouch = Math.max(maxCrouch, s.rider.crouch);
     });
     const tStart = 120 / HZ + 60 / HZ;
-    return { t90: t90 - tStart, overshoot: (peak - to) * Math.sign(to - from), torsoT90, settleLean: w.getState().rider.lean };
+    const end = w.getState().rider;
+    return { t90: t90 - tStart, overshoot: (peak - to) * Math.sign(to - from), torsoPeak, torsoSettleT, settleLean: end.lean, settleTorso: end.torsoPitch, maxCrouch };
   }
-  it('a lean step 0 -> +1 reaches 90 % of the pose in 0.15-0.35 s (a 0.73 m shift of 75 kg under the 2 kN brace cap: 0.28 s, no overshoot); the torso swing lags further; the pose settles at the input', () => {
+  it('a lean step 0 -> +1 reaches 90 % of the pose in 0.15-0.35 s (a 0.73 m shift of 75 kg under the 2 kN brace cap: 0.28 s, no overshoot); the pose settles at the input; torsoPitch is the transient only and crouch the hop preload only (round 10, RIDER_CHAIN.md "Curves")', () => {
     const f = step(0, 1);
     const b = step(0, -1);
     feel('pose.lean.t90.fwd', f.t90, '0.15-0.35 s (design asked 0.10-0.15; the brace cap sets it)');
     feel('pose.lean.overshoot.fwd', f.overshoot, '0-0.1 (slight)');
     feel('pose.lean.t90.back', b.t90, '0.15-0.35 s');
     feel('pose.lean.overshoot.back', b.overshoot, '0-0.1');
-    feel('pose.torso.t90.fwd', f.torsoT90, 'info (torque-limited motor, slower than the mass)');
+    feel('pose.torso.transientPeak.fwd', f.torsoPeak, 'info (rad; the swing lagging the lean, + = pitched forward)');
+    feel('pose.torso.transientPeak.back', b.torsoPeak, 'info');
+    feel('pose.torso.settleT.fwd', f.torsoSettleT, '< 0.75 s (back within 0.02 rad)');
+    feel('pose.torso.settled.fwd', f.settleTorso, '|x| < 0.03 (no steady lean bias; was -0.34 per unit lean)');
+    feel('pose.torso.settled.back', b.settleTorso, '|x| < 0.03');
+    feel('pose.crouch.leanOnly.fwd', f.maxCrouch, '0 (a lean is not a crouch; was 1.0 at lean >= 0.6)');
+    feel('pose.crouch.leanOnly.back', b.maxCrouch, '0 (was 0.67 at lean -1; throttle 0.3 is the hop threshold, lean -1 preloads)');
     feel('pose.lean.settle.fwd', f.settleLean, '0.9-1');
     expect(f.t90).toBeGreaterThan(0.15);
     expect(f.t90).toBeLessThan(0.35);
@@ -873,6 +876,28 @@ describe('rider pose from the rider mass (round 4, blind critic: "rider bolted t
     expect(f.overshoot).toBeLessThan(0.15);
     expect(f.settleLean).toBeGreaterThan(0.9);
     expect(b.settleLean).toBeLessThan(-0.9);
+    expect(Math.abs(f.settleTorso)).toBeLessThan(0.03);
+    expect(Math.abs(b.settleTorso)).toBeLessThan(0.03);
+    expect(f.torsoSettleT).toBeLessThan(0.75);
+    expect(f.maxCrouch).toBe(0);
+  });
+  it('crouch reports the hop preload alone: 0 through a lean-forward and a lean-back below the hop threshold, the eased preload state during one', () => {
+    const w = flatWorld();
+    w.teleport({ pos: { x: 0, y: R }, angle: 0, vel: { x: 9, y: 0 } });
+    let maxLeanCrouch = 0;
+    stepN(w, { throttle: 0.25, lean: -1 }, 120, (s) => (maxLeanCrouch = Math.max(maxLeanCrouch, s.rider.crouch)));
+    stepN(w, { throttle: 0.25, lean: 1 }, 120, (s) => (maxLeanCrouch = Math.max(maxLeanCrouch, s.rider.crouch)));
+    let preloadCrouch = 0;
+    let preloadPhase = false;
+    stepN(w, { throttle: 0.6, lean: -1 }, 36, (s) => {
+      preloadCrouch = Math.max(preloadCrouch, s.rider.crouch);
+      preloadPhase = preloadPhase || s.hopPhase === 'preload';
+    });
+    feel('pose.crouch.leanSweep', maxLeanCrouch, '0 (lean -1 then +1 at 9 m/s, throttle 0.25: no hop, no crouch)');
+    feel('pose.crouch.preload0.3s', preloadCrouch, '0.9-1 (0.3 s into a preload: crouchTime 0.25 s, eased)');
+    expect(maxLeanCrouch).toBe(0);
+    expect(preloadPhase).toBe(true);
+    expect(preloadCrouch).toBeGreaterThan(0.9);
   });
 });
 

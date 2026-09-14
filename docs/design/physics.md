@@ -5,7 +5,42 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
-Status: **round 9 complete** (ninth physics owner). P0 from a real stranger, confirmed by the parent's probe: airborne at
+Status: **round 10 complete** (tenth physics owner). Three asks: airborne lean authority, the pose couplings the
+rider-pose owner documented, and the crash/ragdoll chain re-matched to the drawn rider. (1) **Air lean.** Decomposed by
+switching subsystems off at 14 m/s (`scratch decomp`): the torso store alone gives **+32.5 / −33.8 deg** in 0.5 s for lean
+−1 / +1 — the asked band exactly — and the lean's **mass shift** eats it: the 75 kg point mass translating 0.6 m back /
+0.73 m forward relative to the frame ~0.5 m above its COM is angular momentum the frame must return (torso off: lean −1 is
+**−36**, lean +1 **+19**; both the wrong way), the lean drops' arm pull (`fUp < 0` at the lean-shifted anchor) takes −1 / −12
+more, engine braking −7. On the ground the shift is a lever braced against the tyres (brake 3.2 m, the balance table, the
+climbs); in the air nothing braces it and the drawn hang-back only moves the hips 0.29 m. Shipped: an **airborne blend
+`S_AIR`** (in `F`; toward 1 over `airRise` 0.10 s once both wheels have been off the ground for `airDelay` 12 ticks and no
+frame hard point carries load, back toward 0 over `airFall` 0.12 s the tick a wheel touches) that scales the lean's shift
+and drops to **`airShift` 0.25** of their ground travel — airborne the lean is the torso swing — and fades the **engine
+braking to 0** after the same delay (a rider in the air pulls the clutch; the free-wheeling rear no longer bleeds its
+41 N m s into the frame). The blend **holds through a hop's push and recover**: the forward snap there is the legs
+throwing the body over the bars at ground travel, and an anchor retreating under a mass already thrown forward pitched
+the stationary hop 13 deg nose-down (rear apex 0.68 → 0.78 m, a ground guarantee) — held, the hop is byte-identical. The
+12-tick delay is what keeps the ground byte-identical: at 6 ticks the 60 deg plank's base-corner transition (both wheels
+off ~10 ticks) saw a 3 % blend and the knife-edge crest went 2.91 → 3.86 s, and a constant lean bounced over the 0.3 m
+log at 5 m/s; the frame-contact test is a bike hung on its bash plate over that log, which is not flying. Measured
+(`scratch airprobe2`, level launch, rider settled at lean 0, Δpitch at 0.5 / 0.6 s): **lean −1 +26.7 / +25.6 / +24.4,
+lean +1 −20.8 / −21.6 / −22.5, no input −2.2 / −3.2 / −4.3** at 8 / 14 / 20 m/s (was +14 / +12 / +10, −0.3 / −1.4 /
+−2.4, −3.7 / −5.9 / −8.1); throttle and brake unchanged. Every ground number is unchanged to the printed digit (the
+climbs hash-identical to 2 s; hop 0.68 / ledge 1.06 / brake 3.16 / PD 12 s / loop table); what moved is in the air:
+drops land with the wheel still at road speed (the 3 m buck 17.0 → 18.7 cm, the 3.5 m / +40 landing peaks at 54 instead of
+50 deg, all still ride away). (2) **Pose couplings**: `RiderPose.crouch` is the eased hop-preload state (`S_CROUCH`), not
+the mass's drop — a lean is no longer a crouch (was 1.0 at lean ≥ 0.6, 0.67 at lean −1); `torsoPitch` is the torso store's
+**transient** (its lag behind the lean target, ±0.27 rad peak on a full step, back within 0.02 rad in 0.5 s) plus the
+frame-pitch term — no steady −0.34·lean bias. Render should pass `crouchIsHopOnly: true, torsoPitchLeanBias: 0`. (3)
+**Chain**: `riderChain()` is a port of `src/render/rider/pose.ts` (RIDER_CHAIN.md segment lengths, canonical corners,
+parameter curves, leg / reach slides, 3D two-bone IK with the forward-up-out elbow and forward-in knee poles, projected
+to the plane); checked against RIDER_CHAIN.md's own joint tables, not against a copy: stand_attack / hang_back /
+forward_attack / hang_back + crouch within **0.5 cm / 0.5 deg**, hands on the grips and ankles on the pegs to 0.0 mm.
+Ragdoll rods re-sized to the projected segments (arm 0.26 / 0.28, thigh 0.46, shin 0.42) and the joint anchors to the
+chain (torso ±0.26, neck 0.22); spawn continuity 0.21 cm / 0.35 deg. 60 tests green (one new: the crouch coupling);
+snapshot / foreign-snapshot / determinism untouched (`S_AIR` slot 47, `U_FRAME_GND` slot 13 — both in the hash surface).
+
+Round 9 (ninth physics owner). P0 from a real stranger, confirmed by the parent's probe: airborne at
 20 m/s with no input the bike pitched nose-down at ~100 deg/s (−53 deg in 0.6 s), lean back made it worse (−46) and lean
 forward levelled it. Cause, traced by switching subsystems off: the **aero drag** (4.2 v|v|, 1.7 kN at 20 m/s) was applied to
 the 56 kg frame alone at the frame origin, while the 75 kg rider was not dragged and pushed forward on the frame through the
@@ -197,7 +232,8 @@ cross-tick reads — the hop state machine's `riderExt()` uses the legs-straight
 stop of the *last* force pass, (round 7) `controls()` reads the last tick's crank speed to slew it, and (round 8) the
 wheelie control reads the ground slopes the last `derive()` saw under each wheel — are why `S_LEG_STOP_X/Y`,
 `S_ANCHOR_X/Y`, `S_RPM`, `S_REAR_SLOPE` and `S_FRONT_SLOPE` are in `F` (round 5; `snapshot.test.ts` is the audit).
-`driveFrac` and the chain scratch (`chX/chY`) are write-before-read diagnostics. Rapier/planck
+Round 10 adds `S_AIR` (the airborne blend, slewed from its own last value) and `U_FRAME_GND` (a frame hard point loaded
+last tick), both read by the next tick's `controls()`. `driveFrac` and the chain scratch (`chX/chY`) are write-before-read diagnostics. Rapier/planck
 were rejected for bundle size, async wasm init and the lack of a first-class
 tyre model; see the git history of this file for the comparison table.
 
@@ -297,8 +333,10 @@ grounded last tick (no wheelie to control; the plank corner, the ledge top) but 
 ground: an IMU control does not know about the tyre, and the rear spun to the limiter in the air is the +30 deg/s
 that loops a lip launch. Engine braking (negative torque) is never tapered. The steady state on the flat is a
 36-37 deg wheelie at 16.8 m/s: thrust tapered to where the balance pitch at the resulting acceleration equals the
-pitch. Engine braking 8 % of peak scaled by rpm off throttle. Throttle slews at 40/s
-up, 60/s down. Top speed is limiter-bound at 20.4 m/s (measured 20.45).
+pitch. Engine braking 8 % of peak scaled by rpm off throttle — **on the ground**: round 10 fades it to `engineBrakeAir` 0
+over 3 ticks once both wheels have been off for `rider.airDelay` 12 ticks (a rider in the air pulls the clutch; the
+0.7 kg m² rear at 59 rad/s bleeding 66 Nm into the frame was −11 deg / 0.6 s of no-input nose-down at 20 m/s), back the
+tick a wheel or a frame hard point touches. Throttle slews at 40/s up, 60/s down. Top speed is limiter-bound at 20.4 m/s (measured 20.45).
 Engine torque goes on the rear wheel and its reaction on the frame, so the
 pitch-up moment is F·h as it should be; in the air throttle pitches nose-up
 and brake nose-down through wheel angular momentum (section 12, F9).
@@ -329,7 +367,7 @@ wheel   radius 0.34  mass 7  inertiaRear 0.7  inertiaFront 0.5  wheelbase 1.30
 susp rear  axle (-0.585,-0.210) axis norm(0.17,0.985) travel 0.22 k 12000 cComp 400 [650] cReb 600 [1100] preload 0.00 [0.02] kStop 60000 @0.8 stopRestitution 0.3 stopBounceRate 1.0
 susp front axle (+0.715,-0.215) axis norm(-0.42,0.91) travel 0.20 k 13700 [10500] cComp 400 [550] cReb 520 [950] preload 0.02 kStop 60000 @0.8 stopRestitution 0.3 stopBounceRate 1.0
 tyre    muPeak 2.1 kappaPeak 0.15 slideFrac 0.92 vRef 1.0 rollRes 0.012 (kappa from the previous tick's resolved slip)
-engine  idle 1500 clutch 3500 limiter 10000/9500 peak 52 Nm [38] gear 17.5 eff 0.92 engineBrake 0.08 slew 40/60
+engine  idle 1500 clutch 3500 limiter 10000/9500 peak 52 Nm [38] gear 17.5 eff 0.92 engineBrake 0.08 (engineBrakeAir 0, round 10) slew 40/60
         curve [1500,.68] [3500,.80] [6500,.80] [8000,1] [9500,.9] [10000,.8]  (flat from the clutch to 6500; was .85 @5000, 1.0 @6500)
         crankSpinUp 8000 rpm/s  crankSpinDown 2000  clutchCap 0.8  clutchThrottle 0.25   (round 7: soft clutch off idle)
         wheelieControl pitchFull 25 deg pitchMin 40 minFrac 0.3 rateLead 0.35 s rateLeadFrom 10 deg groundRelax 0.7 rad/s leanOn -0.3 leanOff -0.5  (round 8)
@@ -337,6 +375,7 @@ brakes  front 900 [640] rear 700 [500] antiEndo 0.05 antiEndoFloor 0.7 [0.8] rea
 rider   mass 75 anchor (+0.33,+0.38) k 8400 [6000] c 875 [740] kAlong 28000 [20000] cAlong 2130 [1800] shiftForce 2800 [2000] kLanding 56000 [40000] cLanding 8000 (round 7)
         armPull 420 [300]
         leanBack 0.60 leanFwd 0.73 leanRate 6 leanCrouch 0.20 (back) leanCrouchFwd 0.50
+        airShift 0.25 airDelay 12 ticks airRise 0.10 s airFall 0.12 s  (round 10: the lean's shift and drops airborne; engine.engineBrakeAir 0)
         crouch 0.30 crouchTime 0.25 preloadSlack 0.85 hopExtend 0.15 hopForce 4500 [3200] hopMaxForce 5300 [3800] kPush 500 hopPegX 0.08
         hopPreloadMin 0.12 hopPreloadMax 1.5 hopPushTime 0.35 hopRecoverTime 0.6
         hopLeanBack -0.5 hopThrottle 0.3 hopSnapRate 4
@@ -369,7 +408,7 @@ so the slider stays pro-squat.
 step(input):
  1  restart edge      -> fault('restart') + reset(checkpoint), return (latched until released)
  2  asleep            -> tick++ only (ragdoll settled)
- 3  controls          -> throttle/lean slew, hop state machine, engine rpm/limiter/torque, brake input
+ 3  controls          -> throttle/lean/brake slew, airborne blend (S_AIR), hop state machine, engine rpm/limiter/torque
  4  forces            -> gravity; suspension geometry+rates (pass 1) then impulses (pass 2);
                          rider spring/actuator/weight at the anchor; torso torque pair; engine; drag
  5  collide           -> wheels, frame hard points, rider sensors (riding) or ragdoll circles (crashed)
@@ -438,19 +477,27 @@ weight shift is a real moment with the arm the CONTRACT wants and nothing is
 invented: in free fall the rider floats `m g / k` = 0.12 m above the anchor
 and the frame feels no force.
 
-### 7.2 Derived pose (renderer and crash sensors) — from the rider mass, not the input
-`riderPose()` reads the dynamics: `lean` = the point mass's fore-aft offset from the neutral
-anchor in frame space divided by the lean travel (`leanFwd` 0.73 / `leanBack` 0.60), `crouch`
-= `clamp((anchor.y − riderLocalY)/0.30)`, `torsoPitch = clamp(−0.35·swing − 0.15·wrap(angle), ±0.9)`
-with `swing` the torso DOF's angle relative to the frame over `torso.swing`, `armExtend =
-clamp(max(0, −lean) + 0.5·max(0, wrap(angle) − 0.6), 0, 1)`. The lag is physical: input slew
-(6/s), the 2 kN fore-aft brace cap moving 75 kg through 0.73 m, and the torque-limited torso
-motor. Measured (`FEEL pose.*`): a lean step reaches 90 % of the pose in **0.28 s** (both ways), no
-overshoot (the brace is force-capped and ζ 0.73; dropping `cAlong` to 1200 gives 0.22 s but breaks
-the hop apex, the 60 deg crest and the air controller), the torso swing reaches 90 % in 0.43 s, the pose
-settles exactly at the input. The crash sensors (`riderChain`, 7.7) are built from the same pose, so
-what is drawn is what crashes. The design asked for 0.10-0.15 s with a slight overshoot; that would
-need a rider who can shift 0.73 m in a tenth of a second — open, see 12.4.
+**Airborne (round 10)**: `leanOff` and the lean drops are multiplied by `1 − S_AIR·(1 − airShift)` — 0.25 of the ground
+travel with the blend at 1 (0.15 m back, 0.18 m forward, the drops 0.05 / 0.13). The ground shift is a lever braced
+against the tyres; in the air it is angular momentum the frame has to return, and it cancelled most of the torso store's
+authority (7.4). `S_AIR` slews toward 1 over `airRise` 0.10 s once both wheels have been off the ground for `airDelay` 12
+ticks and no frame hard point carries load (`U_FRAME_GND`), toward 0 over `airFall` 0.12 s the tick that stops being
+true, and holds through a hop's push and recover (7.5). The anchor's travel moving 0.45 m in 0.1 s is force-capped by the
+brace (`shiftForce`); `riderPose()` normalises the mass offset by the same scale so the drawn lean reads the input.
+
+### 7.2 Derived pose (renderer and crash sensors) — from the rider mass and the hop machine
+`riderPose()`: `lean` = the point mass's fore-aft offset from the neutral anchor in frame space over the lean travel in
+force this tick (`leanFwd` 0.73 / `leanBack` 0.60, scaled by the airborne blend, 7.1); **`crouch` = the eased hop-preload
+state** `S_CROUCH` (round 10; it was the mass's drop below the neutral height, which folded the lean drops in — every
+lean ≥ 0.6 read as a full crouch and lean −1 as 0.67, hop or no hop; RIDER_CHAIN.md "What was wrong"); **`torsoPitch` =
+`clamp(−0.35·(swing − leanEff) − 0.15·wrap(angle), ±0.9)`** — the torso store's transient (its lag behind the lean target,
++ = pitched forward relative to the frame) plus the frame-pitch term, zero once any lean has settled (round 10; it was
+−0.35·swing, a steady −0.34 rad per unit lean that pitched the hang-back torso 12 deg forward); `armExtend` as before.
+Measured (`FEEL pose.*`): a lean step reaches 90 % of the pose in **0.27 s** forward / 0.25 back, no overshoot; the
+torso transient peaks at **+0.27 rad** on a forward step (−0.29 back) and is back within 0.02 rad at 0.51 s; settled
+torsoPitch 0.001 / −0.012 at lean ±1; crouch 0 through a lean −1 → +1 sweep at throttle 0.25 and 1.00 0.3 s into a
+preload. The crash sensors (`riderChain`, 7.7) are built from the same pose, so what is drawn is what crashes. The
+design asked for a 0.10-0.15 s pose lag with a slight overshoot; the render's `PoseFollower` adds that on top (12.4 (2)).
 
 ### 7.3 Landing recovery
 Measured (F6): from a 2 m drop at 6 m/s the bike rides away for every pitch in
@@ -468,8 +515,9 @@ it decelerates before the target and never overshoots), impulse clamped at
 clamp: after a corner hit the torso swung 40 deg past its target and the return
 stroke pushed the nose 5-8 deg up — that was the 60 deg stall. Angular momentum
 is conserved (the torso angle is never rendered; `torsoPitch` above is the
-visual). Measured: 0.5 s of lean back in the air = **+12.6 deg**, lean forward
-0, throttle +8.5, brake −19. Note the pure mass shift of leaning back gives
+visual). Measured (round 10, 14 m/s, 0.5 s): lean back **+25.6 deg**, lean forward **−21.6**, throttle +9.1, brake −26.2; the
+store alone (mass shift, drops and engine braking off) is +32.5 / −33.8, and with the ground mass shift left on in the
+air it was +12 / −1.4 (round 9) — see 7.1 and the air table in 12. Note the pure mass shift of leaning back gives
 nose-DOWN (the rider's mass moves back above the bike COM); the torso is what
 gives nose-up, as on a real bike (the bars, not the seat).
 
@@ -484,6 +532,10 @@ PUSH    anchor jumps to +hopExtend, spring -> kPush, damper x0.1, leg actuator +
         the leg stop) or 0.35 s
 RECOVER hopExt, crouch decay; -> IDLE after 0.6 s or when both wheels are down again
 ```
+The airborne blend (7.1) holds its value through PUSH and RECOVER: the snap is the legs throwing the body over the bars
+at ground travel, and a blend engaging mid-snap retreated the anchor under a mass already moving forward at 3 m/s — the
+brace reversed and the stationary hop pitched 13 deg nose-down (rear apex 0.78 m, front 0.53; held: 0.68 / 0.65, byte-
+identical to round 9). A rider holding lean back off a lip is in PRELOAD, which is not exempt.
 Preload: the legs go slack, the rider drops ~0.5 m into the crouch and the
 catch compresses the suspension. Push: the actuator accelerates the rider up at
 ~30 m/s²; the legs-straight stop then yanks the frame up **through the pegs**
@@ -504,36 +556,39 @@ lean stops from 10 m/s in 7.7 m with −7.5 deg of dive and no endo; leaning bac
 **4.47 m** (CONTRACT ≤ 4.5; round 3 had 4.54 with rise 30/s and a 5 % floor).
 
 ### 7.7 Drawn body chain: crash sensors and ragdoll spawn
-The dynamics point mass sits low and far forward at full lean (it is a lever, not a body). Crash sensors
-therefore live on the body the renderer draws (`riderModel.ts` poseRider, standing on the pegs), and since
-round 8 the chain is **written in the render's axle frame**: origin = axle midpoint at static sag
-(`axleOrigin()`, the same numbers `placeBike` uses, (0.054, −0.142) from `bike.pos` — the render calibrates its
-`originOffset` from the same spawn pose and measured (0.055, −0.144)), grips at `(0.27, 0.78)` (`BIKE.grip`),
-ankles at `(−0.13, 0.11)` (`BIKE.pegs` + (0.01, ankle 0.09); the shin ends there, the boot is drawn on the peg).
-Chain: hips `(−0.12 − 0.28·back + 0.14·fwd − 0.06·crouch, 0.74 − 0.28·crouch)`, torso 0.5 m pitched
-`0.62 + torsoPitch + 0.3·fwd + 0.35·crouch − 0.1·back − 0.1·armExtend` rad forward of frame-up, then **the
-pinned-shoulder hang-off**: with `back > 0` the shoulders blend (weight `back`) to arm's reach
-(0.985·(0.30 + 0.27)) from the grip at `φ = 0.32 + 0.15·crouch` above the bar line and the hips hang from them
-at the same torso angle (butt over the rear fender, arms straight); **leg slide**: hips never beyond
-0.985·(0.44 + 0.43) from the ankles (pulled in along the hip → ankle line, shoulders follow); **reach slide**:
-if the shoulders are beyond arm's reach from the grip, or closer than 0.30 m, the whole upper body slides
-along the shoulder → grip line so the hands are on the grips in every pose. Head 0.195 beyond the shoulders at
-`0.45·torsoA − 0.1`; two-bone IK to the grip (upper arm 0.30, forearm 0.27) and the ankle (thigh 0.44, shin 0.43),
-elbows and knees forward. Sensors: head r 0.15, torso r 0.13 at 0.14 and 0.38 up the torso. What you see hit is
-what crashes; a loop-out faults at ~115 deg of pitch (the head reaches the ground). The ragdoll spawns **on** the
-chain: every body is centred on its segment with its local +y (distal → proximal) along it (torso hips →
-shoulders, pelvis centre 0.1 below the hips, head on the chain along the shoulders → head direction, upper arm
-elbow → shoulder, forearm grip → elbow, thigh knee → hip, shin ankle → knee); the joint anchors are the chain's
-joints (neck −0.195 on the head, elbow +0.135 on the forearm), so nothing snaps on the first tick. Velocities are
-the frame's rigid field at each body plus the rider mass's motion relative to the frame; the rng spread is on limb
-spin only. `debug().riderChain` exposes the chain (hips, shoulders, head, elbow, hand, knee, foot = ankle,
-torso/head directions). Measured (`world.test.ts`): against the physics chain of the tick before, carried through
-the frame's one-tick motion, **0.06 cm / 0.07 deg** (loop-out at 7 m/s), 0.11 cm / 0.25 deg (nose plant); against
-the **render's `poseRider` re-derived in the test** (axle coords, origin calibrated the render's way from the
-spawn wheel positions) on the crash tick, **0.00 cm / 0.00 deg** for a hang-off loop-out (pose lean −0.79, the
-pinned-shoulder path), a neutral plant and a forward endo. What is left of the hand-over residual is render's
-~80 ms pose lead and its frame interpolation. Convention: `RagdollBody.angle` is the body's local +y measured
-CCW from world +y, the same as the frame angle and as the render's posed head (`rotation.z = −headA`).
+The dynamics point mass sits low and far forward at full lean (it is a lever, not a body). Crash sensors therefore live
+on the body the renderer draws, and since round 10 `riderChain()` is a **port of `src/render/rider/pose.ts` `riderChain`**
+— the reference-measured chain of `assets/blender/RIDER_CHAIN.md` — written in the render's AXLE frame (origin = axle
+midpoint at static sag, `axleOrigin()`, (0.054, −0.142) from `bike.pos`; the render calibrates the same from the spawn
+pose). Segment lengths torso 0.52, neck 0.22, upper arm 0.32, forearm 0.30, thigh 0.46, shin 0.43, shoulder half-width
+0.21, hip 0.09; left grip (0.27, 0.78, 0.33), left peg (−0.14, 0.02, 0.20), ankle = peg + (0.01, 0.09). Body parameters
+(hips x, y; torso and head angles above horizontal) are blended in parameter space between the canonical corners
+stand_attack (−0.28, 0.85; 40 / 66 deg), hang_back (−0.57, 0.60; 55 / 75), forward_attack (−0.22, 0.90; 26 / 42),
+crouch (−0.38, 0.78; 28 / 40) with `sb = 1 − (1 − back)^1.3`, the hop crouch as a delta on top of the lean pose shrinking
+with `back`, then `torso −= 0.6·torsoPitch`, torso clamped 12..80 deg, head ≥ torso + 12; **leg slide** (hips within
+0.985·(thigh + shin) of the ankles, pulled in along the hip → ankle line, shoulders follow) and **reach slide** (shoulders
+within 0.985·(upper arm + forearm) of the grip measured in 3D — shoulder joint at z 0.21, grip at 0.33 — never closer
+than 0.18 m; the whole upper body slides along the shoulder → grip line) keep the feet on the pegs and the hands on the
+grips in every pose. Elbows and knees by the **3D two-bone IK** with the reference poles — elbow forward-up-out
+(0.6, 0.5, ±1.0), knee forward-in (1, 0.2, ∓0.15) — projected to the plane (the left side). The render's touchdown
+absorb (`crouchExtra`, render-driven) is not in the physics chain: a crash during a landing absorb is the one hand-over
+residual left (up to 0.12 / 0.15 m of hips at land 1). Sensors: head r 0.15 at the helmet centre, torso r 0.13 at 0.14
+and 0.38 up the torso from the hips. The ragdoll spawns **on** the chain: every body centred on its segment with its
+local +y (distal → proximal) along it (torso hips → shoulders, pelvis centre 0.1 below the hips, head on the shoulders →
+head direction, upper arm elbow → shoulder, forearm grip → elbow, thigh knee → hip, shin ankle → knee); the joint
+anchors are the chain's joints (torso ±0.26, neck 0.22 on the head, elbow ±0.13 / 0.14, hip 0.23, knee ±0.23 / 0.21).
+The ragdoll rods are the side view of the arm: upper arm 0.26 and forearm 0.28 (the 3D arm projects to 0.17-0.30 /
+0.26-0.30 across the poses, the elbow being 0.11-0.27 m out of the plane), thigh 0.46, shin 0.42 — where the projected
+segment differs from the rod at the spawn the joint Baumgarte pulls the anchors together over ~10 ticks rather than
+snapping. Velocities are the frame's rigid field at each body plus the rider mass's motion relative to the frame; the
+rng spread is on limb spin only. `debug().riderChain` exposes hips, shoulders, head, elbow, hand, knee, foot (= ankle)
+and the torso / head directions. Measured (`world.test.ts`): against **RIDER_CHAIN.md's own joint tables** (not a copy
+of the render), the physics chain in axle coords at a settled lean 0 / −1 / +1 and a held preload at lean −1 (the
+table's −1 × 1 row): hips / shoulders / head / elbow / knee within **0.5 cm**, torso and head angles within **0.5 deg**,
+hands on the grips and ankles on the pegs to 0.0 mm; spawn continuity against the chain of the tick before, carried
+through the frame's one-tick motion, **0.21 cm / 0.35 deg** (loop-out at 7 m/s), 0.12 cm / 0.24 deg (nose plant).
+Convention: `RagdollBody.angle` is the body's local +y measured CCW from world +y, the same as the frame angle and as
+the render's posed head (`rotation.z = −headA`).
 
 ## 8. Crash detection and ragdoll
 
@@ -610,7 +665,7 @@ static balance map. `src/physics/tools/trackSweep.ts` runs four naive
 controllers over the 15 curriculum tracks and prints progress and first-fault
 cause per track.
 
-## 12. Measured envelope (round 8, 1.4 g) vs CONTRACT §2.5
+## 12. Measured envelope (round 10, 1.4 g) vs CONTRACT §2.5
 
 From `pnpm test src/physics` (`FEEL …` lines in `feel.test.ts`, `LAND …` landing audit, `DRUM …` / `SEESAW …` rows, `PERF …` and `RAGDOLL …` in `world.test.ts`).
 
@@ -624,10 +679,10 @@ From `pnpm test src/physics` (`FEEL …` lines in `feel.test.ts`, `LAND …` lan
 | speed governor | thr 0.3 ≈ 11-13, 0.6 ≈ 16-17, 1.0 = 20 | 10.9 / 17.7 / 20.37 (limiter) | PASS |
 | top speed | 20 m/s | 20.37 m/s, limiter-bound | PASS |
 | brake from 10 m/s | ≤ 4.5 m | **3.16 m** lean back, −8.1 deg dive; 5.1 m at lean 0 (round 9). Full brake from 10 / 12 / 15 / 18 / 20 m/s at lean −1 / 0 / +0.4 / +1: stops in 3.9–20.8 m, dive −8..−20 deg, rear off the ground 0.35–1.5 s, **never flips** (stranger finding "a plain brake at 12 m/s endos" does not reproduce on flat dirt: 7.9 m, −9.4 deg, rear off 0.63 s). Round 8: **3.22 m** lean back, −8.8 deg dive, no endo; 5.3 m at lean 0, −7.4 deg (anti-endo floor 0.8 → 0.7: at 0.8 the soft fork's grab lofted the rear and the bike stoppied over in 1.5 s at lean 0) | PASS |
-| stationary hop rear apex | 0.55-0.75 m | **0.68 m**, airtime 0.53 s (0.62 m / 0.56 s at 9.81) | PASS |
-| 5 m/s run-up, 0.9 m ledge | makeable | **made, rear lifts 0.90 m at the wall, lands −3 deg, rides away** (`ledgeHopper(20,5,8,1.3,45)`; 6 of 80 parameter combos make it, was 29 of 300); 0.5 m ledge clean | PASS |
+| stationary hop rear apex | 0.55-0.75 m | **0.68 m**, airtime 0.53 s (0.62 m / 0.56 s at 9.81); round 10: unchanged — the airborne blend holds through push / recover (with it engaging the hop went nose-down 13 deg and the rear apex to 0.78) | PASS |
+| 5 m/s run-up, 0.9 m ledge | makeable | **made, rear lifts 1.06 m at the wall, lands −11 deg, rides away** (round 10, unchanged from round 9's build; the 0.90 / −3 of the round-8 text was stale) (`ledgeHopper(20,5,8,1.3,45)`; 6 of 80 parameter combos make it, was 29 of 300); 0.5 m ledge clean | PASS |
 | climb 55 deg | sustained | tops a 4 m plank in **1.72 s** (1.61 in round 7, 2.4 in round 6), no fault; the wheelie control never fires on the face (frame at the face angle + 8) | PASS |
-| climb 60 deg | sustained | **crests 3.46 m in 2.73 s** (round 7: 3.04; reference clip 06 ≈ one wheelbase per second → 2.7 s), exit pitch −1..6 deg, no fault; the first round-8 build tapered the push into the base corner (frame rotating up at 120 deg/s with the rear still on the flat) and died at 1.0 m — the face under the front is the reference and the rate lead fades in over the first 10 deg of nose-up | PASS |
+| climb 60 deg | sustained | **crests 3.46 m in 2.91 s** (measured by the feel test's start/top marks; round 7: 3.04; reference clip 06 ≈ one wheelbase per second → 2.7 s), exit pitch −1..6 deg, no fault; the first round-8 build tapered the push into the base corner (frame rotating up at 120 deg/s with the rear still on the flat) and died at 1.0 m — the face under the front is the reference and the rate lead fades in over the first 10 deg of nose-up | PASS |
 | climb 65 deg | stalls, rolls back | stalls at 0.3 m, rolls back 0.33 m, no fault (tan 65 = 2.14 > peak grip 2.0) | PASS |
 | climb > 70 deg | needs a hop | not ridden | PASS |
 | balance pitch, lean 0 | 40-50 deg | 48.4 static (38.1 back, 70.2 fwd, 36.1 at +3 m/s²); **on the throttle at lean ≥ −0.3 the wheelie control parks the nose at 33-40 deg below it** (round 8) | PASS (note) |
@@ -636,58 +691,57 @@ From `pnpm test src/physics` (`FEEL …` lines in `feel.test.ts`, `LAND …` lan
 | landing recovery (2 m, 6 m/s) | design: −5..+40 | −30..+50 rides away, rear-first from −5; falls in 0.52 s (0.62) | PASS |
 | **airtime** (round 6) | hop ≈ 0.6 s; big jump ≈ 1.0 s (clip 07) | hop 0.53 s at 0.68 m; 45 deg 1 m kicker: 6 m/s 0.53 s* / **10 m/s 0.87 s** / 14 m/s 1.10 s (9.81: 1.06 / 1.40 / 1.49); 2 m drop 0.52 s. *at ≤ 10 m/s the bike leaves the 45 deg face at 47-66 deg (the face angle plus the throttle's on-face rotation) and no constant lean lands it — see 12.4 (0c) for the table and why it is the test geometry, not the plant | PASS (12.4 for the kicker) |
 | **suspension** (round 6) | sag 25-30 %; 1.5 m drop ≥ 80 % + rebound; 3 m buck; squat ≥ 20 %; dive ≥ 50 % | sag R 0.27 / F 0.25; 1.5 m: peak 0.93, rebound to 0.14 at +0.35 s, back at sag +0.44 s; 3 m: bottoms 3 ticks, chassis hops **11.6 cm** (round 6: 19.8; `cLanding` 8000 — the buck was the rider's legs storing ~1 kJ, not the bump stop: restitution 0-0.3 × kStop 30-120 kN/m all gave 19-21 cm), pitch kicks 10.6 deg (asked 6-10 cm / 3-6 deg; the kick is the two ends' differential rebound off full travel and is not damping-limited); 1.5 m rebound now to 0.21 at +0.29 s (0.14 at +0.35); squat sag 0.27 → 0.80 for 0.93 s; dive 0.25 → 0.71 (lean 0) / 0.91 (lean back) | PASS |
-| **ragdoll spawn continuity** (round 6/8) | no pop | 0.06 cm / 0.07 deg (loop-out), 0.11 cm / 0.25 deg (nose plant) vs the physics chain of the tick before; **0.00 cm / 0.00 deg vs the render's `poseRider` re-derived in axle coords** (hang-off loop, plant, endo; round 8 — the render measured 0.28-0.48 m against the round-7 bike.pos-relative chain); velocity = frame field + rider relative (1.7 m/s) | PASS |
+| **ragdoll spawn continuity** (round 6/8/10) | no pop | 0.21 cm / 0.35 deg (loop-out), 0.12 cm / 0.24 deg (nose plant) vs the physics chain of the tick before; **the chain vs RIDER_CHAIN.md's canonical joint tables: 0.5 cm / 0.5 deg** at stand_attack, hang_back, forward_attack, hang_back + crouch, hands / ankles on grips / pegs to 0.0 mm (round 10; round 8 measured 0.00 against a copy of the old render pose); velocity = frame field + rider relative (1.7 m/s) | PASS |
 | nose-down 3.5 m at 8 m/s | should endo (critic) | free front wheel: rides away from −20..−50 deg (nose whips up at ~400 deg/s, both ends bottom out); **brake grabbed on landing: endo at every nose-down angle** | note (12.1) |
-| rider pose lag | 0.10-0.15 s + slight overshoot (critic) | pose from the mass: t90 **0.28 s**, no overshoot, torso 0.43 s | note (7.2) |
+| rider pose lag | 0.10-0.15 s + slight overshoot (critic) | pose from the mass: t90 **0.27 s**, no overshoot; torso transient peak ±0.27 rad, gone in 0.51 s; **crouch = hop preload only, torsoPitch has no lean bias** (round 10) | note (7.2) |
 | crashed bike scrub | 1-1.5 m from 7 m/s (critic) | **2.6 m** at 1.4 g (3.2 at 9.81), at rest in 1.1 s; limbs spread 92 deg, hip swing 101 | note (8) |
 | drums / seesaw | (bot sweep: parks) | see 12.3 | measured |
-| air control 0.5 s (8 m/s, F9 test) | — | brake −15.6, throttle +14.8, lean back +14.3, lean fwd −0.3; airPitch lands 8.9 deg for a 15 deg target from −5 deg | PASS |
-| **air control by speed** (round 9; level launch, rider settled at lean 0, 0.6 s, no ground; Δpitch at 0.5 / 0.6 s, rate at 0.6 s) | no input ±5 deg / ±15 deg/s; lean −1 +20..30; lean +1 −20..−30; throttle +8..15; brake −15..−25 | see the table below | partly |
+| air control 0.5 s (8 m/s, F9 test) | — | brake −15.6, throttle +14.8, **lean back +26.7, lean fwd −20.8** (round 10; was +14.3 / −0.3); airPitch lands 12.6 deg for a 15 deg target from −5 deg | PASS |
+| **air control by speed** (round 10; level launch, rider settled at lean 0, 0.6 s, no ground; Δpitch at 0.5 / 0.6 s, rate at 0.6 s) | no input ±5 deg / ±15 deg/s; lean −1 +20..30; lean +1 −20..−30; throttle +8..15; brake −15..−25 | **lean −1 +24..27, lean +1 −21..−23, no input −2..−4 at 0.5 s** (table below); throttle +15 / +9 / 0 (limiter at 20 m/s); brake −16 / −26 / −36 (the rear wheel's angular momentum, scales with speed) | PASS except the brake at ≥ 14 m/s and throttle at 20 |
 | crash rules | head/torso, hazard, oobY | all three tested on the drawn body; over-rotation alone never faults; the tether-force rule needs 45 deg nose-down (round 9): a level 4×0.8 / 4×1.2 / 5×2 / 8×1.8 kicker at 8–17 m/s with thr 0.6 at lean 0 / 0.4 never crashes on the tether (max 4.8–16.9 kN); its crashes are sensor hits after a loop (5×2 at ≥ 11.6 m/s, lean 0) or a coasted nose-plant | PASS |
 | ragdoll vs bike | (visible in clips) | limbs rest on tyres/frame | PASS |
 | restart → riding | 1 tick | `reset()` is one call, `tick = 0` | PASS |
 | determinism | two runs equal; restore(snapshot()) equal | equal over 3000 ticks incl. crash+restart; forks at 5 points × 500 ticks equal; search-load probe 2600 ticks × 7 rollouts every 15 ticks equal; 13 foreign-snapshot forks × 400 ticks equal | PASS |
 | µs/tick p95 | ≤ 60 riding, ≤ 80 ragdoll | 2.4-3.5 riding, 9-16 ragdolling (node, 20k ticks, vitest, noisy under the full suite) | PASS |
 
-**Air control, round 8 → round 9** (`scratch airprobe2`; the round-8 column is the shipped round-8 build measured the same way):
+**Air control, round 9 → round 10** (`scratch airprobe2`: teleport to 6 m up at v with 3 m/s of rise, rider settled at lean 0,
+no ground for 0.6 s; the round-9 column is the shipped round-9 build measured the same way; the asked band in the last column):
 
-| speed | input | round 8: pitch 0.5 / 0.6 s (rate) | round 9: pitch 0.5 / 0.6 s (rate) |
-|--|--|--|--|
-| 8 m/s | none | −9.3 / −13.2 (−43/s) | **−3.7 / −4.7 (−11/s)** |
-| 8 | lean −1 | +9.7 / +5.5 (−48) | **+14.3 / +11.1 (−38)** |
-| 8 | lean +1 | +1.3 / +3.0 (+15) | −0.3 / +1.4 (+18) |
-| 8 | throttle | +8.4 / +8.4 (−4) | +14.8 / +18.1 (+33) |
-| 8 | brake | −20.4 / −25.9 (−57) | −15.6 / −18.6 (−30) |
-| 8 | brake + lean +1 | −4.9 / −3.3 (+11) | −7.0 / −5.6 (+14) |
-| 14 | none | −21.8 / −30.4 (−92) | **−5.9 / −7.7 (−20)** |
-| 14 | lean −1 | −0.9 / −8.2 (−85) | **+12.0 / +8.1 (−47)** |
-| 14 | lean +1 | +1.8 / +3.6 (+15) | −1.4 / +0.1 (+15) |
-| 14 | throttle | −8.4 / −14.0 (−63) | +9.1 / +11.1 (+20) |
-| 14 | brake | −39.1 / −49.3 (−105) | −26.2 / −31.4 (−53) |
-| 14 | brake + lean +1 | −7.3 / −4.8 (+22) | −13.1 / −12.6 (+4) |
-| 20 | none | −37.5 / −50.7 (−137) | **−8.1 / −10.7 (−28)** |
-| 20 | lean −1 | −16.0 / −27.9 (−145) | **+9.8 / +5.1 (−55)** |
-| 20 | lean +1 | +2.5 / +4.5 (+16) | −2.4 / −1.3 (+11) |
-| 20 | throttle | −30.6 / −41.9 (−118) | 0.0 / +0.2 (+2) — the wheel is on the limiter |
-| 20 | brake | −58.5 / −72.4 (−138) | −36.3 / −43.8 (−75) |
-| 20 | brake + lean +1 | −7.1 / −2.8 (+40) | −19.1 / −19.6 (−6) |
+| speed | input | round 9: pitch 0.5 / 0.6 s (rate) | round 10: pitch 0.5 / 0.6 s (rate) | asked |
+|--|--|--|--|--|
+| 8 m/s | none | −3.7 / −4.7 (−11/s) | **−2.2 / −2.5 (−3/s)** | ±5 |
+| 8 | lean −1 | +14.3 / +11.1 (−38) | **+26.7 / +25.5 (−15)** | +20..30 |
+| 8 | lean +1 | −0.3 / +1.4 (+18) | **−20.8 / −19.1 (+19)** | −20..−30 |
+| 8 | throttle | +14.8 / +18.1 (+33) | +14.8 / +18.1 (+33) | +8..15 |
+| 8 | brake | −15.6 / −18.6 (−30) | −15.6 / −18.6 (−30) | −15..−25 |
+| 8 | brake + lean +1 | −7.0 / −5.6 (+14) | −30.8 / −30.8 (−1) | |
+| 14 | none | −5.9 / −7.7 (−20) | **−3.2 / −3.7 (−5)** | ±5 |
+| 14 | lean −1 | +12.0 / +8.1 (−47) | **+25.6 / +24.1 (−18)** | +20..30 |
+| 14 | lean +1 | −1.4 / +0.1 (+15) | **−21.6 / −20.1 (+17)** | −20..−30 |
+| 14 | throttle | +9.1 / +11.1 (+20) | +9.1 / +11.1 (+20) | +8..15 |
+| 14 | brake | −26.2 / −31.4 (−53) | −26.2 / −31.4 (−53) | −15..−25 |
+| 14 | brake + lean +1 | −13.1 / −12.6 (+4) | −37.3 / −38.7 (−13) | |
+| 20 | none | −8.1 / −10.7 (−28) | **−4.3 / −5.0 (−8)** | ±5 |
+| 20 | lean −1 | +9.8 / +5.1 (−55) | **+24.4 / +22.6 (−20)** | +20..30 |
+| 20 | lean +1 | −2.4 / −1.3 (+11) | **−22.5 / −21.1 (+15)** | −20..−30 |
+| 20 | throttle | 0.0 / +0.2 (+2) | 0.0 / +0.2 (+2) — the wheel is on the limiter | +8..15 |
+| 20 | brake | −36.3 / −43.8 (−75) | −36.3 / −43.8 (−75) | −15..−25 |
+| 20 | brake + lean +1 | −19.1 / −19.6 (−6) | −44.9 / −47.9 (−30) | |
 
-The inversion is gone (lean back is nose-up at every speed, lean forward is no longer nose-up) and the no-input drift is the
-engine-braking reaction alone (−11 deg/s per 8 m/s; `engineBrakeFrac` 0.08). What is still short of the asked bands, with the
-lever and its cost measured: **no-input drift at 14–20 m/s** (−7.7 / −10.7 vs ±5): `engineBrakeFrac` 0.025 gives −3.4 / −4.6
-but the 0.9 m ledge hop drops to 0.856 m of lift (needs 0.90) and the 60 deg crest stalls — the hop and climb controllers use the
-engine braking; not taken. **Lean −1 +11..+14 vs +20..30 and lean +1 ~0 vs −20..−30**: the lever is the point where an arm pull
-(`fUp < 0`, the rider above his legs pulling the bike up) reacts on the frame. It reacts at the lean-shifted anchor (−0.27 m
-at lean −1, +1.06 m at lean +1), so a rider hanging off the back pulls the frame up *behind* the COM (a sustained ~110 Nm
-nose-down while his legs re-extend, which is what eats the torso swing) and a rider over the bars pulls it up over the front
-axle. Reacting it at the grips (0.32, 0.64 in frame coordinates — where the hands are) gives **+32 / +31 / +30 for lean −1 and
-−11 / −12 / −12 for lean +1** at 8 / 14 / 20 m/s with the same no-input drift, but the 55 deg climber crashes and the 60 deg
-plank hangs at the lip (the climber leaned on the over-the-front-axle pull); the torso `inertia` 30 / `maxTorque` 600 adds
-~+10 more on lean −1. Both are physically right and cost a climber retune: 12.4 (0f). **Brake −31 / −44 at 14 / 20 m/s vs
-−15..−25**: the rear wheel's angular momentum (0.7 kg m² × 59 rad/s = 41 N m s at 20 m/s) dumped into ~45 kg m² of pitch
-inertia in 0.06 s; it scales with speed and the 8 m/s value is in band. The parent's probe (`harness/out/parent/air.ts`,
-rides at lean 0.5 then teleports at 19.5 m/s): lean 0 / no throttle **−2.8 deg** at 0.6 s (was −53), lean −1 **+6.0** (was −46),
-lean +1 **−6.1** (was −0.7), throttle +6.7 (was −44).
+Decomposition at 14 m/s, 0.5 s, on the round-9 build (`scratch decomp`; lean −1 / lean +1): baseline +12.0 / −1.4; torso
+motor off **−36.5 / +19.6** (the mass shift alone rotates the bike the wrong way); no lean drops +13.2 / −12.1; no arm pull
++11.1 / +0.8; no mass shift **+31.1 / −35.2**; no shift and no drops +27.4 / −38.8; torso alone (no shift, drops, engine
+braking) **+32.5 / −33.8**; no engine braking +17.3 / +1.2; torso inertia 30 / torque 600 +22.8 / −8.7. The round-9 note
+blamed the arm-pull reaction point (grips vs anchor: +32 / −12); the pull is −1 / −12 of it — the mass shift is the term.
+Sweep of the shipped knob (0.5 s, 8 / 14 / 20 m/s, before the delay): `airShift` 0.5 → +27 / +26 / +26 and −17 / −18 / −18;
+0.35 → +29 / +28 / +28 and −23 / −24 / −24; 0.25 → +30 / +30 / +29 and −27 / −28 / −28; with `airDelay` 12 and `airRise`
+0.10 in place 0.35 gives +25 / +23 / +22 and −15 / −16 / −17, 0.25 the table above. The residual **no-input drift** is the
+12 ticks + 3 of engine braking before the clutch pull (−0.7 with none at all); the **brake at 14 / 20 m/s** is the rear
+wheel's angular momentum (41 N m s at 20 m/s into ~45 kg m²) and unchanged; **throttle at 20 m/s** is the limiter. The
+round-9 lever list stands as measured (reacting the pull at the grips, `engineBrakeFrac` 0.025) — neither was needed.
+The parent's probe (`harness/out/parent/air.ts`, rides at lean 0.5 then teleports at 19.5 m/s, pitch at 0.6 s): lean 0 /
+no throttle **+2.7 deg** (round 9: −2.8), lean −1 **+30.3** (+6.0), lean +1 **−11.7** (−6.1; it starts from lean 0.5, so the
+swing to +1 is half of one, and its peak is −15.8 at 0.4 s), throttle +6.7 (+6.7), lean −1 + throttle +30.4.
 
 ### 12.1 Landing envelope audit (`LAND` rows; drop h at speed v and pitch p onto flat dirt, throttle 0.2; round 6 at 1.4 g)
 
@@ -708,6 +762,14 @@ critic expects happens when the rider is **on the brake** as the front lands: cr
 (`FEEL landing.noseDown.*`). An endo without the brake needs a rising landing or an edge under the front.
 
 ### 12.2 Track smoke sweep (`tools/trackSweep.ts`, four naive controllers, best per track)
+
+Round 10 (the tracks owner re-authored in the same tree during the round — b2 is longer, m1's first ledge moved 21 → 34 m,
+so the percentages are not the round-9 track lengths; round 9 in brackets): b1 CLEARED (CLEARED), b2 43 (60; cruise
+reaches 256 m vs 249), b3 CLEARED (CLEARED), e1 58 (58; the loop at ramp@309 unchanged), **e2 92 (89)**, e3 31 (28),
+**m1 27 (6)** — full throttle now rides to ledge@130 instead of endoing at the first ledge, m2 42 (35), **m3 CLEARED (42)**,
+h1 29 (29), **h2 71 (14)** — the fixed-input strangers no longer loop off box@60-70, they fly it, **h3 46 (47)**, **x1 53
+(17)**, x2 13 (14), **x3 30 (15)**. Every first fault is still a naive controller endoing into a step or looping a kicker
+at full gas; what moved is that a held lean now does something in the air. The bot is the judge.
 
 Round 9 (round 8 in brackets; the tracks owner is re-authoring in the same tree): **b1 CLEARED (98 %)**, b2 60 (60), **b3 CLEARED**
 (CLEARED), **e1 58 (38)** — the 48 deg plank foot at 19.8 m/s no longer snaps the tether; the first fault is now a loop at
@@ -869,8 +931,16 @@ the 55 deg climber tops the plank and flies off the test track (out-of-bounds), 
 lean −1 / thr 1 deliberate loop vanishes (the bike reaches the limiter at 1.7 s, before the preload times out), and every
 jump gets longer. Closing the throttle at 20 m/s then decelerates at 2.5 m/s² instead of 12.9 — the tracks were authored
 against the latter. Worth doing, with the climber, hopper and PD retuned and the tracks re-swept: a round.
-(0f) **Arm-pull reaction point**: at the grips (physically where the hands are, and +32 / −11 deg of airborne lean authority
-instead of +14 / 0) once the climber no longer needs the pull over the front axle; see the air-control note in 12.
+(0f) **Arm-pull reaction point** — closed in round 10 without it: the airborne lean authority was the mass shift, not the
+pull's reaction point (decomposition in 12); the pull stays at the anchor (collinear, no invented couple).
+(0g) **Airborne blend seams** (round 10). The blend is by contact, not by load: `airDelay` 12 ticks (0.1 s) before the
+lean travel starts to shorten, so the first 0.1-0.2 s of every flight has round-9 authority (lean −1 at 0.5 s is +24..27,
+not the +30 the blend gives from t 0); it holds through a hop's push and recover, so a hop-then-lean gets its authority
+only after `hopRecoverTime` 0.6 s or the landing (a rider holding lean back off a lip is in preload, not exempt); a bike
+resting on its bash plate is grounded. A load-based blend (rider weight carried by the tyres) would remove the delay but
+the 60 deg crest is a knife edge on the base-corner transition (both wheels off ~10 ticks): at `airDelay` 6 it went
+2.91 → 3.86 s. Also open: the render's touchdown absorb (`crouchExtra`) is not in the physics chain (7.7), and the ragdoll
+arm rods (0.26 / 0.28) are a side-view compromise for a 3D arm (the elbow is 0.11-0.27 m out of the plane).
 (0d) Hand-over: the chain now IS the render's pose in the render's frame (0.00 cm on the crash tick, 7.7); what the
 render still sees is its own ~80 ms pose lead and frame interpolation. If the render changes `poseRider`, the
 `RAGDOLL hand-over vs render pose` test in `world.test.ts` carries the copy to update.

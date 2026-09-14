@@ -71,6 +71,12 @@ export interface BikeTuning {
     gearRatio: number;
     efficiency: number;
     engineBrakeFrac: number;
+    /**
+     * Fraction of the engine braking kept while airborne (round 10). A rider in the air pulls the
+     * clutch: the rear wheel free-wheels and its spin is not bled into the frame (0.08 x peak x rpm was
+     * -11 deg / 0.6 s of no-input nose-down at 20 m/s; on the ground it is untouched).
+     */
+    engineBrakeAir: number;
     throttleRise: number;
     throttleFall: number;
     /**
@@ -159,6 +165,20 @@ export interface BikeTuning {
     cLanding: number;
     leanBack: number;
     leanFwd: number;
+    /**
+     * Fraction of the lean's mass shift (leanBack / leanFwd and the lean drops) kept while airborne
+     * (round 10). On the ground the shift is a lever braced against the tyres (brake distance, balance
+     * point, climbs); in the air nothing braces it and the 75 kg translating 0.6-0.73 m relative to the
+     * frame at 0.5 m above its COM counter-rotates the bike against the torso swing (lean -1 was +12 deg
+     * with the shift, +31 without; lean +1 0 vs -35). Airborne the lean is the torso-swing action; the
+     * remaining shift is what the drawn hang-back moves (~0.3 m back, ~0.1 m forward).
+     */
+    airShift: number;
+    /** Ticks both wheels must be off the ground before the airborne blend starts (a skip is not flight). */
+    airDelay: number;
+    /** Seconds for the airborne blend to reach 1 after that / return to 0 after a touch. */
+    airRise: number;
+    airFall: number;
     leanRate: number;
     crouch: number;
     hopExtend: number;
@@ -305,7 +325,8 @@ const DEFAULTS: BikeTuning = {
     ],
     gearRatio: 17.5,
     efficiency: 0.92,
-    engineBrakeFrac: 0.08, // round 9: was 0.08 (66 Nm at 20 m/s reacting on the frame pitched the airborne bike -11 deg in 0.6 s with no input)
+    engineBrakeFrac: 0.08, // 66 Nm at 20 m/s; on the ground only since round 10 (engineBrakeAir)
+    engineBrakeAir: 0,
     throttleRise: 40,
     throttleFall: 60,
     // round 7: the soft clutch off idle. 1500 -> 3500 in 0.25 s; coasts down in 0.5 s (a flywheel), so a
@@ -334,6 +355,10 @@ const DEFAULTS: BikeTuning = {
     cLanding: 8000,
     leanBack: 0.6,
     leanFwd: 0.73,
+    airShift: 0.25,
+    airDelay: 12,
+    airRise: 0.1,
+    airFall: 0.12,
     leanRate: 6,
     crouch: 0.3,
     hopExtend: 0.15,

@@ -375,154 +375,85 @@ describe('ragdoll spawn continuity (round 6, blind critic: "limbs pop at the cra
   });
 });
 
-describe('ragdoll hand-over vs the render pose (round 8: the chain is written in the render axle frame)', () => {
-  /** `riderModel.ts` poseRider, re-derived here (axle coords; render `BIKE`/`L` numbers) so the physics chain is checked against what is drawn, not against itself. */
-  function renderPose(r: PhysicsState['rider']): { hips: [number, number]; shoulders: [number, number]; head: [number, number]; elbow: [number, number]; grip: [number, number]; knee: [number, number]; ankle: [number, number]; torsoA: number } {
-    const grip: [number, number] = [0.27, 0.78];
-    const pegs = [-0.14, 0.02];
-    const L = { torso: 0.5, headUp: 0.195, upperArm: 0.3, forearm: 0.27, thigh: 0.44, shin: 0.43, ankle: 0.09 };
-    const ik = (ax: number, ay: number, bx: number, by: number, l1: number, l2: number): [number, number] => {
-      let dx = bx - ax;
-      let dy = by - ay;
-      let d = Math.hypot(dx, dy);
-      const max = (l1 + l2) * 0.995;
-      const min = Math.abs(l1 - l2) + 0.02;
-      if (d > max || d < min) {
-        const k = (d > max ? max : min) / (d || 1e-6);
-        dx *= k;
-        dy *= k;
-        d = d > max ? max : min;
-      }
-      const a = (l1 * l1 - l2 * l2 + d * d) / (2 * d);
-      const h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
-      const ux = dx / d;
-      const uy = dy / d;
-      return [ax + ux * a - uy * h, ay + uy * a + ux * h];
-    };
-    const back = Math.max(0, -r.lean);
-    const fwd = Math.max(0, r.lean);
-    const crouch = Math.max(0, r.crouch);
-    const [gx, gy] = grip;
-    const reach = (L.upperArm + L.forearm) * 0.985;
-    let hx = -0.12 - 0.28 * back + 0.14 * fwd - 0.06 * crouch;
-    let hy = 0.74 - 0.28 * crouch;
-    const torsoA = 0.62 + r.torsoPitch + 0.3 * fwd + 0.35 * crouch - 0.1 * back - 0.1 * r.armExtend;
-    let sx = hx + Math.sin(torsoA) * L.torso;
-    let sy = hy + Math.cos(torsoA) * L.torso;
-    if (back > 0) {
-      const phi = 0.32 + 0.15 * crouch;
-      const px = gx - Math.cos(phi) * reach;
-      const py = gy + Math.sin(phi) * reach;
-      sx += (px - sx) * back;
-      sy += (py - sy) * back;
-      hx = sx - Math.sin(torsoA) * L.torso;
-      hy = sy - Math.cos(torsoA) * L.torso;
-    }
-    const ax0 = pegs[0]! + 0.01;
-    const ay0 = pegs[1]! + L.ankle;
-    {
-      const legReach = (L.thigh + L.shin) * 0.985;
-      const d = Math.hypot(hx - ax0, hy - ay0);
-      if (d > legReach) {
-        const kk = (d - legReach) / d;
-        hx += (ax0 - hx) * kk;
-        hy += (ay0 - hy) * kk;
-        sx = hx + Math.sin(torsoA) * L.torso;
-        sy = hy + Math.cos(torsoA) * L.torso;
-      }
-    }
-    {
-      const ddx = gx - sx;
-      const ddy = gy - sy;
-      const d = Math.hypot(ddx, ddy);
-      const near = 0.3;
-      if (d > reach || d < near) {
-        const kk = (d - (d > reach ? reach : near)) / (d || 1e-6);
-        sx += ddx * kk;
-        sy += ddy * kk;
-        hx += ddx * kk;
-        hy += ddy * kk;
-      }
-    }
-    const headA = torsoA * 0.45 - 0.1;
-    return {
-      hips: [hx, hy],
-      shoulders: [sx, sy],
-      head: [sx + Math.sin(headA) * L.headUp, sy + Math.cos(headA) * L.headUp],
-      elbow: ik(sx, sy, gx, gy, L.upperArm, L.forearm),
-      grip,
-      knee: ik(hx, hy, ax0, ay0, L.thigh, L.shin),
-      ankle: [ax0, ay0],
-      torsoA,
-    };
+describe('rider chain vs the reference (round 10: the chain is pose.ts\'s, checked against RIDER_CHAIN.md\'s canonical joint tables)', () => {
+  type P = [number, number];
+  /** RIDER_CHAIN.md "Joint table, lean x crouch" (AXLE coords, .L side, x/y only): hips, shoulders, head, elbow.L, knee.L. */
+  const REF = {
+    stand_attack: { hips: [-0.28, 0.85], shoulders: [0.118, 1.184], head: [0.208, 1.385], elbow: [0.299, 1.057], knee: [0.021, 0.503], torsoDeg: 40, headDeg: 66 },
+    hang_back: { hips: [-0.57, 0.6], shoulders: [-0.272, 1.026], head: [-0.215, 1.238], elbow: [0.015, 0.938], knee: [-0.117, 0.521], torsoDeg: 55, headDeg: 75 },
+    forward_attack: { hips: [-0.22, 0.9], shoulders: [0.247, 1.128], head: [0.411, 1.275], elbow: [0.379, 1.016], knee: [0.016, 0.507], torsoDeg: 26, headDeg: 42 },
+    hang_back_crouch: { hips: [-0.6, 0.551], shoulders: [-0.263, 0.947], head: [-0.158, 1.141], elbow: [0.016, 0.935], knee: [-0.142, 0.518], torsoDeg: 50, headDeg: 62 },
+  } satisfies Record<string, { hips: P; shoulders: P; head: P; elbow: P; knee: P; torsoDeg: number; headDeg: number }>;
+  const GRIP: P = [0.27, 0.78];
+  const ANKLE: P = [-0.13, 0.11];
+  /** The physics chain in axle coords (origin calibrated the render's way from the spawn wheel positions). */
+  interface ChainAxle {
+    hips: P;
+    shoulders: P;
+    head: P;
+    elbow: P;
+    hand: P;
+    knee: P;
+    foot: P;
+    torsoDeg: number;
+    headDeg: number;
+    pose: PhysicsState['rider'];
   }
-  function handover(setup: (w: BikePhysicsWorld) => void, input: Partial<InputFrame>): { maxPos: number; maxAng: number; lean: number; origin: [number, number] } {
-    const w = createBikePhysics(HZ);
-    w.loadTrack(makeTrack(), 3);
-    // the render calibrates its frame origin (axle midpoint, bike-local) on the first grounded frame after a cut
+  function chainAxle(w: BikePhysicsWorld, origin: P): ChainAxle {
+    const s = w.getState();
+    const d = w.debug();
+    const c = Math.cos(s.bike.angle);
+    const n = Math.sin(s.bike.angle);
+    const loc = (p: { x: number; y: number }): P => {
+      const dx = p.x - s.bike.pos.x;
+      const dy = p.y - s.bike.pos.y;
+      return [dx * c + dy * n - origin[0], -dx * n + dy * c - origin[1]];
+    };
+    const ch = d.riderChain;
+    const ang = (v: { x: number; y: number }): number => ((Math.atan2(v.y, v.x) - s.bike.angle) * 180) / Math.PI;
+    return { hips: loc(ch.hips), shoulders: loc(ch.shoulders), head: loc(ch.head), elbow: loc(ch.elbow), hand: loc(ch.hand), knee: loc(ch.knee), foot: loc(ch.foot), torsoDeg: ang(ch.torsoDir), headDeg: ang(ch.headDir), pose: s.rider };
+  }
+  function origin(w: BikePhysicsWorld): P {
     const s0 = w.getState();
     const c0 = Math.cos(s0.bike.angle);
     const n0 = Math.sin(s0.bike.angle);
     const mx = 0.5 * (s0.wheels.rear.pos.x + s0.wheels.front.pos.x) - s0.bike.pos.x;
     const my = 0.5 * (s0.wheels.rear.pos.y + s0.wheels.front.pos.y) - s0.bike.pos.y;
-    const origin: [number, number] = [mx * c0 + my * n0, -mx * n0 + my * c0];
-    stepN(w, {}, 60);
-    setup(w);
-    const q = quantizeInput(input);
-    for (let i = 0; i < HZ * 6; i++) {
-      w.step(q);
-      const s = w.getState();
-      if (!s.ragdoll) continue;
-      // the render draws the posed chain at the crash tick's frame (the frame is interpolated like every body)
-      const p = renderPose(s.rider);
-      const c = Math.cos(s.bike.angle);
-      const n = Math.sin(s.bike.angle);
-      const world = ([lx, ly]: [number, number]): [number, number] => {
-        const x = lx + origin[0];
-        const y = ly + origin[1];
-        return [s.bike.pos.x + x * c - y * n, s.bike.pos.y + x * n + y * c];
-      };
-      const mid = (a: [number, number], b: [number, number]): [number, number] => [0.5 * (a[0] + b[0]), 0.5 * (a[1] + b[1])];
-      const dir = (a: [number, number], b: [number, number]): number => Math.atan2(-(b[0] - a[0]), b[1] - a[1]);
-      const H = world(p.hips);
-      const S = world(p.shoulders);
-      const E = world(p.elbow);
-      const G = world(p.grip);
-      const K = world(p.knee);
-      const A = world(p.ankle);
-      const HD = world(p.head);
-      const ta = dir(H, S);
-      const expected: Record<string, { pos: [number, number]; angle: number }> = {
-        head: { pos: HD, angle: s.bike.angle - (p.torsoA * 0.45 - 0.1) },
-        torso: { pos: mid(H, S), angle: ta },
-        pelvis: { pos: [H[0] + Math.sin(ta) * 0.1, H[1] - Math.cos(ta) * 0.1], angle: ta },
-        upperArm: { pos: mid(E, S), angle: dir(E, S) },
-        forearm: { pos: mid(G, E), angle: dir(G, E) },
-        thigh: { pos: mid(K, H), angle: dir(K, H) },
-        shin: { pos: mid(A, K), angle: dir(A, K) },
-      };
-      let maxPos = 0;
-      let maxAng = 0;
-      for (const b of s.ragdoll) {
-        const e = expected[b.id]!;
-        maxPos = Math.max(maxPos, Math.hypot(b.pos.x - e.pos[0], b.pos.y - e.pos[1]));
-        const da = Math.atan2(Math.sin(b.angle - e.angle), Math.cos(b.angle - e.angle));
-        maxAng = Math.max(maxAng, Math.abs(da));
-      }
-      return { maxPos, maxAng, lean: s.rider.lean, origin };
-    }
-    throw new Error('no crash');
+    return [mx * c0 + my * n0, -mx * n0 + my * c0];
   }
-  it('on the crash tick every ragdoll body sits on the render\'s posed chain (riderModel poseRider in axle coords, origin calibrated the render\'s way) within 3 cm / 3 deg: hang-off loop-out (lean -1), neutral nose plant, forward-lean endo', () => {
-    const cases = [
-      ['hang-off loop', handover((w) => w.teleport({ pos: { x: 0, y: R }, angle: 0.6, vel: { x: 7, y: 0 } }), { throttle: 1, lean: -1 })],
-      ['plant', handover((w) => w.teleport({ pos: { x: 0, y: R + 0.2 }, angle: 1.9, vel: { x: 7, y: 0 } }), { throttle: 0.3 })],
-      ['forward endo', handover((w) => w.teleport({ pos: { x: 0, y: R + 0.2 }, angle: -1.2, vel: { x: 7, y: -3 } }), { brake: 1, lean: 1 })],
-    ] as const;
-    for (const [name, r] of cases) {
-      console.log(`RAGDOLL hand-over vs render pose (${name}, pose lean ${r.lean.toFixed(2)}, origin (${r.origin[0].toFixed(3)}, ${r.origin[1].toFixed(3)})): max body offset ${(r.maxPos * 100).toFixed(2)} cm, max axis error ${((r.maxAng * 180) / Math.PI).toFixed(2)} deg`);
-      expect(r.maxPos).toBeLessThan(0.03);
-      expect(r.maxAng).toBeLessThan((3 * Math.PI) / 180);
+  const dist = (a: P, b: P): number => Math.hypot(a[0] - b[0], a[1] - b[1]);
+  it('hands on the grips and ankles on the pegs in every pose; hips / shoulders / head / elbow / knee within 3 cm and torso / head angles within 5 deg of stand_attack (lean 0), hang_back (lean -1), forward_attack (lean +1) and hang_back + crouch (a held preload)', () => {
+    const w = createBikePhysics(HZ);
+    w.loadTrack(makeTrack(), 3);
+    const o = origin(w);
+    const cases: [string, () => void][] = [
+      ['stand_attack', () => stepN(w, {}, 240)],
+      ['hang_back', () => stepN(w, { throttle: 0.2, lean: -1 }, 180)],
+      ['forward_attack', () => stepN(w, { throttle: 0.2, lean: 1 }, 180)],
+      ['hang_back_crouch', () => stepN(w, { throttle: 0.6, lean: -1 }, 120)],
+    ];
+    for (const [name, drive] of cases) {
+      w.teleport({ pos: { x: 0, y: R }, angle: 0, vel: { x: 6, y: 0 } });
+      drive();
+      const ch = chainAxle(w, o);
+      const ref = REF[name as keyof typeof REF];
+      let maxErr = 0;
+      const parts: string[] = [];
+      for (const k of ['hips', 'shoulders', 'head', 'elbow', 'knee'] as const) {
+        const e = dist(ch[k], ref[k]);
+        maxErr = Math.max(maxErr, e);
+        parts.push(`${k} ${(e * 100).toFixed(1)}`);
+      }
+      const torsoErr = Math.abs(ch.torsoDeg - ref.torsoDeg);
+      const headErr = Math.abs(ch.headDeg - ref.headDeg);
+      console.log(
+        `CHAIN ${name} (pose lean ${ch.pose.lean.toFixed(2)} crouch ${ch.pose.crouch.toFixed(2)} torsoPitch ${ch.pose.torsoPitch.toFixed(3)}): joint error cm ${parts.join(', ')}; torso ${ch.torsoDeg.toFixed(1)} vs ${ref.torsoDeg} deg, head ${ch.headDeg.toFixed(1)} vs ${ref.headDeg}; hand off grip ${(dist(ch.hand, GRIP) * 1000).toFixed(1)} mm, ankle off peg ${(dist(ch.foot, ANKLE) * 1000).toFixed(1)} mm`,
+      );
+      expect(dist(ch.hand, GRIP)).toBeLessThan(0.002);
+      expect(dist(ch.foot, ANKLE)).toBeLessThan(0.002);
+      expect(maxErr).toBeLessThan(0.03);
+      expect(torsoErr).toBeLessThan(5);
+      expect(headErr).toBeLessThan(5);
     }
   });
 });
