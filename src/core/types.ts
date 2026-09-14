@@ -339,6 +339,12 @@ export interface CameraDebug {
   bikeScreenX: number;
   bikeScreenY: number;
   bikeHeightFrac: number;
+  /** Rig angles in radians (render reports them; the harness asserts |roll| < 1e-6). */
+  roll?: number;
+  yaw?: number;
+  pitch?: number;
+  /** Rig state name, e.g. 'side' | 'high34' | 'crash' | 'finish' (render-defined). */
+  state?: string;
 }
 
 export type GameEventListener = (event: GameEvent) => void;
