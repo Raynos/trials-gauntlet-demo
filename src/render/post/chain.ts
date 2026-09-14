@@ -118,7 +118,7 @@ export class PostChain {
     this.target = new THREE.WebGLRenderTarget(1280, 720, { type: THREE.HalfFloatType, samples: 0 });
     this.composer = new EffectComposer(renderer, this.target);
     this.renderPass = new RenderPass(scene, camera);
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(640, 360), 0.5, 0.3, 1.25);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(640, 360), 0.5, 0.3, 1.6);
     this.composite = new ShaderPass(COMPOSITE);
     this.composer.addPass(this.renderPass);
     this.composer.addPass(this.bloom);

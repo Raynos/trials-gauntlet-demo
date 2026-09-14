@@ -106,13 +106,25 @@ function warehouseWall(rng: Rng, paneColor: string, brick: string): { map: THREE
         const pw = ww / cols;
         const ph = wh / rows;
         const broken = rng.next() < 0.06;
-        const dirt = 0.55 + rng.next() * 0.45;
+        const dirt = 0.35 + rng.next() * 0.45;
         g.fillStyle = broken ? '#141210' : paneColor;
         g.globalAlpha = broken ? 1 : dirt;
-        g.fillRect(x + 5, y + 5, pw - 10, ph - 10);
+        g.fillRect(x + 7, y + 7, pw - 14, ph - 14);
         g.globalAlpha = 1;
-        ge.fillStyle = broken ? '#000' : `rgba(255,255,255,${dirt})`;
-        ge.fillRect(x + 5, y + 5, pw - 10, ph - 10);
+        // Mullion cross inside each pane + grime gradient at the bottom of the pane.
+        g.fillStyle = '#1e1c1a';
+        g.fillRect(x + pw / 2 - 2, y + 7, 4, ph - 14);
+        g.fillRect(x + 7, y + ph / 2 - 2, pw - 14, 4);
+        const gr = g.createLinearGradient(0, y + ph - 14, 0, y + ph * 0.5);
+        gr.addColorStop(0, 'rgba(40,32,24,0.7)');
+        gr.addColorStop(1, 'rgba(40,32,24,0)');
+        g.fillStyle = gr;
+        g.fillRect(x + 7, y + 7, pw - 14, ph - 14);
+        ge.fillStyle = broken ? '#000' : `rgba(255,255,255,${dirt * 0.9})`;
+        ge.fillRect(x + 7, y + 7, pw - 14, ph - 14);
+        ge.fillStyle = '#000';
+        ge.fillRect(x + pw / 2 - 2, y + 7, 4, ph - 14);
+        ge.fillRect(x + 7, y + ph / 2 - 2, pw - 14, 4);
       }
     }
   }
@@ -127,6 +139,47 @@ function warehouseWall(rng: Rng, paneColor: string, brick: string): { map: THREE
     g.fillText(rng.next() < 0.5 ? 'TRIALS' : 'BAY ' + rng.int(1, 9), 3 * px, H - 3.2 * px);
   }
   return { map: tex(c), emissive: tex(ce, true), bytes: W * H * 4 * 1.33 * 2 };
+}
+
+/** Container skin: light base (tinted per instance), rust streaks, big number, logo band. Albedo only; the corrugated normal map stays. */
+function containerSkin(rng: Rng): THREE.CanvasTexture {
+  const [c, g] = canvas(1024, 512);
+  g.fillStyle = '#e6e6e2';
+  g.fillRect(0, 0, 1024, 512);
+  // Corrugation shading stripes (albedo-only hint; the normal map does the rest).
+  for (let x = 0; x < 1024; x += 16) {
+    g.fillStyle = 'rgba(0,0,0,0.07)';
+    g.fillRect(x, 0, 6, 512);
+  }
+  // Rust streaks from the top rail and around the door bars.
+  for (let i = 0; i < 9; i++) {
+    const x = rng.range(0, 1024);
+    const w = rng.range(3, 12);
+    const h = rng.range(30, 200);
+    const gr = g.createLinearGradient(0, 0, 0, h);
+    gr.addColorStop(0, 'rgba(110,60,25,0.35)');
+    gr.addColorStop(1, 'rgba(120,60,20,0)');
+    g.fillStyle = gr;
+    g.fillRect(x, 0, w, h);
+  }
+  const grime = g.createLinearGradient(0, 512, 0, 380);
+  grime.addColorStop(0, 'rgba(30,22,14,0.3)');
+  grime.addColorStop(1, 'rgba(30,22,14,0)');
+  g.fillStyle = grime;
+  g.fillRect(0, 0, 1024, 512);
+  // Logo band + serial.
+  g.fillStyle = 'rgba(255,255,255,0.85)';
+  g.fillRect(60, 60, 330, 70);
+  g.fillStyle = '#111';
+  g.font = 'bold 54px Impact, "Arial Black", sans-serif';
+  g.fillText(['SQUADX', 'KBNI', 'REDLYNX', 'TRIALS'][rng.int(0, 3)]!, 80, 116);
+  g.fillStyle = 'rgba(20,20,20,0.85)';
+  g.font = 'bold 72px Impact, "Arial Black", sans-serif';
+  g.fillText(String(rng.int(10, 99)) + 'C', 640, 130);
+  // Door bars (dark verticals on the right third).
+  g.fillStyle = 'rgba(25,25,25,0.7)';
+  for (const x of [790, 840, 890, 940]) g.fillRect(x, 20, 10, 472);
+  return tex(c);
 }
 
 /** Silhouette strip (white shapes on transparent) for a parallax tier. */
@@ -336,7 +389,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
         map: wall.map,
         emissiveMap: wall.emissive,
         emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff2dc),
-        emissiveIntensity: foundry ? 1.6 : 1.8,
+        emissiveIntensity: foundry ? 1.1 : 1.05,
         roughness: 0.95,
       }),
     );
@@ -377,21 +430,51 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       bulb.add(x, roofY - 2.4, z, 0, 1, null, 0, 2.2, 1);
     }
     batches.push(lampShade, bulb);
-    // Mid-ground clutter: containers (some stacked), racks, pallets, drums, tyres, spools.
-    const containers = new PropBatch('container', containerGeometry(), lib.get('container'));
+    // Container skin (albedo) — the library normal/ORM stay so it shares the program.
+    const skin = containerSkin(rng);
+    textureBytes += 1024 * 512 * 4 * 1.33;
+    const contMat = lib.get('container');
+    contMat.map = skin;
+    contMat.needsUpdate = true;
+    // Mid-ground clutter: containers (stacked 2–3), racks, pallets, drums, tyres, chains, cones.
+    const containers = new PropBatch('container', containerGeometry(), contMat);
     const racks = new PropBatch('rack', rackGeometry(), lib.get('rustSteel'));
     const pallets = new PropBatch('pallet', palletGeometry(), lib.get('pallet'));
     const drums = new PropBatch('drum', drumGeometry(), lib.get('barrelRed'));
     const tyres = new PropBatch('tyres', tyreStackGeometry(), lib.get('tyre'));
     const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a];
-    for (let x = x0 + 10; x < x1 - 10; x += rng.range(7, 13)) {
+    const chains = new PropBatch('chain', new THREE.CylinderGeometry(0.02, 0.02, 1, 6).translate(0, -0.5, 0), lib.get('darkSteel'), false);
+    const cones = new PropBatch('cone', coneGeometry(), fogify(new THREE.MeshStandardMaterial({ color: 0xff6a1a, roughness: 0.6 })));
+    const rail = new PropBatch('rail', new THREE.BoxGeometry(1, 0.05, 0.05), lib.get('hazardTape'), false);
+    const railPost = new PropBatch('railpost', new THREE.BoxGeometry(0.05, 1.1, 0.05).translate(0, 0.55, 0), lib.get('darkSteel'), false);
+    const catwalk = new PropBatch('catwalk', new THREE.BoxGeometry(1, 0.08, 1.4), lib.get('grate'));
+    // Back-wall catwalk at 5 m with railing, broken into 1 m instances.
+    for (let x = x0 + 4; x < x1 - 4; x += 1) {
+      catwalk.add(x + 0.5, floorY + 5, -15.6);
+      rail.add(x + 0.5, floorY + 6.05, -14.95);
+      if (Math.round(x - x0) % 3 === 0) railPost.add(x + 0.5, floorY + 5.04, -14.95);
+    }
+    // Chains hanging from the trusses, some with a hook tyre.
+    for (let x = x0 + 5; x < x1; x += rng.range(4, 9)) {
+      const z = rng.range(-12, -5);
+      chains.add(x, roofY - 1.4, z, 0, 1, null, 0, rng.range(2, 6), 1);
+    }
+    // Two container rows: a back row against the wall (dense, stacked) and a mid row.
+    for (let x = x0 + 8; x < x1 - 8; x += rng.range(6.5, 8.5)) {
+      const z = -14.2 + rng.range(-0.4, 0.4);
+      const ry = rng.range(-0.06, 0.06);
+      const n = rng.int(1, 3);
+      for (let k = 0; k < n; k++) containers.add(x + rng.range(-0.15, 0.15), floorY + k * 2.59, z, ry, 1, palette[rng.int(0, palette.length - 1)]!);
+    }
+    for (let x = x0 + 10; x < x1 - 10; x += rng.range(3.5, 6.5)) {
       const gy = floorY;
       const r = rng.next();
-      if (r < 0.42) {
-        const z = rng.range(-14, -7);
-        const ry = rng.range(-0.15, 0.15) + (rng.next() < 0.25 ? Math.PI / 2 : 0);
+      if (r < 0.24) {
+        const z = rng.range(-11, -6.5);
+        const ry = rng.range(-0.15, 0.15) + (rng.next() < 0.3 ? Math.PI / 2 : 0);
         containers.add(x, gy, z, ry, 1, palette[rng.int(0, palette.length - 1)]!);
-        if (rng.next() < 0.45) containers.add(x + rng.range(-0.4, 0.4), gy + 2.59, z + rng.range(-0.2, 0.2), ry + rng.range(-0.05, 0.05), 1, palette[rng.int(0, palette.length - 1)]!);
+        if (rng.next() < 0.55) containers.add(x + rng.range(-0.4, 0.4), gy + 2.59, z + rng.range(-0.2, 0.2), ry + rng.range(-0.05, 0.05), 1, palette[rng.int(0, palette.length - 1)]!);
+        if (rng.next() < 0.5) cones.add(x + rng.range(-3, 3), gy, rng.range(-5.5, -4.5), rng.range(0, 6));
       } else if (r < 0.62) {
         racks.add(x, gy, rng.range(-15, -12), 0, 1);
         racks.add(x + 2.75, gy, rng.range(-15, -12), 0, 1);
@@ -407,14 +490,17 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
         tyres.add(x, gy, rng.range(-7, -4.5), rng.range(0, 6));
       }
     }
-    // Foreground: rare low props so the bike is never hidden.
-    for (let x = x0 + 25; x < x1 - 20; x += rng.range(28, 45)) {
+    // Foreground occluders that slide past the camera: pillars, chains, barrel tops, tyres.
+    for (let x = x0 + 18; x < x1 - 15; x += rng.range(14, 24)) {
       const r = rng.next();
-      if (r < 0.5) drums.add(x, floorY, rng.range(5, 6.5), rng.range(0, 6), 1, 0xa42a1e);
-      else if (r < 0.8) tyres.add(x, floorY, rng.range(5, 6.5), 0);
-      else pallets.add(x, floorY, rng.range(5, 6.5), rng.range(-0.2, 0.2));
+      const z = rng.range(5, 7.5);
+      if (r < 0.3) column.add(x, floorY, z, 0, 1, null, 0, roofY - floorY, 1);
+      else if (r < 0.5) chains.add(x, roofY - 1.4, z, 0, 1, null, 0, rng.range(4, 9), 1);
+      else if (r < 0.75) drums.add(x, floorY, z, rng.range(0, 6), 1, 0xa42a1e);
+      else if (r < 0.9) tyres.add(x, floorY, z, 0);
+      else pallets.add(x, floorY, z, rng.range(-0.2, 0.2));
     }
-    batches.push(containers, racks, pallets, drums, tyres);
+    batches.push(containers, racks, pallets, drums, tyres, chains, cones, rail, railPost, catwalk);
     // Volumetric shafts from the windows: additive tilted quads.
     const shaft = shaftTexture();
     textureBytes += 256 * 256 * 4;
@@ -423,17 +509,24 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       transparent: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
-      color: new THREE.Color(foundry ? 0xff5a1a : 0xffe8c8).multiplyScalar(foundry ? 0.16 : 0.12),
+      color: new THREE.Color(foundry ? 0xff5a1a : 0xffe8c8).multiplyScalar(foundry ? 0.12 : 0.07),
       side: THREE.DoubleSide,
       fog: false,
     });
-    for (let x = x0 + 6; x < x1; x += 24) {
-      for (const dz of [0, 5]) {
-        const q = new THREE.Mesh(new THREE.PlaneGeometry(6, 16), shaftMat);
-        q.position.set(x + 5 + dz * 0.4, floorY + 6.5, -13 + dz);
-        q.rotation.set(0, 0.15, 0.55 + dz * 0.03);
+    // Shafts: one soft quad per window bank on every second bay, hanging from the
+    // bank centre (wall at z = -17, sill 6.2 m, head 9.6 m) and leaning along the sun.
+    for (let bay = 0; x0 + bay * 12 < x1; bay += 2) {
+      for (const bx of [3.2, 8.8]) {
+        const wx = x0 + bay * 12 + bx;
+        const len = 14;
+        const q = new THREE.Mesh(new THREE.PlaneGeometry(4.2, len), shaftMat);
+        // Top edge at the window centre; lean toward +z/-x with the sun (-0.45, 0.78, -0.3 → light travels +0.45, -0.78, +0.3).
+        const dir = new THREE.Vector3(0.45, -0.78, 0.3).normalize();
+        const top = new THREE.Vector3(wx, floorY + 7.9, -16.8);
+        q.position.copy(top).addScaledVector(dir, len / 2);
+        q.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir);
+        q.rotateY(0.35);
         q.renderOrder = 5;
-        q.frustumCulled = true;
         singles.push(q);
       }
     }

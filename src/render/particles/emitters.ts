@@ -12,10 +12,10 @@ import type { RenderFrame } from '../frame';
 import { ParticleSystem, puffTexture, type Burst } from './ParticleSystem';
 
 const DUST_COLOR: Partial<Record<SurfaceKind, number>> = {
-  dirt: 0x7a6446,
-  wood: 0xc9b58e,
+  dirt: 0x5e4e3a,
+  wood: 0x9a8a6a,
   metal: 0x8a8a8a,
-  concrete: 0xa8a49c,
+  concrete: 0x7a7670,
   rubber: 0x444444,
   grate: 0x777777,
   stone: 0xa89888,
@@ -56,7 +56,7 @@ export class Emitters {
     const spark = puffTexture('spark');
     const flake = puffTexture('flake');
     this.dust = new ParticleSystem(2048, soft, { gravity: -0.6, drag: 2.2, fadeIn: 0.08, opacity: 0.26 });
-    this.smoke = new ParticleSystem(512, soft, { gravity: 0.4, drag: 1.8, fadeIn: 0.05, opacity: 0.4 });
+    this.smoke = new ParticleSystem(512, soft, { gravity: 0.4, drag: 1.8, fadeIn: 0.05, opacity: 0.3 });
     this.sparks = new ParticleSystem(1024, spark, { additive: true, gravity: -9.81, drag: 0.6, fadeIn: 0.0, opacity: 1 });
     this.flame = new ParticleSystem(1024, soft, { additive: true, gravity: 4.0, drag: 1.2, fadeIn: 0.05, opacity: 0.9 });
     this.confetti = new ParticleSystem(1024, flake, { gravity: -2.0, drag: 1.5, fadeIn: 0.0, opacity: 1 });
@@ -127,7 +127,7 @@ export class Emitters {
       } else if (surf !== 'concrete' && surf !== 'wood' && surf !== 'rubber') {
         this.lastDirtT = t;
         const n = Math.min(10, Math.round(2 + f.rearSlip * 1.5));
-        Object.assign(b, { x: f.rear.x - 0.25, y: f.rear.y - 0.28, z: 0, count: n, life: [0.4, 1.2], size: [0.12, 0.55], vx: -f.velX * 0.3 - 2.0 - f.rearSlip * 0.4, vy: 1.2, vz: 0, spread: 0.7, jitter: 0.08, color: DUST_COLOR[surf] ?? 0x9c8462, gravityScale: 1 });
+        Object.assign(b, { x: f.rear.x - 0.25, y: f.rear.y - 0.28, z: 0, count: n, life: [0.35, 1.0], size: [0.1, 0.45], vx: -f.velX * 0.35 - 1.6 - f.rearSlip * 0.4, vy: 0.7, vz: 0, spread: 0.5, jitter: 0.06, color: DUST_COLOR[surf] ?? 0x9c8462, gravityScale: 1 });
         this.dust.emit(b, t, rng);
       }
     }
@@ -138,7 +138,7 @@ export class Emitters {
       this.lastExhaustT = t;
       const rng = this.reseed(f.tick, 2);
       const strength = f.throttleEff;
-      Object.assign(b, { x: exhaustTip.x, y: exhaustTip.y, z: exhaustTip.z, count: Math.round(3 + strength * 5), life: [0.35, 0.7], size: [0.12, 0.28 + strength * 0.2], vx: -1.2 - f.velX * 0.2, vy: 0.3, vz: 0.2, spread: 0.5, jitter: 0.03, color: 0x8e8e90, gravityScale: 0.2 });
+      Object.assign(b, { x: exhaustTip.x, y: exhaustTip.y, z: exhaustTip.z, count: Math.round(2 + strength * 3), life: [0.3, 0.55], size: [0.08, 0.2 + strength * 0.12], vx: -1.0 - f.velX * 0.2, vy: 0.25, vz: 0.15, spread: 0.35, jitter: 0.02, color: 0x5a5a5c, gravityScale: 0.15 });
       this.smoke.emit(b, t, rng);
     }
 
@@ -173,7 +173,7 @@ export class Emitters {
     }
     const life: [number, number] = surface === 'snow' ? [0.4, 0.9] : surface === 'wood' || surface === 'concrete' ? [0.3, 0.6] : [0.8, 1.6];
     const n = Math.round(8 + 32 * k) * (surface === 'wood' ? 0.4 : 1);
-    Object.assign(b, { x: w.x, y: w.y - 0.3, z: 0, count: Math.round(n), life, size: [0.2, 0.35 + 0.9 * k], vx: -f.velX * 0.15, vy: 0.9 + k, vz: 0, spread: 1.4, jitter: 0.25, color: DUST_COLOR[surface] ?? 0x9c8462, gravityScale: 1 });
+    Object.assign(b, { x: w.x, y: w.y - 0.32, z: 0, count: Math.round(n), life, size: [0.15, 0.3 + 0.6 * k], vx: -f.velX * 0.2, vy: 0.6 + 0.7 * k, vz: 0, spread: 1.1, jitter: 0.2, color: DUST_COLOR[surface] ?? 0x9c8462, gravityScale: 1 });
     this.dust.emit(b, f.tSim, rng);
   }
 
@@ -184,9 +184,10 @@ export class Emitters {
     const b = this.burst;
     for (const j of jets) {
       // Column: fast bright core, then a slower yellow bloom. Staggered births make it burn ~0.9 s.
-      for (let k = 0; k < 6; k++) {
-        Object.assign(b, { x: j.x, y: j.y + 0.1, z: j.z, count: 8, life: [0.35, 0.7], size: [0.25, 0.7], vx: 0, vy: 6.5, vz: 0, spread: 0.5, jitter: 0.06, color: k % 2 ? 0xffb020 : 0xff6a10, colorJitter: 0.2, gravityScale: 1 });
-        this.flame.emit(b, f.tSim + k * 0.12, rng);
+      // Thin fast column: many small sprites launched straight up over 0.7 s.
+      for (let k = 0; k < 10; k++) {
+        Object.assign(b, { x: j.x, y: j.y + 0.05, z: j.z, count: 9, life: [0.28, 0.5], size: [0.16, 0.3], vx: 0, vy: 7.5, vz: 0, spread: 0.25, jitter: 0.04, color: k % 2 ? 0xffc040 : 0xff7a18, colorJitter: 0.15, gravityScale: 0.6 });
+        this.flame.emit(b, f.tSim + k * 0.07, rng);
       }
       Object.assign(b, { x: j.x, y: j.y + 0.4, z: j.z, count: 10, life: [0.8, 1.4], size: [0.3, 0.9], vx: 0, vy: 2.5, vz: 0, spread: 0.4, jitter: 0.1, color: 0x2a2624, colorJitter: 0.2, gravityScale: 0.3 });
       this.smoke.emit(b, f.tSim + 0.5, rng);

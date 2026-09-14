@@ -129,7 +129,7 @@ export class Wheel {
     const s = 1 + 0.35 * compression;
     this.contact.scale.set(s, 1 + 0.15 * compression, 1);
     // Tyre contact-patch flattening: squash toward the ground by compression.
-    const k = grounded ? 0.055 * (0.4 + compression) : 0;
+    const k = grounded ? 0.07 * (0.4 + compression) : 0;
     this.tyreSquash.scale.set(1, 1 - k, 1);
     this.tyreSquash.position.y = -WHEEL_RADIUS * k;
   }
@@ -368,10 +368,15 @@ export class BikeModel {
       this.calibrated = true;
     }
     // Frame origin = bike.pos + R(angle) * originOffset (rest axle midpoint).
+    // Exaggerate suspension travel ×1.3 visually: the frame sinks toward the wheels and
+    // pitches with the compression difference (the wheels stay on the physics contact).
+    const rc = f.rear.grounded ? f.rear.compression : 0;
+    const fc = f.front.grounded ? f.front.compression : 0;
+    const sink = -0.03 * (rc + fc);
     const ox = this.originOffset.x;
-    const oy = this.originOffset.y;
+    const oy = this.originOffset.y + sink;
     this.frame.position.set(f.bikeX + ox * c - oy * s, f.bikeY + ox * s + oy * c, 0);
-    this.frame.rotation.z = f.bikeAngle;
+    this.frame.rotation.z = f.bikeAngle + 0.05 * (rc - fc);
     this.frame.updateMatrix();
     this.frame.updateMatrixWorld(true);
     this.frameLocal.copy(this.frame.matrixWorld);

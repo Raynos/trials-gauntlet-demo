@@ -17,9 +17,9 @@ three 0.186.0 addons used: `EffectComposer, RenderPass, UnrealBloomPass, ShaderP
 
 | Budget | Cap | Round 1 | Where measured |
 |---|---|---|---|
-| Draw calls | 300 | 160–210 | `renderer.info.render.calls` (accumulated over all passes; `info.autoReset=false`) |
-| Triangles | 500 k | 64–77 k | `renderer.info.render.triangles` |
-| Texture memory | 96 MB | 38.8 MB | `estimateTextureMB` (all maps incl. mips, env, canvas textures) |
+| Draw calls | 300 | 239 | `renderer.info.render.calls` (accumulated over all passes; `info.autoReset=false`) |
+| Triangles | 500 k | 251 k (deck boards/kerbs + pallet supports + dense set dressing) | `renderer.info.render.triangles` |
+| Texture memory | 96 MB | 35.9 MB | `estimateTextureMB` (all maps incl. mips, env, canvas textures) |
 | Track + obstacles | 20 calls / 80 k tris | 11 calls / 5.1 k tris (12-kind synthetic track) | `debugInfo().trackCalls/trackTris` |
 | Texture generation | 400 ms desktop, after first frame | ≈330–400 ms in headless Chromium (SwiftShader host) | `debugInfo().textureGenMs` |
 | Shader programs | 32 | 32 (industrial; every MeshStandardMaterial carries the same map set) | `info.programs` |
@@ -55,7 +55,8 @@ src/render/
   lighting/environment.ts LightingRig: sun + snapped shadow frustum, hemisphere, procedural equirect sky → PMREM, fog chunks
   materials/texgen.ts     Periodic value/ridged/Worley noise → albedo + Sobel normal + ORM DataTextures; 10 painters
   materials/library.ts    MaterialLibrary: ~45 named MeshStandardMaterials, SurfaceKind→material, derive(), generateTextures()
-  world/track.ts          Ribbons from polyline colliders (bevels, aprons, vertex AO shade), merged per surface
+  world/track.ts          Ribbon geometry helpers (bevels, aprons, vertex shade) + profileY
+  world/deck.ts           Built ride surfaces per collider.surface × biome (boards, dirt bed, kerbs, paint lines) + supports
   world/obstacles.ts      Bodies for the 12 placed kinds + unclaimed box/circle/seesaw colliders + hazards
   world/gates.ts          Checkpoint gates (posts, beam, lamp, hanging zone plaque D1…A3), finish arch + checkered banner
   world/props.ts          PropBatch (InstancedMesh) + geometry recipes (container, pallet, drum, tyres, column, truss, lamp, rack, rock, pine, bale, cone, building, pipe)
@@ -84,17 +85,19 @@ distance is solved from the target height fraction: `d = (1.9 / hf / 2) / tan(fo
 
 | State | Trigger | heightFrac | screenX (moving right) | screenY | yaw | pitch |
 |---|---|---|---|---|---|---|
-| idle / countdown | speed < 1.5 | 0.40 | 0.45 | 0.55 | 5° | 3° |
-| riding | 1.5–9 m/s | 0.24 | 0.30 | 0.53 | 15° | 17° |
-| fast / air | speed > 9 or airTime > 0 | 0.09 | 0.28 | 0.50 | 18° | 24° (+6° airborne) |
+| idle / countdown | speed < 1.0 (enter riding at 2.2) | 0.40 | 0.45 | 0.55 | 5° | 3° |
+| riding | 2.2–11 m/s | 0.26 | 0.30 | 0.53 | 15° | 13° |
+| fast / air | speed > 11 (back below 8) or airTime > 0.25 s | 0.14 | 0.28 | 0.50 | 17° | 15° (+5° airborne) |
+
+The zoom state is **discrete with hysteresis** (round 3); the smoothers then make the pull-back one
+eased move that arrives instead of a drift tied to speed.
 
 **Roll is always 0** (Euler YXZ from yaw/pitch keeps the camera right vector horizontal; the
 landing shake moves y only). Only a `CameraKey.roll` can roll. `camera()` reports the measured
 `roll` (angle of the camera right vector to the horizontal) plus `yaw`, `pitch`, `state`, so the
 harness can assert `|roll| < 1e-6` on flat-test (round 2: 0.0 on every sampled frame).
 
-`zoomT = smoothstep(1.5, 9, speed)`, `fastT = smoothstep(9, 15, speed)`, `airT = smoothstep(0, 0.7, airTime)`,
-`wideT = max(fastT, airT)`. Moving left mirrors screenX and yaw. Each parameter is followed by an
+`zoomT/fastT` are 0/1 from the state machine, `airT = smoothstep(0, 0.7, airTime)`. Moving left mirrors screenX and yaw. Each parameter is followed by an
 exponential smoother (half-lives: follow x 0.12 s, follow y 0.18 s with a 0.6 m dead-zone on the
 ground, lookahead 0.25, heightFrac 0.35, screenX/Y 0.5, yaw/pitch 0.45, roll 0.6, fov 0.3).
 Lookahead `clamp(vel.x·0.15, −1.5, 2.5)` on top of the screen offset.
@@ -201,7 +204,7 @@ at z ∈ [−16, −4.5], rare low foreground occluders at z ∈ [+5, +8.5]; not
 
 | Biome | Shell / backdrop | Props | Lights & particles |
 |---|---|---|---|
-| industrial | brick back wall with two 4×3.4 m window banks per 12 m bay (canvas albedo + emissive map, sills at 6.2 m), side walls, roof plane with emissive skylight strips, trusses every 12 m, I-columns | containers (6 colours, some stacked), shelving racks with boxes, pallet stacks, drums (red/white/blue), tyre stacks | hanging sodium lamps (emissive discs) every 9 m, 2 additive light-shaft quads every 24 m, dust motes |
+| industrial | brick back wall with two 4×3.4 m window banks per 12 m bay (canvas albedo + emissive map capped at 1.05, mullion cross per pane, grime gradient, sills 6.2 m), side walls, roof plane with skylight strips, trusses every 12 m, I-columns, back-wall catwalk at 5 m with hazard-striped railing | back row of containers against the wall stacked 1–3 high every 6.5–8.5 m + a sparser mid row (6 colours via instance colour over a canvas skin: rust streaks, logo band, serial number, door bars; corrugated normal map), shelving racks, pallet stacks, drums, tyre stacks, cones, hanging chains; foreground occluders at z 5–7.5 every 14–24 m (pillars, chains, drums, tyres, pallets) | sodium lamps every 9 m, one soft light-shaft quad per window bank on every second bay hanging from the bank centre along the sun direction (alpha 0.07), dust motes |
 | foundry | same shell, red panes and brick | + molten pillars (flickering emissive), pipe runs | 1 point light, embers |
 | canyon | 3 mesa silhouette tiers at z −45/−130/−340 | rocks (displaced icosahedra, 0.8–3.2 m), hay bales, tyres, white drums; occasional foreground rock | — |
 | snow | pine tiers + far hills | pines, crates, lamp posts with warm heads | snowfall (10/0.1 s) |
@@ -210,9 +213,26 @@ at z ∈ [−16, −4.5], rare low foreground occluders at z ∈ [+5, +8.5]; not
 Fog tiering falls out of real depth: the silhouette planes sit at real distances and the fog
 curve does the 100/50/15 % contrast.
 
-## 8. Track and obstacles (`world/track.ts`, `world/obstacles.ts`, `world/gates.ts`)
+## 8. Track and obstacles (`world/deck.ts`, `world/track.ts`, `world/obstacles.ts`, `world/gates.ts`)
 
-**Ribbons.** Every polyline collider becomes a ribbon along its exact points (resampled to
+**Built ride surfaces (round 3).** The surface comes from `collider.surface`, the construction
+from `meta.biome`:
+
+| surface | construction |
+|---|---|
+| wood | individual 0.22 m boards across the track (per-board hue/wear via vertex colour, plank slice per board, 2 cm gaps), lengthwise plywood edge boards, steel joists underneath |
+| dirt, interior | contained 3.2 m dirt bed with a darker worn line, plywood kerb boards both sides — never a wide brown road |
+| dirt, canyon | wide ribbon with rock edging (instanced rocks at z ±1.7–2.3 every 2.6 m) |
+| concrete | slab + painted edge lines (nightCity asphalt look) |
+| metal / grate | steel plate + angle-iron edges (foundry) |
+| snow | packed snow with dark apron |
+
+Interior biomes also get the structure under the ground profile wherever it sits above the hall
+floor: low-poly 3-high pallet stacks scaled to height (< 1.3 m), steel frames (1.3–2.5 m),
+container stacks + pallets (≥ 2.5 m, every 5th bay). On flat-test the dirt bed sits on two rows of
+pallets 0.42 m above the concrete floor — the reference "track built on pallets" read.
+
+**Ribbons (legacy helper).** Every polyline collider becomes a ribbon along its exact points (resampled to
 ≤ 0.75 m). Ground profile (`obstacleIndex = −1`): 9-row section — flat top z ∈ [−1.5, 1.5],
 bevel to ±1.75 (−0.16 m), apron to ±3 (−0.42 m). Obstacle polylines: 5-row 3 m board with a
 5 cm chamfer, lifted 4 mm. Drops are applied along the surface normal so bevels stay bevels on
@@ -251,7 +271,9 @@ grounded frame (`bike.pos → axle midpoint` offset), so whatever physics uses a
 the model sits on its wheels. Wheels are placed at the physics wheel positions; the swingarm
 aims at the rear axle, the fork lowers slide along the fork axis to the front axle, the shock
 stretches between its frame mount and 55 % along the swingarm — suspension travel is exactly
-what physics says.
+what physics says, plus a ×1.3 visual exaggeration: the frame sinks 3 cm per unit of summed
+compression toward the wheels and pitches 0.05 rad × (rear − front compression), and the tyre
+squashes up to 10 % on load, so travel reads at 24 % frame height.
 
 Parts: twin-spar frame + downtube + subframe (`TubeGeometry` on Catmull-Rom), head tube, tank
 (lathe), seat, fenders, side panels, number plate, engine cases + cylinder + clutch/ignition
@@ -278,7 +300,11 @@ Pose (`poseRider`): a smoothed `stand` factor (half-life 0.25 s from tSim) is 1 
 `0.62·stand + 0.3·(1−stand) + torsoPitch + 0.3·fwd + 0.5·crouch − 0.5·back − 0.35·armExtend`
 (attack position standing; arms go straight naturally when the hips are back because the IK
 saturates at full reach; a crouch drops the hips and folds the torso). Head continues the torso at
-45 %. Arms: 2-bone IK shoulders → grips with the elbow **above** the shoulder–hand line and out of
+45 % and **counter-rotates to stay level in the world** (±25°). Pose inputs (`lean`, `torsoPitch`,
+`armExtend`, `crouch`) pass through a second-order spring (period 240 ms, ζ 0.7, ≈120 ms rise with
+slight overshoot) so the upper body trails the bike's pitch and then leads. Proportions: head r
+0.108 (≈7.5 heads), torso capsule r 0.105 × z 1.45, knees pulled to z ±0.15 to grip the tank,
+hips 6 cm forward when standing so the elbows bend. Arms: 2-bone IK shoulders → grips with the elbow **above** the shoulder–hand line and out of
 plane (motocross elbows-up); legs: hips → pegs, knees forward.
 
 Ragdoll: while `state.ragdoll` is non-null the seated hierarchy hides and the seven physics
@@ -314,6 +340,8 @@ Rng: `core/rng` sfc32 reseeded per burst with `track.seed ^ tick ^ salt`.
 - Canyon reads as flat orange ground with visible dirt tiling; nightCity building windows are
   still large; foundry is a red wash — first passes only.
 - Light shafts are additive quads (no occlusion by the bike); dust motes are unlit points.
+- `renderer.ready` is true once textures exist and one frame was drawn; frame 0 of a capture is lit
+  and textured (frame 0/1 diff is HUD + wheel spin only).
 - Textures generate on the very first `render()` (≈330–400 ms in headless Chromium) so no capture
   frame is ever untextured; boot's first-frame budget must absorb it.
 - Kinetic text (READY/GO/CRASH) is the HUD owner's; the renderer only supplies the flash.

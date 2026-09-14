@@ -15,14 +15,14 @@ import { BIKE, type BikeModel } from '../bike/bikeModel';
 
 const L = {
   torso: 0.5,
-  head: 0.135,
+  head: 0.108,
   upperArm: 0.3,
-  forearm: 0.29,
+  forearm: 0.28,
   thigh: 0.44,
   shin: 0.43,
-  hipHalf: 0.1,
-  shoulderHalf: 0.21,
-  pelvis: 0.24,
+  hipHalf: 0.09,
+  shoulderHalf: 0.19,
+  pelvis: 0.22,
 };
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -87,6 +87,32 @@ export class RiderModel {
   private readonly v = new THREE.Vector2();
   private readonly v2 = new THREE.Vector2();
   private standT = 0;
+  /** Second-order lag (≈120 ms, ζ 0.7) on the pose inputs so the upper body trails the bike. */
+  private readonly lag = { lean: 0, leanV: 0, torso: 0, torsoV: 0, arm: 0, armV: 0, crouch: 0, crouchV: 0 };
+
+  private spring(key: 'lean' | 'torso' | 'arm' | 'crouch', target: number, dt: number, snap: boolean): number {
+    const l = this.lag as unknown as Record<string, number>;
+    if (snap || dt <= 0) {
+      l[key] = target;
+      l[key + 'V'] = 0;
+      return target;
+    }
+    const w = 2 * Math.PI / 0.24; // natural period 240 ms → ~120 ms rise
+    const zeta = 0.7;
+    // Semi-implicit Euler in ≤ 4 ms substeps for stability at low frame rates.
+    let t = dt;
+    while (t > 0) {
+      const h = Math.min(t, 0.004);
+      const x = l[key]!;
+      const v = l[key + 'V']!;
+      const a = w * w * (target - x) - 2 * zeta * w * v;
+      const nv = v + a * h;
+      l[key + 'V'] = nv;
+      l[key] = x + nv * h;
+      t -= h;
+    }
+    return l[key]!;
+  }
 
   constructor(private readonly lib: MaterialLibrary) {
     this.kit = this.buildKit(this.seated, false);
@@ -126,12 +152,12 @@ export class RiderModel {
     const visor = this.mesh(new THREE.SphereGeometry(L.head * 1.03, 20, 8, -0.75, 1.5, 1.05, 0.62), 'visor', head);
     visor.rotation.y = 0;
     // Peak
-    const peak = this.mesh(new THREE.BoxGeometry(0.15, 0.015, 0.2), 'helmet', head);
-    peak.position.set(0.1, 0.075, 0);
+    const peak = this.mesh(new THREE.BoxGeometry(0.12, 0.012, 0.16), 'helmet', head);
+    peak.position.set(0.08, 0.06, 0);
     peak.rotation.z = -0.35;
     // Chin bar: flattened box wrapping the front-bottom.
-    const chin = this.mesh(new THREE.BoxGeometry(0.11, 0.07, 0.19), 'helmet', head);
-    chin.position.set(0.1, -0.06, 0);
+    const chin = this.mesh(new THREE.BoxGeometry(0.09, 0.06, 0.15), 'helmet', head);
+    chin.position.set(0.08, -0.05, 0);
     chin.rotation.z = 0.15;
     // Goggle strap
     const strap = this.mesh(new THREE.TorusGeometry(L.head * 1.02, 0.012, 6, 24), 'pants', head);
@@ -139,8 +165,8 @@ export class RiderModel {
     strap.position.y = 0.03;
     strap.scale.set(1, 1, 1.08);
     // Neck
-    const neck = this.mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.1, 10), 'pants', head);
-    neck.position.set(-0.01, -0.15, 0);
+    const neck = this.mesh(new THREE.CylinderGeometry(0.045, 0.055, 0.09, 10), 'pants', head);
+    neck.position.set(-0.01, -0.12, 0);
     parent.add(head);
     return head;
   }
@@ -148,12 +174,12 @@ export class RiderModel {
   private buildKit(parent: THREE.Object3D, ragdoll: boolean): Kit {
     // Torso: chest capsule widened in z, chest plate, shoulder pads, back number.
     const torso = new Segment(L.torso);
-    this.capsule(0.12, L.torso, 'jersey', torso.group, 0.85, 1.55);
-    const chest = this.mesh(new THREE.BoxGeometry(0.06, 0.26, 0.3), 'armour', torso.group);
+    this.capsule(0.105, L.torso, 'jersey', torso.group, 0.8, 1.45);
+    const chest = this.mesh(new THREE.BoxGeometry(0.05, 0.24, 0.26), 'armour', torso.group);
     chest.position.set(0.1, L.torso * 0.62, 0);
     chest.rotation.z = -0.1;
     for (const s of [-1, 1]) {
-      const pad = this.mesh(new THREE.SphereGeometry(0.075, 12, 8), 'armour', torso.group);
+      const pad = this.mesh(new THREE.SphereGeometry(0.065, 12, 8), 'armour', torso.group);
       pad.position.set(0, L.torso - 0.02, s * L.shoulderHalf);
       pad.scale.set(1, 0.8, 1);
     }
@@ -162,9 +188,9 @@ export class RiderModel {
     parent.add(torso.group);
     // Pelvis: shorts block + belt.
     const pelvis = new Segment(L.pelvis);
-    const hips = this.mesh(new THREE.BoxGeometry(0.24, L.pelvis, 0.32), 'pants', pelvis.group);
+    const hips = this.mesh(new THREE.BoxGeometry(0.22, L.pelvis, 0.28), 'pants', pelvis.group);
     hips.position.y = L.pelvis / 2;
-    const belt = this.mesh(new THREE.BoxGeometry(0.25, 0.04, 0.33), 'armour', pelvis.group);
+    const belt = this.mesh(new THREE.BoxGeometry(0.23, 0.04, 0.29), 'armour', pelvis.group);
     belt.position.y = L.pelvis - 0.02;
     parent.add(pelvis.group);
     const head = this.buildHead(parent);
@@ -228,7 +254,12 @@ export class RiderModel {
 
   private poseRider(f: RenderFrame): void {
     const B = BIKE;
-    const r = f.rider;
+    const r = {
+      lean: this.spring('lean', f.rider.lean, f.dt, f.cut),
+      torsoPitch: this.spring('torso', f.rider.torsoPitch, f.dt, f.cut),
+      armExtend: this.spring('arm', f.rider.armExtend, f.dt, f.cut),
+      crouch: this.spring('crouch', f.rider.crouch, f.dt, f.cut),
+    };
     const k = this.kit;
     // Stand on the pegs when moving or airborne; sit at idle. Smoothed from tSim.
     const standTarget = f.airborne || f.speed > 1.2 || r.crouch > 0.3 || Math.abs(r.lean) > 0.5 ? 1 : 0;
@@ -237,7 +268,7 @@ export class RiderModel {
     const back = Math.max(0, -r.lean);
     const fwd = Math.max(0, r.lean);
     // Hips.
-    const hx = B.pegs.x - 0.02 - 0.28 * back - 0.3 * r.armExtend + 0.14 * fwd - 0.06 * r.crouch - 0.16 * (1 - stand);
+    const hx = B.pegs.x + 0.06 * stand - 0.02 - 0.3 * back - 0.3 * r.armExtend + 0.14 * fwd - 0.06 * r.crouch - 0.16 * (1 - stand);
     const hyStand = B.pegs.y + 0.76 - 0.4 * r.crouch;
     const hySeat = B.seatTop.y + 0.1;
     const hy = hySeat + (hyStand - hySeat) * stand;
@@ -250,10 +281,12 @@ export class RiderModel {
     k.torso.place(hx, hy, 0, sx, sy, 0);
     // Head: looks ahead, tilts up when tucked.
     const headA = torsoA * 0.45 - 0.1;
-    const hdx = sx + Math.sin(headA) * (L.head + 0.06);
-    const hdy = sy + Math.cos(headA) * (L.head + 0.06);
+    const hdx = sx + Math.sin(headA) * (L.head + 0.05);
+    const hdy = sy + Math.cos(headA) * (L.head + 0.05);
     k.head.position.set(hdx, hdy, 0);
-    k.head.rotation.z = -headA;
+    // Head counter-rotates to stay level in the world (within ±25°) while the bike pitches.
+    const level = Math.max(-0.45, Math.min(0.45, f.bikeAngle));
+    k.head.rotation.z = -headA - level;
     // Arms: shoulders → grips; elbows up and out (motocross attack).
     const gx = B.barCentre.x - 0.04;
     const gy = B.barCentre.y - 0.06;
@@ -262,7 +295,7 @@ export class RiderModel {
       const z = side * L.shoulderHalf;
       const hz = side * (B.barHalfWidth - 0.06);
       ik(sx, sy, gx, gy, L.upperArm, L.forearm, 1, this.v);
-      const ez = z + (hz - z) * 0.45 + side * 0.1;
+      const ez = z + (hz - z) * 0.4 + side * 0.09;
       k.upperArm[i]!.place(sx, sy, z, this.v.x, this.v.y, ez);
       k.forearm[i]!.place(this.v.x, this.v.y, ez, gx, gy, hz);
     }
@@ -274,7 +307,7 @@ export class RiderModel {
       const hipz = side * L.hipHalf;
       const fz = side * B.pegHalfWidth;
       ik(hx, hy, fx, fy, L.thigh, L.shin, 1, this.v2);
-      const kz = hipz + (fz - hipz) * 0.5;
+      const kz = side * 0.15; // knees grip the tank
       k.thigh[i]!.place(hx, hy, hipz, this.v2.x, this.v2.y, kz);
       k.shin[i]!.place(this.v2.x, this.v2.y, kz, fx, fy, fz);
     }

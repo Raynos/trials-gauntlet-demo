@@ -51,7 +51,7 @@ export class MaterialLibrary {
       return m;
     };
     // Ground / ridden surfaces
-    std('dirt', { color: 0x9e8a70, roughness: 0.95 });
+    std('dirt', { color: 0x948676, roughness: 0.95 });
     std('plank', { color: 0xc9b58e, roughness: 0.75 });
     std('steelPlate', { color: 0x5a5b5e, roughness: 0.55, metalness: 0.8 });
     std('concrete', { color: 0xa4a29e, roughness: 0.85 });
@@ -66,7 +66,7 @@ export class MaterialLibrary {
     std('rustSteel', { color: 0x6b5a4c, roughness: 0.7, metalness: 0.6 });
     std('darkSteel', { color: 0x2a2c30, roughness: 0.55, metalness: 0.8 });
     std('brick', { color: 0x6d4a3a, roughness: 0.95 });
-    std('plywood', { color: 0xc9a46a, roughness: 0.8 });
+    std('plywood', { color: 0xbfa882, roughness: 0.8 });
     std('barrelRed', { color: 0xa42a1e, roughness: 0.45, metalness: 0.5 });
     std('barrelWhite', { color: 0xd8d2c4, roughness: 0.45, metalness: 0.5 });
     std('barrelBlue', { color: 0x244d8a, roughness: 0.45, metalness: 0.5 });
@@ -89,7 +89,7 @@ export class MaterialLibrary {
     std('exhaust', { color: 0xd0d2d6, roughness: 0.2, metalness: 1.0 });
     std('numberPlate', { color: 0xfafafa, roughness: 0.5 });
     // Rider
-    std('jersey', { color: 0xffcf1a, roughness: 0.8 });
+    std('jersey', { color: 0xffcf1a, roughness: 1.0, metalness: 0 });
     std('pants', { color: 0x1a2340, roughness: 0.85 });
     std('armour', { color: 0x24262b, roughness: 0.45, metalness: 0.05 });
     std('boots', { color: 0x151517, roughness: 0.6 });

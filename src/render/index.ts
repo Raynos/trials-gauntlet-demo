@@ -19,7 +19,8 @@ import { RiderModel } from './rider/riderModel';
 import { buildBiomeKit } from './world/biomeKit';
 import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
-import { buildRibbons, profileY } from './world/track';
+import { profileY } from './world/track';
+import { buildRideSurfaces } from './world/deck';
 
 export interface GameRenderer {
   readonly canvas: HTMLCanvasElement;
@@ -136,6 +137,11 @@ export class ThreeRenderer implements GameRenderer {
     return this.frameCount;
   }
 
+  /** True once procedural textures exist and at least one lit frame has been drawn. */
+  get ready(): boolean {
+    return this.lib.hasTextures && this.frameCount > 0;
+  }
+
   // -- contract -------------------------------------------------------------
 
   setTrack(track: CompiledTrack): void {
@@ -147,11 +153,11 @@ export class ThreeRenderer implements GameRenderer {
 
     const group = new THREE.Group();
     group.name = 'world';
-    const ribbons = buildRibbons(track, this.lib);
+    const ribbons = buildRideSurfaces(track, this.biome, this.lib);
     const obstacles = buildObstacles(track, this.lib);
     const gates = buildGates(track, this.lib);
     const kit = buildBiomeKit(track, this.biome, this.lib);
-    group.add(ribbons.group, obstacles.group, gates.group, kit.group);
+    group.add(ribbons.group, ribbons.supports, obstacles.group, gates.group, kit.group);
     // One program variant for the whole world: every standard material gets the full map set.
     group.traverse((o) => {
       const mesh = o as THREE.Mesh;

@@ -111,6 +111,25 @@ export function palletGeometry(): THREE.BufferGeometry {
   return mergeGeometries(parts, false)!;
 }
 
+/** Low-poly 3-high pallet stack for deck supports: 3 boards + 2 stringers per layer, origin bottom centre. */
+export function palletStackGeometry(layers = 3): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+  for (let l = 0; l < layers; l++) {
+    const y0 = l * 0.144;
+    for (const z of [-0.33, 0, 0.33]) {
+      const b = new THREE.BoxGeometry(1.2, 0.022, 0.12);
+      b.translate(0, y0 + 0.133, z);
+      parts.push(b);
+    }
+    for (const x of [-0.5, 0.5]) {
+      const s = new THREE.BoxGeometry(0.1, 0.122, 0.8);
+      s.translate(x, y0 + 0.061, 0);
+      parts.push(s);
+    }
+  }
+  return mergeGeometries(parts, false)!;
+}
+
 /** 200 l oil drum, origin bottom centre. */
 export function drumGeometry(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];

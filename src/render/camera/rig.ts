@@ -67,6 +67,7 @@ export class CameraRig {
   private readonly pitch = new Smooth(0.45);
   private readonly roll = new Smooth(0.6);
   private readonly fov = new Smooth(0.3);
+  private zoom: 0 | 1 | 2 = 0;
   private crashT = -1;
   private crashDist = 1;
   private finishT = -1;
@@ -125,17 +126,25 @@ export class CameraRig {
 
     // --- Targets from the state table.
     const speed = f.speed;
-    const zoomT = smoothstep(1.5, 9, speed);
-    const fastT = smoothstep(9, 15, speed);
+    // Discrete zoom states with hysteresis: the pull-back is one eased move that
+    // arrives, not a continuous drift with speed.
+    if (cut) this.zoom = speed < 1.5 ? 0 : speed > 11 ? 2 : 1;
+    else if (this.zoom === 0 && speed > 2.2) this.zoom = 1;
+    else if (this.zoom === 1 && speed < 1.0) this.zoom = 0;
+    else if (this.zoom === 1 && speed > 11) this.zoom = 2;
+    else if (this.zoom === 2 && speed < 8) this.zoom = 1;
+    const airWide = f.airborne && f.airTime > 0.25 ? 1 : 0;
+    const zoomT = this.zoom >= 1 ? 1 : 0;
+    const fastT = this.zoom === 2 ? 1 : 0;
     const airT = smoothstep(0, 0.7, f.airTime);
-    const wideT = Math.max(fastT, airT);
+    const wideT = Math.max(fastT, airWide);
     const moving = Math.abs(f.velX) > 0.5 ? Math.sign(f.velX) : 1;
     const p: Params = {
-      heightFrac: lerp(lerp(0.4, 0.24, zoomT), 0.09, wideT),
+      heightFrac: lerp(lerp(0.4, 0.26, zoomT), 0.14, wideT),
       screenX: moving > 0 ? lerp(0.45, 0.3, zoomT) - 0.02 * wideT : lerp(0.55, 0.7, zoomT),
       screenY: lerp(0.55, 0.53, zoomT) - 0.03 * airT,
-      yaw: moving * lerp(lerp(5, 15, zoomT), 18, wideT) * DEG,
-      pitch: lerp(lerp(3, 17, zoomT), 24, fastT) * DEG + 6 * DEG * airT,
+      yaw: moving * lerp(lerp(5, 15, zoomT), 17, wideT) * DEG,
+      pitch: lerp(lerp(3, 13, zoomT), 15, fastT) * DEG + 5 * DEG * airT,
       roll: 0,
       fov: lerp(28, 34, zoomT) * DEG,
     };
@@ -205,7 +214,7 @@ export class CameraRig {
       this.finishT = -1;
     }
     if (!f.crashed && !f.finished) {
-      this.state = this.phase === 'countdown' ? 'countdown' : wideT > 0.5 ? 'fast' : zoomT > 0.5 ? 'riding' : 'idle';
+      this.state = this.phase === 'countdown' ? 'countdown' : this.zoom === 2 || airWide ? 'fast' : this.zoom === 1 ? 'riding' : 'idle';
     }
 
     // --- Followed point: lookahead in x, dead-zone in y.

@@ -1,0 +1,310 @@
+/**
+ * Built ride surfaces: what the collider says you ride on, constructed the way
+ * the biome would build it (CONTRACT §2.6 — the surface is exactly the
+ * collider polyline).
+ *
+ *   wood      individual boards across the track on edge boards (all biomes)
+ *   dirt      industrial: a contained dirt bed with a worn line, plywood edge
+ *             boards; canyon: packed dirt with rock edging; else plain ribbon
+ *   concrete  slab + painted edge lines (nightCity asphalt look)
+ *   metal     steel plate + angle-iron edges (foundry)
+ *   snow      packed snow with dark edges
+ *   stone/grate/rubber  plain ribbon
+ *
+ * Interior biomes also get the supporting structure wherever the ground
+ * profile sits above the hall floor: pallet stacks (< 1.3 m), steel frames
+ * (1.3–2.5 m) or container stacks (≥ 2.5 m), so the deck never floats.
+ */
+import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { Rng } from '../../core/rng';
+import type { ColliderPolyline, CompiledTrack, SurfaceKind } from '../../core/types';
+import type { Biome } from '../biomes';
+import { SURFACE_MATERIAL, type MaterialLibrary } from '../materials/library';
+import { fogify } from '../lighting/environment';
+import { PropBatch, containerGeometry, palletGeometry, palletStackGeometry, rockGeometry, triCount } from './props';
+import { ribbonGeometry, resample, type TrackMeshes } from './track';
+
+const DECK_W = 3.0;
+const BOARD_W = 0.22;
+const BOARD_GAP = 0.02;
+const BOARD_T = 0.045;
+
+const WIDE_SECTION: [number, number][] = [
+  [-3.0, -0.42], [-1.75, -0.16], [-1.5, 0], [-0.9, 0], [0, 0], [0.9, 0], [1.5, 0], [1.75, -0.16], [3.0, -0.42],
+];
+/** Contained bed: flat top, tiny lip, no apron (edges are boards/kerbs). */
+const BED_SECTION: [number, number][] = [
+  [-1.62, -0.08], [-1.5, 0], [-0.3, 0], [0, -0.015], [0.3, 0], [1.5, 0], [1.62, -0.08],
+];
+const OBSTACLE_SECTION: [number, number][] = [[-1.5, -0.05], [-1.42, 0], [0, 0], [1.42, 0], [1.5, -0.05]];
+
+const TILE: Record<SurfaceKind, number> = { dirt: 2.5, wood: 1.5, metal: 1.5, concrete: 3, rubber: 1, grate: 1, stone: 2.5, snow: 3 };
+
+type Bucket = Map<string, THREE.BufferGeometry[]>;
+function push(b: Bucket, mat: string, g: THREE.BufferGeometry): void {
+  const l = b.get(mat) ?? [];
+  l.push(g);
+  b.set(mat, l);
+}
+
+const M = new THREE.Matrix4();
+const Q = new THREE.Quaternion();
+const P = new THREE.Vector3();
+const S = new THREE.Vector3(1, 1, 1);
+const ZAX = new THREE.Vector3(0, 0, 1);
+
+/** Box placed at (x, y, z) rotated about z by `rz`, with optional per-vertex colour and custom uv. */
+function box(w: number, h: number, d: number, x: number, y: number, z: number, rz: number, color?: THREE.Color, uv?: (px: number, py: number, pz: number) => [number, number]): THREE.BufferGeometry {
+  const g = new THREE.BoxGeometry(w, h, d);
+  if (uv) {
+    const pos = g.getAttribute('position');
+    const uva = g.getAttribute('uv') as THREE.BufferAttribute;
+    for (let i = 0; i < pos.count; i++) {
+      const [u, v] = uv(pos.getX(i), pos.getY(i), pos.getZ(i));
+      uva.setXY(i, u, v);
+    }
+  }
+  if (color) {
+    const n = g.getAttribute('position').count;
+    const c = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      c[i * 3] = color.r;
+      c[i * 3 + 1] = color.g;
+      c[i * 3 + 2] = color.b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+  }
+  Q.setFromAxisAngle(ZAX, rz);
+  M.compose(P.set(x, y, z), Q, S.set(1, 1, 1));
+  g.applyMatrix4(M);
+  return g;
+}
+
+/** Add a constant vertex colour attribute to a geometry that has none. */
+function tint(g: THREE.BufferGeometry, r: number, gg: number, b: number): THREE.BufferGeometry {
+  if (g.getAttribute('color')) return g;
+  const n = g.getAttribute('position').count;
+  const c = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    c[i * 3] = r;
+    c[i * 3 + 1] = gg;
+    c[i * 3 + 2] = b;
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+  return g;
+}
+
+/** Individual boards across the track along a polyline, plus two lengthwise edge boards. */
+function boards(pl: ColliderPolyline, rng: Rng, out: Bucket, width = DECK_W): void {
+  const pts = resample(pl.points, 0.5);
+  const pitch = BOARD_W + BOARD_GAP;
+  const col = new THREE.Color();
+  // Walk the arc length and drop a board every `pitch`.
+  let carry = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1]!;
+    const b = pts[i]!;
+    const segLen = Math.hypot(b.x - a.x, b.y - a.y);
+    if (segLen < 1e-4) continue;
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    const nx = -Math.sin(ang);
+    const ny = Math.cos(ang);
+    let s = carry;
+    while (s + BOARD_W <= segLen + 1e-6) {
+      const t = (s + BOARD_W / 2) / segLen;
+      const cx = a.x + (b.x - a.x) * t - nx * BOARD_T * 0.5;
+      const cy = a.y + (b.y - a.y) * t - ny * BOARD_T * 0.5;
+      const seed = rng.next();
+      const lum = 0.78 + rng.next() * 0.4;
+      col.setRGB(lum, lum * (0.94 + seed * 0.08), lum * (0.86 + seed * 0.1));
+      // Boards run across the track: grain (u) along z; v picks a plank slice per board.
+      const v0 = seed * 0.9;
+      const wear = rng.next() < 0.12 ? 0.75 : 1;
+      col.multiplyScalar(wear);
+      out.get('plank') ?? out.set('plank', []);
+      push(out, 'plank', box(BOARD_W, BOARD_T, width - 0.25, cx, cy, 0, ang, col, (px, py, pz) => [pz / 1.5 + seed * 3, v0 + (px + py) * 0.15]));
+      s += pitch;
+    }
+    carry = s - segLen;
+  }
+  // Edge boards (lengthwise), slightly proud of the deck, on each side.
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1]!;
+    const b = pts[i]!;
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    if (len < 1e-4) continue;
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    const mx = (a.x + b.x) / 2;
+    const my = (a.y + b.y) / 2;
+    for (const side of [-1, 1]) {
+      const c = new THREE.Color(0.7, 0.62, 0.5);
+      push(out, 'plywood', box(len + 0.02, 0.09, 0.12, mx - Math.sin(ang) * 0.005, my + Math.cos(ang) * 0.005, side * (width / 2 - 0.06), ang, c, (px) => [px / 1.5, 0.35]));
+    }
+    // Joists under the boards every segment (dark steel), visible from the side.
+    push(out, 'darkSteel', tint(box(len + 0.02, 0.1, width - 0.3, mx + Math.sin(ang) * 0.1, my - Math.cos(ang) * 0.1, 0, ang), 0.6, 0.6, 0.6));
+  }
+}
+
+/** Painted lines / kerbs / edging along a polyline. */
+function edging(pl: ColliderPolyline, mat: string, w: number, h: number, zOff: number, lift: number, r: number, g: number, b: number, out: Bucket): void {
+  const pts = resample(pl.points, 1.0);
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1]!;
+    const bb = pts[i]!;
+    const len = Math.hypot(bb.x - a.x, bb.y - a.y);
+    if (len < 1e-4) continue;
+    const ang = Math.atan2(bb.y - a.y, bb.x - a.x);
+    const mx = (a.x + bb.x) / 2 - Math.sin(ang) * lift;
+    const my = (a.y + bb.y) / 2 + Math.cos(ang) * lift;
+    for (const side of [-1, 1]) push(out, mat, tint(box(len + 0.02, h, w, mx, my, side * zOff, ang), r, g, b));
+  }
+}
+
+function ribbonWithShade(pl: ColliderPolyline, section: [number, number][], tile: number, lift: number, shade: (z: number, drop: number) => number): THREE.BufferGeometry {
+  const g = ribbonGeometry(pl.points, section, tile, lift);
+  const pos = g.getAttribute('position');
+  const col = g.getAttribute('color') as THREE.BufferAttribute;
+  // Re-shade by cross-track z (position.z) – drop is not stored, approximate from the section.
+  for (let i = 0; i < pos.count; i++) {
+    const z = pos.getZ(i);
+    let drop = 0;
+    for (const [sz, sd] of section) if (Math.abs(sz - z) < 1e-3) drop = sd;
+    const s = shade(z, drop);
+    col.setXYZ(i, s, s, s);
+  }
+  return g;
+}
+
+export interface DeckResult extends TrackMeshes {
+  /** Extra instanced structure (supports, edging rocks) — counted in track budget. */
+  supports: THREE.Group;
+}
+
+export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: MaterialLibrary): DeckResult {
+  const group = new THREE.Group();
+  group.name = 'deck';
+  const supports = new THREE.Group();
+  supports.name = 'deck-supports';
+  const rng = new Rng((track.def.seed ^ 0xdeadbeef) >>> 0);
+  const buckets: Bucket = new Map();
+  const interior = biome.interior;
+  let floorY = Infinity;
+  for (const p of track.def.profile) floorY = Math.min(floorY, p.y);
+  floorY -= 0.42;
+
+  const rocks = new PropBatch('edge-rock', rockGeometry(track.def.seed ^ 77), lib.get('rock'));
+  const pallets = new PropBatch('support-pallet', palletGeometry(), lib.get('pallet'));
+  const stacks = new PropBatch('support-stack', palletStackGeometry(3), lib.get('pallet'));
+  const containers = new PropBatch('support-container', containerGeometry(), lib.get('container'));
+  const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a];
+
+  for (const c of track.colliders) {
+    if (c.kind !== 'polyline' || c.points.length < 2) continue;
+    const pl = c;
+    const ground = pl.obstacleIndex < 0;
+    const surf = pl.surface;
+    const tile = TILE[surf] ?? 2;
+    if (surf === 'wood') {
+      boards(pl, rng, buckets);
+      continue;
+    }
+    if (surf === 'dirt' && interior) {
+      // Contained dirt bed: worn line down the middle, plywood edge boards.
+      push(buckets, 'dirt', ribbonWithShade(pl, BED_SECTION, tile, 0, (z, drop) => (Math.abs(z) < 0.32 ? 0.62 : 1) * (1 + drop * 1.5)));
+      edging(pl, 'plywood', 0.12, 0.16, 1.62, 0.02, 0.75, 0.66, 0.52, buckets);
+      continue;
+    }
+    if (surf === 'dirt') {
+      push(buckets, 'dirt', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.72 : 1) * (0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9)))));
+      if (biome.id === 'canyon' && ground) {
+        const pts = resample(pl.points, 2.6);
+        for (const p of pts) {
+          for (const side of [-1, 1]) {
+            if (rng.next() < 0.7) rocks.add(p.x + rng.range(-0.5, 0.5), p.y - 0.1, side * rng.range(1.7, 2.3), rng.range(0, 6), rng.range(0.25, 0.6), null, rng.range(-0.3, 0.3));
+          }
+        }
+      }
+      continue;
+    }
+    if (surf === 'concrete') {
+      push(buckets, 'concrete', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.85 : 1) * (0.6 + 0.4 * (1 - Math.min(1, -drop * 0.9)))));
+      // Painted edge lines.
+      edging(pl, 'hazardTape', 0.1, 0.006, 1.32, 0.004, 1, 1, 1, buckets);
+      continue;
+    }
+    if (surf === 'metal' || surf === 'grate') {
+      push(buckets, SURFACE_MATERIAL[surf], ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.7 + 0.3 * (1 - Math.min(1, -drop))));
+      edging(pl, 'darkSteel', 0.08, 0.08, 1.52, 0.03, 0.6, 0.6, 0.6, buckets);
+      continue;
+    }
+    if (surf === 'snow') {
+      push(buckets, 'snow', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.8 : 1) * (0.35 + 0.65 * (1 - Math.min(1, -drop * 1.2)))));
+      continue;
+    }
+    push(buckets, SURFACE_MATERIAL[surf] ?? 'dirt', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9))));
+  }
+
+  // Supports under the ground profile (interior only).
+  if (interior) {
+    const prof = track.def.profile;
+    const deckBottom = 0.12;
+    for (let x = prof[0]!.x + 0.6; x < prof[prof.length - 1]!.x; x += 1.6) {
+      // Profile height at x.
+      let y = prof[0]!.y;
+      for (let i = 1; i < prof.length; i++) {
+        const a = prof[i - 1]!;
+        const b = prof[i]!;
+        if (x <= b.x) {
+          y = a.y + ((b.y - a.y) * (x - a.x)) / (b.x - a.x || 1);
+          break;
+        }
+        y = b.y;
+      }
+      const h = y - deckBottom - floorY;
+      if (h < 0.1) continue;
+      if (h < 1.3) {
+        // Low-poly 3-high stacks, scaled in y to the exact height; two across.
+        const sy = h / (3 * 0.144);
+        for (const z of [-0.8, 0.8]) stacks.add(x + rng.range(-0.03, 0.03), floorY, z + rng.range(-0.03, 0.03), rng.range(-0.05, 0.05), 1, null, 0, sy, 1);
+      } else if (h >= 2.5 && Math.round((x - prof[0]!.x) / 1.25) % 5 === 0) {
+        const n = Math.floor(h / 2.59);
+        for (let k = 0; k < n; k++) containers.add(x + 2.4, floorY + k * 2.59, 0, Math.PI / 2, 1, palette[rng.int(0, palette.length - 1)]!);
+        const rem = h - n * 2.59;
+        const np = Math.round(rem / 0.144);
+        for (let k = 0; k < np; k++) for (const z of [-0.85, 0.85]) pallets.add(x, floorY + n * 2.59 + k * 0.144, z);
+      } else if (h >= 1.3 && h < 2.5) {
+        // Steel frame: 4 legs + 2 beams per bay.
+        for (const z of [-1.2, 1.2]) push(buckets, 'darkSteel', tint(box(0.08, h, 0.08, x, floorY + h / 2, z, 0), 0.7, 0.7, 0.7));
+        push(buckets, 'darkSteel', tint(box(0.08, 0.08, 2.5, x, floorY + h - 0.04, 0, 0), 0.7, 0.7, 0.7));
+      }
+    }
+  }
+
+  let triangles = 0;
+  let drawCalls = 0;
+  for (const [matName, geos] of buckets) {
+    // Geometries mix colour attributes; make sure every one has colour before merging.
+    for (const g of geos) tint(g, 1, 1, 1);
+    const merged = geos.length === 1 ? geos[0]! : mergeGeometries(geos, false);
+    if (!merged) continue;
+    const mat = lib.derive(matName);
+    mat.vertexColors = true;
+    fogify(mat);
+    const mesh = new THREE.Mesh(merged, mat);
+    mesh.receiveShadow = true;
+    mesh.castShadow = matName !== 'dirt' && matName !== 'concrete' && matName !== 'snow';
+    mesh.name = `deck:${matName}`;
+    group.add(mesh);
+    triangles += triCount(merged);
+    drawCalls++;
+  }
+  for (const b of [rocks, pallets, stacks, containers]) {
+    const im = b.build();
+    if (!im) continue;
+    supports.add(im);
+    drawCalls++;
+    triangles += triCount(b.geometry) * b.count;
+  }
+  return { group, supports, triangles, drawCalls };
+}
