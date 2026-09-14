@@ -19,6 +19,8 @@ export interface Observation {
   airborne: boolean;
   /** world.balancePitch(currentLean, 0) in degrees; the only "cheat", and it is public. */
   balancePitchDeg: number;
+  /** Balance pitch (deg) the bike would have at another lean, zero acceleration. */
+  balanceAt: (lean: number) => number;
 }
 
 export type Controller = (obs: Observation) => Partial<InputFrame>;
@@ -53,6 +55,7 @@ export function observe(world: BikePhysicsWorld, s: PhysicsState): Observation {
     frontGrounded: frontG,
     airborne: !rearG && !frontG,
     balancePitchDeg: world.balancePitch(s.rider.lean, 0) * RAD,
+    balanceAt: (lean) => world.balancePitch(lean, 0) * RAD,
   };
 }
 
@@ -61,17 +64,12 @@ export function runController(world: BikePhysicsWorld, ctrl: Controller, opts: R
   const hz = world.physicsHz;
   const decisionEvery = Math.max(1, Math.round(hz / (opts.decisionHz ?? 60)));
   const latencyTicks = Math.round(((opts.latencyMs ?? 0) / 1000) * hz);
-  const queue: InputFrame[] = [];
+  const queue: { at: number; input: InputFrame }[] = [];
   let current = quantizeInput({});
   let last = world.getState();
   for (let i = 0; i < opts.ticks; i++) {
-    if (i % decisionEvery === 0) {
-      const decided = quantizeInput(ctrl(observe(world, last)));
-      queue.push(decided);
-    }
-    while (queue.length > latencyTicks + 1) queue.shift();
-    if (queue.length > latencyTicks) current = queue[0]!;
-    if (queue.length > latencyTicks) queue.shift();
+    if (i % decisionEvery === 0) queue.push({ at: i + latencyTicks, input: quantizeInput(ctrl(observe(world, last))) });
+    while (queue.length > 0 && queue[0]!.at <= i) current = queue.shift()!.input;
     world.step(current);
     last = world.getState();
     opts.onTick?.(last, current);
@@ -156,36 +154,97 @@ export function ledgeHopper(wallX: number, speed = 5, preloadDist = 4, snapDist 
 }
 
 /**
- * Steep climb: hang over the bars and hold the pitch a few degrees above the slope with the
- * throttle (more gas = nose up); rear brake when it gets away, ease off on wheelspin.
+ * Steep climb of a plank whose base is at `baseX`, three phases like the reference clips:
+ * approach — neutral, pop the front a little so the wheel meets the plank face instead of its
+ * base; transition — front on the plank, rear still on the flat: weight forward, drive the
+ * rear into the corner; climb — hang over the bars (lean +1) and use the throttle as the pitch
+ * loop against the wheelie balance point (front hovering a few degrees above the slope). On a
+ * plank steeper than the balance pitch the front cannot stay down, so the controller chops the
+ * throttle and lets the bike roll back (the roll-back deceleration brings the nose down).
  */
-export function climber(slopeDeg: number): Controller {
+export function climber(slopeDeg: number, baseX = -Infinity, opts: { hover?: number; margin?: number; kd?: number; speed?: number; cornerSpeed?: number; topX?: number; popDeg?: number } = {}): Controller {
+  const hover = opts.hover ?? 8; // frame pitch above the slope with the front just off it (rear squat + fork extension are ~4 deg)
+  const margin = opts.margin ?? 10;
+  const kd = opts.kd ?? 0.06;
+  const speed = opts.speed ?? 5;
+  let phase = 0; // 0 approach, 1 transition, 2 climb (latched: never steps back)
   return (o) => {
-    // both wheels down: full gas while the pitch is at/below the slope, ease off as the nose lifts
-    const over = o.pitchDeg - slopeDeg;
-    let throttle = over < 1 ? 1 : Math.max(0, 1 - (over - 1) / 7);
-    if (o.pitchRateDeg > 80) throttle = Math.min(throttle, 0.2);
-    // traction control: back off before the tyre passes its grip peak
+    const rearX = o.state.wheels.rear.pos.x;
+    const frontX = o.state.wheels.front.pos.x;
+    if (phase === 0 && frontX >= baseX - 0.05) phase = 1;
+    if (phase === 1 && rearX >= baseX - 0.15) phase = 2;
+    if (opts.topX !== undefined && frontX > opts.topX - 0.2) {
+      // front at the lip: keep it pinned so the bike carries over the edge instead of hanging on
+      // the bash plate (the front carries weight now, no loop risk), then settle the nose and ride on
+      if (rearX < opts.topX + 0.1) return { throttle: 1, lean: 1 };
+      return { throttle: o.pitchDeg > 20 ? 0.1 : 0.4, lean: o.pitchDeg > 10 ? 0.6 : 0.2, brake: o.pitchDeg > 45 ? 0.5 : 0 };
+    }
+    if (phase === 0) {
+      // approach: hold speed, lift the front to ~15 deg in the last metre
+      const pop = frontX > baseX - 1.2;
+      const hold = Math.max(0, Math.min(1, 0.05 + 0.15 * (speed - o.speed)));
+      if (!pop) return { throttle: hold, lean: 0 };
+      const err = (opts.popDeg ?? 15) - o.pitchDeg - kd * o.pitchRateDeg;
+      return { throttle: Math.max(0.3, Math.min(1, 0.5 + 0.05 * err)), lean: -0.4 };
+    }
+    if (phase === 1) {
+      // transition: front on the face, rear on the flat. Weight forward, roll the rear into the
+      // corner at a walking pace (a fast rear-wheel hit on the corner launches the bike). If the
+      // nose comes up past the balance point while the rear is still in the corner, chop it.
+      const balT = o.balanceAt(1);
+      if (o.pitchDeg > balT - 2) return { throttle: 0, lean: 1, brake: o.pitchDeg > balT + 2 ? 1 : 0 };
+      const hold = Math.max(0.2, Math.min(1, 0.4 + 0.3 * ((opts.cornerSpeed ?? 1.8) - o.speed)));
+      return { throttle: hold, lean: Math.max(0.6, Math.min(1, o.pitchDeg / 40)) };
+    }
+    // climb: pick the lean whose balance pitch sits `margin` above the slope (front hovering, rear
+    // carrying the weight), then hold the pitch a few degrees above the slope with the throttle
+    let leanBase = 1;
+    for (let l = 0.3; l <= 1; l += 0.05) {
+      if (o.balanceAt(l) >= slopeDeg + margin) {
+        leanBase = l;
+        break;
+      }
+    }
+    const balL = o.balanceAt(leanBase);
+    // in the last metre before the lip, accelerate into it: the front is about to land on the flat
+    const nearTop = opts.topX !== undefined && frontX > opts.topX - 1.0;
+    const target = Math.min(slopeDeg + hover + (nearTop ? 6 : 0), balL - (nearTop ? 0 : 2));
+    const err = target - o.pitchDeg - kd * o.pitchRateDeg;
+    let throttle = err > 0 ? 1 : Math.max(0, 1 + err / 4);
     const slip = o.state.rearSlip;
-    if (slip > 0.5) throttle = Math.min(throttle, Math.max(0.3, 1 - (slip - 0.5) * 0.5));
-    const brake = over > 12 ? Math.min(1, (over - 12) / 10) : 0;
-    const lean = Math.max(0.3, Math.min(1, o.pitchDeg / 30));
+    if (slip > 0.6) throttle = Math.min(throttle, Math.max(0.35, 1 - (slip - 0.6) * 0.6));
+    // slow loop: weight forward as the nose rises past the target (the balance formula is static;
+    // suspension squat and the torso swing move the real balance point by a few degrees)
+    const lean = Math.max(leanBase - 0.15, Math.min(1, leanBase + 0.02 * (o.pitchDeg - target)));
+    let brake = 0;
+    if (o.pitchDeg > balL) {
+      throttle = 0;
+      brake = o.pitchDeg > balL + 3 && o.speed > 0.5 ? 1 : 0;
+    }
     return { throttle, lean, brake };
   };
 }
 
 /**
- * Wheelie balance. Lean is slow (body), so the fast loop is throttle/brake: nose low -> gas
- * (acceleration raises the balance point), nose high -> brake. Lean handles the bias.
+ * Wheelie balance. Lean is slow (body) and every lean change kicks the frame through the torso
+ * swing, so the lean is parked where the static balance pitch equals the target and the throttle
+ * is the whole fast loop: nose low -> gas (acceleration lifts the nose), nose high -> off (and
+ * rear brake when it is really getting away). Holds indefinitely at 60 Hz with 100 ms latency.
  */
-export function wheeliePD(targetDeg: number, targetSpeed: number, kp = 0.06, kd = 0.012): Controller {
+export function wheeliePD(targetDeg: number, targetSpeed: number, kp = 0.08, kd = 0.03): Controller {
   return (o) => {
     const err = targetDeg - o.pitchDeg;
     const rate = o.pitchRateDeg;
-    const lean = Math.max(-1, Math.min(1, -0.04 * err + 0.004 * rate));
-    let throttle = 0.35 + kp * err - kd * rate + 0.05 * (targetSpeed - o.speed);
+    let lean = 1;
+    for (let l = -1; l <= 1; l += 0.05) {
+      if (o.balanceAt(l) >= targetDeg) {
+        lean = l;
+        break;
+      }
+    }
+    let throttle = 0.2 + kp * err - kd * rate + 0.05 * (targetSpeed - o.speed);
     throttle = Math.max(0, Math.min(1, throttle));
-    const brake = err < -6 || (err < 0 && rate > 40) ? Math.max(0, Math.min(1, -kp * err + kd * rate)) : 0;
+    const brake = err < -8 && rate > 0 ? Math.min(1, (-err - 8) / 10) : 0;
     return { lean, throttle, brake };
   };
 }

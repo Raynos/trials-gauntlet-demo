@@ -162,6 +162,8 @@ describe('spawn and reset (CONTRACT 2.4)', () => {
   });
 });
 
+const s2w = (w: ReturnType<typeof createBikePhysics>) => w.getState();
+
 describe('crash, ragdoll, hazards, out of bounds', () => {
   it('looping out crashes through head/torso contact, ragdolls 7 bodies, sleeps after 3 s, resets in one tick', () => {
     const w = createBikePhysics(HZ);
@@ -190,6 +192,12 @@ describe('crash, ragdoll, hazards, out of bounds', () => {
     const h1 = hashPhysicsState(w.getState());
     const rag1 = w.getState().ragdoll!;
     for (const b of rag1) expect(b.pos.y).toBeGreaterThan(-0.5); // nothing fell through the floor
+    // ragdoll collides with the bike: no limb centre rests inside a tyre
+    for (const b of rag1) {
+      for (const wh of [s2w(w).wheels.rear.pos, s2w(w).wheels.front.pos]) {
+        expect(Math.hypot(b.pos.x - wh.x, b.pos.y - wh.y)).toBeGreaterThan(R - 0.1);
+      }
+    }
     stepN(w, {}, 60);
     const s2 = w.getState();
     expect(s2.ragdoll).toEqual(rag1);

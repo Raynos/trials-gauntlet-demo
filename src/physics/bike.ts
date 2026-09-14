@@ -25,7 +25,7 @@ import type {
 } from '../core/types';
 import { Rng } from '../core/rng';
 import type { PhysicsWorld } from './index';
-import { CollisionWorld, type Manifold } from './collision';
+import { CollisionWorld, circleVsPrim, PrimKind, type Manifold, type Prim } from './collision';
 import { DEFAULT_TUNING, mergeTuning, SURFACES, type BikeTuning, type PartialTuning, type SuspensionTuning } from './tuning';
 import { atan, atan2, clamp, cos, sin, wrapAngle, HALF_PI, PI } from './dmath';
 
@@ -463,13 +463,14 @@ class BikeWorld implements BikePhysicsWorld {
     const rear = { x: t.suspension.rear.axle.x + t.suspension.rear.axis.x * cr, y: t.suspension.rear.axle.y + t.suspension.rear.axis.y * cr };
     const front = { x: t.suspension.front.axle.x + t.suspension.front.axis.x * cf, y: t.suspension.front.axle.y + t.suspension.front.axis.y * cf };
     const leanOff = lean > 0 ? lean * t.rider.leanFwd : lean * t.rider.leanBack;
-    const rider = { x: t.rider.anchor.x + leanOff, y: t.rider.anchor.y - this.F[S_CROUCH]! * t.rider.crouch - Math.abs(lean) * t.rider.leanCrouch };
+    const rider = { x: t.rider.anchor.x + leanOff, y: t.rider.anchor.y - this.F[S_CROUCH]! * t.rider.crouch - (lean > 0 ? lean * t.rider.leanCrouchFwd : -lean * t.rider.leanCrouch) };
     const M = t.frame.mass + 2 * t.wheel.mass + t.rider.mass;
     const cx = (t.wheel.mass * (rear.x + front.x) + t.rider.mass * rider.x) / M;
     const cy = (t.wheel.mass * (rear.y + front.y) + t.rider.mass * rider.y) / M;
     const d = cx - rear.x;
     const h = cy - (rear.y - R);
-    return HALF_PI - atan2(h, d) + atan(accel / t.gravity);
+    // forward acceleration lifts the nose (pseudo-force at the COM), so the balance pitch drops with accel
+    return HALF_PI - atan2(h, d) - atan(accel / t.gravity);
   }
 
   teleport(pose: TeleportPose): void {
@@ -611,7 +612,7 @@ class BikeWorld implements BikePhysicsWorld {
     const leanOff = lean > 0 ? lean * t.rider.leanFwd : lean * t.rider.leanBack;
     const [ax, ay] = rot(
       t.rider.anchor.x + leanOff,
-      t.rider.anchor.y - this.F[S_CROUCH]! * t.rider.crouch + this.F[S_HOP_EXT]! * t.rider.hopExtend - Math.abs(lean) * t.rider.leanCrouch,
+      t.rider.anchor.y - this.F[S_CROUCH]! * t.rider.crouch + this.F[S_HOP_EXT]! * t.rider.hopExtend - (lean > 0 ? lean * t.rider.leanCrouchFwd : -lean * t.rider.leanCrouch),
     );
     this.px[RIDER] = fx + ax;
     this.py[RIDER] = fy + ay;
@@ -661,6 +662,50 @@ class BikeWorld implements BikePhysicsWorld {
     const dx = this.px[RIDER]! - this.px[FRAME]!;
     const dy = this.py[RIDER]! - this.py[FRAME]!;
     return -dx * s + dy * c;
+  }
+
+  // rider body chain scratch (world): 0 hips, 1 shoulders, 2 head centre; (chDx, chDy) torso unit dir
+  private readonly chX = new Float64Array(3);
+  private readonly chY = new Float64Array(3);
+  private chDx = 0;
+  private chDy = 1;
+
+  /**
+   * The rider body as the renderer draws it (`src/render/rider/riderModel.ts` poseRider, standing):
+   * hips over the pegs, torso pitched forward in the attack position, head ahead of the shoulders.
+   * Crash sensors and the ragdoll spawn come from this chain, not from the dynamics point mass.
+   */
+  private riderChain(): void {
+    const t = this.tuning;
+    const lean = this.F[S_LEAN_EFF]!;
+    const back = Math.max(0, -lean);
+    const fwd = Math.max(0, lean);
+    const crouch = clamp((t.rider.anchor.y - this.riderLocalY()) / t.rider.crouch, 0, 1);
+    const wa = wrapAngle(this.an[FRAME]!);
+    const torsoPitch = clamp(-0.35 * lean - 0.15 * wa, -0.9, 0.9);
+    const armExtend = clamp(back + 0.5 * Math.max(0, wa - 0.6), 0, 1);
+    const hx = -0.12 - 0.28 * back + 0.14 * fwd - 0.06 * crouch;
+    const hy = 0.74 - 0.4 * crouch;
+    const A = 0.62 + torsoPitch + 0.3 * fwd + 0.5 * crouch - 0.5 * back - 0.35 * armExtend;
+    const dxl = sin(A);
+    const dyl = cos(A);
+    const sx = hx + dxl * 0.5;
+    const sy = hy + dyl * 0.5;
+    const headA = A * 0.45 - 0.1;
+    const hdx = sx + sin(headA) * 0.195;
+    const hdy = sy + cos(headA) * 0.195;
+    const c = cos(this.an[FRAME]!);
+    const s = sin(this.an[FRAME]!);
+    const fx = this.px[FRAME]!;
+    const fy = this.py[FRAME]!;
+    this.chX[0] = fx + hx * c - hy * s;
+    this.chY[0] = fy + hx * s + hy * c;
+    this.chX[1] = fx + sx * c - sy * s;
+    this.chY[1] = fy + sx * s + sy * c;
+    this.chX[2] = fx + hdx * c - hdy * s;
+    this.chY[2] = fy + hdx * s + hdy * c;
+    this.chDx = dxl * c - dyl * s;
+    this.chDy = dxl * s + dyl * c;
   }
 
   // -- step phases ----------------------------------------------------------
@@ -825,7 +870,7 @@ class BikeWorld implements BikePhysicsWorld {
       const alx = r.anchor.x + leanOff;
       const cr = F[S_CROUCH]!;
       const eased = cr * cr * (3 - 2 * cr);
-      const aly = r.anchor.y - eased * r.crouch + F[S_HOP_EXT]! * r.hopExtend - Math.abs(lean) * r.leanCrouch;
+      const aly = r.anchor.y - eased * r.crouch + F[S_HOP_EXT]! * r.hopExtend - (lean > 0 ? lean * r.leanCrouchFwd : -lean * r.leanCrouch);
       const axw = fx + alx * c - aly * s;
       const ayw = fy + alx * s + aly * c;
       this.anchorX = axw;
@@ -861,7 +906,7 @@ class BikeWorld implements BikePhysicsWorld {
       if (hop && ext < 0) fUp += r.hopForce;
       const maxUp = hop ? r.hopMaxForce : r.ejectForce * 1.5;
       fUp = clamp(fUp, -maxUp, maxUp);
-      let fAlong = -r.k * along - r.c * alongRate;
+      let fAlong = -r.kAlong * along - r.cAlong * alongRate;
       fAlong = clamp(fAlong, -r.ejectForce * 1.5, r.ejectForce * 1.5);
       const Fx = fAlong * c + fUp * upx;
       const Fy = fAlong * s + fUp * upy;
@@ -963,17 +1008,13 @@ class BikeWorld implements BikePhysicsWorld {
       }
     }
     if (riding) {
-      // rider sensors: head + torso circles -> crash on any touch
-      const wa = wrapAngle(this.an[FRAME]!);
-      const phi = t.rider.torsoFollow * wa;
-      const ux = -sin(phi);
-      const uy = cos(phi);
-      const rx = this.px[RIDER]!;
-      const ry = this.py[RIDER]!;
+      // rider sensors: head + two torso circles on the drawn body (same pose the renderer builds
+      // from lean/crouch/torsoPitch/armExtend, so what you see hit is what crashes)
+      this.riderChain();
       const r = t.rider;
-      this.querySensor(rx + ux * 0.44, ry + uy * 0.44, r.headRadius);
-      this.querySensor(rx + ux * 0.16, ry + uy * 0.16, r.torsoRadius);
-      this.querySensor(rx - ux * 0.12, ry - uy * 0.12, r.torsoRadius);
+      this.querySensor(this.chX[2]!, this.chY[2]!, r.headRadius);
+      this.querySensor(this.chX[0]! + this.chDx * 0.38, this.chY[0]! + this.chDy * 0.38, r.torsoRadius);
+      this.querySensor(this.chX[0]! + this.chDx * 0.14, this.chY[0]! + this.chDy * 0.14, r.torsoRadius);
     } else if (U[U_RAGDOLL] === 1) {
       for (let i = 0; i < NRAG; i++) {
         const b = RAG0 + i;
@@ -990,7 +1031,93 @@ class BikeWorld implements BikePhysicsWorld {
           this.queryBodyCircle(b, this.px[b]! - hx, this.py[b]! - hy, limb.r, spec + speed * dt, 0, true);
         }
       }
+      this.collideRagdollVsBike(spec);
     }
+  }
+
+  /** Scratch primitive for ragdoll-vs-bike circle tests (the bike bodies are not in the static grid). */
+  private readonly bikePrim: Prim = {
+    kind: PrimKind.Circle,
+    colliderId: -1,
+    surface: 2, // metal
+    oneWay: false,
+    body: FRAME,
+    ax: 0,
+    ay: 0,
+    bx: 0,
+    by: 0,
+    nx: 0,
+    ny: 0,
+    cx: 0,
+    cy: 0,
+    r: 0,
+    hw: 0,
+    hh: 0,
+    angle: 0,
+    minX: 0,
+    maxX: 0,
+  };
+  private readonly bikeManifold: Manifold = { px: 0, py: 0, nx: 0, ny: 0, sep: 0, prim: null as unknown as Prim };
+
+  /**
+   * Ragdoll limbs collide with the bike (tyres and frame hard points) so the rider does not fall
+   * through the machine in a crash clip. Fixed order: limb, then wheel/frame circle.
+   */
+  private collideRagdollVsBike(spec: number): void {
+    const t = this.tuning;
+    const dt = this.dt;
+    const c = cos(this.an[FRAME]!);
+    const s = sin(this.an[FRAME]!);
+    const prim = this.bikePrim;
+    const m = this.bikeManifold;
+    for (let i = 0; i < NRAG; i++) {
+      const b = RAG0 + i;
+      const limb = RAG_LIMBS[i]!;
+      const speed = Math.sqrt(this.vx[b]! * this.vx[b]! + this.vy[b]! * this.vy[b]!) + Math.abs(this.av[b]!) * limb.len;
+      const margin = spec + speed * dt;
+      const nEnds = limb.len === 0 ? 1 : 2;
+      for (let e = 0; e < nEnds; e++) {
+        let cx = this.px[b]!;
+        let cy = this.py[b]!;
+        if (limb.len > 0) {
+          const cb = cos(this.an[b]!);
+          const sb = sin(this.an[b]!);
+          const sign = e === 0 ? 1 : -1;
+          cx += -sb * limb.len * 0.5 * sign;
+          cy += cb * limb.len * 0.5 * sign;
+        }
+        // wheels
+        for (let w = 0; w < 2; w++) {
+          const wb = w === 0 ? REAR : FRONT;
+          prim.body = wb;
+          prim.surface = 4; // rubber
+          prim.cx = this.px[wb]!;
+          prim.cy = this.py[wb]!;
+          prim.r = t.wheel.radius;
+          if (circleVsPrim(cx, cy, limb.r, prim, 0, m) && m.sep < margin) this.emitBodyContact(b, cx, cy, limb.r, m);
+        }
+        // frame hard points
+        prim.body = FRAME;
+        prim.surface = 2;
+        for (const fc of t.frame.circles) {
+          prim.cx = this.px[FRAME]! + fc.x * c - fc.y * s;
+          prim.cy = this.py[FRAME]! + fc.x * s + fc.y * c;
+          prim.r = fc.r;
+          if (circleVsPrim(cx, cy, limb.r, prim, 0, m) && m.sep < margin) this.emitBodyContact(b, cx, cy, limb.r, m);
+        }
+      }
+    }
+  }
+
+  private emitBodyContact(body: number, cx: number, cy: number, r: number, m: Manifold): void {
+    this.qBody = body;
+    this.qCx = cx;
+    this.qCy = cy;
+    this.qR = r;
+    this.qWheel = 0;
+    this.qSensor = false;
+    this.qRag = true;
+    this.addContact(m);
   }
 
   private queryBodyCircle(body: number, cx: number, cy: number, r: number, margin: number, wheel: number, rag: boolean): void {
@@ -1631,17 +1758,21 @@ class BikeWorld implements BikePhysicsWorld {
   private spawnRagdoll(): void {
     const t = this.tuning;
     const U = this.U;
-    const wa = wrapAngle(this.an[FRAME]!);
-    const phi = t.rider.torsoFollow * wa;
-    const ux = -sin(phi);
-    const uy = cos(phi);
-    const fx = cos(phi);
-    const fy = sin(phi);
-    const rx = this.px[RIDER]!;
-    const ry = this.py[RIDER]!;
-    const rvx = this.vx[RIDER]!;
-    const rvy = this.vy[RIDER]!;
+    this.riderChain();
+    // torso axis from the drawn body: u points hips -> head
+    const ux = this.chDx;
+    const uy = this.chDy;
+    const fx = uy;
+    const fy = -ux;
+    // rider "centre" 0.15 above the hips along the torso (the ragdoll torso/pelvis join)
+    const rx = this.chX[0]! + ux * 0.1;
+    const ry = this.chY[0]! + uy * 0.1;
+    // velocity of that point on the frame plus the point mass's relative motion along the frame
     const fw = this.av[FRAME]!;
+    const ox0 = rx - this.px[FRAME]!;
+    const oy0 = ry - this.py[FRAME]!;
+    const rvx = this.vx[FRAME]! - fw * oy0 + 0.5 * (this.vx[RIDER]! - this.vx[FRAME]!);
+    const rvy = this.vy[FRAME]! + fw * ox0 + 0.5 * (this.vy[RIDER]! - this.vy[FRAME]!);
     const spread = t.ragdoll.spread;
     // body placement: [centre offset along u, offset along fwd, axis direction (dx, dy) distal->proximal]
     const place = (i: number, cx: number, cy: number, dirx: number, diry: number): void => {
@@ -1650,7 +1781,7 @@ class BikeWorld implements BikePhysicsWorld {
       this.px[b] = cx;
       this.py[b] = cy;
       // local +y points from distal to proximal: (-sin a, cos a) = (dirx, diry)
-      this.an[b] = limb.len === 0 ? phi : atan2(-dirx, diry);
+      this.an[b] = limb.len === 0 ? atan2(-ux, uy) : atan2(-dirx, diry);
       const ox = cx - this.px[FRAME]!;
       const oy = cy - this.py[FRAME]!;
       this.vx[b] = rvx - fw * oy * 0.5 + (this.rng.next() * 2 - 1) * spread;

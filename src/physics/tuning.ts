@@ -72,10 +72,15 @@ export interface BikeTuning {
      * without inventing angular momentum.
      */
     torso: { inertia: number; swing: number; k: number; c: number; maxTorque: number };
-    /** Anchor drops by this * |lean| (sit back low / hang over the bars). */
+    /** Anchor drops by this * |lean| (sit back low / hang over the bars); forward has its own value. */
     leanCrouch: number;
+    leanCrouchFwd: number;
+    /** Leg stiffness / damping along frame-up (N/m, N s/m). */
     k: number;
     c: number;
+    /** Fore-aft stiffness / damping (arms + braced legs: much stiffer than the legs' up-down). */
+    kAlong: number;
+    cAlong: number;
     kLanding: number;
     leanBack: number;
     leanFwd: number;
@@ -173,8 +178,8 @@ const DEFAULTS: BikeTuning = {
     limiterResetRpm: 9500,
     peakTorqueNm: 38,
     curve: [
-      [1500, 0.55],
-      [3500, 0.65],
+      [1500, 0.68],
+      [3500, 0.8],
       [5000, 0.85],
       [6500, 1.0],
       [8000, 0.95],
@@ -190,14 +195,17 @@ const DEFAULTS: BikeTuning = {
   brakes: { frontMaxNm: 640, rearMaxNm: 500, antiEndo: 0.05 },
   rider: {
     mass: 75,
-    anchor: { x: 0.21, y: 0.5 },
+    anchor: { x: 0.33, y: 0.38 },
     torso: { inertia: 15, swing: 1.2, k: 4000, c: 390, maxTorque: 300 },
-    leanCrouch: 0.3,
+    leanCrouch: 0.4,
+    leanCrouchFwd: 0.5,
     k: 6000,
     c: 740,
+    kAlong: 20000,
+    cAlong: 1800,
     kLanding: 40000,
     leanBack: 0.6,
-    leanFwd: 0.85,
+    leanFwd: 0.73,
     leanRate: 6,
     crouch: 0.3,
     hopExtend: 0.15,
@@ -215,7 +223,7 @@ const DEFAULTS: BikeTuning = {
     hopThrottle: 0.3,
     hopSnapRate: 4,
     tetherMax: 0.5,
-    ejectForce: 12000,
+    ejectForce: 16000,
     headRadius: 0.15,
     torsoRadius: 0.13,
     torsoFollow: 0.5,
