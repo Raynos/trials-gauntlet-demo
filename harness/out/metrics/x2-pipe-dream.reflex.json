@@ -4,9 +4,9 @@
   "trackId": "x2-pipe-dream",
   "tier": "extreme",
   "technique": "spinning drums with gaps and see-saw drops",
-  "updatedAt": "2026-09-14T12:38:41.609Z",
+  "updatedAt": "2026-09-14T13:17:53.355Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "c83b6ca8",
+  "srcFingerprint": "e20969c7",
   "attemptsBand": [
     40,
     60
@@ -21,11 +21,11 @@
         2290459158
       ],
       "attempts": [
-        45,
-        48,
-        41
+        42,
+        49,
+        51
       ],
-      "medianAttempts": 45,
+      "medianAttempts": 49,
       "clears": 0,
       "finishTimes": [
         null,
@@ -33,72 +33,85 @@
         null
       ],
       "medianFinishTime": null,
-      "bestX": 130.3087412502449,
+      "bestX": 115.48783394968066,
       "deaths": [
         {
           "obstacle": "ramp @ 47.6 m",
           "x": 47.6,
-          "count": 114,
+          "count": 107,
           "reasons": {
-            "crash": 62,
-            "restart": 52
+            "crash": 64,
+            "restart": 43
           },
           "rules": {
-            "air-brake-nose-down": 18,
-            "nose-low": 10,
+            "air-brake-nose-down": 21,
+            "stuck-restart": 21,
             "cruise": 13,
-            "air-gas-nose-up": 7,
-            "nose-high": 34,
-            "stuck-restart": 29,
-            "hop-snap": 2,
-            "hop-preload": 1
+            "nose-low": 7,
+            "nose-high": 37,
+            "hop-snap": 1,
+            "air-gas-nose-up": 4,
+            "hop-preload": 3
           }
         },
         {
           "obstacle": "logpile @ 49.1 m",
           "x": 49.1,
-          "count": 11,
+          "count": 17,
           "reasons": {
             "crash": 8,
-            "restart": 3
+            "restart": 9
           },
           "rules": {
-            "nose-low": 2,
-            "nose-high": 2,
-            "hop-snap": 1,
             "air-brake-nose-down": 2,
-            "climbing": 1,
+            "air-gas-nose-up": 4,
+            "nose-high": 4,
+            "cruise": 1,
             "stuck-restart": 2,
-            "air-gas-nose-up": 1
+            "nose-low": 2,
+            "hop-snap": 2
           }
         },
         {
           "obstacle": "box @ 35.6 m",
           "x": 35.6,
-          "count": 3,
+          "count": 10,
           "reasons": {
-            "hazard": 1,
-            "crash": 2
+            "crash": 9,
+            "hazard": 1
           },
           "rules": {
-            "air-gas-nose-up": 3
+            "air-gas-nose-up": 8,
+            "nose-low": 1,
+            "hop-snap": 1
           }
         },
         {
-          "obstacle": "ramp @ 39.6 m",
-          "x": 39.6,
+          "obstacle": "ramp @ 55.5 m",
+          "x": 55.5,
           "count": 2,
           "reasons": {
             "crash": 2
           },
           "rules": {
-            "air-gas-nose-up": 1,
-            "nose-low": 1
+            "nose-low": 1,
+            "air-gas-nose-up": 1
           }
         },
         {
-          "obstacle": "ramp @ 132.1 m",
-          "x": 132.1,
+          "obstacle": "ramp @ 39.6 m",
+          "x": 39.6,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "box @ 59.5 m",
+          "x": 59.5,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -106,12 +119,23 @@
           "rules": {
             "nose-high": 1
           }
+        },
+        {
+          "obstacle": "ramp @ 116.1 m",
+          "x": 116.1,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
         }
       ],
       "runs": [
-        "20260914-073840-4e5a63",
-        "20260914-073841-70fd0c",
-        "20260914-073841-8e1cda"
+        "20260914-081752-ff5fbb",
+        "20260914-081752-33e8df",
+        "20260914-081753-4a9e92"
       ]
     }
   ]

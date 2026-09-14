@@ -302,6 +302,23 @@ export interface GateReport extends RunMeta {
   determinism: DeterminismReport | null;
   /** G10: stranger medians per judged track on the working tree's src (informational until armed). */
   stranger?: { srcFingerprint: string; armed: boolean; minSessions: number; rows: GateStrangerRow[] };
+  /** G10 second row: reflex-bot (average) medians on the same tracks (harness/reflex). */
+  reflex?: { srcFingerprint: string; armed: boolean; minSeeds: number; rows: GateReflexRow[] };
+}
+
+export interface GateReflexRow {
+  trackId: string;
+  skill: ReflexSkill;
+  attemptsBand: [number, number] | null;
+  limit: number | null;
+  /** src the metrics file was recorded on; only a match with the working tree counts. */
+  srcFingerprint: string;
+  seedsFresh: number;
+  medianAttempts: number | null;
+  medianFinishTime: number | null;
+  allCleared: boolean;
+  pass: boolean | null;
+  deadliest: string | null;
 }
 
 export interface GateStrangerRow {
@@ -317,4 +334,104 @@ export interface GateStrangerRow {
   /** null = nothing to judge yet */
   pass: boolean | null;
   sessions: string[];
+}
+
+// ---------------------------------------------------------------------------
+// Reflex bot (harness/reflex/**): a real-time controller with human limits
+// ---------------------------------------------------------------------------
+
+export type ReflexSkill = 'novice' | 'average' | 'good';
+
+export interface ReflexDeath {
+  attempt: number;
+  reason: FaultReason;
+  x: number;
+  checkpoint: number;
+  runTime: number;
+  pitchDeg: number;
+  speed: number;
+  airborne: boolean;
+  /** The rule the player was executing when it died. */
+  rule: string;
+  /** Nearest placed obstacle within [-2, +8] m, or null = open ground. */
+  obstacle: { kind: string; x: number; index: number } | null;
+  /** What the section memory changed after this death. */
+  lesson: string[];
+}
+
+export interface ReflexRunReport extends RunMeta {
+  kind: 'reflex';
+  /** 'node' = createSim with the game rules; 'browser' = real keyboard events into the live RAF loop. */
+  mode: 'node' | 'browser';
+  trackId: string;
+  seed: number;
+  physicsHz: number;
+  skill: ReflexSkill;
+  /** Reaction delay drawn for this run (s). */
+  reactionS: number;
+  outcome: 'finished' | 'maxAttempts' | 'timeout';
+  attempts: number;
+  finishTime: number | null;
+  maxX: number;
+  progress: number;
+  simSeconds: number;
+  deaths: ReflexDeath[];
+  faultsByCheckpoint: number[];
+  /** How often each rule was the one driving the hands (tap slots). */
+  rules: Record<string, number>;
+  recordingFile: string;
+  /** Hash of the physics state at the end of play, and of a fresh node replay of the recording. */
+  playHash: string;
+  replayHash: string;
+  replayFaithful: boolean;
+  browserHash?: string | null;
+  browserVerified?: boolean | null;
+  /** Browser mode only. */
+  live?: {
+    fps: number;
+    /** Wall ms per perception round trip, p50/p95. */
+    glanceMsP50: number;
+    glanceMsP95: number;
+    glances: number;
+    keyEvents: number;
+    /** Riding ticks that elapsed before the recording started (prepended as neutral frames). */
+    startTick: number;
+    countdownMs: number;
+    wallS: number;
+    /** 'virtual': Playwright fake clock, rAF at `frameMs` (a 60 fps player regardless of raster cost); 'wall': real clock. */
+    clock: 'virtual' | 'wall';
+    frameMs: number;
+    /** Real ms this machine needed per player frame (SwiftShader raster cost). */
+    wallMsPerFrame: number;
+    /** Node replay of the recording reproduces the browser's final hash. */
+    roundTrip: boolean;
+  };
+}
+
+export interface ReflexTrackMetrics {
+  schema: 1;
+  kind: 'track-reflex-metrics';
+  trackId: string;
+  tier: string;
+  technique: string;
+  updatedAt: string;
+  physics: string;
+  srcFingerprint: string;
+  attemptsBand: [number, number] | null;
+  finishX: number;
+  bySkill: {
+    skill: ReflexSkill;
+    seeds: number[];
+    attempts: number[];
+    medianAttempts: number;
+    clears: number;
+    finishTimes: (number | null)[];
+    medianFinishTime: number | null;
+    bestX: number;
+    /** Deaths aggregated by nearest obstacle across seeds, most deadly first. */
+    deaths: { obstacle: string; x: number; count: number; reasons: Record<string, number>; rules: Record<string, number> }[];
+    runs: string[];
+  }[];
+  /** Live-browser runs (b1 validation), when any. */
+  browser?: { runs: string[]; attempts: number[]; medianAttempts: number; finishTimes: (number | null)[]; fps: number[]; roundTrips: boolean[] };
 }

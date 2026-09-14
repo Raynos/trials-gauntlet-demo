@@ -4,9 +4,9 @@
   "trackId": "e3-stairway",
   "tier": "easy",
   "technique": "stairs: pulse up, brake down",
-  "updatedAt": "2026-09-14T12:38:36.160Z",
+  "updatedAt": "2026-09-14T13:17:47.499Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "c83b6ca8",
+  "srcFingerprint": "e20969c7",
   "attemptsBand": [
     3,
     6
@@ -21,11 +21,11 @@
         3073702006
       ],
       "attempts": [
-        48,
-        46,
-        49
+        51,
+        49,
+        50
       ],
-      "medianAttempts": 48,
+      "medianAttempts": 50,
       "clears": 0,
       "finishTimes": [
         null,
@@ -33,45 +33,50 @@
         null
       ],
       "medianFinishTime": null,
-      "bestX": 101.43185173461026,
+      "bestX": 102.04517501441804,
       "deaths": [
         {
           "obstacle": "stair @ 100.5 m",
           "x": 100.5,
-          "count": 138,
+          "count": 95,
           "reasons": {
-            "crash": 17,
-            "restart": 121
+            "crash": 14,
+            "restart": 81
           },
           "rules": {
-            "air-gas-nose-up": 1,
+            "air-brake-nose-down": 4,
+            "stuck-restart": 48,
             "nose-high": 9,
-            "air-brake-nose-down": 8,
-            "cruise": 46,
-            "stuck-restart": 59,
-            "hop-preload": 10,
-            "nose-low": 4,
-            "hop-snap": 1
+            "climbing": 1,
+            "cruise": 25,
+            "air-gas-nose-up": 1,
+            "hop-snap": 4,
+            "hop-preload": 2,
+            "nose-low": 1
           }
         },
         {
           "obstacle": "stair @ 44.0 m",
           "x": 44,
-          "count": 2,
+          "count": 52,
           "reasons": {
-            "crash": 1,
-            "restart": 1
+            "crash": 4,
+            "restart": 48
           },
           "rules": {
-            "nose-high": 1,
-            "stuck-restart": 1
+            "air-brake-nose-down": 2,
+            "nose-high": 3,
+            "nose-low": 1,
+            "climbing": 3,
+            "steep-ahead": 23,
+            "stuck-restart": 20
           }
         }
       ],
       "runs": [
-        "20260914-073835-24cb95",
-        "20260914-073835-2cd8f0",
-        "20260914-073835-ebb85e"
+        "20260914-081746-50a524",
+        "20260914-081747-46206c",
+        "20260914-081747-8cc022"
       ]
     }
   ]

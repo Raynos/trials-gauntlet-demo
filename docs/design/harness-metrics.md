@@ -87,6 +87,76 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 5 status — the reflex bot: a person holding keys
+
+The two measurement players so far were a beam-search bot (15-tick macros with snapshot lookahead — superhuman
+planning, no reflexes) and an LLM stranger issuing 125 ms slot codes (no real-time constraint). Neither is a
+person holding keys. `harness/reflex/**` adds the third and makes it the primary attempts-to-clear instrument:
+`pnpm harness:reflex`, results in `out/metrics/<track>.reflex.json` + `out/metrics/reflex.md`, gate G10 second row.
+
+| piece | as built |
+|---|---|
+| **perception** (`perceive.ts`, `profile.ts`) | one glance = bike pitch, pitch rate, speed, height above ground, wheel contact, the ground silhouette ahead within ~1.5 s of travel (8–40 m, exactly the colliders render draws, rasterised at 0.25 m; seesaw planks at their current angle) reduced to: max rise, first rise ≥ 0.4 m, steepest 1 m slope in the next 5 m, first vertical face (≥ 0.35 m in one cell) and its height, first drop ≥ 0.8 m, first pit (sharp ≥ 1 m drop that comes back within 8 m) and its width, first hazard, ballistic landing point + its slope when airborne, terrain pitch under the wheels, next checkpoint / finish mark. Glances at 20/25/30 Hz. No obstacle kinds, params, checkpoints or physics internals. |
+| **noise + reaction** (`controller.ts`) | per glance: pitch ± 3/2/1.5° (N), pitch rate through a 2-tap EMA (the eye integrates ~100 ms; a landing spike is not "the bike is flipping") ± 6× that, speed ± 7/5/4 %, height ± 8 cm, timestamp jitter. Reaction delay drawn once per run from 230–280 / 180–220 / 150–170 ms (novice / average / good); every decision acts on the newest glance older than that. The rider extrapolates: rules use `pitch + rate × 0.8 × reaction` (clamped ± 30°). |
+| **rules** | target speed = cruise (9/11/13 m/s) × section scale, raised for a steep climb or a pit (width / 0.32 s + 1.5), capped before a drop or a face; throttle = proportional duty around it, brake when > +2.5 m/s over. Ground: hold `terrainPitch + 6°` with a 6° deadband. **Nose too high** (28° over the terrain) → lean forward, off the gas above 40°. **Nose diving** → lean back, off the brake. **Steep up ahead** → gas + forward; **on the climb** → forward. **Drop ahead** → weight back, ease the gas. **Pit run-up** → gas; **pit lip** (0.3 s) → nose up + gas. **Face** (ledge / box / wall) at 0.3 s + a bike length → the practised hop: 0.18 s preload (gas + back) then 0.12 s snap (gas + forward). **Airborne** → level to the landing slope + 4°; nose way up → a brake tap (this physics pitches −4 rad/s on the brake in the air); nose down → gas + back. The first thing everyone learns: gas + lean back on the ground loops out, so that pair is only allowed inside a deliberate lift. Stuck (no progress 4 s) → restart. Crashed → restart tap after 0.5/0.35/0.25 s. |
+| **hands** | keys are binary and change at most every 100/80/70 ms; analog intent becomes a tap rhythm (sigma-delta duty cycle, like a thumb feathering ↑). Lapses: every ~6/10/20 s (exp.) the hands freeze for 0.25–0.5 s. |
+| **learning** (`memory.ts`) | 6 m x-buckets. A fault at x edits the approach bucket (0.9 s of travel back) and the fault bucket only: fell short (below the ground ahead) → speed +0.12, nose up; looped (pitch > 45°) → lean bias +0.25 forward, throttle cap −0.15, act 80 ms earlier; endo (< −35°) → lean back, slower; anything else → slower, look earlier. Every 4th fault in one bucket tries the opposite (faster). Two clean passes relax a bucket toward the defaults. |
+| **determinism / evidence** | node mode: time = tick / hz, all randomness from `Rng(seed ^ 0x5eed)`; same (track, seed, skill) → identical frames and hash (`reflex.test.ts`). No snapshot / restore anywhere, so the recording *is* the play: `replayFaithful` on every run, and the CLI verifies one recording per track in the browser through `runRecording` (b1: node `87b913d77aae1c05` == browser). |
+| **live browser** (`browser.ts`) | `--browser N`: the live game (`?track=`, no harness param: App shell, countdown, `RafDriver`, `KeyboardInput` → `InputMux` → `quantizeInput`), eyes = `getState()` over CDP, hands = `page.keyboard.down/up` on the arrow keys. Playwright's fake clock steps rAF at 16.7 ms (see README caveat — SwiftShader's 200–280 ms raster makes the real-clock game a 3–4 fps one). An in-page rAF hook starts the recording on the first `riding` frame; the neutral ticks before it are prepended; `roundTrip` = node replay hash == live page hash. |
+| **G10, second row** | `reflex.medianAttempts` in `ship-gate.ts`: `average` medians from `<track>.reflex.json` for b1/b2/b3/e1 on the working tree's src vs `reflex.attemptsBandFactor` (1.5) × band top; informational until each has ≥ `reflex.minSeeds` (3) seeds on this src. |
+
+### Curriculum, `average`, 3 seeds (src c83b6ca8, bikePhysicsFactory, cap 50 attempts / 300 s)
+
+See `harness/out/metrics/reflex.md` for the full table. Beginner + e1 clear in 1–5 attempts (b1 1/1/1 · b2 2/3/5 ·
+b3 2/3/5 · e1 1/3/4, 55–80 s), e2 in 13–14 (one seed hits the cap at the box after the 143 m gap — the
+rear-wheel-first landing is the taught technique and the rules do not have it). From e3 up the reflex player is
+walled by technique, exactly where a keyboard novice is: e3 stairs @ 100 m (five 0.3 m risers from a checkpoint
+4 m before them — 138 stuck-restarts over 3 seeds), m1 0.9 m ledge @ 87 m (the practised hop clears 0.45–0.5 m,
+not 0.9), m2 ramp @ 123 m / logpile, m3 the 164 m gap + plank, h1 wall @ 138 m, h2 boxes @ 52/60 m, h3 barrel @ 57 m,
+x1 ramp+plank @ 44 m, x2 ramp @ 48 m, x3 plank @ 86 m. Those rows are the instrument saying "a reflex player
+without the technique does not get past here", which is the number the tracks owner wants per obstacle.
+
+### Calibration against the strangers (b1/b2/b3/e1)
+
+| track | band | stranger (src 73762476, round 1) | stranger (src c83b6ca8, round 4, fresh) | reflex `average` | reflex `novice` |
+|---|---|---|---|---|---|
+| b1 | 1–1 | 4, 2 → **3** (58.7 s) | 1, 2 → **1.5** (44–56 s) | 1, 1, 1 → **1** (55 s) | 4, 1, 2 → 2 |
+| b2 | 1–2 | 4, 2 → **3** (49.0 s) | — | 2, 3, 5 → **3** (58 s) | 2, 4, 7 → 4 |
+| b3 | 1–2 | 13, 10 → **11.5** (107 s) | 2 (+ one in progress at 5) | 2, 3, 5 → **3** (70 s) | 3, 10, 12 → 10 |
+| e1 | 2–4 | 9, 15 → **12** (120 s) | — | 1, 3, 4 → **3** (79 s) | 6, 3, 10 → 6 |
+
+Against the **fresh** strangers (same physics, same tracks) `average` is within ±50 % everywhere there is data
+(b1 1 vs 1.5, b3 3 vs 2–5). Against the **round-1** strangers only b1/b2 are (1 vs 3 is the b1 miss: 6 of 8 round-1
+attempt-1 deaths were the full-gas loop-out at 24 m that the pitch-rate-led wheelie physics removed); b3 and e1 are
+at 0.3× / 0.25× — and those two medians were made by the old b3 checkpoint 3 m before the kicker (8 of 21 deaths)
+and the old 48° plank right after e1's checkpoint 3 (9 of 20), both since re-authored. The **`novice`** row lands
+on the round-1 medians instead (b1 2 vs 3, b2 4 vs 3, b3 10 vs 11.5, e1 6 vs 12): the slot-code stranger plays
+like a 250 ms keyboard novice, not like an average player. `average` was **not** tuned toward the stale numbers.
+What was tuned (on b1/b3 death traces, before any stranger comparison): pitch extrapolation + 6° deadband (a
+200 ms delay on 0.6 s rollers otherwise amplifies every bump into a loop-out at ~95 m and ~170 m on b1), the
+gas+back guard (after a slow landing the nose-low rule + full gas looped at 75 m on b3), the pitch-rate EMA (a
+landing spike read as "flipping" → forward lean off a hump lip → endo at 60 m on e3), terrain pitch for the
+nose-high threshold (a bike standing on 34° stairs is not looping), and the vertical-face definition (a 40° plank
+foot is not a wall to hop). Deaths line up by place where the geometry survived: b2 ramp @ 314/322 (stranger
+2, reflex 2), b3 kicker landings (stranger 133/145, reflex 70–110 rollers and the 368 box), e1 planks / ramps.
+
+### Browser vs node (b1, `average`)
+
+| | node (`createSim`, 3 seeds) | browser, fake clock 60 fps (3 runs) | browser, real clock (1 run) |
+|---|---|---|---|
+| attempts | 1, 1, 1 | 1, 1, 1 | 26 (timeout at 250 s, 67 %) |
+| time to clear | 54.8 / 55.5 / 56.2 s | 57.9 / 60.0 / 55.8 s | — |
+| game fps | — (ticks) | 63.8 (by construction) | 2.8–3.6 measured |
+| glance round trip | — | 0.9–1.1 ms | 277–336 ms (blocked behind the raster) |
+| key events per run | — | 560–566 | 146–478 |
+| wall per run | 0.1 s | 10–14 min (165–238 ms per player frame) | 4 min (real time) |
+| recording round trip | replay == play | node replay == live hash (`startTick` 0) | node replay == live hash |
+
+The input path (keyboard → mux → quantize → tick → recorder) is byte-faithful: every live recording replays in
+node to the browser's own hash. The only difference between (a) and (b) is the frame period the keys are sampled
+at; at 60 fps the live player behaves like the node player (same attempts, 1–4 s slower — different seeds, and key
+edges land on frame boundaries instead of ticks), at SwiftShader's real 3–4 fps it is a different, unplayable game.
+
 ## 0. Principles
 
 1. **Search runs in node, verification runs in the browser.** `src/physics` is platform-neutral (plain data,

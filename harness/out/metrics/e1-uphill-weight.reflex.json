@@ -4,9 +4,9 @@
   "trackId": "e1-uphill-weight",
   "tier": "easy",
   "technique": "lean forward on steep climbs",
-  "updatedAt": "2026-09-14T12:38:35.186Z",
+  "updatedAt": "2026-09-14T13:17:46.435Z",
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "c83b6ca8",
+  "srcFingerprint": "e20969c7",
   "attemptsBand": [
     2,
     4
@@ -21,35 +21,37 @@
         847839321
       ],
       "attempts": [
+        4,
         1,
-        3,
-        4
+        11
       ],
-      "medianAttempts": 3,
+      "medianAttempts": 4,
       "clears": 3,
       "finishTimes": [
-        60.05,
-        79.26666666666667,
-        87.3
+        74.23333333333333,
+        57.88333333333333,
+        123.46666666666667
       ],
-      "medianFinishTime": 79.26666666666667,
-      "bestX": 544.1791933346765,
+      "medianFinishTime": 74.23333333333333,
+      "bestX": 543.4306176414185,
       "deaths": [
         {
           "obstacle": "ramp @ 445.0 m",
           "x": 445.006136,
-          "count": 2,
+          "count": 9,
           "reasons": {
-            "crash": 2
+            "crash": 9
           },
           "rules": {
-            "nose-high": 1,
-            "air-brake-nose-down": 1
+            "air-brake-nose-down": 5,
+            "nose-high": 2,
+            "nose-low": 1,
+            "air-gas-nose-up": 1
           }
         },
         {
-          "obstacle": "ground @ 165 m",
-          "x": 165,
+          "obstacle": "ground @ 80 m",
+          "x": 80,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -66,25 +68,36 @@
             "crash": 1
           },
           "rules": {
-            "air-gas-nose-up": 1
+            "air-brake-nose-down": 1
           }
         },
         {
-          "obstacle": "ground @ 525 m",
-          "x": 525,
+          "obstacle": "ground @ 315 m",
+          "x": 315,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "air-gas-nose-up": 1
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 410 m",
+          "x": 410,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
           }
         }
       ],
       "runs": [
-        "20260914-073834-a04d87",
-        "20260914-073835-718c17",
-        "20260914-073835-e25875"
+        "20260914-081746-d2fedc",
+        "20260914-081746-0b2f9c",
+        "20260914-081746-1ea405"
       ]
     }
   ]

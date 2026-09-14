@@ -34,7 +34,7 @@ import { percentileOf, runMeta, srcFingerprint } from '../lib/metrics';
 import { DIST_DIR, HARNESS_DIR, REPO_ROOT } from '../lib/paths';
 import { loadRecording } from '../lib/recording';
 import { writeJson } from '../lib/report';
-import type { DeterminismReport, GateCheck, GateReport, GateStrangerRow } from '../lib/schema';
+import type { DeterminismReport, GateCheck, GateReport, GateReflexRow, GateStrangerRow, ReflexTrackMetrics } from '../lib/schema';
 import { createSim } from '../lib/sim';
 import { synthesizeRecording } from '../lib/synth';
 import { BrowserVerifier } from '../lib/verify';
@@ -50,6 +50,39 @@ export function loadThresholds(): { ship: Thresholds; swiftshader: Record<string
   const ship: Thresholds = {};
   for (const [k, v] of Object.entries(raw)) if (k !== '$comment' && k !== 'swiftshader') ship[k] = v as number | boolean | string;
   return { ship, swiftshader };
+}
+
+/**
+ * G10 second row: the reflex bot (harness/reflex, a real-time controller with human limits) at `average`
+ * on the same four tracks — median attempts over the seeds recorded on the working tree's src fingerprint.
+ * Informational until every track has >= minSeeds such seeds; then all four within factor x band top and cleared.
+ */
+export function reflexRows(tracks: readonly string[], factor: number, skill: 'novice' | 'average' | 'good' = 'average'): GateReflexRow[] {
+  const fp = srcFingerprint();
+  const rows: GateReflexRow[] = [];
+  for (const trackId of tracks) {
+    const file = path.join(HARNESS_DIR, 'out', 'metrics', `${trackId}.reflex.json`);
+    if (!fs.existsSync(file)) continue;
+    const m = JSON.parse(fs.readFileSync(file, 'utf8')) as ReflexTrackMetrics;
+    const row = m.bySkill.find((r) => r.skill === skill);
+    const fresh = m.srcFingerprint === fp && row ? row : null;
+    const band = m.attemptsBand ?? null;
+    const limit = band ? factor * band[1] : null;
+    rows.push({
+      trackId,
+      skill,
+      attemptsBand: band,
+      limit,
+      srcFingerprint: m.srcFingerprint,
+      seedsFresh: fresh ? fresh.seeds.length : 0,
+      medianAttempts: fresh ? fresh.medianAttempts : null,
+      medianFinishTime: fresh ? fresh.medianFinishTime : null,
+      allCleared: fresh ? fresh.clears === fresh.seeds.length : false,
+      pass: fresh && limit !== null ? fresh.medianAttempts <= limit && fresh.clears === fresh.seeds.length : null,
+      deadliest: fresh?.deaths[0] ? `${fresh.deaths[0].obstacle} ×${fresh.deaths[0].count}` : null,
+    });
+  }
+  return rows;
 }
 
 /** The tracks a stranger round judges (harness-metrics.md §3). */
@@ -461,6 +494,21 @@ async function main(): Promise<void> {
     });
     report.stranger = { srcFingerprint: srcFingerprint(), armed, minSessions, rows: stranger };
 
+    // G10, second row: the reflex bot (average) on the same tracks, seeds recorded on this src.
+    const reflex = reflexRows(STRANGER_TRACKS, num('reflex.attemptsBandFactor') || 1.5);
+    const minSeeds = num('reflex.minSeeds') || 3;
+    const reflexArmed = reflex.length === STRANGER_TRACKS.length && reflex.every((r) => r.seedsFresh >= minSeeds);
+    const reflexPass = reflex.every((r) => r.pass === true);
+    const reflexSummary = reflex.map((r) => `${r.trackId.split('-')[0]} ${r.medianAttempts ?? '-'}/${r.limit ?? '-'}${r.seedsFresh < minSeeds ? ` (${r.seedsFresh} fresh)` : ''}`).join(' · ');
+    check({
+      id: 'reflex.medianAttempts',
+      value: reflexSummary || 'no reflex metrics',
+      limit: num('reflex.attemptsBandFactor') || 1.5,
+      pass: reflexArmed ? reflexPass : true,
+      note: `reflex bot (average) median attempts / (${num('reflex.attemptsBandFactor') || 1.5} x band top) on src ${srcFingerprint()}; ${reflexArmed ? `armed: ${reflexPass ? 'all four within band' : 'outside band'}` : `informational until every track has >= ${minSeeds} seeds on this src (pnpm harness:reflex --all-tracks --seeds 3)`}`,
+    });
+    report.reflex = { srcFingerprint: srcFingerprint(), armed: reflexArmed, minSeeds, rows: reflex };
+
     const failed = checks.filter((c) => !c.pass).length;
     const full: GateReport = {
       ...runMeta('gate', started, { chromium: launched.browser.version() }),
@@ -482,6 +530,7 @@ async function main(): Promise<void> {
       perf: report.perf!,
       determinism: det,
       stranger: report.stranger!,
+      reflex: report.reflex!,
     };
     if (goldenHash) full.clear.hash = goldenHash;
     const out = path.join(HARNESS_DIR, 'out', 'metrics', 'ship-gate.json');

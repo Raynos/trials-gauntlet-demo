@@ -14,6 +14,8 @@ stranger** (AGENTS.md). Everything below produces numbers or clips for that.
 | --- | --- | --- |
 | `pnpm harness:bot <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] [--crash-probe] [--no-verify]` | attempts-to-clear per skill (beam search in node, committed play with in-band restarts), 0-fault oracle par, browser-verified golden recordings, a deterministic crash recording | `out/metrics/<trackId>.json` (committed), `out/bot/<trackId>/<runId>-skill<k>.json`, `inputs/<trackId>/bot-<skill>.json`, `inputs/<trackId>/crash.json` |
 | `pnpm harness:bot --all-tracks [--skill 2 \| --skill 2,3] [--seeds 2] [--track-wall-s 90] [--tracks a,b]` | **track sweep**: budget-capped committed play on every registered track; best distance (m, % of finishX), clears, attempts, first blocker (fault reason + x + nearest placed obstacle). A skill list writes one table per skill | `out/metrics/sweep.json` (`sweeps[]`) + `sweep.md` (committed), goldens for cleared tracks |
+| `pnpm harness:reflex <trackId> [--skill novice\|average\|good] [--seeds 3] [--attempts-cap 50] [--max-sim-seconds 300] [--browser N] [--all-skills] [--no-verify] [--build]` | **the reflex bot — a person holding keys, the primary attempts-to-clear instrument**: a continuous real-time controller with human limits (glances at 20–30 Hz of what is on screen — pitch, pitch rate, speed, height, the ground silhouette ~1.5 s ahead, the next mark — with ±2° / ±5 % noise, a 160–250 ms reaction delay drawn per run, binary keys changed at most every ~80 ms, lapses, and a per-section memory that changes the *approach* to x after a fault at x). No lookahead, no search, no track internals. Node run per seed via `createSim` (0.1 s wall), one recording browser-verified through `runRecording` (node hash == browser hash). `--browser N`: N runs against the **live game** (`?track=`, no harness param: App shell, countdown, `RafDriver`, `KeyboardInput`) through `page.keyboard.down/up`, eyes = `getState()` over CDP; the page runs on Playwright's fake clock at 60 fps (`--wall-clock` for the real clock, which on SwiftShader is a 3–4 fps game); the live recording (+ the neutral ticks before the first key) must replay in node to the browser's hash (`roundTrip`) | `out/metrics/<trackId>.reflex.json` (committed), `out/reflex/<trackId>/<runId>-<skill>.{json,rec.json}`, `…-browser-<skill>.{json,rec.json}` |
+| `pnpm harness:reflex --all-tracks [--skill average] [--seeds 3] [--tracks a,b]` · `pnpm harness:reflex --calibrate` | curriculum table (attempts per seed, median, clears, time to clear, where it died with the rule it was executing) + the stranger-vs-reflex calibration table on b1/b2/b3/e1 | `out/metrics/reflex.md` (committed) |
 | `pnpm harness:round [--build] [--quick] [--pin] [--tracks flat-test,gap-test,b1-first-ride]` | **per-round check**: bot on three tracks (+ crash probe), determinism on the fingerprint-matched golden, ship gate; exit = failed steps. `--quick` = skill 2, 60 s bot wall, 2 loads, gate `--quick`: **108 s incl. build** on this machine (full: skill 3, 3 loads, 60 s heap) | all of the below |
 | `pnpm harness:clip <trackId> [--recording <path>] [--at-x m --before 1.5 --after 3] [--from-tick N --to-tick N] [--fps 60] [--quality high] [--build]` | **clip evidence per track**: the best recording under `inputs/<trackId>/` (replayed in node: finished > fewer attempts > faster; ties to the current src stamp), rendered 1280×720 @ 60 fps with `setQuality('high')`; `--at-x` renders only the window around the first tick the bike passes x (manoeuvre clips for `harness:pair`). ~25 s wall per clip second on SwiftShader | `out/capture/<trackId>/{clip.mp4,sheet.jpg,clip.json}` |
 | `pnpm harness:clip --tile a,b,c,d [--recapture] [--out tile.jpg]` | one 4×4 contact sheet across tracks: one row per track, frames at 10/37/63/90 % of its clip (captured first when missing) — the parent judges several tracks in one image | `out/capture/tile.jpg` (+ `tile-N.jpg` beyond 4 tracks), `tile.json` legend |
@@ -22,7 +24,7 @@ stranger** (AGENTS.md). Everything below produces numbers or clips for that.
 | `pnpm harness:stranger report <trackId> [--stale]` | **stranger aggregate** (parent side, no call counted): every session of a track — attempts, cleared, time to clear, calls, wall, where each attempt died (nearest placed obstacle), best attempt tick window; medians over completed sessions on the current src fingerprint (`--stale` includes older physics); pass per CONTRACT §3 | `out/metrics/<trackId>.stranger.json` (committed) + `.stranger.md` |
 | `pnpm harness:pair <ours.mp4> <ref.mp4> --tag <manoeuvre> [--seed N] [--mask] [--align a:b]` | blind side-by-side: both clips to 640×360@30, seeded L/R coin, `hstack` mp4 + 2×8 sheet, sealed answer (chmod 000) | `out/compare/pair-<id>.mp4`, `pair-<id>-sheet.jpg`, `pair-<id>.answer.json` |
 | `pnpm harness:log-verdict <pair-id> --verdict '<json>' [--critic name]` | validates a critic verdict, unmasks, appends; running oursWinRate / positionBias per tag | `out/metrics/compare.jsonl` (committed) |
-| `pnpm harness:gate [--track flat-test] [--build] [--quick] [--heap-seconds 60] [--pin]` | **ship gate**: cold boot, first frame, clear by golden replay (bit-equal finish + hash vs `gate/expected.json`), crash, fault→control, restart latency, no countdown on restart, heap over 60 s, perf counters, bundle gz, determinism D1–D8, G10 stranger medians for b1/b2/b3/e1 on the current src (informational until each has ≥ 2 completed sessions). Exit code = failed checks | `out/metrics/ship-gate.json` (committed) |
+| `pnpm harness:gate [--track flat-test] [--build] [--quick] [--heap-seconds 60] [--pin]` | **ship gate**: cold boot, first frame, clear by golden replay (bit-equal finish + hash vs `gate/expected.json`), crash, fault→control, restart latency, no countdown on restart, heap over 60 s, perf counters, bundle gz, determinism D1–D8, G10 stranger medians for b1/b2/b3/e1 on the current src (informational until each has ≥ 2 completed sessions) and the G10 second row `reflex.medianAttempts` (reflex bot `average` medians from `<track>.reflex.json` on the current src, informational until each has ≥ `reflex.minSeeds` seeds). Exit code = failed checks | `out/metrics/ship-gate.json` (committed) |
 | `pnpm harness:snapshot-probe <recording> [--every 15] [--max-ticks 600]` | **snapshot fidelity under search load**: sim B replays the recording but every N ticks does what beam search does at a plan root (snapshot, roll every macro-action 15 ticks, restore); the first tick where B differs from a straight replay names the state physics keeps outside `snapshot()/restore()`. The bot prints the same finding per run as `playReplayDivergence` and the sweep as its `replay` column. Exit 1 on divergence | stdout |
 | `pnpm harness:determinism <recording> [--loads 3] [--pin]` | D1 cross-load, D2 json/bin, D3 node-vs-browser (bisects to the first divergent tick + state paths), D4/D4b snapshot round trip node/page, D5 chunking, D7 no state leak, D8 pinned canonical hash | `out/gate/determinism.json` |
 | `pnpm harness:boot [--runs 3]` | cold boot → `__trials.ready` ms, heap, renderer string, restart latency | `out/boot/boot.json` |
@@ -40,6 +42,8 @@ first), `--json`, `--verbose`. Thresholds live **only** in
 
 ```
 pnpm harness:round --build                               # bot flat-test/gap-test/b1 + determinism + gate
+pnpm harness:reflex --all-tracks --seeds 3                 # the human-like attempts table: out/metrics/reflex.md (+ <track>.reflex.json, feeds gate G10)
+pnpm harness:reflex b1-first-ride --seeds 3 --browser 3 --build   # + 3 live-browser runs on real keys (≈ 12 min each on SwiftShader)
 pnpm harness:bot --all-tracks --skill 2 --seeds 2        # the sweep table for tracks/physics owners
 pnpm harness:bot <track> --all --seeds 3 --crash-probe   # full curve on one track, browser-verified
 pnpm harness:gate --build                                # numbers vs thresholds -> out/metrics/ship-gate.json
@@ -76,12 +80,14 @@ lib/metrics.ts    attempt counting (1 + fault events), diffState, percentiles, r
 lib/schema.ts     every JSON shape written under out/
 lib/verify.ts     BrowserVerifier: one server (frozen copy of dist/) + browser, runRecording per fresh page
 bot/              actions (13 macro-actions × 15 ticks) · score · beam · play (skills 0–3, oracle, player memory) · bot CLI
+reflex/           the reflex bot: profile (ground silhouette from colliders) · perceive (one glance → features) · controller (skills,
+                  reaction delay, rules, hands, lapses) · memory (x-bucket learning) · play (node driver) · browser (live keys, fake clock) · reflex CLI
 stranger/         PROTOCOL.md (handed verbatim to the stranger) · run-stranger.md (what the parent pastes) · cli.ts · session.ts · view.ts (ASCII look) · report.ts (aggregate)
 clip.ts           harness:clip: best-recording pick, tick windows, --tile; lib/golden.ts: fingerprint-matched goldens
 compare/          normalize · mask · pair · log · RUBRIC.md · README.md
 gate/             thresholds.json · expected.json (pinned hashes per physics) · determinism.ts · ship-gate.ts
 inputs/<track>/   bot-<skill>.json, bot-oracle.json, crash.json, stranger-<session>.json (committed)
-out/metrics/      <track>.json, <track>.stranger.json, compare.jsonl, ship-gate.json (committed; ship-gate.json carries the G10 stranger rows for b1/b2/b3/e1)
+out/metrics/      <track>.json, <track>.stranger.json, <track>.reflex.json, reflex.md, compare.jsonl, ship-gate.json (committed; ship-gate.json carries the G10 stranger + reflex rows for b1/b2/b3/e1)
 out/capture/stranger/<track>-<session>/   6 s stranger clips around the deadliest obstacle (clip.mp4, sheet.jpg, clip.json)
 out/…             everything else (gitignored)
 ```
@@ -95,6 +101,20 @@ binary encodings decode to the same frames (gate D2). Replays start at GO; the
 restart flag is in-band, so attempts are countable from the recording alone.
 
 ## Notes / caveats
+
+- **Reflex bot in the live browser runs on a fake clock.** SwiftShader needs ~200–280 ms to raster one 480×270
+  low-quality frame, so on the real clock the live game runs at 3–4 fps and `InputMux` samples the keys every
+  ~280 ms — a 200 ms-reaction player becomes a 700 ms one and loops out everywhere (measured: 26 attempts, no clear
+  on b1, vs 1 attempt in node). `harness:reflex --browser` therefore installs Playwright's clock (`page.clock`) and
+  steps `requestAnimationFrame` at 16.7 ms per frame: the App, `RafDriver`, `KeyboardInput` and the recorder run
+  exactly as for a 60 fps player, keys land between frames, only the wall time stretches (~12 min per 55 s run).
+  `--wall-clock` keeps the real clock for the honest-but-unplayable number. `pauseAt` fast-forwards ~30 s of
+  virtual time first (rAF fires sparsely there, each frame clamped to 0.25 s by the App); the driver asserts the
+  game is still in the countdown afterwards.
+- The reflex recording from the browser starts at the first frame the in-page hook sees `phase() === 'riding'`;
+  the `startTick` riding ticks before it ran on neutral input (no key is sent before GO) and are prepended as
+  neutral frames. `roundTrip` = the node replay of that full recording hashes like the live page did. Measured
+  `startTick` 0 on every run so far (the hook's rAF runs after the App's in the same frame).
 
 - One shared checkout: other builders rebuild `dist/` and edit `src/` while a
   gate runs. `BrowserVerifier` serves a **frozen copy** of `dist/` and warns
