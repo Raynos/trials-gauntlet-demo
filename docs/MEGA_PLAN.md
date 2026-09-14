@@ -10,6 +10,23 @@ outside the industrial hall. Only bots and slot-code strangers have ever ridden 
 extreme are shaped to appease the bot rather than designed. The physics carries three
 honesty debts: 1.4 g, a 10× drag governor, and an ECU wheelie assist.
 
+## P0 — Bike physics v2 (added; supersedes P1's physics items)
+
+The user's directive: Trials is 99% the bike physics — per-tick validated, learnable,
+reproducible; stable when accelerating with weight forward; snapping weight forward corrects a
+rising front; bunny hops reproduce deterministically. Ours reached playability through
+patches (1.4 g, drag governor, ECU wheelie assist, airborne blend). So:
+1. A Fable 5.1 (xhigh) architect produces `docs/research/trials-bike-physics.md` (≥ 4 real
+   Trials games, frame-analysed bunny hops from the corpus, sourced), `docs/research/physics-audit.md`
+   (every hack and knife-edge in the current solver) and `docs/design/physics-v2.md` (a complete
+   ground-up design with parameter table, validation suite and the physics test level spec).
+2. Physics is reimplemented from scratch to that design behind the same `PhysicsWorld` contract.
+3. A short **Physics Test Level** (`lab-physics-test`): flat run-up, one challenging bunny-hop
+   jump, run-out, with a physics HUD (pitch, speed, compression, COM offset). It ships in the
+   track select under "Lab" and is the proving ground for every physics change from then on.
+Priority over everything else in this plan; the other pillars proceed in parallel where they
+do not depend on physics numbers (render, front end, art, harness).
+
 ## The five pillars, and what "done" means for each
 
 ### P1 — The hero moves like 145 kg of bike with a person on it
