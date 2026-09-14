@@ -11,9 +11,9 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import type { Collider, ColliderPolyline, CompiledTrack, TrackDef, Vec2 } from '../core/types';
+import type { Collider, ColliderPolyline, CompiledTrack, TrackDef, TrackObstacle, Vec2 } from '../core/types';
 import { ALL_TRACKS, CURRICULUM, compileTrack, describeTrack, getTrack, listTrackIds } from './index';
-import { CHECKPOINT_RULE, FEEL, SPAWN_CLEAR_AHEAD, SPAWN_CLEAR_BEHIND, auditCheckpoints } from './author';
+import { CHECKPOINT_RULE, FEEL, FINISH_RUNOUT, SPAWN_CLEAR_AHEAD, SPAWN_CLEAR_BEHIND, auditCheckpoints, validateFinishRunout } from './author';
 import { cancelSharedEdges, segmentsCross, type OwnedEdge } from './geometry';
 import { OBSTACLE_KINDS, footprint, type ObstacleKind } from './kinds';
 
@@ -29,6 +29,22 @@ function polylineEdges(c: ColliderPolyline): OwnedEdge[] {
     out.push({ a: c.points[i] as Vec2, b: c.points[i + 1] as Vec2, owner: c.id, surface: c.surface });
   }
   return out;
+}
+
+/** Ground height at x from the profile (linear between points, clamped at the ends). */
+function profileYAt(profile: readonly Vec2[], x: number): number {
+  const first = profile[0] as Vec2;
+  const last = profile[profile.length - 1] as Vec2;
+  if (x <= first.x) return first.y;
+  if (x >= last.x) return last.y;
+  for (let i = 1; i < profile.length; i++) {
+    const b = profile[i] as Vec2;
+    if (x <= b.x) {
+      const a = profile[i - 1] as Vec2;
+      return a.y + ((b.y - a.y) * (x - a.x)) / (b.x - a.x);
+    }
+  }
+  return last.y;
 }
 
 function obstacleExtent(def: TrackDef, track: CompiledTrack, i: number): [number, number] {
@@ -102,7 +118,7 @@ describe('registry', () => {
 
   it('gap-test has exactly one ramp and one gap', () => {
     const g = getTrack('gap-test') as TrackDef;
-    expect(g.obstacles.map((o) => o.kind)).toEqual(['ramp', 'gap']);
+    expect(g.obstacles.filter((o) => o.pos.x < g.finishX).map((o) => o.kind)).toEqual(['ramp', 'gap']);
   });
 });
 
@@ -167,14 +183,30 @@ describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
     }
   });
 
-  it('finishX lies beyond the last obstacle with run-out, and every obstacle is after the start', () => {
-    def.obstacles.forEach((o, i) => {
+  it('finishX lies beyond the last course obstacle with run-out, and every obstacle is after the start', () => {
+    const course = def.obstacles.map((o, i) => ({ o, i })).filter(({ o }) => o.pos.x < def.finishX);
+    course.forEach(({ o, i }) => {
       const [lo, hi] = obstacleExtent(def, track, i);
       expect(hi, `${o.kind} #${i} extends past finish`).toBeLessThanOrEqual(def.finishX + 1e-9);
       expect(lo).toBeGreaterThan(def.start.pos.x + FEEL.wheelbase);
     });
-    const lastEnd = Math.max(0, ...def.obstacles.map((_, i) => obstacleExtent(def, track, i)[1]));
+    const lastEnd = Math.max(0, ...course.map(({ i }) => obstacleExtent(def, track, i)[1]));
     expect(def.finishX - lastEnd).toBeGreaterThanOrEqual(3);
+  });
+
+  it('finish run-out (round 6): 30 m of flat at the finish height past finishX, closed by a ramp into a 2.5 m catch', () => {
+    expect(validateFinishRunout(def)).toEqual([]);
+    const y0 = profileYAt(def.profile, def.finishX);
+    for (let x = def.finishX; x <= def.finishX + FINISH_RUNOUT.flat + 1e-9; x += 0.5) expect(profileYAt(def.profile, x)).toBeCloseTo(y0, 6);
+    const after = def.obstacles.filter((o) => o.pos.x >= def.finishX + FINISH_RUNOUT.flat - 1e-9);
+    expect(after[0]?.kind).toBe('ramp');
+    expect(after[1]?.kind === 'box' || after[1]?.kind === 'wall').toBe(true);
+    expect((after[1]?.params as { height: number }).height).toBeGreaterThanOrEqual(FINISH_RUNOUT.catchHeight);
+    expect(def.obstacles.some((o) => o.pos.x > def.finishX && o.pos.x < def.finishX + FINISH_RUNOUT.flat - 1e-9)).toBe(false);
+    // the catch stands inside the world: bounds cover it and oobY lies under the run-out
+    const catchEnd = (after[1] as TrackObstacle).pos.x + ((after[1]?.params as { width?: number }).width ?? 4);
+    expect(track.bounds.maxX).toBeGreaterThanOrEqual(catchEnd);
+    expect(track.oobY).toBeLessThan(y0 - 5);
   });
 
   it('has no overlapping colliders', () => {

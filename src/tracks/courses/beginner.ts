@@ -188,7 +188,7 @@ export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
   .flat(18)
   .ramp({ length: 4, height: 1.0, curve: 0.3 })
   .flat(8) // under-speed lands here
-  .slope(10, -1.0) // over-speed lands on the downslope
+  .slope(14, -1.0) // over-speed lands on the downslope (round 6: 4 deg and long enough that a 12 m/s launch still lands on it)
   .flat(10)
   .rollers(20, 0.25, 3)
   .flat(8)
@@ -196,14 +196,14 @@ export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
   .flat(16)
   .ramp({ length: 4, height: 1.2, curve: 0.3 }) // ~17 deg: level the bike in the air
   .flat(8)
-  .slope(12, -1.2)
+  .slope(16, -1.2)
   .flat(10)
-  .humpRow(2, 0.25, 8, 4)
+  .bumpRow(2, 0.25, 16) // round 6: was a convex humpRow — the novice reflex player launched nose-down off it 10 m before the 1.5 kicker
   .flat(6)
   .camera({ mode: 'high34', zoomBias: 0.4 })
   .ramp({ length: 5, height: 1.5, curve: 0.3 }) // ~22 deg exit, the biggest lip on B3
   .flat(8)
-  .slope(12, -1.5)
+  .slope(20, -1.5) // round 6: the 22 deg lip at 12 m/s flew past a 12 m slope and landed nose-down on the flat (novice: 4 deaths at 197-224)
   .camera({ mode: 'side' })
   .flat(10)
   .wave(28, 1.5, 16)
@@ -220,9 +220,8 @@ export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
   .flat(16) // run-up: ~9.7 m/s from the spawn; a 5 m gap from a 22 deg lip needs ~8
   .camera({ mode: 'high34', zoomBias: 0.4 })
   .ramp({ length: 5, height: 1.5, curve: 0.3 }) // the set piece
-  .gap({ width: 5 })
-  .box({ width: 16, height: 0.4 }) // long enough that a full-gas 16 m/s launch (~15 m) still lands on it
-  .ramp({ length: 4, height: 0.4, direction: 'down' })
+  .gap({ width: 4 }) // round 6: was 5 m — the novice reflex player (9 m/s cruise) landed in the pit short of any landing shape
+  .gapLanding(0.6, 8, 6, 10) // round 6: an up-ramp at the far lip, not a box edge (reflex `novice` 11 x2: air-gas-nose-up into the 0.4 m box face); 6 + 8 m before the down-ramp so a full-gas 16 m/s launch (~15 m) still lands on it
   .camera({ mode: 'side' })
   .flat(8)
   .rollers(20, 0.25, 3)

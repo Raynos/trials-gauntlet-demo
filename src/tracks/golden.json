@@ -1,121 +1,121 @@
 {
   "flat-test": {
-    "hash": "bc218f1ee2d000fc",
-    "colliders": 1,
+    "hash": "5fa63cf0d7255978",
+    "colliders": 4,
     "hazards": 0,
-    "obstacles": 0,
+    "obstacles": 2,
     "finishX": 120
   },
   "gap-test": {
-    "hash": "94bf5ffceb51eb2e",
-    "colliders": 3,
+    "hash": "9c5b11a3d361033a",
+    "colliders": 6,
     "hazards": 1,
-    "obstacles": 2,
+    "obstacles": 4,
     "finishX": 57
   },
   "b1-first-ride": {
-    "hash": "d7c232c0863e99d5",
-    "colliders": 1,
+    "hash": "902dbe88263f9034",
+    "colliders": 4,
     "hazards": 0,
-    "obstacles": 0,
+    "obstacles": 2,
     "finishX": 583
   },
   "b2-lean-back": {
-    "hash": "070d58377190f9fa",
-    "colliders": 28,
+    "hash": "4016f540807171e9",
+    "colliders": 31,
     "hazards": 0,
-    "obstacles": 21,
+    "obstacles": 23,
     "finishX": 592.2
   },
   "b3-kicker-row": {
-    "hash": "0c91b0a8fcab24cf",
-    "colliders": 24,
+    "hash": "16c9ec0b988505c4",
+    "colliders": 22,
     "hazards": 3,
-    "obstacles": 16,
-    "finishX": 426
+    "obstacles": 15,
+    "finishX": 457.8
   },
   "e1-uphill-weight": {
-    "hash": "314dbdf84ad430fa",
-    "colliders": 40,
+    "hash": "0d4a7c4371542cc6",
+    "colliders": 43,
     "hazards": 0,
-    "obstacles": 27,
+    "obstacles": 29,
     "finishX": 539.006136
   },
   "e2-rear-wheel-first": {
-    "hash": "0a49f01b80cfdcdd",
-    "colliders": 39,
+    "hash": "9ea3ad87f44ec1a9",
+    "colliders": 42,
     "hazards": 8,
-    "obstacles": 33,
+    "obstacles": 35,
     "finishX": 616.6
   },
   "e3-stairway": {
-    "hash": "d9630242a061c9dd",
-    "colliders": 27,
+    "hash": "b48c42d13a8eb7e9",
+    "colliders": 30,
     "hazards": 1,
-    "obstacles": 20,
+    "obstacles": 22,
     "finishX": 526.45
   },
   "m1-hop-up": {
-    "hash": "3b321e7e2e6cd09a",
-    "colliders": 23,
+    "hash": "401a26fdb6de5a2f",
+    "colliders": 28,
     "hazards": 3,
-    "obstacles": 18,
-    "finishX": 476.5
+    "obstacles": 22,
+    "finishX": 481
   },
   "m2-drum-roll": {
-    "hash": "ae49c9b9c7de76af",
-    "colliders": 58,
+    "hash": "c4f01d7367d0d549",
+    "colliders": 61,
     "hazards": 1,
-    "obstacles": 35,
+    "obstacles": 37,
     "finishX": 487.6
   },
   "m3-see-saw": {
-    "hash": "f16cbec30a9b9693",
-    "colliders": 36,
+    "hash": "97f20bbc10b3d54a",
+    "colliders": 39,
     "hazards": 5,
-    "obstacles": 28,
+    "obstacles": 30,
     "finishX": 486.1
   },
   "h1-wheelie-wire": {
-    "hash": "350151626ea3c41f",
-    "colliders": 17,
+    "hash": "24700ed6342cf961",
+    "colliders": 20,
     "hazards": 36,
-    "obstacles": 45,
+    "obstacles": 47,
     "finishX": 597.4
   },
   "h2-gap-chain": {
-    "hash": "dd6652c87e168d4b",
-    "colliders": 78,
+    "hash": "63de706b9d5f461b",
+    "colliders": 81,
     "hazards": 19,
-    "obstacles": 75,
+    "obstacles": 77,
     "finishX": 634.3
   },
   "h3-fire-line": {
-    "hash": "35c39f79fd0b7abe",
-    "colliders": 59,
+    "hash": "ae46c177f4364d69",
+    "colliders": 62,
     "hazards": 22,
-    "obstacles": 27,
+    "obstacles": 29,
     "finishX": 552.4
   },
   "x1-vertical-limit": {
-    "hash": "3380a631441c665b",
-    "colliders": 60,
+    "hash": "3cbd0429a6653ac6",
+    "colliders": 58,
     "hazards": 3,
-    "obstacles": 40,
-    "finishX": 704.145108
+    "obstacles": 39,
+    "finishX": 741.442235
   },
   "x2-pipe-dream": {
-    "hash": "74f350d706cf8bb1",
-    "colliders": 55,
+    "hash": "60e3328f00f8d1be",
+    "colliders": 58,
     "hazards": 8,
-    "obstacles": 42,
+    "obstacles": 44,
     "finishX": 515.1
   },
   "x3-gauntlet": {
-    "hash": "79ee8114fb5b1af9",
-    "colliders": 110,
-    "hazards": 30,
-    "obstacles": 92,
-    "finishX": 772.435665
+    "hash": "389d79ce9c559646",
+    "colliders": 65,
+    "hazards": 18,
+    "obstacles": 51,
+    "finishX": 499.610434
   }
 }

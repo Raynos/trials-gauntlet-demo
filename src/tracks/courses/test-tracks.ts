@@ -1,5 +1,5 @@
 /**
- * Harness fixtures. `flat-test` is the scaffold strip (kept byte-identical);
+ * Harness fixtures. `flat-test` is the scaffold strip (geometry before the finish kept byte-identical; the round-6 catch stands at 150 m);
  * `gap-test` is the simplest track with one ramp and one gap, for the bot's
  * attempts-monotonicity check (harness-metrics.md M3).
  */
@@ -16,7 +16,11 @@ export const FLAT_TEST_TRACK: TrackDef = {
     { x: -10, y: 0 },
     { x: 200, y: 0 },
   ],
-  obstacles: [],
+  // finish run-out (round 6): 30 m of flat past the 120 m finish, then the soft catch every track has
+  obstacles: [
+    { kind: 'ramp', pos: { x: 150, y: 0 }, params: { length: 3, height: 0.75, surface: 'wood' } },
+    { kind: 'box', pos: { x: 153, y: 0 }, params: { width: 2.4, height: 2.5, surface: 'metal' } },
+  ],
   checkpoints: [
     { x: 40, spawn: { pos: { x: 40, y: 0 }, angle: 0 } },
     { x: 80, spawn: { pos: { x: 80, y: 0 }, angle: 0 } },

@@ -102,6 +102,62 @@ export const FEEL = {
  * 48 deg plank 3 m past one. A respawn that cannot reach the speed its first obstacle needs
  * turns one crash into a full-segment wall.
  */
+/**
+ * Finish run-out (round 6; user: "going off the end and crashing, it goes absolutely nuts"): after
+ * `finishX` every track has >= `flat` m of flat rideable ground at the finish height, then a soft
+ * catch — a `rampLength` m up-ramp of `rampHeight` into a `catchHeight` m container — so a flat-out
+ * bike coasts and stops instead of riding off the end of the world. The finish gate, crowd and arch
+ * sit at `finishX`; `finish()` builds and `validateFinishRunout` checks it.
+ */
+export const FINISH_RUNOUT = {
+  flat: 30,
+  rampLength: 3,
+  rampHeight: 0.75,
+  catchHeight: 2.5,
+  catchWidth: 2.4,
+};
+
+/**
+ * Finish run-out check: the profile is flat at the finish height for `FINISH_RUNOUT.flat` m past
+ * `finishX`, no obstacle stands on that flat, and it is closed by a catch — an up-ramp whose foot is at
+ * or past the end of the flat, followed immediately by a solid (box or wall) at least `catchHeight`
+ * tall. Returns the violations (empty when the run-out is good).
+ */
+export function validateFinishRunout(def: TrackDef): string[] {
+  const out: string[] = [];
+  const fx = def.finishX;
+  const end = fx + FINISH_RUNOUT.flat;
+  const yAt = (x: number): number => profileY(def.profile, x);
+  const y0 = yAt(fx);
+  const last = def.profile[def.profile.length - 1];
+  if (!last || last.x < end - 1e-6) out.push(`profile ends at ${last?.x ?? '-'} m, before finishX + ${FINISH_RUNOUT.flat}`);
+  if (Math.abs(yAt(end) - y0) > 1e-6) out.push(`ground at finishX + ${FINISH_RUNOUT.flat} is ${yAt(end).toFixed(2)} m, finish height is ${y0.toFixed(2)}`);
+  for (const p of def.profile) {
+    if (p.x > fx + 1e-6 && p.x < end - 1e-6 && Math.abs(p.y - y0) > 1e-6) {
+      out.push(`profile bends at ${p.x} m inside the ${FINISH_RUNOUT.flat} m run-out`);
+      break;
+    }
+  }
+  const after = def.obstacles.map((o, i) => ({ o, i })).filter(({ o }) => o.pos.x > fx - 1e-6).sort((a, b) => a.o.pos.x - b.o.pos.x);
+  const ramp = after[0];
+  if (!ramp) {
+    out.push('no catch after the run-out');
+    return out;
+  }
+  const rp = ramp.o.params as { length?: number; height?: number; direction?: string };
+  if (ramp.o.kind !== 'ramp' || rp.direction === 'down') out.push(`first obstacle after finishX is a ${ramp.o.kind} at ${ramp.o.pos.x} m, expected the catch ramp`);
+  if (ramp.o.pos.x < end - 1e-6) out.push(`catch ramp at ${ramp.o.pos.x} m starts inside the ${FINISH_RUNOUT.flat} m run-out (needs >= ${end.toFixed(1)})`);
+  const rampEnd = ramp.o.pos.x + (rp.length ?? 4);
+  const wall = after[1];
+  const wp = wall?.o.params as { height?: number } | undefined;
+  if (!wall || (wall.o.kind !== 'box' && wall.o.kind !== 'wall')) out.push('the catch ramp is not followed by a box or wall');
+  else {
+    if (Math.abs(wall.o.pos.x - rampEnd) > 1e-6) out.push(`catch barrier at ${wall.o.pos.x} m does not touch the ramp end at ${rampEnd.toFixed(2)}`);
+    if ((wp?.height ?? 1) < FINISH_RUNOUT.catchHeight - 1e-6) out.push(`catch barrier is ${wp?.height ?? 1} m tall, needs >= ${FINISH_RUNOUT.catchHeight}`);
+  }
+  return out;
+}
+
 export const CHECKPOINT_RULE = {
   /** Flat-or-descending run-up a spawn needs before the first obstacle that needs speed. */
   runupMin: 15,
@@ -915,13 +971,22 @@ export class CourseBuilder {
   }
 
   /**
-   * Finish line at the cursor, `runout` m of flat, then an end bank so nothing rides off the world.
-   * Validates spawns (CONTRACT §2.4) and the checkpoint rule (`CHECKPOINT_RULE`); harness fixtures
-   * and compile-test snippets that are not courses pass `{ checkpointRule: false }`.
+   * Finish line at the cursor, then the finish run-out (round 6, `FINISH_RUNOUT`): >= 30 m of flat
+   * rideable ground at the finish height (`runout` is raised to the minimum), a soft catch — a 3 m
+   * up-ramp into a 2.5 m container — so a flat-out bike coasts and stops instead of riding off the end
+   * of the world, and the 35 deg end bank behind it. Bounds and `oobY` cover all of it (compile).
+   * Validates spawns (CONTRACT §2.4), the checkpoint rule (`CHECKPOINT_RULE`) and the run-out
+   * (`validateFinishRunout`); harness fixtures and compile-test snippets that are not courses pass
+   * `{ checkpointRule: false }`; compile-test snippets that count ground pieces pass `{ catch: false }`.
    */
-  finish(runout = 10, opts: { checkpointRule?: boolean } = {}): TrackDef {
+  finish(runout: number = FINISH_RUNOUT.flat, opts: { checkpointRule?: boolean; catch?: boolean } = {}): TrackDef {
     const finishX = this.x;
-    this.flat(runout);
+    this.flat(Math.max(runout, FINISH_RUNOUT.flat));
+    if (opts.catch !== false) {
+      this.ramp({ length: FINISH_RUNOUT.rampLength, height: FINISH_RUNOUT.rampHeight, surface: 'wood' });
+      this.box({ width: FINISH_RUNOUT.catchWidth, height: FINISH_RUNOUT.catchHeight, surface: 'metal' });
+      this.flat(2);
+    }
     // end bank: 35 deg rise of 4 m
     this.slope(4 / Math.tan((35 * Math.PI) / 180), 4);
     this.closeCamera();
@@ -944,6 +1009,10 @@ export class CourseBuilder {
     if (meta.attemptsBand) def.targetAttempts = meta.attemptsBand[1];
     validateSpawns(def);
     if (opts.checkpointRule !== false) validateCheckpoints(def);
+    if (opts.catch !== false) {
+      const bad = validateFinishRunout(def);
+      if (bad.length > 0) throw new Error(`[${this.id}] finish run-out: ${bad.join('; ')}`);
+    }
     return def;
   }
 

@@ -75,10 +75,12 @@ export const M1 = course('m1-hop-up', 'Hop Up', 'medium')
   .flat(3)
   .camera({ mode: 'side-tight', cut: true })
   .flat(13) // run-up (16 m from the spawn): the 0.9 m rise
-  .ledge({ height: 0.3, length: 4 }) // the steps: roll the 0.3, hop 0.3 (or 0.6 from speed), hop 0.3
-  .ledge({ height: 0.6, length: 4 })
+  .ledge({ height: 0.3, length: 6 }) // the steps: roll the 0.3, hop 0.3 (or 0.6 from speed) onto a landing ramp that carries you to 0.9 (round 6: 6 m of approach, was 4)
+  .ledge({ height: 0.6, length: 1.5 })
+  .ramp({ length: 3, height: 0.3 }, { base: 0.6 }) // round 6: the 0.6 stage lands on an incline, not a flat top then a third riser (average: 12 nose-down / loop deaths at the 0.6 riser, 4 at the 0.9)
   .ledge({ height: 0.9, length: 6 })
   .gap({ width: 2 }) // hop across from the ledge top
+  .ramp({ length: 2, height: 0.25 }, { base: 0.65 }) // landing lip: a short hop meets a 7 deg incline, not the box face (9 deaths)
   .box({ width: 6, height: 0.9 })
   .ramp({ length: 8, height: 0.9, direction: 'down' })
   .camera({ mode: 'side' })
