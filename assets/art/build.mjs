@@ -20,7 +20,7 @@ const jobByName = Object.fromEntries(jobs.map(j => [j.name, j]));
 const primary = jobs.filter(j => !/-v\d+$/.test(j.name));   // v2/v3 are alternate sources, selected via selection.json
 const tmp = join(process.env.TMPDIR || '/tmp', 'trials-art-build');
 mkdirSync(tmp, { recursive: true });
-for (const d of ['menu', 'world', 'plates']) mkdirSync(join(pub, d), { recursive: true });
+for (const d of ['menu', 'world', 'plates', 'icons', 'thumbs']) mkdirSync(join(pub, d), { recursive: true });
 mkdirSync(rawKeep, { recursive: true });
 
 const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'inherit'] }).toString().trim();
@@ -28,7 +28,8 @@ const dims = f => sh('magick', ['identify', '-format', '%w %h', f]).split(' ').m
 const src = id => {
   const s = sel.assets[id];
   const name = (s && s.src) || id;
-  const f = join(rawRoot, name, name + '.png');
+  let f = join(rawRoot, name, name + '.png');
+  if (!existsSync(f)) f = join(rawKeep, name + '.png');
   if (!existsSync(f)) throw new Error(`missing raw for ${id}: ${f}`);
   return { file: f, name, hint: s || {} };
 };
@@ -36,10 +37,10 @@ const src = id => {
 const manifest = [];
 function record(id, rel, kind, tags, name) {
   const f = join(pub, rel);
-  const [w, h] = dims(f);
+  const [w, h] = rel.endsWith('.svg') ? [128, 128] : dims(f);
   const job = jobByName[name];
   manifest.push({ id, path: 'art/' + rel, kind, ...tags, w, h, bytes: statSync(f).size, src: name, prompt: job ? job.prompt : sel.assets[id]?.prompt || '' });
-  if (job) copyFileSync(join(rawRoot, name, name + '.png'), join(rawKeep, name + '.png'));
+  if (job && existsSync(join(rawRoot, name, name + '.png'))) copyFileSync(join(rawRoot, name, name + '.png'), join(rawKeep, name + '.png'));
   console.log(rel.padEnd(44), `${w}x${h}`.padEnd(10), (statSync(f).size / 1024).toFixed(0) + ' KB');
 }
 
@@ -68,6 +69,20 @@ function pngAlpha(inFile, outRel, { w } = {}) {
   sh('magick', args);
   sh('pngquant', ['--force', '--quality', '70-95', '--speed', '1', '--strip', '--output', out, out]);
   sh('oxipng', ['-q', '-o', '4', '--strip', 'all', out]);
+}
+
+
+// Round 3 weight pass: encode under a byte cap by stepping quality down (then width, if allowed).
+function webpCapped(inFile, outRel, { w, q = 80, maxBytes, alpha = false, minQ = 48, fallbackW } = {}) {
+  const enc = alpha ? webpAlpha : webp;
+  const widths = [w, ...(Array.isArray(fallbackW) ? fallbackW : fallbackW ? [fallbackW] : [])];
+  for (const width of widths) {
+    for (let quality = q; quality >= minQ; quality -= 6) {
+      enc(inFile, outRel, { w: width, q: quality });
+      if (statSync(join(pub, outRel)).size <= maxBytes) return { w: width, q: quality };
+    }
+  }
+  return { w: widths[widths.length - 1], q: minQ, over: true };
 }
 
 // Key a flat black background: flood fill from the four corners (interior darks survive), then feather.
@@ -145,10 +160,12 @@ for (const t of TRACKS) {
 for (const m of ['bronze', 'silver', 'gold', 'platinum']) {
   const { file, name, hint } = src(`medal-${m}`);
   const keyed = keyBlack(file, hint.fuzz || '14%');
+  pngAlpha(keyed, `menu/medal-${m}-512.png`, { w: 512 });
+  record(`medal-${m}-512`, `menu/medal-${m}-512.png`, 'medal', { medal: m, variant: '2x', ribbon: true }, name);
   pngAlpha(keyed, `menu/medal-${m}.png`, { w: 256 });
-  record(`medal-${m}`, `menu/medal-${m}.png`, 'medal', { medal: m }, name);
+  record(`medal-${m}`, `menu/medal-${m}.png`, 'medal', { medal: m, variant: '1x', ribbon: true }, name);
 }
-for (const b of ['industrial', 'canyon', 'snow', 'nightCity', 'foundry']) {
+for (const b of ['industrial', 'canyon', 'snow', 'nightCity', 'foundry', 'garage', 'credits']) {
   const { file, name } = src(`results-${b}`);
   webp(file, `menu/results-${b}.webp`, { w: 1152, q: 68 });
   record(`results-${b}`, `menu/results-${b}.webp`, 'results-bg', { biome: b }, name);
@@ -162,24 +179,24 @@ for (const j of primary.filter(j => j.kind === 'stencil')) {
 }
 for (const j of primary.filter(j => j.kind === 'mask')) {
   const { file, name } = src(j.name);
-  webp(file, `world/${j.name}.webp`, { w: 1024, q: 78, extra: ['-colorspace', 'Gray'] });
+  webp(file, `world/${j.name}.webp`, { w: 768, q: 70, extra: ['-colorspace', 'Gray'] });
   record(j.name, `world/${j.name}.webp`, 'mask', { tint: 'white-on-black' }, name);
 }
 for (const j of primary.filter(j => j.kind === 'sign')) {
   const { file, name } = src(j.name);
-  webp(file, `world/${j.name}.webp`, { w: 512, q: 78 });
-  record(j.name, `world/${j.name}.webp`, 'sign', {}, name);
+  const enc = webpCapped(file, `world/${j.name}.webp`, { w: 512, q: 78, maxBytes: 40 * 1024, fallbackW: 384 });
+  record(j.name, `world/${j.name}.webp`, 'sign', { cap: '40KB', q: enc.q }, name);
 }
 for (const j of primary.filter(j => j.kind === 'graffiti')) {
   const { file, name, hint } = src(j.name);
   const keyed = keyBlack(file, hint.fuzz || '12%');
-  webpAlpha(keyed, `world/${j.name}.webp`, { w: 768, q: 76 });
-  record(j.name, `world/${j.name}.webp`, 'graffiti', { alpha: true }, name);
+  const enc = webpCapped(keyed, `world/${j.name}.webp`, { w: 512, q: 74, maxBytes: 40 * 1024, alpha: true, fallbackW: [384, 320], minQ: 40 });
+  record(j.name, `world/${j.name}.webp`, 'graffiti', { alpha: true, cap: '40KB', q: enc.q }, name);
 }
 for (const j of primary.filter(j => j.kind === 'banner')) {
   const { file, name } = src(j.name);
-  webp(file, `world/${j.name}.webp`, { w: 1024, q: 76 });
-  record(j.name, `world/${j.name}.webp`, 'banner', {}, name);
+  const enc = webpCapped(file, `world/${j.name}.webp`, { w: 1024, q: 76, maxBytes: 60 * 1024, fallbackW: 768 });
+  record(j.name, `world/${j.name}.webp`, 'banner', { cap: '60KB', q: enc.q }, name);
 }
 for (const j of primary.filter(j => j.kind === 'crowd')) {
   const { file, name } = src(j.name);
@@ -213,11 +230,103 @@ for (const j of primary.filter(j => j.kind === 'sky')) {
   record(j.name, `plates/${j.name}.webp`, 'sky', { biome: j.biome, tileX: true }, name);
 }
 
+
+// --- 4. garage + icons + thumbs (round 3) ---------------------------------------------------------------
+for (const bike of ['rookie', 'pro']) {
+  const { file, name } = src(`bike-${bike}`);
+  webp(file, `menu/bike-${bike}-1536.webp`, { w: 1536, q: 80 });
+  record(`bike-${bike}-1536`, `menu/bike-${bike}-1536.webp`, 'bike', { bike, view: 'side', variant: '2x' }, name);
+  webp(file, `menu/bike-${bike}-768.webp`, { w: 768, q: 78 });
+  record(`bike-${bike}-768`, `menu/bike-${bike}-768.webp`, 'bike', { bike, view: 'side', variant: '1x' }, name);
+  const alt = src(`bike-${bike}-alt`);
+  webp(alt.file, `menu/bike-${bike}-alt.webp`, { w: 1024, q: 76 });
+  record(`bike-${bike}-alt`, `menu/bike-${bike}-alt.webp`, 'bike', { bike, view: 'three-quarter' }, alt.name);
+}
+{
+  const { file, name } = src('garage-plate');
+  webp(file, 'menu/garage-plate.webp', { w: 1920, q: 78 });
+  record('garage-plate', 'menu/garage-plate.webp', 'plate-menu', { use: 'garage' }, name);
+}
+for (const bike of ['rookie', 'pro']) {
+  const { file, name } = src(`kit-${bike}`);
+  const enc = webpCapped(file, `world/kit-${bike}.webp`, { w: 512, q: 80, maxBytes: 60 * 1024, minQ: 56, fallbackW: [384, 320] });
+  record(`kit-${bike}`, `world/kit-${bike}.webp`, 'kit', { bike, use: 'rider-jersey-decal', cap: '60KB', q: enc.q }, name);
+}
+{
+  // App icon (round 3b pick: icon-b-wheelie). iOS composites onto black and masks its own corners, so every
+  // PNG is opaque, square-cornered, on the icon's own dark gradient (sampled top/bottom), content inside the
+  // inner 80 %. The amber silhouette is keyed by amber dominance (r - b) so the maskable variant can be
+  // re-padded on the same gradient without a visible square edge.
+  const { file, name } = src('app-icon');
+  const emblem = join(tmp, 'icon-emblem.png');
+  const alpha = join(tmp, 'icon-alpha.png');
+  sh('magick', [file, '-colorspace', 'sRGB', '-fx', 'min(1,max(0,(r-b-0.22)/0.3))', '-blur', '0x0.4', alpha]);
+  sh('magick', [file, alpha, '-alpha', 'off', '-compose', 'CopyOpacity', '-composite', 'PNG32:' + emblem]);
+  const [top, bottom] = sh('magick', [file, '-format', '%[pixel:p{512,12}] %[pixel:p{512,1012}]', 'info:']).split(' ');
+  const icon = (outRel, size, fill) => {
+    const out = join(pub, outRel);
+    const inner = Math.round(size * fill);
+    sh('magick', ['-size', `${size}x${size}`, `gradient:${top}-${bottom}`, '(', emblem, '-filter', 'Lanczos', '-resize', `${inner}x${inner}`, ')', '-gravity', 'Center', '-compose', 'Over', '-composite', 'PNG24:' + out]);
+    sh('pngquant', ['--force', '--quality', '75-98', '--speed', '1', '--strip', '--output', out, out]);
+    sh('oxipng', ['-q', '-o', '4', '--strip', 'all', out]);
+  };
+  icon('icons/icon-1024.png', 1024, 1);
+  record('icon-1024', 'icons/icon-1024.png', 'icon', { purpose: 'any', size: 1024 }, name);
+  icon('icons/icon-512.png', 512, 1);
+  record('icon-512', 'icons/icon-512.png', 'icon', { purpose: 'any', size: 512 }, name);
+  icon('icons/icon-192.png', 192, 1);
+  record('icon-192', 'icons/icon-192.png', 'icon', { purpose: 'any', size: 192 }, name);
+  icon('icons/icon-maskable-512.png', 512, 0.8); // +10 % padding each side: safe zone
+  record('icon-maskable-512', 'icons/icon-maskable-512.png', 'icon', { purpose: 'maskable', size: 512 }, name);
+  icon('icons/icon-maskable-192.png', 192, 0.8);
+  record('icon-maskable-192', 'icons/icon-maskable-192.png', 'icon', { purpose: 'maskable', size: 192 }, name);
+  icon('icons/apple-touch-icon.png', 180, 1);
+  record('apple-touch-icon', 'icons/apple-touch-icon.png', 'icon', { purpose: 'apple-touch', size: 180 }, name);
+  icon('icons/favicon-32.png', 32, 1.12);
+  record('favicon-32', 'icons/favicon-32.png', 'icon', { purpose: 'favicon', size: 32 }, name);
+  icon('icons/favicon-16.png', 16, 1.2);
+  record('favicon-16', 'icons/favicon-16.png', 'icon', { purpose: 'favicon', size: 16 }, name);
+  // Alpha emblem (amber silhouette only) for in-UI use: about / credits header, loading badge.
+  const trimmed = join(tmp, 'icon-trim.png');
+  sh('magick', [emblem, '-trim', '+repage', 'PNG32:' + trimmed]);
+  pngAlpha(trimmed, 'icons/emblem-512.png', { w: 512 });
+  record('emblem-512', 'icons/emblem-512.png', 'icon', { purpose: 'emblem', alpha: true, size: 512 }, name);
+}
+{
+  // favicon.svg: the same emblem at 128 px embedded in an SVG with a rounded-square clip (no tracer on
+  // this machine; an embedded raster keeps it pixel-identical to the PNG icons).
+  const png128 = join(tmp, 'fav128.png');
+  sh('magick', [join(pub, 'icons/icon-1024.png'), '-filter', 'Lanczos', '-resize', '128x128', png128]);
+  sh('pngquant', ['--force', '--quality', '75-98', '--speed', '1', '--strip', '--output', png128, png128]);
+  const b64 = readFileSync(png128).toString('base64');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 128 128" width="128" height="128"><clipPath id="r"><rect width="128" height="128" rx="28"/></clipPath><image clip-path="url(#r)" width="128" height="128" xlink:href="data:image/png;base64,${b64}"/></svg>`;
+  writeFileSync(join(pub, 'icons/favicon.svg'), svg);
+  record('favicon-svg', 'icons/favicon.svg', 'icon', { purpose: 'favicon', vector: false, note: 'rounded-square clip around the 128 px emblem' }, 'app-icon-v2');
+}
+{
+  // Open Graph card: rendered by assets/art/og.mts (headless Chromium, the game's own wordmark CSS + fonts).
+  const og = join(pub, 'og.jpg');
+  if (existsSync(og)) record('og-card', 'og.jpg', 'social', { w: 1200, h: 630, use: 'open-graph' }, 'og.mts');
+  else console.warn('og.jpg missing: run `npx tsx assets/art/og.mts`');
+}
+{
+  // Track thumbnails from real renders: assets/art/thumbs.mts writes public/art/thumbs/*.webp + raw/thumbs/thumbs.json.
+  const meta = join(here, 'raw/thumbs/thumbs.json');
+  const thumbs = existsSync(meta) ? JSON.parse(readFileSync(meta, 'utf8')).thumbs : [];
+  for (const t of thumbs) {
+    const rel = `thumbs/${t.id}.webp`;
+    if (!existsSync(join(pub, rel))) continue;
+    const track = TRACKS.find((x) => x.id === t.id);
+    record(`thumb-${t.id}`, rel, 'thumb', { track: t.id, tier: track?.tier, biome: track?.biome, atX: t.x, shot: t.what, recording: t.recording, rendered: true }, 'thumbs.mts');
+  }
+  if (!thumbs.length) console.warn('no thumbs: run `npx tsx assets/art/thumbs.mts`');
+}
+
 // --- manifest -----------------------------------------------------------------------------------------
 const folders = {};
-for (const m of manifest) { const f = m.path.split('/')[1]; folders[f] = (folders[f] || 0) + m.bytes; }
+for (const m of manifest) { const f = m.path.split('/').length > 2 ? m.path.split('/')[1] : 'root'; folders[f] = (folders[f] || 0) + m.bytes; }
 const MENU_CRITICAL = new Set(['keyart', 'tier-card', 'track-card', 'medal']);
 const menuCritical = manifest.filter(m => MENU_CRITICAL.has(m.kind) || m.id === 'wordmark-plate');
-const out = { generatedAt: new Date().toISOString(), generator: 'OpenAI image generation via Codex CLI; optimised with ImageMagick + cwebp + pngquant + oxipng', counts: { total: manifest.length, byFolder: Object.fromEntries(Object.entries(folders).map(([k]) => [k, manifest.filter(m => m.path.split('/')[1] === k).length])) }, bytesByFolder: folders, totalBytes: Object.values(folders).reduce((a, b) => a + b, 0), menuCritical: { note: 'first menu screen: key art, wordmark plate, tier + track cards, medals', count: menuCritical.length, bytes: menuCritical.reduce((a, m) => a + m.bytes, 0) }, rejected: sel.rejected, assets: manifest };
+const out = { generatedAt: new Date().toISOString(), generator: 'OpenAI image generation via Codex CLI; optimised with ImageMagick + cwebp + pngquant + oxipng', counts: { total: manifest.length, byFolder: Object.fromEntries(Object.entries(folders).map(([k]) => [k, manifest.filter(m => (m.path.split('/').length > 2 ? m.path.split('/')[1] : 'root') === k).length])) }, bytesByFolder: folders, totalBytes: Object.values(folders).reduce((a, b) => a + b, 0), menuCritical: { note: 'first menu screen: key art, wordmark plate, tier + track cards, medals', count: menuCritical.length, bytes: menuCritical.reduce((a, m) => a + m.bytes, 0) }, rejected: sel.rejected, assets: manifest };
 writeFileSync(join(pub, 'manifest.json'), JSON.stringify(out, null, 1));
 console.log('\nbytes by folder', folders, 'total', out.totalBytes, 'menu-critical', out.menuCritical.bytes);

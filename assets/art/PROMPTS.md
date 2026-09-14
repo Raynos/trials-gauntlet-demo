@@ -15,6 +15,37 @@ masks, signs, graffiti, banners, crowd sheets and panoramas — see `prompts.mjs
 ## Round 1: 78 images, all generated first try. Rejected after review: 7.
 ## Round 2: 6 regenerations (stencil-apex-v2, stencil-taro-v2, tyremark-straight-v2, mask-rivet-drips-v2, mask-rust-streaks-v2, tyremark-straight-v3).
 
+## Round 3 (art round 2, 2026-09-14): 15 images + 3 icon candidates (3b), all first try. Rejected: 4 (all icon candidates but `icon-b-wheelie`).
+
+Garage (two bike hero renders + 3/4 alternates, an empty bay plate, two rider-kit swatches), the PWA
+icon set, two more results plates (garage, credits) and ribboned medal masters (512 + 256). Same
+runner and prefixes; the new `GARAGE`, `KIT` and `ICON` prefixes are in `prompts.mjs`.
+
+Not generated (real renders / composed):
+- `art/thumbs/<track>.webp` - 15 track thumbnails captured from the game by `npx tsx assets/art/thumbs.mts`
+  (best skill-3 recording under `harness/inputs/<track>/`, first tick past the set-piece x in `THUMB_X`,
+  `setQuality('high')`, 1280x720 -> 768x432 WebP <= 60 KB; 1280x720 PNG proofs in `assets/art/raw/thumbs/`).
+- `art/og.jpg` - 1200x630 Open Graph card by `npx tsx assets/art/og.mts`: mirrored industrial key art +
+  the game's own `.wordmark` CSS and Barlow Condensed woff2 rendered in headless Chromium.
+
+Weight pass (`build.mjs` `webpCapped`): graffiti <= 40 KB (512 -> 384 -> 320 px, alpha), posters and
+signs <= 40 KB (posters 384x576), banners <= 60 KB, kits <= 60 KB, masks 768 px q70.
+
+| candidate | why rejected |
+|---|---|
+| `app-icon` | Helmet-over-wheel emblem: the wheel spokes turn to mush at 60 px and the helmet reads as a blob. Spare. |
+| `app-icon-v2` | Helmet-in-tyre badge: the boldest mass at 60 px, but it could be any moto / gear app. Kept as a spare emblem. |
+| `icon-a-helmet-wheel` | Round 3b (a): helmet over front wheel with a radial glow: one orange blob at 60 px, the glow muddies the edge on a dark wallpaper. |
+| `icon-c-monogram` | Round 3b (c): "TG" on a tread band: legible at 60 px but says nothing about the game; the tread band vanishes. |
+
+**Home-screen icon pick (round 3b): `icon-b-wheelie`** - the rider-mid-wheelie silhouette in amber on the dark gradient.
+Judged side by side at 256 px and 60 px behind an iOS-style rounded mask on a dark ground
+(scratch `sheet-icons.png`): the wheelie is the only candidate that says *trials bike* instantly at 60 px
+while keeping a clean edge. Export (`build.mjs`, amber-keyed silhouette re-composited on the icon's own
+sampled top/bottom gradient, opaque, square corners): `art/icons/icon-{1024,512,192}.png`,
+`icon-maskable-{512,192}.png` (art at 80 %, +10 % safe padding each side), `apple-touch-icon.png` (180),
+`favicon-{32,16}.png`, `favicon.svg` (128 px raster in a rounded clip), `emblem-512.png` (alpha silhouette for UI).
+
 ## Rejected candidates and why
 
 | candidate | why |
@@ -452,3 +483,96 @@ shipped as `art/world/tyremark-straight.webp`
 
 > A black-and-white texture mask seen from directly above: a single straight dirt-bike tyre print pressed into mud, running vertically through the whole frame from the bottom edge to the top edge and about one third of the frame wide. The tread-block prints are pure white, everything else is flat pure black, no grey background, no perspective. The knobbly tread is a bold repeating pattern of big rectangular blocks in staggered rows, the print fading and breaking up near the top and bottom edges.
 
+## Round 3 prompts
+
+### bike-rookie (1536x1024, bike, rookie)
+shipped as `art/menu/bike-rookie-1536.webp (+ -768)`
+
+> Cinematic photoreal video-game key art, grounded and moody, physically plausible lighting with volumetric dust and haze, sharp detail, natural film grade. No text, no lettering, no logos, no watermark, no cartoon or illustration style, no UI. inside a dark motorcycle workshop bay at night: black rubber floor with faint scuffs, a grey steel roller shutter and pegboard tool wall in shadow behind, one warm amber work lamp overhead and a cool white LED strip low along the floor, faint haze, tool chests and tyre stacks softly out of focus in the background. Hero product shot of one parked trials motorcycle (small light frame, no seat, long-travel forks, knobbly tyres) seen side-on from slightly in front of the left, no rider, no stand, resting on both wheels. Livery: glossy royal blue and white two-tone with soft rounded fairing panels, white rims, blue fork guards, friendly trainer look, gentle amber highlights on the tank. Bike centred and large, the lower fifth of the frame quiet floor.
+
+### bike-rookie-v2 (1536x1024, bike, rookie)
+shipped as `art/menu/bike-rookie-alt.webp`
+
+> Cinematic photoreal video-game key art, grounded and moody, physically plausible lighting with volumetric dust and haze, sharp detail, natural film grade. No text, no lettering, no logos, no watermark, no cartoon or illustration style, no UI. inside a dark motorcycle workshop bay at night: black rubber floor with faint scuffs, a grey steel roller shutter and pegboard tool wall in shadow behind, one warm amber work lamp overhead and a cool white LED strip low along the floor, faint haze, tool chests and tyre stacks softly out of focus in the background. Hero product shot of one parked trials motorcycle (small light frame, no seat, long-travel forks, knobbly tyres) seen three-quarter front from the left, no rider, no stand. Livery: matte sky blue and white panels, white rims, a thin white stripe along the frame spar, clean and approachable, a trainer bike. Bike centred and large, the lower fifth of the frame quiet floor.
+
+### bike-pro (1536x1024, bike, pro)
+shipped as `art/menu/bike-pro-1536.webp (+ -768)`
+
+> Cinematic photoreal video-game key art, grounded and moody, physically plausible lighting with volumetric dust and haze, sharp detail, natural film grade. No text, no lettering, no logos, no watermark, no cartoon or illustration style, no UI. inside a dark motorcycle workshop bay at night: black rubber floor with faint scuffs, a grey steel roller shutter and pegboard tool wall in shadow behind, one warm amber work lamp overhead and a cool white LED strip low along the floor, faint haze, tool chests and tyre stacks softly out of focus in the background. Hero product shot of one parked trials motorcycle (small light frame, no seat, long-travel forks, knobbly tyres) seen side-on from slightly in front of the left, no rider, no stand, resting on both wheels. Livery: dark graphite carbon-look panels with sharp fluorescent orange race trim, black rims with an orange rim stripe, gold-anodised forks, aggressive angular bodywork, a race bike. Bike centred and large, the lower fifth of the frame quiet floor.
+
+### bike-pro-v2 (1536x1024, bike, pro)
+shipped as `art/menu/bike-pro-alt.webp`
+
+> Cinematic photoreal video-game key art, grounded and moody, physically plausible lighting with volumetric dust and haze, sharp detail, natural film grade. No text, no lettering, no logos, no watermark, no cartoon or illustration style, no UI. inside a dark motorcycle workshop bay at night: black rubber floor with faint scuffs, a grey steel roller shutter and pegboard tool wall in shadow behind, one warm amber work lamp overhead and a cool white LED strip low along the floor, faint haze, tool chests and tyre stacks softly out of focus in the background. Hero product shot of one parked trials motorcycle (small light frame, no seat, long-travel forks, knobbly tyres) seen three-quarter front from the left, no rider, no stand. Livery: satin black graphite with a broad orange slash across the tank and fork guards, black rims, titanium exhaust, taut and mean, a race bike. Bike centred and large, the lower fifth of the frame quiet floor.
+
+### garage-plate (1536x1024, garage-plate)
+shipped as `art/menu/garage-plate.webp`
+
+> Cinematic photoreal video-game key art, grounded and moody, physically plausible lighting with volumetric dust and haze, sharp detail, natural film grade. No text, no lettering, no logos, no watermark, no cartoon or illustration style, no UI. inside a dark motorcycle workshop bay at night: black rubber floor with faint scuffs, a grey steel roller shutter and pegboard tool wall in shadow behind, one warm amber work lamp overhead and a cool white LED strip low along the floor, faint haze, tool chests and tyre stacks softly out of focus in the background. Wide empty establishing shot of the bay with no motorcycle in it: a clear rubber floor in the centre lit by the overhead work lamp, a workbench with tools and a tyre stack on the left, a tool chest and a hanging helmet on the right, a roller shutter and pegboard behind, the centre third of the frame empty floor and wall so a bike can be composited there.
+
+### kit-rookie (1024x1024, kit, rookie)
+shipped as `art/world/kit-rookie.webp`
+
+> A flat seamless textile pattern swatch filling the whole frame edge to edge, seen straight on with no perspective, no folds, no body, no logos, no text, evenly lit, crisp vector-like print on a matte jersey fabric with a very fine knit texture. Rookie rider kit: royal blue ground with broad diagonal white bands and thin sky-blue pinstripes, a scattering of small white chevrons, clean and friendly.
+
+### kit-pro (1024x1024, kit, pro)
+shipped as `art/world/kit-pro.webp`
+
+> A flat seamless textile pattern swatch filling the whole frame edge to edge, seen straight on with no perspective, no folds, no body, no logos, no text, evenly lit, crisp vector-like print on a matte jersey fabric with a very fine knit texture. Pro rider kit: near-black graphite ground with a carbon weave texture, jagged fluorescent orange slashes and thin grey hex-grid lines, aggressive race look.
+
+### app-icon (1024x1024, icon)
+**rejected** - see the round 3 table above.
+
+> A flat vector-style app icon emblem, isolated on a flat pure solid black background with no gradient, glow, shadow or texture outside the emblem, no text, no letters, no border, centred, filling about 70 percent of the frame, bold simple shapes readable at a very small size. The emblem: a single warm amber (#FFB020) silhouette combining a full-face motocross helmet in profile facing right, sitting above and overlapping a spoked motorcycle wheel with a knobbly tyre, two-tone amber and darker burnt orange, thick strokes, no thin lines.
+
+### app-icon-v2 (1024x1024, icon)
+**rejected** - see the round 3 table above (spare emblem).
+
+> A flat vector-style app icon emblem, isolated on a flat pure solid black background with no gradient, glow, shadow or texture outside the emblem, no text, no letters, no border, centred, filling about 70 percent of the frame, bold simple shapes readable at a very small size. The emblem: a bold amber (#FFB020) circle badge in the shape of a knobbly motorcycle tyre with chunky tread blocks around its rim, and inside it a black full-face motocross helmet in profile facing right with an amber visor slot, flat two-colour, thick strokes.
+
+### results-garage (1536x1024, results-bg, garage)
+shipped as `art/menu/results-garage.webp`
+
+> Cinematic photoreal video-game key art, grounded and moody, physically plausible lighting with volumetric dust and haze, sharp detail, natural film grade. No text, no lettering, no logos, no watermark, no cartoon or illustration style, no UI. inside a dark motorcycle workshop bay at night: black rubber floor with faint scuffs, a grey steel roller shutter and pegboard tool wall in shadow behind, one warm amber work lamp overhead and a cool white LED strip low along the floor, faint haze, tool chests and tyre stacks softly out of focus in the background. The bay after a session: a parked dark trials motorcycle far in the right third of the frame in the lamp light, a helmet and gloves on the bench, the left half of the frame dark near-empty floor and wall as negative space for a menu panel, calm and dim.
+
+### results-credits (1536x1024, results-bg, credits)
+shipped as `art/menu/results-credits.webp`
+
+> Cinematic photoreal video-game key art, grounded and moody, physically plausible lighting with volumetric dust and haze, sharp detail, natural film grade. No text, no lettering, no logos, no watermark, no cartoon or illustration style, no UI. inside a vast old industrial warehouse: stacked rusted shipping containers, plywood kickers, pallets and oil drums, gantry crane rails and hook blocks overhead, riveted steel trusses, amber sodium high-bay lamps, shafts of dusty late light through a big bank of high windows, wet stained concrete floor. Long after the race: the empty warehouse course seen from the finish line looking back down it, tyre marks on the plywood, a checkered banner hanging still, a single hanging lamp lit, dust settling, everything else fading to black, the left two thirds of the frame dark negative space for scrolling text.
+
+### medal-bronze-v2 (1024x1024, medal, bronze)
+shipped as `art/menu/medal-bronze-512.png + medal-bronze.png (256)`
+
+> A single round racing medal, warm dark bronze with copper highlights and a slightly worn patina, on a short deep-red and bronze striped ribbon, embossed with a motorcycle wheel with knobbly tyre in the centre surrounded by a laurel wreath, a thin beaded rim, viewed straight on and perfectly centred. The ribbon is a short folded V of fabric attached to a small ring at the top of the medal, occupying only the top fifth of the frame and never touching the frame edge. The medal disc fills about 65 percent of the frame width. No text, no numbers, studio product lighting with soft reflections, photoreal, isolated on a flat pure solid black background with no gradient, no glow and no shadow outside the medal and ribbon.
+
+### medal-silver-v2 (1024x1024, medal, silver)
+shipped as `art/menu/medal-silver-512.png + medal-silver.png (256)`
+
+> A single round racing medal, bright brushed silver with cool white highlights, on a short navy and silver striped ribbon, embossed with a motorcycle wheel with knobbly tyre in the centre surrounded by a laurel wreath, a thin beaded rim, viewed straight on and perfectly centred. The ribbon is a short folded V of fabric attached to a small ring at the top of the medal, occupying only the top fifth of the frame and never touching the frame edge. The medal disc fills about 65 percent of the frame width. No text, no numbers, studio product lighting with soft reflections, photoreal, isolated on a flat pure solid black background with no gradient, no glow and no shadow outside the medal and ribbon.
+
+### medal-gold-v2 (1024x1024, medal, gold)
+shipped as `art/menu/medal-gold-512.png + medal-gold.png (256)`
+
+> A single round racing medal, rich polished gold with deep warm reflections, on a short crimson and gold striped ribbon, embossed with a motorcycle wheel with knobbly tyre in the centre surrounded by a laurel wreath, a thin beaded rim, viewed straight on and perfectly centred. The ribbon is a short folded V of fabric attached to a small ring at the top of the medal, occupying only the top fifth of the frame and never touching the frame edge. The medal disc fills about 65 percent of the frame width. No text, no numbers, studio product lighting with soft reflections, photoreal, isolated on a flat pure solid black background with no gradient, no glow and no shadow outside the medal and ribbon.
+
+### medal-platinum-v2 (1024x1024, medal, platinum)
+shipped as `art/menu/medal-platinum-512.png + medal-platinum.png (256)`
+
+> A single round racing medal, pale icy platinum with a faint blue-white sheen and a jewelled rim, on a short ice-blue and white striped ribbon, embossed with a motorcycle wheel with knobbly tyre in the centre surrounded by a laurel wreath, a thin beaded rim, viewed straight on and perfectly centred. The ribbon is a short folded V of fabric attached to a small ring at the top of the medal, occupying only the top fifth of the frame and never touching the frame edge. The medal disc fills about 65 percent of the frame width. No text, no numbers, studio product lighting with soft reflections, photoreal, isolated on a flat pure solid black background with no gradient, no glow and no shadow outside the medal and ribbon.
+
+## Round 3b prompts (home-screen icon candidates)
+
+### icon-a-helmet-wheel (1024x1024, icon)
+**rejected** - see the round 3 table above.
+
+> A square mobile app icon, opaque, flat near-black (#0a0b0e) background filling the whole frame with no rounded corners, no border, no drop shadow, no text unless asked, all key content inside the central 80 percent, bold simple shapes with thick strokes that stay readable at 60 pixels, flat vector style with at most three colours. Emblem: a warm amber (#FFB020) full-face motocross helmet in profile facing right, its chin bar sitting on top of a big amber knobbly front wheel whose chunky tread blocks make a saw-toothed circle, a darker burnt-orange (#C9641A) shadow side on both, over a very subtle amber radial glow fading into the black around the emblem.
+
+### icon-b-wheelie (1024x1024, icon)
+shipped as `art/icons/*` (see the round 3b pick above)
+
+> A square mobile app icon, opaque, flat near-black (#0a0b0e) background filling the whole frame with no rounded corners, no border, no drop shadow, no text unless asked, all key content inside the central 80 percent, bold simple shapes with thick strokes that stay readable at 60 pixels, flat vector style with at most three colours. Emblem: the bold silhouette of a trials rider standing on the pegs of a trials motorcycle mid-wheelie, front wheel high, in solid warm amber (#FFB020) on a dark gradient from near-black at the top to deep charcoal-brown at the bottom, one thick amber ground stroke under the rear wheel, no other detail.
+
+### icon-c-monogram (1024x1024, icon)
+**rejected** - see the round 3 table above.
+
+> A square mobile app icon, opaque, flat near-black (#0a0b0e) background filling the whole frame with no rounded corners, no border, no drop shadow, no text unless asked, all key content inside the central 80 percent, bold simple shapes with thick strokes that stay readable at 60 pixels, flat vector style with at most three colours. Emblem: a chunky two-letter monogram "TG" in a heavy condensed italic sans-serif (like Barlow Condensed Black Italic), warm amber (#FFB020) letters with a darker burnt-orange (#C9641A) offset shadow, overlapping slightly, sitting on a horizontal band of black knobbly-tyre tread blocks that crosses the icon behind the letters; only the two letters T and G, nothing else.
