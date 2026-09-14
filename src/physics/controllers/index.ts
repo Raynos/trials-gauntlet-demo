@@ -173,12 +173,14 @@ export function lipHopper(lipX: number, speed = 8.5, preloadS = 0.3, snapS = 0.2
     const rearX = ob.state.wheels.rear.pos.x;
     const v = Math.max(1, ob.speed);
     const hold = Math.max(0, Math.min(1, 0.15 + 0.3 * (speed - ob.speed)));
+    // approach with the weight forward (R3: the Pro loops at lean 0 under the hold throttle from a standstill)
+    const approachLean = ob.speed < speed - 1 ? 0.5 : 0;
     if (!hop) {
-      if (rearX < lipX) return { throttle: hold, lean: 0 };
+      if (rearX < lipX) return { throttle: hold, lean: approachLean };
       return { throttle: 0.25, lean: ob.pitchDeg < -10 ? -0.8 : 0 };
     }
     if (Number.isNaN(preT) && rearX >= lipX - snapLead - preloadS * v) preT = ob.t;
-    if (Number.isNaN(preT)) return { throttle: hold, lean: 0 };
+    if (Number.isNaN(preT)) return { throttle: hold, lean: approachLean };
     if (Number.isNaN(snapT) && (rearX >= lipX - snapLead || ob.t - preT >= preloadS + 0.15)) snapT = ob.t;
     if (Number.isNaN(snapT)) return { throttle: o.thrPre ?? hold, lean: preLean };
     const t = ob.t - snapT;
@@ -228,6 +230,46 @@ export function wheelieHoldV2(targetDeg: number, targetSpeed: number, o: { park?
     leanCmd += Math.max(-leanRate * dtc, Math.min(leanRate * dtc, leanPark - leanCmd));
     const throttle = Math.max(0, Math.min(1, bias + integ + kp * err - kd * rate + ks * (targetSpeed - ob.speed)));
     const brake = err < 0 ? Math.max(0, Math.min(1, -(kb * err + kdb * rate))) : 0;
+    return { throttle, lean: leanCmd, brake };
+  };
+}
+
+/**
+ * Wheelie hold with anticipation (R3, parent decision 4). Same actuators as `wheelieHoldV2` (parked lean,
+ * throttle up / rear brake down) but the feedback variable is the PREDICTED pitch `pitch + rate * horizon`,
+ * the way a human leads a slow actuator: the Rookie's throttle is a 0.15 s lag behind a 100 ms decision
+ * latency, and against the 0.3 s e-fold a PD on the current pitch limit-cycles +-9 deg and eventually
+ * loops. `horizon` ~ latency + throttle lag. The lean is parked at the coasting balance and left alone.
+ */
+export function wheelieHoldV3(targetDeg: number, targetSpeed: number, o: { park?: number; horizon?: number; kp?: number; kd?: number; ki?: number; kb?: number; ks?: number; bias?: number } = {}): Controller {
+  const park = o.park ?? 1;
+  const horizon = o.horizon ?? 0.25;
+  const kp = o.kp ?? 0.035;
+  const kd = o.kd ?? 0.004;
+  const ki = o.ki ?? 0.02;
+  const kb = o.kb ?? 0.03;
+  const ks = o.ks ?? 0.03;
+  const bias = o.bias ?? 0.12;
+  let leanCmd = NaN;
+  let lastT = NaN;
+  let integ = 0;
+  return (ob) => {
+    if (Number.isNaN(leanCmd)) {
+      leanCmd = 1;
+      for (let l = -1; l <= 1.001; l += 0.01) {
+        if (ob.balanceAt(l) >= targetDeg + park) {
+          leanCmd = l;
+          break;
+        }
+      }
+    }
+    const dtc = Number.isNaN(lastT) ? 0 : ob.t - lastT;
+    lastT = ob.t;
+    const predicted = ob.pitchDeg + ob.pitchRateDeg * horizon;
+    const err = targetDeg - predicted;
+    integ = Math.max(-0.25, Math.min(0.25, integ + ki * err * dtc));
+    const throttle = Math.max(0, Math.min(1, bias + integ + kp * err - kd * ob.pitchRateDeg + ks * (targetSpeed - ob.speed)));
+    const brake = err < -3 ? Math.max(0, Math.min(1, -kb * (err + 3))) : 0;
     return { throttle, lean: leanCmd, brake };
   };
 }

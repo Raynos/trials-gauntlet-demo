@@ -70,15 +70,18 @@ describe('determinism (§14.1)', () => {
     // §12: tick, time, checkpoint, finishTime, throttleEff, brakeEff, pose target (3), rear/front compression
     // (2), air counters (2), rng (4) + seed, crash timer, ragdoll rest (6), previous wheel centres (4),
     // applied input (3), rear slip (output). No hop phase timer, no slope memory, no airborne blend, no kappa,
-    // no leg stop. Adding a slot fails here until it is justified in physics-v2.md / physics.md.
+    // no leg stop. R3 adds ONE slot, `targetMove`: the intent memory (the pose target's own travel, decaying over
+    // ~0.2 s) that tells the servo a hop push from a landing recovery (physics.md v2 status R3, deviation 19).
+    // Adding a slot fails here until it is justified in physics-v2.md / physics.md.
     expect([...F_SLOTS]).toEqual([
       'tick', 'time', 'checkpoint', 'finishTime', 'throttleEff', 'brakeEff',
       'targetX', 'targetY', 'targetPsi', 'rearComp', 'frontComp', 'rearAir', 'frontAir',
       'rng0', 'rng1', 'rng2', 'rng3', 'seed', 'crashT',
       'ragRest0', 'ragRest1', 'ragRest2', 'ragRest3', 'ragRest4', 'ragRest5',
       'prevRearX', 'prevRearY', 'prevFrontX', 'prevFrontY', 'inThrottle', 'inBrake', 'inLean', 'rearSlip',
+      'targetMove',
     ]);
-    expect(NSCALAR).toBe(33);
+    expect(NSCALAR).toBe(34);
     expect([...U_SLOTS]).toEqual(['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase']);
     expect(NU).toBe(13);
     const w = createBikePhysics(HZ);

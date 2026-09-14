@@ -45,7 +45,7 @@ export interface PhysicsDebugV2 {
   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
   /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
-  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number };
+  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number };
   /** The declared attitude torque applied this tick (N m). */
   attTorque: number;
   /** Pose target in the chassis frame. */
@@ -126,6 +126,7 @@ export const F_SLOTS = [
   'inBrake',
   'inLean',
   'rearSlip',
+  'targetMove',
 ] as const;
 const S_TICK = 0;
 const S_TIME = 1;
@@ -152,7 +153,8 @@ const S_IN_T = 29; // the applied (quantised) input
 const S_IN_B = 30;
 const S_IN_L = 31;
 const S_REAR_SLIP = 32; // output
-export const NSCALAR = F_SLOTS.length; // 33
+const S_TGT_MOVE = 33; // R3 intent: decaying memory (tau servoIntentTau) of the pose target's own travel, metres
+export const NSCALAR = F_SLOTS.length; // 34
 
 /** Flags (physics-v2.md §12). */
 export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase'] as const;
@@ -213,7 +215,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
   readonly physicsHz: number;
   private _tuning: Readonly<TuningV2>;
   private readonly override: PartialTuningV2 | undefined;
-  private _bike: BikeClassV2 = 'mid';
+  private _bike: BikeClassV2 = 'rookie';
   private readonly dt: number;
   private g: number;
 
@@ -284,6 +286,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private dServoTq = 0;
   private dLegLen = 0;
   private dLegFrac = 1;
+  private dIntent = 0;
   private dAtt = 0;
   private dTgtWx = 0;
   private dTgtWy = 0;
@@ -309,7 +312,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     this.physicsHz = physicsHz;
     this.dt = 1 / physicsHz;
     this.override = tuning;
-    this._tuning = Object.freeze(bikeTuningV2('mid', tuning));
+    this._tuning = Object.freeze(bikeTuningV2('rookie', tuning));
     this.g = this._tuning.gravity;
     this.axleOrigin();
     this.bindViews();
@@ -347,7 +350,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
   // -- PhysicsWorld ---------------------------------------------------------
 
   loadTrack(track: CompiledTrack, seed: number, opts?: LoadTrackOptionsV2): void {
-    this.selectBike(opts?.bike ?? 'mid');
+    this.selectBike(opts?.bike ?? 'rookie');
     this.track = track;
     this.col = new CollisionWorld(track, FIRST_DYN);
     this.nSeesaw = this.col.seesawBodies.length;
@@ -419,12 +422,19 @@ class WorldV2 implements BikePhysicsWorldV2 {
       F[S_BRAKE_EFF] = lag(F[S_BRAKE_EFF]!, input.brake, t.brakes.brakeTau, dt);
       // 2 pose target (reads F only)
       advanceTarget(t.rider, dt, F[S_TGT_X]!, F[S_TGT_Y]!, F[S_TGT_PSI]!, input.lean, this.poseTmp);
+      // intent (R3): how far the target itself has travelled lately. A rider who is MOVING his pose (the hop's
+      // snap) may push at F_max whichever way the gap is closing; a rider holding a pose (a landing) has only the
+      // concentric cap (servoMinFrac at servoCloseV0) on the way back up, so the legs absorb instead of pogoing
+      const mdx = this.poseTmp.x - F[S_TGT_X]!;
+      const mdy = this.poseTmp.y - F[S_TGT_Y]!;
+      F[S_TGT_MOVE] = F[S_TGT_MOVE]! * (1 - dt / t.rider.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy);
       F[S_TGT_X] = this.poseTmp.x;
       F[S_TGT_Y] = this.poseTmp.y;
       F[S_TGT_PSI] = this.poseTmp.psi;
     } else {
       F[S_THROTTLE_EFF] = 0;
       F[S_BRAKE_EFF] = 1;
+      F[S_TGT_MOVE] = 0;
       U[U_LIMITER] = 0;
     }
     this.forces(riding); // 3
@@ -617,6 +627,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
         servoTorque: this.dServoTq,
         legLen: this.dLegLen,
         legFrac: this.dLegFrac,
+        intent: this.dIntent,
         poseTargetWorld: { x: this.dTgtWx, y: this.dTgtWy },
         lag: { x: this.px[RIDER]! - this.dTgtWx, y: this.py[RIDER]! - this.dTgtWy },
       },
@@ -1051,10 +1062,13 @@ class WorldV2 implements BikePhysicsWorldV2 {
       // otherwise fire it (and the bike) back up at F_max - the 0.6 m pogo rebound of R2's first 2 m drop.
       const el = Math.sqrt(ex * ex + ey * ey);
       const vClose = el > 1e-6 ? (vrx * ex + vry * ey) / el : 0;
-      const fl = clamp(1 - vClose / r.servoCloseV0, r.servoMinFrac, 1);
+      const hill = clamp(1 - vClose / r.servoCloseV0, r.servoMinFrac, 1);
+      const intent = clamp(F[S_TGT_MOVE]! / r.servoIntentM, 0, 1);
+      const fl = hill + (1 - hill) * intent;
       const fmax = r.Fmax * fl;
       this.dLegLen = ul;
       this.dLegFrac = fl;
+      this.dIntent = intent;
       const fm = Math.sqrt(Fx * Fx + Fy * Fy);
       if (fm > fmax) {
         Fx *= fmax / fm;

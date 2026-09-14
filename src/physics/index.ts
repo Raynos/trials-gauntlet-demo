@@ -8,7 +8,7 @@ import type { CompiledTrack, GameEvent, InputFrame, PhysicsSnapshot, PhysicsStat
 
 import type { BikeClassV2 } from './v2/tuning';
 
-/** Per-load options: which bike the track is ridden on (a parameter row, §13). Default 'mid', the reference row. */
+/** Per-load options: which bike the track is ridden on (a parameter row, §13). Default 'rookie', the reference row. */
 export interface LoadTrackOptions {
   bike?: BikeClassV2;
 }

@@ -5,6 +5,195 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R3 (of three, physics-v2.md §16.7)
+
+**Finding.** The landing pogo is gone without touching the hop: one new §12 slot, `targetMove` (a 0.2 s decaying
+memory of the pose target's own travel), gates the servo's concentric cap — a rider *moving* his pose (the hop's snap)
+pushes at F_max whichever way the gap is closing, a rider *holding* a pose (a landing) gets 0.3 F_max above 1 m/s of
+closing speed, so the legs absorb instead of firing the bike back up. Drops of 1.5 / 2 / 3 m at 6 and 12 m/s, lean 0
+and +0.5, on both classes all land and ride away (rebound ≤ 0.05 m, pitch −34..+16; R2: 0.6 m pogo at 2 m, loop at
+2.5–3 m); the reference hop is 0.46 m with the cap on or off (identical to 3 decimals). The classes are two parameter
+rows: **Rookie** = R2's mid table plus a 1.07 low-speed knot (940 N, 0.66 g, the thrust a 4 m 45° plank needs from a
+crawl) and a **0.15 s throttle**, which is the lever that separates "forgiving" from "raw" — the neutral-lean loop is
+started by the launch *kick*, not the sustained thrust (the rear squats and the front tops out under thrust, ~6° of
+pitch that costs 0.15 of d/h, so the front lifts at a/g ≈ static d/h − 0.15, and every lift under sustained thrust is
+a loop): with the kick filtered the Rookie lifts 6.7° at lean 0, 6° at +0.25..+1, never loops, and loops at −0.25 /
+−0.5 / −1 in 1.10 / 0.82 / 0.63 s; the **Pro** (54 kg, 1 000 N, 0.08 s throttle, K_att 260, k 12 000 / 9 000, 21 m/s)
+loops at 0 in 0.96 s and at +0.25 in 1.38 s, 0 → 16 in 3.25 s. Two forward pose tables were measured and rejected
+(below). Climbs: the constant-speed climb limit is **geometry, not thrust** — the front load on a slope θ is
+∝ d cos θ − h sin θ, so the crawl limit is atan(d/h) at lean +1 = 37° on this table — and the Trials technique is what
+tops 45° from a crawl: the front rolls onto the face at neutral (a front-heavy bike cannot climb a 45° step), gas at the
+base, then the weight is *thrown* to +1 the instant the front is on the face (the throw is the hop push; a slow forward
+ramp loops the bike on the face first). Rookie 40° and 45° from 2 m/s: TOP; 45° at 5 m/s and 50° at 5–6 m/s are
+timing-critical (one 60 Hz decision separates TOP from a 70 % stall) and not met by the bench controller; the Pro's
+momentum rows (55–60° at 8 m/s) fail at the *base transition*, not on the face. The wheelie hold is met on both classes
+with anticipation: a 60 Hz / 100 ms controller that regulates `pitch + rate × 0.25 s` holds 40 ± 8° for **12.0 s
+(Rookie) / 12.2 s (Pro) of 12.5**, mean 40.1 / 40.3°, never loops; the R2 PD on the current pitch loops in 1.5 s against
+the Rookie's slow throttle. Lab: both classes get onto the ledge at 8–9 m/s with the same −0.06 m corner-roll margin as
+R2 (7 m/s is a nose-dive into the face, crash). Cost 2.7–3.0 µs/tick p95. `pnpm vitest run src/physics`: 140 pass, 11
+todo; typecheck and lint clean. Barrel unchanged (v1 is still `createBikePhysics`; the flip is one line).
+
+### Files (R3)
+
+- `src/physics/v2/bike.ts` — `F_SLOTS` gains `targetMove` (34 scalars); `step()` accumulates the target's travel with
+  the `servoIntentTau` decay and zeroes it when not riding; the servo cap is `hill + (1 − hill) · intent`;
+  `debug().rider.intent`. Default class `'rookie'`.
+- `src/physics/v2/tuning.ts` — `servoCloseV0` 1.0 / `servoMinFrac` 0.3 (on), `servoIntentTau` 0.2 / `servoIntentM` 0.05;
+  `curveV` [0 3 5 8 12 17 20] / `curveF` [1.07 1.07 1 1 0.7 0.48 0.35], `throttleTau` 0.15; `BikeClassV2 = 'rookie' |
+  'pro'` (mid removed; `DEFAULT_TUNING_V2` is the Rookie); the Pro preset above.
+- `src/physics/controllers/index.ts` — `wheelieHoldV3` (anticipation); `lipHopper` approaches with the weight forward
+  (the Pro looped at lean 0 under the hold throttle from a standstill).
+- `src/physics/v2/r3.test.ts` — the R3 rows; `world.test.ts` slot list (34); re-pins in `feel.test.ts` (snap-forward
+  saves 24.6° at 0.5 s: the throttle lag keeps the thrust on ~0.3 s after a cut; air-brake band edge −11.95),
+  `r2.test.ts` (3 m landing dip −30.4°, the R2 "early weight forward" climb controller kept as the wrong-technique
+  reference, wheelie row on V3), `property.test.ts` (throttle-settle 0.6 s at tau 0.15; the §10 stability kick now
+  decays slower — 10.6° peak, 3.6° at 2 s — because a rider holding a pose is soft against a static target).
+- `src/physics/tools/trackSweep.ts`, `src/physics/index.ts` — mid removed from the docs strings.
+
+### FEEL table per class (R2 mid → R3 Rookie | R3 Pro; `pnpm vitest run src/physics/v2` prints every row)
+
+| row | band | R2 (mid) | R3 Rookie | R3 Pro | verdict |
+|--|--|--|--|--|--|
+| static sag rear / front | 28–32 / 24–28 % | 29.3 / 17.0 | 29.5 / 16.7 | 25.2 / 11.6 | as R2 (front spring inconsistency, stiffer Pro) |
+| coasting balance by lean −1 / −0.5 / 0 / +0.5 / +1 | info | 24.2 / 39.4 / 49.9 / 59.6 / 68.6 | same | 24.7 / 38.6 / 48.2 / 57.0 / 65.3 | — |
+| 0 → 16 (lean +0.25) / top | ≤ 4.2 s / 20 ± 0.5 | 4.47 / 20.03 | **3.98** / 20.03 | 3.25 / 21.03 | pass (the knot) |
+| full gas lean +1 / +0.5 / +0.25 / 0 max pitch | ≤ 10, no loop | 6.0 / 5.2 / 5.5 / 7.3 | 5.9 / 5.9 / 6.0 / **6.7** | 6.1 / 5.5 / loop 1.38 / loop 0.96 | Rookie pass; Pro loops at ≤ +0.25 (raw) |
+| full gas lean −0.25 / −0.5 / −1 loop time | Rookie: loop only at ≤ −0.5 | 1.46 / 1.23 / 1.09 | 1.10 / 0.82 / 0.63 | 0.79 / 0.66 / 0.57 | −0.25 still loops (critical lean ≈ −0.1; see below) |
+| open-loop divergence | 1–2 s | 1.34 | 1.29 | 1.63 | pass |
+| wheelie hold 60 Hz / 100 ms, 40 ± 8 for ≥ 10 s | ≥ 10 s | 5.9 s in band (PD) | **12.0 s** (anticipation) | **12.2 s** | pass |
+| snap-forward from 20° held / 30° throttle cut | < 15 at 0.5 s | 3.2 / 0.0 | 4.4 / **24.6** | — | 30° save slower (throttle lag) |
+| brake hard-back / neutral | ≤ 5.0 / ≤ 7 m | 5.64 / 6.84 | 5.64 / 6.85 | — | as R2 |
+| air control 0.5 s lean −1 / +1 / thr / brake @8 | 25–40 / −25..−40 / 8–15 / −12..−40 | 35 / −39 / 9 / −12 | 35 / −39 / 8 / −12 | 29 / −35 / 10 / −12.5 | pass; Pro has less |
+| **hop** ref apex / front / both-off / first / land | 0.45–0.65 / 0.6–0.9 / 0.35–0.6 / front / level | 0.47 / 0.65 / 0.29 / front / +3 | **0.46 / 0.74 / 0.29 / front / +2.8** | 0.49 / — / 0.33 / front / +3.5 | pass (both-off short as R2) |
+| hop tuck gain / seated / half-rate / quantum jump | +0.1–0.2 / ≤ 0.1 / 55–75 % / < 3 cm | 0.105 / 0.20 / 55 % / 0.4 cm | 0.108 / 0.20 / 56 % / 0.4 cm | — | as R2 |
+| landing 1.5 m @6 lean 0 | ≥ 80 %, returns | 100 %, rebound 0.18 | 100 %, **rebound 0.00** | 100 % | pass |
+| landing 2 m @6 / @12 lean 0 | rides, bounded | rebound 0.61 / 0.60 | **0.05 / 0.04**, pitch −3..+11 | 0.05 / 0.03 | pass |
+| landing 3 m @6 / @12 lean 0 | rides, bounded | loop / loop | **rides**, pitch −4..+14 / −5..+10 | rides | pass |
+| landing 3 m @6 / @12 lean +0.5 | rides, bounded | rides / loop | rides −30..+7 / −34..+9 | −23..+12 / −27..+8 | pass |
+| climb 45° from 2 m/s (technique) | Rookie TOP | stall 27 % (R2 controller) | **TOP** (40 TOP) | stall 36 % | Rookie pass |
+| climb 45 @5 / 50 @5 / 50 @6 | Rookie 50 with ≥ 5 | 72 % / — / stall | 72 % / fault / 42 % | fault / 38 % / 46 % | not met (timing) |
+| climb 55 @6..8 / 60 @8 (momentum) | Pro carries | stall at the base | 24–34 % / 23 % | 26–31 % / 22 % | not met (base transition) |
+| kickers 17–22 @8/11 lean released | land ±20 | 11 | **9.0** | — | pass |
+| lab hop @7 / @8 / @9 margin | ≥ 0.1 m | — / −0.06 / — | crash / **−0.06** / −0.07 (cleared) | crash / −0.06 / −0.07 | half, as R2 |
+| µs/tick p95 riding | ≤ 5 (R3) | 2.25 | 2.7–3.0 | — | pass |
+| bounded response dv / dw per tick | ≤ 0.02 / 0.06 | 3.8e-3 / 0.056 | 2.8e-3 / 0.057 | — | pass |
+
+### Hop matrix (rear apex m; preload depth × snap rate) — R2 mid → R3 Rookie | R3 Pro
+
+| preload lean | 4 /s | 8 /s | 16 /s | one tick |
+|--|--|--|--|--|
+| −0.25 | 0.07 → 0.07 \| 0.08 | 0.30 → 0.29 \| 0.31 | 0.34 → 0.33 \| 0.35 | 0.35 → 0.34 \| 0.37 |
+| −0.5 | 0.11 → 0.10 \| 0.08 | 0.39 → 0.38 \| 0.40 | 0.46 → 0.44 \| 0.48 | 0.48 → 0.46 \| 0.50 |
+| −0.75 | 0.28 → 0.24 \| 0.26 | 0.44 → 0.43 \| 0.46 | 0.51 → 0.50 \| 0.55 | 0.47 → 0.47 \| 0.49 |
+| −1 | 0.08 → 0.07 \| 0.09 | 0.43 → 0.41 \| 0.46 | 0.50 → 0.49 \| 0.55 | 0.47 → 0.46 \| 0.49 |
+
+Within 0.02 of R2 everywhere on the Rookie (the intent gate lifts the cap through the whole snap); the Pro hops 5–10 %
+higher (4 kg lighter, stiffer rear). Monotone in depth at ≥ 8 /s and in rate to 16 /s as R2; same surface identity and
+quantum continuity (0.4 cm).
+
+### Landing table (rear max %, pitch range, rebound m; entry 6 / 12 m/s; all ride away, no fault)
+
+| drop | lean | Rookie @6 | Rookie @12 | Pro @6 | Pro @12 |
+|--|--|--|--|--|--|
+| 1.5 m | 0 | 100 %, +1..+10, 0.00 | 100 %, +1..+8, 0.00 | 100 %, +1..+12, 0.00 | 100 %, +1..+9, 0.00 |
+| 1.5 m | +0.5 | 91 %, −11..+6, 0.00 | 88 %, −13..+5, 0.00 | 81 %, −7..+6, 0.00 | 76 %, −9..+5, 0.00 |
+| 2 m | 0 | 100 %, −3..+11, 0.05 | 100 %, −2..+8, 0.04 | 100 %, −2..+13, 0.05 | 100 %, −1..+10, 0.03 |
+| 2 m | +0.5 | 96 %, −18..+8, 0.00 | 92 %, −20..+7, 0.00 | 84 %, −13..+8, 0.00 | 82 %, −15..+8, 0.00 |
+| 3 m | 0 | 100 %, −4..+14, 0.00 | 100 %, −5..+10, 0.00 | 100 %, −3..+16, 0.00 | 100 %, −4..+12, 0.00 |
+| 3 m | +0.5 | 93 %, −30..+7, 0.00 | 84 %, −34..+9, 0.00 | 78 %, −23..+12, 0.00 | 76 %, −27..+8, 0.00 |
+
+With the cap off (R2's tuning) the same 2 m / lean 0 drop rebounds 0.62 m and 3 m loops (asserted in `r3.test.ts`).
+The lean +0.5 landings dip the nose to −30..−34° at 12 m/s — a front-heavy landing, bounded, no fault.
+
+### Climb table (4 m wood plank, the technique controller; TOP / stall % / FAULT)
+
+| entry | 40° | 45° | 50° | 55° | 60° |
+|--|--|--|--|--|--|
+| Rookie 2 m/s | TOP | **TOP** | — | — | — |
+| Rookie 5 / 6 m/s | — | 72 % | FAULT / 42 % | 24 % (6) | — |
+| Rookie 8 m/s | — | — | — | 34 % | 23 % |
+| Pro 2 m/s | FAULT | 36 % | — | — | — |
+| Pro 5 / 6 m/s | — | FAULT | 38 % / 46 % | 26 % (6) | — |
+| Pro 8 m/s | — | — | — | 31 % | 22 % |
+
+Pose-table numbers the parent asked for: comDH(+1) = d 0.61 / h 0.80 → atan 37° (Rookie), 36° (Pro); a 48° geometry
+needs the rider COM at (+0.42, +0.46) chassis frame at lean +1 (over the bars), measured and rejected (deviation 22).
+What a 50° constant-speed climb would need: d/h ≥ 1.19 — the rider COM 0.5 m ahead of its R2 pose. 50–60° are
+momentum climbs on any table (decelerating at ≥ 0.05–0.5 g adds the missing nose-down moment); what fails at 6–10 m/s
+is the base: the front wheel meets a 50°+ face at speed and either stops the bike or the throw comes too early.
+
+### Wheelie hold, lab, cost
+
+- Hold (V3, horizon 0.25 s, kp 0.035, ki 0.02, kb 0.03): Rookie 12.0 s in band of 12.5, mean 40.1°, front never down,
+  v ≤ 7.0; Pro 12.2 s, 40.3°, v ≤ 6.7. V2 (no anticipation): Rookie loops at 1.5 s, Pro at 2.3 s.
+- Lab (`lipHopper`, weight-forward approach): Rookie @7 crash (nose −26° into the face), @8 cleared margin −0.06, land
+  −5°; @9 cleared −0.07, +10°; Pro @7 crash, @8 −0.06 / −6°, @9 −0.07 / +14°. The ≥ 0.1 m clear-air margin is not
+  reached by the R3 hop either: the rear meets the ledge corner and rolls over it at 8–9 m/s exactly as in R2.
+- Cost: 2.7–3.0 µs/tick p95 riding (node), one more scalar per tick.
+
+### Further deviations (R3)
+
+19. **One new §12 slot, `targetMove`** (the intent memory): `tm ← tm (1 − dt/0.2) + |Δtarget|`, clamped to an intent of
+    `tm / 0.05`. Justification: §12 forbids hop-phase memory *for the physics*; this is a memory of the *input's own
+    path* (the target is already state), 8 bytes, in `F`, snapshot round-trip asserted through a landing.
+20. **Servo concentric cap ON**: `servoCloseV0` 1.0 / `servoMinFrac` 0.3, gated by 19. Cost: the §10 stability kick
+    decays slower (10.6° peak, 3.6° at 2 s, still monotone); the 30° throttle-cut save reads 24.6° at 0.5 s.
+21. **Rookie throttle lag 0.15 s** (spec 0.04) and **low-speed knot 1.07** (spec 0.85 at 0). The lag is what keeps the
+    knot from looping the neutral launch. Costs: throttle-driven corrections are ~0.1 s slower; the wheelie hold needs
+    anticipation (met); `property.test` settles 0.6 s before measuring throttle→acceleration.
+22. **Forward pose tables rejected.** Over the bars (+1 at x 0.42 / y 0.46, neutral +0.10, a −0.25 row): the R1-style
+    snap becomes a 1.3–1.5 m throw with a 0.36 m knife between lean quanta, throttle→acceleration goes non-monotone at
+    +0.5 (the rear unloads), bounded-response dw 0.185. Moderate (neutral −0.06, +1 at 0.24 / 0.55): half-rate snap 55
+    → 22 %, knife 0.03 → 0.07 m, dw 0.075, for +3° of crawl geometry the bench cannot see. The pose table is R2's.
+23. **Classes**: `mid` removed; the Rookie *is* the reference row; the Pro preset above (K_att 260 gives 29 / −35° of
+    air authority — below the 25–40 band on the nose-up side by design, "less attitude assist").
+
+### Parent decisions not met, with the cost of meeting them
+
+- **Loop-out at lean −0.5 or harder (Rookie).** Critical lean ≈ −0.1: the launch at −0.25 loops in 1.10 s. Moving it to
+  −0.4 needs d/h(−0.4) ≥ a/g + 0.15 (squat) ⇒ the whole table 0.25 m forward, which kills the hop preload and the
+  balance ladder; or a thrust cap ≤ 0.47 g, which kills the 45° crawl. Not available as a parameter change.
+- **Pro neutral loop in 1.5–2.5 s.** 0.96 s. The lift-to-90° time is the open-loop divergence (~0.3 s e-fold from the
+  lift); stretching it needs less thrust at low speed, which the momentum climbs need. A throttle lag of 0.15 s makes
+  the Pro not loop at all (that is the Rookie).
+- **50° at ≥ 5 m/s (Rookie), 55–60° momentum (Pro).** The face is fine (geometry + thrust suffice); the base transition
+  and the throw timing are not made by a 60 Hz / 50 ms bench controller; a bot with the lift-into-the-face move or a
+  chamfered base would show it. Not a physics parameter.
+- **Lab margin ≥ 0.1 m.** Same −0.06 corner roll as R2 at 8–9 m/s.
+
+### Flip readiness (what a track author will notice moving v1 → v2 Rookie)
+
+- **Speed**: 0 → 16 in 4.0 s (v1 1.4–2.2 s); top 20 m/s. Every run-up is ~2× longer; the throttle answers in 0.15 s.
+- **Climbs**: constant-speed limit 37° at full forward lean; 40–45° top only with the base gas and the throw; 50°+ is a
+  momentum climb that the bot must learn; 65°+ needs a hop. v1's "sustained on ≤ 60°" is gone.
+- **Hop**: 0.46 m from a standing preload (0.55 at a 0.4 s preload); 0.9 m ledge at 5 m/s not yet measured on v2.
+- **Landings**: 3 m at 12 m/s rides away on both classes; big drops are safe, front-heavy landings dip to −30°.
+- **Loops**: the Rookie loops only when leaned back (−0.25 in 1.1 s); the Pro loops at neutral under full gas in 1 s.
+- **Seesaws**: rebound 250 (R2, deviation 14) — re-measure.
+- **Pro**: 21 m/s, 3.25 s to 16, hops 5–10 % higher, less air authority; a track cleared on the Rookie is not
+  automatically clearable on the Pro (the neutral loop) and vice versa (the momentum).
+- Verdict: **safe to flip for the Rookie once tracks are re-authored against the speed and the climb limits**; the
+  four rows above are honest misses, not instabilities; the goldens change (§16.3).
+
+### Requests
+
+- **tracks**: the lab's far wall — a 45° chamfer or a 0.1 m lower ledge (49.3 m) turns the corner roll into the spec's
+  clear-air margin and the rolled miss into a slide-back; re-measure seesaws (rebound 250); re-author run-ups for
+  4 s to 16 m/s; planks > 45° need a base the front can roll onto (a 0.3 m 20° kicker at the foot) or a run-up for the
+  momentum line.
+- **core / render**: nothing new in `PhysicsState`; `debug().rider.intent` is a new HUD field (0..1) for the lab.
+- **harness**: the v2 goldens re-stamp (every replay changes); the bot needs the two climb moves (neutral until the
+  front is on the face, then the throw; and the wheelie hold with a 0.25 s lead) — `r3.test.ts` has both as
+  controllers.
+
+### What R4 must do
+
+1. The `it.todo` rows: rear-wheel pogo at the balance, the 0.9 m ledge at 5 m/s, clips 01 / 07 / 18, the seesaw.
+2. A bot-grade climb controller (lift into the face) and the 50–60° momentum rows on it.
+3. The flip (one line in `src/physics/index.ts`) and v1's deletion once the tracks are re-authored.
+
+---
+
 ## v2 status — R2 (of three, physics-v2.md §16.7)
 
 **Finding.** The hop is real: from a standing start on flat dirt, a 0.3 s preload (lean −1, throttle 0.3), a

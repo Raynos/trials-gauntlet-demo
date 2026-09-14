@@ -14,8 +14,8 @@ import { CURRICULUM } from '../../tracks/courses';
 import { createBikePhysicsV2, type BikePhysicsWorld } from '../index';
 import type { BikeClass } from '../index';
 
-/** Bike class row to sweep (physics v2): `TRIALS_BIKE=pro|mid|rookie npx tsx src/physics/tools/trackSweep.ts` (default rookie, the game's default). */
-const BIKE: BikeClass = process.env.TRIALS_BIKE === 'pro' ? 'pro' : process.env.TRIALS_BIKE === 'mid' ? 'mid' : 'rookie';
+/** Bike class row to sweep (physics v2): `TRIALS_BIKE=pro|rookie npx tsx src/physics/tools/trackSweep.ts` (default rookie, the game's default). */
+const BIKE: BikeClass = process.env.TRIALS_BIKE === 'pro' ? 'pro' : 'rookie';
 import { cruise, fullThrottle, runController, type Controller, type Observation } from '../controllers';
 
 const HZ = 120;

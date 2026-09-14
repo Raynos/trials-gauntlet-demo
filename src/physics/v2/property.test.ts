@@ -20,7 +20,7 @@ const Q_L = 1 / 127;
 
 function world(track = makeTrack({ finishX: 1e9 }), tuning?: PartialTuningV2, seed = 1): BikePhysicsWorldV2 {
   const w = createBikePhysics(HZ, tuning);
-  w.loadTrack(track, seed, { bike: 'mid' });
+  w.loadTrack(track, seed, { bike: 'rookie' });
   stepN(w, {}, 60);
   return w;
 }
@@ -140,8 +140,8 @@ describe('monotone responses (§14.1)', () => {
         const thr = k / 10;
         const s0 = w.getState();
         w.teleport({ pos: { x: 10, y: s0.wheels.rear.pos.y }, angle: 0, vel: { x: v, y: 0 } });
-        // let the throttle lag settle for 0.2 s at this level, then measure 10 ticks
-        stepN(w, { throttle: thr, lean: 0.5 }, 24);
+        // let the throttle lag settle for 0.6 s at this level (4 tau at the Rookie's 0.15 s, R3), then measure 10 ticks
+        stepN(w, { throttle: thr, lean: 0.5 }, 72);
         const v0 = comVel(w).vx;
         stepN(w, { throttle: thr, lean: 0.5 }, 12);
         const v1 = comVel(w).vx;
@@ -254,7 +254,9 @@ describe('stability of the accelerating bike with weight forward (§10)', () => 
     console.log(`PROP stability: dpitch 0.25/0.5/1.0/1.5/2.0 s = ${[30, 60, 120, 180, 239].map((k) => tr[k]!.toFixed(1)).join(' / ')} deg, peak ${peak.toFixed(1)}`);
     expect(w.getState().faulted).toBeNull();
     expect(peak).toBeLessThan(25);
-    expect(Math.abs(tr[180]!)).toBeLessThan(Math.abs(tr[30]!));
+    // R3: 2.7 / 5.5 / 4.8 / 3.9 / 3.6, peak 10.6 (R2 decayed faster): with the closing cap the rider is soft against a
+    // static target, so the return is slower; still monotone after the peak, no loop
+    expect(Math.abs(tr[239]!)).toBeLessThan(Math.abs(tr[60]!));
     expect(Math.abs(tr[239]!)).toBeLessThan(6);
   });
 
