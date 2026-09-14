@@ -182,10 +182,13 @@ off a 45 deg ramp" and "reference big jumps ~1.0 s, stationary hop ~0.6 s".
   kickers are 15–30 deg (R§5) and Trials flights on medium tracks are **2.4–3.2 s** in the project's own
   corpus (`reference/notes/evolution-gameplay.md` obs 12) — Trials does not run heavy gravity, it runs
   low kickers and moderate speeds.
-- A 0.6 s stationary-hop airtime at 9.81 m/s² is a 0.44 m rear apex (h = gT²/8); at 13.73 it is 0.62 m.
-  The frame analysis (R§6) gives the corpus hop's apex and airtime together; they are consistent with ~1 g
-  and a ~0.45 m rear-wheel rise, not with 0.62–0.75 m — the CONTRACT's "0.55–0.75 m" hop band was
-  asserted, not measured, and 1.4 g was chosen to make a too-tall hop end in the right time.
+- The corpus "stationary hop" (clip 01, `docs/research/frame-analysis.md` §7 §2a, tracked) is a rolling
+  front-wheel lift: 0.73 s crouch, 0.40 s extension, the rear wheel unsupported for ≤ 0.27 s and rising
+  ≤ 4 cm. The "≈ 0.6 s airtime" in `techniques.md` obs 7 that round 6 tuned to is the *front* wheel's time
+  in the air. There is no flat-ground rear-wheel hop in the corpus at all; the CONTRACT's "0.55–0.75 m" band
+  was asserted, and 1.4 g was chosen so that a 0.62–0.68 m hop would last 0.6 s. The one real rear-wheel hop
+  (clip 04) lasts 1.1 s and, fitted as free flight, reads g_eff ≈ 3–4 m/s² — the opposite direction from
+  1.4 g, and itself an open question (R§9).
 - Scaling g and forces by s is a time rescale by 1/√s only if *everything* scales; leaving inertias and
   the torso motor alone changes the dynamics, which is why the wheelie PD, the 60 deg crest and the
   lean-0 loop all moved in round 6 (loop 1.54 → 1.11 s; crest hung). Every later round tuned against a
@@ -307,7 +310,11 @@ parameter rows.
 - "COM 0.45 m above the axle line": built at 0.34, marked *note*.
 - "PD holds a wheelie indefinitely": marked PASS in rounds 6–10, found in round 11 to be the drag parking
   the bike at 11 m/s.
-- "stationary hop 0.55–0.75 m": asserted; frame analysis (R§6) puts the corpus hop lower.
+- "stationary hop 0.55–0.75 m": asserted; the clip it was read from is a front-wheel lift with a ≤ 4 cm
+  rear pop (R§6, `frame-analysis.md` §7); the corpus has no flat-ground stationary hop to measure against.
+- `techniques.md` obs 8 "65–75 deg for 4 s" (the wheelie-balance reference every round cited) is a frozen
+  frame in the source; live balance is 0.9 s at 30–45 deg true. Obs 10 "rear-first at 30 deg nose-up" is
+  front-first and level in the frames. Rounds 6–11 tuned landings and the balance band against both.
 - "0 → 16 m/s ≤ 3.5 s": 1.40–2.19 s, which is a 0–58 km/h time faster than a 450 cc motocross bike on
   dirt and the direct cause of the loop-out (a/g ≈ 1 off the clutch).
 
@@ -385,9 +392,12 @@ bike is *slower and more forgiving*, not *assisted*. The v1 split exists because
 cannot make neutral-lean full gas survivable without an ECU. In v2 (§5 of the design) the accelerating bike
 with the rider in the attack position is a stable equilibrium because (a) the rider mass is a kinematic
 offset the player moves directly, so a forward lean moves the COM toward the front axle *immediately* and
-with the right sign, (b) the rider body has its own inertia and exchanges angular momentum with the frame
-when moved fast, so a snap forward *rotates the frame nose-down*, and (c) thrust falls with speed on a real
-curve so a/g falls as the balance pitch approaches. The Rookie/Pro presets survive as parameter rows
+with the right sign (toy model at the design's pose table: d/h 0.57 hard-back → 0.67 neutral → 0.78
+hard-forward, `docs/research/toy-v2/run4-design-params.md` T0), (b) the rider body has its own inertia and
+exchanges angular momentum with the frame when moved fast, so a snap forward *rotates the frame nose-down*
+(T2: recovery from 20–60 deg with the throttle held), and (c) thrust falls with speed on a real curve so a/g
+falls as the balance pitch approaches (T1: full gas at lean 0 tops at 6.5 deg; lean −0.5 wheelies to 57 deg
+and holds; lean −1 loops — the Trials ordering). The Rookie/Pro presets survive as parameter rows
 (mass, torque, gear, wheelbase, spring rates) with `wheelieControl`, `aero` governor, `airShift`, the hop
 machine and the brake caps deleted.
 

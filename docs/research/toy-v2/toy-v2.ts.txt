@@ -1,0 +1,290 @@
+/**
+ * Toy planar model of the proposed v2 rider/bike to check the design's core claims numerically.
+ * Chassis rigid body + two massless-vertical wheels on suspension springs (flat ground) + rear/front spin
+ * DOFs with a slip-stiffness tyre + a RIDER RIGID BODY (mass, inertia) whose pose relative to the chassis
+ * is a rate-limited target of `lean`, tracked by a force/torque-capped servo (internal force pairs only:
+ * momentum and angular momentum are conserved; the caps are the rider's strength).
+ * Not the design's solver (that is sequential impulses); a check that the physics does what is claimed.
+ */
+const g = 9.81;
+const HZ = 120;
+const SUB = 16;
+const dt = 1 / (HZ * SUB);
+
+// bike
+const mC = 56, IC = 12;            // chassis about its own COM
+const mW = 7, IWr = 0.6, IWf = 0.5, R = 0.34;
+const axR = { x: -0.585, y: -0.21 }, axF = { x: 0.715, y: -0.215 }; // axle rest points in chassis frame (COM at origin, 0.55 m up at zero comp)
+const kS = 8500, cS = 700, travel = 0.26, kStop = 80000;
+const muRoad = 1.6, Cslip = 4000;  // N per m/s of slip, before the friction cone
+const massTotal = mC + 2 * mW + 75;
+
+// engine: rim thrust vs speed, throttle-proportional; falls as P/v; engine braking small
+const Fmax = 780; // design F_peak
+const CURVE_V = [0, 4, 7, 12, 17, 20], CURVE_F = [0.85, 1.0, 0.9, 0.62, 0.42, 0.30];
+function thrustAt(v: number): number { const a = Math.abs(v); if (a >= 20) return 0; for (let i = 1; i < CURVE_V.length; i++) if (a <= CURVE_V[i]!) { const t = (a - CURVE_V[i-1]!) / (CURVE_V[i]! - CURVE_V[i-1]!); return Fmax * (CURVE_F[i-1]! + t * (CURVE_F[i]! - CURVE_F[i-1]!)); } return 0; }  // 1067 N: a/g 0.75 off the line for the mid bike
+const Pmax = 1e9; // unused                 // W at the rim (~23 hp)
+const vTop = 20;
+const brakeMaxF = 310, brakeMaxR = 210; // Nm
+
+// rider: mass, inertia about its COM, pose map lean -> (offset from chassis COM in chassis frame, body angle)
+const mR = 75, IR = 9;
+// hips: hang_back (-0.57,0.60) stand_attack (-0.28,0.85) forward_attack (-0.22,0.90) in AXLE coords (RIDER_CHAIN.md);
+// COM ~0.10 above and slightly ahead of hips; chassis COM is at axle-frame (0.05, 0.34+0.21=?) -> use offsets directly:
+function riderTarget(lean: number): { x: number; y: number; phi: number } {
+  // x forward of chassis COM, y above chassis COM, phi = body pitch relative to chassis (+ = leaning back)
+  if (lean < 0) {
+    const b = -lean;
+    return { x: -0.12 - 0.30 * b, y: 0.62 - 0.26 * b, phi: 0.55 * b };
+  }
+  return { x: -0.12 + 0.18 * lean, y: 0.62 + 0.05 * lean, phi: -0.35 * lean };
+}
+const RATE = { lin: 3.0 };
+const RIDER_RATE_ANG = 6.0;  // rad/s
+const kServo = 45000, cServo = 4200; const CAP = { f: 2600 };
+const LEAN_TQ = 180, AIR_DAMP = 20; // declared rider attitude torque (Nm per unit lean) and its rate damping (Nm s)  // N/m, N s/m, N
+const kAng = 2500, cAng = 180, tCap = 300;         // Nm/rad, Nm s, Nm
+
+interface Body { x: number; y: number; a: number; vx: number; vy: number; w: number }
+interface State {
+  c: Body; r: Body; wr: number; wf: number; tgt: { x: number; y: number; phi: number }; t: number;
+  compR: number; compF: number; prevCompR: number; prevCompF: number;
+}
+
+function init(): State {
+  const c: Body = { x: 0, y: 0.55, a: 0, vx: 0, vy: 0, w: 0 };
+  const tg = riderTarget(0);
+  const r: Body = { x: c.x + tg.x, y: c.y + tg.y, a: tg.phi, vx: 0, vy: 0, w: 0 };
+  const s: State = { c, r, wr: 0, wf: 0, tgt: { ...tg }, t: 0, compR: 0, compF: 0, prevCompR: 0, prevCompF: 0 };
+  // settle
+  for (let i = 0; i < HZ * 3; i++) tick(s, { thr: 0, brake: 0, lean: 0 });
+  s.t = 0;
+  return s;
+}
+
+const clamp = (v: number, lo: number, hi: number): number => (v < lo ? lo : v > hi ? hi : v);
+
+function tick(s: State, inp: { thr: number; brake: number; lean: number }): { N_r: number; N_f: number; air: boolean } {
+  let NR = 0, NF = 0, airAll = true;
+  // rider pose target: rate-limited toward the lean's pose (the "rider moves at most this fast")
+  const want = riderTarget(inp.lean);
+  for (let k = 0; k < SUB; k++) {
+    const tg = s.tgt;
+    const dx = want.x - tg.x, dy = want.y - tg.y;
+    const dl = Math.hypot(dx, dy);
+    const stepL = RATE.lin * dt;
+    if (dl > stepL) { tg.x += (dx / dl) * stepL; tg.y += (dy / dl) * stepL; } else { tg.x = want.x; tg.y = want.y; }
+    tg.phi += clamp(want.phi - tg.phi, -RIDER_RATE_ANG * dt, RIDER_RATE_ANG * dt);
+
+    const c = s.c, r = s.r;
+    const ca = Math.cos(c.a), sa = Math.sin(c.a);
+    // forces on chassis / rider accumulators
+    let Fcx = 0, Fcy = -mC * g, Tc = 0;
+    let Frx = 0, Fry = -mR * g, Tr = 0;
+
+    // --- suspension + tyres (massless wheels, flat ground y = 0)
+    const wheels = [
+      { ax: axR, isRear: true },
+      { ax: axF, isRear: false },
+    ];
+    for (const wdef of wheels) {
+      // axle rest point world
+      const px0 = c.x + wdef.ax.x * ca - wdef.ax.y * sa;
+      const py0 = c.y + wdef.ax.x * sa + wdef.ax.y * ca;
+      // compression along chassis-up (-sa, ca) so that wheel centre height = R
+      const upy = ca;
+      let comp = (R - py0) / Math.max(upy, 0.2);
+      const prev = wdef.isRear ? s.prevCompR : s.prevCompF;
+      let N = 0;
+      if (comp > 0) {
+        airAll = false;
+        const rate = (comp - prev) / dt;
+        let Fs = kS * comp + cS * rate;
+        if (comp > travel) Fs += kStop * (comp - travel);
+        if (Fs < 0) Fs = 0;
+        // suspension force on chassis along chassis-up at the axle point (wheel centre)
+        const wx = px0 - comp * sa, wy = py0 + comp * ca; // wheel centre
+        const fx = -Fs * sa, fy = Fs * ca;
+        Fcx += fx; Fcy += fy; Tc += (wx - c.x) * fy - (wy - c.y) * fx;
+        N = Fs * ca; // vertical ground reaction (approx)
+        // tyre: contact patch at (wx, wy - R); patch velocity of chassis-attached wheel centre
+        const rx = wx - c.x, ry = wy - c.y;
+        const vpx = c.vx - c.w * ry; // wheel centre velocity x (patch x-velocity for a non-slipping wheel = vpx - w*R handled via spin)
+        const spin = wdef.isRear ? s.wr : s.wf; // rad/s, + = rolling forward
+        const slip = spin * R - vpx; // >0 wheelspin
+        let T = Cslip * slip;
+        const Tmax = muRoad * N;
+        T = clamp(T, -Tmax, Tmax); // force on chassis at the patch, +x
+        Fcx += T; Tc += -(wy - c.y) * T; // friction reaches the chassis through the AXLE; the engine/brake reaction torque is added separately
+        // wheel spin dynamics: engine/brake torque minus T*R
+        const I = wdef.isRear ? IWr : IWf;
+        let tq = -T * R;
+        if (wdef.isRear) {
+          const v = Math.max(Math.abs(spin * R), 0.1);
+          const F = thrustAt(spin * R);
+          tq += inp.thr * F * R;
+          tq -= (1 - inp.thr) * 0.03 * Fmax * R * clamp(spin * R / 5, -1, 1); // engine braking
+          tq -= inp.brake * brakeMaxR * clamp(spin / 0.5, -1, 1);
+        } else tq -= inp.brake * brakeMaxF * clamp(spin / 0.5, -1, 1);
+        // engine/brake reaction torque acts on the chassis (the rear wheel is on the chassis)
+        if (wdef.isRear) Tc += inp.thr * thrustAt(spin * R) * R - inp.brake * brakeMaxR * clamp(spin / 0.5, -1, 1);
+        else Tc -= inp.brake * brakeMaxF * clamp(spin / 0.5, -1, 1);
+        if (wdef.isRear) s.wr += (tq / I) * dt; else s.wf += (tq / I) * dt;
+      } else {
+        comp = 0;
+        // airborne wheel: engine / brake still act on spin and react on the chassis
+        const spin = wdef.isRear ? s.wr : s.wf;
+        const I = wdef.isRear ? IWr : IWf;
+        let tq = 0;
+        if (wdef.isRear) {
+          const v = Math.max(Math.abs(spin * R), 0.1);
+          const F = thrustAt(spin * R);
+          tq += inp.thr * F * R;
+          tq -= inp.brake * brakeMaxR * clamp(spin / 0.5, -1, 1);
+        } else tq -= inp.brake * brakeMaxF * clamp(spin / 0.5, -1, 1);
+        Tc += tq;
+        if (wdef.isRear) s.wr += (tq / I) * dt; else s.wf += (tq / I) * dt;
+      }
+      if (wdef.isRear) { s.prevCompR = comp; s.compR = comp; NR = N; } else { s.prevCompF = comp; s.compF = comp; NF = N; }
+    }
+
+    // --- rider servo: pull the rider COM to its target point on the chassis (equal and opposite at that point)
+    const txw = c.x + tg.x * ca - tg.y * sa;
+    const tyw = c.y + tg.x * sa + tg.y * ca;
+    const rtx = txw - c.x, rty = tyw - c.y;
+    const vtx = c.vx - c.w * rty, vty = c.vy + c.w * rtx; // target point velocity
+    let fx = kServo * (txw - r.x) + cServo * (vtx - r.vx);
+    let fy = kServo * (tyw - r.y) + cServo * (vty - r.vy);
+    const fm = Math.hypot(fx, fy);
+    if (fm > CAP.f) { fx *= CAP.f / fm; fy *= CAP.f / fm; }
+    Frx += fx; Fry += fy;
+    Fcx -= fx; Fcy -= fy; Tc -= rtx * fy - rty * fx; // reaction on the chassis at the target point
+    // angular servo on the rider body angle relative to the chassis
+    const errA = (c.a + tg.phi) - r.a;
+    let tq = kAng * errA + cAng * (c.w - r.w);
+    tq = clamp(tq, -tCap, tCap);
+    Tr += tq; Tc -= tq;
+    // declared attitude-authority torque: lean back = nose up. Reacted on the rider's angular DOF so the drawn body swings the drawn way
+    Tc += -LEAN_TQ * inp.lean - AIR_DAMP * c.w;
+
+    // integrate (semi-implicit)
+    c.vx += (Fcx / mC) * dt; c.vy += (Fcy / mC) * dt; c.w += (Tc / IC) * dt;
+    r.vx += (Frx / mR) * dt; r.vy += (Fry / mR) * dt; r.w += (Tr / IR) * dt;
+    c.x += c.vx * dt; c.y += c.vy * dt; c.a += c.w * dt;
+    r.x += r.vx * dt; r.y += r.vy * dt; r.a += r.w * dt;
+    s.t += dt;
+  }
+  return { N_r: NR, N_f: NF, air: airAll };
+}
+
+const deg = (r: number): number => (r * 180) / Math.PI;
+const f = (x: number, d = 2): string => x.toFixed(d);
+
+function comDH(s: State): { d: number; h: number } {
+  // combined COM relative to rear contact patch
+  const c = s.c, r = s.r;
+  const ca = Math.cos(c.a), sa = Math.sin(c.a);
+  const rx = c.x + axR.x * ca - axR.y * sa - s.compR * sa;
+  const mx = (mC * c.x + mR * r.x + mW * rx + mW * (c.x + axF.x * ca - axF.y * sa)) / massTotal;
+  const my = (mC * c.y + mR * r.y + mW * R + mW * R) / massTotal;
+  return { d: mx - rx, h: my };
+}
+
+console.log('## T0 static COM geometry (d ahead of rear patch, h above ground) and critical a/g = d/h per lean');
+for (const l of [-1, -0.5, 0, 0.5, 1]) {
+  const s = init();
+  for (let i = 0; i < HZ * 2; i++) tick(s, { thr: 0, brake: 0, lean: l });
+  const { d, h } = comDH(s);
+  console.log(`lean ${l}: d ${f(d)} h ${f(h)} d/h ${f(d / h)}  pitch ${f(deg(s.c.a), 1)} compR ${f(s.compR, 3)} compF ${f(s.compF, 3)}`);
+}
+
+console.log('\n## T1 full throttle from rest, constant lean (design: Fpeak 780 N curve, Katt 180): max pitch in 6 s / loop time / speed at 3 s');
+for (const l of [-1, -0.5, -0.25, 0, 0.25, 0.5, 1]) {
+  const s = init();
+  let maxP = -1e9, tLoop = NaN, v3 = NaN, t16 = NaN, vTopSeen = 0;
+  for (let i = 0; i < HZ * 6; i++) {
+    tick(s, { thr: 1, brake: 0, lean: l });
+    maxP = Math.max(maxP, deg(s.c.a));
+    if (i === HZ * 3) v3 = s.c.vx;
+    if (Number.isNaN(t16) && s.c.vx >= 16) t16 = s.t; vTopSeen = Math.max(vTopSeen, s.c.vx);
+    if (deg(s.c.a) > 90 && Number.isNaN(tLoop)) { tLoop = s.t; break; }
+  }
+  console.log(`lean ${l}: maxPitch ${f(maxP, 1)} loop ${f(tLoop, 2)} s  v(3s) ${f(v3, 1)} m/s  t16 ${f(t16, 2)} top ${f(vTopSeen, 1)}`);
+}
+
+console.log('\n## T2 full throttle lean -1 (wheelie); when pitch crosses X deg snap lean to +1 (throttle held): pitch after 0.1/0.25/0.5/1 s, max after');
+for (const [X, L0] of [[20,-1],[30,-1],[40,-1],[50,-1],[60,-1],[30,-0.5],[40,-0.5]] as [number, number][]) {
+  const s = init();
+  let snapped = false; const tr: number[] = []; let maxA = -1e9, loop = false;
+  for (let i = 0; i < HZ * 5; i++) {
+    if (!snapped && deg(s.c.a) >= X) snapped = true;
+    tick(s, { thr: 1, brake: 0, lean: snapped ? 1 : L0 });
+    if (snapped) { tr.push(deg(s.c.a)); maxA = Math.max(maxA, deg(s.c.a)); if (deg(s.c.a) > 90) { loop = true; break; } }
+  }
+  const at = (sec: number): string => (tr.length > sec * HZ ? f(tr[Math.round(sec * HZ)]!, 1) : '-');
+  console.log(`from lean ${L0} snap at ${X}: +0.1 ${at(0.1)} +0.25 ${at(0.25)} +0.5 ${at(0.5)} +1.0 ${at(1.0)}  max ${f(maxA, 1)} ${loop ? 'LOOP' : ''}`);
+}
+
+console.log('\n## T3 lean step on the ground at 8 m/s: pitch change at 0.05/0.1/0.25/0.5 s (sign of the transient)');
+for (const l of [-1, 1]) {
+  const s = init();
+  for (let i = 0; i < HZ * 6; i++) tick(s, { thr: clamp(0.1 + 0.3 * (8 - s.c.vx), 0, 0.6), brake: 0, lean: 0 });
+  const p0 = deg(s.c.a); const tr: number[] = [];
+  for (let i = 0; i < HZ; i++) { tick(s, { thr: clamp(0.1 + 0.3 * (8 - s.c.vx), 0, 0.6), brake: 0, lean: l }); tr.push(deg(s.c.a) - p0); }
+  console.log(`lean ${l}: ${f(tr[5]!)} ${f(tr[11]!)} ${f(tr[29]!)} ${f(tr[59]!)}  min ${f(Math.min(...tr))} max ${f(Math.max(...tr))}`);
+}
+
+console.log('\n## T4 stationary hop: lean -1 + throttle 0.4 for P s (brake off), then lean +1 at rider rate; rear apex, front apex, airtime');
+function hopRun(P: number, rateLin: number, leanSnap = 1, thrPre = 0.4, thrSnap = 0.3, cap = 5000): string {
+  const saveCap = CAP.f; CAP.f = cap;
+  const s = init();
+  const y0 = s.c.y;
+  let apexC = 0, air = 0, maxP = -1e9, minP = 1e9, apexRearAxle = 0;
+  const saveRate = RATE.lin; RATE.lin = rateLin;
+  const rearAxleY = (): number => s.c.y + axR.x * Math.sin(s.c.a) + axR.y * Math.cos(s.c.a) - s.compR * Math.cos(s.c.a);
+  const frontAxleY = (): number => s.c.y + axF.x * Math.sin(s.c.a) + axF.y * Math.cos(s.c.a) - s.compF * Math.cos(s.c.a);
+  const ry0 = rearAxleY(); const fy0 = frontAxleY(); let apexFront = 0; let bothOff = 0;
+  for (let i = 0; i < HZ * 2.5; i++) {
+    const t = i / HZ;
+    const inp = t < P ? { thr: thrPre, brake: 0, lean: -1 } : t < P + 0.4 ? { thr: thrSnap, brake: 0, lean: leanSnap } : { thr: 0.2, brake: 0, lean: 0 };
+    const o = tick(s, inp);
+    apexC = Math.max(apexC, s.c.y - y0);
+    apexRearAxle = Math.max(apexRearAxle, rearAxleY() - ry0);
+    apexFront = Math.max(apexFront, frontAxleY() - fy0);
+    if (o.air) air++;
+    if (o.air) bothOff++;
+    maxP = Math.max(maxP, deg(s.c.a)); minP = Math.min(minP, deg(s.c.a));
+  }
+  RATE.lin = saveRate; CAP.f = saveCap;
+  return `apex chassis ${f(apexC, 3)} rear ${f(apexRearAxle, 3)} front ${f(apexFront, 3)} bothOff ${f(bothOff / HZ, 2)} s pitch ${f(minP, 0)}..${f(maxP, 0)}`;
+}
+for (const P of [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0]) console.log(`P ${P}: ${hopRun(P, 3.0)}`);
+console.log('-- snap speed (P 0.35):');
+for (const r of [1.0, 1.5, 2.0, 3.0, 4.0]) console.log(`rate ${r} m/s: ${hopRun(0.35, r)}`);
+console.log('-- gas through the snap (P 0.35): thrPre 0.6, thrSnap 0.6/0.8/1.0, rate 3/4.5, cap 5k/8k');
+for (const [ts, r, cap] of [[0.6,3,2500],[0.8,3,2500],[1.0,3,2500],[0.8,4.5,2500],[0.8,4.5,4000],[1.0,4.5,4000],[1.0,6,4000]] as [number,number,number][]) console.log(`thrSnap ${ts} rate ${r} cap ${cap}: ${hopRun(0.35, r, 1, 0.6, ts, cap)}`);
+console.log('-- preload sweep with gas through (thrPre 0.6, thrSnap 0.8, rate 4.5, cap 4k):');
+for (const P of [0.15,0.25,0.35,0.45,0.6,0.8]) console.log(`P ${P}: ${hopRun(P, 4.5, 1, 0.6, 0.8, 4000)}`);
+console.log('-- snap magnitude (P 0.35, rate 3):');
+for (const l of [1, 0.5, 0.25, 0, -0.5]) console.log(`snap to lean ${l}: ${hopRun(0.35, 3.0, l)}`);
+
+console.log('\n## T6 full brake from ~10 m/s at lean -1 / 0 / +1: stopping distance, min front comp, rear lifts?');
+for (const l of [-1, 0, 1]) {
+  const s = init();
+  for (let i = 0; i < HZ * 8; i++) tick(s, { thr: clamp(0.1 + 0.3 * (10 - s.c.vx), 0, 0.7), brake: 0, lean: 0 });
+  const x0 = s.c.x; let rearOff = 0; let minP = 1e9; let t = 0;
+  while (s.c.vx > 0.2 && t < HZ * 5) { const o = tick(s, { thr: 0, brake: 1, lean: l }); if (o.N_r <= 0) rearOff++; minP = Math.min(minP, deg(s.c.a)); t++; }
+  console.log(`lean ${l}: dist ${f(s.c.x - x0, 2)} m  rear off ${f(rearOff / HZ, 2)} s  min pitch ${f(minP, 1)}  t ${f(t / HZ, 2)} s`);
+}
+
+console.log('\n## T5 in the air (launched level at 8 m/s from 3 m, no ground): pitch after 0.5 s for lean -1 / +1 / throttle / brake');
+for (const mode of ['none', 'lean-1', 'lean+1', 'thr', 'brake'] as const) {
+  const s = init();
+  s.c.y += 3; s.r.y += 3; s.c.vx = 8; s.r.vx = 8; s.wr = 8 / R; s.wf = 8 / R;
+  const p0 = deg(s.c.a); let p05 = NaN;
+  for (let i = 0; i < HZ * 0.5; i++) {
+    tick(s, { thr: mode === 'thr' ? 1 : 0, brake: mode === 'brake' ? 1 : 0, lean: mode === 'lean-1' ? -1 : mode === 'lean+1' ? 1 : 0 });
+  }
+  p05 = deg(s.c.a) - p0;
+  console.log(`${mode}: Δpitch ${f(p05, 1)} deg in 0.5 s`);
+}
