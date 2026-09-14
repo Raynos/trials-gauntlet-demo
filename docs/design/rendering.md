@@ -22,7 +22,7 @@ three 0.186.0 addons used: `EffectComposer, RenderPass, UnrealBloomPass, ShaderP
 | Texture memory | 96 MB | 38.3 MB industrial, 34.8–43.9 MB other biomes | `estimateTextureMB` (all maps incl. mips, env, canvas textures) |
 | Track + obstacles | 20 calls / 80 k tris | 11 calls / 5.1 k tris (12-kind synthetic track) | `debugInfo().trackCalls/trackTris` |
 | Texture generation | 400 ms desktop, after first frame | ≈330–400 ms in headless Chromium (SwiftShader host) | `debugInfo().textureGenMs` |
-| Shader programs | 40 (raised round 5) | 33 (35 with the ghost); every library material is `fogify`'d and carries the same map set, every batch material takes vertex colours | `info.programs` |
+| Shader programs | 40 (raised round 5) | 34 on flat-test after the round-6 hero (riderCloth reuses the vertex-colour variant; +0 programs) | `info.programs` |
 | Restart → frame | 1 frame | 1 frame; no rebuild on restart | capture scene detector, scratch `restart.mts` |
 | Synced frame, SwiftShader | p95 250 ms | `high` p50 134 ms, `low` p50 75 ms (56 %) | scratch `timing.mts`, 24 frames after warm-up |
 | JS heap growth | 5 MB / 60 s | −1.8 MB | `harness:perf` |
@@ -165,15 +165,19 @@ periodic value noise on a seeded permutation table (fbm, ridged, Worley F1), so 
 Jobs (frame 2, synchronous so the frame they appear on is identical in every capture):
 dirt 512, plank 512 (rotated 90° so planks run across the track), concrete 512, rust 256
 (steelPlate/rustSteel/grate/darkSteel), corrugated 512 (containers/barrels, colour via
-`material.color` or per-instance colour), rubber 256 (tyre, normal+ORM only), paintedMetal 256
-(frame), fabric 256 (jersey/pants, normal+ORM only), rock 512, snow 256. ≈ 21 MB; total scene
+`material.color` or per-instance colour), rubber 256 (tyre, normal+ORM only), paintMetallic 256
+(frame paint, body plastics, helmet: flake + edge chips), brushed 256 (alloy/anodised/rim, normal+ORM
+only), fabric 256 (jersey/pants/gloves/riderCloth, normal+ORM only; round 6 weave amplitude ÷5 so
+sleeves stop reading as ribbed), rock 512, snow 256. ≈ 21 MB; total scene
 texture footprint incl. canvas textures (wall bays, plaques, banner, silhouettes) and the env
 is 38.8 MB.
 
 `MaterialLibrary` creates every material flat (colour only) so the first frame draws
 immediately; `generateTextures()` binds maps to the named materials and to every clone made
 via `lib.derive(name)` (ribbons need `vertexColors`, so they are derived clones). Saturation
-rule: bike frame `#1646d8`, white plastics (fenders, side panels, number plate), jersey `#ffcf1a`, helmet white, armour near-black; the environment stays low-chroma.
+rule (round 6): bike frame `#1d4fd8` + plastics `#2158e0` (metallic blue), engine/lowers black, alloy
+brushed, white only on the number plates; jersey `#f5c518`, pants dark blue, helmet blue `#1c48d4`,
+boots/gloves black; the environment stays low-chroma.
 
 **One program variant.** `MaterialLibrary.complete(m)` gives every `MeshStandardMaterial` the full
 map set (2×2 neutral white albedo / flat normal / ORM = 1 for untextured ones, plus a white
@@ -276,70 +280,100 @@ hanging plaque with the zone label (D1…A3 from the checkpoint index) angled to
 Finish: tall posts, arch, checkered `FINISH` banner, white lamp. Flame-jet emitter positions
 are the four gate corners.
 
-## 9. Bike (`bike/bikeModel.ts`)
+## 9. Bike (`bike/bikeModel.ts`) — round 6 hero rebuild
 
-Frame-local coordinates: origin = axle midpoint at static sag, calibrated from the first
-grounded frame (`bike.pos → axle midpoint` offset), so whatever physics uses as `bike.pos`
-the model sits on its wheels. Wheels are placed at the physics wheel positions; the swingarm
-aims at the rear axle, the fork lowers slide along the fork axis to the front axle, the shock
-stretches between its frame mount and 55 % along the swingarm — suspension travel is exactly
-what physics says, plus a ×1.3 visual exaggeration: the frame sinks 3 cm per unit of summed
-compression toward the wheels and pitches 0.05 rad × (rear − front compression), and the tyre
-squashes up to 10 % on load, so travel reads at 24 % frame height.
+Frame-local coordinates: origin = axle midpoint at static sag, x forward, y up, z toward the camera
+(the rider's left). `originOffset` (bike.pos → axle midpoint, calibrated on the first grounded frame;
+measured `(0.055, −0.144)` on flat-test) is public because the rider's crash hand-over needs it.
+Wheels sit at the physics wheel positions; the swingarm aims at the rear axle, the fork lowers group
+slides along the fork axis to the front axle, the shock stretches to 55 % along the swingarm and its
+**coil compresses** (`scale.y = len/len0`). Visual exaggeration is now ≤ ×1.3 of the physics travel
+(sink 3 cm per unit of summed compression, pitch 0.05 rad × (rear − front), landing overshoot ≤ 4 cm):
+physics at 1.4 g compresses to 0.8–0.93 and rebounds by itself.
 
-Read (round 4, against the reference bike): **dark-blue frame** (`framePaint 0x1a3fb8`), blue body
-plastics (`bodyPaint 0x2456d6`: tank, radiator shrouds, side panels, fenders), **black engine mass**
-(`engine 0x2c2e33`: cases, finned cylinder with an alloy head, black radiators), alloy covers / triple
-clamps / kick lever, silver forks and rims, dusty lower parts (`engineDusty 0x4a423a`: sump, fork
-sliders), and white only on two small side number plates + a small front plate. The static frame parts
-are merged into one mesh per material (`mergeStaticChildren`); swingarm, fork lowers, shock, spring and
-chain stay separate.
+Layout (m, axle coords): wheelbase 1.30, wheel r 0.34 (front 21" rim r 0.262 × 2.75" section, rear
+18" r 0.228 × 4.00"), swingarm pivot (−0.22, 0.10), head tube (0.43, 0.50)→(0.35, 0.68) collinear with
+the fork axis (24° rake), grips (0.27, 0.78) z ±0.33 (bar width 0.80), pegs (−0.14, 0.02) z ±0.20.
+Parts: **twin 40 mm spars** (tube on Catmull-Rom, head → over the engine → pivot plates), downtube,
+twin cradle tubes + bash plate in the dusted paint variant, seat rails + struts, head gusset; slim
+**tank** (rounded box) → black seat on a dark seat base → **rear mudguard**; small side panels with a
+white oval plate, small shrouds off a radiator under the head tube; **engine**: rounded crankcase,
+finned cylinder leaning forward with an alloy head cover + plug, carb + intake boot, clutch / ignition /
+sprocket covers, water pump, kick lever (far side), brake pedal (near), shifter (far), airbox under the
+seat; **exhaust**: header from the cylinder front down under the engine and back up to a black
+silencer under the seat on the camera side (`exhaustTip` (−0.83, 0.41, 0.15)); bars (brushed) with
+crossbar + pad, risers, grips + bar ends, brake/clutch perches + levers, three cables (brake hose down
+the near fork leg, clutch cable, throttle), front number plate, triple clamps; **forks**: black uppers,
+chrome stanchions with dust seals, anodised lathe sliders with blue fork guards, caliper, front fender
+(flat torus arc hugging the tyre, on the lowers); **swingarm**: tapered brushed-alloy arms, cross brace,
+axle blocks, chain guide, shock linkage; **shock**: anodised body + reservoir, chrome shaft, red coil
+(helix TubeGeometry, 7.5 turns); **chain** on the camera side (z 0.135) with the scrolling link texture,
+front sprocket + rear sprocket ring with 42 teeth; **wheels**: torus carcass + **40 rows of geometric
+knobs** (centre block / two shoulder blocks alternating) so the silhouette is knobbly, alloy rim +
+rim bed + lathe hub, wave-edged brake disc with 6 bolts (front disc near side, rear far side), 32
+crossed spokes fading to the blur disc over |spinVel| 12–30 rad/s, contact blob.
 
-Parts: twin-spar frame + downtube + subframe (`TubeGeometry` on Catmull-Rom), head tube, tank
-(lathe), seat, fenders, shrouds + radiators, side panels + plates, engine cases + sump + fins + head +
-clutch/ignition covers + kick lever, exhaust header (tube) + muffler (lathe) on the camera side, bars + grips + triple clamps,
-pegs, forks (chrome uppers, dusty sliders, caliper), swingarm + brace, shock + red spring,
-chain loop (`TubeGeometry` around the sprockets on the far side; link texture offset scrolls
-`spin·0.11/0.0127` so links move at ground speed), rear sprocket. Wheels: tyre torus (outer
-0.34, tube 0.075), rim torus, lathe hub, brake disc, 32 crossed spokes; spokes fade 1 → 0.15
-over |spinVel| 12–30 rad/s while a translucent ring fades in (0.35). All parts cast shadows.
+Materials (all `MeshStandardMaterial`, no new program): `framePaint` 0x1d4fd8 and `bodyPaint`
+0x2158e0 with the **`paintMetallic`** painter (flake in roughness, wear-noise chips go bare metal via the
+ORM, albedo only darkens at chips — no noise albedo, the round-5 "camo"), `framePaintLow` dusted blue
+for the cradle/bash plate, `engine` black, `alloyBrushed` + `anodised` + `rim` with the **`brushed`**
+painter (anisotropic scratches), `chrome`, `tyre` (rubber normal/ORM), `disc`, `shockSpring` red,
+`numberPlate`. Static frame parts merge to one mesh per material (10 draws); swingarm 3, fork upper 2,
+fork lower 2, shock 2 + coil, chain 1, per wheel tyre / rim+hub / disc+bolts(+sprocket) / spokes /
+blur (hidden when slow) / contact. Bike alone: **≈30 meshes, 31.4 k tris**.
 
-## 10. Rider (`rider/riderModel.ts`)
+## 10. Rider (`rider/riderModel.ts`) — round 6 hero rebuild
 
-Full-gear rider built from a parts kit per segment (`Segment` = group whose +y runs joint→joint,
-scaled to the IK length): helmet shell + **mirrored visor** (metalness 1, roughness 0.06 — it picks up
-the windows) + peak + chin bar + goggle strap + neck; torso capsule widened across the shoulders with
-chest plate, spine protector, shoulder pads, **shoulder caps** and a **numbered patch ("27", canvas)**
-on the back and chest; upper arms with elbow pads; forearms with a sleeve cuff, glove wrist and a
-**fist (torus) closed around the grip** + thumb; pelvis block + belt + hip spheres; thighs with knee
-armour; shins with a knee ball, shin guards, boots, soles and buckles. Joint fillers (caps, hip and knee
-spheres, cuffs) overlap the neighbouring segment so joints read as folds, not seams. Each segment is
-merged to one mesh per material. Materials: helmet white, jersey yellow, armour near-black gloss, pants
-dark blue, gloves/boots black.
+7.5-head body at 1.78 m: torso 0.50 (hips → shoulder line), head centre 0.195 above the shoulders,
+helmet shell r 0.125 (≈0.26 m tall with the chin bar), upper arm 0.30, forearm 0.27 to the **grip
+centre**, thigh 0.44, shin 0.43 to an ankle 0.09 above the peg, shoulders ±0.20, hips ±0.09.
+Segments (`Segment`: group whose +y runs joint→joint, scaled to the IK length, merged to one mesh per
+material): torso = lathe body (wider across the shoulders, 0.72 front-back) + shoulder caps + dark
+collar + neck brace torus + back hump + number patches ("27" canvas, front and back) **+ the pelvis**
+(pants block, belt, hip spheres hanging under the torso base — it tilts with the torso, so it lives in
+the torso segment); head = helmet shell + chin bar + mouth vent + goggle frame with **mirrored lens**
+(`visor`) + strap + peak + white centre stripe + rear vent + neck; upper arm = tapered lathe sleeve +
+shoulder root sphere + sleeve fold + elbow sphere; forearm = tapered sleeve ending 3 cm before the
+grip + glove cuff + cuff strap **+ the fist** (four finger tori around the bar axis, palm, thumb —
+flattened into the forearm group so the segment is one draw); thigh = lathe + hip root sphere + knee
+brace cup + hinge discs; shin = knee sphere + tall boot lathe + shin plate + three buckles; foot = a
+separate level group at the ankle (boot body, toe, sole, heel cup). Everything cloth-like (jersey
+0xf5c518, pants 0x1c2a4e, gloves, boots, sole, armour, buckles) is one **vertex-coloured
+`riderCloth`** material (fabric normal/ORM, the existing vertex-colour program variant); helmet, visor,
+helmet trim and the number patch keep their own materials. Posed rider: **16 meshes, 19.5 k tris**.
+`util/merge.ts` now keeps the `color` attribute when every part of a slot carries it.
 
-**Hands stay on the grips at every lean.** If the shoulder–grip distance exceeds 98.5 % of arm reach,
-the whole upper body (hips + shoulders) slides toward the bars along that line before the IK runs, so
-the arms lock straight instead of the IK letting go of the grips (round 3 lost the grips hanging back).
+**Always standing on the pegs** (Trials riders never sit; the round-5 seated idle is gone). Pose =
+physics' drawn chain (physics.md §7.7) evaluated in frame-local coords: hips
+`(−0.12 − 0.28·back + 0.14·fwd − 0.06·crouch, 0.74 − 0.28·crouch)`, torso from frame-up
+`0.62 + torsoPitch + 0.3·fwd + 0.35·crouch − 0.1·back − 0.1·armExtend`, head at `0.45·torsoA − 0.1`,
+**no world-level counter-rotation** (the ragdoll head carries none). Two departures from the chain,
+both requested of physics: (1) **hanging off the back** the chain's `−0.5·back − 0.35·armExtend` lays
+the torso flat and puts the shoulders 1.1 m from the grips, so the shoulders are pinned at arm's reach
+from the grip (`φ = 0.32 + 0.15·crouch` above the bar line, weight `back`) with the torso near the attack
+angle and the hips hanging from them — butt over the rear fender, arms straight; (2) the crouch drops
+0.28 m / folds 0.35 rad (chain 0.40 / 0.50), which keeps the chest above the bars. Safety clamps:
+hips never beyond thigh+shin from the ankles; shoulders never beyond 98.5 % of arm reach from the
+grip (the whole upper body slides toward the bars) nor closer than 0.30 m (the IK degenerates when a
+folded crouch puts the shoulder on the grip). Arms: two-bone IK shoulders → grip centre, elbows up and
+out (z ±0.30); the forearm segment always ends on the grip, so **hands are on the grips in every
+posed frame** (`debug.armStretch` = forearm actual/nominal length: 1.006 max over a 690-frame run,
+the 3D z-offset). Legs: hips → ankles, knees forward at z ±0.16, boots level. The ≈80 ms pose lead
+from round 4 is kept.
 
-Pose (`poseRider`): a smoothed `stand` factor (half-life 0.25 s from tSim) is 1 when moving
-> 1.2 m/s, airborne, crouching or leaning hard, else 0 (seated at idle). Hips
-`x = pegs.x − 0.02 − 0.28·back − 0.3·armExtend + 0.14·fwd − 0.06·crouch − 0.16·(1−stand)`,
-`y = lerp(seat + 0.1, pegs.y + 0.76 − 0.4·crouch, stand)`. Torso from vertical
-`0.62·stand + 0.3·(1−stand) + torsoPitch + 0.3·fwd + 0.5·crouch − 0.5·back − 0.35·armExtend`
-(attack position standing; arms go straight naturally when the hips are back because the IK
-saturates at full reach; a crouch drops the hips and folds the torso). Head continues the torso at
-45 % and **counter-rotates to stay level in the world** (±25°). Pose inputs (`lean`, `torsoPitch`,
-`armExtend`, `crouch`) get an ≈80 ms **lead** (round 4: `target + v·0.08·1.15`, velocity smoothed with a
-40 ms half-life) because physics' `RiderPose` already lags input by ≈0.28 s t90 — the round-1 240 ms
-second-order spring double-lagged. Wheel spin and the spoke→disc blur come straight from
-`state.wheels.*.spin/spinVel`, so a stalled crashed bike stops its wheels on screen. Proportions: head r
-0.108 (≈7.5 heads), torso capsule r 0.105 × z 1.45, knees pulled to z ±0.15 to grip the tank,
-hips 6 cm forward when standing so the elbows bend. Arms: 2-bone IK shoulders → grips with the elbow **above** the shoulder–hand line and out of
-plane (motocross elbows-up); legs: hips → pegs, knees forward.
-
-Ragdoll: while `state.ragdoll` is non-null the seated hierarchy hides and the seven physics
-bodies are drawn exactly at `pos/angle` (arm and leg bodies drawn twice at z ±0.14). The
-render-side Verlet ragdoll from the earlier draft is **cut** per CONTRACT §2.3.
+**Ragdoll hand-over.** `poseRagdoll` draws each body with local +y = `(−sin a, cos a)` (physics
+convention; up for torso/pelvis/head, distal→proximal for limbs — round 5 drew `(cos a, sin a)`, a 90°
+pop), arms/legs twice at z ±0.15, fists at the forearm ends and boots at the shin ends. The frame
+builder now **interpolates ragdoll bodies** like every other transform (`FrameBuilder.ragdoll`). On
+the spawn frame the last posed joints (kept frame-local, carried to world with the *current* frame
+matrix so the bike's own travel is not counted) are compared with the physics bodies:
+`debug.ragdollResidual` (torso/pelvis endpoints) and `debug.ragdollDetail` (every body). The drawn
+endpoints blend posed → physics over 2 frames for a residual < 10 cm, 3 / 4 / 5 frames at 20 / 30 / 30+
+cm. Measured on flat-test loop-outs: angles coincide (head Δ 0.05–0.27 rad), positions differ by a
+rigid offset of **0.28–0.48 m** = the physics chain being expressed in `bike.pos` coordinates without
+the axle-origin offset (`originOffset` (0.055, −0.144)) plus the render's reach slide / pinned
+shoulders at full lean-back (the chain's shoulders are 1.1 m from the grips there). The blend hides
+it in 4–5 frames; the fix is on the physics side (below).
 
 ## 10a. Ghost (`index.ts setGhost`, CONTRACT §2.7)
 
@@ -406,10 +440,17 @@ Rng: `core/rng` sfc32 reseeded per burst with `track.seed ^ tick ^ salt`.
   frame tops out at the window heads (pitch 11°). The reference gets trusses in frame because its tracks
   hang higher in the hall; a track-authored `high34`/`low` key does the same here.
 - Light shafts are additive quads (no occlusion by the bike or containers); dust motes are unlit points.
-- Rider is still a primitive kit (capsules + fold rings), not a proportioned segmented body: no fingers
-  beyond the fist torus, no cloth, helmet has no decals; the jersey number is a flat patch.
-- Bike is still the primitive build: no cables, no tread pattern (normal map only), no edge-wear or
-  anodised materials, no per-surface mud/dust accumulation map (only the static dusty lower materials).
+- Rider (round 6): still a segment kit — joints are overlapping spheres, not skinned; fingers are four
+  tori, no cloth wrinkles beyond a fold ring, no helmet decals; the forearm/fist reads chunky at 40 %.
+- Bike (round 6): the rear plastics (side panel + seat base + mudguard) still read as one blue slab;
+  no decals/sponsor graphics on the tank and plates; tyre knobs are boxes (no sipes); the edge wear is
+  a wrap-around noise, not curvature-driven; no per-run mud accumulation.
+- Hero draw calls: ≈47 meshes per pass (bike 30 incl. 2 contact blobs + 2 spoke meshes, rider 16) against
+  the 40 target; the remaining cuts are the wheel disc/bolt/hub materials (−4) and a vertex-coloured
+  dark-metal material for the bike's black parts (−4).
+- Physics chain mismatch (request to physics): express the drawn chain in the render's axle-origin
+  frame (`bike.pos` → axle midpoint offset (0.055, −0.144)), adopt the pinned-shoulder hang-off and the
+  0.28 m / 0.35 rad crouch, and add the reach slide; then the hand-over residual drops to the 80 ms lead.
 - Canyon strata are boxes with a banded albedo (no erosion silhouette); heat haze is not implemented.
   nightCity buildings are still boxes with a window texture; wet-asphalt reflections are env-only
   (the neon does not reflect). Foundry remains a red wash in most frames — the hall's orange panes and the

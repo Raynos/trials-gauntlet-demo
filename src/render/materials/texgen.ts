@@ -357,6 +357,30 @@ export const painters = {
     o.ao = 1;
   },
 
+  /** Metallic paint (bike frame / plastics): flake sparkle in roughness, chips at the edges of the
+   *  wear noise go bare-metal (metal 1, rough up) — no albedo noise so the paint reads smooth. */
+  paintMetallic(u: number, v: number, n: Noise, o: Pixel): void {
+    const flake = n.fbm(u * 40, v * 40, 90, 2);
+    const wear = n.fbm(u, v, 5, 3, 0.55);
+    const chip = clamp01((wear - 0.66) * 8);
+    o.r = o.g = o.b = 1 - chip * 0.55;
+    o.h = 0.5 - chip * 0.25 + (flake - 0.5) * 0.02;
+    o.rough = 0.3 + (flake - 0.5) * 0.12 + chip * 0.3;
+    o.metal = 0.45 + chip * 0.55;
+    o.ao = 1;
+  },
+
+  /** Brushed / cast alloy: fine anisotropic scratches along u, no colour. */
+  brushed(u: number, v: number, n: Noise, o: Pixel): void {
+    const scratch = n.fbm(u * 1.5, v * 60, 40, 2);
+    const cast = n.fbm(u, v, 9, 3);
+    o.r = o.g = o.b = 0.94 + (cast - 0.5) * 0.12;
+    o.h = 0.5 + (scratch - 0.5) * 0.08;
+    o.rough = 0.4 + (scratch - 0.5) * 0.2 + (cast - 0.5) * 0.1;
+    o.metal = 1;
+    o.ao = 1;
+  },
+
   /** Knobbly tyre: tread blocks, u around the tyre, v across. */
   rubber(u: number, v: number, n: Noise, o: Pixel): void {
     const bu = u * 48;
@@ -384,11 +408,11 @@ export const painters = {
 
   /** Woven jersey / leather for the rider. */
   fabric(u: number, v: number, n: Noise, o: Pixel): void {
-    const weave = 0.5 + 0.25 * Math.sin(u * 600) + 0.25 * Math.sin(v * 600);
+    const weave = 0.5 + 0.25 * Math.sin(u * 900) + 0.25 * Math.sin(v * 900);
     const fold = n.fbm(u, v, 5, 3);
     o.r = o.g = o.b = 0.9 + (fold - 0.5) * 0.2;
-    o.h = weave * 0.3 + fold * 0.2;
-    o.rough = 0.8 + weave * 0.15;
+    o.h = weave * 0.06 + fold * 0.12; // subtle: the round-5 weave read as ribbing on the sleeves
+    o.rough = 0.82 + weave * 0.1;
     o.ao = 1;
   },
 

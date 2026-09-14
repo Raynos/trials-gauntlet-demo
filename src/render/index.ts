@@ -136,8 +136,8 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   /** Debug access for harness scripts (not part of the contract). */
-  get debug(): { scene: THREE.Scene; renderer: THREE.WebGLRenderer; lighting: LightingRig; post: PostChain; lib: MaterialLibrary; rig: CameraRig; THREE: typeof THREE } {
-    return { scene: this.scene, renderer: this.renderer, lighting: this.lighting, post: this.post, lib: this.lib, rig: this.rig, THREE };
+  get debug(): { scene: THREE.Scene; renderer: THREE.WebGLRenderer; lighting: LightingRig; post: PostChain; lib: MaterialLibrary; rig: CameraRig; THREE: typeof THREE; bike: BikeModel; rider: RiderModel } {
+    return { scene: this.scene, renderer: this.renderer, lighting: this.lighting, post: this.post, lib: this.lib, rig: this.rig, THREE, bike: this.bike, rider: this.rider };
   }
 
   get framesRendered(): number {

@@ -173,7 +173,9 @@ export class FrameBuilder {
     f.crashed = cur.faulted === 'crash' || cur.faulted === 'hazard' || cur.ragdoll !== null;
     f.finished = cur.finished && cur.faulted === null;
     f.faulted = cur.faulted !== null;
-    f.ragdoll = cur.ragdoll ?? null;
+    // Ragdoll bodies interpolate like everything else (both states ragdolling, same body list);
+    // on the spawn frame only `cur` exists and the rider model blends from its last posed frame.
+    f.ragdoll = this.ragdoll(prev.ragdoll ?? null, cur.ragdoll ?? null, a);
     f.seesaws = cur.seesaws ?? [];
     f.drums = cur.drums ?? [];
     f.checkpoint = cur.checkpoint;
@@ -181,6 +183,25 @@ export class FrameBuilder {
     this.prev = cur;
     this.firstFrame = false;
     return f;
+  }
+
+  private readonly ragPool: RagdollBody[] = [];
+  private ragdoll(p: RagdollBody[] | null, c: RagdollBody[] | null, a: number): RagdollBody[] | null {
+    if (!c) return null;
+    if (!p || p.length !== c.length || a >= 1) return c;
+    const out = this.ragPool;
+    for (let i = 0; i < c.length; i++) {
+      const cb = c[i]!;
+      const pb = p[i]!;
+      if (pb.id !== cb.id) return c;
+      const o = out[i] ?? (out[i] = { id: cb.id, pos: { x: 0, y: 0 }, angle: 0 });
+      o.id = cb.id;
+      o.pos.x = lerp(pb.pos.x, cb.pos.x, a);
+      o.pos.y = lerp(pb.pos.y, cb.pos.y, a);
+      o.angle = lerpAngle(pb.angle, cb.angle, a);
+    }
+    out.length = c.length;
+    return out;
   }
 
   private wheel(out: WheelView, p: PhysicsState['wheels']['rear'], c: PhysicsState['wheels']['rear'], a: number): void {

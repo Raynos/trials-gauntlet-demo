@@ -79,32 +79,43 @@ export class MaterialLibrary {
     std('plaqueInk', { color: 0x141416, roughness: 0.6 });
     std('hazardTape', { color: 0xe8b21c, roughness: 0.6 });
     std('safetyGreen', { color: 0x2e8b4a, roughness: 0.7 });
-    // Bike
-    std('framePaint', { color: 0x1a3fb8, roughness: 0.42, metalness: 0.15 }); // dark blue frame
-    std('bodyPaint', { color: 0x2456d6, roughness: 0.35, metalness: 0.05 }); // shrouds / fenders / side panels
-    std('plastic', { color: 0xf2f2f0, roughness: 0.5 }); // small number plates only
-    std('chrome', { color: 0xf0f0f0, roughness: 0.14, metalness: 1.0 });
-    std('engine', { color: 0x2c2e33, roughness: 0.6, metalness: 0.85 }); // black engine mass
-    std('engineDusty', { color: 0x4a423a, roughness: 0.85, metalness: 0.4 }); // dust build-up on the lower parts
-    std('alloy', { color: 0x9a9ca2, roughness: 0.4, metalness: 0.95 }); // covers, hubs, triple clamps
+    // Bike (round 6 hero): metallic blue frame + plastics, black engine mass, brushed alloy,
+    // anodised black lowers, chrome stanchions, steel exhaust. No noise albedo on paint.
+    std('framePaint', { color: 0x1d4fd8, roughness: 0.38, metalness: 0.55 }); // metallic blue spars
+    std('framePaintLow', { color: 0x2f4a9a, roughness: 0.62, metalness: 0.4 }); // cradle / bash plate: dusted
+    std('bodyPaint', { color: 0x2158e0, roughness: 0.32, metalness: 0.08 }); // tank, seat base, fenders, shrouds, guards
+    std('plastic', { color: 0xf2f2f0, roughness: 0.5 });
+    std('chrome', { color: 0xe8e9ec, roughness: 0.12, metalness: 1.0 }); // stanchions, shock shaft
+    std('engine', { color: 0x1e1f23, roughness: 0.55, metalness: 0.7 }); // black engine mass
+    std('engineDusty', { color: 0x3a3630, roughness: 0.85, metalness: 0.4 }); // lower cases: dust build-up
+    std('alloy', { color: 0x9a9ca2, roughness: 0.4, metalness: 0.95 }); // hubs, carb, levers
+    std('alloyBrushed', { color: 0xb4b6ba, roughness: 0.48, metalness: 0.9 }); // swingarm, clamps, covers, bars
+    std('anodised', { color: 0x1b1c20, roughness: 0.3, metalness: 0.85 }); // fork lowers, shock body, axle blocks
     std('blackMatte', { color: 0x151517, roughness: 0.85, metalness: 0.1 });
     std('blackGloss', { color: 0x101012, roughness: 0.35, metalness: 0.2 });
-    std('tyre', { color: 0x101011, roughness: 0.92 });
-    std('rim', { color: 0xdcdcdc, roughness: 0.25, metalness: 1.0 });
+    std('tyre', { color: 0x141415, roughness: 0.92 });
+    std('rim', { color: 0xc9cbd0, roughness: 0.3, metalness: 1.0 });
     std('spoke', { color: 0xcfcfcf, roughness: 0.3, metalness: 1.0 });
-    std('seat', { color: 0x1a1a1c, roughness: 0.95 });
-    std('exhaust', { color: 0xd0d2d6, roughness: 0.2, metalness: 1.0 });
-    std('shockSpring', { color: 0xd42a1e, roughness: 0.4, metalness: 0.5, side: THREE.DoubleSide });
+    std('disc', { color: 0xa8aaae, roughness: 0.35, metalness: 1.0, side: THREE.DoubleSide });
+    std('seat', { color: 0x1c1c1e, roughness: 0.95 });
+    std('exhaust', { color: 0x8e8f93, roughness: 0.38, metalness: 0.95 }); // heat-dulled steel header
+    std('silencer', { color: 0x2a2b2e, roughness: 0.45, metalness: 0.6 }); // black silencer can
+    std('shockSpring', { color: 0xd42a1e, roughness: 0.4, metalness: 0.5 });
     std('numberPlate', { color: 0xfafafa, roughness: 0.5 });
-    // Rider
-    std('jersey', { color: 0xffcf1a, roughness: 1.0, metalness: 0 });
-    std('pants', { color: 0x1a2340, roughness: 0.85 });
+    // Rider: yellow jersey, dark blue pants, black boots/gloves, blue helmet, mirrored visor.
+    std('jersey', { color: 0xf5c518, roughness: 1.0, metalness: 0 });
+    std('pants', { color: 0x1c2a4e, roughness: 0.9 });
     std('armour', { color: 0x24262b, roughness: 0.45, metalness: 0.05 });
-    std('boots', { color: 0x151517, roughness: 0.6 });
-    std('gloves', { color: 0x1f2126, roughness: 0.8 });
-    std('helmet', { color: 0xf7f7f7, roughness: 0.22, metalness: 0.05 });
+    std('boots', { color: 0x131315, roughness: 0.55 });
+    std('bootSole', { color: 0x2c2a26, roughness: 0.9 });
+    std('gloves', { color: 0x1c1e22, roughness: 0.8 });
+    std('helmet', { color: 0x1c48d4, roughness: 0.22, metalness: 0.25 });
+    std('helmetTrim', { color: 0xf4f4f2, roughness: 0.3 });
     std('visor', { color: 0x1a2028, roughness: 0.06, metalness: 1.0 }); // mirrored: catches the sky/windows
     std('jerseyNumber', { color: 0xffffff, roughness: 0.9 });
+    // One vertex-coloured cloth material for the rider kit (jersey / pants / gloves / boots /
+    // armour tints baked per vertex) so every limb segment is a single draw.
+    std('riderCloth', { color: 0xffffff, roughness: 0.9, vertexColors: true });
     std('skin', { color: 0xc9946a, roughness: 0.7 });
     for (const m of this.mats.values()) this.complete(m);
   }
@@ -178,9 +189,9 @@ export class MaterialLibrary {
       { painter: 'rust', size: 256, strength: 1.2, targets: ['steelPlate', 'rustSteel', 'grate', 'darkSteel'], noAlbedo: false },
       { painter: 'corrugated', size: 512, strength: 2.2, targets: ['container', 'containerRed', 'containerBlue', 'barrelRed', 'barrelWhite', 'barrelBlue'] },
       { painter: 'rubber', size: 256, strength: 2.5, targets: ['tyre'], noAlbedo: true },
-      { painter: 'paintedMetal', size: 256, strength: 0.8, targets: ['framePaint'] },
-      { painter: 'paintedMetal', size: 256, strength: 0.5, targets: ['bodyPaint'], noAlbedo: true }, // smooth blue plastics: the mottled albedo read as camo in the hero crops
-      { painter: 'fabric', size: 256, strength: 0.8, targets: ['jersey', 'pants'], noAlbedo: true },
+      { painter: 'paintMetallic', size: 256, strength: 0.6, targets: ['framePaint', 'framePaintLow', 'bodyPaint', 'helmet'] }, // flake + edge chips (albedo only darkens at chips)
+      { painter: 'brushed', size: 256, strength: 0.5, targets: ['alloyBrushed', 'anodised', 'exhaust', 'rim'], noAlbedo: true },
+      { painter: 'fabric', size: 256, strength: 0.8, targets: ['jersey', 'pants', 'gloves', 'riderCloth'], noAlbedo: true },
       { painter: 'rock', size: 512, strength: 2.0, targets: ['rock'] },
       { painter: 'snow', size: 256, strength: 1.5, targets: ['snow'] },
     ];
