@@ -15,6 +15,14 @@ export class PropBatch {
     readonly shadows = true,
   ) {
     fogify(material);
+    // Every batch material takes vertex colours (AO bakes); geometry without a
+    // colour attribute falls back to white, so this costs nothing and keeps the
+    // instanced program variants to two (with / without instance colour).
+    const std = material as THREE.MeshStandardMaterial;
+    if (std.isMeshStandardMaterial && !std.vertexColors) {
+      std.vertexColors = true;
+      std.needsUpdate = true;
+    }
   }
 
   add(x: number, y: number, z: number, ry = 0, scale = 1, color: THREE.Color | number | null = null, rz = 0, sy = scale, sz = scale): void {
@@ -111,6 +119,11 @@ export function palletGeometry(): THREE.BufferGeometry {
   return mergeGeometries(parts, false)!;
 }
 
+/** Low-poly single pallet (3 boards + 2 stringers), 1.2 × 0.144 × 0.8, origin bottom centre. */
+export function palletLowGeometry(): THREE.BufferGeometry {
+  return palletStackGeometry(1);
+}
+
 /** Low-poly 3-high pallet stack for deck supports: 3 boards + 2 stringers per layer, origin bottom centre. */
 export function palletStackGeometry(layers = 3): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
@@ -133,11 +146,11 @@ export function palletStackGeometry(layers = 3): THREE.BufferGeometry {
 /** 200 l oil drum, origin bottom centre. */
 export function drumGeometry(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
-  const body = new THREE.CylinderGeometry(0.29, 0.29, 0.88, 20, 1, false);
+  const body = new THREE.CylinderGeometry(0.29, 0.29, 0.88, 14, 1, false);
   body.translate(0, 0.44, 0);
   parts.push(body);
   for (const y of [0.3, 0.58]) {
-    const rib = new THREE.TorusGeometry(0.295, 0.016, 6, 20);
+    const rib = new THREE.TorusGeometry(0.295, 0.016, 4, 14);
     rib.rotateX(Math.PI / 2);
     rib.translate(0, y, 0);
     parts.push(rib);
@@ -174,17 +187,42 @@ export function columnGeometry(): THREE.BufferGeometry {
   return mergeGeometries(parts, false)!;
 }
 
-/** Roof truss segment 12 m long: top/bottom chords + diagonals, centred. */
-export function trussGeometry(): THREE.BufferGeometry {
+/**
+ * Bake a cheap ambient-occlusion term into a vertex colour attribute: darker
+ * toward the base (contact with the floor), darker on downward-facing faces
+ * (undersides), full brightness on top faces. Multiplies any instance colour.
+ */
+export function bakeAO(g: THREE.BufferGeometry, height: number, strength = 0.45): THREE.BufferGeometry {
+  const pos = g.getAttribute('position');
+  if (!g.getAttribute('normal')) g.computeVertexNormals();
+  const nrm = g.getAttribute('normal');
+  const n = pos.count;
+  const c = new Float32Array(n * 3);
+  const h = Math.max(0.05, height * 0.4);
+  for (let i = 0; i < n; i++) {
+    const t = Math.min(1, Math.max(0, pos.getY(i) / h));
+    let ao = 1 - strength * (1 - t * t * (3 - 2 * t));
+    const ny = nrm.getY(i);
+    if (ny < -0.5) ao *= 0.55;
+    else if (ny > 0.5) ao = Math.min(1, ao + 0.15);
+    c[i * 3] = ao;
+    c[i * 3 + 1] = ao;
+    c[i * 3 + 2] = ao;
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+  return g;
+}
+
+/** Roof truss `L` m long along x: top/bottom chords + diagonals, centred. */
+export function trussGeometry(L = 12): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
-  const L = 12;
   const H = 1.1;
   for (const y of [0, H]) {
     const c = new THREE.BoxGeometry(L, 0.1, 0.1);
     c.translate(0, y, 0);
     parts.push(c);
   }
-  const n = 10;
+  const n = Math.max(4, Math.round(L / 2.4));
   for (let i = 0; i < n; i++) {
     const x0 = -L / 2 + (i * L) / n;
     const x1 = x0 + L / n;
@@ -196,22 +234,59 @@ export function trussGeometry(): THREE.BufferGeometry {
   return mergeGeometries(parts, false)!;
 }
 
-/** Sodium lamp: conical shade + bright disc, hanging from a 1 m cable, origin at cable top. */
+/** Industrial high-bay lamp: conical shade + short stem, origin at the stem top (the chain hangs above). */
 export function lampGeometry(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
-  const cable = new THREE.CylinderGeometry(0.01, 0.01, 1.0, 5);
-  cable.translate(0, -0.5, 0);
-  parts.push(cable);
-  const shade = new THREE.ConeGeometry(0.45, 0.35, 16, 1, true);
-  shade.translate(0, -1.15, 0);
+  const stem = new THREE.CylinderGeometry(0.03, 0.03, 0.3, 6);
+  stem.translate(0, -0.15, 0);
+  parts.push(stem);
+  const shade = new THREE.ConeGeometry(0.55, 0.42, 18, 1, true);
+  shade.translate(0, -0.5, 0);
   parts.push(shade);
+  const ring = new THREE.TorusGeometry(0.55, 0.03, 6, 18);
+  ring.rotateX(Math.PI / 2);
+  ring.translate(0, -0.7, 0);
+  parts.push(ring);
   return mergeGeometries(parts, false)!;
 }
 
 export function lampBulbGeometry(): THREE.BufferGeometry {
-  const disc = new THREE.CylinderGeometry(0.28, 0.28, 0.04, 16);
-  disc.translate(0, -1.31, 0);
+  const disc = new THREE.CylinderGeometry(0.36, 0.36, 0.05, 18);
+  disc.translate(0, -0.68, 0);
   return disc;
+}
+
+/** Hanging chain link run: unit height along -y from the origin (scale y to the drop). */
+export function chainGeometry(): THREE.BufferGeometry {
+  const g = new THREE.CylinderGeometry(0.025, 0.025, 1, 6);
+  g.translate(0, -0.5, 0);
+  return g;
+}
+
+/** Crane hook block: sheave housing + hook, origin at the cable end. */
+export function hookBlockGeometry(): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+  const block = new THREE.BoxGeometry(0.5, 0.6, 0.3);
+  block.translate(0, -0.3, 0);
+  parts.push(block);
+  const hook = new THREE.TorusGeometry(0.22, 0.05, 6, 12, Math.PI * 1.4);
+  hook.rotateZ(Math.PI * 0.8);
+  hook.translate(0, -0.85, 0);
+  parts.push(hook);
+  return mergeGeometries(parts, false)!;
+}
+
+/** Steel I-beam along x, length 1 (scale x), origin centre. */
+export function beamGeometry(w = 0.3, h = 0.5): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+  const web = new THREE.BoxGeometry(1, h - 0.06, 0.03);
+  parts.push(web);
+  for (const y of [-h / 2 + 0.03, h / 2 - 0.03]) {
+    const f = new THREE.BoxGeometry(1, 0.06, w);
+    f.translate(0, y, 0);
+    parts.push(f);
+  }
+  return mergeGeometries(parts, false)!;
 }
 
 /** Shelving rack bay 2.7 m wide, 4 m tall, 1.1 deep: uprights + 3 shelves. */

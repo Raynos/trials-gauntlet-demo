@@ -165,6 +165,16 @@ export class LightingRig {
   private frustumW = 28;
   private readonly sunDir = new THREE.Vector3(0, 1, 0);
   biome: Biome | null = null;
+  private floorY = 0;
+
+  /** World y of the ground floor under the track; the floor fog sits on it. */
+  setFloor(y: number): void {
+    this.floorY = y;
+    const b = this.biome;
+    if (!b) return;
+    const ff = b.floorFog;
+    fogUniforms.uFogFloor.value.set((ff?.h0 ?? 0) + y, ff?.hs ?? 1, ff?.density ?? 0, b.fogTiers[1]);
+  }
 
   constructor(renderer: THREE.WebGLRenderer, private readonly scene: THREE.Scene) {
     installFogChunks();
@@ -208,8 +218,7 @@ export class LightingRig {
     fog.color.setHex(b.fogColor);
     fog.near = b.fogTiers[0];
     fog.far = b.fogTiers[2];
-    const ff = b.floorFog;
-    fogUniforms.uFogFloor.value.set(ff?.h0 ?? 0, ff?.hs ?? 1, ff?.density ?? 0, b.fogTiers[1]);
+    this.setFloor(this.floorY);
 
     this.sky?.dispose();
     this.envRT?.dispose();

@@ -181,3 +181,16 @@ export function buildRibbons(track: CompiledTrack, lib: MaterialLibrary): TrackM
   }
   return { group, triangles, drawCalls };
 }
+
+/**
+ * Hall floor height for interior biomes: the track is built up on containers and
+ * pallets ≈3 m above the concrete (the reference "elevated in a huge hall" read),
+ * so the floor recedes below the deck and the camera looks down into the space.
+ * Exterior biomes keep the terrain right under the apron.
+ */
+export const HALL_DROP = 0.42 + 2.59;
+export function groundFloorY(profile: readonly Vec2[], interior: boolean): number {
+  let minY = Infinity;
+  for (const p of profile) minY = Math.min(minY, p.y);
+  return minY - (interior ? HALL_DROP : 0.42);
+}

@@ -11,7 +11,7 @@ import { biomeFor, type Biome } from './biomes';
 import { BikeModel } from './bike/bikeModel';
 import { CameraRig } from './camera/rig';
 import { FrameBuilder } from './frame';
-import { LightingRig } from './lighting/environment';
+import { LightingRig, fogify } from './lighting/environment';
 import { MaterialLibrary } from './materials/library';
 import { Emitters } from './particles/emitters';
 import { PostChain } from './post/chain';
@@ -19,7 +19,7 @@ import { RiderModel } from './rider/riderModel';
 import { buildBiomeKit } from './world/biomeKit';
 import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
-import { profileY } from './world/track';
+import { groundFloorY, profileY } from './world/track';
 import { buildRideSurfaces } from './world/deck';
 
 export interface GameRenderer {
@@ -38,6 +38,8 @@ export interface GameRenderer {
   setQuality(tier: QualityTier): void;
   camera(): CameraDebug;
   setRunInfo(info: { runTime: number; phase: GamePhase }): void;
+  /** PB ghost: translucent desaturated bike+rider following `state`; null hides it. */
+  setGhost?(state: PhysicsState | null): void;
 }
 
 export interface ThreeRendererOptions {
@@ -91,6 +93,11 @@ export class ThreeRenderer implements GameRenderer {
   private readonly syncPixel = new Uint8Array(4);
   private readonly tmp = new THREE.Vector3();
   private lastCheckpoint = -1;
+  // Ghost (CONTRACT §2.7 setGhost): a second bike+rider with ghosted materials, no
+  // shadow, no particles, no contact blobs; nothing else in the scene reads it.
+  private ghost: { root: THREE.Group; bike: BikeModel; rider: RiderModel; mats: THREE.Material[] } | null = null;
+  private ghostState: PhysicsState | null = null;
+  private readonly ghostFrames = new FrameBuilder();
   /** Wall-clock ms spent generating textures (diagnostic only). */
   textureGenMs = 0;
 
@@ -148,6 +155,7 @@ export class ThreeRenderer implements GameRenderer {
     this.clearWorld();
     this.biome = biomeFor(track.def.meta?.biome);
     this.lighting.apply(this.biome);
+    this.lighting.setFloor(groundFloorY(track.def.profile, this.biome.interior));
     this.post.applyBiome(this.biome);
     this.rig.setKeys(track.def.meta?.camera);
 
@@ -194,12 +202,67 @@ export class ThreeRenderer implements GameRenderer {
   onEvent(e: GameEvent): void {
     this.emitters.onEvent(e);
     if (e.type === 'finish') this.flashT = this.lastTSim;
-    if (e.type === 'restart') this.frames.invalidate();
+    if (e.type === 'restart') {
+      this.frames.invalidate();
+      this.ghostFrames.invalidate();
+    }
   }
 
   setRunInfo(info: { runTime: number; phase: GamePhase }): void {
     this.phase = info.phase;
     this.rig.setPhase(info.phase);
+  }
+
+  setGhost(state: PhysicsState | null): void {
+    this.ghostState = state;
+    if (state && !this.ghost) this.ghost = this.buildGhost();
+    if (!state) {
+      this.ghostFrames.invalidate();
+      if (this.ghost) this.ghost.root.visible = false;
+    }
+  }
+
+  private buildGhost(): NonNullable<ThreeRenderer['ghost']> {
+    const bike = new BikeModel(this.lib);
+    const rider = new RiderModel(this.lib);
+    rider.attach(bike);
+    bike.root.remove(bike.rear.contact, bike.front.contact);
+    const root = new THREE.Group();
+    root.name = 'ghost';
+    root.add(bike.root, rider.root);
+    const cache = new Map<THREE.Material, THREE.Material>();
+    const mats: THREE.Material[] = [];
+    const grey = new THREE.Color(0x9aa4b4);
+    root.traverse((o) => {
+      const m = o as THREE.Mesh;
+      m.castShadow = false;
+      m.receiveShadow = false;
+      if (!m.isMesh) return;
+      const src = m.material as THREE.Material;
+      let g = cache.get(src);
+      if (!g) {
+        const std = src as THREE.MeshStandardMaterial;
+        g = std.isMeshStandardMaterial && std.name ? this.lib.derive(std.name) : fogify(src.clone());
+        g.transparent = true;
+        g.opacity = 0.35;
+        g.depthWrite = false;
+        const gs = g as THREE.MeshStandardMaterial;
+        if (gs.isMeshStandardMaterial) {
+          gs.vertexColors = false; // same define set as the wheel's spoke material → no new program
+          gs.color.lerp(grey, 0.65);
+          gs.emissive.setHex(0x000000);
+          gs.metalness = Math.min(gs.metalness, 0.3);
+        } else if ((g as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
+          (g as THREE.MeshBasicMaterial).color.lerp(grey, 0.65);
+        }
+        cache.set(src, g);
+        mats.push(g);
+      }
+      m.material = g;
+      m.renderOrder = -1;
+    });
+    this.scene.add(root);
+    return { root, bike, rider, mats };
   }
 
   setQuality(tier: QualityTier): void {
@@ -240,6 +303,17 @@ export class ThreeRenderer implements GameRenderer {
 
     this.bike.update(f);
     this.rider.update(f);
+    // Ghost: same interpolation, its own state history; capped at 35 % opacity.
+    if (this.ghost) {
+      const gs = this.ghostState;
+      this.ghost.root.visible = gs !== null;
+      if (gs) {
+        const gf = this.ghostFrames.build(gs, alpha);
+        this.ghost.bike.update(gf);
+        this.ghost.rider.update(gf);
+        for (const m of this.ghost.mats) if (m.opacity > 0.35) m.opacity = 0.35;
+      }
+    }
     // Dynamic colliders.
     const w = this.world;
     if (w) {

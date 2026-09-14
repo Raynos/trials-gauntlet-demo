@@ -12,6 +12,8 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import type { MaterialLibrary } from '../materials/library';
 import type { RenderFrame } from '../frame';
 import { WHEEL_RADIUS } from '../frame';
+import { mergeStaticChildren } from '../util/merge';
+import { fogify } from '../lighting/environment';
 
 export const BIKE = {
   rearAxleRest: new THREE.Vector2(-0.65, 0),
@@ -101,7 +103,7 @@ export class Wheel {
         spokeGeos.push(g);
       }
     }
-    this.spokeMat = lib.get('spoke').clone();
+    this.spokeMat = fogify(lib.get('spoke').clone());
     this.spokeMat.transparent = true;
     this.spokes = new THREE.Mesh(mergeGeometries(spokeGeos, false)!, this.spokeMat);
     // Blur disc: translucent grey disc that fades in with spin rate.
@@ -202,41 +204,65 @@ export class BikeModel {
     const frameMesh = cast(new THREE.Mesh(mergeGeometries(frameGeos, false)!, paint));
     this.frame.add(frameMesh);
 
-    // --- Tank + seat + side panels (lathe + boxes)
-    const tank = cast(new THREE.Mesh(lathe([[0, 0], [0.12, 0.02], [0.15, 0.1], [0.13, 0.2], [0.06, 0.26], [0, 0.27]], 14), paint));
+    // --- Tank + seat + shrouds + side panels. Body colour is blue; white is kept
+    // for two small number plates (reference: dark-blue frame, black engine mass,
+    // silver forks/rims, small white plates).
+    const body = lib.get('bodyPaint');
+    const alloy = lib.get('alloy');
+    const tank = cast(new THREE.Mesh(lathe([[0, 0], [0.12, 0.02], [0.15, 0.1], [0.13, 0.2], [0.06, 0.26], [0, 0.27]], 14), body));
     tank.rotation.z = -Math.PI / 2 + 0.35;
     tank.position.set(0.02, 0.56, 0);
     tank.scale.set(1, 1.2, 0.9);
     const seat = cast(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.07, 0.2), lib.get('seat')));
     seat.position.set(B.seatTop.x, B.seatTop.y, 0);
     seat.rotation.z = 0.06;
-    const plastic = lib.get('plastic');
-    const rearFender = cast(new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.03, 0.16), plastic));
+    const rearFender = cast(new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.03, 0.16), body));
     rearFender.position.set(-0.68, 0.44, 0);
     rearFender.rotation.z = 0.25;
-    const frontFender = cast(new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.03, 0.15), plastic));
+    const frontFender = cast(new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.03, 0.15), body));
     frontFender.rotation.z = -0.15;
-    const sideL = cast(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.2, 0.02), plastic));
-    sideL.position.set(-0.36, 0.3, 0.13);
-    const sideR = sideL.clone();
-    sideR.position.z = -0.13;
-    const numberPlate = cast(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.24, 0.22), lib.get('numberPlate')));
-    numberPlate.position.set(0.5, 0.92, 0);
+    // Radiator shrouds: angled blue panels either side of the tank front, radiators (black) behind them.
+    for (const z of [-1, 1]) {
+      const shroud = cast(new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.22, 0.02), body));
+      shroud.position.set(0.22, 0.5, z * 0.15);
+      shroud.rotation.set(0, z * 0.35, -0.3);
+      const rad = cast(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.2, 0.1), black));
+      rad.position.set(0.28, 0.4, z * 0.11);
+      const side = cast(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.2, 0.02), body));
+      side.position.set(-0.36, 0.3, z * 0.13);
+      // Small white side number plate on the panel.
+      const plate = cast(new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.13, 0.008), lib.get('numberPlate')));
+      plate.position.set(-0.36, 0.31, z * 0.145);
+      this.frame.add(shroud, rad, side, plate);
+    }
+    const numberPlate = cast(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.18, 0.17), lib.get('numberPlate')));
+    numberPlate.position.set(0.5, 0.9, 0);
     numberPlate.rotation.z = -0.35;
-    this.frame.add(tank, seat, rearFender, sideL, sideR, numberPlate);
+    this.frame.add(tank, seat, rearFender, numberPlate);
 
-    // --- Engine: cases, cylinder, clutch cover
-    const cases = cast(new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.26, 0.3), engine));
-    cases.position.set(0.02, 0.1, 0);
-    const cyl = cast(new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.22, 0.2), black));
-    cyl.position.set(0.12, 0.32, 0);
-    cyl.rotation.z = -0.2;
-    const clutch = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.04, 20), chrome));
+    // --- Engine: black cases, finned cylinder + head, alloy covers, dusty lower cases.
+    const cases = cast(new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.2, 0.3), engine));
+    cases.position.set(0.02, 0.13, 0);
+    const sump = cast(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.08, 0.28), lib.get('engineDusty')));
+    sump.position.set(0.02, 0.0, 0);
+    const finGeos: THREE.BufferGeometry[] = [];
+    for (let i = 0; i < 6; i++) finGeos.push(new THREE.BoxGeometry(0.17, 0.012, 0.21).translate(0, i * 0.03, 0));
+    for (let i = 0; i < 5; i++) finGeos.push(new THREE.BoxGeometry(0.12, 0.012, 0.16).translate(0.01, 0.015 + i * 0.03, 0));
+    const fins = cast(new THREE.Mesh(mergeGeometries(finGeos, false)!, engine));
+    fins.position.set(0.12, 0.24, 0);
+    fins.rotation.z = -0.2;
+    const head = cast(new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.08, 0.19), alloy));
+    head.position.set(0.155, 0.43, 0);
+    head.rotation.z = -0.2;
+    const clutch = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.04, 20), alloy));
     clutch.rotation.x = Math.PI / 2;
-    clutch.position.set(-0.02, 0.1, 0.17);
+    clutch.position.set(-0.02, 0.12, 0.17);
     const ignition = clutch.clone();
     ignition.position.z = -0.17;
-    this.frame.add(cases, cyl, clutch, ignition);
+    const kick = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.22, 6), alloy));
+    kick.position.set(-0.08, 0.2, 0.2);
+    kick.rotation.z = 0.5;
+    this.frame.add(cases, sump, fins, head, clutch, ignition, kick);
 
     // --- Exhaust: header out of the cylinder, up and back to the muffler on the near side.
     const header = cast(new THREE.Mesh(tube([new THREE.Vector3(0.2, 0.36, 0.04), new THREE.Vector3(0.36, 0.3, 0.1), new THREE.Vector3(0.3, 0.16, 0.19), new THREE.Vector3(0.05, 0.2, 0.2), new THREE.Vector3(-0.25, 0.36, 0.18), new THREE.Vector3(-0.42, 0.42, 0.17)], 0.024, 10, 32), lib.get('exhaust')));
@@ -257,9 +283,9 @@ export class BikeModel {
       this.frame.add(peg);
     }
     // Triple clamps
-    const clampT = cast(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.03, 0.24), gloss));
+    const clampT = cast(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.03, 0.24), lib.get('alloy')));
     clampT.position.set(B.headTop.x, B.headTop.y + 0.02, 0);
-    const clampB = cast(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.03, 0.24), gloss));
+    const clampB = cast(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.03, 0.24), lib.get('alloy')));
     clampB.position.set(B.headBottom.x - 0.01, B.headBottom.y, 0);
     this.frame.add(bars, clampT, clampB);
 
@@ -277,8 +303,8 @@ export class BikeModel {
       this.forkUpper.add(upTop);
     }
     const lowerGeo = new THREE.CylinderGeometry(0.029, 0.026, 0.38, 10).translate(0, 0.19, 0);
-    this.forkLowerL = cast(new THREE.Mesh(lowerGeo, gloss));
-    this.forkLowerR = cast(new THREE.Mesh(lowerGeo, gloss));
+    this.forkLowerL = cast(new THREE.Mesh(lowerGeo, lib.get('engineDusty')));
+    this.forkLowerR = cast(new THREE.Mesh(lowerGeo, lib.get('engineDusty')));
     this.frame.add(this.forkUpper, this.forkLowerL, this.forkLowerR, frontFender);
     frontFender.position.set(0.55, 0.45, 0);
     // Front brake caliper
@@ -301,7 +327,7 @@ export class BikeModel {
 
     // --- Rear shock: body + spring between shockTop and a point on the swingarm.
     this.shock = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 1, 10).translate(0, 0.5, 0), chrome));
-    this.shockSpring = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1, 10, 1, true).translate(0, 0.5, 0), new THREE.MeshStandardMaterial({ color: 0xd42a1e, roughness: 0.4, metalness: 0.5, side: THREE.DoubleSide })));
+    this.shockSpring = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1, 10, 1, true).translate(0, 0.5, 0), lib.get('shockSpring')));
     this.frame.add(this.shock, this.shockSpring);
 
     // --- Chain: loop around the sprockets on the far side; UV scrolls with rear spin.
@@ -328,12 +354,18 @@ export class BikeModel {
     this.chainTex.repeat.set(90, 1);
     this.chainTex.magFilter = THREE.NearestFilter;
     this.chainTex.needsUpdate = true;
-    this.chainMat = new THREE.MeshStandardMaterial({ map: this.chainTex, roughness: 0.4, metalness: 0.9 });
+    this.chainMat = fogify(new THREE.MeshStandardMaterial({ map: this.chainTex, roughness: 0.4, metalness: 0.9 }));
+    lib.complete(this.chainMat);
     this.chain = new THREE.Mesh(chainGeo, this.chainMat);
     const sprocketR = cast(new THREE.Mesh(new THREE.CylinderGeometry(sprR, sprR, 0.006, 24), lib.get('exhaust')));
     sprocketR.rotation.x = Math.PI / 2;
     sprocketR.position.set(rc.x, rc.y, -0.16);
     this.frame.add(this.chain, sprocketR);
+
+    // One draw per material for the static frame parts; the animated parts stay separate.
+    mergeStaticChildren(this.frame, new Set([this.swingarm, this.forkUpper, this.forkLowerL, this.forkLowerR, this.shock, this.shockSpring, this.chain]));
+    mergeStaticChildren(this.swingarm);
+    mergeStaticChildren(this.forkUpper);
 
     this.rear = new Wheel(lib);
     this.front = new Wheel(lib);

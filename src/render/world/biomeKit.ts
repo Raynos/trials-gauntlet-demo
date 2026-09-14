@@ -9,24 +9,20 @@ import type { CompiledTrack } from '../../core/types';
 import type { Biome } from '../biomes';
 import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
-import { profileY } from './track';
+import { groundFloorY, profileY } from './track';
+import { canvas, tex } from './canvasTex';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { buildHall } from './hall';
 import {
   PropBatch,
+  bakeAO,
   baleGeometry,
   buildingGeometry,
-  columnGeometry,
   coneGeometry,
-  containerGeometry,
   drumGeometry,
-  lampBulbGeometry,
-  lampGeometry,
-  palletGeometry,
   pineGeometry,
-  pipeGeometry,
-  rackGeometry,
   rockGeometry,
   triCount,
-  trussGeometry,
   tyreStackGeometry,
 } from './props';
 
@@ -44,143 +40,6 @@ export interface BiomeKit {
 // ---------------------------------------------------------------------------
 // Canvas textures
 // ---------------------------------------------------------------------------
-
-function canvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
-  const c = document.createElement('canvas');
-  c.width = w;
-  c.height = h;
-  return [c, c.getContext('2d')!];
-}
-
-function tex(c: HTMLCanvasElement, srgb = true, repeat = true): THREE.CanvasTexture {
-  const t = new THREE.CanvasTexture(c);
-  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
-  if (repeat) t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.anisotropy = 4;
-  return t;
-}
-
-/** One 12 m × 14 m warehouse wall bay: brick, steel column, big window bank. Returns albedo + emissive. */
-function warehouseWall(rng: Rng, paneColor: string, brick: string): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture; bytes: number } {
-  const W = 1024;
-  const H = 1024 * (14 / 12);
-  const [c, g] = canvas(W, Math.round(H));
-  const [ce, ge] = canvas(W, Math.round(H));
-  const px = W / 12; // pixels per metre
-  // Brick field.
-  g.fillStyle = brick;
-  g.fillRect(0, 0, W, H);
-  const bh = 0.075 * px;
-  const bw = 0.23 * px;
-  for (let y = 0; y < H; y += bh) {
-    const row = Math.floor(y / bh);
-    for (let x = -(row % 2) * bw * 0.5; x < W; x += bw) {
-      const l = 0.75 + rng.next() * 0.35;
-      g.fillStyle = `rgba(${Math.floor(20 * l)},${Math.floor(12 * l)},${Math.floor(8 * l)},${0.25 + rng.next() * 0.25})`;
-      g.fillRect(x + 1, y + 1, bw - 2, bh - 2);
-    }
-  }
-  // Grime gradient at the bottom, soot at the top.
-  const grad = g.createLinearGradient(0, H, 0, H * 0.6);
-  grad.addColorStop(0, 'rgba(10,8,6,0.55)');
-  grad.addColorStop(1, 'rgba(10,8,6,0)');
-  g.fillStyle = grad;
-  g.fillRect(0, 0, W, H);
-  // Emissive canvas starts black.
-  ge.fillStyle = '#000';
-  ge.fillRect(0, 0, W, H);
-  // Window bank: 8 m wide × 4.6 m tall, sill at 6.6 m from the floor (canvas y down).
-  for (const bx of [1.2, 6.8]) {
-    const wx = bx * px;
-    const ww = 4.0 * px;
-    const wTop = H - 9.6 * px;
-    const wh = 3.4 * px;
-    g.fillStyle = '#1e1c1a';
-    g.fillRect(wx - 10, wTop - 10, ww + 20, wh + 20);
-    const cols = 5;
-    const rows = 4;
-    for (let r = 0; r < rows; r++) {
-      for (let k = 0; k < cols; k++) {
-        const x = wx + (k * ww) / cols;
-        const y = wTop + (r * wh) / rows;
-        const pw = ww / cols;
-        const ph = wh / rows;
-        const broken = rng.next() < 0.06;
-        const dirt = 0.35 + rng.next() * 0.45;
-        g.fillStyle = broken ? '#141210' : paneColor;
-        g.globalAlpha = broken ? 1 : dirt;
-        g.fillRect(x + 7, y + 7, pw - 14, ph - 14);
-        g.globalAlpha = 1;
-        // Mullion cross inside each pane + grime gradient at the bottom of the pane.
-        g.fillStyle = '#1e1c1a';
-        g.fillRect(x + pw / 2 - 2, y + 7, 4, ph - 14);
-        g.fillRect(x + 7, y + ph / 2 - 2, pw - 14, 4);
-        const gr = g.createLinearGradient(0, y + ph - 14, 0, y + ph * 0.5);
-        gr.addColorStop(0, 'rgba(40,32,24,0.7)');
-        gr.addColorStop(1, 'rgba(40,32,24,0)');
-        g.fillStyle = gr;
-        g.fillRect(x + 7, y + 7, pw - 14, ph - 14);
-        ge.fillStyle = broken ? '#000' : `rgba(255,255,255,${dirt * 0.9})`;
-        ge.fillRect(x + 7, y + 7, pw - 14, ph - 14);
-        ge.fillStyle = '#000';
-        ge.fillRect(x + pw / 2 - 2, y + 7, 4, ph - 14);
-        ge.fillRect(x + 7, y + ph / 2 - 2, pw - 14, 4);
-      }
-    }
-  }
-  // Steel column at the bay edge + a horizontal girt.
-  g.fillStyle = '#26282c';
-  g.fillRect(0, 0, 0.35 * px, H);
-  g.fillRect(0, H - 6.2 * px, W, 0.2 * px);
-  // Stencil sign on some bays.
-  if (rng.next() < 0.6) {
-    g.fillStyle = 'rgba(230,220,200,0.55)';
-    g.font = `bold ${Math.floor(0.9 * px)}px Impact, "Arial Black", sans-serif`;
-    g.fillText(rng.next() < 0.5 ? 'TRIALS' : 'BAY ' + rng.int(1, 9), 3 * px, H - 3.2 * px);
-  }
-  return { map: tex(c), emissive: tex(ce, true), bytes: W * H * 4 * 1.33 * 2 };
-}
-
-/** Container skin: light base (tinted per instance), rust streaks, big number, logo band. Albedo only; the corrugated normal map stays. */
-function containerSkin(rng: Rng): THREE.CanvasTexture {
-  const [c, g] = canvas(1024, 512);
-  g.fillStyle = '#e6e6e2';
-  g.fillRect(0, 0, 1024, 512);
-  // Corrugation shading stripes (albedo-only hint; the normal map does the rest).
-  for (let x = 0; x < 1024; x += 16) {
-    g.fillStyle = 'rgba(0,0,0,0.07)';
-    g.fillRect(x, 0, 6, 512);
-  }
-  // Rust streaks from the top rail and around the door bars.
-  for (let i = 0; i < 9; i++) {
-    const x = rng.range(0, 1024);
-    const w = rng.range(3, 12);
-    const h = rng.range(30, 200);
-    const gr = g.createLinearGradient(0, 0, 0, h);
-    gr.addColorStop(0, 'rgba(110,60,25,0.35)');
-    gr.addColorStop(1, 'rgba(120,60,20,0)');
-    g.fillStyle = gr;
-    g.fillRect(x, 0, w, h);
-  }
-  const grime = g.createLinearGradient(0, 512, 0, 380);
-  grime.addColorStop(0, 'rgba(30,22,14,0.3)');
-  grime.addColorStop(1, 'rgba(30,22,14,0)');
-  g.fillStyle = grime;
-  g.fillRect(0, 0, 1024, 512);
-  // Logo band + serial.
-  g.fillStyle = 'rgba(255,255,255,0.85)';
-  g.fillRect(60, 60, 330, 70);
-  g.fillStyle = '#111';
-  g.font = 'bold 54px Impact, "Arial Black", sans-serif';
-  g.fillText(['SQUADX', 'KBNI', 'REDLYNX', 'TRIALS'][rng.int(0, 3)]!, 80, 116);
-  g.fillStyle = 'rgba(20,20,20,0.85)';
-  g.font = 'bold 72px Impact, "Arial Black", sans-serif';
-  g.fillText(String(rng.int(10, 99)) + 'C', 640, 130);
-  // Door bars (dark verticals on the right third).
-  g.fillStyle = 'rgba(25,25,25,0.7)';
-  for (const x of [790, 840, 890, 940]) g.fillRect(x, 20, 10, 472);
-  return tex(c);
-}
 
 /** Silhouette strip (white shapes on transparent) for a parallax tier. */
 function silhouette(kind: 'mesa' | 'pine' | 'city' | 'girder' | 'hills', rng: Rng): THREE.CanvasTexture {
@@ -262,27 +121,77 @@ function silhouette(kind: 'mesa' | 'pine' | 'city' | 'girder' | 'hills', rng: Rn
   return tex(c);
 }
 
-/** Emissive window grid for city blocks (metre-scaled in the caller). */
-function windowGrid(rng: Rng): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture } {
-  const [c, g] = canvas(256, 256);
-  const [ce, ge] = canvas(256, 256);
-  g.fillStyle = '#2b2d33';
-  g.fillRect(0, 0, 256, 256);
-  ge.fillStyle = '#000';
-  ge.fillRect(0, 0, 256, 256);
-  for (let y = 8; y < 256; y += 32) {
-    for (let x = 6; x < 256; x += 24) {
-      const lit = rng.next() < 0.45;
-      g.fillStyle = lit ? '#e9c98a' : '#15171c';
-      g.fillRect(x, y, 14, 18);
-      ge.fillStyle = lit ? `rgba(255,210,140,${0.6 + rng.next() * 0.4})` : '#000';
-      ge.fillRect(x, y, 14, 18);
+/** Sandstone strata: horizontal bands of warm ochre/rust with grain. */
+function stratatexture(rng: Rng): THREE.CanvasTexture {
+  const [c, g] = canvas(512, 512);
+  let y = 0;
+  while (y < 512) {
+    const h = rng.range(10, 46);
+    const t = rng.next();
+    const r = Math.floor(140 + t * 60);
+    const gg = Math.floor(112 + t * 50);
+    const b = Math.floor(84 + t * 40);
+    g.fillStyle = `rgb(${r},${gg},${b})`;
+    g.fillRect(0, y, 512, h);
+    g.fillStyle = 'rgba(40,20,10,0.35)';
+    g.fillRect(0, y + h - 2, 512, 2);
+    for (let i = 0; i < 40; i++) {
+      g.fillStyle = `rgba(0,0,0,${rng.range(0.03, 0.12)})`;
+      g.fillRect(rng.range(0, 512), y + rng.range(0, h), rng.range(4, 40), rng.range(1, 3));
     }
+    y += h;
   }
-  return { map: tex(c), emissive: tex(ce) };
+  const t = tex(c);
+  t.repeat.set(2, 1);
+  return t;
 }
 
-/** Soft radial gradient used for light shafts / glow quads. */
+/** Snow caps for `pineGeometry`: shallow white cones sitting on each tier. */
+function pineSnowGeometry(): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 3; i++) {
+    const r = 2.3 - i * 0.55;
+    const cap = new THREE.ConeGeometry(r * 0.78, 1.15, 9);
+    cap.translate(0, 2.6 + i * 1.7 + 0.95, 0);
+    parts.push(cap);
+  }
+  const top = new THREE.ConeGeometry(0.3, 0.6, 7);
+  top.translate(0, 2.6 + 2 * 1.7 + 1.5 + 0.1, 0);
+  parts.push(top);
+  return mergeGeometries(parts, false)!;
+}
+
+/** Two neon sign panels (top / bottom half): tube-lettered text on dark board; emissive is the glow. */
+function neonSigns(rng: Rng): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture } {
+  const [c, g] = canvas(1024, 256);
+  const [ce, ge] = canvas(1024, 256);
+  g.fillStyle = '#14161c';
+  g.fillRect(0, 0, 1024, 256);
+  ge.fillStyle = '#000';
+  ge.fillRect(0, 0, 1024, 256);
+  const words = [['MOTO', '#ff40c0'], ['TRIALS', '#40e0ff'], ['GARAGE', '#ffd040'], ['24H', '#ff6040']] as const;
+  for (let i = 0; i < 2; i++) {
+    const [w, col] = words[rng.int(0, 3)]!;
+    for (const [ctx, colour] of [[g, col], [ge, col]] as const) {
+      ctx.font = 'bold 120px Impact, "Arial Black", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = colour;
+      ctx.strokeText(w, 512, 64 + i * 128);
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.6;
+      ctx.fillText(w, 512, 64 + i * 128);
+      ctx.globalAlpha = 1;
+    }
+    g.strokeStyle = 'rgba(255,255,255,0.15)';
+    g.lineWidth = 4;
+    g.strokeRect(8, 8 + i * 128, 1008, 112);
+  }
+  return { map: tex(c, true, false), emissive: tex(ce, true, false) };
+}
+
+/** Soft gradient quad (street-light cones). */
 function shaftTexture(): THREE.CanvasTexture {
   const [c, g] = canvas(256, 256);
   const grad = g.createLinearGradient(0, 0, 256, 0);
@@ -302,6 +211,26 @@ function shaftTexture(): THREE.CanvasTexture {
   return tex(c, true, false);
 }
 
+/** Emissive window grid for city blocks (metre-scaled in the caller). */
+function windowGrid(rng: Rng): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture } {
+  const [c, g] = canvas(256, 256);
+  const [ce, ge] = canvas(256, 256);
+  g.fillStyle = '#23252b';
+  g.fillRect(0, 0, 256, 256);
+  ge.fillStyle = '#000';
+  ge.fillRect(0, 0, 256, 256);
+  for (let y = 8; y < 256; y += 32) {
+    for (let x = 6; x < 256; x += 24) {
+      const lit = rng.next() < 0.22;
+      g.fillStyle = lit ? '#e9c98a' : '#1a1c22';
+      g.fillRect(x, y, 14, 18);
+      ge.fillStyle = lit ? `rgba(255,210,140,${0.6 + rng.next() * 0.4})` : '#000';
+      ge.fillRect(x, y, 14, 18);
+    }
+  }
+  return { map: tex(c), emissive: tex(ce) };
+}
+
 // ---------------------------------------------------------------------------
 // Builders
 // ---------------------------------------------------------------------------
@@ -318,9 +247,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
   const x1 = track.bounds.maxX + 60;
   const span = x1 - x0;
   const midX = (x0 + x1) / 2;
-  let floorY = Infinity;
-  for (const p of profile) floorY = Math.min(floorY, p.y);
-  floorY -= 0.42;
+  const floorY = groundFloorY(profile, biome.interior);
   const batches: PropBatch[] = [];
   const singles: THREE.Object3D[] = [];
   const meshes: THREE.Mesh[] = [];
@@ -339,7 +266,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
   {
     const cols: number[] = [];
     for (let x = x0; x <= x1; x += 4) cols.push(x);
-    const zRows = biome.interior ? [-18, -3.0, 3.0, 12, 45] : [-45, -12, -3.0, 3.0, 9, 45];
+    const zRows = biome.interior ? [-30, -3.0, 3.0, 12, 30] : [-45, -12, -3.0, 3.0, 9, 45];
     const pos: number[] = [];
     const uv: number[] = [];
     const idx: number[] = [];
@@ -375,176 +302,14 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
     meshes.push(m);
   }
 
-  if (biome.id === 'industrial' || biome.id === 'foundry') {
-    const foundry = biome.id === 'foundry';
-    const roofY = floorY + 14;
-    // Back wall with window bays, repeated along x.
-    const wall = warehouseWall(rng, foundry ? '#ff9a4a' : '#fff3dc', foundry ? '#3a1a12' : '#4a2c22');
-    textureBytes += wall.bytes;
-    const bays = Math.ceil(span / 12);
-    wall.map.repeat.set(bays, 1);
-    wall.emissive.repeat.set(bays, 1);
-    const wallMat = fogify(
-      new THREE.MeshStandardMaterial({
-        map: wall.map,
-        emissiveMap: wall.emissive,
-        emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff2dc),
-        emissiveIntensity: foundry ? 1.1 : 1.05,
-        roughness: 0.95,
-      }),
-    );
-    addPlane(bays * 12, 14, wallMat, x0 + (bays * 12) / 2, floorY + 7, -17);
-    // Side walls far left/right (so the start and finish aren't open air).
-    const sideMat = fogify(new THREE.MeshStandardMaterial({ map: wall.map, roughness: 0.95, color: 0x6a6a6a }));
-    addPlane(30, 14, sideMat, x0 + 2, floorY + 7, -2, 0, Math.PI / 2);
-    addPlane(30, 14, sideMat, x1 - 2, floorY + 7, -2, 0, -Math.PI / 2);
-    // Roof plane with skylight strips (emissive) seen when the camera pulls back.
-    const [rc, rg] = canvas(512, 256);
-    rg.fillStyle = '#2b2a28';
-    rg.fillRect(0, 0, 512, 256);
-    for (let x = 40; x < 512; x += 128) {
-      rg.fillStyle = foundry ? '#7a2a10' : '#ffe9c4';
-      rg.fillRect(x, 20, 48, 216);
-    }
-    const roofTex = tex(rc);
-    roofTex.repeat.set(span / 12, 2);
-    textureBytes += 512 * 256 * 4 * 1.33;
-    const roofMat = fogify(new THREE.MeshStandardMaterial({ map: roofTex, emissiveMap: roofTex, emissive: 0xffffff, emissiveIntensity: foundry ? 0.6 : 1.1, roughness: 0.9, side: THREE.DoubleSide }));
-    addPlane(span, 28, roofMat, midX, roofY, -4, Math.PI / 2);
-    // Trusses under the roof every 12 m, columns at the wall and mid-hall.
-    const truss = new PropBatch('truss', trussGeometry(), lib.get('darkSteel'), false);
-    const column = new PropBatch('column', columnGeometry(), lib.get('darkSteel'));
-    for (let x = x0 + 6; x < x1; x += 12) {
-      truss.add(x, roofY - 1.3, -10, Math.PI / 2, 1, null, 0, 1, 1.9);
-      column.add(x, floorY, -16.5, 0, 1, null, 0, roofY - floorY, 1);
-      if ((Math.round((x - x0) / 12) & 1) === 0) column.add(x, floorY, -5.5, 0, 1, null, 0, roofY - floorY, 1);
-    }
-    batches.push(truss, column);
-    // Hanging sodium lamps every 9 m.
-    const lampShade = new PropBatch('lamp', lampGeometry(), lib.get('darkSteel'), false);
-    const bulbMat = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: foundry ? 0xff6a2a : 0xffc46a, emissiveIntensity: 6, roughness: 0.4 }));
-    const bulb = new PropBatch('bulb', lampBulbGeometry(), bulbMat, false);
-    for (let x = x0 + 8; x < x1; x += 9) {
-      const z = -8 + rng.range(-1, 1);
-      lampShade.add(x, roofY - 2.4, z, 0, 1, null, 0, 2.2, 1);
-      bulb.add(x, roofY - 2.4, z, 0, 1, null, 0, 2.2, 1);
-    }
-    batches.push(lampShade, bulb);
-    // Container skin (albedo) — the library normal/ORM stay so it shares the program.
-    const skin = containerSkin(rng);
-    textureBytes += 1024 * 512 * 4 * 1.33;
-    const contMat = lib.get('container');
-    contMat.map = skin;
-    contMat.needsUpdate = true;
-    // Mid-ground clutter: containers (stacked 2–3), racks, pallets, drums, tyres, chains, cones.
-    const containers = new PropBatch('container', containerGeometry(), contMat);
-    const racks = new PropBatch('rack', rackGeometry(), lib.get('rustSteel'));
-    const pallets = new PropBatch('pallet', palletGeometry(), lib.get('pallet'));
-    const drums = new PropBatch('drum', drumGeometry(), lib.get('barrelRed'));
-    const tyres = new PropBatch('tyres', tyreStackGeometry(), lib.get('tyre'));
-    const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a];
-    const chains = new PropBatch('chain', new THREE.CylinderGeometry(0.02, 0.02, 1, 6).translate(0, -0.5, 0), lib.get('darkSteel'), false);
-    const cones = new PropBatch('cone', coneGeometry(), fogify(new THREE.MeshStandardMaterial({ color: 0xff6a1a, roughness: 0.6 })));
-    const rail = new PropBatch('rail', new THREE.BoxGeometry(1, 0.05, 0.05), lib.get('hazardTape'), false);
-    const railPost = new PropBatch('railpost', new THREE.BoxGeometry(0.05, 1.1, 0.05).translate(0, 0.55, 0), lib.get('darkSteel'), false);
-    const catwalk = new PropBatch('catwalk', new THREE.BoxGeometry(1, 0.08, 1.4), lib.get('grate'));
-    // Back-wall catwalk at 5 m with railing, broken into 1 m instances.
-    for (let x = x0 + 4; x < x1 - 4; x += 1) {
-      catwalk.add(x + 0.5, floorY + 5, -15.6);
-      rail.add(x + 0.5, floorY + 6.05, -14.95);
-      if (Math.round(x - x0) % 3 === 0) railPost.add(x + 0.5, floorY + 5.04, -14.95);
-    }
-    // Chains hanging from the trusses, some with a hook tyre.
-    for (let x = x0 + 5; x < x1; x += rng.range(4, 9)) {
-      const z = rng.range(-12, -5);
-      chains.add(x, roofY - 1.4, z, 0, 1, null, 0, rng.range(2, 6), 1);
-    }
-    // Two container rows: a back row against the wall (dense, stacked) and a mid row.
-    for (let x = x0 + 8; x < x1 - 8; x += rng.range(6.5, 8.5)) {
-      const z = -14.2 + rng.range(-0.4, 0.4);
-      const ry = rng.range(-0.06, 0.06);
-      const n = rng.int(1, 3);
-      for (let k = 0; k < n; k++) containers.add(x + rng.range(-0.15, 0.15), floorY + k * 2.59, z, ry, 1, palette[rng.int(0, palette.length - 1)]!);
-    }
-    for (let x = x0 + 10; x < x1 - 10; x += rng.range(3.5, 6.5)) {
-      const gy = floorY;
-      const r = rng.next();
-      if (r < 0.24) {
-        const z = rng.range(-11, -6.5);
-        const ry = rng.range(-0.15, 0.15) + (rng.next() < 0.3 ? Math.PI / 2 : 0);
-        containers.add(x, gy, z, ry, 1, palette[rng.int(0, palette.length - 1)]!);
-        if (rng.next() < 0.55) containers.add(x + rng.range(-0.4, 0.4), gy + 2.59, z + rng.range(-0.2, 0.2), ry + rng.range(-0.05, 0.05), 1, palette[rng.int(0, palette.length - 1)]!);
-        if (rng.next() < 0.5) cones.add(x + rng.range(-3, 3), gy, rng.range(-5.5, -4.5), rng.range(0, 6));
-      } else if (r < 0.62) {
-        racks.add(x, gy, rng.range(-15, -12), 0, 1);
-        racks.add(x + 2.75, gy, rng.range(-15, -12), 0, 1);
-      } else if (r < 0.8) {
-        const z = rng.range(-9, -5);
-        const n = rng.int(2, 5);
-        for (let k = 0; k < n; k++) pallets.add(x + rng.range(-0.3, 0.3), gy + k * 0.144, z + rng.range(-0.1, 0.1), rng.range(-0.1, 0.1));
-      } else if (r < 0.92) {
-        const z = rng.range(-8, -5);
-        const n = rng.int(2, 4);
-        for (let k = 0; k < n; k++) drums.add(x + k * 0.62, gy, z + rng.range(-0.3, 0.3), rng.range(0, 6), 1, k % 3 === 1 ? 0xd8d2c4 : k % 3 === 2 ? 0x244d8a : 0xa42a1e);
-      } else {
-        tyres.add(x, gy, rng.range(-7, -4.5), rng.range(0, 6));
-      }
-    }
-    // Foreground occluders that slide past the camera: pillars, chains, barrel tops, tyres.
-    for (let x = x0 + 18; x < x1 - 15; x += rng.range(14, 24)) {
-      const r = rng.next();
-      const z = rng.range(5, 7.5);
-      if (r < 0.3) column.add(x, floorY, z, 0, 1, null, 0, roofY - floorY, 1);
-      else if (r < 0.5) chains.add(x, roofY - 1.4, z, 0, 1, null, 0, rng.range(4, 9), 1);
-      else if (r < 0.75) drums.add(x, floorY, z, rng.range(0, 6), 1, 0xa42a1e);
-      else if (r < 0.9) tyres.add(x, floorY, z, 0);
-      else pallets.add(x, floorY, z, rng.range(-0.2, 0.2));
-    }
-    batches.push(containers, racks, pallets, drums, tyres, chains, cones, rail, railPost, catwalk);
-    // Volumetric shafts from the windows: additive tilted quads.
-    const shaft = shaftTexture();
-    textureBytes += 256 * 256 * 4;
-    const shaftMat = new THREE.MeshBasicMaterial({
-      map: shaft,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      color: new THREE.Color(foundry ? 0xff5a1a : 0xffe8c8).multiplyScalar(foundry ? 0.12 : 0.07),
-      side: THREE.DoubleSide,
-      fog: false,
-    });
-    // Shafts: one soft quad per window bank on every second bay, hanging from the
-    // bank centre (wall at z = -17, sill 6.2 m, head 9.6 m) and leaning along the sun.
-    for (let bay = 0; x0 + bay * 12 < x1; bay += 2) {
-      for (const bx of [3.2, 8.8]) {
-        const wx = x0 + bay * 12 + bx;
-        const len = 14;
-        const q = new THREE.Mesh(new THREE.PlaneGeometry(4.2, len), shaftMat);
-        // Top edge at the window centre; lean toward +z/-x with the sun (-0.45, 0.78, -0.3 → light travels +0.45, -0.78, +0.3).
-        const dir = new THREE.Vector3(0.45, -0.78, 0.3).normalize();
-        const top = new THREE.Vector3(wx, floorY + 7.9, -16.8);
-        q.position.copy(top).addScaledVector(dir, len / 2);
-        q.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir);
-        q.rotateY(0.35);
-        q.renderOrder = 5;
-        singles.push(q);
-      }
-    }
-    if (foundry) {
-      // Molten pillars + pipe runs + glow.
-      const molten = fogify(new THREE.MeshStandardMaterial({ color: 0x1a0402, emissive: 0xff5a10, emissiveIntensity: 2.5, roughness: 0.6 }));
-      flicker.push(molten);
-      const pillars = new PropBatch('molten', new THREE.CylinderGeometry(0.7, 0.9, 1, 14).translate(0, 0.5, 0), molten, false);
-      const pipes = new PropBatch('pipe', pipeGeometry(), lib.get('rustSteel'));
-      for (let x = x0 + 14; x < x1; x += rng.range(16, 26)) {
-        pillars.add(x, floorY, rng.range(-13, -8), 0, 1, null, 0, rng.range(6, 11), 1);
-        pipes.add(x + 4, floorY + rng.range(3, 7), rng.range(-12, -6), rng.range(-0.2, 0.2));
-      }
-      batches.push(pillars, pipes);
-      const pl = new THREE.PointLight(0xff5a10, 60, 30, 2);
-      pl.position.set(midX, floorY + 4, -8);
-      lights.push(pl);
-    }
+  if (biome.interior) {
+    const hall = buildHall(track, biome, lib, rng, floorY, x0, x1);
+    meshes.push(...hall.meshes);
+    singles.push(...hall.singles);
+    batches.push(...hall.batches);
+    flicker.push(...hall.flicker);
+    lights.push(...hall.lights);
+    textureBytes += hall.textureBytes;
   } else {
     // Exterior: three parallax silhouette tiers + biome props.
     const tiers: { z: number; h: number; kind: 'mesa' | 'pine' | 'city' | 'girder' | 'hills'; color: number; yOff: number }[] =
@@ -583,65 +348,152 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       m.receiveShadow = false;
     }
     // Props along the course.
+    const gyAt = (x: number, z: number): number => profileY(profile, x) - 0.42 - Math.min(1, (Math.abs(z) - 3) / 30) ** 2 * 2.5;
     if (biome.id === 'canyon') {
-      const rocks = new PropBatch('rock', rockGeometry(track.def.seed), lib.get('rock'));
+      // Sandstone strata: stepped slab walls at two depths (z −9 and −20) with a
+      // banded albedo, dry scrub on the flats, rocks, bales, drums; warm low sun.
+      const strata = stratatexture(rng);
+      textureBytes += 512 * 512 * 4 * 1.33;
+      const strataMat = fogify(new THREE.MeshStandardMaterial({ map: strata, roughness: 0.95, color: 0xe8dccc }));
+      const slabs = new PropBatch('strata', bakeAO(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), 1, 0.25), strataMat);
+      for (let x = x0; x < x1; x += rng.range(6, 11)) {
+        const h = rng.range(2.0, 4.5);
+        const w = rng.range(7, 13);
+        if (rng.next() < 0.3) continue; // gaps show the mesas behind
+        slabs.add(x, gyAt(x, -12) - 0.5, -12 + rng.range(-1.5, 1.5), rng.range(-0.15, 0.15), w, null, 0, h, rng.range(3, 5));
+        if (rng.next() < 0.5) slabs.add(x + rng.range(-2, 2), gyAt(x, -12) - 0.5 + h * 0.6, -13.5 + rng.range(-1, 1), rng.range(-0.15, 0.15), w * 0.7, null, 0, h * 0.7, 3);
+      }
+      for (let x = x0; x < x1; x += rng.range(8, 14)) {
+        if (rng.next() < 0.35) continue;
+        const h = rng.range(6, 14);
+        slabs.add(x, gyAt(x, -24) - 2, -25 + rng.range(-2, 2), rng.range(-0.2, 0.2), rng.range(10, 18), null, 0, h, rng.range(4, 7));
+      }
+      // Foreground: a low slab or two sliding past.
+      for (let x = x0 + 20; x < x1; x += rng.range(28, 44)) slabs.add(x, gyAt(x, 6) - 2.5, rng.range(5.5, 7.5), rng.range(-0.2, 0.2), rng.range(3, 5), null, 0, rng.range(2.5, 4), 2.5);
+      const rocks = new PropBatch('rock', bakeAO(rockGeometry(track.def.seed), 1.4, 0.3), lib.get('rock'));
+      const scrub = new PropBatch('scrub', new THREE.IcosahedronGeometry(0.45, 1).scale(1.3, 0.7, 1.2).translate(0, 0.3, 0), fogify(new THREE.MeshStandardMaterial({ color: 0x6b6a3a, roughness: 1 })));
       const bales = new PropBatch('bale', baleGeometry(), lib.get('pallet'));
       const tyres = new PropBatch('tyres', tyreStackGeometry(), lib.get('tyre'));
       const drums = new PropBatch('drum', drumGeometry(), lib.get('barrelRed'));
-      for (let x = x0 + 6; x < x1; x += rng.range(5, 11)) {
-        const z = rng.range(-14, -4.5);
-        const gy = profileY(profile, x) - 0.42 - Math.min(1, (Math.abs(z) - 3) / 30) ** 2 * 2.5;
+      for (let x = x0 + 6; x < x1; x += rng.range(3, 7)) {
+        const z = rng.range(-8, -4.5);
+        const gy = gyAt(x, z);
         const r = rng.next();
-        if (r < 0.6) rocks.add(x, gy + rng.range(-0.3, 0.2), z, rng.range(0, 6), rng.range(0.8, 3.2), null, rng.range(-0.2, 0.2));
-        else if (r < 0.75) bales.add(x, gy, z, rng.range(-0.3, 0.3));
-        else if (r < 0.9) tyres.add(x, gy, z, 0);
+        if (r < 0.35) rocks.add(x, gy + rng.range(-0.2, 0.1), z, rng.range(0, 6), rng.range(0.5, 1.6), null, rng.range(-0.2, 0.2));
+        else if (r < 0.75) scrub.add(x, gy - 0.05, z, rng.range(0, 6), rng.range(0.6, 1.4), rng.next() < 0.5 ? 0x8a7a48 : null);
+        else if (r < 0.85) bales.add(x, gy, z, rng.range(-0.3, 0.3));
+        else if (r < 0.93) tyres.add(x, gy, z, 0);
         else drums.add(x, gy, z, 0, 1, 0xd8d2c4);
-        if (rng.next() < 0.12) rocks.add(x + 3, profileY(profile, x + 3) - 0.6, rng.range(5.5, 8), rng.range(0, 6), rng.range(1.5, 2.5));
+        if (rng.next() < 0.3) scrub.add(x + 1.5, gyAt(x + 1.5, 5) - 0.1, rng.range(4.5, 7), rng.range(0, 6), rng.range(0.8, 1.6));
       }
-      batches.push(rocks, bales, tyres, drums);
+      batches.push(slabs, rocks, scrub, bales, tyres, drums);
     } else if (biome.id === 'snow') {
-      const pines = new PropBatch('pine', pineGeometry(), fogify(new THREE.MeshStandardMaterial({ color: 0x1f3a2e, roughness: 0.9 })));
-      const crates = new PropBatch('crate', new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), lib.get('plywood'));
+      // Snow-laden pines (dark green body + white caps), drifted crates, warm lamp posts, low fence.
+      const pineMat = fogify(new THREE.MeshStandardMaterial({ color: 0x24402f, roughness: 0.95 }));
+      const pines = new PropBatch('pine', bakeAO(pineGeometry(), 8, 0.35), pineMat);
+      const capMat = fogify(new THREE.MeshStandardMaterial({ color: 0xf4f7fb, roughness: 0.85 }));
+      const caps = new PropBatch('pinecap', pineSnowGeometry(), capMat, false);
+      const crates = new PropBatch('crate', bakeAO(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), 1, 0.3), lib.get('plywood'));
+      const crateSnow = new PropBatch('cratesnow', new THREE.BoxGeometry(1.04, 0.12, 1.04).translate(0, 1.04, 0), capMat, false);
       const posts = new PropBatch('post', new THREE.CylinderGeometry(0.06, 0.08, 1, 8).translate(0, 0.5, 0), lib.get('darkSteel'));
-      const lampMat = fogify(new THREE.MeshStandardMaterial({ color: 0x221a10, emissive: 0xffb648, emissiveIntensity: 4, roughness: 0.4 }));
+      const lampMat = fogify(new THREE.MeshStandardMaterial({ color: 0x221a10, emissive: 0xffb648, emissiveIntensity: 5, roughness: 0.4 }));
       const lampHeads = new PropBatch('lamphead', new THREE.SphereGeometry(0.18, 10, 8), lampMat, false);
-      for (let x = x0 + 4; x < x1; x += rng.range(4, 9)) {
-        const z = rng.range(-14, -4.5);
-        const gy = profileY(profile, x) - 0.42 - Math.min(1, (Math.abs(z) - 3) / 30) ** 2 * 2.5;
+      const fence = new PropBatch('fence', new THREE.BoxGeometry(2.4, 0.06, 0.04).translate(0, 0.9, 0), lib.get('plywood'));
+      for (let x = x0 + 4; x < x1; x += rng.range(3, 7)) {
+        const z = rng.range(-16, -4.5);
+        const gy = gyAt(x, z);
         const r = rng.next();
-        if (r < 0.65) pines.add(x, gy - 0.3, z, rng.range(0, 6), rng.range(0.7, 1.4));
-        else if (r < 0.8) crates.add(x, gy, z, rng.range(-0.3, 0.3), rng.range(0.8, 1.3));
-        else {
-          posts.add(x, gy, z, 0, 1, null, 0, 3.2, 1);
-          lampHeads.add(x, gy + 3.3, z);
+        if (r < 0.6) {
+          const sc = rng.range(0.7, 1.5);
+          const ry = rng.range(0, 6);
+          pines.add(x, gy - 0.3, z, ry, sc);
+          caps.add(x, gy - 0.3, z, ry, sc);
+        } else if (r < 0.75) {
+          const sc = rng.range(0.8, 1.3);
+          const ry = rng.range(-0.3, 0.3);
+          crates.add(x, gy, z, ry, sc);
+          crateSnow.add(x, gy, z, ry, sc);
+        } else if (r < 0.85) {
+          posts.add(x, gy, z, 0, 1, null, 0, 3.4, 1);
+          lampHeads.add(x, gy + 3.5, z);
+        } else {
+          fence.add(x, gy, -4.2, 0);
+          posts.add(x - 1.2, gy, -4.2, 0, 1, null, 0, 1.0, 1);
         }
-        if (rng.next() < 0.15) pines.add(x + 2, profileY(profile, x + 2) - 1.2, rng.range(6, 8.5), rng.range(0, 6), rng.range(0.9, 1.3));
+        if (rng.next() < 0.2) {
+          const sc = rng.range(0.9, 1.4);
+          const ry = rng.range(0, 6);
+          pines.add(x + 2, gyAt(x + 2, 7) - 1.0, rng.range(6, 8.5), ry, sc);
+          caps.add(x + 2, gyAt(x + 2, 7) - 1.0, rng.range(6, 8.5), ry, sc);
+        }
       }
-      batches.push(pines, crates, posts, lampHeads);
+      batches.push(pines, caps, crates, crateSnow, posts, lampHeads, fence);
     } else {
-      // nightCity
+      // nightCity: buildings set back with metre-scaled windows, neon signs on
+      // posts, street lights with real cones, wet asphalt (deck.ts), fire barrels.
       const g2 = windowGrid(rng);
-      const bMat = fogify(new THREE.MeshStandardMaterial({ map: g2.map, emissiveMap: g2.emissive, emissive: 0xffc080, emissiveIntensity: 1.6, roughness: 0.8 }));
-      g2.map.repeat.set(5, 10);
-      g2.emissive.repeat.set(5, 10);
-      const buildings = new PropBatch('building', buildingGeometry(), bMat);
+      const bMat = fogify(new THREE.MeshStandardMaterial({ map: g2.map, emissiveMap: g2.emissive, emissive: 0xffc080, emissiveIntensity: 1.1, roughness: 0.8 }));
+      g2.map.repeat.set(2.2, 4.5);
+      g2.emissive.repeat.set(2.2, 4.5);
+      const buildings = new PropBatch('building', bakeAO(buildingGeometry(), 1, 0.3), bMat);
       const cones = new PropBatch('cone', coneGeometry(), fogify(new THREE.MeshStandardMaterial({ color: 0xff6a1a, roughness: 0.6 })));
       const fireMat = fogify(new THREE.MeshStandardMaterial({ color: 0x1a0a04, emissive: 0xff7a1a, emissiveIntensity: 4, roughness: 0.6 }));
       flicker.push(fireMat);
       const fires = new PropBatch('firebarrel', drumGeometry(), fireMat, false);
       const drums = new PropBatch('drum', drumGeometry(), lib.get('darkSteel'));
-      for (let x = x0 + 6; x < x1; x += rng.range(9, 16)) {
-        const z = rng.range(-34, -18);
-        const gy = profileY(profile, x) - 0.42 - Math.min(1, (Math.abs(z) - 3) / 30) ** 2 * 2.5;
-        buildings.add(x, gy - 1, z, 0, rng.range(6, 12), null, 0, rng.range(8, 24), rng.range(6, 10));
+      const poles = new PropBatch('pole', new THREE.CylinderGeometry(0.07, 0.1, 1, 8).translate(0, 0.5, 0), lib.get('darkSteel'));
+      const arms = new PropBatch('lamparm', new THREE.BoxGeometry(0.1, 0.08, 1.6).translate(0, 0, 0.8), lib.get('darkSteel'), false);
+      const streetMat = fogify(new THREE.MeshStandardMaterial({ color: 0x202020, emissive: 0xffe2b0, emissiveIntensity: 6, roughness: 0.5 }));
+      const heads = new PropBatch('lamphead', new THREE.BoxGeometry(0.5, 0.14, 0.3), streetMat, false);
+      const coneTex = shaftTexture();
+      textureBytes += 256 * 256 * 4;
+      const coneMat = new THREE.MeshBasicMaterial({ map: coneTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, color: new THREE.Color(0xffe2b0).multiplyScalar(0.09), side: THREE.DoubleSide, fog: false });
+      const neon = neonSigns(rng);
+      textureBytes += 1024 * 256 * 4 * 1.33 * 2;
+      const neonMat = fogify(new THREE.MeshStandardMaterial({ map: neon.map, emissiveMap: neon.emissive, emissive: 0xffffff, emissiveIntensity: 2.2, roughness: 0.6, transparent: true, alphaTest: 0.2 }));
+      for (let x = x0 + 6; x < x1; x += rng.range(7, 12)) {
+        const z = rng.range(-38, -22);
+        const gy = gyAt(x, z);
+        if (rng.next() < 0.8) buildings.add(x, gy - 1, z, 0, rng.range(7, 12), null, 0, rng.range(8, 22), rng.range(7, 11));
+        if (rng.next() < 0.5) buildings.add(x + rng.range(-4, 4), gy - 1, z - 16, 0, rng.range(10, 16), null, 0, rng.range(20, 44), rng.range(8, 12));
         if (rng.next() < 0.5) cones.add(x + rng.range(-3, 3), profileY(profile, x) - 0.42, rng.range(-5, -4), rng.range(0, 6));
         if (rng.next() < 0.4) fires.add(x + 2, profileY(profile, x + 2) - 0.42, rng.range(-6, -4.5));
         else drums.add(x + 2, profileY(profile, x + 2) - 0.42, rng.range(-6, -4.5), rng.range(0, 6));
       }
-      batches.push(buildings, cones, fires, drums);
-      const pl = new THREE.PointLight(0xff7a1a, 40, 22, 2);
-      pl.position.set(track.def.start.pos.x + 6, profileY(profile, track.def.start.pos.x) + 1.5, -5);
-      lights.push(pl);
+      // Street lights every ~14 m behind the track, cone of light down to the ground.
+      for (let x = x0 + 10; x < x1; x += rng.range(12, 17)) {
+        const z = -5.2;
+        const gy = profileY(profile, x) - 0.42;
+        poles.add(x, gy, z, 0, 1, null, 0, 6.5, 1);
+        arms.add(x, gy + 6.4, z, 0);
+        heads.add(x, gy + 6.4, z + 1.6);
+        const c = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 6.6), coneMat);
+        c.position.set(x, gy + 3.2, z + 1.6);
+        c.rotation.y = 0.35;
+        c.renderOrder = 5;
+        singles.push(c);
+      }
+      // Neon signs: alternating the two panels of the sheet, hung on posts at z −7..−11.
+      for (let x = x0 + 14, i = 0; x < x1; x += rng.range(18, 30), i++) {
+        const z = rng.range(-11, -7);
+        const gy = gyAt(x, z);
+        const w = 4.5;
+        // Pick the top / bottom panel through the geometry UVs (one shared texture, no clones).
+        const half = i % 2;
+        const sg = new THREE.PlaneGeometry(w, w / 4);
+        const uv = sg.getAttribute('uv') as THREE.BufferAttribute;
+        for (let k = 0; k < uv.count; k++) uv.setY(k, half * 0.5 + uv.getY(k) * 0.5);
+        const sign = new THREE.Mesh(sg, neonMat);
+        sign.position.set(x, gy + 4.2, z);
+        sign.rotation.y = rng.range(-0.2, 0.2);
+        singles.push(sign);
+        poles.add(x - w / 2 + 0.2, gy, z, 0, 1, null, 0, 4.9, 1);
+        poles.add(x + w / 2 - 0.2, gy, z, 0, 1, null, 0, 4.9, 1);
+        const pl = new THREE.PointLight(half ? 0xff40c0 : 0x40e0ff, 25, 16, 2);
+        pl.position.set(x, gy + 3.6, z + 1.5);
+        if (lights.length < 2) lights.push(pl);
+      }
+      batches.push(buildings, cones, fires, drums, poles, arms, heads);
     }
   }
 

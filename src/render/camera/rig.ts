@@ -128,31 +128,35 @@ export class CameraRig {
     const speed = f.speed;
     // Discrete zoom states with hysteresis: the pull-back is one eased move that
     // arrives, not a continuous drift with speed.
-    if (cut) this.zoom = speed < 1.5 ? 0 : speed > 11 ? 2 : 1;
+    // Riding holds ≈0.26 up to 10 m/s; the pull-back to 0.14 ramps 10 → 18 m/s
+    // (round 4: at 1.85 s the bot is already past 11 m/s, and the old 11 m/s
+    // step made every riding frame a wide frame).
+    if (cut) this.zoom = speed < 1.5 ? 0 : speed > 14 ? 2 : 1;
     else if (this.zoom === 0 && speed > 2.2) this.zoom = 1;
     else if (this.zoom === 1 && speed < 1.0) this.zoom = 0;
-    else if (this.zoom === 1 && speed > 11) this.zoom = 2;
-    else if (this.zoom === 2 && speed < 8) this.zoom = 1;
+    else if (this.zoom === 1 && speed > 14) this.zoom = 2;
+    else if (this.zoom === 2 && speed < 11) this.zoom = 1;
     const airWide = f.airborne && f.airTime > 0.25 ? 1 : 0;
     const zoomT = this.zoom >= 1 ? 1 : 0;
-    const fastT = this.zoom === 2 ? 1 : 0;
+    const fastT = this.zoom === 0 ? 0 : smoothstep(10, 18, speed);
     const airT = smoothstep(0, 0.7, f.airTime);
-    const wideT = Math.max(fastT, airWide);
+    const wideT = Math.max(fastT, airWide * 0.7);
     const moving = Math.abs(f.velX) > 0.5 ? Math.sign(f.velX) : 1;
     const p: Params = {
       heightFrac: lerp(lerp(0.4, 0.26, zoomT), 0.14, wideT),
       screenX: moving > 0 ? lerp(0.45, 0.3, zoomT) - 0.02 * wideT : lerp(0.55, 0.7, zoomT),
-      screenY: lerp(0.55, 0.53, zoomT) - 0.03 * airT,
-      yaw: moving * lerp(lerp(5, 15, zoomT), 17, wideT) * DEG,
-      pitch: lerp(lerp(3, 13, zoomT), 15, fastT) * DEG + 5 * DEG * airT,
+      screenY: lerp(0.55, 0.56, zoomT) - 0.03 * airT,
+      // Idle is a 3/4 view (reference start frames sit ≈20° round and ≈10° down), so depth reads before GO.
+      yaw: moving * lerp(lerp(20, 15, zoomT), 17, wideT) * DEG,
+      pitch: lerp(lerp(10, 11, zoomT), 13, fastT) * DEG + 4 * DEG * airT,
       roll: 0,
       fov: lerp(28, 34, zoomT) * DEG,
     };
     if (this.phase === 'countdown' || this.phase === 'menu') {
       p.heightFrac = 0.4;
       p.screenX = 0.45;
-      p.yaw = 6 * DEG;
-      p.pitch = 4 * DEG;
+      p.yaw = 20 * DEG;
+      p.pitch = 10 * DEG;
       p.fov = 28 * DEG;
     }
 

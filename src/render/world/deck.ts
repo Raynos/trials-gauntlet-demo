@@ -22,8 +22,8 @@ import type { ColliderPolyline, CompiledTrack, SurfaceKind } from '../../core/ty
 import type { Biome } from '../biomes';
 import { SURFACE_MATERIAL, type MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
-import { PropBatch, containerGeometry, palletGeometry, palletStackGeometry, rockGeometry, triCount } from './props';
-import { ribbonGeometry, resample, type TrackMeshes } from './track';
+import { PropBatch, bakeAO, containerGeometry, palletLowGeometry, palletStackGeometry, rockGeometry, triCount } from './props';
+import { groundFloorY, profileY, ribbonGeometry, resample, type TrackMeshes } from './track';
 
 const DECK_W = 3.0;
 const BOARD_W = 0.22;
@@ -122,7 +122,6 @@ function boards(pl: ColliderPolyline, rng: Rng, out: Bucket, width = DECK_W): vo
       const v0 = seed * 0.9;
       const wear = rng.next() < 0.12 ? 0.75 : 1;
       col.multiplyScalar(wear);
-      out.get('plank') ?? out.set('plank', []);
       push(out, 'plank', box(BOARD_W, BOARD_T, width - 0.25, cx, cy, 0, ang, col, (px, py, pz) => [pz / 1.5 + seed * 3, v0 + (px + py) * 0.15]));
       s += pitch;
     }
@@ -189,14 +188,12 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   const rng = new Rng((track.def.seed ^ 0xdeadbeef) >>> 0);
   const buckets: Bucket = new Map();
   const interior = biome.interior;
-  let floorY = Infinity;
-  for (const p of track.def.profile) floorY = Math.min(floorY, p.y);
-  floorY -= 0.42;
+  const floorY = groundFloorY(track.def.profile, interior);
 
   const rocks = new PropBatch('edge-rock', rockGeometry(track.def.seed ^ 77), lib.get('rock'));
-  const pallets = new PropBatch('support-pallet', palletGeometry(), lib.get('pallet'));
+  const pallets = new PropBatch('support-pallet', bakeAO(palletLowGeometry(), 0.144, 0.25), lib.get('pallet'));
   const stacks = new PropBatch('support-stack', palletStackGeometry(3), lib.get('pallet'));
-  const containers = new PropBatch('support-container', containerGeometry(), lib.get('container'));
+  const containers = new PropBatch('support-container', bakeAO(containerGeometry(), 2.59, 0.4), lib.get('container'));
   const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a];
 
   for (const c of track.colliders) {
@@ -228,7 +225,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
       continue;
     }
     if (surf === 'concrete') {
-      push(buckets, 'concrete', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.85 : 1) * (0.6 + 0.4 * (1 - Math.min(1, -drop * 0.9)))));
+      push(buckets, biome.id === 'nightCity' ? 'asphaltWet' : 'concrete', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.85 : 1) * (0.6 + 0.4 * (1 - Math.min(1, -drop * 0.9)))));
       // Painted edge lines.
       edging(pl, 'hazardTape', 0.1, 0.006, 1.32, 0.004, 1, 1, 1, buckets);
       continue;
@@ -239,44 +236,69 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
       continue;
     }
     if (surf === 'snow') {
-      push(buckets, 'snow', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.8 : 1) * (0.35 + 0.65 * (1 - Math.min(1, -drop * 1.2)))));
+      push(buckets, 'snow', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (z, drop) => (Math.abs(z) < 0.3 ? 0.86 : 1) * (0.62 + 0.38 * (1 - Math.min(1, -drop * 1.2)))));
       continue;
     }
     push(buckets, SURFACE_MATERIAL[surf] ?? 'dirt', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9))));
   }
 
-  // Supports under the ground profile (interior only).
+  // Supports under the ground profile (interior only): the deck rides on a
+  // continuous row of containers (rotated across the track, so they stick out
+  // 1.5 m each side as a ledge) topped with pallets to the exact height; where
+  // the profile climbs, extra containers stack up; short heights get pallet
+  // stacks or a steel frame.
   if (interior) {
     const prof = track.def.profile;
     const deckBottom = 0.12;
-    for (let x = prof[0]!.x + 0.6; x < prof[prof.length - 1]!.x; x += 1.6) {
-      // Profile height at x.
-      let y = prof[0]!.y;
-      for (let i = 1; i < prof.length; i++) {
-        const a = prof[i - 1]!;
-        const b = prof[i]!;
-        if (x <= b.x) {
-          y = a.y + ((b.y - a.y) * (x - a.x)) / (b.x - a.x || 1);
-          break;
-        }
-        y = b.y;
-      }
+    for (let x = prof[0]!.x + 1.25; x < prof[prof.length - 1]!.x; x += 2.5) {
+      const y = Math.min(profileY(prof, x - 1.2), profileY(prof, x), profileY(prof, x + 1.2));
       const h = y - deckBottom - floorY;
       if (h < 0.1) continue;
-      if (h < 1.3) {
-        // Low-poly 3-high stacks, scaled in y to the exact height; two across.
-        const sy = h / (3 * 0.144);
-        for (const z of [-0.8, 0.8]) stacks.add(x + rng.range(-0.03, 0.03), floorY, z + rng.range(-0.03, 0.03), rng.range(-0.05, 0.05), 1, null, 0, sy, 1);
-      } else if (h >= 2.5 && Math.round((x - prof[0]!.x) / 1.25) % 5 === 0) {
+      if (h >= 2.5) {
         const n = Math.floor(h / 2.59);
-        for (let k = 0; k < n; k++) containers.add(x + 2.4, floorY + k * 2.59, 0, Math.PI / 2, 1, palette[rng.int(0, palette.length - 1)]!);
+        for (let k = 0; k < n; k++) containers.add(x + rng.range(-0.02, 0.02), floorY + k * 2.59, rng.range(-0.05, 0.05), Math.PI / 2 + rng.range(-0.01, 0.01), 1, palette[rng.int(0, palette.length - 1)]!);
         const rem = h - n * 2.59;
-        const np = Math.round(rem / 0.144);
-        for (let k = 0; k < np; k++) for (const z of [-0.85, 0.85]) pallets.add(x, floorY + n * 2.59 + k * 0.144, z);
-      } else if (h >= 1.3 && h < 2.5) {
-        // Steel frame: 4 legs + 2 beams per bay.
-        for (const z of [-1.2, 1.2]) push(buckets, 'darkSteel', tint(box(0.08, h, 0.08, x, floorY + h / 2, z, 0), 0.7, 0.7, 0.7));
-        push(buckets, 'darkSteel', tint(box(0.08, 0.08, 2.5, x, floorY + h - 0.04, 0, 0), 0.7, 0.7, 0.7));
+        const np = Math.max(0, Math.round(rem / 0.144));
+        const top = floorY + n * 2.59;
+        for (let k = 0; k < np; k++) for (const z of [-0.85, 0.85]) pallets.add(x, top + k * 0.144, z, rng.range(-0.02, 0.02), 2.05, null, 0, 1, 1);
+      } else if (h >= 1.3) {
+        for (const dx of [-0.9, 0.9]) {
+          for (const z of [-1.2, 1.2]) push(buckets, 'darkSteel', tint(box(0.08, h, 0.08, x + dx, floorY + h / 2, z, 0), 0.7, 0.7, 0.7));
+          push(buckets, 'darkSteel', tint(box(0.08, 0.08, 2.5, x + dx, floorY + h - 0.04, 0, 0), 0.7, 0.7, 0.7));
+        }
+      } else {
+        const sy = h / (3 * 0.144);
+        for (const dx of [-0.65, 0.65]) for (const z of [-0.8, 0.8]) stacks.add(x + dx + rng.range(-0.03, 0.03), floorY, z + rng.range(-0.03, 0.03), rng.range(-0.05, 0.05), 1, null, 0, sy, 1);
+      }
+    }
+  }
+
+  // Tyre worn line: a translucent dark strip down the ridden path (reference obs. 19); the dirt bed bakes its own.
+  {
+    const worn: THREE.BufferGeometry[] = [];
+    for (const c of track.colliders) {
+      if (c.kind !== 'polyline' || c.points.length < 2 || c.obstacleIndex >= 0) continue;
+      if (c.surface === 'dirt' && interior) continue;
+      worn.push(ribbonWithShade(c, [[-0.18, 0], [0, 0], [0.18, 0]], 4, 0.008, () => 1));
+    }
+    if (worn.length) {
+      const merged = worn.length === 1 ? worn[0]! : mergeGeometries(worn, false);
+      if (merged) {
+        const mat = lib.derive('rubberMat');
+        mat.color.setHex(0x14100c);
+        mat.vertexColors = true;
+        mat.transparent = true;
+        mat.opacity = 0.22;
+        mat.depthWrite = false;
+        mat.polygonOffset = true;
+        mat.polygonOffsetFactor = -1;
+        mat.polygonOffsetUnits = -1;
+        fogify(mat);
+        const mesh = new THREE.Mesh(merged, mat);
+        mesh.receiveShadow = true;
+        mesh.renderOrder = 1;
+        mesh.name = 'deck:worn';
+        group.add(mesh);
       }
     }
   }
