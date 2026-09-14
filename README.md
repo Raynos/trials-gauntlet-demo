@@ -71,5 +71,7 @@ game.
 - This machine is headless only.
 - Commit early and often.
 - Look at your own work.
+- The game should work on desktop and also on mobile iOS safari.
+- Favor subagents over workflows where possible as subagents are resumable.
 
 Keep this file as the brief.

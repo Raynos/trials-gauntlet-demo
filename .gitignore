@@ -1,0 +1,9 @@
+node_modules/
+dist/
+harness/out/*
+!harness/out/metrics/
+reference/*/raw/
+reference/*/clips/
+*.log
+.DS_Store
+.vite/

@@ -1,0 +1,247 @@
+{
+  "aspect": "crash-restart-ui",
+  "generated": "2026-09-13",
+  "encoding": "1280x720, 30fps, h264 crf26 preset slow, no audio",
+  "sheets_note": "<NN>-<slug>.jpg = fps=2 tile 4x2 (first 4s, as specified); <NN>-<slug>-full.jpg = 16 frames spanning the whole clip.",
+  "sources": [
+    {
+      "id": "nBEtTzin98A",
+      "title": "Trials Evolution - Extreme Tracks Playthrough",
+      "game": "Trials Evolution",
+      "url": "https://www.youtube.com/watch?v=nBEtTzin98A",
+      "raw": "raw/nBEtTzin98A.mp4"
+    },
+    {
+      "id": "7_86rRhggM0",
+      "title": "Trials Evolution - Test Your Might - All Extreme Tracks - 0 Fault Guide",
+      "game": "Trials Evolution",
+      "url": "https://www.youtube.com/watch?v=7_86rRhggM0",
+      "raw": "raw/7_86rRhggM0.mp4"
+    },
+    {
+      "id": "h-n-kD5pDF0",
+      "title": "Trials Evolution: Out of the Pit (Extreme) - No Faults & Platinum Medal",
+      "game": "Trials Evolution",
+      "url": "https://www.youtube.com/watch?v=h-n-kD5pDF0",
+      "raw": "raw/h-n-kD5pDF0.mp4"
+    },
+    {
+      "id": "hEgg5H5Y0iU",
+      "title": "TRIALS RISING Gameplay Walkthrough Part 1 - FIRST 20 MINUTES (Exclusive Early Look)",
+      "game": "Trials Rising",
+      "url": "https://www.youtube.com/watch?v=hEgg5H5Y0iU",
+      "raw": "raw/hEgg5H5Y0iU.mp4"
+    },
+    {
+      "id": "n51JQkY1D10",
+      "title": "Trials Rising: Ragdoll Bailouts & Crashes - Episode 2",
+      "game": "Trials Rising",
+      "url": "https://www.youtube.com/watch?v=n51JQkY1D10",
+      "raw": "raw/n51JQkY1D10.mp4"
+    },
+    {
+      "id": "Ocxq4js7akU",
+      "title": "Industrial Escape (Ninja Lvl 1) - Trials Rising",
+      "game": "Trials Rising",
+      "url": "https://www.youtube.com/watch?v=Ocxq4js7akU",
+      "raw": "raw/Ocxq4js7akU.mp4"
+    }
+  ],
+  "clips": [
+    {
+      "clip": "clips/01-evo-explosion-fault-fade.mp4",
+      "sheet": "sheets/01-evo-explosion-fault-fade.jpg",
+      "sheet_full": "sheets/01-evo-explosion-fault-fade-full.jpg",
+      "game": "Trials Evolution",
+      "source_title": "Trials Evolution - Extreme Tracks Playthrough",
+      "source_url": "https://www.youtube.com/watch?v=nBEtTzin98A",
+      "source_timestamp": "11:00.000",
+      "source_offset_s": 660.0,
+      "duration_s": 5.5,
+      "size_bytes": 1310214,
+      "what": "Fire-pit fault: rider touches flame at in-game 16.95s, screen snaps to near-black in <0.1s, holds dark ~0.9s while bike is repositioned at checkpoint, then depth-of-field unblur/brighten ~0.45s; fault counter 2->3 flips to orange/yellow at end of fade-in; timer keeps counting through the whole thing (16.95->18.55). Red split delta jumps +0.554 -> +7.942 at the fade."
+    },
+    {
+      "clip": "clips/02-evo-tumble-fault-hardcut.mp4",
+      "sheet": "sheets/02-evo-tumble-fault-hardcut.jpg",
+      "sheet_full": "sheets/02-evo-tumble-fault-hardcut-full.jpg",
+      "game": "Trials Evolution",
+      "source_title": "Trials Evolution - Extreme Tracks Playthrough",
+      "source_url": "https://www.youtube.com/watch?v=nBEtTzin98A",
+      "source_timestamp": "11:18.600",
+      "source_offset_s": 678.6,
+      "duration_s": 5.43,
+      "size_bytes": 1129175,
+      "what": "Two full ragdoll-fault cycles in 5.4s. Rider loops back off a steep ramp, falls backward, white impact flash at rider, HARD CUT (no fade) to green-lit checkpoint ~0.35s after flash, counter 4->5 flips orange. Rider re-attempts immediately, fails again ~2.4s later, counter 5->6. In-world checkpoint = green neon panel + green ground glow."
+    },
+    {
+      "clip": "clips/03-evo-rapid-refaults.mp4",
+      "sheet": "sheets/03-evo-rapid-refaults.jpg",
+      "sheet_full": "sheets/03-evo-rapid-refaults-full.jpg",
+      "game": "Trials Evolution",
+      "source_title": "Trials Evolution - Extreme Tracks Playthrough",
+      "source_url": "https://www.youtube.com/watch?v=nBEtTzin98A",
+      "source_timestamp": "11:24.000",
+      "source_offset_s": 684.0,
+      "duration_s": 7.0,
+      "size_bytes": 1309900,
+      "what": "Rapid re-fault rhythm: three faults in 7s (5->6->7) on the same obstacle; shows how tight the attempt-fail-respawn loop is and the red circular direction sign that pulses on the right edge."
+    },
+    {
+      "clip": "clips/04-evo-countdown-go.mp4",
+      "sheet": "sheets/04-evo-countdown-go.jpg",
+      "sheet_full": "sheets/04-evo-countdown-go-full.jpg",
+      "game": "Trials Evolution",
+      "source_title": "Trials Evolution - Test Your Might - All Extreme Tracks - 0 Fault Guide",
+      "source_url": "https://www.youtube.com/watch?v=7_86rRhggM0",
+      "source_timestamp": "05:13.000",
+      "source_offset_s": 313.0,
+      "duration_s": 6.53,
+      "size_bytes": 1362251,
+      "what": "Evolution track start: loading screen fades into track, elastic squash-and-stretch \"3\", \"2\", \"1\" numerals at 1.0s intervals then \"GO\" (yellow outlined italic), camera swings from establishing angle to gameplay angle during countdown, tournament cumulative timer (04:00.248) already displayed."
+    },
+    {
+      "clip": "clips/05-evo-finish-flash-results.mp4",
+      "sheet": "sheets/05-evo-finish-flash-results.jpg",
+      "sheet_full": "sheets/05-evo-finish-flash-results-full.jpg",
+      "game": "Trials Evolution",
+      "source_title": "Trials Evolution - Test Your Might - All Extreme Tracks - 0 Fault Guide",
+      "source_url": "https://www.youtube.com/watch?v=7_86rRhggM0",
+      "source_timestamp": "05:03.300",
+      "source_offset_s": 303.3,
+      "duration_s": 6.5,
+      "size_bytes": 1014784,
+      "what": "Evolution finish: white light burst at the finish gate, timer freezes at 04:00.248, checkered-flag \"FINISH!\" ribbon slides up from bottom, then cut to tournament map with PROGRESS panel and loading screen."
+    },
+    {
+      "clip": "clips/06-evo-pb-race-results.mp4",
+      "sheet": "sheets/06-evo-pb-race-results.jpg",
+      "sheet_full": "sheets/06-evo-pb-race-results-full.jpg",
+      "game": "Trials Evolution",
+      "source_title": "Trials Evolution: Out of the Pit (Extreme) - No Faults & Platinum Medal",
+      "source_url": "https://www.youtube.com/watch?v=h-n-kD5pDF0",
+      "source_timestamp": "01:14.500",
+      "source_offset_s": 74.5,
+      "duration_s": 7.5,
+      "size_bytes": 935817,
+      "what": "Evolution personal-best finish: timer frozen at 01:00.190 with green -00:09.003 delta, \"New Personal Record!\" ribbon + platinum wings flourish, prompt row Results/Retry/View Replay, fade to RACE RESULTS: FAULTS: 0 TIME: 01:00.190, medal row with light burst on platinum, leaderboard neighbours, cash rewards ticking up."
+    },
+    {
+      "clip": "clips/07-evo-menu-select-race.mp4",
+      "sheet": "sheets/07-evo-menu-select-race.jpg",
+      "sheet_full": "sheets/07-evo-menu-select-race-full.jpg",
+      "game": "Trials Evolution",
+      "source_title": "Trials Evolution: Out of the Pit (Extreme) - No Faults & Platinum Medal",
+      "source_url": "https://www.youtube.com/watch?v=h-n-kD5pDF0",
+      "source_timestamp": "00:00.000",
+      "source_offset_s": 0.0,
+      "duration_s": 8.0,
+      "size_bytes": 1517371,
+      "what": "Evolution menus: SELECT EVENT world-map with track thumbnails and medal states, SELECT RACE list with next-medal panel, leaderboard rows and button legend, fade to black before track load."
+    },
+    {
+      "clip": "clips/08-ris-crash-banner-restart.mp4",
+      "sheet": "sheets/08-ris-crash-banner-restart.jpg",
+      "sheet_full": "sheets/08-ris-crash-banner-restart-full.jpg",
+      "game": "Trials Rising",
+      "source_title": "TRIALS RISING Gameplay Walkthrough Part 1 - FIRST 20 MINUTES (Exclusive Early Look)",
+      "source_url": "https://www.youtube.com/watch?v=hEgg5H5Y0iU",
+      "source_timestamp": "10:23.500",
+      "source_offset_s": 623.5,
+      "duration_s": 6.0,
+      "size_bytes": 2353191,
+      "what": "Trials Rising crash + instant full restart: nose-heavy landing, front wheel digs, rider pitches over bars (ragdoll), red \"CRASH!\" stamp scales in top-centre 0.2s after crash, player holds restart, HARD CUT to track start 0.75s after crash, HUD resets to 00:00.000 / 0 faults, ~1.4s idle, timer starts on first throttle and white italic \"GO!\" pops and drifts up-right."
+    },
+    {
+      "clip": "clips/09-ris-countdown-track-start.mp4",
+      "sheet": "sheets/09-ris-countdown-track-start.jpg",
+      "sheet_full": "sheets/09-ris-countdown-track-start-full.jpg",
+      "game": "Trials Rising",
+      "source_title": "TRIALS RISING Gameplay Walkthrough Part 1 - FIRST 20 MINUTES (Exclusive Early Look)",
+      "source_url": "https://www.youtube.com/watch?v=hEgg5H5Y0iU",
+      "source_timestamp": "13:31.000",
+      "source_offset_s": 811.0,
+      "duration_s": 7.03,
+      "size_bytes": 2201734,
+      "what": "Trials Rising track start: camera dollies from establishing shot into gameplay angle, \"3\",\"2\",\"1\" (white italic, drop shadow) at 1.0s spacing then \"GO!\", contract tag \"FINISH UNDER 01:40\" under the HUD pill, camera zooms out noticeably as speed rises after GO."
+    },
+    {
+      "clip": "clips/10-ris-track-finished-crowd.mp4",
+      "sheet": "sheets/10-ris-track-finished-crowd.jpg",
+      "sheet_full": "sheets/10-ris-track-finished-crowd-full.jpg",
+      "game": "Trials Rising",
+      "source_title": "TRIALS RISING Gameplay Walkthrough Part 1 - FIRST 20 MINUTES (Exclusive Early Look)",
+      "source_url": "https://www.youtube.com/watch?v=hEgg5H5Y0iU",
+      "source_timestamp": "14:35.500",
+      "source_offset_s": 875.5,
+      "duration_s": 7.0,
+      "size_bytes": 1745030,
+      "what": "Trials Rising finish: rider crosses checkered line at 01:02.465, cut to cinematic front-facing crowd cam with camera flashes, teal \"TRACK FINISHED!\" tag slides in left of the frozen timer, green -00:07.500 delta, \"TRACK REPLAYED +100/+25\" reward panel top-right, tag swaps to \"2ND PLACE\" with opponent-avatar position bar ~1.2s later, ghost opponents keep arriving."
+    },
+    {
+      "clip": "clips/11-ris-medal-earned.mp4",
+      "sheet": "sheets/11-ris-medal-earned.jpg",
+      "sheet_full": "sheets/11-ris-medal-earned-full.jpg",
+      "game": "Trials Rising",
+      "source_title": "TRIALS RISING Gameplay Walkthrough Part 1 - FIRST 20 MINUTES (Exclusive Early Look)",
+      "source_url": "https://www.youtube.com/watch?v=hEgg5H5Y0iU",
+      "source_timestamp": "14:44.300",
+      "source_offset_s": 884.3,
+      "duration_s": 4.5,
+      "size_bytes": 709533,
+      "what": "Trials Rising MEDAL EARNED / GOLD full-screen card on gold bokeh background, XP ring fills clockwise with +XP counters ticking, level badge, single \"CONTINUE\" prompt bottom-right."
+    },
+    {
+      "clip": "clips/12-ris-finish-ragdoll-tyres.mp4",
+      "sheet": "sheets/12-ris-finish-ragdoll-tyres.jpg",
+      "sheet_full": "sheets/12-ris-finish-ragdoll-tyres-full.jpg",
+      "game": "Trials Rising",
+      "source_title": "TRIALS RISING Gameplay Walkthrough Part 1 - FIRST 20 MINUTES (Exclusive Early Look)",
+      "source_url": "https://www.youtube.com/watch?v=hEgg5H5Y0iU",
+      "source_timestamp": "19:44.500",
+      "source_offset_s": 1184.5,
+      "duration_s": 6.5,
+      "size_bytes": 1902177,
+      "what": "Trials Rising tutorial-track finish: \"TRACK FINISHED!\" appears as the bike crosses the line, then the bike ploughs into a tyre stack, rider ragdolls, camera drops lower and pushes in on the wreck while the reward panel stays up (post-finish physics keeps running)."
+    },
+    {
+      "clip": "clips/13-ris-bailout-castle-ragdoll.mp4",
+      "sheet": "sheets/13-ris-bailout-castle-ragdoll.jpg",
+      "sheet_full": "sheets/13-ris-bailout-castle-ragdoll-full.jpg",
+      "game": "Trials Rising",
+      "source_title": "Trials Rising: Ragdoll Bailouts & Crashes - Episode 2",
+      "source_url": "https://www.youtube.com/watch?v=n51JQkY1D10",
+      "source_timestamp": "00:30.500",
+      "source_offset_s": 30.5,
+      "duration_s": 7.0,
+      "size_bytes": 2057629,
+      "what": "Trials Rising BAILOUT: rider ejects off the bike mid-jump, orange \"BAILOUT!\" stamp top-centre, camera detaches from bike and follows the flailing rider, HUD (timer/faults/progress) fades out completely once the body settles, camera dollies in and orbits slightly on the crumpled ragdoll, crowd NPCs react."
+    },
+    {
+      "clip": "clips/14-ris-barrel-explosion-crash.mp4",
+      "sheet": "sheets/14-ris-barrel-explosion-crash.jpg",
+      "sheet_full": "sheets/14-ris-barrel-explosion-crash-full.jpg",
+      "game": "Trials Rising",
+      "source_title": "Trials Rising: Ragdoll Bailouts & Crashes - Episode 2",
+      "source_url": "https://www.youtube.com/watch?v=n51JQkY1D10",
+      "source_timestamp": "01:50.500",
+      "source_offset_s": 110.5,
+      "duration_s": 5.2,
+      "size_bytes": 1300035,
+      "what": "Trials Rising CRASH via explosive barrel: fireball, red \"CRASH!\" stamp, rider launched ~3 storeys high, 4s of free-fall ragdoll with limbs flailing, camera tracks the body not the bike, fog/atmospheric depth grading."
+    },
+    {
+      "clip": "clips/15-ris-replay-hud-fault-cut.mp4",
+      "sheet": "sheets/15-ris-replay-hud-fault-cut.jpg",
+      "sheet_full": "sheets/15-ris-replay-hud-fault-cut-full.jpg",
+      "game": "Trials Rising",
+      "source_title": "Industrial Escape (Ninja Lvl 1) - Trials Rising",
+      "source_url": "https://www.youtube.com/watch?v=Ocxq4js7akU",
+      "source_timestamp": "01:13.000",
+      "source_offset_s": 73.0,
+      "duration_s": 6.0,
+      "size_bytes": 1011309,
+      "what": "Trials Rising replay-mode HUD: red \"REPLAY / MODE: DEFAULT CAMERA\" tag top-centre, bottom control strip (fast forward / pause / restart, hide UI / change camera / quit), fault 0->1 shown as a hard cut with the in-game timer jumping ~11s (replay skips the crash dead time)."
+    }
+  ]
+}
