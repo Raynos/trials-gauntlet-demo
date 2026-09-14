@@ -29,7 +29,6 @@ async function main(): Promise<void> {
       const hz = rec.header.physicsHz;
       const lines: string[] = [];
       let air = -1; let maxH = 0; let airStartX = 0;
-      const marks = { finishX: sim.compiled.finishX ?? (sim.compiled as any).finishX };
       for (let i = 0; i < frames.length; i++) {
         const evs = sim.step(frames[i]!);
         const s = sim.state();
