@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "h3-fire-line",
+  "tier": "hard",
+  "technique": "commit at speed over fire, then stop hard",
+  "updatedAt": "2026-09-14T12:38:40.182Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    18,
+    25
+  ],
+  "finishX": 473,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        3173388572,
+        3173388573,
+        3173388574
+      ],
+      "attempts": [
+        51,
+        51,
+        51
+      ],
+      "medianAttempts": 51,
+      "clears": 0,
+      "finishTimes": [
+        null,
+        null,
+        null
+      ],
+      "medianFinishTime": null,
+      "bestX": 412.02110809838786,
+      "deaths": [
+        {
+          "obstacle": "barrel @ 57.0 m",
+          "x": 57,
+          "count": 109,
+          "reasons": {
+            "hazard": 109
+          },
+          "rules": {
+            "air-brake-nose-down": 21,
+            "nose-high": 1,
+            "air-level": 53,
+            "drop-ahead-lean-back": 7,
+            "steep-ahead": 12,
+            "air-gas-nose-up": 14,
+            "cruise": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 60 m",
+          "x": 60,
+          "count": 27,
+          "reasons": {
+            "hazard": 27
+          },
+          "rules": {
+            "air-brake-nose-down": 8,
+            "air-level": 18,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 413.0 m",
+          "x": 413,
+          "count": 6,
+          "reasons": {
+            "hazard": 6
+          },
+          "rules": {
+            "air-gas-nose-up": 2,
+            "air-level": 1,
+            "air-brake-nose-down": 3
+          }
+        },
+        {
+          "obstacle": "ramp @ 334.4 m",
+          "x": 334.4,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "nose-low": 1,
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 215 m",
+          "x": 215,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ledge @ 221.6 m",
+          "x": 221.6,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 320.4 m",
+          "x": 320.4,
+          "count": 1,
+          "reasons": {
+            "hazard": 1
+          },
+          "rules": {
+            "air-level": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 325 m",
+          "x": 325,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 345 m",
+          "x": 345,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "barrel @ 406.4 m",
+          "x": 406.4,
+          "count": 1,
+          "reasons": {
+            "hazard": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073839-5847c6",
+        "20260914-073839-bb414d",
+        "20260914-073839-ab7f1f"
+      ]
+    }
+  ]
+}

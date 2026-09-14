@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "m3-see-saw",
+  "tier": "medium",
+  "technique": "see-saw timing and thin landings",
+  "updatedAt": "2026-09-14T12:38:38.271Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    8,
+    12
+  ],
+  "finishX": 395.7,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        1066951255,
+        1066951256,
+        1066951257
+      ],
+      "attempts": [
+        45,
+        42,
+        39
+      ],
+      "medianAttempts": 42,
+      "clears": 0,
+      "finishTimes": [
+        null,
+        null,
+        null
+      ],
+      "medianFinishTime": null,
+      "bestX": 346.75014613606567,
+      "deaths": [
+        {
+          "obstacle": "gap @ 164.4 m",
+          "x": 164.4,
+          "count": 32,
+          "reasons": {
+            "crash": 8,
+            "hazard": 18,
+            "restart": 6
+          },
+          "rules": {
+            "air-brake-nose-down": 6,
+            "air-gas-nose-up": 7,
+            "climbing": 3,
+            "hop-preload": 4,
+            "hop-snap": 2,
+            "cruise": 7,
+            "nose-high": 1,
+            "stuck-restart": 2
+          }
+        },
+        {
+          "obstacle": "ramp @ 160.4 m",
+          "x": 160.4,
+          "count": 26,
+          "reasons": {
+            "crash": 11,
+            "restart": 15
+          },
+          "rules": {
+            "nose-low": 5,
+            "climbing": 7,
+            "air-level": 3,
+            "stuck-restart": 5,
+            "air-brake-nose-down": 1,
+            "air-gas-nose-up": 2,
+            "cruise": 3
+          }
+        },
+        {
+          "obstacle": "plank @ 167.4 m",
+          "x": 167.4,
+          "count": 24,
+          "reasons": {
+            "crash": 9,
+            "hazard": 15
+          },
+          "rules": {
+            "hop-snap": 1,
+            "air-gas-nose-up": 17,
+            "cruise": 4,
+            "air-brake-nose-down": 1,
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 344.2 m",
+          "x": 344.2,
+          "count": 19,
+          "reasons": {
+            "hazard": 15,
+            "crash": 4
+          },
+          "rules": {
+            "air-level": 4,
+            "air-brake-nose-down": 7,
+            "hop-preload": 3,
+            "cruise": 4,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "seesaw @ 336.2 m",
+          "x": 336.2,
+          "count": 10,
+          "reasons": {
+            "crash": 1,
+            "hazard": 9
+          },
+          "rules": {
+            "nose-low": 1,
+            "air-gas-nose-up": 1,
+            "climbing": 6,
+            "air-level": 1,
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "plank @ 347.2 m",
+          "x": 347.2,
+          "count": 5,
+          "reasons": {
+            "hazard": 5
+          },
+          "rules": {
+            "nose-high": 1,
+            "hop-snap": 1,
+            "air-gas-nose-up": 2,
+            "cruise": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 55 m",
+          "x": 55,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 79.6 m",
+          "x": 79.6,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 95 m",
+          "x": 95,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 171.4 m",
+          "x": 171.4,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 220.4 m",
+          "x": 220.4,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 265.4 m",
+          "x": 265.4,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "drop-ahead-lean-back": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 285 m",
+          "x": 285,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073837-da4812",
+        "20260914-073837-4d0807",
+        "20260914-073837-cadc07"
+      ]
+    }
+  ]
+}

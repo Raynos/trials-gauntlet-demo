@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "gap-test",
+  "tier": "beginner",
+  "technique": "jump a gap",
+  "updatedAt": "2026-09-14T12:38:34.359Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    1,
+    3
+  ],
+  "finishX": 57,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        2308543150,
+        2308543151,
+        2308543152
+      ],
+      "attempts": [
+        2,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        11.008333333333333,
+        7.3,
+        6.475
+      ],
+      "medianFinishTime": 7.3,
+      "bestX": 62.10659791491708,
+      "deaths": [
+        {
+          "obstacle": "ground @ 45 m",
+          "x": 45,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-low": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073834-73082b",
+        "20260914-073834-76556e",
+        "20260914-073834-a2b0a8"
+      ]
+    }
+  ]
+}

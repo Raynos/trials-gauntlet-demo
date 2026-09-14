@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "x1-vertical-limit",
+  "tier": "extreme",
+  "technique": "near-vertical planks and pole-top hops",
+  "updatedAt": "2026-09-14T12:38:40.835Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    30,
+    45
+  ],
+  "finishX": 439.173772,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        2756386537,
+        2756386538,
+        2756386539
+      ],
+      "attempts": [
+        43,
+        43,
+        44
+      ],
+      "medianAttempts": 43,
+      "clears": 0,
+      "finishTimes": [
+        null,
+        null,
+        null
+      ],
+      "medianFinishTime": null,
+      "bestX": 65.13545537756343,
+      "deaths": [
+        {
+          "obstacle": "ramp @ 44.0 m",
+          "x": 44,
+          "count": 85,
+          "reasons": {
+            "crash": 32,
+            "restart": 53
+          },
+          "rules": {
+            "nose-high": 17,
+            "cruise": 13,
+            "stuck-restart": 20,
+            "hop-preload": 2,
+            "climbing": 2,
+            "steep-ahead": 5,
+            "nose-low": 15,
+            "air-gas-nose-up": 5,
+            "air-level": 3,
+            "air-brake-nose-down": 3
+          }
+        },
+        {
+          "obstacle": "plank @ 45.2 m",
+          "x": 45.2,
+          "count": 39,
+          "reasons": {
+            "restart": 25,
+            "crash": 14
+          },
+          "rules": {
+            "climbing": 5,
+            "air-brake-nose-down": 6,
+            "stuck-restart": 14,
+            "nose-high": 9,
+            "hop-snap": 3,
+            "cruise": 1,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "box @ 48.1 m",
+          "x": 48.094894,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 62.6 m",
+          "x": 62.623558,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "plank @ 63.8 m",
+          "x": 63.823558,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073840-1b83a5",
+        "20260914-073840-14010d",
+        "20260914-073840-7e8af8"
+      ]
+    }
+  ]
+}

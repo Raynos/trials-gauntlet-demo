@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "e3-stairway",
+  "tier": "easy",
+  "technique": "stairs: pulse up, brake down",
+  "updatedAt": "2026-09-14T12:38:36.160Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    3,
+    6
+  ],
+  "finishX": 366.15,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        3073702004,
+        3073702005,
+        3073702006
+      ],
+      "attempts": [
+        48,
+        46,
+        49
+      ],
+      "medianAttempts": 48,
+      "clears": 0,
+      "finishTimes": [
+        null,
+        null,
+        null
+      ],
+      "medianFinishTime": null,
+      "bestX": 101.43185173461026,
+      "deaths": [
+        {
+          "obstacle": "stair @ 100.5 m",
+          "x": 100.5,
+          "count": 138,
+          "reasons": {
+            "crash": 17,
+            "restart": 121
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "nose-high": 9,
+            "air-brake-nose-down": 8,
+            "cruise": 46,
+            "stuck-restart": 59,
+            "hop-preload": 10,
+            "nose-low": 4,
+            "hop-snap": 1
+          }
+        },
+        {
+          "obstacle": "stair @ 44.0 m",
+          "x": 44,
+          "count": 2,
+          "reasons": {
+            "crash": 1,
+            "restart": 1
+          },
+          "rules": {
+            "nose-high": 1,
+            "stuck-restart": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073835-24cb95",
+        "20260914-073835-2cd8f0",
+        "20260914-073835-ebb85e"
+      ]
+    }
+  ]
+}

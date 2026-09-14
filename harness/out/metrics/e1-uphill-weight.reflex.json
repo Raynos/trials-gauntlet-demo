@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "e1-uphill-weight",
+  "tier": "easy",
+  "technique": "lean forward on steep climbs",
+  "updatedAt": "2026-09-14T12:38:35.186Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    2,
+    4
+  ],
+  "finishX": 539.006136,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        847839319,
+        847839320,
+        847839321
+      ],
+      "attempts": [
+        1,
+        3,
+        4
+      ],
+      "medianAttempts": 3,
+      "clears": 3,
+      "finishTimes": [
+        60.05,
+        79.26666666666667,
+        87.3
+      ],
+      "medianFinishTime": 79.26666666666667,
+      "bestX": 544.1791933346765,
+      "deaths": [
+        {
+          "obstacle": "ramp @ 445.0 m",
+          "x": 445.006136,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "nose-high": 1,
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 165 m",
+          "x": 165,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 308.8 m",
+          "x": 308.789782,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 525 m",
+          "x": 525,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073834-a04d87",
+        "20260914-073835-718c17",
+        "20260914-073835-e25875"
+      ]
+    }
+  ]
+}

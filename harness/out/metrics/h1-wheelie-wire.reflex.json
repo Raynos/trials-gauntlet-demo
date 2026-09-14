@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "h1-wheelie-wire",
+  "tier": "hard",
+  "technique": "sustained wheelie and the lip climb",
+  "updatedAt": "2026-09-14T12:38:38.883Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    10,
+    18
+  ],
+  "finishX": 483,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        1831771780,
+        1831771781,
+        1831771782
+      ],
+      "attempts": [
+        47,
+        49,
+        49
+      ],
+      "medianAttempts": 49,
+      "clears": 0,
+      "finishTimes": [
+        null,
+        null,
+        null
+      ],
+      "medianFinishTime": null,
+      "bestX": 211.0420827597107,
+      "deaths": [
+        {
+          "obstacle": "wall @ 138.0 m",
+          "x": 138,
+          "count": 132,
+          "reasons": {
+            "crash": 40,
+            "restart": 92
+          },
+          "rules": {
+            "nose-high": 9,
+            "hop-snap": 12,
+            "nose-low": 15,
+            "stuck-restart": 38,
+            "air-brake-nose-down": 7,
+            "climbing": 23,
+            "cruise": 22,
+            "air-gas-nose-up": 3,
+            "hop-preload": 3
+          }
+        },
+        {
+          "obstacle": "gap @ 58.5 m",
+          "x": 58.5,
+          "count": 3,
+          "reasons": {
+            "crash": 3
+          },
+          "rules": {
+            "air-gas-nose-up": 2,
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 61.0 m",
+          "x": 61,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 68.5 m",
+          "x": 68.5,
+          "count": 2,
+          "reasons": {
+            "hazard": 1,
+            "crash": 1
+          },
+          "rules": {
+            "hop-preload": 1,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 63.5 m",
+          "x": 63.5,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 85 m",
+          "x": 85,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 210.0 m",
+          "x": 210,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-low": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073838-ed4e91",
+        "20260914-073838-ceea75",
+        "20260914-073838-d5ac63"
+      ]
+    }
+  ]
+}

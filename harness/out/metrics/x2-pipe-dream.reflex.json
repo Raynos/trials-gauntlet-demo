@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "x2-pipe-dream",
+  "tier": "extreme",
+  "technique": "spinning drums with gaps and see-saw drops",
+  "updatedAt": "2026-09-14T12:38:41.609Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    40,
+    60
+  ],
+  "finishX": 367.3,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        2290459156,
+        2290459157,
+        2290459158
+      ],
+      "attempts": [
+        45,
+        48,
+        41
+      ],
+      "medianAttempts": 45,
+      "clears": 0,
+      "finishTimes": [
+        null,
+        null,
+        null
+      ],
+      "medianFinishTime": null,
+      "bestX": 130.3087412502449,
+      "deaths": [
+        {
+          "obstacle": "ramp @ 47.6 m",
+          "x": 47.6,
+          "count": 114,
+          "reasons": {
+            "crash": 62,
+            "restart": 52
+          },
+          "rules": {
+            "air-brake-nose-down": 18,
+            "nose-low": 10,
+            "cruise": 13,
+            "air-gas-nose-up": 7,
+            "nose-high": 34,
+            "stuck-restart": 29,
+            "hop-snap": 2,
+            "hop-preload": 1
+          }
+        },
+        {
+          "obstacle": "logpile @ 49.1 m",
+          "x": 49.1,
+          "count": 11,
+          "reasons": {
+            "crash": 8,
+            "restart": 3
+          },
+          "rules": {
+            "nose-low": 2,
+            "nose-high": 2,
+            "hop-snap": 1,
+            "air-brake-nose-down": 2,
+            "climbing": 1,
+            "stuck-restart": 2,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "box @ 35.6 m",
+          "x": 35.6,
+          "count": 3,
+          "reasons": {
+            "hazard": 1,
+            "crash": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 3
+          }
+        },
+        {
+          "obstacle": "ramp @ 39.6 m",
+          "x": 39.6,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 132.1 m",
+          "x": 132.1,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073840-4e5a63",
+        "20260914-073841-70fd0c",
+        "20260914-073841-8e1cda"
+      ]
+    }
+  ]
+}

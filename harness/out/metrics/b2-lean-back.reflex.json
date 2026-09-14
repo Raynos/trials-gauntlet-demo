@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "b2-lean-back",
+  "tier": "beginner",
+  "technique": "weight shift on drops",
+  "updatedAt": "2026-09-14T12:38:34.810Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "finishX": 414.2,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        3802965488,
+        3802965489,
+        3802965490
+      ],
+      "attempts": [
+        2,
+        3,
+        5
+      ],
+      "medianAttempts": 3,
+      "clears": 3,
+      "finishTimes": [
+        51.45,
+        58.483333333333334,
+        75.35833333333333
+      ],
+      "medianFinishTime": 58.483333333333334,
+      "bestX": 419.39066102237103,
+      "deaths": [
+        {
+          "obstacle": "ramp @ 322.2 m",
+          "x": 322.2,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 2
+          }
+        },
+        {
+          "obstacle": "ground @ 100 m",
+          "x": 100,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 220 m",
+          "x": 220,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "box @ 254.4 m",
+          "x": 254.4,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 345 m",
+          "x": 345,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 380 m",
+          "x": 380,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073834-157b99",
+        "20260914-073834-8fa8b1",
+        "20260914-073834-8afba5"
+      ]
+    }
+  ]
+}

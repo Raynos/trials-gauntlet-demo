@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "b3-kicker-row",
+  "tier": "beginner",
+  "technique": "jump and level in the air",
+  "updatedAt": "2026-09-14T12:38:34.979Z",
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "c83b6ca8",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "finishX": 426,
+  "bySkill": [
+    {
+      "skill": "average",
+      "seeds": [
+        4115132233,
+        4115132234,
+        4115132235
+      ],
+      "attempts": [
+        2,
+        3,
+        5
+      ],
+      "medianAttempts": 3,
+      "clears": 3,
+      "finishTimes": [
+        56.71666666666667,
+        70.24166666666666,
+        78.30833333333334
+      ],
+      "medianFinishTime": 70.24166666666666,
+      "bestX": 430.6093004576428,
+      "deaths": [
+        {
+          "obstacle": "box @ 368.0 m",
+          "x": 368,
+          "count": 2,
+          "reasons": {
+            "hazard": 2
+          },
+          "rules": {
+            "air-level": 1,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 70 m",
+          "x": 70,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 110 m",
+          "x": 110,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 195 m",
+          "x": 195,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 200 m",
+          "x": 200,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 330 m",
+          "x": 330,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260914-073834-d2dfd4",
+        "20260914-073834-49430b",
+        "20260914-073834-380231"
+      ]
+    }
+  ]
+}
