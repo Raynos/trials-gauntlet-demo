@@ -312,11 +312,11 @@ def build_timeline(cut):
         # 15 s cut: title, kicker, slow-mo jump, crash -> respawn on the drop, fire, end card. Music: drops 0,5 breaks 3.5 end 6.5.
         t = 0.0
         t = add(t, bar(0.5), kind='title')
-        t = add(t, bar(1), kind='clip', beat='kicker', in_s=1.0, gain=0.9)
+        t = add(t, bar(1), kind='clip', beat='kicker', in_s=0.6, gain=0.9)
         t = add(t, bar(2), kind='clip', beat='plank', in_s=0.7, gain=0.9,
                 remap=[(0.0, 0.9, 1.0), (0.9, 1.75, 0.35), (1.75, 2.3, 1.0)], punch=True)
         t = add(t, bar(1.5), kind='clip', beat='crash', in_s=0.1, gain=1.0, music_cut=(2.17, None))
-        t = add(t, bar(0.5), kind='clip', beat='crash', in_s=3.3, gain=0.9, overlay=('EVERY CRASH IS A RESTART', ('RESTART',)))
+        t = add(t, bar(0.5), kind='clip', beat='crash', in_s=3.8, gain=0.9, overlay=('EVERY CRASH IS A RESTART', ('RESTART',)))
         t = add(t, bar(1), kind='clip', beat='fire', in_s=0.55, gain=0.9, lift=1.25)
         t = add(t, 2.5, kind='end', fade_out=0.4)
         return S, t
@@ -326,26 +326,27 @@ def build_timeline(cut):
     t = add(t, bar(2.5), kind='clip', beat='cold', in_s=0.1, gain=1.0, fade_in=0.4)
     t = add(t, bar(1), kind='title')
     t = add(t, bar(1.5), kind='clip', beat='flow', in_s=0.1, gain=0.85)
-    t = add(t, bar(1.5), kind='clip', beat='kicker', in_s=0.2, gain=0.9)
+    t = add(t, bar(1.5), kind='clip', beat='kicker', in_s=0.1, gain=0.9)
     # plank: normal 28.25-29.7, slow x0.35 29.7-30.55, normal 30.55-31.51 (source starts 28.1)
     t = add(t, bar(2.5), kind='clip', beat='plank', in_s=0.15, gain=0.9,
             remap=[(0.0, 1.45, 1.0), (1.45, 2.3, 0.35), (2.3, 3.26, 1.0)], punch=True)
     t = add(t, bar(1.5), kind='clip', beat='seesaw', in_s=0.15, gain=0.9, lift=1.3)
-    t = add(t, bar(1), kind='clip', beat='drums', in_s=0.75, gain=0.9)
+    t = add(t, bar(1), kind='clip', beat='drums', in_s=0.1, gain=0.9)
     t = add(t, bar(1.5), kind='card', lines=['15 TRACKS · 5 BIOMES'], accent=('15', '5'), reveal=0.0)
     # crash: jump start at x1 t=3.4 (in_s 0.1), crash at 2.17 s in, hold ragdoll to the bar
     t = add(t, bar(1.5), kind='clip', beat='crash', in_s=0.1, gain=1.0, music_cut=(2.17, None))
     # respawn (x1 t=6.6): 1 bar, card over footage; this is drop 2
-    t = add(t, bar(1), kind='clip', beat='crash', in_s=3.3, gain=0.9, overlay=('EVERY CRASH IS A RESTART', ('RESTART',)))
+    t = add(t, bar(1), kind='clip', beat='crash', in_s=3.8, gain=0.9, overlay=('EVERY CRASH IS A RESTART', ('RESTART',)))
     t = add(t, bar(1.5), kind='clip', beat='fire', in_s=0.2, gain=0.9, lift=1.25)
-    t = add(t, bar(1.5), kind='clip', beat='night', in_s=0.2, gain=0.9)
-    t = add(t, bar(1.5), kind='clip', beat='climb', in_s=0.05, gain=0.9)
-    t = add(t, bar(0.5), kind='clip', beat='stairs', in_s=0.3, gain=0.9)
+    t = add(t, bar(1), kind='clip', beat='night', in_s=0.5, gain=0.9)
+    t = add(t, bar(1), kind='clip', beat='pipes', in_s=0.6, gain=0.9, lift=1.15)
+    t = add(t, bar(1), kind='clip', beat='climb', in_s=0.5, gain=0.9)
+    t = add(t, bar(0.5), kind='clip', beat='stairs', in_s=0.35, gain=0.9)
     t = add(t, bar(1), kind='clip', beat='loopout', in_s=0.15, gain=1.0)
     t = add(t, bar(0.5), kind='clip', beat='hop', in_s=0.15, gain=0.9)
     t = add(t, bar(0.5), kind='clip', beat='chain', in_s=0.15, gain=0.9)
     t = add(t, bar(1), kind='card', lines=['PLAYS IN YOUR BROWSER', 'DESKTOP  ·  iPHONE  ·  GAMEPAD'], accent=('BROWSER',), reveal=0.35)
-    t = add(t, bar(2), kind='clip', beat='finish', in_s=0.4, gain=1.0)
+    t = add(t, bar(2), kind='clip', beat='finish', in_s=0.3, gain=1.0)
     t = add(t, 3.5, kind='end', fade_out=0.5)
     return S, t
 
