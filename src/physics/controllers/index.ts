@@ -6,7 +6,13 @@
  */
 import type { InputFrame, PhysicsState } from '../../core/types';
 import { quantizeInput } from '../../core/replay';
-import type { BikePhysicsWorld } from '../bike';
+import type { PhysicsWorld } from '../index';
+
+/** What a controller needs from a world: v1 and v2 both satisfy it. */
+export interface ControllableWorld extends PhysicsWorld {
+  balancePitch(lean: number, accel?: number): number;
+}
+type BikePhysicsWorld = ControllableWorld;
 
 export interface Observation {
   state: PhysicsState;

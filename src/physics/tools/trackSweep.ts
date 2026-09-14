@@ -11,11 +11,11 @@
 import type { CompiledTrack, PhysicsState, TrackDef } from '../../core/types';
 import { compileTrack } from '../../tracks/compile';
 import { CURRICULUM } from '../../tracks/courses';
-import { createBikePhysics, type BikePhysicsWorld } from '../bike';
-import type { BikeClass } from '../tuning';
+import { createBikePhysicsV2, type BikePhysicsWorld } from '../index';
+import type { BikeClass } from '../index';
 
-/** Bike class to sweep (round 11): `TRIALS_BIKE=pro npx tsx src/physics/tools/trackSweep.ts`. */
-const BIKE: BikeClass = process.env.TRIALS_BIKE === 'pro' ? 'pro' : 'rookie';
+/** Bike class row to sweep (physics v2): `TRIALS_BIKE=pro|mid|rookie npx tsx src/physics/tools/trackSweep.ts` (default rookie, the game's default). */
+const BIKE: BikeClass = process.env.TRIALS_BIKE === 'pro' ? 'pro' : process.env.TRIALS_BIKE === 'mid' ? 'mid' : 'rookie';
 import { cruise, fullThrottle, runController, type Controller, type Observation } from '../controllers';
 
 const HZ = 120;
@@ -98,7 +98,7 @@ export function sweepTrack(def: TrackDef, seconds = 40): SweepRow[] {
   const track: CompiledTrack = compileTrack(def);
   const rows: SweepRow[] = [];
   for (const [name, ctrl] of CONTROLLERS) {
-    const w: BikePhysicsWorld = createBikePhysics(HZ);
+    const w: BikePhysicsWorld = createBikePhysicsV2(HZ);
     w.loadTrack(track, 1, { bike: BIKE });
     let reachX = -Infinity;
     let prev: PhysicsState | null = null;

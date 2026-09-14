@@ -467,7 +467,9 @@ class BikeWorld implements BikePhysicsWorld {
   // -- PhysicsWorld ---------------------------------------------------------
 
   loadTrack(track: CompiledTrack, seed: number, opts?: LoadTrackOptions): void {
-    this.selectBike(opts?.bike ?? 'rookie');
+    // v1 has two rows; the v2 reference row 'mid' rides v1's honest bike
+    const cls = opts?.bike ?? 'rookie';
+    this.selectBike(cls === 'pro' ? 'pro' : 'rookie');
     this.track = track;
     this.col = new CollisionWorld(track, FIRST_DYN);
     this.nSeesaw = this.col.seesawBodies.length;
@@ -1491,6 +1493,8 @@ class BikeWorld implements BikePhysicsWorld {
     angle: 0,
     minX: 0,
     maxX: 0,
+    endA: false,
+    endB: false,
   };
   private readonly bikeManifold: Manifold = { px: 0, py: 0, nx: 0, ny: 0, sep: 0, prim: null as unknown as Prim, straddle: false };
 

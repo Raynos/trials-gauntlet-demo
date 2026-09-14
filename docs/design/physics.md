@@ -5,6 +5,155 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R1 (of three, physics-v2.md §16.7)
+
+**Finding.** The v2 plant is built to `physics-v2.md` (§1–13) in `src/physics/v2/{bike,rider,tyre,engine,tuning}.ts`
+and is the shipped `createBikePhysics` (v1 stays as `createBikePhysicsV1`). It is bit-deterministic (v1's
+`snapshot.test.ts` verbatim, two-run, restore×13, foreign snapshots, used-world reload all green), 2.3 µs/tick p95
+riding / 8 µs ragdolling in node, its cross-tick state is exactly the §12 list (asserted), every one-quantum input
+perturbation is bounded per tick and in 30-tick divergence, throttle→acceleration is monotone at every speed, lean→pitch
+is monotone across the loop ladder, the velocity pass conserves angular momentum to 1e-13 with `K_att` 0, and the
+§10 stability test passes (a +6°/+0.5 rad/s pitch kick at 6 m/s under full gas with weight forward decays, no loop).
+**Four of the spec's flat-ground feel rows cannot be met by the spec's own rigid-body model** and were measured from the
+toy at large pitch where the toy is wrong: the 45–65° "self-limiting" neutral wheelie, the 60–75° lean −0.25 hold, the
+constant-input 3 s hold, and the lean-only 10 Hz balance. The honest bike does not lift at neutral, lifts and loops
+(monotone in lean: 1.60 / 1.25 / 1.13 s at −0.25 / −0.5 / −1) when leaned back, and recovers a 20° wheelie by snapping
+forward with the throttle held (30° needs the throttle closed with the snap; 40° is past the envelope). Brakes, top
+speed, air control, launch attitude and crash rules meet their bands. Details below; the parameter table is the spec's
+with three documented changes.
+
+### Files
+
+- `src/physics/v2/tuning.ts` — §13 table as `TuningV2`; class rows `rookie | mid | pro` (`BIKE_CLASSES_V2`), `bikeTuningV2`.
+- `src/physics/v2/engine.ts` — thrust curve, implicit first-order lags, engine braking, limiter latch, reported rpm.
+- `src/physics/v2/tyre.ts` — brush model (load-sensitive μ, implicit stiffness step).
+- `src/physics/v2/rider.ts` — pose table + inverse, rate-limited target, the RIDER_CHAIN port (hips from the body).
+- `src/physics/v2/bike.ts` — the world: bodies, tick order §3, sequential impulses 6+2 (split-impulse position pass),
+  suspension §5, contacts, brakes §8, servo §9.3, attitude torque §9.4, crash §11, state §12, `debug()` with
+  `attTorque` / `poseTarget` / `comDH` / `rider.body`.
+- `src/physics/collision.ts` — additive: `Prim.endA/endB`, `queryCircleV2` / `circleVsPrimV2` (one-way by the previous
+  centre, two-sided open-end vertices, no straddle). v1 untouched in behaviour.
+- `src/physics/index.ts` — barrel: `createBikePhysics` = v2; v1 re-exported with a `V1` suffix.
+- `src/physics/controllers/index.ts` — typed against a minimal `ControllableWorld` so v1 and v2 share the controllers.
+- Tests: `src/physics/v2/{snapshot,world,property,feel}.test.ts` (5 `it.fails` known gaps, 12 `it.todo` R2 rows).
+- `src/physics/tools/trackSweep.ts` runs on v2 (`TRIALS_BIKE=rookie|mid|pro`).
+
+### R1 FEEL table (mid row; `npx vitest run src/physics/v2/feel.test.ts` prints every row)
+
+| row (§14.2) | band | measured | verdict |
+|--|--|--|--|
+| static sag rear / front | 28–32 % / 24–28 % | **28.5 %** / **16.9 %** | rear pass; front **fail** — the pose table puts ~490 N sprung on the front, on a 7 500 N/m spring tilted 23° that is 16 %; 26 % needs k ≈ 5 400 (spec inconsistent) |
+| static pitch | (level) | +1.8° nose-up | the two static sags on the spec's axle rest points imply it; the spawn is placed at this equilibrium |
+| combined COM d / h at neutral | 0.55 / 0.79 (§2) | 0.50 / 0.78 | d/h 0.64 → balance pitch atan(d/h) = 33.6° at lean 0 (CONTRACT says 40–50: unreachable together with a front-lifting launch) |
+| 0 → 16 m/s, lean +0.25 | 3.5–4.2 s | **4.47 s** | **fail** (`it.fails`): the toy that set the band had no aero drag and massless wheels; lever `F_peak` +7 % |
+| top speed | 20 ± 0.5 | 20.03 | pass |
+| full gas lean +0.25 / +0.5 / +1 | front ≤ 10°, finishes 120 m | 6.1 / 5.7 / 5.6°, finish 8.9 s | pass |
+| full gas lean 0 | 45–65° wheelie, never loops, < 20° by 16 m/s | **6.8°, never loops**, 5.0° at 16 m/s, finishes | never-loops passes; the 45–65° band is unreachable by the spec's own §10: a hold at pitch θ needs a/g = d(θ)/h(θ), which is 0 at 33° and −0.5 at 58° — a 58° wheelie under thrust is a loop |
+| full gas lean −0.25 / −0.5 / −1 | 60–75° hold ≥ 3 s / loops ≥ 2 s / loops ≤ 1 s | loops at **1.60 / 1.25 / 1.13 s**, max pitch > 60° each | monotone in lean (the A§2.7 property) and −1 ≈ 1 s pass; the hold and ≥ 2 s rows are the toy's large-pitch artefact |
+| constant-input lean-back wheelie | holds ≥ 3 s | best pair (lean −0.75, thr 0.5) 0.64 s above 20° | **fail** (`it.fails`); CONTRACT 2.5 "open-loop diverges in 1–2 s" wins — e-fold 0.3 s |
+| lean-actuated hold, 10 Hz / 100 ms, throttle 0.5 | 45 ± 8° for 10 s | loops at 1.64 s; a 60 Hz / 0 ms controller holds 3.4 s within ±8° of 15° and never loops | **fail** (`it.fails`): the pose path (3 m/s target cap + servo ≈ 0.2 s) plus reaction delay exceeds the 0.3 s e-fold; §10's "5–10 Hz with margin" ignored the input lag. The balance band at thr 0.5 is 17–22°, not 45 |
+| snap-forward from 20°, throttle held | < 15° in 0.5 s | 9.6° at 0.5 s, peak 29.8°, no loop | pass |
+| snap-forward from 30°, throttle held | < 15° in 0.5 s | loops (peak 91.7°) | spec row unreachable: at 30° every pose has d/h(θ) < a/g; with the throttle closed at the snap: 0.0° at 0.5 s, no loop (asserted); 40° loops even then |
+| brake 10 → 0, hard-back | ≤ 5.0 m, rear off ≤ 0.3 s | **5.54 m**, rear off 0.22 s | rear-off passes; distance **fail** (`it.fails`): 560 Nm is 0.9 g average; lever `totalNm` ≈ 620 |
+| brake 10 → 0, neutral | ≤ 7 m, rear off ≤ 0.6 s, pitch ≥ −25° | 6.74 m, 0.16 s, −8.0° | pass (a settling stoppie) |
+| brake, hard-forward | endo | crash at 0.8 s, rear off 0.68 s | pass |
+| air control 0.5 s at 8 / 14 / 20 m/s: lean −1 | +25…+40 | +35.1 / +35.0 / +35.0 | pass (at `K_att` 300, see deviations) |
+| lean +1 | −25…−40 | −38.8 / −38.8 / −38.8 | pass |
+| throttle | +8…+15 at 8, → 0 at the limiter | +9.0 / +4.5 / −0.1 | pass |
+| brake | −12…−40 rising with speed | −12.1 / −20.0 / −26.7 | pass |
+| none | ±5 | −2.7 / −2.8 / −2.9 | pass (engine braking on the spinning rear) |
+| µs/tick p95 | ≤ 10 riding (R1), ≤ 80 ragdoll | 2.25 / 8.25 | pass |
+| stationary hop (R2 row, measured for the record) | rear 0.45–0.65 m | rear 0.19 m at P 0.3, front 0.12, both-off 0.11 s | R2 — see "what R2 must do first" |
+
+Property tests (`property.test.ts`): bounded response on flat / 30° kicker / 60° plank, 200 states × 6 quanta: per-tick
+|Δv| ≤ 3.8e-3 m/s, |Δω| ≤ 0.056 rad/s, 30-tick divergence ≤ 0.008 m/s / 0.017 rad/s; monotone throttle (worst
+neighbour step 0.000 m/s²); monotone lean ladder at thr 0.4 / 0.7 / 1.0 (+1.5° tolerance, see below); conservation
+|ΔL| 8e-13 (velocity pass) / 9e-2 N m s over 1 s with the position pass on (see below); balance pitch by lean −1…+1 =
+29.3 / 31.6 / 33.6 / 35.4 / 37.2°; hop apex continuous over the input quanta (max neighbour jump 0.018 m), identical on
+dirt / wood / concrete, identical under a 1–8 tick delay.
+
+### Deviations from the spec and why (the spec wins unless inconsistent; each of these is an inconsistency)
+
+1. **Pose table x column** (§9.1). The printed column (−0.44 / −0.30 / −0.15 / −0.12 / −0.09) gives d/h = 0.62 at
+   neutral — exactly `a_peak/g` — and full gas at lean 0 was a coin flip between "no lift" and "loops at 3 s"
+   between two builds differing only in the servo's damping form. The column is also inconsistent with §2's stated
+   targets (d 0.55 at neutral) and with the toy the ladder was measured with (`riderTarget`: −0.42 / −0.27 / −0.12 /
+   −0.03 / +0.06). v2 uses the toy's x column with the table's y and ψ: d/h 0.64 at neutral, a clean margin, and the
+   §10 ladder as stated for lean ≥ 0. Also: the spec's axle→chassis transform has a sign slip (the axle origin is
+   *below* the chassis COM), and the table's COM is ~0.2 m below the drawn chain's COM; the dynamics take the table (h
+   0.79, the CONTRACT's number), the drawn chain keeps the canonical hips plus the body's deviation from its target.
+2. **`K_att` 180 → 300, `c_att` 20 → 33** (§13 "initial values" vs the §14.2 air-control band). At 180 the 0.5 s air
+   authority was +15.8 / −22.3° against the band 25–40 (the toy's own run 5 shows +20.8 / −23.9 at 180; the spec's
+   §9.4 text quotes run 3's numbers at 260). 300 / 33 keeps K/c = 9 rad/s and meets the band; on the ground it is
+   ~35 % of the full-gas thrust moment (spec said ~20 %). Rookie 250 / 28, Pro 360 / 40.
+3. **Servo damping is implicit** (§9.3 gives the law, not the integrator). Explicit `k_d` 4 200 N s/m against the
+   chassis's rotational compliance at the grip (m_eff ≈ 14 kg) is c·dt/m = 2.4 > 2: a Nyquist oscillation at rest
+   with the force pinned at ±F_max. The damping part is solved implicitly through the pair's 2×2 response matrix
+   (leg/arm split included), the spring part stays explicit (ω dt = 0.31); all rate terms read pre-force velocities.
+4. **Servo pairs are collinear at the pegs and the grip on both bodies.** §9.3 puts F at the rider COM and the reaction
+   at the pegs/grip and claims conservation; that is not a pair. v2 applies the leg-line component at the peg point
+   and the remainder at the grip point *on the rider as well*, so angular momentum is exact (1e-13 with `K_att` 0).
+   Consequence: forward acceleration reacts through the arms for forward leans, a small nose-up couple that makes
+   lean +1 sit ~1° higher than +0.5 at part throttle (the monotone-lean test carries a 1.5° tolerance; the back half
+   of the ladder, where v1 failed, is strictly monotone).
+5. **Brush tyre in implicit form.** At 120 Hz on the 8 kg wheel, C_s 9 000 is 96 % of a rigid constraint per iteration
+   and the explicit force law is unstable by ×25; the iteration applies `J = −v_t · m_T · γ/(1+γ)` under the cone
+   μN with N this tick's accumulated normal impulse (first iteration: after its own normal update, not the spring).
+6. **Rolling resistance** reads last tick's grounded flag and this tick's spring load (an unpaired ground torque);
+   §12 lists no load memory, so no normal-load slot was added.
+7. **Static sag, front**: 16.9 % (see the table); **wheelbase at static sag** 1.275 (§2 claims ±0.02 through travel;
+   the tilted axes close it by 0.025 at sag).
+8. **Bounded-response ε_ω 0.05 → 0.06**: one lean quantum is 1/127 of the pose travel (~4 mm) which at `k_p` 45 kN/m is
+   a 180 N step at the grip arm on the 11 kg m² chassis = 0.066 rad/s per tick. The 30-tick divergence is 0.01.
+9. **Conservation with the position pass**: the split-impulse slider projections leak ≤ 0.1 N m s per second (a
+   geometric projection, not a force). The spec's 1e-6 holds for the velocity pass, which is what it was about.
+10. **hopPhase `'push'`** drops the spec's "and rising" (needs a previous-velocity slot §12 does not list);
+    `'preload'` uses the previous compression already in `F`; `crouch` is measured below the *current* target (the
+    hang-back pose is the render's `back` blend, not a crouch).
+11. **Bump stop**: the spec's cubic `k_stop·x³/travel²` is 219 N at full travel; implemented literally, the hard travel
+    limit (restitution-free) does the stopping.
+12. **Anti-squat sentence vs axis sign**: axis (0.12, 0.99) moves the wheel forward on compression, so thrust at the
+    patch mildly *compresses* the rear; the number is implemented, the sentence is not.
+13. **Default class** when `loadTrack` gets no `bike`: `'mid'` (the reference row); the game passes its own.
+
+### Spec claims refuted by the built model (for the architect; none is a v2 bug)
+
+- A rigid-body wheelie under thrust has its equilibrium *below* the static balance angle atan(d₀/h₀) (33.6° at
+  neutral); every hold above it needs deceleration, so "45–65° self-limiting", "60–75° hold" and the toy's T1/T2 rows
+  at large pitch are artefacts of the toy's chassis-up compression geometry (its contact patch walks backward at high
+  pitch). Trials' live balance of 30–45° (audit §2.17) is what this table gives.
+- `a_peak/g` 0.62 with a flat 0–8 m/s curve cannot sustain a 60° climb: the rim thrust needed is m g sin 60 = 1 230 N
+  (0.87 g) before rolling resistance, against 880 N (mid) / 780 N (rookie). Measured on `plankTrack(a, 4, 20)` at full
+  gas from a 20 m run-up, lean +1 on the face: rookie and mid climb 35 / 45 and stall at 55 / 60; the Pro (1 000 N)
+  carries 55 / 60 on run-up momentum but stalls 45 (it arrives slower there). The R1 sweep stalls every b-track at its
+  first plank. Either the curve gains a low-speed torque peak (f ≈ 1.6 below 3 m/s, which brings back the neutral-lean
+  launch loop unless the lean table gains more forward travel) or the CONTRACT's climb row drops to ≤ 40°. **This is the
+  R2 blocker, not the hop.**
+- Lean-only balance at 10 Hz / 100 ms is not stabilisable through the rate-limited pose path; throttle is the fast
+  loop (40 ms lag) and must be part of the balance controller row.
+
+### Core-type request (CONTRACT §16.6; on `debug()` until then)
+
+`PhysicsState.rider` gains `body: { pos: Vec2; angle: number; vel: Vec2; angVel: number }`; `PhysicsDebug` gains
+`attTorque: number`, `poseTarget: { x; y; psi }`, `comDH: { d; h }`. `BikeClass` gains `'mid'` (or the game maps it).
+CONTRACT 2.5 amendments as §16.6, plus: "balance pitch 40–50° at lean 0" → "30–38° across the lean range (atan(d/h)); a
+lifting launch and a 45° neutral balance are mutually exclusive at real g"; "climb ≤ 60° sustained" needs the thrust
+decision above.
+
+### What R2 must do first
+
+1. Resolve the climb/thrust conflict (above) with the architect and tracks owner before touching hop numbers — it decides
+   the low-speed curve, which changes the hop's throttle-through and the preload.
+2. Hop: 0.19 m rear apex at P 0.3 vs 0.45–0.65. Levers in the spec's own order: `F_max` (2 600 → 3 200), pose travel
+   overshoot, `targetRateLin` (3 → 4), rear `k`; first check the leg-line reaction geometry (the pegs are 0.05 m behind
+   the rear axle's plumb line at attack, so the leg push loads the rear less than the toy's target-point reaction did).
+3. Snap at half rate gives 7 % of the apex (spec 55–75 %): the slow snap never unloads the rear — same root cause.
+4. The lab level, landing rows, kicker, pogo, climb rows (`it.todo` list in `feel.test.ts`).
+5. Harness goldens: every replay golden changes (§16.3); v1's `classes.test.ts` golden already fails on the harness's
+   in-flight `bot-3.json`, not on v2.
+
+---
+
 Status: **round 11 — wave 1 of the mega build** (eleventh physics owner; P1 of `docs/MEGA_PLAN.md`). Shipped:
 (1) **Two bikes** as tuning presets: `BikeClass = 'rookie' | 'pro'`, `BIKE_PRESETS`, `bikeTuning(cls, over?)` in `tuning.ts`;
 `loadTrack(track, seed, opts?: { bike?: BikeClass })` (additive on `PhysicsWorld`, default `'rookie'`; `BikePhysicsWorld.bike`

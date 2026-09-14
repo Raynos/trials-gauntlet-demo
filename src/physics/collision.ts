@@ -42,6 +42,9 @@ export interface Prim {
   angle: number;
   minX: number;
   maxX: number;
+  /** v2 (physics-v2.md §6): this segment is the first / last of a one-way polyline, so its a / b vertex is an open end. */
+  endA: boolean;
+  endB: boolean;
 }
 
 export interface Manifold {
@@ -78,7 +81,8 @@ export class CollisionWorld {
     for (const c of track.colliders) {
       const surface = Math.max(0, SURFACES.indexOf(c.surface));
       switch (c.kind) {
-        case 'polyline':
+        case 'polyline': {
+          const first = this.prims.length;
           for (let i = 1; i < c.points.length; i++) {
             const a = c.points[i - 1]!;
             const b = c.points[i]!;
@@ -106,9 +110,16 @@ export class CollisionWorld {
               angle: 0,
               minX: Math.min(a.x, b.x),
               maxX: Math.max(a.x, b.x),
+              endA: false,
+              endB: false,
             });
           }
+          if (c.oneWay && this.prims.length > first) {
+            this.prims[first]!.endA = true;
+            this.prims[this.prims.length - 1]!.endB = true;
+          }
           break;
+        }
         case 'circle': {
           const p: Prim = {
             kind: PrimKind.Circle,
@@ -130,6 +141,8 @@ export class CollisionWorld {
             angle: 0,
             minX: c.center.x - c.radius,
             maxX: c.center.x + c.radius,
+            endA: false,
+            endB: false,
           };
           this.prims.push(p);
           if (c.rolls) this.drumBodies.push({ prim: p, collider: c });
@@ -157,6 +170,8 @@ export class CollisionWorld {
             angle: c.angle,
             minX: c.center.x - ext,
             maxX: c.center.x + ext,
+            endA: false,
+            endB: false,
           });
           break;
         }
@@ -182,6 +197,8 @@ export class CollisionWorld {
             angle: 0,
             minX: c.pivot.x - ext,
             maxX: c.pivot.x + ext,
+            endA: false,
+            endB: false,
           };
           this.prims.push(p);
           this.seesawBodies.push({ prim: p, collider: c });
@@ -268,6 +285,29 @@ export class CollisionWorld {
   }
 
   private readonly manifold: Manifold = { px: 0, py: 0, nx: 0, ny: 0, sep: 0, prim: null as unknown as Prim, straddle: false };
+
+  /**
+   * v2 wheel query (physics-v2.md §6): a one-way segment collides when the circle's PREVIOUS centre
+   * (`prevX/prevY`) was on its normal side; from the back side only the polyline's open end vertices
+   * collide, as two-sided point colliders. No straddle rule. Same fixed iteration order as `queryCircle`.
+   */
+  queryCircleV2(cx: number, cy: number, r: number, margin: number, bodyAngle: (body: number) => number, out: (m: Manifold) => void, prevX: number, prevY: number): void {
+    const c0 = this.cellOf(cx - r - margin);
+    const c1 = this.cellOf(cx + r + margin);
+    const m = this.manifold;
+    for (let c = c0; c <= c1; c++) {
+      const s = this.cellStart[c]!;
+      const e = this.cellStart[c + 1]!;
+      for (let i = s; i < e; i++) {
+        const pi = this.cellItems[i]!;
+        const p = this.prims[pi]!;
+        const firstCell = this.cellOf(p.minX);
+        if (c !== (firstCell > c0 ? firstCell : c0)) continue;
+        if (p.maxX < cx - r - margin || p.minX > cx + r + margin) continue;
+        if (circleVsPrimV2(cx, cy, r, p, p.body >= 0 ? bodyAngle(p.body) : p.angle, m, prevX, prevY) && m.sep < margin) out(m);
+      }
+    }
+  }
 
   surfaceName(idx: number): SurfaceKind {
     return SURFACES[idx] ?? 'dirt';
@@ -421,4 +461,57 @@ export function circleVsPrim(cx: number, cy: number, r: number, p: Prim, angle: 
     }
   }
   return false;
+}
+
+/**
+ * v2 narrowphase: as `circleVsPrim` for every primitive except one-way segments, which use the
+ * previous-centre side test and the open-end vertex rule (physics-v2.md §6). Never sets `straddle`.
+ */
+export function circleVsPrimV2(cx: number, cy: number, r: number, p: Prim, angle: number, m: Manifold, prevX: number, prevY: number): boolean {
+  if (p.kind !== PrimKind.Segment || !p.oneWay) return circleVsPrim(cx, cy, r, p, angle, m);
+  const sidePrev = (prevX - p.ax) * p.nx + (prevY - p.ay) * p.ny;
+  if (sidePrev >= 0) return circleVsPrim(cx, cy, r, p, angle, m);
+  // back side: only the open ends are solid, as points
+  m.prim = p;
+  m.straddle = false;
+  let best = Infinity;
+  let bx = 0;
+  let by = 0;
+  if (p.endA) {
+    const dx = cx - p.ax;
+    const dy = cy - p.ay;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < best) {
+      best = d2;
+      bx = p.ax;
+      by = p.ay;
+    }
+  }
+  if (p.endB) {
+    const dx = cx - p.bx;
+    const dy = cy - p.by;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < best) {
+      best = d2;
+      bx = p.bx;
+      by = p.by;
+    }
+  }
+  if (best === Infinity) return false;
+  const d = Math.sqrt(best);
+  let nx: number;
+  let ny: number;
+  if (d > 1e-9) {
+    nx = (cx - bx) / d;
+    ny = (cy - by) / d;
+  } else {
+    nx = p.nx;
+    ny = p.ny;
+  }
+  m.px = bx;
+  m.py = by;
+  m.nx = nx;
+  m.ny = ny;
+  m.sep = d - r;
+  return true;
 }
