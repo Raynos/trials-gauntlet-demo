@@ -187,6 +187,7 @@ interface GameRenderer {                 // existing +
   setQuality(tier: 'low'|'medium'|'high'): void;
   camera(): { pos: Vec2; dist: number; bikeScreenX: number; bikeScreenY: number; bikeHeightFrac: number };
   setRunInfo(info: { runTime: number; phase: GamePhase }): void;   // for kinetic text
+  setGhost?(state: PhysicsState | null): void;  // PB ghost bike, drawn translucent; game steps it in lockstep
 }
 interface AudioSystem {                  // existing +
   update(state: PhysicsState, dt: number, input: InputFrame): void;
