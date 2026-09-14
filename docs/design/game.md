@@ -173,3 +173,23 @@ same as a steady-state frame, i.e. the restart itself adds nothing.
   0.25 s, −6°; checkpoint = green line sweep + short green edge flash (0.3 s); finish = white burst
   (0.35 s) + streak-in ribbon; results reveal in stages at 0 / 0.15 / 0.35 / 0.6 (earned medal burst) /
   0.9 (PB line) / 1.1 s (actions), stage state sim-driven, easing CSS.
+
+## 9. Per-tick cost and how to measure it
+
+Measured in Chromium through the hook (round 4, load average 13–22): the whole game path
+(`setInput` + `step(1)`: quantize, PB recorder push, physics step, event drain/fan-out) costs
+**1.8–3.6 µs/tick** with the real physics and ghost off (mock physics: 0.4–1.3 µs, i.e. the game layer
+itself is ≈ 0.5 µs), **2.2–4.8 µs/tick** with the ghost world on, node measures the same physics at
+2.4 µs. Two things made the ship gate read 100 µs/tick:
+
+1. `performance.now()` is coarsened to **100 µs** unless the page is cross-origin isolated, so a
+   2-tick block reads 0 or 0.1 ms. `vite.config.ts` now sends COOP/COEP on dev and preview servers
+   (`crossOriginIsolated === true`, timer resolution 5 µs). Static hosts need the same two headers.
+2. The first JS after a synced frame (`render(true)` = readPixels) pays the post-sync wake-up: even a
+   trivial `setInput` reads 45–50 µs p95 there, and ticks measured right after it read 7–15 µs p50
+   regardless of physics (mock included). Time µs/tick over ≥ 12-tick blocks, or exclude the first
+   tick after a synced frame.
+
+State is cloned lazily once per tick (`getState()` hands out the same object until the next tick),
+nothing hashes per tick, and events fan out synchronously per *event* (checkpoint/fault/land are
+rare) — those were the suspects and they are not on the profile.

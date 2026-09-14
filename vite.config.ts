@@ -25,6 +25,17 @@ function bundleBudget(): Plugin {
   };
 }
 
+/**
+ * Cross-origin isolation gives `performance.now()` 5 µs resolution instead of
+ * Chromium's default 100 µs coarsening, which is what the harness needs to time
+ * a handful of 2–3 µs physics ticks. Every asset is same-origin, so COEP costs
+ * nothing. (Vercel/static hosts need the same two headers in their config.)
+ */
+const ISOLATION_HEADERS = {
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Embedder-Policy': 'require-corp',
+};
+
 export default defineConfig({
   // Relative base so the built bundle also works when served from a subpath
   // (Vercel preview folders, file listings, the harness preview server).
@@ -46,9 +57,11 @@ export default defineConfig({
   server: {
     host: '127.0.0.1',
     strictPort: false,
+    headers: ISOLATION_HEADERS,
   },
   preview: {
     host: '127.0.0.1',
     strictPort: false,
+    headers: ISOLATION_HEADERS,
   },
 });
