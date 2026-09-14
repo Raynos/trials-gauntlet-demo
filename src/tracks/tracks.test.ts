@@ -198,7 +198,7 @@ describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
     expect(track.bounds.minX).toBeLessThanOrEqual(def.start.pos.x);
     expect(track.bounds.maxX).toBeGreaterThanOrEqual(def.finishX);
     expect(track.bounds.maxY - track.bounds.minY).toBeLessThan(30);
-    expect(track.bounds.maxX - track.bounds.minX).toBeLessThan(500);
+    expect(track.bounds.maxX - track.bounds.minX).toBeLessThan(800);
     expect(track.oobY).toBeCloseTo(track.bounds.minY - 6, 6);
     for (const c of track.colliders) {
       if (c.kind === 'polyline') for (const p of c.points) expect(Number.isFinite(p.x) && Number.isFinite(p.y)).toBe(true);

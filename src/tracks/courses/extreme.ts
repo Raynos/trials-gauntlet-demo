@@ -1,7 +1,9 @@
 /**
- * Extreme tier — snow (X1) and foundry (X2, X3). Attempts band 30-80.
- * Planks here run 50-60 deg: inside the 60 deg sustained-climb envelope but
- * without the 20 % margin the lower tiers keep. The bot decides.
+ * Extreme tier — snow (X1) and foundry (X2, X3). Attempts band 30-80, measured at bot
+ * skill 3. Planks here run 50-60 deg: inside the 60 deg sustained-climb envelope but
+ * without the 20 % margin the lower tiers keep. Every big drum is entered from a
+ * `drumStep` shelf at centre + 0.4 (physics 12.3: a bare r >= 0.6 drum on flat ground is
+ * unrideable; x2's old first obstacle was a bare 1.6 m drum). The bot decides.
  */
 import { course } from '../author';
 
@@ -12,11 +14,11 @@ export const X1 = course('x1-vertical-limit', 'Vertical Limit', 'extreme')
     technique: 'near-vertical planks and pole-top hops',
     demands: '60 deg plank from an 8 m run-in, three pole caps at 4.5 m, 4 m gap onto a downhill plank',
     attemptsBand: [30, 45],
-    targetTimeS: 95,
+    targetTimeS: 140,
   })
   .camera({ mode: 'side-tight' })
   .flat(24)
-  .checkpoint()
+  .checkpoint() // 24 m
   .flat(3)
   .steepPlank({ angleDeg: 50, rise: 3.8 })
   .box({ width: 4, height: 3.8 })
@@ -26,59 +28,63 @@ export const X1 = course('x1-vertical-limit', 'Vertical Limit', 'extreme')
   .box({ width: 4, height: 4.0 })
   .ramp({ length: 6, height: 4.0, curve: 0.4, direction: 'down' })
   .flat(6)
-  .checkpoint()
+  .camera({ mode: 'side' })
+  .rollers(15, 0.3, 3)
+  .flat(4)
+  .wave(16, 1.5)
+  .flat(4)
+  .humpRow(3, 0.3, 8)
+  .flat(4)
+  .wave(20, 2.0)
+  .flat(6)
+  .checkpoint() // ~165 m
   .flat(3)
   .camera({ mode: 'low' })
-  .pole({ height: 1.2 })
-  .space(1.3)
-  .pole({ height: 1.5 })
-  .space(1.3)
-  .pole({ height: 1.8 })
-  .space(1.3)
-  .pole({ height: 2.1 })
-  .space(1.3)
-  .pole({ height: 2.4 })
+  .poleRow([1.2, 1.35, 1.5, 1.65, 1.8], 1.1) // rear-wheel hops cap to cap (+0.15 m each) over a kill pit: a miss is a restart, not a stall (+0.3 m steps at 1.3 m: 50 faults)
   .space(0.5)
-  .box({ width: 6, height: 2.4 })
-  .ramp({ length: 5, height: 2.4, direction: 'down' })
-  .flat(6)
+  .box({ width: 6, height: 1.8 })
+  .ramp({ length: 5, height: 1.8, direction: 'down' })
+  .flat(10)
   .camera({ mode: 'side-tight' })
-  .steepPlank({ angleDeg: 58, rise: 3.6 })
+  .steepPlank({ angleDeg: 55, rise: 3.6 }) // was 58 from a 6 m run-in: 50 of 50 faults at the foot under physics 86fd137
   .box({ width: 4, height: 3.6 })
   .ramp({ length: 5, height: 3.6, direction: 'down' })
   .flat(6)
-  .checkpoint()
+  .camera({ mode: 'side' })
+  .humpRow(3, 0.3, 8)
+  .flat(4)
+  .tabletop(6, 8, 1.0)
+  .flat(6)
+  .checkpoint() // ~205 m
   .flat(3)
+  .camera({ mode: 'side-tight' })
   .wall({ height: 1.2, width: 4, lip: 0.2 })
   .steepPlank({ angleDeg: 56, rise: 3.5 }, { base: 1.2 })
   .box({ width: 3, height: 4.7 })
   .camera({ mode: 'low' })
-  .pole({ height: 4.4 })
-  .space(1.5)
-  .pole({ height: 3.6 })
-  .space(1.5)
-  .pole({ height: 2.8 })
-  .space(1.5)
-  .pole({ height: 2.0 })
+  .poleRow([4.4, 3.6, 2.8, 2.0], 1.5)
   .space(2)
   .flat(4)
-  .checkpoint()
+  .camera({ mode: 'side' })
+  .rollers(20, 0.3, 4)
+  .flat(4)
+  .wave(16, 1.5)
+  .flat(6)
+  .checkpoint() // ~285 m
   .flat(3)
   .camera({ mode: 'side-tight' })
   .flat(5) // 8 m run-in total: hop at the foot to carry speed up the face
   .steepPlank({ angleDeg: 60, rise: 4.5 })
   .box({ width: 3, height: 4.5 })
   .camera({ mode: 'low' })
-  .pole({ height: 4.5 })
-  .space(1.7)
-  .pole({ height: 4.5 })
-  .space(1.7)
-  .pole({ height: 4.5 })
+  .poleRow([4.5, 4.5, 4.5], 1.7)
   .gap({ width: 4 })
   .plank({ length: 3, angleDeg: -30, height: 2.0 }) // thin downhill landing
   .flat(3)
   .smooth(8, -1.0)
   .camera({ mode: 'side' })
+  .flat(6)
+  .humpRow(2, 0.3, 8)
   .flat(12)
   .finish();
 
@@ -87,38 +93,52 @@ export const X2 = course('x2-pipe-dream', 'Pipe Dream', 'extreme')
   .meta({
     biome: 'foundry',
     technique: 'spinning drums with gaps and see-saw drops',
-    demands: 'see-saw drop onto a spinning drum, hop a 3 m gap onto another, hop a 4 m gap off it',
+    demands: 'see-saw drop onto a spinning drum shelf, hop a 2 m gap onto another spinning drum, hop a 2.5 m gap off it',
     attemptsBand: [40, 60],
-    targetTimeS: 125,
+    targetTimeS: 150,
   })
   .camera({ mode: 'side-tight' })
   .flat(24)
-  .checkpoint()
+  .checkpoint() // 24 m
   .flat(3)
-  .kickerDrum({ radius: 0.8, rolls: true })
+  .drumStep({ radius: 0.8, rolls: true }) // shelf 1.2 -> spinning 1.6 m drum (was a bare drum behind a 0.5 m kicker: unrideable)
   .gap({ width: 3 })
   .box({ width: 4, height: 0.8 })
   .ramp({ length: 4, height: 0.8, direction: 'down' })
   .flat(4)
-  .logpile({ radius: 0.3, count: 4, rows: 3 })
+  .logStep({ radius: 0.3, count: 4, rows: 3 })
   .flat(4)
-  .kickerDrum({ radius: 0.8, rolls: true })
+  .drumStep({ radius: 0.8, rolls: true }, { exit: true })
   .flat(6)
-  .checkpoint()
+  .camera({ mode: 'side' })
+  .rollers(15, 0.3, 3)
+  .flat(4)
+  .wave(20, 2.0)
+  .flat(4)
+  .humpRow(3, 0.3, 8)
+  .flat(6)
+  .checkpoint() // ~160 m
   .flat(3)
-  .seesawEntry({ length: 8, height: 2.0 })
-  .drum({ radius: 1.0 }) // rear-wheel land on a drum top from the see-saw end
-  .pole({ height: 1.5 })
+  .camera({ mode: 'side-tight' })
+  .seesawEntry({ length: 8, height: 2.0 }) // ride it down, then straight up the shelf
+  .flat(2)
+  .drumStep({ radius: 1.0 }) // shelf 1.4 -> 2.0 m drum
+  .pole({ height: 1.5 }) // step off the drum across a cap onto the box
   .box({ width: 6, height: 1.8 })
   .ramp({ length: 1.5, height: 0.4, curve: 0.3 }, { base: 1.8 })
   .gap({ width: 4 })
-  .drum({ radius: 1.0, rolls: true })
+  .drum({ radius: 1.0, rolls: true }) // land on a spinning top from the kicker
   .flat(6)
-  .checkpoint()
+  .camera({ mode: 'side' })
+  .humpRow(3, 0.3, 8)
+  .flat(4)
+  .wave(16, 1.5)
+  .flat(6)
+  .checkpoint() // ~195 m
   .flat(3)
   .camera({ mode: 'high34' })
   // the pipe run: hop-land-balance-hop x5
-  .kickerDrum({ radius: 0.9, rolls: true })
+  .drumStep({ radius: 0.9, rolls: true })
   .gap({ width: 1.5 })
   .drum({ radius: 0.9, rolls: true })
   .gap({ width: 1.5 })
@@ -128,17 +148,23 @@ export const X2 = course('x2-pipe-dream', 'Pipe Dream', 'extreme')
   .gap({ width: 1.5 })
   .drum({ radius: 0.9, rolls: true })
   .flat(6)
-  .camera({ mode: 'side-tight' })
-  .checkpoint()
+  .camera({ mode: 'side' })
+  .rollers(20, 0.3, 4)
+  .flat(6)
+  .checkpoint() // ~260 m
   .flat(3)
+  .camera({ mode: 'side-tight' })
   .seesawEntry({ length: 8, height: 2.0 })
-  .drum({ radius: 1.0, rolls: true })
-  .gap({ width: 3 })
+  .flat(2)
+  .drumStep({ radius: 1.0, rolls: true })
+  .gap({ width: 2 }) // a spinning top cannot be pumped: at ~5 m/s off the see-saw a 3 m drum-to-drum gap was a 34-attempt wall (sweep 3)
   .drum({ radius: 0.8, rolls: true })
-  .gap({ width: 4 })
+  .gap({ width: 2.5 })
   .flat(4)
   .ledge({ height: 0.7, length: 4 })
   .camera({ mode: 'side' })
+  .flat(8)
+  .humpRow(2, 0.3, 8)
   .flat(12)
   .finish();
 
@@ -149,17 +175,19 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
     technique: 'everything, in order',
     demands: 'kicker gap, 48 deg plank, double gap, stairs, hops, spinning drum, see-saw landing, lip climb + rails, gap chain, fire, 60 deg plank, poles, drum chain, then the finale',
     attemptsBand: [60, 80],
-    targetTimeS: 165,
+    targetTimeS: 200,
   })
   .camera({ mode: 'side' })
   .flat(28)
-  .checkpoint()
+  .checkpoint() // 28 m
   .flat(3)
   // B3 kicker + gap
   .flat(8)
   .ramp({ length: 5, height: 2.0, curve: 0.3 })
   .gap({ width: 5 })
   .box({ width: 8, height: 0.4 })
+  .flat(4)
+  .rollers(15, 0.3, 3)
   .flat(4)
   // E1 plank
   .steepPlank({ angleDeg: 48, rise: 3.7 })
@@ -173,7 +201,7 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .ramp({ length: 3, height: 1.0 }, { base: 0.6 })
   .gap({ width: 6 })
   .flat(6)
-  .checkpoint()
+  .checkpoint() // ~135 m
   .flat(3)
   // E3 stairs
   .stair({ count: 7, height: 0.45, length: 0.4 })
@@ -185,10 +213,12 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .ledge({ height: 0.55, length: 1.5 })
   .gap({ width: 1.5, depth: 2 })
   .flat(6)
-  // M2 spinning drum (as in M2: 0.8 radius after a 6 m approach)
-  .kickerDrum({ radius: 0.8, rolls: true })
+  // M2 spinning drum from its shelf
+  .drumStep({ radius: 0.8, rolls: true }, { exit: true })
+  .flat(12)
+  .wave(16, 1.5)
   .flat(6)
-  .checkpoint()
+  .checkpoint() // ~215 m
   .flat(3)
   // M3 see-saw landing
   .ramp({ length: 4, height: 1.0 })
@@ -208,6 +238,9 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .gap({ width: 0.7, depth: 1.5, hazard: 'kill' })
   .flat(1.3)
   .gap({ width: 0.7, depth: 1.5, hazard: 'kill' })
+  .flat(6)
+  .checkpoint() // ~255 m
+  .flat(3)
   .flat(4)
   // H2 chain
   .ramp({ length: 4, height: 1.0 })
@@ -221,7 +254,9 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .platform(3.5, 1.0)
   .gap({ width: 2 })
   .flat(6)
-  .checkpoint()
+  .humpRow(2, 0.3, 8)
+  .flat(6)
+  .checkpoint() // ~320 m
   .flat(3)
   // H3 fire
   .flat(20)
@@ -235,28 +270,25 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .ledge({ height: 0.7, length: 4 })
   .flat(6)
   .camera({ mode: 'side-tight' })
-  .checkpoint()
+  .checkpoint() // ~385 m
   .flat(3)
   // X1 plank + poles
   .flat(5)
   .steepPlank({ angleDeg: 60, rise: 4.5 })
   .box({ width: 3, height: 4.5 })
-  .pole({ height: 4.5 })
-  .space(1.7)
-  .pole({ height: 4.5 })
-  .space(1.7)
-  .pole({ height: 4.5 })
+  .poleRow([4.5, 4.5, 4.5], 1.7)
   .gap({ width: 4 })
   .plank({ length: 3, angleDeg: -30, height: 2.0 })
   .flat(6)
   // X2 drum chain
   .seesawEntry({ length: 8, height: 2.0 })
-  .drum({ radius: 1.0, rolls: true })
-  .gap({ width: 3 })
+  .flat(2)
+  .drumStep({ radius: 1.0, rolls: true })
+  .gap({ width: 2 })
   .drum({ radius: 0.8, rolls: true })
-  .gap({ width: 4 })
+  .gap({ width: 2.5 })
   .flat(6)
-  .checkpoint()
+  .checkpoint() // ~460 m
   .flat(3)
   // finale: unseen combination
   .flat(12)
@@ -264,15 +296,12 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .ramp({ length: 6, height: 2.5, curve: 0.3 })
   .gap({ width: 6 })
   .seesaw({ length: 8, height: 1.0 }) // land at ~12 m/s: it catapults unless you brake on the board
-  .kickerDrum({ radius: 1.0, rolls: true })
-  .gap({ width: 5 })
-  .pole({ height: 3.0 })
-  .space(1.9)
-  .pole({ height: 3.0 })
-  .space(1.9)
-  .pole({ height: 3.0 })
+  .flat(2)
+  .drumStep({ radius: 1.0, rolls: true })
+  .gap({ width: 2 })
+  .poleRow([1.8, 1.8, 1.8], 1.9) // caps 0.2 under the drum top
   .gap({ width: 3 })
-  .plank({ length: 4, angleDeg: -35, height: 3.0 })
+  .plank({ length: 4, angleDeg: -25, height: 1.8 })
   .flat(4)
   .camera({ mode: 'side' })
   .flat(10)

@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "kind": "sweep",
-  "runId": "20260914-025724-269f50",
-  "startedAt": "2026-09-14T07:57:24.417Z",
-  "wallMs": 1592138,
-  "git": "ea32412",
-  "srcFingerprint": "c6155a64",
+  "runId": "20260914-032829-73255b",
+  "startedAt": "2026-09-14T08:28:29.211Z",
+  "wallMs": 2703365,
+  "git": "0df6abc",
+  "srcFingerprint": "3bf74860",
   "node": "v24.18.1",
   "physics": "bikePhysicsFactory",
   "skill": 2,
@@ -24,8 +24,8 @@
         3277865877,
         3277865878
       ],
-      "bestX": 119.28974965822445,
-      "bestPct": 0.9940812471518704,
+      "bestX": 119.2607597306227,
+      "bestPct": 0.9938396644218558,
       "clears": 2,
       "attempts": [
         1,
@@ -33,8 +33,8 @@
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        7.741666666666666,
-        7.741666666666666
+        7.733333333333333,
+        7.733333333333333
       ],
       "outcomes": [
         "finished",
@@ -43,10 +43,10 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 4220.404625,
+      "wallMs": 5971.085833,
       "runs": [
-        "20260914-025724-8f0a5c",
-        "20260914-025726-3d4656"
+        "20260914-032829-27513e",
+        "20260914-032832-73a349"
       ]
     },
     {
@@ -63,8 +63,8 @@
         2308543150,
         2308543151
       ],
-      "bestX": 56.50096912577531,
-      "bestPct": 0.9912450723820231,
+      "bestX": 56.43617069441933,
+      "bestPct": 0.9901082577968304,
       "clears": 2,
       "attempts": [
         1,
@@ -72,8 +72,8 @@
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        4.958333333333333,
-        4.958333333333333
+        4.85,
+        4.85
       ],
       "outcomes": [
         "finished",
@@ -82,17 +82,17 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 1963.2542920000005,
+      "wallMs": 2862.6747080000005,
       "runs": [
-        "20260914-025728-750617",
-        "20260914-025729-6fef89"
+        "20260914-032835-da19ac",
+        "20260914-032836-a471e5"
       ]
     },
     {
       "trackId": "b1-first-ride",
       "tier": "beginner",
       "technique": "throttle control",
-      "finishX": 139,
+      "finishX": 404,
       "attemptsBand": [
         1,
         1
@@ -102,42 +102,36 @@
         138717428,
         138717429
       ],
-      "bestX": 138.29276478824883,
-      "bestPct": 0.9949119768938764,
+      "bestX": 403.31686912288393,
+      "bestPct": 0.9983090819873365,
       "clears": 2,
       "attempts": [
-        2,
-        2
+        1,
+        1
       ],
-      "attemptsMedian": 2,
+      "attemptsMedian": 1,
       "finishTimes": [
-        14.8,
-        14.8
+        30.016666666666666,
+        30.016666666666666
       ],
       "outcomes": [
         "finished",
         "finished"
       ],
-      "firstBlocker": {
-        "reason": "crash",
-        "x": 136.63887590292038,
-        "checkpoint": 1,
-        "runTime": 10.525,
-        "obstacle": null
-      },
+      "firstBlocker": null,
       "replayFaithful": false,
-      "replayDivergenceX": 76.6671398336385,
-      "wallMs": 8193.822209,
+      "replayDivergenceX": 77.25507836792649,
+      "wallMs": 37109.2705,
       "runs": [
-        "20260914-025730-09a0a0",
-        "20260914-025734-d3a900"
+        "20260914-032838-103068",
+        "20260914-032857-4392ab"
       ]
     },
     {
       "trackId": "b2-lean-back",
       "tier": "beginner",
       "technique": "weight shift on drops",
-      "finishX": 127.8,
+      "finishX": 322.2,
       "attemptsBand": [
         1,
         2
@@ -147,8 +141,8 @@
         3802965488,
         3802965489
       ],
-      "bestX": 127.74479723073955,
-      "bestPct": 0.9995680534486663,
+      "bestX": 321.5130554666545,
+      "bestPct": 0.9978679561348682,
       "clears": 2,
       "attempts": [
         1,
@@ -156,8 +150,8 @@
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        10.641666666666667,
-        10.641666666666667
+        24.108333333333334,
+        24.108333333333334
       ],
       "outcomes": [
         "finished",
@@ -165,18 +159,18 @@
       ],
       "firstBlocker": null,
       "replayFaithful": false,
-      "replayDivergenceX": 127.63946911536841,
-      "wallMs": 6025.0312090000025,
+      "replayDivergenceX": 84.49014528685582,
+      "wallMs": 21070.374583999997,
       "runs": [
-        "20260914-025738-0f9e1b",
-        "20260914-025741-e5d84d"
+        "20260914-032915-212120",
+        "20260914-032925-aa0b7c"
       ]
     },
     {
       "trackId": "b3-kicker-row",
       "tier": "beginner",
       "technique": "jump and level in the air",
-      "finishX": 142,
+      "finishX": 345,
       "attemptsBand": [
         1,
         2
@@ -186,42 +180,36 @@
         4115132233,
         4115132234
       ],
-      "bestX": 141.31750707889307,
-      "bestPct": 0.9951937118231906,
+      "bestX": 344.3549251859053,
+      "bestPct": 0.9981302179301603,
       "clears": 2,
       "attempts": [
-        2,
-        2
+        1,
+        1
       ],
-      "attemptsMedian": 2,
+      "attemptsMedian": 1,
       "finishTimes": [
-        17.3,
-        17.308333333333334
+        29.9,
+        29.9
       ],
       "outcomes": [
         "finished",
         "finished"
       ],
-      "firstBlocker": {
-        "reason": "crash",
-        "x": 131.90398329886028,
-        "checkpoint": 2,
-        "runTime": 13.033333333333333,
-        "obstacle": null
-      },
+      "firstBlocker": null,
       "replayFaithful": false,
-      "replayDivergenceX": 30.78864958243045,
-      "wallMs": 10747.162791000002,
+      "replayDivergenceX": 83.4313061019937,
+      "wallMs": 26564.968332999997,
       "runs": [
-        "20260914-025744-804bf4",
-        "20260914-025750-934d4b"
+        "20260914-032936-a637c7",
+        "20260914-032949-49d722"
       ]
     },
     {
       "trackId": "e1-uphill-weight",
       "tier": "easy",
       "technique": "lean forward on steep climbs",
-      "finishX": 108.112307,
+      "finishX": 300.415624,
       "attemptsBand": [
         2,
         4
@@ -231,36 +219,42 @@
         847839319,
         847839320
       ],
-      "bestX": 107.37930139553539,
-      "bestPct": 0.993219961493703,
+      "bestX": 299.8155315742353,
+      "bestPct": 0.9980024593335909,
       "clears": 2,
       "attempts": [
-        1,
-        1
+        2,
+        2
       ],
-      "attemptsMedian": 1,
+      "attemptsMedian": 2,
       "finishTimes": [
-        12.408333333333333,
-        12.408333333333333
+        34.791666666666664,
+        34.791666666666664
       ],
       "outcomes": [
         "finished",
         "finished"
       ],
-      "firstBlocker": null,
-      "replayFaithful": false,
-      "replayDivergenceX": 81.35682685759768,
-      "wallMs": 8052.485083000003,
+      "firstBlocker": {
+        "reason": "crash",
+        "x": 159.605029095596,
+        "checkpoint": 1,
+        "runTime": 15.508333333333333,
+        "obstacle": null
+      },
+      "replayFaithful": true,
+      "replayDivergenceX": null,
+      "wallMs": 31257.124624999997,
       "runs": [
-        "20260914-025755-fd9d6e",
-        "20260914-025759-ac313c"
+        "20260914-033002-d70973",
+        "20260914-033018-0a4f27"
       ]
     },
     {
       "trackId": "e2-rear-wheel-first",
       "tier": "easy",
       "technique": "rear-wheel-first gap landing",
-      "finishX": 172,
+      "finishX": 383,
       "attemptsBand": [
         3,
         5
@@ -270,36 +264,42 @@
         2125781358,
         2125781359
       ],
-      "bestX": 171.45354840480076,
-      "bestPct": 0.9968229558418649,
+      "bestX": 382.4554410051009,
+      "bestPct": 0.9985781749480441,
       "clears": 2,
       "attempts": [
-        1,
-        1
+        2,
+        2
       ],
-      "attemptsMedian": 1,
+      "attemptsMedian": 2,
       "finishTimes": [
-        12.858333333333333,
-        12.858333333333333
+        33.50833333333333,
+        33.50833333333333
       ],
       "outcomes": [
         "finished",
         "finished"
       ],
-      "firstBlocker": null,
+      "firstBlocker": {
+        "reason": "hazard",
+        "x": 330.63205585718225,
+        "checkpoint": 3,
+        "runTime": 25.025,
+        "obstacle": null
+      },
       "replayFaithful": false,
-      "replayDivergenceX": 99.61656697849055,
-      "wallMs": 9371.729250000004,
+      "replayDivergenceX": 64.22683460447467,
+      "wallMs": 36970.473541000014,
       "runs": [
-        "20260914-025803-b313c3",
-        "20260914-025808-bc9f20"
+        "20260914-033034-990f2f",
+        "20260914-033050-8fb341"
       ]
     },
     {
       "trackId": "e3-stairway",
       "tier": "easy",
       "technique": "stairs: pulse up, brake down",
-      "finishX": 94.1,
+      "finishX": 278.15,
       "attemptsBand": [
         3,
         6
@@ -309,36 +309,42 @@
         3073702004,
         3073702005
       ],
-      "bestX": 93.47389137805142,
-      "bestPct": 0.9933463483321087,
+      "bestX": 277.45889501894027,
+      "bestPct": 0.9975153514971788,
       "clears": 2,
       "attempts": [
-        1,
-        1
+        4,
+        4
       ],
-      "attemptsMedian": 1,
+      "attemptsMedian": 4,
       "finishTimes": [
-        13.641666666666667,
-        13.641666666666667
+        44.43333333333333,
+        44.43333333333333
       ],
       "outcomes": [
         "finished",
         "finished"
       ],
-      "firstBlocker": null,
+      "firstBlocker": {
+        "reason": "crash",
+        "x": 145.13761381619273,
+        "checkpoint": 1,
+        "runTime": 13.641666666666667,
+        "obstacle": null
+      },
       "replayFaithful": false,
-      "replayDivergenceX": 69.46123797613399,
-      "wallMs": 10811.356417000003,
+      "replayDivergenceX": 166.82464560294886,
+      "wallMs": 59523.377707999985,
       "runs": [
-        "20260914-025813-2906f2",
-        "20260914-025818-057cb3"
+        "20260914-033111-f018b2",
+        "20260914-033140-ebe248"
       ]
     },
     {
       "trackId": "m1-hop-up",
       "tier": "medium",
       "technique": "bunny hop onto ledges",
-      "finishX": 103,
+      "finishX": 289,
       "attemptsBand": [
         5,
         9
@@ -348,36 +354,42 @@
         1909798049,
         1909798050
       ],
-      "bestX": 102.3429803006381,
-      "bestPct": 0.9936211679673602,
+      "bestX": 288.3316535899118,
+      "bestPct": 0.9976873826640547,
       "clears": 2,
       "attempts": [
-        1,
-        1
+        2,
+        2
       ],
-      "attemptsMedian": 1,
+      "attemptsMedian": 2,
       "finishTimes": [
-        10.825,
-        10.825
+        32.641666666666666,
+        32.641666666666666
       ],
       "outcomes": [
         "finished",
         "finished"
       ],
-      "firstBlocker": null,
+      "firstBlocker": {
+        "reason": "crash",
+        "x": 239.86583258096337,
+        "checkpoint": 3,
+        "runTime": 24.016666666666666,
+        "obstacle": null
+      },
       "replayFaithful": false,
-      "replayDivergenceX": 73.33806635238875,
-      "wallMs": 6077.031667000003,
+      "replayDivergenceX": 40.8787805779178,
+      "wallMs": 40474.806374999986,
       "runs": [
-        "20260914-025823-46dae8",
-        "20260914-025826-a182ff"
+        "20260914-033210-c9743a",
+        "20260914-033232-27b611"
       ]
     },
     {
       "trackId": "m2-drum-roll",
       "tier": "medium",
-      "technique": "drum crossing and balance",
-      "finishX": 119.1,
+      "technique": "logs and drums: lift the front, roll the top",
+      "finishX": 303.6,
       "attemptsBand": [
         6,
         12
@@ -387,8 +399,8 @@
         3505190447,
         3505190448
       ],
-      "bestX": 118.43790828390534,
-      "bestPct": 0.9944408755995411,
+      "bestX": 302.98118561553696,
+      "bestPct": 0.9979617444517027,
       "clears": 2,
       "attempts": [
         2,
@@ -396,8 +408,8 @@
       ],
       "attemptsMedian": 2,
       "finishTimes": [
-        22.925,
-        22.925
+        33.84166666666667,
+        33.84166666666667
       ],
       "outcomes": [
         "finished",
@@ -405,28 +417,28 @@
       ],
       "firstBlocker": {
         "reason": "crash",
-        "x": 43.083257608274394,
+        "x": 48.609976893668616,
         "checkpoint": 0,
-        "runTime": 4.241666666666666,
+        "runTime": 4.908333333333333,
         "obstacle": {
           "kind": "logpile",
-          "x": 42.7,
+          "x": 47.2,
           "index": 3
         }
       },
-      "replayFaithful": true,
-      "replayDivergenceX": null,
-      "wallMs": 15945.900500000003,
+      "replayFaithful": false,
+      "replayDivergenceX": 239.6661850324846,
+      "wallMs": 34288.462,
       "runs": [
-        "20260914-025829-c130a3",
-        "20260914-025837-7d44c1"
+        "20260914-033251-e2a94f",
+        "20260914-033307-b32e9c"
       ]
     },
     {
       "trackId": "m3-see-saw",
       "tier": "medium",
       "technique": "see-saw timing and thin landings",
-      "finishX": 141.9,
+      "finishX": 306.7,
       "attemptsBand": [
         8,
         12
@@ -436,36 +448,46 @@
         1066951255,
         1066951256
       ],
-      "bestX": 141.23248968892096,
-      "bestPct": 0.9952959104222759,
-      "clears": 2,
+      "bestX": 174.8407828436024,
+      "bestPct": 0.5700710232918239,
+      "clears": 0,
       "attempts": [
-        1,
-        1
+        50,
+        50
       ],
-      "attemptsMedian": 1,
+      "attemptsMedian": 50,
       "finishTimes": [
-        15.166666666666666,
-        15.166666666666666
+        null,
+        null
       ],
       "outcomes": [
-        "finished",
-        "finished"
+        "maxAttempts",
+        "maxAttempts"
       ],
-      "firstBlocker": null,
+      "firstBlocker": {
+        "reason": "crash",
+        "x": 174.8407828436024,
+        "checkpoint": 1,
+        "runTime": 15.15,
+        "obstacle": {
+          "kind": "ramp",
+          "x": 178.4,
+          "index": 17
+        }
+      },
       "replayFaithful": false,
-      "replayDivergenceX": 30.933791101476412,
-      "wallMs": 12750.733458000002,
+      "replayDivergenceX": 30.9271146385939,
+      "wallMs": 101051.30174999998,
       "runs": [
-        "20260914-025845-7908dd",
-        "20260914-025851-3200e8"
+        "20260914-033325-a85d43",
+        "20260914-033420-37a382"
       ]
     },
     {
       "trackId": "h1-wheelie-wire",
       "tier": "hard",
       "technique": "sustained wheelie and the lip climb",
-      "finishX": 196,
+      "finishX": 404,
       "attemptsBand": [
         10,
         18
@@ -475,46 +497,46 @@
         1831771780,
         1831771781
       ],
-      "bestX": 138.68030862689307,
-      "bestPct": 0.7075525950351687,
-      "clears": 0,
+      "bestX": 403.2960020970416,
+      "bestPct": 0.9982574309332712,
+      "clears": 2,
       "attempts": [
-        50,
-        47
+        2,
+        2
       ],
-      "attemptsMedian": 48.5,
+      "attemptsMedian": 2,
       "finishTimes": [
-        null,
-        null
+        104.34166666666667,
+        104.34166666666667
       ],
       "outcomes": [
-        "maxAttempts",
-        "wallTimeout"
+        "finished",
+        "finished"
       ],
       "firstBlocker": {
         "reason": "crash",
-        "x": 88.9141823011622,
-        "checkpoint": 1,
-        "runTime": 7.558333333333334,
+        "x": 220.8070384126409,
+        "checkpoint": 2,
+        "runTime": 85.88333333333334,
         "obstacle": {
-          "kind": "gap",
-          "x": 95,
-          "index": 9
+          "kind": "wall",
+          "x": 222,
+          "index": 24
         }
       },
       "replayFaithful": false,
-      "replayDivergenceX": 30.644767290936745,
-      "wallMs": 117978.34470899998,
+      "replayDivergenceX": 30.6294288976091,
+      "wallMs": 84401.88941599999,
       "runs": [
-        "20260914-025858-3914c6",
-        "20260914-025956-cab9d2"
+        "20260914-033506-1fa55e",
+        "20260914-033547-035d34"
       ]
     },
     {
       "trackId": "h2-gap-chain",
       "tier": "hard",
       "technique": "gap chains: read the width, set the speed",
-      "finishX": 228,
+      "finishX": 420,
       "attemptsBand": [
         14,
         22
@@ -524,36 +546,46 @@
         4247919438,
         4247919439
       ],
-      "bestX": 227.3859822592289,
-      "bestPct": 0.9973069397334602,
+      "bestX": 420.4364897701004,
+      "bestPct": 1,
       "clears": 2,
       "attempts": [
-        1,
-        1
+        8,
+        8
       ],
-      "attemptsMedian": 1,
+      "attemptsMedian": 8,
       "finishTimes": [
-        19.991666666666667,
-        19.991666666666667
+        115.91666666666667,
+        115.91666666666667
       ],
       "outcomes": [
         "finished",
         "finished"
       ],
-      "firstBlocker": null,
+      "firstBlocker": {
+        "reason": "crash",
+        "x": 393.0580299232759,
+        "checkpoint": 3,
+        "runTime": 33.266666666666666,
+        "obstacle": {
+          "kind": "ramp",
+          "x": 397,
+          "index": 65
+        }
+      },
       "replayFaithful": false,
-      "replayDivergenceX": 89.05016463135095,
-      "wallMs": 19218.928916000004,
+      "replayDivergenceX": 76.34512984300369,
+      "wallMs": 98023.71133300004,
       "runs": [
-        "20260914-030056-e7d597",
-        "20260914-030105-a1f66a"
+        "20260914-033630-b9c1a4",
+        "20260914-033714-ffcad9"
       ]
     },
     {
       "trackId": "h3-fire-line",
       "tier": "hard",
       "technique": "commit at speed over fire, then stop hard",
-      "finishX": 219.2,
+      "finishX": 411,
       "attemptsBand": [
         18,
         25
@@ -563,46 +595,42 @@
         3173388572,
         3173388573
       ],
-      "bestX": 218.56446831439132,
-      "bestPct": 0.9971006766167487,
-      "clears": 2,
+      "bestX": 220.63932358618237,
+      "bestPct": 0.5368353371926579,
+      "clears": 0,
       "attempts": [
-        3,
-        3
+        35,
+        33
       ],
-      "attemptsMedian": 3,
+      "attemptsMedian": 34,
       "finishTimes": [
-        23.683333333333334,
-        23.683333333333334
+        null,
+        null
       ],
       "outcomes": [
-        "finished",
-        "finished"
+        "wallTimeout",
+        "wallTimeout"
       ],
       "firstBlocker": {
         "reason": "crash",
-        "x": 116.97631420545582,
+        "x": 220.63932358618237,
         "checkpoint": 1,
-        "runTime": 10.75,
-        "obstacle": {
-          "kind": "ramp",
-          "x": 117.6,
-          "index": 4
-        }
+        "runTime": 18.533333333333335,
+        "obstacle": null
       },
-      "replayFaithful": true,
-      "replayDivergenceX": null,
-      "wallMs": 15435.506915999984,
+      "replayFaithful": false,
+      "replayDivergenceX": 82.03150880512705,
+      "wallMs": 120247.553541,
       "runs": [
-        "20260914-030115-b2fcdd",
-        "20260914-030123-a22c48"
+        "20260914-033808-88f8ef",
+        "20260914-033908-9e1c9d"
       ]
     },
     {
       "trackId": "x1-vertical-limit",
       "tier": "extreme",
       "technique": "near-vertical planks and pole-top hops",
-      "finishX": 186.728923,
+      "finishX": 339.728923,
       "attemptsBand": [
         30,
         45
@@ -612,14 +640,14 @@
         2756386537,
         2756386538
       ],
-      "bestX": 69.93232903809296,
-      "bestPct": 0.3745125710283937,
+      "bestX": 111.52166840282933,
+      "bestPct": 0.3282666292231743,
       "clears": 0,
       "attempts": [
-        3,
-        4
+        37,
+        39
       ],
-      "attemptsMedian": 3.5,
+      "attemptsMedian": 38,
       "finishTimes": [
         null,
         null
@@ -630,28 +658,28 @@
       ],
       "firstBlocker": {
         "reason": "crash",
-        "x": 69.93232903809296,
+        "x": 111.52166840282933,
         "checkpoint": 1,
-        "runTime": 10.8,
+        "runTime": 13.041666666666666,
         "obstacle": {
           "kind": "pole",
-          "x": 70.179316,
+          "x": 111.179316,
           "index": 9
         }
       },
       "replayFaithful": false,
-      "replayDivergenceX": 67.5617149620774,
-      "wallMs": 120151.53520800002,
+      "replayDivergenceX": 54.9649620925945,
+      "wallMs": 120280.05958399992,
       "runs": [
-        "20260914-030131-68db9c",
-        "20260914-030231-0a81c9"
+        "20260914-034009-0a598c",
+        "20260914-034109-ff5fbd"
       ]
     },
     {
       "trackId": "x2-pipe-dream",
       "tier": "extreme",
       "technique": "spinning drums with gaps and see-saw drops",
-      "finishX": 162.3,
+      "finishX": 304.8,
       "attemptsBand": [
         40,
         60
@@ -661,46 +689,42 @@
         2290459156,
         2290459157
       ],
-      "bestX": 49.311292138524934,
-      "bestPct": 0.3038280476803754,
-      "clears": 0,
+      "bestX": 304.1116955593945,
+      "bestPct": 0.9977417833313467,
+      "clears": 2,
       "attempts": [
-        33,
-        30
+        3,
+        3
       ],
-      "attemptsMedian": 31.5,
+      "attemptsMedian": 3,
       "finishTimes": [
-        null,
-        null
+        41.225,
+        41.24166666666667
       ],
       "outcomes": [
-        "wallTimeout",
-        "wallTimeout"
+        "finished",
+        "finished"
       ],
       "firstBlocker": {
         "reason": "crash",
-        "x": 36.15947482666912,
-        "checkpoint": 0,
-        "runTime": 3.775,
-        "obstacle": {
-          "kind": "ramp",
-          "x": 37.1,
-          "index": 4
-        }
+        "x": 221.87752752563463,
+        "checkpoint": 2,
+        "runTime": 21.641666666666666,
+        "obstacle": null
       },
       "replayFaithful": false,
-      "replayDivergenceX": 26.640407345141334,
-      "wallMs": 120160.125,
+      "replayDivergenceX": 61.88139545767958,
+      "wallMs": 39200.73520800006,
       "runs": [
-        "20260914-030331-9cc9b3",
-        "20260914-030431-a25035"
+        "20260914-034209-592e7a",
+        "20260914-034228-5448e7"
       ]
     },
     {
       "trackId": "x3-gauntlet",
       "tier": "extreme",
       "technique": "everything, in order",
-      "finishX": 426.99653,
+      "finishX": 515.345153,
       "attemptsBand": [
         60,
         80
@@ -710,14 +734,14 @@
         264835977,
         264835978
       ],
-      "bestX": 180.65765348277552,
-      "bestPct": 0.4230892777577736,
+      "bestX": 433.9737862599881,
+      "bestPct": 0.8421031685923087,
       "clears": 0,
       "attempts": [
-        6,
-        6
+        5,
+        4
       ],
-      "attemptsMedian": 6,
+      "attemptsMedian": 4.5,
       "finishTimes": [
         null,
         null
@@ -728,21 +752,21 @@
       ],
       "firstBlocker": {
         "reason": "crash",
-        "x": 77.69063942981582,
-        "checkpoint": 0,
-        "runTime": 8.383333333333333,
+        "x": 229.40296720925528,
+        "checkpoint": 2,
+        "runTime": 89.63333333333334,
         "obstacle": {
-          "kind": "ramp",
-          "x": 81.625842,
-          "index": 7
+          "kind": "wall",
+          "x": 230.625842,
+          "index": 28
         }
       },
       "replayFaithful": false,
-      "replayDivergenceX": 38.24034140331797,
-      "wallMs": 120187.70387499995,
+      "replayDivergenceX": 109.66482470520478,
+      "wallMs": 120261.068708,
       "runs": [
-        "20260914-030531-532830",
-        "20260914-030631-1ba813"
+        "20260914-034248-161442",
+        "20260914-034348-839ada"
       ]
     }
   ],
@@ -754,11 +778,11 @@
     {
       "schema": 1,
       "kind": "sweep",
-      "runId": "20260914-025724-269f50",
-      "startedAt": "2026-09-14T07:57:24.417Z",
-      "wallMs": 607318,
-      "git": "ea32412",
-      "srcFingerprint": "c6155a64",
+      "runId": "20260914-032829-73255b",
+      "startedAt": "2026-09-14T08:28:29.211Z",
+      "wallMs": 979710,
+      "git": "0df6abc",
+      "srcFingerprint": "3bf74860",
       "node": "v24.18.1",
       "physics": "bikePhysicsFactory",
       "skill": 2,
@@ -777,8 +801,8 @@
             3277865877,
             3277865878
           ],
-          "bestX": 119.28974965822445,
-          "bestPct": 0.9940812471518704,
+          "bestX": 119.2607597306227,
+          "bestPct": 0.9938396644218558,
           "clears": 2,
           "attempts": [
             1,
@@ -786,8 +810,8 @@
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            7.741666666666666,
-            7.741666666666666
+            7.733333333333333,
+            7.733333333333333
           ],
           "outcomes": [
             "finished",
@@ -796,10 +820,10 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 4220.404625,
+          "wallMs": 5971.085833,
           "runs": [
-            "20260914-025724-8f0a5c",
-            "20260914-025726-3d4656"
+            "20260914-032829-27513e",
+            "20260914-032832-73a349"
           ]
         },
         {
@@ -816,8 +840,8 @@
             2308543150,
             2308543151
           ],
-          "bestX": 56.50096912577531,
-          "bestPct": 0.9912450723820231,
+          "bestX": 56.43617069441933,
+          "bestPct": 0.9901082577968304,
           "clears": 2,
           "attempts": [
             1,
@@ -825,8 +849,8 @@
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            4.958333333333333,
-            4.958333333333333
+            4.85,
+            4.85
           ],
           "outcomes": [
             "finished",
@@ -835,17 +859,17 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 1963.2542920000005,
+          "wallMs": 2862.6747080000005,
           "runs": [
-            "20260914-025728-750617",
-            "20260914-025729-6fef89"
+            "20260914-032835-da19ac",
+            "20260914-032836-a471e5"
           ]
         },
         {
           "trackId": "b1-first-ride",
           "tier": "beginner",
           "technique": "throttle control",
-          "finishX": 139,
+          "finishX": 404,
           "attemptsBand": [
             1,
             1
@@ -855,42 +879,36 @@
             138717428,
             138717429
           ],
-          "bestX": 138.29276478824883,
-          "bestPct": 0.9949119768938764,
+          "bestX": 403.31686912288393,
+          "bestPct": 0.9983090819873365,
           "clears": 2,
           "attempts": [
-            2,
-            2
+            1,
+            1
           ],
-          "attemptsMedian": 2,
+          "attemptsMedian": 1,
           "finishTimes": [
-            14.8,
-            14.8
+            30.016666666666666,
+            30.016666666666666
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": {
-            "reason": "crash",
-            "x": 136.63887590292038,
-            "checkpoint": 1,
-            "runTime": 10.525,
-            "obstacle": null
-          },
+          "firstBlocker": null,
           "replayFaithful": false,
-          "replayDivergenceX": 76.6671398336385,
-          "wallMs": 8193.822209,
+          "replayDivergenceX": 77.25507836792649,
+          "wallMs": 37109.2705,
           "runs": [
-            "20260914-025730-09a0a0",
-            "20260914-025734-d3a900"
+            "20260914-032838-103068",
+            "20260914-032857-4392ab"
           ]
         },
         {
           "trackId": "b2-lean-back",
           "tier": "beginner",
           "technique": "weight shift on drops",
-          "finishX": 127.8,
+          "finishX": 322.2,
           "attemptsBand": [
             1,
             2
@@ -900,8 +918,8 @@
             3802965488,
             3802965489
           ],
-          "bestX": 127.74479723073955,
-          "bestPct": 0.9995680534486663,
+          "bestX": 321.5130554666545,
+          "bestPct": 0.9978679561348682,
           "clears": 2,
           "attempts": [
             1,
@@ -909,8 +927,8 @@
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            10.641666666666667,
-            10.641666666666667
+            24.108333333333334,
+            24.108333333333334
           ],
           "outcomes": [
             "finished",
@@ -918,18 +936,18 @@
           ],
           "firstBlocker": null,
           "replayFaithful": false,
-          "replayDivergenceX": 127.63946911536841,
-          "wallMs": 6025.0312090000025,
+          "replayDivergenceX": 84.49014528685582,
+          "wallMs": 21070.374583999997,
           "runs": [
-            "20260914-025738-0f9e1b",
-            "20260914-025741-e5d84d"
+            "20260914-032915-212120",
+            "20260914-032925-aa0b7c"
           ]
         },
         {
           "trackId": "b3-kicker-row",
           "tier": "beginner",
           "technique": "jump and level in the air",
-          "finishX": 142,
+          "finishX": 345,
           "attemptsBand": [
             1,
             2
@@ -939,42 +957,36 @@
             4115132233,
             4115132234
           ],
-          "bestX": 141.31750707889307,
-          "bestPct": 0.9951937118231906,
+          "bestX": 344.3549251859053,
+          "bestPct": 0.9981302179301603,
           "clears": 2,
           "attempts": [
-            2,
-            2
+            1,
+            1
           ],
-          "attemptsMedian": 2,
+          "attemptsMedian": 1,
           "finishTimes": [
-            17.3,
-            17.308333333333334
+            29.9,
+            29.9
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": {
-            "reason": "crash",
-            "x": 131.90398329886028,
-            "checkpoint": 2,
-            "runTime": 13.033333333333333,
-            "obstacle": null
-          },
+          "firstBlocker": null,
           "replayFaithful": false,
-          "replayDivergenceX": 30.78864958243045,
-          "wallMs": 10747.162791000002,
+          "replayDivergenceX": 83.4313061019937,
+          "wallMs": 26564.968332999997,
           "runs": [
-            "20260914-025744-804bf4",
-            "20260914-025750-934d4b"
+            "20260914-032936-a637c7",
+            "20260914-032949-49d722"
           ]
         },
         {
           "trackId": "e1-uphill-weight",
           "tier": "easy",
           "technique": "lean forward on steep climbs",
-          "finishX": 108.112307,
+          "finishX": 300.415624,
           "attemptsBand": [
             2,
             4
@@ -984,36 +996,42 @@
             847839319,
             847839320
           ],
-          "bestX": 107.37930139553539,
-          "bestPct": 0.993219961493703,
+          "bestX": 299.8155315742353,
+          "bestPct": 0.9980024593335909,
           "clears": 2,
           "attempts": [
-            1,
-            1
+            2,
+            2
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 2,
           "finishTimes": [
-            12.408333333333333,
-            12.408333333333333
+            34.791666666666664,
+            34.791666666666664
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": null,
-          "replayFaithful": false,
-          "replayDivergenceX": 81.35682685759768,
-          "wallMs": 8052.485083000003,
+          "firstBlocker": {
+            "reason": "crash",
+            "x": 159.605029095596,
+            "checkpoint": 1,
+            "runTime": 15.508333333333333,
+            "obstacle": null
+          },
+          "replayFaithful": true,
+          "replayDivergenceX": null,
+          "wallMs": 31257.124624999997,
           "runs": [
-            "20260914-025755-fd9d6e",
-            "20260914-025759-ac313c"
+            "20260914-033002-d70973",
+            "20260914-033018-0a4f27"
           ]
         },
         {
           "trackId": "e2-rear-wheel-first",
           "tier": "easy",
           "technique": "rear-wheel-first gap landing",
-          "finishX": 172,
+          "finishX": 383,
           "attemptsBand": [
             3,
             5
@@ -1023,36 +1041,42 @@
             2125781358,
             2125781359
           ],
-          "bestX": 171.45354840480076,
-          "bestPct": 0.9968229558418649,
+          "bestX": 382.4554410051009,
+          "bestPct": 0.9985781749480441,
           "clears": 2,
           "attempts": [
-            1,
-            1
+            2,
+            2
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 2,
           "finishTimes": [
-            12.858333333333333,
-            12.858333333333333
+            33.50833333333333,
+            33.50833333333333
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "hazard",
+            "x": 330.63205585718225,
+            "checkpoint": 3,
+            "runTime": 25.025,
+            "obstacle": null
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 99.61656697849055,
-          "wallMs": 9371.729250000004,
+          "replayDivergenceX": 64.22683460447467,
+          "wallMs": 36970.473541000014,
           "runs": [
-            "20260914-025803-b313c3",
-            "20260914-025808-bc9f20"
+            "20260914-033034-990f2f",
+            "20260914-033050-8fb341"
           ]
         },
         {
           "trackId": "e3-stairway",
           "tier": "easy",
           "technique": "stairs: pulse up, brake down",
-          "finishX": 94.1,
+          "finishX": 278.15,
           "attemptsBand": [
             3,
             6
@@ -1062,36 +1086,42 @@
             3073702004,
             3073702005
           ],
-          "bestX": 93.47389137805142,
-          "bestPct": 0.9933463483321087,
+          "bestX": 277.45889501894027,
+          "bestPct": 0.9975153514971788,
           "clears": 2,
           "attempts": [
-            1,
-            1
+            4,
+            4
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 4,
           "finishTimes": [
-            13.641666666666667,
-            13.641666666666667
+            44.43333333333333,
+            44.43333333333333
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "crash",
+            "x": 145.13761381619273,
+            "checkpoint": 1,
+            "runTime": 13.641666666666667,
+            "obstacle": null
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 69.46123797613399,
-          "wallMs": 10811.356417000003,
+          "replayDivergenceX": 166.82464560294886,
+          "wallMs": 59523.377707999985,
           "runs": [
-            "20260914-025813-2906f2",
-            "20260914-025818-057cb3"
+            "20260914-033111-f018b2",
+            "20260914-033140-ebe248"
           ]
         },
         {
           "trackId": "m1-hop-up",
           "tier": "medium",
           "technique": "bunny hop onto ledges",
-          "finishX": 103,
+          "finishX": 289,
           "attemptsBand": [
             5,
             9
@@ -1101,36 +1131,42 @@
             1909798049,
             1909798050
           ],
-          "bestX": 102.3429803006381,
-          "bestPct": 0.9936211679673602,
+          "bestX": 288.3316535899118,
+          "bestPct": 0.9976873826640547,
           "clears": 2,
           "attempts": [
-            1,
-            1
+            2,
+            2
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 2,
           "finishTimes": [
-            10.825,
-            10.825
+            32.641666666666666,
+            32.641666666666666
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "crash",
+            "x": 239.86583258096337,
+            "checkpoint": 3,
+            "runTime": 24.016666666666666,
+            "obstacle": null
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 73.33806635238875,
-          "wallMs": 6077.031667000003,
+          "replayDivergenceX": 40.8787805779178,
+          "wallMs": 40474.806374999986,
           "runs": [
-            "20260914-025823-46dae8",
-            "20260914-025826-a182ff"
+            "20260914-033210-c9743a",
+            "20260914-033232-27b611"
           ]
         },
         {
           "trackId": "m2-drum-roll",
           "tier": "medium",
-          "technique": "drum crossing and balance",
-          "finishX": 119.1,
+          "technique": "logs and drums: lift the front, roll the top",
+          "finishX": 303.6,
           "attemptsBand": [
             6,
             12
@@ -1140,8 +1176,8 @@
             3505190447,
             3505190448
           ],
-          "bestX": 118.43790828390534,
-          "bestPct": 0.9944408755995411,
+          "bestX": 302.98118561553696,
+          "bestPct": 0.9979617444517027,
           "clears": 2,
           "attempts": [
             2,
@@ -1149,8 +1185,8 @@
           ],
           "attemptsMedian": 2,
           "finishTimes": [
-            22.925,
-            22.925
+            33.84166666666667,
+            33.84166666666667
           ],
           "outcomes": [
             "finished",
@@ -1158,28 +1194,28 @@
           ],
           "firstBlocker": {
             "reason": "crash",
-            "x": 43.083257608274394,
+            "x": 48.609976893668616,
             "checkpoint": 0,
-            "runTime": 4.241666666666666,
+            "runTime": 4.908333333333333,
             "obstacle": {
               "kind": "logpile",
-              "x": 42.7,
+              "x": 47.2,
               "index": 3
             }
           },
-          "replayFaithful": true,
-          "replayDivergenceX": null,
-          "wallMs": 15945.900500000003,
+          "replayFaithful": false,
+          "replayDivergenceX": 239.6661850324846,
+          "wallMs": 34288.462,
           "runs": [
-            "20260914-025829-c130a3",
-            "20260914-025837-7d44c1"
+            "20260914-033251-e2a94f",
+            "20260914-033307-b32e9c"
           ]
         },
         {
           "trackId": "m3-see-saw",
           "tier": "medium",
           "technique": "see-saw timing and thin landings",
-          "finishX": 141.9,
+          "finishX": 306.7,
           "attemptsBand": [
             8,
             12
@@ -1189,36 +1225,46 @@
             1066951255,
             1066951256
           ],
-          "bestX": 141.23248968892096,
-          "bestPct": 0.9952959104222759,
-          "clears": 2,
+          "bestX": 174.8407828436024,
+          "bestPct": 0.5700710232918239,
+          "clears": 0,
           "attempts": [
-            1,
-            1
+            50,
+            50
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 50,
           "finishTimes": [
-            15.166666666666666,
-            15.166666666666666
+            null,
+            null
           ],
           "outcomes": [
-            "finished",
-            "finished"
+            "maxAttempts",
+            "maxAttempts"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "crash",
+            "x": 174.8407828436024,
+            "checkpoint": 1,
+            "runTime": 15.15,
+            "obstacle": {
+              "kind": "ramp",
+              "x": 178.4,
+              "index": 17
+            }
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 30.933791101476412,
-          "wallMs": 12750.733458000002,
+          "replayDivergenceX": 30.9271146385939,
+          "wallMs": 101051.30174999998,
           "runs": [
-            "20260914-025845-7908dd",
-            "20260914-025851-3200e8"
+            "20260914-033325-a85d43",
+            "20260914-033420-37a382"
           ]
         },
         {
           "trackId": "h1-wheelie-wire",
           "tier": "hard",
           "technique": "sustained wheelie and the lip climb",
-          "finishX": 196,
+          "finishX": 404,
           "attemptsBand": [
             10,
             18
@@ -1228,46 +1274,46 @@
             1831771780,
             1831771781
           ],
-          "bestX": 138.68030862689307,
-          "bestPct": 0.7075525950351687,
-          "clears": 0,
+          "bestX": 403.2960020970416,
+          "bestPct": 0.9982574309332712,
+          "clears": 2,
           "attempts": [
-            50,
-            47
+            2,
+            2
           ],
-          "attemptsMedian": 48.5,
+          "attemptsMedian": 2,
           "finishTimes": [
-            null,
-            null
+            104.34166666666667,
+            104.34166666666667
           ],
           "outcomes": [
-            "maxAttempts",
-            "wallTimeout"
+            "finished",
+            "finished"
           ],
           "firstBlocker": {
             "reason": "crash",
-            "x": 88.9141823011622,
-            "checkpoint": 1,
-            "runTime": 7.558333333333334,
+            "x": 220.8070384126409,
+            "checkpoint": 2,
+            "runTime": 85.88333333333334,
             "obstacle": {
-              "kind": "gap",
-              "x": 95,
-              "index": 9
+              "kind": "wall",
+              "x": 222,
+              "index": 24
             }
           },
           "replayFaithful": false,
-          "replayDivergenceX": 30.644767290936745,
-          "wallMs": 117978.34470899998,
+          "replayDivergenceX": 30.6294288976091,
+          "wallMs": 84401.88941599999,
           "runs": [
-            "20260914-025858-3914c6",
-            "20260914-025956-cab9d2"
+            "20260914-033506-1fa55e",
+            "20260914-033547-035d34"
           ]
         },
         {
           "trackId": "h2-gap-chain",
           "tier": "hard",
           "technique": "gap chains: read the width, set the speed",
-          "finishX": 228,
+          "finishX": 420,
           "attemptsBand": [
             14,
             22
@@ -1277,36 +1323,46 @@
             4247919438,
             4247919439
           ],
-          "bestX": 227.3859822592289,
-          "bestPct": 0.9973069397334602,
+          "bestX": 420.4364897701004,
+          "bestPct": 1,
           "clears": 2,
           "attempts": [
-            1,
-            1
+            8,
+            8
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 8,
           "finishTimes": [
-            19.991666666666667,
-            19.991666666666667
+            115.91666666666667,
+            115.91666666666667
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "crash",
+            "x": 393.0580299232759,
+            "checkpoint": 3,
+            "runTime": 33.266666666666666,
+            "obstacle": {
+              "kind": "ramp",
+              "x": 397,
+              "index": 65
+            }
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 89.05016463135095,
-          "wallMs": 19218.928916000004,
+          "replayDivergenceX": 76.34512984300369,
+          "wallMs": 98023.71133300004,
           "runs": [
-            "20260914-030056-e7d597",
-            "20260914-030105-a1f66a"
+            "20260914-033630-b9c1a4",
+            "20260914-033714-ffcad9"
           ]
         },
         {
           "trackId": "h3-fire-line",
           "tier": "hard",
           "technique": "commit at speed over fire, then stop hard",
-          "finishX": 219.2,
+          "finishX": 411,
           "attemptsBand": [
             18,
             25
@@ -1316,46 +1372,42 @@
             3173388572,
             3173388573
           ],
-          "bestX": 218.56446831439132,
-          "bestPct": 0.9971006766167487,
-          "clears": 2,
+          "bestX": 220.63932358618237,
+          "bestPct": 0.5368353371926579,
+          "clears": 0,
           "attempts": [
-            3,
-            3
+            35,
+            33
           ],
-          "attemptsMedian": 3,
+          "attemptsMedian": 34,
           "finishTimes": [
-            23.683333333333334,
-            23.683333333333334
+            null,
+            null
           ],
           "outcomes": [
-            "finished",
-            "finished"
+            "wallTimeout",
+            "wallTimeout"
           ],
           "firstBlocker": {
             "reason": "crash",
-            "x": 116.97631420545582,
+            "x": 220.63932358618237,
             "checkpoint": 1,
-            "runTime": 10.75,
-            "obstacle": {
-              "kind": "ramp",
-              "x": 117.6,
-              "index": 4
-            }
+            "runTime": 18.533333333333335,
+            "obstacle": null
           },
-          "replayFaithful": true,
-          "replayDivergenceX": null,
-          "wallMs": 15435.506915999984,
+          "replayFaithful": false,
+          "replayDivergenceX": 82.03150880512705,
+          "wallMs": 120247.553541,
           "runs": [
-            "20260914-030115-b2fcdd",
-            "20260914-030123-a22c48"
+            "20260914-033808-88f8ef",
+            "20260914-033908-9e1c9d"
           ]
         },
         {
           "trackId": "x1-vertical-limit",
           "tier": "extreme",
           "technique": "near-vertical planks and pole-top hops",
-          "finishX": 186.728923,
+          "finishX": 339.728923,
           "attemptsBand": [
             30,
             45
@@ -1365,14 +1417,14 @@
             2756386537,
             2756386538
           ],
-          "bestX": 69.93232903809296,
-          "bestPct": 0.3745125710283937,
+          "bestX": 111.52166840282933,
+          "bestPct": 0.3282666292231743,
           "clears": 0,
           "attempts": [
-            3,
-            4
+            37,
+            39
           ],
-          "attemptsMedian": 3.5,
+          "attemptsMedian": 38,
           "finishTimes": [
             null,
             null
@@ -1383,28 +1435,28 @@
           ],
           "firstBlocker": {
             "reason": "crash",
-            "x": 69.93232903809296,
+            "x": 111.52166840282933,
             "checkpoint": 1,
-            "runTime": 10.8,
+            "runTime": 13.041666666666666,
             "obstacle": {
               "kind": "pole",
-              "x": 70.179316,
+              "x": 111.179316,
               "index": 9
             }
           },
           "replayFaithful": false,
-          "replayDivergenceX": 67.5617149620774,
-          "wallMs": 120151.53520800002,
+          "replayDivergenceX": 54.9649620925945,
+          "wallMs": 120280.05958399992,
           "runs": [
-            "20260914-030131-68db9c",
-            "20260914-030231-0a81c9"
+            "20260914-034009-0a598c",
+            "20260914-034109-ff5fbd"
           ]
         },
         {
           "trackId": "x2-pipe-dream",
           "tier": "extreme",
           "technique": "spinning drums with gaps and see-saw drops",
-          "finishX": 162.3,
+          "finishX": 304.8,
           "attemptsBand": [
             40,
             60
@@ -1414,46 +1466,42 @@
             2290459156,
             2290459157
           ],
-          "bestX": 49.311292138524934,
-          "bestPct": 0.3038280476803754,
-          "clears": 0,
+          "bestX": 304.1116955593945,
+          "bestPct": 0.9977417833313467,
+          "clears": 2,
           "attempts": [
-            33,
-            30
+            3,
+            3
           ],
-          "attemptsMedian": 31.5,
+          "attemptsMedian": 3,
           "finishTimes": [
-            null,
-            null
+            41.225,
+            41.24166666666667
           ],
           "outcomes": [
-            "wallTimeout",
-            "wallTimeout"
+            "finished",
+            "finished"
           ],
           "firstBlocker": {
             "reason": "crash",
-            "x": 36.15947482666912,
-            "checkpoint": 0,
-            "runTime": 3.775,
-            "obstacle": {
-              "kind": "ramp",
-              "x": 37.1,
-              "index": 4
-            }
+            "x": 221.87752752563463,
+            "checkpoint": 2,
+            "runTime": 21.641666666666666,
+            "obstacle": null
           },
           "replayFaithful": false,
-          "replayDivergenceX": 26.640407345141334,
-          "wallMs": 120160.125,
+          "replayDivergenceX": 61.88139545767958,
+          "wallMs": 39200.73520800006,
           "runs": [
-            "20260914-030331-9cc9b3",
-            "20260914-030431-a25035"
+            "20260914-034209-592e7a",
+            "20260914-034228-5448e7"
           ]
         },
         {
           "trackId": "x3-gauntlet",
           "tier": "extreme",
           "technique": "everything, in order",
-          "finishX": 426.99653,
+          "finishX": 515.345153,
           "attemptsBand": [
             60,
             80
@@ -1463,14 +1511,14 @@
             264835977,
             264835978
           ],
-          "bestX": 180.65765348277552,
-          "bestPct": 0.4230892777577736,
+          "bestX": 433.9737862599881,
+          "bestPct": 0.8421031685923087,
           "clears": 0,
           "attempts": [
-            6,
-            6
+            5,
+            4
           ],
-          "attemptsMedian": 6,
+          "attemptsMedian": 4.5,
           "finishTimes": [
             null,
             null
@@ -1481,21 +1529,21 @@
           ],
           "firstBlocker": {
             "reason": "crash",
-            "x": 77.69063942981582,
-            "checkpoint": 0,
-            "runTime": 8.383333333333333,
+            "x": 229.40296720925528,
+            "checkpoint": 2,
+            "runTime": 89.63333333333334,
             "obstacle": {
-              "kind": "ramp",
-              "x": 81.625842,
-              "index": 7
+              "kind": "wall",
+              "x": 230.625842,
+              "index": 28
             }
           },
           "replayFaithful": false,
-          "replayDivergenceX": 38.24034140331797,
-          "wallMs": 120187.70387499995,
+          "replayDivergenceX": 109.66482470520478,
+          "wallMs": 120261.068708,
           "runs": [
-            "20260914-030531-532830",
-            "20260914-030631-1ba813"
+            "20260914-034248-161442",
+            "20260914-034348-839ada"
           ]
         }
       ]
@@ -1503,11 +1551,11 @@
     {
       "schema": 1,
       "kind": "sweep",
-      "runId": "20260914-030731-ced6d9",
-      "startedAt": "2026-09-14T08:07:31.735Z",
-      "wallMs": 984820,
-      "git": "ea32412",
-      "srcFingerprint": "e082a61a",
+      "runId": "20260914-034448-c64127",
+      "startedAt": "2026-09-14T08:44:48.921Z",
+      "wallMs": 1723655,
+      "git": "0df6abc",
+      "srcFingerprint": "1afaef89",
       "node": "v24.18.1",
       "physics": "bikePhysicsFactory",
       "skill": 3,
@@ -1526,8 +1574,8 @@
             3277865877,
             3277865878
           ],
-          "bestX": 119.35024906796022,
-          "bestPct": 0.9945854088996685,
+          "bestX": 119.29982088089412,
+          "bestPct": 0.994165174007451,
           "clears": 2,
           "attempts": [
             1,
@@ -1535,8 +1583,8 @@
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            7.6,
-            7.6
+            7.633333333333334,
+            7.633333333333334
           ],
           "outcomes": [
             "finished",
@@ -1545,10 +1593,10 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 18786.159041999956,
+          "wallMs": 19554.666709000012,
           "runs": [
-            "20260914-030731-a2dbaa",
-            "20260914-030740-7ab917"
+            "20260914-034448-05f4c7",
+            "20260914-034458-ded4da"
           ]
         },
         {
@@ -1565,8 +1613,8 @@
             2308543150,
             2308543151
           ],
-          "bestX": 56.34205747049569,
-          "bestPct": 0.9884571486051875,
+          "bestX": 56.3338584318962,
+          "bestPct": 0.9883133058227405,
           "clears": 2,
           "attempts": [
             1,
@@ -1574,8 +1622,8 @@
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            4.741666666666666,
-            4.741666666666666
+            4.85,
+            4.85
           ],
           "outcomes": [
             "finished",
@@ -1584,17 +1632,17 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 4109.77337499999,
+          "wallMs": 4504.117333999951,
           "runs": [
-            "20260914-030750-358311",
-            "20260914-030752-d1d2c0"
+            "20260914-034508-be016e",
+            "20260914-034510-6621fb"
           ]
         },
         {
           "trackId": "b1-first-ride",
           "tier": "beginner",
           "technique": "throttle control",
-          "finishX": 139,
+          "finishX": 404,
           "attemptsBand": [
             1,
             1
@@ -1604,36 +1652,42 @@
             138717428,
             138717429
           ],
-          "bestX": 138.29293096584354,
-          "bestPct": 0.9949131724161405,
-          "clears": 2,
+          "bestX": 403.2628018788434,
+          "bestPct": 0.998175252175355,
+          "clears": 1,
           "attempts": [
             1,
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            10.175,
-            10.175
+            null,
+            27.566666666666666
           ],
           "outcomes": [
-            "finished",
+            "wallTimeout",
             "finished"
           ],
-          "firstBlocker": null,
-          "replayFaithful": true,
-          "replayDivergenceX": null,
-          "wallMs": 30175.402332999976,
+          "firstBlocker": {
+            "reason": "stuck",
+            "x": 339.09675950449724,
+            "checkpoint": -1,
+            "runTime": 22.875,
+            "obstacle": null
+          },
+          "replayFaithful": false,
+          "replayDivergenceX": 52.55564766617553,
+          "wallMs": 118373.45558299986,
           "runs": [
-            "20260914-030754-02f9a5",
-            "20260914-030811-543f46"
+            "20260914-034512-b6b2d4",
+            "20260914-034613-bfe5a4"
           ]
         },
         {
           "trackId": "b2-lean-back",
           "tier": "beginner",
           "technique": "weight shift on drops",
-          "finishX": 127.8,
+          "finishX": 322.2,
           "attemptsBand": [
             1,
             2
@@ -1643,36 +1697,42 @@
             3802965488,
             3802965489
           ],
-          "bestX": 127.11303830462325,
-          "bestPct": 0.9946247128687266,
+          "bestX": 321.50181908164126,
+          "bestPct": 0.9978330821900723,
           "clears": 2,
           "attempts": [
-            1,
-            1
+            2,
+            2
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 2,
           "finishTimes": [
-            10.55,
-            10.55
+            26.741666666666667,
+            26.741666666666667
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": null,
-          "replayFaithful": true,
-          "replayDivergenceX": null,
-          "wallMs": 28365.960290999967,
+          "firstBlocker": {
+            "reason": "crash",
+            "x": 292.76521355583026,
+            "checkpoint": 3,
+            "runTime": 20.891666666666666,
+            "obstacle": null
+          },
+          "replayFaithful": false,
+          "replayDivergenceX": 163.6749791379735,
+          "wallMs": 93760.52487500012,
           "runs": [
-            "20260914-030824-f0e480",
-            "20260914-030838-835681"
+            "20260914-034711-ca802e",
+            "20260914-034758-f3f57c"
           ]
         },
         {
           "trackId": "b3-kicker-row",
           "tier": "beginner",
           "technique": "jump and level in the air",
-          "finishX": 142,
+          "finishX": 345,
           "attemptsBand": [
             1,
             2
@@ -1682,8 +1742,8 @@
             4115132233,
             4115132234
           ],
-          "bestX": 141.30421154591704,
-          "bestPct": 0.995100081309275,
+          "bestX": 344.2930162672345,
+          "bestPct": 0.9979507717890855,
           "clears": 2,
           "attempts": [
             1,
@@ -1691,8 +1751,8 @@
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            11.841666666666667,
-            11.841666666666667
+            28.441666666666666,
+            28.441666666666666
           ],
           "outcomes": [
             "finished",
@@ -1700,18 +1760,18 @@
           ],
           "firstBlocker": null,
           "replayFaithful": false,
-          "replayDivergenceX": 48.80142565982054,
-          "wallMs": 37589.531833000015,
+          "replayDivergenceX": 132.92004702465258,
+          "wallMs": 108111.37541699992,
           "runs": [
-            "20260914-030853-2a2d8a",
-            "20260914-030911-4d5fd9"
+            "20260914-034845-9f7c34",
+            "20260914-034938-a96146"
           ]
         },
         {
           "trackId": "e1-uphill-weight",
           "tier": "easy",
           "technique": "lean forward on steep climbs",
-          "finishX": 108.112307,
+          "finishX": 300.415624,
           "attemptsBand": [
             2,
             4
@@ -1721,46 +1781,36 @@
             847839319,
             847839320
           ],
-          "bestX": 107.43580178107392,
-          "bestPct": 0.9937425697619598,
+          "bestX": 299.75665997590585,
+          "bestPct": 0.9978064921680168,
           "clears": 2,
           "attempts": [
-            2,
-            2
+            1,
+            1
           ],
-          "attemptsMedian": 2,
+          "attemptsMedian": 1,
           "finishTimes": [
-            15.075,
-            15.075
+            27.591666666666665,
+            27.591666666666665
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": {
-            "reason": "crash",
-            "x": 92.67258448994498,
-            "checkpoint": 2,
-            "runTime": 10.766666666666667,
-            "obstacle": {
-              "kind": "plank",
-              "x": 91.702819,
-              "index": 9
-            }
-          },
+          "firstBlocker": null,
           "replayFaithful": false,
-          "replayDivergenceX": 33.707848628502845,
-          "wallMs": 43126.51916699996,
+          "replayDivergenceX": 89.27528514473786,
+          "wallMs": 106329.20233300002,
           "runs": [
-            "20260914-030930-54309a",
-            "20260914-030952-2fb1e0"
+            "20260914-035033-ae51ba",
+            "20260914-035126-9935a0"
           ]
         },
         {
           "trackId": "e2-rear-wheel-first",
           "tier": "easy",
           "technique": "rear-wheel-first gap landing",
-          "finishX": 172,
+          "finishX": 383,
           "attemptsBand": [
             3,
             5
@@ -1770,46 +1820,36 @@
             2125781358,
             2125781359
           ],
-          "bestX": 171.32413260539025,
-          "bestPct": 0.9960705384034316,
+          "bestX": 382.457332520044,
+          "bestPct": 0.9985831136293577,
           "clears": 2,
           "attempts": [
-            2,
-            2
+            1,
+            1
           ],
-          "attemptsMedian": 2,
+          "attemptsMedian": 1,
           "finishTimes": [
-            15.641666666666667,
-            15.641666666666667
+            27.3,
+            27.3
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": {
-            "reason": "crash",
-            "x": 133.50800351650759,
-            "checkpoint": 2,
-            "runTime": 10.233333333333333,
-            "obstacle": {
-              "kind": "ramp",
-              "x": 133,
-              "index": 11
-            }
-          },
+          "firstBlocker": null,
           "replayFaithful": false,
-          "replayDivergenceX": 49.9452568087315,
-          "wallMs": 51303.557541999966,
+          "replayDivergenceX": 95.76850654217388,
+          "wallMs": 99647.53499999992,
           "runs": [
-            "20260914-031013-78a05d",
-            "20260914-031039-b9bc57"
+            "20260914-035219-8093de",
+            "20260914-035309-c1fce0"
           ]
         },
         {
           "trackId": "e3-stairway",
           "tier": "easy",
           "technique": "stairs: pulse up, brake down",
-          "finishX": 94.1,
+          "finishX": 278.15,
           "attemptsBand": [
             3,
             6
@@ -1819,8 +1859,8 @@
             3073702004,
             3073702005
           ],
-          "bestX": 93.37752955697282,
-          "bestPct": 0.9923223119763318,
+          "bestX": 277.4655061291999,
+          "bestPct": 0.9975391196447958,
           "clears": 2,
           "attempts": [
             1,
@@ -1828,8 +1868,8 @@
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            11.558333333333334,
-            11.558333333333334
+            27.666666666666668,
+            27.666666666666668
           ],
           "outcomes": [
             "finished",
@@ -1837,18 +1877,18 @@
           ],
           "firstBlocker": null,
           "replayFaithful": false,
-          "replayDivergenceX": 41.508454209844736,
-          "wallMs": 39458.96100000001,
+          "replayDivergenceX": 147.96442521392436,
+          "wallMs": 111535.16883400013,
           "runs": [
-            "20260914-031105-9a12a6",
-            "20260914-031126-a5455e"
+            "20260914-035359-90de99",
+            "20260914-035455-34893e"
           ]
         },
         {
           "trackId": "m1-hop-up",
           "tier": "medium",
           "technique": "bunny hop onto ledges",
-          "finishX": 103,
+          "finishX": 289,
           "attemptsBand": [
             5,
             9
@@ -1858,46 +1898,46 @@
             1909798049,
             1909798050
           ],
-          "bestX": 102.27259821840258,
-          "bestPct": 0.9929378467806076,
-          "clears": 2,
+          "bestX": 94.97031222739018,
+          "bestPct": 0.32861699732660965,
+          "clears": 0,
           "attempts": [
-            2,
-            2
+            1,
+            1
           ],
-          "attemptsMedian": 2,
+          "attemptsMedian": 1,
           "finishTimes": [
-            12.85,
-            12.85
+            null,
+            null
           ],
           "outcomes": [
-            "finished",
-            "finished"
+            "wallTimeout",
+            "wallTimeout"
           ],
           "firstBlocker": {
-            "reason": "crash",
-            "x": 83.69731883349395,
-            "checkpoint": 2,
-            "runTime": 8.041666666666666,
+            "reason": "stuck",
+            "x": 94.97031222739018,
+            "checkpoint": -1,
+            "runTime": 33.375,
             "obstacle": {
-              "kind": "box",
-              "x": 84,
-              "index": 7
+              "kind": "ledge",
+              "x": 95,
+              "index": 3
             }
           },
-          "replayFaithful": false,
-          "replayDivergenceX": 42.72447003313793,
-          "wallMs": 37228.86679100001,
+          "replayFaithful": true,
+          "replayDivergenceX": null,
+          "wallMs": 120280.95858400012,
           "runs": [
-            "20260914-031144-d336b3",
-            "20260914-031201-9af35d"
+            "20260914-035550-f91827",
+            "20260914-035650-2fb027"
           ]
         },
         {
           "trackId": "m2-drum-roll",
           "tier": "medium",
-          "technique": "drum crossing and balance",
-          "finishX": 119.1,
+          "technique": "logs and drums: lift the front, roll the top",
+          "finishX": 303.6,
           "attemptsBand": [
             6,
             12
@@ -1907,36 +1947,46 @@
             3505190447,
             3505190448
           ],
-          "bestX": 118.477406462586,
-          "bestPct": 0.9947725143793955,
-          "clears": 2,
+          "bestX": 297.97863876184624,
+          "bestPct": 0.9814843173973854,
+          "clears": 0,
           "attempts": [
-            1,
-            1
+            3,
+            3
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 3,
           "finishTimes": [
-            15.466666666666667,
-            15.466666666666667
+            null,
+            null
           ],
           "outcomes": [
-            "finished",
-            "finished"
+            "wallTimeout",
+            "wallTimeout"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "crash",
+            "x": 92.91840943605389,
+            "checkpoint": 1,
+            "runTime": 9.166666666666666,
+            "obstacle": {
+              "kind": "ramp",
+              "x": 91.8,
+              "index": 6
+            }
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 55.99777926939324,
-          "wallMs": 66448.19858299999,
+          "replayDivergenceX": 83.13042894444212,
+          "wallMs": 120381.874542,
           "runs": [
-            "20260914-031221-b595cf",
-            "20260914-031257-c30346"
+            "20260914-035751-c18fe1",
+            "20260914-035851-3c6009"
           ]
         },
         {
           "trackId": "m3-see-saw",
           "tier": "medium",
           "technique": "see-saw timing and thin landings",
-          "finishX": 141.9,
+          "finishX": 306.7,
           "attemptsBand": [
             8,
             12
@@ -1946,46 +1996,36 @@
             1066951255,
             1066951256
           ],
-          "bestX": 141.24525539951526,
-          "bestPct": 0.9953858731466896,
+          "bestX": 306.4127340963843,
+          "bestPct": 0.9990633651659091,
           "clears": 2,
           "attempts": [
-            2,
-            2
+            1,
+            1
           ],
-          "attemptsMedian": 2,
+          "attemptsMedian": 1,
           "finishTimes": [
-            14.675,
-            14.675
+            24.6,
+            24.6
           ],
           "outcomes": [
             "finished",
             "finished"
           ],
-          "firstBlocker": {
-            "reason": "crash",
-            "x": 66.31930110856396,
-            "checkpoint": 1,
-            "runTime": 5.666666666666667,
-            "obstacle": {
-              "kind": "seesaw",
-              "x": 64.4,
-              "index": 5
-            }
-          },
+          "firstBlocker": null,
           "replayFaithful": false,
-          "replayDivergenceX": 44.82665186001278,
-          "wallMs": 42780.19524999999,
+          "replayDivergenceX": 39.69816877349725,
+          "wallMs": 98477.53920800006,
           "runs": [
-            "20260914-031328-6c6a49",
-            "20260914-031349-444479"
+            "20260914-035951-776fdd",
+            "20260914-040040-4d75cd"
           ]
         },
         {
           "trackId": "h1-wheelie-wire",
           "tier": "hard",
           "technique": "sustained wheelie and the lip climb",
-          "finishX": 196,
+          "finishX": 404,
           "attemptsBand": [
             10,
             18
@@ -1995,46 +2035,42 @@
             1831771780,
             1831771781
           ],
-          "bestX": 195.26989972874287,
-          "bestPct": 0.9962749986160351,
-          "clears": 2,
+          "bestX": 320.9037019297743,
+          "bestPct": 0.7943160938855799,
+          "clears": 0,
           "attempts": [
-            2,
-            2
+            1,
+            1
           ],
-          "attemptsMedian": 2,
+          "attemptsMedian": 1,
           "finishTimes": [
-            20.008333333333333,
-            20.008333333333333
+            null,
+            null
           ],
           "outcomes": [
-            "finished",
-            "finished"
+            "wallTimeout",
+            "wallTimeout"
           ],
           "firstBlocker": {
-            "reason": "crash",
-            "x": 93.92278045004572,
-            "checkpoint": 1,
-            "runTime": 7.541666666666667,
-            "obstacle": {
-              "kind": "gap",
-              "x": 95,
-              "index": 9
-            }
+            "reason": "stuck",
+            "x": 318.80414171838,
+            "checkpoint": -1,
+            "runTime": 25.125,
+            "obstacle": null
           },
           "replayFaithful": false,
-          "replayDivergenceX": 35.493418638602634,
-          "wallMs": 72510.82979199989,
+          "replayDivergenceX": 39.17566632720626,
+          "wallMs": 120389.86774999998,
           "runs": [
-            "20260914-031411-bfad4e",
-            "20260914-031447-31a021"
+            "20260914-040129-f7f7c8",
+            "20260914-040230-5a7fe1"
           ]
         },
         {
           "trackId": "h2-gap-chain",
           "tier": "hard",
           "technique": "gap chains: read the width, set the speed",
-          "finishX": 228,
+          "finishX": 420,
           "attemptsBand": [
             14,
             22
@@ -2044,36 +2080,46 @@
             4247919438,
             4247919439
           ],
-          "bestX": 227.42054353483277,
-          "bestPct": 0.9974585242755823,
-          "clears": 2,
+          "bestX": 352.8994501334998,
+          "bestPct": 0.8402367860321424,
+          "clears": 0,
           "attempts": [
             1,
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            17.466666666666665,
-            17.466666666666665
+            null,
+            null
           ],
           "outcomes": [
-            "finished",
-            "finished"
+            "wallTimeout",
+            "wallTimeout"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "stuck",
+            "x": 347.47489603261283,
+            "checkpoint": -1,
+            "runTime": 24.75,
+            "obstacle": {
+              "kind": "gap",
+              "x": 348,
+              "index": 50
+            }
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 43.86188441111411,
-          "wallMs": 71393.99520800007,
+          "replayDivergenceX": 44.56637217154871,
+          "wallMs": 120435.28570799995,
           "runs": [
-            "20260914-031523-6c7f43",
-            "20260914-031555-cb80cc"
+            "20260914-040330-3c1bde",
+            "20260914-040430-c0ec5a"
           ]
         },
         {
           "trackId": "h3-fire-line",
           "tier": "hard",
           "technique": "commit at speed over fire, then stop hard",
-          "finishX": 219.2,
+          "finishX": 411,
           "attemptsBand": [
             18,
             25
@@ -2083,36 +2129,42 @@
             3173388572,
             3173388573
           ],
-          "bestX": 218.6762358845332,
-          "bestPct": 0.9976105651666661,
-          "clears": 2,
+          "bestX": 227.0889548813043,
+          "bestPct": 0.5525278707574314,
+          "clears": 0,
           "attempts": [
-            1,
-            1
+            2,
+            2
           ],
-          "attemptsMedian": 1,
+          "attemptsMedian": 2,
           "finishTimes": [
-            18.325,
-            18.325
+            null,
+            null
           ],
           "outcomes": [
-            "finished",
-            "finished"
+            "wallTimeout",
+            "wallTimeout"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "crash",
+            "x": 172.91972190683623,
+            "checkpoint": 1,
+            "runTime": 13.675,
+            "obstacle": null
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 106.4047137215786,
-          "wallMs": 86592.20162499999,
+          "replayDivergenceX": 187.54408727539882,
+          "wallMs": 120173.22554200003,
           "runs": [
-            "20260914-031635-b3ce25",
-            "20260914-031717-3756ea"
+            "20260914-040530-78568e",
+            "20260914-040630-74ec7b"
           ]
         },
         {
           "trackId": "x1-vertical-limit",
           "tier": "extreme",
           "technique": "near-vertical planks and pole-top hops",
-          "finishX": 186.728923,
+          "finishX": 339.728923,
           "attemptsBand": [
             30,
             45
@@ -2122,36 +2174,46 @@
             2756386537,
             2756386538
           ],
-          "bestX": 186.04696522514553,
-          "bestPct": 0.9963478728206745,
-          "clears": 2,
+          "bestX": 145.60059502146783,
+          "bestPct": 0.4285787437105195,
+          "clears": 0,
           "attempts": [
             1,
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            27.241666666666667,
-            27.241666666666667
+            null,
+            null
           ],
           "outcomes": [
-            "finished",
-            "finished"
+            "wallTimeout",
+            "wallTimeout"
           ],
-          "firstBlocker": null,
+          "firstBlocker": {
+            "reason": "stuck",
+            "x": 143.62630940840455,
+            "checkpoint": -1,
+            "runTime": 18.625,
+            "obstacle": {
+              "kind": "ramp",
+              "x": 141.810141,
+              "index": 18
+            }
+          },
           "replayFaithful": false,
-          "replayDivergenceX": 27.91681756136544,
-          "wallMs": 113897.12149999989,
+          "replayDivergenceX": 79.9942781562536,
+          "wallMs": 120499.41195800016,
           "runs": [
-            "20260914-031801-e093a7",
-            "20260914-031858-d89de3"
+            "20260914-040730-b1c74e",
+            "20260914-040831-74b2a6"
           ]
         },
         {
           "trackId": "x2-pipe-dream",
           "tier": "extreme",
           "technique": "spinning drums with gaps and see-saw drops",
-          "finishX": 162.3,
+          "finishX": 304.8,
           "attemptsBand": [
             40,
             60
@@ -2161,14 +2223,14 @@
             2290459156,
             2290459157
           ],
-          "bestX": 56.3934358431231,
-          "bestPct": 0.3474641764825822,
+          "bestX": 206.70974123411514,
+          "bestPct": 0.6781815657287242,
           "clears": 0,
           "attempts": [
-            2,
-            2
+            1,
+            1
           ],
-          "attemptsMedian": 2,
+          "attemptsMedian": 1,
           "finishTimes": [
             null,
             null
@@ -2178,29 +2240,29 @@
             "wallTimeout"
           ],
           "firstBlocker": {
-            "reason": "crash",
-            "x": 56.3934358431231,
-            "checkpoint": 0,
-            "runTime": 7.15,
+            "reason": "stuck",
+            "x": 190.75932159914302,
+            "checkpoint": -1,
+            "runTime": 17.375,
             "obstacle": {
-              "kind": "ramp",
-              "x": 63.6,
-              "index": 8
+              "kind": "gap",
+              "x": 190.2,
+              "index": 31
             }
           },
           "replayFaithful": false,
-          "replayDivergenceX": 26.640407345141334,
-          "wallMs": 120618.05420799996,
+          "replayDivergenceX": 97.90938954561001,
+          "wallMs": 120404.52824999997,
           "runs": [
-            "20260914-031955-29d2fd",
-            "20260914-032055-e9af79"
+            "20260914-040931-618f3c",
+            "20260914-041031-7d831a"
           ]
         },
         {
           "trackId": "x3-gauntlet",
           "tier": "extreme",
           "technique": "everything, in order",
-          "finishX": 426.99653,
+          "finishX": 515.345153,
           "attemptsBand": [
             60,
             80
@@ -2210,8 +2272,8 @@
             264835977,
             264835978
           ],
-          "bestX": 111.65065528588717,
-          "bestPct": 0.26147906936360155,
+          "bestX": 127.22624235662042,
+          "bestPct": 0.2468757911391871,
           "clears": 0,
           "attempts": [
             2,
@@ -2228,21 +2290,21 @@
           ],
           "firstBlocker": {
             "reason": "crash",
-            "x": 78.93456330250764,
+            "x": 95.94203788616454,
             "checkpoint": 0,
-            "runTime": 8.175,
+            "runTime": 9.508333333333333,
             "obstacle": {
               "kind": "ramp",
-              "x": 81.625842,
+              "x": 100.625842,
               "index": 7
             }
           },
           "replayFaithful": false,
-          "replayDivergenceX": 41.940697031494096,
-          "wallMs": 120426.22224999988,
+          "replayDivergenceX": 38.24034140331797,
+          "wallMs": 120650.89454100002,
           "runs": [
-            "20260914-032156-8688f8",
-            "20260914-032256-b785ac"
+            "20260914-041131-8b0856",
+            "20260914-041232-a499ad"
           ]
         }
       ]

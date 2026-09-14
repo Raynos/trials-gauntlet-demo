@@ -28,7 +28,7 @@ describe('kinds', () => {
 
 describe('compileTrack merge', () => {
   it('ramp -> box -> ramp share no faces: only the exposed outline survives', () => {
-    const def = course('t-tabletop', 't', 'beginner').meta(meta).flat(10).tabletop(4, 6, 1.2).flat(10).finish();
+    const def = course('t-tabletop', 't', 'beginner').meta(meta).flat(10).tabletop(4, 6, 1.2, 4).flat(10).finish();
     const ps = polys(def);
     const ramp = ps.find((p) => p.obstacleIndex === 0) as ColliderPolyline;
     const box = ps.find((p) => p.obstacleIndex === 1) as ColliderPolyline;

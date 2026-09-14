@@ -1,6 +1,6 @@
 # Track system and curriculum
 
-Status: round 1 built. Owner: tracks. Consumers: physics, render, audio, harness, game.
+Status: round 3 (drum rules, length and rhythm, hints). Owner: tracks. Consumers: physics, render, audio, harness, game.
 `docs/design/CONTRACT.md` wins over this file; the executable form is `src/core/types.ts`
 (`TrackDef`, `TrackMeta`, `CameraKey`, `CompiledTrack`, `Collider`, `HazardZone`,
 `PlacedObstacle`) and `src/tracks/index.ts`. Metres, seconds, radians unless a param is
@@ -31,8 +31,11 @@ replaces the contract one:
 | rolling hop (5 m/s run-up) | 0.9 m ledge | rolling ledges <= 0.72 m |
 | climb | sustained <= 60 deg, 65 stalls, > 70 needs a hop; **55-65 deg planks currently wedge at a sharp base corner (fix in progress)** | planks <= 48 deg through Hard; Extreme runs 50-60 deg with no margin; every plank >= 48 deg gets a concave ramp fillet at its foot (`steepPlank`) |
 | crash | head/torso touches a collider or hazard, or y < oobY; over-rotation alone is not a crash. **Physics tests every body incl. wheels against hazards** | pit hazards stop 0.6 m below the lip (a wheel faults only when wholly in the pit); fire is 0.6 m above a barrel and a jump over fire must carry the wheels above barrel top + 0.6 + 0.34 |
-| low-speed climb onto drums / see-saws | **sweep 1: a bare drum or see-saw end is a wall below ~5 m/s** (physics fix in progress) | every drum has a 1.5 m kicker (`kickerDrum`), every see-saw a 0.8 m fillet flush with the resting end (`seesawEntry`) |
-| lip climb (front wheel onto a ledge, hop the rear up) | front wheel reaches ~1.25 m at 45 deg pitch, ~1.45 m at 60 | walls with a lip <= 1.4 m, always with >= 5 m run-up |
+| drums and logs (physics round 4, physics.md 12.3) | **geometry, not speed**: a 0.34 m wheel meets a drum of radius r where the contact normal is `acos((R - r)/(R + r))` from vertical — 57 deg for r 0.1, 86 deg for a 0.3 m log, an overhang for r > 0.34. r <= 0.15 rolls; a bare 0.3 m log needs a front lift or a held lean-back at >= 5 m/s (never a constant lean); r 0.45 is a knife-edge hop; **r >= 0.6 on flat ground is unrideable in any technique**. Sunk r 0.5 showing 0.3 m rolls at 3/5/8 m/s with a constant lean; the 1.2 m box -> 0.8 m drum line is the measured way over a big drum | beginner tier has **no bare log or drum**: bumps are `hump` or `bumpDrum` (sunk, <= 0.3 m proud, contact normal 50 deg). Medium+: sunk drums show <= 0.5 m (56 deg), every big drum is entered from a `drumStep` shelf at centre + 0.4 (normal <= 56 deg for r <= 1.0) or from another drum's top across a gap. Bare 0.3 m logs are a Medium lesson (M2, with hints). `kickerDrum` is gone: a 0.5 m kicker against a 1.6 m drum still met the face below the centre |
+| see-saws (physics round 4) | every curriculum board (L6 h0.8/1.0/1.5, L8 h1.2/2.0, L5 h1.0) rides on, tips in 0.4-1.0 s and rides off; the 0.12 m end lip never parks the bike | `seesawEntry` fillet kept for the lesson boards; bare boards where the landing is the lesson |
+| lip climb (front wheel onto a ledge, hop the rear up) | front wheel reaches ~1.25 m at 45 deg pitch, ~1.45 m at 60; **the 0.9 m ledge needs a 1.45 m rear lift (29 of 300 hop combos)** | walls with a lip <= 1.4 m, always with >= 5 m run-up; the 0.9 m ledge is M1's demand only, after 0.45-0.7 m steps |
+| climb 60 deg | **crests in 2.95 s** (bash plate now at trials clearance) | X1 keeps 60 deg as its demand |
+| rider pose lag | **0.28 s** t90 | a hint names the technique one obstacle early (the HUD shows hints in order) |
 | restart -> riding | one tick, one frame | every checkpoint has >= 3 m of flat run-in |
 
 Jump sizing uses `FEEL.jumpRange(v, angleDeg, drop)` (flat-landing ballistic range) at the
@@ -117,10 +120,17 @@ Cursor semantics: ground ops (`flat slope smooth rollers space`) extend the prof
 the cursor; obstacle ops place at the cursor and advance by the footprint. Compound ops,
 each written from a measured failure: `tabletop(up, top, height, down)` = ramp + box +
 ramp; `hump(h, len)` = convex ramp up + down (a speed bump that rolls at any speed);
-`kickerDrum(drum)` = 1.5 m concave kicker (0.6 r, max 0.5) + drum; `seesawEntry(seesaw)` =
+`drumStep(drum, {exit})` = ramp + 1 m shelf at drum-centre + 0.4 + drum (+ mirror shelf and
+ramp with `exit`), the measured box -> drum line (physics 12.3), replacing the round-2
+`kickerDrum` whose 0.5 m kicker still met a 1.6 m drum's face below the centre;
+`bumpDrum(r, proud)` = drum sunk so `proud` m shows (0.3 rolls at any speed); `seesawEntry(seesaw)` =
 0.8 m fillet flush with the resting board end + see-saw; `platform(width, height)` = box
 whose last 1.5 m is a 0.4 m kicker on top (gap chains: a flat launch can never land level,
-so every platform launches at an angle); `steepPlank({angleDeg, rise})` = fillet + plank. Consecutive flats merge into one profile segment.
+so every platform launches at an angle); `steepPlank({angleDeg, rise})` = fillet + plank.
+Flow vocabulary (round 3, no new technique, keeps speed): `humpRow(count, h, pitch)`,
+`wave(length, dy)` = smooth rise and fall, `stepDowns(up, top, heights[])` = ramp onto a
+cascade of shelves each a drop, `smallGap(rampLen, rampH, gap)` = kicker + gap onto flat.
+Consecutive flats merge into one profile segment.
 Obstacles pin the profile at both ends so a slope after a box starts after the box.
 `plank({ angleDeg, rise })` computes the board length; `steepPlank({ angleDeg, rise })` puts a
 1.2 x 0.35 concave ramp fillet under the foot and climbs the remaining rise. The cursor is
@@ -150,9 +160,14 @@ range)` is the text the stranger REPL's `look` will use.
 
 Rule: each track TEACHES one technique in a safe zone right after a checkpoint, repeats it
 with rising stakes, then DEMANDS it once where failure costs the run back to a checkpoint.
-Every track has 2-6 checkpoints, each followed by >= 3 m of flat run-in. Attempts bands are
-the stranger attempts-to-clear target (harness-metrics.md §3 measures them):
-Beginner 1-2 | Easy 2-6 | Medium 5-12 | Hard 10-25 | Extreme 30-80.
+Round 3 adds RHYTHM: between the taught obstacles every track has flow sections (rollers,
+humps, waves, tabletops, small kickers) that keep speed and teach nothing new, and ends on
+a set piece. Every track has 3-7 checkpoints, each followed by >= 3 m of flat run-in, spaced
+~12-18 s of bot time apart (the bot rides flow at ~13 m/s; a stranger at 60-70 % of that
+sees a checkpoint every 20-30 s). Attempts bands are the stranger attempts-to-clear target
+(harness-metrics.md §3 measures them): Beginner 1-2 | Easy 2-6 | Medium 5-12 | Hard 10-25 |
+Extreme 30-80. Bot tier criterion (round 3): beginner <= 2 attempts at skill 1, easy and
+medium <= 4 / <= 10 at skill 2, hard <= 20 and extreme <= 60 at skill 3.
 
 Biomes: Beginner industrial (warehouse amber, HUD hints on); Easy canyon; Medium
 industrial / snow / foundry; Hard nightCity / nightCity / foundry; Extreme snow / foundry /
@@ -160,139 +175,189 @@ foundry. `loop` is cut from the vocabulary, so H3 (was "Loop Line") is the speed
 track over fire barrels; drums spin in place, so M2 / X2 are about balancing on a spinning
 surface rather than riding a translating spool.
 
+Drum rule (physics 12.3, §0): no bare log or drum anywhere below Extreme. **The bare 0.3 m
+log is gone from the curriculum**: moved from B2 to M2 as a front-lift lesson, the skill-2
+bot failed it 50 times in 50 (an 86 deg wall to anything but a timed lift), so M2 rides
+half-buried logs (`bumpDrum(0.3, 0.3, wood)`, 0.3 m proud) and every log pyramid gets a
+0.3 m entry ramp (`logStep`) so the wheel meets the first log at its centre. Every r >= 0.6
+drum is sunk to <= 0.5 m proud or entered from a `drumStep` shelf (or from another drum's top
+across a gap <= 2 m: a spinning top cannot be pumped, so X2's 3 m / 4 m drum-to-drum gaps at
+see-saw speed were a 34-attempt wall and are now 2 / 2.5 m). Landing rule (sweep 3): never
+start a rise (wave, up-ramp, tabletop) within 10 m of a drop exit — a nose-down landing on
+rising ground is the one endo physics produces without a brake (m1: 49 of 50 faults at one
+wave foot; b2, e1, e3 likewise) — and a `tabletop` landing ramp is 10 x height long
+(5.7 deg) so a bike leaving the top at 14-18 m/s lands on the ramp, not past it. Hints
+(beginner tier, shown by the HUD in order) name the technique in <= 6 words.
+
 ### Beginner
 
-**B1 `b1-first-ride` First Ride** — TEACHES throttle control. Hints "HOLD THROTTLE",
-"SLOW DOWN". 139 m, CP 42 / 88. Hill (8.5 deg) and smooth descent; 3 rollers (0.3 m);
-tabletop 6/8/1.0 m; DEMANDS: 11 deg descent, 8 m brake zone, a 0.3 m hump, a 0.5 m
-tabletop. Nothing on B1 needs a front lift (sweep 1: a controls-only stranger was stopped
-dead by the old drum bump). Target 1 attempt, 18 s. Bot skill 1: 1 attempt, 11.1 s.
+**B1 `b1-first-ride` First Ride** — TEACHES throttle control. Hints "Hold the gas up the
+hill" / "Steady gas over the rollers" / "Off the gas down the descent" / "Brake before the
+hump". 501 m, CP 42 / 171 / 332. Hill (8.5 deg) and smooth descent; rollers; tabletop
+6/8/1.0; flow (hump row, 1.5 m wave, rollers); tabletops 8/10/1.2 and 6/8/1.0 with hump rows
+between; DEMANDS: 11 deg descent, 8 m brake zone, a 0.3 m hump, a 0.5 m tabletop; set piece: a
+2.5 m wave roller-coaster, rollers, a tabletop and a 2 m wave home. Nothing on B1 needs a
+front lift. Target 1 attempt, 45 s.
 
-**B2 `b2-lean-back` Lean Back** — TEACHES weight shift on bumps and drops. 128 m,
-CP 28 / 67 / 90. Single logs, a touching log pair; ramp onto a 0.5 m kerb (drop 0.5); ramp
-onto a 1.0 m box (drop 1.0); ramp + box + 4-step stair down; DEMANDS: 8 x 1.8 ramp onto a
-10 m box with a 1.8 m drop onto a downslope (camera `low`). Target 1-2, 22 s. Bot skill 1: 1.
+**B2 `b2-lean-back` Lean Back** — TEACHES weight shift on bumps and drops. Hints "Lean back
+over the bumps" / "Lean back off the drop" / "No brakes down the stairs" / "Lean back, gas
+off the big drop". 414 m, CP 41 / 190 / 289 / 353. Three sunk drums (0.3 m proud) and a hump
+(the round-2 bare logs needed a front lift, which is not a beginner input); ramp onto a
+0.5 m kerb (drop 0.5 onto a 5.7 deg downslope), 10 m to settle; ramp onto a 1.0 m box (drop
+1.0 onto a downslope); flow; ramp + box +
+4-step stair down, a wave, a 1.5/1.0/0.5 cascade of shelves; ramp + 1.0 box + 3 steps; flow;
+DEMANDS: 8 x 1.8 ramp onto a 10 m box with a 1.8 m drop onto a downslope (camera `low`).
+Target 1-2, 50 s.
 
 **B3 `b3-kicker-row` Kicker Row** — TEACHES the jump: throttle to the lip, level in the
-air, land rear first. 142 m, CP 28 / 72 / 100. Kickers 4 x 1.2 and 4 x 1.5 (curve 0.3),
-uphill landing on a 0.8 m tabletop; 5 x 2.0 kicker over three unlit barrels onto a convex
-landing ramp (camera `high34`); DEMANDS: 10 m run-up, 5 x 2.0 kicker over a 5 m gap onto a
-0.4 m box. Target 1-2, 26 s. Bot skill 1: 1.
+air, land rear first. Hints "Full gas off the lip" / "Level the bike in the air" / "Off the
+gas before the landing" / "Hold gas to clear the gap". 410 m, CP 28 / 129 / 207 / 343.
+Kickers 4 x 1.2 and 4 x 1.5 (curve 0.3), uphill landing on a 0.8 m tabletop; rollers and two
+4 x 1.0 kickers; 5 x 2.0 kicker over three unlit barrels onto a convex landing ramp (camera
+`high34`); hump row; small gaps 2 m and 3 m from 4 x 1.0 / 4 x 1.2 kickers; flow (2 m wave,
+rollers, humps); kicker onto the 0.8 tabletop again, a 3 m gap; DEMANDS: 10 m run-up,
+5 x 2.0 kicker over a 5 m gap onto a 0.4 m box. Target 1-2, 55 s.
 
 ### Easy
 
-**E1 `e1-uphill-weight` Uphill Weight** — TEACHES lean forward on steep planks. 108 m,
-CP 28 / 53 / 78. Plank 30 deg onto a 3.0 m box, 6 steps down; plank 40 deg onto 3.6 m,
-quarter-pipe roll-out; DEMANDS: filleted plank 48 deg (rise 3.7) from a 3 m run-in, then a
-40 deg plank descent. Target 2-4, 30 s. Bot skill 2: 2.
+**E1 `e1-uphill-weight` Uphill Weight** — TEACHES lean forward on steep planks. 365 m,
+CP 41 / 137 / 198 / 289. Plank 30 deg onto a 3.0 m box, 6 steps down; wave, hump row,
+rollers; plank 40 deg onto 3.6 m, quarter-pipe roll-out (~16 m/s at the bottom: rollers and
+humps here, no tabletop — a 9.5 deg lip at that speed overshot an 8 m top and landed
+nose-down on flat, 40 faults); plank 36 deg onto 2.4 m, curved
+roll-out; hump row, 2 m wave, rollers; DEMANDS: filleted plank 48 deg (rise 3.7) from a 3 m
+run-in, then a 40 deg plank descent; flow home. Target 2-4, 60 s.
 
 **E2 `e2-rear-wheel-first` Rear Wheel First** — TEACHES rear-wheel-first gap landings.
-172 m, CP 24 / 73 / 120. 4 x 0.8 ramp / 3 m gap; 5 x 1.2 / 4 m gap onto an uphill landing
-ramp; 12 m run-up, 5 x 1.5 / 6 m gap onto a 1.0 m box; DEMANDS: 5 x 1.5 / 5 m gap onto a
-6 m x 0.6 box carrying a 3 x 1.0 ramp straight into a 6 m gap. Target 3-5, 34 s. Bot: 1.
+442 m, CP 24 / 109 / 216 / 352. 4 x 0.8 ramp / 3 m gap; 5 x 1.2 / 4 m gap onto an uphill
+landing ramp; rollers + hump row; 12 m run-up, 5 x 1.5 / 6 m gap onto a 1.0 m box; wave, two
+3 m small gaps; 5 x 1.2 / 4 m gap onto a 0.8 box, rollers, tabletop, 2 m wave, humps; DEMANDS: 5 x 1.5 / 5 m
+gap onto a 6 m x 0.6 box carrying a 3 x 1.0 ramp straight into a 6 m gap; flow home.
+Target 3-5, 65 s.
 
 **E3 `e3-stairway` Stairway** — TEACHES stairs: throttle pulses up, brake down without a
-stoppie. 94 m, CP 28 / 48 / 68. 5 x (0.30/0.45) up, box, 5 down; 6 x (0.40/0.45) up, 8
-down past unlit barrels; DEMANDS: 7 x (0.45/0.40) up (48 deg envelope), 9 x (0.35/0.40)
-down into a 2 m gap. Target 3-6, 38 s. Bot: 1.
+stoppie. 360 m, CP 41 / 98 / 169 / 261. 5 x (0.30/0.45) up, box, 5 down; wave + humps;
+6 x (0.40/0.45) up, 8 down past unlit barrels; tabletop, rollers; 4 x 0.4 up, 5 down at speed;
+hump row, 2 m wave, rollers; DEMANDS: 7 x (0.45/0.40) up (48 deg envelope), 9 x (0.35/0.40)
+down into a 2 m gap; wave, tabletop, rollers home. Target 3-6, 70 s.
 
 ### Medium
 
 **M1 `m1-hop-up` Hop Up** — TEACHES the bunny hop onto ledges (preload lean back +
-throttle, snap forward; there is no hop button). 103 m, CP 18 / 43 / 63. Kerbs 0.45, 0.5,
-0.55 (rising through the measured stationary apex 0.55), a 0.55 kerb into a 1.5 m gap;
-DEMANDS: 10 m run-up, 0.9 m ledge (the rolling-hop envelope), 2 m hop across to a 0.9 m
-box (camera `side-tight` cut). Target 5-9, 42 s. Bot skill 2: 2 (was 50 with a 0.6 kerb
-and a pole-cap hop).
+throttle, snap forward; there is no hop button). 351 m, CP 18 / 84 / 207 / 262. Kerbs 0.45,
+0.5 (stationary apex 0.62); rollers, wave; 0.55, a 0.55 kerb into a 1.5 m gap; hump row,
+tabletop, 2 m wave, rollers; 6 m run-up, 0.7 m kerb (the rolling hop at a rideable height), 0.6 kerb into a 2 m
+gap; rollers; DEMANDS: 10 m run-up, 0.9 m ledge (the rolling-hop envelope: a 1.45 m rear
+lift), 2 m hop across to a 0.9 m box (camera `side-tight` cut); 12 m to land, humps, 2 m wave
+home. Target 5-9,
+80 s.
 
-**M2 `m2-drum-roll` Drum Roll** — TEACHES drum crossings and balance on a spinning
-drum. 119 m, CP 24 / 51 / 75. Sunk 0.5 drum (0.3 proud), kicker + 0.6 drum, 2-row log
-pyramid; kicker + 0.8 drum / 2 m gap / 0.8 drum, kicker + spinning 0.8; DEMANDS: ramp to a
-1.2 m box -> spinning 0.8 drum (top 1.6) -> box, 3-row log pyramid, see-saw exit. Target
-6-12, 52 s. Bot skill 2: 1 (was a wall at the first bare drum).
+**M2 `m2-drum-roll` Drum Roll** — TEACHES logs and drums: lean back over half-buried logs,
+roll a big drum from its shelf, balance on a spinning one. Hints "Lean back over the logs" /
+"Roll the drum from the shelf" / "Gas off on the spinning drum" (the HUD shows hints for
+beginner only today; see open items). 353 m, CP 24 / 120 / 193 / 281. Sunk 0.5 drum (0.3
+proud), sunk 0.8 drum (0.5 proud), two half-buried logs, a touching half-buried pair;
+rollers, 2 m wave, humps; 2-row log pyramid behind a 0.3 m entry ramp (`logStep`),
+`drumStep` 0.6 with exit shelf; hump row, wave; `drumStep` 0.8 / 2 m gap / 0.8 drum (drum
+top to drum top), `drumStep` spinning 0.8 with exit; tabletop, rollers; DEMANDS: ramp to a
+1.2 m box -> spinning 0.8 drum (top 1.6) -> box, 3-row log pyramid (`logStep`), see-saw exit;
+12 m, wave home. Target 6-12, 85 s.
 
-**M3 `m3-see-saw` See-Saw** — TEACHES see-saw timing and thin landings. 142 m,
-CP 28 / 61 / 93. Filleted see-saws 6/0.8 and 8/1.2 (camera `low`); see-saw 6/1.5, ramp /
-3 m gap / 4 m plank at 1.5 / ramp down; DEMANDS: ramp / 3 m gap landing on the resting end
-of a see-saw 8/2.0, 3 m gap to a 3 m plank at 2.0, 2.5 m gap to a 2.0 m box, curved
-roll-out. Target 8-12, 58 s. Bot skill 2: 1 (was parked at the plank end).
+**M3 `m3-see-saw` See-Saw** — TEACHES see-saw timing and thin landings. 365 m,
+CP 28 / 145 / 233 / 295. Filleted see-saws 6/0.8 and 8/1.2 (camera `low`); rollers, humps,
+2 m wave, rollers;
+see-saw 6/1.5, ramp / 3 m gap / 4 m plank at 1.5 / ramp down; wave, tabletop; ramp / 3 m gap /
+plank at 1.0, see-saw 8/1.5; rollers; DEMANDS: ramp / 3 m gap landing on the resting end of a
+see-saw 8/2.0, 3 m gap to a 3 m plank at 2.0, 2.5 m gap to a 2.0 m box, curved roll-out; humps
+home. Target 8-12, 90 s.
 
 ### Hard
 
 **H1 `h1-wheelie-wire` Wheelie Wire** — TEACHES sustained wheelie / rear-wheel balance
 across slotted rails (0.7 m kill pits a grounded front wheel drops into) and the lip climb.
-196 m, CP 28 / 77 / 119 / 156. Rollers with the front down; 8 slots at 2.5 m; 5 m run-up,
-wall 1.0 with lip -> 6 slots at 3.0; wall 1.2 -> 6 slots at 2.5; DEMANDS: 6 m run-up, wall
+449 m, CP 28 / 122 / 259 / 337 / 390. Rollers with the front down; 8 slots at 2.5 m; wave +
+humps; 5 m run-up, wall 1.0 with lip -> 6 slots at 3.0; rollers, tabletop, 2 m wave, humps;
+wall 1.2 -> 6 slots
+at 2.5; 2 m wave, humps; the long wire: 10 slots at 2.0; rollers; DEMANDS: 6 m run-up, wall
 1.4 with a 0.2 lip straight into 5 slots at 2.0 and a 3 m gap from the rear wheel (camera
-`low` cut). Target 10-18, 62 s. Bot skill 2: 2 (the old 1.6 wall was uncleared).
+`low` cut); humps home. Target 10-18, 110 s.
 
 **H2 `h2-gap-chain` Gap Chain** — TEACHES precision gaps with speed control on kicker
-platforms (camera `high34`). 228 m, CP 28 / 78 / 153. Chain A: gaps 4/3/5/2 onto 5-4.5-5 m
-platforms; chain B: gaps 4/3/4/2/3 with platforms stepping up 0.3 m each (rear first
-mandatory), curved roll-out; DEMANDS chain C: gaps 4/5/3/4/2 on 3.5 m platforms, then a
-5 m gap onto a see-saw and a 3 m gap off it. Target 14-22, 72 s. Bot skill 2: 1 (was 48
-attempts and a wall at the flat-launch step-up).
+platforms (camera `high34`). 471 m, CP 28 / 166 / 294 / 377. Chain A: gaps 4/3/5/2 onto
+5-4.5-5 m platforms; rollers, wave, humps, 2 m wave; chain B: gaps 4/3/4/2/3 with platforms stepping up 0.3 m
+each (rear first mandatory), curved roll-out; humps, tabletop; chain D: gaps 5/4/5 on 5 m
+platforms at 1.2, fast and wide; rollers; DEMANDS chain C: gaps 4/5/3/4/2 on 3.5 m platforms,
+then a 5 m gap onto a see-saw and a 3 m gap off it; humps home. Target 14-22, 120 s.
 
 **H3 `h3-fire-line` Fire Line** — TEACHES speed commitment (clear a row of burning
 barrels from a 2.0 m kicker: any body part through the fire is a hazard fault) and the hard
-stop after. 219 m, CP 28 / 82 / 142. 20 m run-up, kicker over 4 barrels; 20 m run-up,
-kicker over 6 barrels onto a landing ramp, 8 m brake zone, 0.7 m kerb hop; DEMANDS: 20 m
-run-up, kicker over a 2 m gap AND 6 barrels, landing ramp, brake to walking pace, 0.3 hump,
-2 m low-speed hop gap, 0.7 kerb. Target 18-25, 78 s. Bot skill 2: 3 (was 50 with a 1.5 m
-lip: the wheels never cleared the fire).
+stop after. 469 m, CP 28 / 170 / 282 / 372. 20 m run-up, kicker over 4 barrels; rollers,
+humps, 2 m wave, tabletop; 20 m run-up, kicker over 6 barrels onto a landing ramp, 8 m brake zone, 0.7 m kerb
+hop; wave, tabletop; kicker over 5 barrels, brake, hump, 0.5 kerb (the stop-and-hop at half
+stakes); rollers; DEMANDS: 20 m run-up, kicker over a 2 m gap AND 6 barrels, landing ramp,
+brake to walking pace, 0.3 hump, 2 m low-speed hop gap, 0.7 kerb; humps home. Target 18-25,
+125 s.
 
 ### Extreme
 
 **X1 `x1-vertical-limit` Vertical Limit** — TEACHES near-vertical planks (hang over the
-bars, tap throttle) and pole-top rear-wheel hops. 187 m, CP 24 / 65 / 112 / 138. All planks
-filleted. Planks 50 and 55 deg onto boxes; poles 1.2 -> 2.4 at 1.8 m pitch; plank 58 deg
-onto a 3.6 box; wall 1.2 + plank 56 deg from its top, poles descending 4.4 -> 2.0;
-DEMANDS: 8 m run-in, plank 60 deg (rise 4.5), three pole caps at 4.5, 4 m gap onto a 3 m
-plank at -30 deg. Target 30-45, 95 s.
+bars, tap throttle) and pole-top rear-wheel hops. 391 m, CP 24 / 153 / 253 / 325. All planks
+filleted. Planks 50 and 55 deg onto boxes; rollers, wave, humps, 2 m wave; poles 1.2 -> 2.4 at 1.8 m pitch;
+plank 58 deg onto a 3.6 box; humps, tabletop; wall 1.2 + plank 56 deg from its top, poles
+descending 4.4 -> 2.0; rollers, wave; DEMANDS: 8 m run-in, plank 60 deg (rise 4.5), three
+pole caps at 4.5, 4 m gap onto a 3 m plank at -30 deg; humps home. Target 30-45, 140 s.
 
 **X2 `x2-pipe-dream` Pipe Dream** — TEACHES spinning drums as slippery platforms with
-gaps and see-saw drops. 162 m, CP 24 / 61 / 94 / 120. Kicker + spinning 0.8 / 3 m gap /
-box; log pyramid; kicker + spinning 0.8; see-saw 8/2.0 dropping onto a 1.0 drum, pole 1.5,
-1.8 box with a kicker, 4 m gap onto a spinning 1.0; the pipe run: five 0.9 spinning drums
-with 1.5 m gaps (camera `high34`); DEMANDS: see-saw 8/2.0 onto a spinning 1.0, 3 m gap
-onto a spinning 0.8, 4 m gap off it, 0.7 kerb. Target 40-60, 125 s.
+gaps and see-saw drops. 349 m, CP 24 / 141 / 227 / 282. `drumStep` spinning 0.8 / 3 m gap /
+box (the round-2 first obstacle was a bare 1.6 m drum behind a 0.5 m kicker: unrideable by
+geometry); log pyramid (`logStep`); `drumStep` spinning 0.8 with exit; rollers, 2 m wave,
+humps; see-saw 8/2.0, 2 m,
+`drumStep` 1.0 (shelf 1.4), pole 1.5, 1.8 box with a kicker, 4 m gap onto a spinning 1.0;
+humps, wave; the pipe run: `drumStep` spinning 0.9 then four 0.9 spinning drums with 1.5 m
+gaps (camera `high34`); rollers; DEMANDS: see-saw 8/2.0, `drumStep` spinning 1.0, 2 m gap
+onto a spinning 0.8, 2.5 m gap off it, 0.7 kerb (3 m / 4 m gaps were a 34-attempt wall: a
+spinning top cannot be pumped and the see-saw leaves ~5 m/s); humps home. Target 40-60, 150 s.
 
 **X3 `x3-gauntlet` The Gauntlet** — DEMANDS everything in curriculum order, no teaching
-zone. 425 m, CP 28 / 113 / 147 / 238 / 299 / 356. B3 kicker gap, E1 48 deg plank, E2 double
-gap | E3 stairs into a gap, M1 0.55 kerb hop + gap, M2 kicker + spinning drum | M3 see-saw
-landing + plank, H1 lip climb + 4 slots, H2 four-gap chain on 3.5 m platforms | H3 fire
-over a gap + brake + kerb | X1 60 deg plank + three 4.5 poles, X2 see-saw -> spinning drums
--> 4 m gap | finale (unseen): 6 x 2.5 kicker over a 6 m gap landing on a see-saw 8/1.0 at
-~12 m/s, kicker + spinning drum, 5 m gap onto three pole caps at 3.0, 3 m gap onto a 4 m
-plank at -35 deg. Target 60-80, 165 s.
+zone. 518 m, CP 28 / 132 / 205 / 255 / 321 / 382 / 445. B3 kicker gap, rollers, E1 48 deg
+plank, E2 double gap | E3 stairs into a gap, M1 0.55 kerb hop + gap, M2 `drumStep` spinning
+drum, wave | M3 see-saw landing + plank, H1 lip climb + 4 slots | H2 four-gap chain on 3.5 m
+platforms, humps | H3 fire over a gap + brake + kerb | X1 60 deg plank + three 4.5 poles, X2
+see-saw -> `drumStep` spinning 1.0 -> 2 m gap -> spinning 0.8 -> 2.5 m gap | finale (unseen):
+6 x 2.5 kicker over a 6 m gap landing on a see-saw 8/1.0 at ~12 m/s, `drumStep` spinning 1.0,
+2 m gap onto three pole caps at 1.8 (0.2 under the drum top), 3 m gap onto a 4 m plank at
+-25 deg. Target 60-80, 200 s.
 
-### Curriculum summary (compiled, round 2b; bot = committed-play attempts at git ea32412 / src 665a36d1)
+### Curriculum summary (round 3 sweep; physics frozen at 2bdd175, git c6523b4, tier skill, 2 seeds, wall 180 s)
 
-| id | tier | technique | length m | obstacles | CPs | attempts | target s | bot |
-|---|---|---|---:|---:|---:|---:|---:|---|
-| b1-first-ride | beginner | throttle control | 139 | 8 | 2 | 1 | 18 | skill 1: 1 (skill 2: 2) |
-| b2-lean-back | beginner | weight shift on drops | 128 | 12 | 3 | 1-2 | 22 | skill 1: 1 |
-| b3-kicker-row | beginner | jump and level in the air | 142 | 11 | 3 | 1-2 | 26 | skill 1: 1 |
-| e1-uphill-weight | easy | lean forward on steep climbs | 108 | 10 | 3 | 2-4 | 30 | skill 2: 2 |
-| e2-rear-wheel-first | easy | rear-wheel-first gap landing | 172 | 16 | 3 | 3-5 | 34 | skill 2: 1 |
-| e3-stairway | easy | stairs: pulse up, brake down | 94 | 11 | 3 | 3-6 | 38 | skill 2: 1 |
-| m1-hop-up | medium | bunny hop onto ledges | 103 | 9 | 3 | 5-9 | 42 | skill 2: 2 |
-| m2-drum-roll | medium | drum crossing and balance | 119 | 18 | 3 | 6-12 | 52 | skill 2: 1 |
-| m3-see-saw | medium | see-saw timing and thin landings | 142 | 18 | 3 | 8-12 | 58 | skill 2: 1 |
-| h1-wheelie-wire | hard | sustained wheelie and the lip climb | 196 | 29 | 4 | 10-18 | 62 | skill 3: 1 (skill 2: 50) |
-| h2-gap-chain | hard | gap chains: read the width, set the speed | 228 | 46 | 3 | 14-22 | 72 | skill 2: 1 |
-| h3-fire-line | hard | commit at speed over fire, then stop hard | 219 | 14 | 3 | 18-25 | 78 | skill 2: 3 |
-| x1-vertical-limit | extreme | near-vertical planks and pole-top hops | 187 | 35 | 4 | 30-45 | 95 | skill 3: 1 |
-| x2-pipe-dream | extreme | spinning drums with gaps and see-saw drops | 162 | 33 | 4 | 40-60 | 125 | skill 3: 2 |
-| x3-gauntlet | extreme | everything, in order | 425 | 74 | 6 | 60-80 | 165 | skill 3: 4 attempts, 45 % in a 420 s wall; oracle 18 % in 1500 s — wall-bound, not blocked (every section clears in its source track) |
+Tier criterion: beginner <= 2 attempts at skill 1, easy <= 4 / medium <= 10 at skill 2, hard <= 20
+/ extreme <= 60 at skill 3. "Clean time" is the bot's finish clock on a 1-attempt run.
 
-The bot clears every track in far fewer attempts than the stranger bands: the bands are
-stranger targets (harness-metrics.md §3) and the bot table is the "physically possible"
-gate. Tracks are also short (bot clean times 11-35 s vs corpus 16-19 s beginner, 40-70 s
-medium): round 3 lengthens once stranger data says where the time should go. Physics
-changed under sweep 2 (`ea32412`: torso spring, tyre slip): h1 went from 2 attempts at
-skill 2 to 50, yet clears at skill 3 in 1 — the hard tier is measured at skill 3 per the
-round-2b criteria, but H1's rail slots are the most physics-sensitive section we have.
+| track | tier | skill | attempts (2 seeds) | clean time s | length m | CPs | first blocker |
+|---|---|---:|---|---:|---:|---:|---|
+| b1-first-ride | beginner | 1 | 1, 1 | 35.2 | 501 | 3 | — |
+| b2-lean-back | beginner | 1 | 1, 1 | 29.7 | 414 | 4 | — |
+| b3-kicker-row | beginner | 1 | 1, 1 | 31.8 | 410 | 4 | — |
+| e1-uphill-weight | easy | 2 | 1, 1 | 29.2 | 365 | 4 | — |
+| e2-rear-wheel-first | easy | 2 | 1, 1 | 30.6 | 442 | 4 | — |
+| e3-stairway | easy | 2 | 1, 1 | 30.3 | 360 | 4 | — |
+| m1-hop-up | medium | 2 | 1, 1 | 29.7 | 351 | 4 | — |
+| m2-drum-roll | medium | 2 | 1, 1 | 28.0 | 356 | 4 | — |
+| m3-see-saw | medium | 2 | 1, 1 | 27.8 | 365 | 4 | — |
+| h1-wheelie-wire | hard | 3 | 1, 1 | 32.9 | 449 | 5 | — |
+| h2-gap-chain | hard | 3 | 1, 1 | 33.7 | 471 | 4 | — |
+| h3-fire-line | hard | 3 | 1, 1 | 31.6 | 469 | 4 | — |
+| x1-vertical-limit | extreme | 3 | 1, 1 | 41.5 | 394 | 4 | — |
+| x2-pipe-dream | extreme | 3 | 1, 1 | 28.7 | 351 | 4 | — |
+| x3-gauntlet | extreme | 3 | 2, 2 | 48.9 (with faults) | 518 | 7 | crash@445.5m(ground) |
+
+Both seeds produce identical runs (the bot is deterministic per track; seeds only vary the
+physics rng, which nothing on these tracks consumes). Bot-clean times are ~30-45 s across all
+tiers against a 35-60 / 60-120 / 90-150 s corpus band: the skill-2/3 bot rides flow at 13-14 m/s
+and technical sections at 7-8 m/s, so a 60 s medium track would be ~600 m and a 90 s hard track
+~900 m; the tracks stopped at 350-520 m (test cap 800 m, render triangle budget unknown at that
+length). Stranger clean times run 1.5-2.5 x the bot's (harness-metrics.md §3), which puts the
+beginner tier inside its band and medium/hard at the low edge. Restart latency is harness'.
 
 Fixtures: `flat-test` (scaffold strip, unchanged) and `gap-test` (20 m run-up, 4 x 1.0
 ramp, 3 m gap, 20 m run-out) for harness-metrics.md M3.
@@ -328,7 +393,14 @@ the thresholds and the ship gate are all owned by harness and specified in
   2.0 m fire kickers with 20 m run-ups, walls <= 1.4 with run-ups, M1 kerbs 0.45/0.5/0.55
   -> 0.9 with run-up. Sweep 2: beginner clears at skill 1 in 1, easy/medium at skill 2 in
   <= 2, hard at skill 2 in <= 3, extreme at skill 3 in 3.
-- **Round 3** — stranger medians for Beginner + Easy; lengthen tracks toward corpus clean
-  times; fix the two worst segments per track; ship gate on `b1` and `x3`.
+- **Round 3 (done)** — physics round 4 made drums geometry: bare logs left Beginner (B2 rides
+  sunk drums and humps; the logs are M2's front-lift lesson with hints), `kickerDrum` was
+  replaced by `drumStep` (shelf at centre + 0.4) and `bumpDrum`, X2's bare 1.6 m first drum is
+  gone. Every track roughly tripled in length with flow sections and a set piece; beginner
+  hints name the technique in <= 6 words in obstacle order; checkpoints every ~12-18 s of bot
+  time. Sweep at tier skill: see the table.
+- **Round 4** — stranger medians for Beginner + Easy against the new lengths; hard/extreme
+  bot-clean times are still under the 90-150 s corpus band (see the table): another flow pass
+  or a second set piece per hard track once render confirms the triangle budget at 400-500 m.
 - **Later** — camera keys tuned against the render clips; X3 trimmed under 400 m if the bot
   clean time exceeds 165 s.

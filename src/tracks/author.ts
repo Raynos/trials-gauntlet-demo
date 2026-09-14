@@ -245,13 +245,89 @@ export class CourseBuilder {
   }
 
   /**
-   * Drum with an approach kicker so the front wheel reaches the drum top at low speed
-   * (physics round 2: bare drums are a wall below ~5 m/s). Kicker height 0.6 r capped 0.5.
+   * Drum with an approach step: a ramp up to a 1 m shelf at drum-centre height + 0.4, so
+   * the wheel meets the drum ABOVE its centre (contact normal <= ~56 deg from vertical for
+   * r <= 1.0) instead of the >= 86 deg wedge a bare drum presents to a 0.34 m wheel.
+   * Physics round 4 (physics.md 12.3): r >= 0.6 on flat ground is unrideable in any
+   * technique, and M2's 1.2 m box -> 0.8 m drum is the one measured way over a big drum.
+   * `exit` adds the mirror shelf + ramp so the far side is a 0.4 m step down, not a 2r drop.
    */
-  kickerDrum(p: Partial2<KindParams['drum']>, o?: ObstacleOpts): this {
+  drumStep(p: Partial2<KindParams['drum']>, opts: { exit?: boolean; rampLength?: number } & ObstacleOpts = {}): this {
     const r = p.radius ?? 0.8;
-    const h = Math.min(0.5, 0.6 * r);
-    return this.ramp({ length: 1.5, height: h, curve: 0.5 }, o).drum(p, o);
+    const h = r + 0.4;
+    const len = opts.rampLength ?? (h <= 1.0 ? 3 : h <= 1.3 ? 4 : 5);
+    const o: ObstacleOpts | undefined = opts.base !== undefined ? { base: opts.base } : undefined;
+    this.ramp({ length: len, height: h }, o).box({ width: 1.0, height: h }, o).drum(p, o);
+    if (opts.exit) this.box({ width: 1.0, height: h }, o).ramp({ length: len, height: h, direction: 'down' }, o);
+    return this;
+  }
+
+  /** Round speed bump: a drum sunk so only `proud` m shows (<= 0.3 rolls at any speed with a constant lean, physics 12.3). */
+  bumpDrum(radius = 0.5, proud = 0.3, extra: Partial2<KindParams['drum']> = {}): this {
+    return this.drum({ radius, depth: 2 * radius - proud, ...extra });
+  }
+
+  /**
+   * Log pyramid with a 0.3 m entry ramp so the wheel meets the first log at its centre height
+   * (contact normal <= 58 deg) instead of the 86 deg wall a bare 0.3 m log is (physics 12.3;
+   * sweep 3: the skill-2 bot failed a bare log 50 times).
+   */
+  logStep(p: Partial2<KindParams['logpile']>, o?: ObstacleOpts): this {
+    const r = p.radius ?? 0.3;
+    return this.ramp({ length: 1.5, height: r, curve: 0.5 }, o).logpile(p, o);
+  }
+
+  /**
+   * Row of pole caps at `spacing` between shafts, standing in one kill pit: a missed cap is a
+   * fault and a restart, not a stall on the ground under a 2-4 m pole (sweep 3: the skill-3
+   * bot sat wall-bound between X1's rising poles, 3 attempts in 240 s, no fault to restart on).
+   */
+  poleRow(heights: number[], spacing: number, opts: { radius?: number; pit?: number } = {}): this {
+    const r = opts.radius ?? 0.25;
+    const n = heights.length;
+    const width = n * 2 * r + (n - 1) * spacing;
+    const x0 = this.x;
+    const pit = opts.pit ?? 2;
+    if (pit > 0) {
+      this.gap({ width, depth: pit, hazard: 'kill' });
+      this.x = x0;
+    }
+    heights.forEach((h, i) => {
+      this.pole({ height: h, radius: r });
+      if (i < n - 1) this.x = round(this.x + spacing);
+    });
+    this.x = round(x0 + width);
+    return this;
+  }
+
+  /** Flow: `count` speed humps at `pitch` m spacing, each `height` (<= 0.3 rolls at any speed). */
+  humpRow(count: number, height = 0.3, pitch = 6, length = 3): this {
+    for (let i = 0; i < count; i++) {
+      this.hump(height, length);
+      if (i < count - 1) this.flat(pitch - length);
+    }
+    return this;
+  }
+
+  /** Flow: a smooth rise and fall (a berm roll) that keeps speed. */
+  wave(length: number, dy: number): this {
+    return this.smooth(length / 2, dy).smooth(length / 2, -dy);
+  }
+
+  /**
+   * Cascade of drops: a ramp up to the first shelf, then `heights` shelves each `top` m long,
+   * every step down being a drop the rider leans back off. Ends on the ground.
+   */
+  stepDowns(up: number, top: number, heights: number[]): this {
+    const first = heights[0] ?? 0;
+    this.ramp({ length: up, height: first });
+    for (const h of heights) this.box({ width: top, height: h });
+    return this;
+  }
+
+  /** Flow: a kicker over a gap onto flat ground (the B3 shape at small scale). */
+  smallGap(rampLength: number, rampHeight: number, gapWidth: number): this {
+    return this.ramp({ length: rampLength, height: rampHeight, curve: 0.3 }).gap({ width: gapWidth });
   }
 
   /**
@@ -273,9 +349,14 @@ export class CourseBuilder {
     return this.box({ width: width - kl, height }).ramp({ length: kl, height: kh, curve: 0.3 }, { base: height });
   }
 
-  /** ramp up + box top + ramp down, all one height. */
-  tabletop(up: number, top: number, height: number, down = up): this {
-    return this.ramp({ length: up, height }).box({ width: top, height }).ramp({ length: down, height, direction: 'down' });
+  /**
+   * ramp up + box top + ramp down, all one height. The landing ramp defaults to 10 x height
+   * (<= 5.7 deg): a bike leaving the top at 14 m/s follows a parabola that a 9.5 deg ramp
+   * falls away from, so it landed nose-down on the flat past the ramp (sweep 3: e1 / e3).
+   */
+  tabletop(up: number, top: number, height: number, down?: number): this {
+    const dn = down ?? Math.max(up, 10 * height);
+    return this.ramp({ length: up, height }).box({ width: top, height }).ramp({ length: dn, height, direction: 'down' });
   }
 
   private place(kind: ObstacleKind, params: object, o?: ObstacleOpts): this {
