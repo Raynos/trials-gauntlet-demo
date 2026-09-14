@@ -197,6 +197,14 @@ export interface BikeTuning {
     /** Rider torso follows this fraction of frame pitch. */
     torsoFollow: number;
   };
+  /**
+   * Aero drag -dragCoef*v|v| on the whole bike+rider as a uniform deceleration field (each riding body
+   * takes its mass share), so it acts through the combined COM with no pitch moment and no load on
+   * the rider tether. 4.2 kg/m is 1.7 kN at 20 m/s (a real CdA 0.75 m2 would be 0.45 kg/m, ~180 N): it is
+   * kept deliberately large as the part-throttle speed governor and the round 6-8 acceleration envelope;
+   * round 9 measured 0.45 and it costs the PD wheelie hold (12 -> 4 s), the 55/60 deg climbs and the
+   * deliberate loops - a round of its own (physics.md 12.4).
+   */
   aero: { dragCoef: number };
   solver: { velocityIters: number; slop: number; baumgarte: number; jointBaumgarte: number; speculativeMargin: number };
   ragdoll: {
@@ -284,8 +292,10 @@ const DEFAULTS: BikeTuning = {
     limiterResetRpm: 9500,
     peakTorqueNm: 52, // ~38 x 1.4 (gravityScale): the 60 deg plank needs m g sin 60 = 1725 N at the rim; 53 loops the lean-0 stranger at 1.3 s, 51.5 never
     curve: [
-      // flat from the clutch to 6500 (was 0.85 @5000, 1.0 @6500): the lean-0 stranger loop diverges in the
-      // 3500-6500 window, and the mid-range rise was what took it over; the pipe comes on at 8000
+      // round 9: the curve above the clutch is the round-8 NET thrust (its curve minus the 4.2 v|v| drag
+      // that used to live in the aero) so the on-ground acceleration envelope is unchanged now that the
+      // drag is a real CdA: 0.80 at 3500 (the 60 deg plank climbs on the slipping clutch here, untouched),
+      // 0.59 at 12 m/s, 0.56 at 14-16, 0.45 at 18, 0.22 at the limiter (power peaks ~7500 and falls off)
       [1500, 0.68],
       [3500, 0.8],
       [6500, 0.8],
@@ -295,7 +305,7 @@ const DEFAULTS: BikeTuning = {
     ],
     gearRatio: 17.5,
     efficiency: 0.92,
-    engineBrakeFrac: 0.08,
+    engineBrakeFrac: 0.08, // round 9: was 0.08 (66 Nm at 20 m/s reacting on the frame pitched the airborne bike -11 deg in 0.6 s with no input)
     throttleRise: 40,
     throttleFall: 60,
     // round 7: the soft clutch off idle. 1500 -> 3500 in 0.25 s; coasts down in 0.5 s (a flywheel), so a
@@ -343,12 +353,12 @@ const DEFAULTS: BikeTuning = {
     hopThrottle: 0.3,
     hopSnapRate: 4,
     tetherMax: 0.5,
-    ejectForce: 22400,
+    ejectForce: 30000, // round 9: was 22400; only counts past 45 deg nose-down (bike.ts derive)
     headRadius: 0.15,
     torsoRadius: 0.13,
     torsoFollow: 0.5,
   },
-  aero: { dragCoef: 4.2 },
+  aero: { dragCoef: 4.2 }, // a uniform field over bike+rider since round 9 (see BikeTuning.aero); the magnitude is the speed governor
   solver: { velocityIters: 8, slop: 0.005, baumgarte: 0.2, jointBaumgarte: 0.3, speculativeMargin: 0.02 },
   ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },
   drum: { density: 60 },

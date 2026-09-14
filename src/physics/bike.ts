@@ -27,7 +27,7 @@ import { Rng } from '../core/rng';
 import type { PhysicsWorld } from './index';
 import { CollisionWorld, circleVsPrim, PrimKind, type Manifold, type Prim } from './collision';
 import { DEFAULT_TUNING, mergeTuning, SURFACES, type BikeTuning, type PartialTuning, type SuspensionTuning } from './tuning';
-import { atan, atan2, clamp, cos, sin, wrapAngle, HALF_PI, PI } from './dmath';
+import { atan, atan2, clamp, cos, sin, wrapAngle, HALF_PI, PI, QUARTER_PI } from './dmath';
 
 // ---------------------------------------------------------------------------
 // Public extras
@@ -690,7 +690,9 @@ class BikeWorld implements BikePhysicsWorld {
     );
     this.px[RIDER] = fx + ax;
     this.py[RIDER] = fy + ay;
-    this.an[RIDER] = angle;
+    // torso at its lean target (round 9: a teleport with a stale leanEff used to leave the torso at 0
+    // and the motor swung it on the next ticks, pitching the placed bike by ~10 deg out of nothing)
+    this.an[RIDER] = angle + lean * t.rider.torso.swing;
     for (let b = 0; b <= RIDER; b++) {
       const dx = this.px[b]! - rx;
       const dy = this.py[b]! - ry;
@@ -1233,11 +1235,20 @@ class BikeWorld implements BikePhysicsWorld {
         av[FRAME] = av[FRAME]! - ii[FRAME]! * (lx * legUpFy - ly * legUpFx) * dt;
       }
 
-      // aero drag on the frame
+      // aero drag as a uniform deceleration field on frame, wheels and rider (each body its mass
+      // share of -dragCoef*v|v| at the frame's velocity): it acts through the combined COM, so it has
+      // no pitch moment and puts no load on the rider tether. Round 8 put all of it on the frame at
+      // 4.2 kg/m: 1.7 kN at 20 m/s decelerating the 56 kg frame under a 75 kg rider who was not
+      // dragged, and the brace reacting at the anchor above the frame COM pitched the airborne bike
+      // nose-down at ~100 deg/s
       const sp = Math.sqrt(vx[FRAME]! * vx[FRAME]! + vy[FRAME]! * vy[FRAME]!);
-      const dcoef = t.aero.dragCoef * sp * dt * im[FRAME]!;
-      vx[FRAME] = vx[FRAME]! - dcoef * vx[FRAME]!;
-      vy[FRAME] = vy[FRAME]! - dcoef * vy[FRAME]!;
+      const dcoef = (t.aero.dragCoef * sp * dt) / (t.frame.mass + 2 * t.wheel.mass + t.rider.mass);
+      const ddx = dcoef * vx[FRAME]!;
+      const ddy = dcoef * vy[FRAME]!;
+      for (let b = 0; b <= RIDER; b++) {
+        vx[b] = vx[b]! - ddx;
+        vy[b] = vy[b]! - ddy;
+      }
     }
   }
 
@@ -2051,7 +2062,11 @@ class BikeWorld implements BikePhysicsWorld {
         if (dx * dx + dy * dy > t.rider.tetherMax * t.rider.tetherMax * 1.69) {
           fault = 1;
           cause = 2;
-        } else if (F[S_TETHER_OVER]! >= 2) {
+        } else if (F[S_TETHER_OVER]! >= 2 && wrapAngle(this.an[FRAME]!) < -QUARTER_PI) {
+          // round 9: the force rule is an over-the-bars qualifier, not a crash of its own - it fired on
+          // ordinary lip hits and plank feet (a stranger's level 4x0.8 kicker at 11.6 m/s). A crash is
+          // the head or torso touching something (rule 1) or the rider leaving the bike (tetherDist);
+          // a violent front impact only counts once the bike is past 45 deg nose-down
           fault = 1;
           cause = 3;
         }

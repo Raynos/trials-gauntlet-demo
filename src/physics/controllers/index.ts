@@ -214,7 +214,7 @@ export function drumLifter(centreX: number, r: number, speed = 5, opts: { popDeg
  * throttle and lets the bike roll back (the roll-back deceleration brings the nose down).
  */
 export function climber(slopeDeg: number, baseX = -Infinity, opts: { hover?: number; margin?: number; kd?: number; speed?: number; cornerSpeed?: number; topX?: number; popDeg?: number } = {}): Controller {
-  const hover = opts.hover ?? 8; // frame pitch above the slope with the front just off it (rear squat + fork extension are ~4 deg)
+  const hover = opts.hover ?? 10; // frame pitch above the slope with the front just off it (rear squat + fork extension are ~4 deg; round 9: 8 -> 10, the 60 deg crest stalled at the lip with the rear spinning once the drag became a field)
   const margin = opts.margin ?? 10;
   const kd = opts.kd ?? 0.06;
   const speed = opts.speed ?? 5;
