@@ -15,7 +15,7 @@ import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { canvas, tex } from './canvasTex';
-import { PropBatch, bakeAO, triCount } from './props';
+import { PropBatch, bakeAO, triCount, trussGeometry, lightConeGeometry } from './props';
 import { drawArt, type ArtLibrary } from '../art/library';
 import { groundFloorY, profileY } from './track';
 
@@ -570,6 +570,58 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
   drawCalls += 7;
   triangles += 900;
   crowdZone(fx - 7, fx + 9, 34, true);
+
+  // --- Round 11 nightCity dressing (builder "city"): the start and the finish as a street event ---
+  // A lighting truss over each gate with four par cans (magenta / cyan, bulbs bloom, additive beams
+  // down onto the deck) and an LED wall behind the crowd; the police cars, jersey barriers and
+  // cones round the gates are in the biome kit (`kit.flicker` runs the lightbars).
+  if (biome.id === 'nightCity') {
+    const sx = track.def.start.pos.x;
+    const led = bannerTexture('TRIALS NIGHT', '#0a1020', '#7fd0ff');
+    textureBytes += 1024 * 256 * 4 * 1.33;
+    const ledMat = fogify(new THREE.MeshStandardMaterial({ map: led, emissiveMap: led, emissive: 0xffffff, emissiveIntensity: 1.5, roughness: 0.6 }));
+    const chk = checkerTexture();
+    textureBytes += 512 * 128 * 4;
+    const chkMat = fogify(new THREE.MeshStandardMaterial({ map: chk, emissiveMap: chk, emissive: 0xffffff, emissiveIntensity: 1.2, roughness: 0.6 }));
+    const rig = new PropBatch('stagetruss', trussGeometry(12), steel, false);
+    const canMat = fogify(new THREE.MeshStandardMaterial({ color: 0x141416, roughness: 0.6, vertexColors: true }));
+    const cans = new PropBatch('parcan', new THREE.CylinderGeometry(0.16, 0.2, 0.36, 10).translate(0, -0.2, 0), canMat, false);
+    const bulb = (hex: number): THREE.MeshStandardMaterial => fogify(new THREE.MeshStandardMaterial({ color: 0x101010, emissive: hex, emissiveIntensity: 5, roughness: 0.5, vertexColors: true }));
+    const bulbsM = new PropBatch('parbulb-m', new THREE.SphereGeometry(0.13, 8, 6).translate(0, -0.38, 0), bulb(0xff40c0), false);
+    const bulbsC = new PropBatch('parbulb-c', new THREE.SphereGeometry(0.13, 8, 6).translate(0, -0.38, 0), bulb(0x40e0ff), false);
+    const beamMat = (hex: number): THREE.MeshBasicMaterial => new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, color: new THREE.Color(hex).multiplyScalar(0.05), side: THREE.DoubleSide, fog: false, vertexColors: true });
+    const beamsM = new PropBatch('parbeam-m', lightConeGeometry(), beamMat(0xff40c0), false);
+    const beamsC = new PropBatch('parbeam-c', lightConeGeometry(), beamMat(0x40e0ff), false);
+    for (const [cx, mat] of [[sx, ledMat], [fx, chkMat]] as const) {
+      const gy = profileY(profile, cx);
+      // Truss across the deck (the 12 m truss along x, turned to span z, scaled to 6 m) on two posts.
+      rig.add(cx, gy + 5.6, 0, Math.PI / 2, 0.5, null, 0, 1, 1);
+      for (const z of [-3.0, 3.0]) stage.add(cx, gy - 0.05, z, 0, 0.18, null, 0, 5.65, 0.18);
+      for (let k = 0; k < 4; k++) {
+        const z = -2.25 + k * 1.5;
+        cans.add(cx, gy + 5.55, z, 0);
+        (k % 2 ? bulbsC : bulbsM).add(cx, gy + 5.55, z, 0);
+        (k % 2 ? beamsC : beamsM).add(cx, gy + 5.15, z, 0, 0.3, null, 0, 5.1, 0.3);
+      }
+      // LED wall behind the crowd, tilted toward the camera.
+      const wz = -8.2;
+      const wy = gyAt(cx, wz);
+      const screen = new THREE.Mesh(new THREE.PlaneGeometry(7, 1.75), mat);
+      screen.position.set(cx, wy + 5.4, wz);
+      screen.rotation.x = -0.18;
+      group.add(screen);
+      drawCalls++;
+      triangles += 2;
+      for (const dx of [-3.4, 3.4]) stage.add(cx + dx, wy, wz, 0, 0.16, null, 0, 6.3, 0.16);
+    }
+    for (const b of [rig, cans, bulbsM, bulbsC, beamsM, beamsC]) {
+      const im = b.build();
+      if (!im) continue;
+      group.add(im);
+      drawCalls++;
+      triangles += triCount(b.geometry) * b.count;
+    }
+  }
 
   // --- Build the batches -------------------------------------------------------
   for (const b of [crowd, flags, poles, rails, railPosts, stage]) {

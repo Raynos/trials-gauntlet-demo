@@ -45,12 +45,28 @@ interface Params {
   fov: number;
 }
 
+/**
+ * Track-authored modes. Round 11: every course authors `side` over almost its whole length, and
+ * `side` used to mean yaw 5° / pitch 4° — so the shipped riding frame was a flat profile (the
+ * round-10 recipe's 15° riding pitch never reached a real track: b1 bot-3 measured pitch 4°).
+ * `side` is now the reference riding camera (20–25° down, 15–20° round): yaw 16°, pitch 21°;
+ * `side-tight` the same with the tighter frame. `high34` / `low` are the deliberate exceptions.
+ */
 const MODE: Record<NonNullable<CameraKey['mode']>, Partial<Params> & { zoomBias?: number }> = {
-  side: { yaw: 5 * DEG, pitch: 4 * DEG },
-  'side-tight': { yaw: 4 * DEG, pitch: 2 * DEG, zoomBias: -0.5 },
+  side: { yaw: 16 * DEG, pitch: 21 * DEG },
+  'side-tight': { yaw: 14 * DEG, pitch: 19 * DEG, zoomBias: -0.5 },
   high34: { yaw: 30 * DEG, pitch: 48 * DEG },
   low: { yaw: 14 * DEG, pitch: -8 * DEG },
 };
+
+/**
+ * Inner band the rig aims for when it has to slide / tilt to keep the bike in frame. The harness
+ * gate asserts the bike centre inside [0.2, 0.8] (`harness/capture.ts CAMERA_BOX`); round 10 tilted
+ * the bike onto the 0.2 edge exactly, and float jitter put 37 b3 frames at 0.1999 → FAIL. Aim 0.04
+ * inside the gate box so a pass has margin.
+ */
+const BAND_LO = 0.24;
+const BAND_HI = 0.76;
 
 /** World box the camera may occupy (set per track by the renderer; hard clamp every frame). */
 export interface CameraBounds {
@@ -70,7 +86,7 @@ export class CameraRig {
    * full of skylight backs). After all smoothing the camera POSITION is clamped to `bounds`
    * (floor + 1.5 … roof − 1, inside the hall in z/x; exteriors get a sky ceiling). When the
    * clamp binds the framing widens instead: FOV up to +12°, then the pitch tilts so the bike
-   * stays inside the central [0.2, 0.8] box. `clamped` / `posZ` are reported by `debug()`.
+   * stays inside the inner [0.24, 0.76] band (gate box [0.2, 0.8]). `clamped` / `posZ` are reported by `debug()`.
    */
   bounds: CameraBounds | null = null;
   private clamped = false;
@@ -168,15 +184,19 @@ export class CameraRig {
     const wideT = Math.max(fastT, airWide * 0.7);
     const moving = Math.abs(f.velX) > 0.5 ? Math.sign(f.velX) : 1;
     const p: Params = {
-      heightFrac: lerp(lerp(0.4, 0.26, zoomT), 0.14, wideT),
-      screenX: moving > 0 ? lerp(0.45, 0.3, zoomT) - 0.02 * wideT : lerp(0.55, 0.7, zoomT),
+      // Round 11: the pull-back floor rises 0.14 → 0.16 (a 16 m/s bot frame read the bike at
+      // 13 % of frame height against the reference's ≈ 20 % at speed).
+      heightFrac: lerp(lerp(0.4, 0.26, zoomT), 0.16, wideT),
+      // Round 11: 0.30/0.28 put the bike itself (followed point minus the lookahead) on the 0.20
+      // edge of the gate box in every fast frame (b1 bot-3 at 16.6 m/s: bx 0.20). 0.34 → 0.36.
+      screenX: moving > 0 ? lerp(0.45, 0.34, zoomT) + 0.02 * wideT : lerp(0.55, 0.66, zoomT),
       screenY: lerp(0.55, 0.56, zoomT) - 0.03 * airT,
       // Idle is a 3/4 view (reference start frames sit ≈20° round and ≈10° down), so depth reads before GO.
       // Round 10: the riding pitch goes 11° → 15° and the yaw 15° → 18° (reference riding
       // frames sit 20–25° down / 15–25° round): the top of the deck, the far ledge clutter and
       // the container roofs enter the frame and the window wall drops out of the upper third.
       yaw: moving * lerp(lerp(20, 18, zoomT), 19, wideT) * DEG,
-      pitch: lerp(lerp(11, 15, zoomT), 21, fastT) * DEG, // round 7: never tilt up in the air — pull back instead; round 10: the pull-back looks DOWN (21°) so the wide frame shows the deck and the hall floor, not a band of window wall
+      pitch: lerp(lerp(11, 18, zoomT), 22, fastT) * DEG, // round 11: riding 18° (was 15°) — the reference sits 20–25° down and the `side` key now carries 21° // round 7: never tilt up in the air — pull back instead; round 10: the pull-back looks DOWN (21°) so the wide frame shows the deck and the hall floor, not a band of window wall
       roll: 0,
       fov: lerp(28, 34, zoomT) * DEG,
     };
@@ -272,7 +292,10 @@ export class CameraRig {
     }
 
     // --- Followed point: lookahead in x, dead-zone in y.
-    const lookTarget = f.finished ? 0 : Math.min(2.5, Math.max(-1.5, f.velX * 0.15));
+    // Lookahead: ≤ 2.5 m and ≤ 8 % of the visible width at the target frame (round 11: in the
+    // wide frame 2.5 m was 12 % of the width and pushed the bike onto the box edge).
+    const lookCap = Math.min(2.5, 0.08 * (RIDER_HEIGHT / Math.max(0.03, p.heightFrac)) * this.aspect);
+    const lookTarget = f.finished ? 0 : Math.min(lookCap, Math.max(-1.5, f.velX * 0.15));
     const fxT = followTarget.x;
     // In the air (round 5, critic: "ground leaves the frame"): aim between the bike and the
     // landing zone and pull back with height, so the ground line stays in the bottom third.
@@ -375,10 +398,10 @@ export class CameraRig {
         su = this.screenX.x + du;
         sv = this.screenY.x - dv;
       }
-      if (sv < 0.2) this.fy.snap(this.fy.x + ((0.2 - sv) * 2 * halfH) / Math.cos(pitch));
-      else if (sv > 0.8) this.fy.snap(this.fy.x - ((sv - 0.8) * 2 * halfH) / Math.cos(pitch));
-      if (su < 0.2) this.fx.snap(this.fx.x - ((0.2 - su) * 2 * halfW) / Math.cos(yaw));
-      else if (su > 0.8) this.fx.snap(this.fx.x + ((su - 0.8) * 2 * halfW) / Math.cos(yaw));
+      if (sv < BAND_LO) this.fy.snap(this.fy.x + ((BAND_LO - sv) * 2 * halfH) / Math.cos(pitch));
+      else if (sv > BAND_HI) this.fy.snap(this.fy.x - ((sv - BAND_HI) * 2 * halfH) / Math.cos(pitch));
+      if (su < BAND_LO) this.fx.snap(this.fx.x - ((BAND_LO - su) * 2 * halfW) / Math.cos(yaw));
+      else if (su > BAND_HI) this.fx.snap(this.fx.x + ((su - BAND_HI) * 2 * halfW) / Math.cos(yaw));
     }
     const bx2 = this.fx.x + this.look.x;
     const by2 = this.fy.x + shakeY;
@@ -412,16 +435,18 @@ export class CameraRig {
           let sv = 0.5 - yv / zv / (2 * th);
           const su = 0.5 + xv / zv / (2 * th * this.aspect);
           // (a) widen: the FOV grows (≤ +12°) until the bike is back inside the 0.2–0.8 band.
-          const need = Math.max(Math.abs(yv / zv) / 0.6, Math.abs(xv / zv) / (0.6 * this.aspect));
-          if (need > th || sv < 0.2 || sv > 0.8 || su < 0.2 || su > 0.8) {
+          // Band half-width 0.26 (BAND_HI − 0.5): the FOV grows until the bike is 0.04 inside the gate box.
+          const bw = BAND_HI - 0.5;
+          const need = Math.max(Math.abs(yv / zv) / (2 * bw), Math.abs(xv / zv) / (2 * bw * this.aspect));
+          if (need > th || sv < BAND_LO || sv > BAND_HI || su < BAND_LO || su > BAND_HI) {
             const fovNeed = 2 * Math.atan(need * 1.02);
             fovOut = Math.min(fov + 12 * DEG, Math.max(fov, fovNeed));
             const th2 = Math.tan(fovOut / 2);
             sv = 0.5 - yv / zv / (2 * th2);
-            // (b) still out: tilt the pitch so the bike sits on the band edge.
-            if (sv < 0.2 || sv > 0.8) {
+            // (b) still out: tilt the pitch so the bike sits on the inner band edge (not the gate edge).
+            if (sv < BAND_LO || sv > BAND_HI) {
               const a = Math.atan2(yv, zv); // angle of the bike above the view axis
-              const edge = Math.atan(0.6 * th2) * (sv < 0.2 ? 1 : -1);
+              const edge = Math.atan(2 * bw * th2) * (sv < BAND_LO ? 1 : -1);
               const dp = a - edge; // rotate the view up by dp (pitch is positive looking down)
               this.e.set(-(pitch - dp), yaw, roll, 'YXZ');
               this.q.setFromEuler(this.e);

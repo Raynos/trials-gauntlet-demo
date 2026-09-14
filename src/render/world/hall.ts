@@ -98,6 +98,7 @@ function moltenTexture(rng: Rng): THREE.CanvasTexture {
 }
 
 export const HALL = { wallZ: -30, frontZ: 30, height: 16 };
+const FOREGROUND_HANGS = false;
 
 /** One 12 m × 16 m warehouse wall bay: brick, steel column, a 7 m tall window bank + clerestory. Returns albedo + emissive. */
 function warehouseWall(rng: Rng, paneColor: string, brick: string, foundry = false): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture; bytes: number } {
@@ -442,12 +443,12 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   }
   for (let x = x0 + 12; x < x1; x += 24) column.add(x, floorY, -17, 0, 1, null, 0, roofY - floorY, 1);
   for (const z of [-26, -19, -12, -5, 2, 9, 16, 23]) purlin.add(midX, roofY - 0.2, z, 0, span, null, 0, 1, 1);
-  for (const z of [-24, 12]) rail.add(midX, floorY + 12.2, z, 0, span, null, 0, 1, 1);
+  for (const z of [-24, 2]) rail.add(midX, floorY + 12.2, z, 0, span, null, 0, 1, 1); // round 11: the near rail was at z +12 — 6 m in front of the new high riding camera, a black band across the upper third of every frame
   // Crane bridge + trolley + hook at 45 % of the hall.
   {
     const bx = x0 + span * 0.45;
-    const bridge = new THREE.Mesh(bakeAO(new THREE.BoxGeometry(1.0, 1.1, 36.5), 1.1, 0.2), vc('rustSteel'));
-    bridge.position.set(bx, floorY + 13.05, -6);
+    const bridge = new THREE.Mesh(bakeAO(new THREE.BoxGeometry(1.0, 1.1, 26.5), 1.1, 0.2), vc('rustSteel'));
+    bridge.position.set(bx, floorY + 13.05, -11);
     bridge.castShadow = true;
     out.meshes.push(bridge);
     const trolley = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.9, 1.6), steel);
@@ -508,7 +509,10 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   // inside a spawn keep-out, and they end ABOVE the rider's head (deck + 3 m) or carry a
   // lamp high up — a thin chain passing through the frame, never a pillar through the bike.
   const hookTyres = new PropBatch('hooktyre', bakeAO(tyreStackGeometry(), 0.9, 0.2), lib.get('tyre'));
-  for (let x = x0 + 22; x < x1 - 10; x += rng.range(34, 48)) {
+  // Round 11: the riding camera is now 7.5 m up and 18 m out (pitch 21°): anything at z 4.5–7
+  // above deck + 1.5 sits on the line to the bike, so the foreground hooks / lamps are gone
+  // (`FOREGROUND_HANGS` = false); the loop stays for the idle 3/4 view should it come back.
+  for (let x = x0 + 22; x < x1 - 10 && FOREGROUND_HANGS; x += rng.range(34, 48)) {
     const z = rng.range(4.5, 7);
     if (keepOut(x, 1)) continue;
     if (rng.next() < 0.6) {
@@ -530,19 +534,19 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
 
   // --- Container rows at three depths with gaps. Eight skin variants
   // (rust × logo × door side × stripe), each its own batch (8 calls, one program).
-  const contMat = lib.get('container');
   const skinBatches: PropBatch[] = [];
   const contGeo = bakeAO(containerGeometry(), 2.59, 0.4);
   for (let i = 0; i < 8; i++) {
     const skin = containerSkin(rng, { rust: i % 3, logo: i, doorLeft: (i & 1) === 1, stripe: i % 4 === 3 }, art);
     out.textureBytes += 1024 * 512 * 4 * 1.33;
-    const m = i === 0 ? contMat : lib.derive('container');
+    // Round 11: every skin on its own derived material (skin 0 used to be painted onto the shared
+    // library `container` material, which the texture generator then overwrote on the session's
+    // first world and which leaked into every other biome's containers afterwards).
+    const m = lib.derive('container');
     m.map = skin;
     m.needsUpdate = true;
-    if (i > 0) {
-      m.vertexColors = true;
-      fogify(m);
-    }
+    m.vertexColors = true;
+    fogify(m);
     skinBatches.push(new PropBatch(`container${i}`, contGeo, m));
   }
   const palette = [0x1f5a4a, 0x7a2418, 0x1e3d66, 0x46463e, 0x8a5a1e, 0x2e5a2a, 0x5a2a52, 0x2f4f6e, 0x6a6a62]; // round 10: deeper, more saturated (the pale set read as a grey wall at 18 m)
@@ -675,7 +679,86 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   // reach the wheels; (c) adjacent containers on the floor at z ≈ −5.2 (mid tier) and z ≈ +5
   // (foreground, outside spawn keep-outs) with clutter on their roofs. Every prop that touches a
   // surface gets a contact-shadow decal; paper, gravel and bolts scatter on all three.
-  dressDeckLevel(track, rng, floorY, keepOut, lib, out, skinBatches, pick, { pallets, drums, tyres, cones, reels, forklifts, palletGeo, drumGeo, tyreGeo, reelGeo, steel, foundry, x0, x1 });
+  const hangLamp = (x: number, y: number, z: number): void => {
+    chains.add(x, roofY, z, 0, 1, null, 0, roofY - y, 1);
+    lampAt(x, y, z);
+  };
+  dressDeckLevel(track, rng, floorY, keepOut, lib, out, skinBatches, pick, { pallets, drums, tyres, cones, reels, forklifts, palletGeo, drumGeo, tyreGeo, reelGeo, steel, foundry, x0, x1, tarps, hangLamp });
+
+  if (!foundry) {
+    // --- Round 11: one identifiable set piece per industrial course at 45 % of the ridden span,
+    // and the start / finish dressed as an event (scaffold stands, banner gantry lamps, cones).
+    // Everything sits BEHIND the line (z < 0) or below deck + 1.5 in front: the riding camera is
+    // 7.5 m up and 18 m out, so a foreground post above the deck would cut through the bike.
+    const pStart = profile[0]!.x;
+    const pEnd = profile[profile.length - 1]!.x;
+    const setX = pStart + (pEnd - pStart) * 0.45;
+    const id = track.def.id;
+    const rustVc = vc('rustSteel');
+    const single = (g: THREE.BufferGeometry, m: THREE.Material, x: number, y: number, z: number, shadow = true): THREE.Mesh => {
+      const mesh = new THREE.Mesh(g, m);
+      mesh.position.set(x, y, z);
+      mesh.castShadow = shadow;
+      mesh.receiveShadow = true;
+      out.meshes.push(mesh);
+      return mesh;
+    };
+    const drumSet = new PropBatch('setdrum', drumGeo, vc('barrelRed'));
+    if (id === 'b2-lean-back') {
+      // Stacked-container arch behind the line: two 3-high piers at z −5.5 and z −12 with a
+      // turned unit bridging them 7.8 m up.
+      for (const pz of [-5.5, -12]) for (let k = 0; k < 3; k++) skinBatches[(k * 3 + (pz < -8 ? 1 : 0)) % 8]!.add(setX + (pz < -8 ? 0.2 : -0.2), floorY + k * 2.59, pz, Math.PI / 2 + rng.range(-0.02, 0.02), 1, pick());
+      skinBatches[5]!.add(setX, floorY + 3 * 2.59, -8.75, Math.PI / 2, 1, 0xa8722a);
+      hangLamp(setX - 4, floorY + 6.2, -3.9);
+      hangLamp(setX + 4, floorY + 6.2, -3.9);
+    } else if (id === 'b3-kicker-row') {
+      // Shipping-crane hook over the far ledge holding a sling of three drums at deck + 3.
+      const hy = deckY + 4.6;
+      const cableMesh = single(chainGeometry(), steel, setX, roofY - 1.4, -2.6, false);
+      cableMesh.scale.set(1, roofY - 1.4 - hy, 1);
+      single(hookBlockGeometry(), rustVc, setX, hy - 0.7, -2.6);
+      for (const [dx, dz] of [[-0.36, 0.15], [0.36, 0.15], [0, -0.32]] as const) drumSet.add(setX + dx, hy - 0.7 - 1.2, -2.6 + dz, rng.range(0, 6), 1, [0xa42a1e, 0x244d8a, 0xd8d2c4][Math.round(dx * 3 + 2) % 3]!);
+      hangLamp(setX, floorY + 6.4, -3.9);
+    } else if (id === 'm1-hop-up') {
+      // Forklift lane: four forklifts nose to tail on a hazard-taped lane at z −6 with pallet loads.
+      const lane = new PropBatch('lanetape', new THREE.BoxGeometry(1, 0.01, 0.12), lib.get('hazardTape'), false);
+      for (const lz of [-4.6, -7.4]) lane.add(setX, floorY + 0.006, lz, 0, 22, null, 0, 1, 1);
+      for (let i = 0; i < 4; i++) {
+        const fx = setX - 8 + i * 5.2;
+        forklifts.add(fx, floorY, -6 + rng.range(-0.2, 0.2), rng.range(-0.08, 0.08));
+        for (let k = 0; k < 3; k++) pallets.add(fx + 1.7, floorY + 0.15 + k * 0.144, -6, 0);
+        cones.add(fx + 2.6, floorY, -4.3, rng.range(0, 6));
+      }
+      out.batches.push(lane);
+      hangLamp(setX - 3, floorY + 6.0, -3.9);
+      hangLamp(setX + 5, floorY + 6.0, -3.9);
+    } else {
+      // b1-first-ride (default): a jib gantry — a leg at z −6.5 carrying a beam out over the
+      // line to z +2 at floor + 10.5, a tie back to the roof truss, hook block over the deck,
+      // banners hung from the beam behind the line.
+      single(bakeAO(columnGeometry(), 1, 0.35), steel, setX, floorY, -6.5).scale.set(1.4, roofY - floorY - 5, 1.4);
+      const jib = single(bakeAO(beamGeometry(0.5, 0.7), 0.7, 0.2), rustVc, setX, floorY + 10.5, -2.25);
+      jib.rotation.y = Math.PI / 2;
+      jib.scale.set(8.5, 1, 1);
+      single(chainGeometry(), steel, setX, floorY + 10.5, 1.6, false).scale.set(1, floorY + 10.5 - (deckY + 3.4), 1);
+      single(hookBlockGeometry(), rustVc, setX, deckY + 3.4 - 0.7, 1.6);
+      for (const bz of [-5.5, -4.0]) tarps.add(setX + (bz < -5 ? -1.2 : 1.2), floorY + 10.3, bz, 0, 1, bz < -5 ? 0xd8a020 : 0xa42a1e, 0, 0.8, 1);
+      hangLamp(setX - 4, floorY + 6.2, -3.9);
+      hangLamp(setX + 4, floorY + 6.2, -3.9);
+    }
+    // Start / finish as an event: a scaffold stand with a tarp banner behind each gate at
+    // z −5.5, cones along the far ledge, a lamp over each gate, drums as barrier weights.
+    const scaffolds2 = new PropBatch('standscaffold', bakeAO(scaffoldGeo, 4, 0.3), steel, false);
+    for (const gx of [pStart + 2, track.def.finishX + 3]) {
+      for (const dx of [-3.2, -1.0, 1.2, 3.4]) scaffolds2.add(gx + dx, floorY, -5.6, 0);
+      tarps.add(gx, floorY + 4.0, -4.9, 0, 2.2, gx < setX ? 0x2a4d8a : 0xa42a1e, 0, 0.55, 1);
+      hangLamp(gx, floorY + 6.6, -3.9);
+      const ledge = supportLedgeY(profile, floorY, gx);
+      if (ledge !== null) for (const dx of [-2.5, 0, 2.5]) cones.add(gx + dx, ledge, -2.3, rng.range(0, 6));
+      for (const dx of [-4.5, 4.5]) drumSet.add(gx + dx, floorY, -4.4, rng.range(0, 6), 1, 0xd8d2c4);
+    }
+    out.batches.push(drumSet, scaffolds2);
+  }
 
   // --- Wall decals from the art pack: posters and safety signs low on the back wall between
   // the bays, graffiti pieces on the far container row and the wall. One batch per texture.
@@ -738,7 +821,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     pourTex.rotation = Math.PI / 2;
     pourTex.center.set(0.5, 0.5);
     const molten = fogify(new THREE.MeshStandardMaterial({ map: flow, emissiveMap: flow, color: 0xffffff, emissive: 0xff7a22, emissiveIntensity: 4.0, roughness: 0.55 }));
-    const pourMat = fogify(new THREE.MeshStandardMaterial({ map: pourTex, emissiveMap: pourTex, color: 0xffffff, emissive: 0xffa040, emissiveIntensity: 5.0, roughness: 0.5 }));
+    const pourMat = fogify(new THREE.MeshStandardMaterial({ map: pourTex, emissiveMap: pourTex, color: 0xffffff, emissive: 0xffa040, emissiveIntensity: 3.5, roughness: 0.5 })); // round 11: 5.0 read as white columns at exposure 1.7
     const glow = fogify(new THREE.MeshStandardMaterial({ color: 0x1a0402, emissive: 0xff6a18, emissiveIntensity: 5.0, roughness: 0.6 }));
     out.flicker.push(molten, pourMat, glow);
     out.scroll.push({ tex: flow, vx: 0.07, vy: 0 }, { tex: pourTex, vx: 0, vy: -0.9 });
@@ -822,11 +905,109 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
         out.meshes.push(edge);
       }
     }
+    // Round 11 (foundry warm read): melt sources AT deck level. Slag pots on the far support
+    // ledge every ≈ 11 m — a squat crucible with a glowing top — so a riding frame always has
+    // two or more sources within the melt lights' reach and the deck itself gets the up-light.
+    const potGeo = bakeAO(mergeGeometries([new THREE.CylinderGeometry(0.62, 0.48, 0.9, 14, 1, true).translate(0, 0.45, 0), new THREE.CylinderGeometry(0.48, 0.48, 0.06, 14).translate(0, 0.03, 0), new THREE.TorusGeometry(0.62, 0.05, 6, 14).rotateX(Math.PI / 2).translate(0, 0.9, 0)], false)!, 0.9, 0.3);
+    const pots = new PropBatch('slagpot', potGeo, vc('darkSteel'));
+    // The pots are 2.5 m from the deck: as real point-light sources (140 cd, decay 2) they blew
+    // the bike out to white when it passed one, so they bake up-light only (`bakeSources`).
+    const bakeSources: { x: number; y: number; z: number }[] = [];
+    const potMelt = new PropBatch('slagmelt', new THREE.CylinderGeometry(0.56, 0.56, 0.06, 14).translate(0, 0.86, 0), molten, false);
+    const profStart = profile[0]!.x;
+    const profEnd = profile[profile.length - 1]!.x;
+    for (let x = profStart + 6; x < profEnd - 4; x += rng.range(9, 13)) {
+      const ledge = supportLedgeY(profile, floorY, x);
+      if (ledge === null) continue;
+      const deck = profileY(profile, x);
+      if (deck - ledge > 2.4) continue;
+      const pz = rng.range(-2.7, -2.2);
+      const px = x + rng.range(-0.5, 0.5);
+      pots.add(px, ledge, pz, rng.range(0, 6));
+      potMelt.add(px, ledge, pz);
+      bakeSources.push({ x: px, y: ledge + 0.95, z: pz });
+    }
+    out.batches.push(pots, potMelt);
+
+    // Round 11: one set piece per foundry course, at 45 % of the ridden span, and a sparks /
+    // warning-light dressing at the start and finish (the gates kit adds the jets).
+    const setX = profStart + (profEnd - profStart) * 0.45;
+    const id = track.def.id;
+    const beaconMat = fogify(new THREE.MeshStandardMaterial({ color: 0x2a0806, emissive: 0xff2a10, emissiveIntensity: 6, roughness: 0.4 }));
+    out.flicker.push(beaconMat);
+    const beacons = new PropBatch('beacon', new THREE.SphereGeometry(0.14, 10, 8).translate(0, 0.14, 0), beaconMat, false);
+    const beaconPost = new PropBatch('beaconpost', new THREE.CylinderGeometry(0.04, 0.05, 1, 6).translate(0, 0.5, 0), steel, false);
+    for (const gx of [profStart + 1.5, track.def.finishX + 2]) {
+      for (const gz of [-2.2, 2.2]) {
+        const gy = profileY(profile, gx);
+        beaconPost.add(gx, gy, gz, 0, 1, null, 0, 1.6, 1);
+        beacons.add(gx, gy + 1.6, gz);
+      }
+    }
+    out.batches.push(beacons, beaconPost);
+    if (id === 'm3-see-saw') {
+      // Rolling mill: a housing either side of the line at z −8 with two big rollers and a
+      // glowing slab coming through at deck height.
+      const housing = new THREE.Mesh(bakeAO(new THREE.BoxGeometry(2.2, 5.2, 3.6).translate(0, 2.6, 0), 5.2, 0.35), rust);
+      housing.position.set(setX - 4.2, floorY, -8);
+      housing.castShadow = true;
+      out.meshes.push(housing);
+      const housing2 = housing.clone();
+      housing2.position.x = setX + 4.2;
+      out.meshes.push(housing2);
+      for (const ry of [floorY + 2.0, floorY + 3.3]) {
+        const roller = new THREE.Mesh(bakeAO(new THREE.CylinderGeometry(0.55, 0.55, 6.6, 18).rotateZ(Math.PI / 2), 1.1, 0.2), vc('darkSteel'));
+        roller.position.set(setX, ry, -8);
+        out.meshes.push(roller);
+      }
+      const slab = new THREE.Mesh(new THREE.BoxGeometry(22, 0.16, 1.4), molten);
+      slab.position.set(setX, floorY + 2.65, -8);
+      out.meshes.push(slab);
+      for (const dx of [-9, -3, 3, 9]) out.fountains.push({ x: setX + dx, y: floorY + 2.9, z: -8 });
+    } else if (id === 'x2-pipe-dream') {
+      // Pipe rack: five big pipes on A-frames running 48 m behind the line at z −6.5, with a
+      // glowing melt launder on top.
+      const rack = new PropBatch('piperack', bakeAO(mergeGeometries([new THREE.BoxGeometry(0.2, 4.6, 0.2).translate(-1.4, 2.3, 0), new THREE.BoxGeometry(0.2, 4.6, 0.2).translate(1.4, 2.3, 0), new THREE.BoxGeometry(3.2, 0.18, 0.24).translate(0, 4.5, 0), new THREE.BoxGeometry(3.2, 0.18, 0.24).translate(0, 2.9, 0)], false)!, 4.6, 0.3), rust, false);
+      const bigPipe = new PropBatch('bigpipe', new THREE.CylinderGeometry(0.34, 0.34, 1, 12).rotateZ(Math.PI / 2).translate(0.5, 0, 0), rust, false);
+      const len = 48;
+      for (let x = setX - len / 2; x <= setX + len / 2; x += 6) rack.add(x, floorY, -6.5, 0);
+      for (const [py, pz] of [[4.9, -7.4], [4.9, -6.6], [4.9, -5.8], [3.3, -7.2], [3.3, -6.0]] as const) bigPipe.add(setX - len / 2, floorY + py, pz, 0, len, [0x6b5a4c, 0x4a4a48, 0x7a3a2a, 0x5a5a52, 0x6b5a4c][Math.round(pz * 10) % 5]!, 0, 1, 1);
+      const launder = new THREE.Mesh(new THREE.BoxGeometry(len, 0.08, 0.5), molten);
+      launder.position.set(setX, floorY + 5.32, -6.6);
+      out.meshes.push(launder);
+      for (let dx = -len / 2 + 6; dx < len / 2; dx += 12) out.fountains.push({ x: setX + dx, y: floorY + 5.5, z: -6.6 });
+      out.batches.push(rack, bigPipe);
+    } else if (id === 'x3-gauntlet') {
+      // Furnace wall: three furnaces shoulder to shoulder at z −8, mouths open to the line.
+      for (const dx of [-6.5, 0, 6.5]) {
+        const py = deckY - 1.6;
+        plinth.add(setX + dx, floorY, -8, 0, 5.4, null, 0, Math.max(0.3, py - floorY), 4.4);
+        furnace.add(setX + dx, py, -8, 0);
+        mouth.add(setX + dx, py, -8);
+        mouthPool.add(setX + dx, py, -8);
+        out.fountains.push({ x: setX + dx, y: py + 1.0, z: -5.9 });
+      }
+    } else {
+      // h3-fire-line (and any other foundry course): a pouring ladle hung over the line from
+      // the crane rail, its stream landing in a mould just behind the far ledge.
+      const ly = profileY(profile, setX) + 3.6;
+      cables.add(setX, railY, -1.4, 0, 1, null, 0, railY - (ly + 3.6), 1);
+      ladles.add(setX, ly, -1.4, 0, 1.25, null, 0.22);
+      melt.add(setX, ly, -1.4, 0, 1.25);
+      const px = setX + 1.7;
+      const drop = ly + 2.1 - floorY - 0.62;
+      pours.add(px, ly + 2.1, -3.6, 0, 1.2, null, 0, drop, 1.2);
+      moulds.add(px, floorY, -3.6, 0, 1.3);
+      mouldMelt.add(px, floorY, -3.6, 0, 1.3);
+      out.fountains.push({ x: px, y: floorY + 0.8, z: -3.6 }, { x: setX, y: ly + 1.9, z: -1.4 });
+    }
     out.batches.push(ladles, melt, pours, moulds, mouldMelt, cables, plinth, furnace, mouth, mouthPool, stacks, pipes, pipeV);
-    // Round 8: the two point lights follow the camera (renderer: the two nearest melt sources
-    // to the camera target), so the melt lights the structure wherever the bike is; the kit
-    // adds none of its own. The floor channel adds a baked up-light in the vertex colours of
-    // the near steel (see the terrain tint in biomeKit) — GI stands in for the rest.
+    // Round 11: bake the melt's up-light into the per-instance colour of everything within
+    // 10 m of a source (GI stand-in; the four camera-following melt lights do the real work).
+    for (const b of out.batches) {
+      b.tintNear(out.fountains, 10, [1.75, 1.22, 0.86]);
+      b.tintNear(bakeSources, 6, [1.6, 1.2, 0.9], 0.7);
+    }
   }
   return out;
 }
@@ -870,6 +1051,9 @@ interface DressKit {
   foundry: boolean;
   x0: number;
   x1: number;
+  /** Round 11: a hanging tarp plane batch (origin at the top edge) and a hung lamp (chain from the truss + head + bulb + pool). */
+  tarps: PropBatch;
+  hangLamp: (x: number, y: number, z: number) => void;
 }
 
 function dressDeckLevel(track: CompiledTrack, rng: Rng, floorY: number, keepOut: (x: number, hw?: number) => boolean, lib: MaterialLibrary, out: HallOut, skins: PropBatch[], pickColor: () => number, kit: DressKit): void {
@@ -1044,26 +1228,74 @@ function dressDeckLevel(track: CompiledTrack, rng: Rng, floorY: number, keepOut:
     for (const side of [-1, 1]) scatter(x, y + 0.004, side * 1.25, 2.0, 0.4, 0.5);
     if (rng.next() < 0.22) oil.add(x, y + 0.006, rng.range(-0.9, 0.9), rng.range(0, 6), rng.range(0.3, 0.55), null, 0, 1, rng.range(0.3, 0.55));
   }
-  // (c) Adjacent containers on the floor: mid tier right behind the far ledge (z −5.2), 1–2
-  // high with clutter on the roof; foreground singles at z +5 outside spawn keep-outs with low
-  // clutter on the roof (they sit 6–7 m in front of the riding camera, well under the deck line).
+  // (c) Adjacent containers on the floor: mid tier right behind the far ledge (z −5.2).
+  // Round 11 (honest read of the round-10 two-up: "a flat, uniformly lit wall"): irregular
+  // gaps (a quarter of the slots empty, the pitch itself irregular), a third of the units turned
+  // end-on or yawed 10–25°, 1 or 2 high, per-unit front wear (the palette colour × 0.55–1.1),
+  // things leaning on the fronts (ladders, planks, a pallet, a draped tarp), roof clutter, and a
+  // low sodium lamp hung IN FRONT of the row every third unit so its pool falls on the front
+  // face and the deck instead of the roof.
   const contRoof = 2.59;
-  for (let x = kit.x0 + 24; x < kit.x1 - 12; x += rng.range(13, 24)) {
-    if (rng.next() < 0.3) continue;
-    const z = -5.2 + rng.range(-0.4, 0.4);
-    const n = rng.next() < 0.3 ? 2 : 1;
-    const turned = rng.next() < 0.25; // end-on now and then so the row is not one flat wall
-    for (let k = 0; k < n; k++) skins[rng.int(0, skins.length - 1)]!.add(x + rng.range(-0.1, 0.1), floorY + k * contRoof, z - (turned ? 1.6 : 0), (turned ? Math.PI / 2 : 0) + rng.range(-0.04, 0.04) + (rng.next() < 0.5 ? Math.PI : 0), 1, pickColor());
-    shadowAt(x, floorY, z, 3.6, 1.6);
+  const leanGeo = {
+    ladder: bakeAO(
+      mergeGeometries([
+        new THREE.BoxGeometry(0.04, 3.2, 0.04).translate(-0.2, 1.6, 0),
+        new THREE.BoxGeometry(0.04, 3.2, 0.04).translate(0.2, 1.6, 0),
+        ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => new THREE.BoxGeometry(0.44, 0.03, 0.03).translate(0, 0.3 + i * 0.3, 0)),
+      ], false)!.rotateX(-0.28),
+      3.2,
+      0.25,
+    ),
+    plank: bakeAO(new THREE.BoxGeometry(0.22, 3.0, 0.045).translate(0, 1.5, 0).rotateX(-0.32), 3, 0.25),
+    pallet: bakeAO(new THREE.BoxGeometry(1.2, 1.2, 0.144).translate(0, 0.6, 0).rotateX(-0.22), 1.2, 0.25),
+  };
+  const ladders = new PropBatch('ladder', leanGeo.ladder, kit.steel);
+  const leanPlanks = new PropBatch('leanplank', leanGeo.plank, vc('plank'));
+  const leanPallets = new PropBatch('leanpallet', leanGeo.pallet, vc('pallet'));
+  const tarpColors = [0x2a4d8a, 0x8a6a2a, 0x5a5a5a, 0x3d6b3a];
+  let unit = 0;
+  for (let x = kit.x0 + 24; x < kit.x1 - 12; x += rng.range(9, 19)) {
+    if (rng.next() < 0.25) continue; // gap
+    unit++;
+    const z = -5.2 + rng.range(-0.5, 0.5);
+    const n = rng.next() < 0.28 ? 2 : 1;
+    const r = rng.next();
+    const turned = r < 0.18; // end-on
+    const yaw = turned ? Math.PI / 2 : r < 0.5 ? (rng.next() < 0.5 ? 1 : -1) * rng.range(0.17, 0.44) : rng.range(-0.05, 0.05);
+    const cz = z - (turned ? 1.6 : 0);
+    const wear = rng.range(0.55, 1.1);
+    for (let k = 0; k < n; k++) {
+      const c = new THREE.Color(pickColor()).multiplyScalar(k === 0 ? wear : rng.range(0.6, 1.05));
+      skins[rng.int(0, skins.length - 1)]!.add(x + rng.range(-0.1, 0.1), floorY + k * contRoof, cz, yaw + rng.range(-0.03, 0.03) + (rng.next() < 0.5 ? Math.PI : 0), 1, c);
+    }
+    shadowAt(x, floorY, cz, turned ? 1.6 : 3.6, turned ? 3.6 : 1.6);
     const top = floorY + n * contRoof;
-    // Roof clutter: 1–3 clusters along the 6 m roof.
-    for (let k = 0, m = rng.int(1, 3); k < m; k++) cluster(x + rng.range(-2.4, 2.4), top, z + rng.range(-0.7, 0.7), true, 2.5);
-    scatter(x, top, z, 5.6, 2.2, 0.25);
-    // A chain and hook off the truss above, or a lamp-lit hanging tarp corner: hangs reads depth.
-    if (rng.next() < 0.5) {
+    // Roof clutter: 1–3 clusters along the roof (2 high: fewer, they sit above the lamps' pools).
+    for (let k = 0, m = rng.int(1, n === 2 ? 2 : 3); k < m; k++) cluster(x + rng.range(-2.2, 2.2), top, cz + rng.range(-0.6, 0.6), true, 2.5);
+    scatter(x, top, cz, turned ? 2.2 : 5.6, turned ? 5.6 : 2.2, 0.25);
+    // Front face (toward the camera): z of the face at the unit's x, allowing for the yaw.
+    const faceZ = (dx: number): number => cz + (turned ? 3.05 : 1.25) + Math.tan(Math.min(0.5, Math.abs(yaw))) * dx * (yaw > 0 ? -1 : 1) * (turned ? 0 : 1);
+    if (!turned || rng.next() < 0.5) {
+      const leans = rng.int(1, 3);
+      for (let k = 0; k < leans; k++) {
+        const dx = rng.range(-2.4, 2.4) * (turned ? 0.35 : 1);
+        const lr = rng.next();
+        const fz = faceZ(dx);
+        if (lr < 0.3) ladders.add(x + dx, floorY, fz + 0.86, rng.range(-0.05, 0.05), 1, [0x8a8a80, 0xd8a020, 0x5a5a5a][rng.int(0, 2)]!);
+        else if (lr < 0.65) {
+          for (let j = 0, pn = rng.int(2, 4); j < pn; j++) leanPlanks.add(x + dx + j * 0.26, floorY, fz + 0.94 + rng.range(-0.04, 0.04), rng.range(-0.06, 0.06), 1, null, 0, rng.range(0.8, 1.05), 1);
+        } else if (lr < 0.85) leanPallets.add(x + dx, floorY, fz + 0.28, rng.range(-0.06, 0.06));
+        else kit.tarps.add(x + dx, top + 0.05, fz + 0.1, 0, rng.range(0.6, 0.9), tarpColors[rng.int(0, 3)]!, 0, rng.range(0.5, 0.8), 1); // a tarp draped over the front edge
+        shadowAt(x + dx, floorY, fz + 0.5, 0.5, 0.35);
+      }
+    }
+    // A low lamp in front of the row: floor + 5.0 (≈ deck + 2), z −3.9 — the pool lands on the front face and the deck.
+    if (unit % 3 === 1) kit.hangLamp(x + rng.range(-1.5, 1.5), floorY + 5.0 + rng.range(-0.2, 0.3), -3.9 + rng.range(-0.2, 0.2));
+    // A chain and hook off the truss above, now and then.
+    if (rng.next() < 0.4) {
       const hy = top + rng.range(2.2, 3.6);
-      hangChains.add(x + rng.range(-2, 2), roofY - 1.4, z, 0, 1, null, 0, roofY - 1.4 - hy, 1);
-      hooks.add(x + rng.range(-2, 2), hy - 0.7, z);
+      hangChains.add(x + rng.range(-2, 2), roofY - 1.4, cz, 0, 1, null, 0, roofY - 1.4 - hy, 1);
+      hooks.add(x + rng.range(-2, 2), hy - 0.7, cz);
     }
   }
   // Pallet racks standing on the floor between the containers (top at floor + 4 ≈ deck + 1).
@@ -1084,5 +1316,5 @@ function dressDeckLevel(track: CompiledTrack, rng: Rng, floorY: number, keepOut:
   // Floor under the deck edges (visible in the idle 3/4 view and on wide pull-backs): contact
   // shadows under the existing floor clutter are cheap, so scatter a little there too.
   for (let x = kit.x0 + 10; x < kit.x1 - 10; x += rng.range(6, 12)) scatter(x, floorY, rng.range(-9, -4.5), 3, 2, 0.25);
-  out.batches.push(shadows, oil, crates, bundles, plankEnds, carts, bottles, tyreFlat, drumLying, paper, gravel, bolts, hangChains, hooks, racksNear);
+  out.batches.push(shadows, oil, crates, bundles, plankEnds, carts, bottles, tyreFlat, drumLying, paper, gravel, bolts, hangChains, hooks, racksNear, ladders, leanPlanks, leanPallets);
 }

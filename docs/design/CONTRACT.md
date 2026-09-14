@@ -203,6 +203,11 @@ interface GameRenderer {                 // existing +
   camera(): { pos: Vec2; dist: number; bikeScreenX: number; bikeScreenY: number; bikeHeightFrac: number };
   setRunInfo(info: { runTime: number; phase: GamePhase }): void;   // for kinetic text
   setGhost?(state: PhysicsState | null): void;  // PB ghost bike, drawn translucent; game steps it in lockstep
+  // v2 additive: render (round 11). Repaint the hero to the class livery — Rookie = blue plastics, white
+  // plate #7; Pro = charcoal / gunmetal / raw-alloy, yellow plate #1 — for both the procedural and the glTF
+  // bike. Materials only (no rebuild, no frame skipped); default 'rookie' when never called. core-game calls
+  // it on garage preview and track launch (`App.onBikeChange`).
+  setBikeClass?(c: BikeClass): void;
 }
 interface AudioSystem {                  // existing +
   update(state: PhysicsState, dt: number, input: InputFrame): void;

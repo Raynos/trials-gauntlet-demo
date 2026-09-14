@@ -35,7 +35,7 @@ export const SURFACE_MATERIAL: Record<SurfaceKind, string> = {
 export class MaterialLibrary {
   private readonly mats = new Map<string, THREE.MeshStandardMaterial>();
   private readonly sets: TexSet[] = [];
-  private readonly derived: { base: THREE.MeshStandardMaterial; mat: THREE.MeshStandardMaterial }[] = [];
+  private readonly derived: { base: THREE.MeshStandardMaterial; mat: THREE.MeshStandardMaterial; hero?: boolean; mapAtDerive: THREE.Texture | null }[] = [];
   private generated = false;
   /** 2x2 neutral maps: every MeshStandardMaterial carries the same map set → one program variant. */
   private readonly flat = flatSet();
@@ -151,13 +151,44 @@ export class MaterialLibrary {
     const base = this.get(name);
     const m = fogify(base.clone());
     m.name = '';
-    this.derived.push({ base, mat: m });
+    this.derived.push({ base, mat: m, mapAtDerive: m.map });
     if (this.generated) this.copyMaps(base, m);
     return m;
   }
 
-  private copyMaps(base: THREE.MeshStandardMaterial, m: THREE.MeshStandardMaterial): void {
-    m.map = base.map;
+  /**
+   * Round 11 (liveries): a per-instance clone of a hero material. Like `derive` it receives the
+   * procedural map set when that is generated, but it is NOT fogified (hero materials never are —
+   * same program variant as the rest of the bike), maps already set on it are kept (the number
+   * plate canvas) and its colour / roughness / metalness are never copied back over.
+   */
+  deriveHero(name: string): THREE.MeshStandardMaterial {
+    const base = this.get(name);
+    const m = base.clone();
+    m.name = '';
+    this.derived.push({ base, mat: m, hero: true, mapAtDerive: m.map });
+    if (this.generated) this.copyMaps(base, m, true);
+    return m;
+  }
+
+  private copyMaps(base: THREE.MeshStandardMaterial, m: THREE.MeshStandardMaterial, hero = false, mapAtDerive: THREE.Texture | null = null): void {
+    if (hero) {
+      if (!m.map || m.map === base.map) m.map = base.map;
+      if (!m.normalMap) m.normalMap = base.normalMap;
+      m.normalScale.copy(base.normalScale);
+      if (!m.roughnessMap) m.roughnessMap = base.roughnessMap;
+      if (!m.metalnessMap) m.metalnessMap = base.metalnessMap;
+      if (!m.aoMap) m.aoMap = base.aoMap;
+      m.aoMapIntensity = base.aoMapIntensity;
+      if (!m.emissiveMap) m.emissiveMap = base.emissiveMap;
+      m.needsUpdate = true;
+      return;
+    }
+    // Round 11: a derived material that set its OWN albedo (the hall's eight container skins,
+    // `hall.ts containerSkin`) keeps it — this copy used to replace the skins with the generic
+    // container map on the first world of every session (built before `generateTextures`), so
+    // load 1 and load 2 of the same track drew different containers (49 vs 70 MB of textures).
+    if (!m.map || m.map === mapAtDerive || m.map === base.map) m.map = base.map;
     m.normalMap = base.normalMap;
     m.normalScale.copy(base.normalScale);
     m.roughnessMap = base.roughnessMap;
@@ -274,7 +305,7 @@ export class MaterialLibrary {
     // Wet asphalt keeps a low roughness scalar over the concrete ORM (reflections of the neon/sky).
     this.get('asphaltWet').roughness = 0.35;
     for (const m of this.mats.values()) this.complete(m);
-    for (const d of this.derived) this.copyMaps(d.base, d.mat);
+    for (const d of this.derived) this.copyMaps(d.base, d.mat, d.hero === true, d.mapAtDerive);
   }
 
   /** Generate every remaining job synchronously (the render() fallback: one deterministic step). */

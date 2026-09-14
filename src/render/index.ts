@@ -6,7 +6,7 @@
  * captures of one recording are pixel-identical. See docs/design/rendering.md.
  */
 import * as THREE from 'three';
-import type { CameraDebug, CompiledTrack, GameEvent, GamePhase, PhysicsState, QualityTier, RenderStats } from '../core/types';
+import type { BikeClass, CameraDebug, CompiledTrack, GameEvent, GamePhase, PhysicsState, QualityTier, RenderStats } from '../core/types';
 import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
@@ -50,6 +50,13 @@ export interface GameRenderer {
   whenReady?(): Promise<void>;
   /** Cooperative startup for a loading screen: chunked ≤ 16 ms tasks, `report(done, total, label)`. */
   prepare?(report: (done: number, total: number, label?: string) => void): Promise<void>;
+  /**
+   * v2 additive (render, round 11): repaint the hero to the bike class livery — Rookie = blue
+   * plastics, white plate #7; Pro = charcoal / gunmetal / raw alloy, yellow plate #1. Applies to
+   * the procedural and the glTF bike; default 'rookie' when never called. Safe at any time
+   * (materials only; no rebuild, no frame skipped).
+   */
+  setBikeClass?(c: BikeClass): void;
 }
 
 export interface ThreeRendererOptions {
@@ -110,6 +117,8 @@ export class ThreeRenderer implements GameRenderer {
   private bikeRef: HeroBike | null = null;
   private riderRef: HeroRider | null = null;
   private models: ModelChoices = { riderModel: 'proc', bikeModel: 'proc' };
+  private readonly nearestScratch: number[] = [];
+  private bikeClass: BikeClass = 'rookie';
   private readonly gltf: { bike: GLTF | null; rider: GLTF | null } = { bike: null, rider: null };
   /** In-flight setModels (glTF load + swap); `whenReady` waits for it. */
   private heroPending: Promise<void> = Promise.resolve();
@@ -254,6 +263,7 @@ export class ThreeRenderer implements GameRenderer {
     if (this.bikeRef && this.riderRef) return;
     if (!this.bikeRef) {
       this.bikeRef = new BikeModel(this.lib);
+      this.bikeRef.setLivery(this.bikeClass);
       this.scene.add(this.bikeRef.root);
       if (this.track) this.bindGround(this.track);
     }
@@ -333,6 +343,7 @@ export class ThreeRenderer implements GameRenderer {
     let changed = false;
     if (this.kindOfBike(this.bike) !== wantBike) {
       const next = this.makeBike(wantBike);
+      next.setLivery(this.bikeClass);
       const old = this.bike;
       next.placer.copyFrom(old.placer);
       next.ground = old.ground;
@@ -625,6 +636,7 @@ export class ThreeRenderer implements GameRenderer {
       const mats = Array.isArray(mesh.material) ? mesh.material : mesh.material ? [mesh.material] : [];
       for (const m of mats) if ((m as THREE.MeshStandardMaterial).isMeshStandardMaterial) this.lib.complete(m as THREE.MeshStandardMaterial);
     });
+    harmonizeUv1(group);
     this.scene.add(group);
     this.world = {
       group,
@@ -645,24 +657,28 @@ export class ThreeRenderer implements GameRenderer {
       lampLights: [],
     };
     if (this.biome.lampLights && kit.lamps.length) {
-      // Round 10 recipe: the sodium high-bays are a real second key. Two spots (no shadow map;
-      // the cone decal + puddle carry the volumetric read) sit on the two lamp heads nearest the
-      // camera target every frame — a pure function of state, like the foundry melt lights.
+      // Round 10 recipe: the sodium high-bays are a real second key. N spots (no shadow map; the
+      // cone decal + puddle carry the volumetric read) sit on the N lamp heads nearest the camera
+      // target every frame — a pure function of state, like the foundry melt lights.
       const L = this.biome.lampLights;
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < (L.count ?? 2); i++) {
         const sl = new THREE.SpotLight(L.color, L.intensity, L.distance, L.angle, L.penumbra, 2);
         sl.castShadow = false;
         group.add(sl, sl.target);
         this.world.lampLights.push(sl);
       }
     }
-    if (this.biome.id === 'foundry' && kit.fountains.length) {
-      // Camera-following melt lights: the two nearest pours / furnace mouths light the kit and
-      // the hero from below (no GI; the emissive melt lights nothing by itself).
-      for (let i = 0; i < 2; i++) {
-        const pl = new THREE.PointLight(0xff7a22, 140, 34, 2);
-        group.add(pl);
-        this.world.meltLights.push(pl);
+    if (kit.fountains.length) {
+      // Camera-following melt / fire lights (round 11: count + colour per biome, `Biome.meltLights`):
+      // the N nearest pours / furnace mouths light the kit and the hero from below (no GI; the
+      // emissive melt lights nothing by itself).
+      const M = this.biome.meltLights ?? (this.biome.id === 'foundry' ? { color: 0xff7a22, intensity: 140, distance: 34, count: 2 } : null);
+      if (M) {
+        for (let i = 0; i < M.count; i++) {
+          const pl = new THREE.PointLight(M.color, M.intensity, M.distance, 2);
+          group.add(pl);
+          this.world.meltLights.push(pl);
+        }
       }
     }
     const profile = track.def.profile;
@@ -744,6 +760,13 @@ export class ThreeRenderer implements GameRenderer {
     });
     this.scene.add(root);
     return { root, bike, rider, mats };
+  }
+
+  setBikeClass(c: BikeClass): void {
+    this.bikeClass = c === 'pro' ? 'pro' : 'rookie';
+    // The hero may not exist yet (built lazily by `ensureHero` / swapped by `applyModels`): both
+    // paths read `bikeClass`, so a call before the first frame still lands.
+    this.bikeRef?.setLivery(this.bikeClass);
   }
 
   setQuality(tier: QualityTier): void {
@@ -831,66 +854,37 @@ export class ThreeRenderer implements GameRenderer {
       }
       for (const s of w.scroll) s.tex.offset.set((s.vx * f.tSim) % 1, (s.vy * f.tSim) % 1);
       if (w.meltLights.length) {
-        // Two nearest melt sources to the camera target (deterministic: pure function of state).
-        const tx = this.rig.targetX;
-        let a = -1;
-        let b = -1;
-        let da = Infinity;
-        let db = Infinity;
-        for (let i = 0; i < w.fountains.length; i++) {
-          const d = Math.abs(w.fountains[i]!.x - tx);
-          if (d < da) {
-            b = a;
-            db = da;
-            a = i;
-            da = d;
-          } else if (d < db) {
-            b = i;
-            db = d;
-          }
-        }
-        [a, b].forEach((idx, k) => {
+        // N nearest melt sources to the camera target (deterministic: pure function of state).
+        const M = this.biome.meltLights ?? { intensity: 140 };
+        nearestK(w.fountains, this.rig.targetX, w.meltLights.length, this.nearestScratch);
+        for (let k = 0; k < w.meltLights.length; k++) {
           const pl = w.meltLights[k]!;
+          const idx = this.nearestScratch[k]!;
           if (idx < 0) {
             pl.intensity = 0;
-            return;
+            continue;
           }
           const s = w.fountains[idx]!;
           pl.position.set(s.x, s.y + 1.2, s.z + 2.5);
           const flick = 1 + 0.12 * Math.sin(17 * f.tSim + idx) * Math.sin(5.1 * f.tSim);
-          pl.intensity = 140 * flick;
-        });
+          pl.intensity = M.intensity * flick;
+        }
       }
       if (w.lampLights.length) {
-        const tx = this.rig.targetX;
-        let a = -1;
-        let b = -1;
-        let da = Infinity;
-        let db = Infinity;
-        for (let i = 0; i < w.lamps.length; i++) {
-          const d = Math.abs(w.lamps[i]!.x - tx);
-          if (d < da) {
-            b = a;
-            db = da;
-            a = i;
-            da = d;
-          } else if (d < db) {
-            b = i;
-            db = d;
-          }
-        }
-        [a, b].forEach((idx, k) => {
+        nearestK(w.lamps, this.rig.targetX, w.lampLights.length, this.nearestScratch);
+        for (let k = 0; k < w.lampLights.length; k++) {
           const sl = w.lampLights[k]!;
+          const idx = this.nearestScratch[k]!;
           if (idx < 0) {
             sl.intensity = 0;
-            return;
+            continue;
           }
           const l = w.lamps[idx]!;
           sl.position.set(l.x, l.y - 0.2, l.z);
           sl.target.position.set(l.x, l.y - 8, l.z + 0.6);
           sl.target.updateMatrixWorld();
           sl.intensity = this.biome.lampLights!.intensity;
-        });
+        }
       }
       // Crowd: cheer for 3.5 s after GO and through the finish; sway otherwise.
       const cheer = this.phase === 'finished' || f.finished || (this.phase === 'riding' && this.runTime < 3.5) ? 1 : 0;
@@ -916,7 +910,39 @@ export class ThreeRenderer implements GameRenderer {
     this.renderer.info.reset();
     this.post.render();
     this.frameCount++;
+    // Round 11 program census: three keeps every program a material ever compiled with until the
+    // material is disposed, and a handful of world materials (the deck AO decal, the light shafts,
+    // the lamp cones) compile once during boot / the art-landed rebuild with a texture-channel
+    // state they no longer have — 3 dead programs on b1 (47 → 42 → 39 with the other cuts). Once
+    // per world, three frames after it was built, drop each material's non-current programs.
+    if (this.world && this.frameCount === this.world.builtAtFrame + 3) this.pruneStalePrograms();
     return performance.now() - t0;
+  }
+
+  /** Release the programs a material is no longer using (see `render()`); a no-op on a clean session. */
+  private pruneStalePrograms(): void {
+    type Prog = { cacheKey: string; usedTimes: number; destroy(): void };
+    const list = this.renderer.info.programs as unknown as Prog[] | null;
+    if (!list) return;
+    const seen = new Set<THREE.Material>();
+    this.scene.traverse((o) => {
+      const m = (o as THREE.Mesh).material;
+      for (const mat of Array.isArray(m) ? m : m ? [m] : []) {
+        if (seen.has(mat)) continue;
+        seen.add(mat);
+        const p = this.renderer.properties.get(mat) as { programs?: Map<string, Prog>; currentProgram?: Prog } | undefined;
+        if (!p?.programs || p.programs.size < 2 || !p.currentProgram) continue;
+        for (const [key, prog] of p.programs) {
+          if (prog === p.currentProgram) continue;
+          p.programs.delete(key);
+          if (--prog.usedTimes === 0) {
+            const i = list.indexOf(prog);
+            if (i >= 0) list.splice(i, 1);
+            prog.destroy();
+          }
+        }
+      }
+    });
   }
 
   finish(): void {
@@ -1044,6 +1070,44 @@ export class ThreeRenderer implements GameRenderer {
 }
 
 /** Unmasked renderer string when the debug extension is available. */
+/** Indices of the `k` sources nearest `x` (ascending distance; −1 pads), insertion-sorted into `out`. */
+function nearestK(src: { x: number }[], x: number, k: number, out: number[]): number[] {
+  out.length = k;
+  for (let i = 0; i < k; i++) out[i] = -1;
+  for (let i = 0; i < src.length; i++) {
+    const d = Math.abs(src[i]!.x - x);
+    let j = k - 1;
+    if (out[j]! >= 0 && Math.abs(src[out[j]!]!.x - x) <= d) continue;
+    while (j > 0 && (out[j - 1]! < 0 || Math.abs(src[out[j - 1]!]!.x - x) > d)) {
+      out[j] = out[j - 1]!;
+      j--;
+    }
+    out[j] = i;
+  }
+  return out;
+}
+
+/**
+ * Round 11 program census: three's program cache key includes `vertexUv1s` (does the geometry
+ * carry a `uv1` attribute). AO-baked geometries have one, plain ones do not, and `lib.complete`
+ * gives every standard material an `aoMap` — so the same world material compiled TWICE (b1: the
+ * big standard+vertexColour variant, `deck:ao`, the light shafts, the lamp cones: 4 programs for
+ * nothing). Every world geometry now carries `uv1` as an alias of `uv` (same BufferAttribute,
+ * no memory), so one material is one program whatever it is drawn on.
+ */
+function harmonizeUv1(root: THREE.Object3D): void {
+  const seen = new Set<THREE.BufferGeometry>();
+  root.traverse((o) => {
+    const g = (o as THREE.Mesh).geometry;
+    if (!g || seen.has(g)) return;
+    seen.add(g);
+    if (!g.getAttribute('uv1')) {
+      const uv = g.getAttribute('uv');
+      if (uv) g.setAttribute('uv1', uv);
+    }
+  });
+}
+
 export function describeRenderer(gl: WebGLRenderingContext | WebGL2RenderingContext): string {
   const ext = gl.getExtension('WEBGL_debug_renderer_info');
   if (ext) {

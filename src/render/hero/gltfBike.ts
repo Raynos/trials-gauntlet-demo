@@ -13,6 +13,9 @@ import { BIKE, ContactBlob, FramePlacer, type HeroBike } from '../bike/bikeModel
 import { WHEEL_RADIUS, type RenderFrame } from '../frame';
 import type { MaterialLibrary } from '../materials/library';
 import { countTriangles, prepareHeroMaterials } from './gltf';
+import type { BikeClass } from '../../core/types';
+import { applyPlate, LIVERIES } from '../bike/livery';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 const FILE = {
   /** axle-midpoint frame → file frame (rear axle origin). */
@@ -37,6 +40,13 @@ export class GltfBike implements HeroBike {
   ground: ((x: number) => { y: number; angle: number }) | null = null;
   /** Materials of this instance (for ghost tinting). */
   readonly materials: THREE.MeshStandardMaterial[];
+  /** Livery targets (round 11): own clones of the atlas material for the plastics and the frame, + add-on plates. */
+  private readonly liveryMats: { body: THREE.MeshStandardMaterial | null; frame: THREE.MeshStandardMaterial | null; plate: THREE.MeshStandardMaterial };
+  private readonly atlasBody = new THREE.Color(1, 1, 1);
+  private readonly atlasFrame = new THREE.Color(1, 1, 1);
+  private atlasBodyRough = 1;
+  private readonly tint = new THREE.Color();
+  private livery: BikeClass = 'rookie';
   private readonly scene: THREE.Object3D;
   private readonly nodes: Record<string, THREE.Object3D | null>;
   private readonly rearBlob = new ContactBlob();
@@ -62,9 +72,51 @@ export class GltfBike implements HeroBike {
       }
       m.material = c;
     });
+    // Livery: the plastics and the frame get their own atlas clones so a class tint touches
+    // nothing else (engine, wheels, exhaust stay as authored).
+    const own = (name: string): THREE.MeshStandardMaterial | null => {
+      const mesh = this.scene.getObjectByName(name) as THREE.Mesh | undefined;
+      const src = mesh?.material as THREE.MeshStandardMaterial | undefined;
+      if (!mesh || !src?.isMeshStandardMaterial) return null;
+      const c = src.clone();
+      mesh.material = c;
+      return c;
+    };
+    const bodyMat = own('bodywork');
+    const frameMat = own('frame');
     this.materials = prepareHeroMaterials(this.scene, (m) => lib.complete(m));
+    if (bodyMat) {
+      this.atlasBody.copy(bodyMat.color);
+      this.atlasBodyRough = bodyMat.roughness;
+    }
+    if (frameMat) this.atlasFrame.copy(frameMat.color);
+    // Add-on number plates (the atlas has none): front plate off the bars, one per side under the seat.
+    const plateMat = lib.deriveHero('numberPlate');
+    applyPlate(plateMat, 'rookie');
+    this.liveryMats = { body: bodyMat, frame: frameMat, plate: plateMat };
+    this.materials.push(plateMat);
+    const plates = new THREE.Group();
+    plates.name = 'plates';
+    const front = new THREE.Mesh(new RoundedBoxGeometry(0.012, 0.17, 0.16, 2, 0.02), plateMat);
+    front.position.set(0.43, 0.8, 0);
+    front.rotation.z = -0.35;
+    plates.add(front);
+    for (const sd of [-1, 1]) {
+      const side = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.006, 20).rotateX(Math.PI / 2), plateMat);
+      side.scale.set(1.15, 1, 1);
+      side.position.set(-0.5, 0.42, sd * 0.13);
+      side.rotation.y = sd * 0.08;
+      plates.add(side);
+    }
+    plates.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (m.isMesh) {
+        m.castShadow = true;
+        m.frustumCulled = false;
+      }
+    });
     this.scene.position.set(-FILE.shift, 0, 0);
-    this.frame.add(this.scene);
+    this.frame.add(this.scene, plates);
     this.root.add(this.frame, this.rearBlob.mesh, this.frontBlob.mesh);
     this.root.name = 'bike:gltf';
     this.contacts = [this.rearBlob.mesh, this.frontBlob.mesh];
@@ -153,7 +205,21 @@ export class GltfBike implements HeroBike {
     return out.set(x, y, z).applyMatrix4(this.frameLocal);
   }
 
+  setLivery(cls: BikeClass): void {
+    if (cls === this.livery) return;
+    this.livery = cls;
+    const L = LIVERIES[cls];
+    const M = this.liveryMats;
+    if (M.body) {
+      M.body.color.copy(this.atlasBody).multiply(this.tint.setRGB(L.gltfBody[0], L.gltfBody[1], L.gltfBody[2]));
+      M.body.roughness = Math.min(1, this.atlasBodyRough * L.gltfBodyRough);
+    }
+    if (M.frame) M.frame.color.copy(this.atlasFrame).multiply(this.tint.setRGB(L.gltfFrame[0], L.gltfFrame[1], L.gltfFrame[2]));
+    applyPlate(M.plate, cls);
+  }
+
   dispose(): void {
     for (const m of this.materials) m.dispose();
+    this.frame.getObjectByName('plates')?.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
   }
 }

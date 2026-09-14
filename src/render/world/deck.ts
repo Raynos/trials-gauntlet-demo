@@ -274,7 +274,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   // only for the last < 0.45 m.
   const crates = new PropBatch('support-crate', bakeAO(new THREE.BoxGeometry(2.2, 1, 2.2).translate(0, 0.5, 0), 1, 0.3), lib.get('plywood'), false);
   const containers = new PropBatch('support-container', bakeAO(containerGeometry(), 2.59, 0.4), lib.get('container'));
-  const palette = [0x1f5a4a, 0x7a2418, 0x1e3d66, 0x46463e, 0x8a5a1e, 0x2e5a2a];
+  const palette = [0x2f7a66, 0x9a3424, 0x2e5588, 0x5e5e54, 0xa8722a, 0x3e7238, 0x6a6a62, 0x7a4a3a]; // round 11: the support wall is the bottom third of the high riding frame — lifted so it is not a black band
 
   for (const c of track.colliders) {
     if (c.kind !== 'polyline' || c.points.length < 2) continue;
@@ -354,14 +354,53 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   if (interior) {
     const prof = track.def.profile;
     const deckBottom = 0.12;
+    // Round 11: the under-deck steel read as 0.08 m sticks. A real frame: four I-section posts
+    // (flange 0.18 m + web), top beams along z and x, X-bracing in the two camera-facing end
+    // planes (z ±1.2), gusset plates at every post / beam joint and base plates on the floor —
+    // all merged into the one `rustSteel` bucket (one draw call per material for the whole
+    // track), darkened per member so the rust reads as weathered, not one flat tone.
+    const rustMember = (): [number, number, number] => {
+      const k = rng.range(0.55, 0.9);
+      return [k, k * rng.range(0.9, 1.0), k * rng.range(0.82, 0.95)];
+    };
+    const member = (w: number, hh: number, d: number, px: number, py: number, pz: number, rz = 0): void => {
+      const [r, g, b] = rustMember();
+      push(buckets, 'rustSteel', tint(box(w, hh, d, px, py, pz, rz), r, g, b));
+    };
+    const steelFrame = (x: number, base: number, h: number): void => {
+      const fw = 0.18; // flange width
+      const ft = 0.018; // flange thickness
+      const web = 0.012;
+      for (const dx of [-0.95, 0.95]) {
+        for (const z of [-1.2, 1.2]) {
+          // I-section post: two flanges (facing ±x) and a web; the flanges are what the camera sees.
+          member(ft, h, fw, x + dx - (fw - ft) / 2, base + h / 2, z);
+          member(ft, h, fw, x + dx + (fw - ft) / 2, base + h / 2, z);
+          member(fw - 2 * ft, h, web, x + dx, base + h / 2, z);
+          member(0.32, 0.02, 0.32, x + dx, base + 0.01, z); // base plate
+          member(0.26, 0.24, 0.02, x + dx, base + h - 0.24, z + (z < 0 ? -0.1 : 0.1)); // gusset at the head
+        }
+        member(0.16, 0.14, 2.6, x + dx, base + h - 0.07, 0); // top beam across (along z)
+      }
+      // Longitudinal top beams (along x) on the two faces, and a mid rail when the frame is tall.
+      for (const z of [-1.2, 1.2]) {
+        member(2.1, 0.14, 0.16, x, base + h - 0.07, z);
+        if (h > 2.0) member(1.9, 0.1, 0.12, x, base + h * 0.5, z);
+      }
+      // X-bracing in the two end planes: two flats from foot to head, crossing at the middle.
+      const L = Math.hypot(1.9, h - 0.3);
+      const ang = Math.atan2(h - 0.3, 1.9);
+      for (const z of [-1.2, 1.2]) {
+        member(L, 0.08, 0.03, x, base + h / 2, z + (z < 0 ? -0.08 : 0.08), ang);
+        member(L, 0.08, 0.03, x, base + h / 2, z + (z < 0 ? -0.08 : 0.08), -ang);
+        member(0.3, 0.3, 0.02, x, base + h / 2, z + (z < 0 ? -0.1 : 0.1)); // centre gusset
+      }
+    };
     // Fill `h` metres above `base` at slot `x` with the cheapest thing that reads as a support.
     const fill = (x: number, base: number, h: number): void => {
       if (h < 0.1) return;
       if (h >= 1.3) {
-        for (const dx of [-0.9, 0.9]) {
-          for (const z of [-1.2, 1.2]) push(buckets, 'darkSteel', tint(box(0.08, h, 0.08, x + dx, base + h / 2, z, 0), 0.7, 0.7, 0.7));
-          push(buckets, 'darkSteel', tint(box(0.08, 0.08, 2.5, x + dx, base + h - 0.04, 0, 0), 0.7, 0.7, 0.7));
-        }
+        steelFrame(x, base, h);
       } else if (h >= 0.45) {
         crates.add(x + rng.range(-0.02, 0.02), base, rng.range(-0.04, 0.04), rng.range(-0.02, 0.02), 1, null, 0, h, 1);
       } else {
@@ -418,8 +457,8 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   if (interior) {
     const [c, g] = canvas(4, 64);
     const gr = g.createLinearGradient(0, 0, 0, 64);
-    gr.addColorStop(0, 'rgba(0,0,0,0.45)'); // round 10: 0.7 was a black void under the deck at idle now that SSAO + contact decals exist
-    gr.addColorStop(0.35, 'rgba(0,0,0,0.18)');
+    gr.addColorStop(0, 'rgba(0,0,0,0.3)'); // round 11: 0.3 (the high camera frames the whole skirt); round 10: 0.7 was a black void under the deck at idle now that SSAO + contact decals exist
+    gr.addColorStop(0.35, 'rgba(0,0,0,0.1)');
     gr.addColorStop(1, 'rgba(0,0,0,0)');
     g.fillStyle = gr;
     g.fillRect(0, 0, 4, 64);
@@ -468,7 +507,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     fogify(mat);
     const mesh = new THREE.Mesh(merged, mat);
     mesh.receiveShadow = true;
-    mesh.castShadow = matName !== 'dirt' && matName !== 'concrete' && matName !== 'snow';
+    mesh.castShadow = matName !== 'dirt' && matName !== 'concrete' && matName !== 'snow' && matName !== 'rustSteel'; // round 11: the under-deck frames (rustSteel, 51 k tris on b1) live in the deck's own shadow — no caster
     mesh.name = `deck:${matName}`;
     group.add(mesh);
     triangles += triCount(merged);

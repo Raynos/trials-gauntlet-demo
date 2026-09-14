@@ -100,9 +100,9 @@ distance is solved from the target height fraction: `d = (1.9 / hf / 2) / tan(fo
 | State | Trigger | heightFrac | screenX (moving right) | screenY | yaw | pitch |
 |---|---|---|---|---|---|---|
 | idle / countdown | speed < 1.0 (enter riding at 2.2) | 0.40 | 0.45 | 0.55 | 20° | 10° (3/4 view: depth reads before GO) |
-| riding | 2.2–10 m/s | 0.26 | 0.30 | 0.56 | 15° | 11° |
-| pull-back | 10 → 18 m/s, `smoothstep` | 0.26 → 0.14 | 0.28 | 0.56 | 17° | 13° |
-| fast / air | speed > 18, or airTime > 0.25 s (70 % of the way) | 0.14 | 0.28 | 0.53 | 17° | 13° (+4° airborne) |
+| riding | 2.2–10 m/s | 0.26 | 0.34 | 0.56 | 18° | 18° (round 11; every course's `side` key overrides to 16° / 21°) |
+| pull-back | 10 → 18 m/s, `smoothstep` | 0.26 → 0.16 | 0.36 | 0.56 | 19° | 22° |
+| fast / air | speed > 18, or airTime > 0.25 s (70 % of the way) | 0.16 | 0.36 | 0.53 | 19° | 22° |
 
 Round 4 measured on `flat-test-clear` (`camera().bikeHeightFrac`, smoothers included): 0.399 idle;
 0.288 @ 8.7 m/s; 0.278 @ 10.3; 0.268 @ 11.9; 0.234 @ 14.9 (t = 1.8 s); 0.189 @ 17.1; 0.147 @ 19.5;
@@ -139,7 +139,7 @@ smoother snapped). **Countdown/menu** (`setRunInfo.phase`): idle params held.
 
 `meta.camera` keys: while `bikeX ∈ [x0, x1]` a per-key weight follows 1 (half-life `blend/3`,
 or snaps when `cut`); `yaw/pitch/roll` override, `zoomBias` scales heightFrac by `1 − 0.6·bias`,
-`dist` converts to a heightFrac at the current fov. Modes: `side` (5°/4°), `side-tight` (+bias
+`dist` converts to a heightFrac at the current fov. Modes (round 11): `side` (16°/21° — the reference riding camera; every course authors it), `side-tight` (14°/19°, bias
 −0.5), `high34` (30°/48°), `low` (14°/−8°).
 
 ## 4. Lighting, shadows, fog (`lighting/environment.ts`, `biomes/index.ts`)
@@ -859,11 +859,167 @@ until that default flips to `'gltf'` — one-line change on their side. Ragdoll 
 rig is a fixed **2-frame** slerp (3 above a 0.25 m pelvis residual; physics' crash chain is now a
 port of `pose.ts`).
 
-## 12. Known gaps after round 10 (what still reads non-AAA, and what the coordinator asked for that is not done)
+## 11f. Round 11 (mega build wave 2) — the world reads as a place, every biome
 
-- **Industrial, honest read of the final two-up:** the mid-tier container row still reads as a flat wall (uniform height, front faces evenly lit — needs gaps, turned units, things leaning on them and the lamps hanging *in front* of them); the under-deck steel frames read as thin sticks; the shadow floor is 17–21 % of pixels under 0.08 against the reference 2 % (floor fog lift or a 0.01 grade lift); saturation 1.3× the reference; the reference camera sits 20–25° down against our 15°. Wave-2 targets before propagating the recipe.
-- **Programs 45–47 with the glTF hero** (cap 40) — cut list in §11e.
-- **Session texture accumulation**: texMB 48.8 → 70.1 on a second `loadTrack` of the same session (hero-clip run); per-track numbers are clean.
+**Finding:** every course authors `camera: { mode: 'side' }` over almost its whole length and `side`
+meant yaw 5° / pitch 4°, so the round-10 recipe's 15° riding pitch never reached a real track (b1
+bot-3 measured **pitch 4°**, bike 13 % of frame height at 16.6 m/s, on the 0.20 edge of the gate
+box); `side` is now the reference riding camera (yaw 16° / pitch 21°), the rig aims for an inner
+[0.24, 0.76] band so the harness's [0.2, 0.8] gate passes with margin, and the five biomes carry the
+industrial recipe (real lamp / fire pools, 40–140 lit props in the riding frame, contact shadows,
+three tiers with content, a set piece per track, event gates) with programs at 39 (cap 40) and the
+"texture accumulation" traced to the session's first world drawing skinless containers.
+
+### Camera (`camera/rig.ts`)
+
+- `MODE.side = { yaw 16°, pitch 21° }`, `side-tight = { 14°, 19°, zoomBias −0.5 }` (were 5°/4° and
+  4°/2°); `high34` / `low` unchanged. State table: riding pitch 15° → **18°**, fast 21° → 22°,
+  pull-back floor heightFrac 0.14 → **0.16**, moving-right screenX 0.30/0.28 → 0.34/0.36, lookahead
+  capped at 8 % of the visible width (2.5 m was 12 % of a wide frame and pushed the bike itself onto
+  the box edge). Measured b1 bot-3 t700 (16.6 m/s): before pitch 4°, hf 0.133, bx 0.20 → after pitch
+  21°, hf 0.153, bx 0.29, by 0.53.
+- **Camera box reconciled with the harness.** `harness/capture.ts CAMERA_BOX` = [0.2, 0.8] (strict
+  `<`), the predecessor measured against [0.15, 0.85]. The round-10 clamp reframe tilted the bike onto
+  the 0.2 edge *exactly* (`edge = atan(0.6·tan(fov/2))`), so float jitter put 37 b3 frames at 0.1999 →
+  `camera.b3 FAIL`. The rig now slides / widens / tilts to `BAND_LO/HI = 0.24 / 0.76`. Harness clip on
+  the b3 golden, 20 fps `low`: **PASS 0/593 out (riding 0), bike y 0.24..0.649, x 0.314..0.793**,
+  clamped 207 (34.9 %; the camera sits higher now and the hall roof bound binds more — the FOV boost
+  path keeps the bike in box; not a failure). **Recommended gate box: keep [0.2, 0.8] on
+  `bikeScreenX/Y` while `phase === 'riding'`, settle-excluded, roll < 1e-6; do not gate on `clamped`.**
+- The high camera made the hall's front crane rail (z +12, floor + 12.2) a black band across the
+  upper third of every industrial frame: rail moved to z +2, bridge 26.5 m centred z −11, the
+  foreground hanging lamps / hook-tyres at z 4.5–7 disabled (`FOREGROUND_HANGS`). Rule: with the
+  riding camera ≈ 7.5 m above the bike and 18 m out, foreground (z > +3) elements above deck + 2 m
+  occlude — keep the foreground low.
+
+### Liveries — `setBikeClass(c)` (`bike/livery.ts`, `bike/bikeModel.ts`, `hero/gltfBike.ts`, CONTRACT §2.7)
+
+Rookie = the round-6 blue hero, white plate **#7**; Pro = charcoal plastics, gunmetal spars, raw-alloy
+cradle, yellow plate with a red **#1**. Procedural bike: four per-instance paint materials via
+`MaterialLibrary.deriveHero()` (not fogified, maps back-filled only where missing, colour /
+roughness never copied over — `derive()` would have wiped them when the textures generated). glTF
+bike: `bodywork` / `frame` get their own atlas clones tinted by multiplication (the atlas blue lives
+mostly on `frame`: body ×(0.7, 0.4, 0.06), frame ×(0.5, 0.36, 0.08) → dark), plus add-on plates (front
+off the bars, one per side) sharing the atlas's double-sided program. `setBikeClass` is safe before
+the hero exists (`ensureHero` / `applyModels` read `bikeClass`); the ghost keeps its grey derive.
+Evidence: `render5/livery/livery-sheet.jpg` (b1 bot-3 t330, both kits × both classes),
+`livery-gltf-idle.jpg`. Programs: +0 (probe: 45 → 45 across the call).
+
+### Programs 45–48 → 39 with the glTF hero (`index.ts harmonizeUv1 / pruneStalePrograms`, `props.ts`, `livery.ts`)
+
+The census (`render5/programs.mts`: material → `renderer.properties.get(m).programs`, cache-key diff
+per pair) found the over-cap was **duplicate variants of the same materials**, not too many materials:
+(1) three's key bit `instancingColor` — one library material shared by a coloured `PropBatch` and an
+uncoloured one compiled twice (darkSteel, barrelRed) → every chunk now carries `instanceColor`
+(white when unused); (2) key bit `vertexUv1s` (= a texture of the material uses uv channel 1, which
+`lib.complete`'s `aoMap` does) split the big standard+vertexColour world variant in two → every world
+geometry carries `uv1` as an alias of `uv` (same BufferAttribute, no memory); (3) three keeps every
+program a material ever compiled with until the material is disposed, and `deck:ao`, the light shafts
+and the lamp cones each held a dead program from boot / the art-landed rebuild → once per world, three
+frames after it is built, `pruneStalePrograms()` drops each material's non-current programs;
+(4) the plate material is double-sided so it shares the atlas variant. b1 47 → 42 → **39**, h3 39,
+h1 39 (one track per session, glTF hero, three renders). Per-session accumulation across biomes is
+still real (b1 → e1 → h3 → b1 read 61): the cap is defined per track.
+
+### "Texture accumulation" (49 → 70 MB on a second `loadTrack`) — not a leak (`materials/library.ts`, `hall.ts`)
+
+`texseq.mts` (one session, uuid-diffed tallies) showed the **first** industrial world of a session had
+no container skins at all: the eight 1024×512 skins are painted onto `lib.derive('container')`
+materials, and when `generateTextures()` ran afterwards its `copyMaps` replaced `map` with the
+generic container map (skin 0 was painted onto the shared library material itself and then leaked
+into every other biome). `copyMaps` now keeps an albedo the derived material set itself
+(`mapAtDerive`), every skin derives. b1 reads **70.5 MB on every load** (was 49 skinless / 70 with);
+b1 → e1 → h3 → b1 → m2 → h1: 70.5 / 52.5 / 72.2 / 70.5 / 40.2 / 60.0 — no growth, all under 96.
+
+### Biomes (builders: interiors, exteriors, city; numbers from `ride.mts` on the bot-3 goldens, `high`, glTF hero)
+
+| track (biome) | tick | props in frame before → after | calls / tris / programs / texMB after | lum p1 / p50 / p99 · <0.08 · sat · edge (after) | reference cell | two-up |
+|---|---|---|---|---|---|---|
+| b1 (industrial) | 700 | 72 → **139** (+139 structure) | 210 / 356 k / 45→39 / 49→70.5 | 0.076 / 0.203 / 0.532 · **2.0 %** · **0.279** · 0.042 (before 0.037 / 0.243 / 0.769 · 7.1 % · 0.270) | techniques 01 c5: 0.015 / 0.284 / 0.876 · 2.4 % · 0.279 · 0.013 | `render5/interiors/after/twoup-b1-vs-01.jpg` |
+| b3 (industrial) | 900 | 82 → 62 (+215) | 256 / 276 k / 39 / 49.6 | 0.078 / 0.206 / 0.565 · **1.4 %** · 0.270 · 0.043 | techniques 07 c9: 0.011 / 0.223 / 0.849 · 1.7 % · 0.217 | `interiors/after/twoup-b3-vs-07.jpg` |
+| h3 (foundry) | 700 | 87 → **94** (+145) | 234 / 288 k / 39 / 50.9 | 0.041 / **0.103** / 0.790 · 31.3 % · **0.731** · 0.047 (before p50 0.070 · 64.8 % · 0.955) | rising 12 c5: 0.013 / 0.106 / 0.780 · 27.1 % · 0.704 | `interiors/after/twoup-h3-vs-12c5.jpg` |
+| e1 (canyon) | 600 | 23 → **90** (+62) | 187 / 275 k / 36 / 52.5 | 0.077 / 0.278 / 0.683 · 1.3 % · 0.527 · 0.039 | rising 03 c6: 0.011 / 0.305 / 0.763 · 2.6 % · 0.499 | `exteriors/final/twoup-e1-t600.jpg` |
+| m2 (snow) | 600 | 24 → 46 (t1200: 95) | 157 / 275 k / 37 / 40.2 | 0.091 / 0.555 / 0.790 · 0.3 % · 0.354 · 0.048 (before p50 **0.842** · sat 0.133, 9 % blown) | rising 15 c1: 0.030 / 0.474 / 0.712 · 1.2 % · 0.389 | `exteriors/r4/twoup-m2-drum-roll-t600.jpg` |
+| x1 (snow) | 1200 | 24 → 92 | 180 / 368 k / 36 / 39.8 | 0.086 / 0.598 / 0.957 · 0.6 % · 0.280 · 0.077 | rising 15 c1 | `exteriors/r4/twoup-x1-vertical-limit-t1200.jpg` |
+| h1 (nightCity) | 1200 | 24 → 42 (t2700: 67) | 204 / 153 k / 40→39 / 62.2→60.0 | 0.049 / 0.119 / 0.969 · 15.3 % · 0.511 · 0.045 | rising 05 c6: 0.007 / 0.291 / 0.486 · 3.0 % · 0.640 | `city/twoup-h1-t1200-vs-05c6.jpg` |
+| h2 (nightCity) | 1200 | 26 → 48 | 178 / 222 k / 39 / 59.6 | 0.049 / 0.250 · 10.3 % · 0.482 | rising 05 c6 | `city/twoup-h2-t1200-vs-05c6.jpg` |
+
+What each biome got (details in the builders' blocks of `hall.ts`, `deck.ts`, `biomeKit.ts`, `gates.ts`,
+`biomes/index.ts`, `props.ts` append): **industrial** — irregular mid-tier row (25 % gaps, 18 % end-on,
+32 % yawed, 28 % two-high, ladders / planks / pallets leaning, tarps, a low sodium lamp hung *in front*
+every third unit), I-section under-deck steel with bracing / gussets / base plates (1 call per track,
+no shadow), floor fog 0.035 → 0.085 + a 0.0075 grade lift + lighter support palette (shadow floor
+26 % → 2 %), lamps count 3, set pieces b1 jib gantry / b2 container arch / b3 crane hook with a drum
+sling / m1 forklift lane, scaffold stand + banner tarp + gate lamp at start/finish. **foundry** — warm
+fill (hemi 0x7a5648 / 0x9a4020 × 2.4, exposure 1.7), four camera-following melt lights
+(`Biome.meltLights`), baked up-light (`PropBatch.tintNear`) over every batch near a source, slag pots on
+the far ledge, set pieces h3 pouring ladle over the line / m3 rolling mill / x2 pipe rack + launder /
+x3 furnace wall, red beacons at the gates, saturation pulled back to 0.70. **canyon** — sun from the
+camera side, cool fill, peach fog 50/130/300, boulders / snags / split-rail fence / tyre walls /
+spools / hay at deck level, strata silhouette tiers at z −95 / −150, terrain vertex colours, set
+pieces water tower / windmill / pickup / mine portal, light towers (real spots) + braziers + bleachers
+at the gates. **snow** — cold key, blue-white fog 13/36/72, exposure 0.8, seven-tier conifers with
+snow loads (≈ 440 tris, instanced, far rows no shadow), cabins / lift station with glowing windows,
+lanterns as real pools, braziers, log piles / sleds / pylons / chairs on a cable / ice curtain.
+**nightCity** — shop row moved to z −12, street kit z −12…+8 (cars, box truck as the foreground
+occluder, dumpsters, bollards, hydrants, scaffold hoardings, fire escapes, awnings, AC units,
+traffic lights, bus shelter, food cart), four nearest street lamps as real spots over the deck
+edge, fire barrels as melt lights, police lightbars / beacon flicker, lit 1024×256 skyline at z −85,
+lighting truss + LED wall + par-can beams at start/finish, set pieces viaduct + train (h1) / tower
+crane + site (h2); texMB 62.2 → 60.0.
+
+### Renderer plumbing this round (`index.ts`, `biomes/index.ts`, `props.ts`)
+
+`Biome.lampLights.count` and `Biome.meltLights { color, intensity, distance, count }` — N
+camera-following spots / points on the N nearest `kit.lamps` / `kit.fountains` (`nearestK`, no
+per-frame allocation). `PropBatch.build()` gives a vertex-coloured material on a geometry without a
+`color` attribute a white one (the canyon edge rock rendered as black rings — GL's last generic
+attribute value). `harmonizeUv1`, `pruneStalePrograms` as above.
+
+### Evidence (scratch `render5/`)
+
+`before/` (b1 t700 + two-up), `cam/` (camera-only b1 frames, `clip-b3.log` harness camera line),
+`livery/`, `interiors/`, `exteriors/`, `city/` (per-builder before / after frames and two-ups),
+`final/` (determinism pair `det-a` / `det-b` md5, b3 clip, `perf.log`), tooling `ride.mts` (played
+frames from a recording at given ticks + stats), `programs.mts` (program census), `texseq.mts`
+(session texture tally), `budget.mts`, `twoup.py`, `withlock.sh` (serial captures on the shared host).
+
+## 12. Known gaps after round 11 (what still reads non-AAA)
+
+- **Industrial mids / highlights**: p50 0.20 vs 0.284, p99 0.53 vs 0.876 — with the high camera the
+  window bank is out of frame and nothing pale is lit by the key; the far stacks (z −15 / −25) are a flat
+  blue-grey wash. Wants pale lit surfaces at deck level and a far tier with structure. The b1 jib gantry
+  beam sits at the top of the frame around x 110 (drop to floor + 9). Under-deck `deck:rustSteel` is one
+  unchunked 51 k-tri mesh on b1 (same known gap as the ride surfaces).
+- **Foundry**: uniform pink-red haze in the mid tier; the reference has deeper darks *between* saturated
+  glows; slag pots are bake-only. `<0.08` 31 % vs 27 % reference.
+- **Canyon**: mesas are still terraced "cakes" (banded now, regular rhythm); the far strata planes hide
+  behind the mesa shoulders in most riding frames; the `dirt` albedo reads dark and stippled under a low
+  sun (a ~1.4× brighter, lower-frequency dirt map would put the terrain median at the reference 0.305);
+  the idle frame is dim (sun behind the crowd).
+- **Snow**: cabins are plain dark boxes (one 512² plank map would fix it); string lights read as dots at
+  riding distance; crowd sheet is the summer row (request to art: `crowd-winter`).
+- **nightCity**: the lower 40 % of the riding frame (deck + wet asphalt) stays under 0.08 outside the lamp
+  pools (10–26 % vs 3 %); facades still read as flat window grids; the viaduct / train hides behind the
+  shop row at the 21° camera; screen-space blur at 20 m/s smears every neon edge.
+- **Camera**: clamped 35 % of b3 frames (the hall roof bound with the higher camera) — in box, but the
+  FOV boost widens those frames; a lower `maxY` bias for kicker tracks or an authored `low` key would
+  hold the tight frame. The `fast` pull-back (hf 0.15–0.16) still shrinks the near kit to specks; the
+  riding-state frames are where the density reads.
+- **Programs**: 39 per track with the glTF hero; a session that visits several biomes accumulates (61
+  after four loads across three biomes) because each biome's one-off materials add live variants. The
+  post chain is 12–13 of the 39 (UnrealBloom's five blur kernels): a two-program bloom is the next cut
+  if the cap tightens.
+- **Liveries**: the glTF Pro tint is a multiply on the atlas (dark charcoal-navy, not a repaint); a
+  second atlas from the art owner would give a true colourway. Plates are add-on quads on the glTF.
+- `twoup.py` assumes 4×4 sheets; the rising-visuals sheets are 4×2 (builders used tiled copies).
+
+### Carried from round 10
+
+
+- ~~(round 11)~~ **Industrial, honest read of the final two-up:** the mid-tier container row still reads as a flat wall (uniform height, front faces evenly lit — needs gaps, turned units, things leaning on them and the lamps hanging *in front* of them); the under-deck steel frames read as thin sticks; the shadow floor is 17–21 % of pixels under 0.08 against the reference 2 % (floor fog lift or a 0.01 grade lift); saturation 1.3× the reference; the reference camera sits 20–25° down against our 15°. Wave-2 targets before propagating the recipe.
+- ~~(round 11)~~ **Programs 45–47 with the glTF hero** (cap 40) — cut list in §11e.
+- ~~(round 11)~~ **Session texture accumulation**: texMB 48.8 → 70.1 on a second `loadTrack` of the same session (hero-clip run); per-track numbers are clean.
 - **core-game**: `loadModelChoice()` still returns `proc` when nothing is stored, so the shipped game boots procedural until that default flips; `hook.loadTrack` still does not await `renderer.whenReady()` (`whenReady` now rebuilds an undrawn world itself, so scripts that await it are safe).
 - The wheelie evidence plan needs retuning for the wave-1 physics (throttle 1 + lean −1 loops out in 0.5 s).
 
@@ -885,7 +1041,7 @@ port of `pose.ts`).
   compiles in parallel under `compileAsync`. The loader rows show it as `First frame · …`.
 - `low` = 41–44 % of `high` at load 17; a quiet-machine measurement (load < 8) has not been possible
   this round (load average 17–36 all day).
-- Foundry / nightCity / canyon looks unchanged from round 8 (§12 items below still stand).
+- ~~(round 11)~~ Foundry / nightCity / canyon looks unchanged from round 8 (§12 items below still stand).
 
 - glTF rider: `idle_breathe`/`land_absorb`/`extend` are additive deltas tuned by eye, not against the
   reference clips. The glTF bike's chain scroll direction is unverified. GLTFLoader sanitises bone
@@ -896,7 +1052,7 @@ port of `pose.ts`).
 - Perf numbers this round were taken at load 20–34; only within-run ratios are trustworthy.
 
 
-- **Foundry** is still dark-and-dim rather than the reference's warm, readable red-orange hall: the
+- ~~(round 11)~~ **Foundry** is still dark-and-dim rather than the reference's warm, readable red-orange hall: the
   emissive sources light nothing (no GI, two point lights per track), so the rust structure only shows
   where the sun's steep key lands. It needs baked up-light in the vertex colours near every melt
   source and/or a third/fourth point light attached to the two nearest sources as the camera moves.
@@ -918,7 +1074,7 @@ port of `pose.ts`).
 - Perf numbers this round were taken on a machine at load 20–25 (another owner's headless Chromium
   at 13 cores) and are 1.8–2× the round-6 values on every tier; the within-run `low/high` ratio (48 %)
   is the only trustworthy figure. Heap growth read 6.3 MB / 60 s under the same load (round 6: −1.8).
-- h3-fire-line (foundry) sits at ≈640 k tris with the shadow pass (500 k cap): the hall kit's pallets /
+- ~~(round 11)~~ h3-fire-line (foundry) sits at ≈640 k tris with the shadow pass (500 k cap): the hall kit's pallets /
   drums / tyres dominate; the fix is lower-poly deck supports and a shadow cull on props behind z −12.
 
 - ~~No SSAO~~ (round 7: depth-only AO on `high`).

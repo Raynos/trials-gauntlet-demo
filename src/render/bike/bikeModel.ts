@@ -18,6 +18,8 @@ import type { MaterialLibrary } from '../materials/library';
 import type { RenderFrame } from '../frame';
 import { WHEEL_RADIUS } from '../frame';
 import { mergeStaticChildren } from '../util/merge';
+import type { BikeClass } from '../../core/types';
+import { applyPlate, LIVERIES } from './livery';
 import { fogify } from '../lighting/environment';
 
 export const BIKE = {
@@ -189,6 +191,8 @@ export interface HeroBike {
   ground: ((x: number) => { y: number; angle: number }) | null;
   update(f: RenderFrame): void;
   toWorld(x: number, y: number, z: number, out: THREE.Vector3): THREE.Vector3;
+  /** Round 11 (CONTRACT §2.7 `setBikeClass`): repaint to the class livery (`bike/livery.ts`). */
+  setLivery(cls: BikeClass): void;
   dispose(): void;
 }
 
@@ -371,10 +375,17 @@ export class BikeModel implements HeroBike {
   private readonly tmp = new THREE.Vector2();
   private readonly tmp3 = new THREE.Vector3();
 
+  /** Per-bike paint clones (livery): same maps / defines as the library originals → same program. */
+  private readonly paints: { frame: THREE.MeshStandardMaterial; frameLow: THREE.MeshStandardMaterial; body: THREE.MeshStandardMaterial; plate: THREE.MeshStandardMaterial };
+  private livery: BikeClass = 'rookie';
+
   constructor(lib: MaterialLibrary) {
-    const paint = lib.get('framePaint');
-    const paintLow = lib.get('framePaintLow');
-    const body = lib.get('bodyPaint');
+    const paint = lib.deriveHero('framePaint');
+    const paintLow = lib.deriveHero('framePaintLow');
+    const body = lib.deriveHero('bodyPaint');
+    const plateMat = lib.deriveHero('numberPlate');
+    this.paints = { frame: paint, frameLow: paintLow, body, plate: plateMat };
+    applyPlate(plateMat, 'rookie');
     const chrome = lib.get('chrome');
     const black = lib.get('blackMatte');
     const gloss = lib.get('anodised');
@@ -443,7 +454,7 @@ export class BikeModel implements HeroBike {
       const panel = cast(new THREE.Mesh(rbox(0.24, 0.13, 0.014, 0.02, 2), body));
       panel.position.set(-0.45, 0.42, s * 0.1);
       panel.rotation.set(s * 0.12, 0, 0.12);
-      const plate = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.006, 20).rotateX(Math.PI / 2), lib.get('numberPlate')));
+      const plate = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.006, 20).rotateX(Math.PI / 2), plateMat));
       plate.scale.set(1.15, 1, 1);
       plate.position.set(-0.47, 0.4, s * 0.112);
       this.frame.add(panel, plate);
@@ -527,7 +538,7 @@ export class BikeModel implements HeroBike {
     const barPad = cast(new THREE.Mesh(rbox(0.05, 0.05, 0.16, 0.015), body));
     barPad.position.copy(crossbar.position);
     // Front number plate hangs off the bars.
-    const numberPlate = cast(new THREE.Mesh(rbox(0.012, 0.16, 0.15, 0.02, 2), lib.get('numberPlate')));
+    const numberPlate = cast(new THREE.Mesh(rbox(0.012, 0.16, 0.15, 0.02, 2), plateMat));
     numberPlate.position.set(0.42, 0.74, 0);
     numberPlate.rotation.z = -0.35;
     // Risers: from the top clamp up to the bar clamp.
@@ -715,8 +726,26 @@ export class BikeModel implements HeroBike {
     return [this.rear.contact, this.front.contact];
   }
 
+  setLivery(cls: BikeClass): void {
+    if (cls === this.livery) return;
+    this.livery = cls;
+    const L = LIVERIES[cls];
+    const P = this.paints;
+    P.frame.color.setHex(L.frame);
+    P.frame.roughness = L.frameRough;
+    P.frame.metalness = L.frameMetal;
+    P.frameLow.color.setHex(L.frameLow);
+    P.frameLow.roughness = cls === 'pro' ? 0.45 : 0.62;
+    P.frameLow.metalness = cls === 'pro' ? 0.9 : 0.4;
+    P.body.color.setHex(L.body);
+    P.body.roughness = L.bodyRough;
+    P.body.metalness = L.bodyMetal;
+    applyPlate(P.plate, cls);
+  }
+
   dispose(): void {
     this.root.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
+    for (const m of Object.values(this.paints)) m.dispose();
   }
 
   /** Pose from the interpolated frame. */
