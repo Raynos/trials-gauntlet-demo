@@ -14,7 +14,8 @@ pnpm harness:stranger start --track <trackId> --agent <name>     # prints `sessi
 ```
 
 Creating the session yourself pins the track and the session id; the stranger then never
-picks a track. Use a distinct `--agent` per stranger (`s1`, `s2`, ...). Run at least two
+picks a track. The stranger's `look` shows what the game's menu and HUD show (tier, name,
+`meta.technique`, beginner `meta.hints`, checkpoint xs, finish x) and nothing else. Use a distinct `--agent` per stranger (`s1`, `s2`, ...). Run at least two
 strangers per track before judging it.
 
 ## Paste this, verbatim, as the stranger's whole prompt
@@ -60,10 +61,14 @@ that attempt) and `startTick`/`endTick` in `attempts/NNN.json`. `session.json.be
 names the clearing attempt (whole-session recording) or the furthest one:
 
 ```
-pnpm harness:clip <trackId> --recording <bestAttempt.recordingFile> --from-tick <bestAttempt.startTick> --out harness/out/capture/<trackId>-stranger-<sessionId>
+pnpm harness:clip <trackId> --recording <bestAttempt.recordingFile> --from-tick <bestAttempt.startTick> --out harness/out/capture/stranger/<trackId>-<sessionId>
 ```
 
 About 25 s of wall per second of clip on this machine (SwiftShader at 1280×720, quality high).
+For the 6 s around one obstacle pass `--from-tick`/`--to-tick` (attempt ticks are in `attempts/NNN.json`).
+A recording only replays on the physics it was played on (`src=` stamp in its note = the session's
+`srcFingerprint`): if the working tree has moved on, capture from a `git archive HEAD` copy of the
+matching commit, pointing `--recording`/`--out` at absolute paths in this checkout.
 
 ## Re-judging after a physics or track change
 

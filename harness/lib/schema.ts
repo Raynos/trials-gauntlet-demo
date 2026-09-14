@@ -288,7 +288,7 @@ export interface GateReport extends RunMeta {
     hashOk: boolean | null;
   };
   crash: { recording: string | null; faultTick: number | null; faultTime: number | null; reason: FaultReason | null };
-  restart: { ticks: number | null; wallMs: number[]; frameMs: number[]; noCountdown: boolean | null; movesOnFirstTick: boolean | null };
+  restart: { ticks: number | null; wallMs: number[]; frameMs: number[]; noCountdown: boolean | null; movesOnFirstTick: boolean | null; movesAfterTicks?: number };
   fault: { toControlTicks: number | null; toControlMs: number | null; autoRespawnTicks: number | null; autoRespawnMs: number | null };
   heap: { beforeMB: number; afterMB: number; growthMB: number; seconds: number };
   perf: {
@@ -300,4 +300,21 @@ export interface GateReport extends RunMeta {
     renderSyncedMsP95: number;
   };
   determinism: DeterminismReport | null;
+  /** G10: stranger medians per judged track on the working tree's src (informational until armed). */
+  stranger?: { srcFingerprint: string; armed: boolean; minSessions: number; rows: GateStrangerRow[] };
+}
+
+export interface GateStrangerRow {
+  trackId: string;
+  attemptsBand: [number, number] | null;
+  /** factor x attemptsBand[1] */
+  limit: number | null;
+  /** Sessions completed on the working tree's src fingerprint (the only ones that count). */
+  completedFresh: number;
+  completedAny: number;
+  medianAttempts: number | null;
+  allCleared: boolean;
+  /** null = nothing to judge yet */
+  pass: boolean | null;
+  sessions: string[];
 }

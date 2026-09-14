@@ -14,7 +14,7 @@ import type { GameEvent, PhysicsState } from '../../src/core/types';
 import { InputRecorder, encodeJSON, iterateFrames, type InputRecording } from '../../src/core/replay';
 import { createSim, type Sim, type SimSnapshot } from '../lib/sim';
 import type { RulesCounters } from '../lib/rules';
-import type { TimedEvent } from '../lib/metrics';
+import { srcFingerprint, type TimedEvent } from '../lib/metrics';
 import type { AttemptLog } from '../lib/schema';
 import { OUT_DIR, REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
@@ -137,7 +137,7 @@ export async function createSession(opts: {
     trackId: opts.trackId,
     seed: sim.seed,
     physicsHz: sim.hz,
-    note: `stranger ${sessionId} agent=${opts.agent}`,
+    note: `stranger ${sessionId} agent=${opts.agent} src=${srcFingerprint()}`,
   });
   const state: PersistedState = {
     schema: 1,

@@ -1,14 +1,14 @@
 {
   "flat-test": {
     "canonical1200": {
-      "hash": "1b77c919b99399fc",
+      "hash": "f80b29d13e0956b5",
       "physics": "bikePhysicsFactory"
     },
     "golden": {
-      "file": "bot-2.json",
-      "finishTime": 7.491666666666666,
-      "hash": "d93600e5d7c68be2",
-      "ticks": 899,
+      "file": "bot-3.json",
+      "finishTime": 7.041666666666667,
+      "hash": "7b4e0c804fa7226e",
+      "ticks": 845,
       "physics": "bikePhysicsFactory"
     }
   }

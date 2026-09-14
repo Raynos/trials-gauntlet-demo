@@ -11,6 +11,7 @@
   "restart.wallMsP95": 5,
   "restart.frameMsP95": 33,
   "restart.noCountdown": true,
+  "restart.movesWithinTicks": 12,
   "heap.growthMBPer60s": 5,
   "bundle.jsGzipKB": 600,
   "perf.drawCallsMax": 300,
@@ -22,6 +23,7 @@
   "perf.renderSyncedMsP95": 16,
   "determinism.pass": true,
   "stranger.attemptsBandFactor": 1.5,
+  "stranger.minSessions": 2,
   "swiftshader": {
     "boot.firstFrameMs": 4000,
     "restart.frameMsP95": 150,

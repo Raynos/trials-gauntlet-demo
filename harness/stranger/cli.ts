@@ -4,10 +4,11 @@
  *   tsx harness/stranger/cli.ts <cmd> [args] [--track <id>] [--session <id>] [--agent <name>]
  *
  *   start [--track flat-test] [--seed N]   create a session, print its id + `look`
- *   look                                    numbers + ASCII side-view of the next 40 m
+ *   look                                    track card (name, technique, beginner hints, checkpoint xs) + numbers + ASCII side-view
  *   status                                  numbers only
- *   play "<slots>"                          e.g. "g8 gb4 c2"  (max 40 slots of 1/8 s)
- *   restart                                 back to the last checkpoint (an attempt)
+ *   play "<slots>"                          e.g. "g8 gb4 c2"  (max 40 slots of 1/8 s); prints the side-view afterwards.
+ *                                           A crash ends the call: the game's 1.0 s auto-respawn (rules.ts) is played out in-call.
+ *   restart                                 give up a live attempt: back to the last checkpoint (an attempt)
  *   reset                                   back to the start line (an attempt)
  *   done                                    finalize session.json + metrics
  *   report <trackId>                        (parent) aggregate all sessions -> out/metrics/<track>.stranger.{json,md}
@@ -90,6 +91,26 @@ function numbers(s: LoadedSession): Numbers {
   };
 }
 
+/**
+ * What the game shows on screen before/while riding, and nothing else: the HUD's
+ * tier + name, the menu's technique one-liner, the beginner hint strip (the HUD shows
+ * `meta.hints` for beginner tracks only), the progress strip's checkpoint marks and the
+ * finish. No geometry, no bands, no `demands` (a player never sees those).
+ */
+function trackCard(s: LoadedSession): string {
+  const t = s.sim.track;
+  const lines = [`track ${t.id} (${t.tier}) "${t.name}"${t.meta?.technique ? ` — technique: ${t.meta.technique}` : ''}`];
+  const hints = t.tier === 'beginner' && t.meta?.hints?.length ? t.meta.hints : null;
+  if (hints) lines.push(`hints: ${hints.join(' · ')}`);
+  lines.push(`checkpoints at x = ${t.checkpoints.map((c) => c.x).join(', ')} m; finish at x = ${t.finishX} m`);
+  return lines.join('\n');
+}
+
+/** The screen: numbers + side-view. Printed by look/start and after every play. */
+function screen(s: LoadedSession): string {
+  return `${JSON.stringify(numbers(s))}\n${asciiView(s.sim.compiled, s.sim.state())}`;
+}
+
 function brief(st: PhysicsState): { x: number; vx: number; angle_deg: number } {
   return { x: round(st.bike.pos.x, 2), vx: round(st.bike.vel.x, 2), angle_deg: round((st.bike.angle * 180) / Math.PI, 1) };
 }
@@ -131,22 +152,44 @@ function tick(s: LoadedSession, frame: InputFrame): PersistedEvent[] {
 }
 
 /**
- * The restart mash a player does after a crash: restart held one tick, then a
- * coast tick (both recorded, so a replay respawns at the same tick). If the
- * physics still reports a fault afterwards we reset the world directly and
- * flag it: the recording cannot express that.
+ * If the sim is not riding at the expected checkpoint after a respawn, reset the
+ * world directly and flag it: the recording cannot express that (never seen on the
+ * real physics; kept as the safety net the metrics audit via `forcedResets`).
+ */
+function ensureRiding(s: LoadedSession, checkpoint: number): boolean {
+  const st = s.sim.state();
+  if (s.sim.phase() === 'riding' && st.checkpoint === checkpoint) return false;
+  s.sim.world.reset(checkpoint);
+  s.sim.world.drainEvents();
+  s.state.forcedResets++;
+  return true;
+}
+
+/**
+ * The restart tap a player does to give up an attempt: restart held one tick (the
+ * edge is the fault + checkpoint respawn), then a coast tick. Both recorded, so a
+ * replay respawns at the same tick.
  */
 function respawn(s: LoadedSession, checkpoint: number): { events: PersistedEvent[]; forcedReset: boolean } {
   const events = [...tick(s, RESTART_FRAME), ...tick(s, COAST)];
-  let forcedReset = false;
-  const st = s.sim.state();
-  if (s.sim.phase() !== 'riding' || st.checkpoint !== checkpoint) {
-    s.sim.world.reset(checkpoint);
-    s.sim.world.drainEvents();
-    s.state.forcedResets++;
-    forcedReset = true;
+  return { events, forcedReset: ensureRiding(s, checkpoint) };
+}
+
+/**
+ * What happens after a crash when the player does nothing: the bike tumbles and the
+ * game respawns it at the checkpoint after `T.autoRespawn` (1.0 s) of run clock
+ * (`harness/lib/rules.ts`, phase 'crashed'). Coast frames only: the player has let
+ * go. Recorded, so a replay respawns at the same tick.
+ */
+function autoRespawn(s: LoadedSession, checkpoint: number): { events: PersistedEvent[]; forcedReset: boolean; waitTicks: number } {
+  const events: PersistedEvent[] = [];
+  let waitTicks = 0;
+  const limit = s.sim.rules.T.autoRespawn + 2;
+  while (s.sim.phase() === 'crashed' && waitTicks < limit) {
+    events.push(...tick(s, COAST));
+    waitTicks++;
   }
-  return { events, forcedReset };
+  return { events, forcedReset: ensureRiding(s, checkpoint), waitTicks };
 }
 
 interface PlayResult {
@@ -157,12 +200,13 @@ interface PlayResult {
   before: ReturnType<typeof brief>;
   after: ReturnType<typeof brief>;
   events: CompactEvent[];
-  faulted?: { reason: string; respawnedAt: number; forcedReset?: true };
+  faulted?: { reason: string; at: number; respawnedAt: number; respawnAfterS: number; forcedReset?: true };
   finished?: true;
   checkpoint: number;
   grounded: boolean;
   faults: number;
   runTime: number;
+  distanceToFinish: number;
   budget: { callsLeft: number; secondsLeft: number };
   note?: string;
 }
@@ -182,33 +226,39 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
     const frames = framesOf(id);
     const code = ACTIONS[id]!.code;
     let slotFault: PersistedEvent | null = null;
+    const marks: string[] = [];
     for (let i = 0; i < HOLD; i++) {
       const evs = tick(s, frames[i]!);
       events.push(...evs);
       for (const e of evs) {
         if (e.event.type === 'finish') finished = true;
         if (e.event.type === 'fault' && !slotFault) slotFault = e;
+        if (e.event.type === 'checkpoint') marks.push(`CHECKPOINT ${e.event.index}`);
       }
       if (finished || slotFault) break;
     }
+    if (finished) marks.push('FINISH');
+    if (slotFault && slotFault.event.type === 'fault') marks.push(`CRASH (${slotFault.event.reason})`);
     played++;
     const st = s.sim.state();
     const g = st.wheels.rear.grounded || st.wheels.front.grounded;
     trace.push(
-      `${String(played).padStart(2, '0')} ${code.padEnd(3)} x=${st.bike.pos.x.toFixed(1).padStart(6)} vx=${st.bike.vel.x.toFixed(1).padStart(5)} ang=${((st.bike.angle * 180) / Math.PI).toFixed(0).padStart(4)} ${g ? 'ground' : 'AIR'}`,
+      `${String(played).padStart(2, '0')} ${code.padEnd(3)} x=${st.bike.pos.x.toFixed(1).padStart(6)} vx=${st.bike.vel.x.toFixed(1).padStart(5)} ang=${((st.bike.angle * 180) / Math.PI).toFixed(0).padStart(4)} ${g ? 'ground' : 'AIR'}${marks.length ? `  <- ${marks.join(', ')}` : ''}`,
     );
     if (finished) break outer; // the successful attempt is not an ended one: strangerAttempts = 1 + faults
     if (slotFault && slotFault.event.type === 'fault') {
       const reason = slotFault.event.reason;
       const cp = st.checkpoint;
+      const crashX = st.bike.pos.x;
       endAttempt(s, 'fault', st, reason);
-      const r = respawn(s, cp);
+      const r = autoRespawn(s, cp);
       beginAttempt(s);
       events.push(...r.events);
       const after = s.sim.state();
-      faulted = { reason, respawnedAt: round(after.bike.pos.x, 2) };
+      const waitS = round(r.waitTicks / s.state.physicsHz, 2);
+      faulted = { reason, at: round(crashX, 2), respawnedAt: round(after.bike.pos.x, 2), respawnAfterS: waitS };
       if (r.forcedReset) faulted.forcedReset = true;
-      note = `crashed (${reason}) after slot ${played}; you are back at checkpoint ${cp} (x=${after.bike.pos.x.toFixed(1)}), stationary. Remaining ${ids.length - played} slot(s) were NOT played.`;
+      note = `crashed (${reason}) at x=${crashX.toFixed(1)} after slot ${played}; the game respawned you ${waitS.toFixed(1)} s later at checkpoint ${cp} (x=${after.bike.pos.x.toFixed(1)}), stationary, facing +x. Remaining ${ids.length - played} slot(s) were NOT played; your next play starts here.`;
       break outer;
     }
   }
@@ -227,6 +277,7 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
     grounded: after.wheels.rear.grounded || after.wheels.front.grounded,
     faults: countedFaults(s.state.events).length,
     runTime: round(s.state.runTicks / s.state.physicsHz, 3),
+    distanceToFinish: round(s.sim.track.finishX - after.bike.pos.x, 2),
     budget: { callsLeft: b.callsLeft, secondsLeft: b.secondsLeft },
   };
   if (faulted) result.faulted = faulted;
@@ -255,6 +306,7 @@ function restart(s: LoadedSession): Record<string, unknown> {
     attempt: attemptsFromEvents(s.state.events),
     runTime: round(s.state.runTicks / s.state.physicsHz, 3),
     budget: { callsLeft: b.callsLeft, secondsLeft: b.secondsLeft },
+    note: `back at checkpoint ${cp} (x=${after.bike.pos.x.toFixed(1)}), stationary; that cost one attempt. A crash respawns you here by itself: restart is only for giving up a live attempt.`,
   };
 }
 
@@ -280,6 +332,7 @@ function reset(s: LoadedSession): Record<string, unknown> {
     attempt: attemptsFromEvents(s.state.events),
     runTime: round(s.state.runTicks / s.state.physicsHz, 3),
     budget: { callsLeft: b.callsLeft, secondsLeft: b.secondsLeft },
+    note: `back at the start line (x=${after.bike.pos.x.toFixed(1)}); checkpoints forgotten, faults kept, that cost one attempt.`,
   };
 }
 
@@ -412,14 +465,14 @@ async function main(): Promise<number> {
       case 'start': {
         saveSession(s);
         console.log(`session ${s.state.sessionId}`);
-        console.log(JSON.stringify(numbers(s)));
-        console.log(asciiView(s.sim.compiled, s.sim.state()));
+        console.log(trackCard(s));
+        console.log(screen(s));
         break;
       }
       case 'look': {
         saveSession(s);
-        console.log(JSON.stringify(numbers(s)));
-        console.log(asciiView(s.sim.compiled, s.sim.state()));
+        console.log(trackCard(s));
+        console.log(screen(s));
         break;
       }
       case 'status': {
@@ -434,6 +487,8 @@ async function main(): Promise<number> {
         saveSession(s);
         console.log(JSON.stringify(result));
         console.log(trace.join('\n'));
+        // The screen after the move, as a player sees it: no `look` call needed.
+        if (!result.finished) console.log(asciiView(s.sim.compiled, s.sim.state()));
         break;
       }
       case 'restart': {
@@ -441,6 +496,7 @@ async function main(): Promise<number> {
         appendLog(s, `-> ${JSON.stringify({ ...r, budget: undefined })}`);
         saveSession(s);
         console.log(JSON.stringify(r));
+        console.log(asciiView(s.sim.compiled, s.sim.state()));
         break;
       }
       case 'reset': {
@@ -448,6 +504,7 @@ async function main(): Promise<number> {
         appendLog(s, `-> ${JSON.stringify({ ...r, budget: undefined })}`);
         saveSession(s);
         console.log(JSON.stringify(r));
+        console.log(asciiView(s.sim.compiled, s.sim.state()));
         break;
       }
       case 'done': {

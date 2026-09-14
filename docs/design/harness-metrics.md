@@ -57,6 +57,36 @@ to CONTRACT.md; where the sections below still describe the original plan, this 
 | **play/replay divergence** (found this round) | `PlayResult.hashes` (per committed tick) + `BotRunReport.playReplayDivergence` + sweep `replay` column + `pnpm harness:snapshot-probe <recording>` (`gate/snapshot-probe.ts`). On the working tree of 2026-09-14 the bot's committed play is **not** retraced by a replay of its own recording (e1: diverges at tick 376, x 33.7 m; flat-test golden: tick 346, x 28.8 m — the first hop). Cause in `src/physics/bike.ts`: `private brakeIn` (and `seesawLambda`, `chDx/chDy`) live on the instance, outside the `F`/`U` arrays that `snapshot()` copies; beam search restores a root after rollouts and resumes with the rollout's brake filter state. Consequence: every bot attempts/clears number since the physics gained `brakeIn` describes a trajectory no replay reproduces (the browser hash still "verifies" because both sides replay the recording). **Requested src change:** move that state into `F`; `harness:snapshot-probe` must PASS on flat-test and e1 before the sweep numbers mean anything. |
 | **blind pairs, round 3** | Three manoeuvre pairs from real-track bot clips vs the closest reference: b2 drop landing (x≈37 m, ledge) vs techniques/07 uphill-plank-landing (`big-jump-landing`); e1 steep climb (ramp @ 81.5 m) vs techniques/05 steep-curved-ramp-climb (`steep-climb`); x1 plank climb (ramp @ 27 m + plank @ 28.2 m) vs techniques/06 near-vertical-ramp-climb (`steep-climb`). Ids and prompt paths in the round-3 report / `out/compare/pair-*.prompt.md`; verdicts via `harness:log-verdict`. |
 
+## Round 4 status — stranger parity with a real player, call ergonomics, stranger clips, gate G10
+
+Round-1 strangers (8 sessions, src 73762476): 47–107 calls each, 30–86 `play`s, 13–16 `look`s, 0 CLI
+errors. What cost calls was the loop, not the track: **`look` after every second `play`** (a quarter of
+all calls, because `play` printed no screen), plays chopped to 4–8 slots on the PROTOCOL's own advice,
+and on b3 six `reset`s to the start line to rebuild speed for the kicker (checkpoint 1 respawns at
+x = 130 m, 3 m before the kicker at 133 m — a track finding, see below). Six of eight sessions lost
+attempt 1 at x ≈ 24–27 m to a full-gas loop-out on flat ground (`g40` from the line: angle 44° by
+slot 15, over at slot 18).
+
+| topic | as built |
+|---|---|
+| **what the stranger sees (parity)** | `start` and `look` print the **track card** — exactly what the game shows on the menu and HUD and nothing else: `track <id> (<tier>) "<name>" — technique: <meta.technique>`, `hints: …` (`meta.hints`, beginner tier only, as the HUD does — m2's authored hints are not shown to a player today, so not to the stranger), `checkpoints at x = …; finish at x = …` (the progress strip's marks). No `demands`, no band, no geometry. |
+| **crash = the game's auto-respawn** | `play` no longer taps restart on a crash. It plays coast frames through the `crashed` phase until `RunRules` fires the 1.0 s auto-respawn (`T.autoRespawn`, `harness/lib/rules.ts`), exactly what a player who lets go sees; the run clock pays the second. Recorded, so a replay respawns at the same tick (node vs browser byte-identical on a crash+ride smoke: hash `02550d312f0f69be` both sides, fresh build). `faulted` now carries `at`, `respawnedAt`, `respawnAfterS`; `restart` (give up a live attempt: the restart tap, instant) and `reset` (0.6 s hold) unchanged, both now say in their `note` what they cost. |
+| **fewer calls, same information** | `play`, `restart` and `reset` print the ASCII side-view from the new position after the trace, so `look` is only for the track card; `play` gained `distanceToFinish`. PROTOCOL.md rewritten around that: send the whole plan (unplayed slots cost nothing, a crash costs an attempt not calls), never `look` after `play`, `restart` is never needed after a crash, `reset` almost never worth it; a worked crash example. Expected saving from the round-1 logs: 13–16 `look`s per session (25 %) plus whatever longer plays buy. |
+| **stranger clips** | `out/capture/stranger/<track>-<session>/{clip.mp4,sheet.jpg,clip.json}` for all 8 round-1 sessions: 6 s around the deadliest obstacle (b1 x 303, b2 x 36, b3 x 133, e1 x 292), 1280×720 @ 60 fps, quality high. Rendered on the physics the strangers played on — the working tree had uncommitted `src/physics` edits (fp 61f2e6e9 vs the sessions' 73762476), so the clips were captured from a `git archive HEAD` copy in the scratchpad, pointed at the committed recordings. The attempt in the clip is the clearing one where it rides through that obstacle (b1, e1), else the latest attempt that did (b2 s1 #2, b2 s2 #1, b3 s1 #12, b3 s2 #9 — every b2/b3 clearing attempt started at a checkpoint past the obstacle). |
+| **gate G10 stranger** | `stranger.medianAttempts` row over b1/b2/b3/e1: per track, median `strangerAttempts` of sessions completed **on the working tree's src fingerprint** vs `stranger.attemptsBandFactor` (1.5) × `meta.attemptsBand[1]`; value is the summary string, `report.stranger.rows[]` the numbers. Informational (pass) until every track has ≥ `stranger.minSessions` (2) such sessions; then a real check (all four within band and every counted session cleared). Replaces the old single-track stranger row. |
+| **goldens re-pinned on 2df0b0d** | The physics commit after 2bdd175 landed mid-round (`2df0b0d` "pitch-rate-led wheelie control", src fingerprint 0693a0b2). `pnpm harness:round --build --pin` (full profile, 589 s): bot flat-test 13.8 s, gap-test 5.1 s, b1 134 s (skill 3: 1 attempt, finish 33.958 s), determinism 8/8 (D8 re-pinned f80b29d13e0956b5), gate `expected.json` re-pinned (flat-test bot-3 finish 7.041666666666667, hash 7b4e0c804fa7226e). Gate on that tree: **18/21**; the three fails are the SwiftShader-informational render timings (`boot.firstFrameMs`, `restart.frameMsP95`, `perf.renderSyncedMsP95`); `fault.toControlMs` 41.7 ms, auto-respawn path 1033 ms, crash probe 2.40 s, heap −5.9 MB/60 s, physics 25 µs/tick p95, G6 2 ticks. `out/metrics/ship-gate.json` is the full (60 s heap) run after the G6 re-spec: 18/21, wall 441 s. Every round-1 stranger session is now `stale src` (73762476 ≠ 0693a0b2): the round-4 stranger round has to be replayed on the new physics before G10 can arm. |
+| **G6 re-specified** | `restart.noCountdown` used to demand `vel.x > 0` on the very first throttle tick after a restart. The committed clutch model (crank inertia, centrifugal capacity) needs 2 ticks from idle, so that check failed on physics that has no countdown at all. It now holds throttle from the first tick after the restart tick and reports the worst-of-20 tick count until the bike rolls, limit `restart.movesWithinTicks` = 12 (0.1 s; a countdown would be 360+). Measured 2 ticks. `report.restart.movesAfterTicks` carries the number; `movesOnFirstTick` is still reported. |
+
+Track findings for the parent (from the sessions, not the harness): (1) **b3 checkpoint 1 at ~130 m,
+kicker at 133 m** — a stationary respawn has 3 m of run-up, so strangers `reset` to the start (6 resets
+across two sessions) or die on the lip (8 of 21 deaths at 130–145 m); (2) **full gas from the line loops
+out at 2.4 s on flat** on 73762476 (6/8 first attempts); the working-tree physics holds the wheelie at
+36–37° instead; (3) e1 s2 finished in 15 attempts on 107 calls after the round-1 commit (`in-progress` there);
+e1's median is now 12 (band 2–4), 2 of 2 cleared; (4) **b3 kicker flight is played blind**: in both b3
+clips the camera rides up into the skylights after the 133 m kicker and shows only ceiling for ~2.5 s of a
+~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
+"Level the bike in the air"; the next frame is a top-down view of the landing.
+
 ## 0. Principles
 
 1. **Search runs in node, verification runs in the browser.** `src/physics` is platform-neutral (plain data,
@@ -265,14 +295,18 @@ can" tracks.
 ```
 You are playing a 2D motorbike trials track. Controls per 1/8 s slot: throttle 0..1, brake 0..1,
 lean -1..1 (negative = lean back). No hop button: preload (gb) then snap (gf). The bike starts stationary facing +x.
-Cross the finish without crashing. A crash returns you to the last checkpoint; the clock keeps running.
+Cross the finish without crashing. A crash tumbles 1.0 s then respawns you at the last checkpoint (the
+game's auto-respawn, inside the same play call); the clock keeps running.
 Tool: `pnpm harness:stranger <cmd> --session <id>`   (the real text is harness/stranger/PROTOCOL.md)
-  look                -> ASCII side-view of the next 40 m + JSON: x, vx, angle_deg, grounded, checkpoint, faults, time, finishX
+  look                -> track card (tier, name, technique, beginner hints, checkpoint xs, finish x: what the
+                         menu/HUD show) + JSON: x, vx, angle_deg, grounded, checkpoint, faults, time, finishX
+                         + ASCII side-view of the next 40 m
   status              -> the JSON only
   play "<slots>"      -> apply slots, e.g. "g8 gb4 c2 gf1 g6"  (g gas, gb gas+lean back, gf gas+lean fwd,
                          hg/hgb/hgf half gas, c coast, b brake, bf/bb brake+lean, lb lean back, lf lean fwd,
                          t tap gas; number = slots of 125 ms, max 40 per call)
-                         returns summary + events + a per-slot trace (x, vx, angle, ground/air); stops at a crash
+                         returns summary + events + a per-slot trace (x, vx, angle, ground/air) + the side-view
+                         from the new position; stops at a crash (after the auto-respawn) or the finish
   restart             -> back to last checkpoint (counts as an attempt)
   reset               -> back to the start line (counts as an attempt; the 0.6 s hold rule, replayable)
   done                -> end the session
@@ -385,10 +419,11 @@ One command, one JSON, exit code = number of failed checks (0 = ship). Runs agai
 | G3 | Crash | `runRecording(inputs/<track>/crash.json)` (full gas + lean back into the first obstacle; produced by `bot --crash-probe`, which searches for the earliest `crash` fault); assert `fault{reason:'crash'}` within 8 s sim | `crash.faultTick` |
 | G4 | Fault -> control | after G3: `setInput({throttle:1})`, step 1 tick at a time until `state.tick < previous` (respawn happened) AND `bike.vel.x > 0.05`; ticks * 1000/120 = ms | `fault.toControlTicks`, `fault.toControlMs` |
 | G5 | Restart latency | at t=3 s of the clear replay, 20 reps: `t0=now; setInput({restart:true}); step(1); setInput({restart:false})`; assert `tick===0`, `checkpoint` correct, `faulted===null` after exactly 1 tick; then `render(true)` timing | `restart.ticks` (1), `restart.wallMs[]`, `restart.frameMs[]` |
-| G6 | No countdown on restart | after G5, `setInput({throttle:1}); step(1)` must give `vel.x > 0` | `restart.noCountdown` |
+| G6 | No countdown on restart | after G5, hold `throttle:1` from the first tick after the restart tick; the bike must roll (`vel.x > 0`) within `restart.movesWithinTicks` (12; the clutch needs 2, a countdown would be 360+), worst of 20 reps | `restart.noCountdown` (ticks), `restart.movesAfterTicks` |
 | G7 | Capture sanity | `capture` of the clear replay with `--tail 0`; ffprobe frames == `ceil(ticks*fps/hz)`; end hash == G2 hash | `capture.*` |
 | G8 | Perf | 5 s `perf`: draw calls, tris, textures MB, heap growth, physics us/tick, render submit ms | `perf.*` |
 | G9 | Determinism | section 6 checks D1-D5, D7, D8 | `determinism.pass` |
+| G10 | Stranger | `out/metrics/{b1,b2,b3,e1}.stranger.json`: median `strangerAttempts` of sessions completed on the working tree's src fingerprint vs 1.5 × `meta.attemptsBand[1]`; informational until every track has ≥ `stranger.minSessions` (2) such sessions, then all four must pass with every counted session cleared | `stranger.medianAttempts`, `stranger.rows[]` |
 
 ### 5.2 Thresholds (`gate/thresholds.json`)
 
@@ -408,6 +443,7 @@ The file is the source of truth (CONTRACT §3); this is a copy:
   "restart.wallMsP95": 5,
   "restart.frameMsP95": 33,
   "restart.noCountdown": true,
+  "restart.movesWithinTicks": 12,
   "heap.growthMBPer60s": 5,
   "bundle.jsGzipKB": 600,
   "perf.drawCallsMax": 300,
@@ -455,7 +491,7 @@ On mismatch the tool bisects over `step` with hashes (<= 11 extra runs for 1200 
 | `strangerClearWallMs` | wall time to first clear | same | <= 20 min |
 | `fault.toControlMs` | crash fault -> bike responds to throttle | gate G4 | <= 500 |
 | `restart.ticks` / `restart.frameMsP95` | restart input -> reset state / synced frame | gate G5 | 1 / <= 50 |
-| `restart.noCountdown` | throttle moves the bike on the first tick after restart | gate G6 | true |
+| `restart.noCountdown` | ticks of held throttle after the restart tick until the bike rolls (worst of 20) | gate G6 | ≤ `restart.movesWithinTicks` (12) |
 | `boot.p50Ms` / `boot.maxMs` | nav -> `__trials.ready` | gate G1 | 800 / 1500 |
 | `oursWinRate[manoeuvre]` | blind critic wins vs reference | `harness:compare` | >= 0.5 per shipped manoeuvre |
 | `determinism.pass` | D1-D5, D7, D8 | `harness:determinism` | true |

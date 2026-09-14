@@ -9,10 +9,14 @@
  *   G3 crash            inputs/<track>/crash.json: a non-restart fault within crash.faultWithinS
  *   G4 fault -> control after the crash: throttle until the bike moves again (ms)
  *   G5 restart latency  20 reps: restart edge -> tick 0 after exactly one tick; -> synced frame ms
- *   G6 no countdown     throttle on the first tick after restart moves the bike
+ *   G6 no countdown     throttle held from the first tick after restart rolls the bike within restart.movesWithinTicks
+ *                       (the clutch model needs a few ticks from idle; a countdown would hold it 360+)
  *   G7 heap + perf      N s of play: heap growth, draw calls, tris, textures, physics us/tick, render submit ms
  *   G8 bundle           gzip of dist/assets/*.js
  *   G9 determinism      gate/determinism.ts on the golden recording
+ *   G10 stranger        out/metrics/{b1,b2,b3,e1}.stranger.json: median attempts of completed sessions on the
+ *                       working tree's src fingerprint vs 1.5 x meta.attemptsBand[1]. Informational until all
+ *                       four tracks have >= 2 such sessions (stranger.minSessions); then a real check.
  *
  * Every threshold lives in gate/thresholds.json. Output harness/out/metrics/ship-gate.json.
  */
@@ -26,11 +30,11 @@ import type { FaultReason } from '../../src/core/types';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
 import { openGame, readHeap } from '../lib/hook';
 import { pickGolden } from '../lib/golden';
-import { percentileOf, runMeta } from '../lib/metrics';
+import { percentileOf, runMeta, srcFingerprint } from '../lib/metrics';
 import { DIST_DIR, HARNESS_DIR, REPO_ROOT } from '../lib/paths';
 import { loadRecording } from '../lib/recording';
 import { writeJson } from '../lib/report';
-import type { DeterminismReport, GateCheck, GateReport } from '../lib/schema';
+import type { DeterminismReport, GateCheck, GateReport, GateStrangerRow } from '../lib/schema';
 import { createSim } from '../lib/sim';
 import { synthesizeRecording } from '../lib/synth';
 import { BrowserVerifier } from '../lib/verify';
@@ -46,6 +50,43 @@ export function loadThresholds(): { ship: Thresholds; swiftshader: Record<string
   const ship: Thresholds = {};
   for (const [k, v] of Object.entries(raw)) if (k !== '$comment' && k !== 'swiftshader') ship[k] = v as number | boolean | string;
   return { ship, swiftshader };
+}
+
+/** The tracks a stranger round judges (harness-metrics.md §3). */
+export const STRANGER_TRACKS = ['b1-first-ride', 'b2-lean-back', 'b3-kicker-row', 'e1-uphill-weight'] as const;
+
+/**
+ * One row per stranger metrics file: median attempts over the sessions completed on the
+ * working tree's src fingerprint (the file's own medians may be from an older run of `report`).
+ */
+export function strangerRows(tracks: readonly string[], factor: number): GateStrangerRow[] {
+  const fp = srcFingerprint();
+  const rows: GateStrangerRow[] = [];
+  for (const trackId of tracks) {
+    const file = path.join(HARNESS_DIR, 'out', 'metrics', `${trackId}.stranger.json`);
+    if (!fs.existsSync(file)) continue;
+    const m = JSON.parse(fs.readFileSync(file, 'utf8')) as {
+      attemptsBand?: [number, number] | null;
+      sessions: Array<{ sessionId: string; status: string; srcFingerprint: string | null; strangerAttempts: number; cleared: boolean }>;
+    };
+    const fresh = m.sessions.filter((x) => x.status === 'done' && x.srcFingerprint === fp);
+    const attempts = fresh.map((x) => x.strangerAttempts).sort((a, b) => a - b);
+    const median = attempts.length ? (attempts.length % 2 ? attempts[(attempts.length - 1) / 2]! : (attempts[attempts.length / 2 - 1]! + attempts[attempts.length / 2]!) / 2) : null;
+    const band = m.attemptsBand ?? null;
+    const limit = band ? factor * band[1] : null;
+    rows.push({
+      trackId,
+      attemptsBand: band,
+      limit,
+      completedFresh: fresh.length,
+      completedAny: m.sessions.filter((x) => x.status === 'done').length,
+      medianAttempts: median,
+      allCleared: fresh.length > 0 && fresh.every((x) => x.cleared),
+      pass: median === null || limit === null ? null : median <= limit && fresh.every((x) => x.cleared),
+      sessions: fresh.map((x) => x.sessionId),
+    });
+  }
+  return rows;
 }
 
 function dirBytes(dir: string): number {
@@ -274,6 +315,9 @@ async function main(): Promise<void> {
           const frameMs: number[] = [];
           let ticksOk = true;
           let movesOnFirstTick = true;
+          // Ticks of held throttle after the restart tick until the bike rolls (vel.x > 0). A
+          // countdown would hold it for 360+; the clutch model needs a few ticks from idle.
+          let movesAfterTicks = 0;
           for (let rep = 0; rep < 20; rep++) {
             t.setInput({ throttle: 1 });
             t.step(120);
@@ -291,19 +335,26 @@ async function main(): Promise<void> {
             t.setInput({ throttle: 1 });
             t.step(1);
             if (!(t.getState().bike.vel.x > 0)) movesOnFirstTick = false;
+            let n = 1;
+            while (!(t.getState().bike.vel.x > 0) && n < 120) {
+              t.step(1);
+              n++;
+            }
+            if (n > movesAfterTicks) movesAfterTicks = n;
           }
-          return { wallMs, frameMs, ticksOk, movesOnFirstTick, phase: t.phase(), faults: t.faults() };
+          return { wallMs, frameMs, ticksOk, movesOnFirstTick, movesAfterTicks, phase: t.phase(), faults: t.faults() };
         },
         [trackId] as const,
       );
       await page.close();
-      report.restart = { ticks: r.ticksOk ? 1 : null, wallMs: r.wallMs, frameMs: r.frameMs, noCountdown: r.movesOnFirstTick, movesOnFirstTick: r.movesOnFirstTick };
+      const movesOk = r.movesAfterTicks <= num('restart.movesWithinTicks');
+      report.restart = { ticks: r.ticksOk ? 1 : null, wallMs: r.wallMs, frameMs: r.frameMs, noCountdown: movesOk, movesOnFirstTick: r.movesOnFirstTick, movesAfterTicks: r.movesAfterTicks };
       check({ id: 'restart.ticks', value: r.ticksOk ? 1 : -1, limit: num('restart.ticks'), pass: r.ticksOk, note: 'tick==0 && faulted==null after exactly one tick, 20 reps' });
       const w95 = percentileOf(r.wallMs, 95);
       check({ id: 'restart.wallMsP95', value: w95, limit: num('restart.wallMsP95'), pass: w95 <= num('restart.wallMsP95'), unit: 'ms' });
       const f95 = percentileOf(r.frameMs, 95);
       check({ id: 'restart.frameMsP95', value: f95, limit: num('restart.frameMsP95'), pass: f95 <= num('restart.frameMsP95'), unit: 'ms', note: 'restart -> synced frame' });
-      check({ id: 'restart.noCountdown', value: r.movesOnFirstTick, limit: true, pass: r.movesOnFirstTick, note: `throttle moves the bike on the first tick after restart (game faults=${r.faults})` });
+      check({ id: 'restart.noCountdown', value: r.movesAfterTicks, limit: num('restart.movesWithinTicks'), pass: movesOk, unit: ' ticks', note: `worst of 20 reps: held throttle after the restart tick until the bike rolls (a countdown would be 360+); first-tick roll ${r.movesOnFirstTick ? 'yes' : 'no'}; game faults=${r.faults}` });
     }
 
     // G7 heap + perf over N seconds of play
@@ -395,13 +446,20 @@ async function main(): Promise<void> {
       check({ id: 'determinism.pass', value: null, limit: true, pass: false, note: 'no golden recording' });
     }
 
-    // Stranger (informational unless a session exists)
-    const strangerFile = path.join(HARNESS_DIR, 'out', 'metrics', `${trackId}.stranger.json`);
-    if (fs.existsSync(strangerFile)) {
-      const s = JSON.parse(fs.readFileSync(strangerFile, 'utf8')) as { medianAttempts?: number; pass?: boolean | null; attemptsBand?: [number, number] | null };
-      const limit = s.attemptsBand ? num('stranger.attemptsBandFactor') * s.attemptsBand[1] : null;
-      check({ id: 'stranger.medianAttempts', value: s.medianAttempts ?? null, limit, pass: s.pass !== false, note: s.attemptsBand ? `band ${s.attemptsBand.join('-')}` : 'no attemptsBand on track meta (informational)' });
-    }
+    // G10 stranger: the four judged tracks, on the physics in the working tree right now.
+    const stranger = strangerRows(STRANGER_TRACKS, num('stranger.attemptsBandFactor'));
+    const minSessions = num('stranger.minSessions') || 2;
+    const armed = stranger.length === STRANGER_TRACKS.length && stranger.every((r) => r.completedFresh >= minSessions);
+    const allPass = stranger.every((r) => r.pass === true);
+    const summary = stranger.map((r) => `${r.trackId.split('-')[0]} ${r.medianAttempts ?? '-'}/${r.limit ?? '-'}${r.completedFresh < minSessions ? ` (${r.completedFresh} fresh)` : ''}`).join(' · ');
+    check({
+      id: 'stranger.medianAttempts',
+      value: summary || 'no stranger metrics',
+      limit: num('stranger.attemptsBandFactor'),
+      pass: armed ? allPass : true,
+      note: `median attempts / (${num('stranger.attemptsBandFactor')} x band top) on src ${srcFingerprint()}; ${armed ? `armed: ${allPass ? 'all four within band' : 'outside band'}` : `informational until every track has >= ${minSessions} completed sessions on this src`}`,
+    });
+    report.stranger = { srcFingerprint: srcFingerprint(), armed, minSessions, rows: stranger };
 
     const failed = checks.filter((c) => !c.pass).length;
     const full: GateReport = {
@@ -423,6 +481,7 @@ async function main(): Promise<void> {
       heap: report.heap!,
       perf: report.perf!,
       determinism: det,
+      stranger: report.stranger!,
     };
     if (goldenHash) full.clear.hash = goldenHash;
     const out = path.join(HARNESS_DIR, 'out', 'metrics', 'ship-gate.json');

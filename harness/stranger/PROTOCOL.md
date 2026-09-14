@@ -6,13 +6,15 @@ attempts as you can, and then say **DONE**.
 
 Rules of the game:
 
-- A crash (falling over, looping out, hitting a hazard, leaving the course) ends the attempt and puts
-  you back at the last checkpoint you crossed (or the start line), stationary. **The clock keeps
-  running** and your fault count goes up by one. Attempts = 1 + faults.
+- A crash (falling over, looping out, hitting a hazard, leaving the course) ends the attempt. The bike
+  tumbles for **1.0 s and then respawns by itself** at the last checkpoint you crossed (or the start
+  line), stationary, facing +x. This all happens inside the `play` call that crashed: when it returns
+  you are already standing at the checkpoint, ready for the next `play`. **The clock keeps running**
+  and your fault count goes up by one. Attempts = 1 + faults.
 - There is no undo. Time only goes forward. Every command is final.
-- Budget: **150 calls or 25 minutes** from `start`, whichever comes first. `look` and `status` count
-  as calls too. When the budget is gone, `play`/`restart`/`reset` answer `{"budget":"exhausted"}`;
-  call `done` at that point.
+- Budget: **150 calls or 25 minutes** from `start`, whichever comes first. **Every command is a call**,
+  `look` and `status` included. When the budget is gone, `play`/`restart`/`reset` answer
+  `{"budget":"exhausted"}`; call `done` at that point.
 
 ## Setup (do this first, once)
 
@@ -26,9 +28,9 @@ pnpm harness:stranger start --track b1-first-ride --agent <your-name>
 (If whoever handed you this file named a different track, use that id instead of `b1-first-ride`. If
 they also gave you a **session id**, the session already exists: skip `start`, run `look` with
 `--session <id>` instead, and use that id on every command.)
-The output begins with a JSON object whose `sessionId` is **your session id** for every later
-command, followed by your first `look`. Nothing else needs installing; do not read or edit any other
-file in that folder — the track is meant to be discovered by riding it.
+The output begins with `session <id>`: that is **your session id** for every later command. It is
+followed by the track card and your first screen (see "What you see"). Nothing else needs installing;
+do not read or edit any other file in that folder — the track is meant to be discovered by riding it.
 
 ## The tool
 
@@ -40,13 +42,31 @@ pnpm harness:stranger <cmd> [args] --session <id>
 
 | command | what it does |
 | --- | --- |
-| `start --track <id> --agent <name>` | create your session (once). Prints the session id and a first `look`. |
-| `look` | JSON numbers + an ASCII side-view of the next ~40 m of track (`B` = you, `\|` = checkpoint, `F` = finish, `_ / \` = ground and ramps, `#` = block, `o` = drum, `~` = seesaw plank, `x` = hazard, a ruler with x in metres underneath). |
+| `start --track <id> --agent <name>` | create your session (once). Prints the session id, the track card and the screen. |
+| `play "<slots>"` | drive for up to 40 slots of 1/8 s each. Prints a JSON summary, one trace line per slot (`x`, `vx`, angle, ground/AIR), **then the screen**. Stops early at a crash (after the auto-respawn) or at the finish. **This is the only command you normally need.** |
+| `look` | the track card and the screen again, without moving. Costs a call; `play` already shows you the screen, so you rarely need it. |
 | `status` | the JSON numbers only. |
-| `play "<slots>"` | drive for up to 40 slots of 1/8 s each. Returns a JSON summary, then one trace line per slot (`x`, `vx`, angle, ground/AIR). Stops early at a crash or the finish. |
-| `restart` | give up this attempt: back to the last checkpoint (counts as a fault). |
-| `reset` | back to the start line, faults kept (counts as a fault). |
+| `restart` | give up a **live** attempt: back to the last checkpoint, stationary (counts as a fault). Never needed after a crash — the crash already respawned you there. |
+| `reset` | back to the **start line**, checkpoints forgotten, faults kept (counts as a fault). Almost never worth it: a checkpoint respawn keeps your progress. |
 | `done` | end the session and write the result. Call it exactly once, when finished or stuck. |
+
+## What you see
+
+The **track card** (printed by `start` and `look`) is what the game shows on its menu and HUD:
+
+```
+track b1-first-ride (beginner) "First Ride" — technique: throttle control
+hints: Hold the gas up the hill · Steady gas over the rollers · Off the gas down the descent · Brake before the hump
+checkpoints at x = 42, 171, 332 m; finish at x = 501 m
+```
+
+`technique` is the one skill the track is about. `hints` (beginner tracks only) are the on-screen tips,
+in obstacle order. The checkpoint list is the progress strip: cross a checkpoint and every later crash
+respawns you there.
+
+The **screen** is the JSON numbers followed by an ASCII side-view of the ~35 m ahead of you (and 5 m
+behind): `B` = you, `|` = checkpoint, `F` = finish, `_ / \` = ground and ramps, `#` = block, `o` = drum,
+`~` = seesaw plank, `x` = hazard, with a ruler in metres underneath.
 
 The JSON numbers: `x` (metres along the course), `y`, `vx` (m/s), `angle_deg` (0 = level, positive =
 nose up, negative = nose down), `grounded`, `checkpoint` (index of the last one crossed, -1 = none),
@@ -74,31 +94,57 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
 | `lf` | lean forward (no gas) | rotate nose down in the air |
 | `t` | tap gas (a short blip, then coast for the rest of the slot) | inch forward, balance |
 
-Tips: a crashed attempt tells you what happened (`faulted.reason`) and where you respawned. Read the
-trace lines: the angle and ground/AIR columns show a wheelie or a flight developing slot by slot, so
-shorten the next `play` and correct. Leaning in the air changes your pitch, not your path. If a call
-says `finished: true`, you are done: call `done`.
+## Spending calls well
+
+- **Send the whole plan you are confident in, in one `play`.** The call stops by itself at a crash or
+  the finish, and unplayed slots cost nothing. A crash costs an attempt, never extra calls. Chopping a
+  plan into 4-slot pieces costs a call per piece and gains nothing you cannot read from the trace.
+- **Do not `look` after a `play`** — the screen is already at the bottom of the `play` output. `look` is
+  for when you want the track card back.
+- **Read the trace.** The angle column shows a wheelie or a flight developing slot by slot; `AIR`
+  shows when you left the ground; a slot that crossed a checkpoint, crashed or finished is marked
+  `<- CHECKPOINT n` / `<- CRASH (reason)` / `<- FINISH`. `faulted` in the summary tells you where you crashed (`at`) and
+  where you respawned (`respawnedAt`); the screen underneath is already drawn from the respawn point.
+- **Count from the ruler.** At `vx` m/s you cover `vx / 8` m per slot, so the ruler tells you how
+  many slots reach the next obstacle.
+- Leaning in the air changes your pitch, not your path.
+- If a call says `finished: true`, you are done: call `done`.
 
 ## Example session
 
 ```
 $ pnpm harness:stranger look --session flat-test-20260914-002749
-{"x":0,"y":0.54,"vx":0,"angle_deg":0,"grounded":true,"checkpoint":-1,"checkpointCount":2,"faults":0,"attempt":1,"runTime":0,"finishX":120,"distanceToFinish":120,...}
-$ pnpm harness:stranger play "g20" --session flat-test-20260914-002749
-{"attempt":1,"slots":"g20","slotsPlayed":20,"after":{"x":18.15,"vx":11.67,"angle_deg":0},"events":[],"checkpoint":-1,"grounded":true,"faults":0,"runTime":2.5,...}
+track flat-test (beginner) "Flat Test Strip"
+checkpoints at x = 40, 80 m; finish at x = 120 m
+{"x":0.57,"y":0.48,"vx":0,"angle_deg":0,"grounded":false,"checkpoint":-1,"checkpointCount":2,"faults":0,"attempt":1,"runTime":0,"finishX":120,"distanceToFinish":119.43,...}
+view x -4..36 m, y -1.0..7.0 m  (B bike, | checkpoint, F finish, _/\ ground, # box, o drum, ~ seesaw, x hazard)
+(... 16 rows of side-view ...)
+__________B_____________________________________________________________________
+        0                   10                  20                  30
 $ pnpm harness:stranger play "g40" --session flat-test-20260914-002749
-{"attempt":1,"slotsPlayed":40,"after":{"x":51.29,"vx":14,"angle_deg":0},"events":[{"t":6.667,"type":"checkpoint","index":0}],"checkpoint":0,...}
+{"attempt":1,"slots":"g40","slotsPlayed":40,"slotsRequested":40,"before":{"x":0.57,"vx":0,"angle_deg":0},"after":{"x":69.65,"vx":16.35,"angle_deg":36.7},"events":[{"t":3.167,"type":"checkpoint","index":0}],"checkpoint":0,"grounded":true,"faults":0,"runTime":5,"distanceToFinish":50.35,...}
+01 g   x=   0.6 vx=  0.5 ang=   2 ground
+02 g   x=   0.7 vx=  1.8 ang=   7 ground
+(... one line per slot ...)
+40 g   x=  69.7 vx= 16.4 ang=  37 ground
+view x 65..105 m, y -1.0..7.0 m  (B bike, | checkpoint, F finish, _/\ ground, # box, o drum, ~ seesaw, x hazard)
+                              |
+(... side-view from the new position: the next checkpoint is the | at x = 80 ...)
+          B                   |
+________________________________________________________________________________
+          70                  80                  90                  100
 $ pnpm harness:stranger play "g40" --session flat-test-20260914-002749
-{"attempt":1,"slotsPlayed":39,"events":[{"t":9.525,"type":"checkpoint","index":1},{"t":12.383,"type":"finish"}],"finished":true,"note":"FINISHED at run time 12.3833s. Call 'done'."}
+{"attempt":1,"slots":"g40","slotsPlayed":25,"slotsRequested":40,...,"events":[{"t":5.592,"type":"checkpoint","index":1},{"t":8.067,"type":"finish"}],"finished":true,"note":"FINISHED at run time 8.0667s. Call 'done'."}
 $ pnpm harness:stranger done --session flat-test-20260914-002749
-stranger flat-test session=flat-test-20260914-002749 attempts=1 cleared=yes finish=12.383s calls=5 wall=41.2s
+stranger flat-test session=flat-test-20260914-002749 attempts=1 cleared=yes finish=8.067s calls=4 wall=41.2s
 DONE
+```
+
+A crash looks like this (the remaining slots are dropped; you are already back at the checkpoint):
+
+```
+{"attempt":1,"slots":"g40","slotsPlayed":20,"slotsRequested":40,...,"faults":1,"runTime":3.45,"faulted":{"reason":"crash","at":27.11,"respawnedAt":0.57,"respawnAfterS":1},"note":"crashed (crash) at x=27.1 after slot 20; the game respawned you 1.0 s later at checkpoint -1 (x=0.6), stationary, facing +x. Remaining 20 slot(s) were NOT played; your next play starts here."}
 ```
 
 When you have finished the track, or you are stuck and out of ideas or budget, run `done` and then
 reply with the single word **DONE** followed by one sentence on what the hardest part was.
-
-Reading the side-view: the ground is drawn with `_` (flat), `/` (uphill) and `\` (downhill); a `#`
-block or `/` ramp ahead means you need speed and/or a lifted front wheel; a gap in the ground line is
-a hole you must jump. The ruler underneath gives x in metres so you can count how many slots of riding
-(at your current `vx`) reach it. When in doubt, `play` short strings (4–8 slots), `look`, adjust.
