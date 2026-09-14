@@ -9,3 +9,4 @@
 - One commit per round; the subject states the finding.
 - Ship gate every third round: cold boot, clear a track, crash, instant restart.
 - Never announce completion while budget remains.
+- This game should be playable on mobile iOS safari & desktop.
