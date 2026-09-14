@@ -7,7 +7,7 @@
 import type { InputDevice, QualityTier, TrackDef } from '../core/types';
 import type { AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
-import { MainMenu, PauseMenu, loadGhostEnabled, loadQualityOverride, mountRotatePrompt, saveGhostEnabled, saveQualityOverride, type BestTimes, type DomHud, type QualityChoice } from '../ui';
+import { MainMenu, PauseMenu, loadGhostEnabled, loadModelChoice, loadQualityOverride, mountRotatePrompt, saveGhostEnabled, saveModelChoice, saveQualityOverride, type BestTimes, type DomHud, type ModelChoice, type QualityChoice } from '../ui';
 import type { Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
 
@@ -20,6 +20,12 @@ export interface AppOptions {
   uiRoot: HTMLElement;
   resize(width: number, height: number, pixelRatio: number): void;
   initialTrack?: string | undefined;
+  /** Model choices in effect for this page load (URL param or stored). */
+  models: { rider: ModelChoice; bike: ModelChoice };
+  /** Called after a model choice changes; the renderer is built once, so the app reloads. */
+  applyModels?: ((models: { rider: ModelChoice; bike: ModelChoice }) => boolean) | undefined;
+  /** `?touchdebug=1`: overlay of active pointers + live InputFrame. */
+  touchDebug?: boolean | undefined;
 }
 
 const PROBE_FRAMES = 60;
@@ -63,7 +69,7 @@ export class App {
       .map((id) => getTrack(id))
       .filter((t): t is TrackDef => t !== undefined);
 
-    this.touch = new TouchInput(o.uiRoot);
+    this.touch = new TouchInput(o.uiRoot, { debug: o.touchDebug ?? false });
     this.mux.add(new KeyboardInput()).add(new GamepadInput()).add(this.touch);
     this.mux.onDeviceChange = (d) => this.onDevice(d);
 
@@ -76,6 +82,18 @@ export class App {
         setGhost: (on) => {
           saveGhostEnabled(on);
           this.game.setGhostEnabled(on);
+        },
+        setModel: (which, v) => {
+          saveModelChoice(which, v);
+          const models = { rider: loadModelChoice('rider'), bike: loadModelChoice('bike') };
+          const applied = o.applyModels?.(models) ?? false;
+          if (!applied) {
+            // Renderer is constructed once: reload without model params so the stored choice wins.
+            const url = new URL(location.href);
+            url.searchParams.delete('rider');
+            url.searchParams.delete('bike');
+            location.replace(url.toString());
+          }
         },
       },
       (id) => this.bestTimes.get(id),
@@ -99,6 +117,8 @@ export class App {
 
     this.qualityChoice = loadQualityOverride();
     this.menu.setQuality(this.qualityChoice);
+    this.menu.setModel('rider', o.models.rider);
+    this.menu.setModel('bike', o.models.bike);
     const ghostOn = loadGhostEnabled();
     this.menu.setGhost(ghostOn);
     this.game.setGhostEnabled(ghostOn);

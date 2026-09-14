@@ -392,15 +392,21 @@ export class DomHud implements Hud {
 
   private refreshHints(): void {
     const t = this.track;
-    const hints = t?.tier === 'beginner' ? (t.meta?.hints?.length ? t.meta.hints : DEFAULT_HINTS[this.device]) : null;
+    // Authored hints show on every track that has them; beginner tracks without any get the device defaults.
+    const authored = t?.meta?.hints;
+    const hints = authored?.length ? authored : t?.tier === 'beginner' ? DEFAULT_HINTS[this.device] : null;
     if (!hints) {
       this.hintsEl.classList.remove('show');
       return;
     }
+    const isDefault = !authored?.length;
     this.hintsEl.innerHTML = hints
       .map((h) => {
         const sp = h.indexOf(' ');
-        return sp > 0 ? `<span><kbd>${escapeHtml(h.slice(0, sp))}</kbd>${escapeHtml(h.slice(sp + 1))}</span>` : `<span>${escapeHtml(h)}</span>`;
+        // Device defaults are "Key action" pairs (key in a keycap); authored hints are sentences.
+        return isDefault && sp > 0
+          ? `<span><kbd>${escapeHtml(h.slice(0, sp))}</kbd>${escapeHtml(h.slice(sp + 1))}</span>`
+          : `<span>${escapeHtml(h)}</span>`;
       })
       .join('');
     this.hintsEl.classList.add('show');

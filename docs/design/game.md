@@ -193,3 +193,34 @@ itself is ≈ 0.5 µs), **2.2–4.8 µs/tick** with the ghost world on, node mea
 State is cloned lazily once per tick (`getState()` hands out the same object until the next tick),
 nothing hashes per tick, and events fan out synchronously per *event* (checkpoint/fault/land are
 rare) — those were the suspects and they are not on the profile.
+
+## 10. Front end (title → menu → track select → run) — spec for the next round
+
+Flow (`App` state): `title` → `menu` → `tracks` → `settings` | `credits`; `run` (countdown…) → `pause`
+→ `results`. `?harness=1` and `?track=` skip straight to the run; `?dev=1` unlocks every tier.
+
+- **Title**: live 3D scene as backdrop (bike idling at `b1-first-ride`'s start, camera drifting on a
+  slow 12 s ease, exhaust blips from the renderer's idle state, ambient audio after unlock). Key art
+  from `public/art/manifest.json` (`kind: 'keyart'`) sits *behind* the 3D canvas at 55 % opacity with a
+  bottom-up scrim `linear-gradient(180deg, transparent 35%, rgba(6,7,9,.92))`. Wordmark **TRIALS
+  GAUNTLET**: display face (bundled woff2 ≤ 60 KB, heavy italic condensed), amber bevel via layered
+  text-shadow + faint emissive glow, tracking −0.01em; one "PRESS ANY KEY · TAP TO START" line pulsing
+  at 1.6 s. No buttons. Any key/pad button/tap → menu (240 ms fade + 12 px rise).
+- **Main menu**: left-aligned vertical list, 2.4 rem items, amber selection bar sliding at 120 ms,
+  item rise 240 ms; Play, Time Attack (ghost info + last PB), Settings, Credits. Focus by keyboard /
+  d-pad / stick with tick sounds (`audio.onEvent`-adjacent UI cue), tap on touch, Esc/B back.
+- **Track select**: tier rows (Beginner → Extreme) as horizontal carousels; card = art
+  (`kind:'track', track:<id>`; fallback biome-tinted panel with the tier badge), medal icon
+  (`kind:'medal'`), best time + target, technique line; locked rows dimmed with a lock glyph until the
+  previous tier holds a medal per track. Selecting scales the card 1.06 → flies up 400 ms while the 3D
+  scene loads the track and the countdown begins in place (no reload feel).
+- **Settings panel**: Quality, Sound + volume slider, Ghost, Rider/Bike model, Controls reference
+  (device diagrams: keyboard keycaps, pad glyphs, touch zone map), Reset progress. Dev-only flags stay
+  URL-only.
+- **Tokens** (`src/ui/styles.ts`): colours (`--amber`, `--ink`, `--slab` …), spacing 4/8/12/16/24/40,
+  radii 6/10/16, motion 120/240/400 ms with `cubic-bezier(.2,.8,.2,1)`, display + UI faces.
+- **Budget**: title-critical art ≤ 2.5 MB (key art + wordmark + fonts); track cards, medal icons and
+  plates lazy-loaded on entering track select; missing manifest or asset → tinted fallback, never a
+  broken image.
+- **Evidence**: captures at 1280×720 and 844×390 for title, menu, track select, settings, pause,
+  results.

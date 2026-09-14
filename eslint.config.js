@@ -26,6 +26,12 @@ export default tseslint.config(
     rules: { 'no-console': 'off' },
   },
   {
+    // Node scripts outside the TS graph (art generation, build helpers).
+    files: ['**/*.mjs', '**/*.cjs', 'assets/**/*.js'],
+    languageOptions: { globals: { ...globals.node } },
+    rules: { 'no-console': 'off' },
+  },
+  {
     files: DETERMINISTIC_PATHS,
     ignores: ['**/*.test.ts', 'src/core/loop.ts'],
     rules: {

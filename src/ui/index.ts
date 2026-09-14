@@ -26,5 +26,5 @@ export interface Hud {
 export { formatTime, formatDelta } from './format';
 export { DomHud } from './hud';
 export { MainMenu, PauseMenu, mountRotatePrompt, type MenuCallbacks, type PauseCallbacks, type QualityChoice } from './menu';
-export { BestTimes, loadQualityOverride, saveQualityOverride, loadGhostEnabled, saveGhostEnabled, type BestEntry } from './best';
+export { BestTimes, loadQualityOverride, saveQualityOverride, loadGhostEnabled, saveGhostEnabled, loadModelChoice, saveModelChoice, type BestEntry, type ModelChoice } from './best';
 export { injectStyles, UI_CSS } from './styles';

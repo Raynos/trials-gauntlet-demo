@@ -65,6 +65,26 @@ export class BestTimes {
 }
 
 const GHOST_KEY = 'trials.ghost';
+const MODEL_KEYS = { rider: 'trials.riderModel', bike: 'trials.bikeModel' } as const;
+
+export type ModelChoice = 'proc' | 'gltf';
+
+export function loadModelChoice(which: 'rider' | 'bike'): ModelChoice {
+  try {
+    const v = store()?.getItem(MODEL_KEYS[which]);
+    return v === 'gltf' ? 'gltf' : 'proc';
+  } catch {
+    return 'proc';
+  }
+}
+
+export function saveModelChoice(which: 'rider' | 'bike', v: ModelChoice): void {
+  try {
+    store()?.setItem(MODEL_KEYS[which], v);
+  } catch {
+    /* storage unavailable */
+  }
+}
 
 export function loadGhostEnabled(): boolean {
   try {

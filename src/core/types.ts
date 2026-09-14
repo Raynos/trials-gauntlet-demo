@@ -253,10 +253,15 @@ export interface PhysicsState {
   rider: RiderPose;
   /** Index of the last checkpoint crossed, -1 when none. */
   checkpoint: number;
-  /** True when the run is over (finished or faulted). */
+  /**
+   * "Run over" flag — TRUE ON FAULTS TOO (crash, out-of-bounds, hazard), not just on a finish.
+   * It means "physics stopped racing", not "the player cleared the track". To test for a clear
+   * use `finishTime !== null` (or `hook.cleared()` / `Game.cleared()`); to test for a crash use
+   * `faulted !== null`. Two owners have tripped on this; the name is kept for wire compatibility.
+   */
   finished: boolean;
   faulted: FaultReason | null;
-  /** Finish time in seconds, or null while running. */
+  /** Finish time in seconds — non-null iff the track was CLEARED. Null while running or after a fault. */
   finishTime: number | null;
   /** The quantized input applied this tick. */
   input: { throttle: number; brake: number; lean: number };
@@ -451,4 +456,6 @@ export interface TrialsHook {
   skipCountdown(): void;
   /** PB ghost physics state (second world, lockstep from GO), or null. */
   ghost(): PhysicsState | null;
+  /** True iff the current segment crossed the finish line (`finishTime !== null`). Faults never set this. */
+  cleared(): boolean;
 }

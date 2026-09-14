@@ -7,6 +7,8 @@
  *   ?physics=mock   force the scaffold MockPhysics even when the real bike physics exists
  *   ?audio=0        NullAudio (the hook then has no renderOffline)
  *   ?ghost=1        run the PB ghost world in harness mode too (off by default there: one world per µs/tick)
+ *   ?rider=gltf|proc, ?bike=gltf|proc   rider / bike model (default proc; stored choice from the settings menu otherwise)
+ *   ?touchdebug=1   overlay showing active touch pointers and the live InputFrame
  *   ?track=<id>     start straight into a track (skips the menu)
  *   ?hz=<n>         physics rate (default 120)
  */
@@ -18,7 +20,7 @@ import type { AudioSystem } from './audio';
 import type { PhysicsWorld } from './physics';
 import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, dprCap, installHook, type HookExtras } from './game';
-import { BestTimes, DomHud, injectStyles } from './ui';
+import { BestTimes, DomHud, injectStyles, loadModelChoice, type ModelChoice } from './ui';
 
 type AnyModule = Record<string, unknown>;
 
@@ -36,9 +38,23 @@ function physicsFactory(forceMock: boolean): { make: PhysicsFactoryFn; kind: str
   return { make: (hz) => new MockPhysics(hz), kind: 'mock' };
 }
 
-function makeRenderer(parent: HTMLElement, harness: boolean): { renderer: GameRenderer; kind: string } {
+export interface ModelChoices {
+  riderModel: ModelChoice;
+  bikeModel: ModelChoice;
+}
+
+function modelChoices(params: URLSearchParams): ModelChoices {
+  const pick = (v: string | null, stored: ModelChoice): ModelChoice => (v === 'gltf' || v === 'proc' ? v : stored);
+  return {
+    riderModel: pick(params.get('rider'), loadModelChoice('rider')),
+    bikeModel: pick(params.get('bike'), loadModelChoice('bike')),
+  };
+}
+
+function makeRenderer(parent: HTMLElement, harness: boolean, models: ModelChoices): { renderer: GameRenderer; kind: string } {
   const m = renderMod as AnyModule;
-  const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness };
+  // riderModel / bikeModel: 'proc' | 'gltf' — the render owner reads them; unknown keys are ignored today.
+  const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness, ...models };
   const create = m['createRenderer'];
   if (typeof create === 'function') {
     return { renderer: (create as (p: HTMLElement, o: typeof opts) => GameRenderer)(parent, opts), kind: 'createRenderer' };
@@ -94,12 +110,13 @@ function boot(): void {
   injectStyles();
   const extras: HookExtras = {};
   const initialTrack = params.get('track') ?? undefined;
+  const models = modelChoices(params);
 
   let composed: Composed | null = null;
   const compose = (): Composed => {
     if (composed) return composed;
     const t0 = performance.now();
-    const { renderer, kind: renderKind } = makeRenderer(app, harness);
+    const { renderer, kind: renderKind } = makeRenderer(app, harness, models);
     const tRender = performance.now();
     const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics') === 'mock');
     const physics = makePhysics(physicsHz);
@@ -126,7 +143,7 @@ function boot(): void {
       ghostEnabled: !harness || params.get('ghost') === '1',
     });
     const tGame = performance.now();
-    extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind };
+    extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind, rider: models.riderModel, bike: models.bikeModel };
     console.info(
       `[trials] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=${harness} | compose at ${t0.toFixed(0)} ms since nav; ms: render ${(tRender - t0).toFixed(0)} physics ${(tPhysics - tRender).toFixed(0)} audio ${(tAudio - tPhysics).toFixed(0)} game+hud ${(tGame - tAudio).toFixed(0)}`,
     );
@@ -162,6 +179,14 @@ function boot(): void {
     uiRoot: document.getElementById('ui')!,
     resize: (w, h, dpr) => renderer.resize(w, h, dpr),
     initialTrack,
+    models: { rider: models.riderModel, bike: models.bikeModel },
+    touchDebug: params.get('touchdebug') === '1',
+    applyModels: (m) => {
+      const r = renderer as Partial<{ setModels(o: ModelChoices): void }>;
+      if (typeof r.setModels !== 'function') return false;
+      r.setModels({ riderModel: m.rider, bikeModel: m.bike });
+      return true;
+    },
   });
   installHook(game, false, extras);
   renderer.resize(window.innerWidth, window.innerHeight, dprCap());

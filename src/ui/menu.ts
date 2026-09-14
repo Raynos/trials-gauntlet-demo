@@ -4,7 +4,7 @@
  * keyboard (Enter / Esc) and the gamepad meta buttons via `confirm()`/`back()`.
  */
 import type { QualityTier, TrackDef, TrackTier } from '../core/types';
-import type { BestEntry } from './best';
+import type { BestEntry, ModelChoice } from './best';
 import { formatTime } from './format';
 
 export type QualityChoice = QualityTier | 'auto';
@@ -14,6 +14,8 @@ export interface MenuCallbacks {
   setQuality(q: QualityChoice): void;
   setAudio(on: boolean): void;
   setGhost(on: boolean): void;
+  /** Rider / bike model choice; applies on the next load (the renderer is built once). */
+  setModel(which: 'rider' | 'bike', v: ModelChoice): void;
 }
 
 export interface PauseCallbacks {
@@ -56,6 +58,10 @@ export class MainMenu {
           </div>
           <button class="btn audio">Sound on</button>
           <button class="btn ghost">Ghost on</button>
+          <span class="lbl">Rider</span>
+          <div class="seg model" data-which="rider"><button data-m="proc">Procedural</button><button data-m="gltf">Modelled</button></div>
+          <span class="lbl">Bike</span>
+          <div class="seg model" data-which="bike"><button data-m="proc">Procedural</button><button data-m="gltf">Modelled</button></div>
         </div>
       </div>
       <div class="list"></div>`;
@@ -68,6 +74,15 @@ export class MainMenu {
       this.setQuality(q);
       this.cb.setQuality(q);
     });
+    for (const seg of panel.querySelectorAll<HTMLDivElement>('.seg.model')) {
+      seg.addEventListener('click', (e) => {
+        const m = (e.target as HTMLElement).closest('[data-m]')?.getAttribute('data-m') as ModelChoice | null;
+        const which = seg.getAttribute('data-which') as 'rider' | 'bike';
+        if (!m) return;
+        this.setModel(which, m);
+        this.cb.setModel(which, m);
+      });
+    }
     this.ghostBtn = panel.querySelector('.btn.ghost') as HTMLButtonElement;
     this.ghostBtn.addEventListener('click', () => this.setGhost(!this.ghostOn, true));
     this.audioBtn.addEventListener('click', () => {
@@ -109,6 +124,11 @@ export class MainMenu {
       html += '</div>';
     }
     this.list.innerHTML = html;
+  }
+
+  setModel(which: 'rider' | 'bike', v: ModelChoice): void {
+    const seg = this.root.querySelector(`.seg.model[data-which="${which}"]`);
+    seg?.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-m') === v));
   }
 
   setGhost(on: boolean, notify = false): void {

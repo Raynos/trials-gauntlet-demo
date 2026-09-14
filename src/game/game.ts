@@ -690,6 +690,11 @@ export class Game {
     return this.getState().finishTime;
   }
 
+  /** Track cleared (finish line crossed). `PhysicsState.finished` is also true on faults — do not use it for this. */
+  cleared(): boolean {
+    return this.getState().finishTime !== null;
+  }
+
   stats(): RenderStats {
     return this.renderer.stats();
   }
