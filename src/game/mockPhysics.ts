@@ -15,6 +15,9 @@ const BRAKE_DECEL = 16;
 const DRAG = 0.6;
 const LEAN_RATE = 3.5;
 const MAX_ANGLE = 0.5;
+/** Mock crash: lean back + throttle held this many ticks at speed = loop-out. */
+const LOOP_OUT_TICKS = 120;
+const RAGDOLL_IDS = ['head', 'torso', 'pelvis', 'upperArm', 'forearm', 'thigh', 'shin'] as const;
 
 function profileY(track: TrackDef, x: number): number {
   const p = track.profile;
@@ -41,6 +44,9 @@ export class MockPhysics implements PhysicsWorld {
   private events: GameEvent[] = [];
   private hopLatch = false;
   private restartLatch = false;
+  /** Consecutive ticks of lean-back + throttle at speed; loops out past LOOP_OUT_TICKS. */
+  private wheelieTicks = 0;
+  private oobY = -6;
 
   constructor(physicsHz: number) {
     this.physicsHz = physicsHz;
@@ -79,6 +85,7 @@ export class MockPhysics implements PhysicsWorld {
   loadTrack(track: CompiledTrack, seed: number): void {
     this.track = track.def;
     this.seed = seed >>> 0;
+    this.oobY = track.oobY;
     this.reset(-1);
   }
 
@@ -93,6 +100,7 @@ export class MockPhysics implements PhysicsWorld {
     this.rng = new Rng((this.seed ^ Math.imul(checkpoint + 2, 0x9e3779b9)) >>> 0);
     this.hopLatch = false;
     this.restartLatch = false;
+    this.wheelieTicks = 0;
     this.placeWheels();
     this.events.push({ type: 'restart', checkpoint, tick: 0 });
   }
@@ -111,6 +119,13 @@ export class MockPhysics implements PhysicsWorld {
       return;
     }
     if (!input.restart) this.restartLatch = false;
+    if (s.faulted) {
+      // Ragdoll tumbles deterministically until the game resets us.
+      this.stepRagdoll();
+      s.tick++;
+      s.time = s.tick * dt;
+      return;
+    }
     if (s.finished) {
       // Frozen; still tick the clock so hashes advance predictably.
       s.tick++;
@@ -135,14 +150,12 @@ export class MockPhysics implements PhysicsWorld {
     s.rider.torsoPitch = -s.rider.lean * 0.3;
     s.rider.armExtend = Math.max(0, -s.rider.lean);
 
-    // Hop: a tiny deterministic bounce (visual only in the mock).
-    if (input.hop && !this.hopLatch) {
-      this.hopLatch = true;
-      s.bike.vel.y = 2.5;
-      s.rider.crouch = 1;
-    }
-    if (!input.hop) this.hopLatch = false;
+    // Loop-out: lean back with throttle at speed for too long = crash (the
+    // mock's only fault, so the harness has a deterministic crash probe).
+    const wheelie = input.lean <= -0.9 && input.throttle >= 0.5 && Math.abs(s.bike.vel.x) > 2;
+    this.wheelieTicks = wheelie ? this.wheelieTicks + 1 : 0;
     s.rider.crouch = Math.max(0, s.rider.crouch - 4 * dt);
+    s.hopPhase = wheelie ? 'preload' : 'idle';
     const groundY = profileY(track, s.bike.pos.x) + WHEEL_RADIUS + 0.2;
     s.bike.vel.y -= 9.81 * dt;
     s.bike.pos.y += s.bike.vel.y * dt;
@@ -169,11 +182,51 @@ export class MockPhysics implements PhysicsWorld {
       s.finished = true;
       s.finishTime = s.time;
       this.events.push({ type: 'finish', tick: s.tick, time: s.time });
+    } else if (this.wheelieTicks >= LOOP_OUT_TICKS) {
+      this.crash('crash');
+    } else if (s.bike.pos.y < this.oobY) {
+      this.crash('out-of-bounds');
     }
 
     // Consume one RNG value per tick so the RNG stream is part of the hash
     // surface (mirrors what real physics does with contact jitter).
     void this.rng.next();
+  }
+
+  private crash(reason: 'crash' | 'out-of-bounds'): void {
+    const s = this.state;
+    s.faulted = reason;
+    s.hopPhase = 'idle';
+    s.bike.angVel = -6;
+    // Rider leaves the bike backwards and up; bodies trail the pelvis.
+    s.ragdoll = RAGDOLL_IDS.map((id, i) => ({
+      id,
+      pos: { x: s.bike.pos.x - i * 0.12, y: s.bike.pos.y + 0.9 - i * 0.1 },
+      angle: -0.3 * i,
+    }));
+    this.events.push({ type: 'fault', reason, tick: s.tick, time: s.time });
+  }
+
+  private stepRagdoll(): void {
+    const s = this.state;
+    const dt = this.dt;
+    const track = this.requireTrack();
+    // Bike slides to a stop on its side.
+    s.bike.vel.x *= 1 - 3 * dt;
+    s.bike.pos.x += s.bike.vel.x * dt;
+    s.bike.angle = Math.max(-1.4, s.bike.angle + s.bike.angVel * dt);
+    s.bike.angVel *= 1 - 4 * dt;
+    this.placeWheels();
+    // Bodies: ballistic with a bounce, each body slightly behind the last.
+    const ground = profileY(track, s.bike.pos.x);
+    for (let i = 0; i < (s.ragdoll?.length ?? 0); i++) {
+      const b = s.ragdoll![i]!;
+      const vx = -1.5 - i * 0.2;
+      const vy = 3.5 - 9.81 * Math.min(1.2, (s.tick % 400) * dt);
+      b.pos.x += vx * dt;
+      b.pos.y = Math.max(ground + 0.15, b.pos.y + vy * dt);
+      b.angle += (2 + i * 0.4) * dt;
+    }
   }
 
   private placeWheels(): void {
@@ -211,16 +264,24 @@ export class MockPhysics implements PhysicsWorld {
   snapshot(): PhysicsSnapshot {
     const f64 = new Float64Array([this.seed, ...this.rng.state()]);
     const u8 = new TextEncoder().encode(
-      JSON.stringify({ s: this.state, h: this.hopLatch, r: this.restartLatch }),
+      JSON.stringify({ s: this.state, h: this.hopLatch, r: this.restartLatch, w: this.wheelieTicks, o: this.oobY }),
     );
     return { v: 1, f64, u8 };
   }
 
   restore(snap: PhysicsSnapshot): void {
-    const o = JSON.parse(new TextDecoder().decode(snap.u8)) as { s: PhysicsState; h: boolean; r: boolean };
+    const o = JSON.parse(new TextDecoder().decode(snap.u8)) as {
+      s: PhysicsState;
+      h: boolean;
+      r: boolean;
+      w?: number;
+      o?: number;
+    };
     this.state = o.s;
     this.hopLatch = o.h;
     this.restartLatch = o.r;
+    this.wheelieTicks = o.w ?? 0;
+    this.oobY = o.o ?? -6;
     this.seed = snap.f64[0]! >>> 0;
     this.rng.setState([snap.f64[1]!, snap.f64[2]!, snap.f64[3]!, snap.f64[4]!]);
   }

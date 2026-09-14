@@ -12,7 +12,7 @@ function run(seed: number, ticks: number): { hash: string; finish: number | null
   const events: string[] = [];
   for (let i = 0; i < ticks; i++) {
     const t = i / 120;
-    p.step(quantizeInput({ throttle: 1, lean: Math.sin(t), hop: i === 300 }));
+    p.step(quantizeInput({ throttle: 1, lean: Math.sin(t) }));
     for (const e of p.drainEvents()) events.push(e.type);
   }
   return { hash: hashPhysicsState(p.getState()), finish: p.getState().finishTime, events };

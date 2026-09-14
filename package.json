@@ -16,7 +16,16 @@
     "harness:capture": "tsx harness/capture.ts",
     "harness:perf": "tsx harness/perf.ts",
     "harness:gen-input": "tsx harness/gen-input.ts",
-    "harness:all": "tsx harness/all.ts"
+    "harness:all": "tsx harness/all.ts",
+    "harness:bot": "tsx harness/bot/bot.ts",
+    "harness:stranger": "tsx harness/stranger/cli.ts",
+    "harness:pair": "tsx harness/compare/pair.ts",
+    "harness:log-verdict": "tsx harness/compare/log.ts",
+    "harness:determinism": "tsx harness/gate/determinism.ts",
+    "harness:gate": "tsx harness/gate/ship-gate.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "engines": {
     "node": ">=22"
@@ -26,11 +35,15 @@
     "three": "0.186.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@types/node": "^24.6.0",
     "@types/three": "0.186.0",
+    "eslint": "^9.39.5",
+    "globals": "^16.5.0",
     "playwright": "1.62.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.0",
     "vite": "^7.1.7",
     "vitest": "^3.2.4"
   },

@@ -30,7 +30,11 @@ export interface InputFrame {
   brake: number;
   /** -1..1 rider weight shift, negative = lean back, positive = lean forward. */
   lean: number;
-  /** Bunny-hop / preload request (edge-triggered by physics). */
+  /**
+   * @deprecated There is no hop button (CONTRACT §2.8): the hop is a lean/throttle
+   * technique inside physics. Kept only so the recording flag byte keeps its layout;
+   * input devices never set it and physics must ignore it.
+   */
   hop?: boolean;
   /** Player asked for an instant restart at the last checkpoint. */
   restart?: boolean;
@@ -63,7 +67,7 @@ export interface TrackObstacle {
 }
 
 /** Piecewise-linear ground profile: sorted by x. */
-export interface TrackProfilePoint extends Vec2 {}
+export type TrackProfilePoint = Vec2;
 
 export interface TrackCheckpoint {
   /** x position along the course; crossing it arms a restart point. */
@@ -291,6 +295,44 @@ export type GameEvent =
 export type GamePhase = 'menu' | 'countdown' | 'riding' | 'crashed' | 'finished';
 export type QualityTier = 'low' | 'medium' | 'high';
 
+/**
+ * Per-frame run info the game pushes to the HUD (`Hud.setRun`) and the renderer
+ * (`GameRenderer.setRunInfo`, which only needs `runTime` + `phase`).
+ */
+export interface RunInfo {
+  /** Run clock in seconds: 0 before GO, runs through crashes/restarts, frozen at finish. */
+  runTime: number;
+  faults: number;
+  phase: GamePhase;
+  /** Last checkpoint crossed, -1 = none. */
+  checkpoint: number;
+  checkpointCount: number;
+  /**
+   * Simulated seconds since the track was loaded (loop ticks / hz; keeps
+   * running through countdown and restarts). HUD motion is clocked from this,
+   * never from wall time, so captures are frame-deterministic.
+   */
+  simTime: number;
+}
+
+export type Medal = 'platinum' | 'gold' | 'silver' | 'bronze';
+
+/** Outcome of one finished run (results panel, best-time store). */
+export interface RunResult {
+  trackId: string;
+  /** Run clock at the finish line (what every metric calls "finish time"). */
+  time: number;
+  faults: number;
+  medal: Medal;
+  /** True when this run beat the stored best time. */
+  personalBest: boolean;
+  /** Previous best time, or null on the first clear. */
+  previousBest: number | null;
+  targetTimeS: number | null;
+}
+
+export type InputDevice = 'keyboard' | 'gamepad' | 'touch';
+
 export interface CameraDebug {
   pos: Vec2;
   dist: number;
@@ -335,6 +377,10 @@ export interface HookInfo {
   seed: number;
   /** True when the game is not running its own clock (harness mode). */
   harness: boolean;
+  /** Wall ms of the most recent loadTrack (compile + physics + renderer.setTrack + audio.setTrack). */
+  loadTrackMs?: number;
+  /** Which implementations main.ts composed, e.g. { physics: 'createBikePhysics', render: 'ThreeRenderer', audio: 'WebAudioSystem' }. */
+  modules?: Record<string, string>;
 }
 
 /**

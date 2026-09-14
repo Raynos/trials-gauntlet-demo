@@ -1,7 +1,10 @@
+/**
+ * Minimal real-time driver for a Game without the App shell (tests, embeds):
+ * polls an InputMux and feeds elapsed seconds. The browser entry uses `App`.
+ */
 import type { Game } from './game';
-import type { KeyboardInput } from './input';
+import type { InputMux } from './input';
 
-/** Drives the game from requestAnimationFrame in real browsers. */
 export class RafDriver {
   private handle = 0;
   private last = 0;
@@ -9,7 +12,7 @@ export class RafDriver {
 
   constructor(
     private readonly game: Game,
-    private readonly keyboard: KeyboardInput,
+    private readonly mux: InputMux,
   ) {}
 
   start(): void {
@@ -20,7 +23,7 @@ export class RafDriver {
       if (!this.running) return;
       const elapsed = (now - this.last) / 1000;
       this.last = now;
-      this.game.setInput(this.keyboard.read());
+      this.game.setInput(this.mux.poll().frame);
       this.game.advance(elapsed);
       this.handle = requestAnimationFrame(frame);
     };
