@@ -271,8 +271,8 @@ export class App {
     this.menu = new MainMenuScreen(o.uiRoot, this.sfx, cb, bestOf, state);
     this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
-    this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb);
-    this.garage = new GarageScreen(o.uiRoot, this.sfx, {
+    this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb, this.art);
+    this.garage = new GarageScreen(o.uiRoot, this.sfx, this.art, {
       previewBike: (b) => this.applyBike(b, false),
       setBike: (b) => this.applyBike(b, true),
       back: () => this.goto('menu'),

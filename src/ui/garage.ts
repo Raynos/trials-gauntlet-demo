@@ -7,6 +7,7 @@
  * per-tier default applies only until the player has picked once (rules.ts).
  */
 import type { BikeClass } from '../core/types';
+import type { ArtManifest } from './art';
 import { escapeHtml } from './front';
 import type { UiSfx } from './sfx';
 
@@ -83,9 +84,14 @@ export class GarageScreen {
   constructor(
     parent: HTMLElement,
     private readonly sfx: UiSfx,
+    art: ArtManifest,
     private readonly cb: GarageCallbacks,
   ) {
     this.root = h('div', 'screen garage-screen');
+    // Art round 2: garage plate behind the card column (masked clear on the live-bike side), bike renders in the cards.
+    const plate = h('div', 'plate-bg garage-plate');
+    this.root.appendChild(plate);
+    art.whenReady(() => art.applyBackground(plate, art.byId('garage-plate') ?? art.byId('results-garage')));
     const head = h('div', 'garage-head', `<h1><small>Garage</small>Choose your bike</h1><div class="garage-sub">Applies to every track · change it here any time</div>`);
     const row = h('div', 'garage-cards');
     for (const spec of [BIKE_SPECS.rookie, BIKE_SPECS.pro]) {
@@ -93,7 +99,7 @@ export class GarageScreen {
       el.type = 'button';
       el.dataset['bike'] = spec.id;
       el.style.setProperty('--tint', spec.tint);
-      el.innerHTML = `<div class="bc-top"><span class="bc-kicker">${spec.id === 'rookie' ? 'Class A' : 'Class P'}</span><span class="bc-sel">Selected</span></div>
+      el.innerHTML = `<div class="bc-art"></div><div class="bc-top"><span class="bc-kicker">${spec.id === 'rookie' ? 'Class A' : 'Class P'}</span><span class="bc-sel">Selected</span></div>
         <div class="bc-name">${escapeHtml(spec.name)}</div>
         <div class="bc-line">${escapeHtml(spec.line)}</div>
         <div class="bc-stats">${bar('Power', spec.power)}${bar('Grip', spec.grip)}${bar('Weight', spec.weight, spec.weightFeel)}</div>
@@ -105,6 +111,8 @@ export class GarageScreen {
         this.setFocus(spec.id, false);
         this.confirm();
       });
+      const artEl = el.querySelector<HTMLDivElement>('.bc-art')!;
+      art.whenReady(() => art.applyBackground(artEl, art.bikeArt(spec.id)));
       row.appendChild(el);
       this.cards.set(spec.id, el);
     }

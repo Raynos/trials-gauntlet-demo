@@ -79,7 +79,7 @@ function publicItems(root: string): LoadItem[] {
   } catch {
     /* no art pack */
   }
-  for (const f of ['manifest.webmanifest', 'art/icons/icon-192.png', 'art/icons/apple-touch-icon.png', 'art/icons/favicon-32.png', 'art/icons/favicon.svg']) {
+  for (const f of ['manifest.webmanifest', 'art/icons/icon-192.png', 'art/icons/icon-maskable-192.png', 'art/icons/apple-touch-icon.png', 'art/icons/favicon-32.png', 'art/icons/favicon.svg']) {
     const b = stat(f);
     if (b) items.push({ path: `./${f}`, bytes: b, gz: b, phase: 'title', label: f });
   }

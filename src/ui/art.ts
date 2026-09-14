@@ -25,6 +25,8 @@ export interface ArtEntry {
   bytes?: number;
   /** Resolution variant (`1x` / `2x`) when the pack ships more than one. */
   variant?: string;
+  /** Bike class for `kind: 'bike'` renders. */
+  bike?: string;
 }
 
 const ART_BASE = 'art/';
@@ -58,6 +60,7 @@ function normalise(raw: unknown): ArtEntry[] {
     if (typeof o['w'] === 'number') e.width = o['w'];
     if (typeof o['h'] === 'number') e.height = o['h'];
     if (typeof o['variant'] === 'string') e.variant = o['variant'];
+    if (typeof o['bike'] === 'string') e.bike = o['bike'];
     out.push(e);
   }
   return out;
@@ -120,6 +123,24 @@ export class ArtManifest {
 
   trackCard(trackId: string): ArtEntry | null {
     return this.find((e) => (e.kind === 'track-card' || e.kind === 'track') && e.track === trackId);
+  }
+
+  /** Real-render thumbnail (`kind: 'thumb'`, art round 2) — preferred over the generated card when present. */
+  trackThumb(trackId: string): ArtEntry | null {
+    return this.find((e) => e.kind === 'thumb' && e.track === trackId);
+  }
+
+  /** Garage bike render for a class; `2x` on DPR > 1.5 or wide viewports, else `1x` (the `alt` angle only as a last resort). */
+  bikeArt(bike: 'rookie' | 'pro'): ArtEntry | null {
+    const list = this.entries.filter((e) => e.kind === 'bike' && e.bike === bike);
+    if (list.length === 0) return null;
+    const hi = (typeof devicePixelRatio === 'number' && devicePixelRatio > 1.5) || (typeof innerWidth === 'number' && innerWidth > 1600);
+    return list.find((e) => e.variant === (hi ? '2x' : '1x')) ?? list.find((e) => e.variant) ?? list[0]!;
+  }
+
+  /** Any entry by id (`garage-plate`, `results-credits`, …). */
+  byId(id: string): ArtEntry | null {
+    return this.find((e) => e.id === id);
   }
 
   tierCard(tier: TrackTier): ArtEntry | null {

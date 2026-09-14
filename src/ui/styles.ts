@@ -275,6 +275,15 @@ export const FRONT_CSS = /* css */ `
 .overlay.leaving .tile, .overlay.leaving .visuals, .overlay.leaving .ov-foot { animation: none; }
 @supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) { html:not(.short) .pause-overlay.show { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); } }
 
+/* ---- art plates behind a screen (garage / credits): cover, masked clear where the live scene should show ---- */
+.plate-bg { position: absolute; inset: 0; pointer-events: none; background-size: cover; background-position: 50% 50%; opacity: 0; transition: opacity var(--t3) var(--ease); }
+.plate-bg.loaded { opacity: .55; }
+.garage-plate { -webkit-mask-image: linear-gradient(90deg, #000 40%, transparent 62%); mask-image: linear-gradient(90deg, #000 40%, transparent 62%); }
+.credits-screen .plate-bg.loaded { opacity: .35; }
+.bc-art { position: relative; width: calc(100% + 2 * var(--s4)); margin: calc(-1 * var(--s4)) calc(-1 * var(--s4)) 0; aspect-ratio: 3 / 2; max-height: 34%; background-size: cover; background-position: 50% 45%; opacity: 0; transition: opacity var(--t3) var(--ease); -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 100%); mask-image: linear-gradient(180deg, #000 60%, transparent 100%); }
+.bc-art.loaded { opacity: 1; }
+.bc-art:not(.loaded) { display: none; }
+html.short .bc-art { display: none; }
 /* ---- garage (two bike cards left, the live 3D bike is the preview on the right) ---- */
 .garage-screen { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.86) 38%, rgba(6,7,9,.25) 62%, rgba(6,7,9,.1) 100%); }
 #app.garage canvas { transform: scale(1.25) translate(28%, -2%); transform-origin: 45% 58%; transition: transform var(--t3) var(--ease); }
@@ -302,7 +311,7 @@ export const FRONT_CSS = /* css */ `
 .bike-card.on .bc-note { color: var(--ink-dim); }
 .card .top em.bike { font-style: normal; color: #0b1a2e; background: var(--blue); border-radius: 3px; padding: 1px 6px; margin-right: 2.1rem; letter-spacing: .1em; font-weight: 700; }
 .card .top em.ghost + em.bike { margin-left: -1.9rem; }
-.card .lockline { position: absolute; left: var(--s3); right: var(--s3); top: 42%; transform: translateY(-50%); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 700; text-shadow: var(--outline); display: flex; align-items: center; gap: .5em; }
+.card .lockline { position: absolute; left: var(--s3); right: var(--s3); top: 36%; transform: translateY(-50%); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); font-weight: 700; text-shadow: var(--outline); display: flex; align-items: center; gap: .45em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card .lockline::before { content: ""; flex: 0 0 auto; width: 1em; height: 1em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E") center / contain no-repeat; }
 .ov-stats b.bike-pro { color: var(--blue); }
 .tile span small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .68rem; letter-spacing: .14em; margin-top: 4px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }

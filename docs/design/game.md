@@ -406,7 +406,7 @@ User (3G, round 3): white then black for many seconds. Now:
   countdown show the chosen bike). The ghost world loads with the PB recording's own `header.bike`.
 - **Garage** (`src/ui/garage.ts`, main menu item between Play and Settings, note = current bike): two cards
   (`BIKE_SPECS`: name, one-line character, stat strip power / grip / weight feel, rule note; Rookie amber,
-  Pro `--blue`) on the left, the live 3D bike on the right is the preview (`#app.garage canvas` scales the
+  Pro `--blue`; art round 2: `bikeArt(class)` render at the top of each card, `garage-plate` masked behind the card column; track cards prefer `trackThumb` real renders, credits sit on `results-credits`) on the left, the live 3D bike on the right is the preview (`#app.garage canvas` scales the
   idle camera 1.25× and carries the bike right of the cards; the renderer gets `setBikeClass(bike)` when it
   exports one — until then the card tint is the only colour). Focus previews (`previewBike`, the backdrop
   reloads with that class), confirm commits (`trials.bikeClass`), Esc previews back to the committed class.
@@ -450,7 +450,7 @@ User (3G, round 3): white then black for many seconds. Now:
 ## 15. PWA: manifest, icons, service worker, update toast
 
 - `public/manifest.webmanifest`: `standalone`, `orientation: landscape`, `background #07080a`, `theme #0b0d10`,
-  icons from the art owner's `public/art/icons/` (`icon-192/512/1024` any, `maskable-192/512`), `og.jpg` as
+  icons from the art owner's `public/art/icons/` (`icon-192/512/1024` any, `icon-maskable-192/512`), `og.jpg` as
   the wide screenshot. `index.html`: `<link rel=manifest>`, `apple-touch-icon` (180), SVG + 32/16 favicons,
   `apple-mobile-web-app-title`, OG / Twitter card metas pointing at `https://trials-gauntlet-demo.vercel.app/art/og.jpg`.
 - Service worker source is `src/pwa/sw.js`; the `trials:pwa` Vite plugin emits `dist/sw.js` with the build id

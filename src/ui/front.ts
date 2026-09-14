@@ -492,7 +492,7 @@ export class TrackSelectScreen extends Screen {
     const artEl = el.querySelector<HTMLDivElement>('.art')!;
     const medalEl = el.querySelector<HTMLDivElement>('.medal')!;
     this.art.whenReady(() => {
-      this.art.applyBackground(artEl, this.art.trackCard(t.id) ?? this.art.tierCard(t.tier));
+      this.art.applyBackground(artEl, this.art.trackThumb(t.id) ?? this.art.trackCard(t.id) ?? this.art.tierCard(t.tier));
       if (medal) {
         const m = this.art.medal(medal);
         if (m)
@@ -885,8 +885,11 @@ export function controlsReferenceHtml(): string {
 // ---------------------------------------------------------------------------
 
 export class CreditsScreen extends Screen {
-  constructor(parent: HTMLElement, private readonly sfx: UiSfx, private readonly cb: FrontCallbacks) {
+  constructor(parent: HTMLElement, private readonly sfx: UiSfx, private readonly cb: FrontCallbacks, art: ArtManifest) {
     super(parent, 'credits-screen');
+    const plate = h('div', 'plate-bg');
+    this.root.appendChild(plate);
+    art.whenReady(() => art.applyBackground(plate, art.byId('results-credits') ?? art.plate('results-bg')));
     const wrap = h('div', 'credits-wrap rise');
     wrap.innerHTML = `<h1>Credits</h1>
       <dl>
