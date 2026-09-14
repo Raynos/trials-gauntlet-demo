@@ -1,0 +1,370 @@
+/**
+ * glTF rider (round 8): `public/models/rider.glb` — one skinned mesh, 19 joints, 8 clips —
+ * posed from the SAME chain as the procedural kit (`solveChain`, later the pose owner's
+ * `rider/pose.ts`), per the README bone recipe: each bone's world rotation is
+ * `setFromUnitVectors(restDir, targetDir) · restWorldQ`, converted to parent space in
+ * hierarchy order; the pelvis (root) carries the hips position. Rest directions come from the
+ * loaded bind pose (local +y = head → tail), so a rebuilt rider.glb with a different rest
+ * pose needs no table edits.
+ *
+ * Clips are applied ADDITIVELY on top of the chain (bone-local delta from the clip's own
+ * first frame): `idle_breathe` at rest, `land_absorb` for a second after a hard landing,
+ * `extend` on the hop push — all sampled at simulated time, so captures stay identical.
+ * Ragdoll: the rig is re-parented to the world and every bone takes the direction of its
+ * physics body (`state.ragdoll`, README body → bone map); the pelvis follows the pelvis body.
+ */
+import * as THREE from 'three';
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import type { RagdollBody } from '../../core/types';
+import type { HeroBike } from '../bike/bikeModel';
+import type { RenderFrame } from '../frame';
+import type { MaterialLibrary } from '../materials/library';
+import { newChain, solveChain, type Chain } from '../rider/riderModel';
+import { countTriangles, prepareHeroMaterials } from './gltf';
+
+const SHIFT = 0.65; // axle-midpoint frame → file frame (rear axle origin)
+const ORDER = ['pelvis', 'spine', 'chest', 'neck', 'head', 'shoulder.L', 'upperArm.L', 'forearm.L', 'hand.L', 'shoulder.R', 'upperArm.R', 'forearm.R', 'hand.R', 'thigh.L', 'shin.L', 'foot.L', 'thigh.R', 'shin.R', 'foot.R'] as const;
+type BoneName = (typeof ORDER)[number];
+
+interface ClipSampler {
+  duration: number;
+  rot: Map<string, { interp: THREE.Interpolant; rest: THREE.Quaternion; out: THREE.Quaternion }>;
+  pos: Map<string, { interp: THREE.Interpolant; rest: THREE.Vector3; out: THREE.Vector3 }>;
+}
+
+/**
+ * GLTFLoader sanitises node names for PropertyBinding (`shoulder.L` → `shoulderL`); the README
+ * names, the clip track names and our tables use the dotted form. Normalise to dotted.
+ */
+export function boneName(raw: string): string {
+  if (raw.includes('.')) return raw;
+  const m = /^([a-zA-Z]+)([LR])$/.exec(raw);
+  return m ? `${m[1]}.${m[2]}` : raw;
+}
+
+function sampler(clip: THREE.AnimationClip): ClipSampler {
+  const s: ClipSampler = { duration: clip.duration, rot: new Map(), pos: new Map() };
+  for (const t of clip.tracks) {
+    const dot = t.name.lastIndexOf('.');
+    const node = boneName(t.name.slice(0, dot));
+    const prop = t.name.slice(dot + 1);
+    const interp = (t as unknown as { createInterpolant(): THREE.Interpolant }).createInterpolant();
+    if (prop === 'quaternion') {
+      const r = interp.evaluate(0) as Float32Array;
+      s.rot.set(node, { interp, rest: new THREE.Quaternion(r[0], r[1], r[2], r[3]), out: new THREE.Quaternion() });
+    } else if (prop === 'position') {
+      const r = interp.evaluate(0) as Float32Array;
+      s.pos.set(node, { interp, rest: new THREE.Vector3(r[0], r[1], r[2]), out: new THREE.Vector3() });
+    }
+  }
+  return s;
+}
+
+export class GltfRider {
+  readonly root = new THREE.Group();
+  readonly triangles: number;
+  readonly materials: THREE.MeshStandardMaterial[];
+  readonly debug = { armStretch: [1, 1], legStretch: [1, 1], handOnGrip: [true, true], ragdollResidual: -1, ragdollBlend: 0, ragdollDetail: [] as string[], bones: 0, clips: [] as string[] };
+  private readonly scene: THREE.Object3D;
+  private readonly bones = new Map<string, THREE.Bone>();
+  private readonly q0 = new Map<string, THREE.Quaternion>();
+  private readonly d0 = new Map<string, THREE.Vector3>();
+  private readonly parentOf = new Map<string, string | null>();
+  private readonly worldQ = new Map<string, THREE.Quaternion>();
+  private readonly restLocalQ = new Map<string, THREE.Quaternion>();
+  private readonly restLocalP = new Map<string, THREE.Vector3>();
+  private armQ = new THREE.Quaternion();
+  private readonly armInv = new THREE.Matrix4();
+  private readonly chain = newChain();
+  private readonly clips = new Map<string, ClipSampler>();
+  private bike: HeroBike | null = null;
+  private inRagdoll = false;
+  private readonly lead = { lean: 0, leanV: 0, torso: 0, torsoV: 0, arm: 0, armV: 0, crouch: 0, crouchV: 0 };
+  private landT = -1;
+  private pushT = -1;
+  private lastHop: RenderFrame['hopPhase'] = 'idle';
+  // scratch
+  private readonly qa = new THREE.Quaternion();
+  private readonly qb = new THREE.Quaternion();
+  private readonly qc = new THREE.Quaternion();
+  private readonly va = new THREE.Vector3();
+  private readonly vb = new THREE.Vector3();
+  private readonly ID = new THREE.Quaternion();
+
+  constructor(gltf: GLTF, lib: MaterialLibrary) {
+    this.scene = cloneSkeleton(gltf.scene);
+    const matMap = new Map<THREE.Material, THREE.Material>();
+    this.scene.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      const src = m.material as THREE.Material;
+      let c = matMap.get(src);
+      if (!c) {
+        c = src.clone();
+        matMap.set(src, c);
+      }
+      m.material = c;
+    });
+    this.materials = prepareHeroMaterials(this.scene, (m) => lib.complete(m));
+    this.scene.position.set(-SHIFT, 0, 0);
+    this.root.name = 'rider:gltf';
+    this.triangles = countTriangles(this.scene);
+    // Rest pose capture in file space (scene at identity).
+    const holder = new THREE.Group();
+    holder.add(this.scene);
+    this.scene.position.set(0, 0, 0);
+    holder.updateMatrixWorld(true);
+    this.scene.traverse((o) => {
+      if ((o as THREE.Bone).isBone) this.bones.set(boneName(o.name), o as THREE.Bone);
+    });
+    for (const name of ORDER) {
+      const b = this.bones.get(name);
+      if (!b) continue;
+      const q = new THREE.Quaternion();
+      b.getWorldQuaternion(q);
+      this.q0.set(name, q);
+      this.d0.set(name, new THREE.Vector3(0, 1, 0).applyQuaternion(q).normalize());
+      const p = b.parent;
+      this.parentOf.set(name, p && (p as THREE.Bone).isBone ? boneName(p.name) : null);
+      this.restLocalQ.set(name, b.quaternion.clone());
+      this.restLocalP.set(name, b.position.clone());
+    }
+    const pelvis = this.bones.get('pelvis');
+    if (pelvis?.parent) {
+      pelvis.parent.getWorldQuaternion(this.armQ);
+      this.armInv.copy(pelvis.parent.matrixWorld).invert();
+    }
+    holder.remove(this.scene);
+    this.scene.position.set(-SHIFT, 0, 0);
+    this.debug.bones = this.bones.size;
+    for (const c of gltf.animations) {
+      this.clips.set(c.name, sampler(c));
+      this.debug.clips.push(c.name);
+    }
+  }
+
+  attach(bike: HeroBike): void {
+    this.bike = bike;
+    bike.frame.add(this.scene);
+    this.scene.position.set(-SHIFT, 0, 0);
+    this.scene.quaternion.identity();
+    this.inRagdoll = false;
+  }
+
+  detach(): void {
+    this.scene.removeFromParent();
+  }
+
+  /** Same 80 ms pose lead as the procedural rider. */
+  private spring(key: 'lean' | 'torso' | 'arm' | 'crouch', target: number, dt: number, snap: boolean): number {
+    const l = this.lead as unknown as Record<string, number>;
+    if (snap || dt <= 0) {
+      l[key] = target;
+      l[key + 'V'] = 0;
+      return target;
+    }
+    const vRaw = (target - l[key]!) / dt;
+    const k = 1 - Math.pow(0.5, dt / 0.04);
+    const v = l[key + 'V']! + (vRaw - l[key + 'V']!) * k;
+    l[key] = target;
+    l[key + 'V'] = v;
+    return Math.max(-1.5, Math.min(1.5, target + v * 0.08 * 1.15));
+  }
+
+  update(f: RenderFrame): void {
+    if (f.cut) {
+      this.landT = -1;
+      this.pushT = -1;
+    }
+    if (f.ragdoll && f.ragdoll.length > 0) {
+      if (!this.inRagdoll) {
+        this.root.add(this.scene);
+        this.scene.position.set(0, 0, 0);
+        this.inRagdoll = true;
+      }
+      this.poseRagdoll(f.ragdoll);
+      return;
+    }
+    if (this.inRagdoll && this.bike) this.attach(this.bike);
+    const r = {
+      lean: this.spring('lean', f.rider.lean, f.dt, f.cut),
+      torsoPitch: this.spring('torso', f.rider.torsoPitch, f.dt, f.cut),
+      armExtend: this.spring('arm', f.rider.armExtend, f.dt, f.cut),
+      crouch: this.spring('crouch', f.rider.crouch, f.dt, f.cut),
+    };
+    const c = solveChain(r, this.chain);
+    this.poseFromChain(c);
+    // Additive clips.
+    if (f.justLanded && f.landImpulse > 1.5) this.landT = f.tSim;
+    if (f.hopPhase === 'push' && this.lastHop !== 'push') this.pushT = f.tSim;
+    this.lastHop = f.hopPhase;
+    const rest = Math.max(0, Math.min(1, (1.5 - f.speed) / 1.1)) * Math.max(0, 1 - Math.abs(r.lean) * 2) * Math.max(0, 1 - r.crouch * 2);
+    if (rest > 0.01) this.additive('idle_breathe', f.tSim, rest, true);
+    if (this.landT >= 0) {
+      const t = f.tSim - this.landT;
+      const s = this.clips.get('land_absorb');
+      if (s && t < s.duration) this.additive('land_absorb', t, 0.45 * Math.sin(Math.PI * Math.min(1, t / s.duration)) + 0.0, false);
+      else this.landT = -1;
+    }
+    if (this.pushT >= 0) {
+      const t = f.tSim - this.pushT;
+      const s = this.clips.get('extend');
+      if (s && t < s.duration) this.additive('extend', t, 0.5 * Math.sin(Math.PI * Math.min(1, t / s.duration)), false);
+      else this.pushT = -1;
+    }
+  }
+
+  /** World (file-space) rotation for a bone → local, in hierarchy order. */
+  private setWorld(name: string, qWorld: THREE.Quaternion): void {
+    const b = this.bones.get(name);
+    if (!b) return;
+    const parent = this.parentOf.get(name) ?? null;
+    const pq = parent ? this.worldQ.get(parent) : this.armQ;
+    let wq = this.worldQ.get(name);
+    if (!wq) {
+      wq = new THREE.Quaternion();
+      this.worldQ.set(name, wq);
+    }
+    wq.copy(qWorld);
+    b.quaternion.copy(pq ?? this.ID).invert().multiply(qWorld);
+  }
+
+  private aim(name: BoneName, dir: THREE.Vector3): void {
+    const d0 = this.d0.get(name);
+    const q0 = this.q0.get(name);
+    if (!d0 || !q0) return;
+    this.va.copy(dir).normalize();
+    this.qa.setFromUnitVectors(d0, this.va).multiply(q0);
+    this.setWorld(name, this.qa);
+  }
+
+  /** Bone keeps its rest rotation relative to its parent's current delta. */
+  private rigid(name: BoneName): void {
+    const parent = this.parentOf.get(name);
+    const q0 = this.q0.get(name);
+    if (!parent || !q0) return;
+    const pw = this.worldQ.get(parent);
+    const p0 = this.q0.get(parent);
+    if (!pw || !p0) return;
+    this.qb.copy(pw).multiply(this.qc.copy(p0).invert()).multiply(q0);
+    this.setWorld(name, this.qb);
+  }
+
+  private setPelvisPosition(px: number, py: number, pz: number): void {
+    const pelvis = this.bones.get('pelvis');
+    if (!pelvis) return;
+    this.vb.set(px, py, pz).applyMatrix4(this.armInv);
+    pelvis.position.copy(this.vb);
+  }
+
+  private poseFromChain(c: Chain): void {
+    const torso = this.va.set(Math.sin(c.torsoAngle), Math.cos(c.torsoAngle), 0);
+    const tx = torso.x;
+    const ty = torso.y;
+    // Pelvis head sits 0.02 below the hip joint along the torso; file frame = axle + shift.
+    this.setPelvisPosition(c.hips.x + SHIFT - 0.02 * tx, c.hips.y - 0.02 * ty, 0);
+    this.aim('pelvis', this.vb.set(tx, ty, 0));
+    this.aim('spine', this.vb.set(tx, ty, 0));
+    this.aim('chest', this.vb.set(tx, ty, 0));
+    const ha = -c.headAngle; // chain headAngle is the group rotation (−headA)
+    this.aim('neck', this.vb.set(Math.sin(ha), Math.cos(ha), 0));
+    this.aim('head', this.vb.set(Math.sin(ha), Math.cos(ha), 0));
+    for (let i = 0; i < 2; i++) {
+      const s = i === 0 ? 'L' : 'R';
+      this.rigid(`shoulder.${s}` as BoneName);
+      this.aim(`upperArm.${s}` as BoneName, this.vb.subVectors(c.elbow[i]!, c.shoulder[i]!));
+      this.aim(`forearm.${s}` as BoneName, this.vb.subVectors(c.hand[i]!, c.elbow[i]!));
+      this.rigid(`hand.${s}` as BoneName);
+      this.aim(`thigh.${s}` as BoneName, this.vb.subVectors(c.knee[i]!, c.hip[i]!));
+      this.aim(`shin.${s}` as BoneName, this.vb.subVectors(c.ankle[i]!, c.knee[i]!));
+      // Boots stay level on the pegs: rest world rotation.
+      this.setWorld(`foot.${s}`, this.q0.get(`foot.${s}`)!);
+    }
+  }
+
+  /** Blend a clip's bone-local delta (from its first frame) onto the current pose. */
+  private additive(name: string, t: number, w: number, loop: boolean): void {
+    const s = this.clips.get(name);
+    if (!s || w <= 0) return;
+    const tt = loop ? t % s.duration : Math.min(t, s.duration - 1e-4);
+    for (const [node, r] of s.rot) {
+      const b = this.bones.get(node);
+      if (!b) continue;
+      const v = r.interp.evaluate(tt) as Float32Array;
+      r.out.set(v[0]!, v[1]!, v[2]!, v[3]!);
+      // delta = rest⁻¹ · clip, scaled by w, applied in the bone's own space.
+      this.qa.copy(r.rest).invert().multiply(r.out);
+      this.qb.copy(this.ID).slerp(this.qa, w);
+      b.quaternion.multiply(this.qb);
+    }
+    for (const [node, p] of s.pos) {
+      const b = this.bones.get(node);
+      if (!b) continue;
+      const v = p.interp.evaluate(tt) as Float32Array;
+      p.out.set(v[0]!, v[1]!, v[2]!).sub(p.rest).multiplyScalar(w);
+      b.position.add(p.out);
+    }
+  }
+
+  private readonly ragTargets = new Map<string, THREE.Vector3 | 'rigid' | 'rest'>();
+
+  private poseRagdoll(bodies: RagdollBody[]): void {
+    // Collect per-bone targets first, then apply in hierarchy order (parents before children).
+    const T = this.ragTargets;
+    T.clear();
+    const up = (a: number): THREE.Vector3 => new THREE.Vector3(-Math.sin(a), Math.cos(a), 0);
+    const down = (a: number): THREE.Vector3 => new THREE.Vector3(Math.sin(a), -Math.cos(a), 0);
+    for (const bd of bodies) {
+      switch (bd.id) {
+        case 'pelvis': {
+          const u = up(bd.angle);
+          this.setPelvisPosition(bd.pos.x + u.x * 0.08, bd.pos.y + u.y * 0.08, 0);
+          T.set('pelvis', u);
+          break;
+        }
+        case 'torso':
+          T.set('spine', up(bd.angle));
+          T.set('chest', up(bd.angle));
+          T.set('shoulder.L', 'rigid');
+          T.set('shoulder.R', 'rigid');
+          break;
+        case 'head':
+          T.set('neck', up(bd.angle));
+          T.set('head', up(bd.angle));
+          break;
+        case 'upperArm':
+          T.set('upperArm.L', down(bd.angle));
+          T.set('upperArm.R', down(bd.angle));
+          break;
+        case 'forearm':
+          T.set('forearm.L', down(bd.angle));
+          T.set('forearm.R', down(bd.angle));
+          T.set('hand.L', 'rigid');
+          T.set('hand.R', 'rigid');
+          break;
+        case 'thigh':
+          T.set('thigh.L', down(bd.angle));
+          T.set('thigh.R', down(bd.angle));
+          break;
+        case 'shin':
+          T.set('shin.L', down(bd.angle));
+          T.set('shin.R', down(bd.angle));
+          T.set('foot.L', 'rigid');
+          T.set('foot.R', 'rigid');
+          break;
+      }
+    }
+    for (const name of ORDER) {
+      const t = T.get(name);
+      if (!t) continue;
+      if (t === 'rigid') this.rigid(name);
+      else if (t === 'rest') this.setWorld(name, this.q0.get(name)!);
+      else this.aim(name, t);
+    }
+  }
+
+  dispose(): void {
+    for (const m of this.materials) m.dispose();
+  }
+}

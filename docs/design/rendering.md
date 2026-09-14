@@ -521,7 +521,157 @@ the worst frame; full-throttle b3: 278 airborne frames, 0 out, worst offset 0.21
 **Budget cuts.** Deck support pallets/stacks no longer cast shadows, tyre stacks 6×14 tori (was 8×20),
 canyon edge rocks detail 1 at 45 %, scrub lobes detail 0.
 
-## 12. Known gaps after round 7 (what still reads non-AAA)
+## 11c. Round 8 — art pack, glTF hero, camera bounds, brands, foreground rule
+
+**Brands audit (P0).** `gates.ts` and `hall.ts` carried `FOX`, `REDLYNX`, `MAERSK` (real
+companies) on the sponsor boards, flags and container logos. Gone: the renderer's only sponsor
+strings are the art pack's fictional brands (`VORTEX OIL`, `KESTREL TYRES`, `NORDVIK`, `APEX
+SUSPENSION`, `BOLT ENERGY`, `IRONWORKS TRIALS SERIES`) plus generic text (`TRIALS`, `START`,
+`FINISH`, `CP n`, `BAY n`, shop names, `MOTO / GARAGE / 24H`). Container fallback owner codes are
+`NORDVIK / HKR / OCTU / TARO / APEX / KESTREL` (the stencil set). Audit: `grep -rniE
+"redlynx|fox|maersk|ubisoft|ktm|honda|yamaha|red ?bull|monster" src/render` → nothing.
+
+**ArtLibrary (`art/library.ts`).** Loading starts in the `ThreeRenderer` constructor:
+`art/manifest.json`, then every `world/` + `plates/` asset (44 files, 2.77 MB delivered; menu art
+is the UI owner's) is fetched and decoded with `createImageBitmap({imageOrientation:'flipY'})`
+in parallel (≈310 ms on the loaded headless host). `renderer.ready` now also requires
+`art.settled` (loaded *or* failed — a missing file just keeps that item procedural) and any
+requested glTF hero; `renderer.whenReady()` is the promise. **Determinism rule:** the world is
+built from whatever is present at `setTrack`; if the pack settles later it is rebuilt **only if no
+frame has been drawn with that world** (`World.builtAtFrame === frameCount`), so a capture is
+all-art or all-procedural and never changes mid-run. The harness's `openGame` waits for
+`__trials.ready`, which the hook sets at install time — before the renderer exists — so
+`pnpm harness:capture` renders its first frame before the pack settles and stays procedural until
+the game/hook awaits `renderer.whenReady()` in `loadTrack` (request to core-game, one line;
+`page.evaluate` awaits a returned promise so the harness needs no change). The round-8 evidence
+scripts await `whenReady()` themselves. Budget rule (coordinator): art textures count at their
+**delivered compressed size** (`texture.userData.deliveredBytes`, honoured by `estimateTextureMB`);
+GPU footprint is the RGBA estimate as before for everything else.
+
+Where the pack lands (procedural fallback in brackets):
+
+| asset | use |
+|---|---|
+| `plate-{canyon,snow,nightcity}` 2048×512 α | far layer at z −200, 720 m of world per repeat (city 560), horizon band (v ≈ 0.45) 8 m under the floor line so the riding camera's 11° down-pitch keeps it in the upper third; the −130/−340 silhouette tiers are gone, the near tier (z −45) stays for the mid-ground step [three silhouette tiers] |
+| `sky-*` 2048×1024 | 2:1 panorama on a quad at z −330 (2 km per repeat) **and** `scene.background` (equirect clone) for exteriors [procedural gradient] |
+| `plate-industrial` / `plate-foundry` | the hall's **end walls** (x0 + 2, x1 − 2) so the hall reads as continuing past its ends [window-bay wall repeat] |
+| `stencil-*` (6 of 8; `apex`/`taro` were rejected by the art owner) | container owner markings, screen-blended white paint, one big + one small per skin variant |
+| `mask-edge-grime`, `mask-rust-streaks`, `mask-grime-spatter`, `mask-rivet-drips` | tinted rust/grime layers on the 8 container skins by rust level (`tintMask`: luminance → alpha, colour fill) |
+| `poster-*`, `sign-*`, `graffiti-*` | wall decals on the back wall between the window bays (posters 1.2×1.8 m low, signs 0.9 m at 4–5 m, graffiti 2.6 m at the floor), one `PropBatch` per texture |
+| `banner-*` | barrier strip (4 boards per 8 m, centre 2:1 crop of the 3:2 banner) and the 2×2 flag atlas |
+| `crowd-day` / `crowd-night` | the crowd card sheet: 8 photo figures, one pose (cheer = bob only), card 0.51×1.9 m; night sheet for nightCity + foundry [painted 8×2 atlas] |
+| `tyremark-arc`, `tyremark-straight` | alpha-masked dark decals on flat deck stretches every 9–16 m (never inside a spawn keep-out) |
+
+**Foreground occluder rule (user's b2 frame: a hall column + hook chain through the bike at a
+spawn).** `foregroundKeepOut(track)`: nothing at z > +3 within [spawn − 10, spawn + 14] of the
+start, any checkpoint or the finish; foreground chains one per 34–48 m (was 15–24) and their hook
+tyres end at deck + 3.0–4.2 m (above the rider's head; was 0.8–1.8 = through him); **no
+floor-to-roof columns in the foreground** at all; floor clutter every 14–22 m (was 9–16). The
+exterior kits apply the same keep-out to the canyon outcrops/scrub/rocks, the snow banks and the
+foreground pines (also thinned 22 → 12 %).
+
+**Camera bounds (user's b3 frame: the apex pull-back put the camera above the roof).**
+`CameraRig.bounds` per track: interiors `[floor + 1.5, roof − 1.0]` in y, `[wallZ + 1, frontZ − 1]`
+in z, the hall span in x; exteriors a sky box (`floor + 60`). After every smoother the camera
+**position is hard-clamped**; when the clamp binds the framing widens instead of moving through
+geometry: the bike is re-projected from the clamped position, the FOV grows (≤ +12°) until it is
+back inside the [0.2, 0.8] band, and if that is not enough the pitch tilts so the bike sits on the
+band edge. `camera()` now reports `clamped`, `posZ`, `fovBoostDeg`. The hall's roof and floor are
+planes, so the plane clamp *is* the geometry test; a sloped roof would need the segment test.
+Evidence: scratch `camcheck.mts` over the b3 bot + stranger recordings (numbers in §12 table).
+
+**Industrial key-art pass.** High-bay lamps carry the city kit's additive volumetric cone
+(`lightConeGeometry`, now in `props.ts`) from the shade to the floor, a dark glossy puddle
+(roughness 0.08, metalness 0.6, 80 % opaque — reflects the env/window bank) and a lamp streak
+toward the camera under each; grade lift 0/0/0 (was 0.018), skylight fill cooler `0x8cb0e4 × 1.05`,
+contrast 1.15, bloom 0.55.
+
+**Foundry.** Shadow-culled: racks, scaffolds, stacks, pipes (all behind z −12) no longer cast;
+deck support pallets are 3-layer stacks (÷3 instances). The two point lights now **follow the
+camera**: each frame the two melt sources (pours / furnace mouths) nearest the camera target get
+the lights (intensity 140, distance 34, flicker from tSim) — a pure function of state.
+
+**glTF hero (`hero/gltf.ts`, `gltfBike.ts`, `gltfRider.ts`).** `GLTFLoader` + `MeshoptDecoder`
+(three's module), one parsed document per file, cloned per instance (`SkeletonUtils.clone` for
+the rider). Bike: the scene sits at x −0.65 inside the axle-midpoint `frame`; wheels at the
+physics positions (`rotation.z = −spin`), `fork_lower` at the front axle, `swingarm` aimed at the
+rear axle (rest angle from the pivot), `shock_body`/`shock_spring` quaternion from (0,−1,0) to
+top→link with the coil `scale.y = len / 0.6027`, front sprocket at the 0.101/0.033 ratio, chain
+`map.offset.x` in link units; frame placement + visual suspension + contact blobs are the shared
+`FramePlacer` / `ContactBlob` (also used by the procedural bike). Rider: rest world quaternions
+and rest directions (local +y) are read from the loaded bind pose; per frame each bone gets
+`setFromUnitVectors(d0, d1) · q0` in hierarchy order (pelvis/spine/chest = torso dir, neck/head =
+head dir, upper arm/forearm/thigh/shin = chain joint→joint, shoulder/hand rigid to their parent,
+boots level), pelvis position = hips − 0.02·torsoDir. Clips are **additive** (bone-local delta from
+each clip's first frame): `idle_breathe` blended in at rest (speed < 1.5, no lean, no crouch),
+`land_absorb` ×0.45 over its length after a landing with impulse > 1.5, `extend` ×0.5 on the hop
+`push` phase (`RenderFrame.hopPhase`). Ragdoll: the rig re-parents to the world; bones take their
+physics body's direction (README body → bone map, limbs reversed), the pelvis bone follows the
+pelvis body. Materials go through `lib.complete` (same standard program + the skinning variant).
+
+**`setModels({riderModel, bikeModel})` (hot swap).** Builds the requested kit (loading the glTF
+first if needed; `whenReady` waits), copies the calibrated frame origin and landing state
+(`FramePlacer.copyFrom`), re-attaches the rider to the new frame and swaps the scene roots; the
+next `render()` poses everything from the same physics state, so pose and wheel spin carry over.
+Physics, camera and particles are untouched; the ghost is rebuilt with the same choice (ghost
+tint works for both kits: library materials derive, glTF materials clone). Constructor options
+`riderModel` / `bikeModel` (`?rider=gltf&bike=gltf`) call it at boot.
+
+**One rider chain.** `riderModel.ts` no longer owns pose math: `solveChain()` adapts the pose
+owner's `rider/pose.ts` (`riderChain`, canonical poses from `assets/blender/RIDER_CHAIN.md`,
+physics lean→crouch coupling removed) into the render joint set, and both the procedural kit and
+the glTF rig pose from it. The kit is built at the chain's proportions (`SEG`: torso 0.52, neck
+0.22, upper arm 0.32, forearm 0.30, thigh 0.46, shin 0.43, shoulders ±0.21). The render adds
+`crouchExtra` from the landing impulse (0.18 × impulse, half-sine over 0.5 s).
+
+
+### Round 8 status table (measured 2026-09-14, host load average 20–34 — another owner's headless Chromium; timings are not comparable to round 6)
+
+| track (biome) | calls | tris | programs* | texMB (art at delivered size) |
+|---|---|---|---|---|
+| flat-test (industrial, high, riding, proc) | 206–220 | 304 k | 41–42 | 45.9 |
+| flat-test, glTF bike + rider | 149–163 | 297 k | 47 (session incl. proc) | — |
+| e1 (canyon) | 157 | 476 k | 37 (see note) | 35.8 |
+| m2 (snow) | 147 | 244 k | 37 (see note) | 31.5 |
+| h1 (nightCity) | 155 | 208 k | 50 (see note) | 49.2 |
+| h3 (foundry) | 231 | 591 k before the support-stack cut (not re-measured) | 53 (see note) | 69.6 |
+
+Note: `info.programs` accumulates over a session; the e1/m2/h1/h3 figures were taken in ONE
+session after other tracks (per-track ≈ 37–42). Hero: glTF bike 29 356 tris / rider 11 718
+(proc 31 444 / 19 532). Art pack: 44 assets, 2.77 MB delivered, 310–710 ms to decode.
+`prepare()` on flat-test (glTF requested): 4–16 s wall on SwiftShader; long tasks 52–65 ms (three
+512² painter jobs) and one 4–11 s task = the GLSL compile of the standard program + post chain,
+which software GL does synchronously (a real driver compiles in parallel; not splittable from JS).
+
+Camera bounds evidence (b3 bot recording, 1706 frames, new physics): camera y max 5.59 vs roof
+limit 8.29 (never bound in y), z clamp bound on 31 frames at the hall front (z 29), 561 airborne
+frames, 0 outside [0.15, 0.85]², worst offset 0.284; max bike apex 3.17 m. Stranger recordings not
+run (25 s wall per clip second on this host).
+
+## 12. Known gaps after round 8 (what still reads non-AAA, and what the coordinator asked for that is not done)
+
+- **Finish camera** (user frame: motion-blur smear after the line): not done. Wanted: ease out of the
+  forward follow within 1.5 s, hold a medium-wide frame on the coasting bike, no smear after the
+  line, fireworks in frame, 3 s dolly; same hold on a crash past the line. `rig.ts` finish beat +
+  `post.setDynamics` smear gate on `f.finished`.
+- **Boot cost**: the constructor still starts the whole world/plate art fetch (2.8 MB) — should
+  load the showcase biome's assets first and the rest lazily on `setTrack`; `prepare()` exists and
+  chunks materials per job and shaders per two materials, but a 512² painter job is 50–65 ms on this
+  host (split the painter by rows to get under 16 ms) and the first shader compile is one task.
+- **Harness determinism gate not re-run this round** (two captures + `cmp`): every new effect is
+  clocked from tSim / seeded, and the art/hero loads are gated by `whenReady`, but the capture path
+  itself renders before the pack settles until the hook awaits `renderer.whenReady()` in
+  `loadTrack` (request to core-game).
+- glTF rider: limbs are direction-driven from the chain, so the wrist sits ≤ 3.5 cm off the grip at
+  mid-lean (bone lengths are fixed); no ragdoll hand-over blend; `idle_breathe`/`land_absorb`/`extend`
+  are additive deltas and untuned against the reference. The glTF bike's chain scroll direction is
+  unverified. GLTFLoader sanitises bone names (`shoulder.L` -> `shoulderL`): `boneName()` normalises.
+- Foundry tri count after the support-stack cut is not re-measured (was 591 k with shadow culls).
+- Snow: the near pine silhouette tier reads as white paper cut-outs in front of the art plate —
+  drop it when the plate is present.
+- nightCity reflections are still the sign/lamp streak decals only; canyon far tier is the plate.
+- Perf numbers this round were taken at load 20–34; only within-run ratios are trustworthy.
+
 
 - **Foundry** is still dark-and-dim rather than the reference's warm, readable red-orange hall: the
   emissive sources light nothing (no GI, two point lights per track), so the rust structure only shows

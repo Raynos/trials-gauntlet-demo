@@ -59,9 +59,9 @@ export const BIOMES: Record<BiomeId, Biome> = {
     sunDir: [-0.45, 0.78, -0.3],
     sunColor: 0xffe2c4, // warm key, not orange
     sunIntensity: 3.2,
-    hemiSky: 0x9cb6d8, // neutral-cool skylight fill
+    hemiSky: 0x8cb0e4, // cool skylight fill (round 8 key-art match: the lamps are the warm source, the roof light is cold)
     hemiGround: 0x2a2622,
-    hemiIntensity: 1.0,
+    hemiIntensity: 1.05,
     skyZenith: 0x6f7f96,
     skyHorizon: 0xd8c8a8,
     skyGround: 0x1a1512,
@@ -71,12 +71,12 @@ export const BIOMES: Record<BiomeId, Biome> = {
     fogTiers: [16, 55, 110], // a 60 m deep hall: the far wall sits at ≈50 % haze, each container row a step nearer
     fogColor: 0x6a625a, // desaturated warm-grey air; fog must not tint
     floorFog: { h0: 0.3, hs: 1.8, density: 0.035 },
-    gradeLift: [0.018, 0.018, 0.022],
+    gradeLift: [0, 0, 0], // round 8: deep blacks under the deck and in the far bays (key art)
     gradeGain: [1.02, 1.0, 0.98],
     saturation: 0.9,
-    contrast: 1.12,
+    contrast: 1.15,
     vignette: 0.38,
-    bloomStrength: 0.45,
+    bloomStrength: 0.55, // sodium lamps bloom
     groundSurface: 'concrete',
     ambient: 'motes',
     interior: true,

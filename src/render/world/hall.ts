@@ -18,6 +18,7 @@ import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
 import { canvas, tex } from './canvasTex';
 import { profileY } from './track';
+import { drawArt, pickId, tintMask, type ArtLibrary } from '../art/library';
 import {
   PropBatch,
   bakeAO,
@@ -30,9 +31,11 @@ import {
   hookBlockGeometry,
   lampBulbGeometry,
   lampGeometry,
+  lightConeGeometry,
   palletGeometry,
   pipeGeometry,
   rackGeometry,
+  reflectionMaskTexture,
   trussGeometry,
   tyreStackGeometry,
 } from './props';
@@ -46,6 +49,18 @@ export interface HallOut {
   scroll: { tex: THREE.Texture; vx: number; vy: number }[];
   fountains: { x: number; y: number; z: number }[];
   textureBytes: number;
+}
+
+/**
+ * Foreground occluder rule (round 8, user's b2 screenshot: a pillar + chain ran straight
+ * through the bike at a spawn). Nothing at z > +3 may sit within [spawn − 10, spawn + 14] of
+ * the start or any checkpoint (the bike lives at screen x 0.15–0.5 there for a second or
+ * more), occluders are sparse (≈ one per 40 m), thin, and there are no floor-to-roof
+ * columns in the foreground at all.
+ */
+export function foregroundKeepOut(track: CompiledTrack): (x: number, halfWidth?: number) => boolean {
+  const spawns = [track.def.start.pos.x, ...track.def.checkpoints.map((c) => c.spawn.pos.x), track.def.finishX];
+  return (x, halfWidth = 0) => spawns.some((s) => x + halfWidth > s - 10 && x - halfWidth < s + 14);
 }
 
 /** Molten flow tile: dark crust with bright streaks along x; used as albedo and emissive, scrolled along x (channels) or y (pours). */
@@ -193,8 +208,11 @@ function warehouseWall(rng: Rng, paneColor: string, brick: string, foundry = fal
  * Container skin variant: light base (tinted per instance), rust level 0–2, logo choice,
  * door bars on the left or right, optional hazard stripe. Albedo only; the corrugated
  * normal / ORM maps from the library stay so every variant shares one program.
+ * Round 8: with the art pack the owner markings are the generated stencils (white paint,
+ * screen-blended) and the rust / grime come from the grime masks tinted rust-brown; the
+ * procedural streaks stay as the fallback. Only fictional owners (brands audit).
  */
-function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: boolean; stripe: boolean }): THREE.CanvasTexture {
+function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: boolean; stripe: boolean }, art: ArtLibrary | null): THREE.CanvasTexture {
   const [c, g] = canvas(1024, 512);
   g.fillStyle = '#e6e6e2';
   g.fillRect(0, 0, 1024, 512);
@@ -202,7 +220,10 @@ function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: bool
     g.fillStyle = 'rgba(0,0,0,0.07)';
     g.fillRect(x, 0, 6, 512);
   }
-  const streaks = [3, 9, 18][v.rust]!;
+  const stencils = art ? art.ids('stencil').filter((id) => id !== 'stencil-apex' && id !== 'stencil-taro') : []; // the two the art owner rejected
+  const masks = art ? ['mask-rust-streaks', 'mask-grime-spatter', 'mask-edge-grime', 'mask-rivet-drips'].filter((id) => art.has(id)) : [];
+  const useArt = art !== null && stencils.length > 0;
+  const streaks = useArt ? [0, 3, 8][v.rust]! : [3, 9, 18][v.rust]!;
   for (let i = 0; i < streaks; i++) {
     const x = rng.range(0, 1024);
     const w = rng.range(3, 12 + v.rust * 6);
@@ -213,7 +234,7 @@ function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: bool
     g.fillStyle = gr;
     g.fillRect(x, 0, w, h);
   }
-  if (v.rust === 2) {
+  if (v.rust === 2 && !useArt) {
     for (let i = 0; i < 30; i++) {
       g.fillStyle = `rgba(90,45,20,${rng.range(0.2, 0.5)})`;
       g.beginPath();
@@ -221,21 +242,51 @@ function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: bool
       g.fill();
     }
   }
+  if (useArt && masks.length) {
+    // Grime: edge grime on every skin, rust streaks / rivet drips / spatter by rust level.
+    const put = (id: string | null, color: string, strength: number, x: number, y: number, w: number, h: number): void => {
+      const bmp = id ? art!.bitmap(id) : null;
+      if (!bmp) return;
+      g.drawImage(tintMask(bmp, 512, 512, color, strength), x, y, w, h);
+    };
+    put(masks.includes('mask-edge-grime') ? 'mask-edge-grime' : null, '#2a1e14', 0.35 + 0.2 * v.rust, 0, 0, 1024, 512);
+    if (v.rust >= 1) {
+      put(masks.includes('mask-rust-streaks') ? 'mask-rust-streaks' : null, '#6a3a1a', 0.5 + 0.25 * v.rust, rng.range(-200, 0), -40, 1024, 560);
+      put(masks.includes('mask-grime-spatter') ? 'mask-grime-spatter' : null, '#3a2a1a', 0.5, rng.range(-300, 0), 200, 1024, 340);
+    }
+    if (v.rust === 2) put(masks.includes('mask-rivet-drips') ? 'mask-rivet-drips' : null, '#7a4020', 0.8, rng.range(-100, 100), 20, 1024, 500);
+  }
   const grime = g.createLinearGradient(0, 512, 0, 380);
   grime.addColorStop(0, `rgba(30,22,14,${0.3 + v.rust * 0.15})`);
   grime.addColorStop(1, 'rgba(30,22,14,0)');
   g.fillStyle = grime;
   g.fillRect(0, 0, 1024, 512);
   const lx = v.doorLeft ? 300 : 60;
-  const logos = ['SQUADX', 'KBNI', 'REDLYNX', 'TRIALS', 'FOX', 'MAERSK'];
-  g.fillStyle = 'rgba(255,255,255,0.85)';
-  g.fillRect(lx, 60, 330, 70);
-  g.fillStyle = '#111';
-  g.font = 'bold 54px Impact, "Arial Black", sans-serif';
-  g.fillText(logos[v.logo % logos.length]!, lx + 20, 116);
-  g.fillStyle = 'rgba(20,20,20,0.85)';
-  g.font = 'bold 72px Impact, "Arial Black", sans-serif';
-  g.fillText(String(rng.int(10, 99)) + 'C', v.doorLeft ? 300 : 640, 130 + (v.doorLeft ? 200 : 0));
+  if (useArt) {
+    // Owner stencil (white spray paint) on the side panel; a second small one (weights / hazard / arrows) near the doors.
+    const main = pickId(stencils, v.logo)!;
+    const bmp = art!.bitmap(main)!;
+    const size = 300;
+    g.globalCompositeOperation = 'screen';
+    g.globalAlpha = 0.82;
+    drawArt(g, bmp, lx + 20, 40, size, size);
+    const smallIds = stencils.filter((id) => id !== main);
+    const small = pickId(smallIds, v.logo * 3 + 1);
+    if (small) drawArt(g, art!.bitmap(small)!, v.doorLeft ? 600 : 420, 250, 180, 180);
+    g.globalAlpha = 1;
+    g.globalCompositeOperation = 'source-over';
+  } else {
+    // Fallback: generic fictional owner codes (no real company names).
+    const logos = ['NORDVIK', 'HKR', 'OCTU', 'TARO', 'APEX', 'KESTREL'];
+    g.fillStyle = 'rgba(255,255,255,0.85)';
+    g.fillRect(lx, 60, 330, 70);
+    g.fillStyle = '#111';
+    g.font = 'bold 54px Impact, "Arial Black", sans-serif';
+    g.fillText(logos[v.logo % logos.length]!, lx + 20, 116);
+    g.fillStyle = 'rgba(20,20,20,0.85)';
+    g.font = 'bold 72px Impact, "Arial Black", sans-serif';
+    g.fillText(String(rng.int(10, 99)) + 'C', v.doorLeft ? 300 : 640, 130 + (v.doorLeft ? 200 : 0));
+  }
   if (v.stripe) {
     g.fillStyle = 'rgba(230,180,30,0.8)';
     g.fillRect(0, 440, 1024, 26);
@@ -285,7 +336,8 @@ function roofTexture(foundry: boolean): THREE.CanvasTexture {
   return tex(rc);
 }
 
-export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, rng: Rng, floorY: number, x0: number, x1: number): HallOut {
+export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, rng: Rng, floorY: number, x0: number, x1: number, art: ArtLibrary | null = null): HallOut {
+  const keepOut = foregroundKeepOut(track);
   const foundry = biome.id === 'foundry';
   const out: HallOut = { meshes: [], singles: [], batches: [], flicker: [], lights: [], scroll: [], fountains: [], textureBytes: 0 };
   const span = x1 - x0;
@@ -329,10 +381,31 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     }),
   );
   addPlane(bays * 12, HALL.height, wallMat, x0 + (bays * 12) / 2, floorY + HALL.height / 2, wallZ);
-  const sideMat = fogify(new THREE.MeshStandardMaterial({ map: wall.map, emissiveMap: wall.emissive, emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff0d8), emissiveIntensity: foundry ? 0.18 : 1.2, roughness: 0.95, color: 0x8a8a8a }));
   const depth = HALL.frontZ - wallZ;
-  addPlane(depth, HALL.height, sideMat, x0 + 2, floorY + HALL.height / 2, (wallZ + HALL.frontZ) / 2, 0, Math.PI / 2);
-  addPlane(depth, HALL.height, sideMat, x1 - 2, floorY + HALL.height / 2, (wallZ + HALL.frontZ) / 2, 0, -Math.PI / 2);
+  // End walls: with the art pack they are the far plate ("distant interior bays receding"),
+  // so the hall reads as continuing past its ends; otherwise the window wall repeats.
+  const plateId = foundry ? 'plate-foundry' : 'plate-industrial';
+  const plate = art?.texture(plateId, true, true) ?? null;
+  if (plate) {
+    const pe = art!.entry(plateId)!;
+    out.textureBytes += pe.bytes;
+    const pm = new THREE.MeshBasicMaterial({ map: plate, transparent: true, depthWrite: false, fog: false, side: THREE.DoubleSide, color: new THREE.Color(foundry ? 0xffd0b0 : 0xffffff) });
+    // The plate is 4:1 with its interest band in the middle; 60 m across → 15 m tall, its
+    // horizon (v ≈ 0.45) at deck eye level.
+    const ph = depth / 4;
+    for (const [x, ry] of [[x0 + 1.9, Math.PI / 2], [x1 - 1.9, -Math.PI / 2]] as const) {
+      const m = addPlane(depth, ph, pm, x, deckY + 1.6 - ph * 0.05, (wallZ + HALL.frontZ) / 2, 0, ry);
+      m.receiveShadow = false;
+      m.renderOrder = -2;
+    }
+    const capMat = fogify(new THREE.MeshStandardMaterial({ color: foundry ? 0x14100e : 0x2a2420, roughness: 0.95 }));
+    addPlane(depth, HALL.height, capMat, x0 + 2.1, floorY + HALL.height / 2, (wallZ + HALL.frontZ) / 2, 0, Math.PI / 2);
+    addPlane(depth, HALL.height, capMat, x1 - 2.1, floorY + HALL.height / 2, (wallZ + HALL.frontZ) / 2, 0, -Math.PI / 2);
+  } else {
+    const sideMat = fogify(new THREE.MeshStandardMaterial({ map: wall.map, emissiveMap: wall.emissive, emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff0d8), emissiveIntensity: foundry ? 0.18 : 1.2, roughness: 0.95, color: 0x8a8a8a }));
+    addPlane(depth, HALL.height, sideMat, x0 + 2, floorY + HALL.height / 2, (wallZ + HALL.frontZ) / 2, 0, Math.PI / 2);
+    addPlane(depth, HALL.height, sideMat, x1 - 2, floorY + HALL.height / 2, (wallZ + HALL.frontZ) / 2, 0, -Math.PI / 2);
+  }
   const roofTex = roofTexture(foundry);
   roofTex.repeat.set(span / 12, depth / 12);
   out.textureBytes += 512 * 512 * 4 * 1.33;
@@ -374,24 +447,43 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   out.batches.push(truss, purlin, column, rail);
 
   // --- High-bay lamps on long chains (mid hall + a few in the foreground that slide past).
+  // Round 8 (industrial key art): every lamp carries a volumetric cone (the city kit's
+  // additive cone, vertex alpha fading to the floor) and a wet-floor pool under it.
   const chains = new PropBatch('chain', chainGeometry(), steel, false);
   const lampShade = new PropBatch('lamp', lampGeometry(), steel, false);
   const bulbMat = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: foundry ? 0xff6a2a : 0xffc46a, emissiveIntensity: 7, roughness: 0.4 }));
   const bulb = new PropBatch('bulb', lampBulbGeometry(), bulbMat, false);
+  const coneMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, color: new THREE.Color(foundry ? 0xff7a30 : 0xffc888).multiplyScalar(foundry ? 0.05 : 0.085), side: THREE.DoubleSide, fog: false, vertexColors: true });
+  const lampCones = new PropBatch('lampcone', lightConeGeometry(), coneMat, false);
+  const poolMask = reflectionMaskTexture();
+  out.textureBytes += 256 * 256 * 4;
+  // Wet patch: dark glossy puddle (reflects the env / window bank) + an additive lamp streak toward the camera.
+  const puddleMat = fogify(new THREE.MeshStandardMaterial({ color: 0x0c0d10, roughness: 0.08, metalness: 0.6, transparent: true, opacity: 0.8, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
+  const puddles = new PropBatch('puddle', new THREE.CircleGeometry(1, 20).rotateX(-Math.PI / 2), puddleMat, false);
+  const streakMat = new THREE.MeshBasicMaterial({ map: poolMask, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: foundry ? 0.18 : 0.3, color: foundry ? 0xff8a40 : 0xffd8a0, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+  const streaks = new PropBatch('lampstreak', new THREE.PlaneGeometry(2.2, 8).rotateX(-Math.PI / 2).translate(0, 0, 4), streakMat, false);
+  const lampAt = (x: number, y: number, z: number): void => {
+    lampShade.add(x, y, z);
+    bulb.add(x, y, z);
+    lampCones.add(x, y - 0.25, z, 0, 1.15, null, 0, y - 0.25 - floorY, 1.15);
+    puddles.add(x + rng.range(-0.8, 0.8), floorY + 0.012, z + rng.range(-0.5, 1.0), rng.range(0, 6), rng.range(1.6, 2.8), null, 0, 1, rng.range(1.0, 1.8));
+    streaks.add(x, floorY + 0.02, z, 0);
+  };
   for (let x = x0 + 9; x < x1; x += 12) {
     const z = -10 + rng.range(-1.5, 1.5);
     const lampY = deckY + rng.range(5.5, 7.0);
     chains.add(x, roofY, z, 0, 1, null, 0, roofY - lampY, 1);
-    lampShade.add(x, lampY, z);
-    bulb.add(x, lampY, z);
+    lampAt(x, lampY, z);
   }
-  // Foreground chains that slide past the camera (z 4.5–7): most end in a hook
-  // tyre just above deck height, a few carry a lamp well above the camera.
+  // Foreground chains that slide past the camera (z 4.5–7): sparse (one per ≈40 m), never
+  // inside a spawn keep-out, and they end ABOVE the rider's head (deck + 3 m) or carry a
+  // lamp high up — a thin chain passing through the frame, never a pillar through the bike.
   const hookTyres = new PropBatch('hooktyre', bakeAO(tyreStackGeometry(), 0.9, 0.2), lib.get('tyre'));
-  for (let x = x0 + 22; x < x1 - 10; x += rng.range(15, 24)) {
+  for (let x = x0 + 22; x < x1 - 10; x += rng.range(34, 48)) {
     const z = rng.range(4.5, 7);
-    if (rng.next() < 0.7) {
-      const endY = deckY + rng.range(0.8, 1.8);
+    if (keepOut(x, 1)) continue;
+    if (rng.next() < 0.6) {
+      const endY = deckY + rng.range(3.0, 4.2);
       chains.add(x, roofY, z, 0, 1, null, 0, roofY - endY, 1);
       hookTyres.add(x, endY - 0.85, z, rng.range(0, 6), 1, null, Math.PI / 2, 1, 1);
     } else {
@@ -401,7 +493,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       bulb.add(x, lampY, z);
     }
   }
-  out.batches.push(hookTyres);
+  out.batches.push(hookTyres, lampCones, puddles, streaks);
   // Loose chains off the trusses, mid hall.
   for (let x = x0 + 5; x < x1; x += rng.range(5, 10)) chains.add(x, roofY - 1.4, rng.range(-16, -6), 0, 1, null, 0, rng.range(3, 8), 1);
   out.batches.push(chains, lampShade, bulb);
@@ -412,7 +504,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   const skinBatches: PropBatch[] = [];
   const contGeo = bakeAO(containerGeometry(), 2.59, 0.4);
   for (let i = 0; i < 8; i++) {
-    const skin = containerSkin(rng, { rust: i % 3, logo: i, doorLeft: (i & 1) === 1, stripe: i % 4 === 3 });
+    const skin = containerSkin(rng, { rust: i % 3, logo: i, doorLeft: (i & 1) === 1, stripe: i % 4 === 3 }, art);
     out.textureBytes += 1024 * 512 * 4 * 1.33;
     const m = i === 0 ? contMat : lib.derive('container');
     m.map = skin;
@@ -450,7 +542,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   out.batches.push(...skinBatches);
 
   // --- Racks, catwalk under the windows, floor clutter, foreground occluders.
-  const racks = new PropBatch('rack', bakeAO(rackGeometry(), 4, 0.35), vc('rustSteel'));
+  const racks = new PropBatch('rack', bakeAO(rackGeometry(), 4, 0.35), vc('rustSteel'), false); // against the wall: shadow-culled (z −28)
   const pallets = new PropBatch('pallet', bakeAO(palletGeometry(), 0.144, 0.3), vc('pallet'));
   const drums = new PropBatch('drum', bakeAO(drumGeometry(), 0.88, 0.4), vc('barrelRed'));
   const tyres = new PropBatch('tyres', bakeAO(tyreStackGeometry(), 0.9, 0.4), vc('tyre'));
@@ -483,15 +575,16 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       cones.add(x + rng.range(-2, 2), floorY, rng.range(-6, -4), rng.range(0, 6));
     }
   }
-  // Foreground: columns, drums, tyres, pallets at z 4.5–8 on the floor (they slide past under the camera).
-  for (let x = x0 + 14; x < x1 - 10; x += rng.range(9, 16)) {
+  // Foreground: low clutter (drums, tyres, pallets) at z 4.5–8 on the floor — 3 m below the
+  // deck, so it slides past under the bike; no columns (round 8 rule), none near a spawn.
+  for (let x = x0 + 14; x < x1 - 10; x += rng.range(14, 22)) {
     const r = rng.next();
     const z = rng.range(4.5, 8);
-    if (r < 0.2) column.add(x, floorY, z + 1, 0, 1, null, 0, roofY - floorY, 1);
-    else if (r < 0.5) {
+    if (keepOut(x, 1.5)) continue;
+    if (r < 0.4) {
       const n = rng.int(2, 4);
       for (let k = 0; k < n; k++) drums.add(x + k * 0.62, floorY, z + rng.range(-0.3, 0.3), rng.range(0, 6), 1, k % 2 ? 0xd8d2c4 : 0xa42a1e);
-    } else if (r < 0.75) tyres.add(x, floorY, z, 0);
+    } else if (r < 0.7) tyres.add(x, floorY, z, 0);
     else {
       const n = rng.int(3, 7);
       for (let k = 0; k < n; k++) pallets.add(x, floorY + k * 0.144, z, rng.range(-0.2, 0.2));
@@ -513,7 +606,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     }
     return mergeGeometries(parts, false)!;
   })();
-  const scaffolds = new PropBatch('scaffold', bakeAO(scaffoldGeo, 4, 0.3), steel);
+  const scaffolds = new PropBatch('scaffold', bakeAO(scaffoldGeo, 4, 0.3), steel, false);
   const tarpMat = fogify(new THREE.MeshStandardMaterial({ color: 0x2a4d8a, roughness: 0.9, side: THREE.DoubleSide }));
   const tarps = new PropBatch('tarp', new THREE.PlaneGeometry(3, 2.4, 6, 4).translate(0, -1.2, 0), tarpMat, true);
   const forkliftGeo = bakeAO((() => {
@@ -533,6 +626,29 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     else signs.add(x, floorY, wallZ + 2.2, 0);
   }
   out.batches.push(racks, pallets, drums, tyres, cones, railTape, railPost, catwalk, reels, scaffolds, tarps, forklifts, signs);
+
+  // --- Wall decals from the art pack: posters and safety signs low on the back wall between
+  // the bays, graffiti pieces on the far container row and the wall. One batch per texture.
+  if (art) {
+    const decal = (id: string, w: number, h: number, alpha: boolean): PropBatch | null => {
+      const t = art.texture(id, true, false);
+      if (!t) return null;
+      out.textureBytes += art.entry(id)?.bytes ?? 0;
+      const m = fogify(new THREE.MeshStandardMaterial({ map: t, roughness: 0.85, transparent: alpha, alphaTest: alpha ? 0.3 : 0, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
+      return new PropBatch(`decal:${id}`, new THREE.PlaneGeometry(w, h).translate(0, h / 2, 0), m, false);
+    };
+    const posters = ['poster-trials-night', 'poster-tyres'].map((id) => decal(id, 1.2, 1.8, false)).filter((b): b is PropBatch => !!b);
+    const signsArt = ['sign-hard-hat', 'sign-overhead-crane', 'sign-forklift', 'sign-exit'].map((id) => decal(id, 0.9, 0.9, false)).filter((b): b is PropBatch => !!b);
+    const graffiti = ['graffiti-rise', 'graffiti-grind', 'graffiti-nofear', 'graffiti-skull', 'graffiti-tag-wall', 'graffiti-wheel'].map((id) => decal(id, 2.6, 2.6, true)).filter((b): b is PropBatch => !!b);
+    for (let x = x0 + 9, i = 0; x < x1 - 6; x += 12, i++) {
+      // Between the window banks (bay x 10–12 m) the brick is bare: posters + a sign there.
+      const bx = x + 1.5 + rng.range(-0.5, 0.5);
+      if (posters.length && rng.next() < 0.7) posters[i % posters.length]!.add(bx, floorY + rng.range(1.2, 2.4), wallZ + 0.06, 0, 1, null, rng.range(-0.04, 0.04));
+      if (signsArt.length && rng.next() < 0.6) signsArt[(i * 3 + 1) % signsArt.length]!.add(bx + rng.range(-0.6, 0.6), floorY + rng.range(4.2, 5.4), wallZ + 0.06);
+      if (graffiti.length && rng.next() < (foundry ? 0.25 : 0.45)) graffiti[(i * 5 + 2) % graffiti.length]!.add(x + rng.range(4, 8), floorY + rng.range(0.2, 0.8), wallZ + 0.06, 0, rng.range(0.9, 1.4));
+    }
+    out.batches.push(...posters, ...signsArt, ...graffiti);
+  }
 
   // --- Light shafts from the main window banks, leaning along the sun.
   const shaft = shaftTexture();
@@ -606,9 +722,9 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     const mouth = new PropBatch('furnacemouth', new THREE.BoxGeometry(1.8, 1.3, 0.1).translate(0, 1.3, 2.0), glow, false);
     const mouthPool = new PropBatch('furnacepool', new THREE.BoxGeometry(2.4, 0.04, 1.6).translate(0, 0.04, 3.0), molten, false);
     const plinth = new PropBatch('plinth', bakeAO(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), 1, 0.35), vc('darkSteel'));
-    const stacks = new PropBatch('stack', bakeAO(mergeGeometries([new THREE.CylinderGeometry(1.1, 1.4, 14, 14).translate(0, 7, 0), new THREE.TorusGeometry(1.25, 0.1, 6, 14).rotateX(Math.PI / 2).translate(0, 4, 0), new THREE.TorusGeometry(1.2, 0.1, 6, 14).rotateX(Math.PI / 2).translate(0, 9, 0)], false)!, 14, 0.3), rust);
-    const pipes = new PropBatch('pipe', pipeGeometry(), rust);
-    const pipeV = new PropBatch('pipev', new THREE.CylinderGeometry(0.35, 0.35, 1, 12).translate(0, 0.5, 0), rust);
+    const stacks = new PropBatch('stack', bakeAO(mergeGeometries([new THREE.CylinderGeometry(1.1, 1.4, 14, 14).translate(0, 7, 0), new THREE.TorusGeometry(1.25, 0.1, 6, 14).rotateX(Math.PI / 2).translate(0, 4, 0), new THREE.TorusGeometry(1.2, 0.1, 6, 14).rotateX(Math.PI / 2).translate(0, 9, 0)], false)!, 14, 0.3), rust, false);
+    const pipes = new PropBatch('pipe', pipeGeometry(), rust, false);
+    const pipeV = new PropBatch('pipev', new THREE.CylinderGeometry(0.35, 0.35, 1, 12).translate(0, 0.5, 0), rust, false);
     const railY = floorY + 12.2;
     for (let x = x0 + 8; x < x1; x += rng.range(9, 14)) {
       const r = rng.next();
@@ -657,11 +773,10 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       }
     }
     out.batches.push(ladles, melt, pours, moulds, mouldMelt, cables, plinth, furnace, mouth, mouthPool, stacks, pipes, pipeV);
-    for (const fx of [0.3, 0.7]) {
-      const pl = new THREE.PointLight(0xff6a18, 90, 36, 2);
-      pl.position.set(x0 + span * fx, floorY + 2.5, -6);
-      out.lights.push(pl);
-    }
+    // Round 8: the two point lights follow the camera (renderer: the two nearest melt sources
+    // to the camera target), so the melt lights the structure wherever the bike is; the kit
+    // adds none of its own. The floor channel adds a baked up-light in the vertex colours of
+    // the near steel (see the terrain tint in biomeKit) — GI stands in for the rest.
   }
   return out;
 }

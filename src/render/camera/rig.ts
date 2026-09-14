@@ -52,9 +52,30 @@ const MODE: Record<NonNullable<CameraKey['mode']>, Partial<Params> & { zoomBias?
   low: { yaw: 14 * DEG, pitch: -8 * DEG },
 };
 
+/** World box the camera may occupy (set per track by the renderer; hard clamp every frame). */
+export interface CameraBounds {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  minZ: number;
+  maxZ: number;
+}
+
 export class CameraRig {
   readonly camera: THREE.PerspectiveCamera;
   private keys: CameraKey[] = [];
+  /**
+   * Round 8 (user's b3 frame: the apex pull-back put the camera above the hall roof, frame
+   * full of skylight backs). After all smoothing the camera POSITION is clamped to `bounds`
+   * (floor + 1.5 … roof − 1, inside the hall in z/x; exteriors get a sky ceiling). When the
+   * clamp binds the framing widens instead: FOV up to +12°, then the pitch tilts so the bike
+   * stays inside the central [0.2, 0.8] box. `clamped` / `posZ` are reported by `debug()`.
+   */
+  bounds: CameraBounds | null = null;
+  private clamped = false;
+  private fovBoost = 0;
+  private readonly bikeView = new THREE.Vector3();
   private readonly keyWeights: Smooth[] = [];
   // Followed bike point.
   private readonly fx = new Smooth(0.12);
@@ -342,8 +363,52 @@ export class CameraRig {
     this.aim.set(bx2, by2, 0).addScaledVector(this.right, -ox).addScaledVector(this.up, -oy);
     this.camera.position.copy(this.aim).addScaledVector(this.dir, -dist2);
     this.camera.quaternion.copy(this.q);
-    if (Math.abs(this.camera.fov - fov / DEG) > 1e-3) {
-      this.camera.fov = fov / DEG;
+    let fovOut = fov;
+    this.clamped = false;
+    const B = this.bounds;
+    if (B) {
+      const cp = this.camera.position;
+      const cx = Math.min(B.maxX, Math.max(B.minX, cp.x));
+      const cy = Math.min(B.maxY, Math.max(B.minY, cp.y));
+      const cz = Math.min(B.maxZ, Math.max(B.minZ, cp.z));
+      if (cx !== cp.x || cy !== cp.y || cz !== cp.z) {
+        this.clamped = true;
+        cp.set(cx, cy, cz);
+        // Reframe from the clamped position: where does the bike centre land now?
+        const v = this.bikeView.set(f.bikeX - cx, f.bikeY + 0.45 - cy, -cz);
+        const zv = -v.dot(this.dir);
+        const yv = v.dot(this.up);
+        const xv = v.dot(this.right);
+        if (zv > 0.5) {
+          const th = Math.tan(fov / 2);
+          let sv = 0.5 - yv / zv / (2 * th);
+          const su = 0.5 + xv / zv / (2 * th * this.aspect);
+          // (a) widen: the FOV grows (≤ +12°) until the bike is back inside the 0.2–0.8 band.
+          const need = Math.max(Math.abs(yv / zv) / 0.6, Math.abs(xv / zv) / (0.6 * this.aspect));
+          if (need > th || sv < 0.2 || sv > 0.8 || su < 0.2 || su > 0.8) {
+            const fovNeed = 2 * Math.atan(need * 1.02);
+            fovOut = Math.min(fov + 12 * DEG, Math.max(fov, fovNeed));
+            const th2 = Math.tan(fovOut / 2);
+            sv = 0.5 - yv / zv / (2 * th2);
+            // (b) still out: tilt the pitch so the bike sits on the band edge.
+            if (sv < 0.2 || sv > 0.8) {
+              const a = Math.atan2(yv, zv); // angle of the bike above the view axis
+              const edge = Math.atan(0.6 * th2) * (sv < 0.2 ? 1 : -1);
+              const dp = a - edge; // rotate the view up by dp (pitch is positive looking down)
+              this.e.set(-(pitch - dp), yaw, roll, 'YXZ');
+              this.q.setFromEuler(this.e);
+              this.dir.set(0, 0, -1).applyQuaternion(this.q);
+              this.right.set(1, 0, 0).applyQuaternion(this.q);
+              this.up.set(0, 1, 0).applyQuaternion(this.q);
+              this.camera.quaternion.copy(this.q);
+            }
+          }
+        }
+      }
+    }
+    this.fovBoost = fovOut - fov;
+    if (Math.abs(this.camera.fov - fovOut / DEG) > 1e-3) {
+      this.camera.fov = fovOut / DEG;
       this.camera.updateProjectionMatrix();
     }
     this.camera.updateMatrixWorld(true);
@@ -371,8 +436,11 @@ export class CameraRig {
     // True roll: angle of the camera's right vector against the world horizontal plane.
     this.right.set(1, 0, 0).applyQuaternion(cam.quaternion);
     const roll = Math.atan2(this.right.y, Math.hypot(this.right.x, this.right.z));
-    const out: CameraDebug & { roll: number; yaw: number; pitch: number; state: string } = {
+    const out: CameraDebug & { roll: number; yaw: number; pitch: number; state: string; clamped: boolean; posZ: number; fovBoostDeg: number } = {
       pos: { x: cam.position.x, y: cam.position.y },
+      clamped: this.clamped,
+      posZ: cam.position.z,
+      fovBoostDeg: this.fovBoost / DEG,
       dist: this.dist,
       bikeScreenX: sx,
       bikeScreenY: sy,

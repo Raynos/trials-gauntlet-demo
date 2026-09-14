@@ -331,7 +331,8 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
         const rem = h - n * 2.59;
         const np = Math.max(0, Math.round(rem / 0.144));
         const top = floorY + n * 2.59;
-        for (let k = 0; k < np; k++) for (const z of [-0.85, 0.85]) pallets.add(x, top + k * 0.144, z, rng.range(-0.02, 0.02), 2.05, null, 0, 1, 1);
+        // Round 8 (tri budget): 3-layer stacks instead of single pallets (÷3 instances); a partial top stack is y-scaled.
+        for (let k = 0; k < np; k += 3) for (const z of [-0.85, 0.85]) stacks.add(x, top + k * 0.144, z, rng.range(-0.02, 0.02), 2.05, null, 0, Math.min(1, (np - k) / 3), 1);
       } else if (h >= 1.3) {
         for (const dx of [-0.9, 0.9]) {
           for (const z of [-1.2, 1.2]) push(buckets, 'darkSteel', tint(box(0.08, h, 0.08, x + dx, floorY + h / 2, z, 0), 0.7, 0.7, 0.7));

@@ -138,6 +138,10 @@ export class MaterialLibrary {
     return m;
   }
 
+  has(name: string): boolean {
+    return this.mats.has(name);
+  }
+
   surface(kind: SurfaceKind): THREE.MeshStandardMaterial {
     return this.get(SURFACE_MATERIAL[kind] ?? 'dirt');
   }
@@ -178,56 +182,79 @@ export class MaterialLibrary {
    * Generate every procedural map and bind it. Synchronous by design so that
    * the frame on which textures appear is the same in every capture.
    */
-  generateTextures(): void {
-    if (this.generated) return;
-    this.generated = true;
+  private static readonly JOBS: TexJob[] = [
+    { painter: 'dirt', size: 512, strength: 2.0, targets: ['dirt'] },
+    { painter: 'plank', size: 512, strength: 1.4, rotate: true, targets: ['plank', 'plywood', 'pallet'] },
+    { painter: 'concrete', size: 512, strength: 1.2, targets: ['concrete', 'asphaltWet'] },
+    { painter: 'rust', size: 256, strength: 1.2, targets: ['steelPlate', 'rustSteel', 'grate', 'darkSteel'], noAlbedo: false },
+    { painter: 'corrugated', size: 512, strength: 2.2, targets: ['container', 'containerRed', 'containerBlue', 'barrelRed', 'barrelWhite', 'barrelBlue'] },
+    { painter: 'rubber', size: 256, strength: 2.5, targets: ['tyre'], noAlbedo: true },
+    { painter: 'paintMetallic', size: 256, strength: 0.6, targets: ['framePaint', 'framePaintLow', 'bodyPaint', 'helmet'] }, // flake + edge chips (albedo only darkens at chips)
+    { painter: 'brushed', size: 256, strength: 0.5, targets: ['alloyBrushed', 'anodised', 'exhaust', 'rim'], noAlbedo: true },
+    { painter: 'fabric', size: 256, strength: 0.8, targets: ['jersey', 'pants', 'gloves', 'riderCloth'], noAlbedo: true },
+    { painter: 'rock', size: 512, strength: 2.0, targets: ['rock'] },
+    { painter: 'snow', size: 256, strength: 1.5, targets: ['snow'] },
+  ];
+  private nextJob = 0;
+
+  /** Number of texture jobs (for progress reporting). */
+  get jobCount(): number {
+    return MaterialLibrary.JOBS.length;
+  }
+  get jobsDone(): number {
+    return this.nextJob;
+  }
+
+  /** Run one texture job (≈ 20–80 ms of CPU). Returns false when all are done. */
+  generateStep(): boolean {
+    const jobs = MaterialLibrary.JOBS;
+    if (this.nextJob >= jobs.length) return false;
     const t0 = performance.now();
-    const jobs: TexJob[] = [
-      { painter: 'dirt', size: 512, strength: 2.0, targets: ['dirt'] },
-      { painter: 'plank', size: 512, strength: 1.4, rotate: true, targets: ['plank', 'plywood', 'pallet'] },
-      { painter: 'concrete', size: 512, strength: 1.2, targets: ['concrete', 'asphaltWet'] },
-      { painter: 'rust', size: 256, strength: 1.2, targets: ['steelPlate', 'rustSteel', 'grate', 'darkSteel'], noAlbedo: false },
-      { painter: 'corrugated', size: 512, strength: 2.2, targets: ['container', 'containerRed', 'containerBlue', 'barrelRed', 'barrelWhite', 'barrelBlue'] },
-      { painter: 'rubber', size: 256, strength: 2.5, targets: ['tyre'], noAlbedo: true },
-      { painter: 'paintMetallic', size: 256, strength: 0.6, targets: ['framePaint', 'framePaintLow', 'bodyPaint', 'helmet'] }, // flake + edge chips (albedo only darkens at chips)
-      { painter: 'brushed', size: 256, strength: 0.5, targets: ['alloyBrushed', 'anodised', 'exhaust', 'rim'], noAlbedo: true },
-      { painter: 'fabric', size: 256, strength: 0.8, targets: ['jersey', 'pants', 'gloves', 'riderCloth'], noAlbedo: true },
-      { painter: 'rock', size: 512, strength: 2.0, targets: ['rock'] },
-      { painter: 'snow', size: 256, strength: 1.5, targets: ['snow'] },
-    ];
-    let idx = 0;
-    for (const job of jobs) {
-      const set = generate(job.size, (this.seed ^ Math.imul(idx + 1, 0x9e3779b9)) >>> 0, painters[job.painter], job.strength);
-      idx++;
-      this.sets.push(set);
-      this.textureBytes += set.bytes;
-      if (job.rotate) {
-        for (const t of [set.map, set.normalMap, set.ormMap]) {
-          t.center.set(0.5, 0.5);
-          t.rotation = Math.PI / 2;
-        }
-      }
-      for (const name of job.targets) {
-        const m = this.get(name);
-        if (!job.noAlbedo) m.map = set.map;
-        m.normalMap = set.normalMap;
-        m.normalScale.set(1, 1);
-        m.roughnessMap = set.ormMap;
-        m.metalnessMap = set.ormMap;
-        m.aoMap = set.ormMap;
-        m.aoMapIntensity = 0.8;
-        // When a map is present the scalar multiplies the texel; painters bake
-        // mid-grey so the scalar keeps its meaning.
-        if (m.metalnessMap) m.metalness = Math.max(m.metalness, 1);
-        m.roughness = 1;
-        m.needsUpdate = true;
+    const idx = this.nextJob++;
+    const job = jobs[idx]!;
+    const set = generate(job.size, (this.seed ^ Math.imul(idx + 1, 0x9e3779b9)) >>> 0, painters[job.painter], job.strength);
+    this.sets.push(set);
+    this.textureBytes += set.bytes;
+    if (job.rotate) {
+      for (const t of [set.map, set.normalMap, set.ormMap]) {
+        t.center.set(0.5, 0.5);
+        t.rotation = Math.PI / 2;
       }
     }
+    for (const name of job.targets) {
+      const m = this.get(name);
+      if (!job.noAlbedo) m.map = set.map;
+      m.normalMap = set.normalMap;
+      m.normalScale.set(1, 1);
+      m.roughnessMap = set.ormMap;
+      m.metalnessMap = set.ormMap;
+      m.aoMap = set.ormMap;
+      m.aoMapIntensity = 0.8;
+      // When a map is present the scalar multiplies the texel; painters bake
+      // mid-grey so the scalar keeps its meaning.
+      if (m.metalnessMap) m.metalness = Math.max(m.metalness, 1);
+      m.roughness = 1;
+      m.needsUpdate = true;
+    }
+    this.generateMs += performance.now() - t0;
+    if (this.nextJob >= jobs.length) this.finishTextures();
+    return this.nextJob < jobs.length;
+  }
+
+  private finishTextures(): void {
+    if (this.generated) return;
+    this.generated = true;
     // Wet asphalt keeps a low roughness scalar over the concrete ORM (reflections of the neon/sky).
     this.get('asphaltWet').roughness = 0.35;
     for (const m of this.mats.values()) this.complete(m);
     for (const d of this.derived) this.copyMaps(d.base, d.mat);
-    this.generateMs = performance.now() - t0;
+  }
+
+  /** Generate every remaining job synchronously (the render() fallback: one deterministic step). */
+  generateTextures(): void {
+    while (this.generateStep()) {
+      /* next job */
+    }
   }
 
   dispose(): void {

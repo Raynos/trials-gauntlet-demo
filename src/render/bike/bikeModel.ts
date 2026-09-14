@@ -94,6 +94,104 @@ function contactTexture(): THREE.CanvasTexture {
   return t;
 }
 
+/**
+ * Contact-shadow blob under a tyre (world space, added to the scene root). Shared by the
+ * procedural wheel and the glTF bike (round 8).
+ */
+export class ContactBlob {
+  readonly mesh: THREE.Mesh;
+  private readonly mat: THREE.MeshBasicMaterial;
+  constructor() {
+    this.mat = new THREE.MeshBasicMaterial({ map: contactTexture(), transparent: true, opacity: 0.85, depthWrite: false, color: 0x000000, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.42), this.mat);
+    this.mesh.renderOrder = 2;
+    this.mesh.frustumCulled = false;
+  }
+  /** Place at the tyre's ground point; fade with height and compression. Returns the tyre squash factor. */
+  set(gx: number, gy: number, groundAngle: number, grounded: boolean, compression: number, hover: number): number {
+    const vis = grounded ? 1 : Math.max(0, 1 - hover / 0.6);
+    this.mesh.visible = vis > 0.02;
+    this.mat.opacity = 0.55 * vis + 0.3 * compression * vis;
+    this.mesh.position.set(gx, gy + 0.006, 0);
+    this.mesh.rotation.set(-Math.PI / 2, 0, 0);
+    this.mesh.rotateOnWorldAxis(Z_AXIS, groundAngle);
+    const s = 1 + 0.35 * compression;
+    this.mesh.scale.set(s, 1 + 0.15 * compression, 1);
+    return grounded ? 0.1 * (0.4 + compression) : 0;
+  }
+}
+
+/**
+ * Frame placement shared by both hero bikes: origin = bike.pos + R(angle) · originOffset
+ * (calibrated to the axle midpoint on the first grounded frame), plus the visual suspension
+ * exaggeration (≤ ×1.3 of the physics travel): sink 3 cm per unit of summed compression,
+ * pitch 0.05 rad × (rear − front), and a ≤ 4 cm rebound overshoot after a hard landing.
+ */
+export class FramePlacer {
+  /** bike.pos → axle midpoint, in frame-local coords (calibrated). */
+  readonly originOffset = new THREE.Vector2(0.065, -0.27);
+  calibrated = false;
+  private landT = -1;
+  private landAmp = 0;
+
+  /** Copy calibration + landing state from another placer (hot swap keeps the frame origin). */
+  copyFrom(o: FramePlacer): void {
+    this.originOffset.copy(o.originOffset);
+    this.calibrated = o.calibrated;
+    this.landT = o.landT;
+    this.landAmp = o.landAmp;
+  }
+
+  place(f: RenderFrame, frame: THREE.Object3D): void {
+    const c = Math.cos(f.bikeAngle);
+    const s = Math.sin(f.bikeAngle);
+    const mx = (f.rear.x + f.front.x) / 2 - f.bikeX;
+    const my = (f.rear.y + f.front.y) / 2 - f.bikeY;
+    const lx = mx * c + my * s;
+    const ly = -mx * s + my * c;
+    if (!this.calibrated || (f.cut && f.rear.grounded && f.front.grounded)) {
+      this.originOffset.set(lx, ly);
+      this.calibrated = true;
+    }
+    const rc = f.rear.grounded ? f.rear.compression : 0;
+    const fc = f.front.grounded ? f.front.compression : 0;
+    if (f.cut) this.landT = -1;
+    if (f.justLanded && f.landImpulse > 1.5) {
+      this.landT = f.tSim;
+      this.landAmp = Math.min(0.04, f.landImpulse * 0.01);
+    }
+    let rebound = 0;
+    if (this.landT >= 0) {
+      const lt = f.tSim - this.landT;
+      if (lt < 0.5) rebound = -this.landAmp * Math.exp(-lt / 0.14) * Math.cos(2 * Math.PI * 4.5 * lt);
+      else this.landT = -1;
+    }
+    const sink = -0.03 * (rc + fc) + rebound;
+    const ox = this.originOffset.x;
+    const oy = this.originOffset.y + sink;
+    frame.position.set(f.bikeX + ox * c - oy * s, f.bikeY + ox * s + oy * c, 0);
+    frame.rotation.z = f.bikeAngle + 0.05 * (rc - fc);
+    frame.updateMatrix();
+    frame.updateMatrixWorld(true);
+  }
+}
+
+/** What the rider and the renderer need from either hero bike. */
+export interface HeroBike {
+  readonly root: THREE.Group;
+  readonly frame: THREE.Group;
+  readonly frameLocal: THREE.Matrix4;
+  readonly placer: FramePlacer;
+  readonly exhaustTip: THREE.Vector3;
+  readonly triangles: number;
+  /** World-space contact blobs (the ghost removes them). */
+  readonly contacts: THREE.Object3D[];
+  ground: ((x: number) => { y: number; angle: number }) | null;
+  update(f: RenderFrame): void;
+  toWorld(x: number, y: number, z: number, out: THREE.Vector3): THREE.Vector3;
+  dispose(): void;
+}
+
 export class Wheel {
   readonly root = new THREE.Group();
   readonly spinner = new THREE.Group();
@@ -242,7 +340,7 @@ export class Wheel {
   }
 }
 
-export class BikeModel {
+export class BikeModel implements HeroBike {
   readonly root = new THREE.Group();
   /** Frame-attached parts (rotate with bike.angle). */
   readonly frame = new THREE.Group();
@@ -258,11 +356,11 @@ export class BikeModel {
   private readonly chain: THREE.Mesh;
   private readonly chainMat: THREE.MeshStandardMaterial;
   private readonly chainTex: THREE.DataTexture;
+  readonly placer = new FramePlacer();
   /** bike.pos → axle midpoint, in frame-local coords (calibrated). */
-  readonly originOffset = new THREE.Vector2(0.065, -0.27);
-  private calibrated = false;
-  private landT = -1;
-  private landAmp = 0;
+  get originOffset(): THREE.Vector2 {
+    return this.placer.originOffset;
+  }
   /** Frame-local attach points for the rider (updated per frame). */
   readonly barL = new THREE.Vector3();
   readonly pegL = new THREE.Vector3();
@@ -613,44 +711,17 @@ export class BikeModel {
     w.setContact(wx, g.y, g.angle, false, 0, Math.max(0, wy - WHEEL_RADIUS - g.y));
   }
 
+  get contacts(): THREE.Object3D[] {
+    return [this.rear.contact, this.front.contact];
+  }
+
+  dispose(): void {
+    this.root.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
+  }
+
   /** Pose from the interpolated frame. */
   update(f: RenderFrame): void {
-    const c = Math.cos(f.bikeAngle);
-    const s = Math.sin(f.bikeAngle);
-    // Axle midpoint in bike-local coordinates.
-    const mx = (f.rear.x + f.front.x) / 2 - f.bikeX;
-    const my = (f.rear.y + f.front.y) / 2 - f.bikeY;
-    const lx = mx * c + my * s;
-    const ly = -mx * s + my * c;
-    if (!this.calibrated || (f.cut && f.rear.grounded && f.front.grounded)) {
-      this.originOffset.set(lx, ly);
-      this.calibrated = true;
-    }
-    // Frame origin = bike.pos + R(angle) * originOffset (rest axle midpoint).
-    // Visual suspension exaggeration, ≤ ×1.3 of the physics travel (round 6: physics at 1.4 g
-    // now compresses to 0.8–0.93 and rebounds by itself): the frame sinks 3 cm per unit of
-    // summed compression, pitches 0.05 rad × (rear − front) and overshoots ≤ 4 cm after a
-    // hard landing; the wheels stay on the physics contact.
-    const rc = f.rear.grounded ? f.rear.compression : 0;
-    const fc = f.front.grounded ? f.front.compression : 0;
-    if (f.cut) this.landT = -1;
-    if (f.justLanded && f.landImpulse > 1.5) {
-      this.landT = f.tSim;
-      this.landAmp = Math.min(0.04, f.landImpulse * 0.01);
-    }
-    let rebound = 0;
-    if (this.landT >= 0) {
-      const lt = f.tSim - this.landT;
-      if (lt < 0.5) rebound = -this.landAmp * Math.exp(-lt / 0.14) * Math.cos(2 * Math.PI * 4.5 * lt);
-      else this.landT = -1;
-    }
-    const sink = -0.03 * (rc + fc) + rebound;
-    const ox = this.originOffset.x;
-    const oy = this.originOffset.y + sink;
-    this.frame.position.set(f.bikeX + ox * c - oy * s, f.bikeY + ox * s + oy * c, 0);
-    this.frame.rotation.z = f.bikeAngle + 0.05 * (rc - fc);
-    this.frame.updateMatrix();
-    this.frame.updateMatrixWorld(true);
+    this.placer.place(f, this.frame);
     this.frameLocal.copy(this.frame.matrixWorld);
 
     this.rear.set(f.rear.x, f.rear.y, f.rear.spin, f.rear.spinVel);

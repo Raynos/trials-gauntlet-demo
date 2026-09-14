@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { fogify } from '../lighting/environment';
+import { canvas, tex } from './canvasTex';
 
 export class PropBatch {
   private readonly items: { m: THREE.Matrix4; c: THREE.Color | null }[] = [];
@@ -394,4 +395,51 @@ export function pipeGeometry(): THREE.BufferGeometry {
     parts.push(f);
   }
   return mergeGeometries(parts, false)!;
+}
+
+// ---------------------------------------------------------------------------
+// Shared by the hall and the city kit (round 8: the high-bay lamps reuse the street-light cone).
+
+export function setColors(g: THREE.BufferGeometry, f: (x: number, y: number, z: number, i: number) => [number, number, number]): THREE.BufferGeometry {
+  const p = g.getAttribute('position');
+  const c = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i++) {
+    const [r, gg, b] = f(p.getX(i), p.getY(i), p.getZ(i), i);
+    c[i * 3] = r;
+    c[i * 3 + 1] = gg;
+    c[i * 3 + 2] = b;
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+  return g;
+}
+
+/** Additive light cone: apex at the origin, opening downward to radius 1.6 at y = −1 (scale y to the drop). */
+export function lightConeGeometry(): THREE.BufferGeometry {
+  const g = new THREE.ConeGeometry(1.6, 1, 18, 1, true).translate(0, -0.5, 0);
+  return setColors(g, (_x, y) => {
+    const t = Math.min(1, Math.max(0, -y));
+    const a = Math.pow(1 - t, 1.6) * 0.9 + 0.02;
+    return [a, a, a];
+  });
+}
+
+/** Wet-road reflection mask: luminance = alpha, strong at v = 1 (the light's foot), fading toward v = 0 and to the sides. */
+export function reflectionMaskTexture(): THREE.CanvasTexture {
+  const [c, g] = canvas(256, 256);
+  const img = g.createImageData(256, 256);
+  for (let y = 0; y < 256; y++) {
+    for (let x = 0; x < 256; x++) {
+      const v = 1 - y / 255; // canvas row 0 = v 1
+      const u = x / 255;
+      const side = Math.pow(Math.sin(u * Math.PI), 0.7);
+      const along = Math.pow(v, 1.8);
+      const ripple = 0.8 + 0.2 * Math.sin(y * 0.9 + Math.sin(x * 0.2) * 3);
+      const a = Math.min(1, side * along * ripple) * 255;
+      const k = (y * 256 + x) * 4;
+      img.data[k] = img.data[k + 1] = img.data[k + 2] = a;
+      img.data[k + 3] = a;
+    }
+  }
+  g.putImageData(img, 0, 0);
+  return tex(c, false, false);
 }

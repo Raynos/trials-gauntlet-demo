@@ -16,6 +16,7 @@ import { fogify } from '../lighting/environment';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { canvas, tex } from './canvasTex';
 import { PropBatch, bakeAO, triCount } from './props';
+import { drawArt, type ArtLibrary } from '../art/library';
 import { groundFloorY, profileY } from './track';
 
 export interface Gates {
@@ -34,7 +35,11 @@ export interface Gates {
 }
 
 const TEAM = ['#2a5cc8', '#e0b83a', '#c8443a', '#3a9a68', '#e07a30', '#e8e6e0', '#7a4ab8', '#3aa8c0'];
-const SPONSORS = ['SQUADX', 'KBNI', 'FOX', 'TRIALS', 'REDLYNX', 'SX'];
+// Fictional sponsors only (round 8 brands audit): the art pack's banner brands plus generic
+// series text. No real-world company or trademark string anywhere in the renderer.
+const SPONSORS = ['VORTEX OIL', 'KESTREL', 'NORDVIK', 'APEX', 'BOLT', 'IRONWORKS', 'TRIALS'];
+/** Manifest ids of the sponsor banners (all fictional brands). */
+const BANNER_IDS = ['banner-vortex-oil', 'banner-kestrel-tyres', 'banner-nordvik', 'banner-apex-suspension', 'banner-bolt-energy', 'banner-ironworks-series'];
 
 function plaqueTexture(n: number): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture } {
   const [c, g] = canvas(256, 128);
@@ -90,8 +95,29 @@ function checkerTexture(): THREE.CanvasTexture {
   return tex(c, true, false);
 }
 
-/** Sponsor strip for the crowd barriers: 4 boards per tile, repeats along x. */
-function sponsorStrip(rng: Rng): THREE.CanvasTexture {
+/** Sponsor strip for the crowd barriers: 4 boards per tile, repeats along x. With the art pack the boards are the printed vinyl banners (centre-cropped 3:2 → 2:1). */
+function sponsorStrip(rng: Rng, art: ArtLibrary | null): { tex: THREE.CanvasTexture; bytes: number } {
+  const banners = art ? BANNER_IDS.filter((id) => art.has(id)) : [];
+  if (art && banners.length) {
+    const [c, g] = canvas(2048, 256);
+    const order = banners.slice();
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = rng.int(0, i);
+      [order[i], order[j]] = [order[j]!, order[i]!];
+    }
+    for (let i = 0; i < 4; i++) {
+      const bmp = art.bitmap(order[i % order.length]!)!;
+      // Crop the middle 2:1 band of the 3:2 banner; a thin dark frame between boards.
+      const sh = bmp.width / 2;
+      drawArt(g, bmp, i * 512, 0, 512, 256, 0, (bmp.height - sh) / 2, bmp.width, sh);
+      g.fillStyle = 'rgba(20,20,22,0.9)';
+      g.fillRect(i * 512, 0, 6, 256);
+      g.fillRect(i * 512 + 506, 0, 6, 256);
+    }
+    const t = tex(c, true, true);
+    t.anisotropy = 8;
+    return { tex: t, bytes: 2048 * 256 * 4 * 1.33 };
+  }
   const [c, g] = canvas(1024, 128);
   for (let i = 0; i < 4; i++) {
     const x = i * 256;
@@ -107,10 +133,26 @@ function sponsorStrip(rng: Rng): THREE.CanvasTexture {
     g.textBaseline = 'middle';
     g.fillText(SPONSORS[rng.int(0, SPONSORS.length - 1)]!, x + 128, 66);
   }
-  return tex(c, true, true);
+  return { tex: tex(c, true, true), bytes: 1024 * 128 * 4 * 1.33 };
 }
 
-/** 8 figures × 2 poses (arms down | arms up), 64×256 px per cell, transparent background. */
+/**
+ * Crowd sheet. Art pack: the keyed photo row of 8 spectators (`crowd-day` for daylit biomes,
+ * `crowd-night` for nightCity / foundry) — 8 cells, one pose (the cheer is the bob).
+ * Fallback: 8 painted figures × 2 poses (arms down | arms up), 64×256 px per cell.
+ */
+function crowdSheet(rng: Rng, art: ArtLibrary | null, night: boolean): { tex: THREE.Texture; cells: number; poses: number; aspect: number; bytes: number } {
+  const id = night ? 'crowd-night' : 'crowd-day';
+  const t = art?.texture(id, true, false) ?? null;
+  const e = art?.entry(id);
+  if (t && e) {
+    t.minFilter = THREE.LinearMipmapLinearFilter;
+    t.anisotropy = 8;
+    return { tex: t, cells: 8, poses: 1, aspect: e.w / 8 / e.h, bytes: e.bytes };
+  }
+  return { tex: crowdAtlas(rng), cells: 16, poses: 2, aspect: 64 / 256, bytes: 1024 * 256 * 4 * 1.33 };
+}
+
 function crowdAtlas(rng: Rng): THREE.CanvasTexture {
   const W = 1024;
   const H = 256;
@@ -201,12 +243,20 @@ function crowdAtlas(rng: Rng): THREE.CanvasTexture {
   return t;
 }
 
-/** 2×2 team-flag atlas. */
-function flagAtlas(rng: Rng): THREE.CanvasTexture {
+/** 2×2 team-flag atlas: the art pack's sponsor banners (square centre crop) or painted team flags. */
+function flagAtlas(rng: Rng, art: ArtLibrary | null): THREE.CanvasTexture {
   const [c, g] = canvas(512, 512);
+  const banners = art ? BANNER_IDS.filter((id) => art.has(id)) : [];
   for (let i = 0; i < 4; i++) {
     const x = (i % 2) * 256;
     const y = Math.floor(i / 2) * 256;
+    if (art && banners.length) {
+      const bmp = art.bitmap(banners[(i * 2 + rng.int(0, 1)) % banners.length]!)!;
+      // Flags are 1.3 × 0.85: crop a 3:2 band so the emblem is not squashed.
+      const sh = bmp.height * 0.9;
+      drawArt(g, bmp, x, y, 256, 256, 0, (bmp.height - sh) / 2, bmp.width, sh);
+      continue;
+    }
     const a = TEAM[rng.int(0, TEAM.length - 1)]!;
     let b = TEAM[rng.int(0, TEAM.length - 1)]!;
     if (b === a) b = '#f2f2f2';
@@ -242,7 +292,7 @@ function flagAtlas(rng: Rng): THREE.CanvasTexture {
  * instance's z-scale (1..N) and whose motion is driven by uTime / uCheer.
  * mode 0 = crowd (16-cell strip, pose switch + bob), 1 = flag (2×2 atlas, wave).
  */
-function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim']): THREE.MeshStandardMaterial {
+function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim'], cells = 16, poses = 2): THREE.MeshStandardMaterial {
   const m = new THREE.MeshStandardMaterial({ map, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide, vertexColors: true });
   fogify(m);
   const prev = m.onBeforeCompile;
@@ -251,13 +301,17 @@ function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim']): THR
     shader.uniforms.uTime = anim.uTime;
     shader.uniforms.uCheer = anim.uCheer;
     shader.uniforms.uMode = { value: mode };
+    shader.uniforms.uCells = { value: cells };
+    shader.uniforms.uPoseShift = { value: poses > 1 ? cells / poses : 0 };
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
         `#include <common>
         uniform float uTime;
         uniform float uCheer;
-        uniform float uMode;`,
+        uniform float uMode;
+        uniform float uCells;
+        uniform float uPoseShift;`,
       )
       .replace(
         '#include <uv_vertex>',
@@ -268,7 +322,7 @@ function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim']): THR
         #ifdef USE_MAP
         if (uMode < 0.5) {
           float up = step(0.0, cardS) * step(0.5, uCheer);
-          vMapUv.x = (vMapUv.x + cardCell + up * 8.0) / 16.0;
+          vMapUv.x = (vMapUv.x + cardCell + up * uPoseShift) / uCells;
         } else {
           vMapUv = (vMapUv + vec2(mod(cardCell, 2.0), floor(cardCell / 2.0))) * 0.5;
         }
@@ -290,7 +344,7 @@ function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim']): THR
   return m;
 }
 
-export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibrary): Gates {
+export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, art: ArtLibrary | null = null): Gates {
   const group = new THREE.Group();
   group.name = 'gates';
   const profile = track.def.profile;
@@ -308,13 +362,14 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
   const gyAt = (x: number, z: number): number => (interior ? floorY : profileY(profile, x) - 0.42 - Math.min(1, (Math.abs(z) - 3) / 30) ** 2 * 2.5);
 
   // --- Shared kit -----------------------------------------------------------
-  const crowdTex = crowdAtlas(rng);
-  textureBytes += 1024 * 256 * 4 * 1.33;
-  const flagTex = flagAtlas(rng);
+  const sheet = crowdSheet(rng, art, biome.id === 'nightCity' || biome.id === 'foundry');
+  textureBytes += sheet.bytes;
+  const flagTex = flagAtlas(rng, art);
   textureBytes += 512 * 512 * 4 * 1.33;
-  const crowdMat = cardMaterial(crowdTex, 0, anim);
+  const crowdMat = cardMaterial(sheet.tex, 0, anim, sheet.cells, sheet.poses);
   const flagMat = cardMaterial(flagTex, 1, anim);
-  const card = new THREE.PlaneGeometry(0.62, 1.9).translate(0, 0.95, 0);
+  // Card = one figure, 1.9 m tall (photo sheet: 1024/8 × 478 → 0.51 m wide; painted: 0.62).
+  const card = new THREE.PlaneGeometry(1.9 * sheet.aspect, 1.9).translate(0, 0.95, 0);
   const cardUV = card.getAttribute('uv') as THREE.BufferAttribute;
   const cardCol = new Float32Array(cardUV.count * 3);
   for (let i = 0; i < cardUV.count; i++) {
@@ -336,9 +391,9 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
   const rails = new PropBatch('barrier', new THREE.BoxGeometry(1, 0.05, 0.05).translate(0, 1.0, 0), steel, false);
   const railPosts = new PropBatch('barrierpost', new THREE.BoxGeometry(0.05, 1.05, 0.05).translate(0, 0.52, 0), steel, false);
   const stage = new PropBatch('stage', bakeAO(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), 1, 0.35), fogify(lib.get('rustSteel')));
-  const stripTex = sponsorStrip(rng);
-  textureBytes += 1024 * 128 * 4 * 1.33;
-  const stripMat = fogify(new THREE.MeshStandardMaterial({ map: stripTex, roughness: 0.8, side: THREE.DoubleSide }));
+  const strip = sponsorStrip(rng, art);
+  textureBytes += strip.bytes;
+  const stripMat = fogify(new THREE.MeshStandardMaterial({ map: strip.tex, roughness: 0.8, side: THREE.DoubleSide }));
   const strips: THREE.BufferGeometry[] = [];
 
   const yawToCam = 0.25; // the camera sits at +z, yawed ~15–20°: face the cards toward it
@@ -357,7 +412,7 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
       const x = xa + ((i + 0.5) / n) * (xb - xa) + rng.range(-0.25, 0.25);
       const z = zFront - row * 0.9 - rng.range(0, 0.3);
       const sc = rng.range(0.92, 1.08);
-      const fig = rng.int(1, 8);
+      const fig = rng.int(1, sheet.cells / sheet.poses);
       // z-scale carries the atlas cell (1..8); the plane has no depth so it costs nothing.
       crowd.add(x, baseY(x, z) + row * 0.25, z, yawToCam + rng.range(-0.15, 0.15), sc, null, 0, sc, fig);
     }

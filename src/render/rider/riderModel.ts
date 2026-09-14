@@ -19,23 +19,25 @@ import * as THREE from 'three';
 import type { RagdollBody } from '../../core/types';
 import type { MaterialLibrary } from '../materials/library';
 import type { RenderFrame } from '../frame';
-import { BIKE, type BikeModel } from '../bike/bikeModel';
+import { BIKE, type HeroBike } from '../bike/bikeModel';
+import { DEFAULT_OPTS, SEG, makeChain, riderChain, type Chain as PoseChain, type ChainOpts } from './pose';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { canvas, tex } from '../world/canvasTex';
 import { mergeStaticChildren } from '../util/merge';
 
 /** Segment lengths (m), 7.5 heads at 1.78 m. */
+/** Segment lengths = the pose owner's `SEG` (assets/blender/RIDER_CHAIN.md), so the kit is built at the chain's proportions. */
 const L = {
-  torso: 0.5, // hips → shoulder line
-  headUp: 0.195, // shoulder line → head centre (physics chain)
-  headR: 0.125, // helmet shell radius (≈0.26 m tall with the chin bar)
-  upperArm: 0.3,
-  forearm: 0.27, // elbow → grip centre (hand included)
-  thigh: 0.44,
-  shin: 0.43, // knee → ankle
-  ankle: 0.09, // ankle above the peg
-  hipHalf: 0.09,
-  shoulderHalf: 0.2,
+  torso: SEG.torso, // hips → shoulder line
+  headUp: SEG.neck, // shoulder line → helmet centre
+  headR: 0.13, // helmet shell radius
+  upperArm: SEG.upperArm,
+  forearm: SEG.forearm, // elbow → grip centre (hand included)
+  thigh: SEG.thigh,
+  shin: SEG.shin, // knee → ankle
+  ankle: SEG.ankleUp, // ankle above the peg
+  hipHalf: SEG.hipHalf,
+  shoulderHalf: SEG.shoulderHalf,
   pelvis: 0.2,
 };
 
@@ -61,28 +63,78 @@ class Segment {
   }
 }
 
-/** Two-bone IK in XY: joint for a→b with bone lengths l1, l2; `side` = which side of the a–b line. */
-function ik(ax: number, ay: number, bx: number, by: number, l1: number, l2: number, side: number, out: THREE.Vector2): void {
-  let dx = bx - ax;
-  let dy = by - ay;
-  let d = Math.hypot(dx, dy);
-  const max = (l1 + l2) * 0.995;
-  const min = Math.abs(l1 - l2) + 0.02;
-  if (d > max || d < min) {
-    const k = (d > max ? max : min) / (d || 1e-6);
-    dx *= k;
-    dy *= k;
-    d = d > max ? max : min;
+// ---------------------------------------------------------------------------
+// The drawn chain (shared by the procedural kit and the glTF rig, round 8)
+// ---------------------------------------------------------------------------
+
+/** Joint positions of the drawn rider chain in axle (frame-local) coordinates, metres. Index 0 = rider's left (+z, camera side). */
+export interface Chain {
+  hips: THREE.Vector3;
+  pelvisBottom: THREE.Vector3;
+  shoulders: THREE.Vector3;
+  head: THREE.Vector3;
+  /** Head group rotation about z (frame-local). */
+  headAngle: number;
+  /** Torso lean from +y toward +x (rad). */
+  torsoAngle: number;
+  shoulder: THREE.Vector3[];
+  elbow: THREE.Vector3[];
+  hand: THREE.Vector3[];
+  hip: THREE.Vector3[];
+  knee: THREE.Vector3[];
+  ankle: THREE.Vector3[];
+}
+
+export interface ChainInput {
+  lean: number;
+  torsoPitch: number;
+  armExtend: number;
+  crouch: number;
+}
+
+export function newChain(): Chain {
+  const pair = (): THREE.Vector3[] => [new THREE.Vector3(), new THREE.Vector3()];
+  return { hips: new THREE.Vector3(), pelvisBottom: new THREE.Vector3(), shoulders: new THREE.Vector3(), head: new THREE.Vector3(), headAngle: 0, torsoAngle: 0, shoulder: pair(), elbow: pair(), hand: pair(), hip: pair(), knee: pair(), ankle: pair() };
+}
+
+const POSE_OUT: PoseChain = makeChain();
+// Physics round 10 (d98236a): `crouch` is the hop preload alone and `torsoPitch` the transient
+// only, so the chain's coupling removal is off (it would double-strip).
+const POSE_OPTS: ChainOpts = { ...DEFAULT_OPTS, grips: { x: BIKE.grip.x, y: BIKE.grip.y, z: BIKE.gripZ }, pegs: { x: BIKE.pegs.x, y: BIKE.pegs.y, z: BIKE.pegHalfWidth }, seatTop: { x: BIKE.seatTop.x, y: BIKE.seatTop.y }, crouchIsHopOnly: true, torsoPitchLeanBias: 0 };
+
+/**
+ * The one chain both the procedural kit and the glTF rig pose from. Round 8: the body is the
+ * pose owner's `riderChain` (rider/pose.ts — canonical poses from assets/blender/RIDER_CHAIN.md,
+ * curves measured from the reference, and the physics lean→crouch coupling removed), converted
+ * to the render's joint set: torsoAngle here is measured from +y toward +x, `headAngle` is the
+ * head group's rotation about z. `crouchExtra` (0..1) is the render-driven landing compression.
+ */
+export function solveChain(r: ChainInput, c: Chain, crouchExtra = 0): Chain {
+  POSE_OPTS.crouchExtra = crouchExtra;
+  const p = riderChain({ lean: r.lean, crouch: r.crouch, torsoPitch: r.torsoPitch, armExtend: r.armExtend }, POSE_OPTS, POSE_OUT);
+  c.hips.set(p.hips.x, p.hips.y, p.hips.z);
+  c.shoulders.set(p.shoulders.x, p.shoulders.y, p.shoulders.z);
+  c.head.set(p.head.x, p.head.y, p.head.z);
+  c.torsoAngle = Math.PI / 2 - p.torsoAngle;
+  c.headAngle = -(Math.PI / 2 - p.headAngle);
+  const tx = Math.sin(c.torsoAngle);
+  const ty = Math.cos(c.torsoAngle);
+  c.pelvisBottom.set(p.hips.x - tx * L.pelvis * 0.9, p.hips.y - ty * L.pelvis * 0.9, 0);
+  for (let i = 0; i < 2; i++) {
+    const S = p.shoulder[i]!;
+    const E = p.elbow[i]!;
+    const H = p.hand[i]!;
+    const HP = p.hipSide[i]!;
+    const K = p.knee[i]!;
+    const A = p.ankle[i]!;
+    c.shoulder[i]!.set(S.x, S.y, S.z);
+    c.elbow[i]!.set(E.x, E.y, E.z);
+    c.hand[i]!.set(H.x, H.y, H.z);
+    c.hip[i]!.set(HP.x, HP.y, HP.z);
+    c.knee[i]!.set(K.x, K.y, K.z);
+    c.ankle[i]!.set(A.x, A.y, A.z);
   }
-  if (d < 1e-4) {
-    out.set(ax + l1, ay);
-    return;
-  }
-  const a = (l1 * l1 - l2 * l2 + d * d) / (2 * d);
-  const h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
-  const ux = dx / d;
-  const uy = dy / d;
-  out.set(ax + ux * a - uy * h * side, ay + uy * a + ux * h * side);
+  return c;
 }
 
 function rbox(w: number, h: number, d: number, r = 0.01, seg = 2): THREE.BufferGeometry {
@@ -135,9 +187,10 @@ export class RiderModel {
   readonly debug = { armStretch: [1, 1], legStretch: [1, 1], handOnGrip: [true, true], ragdollResidual: -1, ragdollBlend: 0, ragdollDetail: [] as string[] };
   private readonly kit: Kit;
   private readonly rag: Kit;
-  private readonly v = new THREE.Vector2();
-  private readonly v2 = new THREE.Vector2();
-  private bike: BikeModel | null = null;
+  private readonly chain = newChain();
+  private landT = -1;
+  private landAmp = 0;
+  private bike: HeroBike | null = null;
   private readonly posed: PosedJoints = {
     hips: new THREE.Vector3(),
     pelvisBottom: new THREE.Vector3(),
@@ -218,9 +271,19 @@ export class RiderModel {
     return m;
   }
 
-  attach(bike: BikeModel): void {
+  attach(bike: HeroBike): void {
     this.bike = bike;
     bike.frame.add(this.seated);
+  }
+
+  /** Take the posed kit out of the bike frame (hot swap). */
+  detach(): void {
+    this.seated.removeFromParent();
+  }
+
+  dispose(): void {
+    this.root.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
+    this.seated.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
   }
 
   // ---------------------------------------------------------------------------
@@ -469,129 +532,59 @@ export class RiderModel {
   }
 
   private poseRider(f: RenderFrame): void {
-    const B = BIKE;
     const r = {
       lean: this.spring('lean', f.rider.lean, f.dt, f.cut),
       torsoPitch: this.spring('torso', f.rider.torsoPitch, f.dt, f.cut),
       armExtend: this.spring('arm', f.rider.armExtend, f.dt, f.cut),
       crouch: this.spring('crouch', f.rider.crouch, f.dt, f.cut),
     };
+    if (f.cut) this.landT = -1;
+    if (f.justLanded && f.landImpulse > 1.2) {
+      this.landT = f.tSim;
+      this.landAmp = Math.min(1, f.landImpulse * 0.18);
+    }
+    let landK = 0;
+    if (this.landT >= 0) {
+      const lt = f.tSim - this.landT;
+      landK = lt < 0.5 ? this.landAmp * Math.sin(Math.PI * Math.min(1, lt / 0.5)) : 0;
+      if (lt >= 0.5) this.landT = -1;
+    }
+    const c = solveChain(r, this.chain, landK);
     const k = this.kit;
-    const back = Math.max(0, -r.lean);
-    const fwd = Math.max(0, r.lean);
-    const crouch = Math.max(0, r.crouch);
-    // Body chain = physics' drawn chain (physics.md §7.7), evaluated in frame-local coords: hips,
-    // torso pitch and head are the same expressions the crash sensors and the ragdoll spawn use,
-    // so the last posed frame and the first ragdoll frame coincide up to the axle-origin offset
-    // (`BikeModel.originOffset`, reported as `debug.ragdollResidual`). Always standing on the pegs.
-    // Render-side departures from the chain (requested of physics, see rendering.md §10):
-    // hanging off the back the chain's hips/torso put the shoulders 1.1 m from the grips, so
-    // here the shoulders are pinned at arm's reach from the grip (slightly above the bar line)
-    // with the torso near the attack angle, and the hips hang from them — butt over the rear
-    // fender, arms straight, hands on the grips. The crouch drops 0.28 m (chain: 0.40) with the
-    // torso folding 0.35 rad (chain: 0.50), which keeps the chest above the bars.
-    const gx = B.grip.x;
-    const gy = B.grip.y;
-    const reach = (L.upperArm + L.forearm) * 0.985;
-    let hx = -0.12 - 0.28 * back + 0.14 * fwd - 0.06 * crouch;
-    let hy = 0.74 - 0.28 * crouch;
-    const torsoA = 0.62 + r.torsoPitch + 0.3 * fwd + 0.35 * crouch - 0.1 * back - 0.1 * r.armExtend;
-    let sx = hx + Math.sin(torsoA) * L.torso;
-    let sy = hy + Math.cos(torsoA) * L.torso;
-    if (back > 0) {
-      const phi = 0.32 + 0.15 * crouch;
-      const px = gx - Math.cos(phi) * reach;
-      const py = gy + Math.sin(phi) * reach;
-      sx += (px - sx) * back;
-      sy += (py - sy) * back;
-      hx = sx - Math.sin(torsoA) * L.torso;
-      hy = sy - Math.cos(torsoA) * L.torso;
-    }
-    // Legs never overreach: if the hips are beyond thigh+shin from the ankles, bring them in
-    // along the hip→ankle line (the shoulders follow at the same torso angle).
-    {
-      const ax0 = B.pegs.x + 0.01;
-      const ay0 = B.pegs.y + L.ankle;
-      const legReach = (L.thigh + L.shin) * 0.985;
-      const d = Math.hypot(hx - ax0, hy - ay0);
-      if (d > legReach) {
-        const kk = (d - legReach) / d;
-        hx += (ax0 - hx) * kk;
-        hy += (ay0 - hy) * kk;
-        sx = hx + Math.sin(torsoA) * L.torso;
-        sy = hy + Math.cos(torsoA) * L.torso;
-      }
-    }
-    // Hands stay ON the grips at every lean: if the shoulder is out of reach the whole
-    // upper body slides toward the bars (arms lock straight) instead of the IK letting go.
-    {
-      const ddx = gx - sx;
-      const ddy = gy - sy;
-      const d = Math.hypot(ddx, ddy);
-      // …and never closer than 0.3 m (a folded crouch over the bars would put the shoulder on
-      // the grip and the IK degenerates): push the body back along the same line.
-      const near = 0.3;
-      if (d > reach || d < near) {
-        const kk = (d - (d > reach ? reach : near)) / (d || 1e-6);
-        sx += ddx * kk;
-        sy += ddy * kk;
-        hx += ddx * kk;
-        hy += ddy * kk;
-      }
-    }
-    // Pelvis under the torso base, tilted with it (its top is the hip joint).
-    const pbx = hx - Math.sin(torsoA) * L.pelvis * 0.9;
-    const pby = hy - Math.cos(torsoA) * L.pelvis * 0.9;
-    k.torso.place(hx, hy, 0, sx, sy, 0);
-    // Head continues the torso at 45 % (chain: 0.195 beyond the shoulders); no world-level
-    // counter-rotation — the ragdoll head does not carry one (round 6 hand-over fix).
-    const headA = torsoA * 0.45 - 0.1;
-    const hdx = sx + Math.sin(headA) * L.headUp;
-    const hdy = sy + Math.cos(headA) * L.headUp;
-    k.head.position.set(hdx, hdy, 0);
-    const headRot = -headA;
-    k.head.rotation.z = headRot;
-    // Arms: shoulders → grips; elbows up and out (attack position). The forearm segment always
-    // ends on the grip centre; the hand is a fist around the bar there.
+    const { hips: H, shoulders: S, head: HD } = c;
+    k.torso.place(H.x, H.y, 0, S.x, S.y, 0);
+    k.head.position.copy(HD);
+    k.head.rotation.z = c.headAngle;
     for (let i = 0; i < 2; i++) {
-      const side = i === 0 ? 1 : -1;
-      const z = side * L.shoulderHalf;
-      const hz = side * B.gripZ;
-      ik(sx, sy, gx, gy, L.upperArm, L.forearm, 1, this.v);
-      const ez = side * 0.3;
-      k.upperArm[i]!.place(sx, sy, z, this.v.x, this.v.y, ez);
-      k.forearm[i]!.place(this.v.x, this.v.y, ez, gx, gy, hz);
+      const sh = c.shoulder[i]!;
+      const el = c.elbow[i]!;
+      const hd = c.hand[i]!;
+      k.upperArm[i]!.place(sh.x, sh.y, sh.z, el.x, el.y, el.z);
+      k.forearm[i]!.place(el.x, el.y, el.z, hd.x, hd.y, hd.z);
       this.debug.armStretch[i] = k.forearm[i]!.stretch;
       this.debug.handOnGrip[i] = true;
-      this.posed.elbow[i]!.set(this.v.x, this.v.y, ez);
-      this.posed.wrist[i]!.set(gx, gy, hz);
-    }
-    // Legs: hips → ankles above the pegs, knees forward and slightly out; boots level on the pegs.
-    const ax = B.pegs.x + 0.01;
-    const ay = B.pegs.y + L.ankle;
-    for (let i = 0; i < 2; i++) {
-      const side = i === 0 ? 1 : -1;
-      const hipz = side * L.hipHalf;
-      const fz = side * B.pegHalfWidth;
-      ik(hx, hy, ax, ay, L.thigh, L.shin, 1, this.v2);
-      const kz = side * 0.16;
-      k.thigh[i]!.place(hx, hy, hipz, this.v2.x, this.v2.y, kz);
-      k.shin[i]!.place(this.v2.x, this.v2.y, kz, ax, ay, fz);
+      this.posed.elbow[i]!.copy(el);
+      this.posed.wrist[i]!.copy(hd);
+      const hp = c.hip[i]!;
+      const kn = c.knee[i]!;
+      const an = c.ankle[i]!;
+      k.thigh[i]!.place(hp.x, hp.y, hp.z, kn.x, kn.y, kn.z);
+      k.shin[i]!.place(kn.x, kn.y, kn.z, an.x, an.y, an.z);
       const ft = k.foot[i]!;
-      ft.position.set(ax, ay, fz);
+      ft.position.copy(an);
       ft.rotation.set(0, 0, -0.05);
       this.debug.legStretch[i] = k.shin[i]!.stretch;
-      this.posed.knee[i]!.set(this.v2.x, this.v2.y, kz);
-      this.posed.ankle[i]!.set(ax, ay, fz);
+      this.posed.knee[i]!.copy(kn);
+      this.posed.ankle[i]!.copy(an);
     }
     // Remember the posed joints (frame-local) for the ragdoll hand-over; they are carried to
     // world space with the frame matrix of the ragdoll frame, so the bike's own motion between
     // the two frames is not counted as a pose residual.
-    this.posed.hips.set(hx, hy, 0);
-    this.posed.pelvisBottom.set(pbx, pby, 0);
-    this.posed.shoulders.set(sx, sy, 0);
-    this.posed.head.set(hdx, hdy, 0);
-    this.posed.headAngle = headRot;
+    this.posed.hips.copy(H);
+    this.posed.pelvisBottom.copy(c.pelvisBottom);
+    this.posed.shoulders.copy(S);
+    this.posed.head.copy(HD);
+    this.posed.headAngle = c.headAngle;
     this.posedWorld = false;
     this.debug.ragdollBlend = 0;
   }
@@ -683,7 +676,7 @@ export class RiderModel {
     }
     if (this.ragFrames === 0) {
       this.debug.ragdollResidual = residual;
-      this.blendFrames = residual < 0.1 ? 2 : residual < 0.2 ? 3 : residual < 0.3 ? 4 : 5;
+      this.blendFrames = 2; // physics' crash chain is a port of pose.ts (≤ 0.5 cm), round 10
     }
   }
 }

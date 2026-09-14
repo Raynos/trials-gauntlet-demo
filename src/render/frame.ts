@@ -37,6 +37,8 @@ export interface RenderFrame {
   rear: WheelView;
   front: WheelView;
   rider: { lean: number; crouch: number; torsoPitch: number; armExtend: number };
+  /** Physics hop state machine (glTF rider plays `extend` on 'push'). */
+  hopPhase: 'idle' | 'preload' | 'push' | 'recover';
   throttle: number;
   throttleEff: number;
   rpm: number;
@@ -88,6 +90,7 @@ export class FrameBuilder {
     rear: { x: 0, y: 0, spin: 0, spinVel: 0, compression: 0, grounded: true },
     front: { x: 0, y: 0, spin: 0, spinVel: 0, compression: 0, grounded: true },
     rider: { lean: 0, crouch: 0, torsoPitch: 0, armExtend: 0 },
+    hopPhase: 'idle',
     throttle: 0,
     throttleEff: 0,
     rpm: 1500,
@@ -146,6 +149,7 @@ export class FrameBuilder {
     f.rider.crouch = lerp(prev.rider.crouch, cur.rider.crouch, a);
     f.rider.torsoPitch = lerp(prev.rider.torsoPitch, cur.rider.torsoPitch, a);
     f.rider.armExtend = lerp(prev.rider.armExtend, cur.rider.armExtend, a);
+    f.hopPhase = cur.hopPhase ?? 'idle';
 
     f.throttle = cur.input?.throttle ?? 0;
     f.throttleEff = cur.engine?.throttleEff ?? f.throttle;

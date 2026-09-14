@@ -7,8 +7,13 @@
  */
 import * as THREE from 'three';
 import type { CameraDebug, CompiledTrack, GameEvent, GamePhase, PhysicsState, QualityTier, RenderStats } from '../core/types';
+import { ArtLibrary } from './art/library';
 import { biomeFor, type Biome } from './biomes';
-import { BikeModel } from './bike/bikeModel';
+import { BikeModel, type HeroBike } from './bike/bikeModel';
+import { HERO_URLS, loadGltf, type ModelChoice, type ModelChoices } from './hero/gltf';
+import { GltfBike } from './hero/gltfBike';
+import { GltfRider } from './hero/gltfRider';
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { CameraRig } from './camera/rig';
 import { FrameBuilder } from './frame';
 import { LightingRig, fogify } from './lighting/environment';
@@ -20,6 +25,7 @@ import { buildBiomeKit } from './world/biomeKit';
 import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
 import { groundFloorY, profileY } from './world/track';
+import { HALL } from './world/hall';
 import { buildRideSurfaces } from './world/deck';
 
 export interface GameRenderer {
@@ -47,7 +53,12 @@ export interface ThreeRendererOptions {
   pixelRatio?: number;
   preserveDrawingBuffer?: boolean;
   quality?: QualityTier;
+  /** Hero model choice (`?rider=gltf&bike=gltf`); default procedural. */
+  riderModel?: ModelChoice;
+  bikeModel?: ModelChoice;
 }
+
+type HeroRider = RiderModel | GltfRider;
 
 export interface RenderBudget {
   calls: number;
@@ -67,6 +78,13 @@ interface World {
   textureBytes: number;
   trackCalls: number;
   trackTris: number;
+  /** Built with the art pack present (false → rebuilt once the pack settles, if nothing was drawn yet). */
+  withArt: boolean;
+  /** Melt sources (foundry): the two follow lights snap to the nearest ones each frame. */
+  fountains: { x: number; y: number; z: number }[];
+  meltLights: THREE.PointLight[];
+  /** `frameCount` when the world was built: a rebuild is only allowed before the first frame. */
+  builtAtFrame: number;
 }
 
 export class ThreeRenderer implements GameRenderer {
@@ -76,12 +94,21 @@ export class ThreeRenderer implements GameRenderer {
   private readonly lib: MaterialLibrary;
   private readonly lighting: LightingRig;
   private readonly rig = new CameraRig();
-  private readonly bike: BikeModel;
-  private readonly rider: RiderModel;
+  private bike: HeroBike;
+  private rider: HeroRider;
+  private models: ModelChoices = { riderModel: 'proc', bikeModel: 'proc' };
+  private readonly gltf: { bike: GLTF | null; rider: GLTF | null } = { bike: null, rider: null };
+  /** In-flight setModels (glTF load + swap); `whenReady` waits for it. */
+  private heroPending: Promise<void> = Promise.resolve();
+  private heroLoading = 0;
   private readonly emitters = new Emitters();
   private readonly post: PostChain;
   private readonly frames = new FrameBuilder();
   private world: World | null = null;
+  private track: CompiledTrack | null = null;
+  /** Round 8: the generated art pack; loading starts in the constructor, `ready` waits for it. */
+  readonly art = new ArtLibrary('art/');
+  private artBackground: THREE.Texture | null = null;
   private biome: Biome = biomeFor('industrial');
   private frameCount = 0;
   private tier: QualityTier;
@@ -98,7 +125,7 @@ export class ThreeRenderer implements GameRenderer {
   private lastCheckpoint = -1;
   // Ghost (CONTRACT §2.7 setGhost): a second bike+rider with ghosted materials, no
   // shadow, no particles, no contact blobs; nothing else in the scene reads it.
-  private ghost: { root: THREE.Group; bike: BikeModel; rider: RiderModel; mats: THREE.Material[] } | null = null;
+  private ghost: { root: THREE.Group; bike: HeroBike; rider: HeroRider; mats: THREE.Material[] } | null = null;
   private ghostState: PhysicsState | null = null;
   private readonly ghostFrames = new FrameBuilder();
   /** Wall-clock ms spent generating textures (diagnostic only). */
@@ -135,39 +162,252 @@ export class ThreeRenderer implements GameRenderer {
     this.lighting.setQuality(this.tier);
     this.lighting.apply(this.biome);
     this.post.applyBiome(this.biome);
+    // Art pack: fetch + decode off the main thread now; when it settles, a world that was built
+    // without it is rebuilt once (before the first frame in normal play — the menu is up).
+    void this.art.load();
+    if (options.riderModel === 'gltf' || options.bikeModel === 'gltf') this.setModels({ riderModel: options.riderModel ?? 'proc', bikeModel: options.bikeModel ?? 'proc' });
+    this.art.onSettled(() => {
+      // Determinism: a world that has already been drawn is never swapped mid-run (a capture is
+      // all-art or all-procedural); the next setTrack picks the pack up. Callers that need the
+      // art-complete first frame await `whenReady()` before rendering.
+      const w = this.world;
+      if (this.track && w && !w.withArt && this.art.ok && w.builtAtFrame === this.frameCount) this.setTrack(this.track);
+    });
     (window as unknown as { __render?: ThreeRenderer }).__render = this; // debug handle for the harness
   }
 
   /** Debug access for harness scripts (not part of the contract). */
-  get debug(): { scene: THREE.Scene; renderer: THREE.WebGLRenderer; lighting: LightingRig; post: PostChain; lib: MaterialLibrary; rig: CameraRig; THREE: typeof THREE; bike: BikeModel; rider: RiderModel } {
-    return { scene: this.scene, renderer: this.renderer, lighting: this.lighting, post: this.post, lib: this.lib, rig: this.rig, THREE, bike: this.bike, rider: this.rider };
+  get debug(): { scene: THREE.Scene; renderer: THREE.WebGLRenderer; lighting: LightingRig; post: PostChain; lib: MaterialLibrary; rig: CameraRig; THREE: typeof THREE; bike: HeroBike; rider: HeroRider; models: ModelChoices } {
+    return { scene: this.scene, renderer: this.renderer, lighting: this.lighting, post: this.post, lib: this.lib, rig: this.rig, THREE, bike: this.bike, rider: this.rider, models: this.models };
+  }
+
+  // -- hero models (round 8) --------------------------------------------------
+
+  /**
+   * Choose the hero meshes. Hot-swappable mid-run: the new bike/rider are built, take over
+   * the calibrated frame origin and landing state, the rider re-attaches to the new frame,
+   * and the next `render()` poses them from the same physics state — physics, camera and
+   * particles are untouched. A swap is a render-only event; with `?bike=gltf` the glTF is
+   * loaded before `ready`, so captures are deterministic.
+   */
+  setModels(m: ModelChoices): void {
+    this.models = { riderModel: m.riderModel === 'gltf' ? 'gltf' : 'proc', bikeModel: m.bikeModel === 'gltf' ? 'gltf' : 'proc' };
+    const want = this.models;
+    this.heroLoading++;
+    const run = async (): Promise<void> => {
+      if (want.bikeModel === 'gltf' && !this.gltf.bike) this.gltf.bike = await loadGltf(HERO_URLS.bike);
+      if (want.riderModel === 'gltf' && !this.gltf.rider) this.gltf.rider = await loadGltf(HERO_URLS.rider);
+      if (want !== this.models) return; // superseded
+      this.applyModels();
+    };
+    this.heroPending = run()
+      .catch((e) => console.warn('[render] setModels failed', e))
+      .then(() => {
+        this.heroLoading--;
+      });
+  }
+
+  private makeBike(choice: ModelChoice): HeroBike {
+    return choice === 'gltf' && this.gltf.bike ? new GltfBike(this.gltf.bike, this.lib) : new BikeModel(this.lib);
+  }
+
+  private makeRider(choice: ModelChoice): HeroRider {
+    return choice === 'gltf' && this.gltf.rider ? new GltfRider(this.gltf.rider, this.lib) : new RiderModel(this.lib);
+  }
+
+  private kindOfBike(b: HeroBike): ModelChoice {
+    return b instanceof GltfBike ? 'gltf' : 'proc';
+  }
+
+  private kindOfRider(r: HeroRider): ModelChoice {
+    return r instanceof GltfRider ? 'gltf' : 'proc';
+  }
+
+  private applyModels(): void {
+    const wantBike = this.models.bikeModel === 'gltf' && this.gltf.bike ? 'gltf' : 'proc';
+    const wantRider = this.models.riderModel === 'gltf' && this.gltf.rider ? 'gltf' : 'proc';
+    let changed = false;
+    if (this.kindOfBike(this.bike) !== wantBike) {
+      const next = this.makeBike(wantBike);
+      const old = this.bike;
+      next.placer.copyFrom(old.placer);
+      next.ground = old.ground;
+      this.scene.remove(old.root);
+      this.scene.add(next.root);
+      this.bike = next;
+      this.rider.attach(next);
+      old.dispose();
+      changed = true;
+    }
+    if (this.kindOfRider(this.rider) !== wantRider) {
+      const old = this.rider;
+      old.detach();
+      this.scene.remove(old.root);
+      const next = this.makeRider(wantRider);
+      next.attach(this.bike);
+      this.scene.add(next.root);
+      this.rider = next;
+      old.dispose();
+      changed = true;
+    }
+    if (changed && this.ghost) {
+      // The ghost follows the same choice (ghost tint works for both kits).
+      const gs = this.ghostState;
+      this.scene.remove(this.ghost.root);
+      this.ghost.bike.dispose();
+      this.ghost.rider.dispose();
+      this.ghost = this.buildGhost();
+      this.ghost.root.visible = gs !== null;
+    }
   }
 
   get framesRendered(): number {
     return this.frameCount;
   }
 
-  /** True once procedural textures exist and at least one lit frame has been drawn. */
+  /**
+   * True once procedural textures exist, the art pack has settled (loaded or failed) and at
+   * least one lit frame has been drawn — the frame after that is the final look.
+   */
   get ready(): boolean {
-    return this.lib.hasTextures && this.frameCount > 0;
+    return this.lib.hasTextures && this.art.settled && this.heroLoading === 0 && this.frameCount > 0;
   }
+
+  /** Resolves when the art pack has settled and any requested glTF hero is in (the first capturable frame is final after this). */
+  whenReady(): Promise<void> {
+    return Promise.all([this.art.whenSettled, this.heroPending]).then(() => undefined);
+  }
+
+  private prepared: Promise<void> | null = null;
+
+  /**
+   * Cooperative startup for the loading screen (round 8, P0): every heavy step yields to the
+   * frame loop between units of ≤ one texture job / one shader batch, and reports a
+   * human-readable step. Idempotent. `render()` before this resolves still draws (a dark,
+   * flat-shaded frame; the synchronous texture fallback only runs if prepare() was never
+   * started). Steps: art pack decode (off-thread), procedural materials (one job per yield),
+   * hero glTF (if requested), shader compile (`compileAsync`, per material chunk).
+   */
+  prepare(report: (name: string, done: number, total: number) => void = () => undefined): Promise<void> {
+    if (this.prepared) return this.prepared;
+    this.preparing = true;
+    const yieldFrame = (): Promise<void> => new Promise((r) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => r()) : setTimeout(r, 0)));
+    const run = async (): Promise<void> => {
+      // 1. Art pack (fetch + createImageBitmap are off the main thread; only bookkeeping runs here).
+      const artP = this.art.load();
+      this.art.onProgress = (d, t) => report(`Loading art pack ${d}/${t}`, d, t);
+      report('Loading art pack', 0, Math.max(1, this.art.progress.total));
+      // 2. Procedural materials, one job per frame.
+      const n = this.lib.jobCount;
+      while (this.lib.jobsDone < n) {
+        report(`Generating materials ${this.lib.jobsDone + 1}/${n}`, this.lib.jobsDone, n);
+        this.lib.generateStep();
+        await yieldFrame();
+      }
+      report(`Generating materials ${n}/${n}`, n, n);
+      this.textureGenMs = this.lib.generateMs;
+      await artP;
+      // 3. Hero models (only when requested).
+      if (this.models.bikeModel === 'gltf' || this.models.riderModel === 'gltf') {
+        report(`Loading ${this.models.riderModel === 'gltf' ? 'rider' : 'bike'} model`, 0, 1);
+        await this.heroPending;
+        report('Loading hero models', 1, 1);
+      }
+      // 4. Shaders: compile what is in the scene (hero + the world if a track is set) in chunks.
+      report('Compiling shaders', 0, 1);
+      const mats: THREE.Material[] = [];
+      const seen = new Set<THREE.Material>();
+      this.scene.traverse((o) => {
+        const m = (o as THREE.Mesh).material;
+        for (const mat of Array.isArray(m) ? m : m ? [m] : []) if (!seen.has(mat)) {
+          seen.add(mat);
+          mats.push(mat);
+        }
+      });
+      const r = this.renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
+      if (r.compileAsync) {
+        // Chunk by hiding everything but ~8 materials per call so no single compile batch is long.
+        const chunk = 2;
+        for (let i = 0; i < mats.length; i += chunk) {
+          const keep = new Set(mats.slice(i, i + chunk));
+          const hidden: THREE.Object3D[] = [];
+          this.scene.traverse((o) => {
+            const m = (o as THREE.Mesh).material;
+            if (!m) return;
+            const list = Array.isArray(m) ? m : [m];
+            if (!list.some((x) => keep.has(x)) && o.visible) {
+              o.visible = false;
+              hidden.push(o);
+            }
+          });
+          try {
+            await r.compileAsync(this.scene, this.rig.camera);
+          } finally {
+            for (const o of hidden) o.visible = true;
+          }
+          report(`Compiling shaders ${Math.min(mats.length, i + chunk)}/${mats.length}`, Math.min(mats.length, i + chunk), mats.length);
+          await yieldFrame();
+        }
+      }
+      // 5. Post chain + shadow programs: one warm-up frame through the composer (these are
+      // screen-quad shaders compileAsync cannot reach). Nothing is captured from it.
+      report('Warming up the post chain', 0, 1);
+      this.renderer.info.autoReset = false;
+      this.post.render();
+      await yieldFrame();
+      report('Ready', 1, 1);
+    };
+    this.prepared = run().finally(() => {
+      this.preparing = false;
+    });
+    return this.prepared;
+  }
+  private preparing = false;
 
   // -- contract -------------------------------------------------------------
 
   setTrack(track: CompiledTrack): void {
     this.clearWorld();
+    this.track = track;
     this.biome = biomeFor(track.def.meta?.biome);
     this.lighting.apply(this.biome);
+    const art = this.art.settled && this.art.ok ? this.art : null;
+    // Sky panorama as the background for exterior biomes (the kit also draws it as a far quad).
+    this.artBackground?.dispose();
+    this.artBackground = null;
+    if (art && !this.biome.interior) {
+      const skyId = { canyon: 'sky-canyon', snow: 'sky-snow', nightCity: 'sky-nightcity' }[this.biome.id as 'canyon' | 'snow' | 'nightCity'];
+      const sky = skyId ? art.texture(skyId, true, true) : null;
+      if (sky) {
+        const bg = sky.clone();
+        bg.mapping = THREE.EquirectangularReflectionMapping;
+        bg.wrapS = THREE.RepeatWrapping;
+        bg.needsUpdate = true;
+        this.artBackground = bg;
+        this.scene.background = bg;
+      }
+    }
     this.lighting.setFloor(groundFloorY(track.def.profile, this.biome.interior));
     this.post.applyBiome(this.biome);
     this.rig.setKeys(track.def.meta?.camera);
+    // Camera bounds (round 8): inside the hall for interiors (floor + 1.5 … roof − 1, between the
+    // back wall and the front), a generous sky box for exteriors. Hard clamp every frame.
+    {
+      const floorY = groundFloorY(track.def.profile, this.biome.interior);
+      const b = track.bounds;
+      if (this.biome.interior) {
+        this.rig.bounds = { minX: b.minX - 36, maxX: b.maxX + 56, minY: floorY + 1.5, maxY: floorY + HALL.height - 1.0, minZ: HALL.wallZ + 1.0, maxZ: HALL.frontZ - 1.0 };
+      } else {
+        this.rig.bounds = { minX: b.minX - 60, maxX: b.maxX + 80, minY: b.minY - 6, maxY: floorY + 60, minZ: -40, maxZ: 120 };
+      }
+    }
 
     const group = new THREE.Group();
     group.name = 'world';
     const ribbons = buildRideSurfaces(track, this.biome, this.lib);
     const obstacles = buildObstacles(track, this.lib);
-    const gates = buildGates(track, this.biome, this.lib);
-    const kit = buildBiomeKit(track, this.biome, this.lib);
+    const gates = buildGates(track, this.biome, this.lib, art);
+    const kit = buildBiomeKit(track, this.biome, this.lib, art);
     group.add(ribbons.group, ribbons.supports, obstacles.group, gates.group, kit.group);
     // One program variant for the whole world: every standard material gets the full map set.
     group.traverse((o) => {
@@ -186,7 +426,20 @@ export class ThreeRenderer implements GameRenderer {
       textureBytes: kit.textureBytes + gates.textureBytes,
       trackCalls: ribbons.drawCalls + obstacles.drawCalls,
       trackTris: ribbons.triangles + obstacles.triangles,
+      withArt: art !== null,
+      builtAtFrame: this.frameCount,
+      fountains: kit.fountains,
+      meltLights: [],
     };
+    if (this.biome.id === 'foundry' && kit.fountains.length) {
+      // Camera-following melt lights: the two nearest pours / furnace mouths light the kit and
+      // the hero from below (no GI; the emissive melt lights nothing by itself).
+      for (let i = 0; i < 2; i++) {
+        const pl = new THREE.PointLight(0xff7a22, 140, 34, 2);
+        group.add(pl);
+        this.world.meltLights.push(pl);
+      }
+    }
     const profile = track.def.profile;
     this.rig.ground = (x) => profileY(profile, x);
     this.bike.ground = (x) => {
@@ -229,10 +482,10 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   private buildGhost(): NonNullable<ThreeRenderer['ghost']> {
-    const bike = new BikeModel(this.lib);
-    const rider = new RiderModel(this.lib);
+    const bike = this.makeBike(this.kindOfBike(this.bike));
+    const rider = this.makeRider(this.kindOfRider(this.rider));
     rider.attach(bike);
-    bike.root.remove(bike.rear.contact, bike.front.contact);
+    bike.root.remove(...bike.contacts);
     const root = new THREE.Group();
     root.name = 'ghost';
     root.add(bike.root, rider.root);
@@ -248,7 +501,7 @@ export class ThreeRenderer implements GameRenderer {
       let g = cache.get(src);
       if (!g) {
         const std = src as THREE.MeshStandardMaterial;
-        g = std.isMeshStandardMaterial && std.name ? this.lib.derive(std.name) : fogify(src.clone());
+        g = std.isMeshStandardMaterial && std.name && this.lib.has(std.name) ? this.lib.derive(std.name) : fogify(src.clone());
         g.transparent = true;
         g.opacity = 0.35;
         g.depthWrite = false;
@@ -296,7 +549,8 @@ export class ThreeRenderer implements GameRenderer {
     const t0 = performance.now();
     // Procedural textures are generated synchronously on the first render (after
     // installHook), so the frame they appear on is identical in every capture.
-    if (!this.lib.hasTextures) {
+    if (!this.lib.hasTextures && !this.preparing) {
+      // No loader in front of us (harness path): one synchronous, deterministic step.
       this.lib.generateTextures();
       this.textureGenMs = this.lib.generateMs;
     }
@@ -344,6 +598,37 @@ export class ThreeRenderer implements GameRenderer {
         w.flicker[i]!.emissiveIntensity = w.flickerBase[i]! * (1 + 0.15 * Math.sin(23 * f.tSim) * Math.sin(7.3 * f.tSim));
       }
       for (const s of w.scroll) s.tex.offset.set((s.vx * f.tSim) % 1, (s.vy * f.tSim) % 1);
+      if (w.meltLights.length) {
+        // Two nearest melt sources to the camera target (deterministic: pure function of state).
+        const tx = this.rig.targetX;
+        let a = -1;
+        let b = -1;
+        let da = Infinity;
+        let db = Infinity;
+        for (let i = 0; i < w.fountains.length; i++) {
+          const d = Math.abs(w.fountains[i]!.x - tx);
+          if (d < da) {
+            b = a;
+            db = da;
+            a = i;
+            da = d;
+          } else if (d < db) {
+            b = i;
+            db = d;
+          }
+        }
+        [a, b].forEach((idx, k) => {
+          const pl = w.meltLights[k]!;
+          if (idx < 0) {
+            pl.intensity = 0;
+            return;
+          }
+          const s = w.fountains[idx]!;
+          pl.position.set(s.x, s.y + 1.2, s.z + 2.5);
+          const flick = 1 + 0.12 * Math.sin(17 * f.tSim + idx) * Math.sin(5.1 * f.tSim);
+          pl.intensity = 140 * flick;
+        });
+      }
       // Crowd: cheer for 3.5 s after GO and through the finish; sway otherwise.
       const cheer = this.phase === 'finished' || f.finished || (this.phase === 'riding' && this.runTime < 3.5) ? 1 : 0;
       w.gates.anim.uTime.value = f.tSim;
@@ -405,7 +690,7 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   /** Extra diagnostics for the harness / perf report. */
-  debugInfo(): { biome: string; zoom: string; phase: GamePhase; tier: QualityTier; trackCalls: number; trackTris: number; textureGenMs: number; passes: number } {
+  debugInfo(): { biome: string; zoom: string; phase: GamePhase; tier: QualityTier; trackCalls: number; trackTris: number; textureGenMs: number; passes: number; art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean } } {
     return {
       biome: this.biome.id,
       zoom: this.rig.zoomState,
@@ -415,6 +700,7 @@ export class ThreeRenderer implements GameRenderer {
       trackTris: Math.round(this.world?.trackTris ?? 0),
       textureGenMs: this.textureGenMs,
       passes: this.post.info.passes,
+      art: { settled: this.art.settled, ok: this.art.ok, loadMs: Math.round(this.art.loadMs), deliveredMB: +(this.art.bytesDelivered / (1024 * 1024)).toFixed(2), inWorld: this.world?.withArt ?? false },
     };
   }
 
@@ -423,6 +709,8 @@ export class ThreeRenderer implements GameRenderer {
     this.post.dispose();
     this.lighting.dispose();
     this.lib.dispose();
+    this.art.dispose();
+    this.artBackground?.dispose();
     for (const s of this.emitters.systems) s.dispose();
     this.renderer.dispose();
     this.canvas.remove();
@@ -463,13 +751,22 @@ export function describeRenderer(gl: WebGLRenderingContext | WebGL2RenderingCont
   return String(gl.getParameter(gl.RENDERER));
 }
 
-/** Rough GPU texture footprint: RGBA8 with a mip chain (x1.33), float textures by type. */
+/**
+ * Rough GPU texture footprint: RGBA8 with a mip chain (x1.33), float textures by type.
+ * Art-pack textures count at their delivered (compressed) size — `userData.deliveredBytes`,
+ * the budget rule for the generated assets (round 8).
+ */
 export function estimateTextureMB(scene: THREE.Scene): number {
   const seen = new Set<THREE.Texture>();
   let bytes = 0;
   const visit = (value: unknown): void => {
     if (value instanceof THREE.Texture && !seen.has(value)) {
       seen.add(value);
+      const delivered = value.userData['deliveredBytes'] as number | undefined;
+      if (delivered) {
+        bytes += delivered;
+        return;
+      }
       const img = value.image as { width?: number; height?: number } | undefined;
       const w = img?.width ?? 0;
       const h = img?.height ?? 0;

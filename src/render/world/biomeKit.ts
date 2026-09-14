@@ -12,7 +12,8 @@ import { fogify } from '../lighting/environment';
 import { groundFloorY, profileY } from './track';
 import { canvas, tex } from './canvasTex';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { buildHall } from './hall';
+import { buildHall, foregroundKeepOut } from './hall';
+import type { ArtLibrary } from '../art/library';
 import {
   PropBatch,
   bakeAO,
@@ -20,7 +21,10 @@ import {
   buildingGeometry,
   coneGeometry,
   drumGeometry,
+  lightConeGeometry,
+  reflectionMaskTexture,
   rockGeometry,
+  setColors,
   triCount,
   tyreStackGeometry,
 } from './props';
@@ -213,19 +217,6 @@ function lcg(seed: number): () => number {
 }
 
 /** Constant / per-vertex colour attribute helper. */
-function setColors(g: THREE.BufferGeometry, f: (x: number, y: number, z: number, i: number) => [number, number, number]): THREE.BufferGeometry {
-  const p = g.getAttribute('position');
-  const c = new Float32Array(p.count * 3);
-  for (let i = 0; i < p.count; i++) {
-    const [r, gg, b] = f(p.getX(i), p.getY(i), p.getZ(i), i);
-    c[i * 3] = r;
-    c[i * 3 + 1] = gg;
-    c[i * 3 + 2] = b;
-  }
-  g.setAttribute('color', new THREE.BufferAttribute(c, 3));
-  return g;
-}
-
 /**
  * Sandstone formation: a terraced mound (unit radius 0.5, unit height 1) built from
  * rings × layers. Cliff layers keep their radius, ledge layers step in; per-column
@@ -400,37 +391,6 @@ function snowBankGeometry(seed: number): THREE.BufferGeometry {
   });
 }
 
-/** Additive light cone: apex at the origin, opening downward to radius 1.6 at y = −1 (scale y to the drop). */
-function lightConeGeometry(): THREE.BufferGeometry {
-  const g = new THREE.ConeGeometry(1.6, 1, 18, 1, true).translate(0, -0.5, 0);
-  return setColors(g, (_x, y) => {
-    const t = Math.min(1, Math.max(0, -y));
-    const a = Math.pow(1 - t, 1.6) * 0.9 + 0.02;
-    return [a, a, a];
-  });
-}
-
-/** Wet-road reflection mask: luminance = alpha, strong at v = 1 (the light's foot), fading toward v = 0 and to the sides. */
-function reflectionMaskTexture(): THREE.CanvasTexture {
-  const [c, g] = canvas(256, 256);
-  const img = g.createImageData(256, 256);
-  for (let y = 0; y < 256; y++) {
-    for (let x = 0; x < 256; x++) {
-      const v = 1 - y / 255; // canvas row 0 = v 1
-      const u = x / 255;
-      const side = Math.pow(Math.sin(u * Math.PI), 0.7);
-      const along = Math.pow(v, 1.8);
-      const ripple = 0.8 + 0.2 * Math.sin(y * 0.9 + Math.sin(x * 0.2) * 3);
-      const a = Math.min(1, side * along * ripple) * 255;
-      const k = (y * 256 + x) * 4;
-      img.data[k] = img.data[k + 1] = img.data[k + 2] = a;
-      img.data[k + 3] = a;
-    }
-  }
-  g.putImageData(img, 0, 0);
-  return tex(c, false, false);
-}
-
 /** Rooftop kit over a unit footprint (scale x/z to the building): parapet, water tank, AC boxes, a stair head. */
 function rooftopGeometry(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
@@ -580,8 +540,9 @@ function shopfrontTexture(rng: Rng): { map: THREE.CanvasTexture; emissive: THREE
 // Builders
 // ---------------------------------------------------------------------------
 
-export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialLibrary): BiomeKit {
+export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, art: ArtLibrary | null = null): BiomeKit {
   const group = new THREE.Group();
+  const keepOut = foregroundKeepOut(track);
   group.name = `biome:${biome.id}`;
   const rng = new Rng((track.def.seed ^ 0x5bd1e995) >>> 0);
   const flicker: THREE.MeshStandardMaterial[] = [];
@@ -655,7 +616,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
   }
 
   if (biome.interior) {
-    const hall = buildHall(track, biome, lib, rng, floorY, x0, x1);
+    const hall = buildHall(track, biome, lib, rng, floorY, x0, x1, art);
     meshes.push(...hall.meshes);
     singles.push(...hall.singles);
     batches.push(...hall.batches);
@@ -665,7 +626,59 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
     fountains.push(...hall.fountains);
     textureBytes += hall.textureBytes;
   } else {
-    // Exterior: three parallax silhouette tiers + biome props.
+    // Exterior backdrop. Round 8: with the art pack the far layer is the painted plate
+    // (2048×512, tiles in x, alpha-faded bottom) at z −140 and the sky panorama at z −330
+    // (plus `scene.background`, set by the renderer); the near/mid geometry stays. Without
+    // the pack: the three parallax silhouette tiers.
+    const plateId = { canyon: 'plate-canyon', snow: 'plate-snow', nightCity: 'plate-nightcity' }[biome.id as 'canyon' | 'snow' | 'nightCity'];
+    const skyId = { canyon: 'sky-canyon', snow: 'sky-snow', nightCity: 'sky-nightcity' }[biome.id as 'canyon' | 'snow' | 'nightCity'];
+    const plateTex = plateId ? (art?.texture(plateId, true, true) ?? null) : null;
+    const skyTex = skyId ? (art?.texture(skyId, true, true) ?? null) : null;
+    if (plateTex && skyTex) {
+      textureBytes += (art!.entry(plateId!)?.bytes ?? 0) + (art!.entry(skyId!)?.bytes ?? 0);
+      // Sky: a 2:1 panorama; 2048 px ≈ 360° of azimuth at this distance, so one repeat per ~2000 m.
+      const sz = -330;
+      const sw = span * 3 + Math.abs(sz) * 2;
+      const sh = sw / 2 / 2.4; // stretch: the panorama's horizon band sits low, the top third is plain sky
+      skyTex.repeat.set(sw / 2000, 1);
+      const skyMat = new THREE.MeshBasicMaterial({ map: skyTex, fog: false, depthWrite: false, side: THREE.DoubleSide });
+      // Sky quad: its lower edge well under the plate's horizon (the plate fades to alpha 0 at its foot).
+      const sky = addPlane(sw, sh, skyMat, midX, floorY - 60 + sh / 2, sz);
+      sky.receiveShadow = false;
+      sky.renderOrder = -3;
+      // Far plate: 4:1 strip, interest in the middle band, alpha fades out at the bottom so it
+      // sits on the sky without a hard base line. 700 m of world per repeat keeps the mesas
+      // building-sized; nightCity a little tighter.
+      const pz = -200;
+      const pw = span * 3 + Math.abs(pz) * 2;
+      const perRepeat = biome.id === 'nightCity' ? 560 : 720;
+      const ph = perRepeat / 4;
+      plateTex.repeat.set(pw / perRepeat, 1);
+      const plateMat = new THREE.MeshBasicMaterial({ map: plateTex, transparent: true, fog: false, depthWrite: false, side: THREE.DoubleSide });
+      // The plate's horizon band (v ≈ 0.45) sits a few metres under deck eye level: the riding
+      // camera pitches 11° down, so at 200 m the frame spans ≈ [cam − 95, cam + 12].
+      const plateBase = floorY - 8 - 0.45 * ph;
+      const plate = addPlane(pw, ph, plateMat, midX, plateBase + ph / 2, pz);
+      plate.receiveShadow = false;
+      plate.renderOrder = -2;
+      // One near silhouette tier keeps the mid-ground depth step (fogged like the props).
+      const near = biome.id === 'canyon' ? { z: -45, h: 26, kind: 'mesa' as const, color: 0x5a3a2c, yOff: -3 } : biome.id === 'snow' ? { z: -40, h: 18, kind: 'pine' as const, color: 0x2c3a34, yOff: -2 } : { z: -45, h: 30, kind: 'city' as const, color: 0x14161c, yOff: -3 };
+      const st = silhouette(near.kind, rng);
+      textureBytes += 2048 * 512 * 4 * 1.33;
+      const w = span * 3 + Math.abs(near.z) * 2;
+      st.repeat.set(w / (near.h * 4), 1);
+      const mat = new THREE.MeshStandardMaterial({ map: st, alphaTest: 0.5, color: near.color, roughness: 1, side: THREE.DoubleSide });
+      if (biome.id === 'nightCity') {
+        const grid = windowGrid(rng);
+        mat.emissiveMap = grid.emissive;
+        mat.emissive = new THREE.Color(0xffc080);
+        mat.emissiveIntensity = 1.2;
+        grid.emissive.repeat.set(w / 6, near.h / 6);
+      }
+      fogify(mat);
+      const m = addPlane(w, near.h, mat, midX, floorY + near.h / 2 + near.yOff, near.z);
+      m.receiveShadow = false;
+    } else {
     const tiers: { z: number; h: number; kind: 'mesa' | 'pine' | 'city' | 'girder' | 'hills'; color: number; yOff: number }[] =
       biome.id === 'canyon'
         ? [
@@ -701,6 +714,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       const m = addPlane(w, t.h, mat, midX, floorY + t.h / 2 + t.yOff, t.z);
       m.receiveShadow = false;
     }
+    }
     // Props along the course.
     const gyAt = (x: number, z: number): number => profileY(profile, x) - 0.42 - Math.min(1, (Math.abs(z) - 3) / 30) ** 2 * 2.5;
     if (biome.id === 'canyon') {
@@ -729,7 +743,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
         pick().add(x, gyAt(x, -26) - 2.5, -27 + rng.range(-3, 3), rng.range(0, 6), w, null, 0, h, w * rng.range(0.6, 1.0));
       }
       // Foreground: a low outcrop sliding past now and then.
-      for (let x = x0 + 20; x < x1; x += rng.range(30, 48)) pick().add(x, gyAt(x, 6) - 2.4, rng.range(5.5, 7.5), rng.range(0, 6), rng.range(2.5, 4), null, 0, rng.range(2.2, 3.6), 2.5);
+      for (let x = x0 + 20; x < x1; x += rng.range(36, 52)) if (!keepOut(x, 2.5)) pick().add(x, gyAt(x, 6) - 2.4, rng.range(5.5, 7.5), rng.range(0, 6), rng.range(2.5, 4), null, 0, rng.range(2.2, 3.6), 2.5);
       const rocks = new PropBatch('rock', bakeAO(rockGeometry(track.def.seed), 1.4, 0.3), lib.get('rock'));
       const scrubMat = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, vertexColors: true }));
       const scrub = new PropBatch('scrub', scrubGeometry(track.def.seed ^ 0x33), scrubMat);
@@ -745,8 +759,8 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
         else if (r < 0.86) bales.add(x, gy, z, rng.range(-0.3, 0.3));
         else if (r < 0.93) tyres.add(x, gy, z, 0);
         else drums.add(x, gy, z, 0, 1, 0xd8d2c4);
-        if (rng.next() < 0.35) scrub.add(x + 1.5, gyAt(x + 1.5, 5) - 0.1, rng.range(4.5, 7), rng.range(0, 6), rng.range(0.8, 1.6), null, 0, rng.range(0.7, 1.1), rng.range(0.8, 1.6));
-        if (rng.next() < 0.12) rocks.add(x + 1, gyAt(x + 1, 5.5) - 0.3, rng.range(5, 7), rng.range(0, 6), rng.range(0.8, 1.6), 0xd8c2a8, 0, rng.range(0.5, 0.9), rng.range(0.8, 1.6));
+        if (rng.next() < 0.35 && !keepOut(x + 1.5, 1)) scrub.add(x + 1.5, gyAt(x + 1.5, 5) - 0.1, rng.range(4.5, 7), rng.range(0, 6), rng.range(0.8, 1.6), null, 0, rng.range(0.7, 1.1), rng.range(0.8, 1.6));
+        if (rng.next() < 0.12 && !keepOut(x + 1, 1)) rocks.add(x + 1, gyAt(x + 1, 5.5) - 0.3, rng.range(5, 7), rng.range(0, 6), rng.range(0.8, 1.6), 0xd8c2a8, 0, rng.range(0.5, 0.9), rng.range(0.8, 1.6));
       }
       batches.push(...mesaBatches, rocks, scrub, bales, tyres, drums);
     } else if (biome.id === 'snow') {
@@ -767,7 +781,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       // Snow banks hugging the trail on both sides (they read as the ploughed edge).
       for (let x = x0 + 2; x < x1; x += rng.range(2.2, 4.5)) {
         if (rng.next() > 0.25) banks.add(x, profileY(profile, x) - 0.55, rng.range(-4.2, -3.0), rng.range(0, 6), rng.range(1.4, 2.8), null, 0, rng.range(0.45, 0.9), rng.range(0.7, 1.1));
-        if (rng.next() > 0.55) banks.add(x, profileY(profile, x) - 0.6, rng.range(3.6, 4.6), rng.range(0, 6), rng.range(1.0, 2.0), null, 0, rng.range(0.3, 0.6), rng.range(0.5, 0.8));
+        if (rng.next() > 0.55 && !keepOut(x, 1.5)) banks.add(x, profileY(profile, x) - 0.6, rng.range(3.6, 4.6), rng.range(0, 6), rng.range(1.0, 2.0), null, 0, rng.range(0.3, 0.6), rng.range(0.5, 0.8));
       }
       for (let x = x0 + 4; x < x1; x += rng.range(2.5, 6)) {
         const z = rng.range(-18, -4.5);
@@ -791,7 +805,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
           fence.add(x, gy, -4.2, 0);
           posts.add(x - 1.2, gy, -4.2, 0, 1, null, 0, 1.0, 1);
         }
-        if (rng.next() < 0.22) {
+        if (rng.next() < 0.12 && !keepOut(x + 2, 2)) {
           const sc = rng.range(0.9, 1.4);
           const ry = rng.range(0, 6);
           const fz = rng.range(6, 8.5);
@@ -917,6 +931,27 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
         }
       }
       batches.push(...bBatches, roofs, shops, cones, fires, drums, poles, arms, heads, lightCones, lampStreaks);
+    }
+  }
+
+  // Tyre marks on the deck (art pack): the burnout arc and the straight print as alpha-masked
+  // dark decals on flat stretches, avoiding spawns; one batch per texture.
+  if (art) {
+    const marks: PropBatch[] = [];
+    for (const [id, w, h, op] of [['tyremark-arc', 1.6, 1.6, 0.55], ['tyremark-straight', 0.55, 2.2, 0.4]] as const) {
+      const t = art.texture(id, false, false);
+      if (!t) continue;
+      textureBytes += art.entry(id)?.bytes ?? 0;
+      const m = fogify(new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 1, alphaMap: t, transparent: true, opacity: op, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
+      marks.push(new PropBatch(`decal:${id}`, new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2), m, false));
+    }
+    if (marks.length) {
+      for (let x = track.bounds.minX + 6, i = 0; x < track.bounds.maxX - 4; x += rng.range(9, 16), i++) {
+        const slope = Math.abs(profileY(profile, x + 1.2) - profileY(profile, x - 1.2));
+        if (slope > 0.08 || keepOut(x, 1)) continue;
+        marks[i % marks.length]!.add(x, profileY(profile, x) + 0.012, rng.range(-0.5, 0.5), rng.range(-0.25, 0.25) + (rng.next() < 0.5 ? Math.PI : 0), rng.range(0.8, 1.3));
+      }
+      batches.push(...marks);
     }
   }
 
