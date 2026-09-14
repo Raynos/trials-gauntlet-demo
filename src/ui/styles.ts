@@ -560,7 +560,7 @@ export const HUD_CSS = /* css */ `
 .hud.touch .hints { bottom: calc(3.6rem + var(--sab)); }
 
 /* ---- landscape prompt (rotate-to-play) ------------------------------- */
-.rotate { position: absolute; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; flex-direction: column; gap: var(--s5); background: radial-gradient(120% 90% at 50% 30%, #1a1409 0%, var(--bg) 70%); color: var(--ink); text-align: center; padding: calc(var(--s6) + var(--sat)) var(--s5) calc(var(--s6) + var(--sab)); pointer-events: auto; }
+.rotate { position: absolute; inset: 0; z-index: 28; /* above .onboard (25) and every run overlay; below .toast (30) so an update stays reachable */ display: none; align-items: center; justify-content: center; flex-direction: column; gap: var(--s5); background: radial-gradient(120% 90% at 50% 30%, #1a1409 0%, var(--bg) 70%); color: var(--ink); text-align: center; padding: calc(var(--s6) + var(--sat)) var(--s5) calc(var(--s6) + var(--sab)); pointer-events: auto; }
 .rotate .wordmark { font-size: clamp(3rem, 16vw, 5rem); text-align: center; }
 .rotate .msg { font-size: 1rem; font-weight: 700; letter-spacing: .34em; text-transform: uppercase; color: var(--ink-dim); }
 .rotate i { display: block; width: 3rem; height: 5.2rem; border: 3px solid var(--amber); border-radius: var(--r2); box-shadow: 0 0 24px -6px var(--amber); animation: rot 1.6s var(--ease) infinite; }

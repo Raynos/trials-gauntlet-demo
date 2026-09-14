@@ -440,6 +440,23 @@ export class TrackSelectScreen extends Screen {
     const ship = shipTracks(tracks, s.dev);
     this.tiers.innerHTML = '';
     this.rows = [];
+    // Lab (MEGA_PLAN P0 §3): the physics test levels, first (the user's proving ground), always open, outside medals and progression.
+    const lab = labTracks(tracks);
+    if (lab.length > 0) {
+      const rowEl = h('div', 'tier-row lab-row');
+      rowEl.innerHTML = `<div class="tier-head"><b>Lab</b><span>Physics proving ground · live physics HUD · no medals</span></div>`;
+      const car = h('div', 'carousel');
+      const cards: CardRef[] = [];
+      const r = this.rows.length;
+      lab.forEach((t, c) => {
+        const el = this.card(t, false, r, c, true);
+        car.appendChild(el);
+        cards.push({ el, track: t, locked: false });
+      });
+      rowEl.appendChild(car);
+      this.tiers.appendChild(rowEl);
+      this.rows.push({ tier: lab[0]!.tier, el: rowEl, cards, locked: false });
+    }
     for (const tier of TIER_ORDER) {
       const list = tracksInTier(ship, tier);
       if (list.length === 0) continue;
@@ -459,23 +476,6 @@ export class TrackSelectScreen extends Screen {
       rowEl.appendChild(car);
       this.tiers.appendChild(rowEl);
       this.rows.push({ tier, el: rowEl, cards, locked });
-    }
-    // Lab (MEGA_PLAN P0 §3): the physics test levels, last, always open, outside medals and progression.
-    const lab = labTracks(tracks);
-    if (lab.length > 0) {
-      const rowEl = h('div', 'tier-row lab-row');
-      rowEl.innerHTML = `<div class="tier-head"><b>Lab</b><span>Physics proving ground · live physics HUD · no medals</span></div>`;
-      const car = h('div', 'carousel');
-      const cards: CardRef[] = [];
-      const r = this.rows.length;
-      lab.forEach((t, c) => {
-        const el = this.card(t, false, r, c, true);
-        car.appendChild(el);
-        cards.push({ el, track: t, locked: false });
-      });
-      rowEl.appendChild(car);
-      this.tiers.appendChild(rowEl);
-      this.rows.push({ tier: lab[0]!.tier, el: rowEl, cards, locked: false });
     }
     this.col = this.rows.map(() => 0);
     const totals = medalTotals(ship, medalOf);
