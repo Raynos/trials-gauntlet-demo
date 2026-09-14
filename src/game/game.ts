@@ -30,6 +30,7 @@ import {
   type InputFrame,
   type InputTraceRun,
   type PhysicsSnapshot,
+  type PhysicsVersion,
   type PhysicsState,
   type QualityTier,
   type RenderStats,
@@ -104,6 +105,12 @@ export interface GameOptions {
   autoRecord?: boolean;
   /** PB ghost on by default (harness mode passes false so µs/tick measures one world). */
   ghostEnabled?: boolean;
+  /**
+   * Solver `physics` / `physicsFactory` are (`'v2'` = the shipped default, `'v1'` = `?physics=v1`). Stamped
+   * into every recording header; a stored PB whose stamp differs is never ghosted or offered as a replay
+   * (its medal stays). Absent (mock physics, unit tests) = no gating.
+   */
+  physicsVersion?: PhysicsVersion | undefined;
 }
 
 /** Everything the game layer adds on top of the physics snapshot. */
@@ -134,7 +141,22 @@ type RendererExtras = Partial<{
   camera(): CameraDebug;
   setRunInfo(info: { runTime: number; phase: GamePhase }): void;
   setGhost(state: PhysicsState | null): void;
+  setBikeClass(c: BikeClass): void;
 }>;
+
+/** Solver stamp of a recording (JSON or binary); unstamped = `'v1'` (recorded before the v2 flip). */
+export function recordingPhysics(source: string): PhysicsVersion {
+  try {
+    if (source.charCodeAt(0) === 0x7b /* { */) {
+      const raw = JSON.parse(source) as { header?: { physics?: unknown } };
+      const p = raw.header?.physics;
+      return p === 'v2' ? 'v2' : 'v1';
+    }
+    return decodeAny(source).header.physics ?? 'v1';
+  } catch {
+    return 'v1';
+  }
+}
 
 export class Game {
   readonly loop: FixedStepLoop;
@@ -148,6 +170,8 @@ export class Game {
   private readonly autoSkipCountdown: boolean;
   private readonly physicsFactory: ((physicsHz: number) => PhysicsWorld) | undefined;
   private readonly autoRecord: boolean;
+  /** Solver in effect (see `GameOptions.physicsVersion`); undefined = ungated. */
+  readonly physicsVersion: PhysicsVersion | undefined;
   private compiled: CompiledTrack | null = null;
   private pbRecorder: InputRecorder | null = null;
   private pbJson: string | null = null;
@@ -232,6 +256,7 @@ export class Game {
     this.physicsFactory = options.physicsFactory;
     this.autoRecord = options.autoRecord ?? false;
     this.ghostEnabled = options.ghostEnabled ?? true;
+    this.physicsVersion = options.physicsVersion;
     this.loop = new FixedStepLoop(
       {
         tick: () => this.tick(),
@@ -309,6 +334,10 @@ export class Game {
     this.compiled = compiled;
     this.physics.loadTrack(compiled, this.seed, { bike: this.bike });
     this.renderer.setTrack(compiled);
+    // CONTRACT §2.7 `setBikeClass` (render round 11): the hero wears the class livery on every load path —
+    // garage preview (`setBike` reload), track launch, `hook.setBike`, a replay's `header.bike`. Optional: a
+    // renderer without it keeps the default livery and the garage card tint carries the colour.
+    this.renderer.setBikeClass?.(this.bike);
     (this.audio as Partial<{ setTrack(t: CompiledTrack, seed: number): void }> | undefined)?.setTrack?.(compiled, this.seed);
     this.hud?.setTrack(track);
     this.loop.reset();
@@ -372,7 +401,7 @@ export class Game {
     this.runTicks = 0;
     this.splits = [];
     this.pbJson = null;
-    this.pbRecorder = this.autoRecord && this.track ? new InputRecorder({ version: 1, trackId: this.track.id, seed: this.seed, physicsHz: this.physicsHz, bike: this.bike }) : null;
+    this.pbRecorder = this.autoRecord && this.track ? new InputRecorder({ version: 1, trackId: this.track.id, seed: this.seed, physicsHz: this.physicsHz, bike: this.bike, ...(this.physicsVersion ? { physics: this.physicsVersion } : {}) }) : null;
     this.setPhase('riding');
     this.emit({ type: 'go' });
     this.beginAttempt(-1);
@@ -431,7 +460,8 @@ export class Game {
       return;
     }
     const rec = this.bestTimes?.get(this.track.id, this.bike)?.recording;
-    if (!rec) {
+    if (!rec || !this.recordingMatchesPhysics(rec)) {
+      // No PB, or a PB recorded on the other solver: the same inputs would ride to a different finish, so no ghost.
       this.ghost = null;
       this.ghostSource = null;
       return;
@@ -448,6 +478,15 @@ export class Game {
       this.ghost = null;
       this.ghostSource = null;
     }
+  }
+
+  /**
+   * True when a recording was produced on the live solver (header stamp; unstamped = v1). A game without a
+   * `physicsVersion` (mock physics, unit tests) accepts everything. Cheap: JSON is sniffed for the header only.
+   */
+  recordingMatchesPhysics(source: string): boolean {
+    if (!this.physicsVersion) return true;
+    return recordingPhysics(source) === this.physicsVersion;
   }
 
   setGhostEnabled(on: boolean): void {
@@ -1081,6 +1120,7 @@ export class Game {
       physicsHz: this.physicsHz,
       bike: this.bike,
     };
+    if (this.physicsVersion) header.physics = this.physicsVersion;
     if (note) header.note = note;
     this.recorder = new InputRecorder(header);
   }

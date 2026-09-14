@@ -183,6 +183,17 @@ same as a steady-state frame, i.e. the restart itself adds nothing.
   riding/crashed rules (restart edge → reset to last checkpoint; crash → auto-respawn after 120 ticks or
   on the next edge) so the recorded run reproduces bit-for-bit (tested: ghost hash == PB run hash every
   100 ticks and at its finish). After a snapshot `restore` the ghost re-seeks to `runTicks`.
+- **Solver stamp (core round 7, physics v2 default).** Every recording header carries `physics: 'v1' | 'v2'`
+  (`PhysicsVersion`, `src/core/types.ts`; JSON field, binary second trailer byte after the bike byte — 1 v1,
+  2 v2; absent = recorded before the flip = v1). `Game` takes `physicsVersion` from `main.ts` (`'v1'` when
+  `?physics=v1` resolved `createBikePhysicsV1`, else `'v2'`; undefined for the mock) and stamps the PB recorder
+  and `startRecording`. `Game.recordingMatchesPhysics(json)` gates the ghost (`spawnGhost`) and the App's
+  `playableBest` strips `recording` from what the front sees (card `▶ Watch`, `watchPb`) when the stamp
+  differs, so a v1 PB is **never** ghosted or replayed under v2 (the same inputs ride to a different finish)
+  while its medal, time and splits stay exactly where they were — the PB key is unchanged (`trials.best.<id>`
+  / `@pro`), nothing is cleared. The next clear under v2 that beats the v1 time overwrites the entry with a v2
+  recording and the ghost returns. `runRecording` / `startPlayback` themselves stay ungated (harness paths).
+  Tested in `game.test.ts` ("physics version stamp") and `replay.test.ts` (both encodings).
 - Exposed as `GameRenderer.setGhost(state | null)` (called every render, defensively), `hook.ghost()`,
   and a grey pin on the HUD progress strip. Toggle in the menu (`trials.ghost`, default on); harness
   mode defaults it off (`?ghost=1` to enable) so physics µs/tick measures one world.
@@ -407,9 +418,21 @@ User (3G, round 3): white then black for many seconds. Now:
 - **Garage** (`src/ui/garage.ts`, main menu item between Play and Settings, note = current bike): two cards
   (`BIKE_SPECS`: name, one-line character, stat strip power / grip / weight feel, rule note; Rookie amber,
   Pro `--blue`; art round 2: `bikeArt(class)` render at the top of each card, `garage-plate` masked behind the card column; track cards prefer `trackThumb` real renders, credits sit on `results-credits`) on the left, the live 3D bike on the right is the preview (`#app.garage canvas` scales the
-  idle camera 1.25× and carries the bike right of the cards; the renderer gets `setBikeClass(bike)` when it
-  exports one — until then the card tint is the only colour). Focus previews (`previewBike`, the backdrop
-  reloads with that class), confirm commits (`trials.bikeClass`), Esc previews back to the committed class.
+  idle camera 1.25× and carries the bike right of the cards; **`Game.loadTrack` calls
+  `renderer.setBikeClass?.(bike)` on every load** — garage preview reload, track launch, `hook.setBike` +
+  `loadTrack`, a replay's `header.bike` — so the render round-11 liveries (Rookie blue / plate #7, Pro
+  charcoal / plate #1) follow the class everywhere; a renderer without the method keeps its default and the
+  card tint carries the colour. `App.play` also signals `onBikeChange` on every launch). Focus previews
+  (`previewBike`, the backdrop reloads with that class), confirm commits (`trials.bikeClass`), Esc previews
+  back to the committed class.
+- **Copy = physics v2 R3** (physics.md "v2 status — R3"; `BIKE_SPECS`): Rookie — *Never loops at neutral.
+  Forgiving landings, 0→16 in 4.0 s, tops 20 m/s.* / note *Loops only leaning back · standard medal targets*;
+  Pro — *Loops at neutral under full gas in ~1 s. 21 m/s, sharper throttle, higher hop.* / note *Raw · medal
+  targets 10 % tighter*. The old "wheelie assist" wording is gone: v2 has no assist, the Rookie's 0.15 s
+  throttle filter is what keeps the launch kick from lifting the front. **Balance hint** (`BALANCE_HINT`):
+  *Wheelie balance point: ~50° at neutral · lean back and it moves to 69°, forward to 24°* (the R3
+  coasting-balance row, lean −1 / 0 / +1) is shown exactly twice — the garage header (`garage-tip`, hidden on
+  `html.short`) and the first-run card (`ob-tip`) — never floated during play.
 - **Default rule** (`defaultBikeForTier`, tested): beginner / easy → Rookie, hard / extreme → Pro, medium →
   the last bike ridden this session (else Rookie). The default applies only until the player has picked once
   in the Garage; a stored choice persists across every track.
@@ -431,9 +454,13 @@ User (3G, round 3): white then black for many seconds. Now:
 
 ## 14. Telemetry (local run log) and `?perf=1`
 
-- `RunTelemetry` (`src/core/types.ts`): `{ at, track, bike, attempts, faults, time, timeToClear, medal,
+- `RunTelemetry` (`src/core/types.ts`): `{ at, track, bike, attempts, faults, physics, time, timeToClear, medal,
   deaths: [{ x, reason, checkpoint }], device, quality, qualityWhy, fps: { p50, p95 }, frameMs: { p50, p95 },
-  build }`. `RunLog` (`src/game/telemetry.ts`) appends one per finished run to `localStorage['trials.runlog']`,
+  build }` — `physics` is the solver stamp (`'v2'` from the flip on, `'v1'` under `?physics=v1`; absent in
+  entries logged before core round 7 = v1), so a phone session's `attempts` per track read against the
+  solver they were ridden on. **Copy run log** runs `navigator.clipboard.writeText` synchronously inside the
+  button's click handler (the JSON is built before the first `await`), which is what iOS Safari's
+  user-gesture rule needs; the hidden-textarea `execCommand('copy')` fallback sits in the same handler. `RunLog` (`src/game/telemetry.ts`) appends one per finished run to `localStorage['trials.runlog']`,
   bounded to 200 entries; `RunCollector` gathers the run (deaths at the fault tick's bike x, frame-time
   percentiles over the run, the quality tier and why). `timeToClear` = wall seconds from the first GO on that
   track load to the results panel (full restarts stay inside the window; launching another track abandons it).
@@ -505,7 +532,10 @@ User (3G, round 3): white then black for many seconds. Now:
 - **Lab** (`lab-*` tracks or `?lab=1`; `src/ui/lab.ts`, physics-v2.md §15): bottom-right monospace panel (the bike rides at x ≈ 30 %; the left third stays clear) —
   pitch / rate / speed / rear slip, compression %, COM (`rider.lean` / crouch), hop phase, airtime, attempt
   (`1 + faults`); gauges: rear / front compression with the bump-stop zone (`tuning.stopStart`, default 0.8)
-  marked, `τ_att` signed bar, gas / brake bars, balance bar `d/h` vs `a/g` (red once a/g passes d/h), a side
+  marked, `τ_att` signed bar, gas / brake bars, balance bar `d/h` vs `a/g` (red once a/g passes d/h),
+  **R3 servo rows** `INTENT` (`debug().rider.intent`, 0..1 — 1 while the pose target itself is moving, i.e. a
+  hop's snap gets F_max both ways; 0 while a pose is held, a landing absorbs at 0.3 F_max; magenta above 0.5)
+  and `LEG` (`rider.legLen` m · `rider.legFrac` % of F_max the leg length allows), a side
   schematic with the COM dot and pose-target (hollow) vs body (filled) markers; last-hop stats held 3 s after
   a landing; a 3 s trace of pitch (±90°) and both compressions. Samples come per tick from `Game.tickTap`
   (120 Hz, rings), drawn decimated ×2 at ≤ 30 Hz; the text repaints at 10 Hz. `debug()` fields (`attTorque`,
@@ -517,5 +547,7 @@ User (3G, round 3): white then black for many seconds. Now:
   the last ≤ 120 ticks of quantized input before the fault, RLE like a recording (`Game.recentInput()`,
   `DeathRecord.trace`), so a run log reads back as technique failures, not just x positions.
 - **`?physics=v1|v2`** picks `createBikePhysicsV1` / `createBikePhysicsV2` from the physics barrel when
-  exported (else `createBikePhysics`); `?dev=1` shows a Physics row in Settings that reloads with the choice.
-  `hook.info().modules.physics` names the factory used.
+  exported (else `createBikePhysics`, which is **v2** since the R3 flip); `?dev=1` shows a Physics row in
+  Settings that reloads with the choice and states the live solver in its subtitle (*Live solver: V2 · dev
+  A/B — reloads the page*; the Default option reads *Default (V2)*). `hook.info().modules.physics` names the
+  factory used (`createBikePhysicsV1` under `?physics=v1`). PBs and ghosts are per solver — see §8.

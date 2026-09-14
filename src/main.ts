@@ -19,7 +19,7 @@
  *   ?trace=1        live InputFrame bars (gas / brake / lean) under the HUD timer — for filming the phone
  *   ?lab=1          physics lab HUD + ghost of the last attempt on every track (automatic on `lab-*` tracks)
  */
-import { DEFAULT_PHYSICS_HZ } from './core';
+import { DEFAULT_PHYSICS_HZ, type PhysicsVersion } from './core';
 import * as audioMod from './audio';
 import * as physicsMod from './physics';
 import * as renderMod from './render';
@@ -46,17 +46,21 @@ function physicsVersions(): ('v1' | 'v2')[] {
   return out;
 }
 
-/** Real bike physics when the physics owner has exported a factory; mock otherwise. `?physics=v1|v2` picks a versioned factory when it exists. */
-function physicsFactory(choice: string | null): { make: PhysicsFactoryFn; kind: string } {
+/**
+ * Real bike physics when the physics owner has exported a factory; mock otherwise. `?physics=v1|v2` picks a
+ * versioned factory when it exists. `version` is the solver stamp (`createBikePhysics` is v2 since the R3 flip,
+ * `src/physics/index.ts`); undefined for the mock.
+ */
+function physicsFactory(choice: string | null): { make: PhysicsFactoryFn; kind: string; version: PhysicsVersion | undefined } {
   const m = physicsMod as AnyModule;
   if (choice !== 'mock') {
     const names = choice === 'v1' ? ['createBikePhysicsV1'] : choice === 'v2' ? ['createBikePhysicsV2'] : [];
     for (const name of [...names, 'createBikePhysics', 'bikePhysicsFactory', 'createPhysics']) {
       const f = m[name];
-      if (typeof f === 'function') return { make: f as PhysicsFactoryFn, kind: name };
+      if (typeof f === 'function') return { make: f as PhysicsFactoryFn, kind: name, version: name === 'createBikePhysicsV1' ? 'v1' : 'v2' };
     }
   }
-  return { make: (hz) => new MockPhysics(hz), kind: 'mock' };
+  return { make: (hz) => new MockPhysics(hz), kind: 'mock', version: undefined };
 }
 
 export interface ModelChoices {
@@ -143,7 +147,7 @@ function boot(): void {
     const t0 = performance.now();
     const { renderer, kind: renderKind } = makeRenderer(app, harness, models);
     const tRender = performance.now();
-    const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics'));
+    const { make: makePhysics, kind: physicsKind, version: physicsVersion } = physicsFactory(params.get('physics'));
     const physics = makePhysics(physicsHz);
     const tPhysics = performance.now();
     const audioParts = makeAudio(makePhysics, params.get('audio') === '0');
@@ -166,6 +170,7 @@ function boot(): void {
       physicsFactory: makePhysics,
       autoRecord: true,
       ghostEnabled: !harness || params.get('ghost') === '1',
+      physicsVersion,
     });
     const tGame = performance.now();
     extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind, rider: models.riderModel, bike: models.bikeModel };
@@ -213,7 +218,7 @@ function boot(): void {
       const { renderer, kind: renderKind } = makeRenderer(appRoot, false, models);
       loader.step('Physics world');
       await nextPaint();
-      const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics'));
+      const { make: makePhysics, kind: physicsKind, version: physicsVersion } = physicsFactory(params.get('physics'));
       const physics = makePhysics(physicsHz);
       loader.step('Audio');
       await nextPaint();
@@ -237,6 +242,7 @@ function boot(): void {
         physicsFactory: makePhysics,
         autoRecord: true,
         ghostEnabled: true,
+        physicsVersion,
       });
       extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind, rider: models.riderModel, bike: models.bikeModel };
       console.info(`[trials] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=false`);
@@ -267,7 +273,7 @@ function boot(): void {
         perf: params.get('perf') === '1',
         trace: params.get('trace') === '1',
         lab: params.get('lab') === '1',
-        physics: { current: params.get('physics') === 'v1' ? 'v1' : params.get('physics') === 'v2' ? 'v2' : 'default', available: physicsVersions() },
+        physics: { current: params.get('physics') === 'v1' ? 'v1' : params.get('physics') === 'v2' ? 'v2' : 'default', available: physicsVersions(), live: physicsVersion },
         // Per-class livery when the render owner exports it (`setBikeClass(bike)`); otherwise the garage card carries the colour.
         onBikeChange: (bike) => {
           const r = renderer as Partial<{ setBikeClass(b: 'rookie' | 'pro'): void }>;

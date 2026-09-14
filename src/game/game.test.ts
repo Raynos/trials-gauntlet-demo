@@ -441,6 +441,75 @@ describe('PB ghost and splits', () => {
   });
 });
 
+describe('physics version stamp (game.md §8, §17): a PB from the other solver is never ghosted', () => {
+  class MemStore {
+    rec: { time: number; faults: number; splits?: number[]; recording?: string } | null = null;
+    get(): { time: number; faults: number; splits?: number[]; recording?: string } | null {
+      return this.rec;
+    }
+    put(_id: string, r: { time: number; faults: number }, run: { splits: number[]; recording: string | null }): void {
+      this.rec = { time: r.time, faults: r.faults, splits: run.splits, ...(run.recording ? { recording: run.recording } : {}) };
+    }
+  }
+  const make = (store: MemStore, physicsVersion: 'v1' | 'v2' | undefined): Game =>
+    new Game({ physics: new MockPhysics(120), renderer: new StubRenderer(), autoSkipCountdown: true, autoRecord: true, physicsFactory: (hz) => new MockPhysics(hz), bestTimes: store, physicsVersion });
+  const clear = (g: Game): void => {
+    g.loadTrack('flat-test');
+    g.setInput({ throttle: 1 });
+    for (let i = 0; i < 6000 && g.phase() !== 'finished'; i++) g.step(1);
+    expect(g.phase()).toBe('finished');
+    g.step(48);
+  };
+
+  it('stamps recordings with the live solver and reads an unstamped one as v1', () => {
+    const store = new MemStore();
+    clear(make(store, 'v2'));
+    expect(JSON.parse(store.rec!.recording!).header.physics).toBe('v2');
+    const g = make(store, 'v1');
+    expect(g.recordingMatchesPhysics(store.rec!.recording!)).toBe(false);
+    expect(make(store, 'v2').recordingMatchesPhysics(store.rec!.recording!)).toBe(true);
+    // Unstamped (pre-flip) recordings are v1 recordings.
+    const legacy = JSON.stringify({ ...JSON.parse(store.rec!.recording!), header: { ...JSON.parse(store.rec!.recording!).header, physics: undefined } });
+    expect(make(store, 'v1').recordingMatchesPhysics(legacy)).toBe(true);
+    expect(make(store, 'v2').recordingMatchesPhysics(legacy)).toBe(false);
+    // No version (mock / tests): ungated.
+    expect(make(store, undefined).recordingMatchesPhysics(legacy)).toBe(true);
+  });
+
+  it('ghosts a PB only under the solver it was set on; the entry (medal, time) is untouched', () => {
+    const store = new MemStore();
+    clear(make(store, 'v1'));
+    const v1pb = store.rec!;
+    const under2 = make(store, 'v2');
+    under2.loadTrack('flat-test');
+    expect(under2.ghostState()).toBeNull();
+    expect(store.rec).toBe(v1pb);
+    const under1 = make(store, 'v1');
+    under1.loadTrack('flat-test');
+    expect(under1.ghostState()).not.toBeNull();
+  });
+});
+
+describe('renderer.setBikeClass (CONTRACT §2.7)', () => {
+  it('is called with the class on every load path and skipped for renderers without it', () => {
+    class LiveryRenderer extends StubRenderer {
+      classes: string[] = [];
+      setBikeClass(c: 'rookie' | 'pro'): void {
+        this.classes.push(c);
+      }
+    }
+    const r = new LiveryRenderer();
+    const g = new Game({ physics: new MockPhysics(120), renderer: r, autoSkipCountdown: true });
+    g.loadTrack('flat-test');
+    g.loadTrack('flat-test', undefined, 'pro');
+    g.toMenu();
+    g.setBike('rookie'); // menu-phase reload (garage preview / hook.setBike)
+    expect(r.classes).toEqual(['rookie', 'pro', 'rookie']);
+    const plain = new Game({ physics: new MockPhysics(120), renderer: new StubRenderer(), autoSkipCountdown: true });
+    expect(plain.loadTrack('flat-test', undefined, 'pro')).toBe(true);
+  });
+});
+
 describe('replay viewer playback (docs/design/game.md §16)', () => {
   class MemStore {
     rec: { time: number; faults: number; splits?: number[]; recording?: string } | null = null;

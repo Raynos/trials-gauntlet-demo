@@ -86,6 +86,24 @@ describe('recording encodings', () => {
     expect(decodeBinary(encodeBinary(base)).header.bike).toBeUndefined();
   });
 
+  it('carries header.physics through both encodings; unstamped stays unstamped (= v1 to callers)', () => {
+    const base = sample();
+    for (const physics of ['v1', 'v2'] as const) {
+      const rec: InputRecording = { ...base, header: { ...base.header, physics } };
+      expect(decodeJSON(encodeJSON(rec)).header.physics).toBe(physics);
+      expect(decodeBinary(encodeBinary(rec)).header.physics).toBe(physics);
+      // A stamped binary without an explicit bike carries the default class byte so the layout stays positional.
+      expect(decodeBinary(encodeBinary(rec)).header.bike).toBe('rookie');
+      const pro: InputRecording = { ...base, header: { ...base.header, physics, bike: 'pro' } };
+      expect(decodeBinary(encodeBinary(pro)).header).toMatchObject({ physics, bike: 'pro' });
+    }
+    expect(decodeJSON(encodeJSON(base)).header.physics).toBeUndefined();
+    expect(decodeBinary(encodeBinary(base)).header.physics).toBeUndefined();
+    const bikeOnly: InputRecording = { ...base, header: { ...base.header, bike: 'pro' } };
+    expect(decodeBinary(encodeBinary(bikeOnly)).header).toMatchObject({ bike: 'pro' });
+    expect(decodeBinary(encodeBinary(bikeOnly)).header.physics).toBeUndefined();
+  });
+
   it('splits runs longer than u16 in binary', () => {
     const rec = new InputRecorder({ version: 1, trackId: 't', seed: 1, physicsHz: 120 });
     const f = quantizeInput({ throttle: 1 });

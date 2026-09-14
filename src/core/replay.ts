@@ -10,7 +10,7 @@
  *   - JSON  (human readable, `{ header, runs: [[count, t, b, l, flags], ...] }`)
  *   - binary (magic "TRIN", little-endian; see encodeBinary)
  */
-import type { BikeClass, InputFrame } from './types';
+import type { BikeClass, InputFrame, PhysicsVersion } from './types';
 
 export const RECORDING_VERSION = 1;
 const MAGIC = 'TRIN';
@@ -24,6 +24,8 @@ export interface RecordingHeader {
   note?: string;
   /** Bike class the inputs were recorded on (absent = rookie, the pre-garage physics). */
   bike?: BikeClass;
+  /** Solver the inputs were recorded on (absent = v1, recorded before the v2 flip). Gates the PB ghost / Watch. */
+  physics?: PhysicsVersion;
 }
 
 /** [count, throttle u8, brake u8, lean i8, flags u8] */
@@ -161,6 +163,7 @@ function validateHeader(h: unknown): RecordingHeader {
   };
   if (typeof o.note === 'string') header.note = o.note;
   if (o.bike === 'rookie' || o.bike === 'pro') header.bike = o.bike;
+  if (o.physics === 'v1' || o.physics === 'v2') header.physics = o.physics;
   return header;
 }
 
@@ -178,6 +181,7 @@ function validateHeader(h: unknown): RecordingHeader {
 //  ..      4     run count (u32 LE)
 //  ..      6*k   runs: count u16, throttle u8, brake u8, lean i8, flags u8
 //  ..      0|1   bike class (u8: 0 rookie, 1 pro) — optional trailer; absent = rookie
+//  ..      0|1   physics version (u8: 1 v1, 2 v2, 0 unstamped) — optional second trailer byte; absent = unstamped (v1)
 
 export function encodeBinary(rec: InputRecording): Uint8Array {
   const trackBytes = new TextEncoder().encode(rec.header.trackId);
@@ -191,8 +195,11 @@ export function encodeBinary(rec: InputRecording): Uint8Array {
       remaining -= c;
     }
   }
-  const bikeByte = rec.header.bike === 'pro' ? 1 : rec.header.bike === 'rookie' ? 0 : -1;
-  const size = 13 + trackBytes.length + 4 + runs.length * 6 + (bikeByte >= 0 ? 1 : 0);
+  const physByte = rec.header.physics === 'v1' ? 1 : rec.header.physics === 'v2' ? 2 : 0;
+  // The physics byte sits after the bike byte, so a stamped recording always carries both (bike defaults to rookie).
+  const bikeByte = rec.header.bike === 'pro' ? 1 : rec.header.bike === 'rookie' || physByte > 0 ? 0 : -1;
+  const trailer = physByte > 0 ? 2 : bikeByte >= 0 ? 1 : 0;
+  const size = 13 + trackBytes.length + 4 + runs.length * 6 + trailer;
   const buf = new ArrayBuffer(size);
   const dv = new DataView(buf);
   const u8 = new Uint8Array(buf);
@@ -214,6 +221,7 @@ export function encodeBinary(rec: InputRecording): Uint8Array {
     o += 6;
   }
   if (bikeByte >= 0) dv.setUint8(o, bikeByte);
+  if (physByte > 0) dv.setUint8(o + 1, physByte);
   return u8;
 }
 
@@ -239,6 +247,11 @@ export function decodeBinary(bytes: Uint8Array): InputRecording {
   }
   const header: RecordingHeader = { version, trackId, seed, physicsHz };
   if (o < bytes.length) header.bike = bytes[o] === 1 ? 'pro' : 'rookie';
+  if (o + 1 < bytes.length) {
+    const p = bytes[o + 1];
+    if (p === 1) header.physics = 'v1';
+    else if (p === 2) header.physics = 'v2';
+  }
   return { header, runs };
 }
 

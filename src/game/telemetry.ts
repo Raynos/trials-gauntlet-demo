@@ -7,7 +7,7 @@
  * The app owns the collection (`RunCollector`): deaths with the bike x at the fault tick,
  * frame-time percentiles from the RAF loop, the quality tier and the reason it was chosen.
  */
-import type { BikeClass, FaultReason, InputTraceRun, Medal, QualityTier, RunTelemetry } from '../core/types';
+import type { BikeClass, FaultReason, InputTraceRun, Medal, PhysicsVersion, QualityTier, RunTelemetry } from '../core/types';
 import { Percentiles } from './game';
 
 export const RUNLOG_KEY = 'trials.runlog';
@@ -118,6 +118,7 @@ export class RunCollector {
   finish(o: {
     track: string;
     bike: BikeClass;
+    physics?: PhysicsVersion | undefined;
     faults: number;
     time: number;
     medal: Medal;
@@ -134,6 +135,7 @@ export class RunCollector {
       bike: o.bike,
       attempts: 1 + o.faults,
       faults: o.faults,
+      ...(o.physics ? { physics: o.physics } : {}),
       time: Math.round(o.time * 1000) / 1000,
       timeToClear: Math.round((performance.now() - this.startedAt) / 100) / 10,
       medal: o.medal,

@@ -347,6 +347,14 @@ export type BikeClass = 'rookie' | 'pro';
 export const BIKE_CLASSES: readonly BikeClass[] = ['rookie', 'pro'];
 export const DEFAULT_BIKE: BikeClass = 'rookie';
 
+/**
+ * Bike solver a recording / PB / run-log entry was produced on (physics.md "v2 status"; CONTRACT §2.5 v2
+ * block). Stamped into `RecordingHeader.physics`; a recording without the stamp predates the v2 flip and
+ * reads as `'v1'`. The game never ghosts or offers to watch a PB whose stamp differs from the live solver
+ * (its medal and time stay), because the same inputs run to a different finish on the other solver.
+ */
+export type PhysicsVersion = 'v1' | 'v2';
+
 /** Outcome of one finished run (results panel, best-time store). */
 export interface RunResult {
   trackId: string;
@@ -406,6 +414,8 @@ export interface RunTelemetry {
   /** 1 + faults (CONTRACT §3). */
   attempts: number;
   faults: number;
+  /** Solver the run was ridden on (`'v2'` from the flip on; absent in entries logged before it = v1). */
+  physics?: PhysicsVersion;
   /** Run clock at the line (s). */
   time: number;
   /** Wall seconds from the first GO on this track load to the results panel (includes pauses). */

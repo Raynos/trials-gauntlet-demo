@@ -9,7 +9,7 @@
  * `run` (countdown…) → pause overlay → results. The title and menu render
  * over the live 3D scene with `BACKDROP_TRACK` loaded in the `menu` phase.
  */
-import type { BikeClass, InputDevice, QualityTier, ReplayCameraMode, RunResult, TrackDef } from '../core/types';
+import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RunResult, TrackDef } from '../core/types';
 import type { AudioSystem } from '../audio';
 import { getTrack, isLabTrackId, listTrackIds } from '../tracks';
 import {
@@ -49,6 +49,7 @@ import {
   saveVolume,
   shipTracks,
   tierUnlocked,
+  type BestEntry,
   type BestTimes,
   type DomHud,
   type FrontScreen,
@@ -97,7 +98,7 @@ export interface AppOptions {
   /** `?lab=1`: the physics lab HUD on every track (it is automatic on `lab-*` tracks). */
   lab?: boolean | undefined;
   /** Solver in effect + exported versions (hidden dev Settings row, `?physics=v1|v2`). */
-  physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[] } | undefined;
+  physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[]; live?: PhysicsVersion | undefined } | undefined;
 }
 
 const PROBE_FRAMES = 60;
@@ -219,7 +220,7 @@ export class App {
       }
     });
 
-    const bestOf = (id: string) => this.bestTimes.get(id);
+    const bestOf = (id: string) => this.playableBest(this.bestTimes.get(id));
     const state = (): FrontState => ({
       quality: this.qualityChoice,
       sound: this.soundOn,
@@ -287,7 +288,7 @@ export class App {
         location.replace(url.toString());
       },
       watchPb: (id: string) => {
-        const pb = this.bestTimes.get(id);
+        const pb = this.playableBest(this.bestTimes.get(id));
         if (pb?.recording) this.enterReplay({ json: pb.recording, kind: 'pb', isPb: true }, { from: 'tracks' });
       },
       resetProgress: () => {
@@ -595,7 +596,8 @@ export class App {
     if (this.replay.active) this.replay.close();
     this.setLab(id);
     if (!this.game.loadTrack(id, undefined, bike)) return;
-    if (bike !== this.lastRidden) this.o.onBikeChange?.(bike);
+    // Always on launch (materials only, no rebuild): a garage browse may have left the hero in the other livery.
+    this.o.onBikeChange?.(bike);
     this.lastRidden = bike;
     this.screen = 'run';
     this.screenAt = performance.now();
@@ -624,6 +626,16 @@ export class App {
       this.game.setPaused(true);
       this.onboard.show(this.mux.activeDevice());
     }
+  }
+
+  /**
+   * A PB as the front end may show it: medal and time always; the recording (the card's `▶ Watch` and the
+   * ghost) only when it was ridden on the live solver — a v1 PB is never replayed under v2 or vice versa.
+   */
+  private playableBest(b: BestEntry | null): BestEntry | null {
+    if (!b?.recording || this.game.recordingMatchesPhysics(b.recording)) return b;
+    const { recording: _dropped, ...rest } = b;
+    return rest;
   }
 
   // -- garage / bike ------------------------------------------------------------
@@ -661,6 +673,7 @@ export class App {
     const entry = this.collector.finish({
       track: r.trackId,
       bike: r.bike ?? 'rookie',
+      physics: this.game.physicsVersion,
       faults: r.faults,
       time: r.time,
       medal: r.medal,

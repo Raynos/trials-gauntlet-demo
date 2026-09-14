@@ -2,9 +2,10 @@
  * Garage (MEGA_PLAN P4): choose the bike class. Two cards — Rookie / Pro — each with a
  * one-line character, a stat strip (power / grip / weight feel) and a rule note; the live 3D
  * bike behind the screen is the preview (the menu backdrop reloads with the chosen class via
- * `Game.setBike`, and the renderer gets `setBikeClass` when it exports one; otherwise the
- * card tint is the only colour difference). Selection persists (`trials.bikeClass`); the
- * per-tier default applies only until the player has picked once (rules.ts).
+ * `Game.setBike`, whose `loadTrack` repaints the hero through `renderer.setBikeClass` — render
+ * round 11 liveries; a renderer without it leaves the card tint as the only colour difference).
+ * Copy states the physics v2 R3 numbers (physics.md "v2 status — R3"). Selection persists
+ * (`trials.bikeClass`); the per-tier default applies only until the player has picked once (rules.ts).
  */
 import type { BikeClass } from '../core/types';
 import type { ArtManifest } from './art';
@@ -31,28 +32,39 @@ export const BIKE_SPECS: Record<BikeClass, BikeSpec> = {
   rookie: {
     id: 'rookie',
     name: 'Rookie',
-    line: 'Soft and forgiving. The ECU catches your wheelies; the tyres catch your mistakes.',
+    // physics.md "v2 status — R3": never loops at neutral (6.7° max pitch at lean 0), loops only leaning back
+    // (−0.5 in 0.82 s), 0→16 m/s in 3.98 s at the launch pose, limiter 20 m/s, landings absorb (3 m drops ride away).
+    line: 'Never loops at neutral. Forgiving landings, 0→16 in 4.0 s, tops 20 m/s.',
     power: 0.55,
     grip: 0.82,
     weight: 0.72,
     weightFeel: 'Planted',
-    note: 'Wheelie assist on · standard medal targets',
+    note: 'Loops only leaning back · standard medal targets',
     tint: '#ffb020',
   },
   pro: {
     id: 'pro',
     name: 'Pro',
-    line: 'Raw. No assist, real drag, a throttle that answers the instant you ask.',
+    // R3 Pro row: 54 kg rider, 1 000 N, 0.08 s throttle, loops at lean 0 in 0.96 s under full gas, 0→16 in 3.25 s,
+    // limiter 21 m/s, hop 5–10 % higher than the Rookie.
+    line: 'Loops at neutral under full gas in ~1 s. 21 m/s, sharper throttle, higher hop.',
     power: 0.92,
     grip: 0.58,
     weight: 0.42,
     weightFeel: 'Flickable',
-    note: 'No assist · medal targets 10 % tighter',
+    note: 'Raw · medal targets 10 % tighter',
     tint: '#5aa9ff',
   },
 };
 
 export const BIKE_LABEL: Record<BikeClass, string> = { rookie: 'Rookie', pro: 'Pro' };
+
+/**
+ * The one place a player reads the wheelie balance point (physics.md R3 coasting-balance row, Rookie:
+ * lean −1 / 0 / +1 → 24 / 50 / 69°; the Pro is within 3°). Garage footer + the first-run card; never
+ * floated during play.
+ */
+export const BALANCE_HINT = 'Wheelie balance point: ~50° at neutral · lean back and it moves to 69°, forward to 24°';
 
 export interface GarageCallbacks {
   /** Focus moved: swap the live preview (not persisted). */
@@ -92,7 +104,7 @@ export class GarageScreen {
     const plate = h('div', 'plate-bg garage-plate');
     this.root.appendChild(plate);
     art.whenReady(() => art.applyBackground(plate, art.byId('garage-plate') ?? art.byId('results-garage')));
-    const head = h('div', 'garage-head', `<h1><small>Garage</small>Choose your bike</h1><div class="garage-sub">Applies to every track · change it here any time</div>`);
+    const head = h('div', 'garage-head', `<h1><small>Garage</small>Choose your bike</h1><div class="garage-sub">Applies to every track · change it here any time</div><div class="garage-tip">${escapeHtml(BALANCE_HINT)}</div>`);
     const row = h('div', 'garage-cards');
     for (const spec of [BIKE_SPECS.rookie, BIKE_SPECS.pro]) {
       const el = h('button', 'bike-card');

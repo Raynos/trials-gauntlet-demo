@@ -312,7 +312,7 @@ html.narrow .rp-seg.cams button { padding: 0 6px; min-width: 40px; }
 .lab { position: absolute; right: calc(.8rem + var(--sar)); bottom: calc(.8rem + var(--sab)); z-index: 6; pointer-events: none; display: flex; flex-direction: column; gap: 4px; padding: .4rem .55rem; background: rgba(0,0,0,.72); border: 1px solid var(--line-2); border-radius: var(--r1); }
 .lab .lab-text { margin: 0; font: 11px/1.45 var(--mono); color: #cfe; white-space: pre; text-shadow: none; }
 .lab .lab-trace { display: block; width: 360px; height: 112px; background: rgba(255,255,255,.03); border-radius: 4px; }
-.lab .lab-gauges { display: block; width: 360px; height: 150px; }
+.lab .lab-gauges { display: block; width: 360px; height: 186px; }
 .lab .lab-hop { color: var(--amber); }
 .lab .lab-hop[hidden] { display: none; }
 html.short .lab .lab-gauges { width: 300px; height: 125px; }
@@ -357,6 +357,7 @@ html.short .bc-art { display: none; }
 .garage-head h1 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.2rem; line-height: .9; text-transform: uppercase; letter-spacing: .01em; }
 .garage-head h1 small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .34em; color: var(--amber); margin-bottom: .35em; }
 .garage-sub { font-size: .82rem; letter-spacing: .08em; color: var(--ink-mute); }
+.garage-tip { font-size: .74rem; letter-spacing: .04em; color: var(--ink-mute); margin-top: 2px; font-variant-numeric: tabular-nums; }
 .garage-cards { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat) + 5.6rem); bottom: calc(var(--s6) + var(--sab)); width: min(40rem, calc(50 * var(--vw))); display: flex; gap: var(--s4); align-items: flex-start; }
 .bike-card { position: relative; flex: 1 1 0; min-width: 0; max-height: 100%; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4) var(--s4) var(--s3); border-radius: var(--r3); border: 1px solid var(--line-2); background: linear-gradient(180deg, rgba(16,19,25,.96), rgba(9,11,15,.92)); box-shadow: var(--plate); color: var(--ink); text-align: left; cursor: pointer; overflow: hidden; transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease), border-color var(--t1); }
 .bike-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--tint); opacity: .55; transition: opacity var(--t1); }
@@ -405,12 +406,14 @@ html.short .bc-art { display: none; }
 .ob-lines b { color: var(--ink); }
 .ob-lines kbd { font-family: var(--font); font-weight: 700; color: var(--ink); background: rgba(255,255,255,.1); border: 1px solid var(--line); border-bottom-width: 2px; padding: .02em .45em; border-radius: var(--r1); font-size: .9em; min-width: 1.6em; display: inline-block; text-align: center; }
 .ob-hop { font-size: .82rem; color: var(--ink-mute); border-top: 1px solid var(--line-2); padding-top: var(--s3); }
+.ob-tip { font-size: .74rem; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
 .ob-card .btn { align-self: flex-end; min-height: 48px; }
 html.short .garage-cards { top: calc(var(--s3) + var(--sat) + 3.4rem); bottom: calc(var(--s4) + var(--sab)); width: min(32rem, calc(54 * var(--vw))); gap: var(--s2); }
 html.short #app.garage canvas { transform: scale(1.3) translate(30%, -4%); }
 html.short .garage-head { top: calc(var(--s3) + var(--sat)); }
 html.short .garage-head h1 { font-size: 1.6rem; }
 html.short .garage-sub { display: none; }
+html.short .garage-tip { display: none; }
 html.short .bike-card { padding: var(--s3) var(--s3) var(--s2); gap: var(--s1); }
 html.short .bc-name { font-size: 1.8rem; }
 html.short .bc-line { font-size: .78rem; min-height: 0; }
@@ -420,6 +423,7 @@ html.short .ob-card { padding: var(--s4); gap: var(--s2); }
 html.short .ob-card h2 { font-size: 1.6rem; }
 html.short .ob-lines { font-size: .82rem; gap: var(--s1); }
 html.short .ob-hop { display: none; }
+html.short .ob-tip { display: none; }
 html.short .tile span small { display: none; }
 html.short .perf { top: calc(3.6rem + var(--sat)); font-size: 10px; }
 

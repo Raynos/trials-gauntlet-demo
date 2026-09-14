@@ -10,8 +10,9 @@
  *
  * Samples arrive per physics tick (`Game.tickTap`, 120 Hz) into fixed rings; the trace is decimated ×2.
  * Everything is read from `PhysicsState` and — defensively, field by field — from the world's `debug()`
- * (`attTorque`, `poseTarget`, `comDH`, `lastHop`, `suspension.*.compression`) which physics v2 exposes
- * before the fields land in `types.ts`; a missing field leaves its gauge grey, never throws.
+ * (`attTorque`, `poseTarget`, `comDH`, `lastHop`, `suspension.*.compression`, R3: `rider.intent`,
+ * `rider.legLen` / `rider.legFrac`) which physics v2 exposes before the fields land in `types.ts`; a
+ * missing field leaves its gauge grey, never throws.
  */
 import type { PhysicsState } from '../core/types';
 
@@ -41,7 +42,16 @@ interface DebugLike {
   ag?: number;
   lastHop?: { preload?: number; snapMs?: number; apex?: number; airtime?: number; landedPitchDeg?: number; landedPitch?: number; at?: number };
   suspension?: { rear?: { compression?: number; stopStart?: number }; front?: { compression?: number; stopStart?: number } };
-  rider?: { body?: { pos?: { x: number; y: number }; angle?: number }; anchor?: { x: number; y: number }; offset?: { x: number; y: number } };
+  rider?: {
+    body?: { pos?: { x: number; y: number }; angle?: number };
+    anchor?: { x: number; y: number };
+    offset?: { x: number; y: number };
+    /** R3: the intent memory 0..1 — 1 while the pose target itself is moving (a hop's snap), 0 while a pose is held (a landing). Gates the servo's concentric cap: `hill + (1 − hill) · intent`. */
+    intent?: number;
+    /** R2: hips → pegs distance (m) and the force-length fraction of F_max it allows. */
+    legLen?: number;
+    legFrac?: number;
+  };
 }
 
 export interface LabHop {
@@ -110,7 +120,7 @@ export class LabPanel {
     this.gauges = document.createElement('canvas');
     this.gauges.className = 'lab-gauges';
     this.gauges.width = COLS * 2;
-    this.gauges.height = 150;
+    this.gauges.height = 186;
     this.gctx = this.gauges.getContext('2d');
     this.hopEl = document.createElement('pre');
     this.hopEl.className = 'lab-text lab-hop';
@@ -262,6 +272,13 @@ export class LabPanel {
     row(40, 'τ ATT', att === null ? null : att / this.attMax, '#ffb347', { signed: true, text: att === null ? '' : `${att >= 0 ? '+' : '−'}${Math.abs(att).toFixed(0)} N·m` });
     row(58, 'GAS', l.throttle, '#f5a623');
     row(76, 'BRAKE', l.brake, '#ff5b4a');
+    // R3 servo gauges. INTENT: 1 = the rider is moving his pose (full F_max both ways), 0 = holding one (a landing
+    // absorbs at 0.3 F_max). LEG: hips → pegs length with the force-length fraction it allows (the bar).
+    const intent = num(d?.rider?.intent);
+    row(112, 'INTENT', intent, intent !== null && intent > 0.5 ? '#ff8fd6' : '#c79bff', { text: intent === null ? '' : intent.toFixed(2) });
+    const legFrac = num(d?.rider?.legFrac);
+    const legLen = num(d?.rider?.legLen);
+    row(130, 'LEG', legFrac, '#7fffd4', { text: legFrac === null ? '' : `${legLen === null ? '' : `${legLen.toFixed(2)} m · `}${(legFrac * 100).toFixed(0)}%` });
     // Balance bar: d/h (COM ahead of the rear contact over COM height) vs a/g (the front lifts when a/g crosses d/h).
     const com = d?.comDH;
     let dh: number | null = null;

@@ -6,6 +6,7 @@
  *    (`trials.onboarded`). Shown over the first countdown with the game paused.
  */
 import type { InputDevice } from '../core/types';
+import { BALANCE_HINT } from './garage';
 
 function h<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, html?: string): HTMLElementTagNameMap[K] {
   const e = document.createElement(tag);
@@ -56,7 +57,7 @@ export class OnboardingCard {
 
   constructor(parent: HTMLElement, private readonly onDone: () => void) {
     this.root = h('div', 'onboard');
-    this.root.innerHTML = `<div class="ob-card rise"><div class="kicker">First ride</div><h2>Gas, brake, lean.</h2><div class="ob-lines"></div><div class="ob-hop">There is no hop button: lean back on the gas, then snap forward.</div><button type="button" class="btn primary">Got it · Ride</button></div>`;
+    this.root.innerHTML = `<div class="ob-card rise"><div class="kicker">First ride</div><h2>Gas, brake, lean.</h2><div class="ob-lines"></div><div class="ob-hop">There is no hop button: lean back on the gas, then snap forward.</div><div class="ob-tip">${BALANCE_HINT}</div><button type="button" class="btn primary">Got it · Ride</button></div>`;
     this.lines = this.root.querySelector('.ob-lines') as HTMLDivElement;
     this.root.querySelector('button')!.addEventListener('click', () => this.dismiss());
     this.root.addEventListener('click', (e) => {

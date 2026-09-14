@@ -54,8 +54,8 @@ export interface FrontState {
   runlog: { runs: number; tracks: number };
   /** `navigator.share` exists (iOS / Android share sheet). */
   canShare: boolean;
-  /** `?dev=1` only: physics solver in effect (`default` = whatever `createBikePhysics` is) and which are exported. */
-  physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[] };
+  /** `?dev=1` only: physics solver chosen (`default` = whatever `createBikePhysics` is), which are exported, and which one is live. */
+  physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[]; live?: 'v1' | 'v2' | undefined };
 }
 
 export const BIKE_NAME: Record<BikeClass, string> = { rookie: 'Rookie', pro: 'Pro' };
@@ -718,8 +718,9 @@ export class SettingsScreen extends Screen {
     const phys = s().physics;
     if (s().dev && phys && phys.available.length > 0 && this.cb.setPhysics) {
       // Hidden dev row (physics v2 A/B, docs/design/physics-v2.md §16.2): reloads the page with `?physics=`.
-      const opts = [{ v: 'default', l: 'Default' }, ...phys.available.map((v) => ({ v, l: v.toUpperCase() }))];
-      seg('physics', 'Physics', 'Dev: solver A/B — reloads the page', opts, () => phys.current, (v) => this.cb.setPhysics?.(v as 'default' | 'v1' | 'v2'));
+      const opts = [{ v: 'default', l: phys.current === 'default' && phys.live ? `Default (${phys.live.toUpperCase()})` : 'Default' }, ...phys.available.map((v) => ({ v, l: v.toUpperCase() }))];
+      const live = phys.live ? `Live solver: ${phys.live.toUpperCase()}` : 'Live solver: mock';
+      seg('physics', 'Physics', `${live} · dev A/B — reloads the page`, opts, () => phys.current, (v) => this.cb.setPhysics?.(v as 'default' | 'v1' | 'v2'));
     }
 
     // Run log export: Copy (clipboard JSON) · Share (Web Share API, text) — never leaves the device otherwise.
