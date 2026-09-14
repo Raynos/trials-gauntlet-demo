@@ -1,12 +1,14 @@
 /**
- * Pause overlay (same list + amber bar as the main menu), spatial focus
- * navigation for button grids (results panel), and the rotate prompt.
+ * Pause overlay (same list + amber bar as the main menu) and spatial focus
+ * navigation for button grids (results panel). No rotate prompt: a portrait
+ * viewport is rotated into landscape instead (src/ui/orientation.ts).
  * Every target ≥ 44 px; mouse, touch, keyboard and pad via `confirm()`/`move()`.
  */
 import type { QualityTier } from '../core/types';
 import type { ModelChoice } from './best';
 import { formatTime } from './format';
-import { BUILD_STAMP, FocusList, GAME_NAME, escapeHtml, hardReload } from './front';
+import { FocusList, escapeHtml, hardReload } from './front';
+import { logicalRect } from './orientation';
 import type { UiSfx } from './sfx';
 
 export type QualityChoice = QualityTier | 'auto';
@@ -41,14 +43,15 @@ export function spatialMove(root: HTMLElement, dx: number, dy: number): void {
     items[0]!.scrollIntoView({ block: 'nearest' });
     return;
   }
-  const r = cur.getBoundingClientRect();
+  // Logical boxes: under forced landscape the client rects are rotated 90°.
+  const r = logicalRect(cur);
   const cx = r.left + r.width / 2;
   const cy = r.top + r.height / 2;
   let best: HTMLButtonElement | null = null;
   let bestScore = Infinity;
   for (const b of items) {
     if (b === cur) continue;
-    const q = b.getBoundingClientRect();
+    const q = logicalRect(b);
     const qx = q.left + q.width / 2;
     const qy = q.top + q.height / 2;
     const along = dx !== 0 ? (qx - cx) * dx : (qy - cy) * dy;
@@ -90,11 +93,14 @@ export class PauseMenu {
       { id: 'restart', label: 'Restart track' },
       ...(cb.models ? [{ id: 'rider', label: 'Rider' }, { id: 'bike', label: 'Bike' }] : []),
       { id: 'quit', label: 'Main menu' },
+      // Last row, never top-right: a home-screen install has no browser chrome to reload with.
+      { id: 'reload', label: '⟳ Reload game' },
     ]);
     this.list.onPick = (id) => {
       if (id === 'resume') cb.resume();
       else if (id === 'restart') cb.restartTrack();
       else if (id === 'quit') cb.quit();
+      else if (id === 'reload') void hardReload();
       else if (id === 'rider' || id === 'bike') this.cycleModel(id, 1);
     };
     this.paintModels();
@@ -154,23 +160,4 @@ export class PauseMenu {
     this.list.setSegment('rider', MODEL_OPTIONS, cur.rider);
     this.list.setSegment('bike', MODEL_OPTIONS, cur.bike);
   }
-}
-
-/**
- * Full-screen portrait prompt (CSS decides when it shows: portrait + coarse pointer). A designed
- * screen in the menu tokens: wordmark, rotating phone glyph, the game's one and only
- * "Reload game" button (home-screen / standalone iOS has no browser chrome to reload with),
- * build stamp. The in-run top-right ↻ stays restart-to-checkpoint and nothing else.
- */
-export function mountRotatePrompt(parent: HTMLElement): HTMLDivElement {
-  const d = document.createElement('div');
-  d.className = 'rotate armed';
-  d.innerHTML = `<div class="wordmark">${GAME_NAME.split(' ')[0]}<br>${GAME_NAME.split(' ').slice(1).join(' ')}</div>
-    <i></i>
-    <div class="msg">Rotate to landscape</div>
-    <button type="button" class="btn primary reload">⟳ Reload game</button>
-    <div class="build">${escapeHtml(BUILD_STAMP)}</div>`;
-  d.querySelector('button')!.addEventListener('click', () => void hardReload());
-  parent.appendChild(d);
-  return d;
 }

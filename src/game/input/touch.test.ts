@@ -7,6 +7,7 @@
  */
 import { beforeEach, describe, expect, it } from 'vitest';
 import { NEUTRAL_INPUT, type InputFrame } from '../../core/types';
+import { _setOrientationForTest, toLogical, toPhysical } from '../../ui/orientation';
 import { TouchInput } from './touch';
 
 // jsdom has no PointerEvent / TouchEvent; minimal stand-ins carrying the fields TouchInput reads.
@@ -37,8 +38,8 @@ function setup(): { t: TouchInput; frame: () => InputFrame; root: HTMLElement } 
   Object.defineProperty(window, 'innerHeight', { value: 500, configurable: true });
   const t = new TouchInput(ui, { now });
   // jsdom has no layout: give the layer a size and put the buttons off to the corners.
-  Object.defineProperty(t.root, 'clientWidth', { value: 1000 });
-  Object.defineProperty(t.root, 'clientHeight', { value: 500 });
+  Object.defineProperty(t.root, 'clientWidth', { value: 1000, configurable: true });
+  Object.defineProperty(t.root, 'clientHeight', { value: 500, configurable: true });
   for (const b of t.root.querySelectorAll<HTMLElement>('.tz-btn')) {
     b.getBoundingClientRect = () => ({ left: -100, right: -50, top: -100, bottom: -50, width: 50, height: 50, x: -100, y: -100, toJSON: () => ({}) });
   }
@@ -105,6 +106,66 @@ describe('TouchInput lifecycle (iOS Safari semantics)', () => {
     expect(t.activePointers).toBe(1);
     root.dispatchEvent(new FakeTouchEvent('touchend', 0)); // last finger lifted per the raw stream
     expect(frame().throttle).toBe(0);
+  });
+
+  it('GAS held, then LEAN: Safari fires gesturestart for the second finger — nothing releases (multi-touch P0)', () => {
+    const { root, frame, t } = setup();
+    down(root, 1, 900, 300); // GAS
+    root.dispatchEvent(new FakeTouchEvent('touchstart', 1));
+    expect(frame().throttle).toBe(1);
+    down(root, 2, 100, 300); // LEAN back, second finger
+    root.dispatchEvent(new FakeTouchEvent('touchstart', 2));
+    const g = new Event('gesturestart', { bubbles: true, cancelable: true });
+    document.dispatchEvent(g);
+    expect(g.defaultPrevented).toBe(true);
+    document.dispatchEvent(new Event('gesturechange', { bubbles: true, cancelable: true }));
+    let f = frame();
+    expect(f.throttle).toBe(1);
+    expect(f.lean).toBe(-1);
+    expect(t.activePointers).toBe(2);
+    expect(t.releaseLog.count).toBe(0);
+    // Slide the lean finger across to lean-forward while GAS stays down.
+    move(root, 2, 400, 300);
+    f = frame();
+    expect(f.throttle).toBe(1);
+    expect(f.lean).toBe(1);
+    // Lift only the lean finger (one finger still on the glass).
+    root.dispatchEvent(new FakePointerEvent('pointerup', { pointerId: 2, clientX: 400, clientY: 300 }));
+    root.dispatchEvent(new FakeTouchEvent('touchend', 1));
+    f = frame();
+    expect(f.throttle).toBe(1);
+    expect(f.lean).toBe(0);
+    // Brake + lean and a third finger: ignored gracefully (it just lands in a zone).
+    down(root, 3, 600, 300);
+    down(root, 4, 100, 300);
+    f = frame();
+    expect(f.throttle).toBe(1);
+    expect(f.brake).toBe(1);
+    expect(f.lean).toBe(-1);
+  });
+
+  it('forced landscape: physical (portrait) touch points map onto the logical halves', () => {
+    const { root, frame } = setup();
+    // Portrait phone 390×844 rotated: logical layer is 844×390 (setup gave 1000×500; override).
+    Object.defineProperty(root, 'clientWidth', { value: 844, configurable: true });
+    Object.defineProperty(root, 'clientHeight', { value: 390, configurable: true });
+    _setOrientationForTest({ forced: true, physW: 390, physH: 844 });
+    try {
+      // Logical GAS zone centre (x=760,y=200) ↔ physical (390-200, 760) = (190, 760): near the home indicator.
+      const gas = toPhysical(760, 200);
+      expect(gas).toEqual({ x: 190, y: 760 });
+      expect(toLogical(gas.x, gas.y)).toEqual({ x: 760, y: 200 });
+      down(root, 1, gas.x, gas.y);
+      expect(frame().throttle).toBe(1);
+      // Logical lean-back centre (x=100, y=200) ↔ physical (190, 100): near the notch.
+      const back = toPhysical(100, 200);
+      down(root, 2, back.x, back.y);
+      const f = frame();
+      expect(f.throttle).toBe(1);
+      expect(f.lean).toBe(-1);
+    } finally {
+      _setOrientationForTest({ forced: false, physW: 0, physH: 0 });
+    }
   });
 
   it('raw touchcancel with zero fingers releases everything even without pointer events', () => {

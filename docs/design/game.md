@@ -95,6 +95,13 @@ the sound toggle and the pause actions; confirm clicks the focused control.
 Touch: pointer events on a full-screen overlay with `touch-action: none`; each pointer id is tracked
 independently so lean + throttle + brake can all be down at once; zones are split at 50 % width and
 25 % / 75 % for the sub-zones, buttons carved out of the top edge respecting safe-area insets.
+**Multi-touch rule (P0, round 3):** Safari fires its proprietary `gesturestart` / `gesturechange` the moment a
+*second* finger lands — for GAS + LEAN, not only for a pinch — whatever `touch-action` and the touch handlers
+did. Those events are `preventDefault`'d and otherwise ignored; a pointer leaves the map only through its own
+end event, the raw stream saying zero fingers, focus loss or the watchdog. (The old handler called
+`releaseAll` on `gesturestart`, which dropped GAS the instant LEAN was pressed.) Verified with Chromium CDP
+`Input.dispatchTouchEvent` two- and three-point sequences and jsdom (`touch.test.ts`). Hit-testing runs in
+the *logical* frame (`toLogical`, §11) so zones stay left/right halves under forced landscape.
 Zone outlines fade in on first touch, sit at ~35 % opacity while touch is the active device and drop to 30 % three seconds after GO (§10); the HUD top band shifts to clear the two touch buttons (top-left ❚❚ pause, top-right ↻ Restart).
 
 ## 4. HUD (`src/ui/`)
@@ -123,7 +130,8 @@ crisp at DPR 1–3 (DOM/CSS, no canvas text), min 12 px at phone width, 1 rem = 
   `medium`, else `low`. Applied once via `setQuality`; a manual choice in the menu (`localStorage trials.quality`)
   wins over the probe.
 - `index.html`: `viewport-fit=cover`, `user-scalable=no`, `overscroll-behavior: none`, `touch-action:
-  none`, safe-area padding on every HUD edge, landscape prompt overlay in portrait on coarse pointers.
+  none`, safe-area padding on every HUD edge. Portrait on a touch device = forced landscape (§11); there is
+  no rotate prompt.
 - Audio `unlock()` on the first pointerdown/keydown; `visibilitychange` hidden → pause + audio ducked.
 - Memory: no per-frame allocations in the HUD update path beyond string formatting; event queues bounded.
 
@@ -249,10 +257,20 @@ can be removed stays.
   device pill shows only when the active device changes, for 1.5 s of sim time. Touch zone outlines drop
   to 30 % (55 % while held) 3 s after GO (`TouchInput.setSettled`), re-armed by every countdown. The
   top-right touch button reads "↻ Restart" (tap = checkpoint, hold = track).
-- **Portrait prompt** (iOS): a designed screen — wordmark, rotating phone glyph, the game's **only**
-  "⟳ Reload game" button (home-screen standalone mode has no browser chrome; it clears SW caches +
-  sessionStorage and reloads with a cache-busting query), build stamp at 40 %. No reload control anywhere
-  else — the in-run top-right ↻ is restart and nothing else lives up there.
+- **Reload game**: the last row of the pause menu and the last row of Settings ("⟳ Reload game";
+  `hardReload` clears SW caches + sessionStorage and reloads with a cache-busting query — home-screen
+  standalone mode has no browser chrome). Never top-right: the in-run top-right ↻ is restart and nothing
+  else lives up there. The build stamp stays in Settings and on the title corner. (The portrait prompt that
+  used to host the button is gone — §11.)
+- **Title any-key**: the title leaves on the gesture's *end* (`pointerup`), not `pointerdown`, so the same
+  tap's `click` can't land on the menu item that appears under the finger 200 ms later; and for 150 ms after
+  any screen change the shell drops confirm/back/nav edges (`SCREEN_GRACE_MS`), so the key that changed
+  screens never acts twice.
+- **Run → menu** (`quit`, from pause or the results panel): exactly the cold-boot path — `loadTrack(b1)`
+  afresh (renderer `setTrack`: world rebuilt, particles / finish flash cleared, camera cut to the idle
+  framing), `toMenu()`, HUD `hidden`, touch layer off (`.tz` outlines and buttons only render while the layer
+  is `.on`, i.e. during a run). Re-arming the finished track in place (`startRun`) left its frozen finish state
+  and the touch buttons under the menu (user screenshot, round 3).
 - **Results**: restyled to the tokens (display-face time, amber rule, staged reveal unchanged); medal art
   from the manifest via `DomHud.setMedalArt`.
 - **Sound cues** (`src/ui/sfx.ts`): synthesised tick / confirm / back / launch through the audio system's
@@ -280,3 +298,40 @@ can be removed stays.
   (machine-load dependent). The evidence scripts run the page on a virtual clock (RAF, `performance.now`,
   `setTimeout` advanced 100 ms per frame; CSS animations paused between frames via CDP
   `Animation.setPlaybackRate`) — `?harness=1` is unaffected (no RAF).
+
+## 11. Forced landscape (`src/ui/orientation.ts`)
+
+A home-screen web app cannot declare landscape-only the way YouTube / Netflix do: iOS has no
+`screen.orientation.lock()` outside fullscreen video, so with the rotation lock on the viewport stays portrait
+whichever way the phone is held. So the *page* rotates: on a coarse-pointer touch device with
+`innerHeight > innerWidth`, `#app` (canvas + `#ui`) is laid out at the logical size `{ w: innerHeight,
+h: innerWidth }` and turned 90° inside the portrait viewport; the renderer gets that logical size through the
+normal `resize` path at the unchanged DPR cap (backing store = logical × DPR, so text is laid out and
+rasterised at device resolution and only *rotated*, never resampled — a 90° turn with integer sizes maps
+pixel to pixel). Re-evaluated on `resize`, `orientationchange` and `visualViewport` resize.
+
+- **Direction: clockwise** — `html.forced-landscape #app { width: var(--lw); height: var(--lh);
+  transform-origin: top left; transform: rotate(90deg) translateY(-100%); will-change: transform }`. The game's
+  top edge lies on the phone's physical **right** edge and its left edge on the physical **top** (notch), so
+  the game reads upright held **notch-left, home-indicator-right** (iOS "landscape left", the default
+  landscape of Apple's own games). Mapping (`toLogical` / `toPhysical`, the single transform used by touch
+  hit-testing, the touch debug overlay and `spatialMove`): `lx = py`, `ly = innerWidth − px`.
+- **Safe areas** rotate with it: `html.forced-landscape { --sat: env(safe-area-inset-right); --sar:
+  env(…-bottom); --sab: env(…-left); --sal: env(…-top) }` — the notch becomes the logical *left* inset (pause
+  button, HUD name, menu column all clear it) and the home indicator the logical *right* inset (restart
+  button, progress strip, legend).
+- **Viewport units**: every `vw`/`vh` in the stylesheet is `calc(n * var(--vw|--vh))` (`1vw`/`1vh` normally,
+  logical px / 100 when forced), and the phone rules that were `@media (max-height: 500px)` /
+  `(max-width: 720px)` are `html.short` / `html.narrow`, set from the *logical* size — so the 844×390 layout
+  is the same whether the phone reports 844×390 or 390×844.
+- **Triggers only on touch + portrait.** Desktop windows (fine pointer), keyboard, gamepad and `?harness=1`
+  (no App is constructed; asserted at 1280×720: no class, `transform: none`) are untouched. In real
+  landscape nothing changes (regression captures in the round-3 evidence).
+- **Touch**: `clientX/Y` arrive in the physical frame; `TouchInput.zoneAt` maps once through `toLogical` and
+  `inside()` maps the buttons' client rects the same way, so every release path (pointercancel,
+  lostpointercapture, raw touchend, watchdog) is untouched. Rotating mid-run re-issues `setEnabled`, which
+  drops any held pointer.
+- **Not verifiable headless** (WebKit desktop emulation): real `env(safe-area-inset-*)` values, the
+  status bar / home-indicator overlay in standalone mode, hardware key-repeat, whether iOS honours the
+  compositor rotation without a text-resample on a specific device — check on the phone with
+  `?touchdebug=1`, which prints `forced-landscape WxH -> WxH` and each pointer's zone.

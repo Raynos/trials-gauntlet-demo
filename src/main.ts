@@ -20,7 +20,7 @@ import * as renderMod from './render';
 import type { AudioSystem } from './audio';
 import type { PhysicsWorld } from './physics';
 import type { GameRenderer } from './render';
-import { App, Game, MockPhysics, dprCap, installHook, type HookExtras } from './game';
+import { App, Game, MockPhysics, installHook, type HookExtras } from './game';
 import { resolveBoot } from './game/flow';
 import { getTrack } from './tracks';
 import { BestTimes, DomHud, injectStyles, loadModelChoice, type ModelChoice } from './ui';
@@ -196,7 +196,8 @@ function boot(): void {
     },
   });
   installHook(game, false, extras);
-  renderer.resize(window.innerWidth, window.innerHeight, dprCap());
+  // The App's constructor already sized the renderer through its orientation-aware fit()
+  // (forced landscape hands the renderer the rotated logical size); nothing overrides it here.
   shell.start();
 }
 

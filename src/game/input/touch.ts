@@ -13,8 +13,21 @@
  * fingers are down. touchstart/touchmove are non-passive and preventDefault'd
  * on the layer so Safari never claims the gesture for selection, callout,
  * magnifier or rubber-band scroll in the first place.
+ *
+ * Multi-touch (the second P0): Safari fires its proprietary `gesturestart` /
+ * `gesturechange` the moment a SECOND finger lands, whatever `touch-action`
+ * and the touch handlers did — it is a notification, not a claim. Those
+ * events are preventDefault'd and otherwise ignored; they must never release
+ * anything (the old code did, which dropped GAS the instant LEAN was pressed).
+ * A pointer only ever leaves the Map through its own end event, the raw
+ * stream saying zero fingers, focus loss, or the watchdog.
+ *
+ * Coordinates: `clientX/Y` are physical; every hit-test goes through
+ * `toLogical` (src/ui/orientation.ts) so the zones sit in the game's frame
+ * when the page is rotated for forced landscape.
  */
 import type { InputFrame } from '../../core/types';
+import { isForcedLandscape, logicalRect, toLogical, type Point } from '../../ui/orientation';
 import { clearMeta, type InputSource, type MetaButtons } from './types';
 
 type Zone = 'back' | 'fwd' | 'brake' | 'throttle' | 'restart' | 'pause' | 'none';
@@ -50,6 +63,9 @@ export class TouchInput implements InputSource {
   private lastFrame: InputFrame = { throttle: 0, brake: 0, lean: 0, hop: false, restart: false };
   private releases = 0;
   private lastRelease = '';
+  /** Safari gesture events seen (debug): they are swallowed, never a release. */
+  private gestures = 0;
+  private readonly pt: Point = { x: 0, y: 0 };
 
   constructor(parent: HTMLElement, options: TouchInputOptions = {}) {
     this.now = options.now ?? (() => performance.now());
@@ -132,9 +148,11 @@ export class TouchInput implements InputSource {
 
   // -- hit testing ------------------------------------------------------------
 
-  private zoneAt(x: number, y: number, current: Zone | undefined): Zone {
-    const w = this.root.clientWidth || window.innerWidth;
-    const h = this.root.clientHeight || window.innerHeight;
+  /** `px, py` = event `clientX/Y` (physical frame); zones are laid out in the logical frame. */
+  private zoneAt(px: number, py: number, current: Zone | undefined): Zone {
+    const { x, y } = toLogical(px, py, this.pt);
+    const w = this.root.clientWidth || (isForcedLandscape() ? window.innerHeight : window.innerWidth);
+    const h = this.root.clientHeight || (isForcedLandscape() ? window.innerWidth : window.innerHeight);
     if (current === undefined) {
       if (inside(this.els.restart, x, y)) return 'restart';
       if (inside(this.els.pause, x, y)) return 'pause';
@@ -215,9 +233,15 @@ export class TouchInput implements InputSource {
     }
   };
 
+  /**
+   * Safari's gesturestart/gesturechange fire for ANY second finger (GAS + LEAN),
+   * not only for a pinch it has claimed; preventDefault keeps the page from
+   * zooming and nothing is released — the pointers that make up the "gesture"
+   * are our zones.
+   */
   private readonly onGesture = (e: Event): void => {
     if (this.enabled) e.preventDefault();
-    this.releaseAll(e.type);
+    this.gestures++;
   };
 
   private readonly onLostFocus = (e: Event): void => this.releaseAll(e.type);
@@ -282,7 +306,8 @@ export class TouchInput implements InputSource {
     const f = this.lastFrame;
     const ps = [...this.pointers.entries()].map(([id, p]) => `#${id} ${p.type} ${p.zone}`).join('  ') || '(no pointers)';
     this.debugEl!.textContent =
-      `touch ${this.enabled ? 'on' : 'off'}  raw fingers ${this.rawTouches}  releases ${this.releases} (${this.lastRelease || '-'})\n` +
+      `touch ${this.enabled ? 'on' : 'off'}  raw fingers ${this.rawTouches}  releases ${this.releases} (${this.lastRelease || '-'})  gestures ${this.gestures}` +
+      `${isForcedLandscape() ? `  forced-landscape ${window.innerWidth}x${window.innerHeight} -> ${this.root.clientWidth}x${this.root.clientHeight}` : ''}\n` +
       `${ps}\nthr ${f.throttle} brk ${f.brake} lean ${f.lean} restart ${f.restart ? 1 : 0}`;
   }
 
@@ -302,8 +327,9 @@ export class TouchInput implements InputSource {
   }
 }
 
+/** `x, y` logical; the element's box is mapped into the same frame. */
 function inside(el: HTMLElement, x: number, y: number): boolean {
-  const r = el.getBoundingClientRect();
+  const r = logicalRect(el);
   return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
 }
 

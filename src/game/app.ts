@@ -26,7 +26,6 @@ import {
   loadQualityOverride,
   loadSoundEnabled,
   loadVolume,
-  mountRotatePrompt,
   saveGhostEnabled,
   saveModelChoice,
   saveQualityOverride,
@@ -40,6 +39,7 @@ import {
   type ModelChoice,
   type QualityChoice,
 } from '../ui';
+import { applyOrientation, isForcedLandscape } from '../ui/orientation';
 import { BACKDROP_TRACK } from './flow';
 import type { Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
@@ -74,6 +74,9 @@ const PROBE_FRAMES = 60;
 const DEVICE_SHOW_FRAMES = 90;
 const LAST_TRACK_KEY = 'trials.lastTrack';
 const TOUCH_SETTLE_S = 3;
+
+/** Grace after a screen change during which menu buttons (confirm/back/nav) are ignored: the edge that changed screens must not act twice. */
+const SCREEN_GRACE_MS = 150;
 
 export function isPhone(): boolean {
   const coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
@@ -118,6 +121,8 @@ export class App {
   /** Seconds of riding since the last GO (touch zones settle at 3 s). */
   private rideSeconds = 0;
   private settled = false;
+  private screenAt = 0;
+  private forced = false;
 
   constructor(private readonly o: AppOptions) {
     this.game = o.game;
@@ -240,7 +245,6 @@ export class App {
           }
         : {}),
     });
-    mountRotatePrompt(o.uiRoot);
     this.menu.setTracks(shipTracks(this.tracks, o.dev ?? false));
 
     this.hud.onAction = (a) => {
@@ -267,6 +271,7 @@ export class App {
       if (document.hidden && this.inRun() && !this.game.paused()) this.togglePause();
     });
     window.addEventListener('resize', () => this.fit());
+    window.addEventListener('orientationchange', () => this.fit());
     window.visualViewport?.addEventListener('resize', () => this.fit());
     this.fit();
 
@@ -306,10 +311,10 @@ export class App {
    * Put a track under the menus: loaded, bike at its start, phase `menu` so
    * nothing ticks. The countdown cue the load emits is muted for the moment.
    */
-  private loadBackdrop(id: string): void {
+  private loadBackdrop(id: string, fresh = false): void {
     const vol = this.soundOn ? this.volume : 0;
     this.audio?.setMasterVolume(0);
-    if (this.game.currentTrack?.id === id) this.game.startRun();
+    if (!fresh && this.game.currentTrack?.id === id) this.game.startRun();
     else this.game.loadTrack(id);
     this.game.toMenu();
     this.hud.hideResults();
@@ -318,6 +323,7 @@ export class App {
 
   goto(screen: FrontScreen): void {
     this.screen = screen;
+    this.screenAt = performance.now();
     this.touch.setEnabled(false);
     this.pause.hide();
     this.title.hide();
@@ -346,6 +352,7 @@ export class App {
   private play(id: string): void {
     if (!this.game.loadTrack(id)) return;
     this.screen = 'run';
+    this.screenAt = performance.now();
     this.lastTrackId = id;
     try {
       localStorage.setItem(LAST_TRACK_KEY, id);
@@ -364,9 +371,19 @@ export class App {
     this.touch.setEnabled(true);
   }
 
+  /**
+   * Run → main menu, by exactly the cold-boot path: the showcase track is
+   * loaded afresh (`loadTrack` → renderer `setTrack`: world rebuilt, particles
+   * and finish flash cleared, camera cut to the idle framing), phase `menu`,
+   * then the menu fades in over it. Re-arming the finished track in place left
+   * its frozen finish state under the menu (user screenshot, round 3).
+   */
   private quit(): void {
     this.game.setPaused(false);
-    this.loadBackdrop(this.game.currentTrack?.id ?? BACKDROP_TRACK);
+    this.pause.hide();
+    this.hud.hideResults();
+    this.touch.setEnabled(false);
+    this.loadBackdrop(BACKDROP_TRACK, true);
     this.goto('menu');
   }
 
@@ -400,6 +417,11 @@ export class App {
 
   private tickFrame(elapsed: number): void {
     const { frame, meta } = this.mux.poll();
+    if (performance.now() - this.screenAt < SCREEN_GRACE_MS && this.screen !== 'run') {
+      // The key / tap that just changed screens must not also act on the new one.
+      meta.confirm = meta.back = meta.pause = false;
+      meta.navX = meta.navY = 0;
+    }
     if (this.screen === 'title') {
       // Any key / pad button / touch (the title root also listens to pointerdown).
       if (meta.active || meta.confirm || meta.pause || meta.back || frame.throttle > 0 || frame.brake > 0 || frame.lean !== 0) this.title.anyInput();
@@ -471,10 +493,22 @@ export class App {
     }
   }
 
+  /**
+   * Viewport → renderer size. A portrait touch viewport is rotated into a
+   * landscape game (forced landscape, src/ui/orientation.ts): the renderer then
+   * gets the logical `{ w: innerHeight, h: innerWidth }` at the same DPR cap.
+   */
   private fit(): void {
-    const vv = window.visualViewport;
-    const w = Math.round(vv?.width ?? window.innerWidth);
-    const h = Math.round(vv?.height ?? window.innerHeight);
-    this.o.resize(w, h, dprCap());
+    const size = applyOrientation();
+    if (size.forced !== this.forced) {
+      this.forced = size.forced;
+      this.touch.setEnabled(this.screen === 'run' && !this.pause.visible); // drops any pointer mid-rotation
+    }
+    this.o.resize(size.w, size.h, dprCap());
+  }
+
+  /** True while the page is rotated 90° inside a portrait viewport (tests / debug). */
+  forcedLandscape(): boolean {
+    return isForcedLandscape();
   }
 }

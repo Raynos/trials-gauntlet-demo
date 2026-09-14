@@ -132,7 +132,15 @@ export class TitleScreen extends Screen {
       h('div', 'press rise', '<i></i>Press any key · Tap to start'),
       h('div', 'build', escapeHtml(BUILD_STAMP)),
     );
-    this.root.addEventListener('pointerdown', () => this.start(), { passive: true });
+    // Leave on the gesture's END: a pointerdown-triggered transition let the same tap's click land
+    // on whichever menu item had appeared under the finger 200 ms later (the "double fire").
+    let armed = false;
+    this.root.addEventListener('pointerdown', () => (armed = true), { passive: true });
+    this.root.addEventListener('pointerup', () => {
+      if (armed) this.start();
+      armed = false;
+    }, { passive: true });
+    this.root.addEventListener('pointercancel', () => (armed = false), { passive: true });
     art.whenReady(() => art.applyBackground(this.keyart, art.keyart('industrial')));
   }
 
@@ -555,7 +563,7 @@ export class TrackSelectScreen extends Screen {
 // Settings
 // ---------------------------------------------------------------------------
 
-type SettingId = 'quality' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'reset';
+type SettingId = 'quality' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'reset' | 'reload';
 
 interface SettingRow {
   id: SettingId;
@@ -683,6 +691,25 @@ export class SettingsScreen extends Screen {
       });
       el.addEventListener('pointerenter', () => this.focusRow(this.rows.findIndex((r) => r.el === el), true));
       this.rows.push({ id: 'reset', el, step: () => undefined, activate });
+      list.appendChild(el);
+    }
+
+    // Reload game: the only way to pick up a new build from a home-screen install (no browser chrome).
+    {
+      const el = h('div', 'setting');
+      el.innerHTML = `<div class="lab">Reload game<small>Fetches the latest build · settings and best times stay</small></div><button type="button" class="btn">⟳ Reload</button>`;
+      const btn = el.querySelector<HTMLButtonElement>('button')!;
+      const activate = (): void => {
+        btn.textContent = 'Reloading…';
+        this.sfx.confirm();
+        void hardReload();
+      };
+      btn.addEventListener('click', () => {
+        this.focusRow(this.rows.findIndex((r) => r.el === el), false);
+        activate();
+      });
+      el.addEventListener('pointerenter', () => this.focusRow(this.rows.findIndex((r) => r.el === el), true));
+      this.rows.push({ id: 'reload', el, step: () => undefined, activate });
       list.appendChild(el);
     }
     this.focusRow(0, false);
