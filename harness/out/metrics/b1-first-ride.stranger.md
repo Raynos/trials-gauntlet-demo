@@ -1,4 +1,4 @@
-# Stranger — b1-first-ride (bikePhysicsFactory, src e10f2cfe, 2026-09-14T15:41:58.969Z)
+# Stranger — b1-first-ride (bikePhysicsFactory, src d4d4cb77, 2026-09-14T16:51:59.071Z)
 
 completed 0 · cleared 0/0 · median attempts — (band 1–1, pass ≤ 1.5) · median time to clear — · median calls — · median wall — · pass n/a
 
@@ -9,3 +9,5 @@ completed 0 · cleared 0/0 · median attempts — (band 1–1, pass ≤ 1.5) · 
 | b1-first-ride-20260914-051950 | s2 | done (stale src) | 2 | yes | 53.8 s | 47 | 6.3 min | 6 | crash@24m | #2 clear ticks 269–6461 |
 | b1-first-ride-20260914-073444 | s3 | done (stale src) | 1 | yes | 44.1 s | 13 | 2.5 min | 3 | — | #1 clear ticks 0–5290 |
 | b1-first-ride-20260914-073446 | s4 | done (stale src) | 2 | yes | 55.7 s | 15 | 2.9 min | 3 | crash@478m | #2 clear ticks 4633–6688 |
+| b1-first-ride-r3-s1-20260914-113731 | s1 | done (stale src) | 2 | yes | 76.5 s | 20 | 3.1 min | 3 | crash@220m | #2 clear ticks 2370–9372 |
+| b1-first-ride-r3-s2-20260914-113731 | s2 | done (stale src) | 1 | yes | 58.3 s | 19 | 3.0 min | 3 | — | #1 clear ticks 0–7184 |

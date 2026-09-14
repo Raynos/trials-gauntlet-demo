@@ -7,8 +7,8 @@
     1
   ],
   "physics": "bikePhysicsFactory",
-  "srcFingerprint": "e10f2cfe",
-  "updatedAt": "2026-09-14T15:41:58.969Z",
+  "srcFingerprint": "d4d4cb77",
+  "updatedAt": "2026-09-14T16:51:59.071Z",
   "includeStale": false,
   "sessions": [
     {
@@ -232,6 +232,74 @@
           "calls": 10
         }
       ]
+    },
+    {
+      "sessionId": "b1-first-ride-r3-s1-20260914-113731",
+      "agent": "s1",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "68e975a6",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 76.55,
+      "calls": 20,
+      "wallMs": 188185,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 583,
+        "startTick": 2370,
+        "endTick": 9372,
+        "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r3-s1-20260914-113731.json"
+      },
+      "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r3-s1-20260914-113731.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 219.838,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 5
+        }
+      ]
+    },
+    {
+      "sessionId": "b1-first-ride-r3-s2-20260914-113731",
+      "agent": "s2",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "68e975a6",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 58.3167,
+      "calls": 19,
+      "wallMs": 182464,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 583,
+        "startTick": 0,
+        "endTick": 7184,
+        "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r3-s2-20260914-113731.json"
+      },
+      "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r3-s2-20260914-113731.json",
+      "deaths": []
     }
   ],
   "completed": 0,

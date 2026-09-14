@@ -1,0 +1,222 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "e3-stairway",
+  "attemptsBand": [
+    3,
+    6
+  ],
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "d4d4cb77",
+  "updatedAt": "2026-09-14T16:51:59.194Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "e3-stairway-r3-s1-20260914-113731",
+      "agent": "s1",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "1a155a14",
+      "strangerAttempts": 8,
+      "cleared": true,
+      "finishTime": 108.4583,
+      "calls": 44,
+      "wallMs": 846690,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        2,
+        3,
+        2
+      ],
+      "bestAttempt": {
+        "n": 8,
+        "cleared": true,
+        "x": 526.45,
+        "startTick": 11166,
+        "endTick": 13211,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r3-s1-20260914-113731.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r3-s1-20260914-113731.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 170.417,
+          "checkpoint": 1,
+          "obstacle": "stair @ 171.2 m",
+          "calls": 9
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 175.896,
+          "checkpoint": 1,
+          "obstacle": "barrel @ 173.9 m",
+          "calls": 12
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 271.023,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 19
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 267.176,
+          "checkpoint": 2,
+          "obstacle": "stair @ 268.2 m",
+          "calls": 21
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 275.754,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 24
+        },
+        {
+          "n": 6,
+          "endedBy": "restart",
+          "reason": "restart",
+          "x": 401.705,
+          "checkpoint": 3,
+          "obstacle": "stair @ 402.3 m",
+          "calls": 34
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 413.56,
+          "checkpoint": 3,
+          "obstacle": "gap @ 418.4 m",
+          "calls": 37
+        }
+      ]
+    },
+    {
+      "sessionId": "e3-stairway-r3-s2-20260914-113731",
+      "agent": "s2",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "bd2b7d6d",
+      "strangerAttempts": 8,
+      "cleared": true,
+      "finishTime": 92.25,
+      "calls": 38,
+      "wallMs": 742729,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        2,
+        3,
+        0,
+        2
+      ],
+      "bestAttempt": {
+        "n": 8,
+        "cleared": true,
+        "x": 526.45,
+        "startTick": 9257,
+        "endTick": 11262,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r3-s2-20260914-113731.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r3-s2-20260914-113731.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 82.81,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 4
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 69.638,
+          "checkpoint": 0,
+          "obstacle": "stair @ 69.5 m",
+          "calls": 5
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 174.151,
+          "checkpoint": 1,
+          "obstacle": "barrel @ 173.9 m",
+          "calls": 15
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 173.544,
+          "checkpoint": 1,
+          "obstacle": "barrel @ 173.9 m",
+          "calls": 16
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 173.944,
+          "checkpoint": 1,
+          "obstacle": "barrel @ 173.9 m",
+          "calls": 18
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 422.241,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 30
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 413.529,
+          "checkpoint": 3,
+          "obstacle": "gap @ 418.4 m",
+          "calls": 32
+        }
+      ]
+    }
+  ],
+  "completed": 0,
+  "clearedCount": 0,
+  "medianAttempts": null,
+  "medianFinishTime": null,
+  "medianCalls": null,
+  "medianWallMs": null,
+  "pass": null,
+  "deaths": {
+    "total": 0,
+    "byReason": {},
+    "byObstacle": [],
+    "byCheckpoint": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}
