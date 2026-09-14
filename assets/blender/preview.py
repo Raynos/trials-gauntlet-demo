@@ -217,6 +217,57 @@ def preview_composite():
     montage(crops, os.path.join(C.PREVIEWS, "composite-gamesize.png"), 2)
 
 
+def preview_compare():
+    """Our rider+bike next to two reference crops for the same poses (attack, hang-back)."""
+    import subprocess
+
+    ref = os.path.join(C.HERE, "..", "..", "reference")
+    tmp = os.path.join(C.PREVIEWS, "_cmp")
+    os.makedirs(tmp, exist_ok=True)
+    # reference frames straight from the clips
+    subprocess.run(["/opt/homebrew/bin/ffmpeg", "-v", "error", "-y", "-ss", "3.4", "-i", os.path.join(ref, "rising-visuals/clips/02-canyon-multistart.mp4"), "-frames:v", "1", os.path.join(tmp, "ref-idle.png")], check=True)
+    subprocess.run(["/opt/homebrew/bin/ffmpeg", "-v", "error", "-y", "-ss", "5.0", "-i", os.path.join(ref, "techniques/clips/13-wheelie-countdown-launch.mp4"), "-frames:v", "1", os.path.join(tmp, "ref-wheelie.png")], check=True)
+    subprocess.run(["/opt/homebrew/bin/ffmpeg", "-v", "error", "-y", "-ss", "4.2", "-i", os.path.join(ref, "techniques/clips/13-wheelie-countdown-launch.mp4"), "-frames:v", "1", os.path.join(tmp, "ref-go.png")], check=True)
+    subprocess.run(["/opt/homebrew/bin/magick", os.path.join(tmp, "ref-idle.png"), "-crop", "300x300+190+230", "+repage", "-resize", "500x500", os.path.join(tmp, "ref-attack.png")], check=True)
+    subprocess.run(["/opt/homebrew/bin/magick", os.path.join(tmp, "ref-wheelie.png"), "-crop", "240x240+310+290", "+repage", "-resize", "500x500", os.path.join(tmp, "ref-hangback.png")], check=True)
+    subprocess.run(["/opt/homebrew/bin/magick", os.path.join(tmp, "ref-go.png"), "-crop", "240x240+250+280", "+repage", "-resize", "500x500", os.path.join(tmp, "ref-forward.png")], check=True)
+    setup_world()
+    bike, bobjs = import_glb(os.path.join(C.MODELS, "bike.glb"), "bike_import")
+    rider, robjs = import_glb(os.path.join(C.MODELS, "rider.glb"), "rider_import")
+    arm = find_armature(robjs)
+    shots = [
+        ("attack", "stand_attack", 30, 0.0, 42, 16, 3.5, (0.55, 0, 0.70)),
+        ("side", "stand_attack", 30, 0.0, 12, 10, 4.2, (0.55, 0, 0.60)),
+        ("forward", "forward_attack", 30, 0.0, -35, 28, 4.4, (0.55, 0, 0.75)),
+        ("hangback", "hang_back", 30, 38.0, -40, 25, 4.6, (0.45, 0, 0.85)),
+    ]
+    outs = []
+    for label, action, frame, pitch_up, yaw, pitch, dist, target in shots:
+        set_action(arm, action, frame)
+        # pitch bike + rider nose-up about the rear axle (origin): rotate about Blender -Y
+        for g in (bike, rider):
+            g.rotation_euler = (0, -math.radians(pitch_up), 0)
+        cam = camera_at(target, yaw, pitch, dist)
+        p = os.path.join(tmp, f"ours-{label}.png")
+        render(p, 500, 500)
+        bpy.data.objects.remove(cam)
+        outs.append(p)
+    for g in (bike, rider):
+        g.rotation_euler = (0, 0, 0)
+    hero = os.path.join(os.path.dirname(C.HERE), "..", "..", "..", "..")  # unused
+    hero_grid = "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/render3/hero-crops-r6.jpg"
+    side_ref = os.path.join(tmp, "ref-side.png")
+    if os.path.exists(hero_grid):
+        subprocess.run(["/opt/homebrew/bin/magick", hero_grid, "-crop", "440x440+20+440", "+repage", "-resize", "500x500", side_ref], check=True)
+    else:
+        subprocess.run(["/opt/homebrew/bin/magick", "-size", "500x500", "xc:#333", side_ref], check=True)
+    tiles = [os.path.join(tmp, "ref-attack.png"), outs[0], side_ref, outs[1], os.path.join(tmp, "ref-forward.png"), outs[2], os.path.join(tmp, "ref-hangback.png"), outs[3]]
+    labels = ["reference: start-gate attack", "ours: stand_attack", "reference: finish-line side", "ours: stand_attack side", "reference: GO hang-forward", "ours: forward_attack", "reference: wheelie hang-back", "ours: hang_back (bike +38 deg)"]
+    for t, l in zip(tiles, labels):
+        subprocess.run(["/opt/homebrew/bin/magick", t, "-gravity", "north", "-pointsize", "22", "-fill", "white", "-undercolor", "#00000080", "-annotate", "+0+6", l, t], check=True)
+    montage(tiles, os.path.join(C.PREVIEWS, "compare-reference.png"), 2)
+
+
 if __name__ == "__main__":
     os.makedirs(C.PREVIEWS, exist_ok=True)
     if WHAT in ("bike", "all"):
@@ -225,3 +276,5 @@ if __name__ == "__main__":
         preview_rider()
     if WHAT in ("composite", "all") and os.path.exists(os.path.join(C.MODELS, "rider.glb")):
         preview_composite()
+    if WHAT in ("compare", "all") and os.path.exists(os.path.join(C.MODELS, "rider.glb")):
+        preview_compare()

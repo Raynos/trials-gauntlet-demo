@@ -29,7 +29,7 @@ rider only: `--decimate 0.55` (body collapse ratio). Blender 5.2 at `/opt/homebr
 | file | tris | bytes | textures |
 |---|---|---|---|
 | `public/models/bike.glb` | 29 356 (both wheels 14.3k, frame 3.1k, engine 2.1k) | 1 348 068 (meshopt) — 1.89 MB without meshopt | albedo 2048² JPEG, normal 1024², ORM 1024², chain 64×32 PNG |
-| `public/models/rider.glb` | 11 578 (body skin 2.9k + gear 8.6k), 5 880 verts, 19 joints, 8 clips | 860 104 (meshopt) — 1.22 MB without | albedo / normal / ORM 1024² JPEG |
+| `public/models/rider.glb` | 11 718 (body skin ~3k + gear ~8.7k)  5 950 verts  19 joints  8 clips | 856 184 (meshopt) — 1.22 MB without | albedo / normal / ORM 1024² JPEG |
 
 Both files use **`EXT_meshopt_compression`**: three.js needs
 `loader.setMeshoptDecoder(MeshoptDecoder)` with
@@ -101,26 +101,26 @@ pelvis ├ thigh.L └ shin.L └ foot.L
 ```
 
 Every bone's local **+y runs head → tail** (Blender bone convention, kept by the exporter).
-Rest pose = the render's attack chain (`poseRider` at lean 0, crouch 0, torsoPitch 0, armExtend 0;
-physics.md §7.7), evaluated in the file frame. Rest head → tail positions (x, y_up, z_camera),
+Rest pose = `stand_attack` of RIDER_CHAIN.md (reference-measured attack stance: hips over the seat
+rear, torso 40 deg, elbows forward-up-out, knees over the pegs), evaluated in the file frame. Rest head → tail positions (x, y_up, z_camera),
 metres, file frame (rear axle origin) — for `.R` negate z:
 
 | bone | head | tail | length |
 |---|---|---|---|
-| pelvis | (0.518, 0.724, 0) | (0.588, 0.821, 0) | 0.120 — head sits 0.02 below the hip joint (0.530, 0.740) along the torso axis |
-| spine | (0.588, 0.821, 0) | (0.693, 0.968, 0) | 0.180 |
-| chest | (0.693, 0.968, 0) | (0.821, 1.147, 0) = shoulders | 0.220 |
-| neck | (0.821, 1.147, 0) | (0.837, 1.236, 0) | 0.090 |
-| head | (0.837, 1.236, 0) | (0.876, 1.452, 0) | 0.220 — head centre (chain) = (0.855, 1.339) |
-| shoulder.L | (0.821, 1.137, 0.040) | (0.821, 1.147, 0.200) | 0.160 (clavicle) |
-| upperArm.L | (0.821, 1.147, 0.200) | (1.080, 0.997, 0.300) = elbow | 0.316 (0.30 in XY + the 0.10 z spread) |
-| forearm.L | (1.080, 0.997, 0.300) | (0.920, 0.780, 0.330) = grip | 0.272 |
-| hand.L | (0.920, 0.780, 0.330) | (0.867, 0.708, 0.340) | 0.090 (continues the forearm; fist is closed round the bar axis z) |
-| thigh.L | (0.530, 0.740, 0.090) | (0.825, 0.413, 0.160) = knee | 0.446 |
-| shin.L | (0.825, 0.413, 0.160) | (0.520, 0.110, 0.200) = ankle | 0.432 |
-| foot.L | (0.520, 0.110, 0.200) | (0.710, 0.035, 0.200) | 0.204 (boot sole sits on the peg at y 0.02) |
+| pelvis | (0.355, 0.837, -0.000) | (0.447, 0.914, -0.000) | 0.120 |
+| spine | (0.447, 0.914, -0.000) | (0.584, 1.030, -0.000) | 0.180 |
+| chest | (0.584, 1.030, -0.000) | (0.768, 1.184, -0.000) | 0.240 |
+| neck | (0.768, 1.184, -0.000) | (0.809, 1.276, -0.000) | 0.100 |
+| head | (0.809, 1.276, -0.000) | (0.915, 1.513, -0.000) | 0.260 |
+| shoulder.L | (0.768, 1.174, 0.040) | (0.768, 1.184, 0.210) | 0.170 |
+| upperArm.L | (0.768, 1.184, 0.210) | (0.949, 1.057, 0.442) | 0.320 |
+| forearm.L | (0.949, 1.057, 0.442) | (0.920, 0.780, 0.330) | 0.300 |
+| hand.L | (0.920, 0.780, 0.330) | (0.911, 0.697, 0.297) | 0.090 |
+| thigh.L | (0.370, 0.850, 0.090) | (0.671, 0.503, 0.115) | 0.460 |
+| shin.L | (0.671, 0.503, 0.115) | (0.520, 0.110, 0.200) | 0.430 |
+| foot.L | (0.520, 0.110, 0.200) | (0.710, 0.035, 0.200) | 0.204 |
 
-Torso direction at rest = 0.62 rad forward of +y; head direction 0.179 rad.
+Torso at rest = 40 deg from horizontal (hips (-0.28, 0.85) axle-frame), head/neck direction 66 deg. The full pose chain, measured from the reference, is **`assets/blender/RIDER_CHAIN.md`** (canonical poses, joint tables, elbow/knee pole rules) — that file is now the anatomy contract; the render should drive bones from it, not from the old `poseRider` chain.
 
 **Driving the rig from the render's chain (recommended):** capture each bone's rest world quaternion
 `q0[b]` once after load (skeleton in bind pose). Per frame, for each bone in the order above, take
@@ -141,18 +141,18 @@ starts from the rest pose unless stated so they blend from `stand_attack`):
 
 | name | frames | what |
 |---|---|---|
-| `stand_attack` | 1–30 (0.97 s) | rest pose held (lean 0, crouch 0) |
-| `hang_back` | 1–30 | rest → full lean-back at f15 (hips over the rear axle, arms straight, `lean = -1` chain) → hold |
-| `forward_attack` | 1–30 | rest → over the bars at f15 (`lean = +1`) → hold |
-| `crouch` | 1–30 | rest → hop preload at f15 (`crouch = 1`: hips -0.28 m, torso folds 0.35 rad) → hold |
-| `extend` | 1–20 (0.63 s) | starts crouched → legs pushed straight at f8 (`crouch = -0.35`, arms extended) → settle f20 |
-| `land_absorb` | 1–30 | starts extended → deep compress at f8 (`crouch 0.9`, lean -0.3) → rest at f30 |
-| `idle_breathe` | 1–121 (4.0 s loop) | rest ± 3 cm crouch, ±0.015 rad torso, arm flex; cyclic |
-| `sit_cruise` | 1–30 | rest → seated on the seat top (hips (0.33, 0.64), torso 0.30 rad, feet on pegs, hands on grips) at f15 → hold |
+| `stand_attack` | 1–30 (0.97 s) | rest pose held (RIDER_CHAIN `stand_attack`) |
+| `hang_back` | 1–30 | stand_attack → `hang_back` at f15 (hips (-0.57, 0.60), arms straight, torso 55 deg) → hold |
+| `forward_attack` | 1–30 | stand_attack → `forward_attack` at f15 (hips (-0.22, 0.90), torso 26 deg, elbows 73 deg high and out) → hold |
+| `crouch` | 1–30 | stand_attack → `crouch` at f15 (hips (-0.38, 0.78), torso 28 deg, knees 71 deg) → hold |
+| `extend` | 1–20 (0.63 s) | `crouch` → `extend` at f8 (hips (-0.14, 0.96), knees 31 deg, elbows 133 deg) → stand_attack at f20 |
+| `land_absorb` | 1–30 | `extend` → `land_absorb` at f8 (hips (-0.40, 0.70), knees 85 deg) → stand_attack at f30 |
+| `idle_breathe` | 1–121 (4.0 s loop) | stand_attack ± 1.5 cm hips, ± 1.5 deg torso, ± 2 deg head; cyclic |
+| `sit_cruise` | 1–30 | stand_attack → `sit_cruise` at f15 (hips on the seat (-0.30, 0.62), torso 60 deg, knees 104 deg) → hold |
 
-The chain parameter sets used for every key are in `build_actions()`; `chain()` in build_rider.py
-is a line-for-line port of `poseRider` (hang-off pinned shoulders, leg slide, reach slide, head
-0.45·torso − 0.1), so the clips agree with the procedural model's joints to the millimetre.
+Every key is a canonical pose from RIDER_CHAIN.md (`POSES` + `pose_chain()` in build_rider.py: hips,
+torso angle, head angle → 3D two-bone IK with the elbow pole (0.6, 0.5, ±1.0) and knee pole
+(1, 0.2, ∓0.15), hands pinned to the grips with the reach slide); clips are Bezier blends between them.
 
 **Mesh:** body = skin-modifier stick figure (27 verts, per-vertex radii) + subdivision ×2, collapsed
 to 0.55 (≈2.9k tris, continuous surface through hips/shoulders); gear merged into the same mesh:
@@ -177,13 +177,15 @@ Checked in previews/rider-poses.png: no tearing at armpits/knees in any of the 8
 * `composite.png` — rider on bike at the reference camera (yaw 20°, pitch 15° down).
 * `composite-25pct.png`, `composite-40pct.png` (1280×720) and `composite-gamesize.png` (centre crops
   ×2) — the pair at the game's ~25 % and ~40 % frame-height sizes; judge at these.
+* `compare-reference.png` — ours next to reference crops for the same pose and camera: start-gate
+  attack (3/4 front), finish-line side, GO hang-forward, wheelie hang-back (bike pitched +38 deg).
 
 Lighting in previews: one 4 W/m² sun + fill, AgX; the game's own grade will differ.
 
 ## Known limits / next steps for a second pass
 
-* Body proportions are the render's chain (deep attack crouch, hips 0.74 above the axle line);
-  a taller stance is one number in `chain()` if the physics chain moves.
+* The rest pose no longer equals the physics crash-sensor chain (physics.md §7.7 hips 0.74, torso
+  0.62 rad); physics/render should re-derive the sensors from RIDER_CHAIN.md `stand_attack`.
 * Normal maps are subtle (JPEG, 1024²); most surface read comes from albedo + roughness.
 * No morph targets, no facial anything (helmet + goggles); no separate visor object.
 * Bike: no headlight (trials bikes do not have one), no brake lines/cables.

@@ -32,96 +32,180 @@ MESHOPT = "--no-meshopt" not in ARGS
 FPS = 30
 BODY_DECIMATE = float(ARGS[ARGS.index("--decimate") + 1]) if "--decimate" in ARGS else 0.55
 
-# ---- render's rider chain (riderModel.ts) in the axle-midpoint frame; +0.65 x -> rear-axle frame
+# ---- rider chain (assets/blender/RIDER_CHAIN.md), measured from the reference; +0.65 x -> rear-axle frame
 X0 = 0.65
-L = dict(torso=0.5, headUp=0.195, headR=0.125, upperArm=0.3, forearm=0.27, thigh=0.44, shin=0.43, ankle=0.09, hipHalf=0.09, shoulderHalf=0.2, pelvis=0.2)
+L = dict(torso=0.52, neck=0.22, headR=0.13, upperArm=0.32, forearm=0.30, thigh=0.46, shin=0.43, ankle=0.09, hipHalf=0.09, shoulderHalf=0.21, pelvis=0.2)
 GRIP = (0.27 + X0, 0.78)
 GRIP_Z = 0.33
 PEGS = (-0.14 + X0, 0.02)
 PEG_HALF = 0.2
 SEAT_TOP = (-0.3 + X0, 0.55)
+ELBOW_POLE = Vector((0.6, 0.5, 1.0))   # forward-up-out (z sign flipped per side)
+KNEE_POLE = Vector((1.0, 0.2, -0.15))  # forward, a little up, slightly IN (z sign flipped per side)
+KNEE_MIN_Z = 0.08
+
+# canonical poses: hips (x, y) in AXLE coords, torso angle from horizontal (deg), head angle (deg)
+POSES = dict(
+    stand_attack=dict(hips=(-0.28, 0.85), torso=40, head=66),
+    forward_attack=dict(hips=(-0.22, 0.90), torso=26, head=42),
+    hang_back=dict(hips=(-0.57, 0.60), torso=55, head=75),
+    crouch=dict(hips=(-0.38, 0.78), torso=28, head=40),
+    sit_cruise=dict(hips=(-0.30, 0.62), torso=60, head=80),
+    extend=dict(hips=(-0.14, 0.96), torso=46, head=70),
+    land_absorb=dict(hips=(-0.40, 0.70), torso=30, head=45),
+)
 
 
-def ik2(ax, ay, bx, by, l1, l2, side):
-    dx, dy = bx - ax, by - ay
-    d = math.hypot(dx, dy)
+def ik3(a, b, l1, l2, pole):
+    """3D two-bone IK: joint for a->b with lengths l1/l2, elbow/knee pushed toward `pole`.
+    Returns (joint, reach_clamped)."""
+    a, b = Vector(a), Vector(b)
+    d = b - a
+    dist = d.length
     mx = (l1 + l2) * 0.995
     mn = abs(l1 - l2) + 0.02
-    if d > mx or d < mn:
-        k = (mx if d > mx else mn) / (d or 1e-6)
-        dx *= k
-        dy *= k
-        d = mx if d > mx else mn
-    a = (l1 * l1 - l2 * l2 + d * d) / (2 * d)
-    h = math.sqrt(max(0.0, l1 * l1 - a * a))
-    ux, uy = dx / d, dy / d
-    return (ax + ux * a - uy * h * side, ay + uy * a + ux * h * side)
+    dist_c = min(max(dist, mn), mx)
+    u = d / (dist or 1e-6)
+    x = (l1 * l1 - l2 * l2 + dist_c * dist_c) / (2 * dist_c)
+    h = math.sqrt(max(0.0, l1 * l1 - x * x))
+    p = Vector(pole)
+    p = p - u * p.dot(u)
+    if p.length < 1e-6:
+        p = Vector((0, 0, 1))
+    p.normalize()
+    return a + u * x + p * h, dist > mx
 
 
-def chain(lean=0.0, crouch=0.0, torsoPitch=0.0, armExtend=0.0, seated=False, hips_override=None):
-    """Port of riderModel.ts poseRider -> joint positions in the rear-axle frame (x, z) + z-widths.
-    Returns dict of 3D Blender-frame Vectors for both sides (.L = -y)."""
-    back = max(0.0, -lean)
-    fwd = max(0.0, lean)
-    cr = crouch  # (render clamps >= 0; negative = legs extending for the hop push)
+def pose_chain(hips=(-0.20, 0.93), torso=47.0, head=68.0, side_z=None):
+    """Canonical pose -> joint positions (Blender frame: x fwd, y = -z_camera, z up), keys like the
+    old chain(): hips, shoulders, head, torsoDir, headDir, and per side shoulder/elbow/wrist/hip/knee/
+    ankle/toe.  Hands stay ON the grips: if the shoulder is out of arm's reach the whole upper body
+    slides toward the bars along the shoulder->grip line (and away if closer than 0.18 m)."""
+    hx, hy = hips[0] + X0, hips[1]
+    ta = math.radians(torso)
+    ha = math.radians(head)
+    t = Vector((math.cos(ta), 0, math.sin(ta)))      # torso direction (hips -> shoulders)
+    hd = Vector((math.cos(ha), 0, math.sin(ha)))     # neck/head direction
+    S = Vector((hx, 0, hy)) + t * L["torso"]
+    H = Vector((hx, 0, hy))
     gx, gy = GRIP
     reach = (L["upperArm"] + L["forearm"]) * 0.985
-    hx = -0.12 - 0.28 * back + 0.14 * fwd - 0.06 * max(cr, 0) + X0
-    hy = 0.74 - 0.28 * cr
-    torsoA = 0.62 + torsoPitch + 0.3 * fwd + 0.35 * max(cr, 0) - 0.1 * back - 0.1 * armExtend
-    if seated:
-        hx, hy = SEAT_TOP[0] - 0.02, SEAT_TOP[1] + 0.09
-        torsoA = 0.30 + torsoPitch
-    if hips_override:
-        hx, hy = hips_override
-    sx = hx + math.sin(torsoA) * L["torso"]
-    sy = hy + math.cos(torsoA) * L["torso"]
-    if back > 0 and not seated:
-        phi = 0.32 + 0.15 * max(cr, 0)
-        px = gx - math.cos(phi) * reach
-        py = gy + math.sin(phi) * reach
-        sx += (px - sx) * back
-        sy += (py - sy) * back
-        hx = sx - math.sin(torsoA) * L["torso"]
-        hy = sy - math.cos(torsoA) * L["torso"]
+    # reach slide (3D distance shoulder joint -> grip, z from +-0.21 to +-0.33)
+    dz = GRIP_Z - L["shoulderHalf"]
+    dvec = Vector((gx - S.x, 0, gy - S.z))
+    d3 = math.hypot(dvec.length, dz)
+    near = 0.18
+    if d3 > reach or d3 < near:
+        want = reach if d3 > reach else near
+        planar = math.sqrt(max(want * want - dz * dz, 1e-6))
+        shift = dvec.normalized() * (dvec.length - planar)
+        S += shift
+        H += shift
+    # leg slide: hips never beyond thigh+shin from the ankles
     ax0 = PEGS[0] + 0.01
     ay0 = PEGS[1] + L["ankle"]
     legReach = (L["thigh"] + L["shin"]) * 0.985
-    d = math.hypot(hx - ax0, hy - ay0)
-    if d > legReach:
-        kk = (d - legReach) / d
-        hx += (ax0 - hx) * kk
-        hy += (ay0 - hy) * kk
-        sx = hx + math.sin(torsoA) * L["torso"]
-        sy = hy + math.cos(torsoA) * L["torso"]
-    ddx, ddy = gx - sx, gy - sy
-    d = math.hypot(ddx, ddy)
-    near = 0.3
-    if d > reach or d < near:
-        kk = (d - (reach if d > reach else near)) / (d or 1e-6)
-        sx += ddx * kk
-        sy += ddy * kk
-        hx += ddx * kk
-        hy += ddy * kk
-    headA = torsoA * 0.45 - 0.1
-    hdx = sx + math.sin(headA) * L["headUp"]
-    hdy = sy + math.cos(headA) * L["headUp"]
-    ex, ey = ik2(sx, sy, gx, gy, L["upperArm"], L["forearm"], 1)
-    kx, ky = ik2(hx, hy, ax0, ay0, L["thigh"], L["shin"], 1)
-    t = Vector((math.sin(torsoA), 0, math.cos(torsoA)))
-    hd = Vector((math.sin(headA), 0, math.cos(headA)))
-    J = dict(
-        hips=V(hx, 0, hy), shoulders=V(sx, 0, sy), head=V(hdx, 0, hdy), torsoDir=t, headDir=hd, torsoA=torsoA, headA=headA,
-    )
+    dl = Vector((ax0 - H.x, 0, ay0 - H.z))
+    dzl = PEG_HALF - L["hipHalf"]
+    d3l = math.hypot(dl.length, dzl)
+    if d3l > legReach:
+        planar = math.sqrt(max(legReach ** 2 - dzl ** 2, 1e-6))
+        shift = dl.normalized() * (dl.length - planar)
+        H += shift
+        S += shift
+    headC = S + hd * L["neck"]
+    J = dict(hips=H, shoulders=S, head=headC, torsoDir=t, headDir=hd, torsoA=math.pi / 2 - ta, headA=math.pi / 2 - ha)
     for name, s in (("L", -1), ("R", 1)):
-        J["shoulder." + name] = V(sx, s * L["shoulderHalf"], sy)
-        J["elbow." + name] = V(ex, s * 0.30, ey)
-        J["wrist." + name] = V(gx, s * GRIP_Z, gy)
-        J["hip." + name] = V(hx, s * L["hipHalf"], hy)
-        J["knee." + name] = V(kx, s * 0.16, ky)
-        J["ankle." + name] = V(ax0, s * PEG_HALF, ay0)
-        J["toe." + name] = V(ax0 + 0.19, s * PEG_HALF, ay0 - 0.075)
+        sh = Vector((S.x, s * L["shoulderHalf"], S.z))
+        wr = Vector((gx, s * GRIP_Z, gy))
+        # axle pole (x, y_up, z_cam*sign) -> blender (x, y_bl = -z_cam, z_bl = y_up); side s=-1 is .L (+z_cam)
+        pole = Vector((ELBOW_POLE.x, s * ELBOW_POLE.z, ELBOW_POLE.y))
+        el, _ = ik3(sh, wr, L["upperArm"], L["forearm"], pole)
+        hp = Vector((H.x, s * L["hipHalf"], H.z))
+        an = Vector((ax0, s * PEG_HALF, ay0))
+        kpole = Vector((KNEE_POLE.x, s * KNEE_POLE.z, KNEE_POLE.y))
+        kn, _ = ik3(hp, an, L["thigh"], L["shin"], kpole)
+        if abs(kn.y) < KNEE_MIN_Z:
+            kn.y = s * KNEE_MIN_Z
+        J["shoulder." + name] = sh
+        J["elbow." + name] = el
+        J["wrist." + name] = wr
+        J["hip." + name] = hp
+        J["knee." + name] = kn
+        J["ankle." + name] = an
+        J["toe." + name] = an + Vector((0.19, 0, -0.075))
     return J
+
+
+def chain(pose="stand_attack", **over):
+    """Canonical pose by name with optional overrides (hips=(x,y), torso=deg, head=deg, dh=(dx,dy), dt=deg)."""
+    P = dict(POSES[pose])
+    dh = over.pop("dh", None)
+    if dh:
+        P["hips"] = (P["hips"][0] + dh[0], P["hips"][1] + dh[1])
+    dt = over.pop("dt", None)
+    if dt:
+        P["torso"] = P["torso"] + dt
+    P.update(over)
+    return pose_chain(**P)
+
+
+def to_axle(v):
+    """Blender file-frame Vector -> AXLE coords (x fwd, y up, z camera) tuple."""
+    return (round(v.x - X0, 3), round(v.z, 3), round(-v.y, 3))
+
+
+def write_chain_md(path):
+    lines = []
+    lines.append("# Rider chain (measured from the reference, owned by assets/blender)\n")
+    lines.append("Rider 1.78 m at 7.5 heads (head 0.237). AXLE coordinates: origin = axle midpoint at static sag, x forward, y up, z toward the camera (rider's LEFT = +z). Grips fixed at (0.27, 0.78, +-0.33), pegs at (-0.14, 0.02, +-0.20); ankles = pegs + (0.01, 0.09).\n")
+    lines.append("## Segment lengths (m)\n")
+    lines.append("| segment | length | note |\n|---|---|---|")
+    lines.append(f"| torso (hip joint -> shoulder line) | {L['torso']:.2f} | acromion height for 1.78 m |")
+    lines.append(f"| neck (shoulder line -> head/helmet centre) | {L['neck']:.2f} | helmet radius {L['headR']:.2f}; helmet bottom sits 0.09 above the shoulder line = a visible neck |")
+    lines.append(f"| upper arm | {L['upperArm']:.2f} | shoulder joint -> elbow |")
+    lines.append(f"| forearm (elbow -> grip centre, fist included) | {L['forearm']:.2f} | |")
+    lines.append(f"| thigh | {L['thigh']:.2f} | hip joint -> knee |")
+    lines.append(f"| shin (knee -> ankle) | {L['shin']:.2f} | ankle 0.09 above the peg, boot on the peg |")
+    lines.append(f"| shoulder half width | {L['shoulderHalf']:.2f} | biacromial 0.42 |")
+    lines.append(f"| hip half width | {L['hipHalf']:.2f} | |")
+    lines.append("\nMeasured on reference/techniques/clips 13 (countdown, GO, wheelie), 06/07 (hang-forward climb, landing), 03 (rear-wheel balance), rising-visuals 02 (start gate idle) and the hero crop grid: attack torso 45-50 deg from horizontal, upper arm 25-35 deg below horizontal going FORWARD and OUT, elbow interior 125-130 deg, forearm ~70 deg down to the bar; thigh 65-70 deg below horizontal, knee flexion 35-45 deg, shin 12-18 deg from vertical (foot behind the knee); hang-forward: torso 20-30, elbows 85-95 high and out; hang-back: arms straight (~170), shoulders ~25 deg above the bar line, torso 50-60, knees 80-95; countdown crouch: torso 20-30, elbows 60-75, knees 100-110; elbows ~0.2 m outside the shoulders in 3/4 views, knees on the tank sides.\n")
+    lines.append("## Bend-direction rules (pole vectors for a 2-bone IK)\n")
+    lines.append("Two-bone IK in 3D: `u = normalize(B - A)`, `x = (l1^2 - l2^2 + d^2) / 2d`, `h = sqrt(l1^2 - x^2)`, joint `= A + u*x + h * normalize(pole - u*(pole.u))`. Reach is clamped to 0.995*(l1+l2); if the shoulder is farther than 0.985*(l1+l2) from the grip the WHOLE upper body slides toward the grip along the shoulder->grip line (hands never leave the grips), and away if closer than 0.18 m; the hips never go beyond 0.985*(thigh+shin) from the ankles.\n")
+    lines.append(f"* **Elbow pole = forward-up-out:** `pole = (0.6, 0.5, sign(side)*1.0)` in axle coords (side = +1 for .L/+z, -1 for .R). In attack the elbow ends ~0.18 m ahead of, ~0.14 m below and ~0.22 m outside the shoulder (upper arm ~27 deg below horizontal going forward and out, elbow ~0.28 m above the grip), the forearm angles ~70 deg down and in to the grip: one wide S from shoulder to bar. A pure up-or-out pole is WRONG: it folds the elbow sideways and the arm reads as hanging straight from the side view. Never below the bar line, never behind the shoulder.")
+    lines.append(f"* **Knee pole = forward-and-slightly-in:** `pole = (1, 0.2, -sign(side)*0.15)`; clamp `|knee.z| >= {KNEE_MIN_Z}` so the knees hug the tank sides (tank half width 0.10) without crossing. Knee ends ahead of the hip and roughly above the peg; the shin is 10-20 deg from vertical in attack.")
+    lines.append("* Torso: hips -> shoulders at the torso angle from horizontal; head/helmet centre = shoulders + 0.22 at the head angle (always more upright than the torso: the rider looks ahead). Shoulder joints at z = +-0.21 on the shoulder line; hips at z = +-0.09.\n")
+    lines.append("## Canonical poses (AXLE coords, metres; .L side listed, .R mirrors z)\n")
+    lines.append("| pose | hips (x,y) | torso deg | head deg | interior elbow | knee flexion |\n|---|---|---|---|---|---|")
+    tables = []
+    for name in ("stand_attack", "hang_back", "forward_attack", "crouch", "sit_cruise", "extend", "land_absorb"):
+        P = POSES[name]
+        J = pose_chain(**P)
+        sh, el, wr = J["shoulder.L"], J["elbow.L"], J["wrist.L"]
+        hp, kn, an = J["hip.L"], J["knee.L"], J["ankle.L"]
+        def ang(a, b, c):
+            v1 = (a - b).normalized()
+            v2 = (c - b).normalized()
+            return math.degrees(math.acos(max(-1, min(1, v1.dot(v2)))))
+        e_int = ang(sh, el, wr)
+        k_int = ang(hp, kn, an)
+        lines.append(f"| {name} | ({P['hips'][0]:.2f}, {P['hips'][1]:.2f}) | {P['torso']} | {P['head']} | {e_int:.0f} | {180 - k_int:.0f} |")
+        chest = J["hips"] + J["torsoDir"] * (L["torso"] * 0.72)
+        rows = [("hips", J["hips"]), ("chest", chest), ("shoulders (centre)", J["shoulders"]), ("shoulder.L", sh), ("elbow.L", el), ("hand.L (grip)", wr), ("hip.L", hp), ("knee.L", kn), ("ankle.L", an), ("head (helmet centre)", J["head"])]
+        tables.append((name, rows))
+    lines.append("")
+    for name, rows in tables:
+        lines.append(f"### {name}\n")
+        lines.append("| joint | x | y | z |\n|---|---|---|---|")
+        for label, v in rows:
+            x, y, z = to_axle(v)
+            lines.append(f"| {label} | {x:.3f} | {y:.3f} | {z:+.3f} |")
+        lines.append("")
+    lines.append("`extend` (hop push) and `land_absorb` (touchdown) are the two transient poses the clips pass through; `stand_attack` is the rest pose of rider.glb.\n")
+    lines.append("## Clips = blends between canonical poses (30 fps)\n")
+    lines.append("stand_attack: hold. hang_back / forward_attack / crouch / sit_cruise: stand_attack -> pose at f15 -> hold to f30. extend: crouch -> extend at f8 -> stand_attack at f20. land_absorb: extend -> land_absorb at f8 -> stand_attack at f30. idle_breathe: stand_attack with hips +-1.5 cm, torso +-1.5 deg, head +-2 deg over 4 s (cyclic).\n")
+    with open(path, "w") as f:
+        f.write("\n".join(lines))
 
 
 REST = chain()
@@ -138,8 +222,8 @@ def define_bones(J):
     B["pelvis"] = (H - t * 0.02, H + t * 0.10, None)
     B["spine"] = (H + t * 0.10, H + t * 0.28, "pelvis")
     B["chest"] = (H + t * 0.28, S, "spine")
-    B["neck"] = (S, S + hd * 0.09, "chest")
-    B["head"] = (S + hd * 0.09, S + hd * 0.31, "neck")
+    B["neck"] = (S, S + hd * 0.10, "chest")
+    B["head"] = (S + hd * 0.10, S + hd * 0.36, "neck")
     for s, sg in (("L", -1), ("R", 1)):
         B["shoulder." + s] = (S + V(0, sg * 0.04, -0.01), J["shoulder." + s], "chest")
         B["upperArm." + s] = (J["shoulder." + s], J["elbow." + s], "shoulder." + s)
@@ -350,24 +434,24 @@ def build_body(J, M):
     crotch = add(H - t * 0.13 + fwd * 0.01, 0.085, 0.055)
     hips = add(H, 0.16, 0.115)
     belly = add(H + t * 0.22, 0.155, 0.14)
-    chest = add(H + t * 0.40 - fwd * 0.01, 0.20, 0.16)
-    neckb = add(S + t * 0.015, 0.09, 0.08)
-    neckt = add(S + hd * 0.10, 0.055, 0.055)
-    skull = add(S + hd * 0.215, 0.085, 0.09)
+    chest = add(H + t * 0.40 - fwd * 0.01, 0.225, 0.17)
+    neckb = add(S + t * 0.01, 0.10, 0.085)
+    neckt = add(S + hd * 0.11, 0.058, 0.058)
+    skull = add(S + hd * 0.22, 0.085, 0.09)
     for a, b in ((crotch, hips), (hips, belly), (belly, chest), (chest, neckb), (neckb, neckt), (neckt, skull)):
         seg(a, b)
     for s, sg in (("L", -1), ("R", 1)):
-        sh = add(J["shoulder." + s] - side * (sg * 0.02), 0.08, 0.072)
-        ua = add(J["shoulder." + s].lerp(J["elbow." + s], 0.5), 0.062, 0.058)
+        sh = add(J["shoulder." + s] - side * (sg * 0.015), 0.078, 0.07)
+        ua = add(J["shoulder." + s].lerp(J["elbow." + s], 0.5), 0.07, 0.065)
         el = add(J["elbow." + s], 0.054, 0.05)
         fa = add(J["elbow." + s].lerp(J["wrist." + s], 0.55), 0.055, 0.051)
         wr = add(J["wrist." + s] - (J["wrist." + s] - J["elbow." + s]).normalized() * 0.04, 0.041, 0.039)
         for a, b in ((chest, sh), (sh, ua), (ua, el), (el, fa), (fa, wr)):
             seg(a, b)
         hp = add(J["hip." + s] - side * (sg * 0.005), 0.10, 0.095)
-        th = add(J["hip." + s].lerp(J["knee." + s], 0.5), 0.092, 0.088)
-        kn = add(J["knee." + s], 0.072, 0.07)
-        sn = add(J["knee." + s].lerp(J["ankle." + s], 0.5), 0.058, 0.056)
+        th = add(J["hip." + s].lerp(J["knee." + s], 0.5), 0.095, 0.09)
+        kn = add(J["knee." + s], 0.062, 0.06)
+        sn = add(J["knee." + s].lerp(J["ankle." + s], 0.5), 0.056, 0.054)
         an = add(J["ankle." + s], 0.05, 0.05)
         for a, b in ((hips, hp), (hp, th), (th, kn), (kn, sn), (sn, an)):
             seg(a, b)
@@ -435,9 +519,9 @@ def build_gear(J, M, b):
         (fwd_t.z, 0, t.z, S.z),
         (0, 0, 0, 1),
     ))
-    add(b, prim_torus(0.10, 0.026, seg=28, sides=8, scale_r=(1.1, 1)), Mt @ Matrix.Translation((-0.02, 0, -0.03)) @ Matrix.Diagonal((1.1, 1.3, 1, 1)), M["armour"], "chest")
+    add(b, prim_torus(0.10, 0.024, seg=28, sides=8, scale_r=(1.1, 1)), Mt @ Matrix.Translation((-0.03, 0, -0.02)) @ Matrix.Diagonal((1.1, 1.3, 1, 1)), M["armour"], "chest")
     add(b, prim_torus(0.068, 0.012, seg=20, sides=6), Mt @ Matrix.Translation((0.0, 0, 0.012)), M["pants"], "chest")
-    add(b, prim_sphere(0.095, seg=16, rings=10, scale=(0.7, 1.25, 1.45)), Mt @ Matrix.Translation((-0.115, 0, -0.15)), M["jersey"], lambda co: {"chest": 1.0})
+    add(b, prim_sphere(0.085, seg=16, rings=10, scale=(0.6, 1.2, 1.4)), Mt @ Matrix.Translation((-0.115, 0, -0.16)), M["jersey"], lambda co: {"chest": 1.0})
     # number patch on the back (a decal quad floating 4 mm off the hump) and a small one on the chest
     add(b, prim_box(0.004, 0.20, 0.20, bevel=0.0, segments=1), Mt @ Matrix.Translation((-0.165, 0, -0.14)), M["number"], "chest", smooth=False)
     NUMBER_PATCHES.append((Mt @ Vector((-0.165, 0, -0.14)), Vector((0, -1, 0)), t, 0.20))
@@ -461,7 +545,7 @@ def build_gear(J, M, b):
         an, kn = J["ankle." + s], J["knee." + s]
         sd = (kn - an).normalized()
         shaft_len = 0.30
-        add(b, prim_lathe([(0.0, -0.01), (0.062, 0.0), (0.06, 0.12), (0.056, 0.24), (0.062, shaft_len), (0.0, shaft_len + 0.01)], seg=14), Matrix.Translation(an) @ C.rot_frame(sd), M["boots"], lambda co, an=an, sd=sd, s=s: {"shin." + s: 1.0} if (co - an).dot(sd) > 0.05 else {"shin." + s: 0.6, "foot." + s: 0.4})
+        add(b, prim_lathe([(0.0, -0.01), (0.058, 0.0), (0.056, 0.12), (0.054, 0.24), (0.06, shaft_len), (0.0, shaft_len + 0.01)], seg=14), Matrix.Translation(an) @ C.rot_frame(sd), M["boots"], lambda co, an=an, sd=sd, s=s: {"shin." + s: 1.0} if (co - an).dot(sd) > 0.05 else {"shin." + s: 0.6, "foot." + s: 0.4})
         Mf = Matrix.Translation(an)
         add(b, prim_box(0.25, 0.105, 0.085, bevel=0.03, segments=3), Mf @ Matrix.Translation((0.055, 0, -0.048)), M["boots"], "foot." + s)
         add(b, prim_box(0.09, 0.10, 0.06, bevel=0.028, segments=3), Mf @ Matrix.Translation((0.155, 0, -0.06)), M["boots"], "foot." + s)
@@ -473,10 +557,10 @@ def build_gear(J, M, b):
         # -- knee brace: cup over the knee + hinge plates, on the knee (thigh/shin blend)
         td = (kn - J["hip." + s]).normalized()
         knee_fwd = Vector((td.z, 0, -td.x))
-        add(b, prim_sphere(0.075, seg=14, rings=8, scale=(0.9, 1.0, 1.1)), Matrix.Translation(kn + knee_fwd * 0.03 - td * 0.02), M["armour"], {"thigh." + s: 0.5, "shin." + s: 0.5})
-        add(b, prim_box(0.10, 0.10, 0.18, bevel=0.035, segments=3), Matrix.Translation(kn + knee_fwd * 0.035) @ C.rot_frame(sd) , M["armour"], {"thigh." + s: 0.5, "shin." + s: 0.5})
+        add(b, prim_sphere(0.062, seg=14, rings=8, scale=(0.9, 1.0, 1.1)), Matrix.Translation(kn + knee_fwd * 0.025 - td * 0.02), M["armour"], {"thigh." + s: 0.5, "shin." + s: 0.5})
+        add(b, prim_box(0.085, 0.09, 0.16, bevel=0.03, segments=3), Matrix.Translation(kn + knee_fwd * 0.03) @ C.rot_frame(sd), M["armour"], {"thigh." + s: 0.5, "shin." + s: 0.5})
         for hs in (-1, 1):
-            add(b, prim_cylinder(0.032, 0.032, 0.012, seg=12), Matrix.Translation(kn + V(0, hs * 0.068, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"), M["alloy"], {"thigh." + s: 0.5, "shin." + s: 0.5}, sharp=40)
+            add(b, prim_cylinder(0.022, 0.022, 0.010, seg=12), Matrix.Translation(kn + V(0, hs * 0.058, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"), M["alloy"], {"thigh." + s: 0.5, "shin." + s: 0.5}, sharp=40)
         # -- hip pads / belt on the pelvis
 
 
@@ -564,8 +648,8 @@ def pose_from_joints(arm, B, J):
     targets["pelvis"] = (H - t * 0.02, H + t * 0.10)
     targets["spine"] = (H + t * 0.10, H + t * 0.28)
     targets["chest"] = (H + t * 0.28, S)
-    targets["neck"] = (S, S + hd * 0.09)
-    targets["head"] = (S + hd * 0.09, S + hd * 0.31)
+    targets["neck"] = (S, S + hd * 0.10)
+    targets["head"] = (S + hd * 0.10, S + hd * 0.36)
     for s, sg in (("L", -1), ("R", 1)):
         targets["shoulder." + s] = (S + V(0, sg * 0.04, -0.01), J["shoulder." + s])
         targets["upperArm." + s] = (J["shoulder." + s], J["elbow." + s])
@@ -619,8 +703,6 @@ def make_action(arm, name, keys, loop=False):
     except Exception:
         pass
     for frame, J in keys:
-        if isinstance(J, dict) and "hips" not in J:
-            J = chain(**J)
         pose_from_joints(arm, BONES, J)
         key_all(arm, frame)
     act.frame_range = (keys[0][0], keys[-1][0])
@@ -641,19 +723,20 @@ def make_action(arm, name, keys, loop=False):
 
 def build_actions(arm):
     A = {}
-    rest = chain()
+    P = lambda name, **o: chain(name, **o)  # noqa: E731
+    rest = P("stand_attack")
     A["stand_attack"] = make_action(arm, "stand_attack", [(1, rest), (30, rest)])
-    A["hang_back"] = make_action(arm, "hang_back", [(1, rest), (15, dict(lean=-1.0)), (30, dict(lean=-1.0))])
-    A["forward_attack"] = make_action(arm, "forward_attack", [(1, rest), (15, dict(lean=1.0, torsoPitch=0.05)), (30, dict(lean=1.0, torsoPitch=0.05))])
-    A["crouch"] = make_action(arm, "crouch", [(1, rest), (15, dict(crouch=1.0)), (30, dict(crouch=1.0))])
-    A["extend"] = make_action(arm, "extend", [(1, dict(crouch=1.0)), (8, dict(crouch=-0.35, armExtend=1.0, torsoPitch=-0.15)), (20, dict(crouch=-0.2, armExtend=0.6, torsoPitch=-0.1))])
-    A["land_absorb"] = make_action(arm, "land_absorb", [(1, dict(crouch=-0.2, armExtend=0.3)), (8, dict(crouch=0.9, lean=-0.3, torsoPitch=-0.05)), (30, rest)])
+    A["hang_back"] = make_action(arm, "hang_back", [(1, rest), (15, P("hang_back")), (30, P("hang_back"))])
+    A["forward_attack"] = make_action(arm, "forward_attack", [(1, rest), (15, P("forward_attack")), (30, P("forward_attack"))])
+    A["crouch"] = make_action(arm, "crouch", [(1, rest), (15, P("crouch")), (30, P("crouch"))])
+    A["extend"] = make_action(arm, "extend", [(1, P("crouch")), (8, P("extend")), (20, rest)])
+    A["land_absorb"] = make_action(arm, "land_absorb", [(1, P("extend")), (8, P("land_absorb")), (30, rest)])
     breathe = []
     for f in range(0, 121, 15):
         ph = f / 120 * 2 * math.pi
-        breathe.append((1 + f, dict(crouch=0.03 - 0.03 * math.cos(ph), torsoPitch=0.015 * math.sin(ph), armExtend=0.05 - 0.05 * math.cos(ph))))
+        breathe.append((1 + f, P("stand_attack", dh=(0.0, -0.015 + 0.015 * math.cos(ph)), dt=1.5 * math.sin(ph), head=68 + 2 * math.sin(ph))))
     A["idle_breathe"] = make_action(arm, "idle_breathe", breathe, loop=True)
-    A["sit_cruise"] = make_action(arm, "sit_cruise", [(1, rest), (15, dict(seated=True)), (30, dict(seated=True, torsoPitch=0.02))])
+    A["sit_cruise"] = make_action(arm, "sit_cruise", [(1, rest), (15, P("sit_cruise")), (30, P("sit_cruise", head=82))])
     return A
 
 
@@ -688,6 +771,7 @@ def main():
     tris = C.tri_count(body)
     log("rider tris", tris, "verts", len(body.data.vertices))
 
+    write_chain_md(os.path.join(C.HERE, "RIDER_CHAIN.md"))
     C.unwrap_all([body], angle=66, margin=0.002)
     apply_number_uvs(body, M)
     if not NO_BAKE:
