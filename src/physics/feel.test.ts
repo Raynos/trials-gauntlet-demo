@@ -72,19 +72,33 @@ describe('launch and top speed (C2)', () => {
 });
 
 describe('stranger launch and speed governor (round 2)', () => {
-  function constant(thr: number, lean: number, seconds = 15): { top: number; fault: string | null; finish: number | null; faultAt: number; t16: number } {
+  function constant(
+    thr: number,
+    lean: number,
+    seconds = 15,
+  ): { top: number; fault: string | null; finish: number | null; faultAt: number; t16: number; maxPitch: number; plateauLo: number; plateauHi: number } {
     const w = createBikePhysics(HZ);
     w.loadTrack(makeTrack({ finishX: 120 }), 1);
     let top = 0;
     let faultAt = -1;
     let t16 = -1;
+    let maxPitch = -999;
+    let plateauLo = 999;
+    let plateauHi = -999;
     stepN(w, { throttle: thr, lean }, HZ * seconds, (s) => {
       top = Math.max(top, s.bike.vel.x);
       if (t16 < 0 && s.bike.vel.x >= 16) t16 = s.time;
       if (s.faulted && faultAt < 0) faultAt = s.time;
+      if (!s.faulted) {
+        maxPitch = Math.max(maxPitch, deg(s.bike.angle));
+        if (s.time > 3 && s.finishTime === null) {
+          plateauLo = Math.min(plateauLo, deg(s.bike.angle));
+          plateauHi = Math.max(plateauHi, deg(s.bike.angle));
+        }
+      }
     });
     const s = w.getState();
-    return { top, fault: s.faulted, finish: s.finishTime, faultAt, t16 };
+    return { top, fault: s.faulted, finish: s.finishTime, faultAt, t16, maxPitch, plateauLo, plateauHi };
   }
   it('thr=1 lean=+0.4 held constant finishes flat-test without a fault', () => {
     const r = constant(1, 0.4);
@@ -92,15 +106,35 @@ describe('stranger launch and speed governor (round 2)', () => {
     expect(r.fault).toBeNull();
     expect(r.finish).not.toBeNull();
   });
-  it('thr=1 lean=0 does not loop for >= 1.5 s (round 7: 2.26 s with the soft clutch off idle, was 1.11); lean=-1 still loops (2.4 s: sitting back at full throttle is the hop preload, the crouched rider loops when he stands back up)', () => {
+  it('thr=1 lean=0 held from rest lifts the front into a self-limiting wheelie (30-40 deg, never loops) and reaches the finish (round 8: pitch-aware drive; round 7 looped at 2.26 s / x 24 m, every stranger\'s first crash); lean -0.3 the same', () => {
     const l0 = constant(1, 0);
+    const l3 = constant(1, -0.3);
+    feel('wheelieControl.thr1.lean0.maxPitchDeg', l0.maxPitch, '25-42 (a wheelie, not a loop)');
+    feel('wheelieControl.thr1.lean0.plateauDeg', `${l0.plateauLo.toFixed(1)}..${l0.plateauHi.toFixed(1)}`, 'info (pitch band after 3 s)');
+    feel('wheelieControl.thr1.lean0.finish', l0.finish ?? -1, '> 0, no fault (120 m)');
+    feel('wheelieControl.thr1.lean0.top', l0.top, 'info (the wheelie costs top speed)');
+    feel('wheelieControl.thr1.lean-0.3.maxPitchDeg', l3.maxPitch, '25-42');
+    feel('wheelieControl.thr1.lean-0.3.finish', l3.finish ?? -1, '> 0, no fault');
+    expect(l0.fault).toBeNull();
+    expect(l0.finish).not.toBeNull();
+    expect(l0.maxPitch).toBeLessThanOrEqual(42);
+    expect(l0.maxPitch).toBeGreaterThanOrEqual(25);
+    expect(l3.fault).toBeNull();
+    expect(l3.maxPitch).toBeLessThanOrEqual(42);
+  });
+  it('looping is deliberate: thr=1 with lean <= -0.5 (the wheelie control is off) still loops (lean -0.5 at ~1.4 s; lean -1 at 2.4 s: sitting all the way back at full throttle is the hop preload and the crouched rider loops when he stands back up); the control never touches partial throttle', () => {
     const lb = constant(1, -1);
-    feel('loop.thr1.lean0.at', l0.faultAt, '>= 1.5 s (design band)');
-    feel('loop.thr1.leanBack.at', lb.faultAt, 'loops (design ~0.7 s; round 7: 2.4, the preload crouch delays it)');
-    expect(l0.fault).toBe('crash');
-    expect(l0.faultAt).toBeGreaterThanOrEqual(1.5);
+    const lh = constant(1, -0.5);
+    const p7 = constant(0.7, 0);
+    feel('loop.thr1.leanBack.at', lb.faultAt, 'loops (design ~0.7-1.2 s; 2.4: the preload crouch delays it, 12.4 (0b))');
+    feel('loop.thr1.lean-0.5.at', lh.faultAt, 'loops <= 1.5 s');
+    feel('loop.thr0.7.lean0.maxPitchDeg', p7.maxPitch, '< 15 (front stays down)');
     expect(lb.fault).toBe('crash');
     expect(lb.faultAt).toBeLessThan(3.0);
+    expect(lh.fault).toBe('crash');
+    expect(lh.faultAt).toBeLessThanOrEqual(1.5);
+    expect(p7.fault).toBeNull();
+    expect(p7.maxPitch).toBeLessThan(15);
   });
   it('partial throttle tops out below the limiter: thr 0.3 ~ 11-13, thr 0.6 ~ 16-18, thr 1 ~ 20 m/s', () => {
     const a = constant(0.3, 0.5);
@@ -351,15 +385,18 @@ describe('wheelie balance (C7)', () => {
     expect(up.dir === 1 || down.dir === -1).toBe(true);
   });
 
-  it.fails('KNOWN GAP (round 7): PD controller (60 Hz, 100 ms latency) holds a wheelie >= 10 s. The soft clutch (crank 1500 -> 3500 in 0.25 s) is a throttle lag in the slipping regime (< 7 m/s) and the throttle-only PD cannot balance through it (6 s, RMS 21). The round-6 12 s hold was a knife edge: with the instant plant only kp 0.08 / kd 0.03 from this exact start holds; a 0.3 s rev before the teleport drops it to 1.3 s. The reference (techniques obs 8) balances with LEAN, not throttle blips; a lean-loop controller is the fix', () => {
+  /** PD wheelie hold from a teleport at `target` with the lean parked where the static balance equals it. */
+  function pdHold(target: number, kp: number, kd: number): { held: number; rms: number; lo: number; hi: number; sat: number; lean: number } {
     const w = flatWorld();
-    const target = 45;
     w.teleport({ pos: { x: 0, y: R }, angle: rad(target), vel: { x: 4, y: 0 } });
     let held = 0;
     let n = 0;
     let err2 = 0;
     let sat = 0;
-    runController(w, wheeliePD(target, 4), {
+    let lo = 999;
+    let hi = -999;
+    let lean = 1;
+    runController(w, wheeliePD(target, 4, kp, kd), {
       ticks: HZ * 12,
       decisionHz: 60,
       latencyMs: 100,
@@ -368,13 +405,30 @@ describe('wheelie balance (C7)', () => {
         n++;
         err2 += (deg(s.bike.angle) - target) ** 2;
         if (Math.abs(inp.lean) >= 0.99) sat++;
+        if (s.time > 2) {
+          lo = Math.min(lo, deg(s.bike.angle));
+          hi = Math.max(hi, deg(s.bike.angle));
+        }
+        lean = inp.lean;
       },
       stopWhen: (s) => s.faulted !== null || (s.wheels.front.grounded && s.time > 1),
     });
-    feel('wheelie.pdHeld', held / HZ, '>= 10 s');
-    feel('wheelie.pdRmsErrDeg', Math.sqrt(err2 / n), 'info (throttle-only loop, ~10)');
-    feel('wheelie.pdLeanSaturated', sat / n, '< 0.2');
-    expect(held / HZ).toBeGreaterThanOrEqual(10);
+    return { held: held / HZ, rms: Math.sqrt(err2 / n), lo, hi, sat: sat / n, lean };
+  }
+  it('PD controller (60 Hz, 100 ms latency) holds a balance-point wheelie >= 10 s with the rider sat back past the wheelie control (44 deg at lean -0.5, kp 0.1 kd 0.03; round 7: 6 s at 45 deg / lean -0.3 and no gain pair held); at neutral-ish lean the control itself parks the nose at 33-37 deg whatever the PD asks for', () => {
+    const bal = pdHold(44, 0.1, 0.03);
+    const neutral = pdHold(45, 0.08, 0.03);
+    feel('wheelie.pdHeld', bal.held, '>= 10 s (44 deg target, lean -0.5: the pure plant, control off)');
+    feel('wheelie.pdRmsErrDeg', bal.rms, '< 12 (a real balance-point hold)');
+    feel('wheelie.pdBandDeg', `${bal.lo.toFixed(1)}..${bal.hi.toFixed(1)}`, 'info (after 2 s)');
+    feel('wheelie.pdLeanSaturated', bal.sat, '< 0.2');
+    feel('wheelie.pdNeutral.held', neutral.held, 'info (45 deg target parks the lean at -0.3: the wheelie control holds it)');
+    feel('wheelie.pdNeutral.bandDeg', `${neutral.lo.toFixed(1)}..${neutral.hi.toFixed(1)}`, 'info (the control plateau, below the 45 asked)');
+    expect(bal.held).toBeGreaterThanOrEqual(10);
+    expect(bal.rms).toBeLessThan(12);
+    expect(bal.sat).toBeLessThan(0.2);
+    expect(neutral.held).toBeGreaterThanOrEqual(10);
+    expect(neutral.hi).toBeLessThanOrEqual(42);
   });
 });
 

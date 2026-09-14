@@ -86,6 +86,27 @@ export interface BikeTuning {
      */
     clutchThrottle: number;
     /**
+     * Pitch-aware drive (round 8, an ECU-style wheelie control): with the rider NOT leaning back and the
+     * front wheel off the ground, positive drive torque is tapered with the frame's pitch RELATIVE TO
+     * THE GROUND under the rear wheel (so a steep plank climb, where the frame sits near the face
+     * angle, is never tapered) - full torque up to `pitchFull`, falling linearly to `minFrac` at
+     * `pitchMin` and held there. A pitch-rate term (`rateLead`, seconds) reads the pitch ahead so the
+     * control acts before the nose passes the balance point. `leanOn`..`leanOff` blend the control
+     * out as the rider sits back: at lean <= leanOff a deliberate loop is the rider's.
+     */
+    wheelieControl: {
+      pitchFull: number;
+      pitchMin: number;
+      minFrac: number;
+      rateLead: number;
+      /** Degrees of nose-up over which the rate lead fades in (below it a rotating frame is a corner, not a wheelie). */
+      rateLeadFrom: number;
+      /** rad/s at which a lifted front wheel's remembered ground slope relaxes toward the rear's. */
+      groundRelax: number;
+      leanOn: number;
+      leanOff: number;
+    };
+    /**
      * Centrifugal auto-clutch: the torque it can pass rises from 0 at idle to `clutchCap` of peak at
      * `clutchRpm` (the curve's value there, so a settled throttle is never capped - only the launch
      * from idle, which gets its thrust over the crank's spin-up instead of in one tick).
@@ -283,6 +304,9 @@ const DEFAULTS: BikeTuning = {
     crankSpinDown: 2000,
     clutchThrottle: 0.25,
     clutchCap: 0.8,
+    // round 8: the ECU-style wheelie control (full torque to 25 deg above the ground under the rear,
+    // 30 % at 50 deg; off when the rider sits back past -0.5, off while the front is on the ground)
+    wheelieControl: { pitchFull: 25, pitchMin: 40, minFrac: 0.3, rateLead: 0.35, rateLeadFrom: 10, groundRelax: 0.7, leanOn: -0.3, leanOff: -0.5 },
   },
   brakes: { frontMaxNm: 900, rearMaxNm: 700, antiEndo: 0.05, antiEndoFloor: 0.7, rearLoadMin: 0.04, rise: 60, fall: 40 },
   rider: {

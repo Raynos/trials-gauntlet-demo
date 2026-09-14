@@ -44,7 +44,7 @@ export interface SuspDebug {
 export interface PhysicsDebug {
   bodies: { id: string; pos: Vec2; vel: Vec2; angle: number; angVel: number }[];
   contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; mu: number; surface: SurfaceKind }[];
-  engine: { rpm: number; torqueNm: number; limiter: boolean; throttleEff: number };
+  engine: { rpm: number; torqueNm: number; limiter: boolean; throttleEff: number; driveFrac: number; rearSlopeDeg: number; frontSlopeDeg: number };
   suspension: { rear: SuspDebug; front: SuspDebug };
   rider: { anchor: Vec2; offset: Vec2; tetherForce: number; hopPhase: HopPhase; crouch: number; hopExt: number };
   balancePitch: number;
@@ -127,6 +127,13 @@ const S_LEG_STOP_X = 41;
 const S_LEG_STOP_Y = 42;
 const S_ANCHOR_X = 43;
 const S_ANCHOR_Y = 44;
+/**
+ * Ground slope (rad, CCW from +x) of the steepest loaded contact under each wheel at its last grounded
+ * tick, from derive(): read by the next controls() (the wheelie control keys on the frame pitch relative
+ * to the steeper of the two), so they live in F.
+ */
+const S_REAR_SLOPE = 45;
+const S_FRONT_SLOPE = 46;
 const NSCALAR = 48;
 
 // flag slots in U
@@ -166,7 +173,7 @@ const RAG_LIMBS: RagLimb[] = [
   { len: 0.4, r: 0.13, mass: 30 }, // torso
   { len: 0.2, r: 0.12, mass: 12 }, // pelvis
   { len: 0.3, r: 0.06, mass: 5 }, // upperArm
-  { len: 0.28, r: 0.05, mass: 3 }, // forearm
+  { len: 0.27, r: 0.05, mass: 3 }, // forearm (render L.forearm: elbow -> grip centre, hand included)
   { len: 0.44, r: 0.08, mass: 12 }, // thigh (render L.thigh)
   { len: 0.43, r: 0.06, mass: 8 }, // shin (render L.shin)
 ];
@@ -174,22 +181,28 @@ const RAG_LIMBS: RagLimb[] = [
  * [parent, child, parentLocalY, childLocalY, angularRange] — anchors are on the local y axis (+y runs
  * distal -> proximal, i.e. from the far end of the limb toward the body). The anchors are where the
  * drawn chain's joints are: torso centre is 0.25 above the hips, so the neck (shoulders) is +0.25 and
- * the spine (hips) -0.25 on the torso; the head hangs 0.158 (render L.head + 0.05) beyond the
+ * the spine (hips) -0.25 on the torso; the head hangs 0.195 (render L.headUp) beyond the
  * shoulders; the pelvis centre is 0.1 below the hips.
  */
 const RAG_JOINTS: [number, number, number, number, number][] = [
-  [1, 0, 0.25, -0.158, 0.7], // neck
+  [1, 0, 0.25, -0.195, 0.7], // neck
   [1, 2, -0.25, 0.1, 0.6], // spine
   [1, 3, 0.25, 0.15, 2.5], // shoulder
-  [3, 4, -0.15, 0.14, 1.6], // elbow
+  [3, 4, -0.15, 0.135, 1.6], // elbow
   [2, 5, -0.1, 0.22, 1.4], // hip
   [5, 6, -0.22, 0.215, 1.4], // knee
 ];
-/** Frame-local grip (render barCentre - (0.04, 0.07)) and foot-on-peg (render pegs + (0.03, 0.03)) points. */
-const GRIP_X = 0.32;
-const GRIP_Y = 0.79;
-const FOOT_X = -0.07;
-const FOOT_Y = 0.01;
+/**
+ * Render axle-frame (origin = axle midpoint at static sag) grip centre (`BIKE.grip`) and ankle
+ * (`BIKE.pegs` + (0.01, 0.09): the ankle sits 9 cm above the peg, the shin ends there); torso hips ->
+ * shoulder line 0.5, shoulder line -> head centre 0.195 (render `L`).
+ */
+const GRIP_X = 0.27;
+const GRIP_Y = 0.78;
+const ANKLE_X = -0.14 + 0.01;
+const ANKLE_Y = 0.02 + 0.09;
+const TORSO_LEN = 0.5;
+const HEAD_UP = 0.195;
 /** Two-bone IK, the render's (`riderModel.ts` ik): joint between a and b for bone lengths l1, l2, bending to `side`. */
 function ik2(ax: number, ay: number, bx: number, by: number, l1: number, l2: number, side: number): [number, number] {
   let dx = bx - ax;
@@ -249,6 +262,9 @@ class BikeWorld implements BikePhysicsWorld {
   private readonly cPy = new Float64Array(MAX_CONTACTS);
   private readonly cNx = new Float64Array(MAX_CONTACTS);
   private readonly cNy = new Float64Array(MAX_CONTACTS);
+  /** Ground (surface) normal of the contact: a segment's own normal even when the manifold is a vertex contact (whose normal points from the corner to the wheel centre and would read a 6 deg descent as a 20 deg climb at 17 m/s); the contact normal for circles and boxes. */
+  private readonly cGx = new Float64Array(MAX_CONTACTS);
+  private readonly cGy = new Float64Array(MAX_CONTACTS);
   private readonly cRAx = new Float64Array(MAX_CONTACTS);
   private readonly cRAy = new Float64Array(MAX_CONTACTS);
   private readonly cRBx = new Float64Array(MAX_CONTACTS);
@@ -309,6 +325,7 @@ class BikeWorld implements BikePhysicsWorld {
     this.dt = 1 / physicsHz;
     this.tuning = Object.freeze(mergeTuning(DEFAULT_TUNING, tuning));
     this.g = this.tuning.gravity * this.tuning.gravityScale;
+    this.axleOrigin();
     this.bindViews();
   }
 
@@ -551,7 +568,7 @@ class BikeWorld implements BikePhysicsWorld {
     return {
       bodies,
       contacts,
-      engine: { rpm: F[S_RPM]!, torqueNm: F[S_ENGINE_TQ]!, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]! },
+      engine: { rpm: F[S_RPM]!, torqueNm: F[S_ENGINE_TQ]!, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]!, driveFrac: this.driveFrac, rearSlopeDeg: (F[S_REAR_SLOPE]! * 180) / PI, frontSlopeDeg: (F[S_FRONT_SLOPE]! * 180) / PI },
       suspension: {
         rear: { compression: this.sComp[0]!, rate: this.sRate[0]!, force: this.sForce[0]! },
         front: { compression: this.sComp[1]!, rate: this.sRate[1]!, force: this.sForce[1]! },
@@ -753,10 +770,30 @@ class BikeWorld implements BikePhysicsWorld {
   private chHx = 0;
   private chHy = 1;
 
+  /** Frame-local (bike.pos-relative) axle midpoint at static sag: the render's frame origin (`BikeModel.originOffset`, calibrated from the same spawn pose). */
+  private axleOrgX = 0;
+  private axleOrgY = 0;
+  private axleOrigin(): void {
+    const t = this.tuning;
+    const sr = t.suspension.rear;
+    const sf = t.suspension.front;
+    const cr = this.staticSag(sr, this.staticLoad(0));
+    const cf = clamp((sr.axle.y - sf.axle.y + sr.axis.y * cr) / sf.axis.y, 0, sf.travel);
+    this.axleOrgX = 0.5 * (sr.axle.x + sr.axis.x * cr + sf.axle.x + sf.axis.x * cf);
+    this.axleOrgY = sr.axle.y + sr.axis.y * cr;
+  }
+
   /**
-   * The rider body as the renderer draws it (`src/render/rider/riderModel.ts` poseRider, standing):
-   * hips over the pegs, torso pitched forward in the attack position, head ahead of the shoulders.
-   * Crash sensors and the ragdoll spawn come from this chain, not from the dynamics point mass.
+   * The rider body as the renderer draws it (`src/render/rider/riderModel.ts` poseRider, standing on
+   * the pegs), written in the render's AXLE frame (origin = axle midpoint at static sag, `axleOrigin()`)
+   * with the render's grips (0.27, 0.78) and pegs (-0.14, 0.02), so the last posed frame and the first
+   * ragdoll frame coincide (round 8; the round-6 chain was bike.pos-relative and the render measured a
+   * rigid 0.28-0.48 m residual). Hips over the pegs, torso pitched forward in the attack position;
+   * hanging off the back the shoulders are pinned at arm's reach from the grip (phi 0.32 + 0.15 crouch
+   * above the bar line) and the hips hang from them; the crouch drops 0.28 m and folds the torso 0.35 rad;
+   * the legs never overreach the ankles; the whole upper body slides toward the bars if the shoulders
+   * are out of reach (and back if closer than 0.3 m). Crash sensors and the ragdoll spawn come from this
+   * chain, not from the dynamics point mass.
    */
   private riderChain(): void {
     const pose = this.riderPose();
@@ -766,26 +803,72 @@ class BikeWorld implements BikePhysicsWorld {
     const crouch = pose.crouch;
     const torsoPitch = pose.torsoPitch;
     const armExtend = pose.armExtend;
-    const hx = -0.12 - 0.28 * back + 0.14 * fwd - 0.06 * crouch;
-    const hy = 0.74 - 0.4 * crouch;
-    const A = 0.62 + torsoPitch + 0.3 * fwd + 0.5 * crouch - 0.5 * back - 0.35 * armExtend;
+    const gx = GRIP_X;
+    const gy = GRIP_Y;
+    const reach = (RAG_LIMBS[3]!.len + RAG_LIMBS[4]!.len) * 0.985;
+    let hx = -0.12 - 0.28 * back + 0.14 * fwd - 0.06 * crouch;
+    let hy = 0.74 - 0.28 * crouch;
+    const A = 0.62 + torsoPitch + 0.3 * fwd + 0.35 * crouch - 0.1 * back - 0.1 * armExtend;
     const dxl = sin(A);
     const dyl = cos(A);
-    const sx = hx + dxl * 0.5;
-    const sy = hy + dyl * 0.5;
+    let sx = hx + dxl * TORSO_LEN;
+    let sy = hy + dyl * TORSO_LEN;
+    if (back > 0) {
+      // pinned-shoulder hang-off: shoulders at arm's reach from the grip, hips hang from them
+      const phi = 0.32 + 0.15 * crouch;
+      const px = gx - cos(phi) * reach;
+      const py = gy + sin(phi) * reach;
+      sx += (px - sx) * back;
+      sy += (py - sy) * back;
+      hx = sx - dxl * TORSO_LEN;
+      hy = sy - dyl * TORSO_LEN;
+    }
+    {
+      // legs never overreach: pull the hips in along the hip -> ankle line (shoulders follow)
+      const legReach = (RAG_LIMBS[5]!.len + RAG_LIMBS[6]!.len) * 0.985;
+      const ddx = hx - ANKLE_X;
+      const ddy = hy - ANKLE_Y;
+      const d = Math.sqrt(ddx * ddx + ddy * ddy);
+      if (d > legReach) {
+        const kk = (d - legReach) / d;
+        hx += (ANKLE_X - hx) * kk;
+        hy += (ANKLE_Y - hy) * kk;
+        sx = hx + dxl * TORSO_LEN;
+        sy = hy + dyl * TORSO_LEN;
+      }
+    }
+    {
+      // reach slide: hands stay on the grips - the upper body slides toward the bars when the shoulders
+      // are out of reach, and back when a folded crouch would put them on the grip
+      const ddx = gx - sx;
+      const ddy = gy - sy;
+      const d = Math.sqrt(ddx * ddx + ddy * ddy);
+      const near = 0.3;
+      if (d > reach || d < near) {
+        const kk = (d - (d > reach ? reach : near)) / (d || 1e-6);
+        sx += ddx * kk;
+        sy += ddy * kk;
+        hx += ddx * kk;
+        hy += ddy * kk;
+      }
+    }
     const headA = A * 0.45 - 0.1;
     const hsx = sin(headA);
     const hsy = cos(headA);
-    const hdx = sx + hsx * 0.158;
-    const hdy = sy + hsy * 0.158;
-    // arms: shoulders -> grips, elbows up and out; legs: hips -> pegs, knees forward (render IK)
-    const [ex, ey] = ik2(sx, sy, GRIP_X, GRIP_Y, RAG_LIMBS[3]!.len, RAG_LIMBS[4]!.len, 1);
-    const [kx, ky] = ik2(hx, hy, FOOT_X, FOOT_Y, RAG_LIMBS[5]!.len, RAG_LIMBS[6]!.len, 1);
+    const hdx = sx + hsx * HEAD_UP;
+    const hdy = sy + hsy * HEAD_UP;
+    // arms: shoulders -> grips, elbows up and out; legs: hips -> ankles, knees forward (render IK)
+    const [ex, ey] = ik2(sx, sy, gx, gy, RAG_LIMBS[3]!.len, RAG_LIMBS[4]!.len, 1);
+    const [kx, ky] = ik2(hx, hy, ANKLE_X, ANKLE_Y, RAG_LIMBS[5]!.len, RAG_LIMBS[6]!.len, 1);
     const c = cos(this.an[FRAME]!);
     const s = sin(this.an[FRAME]!);
     const fx = this.px[FRAME]!;
     const fy = this.py[FRAME]!;
-    const put = (i: number, lx: number, ly: number): void => {
+    const ox = this.axleOrgX;
+    const oy = this.axleOrgY;
+    const put = (i: number, ax: number, ay: number): void => {
+      const lx = ax + ox;
+      const ly = ay + oy;
       this.chX[i] = fx + lx * c - ly * s;
       this.chY[i] = fy + lx * s + ly * c;
     };
@@ -793,9 +876,9 @@ class BikeWorld implements BikePhysicsWorld {
     put(1, sx, sy);
     put(2, hdx, hdy);
     put(3, ex, ey);
-    put(4, GRIP_X, GRIP_Y);
+    put(4, gx, gy);
     put(5, kx, ky);
-    put(6, FOOT_X, FOOT_Y);
+    put(6, ANKLE_X, ANKLE_Y);
     this.chDx = dxl * c - dyl * s;
     this.chDy = dxl * s + dyl * c;
     this.chHx = hsx * c - hsy * s;
@@ -803,6 +886,9 @@ class BikeWorld implements BikePhysicsWorld {
   }
 
   // -- step phases ----------------------------------------------------------
+
+  /** Diagnostic only (debug().engine.driveFrac): the wheelie control's torque factor of the last controls() pass. */
+  private driveFrac = 1;
 
   private controls(input: InputFrame): void {
     const F = this.F;
@@ -905,6 +991,30 @@ class BikeWorld implements BikePhysicsWorld {
     const capFrac = clamp((rpm - e.idleRpm) / (e.clutchRpm - e.idleRpm), 0, 1);
     let torque = limiter === 1 ? 0 : nte * peakWheel * this.curveFrac(rpm);
     if (capFrac < 1) torque = Math.min(torque, capFrac * e.clutchCap * peakWheel);
+    // pitch-aware drive (ECU-style wheelie control, round 8): with the front wheel up and the rider not
+    // sitting back, taper the drive with the frame pitch relative to the ground the bike is on (the
+    // steeper of the two wheels' last loaded ground slopes, S_REAR_SLOPE / S_FRONT_SLOPE) plus a rate
+    // lead. Full torque to `pitchFull`, `minFrac` from `pitchMin` up. It reads the IMU, not the tyre: a
+    // rear wheel skipping or airborne with the nose past the band is not spun up either (the wheel's
+    // angular momentum is the in-air nose-up). A beginner holding the gas at neutral lean lifts the
+    // front into a wheelie that self-limits; looping the bike takes a deliberate lean back.
+    this.driveFrac = 1;
+    if (torque > 0 && U[U_FRONT_GND] === 0) {
+      const wc = e.wheelieControl;
+      const gate = clamp((nle - wc.leanOff) / (wc.leanOn - wc.leanOff), 0, 1);
+      if (gate > 0) {
+        const ground = Math.max(F[S_REAR_SLOPE]!, F[S_FRONT_SLOPE]!);
+        const rel = wrapAngle(this.an[FRAME]! - ground);
+        // the rate lead fades in over the first `rateLeadFrom` degrees of nose-up: a frame rotating up
+        // into a plank's base corner (nose still below the face angle) is not a wheelie
+        const lead = wc.rateLead * this.av[FRAME]! * clamp(((rel * 180) / PI) / wc.rateLeadFrom, 0, 1);
+        const relDeg = ((rel + lead) * 180) / PI;
+        const w = 1 - clamp((relDeg - wc.pitchFull) / (wc.pitchMin - wc.pitchFull), 0, 1);
+        const frac = wc.minFrac + (1 - wc.minFrac) * w;
+        this.driveFrac = 1 - gate * (1 - frac);
+        torque *= this.driveFrac;
+      }
+    }
     // engine braking: drag on the rear wheel proportional to rpm when off throttle
     torque -= e.engineBrakeFrac * peakWheel * (1 - nte) * clamp(rpmWheel / e.limiterRpm, 0, 1.2) * (wheelFwd > 0 ? 1 : wheelFwd < 0 ? -1 : 0);
     F[S_ENGINE_TQ] = torque;
@@ -1335,6 +1445,14 @@ class BikeWorld implements BikePhysicsWorld {
     this.cPy[i] = m.py;
     this.cNx[i] = nx;
     this.cNy[i] = ny;
+    if (m.prim.kind === PrimKind.Segment) {
+      const flip = m.prim.nx * nx + m.prim.ny * ny < 0 ? -1 : 1;
+      this.cGx[i] = flip * m.prim.nx;
+      this.cGy[i] = flip * m.prim.ny;
+    } else {
+      this.cGx[i] = nx;
+      this.cGy[i] = ny;
+    }
     this.cRAx[i] = rax;
     this.cRAy[i] = ray;
     this.cRBx[i] = rbx;
@@ -1835,6 +1953,10 @@ class BikeWorld implements BikePhysicsWorld {
     let rearBest = 0;
     let frontBest = 0;
     let rearMu = 0;
+    let rearSlope = F[S_REAR_SLOPE]!;
+    let rearSlopeSet = false;
+    let frontSlope = F[S_FRONT_SLOPE]!;
+    let frontSlopeSet = false;
     for (let i = 0; i < this.nC; i++) {
       const A = this.cA[i]!;
       const ln = this.cLn[i]!;
@@ -1846,12 +1968,26 @@ class BikeWorld implements BikePhysicsWorld {
           rearSurf = this.cSurf[i]!;
           rearMu = this.cMu[i]!;
         }
+        if (ln > 0) {
+          // the steepest surface the wheel is pushing on: the ground the bike is on, for the wheelie
+          // control (in a plank's base corner the front is on the face while the rear is still on the
+          // flat, and the frame sits at the face angle - no wheelie, and the push into the corner
+          // must not be starved)
+          const sl = atan2(-this.cGx[i]!, this.cGy[i]!);
+          if (!rearSlopeSet || sl > rearSlope) rearSlope = sl;
+          rearSlopeSet = true;
+        }
       } else if (A === FRONT) {
         frontLn += ln;
         frontLt += this.cLt[i]!;
         if (ln > frontBest) {
           frontBest = ln;
           frontSurf = this.cSurf[i]!;
+        }
+        if (ln > 0) {
+          const sl = atan2(-this.cGx[i]!, this.cGy[i]!);
+          if (!frontSlopeSet || sl > frontSlope) frontSlope = sl;
+          frontSlopeSet = true;
         }
       }
     }
@@ -1860,6 +1996,12 @@ class BikeWorld implements BikePhysicsWorld {
     F[S_REAR_LT] = rearLt;
     F[S_FRONT_LT] = frontLt;
     F[S_REAR_MU] = rearMu;
+    F[S_REAR_SLOPE] = rearSlope;
+    // a lifted front wheel's ground fades toward the rear's (a wheelie that started off a ramp is soon a
+    // wheelie on whatever the rear is rolling on); slow enough that the ~0.15 s the front hovers off a
+    // plank face in the base corner keeps the face as the reference
+    if (!frontSlopeSet) frontSlope += clamp(rearSlope - frontSlope, -t.engine.wheelieControl.groundRelax * dt, t.engine.wheelieControl.groundRelax * dt);
+    F[S_FRONT_SLOPE] = frontSlope;
     const rearGnd = rearLn > 0 ? 1 : 0;
     const frontGnd = frontLn > 0 ? 1 : 0;
     const tick = F[S_TICK]!;
