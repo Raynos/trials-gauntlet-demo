@@ -16,54 +16,67 @@ export interface HookExtras {
   modules?: Record<string, string>;
 }
 
-export function installHook(game: Game, harness: boolean, extras: HookExtras = {}): TrialsHook {
+/**
+ * `source` may be a Game or a thunk that composes one on first use, so the hook
+ * (and `ready`) can be installed before the renderer/WebGL context exists; every
+ * method resolves the game synchronously, so correctness never depends on task order.
+ */
+export function installHook(source: Game | (() => Game), harness: boolean, extras: HookExtras = {}): TrialsHook {
+  let cached: Game | null = typeof source === 'function' ? null : source;
+  const g = (): Game => {
+    if (!cached) cached = (source as () => Game)();
+    return cached;
+  };
+  const readyAtMs = performance.now();
   const hook: TrialsHook = {
     ready: true,
     info: () => ({
       version: GAME_VERSION,
-      physicsHz: game.physicsHz,
-      trackId: game.currentTrack?.id ?? '',
-      seed: game.currentSeed,
+      physicsHz: g().physicsHz,
+      trackId: g().currentTrack?.id ?? '',
+      seed: g().currentSeed,
       harness,
-      loadTrackMs: Math.round(game.lastLoadMs * 10) / 10,
+      readyAtMs: Math.round(readyAtMs * 10) / 10,
+      loadTrackMs: Math.round(g().lastLoadMs * 10) / 10,
+      lastRender: { ...g().lastRender },
       ...(extras.modules ? { modules: extras.modules } : {}),
     }),
-    step: (n = 1) => game.step(n),
-    setInput: (frame: Partial<InputFrame>) => game.setInput(frame),
-    getState: () => game.getState(),
-    loadTrack: (id: string, seed?: number) => game.loadTrack(id, seed),
-    restart: () => game.restart(),
-    finishTime: () => game.finishTime(),
-    hashState: () => game.hashState(),
-    frame: () => game.getState().tick,
-    renderedFrames: () => game.framesRendered,
-    render: (sync = false) => game.renderOnce(sync),
-    stats: () => game.stats(),
-    resize: (w: number, h: number) => game.resize(w, h, 1),
-    runRecording: (json: string) => game.runRecording(json),
-    startRecording: () => game.startRecording(),
-    stopRecording: () => game.stopRecording(),
+    step: (n = 1) => g().step(n),
+    setInput: (frame: Partial<InputFrame>) => g().setInput(frame),
+    getState: () => g().getState(),
+    loadTrack: (id: string, seed?: number) => g().loadTrack(id, seed),
+    restart: () => g().restart(),
+    finishTime: () => g().finishTime(),
+    hashState: () => g().hashState(),
+    frame: () => g().getState().tick,
+    renderedFrames: () => g().framesRendered,
+    render: (sync = false) => g().renderOnce(sync),
+    stats: () => g().stats(),
+    resize: (w: number, h: number) => g().resize(w, h, 1),
+    runRecording: (json: string) => g().runRecording(json),
+    startRecording: () => g().startRecording(),
+    stopRecording: () => g().stopRecording(),
     listTracks: () => listTrackIds(),
     // -- CONTRACT.md §2.9 --
-    snapshot: () => encodeSnapshot(game.snapshot(), game.counters()),
+    snapshot: () => encodeSnapshot(g().snapshot(), g().counters()),
     restore: (b64: string) => {
       const { physics, counters } = decodeSnapshot(b64);
-      game.restore(physics);
-      if (counters) game.restoreCounters(counters);
+      g().restore(physics);
+      if (counters) g().restoreCounters(counters);
     },
-    drainEvents: () => game.drainEvents(),
-    runTime: () => game.runTime(),
-    faults: () => game.faults(),
-    phase: () => game.phase(),
+    drainEvents: () => g().drainEvents(),
+    runTime: () => g().runTime(),
+    faults: () => g().faults(),
+    phase: () => g().phase(),
     marks: () => {
-      const t = game.currentTrack;
+      const t = g().currentTrack;
       return t
         ? { checkpoints: t.checkpoints.map((c) => c.x), finishX: t.finishX, start: t.start.pos.x }
         : { checkpoints: [], finishX: 0, start: 0 };
     },
-    camera: () => game.camera(),
-    setQuality: (t) => game.setQuality(t),
-    skipCountdown: () => game.skipCountdown(),
+    camera: () => g().camera(),
+    setQuality: (t) => g().setQuality(t),
+    skipCountdown: () => g().skipCountdown(),
   };
   if (extras.renderOffline) {
     const renderOffline = extras.renderOffline;

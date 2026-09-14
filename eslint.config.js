@@ -21,8 +21,8 @@ export default tseslint.config(
     },
   },
   {
-    // CLI tools print.
-    files: ['harness/**/*.ts', 'vite.config.ts'],
+    // CLI tools and tests print.
+    files: ['harness/**/*.ts', 'vite.config.ts', '**/*.test.ts', 'src/**/tools/**/*.ts'],
     rules: { 'no-console': 'off' },
   },
   {

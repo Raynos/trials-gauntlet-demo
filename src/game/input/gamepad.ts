@@ -13,12 +13,17 @@ const BTN_B = 1;
 const BTN_LT = 6;
 const BTN_RT = 7;
 const BTN_START = 9;
+const DPAD_UP = 12;
+const DPAD_DOWN = 13;
 const DPAD_LEFT = 14;
 const DPAD_RIGHT = 15;
+const NAV_THRESHOLD = 0.6;
 
 export class GamepadInput implements InputSource {
   readonly device = 'gamepad' as const;
-  private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, active: false };
+  private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false };
+  private prevNavX = 0;
+  private prevNavY = 0;
   private prevStart = false;
   private prevA = false;
   private prevB = false;
@@ -68,6 +73,15 @@ export class GamepadInput implements InputSource {
     if (a && !this.prevA) this.meta.confirm = true;
     if (b && !this.prevB) this.meta.back = true;
     if (rt > 0.05 || lt > 0.05 || lean !== 0 || b || a || start) this.meta.active = true;
+    // Menu navigation edges from d-pad or left stick.
+    const y = p.axes[1] ?? 0;
+    const navX = pressed(p, DPAD_RIGHT) || x > NAV_THRESHOLD ? 1 : pressed(p, DPAD_LEFT) || x < -NAV_THRESHOLD ? -1 : 0;
+    const navY = pressed(p, DPAD_DOWN) || y > NAV_THRESHOLD ? 1 : pressed(p, DPAD_UP) || y < -NAV_THRESHOLD ? -1 : 0;
+    if (navX !== 0 && navX !== this.prevNavX) this.meta.navX = navX;
+    if (navY !== 0 && navY !== this.prevNavY) this.meta.navY = navY;
+    if (navX || navY) this.meta.active = true;
+    this.prevNavX = navX;
+    this.prevNavY = navY;
     this.prevStart = start;
     this.prevA = a;
     this.prevB = b;

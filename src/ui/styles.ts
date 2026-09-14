@@ -104,10 +104,12 @@ html { font-size: clamp(13px, 1.25vw + 4px, 18px); }
 /* ---- menus ---------------------------------------------------------- */
 .overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 100% at 30% 40%, rgba(8,10,14,.55), rgba(8,10,14,.92)); opacity: 0; pointer-events: none; transition: opacity .2s; padding: calc(1rem + var(--sat)) calc(1rem + var(--sar)) calc(1rem + var(--sab)) calc(1rem + var(--sal)); }
 .overlay.show { opacity: 1; pointer-events: auto; }
-.panel { width: min(46rem, 100%); max-height: 100%; overflow: auto; -webkit-overflow-scrolling: touch; }
+.panel { width: min(46rem, 100%); max-height: 100%; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.settings { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; justify-content: flex-end; }
 .title { font-size: 3.4rem; font-weight: 900; font-style: italic; letter-spacing: -.01em; line-height: .95; margin: 0; text-transform: uppercase; }
 .title small { display: block; font-size: .32em; letter-spacing: .42em; color: var(--amber); font-style: normal; font-weight: 800; margin-bottom: .3em; }
-.sub { color: var(--ink-dim); margin: .4rem 0 1.2rem; font-size: .95rem; }
+.sub { color: var(--ink-dim); margin: .4rem 0 .6rem; font-size: .95rem; max-width: 34rem; }
 .tier { margin: 1rem 0 .4rem; font-size: .75rem; letter-spacing: .32em; text-transform: uppercase; color: var(--amber); font-weight: 800; }
 .tracks { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: .5rem; }
 .track { display: flex; flex-direction: column; gap: .25rem; text-align: left; padding: .7rem .85rem; background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: .5rem; cursor: pointer; min-height: 44px; }
@@ -153,6 +155,17 @@ html { font-size: clamp(13px, 1.25vw + 4px, 18px); }
 @keyframes rot { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
 @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate.armed { display: flex; } }
 
+/* Short landscape phones: compact header so the track grid is above the fold. */
+@media (max-height: 500px) {
+  .title { font-size: 2rem; }
+  .title small { font-size: .4em; margin-bottom: .1em; }
+  .sub { display: none; }
+  .tier { margin: .6rem 0 .3rem; }
+  .tracks { grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .4rem; }
+  .track { padding: .5rem .7rem; gap: .15rem; }
+  .track .name { font-size: .95rem; }
+  .overlay { padding-top: calc(.6rem + var(--sat)); padding-bottom: calc(.6rem + var(--sab)); }
+}
 @media (max-width: 720px) {
   .hud-timer { font-size: 1.9rem; }
   .hud-faults { font-size: 1.25rem; }

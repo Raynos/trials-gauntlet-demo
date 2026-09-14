@@ -15,7 +15,7 @@ export class TouchInput implements InputSource {
   readonly device = 'touch' as const;
   readonly root: HTMLDivElement;
   private readonly zones = new Map<number, Zone>();
-  private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, active: false };
+  private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false };
   private enabled = false;
   private readonly els: Record<Exclude<Zone, 'none'>, HTMLDivElement>;
 

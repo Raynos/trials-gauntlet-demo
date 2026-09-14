@@ -41,16 +41,20 @@ export class MainMenu {
     const panel = document.createElement('div');
     panel.className = 'panel';
     panel.innerHTML = `
-      <h1 class="title"><small>Physics trials</small>Gauntlet</h1>
-      <p class="sub">Gas, brake, lean. The clock runs through every crash. Tap restart for the last checkpoint, hold it to restart the track.</p>
-      <div class="list"></div>
-      <div class="row">
-        <span class="lbl">Quality</span>
-        <div class="seg quality">
-          <button data-q="auto">Auto</button><button data-q="low">Low</button><button data-q="medium">Medium</button><button data-q="high">High</button>
+      <div class="head">
+        <div>
+          <h1 class="title"><small>Physics trials</small>Gauntlet</h1>
+          <p class="sub">Gas, brake, lean. The clock runs through every crash. Tap restart for the last checkpoint, hold it to restart the track.</p>
         </div>
-        <button class="btn audio">Sound on</button>
-      </div>`;
+        <div class="settings">
+          <span class="lbl">Quality</span>
+          <div class="seg quality">
+            <button data-q="auto">Auto</button><button data-q="low">Low</button><button data-q="medium">Med</button><button data-q="high">High</button>
+          </div>
+          <button class="btn audio">Sound on</button>
+        </div>
+      </div>
+      <div class="list"></div>`;
     this.list = panel.querySelector('.list') as HTMLDivElement;
     this.qualitySeg = panel.querySelector('.seg.quality') as HTMLDivElement;
     this.audioBtn = panel.querySelector('.btn.audio') as HTMLButtonElement;
@@ -119,11 +123,60 @@ export class MainMenu {
     return this.root.classList.contains('show');
   }
 
-  /** Gamepad A / Enter: play the focused (or last played) track. */
+  /** Gamepad A / Enter: activate the focused control (or play the last played track). */
   confirm(): void {
-    const focused = document.activeElement?.closest?.('[data-track]')?.getAttribute('data-track');
-    const id = focused ?? this.lastTrackId;
-    if (id) this.cb.play(id);
+    const active = document.activeElement as HTMLElement | null;
+    if (active && this.root.contains(active) && active.tagName === 'BUTTON') {
+      active.click();
+      return;
+    }
+    if (this.lastTrackId) this.cb.play(this.lastTrackId);
+  }
+
+  /** D-pad / stick / arrows: move focus spatially. */
+  move(dx: number, dy: number): void {
+    spatialMove(this.root, dx, dy);
+  }
+}
+
+/**
+ * Spatial focus navigation over the visible buttons of `root`: pick the nearest
+ * button in the requested direction (distance along the axis + 2× the
+ * perpendicular offset). Wraps nothing; keeps focus where it is at an edge.
+ */
+export function spatialMove(root: HTMLElement, dx: number, dy: number): void {
+  const items = [...root.querySelectorAll<HTMLButtonElement>('button:not([disabled])')].filter((b) => b.offsetParent !== null);
+  if (items.length === 0) return;
+  const cur = document.activeElement as HTMLElement | null;
+  if (!cur || !items.includes(cur as HTMLButtonElement)) {
+    items[0]!.focus({ preventScroll: true });
+    items[0]!.scrollIntoView({ block: 'nearest' });
+    return;
+  }
+  const r = cur.getBoundingClientRect();
+  const cx = r.left + r.width / 2;
+  const cy = r.top + r.height / 2;
+  let best: HTMLButtonElement | null = null;
+  let bestScore = Infinity;
+  for (const b of items) {
+    if (b === cur) continue;
+    const q = b.getBoundingClientRect();
+    const qx = q.left + q.width / 2;
+    const qy = q.top + q.height / 2;
+    const along = dx !== 0 ? (qx - cx) * dx : (qy - cy) * dy;
+    if (along <= 4) continue;
+    // Prefer items that overlap on the cross axis (same row / column).
+    const overlap = dx !== 0 ? Math.min(r.bottom, q.bottom) - Math.max(r.top, q.top) : Math.min(r.right, q.right) - Math.max(r.left, q.left);
+    const perp = dx !== 0 ? Math.abs(qy - cy) : Math.abs(qx - cx);
+    const score = along + (overlap > 0 ? 0 : 2 * perp + 200);
+    if (score < bestScore) {
+      bestScore = score;
+      best = b;
+    }
+  }
+  if (best) {
+    best.focus({ preventScroll: true });
+    best.scrollIntoView({ block: 'nearest' });
   }
 }
 
@@ -162,6 +215,15 @@ export class PauseMenu {
 
   get visible(): boolean {
     return this.root.classList.contains('show');
+  }
+
+  confirm(): void {
+    const active = document.activeElement as HTMLElement | null;
+    if (active && this.root.contains(active) && active.tagName === 'BUTTON') active.click();
+  }
+
+  move(dx: number, dy: number): void {
+    spatialMove(this.root, dx, dy);
   }
 }
 

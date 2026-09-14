@@ -14,12 +14,16 @@ export interface MetaButtons {
   pause: boolean;
   confirm: boolean;
   back: boolean;
+  /** Menu focus movement, edge-triggered: -1 / 0 / +1 per axis (d-pad, stick, arrow keys). */
+  navX: number;
+  navY: number;
   /** Any activity at all this frame (for device indicator + audio unlock). */
   active: boolean;
 }
 
-export const NO_META: Readonly<MetaButtons> = Object.freeze({ pause: false, confirm: false, back: false, active: false });
+export const NO_META: Readonly<MetaButtons> = Object.freeze({ pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false });
 
 export function clearMeta(m: MetaButtons): void {
   m.pause = m.confirm = m.back = m.active = false;
+  m.navX = m.navY = 0;
 }

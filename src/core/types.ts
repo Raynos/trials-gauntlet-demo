@@ -348,6 +348,9 @@ export type GameEventListener = (event: GameEvent) => void;
 // ---------------------------------------------------------------------------
 
 export const DEFAULT_PHYSICS_HZ = 120;
+/** Bike geometry shared by physics, render and the mock (CONTRACT §2.5). */
+export const WHEEL_RADIUS = 0.34;
+export const WHEELBASE = 1.3;
 
 // ---------------------------------------------------------------------------
 // Test hook exposed on `window.__trials`
@@ -377,8 +380,12 @@ export interface HookInfo {
   seed: number;
   /** True when the game is not running its own clock (harness mode). */
   harness: boolean;
+  /** Page time (performance.now) at which the hook was installed and `ready` became true. */
+  readyAtMs?: number;
   /** Wall ms of the most recent loadTrack (compile + physics + renderer.setTrack + audio.setTrack). */
   loadTrackMs?: number;
+  /** Breakdown of the most recent render(): HUD DOM work, renderer submit, GPU sync (when sync=true). */
+  lastRender?: { hudMs: number; submitMs: number; syncMs: number };
   /** Which implementations main.ts composed, e.g. { physics: 'createBikePhysics', render: 'ThreeRenderer', audio: 'WebAudioSystem' }. */
   modules?: Record<string, string>;
 }

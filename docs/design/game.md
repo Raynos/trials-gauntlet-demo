@@ -86,6 +86,11 @@ button** anywhere: the hop is preload (lean back + throttle) then snap forward, 
 | restart (tap / hold 0.6 s) | Enter / R / Backspace | B / circle (button 1) | top-right button (≥ 44 pt) |
 | pause / menu | Esc | Start (button 9) | top-left button |
 | menu confirm / back | Enter / Esc | A / B | tap |
+| menu focus movement | arrows / WASD | d-pad, left stick (0.6 threshold, edge-triggered) | — |
+
+Menus use spatial focus navigation (`spatialMove`: nearest visible button along the axis, same
+row/column preferred), so a pad or the keyboard can reach every track card, the quality segment,
+the sound toggle and the pause actions; confirm clicks the focused control.
 
 Touch: pointer events on a full-screen overlay with `touch-action: none`; each pointer id is tracked
 independently so lean + throttle + brake can all be down at once; zones are split at 50 % width and
@@ -130,10 +135,18 @@ is base64 of `[u32 v=2, physF64Len, physU8Len, gameLen][phys f64][phys u8][game 
 
 ## 7. Boot order (harness mode)
 
-`installHook` runs before `loadTrack` (next macrotask) so `__trials.ready` is observable before
-track/texture generation, which CONTRACT §3 budgets separately; `hook.info().loadTrackMs` reports
-the wall time of the most recent `loadTrack` (compile + physics + `renderer.setTrack` +
-`audio.setTrack`) and `info().modules` says which physics/render/audio implementations are composed.
+`installHook` runs at module-evaluation time with a thunk that composes the game (renderer +
+WebGL context, physics, audio, HUD) on first use; the composition and `loadTrack` run in the next
+macrotask, so `__trials.ready` is observable before any of it and every hook call is still correct
+regardless of task order. No frame is rendered on the boot path: the first frame (shader compile,
+texture upload) is the harness's own `render()`, which the gate times as "first frame". Measured
+page-side: `ready` at ≈30 ms after navigation start, compose ≈30 ms (renderer 27 ms), `loadTrack`
+15–21 ms; the harness's nav→ready number adds ~150–200 ms of Playwright/CDP polling latency.
+`hook.info()` reports `readyAtMs` (page time the hook was installed), `loadTrackMs`, `lastRender`
+(`{ hudMs, submitMs, syncMs }` of the most recent render) and `modules` (which physics/render/audio
+implementations are composed). The restart → synced-frame budget splits as: `restart()` 0.1–0.2 ms,
+HUD DOM ≤ 0.2 ms, renderer submit ≈ 1 ms, GPU sync (SwiftShader raster) 64–72 ms at 1280×720 — the
+same as a steady-state frame, i.e. the restart itself adds nothing.
 `main.ts` composes the real modules when their barrels export them (`createBikePhysics` /
 `bikePhysicsFactory`, `createRenderer` / `ThreeRenderer`, `WebAudioSystem`) with `?physics=mock` and
 `?audio=0` as fallbacks.

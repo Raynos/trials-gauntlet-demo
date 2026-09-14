@@ -431,7 +431,11 @@ export class Game {
     this.onResults?.(result);
   }
 
+  /** Timing of the most recent render pass (hook.info().lastRender). */
+  readonly lastRender = { hudMs: 0, submitMs: 0, syncMs: 0 };
+
   private render(alpha: number, dt: number): number {
+    const tStart = performance.now();
     const state = this.getState();
     const info = this.runInfo;
     info.runTime = this.runTime();
@@ -444,7 +448,12 @@ export class Game {
     this.hud?.setRun(info);
     this.hud?.update(state);
     this.audio?.update(state, dt, this.input);
-    return this.renderer.render(state, alpha);
+    const tHud = performance.now();
+    const ms = this.renderer.render(state, alpha);
+    this.lastRender.hudMs = tHud - tStart;
+    this.lastRender.submitMs = performance.now() - tHud;
+    this.lastRender.syncMs = 0;
+    return ms;
   }
 
   /** Harness entry: advance exactly n ticks. */
@@ -457,8 +466,11 @@ export class Game {
     if (!sync) return this.render(this.loop.alpha, this.loop.dt);
     const t0 = performance.now();
     this.render(this.loop.alpha, this.loop.dt);
+    const t1 = performance.now();
     this.renderer.finish();
-    return performance.now() - t0;
+    const t2 = performance.now();
+    this.lastRender.syncMs = t2 - t1;
+    return t2 - t0;
   }
 
   /** Real-time entry: feed elapsed seconds. Paused or in the menu: render only. */

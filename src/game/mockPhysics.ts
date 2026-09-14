@@ -5,10 +5,9 @@
  */
 import type { CompiledTrack, GameEvent, InputFrame, PhysicsSnapshot, PhysicsState, TrackDef, Vec2 } from '../core/types';
 import { Rng } from '../core/rng';
+import { WHEELBASE, WHEEL_RADIUS } from '../core/types';
 import type { PhysicsWorld } from '../physics';
 
-const WHEELBASE = 1.3;
-const WHEEL_RADIUS = 0.34;
 const MAX_SPEED = 14; // m/s
 const ACCEL = 9;
 const BRAKE_DECEL = 16;

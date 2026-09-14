@@ -15,7 +15,7 @@ const TRACKED = new Set([...THROTTLE, ...BRAKE, ...BACK, ...FWD, ...RESTART, 'Es
 export class KeyboardInput implements InputSource {
   readonly device = 'keyboard' as const;
   private readonly down = new Set<string>();
-  private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, active: false };
+  private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false };
   private readonly onDown = (e: KeyboardEvent): void => {
     if (e.repeat) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -25,6 +25,10 @@ export class KeyboardInput implements InputSource {
     if (e.code === 'Escape') this.meta.pause = true;
     if (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space') this.meta.confirm = true;
     if (e.code === 'Backspace') this.meta.back = true;
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') this.meta.navX = -1;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') this.meta.navX = 1;
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') this.meta.navY = -1;
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') this.meta.navY = 1;
   };
   private readonly onUp = (e: KeyboardEvent): void => {
     this.down.delete(e.code);

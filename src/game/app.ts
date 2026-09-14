@@ -189,10 +189,12 @@ export class App {
   private tickFrame(elapsed: number): void {
     const { frame, meta } = this.mux.poll();
     if (this.menu.visible) {
+      if (meta.navX || meta.navY) this.menu.move(meta.navX, meta.navY);
       if (meta.confirm) this.menu.confirm();
     } else if (this.pause.visible) {
+      if (meta.navX || meta.navY) this.pause.move(meta.navX, meta.navY);
       if (meta.pause || meta.back) this.resume();
-      else if (meta.confirm) this.resume();
+      else if (meta.confirm) this.pause.confirm();
     } else {
       if (meta.pause) this.togglePause();
       this.game.setInput(frame);

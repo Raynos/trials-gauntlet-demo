@@ -76,6 +76,14 @@ function makeAudio(makePhysics: PhysicsFactoryFn, muted: boolean): { audio: Audi
   return { audio, kind, extras };
 }
 
+interface Composed {
+  game: Game;
+  hud: DomHud;
+  bestTimes: BestTimes;
+  audio: AudioSystem;
+  renderer: GameRenderer;
+}
+
 function boot(): void {
   const params = new URLSearchParams(location.search);
   const harness = params.get('harness') === '1';
@@ -83,60 +91,71 @@ function boot(): void {
   const app = document.getElementById('app');
   if (!app) throw new Error('#app missing');
   injectStyles();
-
-  const t0 = performance.now();
-  const { renderer, kind: renderKind } = makeRenderer(app, harness);
-  const tRender = performance.now();
-  const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics') === 'mock');
-  const physics = makePhysics(physicsHz);
-  const tPhysics = performance.now();
-  const { audio, kind: audioKind, extras } = makeAudio(makePhysics, params.get('audio') === '0');
-  const tAudio = performance.now();
-
-  const ui = document.createElement('div');
-  ui.id = 'ui';
-  app.appendChild(ui);
-  const bestTimes = new BestTimes();
-  const hud = new DomHud(ui, (id) => bestTimes.get(id));
-
-  const game = new Game({
-    physicsHz,
-    physics,
-    renderer,
-    hud,
-    audio,
-    bestTimes,
-    autoSkipCountdown: harness && params.get('countdown') !== '1',
-  });
-  const tGame = performance.now();
-  console.info(
-    `[trials] physics=${physicsKind} render=${renderKind} audio=${audioKind} harness=${harness} | construct ms: render ${(tRender - t0).toFixed(0)} physics ${(tPhysics - tRender).toFixed(0)} audio ${(tAudio - tPhysics).toFixed(0)} game ${(tGame - tAudio).toFixed(0)}`,
-  );
-
-  extras.modules = { physics: physicsKind, render: renderKind, audio: audioKind };
+  const extras: HookExtras = {};
   const initialTrack = params.get('track') ?? undefined;
 
+  let composed: Composed | null = null;
+  const compose = (): Composed => {
+    if (composed) return composed;
+    const t0 = performance.now();
+    const { renderer, kind: renderKind } = makeRenderer(app, harness);
+    const tRender = performance.now();
+    const { make: makePhysics, kind: physicsKind } = physicsFactory(params.get('physics') === 'mock');
+    const physics = makePhysics(physicsHz);
+    const tPhysics = performance.now();
+    const audioParts = makeAudio(makePhysics, params.get('audio') === '0');
+    if (audioParts.extras.renderOffline) extras.renderOffline = audioParts.extras.renderOffline;
+    const tAudio = performance.now();
+
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    app.appendChild(ui);
+    const bestTimes = new BestTimes();
+    const hud = new DomHud(ui, (id) => bestTimes.get(id));
+    const game = new Game({
+      physicsHz,
+      physics,
+      renderer,
+      hud,
+      audio: audioParts.audio,
+      bestTimes,
+      autoSkipCountdown: harness && params.get('countdown') !== '1',
+    });
+    const tGame = performance.now();
+    extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind };
+    console.info(
+      `[trials] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=${harness} | compose at ${t0.toFixed(0)} ms since nav; ms: render ${(tRender - t0).toFixed(0)} physics ${(tPhysics - tRender).toFixed(0)} audio ${(tAudio - tPhysics).toFixed(0)} game+hud ${(tGame - tAudio).toFixed(0)}`,
+    );
+    if (harness) {
+      renderer.resize(window.innerWidth, window.innerHeight, 1);
+      window.addEventListener('resize', () => renderer.resize(window.innerWidth, window.innerHeight, 1));
+    }
+    composed = { game, hud, bestTimes, audio: audioParts.audio, renderer };
+    return composed;
+  };
+
   if (harness) {
-    renderer.resize(window.innerWidth, window.innerHeight, 1);
-    window.addEventListener('resize', () => renderer.resize(window.innerWidth, window.innerHeight, 1));
-    // Hook first (CONTRACT §3: track/texture generation happens *after* installHook and is
-    // budgeted separately — see info().loadTrackMs), then the track in the next task so
-    // `ready` is observable before the load. Any hook call the harness makes queues behind it.
-    installHook(game, true, extras);
+    // `ready` first, at module-evaluation time. The hook resolves the game on first use, so
+    // any harness call is correct regardless of task order; normally the composition task
+    // below (renderer + WebGL context, physics, audio, HUD) and the track load have already
+    // run. CONTRACT §3: texture/track generation happens after installHook and is budgeted
+    // separately — `info().loadTrackMs`; the first frame is the harness's own `render()`.
+    installHook(() => compose().game, true, extras);
     setTimeout(() => {
-      game.loadTrack(initialTrack);
+      const { game } = compose();
+      if (!game.currentTrack) game.loadTrack(initialTrack);
       console.info(`[trials] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
-      game.renderOnce(); // one frame so the canvas is not blank before the harness takes over
     }, 0);
     return;
   }
 
+  const { game, hud, bestTimes, audio, renderer } = compose();
   const shell = new App({
     game,
     hud,
     bestTimes,
     audio,
-    uiRoot: ui,
+    uiRoot: document.getElementById('ui')!,
     resize: (w, h, dpr) => renderer.resize(w, h, dpr),
     initialTrack,
   });
