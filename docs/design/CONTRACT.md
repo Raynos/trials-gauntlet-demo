@@ -99,7 +99,9 @@ export interface CompiledTrack {
 export function compileTrack(def: TrackDef): CompiledTrack;   // src/tracks/compile.ts, pure, deterministic
 ```
 
-Rules: seesaw is the only dynamic collider; drums with `rolls` spin about their centre with an
+Rules: polylines are oriented with the **solid on the right of travel** (ground runs +x, so
+its normal points +y); `oneWay` polylines collide only from their normal side. Obstacle
+`pos.y` is the base reference — heights are `pos.y + height`. Seesaw is the only dynamic collider; drums with `rolls` spin about their centre with an
 inertia physics chooses (they do not translate). Polylines are the ground profile plus every
 static obstacle outline, merged so no surface is double-registered. `obstacleIndex` points into
 `def.obstacles` (-1 = ground profile).

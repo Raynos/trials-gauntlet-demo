@@ -1,30 +1,14 @@
 /**
- * Track registry. Real hand-authored courses land here later; the scaffold
- * ships one flat test track so the harness has something to load.
+ * Track registry (tracks owner). Fixtures `flat-test` / `gap-test` plus the
+ * 15-track curriculum, registered with stable ids (`b1-first-ride` style).
  */
 import type { TrackDef } from '../core/types';
-import { seedFromString } from '../core/rng';
+import { ALL_TRACKS, CURRICULUM, FLAT_TEST_TRACK, GAP_TEST_TRACK } from './courses';
 
-export const FLAT_TEST_TRACK: TrackDef = {
-  id: 'flat-test',
-  name: 'Flat Test Strip',
-  tier: 'beginner',
-  seed: seedFromString('flat-test'),
-  profile: [
-    { x: -10, y: 0 },
-    { x: 200, y: 0 },
-  ],
-  obstacles: [],
-  checkpoints: [
-    { x: 40, spawn: { pos: { x: 40, y: 0 }, angle: 0 } },
-    { x: 80, spawn: { pos: { x: 80, y: 0 }, angle: 0 } },
-  ],
-  start: { pos: { x: 0, y: 0 }, angle: 0 },
-  finishX: 120,
-  targetAttempts: 1,
-};
+export { FLAT_TEST_TRACK, GAP_TEST_TRACK, CURRICULUM, ALL_TRACKS };
 
-const registry = new Map<string, TrackDef>([[FLAT_TEST_TRACK.id, FLAT_TEST_TRACK]]);
+const registry = new Map<string, TrackDef>();
+for (const t of ALL_TRACKS) registry.set(t.id, t);
 
 export function registerTrack(track: TrackDef): void {
   if (registry.has(track.id)) throw new Error(`track already registered: ${track.id}`);
@@ -41,4 +25,17 @@ export function listTrackIds(): string[] {
 
 export const DEFAULT_TRACK_ID = FLAT_TEST_TRACK.id;
 
-export { compileTrack, hashColliders } from './compile';
+export { compileTrack, hashColliders, TrackCompileError, profileQuery } from './compile';
+export { course, CourseBuilder, FEEL, validateSpawns } from './author';
+export { describeTrack, describeObstacles, describeAhead } from './describe';
+export {
+  OBSTACLE_KINDS,
+  KIND_DEFAULTS,
+  SUMMARY_KEYS,
+  footprint,
+  isObstacleKind,
+  isSolidKind,
+  resolveParams,
+  type ObstacleKind,
+  type KindParams,
+} from './kinds';
