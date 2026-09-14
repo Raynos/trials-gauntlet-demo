@@ -25,3 +25,8 @@ export interface PhysicsWorld {
 }
 
 export type PhysicsFactory = (physicsHz: number) => PhysicsWorld;
+
+export { createBikePhysics, bikePhysicsFactory } from './bike';
+export type { BikePhysicsWorld, PhysicsDebug, TeleportPose, SuspDebug, HopPhase } from './bike';
+export { DEFAULT_TUNING, mergeTuning } from './tuning';
+export type { BikeTuning, PartialTuning } from './tuning';

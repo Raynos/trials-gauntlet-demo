@@ -1,487 +1,314 @@
 # Physics design: bike + rider
 
-Owner: physics. Scope: `src/physics/**` (implements the existing `PhysicsWorld`
-contract in `src/physics/index.ts`, consumes `src/core/types.ts` unchanged).
-Reference numbers come from `reference/notes/*.md` (frame-counted footage of
-Trials Evolution / Rising). Units: metres, kilograms, seconds, radians; x along
-the course, y up; angles CCW-positive, so **nose-up pitch is positive**.
+Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
+`docs/design/CONTRACT.md`, the CONTRACT wins and this file is wrong.
+Units: metres, kilograms, seconds, radians; +x along the course, +y up;
+angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
+
+Status: **round 1 shipped** — `createBikePhysics(hz, tuning?)` /
+`bikePhysicsFactory` in `src/physics/bike.ts`, 36 vitest tests green,
+measured envelope in section 12. Not yet wired into `src/main.ts` (core-game
+owner swaps `new MockPhysics(hz)` for `bikePhysicsFactory(hz)`).
 
 ## 1. Goals and non-goals
 
 - The metric is attempts-to-clear and restart latency. Physics must be (a) fun
-  to fail in, (b) readable (pitch drifts, never snaps), (c) totally reset-able
-  in one tick, (d) bit-identical on replay.
-- Feel targets lifted from the corpus: throttle from rest lifts the front in
-  ~0.3 s; rear-wheel balance is held for seconds at 40-50 deg (rider back) or
-  65-75 deg (rider forward) with +/-5 deg wobble at ~1 s period; landings are
-  rear-first with a 0.25 s compress / 0.4 s extend settle; a stationary hop
-  has ~0.6 s airtime; a 60 deg plank is climbable at ~1 wheelbase/s and a
-  failed climb rolls back instead of crashing; big-air is 2.4-3.2 s.
+  to fail in, (b) readable (pitch drifts, never snaps), (c) reset-able in one
+  tick, (d) bit-identical on replay and after `restore(snapshot())`.
+- Feel targets are the CONTRACT §2.5 table (measured in section 12) plus the
+  corpus: throttle from rest lifts the front in ~0.3 s; wheelie balance is held
+  for seconds at 40-50 deg; landings are rear-first with a compress/extend
+  settle; a stationary hop has ~0.6 s airtime; a failed climb rolls back
+  instead of crashing; big air is 2.4-3.2 s.
 - Non-goals: lateral dynamics (the world is 2D), gears, clutch input, tyre
-  temperature, soft-body terrain. Camera and particles read `PhysicsState`
-  only; they are not simulated here.
+  temperature, soft-body terrain.
 
-## 2. Custom solver vs Rapier / planck.js
+## 2. Solver
 
-We build a custom 2D sequential-impulse solver (~1.2 kLOC TS). Reasons, then
-the honest cost:
+Custom 2D sequential-impulse solver (`src/physics/bike.ts`, ~1.4 kLOC).
+Semi-implicit Euler, 8 velocity iterations per tick in a fixed order, Baumgarte
+position correction (β 0.2 contacts with 5 mm slop, 0.3 joints), speculative
+contacts (margin 2 cm + |v|·dt) so a 20 m/s wheel never tunnels a plank edge.
+No warm starting, so there are no contact caches to snapshot. Rapier/planck
+were rejected for bundle size, async wasm init and the lack of a first-class
+tyre model; see the git history of this file for the comparison table.
 
-| | Rapier (wasm) | planck.js (Box2D port) | Custom |
-|--|--|--|--|
-| Determinism | Yes with `enhanced-determinism`, but wasm init is async (~10-30 ms) and the 1.5-2 MB bundle hurts the 40-80 ms cold boot we measured | Yes on one engine; uses `Math.sin/cos/atan2` internally (ulp differences across engines) | Yes; we ban transcendental `Math.*` in the hot path (section 9) |
-| Tyre model | Contact friction is a Coulomb clamp; a slip-curve tyre means fighting the solver | Same; `WheelJoint` is a car-suspension joint, no slip curve | Tyre is a first-class constraint with our own `mu(kappa)` |
-| Tuning surface | Generic joint/contact params | Generic | Every number in section 4 is ours and named |
-| Cost | 0 physics code, +collision, +ragdoll for free | Small bundle, generic shapes | We write circle/capsule/polygon vs segment/circle/box and 4 ragdoll revolute joints; no broadphase generality, no CCD beyond speculative contacts |
+All mutable state lives in one `Float64Array F` (40 scalars + SoA bodies:
+`px py vx vy angle angVel invMass invInertia`) and one `Uint8Array U` (16
+flags/enums). `snapshot()` is two typed-array copies; `restore()` is bit-exact
+by construction (`world.test.ts` forks at ticks 200, crash-5, crash, crash+1,
+crash+200 and compares 500-tick hash traces).
 
-Trade-off stated plainly: a library gives us robust stacking, CCD and shape
-generality on day one; we need none of those (3-4 bodies while riding, <=10
-while ragdolling, all against static geometry) and we do need control of
-solve order, effective-mass coupling of the rear tyre to engine torque, and a
-single deterministic arithmetic path. If the custom solver is not stable and
-bit-exact by the end of milestone M2 (section 12) we fall back to planck.js
-with a custom friction callback and accept engine-specific replays.
+### 2.1 Bodies
 
-## 3. Bodies, geometry, coordinate frames
+| index | body | mass (kg) | inertia (kg m²) | collision shape |
+|--|--|--|--|--|
+| 0 | frame | 56 | 14 | 4 hard-point circles (bash plate, tail, fork crown, bars) |
+| 1 | rearWheel | 7 | 0.7 | circle r 0.34 (tyre) |
+| 2 | frontWheel | 7 | 0.5 | circle r 0.34 (tyre) |
+| 3 | rider | 75 | 15 (hidden torso DOF, section 7.4) | 3 sensor circles: head r 0.15, torso 2× r 0.13 — a touch is a crash, never a contact |
+| 4-10 | ragdoll head/torso/pelvis/upperArm/forearm/thigh/shin | 5/30/12/5/3/12/8 | rod | 1-2 circles per limb, μ 0.6, e 0.15 |
+| 11+ | one pinned body per seesaw, then per rolling drum | ∞ | seesaw m·L²/3; drum ½(60·r²)·r² | box / circle owned by the body |
 
-All positions in world space; each body carries `pos`, `vel`, `angle`,
-`angVel`, `invMass`, `invInertia`. State is stored SoA in one `Float64Array`
-(section 9) so a snapshot is a copy.
+Total 145 kg; combined COM at neutral lean is 0.70 m ahead of the rear axle and
+0.74 m above ground (0.40 m above the axle line; CONTRACT says 0.45 — the
+0.05 m went into `leanCrouch`, see 7.1, so the neutral figure is what the
+40-50 deg balance requires).
 
-| Body | Mass (kg) | Inertia (kg m^2) | Shape (local, m) |
-|--|--|--|--|
-| `frame` (chassis + engine + fuel) | 56 | 9.0 | Convex 7-gon: (-0.75,-0.10) (-0.45,-0.30) (0.45,-0.32) (0.85,-0.05) (0.70,0.25) (0.20,0.45) (-0.40,0.35) |
-| `rearWheel` | 7 | 0.9 (incl. reflected flywheel) | circle r=0.34 |
-| `frontWheel` | 7 | 0.45 | circle r=0.34 |
-| `rider` (while riding) | 75 | point mass (pose is derived) | capsule for crash test: hips at COM-(0,0.30) to head at COM+(0,0.40), r=0.15 |
+### 2.2 Constraints, in solve order
 
-Total 145 kg. Frame local origin is the frame COM, which sits 0.585 m ahead of
-the rear axle and 0.55 m above ground at zero suspension compression.
+1. Suspension sliders (rear, front): wheel centre on the line `axle + axis·c` in
+   frame space (bilateral perpendicular constraint) plus unilateral travel
+   limits at c = 0 and c = travel. Spring/damper along the axis is a force
+   (section 4) with the damping impulse clamped so it can never reverse the
+   compression rate in a tick.
+2. Rider tether: radial max-distance (`tetherMax` 0.5 m) and the
+   **legs-straight stop**: the rider cannot rise more than `legSlack` (5 cm)
+   above the anchor along frame-up. The stop is what lets a hop lift the bike.
+3. Ragdoll revolute joints (6, point + angular range about the spawn pose).
+4. Seesaw angle limits (±`maxAngle`).
+5. Contacts: normal (accumulated, ≥ 0, restitution 0 for bike, 0.15 ragdoll)
+   then friction (tyre model for wheels, Coulomb 0.6 otherwise).
+6. Brakes: angular constraint locking wheel spin to the frame, impulse-capped
+   at `brake·maxNm·dt`; the front cap fades with rear-wheel unload (7.6).
+
+### 2.3 Tyre
+
+Contact-point friction is the rolling constraint (the patch velocity already
+includes ω×r). `κ = |slip| / max(|v_t|, 1 m/s)`; μ = `muPeak`·grip(surface)·
+shape(κ) with shape = 1 for κ ≤ 0.15 falling linearly to `slideFrac` 0.9 at
+κ ≥ 1. `muPeak` 2.0; grip dirt 1.0, wood 0.95, concrete 1.05, metal 0.75,
+rubber 1.1, grate 0.9, stone 1.0, snow 0.5. Rolling resistance 0.012·N·R.
+
+## 3. Engine, brakes, aero
+
+`rpm = max(idle + throttleEff·(clutchRpm − idle), ω_rear·gearRatio·60/2π)`
+— idle 1500, slipping auto-clutch 3500 under throttle, **limiter cuts at
+10 000 and re-arms below 9 500** (CONTRACT). Torque curve (rpm, fraction):
+`[1500,.9] [3000,1] [5000,1] [6500,.98] [8000,.9] [9500,.72] [10000,.62]`,
+peak 38 Nm × gear 17.5 × η 0.92 = 612 Nm at the wheel = 1800 N of thrust.
+Engine braking 8 % of peak scaled by rpm off throttle. Throttle slews at 40/s
+up, 60/s down. Top speed is limiter-bound at 20.4 m/s (measured 20.45).
+Engine torque goes on the rear wheel and its reaction on the frame, so the
+pitch-up moment is F·h as it should be; in the air throttle pitches nose-up
+and brake nose-down through wheel angular momentum (section 12, F9).
+
+Brakes: front 640 Nm, rear 500 Nm. Aero drag F = −0.4·v|v| on the frame.
+
+## 4. Tuning table
+
+`src/physics/tuning.ts` `DEFAULT_TUNING` (frozen); `createBikePhysics(hz,
+partial)` deep-merges. Values as shipped in round 1:
 
 ```
-wheelbase L        = 1.30          wheel radius r      = 0.34
-rear axle (local)  = (-0.585,-0.21) front axle (local) = (+0.715,-0.21)
-rear susp axis     = norm(+0.17, 0.985)   // swingarm arc: up + slightly fwd
-front susp axis    = norm(-0.42, 0.91)    // 25 deg rake fork: up + back
-rider neutral anchor (local) = (-0.035, 0.50)   // rider COM 1.05 m above ground
-rider lean range   = -0.35 m (back) .. +0.45 m (fwd) along frame x
-rider crouch       = -0.30 m ; hop extension = +0.25 m along frame y
+gravity 9.81
+frame   mass 56  inertia 14  comHeight 0.55
+wheel   radius 0.34  mass 7  inertiaRear 0.7  inertiaFront 0.5  wheelbase 1.30
+susp rear  axle (-0.585,-0.210) axis norm(0.17,0.985) travel 0.22 k 12000 cComp 650 cReb 1100 preload 0.02 kStop 60000 @0.8
+susp front axle (+0.715,-0.215) axis norm(-0.42,0.91) travel 0.20 k 10500 cComp 550 cReb 950  preload 0.02 kStop 60000 @0.8
+tyre    muPeak 2.0 kappaPeak 0.15 slideFrac 0.9 vRef 1.0 rollRes 0.012
+engine  idle 1500 clutch 3500 limiter 10000/9500 peak 38 Nm gear 17.5 eff 0.92 engineBrake 0.08 slew 40/60
+brakes  front 640 rear 500 antiEndo 0.05
+rider   mass 75 anchor (+0.21,+0.50) k 6000 c 740 kLanding 40000
+        leanBack 0.60 leanFwd 0.85 leanRate 6 leanCrouch 0.30
+        crouch 0.30 crouchTime 0.25 hopExtend 0.15 hopForce 2600 hopMaxForce 3200 kPush 500
+        hopPreloadMin 0.12 hopPreloadMax 1.5 hopPushTime 0.35 hopRecoverTime 0.6
+        hopLeanBack -0.5 hopThrottle 0.3 hopSnapRate 4
+        tetherMax 0.5 ejectForce 12000 legSlack 0.05 armFrac 0.3
+        headRadius 0.15 torsoRadius 0.13 torsoFollow 0.5
+        torso inertia 15 swing 1.2 k 4000 c 390 maxTorque 300
+aero    dragCoef 0.4
+solver  velocityIters 8 slop 0.005 baumgarte 0.2 jointBaumgarte 0.3 speculativeMargin 0.02
+ragdoll sleepAfter 3.0 restitution 0.15 mu 0.6 spread 0.3
+drum    density 60
 ```
 
-Ground truth for the balance analysis (section 6): combined COM at neutral is
-0.573 m ahead of the rear axle and 0.788 m above ground (0.448 m above the
-axle).
+Static checks: rear sag 0.125·0.22 = 27 mm, front 0.206·0.20 = 41 mm (the
+raked fork carries less of its load axially); frame level within 0.24 deg at
+rest; sprung frequency ~2 Hz; rider spring 8.9 rad/s, ζ 0.55.
 
-## 4. Tuning table (initial values)
-
-Everything below is one `BikeTuning` object (`src/physics/tuning.ts`);
-`DEFAULT_TUNING` is frozen and hashed into `HookInfo.version` so a replay
-records which tuning it was made with.
-
-```ts
-export interface BikeTuning {
-  gravity: number;               // 9.81   (world scale 1.0; big air comes from speed, not low g)
-  frame: { mass: 56; inertia: 9.0; poly: Vec2[] };
-  wheel: { radius: 0.34; mass: 7; inertiaRear: 0.9; inertiaFront: 0.45 };
-  suspension: {
-    rear:  { axis: Vec2; travel: 0.22; k: 12000; cComp: 650; cReb: 1100; preload: 0.02; kStop: 60000; stopStart: 0.80 };
-    front: { axis: Vec2; travel: 0.20; k: 10500; cComp: 550; cReb: 950;  preload: 0.02; kStop: 60000; stopStart: 0.80 };
-  };
-  tyre: { muPeak: 1.6; B: 10; C: 1.3; E: 0.97; vRef: 1.0; rollRes: 0.015; restitution: 0 };
-  engine: {
-    idleRpm: 1500; limiterRpm: 10500; limiterResetRpm: 10000;
-    peakTorqueNm: 27;                     // at the crank
-    curve: [number, number][];            // [rpm, fraction of peak], piecewise linear
-    gearRatio: 15.5; efficiency: 0.92;    // -> 385 N m peak at the wheel, 1132 N drive force
-    engineBrakeFrac: 0.08;                // drag torque at zero throttle, scaled by rpm/limiter
-    throttleRise: 40; throttleFall: 60;   // 1/s slew on the *effective* throttle (fuel lag ~25 ms)
-  };
-  brakes: { frontMaxNm: 900; rearMaxNm: 600; bias: 0.6 /* fraction of input to front */ };
-  rider: {
-    mass: 75; k: 6000; c: 740; kLanding: 40000 /* cubic term, section 7.3 */;
-    leanBack: 0.35; leanFwd: 0.45; leanRate: 6 /* per s: full swing 0.17 s */;
-    crouch: 0.30; hopExtend: 0.25; kHop: 25000; hopPreloadMin: 0.12; hopPreloadMax: 0.45; hopPushTime: 0.20;
-    tetherMax: 0.45; ejectForce: 7500;    // N, sustained >= 2 ticks -> crash
-  };
-  aero: { dragCoef: 0.40 /* N s^2/m^2, F = -c v|v| */ };
-  solver: { velocityIters: 8; positionIters: 3; slop: 0.005; baumgarte: 0.2; speculativeMargin: 0.01 };
-  crash: { headRadius: 0.15; overRotationRad: null /* backflips are legal */; oobDepth: 5 };
-  ragdoll: { sleepAfter: 3.0; restitution: 0.15; mu: 0.6 };
-}
-```
-
-Engine curve (rpm, fraction): `[1500,.55] [3000,.75] [5000,.92] [6500,1.0]
-[8000,.95] [9500,.78] [10500,.60]`; above the limiter torque is 0 until rpm
-falls under `limiterResetRpm` (the audible bounce). Engine rpm is
-`max(idleRpm, wheelOmega * gearRatio * 60/2pi)`; the auto-clutch is implied
-(no stall, no clutch input). Top speed is limiter-bound at ~24 m/s (wheel
-omega 70.6 rad/s), not drag-bound: at 22 m/s drag is 194 N vs 850 N of thrust.
-
-Sanity checks on the table: static sag rear = 782 N / 12000 = 0.065 m (30% of
-travel), front 640 N / 10500 = 0.061 m; sprung natural frequency
-`sqrt(12000/72) = 12.9 rad/s = 2.05 Hz`, damping ratio 0.35 in compression /
-0.6 in rebound. Rider spring `sqrt(6000/75) = 8.9 rad/s`, zeta 0.55, so a
-lean step is 90% realised in ~0.2 s: the "body lags input by 100-150 ms"
-observation, without scripting it.
-
-## 5. Integration scheme and tick order
-
-Fixed `dt = 1/120`. Semi-implicit (symplectic) Euler for bodies, sequential
-impulses for constraints, non-linear Gauss-Seidel for position error. Fixed
-iteration counts, no tolerance early-outs, constraints solved in a fixed order
-(by constraint kind, then body id) so the floating-point sequence is
-identical every run.
+## 5. Tick order
 
 ```
 step(input):
- 1  restart edge   -> fault('restart') + reset(checkpoint), return
- 2  if faulted     -> ragdoll/free-bike sim only (steps 5-9 with rider bodies), tick++, return
- 3  input          -> effective throttle slew; brake torques; lean target slew (leanRate);
-                      hop state machine edge (section 7.4)
- 4  forces         -> gravity; suspension spring/damper along axis (preload, bump stop);
-                      rider spring/damper (nonlinear); engine torque on rearWheel and -torque
-                      on frame; engine braking; rolling resistance; aero drag on frame
- 5  v += F/m dt, w += tau/I dt            (all bodies)
- 6  collide        -> wheels, frame poly, rider capsule vs static shapes (speculative margin
-                      = max(0.01, |v_n| dt)); rider contact => crash flag (section 8)
- 7  velocity solve -> 8 iterations over: slider joints, slider limits, rider tether,
-                      contacts (normal, then tyre/friction), brake torque clamp
- 8  x += v dt, angle += w dt, spin += spinVel dt
- 9  position solve -> 3 NGS iterations: slider perpendicular error, limits, contact penetration
-10  derive         -> compression, grounded, rider pose, checkpoint/finish, crash resolution,
-                      events, tick++, time = tick*dt
+ 1  restart edge      -> fault('restart') + reset(checkpoint), return (latched until released)
+ 2  asleep            -> tick++ only (ragdoll settled)
+ 3  controls          -> throttle/lean slew, hop state machine, engine rpm/limiter/torque, brake input
+ 4  forces            -> gravity; suspension geometry+rates (pass 1) then impulses (pass 2);
+                         rider spring/actuator/weight at the anchor; torso torque pair; engine; drag
+ 5  collide           -> wheels, frame hard points, rider sensors (riding) or ragdoll circles (crashed)
+ 6  solve             -> 8 iterations in the order of 2.2
+ 7  integrate         -> x += v dt, angle += ω dt
+ 8  derive            -> compression, grounded/surface, land events, slip, checkpoint/finish,
+                         crash rules -> ragdoll spawn, sleep, rng advance, tick++
 ```
 
-Brake torque is applied as a clamped impulse inside the velocity solve (max
-|dw| such that spin cannot reverse within a tick), which is what makes a brake
-at 0.5 m/s stop the wheel dead instead of oscillating.
+Suspension rates are read for **both** wheels before either spring impulse is
+applied (a rate read after the other wheel's impulse produced a phantom 0.14
+m/s damper velocity at rest in the first build).
 
-### 5.1 Constraints
+## 6. Balance point
 
-- **Slider (suspension)**: wheel centre stays on the line through the axle
-  rest point along `axis` (in frame space). 1-DOF constraint on the
-  perpendicular; effective mass includes the frame's angular term
-  `1/(1/m_f + 1/m_w + (r_perp x n)^2 / I_f)`. Along the axis: soft spring
-  force (step 4) + unilateral limit impulses at compression 0 and `travel`.
-  Compression above `stopStart` adds `kStop*(c-stopStart*travel)` (bump stop).
-- **Rider tether**: while the rider is a point mass it is coupled with the
-  nonlinear spring (step 4) and a hard max-distance constraint at
-  `tetherMax` from the anchor. The tether impulse is accumulated; if the
-  equivalent force exceeds `ejectForce` for 2 consecutive ticks the rider is
-  ejected (crash). The spring reaction is applied to the frame at the anchor,
-  so weight shift is a real force with a real moment arm.
-- **Contact**: non-penetration with restitution 0 (wheels) / 0.15 (frame,
-  ragdoll), Baumgarte-free (position error fixed by NGS). Friction: tyre
-  model for wheels (section 5.2), Coulomb mu 0.6 for everything else.
-- **Revolute** (ragdoll only): 2-DOF point constraint + angular limit.
+Combined COM in frame space relative to the rear contact patch: `d` ahead,
+`h` above. `balancePitch(lean, a) = π/2 − atan2(h, d) + atan(a/g)`, computed
+from the tuning masses with the rider at the lean-shifted anchor.
 
-### 5.2 Tyre model
+| lean | d (m) | h (m) | balance pitch | measured |
+|--|--|--|--|--|
+| −1 (back) | 0.39 | 0.59 | 32 deg | 32.4 |
+| 0 | 0.70 | 0.74 | 43 deg | 42.4 |
+| +1 (fwd) | 1.14 | 0.59 | 62 deg | 62.0 |
+| 0, a = +3 m/s² | | | 59 deg | 59.5 |
 
-Per grounded wheel, with contact normal `n`, tangent `t`, normal impulse
-`lambda_n` from the same iteration:
-
-```
-v_c    = v_wheel + w x r_vec                // contact patch velocity
-slip   = (w * r) - dot(v_c - v_ground, t)   // + = wheel spinning faster than rolling
-kappa  = slip / max(|dot(v_c, t)|, vRef)    // vRef = 1 m/s keeps standstill finite
-mu     = muPeak * grip(material) * sin(C * atan(B*kappa - E*(B*kappa - atan(B*kappa))))
-lambda_t = clamp(-m_eff_t * slip, -mu*lambda_n, +mu*lambda_n)   // rolling constraint, cone-clamped
-```
-
-`m_eff_t = 1/(1/m_w + r^2/I_w + coupling)`; the coupling to the frame comes
-for free from iterating with the slider joint. The curve peaks at
-kappa ~0.15 with `mu = 1.6` and settles to `1.6*sin(1.3*pi/2) = 1.42` when
-fully spinning. Because the sticking case is an impulse (not a stiff spring)
-there is no chatter at 120 Hz; the explicit alternative has a 0.4 ms time
-constant and is unstable at this dt. Material grip: dirt 1.0, wood 0.95,
-concrete 1.05, metal 0.75, rubber (drums) 1.10, mud 0.60, ice 0.25.
-
-Drive: engine torque `tau` on `rearWheel` (spinning it CW for +x travel) and
-`-tau` on `frame`. The reaction is what pitches the nose up; the drive force
-at the patch is what accelerates. In the air, throttle spins the rear wheel
-up and (via `-tau`) rotates the frame nose-up; brake does the reverse. With
-`inertiaRear = 0.9` a 0.5 s full brake from 30 rad/s transfers 27 N m s to a
-frame with ~15 kg m^2 pitch inertia (frame+rider hanging on): about -20 deg
-of pitch, which is the Trials mid-air correction.
-
-## 6. Balance point analysis (wheelie equilibrium)
-
-With the rear wheel on the ground and the front in the air the bike is an
-inverted pendulum about the rear contact patch. Let `(d, h)` be the combined
-COM relative to the rear axle in frame space at zero pitch, `lambda` the
-effective lean in [-1, 1], `a` the longitudinal acceleration.
-
-```
-d(lambda) = 0.573 + 0.233*max(lambda,0) + 0.181*min(lambda,0)   // 75 kg * 0.45 m fwd / 0.35 m back, over 145 kg
-h         = 0.448                  (rider crouch lowers it: -0.155 * crouch)
-phi       = atan2(h, d)            // COM elevation angle in frame space
-theta_bal = pi/2 - phi + atan(a/g) // pitch at which gravity torque about the patch is zero
-```
-
-| lean | d (m) | theta_bal, a=0 | theta_bal, a=+3 m/s^2 |
-|--|--|--|--|
-| -1 (back)  | 0.392 | 41.2 deg | 58.2 deg |
-| 0          | 0.573 | 52.0 deg | 69.0 deg |
-| +1 (fwd)   | 0.806 | 60.9 deg | 77.9 deg |
-
-So full lean authority moves the equilibrium by ~20 deg (41 -> 61) and throttle
-(acceleration) moves it by `atan(a/g)`, 17 deg at 3 m/s^2. Read it as the
-corpus does: the slow 30-45 deg cruising wheelie at 4.1 m/s is a rider hanging
-back with small throttle pulses (a > 0 keeps the effective balance above the
-actual pitch, then coasting brings it back); the 65-75 deg stationary balance
-is a rider standing forward over the bars.
-
-Stability: it is unstable with growth rate `sigma = sqrt(g/l)`, `l = 0.974 m`
-from the patch to the COM, so `sigma = 3.17 /s`, e-fold 0.315 s; a 1 deg
-error becomes 15 deg in ~0.85 s with no input. That is the "pitch drifts,
-gets corrected" feel, and it fixes the controller requirement: a human with
-~150 ms reaction can hold it (feel test F4 proves a bot with 100 ms latency
-can). The linearised pitch dynamics the bot and the tests use:
-
-```
-I_p * theta'' = M g l sin(theta_bal(lambda,a) - theta)   +   tau_engine - tau_brake  - (rider spring transient)
-I_p ~ M l^2 + I_frame + I_rider_offset ~ 145*0.949 + 9 + 3 ~ 150 kg m^2
-```
-
-Lean does two things: statically it moves `theta_bal` (table above); dynamically the
-rider spring reaction pushes the frame the opposite way for ~0.2 s (a lean-back
-step first gives a small nose-*down* kick of ~2 deg before the COM shift takes
-over). F5 measures both. Launch check: at rest with neutral lean the drive force
-1132 N at height 0.788 m gives 892 N m of nose-up moment vs 145*9.81*0.573 = 815
-N m of gravity, so full throttle from a standstill *does* lift the front with no
-lean (F2), and with lean back (d=0.392, 558 N m) it lifts in well under 0.3 s.
+Instability: σ = √(g/l), l ≈ 1.02 m → e-fold 0.32 s; a 0.5 deg error leaves
+±15 deg in **1.0 s** open loop (measured 1.02 / 0.98 s), inside the CONTRACT's
+1-2 s. The same geometry fixes the climb: moment about the rear contact
+`m g (d cos θ − h sin θ)` keeps the front wheel loaded up to 62 deg at full
+forward lean, so 60 deg is climbable and 65 loops — the CONTRACT bands.
 
 ## 7. Rider model
 
 ### 7.1 Weight shift as a force
-Input `lean` in [-1,1] is slewed at `leanRate` into `leanEff`. The anchor target
-in frame space is `(-0.035 + leanOffset(leanEff), 0.50 - crouch*0.30 + hop*0.25)`.
-The rider point mass is pulled toward the world-space anchor by
-`F = -k*dx - c*dv - kLanding*|dx|^2*dx/|dx|` (cubic term stiffens legs under
-landing loads); `-F` is applied to the frame at the anchor. Nothing else
-moves the bike when you lean: no direct torque, no fake angular velocity.
+`lean` is slewed at `leanRate` into `leanEff`. The anchor in frame space is
+`(0.21 + leanOff, 0.50 − |leanEff|·0.30 − crouch·0.30 + hopExt·0.15)` with
+`leanOff = leanEff·0.85` forward, `leanEff·0.60` back: leaning also crouches
+(sit back low / hang over the bars). The rider point mass is pulled toward
+the anchor by a spring/damper decomposed in frame axes: along-bike
+`−k·x − c·ẋ`; up `−k_up·ext − c·ėxt + m g`, where `k_up = k + kLanding·|d|`
+in compression (legs, stiffening under landing loads) and `k·armFrac` in
+extension **only while preloading** (legs relax so the crouch does not yank
+the bike up). Every rider force reacts on the frame **at the anchor**, so
+weight shift is a real moment with the arm the CONTRACT wants and nothing is
+invented: in free fall the rider floats `m g / k` = 0.12 m above the anchor
+and the frame feels no force.
 
-### 7.2 Derived pose (for the renderer, not simulated)
-```
-rider.lean       = leanEff
-rider.crouch     = clamp(-(riderRelY - neutralY)/0.30, 0, 1)      // actual compression, so landings squash
-rider.torsoPitch = clamp(-0.35*leanEff - 0.15*frame.angle, -0.9, 0.9)
-rider.armExtend  = clamp(max(0, -leanEff) + 0.5*max(0, frame.angle - 0.6), 0, 1)
-```
+### 7.2 Derived pose (renderer only)
+`lean = leanEff`, `crouch = clamp((0.50 − riderLocalY)/0.30, 0, 1)`,
+`torsoPitch = clamp(−0.35·lean − 0.15·wrap(angle), ±0.9)`,
+`armExtend = clamp(max(0, −lean) + 0.5·max(0, wrap(angle) − 0.6), 0, 1)`.
 
 ### 7.3 Landing recovery
-Rear-first landings at +25..35 deg relative to the surface are ideal by
-construction: the rear suspension takes the first hit, the rider spring
-compresses (crouch rises over ~0.1-0.15 s), gravity torque about the rear
-patch drops the front over 0.2-0.4 s, the front suspension lands a second,
-smaller hit, and the rider spring re-extends over ~0.4 s (zeta 0.55 at 8.9
-rad/s gives exactly that). Nose-first below about -20 deg pushes the combined
-COM ahead of the front patch: the frame pitches forward faster than the rider
-spring can follow, the tether saturates, `ejectForce` trips or the head capsule
-hits: crash. The envelope is measured in F6 and is the primary tuning gate for
-`kLanding`, `ejectForce`, `tetherMax`.
+Measured (F6): from a 2 m drop at 6 m/s the bike rides away for every pitch in
+**−30..+35 deg**; +40 loops out, ≤ −35 is not tested. Rear touches first from
+−15 deg up. The eject rule is 12 kN sustained 2 ticks or 1.3·tetherMax.
 
-### 7.4 Bunny hop (preload + release)
-`hop` is edge-triggered. State machine (all times sim time):
+### 7.4 Torso angular momentum store
+A point-mass rider cannot rotate the bike in the air the way Trials does
+(pulling the bars). The rider carries a hidden angular DOF (inertia 15 kg m²)
+coupled to the frame by a torque pair `τ = clamp(k·(lean·swing − rel) −
+c·relRate, ±300 Nm)`: leaning back swings the torso and the equal-and-opposite
+torque pitches the frame nose-up. Angular momentum is conserved (the torso
+angle is never rendered; `torsoPitch` above is the visual). Measured: 0.5 s of
+lean back in the air = **+15 deg**, throttle +14, brake −17.
+
+### 7.5 Bunny hop (technique, no button)
 ```
-IDLE --hop down--> PRELOAD: crouch target -> 1 at rate 1/0.25 s (rider drops 0.30 m,
-                            suspension loads up); held while hop stays true, min 0.12 s
-PRELOAD --hop up (or 0.45 s cap)--> PUSH: anchor target jumps to +0.25 m, k -> kHop (25000)
-                            for hopPushTime (0.20 s); rider mass drives frame into the ground,
-                            ground reaction + suspension rebound launches the whole system
-PUSH --timer--> RECOVER: k -> 6000, crouch target -> 0, back to IDLE when both wheels grounded
+IDLE    --lean <= -0.5 && throttle >= 0.3 && rear grounded-->  PRELOAD (t=0)
+PRELOAD crouch -> 1 over 0.25 s (eased); lean back lifts the front (7.1 + 7.4)
+        --t >= 0.12 s && (lean rate >= +4/s || lean > 0)-->      PUSH
+        --t > 1.5 s || lean released || throttle dropped-->       RECOVER
+PUSH    anchor jumps to +hopExtend, spring -> kPush, damper x0.1, leg actuator +hopForce
+        (capped hopMaxForce) until the rider passes the anchor (legs straight) or 0.35 s
+RECOVER hopExt, crouch decay; -> IDLE after 0.6 s or when both wheels are down again
 ```
-Combined with lean it produces the corpus sequence: lean back during PRELOAD
-lifts the front, PUSH lifts the rear ~0.3-0.6 s later, land rear-first. Target
-for a neutral-lean stationary hop: rear wheel apex 0.30-0.50 m, airtime 0.45-0.70 s
-(F7). Hop is an internal force pair; total vertical momentum still comes from
-the ground, so a hop in mid-air only shuffles the rider (legal, harmless).
+The actuator accelerates the rider up at ~30 m/s²; the legs-straight stop
+then yanks the frame up through the anchor and the recovering anchor pulls
+the frame up further. Measured stationary hop (0.3 s preload): rear apex
+**0.69 m**, airtime 0.85 s, phases idle>preload>push>recover.
+
+### 7.6 Braking
+Front brake torque fades with rear-wheel unload (`antiEndo`: factor
+`clamp(N_rear / (0.05·W), 0.25, 1)`) — the rider modulating a stoppie. Full
+brake at neutral lean stops in 8.0 m with −7.5 deg of dive and no endo;
+leaning back stops from 10 m/s in **5.2 m** (CONTRACT asks ≤ 4.5, see 12).
 
 ## 8. Crash detection and ragdoll
 
-Crash (`fault('crash')`) fires when any of:
-1. **Rider contact**: the rider capsule (hips->head, r 0.15) or head sphere
-   touches any static shape (the bike's own bodies are excluded).
-2. **Ejection**: tether force >= `ejectForce` for 2 consecutive ticks, or rider
-   distance from anchor > `tetherMax*1.3` after position solve (solver gave up).
-3. **Out of bounds**: any body below `min(profile.y) - oobDepth`, or x outside
-   `[profile[0].x - 5, profile[last].x + 5]` -> `fault('out-of-bounds')`.
-Over-rotation is *not* a crash rule (flips are legal); an upside-down landing
-crashes through rule 1. Frame-vs-ground contact (bash plate, bars) is a normal
-contact, not a crash, matching "failed climb rolls back".
-
-On crash: `finished = true`, `faulted = 'crash'`, `finishTime` stays null,
-engine torque is cut, brakes released. The rider point mass is replaced by a
-5-body ragdoll (head 5 kg r 0.12; torso capsule 0.45 m r 0.14, 32 kg; upper legs
-0.42 m, 18 kg; lower legs 0.42 m, 12 kg; arms 0.55 m, 8 kg) joined by revolute
-joints with limits (neck +/-40 deg, hip -20..110, knee 0..140, shoulder -60..170),
-seeded from the rider's velocity plus the frame's angular contribution plus a
-deterministic +/-0.3 m/s spread from `Rng(seed ^ imul(checkpoint+2, 0x9e3779b9) ^ tick)`.
-The bike continues as free bodies (wheels keep spinning, mu 0.6 sliding). After
-`sleepAfter = 3 s` every ragdoll/bike velocity is zeroed so the hash and cost
-stop changing. The whole thing is interruptible: `reset()` on the next tick is
-the single-frame hard cut the corpus demands (respawn <= 1 tick, camera/HUD are
-the game layer's problem).
-
-`reset(checkpoint)` rebuilds *all* physics state from the checkpoint spawn +
-tuning (no carried-over velocities, contacts, RNG position, hop state, throttle
-slew). F10 asserts `hash(reset)` == `hash(loadTrack + reset)`.
+Fault when any of: head/torso sensor circle touches any collider (rule 1,
+`debug().crashCause = 'sensor'`); rider 1.3·tetherMax from the anchor or
+≥ 12 kN of tether force for 2 ticks ('tetherDist'/'tetherForce'); any bike
+body below `track.oobY` → `out-of-bounds`; any bike body inside a hazard AABB
+→ `hazard`. Over-rotation alone is not a crash; frame hard points touching the
+ground are ordinary contacts. On fault: `finished = true`, engine cut, rider
+point mass parked, 7-body ragdoll spawned from the rider pose with the rider's
+velocity + ½ frame spin + ±0.3 m/s `Rng` spread (one `nextU32` per tick keeps
+the stream in the hash surface), bike continues as free bodies. After 3 s
+every velocity is zeroed and the world sleeps. `reset()` rebuilds everything
+from the spawn in one tick (`world.test.ts`).
 
 ## 9. Determinism rules
 
-- No `Math.random`, `Date`, `performance`, frame delta. `Rng` from `src/core/rng`
-  only, reseeded on reset, consumed only for ragdoll spread (one `nextU32` per
-  tick regardless of use, so the stream position is part of the hashed surface
-  as in `MockPhysics`).
-- No `Math.sin/cos/tan/atan/atan2/exp/pow/hypot` in `src/physics` (an ESLint
-  `no-restricted-properties` rule guards it). `src/physics/dmath.ts` provides
-  `sin/cos` (range-reduced degree-9/8 minimax polynomials), `atan/atan2`
-  (degree-11 odd polynomial on [-1,1] with argument folding), all built from
-  `+ - * /` and `Math.sqrt`, which are correctly rounded under IEEE-754 in every
-  engine. Max error ~2e-9 rad, irrelevant for feel, exact across V8/JSC/SpiderMonkey.
-- Fixed iteration counts, fixed constraint order (kind, then body id), no
-  data-dependent early exits, no `Map`/`Set` iteration over object identity,
-  no `Array.sort` with unstable comparators (broadphase buckets are built by
-  index arithmetic).
-- All state lives in one `Float64Array` (`WorldBuffer`, ~180 doubles while
-  riding, ~320 with ragdoll) plus a handful of integer flags; `getState()`
-  copies out the `PhysicsState` fields (plain objects, structured-clone-safe,
-  `-0` normalised to `0` where it can arise: spins and slews).
-- Inputs are already quantised (`quantizeInput`); physics never sees a raw float.
-- The same TS runs in node (vitest) and the browser; F10 compares hashes across
-  the two, which also catches accidental engine-specific paths.
+No `Math.random`, `Date`, `performance`, frame delta. `src/physics/dmath.ts`
+provides `sin cos atan atan2` from `+ − × ÷ sqrt` only (Taylor with range
+folding, |err| < 1e-9, tested against `Math` over 4e5 samples) so V8 and JSC
+agree bit-for-bit. Fixed iteration counts, fixed constraint order, grid
+broadphase by index arithmetic, no `Map` iteration, no sorting. Two worlds
+hash identically over 3000 ticks including a crash and a restart.
 
 ## 10. Collision against track geometry
 
-`compileTrack(track: TrackDef): StaticShapes` at `loadTrack`:
-- `profile` polyline -> `Segment[]` with material `dirt` (or per-point
-  `params.material` later). A `gap` obstacle (`{x0,x1}`) removes the profile
-  segments in that span; the kill plane below handles falls.
-- Obstacle vocabulary the tracks builder can use (`params` per kind):
-  `ramp {w,h,curve?}` -> segments (curve sampled at 0.15 m), `plank {len,angle,thick}`
-  and `box {w,h,angle}` -> OBB, `drum {r}` -> Circle (material rubber), `pipe {r}`
-  -> Circle concave side unsupported (inside is a segment chain), `pit` = gap.
-  Unknown kinds are ignored by physics (render-only props).
-- Shapes are bucketed into a uniform grid along x (cell 2 m); a query for a
-  circle of radius r at x hits cells `[floor((x-r-m)/2) .. floor((x+r+m)/2)]`.
-- Primitives: circle-vs-segment/circle/OBB (closest point), capsule-vs-* (two
-  circles + swept segment), convex-poly-vs-segment/OBB (SAT over edge normals,
-  deepest point). Each returns `{point, normal, depth, material}`; speculative
-  margin makes 17 cm/tick at 20 m/s safe against a 3 cm plank edge.
-- Wheels get at most 2 contacts each per tick (deepest two by manifold id);
-  frame polygon up to 2; rider capsule any (a hit is a crash, count irrelevant).
+`src/physics/collision.ts` turns `CompiledTrack.colliders` into primitives:
+polyline → segments with left normal (`oneWay` segments only from their normal
+side, per CONTRACT §2.2), circle → static circle or drum body, box → OBB,
+seesaw → OBB owned by a pinned body (rests tipped toward −x at its limit).
+Uniform 2 m grid on x; every moving thing is a circle so the narrowphase is
+circle-vs-{segment, circle, OBB}. Hazards are AABBs checked in `derive`.
 
 ## 11. API surface
 
-Implements the existing contract exactly; extras live on a subtype so `Game`
-and the hook need no change.
-
 ```ts
-// src/physics/index.ts (existing) — unchanged:
-export interface PhysicsWorld { readonly physicsHz; loadTrack(track, seed); reset(cp); step(input); getState(); drainEvents(); }
-export type PhysicsFactory = (physicsHz: number) => PhysicsWorld;
-
-// src/physics/bike.ts
+export function createBikePhysics(physicsHz: number, tuning?: PartialTuning): BikePhysicsWorld;
+export const bikePhysicsFactory: PhysicsFactory;
 export interface BikePhysicsWorld extends PhysicsWorld {
   readonly tuning: Readonly<BikeTuning>;
-  /** Copy of the raw world buffer; loadSnapshot restores it bit-exactly (tests, rollback). */
-  saveSnapshot(): Float64Array;
-  loadSnapshot(buf: Float64Array): void;
-  /** Rich read-only view for tests/debug draw; NOT part of the hash. */
-  debug(): PhysicsDebug;
-  /** Balance pitch for the current lean/crouch and an assumed acceleration (section 6). */
+  debug(): PhysicsDebug;            // bodies, contacts (λn, λt, μ, surface), engine, suspension, rider, balancePitch, crashCause
   balancePitch(lean: number, accel?: number): number;
-  /** Place the bike in a given pose (used by feel tests to start from a balanced wheelie). */
-  teleport(pose: { pos: Vec2; angle: number; vel?: Vec2; angVel?: number; rearOnly?: boolean }): void;
+  teleport(pose: { pos: Vec2 /* rear wheel centre */; angle: number; vel?: Vec2; angVel?: number }): void;
 }
-export interface PhysicsDebug {
-  bodies: { id: 'frame'|'rearWheel'|'frontWheel'|'rider'|`rag:${string}`; pos: Vec2; vel: Vec2; angle: number; angVel: number }[];
-  contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; slip: number; mu: number }[];
-  engine: { rpm: number; torqueNm: number; limiter: boolean; throttleEff: number };
-  suspension: { rear: SuspDebug; front: SuspDebug };       // compression m, force N, velocity
-  rider: { anchor: Vec2; offset: Vec2; tetherForce: number; hopPhase: 'idle'|'preload'|'push'|'recover' };
-  balancePitch: number;                                      // for the current lean, a=0
-}
-export function createBikePhysics(physicsHz: number, tuning: Partial<BikeTuning> = {}): BikePhysicsWorld;
-export const bikePhysicsFactory: PhysicsFactory = (hz) => createBikePhysics(hz);
 ```
+`getState()` fills every `PhysicsState` field: `wheels.*.spinVel` is positive
+when rolling forward (mock convention, so `rearSlip = spinVel·R − groundSpeed`
+holds), `contacts` name the surface under each grounded wheel, `land` events
+fire when a wheel regrounds after ≥ 6 airborne ticks with the normal impulse.
 
-`getState()` fills `PhysicsState` as specified in `types.ts`: `bike.pos/vel/
-angle/angVel` are the frame body; `wheels.*.compression = c/travel`;
-`grounded` = normal impulse > 0 this tick; `rider` per 7.2; `checkpoint`
-advances when the front axle x crosses `checkpoints[i].x`; `finished/
-finishTime` when the front axle x crosses `finishX`; events as `GameEvent`.
-Wiring: `src/main.ts` swaps `new MockPhysics(hz)` for `bikePhysicsFactory(hz)`
-(one line, owned by game; the mock stays for harness smoke tests).
+Controllers (`src/physics/controllers/`, tests only): `fullThrottle`
+(anti-loop launch), `cruise`, `wheeliePD`, `airPitch`, `hopper`,
+`ledgeHopper`, `climber(slopeDeg)`, plus `runController` (decision Hz,
+latency, quantized like a human) and `stepN`.
 
-### 11.1 Bot input protocol
+## 12. Measured envelope (round 1) vs CONTRACT §2.5
 
-Bots are closed-loop controllers that run against the physics directly in
-node (vitest, ~1e5 ticks/s) and, for cross-runtime checks, in the browser
-through `window.__trials.setInput/step`. A bot never sees hidden state: it
-gets `PhysicsState` plus a few derived scalars, at a decision rate and with a
-latency, and its output goes through `quantizeInput` like a human's.
+From `pnpm test` (`FEEL …` lines in `feel.test.ts`, `PERF …` in `world.test.ts`).
 
-```ts
-export interface BotObservation {
-  state: PhysicsState; t: number;
-  pitchDeg: number; pitchRateDeg: number; speed: number;
-  rearGrounded: boolean; frontGrounded: boolean; airborne: boolean;
-  balancePitchDeg: number;          // world.balancePitch(currentLean, 0), the only "cheat", and it is public
-}
-export type Bot = (obs: BotObservation) => Partial<InputFrame>;
-export interface BotRunOptions { decisionHz?: number /*60*/; latencyMs?: number /*100*/; maxTicks: number; stopWhen?: (s: PhysicsState) => boolean }
-export function runBot(world: BikePhysicsWorld, bot: Bot, opts: BotRunOptions): { states: PhysicsState[]; recording: Recording; ticks: number };
-```
-`runBot` records every quantised frame into the existing RLE `Recording`
-format so any bot run can be replayed byte-for-byte in the browser hook
-(`runRecording`) and captured to mp4. Reference bots (`src/physics/bots/`):
-`fullThrottle`, `wheeliePD` (lean = clamp(Kp*(target - pitch) - Kd*pitchRate),
-Kp = 2.5/rad, Kd = 0.5 s/rad, throttle 0.35 + 0.4*speedError), `airPitch`
-(in air: lean/brake/throttle to hit a target landing pitch), `hopper`,
-`climber` (lean +0.6, throttle modulated by rear slip > 0.25).
-
-## 12. Feel tests (measurable, run in vitest at 120 Hz)
-
-Each test starts from `loadTrack(flat-test or a purpose track) + reset(-1)`,
-uses `teleport` where a pose is needed, and asserts bands. Bands are the
-first-draft tuning gate; they tighten as clips are compared side by side.
-
-| # | Test | Procedure | Pass band |
+| quantity | CONTRACT | measured | |
 |--|--|--|--|
-| F1 | Static settle | zero input 2 s | rear compression 0.27-0.34, front 0.26-0.34; pitch within 0.5 deg; every body speed < 1e-4 m/s; hash identical on 3 fresh worlds and after `loadSnapshot(saveSnapshot())` |
-| F2 | Wheelie launch | throttle 1, lean 0, from rest | front leaves ground at 0.20-0.40 s; pitch 45 deg at 0.9-1.4 s; loops out (crash by ejection/head) at 1.4-2.4 s; with lean -1 front lifts <= 0.25 s |
-| F3 | Zero-input hold from balance | teleport rear-only at `balancePitch(0)+0.5 deg`, v=4 m/s, throttle = value that holds speed (computed by a 2 s pre-run), lean 0 | time to leave +/-15 deg of balance: 0.7-1.6 s (drift, never snap); fall direction matches sign of the initial error |
-| F4 | Bot balance | `wheeliePD`, 60 Hz, 100 ms latency, 12 s, target 45 deg, v 4 m/s | wheelie held >= 10 s; pitch RMS error < 6 deg; dominant wobble period 0.7-1.5 s; lean saturated < 20% of ticks |
-| F5 | Lean authority | from F3 initial state, step lean to -1 (then +1 in a second run) | pitch rate reaches <= -40 deg/s (resp. >= +40) within 0.35 s; static `balancePitch(+1) - balancePitch(-1)` in 16-24 deg; initial reaction kick opposite in sign and < 3 deg |
-| F6 | Landing envelope | teleport airborne at 2.0 m, vx 6, pitch sweep -30..+60 deg step 5, lean 0 | rides away (no fault, both wheels grounded within 0.6 s of first contact) for every pitch in [-5, +40]; crashes for every pitch <= -25; rear touches first for pitch >= +10; rear compression peak 0.05-0.15 s after touchdown, front touchdown 0.15-0.45 s later, `rider.crouch` back < 0.1 within 0.6 s |
-| F7 | Bunny hop | stationary flat, hop true for 0.25 s then false, lean 0 | both wheels airborne; rear apex 0.30-0.50 m; airtime 0.45-0.70 s; with lean -0.5 during preload the front lifts 0.2-0.5 s before the rear and lands 0.1-0.4 s after it |
-| F8 | Steep climb | 3 m plank at 55 deg then 65 deg, run-in 5 m/s, `climber` bot | 55: reaches top, mean speed along plank 1.5-2.5 wheelbase/s (2.0-3.3 m/s); 65: stalls and rolls back >= 1 m with no fault |
-| F9 | Brakes | 10 m/s flat, brake 1 | stops in 5-8 m; front compression peak 0.7-0.95; pitch dip -5..-12 deg; no fault. Airborne level at 1 m: brake 1 for 0.5 s -> pitch -10..-25 deg; throttle 1 for 0.5 s -> +8..+20 deg |
-| F10 | Reset, replay, perf | crash 3 times, `reset(cp)`; `runBot` 60 s recording replayed in node and chromium | `hash(reset)` == `hash(loadTrack+reset)` every time; node hash == chromium hash == `.bin` hash; finish times equal to the bit; step p95 < 40 us riding, < 80 us ragdolling (node, 10k ticks warm) |
+| total mass / wheelbase / radius | 145 kg / 1.30 / 0.34 | 145 / 1.30 (1.28 at sag) / 0.34 | PASS |
+| COM above axle line, neutral | 0.45 m | 0.40 m (0.05 traded into lean crouch) | note |
+| 0 → 16 m/s, flat dirt | ≤ 3.5 s | 2.48 s (anti-loop launch, lean +0.2) | PASS |
+| top speed | 20 m/s | 20.45 m/s, limiter-bound | PASS |
+| brake from 10 m/s | ≤ 4.5 m | 5.2 m lean back (no endo), 8.0 m neutral | FAIL |
+| stationary hop rear apex | 0.55-0.75 m | 0.69 m, airtime 0.85 s | PASS |
+| 5 m/s run-up, 0.9 m ledge | makeable | rear reaches the top, run ends in a crash; 0.5 m ledge clean | FAIL |
+| climb 55 / 60 deg | sustained | rear wheel wedges at the base corner (no fault) | FAIL |
+| climb 65 deg | stalls, rolls back | stalls (0.4 m back) then loops and head-hits | FAIL |
+| climb > 70 deg | needs a hop | not ridden | PASS |
+| balance pitch, lean 0 | 40-50 deg | 42.4 (32.4 back, 62.0 fwd, 59.5 at +3 m/s²) | PASS |
+| open-loop divergence | 1-2 s | 1.02 / 0.98 s | PASS |
+| PD hold | indefinitely | 1.7 s (controller, not physics: lean authority is slow, 100 ms latency) | FAIL |
+| landing recovery (2 m, 6 m/s) | design: −5..+40 | −30..+35 rides away | partial |
+| air control 0.5 s | — | brake −17, throttle +14, lean back +15 deg | PASS |
+| crash rules | head/torso, hazard, oobY | all three tested; over-rotation alone never faults | PASS |
+| restart → riding | 1 tick | `reset()` is one call, `tick = 0`, events `fault,restart` | PASS |
+| determinism | two runs equal; restore(snapshot()) equal | equal over 3000 ticks incl. crash+restart; forks at 5 points × 500 ticks equal | PASS |
+| µs/tick p95 | ≤ 60 riding, ≤ 80 ragdoll | 3.7 riding, 10.2 ragdolling (node, 20k ticks) | PASS |
 
-Airtime cross-check (not a gate): a 45 deg kicker exit at 20 m/s gives
-vy 14.1 m/s and 2.9 s of air at g 9.81, inside the corpus 2.4-3.2 s band; with
-the bike's angular momentum alone the pitch drifts ~8-15 deg per second of
-air, so the "30 deg over the arc unless leaned" observation is met without an
-air-damping hack.
-
-## 13. Build plan
-
-Milestones are ordered; each has an acceptance test that becomes a permanent
-vitest. One commit per milestone; subject states the measured finding.
-
-| M | Deliverable | Acceptance |
-|--|--|--|
-| M0 | `dmath.ts`, `WorldBuffer` SoA bodies, semi-implicit integrator, circle-vs-segment contact + NGS, flat `compileTrack` | Dropped frame polygon settles on flat ground: no jitter (max speed < 1e-6 after 1.0 s), penetration < 5 mm, hash stable across 3 runs; `dmath` vs `Math` max error < 5e-9 over 1e6 samples; ESLint bans `Math.sin` & co. in `src/physics` |
-| M1 | Wheels, slider joints, spring/damper, limits, bump stop | F1 passes; drop from 1 m lands without bottoming, from 4 m bottoms and recovers; suspension frequency measured 1.9-2.2 Hz from the rear compression trace |
-| M2 | Engine curve, limiter, auto-clutch rpm, tyre model, brakes, drag, rolling resistance | Locked-rider variant (rider fused to frame): 0-20 m/s in 4-6 s; slip ratio stays < 0.2 on dirt at full throttle above 5 m/s and spins on ice; F9 flat-brake half passes; step cost < 25 us. **Go/no-go for custom solver vs planck fallback (section 2)** |
-| M3 | Rider point mass, lean, anchor slew, `balancePitch`, `teleport`, bots `fullThrottle`/`wheeliePD` | F2, F3, F4, F5 pass; balance table in section 6 reproduced by `balancePitch` within 1 deg |
-| M4 | Full `compileTrack` (ramps, planks, boxes, drums, gaps), broadphase, frame polygon and capsule collision, speculative contacts | F8 passes; 20 m/s over a 3 cm plank edge never tunnels (1000 random-seeded approach offsets, deterministic seeds); airtime cross-check |
-| M5 | Landing spring nonlinearity, hop state machine, `airPitch`/`hopper` bots | F6, F7 pass; F9 airborne half passes |
-| M6 | Crash detection, ragdoll bodies + revolute joints, sleep, total `reset` | F10 reset/hash part; crash-to-`reset` is 1 tick; ragdoll hash stable after 3 s; fault events carry the correct tick/time |
-| M7 | Wire `bikePhysicsFactory` into `main.ts`, harness replay/capture of a bot recording, node-vs-chromium hash | F10 full; `pnpm harness:all` green with the real physics; a 30 s clip of `wheeliePD` + a clear of `flat-test` captured for the judge |
-| M8 | Tuning pass against clips 03/05/12/14 (balance wobble period, landing settle, hop timing, wheelie cadence) | Every F-band re-measured and tightened by >= 30%; `DEFAULT_TUNING` hash bumped; findings recorded in this doc's section 4 table |
-
-Budget guardrail: if M2 slips past its own acceptance twice, switch to the
-planck.js fallback the same day; everything above M2 (rider, hop, crash, bots,
-tests) is written against `BikePhysicsWorld`, not the solver, and survives.
+Known gaps for round 2, in order: (1) climb — the rear wheel sits in the
+concave flat/plank corner with two contacts and spins; needs either a
+compliant tyre (soft contact) or a corner-rolling fix in the narrowphase, then
+the 65 deg roll-back needs the climber to brake instead of looping; (2) brake
+distance — traction/ramp-limited at ~11 m/s², needs the rider mass lower under
+braking or a stiffer initial bite; (3) `wheeliePD` — retune with throttle as
+the fast loop (the physics holds a wheelie fine: open-loop 1 s divergence);
+(4) 0.9 m ledge — the manual + hop reaches the height, the landing on the top
+needs the recover phase to level the bike; (5) ragdoll does not collide with
+the bike bodies (passes through the frame).
