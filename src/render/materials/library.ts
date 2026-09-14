@@ -7,7 +7,7 @@
  */
 import * as THREE from 'three';
 import type { SurfaceKind } from '../../core/types';
-import { generate, painters, type PainterName, type TexSet } from './texgen';
+import { flatSet, generate, painters, type PainterName, type TexSet } from './texgen';
 
 interface TexJob {
   painter: PainterName;
@@ -36,6 +36,8 @@ export class MaterialLibrary {
   private readonly sets: TexSet[] = [];
   private readonly derived: { base: THREE.MeshStandardMaterial; mat: THREE.MeshStandardMaterial }[] = [];
   private generated = false;
+  /** 2x2 neutral maps: every MeshStandardMaterial carries the same map set → one program variant. */
+  private readonly flat = flatSet();
   /** Bytes of generated textures (for stats). */
   textureBytes = 0;
   /** Wall-clock ms the last generation took (reported, never used for logic). */
@@ -49,22 +51,22 @@ export class MaterialLibrary {
       return m;
     };
     // Ground / ridden surfaces
-    std('dirt', { color: 0xa88458, roughness: 0.95 });
+    std('dirt', { color: 0x9e8a70, roughness: 0.95 });
     std('plank', { color: 0xc9b58e, roughness: 0.75 });
     std('steelPlate', { color: 0x5a5b5e, roughness: 0.55, metalness: 0.8 });
-    std('concrete', { color: 0x7c7a78, roughness: 0.85 });
+    std('concrete', { color: 0xa4a29e, roughness: 0.85 });
     std('rubberMat', { color: 0x1c1c1e, roughness: 0.9 });
     std('grate', { color: 0x3a3c40, roughness: 0.6, metalness: 0.7 });
     std('rock', { color: 0xb08260, roughness: 0.9 });
     std('snow', { color: 0xeef3f8, roughness: 0.7 });
     // Props
-    std('container', { color: 0x2f6f5e, roughness: 0.5, metalness: 0.6 });
+    std('container', { color: 0xffffff, roughness: 0.5, metalness: 0.6 }); // per-instance colour
     std('containerRed', { color: 0x8a2c22, roughness: 0.5, metalness: 0.6 });
     std('containerBlue', { color: 0x2a4f7a, roughness: 0.5, metalness: 0.6 });
     std('rustSteel', { color: 0x6b5a4c, roughness: 0.7, metalness: 0.6 });
     std('darkSteel', { color: 0x2a2c30, roughness: 0.55, metalness: 0.8 });
     std('brick', { color: 0x6d4a3a, roughness: 0.95 });
-    std('plywood', { color: 0xb9955f, roughness: 0.8 });
+    std('plywood', { color: 0xc9a46a, roughness: 0.8 });
     std('barrelRed', { color: 0xa42a1e, roughness: 0.45, metalness: 0.5 });
     std('barrelWhite', { color: 0xd8d2c4, roughness: 0.45, metalness: 0.5 });
     std('barrelBlue', { color: 0x244d8a, roughness: 0.45, metalness: 0.5 });
@@ -75,6 +77,7 @@ export class MaterialLibrary {
     std('safetyGreen', { color: 0x2e8b4a, roughness: 0.7 });
     // Bike
     std('framePaint', { color: 0x1646d8, roughness: 0.45, metalness: 0.1 });
+    std('plastic', { color: 0xf2f2f0, roughness: 0.5 });
     std('chrome', { color: 0xf0f0f0, roughness: 0.14, metalness: 1.0 });
     std('engine', { color: 0x6c6e72, roughness: 0.55, metalness: 0.9 });
     std('blackMatte', { color: 0x151517, roughness: 0.85, metalness: 0.1 });
@@ -87,12 +90,26 @@ export class MaterialLibrary {
     std('numberPlate', { color: 0xfafafa, roughness: 0.5 });
     // Rider
     std('jersey', { color: 0xffcf1a, roughness: 0.8 });
-    std('pants', { color: 0x1f2126, roughness: 0.85 });
+    std('pants', { color: 0x1a2340, roughness: 0.85 });
+    std('armour', { color: 0x24262b, roughness: 0.45, metalness: 0.05 });
     std('boots', { color: 0x151517, roughness: 0.6 });
     std('gloves', { color: 0x1f2126, roughness: 0.8 });
     std('helmet', { color: 0xf7f7f7, roughness: 0.22, metalness: 0.05 });
     std('visor', { color: 0x0a0c10, roughness: 0.1, metalness: 0.5 });
     std('skin', { color: 0xc9946a, roughness: 0.7 });
+    for (const m of this.mats.values()) this.complete(m);
+  }
+
+  /** Fill missing maps with the neutral set so the material shares the common program. */
+  complete(m: THREE.MeshStandardMaterial): void {
+    const flat = this.flat;
+    if (!m.map || m.map === flat.map) m.map = m.map ?? flat.map;
+    if (!m.normalMap) m.normalMap = flat.normalMap;
+    if (!m.roughnessMap) m.roughnessMap = flat.ormMap;
+    if (!m.metalnessMap) m.metalnessMap = flat.ormMap;
+    if (!m.aoMap) m.aoMap = flat.ormMap;
+    if (!m.emissiveMap) m.emissiveMap = flat.map;
+    m.needsUpdate = true;
   }
 
   get(name: string): THREE.MeshStandardMaterial {
@@ -123,6 +140,7 @@ export class MaterialLibrary {
     m.metalnessMap = base.metalnessMap;
     m.aoMap = base.aoMap;
     m.aoMapIntensity = base.aoMapIntensity;
+    m.emissiveMap = base.emissiveMap;
     m.roughness = base.roughness;
     m.metalness = base.metalness;
     m.needsUpdate = true;
@@ -184,6 +202,7 @@ export class MaterialLibrary {
         m.needsUpdate = true;
       }
     }
+    for (const m of this.mats.values()) this.complete(m);
     for (const d of this.derived) this.copyMaps(d.base, d.mat);
     this.generateMs = performance.now() - t0;
   }

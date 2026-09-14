@@ -423,7 +423,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       transparent: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
-      color: new THREE.Color(foundry ? 0xff5a1a : 0xffd9a0).multiplyScalar(foundry ? 0.16 : 0.17),
+      color: new THREE.Color(foundry ? 0xff5a1a : 0xffe8c8).multiplyScalar(foundry ? 0.16 : 0.12),
       side: THREE.DoubleSide,
       fog: false,
     });

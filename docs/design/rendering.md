@@ -22,8 +22,8 @@ three 0.186.0 addons used: `EffectComposer, RenderPass, UnrealBloomPass, ShaderP
 | Texture memory | 96 MB | 38.8 MB | `estimateTextureMB` (all maps incl. mips, env, canvas textures) |
 | Track + obstacles | 20 calls / 80 k tris | 11 calls / 5.1 k tris (12-kind synthetic track) | `debugInfo().trackCalls/trackTris` |
 | Texture generation | 400 ms desktop, after first frame | ≈330–400 ms in headless Chromium (SwiftShader host) | `debugInfo().textureGenMs` |
-| Shader programs | 32 | 39–58 (nightCity/foundry highest) | `info.programs` — over budget, see §12 |
-| Restart → frame | 1 frame | 1 frame (hard cut in `FrameBuilder`) | capture scene detector |
+| Shader programs | 32 | 32 (industrial; every MeshStandardMaterial carries the same map set) | `info.programs` |
+| Restart → frame | 1 frame | 1 frame; the restart frame costs the same as any frame (no rebuild: p50 93 ms vs 95 ms normal on SwiftShader `high`, 48 vs 60 on `low`) | capture scene detector, scratch `restart.mts` |
 | JS heap growth | 5 MB / 60 s | −1.8 MB | `harness:perf` |
 
 ## 1. Frame and cues (`frame.ts`)
@@ -85,8 +85,13 @@ distance is solved from the target height fraction: `d = (1.9 / hf / 2) / tan(fo
 | State | Trigger | heightFrac | screenX (moving right) | screenY | yaw | pitch |
 |---|---|---|---|---|---|---|
 | idle / countdown | speed < 1.5 | 0.40 | 0.45 | 0.55 | 5° | 3° |
-| riding | 1.5–9 m/s | 0.24 | 0.30 | 0.53 | 20° | 22° |
-| fast / air | speed > 9 or airTime > 0 | 0.09 | 0.28 | 0.50 | 24° | 30° (+14° airborne) |
+| riding | 1.5–9 m/s | 0.24 | 0.30 | 0.53 | 15° | 17° |
+| fast / air | speed > 9 or airTime > 0 | 0.09 | 0.28 | 0.50 | 18° | 24° (+6° airborne) |
+
+**Roll is always 0** (Euler YXZ from yaw/pitch keeps the camera right vector horizontal; the
+landing shake moves y only). Only a `CameraKey.roll` can roll. `camera()` reports the measured
+`roll` (angle of the camera right vector to the horizontal) plus `yaw`, `pitch`, `state`, so the
+harness can assert `|roll| < 1e-6` on flat-test (round 2: 0.0 on every sampled frame).
 
 `zoomT = smoothstep(1.5, 9, speed)`, `fastT = smoothstep(9, 15, speed)`, `airT = smoothstep(0, 0.7, airTime)`,
 `wideT = max(fastT, airT)`. Moving left mirrors screenX and yaw. Each parameter is followed by an
@@ -119,9 +124,15 @@ disc up to intensity 40 + glow) run through `PMREMGenerator` (row 0 = nadir; the
 down until that was fixed — the tell was a bright floor lit "from the sky below"). The same sky
 is `scene.background`. Renderer tone mapping is **off**; ACES + exposure live in the composite.
 
-Industrial numbers as tuned: sun `0xffd9a8` × 3.0 from (−0.45, 0.78, −0.30) (high, slightly
-behind → short shadows toward the camera), hemi 0.42, env 0.4, exposure 0.85, fog `0x6e5a44`
-tiers 60/140/260 m, floor fog h0 0.3 / hs 1.4 / density 0.06, bloom 0.5.
+Industrial numbers as tuned (round 2, matched against `reference/techniques/clips/01` and `07`
+frames: median luminance 0.19–0.27 vs 0.28–0.29 reference, 1st percentile 0.01–0.06 vs 0.09–0.12,
+mean HSV saturation 0.39–0.41 vs 0.19–0.30): warm key `0xffe2c4` × 3.2 from (−0.45, 0.78, −0.30),
+**neutral-cool skylight fill** hemi `0x9cb6d8` × 0.65, env 0.4, exposure 1.25, contrast 1.16
+(power curve about 18 % grey), saturation 0.95, no global tint (gain 1.02/1.0/0.98, lift 0),
+fog **desaturated grey** `0x5a5654` tiers 90/200/380 m, floor fog density 0.025, bloom 0.45.
+The round-1 sepia came from an amber fog colour + amber gain + orange dirt; colour separation now
+comes from the materials themselves (per-instance container colours, white bike plastics, blue
+frame, yellow jersey, dark armour, grey concrete, red/blue drums).
 
 Shadows: one 2048² `PCFShadowMap` (`PCFSoftShadowMap` no longer exists in r186), bias −0.0004,
 normalBias 0.03; orthographic frustum 28×18 m (48×30 m when the camera distance > 20 m) centred
@@ -152,7 +163,14 @@ is 38.8 MB.
 `MaterialLibrary` creates every material flat (colour only) so the first frame draws
 immediately; `generateTextures()` binds maps to the named materials and to every clone made
 via `lib.derive(name)` (ribbons need `vertexColors`, so they are derived clones). Saturation
-rule: bike frame `#1646d8`, jersey `#ffcf1a`, helmet white; the environment stays low-chroma.
+rule: bike frame `#1646d8`, white plastics (fenders, side panels, number plate), jersey `#ffcf1a`, helmet white, armour near-black; the environment stays low-chroma.
+
+**One program variant.** `MaterialLibrary.complete(m)` gives every `MeshStandardMaterial` the full
+map set (2×2 neutral white albedo / flat normal / ORM = 1 for untextured ones, plus a white
+emissiveMap), so the albedo/normal/roughness/metalness/AO/emissive-map defines are identical across
+the library and the world materials (`setTrack` traverses the world and completes them). Remaining
+variants are instancing, vertex colours and instance colour. Result: 32 programs on industrial
+(was 39–58).
 
 ## 6. Post chain (`post/chain.ts`)
 
@@ -163,13 +181,16 @@ length `clamp((speed−9)·1.1, 0, 8)` px, masked to zero within 0.12–0.34 of 
 position so bike and rider stay sharp) → exposure → ACES → lift/gain grade + saturation →
 vignette → chromatic aberration `0.006·smoothstep(8,16,speed)` → flash → 1/255 dither → sRGB.
 
-| Tier | Bloom | Bloom res | Shadow map | Pixel-ratio cap |
-|---|---|---|---|---|
-| low | off | — | 1024², radius 1.5 | 1.0 |
-| medium | on | 480×270 | 2048² | 1.5 |
-| high | on | 640×360 | 2048² | 2.0 |
+| Tier | Bloom | Bloom res | Shadows | Internal resolution | Particles | SwiftShader synced p50 (1280×720) |
+|---|---|---|---|---|---|---|
+| low | off | — | **off** (materials recompiled) | 0.75× (composite upscales) | ½ counts | 60 ms |
+| medium | on | 480×270 | 2048² | ≤ 1.5× DPR | full | 125 ms |
+| high | on | 640×360 | 2048² | ≤ 2× DPR | full | 95–137 ms |
 
-Smear is off on `low`. There is no SSAO this round (baked vertex shade on ribbons + real shadows).
+Smear is off on `low`. Contact: no SSAO yet; instead each tyre carries a projected contact-shadow
+blob (radial-gradient plane at the ground point, opacity 0.55 + 0.3·compression, fading over 0.6 m
+of hover using the profile height under the wheel) and the tyre torus squashes toward the ground by
+`5.5 % · (0.4 + compression)` inside a non-rotating parent group so the contact patch flattens.
 
 ## 7. World kit — 5 biomes (`world/biomeKit.ts`, `world/props.ts`)
 
@@ -243,11 +264,22 @@ over |spinVel| 12–30 rad/s while a translucent ring fades in (0.35). All parts
 
 ## 10. Rider (`rider/riderModel.ts`)
 
-Ten capsule segments + helmet (sphere, visor, peak) + boots, in the bike frame's space.
-Pelvis: `x = pegs.x − 0.08 − 0.22·max(0,−lean) − 0.12·armExtend + 0.16·max(0,lean) − 0.05·crouch`,
-`y = pegs.y + 0.5 + 0.36·(1 − crouch)`. Torso angle `0.38 + torsoPitch + 0.35·lean + 0.4·crouch − 0.3·armExtend`
-from vertical; head continues the torso tilted back 0.45 rad. Arms: 2-bone IK shoulders →
-bar grips, elbows below the line and out of plane; legs: 2-bone IK hips → pegs, knees forward.
+Full-gear rider built from a parts kit per segment (`Segment` = group whose +y runs joint→joint,
+scaled to the IK length): helmet shell + dark visor band + peak + chin bar + goggle strap + neck;
+torso capsule widened across the shoulders with chest plate, spine protector and shoulder pads;
+upper arms with elbow pads; forearms with gloves; pelvis block + belt; thighs with knee armour;
+shins with shin guards, boots, soles and buckles. Materials: helmet white, jersey yellow, armour
+near-black gloss, pants dark blue, gloves/boots black.
+
+Pose (`poseRider`): a smoothed `stand` factor (half-life 0.25 s from tSim) is 1 when moving
+> 1.2 m/s, airborne, crouching or leaning hard, else 0 (seated at idle). Hips
+`x = pegs.x − 0.02 − 0.28·back − 0.3·armExtend + 0.14·fwd − 0.06·crouch − 0.16·(1−stand)`,
+`y = lerp(seat + 0.1, pegs.y + 0.76 − 0.4·crouch, stand)`. Torso from vertical
+`0.62·stand + 0.3·(1−stand) + torsoPitch + 0.3·fwd + 0.5·crouch − 0.5·back − 0.35·armExtend`
+(attack position standing; arms go straight naturally when the hips are back because the IK
+saturates at full reach; a crouch drops the hips and folds the torso). Head continues the torso at
+45 %. Arms: 2-bone IK shoulders → grips with the elbow **above** the shoulder–hand line and out of
+plane (motocross elbows-up); legs: hips → pegs, knees forward.
 
 Ragdoll: while `state.ragdoll` is non-null the seated hierarchy hides and the seven physics
 bodies are drawn exactly at `pos/angle` (arm and leg bodies drawn twice at z ±0.14). The
@@ -274,15 +306,16 @@ Rng: `core/rng` sfc32 reseeded per burst with `track.seed ^ tick ^ salt`.
 
 ## 12. Known gaps after round 1 (what still reads non-AAA)
 
-- Shader programs 39–58 exceed the 32 target (one program per material permutation: fog
-  variants, vertex colours, instancing, emissive maps). Merge material variants next round.
 - Synced render time on SwiftShader is ≈150 ms/frame at `high` (2048² shadow + bloom + HalfFloat
   1280×720); the perf harness should pin `low` for timing runs (harness owner).
-- No SSAO / contact AO under the bike beyond the real shadow; no worn-line decal on the ribbon.
-- Rider silhouette is capsules; no hands/fingers, no helmet visor detail at 40 % zoom.
+- No SSAO; contact is blobs + tyre squash only. No worn-line decal on the ribbon.
+- Windows still blow out to pure white (p99 0.98); the reference keeps pane texture at ~0.85.
+- Rider is a parts kit, not a skinned mesh: no fingers, no cloth folds, joints are hard.
 - Canyon reads as flat orange ground with visible dirt tiling; nightCity building windows are
   still large; foundry is a red wash — first passes only.
 - Light shafts are additive quads (no occlusion by the bike); dust motes are unlit points.
+- Textures generate on the very first `render()` (≈330–400 ms in headless Chromium) so no capture
+  frame is ever untextured; boot's first-frame budget must absorb it.
 - Kinetic text (READY/GO/CRASH) is the HUD owner's; the renderer only supplies the flash.
 
 ## 13. Verification recipe

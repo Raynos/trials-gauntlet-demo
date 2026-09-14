@@ -19,6 +19,7 @@ const COMPOSITE = {
     uLift: { value: new THREE.Vector3(0, 0, 0) },
     uGain: { value: new THREE.Vector3(1, 1, 1) },
     uSaturation: { value: 1.0 },
+    uContrast: { value: 1.0 },
     uVignette: { value: 0.35 },
     uChroma: { value: 0.0 },
     uSmear: { value: new THREE.Vector2(0, 0) },
@@ -35,6 +36,7 @@ const COMPOSITE = {
     uniform vec3 uLift;
     uniform vec3 uGain;
     uniform float uSaturation;
+    uniform float uContrast;
     uniform float uVignette;
     uniform float uChroma;
     uniform vec2 uSmear;
@@ -79,6 +81,8 @@ const COMPOSITE = {
       }
       col *= uExposure;
       col = aces(col);
+      // Contrast: power curve about 18 % grey (linear), before the sRGB encode.
+      col = 0.18 * pow(max(col, vec3(0.0)) / 0.18, vec3(uContrast));
       // Grade: lift shadows, gain highlights, saturation.
       col = col * uGain + uLift * (1.0 - col);
       float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
@@ -136,7 +140,8 @@ export class PostChain {
     this.width = width;
     this.height = height;
     this.pixelRatio = pixelRatio;
-    const cap = this.tier === 'low' ? 1 : this.tier === 'medium' ? 1.5 : 2;
+    // low renders the scene at 0.75x and lets the composite upscale — the phone lever.
+    const cap = this.tier === 'low' ? 0.75 : this.tier === 'medium' ? 1.5 : 2;
     const pr = Math.min(pixelRatio, cap);
     this.composer.setPixelRatio(pr);
     this.composer.setSize(width, height);
@@ -149,6 +154,7 @@ export class PostChain {
     (u.uLift!.value as THREE.Vector3).set(b.gradeLift[0], b.gradeLift[1], b.gradeLift[2]);
     (u.uGain!.value as THREE.Vector3).set(b.gradeGain[0], b.gradeGain[1], b.gradeGain[2]);
     u.uSaturation!.value = b.saturation;
+    u.uContrast!.value = b.contrast ?? 1.0;
     u.uVignette!.value = b.vignette;
     this.bloom.strength = b.bloomStrength;
   }

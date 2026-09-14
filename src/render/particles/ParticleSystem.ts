@@ -183,10 +183,14 @@ export class ParticleSystem {
     this.birth.needsUpdate = true;
   }
 
+  /** Multiplies burst counts (quality tiers). */
+  countScale = 1;
+
   emit(b: Burst, tSim: number, rng: Rng): void {
     const base = this.tmpColor.set(b.color as THREE.ColorRepresentation);
     const cj = b.colorJitter ?? 0.15;
-    for (let i = 0; i < b.count; i++) {
+    const n = Math.max(1, Math.round(b.count * this.countScale));
+    for (let i = 0; i < n; i++) {
       const k = this.head;
       this.head = (this.head + 1) % this.capacity;
       const j = b.jitter;

@@ -40,6 +40,24 @@ function lathe(profile: [number, number][], segments = 16): THREE.BufferGeometry
   );
 }
 
+const Z_AXIS = new THREE.Vector3(0, 0, 1);
+
+function contactTexture(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 128;
+  c.height = 64;
+  const g = c.getContext('2d')!;
+  const grad = g.createRadialGradient(64, 32, 2, 64, 32, 32);
+  grad.addColorStop(0, 'rgba(0,0,0,1)');
+  grad.addColorStop(0.45, 'rgba(0,0,0,0.6)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  g.scale(2, 1);
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c);
+  return t;
+}
+
 export class Wheel {
   readonly root = new THREE.Group();
   readonly spinner = new THREE.Group();
@@ -47,6 +65,11 @@ export class Wheel {
   private readonly blur: THREE.Mesh;
   private readonly blurMat: THREE.MeshBasicMaterial;
   private readonly spokeMat: THREE.MeshStandardMaterial;
+  private readonly tyre: THREE.Mesh;
+  private readonly tyreSquash = new THREE.Group();
+  /** Contact-shadow blob on the ground under the tyre (world space, added to the scene root). */
+  readonly contact: THREE.Mesh;
+  private readonly contactMat: THREE.MeshBasicMaterial;
 
   constructor(lib: MaterialLibrary) {
     const R = WHEEL_RADIUS;
@@ -85,13 +108,36 @@ export class Wheel {
     this.blurMat = new THREE.MeshBasicMaterial({ color: 0x9a9a9a, transparent: true, opacity: 0, depthWrite: false });
     this.blur = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.245, 32), this.blurMat);
     this.blur.visible = false;
-    this.spinner.add(tyre, rim, hub, disc, this.spokes);
-    this.root.add(this.spinner, this.blur);
+    this.tyre = tyre;
+    this.tyreSquash.add(tyre);
+    this.spinner.add(rim, hub, disc, this.spokes);
+    this.root.add(this.tyreSquash, this.spinner, this.blur);
+    this.contactMat = new THREE.MeshBasicMaterial({ map: contactTexture(), transparent: true, opacity: 0.85, depthWrite: false, color: 0x000000, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    this.contact = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.42), this.contactMat);
+    this.contact.renderOrder = 2;
+    this.contact.frustumCulled = false;
+  }
+
+  /** Place the contact blob at the tyre's ground point; fade with height and compression. */
+  setContact(gx: number, gy: number, groundAngle: number, grounded: boolean, compression: number, hover: number): void {
+    const vis = grounded ? 1 : Math.max(0, 1 - hover / 0.6);
+    this.contact.visible = vis > 0.02;
+    this.contactMat.opacity = 0.55 * vis + 0.3 * compression * vis;
+    this.contact.position.set(gx, gy + 0.006, 0);
+    this.contact.rotation.set(-Math.PI / 2, 0, 0);
+    this.contact.rotateOnWorldAxis(Z_AXIS, groundAngle);
+    const s = 1 + 0.35 * compression;
+    this.contact.scale.set(s, 1 + 0.15 * compression, 1);
+    // Tyre contact-patch flattening: squash toward the ground by compression.
+    const k = grounded ? 0.055 * (0.4 + compression) : 0;
+    this.tyreSquash.scale.set(1, 1 - k, 1);
+    this.tyreSquash.position.y = -WHEEL_RADIUS * k;
   }
 
   set(x: number, y: number, spin: number, spinVel: number): void {
     this.root.position.set(x, y, 0);
     this.spinner.rotation.z = -spin;
+    this.tyre.rotation.z = -spin;
     // Spokes crossfade to the disc over |spinVel| ∈ [12, 30] rad/s.
     const t = Math.min(1, Math.max(0, (Math.abs(spinVel) - 12) / 18));
     this.spokeMat.opacity = 1 - t * 0.85;
@@ -164,12 +210,13 @@ export class BikeModel {
     const seat = cast(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.07, 0.2), lib.get('seat')));
     seat.position.set(B.seatTop.x, B.seatTop.y, 0);
     seat.rotation.z = 0.06;
-    const rearFender = cast(new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.03, 0.16), paint));
+    const plastic = lib.get('plastic');
+    const rearFender = cast(new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.03, 0.16), plastic));
     rearFender.position.set(-0.68, 0.44, 0);
     rearFender.rotation.z = 0.25;
-    const frontFender = cast(new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.03, 0.15), paint));
+    const frontFender = cast(new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.03, 0.15), plastic));
     frontFender.rotation.z = -0.15;
-    const sideL = cast(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.2, 0.02), paint));
+    const sideL = cast(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.2, 0.02), plastic));
     sideL.position.set(-0.36, 0.3, 0.13);
     const sideR = sideL.clone();
     sideR.position.z = -0.13;
@@ -290,7 +337,21 @@ export class BikeModel {
 
     this.rear = new Wheel(lib);
     this.front = new Wheel(lib);
-    this.root.add(this.frame, this.rear.root, this.front.root);
+    this.root.add(this.frame, this.rear.root, this.front.root, this.rear.contact, this.front.contact);
+  }
+
+  /** Ground height / slope sampler supplied by the renderer (profile). */
+  ground: ((x: number) => { y: number; angle: number }) | null = null;
+
+  private placeContact(w: Wheel, wx: number, wy: number, grounded: boolean, compression: number, bikeAngle: number): void {
+    if (grounded) {
+      const nx = -Math.sin(bikeAngle);
+      const ny = Math.cos(bikeAngle);
+      w.setContact(wx - nx * WHEEL_RADIUS, wy - ny * WHEEL_RADIUS, bikeAngle, true, compression, 0);
+      return;
+    }
+    const g = this.ground ? this.ground(wx) : { y: wy - WHEEL_RADIUS, angle: 0 };
+    w.setContact(wx, g.y, g.angle, false, 0, Math.max(0, wy - WHEEL_RADIUS - g.y));
   }
 
   /** Pose from the interpolated frame. */
@@ -317,6 +378,8 @@ export class BikeModel {
 
     this.rear.set(f.rear.x, f.rear.y, f.rear.spin, f.rear.spinVel);
     this.front.set(f.front.x, f.front.y, f.front.spin, f.front.spinVel);
+    this.placeContact(this.rear, f.rear.x, f.rear.y, f.rear.grounded, f.rear.compression, f.bikeAngle);
+    this.placeContact(this.front, f.front.x, f.front.y, f.front.grounded, f.front.compression, f.bikeAngle);
 
     // Rear axle in frame-local → aim swingarm.
     const ra = this.toLocal(f.rear.x, f.rear.y);

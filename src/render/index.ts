@@ -19,7 +19,7 @@ import { RiderModel } from './rider/riderModel';
 import { buildBiomeKit } from './world/biomeKit';
 import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
-import { buildRibbons } from './world/track';
+import { buildRibbons, profileY } from './world/track';
 
 export interface GameRenderer {
   readonly canvas: HTMLCanvasElement;
@@ -152,6 +152,12 @@ export class ThreeRenderer implements GameRenderer {
     const gates = buildGates(track, this.lib);
     const kit = buildBiomeKit(track, this.biome, this.lib);
     group.add(ribbons.group, obstacles.group, gates.group, kit.group);
+    // One program variant for the whole world: every standard material gets the full map set.
+    group.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      const mats = Array.isArray(mesh.material) ? mesh.material : mesh.material ? [mesh.material] : [];
+      for (const m of mats) if ((m as THREE.MeshStandardMaterial).isMeshStandardMaterial) this.lib.complete(m as THREE.MeshStandardMaterial);
+    });
     this.scene.add(group);
     this.world = {
       group,
@@ -162,6 +168,12 @@ export class ThreeRenderer implements GameRenderer {
       textureBytes: kit.textureBytes + gates.textureBytes,
       trackCalls: ribbons.drawCalls + obstacles.drawCalls,
       trackTris: ribbons.triangles + obstacles.triangles,
+    };
+    const profile = track.def.profile;
+    this.bike.ground = (x) => {
+      const y = profileY(profile, x);
+      const dy = profileY(profile, x + 0.3) - profileY(profile, x - 0.3);
+      return { y, angle: Math.atan2(dy, 0.6) };
     };
     const fy = track.def.profile.length ? track.def.profile[track.def.profile.length - 1]!.y : 0;
     this.emitters.setTrack(track.def.seed, gates.jets, track.def.finishX, fy, this.biome);
@@ -189,6 +201,16 @@ export class ThreeRenderer implements GameRenderer {
     this.tier = tier;
     this.post.setQuality(tier);
     this.lighting.setQuality(tier);
+    this.emitters.countScale = tier === 'low' ? 0.5 : 1;
+    // Shadows off on low: materials must recompile to drop the shadow sampling.
+    const shadows = tier !== 'low';
+    if (this.renderer.shadowMap.enabled !== shadows) {
+      this.renderer.shadowMap.enabled = shadows;
+      this.scene.traverse((o) => {
+        const m = (o as THREE.Mesh).material;
+        for (const mat of Array.isArray(m) ? m : m ? [m] : []) mat.needsUpdate = true;
+      });
+    }
   }
 
   camera(): CameraDebug {
@@ -197,9 +219,9 @@ export class ThreeRenderer implements GameRenderer {
 
   render(state: PhysicsState, alpha: number): number {
     const t0 = performance.now();
-    // Procedural textures are generated on the second frame, always, so the
-    // frame they appear on is identical in every capture.
-    if (this.frameCount === 1 && !this.lib.hasTextures) {
+    // Procedural textures are generated synchronously on the first render (after
+    // installHook), so the frame they appear on is identical in every capture.
+    if (!this.lib.hasTextures) {
       this.lib.generateTextures();
       this.textureGenMs = this.lib.generateMs;
     }

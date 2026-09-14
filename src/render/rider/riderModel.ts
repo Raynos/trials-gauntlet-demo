@@ -1,7 +1,11 @@
 /**
- * Articulated rider posed from `RiderPose` (hands pinned to the bar ends, feet
- * to the pegs, two-bone IK per limb) and, while `state.ragdoll` is non-null,
- * drawn exactly at the physics ragdoll bodies instead.
+ * Rider: full-gear motocross rider (helmet + visor + peak + chin bar, jersey
+ * with chest plate and shoulder pads, elbow pads, gloves, pants, knee/shin
+ * armour, boots), posed from `RiderPose` with two-bone IK (hands pinned to the
+ * grips, feet to the pegs). Standing on the pegs when moving, seated at idle,
+ * hips back with arms straight when hanging off the back, tucked on a crouch.
+ * While `state.ragdoll` is non-null the same parts are drawn exactly at the
+ * physics ragdoll bodies instead.
  */
 import * as THREE from 'three';
 import type { RagdollBody } from '../../core/types';
@@ -10,47 +14,37 @@ import type { RenderFrame } from '../frame';
 import { BIKE, type BikeModel } from '../bike/bikeModel';
 
 const L = {
-  torso: 0.52,
-  neck: 0.02,
-  head: 0.13,
-  upperArm: 0.31,
-  forearm: 0.3,
+  torso: 0.5,
+  head: 0.135,
+  upperArm: 0.3,
+  forearm: 0.29,
   thigh: 0.44,
-  shin: 0.44,
-  hipHalf: 0.11,
-  shoulderHalf: 0.2,
+  shin: 0.43,
+  hipHalf: 0.1,
+  shoulderHalf: 0.21,
+  pelvis: 0.24,
 };
 
-interface Seg {
-  mesh: THREE.Mesh;
-  len: number;
-}
-
-function capsule(r: number, len: number, mat: THREE.Material): THREE.Mesh {
-  const g = new THREE.CapsuleGeometry(r, Math.max(0.01, len - 2 * r), 4, 10);
-  const m = new THREE.Mesh(g, mat);
-  m.castShadow = true;
-  return m;
-}
-
-/** Place a y-axis capsule between two points (in the parent's space). */
-function place(seg: Seg, ax: number, ay: number, az: number, bx: number, by: number, bz: number): void {
-  const m = seg.mesh;
-  m.position.set((ax + bx) / 2, (ay + by) / 2, (az + bz) / 2);
-  const dx = bx - ax;
-  const dy = by - ay;
-  const dz = bz - az;
-  const len = Math.hypot(dx, dy, dz) || 0.001;
-  m.scale.set(1, len / seg.len, 1);
-  m.quaternion.setFromUnitVectors(UP, TMP.set(dx, dy, dz).normalize());
-}
 const UP = new THREE.Vector3(0, 1, 0);
 const TMP = new THREE.Vector3();
 
-/**
- * Two-bone IK in the XY plane: joint position for a chain a→(joint)→b with
- * bone lengths l1, l2; `side` picks which side of the a–b line the joint goes.
- */
+/** A limb segment: a group whose local +y runs from joint a to joint b, scaled to the actual length. */
+class Segment {
+  readonly group = new THREE.Group();
+  constructor(readonly len: number) {}
+  place(ax: number, ay: number, az: number, bx: number, by: number, bz: number): void {
+    const g = this.group;
+    g.position.set(ax, ay, az);
+    const dx = bx - ax;
+    const dy = by - ay;
+    const dz = bz - az;
+    const len = Math.hypot(dx, dy, dz) || 0.001;
+    g.scale.set(1, len / this.len, 1);
+    g.quaternion.setFromUnitVectors(UP, TMP.set(dx, dy, dz).normalize());
+  }
+}
+
+/** Two-bone IK in XY: joint for a→b with bone lengths l1, l2; `side` = which side of the a–b line. */
 function ik(ax: number, ay: number, bx: number, by: number, l1: number, l2: number, side: number, out: THREE.Vector2): void {
   let dx = bx - ax;
   let dy = by - ay;
@@ -72,84 +66,153 @@ function ik(ax: number, ay: number, bx: number, by: number, l1: number, l2: numb
   out.set(ax + ux * a - uy * h * side, ay + uy * a + ux * h * side);
 }
 
+interface Kit {
+  torso: Segment;
+  pelvis: Segment;
+  head: THREE.Group;
+  upperArm: Segment[];
+  forearm: Segment[];
+  thigh: Segment[];
+  shin: Segment[];
+}
+
 export class RiderModel {
   readonly root = new THREE.Group();
-  /** Seated rider, in the bike frame's local space. */
+  /** Seated/standing rider, in the bike frame's local space. */
   readonly seated = new THREE.Group();
   /** Ragdoll bodies in world space. */
   readonly ragdoll = new THREE.Group();
-  private readonly torso: Seg;
-  private readonly pelvis: Seg;
-  private readonly head: THREE.Mesh;
-  private readonly visor: THREE.Mesh;
-  private readonly upperArm: [Seg, Seg];
-  private readonly forearm: [Seg, Seg];
-  private readonly thigh: [Seg, Seg];
-  private readonly shin: [Seg, Seg];
-  private readonly boots: [THREE.Mesh, THREE.Mesh];
-  private readonly rag: Record<RagdollBody['id'], Seg[]>;
-  private readonly ragHead: THREE.Mesh;
+  private readonly kit: Kit;
+  private readonly rag: Kit;
   private readonly v = new THREE.Vector2();
   private readonly v2 = new THREE.Vector2();
+  private standT = 0;
 
-  constructor(lib: MaterialLibrary) {
-    const jersey = lib.get('jersey');
-    const pants = lib.get('pants');
-    const boots = lib.get('boots');
-    const gloves = lib.get('gloves');
-    const helmet = lib.get('helmet');
-    const seg = (r: number, len: number, mat: THREE.Material, parent: THREE.Group): Seg => {
-      const mesh = capsule(r, len, mat);
-      parent.add(mesh);
-      return { mesh, len };
-    };
-    this.torso = seg(0.13, L.torso, jersey, this.seated);
-    this.pelvis = seg(0.12, 0.26, pants, this.seated);
-    this.head = new THREE.Mesh(new THREE.SphereGeometry(L.head, 16, 12), helmet);
-    this.head.castShadow = true;
-    this.head.scale.set(1, 1.08, 1);
-    this.visor = new THREE.Mesh(new THREE.SphereGeometry(L.head * 1.02, 16, 8, -0.9, 1.8, 0.9, 1.1), lib.get('visor'));
-    this.head.add(this.visor);
-    const peak = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, 0.18), helmet);
-    peak.position.set(0.11, 0.07, 0);
-    peak.rotation.z = -0.3;
-    this.head.add(peak);
-    this.seated.add(this.head);
-    this.upperArm = [seg(0.05, L.upperArm, jersey, this.seated), seg(0.05, L.upperArm, jersey, this.seated)];
-    this.forearm = [seg(0.045, L.forearm, gloves, this.seated), seg(0.045, L.forearm, gloves, this.seated)];
-    this.thigh = [seg(0.075, L.thigh, pants, this.seated), seg(0.075, L.thigh, pants, this.seated)];
-    this.shin = [seg(0.06, L.shin, boots, this.seated), seg(0.06, L.shin, boots, this.seated)];
-    this.boots = [new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.1, 0.11), boots), new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.1, 0.11), boots)];
-    for (const b of this.boots) {
-      b.castShadow = true;
-      this.seated.add(b);
-    }
-    // Ragdoll: same segments, world space.
-    const rs = (r: number, len: number, mat: THREE.Material, n: number): Seg[] => {
-      const out: Seg[] = [];
-      for (let i = 0; i < n; i++) out.push(seg(r, len, mat, this.ragdoll));
-      return out;
-    };
-    this.rag = {
-      head: [],
-      torso: rs(0.13, L.torso, jersey, 1),
-      pelvis: rs(0.12, 0.26, pants, 1),
-      upperArm: rs(0.05, L.upperArm, jersey, 2),
-      forearm: rs(0.045, L.forearm, gloves, 2),
-      thigh: rs(0.075, L.thigh, pants, 2),
-      shin: rs(0.06, L.shin, boots, 2),
-    };
-    this.ragHead = new THREE.Mesh(new THREE.SphereGeometry(L.head, 16, 12), helmet);
-    this.ragHead.castShadow = true;
-    this.ragdoll.add(this.ragHead);
+  constructor(private readonly lib: MaterialLibrary) {
+    this.kit = this.buildKit(this.seated, false);
+    this.rag = this.buildKit(this.ragdoll, true);
     this.ragdoll.visible = false;
     this.root.add(this.ragdoll);
   }
 
-  /** Attach the seated hierarchy under the bike frame. */
   attach(bike: BikeModel): void {
     bike.frame.add(this.seated);
   }
+
+  // ---------------------------------------------------------------------------
+  // Parts
+  // ---------------------------------------------------------------------------
+
+  private mesh(g: THREE.BufferGeometry, mat: string, parent: THREE.Object3D): THREE.Mesh {
+    const m = new THREE.Mesh(g, this.lib.get(mat));
+    m.castShadow = true;
+    parent.add(m);
+    return m;
+  }
+
+  /** Capsule along +y from 0 to len. */
+  private capsule(r: number, len: number, mat: string, parent: THREE.Object3D, sx = 1, sz = 1): THREE.Mesh {
+    const m = this.mesh(new THREE.CapsuleGeometry(r, Math.max(0.01, len - 2 * r), 4, 12), mat, parent);
+    m.position.y = len / 2;
+    m.scale.set(sx, 1, sz);
+    return m;
+  }
+
+  private buildHead(parent: THREE.Object3D): THREE.Group {
+    const head = new THREE.Group();
+    const shell = this.mesh(new THREE.SphereGeometry(L.head, 20, 14), 'helmet', head);
+    shell.scale.set(1.0, 1.08, 0.98);
+    // Visor opening: dark band across the front.
+    const visor = this.mesh(new THREE.SphereGeometry(L.head * 1.03, 20, 8, -0.75, 1.5, 1.05, 0.62), 'visor', head);
+    visor.rotation.y = 0;
+    // Peak
+    const peak = this.mesh(new THREE.BoxGeometry(0.15, 0.015, 0.2), 'helmet', head);
+    peak.position.set(0.1, 0.075, 0);
+    peak.rotation.z = -0.35;
+    // Chin bar: flattened box wrapping the front-bottom.
+    const chin = this.mesh(new THREE.BoxGeometry(0.11, 0.07, 0.19), 'helmet', head);
+    chin.position.set(0.1, -0.06, 0);
+    chin.rotation.z = 0.15;
+    // Goggle strap
+    const strap = this.mesh(new THREE.TorusGeometry(L.head * 1.02, 0.012, 6, 24), 'pants', head);
+    strap.rotation.x = Math.PI / 2;
+    strap.position.y = 0.03;
+    strap.scale.set(1, 1, 1.08);
+    // Neck
+    const neck = this.mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.1, 10), 'pants', head);
+    neck.position.set(-0.01, -0.15, 0);
+    parent.add(head);
+    return head;
+  }
+
+  private buildKit(parent: THREE.Object3D, ragdoll: boolean): Kit {
+    // Torso: chest capsule widened in z, chest plate, shoulder pads, back number.
+    const torso = new Segment(L.torso);
+    this.capsule(0.12, L.torso, 'jersey', torso.group, 0.85, 1.55);
+    const chest = this.mesh(new THREE.BoxGeometry(0.06, 0.26, 0.3), 'armour', torso.group);
+    chest.position.set(0.1, L.torso * 0.62, 0);
+    chest.rotation.z = -0.1;
+    for (const s of [-1, 1]) {
+      const pad = this.mesh(new THREE.SphereGeometry(0.075, 12, 8), 'armour', torso.group);
+      pad.position.set(0, L.torso - 0.02, s * L.shoulderHalf);
+      pad.scale.set(1, 0.8, 1);
+    }
+    const spine = this.mesh(new THREE.BoxGeometry(0.04, 0.34, 0.12), 'armour', torso.group);
+    spine.position.set(-0.11, L.torso * 0.5, 0);
+    parent.add(torso.group);
+    // Pelvis: shorts block + belt.
+    const pelvis = new Segment(L.pelvis);
+    const hips = this.mesh(new THREE.BoxGeometry(0.24, L.pelvis, 0.32), 'pants', pelvis.group);
+    hips.position.y = L.pelvis / 2;
+    const belt = this.mesh(new THREE.BoxGeometry(0.25, 0.04, 0.33), 'armour', pelvis.group);
+    belt.position.y = L.pelvis - 0.02;
+    parent.add(pelvis.group);
+    const head = this.buildHead(parent);
+    const upperArm: Segment[] = [];
+    const forearm: Segment[] = [];
+    const thigh: Segment[] = [];
+    const shin: Segment[] = [];
+    const n = 2;
+    for (let i = 0; i < n; i++) {
+      const ua = new Segment(L.upperArm);
+      this.capsule(0.052, L.upperArm, 'jersey', ua.group);
+      const elbow = this.mesh(new THREE.SphereGeometry(0.06, 10, 8), 'armour', ua.group);
+      elbow.position.y = L.upperArm;
+      elbow.scale.set(1, 0.9, 0.9);
+      parent.add(ua.group);
+      upperArm.push(ua);
+      const fa = new Segment(L.forearm);
+      this.capsule(0.045, L.forearm, 'jersey', fa.group);
+      const glove = this.mesh(new THREE.BoxGeometry(0.1, 0.1, 0.07), 'gloves', fa.group);
+      glove.position.set(0.0, L.forearm - 0.01, 0);
+      parent.add(fa.group);
+      forearm.push(fa);
+      const th = new Segment(L.thigh);
+      this.capsule(0.08, L.thigh, 'pants', th.group, 1, 1.1);
+      const knee = this.mesh(new THREE.BoxGeometry(0.11, 0.17, 0.13), 'armour', th.group);
+      knee.position.set(0.05, L.thigh - 0.04, 0);
+      parent.add(th.group);
+      thigh.push(th);
+      const sh = new Segment(L.shin);
+      this.capsule(0.06, L.shin, 'pants', sh.group);
+      const guard = this.mesh(new THREE.BoxGeometry(0.06, 0.26, 0.11), 'boots', sh.group);
+      guard.position.set(0.05, L.shin * 0.45, 0);
+      const boot = this.mesh(new THREE.BoxGeometry(0.29, 0.13, 0.12), 'boots', sh.group);
+      boot.position.set(0.07, L.shin - 0.02, 0);
+      const sole = this.mesh(new THREE.BoxGeometry(0.3, 0.03, 0.13), 'armour', sh.group);
+      sole.position.set(0.07, L.shin + 0.05, 0);
+      const buckle = this.mesh(new THREE.BoxGeometry(0.02, 0.2, 0.13), 'plastic', sh.group);
+      buckle.position.set(0.09, L.shin - 0.06, 0);
+      parent.add(sh.group);
+      shin.push(sh);
+    }
+    void ragdoll;
+    return { torso, pelvis, head, upperArm, forearm, thigh, shin };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Posing
+  // ---------------------------------------------------------------------------
 
   update(f: RenderFrame): void {
     if (f.ragdoll && f.ragdoll.length > 0) {
@@ -160,76 +223,83 @@ export class RiderModel {
     }
     this.seated.visible = true;
     this.ragdoll.visible = false;
-    this.poseSeated(f);
+    this.poseRider(f);
   }
 
-  private poseSeated(f: RenderFrame): void {
+  private poseRider(f: RenderFrame): void {
     const B = BIKE;
     const r = f.rider;
-    // Standing on the pegs: pelvis above/behind the pegs, back with lean and armExtend, down with crouch.
-    const stand = 1 - r.crouch;
-    const px = B.pegs.x - 0.08 - 0.22 * Math.max(0, -r.lean) - 0.12 * r.armExtend + 0.16 * Math.max(0, r.lean) - 0.05 * r.crouch;
-    const py = B.pegs.y + 0.5 + 0.36 * stand;
-    // Torso: forward lean base 28°, more with crouch and forward lean, less when hanging back.
-    const torsoA = 0.38 + r.torsoPitch + 0.35 * r.lean + 0.4 * r.crouch - 0.3 * r.armExtend;
-    const sx = px + Math.sin(torsoA) * L.torso;
-    const sy = py + Math.cos(torsoA) * L.torso;
-    place(this.pelvis, px - 0.05, py - 0.08, 0, px + 0.03, py + 0.1, 0);
-    place(this.torso, px, py, 0, sx, sy, 0);
-    // Head continues the torso, tilted up to look ahead.
-    const headA = torsoA - 0.45;
-    const hx = sx + Math.sin(headA) * (L.neck + L.head);
-    const hy = sy + Math.cos(headA) * (L.neck + L.head);
-    this.head.position.set(hx, hy, 0);
-    this.head.rotation.z = -headA;
-    // Arms: shoulders → bar ends. Elbow goes below the shoulder-hand line, slightly out.
-    const bx = B.barCentre.x - 0.04;
-    const by = B.barCentre.y - 0.05;
+    const k = this.kit;
+    // Stand on the pegs when moving or airborne; sit at idle. Smoothed from tSim.
+    const standTarget = f.airborne || f.speed > 1.2 || r.crouch > 0.3 || Math.abs(r.lean) > 0.5 ? 1 : 0;
+    this.standT = f.cut ? standTarget : this.standT + (standTarget - this.standT) * (1 - Math.pow(0.5, f.dt / 0.25));
+    const stand = this.standT;
+    const back = Math.max(0, -r.lean);
+    const fwd = Math.max(0, r.lean);
+    // Hips.
+    const hx = B.pegs.x - 0.02 - 0.28 * back - 0.3 * r.armExtend + 0.14 * fwd - 0.06 * r.crouch - 0.16 * (1 - stand);
+    const hyStand = B.pegs.y + 0.76 - 0.4 * r.crouch;
+    const hySeat = B.seatTop.y + 0.1;
+    const hy = hySeat + (hyStand - hySeat) * stand;
+    // Torso from vertical: attack position ≈ 0.45 rad, more when crouched or leaning forward, less hanging back.
+    const torsoA = 0.62 * stand + 0.3 * (1 - stand) + r.torsoPitch + 0.3 * fwd + 0.5 * r.crouch - 0.5 * back - 0.35 * r.armExtend;
+    const sx = hx + Math.sin(torsoA) * L.torso;
+    const sy = hy + Math.cos(torsoA) * L.torso;
+    // Pelvis block sits under the torso base, tilted with it.
+    k.pelvis.place(hx - Math.sin(torsoA) * L.pelvis * 0.9, hy - Math.cos(torsoA) * L.pelvis * 0.9, 0, hx, hy, 0);
+    k.torso.place(hx, hy, 0, sx, sy, 0);
+    // Head: looks ahead, tilts up when tucked.
+    const headA = torsoA * 0.45 - 0.1;
+    const hdx = sx + Math.sin(headA) * (L.head + 0.06);
+    const hdy = sy + Math.cos(headA) * (L.head + 0.06);
+    k.head.position.set(hdx, hdy, 0);
+    k.head.rotation.z = -headA;
+    // Arms: shoulders → grips; elbows up and out (motocross attack).
+    const gx = B.barCentre.x - 0.04;
+    const gy = B.barCentre.y - 0.06;
     for (let i = 0; i < 2; i++) {
       const side = i === 0 ? 1 : -1;
       const z = side * L.shoulderHalf;
-      const hz = side * (B.barHalfWidth - 0.05);
-      ik(sx, sy, bx, by, L.upperArm, L.forearm, -1, this.v);
-      const ez = z + (hz - z) * 0.5 + side * 0.08;
-      place(this.upperArm[i]!, sx, sy, z, this.v.x, this.v.y, ez);
-      place(this.forearm[i]!, this.v.x, this.v.y, ez, bx, by, hz);
+      const hz = side * (B.barHalfWidth - 0.06);
+      ik(sx, sy, gx, gy, L.upperArm, L.forearm, 1, this.v);
+      const ez = z + (hz - z) * 0.45 + side * 0.1;
+      k.upperArm[i]!.place(sx, sy, z, this.v.x, this.v.y, ez);
+      k.forearm[i]!.place(this.v.x, this.v.y, ez, gx, gy, hz);
     }
-    // Legs: hips → pegs. Knee forward.
+    // Legs: hips → pegs, knees forward; feet flat on the pegs.
+    const fx = B.pegs.x + 0.03;
+    const fy = B.pegs.y + 0.03;
     for (let i = 0; i < 2; i++) {
       const side = i === 0 ? 1 : -1;
-      const hz = side * L.hipHalf;
+      const hipz = side * L.hipHalf;
       const fz = side * B.pegHalfWidth;
-      const fx = B.pegs.x + 0.02;
-      const fy = B.pegs.y + 0.05;
-      ik(px, py, fx, fy, L.thigh, L.shin, 1, this.v2);
-      const kz = hz + (fz - hz) * 0.5;
-      place(this.thigh[i]!, px, py, hz, this.v2.x, this.v2.y, kz);
-      place(this.shin[i]!, this.v2.x, this.v2.y, kz, fx, fy, fz);
-      const boot = this.boots[i]!;
-      boot.position.set(fx + 0.05, fy - 0.02, fz);
-      boot.rotation.z = 0.1;
+      ik(hx, hy, fx, fy, L.thigh, L.shin, 1, this.v2);
+      const kz = hipz + (fz - hipz) * 0.5;
+      k.thigh[i]!.place(hx, hy, hipz, this.v2.x, this.v2.y, kz);
+      k.shin[i]!.place(this.v2.x, this.v2.y, kz, fx, fy, fz);
     }
   }
 
   private poseRagdoll(bodies: RagdollBody[]): void {
-    // Hide everything, then place what physics reports.
-    for (const list of Object.values(this.rag)) for (const s of list) s.mesh.visible = false;
-    this.ragHead.visible = false;
+    const k = this.rag;
+    for (const s of [k.torso, k.pelvis, ...k.upperArm, ...k.forearm, ...k.thigh, ...k.shin]) s.group.visible = false;
+    k.head.visible = false;
     for (const b of bodies) {
       if (b.id === 'head') {
-        this.ragHead.visible = true;
-        this.ragHead.position.set(b.pos.x, b.pos.y, 0);
-        this.ragHead.rotation.z = b.angle;
+        k.head.visible = true;
+        k.head.position.set(b.pos.x, b.pos.y, 0);
+        k.head.rotation.z = b.angle;
         continue;
       }
-      const segs = this.rag[b.id];
-      const len = b.id === 'torso' ? L.torso : b.id === 'pelvis' ? 0.26 : b.id === 'upperArm' ? L.upperArm : b.id === 'forearm' ? L.forearm : b.id === 'thigh' ? L.thigh : L.shin;
+      const segs: Segment[] = b.id === 'torso' ? [k.torso] : b.id === 'pelvis' ? [k.pelvis] : b.id === 'upperArm' ? k.upperArm : b.id === 'forearm' ? k.forearm : b.id === 'thigh' ? k.thigh : k.shin;
+      const len = segs[0]!.len;
+      // Body angle is the segment axis (CCW from +x); draw from the centre both ways.
       const dx = Math.cos(b.angle) * len * 0.5;
       const dy = Math.sin(b.angle) * len * 0.5;
       segs.forEach((s, i) => {
-        s.mesh.visible = true;
-        const z = segs.length > 1 ? (i === 0 ? 0.14 : -0.14) : 0;
-        place(s, b.pos.x - dx, b.pos.y - dy, z, b.pos.x + dx, b.pos.y + dy, z);
+        s.group.visible = true;
+        const z = segs.length > 1 ? (i === 0 ? 0.15 : -0.15) : 0;
+        s.place(b.pos.x - dx, b.pos.y - dy, z, b.pos.x + dx, b.pos.y + dy, z);
       });
     }
   }

@@ -31,6 +31,10 @@ export class Emitters {
   readonly confetti: ParticleSystem;
   readonly ambient: ParticleSystem;
   private readonly rng = new Rng(1);
+  /** Multiplies every burst count (low tier = 0.5). */
+  set countScale(v: number) {
+    for (const s of this.systems) s.countScale = v;
+  }
   private seed = 0;
   private lastExhaustT = -10;
   private lastDirtT = -10;

@@ -35,6 +35,8 @@ export interface Biome {
   gradeLift: [number, number, number];
   gradeGain: [number, number, number];
   saturation: number;
+  /** S-curve contrast around mid grey (1 = none). */
+  contrast?: number;
   vignette: number;
   bloomStrength: number;
   /** Default ridden surface when a collider has none we know. */
@@ -49,25 +51,26 @@ export const BIOMES: Record<BiomeId, Biome> = {
   industrial: {
     id: 'industrial',
     sunDir: [-0.45, 0.78, -0.3],
-    sunColor: 0xffd9a8,
-    sunIntensity: 3.0,
-    hemiSky: 0xc9b08a,
-    hemiGround: 0x2a2018,
-    hemiIntensity: 0.42,
-    skyZenith: 0x8c7a62,
-    skyHorizon: 0xe6c894,
-    skyGround: 0x2a2219,
+    sunColor: 0xffe2c4, // warm key, not orange
+    sunIntensity: 3.2,
+    hemiSky: 0x9cb6d8, // neutral-cool skylight fill
+    hemiGround: 0x1a1612,
+    hemiIntensity: 0.65,
+    skyZenith: 0x6f7f96,
+    skyHorizon: 0xd8c8a8,
+    skyGround: 0x1a1512,
     sunDiscIntensity: 30,
     envIntensity: 0.4,
-    exposure: 0.85,
-    fogTiers: [60, 140, 260],
-    fogColor: 0x6e5a44,
-    floorFog: { h0: 0.3, hs: 1.4, density: 0.06 },
-    gradeLift: [0.03, 0.02, 0.0],
-    gradeGain: [1.04, 1.0, 0.94],
-    saturation: 1.05,
-    vignette: 0.32,
-    bloomStrength: 0.5,
+    exposure: 1.25,
+    fogTiers: [90, 200, 380],
+    fogColor: 0x5a5654, // desaturated: fog must not tint
+    floorFog: { h0: 0.3, hs: 1.6, density: 0.025 },
+    gradeLift: [0.0, 0.0, 0.0],
+    gradeGain: [1.02, 1.0, 0.98],
+    saturation: 0.95,
+    contrast: 1.16,
+    vignette: 0.38,
+    bloomStrength: 0.45,
     groundSurface: 'concrete',
     ambient: 'motes',
     interior: true,

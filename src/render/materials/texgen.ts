@@ -454,3 +454,18 @@ export const painters = {
 };
 
 export type PainterName = keyof typeof painters;
+
+/** 2x2 neutral set: white albedo, flat normal, ORM = (1, 1, 1) so scalars keep their meaning. */
+export function flatSet(): TexSet {
+  const mk = (rgba: [number, number, number, number], srgb: boolean): THREE.DataTexture => {
+    const d = new Uint8Array(16);
+    for (let i = 0; i < 4; i++) d.set(rgba, i * 4);
+    const t = new THREE.DataTexture(d, 2, 2, THREE.RGBAFormat, THREE.UnsignedByteType);
+    t.generateMipmaps = false;
+    t.minFilter = t.magFilter = THREE.LinearFilter;
+    if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+    t.needsUpdate = true;
+    return t;
+  };
+  return { map: mk([255, 255, 255, 255], true), normalMap: mk([128, 128, 255, 255], false), ormMap: mk([255, 255, 255, 255], false), bytes: 48 };
+}

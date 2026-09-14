@@ -134,8 +134,8 @@ export class CameraRig {
       heightFrac: lerp(lerp(0.4, 0.24, zoomT), 0.09, wideT),
       screenX: moving > 0 ? lerp(0.45, 0.3, zoomT) - 0.02 * wideT : lerp(0.55, 0.7, zoomT),
       screenY: lerp(0.55, 0.53, zoomT) - 0.03 * airT,
-      yaw: moving * lerp(lerp(5, 20, zoomT), 24, wideT) * DEG,
-      pitch: lerp(lerp(3, 22, zoomT), 30, fastT) * DEG + 14 * DEG * airT,
+      yaw: moving * lerp(lerp(5, 15, zoomT), 18, wideT) * DEG,
+      pitch: lerp(lerp(3, 17, zoomT), 24, fastT) * DEG + 6 * DEG * airT,
       roll: 0,
       fov: lerp(28, 34, zoomT) * DEG,
     };
@@ -210,8 +210,8 @@ export class CameraRig {
 
     // --- Followed point: lookahead in x, dead-zone in y.
     const lookTarget = Math.min(2.5, Math.max(-1.5, f.velX * 0.15));
-    let fxT = followTarget.x;
-    let fyT = followTarget.y + 0.45 - 0.3 * airT;
+    const fxT = followTarget.x;
+    const fyT = followTarget.y + 0.45 - 0.3 * airT;
     if (cut) {
       this.fx.snap(fxT);
       this.fy.snap(fyT);
@@ -252,7 +252,7 @@ export class CameraRig {
       if (st < 0.8) {
         const env = Math.exp(-st / 0.18) * Math.sin(2 * Math.PI * 9 * st);
         shakeY = this.shakeAmp * env;
-        shakeRoll = 0.8 * DEG * env * (this.shakeAmp / 0.12);
+        shakeRoll = 0; // Trials never rolls the camera (only a CameraKey.roll may)
       } else this.shakeT = -1;
     }
 
@@ -306,6 +306,20 @@ export class CameraRig {
     const bottom = this.proj.y;
     this.proj.set(this.lastBikeX, this.lastBikeY - 0.55 + RIDER_HEIGHT, 0).project(cam);
     const heightFrac = Math.abs(this.proj.y - bottom) / 2;
-    return { pos: { x: cam.position.x, y: cam.position.y }, dist: this.dist, bikeScreenX: sx, bikeScreenY: sy, bikeHeightFrac: heightFrac };
+    // True roll: angle of the camera's right vector against the world horizontal plane.
+    this.right.set(1, 0, 0).applyQuaternion(cam.quaternion);
+    const roll = Math.atan2(this.right.y, Math.hypot(this.right.x, this.right.z));
+    const out: CameraDebug & { roll: number; yaw: number; pitch: number; state: string } = {
+      pos: { x: cam.position.x, y: cam.position.y },
+      dist: this.dist,
+      bikeScreenX: sx,
+      bikeScreenY: sy,
+      bikeHeightFrac: heightFrac,
+      roll,
+      yaw: this.yaw.x,
+      pitch: this.pitch.x,
+      state: this.state,
+    };
+    return out;
   }
 }
