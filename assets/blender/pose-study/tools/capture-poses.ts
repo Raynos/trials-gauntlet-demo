@@ -61,7 +61,7 @@ async function main() {
       const dir = path.join(outDir, name);
       fs.rmSync(dir, { recursive: true, force: true });
       fs.mkdirSync(dir, { recursive: true });
-      const log: any[] = [];
+      const log: Record<string, unknown>[] = [];
       let k = 0;
       let tAcc = 0;
       for (const seg of script) {
@@ -84,7 +84,7 @@ async function main() {
         tAcc += seg.dur;
       }
       fs.writeFileSync(path.join(dir, 'log.json'), JSON.stringify(log, null, 1));
-      console.log(name, 'frames', k, 'bikeScreen', log[0].cam.bikeScreenX, log[0].cam.bikeScreenY, 'hFrac', log[0].cam.bikeHeightFrac);
+      console.info(name, 'frames', k, 'bikeScreen', log[0].cam.bikeScreenX, log[0].cam.bikeScreenY, 'hFrac', log[0].cam.bikeHeightFrac);
     }
   } finally {
     await launched.close();

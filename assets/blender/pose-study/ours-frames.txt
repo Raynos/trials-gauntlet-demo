@@ -1,0 +1,33 @@
+ours v1 lean back (input 0 to -1 over 0.5 s, hold)
+col 1: f16 t=0.27s input 0.00 lean -0.00 crouch 0.00 torsoPitch -0.01 arm 0.00 hop idle
+col 2: f24 t=0.40s input -0.21 lean -0.10 crouch 0.04 torsoPitch 0.02 arm 0.10 hop idle
+col 3: f30 t=0.50s input -0.41 lean -0.29 crouch 0.12 torsoPitch 0.08 arm 0.29 hop idle
+col 4: f36 t=0.60s input -0.62 lean -0.49 crouch 0.25 torsoPitch 0.15 arm 0.49 hop idle
+col 5: f42 t=0.70s input -0.83 lean -0.70 crouch 0.40 torsoPitch 0.22 arm 0.70 hop idle
+col 6: f48 t=0.80s input -1.00 lean -0.90 crouch 0.55 torsoPitch 0.29 arm 0.90 hop idle
+col 7: f54 t=0.90s input -1.00 lean -0.99 crouch 0.67 torsoPitch 0.33 arm 0.99 hop idle
+col 8: f60 t=1.00s input -1.00 lean -1.00 crouch 0.71 torsoPitch 0.34 arm 1.00 hop idle
+col 9: f66 t=1.10s input -1.00 lean -1.00 crouch 0.69 torsoPitch 0.34 arm 1.00 hop idle
+col 10: f72 t=1.20s input -1.00 lean -1.00 crouch 0.67 torsoPitch 0.34 arm 1.00 hop idle
+ours v1 lean forward (-1 to +1 over 1 s, hold)
+col 1: f78 t=1.30s input -1.00 lean -1.00 crouch 0.66 torsoPitch 0.34 arm 1.00 hop idle
+col 2: f90 t=1.50s input -0.59 lean -0.72 crouch 0.54 torsoPitch 0.25 arm 0.72 hop idle
+col 3: f102 t=1.70s input -0.19 lean -0.32 crouch 0.27 torsoPitch 0.11 arm 0.32 hop idle
+col 4: f114 t=1.90s input 0.22 lean 0.09 crouch 0.13 torsoPitch -0.02 arm 0.00 hop idle
+col 5: f120 t=2.00s input 0.42 lean 0.29 crouch 0.31 torsoPitch -0.10 arm 0.00 hop idle
+col 6: f126 t=2.10s input 0.63 lean 0.49 crouch 0.62 torsoPitch -0.16 arm 0.00 hop idle
+col 7: f132 t=2.20s input 0.83 lean 0.70 crouch 1.00 torsoPitch -0.23 arm 0.00 hop idle
+col 8: f138 t=2.30s input 1.00 lean 0.90 crouch 1.00 torsoPitch -0.30 arm 0.00 hop idle
+col 9: f150 t=2.50s input 1.00 lean 1.00 crouch 1.00 torsoPitch -0.34 arm 0.00 hop idle
+col 10: f162 t=2.70s input 1.00 lean 1.00 crouch 1.00 torsoPitch -0.34 arm 0.00 hop idle
+ours v1 crouch (hop preload lean -0.6 thr 0.5, snap)
+col 1: f16 t=0.27s input 0.00 lean -0.00 crouch 0.00 torsoPitch -0.01 arm 0.00 hop idle
+col 2: f22 t=0.37s input -0.48 lean -0.14 crouch 0.04 torsoPitch 0.01 arm 0.14 hop idle
+col 3: f26 t=0.43s input -0.60 lean -0.41 crouch 0.20 torsoPitch 0.04 arm 0.41 hop preload
+col 4: f30 t=0.50s input -0.60 lean -0.54 crouch 0.53 torsoPitch 0.09 arm 0.54 hop preload
+col 5: f34 t=0.57s input -0.60 lean -0.60 crouch 1.00 torsoPitch 0.14 arm 0.60 hop preload
+col 6: f40 t=0.67s input -0.60 lean -0.61 crouch 1.00 torsoPitch 0.19 arm 0.61 hop preload
+col 7: f60 t=1.00s input -0.60 lean -0.62 crouch 1.00 torsoPitch 0.20 arm 0.62 hop preload
+col 8: f86 t=1.43s input 0.60 lean -0.58 crouch 1.00 torsoPitch 0.19 arm 0.58 hop push
+col 9: f88 t=1.47s input 0.00 lean -0.50 crouch 0.66 torsoPitch 0.18 arm 0.50 hop push
+col 10: f92 t=1.53s input 0.00 lean -0.20 crouch 0.00 torsoPitch 0.15 arm 0.20 hop recover
