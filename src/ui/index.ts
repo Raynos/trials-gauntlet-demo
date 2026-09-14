@@ -7,8 +7,8 @@ import type { GameEvent, InputDevice, PhysicsState, RunInfo, RunResult, TrackDef
 export type HudAction = 'retry' | 'next' | 'menu' | 'pause';
 
 export interface Hud {
-  /** Per rendered frame, after `setRun`. */
-  update(state: PhysicsState): void;
+  /** Per rendered frame, after `setRun`. `ghost` is the PB ghost's state when one is running. */
+  update(state: PhysicsState, ghost?: PhysicsState | null): void;
   onEvent(event: GameEvent): void;
   /** Per rendered frame: run clock, faults, phase, checkpoint progress, sim clock. */
   setRun(info: RunInfo): void;
@@ -17,6 +17,8 @@ export interface Hud {
   setTrackName(name: string): void;
   /** 0.4 s after the finish line. */
   showResults(result: RunResult): void;
+  /** Checkpoint split vs the stored PB: negative = ahead. Kinetic label by the timer for 1.5 s. */
+  showSplit(checkpoint: number, deltaSeconds: number): void;
   setDevice(device: InputDevice, visible: boolean): void;
   dispose(): void;
 }
@@ -24,5 +26,5 @@ export interface Hud {
 export { formatTime, formatDelta } from './format';
 export { DomHud } from './hud';
 export { MainMenu, PauseMenu, mountRotatePrompt, type MenuCallbacks, type PauseCallbacks, type QualityChoice } from './menu';
-export { BestTimes, loadQualityOverride, saveQualityOverride, type BestEntry } from './best';
+export { BestTimes, loadQualityOverride, saveQualityOverride, loadGhostEnabled, saveGhostEnabled, type BestEntry } from './best';
 export { injectStyles, UI_CSS } from './styles';

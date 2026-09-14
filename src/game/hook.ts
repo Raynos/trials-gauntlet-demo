@@ -77,6 +77,7 @@ export function installHook(source: Game | (() => Game), harness: boolean, extra
     camera: () => g().camera(),
     setQuality: (t) => g().setQuality(t),
     skipCountdown: () => g().skipCountdown(),
+    ghost: () => g().ghostState(),
   };
   if (extras.renderOffline) {
     const renderOffline = extras.renderOffline;

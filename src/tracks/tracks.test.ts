@@ -37,10 +37,21 @@ function obstacleExtent(def: TrackDef, track: CompiledTrack, i: number): [number
   let hi = o.pos.x + footprint(o.kind as ObstacleKind, o.params);
   for (const c of track.colliders) {
     if (c.obstacleIndex !== i) continue;
-    if (c.kind === 'polyline') for (const p of c.points) (lo = Math.min(lo, p.x)), (hi = Math.max(hi, p.x));
-    else if (c.kind === 'circle') (lo = Math.min(lo, c.center.x - c.radius)), (hi = Math.max(hi, c.center.x + c.radius));
-    else if (c.kind === 'box') (lo = Math.min(lo, c.center.x - c.halfW)), (hi = Math.max(hi, c.center.x + c.halfW));
-    else (lo = Math.min(lo, c.pivot.x - c.halfLength)), (hi = Math.max(hi, c.pivot.x + c.halfLength));
+    if (c.kind === 'polyline') {
+      for (const p of c.points) {
+        lo = Math.min(lo, p.x);
+        hi = Math.max(hi, p.x);
+      }
+    } else if (c.kind === 'circle') {
+      lo = Math.min(lo, c.center.x - c.radius);
+      hi = Math.max(hi, c.center.x + c.radius);
+    } else if (c.kind === 'box') {
+      lo = Math.min(lo, c.center.x - c.halfW);
+      hi = Math.max(hi, c.center.x + c.halfW);
+    } else {
+      lo = Math.min(lo, c.pivot.x - c.halfLength);
+      hi = Math.max(hi, c.pivot.x + c.halfLength);
+    }
   }
   return [lo, hi];
 }

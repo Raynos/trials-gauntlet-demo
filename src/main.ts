@@ -6,6 +6,7 @@
  *   ?countdown=1    keep the 3-2-1-GO in harness mode (captures of the countdown)
  *   ?physics=mock   force the scaffold MockPhysics even when the real bike physics exists
  *   ?audio=0        NullAudio (the hook then has no renderOffline)
+ *   ?ghost=1        run the PB ghost world in harness mode too (off by default there: one world per µs/tick)
  *   ?track=<id>     start straight into a track (skips the menu)
  *   ?hz=<n>         physics rate (default 120)
  */
@@ -120,6 +121,9 @@ function boot(): void {
       audio: audioParts.audio,
       bestTimes,
       autoSkipCountdown: harness && params.get('countdown') !== '1',
+      physicsFactory: makePhysics,
+      autoRecord: true,
+      ghostEnabled: !harness || params.get('ghost') === '1',
     });
     const tGame = performance.now();
     extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind };

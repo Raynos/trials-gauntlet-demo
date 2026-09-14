@@ -43,6 +43,8 @@ export class DomHud implements Hud {
   private readonly strip: HTMLDivElement;
   private readonly stripFill: HTMLDivElement;
   private readonly stripPin: HTMLDivElement;
+  private readonly ghostPin: HTMLDivElement;
+  private lastGhostX = Number.NaN;
   private stripMarks: HTMLDivElement[] = [];
   private readonly bannersEl: HTMLDivElement;
   private readonly banners: Banner[] = [];
@@ -52,6 +54,13 @@ export class DomHud implements Hud {
   private readonly resFaults: HTMLDivElement;
   private readonly resPb: HTMLDivElement;
   private readonly resMedals: Record<'platinum' | 'gold' | 'silver' | 'bronze', HTMLDivElement>;
+  private readonly splitEl: HTMLDivElement;
+  private readonly flashEl: HTMLDivElement;
+  private splitStart = -1;
+  private flashStart = -1;
+  private flashKind: 'cp' | 'finish' = 'cp';
+  private resultsAt = -1;
+  private resultsStage = -1;
 
   private track: TrackDef | null = null;
   private best: BestEntry | null = null;
@@ -85,13 +94,16 @@ export class DomHud implements Hud {
     this.faultsEl.innerHTML = '<span class="x">✕</span><span class="n">0</span>';
     this.faultsN = this.faultsEl.querySelector('.n') as HTMLSpanElement;
     center.append(this.timerEl, this.faultsEl);
+    this.splitEl = el('div', 'hud-split');
+    center.appendChild(this.splitEl);
     const right = el('div', 'hud-right');
     this.strip = el('div', 'strip');
     const bar = el('div', 'bar');
     this.stripFill = el('div', 'fill');
     bar.appendChild(this.stripFill);
     this.stripPin = el('div', 'pin');
-    this.strip.append(bar, el('div', 'finish'), this.stripPin);
+    this.ghostPin = el('div', 'pin ghost');
+    this.strip.append(bar, el('div', 'finish'), this.ghostPin, this.stripPin);
     right.appendChild(this.strip);
     top.append(left, center, right);
     this.deltaEl = el('div', 'hud-delta');
@@ -137,7 +149,8 @@ export class DomHud implements Hud {
       if (act) this.onAction?.(act);
     });
 
-    this.root.append(top, this.deltaEl, this.bannersEl, this.hintsEl, this.results);
+    this.flashEl = el('div', 'flash');
+    this.root.append(this.flashEl, top, this.deltaEl, this.bannersEl, this.hintsEl, this.results);
     parent.appendChild(this.root);
   }
 
@@ -210,6 +223,10 @@ export class DomHud implements Hud {
       this.deltaEl.className = 'hud-delta';
     }
 
+    this.animateSplit();
+    this.animateFlash();
+    this.animateResults();
+
     // Deferred CRASH! stamp (0.2 s after the fault, Rising timing).
     if (this.pendingCrashAt >= 0 && this.simTime >= this.pendingCrashAt) {
       this.pendingCrashAt = -1;
@@ -218,10 +235,19 @@ export class DomHud implements Hud {
     this.animateBanners();
   }
 
-  update(state: PhysicsState): void {
+  update(state: PhysicsState, ghost?: PhysicsState | null): void {
     const t = this.track;
     if (!t) return;
     const span = Math.max(1e-6, t.finishX - t.start.pos.x);
+    const gx = ghost ? ghost.bike.pos.x : Number.NaN;
+    if (!(gx === this.lastGhostX || (Number.isNaN(gx) && Number.isNaN(this.lastGhostX)))) {
+      this.lastGhostX = gx;
+      if (Number.isNaN(gx)) this.ghostPin.style.opacity = '0';
+      else {
+        this.ghostPin.style.opacity = '1';
+        this.ghostPin.style.left = `${(clamp01((gx - t.start.pos.x) / span) * 100).toFixed(2)}%`;
+      }
+    }
     const x = state.bike.pos.x;
     if (x !== this.lastStripX) {
       this.lastStripX = x;
@@ -261,16 +287,73 @@ export class DomHud implements Hud {
         return;
       case 'checkpoint':
         this.spawn('cp', `Checkpoint ${event.index + 1}`, 0.9);
+        this.flashKind = 'cp';
+        this.flashStart = this.simTime;
         return;
       case 'finish':
         this.spawn('finish', 'Track finished!', 2.3);
+        this.flashKind = 'finish';
+        this.flashStart = this.simTime;
         return;
       default:
         return;
     }
   }
 
+  showSplit(_checkpoint: number, delta: number): void {
+    this.splitEl.textContent = formatDelta(delta);
+    this.splitEl.className = `hud-split ${delta <= 0 ? 'ahead' : 'behind'}`;
+    this.splitStart = this.simTime;
+    this.animateSplit();
+  }
+
+  private animateSplit(): void {
+    if (this.splitStart < 0) return;
+    const age = this.simTime - this.splitStart;
+    const life = 1.5;
+    const s = this.splitEl.style;
+    if (age < 0 || age >= life) {
+      this.splitStart = -1;
+      s.opacity = '0';
+      return;
+    }
+    const k = easeOut(clamp01(age / 0.12));
+    const left = life - age;
+    const op = left < 0.3 ? left / 0.3 : 1;
+    s.opacity = op.toFixed(3);
+    s.transform = `translateX(${(-14 * (1 - k)).toFixed(1)}px) scale(${(1.25 - 0.25 * k).toFixed(3)})`;
+  }
+
+  private animateFlash(): void {
+    if (this.flashStart < 0) return;
+    const age = this.simTime - this.flashStart;
+    const life = this.flashKind === 'finish' ? 0.35 : 0.3;
+    const s = this.flashEl.style;
+    if (age < 0 || age >= life) {
+      this.flashStart = -1;
+      s.opacity = '0';
+      return;
+    }
+    this.flashEl.className = `flash ${this.flashKind}`;
+    // Snap on, decay out (Evolution's white burst / green checkpoint light).
+    const k = age / life;
+    s.opacity = ((1 - k) * (1 - k)).toFixed(3);
+  }
+
+  /** Layered reveal (Evolution results): headline → faults → medal row → earned medal burst → PB line → actions. */
+  private animateResults(): void {
+    if (this.resultsAt < 0) return;
+    const age = this.simTime - this.resultsAt;
+    const stage = age < 0.15 ? 0 : age < 0.35 ? 1 : age < 0.6 ? 2 : age < 0.9 ? 3 : age < 1.1 ? 4 : 5;
+    if (stage !== this.resultsStage) {
+      this.resultsStage = stage;
+      this.results.className = `results show stage-${stage}`;
+    }
+  }
+
   showResults(r: RunResult): void {
+    this.resultsAt = this.simTime;
+    this.resultsStage = -1;
     this.resTime.textContent = formatTime(r.time);
     this.resFaults.innerHTML = `<span>✕</span> ${r.faults} ${r.faults === 1 ? 'fault' : 'faults'}`;
     this.resPb.textContent = r.personalBest
@@ -290,13 +373,15 @@ export class DomHud implements Hud {
       (m.querySelector('small') as HTMLElement).textContent = thresholds[k];
     }
     this.results.querySelector('h2')!.textContent = `${MEDAL_LABEL[r.medal]} · ${this.track?.name ?? ''}`;
-    this.results.classList.add('show');
+    this.results.className = 'results show stage-0';
     this.best = this.bestOf(r.trackId);
     for (const b of this.banners) if (b.kind === 'finish') this.retire(b); // the panel restates it
   }
 
   hideResults(): void {
-    this.results.classList.remove('show');
+    this.results.className = 'results';
+    this.resultsAt = -1;
+    this.resultsStage = -1;
   }
 
   dispose(): void {

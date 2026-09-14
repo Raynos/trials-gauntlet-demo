@@ -13,6 +13,7 @@ export interface MenuCallbacks {
   play(trackId: string): void;
   setQuality(q: QualityChoice): void;
   setAudio(on: boolean): void;
+  setGhost(on: boolean): void;
 }
 
 export interface PauseCallbacks {
@@ -28,8 +29,10 @@ export class MainMenu {
   private readonly list: HTMLDivElement;
   private readonly qualitySeg: HTMLDivElement;
   private readonly audioBtn: HTMLButtonElement;
+  private readonly ghostBtn: HTMLButtonElement;
   private lastTrackId: string | null = null;
   private audioOn = true;
+  private ghostOn = true;
 
   constructor(
     parent: HTMLElement,
@@ -52,6 +55,7 @@ export class MainMenu {
             <button data-q="auto">Auto</button><button data-q="low">Low</button><button data-q="medium">Med</button><button data-q="high">High</button>
           </div>
           <button class="btn audio">Sound on</button>
+          <button class="btn ghost">Ghost on</button>
         </div>
       </div>
       <div class="list"></div>`;
@@ -64,6 +68,8 @@ export class MainMenu {
       this.setQuality(q);
       this.cb.setQuality(q);
     });
+    this.ghostBtn = panel.querySelector('.btn.ghost') as HTMLButtonElement;
+    this.ghostBtn.addEventListener('click', () => this.setGhost(!this.ghostOn, true));
     this.audioBtn.addEventListener('click', () => {
       this.audioOn = !this.audioOn;
       this.audioBtn.textContent = this.audioOn ? 'Sound on' : 'Sound off';
@@ -103,6 +109,12 @@ export class MainMenu {
       html += '</div>';
     }
     this.list.innerHTML = html;
+  }
+
+  setGhost(on: boolean, notify = false): void {
+    this.ghostOn = on;
+    this.ghostBtn.textContent = on ? 'Ghost on' : 'Ghost off';
+    if (notify) this.cb.setGhost(on);
   }
 
   setQuality(q: QualityChoice): void {

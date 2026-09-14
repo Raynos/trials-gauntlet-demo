@@ -81,7 +81,7 @@ export function plan(sim: Sim, cfg: BeamConfig, w: ScoreWeights, opts: PlanOptio
   outer: for (let d = 0; d < cfg.depth; d++) {
     if (d > 0 && performance.now() - t0 > cfg.budgetMs) break;
     const cells = new Map<string, Node>();
-    let finishedChildren: Node[] = [];
+    const finishedChildren: Node[] = [];
     let anyClean = false;
     for (const node of frontier) {
       if (node.faulted) continue; // do not expand past a fault; the fault is real

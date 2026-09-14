@@ -443,4 +443,6 @@ export interface TrialsHook {
   audio?: { renderOffline(recordingJson: string, seconds: number): Promise<Float32Array> };
   /** Harness convenience: jump straight to GO. */
   skipCountdown(): void;
+  /** PB ghost physics state (second world, lockstep from GO), or null. */
+  ghost(): PhysicsState | null;
 }

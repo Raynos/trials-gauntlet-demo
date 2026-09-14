@@ -7,7 +7,7 @@
 import type { InputDevice, QualityTier, TrackDef } from '../core/types';
 import type { AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
-import { MainMenu, PauseMenu, loadQualityOverride, mountRotatePrompt, saveQualityOverride, type BestTimes, type DomHud, type QualityChoice } from '../ui';
+import { MainMenu, PauseMenu, loadGhostEnabled, loadQualityOverride, mountRotatePrompt, saveGhostEnabled, saveQualityOverride, type BestTimes, type DomHud, type QualityChoice } from '../ui';
 import type { Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
 
@@ -73,6 +73,10 @@ export class App {
         play: (id) => this.play(id),
         setQuality: (q) => this.chooseQuality(q),
         setAudio: (on) => this.audio?.setMasterVolume(on ? 1 : 0),
+        setGhost: (on) => {
+          saveGhostEnabled(on);
+          this.game.setGhostEnabled(on);
+        },
       },
       (id) => this.bestTimes.get(id),
     );
@@ -95,6 +99,9 @@ export class App {
 
     this.qualityChoice = loadQualityOverride();
     this.menu.setQuality(this.qualityChoice);
+    const ghostOn = loadGhostEnabled();
+    this.menu.setGhost(ghostOn);
+    this.game.setGhostEnabled(ghostOn);
     if (this.qualityChoice !== 'auto') {
       this.game.setQuality(this.qualityChoice);
       this.probeDone = true;

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { hashPhysicsState } from '../core/hash';
 import type { CameraDebug, CompiledTrack, GameEvent, PhysicsState, RenderStats } from '../core/types';
 import type { GameRenderer } from '../render';
+import type { Hud } from '../ui';
 import { Game } from './game';
 import { decodeSnapshot, encodeSnapshot } from './hook';
 import { MockPhysics } from './mockPhysics';
@@ -229,5 +231,119 @@ describe('Game run state machine', () => {
     game.step(300);
     expect(game.hashState()).toBe(h1);
     expect(game.counters()).toEqual(c1);
+  });
+});
+
+describe('PB ghost and splits', () => {
+  class MemStore {
+    rec: { time: number; faults: number; splits?: number[]; recording?: string } | null = null;
+    get(): { time: number; faults: number; splits?: number[]; recording?: string } | null {
+      return this.rec;
+    }
+    put(_id: string, r: { time: number; faults: number }, run: { splits: number[]; recording: string | null }): void {
+      this.rec = { time: r.time, faults: r.faults, splits: run.splits, ...(run.recording ? { recording: run.recording } : {}) };
+    }
+  }
+  const makeGhostGame = (store: MemStore, hud?: Partial<Hud>): Game =>
+    new Game({
+      physics: new MockPhysics(120),
+      renderer: new StubRenderer(),
+      autoSkipCountdown: true,
+      autoRecord: true,
+      physicsFactory: (hz) => new MockPhysics(hz),
+      bestTimes: store,
+      ...(hud ? { hud: hud as Hud } : {}),
+    });
+
+  it('stores the PB recording + splits, then replays it as a lockstep ghost with matching hashes', () => {
+    const store = new MemStore();
+    const a = makeGhostGame(store);
+    a.loadTrack('flat-test');
+    expect(a.ghostState()).toBeNull(); // no PB yet
+    const hashes = new Map<number, string>();
+    const script: Array<[number, Partial<PhysicsState['input']> & { restart?: boolean }]> = [
+      [500, { throttle: 1 }],
+      [1, { throttle: 1, restart: true }],
+      [150, { throttle: 1 }],
+      [300, { throttle: 1, lean: -1 }], // crash + auto respawn
+      [3000, { throttle: 1 }],
+    ];
+    let t = 0;
+    for (const [n, f] of script) {
+      a.setInput(f);
+      for (let i = 0; i < n && a.phase() !== 'finished'; i++) {
+        a.step(1);
+        t++;
+        if (t % 100 === 0) hashes.set(t, a.hashState());
+      }
+    }
+    expect(a.phase()).toBe('finished');
+    const liveFinalHash = a.hashState();
+    a.step(48); // results → store
+    expect(store.rec?.recording).toBeTruthy();
+    expect(store.rec?.splits?.length).toBe(2);
+    expect(a.faults()).toBeGreaterThanOrEqual(2);
+
+    // Second run: ghost exists from GO and matches the first run tick for tick.
+    const splits: Array<[number, number]> = [];
+    const b = makeGhostGame(store, {
+      update() {},
+      onEvent() {},
+      setRun() {},
+      setTrack() {},
+      setTrackName() {},
+      showResults() {},
+      setDevice() {},
+      dispose() {},
+      showSplit: (cp, d) => splits.push([cp, d]),
+    });
+    b.loadTrack('flat-test');
+    expect(b.ghostState()).not.toBeNull();
+    b.setInput({ throttle: 1 });
+    let ticks = 0;
+    for (const [k, h] of hashes) {
+      while (ticks < k) {
+        b.step(1);
+        ticks++;
+      }
+      expect(hashPhysicsState(b.ghostState()!)).toBe(h);
+    }
+    while (b.phase() !== 'finished' && ticks < 6000) {
+      b.step(1);
+      ticks++;
+    }
+    // The clean run finishes first; the ghost keeps going under the results and freezes at its own finish.
+    b.step(1500);
+    expect(hashPhysicsState(b.ghostState()!)).toBe(liveFinalHash);
+    // A clean run is ahead of a run with two faults at both checkpoints... except the first
+    // checkpoint (x=40) precedes the first fault, so only checkpoint 2 must be ahead.
+    expect(splits.map(([cp]) => cp)).toEqual([0, 1]);
+    expect(splits[1]![1]).toBeLessThan(0);
+    // Live restarts do not touch the ghost's clock: a tap mid-run leaves ghost tick == runTicks.
+  });
+
+  it('ghost survives snapshot restore (re-seeks to the run clock) and can be toggled', () => {
+    const store = new MemStore();
+    const a = makeGhostGame(store);
+    a.loadTrack('flat-test');
+    a.setInput({ throttle: 1 });
+    while (a.phase() !== 'finished') a.step(1);
+    a.step(48);
+    const b = makeGhostGame(store);
+    b.loadTrack('flat-test');
+    b.setInput({ throttle: 1 });
+    b.step(200);
+    const snap = encodeSnapshot(b.snapshot(), b.counters());
+    b.step(150);
+    const ghostAt350 = hashPhysicsState(b.ghostState()!);
+    const dec = decodeSnapshot(snap);
+    b.restore(dec.physics);
+    b.restoreCounters(dec.counters!);
+    b.step(150);
+    expect(hashPhysicsState(b.ghostState()!)).toBe(ghostAt350);
+    b.setGhostEnabled(false);
+    expect(b.ghostState()).toBeNull();
+    b.setGhostEnabled(true);
+    expect(hashPhysicsState(b.ghostState()!)).toBe(ghostAt350);
   });
 });

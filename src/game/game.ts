@@ -36,11 +36,21 @@ import type { PhysicsWorld } from '../physics';
 import type { GameRenderer } from '../render';
 import { DEFAULT_TRACK_ID, compileTrack, getTrack } from '../tracks';
 import type { Hud } from '../ui';
+import { GhostRunner } from './ghost';
 import { COUNTDOWN_BEATS, medalFor, ruleTicks, targetTimeOf, type RunResult } from './rules';
 
+export interface BestRecord {
+  time: number;
+  faults: number;
+  /** Run clock at each checkpoint crossing of the PB run (index = checkpoint index). */
+  splits?: number[];
+  /** JSON InputRecording of the PB run, from GO to the finish (drives the ghost). */
+  recording?: string;
+}
+
 export interface BestTimeStore {
-  get(trackId: string): { time: number; faults: number } | null;
-  put(trackId: string, result: RunResult): void;
+  get(trackId: string): BestRecord | null;
+  put(trackId: string, result: RunResult, run: { splits: number[]; recording: string | null }): void;
 }
 
 export interface GameOptions {
@@ -52,6 +62,12 @@ export interface GameOptions {
   bestTimes?: BestTimeStore;
   /** Harness mode: `loadTrack` and full restarts start at GO (no countdown). */
   autoSkipCountdown?: boolean;
+  /** Builds the second world for the PB ghost; without it there is no ghost. */
+  physicsFactory?: (physicsHz: number) => PhysicsWorld;
+  /** Record every run from GO so a personal best can be stored with its inputs (live mode). */
+  autoRecord?: boolean;
+  /** PB ghost on by default (harness mode passes false so µs/tick measures one world). */
+  ghostEnabled?: boolean;
 }
 
 /** Everything the game layer adds on top of the physics snapshot. */
@@ -77,6 +93,7 @@ type RendererExtras = Partial<{
   setQuality(t: QualityTier): void;
   camera(): CameraDebug;
   setRunInfo(info: { runTime: number; phase: GamePhase }): void;
+  setGhost(state: PhysicsState | null): void;
 }>;
 
 export class Game {
@@ -89,6 +106,15 @@ export class Game {
   private readonly audio: AudioSystem | undefined;
   private readonly bestTimes: BestTimeStore | undefined;
   private readonly autoSkipCountdown: boolean;
+  private readonly physicsFactory: ((physicsHz: number) => PhysicsWorld) | undefined;
+  private readonly autoRecord: boolean;
+  private compiled: CompiledTrack | null = null;
+  private pbRecorder: InputRecorder | null = null;
+  private pbJson: string | null = null;
+  private splits: number[] = [];
+  private ghost: GhostRunner | null = null;
+  private ghostEnabled = true;
+  private lastGhostState: PhysicsState | null = null;
 
   private input: InputFrame = { ...NEUTRAL_INPUT };
   /** Reused frame forwarded to physics: the player's frame minus `restart`. */
@@ -134,6 +160,9 @@ export class Game {
     this.audio = options.audio;
     this.bestTimes = options.bestTimes;
     this.autoSkipCountdown = options.autoSkipCountdown ?? false;
+    this.physicsFactory = options.physicsFactory;
+    this.autoRecord = options.autoRecord ?? false;
+    this.ghostEnabled = options.ghostEnabled ?? true;
     this.loop = new FixedStepLoop(
       {
         tick: () => this.tick(),
@@ -187,6 +216,7 @@ export class Game {
     this.track = track;
     this.seed = (seed ?? track.seed) >>> 0;
     const compiled = compileTrack(track);
+    this.compiled = compiled;
     this.physics.loadTrack(compiled, this.seed);
     this.renderer.setTrack(compiled);
     (this.audio as Partial<{ setTrack(t: CompiledTrack, seed: number): void }> | undefined)?.setTrack?.(compiled, this.seed);
@@ -240,8 +270,57 @@ export class Game {
     this.physics.drainEvents(); // swallow whatever reset produced: replays start here
     this.lastState = null;
     this.runTicks = 0;
+    this.splits = [];
+    this.pbJson = null;
+    this.pbRecorder = this.autoRecord && this.track ? new InputRecorder({ version: 1, trackId: this.track.id, seed: this.seed, physicsHz: this.physicsHz }) : null;
     this.setPhase('riding');
     this.emit({ type: 'go' });
+    this.spawnGhost();
+  }
+
+  // -- PB ghost ---------------------------------------------------------------
+
+  /** Build the ghost for the current track from the stored PB recording (if any). */
+  private spawnGhost(): void {
+    this.ghost = null;
+    this.lastGhostState = null;
+    if (!this.ghostEnabled || !this.physicsFactory || !this.track || !this.compiled) return;
+    const rec = this.bestTimes?.get(this.track.id)?.recording;
+    if (!rec) return;
+    try {
+      this.ghost = new GhostRunner(this.physicsFactory(this.physicsHz), this.compiled, rec, this.ticks.autoRespawn);
+    } catch (e) {
+      console.warn('[trials] ghost recording unusable', e);
+      this.ghost = null;
+    }
+  }
+
+  setGhostEnabled(on: boolean): void {
+    if (on === this.ghostEnabled) return;
+    this.ghostEnabled = on;
+    if (!on) {
+      this.ghost = null;
+      this.lastGhostState = null;
+    } else if (this.phaseValue !== 'menu' && this.phaseValue !== 'countdown') {
+      this.spawnGhost();
+      this.ghost?.seek(this.runTicks);
+    }
+  }
+
+  ghostEnabledFlag(): boolean {
+    return this.ghostEnabled;
+  }
+
+  /** Ghost physics state for the renderer / hook; null when there is no ghost or before GO. */
+  ghostState(): PhysicsState | null {
+    if (!this.ghost || this.phaseValue === 'menu' || this.phaseValue === 'countdown') return null;
+    if (!this.lastGhostState) this.lastGhostState = this.ghost.state();
+    return this.lastGhostState;
+  }
+
+  /** Current run's checkpoint splits (run clock at each crossing). */
+  currentSplits(): readonly number[] {
+    return this.splits;
   }
 
   /** Manual restart (tap): a fault while riding, free while crashed, full retry when finished. */
@@ -324,6 +403,14 @@ export class Game {
       return;
     }
 
+    if (this.phaseValue === 'riding' || this.phaseValue === 'crashed' || this.phaseValue === 'finished') {
+      if (this.phaseValue !== 'finished') this.pbRecorder?.push(input);
+      if (this.ghost) {
+        this.ghost.step();
+        this.lastGhostState = null;
+      }
+    }
+
     switch (this.phaseValue) {
       case 'menu':
         return;
@@ -396,9 +483,22 @@ export class Game {
         this.setPhase('crashed');
         this.emit(e);
         return;
+      case 'checkpoint': {
+        if (this.phaseValue === 'riding') {
+          const t = this.runTicks / this.physicsHz;
+          this.splits[e.index] = t;
+          const pb = this.track ? this.bestTimes?.get(this.track.id) : null;
+          const ref = pb?.splits?.[e.index];
+          if (typeof ref === 'number') this.hud?.showSplit(e.index, t - ref);
+        }
+        this.emit(e);
+        return;
+      }
       case 'finish':
         if (this.phaseValue !== 'riding') return;
         this.finishRunTicks = this.runTicks;
+        this.pbJson = this.pbRecorder ? encodeJSON(this.pbRecorder.toRecording()) : null;
+        this.pbRecorder = null;
         this.resultsTicks = 0;
         this.resultsShown = false;
         this.setPhase('finished');
@@ -426,7 +526,7 @@ export class Game {
       targetTimeS: targetTimeOf(track),
     };
     this.lastResult = result;
-    if (result.personalBest) this.bestTimes?.put(track.id, result);
+    if (result.personalBest) this.bestTimes?.put(track.id, result, { splits: [...this.splits], recording: this.pbJson });
     this.hud?.showResults(result);
     this.onResults?.(result);
   }
@@ -445,8 +545,9 @@ export class Game {
     info.checkpointCount = this.track?.checkpoints.length ?? 0;
     info.simTime = (this.loop.ticks + alpha) / this.physicsHz;
     this.renderer.setRunInfo?.(info);
+    this.renderer.setGhost?.(this.ghostState());
     this.hud?.setRun(info);
-    this.hud?.update(state);
+    this.hud?.update(state, this.ghostState());
     this.audio?.update(state, dt, this.input);
     const tHud = performance.now();
     const ms = this.renderer.render(state, alpha);
@@ -539,6 +640,10 @@ export class Game {
     this.restartLatch = c.restartLatch;
     this.resultsTicks = c.resultsTicks;
     this.resultsShown = c.resultsShown;
+    if (this.ghost) {
+      this.ghost.seek(this.runTicks);
+      this.lastGhostState = null;
+    }
   }
 
   /** Events since the last call (also delivered to listeners as they happen). */

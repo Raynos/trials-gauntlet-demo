@@ -9,6 +9,10 @@ export interface BestEntry {
   time: number;
   faults: number;
   medal: Medal;
+  /** Run clock at each checkpoint of the PB run. */
+  splits?: number[];
+  /** JSON InputRecording of the PB run (GO → finish) for the ghost. */
+  recording?: string;
 }
 
 const PREFIX = 'trials.best.';
@@ -36,6 +40,8 @@ export class BestTimes {
       const o = JSON.parse(raw) as Partial<BestEntry>;
       if (typeof o.time !== 'number' || typeof o.faults !== 'number') return null;
       const entry: BestEntry = { time: o.time, faults: o.faults, medal: (o.medal as Medal | undefined) ?? 'bronze' };
+      if (Array.isArray(o.splits) && o.splits.every((x) => typeof x === 'number')) entry.splits = o.splits;
+      if (typeof o.recording === 'string' && o.recording.length > 0) entry.recording = o.recording;
       this.cache.set(trackId, entry);
       return entry;
     } catch {
@@ -43,14 +49,36 @@ export class BestTimes {
     }
   }
 
-  put(trackId: string, r: RunResult): void {
+  put(trackId: string, r: RunResult, run?: { splits: number[]; recording: string | null }): void {
     const entry: BestEntry = { time: r.time, faults: r.faults, medal: r.medal };
+    if (run) {
+      entry.splits = run.splits;
+      if (run.recording) entry.recording = run.recording;
+    }
     this.cache.set(trackId, entry);
     try {
       store()?.setItem(PREFIX + trackId, JSON.stringify(entry));
     } catch {
       /* storage unavailable */
     }
+  }
+}
+
+const GHOST_KEY = 'trials.ghost';
+
+export function loadGhostEnabled(): boolean {
+  try {
+    return store()?.getItem(GHOST_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
+
+export function saveGhostEnabled(on: boolean): void {
+  try {
+    store()?.setItem(GHOST_KEY, on ? '1' : '0');
+  } catch {
+    /* storage unavailable */
   }
 }
 

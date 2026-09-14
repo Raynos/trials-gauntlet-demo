@@ -126,8 +126,9 @@ export class MockPhysics implements PhysicsWorld {
       return;
     }
     if (s.finished) {
-      // Frozen; still tick the clock so hashes advance predictably.
+      // Frozen bike; the segment clock keeps running (render effects are clocked from it).
       s.tick++;
+      s.time = s.tick * dt;
       return;
     }
 

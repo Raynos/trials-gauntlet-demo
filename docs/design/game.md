@@ -150,3 +150,26 @@ same as a steady-state frame, i.e. the restart itself adds nothing.
 `main.ts` composes the real modules when their barrels export them (`createBikePhysics` /
 `bikePhysicsFactory`, `createRenderer` / `ThreeRenderer`, `WebAudioSystem`) with `?physics=mock` and
 `?audio=0` as fallbacks.
+
+## 8. PB ghost and splits
+
+- On a personal best the run's `InputRecording` (JSON, recorded from GO to the finish by the game's
+  own recorder, restarted at every GO) and its per-checkpoint run clock (`splits`) are stored with the
+  best time (`trials.best.<trackId>` → `{ time, faults, medal, splits, recording }`).
+- `GhostRunner` (`src/game/ghost.ts`) replays that recording in a second, independent physics world
+  built from the same factory `main.ts` uses, stepped once per game tick from GO. It keeps its own
+  tick counter (== live `runTicks`): live restarts never touch it (Trials rule). It mirrors the game's
+  riding/crashed rules (restart edge → reset to last checkpoint; crash → auto-respawn after 120 ticks or
+  on the next edge) so the recorded run reproduces bit-for-bit (tested: ghost hash == PB run hash every
+  100 ticks and at its finish). After a snapshot `restore` the ghost re-seeks to `runTicks`.
+- Exposed as `GameRenderer.setGhost(state | null)` (called every render, defensively), `hook.ghost()`,
+  and a grey pin on the HUD progress strip. Toggle in the menu (`trials.ghost`, default on); harness
+  mode defaults it off (`?ghost=1` to enable) so physics µs/tick measures one world.
+- Splits: at each checkpoint the delta vs the PB's split (`runTime − pb.splits[i]`) is a kinetic
+  label beside the timer for 1.5 s (green ahead / red behind, sim-clocked); the finish shows the delta
+  vs the PB time under the timer.
+- Kinetic feedback (per reference/notes/crash-restart-ui.md): fault digit flips orange ×1.35 for 0.3 s
+  on the respawn frame (never the impact frame); CRASH! stamp 0.2 s after the fault, 60→100 % over
+  0.25 s, −6°; checkpoint = green line sweep + short green edge flash (0.3 s); finish = white burst
+  (0.35 s) + streak-in ribbon; results reveal in stages at 0 / 0.15 / 0.35 / 0.6 (earned medal burst) /
+  0.9 (PB line) / 1.1 s (actions), stage state sim-driven, easing CSS.

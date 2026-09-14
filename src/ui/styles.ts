@@ -47,7 +47,7 @@ html { font-size: clamp(13px, 1.25vw + 4px, 18px); }
 .hud-device.show { opacity: 1; }
 .hud-device i { width: .55em; height: .55em; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
 
-.hud-center { display: flex; align-items: center; gap: .6rem; background: var(--slab); border: 1px solid var(--line); border-radius: .5rem; padding: .3rem .9rem .3rem 1rem; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.hud-center { position: relative; display: flex; align-items: center; gap: .6rem; background: var(--slab); border: 1px solid var(--line); border-radius: .5rem; padding: .3rem .9rem .3rem 1rem; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .hud-timer { font-size: 2.35rem; line-height: 1; font-weight: 800; font-style: italic; letter-spacing: .01em; font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; text-shadow: 0 2px 0 rgba(0,0,0,.55); min-width: 7.2ch; text-align: center; }
 .hud-timer.frozen { color: var(--green); }
 .hud-timer .ms { font-size: .58em; font-weight: 700; opacity: .85; }
@@ -59,6 +59,11 @@ html { font-size: clamp(13px, 1.25vw + 4px, 18px); }
 .hud-delta.show { opacity: 1; }
 .hud-delta.ahead { color: var(--green); } .hud-delta.behind { color: var(--red); }
 
+.hud-split { position: absolute; left: calc(100% + .7rem); top: 50%; margin-top: -.75em; font-size: 1.5rem; font-weight: 900; font-style: italic; font-variant-numeric: tabular-nums; white-space: nowrap; opacity: 0; transform-origin: 0 50%; text-shadow: 0 2px 0 rgba(0,0,0,.6), 0 0 .5em rgba(0,0,0,.5); pointer-events: none; }
+.hud-split.ahead { color: var(--green); } .hud-split.behind { color: var(--red); }
+.flash { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.flash.cp { box-shadow: inset 0 0 10vmin 1vmin rgba(74,227,127,.4); }
+.flash.finish { background: #fff; }
 .hud-right { display: flex; justify-content: flex-end; min-width: 0; }
 .strip { position: relative; width: min(24vw, 22rem); height: 2rem; margin-top: .35rem; }
 .strip .bar { position: absolute; left: 0; right: 0; top: .95rem; height: .5rem; background: rgba(0,0,0,.6); border: 1px solid var(--line); border-radius: .25rem; overflow: hidden; }
@@ -67,6 +72,7 @@ html { font-size: clamp(13px, 1.25vw + 4px, 18px); }
 .strip .mark.done { background: var(--green); box-shadow: 0 0 5px var(--green); }
 .strip .finish { position: absolute; right: -1px; top: .35rem; width: .7rem; height: 1.7rem; background:
   repeating-conic-gradient(#fff 0 25%, #111 0 50%) 0 0 / .35rem .35rem; border-radius: 2px; }
+.strip .pin.ghost { background: rgba(255,255,255,.55); border-color: rgba(0,0,0,.5); opacity: 0; top: .15rem; width: .75rem; height: .75rem; margin-left: -.37rem; }
 .strip .pin { position: absolute; top: .05rem; width: .9rem; height: .9rem; margin-left: -.45rem; background: var(--amber); border: 2px solid #1a1206; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 1px 3px rgba(0,0,0,.6); }
 
 /* ---- kinetic banners ------------------------------------------------ */
@@ -100,6 +106,17 @@ html { font-size: clamp(13px, 1.25vw + 4px, 18px); }
 .results .medal.earned { opacity: 1; border-color: currentColor; background: rgba(255,255,255,.06); box-shadow: 0 0 22px -6px currentColor; }
 .results .medal small { display: block; color: var(--ink-dim); letter-spacing: 0; text-transform: none; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: .2rem; }
 .results .actions { display: flex; gap: .6rem; }
+/* staged reveal: each block pops in when its stage class arrives (state is sim-driven, easing is CSS) */
+.results .headline .time, .results .headline .faults, .results .medals, .results .pb, .results .actions { opacity: 0; transform: translateY(.4rem); transition: opacity .2s ease-out, transform .25s cubic-bezier(.2,1.4,.4,1); }
+.results.stage-0 .headline .time,
+.results.stage-1 .headline .time, .results.stage-1 .headline .faults,
+.results.stage-2 .headline .time, .results.stage-2 .headline .faults, .results.stage-2 .medals,
+.results.stage-3 .headline .time, .results.stage-3 .headline .faults, .results.stage-3 .medals,
+.results.stage-4 .headline .time, .results.stage-4 .headline .faults, .results.stage-4 .medals, .results.stage-4 .pb,
+.results.stage-5 .headline .time, .results.stage-5 .headline .faults, .results.stage-5 .medals, .results.stage-5 .pb, .results.stage-5 .actions { opacity: 1; transform: none; }
+.results .medal.earned { transition: transform .3s cubic-bezier(.2,1.6,.4,1), box-shadow .3s; transform: scale(.85); box-shadow: none; }
+.results.stage-3 .medal.earned, .results.stage-4 .medal.earned, .results.stage-5 .medal.earned { transform: scale(1.08); box-shadow: 0 0 28px -4px currentColor, 0 0 0 1px currentColor inset; }
+.results.stage-2 .medal.earned { opacity: .35; }
 
 /* ---- menus ---------------------------------------------------------- */
 .overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 100% at 30% 40%, rgba(8,10,14,.55), rgba(8,10,14,.92)); opacity: 0; pointer-events: none; transition: opacity .2s; padding: calc(1rem + var(--sat)) calc(1rem + var(--sar)) calc(1rem + var(--sab)) calc(1rem + var(--sal)); }
