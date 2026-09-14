@@ -882,18 +882,29 @@ class BikeWorld implements BikePhysicsWorld {
     F[S_CROUCH] = crouch;
     F[S_HOP_EXT] = hopExt;
 
-    // engine
+    // engine. The crank has inertia: while the clutch slips (wheel below the crank) it revs toward
+    // the throttle's demand at a finite rate (S_RPM is the crank speed of the last tick: cross-tick
+    // state, in F); once the wheel drives it faster the two are locked and the rpm is the wheel's
     const wheelFwd = -this.av[REAR]!;
     const rpmWheel = Math.max(0, wheelFwd) * e.gearRatio * RPM_PER_RADS;
-    const rpmClutch = e.idleRpm + nte * (e.clutchRpm - e.idleRpm);
-    const rpm = Math.max(rpmWheel, rpmClutch);
+    const rpmDemand = e.idleRpm + Math.min(1, nte / e.clutchThrottle) * (e.clutchRpm - e.idleRpm);
+    const prev = F[S_RPM]!;
+    let crank: number;
+    if (rpmWheel >= e.clutchRpm) crank = rpmWheel; // locked: the wheel turns the crank (a spinning tyre that grips again drags the crank down with it)
+    else crank = prev < rpmDemand ? Math.min(rpmDemand, prev + e.crankSpinUp * dt) : Math.max(rpmDemand, prev - e.crankSpinDown * dt);
+    const rpm = Math.max(rpmWheel, crank);
     let limiter = U[U_LIMITER]!;
     if (rpm >= e.limiterRpm) limiter = 1;
     else if (limiter === 1 && rpm < e.limiterResetRpm) limiter = 0;
     U[U_LIMITER] = limiter;
     F[S_RPM] = rpm;
     const peakWheel = e.peakTorqueNm * e.gearRatio * e.efficiency;
+    // centrifugal auto-clutch: what it can pass rises with crank speed from 0 at idle to clutchCap
+    // at clutchRpm. A settled throttle is never capped (the curve there is clutchCap); a launch from
+    // idle gets its thrust over the crank's spin-up, which is the soft clutch off the line
+    const capFrac = clamp((rpm - e.idleRpm) / (e.clutchRpm - e.idleRpm), 0, 1);
     let torque = limiter === 1 ? 0 : nte * peakWheel * this.curveFrac(rpm);
+    if (capFrac < 1) torque = Math.min(torque, capFrac * e.clutchCap * peakWheel);
     // engine braking: drag on the rear wheel proportional to rpm when off throttle
     torque -= e.engineBrakeFrac * peakWheel * (1 - nte) * clamp(rpmWheel / e.limiterRpm, 0, 1.2) * (wheelFwd > 0 ? 1 : wheelFwd < 0 ? -1 : 0);
     F[S_ENGINE_TQ] = torque;
@@ -1009,7 +1020,8 @@ class BikeWorld implements BikePhysicsWorld {
       // m*g/k above the anchor with no force on the frame.
       const preload = this.U[U_HOP] === 1;
       const kUp = ext < 0 ? k + kl : k;
-      const cUp = hop ? r.c * 0.1 : r.c;
+      // landing loads are absorbed, not stored: the legs' damping stiffens with compression like their spring
+      const cUp = hop ? r.c * 0.1 : ext < 0 ? r.c + r.cLanding * dist : r.c;
       const fWeight = r.mass * g;
       let fUp = -kUp * ext - cUp * extRate + fWeight;
       // preload crouch: the legs go slack so the rider drops toward the lowered anchor at ~g and the

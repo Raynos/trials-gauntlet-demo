@@ -73,6 +73,24 @@ export interface BikeTuning {
     engineBrakeFrac: number;
     throttleRise: number;
     throttleFall: number;
+    /**
+     * Crank inertia (rpm/s): while the clutch slips (wheel below the crank) the crank revs toward
+     * the throttle's demand at this rate up / down; once the wheel drives it the two are locked.
+     */
+    crankSpinUp: number;
+    crankSpinDown: number;
+    /**
+     * Throttle at which the slipping auto-clutch holds the crank at `clutchRpm` (a quarter throttle
+     * revs it to engagement speed, like a rider keeping the revs up on the clutch); below it the
+     * crank demand is proportional. Keeps a blipped throttle in a wheelie from dropping the clutch.
+     */
+    clutchThrottle: number;
+    /**
+     * Centrifugal auto-clutch: the torque it can pass rises from 0 at idle to `clutchCap` of peak at
+     * `clutchRpm` (the curve's value there, so a settled throttle is never capped - only the launch
+     * from idle, which gets its thrust over the crank's spin-up instead of in one tick).
+     */
+    clutchCap: number;
   };
   brakes: {
     frontMaxNm: number;
@@ -111,6 +129,13 @@ export interface BikeTuning {
     /** Cap on the fore-aft brace force (N): the most the rider can push/pull along the bike. */
     shiftForce: number;
     kLanding: number;
+    /**
+     * Leg damping added per metre of leg compression (N s/m per m), like kLanding: a rider absorbs a
+     * landing with damped legs, not a spring that fires him (and the bike) back up. Round 7: the 3 m
+     * bottom-out buck was the legs' ~1 kJ rebounding, not the bump stop (restitution 0 - 0.3 and
+     * kStop 30 - 120 kN/m all gave the same 20 cm / 11 deg).
+     */
+    cLanding: number;
     leanBack: number;
     leanFwd: number;
     leanRate: number;
@@ -252,6 +277,12 @@ const DEFAULTS: BikeTuning = {
     engineBrakeFrac: 0.08,
     throttleRise: 40,
     throttleFall: 60,
+    // round 7: the soft clutch off idle. 1500 -> 3500 in 0.25 s; coasts down in 0.5 s (a flywheel), so a
+    // blipped throttle in a wheelie keeps the clutch engaged and the PD hold keeps its authority
+    crankSpinUp: 8000,
+    crankSpinDown: 2000,
+    clutchThrottle: 0.25,
+    clutchCap: 0.8,
   },
   brakes: { frontMaxNm: 900, rearMaxNm: 700, antiEndo: 0.05, antiEndoFloor: 0.7, rearLoadMin: 0.04, rise: 60, fall: 40 },
   rider: {
@@ -266,6 +297,7 @@ const DEFAULTS: BikeTuning = {
     cAlong: 2130,
     shiftForce: 2800,
     kLanding: 56000,
+    cLanding: 8000,
     leanBack: 0.6,
     leanFwd: 0.73,
     leanRate: 6,

@@ -186,8 +186,10 @@ export function drumLifter(centreX: number, r: number, speed = 5, opts: { popDeg
     const fx = o.state.wheels.front.pos.x;
     const rx = o.state.wheels.rear.pos.x;
     const dist = centreX - fx;
-    const hold = Math.max(0, Math.min(1, 0.05 + 0.15 * (speed - o.speed)));
-    if (phase === 0 && dist > leadDist) return { throttle: hold, lean: 0 };
+    // approach with the revs up (round 7, soft clutch: a pop off an idling crank arrives 0.25 s late),
+    // holding the speed on the brake instead of a closed throttle
+    const hold = Math.max(0.25, Math.min(1, 0.05 + 0.15 * (speed - o.speed)));
+    if (phase === 0 && dist > leadDist) return { throttle: hold, lean: 0, brake: o.speed > speed + 0.2 ? 0.3 : 0 };
     if (phase === 0 && (dist > r + 0.15 || (!o.frontGrounded && fx < centreX))) {
       if (fx > centreX - r - 0.1 && o.state.wheels.front.pos.y > 2 * r + R - 0.05) phase = 1;
       else {
@@ -226,11 +228,13 @@ export function climber(slopeDeg: number, baseX = -Infinity, opts: { hover?: num
       // front at the lip: keep it pinned so the bike carries over the edge instead of hanging on
       // the bash plate (the front carries weight now, no loop risk), then settle the nose and ride on
       if (rearX < opts.topX + 0.1) {
-        // feather the throttle when the rear spins up (round 6: at 1.4 g a chopped-then-floored throttle
-        // spun the tyre at 20 m/s of slip on the last half metre of the 60 deg face and hung the plate)
+        // drive through the lip (round 7): with the front over the flat there is no loop to fear, and the
+        // round-6 chop at the balance pitch is what hung the bike (speed 1.2 -> 0.4 m/s, then the
+        // floored throttle spun the tyre at 20 m/s of slip and the plate rested on the edge). Feather
+        // only on real wheelspin, ease only if the nose actually passes the balance point; no brake.
         const slipHere = o.state.rearSlip;
-        const thr = o.pitchDeg > o.balanceAt(1) - 4 ? 0 : slipHere > 1.5 ? 0.4 : 1;
-        return { throttle: thr, lean: 1, brake: o.pitchDeg > o.balanceAt(1) ? 1 : 0 };
+        const thr = o.pitchDeg > o.balanceAt(1) + 4 ? 0.3 : slipHere > 3 ? 0.6 : 1;
+        return { throttle: thr, lean: 1, brake: 0 };
       }
       // over the lip: stay over the bars until the nose is down (a lean change here swings the torso
       // and kicks the nose up while the spinning rear grabs the edge), brake if it keeps rising
