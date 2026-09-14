@@ -3,7 +3,7 @@
  * `page.evaluate` round trip; batch work in-page where it matters (replay).
  */
 import type { Page } from 'playwright';
-import type { HookInfo, InputFrame, PhysicsState, RenderStats } from '../../src/core/types';
+import type { HookInfo, InputFrame, PhysicsState, QualityTier, RenderStats } from '../../src/core/types';
 
 export interface OpenGameOptions {
   /** Extra query params (track, hz). */
@@ -96,6 +96,10 @@ export class HookClient {
 
   resize(w: number, h: number): Promise<void> {
     return this.page.evaluate(([a, b]) => window.__trials!.resize(a, b), [w, h] as const);
+  }
+
+  setQuality(t: QualityTier): Promise<void> {
+    return this.page.evaluate((q) => window.__trials!.setQuality(q), t);
   }
 
   restart(): Promise<void> {

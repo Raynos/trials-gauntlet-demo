@@ -10,6 +10,7 @@
  *   restart                                 back to the last checkpoint (an attempt)
  *   reset                                   back to the start line (an attempt)
  *   done                                    finalize session.json + metrics
+ *   report <trackId>                        (parent) aggregate all sessions -> out/metrics/<track>.stranger.{json,md}
  *
  * Exit codes: 0 ok, 1 error ({error} JSON), 2 budget exhausted ({budget:'exhausted'}).
  * See PROTOCOL.md (what the stranger is told) and docs/design/harness-metrics.md §3.
@@ -19,13 +20,15 @@ import path from 'node:path';
 import type { GameEvent, InputFrame, PhysicsState } from '../../src/core/types';
 import { encodeJSON } from '../../src/core/replay';
 import { ACTIONS, COAST, HOLD, RESTART_FRAME, formatActions, framesOf, parseSlots } from '../bot/actions';
-import { flagNum, flagStr, parseArgs } from '../lib/args';
-import { attemptsFromEvents, countedFaults, faultsByCheckpoint, median, runMeta } from '../lib/metrics';
+import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
+import { attemptsFromEvents, countedFaults, faultsByCheckpoint, runMeta } from '../lib/metrics';
 import { REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
-import type { StrangerSession } from '../lib/schema';
+import type { BestAttempt, StrangerSession } from '../lib/schema';
+import { report as strangerReport } from './report';
 import {
   appendLog,
+  beginAttempt,
   budgetLeft,
   createSession,
   endAttempt,
@@ -200,6 +203,7 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
       const cp = st.checkpoint;
       endAttempt(s, 'fault', st, reason);
       const r = respawn(s, cp);
+      beginAttempt(s);
       events.push(...r.events);
       const after = s.sim.state();
       faulted = { reason, respawnedAt: round(after.bike.pos.x, 2) };
@@ -238,6 +242,7 @@ function restart(s: LoadedSession): Record<string, unknown> {
   const cp = st.checkpoint;
   endAttempt(s, 'restart', st);
   const r = respawn(s, cp);
+  beginAttempt(s);
   const after = s.sim.state();
   const b = budgetLeft(s);
   return {
@@ -263,6 +268,7 @@ function reset(s: LoadedSession): Record<string, unknown> {
   const events: PersistedEvent[] = [];
   for (let i = 0; i < s.sim.rules.T.holdRestart; i++) events.push(...tick(s, RESTART_FRAME));
   events.push(...tick(s, COAST));
+  beginAttempt(s);
   const r = { events, forcedReset: false };
   const after = s.sim.state();
   const b = budgetLeft(s);
@@ -281,26 +287,8 @@ function reset(s: LoadedSession): Record<string, unknown> {
 // done: session.json + recording + metrics merge
 // ---------------------------------------------------------------------------
 
-interface StrangerMetricsFile {
-  schema: 1;
-  kind: 'stranger-metrics';
-  trackId: string;
-  attemptsBand: [number, number] | null;
-  sessions: {
-    sessionId: string;
-    agent: string;
-    strangerAttempts: number;
-    cleared: boolean;
-    finishTime: number | null;
-    calls: number;
-    wallMs: number;
-  }[];
-  medianAttempts: number | null;
-  pass: boolean | null;
-  updatedAt: string;
-}
 
-function done(s: LoadedSession): { session: StrangerSession; metricsFile: string; line: string } {
+async function done(s: LoadedSession): Promise<{ session: StrangerSession; metricsFile: string; line: string }> {
   const st = s.state;
   const faults = countedFaults(st.events);
   const strangerAttempts = 1 + faults.length;
@@ -316,6 +304,17 @@ function done(s: LoadedSession): { session: StrangerSession; metricsFile: string
 
   // Faults by checkpoint: the checkpoint the bike held when each counted fault fired.
   const faultCps = (faults as PersistedEvent[]).map((f) => ({ checkpoint: f.checkpoint }));
+
+  // The attempt worth a clip: the clearing one (the whole-session recording from its
+  // start tick), else the ended attempt that got furthest (its prefix recording).
+  let bestAttempt: BestAttempt | null = null;
+  if (st.cleared) {
+    const last = st.attempts[st.attempts.length - 1];
+    bestAttempt = { n: st.attempts.length + 1, cleared: true, x: round(s.sim.track.finishX, 3), startTick: st.attemptStartTick ?? last?.endTick ?? 0, endTick: st.runTicks, recordingFile: recRel };
+  } else {
+    const far = [...st.attempts].sort((a, b) => b.x - a.x)[0];
+    if (far && far.recordingFile) bestAttempt = { n: far.n, cleared: false, x: far.x, startTick: far.startTick ?? 0, endTick: far.endTick ?? 0, recordingFile: far.recordingFile };
+  }
 
   const session: StrangerSession = {
     ...runMeta('stranger', new Date(st.startedAt), { physics: st.physics }),
@@ -337,32 +336,16 @@ function done(s: LoadedSession): { session: StrangerSession; metricsFile: string
     replayFaults: null,
     attemptsBand,
     pass: attemptsBand ? strangerAttempts <= 1.5 * attemptsBand[1] : null,
+    bestAttempt,
     log: st.log,
   };
   session.wallMs = wall;
   writeJson(path.join(s.dir, 'session.json'), { ...session, forcedResets: st.forcedResets });
 
-  // Merge into the per-track metrics file.
-  const metricsFile = path.join(REPO_ROOT, 'harness', 'out', 'metrics', `${st.trackId}.stranger.json`);
-  let m: StrangerMetricsFile | null = null;
-  if (fs.existsSync(metricsFile)) {
-    try {
-      m = JSON.parse(fs.readFileSync(metricsFile, 'utf8')) as StrangerMetricsFile;
-      if (m.kind !== 'stranger-metrics') m = null;
-    } catch {
-      m = null;
-    }
-  }
-  if (!m) m = { schema: 1, kind: 'stranger-metrics', trackId: st.trackId, attemptsBand, sessions: [], medianAttempts: null, pass: null, updatedAt: '' };
-  m.attemptsBand = attemptsBand;
-  m.sessions = m.sessions.filter((x) => x.sessionId !== st.sessionId);
-  m.sessions.push({ sessionId: st.sessionId, agent: st.agent, strangerAttempts, cleared: st.cleared, finishTime: st.finishTime, calls: st.calls, wallMs: wall });
-  m.medianAttempts = median(m.sessions.map((x) => x.strangerAttempts));
-  m.pass = attemptsBand ? m.medianAttempts <= 1.5 * attemptsBand[1] && m.sessions.every((x) => x.cleared) : null;
-  m.updatedAt = new Date().toISOString();
-  writeJson(metricsFile, m);
+  // The per-track metrics file is the aggregate of every session (stranger/report.ts).
+  const { jsonFile: metricsFile } = await strangerReport(st.trackId);
 
-  const line = `stranger ${st.trackId} session=${st.sessionId} attempts=${strangerAttempts} cleared=${st.cleared ? 'yes' : 'no'} finish=${st.finishTime === null ? '-' : `${st.finishTime.toFixed(3)}s`} calls=${st.calls} wall=${(wall / 1000).toFixed(1)}s`;
+  const line = `stranger ${st.trackId} session=${st.sessionId} attempts=${strangerAttempts} cleared=${st.cleared ? 'yes' : 'no'} finish=${st.finishTime === null ? '-' : `${st.finishTime.toFixed(3)}s`} calls=${st.calls} wall=${(wall / 1000).toFixed(1)}s${bestAttempt ? ` best=#${bestAttempt.n}@${bestAttempt.x.toFixed(1)}m` : ''}`;
   return { session, metricsFile, line };
 }
 
@@ -376,10 +359,19 @@ async function main(): Promise<number> {
   const { positional, flags } = parseArgs();
   const cmd = positional[0];
   if (!cmd || flags['help'] === true) {
-    console.log('usage: cli.ts <start|look|status|play "<slots>"|restart|reset|done> [--track id] [--session id] [--agent name] [--seed N]');
+    console.log('usage: cli.ts <start|look|status|play "<slots>"|restart|reset|done> [--track id] [--session id] [--agent name] [--seed N]\n       cli.ts report <trackId>   (parent side: aggregate every session of a track)');
     return cmd ? 0 : 1;
   }
   const trackFlag = typeof flags['track'] === 'string' ? flags['track'] : undefined;
+  if (cmd === 'report') {
+    // Parent-side aggregation; touches no session and counts as no call.
+    const id = positional[1] ?? trackFlag;
+    if (!id) throw new Error('usage: report <trackId>');
+    const r = await strangerReport(id, { fresh: !flagBool(flags, 'stale') });
+    console.log(r.markdown);
+    console.log(`report: ${r.jsonFile} (+ .md) sessions=${r.metrics.sessions.length} completed=${r.metrics.completed} median attempts=${r.metrics.medianAttempts ?? '-'} pass=${r.metrics.pass ?? 'n/a'}`);
+    return 0;
+  }
   const sessionFlag = typeof flags['session'] === 'string' ? flags['session'] : process.env['TRIALS_STRANGER_SESSION'];
   const agent = flagStr(flags, 'agent', process.env['TRIALS_STRANGER_AGENT'] ?? 'stranger');
 
@@ -460,7 +452,7 @@ async function main(): Promise<number> {
       }
       case 'done': {
         saveSession(s);
-        const { session, metricsFile, line } = done(s);
+        const { session, metricsFile, line } = await done(s);
         console.log(line);
         console.log(JSON.stringify({ sessionFile: path.join(s.dir, 'session.json'), metricsFile, recordingFile: session.recordingFile, strangerAttempts: session.strangerAttempts, cleared: session.cleared, finishTime: session.finishTime, pass: session.pass }));
         break;

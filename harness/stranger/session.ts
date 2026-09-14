@@ -11,12 +11,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { GameEvent, PhysicsState } from '../../src/core/types';
-import { InputRecorder, iterateFrames, type InputRecording } from '../../src/core/replay';
+import { InputRecorder, encodeJSON, iterateFrames, type InputRecording } from '../../src/core/replay';
 import { createSim, type Sim, type SimSnapshot } from '../lib/sim';
 import type { RulesCounters } from '../lib/rules';
 import type { TimedEvent } from '../lib/metrics';
 import type { AttemptLog } from '../lib/schema';
-import { OUT_DIR } from '../lib/paths';
+import { OUT_DIR, REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
 
 export const STRANGER_OUT = path.join(OUT_DIR, 'stranger');
@@ -61,6 +61,8 @@ export interface PersistedState {
   firstCheckpointCalls: number | null;
   /** How many times the CLI had to call world.reset() directly (not expressible in the recording). */
   forcedResets: number;
+  /** Run-clock tick at which the current attempt began (0, or the tick after the last respawn/reset). */
+  attemptStartTick?: number;
   budget: { calls: number; minutes: number };
   log: string[];
 }
@@ -157,6 +159,7 @@ export async function createSession(opts: {
     finishTime: null,
     firstCheckpointCalls: null,
     forcedResets: 0,
+    attemptStartTick: 0,
     budget: budgetFromEnv(),
     log: [],
   };
@@ -228,7 +231,12 @@ export function budgetLeft(s: LoadedSession): { callsLeft: number; secondsLeft: 
   return { callsLeft, secondsLeft: Math.round(secondsLeft), exhausted: callsLeft <= 0 || secondsLeft <= 0 };
 }
 
-/** Log an ended attempt to state + attempts/NNN.json (crash-safe: written immediately). */
+/**
+ * Log an ended attempt to state + attempts/NNN.json (crash-safe: written immediately),
+ * with attempts/NNN.rec.json: the session's input stream up to this moment. That prefix
+ * replays from GO to the end of this attempt, so any attempt is a clip
+ * (`harness:clip <track> --recording <rec> --from-tick <startTick>`).
+ */
 export function endAttempt(
   s: LoadedSession,
   endedBy: AttemptLog['endedBy'],
@@ -237,6 +245,10 @@ export function endAttempt(
   extra: Record<string, unknown> = {},
 ): AttemptLog {
   const n = s.state.attempts.length + 1;
+  const recName = `${String(n).padStart(3, '0')}.rec.json`;
+  const recAbs = path.join(s.dir, 'attempts', recName);
+  fs.mkdirSync(path.dirname(recAbs), { recursive: true });
+  fs.writeFileSync(recAbs, encodeJSON(s.recorder.toRecording()) + '\n');
   const a: AttemptLog = {
     n,
     endedBy,
@@ -246,11 +258,19 @@ export function endAttempt(
     runTime: round(s.state.runTicks / s.state.physicsHz, 4),
     wallMs: wallMs(s),
     calls: s.state.calls,
+    startTick: s.state.attemptStartTick ?? 0,
+    endTick: s.state.runTicks,
+    recordingFile: path.relative(REPO_ROOT, recAbs),
   };
   if (reason !== undefined) a.reason = reason;
   s.state.attempts.push(a);
   writeJson(path.join(s.dir, 'attempts', `${String(n).padStart(3, '0')}.json`), { ...a, ...extra });
   return a;
+}
+
+/** Call after the respawn/reset ticks have been recorded: the next attempt starts here. */
+export function beginAttempt(s: LoadedSession): void {
+  s.state.attemptStartTick = s.state.runTicks;
 }
 
 export function round(v: number, d: number): number {

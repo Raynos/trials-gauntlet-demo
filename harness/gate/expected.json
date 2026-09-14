@@ -5,10 +5,10 @@
       "physics": "bikePhysicsFactory"
     },
     "golden": {
-      "file": "bot-oracle.json",
-      "finishTime": null,
-      "hash": "c67529bcbbfd0fd7",
-      "ticks": 420,
+      "file": "bot-2.json",
+      "finishTime": 7.491666666666666,
+      "hash": "d93600e5d7c68be2",
+      "ticks": 899,
       "physics": "bikePhysicsFactory"
     }
   }

@@ -21,7 +21,7 @@ import { HookClient, openGame } from './lib/hook';
 import { describeRecording, loadRecording } from './lib/recording';
 import { ensureOut, fail, printKV, writeJson } from './lib/report';
 import { startServer } from './lib/server';
-import type { InputFrame, PhysicsState } from '../src/core/types';
+import type { InputFrame, PhysicsState, QualityTier } from '../src/core/types';
 
 export interface CaptureOptions {
   recording: InputRecording;
@@ -37,6 +37,18 @@ export interface CaptureOptions {
   dev?: boolean;
   build?: boolean;
   verbose?: boolean;
+  /** Renderer quality tier applied after loadTrack (harness:clip uses 'high'). */
+  quality?: QualityTier;
+  /**
+   * Physics-tick window to render. Ticks before `startTick` are simulated without
+   * rendering (the same recording, so the state is identical); rendering stops after
+   * `endTick` (exclusive) or at the finish tail. Both default to the whole recording.
+   */
+  startTick?: number;
+  endTick?: number;
+  /** Contact sheet grid (default 4x2). */
+  sheetCols?: number;
+  sheetRows?: number;
 }
 
 export interface CaptureResult {
@@ -80,15 +92,32 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
       throw new Error(`unknown track ${o.recording.header.trackId}`);
     }
     await hook.resize(width, height);
+    if (o.quality) await hook.setQuality(o.quality);
+
+    // Tick window: simulate the prefix without rendering, in one round trip per 5 s.
+    const startTick = Math.max(0, Math.min(frames.length, Math.floor((o.startTick ?? 0) / ticksPerFrame) * ticksPerFrame));
+    const endTick = Math.min(frames.length, Math.max(startTick, o.endTick ?? frames.length));
+    for (let t = 0; t < startTick; t += hz * 5) {
+      const slice: InputFrame[] = frames.slice(t, Math.min(startTick, t + hz * 5));
+      await page.evaluate((inputs) => {
+        const tr = window.__trials!;
+        for (const f of inputs) {
+          tr.setInput(f);
+          tr.step(1);
+        }
+      }, slice);
+    }
 
     const framePaths: string[] = [];
     let finishedAt = -1;
     let lastState: PhysicsState | null = null;
-    const totalVideoFrames = Math.ceil(frames.length / ticksPerFrame);
+    const firstVideoFrame = startTick / ticksPerFrame;
+    const totalVideoFrames = Math.ceil(endTick / ticksPerFrame);
     // Run the recording to its end; when the run finishes early (and
     // stopOnFinish is set) stop after the tail; when it finishes on the
     // last recorded frame, extend by the tail so the outcome is visible.
-    for (let k = 0; k < totalVideoFrames || (finishedAt >= 0 && k - finishedAt < tailFrames); k++) {
+    for (let k = firstVideoFrame; k < totalVideoFrames || (finishedAt >= 0 && k - finishedAt < tailFrames); k++) {
+      if (o.endTick !== undefined && k * ticksPerFrame >= endTick && finishedAt < 0) break;
       const slice: InputFrame[] = frames.slice(k * ticksPerFrame, (k + 1) * ticksPerFrame);
       // Step this frame's ticks and render in one round trip.
       const res = await page.evaluate(
@@ -107,21 +136,22 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
         [slice, ticksPerFrame, mode === 'canvas'] as const,
       );
       lastState = res.state;
-      const file = path.join(framesDir, `frame-${String(k).padStart(5, '0')}.png`);
+      const file = path.join(framesDir, `frame-${String(k - firstVideoFrame).padStart(5, '0')}.png`);
       if (mode === 'canvas' && res.dataUrl) {
         fs.writeFileSync(file, Buffer.from(res.dataUrl.split(',')[1]!, 'base64'));
       } else {
         await page.screenshot({ path: file, type: 'png', animations: 'disabled', caret: 'hide' });
       }
       framePaths.push(file);
-      if (res.state.finished && finishedAt < 0) finishedAt = k;
+      // PhysicsState.finished is "run over" (finish OR fault); only a real finish ends the clip early.
+      if (res.state.finishTime !== null && finishedAt < 0) finishedAt = k;
       if (stopOnFinish && finishedAt >= 0 && k - finishedAt >= tailFrames) break;
     }
     const finalHash = await hook.hashState();
 
     await encodeMp4({ fps, pattern: path.join(framesDir, 'frame-%05d.png'), out: o.outMp4 });
     const sheet = path.join(outDir, 'sheet.jpg');
-    await contactSheet({ frames: framePaths, out: sheet, cols: 4, rows: 2 });
+    await contactSheet({ frames: framePaths, out: sheet, cols: o.sheetCols ?? 4, rows: o.sheetRows ?? 2 });
     const probe = await probeVideo(o.outMp4);
     if (!(o.keepFrames ?? false)) fs.rmSync(framesDir, { recursive: true, force: true });
 

@@ -1,29 +1,198 @@
 {
-  "schema": 1,
+  "schema": 2,
   "kind": "stranger-metrics",
   "trackId": "flat-test",
   "attemptsBand": null,
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "0faf782f",
+  "updatedAt": "2026-09-14T07:32:35.035Z",
+  "includeStale": false,
   "sessions": [
     {
       "sessionId": "flat-test-20260914-002749",
       "agent": "fake",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": null,
       "strangerAttempts": 2,
       "cleared": true,
       "finishTime": 12.3833,
       "calls": 8,
-      "wallMs": 76814
+      "wallMs": 76814,
+      "firstCheckpointCalls": 5,
+      "faultsByCheckpoint": [
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": null,
+      "recordingFile": "harness/inputs/flat-test/stranger-flat-test-20260914-002749.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "restart",
+          "reason": "restart",
+          "x": 18.155,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 4
+        }
+      ]
     },
     {
       "sessionId": "flat-test-20260914-010849",
       "agent": "smoke",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": null,
       "strangerAttempts": 2,
       "cleared": false,
       "finishTime": null,
       "calls": 6,
-      "wallMs": 1321
+      "wallMs": 1321,
+      "firstCheckpointCalls": 5,
+      "faultsByCheckpoint": [
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": null,
+      "recordingFile": "harness/inputs/flat-test/stranger-flat-test-20260914-010849.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 5.216,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 2
+        },
+        {
+          "n": 2,
+          "endedBy": "restart",
+          "reason": "restart",
+          "x": 0.579,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 3
+        },
+        {
+          "n": 3,
+          "endedBy": "reset",
+          "reason": "reset",
+          "x": 0.579,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 4
+        }
+      ]
+    },
+    {
+      "sessionId": "flat-test-r3test",
+      "agent": "r3test",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "0faf782f",
+      "strangerAttempts": 6,
+      "cleared": false,
+      "finishTime": null,
+      "calls": 7,
+      "wallMs": 1898,
+      "firstCheckpointCalls": null,
+      "faultsByCheckpoint": [
+        5,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": false,
+        "x": 11.525,
+        "startTick": 114,
+        "endTick": 304,
+        "recordingFile": "harness/out/stranger/flat-test/flat-test-r3test/attempts/003.rec.json"
+      },
+      "recordingFile": "harness/inputs/flat-test/stranger-flat-test-r3test.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 4.252,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 2
+        },
+        {
+          "n": 2,
+          "endedBy": "restart",
+          "reason": "restart",
+          "x": 0.58,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 3
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 11.525,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 4
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 11.525,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 5
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 11.525,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 6
+        }
+      ]
     }
   ],
-  "medianAttempts": 2,
+  "completed": 1,
+  "clearedCount": 0,
+  "medianAttempts": 6,
+  "medianFinishTime": null,
+  "medianCalls": 7,
+  "medianWallMs": 1898,
   "pass": null,
-  "updatedAt": "2026-09-14T06:08:51.083Z"
+  "deaths": {
+    "total": 5,
+    "byReason": {
+      "crash": 4,
+      "restart": 1
+    },
+    "byObstacle": [
+      {
+        "obstacle": "ground",
+        "count": 5,
+        "xs": [
+          4.3,
+          0.6,
+          11.5,
+          11.5,
+          11.5
+        ]
+      }
+    ],
+    "byCheckpoint": [
+      5,
+      0,
+      0
+    ]
+  }
 }

@@ -24,6 +24,8 @@
     "harness:determinism": "tsx harness/gate/determinism.ts",
     "harness:gate": "tsx harness/gate/ship-gate.ts",
     "harness:round": "tsx harness/round.ts",
+    "harness:clip": "tsx harness/clip.ts",
+    "harness:snapshot-probe": "tsx harness/gate/snapshot-probe.ts",
     "harness:critic-prompt": "tsx harness/compare/critic-prompt.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

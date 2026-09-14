@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "track-bot-metrics",
   "trackId": "h3-fire-line",
-  "updatedAt": "2026-09-14T07:01:58.795Z",
+  "updatedAt": "2026-09-14T08:18:01.605Z",
   "physics": "bikePhysicsFactory",
   "attemptsBand": [
     18,
@@ -17,26 +17,47 @@
         3173388573
       ],
       "attempts": [
-        50,
-        50
+        3,
+        3
       ],
-      "median": 50,
+      "median": 3,
       "finishTimes": [
-        null,
-        null
+        23.683333333333334,
+        23.683333333333334
+      ]
+    },
+    {
+      "skill": 3,
+      "seeds": [
+        3173388572,
+        3173388573
+      ],
+      "attempts": [
+        1,
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        18.325,
+        18.325
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": {
-    "checkpoint": 0,
-    "share": 1
-  },
+  "singleWall": null,
   "runs": [
     "20260914-013943-aa4607",
     "20260914-014037-c8d2f6",
     "20260914-020125-79ac62",
-    "20260914-020142-b536c8"
+    "20260914-020142-b536c8",
+    "20260914-022145-dbbfaf",
+    "20260914-022159-77cf0e",
+    "20260914-025240-74122d",
+    "20260914-025248-ab9b5a",
+    "20260914-030115-b2fcdd",
+    "20260914-030123-a22c48",
+    "20260914-031635-b3ce25",
+    "20260914-031717-3756ea"
   ]
 }

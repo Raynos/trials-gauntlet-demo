@@ -23,7 +23,9 @@ cd /Users/raynos/projects/game-demos/trials-gauntlet-demo
 pnpm harness:stranger start --track b1-first-ride --agent <your-name>
 ```
 
-(If whoever handed you this file named a different track, use that id instead of `b1-first-ride`.)
+(If whoever handed you this file named a different track, use that id instead of `b1-first-ride`. If
+they also gave you a **session id**, the session already exists: skip `start`, run `look` with
+`--session <id>` instead, and use that id on every command.)
 The output begins with a JSON object whose `sessionId` is **your session id** for every later
 command, followed by your first `look`. Nothing else needs installing; do not read or edit any other
 file in that folder — the track is meant to be discovered by riding it.

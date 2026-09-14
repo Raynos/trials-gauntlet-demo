@@ -66,6 +66,9 @@ export interface SweepRow {
   firstBlocker: Blocker | null;
   wallMs: number;
   runs: string[];
+  /** False when any seed's committed play is not retraced by a replay of its recording (physics snapshot infidelity): attempts/clears are then unverifiable. */
+  replayFaithful?: boolean;
+  replayDivergenceX?: number | null;
 }
 export interface SweepReport extends RunMeta {
   kind: 'sweep';
@@ -127,6 +130,8 @@ export interface BotRunReport extends RunMeta {
   };
   recordingFile: string;
   nodeHash: string;
+  /** First tick where a straight replay of `recordingFile` stops matching the committed play's per-tick hash (null = retraces exactly). */
+  playReplayDivergence?: { tick: number; x: number; playHash: string; replayHash: string } | null;
   browserHash: string | null;
   browserVerified: boolean | null;
 }
@@ -158,6 +163,22 @@ export interface AttemptLog {
   runTime: number;
   wallMs: number;
   calls: number;
+  /** Run-clock ticks spanned by this attempt (the recording below replays from GO and ends at endTick). */
+  startTick?: number;
+  endTick?: number;
+  /** Prefix recording written the moment the attempt ended: out/stranger/<track>/<id>/attempts/NNN.rec.json. */
+  recordingFile?: string;
+}
+
+/** The attempt worth a clip: the clearing one, else the one that got furthest. */
+export interface BestAttempt {
+  n: number;
+  cleared: boolean;
+  x: number;
+  startTick: number;
+  endTick: number;
+  /** Repo-relative recording; capture with `pnpm harness:clip <track> --recording <file> --from-tick <startTick>`. */
+  recordingFile: string;
 }
 
 export interface StrangerSession extends RunMeta {
@@ -181,6 +202,7 @@ export interface StrangerSession extends RunMeta {
   attemptsBand: [number, number] | null;
   /** median(strangerAttempts over sessions) <= 1.5 * attemptsBand[1] */
   pass: boolean | null;
+  bestAttempt?: BestAttempt | null;
   log: string[];
 }
 
@@ -255,7 +277,7 @@ export interface GateReport extends RunMeta {
   checks: GateCheck[];
   failed: number;
   pass: boolean;
-  boot: { runs: number[]; p50: number; max: number; firstFrameMs: number[] };
+  boot: { runs: number[]; p50: number; min?: number; max: number; firstFrameMs: number[]; loadavg1?: number; cores?: number; retried?: boolean };
   clear: {
     recording: string | null;
     finishTime: number | null;

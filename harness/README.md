@@ -13,13 +13,17 @@ stranger** (AGENTS.md). Everything below produces numbers or clips for that.
 | command | what it proves | output |
 | --- | --- | --- |
 | `pnpm harness:bot <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] [--crash-probe] [--no-verify]` | attempts-to-clear per skill (beam search in node, committed play with in-band restarts), 0-fault oracle par, browser-verified golden recordings, a deterministic crash recording | `out/metrics/<trackId>.json` (committed), `out/bot/<trackId>/<runId>-skill<k>.json`, `inputs/<trackId>/bot-<skill>.json`, `inputs/<trackId>/crash.json` |
-| `pnpm harness:bot --all-tracks [--skill 2] [--seeds 2] [--track-wall-s 90] [--tracks a,b]` | **track sweep**: budget-capped committed play on every registered track; best distance (m, % of finishX), clears, attempts, first blocker (fault reason + x + nearest placed obstacle) | `out/metrics/sweep.json` + `sweep.md` (committed), goldens for cleared tracks |
-| `pnpm harness:round [--build] [--quick] [--pin] [--tracks flat-test,gap-test,b1-first-ride]` | **per-round check**: bot on three tracks (+ crash probe), determinism, ship gate; exit = failed steps | all of the below |
+| `pnpm harness:bot --all-tracks [--skill 2 \| --skill 2,3] [--seeds 2] [--track-wall-s 90] [--tracks a,b]` | **track sweep**: budget-capped committed play on every registered track; best distance (m, % of finishX), clears, attempts, first blocker (fault reason + x + nearest placed obstacle). A skill list writes one table per skill | `out/metrics/sweep.json` (`sweeps[]`) + `sweep.md` (committed), goldens for cleared tracks |
+| `pnpm harness:round [--build] [--quick] [--pin] [--tracks flat-test,gap-test,b1-first-ride]` | **per-round check**: bot on three tracks (+ crash probe), determinism on the fingerprint-matched golden, ship gate; exit = failed steps. `--quick` = skill 2, 60 s bot wall, 2 loads, gate `--quick`: **108 s incl. build** on this machine (full: skill 3, 3 loads, 60 s heap) | all of the below |
+| `pnpm harness:clip <trackId> [--recording <path>] [--at-x m --before 1.5 --after 3] [--from-tick N --to-tick N] [--fps 60] [--quality high] [--build]` | **clip evidence per track**: the best recording under `inputs/<trackId>/` (replayed in node: finished > fewer attempts > faster; ties to the current src stamp), rendered 1280×720 @ 60 fps with `setQuality('high')`; `--at-x` renders only the window around the first tick the bike passes x (manoeuvre clips for `harness:pair`). ~25 s wall per clip second on SwiftShader | `out/capture/<trackId>/{clip.mp4,sheet.jpg,clip.json}` |
+| `pnpm harness:clip --tile a,b,c,d [--recapture] [--out tile.jpg]` | one 4×4 contact sheet across tracks: one row per track, frames at 10/37/63/90 % of its clip (captured first when missing) — the parent judges several tracks in one image | `out/capture/tile.jpg` (+ `tile-N.jpg` beyond 4 tracks), `tile.json` legend |
 | `pnpm harness:critic-prompt <pair-id>` | the exact, self-contained prompt for a blind critic (tag, sheet + mp4 paths, RUBRIC sections, JSON shape); hand to a fresh agent unchanged | `out/compare/pair-<id>.prompt.md` |
-| `pnpm harness:stranger <start\|look\|play "<slots>"\|restart\|reset\|status\|done> [--track id] [--session id]` | attempts-to-clear for a fresh agent that knows only `stranger/PROTOCOL.md`; 150 calls / 25 min budget; pass = median ≤ 1.5 × `meta.attemptsBand[1]` | `out/stranger/<track>/<session>/{state,session}.json`, `out/metrics/<trackId>.stranger.json` (committed), `inputs/<trackId>/stranger-<session>.json` |
+| `pnpm harness:stranger <start\|look\|play "<slots>"\|restart\|reset\|status\|done> [--track id] [--session id]` | attempts-to-clear for a fresh agent that knows only `stranger/PROTOCOL.md` (spawn text: `stranger/run-stranger.md`); 150 calls / 25 min budget; pass = median ≤ 1.5 × `meta.attemptsBand[1]`. Every ended attempt writes a replayable prefix recording + `startTick`/`endTick`; `session.json.bestAttempt` names the clip-worthy one | `out/stranger/<track>/<session>/{state,session}.json`, `attempts/NNN.{json,rec.json}`, `inputs/<trackId>/stranger-<session>.json` |
+| `pnpm harness:stranger report <trackId> [--stale]` | **stranger aggregate** (parent side, no call counted): every session of a track — attempts, cleared, time to clear, calls, wall, where each attempt died (nearest placed obstacle), best attempt tick window; medians over completed sessions on the current src fingerprint (`--stale` includes older physics); pass per CONTRACT §3 | `out/metrics/<trackId>.stranger.json` (committed) + `.stranger.md` |
 | `pnpm harness:pair <ours.mp4> <ref.mp4> --tag <manoeuvre> [--seed N] [--mask] [--align a:b]` | blind side-by-side: both clips to 640×360@30, seeded L/R coin, `hstack` mp4 + 2×8 sheet, sealed answer (chmod 000) | `out/compare/pair-<id>.mp4`, `pair-<id>-sheet.jpg`, `pair-<id>.answer.json` |
 | `pnpm harness:log-verdict <pair-id> --verdict '<json>' [--critic name]` | validates a critic verdict, unmasks, appends; running oursWinRate / positionBias per tag | `out/metrics/compare.jsonl` (committed) |
 | `pnpm harness:gate [--track flat-test] [--build] [--quick] [--heap-seconds 60] [--pin]` | **ship gate**: cold boot, first frame, clear by golden replay (bit-equal finish + hash vs `gate/expected.json`), crash, fault→control, restart latency, no countdown on restart, heap over 60 s, perf counters, bundle gz, determinism D1–D8. Exit code = failed checks | `out/metrics/ship-gate.json` (committed) |
+| `pnpm harness:snapshot-probe <recording> [--every 15] [--max-ticks 600]` | **snapshot fidelity under search load**: sim B replays the recording but every N ticks does what beam search does at a plan root (snapshot, roll every macro-action 15 ticks, restore); the first tick where B differs from a straight replay names the state physics keeps outside `snapshot()/restore()`. The bot prints the same finding per run as `playReplayDivergence` and the sweep as its `replay` column. Exit 1 on divergence | stdout |
 | `pnpm harness:determinism <recording> [--loads 3] [--pin]` | D1 cross-load, D2 json/bin, D3 node-vs-browser (bisects to the first divergent tick + state paths), D4/D4b snapshot round trip node/page, D5 chunking, D7 no state leak, D8 pinned canonical hash | `out/gate/determinism.json` |
 | `pnpm harness:boot [--runs 3]` | cold boot → `__trials.ready` ms, heap, renderer string, restart latency | `out/boot/boot.json` |
 | `pnpm harness:replay <input> [--runs 2]` | two fresh page loads hash-identical | `out/replay/<name>.json` |
@@ -39,15 +43,24 @@ pnpm harness:round --build                               # bot flat-test/gap-tes
 pnpm harness:bot --all-tracks --skill 2 --seeds 2        # the sweep table for tracks/physics owners
 pnpm harness:bot <track> --all --seeds 3 --crash-probe   # full curve on one track, browser-verified
 pnpm harness:gate --build                                # numbers vs thresholds -> out/metrics/ship-gate.json
-pnpm harness:capture harness/inputs/<track>/bot-oracle.json
-pnpm harness:pair harness/out/capture/bot-oracle/clip.mp4 reference/techniques/clips/13-*.mp4 --tag wheelie-launch --mask
+pnpm harness:clip <track>                                # best recording -> out/capture/<track>/clip.mp4 + sheet (1280x720@60, high)
+pnpm harness:clip --tile b1-first-ride,b2-lean-back,b3-kicker-row,e1-uphill-weight   # 4x4 sheet, one row per track
+pnpm harness:clip b2-lean-back --at-x 37 --before 1 --after 3.5 --out harness/out/capture/b2-drop   # manoeuvre window for a pair
+pnpm harness:pair harness/out/capture/b2-drop/clip.mp4 reference/techniques/clips/07-*.mp4 --tag big-jump-landing --mask
+pnpm harness:critic-prompt <pair-id>                     # -> out/compare/pair-<id>.prompt.md, hand to a fresh critic unchanged
 # spawn a critic with compare/RUBRIC.md + the sheet + the mp4 path; then
 pnpm harness:log-verdict <pair-id> --verdict '<json>' --critic <name>
-# spawn a stranger with stranger/PROTOCOL.md and a session id from `harness:stranger start`
+# spawn a stranger: paste stranger/run-stranger.md's block (PROTOCOL.md + track + session id); afterwards
+pnpm harness:stranger report <track>                     # -> out/metrics/<track>.stranger.{json,md}
+pnpm harness:clip <track> --recording <bestAttempt.recordingFile> --from-tick <bestAttempt.startTick> --out harness/out/capture/<track>-stranger
 ```
 
 `bot` must be re-run after any physics or track change: the gate's `clear.*`
-and `D8` checks fail on purpose when the goldens predate the physics.
+and `D8` checks fail on purpose when the goldens predate the physics. Goldens are
+chosen by **src fingerprint** (`lib/golden.ts`): the bot stamps `src=<fp>` into every
+recording's header note and the gate/round pick the highest-skill golden whose stamp
+equals the working tree's, falling back to the newest file with a WARNING. `harness:clip`
+prints the same stamp per candidate.
 
 ## Layout
 
@@ -61,7 +74,8 @@ lib/metrics.ts    attempt counting (1 + fault events), diffState, percentiles, r
 lib/schema.ts     every JSON shape written under out/
 lib/verify.ts     BrowserVerifier: one server (frozen copy of dist/) + browser, runRecording per fresh page
 bot/              actions (13 macro-actions × 15 ticks) · score · beam · play (skills 0–3, oracle, player memory) · bot CLI
-stranger/         PROTOCOL.md (handed verbatim to the stranger) · cli.ts · session.ts · view.ts (ASCII look)
+stranger/         PROTOCOL.md (handed verbatim to the stranger) · run-stranger.md (what the parent pastes) · cli.ts · session.ts · view.ts (ASCII look) · report.ts (aggregate)
+clip.ts           harness:clip: best-recording pick, tick windows, --tile; lib/golden.ts: fingerprint-matched goldens
 compare/          normalize · mask · pair · log · RUBRIC.md · README.md
 gate/             thresholds.json · expected.json (pinned hashes per physics) · determinism.ts · ship-gate.ts
 inputs/<track>/   bot-<skill>.json, bot-oracle.json, crash.json, stranger-<session>.json (committed)
@@ -91,6 +105,19 @@ restart flag is in-band, so attempts are countable from the recording alone.
   renderer string says SwiftShader. The check line prints both, and `ship-gate.json` keeps
   `shipLimit`/`shipPass` per affected check.
 - Timing precision inside headless Chromium is 0.1 ms; sub-0.1 ms prints as 0.
+- Boot `ready` p50 is over 5 samples (3 with `--quick`), min reported beside it; a p50 miss
+  while the 1-min loadavg exceeds the core count is re-sampled once and the better batch kept
+  (`ship-gate.json.boot.{min,loadavg1,cores,retried}`). Contention is not a boot regression.
+- `tsconfig.harness.json` excludes `harness/out`, so stray files there cannot break `pnpm typecheck`.
+- **Committed play vs replay.** `bot.ts` now replays every run's recording tick by tick against the
+  per-tick hashes recorded during committed play (`PlayResult.hashes`). A mismatch
+  (`playReplayDivergence`, WARNING on stderr, `replay` column in `sweep.md`) means the search's
+  snapshot/restore did not resume the same world — the bot's attempts/finish then describe a
+  trajectory no replay reproduces and the golden is not evidence. Found on 2026-09-14: `BikePhysics`
+  keeps `brakeIn` (filtered brake input, `private brakeIn` in `src/physics/bike.ts`), the seesaw
+  warm-start `seesawLambda` and `chDx/chDy` outside the `F`/`U` snapshot arrays; the probe fails on
+  flat-test at tick 346 and on e1 at tick 376 (first hop / plank contact). D4 cannot see it because it
+  round-trips the *current* state. Reproduce: `pnpm harness:snapshot-probe harness/inputs/flat-test/bot-2.json`.
 - SwiftShader is a CPU rasterizer: synced render ms (and everything downstream
   of a synced frame: `boot.firstFrameMs`, `restart.frameMsP95`) are pessimistic
   by an order of magnitude versus a real GPU. Trend the GPU-independent

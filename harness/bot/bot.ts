@@ -4,7 +4,8 @@
  *   pnpm harness:bot <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms]
  *                    [--max-attempts 50] [--max-sim-seconds 300] [--track-wall-s 120] [--no-verify] [--crash-probe]
  *                    [--dev] [--build] [--verbose]
- *   pnpm harness:bot --all-tracks [--skill 2] [--seeds 2] [--track-wall-s 120]   -> out/metrics/sweep.json + sweep.md
+ *   pnpm harness:bot --all-tracks [--skill 2 | --skill 2,3] [--seeds 2] [--track-wall-s 120]   -> out/metrics/sweep.json + sweep.md
+ *   (a skill list runs one sweep per skill and writes one table per skill into sweep.md; sweep.json holds `sweeps[]`)
  *
  * Writes per run  harness/out/bot/<trackId>/<runId>.json          (BotRunReport)
  *        summary  harness/out/metrics/<trackId>.json               (TrackBotMetrics, committed)
@@ -41,7 +42,8 @@ export function goldenFile(trackId: string, skill: Skill): string {
 }
 
 export function recordingFromFrames(sim: Sim, frames: InputFrame[], note: string): InputRecording {
-  const rec = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, note });
+  // `src=<fingerprint>` lets the gate pick goldens recorded on this physics (ship-gate pickGolden).
+  const rec = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, note: `${note} src=${srcFingerprint()}` });
   for (const f of frames) rec.push(f);
   return rec.toRecording();
 }
@@ -90,7 +92,20 @@ export async function runOnce(
   const recording = recordingFromFrames(sim, res.frames, `bot skill=${skillLabel(skill)} outcome=${res.outcome}`);
   // Node hash: replay the recording from a fresh sim so it is the recording's hash, not the search's.
   const fresh = await createSim(trackId, seed);
-  const replay = fresh.run(res.frames);
+  // Tick-by-tick: the replay must retrace the committed play exactly. A divergence means
+  // the search's snapshot/restore left the world in a state a straight run never reaches
+  // (physics snapshot() misses state) — the recording is then not evidence of the play.
+  let playReplayDivergence: BotRunReport['playReplayDivergence'] = null;
+  for (let i = 0; i < res.frames.length; i++) {
+    fresh.step(res.frames[i]!);
+    if (playReplayDivergence === null && fresh.hash() !== res.hashes[i]) {
+      playReplayDivergence = { tick: i + 1, x: fresh.state().bike.pos.x, playHash: res.hashes[i]!, replayHash: fresh.hash() };
+    }
+  }
+  const replay = { hash: fresh.hash() };
+  if (playReplayDivergence) {
+    console.error(`  [bot] WARNING replay of the recording diverges from the committed play at tick ${playReplayDivergence.tick} (x=${playReplayDivergence.x.toFixed(2)} m): physics snapshot()/restore() is not a faithful round trip on this build; the bot's attempts/finish below describe a trajectory no replay reproduces`);
+  }
   const planWall = res.plans.map((p) => p.wallMs);
   const runDir = path.join(HARNESS_DIR, 'out', 'bot', trackId);
   const meta = runMeta('bot', started, { physics: sim.physicsName });
@@ -123,6 +138,7 @@ export async function runOnce(
     },
     recordingFile: path.join(runDir, `${meta.runId}-skill${skillLabel(skill)}.rec.json`),
     nodeHash: replay.hash,
+    playReplayDivergence,
     browserHash: null,
     browserVerified: null,
   };
@@ -155,14 +171,14 @@ export function printRunLine(r: BotRunReport): void {
 
 export function sweepMarkdown(rep: SweepReport): string {
   const lines = [
-    `| track | tier | technique | finishX | best m | best % | clear | attempts (seeds) | first blocker |`,
-    `|---|---|---|---:|---:|---:|---|---|---|`,
+    `| track | tier | technique | finishX | best m | best % | clear | attempts (seeds) | replay | first blocker |`,
+    `|---|---|---|---:|---:|---:|---|---|---|---|`,
   ];
   for (const r of rep.rows) {
     const b = r.firstBlocker;
     const blocker = b ? `${b.reason} @ ${b.x.toFixed(1)} m${b.obstacle ? ` — ${b.obstacle.kind} @ ${b.obstacle.x.toFixed(1)} m` : ' — ground'}` : '—';
     lines.push(
-      `| ${r.trackId} | ${r.tier} | ${r.technique} | ${r.finishX.toFixed(0)} | ${r.bestX.toFixed(1)} | ${(r.bestPct * 100).toFixed(0)}% | ${r.clears}/${r.seeds.length} | ${r.attemptsMedian} (${r.attempts.join(', ')}) | ${blocker} |`,
+      `| ${r.trackId} | ${r.tier} | ${r.technique} | ${r.finishX.toFixed(0)} | ${r.bestX.toFixed(1)} | ${(r.bestPct * 100).toFixed(0)}% | ${r.clears}/${r.seeds.length} | ${r.attemptsMedian} (${r.attempts.join(', ')}) | ${r.replayFaithful === undefined ? '?' : r.replayFaithful ? 'ok' : `DIVERGES @ ${r.replayDivergenceX?.toFixed(0) ?? '?'} m`} | ${blocker} |`,
     );
   }
   return lines.join('\n');
@@ -287,10 +303,9 @@ export async function crashProbe(trackId: string, seed: number): Promise<{ file:
 }
 
 
-/** --all-tracks: budget-capped committed play on every registered track; one summary table. */
-async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number): Promise<void> {
+/** --all-tracks: budget-capped committed play on every registered track; one summary table per skill. */
+async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number, skill: Skill): Promise<{ report: SweepReport; md: string; fp0: string; started: Date }> {
   const started = new Date();
-  const skill = (flagBool(flags, 'oracle') ? 'oracle' : (Math.max(0, Math.min(3, Math.round(flagNum(flags, 'skill', 2)))) as 0 | 1 | 2 | 3)) as Skill;
   const trackWallS = flagNum(flags, 'track-wall-s', 120);
   const budget = flags.budget !== undefined ? flagNum(flags, 'budget', 0) : undefined;
   const only = typeof flags.tracks === 'string' ? flags.tracks.split(',') : null;
@@ -339,6 +354,8 @@ async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number
       finishTimes: reps.map((r) => r.finishTime),
       outcomes: reps.map((r) => r.outcome),
       firstBlocker: blockers[0] ?? null,
+      replayFaithful: reps.every((r) => !r.playReplayDivergence),
+      replayDivergenceX: reps.map((r) => r.playReplayDivergence?.x).find((x): x is number => x !== undefined) ?? null,
       wallMs: performance.now() - t0,
       runs: reps.map((r) => r.runId),
     });
@@ -356,10 +373,36 @@ async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds: number
     trackWallS,
     rows,
   };
-  writeJson(path.join(METRICS_DIR, 'sweep.json'), report);
   const md = sweepMarkdown(report);
-  fs.writeFileSync(path.join(METRICS_DIR, 'sweep.md'), `# Bot sweep — skill ${skillLabel(skill)}, ${seeds} seed(s), physics ${first.physicsName}, src ${fp0}, git ${report.git}, ${started.toISOString()}\n\n${md}\n`);
-  console.log(`\n${md}\nsweep: harness/out/metrics/sweep.json (+ sweep.md) wall=${((Date.now() - started.getTime()) / 1000).toFixed(0)}s`);
+  console.log(`\n${md}\nsweep skill=${skillLabel(skill)}: wall=${((Date.now() - started.getTime()) / 1000).toFixed(0)}s`);
+  return { report, md, fp0, started };
+}
+
+/** Parse `--skill 2` / `--skill 2,3` / `--oracle` into the list of skills to sweep. */
+export function sweepSkills(flags: ReturnType<typeof parseArgs>['flags']): Skill[] {
+  if (flagBool(flags, 'oracle')) return ['oracle'];
+  const raw = typeof flags.skill === 'string' ? flags.skill : String(flagNum(flags, 'skill', 2));
+  const out: Skill[] = [];
+  for (const part of raw.split(',')) {
+    const t = part.trim();
+    if (t === 'oracle') out.push('oracle');
+    else if (/^[0-3]$/.test(t)) out.push(Number(t) as 0 | 1 | 2 | 3);
+    else fail(`--skill: '${t}' is not 0..3 or oracle`);
+  }
+  return out;
+}
+
+/** One sweep per skill; sweep.md gets one section per skill, sweep.json `sweeps[]` (+ the first at top level for older readers). */
+async function sweepAll(flags: ReturnType<typeof parseArgs>['flags'], seeds: number): Promise<void> {
+  const skills = sweepSkills(flags);
+  const results: Awaited<ReturnType<typeof sweep>>[] = [];
+  for (const skill of skills) results.push(await sweep(flags, seeds, skill));
+  const first = results[0]!;
+  const header = (r: (typeof results)[number]): string => `## skill ${skillLabel(r.report.skill)} — ${seeds} seed(s), physics ${r.report.physics}, src ${r.fp0}${r.fp0 !== freshFingerprint() ? ` (src is now ${freshFingerprint()})` : ''}, git ${r.report.git}, ${r.started.toISOString()}, wall ${(r.report.wallMs / 1000).toFixed(0)} s`;
+  const md = [`# Bot sweep — skills ${skills.map(skillLabel).join(', ')} (${results.length === 1 ? 'one table' : 'one table per skill'})`, '', ...results.flatMap((r) => [header(r), '', r.md, ''])].join('\n');
+  writeJson(path.join(METRICS_DIR, 'sweep.json'), { ...first.report, wallMs: results.reduce((a, r) => a + r.report.wallMs, 0), skills, sweeps: results.map((r) => r.report) });
+  fs.writeFileSync(path.join(METRICS_DIR, 'sweep.md'), md);
+  console.log(`\nsweep: harness/out/metrics/sweep.json (+ sweep.md) skills=${skills.map(skillLabel).join(',')} wall=${(results.reduce((a, r) => a + r.report.wallMs, 0) / 1000).toFixed(0)}s`);
 }
 
 async function main(): Promise<void> {
@@ -369,7 +412,7 @@ async function main(): Promise<void> {
   if (!trackId && !allTracks) fail('usage: harness/bot/bot.ts <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] | --all-tracks');
   const seeds = Math.max(1, flagNum(flags, 'seeds', 1));
   if (allTracks) {
-    await sweep(flags, seeds);
+    await sweepAll(flags, seeds);
     return;
   }
   const budget = flags.budget !== undefined ? flagNum(flags, 'budget', 0) : undefined;

@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "track-bot-metrics",
   "trackId": "x3-gauntlet",
-  "updatedAt": "2026-09-14T07:06:17.064Z",
+  "updatedAt": "2026-09-14T08:23:56.555Z",
   "physics": "bikePhysicsFactory",
   "attemptsBand": [
     60,
@@ -17,23 +17,67 @@
         264835978
       ],
       "attempts": [
-        1,
+        6,
+        6
+      ],
+      "median": 6,
+      "finishTimes": [
+        null,
+        null
+      ]
+    },
+    {
+      "skill": 3,
+      "seeds": [
+        264835977,
+        264835978
+      ],
+      "attempts": [
+        2,
+        2
+      ],
+      "median": 2,
+      "finishTimes": [
+        null,
+        null
+      ]
+    },
+    {
+      "skill": "oracle",
+      "seeds": [
+        264835977
+      ],
+      "attempts": [
         1
       ],
       "median": 1,
       "finishTimes": [
-        null,
         null
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": null,
+  "singleWall": {
+    "checkpoint": 0,
+    "share": 1
+  },
   "runs": [
     "20260914-014726-eaa88c",
     "20260914-014856-bbcabd",
     "20260914-020416-e31e4b",
-    "20260914-020516-89befc"
+    "20260914-020516-89befc",
+    "20260914-022614-e40474",
+    "20260914-022714-14d8eb",
+    "20260914-023322-b22865",
+    "20260914-023722-2a8ffb",
+    "20260914-024149-e1369e",
+    "20260914-025657-cdcaa1",
+    "20260914-025757-1b875d",
+    "20260914-030531-532830",
+    "20260914-030631-1ba813",
+    "20260914-024927-1c9770",
+    "20260914-032156-8688f8",
+    "20260914-032256-b785ac"
   ]
 }

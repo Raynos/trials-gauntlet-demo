@@ -1,23 +1,90 @@
 {
-  "schema": 1,
+  "schema": 2,
   "kind": "stranger-metrics",
   "trackId": "b1-first-ride",
   "attemptsBand": [
     1,
     1
   ],
+  "physics": "bikePhysicsFactory",
+  "srcFingerprint": "45dff798",
+  "updatedAt": "2026-09-14T07:38:22.529Z",
+  "includeStale": false,
   "sessions": [
     {
       "sessionId": "b1-first-ride-20260914-013710",
       "agent": "harness-smoke",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "d698717f",
       "strangerAttempts": 5,
       "cleared": false,
       "finishTime": null,
       "calls": 19,
-      "wallMs": 169316
+      "wallMs": 169316,
+      "firstCheckpointCalls": 5,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        4
+      ],
+      "bestAttempt": null,
+      "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-20260914-013710.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 111.212,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 112.0 m",
+          "calls": 8
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 113.711,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 113.5 m",
+          "calls": 12
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 118.366,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 121.0 m",
+          "calls": 14
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 104.503,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 112.0 m",
+          "calls": 15
+        }
+      ]
     }
   ],
-  "medianAttempts": 5,
-  "pass": false,
-  "updatedAt": "2026-09-14T06:39:59.395Z"
+  "completed": 0,
+  "clearedCount": 0,
+  "medianAttempts": null,
+  "medianFinishTime": null,
+  "medianCalls": null,
+  "medianWallMs": null,
+  "pass": null,
+  "deaths": {
+    "total": 0,
+    "byReason": {},
+    "byObstacle": [],
+    "byCheckpoint": [
+      0,
+      0,
+      0
+    ]
+  }
 }

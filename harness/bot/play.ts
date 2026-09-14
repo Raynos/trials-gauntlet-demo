@@ -46,6 +46,8 @@ export const DEFAULT_LIMITS: PlayLimits = { maxAttempts: 50, maxSimSeconds: 300,
 export interface PlayResult {
   outcome: 'finished' | 'maxAttempts' | 'timeout' | 'wallTimeout' | 'stuck';
   frames: InputFrame[];
+  /** Physics hash after each committed tick (same index as `frames`): lets the caller prove a replay of `frames` retraces the play. */
+  hashes: string[];
   /** Furthest bike x reached during committed play (m). */
   maxX: number;
   wallMs: number;
@@ -89,6 +91,7 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
   const hz = sim.hz;
 
   const frames: InputFrame[] = [];
+  const hashes: string[] = [];
   const events: TimedEvent[] = [];
   const faults: FaultEvent[] = [];
   const plans: Plan[] = [];
@@ -116,6 +119,7 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
   const stepPlay = (f: InputFrame): { fault: TimedEvent | null; finish: TimedEvent | null } => {
     const ev = sim.step(f);
     frames.push(f);
+    hashes.push(sim.hash());
     let fault: TimedEvent | null = null;
     let finish: TimedEvent | null = null;
     for (const e of ev) {
@@ -174,6 +178,7 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
             ban(h.rootHash, history.slice(idx).map((e) => e.aid));
             sim.restore(h.snap);
             frames.length = h.framesLen;
+            hashes.length = h.framesLen;
             events.length = h.eventsLen;
             history.length = idx;
             rewinds++;
@@ -219,6 +224,7 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
   return {
     outcome,
     frames,
+    hashes,
     maxX,
     wallMs: performance.now() - wall0,
     events,
