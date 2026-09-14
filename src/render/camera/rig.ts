@@ -172,8 +172,11 @@ export class CameraRig {
       screenX: moving > 0 ? lerp(0.45, 0.3, zoomT) - 0.02 * wideT : lerp(0.55, 0.7, zoomT),
       screenY: lerp(0.55, 0.56, zoomT) - 0.03 * airT,
       // Idle is a 3/4 view (reference start frames sit ≈20° round and ≈10° down), so depth reads before GO.
-      yaw: moving * lerp(lerp(20, 15, zoomT), 17, wideT) * DEG,
-      pitch: lerp(lerp(10, 11, zoomT), 13, fastT) * DEG, // round 7: never tilt up in the air — pull back instead
+      // Round 10: the riding pitch goes 11° → 15° and the yaw 15° → 18° (reference riding
+      // frames sit 20–25° down / 15–25° round): the top of the deck, the far ledge clutter and
+      // the container roofs enter the frame and the window wall drops out of the upper third.
+      yaw: moving * lerp(lerp(20, 18, zoomT), 19, wideT) * DEG,
+      pitch: lerp(lerp(11, 15, zoomT), 21, fastT) * DEG, // round 7: never tilt up in the air — pull back instead; round 10: the pull-back looks DOWN (21°) so the wide frame shows the deck and the hall floor, not a band of window wall
       roll: 0,
       fov: lerp(28, 34, zoomT) * DEG,
     };
@@ -181,7 +184,7 @@ export class CameraRig {
       p.heightFrac = 0.4;
       p.screenX = 0.45;
       p.yaw = 20 * DEG;
-      p.pitch = 10 * DEG;
+      p.pitch = 11 * DEG;
       p.fov = 28 * DEG;
     }
 

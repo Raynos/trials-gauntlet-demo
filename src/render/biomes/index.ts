@@ -51,35 +51,44 @@ export interface Biome {
   /** Floor-fog base height is relative to the ground floor (`groundFloorY`), set per track by the lighting rig. */
   /** Whether the scene is an interior (back wall + roof instead of a sky dome). */
   interior: boolean;
+  /**
+   * Round 10: real local key pools. The renderer keeps two `SpotLight`s (no shadow) on the two
+   * kit lamps nearest the camera target (`BiomeKit.lamps`) — a pure function of state.
+   */
+  lampLights?: { color: number; intensity: number; distance: number; angle: number; penumbra: number };
 }
 
 export const BIOMES: Record<BiomeId, Biome> = {
   industrial: {
     id: 'industrial',
-    sunDir: [-0.45, 0.78, -0.3],
+    // Round 10 recipe ("industrial to the bar"): the skylight sun is the one shadow-casting key;
+    // the sodium high-bay lamps add real warm pools (two camera-following spots, `lampLights`);
+    // the skylight fill is cool and LOW so the pools read; lift 0; dark warm-grey air.
+    sunDir: [-0.4, 0.8, 0.42], // round 10: from the camera side, like the light shafts already were — the faces that face the camera (bike, rider, container fronts) are the lit ones, shadows fall behind
     sunColor: 0xffe2c4, // warm key, not orange
-    sunIntensity: 3.2,
+    sunIntensity: 3.0,
     hemiSky: 0x8cb0e4, // cool skylight fill (round 8 key-art match: the lamps are the warm source, the roof light is cold)
-    hemiGround: 0x2a2622,
-    hemiIntensity: 1.05,
+    hemiGround: 0x3a342e,
+    hemiIntensity: 0.8, // round 10: 1.05 flattened the hall — the lamps must be the second source; 0.62 crushed 17 % of the frame under 0.08 (reference 2 %)
     skyZenith: 0x6f7f96,
     skyHorizon: 0xd8c8a8,
     skyGround: 0x1a1512,
     sunDiscIntensity: 30,
-    envIntensity: 0.55,
+    envIntensity: 0.4,
     exposure: 1.5,
-    fogTiers: [16, 55, 110], // a 60 m deep hall: the far wall sits at ≈50 % haze, each container row a step nearer
-    fogColor: 0x6a625a, // desaturated warm-grey air; fog must not tint
+    fogTiers: [14, 44, 96], // a 60 m deep hall: the far wall (≈ 42 m from the riding camera) sits at 50 % haze; near ledge / mid stacks / far wall are the three tiers
+    fogColor: 0x45494e, // dark cool-grey air (the reference hall haze is grey-blue; the sodium pools and the warm key stay the only warm things) (round 10: 0x6a625a read as a grey wash over the far wall; neutral so the sodium pools stay the only warm thing)
     floorFog: { h0: 0.3, hs: 1.8, density: 0.035 },
-    gradeLift: [0, 0, 0], // round 8: deep blacks under the deck and in the far bays (key art)
+    gradeLift: [0, 0, 0], // deep blacks under the deck and in the far bays (key art)
     gradeGain: [1.02, 1.0, 0.98],
-    saturation: 0.9,
-    contrast: 1.15,
-    vignette: 0.38,
-    bloomStrength: 0.55, // sodium lamps bloom
+    saturation: 0.88, // measured vs techniques 01/07: ours 0.49 mean HSV sat at 1.0 against 0.28 reference
+    contrast: 1.1, // 1.2 + lift 0 crushed the floor; the reference's p1 is 0.015, not 0
+    vignette: 0.28, // 0.4 blacked out the under-deck corners
+    bloomStrength: 0.55, // sodium lamps bloom (threshold 1.6 HDR: only bulbs, sun, sparks)
     groundSurface: 'concrete',
     ambient: 'motes',
     interior: true,
+    lampLights: { color: 0xffb257, intensity: 340, distance: 26, angle: 0.5, penumbra: 0.7 },
   },
   canyon: {
     id: 'canyon',

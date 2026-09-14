@@ -764,7 +764,109 @@ Per-frame box check `[0.15, 0.85]²` on the trailer goldens (`render6/camcheck.m
 `render6/hero-grid-r9.jpg` (top proc, bottom glTF: idle / riding / wheelie ; crouch / lean-fwd /
 crash), `render6/hero-proc/hero-proc-4s.mp4`, `render6/hero-gltf/hero-gltf-4s.mp4`.
 
-## 12. Known gaps after round 9 (what still reads non-AAA, and what the coordinator asked for that is not done)
+## 11e. Round 10 (mega build wave 1) — industrial to the bar, glTF hero default
+
+### Biome recipe — "industrial to the bar" (`biomes/index.ts`, `world/hall.ts`, `world/deck.ts`, `index.ts`)
+
+The written recipe; every other biome gets the same five parts in wave 2. Numbers are the
+shipped industrial values; the *measure* column is how each part is checked, not eyeballed.
+
+| part | rule | industrial numbers | measure |
+|---|---|---|---|
+| **1 · one key + real local pools** | One shadow-casting key from the **camera side** (the faces that face the camera — bike, rider, container fronts — are the lit ones; shadows fall behind). The biome's point sources are **real lights, not just emissive**: two `SpotLight`s (no shadow map) park on the two kit lamps nearest the camera target every frame (`Biome.lampLights`, `World.lampLights`, `BiomeKit.lamps`), a pure function of state. Fill is cool and low so the pools read; **lift 0**; bloom threshold 1.6 HDR so only bulbs / sun / sparks bloom, never a lit surface. | sun `0xffe2c4 × 3.0` from `(−0.4, 0.8, 0.42)` (was `z −0.3`: the bike was backlit and the light shafts already leaned the other way); hemi `0x8cb0e4 / 0x3a342e × 0.8` (was 1.05); env 0.4; lamps `0xffb257`, 340 cd, 26 m, half-angle 0.5 rad, penumbra 0.7, decay 2 — hung at **z −3.5** just behind the deck at deck + 5.4–6.4 m every 12 m (a sparser row at z −11 every 24 m); exposure 1.5, contrast 1.1, saturation 0.88, vignette 0.28 | lamp on/off diff (`render7/lamp-onoff.jpg`): mean frame luminance +1.3/255, pool on the deck and the container fronts; luminance histogram vs techniques 01/07 (below) |
+| **2 · contact shadows under everything** | SSAO on `high` (unchanged) **plus a contact-shadow decal under every prop that stands on something** (`contactshadow` batch: black radial disc, `map` alpha, opacity 0.6, polygon offset) and the hero's per-tyre blobs. The under-deck AO skirt drops to 0.45 (it was a black void once real AO existed). | 1 batch, 0 programs (shares the lamp-streak MeshBasic+map program) | `propsInFrame().structure` counts them; visible in every two-up |
+| **3 · 20–50 lit props in every riding frame, at deck level** | Density is placed **where the riding camera looks**: the reference frames are dense because the clutter is *at* the track, not on the floor 3 m below it. Three shelves (`dressDeckLevel`): (a) the **far support ledge** (z −1.7…−3.0, the container roof 0.4 m under the deck) — a cluster on 55 % of 2.5 m slots, tall things allowed, raised on a stored pallet stack to deck − 0.45 where the deck climbs; (b) the **near ledge** (z +1.7…+3.0) — only things ≤ 0.6 m (flat tyres, cones, plank bundles, lying drums, tool boxes) so nothing ever reaches the wheels, none inside a spawn keep-out; (c) **adjacent containers on the floor** at z −5.2 (mid tier, 1–2 high, 25 % end-on, clutter on the roofs, hooks and chains above) and z +5 (foreground singles outside keep-outs, 6–7 m in front of the riding camera, under the deck line). Prop kit: drums (standing / lying), pallets, tyre stacks / flat tyres, crates, plank bundles / loose plank ends, tool carts, gas bottles, cable reels, cones, racks; all instanced, AO-baked, seeded by the track seed. | b1 riding frame: **37 props** (+ 151 structure / decal / scatter instances) within 60 m; b3 riding **51**; idle 10–18 (the start gate's crowd and barriers fill the idle frame) | `renderer.propsInFrame(60)` (debug): instanced props with their origin inside the frustum, by batch, structure separated |
+| **4 · ground decals and scatter, edge wear on every plank** | On the deck: oil stains (dark, roughness 0.22 — they catch the lamps), bolts and gravel along the plywood edges, the art pack's tyre marks. On every shelf and container roof: paper / cardboard sheets, gravel, bolts, plank ends. **Every board of a wood deck darkens at both ends** (per-end random 0.5–0.85, boards are now 4-segment boxes so the middle stays pale) and lifts 6 % on the worn line. | `oilstain`, `paper`, `gravel`, `bolt`, `plankend` batches; +24 tris per board | visible in the b3 two-up; tri budget below |
+| **5 · three fog / depth tiers, each carrying detail** | Near = the ledges and the hero; mid = the adjacent container roofs and stacks at z −5…−16 with the lamps hanging in front of them; far = the back wall, whose **window bank now sits above eye level** (sill 6.4 m = deck + 3.4 m, emissive 0.55 — it used to start at 3.5 m at 0.95 and was the brightest thing in every riding frame). Fog `0x45494e` (cool grey; the pools stay the only warm thing) at **14 / 44 / 96 m**, so the wall ≈ 42 m from the riding camera sits at 50 % haze; floor fog unchanged. Lamp cones are a hint (alpha 0.018), not the solid triangles they were. | | luminance histogram vs 01/07 |
+| **camera** | Riding pitch **15°** (was 11°), yaw 18° (was 15°), idle pitch 11°, and the fast / air pull-back **looks down 21°** (was 13°) so the wide frame shows the deck and the hall floor instead of a band of window wall. Reference riding frames sit 20–25° down. | | `render7/camcheck*.log` (60 fps, box [0.15, 0.85]²): b1 bot-3 **0 / 2045** out, e1 bot-3 **0 / 2180**, b3 bot-3 **0 / 1733** (clamped 13 frames at the hall front; round 9: 390) |
+
+**Two-ups and histograms** (`render7/twoup-*.jpg`, `twoup.py`; luminance of the frame below the HUD band,
+reference cell from the techniques sheet):
+
+| frame | lum p1 / p50 / p99 | pixels < 0.08 | pixels > 0.9 | mean HSV sat |
+|---|---|---|---|---|
+| round 9 baseline, b1 riding | 0.024 / 0.306 / 0.876 | 8.0 % | 0.5 % | 0.41 |
+| round 10 b1 riding (before the grade pass) | 0.000 / 0.203 / 0.788 | 17.4 % | 0.2 % | 0.49 |
+| round 10 b1 riding (shipped, `final-b1-ride.png`) | 0.000 / 0.230 / 0.753 | 17.8 % | 0.1 % | 0.36 |
+| round 10 b3 riding (shipped, `final-b3-ride.png`) | 0.001 / 0.256 / 0.827 | 21.4 % | 0.4 % | 0.34 |
+| reference techniques 01 cell 5 | 0.015 / 0.284 / 0.876 | 2.4 % | 0.5 % | 0.28 |
+| reference techniques 07 cell 9 | 0.011 / 0.223 / 0.849 | 1.7 % | 0.6 % | 0.22 |
+
+Reading: the median is in band, the highlights are in band (nothing but the bulbs clips), the
+**shadow floor is not** — 16–21 % of our pixels sit under 0.08 against the reference's 2 %; the
+reference's blacks are a lifted grey haze. The remaining black is the under-deck support wall and the
+hall floor in the bottom third; what would fix it is the floor fog lifting those (density 0.035 →
+≈ 0.08 with a cooler colour) or a small lift (0.01) — left for the critic round, since the outside
+review asked for lift 0. Saturation is still 1.5× the reference (the sodium pools + the deeper
+container palette); a further 0.1 off the grade is the likely move after the blind verdict.
+
+### Round 10 status table (one track per session, glTF hero + art, riding frame, `high`; host load 30–45)
+
+| track (biome) | calls | tris | programs | texMB | props in frame (60 m) |
+|---|---|---|---|---|---|
+| b1-first-ride (industrial) | 177 | 304 k | 45 | 49.1 | 72 (idle 40) |
+| b3-kicker-row (industrial) | 208 | 262 k | 47 | 49.5 | 74 |
+| h3-fire-line (foundry) | 204 | 260 k | 45 | 50.8 | 56 |
+| e1-uphill-weight (canyon) | 96 | 188 k | 39 | 49.5 | 9 |
+| m2-drum-roll (snow) | 113 | 244 k | 35 | 39.8 | 31 |
+| h1-wheelie-wire (nightCity) | 135 | 129 k | 41 | 62.2 | 17 |
+| x1-vertical-limit (snow) | 97 | 364 k | 36 | 39.5 | 19 |
+
+Calls ≤ 300, tris ≤ 500 k, textures ≤ 96 MB everywhere. **Programs 45–47 on the hall tracks and
+41 on nightCity are over the 40 cap**: the glTF hero brings the skinning variant + its own material
+set (+3–4 over the procedural kit, which measured 38 in round 9), the two follow spots add the
+`NUM_SPOT_LIGHTS` variant, and the round-10 batches share the existing MeshBasic+map / standard
+programs (the oil / shadow decals were moved from `alphaMap` to `map` for exactly that reason). Cut
+list for wave 2: fold the hero's bodywork / engine / exhaust materials into one (−2), drop the
+`lampstreak` MeshBasic variant by drawing streaks with the cone material (−1), and the ghost's two
+derived variants when no ghost is set (−2). Hero clips in one flat-test session read 48 programs and
+**texMB 48.8 → 70.1 on the second `loadTrack` of the same session** (accumulation across reloads —
+the ghost's cloned material set or an un-disposed skin canvas; per-track numbers above are clean).
+
+### Texture budget (`hero/gltf.ts shrinkTextures`, `hall.ts warehouseWall`)
+
+The glTF hero shipped 2048² albedo + 1024² normal / ORM sets: **bike 32 MB, rider 16 MB** at RGBA8 +
+mips (round 8 never measured `texMB` with the glTF on; b1 read **90.5 MB** against the 96 cap, and
+foundry would have been ≈ 115). At load every hero albedo is capped at 1024² and normal / ORM at 512²
+(canvas downsample, deterministic) → 16 MB; the wall bay texture goes 1024 → 512 px per 12 m bay
+(43 px/m for a wall ≥ 30 m from any camera; 14.2 → 3.6 MB). b1 with the glTF hero + art: **49 MB**.
+
+### Art-pack determinism bugs found by the tally (`art/library.ts`, `index.ts`)
+
+`debugInfo().art.inWorld` was **false on every harness capture of the industrial hall** — the world
+was procedural (no stencils, no wall decals) while the title backdrop had the pack. Two causes:
+(1) `ArtLibrary.request()` for ids another request was already fetching returned at once instead of
+waiting for them, so a second `setTrack` for the same biome resolved `whenReady()` before the decals
+had landed; (2) a throwing loader progress callback could reject `request()` before `fetchOne` ran
+(swallowed by the `.catch`). Both fixed (in-flight fetches are awaited, progress callbacks are
+guarded and logged), and `whenReady()` now performs the undrawn-world rebuild itself. `debugInfo().art`
+reports `builtAtFrame` / `frames` so the tally can prove it.
+
+### Evidence (scratch `render7/`)
+
+- Two-ups: `twoup-final-b1-vs-01.jpg`, `twoup-final-b3-vs-07.jpg` (ours | reference cell), `twoup-base-vs-01.jpg` (round 9 baseline); `lamp-onoff.jpg` (spots on / off); `r4-b1-both.jpg` (ride + idle).
+- Hero clips, glTF, 60 fps 4 s: `hero/wheelie-4s.mp4` (the lean-back plan loops out at 1.6 s on the wave-1 physics — it is a second crash clip; `+strip.jpg`), `hero/crash-4s.mp4` (loop-out → ragdoll → `CRASH!` → hard cut at 3.2 s → riding), `hero/kicker-landing-4s.mp4` (b3 bot-3 from tick 249, first flight at tick 369). Wrist error ≤ 0.05 m over the three (0.000 posed, the 0.02–0.05 is the ragdoll frames), hand-over 2 frames, pelvis residual 0.32–0.38 m on the glTF rig (the rig's pelvis bone origin vs the physics body centre — a constant rig offset, to be measured against the posed→ragdoll bone motion rather than this number).
+- Determinism: `det/` — flat-test-clear 90 frames × 2 captures, 0 differing, mp4 md5 `5ee39513…` both.
+- Camera: `camcheck.log`, `camcheck-b3-p21.log`. Budgets: `budgets.log`, `shot2.mts` output above.
+
+### glTF hero default (`index.ts`)
+
+`riderModel` / `bikeModel` default to `'gltf'` when the option is absent; `?rider=proc&bike=proc`
+forces the kit; a glTF that fails to load resolves null and the procedural kit stays (unchanged
+fallback path). **Note for core-game:** `main.ts` always passes an explicit choice
+(`loadModelChoice()` returns `'proc'` when nothing is stored), so the game still boots procedural
+until that default flips to `'gltf'` — one-line change on their side. Ragdoll hand-over on the glTF
+rig is a fixed **2-frame** slerp (3 above a 0.25 m pelvis residual; physics' crash chain is now a
+port of `pose.ts`).
+
+## 12. Known gaps after round 10 (what still reads non-AAA, and what the coordinator asked for that is not done)
+
+- **Industrial, honest read of the final two-up:** the mid-tier container row still reads as a flat wall (uniform height, front faces evenly lit — needs gaps, turned units, things leaning on them and the lamps hanging *in front* of them); the under-deck steel frames read as thin sticks; the shadow floor is 17–21 % of pixels under 0.08 against the reference 2 % (floor fog lift or a 0.01 grade lift); saturation 1.3× the reference; the reference camera sits 20–25° down against our 15°. Wave-2 targets before propagating the recipe.
+- **Programs 45–47 with the glTF hero** (cap 40) — cut list in §11e.
+- **Session texture accumulation**: texMB 48.8 → 70.1 on a second `loadTrack` of the same session (hero-clip run); per-track numbers are clean.
+- **core-game**: `loadModelChoice()` still returns `proc` when nothing is stored, so the shipped game boots procedural until that default flips; `hook.loadTrack` still does not await `renderer.whenReady()` (`whenReady` now rebuilds an undrawn world itself, so scripts that await it are safe).
+- The wheelie evidence plan needs retuning for the wave-1 physics (throttle 1 + lean −1 loops out in 0.5 s).
+
 
 - **3G first run**: the title now waits for 0.99 MB of art, but an industrial run's `whenReady`
   still waits for the 12 back-wall decals (1.07 MB, six 768² graffiti = 0.79 MB of it). Request to

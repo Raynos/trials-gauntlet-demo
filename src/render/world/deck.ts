@@ -60,8 +60,8 @@ const S = new THREE.Vector3(1, 1, 1);
 const ZAX = new THREE.Vector3(0, 0, 1);
 
 /** Box placed at (x, y, z) rotated about z by `rz`, with optional per-vertex colour and custom uv. */
-function box(w: number, h: number, d: number, x: number, y: number, z: number, rz: number, color?: THREE.Color, uv?: (px: number, py: number, pz: number) => [number, number]): THREE.BufferGeometry {
-  const g = new THREE.BoxGeometry(w, h, d);
+function box(w: number, h: number, d: number, x: number, y: number, z: number, rz: number, color?: THREE.Color, uv?: (px: number, py: number, pz: number) => [number, number], shade?: (px: number, py: number, pz: number) => number, segZ = 1): THREE.BufferGeometry {
+  const g = new THREE.BoxGeometry(w, h, d, 1, 1, segZ);
   if (uv) {
     const pos = g.getAttribute('position');
     const uva = g.getAttribute('uv') as THREE.BufferAttribute;
@@ -71,12 +71,14 @@ function box(w: number, h: number, d: number, x: number, y: number, z: number, r
     }
   }
   if (color) {
-    const n = g.getAttribute('position').count;
+    const pos = g.getAttribute('position');
+    const n = pos.count;
     const c = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
-      c[i * 3] = color.r;
-      c[i * 3 + 1] = color.g;
-      c[i * 3 + 2] = color.b;
+      const k = shade ? shade(pos.getX(i), pos.getY(i), pos.getZ(i)) : 1;
+      c[i * 3] = color.r * k;
+      c[i * 3 + 1] = color.g * k;
+      c[i * 3 + 2] = color.b * k;
     }
     g.setAttribute('color', new THREE.BufferAttribute(c, 3));
   }
@@ -127,7 +129,18 @@ function boards(pl: ColliderPolyline, rng: Rng, out: Bucket, width = DECK_W): vo
       const v0 = seed * 0.9;
       const wear = rng.next() < 0.12 ? 0.75 : 1;
       col.multiplyScalar(wear);
-      push(out, 'plank', box(BOARD_W, BOARD_T, width - 0.25, cx, cy, 0, ang, col, (px, py, pz) => [pz / 1.5 + seed * 3, v0 + (px + py) * 0.15]));
+      // Round 10 (recipe: edge wear on every plank): both ends of every board darken — grime
+      // and split ends where boots and tyres leave the deck — by a per-end random amount, and
+      // the worn line down the middle is a touch paler where the tyres polish the grain.
+      const endA = 0.5 + rng.next() * 0.35;
+      const endB = 0.5 + rng.next() * 0.35;
+      const half = (width - 0.25) / 2;
+      const endShade = (_px: number, _py: number, pz: number): number => {
+        const e = Math.abs(pz) > half - 0.01 ? (pz < 0 ? endA : endB) : 1;
+        const mid = Math.abs(pz) < 0.4 ? 1.06 : 1;
+        return e * mid;
+      };
+      push(out, 'plank', box(BOARD_W, BOARD_T, width - 0.25, cx, cy, 0, ang, col, (px, py, pz) => [pz / 1.5 + seed * 3, v0 + (px + py) * 0.15], endShade, 4));
       s += pitch;
     }
     carry = s - segLen;
@@ -222,6 +235,22 @@ function ribbonWithShade(pl: ColliderPolyline, section: [number, number][], tile
   return g;
 }
 
+/**
+ * Top of the support-container ledge under the deck at slot `x` (interior biomes): the deck
+ * rides on cross-wise containers that stick out 1.5 m each side, so their roof is a shelf at
+ * `floorY + n·2.59`. Null where the deck is too low for a container (frame / crate / pallets).
+ * Shared with the hall kit, which dresses the ledge (round 10).
+ */
+export function supportLedgeY(profile: { x: number; y: number }[], floorY: number, x: number): number | null {
+  const y = Math.min(profileY(profile, x - 1.2), profileY(profile, x), profileY(profile, x + 1.2));
+  const h = y - 0.12 - floorY;
+  if (h < 2.5) return null;
+  const n = Math.floor(h / 2.59);
+  return n >= 1 ? floorY + n * 2.59 : null;
+}
+/** Support slots are every 2.5 m from the first profile point + 1.25 (same walk as the builder). */
+export const SUPPORT_SLOT = 2.5;
+
 export interface DeckResult extends TrackMeshes {
   /** Extra instanced structure (supports, edging rocks) — counted in track budget. */
   supports: THREE.Group;
@@ -245,7 +274,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   // only for the last < 0.45 m.
   const crates = new PropBatch('support-crate', bakeAO(new THREE.BoxGeometry(2.2, 1, 2.2).translate(0, 0.5, 0), 1, 0.3), lib.get('plywood'), false);
   const containers = new PropBatch('support-container', bakeAO(containerGeometry(), 2.59, 0.4), lib.get('container'));
-  const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a];
+  const palette = [0x1f5a4a, 0x7a2418, 0x1e3d66, 0x46463e, 0x8a5a1e, 0x2e5a2a];
 
   for (const c of track.colliders) {
     if (c.kind !== 'polyline' || c.points.length < 2) continue;
@@ -389,8 +418,8 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   if (interior) {
     const [c, g] = canvas(4, 64);
     const gr = g.createLinearGradient(0, 0, 0, 64);
-    gr.addColorStop(0, 'rgba(0,0,0,0.7)');
-    gr.addColorStop(0.35, 'rgba(0,0,0,0.3)');
+    gr.addColorStop(0, 'rgba(0,0,0,0.45)'); // round 10: 0.7 was a black void under the deck at idle now that SSAO + contact decals exist
+    gr.addColorStop(0.35, 'rgba(0,0,0,0.18)');
     gr.addColorStop(1, 'rgba(0,0,0,0)');
     g.fillStyle = gr;
     g.fillRect(0, 0, 4, 64);

@@ -4,7 +4,7 @@
  * One loader, one parsed document per file, cloned per instance (live + ghost).
  * `?rider=gltf&bike=gltf` (or the settings menu) selects them through `setModels`.
  */
-import * as THREE from 'three';
+import type * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 
@@ -25,7 +25,10 @@ export function loadGltf(url: string): Promise<GLTF | null> {
     p = new Promise<GLTF | null>((resolve) => {
       loader.load(
         url,
-        (g) => resolve(g),
+        (g) => {
+          shrinkTextures(g.scene);
+          resolve(g);
+        },
         undefined,
         (err) => {
           console.warn(`[render] glTF ${url} failed:`, err);
@@ -36,6 +39,46 @@ export function loadGltf(url: string): Promise<GLTF | null> {
     cache.set(url, p);
   }
   return p;
+}
+
+/**
+ * Round 10 (texture budget): the hero ships 2048² albedo + 1024² normal / ORM sets (bike 32 MB,
+ * rider 16 MB at RGBA8 + mips — half the 96 MB cap for a hero that is ≈ 180 px tall at the
+ * riding zoom). Albedo is capped at 1024², normal / ORM at 512², by a canvas downsample at load
+ * (deterministic; the same bitmap in every session). ≈ 48 MB → ≈ 16 MB.
+ */
+export function shrinkTextures(root: THREE.Object3D, albedoMax = 1024, otherMax = 512): void {
+  const done = new Set<THREE.Texture>();
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    for (const mat of mats) {
+      const std = mat as THREE.MeshStandardMaterial;
+      if (!std.isMeshStandardMaterial) continue;
+      for (const key of ['map', 'emissiveMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap'] as const) {
+        const t = std[key];
+        if (!t || done.has(t)) continue;
+        done.add(t);
+        const img = t.image as { width?: number; height?: number } | undefined;
+        const w = img?.width ?? 0;
+        const h = img?.height ?? 0;
+        const max = key === 'map' || key === 'emissiveMap' ? albedoMax : otherMax;
+        if (!w || !h || Math.max(w, h) <= max) continue;
+        const k = max / Math.max(w, h);
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(w * k));
+        c.height = Math.max(1, Math.round(h * k));
+        const g = c.getContext('2d');
+        if (!g) continue;
+        g.imageSmoothingEnabled = true;
+        g.imageSmoothingQuality = 'high';
+        g.drawImage(t.image as CanvasImageSource, 0, 0, c.width, c.height);
+        t.image = c;
+        t.needsUpdate = true;
+      }
+    }
+  });
 }
 
 export const HERO_URLS = { bike: 'models/bike.glb', rider: 'models/rider.glb' } as const;

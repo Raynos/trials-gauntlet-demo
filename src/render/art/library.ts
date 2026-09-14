@@ -179,27 +179,53 @@ export class ArtLibrary {
     // not contending with canyon's sky on a slow link.
     if (this.started && label !== 'art pack' && !this.settled) await this.whenSettled;
     const wanted: ArtEntry[] = [];
+    const inFlight: Promise<void>[] = [];
     for (const id of ids) {
       const e = this.entries.get(id);
-      if (e && !this.fetches.has(id)) wanted.push(e);
+      if (!e) continue;
+      const had = this.fetches.get(id);
+      if (had) inFlight.push(had);
+      else wanted.push(e);
     }
-    if (!wanted.length) return;
+    // Round 10: a request for ids another request is already fetching must still resolve only
+    // once they have landed (a second `setTrack` for the same biome used to resolve at once, so
+    // `whenReady()` returned before the back-wall decals were in and the world stayed procedural).
+    if (!wanted.length) {
+      await Promise.all(inFlight);
+      return;
+    }
     const total = wanted.length;
     const bytesTotal = wanted.reduce((a, e) => a + e.bytes, 0);
     let done = 0;
     let bytes = 0;
     this.progress = { done: 0, total, bytes: 0, bytesTotal, label };
-    this.onProgress?.(0, total, label, 0, bytesTotal);
-    await Promise.all(
-      wanted.map(async (e) => {
+    // Round 10: a throwing loader callback must never abort the fetches (it did: the game's
+    // report callback threw once the loader had closed, `request` rejected before `fetchOne`
+    // ran, `whenReady` resolved on the swallowed rejection and every harness capture rendered
+    // the industrial hall without its back-wall decals — `debugInfo().art.inWorld === false`).
+    const progress = (d: number, by: number): void => {
+      this.progress = { done: d, total, bytes: by, bytesTotal, label };
+      try {
+        this.onProgress?.(d, total, label, by, bytesTotal);
+      } catch (err) {
+        console.warn('[render] art progress callback threw', err);
+      }
+    };
+    progress(0, 0);
+    await Promise.all([
+      ...inFlight,
+      ...wanted.map(async (e) => {
         await this.fetchOne(e);
         done++;
         if (this.bitmaps.has(e.id)) bytes += e.bytes;
-        this.progress = { done, total, bytes, bytesTotal, label };
-        this.onProgress?.(done, total, label, bytes, bytesTotal);
+        progress(done, bytes);
       }),
-    );
-    this.onRequestSettled?.();
+    ]);
+    try {
+      this.onRequestSettled?.();
+    } catch (err) {
+      console.warn('[render] art settle callback threw', err);
+    }
   }
 
   /** True when the manifest is in and every listed id has either decoded or failed (nothing in flight). */

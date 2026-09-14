@@ -18,6 +18,7 @@ import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
 import { canvas, tex } from './canvasTex';
 import { profileY } from './track';
+import { SUPPORT_SLOT, supportLedgeY } from './deck';
 import { drawArt, pickId, tintMask, type ArtLibrary } from '../art/library';
 import {
   PropBatch,
@@ -48,6 +49,8 @@ export interface HallOut {
   lights: THREE.PointLight[];
   scroll: { tex: THREE.Texture; vx: number; vy: number }[];
   fountains: { x: number; y: number; z: number }[];
+  /** High-bay lamp heads (round 10): the renderer parks two spot lights on the nearest ones. */
+  lamps: { x: number; y: number; z: number }[];
   textureBytes: number;
 }
 
@@ -98,8 +101,10 @@ export const HALL = { wallZ: -30, frontZ: 30, height: 16 };
 
 /** One 12 m × 16 m warehouse wall bay: brick, steel column, a 7 m tall window bank + clerestory. Returns albedo + emissive. */
 function warehouseWall(rng: Rng, paneColor: string, brick: string, foundry = false): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture; bytes: number } {
-  const W = 1024;
-  const H = Math.round(1024 * (HALL.height / 12));
+  // Round 10 (texture budget): 512 px per 12 m bay (43 px/m; the wall is ≥ 30 m from any camera,
+  // where a metre is ≈ 17 px) — 14.2 MB → 3.6 MB for albedo + emissive.
+  const W = 512;
+  const H = Math.round(W * (HALL.height / 12));
   const [c, g] = canvas(W, H);
   const [ce, ge] = canvas(W, H);
   const px = W / 12; // pixels per metre
@@ -188,8 +193,11 @@ function warehouseWall(rng: Rng, paneColor: string, brick: string, foundry = fal
     }
     bank(2.0, 12.6, 8.0, 1.4, 8, 1); // clerestory only: 12.6 → 14 m
   } else {
-    bank(2.0, 3.5, 8.0, 7.0, 5, 8); // main bank: 3.5 → 10.5 m
-    bank(2.0, 12.4, 8.0, 2.0, 5, 2); // clerestory: 12.4 → 14.4 m
+    // Round 10: the bank sits ABOVE eye level (sill 6.4 m = deck + 3.4 m) — the reference
+    // halls put their windows in the upper third of the riding frame and the eye-level band is
+    // dark brick behind the stacks. It used to start at 3.5 m and fill the frame behind the bike.
+    bank(2.0, 6.4, 8.0, 6.2, 5, 7); // main bank: 6.4 → 12.6 m
+    bank(2.0, 13.4, 8.0, 1.4, 5, 1); // clerestory: 13.4 → 14.8 m
   }
   // Steel column at the bay edge + girts.
   g.fillStyle = '#26282c';
@@ -217,7 +225,7 @@ const tintCache = new Map<string, HTMLCanvasElement>();
 
 function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: boolean; stripe: boolean }, art: ArtLibrary | null): THREE.CanvasTexture {
   const [c, g] = canvas(1024, 512);
-  g.fillStyle = '#e6e6e2';
+  g.fillStyle = '#d6d6d0';
   g.fillRect(0, 0, 1024, 512);
   for (let x = 0; x < 1024; x += 16) {
     g.fillStyle = 'rgba(0,0,0,0.07)';
@@ -349,7 +357,7 @@ function roofTexture(foundry: boolean): THREE.CanvasTexture {
 export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, rng: Rng, floorY: number, x0: number, x1: number, art: ArtLibrary | null = null): HallOut {
   const keepOut = foregroundKeepOut(track);
   const foundry = biome.id === 'foundry';
-  const out: HallOut = { meshes: [], singles: [], batches: [], flicker: [], lights: [], scroll: [], fountains: [], textureBytes: 0 };
+  const out: HallOut = { meshes: [], singles: [], batches: [], flicker: [], lights: [], scroll: [], fountains: [], lamps: [], textureBytes: 0 };
   const span = x1 - x0;
   const midX = (x0 + x1) / 2;
   const roofY = floorY + HALL.height;
@@ -386,7 +394,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       map: wall.map,
       emissiveMap: wall.emissive,
       emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff0d8),
-      emissiveIntensity: foundry ? 0.6 : 0.95, // p99 of the frame must stay ≈0.92 after tonemap (round 5); foundry: sooty panes, the melt is the light
+      emissiveIntensity: foundry ? 0.6 : 0.55, // round 10: 0.95 made the window bank the brightest thing in every riding frame (a backlit wash); the lamps are the key now
       roughness: 0.95,
     }),
   );
@@ -463,7 +471,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   const lampShade = new PropBatch('lamp', lampGeometry(), steel, false);
   const bulbMat = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: foundry ? 0xff6a2a : 0xffc46a, emissiveIntensity: 7, roughness: 0.4 }));
   const bulb = new PropBatch('bulb', lampBulbGeometry(), bulbMat, false);
-  const coneMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, color: new THREE.Color(foundry ? 0xff7a30 : 0xffc888).multiplyScalar(foundry ? 0.05 : 0.085), side: THREE.DoubleSide, fog: false, vertexColors: true });
+  const coneMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, color: new THREE.Color(foundry ? 0xff7a30 : 0xffc888).multiplyScalar(foundry ? 0.05 : 0.018), side: THREE.DoubleSide, fog: false, vertexColors: true });
   const lampCones = new PropBatch('lampcone', lightConeGeometry(), coneMat, false);
   const poolMask = reflectionMaskTexture();
   out.textureBytes += 256 * 256 * 4;
@@ -478,9 +486,20 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     lampCones.add(x, y - 0.25, z, 0, 1.15, null, 0, y - 0.25 - floorY, 1.15);
     puddles.add(x + rng.range(-0.8, 0.8), floorY + 0.012, z + rng.range(-0.5, 1.0), rng.range(0, 6), rng.range(1.6, 2.8), null, 0, 1, rng.range(1.0, 1.8));
     streaks.add(x, floorY + 0.02, z, 0);
+    out.lamps.push({ x, y, z });
   };
+  // Round 10: the main lamp row hangs just behind the deck (z −3.5) at deck + 5.5–6.5 m, so
+  // each lamp's real spot pool (renderer `lampLights`) lands on the boards and the far ledge
+  // clutter — the sodium pools are the second key, like the reference's D2 / D1 zones. A
+  // second, sparser row stays over the mid hall (z −11) for the depth step.
   for (let x = x0 + 9; x < x1; x += 12) {
-    const z = -10 + rng.range(-1.5, 1.5);
+    const z = -3.5 + rng.range(-0.8, 0.8);
+    const lampY = profileY(profile, x) + rng.range(5.4, 6.4);
+    chains.add(x, roofY, z, 0, 1, null, 0, roofY - lampY, 1);
+    lampAt(x, lampY, z);
+  }
+  for (let x = x0 + 15; x < x1; x += 24) {
+    const z = -11 + rng.range(-1.5, 1.5);
     const lampY = deckY + rng.range(5.5, 7.0);
     chains.add(x, roofY, z, 0, 1, null, 0, roofY - lampY, 1);
     lampAt(x, lampY, z);
@@ -501,6 +520,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       chains.add(x, roofY, z, 0, 1, null, 0, roofY - lampY, 1);
       lampShade.add(x, lampY, z);
       bulb.add(x, lampY, z);
+      out.lamps.push({ x, y: lampY, z });
     }
   }
   out.batches.push(hookTyres, lampCones, puddles, streaks);
@@ -525,7 +545,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     }
     skinBatches.push(new PropBatch(`container${i}`, contGeo, m));
   }
-  const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a, 0x7a3b6a, 0x4a6a8a, 0x9a9a92];
+  const palette = [0x1f5a4a, 0x7a2418, 0x1e3d66, 0x46463e, 0x8a5a1e, 0x2e5a2a, 0x5a2a52, 0x2f4f6e, 0x6a6a62]; // round 10: deeper, more saturated (the pale set read as a grey wall at 18 m)
   const pick = (): number => palette[rng.int(0, palette.length - 1)]!;
   const stack = (x: number, z: number, n: number, ry: number): void => {
     for (let k = 0; k < n; k++) {
@@ -646,6 +666,17 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   }
   out.batches.push(racks, pallets, drums, tyres, palletsFar, drumsFar, tyresFar, cones, railTape, railPost, catwalk, reels, scaffolds, tarps, forklifts, signs);
 
+  // --- Round 10: deck-level dressing (the density tier the riding frame actually sees).
+  // Everything before this sits on the hall floor 3 m under the deck, where the 11–15° riding
+  // camera cannot see it. The reference frames are dense because the clutter is AT the track:
+  // barrels behind the plank, pallets on the container tops, paper and planks on every ledge.
+  // Three shelves: (a) the far support ledge (z −1.7…−3.0, deck − 0.4) — anything, it pokes up
+  // behind the deck; (b) the near ledge (z +1.7…+3.0) — only things ≤ 0.6 m tall, they never
+  // reach the wheels; (c) adjacent containers on the floor at z ≈ −5.2 (mid tier) and z ≈ +5
+  // (foreground, outside spawn keep-outs) with clutter on their roofs. Every prop that touches a
+  // surface gets a contact-shadow decal; paper, gravel and bolts scatter on all three.
+  dressDeckLevel(track, rng, floorY, keepOut, lib, out, skinBatches, pick, { pallets, drums, tyres, cones, reels, forklifts, palletGeo, drumGeo, tyreGeo, reelGeo, steel, foundry, x0, x1 });
+
   // --- Wall decals from the art pack: posters and safety signs low on the back wall between
   // the bays, graffiti pieces on the far container row and the wall. One batch per texture.
   if (art) {
@@ -689,7 +720,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     const wx = x0 + bay * 12 + 6;
     const len = 30;
     const q = new THREE.Mesh(new THREE.PlaneGeometry(8.5, len), shaftMat);
-    const top = new THREE.Vector3(wx, floorY + 7.0, wallZ + 0.3);
+    const top = new THREE.Vector3(wx, floorY + 9.5, wallZ + 0.3);
     q.position.copy(top).addScaledVector(sunDir, len / 2);
     q.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), sunDir);
     q.rotateY(0.3);
@@ -798,4 +829,260 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     // the near steel (see the terrain tint in biomeKit) — GI stands in for the rest.
   }
   return out;
+}
+
+
+// ---------------------------------------------------------------------------
+// Round 10: deck-level dressing
+// ---------------------------------------------------------------------------
+
+/** Radial falloff disc: alpha 1 at the centre → 0 at the rim (contact shadows, oil, puddles). */
+function radialTexture(power = 1.6): THREE.CanvasTexture {
+  const [c, g] = canvas(128, 128);
+  const img = g.createImageData(128, 128);
+  for (let y = 0; y < 128; y++) {
+    for (let x = 0; x < 128; x++) {
+      const dx = (x + 0.5) / 64 - 1;
+      const dy = (y + 0.5) / 64 - 1;
+      const r = Math.min(1, Math.hypot(dx, dy));
+      const a = Math.pow(1 - r, power) * 255;
+      const k = (y * 128 + x) * 4;
+      img.data[k] = img.data[k + 1] = img.data[k + 2] = a;
+      img.data[k + 3] = a;
+    }
+  }
+  g.putImageData(img, 0, 0);
+  return tex(c, false, false);
+}
+
+interface DressKit {
+  pallets: PropBatch;
+  drums: PropBatch;
+  tyres: PropBatch;
+  cones: PropBatch;
+  reels: PropBatch;
+  forklifts: PropBatch;
+  palletGeo: THREE.BufferGeometry;
+  drumGeo: THREE.BufferGeometry;
+  tyreGeo: THREE.BufferGeometry;
+  reelGeo: THREE.BufferGeometry;
+  steel: THREE.MeshStandardMaterial;
+  foundry: boolean;
+  x0: number;
+  x1: number;
+}
+
+function dressDeckLevel(track: CompiledTrack, rng: Rng, floorY: number, keepOut: (x: number, hw?: number) => boolean, lib: MaterialLibrary, out: HallOut, skins: PropBatch[], pickColor: () => number, kit: DressKit): void {
+  const profile = track.def.profile;
+  const { foundry } = kit;
+  const density = foundry ? 0.6 : 1;
+  const vc = (name: string): THREE.MeshStandardMaterial => {
+    const m = lib.get(name);
+    if (!m.vertexColors) {
+      m.vertexColors = true;
+      m.needsUpdate = true;
+    }
+    return fogify(m);
+  };
+  // Contact shadows: one batch, a black radial disc a hair above every surface a prop stands on.
+  const radial = radialTexture(1.8);
+  out.textureBytes += 128 * 128 * 4;
+  // `map` (not `alphaMap`) carries the falloff: the map's alpha is the opacity and the define set stays the lamp-streak one — no new program.
+  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, map: radial, transparent: true, opacity: 0.6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+  const shadows = new PropBatch('contactshadow', new THREE.CircleGeometry(1, 14).rotateX(-Math.PI / 2), shadowMat, false);
+  const shadowAt = (x: number, y: number, z: number, r: number, sz = r): void => shadows.add(x, y + 0.008, z, rng.range(0, 6), r, null, 0, 1, sz);
+  // Oil stains: dark, glossy, catch the lamps; puddles on the ledges reflect the window bank.
+  const oilMat = fogify(new THREE.MeshStandardMaterial({ color: 0x08070a, roughness: 0.22, metalness: 0.4, map: radialTexture(0.9), transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
+  const oil = new PropBatch('oilstain', new THREE.CircleGeometry(1, 12).rotateX(-Math.PI / 2), oilMat, false);
+  // Deck-level prop geometry (all cheap boxes / lathes, AO baked, origin bottom centre).
+  const crateGeo = bakeAO(mergeGeometries([new THREE.BoxGeometry(0.9, 0.72, 0.7).translate(0, 0.36, 0), new THREE.BoxGeometry(0.94, 0.06, 0.74).translate(0, 0.03, 0), new THREE.BoxGeometry(0.94, 0.06, 0.74).translate(0, 0.69, 0), new THREE.BoxGeometry(0.06, 0.72, 0.74).translate(0, 0.36, 0)], false)!, 0.72, 0.35);
+  const crates = new PropBatch('crate', crateGeo, vc('plywood'));
+  const bundleGeo = bakeAO(
+    mergeGeometries(
+      [
+        ...[0, 1, 2].flatMap((row) => [0, 1].map((k) => new THREE.BoxGeometry(2.4, 0.045, 0.22).translate(0, 0.0225 + row * 0.05, -0.12 + k * 0.24))),
+        new THREE.BoxGeometry(0.05, 0.16, 0.5).translate(-0.9, 0.08, 0),
+        new THREE.BoxGeometry(0.05, 0.16, 0.5).translate(0.9, 0.08, 0),
+      ],
+      false,
+    )!,
+    0.16,
+    0.3,
+  );
+  const bundles = new PropBatch('plankbundle', bundleGeo, vc('plank'));
+  const plankEndGeo = new THREE.BoxGeometry(0.9, 0.045, 0.22).translate(0, 0.0225, 0);
+  const plankEnds = new PropBatch('plankend', bakeAO(plankEndGeo, 0.045, 0.2), vc('plank'));
+  const cartGeo = bakeAO(
+    mergeGeometries(
+      [
+        new THREE.BoxGeometry(0.8, 0.7, 0.5).translate(0, 0.5, 0),
+        new THREE.BoxGeometry(0.84, 0.05, 0.54).translate(0, 0.87, 0),
+        new THREE.CylinderGeometry(0.02, 0.02, 0.9, 6).translate(-0.44, 0.75, 0),
+        new THREE.BoxGeometry(0.03, 0.03, 0.5).translate(-0.44, 1.2, 0),
+        ...[-0.3, 0.3].flatMap((x) => [-0.22, 0.22].map((z) => new THREE.CylinderGeometry(0.07, 0.07, 0.05, 8).rotateX(Math.PI / 2).translate(x, 0.07, z))),
+      ],
+      false,
+    )!,
+    0.9,
+    0.3,
+  );
+  const carts = new PropBatch('toolcart', cartGeo, vc('barrelRed'));
+  const bottleGeo = bakeAO(mergeGeometries([new THREE.CylinderGeometry(0.115, 0.115, 1.3, 10).translate(0, 0.65, 0), new THREE.SphereGeometry(0.115, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, 1.3, 0), new THREE.CylinderGeometry(0.03, 0.03, 0.12, 6).translate(0, 1.45, 0)], false)!, 1.4, 0.35);
+  const bottles = new PropBatch('gasbottle', bottleGeo, vc('darkSteel'));
+  const tyreFlat = new PropBatch('tyreflat', bakeAO(new THREE.TorusGeometry(0.28, 0.1, 6, 14).rotateX(Math.PI / 2).translate(0, 0.1, 0), 0.2, 0.2), vc('tyre'));
+  const drumLying = new PropBatch('drumlying', bakeAO(drumGeometry().rotateZ(Math.PI / 2).translate(0, 0.29, 0), 0.58, 0.3), vc('barrelRed'));
+  const paper = new PropBatch('paper', new THREE.PlaneGeometry(0.5, 0.7).rotateX(-Math.PI / 2), fogify(new THREE.MeshStandardMaterial({ color: 0xd8d0c0, roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 })), false);
+  const gravel = new PropBatch('gravel', bakeAO(new THREE.IcosahedronGeometry(0.07, 0), 0.14, 0.4), fogify(new THREE.MeshStandardMaterial({ color: 0x5a544c, roughness: 0.95 })), false);
+  const bolts = new PropBatch('bolt', new THREE.CylinderGeometry(0.028, 0.028, 0.03, 6).translate(0, 0.015, 0), kit.steel, false);
+  const chainMat = kit.steel;
+  const hangChains = new PropBatch('hangchain', chainGeometry(), chainMat, false);
+  const hooks = new PropBatch('hook', hookBlockGeometry(), vc('rustSteel'));
+  const rackGeo = bakeAO(rackGeometry(), 4, 0.35);
+  const racksNear = new PropBatch('racknear', rackGeo, vc('rustSteel'));
+  const palette = [0xa42a1e, 0x244d8a, 0xd8d2c4, 0x3d6b3a, 0x6b6b60, 0xe0a020];
+  const drumColor = (): number => palette[rng.int(0, palette.length - 1)]!;
+
+  const roofY = floorY + HALL.height;
+  const start = profile[0]!.x;
+  const end = profile[profile.length - 1]!.x;
+
+  /** Scatter on a horizontal patch: paper sheets, gravel, bolts (density per m²). */
+  const scatter = (x: number, y: number, z: number, w: number, d: number, k = 1): void => {
+    const area = w * d * k * density;
+    for (let i = 0, n = Math.round(area * 0.5 * rng.range(0.5, 1.5)); i < n; i++) paper.add(x + rng.range(-w / 2, w / 2), y + 0.006, z + rng.range(-d / 2, d / 2), rng.range(0, 6), rng.range(0.6, 1.3), [0xd8d0c0, 0xb8a888, 0xc8c0b0, 0x8a7a60][rng.int(0, 3)]!);
+    for (let i = 0, n = Math.round(area * 1.4 * rng.range(0.5, 1.5)); i < n; i++) gravel.add(x + rng.range(-w / 2, w / 2), y, z + rng.range(-d / 2, d / 2), rng.range(0, 6), rng.range(0.4, 1.1), null, 0, rng.range(0.3, 0.7), rng.range(0.4, 1.1));
+    for (let i = 0, n = Math.round(area * 0.9 * rng.range(0.5, 1.5)); i < n; i++) bolts.add(x + rng.range(-w / 2, w / 2), y, z + rng.range(-d / 2, d / 2), rng.range(0, 6));
+  };
+  /** A cluster of clutter standing on a surface at (x, y, z); `tall` allows things > 0.6 m. */
+  const cluster = (x: number, y: number, z: number, tall: boolean, w: number): void => {
+    const r = rng.next();
+    if (tall && r < 0.28) {
+      const n = rng.int(2, 4);
+      for (let k = 0; k < n; k++) {
+        const dx = x - ((n - 1) * 0.62) / 2 + k * 0.62;
+        kit.drums.add(dx, y, z + rng.range(-0.15, 0.15), rng.range(0, 6), 1, drumColor());
+        shadowAt(dx, y, z, 0.4);
+      }
+    } else if (tall && r < 0.42) {
+      const n = rng.int(3, 8);
+      for (let k = 0; k < n; k++) kit.pallets.add(x + rng.range(-0.03, 0.03), y + k * 0.144, z, rng.range(-0.15, 0.15));
+      shadowAt(x, y, z, 0.8, 0.6);
+      if (rng.next() < 0.5) {
+        crates.add(x, y + n * 0.144, z, rng.range(-0.3, 0.3), rng.range(0.7, 1));
+      }
+    } else if (tall && r < 0.52) {
+      kit.tyres.add(x, y, z, rng.range(0, 6));
+      shadowAt(x, y, z, 0.42);
+    } else if (tall && r < 0.6) {
+      kit.reels.add(x, y, z, rng.range(0, 6), rng.range(0.55, 0.85));
+      shadowAt(x, y, z, 0.8, 0.5);
+    } else if (tall && r < 0.68) {
+      carts.add(x, y, z, rng.range(-0.4, 0.4) + (rng.next() < 0.5 ? Math.PI : 0));
+      shadowAt(x, y, z, 0.5, 0.35);
+    } else if (tall && r < 0.76) {
+      const n = rng.int(1, 3);
+      for (let k = 0; k < n; k++) {
+        bottles.add(x + k * 0.26, y, z, 0, 1, [0x2a4f7a, 0x8a8a80, 0x6b2a20][rng.int(0, 2)]!);
+        shadowAt(x + k * 0.26, y, z, 0.16);
+      }
+    } else if (r < 0.82) {
+      tyreFlat.add(x, y, z, rng.range(0, 6));
+      if (rng.next() < 0.5) tyreFlat.add(x + 0.12, y + 0.2, z + 0.08, rng.range(0, 6));
+      shadowAt(x, y, z, 0.4);
+    } else if (r < 0.88) {
+      drumLying.add(x, y, z, rng.range(-0.3, 0.3), 1, drumColor());
+      shadowAt(x, y, z, 0.55, 0.36);
+    } else if (r < 0.93) {
+      bundles.add(x, y, z, rng.range(-0.2, 0.2) + (rng.next() < 0.3 ? Math.PI / 2 : 0));
+      shadowAt(x, y, z, 1.3, 0.35);
+    } else if (r < 0.97) {
+      kit.cones.add(x, y, z, rng.range(0, 6));
+      if (rng.next() < 0.6) kit.cones.add(x + rng.range(0.4, 0.9), y, z + rng.range(-0.2, 0.2), rng.range(0, 6));
+      shadowAt(x, y, z, 0.22);
+    } else {
+      for (let k = 0, n = rng.int(2, 4); k < n; k++) plankEnds.add(x + rng.range(-0.3, 0.3), y + k * 0.045, z + rng.range(-0.15, 0.15), rng.range(-0.3, 0.3));
+      shadowAt(x, y, z, 0.5, 0.25);
+    }
+    scatter(x, y, z, w, 1.0, 0.5);
+  };
+
+  // (a) + (b): the support ledges, slot by slot (same walk as the deck builder).
+  for (let x = start + SUPPORT_SLOT / 2; x < end; x += SUPPORT_SLOT) {
+    const ledge = supportLedgeY(profile, floorY, x);
+    if (ledge === null) continue;
+    const deck = profileY(profile, x);
+    if (deck - ledge > 3.2) continue; // the ledge is too far under the deck to read from the riding camera
+    // Far ledge: dense (a cluster on ≈ 55 % of slots), tall things allowed. Where the deck
+    // climbs more than 0.9 m above the ledge the clutter would hide under the deck line, so on
+    // 45 % of those slots a stored pallet stack raises it to deck − 0.45 first.
+    if (rng.next() < 0.55 * density) {
+      let shelf = ledge;
+      const fz = rng.range(-2.75, -2.05);
+      const fx = x + rng.range(-0.6, 0.6);
+      if (deck - ledge > 0.9 && rng.next() < 0.72) {
+        const n = Math.min(14, Math.round((deck - 0.45 - ledge) / 0.144));
+        for (let k = 0; k < n; k++) kit.pallets.add(fx + rng.range(-0.02, 0.02), ledge + k * 0.144, fz, rng.range(-0.06, 0.06));
+        shadowAt(fx, ledge, fz, 0.8, 0.6);
+        shelf = ledge + n * 0.144;
+      }
+      cluster(fx, shelf, fz, true, 2.2);
+    } else scatter(x, ledge, -2.35, 2.2, 1.2, 0.35);
+    // Oil on the far ledge now and then.
+    if (rng.next() < 0.2) oil.add(x + rng.range(-0.8, 0.8), ledge, rng.range(-2.7, -2.0), rng.range(0, 6), rng.range(0.35, 0.7), null, 0, 1, rng.range(0.35, 0.7));
+    // Near ledge: only low things, and nothing near a spawn (the bike must read clean there).
+    if (keepOut(x, 1)) continue;
+    if (rng.next() < 0.32 * density) cluster(x + rng.range(-0.6, 0.6), ledge, rng.range(2.05, 2.75), false, 2.2);
+    else if (rng.next() < 0.5) scatter(x, ledge, 2.35, 2.2, 1.2, 0.3);
+  }
+  // Deck top: bolts and a little gravel along the plywood edges, oil on the boards now and then
+  // (flat stretches only, never in a spawn keep-out).
+  for (let x = start + 3; x < end - 3; x += rng.range(2.5, 5)) {
+    if (keepOut(x, 1.5)) continue;
+    const slope = Math.abs(profileY(profile, x + 1) - profileY(profile, x - 1));
+    if (slope > 0.12) continue;
+    const y = profileY(profile, x);
+    for (const side of [-1, 1]) scatter(x, y + 0.004, side * 1.25, 2.0, 0.4, 0.5);
+    if (rng.next() < 0.22) oil.add(x, y + 0.006, rng.range(-0.9, 0.9), rng.range(0, 6), rng.range(0.3, 0.55), null, 0, 1, rng.range(0.3, 0.55));
+  }
+  // (c) Adjacent containers on the floor: mid tier right behind the far ledge (z −5.2), 1–2
+  // high with clutter on the roof; foreground singles at z +5 outside spawn keep-outs with low
+  // clutter on the roof (they sit 6–7 m in front of the riding camera, well under the deck line).
+  const contRoof = 2.59;
+  for (let x = kit.x0 + 24; x < kit.x1 - 12; x += rng.range(13, 24)) {
+    if (rng.next() < 0.3) continue;
+    const z = -5.2 + rng.range(-0.4, 0.4);
+    const n = rng.next() < 0.3 ? 2 : 1;
+    const turned = rng.next() < 0.25; // end-on now and then so the row is not one flat wall
+    for (let k = 0; k < n; k++) skins[rng.int(0, skins.length - 1)]!.add(x + rng.range(-0.1, 0.1), floorY + k * contRoof, z - (turned ? 1.6 : 0), (turned ? Math.PI / 2 : 0) + rng.range(-0.04, 0.04) + (rng.next() < 0.5 ? Math.PI : 0), 1, pickColor());
+    shadowAt(x, floorY, z, 3.6, 1.6);
+    const top = floorY + n * contRoof;
+    // Roof clutter: 1–3 clusters along the 6 m roof.
+    for (let k = 0, m = rng.int(1, 3); k < m; k++) cluster(x + rng.range(-2.4, 2.4), top, z + rng.range(-0.7, 0.7), true, 2.5);
+    scatter(x, top, z, 5.6, 2.2, 0.25);
+    // A chain and hook off the truss above, or a lamp-lit hanging tarp corner: hangs reads depth.
+    if (rng.next() < 0.5) {
+      const hy = top + rng.range(2.2, 3.6);
+      hangChains.add(x + rng.range(-2, 2), roofY - 1.4, z, 0, 1, null, 0, roofY - 1.4 - hy, 1);
+      hooks.add(x + rng.range(-2, 2), hy - 0.7, z);
+    }
+  }
+  // Pallet racks standing on the floor between the containers (top at floor + 4 ≈ deck + 1).
+  for (let x = kit.x0 + 30; x < kit.x1 - 12; x += rng.range(28, 50)) {
+    racksNear.add(x, floorY, -5.6 + rng.range(-0.3, 0.3), 0, 1);
+    shadowAt(x, floorY, -5.6, 1.6, 0.8);
+  }
+  // Foreground containers (near side): sparse, never inside a spawn keep-out.
+  for (let x = kit.x0 + 40; x < kit.x1 - 20; x += rng.range(30, 48)) {
+    if (keepOut(x, 4)) continue;
+    const z = 5.2 + rng.range(-0.3, 0.6);
+    skins[rng.int(0, skins.length - 1)]!.add(x, floorY, z, rng.range(-0.05, 0.05) + (rng.next() < 0.5 ? Math.PI : 0), 1, pickColor());
+    shadowAt(x, floorY, z, 3.6, 1.6);
+    const top = floorY + contRoof;
+    for (let k = 0, m = rng.int(1, 2); k < m; k++) cluster(x + rng.range(-2.2, 2.2), top, z + rng.range(-0.5, 0.5), rng.next() < 0.5, 2.5);
+    scatter(x, top, z, 5.6, 2.2, 0.25);
+  }
+  // Floor under the deck edges (visible in the idle 3/4 view and on wide pull-backs): contact
+  // shadows under the existing floor clutter are cheap, so scatter a little there too.
+  for (let x = kit.x0 + 10; x < kit.x1 - 10; x += rng.range(6, 12)) scatter(x, floorY, rng.range(-9, -4.5), 3, 2, 0.25);
+  out.batches.push(shadows, oil, crates, bundles, plankEnds, carts, bottles, tyreFlat, drumLying, paper, gravel, bolts, hangChains, hooks, racksNear);
 }

@@ -57,7 +57,11 @@ export interface ThreeRendererOptions {
   pixelRatio?: number;
   preserveDrawingBuffer?: boolean;
   quality?: QualityTier;
-  /** Hero model choice (`?rider=gltf&bike=gltf`); default procedural. */
+  /**
+   * Hero model choice (`?rider=proc&bike=proc` to force the procedural kit). Round 10: the
+   * default is the glTF hero; the procedural kit stays as the load-failure fallback (a glTF
+   * that fails to load resolves null and `applyModels` keeps the procedural meshes).
+   */
   riderModel?: ModelChoice;
   bikeModel?: ModelChoice;
 }
@@ -89,6 +93,9 @@ interface World {
   /** Melt sources (foundry): the two follow lights snap to the nearest ones each frame. */
   fountains: { x: number; y: number; z: number }[];
   meltLights: THREE.PointLight[];
+  /** Round 10: high-bay lamp heads + the two follow spots parked on the nearest ones. */
+  lamps: { x: number; y: number; z: number }[];
+  lampLights: THREE.SpotLight[];
   /** `frameCount` when the world was built: a rebuild is only allowed before the first frame. */
   builtAtFrame: number;
 }
@@ -178,7 +185,11 @@ export class ThreeRenderer implements GameRenderer {
     // Round 9: the constructor is the WebGL context only. Lighting (sky PMREM), the hero
     // meshes, the post chain, the procedural textures and the art pack are built by
     // `prepare()` in ≤ 16 ms tasks (or lazily by the first call that needs them).
-    if (options.riderModel === 'gltf' || options.bikeModel === 'gltf') this.setModels({ riderModel: options.riderModel ?? 'proc', bikeModel: options.bikeModel ?? 'proc' });
+    {
+      const riderModel: ModelChoice = options.riderModel ?? 'gltf';
+      const bikeModel: ModelChoice = options.bikeModel ?? 'gltf';
+      if (riderModel === 'gltf' || bikeModel === 'gltf') this.setModels({ riderModel, bikeModel });
+    }
     // Art progress goes to whatever loader callback `prepare` installed (per-track requests
     // after boot show as a background phase: "World art · canyon 3/4 (0.12 / 0.20 MB)").
     const mb = (b: number): string => `${(b / (1024 * 1024)).toFixed(2)} MB`;
@@ -187,8 +198,7 @@ export class ThreeRenderer implements GameRenderer {
       // Determinism: a world that has already been drawn is never swapped mid-run (a capture is
       // all-art or all-procedural); the next setTrack picks the pack up. Callers that need the
       // art-complete first frame await `whenReady()` before rendering.
-      const w = this.world;
-      if (this.track && w && this.art.ok && w.builtAtFrame === this.frameCount && w.artKey !== this.artKey()) this.setTrack(this.track);
+      this.rebuildIfArtLanded();
     };
     (window as unknown as { __render?: ThreeRenderer }).__render = this; // debug handle for the harness
     performance.mark?.('render:ctor');
@@ -374,7 +384,20 @@ export class ThreeRenderer implements GameRenderer {
    */
   whenReady(): Promise<void> {
     const req = this.artRequest;
-    return Promise.all([this.art.whenSettled, req, this.heroPending]).then(() => (this.artRequest !== req ? this.whenReady() : undefined));
+    return Promise.all([this.art.whenSettled, req, this.heroPending]).then(() => {
+      if (this.artRequest !== req) return this.whenReady();
+      // Round 10: the settle callback only rebuilds an undrawn world; do the same here so a
+      // caller that awaits `whenReady()` right after `setTrack` gets the art-complete world
+      // even when the settle fired before `setTrack` finished wiring it.
+      this.rebuildIfArtLanded();
+      return undefined;
+    });
+  }
+
+  /** Rebuild the world with the pack if it settled after the build and nothing has been drawn since. */
+  private rebuildIfArtLanded(): void {
+    const w = this.world;
+    if (this.track && w && this.art.ok && w.builtAtFrame === this.frameCount && w.artKey !== this.artKey()) this.setTrack(this.track);
   }
 
   private prepared: Promise<void> | null = null;
@@ -554,7 +577,7 @@ export class ThreeRenderer implements GameRenderer {
     void this.art.load();
     if (!this.art.requested(this.artIds)) {
       const pending = this.art.pendingBytes(this.artIds);
-      this.artRequest = this.art.request(this.artIds, `${biome.id} (${(pending / (1024 * 1024)).toFixed(2)} MB)`).catch(() => undefined);
+      this.artRequest = this.art.request(this.artIds, `${biome.id} (${(pending / (1024 * 1024)).toFixed(2)} MB)`).catch((err) => console.warn('[render] art request failed', err));
     }
     // All-or-nothing (determinism): the world uses the pack only once this biome's whole set has
     // settled; a partial set would make two captures differ by which files had landed.
@@ -618,7 +641,21 @@ export class ThreeRenderer implements GameRenderer {
       builtAtFrame: this.frameCount,
       fountains: kit.fountains,
       meltLights: [],
+      lamps: kit.lamps,
+      lampLights: [],
     };
+    if (this.biome.lampLights && kit.lamps.length) {
+      // Round 10 recipe: the sodium high-bays are a real second key. Two spots (no shadow map;
+      // the cone decal + puddle carry the volumetric read) sit on the two lamp heads nearest the
+      // camera target every frame — a pure function of state, like the foundry melt lights.
+      const L = this.biome.lampLights;
+      for (let i = 0; i < 2; i++) {
+        const sl = new THREE.SpotLight(L.color, L.intensity, L.distance, L.angle, L.penumbra, 2);
+        sl.castShadow = false;
+        group.add(sl, sl.target);
+        this.world.lampLights.push(sl);
+      }
+    }
     if (this.biome.id === 'foundry' && kit.fountains.length) {
       // Camera-following melt lights: the two nearest pours / furnace mouths light the kit and
       // the hero from below (no GI; the emissive melt lights nothing by itself).
@@ -824,6 +861,37 @@ export class ThreeRenderer implements GameRenderer {
           pl.intensity = 140 * flick;
         });
       }
+      if (w.lampLights.length) {
+        const tx = this.rig.targetX;
+        let a = -1;
+        let b = -1;
+        let da = Infinity;
+        let db = Infinity;
+        for (let i = 0; i < w.lamps.length; i++) {
+          const d = Math.abs(w.lamps[i]!.x - tx);
+          if (d < da) {
+            b = a;
+            db = da;
+            a = i;
+            da = d;
+          } else if (d < db) {
+            b = i;
+            db = d;
+          }
+        }
+        [a, b].forEach((idx, k) => {
+          const sl = w.lampLights[k]!;
+          if (idx < 0) {
+            sl.intensity = 0;
+            return;
+          }
+          const l = w.lamps[idx]!;
+          sl.position.set(l.x, l.y - 0.2, l.z);
+          sl.target.position.set(l.x, l.y - 8, l.z + 0.6);
+          sl.target.updateMatrixWorld();
+          sl.intensity = this.biome.lampLights!.intensity;
+        });
+      }
       // Crowd: cheer for 3.5 s after GO and through the finish; sway otherwise.
       const cheer = this.phase === 'finished' || f.finished || (this.phase === 'riding' && this.runTime < 3.5) ? 1 : 0;
       w.gates.anim.uTime.value = f.tSim;
@@ -887,8 +955,44 @@ export class ThreeRenderer implements GameRenderer {
     };
   }
 
+  /**
+   * Round 10 evidence: instanced props whose instance origin is inside the view frustum and
+   * within `maxDist` m of the camera (structure, decals, scatter and shadows excluded) — the
+   * "lit props in frame" count of the industrial recipe, by batch.
+   */
+  propsInFrame(maxDist = 60): { total: number; byBatch: Record<string, number>; structure: number } {
+    const cam = this.rig.camera;
+    cam.updateMatrixWorld();
+    const frustum = new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse));
+    const m = new THREE.Matrix4();
+    const p = new THREE.Vector3();
+    const camPos = cam.getWorldPosition(new THREE.Vector3());
+    const skip = /^props:(truss|purlin|column|cranerail|chain|hangchain|catwalk|rail|railpost|lampcone|lampstreak|puddle|contactshadow|oilstain|paper|gravel|bolt|decal:.*|support-.*|edge-rock|worn|crowd.*|flag.*|barrier.*|strip.*)(:|$)/;
+    const byBatch: Record<string, number> = {};
+    let total = 0;
+    let structure = 0;
+    this.scene.traverse((o) => {
+      const im = o as THREE.InstancedMesh;
+      if (!im.isInstancedMesh || !o.name.startsWith('props:')) return;
+      const batch = o.name.split(':').slice(1, -1).join(':');
+      const isStructure = skip.test(o.name);
+      o.updateMatrixWorld();
+      for (let i = 0; i < im.count; i++) {
+        im.getMatrixAt(i, m);
+        p.setFromMatrixPosition(m).applyMatrix4(o.matrixWorld);
+        if (p.distanceTo(camPos) > maxDist || !frustum.containsPoint(p)) continue;
+        if (isStructure) structure++;
+        else {
+          total++;
+          byBatch[batch] = (byBatch[batch] ?? 0) + 1;
+        }
+      }
+    });
+    return { total, byBatch, structure };
+  }
+
   /** Extra diagnostics for the harness / perf report. */
-  debugInfo(): { biome: string; zoom: string; phase: GamePhase; tier: QualityTier; trackCalls: number; trackTris: number; textureGenMs: number; passes: number; art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean; trackComplete: boolean; trackIds: number }; prepare: { step: string; ms: number; bytes: number }[] } {
+  debugInfo(): { biome: string; zoom: string; phase: GamePhase; tier: QualityTier; trackCalls: number; trackTris: number; textureGenMs: number; passes: number; art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean; trackComplete: boolean; trackIds: number; builtAtFrame: number; frames: number }; prepare: { step: string; ms: number; bytes: number }[] } {
     return {
       prepare: this.prepareTimeline,
       biome: this.biome.id,
@@ -899,7 +1003,7 @@ export class ThreeRenderer implements GameRenderer {
       trackTris: Math.round(this.world?.trackTris ?? 0),
       textureGenMs: this.textureGenMs,
       passes: this.postRef?.info.passes ?? 0,
-      art: { settled: this.art.settled, ok: this.art.ok, loadMs: Math.round(this.art.loadMs), deliveredMB: +(this.art.bytesDelivered / (1024 * 1024)).toFixed(2), inWorld: this.world?.withArt ?? false, trackComplete: this.art.requested(this.artIds), trackIds: this.artIds.length },
+      art: { settled: this.art.settled, ok: this.art.ok, loadMs: Math.round(this.art.loadMs), deliveredMB: +(this.art.bytesDelivered / (1024 * 1024)).toFixed(2), inWorld: this.world?.withArt ?? false, trackComplete: this.art.requested(this.artIds), trackIds: this.artIds.length, builtAtFrame: this.world?.builtAtFrame ?? -1, frames: this.frameCount },
     };
   }
 

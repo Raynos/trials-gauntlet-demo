@@ -42,6 +42,8 @@ export interface BiomeKit {
   scroll: { tex: THREE.Texture; vx: number; vy: number }[];
   /** Spark fountain positions (foundry ladles / pours). */
   fountains: { x: number; y: number; z: number }[];
+  /** High-bay lamp heads (interior kits, round 10): the renderer's two follow spots park on the nearest. */
+  lamps: { x: number; y: number; z: number }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -549,6 +551,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
   const lights: THREE.PointLight[] = [];
   const scroll: BiomeKit['scroll'] = [];
   const fountains: BiomeKit['fountains'] = [];
+  const lamps: BiomeKit['lamps'] = [];
   let textureBytes = 0;
   const profile = track.def.profile;
   const x0 = track.bounds.minX - 40;
@@ -624,6 +627,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
     lights.push(...hall.lights);
     scroll.push(...hall.scroll);
     fountains.push(...hall.fountains);
+    lamps.push(...hall.lamps);
     textureBytes += hall.textureBytes;
   } else {
     // Exterior backdrop. Round 8: with the art pack the far layer is the painted plate
@@ -991,5 +995,5 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
     triangles += triCount(b.geometry) * b.count;
   }
   for (const l of lights) group.add(l);
-  return { group, drawCalls, triangles, textureBytes, flicker, lights, scroll, fountains };
+  return { group, drawCalls, triangles, textureBytes, flicker, lights, scroll, fountains, lamps };
 }

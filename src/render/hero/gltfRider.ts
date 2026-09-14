@@ -222,7 +222,8 @@ export class GltfRider {
           const pb = f.ragdoll.find((b) => b.id === 'pelvis');
           const residual = pb ? Math.hypot(pb.pos.x - H.pelvisP.x, pb.pos.y - H.pelvisP.y) : 0;
           this.debug.ragdollResidual = +residual.toFixed(3);
-          const frames = residual < 0.1 ? 2 : residual < 0.2 ? 3 : residual < 0.3 ? 4 : 5;
+          // Round 10: physics' crash chain is now a port of pose.ts (residual ≤ 1 cm on flat-test), so the hand-over is a fixed 2-frame slerp; anything longer read as the rider sliding into the ragdoll.
+          const frames = residual < 0.25 ? 2 : 3;
           H.dur = frames / 60;
           H.t0 = f.tSim;
           H.active = true;
