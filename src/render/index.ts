@@ -1,12 +1,25 @@
 /**
- * Render contract + scaffold implementation.
+ * Render contract + ThreeRenderer facade (CONTRACT.md §2.7).
  *
- * `ThreeRenderer` draws the physics snapshot as placeholder geometry (frame
- * box, two wheel discs, rider capsule, ground ribbon) with a following camera.
- * The real art pipeline replaces the meshes; the interface and stats stay.
+ * The renderer is a pure function of (state history, events, simulated time):
+ * nothing in `render()` reads the wall clock to decide what to draw, so two
+ * captures of one recording are pixel-identical. See docs/design/rendering.md.
  */
 import * as THREE from 'three';
-import type { CompiledTrack, PhysicsState, RenderStats } from '../core/types';
+import type { CameraDebug, CompiledTrack, GameEvent, GamePhase, PhysicsState, QualityTier, RenderStats } from '../core/types';
+import { biomeFor, type Biome } from './biomes';
+import { BikeModel } from './bike/bikeModel';
+import { CameraRig } from './camera/rig';
+import { FrameBuilder } from './frame';
+import { LightingRig } from './lighting/environment';
+import { MaterialLibrary } from './materials/library';
+import { Emitters } from './particles/emitters';
+import { PostChain } from './post/chain';
+import { RiderModel } from './rider/riderModel';
+import { buildBiomeKit } from './world/biomeKit';
+import { buildGates, type Gates } from './world/gates';
+import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
+import { buildRibbons } from './world/track';
 
 export interface GameRenderer {
   readonly canvas: HTMLCanvasElement;
@@ -19,217 +32,245 @@ export interface GameRenderer {
   stats(): RenderStats;
   readonly framesRendered: number;
   dispose(): void;
+  // CONTRACT §2.7 additions
+  onEvent(e: GameEvent): void;
+  setQuality(tier: QualityTier): void;
+  camera(): CameraDebug;
+  setRunInfo(info: { runTime: number; phase: GamePhase }): void;
 }
 
 export interface ThreeRendererOptions {
   antialias?: boolean;
   pixelRatio?: number;
-  /** Force a specific context for diagnostics. Defaults to auto (webgl2). */
   preserveDrawingBuffer?: boolean;
+  quality?: QualityTier;
 }
 
-interface Placeholder {
-  root: THREE.Group;
-  frame: THREE.Mesh;
-  rear: THREE.Mesh;
-  front: THREE.Mesh;
-  rider: THREE.Mesh;
+export interface RenderBudget {
+  calls: number;
+  triangles: number;
+  texturesMB: number;
+}
+export const RENDER_BUDGET: RenderBudget = { calls: 300, triangles: 500_000, texturesMB: 96 };
+
+interface World {
+  group: THREE.Group;
+  obstacles: ObstacleMeshes;
+  gates: Gates;
+  flicker: THREE.MeshStandardMaterial[];
+  flickerBase: number[];
+  textureBytes: number;
+  trackCalls: number;
+  trackTris: number;
 }
 
 export class ThreeRenderer implements GameRenderer {
   readonly canvas: HTMLCanvasElement;
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
-  private readonly camera: THREE.PerspectiveCamera;
-  private readonly placeholder: Placeholder;
-  private ground: THREE.Mesh | null = null;
-  private finishGate: THREE.Mesh | null = null;
-  private checkpointGates: THREE.Mesh[] = [];
-  private frames = 0;
+  private readonly lib: MaterialLibrary;
+  private readonly lighting: LightingRig;
+  private readonly rig = new CameraRig();
+  private readonly bike: BikeModel;
+  private readonly rider: RiderModel;
+  private readonly emitters = new Emitters();
+  private readonly post: PostChain;
+  private readonly frames = new FrameBuilder();
+  private world: World | null = null;
+  private biome: Biome = biomeFor('industrial');
+  private frameCount = 0;
+  private tier: QualityTier;
+  private height = 720;
+  private pixelRatio: number;
+  private phase: GamePhase = 'riding';
+  private flashT = -1;
+  private lastTSim = 0;
   private readonly rendererString: string;
   private readonly contextKind: string;
-  private readonly camTarget = new THREE.Vector3();
-  private readonly camPos = new THREE.Vector3();
-  private cameraPrimed = false;
+  private readonly syncPixel = new Uint8Array(4);
+  private readonly tmp = new THREE.Vector3();
+  private lastCheckpoint = -1;
+  /** Wall-clock ms spent generating textures (diagnostic only). */
+  textureGenMs = 0;
 
   constructor(parent: HTMLElement, options: ThreeRendererOptions = {}) {
     this.canvas = document.createElement('canvas');
     parent.appendChild(this.canvas);
-
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      antialias: options.antialias ?? true,
+      antialias: options.antialias ?? false, // MSAA happens in the composer target when supported
       powerPreference: 'high-performance',
       preserveDrawingBuffer: options.preserveDrawingBuffer ?? false,
     });
-    this.renderer.setPixelRatio(options.pixelRatio ?? Math.min(window.devicePixelRatio || 1, 2));
+    this.pixelRatio = options.pixelRatio ?? Math.min(window.devicePixelRatio || 1, 2);
+    this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.0;
+    this.renderer.toneMapping = THREE.NoToneMapping; // ACES lives in the composite pass
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     const gl = this.renderer.getContext();
     this.contextKind = gl instanceof WebGL2RenderingContext ? 'webgl2' : 'webgl';
     this.rendererString = describeRenderer(gl);
 
-    this.camera = new THREE.PerspectiveCamera(38, 16 / 9, 0.1, 500);
-    this.scene.background = new THREE.Color(0x10141a);
-    this.scene.fog = new THREE.Fog(0x10141a, 40, 140);
-
-    const hemi = new THREE.HemisphereLight(0xbfd4ff, 0x30241a, 0.9);
-    this.scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xfff1dc, 2.2);
-    sun.position.set(-8, 14, 12);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(1024, 1024);
-    sun.shadow.camera.near = 1;
-    sun.shadow.camera.far = 60;
-    sun.shadow.camera.left = -20;
-    sun.shadow.camera.right = 20;
-    sun.shadow.camera.top = 20;
-    sun.shadow.camera.bottom = -20;
-    this.scene.add(sun);
-    this.scene.add(sun.target);
-    this.sun = sun;
-
-    this.placeholder = this.buildPlaceholder();
-    this.scene.add(this.placeholder.root);
+    this.lib = new MaterialLibrary(0x7a1a15);
+    this.lighting = new LightingRig(this.renderer, this.scene);
+    this.bike = new BikeModel(this.lib);
+    this.rider = new RiderModel(this.lib);
+    this.rider.attach(this.bike);
+    this.scene.add(this.bike.root, this.rider.root, this.emitters.group);
+    this.post = new PostChain(this.renderer, this.scene, this.rig.camera);
+    this.tier = options.quality ?? 'high';
+    this.post.setQuality(this.tier);
+    this.lighting.setQuality(this.tier);
+    this.lighting.apply(this.biome);
+    this.post.applyBiome(this.biome);
+    (window as unknown as { __render?: ThreeRenderer }).__render = this; // debug handle for the harness
   }
 
-  private readonly sun: THREE.DirectionalLight;
-
-  private buildPlaceholder(): Placeholder {
-    const root = new THREE.Group();
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0xe0442c, roughness: 0.45, metalness: 0.25 });
-    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1c, roughness: 0.9 });
-    const riderMat = new THREE.MeshStandardMaterial({ color: 0x2a6df2, roughness: 0.7 });
-
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.45, 0.3), frameMat);
-    frame.castShadow = true;
-    const wheelGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.12, 24);
-    wheelGeo.rotateX(Math.PI / 2);
-    const rear = new THREE.Mesh(wheelGeo, wheelMat);
-    const front = new THREE.Mesh(wheelGeo, wheelMat);
-    rear.castShadow = front.castShadow = true;
-    const rider = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.6, 4, 8), riderMat);
-    rider.castShadow = true;
-    root.add(frame, rear, front, rider);
-    return { root, frame, rear, front, rider };
+  /** Debug access for harness scripts (not part of the contract). */
+  get debug(): { scene: THREE.Scene; renderer: THREE.WebGLRenderer; lighting: LightingRig; post: PostChain; lib: MaterialLibrary; rig: CameraRig; THREE: typeof THREE } {
+    return { scene: this.scene, renderer: this.renderer, lighting: this.lighting, post: this.post, lib: this.lib, rig: this.rig, THREE };
   }
 
   get framesRendered(): number {
-    return this.frames;
+    return this.frameCount;
   }
 
-  setTrack(compiled: CompiledTrack): void {
-    const track = compiled.def;
-    if (this.ground) {
-      this.scene.remove(this.ground);
-      this.ground.geometry.dispose();
-    }
-    for (const g of this.checkpointGates) {
-      this.scene.remove(g);
-      g.geometry.dispose();
-    }
-    this.checkpointGates = [];
-    if (this.finishGate) {
-      this.scene.remove(this.finishGate);
-      this.finishGate.geometry.dispose();
-    }
+  // -- contract -------------------------------------------------------------
 
-    // Ground ribbon extruded from the profile: a triangle strip 6 units deep.
-    const depth = 6;
-    const pts = track.profile;
-    const positions = new Float32Array(pts.length * 2 * 3);
-    const indices: number[] = [];
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i]!;
-      positions.set([p.x, p.y, -depth / 2], i * 6);
-      positions.set([p.x, p.y, depth / 2], i * 6 + 3);
-      if (i > 0) {
-        const a = (i - 1) * 2;
-        indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+  setTrack(track: CompiledTrack): void {
+    this.clearWorld();
+    this.biome = biomeFor(track.def.meta?.biome);
+    this.lighting.apply(this.biome);
+    this.post.applyBiome(this.biome);
+    this.rig.setKeys(track.def.meta?.camera);
+
+    const group = new THREE.Group();
+    group.name = 'world';
+    const ribbons = buildRibbons(track, this.lib);
+    const obstacles = buildObstacles(track, this.lib);
+    const gates = buildGates(track, this.lib);
+    const kit = buildBiomeKit(track, this.biome, this.lib);
+    group.add(ribbons.group, obstacles.group, gates.group, kit.group);
+    this.scene.add(group);
+    this.world = {
+      group,
+      obstacles,
+      gates,
+      flicker: kit.flicker,
+      flickerBase: kit.flicker.map((m) => m.emissiveIntensity),
+      textureBytes: kit.textureBytes + gates.textureBytes,
+      trackCalls: ribbons.drawCalls + obstacles.drawCalls,
+      trackTris: ribbons.triangles + obstacles.triangles,
+    };
+    const fy = track.def.profile.length ? track.def.profile[track.def.profile.length - 1]!.y : 0;
+    this.emitters.setTrack(track.def.seed, gates.jets, track.def.finishX, fy, this.biome);
+    this.frames.invalidate();
+    this.lastCheckpoint = -1;
+    this.flashT = -1;
+    if (this.world.trackCalls > 20 || this.world.trackTris > 80_000) {
+      console.warn(`[render] track budget: ${this.world.trackCalls} calls / ${Math.round(this.world.trackTris)} tris (cap 20 / 80k)`);
+    }
+  }
+
+  onEvent(e: GameEvent): void {
+    this.emitters.onEvent(e);
+    if (e.type === 'finish') this.flashT = this.lastTSim;
+    if (e.type === 'restart') this.frames.invalidate();
+  }
+
+  setRunInfo(info: { runTime: number; phase: GamePhase }): void {
+    this.phase = info.phase;
+    this.rig.setPhase(info.phase);
+  }
+
+  setQuality(tier: QualityTier): void {
+    if (tier === this.tier) return;
+    this.tier = tier;
+    this.post.setQuality(tier);
+    this.lighting.setQuality(tier);
+  }
+
+  camera(): CameraDebug {
+    return this.rig.debug();
+  }
+
+  render(state: PhysicsState, alpha: number): number {
+    const t0 = performance.now();
+    // Procedural textures are generated on the second frame, always, so the
+    // frame they appear on is identical in every capture.
+    if (this.frameCount === 1 && !this.lib.hasTextures) {
+      this.lib.generateTextures();
+      this.textureGenMs = this.lib.generateMs;
+    }
+    const f = this.frames.build(state, alpha);
+    this.lastTSim = f.tSim;
+
+    this.rig.update(f);
+    const cam = this.rig.camera;
+    this.lighting.follow(this.rig.targetX, this.rig.targetY, this.rig.distance > 20);
+
+    this.bike.update(f);
+    this.rider.update(f);
+    // Dynamic colliders.
+    const w = this.world;
+    if (w) {
+      for (const s of f.seesaws) {
+        const o = w.obstacles.seesaws.get(s.id);
+        if (o) o.rotation.z = s.angle;
+      }
+      for (const d of f.drums) {
+        const o = w.obstacles.drums.get(d.id);
+        if (o) o.rotation.z = d.spin;
+      }
+      if (f.checkpoint !== this.lastCheckpoint) {
+        this.lastCheckpoint = f.checkpoint;
+        w.gates.lamps.forEach((m, i) => {
+          const lit = i <= f.checkpoint;
+          m.emissive.setHex(lit ? 0x22ff55 : 0x7a1010);
+          m.emissiveIntensity = lit ? 4 : 1.5;
+        });
+      }
+      for (let i = 0; i < w.flicker.length; i++) {
+        w.flicker[i]!.emissiveIntensity = w.flickerBase[i]! * (1 + 0.15 * Math.sin(23 * f.tSim) * Math.sin(7.3 * f.tSim));
       }
     }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setIndex(indices);
-    geo.computeVertexNormals();
-    const mat = new THREE.MeshStandardMaterial({ color: 0x59605a, roughness: 0.95 });
-    this.ground = new THREE.Mesh(geo, mat);
-    this.ground.receiveShadow = true;
-    this.scene.add(this.ground);
+    // Particles.
+    this.bike.toWorld(this.bike.exhaustTip.x, this.bike.exhaustTip.y, this.bike.exhaustTip.z, this.tmp);
+    this.emitters.setViewport(this.height * Math.min(this.pixelRatio, this.tier === 'low' ? 1 : this.tier === 'medium' ? 1.5 : 2), (cam.fov * Math.PI) / 180);
+    this.emitters.update(f, this.tmp, this.rig.targetX);
 
-    const gateGeo = new THREE.BoxGeometry(0.15, 3, 0.15);
-    const cpMat = new THREE.MeshStandardMaterial({ color: 0xffc23d, emissive: 0x6b4e00 });
-    for (const cp of track.checkpoints) {
-      const gate = new THREE.Mesh(gateGeo, cpMat);
-      gate.position.set(cp.x, 1.5 + cp.spawn.pos.y, -depth / 2 - 0.2);
-      this.scene.add(gate);
-      this.checkpointGates.push(gate);
-    }
-    const finMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x444444 });
-    this.finishGate = new THREE.Mesh(new THREE.BoxGeometry(0.2, 4, 0.2), finMat);
-    this.finishGate.position.set(track.finishX, 2, -depth / 2 - 0.2);
-    this.scene.add(this.finishGate);
-    this.cameraPrimed = false;
-  }
+    // Post dynamics: smear only above 9 m/s, along the screen-space travel direction.
+    const dbg = this.rig.debug();
+    const smear = Math.min(8, Math.max(0, (f.speed - 9) * 1.1));
+    const dl = Math.hypot(f.velX, f.velY) || 1;
+    const flash = this.flashT >= 0 ? Math.max(0, 1 - (f.tSim - this.flashT) / 0.2) : 0;
+    this.post.setDynamics(f.speed, dbg.bikeScreenX, dbg.bikeScreenY, smear, f.velX / dl, -f.velY / dl, flash);
 
-  render(state: PhysicsState, _alpha: number): number {
-    const t0 = performance.now();
-    const ph = this.placeholder;
-    ph.frame.position.set(state.bike.pos.x, state.bike.pos.y, 0);
-    ph.frame.rotation.z = state.bike.angle;
-    ph.rear.position.set(state.wheels.rear.pos.x, state.wheels.rear.pos.y, 0);
-    ph.rear.rotation.z = -state.wheels.rear.spin;
-    ph.front.position.set(state.wheels.front.pos.x, state.wheels.front.pos.y, 0);
-    ph.front.rotation.z = -state.wheels.front.spin;
-    ph.rider.position.set(
-      state.bike.pos.x + state.rider.lean * 0.35 - Math.sin(state.bike.angle) * 0.6,
-      state.bike.pos.y + 0.75 - state.rider.crouch * 0.25 + Math.cos(state.bike.angle) * 0.1,
-      0,
-    );
-    ph.rider.rotation.z = state.bike.angle + state.rider.torsoPitch;
-
-    // Camera: side-on with slight yaw, leading the bike by velocity.
-    const lead = Math.max(-2, Math.min(4, state.bike.vel.x * 0.25));
-    this.camTarget.set(state.bike.pos.x + lead, state.bike.pos.y + 1.0, 0);
-    this.camPos.set(this.camTarget.x - 3.5, this.camTarget.y + 3.5, 14);
-    if (!this.cameraPrimed) {
-      this.camera.position.copy(this.camPos);
-      this.cameraPrimed = true;
-    } else {
-      // Deterministic smoothing: the harness renders at a fixed cadence, so
-      // this lerp is reproducible frame-for-frame.
-      this.camera.position.lerp(this.camPos, 0.18);
-    }
-    this.camera.lookAt(this.camTarget);
-    this.sun.position.set(state.bike.pos.x - 8, 14, 12);
-    this.sun.target.position.set(state.bike.pos.x, state.bike.pos.y, 0);
-
-    this.renderer.render(this.scene, this.camera);
-    this.frames++;
+    this.renderer.info.autoReset = false;
+    this.renderer.info.reset();
+    this.post.render();
+    this.frameCount++;
     return performance.now() - t0;
   }
 
-  private readonly syncPixel = new Uint8Array(4);
-
   finish(): void {
-    // gl.finish() returns immediately in Chromium's WebGL (it only flushes the
-    // command buffer to the GPU process). A 1x1 readPixels is the reliable way
-    // to block until the frame has actually been rasterized.
+    // gl.finish() returns immediately in Chromium; a 1x1 readPixels blocks on raster.
     const gl = this.renderer.getContext();
     gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, this.syncPixel);
   }
 
   resize(width: number, height: number, pixelRatio?: number): void {
-    if (pixelRatio !== undefined) this.renderer.setPixelRatio(pixelRatio);
+    if (pixelRatio !== undefined) {
+      this.pixelRatio = pixelRatio;
+      this.renderer.setPixelRatio(pixelRatio);
+    }
+    this.height = height;
     this.renderer.setSize(width, height, false);
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
+    this.rig.setAspect(width / height);
+    this.post.setSize(width, height, this.pixelRatio);
   }
 
   stats(): RenderStats {
@@ -242,15 +283,57 @@ export class ThreeRenderer implements GameRenderer {
       geometries: info.memory.geometries,
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
-      texturesMB: estimateTextureMB(this.scene),
+      texturesMB: estimateTextureMB(this.scene) + this.lighting.textureBytes / (1024 * 1024),
       renderer: this.rendererString,
       contextKind: this.contextKind,
     };
   }
 
+  /** Extra diagnostics for the harness / perf report. */
+  debugInfo(): { biome: string; zoom: string; phase: GamePhase; tier: QualityTier; trackCalls: number; trackTris: number; textureGenMs: number; passes: number } {
+    return {
+      biome: this.biome.id,
+      zoom: this.rig.zoomState,
+      phase: this.phase,
+      tier: this.tier,
+      trackCalls: this.world?.trackCalls ?? 0,
+      trackTris: Math.round(this.world?.trackTris ?? 0),
+      textureGenMs: this.textureGenMs,
+      passes: this.post.info.passes,
+    };
+  }
+
   dispose(): void {
+    this.clearWorld();
+    this.post.dispose();
+    this.lighting.dispose();
+    this.lib.dispose();
+    for (const s of this.emitters.systems) s.dispose();
     this.renderer.dispose();
     this.canvas.remove();
+  }
+
+  // -- internals ------------------------------------------------------------
+
+  private clearWorld(): void {
+    const w = this.world;
+    if (!w) return;
+    this.scene.remove(w.group);
+    w.group.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (m.geometry) m.geometry.dispose();
+      const mats = Array.isArray(m.material) ? m.material : m.material ? [m.material] : [];
+      for (const mat of mats) {
+        // Library materials are shared; only dispose clones / one-offs (they carry no name from the library).
+        if (mat && !(mat as THREE.Material).name) {
+          for (const v of Object.values(mat as unknown as Record<string, unknown>)) {
+            if (v instanceof THREE.CanvasTexture) v.dispose();
+          }
+          (mat as THREE.Material).dispose();
+        }
+      }
+    });
+    this.world = null;
   }
 }
 
@@ -265,24 +348,30 @@ export function describeRenderer(gl: WebGLRenderingContext | WebGL2RenderingCont
   return String(gl.getParameter(gl.RENDERER));
 }
 
-/** Rough GPU texture footprint: RGBA8 with a mip chain (x1.33). */
+/** Rough GPU texture footprint: RGBA8 with a mip chain (x1.33), float textures by type. */
 export function estimateTextureMB(scene: THREE.Scene): number {
   const seen = new Set<THREE.Texture>();
   let bytes = 0;
+  const visit = (value: unknown): void => {
+    if (value instanceof THREE.Texture && !seen.has(value)) {
+      seen.add(value);
+      const img = value.image as { width?: number; height?: number } | undefined;
+      const w = img?.width ?? 0;
+      const h = img?.height ?? 0;
+      const bpp = value.type === THREE.FloatType ? 16 : value.type === THREE.HalfFloatType ? 8 : 4;
+      bytes += w * h * bpp * (value.generateMipmaps ? 1.333 : 1);
+    }
+  };
   scene.traverse((obj) => {
     const mesh = obj as THREE.Mesh;
     const mats = Array.isArray(mesh.material) ? mesh.material : mesh.material ? [mesh.material] : [];
     for (const m of mats) {
-      for (const value of Object.values(m as unknown as Record<string, unknown>)) {
-        if (value instanceof THREE.Texture && !seen.has(value)) {
-          seen.add(value);
-          const img = value.image as { width?: number; height?: number } | undefined;
-          const w = img?.width ?? 0;
-          const h = img?.height ?? 0;
-          bytes += w * h * 4 * (value.generateMipmaps ? 1.333 : 1);
-        }
-      }
+      for (const value of Object.values(m as unknown as Record<string, unknown>)) visit(value);
+      const sm = m as THREE.ShaderMaterial;
+      if (sm.uniforms) for (const u of Object.values(sm.uniforms)) visit(u.value);
     }
   });
+  if (scene.environment) visit(scene.environment);
+  if (scene.background instanceof THREE.Texture) visit(scene.background);
   return bytes / (1024 * 1024);
 }
