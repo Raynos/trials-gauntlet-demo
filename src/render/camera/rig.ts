@@ -88,6 +88,8 @@ export class CameraRig {
   private lastBikeY = 0;
   private dist = 10;
   private primed = false;
+  /** Ground height sampler (profile) for the airborne framing; set by the renderer per track. */
+  ground: ((x: number) => number) | null = null;
 
   constructor() {
     this.camera = new THREE.PerspectiveCamera(34, 16 / 9, 0.2, 900);
@@ -196,7 +198,8 @@ export class CameraRig {
       if (pelvis) followTarget = { x: pelvis.pos.x, y: pelvis.pos.y };
       this.fx.halfLife = lerp(0.12, 1.0, Math.min(1, since));
       this.fy.halfLife = lerp(0.18, 1.0, Math.min(1, since));
-      if (since > 1) this.crashDist *= 1 - 0.025 * dt;
+      // Creep in from the crash tick (reference: the camera decelerates and closes during the second before respawn).
+      this.crashDist *= 1 - 0.04 * dt;
       p.heightFrac = 0.24 / this.crashDist;
       p.pitch = 14 * DEG;
       p.yaw = 12 * DEG;
@@ -224,7 +227,15 @@ export class CameraRig {
     // --- Followed point: lookahead in x, dead-zone in y.
     const lookTarget = Math.min(2.5, Math.max(-1.5, f.velX * 0.15));
     const fxT = followTarget.x;
-    const fyT = followTarget.y + 0.45 - 0.3 * airT;
+    // In the air (round 5, critic: "ground leaves the frame"): aim between the bike and the
+    // landing zone and pull back with height, so the ground line stays in the bottom third.
+    let fyT = followTarget.y + 0.45 - 0.3 * airT;
+    if (f.airborne && !f.crashed && this.ground) {
+      const gy = this.ground(f.bikeX + Math.max(0, f.velX) * 0.6);
+      const above = Math.max(0, f.bikeY - 0.55 - gy);
+      fyT -= 0.5 * above * airT;
+      p.heightFrac *= Math.max(0.45, 1.9 / (1.9 + 0.9 * above * airT));
+    }
     if (cut) {
       this.fx.snap(fxT);
       this.fy.snap(fyT);

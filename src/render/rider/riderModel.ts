@@ -206,6 +206,10 @@ export class RiderModel {
     }
     const spine = this.mesh(new THREE.BoxGeometry(0.04, 0.34, 0.12), 'armour', torso.group);
     spine.position.set(-0.11, L.torso * 0.5, 0);
+    // Back-protector hump between the shoulder blades.
+    const hump = this.mesh(new THREE.SphereGeometry(0.09, 14, 10), 'armour', torso.group);
+    hump.position.set(-0.1, L.torso * 0.78, 0);
+    hump.scale.set(0.7, 1.0, 1.3);
     // Shoulder caps (sleeve roots) so the arm joint reads as cloth, not a seam.
     for (const sd of [-1, 1]) {
       const cap = this.mesh(new THREE.SphereGeometry(0.068, 12, 8), 'jersey', torso.group);
@@ -241,6 +245,12 @@ export class RiderModel {
     for (let i = 0; i < n; i++) {
       const ua = new Segment(L.upperArm);
       this.capsule(0.052, L.upperArm, 'jersey', ua.group);
+      // Sleeve folds: two slightly proud rings so the sleeve reads as bunched cloth, not a tube.
+      for (const fy of [0.16]) {
+        const fold = this.mesh(new THREE.TorusGeometry(0.05, 0.007, 6, 14), 'jersey', ua.group);
+        fold.rotation.x = Math.PI / 2;
+        fold.position.y = fy;
+      }
       const elbow = this.mesh(new THREE.SphereGeometry(0.06, 10, 8), 'armour', ua.group);
       elbow.position.y = L.upperArm;
       elbow.scale.set(1, 0.9, 0.9);
@@ -250,6 +260,11 @@ export class RiderModel {
       this.capsule(0.045, L.forearm, 'jersey', fa.group);
       const cuff = this.mesh(new THREE.CylinderGeometry(0.05, 0.046, 0.06, 10), 'jersey', fa.group);
       cuff.position.y = 0.03;
+      for (const fy of [0.14]) {
+        const fold = this.mesh(new THREE.TorusGeometry(0.044, 0.006, 6, 14), 'jersey', fa.group);
+        fold.rotation.x = Math.PI / 2;
+        fold.position.y = fy;
+      }
       const wrist = this.mesh(new THREE.CylinderGeometry(0.04, 0.042, 0.05, 10), 'gloves', fa.group);
       wrist.position.y = L.forearm - 0.06;
       // Fist closed around the grip: torus whose axis runs along the bar (local z), plus a thumb.
@@ -276,8 +291,16 @@ export class RiderModel {
       boot.position.set(0.07, L.shin - 0.02, 0);
       const sole = this.mesh(new THREE.BoxGeometry(0.3, 0.03, 0.13), 'armour', sh.group);
       sole.position.set(0.07, L.shin + 0.05, 0);
-      const buckle = this.mesh(new THREE.BoxGeometry(0.02, 0.2, 0.13), 'plastic', sh.group);
-      buckle.position.set(0.09, L.shin - 0.06, 0);
+      for (const by of [0.1, 0.19, 0.28]) {
+        const buckle = this.mesh(new THREE.BoxGeometry(0.03, 0.035, 0.14), 'alloy', sh.group);
+        buckle.position.set(0.085, L.shin - by, 0);
+      }
+      // Knee brace hinge plates either side of the knee.
+      for (const sd of [-1, 1]) {
+        const hinge = this.mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.012, 10), 'alloy', sh.group);
+        hinge.rotation.x = Math.PI / 2;
+        hinge.position.set(0.0, 0.03, sd * 0.07);
+      }
       parent.add(sh.group);
       shin.push(sh);
     }

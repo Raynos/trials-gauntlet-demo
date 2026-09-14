@@ -172,9 +172,15 @@ export class Emitters {
       return;
     }
     const life: [number, number] = surface === 'snow' ? [0.4, 0.9] : surface === 'wood' || surface === 'concrete' ? [0.3, 0.6] : [0.8, 1.6];
-    const n = Math.round(8 + 32 * k) * (surface === 'wood' ? 0.4 : 1);
-    Object.assign(b, { x: w.x, y: w.y - 0.32, z: 0, count: Math.round(n), life, size: [0.15, 0.3 + 0.6 * k], vx: -f.velX * 0.2, vy: 0.6 + 0.7 * k, vz: 0, spread: 1.1, jitter: 0.2, color: DUST_COLOR[surface] ?? 0x9c8462, gravityScale: 1 });
+    // Round 5 (critic: "no dust at any contact"): bigger, wider, brighter puff that must read at 25 % frame height.
+    const n = Math.round(16 + 48 * k) * (surface === 'wood' ? 0.6 : 1);
+    Object.assign(b, { x: w.x, y: w.y - 0.32, z: 0, count: Math.round(n), life, size: [0.25, 0.6 + 1.0 * k], vx: -f.velX * 0.25, vy: 0.9 + 1.2 * k, vz: 0, spread: 1.8, jitter: 0.35, color: DUST_COLOR[surface] ?? 0x9c8462, gravityScale: 0.8 });
     this.dust.emit(b, f.tSim, rng);
+    if (surface === 'wood') {
+      // Plank thud: a second, finer burst of pale motes thrown sideways.
+      Object.assign(b, { x: w.x, y: w.y - 0.3, z: 0, count: Math.round(10 + 20 * k), life: [0.5, 1.0], size: [0.06, 0.12], vx: -f.velX * 0.1, vy: 1.4 + k, vz: 0, spread: 2.2, jitter: 0.5, color: 0xd8c8a8, gravityScale: 0.5 });
+      this.dust.emit(b, f.tSim, rng);
+    }
   }
 
   private flames(f: RenderFrame, index: number): void {

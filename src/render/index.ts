@@ -184,6 +184,7 @@ export class ThreeRenderer implements GameRenderer {
       trackTris: ribbons.triangles + obstacles.triangles,
     };
     const profile = track.def.profile;
+    this.rig.ground = (x) => profileY(profile, x);
     this.bike.ground = (x) => {
       const y = profileY(profile, x);
       const dy = profileY(profile, x + 0.3) - profileY(profile, x - 0.3);

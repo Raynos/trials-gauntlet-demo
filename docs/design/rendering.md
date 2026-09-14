@@ -17,12 +17,12 @@ three 0.186.0 addons used: `EffectComposer, RenderPass, UnrealBloomPass, ShaderP
 
 | Budget | Cap | Round 1 | Where measured |
 |---|---|---|---|
-| Draw calls | 300 | 172 idle / ≈215 riding (+62 with the ghost) — bike frame and rider segments are merged per material (`util/merge.ts`) | `renderer.info.render.calls` (accumulated over all passes; `info.autoReset=false`) |
-| Triangles | 500 k | 301 k (deck on a continuous container + pallet base, three container rows, hall structure; shadow pass counted) | `renderer.info.render.triangles` |
+| Draw calls | 300 | 202 idle / ≈215 riding (+62 with the ghost; round 5 added 8 skin batches + 5 prop types + deck AO) — bike frame and rider segments are merged per material (`util/merge.ts`) | `renderer.info.render.calls` (accumulated over all passes; `info.autoReset=false`) |
+| Triangles | 500 k | 326 k (deck on a continuous container + pallet base, three container rows, hall structure; shadow pass counted) | `renderer.info.render.triangles` |
 | Texture memory | 96 MB | 38.3 MB industrial, 34.8–43.9 MB other biomes | `estimateTextureMB` (all maps incl. mips, env, canvas textures) |
 | Track + obstacles | 20 calls / 80 k tris | 11 calls / 5.1 k tris (12-kind synthetic track) | `debugInfo().trackCalls/trackTris` |
 | Texture generation | 400 ms desktop, after first frame | ≈330–400 ms in headless Chromium (SwiftShader host) | `debugInfo().textureGenMs` |
-| Shader programs | 32 | 29 (31 with the ghost); every library material is `fogify`'d and carries the same map set, every batch material takes vertex colours | `info.programs` |
+| Shader programs | 40 (raised round 5) | 33 (35 with the ghost); every library material is `fogify`'d and carries the same map set, every batch material takes vertex colours | `info.programs` |
 | Restart → frame | 1 frame | 1 frame; no rebuild on restart | capture scene detector, scratch `restart.mts` |
 | Synced frame, SwiftShader | p95 250 ms | `high` p50 134 ms, `low` p50 75 ms (56 %) | scratch `timing.mts`, 24 frames after warm-up |
 | JS heap growth | 5 MB / 60 s | −1.8 MB | `harness:perf` |
@@ -371,7 +371,34 @@ Rng: `core/rng` sfc32 reseeded per burst with `track.seed ^ tick ^ salt`.
 | `fault crash/hazard` | 30 dust at the bike |
 | ambient | motes (industrial), snowfall, embers (nightCity/foundry) around the camera target |
 
-## 12. Known gaps after round 4 (what still reads non-AAA)
+## 11a. Round 5 (hero asset + critic round 2) — what landed
+
+- **Containers**: 8 skin variants (rust level × logo × door side × hazard stripe) as 8 batches over one
+  program; stack layers turn 180° at random; 9 instance colours. **New prop types**: cable reels, scaffold
+  towers, hanging tarps, forklifts, signage boards (`hall.ts`).
+- **Windows**: wall emissive 1.3 → 0.95 so the brightest window pixel stops clipping at 1.0.
+- **Contact / AO under the deck**: a vertical dark gradient ribbon (0.7 → 0 over 1.4 m) on both deck
+  edges plus a 1.3 m skirt across the container ledge (`deck:ao`), the corner SSAO would darken.
+  **SSAO itself is not in**: `SSAOPass`/`GTAOPass` re-render the scene for normals+depth, which doubles
+  draw calls (174 → ≈350) against the 300 cap; the programs relief (40) does not help with that.
+- **Rider**: sleeve fold rings on upper arms and forearms, back-protector hump, three alloy boot buckles,
+  knee-brace hinge plates. **Bike**: clutch/brake levers, chain guide. (The full re-proportioned rider and
+  the modern-trials bike rebuild remain open — see gaps.)
+- **Suspension (critic 3)**: chassis sink ×2 (0.06 m per unit compression), pitch ×2 (0.1 rad), tyre
+  squash 0.1, and a rebound overshoot after a landing with impulse > 1.5: `−amp·e^(−t/0.14)·cos(2π·4.5t)`,
+  amp ≤ 6 cm, so the frame bottoms and springs back over ≈2 frames.
+- **Air camera (critic 1)**: while airborne the followed point drops by half the height above the landing
+  zone (ground sampled 0.6 s of x-velocity ahead) and `heightFrac` scales by `1.9 / (1.9 + 0.9·h)`
+  (floor 0.45): the camera pulls back with apex height and keeps the ground line in the bottom third.
+- **Crash camera (critic 6)**: the creep-in now starts at the crash tick (4 %/s) while the follow
+  half-lives ramp 0.12 → 1.0 s, so the camera decelerates and closes during the 1 s before respawn.
+- **Landing dust (critic 4)**: 16–64 particles 0.25 → 0.6–1.6 m, spread 1.8, per-surface colour; wood
+  adds a fine pale "plank thud" burst; metal/grate keep sparks. Slip trail unchanged (`rearSlip > 1.2`).
+- Not addressed this round: checkpoint lurch (critic 2 — keys already blend with half-life `blend/3`;
+  needs a repro clip with the key list), ragdoll spawn pop (critic 5 — the posed rider and the physics
+  ragdoll bodies have not been compared at the crash tick; a 2-frame blend is not implemented).
+
+## 12. Known gaps after round 5 (what still reads non-AAA)
 
 - No SSAO (a pass would cost 3–4 programs against a 32 cap); contact is baked vertex AO on the kit,
   tyre blobs and tyre squash. Corners between deck and containers still lack a proper AO gradient.
@@ -379,9 +406,10 @@ Rng: `core/rng` sfc32 reseeded per burst with `track.seed ^ tick ^ salt`.
   frame tops out at the window heads (pitch 11°). The reference gets trusses in frame because its tracks
   hang higher in the hall; a track-authored `high34`/`low` key does the same here.
 - Light shafts are additive quads (no occlusion by the bike or containers); dust motes are unlit points.
-- Rider is still a parts kit: no fingers beyond the fist torus, no cloth simulation, helmet has no
-  decals; the jersey number is a flat patch, not printed on the fabric UVs.
-- Bike: no cables, no chain guide, no tread pattern on the tyre (normal map only), no mud splatter map.
+- Rider is still a primitive kit (capsules + fold rings), not a proportioned segmented body: no fingers
+  beyond the fist torus, no cloth, helmet has no decals; the jersey number is a flat patch.
+- Bike is still the primitive build: no cables, no tread pattern (normal map only), no edge-wear or
+  anodised materials, no per-surface mud/dust accumulation map (only the static dusty lower materials).
 - Canyon strata are boxes with a banded albedo (no erosion silhouette); heat haze is not implemented.
   nightCity buildings are still boxes with a window texture; wet-asphalt reflections are env-only
   (the neon does not reflect). Foundry remains a red wash in most frames — the hall's orange panes and the

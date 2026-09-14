@@ -24,6 +24,7 @@ import { SURFACE_MATERIAL, type MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
 import { PropBatch, bakeAO, containerGeometry, palletLowGeometry, palletStackGeometry, rockGeometry, triCount } from './props';
 import { groundFloorY, profileY, ribbonGeometry, resample, type TrackMeshes } from './track';
+import { canvas, tex } from './canvasTex';
 
 const DECK_W = 3.0;
 const BOARD_W = 0.22;
@@ -300,6 +301,50 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
         mesh.name = 'deck:worn';
         group.add(mesh);
       }
+    }
+  }
+
+  // Contact / AO gradient under the deck edge (interior): a vertical dark gradient
+  // ribbon on each side, from the deck bottom 1.4 m down over the container ledge,
+  // plus a soft skirt on the ledge itself — the corner the SSAO would darken.
+  if (interior) {
+    const [c, g] = canvas(4, 64);
+    const gr = g.createLinearGradient(0, 0, 0, 64);
+    gr.addColorStop(0, 'rgba(0,0,0,0.7)');
+    gr.addColorStop(0.35, 'rgba(0,0,0,0.3)');
+    gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, 4, 64);
+    const aoTex = tex(c, false, false);
+    const aoMat = new THREE.MeshBasicMaterial({ map: aoTex, transparent: true, depthWrite: false, color: 0x000000, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+    const pts = resample(track.def.profile, 2.0);
+    const geos: THREE.BufferGeometry[] = [];
+    for (const side of [-1, 1]) {
+      for (const [zOff, drop, w] of [[1.66 * side, 1.4, 0.0], [1.68 * side, 0.0, 1.3 * side]] as const) {
+        const pos: number[] = [];
+        const uv: number[] = [];
+        const idx: number[] = [];
+        for (let i = 0; i < pts.length; i++) {
+          const p = pts[i]!;
+          const top = p.y - 0.12;
+          pos.push(p.x, top, zOff, p.x, top - drop, zOff + w);
+          uv.push(0, 0, 0, 1);
+          if (i > 0) idx.push(2 * i - 2, 2 * i - 1, 2 * i, 2 * i, 2 * i - 1, 2 * i + 1);
+        }
+        const gg = new THREE.BufferGeometry();
+        gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        gg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+        gg.setIndex(idx);
+        geos.push(gg);
+      }
+    }
+    const merged = mergeGeometries(geos, false);
+    if (merged) {
+      const m = new THREE.Mesh(merged, aoMat);
+      m.renderOrder = 1;
+      m.frustumCulled = false;
+      m.name = 'deck:ao';
+      group.add(m);
     }
   }
 

@@ -178,7 +178,8 @@ export class MaterialLibrary {
       { painter: 'rust', size: 256, strength: 1.2, targets: ['steelPlate', 'rustSteel', 'grate', 'darkSteel'], noAlbedo: false },
       { painter: 'corrugated', size: 512, strength: 2.2, targets: ['container', 'containerRed', 'containerBlue', 'barrelRed', 'barrelWhite', 'barrelBlue'] },
       { painter: 'rubber', size: 256, strength: 2.5, targets: ['tyre'], noAlbedo: true },
-      { painter: 'paintedMetal', size: 256, strength: 0.8, targets: ['framePaint', 'bodyPaint'] },
+      { painter: 'paintedMetal', size: 256, strength: 0.8, targets: ['framePaint'] },
+      { painter: 'paintedMetal', size: 256, strength: 0.5, targets: ['bodyPaint'], noAlbedo: true }, // smooth blue plastics: the mottled albedo read as camo in the hero crops
       { painter: 'fabric', size: 256, strength: 0.8, targets: ['jersey', 'pants'], noAlbedo: true },
       { painter: 'rock', size: 512, strength: 2.0, targets: ['rock'] },
       { painter: 'snow', size: 256, strength: 1.5, targets: ['snow'] },

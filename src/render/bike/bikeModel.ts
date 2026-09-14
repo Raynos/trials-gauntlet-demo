@@ -131,7 +131,7 @@ export class Wheel {
     const s = 1 + 0.35 * compression;
     this.contact.scale.set(s, 1 + 0.15 * compression, 1);
     // Tyre contact-patch flattening: squash toward the ground by compression.
-    const k = grounded ? 0.07 * (0.4 + compression) : 0;
+    const k = grounded ? 0.1 * (0.4 + compression) : 0;
     this.tyreSquash.scale.set(1, 1 - k, 1);
     this.tyreSquash.position.y = -WHEEL_RADIUS * k;
   }
@@ -166,6 +166,8 @@ export class BikeModel {
   /** bike.pos → axle midpoint, in frame-local coords (calibrated). */
   private readonly originOffset = new THREE.Vector2(0, -0.2);
   private calibrated = false;
+  private landT = -1;
+  private landAmp = 0;
   /** World-space bar ends / pegs for the rider (frame-local, updated per frame). */
   readonly barL = new THREE.Vector3();
   readonly pegL = new THREE.Vector3();
@@ -282,6 +284,13 @@ export class BikeModel {
       peg.position.set(B.pegs.x, B.pegs.y, z * B.pegHalfWidth);
       this.frame.add(peg);
     }
+    // Levers (clutch far side, brake near side) and a chain guide under the swingarm.
+    for (const z of [-1, 1]) {
+      const lever = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.009, 0.16, 6).rotateZ(Math.PI / 2), alloy));
+      lever.position.set(B.barCentre.x + 0.06, B.barCentre.y - 0.05, z * (B.barHalfWidth - 0.16));
+      lever.rotation.y = z * 0.5;
+      this.frame.add(lever);
+    }
     // Triple clamps
     const clampT = cast(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.03, 0.24), lib.get('alloy')));
     clampT.position.set(B.headTop.x, B.headTop.y + 0.02, 0);
@@ -322,7 +331,9 @@ export class BikeModel {
     }
     const brace = cast(new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.2), paint));
     brace.position.set(0.12, 0.01, 0);
-    this.swingarm.add(brace);
+    const guide = cast(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.04), black));
+    guide.position.set(armLen - 0.14, -0.05, -0.16);
+    this.swingarm.add(brace, guide);
     this.frame.add(this.swingarm);
 
     // --- Rear shock: body + spring between shockTop and a point on the swingarm.
@@ -404,11 +415,24 @@ export class BikeModel {
     // pitches with the compression difference (the wheels stay on the physics contact).
     const rc = f.rear.grounded ? f.rear.compression : 0;
     const fc = f.front.grounded ? f.front.compression : 0;
-    const sink = -0.03 * (rc + fc);
+    // Round 5 (critic: "no visible compression"): ×2 sink, ×2 pitch, plus a 2-frame rebound
+    // overshoot after a hard landing so the chassis visibly bottoms and springs back.
+    if (f.cut) this.landT = -1;
+    if (f.justLanded && f.landImpulse > 1.5) {
+      this.landT = f.tSim;
+      this.landAmp = Math.min(0.06, f.landImpulse * 0.012);
+    }
+    let rebound = 0;
+    if (this.landT >= 0) {
+      const lt = f.tSim - this.landT;
+      if (lt < 0.5) rebound = -this.landAmp * Math.exp(-lt / 0.14) * Math.cos(2 * Math.PI * 4.5 * lt);
+      else this.landT = -1;
+    }
+    const sink = -0.06 * (rc + fc) + rebound;
     const ox = this.originOffset.x;
     const oy = this.originOffset.y + sink;
     this.frame.position.set(f.bikeX + ox * c - oy * s, f.bikeY + ox * s + oy * c, 0);
-    this.frame.rotation.z = f.bikeAngle + 0.05 * (rc - fc);
+    this.frame.rotation.z = f.bikeAngle + 0.1 * (rc - fc);
     this.frame.updateMatrix();
     this.frame.updateMatrixWorld(true);
     this.frameLocal.copy(this.frame.matrixWorld);

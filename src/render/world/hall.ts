@@ -10,6 +10,7 @@
  * (12 / 45 / 95 m) so each row sits at a visibly different depth.
  */
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { Rng } from '../../core/rng';
 import type { CompiledTrack } from '../../core/types';
 import type { Biome } from '../biomes';
@@ -133,8 +134,12 @@ function warehouseWall(rng: Rng, paneColor: string, brick: string): { map: THREE
   return { map: tex(c), emissive: tex(ce, true), bytes: W * H * 4 * 1.33 * 2 };
 }
 
-/** Container skin: light base (tinted per instance), rust streaks, big number, logo band. Albedo only; the corrugated normal map stays. */
-function containerSkin(rng: Rng): THREE.CanvasTexture {
+/**
+ * Container skin variant: light base (tinted per instance), rust level 0–2, logo choice,
+ * door bars on the left or right, optional hazard stripe. Albedo only; the corrugated
+ * normal / ORM maps from the library stay so every variant shares one program.
+ */
+function containerSkin(rng: Rng, v: { rust: number; logo: number; doorLeft: boolean; stripe: boolean }): THREE.CanvasTexture {
   const [c, g] = canvas(1024, 512);
   g.fillStyle = '#e6e6e2';
   g.fillRect(0, 0, 1024, 512);
@@ -142,31 +147,47 @@ function containerSkin(rng: Rng): THREE.CanvasTexture {
     g.fillStyle = 'rgba(0,0,0,0.07)';
     g.fillRect(x, 0, 6, 512);
   }
-  for (let i = 0; i < 9; i++) {
+  const streaks = [3, 9, 18][v.rust]!;
+  for (let i = 0; i < streaks; i++) {
     const x = rng.range(0, 1024);
-    const w = rng.range(3, 12);
-    const h = rng.range(30, 200);
+    const w = rng.range(3, 12 + v.rust * 6);
+    const h = rng.range(30, 200 + v.rust * 120);
     const gr = g.createLinearGradient(0, 0, 0, h);
-    gr.addColorStop(0, 'rgba(110,60,25,0.35)');
+    gr.addColorStop(0, `rgba(110,60,25,${0.3 + v.rust * 0.15})`);
     gr.addColorStop(1, 'rgba(120,60,20,0)');
     g.fillStyle = gr;
     g.fillRect(x, 0, w, h);
   }
+  if (v.rust === 2) {
+    for (let i = 0; i < 30; i++) {
+      g.fillStyle = `rgba(90,45,20,${rng.range(0.2, 0.5)})`;
+      g.beginPath();
+      g.ellipse(rng.range(0, 1024), rng.range(300, 512), rng.range(10, 60), rng.range(6, 30), 0, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
   const grime = g.createLinearGradient(0, 512, 0, 380);
-  grime.addColorStop(0, 'rgba(30,22,14,0.3)');
+  grime.addColorStop(0, `rgba(30,22,14,${0.3 + v.rust * 0.15})`);
   grime.addColorStop(1, 'rgba(30,22,14,0)');
   g.fillStyle = grime;
   g.fillRect(0, 0, 1024, 512);
+  const lx = v.doorLeft ? 300 : 60;
+  const logos = ['SQUADX', 'KBNI', 'REDLYNX', 'TRIALS', 'FOX', 'MAERSK'];
   g.fillStyle = 'rgba(255,255,255,0.85)';
-  g.fillRect(60, 60, 330, 70);
+  g.fillRect(lx, 60, 330, 70);
   g.fillStyle = '#111';
   g.font = 'bold 54px Impact, "Arial Black", sans-serif';
-  g.fillText(['SQUADX', 'KBNI', 'REDLYNX', 'TRIALS'][rng.int(0, 3)]!, 80, 116);
+  g.fillText(logos[v.logo % logos.length]!, lx + 20, 116);
   g.fillStyle = 'rgba(20,20,20,0.85)';
   g.font = 'bold 72px Impact, "Arial Black", sans-serif';
-  g.fillText(String(rng.int(10, 99)) + 'C', 640, 130);
+  g.fillText(String(rng.int(10, 99)) + 'C', v.doorLeft ? 300 : 640, 130 + (v.doorLeft ? 200 : 0));
+  if (v.stripe) {
+    g.fillStyle = 'rgba(230,180,30,0.8)';
+    g.fillRect(0, 440, 1024, 26);
+  }
   g.fillStyle = 'rgba(25,25,25,0.7)';
-  for (const x of [790, 840, 890, 940]) g.fillRect(x, 20, 10, 472);
+  const bars = v.doorLeft ? [40, 90, 140, 190] : [790, 840, 890, 940];
+  for (const x of bars) g.fillRect(x, 20, 10, 472);
   return tex(c);
 }
 
@@ -248,7 +269,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       map: wall.map,
       emissiveMap: wall.emissive,
       emissive: new THREE.Color(foundry ? 0xff7a30 : 0xfff0d8),
-      emissiveIntensity: foundry ? 0.7 : 1.3,
+      emissiveIntensity: foundry ? 0.7 : 0.95, // p99 of the frame must stay ≈0.92 after tonemap (round 5)
       roughness: 0.95,
     }),
   );
@@ -330,17 +351,31 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   for (let x = x0 + 5; x < x1; x += rng.range(5, 10)) chains.add(x, roofY - 1.4, rng.range(-16, -6), 0, 1, null, 0, rng.range(3, 8), 1);
   out.batches.push(chains, lampShade, bulb);
 
-  // --- Container rows at three depths with gaps.
-  const skin = containerSkin(rng);
-  out.textureBytes += 1024 * 512 * 4 * 1.33;
+  // --- Container rows at three depths with gaps. Eight skin variants
+  // (rust × logo × door side × stripe), each its own batch (8 calls, one program).
   const contMat = lib.get('container');
-  contMat.map = skin;
-  contMat.needsUpdate = true;
-  const containers = new PropBatch('container', bakeAO(containerGeometry(), 2.59, 0.4), contMat);
-  const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a, 0x7a3b6a];
+  const skinBatches: PropBatch[] = [];
+  const contGeo = bakeAO(containerGeometry(), 2.59, 0.4);
+  for (let i = 0; i < 8; i++) {
+    const skin = containerSkin(rng, { rust: i % 3, logo: i, doorLeft: (i & 1) === 1, stripe: i % 4 === 3 });
+    out.textureBytes += 1024 * 512 * 4 * 1.33;
+    const m = i === 0 ? contMat : lib.derive('container');
+    m.map = skin;
+    m.needsUpdate = true;
+    if (i > 0) {
+      m.vertexColors = true;
+      fogify(m);
+    }
+    skinBatches.push(new PropBatch(`container${i}`, contGeo, m));
+  }
+  const palette = [0x2f6f5e, 0x8a2c22, 0x2a4f7a, 0x6b6b60, 0xa9682a, 0x3d6b3a, 0x7a3b6a, 0x4a6a8a, 0x9a9a92];
   const pick = (): number => palette[rng.int(0, palette.length - 1)]!;
   const stack = (x: number, z: number, n: number, ry: number): void => {
-    for (let k = 0; k < n; k++) containers.add(x + rng.range(-0.12, 0.12), floorY + k * 2.59, z + rng.range(-0.1, 0.1), ry + rng.range(-0.03, 0.03), 1, pick());
+    for (let k = 0; k < n; k++) {
+      const b = skinBatches[rng.int(0, skinBatches.length - 1)]!;
+      // Every other layer in a stack turns 180° so door ends and logos alternate.
+      b.add(x + rng.range(-0.12, 0.12), floorY + k * 2.59, z + rng.range(-0.1, 0.1), ry + rng.range(-0.03, 0.03) + (rng.next() < 0.5 ? Math.PI : 0), 1, pick());
+    }
   };
   // Far row against the wall: 2–4 high, 25 % gaps.
   for (let x = x0 + 6; x < x1 - 6; x += rng.range(6.6, 8.5)) {
@@ -357,7 +392,7 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     if (rng.next() < 0.3) continue;
     stack(x, -7.5 + rng.range(-1.0, 1.0), rng.next() < 0.3 ? 2 : 1, rng.next() < 0.5 ? Math.PI / 2 : rng.range(-0.3, 0.3));
   }
-  out.batches.push(containers);
+  out.batches.push(...skinBatches);
 
   // --- Racks, catwalk under the windows, floor clutter, foreground occluders.
   const racks = new PropBatch('rack', bakeAO(rackGeometry(), 4, 0.35), vc('rustSteel'));
@@ -407,7 +442,42 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       for (let k = 0; k < n; k++) pallets.add(x, floorY + k * 0.144, z, rng.range(-0.2, 0.2));
     }
   }
-  out.batches.push(racks, pallets, drums, tyres, cones, railTape, railPost, catwalk);
+  // Round 5 prop types: cable reels, scaffold towers, hanging tarps, forklift, signage boards.
+  const reelGeo = bakeAO((() => {
+    const parts: THREE.BufferGeometry[] = [new THREE.CylinderGeometry(0.9, 0.9, 0.12, 18).rotateX(Math.PI / 2).translate(0, 0.9, 0.45), new THREE.CylinderGeometry(0.9, 0.9, 0.12, 18).rotateX(Math.PI / 2).translate(0, 0.9, -0.45), new THREE.CylinderGeometry(0.55, 0.55, 0.8, 14).rotateX(Math.PI / 2).translate(0, 0.9, 0)];
+    return mergeGeometries(parts, false)!;
+  })(), 1.8, 0.35);
+  const reels = new PropBatch('reel', reelGeo, lib.get('pallet'));
+  const scaffoldGeo = (() => {
+    const parts: THREE.BufferGeometry[] = [];
+    for (const x of [-0.9, 0.9]) for (const z of [-0.6, 0.6]) parts.push(new THREE.CylinderGeometry(0.03, 0.03, 4, 6).translate(x, 2, z));
+    for (const y of [1.3, 2.6, 3.9]) {
+      for (const z of [-0.6, 0.6]) parts.push(new THREE.BoxGeometry(1.8, 0.05, 0.05).translate(0, y, z));
+      for (const x of [-0.9, 0.9]) parts.push(new THREE.BoxGeometry(0.05, 0.05, 1.2).translate(x, y, 0));
+      parts.push(new THREE.BoxGeometry(1.8, 0.04, 1.2).translate(0, y + 0.03, 0));
+    }
+    return mergeGeometries(parts, false)!;
+  })();
+  const scaffolds = new PropBatch('scaffold', bakeAO(scaffoldGeo, 4, 0.3), steel);
+  const tarpMat = fogify(new THREE.MeshStandardMaterial({ color: 0x2a4d8a, roughness: 0.9, side: THREE.DoubleSide }));
+  const tarps = new PropBatch('tarp', new THREE.PlaneGeometry(3, 2.4, 6, 4).translate(0, -1.2, 0), tarpMat, true);
+  const forkliftGeo = bakeAO((() => {
+    const parts: THREE.BufferGeometry[] = [new THREE.BoxGeometry(1.1, 0.9, 1.0).translate(0, 0.75, 0), new THREE.BoxGeometry(0.9, 0.5, 0.9).translate(-0.2, 1.4, 0), new THREE.BoxGeometry(0.08, 2.6, 0.9).translate(0.75, 1.3, 0), new THREE.BoxGeometry(1.0, 0.05, 0.15).translate(1.3, 0.1, 0.3), new THREE.BoxGeometry(1.0, 0.05, 0.15).translate(1.3, 0.1, -0.3)];
+    for (const x of [-0.35, 0.4]) for (const z of [-0.5, 0.5]) parts.push(new THREE.CylinderGeometry(0.3, 0.3, 0.2, 12).rotateX(Math.PI / 2).translate(x, 0.3, z));
+    return mergeGeometries(parts, false)!;
+  })(), 2.5, 0.35);
+  const forklifts = new PropBatch('forklift', forkliftGeo, fogify(new THREE.MeshStandardMaterial({ color: 0xd8a020, roughness: 0.5, metalness: 0.3 })));
+  const signMat = lib.get('hazardTape');
+  const signs = new PropBatch('sign', new THREE.BoxGeometry(1.6, 1.0, 0.05).translate(0, 2.0, 0), signMat);
+  for (let x = x0 + 10; x < x1 - 10; x += rng.range(9, 16)) {
+    const r = rng.next();
+    if (r < 0.25) reels.add(x, floorY, rng.range(-12, -6), rng.range(0, 6), rng.range(0.6, 1.0));
+    else if (r < 0.45) scaffolds.add(x, floorY, rng.range(-14, -9), rng.range(-0.2, 0.2));
+    else if (r < 0.65) tarps.add(x, roofY - 3 - rng.range(0, 3), rng.range(-16, -8), rng.range(-0.4, 0.4), 1, [0x2a4d8a, 0x8a6a2a, 0x5a5a5a][rng.int(0, 2)]!);
+    else if (r < 0.8) forklifts.add(x, floorY, rng.range(-9, -5), rng.range(-0.5, 0.5) + (rng.next() < 0.5 ? Math.PI : 0));
+    else signs.add(x, floorY, wallZ + 2.2, 0);
+  }
+  out.batches.push(racks, pallets, drums, tyres, cones, railTape, railPost, catwalk, reels, scaffolds, tarps, forklifts, signs);
 
   // --- Light shafts from the main window banks, leaning along the sun.
   const shaft = shaftTexture();
