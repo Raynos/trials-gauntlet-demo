@@ -61,6 +61,13 @@ export interface BikeTuning {
     rearMaxNm: number;
     /** Front brake fades as the rear wheel unloads (rider modulating a stoppie); 0 disables. */
     antiEndo: number;
+    /** Fraction of the front brake kept when the rear is fully unloaded (a stoppie is still possible). */
+    antiEndoFloor: number;
+    /** The rider caps the front brake so this fraction of the weight stays on the rear (feed-forward). */
+    rearLoadMin: number;
+    /** Brake input slew, 1/s (lever squeeze / release). */
+    rise: number;
+    fall: number;
   };
   rider: {
     mass: number;
@@ -68,10 +75,12 @@ export interface BikeTuning {
     anchor: Vec2;
     /**
      * Rider torso as a hidden angular momentum store: lean swings it by `swing` rad relative to
-     * the frame through a torque pair, so leaning in the air rotates the bike (lean back = nose up)
-     * without inventing angular momentum.
+     * the frame through a torque-limited motor (a velocity constraint with a bang-bang optimal rate
+     * profile: it never overshoots and frame rotation cannot pump it), so leaning in the air rotates
+     * the bike (lean back = nose up) without inventing angular momentum. `maxRate` rad/s caps the
+     * swing speed; `maxTorque` Nm caps the motor and therefore how fast the bike reacts.
      */
-    torso: { inertia: number; swing: number; k: number; c: number; maxTorque: number };
+    torso: { inertia: number; swing: number; maxRate: number; maxTorque: number };
     /** Anchor drops by this * |lean| (sit back low / hang over the bars); forward has its own value. */
     leanCrouch: number;
     leanCrouchFwd: number;
@@ -81,6 +90,8 @@ export interface BikeTuning {
     /** Fore-aft stiffness / damping (arms + braced legs: much stiffer than the legs' up-down). */
     kAlong: number;
     cAlong: number;
+    /** Cap on the fore-aft brace force (N): the most the rider can push/pull along the bike. */
+    shiftForce: number;
     kLanding: number;
     leanBack: number;
     leanFwd: number;
@@ -89,12 +100,20 @@ export interface BikeTuning {
     hopExtend: number;
     /** Leg actuator force during the hop push (N, rider up / frame down). */
     hopForce: number;
+    /**
+     * Frame-local x where the legs act on the bike while pushing/recovering in a hop (the pegs).
+     * The neutral anchor is the rider COM; at full forward lean it sits almost over the front axle,
+     * so a yank there lifts the front and leaves the rear behind. The pegs are where the feet are.
+     */
+    hopPegX: number;
     /** Rider spring stiffness while the legs are pushing (soft: the actuator does the work). */
     kPush: number;
     /** Seconds for the preload crouch to reach full depth (eased). */
     crouchTime: number;
-    /** Arm stiffness as a fraction of leg stiffness (rider above the anchor). */
-    armFrac: number;
+    /** Fraction of the rider's weight the legs stop carrying while crouching into a preload (slack legs). */
+    preloadSlack: number;
+    /** Most the rider can pull the bike up toward himself outside a hop (arms on the bars), N. */
+    armPull: number;
     /** Hard stop: the rider cannot rise more than this above the anchor (legs straight, feet on pegs). */
     legSlack: number;
     hopMaxForce: number;
@@ -164,9 +183,9 @@ const DEFAULTS: BikeTuning = {
     },
   },
   tyre: {
-    muPeak: 2.0,
+    muPeak: 2.1,
     kappaPeak: 0.15,
-    slideFrac: 0.9,
+    slideFrac: 0.92,
     vRef: 1.0,
     rollRes: 0.012,
     grip: { dirt: 1.0, wood: 0.95, metal: 0.75, concrete: 1.05, rubber: 1.1, grate: 0.9, stone: 1.0, snow: 0.5 },
@@ -192,29 +211,32 @@ const DEFAULTS: BikeTuning = {
     throttleRise: 40,
     throttleFall: 60,
   },
-  brakes: { frontMaxNm: 640, rearMaxNm: 500, antiEndo: 0.05 },
+  brakes: { frontMaxNm: 640, rearMaxNm: 500, antiEndo: 0.05, antiEndoFloor: 0.8, rearLoadMin: 0.05, rise: 30, fall: 40 },
   rider: {
     mass: 75,
     anchor: { x: 0.33, y: 0.38 },
-    torso: { inertia: 15, swing: 1.2, k: 4000, c: 390, maxTorque: 300 },
-    leanCrouch: 0.4,
+    torso: { inertia: 20, swing: 1.5, maxRate: 7, maxTorque: 400 },
+    leanCrouch: 0.2,
     leanCrouchFwd: 0.5,
     k: 6000,
     c: 740,
     kAlong: 20000,
     cAlong: 1800,
+    shiftForce: 2000,
     kLanding: 40000,
     leanBack: 0.6,
     leanFwd: 0.73,
     leanRate: 6,
     crouch: 0.3,
     hopExtend: 0.15,
-    hopForce: 2600,
+    hopForce: 3200,
+    hopPegX: 0.08,
     kPush: 500,
     crouchTime: 0.25,
-    armFrac: 0.3,
+    preloadSlack: 0.85,
+    armPull: 300,
     legSlack: 0.05,
-    hopMaxForce: 3200,
+    hopMaxForce: 3800,
     hopPreloadMin: 0.12,
     hopPreloadMax: 1.5,
     hopPushTime: 0.35,

@@ -133,23 +133,36 @@ export function hopper(startT: number, preloadS = 0.3, roll = false): Controller
 }
 
 /**
- * Rolling hop onto a ledge whose vertical face is at `wallX`: hold `speed` on the approach,
- * preload (lean back + throttle) from `preloadDist` before the wall, snap forward at `snapDist`.
+ * Rolling hop onto a ledge whose vertical face is at `wallX` (top at `ledgeY`), the way the clips
+ * do it: hold `speed` on the approach, then from `preloadDist` before the wall lean back and gas
+ * into a wheelie held at `wheelieDeg` (front wheel high enough to meet the lip, not the face);
+ * when the front is `snapDist` from the wall snap forward (the hop push lifts the rear); once the
+ * rear is over the lip level the bike with throttle/lean (nose-down: gas + lean back; nose-up:
+ * brake + lean forward) and ride away.
  */
-export function ledgeHopper(wallX: number, speed = 5, preloadDist = 4, snapDist = 1.4, wheelieDeg = 30): Controller {
+export function ledgeHopper(wallX: number, speed = 5, preloadDist = 4, snapDist = 0.4, wheelieDeg = 35): Controller {
+  let snapped = false;
   return (o) => {
     const frontX = o.state.wheels.front.pos.x;
+    const rearX = o.state.wheels.rear.pos.x;
     const dist = wallX - frontX;
     const hold = Math.max(0, Math.min(1, 0.05 + 0.15 * (speed - o.speed)));
-    if (dist > preloadDist) return { throttle: hold, lean: 0 };
-    if (dist > snapDist) {
-      // manual: lean back, gas to pop the front, then hold the pitch with throttle
+    if (!snapped && dist > preloadDist) return { throttle: hold, lean: 0 };
+    if (!snapped && dist > snapDist) {
+      // wheelie: lean back, throttle as the pitch loop
       const err = wheelieDeg - o.pitchDeg;
-      const throttle = Math.max(0.3, Math.min(1, 0.4 + 0.05 * err - 0.01 * o.pitchRateDeg));
+      const throttle = Math.max(0.3, Math.min(1, 0.45 + 0.06 * err - 0.012 * o.pitchRateDeg));
       return { throttle, lean: -1 };
     }
-    if (dist > -1.5) return { throttle: 0.5, lean: 1 };
-    return { throttle: 0.3, lean: 0 };
+    snapped = true;
+    if (rearX < wallX + 0.2) return { throttle: 0.5, lean: 1 };
+    // recover: level the bike, then ride
+    if (o.airborne || !o.rearGrounded) {
+      if (o.pitchDeg < -8) return { throttle: 1, lean: -0.6 };
+      if (o.pitchDeg > 25) return { brake: 1, throttle: 0, lean: 1 };
+      return { throttle: 0.4, lean: 0.3 };
+    }
+    return { throttle: 0.35, lean: 0 };
   };
 }
 
@@ -176,8 +189,11 @@ export function climber(slopeDeg: number, baseX = -Infinity, opts: { hover?: num
     if (opts.topX !== undefined && frontX > opts.topX - 0.2) {
       // front at the lip: keep it pinned so the bike carries over the edge instead of hanging on
       // the bash plate (the front carries weight now, no loop risk), then settle the nose and ride on
-      if (rearX < opts.topX + 0.1) return { throttle: 1, lean: 1 };
-      return { throttle: o.pitchDeg > 20 ? 0.1 : 0.4, lean: o.pitchDeg > 10 ? 0.6 : 0.2, brake: o.pitchDeg > 45 ? 0.5 : 0 };
+      if (rearX < opts.topX + 0.1) return { throttle: o.pitchDeg > o.balanceAt(1) - 4 ? 0 : 1, lean: 1, brake: o.pitchDeg > o.balanceAt(1) ? 1 : 0 };
+      // over the lip: stay over the bars until the nose is down (a lean change here swings the torso
+      // and kicks the nose up while the spinning rear grabs the edge), brake if it keeps rising
+      if (o.pitchDeg > 25) return { throttle: 0, lean: 1, brake: o.pitchDeg > 35 || o.pitchRateDeg > 40 ? 1 : 0 };
+      return { throttle: 0.3, lean: o.pitchDeg > 10 ? 0.8 : 0.3 };
     }
     if (phase === 0) {
       // approach: hold speed, lift the front to ~15 deg in the last metre

@@ -118,7 +118,8 @@ const S_FRONT_LT = 31;
 const S_REAR_MU = 32;
 const S_FRONT_SLIP = 33;
 const S_RAG_REST = 34; // 6 slots
-const NSCALAR = 40;
+const S_BRAKE_EFF = 40;
+const NSCALAR = 44;
 
 // flag slots in U
 const U_FINISHED = 0;
@@ -238,9 +239,17 @@ class BikeWorld implements BikePhysicsWorld {
   private tetherSep = 0;
   private anchorX = 0;
   private anchorY = 0;
+  private legX = 0;
+  private legY = 0;
+  private legStopX = 0;
+  private legStopY = 0;
+  private braceX = 0;
+  private braceY = 0;
   private readonly ragLambda = new Float64Array(RAG_JOINTS.length * 3);
   private seesawLambda = new Float64Array(0);
   private brakeIn = 0;
+  private torsoLambda = 0;
+  private torsoRate = 0;
   private readonly rng = new Rng(0);
 
   // query scratch
@@ -455,7 +464,8 @@ class BikeWorld implements BikePhysicsWorld {
 
   // -- extras ---------------------------------------------------------------
 
-  balancePitch(lean: number, accel = 0): number {
+  /** Combined COM relative to the rear contact patch in frame space (d ahead, h above) for a lean, at static sag. */
+  private comDH(lean: number): { d: number; h: number } {
     const t = this.tuning;
     const R = t.wheel.radius;
     const cr = this.staticSag(t.suspension.rear, this.staticLoad(0));
@@ -467,10 +477,13 @@ class BikeWorld implements BikePhysicsWorld {
     const M = t.frame.mass + 2 * t.wheel.mass + t.rider.mass;
     const cx = (t.wheel.mass * (rear.x + front.x) + t.rider.mass * rider.x) / M;
     const cy = (t.wheel.mass * (rear.y + front.y) + t.rider.mass * rider.y) / M;
-    const d = cx - rear.x;
-    const h = cy - (rear.y - R);
+    return { d: cx - rear.x, h: cy - (rear.y - R) };
+  }
+
+  balancePitch(lean: number, accel = 0): number {
+    const { d, h } = this.comDH(lean);
     // forward acceleration lifts the nose (pseudo-force at the COM), so the balance pitch drops with accel
-    return HALF_PI - atan2(h, d) - atan(accel / t.gravity);
+    return HALF_PI - atan2(h, d) - atan(accel / this.tuning.gravity);
   }
 
   teleport(pose: TeleportPose): void {
@@ -647,12 +660,12 @@ class BikeWorld implements BikePhysicsWorld {
     this.saveRng();
   }
 
-  /** Rider height above the current anchor along frame-up (uses the anchor of the last force pass). */
+  /** Rider height above the legs-straight stop along frame-up (uses the stop of the last force pass). */
   private riderExt(): number {
     const c = cos(this.an[FRAME]!);
     const s = sin(this.an[FRAME]!);
-    const dx = this.px[RIDER]! - this.anchorX;
-    const dy = this.py[RIDER]! - this.anchorY;
+    const dx = this.px[RIDER]! - this.legStopX;
+    const dy = this.py[RIDER]! - this.legStopY;
     return -dx * s + dy * c;
   }
 
@@ -731,7 +744,14 @@ class BikeWorld implements BikePhysicsWorld {
     if (Math.abs(nle - input.lean) < 1e-9) nle = input.lean;
     F[S_LEAN_EFF] = nle;
 
-    this.brakeIn = input.brake;
+    // brake slew (lever squeeze): a digital input still takes ~0.1 s to reach full clamp
+    {
+      const be = F[S_BRAKE_EFF]!;
+      let nbe = be + clamp(input.brake - be, -t.brakes.fall * dt, t.brakes.rise * dt);
+      if (Math.abs(nbe - input.brake) < 1e-9) nbe = input.brake;
+      F[S_BRAKE_EFF] = nbe;
+      this.brakeIn = nbe;
+    }
 
     // hop state machine (technique, no button)
     const r = t.rider;
@@ -861,6 +881,8 @@ class BikeWorld implements BikePhysicsWorld {
     // rider anchor + spring force from pre-impulse velocities
     let riderFx = 0;
     let riderFy = 0;
+    let legUpFx = 0;
+    let legUpFy = 0;
     let rax = 0;
     let ray = 0;
     if (riding) {
@@ -875,6 +897,11 @@ class BikeWorld implements BikePhysicsWorld {
       const ayw = fy + alx * s + aly * c;
       this.anchorX = axw;
       this.anchorY = ayw;
+      // legs-straight stop: fixed leg length above the pegs (neutral height + hop extension); the
+      // crouch and the lean crouch lower the target, not the limit, so a crouch cannot yank the bike
+      const sly = r.anchor.y + F[S_HOP_EXT]! * r.hopExtend;
+      this.legStopX = fx + alx * c - sly * s;
+      this.legStopY = fy + alx * s + sly * c;
       rax = axw - fx;
       ray = ayw - fy;
       const wf = av[FRAME]!;
@@ -896,25 +923,55 @@ class BikeWorld implements BikePhysicsWorld {
       const kl = r.kLanding * dist;
       const k = hop ? r.kPush : r.k;
       // legs: full stiffness plus the landing cubic in compression (ext < 0); while preloading the
-      // legs relax (armFrac) so the crouch does not yank the bike up. In free fall the rider floats
+      // legs go slack (preloadSlack) so the rider drops into the crouch. In free fall the rider floats
       // m*g/k above the anchor with no force on the frame.
       const preload = this.U[U_HOP] === 1;
-      const kUp = ext < 0 ? k + kl : preload ? k * r.armFrac : k;
+      const kUp = ext < 0 ? k + kl : k;
       const cUp = hop ? r.c * 0.1 : r.c;
       const fWeight = r.mass * g;
       let fUp = -kUp * ext - cUp * extRate + fWeight;
-      if (hop && ext < 0) fUp += r.hopForce;
+      // preload crouch: the legs go slack so the rider drops toward the lowered anchor at ~g and the
+      // bike unloads (suspension extends); the stiff catch below the anchor then loads it up
+      if (preload && ext > 0) fUp = fWeight * (1 - r.preloadSlack) - cUp * 0.1 * extRate;
+      // feet on pegs: the legs cannot pull the bike up; only the arms can, by `armPull` at most (the
+      // hop's yank goes through the legs-straight stop instead). Without this a lean-back crouch
+      // dropping the anchor at 1.2 m/s lifted the bike by ~1.2 kN through the leg damper.
+      if (!hop && fUp < -r.armPull) fUp = -r.armPull;
+      // the leg actuator pushes until the legs are straight (rider at the leg stop), not merely to the anchor
+      const extStop = (px[RIDER]! - this.legStopX) * upx + (py[RIDER]! - this.legStopY) * upy;
+      if (hop && extStop < 0) fUp += r.hopForce;
       const maxUp = hop ? r.hopMaxForce : r.ejectForce * 1.5;
       fUp = clamp(fUp, -maxUp, maxUp);
+      // fore-aft brace, capped at what arms and legs can push: a weight shift is the rider moving
+      // himself, not a 20 kN/m spring yanking 75 kg through 0.6 m in 0.17 s (which lifted the rear)
       let fAlong = -r.kAlong * along - r.cAlong * alongRate;
-      fAlong = clamp(fAlong, -r.ejectForce * 1.5, r.ejectForce * 1.5);
+      fAlong = clamp(fAlong, -r.shiftForce, r.shiftForce);
       const Fx = fAlong * c + fUp * upx;
       const Fy = fAlong * s + fUp * upy;
       const mag = Math.sqrt(Fx * Fx + Fy * Fy);
       F[S_TETHER_F] = mag;
       F[S_TETHER_OVER] = mag >= r.ejectForce && !hop ? F[S_TETHER_OVER]! + 1 : 0;
-      riderFx = Fx;
-      riderFy = Fy;
+      // the fore-aft brace reacts on the frame at the anchor: for a point-mass rider the reaction must
+      // be collinear with the rider's inertia force or it injects a couple (tried at the pegs: the bike
+      // then pitched nose-down under every acceleration and the wheelie balance point moved)
+      riderFx = fAlong * c;
+      riderFy = fAlong * s;
+      this.braceX = axw;
+      this.braceY = ayw;
+      // while the legs push (hop push/recover) they act on the pegs too, not on the rider COM anchor
+      const legsOnPegs = this.U[U_HOP] === 2 || this.U[U_HOP] === 3;
+      if (legsOnPegs) {
+        const plx = r.hopPegX;
+        this.legX = fx + plx * c - aly * s;
+        this.legY = fy + plx * s + aly * c;
+        legUpFx = fUp * upx;
+        legUpFy = fUp * upy;
+      } else {
+        this.legX = axw;
+        this.legY = ayw;
+        legUpFx = fUp * upx;
+        legUpFy = fUp * upy;
+      }
     }
 
     // pass 2: apply suspension impulses
@@ -958,21 +1015,18 @@ class BikeWorld implements BikePhysicsWorld {
       av[FRAME] = av[FRAME]! + tq * dt * ii[FRAME]!;
 
       // rider spring/damper reaction (computed above): the rider gets F, the frame gets -F at the anchor
-      vx[RIDER] = vx[RIDER]! + riderFx * dt * im[RIDER]!;
-      vy[RIDER] = vy[RIDER]! + riderFy * dt * im[RIDER]!;
-      vx[FRAME] = vx[FRAME]! - riderFx * dt * im[FRAME]!;
-      vy[FRAME] = vy[FRAME]! - riderFy * dt * im[FRAME]!;
-      av[FRAME] = av[FRAME]! - ii[FRAME]! * (rax * riderFy - ray * riderFx) * dt;
-
-      // torso swing: torque pair between the rider's angular DOF and the frame (lean back = nose up)
+      // (the leg part at the pegs while hopping)
+      vx[RIDER] = vx[RIDER]! + (riderFx + legUpFx) * dt * im[RIDER]!;
+      vy[RIDER] = vy[RIDER]! + (riderFy + legUpFy) * dt * im[RIDER]!;
+      vx[FRAME] = vx[FRAME]! - (riderFx + legUpFx) * dt * im[FRAME]!;
+      vy[FRAME] = vy[FRAME]! - (riderFy + legUpFy) * dt * im[FRAME]!;
       {
-        const ts = t.rider.torso;
-        const rel = this.an[RIDER]! - this.an[FRAME]!;
-        const relRate = av[RIDER]! - av[FRAME]!;
-        const target = F[S_LEAN_EFF]! * ts.swing;
-        const tq = clamp(ts.k * (target - rel) - ts.c * relRate, -ts.maxTorque, ts.maxTorque);
-        av[RIDER] = av[RIDER]! + tq * dt * ii[RIDER]!;
-        av[FRAME] = av[FRAME]! - tq * dt * ii[FRAME]!;
+        const bx = this.braceX - fx;
+        const by = this.braceY - fy;
+        av[FRAME] = av[FRAME]! - ii[FRAME]! * (bx * riderFy - by * riderFx) * dt;
+        const lx = this.legX - fx;
+        const ly = this.legY - fy;
+        av[FRAME] = av[FRAME]! - ii[FRAME]! * (lx * legUpFy - ly * legUpFx) * dt;
       }
 
       // aero drag on the frame
@@ -1207,7 +1261,10 @@ class BikeWorld implements BikePhysicsWorld {
     if (this.qRag && vn < -1) vnMin = Math.max(vnMin, -t.ragdoll.restitution * vn);
     this.cVnMin[i] = vnMin;
     if (this.qWheel === 1) {
-      const slip = rvx * tx + rvy * ty;
+      // slip ratio from the previous tick's RESOLVED slip: the pre-solve contact velocity already
+      // carries this tick's unconstrained engine spin-up of the light wheel (~2 m/s per tick at full
+      // torque), which judged every driven tyre as sliding and cost 10 % of grip under throttle
+      const slip = A === REAR ? this.F[S_REAR_SLIP]! : this.F[S_FRONT_SLIP]!;
       const vcx = this.vx[A]! - vbx;
       const vcy = this.vy[A]! - vby;
       const vct = Math.abs(vcx * tx + vcy * ty);
@@ -1246,7 +1303,16 @@ class BikeWorld implements BikePhysicsWorld {
     this.tetherActive = false;
     this.legLambda = 0;
     this.legActive = false;
+    this.torsoLambda = 0;
     if (riding) {
+      // torso motor: the rate that brings the swing to its lean target with the deceleration the
+      // torque cap allows (bang-bang optimal), so the torso never overshoots and frame rotation
+      // under it is absorbed, not stored and returned
+      const ts = t.rider.torso;
+      const err = this.F[S_LEAN_EFF]! * ts.swing - (this.an[RIDER]! - this.an[FRAME]!);
+      const acc = (0.8 * ts.maxTorque) / ts.inertia;
+      const mag = Math.min(ts.maxRate, Math.sqrt(2 * acc * Math.abs(err)), Math.abs(err) / dt);
+      this.torsoRate = err < 0 ? -mag : mag;
       const dx = this.px[RIDER]! - this.anchorX;
       const dy = this.py[RIDER]! - this.anchorY;
       const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1257,10 +1323,10 @@ class BikeWorld implements BikePhysicsWorld {
         this.tetherNy = dy / dist;
         this.tetherSep = max - dist;
       }
-      // legs straight: the rider cannot rise more than legSlack above the anchor along frame-up
+      // legs straight: the rider cannot rise more than legSlack above the leg-stop point along frame-up
       const c0 = cos(this.an[FRAME]!);
       const s0 = sin(this.an[FRAME]!);
-      const ext = -dx * s0 + dy * c0;
+      const ext = -(this.px[RIDER]! - this.legStopX) * s0 + (this.py[RIDER]! - this.legStopY) * c0;
       const sep = t.rider.legSlack - ext;
       if (sep < 0.05) {
         this.legActive = true;
@@ -1370,8 +1436,8 @@ class BikeWorld implements BikePhysicsWorld {
         const s0 = sin(this.an[FRAME]!);
         const nx = -s0;
         const ny = c0;
-        const rax = this.anchorX - fx;
-        const ray = this.anchorY - fy;
+        const rax = this.legX - fx;
+        const ray = this.legY - fy;
         const rn = rax * ny - ray * nx;
         const mass = 1 / (im[RIDER]! + im[FRAME]! + ii[FRAME]! * rn * rn);
         const relx = vx[RIDER]! - (vx[FRAME]! - av[FRAME]! * ray);
@@ -1389,6 +1455,20 @@ class BikeWorld implements BikePhysicsWorld {
         vx[FRAME] = vx[FRAME]! + lambda * nx * im[FRAME]!;
         vy[FRAME] = vy[FRAME]! + lambda * ny * im[FRAME]!;
         av[FRAME] = av[FRAME]! + ii[FRAME]! * rn * lambda;
+      }
+
+      // --- torso motor (torque-limited velocity constraint between the rider's angular DOF and the frame)
+      if (riding) {
+        const maxJ = t.rider.torso.maxTorque * dt;
+        const rel = av[RIDER]! - av[FRAME]!;
+        const mass = 1 / (ii[RIDER]! + ii[FRAME]!);
+        let lambda = -mass * (rel - this.torsoRate);
+        const old = this.torsoLambda;
+        const acc = clamp(old + lambda, -maxJ, maxJ);
+        lambda = acc - old;
+        this.torsoLambda = acc;
+        av[RIDER] = av[RIDER]! + lambda * ii[RIDER]!;
+        av[FRAME] = av[FRAME]! - lambda * ii[FRAME]!;
       }
 
       // --- ragdoll joints
@@ -1497,9 +1577,18 @@ class BikeWorld implements BikePhysicsWorld {
           const wb = wheelB[w]!;
           let maxNm = w === 0 ? t.brakes.rearMaxNm : t.brakes.frontMaxNm;
           if (w === 1 && t.brakes.antiEndo > 0) {
+            // the rider modulates the front: feed-forward cap at the torque that keeps `rearLoadMin`
+            // of the weight on the rear for the COM geometry of the current lean (load transfer
+            // a*h/L against the static split), plus a feedback fade if the rear still unloads
             const W = (t.frame.mass + 2 * t.wheel.mass + t.rider.mass) * t.gravity;
             const rearN = this.F[S_REAR_LN]! / dt;
-            maxNm *= clamp(rearN / (t.brakes.antiEndo * W), 0.25, 1);
+            const { d, h } = this.comDH(this.F[S_LEAN_EFF]!);
+            const L = t.wheel.wheelbase;
+            const nrMin = t.brakes.rearLoadMin * W;
+            const fRear = t.tyre.muPeak * nrMin;
+            const fFront = (W * (L - d) - nrMin * L) / Math.max(h, 0.2) - fRear;
+            maxNm = Math.min(maxNm, Math.max(0, fFront) * t.wheel.radius);
+            maxNm *= clamp(rearN / (t.brakes.antiEndo * W), t.brakes.antiEndoFloor, 1);
           }
           const maxJ = this.brakeIn * maxNm * dt;
           const rel = av[wb]! - av[FRAME]!;
