@@ -23,7 +23,38 @@
  */
 import type { CameraKey, TrackCheckpoint, TrackDef, TrackMeta, TrackObstacle, TrackTier, Vec2 } from '../core/types';
 import { seedFromString } from '../core/rng';
-import { footprint, isSolidKind, type KindParams, type ObstacleKind, type ParamRecord } from './kinds';
+import { footprint, isDecorKind, isSolidKind, type DecorKind, type KindParams, type ObstacleKind, type ParamRecord } from './kinds';
+
+// ---------------------------------------------------------------------------
+// Set pieces (mega build wave 1, P2 / P3): x ranges render reacts to (crowd, lights, camera cue)
+// ---------------------------------------------------------------------------
+
+/**
+ * `start` / `finish` are the event gantries; `crowd` a spectator stand; `tunnel` a covered
+ * stretch (pair it with a `tunnel` decor); `drop` a drop into the unknown (camera pull-out,
+ * dust); `fire` a pyro line; `climb` the big face; `air` a hero jump; `balance` a slow
+ * technical moment (camera tight). Metadata only: nothing here touches physics or the hash.
+ */
+export type SetPieceKind = 'start' | 'finish' | 'crowd' | 'tunnel' | 'drop' | 'fire' | 'climb' | 'air' | 'balance';
+export interface SetPiece {
+  x0: number;
+  x1: number;
+  kind: SetPieceKind;
+  /** Storyboard beat name, for the HUD / replay viewer / describeTrack. */
+  label?: string;
+}
+/**
+ * `TrackMeta` plus the set-piece markers. Core owns `TrackMeta`; until it grows
+ * `setPieces?: {x0,x1,kind}[]` (requested wave 1) tracks writes the field through this type
+ * and readers use `setPiecesOf(def)`.
+ */
+export type TracksMeta = TrackMeta & { setPieces?: SetPiece[] };
+
+/** Set-piece markers of a track (empty when the course authored none). */
+export function setPiecesOf(def: TrackDef): SetPiece[] {
+  const sp = (def.meta as TracksMeta | undefined)?.setPieces;
+  return Array.isArray(sp) ? sp : [];
+}
 
 // ---------------------------------------------------------------------------
 // Feel envelope (CONTRACT §2.5) with 20 % authoring margin
@@ -138,7 +169,10 @@ export function validateFinishRunout(def: TrackDef): string[] {
       break;
     }
   }
-  const after = def.obstacles.map((o, i) => ({ o, i })).filter(({ o }) => o.pos.x > fx - 1e-6).sort((a, b) => a.o.pos.x - b.o.pos.x);
+  const after = def.obstacles
+    .map((o, i) => ({ o, i }))
+    .filter(({ o }) => o.pos.x > fx - 1e-6 && !isDecorKind(o.kind)) // a finish gantry over the line is decor, not an obstacle
+    .sort((a, b) => a.o.pos.x - b.o.pos.x);
   const ramp = after[0];
   if (!ramp) {
     out.push('no catch after the run-out');
@@ -256,7 +290,10 @@ function profileY(profile: readonly Vec2[], x: number): number {
 }
 
 function features(def: TrackDef): Feature[] {
-  const obs = def.obstacles.map((o, index) => ({ o, index })).sort((a, b) => a.o.pos.x - b.o.pos.x || a.index - b.index);
+  const obs = def.obstacles
+    .map((o, index) => ({ o, index }))
+    .filter(({ o }) => !isDecorKind(o.kind)) // arches and tunnels have no collider: neither a feature nor a neighbour
+    .sort((a, b) => a.o.pos.x - b.o.pos.x || a.index - b.index);
   const out: Feature[] = [];
   const R = CHECKPOINT_RULE;
   for (let k = 0; k < obs.length; k++) {
@@ -573,6 +610,10 @@ export class CourseBuilder {
   private readonly cameras: CameraKey[] = [];
   private readonly hints: string[] = [];
   private readonly footprints: { x0: number; x1: number; kind: string }[] = [];
+  /** Decor (arch / tunnel): appended after every rideable obstacle in `finish()` so `obstacleIndex` — and the golden hash — never move. */
+  private readonly decor: TrackObstacle[] = [];
+  private readonly setPieces: SetPiece[] = [];
+  private openSetPiece: SetPiece | null = null;
   private metaData: TrackMeta | null = null;
   private openCamera: CameraKey | null = null;
 
@@ -593,6 +634,37 @@ export class CourseBuilder {
 
   meta(m: Omit<TrackMeta, 'camera' | 'hints'>): this {
     this.metaData = { ...m };
+    return this;
+  }
+
+  // -- decor and set pieces (no colliders, no hash; render reacts) ----------
+
+  /**
+   * Overhead arch / gate centred on the cursor (`span` m wide, underside `height` above the
+   * current ground + `base`). No collider; the cursor does not move. `.checkpoint().arch({ style:
+   * 'checkpoint' })` puts the post's gantry over the spawn; `.arch({ style: 'finish' }).finish()`
+   * the finish gantry over the line.
+   */
+  arch(p: Partial2<KindParams['arch']> = {}, o?: ObstacleOpts): this {
+    const span = p.span ?? 6;
+    return this.placeDecor('arch', { ...p, span }, this.x - span / 2, o);
+  }
+  /** Covered stretch from the cursor for `length` m. No collider; the cursor does not move. */
+  tunnel(p: Partial2<KindParams['tunnel']> = {}, o?: ObstacleOpts): this {
+    return this.placeDecor('tunnel', p, this.x, o);
+  }
+  /**
+   * Open a set-piece range at the cursor; `endSetPiece()` or the next `setPiece()` closes it, and
+   * `finish()` closes an open one ON the finish line. Ends up in `meta.setPieces`
+   * (`setPiecesOf(def)`), x0 < x1, non-decreasing by x0.
+   */
+  setPiece(kind: SetPieceKind, label?: string): this {
+    this.closeSetPiece();
+    this.openSetPiece = label === undefined ? { x0: this.x, x1: this.x, kind } : { x0: this.x, x1: this.x, kind, label };
+    return this;
+  }
+  endSetPiece(): this {
+    this.closeSetPiece();
     return this;
   }
 
@@ -944,6 +1016,27 @@ export class CourseBuilder {
     return this;
   }
 
+  private placeDecor(kind: DecorKind, params: object, x: number, o?: ObstacleOpts): this {
+    const p = params as Partial2<KindParams['arch']> & Partial2<KindParams['tunnel']>;
+    if (p.span !== undefined) this.assertPositive(p.span, 'arch span');
+    if (p.length !== undefined) this.assertPositive(p.length, 'tunnel length');
+    if (p.height !== undefined) this.assertPositive(p.height, `${kind} height`);
+    this.decor.push({ kind, pos: { x: round(x), y: this.y + (o?.base ?? 0) }, params: { ...(params as ParamRecord) } });
+    return this;
+  }
+
+  private closeSetPiece(): void {
+    const sp = this.openSetPiece;
+    if (!sp) return;
+    sp.x1 = round(this.x);
+    sp.x0 = round(sp.x0);
+    if (sp.x1 <= sp.x0) throw new Error(`[${this.id}] set piece '${sp.kind}' opened at x=${sp.x0} has no length; move the cursor before closing it`);
+    const last = this.setPieces[this.setPieces.length - 1];
+    if (last && sp.x0 < last.x0) throw new Error(`[${this.id}] set piece '${sp.kind}' at x=${sp.x0} opens before '${last.kind}' at x=${last.x0}`);
+    this.setPieces.push(sp);
+    this.openSetPiece = null;
+  }
+
   private pin(): void {
     const last = this.profile[this.profile.length - 1] as Vec2;
     if (last.x < this.x - 1e-9) this.pushProfile(this.x, this.y);
@@ -981,6 +1074,7 @@ export class CourseBuilder {
    */
   finish(runout: number = FINISH_RUNOUT.flat, opts: { checkpointRule?: boolean; catch?: boolean } = {}): TrackDef {
     const finishX = this.x;
+    this.closeSetPiece(); // an open set piece ends on the line, not after the run-out
     this.flat(Math.max(runout, FINISH_RUNOUT.flat));
     if (opts.catch !== false) {
       this.ramp({ length: FINISH_RUNOUT.rampLength, height: FINISH_RUNOUT.rampHeight, surface: 'wood' });
@@ -990,17 +1084,19 @@ export class CourseBuilder {
     // end bank: 35 deg rise of 4 m
     this.slope(4 / Math.tan((35 * Math.PI) / 180), 4);
     this.closeCamera();
-    const meta = this.metaData;
+    const meta = this.metaData as TracksMeta | null;
     if (!meta) throw new Error(`[${this.id}] meta() is required`);
     if (this.cameras.length > 0) meta.camera = this.cameras;
     if (this.hints.length > 0) meta.hints = this.hints;
+    if (this.setPieces.length > 0) meta.setPieces = this.setPieces;
     const def: TrackDef = {
       id: this.id,
       name: this.name,
       tier: this.tier,
       seed: seedFromString(this.id),
       profile: this.profile.map((p) => ({ x: round(p.x), y: round(p.y) })),
-      obstacles: this.obstacles.map((o) => ({ kind: o.kind, pos: { x: round(o.pos.x), y: round(o.pos.y) }, params: o.params ?? {} })),
+      // decor last: the rideable obstacles keep their indices (and the golden hash) when a course gains an arch
+      obstacles: [...this.obstacles, ...this.decor].map((o) => ({ kind: o.kind, pos: { x: round(o.pos.x), y: round(o.pos.y) }, params: o.params ?? {} })),
       checkpoints: this.checkpoints.map((c) => ({ x: round(c.x), spawn: { pos: { x: round(c.spawn.pos.x), y: round(c.spawn.pos.y) }, angle: 0 } })),
       start: { pos: { x: 0, y: 0 }, angle: 0 },
       finishX: round(finishX),

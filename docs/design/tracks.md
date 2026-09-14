@@ -1,6 +1,6 @@
 # Track system and curriculum
 
-Status: round 6 (X3 trimmed to one feature per lesson at 500 m, X1 re-sequenced around a 45 deg opener with 40 m plank run-ins, B3 / M1 demand landings on inclines, and the finish run-out + catch on every track). Owner: tracks. Consumers: physics, render, audio, harness, game.
+Status: mega build wave 1 (round 7) — DESIGN wave: `docs/design/tracks-storyboards.md` storyboards h1-h3 / x1-x3 as designed courses (premise, technique story, set piece, pacing, checkpoints, attempts band, ASCII elevation) and sanity-passes m1-m3; the vocabulary gains the collider-free decor kinds `arch` / `tunnel` and `meta.setPieces` markers (§1.2, §1.4) so render can dress set pieces; no course changes (every golden and the round-6 acceptance matrix stand); §5 is the wave 2 plan. Round 6 for the record: X3 trimmed to one feature per lesson at 500 m, X1 re-sequenced around a 45 deg opener with 40 m plank run-ins, B3 / M1 demand landings on inclines, and the finish run-out + catch on every track. Owner: tracks. Consumers: physics, render, audio, harness, game.
 `docs/design/CONTRACT.md` wins over this file; the executable form is `src/core/types.ts`
 (`TrackDef`, `TrackMeta`, `CameraKey`, `CompiledTrack`, `Collider`, `HazardZone`,
 `PlacedObstacle`) and `src/tracks/index.ts`. Metres, seconds, radians unless a param is
@@ -85,6 +85,23 @@ Solids (`ramp wall stair box ledge`) sit on the ground: their outline runs from 
 up over the top and back down, and the bottom follows the ground chain under the footprint,
 so a solid on a slope is exact.
 
+**Decor kinds (wave 1, mega build P2 "every biome gets its own set piece").** Two collider-free
+kinds that `TrackObstacle.kind` may also hold (`DecorKind`, `DECOR_KINDS`, `isDecorKind`;
+`TrackKind = ObstacleKind | DecorKind`, `isTrackKind`). They compile to a `placed` entry with an
+empty `colliderIds`, contribute nothing to colliders, hazards, bounds or the hash, are ignored by
+the checkpoint rule, the finish run-out check and spawn validation, and the builder appends them
+AFTER every rideable obstacle so `obstacleIndex` of the real colliders — and therefore the golden
+hash — does not move when a course gains one (compile test: the same course with and without
+dressing hashes identically). Footprint 0: the DSL cursor does not advance.
+
+| kind | params (default) | placement | render dressing |
+|---|---|---|---|
+| `arch` | span 6, height 5 (underside above pos.y), depth 6 (z), style girder (`start finish checkpoint crowd girder pipe ice`), surface metal | `arch()` centres it on the cursor: pos.x = cursor - span / 2 | gantry with banners / countdown / confetti (`start`, `finish`), post + sign (`checkpoint`), spectator bridge (`crowd`), truss / duct / cornice |
+| `tunnel` | length 20, height 5, depth 6, style scaffold (`scaffold concrete pipe ice foundry`), lit true, surface concrete | `tunnel()` starts it at the cursor and runs `length` forward over whatever the course places under it | roof + walls + interior point lights (`lit`) or headlight-only; the "drop into shadowed scaffold" of rising clip 11 |
+
+Render's `switch (po.kind)` default branch iterates `colliderIds`, so an undressed arch is
+invisible, not a crash (render request: dress both kinds from `placed[].params`).
+
 ### 1.3 Compilation — `src/tracks/compile.ts`
 
 `compileTrack(def): CompiledTrack` is pure and deterministic (all coordinates quantised to
@@ -147,6 +164,16 @@ kept on the 1e-6 grid so computed footprint ends and the next `pos.x` quantise i
 (rear-wheel contact at cursor + 0.5, angle 0); `camera(key)` opens a `CameraKey` that runs
 to the next key or the finish; `hint(text)` adds a HUD hint; `finish(runout = 30)` sets
 `finishX` at the cursor, adds the run-out (round 6: `runout` is raised to `FINISH_RUNOUT.flat` = 30 m of flat at the finish height, then the catch — a 3 m x 0.75 ramp into a 2.5 m container — then the 35 deg end bank; `validateFinishRunout` checks flat, catch and that nothing stands on the run-out) and validates. Round 4 (authored to the stranger): `plateau(up, top, height)` = cosine rise, flat top, cosine fall with every crest grounded at 16 m/s (B1's tabletops), `descent(length, drop)` = a smooth descent whose top cannot launch, `bumpRow(count, h, groundedAt)` = cosine speed bumps grounded at that speed (B1's hump rows), `wave(length, dy, groundedAt)` asserts the same. `finish(runout, { checkpointRule: false })` opts a harness fixture out of the checkpoint rule; `{ catch: false }` opts a compile-test snippet out of the catch (fixtures keep it: `flat-test` carries the catch at 150 m by hand). Round 6: `steepPlank` takes `filletLength` / `filletHeight` — a 2.4 x 0.8 fillet in front of a >= 48 deg plank spreads the pitch-up over ~0.2 s (X1's 50 deg plank went from a 78-death stuck-restart wall to 3 deaths for reflex `good`; the 1.2 x 0.35 default stays on the <= 48 deg planks of E1).
+
+**Set pieces (wave 1).** `setPiece(kind, label?)` opens an x range at the cursor; `endSetPiece()`
+or the next `setPiece()` closes it and `finish()` closes an open one ON the finish line. Kinds
+(`SetPieceKind`): `start finish crowd tunnel drop fire climb air balance`. Ranges must have length
+and open in course order. They land in `meta.setPieces` (`TracksMeta = TrackMeta & { setPieces? }`;
+read with `setPiecesOf(def)` from `src/tracks` until core adds the field to `TrackMeta` — requested)
+and `describeTrack` prints them. Metadata only: no collider, no hash. Typical: `.arch({ style:
+'start' }).setPiece('start', 'grid').flat(28).endSetPiece().checkpoint()` ... `.setPiece('air', 'the
+crane jump')` ... `.arch({ style: 'finish' }).finish()`. No course carries decor or set pieces yet
+(wave 1 is design-only); wave 2 authors them per the storyboards.
 
 Builder-enforced: solids and gaps stand on level ground and never overlap each other's
 footprints; ground slopes <= 40 deg (steeper is a plank or ramp); profile x increasing;
@@ -540,6 +567,20 @@ the thresholds and the ship gate are all owned by harness and specified in
   m1 at the 1.5 x edge, b3 `novice` 11 at the demand's 16 m box, h2 / x3 `good` stop at the lipped
   chains on the air rule (nose-down -> gas + back -> loop; physics' next air-lean round should move
   this), the search bot needs a longer wall than 180 s for 600-770 m tracks.
+- **Wave 1 of the mega build (round 7, done, design only)** — `tracks-storyboards.md`: h1-h3 /
+  x1-x3 re-designed on paper as technique stories with a set piece each (H1 "Rooftop Wire": +6 m of
+  roofline, the wire on the parapet, a 40 deg roll-off into a scaffold tunnel; H2 "Container Yard":
+  chains up the stacks, a 22 deg apron jump over 8 m of water; H3 "The Pour": two fire rows 22 m
+  apart inside a foundry tunnel; X1 "The Ascent": +8 m of glacier, the 60 deg face into an ice cave
+  with the caps, a 70 m glissade home; X2 "The Rolling Mill": the 4 m gap over a fire pit onto the
+  spinning roller; X3 "The Stack": the round-6 sequence given halls, plaques and the chimney caps),
+  m1-m3 sanity-passed, decor kinds + set-piece markers implemented (no course uses them yet), §5
+  wave 2 plan. Every golden and the round-6 matrix unchanged. Finding: every hard / extreme track
+  today is a list of one probe-cleared shape on flat ground (H3 four identical fire kickers, H1 five
+  slot rows, X1 four sawtooth planks giving every metre back); the storyboards keep those exact
+  shapes and change the ORDER, the HEIGHT and what surrounds them — the reflex / bot numbers should
+  therefore carry over, and the `[wave 2 probe]` list in the storyboards names the only new
+  exposures (the roll-off drop, the apron jump, the tunnel fire pair, the summit caps).
 - **Round 6 (done)** — the round-5 opens, plus the finish run-out. X3 trimmed 773 -> 500 m to one
   feature per lesson with a mid checkpoint (bot 2 attempts / 42.6 s, reflex `good` 94-95 % for every
   seed); X1 re-sequenced (45 deg opener 40 m from the start, CP0 after its landing, 50 / 55 / 60 each
@@ -554,3 +595,66 @@ the thresholds and the ship gate are all owned by harness and specified in
   fillet did not move it); a 20 m/s impact on the finish catch is a contained crash about half the
   time (the catch is a wall; coasting stops inside the 30 m); hard/extreme bot-clean times are still
   under the 90-150 s corpus band.
+
+## 5. Wave 2 plan (re-author hard / extreme to the storyboards; starts at the `physics-v2` tag)
+
+**Step 0 — re-measure, author nothing.** On `physics-v2` with the Pro bike, re-run the §0 probes
+(`harness` scratch probes, 3-6 seeds): brake from 10 m/s, 0 -> 16 m/s, stationary / rolling hop
+apex, 45 / 50 / 55 / 60 deg climb (with the 2.4 x 0.8 fillet), see-saw tip, drum-top 2 m hop, the
+cap row 1.2 -> 1.8, the 40 deg roll-off + 7 deg descent at 6 / 10 / 13 m/s, and the 22 deg kicker
+over 6 / 8 / 10 m onto `gapLanding` 1.0 from 26 m. Update §0 and `FEEL`; only then touch a course.
+
+**Order** (one track per commit, acceptance re-run before the next; the subject states the
+finding): 1. **H3** (smallest change: re-sequence + the tunnel pair; proves the arch / tunnel /
+set-piece pipeline end to end with render) -> 2. **H1** (height + drop: the first track with a
+profile that climbs; proves `smooth` climbs under the checkpoint rule) -> 3. **X1** (the same
+height grammar at extreme scale; the summit cap probe) -> 4. **H2** (the apron jump probe) ->
+5. **X2** (hazard re-type + flow, smallest extreme change) -> 6. **X3** (dressing only, last,
+because it is the exam and its geometry is the round-6 bot-cleared one) -> 7. m1-m3 gantries and
+crowds (meta / decor only, no colliders). Stranger round after 1-2 and after 3-4 (harness).
+
+**Validator rules to add to `author.ts` / `tracks.test.ts`** (each a pure function over
+`TrackDef` like `auditCheckpoints`, enforced in `finish()` for tiers >= hard, warned below):
+
+1. `maxRepeats` — a *feature signature* is kind + its key params rounded (plank angle to 5 deg,
+   heights to 0.1 m, barrel count, slot pitch to 0.5 m, chain platform width to 0.5 m). No
+   signature appears more than **twice** per track unless each repeat changes one key param by
+   >= 15 % in one direction (escalation: H1's 1.0 -> 1.2 -> 1.4 walls pass, H3's four 5 x 2.0
+   kickers fail unless barrels / context differ — the storyboard makes them 4 / 5 / 5 + 6 / 6).
+2. `breatherAfterDemand` — after any speed feature (`Feature.speed !== false`, a plank >= 50 deg,
+   a wall >= 1.2, a pole row, a gap >= 4 m) there are >= 12 m of flat or flow (`Feature.flow`)
+   before the next technical feature, and after the set piece >= 25 m. The existing "no rise
+   within 10 m of a drop exit" rule becomes a case of this.
+3. `density` — no 60 m window holds more than three speed features (X3 exempt: it is the exam,
+   capped at four).
+4. `story` — the track's `technique` feature kind appears >= 3 times with a monotone key param
+   (teach -> repeat -> demand), and the demand instance is the LAST technical feature before the
+   finish flow (X1 exempt: the summit is set piece and demand at once).
+5. `setPieces` — every hard / extreme track declares `start`, `finish` and >= 1 of `drop fire
+   climb air balance tunnel`; each non-gantry set piece range contains >= 1 feature and lies inside
+   a camera key that is not the default; `tunnel` ranges are covered by a `tunnel` decor of the same
+   length (+- 2 m) and `start` / `finish` ranges by an `arch` of that style.
+6. `heightBudget` — net elevation between consecutive checkpoints <= 2.5 m and every climb is a
+   `smooth` grounded at 16 m/s (`FEEL.smoothLengthFor`) or a `slope` <= 20 deg followed by >= 4 m
+   of flat; a `slope` steeper than 30 deg is only legal as a descent (the roll-off) and must be
+   followed by a descent of <= 10 deg for >= 6 x its drop.
+7. `lineB` — a lip wall >= 1.0, a plank >= 55 deg, a pole row: either a B line exists (`steppedWall`
+   ramp, ledge under the first cap) or the feature is inside the last third of the track (round 5's
+   rule, made a validator).
+8. `checkpointSpacing` — 90-200 m between consecutive spawns (12-18 s of bot time), on top of the
+   round-4 checkpoint rule.
+
+**Acceptance held per re-authored track** (all of it before the commit, on `physics-v2`, sequential
+bot, 600 s wall):
+
+- search bot skill 3 clears: hard <= 20 attempts, extreme <= 60 (X3 <= 60 at 500 m);
+- reflex `good` >= 60 % of finishX on 3 seeds AND (new, MEGA_PLAN P3) `good` clears >= 1 of 3 seeds
+  on hard; reflex `average` >= 40 % on hard;
+- bot clean time inside band: hard 30-40 s, extreme 40-55 s (human 45-60 / 60-90 s);
+- every `[wave 2 probe]` in the storyboards run first and recorded in `tracks.md` §0;
+- 0 frames out of the camera box on every set piece (harness gate, `high34` / `low` keys included);
+- determinism: a recorded skill-3 input replays byte-identical (`harness/gate/determinism.ts`);
+- `pnpm vitest run src/tracks` green with the new validators, goldens bumped ON PURPOSE
+  (`UPDATE_GOLDEN=1`) only for the track in the commit;
+- stranger median inside `attemptsBand` after the stranger round, else the TRACK is edited, never
+  the band (§3 tuning rule); tier medians non-decreasing.

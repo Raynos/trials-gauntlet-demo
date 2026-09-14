@@ -26,17 +26,22 @@ export function listTrackIds(): string[] {
 export const DEFAULT_TRACK_ID = FLAT_TEST_TRACK.id;
 
 export { compileTrack, hashColliders, TrackCompileError, profileQuery } from './compile';
-export { course, CourseBuilder, FEEL, CHECKPOINT_RULE, FINISH_RUNOUT, validateSpawns, validateCheckpoints, auditCheckpoints, validateFinishRunout } from './author';
-export type { CheckpointAuditRow, CheckpointViolation } from './author';
+export { course, CourseBuilder, FEEL, CHECKPOINT_RULE, FINISH_RUNOUT, validateSpawns, validateCheckpoints, auditCheckpoints, validateFinishRunout, setPiecesOf } from './author';
+export type { CheckpointAuditRow, CheckpointViolation, SetPiece, SetPieceKind, TracksMeta } from './author';
 export { describeTrack, describeObstacles, describeAhead } from './describe';
 export {
   OBSTACLE_KINDS,
+  DECOR_KINDS,
   KIND_DEFAULTS,
   SUMMARY_KEYS,
   footprint,
   isObstacleKind,
+  isDecorKind,
+  isTrackKind,
   isSolidKind,
   resolveParams,
   type ObstacleKind,
+  type DecorKind,
+  type TrackKind,
   type KindParams,
 } from './kinds';

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { ColliderPolyline, ColliderSeesaw, TrackDef, Vec2 } from '../core/types';
-import { course, FEEL } from './author';
+import { auditCheckpoints, course, FEEL, setPiecesOf, validateFinishRunout } from './author';
 import { compileTrack, hashColliders, profileQuery } from './compile';
-import { describeAhead } from './describe';
-import { KIND_DEFAULTS, OBSTACLE_KINDS, footprint, resolveParams } from './kinds';
+import { describeAhead, describeTrack } from './describe';
+import { DECOR_KINDS, KIND_DEFAULTS, OBSTACLE_KINDS, footprint, isDecorKind, isObstacleKind, isTrackKind, resolveParams } from './kinds';
 
 const meta = { biome: 'industrial', technique: 't' } as const;
 
@@ -246,5 +246,90 @@ describe('describeAhead', () => {
     const c = compileTrack(def);
     expect(describeAhead(c, 5, 20)).toBe('ramp 4x1 in 5.0 m, gap 3x3 in 9.0 m, checkpoint in 12.0 m');
     expect(describeAhead(c, 100, 5)).toBe('flat for 5 m');
+  });
+});
+
+describe('decor kinds and set pieces (mega build wave 1)', () => {
+  // the same course with and without dressing: colliders, bounds and hash must be identical
+  const plain = (): TrackDef =>
+    course('t-plain', 't', 'hard').meta(meta).flat(20).checkpoint().flat(16).tabletop(4, 6, 1.2).flat(20).finish(30, { checkpointRule: false });
+  const dressed = (): TrackDef =>
+    course('t-dressed', 't', 'hard')
+      .meta(meta)
+      .arch({ style: 'start', span: 8, height: 6 })
+      .setPiece('start', 'grid')
+      .flat(20)
+      .endSetPiece()
+      .checkpoint()
+      .arch({ style: 'checkpoint' })
+      .flat(16)
+      .setPiece('air', 'the tabletop')
+      .tunnel({ length: 14, height: 5, style: 'scaffold' })
+      .tabletop(4, 6, 1.2)
+      .setPiece('crowd')
+      .flat(20)
+      .arch({ style: 'finish' })
+      .finish(30, { checkpointRule: false });
+
+  it('vocabulary: decor kinds are track kinds but not obstacle kinds, footprint 0, defaults filled', () => {
+    expect(DECOR_KINDS).toEqual(['arch', 'tunnel']);
+    expect(isTrackKind('arch') && isTrackKind('tunnel') && isTrackKind('ramp')).toBe(true);
+    expect(isObstacleKind('arch') || isDecorKind('ramp')).toBe(false);
+    expect(footprint('arch', { span: 12 })).toBe(0);
+    expect(footprint('tunnel', { length: 30 })).toBe(0);
+    expect(resolveParams('arch', undefined)).toEqual({ span: 6, height: 5, depth: 6, style: 'girder', surface: 'metal', variant: 0 });
+    expect(resolveParams('tunnel', { style: 'pipe' })).toMatchObject({ length: 20, height: 5, style: 'pipe', lit: true, variant: 0 });
+  });
+
+  it('compile: decor gets a placed entry with no colliders and leaves colliders, bounds and hash untouched', () => {
+    const a = compileTrack(plain());
+    const b = compileTrack(dressed());
+    expect(b.hash).toBe(a.hash);
+    expect(b.colliders).toEqual(a.colliders);
+    expect(b.bounds).toEqual(a.bounds);
+    expect(b.hazards).toEqual(a.hazards);
+    const decor = b.placed.filter((p) => isDecorKind(p.kind));
+    expect(decor.map((p) => p.kind)).toEqual(['arch', 'arch', 'tunnel', 'arch']);
+    for (const d of decor) expect(d.colliderIds).toEqual([]);
+    // decor is appended after every rideable obstacle, so obstacleIndex of the real colliders never moves
+    const firstDecor = b.placed.findIndex((p) => isDecorKind(p.kind));
+    expect(b.placed.slice(0, firstDecor).every((p) => !isDecorKind(p.kind))).toBe(true);
+    expect(b.placed.slice(0, firstDecor).map((p) => p.kind)).toEqual(a.placed.map((p) => p.kind));
+  });
+
+  it('DSL: arch is centred on the cursor, tunnel starts at it, neither moves the cursor', () => {
+    const b = compileTrack(dressed());
+    const [startArch, cpArch, tunnel, finishArch] = b.placed.filter((p) => isDecorKind(p.kind));
+    expect(startArch?.pos).toEqual({ x: -4, y: 0 }); // span 8 centred on x=0
+    expect(cpArch?.pos).toEqual({ x: 20 - 3, y: 0 }); // default span 6 centred on the checkpoint at 20
+    expect(tunnel?.pos).toEqual({ x: 36, y: 0 });
+    expect(tunnel?.params).toMatchObject({ length: 14, height: 5, style: 'scaffold' });
+    expect(finishArch?.pos).toEqual({ x: b.def.finishX - 3, y: 0 });
+    expect(b.def.finishX).toBe(plain().finishX);
+  });
+
+  it('set pieces land in meta.setPieces with x0 < x1 in course order; the finish run-out still validates with a finish arch', () => {
+    const def = dressed();
+    expect(setPiecesOf(def)).toEqual([
+      { x0: 0, x1: 20, kind: 'start', label: 'grid' },
+      { x0: 36, x1: 36 + 4 + 6 + 12, kind: 'air', label: 'the tabletop' },
+      { x0: 58, x1: 78, kind: 'crowd' },
+    ]);
+    expect(setPiecesOf(plain())).toEqual([]);
+    expect(validateFinishRunout(def)).toEqual([]);
+    expect(describeTrack(compileTrack(def))).toContain('setPieces: start"grid"[0-20], air"the tabletop"[36-58], crowd[58-78]');
+    expect(describeTrack(compileTrack(def))).toContain('(decor)');
+  });
+
+  it('set piece validation: an empty range or one opened before the previous throws', () => {
+    expect(() => course('t-sp', 't', 'hard').meta(meta).flat(20).setPiece('crowd').endSetPiece()).toThrow(/no length/);
+    expect(() => course('t-sp', 't', 'hard').meta(meta).setPiece('start').flat(20).arch({ span: 0 })).toThrow(/arch span/);
+  });
+
+  it('checkpoint rule ignores decor: a tunnel over a run-up neither blocks nor counts as a feature', () => {
+    const withTunnel = course('t-cp', 't', 'hard').meta(meta).flat(28).checkpoint().flat(3).tunnel({ length: 20 }).flat(13).ramp({ length: 4, height: 1 }).gap(3).flat(20).finish();
+    const without = course('t-cp2', 't', 'hard').meta(meta).flat(28).checkpoint().flat(3).flat(13).ramp({ length: 4, height: 1 }).gap(3).flat(20).finish();
+    expect(auditCheckpoints(withTunnel).rows).toEqual(auditCheckpoints(without).rows);
+    expect(auditCheckpoints(withTunnel).violations).toEqual([]);
   });
 });

@@ -3,7 +3,8 @@
  * can read a track obstacle by obstacle without rendering it.
  */
 import type { CompiledTrack } from '../core/types';
-import { SUMMARY_KEYS, type ObstacleKind } from './kinds';
+import { setPiecesOf } from './author';
+import { SUMMARY_KEYS, type TrackKind } from './kinds';
 
 function fmt(v: number | string | boolean): string {
   if (typeof v === 'number') return Number.isInteger(v) ? String(v) : v.toFixed(2).replace(/\.?0+$/, '');
@@ -13,9 +14,10 @@ function fmt(v: number | string | boolean): string {
 /** One line per obstacle: `#i kind @x key=value ...`. */
 export function describeObstacles(track: CompiledTrack): string[] {
   return track.placed.map((o, i) => {
-    const keys = SUMMARY_KEYS[o.kind as ObstacleKind] ?? [];
+    const keys = SUMMARY_KEYS[o.kind as TrackKind] ?? [];
     const parts = keys.map((k) => `${k}=${fmt(o.params[k] as number | string | boolean)}`);
-    return `#${String(i).padStart(2, ' ')} ${o.kind.padEnd(7)} @${o.pos.x.toFixed(1).padStart(6)} y=${fmt(o.pos.y).padEnd(5)} ${parts.join(' ')}`;
+    const decor = o.colliderIds.length === 0 ? ' (decor)' : '';
+    return `#${String(i).padStart(2, ' ')} ${o.kind.padEnd(7)} @${o.pos.x.toFixed(1).padStart(6)} y=${fmt(o.pos.y).padEnd(5)} ${parts.join(' ')}${decor}`;
   });
 }
 
@@ -30,6 +32,8 @@ export function describeTrack(track: CompiledTrack): string {
     lines.push(`  attemptsBand=${m.attemptsBand ? `${m.attemptsBand[0]}-${m.attemptsBand[1]}` : '-'}  targetTimeS=${m.targetTimeS ?? '-'}  cameraKeys=${m.camera?.length ?? 0}  hints=${m.hints?.length ?? 0}`);
   }
   lines.push(`  checkpoints: ${d.checkpoints.map((c) => c.x.toFixed(0)).join(', ')}  finishX=${d.finishX}  bounds=[${track.bounds.minX},${track.bounds.maxX}]x[${track.bounds.minY},${track.bounds.maxY}]  oobY=${track.oobY}`);
+  const sps = setPiecesOf(d);
+  if (sps.length > 0) lines.push(`  setPieces: ${sps.map((s) => `${s.kind}${s.label ? `"${s.label}"` : ''}[${s.x0.toFixed(0)}-${s.x1.toFixed(0)}]`).join(', ')}`);
   lines.push(...describeObstacles(track).map((l) => `  ${l}`));
   lines.push(`  hash=${track.hash}`);
   return lines.join('\n');
@@ -41,7 +45,7 @@ export function describeAhead(track: CompiledTrack, x: number, range = 25): stri
     .map((o, i) => ({ o, i }))
     .filter(({ o }) => o.pos.x >= x && o.pos.x < x + range)
     .map(({ o }) => {
-      const keys = SUMMARY_KEYS[o.kind as ObstacleKind] ?? [];
+      const keys = SUMMARY_KEYS[o.kind as TrackKind] ?? [];
       const parts = keys.slice(0, 2).map((k) => fmt(o.params[k] as number | string | boolean));
       return `${o.kind} ${parts.join('x')} in ${(o.pos.x - x).toFixed(1)} m`;
     });

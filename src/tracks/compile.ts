@@ -8,7 +8,8 @@
  *   1. ground polylines (obstacleIndex -1), by min x
  *   2. per obstacle, in def order: merged solid outlines, open chains (plank
  *      tops, lips), then circles / boxes / seesaws in the order the kind emitted them
- * Hazards are numbered in obstacle order.
+ * Hazards are numbered in obstacle order. Decor kinds (`arch`, `tunnel`) get a `placed`
+ * entry with no colliders and contribute nothing to bounds or the hash.
  */
 import type { Collider, CompiledTrack, HazardZone, PlacedObstacle, TrackDef, Vec2 } from '../core/types';
 import { StateHasher } from '../core/hash';
@@ -16,7 +17,7 @@ import { chainEdges, mergeSolids, polygonEdges, quantize, quantizeVec, type Owne
 import {
   GAP_WALL_LEAN,
   compileKind,
-  isObstacleKind,
+  isTrackKind,
   resolveParams,
   type GroundQuery,
   type KindGeometry,
@@ -109,7 +110,7 @@ export function compileTrack(def: TrackDef): CompiledTrack {
   const resolved: ParamRecord[] = [];
   const gaps: GapCut[] = [];
   def.obstacles.forEach((o, i) => {
-    if (!isObstacleKind(o.kind)) throw new TrackCompileError(def.id, `obstacle ${i}: unknown kind '${o.kind}'`);
+    if (!isTrackKind(o.kind)) throw new TrackCompileError(def.id, `obstacle ${i}: unknown kind '${o.kind}'`);
     const params = resolveParams(o.kind, o.params) as unknown as ParamRecord;
     resolved.push(params);
     geoms.push(compileKind(o.kind, o.pos, o.params, ground));

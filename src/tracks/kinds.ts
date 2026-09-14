@@ -63,6 +63,20 @@ export const OBSTACLE_KINDS: readonly ObstacleKind[] = [
   'ledge',
 ];
 
+/**
+ * Decor kinds (wave 1 of the mega build, P2 "every biome gets its own set piece"): overhead
+ * dressing with NO collider. `arch` is a gate / girder / crowd bridge spanning the course at one
+ * x; `tunnel` is a covered stretch. They compile to a `placed` entry with an empty `colliderIds`
+ * so render can dress them, they never touch physics, and the builder appends them AFTER every
+ * rideable obstacle so `obstacleIndex` of the real colliders — and therefore the golden hash —
+ * does not move when a course gains one. Footprint 0: they hang over whatever the course places
+ * under them, and the DSL cursor does not advance.
+ */
+export type DecorKind = 'arch' | 'tunnel';
+export const DECOR_KINDS: readonly DecorKind[] = ['arch', 'tunnel'];
+/** Everything `TrackObstacle.kind` may hold: the 12 rideable kinds plus the decor kinds. */
+export type TrackKind = ObstacleKind | DecorKind;
+
 /** Solid wedge. `curve` 0 = straight, +1 = concave (quarter-pipe / kicker lip), -1 = convex roller. */
 export interface RampParams extends BaseParams {
   length: number;
@@ -157,7 +171,35 @@ export interface LedgeParams extends BaseParams {
   surface: SurfaceKind;
 }
 
+/**
+ * Overhead arch / gate spanning `span` m of course centred on pos.x, its underside `height` above
+ * pos.y, `depth` m along z. `style` is the render dressing: `start` / `finish` gantries with
+ * banners and confetti cannons, `checkpoint` post + sign, `crowd` a spectator bridge, `girder` a
+ * steel truss, `pipe` a foundry duct, `ice` a snow cornice. No collider.
+ */
+export interface ArchParams extends BaseParams {
+  span: number;
+  height: number;
+  depth: number;
+  style: 'start' | 'finish' | 'checkpoint' | 'crowd' | 'girder' | 'pipe' | 'ice';
+  surface: SurfaceKind;
+}
+/**
+ * Covered stretch from pos.x for `length` m, roof `height` above pos.y, `depth` m along z. `lit`
+ * asks render for interior point lights (headlight cone otherwise). No collider.
+ */
+export interface TunnelParams extends BaseParams {
+  length: number;
+  height: number;
+  depth: number;
+  style: 'scaffold' | 'concrete' | 'pipe' | 'ice' | 'foundry';
+  lit: boolean;
+  surface: SurfaceKind;
+}
+
 export interface KindParams {
+  arch: ArchParams;
+  tunnel: TunnelParams;
   ramp: RampParams;
   plank: PlankParams;
   drum: DrumParams;
@@ -172,7 +214,9 @@ export interface KindParams {
   ledge: LedgeParams;
 }
 
-export const KIND_DEFAULTS: { readonly [K in ObstacleKind]: Readonly<KindParams[K]> } = {
+export const KIND_DEFAULTS: { readonly [K in TrackKind]: Readonly<KindParams[K]> } = {
+  arch: { span: 6, height: 5, depth: 6, style: 'girder', surface: 'metal', variant: 0 },
+  tunnel: { length: 20, height: 5, depth: 6, style: 'scaffold', lit: true, surface: 'concrete', variant: 0 },
   ramp: { length: 4, height: 1, curve: 0, direction: 'up', surface: 'wood', variant: 0 },
   plank: { length: 4, angleDeg: 0, height: 0, thickness: 0.12, oneWay: true, surface: 'wood', variant: 0 },
   drum: { radius: 0.8, width: 1.2, depth: 0, rolls: false, surface: 'metal', variant: 0 },
@@ -192,9 +236,15 @@ export type ParamRecord = Record<string, number | string | boolean>;
 export function isObstacleKind(kind: string): kind is ObstacleKind {
   return (OBSTACLE_KINDS as readonly string[]).includes(kind);
 }
+export function isDecorKind(kind: string): kind is DecorKind {
+  return (DECOR_KINDS as readonly string[]).includes(kind);
+}
+export function isTrackKind(kind: string): kind is TrackKind {
+  return isObstacleKind(kind) || isDecorKind(kind);
+}
 
 /** Fill defaults; unknown params pass through so render can carry decoration hints. */
-export function resolveParams<K extends ObstacleKind>(kind: K, params: ParamRecord | undefined): KindParams[K] {
+export function resolveParams<K extends TrackKind>(kind: K, params: ParamRecord | undefined): KindParams[K] {
   return { ...(KIND_DEFAULTS[kind] as object), ...(params ?? {}) } as unknown as KindParams[K];
 }
 
@@ -202,8 +252,11 @@ export function resolveParams<K extends ObstacleKind>(kind: K, params: ParamReco
 // Footprint: how far along x an obstacle occupies (the DSL advances its cursor by this)
 // ---------------------------------------------------------------------------
 
-export function footprint(kind: ObstacleKind, params: ParamRecord | undefined): number {
+export function footprint(kind: TrackKind, params: ParamRecord | undefined): number {
   switch (kind) {
+    case 'arch':
+    case 'tunnel':
+      return 0; // decor hangs over the course; the cursor does not advance
     case 'ramp':
       return resolveParams('ramp', params).length;
     case 'plank': {
@@ -242,7 +295,7 @@ export function footprint(kind: ObstacleKind, params: ParamRecord | undefined): 
 }
 
 /** True for kinds whose outline is merged with the ground (must sit on it, footprints may not overlap). */
-export function isSolidKind(kind: ObstacleKind): boolean {
+export function isSolidKind(kind: TrackKind): boolean {
   return kind === 'ramp' || kind === 'wall' || kind === 'stair' || kind === 'box' || kind === 'ledge';
 }
 
@@ -346,9 +399,12 @@ function pushUnique(arr: Vec2[], p: Vec2): void {
   arr.push(p);
 }
 
-type Compiler<K extends ObstacleKind> = (pos: Vec2, p: KindParams[K], ground: GroundQuery) => KindGeometry;
+type Compiler<K extends TrackKind> = (pos: Vec2, p: KindParams[K], ground: GroundQuery) => KindGeometry;
 
 const empty = (): KindGeometry => ({ solids: [], chains: [], loose: [], hazards: [] });
+
+/** Decor: no geometry at all. Render reads `placed[].params` (span / length, height, depth, style). */
+const compileDecor = (): KindGeometry => empty();
 
 const compileRamp: Compiler<'ramp'> = (pos, p, ground) => {
   const x0 = pos.x;
@@ -520,7 +576,9 @@ const compileBarrel: Compiler<'barrel'> = (pos, p) => {
   return g;
 };
 
-const COMPILERS: { [K in ObstacleKind]: Compiler<K> } = {
+const COMPILERS: { [K in TrackKind]: Compiler<K> } = {
+  arch: compileDecor,
+  tunnel: compileDecor,
   ramp: compileRamp,
   plank: compilePlank,
   drum: compileDrum,
@@ -535,13 +593,15 @@ const COMPILERS: { [K in ObstacleKind]: Compiler<K> } = {
   ledge: compileLedge,
 };
 
-export function compileKind(kind: ObstacleKind, pos: Vec2, params: ParamRecord | undefined, ground: GroundQuery): KindGeometry {
+export function compileKind(kind: TrackKind, pos: Vec2, params: ParamRecord | undefined, ground: GroundQuery): KindGeometry {
   const resolved = resolveParams(kind, params);
   return (COMPILERS[kind] as Compiler<typeof kind>)(pos, resolved as never, ground);
 }
 
 /** The params a course summary should print for a kind, in order. */
-export const SUMMARY_KEYS: { readonly [K in ObstacleKind]: readonly (keyof KindParams[K] & string)[] } = {
+export const SUMMARY_KEYS: { readonly [K in TrackKind]: readonly (keyof KindParams[K] & string)[] } = {
+  arch: ['span', 'height', 'style'],
+  tunnel: ['length', 'height', 'style'],
   ramp: ['length', 'height', 'curve', 'direction'],
   plank: ['length', 'angleDeg', 'height'],
   drum: ['radius', 'depth', 'rolls'],
