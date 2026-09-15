@@ -1,0 +1,275 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "m3-see-saw",
+  "attemptsBand": [
+    8,
+    12
+  ],
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "db68bbeb",
+  "updatedAt": "2026-09-15T03:12:20.459Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "m3-see-saw-r6-s1-20260914-215809",
+      "agent": "s1",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "db68bbeb",
+      "strangerAttempts": 5,
+      "cleared": true,
+      "finishTime": 65.3083,
+      "calls": 30,
+      "wallMs": 474806,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        2,
+        1,
+        1
+      ],
+      "bestAttempt": {
+        "n": 5,
+        "cleared": true,
+        "x": 504.1,
+        "startTick": 6444,
+        "endTick": 8200,
+        "recordingFile": "harness/inputs/m3-see-saw/stranger-m3-see-saw-r6-s1-20260914-215809.json"
+      },
+      "recordingFile": "harness/inputs/m3-see-saw/stranger-m3-see-saw-r6-s1-20260914-215809.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 217.689,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 219.6 m",
+          "calls": 6
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 195.831,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 202.6 m",
+          "calls": 8
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 339.762,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 13
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 402.756,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 17
+        }
+      ]
+    },
+    {
+      "sessionId": "m3-see-saw-r6-s2-20260914-215809",
+      "agent": "s2",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "db68bbeb",
+      "strangerAttempts": 11,
+      "cleared": true,
+      "finishTime": 129.025,
+      "calls": 39,
+      "wallMs": 780762,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        1,
+        8
+      ],
+      "bestAttempt": {
+        "n": 11,
+        "cleared": true,
+        "x": 504.1,
+        "startTick": 13869,
+        "endTick": 15780,
+        "recordingFile": "harness/inputs/m3-see-saw/stranger-m3-see-saw-r6-s2-20260914-215809.json"
+      },
+      "recordingFile": "harness/inputs/m3-see-saw/stranger-m3-see-saw-r6-s2-20260914-215809.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 68.708,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 3
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 350.633,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 13
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 403.274,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 16
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 434.383,
+          "checkpoint": 3,
+          "obstacle": "plank @ 432.4 m",
+          "calls": 19
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 433.64,
+          "checkpoint": 3,
+          "obstacle": "plank @ 432.4 m",
+          "calls": 21
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 422.635,
+          "checkpoint": 3,
+          "obstacle": "ramp @ 421.4 m",
+          "calls": 23
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 415.317,
+          "checkpoint": 3,
+          "obstacle": "ramp @ 421.4 m",
+          "calls": 25
+        },
+        {
+          "n": 8,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 414.423,
+          "checkpoint": 3,
+          "obstacle": "ramp @ 421.4 m",
+          "calls": 27
+        },
+        {
+          "n": 9,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 435.245,
+          "checkpoint": 3,
+          "obstacle": "gap @ 436.4 m",
+          "calls": 29
+        },
+        {
+          "n": 10,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 483.961,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 33
+        }
+      ]
+    }
+  ],
+  "completed": 2,
+  "clearedCount": 2,
+  "medianAttempts": 8,
+  "medianFinishTime": 97.16665,
+  "medianCalls": 34.5,
+  "medianWallMs": 627784,
+  "pass": true,
+  "deaths": {
+    "total": 14,
+    "byReason": {
+      "crash": 14
+    },
+    "byObstacle": [
+      {
+        "obstacle": "ground",
+        "count": 6,
+        "xs": [
+          339.8,
+          402.8,
+          68.7,
+          350.6,
+          403.3,
+          484
+        ]
+      },
+      {
+        "obstacle": "ramp @ 421.4 m",
+        "count": 3,
+        "xs": [
+          422.6,
+          415.3,
+          414.4
+        ]
+      },
+      {
+        "obstacle": "plank @ 432.4 m",
+        "count": 2,
+        "xs": [
+          434.4,
+          433.6
+        ]
+      },
+      {
+        "obstacle": "ramp @ 219.6 m",
+        "count": 1,
+        "xs": [
+          217.7
+        ]
+      },
+      {
+        "obstacle": "ramp @ 202.6 m",
+        "count": 1,
+        "xs": [
+          195.8
+        ]
+      },
+      {
+        "obstacle": "gap @ 436.4 m",
+        "count": 1,
+        "xs": [
+          435.2
+        ]
+      }
+    ],
+    "byCheckpoint": [
+      0,
+      1,
+      2,
+      2,
+      9
+    ]
+  }
+}

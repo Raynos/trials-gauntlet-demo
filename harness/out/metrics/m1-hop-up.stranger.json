@@ -1,0 +1,271 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "m1-hop-up",
+  "attemptsBand": [
+    5,
+    9
+  ],
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "db68bbeb",
+  "updatedAt": "2026-09-15T03:12:20.401Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "m1-hop-up-r6-s1-20260914-215809",
+      "agent": "s1",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "db68bbeb",
+      "strangerAttempts": 8,
+      "cleared": true,
+      "finishTime": 81.325,
+      "calls": 33,
+      "wallMs": 545648,
+      "firstCheckpointCalls": 4,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        2,
+        4,
+        1
+      ],
+      "bestAttempt": {
+        "n": 8,
+        "cleared": true,
+        "x": 481,
+        "startTick": 7939,
+        "endTick": 10110,
+        "recordingFile": "harness/inputs/m1-hop-up/stranger-m1-hop-up-r6-s1-20260914-215809.json"
+      },
+      "recordingFile": "harness/inputs/m1-hop-up/stranger-m1-hop-up-r6-s1-20260914-215809.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 114.278,
+          "checkpoint": 1,
+          "obstacle": "gap @ 113.0 m",
+          "calls": 6
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 112.433,
+          "checkpoint": 1,
+          "obstacle": "gap @ 113.0 m",
+          "calls": 7
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 272.022,
+          "checkpoint": 2,
+          "obstacle": "ledge @ 272.3 m",
+          "calls": 14
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 280.369,
+          "checkpoint": 2,
+          "obstacle": "ledge @ 280.3 m",
+          "calls": 15
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 288.642,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 17
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 283.536,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 284.3 m",
+          "calls": 18
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 366.908,
+          "checkpoint": 3,
+          "obstacle": "ledge @ 369.3 m",
+          "calls": 26
+        }
+      ]
+    },
+    {
+      "sessionId": "m1-hop-up-r6-s2-20260914-215809",
+      "agent": "s2",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "db68bbeb",
+      "strangerAttempts": 7,
+      "cleared": true,
+      "finishTime": 78.0417,
+      "calls": 29,
+      "wallMs": 412770,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        2,
+        3,
+        1
+      ],
+      "bestAttempt": {
+        "n": 7,
+        "cleared": true,
+        "x": 481,
+        "startTick": 7545,
+        "endTick": 9698,
+        "recordingFile": "harness/inputs/m1-hop-up/stranger-m1-hop-up-r6-s2-20260914-215809.json"
+      },
+      "recordingFile": "harness/inputs/m1-hop-up/stranger-m1-hop-up-r6-s2-20260914-215809.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 116.005,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 5
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 109.098,
+          "checkpoint": 1,
+          "obstacle": "ledge @ 109.0 m",
+          "calls": 6
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 269.423,
+          "checkpoint": 2,
+          "obstacle": "ledge @ 272.3 m",
+          "calls": 13
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 272.873,
+          "checkpoint": 2,
+          "obstacle": "ledge @ 272.3 m",
+          "calls": 15
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 281.1,
+          "checkpoint": 2,
+          "obstacle": "ledge @ 280.3 m",
+          "calls": 17
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 368.4,
+          "checkpoint": 3,
+          "obstacle": "ledge @ 369.3 m",
+          "calls": 23
+        }
+      ]
+    }
+  ],
+  "completed": 2,
+  "clearedCount": 2,
+  "medianAttempts": 7.5,
+  "medianFinishTime": 79.68335,
+  "medianCalls": 31,
+  "medianWallMs": 479209,
+  "pass": true,
+  "deaths": {
+    "total": 13,
+    "byReason": {
+      "crash": 13
+    },
+    "byObstacle": [
+      {
+        "obstacle": "ledge @ 272.3 m",
+        "count": 3,
+        "xs": [
+          272,
+          269.4,
+          272.9
+        ]
+      },
+      {
+        "obstacle": "gap @ 113.0 m",
+        "count": 2,
+        "xs": [
+          114.3,
+          112.4
+        ]
+      },
+      {
+        "obstacle": "ledge @ 280.3 m",
+        "count": 2,
+        "xs": [
+          280.4,
+          281.1
+        ]
+      },
+      {
+        "obstacle": "ground",
+        "count": 2,
+        "xs": [
+          288.6,
+          116
+        ]
+      },
+      {
+        "obstacle": "ledge @ 369.3 m",
+        "count": 2,
+        "xs": [
+          366.9,
+          368.4
+        ]
+      },
+      {
+        "obstacle": "ramp @ 284.3 m",
+        "count": 1,
+        "xs": [
+          283.5
+        ]
+      },
+      {
+        "obstacle": "ledge @ 109.0 m",
+        "count": 1,
+        "xs": [
+          109.1
+        ]
+      }
+    ],
+    "byCheckpoint": [
+      0,
+      0,
+      4,
+      7,
+      2
+    ]
+  }
+}

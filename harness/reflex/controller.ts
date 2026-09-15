@@ -154,6 +154,8 @@ export const AIR = {
   releaseSwingDeg: 30,
   /** After a release the hands stay light for this long (s) so the swing is not re-grabbed. */
   releaseCooldownS: 0.3,
+  /** No gas / brake nudge when the ballistic time to land is under this (s): short air (tip-air, bounces) is flown hands-off. */
+  nudgeMinAirS: 0.5,
   /** Brake nudge when the predicted error is beyond this (deg, nose high); gas nudge when below minus `gasBelowDeg`. */
   brakeBeyondDeg: 30,
   gasBelowDeg: 30,
@@ -388,6 +390,9 @@ export class ReflexController {
     const errRaw = pp - targetPitch; // +ve = nose too high
     const err = Math.abs(errRaw) < 6 ? 0 : errRaw - Math.sign(errRaw) * 6;
     let lean = clamp((err / 25) * g, -1, 1);
+    // Round 10 (tracks r8 request c): a brake on the ground wants the weight back. `too-fast-brake` at lean 0 from
+    // 11 m/s stood the Rookie on its front wheel for 4 m into the m1 ledge face (112-118 m, ledge @ 109 x30).
+    if (rule === 'too-fast-brake') lean = Math.min(lean, -0.5 * Math.max(0.6, g));
 
     if (a.steepDeg > 20 && timeTo(a.steepDist) < lead && a.faceDist === null) {
       // Steep up ahead (v2 technique, physics R3): base gas and NEUTRAL weight so the front rolls up onto the
@@ -451,7 +456,12 @@ export class ReflexController {
       else if (this.hop.phase === 'snap') this.hop = { phase: 'tuck', until: t + 0.1 };
       else this.hop = null;
     }
-    if (!this.hop && grounded && a.faceDist !== null && a.faceDist < v * 0.4 + 1.0 + mem.leadS * v && t - this.lastHopT > 1.2) {
+    // Round 10 (tracks r8 request a): a hop is a flat-ground move. On a kicker the lipped plank beyond it reads as a
+    // face and the preload (lean -1) was held through the lip: +30-56 deg exits, m3 box @ 438.9 x18-30. No preload
+    // starts on ground steeper than 8 deg, and a preload under way is dropped the moment the ground tilts up.
+    const onRamp = slopeUnder > 8;
+    if (this.hop?.phase === 'preload' && onRamp) this.hop = null;
+    if (!this.hop && grounded && !onRamp && a.faceDist !== null && a.faceDist < v * 0.4 + 1.0 + mem.leadS * v && t - this.lastHopT > 1.2) {
       this.hop = { phase: 'preload', until: t + 0.3 };
       this.lastHopT = t;
     }
@@ -538,10 +548,19 @@ export class ReflexController {
       // Touchdown: descending onto ground within ~0.25 s — hands off (no gas + lean back through the landing: on v2
       // that is a loop the moment the rear grips), weight neutral-to-forward for the dip.
       const landingSoon = o.vy < -0.5 && o.height / Math.max(1, -o.vy) < 0.25;
+      // Round 10 (tracks r8 request b): a nudge is +6 / -15 deg per half second; under half a second of air it cannot
+      // level anything, it only lands with the throttle or brake engaged (m3 see-saw tip-air @ 405 m: the bike leaves
+      // the falling board at 6 m/s and would land if left alone; the taps looped it, ground @ 410 x17). Time to land
+      // from the ballistic arc; nudges only when there is air to use them in.
+      const tLand = (o.vy + Math.sqrt(Math.max(0, o.vy * o.vy + 2 * 9.81 * Math.max(0, o.height)))) / 9.81;
+      const shortAir = tLand < AIR.nudgeMinAirS;
       if (landingSoon) {
         lean = clamp(Math.max(lean, 0), 0, 0.5);
         rule = 'touchdown';
         this.landingUntil = t + 0.15;
+      } else if (shortAir) {
+        // (The lean stays: a neutral-lean variant read m3 36 / e2 10 against 34 / 8 on nine seeds.)
+        rule = 'air-short';
       } else if (ePred > AIR.brakeBeyondDeg && rate > -30) {
         // Nose way up and not yet coming down: the brake nudge (-15 deg per half second) on top of the lean.
         brk = 1;

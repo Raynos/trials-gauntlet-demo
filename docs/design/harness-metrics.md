@@ -87,6 +87,168 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 10 status — strangers clear the new e3 in one and the first medium round in band; the blind critic picks ours 2 of 6 (hop, crash) and names the camera, the shadow and the rigid rider; goldens and gate re-pinned on tracks r8
+
+**Finding.** Stranger round 5 on the frozen HEAD 539e500 (src db68bbeb, Rookie, r8 feel notes in the PROTOCOL): **e3-stairway 1 attempt
+(3, 1, 1, 1; band 3–6), m1-hop-up 7.5 (8, 7; band 5–9), m2-drum-roll 4 (4, 4; band 6–12), m3-see-saw 8 (5, 11; band 8–12) — every
+session cleared, every track PASS** (≤ 1.5 × band top). The tracks owner's r8 re-author closed the e3 gap that round 9 named (strangers
+20 / 11-not-cleared → 3, 1, 1, 1; 42.1–42.4 s on plain gas); three of the four e3 strangers still saw 53–59° nose-up on the up-flights
+at 15 m/s under plain gas and one looped there. P3's beginner + easy bar is met on the stranger side; medium is in band on the first
+round. **Blind critic round 3 (RoG H5): ours picked 2 of 6** — the bunny hop (0.86; the reference window showed a rear-wheel balance,
+not a hop — a weak pair, counted as the rubric was applied) and the crash (0.55; ours cuts to the checkpoint 1.17 s after the fault,
+the reference window never reaches its respawn — the critic's tell against ours is the post-cut camera still sliding for a second and
+the bike not yet moving); wheelie, landing, industrial world and canyon world went to the reference. The tells, verbatim, are below; the recurring ones are **the camera** (the pull-out to a top-down framing that shrinks the
+hero to a dot on e2's demand jump; a one-frame checkpoint push-in with a blur burst on e1), **no ground shadow under the hero on b1's
+dirt** ("no visible shadow… reads slightly pasted") and **a rigid rider** ("no body sway", "does not lag or load with the bike").
+H5's done line (≥ 2/6, no tell naming weight / suspension / rider lag / camera) is met on the count and not on the tells: camera,
+weight and rider lag are all named. Goldens: 25 restamped (node == browser, incl. the tracks owner's x3 Rookie 48.233 s / 2 attempts), 13 stale re-proven at
+one attempt each (e1 three), gate 22/26 NO-SHIP on the same four rows as round 9. Reflex matrix: **6 of 16 courses over band**
+(round 9: 8) with the three tracks-owner rules landed; m3 stays the outlier (34) and the trace says why (below). Timelapse ledger
+100 → 123 commits and **`progress-wave3.mp4` (30.0 s, 20.6 MB)** cut (loadavg 40–60 all round; every wall time here is contention-pessimistic).
+
+| piece | as built |
+|---|---|
+| **reflex controller** (`reflex/controller.ts`) | tracks r8 requests: (a) `hop-preload` never starts on ground steeper than 8° and a preload is dropped when the ground tilts up (`onRamp`) — the lipped plank beyond m3's 14° kicker read as a face and the −1 preload was held through the lip; (b) `air-short`: no gas / brake nudge when the ballistic time to land is under `AIR.nudgeMinAirS` = 0.5 s (a nudge is +6 / −15° per half second; in short air it only lands with the throttle or brake engaged) — the lean stays (a neutral-lean variant read m3 36 / e2 10 against 34 / 8); (c) `too-fast-brake` on the ground pulls lean to −0.5 × gain (the m1 stoppie into the ledge face). Death labels shift with (b): deaths in short air are now attributed to `air-short` where round 9 read `air-brake-nose-down` / `air-gas-nose-up` — a label, not a new cause. |
+| **reflex matrix** (`reflex/reflex.ts`) | `--all-tracks --noisy a,b,c [--noisy-seeds 9]`: the named tracks run 9 seeds while the rest keep `--seeds` (request d). The 9-seed A/B on e2 / e3 / m1 / m3, Rookie `average`, HEAD controller → this round: **e2 13 → 8 · e3 3 → 2 · m1 7 → 8 · m3 28 → 34** (`good`: 8 → 7 · 1 → 2 · 7 → 6 · 13 → 18). |
+| **bot fallback** (`bot/play.ts` `NO_PLAN_FALLBACKS`) | when the beam returns no actions from a root the player memory has banned every line at, the opening cycles gas → half-gas-back → gas-fwd → coast → brake → lean-back → hop with the number of bans at that root (deterministic per seed) instead of plain gas 47 times (x3 477 m). The x3 Rookie golden was already 2 attempts on the tracks owner's crest; the Pro x3 re-proved in 1. |
+| **stranger PROTOCOL** | r8 feel notes: stairs are shin-high 0.15 m risers (plain `g` rides a flight, a brake or a held lean on them is the only fall), a held `lb` rides a long down-ramp but loops down a stair flight, hop ledges sit ~6 m past their checkpoint (hop speed from a standing start; brake early with `bb`, never flat at the face). Round id on disk **r6** (r5 was the R5 delta). |
+| **browser reflex** (`reflex/browser.ts`) | the fresh-context onboarding card is pre-dismissed (`trials.onboarded` init script) — not the cause: the page reaches `ready` with **App screen `title`** (`initialTrack` never reached `App.start()`; `resolveBoot` took the `front` route under the driver's URL), so the failure now reports the screen and the nav log. Open, below. |
+| **critic pairs** (`compare/`) | six pairs on HEAD 539e500 at `high` (captures `out/capture/r14-*`, low-tier twins captured for the record): wheelie h1 slots vs Rising wheelie skill game, landing e2 demand gap vs Evolution A-license jump, crash e3 stranger s1 fault @ 418 m vs Rising ragdoll respawn, hop lab vs Rising flat box hops, world b1 vs Evolution HD Warehouse, world e1 vs Rising canyon; `--mask`, sides by seed, answers sealed, one fresh critic per pair. Two pairs were rebuilt: the first landing and hop pairs ran the align window past our clip's end and the normaliser cloned the tail — the "0.8 s frozen frame" tell on the first landing pair was the pairing, not the game; both first verdicts are in `compare.jsonl` and discounted here. **Rule for the next holder: our capture must be ≥ anchor + 2.5 s long.** |
+| **shared checkout** | `scratchpad/harness9/tree` = `git archive 539e500` (src db68bbeb) + the tracks owner's uncommitted x3 `bot-3.json`; `treeB` = the same for the HEAD-controller A/B. Overlay by `rsync -a --exclude out/ --exclude inputs/` (never `--delete`); results copied back with `cp`. |
+
+### Stranger round 5 — Rookie, 10 sessions on the frozen 539e500 (src db68bbeb), prompt = `run-stranger.md` block verbatim, PROTOCOL with the r8 notes; loadavg 15–25 at spawn, 30–60 during (the golden chain, the gate and the captures shared the box)
+
+| session | attempts | cleared | time | calls | wall | died at | what the stranger said |
+|---|---:|---|---:|---:|---:|---|---|
+| e3 s1 | 3 | yes | 55.0 s | 16 | 3.0 min | 418 m (pit) ×2 | full gas at ~15 m/s up the third flight pitched 45 → 59° into a loop; the half-gas fix left too little run-up for the pit at 418 |
+| e3 s2 | 1 | yes | 42.1 s | 11 | 1.1 min | — | plain `g40` throughout; 53–56° nose-up on the two big flights (264, 414 m), trusted neutral gas to bring it back |
+| e3 s3 | 1 | yes | 42.2 s | 11 | 1.4 min | — | same: 53–56° on the flights, a near loop-out, did not touch the lean |
+| e3 s4 | 1 | yes | 42.4 s | 11 | 1.2 min | — | same: ~55° on the up-flights hit at 15+ m/s |
+| m1 s1 | 8 | yes | 81.3 s | 33 | 9.1 min | 114, 112 (gap), 272, 280, 289, 284, 367 m | sub-half-metre bumps a few metres before each drawn ledge that the ASCII view cannot show: stop the bike dead at coast speed, or launch the second hop nose-up |
+| m1 s2 | 7 | yes | 78.0 s | 29 | 6.9 min | 116, 109, 269, 273, 281, 368 m (ledges) | the ~0.3 m steps after checkpoints at 108 / 271 / 362 m are invisible on the screen; 6 of 7 attempts calibrated "start `h` ~2.3 m before the face at ~6 m/s" |
+| m2 s1 | 4 | yes | 73.4 s | 29 | 5.7 min | 28 (drum), 186 (drum), 308 m (ramp) | leaving the second drum's rounded 2 m face on plain gas pitched over the bars; a lean-back at the drop landed it |
+| m2 s2 | 4 | yes | 69.6 s | 34 | 8.0 min | 187 (box), 180 (ramp), 325 m (ramp) | cresting a shelf drum above a crawl, or with any lean at the lip, is an unrecoverable nose-down dive; roll the top at 2–3 m/s neutral |
+| m3 s1 | 5 | yes | 65.3 s | 30 | 7.9 min | 218, 196 (ramp), 340, 403 m | in-air pitch off the kicker lips wildly inconsistent (nose-dived at 18 m/s, looped at 9.6); entered every lip at ~11.5 m/s on `gf` |
+| m3 s2 | 11 | yes | 129.0 s | 39 | 13.0 min | 69, 351, 403, 434 ×2 (plank), 423, 415, 414 (ramp), 435 (gap), 484 m | the pit-jump ramp at 421–427 m kicks the nose up 30–40° every time; only a four-slot lean-forward held through the flight lands the 4 m platform |
+
+| track | band | sessions | cleared | median attempts | median time | median calls | pass (≤ 1.5 × band top, all cleared) | reflex `average` (9 seeds) |
+|---|---|---:|---:|---:|---:|---:|---|---:|
+| e3-stairway | 3–6 | 4 | 4 | **1** | 42.3 s | 11 | PASS | 2 |
+| m1-hop-up | 5–9 | 2 | 2 | **7.5** | 79.7 s | 31 | PASS | 8 |
+| m2-drum-roll | 6–12 | 2 | 2 | **4** | 71.5 s | 31.5 | PASS | 8 (3 seeds) |
+| m3-see-saw | 8–12 | 2 | 2 | **8** | 97.2 s | 34.5 | PASS | 34 |
+
+Recordings in `inputs/<track>/stranger-<track>-r6-s<n>-20260914-2158xx.json` (byte-faithful on db68bbeb), sessions under
+`out/stranger/<track>/`, round manifest `out/stranger/rounds/r6/`. Two stranger-tooling notes: the ASCII screen does not draw
+sub-0.5 m steps (both m1 strangers found the 0.3 m ledges by hitting them), and every m3 death but two sits in 403–435 m — the
+same see-saw exit → 421 m kicker → 434 m plank section the reflex trace names below.
+
+### Blind critic round 3 (RoG H5) — six pairs, one fresh critic each, HEAD 539e500 `high` vs the reference corpus
+
+| pair | pick | conf | why (critic, abridged) | the tell (verbatim `nonAAA`) |
+|---|---|---:|---|---|
+| wheelie-launch (h1 slots vs Rising wheelie) | **ref** | 0.66 | ours never establishes a wheelie — the front lifts off a bump for ~4 frames at t≈1.45 s and slaps back; camera trails so the bike drifts centre → right third; 1–2 frame orange flashes on the crosswalk | "B's wheelie-launch never happens as a controlled pitch: the front lifts off a terrain bump for four frames and slaps back down, so there is no sustained, drifting-and-corrected wheelie angle and no rider lean lagging into a held pose - plus the trailing camera and 1-2 frame light pops break the read of continuous, motivated motion." |
+| big-jump-landing (e2 demand gap vs Evolution A-license jump) | **ref** | 0.90 | our camera pulls out continuously from t=0.9 s to an overhead view by t=2.0 s and never eases back; the bike is a 15 px dot at touchdown, lands flat, no dust, no compression | "A's camera runs away from the action: an unmotivated, ever-widening pull-out to a top-down angle shrinks the bike to a dot, so the landing has no readable pitch, compression, rebound or dust — the jump has no weight and no settle, and the camera never eases back in to sell the touchdown." |
+| fault-respawn (e3 stranger fault @ 418 m vs Rising ragdoll respawn) | **ours** | 0.55 | ours nose-plants off the step at t≈1.1 s, rider ejects over the bars, hard cut to the checkpoint at t≈2.27 s with no fade; dust puff at the contact point within ~3 frames; but after the cut the camera keeps sliding ~60 px for over a second and the bike is not yet moving; the reference's ragdoll never respawns inside the window (its debris read is stronger: rider separates mid-air, bike rebounds off the container and creeps to rest) | "A never delivers the respawn — 2.3s after the crash the ragdoll is still lying there with the camera idly drifting, so the manoeuvre is incomplete; B does cut, but the camera is still sliding into the checkpoint frame for over a second after the cut and the bike is not yet moving, so the restart reads as late and unsettled rather than snappy." |
+| bunny-hop (lab hop vs Rising flat box hops) | **ours** | 0.86 | ours: front lifts at the lip, clears the gap, rear touches first, front 2–3 frames later, rolls on; the reference window showed a rear-wheel balance held for a second (a weak pair — the critic's tell is about the reference) | (against the reference) "A has no mass: pitch changes take a second to happen, the bike hangs mid-wheelie without falling…" — ours drew "three clean but arbitrary hard cuts" (the lab track's checkpoint re-arms) and "little visible squat" |
+| world-industrial (b1 riding frame vs Evolution HD Warehouse) | **ref** | 0.75 | ours glides at one speed over the crests with no pitch, no compression, no rider lean; no visible shadow on the dirt ribbon; camera at a fixed offset | "A's weaker read is weight: the bike glides at one speed over crests with no pitch, no suspension compression and no rider lean, and it casts no shadow, so it feels like a sprite on a rail rather than 100 kg rolling through a lit room." |
+| world-canyon (e1 riding frame vs Rising canyon) | **ref** | 0.72 | a held opening frame, then at t=0.07 s a ~15 % camera push-in and a scene-wide blur switch in one frame as the checkpoint light goes green; rider stiff while the bike pitches ~20° onto the ramp; flat diorama with tilt-shift blur, blob shadow | "A's one-frame checkpoint push-in with a scene-wide blur burst, preceded by a held opening frame, is the tell: the camera changes scale instantly instead of easing, and the rider does not lag or load with the bike as it pitches onto the ramp. B never snaps, lands front-then-rear with a visible settle, and its shadows sit under everything." |
+
+**Tally: ours 2 / 6** (hop 0.86, crash 0.55; H5 wants ≥ 2/6 with no tell naming weight, suspension, rider lag or camera — the count
+is met, the tells are not: camera is named on four pairs, weight on two, rider lag / rigidity on three). Both wins are against weak
+reference windows (a rear-wheel balance where a hop was cut; a ragdoll whose respawn falls outside 3.5 s), so the honest read is
+"2/6 on the count, 0/4 on the pairs where the reference showed the manoeuvre". For the render owner, the tells that recur across critics: (1) **camera** — the
+airtime pull-out on e2 goes to a top-down framing and never eases back in; the e1 checkpoint push-in is a one-frame scale step with a
+blur burst; the h1 camera trails the bike to the right third; (2) **hero shadow** — none read on b1's dirt at `high` ("reads slightly
+pasted"), a "soft blob" on e1; (3) **rider rigidity** — no sway over crests, no lag into the ramp pitch, no crouch before the hop;
+(4) the reference's dust at the rear patch 2–3 frames after touchdown is what every landing critic keys on, and ours shows none.
+Discounted pairs (logged in `compare.jsonl`, not in the tally): `big-jump-landing-…-68e2` (align window past our clip → cloned tail
+read as a "0.8 s frozen frame") and `bunny-hop-…-dc80` (same, ours picked 0.6). Pairs, sheets and sealed answers in `out/compare/`.
+
+### Goldens, skill 3, one seed, every clear browser-verified (node hash == page hash), frozen HEAD 539e500, src db68bbeb (loadavg 16–48)
+
+`--refresh-goldens`: fresh 0, restamped 25 (74f5de4d → db68bbeb; **x3-gauntlet `bot-3.json` 48.233 s / 2 attempts, the tracks owner's
+node-only golden, proves in the browser: 34b8d869 → db68bbeb**), stale 13 — the seven r8 tracks both classes minus x3 Rookie, plus x3
+Pro. Re-proven: b2 1 / 38.417 `fbbbcc12ef37654e` · Pro 1 / 36.367 `e62cee03a3627e38` · b3 1 / 33.067 `c24caa6771450950` · Pro 1 /
+30.008 `485b1c24296dbb95` · e1 **3** / 55.192 `b192ecb013eca683` · Pro **3** / 50.717 `68fe004d241b2a6c` · e2 1 / 44.175
+`39238928bb85d7e7` · Pro 1 / 41.000 `b720878355e8e3c7` · e3 1 / 41.817 `09ed79eb92bf95d0` · Pro 1 / 38.275 `16fe4690ef7ae131` · m1 1 /
+34.583 `6c61583f2a7c685b` · Pro 1 / 30.208 `4216a409fce0db67` · x3 Pro 1 / 42.792 `f1940fe691627514`; every one `verified=true`.
+Every track has a proven golden on db68bbeb for both classes (19/19).
+
+### Ship gate (`harness:gate --pin --heap-seconds 60`, frozen HEAD 539e500, src db68bbeb)
+
+**22/26 (NO-SHIP on the three SwiftShader rows + the reflex row), wall 1667 s, loadavg 50 at boot → 55 at the end (the captures, the
+10 strangers and another owner's jobs shared the box).** boot.readyP50 120.5 ms (limit 300; 116/121/220/107/155) · firstFrame 17234 ms
+(SwiftShader, informational) · clear.golden / bitEqual / hashOk PASS (`b002d139195b5757`) · clear.pro.flat / b1 PASS · crash.faultWithinS
+0.75 s · fault.toControlMs 50 ms (auto-respawn 1042 ms) · restart.ticks 1 · restart.wallMsP95 0.14 ms · restart.frameMsP95 1162 ms
+(SwiftShader) · restart.noCountdown 1 tick · heap −5.37 MB/60 s · draw calls 198 · triangles 159 739 · textures 76.9 MB · physics
+30.0 µs/tick p95 · renderSubmit 2.88 ms · renderSynced 18428 ms (SwiftShader) · bundle 441.1 KB gz (dist 17075 KB) · determinism 9/9 ·
+**camera.box PASS 0 riding frames out of the box, clamped 34.4 % (reported)** · stranger.medianAttempts informational (no b1–e1 session
+on db68bbeb yet; this round's sessions are e3 / m1–m3) · **reflex.medianAttempts FAIL b1 1/1.5 · b2 2/3 · b3 4/3 · e1 8/6** · Pro
+informational b1 2 · b2 7 · b3 12 · e1 36. Log `scratchpad/harness9/gate.log`, report under `out/gate/`.
+
+### Reflex matrix on HEAD 539e500 (`harness:reflex --all-tracks --bike both --skill novice,average,good --seeds 3 --noisy e2-rear-wheel-first,e3-stairway,m1-hop-up,m3-see-saw --noisy-seeds 9`, 94 s wall, loadavg 28; full tables with every death rule in `out/metrics/reflex.md`)
+
+Rookie `average` median (seeds) / clears — band: flat 1 · gap 2 · b1 1 · b2 2 · **b3 4** (3, 4, 6) 1–2 · **e1 8** (6, 10, 8) 2–4 ·
+**e2 8** (8, 24, 17, 1, 5, 10, 6, 5, 21) 3–5 · e3 2 (3, 2, 1, 4, 3, 2, 1, 3, 1) 3–6 · m1 8 (10, 6, 10, 6, 13, 9, 5, 7, 8) 5–9 · m2 8
+(8, 6, 12) 6–12 · **m3 34** (28, 15, 36, 25, 36, 22, 38, 37, 34; 5/9) 8–12 · **h1 51** (0/3) 10–18 · **h2 39** (0/3) 14–22 · h3 22 (3/3)
+18–25 · x1 29 (0/3, walled at 53 %) · x2 47 (0/3) · x3 34 (0/3) · lab 1 · lab-flat 1. **Out of band (Rookie `average`): b3, e1, e2, m3,
+h1, h2 = 6 of 16** (round 9: 8; the x-tier rows sit inside their 30–80 bands only because the runs wall before clearing — 0/3 clears on
+x1/x2/x3, so they are not passes). `novice`: b3 8 · e1 17 · e2 16 · m1 11 · m3 34 over band; `good`: b3 3 · e1 16 · e2 7 · m2 16 · m3 18.
+Pro rows stay informational (b1 2 · b2 7 · b3 12 · e1 36 · e2 29 · e3 15 · m1 26). Top death sites (`average`): b3 ground @ 355 ×2
+(nose-high), ramp @ 409.8 / 423.8 · e1 ramp @ 449.9 ×11 (the box-edge launch onto the 22 m ramp, `air-short`) · e2 ramp @ 191.2 ×16,
+box @ 505.4 ×13, box @ 72.0 ×9 · m1 ledge @ 109 ×21 (`nose-low` — the stoppie became a nose-low dip at the same face) · m3 ground @ 410
+×67, ramp @ 421.4 ×34, box @ 438.9 ×24 · h1 wall @ 175.8 ×71 (`nose-low`) · h2 ramp @ 275.8 / 265.8 (`air-gas-nose-up`).
+
+**m3 trace (`scratchpad/harness9/{trace,probe}.mts`, `good` seed 1000, 396–426 m).** The demand see-saw (pivot 403.4 m, half-length 4,
+rest +22.6° with the near end at 0.19 m) is approached over a 3 m pit (floor −3.0 m) from a ramp ending at 396.4 m: the bike flies the
+pit onto the plank's low end, rides up it, the board tips at ~−140 °/s under the bike and hands it that nose-down rate at take-off
+(pitch 20, rate −123 °/s leaving the far end at 404.6 m, 5.5 m/s); `drop-ahead-lean-back` (the plank's far end reads as a ≥ 0.8 m
+drop) and the air rules then fight the inherited rotation into the ground at 410 m. The nudges were not the killer — with them off
+the deaths at 410 stay and a neutral-lean variant is worse — so the controller needs a see-saw model (the board's angular rate is
+observable in `st.seesaws[].angVel`; a rider on a tipping board should hold the pose it had and let the board set the exit), and the
+421.4 m kicker deaths that appeared once the hop-preload no longer fires there are the same flight ridden as `ramp-ride` (+0.8, gas)
+into the 434 m plank. Both are the controller's, not the track's — m3's strangers cleared in 5 and 11.
+
+### Browser reflex (`harness:reflex b1-first-ride --seeds 1 --browser 1`, frozen 539e500)
+
+Node 1 attempt / 56.658 s; `runRecording` browser hash `91572684717b2c19` IDENTICAL. Live keys still fail at `fake clock: expected the
+countdown after pauseAt, got 'menu'` — with this round's diagnostic: **`app.screen() === 'title'`, nav log empty**. `App.start()` only
+calls `play(initialTrack)` when `resolveBoot` returned the `run` route, so under the driver's `?track=b1-first-ride` URL the page opened
+on the title (the onboarding card was not it — `trials.onboarded` is pre-set and the screen is `title`, not `run`). Core-game merged
+the title into the menu at 20d463d after this tree was frozen; the next holder re-runs on that HEAD and, if the screen is still not
+`run`, logs `location.search` as the page saw it (the `?track=` route is the contract: straight to the run). The round-7 live-keys
+numbers stand.
+
+### Timelapse
+
+Ledger append started from e05153e (23 first-parent commits through 20d463d) with `--clips milestones --milestones
+fc17e77,bdf9f0c,e8f2ec7,18df821,47f0455,71d1988,539e500` (the renderer appends the latest commit), niced, in the background at
+loadavg 40–60 (~2–3 min per capture on this box). Ledger **100 → 123** (every commit built + captured, 52.1 min niced at loadavg 40–60); `progress-stills.mp4` (121 stills) and
+`progress-clips.mp4` re-rendered. Wave-3 montage **`harness/out/timelapse/progress-wave3.mp4`: 30.0 s, 20.6 MB** (crf 22 re-encode of
+the 27.7 MB render): bdf9f0c physics R4 → e8f2ec7 R5 → 47f0455 rider kit → 18df821 touch invariant → 71d1988 render r13 → 539e500
+tracks r8 → 20d463d menu merge (the latest, appended by the renderer); fc17e77 harness r8 was dropped to keep the 4 s-per-build cut
+at 30 s (the 8-milestone render is 34.0 s).
+
+### Open
+
+- **RoG H5: ours 2/6 on the count, tells still name camera / weight / rider lag — not done.** Tells for the render owner (verbatim
+  above): the airtime camera pull-out to a top-down framing on e2 that never eases back; the one-frame checkpoint push-in + blur burst
+  on e1; the post-respawn camera still sliding for a second while the bike stands; no hero shadow read on b1's dirt at `high`; the
+  rigid rider (no sway, no lag, no crouch); no dust at the rear patch after touchdown. Next critic round on render r14, with the two
+  reference windows re-cut so they show the manoeuvre.
+- **Pair hygiene**: our capture must run ≥ anchor + 2.5 s or the normaliser clones the tail and the critic reads a frozen frame (two
+  pairs rebuilt this round). `pair.ts` should refuse an align window that leaves either clip's duration.
+- **m3-see-saw reflex 34 vs band 8–12 while strangers read 5 / 11**: a see-saw model in the controller (above), not a track change.
+- **b3 4 / e1 8 / e2 8 over band for the reflex `average`** while strangers passed all three in rounds 4–5; the round-9 open item
+  (air-brake off a box edge at speed, now labelled `air-short`) stands: e1 ramp @ 449.9 ×11, e2 ramp @ 191.2 ×16 / box @ 505.4 ×13.
+- **Three of four e3 strangers report 53–59° nose-up on the up-flights at 15 m/s under plain gas; one looped.** Tracks / physics: the
+  flights are ridden in one attempt, but the margin at full gas is a few degrees.
+- **Stranger screen does not draw sub-0.5 m steps** (m1's 0.3 m ledges at 108 / 271 / 362 m): `stranger/view.ts` wants a glyph for
+  a step under half a metre.
+- **`harness:reflex --browser` live keys**: App screen `title` under `?track=` on 539e500 — re-run on the menu-merge HEAD.
+- **`?perf=1` overlay does not carry `debugInfo()`** (round 9): still open with core-game.
+
 ## Round 9 status — the reflex controller learns the v2 air (rate-aware lean, early release), stranger round 4 passes b1–e2 on R4 and R5, e3 is the stairway that no human proxy clears
 
 **Finding.** The round-8 deaths were the controller's, as physics R4 said: `air-level` mapped pitch error to a lean that

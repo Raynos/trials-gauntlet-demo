@@ -3,7 +3,7 @@
  *
  *   pnpm harness:reflex <trackId> [--skill novice|average|good] [--seeds 3] [--attempts-cap 50] [--max-sim-seconds 300]
  *                       [--browser N] [--no-verify] [--build] [--dev] [--verbose]
- *   pnpm harness:reflex --all-tracks [--skill average] [--seeds 3] [--tracks a,b]
+ *   pnpm harness:reflex --all-tracks [--skill average] [--seeds 3] [--tracks a,b] [--noisy a,b --noisy-seeds 9]
  *   pnpm harness:reflex --calibrate                      # reflex (average) vs the stranger medians on b1/b2/b3/e1
  *
  * Writes per run  harness/out/reflex/<trackId>/<runId>-<skill>.json (+ .rec.json)   ReflexRunReport + recording
@@ -389,6 +389,10 @@ async function main(): Promise<void> {
   if (flagBool(flags, 'all-tracks')) {
     const only = typeof flags.tracks === 'string' ? flags.tracks.split(',') : null;
     const ids = listSimTracks().filter((id) => !only || only.includes(id));
+    // Round 10 (tracks r8 request d): the 3-seed medians on e2 / e3 / m1 / m3 move 3x under identical geometry;
+    // `--noisy a,b,c` runs those tracks on `--noisy-seeds` (9) seeds while the rest keep `--seeds`.
+    const noisy = new Set(typeof flags.noisy === 'string' ? flags.noisy.split(',').map((x) => x.trim()) : []);
+    const noisySeeds = Math.max(seeds, flagNum(flags, 'noisy-seeds', 9));
     const started = new Date();
     const sections: string[] = [];
     // Round 8: `--skill novice,average,good` (or `all`) = the reflex matrix, one section per (bike, skill).
@@ -401,10 +405,10 @@ async function main(): Promise<void> {
         const rows: ReflexTrackMetrics[] = [];
         const t0 = new Date();
         console.log(`reflex sweep: bike=${bike} skill=${sk} seeds=${seeds} src=${srcFingerprint()} tracks=${ids.length} loadavg=${os.loadavg().map((l) => l.toFixed(1)).join(' ')}`);
-        for (const id of ids) rows.push((await runTrack(id, [sk], seeds, flags, bike)).metrics);
+        for (const id of ids) rows.push((await runTrack(id, [sk], noisy.has(id) ? noisySeeds : seeds, flags, bike)).metrics);
         sections.push(
           [
-            `## ${bike === 'pro' ? 'Pro' : 'Rookie'} bike — skill ${sk}, ${seeds} seed(s), physics ${rows[0]?.physics ?? '?'}, src ${srcFingerprint()}, ${t0.toISOString()}, wall ${((Date.now() - t0.getTime()) / 1000).toFixed(0)} s`,
+            `## ${bike === 'pro' ? 'Pro' : 'Rookie'} bike — skill ${sk}, ${seeds} seed(s)${noisy.size ? ` (${noisySeeds} on ${[...noisy].join(', ')})` : ''}, physics ${rows[0]?.physics ?? '?'}, src ${srcFingerprint()}, ${t0.toISOString()}, wall ${((Date.now() - t0.getTime()) / 1000).toFixed(0)} s`,
             '',
             paramsLine(sk),
             '',

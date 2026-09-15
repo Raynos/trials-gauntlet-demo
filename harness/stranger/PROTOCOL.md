@@ -109,7 +109,15 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
 - **The hop is a move, not a button:** lean back on light gas to load the bike (~0.3 s), then snap the
   weight forward. `h` is that recipe; `gb2 gf2 lb1` is the same thing by hand.
 - **Drops are safe.** A 3 m drop at speed lands and rides away; a nose-down landing dips the front hard,
-  so come off a ledge with a touch of `lb`.
+  so come off a ledge with a touch of `lb`. Down a long ramp a held `lb` is fine (it rides any drop to
+  ~1.8 m); down a **stair flight** a held `lb` loops the bike — descend stairs on plain `g` or `c`, neutral.
+- **Stairs are shin-high steps** (0.15 m risers, flights of a few steps). Plain `g` rides a flight up or
+  down at any speed; a brake on or just before a step, or a lean held through the flight, is the only
+  way to fall on them. Do not wheelie into them, do not brake on them.
+- **Ledges you hop onto come ~6 m after their checkpoint.** That is hop speed (5-8 m/s) from a standing
+  start, so ride `g` from the checkpoint and start `h` about a bike length before the face. Arriving fast
+  (11+ m/s) and braking flat stands the bike on its front wheel into the face: brake early with the
+  weight back (`bb`), never at the face.
 - **Climbs are geometry.** Weight forward holds ~37 deg at a crawl; 40-45 deg needs the front wheel on
   the face first and then the throw (`ct`); anything steeper wants speed.
 - **In the air, gas and brake are nudges; the lean is the control.** A gas tap lifts the nose ~6 deg in

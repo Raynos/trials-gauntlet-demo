@@ -141,6 +141,16 @@ export class ReflexBrowser {
       if (virtual) await page.clock.install({ time: clock0 });
       const url = new URL(server.url);
       url.searchParams.set('track', trackId);
+      // Round 10: `?track=` goes straight to the run, but a first launch ever shows the onboarding card with the game
+      // paused (phase 'menu') until a key — a fresh Playwright context is always a first launch, which is the round-9
+      // "expected the countdown after pauseAt, got 'menu'". A returning player has `trials.onboarded` set; so does the driver.
+      await page.addInitScript(() => {
+        try {
+          localStorage.setItem('trials.onboarded', '1');
+        } catch {
+          /* storage unavailable */
+        }
+      });
       await page.goto(url.toString(), { waitUntil: 'commit' });
       await page.waitForFunction(() => window.__trials?.ready === true, undefined, { timeout: 30_000 });
       if (virtual) {
@@ -148,7 +158,14 @@ export class ReflexBrowser {
         // App), so a target well past the slowest boot costs a little countdown, never the GO.
         await page.clock.pauseAt(Math.max(clock0, Date.now()) + 30_000);
         const ph = (await page.evaluate('window.__trials.phase()')) as string;
-        if (ph !== 'countdown') throw new Error(`fake clock: expected the countdown after pauseAt, got '${ph}'`);
+        if (ph !== 'countdown') {
+          // Round 10: `?track=` lands in `play()` (phase countdown) and something under the fast-forward takes it back to
+          // `menu` (`quit()` / `loadBackdrop()` are the only paths) — report the App screen and the nav log with the failure.
+          const why = (await page.evaluate(
+            `(() => { const t = window.__trials; const app = t && t.app; return JSON.stringify({ screen: app && app.screen ? app.screen() : null, nav: t && t.navLog ? t.navLog().slice(-8) : null }); })()`,
+          )) as string;
+          throw new Error(`fake clock: expected the countdown after pauseAt, got '${ph}' (app ${why})`);
+        }
       }
       await page.evaluate(`window.__trials.setQuality(${JSON.stringify(this.opts.quality ?? 'low')})`);
       await page.evaluate(IN_PAGE_HOOK);

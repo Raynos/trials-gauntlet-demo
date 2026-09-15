@@ -1,0 +1,195 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "m2-drum-roll",
+  "attemptsBand": [
+    6,
+    12
+  ],
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "db68bbeb",
+  "updatedAt": "2026-09-15T03:12:20.437Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "m2-drum-roll-r6-s1-20260914-215809",
+      "agent": "s1",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "db68bbeb",
+      "strangerAttempts": 4,
+      "cleared": true,
+      "finishTime": 73.3833,
+      "calls": 29,
+      "wallMs": 339651,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 4,
+        "cleared": true,
+        "x": 488.2,
+        "startTick": 5753,
+        "endTick": 9143,
+        "recordingFile": "harness/inputs/m2-drum-roll/stranger-m2-drum-roll-r6-s1-20260914-215809.json"
+      },
+      "recordingFile": "harness/inputs/m2-drum-roll/stranger-m2-drum-roll-r6-s1-20260914-215809.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 27.727,
+          "checkpoint": 0,
+          "obstacle": "drum @ 27.0 m",
+          "calls": 3
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 185.898,
+          "checkpoint": 1,
+          "obstacle": "drum @ 186.0 m",
+          "calls": 13
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 308.111,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 311.2 m",
+          "calls": 20
+        }
+      ]
+    },
+    {
+      "sessionId": "m2-drum-roll-r6-s2-20260914-215809",
+      "agent": "s2",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "db68bbeb",
+      "strangerAttempts": 4,
+      "cleared": true,
+      "finishTime": 69.6167,
+      "calls": 34,
+      "wallMs": 479300,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        2,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 4,
+        "cleared": true,
+        "x": 488.2,
+        "startTick": 5299,
+        "endTick": 8648,
+        "recordingFile": "harness/inputs/m2-drum-roll/stranger-m2-drum-roll-r6-s2-20260914-215809.json"
+      },
+      "recordingFile": "harness/inputs/m2-drum-roll/stranger-m2-drum-roll-r6-s2-20260914-215809.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 187.488,
+          "checkpoint": 1,
+          "obstacle": "box @ 187.2 m",
+          "calls": 11
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 179.99,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 182.0 m",
+          "calls": 13
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 325.051,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 328.8 m",
+          "calls": 21
+        }
+      ]
+    }
+  ],
+  "completed": 2,
+  "clearedCount": 2,
+  "medianAttempts": 4,
+  "medianFinishTime": 71.5,
+  "medianCalls": 31.5,
+  "medianWallMs": 409475.5,
+  "pass": true,
+  "deaths": {
+    "total": 6,
+    "byReason": {
+      "crash": 6
+    },
+    "byObstacle": [
+      {
+        "obstacle": "drum @ 27.0 m",
+        "count": 1,
+        "xs": [
+          27.7
+        ]
+      },
+      {
+        "obstacle": "drum @ 186.0 m",
+        "count": 1,
+        "xs": [
+          185.9
+        ]
+      },
+      {
+        "obstacle": "ramp @ 311.2 m",
+        "count": 1,
+        "xs": [
+          308.1
+        ]
+      },
+      {
+        "obstacle": "box @ 187.2 m",
+        "count": 1,
+        "xs": [
+          187.5
+        ]
+      },
+      {
+        "obstacle": "ramp @ 182.0 m",
+        "count": 1,
+        "xs": [
+          180
+        ]
+      },
+      {
+        "obstacle": "ramp @ 328.8 m",
+        "count": 1,
+        "xs": [
+          325.1
+        ]
+      }
+    ],
+    "byCheckpoint": [
+      0,
+      1,
+      3,
+      2,
+      0
+    ]
+  }
+}

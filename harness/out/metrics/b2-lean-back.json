@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "b2-lean-back",
   "bike": "rookie",
-  "updatedAt": "2026-09-15T00:45:53.092Z",
+  "updatedAt": "2026-09-15T02:55:45.772Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        38.6
+        38.416666666666664
       ]
     }
   ],
@@ -32,6 +32,7 @@
     "20260914-175415-ef954f",
     "20260914-175510-a3522c",
     "20260914-175614-80a63f",
-    "20260914-194405-6f6e9e"
+    "20260914-194405-6f6e9e",
+    "20260914-215438-498e75"
   ]
 }

@@ -18,7 +18,10 @@ import type { InputFrame, PhysicsState } from '../../src/core/types';
 import type { BeamConfig, FaultEvent, Skill } from '../lib/schema';
 import { countedFaults, type TimedEvent } from '../lib/metrics';
 import type { Sim } from '../lib/sim';
-import { COAST, RESTART_FRAME, macroFrameAt, macroTicks, type MacroCtx } from './actions';
+import { ACTIONS, COAST, RESTART_FRAME, macroFrameAt, macroTicks, type MacroCtx } from './actions';
+
+/** Openings played when the beam returns no actions: gas, half-gas-back, gas-fwd, coast, brake, lean-back, hop (action ids). */
+export const NO_PLAN_FALLBACKS: readonly number[] = [1, 5, 3, 0, 7, 10, 13];
 import { plan, type Plan } from './beam';
 import { DEFAULT_WEIGHTS, type ScoreWeights } from './score';
 
@@ -144,8 +147,13 @@ export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
     const p = plan(sim, cfg, w, { banned: bannedByRoot.get(rootHash) ?? [] });
     plans.push(p);
     const committedSinceRoot: number[] = [];
-    const toPlay = p.actions.length === 0 ? [1] : p.finishes ? p.actions : p.actions.slice(0, cfg.commit);
-    if (p.actions.length === 0) log(`plan returned no actions (allFault=${p.allFault}); playing gas`);
+    // No plan from a root the player memory has banned every line at: a perturbed fallback, not plain gas (tracks r8:
+    // from the x3 CP5 spawn plain gas drove the identical launch into the 60 deg face 47 times). The opening cycles
+    // with the number of bans at this root, so each retry from the same root starts differently and stays deterministic.
+    const bansHere = bannedByRoot.get(rootHash)?.length ?? 0;
+    const fallback = NO_PLAN_FALLBACKS[bansHere % NO_PLAN_FALLBACKS.length]!;
+    const toPlay = p.actions.length === 0 ? [fallback] : p.finishes ? p.actions : p.actions.slice(0, cfg.commit);
+    if (p.actions.length === 0) log(`plan returned no actions (allFault=${p.allFault}, bans here=${bansHere}); playing ${ACTIONS[fallback]!.code}`);
 
     let replan = false;
     for (const aid of toPlay) {
