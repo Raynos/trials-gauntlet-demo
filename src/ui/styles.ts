@@ -79,8 +79,8 @@ export const FRONT_CSS = /* css */ `
    screen that is not the current one. */
 .screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
 .screen.show { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity var(--t2) var(--ease), visibility 0s; }
-.screen:not(.show) *, .overlay:not(.show) *, .onboard:not(.show) *, .results:not(.show) * { pointer-events: none !important; }
-.overlay:not(.show), .onboard:not(.show), .results:not(.show) { visibility: hidden; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
+.screen:not(.show) *, .overlay:not(.show) *, .onboard:not(.show) *, .results:not(.show) *, .replay:not(.show) * { pointer-events: none !important; }
+.overlay:not(.show), .onboard:not(.show), .results:not(.show), .replay:not(.show) { visibility: hidden; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
 .screen.show .rise { animation: rise var(--t2) var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 .scrim { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 35%, rgba(6,7,9,.92)); }
@@ -285,7 +285,7 @@ export const FRONT_CSS = /* css */ `
 
 /* ---- replay viewer (docs/design/game.md §16): kicker top-left, transport bar in the lower band ---- */
 .replay { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity var(--t2) var(--ease); z-index: 5; }
-.replay.show { opacity: 1; }
+.replay.show { opacity: 1; visibility: visible; transition: opacity var(--t2) var(--ease), visibility 0s; }
 .replay .rp-head { position: absolute; left: calc(var(--s5) + var(--sal)); top: calc(var(--s5) + var(--sat)); display: flex; flex-direction: column; gap: 2px; }
 .replay .ov-kicker { color: var(--amber); }
 .replay .ov-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.6rem; line-height: 1; text-transform: uppercase; }
@@ -307,7 +307,7 @@ export const FRONT_CSS = /* css */ `
 .hud.replay-on .hud-track, .hud.replay-on .hud-device, .hud.replay-on .hints { opacity: 0; }
 .replay.touch .rp-legend { display: none; }
 html.short .rp-bar { bottom: calc(var(--s3) + var(--sab)); padding: var(--s1) var(--s2); gap: var(--s1); }
-html.short .rp-bar button { min-height: 40px; min-width: 40px; font-size: .75rem; }
+html.short .rp-bar button { min-height: 44px; min-width: 44px; font-size: .75rem; }
 html.short .rp-bar .rp-time { font-size: .8rem; min-width: 4.2em; }
 html.short .rp-bar .rp-exit span { display: none; }
 html.short .replay .rp-head { top: calc(var(--s3) + var(--sat)); }

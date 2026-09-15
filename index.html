@@ -51,7 +51,13 @@
       #loader .top.setup .pct { color: #7fd1ff; }
       #loader .status { color: rgba(243,245,248,.85); min-height: 1.4em; max-width: 560px; font-variant-numeric: tabular-nums; margin-top: 8px; font-size: 13px; }
       #loader ol { list-style: none; margin: 14px 0 0; padding: 0; max-width: 560px; max-height: 40vh; overflow: hidden; font-size: 12px; font-variant-numeric: tabular-nums; color: rgba(243,245,248,.62); }
+      #loader ol { display: flex; flex-direction: column; }
       #loader li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; white-space: nowrap; }
+      /* Background rows (art that hot-swaps in after the title): grouped last under their own heading, dimmer, marked ↓ not ✓. */
+      #loader li.bg { order: 3; color: rgba(243,245,248,.42); }
+      #loader li.bg.ok::after { content: "↓ in"; color: rgba(243,245,248,.42); }
+      #loader li.bg.on::after { content: "↓"; color: rgba(243,245,248,.42); }
+      #loader li.bghead { order: 2; margin-top: 8px; color: rgba(243,245,248,.42); letter-spacing: .12em; text-transform: uppercase; font-size: 10px; }
       #loader li span:first-child { overflow: hidden; text-overflow: ellipsis; }
       #loader li.on { color: #f3f5f8; }
       #loader li.ok::after { content: "✓"; color: #4ae37f; }
@@ -94,7 +100,7 @@
             list.appendChild(li);
             r = rows[name] = { li: li, a: li.children[0], b: li.children[1], done: 0, total: 0, at: performance.now() };
             order.push(name);
-            if (list.children.length > 14) { var old = order.shift(); list.removeChild(rows[old].li); delete rows[old]; }
+            if (list.children.length > 18) { var old = order.shift(); list.removeChild(rows[old].li); delete rows[old]; }
           }
           return r;
         }
@@ -124,7 +130,9 @@
           tEl.textContent = ((now - t0) / 1000).toFixed(1) + ' s';
           var s = dl.samples; while (s.length && now - s[0][0] > 1500) s.shift();
           if (s.length > 1) { var bytes = 0; for (var i = 1; i < s.length; i++) bytes += s[i][1]; var sec = (s[s.length - 1][0] - s[0][0]) / 1000; if (sec > 0.2) netEl.textContent = '≈ ' + (bytes * 8 / sec / 1000).toFixed(0) + ' kbps on the wire'; }
-          for (var ph in bg) { var g = bg[ph]; if (g.done) setRow(g.label, KB(g.done) + ' / ' + KB(g.total), g.done >= g.total ? 'ok' : 'on'); }
+          var anyBg = false;
+          for (var ph in bg) { var g = bg[ph]; if (g.done && !g.need) { anyBg = true; setRow(g.label, KB(g.done) + ' / ' + KB(g.total), (g.done >= g.total ? 'ok' : 'on') + ' bg'); } else if (g.done) setRow(g.label, KB(g.done) + ' / ' + KB(g.total), g.done >= g.total ? 'ok' : 'on'); }
+          if (anyBg && !rows['Streams in after start']) { setRow('Streams in after start', 'not needed to play', 'bghead'); }
         }
         setInterval(function () { if (!finished) paint(); }, 100);
         function fail(msg) {
@@ -228,7 +236,7 @@
            from Resource Timing as each file completes, against the manifest's totals. */
         var bg = {}, byTail = {};
         function watchBackground(items) {
-          var labels = { world: 'World art (renderer, background)', menu: 'Menu art (background)', models: 'Models (background)', title: 'Title art (background)' };
+          var labels = { world: 'World art', menu: 'Menu art', models: 'Models', title: 'Title plate' };
           var need = { models: 1 }; /* the glTF hero waits for these; title key art, menu and world art hot-swap in (the title shows its gradient until the plate lands) */
           items.forEach(function (i) { if (i.phase in labels) { byTail[i.path.replace(/^\.?\//, '')] = i; var g = bg[i.phase] || (bg[i.phase] = { label: labels[i.phase], done: 0, total: 0, seen: {}, need: !!need[i.phase] }); g.total += i.bytes; } });
           function take(list) { list.forEach(function (e) { var tail = e.name.replace(/^[a-z]+:\/\/[^/]+\//, '').split('?')[0]; var i = byTail[tail]; if (!i || bg[i.phase].seen[tail]) return; bg[i.phase].seen[tail] = 1; bg[i.phase].done += i.bytes; }); }
