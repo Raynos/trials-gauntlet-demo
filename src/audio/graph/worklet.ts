@@ -4,6 +4,7 @@
  *   Float32Array            packed AudioParams (params.ts wire format)
  *   { master: number }      master volume (0..1, already perceptual-scaled)
  *   { seed: number }        reseed → new synth
+ *   { scene: number }       music scene (0 run, 1 menu, 2 results) — the front end posts no frames
  *   { stop: true }          let the processor be garbage-collected
  * The processor name is 'trials-synth' (mirrored in webAudio.ts; do not
  * import this module from the main thread — it calls registerProcessor).
@@ -20,15 +21,21 @@ declare class AudioWorkletProcessor {
 class TrialsSynthProcessor extends AudioWorkletProcessor {
   private synth = new TrialsSynth(sampleRate);
   private alive = true;
+  private scene = 0;
 
   constructor() {
     super();
     this.port.onmessage = (ev: MessageEvent) => {
-      const d = ev.data as Float32Array | { master?: number; seed?: number; stop?: boolean };
+      const d = ev.data as Float32Array | { master?: number; seed?: number; scene?: number; stop?: boolean };
       if (d instanceof Float32Array) this.synth.setParams(d);
       else if (typeof d.master === 'number') this.synth.setMaster(d.master);
-      else if (typeof d.seed === 'number') this.synth = new TrialsSynth(sampleRate, { seed: d.seed });
-      else if (d.stop) this.alive = false;
+      else if (typeof d.seed === 'number') {
+        this.synth = new TrialsSynth(sampleRate, { seed: d.seed });
+        this.synth.setScene(this.scene);
+      } else if (typeof d.scene === 'number') {
+        this.scene = d.scene;
+        this.synth.setScene(d.scene);
+      } else if (d.stop) this.alive = false;
     };
   }
 

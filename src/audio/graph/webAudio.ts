@@ -12,10 +12,10 @@
  * Everything musical lives in the model + synth; this file only moves a
  * Float32Array per frame.
  */
-import type { CompiledTrack, GameEvent, InputFrame, PhysicsState } from '../../core/types';
+import type { BikeClass, CompiledTrack, GameEvent, InputFrame, PhysicsState } from '../../core/types';
 import type { PhysicsFactory } from '../../physics';
 import type { AudioSystem } from '../index';
-import { ModelDriver } from '../driver';
+import { ModelDriver, type AudioScene } from '../driver';
 import { createOfflineRenderer, type OfflineOptions } from '../offline';
 import { FallbackGraph } from './fallback';
 
@@ -65,7 +65,30 @@ export class WebAudioSystem implements AudioSystem {
     this.track = track;
     this.seed = seed >>> 0;
     this.driver.setTrack(track, this.seed);
-    if (this.backend?.kind === 'worklet') this.backend.node.port.postMessage({ seed: this.seed });
+    if (this.backend?.kind === 'worklet') {
+      this.backend.node.port.postMessage({ seed: this.seed });
+      this.postScene();
+    }
+  }
+
+  /** Optional (additive): the class the physics was loaded with (Game.setBike / loadTrack). Voicing only. */
+  setBike(bike: BikeClass): void {
+    this.driver.setBike(bike);
+  }
+
+  /**
+   * Optional (additive): the app's screen, for the music bed — 'menu' (front end, garage, track select),
+   * 'results', or 'run'. Without it the bed is inferred: menu until the first countdown, results 1.4 s
+   * after a finish, run again on the next restart. Pass null to return to inference.
+   */
+  setScene(scene: AudioScene | null): void {
+    this.driver.setScene(scene);
+    this.postScene();
+  }
+
+  private postScene(): void {
+    const b = this.backend;
+    if (b?.kind === 'worklet') b.node.port.postMessage({ scene: this.driver.scene });
   }
 
   unlock(): Promise<void> {
@@ -120,6 +143,7 @@ export class WebAudioSystem implements AudioSystem {
         node.connect(ctx.destination);
         node.port.postMessage({ seed: this.seed });
         node.port.postMessage({ master: this.master });
+        node.port.postMessage({ scene: this.driver.scene });
         backend = { kind: 'worklet', node };
       } catch {
         backend = null;
@@ -146,7 +170,10 @@ export class WebAudioSystem implements AudioSystem {
   }
 
   onEvent(event: GameEvent): void {
+    const before = this.driver.scene;
     this.driver.onEvent(event);
+    // scene edges from events reach the worklet even when no frame follows (finish → results in the menu-less case)
+    if (this.driver.scene !== before) this.postScene();
   }
 
   setMasterVolume(v: number): void {

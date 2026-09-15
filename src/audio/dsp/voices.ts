@@ -12,6 +12,10 @@ export const BUS_AMBIENT = 2;
 
 const MAX_PARTIALS = 4;
 const KILL_S = 0.005;
+// the stinger family's key (D): D5 / A5 / D6
+const D5 = 587.33;
+const A5 = 880;
+const D6 = 1174.66;
 
 class Voice {
   active = false;
@@ -224,14 +228,22 @@ export class VoicePool {
         this.landing(gain * 0.5, 0, pan, delay);
         break;
       case 2: {
-        // bottomOut
+        // bottomOut (v2): the rear on its bump stop — a deep, dull stop knock (every drop >= 1 m does this and
+        // rides away, so it must not read as a failure clang); the ring only on metal / grate
         const v = this.alloc();
-        this.partial(v, 1, 2200, 2200, 0, 0.18);
-        this.partial(v, 0.8, 3100, 3100, 0, 0.12);
-        this.partial(v, 0.6, 4700, 4700, 0, 0.08);
-        this.env(v, 0.001, 0, 0.2, 0.4);
-        this.finish(v, -16, gain, pan, delay, BUS_CHASSIS, 0.15);
-        this.landing(1, 0, pan, delay);
+        this.partial(v, 1, 160, 70, 0.04, 0.12);
+        this.partial(v, 0.35, 1100, 1100, 0, 0.04);
+        this.noise(v, 0.6, 0.02, 0, 2, 700, 1);
+        this.env(v, 0.001, 0.005, 0.14, 0.3);
+        this.finish(v, -6, gain, pan, delay, BUS_CHASSIS, 0.12);
+        if (surf === 2 || surf === 5) {
+          const r = this.alloc();
+          this.partial(r, 1, 2200, 2200, 0, 0.14);
+          this.partial(r, 0.6, 3100, 3100, 0, 0.1);
+          this.env(r, 0.001, 0, 0.16, 0.3);
+          this.finish(r, -22, gain, pan, delay, BUS_CHASSIS, 0.15);
+        }
+        this.landing(gain, surf, pan, delay);
         break;
       }
       case 3: {
@@ -309,26 +321,17 @@ export class VoicePool {
         break;
       }
       case 9: {
-        // countdown tick 880 Hz
-        const v = this.alloc();
-        this.partial(v, 1, 880, 880, 0, 0.3);
-        this.env(v, 0.003, 0.01, 0.07, 0.3);
-        this.finish(v, -14, gain, pan, delay, BUS_UI, 0.1);
+        // countdown: one D5 stab of the family (the same brass as GO, the checkpoint and the fanfare)
+        this.stab([D5], -14, 0.003, 0.04, 0.09, gain, pan, delay, 0.1);
         break;
       }
       case 10: // go
         this.goChord(-10, gain, pan, delay, true);
         break;
       case 11: {
-        // checkpoint: C6 → E6 triangle + flame-jet whoosh
-        const a = this.alloc();
-        this.partial(a, 1, 1046.5, 1046.5, 0, 0.4, 2);
-        this.env(a, 0.003, 0.02, 0.4, 0.6);
-        this.finish(a, -14, gain, pan, delay, BUS_UI, 0.3);
-        const b = this.alloc();
-        this.partial(b, 1, 1318.5, 1318.5, 0, 0.4, 2);
-        this.env(b, 0.003, 0.02, 0.4, 0.6);
-        this.finish(b, -14, gain, pan, delay + 0.09, BUS_UI, 0.3);
+        // checkpoint: A5 → D6 of the family (+90 ms) + flame-jet whoosh
+        this.stab([A5], -15, 0.003, 0.03, 0.3, gain, pan, delay, 0.3);
+        this.stab([D6, A5 * 0.5], -14, 0.003, 0.05, 0.35, gain, pan, delay + 0.09, 0.3);
         const w = this.alloc();
         this.noise(w, 1, 0.35, 0, 2, 400, 0.8, 1500, 0.3, 0.03);
         this.env(w, 0.03, 0.05, 0.35, 0.6);
@@ -352,14 +355,10 @@ export class VoicePool {
         this.goChord(-16, gain, pan, delay, false);
         break;
       case 14: {
-        // fanfare note
-        const notes = [523.3, 659.3, 784.0, 1046.5];
-        const f = notes[clamp(Math.round(pitch * 4), 0, 3)]!;
-        const v = this.alloc();
-        this.partial(v, 0.7, f, f, 0, 0.6, 2);
-        this.partial(v, 0.5, f, f, 0, 0.6, 0);
-        this.env(v, 0.004, 0.05, 0.6, 1.0);
-        this.finish(v, -12, gain, pan, delay, BUS_UI, 0.4);
+        // fanfare note: D5 F#5 A5 D6 — the family in D, resolving into the results bed's key
+        const notes = [D5, 739.99, A5, D6];
+        const i = clamp(Math.round(pitch * 4), 0, 3);
+        this.stab([notes[i]!, notes[i]! * 0.5], -12, 0.004, i === 3 ? 0.2 : 0.05, i === 3 ? 0.7 : 0.5, gain, pan, delay, 0.4);
         break;
       }
       case 15: {
@@ -420,6 +419,40 @@ export class VoicePool {
         this.finish(v, -21, gain, pan, delay, BUS_CHASSIS, 0.05);
         break;
       }
+      case 25: {
+        // the hop: pitch 0 = preload creak (rider + suspension loading), pitch 1 = the snap (spring release)
+        if (pitch < 0.5) {
+          const v = this.alloc();
+          this.partial(v, 1, 190, 150, 0.2, 0.25, 1);
+          v.amHz = 11;
+          v.amDepth = 0.5;
+          v.formant = true;
+          v.f1.bypass();
+          v.f2.bypass();
+          v.f3.bypass();
+          v.flp.lowpass(900, 0.7);
+          this.env(v, 0.03, 0.12, 0.1, 0.35);
+          this.finish(v, -28, gain, pan, delay, BUS_CHASSIS, 0.1);
+        } else {
+          const v = this.alloc();
+          this.noise(v, 1, 0.008, 0, 2, 900, 1.5);
+          this.partial(v, 0.8, 140, 90, 0.03, 0.06);
+          this.partial(v, 0.4, 480, 420, 0.06, 0.08);
+          this.env(v, 0.001, 0.004, 0.07, 0.2);
+          this.finish(v, -22, gain, pan, delay, BUS_CHASSIS, 0.1);
+        }
+        break;
+      }
+      case 26: {
+        // ragdoll body thud: torso / pelvis (pitch 0) heavy and low, a limb (pitch 0.6) lighter and shorter
+        const limb = pitch > 0.3;
+        const v = this.alloc();
+        this.partial(v, 1, limb ? 140 : 90, limb ? 80 : 50, 0.04, limb ? 0.07 : 0.12);
+        this.noise(v, limb ? 0.5 : 0.8, limb ? 0.02 : 0.03, 2, 1, 400, 0.7);
+        this.env(v, 0.002, 0, limb ? 0.08 : 0.14, 0.3);
+        this.finish(v, limb ? -18 : -14, gain, pan, delay, BUS_CHASSIS, 0.12);
+        break;
+      }
       // -- internal ambience events (>= 100) ------------------------------------
       case 100: {
         // metal creak
@@ -459,6 +492,39 @@ export class VoicePool {
         this.finish(v, -32, gain, pan, delay, BUS_AMBIENT);
         break;
       }
+      case 104: {
+        // industrial: a distant press — one soft thump through the hall
+        const v = this.alloc();
+        this.partial(v, 1, 70, 45, 0.08, 0.25);
+        this.noise(v, 0.4, 0.06, 2, 1, 300, 0.7);
+        this.env(v, 0.004, 0, 0.3, 0.6);
+        this.finish(v, -34, gain, pan, delay, BUS_AMBIENT, 0.6);
+        break;
+      }
+      case 105: {
+        // snow: a wind gust, rising then falling over ~2.5 s
+        const v = this.alloc();
+        this.noise(v, 1, 1.2, 1, 2, 500, 0.8, 900, 1.0, 0.9);
+        this.env(v, 0.9, 0.4, 1.2, 3.0);
+        this.finish(v, -30, gain, pan, delay, BUS_AMBIENT, 0.1);
+        break;
+      }
+      case 106: {
+        // night city: a car passing on a street below (low rumble swell, one side)
+        const v = this.alloc();
+        this.noise(v, 1, 1.2, 2, 1, 700, 0.7, 400, 1.5, 1.0);
+        this.env(v, 1.0, 0.3, 1.2, 3.0);
+        this.finish(v, -28, gain, pan, delay, BUS_AMBIENT, 0.15);
+        break;
+      }
+      case 107: {
+        // foundry: a steam vent
+        const v = this.alloc();
+        this.noise(v, 1, 0.6, 0, 3, 2000, 0.7);
+        this.env(v, 0.15, 0.5, 0.6, 1.6);
+        this.finish(v, -31, gain, pan, delay, BUS_AMBIENT, 0.3);
+        break;
+      }
     }
   }
 
@@ -479,12 +545,29 @@ export class VoicePool {
     }
   }
 
-  private goChord(db: number, gain: number, pan: number, delay: number, whoosh: boolean): void {
+  /**
+   * The stinger family: two detuned saws + a triangle an octave down through a 2.8 kHz lowpass — one
+   * brass-like voice for countdown, GO, checkpoint, finish tick and fanfare, all in D.
+   */
+  private stab(freqs: readonly number[], db: number, attS: number, holdS: number, decS: number, gain: number, pan: number, delay: number, send: number): void {
     const v = this.alloc();
-    this.partial(v, 1, 1320, 1320, 0, 0.22);
-    this.partial(v, 0.8, 1760, 1760, 0, 0.22);
-    this.env(v, 0.002, 0.06, 0.22, 0.5);
-    this.finish(v, db, gain, pan, delay, BUS_UI, 0.2);
+    const f = freqs[0]!;
+    this.partial(v, 0.55, f * 1.003, f * 1.003, 0, decS, 1);
+    this.partial(v, 0.55, f * 0.997, f * 0.997, 0, decS, 1);
+    this.partial(v, 0.5, freqs[1] ?? f * 0.5, freqs[1] ?? f * 0.5, 0, decS, 2);
+    if (freqs[2] !== undefined) this.partial(v, 0.45, freqs[2], freqs[2], 0, decS, 1);
+    v.formant = true;
+    v.f1.bypass();
+    v.f2.bypass();
+    v.f3.bypass();
+    v.flp.lowpass(2800, 0.8);
+    this.env(v, attS, holdS, decS, attS + holdS + decS * 3);
+    this.finish(v, db, gain, pan, delay, BUS_UI, send);
+  }
+
+  private goChord(db: number, gain: number, pan: number, delay: number, whoosh: boolean): void {
+    // GO / finish tick: D6 over A5 over D5
+    this.stab([D6, A5, D5], db, 0.002, whoosh ? 0.12 : 0.06, whoosh ? 0.3 : 0.22, gain, pan, delay, 0.2);
     if (whoosh) {
       const w = this.alloc();
       this.noise(w, 1, 0.2, 0, 2, 600, 1, 5000, 0.25, 0.02);

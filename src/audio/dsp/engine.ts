@@ -18,6 +18,13 @@
  *   intake noise    white → BP 700 + 1200·load Hz, −26 + 12·load dB
  * Rev limiter: every 3rd cycle emits nothing. Clutch slip: gated 2.8 kHz whine with 30 Hz
  * chatter while the auto-clutch holds the crank. All randomness from the seeded NoiseRng.
+ *
+ * Round 3 (v2): `torque` (throttleEff × the class thrust curve at the rim speed) drives the bark —
+ * pulse amplitude, honk and 3 dB of level — so the engine goes from torque-y at 5 m/s to a thinner,
+ * higher scream at 18 m/s where v2's curve has fallen to 0.4 (the harmonic brightness follows rpm as
+ * before). `bike` 1 = Pro voicing: shorter pulses (τ × 0.75), fp +25 Hz, more noise in the pulse, the
+ * lowpass 700 Hz more open, the 380 Hz chamber up at 430 Hz, a flatter harmonic tilt — raspier; the
+ * limiter rpm is physics' (10 000 on both classes; the Pro reaches it at 21 m/s through its gearing).
  */
 import { Biquad, NoiseRng, TWO_PI, clamp, dbToGain, smoothCoef } from './util';
 
@@ -43,18 +50,22 @@ export class EngineVoice {
   private gainTarget = 1;
   private clutchTarget = 0;
   private speedTarget = 0;
+  private torqueTarget = 0;
+  private bike = 0;
   private limiter = false;
   private rpm = IDLE;
   private load = 0;
   private gain = 1;
   private clutch = 0;
   private speed = 0;
+  private torque = 0;
   private readonly kRpm: number;
   private readonly kLoad: number;
   private readonly kGain: number;
   private readonly kSlow: number;
   private readonly harmGain = new Float64Array(PARTIALS);
   private readonly r130: Biquad;
+  private readonly r260: Biquad;
   private readonly r380: Biquad;
   private readonly lp: Biquad;
   private readonly hp: Biquad;
@@ -77,7 +88,11 @@ export class EngineVoice {
     this.kGain = smoothCoef(0.005, sr);
     this.kSlow = smoothCoef(0.03, sr);
     this.r130 = new Biquad(sr);
-    this.r130.peaking(130, 3, 6);
+    this.r130.peaking(130, 3, 4);
+    // round 3: a second chamber resonance at 260 Hz — the reference start-gate spectrogram carries its engine energy
+    // in moving 200–500 Hz ridges, ours sat in a too-smooth 100–250 Hz band (beats table / spectrograms)
+    this.r260 = new Biquad(sr);
+    this.r260.peaking(260, 2.5, 5);
     this.r380 = new Biquad(sr);
     this.r380.peaking(380, 2.5, 3);
     this.lp = new Biquad(sr);
@@ -90,13 +105,18 @@ export class EngineVoice {
     this.setBlockCoefs();
   }
 
-  set(rpm: number, load: number, limiter: boolean, gain: number, clutch = 0, speed = 0): void {
+  set(rpm: number, load: number, limiter: boolean, gain: number, clutch = 0, speed = 0, torque = load, bike = 0): void {
     this.rpmTarget = clamp(rpm, 200, 14000);
     this.loadTarget = clamp(load, 0, 1);
     this.limiter = limiter;
     this.gainTarget = clamp(gain, 0, 1);
     this.clutchTarget = clamp(clutch, 0, 1);
     this.speedTarget = clamp(speed, 0, 1);
+    this.torqueTarget = clamp(torque, 0, 1);
+    if (bike !== this.bike) {
+      this.bike = bike;
+      this.r380.peaking(bike === 1 ? 430 : 380, 2.5, bike === 1 ? 4 : 3);
+    }
   }
 
   /** Current smoothed rpm (for tests). */
@@ -106,12 +126,15 @@ export class EngineVoice {
 
   private setBlockCoefs(): void {
     const load = this.load;
-    this.lp.lowpass(1400 + 3200 * load, 0.8);
+    const pro = this.bike === 1;
+    const torque = this.torque;
+    this.lp.lowpass(1400 + 3200 * load + (pro ? 700 : 0), 0.8);
     this.honk.bandpass(380 + 300 * load, 5);
-    this.honkGain = 1.8 * load * load;
+    this.honkGain = 1.8 * load * load * (0.55 + 0.45 * torque);
     this.intake.bandpass(700 + 1200 * load, 1);
-    this.intakeGain = dbToGain(-26 + 12 * load);
-    const k = 1.6 - 0.8 * load;
+    // intake noise 6 dB lower than v1 (−32 + 12·load): the flat 500 Hz–8 kHz wash was the loudest synthetic tell
+    this.intakeGain = dbToGain(-32 + 12 * load + (pro ? 2 : 0));
+    const k = 1.6 - 0.8 * load - (pro ? 0.15 : 0);
     let sum = 0;
     for (let n = 1; n <= PARTIALS; n++) {
       let g = Math.pow(n, -k);
@@ -121,7 +144,8 @@ export class EngineVoice {
     }
     this.harmLevel = ((0.4 + 0.6 * load) * 0.8) / sum;
     const revNorm = clamp((this.rpm - IDLE) / (REDLINE - IDLE), 0, 1);
-    this.level = dbToGain(-18 + 12 * load + 2 * revNorm + 2 * this.speed) * this.gain;
+    // closed-throttle floor −14 dB (v1 −18): the reference wheelie / coast beats keep the engine present (beats table)
+    this.level = dbToGain(-14 + 6 * load + 3 * torque + 2 * revNorm + 2 * this.speed) * this.gain;
   }
 
   /** Adds `n` mono samples into `out` starting at `off`. */
@@ -131,6 +155,7 @@ export class EngineVoice {
     this.gain += (this.gainTarget - this.gain) * (1 - Math.pow(1 - this.kGain, n));
     this.clutch += (this.clutchTarget - this.clutch) * (1 - Math.pow(1 - this.kSlow, n));
     this.speed += (this.speedTarget - this.speed) * (1 - Math.pow(1 - this.kSlow, n));
+    this.torque += (this.torqueTarget - this.torque) * (1 - Math.pow(1 - this.kLoad, n));
     this.setBlockCoefs();
     if (this.level < 1e-5 && this.clutch < 1e-3) return;
 
@@ -141,9 +166,11 @@ export class EngineVoice {
     const hg = this.harmGain;
     const harmLevel = this.harmLevel;
     const load = this.load;
-    const pulseAmp = 0.5 + 0.5 * load;
-    const tau = 0.01 - 0.006 * load;
-    const pulseFTarget = 120 + 90 * load;
+    const pro = this.bike === 1;
+    const pulseAmp = 0.45 + 0.3 * load + 0.25 * this.torque;
+    const tau = (0.01 - 0.006 * load) * (pro ? 0.75 : 1);
+    const pulseFTarget = 120 + 90 * load + (pro ? 25 : 0);
+    const pulseNoiseBase = pro ? 0.25 : 0.15;
     const level = this.level;
     const intakeGain = this.intakeGain;
     const honkGain = this.honkGain;
@@ -176,7 +203,7 @@ export class EngineVoice {
           this.pulseDecay = Math.exp(-dt / t);
           this.pulseT = 0;
           this.pulseF = pulseFTarget;
-          this.pulseNoise = 0.15 + 0.3 * load;
+          this.pulseNoise = pulseNoiseBase + 0.3 * load;
           this.honkEnv = amp;
           this.honkDecay = Math.exp(-dt / 0.003);
         }
@@ -206,8 +233,10 @@ export class EngineVoice {
       h *= harmLevel;
 
       // -- exhaust path ---------------------------------------------------------
-      let x = pulse * 1.7 + h * 0.6;
+      // more pulse than bank (v1 1.7 / 0.6): the dotted pulse texture of a single is what the spectrogram shows
+      let x = pulse * 2.0 + h * 0.45;
       x = this.r130.process(x);
+      x = this.r260.process(x);
       x = this.r380.process(x);
       x = this.lp.process(x);
       x = this.hp.process(x);

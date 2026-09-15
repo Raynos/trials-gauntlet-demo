@@ -17,6 +17,9 @@ export class Ambience {
   private readonly hiss: Biquad;
   private readonly neonLp: Biquad;
   private readonly windHp: Biquad;
+  private readonly windBp: Biquad;
+  private readonly windColour = new NoiseColour();
+  private windF = 350;
   private biome = -1;
   private gainTarget = 1;
   private gain = 0;
@@ -37,6 +40,13 @@ export class Ambience {
   private bedGain = 0;
   private bedGain2 = 0;
   private lfoGain = 1;
+  // round 3 extras: industrial press timer + conveyor hum, foundry hiss LFO
+  private pressNext = 0;
+  private conv1 = 0;
+  private conv2 = 0;
+  private convAm = 0;
+  private readonly hissHp: Biquad;
+  private hissLfo = 0;
 
   constructor(sr: number, seed: number) {
     this.sr = sr;
@@ -46,8 +56,15 @@ export class Ambience {
     this.hiss = new Biquad(sr);
     this.neonLp = new Biquad(sr);
     this.neonLp.lowpass(400, 0.7);
+    // speed wind (round 3): a dark rush — pink noise through a bandpass that climbs 350 → 900 Hz with speed —
+    // plus a little HP 3 kHz hiss 12 dB under it; v1's white HP 1.2 kHz put the landing beat's centroid at 1.6 kHz
+    // against the reference's 150–300 Hz
     this.windHp = new Biquad(sr);
-    this.windHp.highpass(1200, 0.7);
+    this.windHp.highpass(3000, 0.7);
+    this.windBp = new Biquad(sr);
+    this.windBp.bandpass(350, 0.8);
+    this.hissHp = new Biquad(sr);
+    this.hissHp.highpass(3000, 0.7);
     this.kGain = smoothCoef(0.05, sr);
     this.kWind = smoothCoef(0.03, sr);
   }
@@ -58,7 +75,13 @@ export class Ambience {
       this.configure();
     }
     this.gainTarget = clamp(ambientGain, 0, 1);
-    this.windTarget = dbToGain(-40 + 16 * clamp(wind, 0, 1) + (airborne ? 6 : 0)) * (wind > 0.01 ? 1 : 0);
+    const w = clamp(wind, 0, 1);
+    this.windTarget = dbToGain(-38 + 14 * w + (airborne ? 4 : 0)) * (wind > 0.01 ? 1 : 0);
+    const f = 350 + 550 * w;
+    if (Math.abs(f - this.windF) > 10) {
+      this.windF = f;
+      this.windBp.bandpass(f, 0.8);
+    }
   }
 
   private configure(): void {
@@ -76,9 +99,9 @@ export class Ambience {
         this.bedLp.lowpass(320, 0.7);
         this.bedGain = dbToGain(-27);
         break;
-      case 2: // snow wind + hiss
-        this.bedLp.lowpass(500, 0.7);
-        this.bedGain = dbToGain(-29);
+      case 2: // snow: hush (a quieter, darker bed than the canyon) + hiss; the gusts are events
+        this.bedLp.lowpass(420, 0.7);
+        this.bedGain = dbToGain(-31);
         this.hiss.highpass(6000, 0.7);
         break;
       case 3: // night city traffic bed
@@ -101,8 +124,15 @@ export class Ambience {
     } else if (b === 1) {
       pool.trigger({ kind: 101, gain: 1, pitch: 0, pan: this.rng.range2(-0.6, 0.6), delay: 0 });
       this.nextEvent = this.rng.range2(6, 14) * this.sr;
+    } else if (b === 2) {
+      pool.trigger({ kind: 105, gain: 1, pitch: 0, pan: this.rng.range2(-0.5, 0.5), delay: 0 });
+      this.nextEvent = this.rng.range2(5, 9) * this.sr;
+    } else if (b === 3) {
+      pool.trigger({ kind: 106, gain: 1, pitch: 0, pan: this.rng.u() < 0.5 ? -0.7 : 0.7, delay: 0 });
+      this.nextEvent = this.rng.range2(7, 13) * this.sr;
     } else if (b === 4) {
-      pool.trigger({ kind: 102, gain: 1, pitch: 0, pan: this.rng.range2(-0.4, 0.4), delay: 0 });
+      const steam = this.rng.u() < 0.5;
+      pool.trigger({ kind: steam ? 107 : 102, gain: 1, pitch: 0, pan: this.rng.range2(-0.4, 0.4), delay: 0 });
       this.nextEvent = this.rng.range2(5, 11) * this.sr;
     } else {
       this.nextEvent = 30 * this.sr;
@@ -134,6 +164,18 @@ export class Ambience {
     if (this.gain > 1e-4 || this.gainTarget > 1e-4) {
       this.nextEvent -= n;
       if (this.nextEvent <= 0) this.scheduleEvent(pool);
+      if (b === 0) {
+        // distant machinery: a press every 1.25 s (a little seeded slop), never quite on the beat
+        this.pressNext -= n;
+        if (this.pressNext <= 0) {
+          pool.trigger({ kind: 104, gain: this.rng.range2(0.6, 1), pitch: 0, pan: this.rng.range2(-0.3, 0.3), delay: 0 });
+          this.pressNext = this.rng.range2(1.15, 1.35) * this.sr;
+        }
+      }
+    }
+    if (b === 4) {
+      this.hissLfo += TWO_PI * 0.3 * blockDt;
+      if (this.hissLfo > TWO_PI) this.hissLfo -= TWO_PI;
     }
 
     const sr = this.sr;
@@ -141,6 +183,8 @@ export class Ambience {
     const neonG = dbToGain(-42);
     const cricketG = dbToGain(-40);
     const hissG = dbToGain(-46);
+    const convG = dbToGain(-44);
+    const furnaceHissG = dbToGain(-38 + 4 * Math.sin(this.hissLfo));
     const crackleRate = this.crackleRate;
     for (let i = 0; i < n; i++) {
       this.gain += (this.gainTarget - this.gain) * this.kGain;
@@ -159,8 +203,13 @@ export class Ambience {
           this.hum2 += (TWO_PI * 120) / sr;
           const hum = (Math.sin(this.hum1) + 0.6 * Math.sin(this.hum2)) * humG;
           const hvac = this.bedLp2.process(this.colour2.pink(wR)) * this.bedGain2;
-          l += hum + hvac;
-          r += hum + hvac;
+          // conveyor: 90 / 135 Hz partials under a slow 0.4 Hz swell
+          this.conv1 += (TWO_PI * 90) / sr;
+          this.conv2 += (TWO_PI * 135) / sr;
+          this.convAm += (TWO_PI * 0.4) / sr;
+          const conv = (Math.sin(this.conv1) + 0.5 * Math.sin(this.conv2)) * convG * (0.7 + 0.3 * Math.sin(this.convAm));
+          l += hum + hvac + conv;
+          r += hum + hvac + conv * 0.8;
         } else if (b === 2) {
           const h = this.hiss.process(wR) * hissG;
           l += h;
@@ -175,14 +224,18 @@ export class Ambience {
           const cr = this.cricketGate < 0.6 ? Math.sin(this.cricket) * cricketG : 0;
           l += nz + cr * 0.4;
           r += nz + cr;
-        } else if (b === 4 && crackleRate > 0 && this.rng.u() < crackleRate) {
-          pool.trigger({ kind: 103, gain: 1, pitch: 0, pan: this.rng.range2(-0.7, 0.7), delay: 0 });
+        } else if (b === 4) {
+          // furnace: the roar bed plus a breathing hiss
+          const hs = this.hissHp.process(wR) * furnaceHissG;
+          l += hs;
+          r += hs * 0.85;
+          if (crackleRate > 0 && this.rng.u() < crackleRate) pool.trigger({ kind: 103, gain: 1, pitch: 0, pan: this.rng.range2(-0.7, 0.7), delay: 0 });
         }
         l *= g;
         r *= g;
       }
       // speed wind (not gated by ambientGain: it belongs to the bike)
-      const wind = this.windHp.process(wR) * this.wind;
+      const wind = (this.windBp.process(this.windColour.pink(wR)) * 2.5 + this.windHp.process(wR) * 0.25) * this.wind;
       l += wind;
       r += wind;
       L[off + i] = L[off + i]! + l;
@@ -191,5 +244,8 @@ export class Ambience {
     if (this.hum1 > TWO_PI) this.hum1 -= TWO_PI;
     if (this.hum2 > TWO_PI) this.hum2 -= TWO_PI;
     if (this.cricket > TWO_PI) this.cricket -= TWO_PI;
+    if (this.conv1 > TWO_PI) this.conv1 -= TWO_PI;
+    if (this.conv2 > TWO_PI) this.conv2 -= TWO_PI;
+    if (this.convAm > TWO_PI) this.convAm -= TWO_PI;
   }
 }

@@ -5,8 +5,8 @@
  */
 import type { GameEvent } from '../../core/types';
 import type { Rng } from '../../core/rng';
-import { CHASSIS, DUCK, TIMING, TK, pushTransient, surfaceIndex, type AudioParams } from '../params';
-import { resetScratch, type ModelScratch } from './mapParams';
+import { CHASSIS, CROWD, DUCK, TIMING, TK, pushTransient, surfaceIndex, type AudioParams } from '../params';
+import { SCENE_RUN, resetScratch, scheduleResults, type ModelScratch } from './mapParams';
 
 const clamp = (v: number, lo: number, hi: number): number => (v < lo ? lo : v > hi ? hi : v);
 
@@ -14,10 +14,17 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
   const now = scratch.time;
   switch (e.type) {
     case 'countdown':
+      // a run is starting: the front-end bed goes (inferred scene; an explicit setScene overrides)
+      scratch.scene = SCENE_RUN;
+      scratch.resultsAt = -1;
       pushTransient(out, TK.countdown, 1, (3 - e.n) / 3);
       break;
     case 'go':
+      scratch.scene = SCENE_RUN;
+      scratch.resultsAt = -1;
       pushTransient(out, TK.go, 1);
+      // the start-gate stands roar (scaled by how many people are within earshot)
+      if (scratch.crowd >= CROWD.earshot) pushTransient(out, TK.crowdRoar, scratch.crowd, 0, 0, 0.03);
       scratch.duckUiUntil = now + DUCK.uiHoldS;
       break;
     case 'land': {
@@ -26,6 +33,13 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
       const gain = Math.pow(clamp(e.impulse / CHASSIS.landingImpulseRef, 0, 1), CHASSIS.landingCurve);
       pushTransient(out, TK.landing, gain, surfaceIndex(e.surface) / 8, e.wheel === 'rear' ? -0.15 : 0.15);
       if (gain >= 0.5) scratch.duckImpactUntil = now + DUCK.impactHoldS * 0.5;
+      // a clean landing after real air: the nearby stands cheer (once per flight)
+      const air = scratch.airborneFor > 0 ? scratch.airborneFor : scratch.lastAir;
+      if (air >= CROWD.cheerAirS && scratch.crashAt < 0 && scratch.crowd >= CROWD.earshot) {
+        pushTransient(out, TK.crowdCheer, scratch.crowd * clamp(0.6 + air / 2, 0.6, 1), clamp(air / 1.5, 0, 1), 0, 0.12 + rng.range(0, 0.06));
+        scratch.lastAir = 0;
+        scratch.airborneFor = 0;
+      }
       break;
     }
     case 'checkpoint':
@@ -46,12 +60,14 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
         pushTransient(out, TK.grunt, 1, 0, 0, TIMING.gruntDelayS);
         if (rng.bool(0.5)) pushTransient(out, TK.grunt, 0.7, 0.3, 0.1, TIMING.grunt2DelayS);
         pushTransient(out, TK.fault, 1, 0, 0, TIMING.faultStampDelayS);
+        if (scratch.crowd >= CROWD.earshot) pushTransient(out, TK.crowdGroan, scratch.crowd, 0, 0, CROWD.groanDelayS);
       } else if (e.reason === 'hazard') {
         scratch.crashAt = now;
         scratch.duckImpactUntil = now + DUCK.impactHoldS;
         pushTransient(out, TK.hazard, 1, 0, 0);
         pushTransient(out, TK.grunt, 0.8, 0.6, 0, TIMING.gruntDelayS);
         pushTransient(out, TK.fault, 1, 0, 0, TIMING.faultStampDelayS);
+        if (scratch.crowd >= CROWD.earshot) pushTransient(out, TK.crowdGroan, scratch.crowd, 0.5, 0, CROWD.groanDelayS);
       } else if (e.reason === 'restart') {
         // Manual restart: the restart event that follows does the work.
       } else {
@@ -59,11 +75,15 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
       }
       break;
     }
-    case 'restart':
+    case 'restart': {
+      // a results bed (or the inferred menu after a quit) ends the moment a run restarts
+      const wasResults = scratch.scene !== SCENE_RUN && scratch.sceneOverride < 0 && scratch.finishAt >= 0;
       resetScratch(scratch, true);
+      if (wasResults) scratch.scene = SCENE_RUN;
       pushTransient(out, TK.restart, 1);
       pushTransient(out, TK.starter, 1, 0, 0, 0.02);
       break;
+    }
     case 'finish':
       scratch.finishAt = now;
       scratch.duckUiUntil = now + DUCK.uiHoldS;
@@ -72,7 +92,9 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
       for (let i = 0; i < 5; i++) {
         pushTransient(out, TK.firework, rng.range(0.6, 1), rng.next(), rng.range(-0.8, 0.8), 0.2 + i * 0.22 + rng.range(0, 0.08));
       }
-      pushTransient(out, TK.crowd, 1, 0, 0, 0.05);
+      // the finish stands applaud; far from any stand a thin scatter still reads the finish
+      pushTransient(out, TK.crowdApplause, clamp(0.3 + scratch.crowd, 0.3, 1), 0, 0, CROWD.applauseDelayS);
+      scheduleResults(scratch);
       break;
   }
 }

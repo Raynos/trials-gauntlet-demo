@@ -8,10 +8,12 @@
  * stochastic draw is seeded.
  */
 import { NEUTRAL_INPUT, decodeAny, iterateFrames, type GameEvent, type InputFrame, type PhysicsState } from '../core';
-import type { PhysicsFactory } from '../physics';
+import type { PhysicsFactory, PhysicsWorld } from '../physics';
 import { compileTrack, getTrack } from '../tracks';
-import { ModelDriver } from './driver';
+import type { BikeClass, CompiledTrack } from '../core/types';
+import { ModelDriver, type AudioScene } from './driver';
 import { TrialsSynth, type SynthOptions } from './dsp/synth';
+import type { Stand } from './model/mapParams';
 
 export const OFFLINE_SAMPLE_RATE = 48000;
 export const OFFLINE_UPDATE_HZ = 60;
@@ -27,6 +29,11 @@ export interface OfflineOptions {
    * crash/hazard fault unless the recording restarts first. Default 1.0; 0 disables.
    */
   autoRestartS?: number;
+  /** Music scene for the render; default 'run' (silent bed). null = infer from events (menu at t = 0). */
+  scene?: AudioScene | null;
+  /** Script renders only: crowd stands and bike class (recordings take them from the track / header). */
+  stands?: Stand[];
+  bike?: BikeClass;
   /** Called per update with the state (tests use it to log rpm etc.). */
   onUpdate?: (u: number, state: PhysicsState, driver: ModelDriver) => void;
   /** Called for every event the physics emitted (after the model saw it). */
@@ -55,6 +62,9 @@ export function renderScript(script: StateScript, seconds: number, opts: Offline
   const updates = Math.ceil(seconds * updateHz);
   const driver = new ModelDriver();
   driver.setTrack(null, seed);
+  driver.setScene(opts.scene === undefined ? 'run' : opts.scene);
+  if (opts.stands) driver.scratch.stands = opts.stands;
+  driver.setBike(opts.bike);
   const synth = new TrialsSynth(sampleRate, { seed, solo: opts.solo ?? null });
   const L = new Float32Array(updates * spu);
   const R = new Float32Array(updates * spu);
@@ -80,20 +90,10 @@ export async function renderRecording(
   const def = getTrack(rec.header.trackId);
   if (!def) throw new Error(`renderOffline: unknown track ${rec.header.trackId}`);
   const track = compileTrack(def);
-  const sampleRate = opts.sampleRate ?? OFFLINE_SAMPLE_RATE;
-  const updateHz = opts.updateHz ?? OFFLINE_UPDATE_HZ;
-  const spu = sampleRate / updateHz;
-  const tpu = rec.header.physicsHz / updateHz;
-  if (!Number.isInteger(spu) || !Number.isInteger(tpu)) {
-    throw new Error(`renderOffline: sampleRate ${sampleRate}, physicsHz ${rec.header.physicsHz} must be multiples of ${updateHz}`);
-  }
   const physics = makePhysics(rec.header.physicsHz);
-  physics.loadTrack(track, rec.header.seed);
-  const driver = new ModelDriver();
-  driver.setTrack(track, rec.header.seed);
-  const synth = new TrialsSynth(sampleRate, { seed: rec.header.seed, solo: opts.solo ?? null });
+  const bike = rec.header.bike;
+  physics.loadTrack(track, rec.header.seed, bike ? { bike } : undefined);
   const frames = iterateFrames(rec);
-  let current: Readonly<InputFrame> = NEUTRAL_INPUT;
   let exhausted = false;
   const nextFrame = (): Readonly<InputFrame> => {
     if (exhausted) return NEUTRAL_INPUT;
@@ -104,6 +104,40 @@ export async function renderRecording(
     }
     return r.value;
   };
+  return renderWorld({ physics, track, seed: rec.header.seed, physicsHz: rec.header.physicsHz, bike, nextFrame }, seconds, opts);
+}
+
+export interface WorldSource {
+  /** A loaded physics world (loadTrack already called; its load events are drained here). */
+  physics: PhysicsWorld;
+  track: CompiledTrack;
+  seed: number;
+  physicsHz: number;
+  bike?: BikeClass | undefined;
+  /** Input for the next physics tick (called physicsHz times per second; may read the world's state). */
+  nextFrame: (tick: number) => Readonly<InputFrame>;
+}
+
+/**
+ * The offline loop over any physics source: `physicsHz / updateHz` ticks per update, every event to the
+ * model, the CONTRACT §2.8 auto-restart, `spu` samples per update. `renderRecording` and the beats tool
+ * (tools/beats.ts: a controller-driven wheelie, a teleported 2 m drop) share it.
+ */
+export function renderWorld(src: WorldSource, seconds: number, opts: OfflineOptions = {}): OfflineResult {
+  const { physics, track } = src;
+  const sampleRate = opts.sampleRate ?? OFFLINE_SAMPLE_RATE;
+  const updateHz = opts.updateHz ?? OFFLINE_UPDATE_HZ;
+  const spu = sampleRate / updateHz;
+  const tpu = src.physicsHz / updateHz;
+  if (!Number.isInteger(spu) || !Number.isInteger(tpu)) {
+    throw new Error(`renderOffline: sampleRate ${sampleRate}, physicsHz ${src.physicsHz} must be multiples of ${updateHz}`);
+  }
+  const driver = new ModelDriver();
+  driver.setTrack(track, src.seed);
+  driver.setBike(src.bike);
+  driver.setScene(opts.scene === undefined ? 'run' : opts.scene);
+  const synth = new TrialsSynth(sampleRate, { seed: src.seed, solo: opts.solo ?? null });
+  let current: Readonly<InputFrame> = NEUTRAL_INPUT;
   const preroll = opts.countdown ? 3 * updateHz : 0;
   const updates = Math.ceil(seconds * updateHz);
   const L = new Float32Array(updates * spu);
@@ -116,6 +150,7 @@ export async function renderRecording(
   let lastState = physics.getState();
   const autoRestart = opts.autoRestartS ?? 1.0;
   let crashedAt = -1;
+  let tick = 0;
   for (let u = 0; u < updates; u++) {
     if (u < preroll) {
       if (u % updateHz === 0) {
@@ -125,7 +160,7 @@ export async function renderRecording(
     } else {
       if (u === preroll) driver.onEvent({ type: 'go' });
       for (let k = 0; k < tpu; k++) {
-        current = nextFrame();
+        current = src.nextFrame(tick++);
         physics.step(current);
         for (const e of physics.drainEvents()) {
           driver.onEvent(e);

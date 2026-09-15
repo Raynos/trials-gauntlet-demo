@@ -1,6 +1,9 @@
 # Audio design — procedural Web Audio for the trials gauntlet
 
-Status: **round 2 implemented** (`src/audio/**`; retuned to physics 2bdd175: auto-clutch launch, 1.4 g impulses, rebounding suspension, stalling crash). Owner paths: `src/audio/**`, this file.
+Status: **round 3 implemented** (`src/audio/**`; retuned to **physics v2** R3–R5 — the clutch launch as `reportRpm`
+models it, torque from the class thrust curve, the landing on the bump stop, the hop from `hopPhase`, the crash as
+ragdoll sensors — plus the crowd, per-biome rooms, one stinger family and a procedural music bed; §10 below).
+Round 2 (v1 tuning) is the body of §1–§8; where §10 says a number changed, §10 wins. Owner paths: `src/audio/**`, this file.
 Binding contract: `docs/design/CONTRACT.md` §2.3 (audio consumes `state.engine`, never
 re-derives rpm), §2.7 (`AudioSystem.update(state, dt, input)` + optional `renderOffline`),
 §2.8 (unlock on first touch/key). Where this file and CONTRACT disagree, CONTRACT wins.
@@ -77,12 +80,14 @@ src/audio/
     mapParams.test.ts golden stream hash, edge rules, ducking, allocation stability
   dsp/                pure sample-rate synth (runs in the worklet, OfflineAudioContext and node)
     util.ts           Biquad, noise colours, xorshift rng, pan, FDN reverb
-    engine.ts         4-stroke single: pulses + harmonic bank + chamber formants + intake
+    engine.ts         4-stroke single: pulses + harmonic bank + chamber formants + intake (+ torque, Pro voicing)
     tyres.ts          8 surface chains, skid, chain whine
-    voices.ts         16-voice one-shot pool + every recipe (chassis, crash, UI, ambience events)
-    ambience.ts       5 biome beds + sparse events + speed wind
-    synth.ts          buses, ducking, reverb sends, limiter, soft clip
-    synth.test.ts     pitch tracking, blip latency, limiter duty, onsets, duck, restart, ambience, tyres
+    voices.ts         16-voice one-shot pool + every recipe (chassis, crash, UI family in D, hop, body thud, ambience events)
+    ambience.ts       5 biome beds + sparse events (press, gusts, pass-bys, steam) + speed wind
+    crowd.ts          the stands: murmur bed, roar / cheer / groan / applause (round 3)
+    music.ts          procedural front-end / results bed, 92 bpm in D (round 3)
+    synth.ts          buses, ducking, reverb room per biome, canyon slap-back, limiter, soft clip
+    synth.test.ts     pitch tracking, blip latency, limiter duty, onsets, duck, restart, ambience, tyres, crowd, music, stingers, rooms, budget
   graph/
     worklet.ts        AudioWorkletProcessor 'trials-synth' (Vite chunk via dynamic import('./worklet?worker&url'))
     webAudio.ts       WebAudioSystem: gesture-safe context, worklet → fallback, param posting
@@ -90,6 +95,7 @@ src/audio/
   tools/
     fixture.ts        blankState(), gauntlet StateScript (countdown→…→finish, 17 s)
     renderDemo.ts     WAV + spectrogram + ebur128 report (headless listening)
+    beats.ts          the four beats vs the reference corpus' audio: WAV ×2 (sha256), spectrograms, RMS/peak/crest/centroid table
 ```
 
 ## 3. AudioParams — the model ↔ DSP contract (`params.ts`)
@@ -304,3 +310,177 @@ silent at rest and louder with speed.
   bit-exact **live** capture it should use `renderOffline`, not a media stream.
 - No harness stage yet (`harness/**` is the harness owner's); `renderDemo.ts` is the
   interim listening tool.
+
+
+## 10. Round 3 — retuned to physics v2, crowd, rooms, stingers, music (`src/audio/**`)
+
+Everything in §1–§9 that was calibrated to v1 was re-derived from `docs/design/physics.md` "v2 status — R3/R4/R5"
+and a probe of the v2 world itself (`createBikePhysicsV2`: launch traces, hop phases, 0.5–3 m drops at 6 / 12 m/s on
+both classes, a crash, and every `land` event over the 21 `bot-3.json` recordings). Nothing re-derives rpm
+(CONTRACT §2.3): the model reads `state.engine`, and where it needs the engine's *shape* (the thrust curve) it
+carries a copy of physics' table as a tone map.
+
+### 10.1 The retune table (model input → v1 value → v2 value → source)
+
+| model input | v1 (round 2) | v2 (round 3) | source |
+|--|--|--|--|
+| clutch detector | rpm within 80 of 3500 **and rear roll < 6 m/s**, load ≥ 0.25 | rpm within 80 of 3500 and **rim speed < 7 m/s** (`clutchSpeed`), load ≥ 0.25 | `v2/engine.ts reportRpm`: below 7 m/s rpm = max(wheel, idle + throttleEff·2000); probe: Rookie holds 3499 from t 0.6 to 1.3 s, 6.1 m/s |
+| launch shape (what the clutch whine sits on) | "0.25 s climb → 3500 hold ~0.45 s → limiter" | the 0.15 s throttle lag climbs 1500 → 3500 over ~1 s, holds to 7 m/s, then a 4 s pull: 5000 @ 2 s, 8000 @ 4 s, 9500 @ 6 s — no stall, no rev cut | R3 FEEL "0 → 16 in 3.98 s", `throttleTau` 0.15 (Pro 0.08); probe trace |
+| engine tone: `torque` (new) | — (load only) | `throttleEff × f(v_rim) / f(0)`, f = `curveV/curveF` per class (Rookie 1.07 1.07 1 1 0.7 0.48 0.35 at 0 3 5 8 12 17 20 m/s; Pro 1 … at 0 3 5 8 12.6 17.85 21); drives pulse amplitude (0.45 + 0.3·load + 0.25·torque), the honk (× 0.55 + 0.45·torque) and 3 dB of level | `v2/tuning.ts` engine.curveV/F; R3 deviation 21 (the knot) |
+| engine level | −18 + 12·load + 2·rev + 2·speed dB | **−14 + 6·load + 3·torque** + 2·rev + 2·speed | beats table: the reference wheelie / coast beats keep the engine at −22 dBFS; v1's closed-throttle floor left ours at −32 |
+| engine spectrum | pulse 1.7 / bank 0.6, chambers 130 (+6) / 380 Hz, intake −26 + 12·load dB | pulse **2.0** / bank **0.45**, chambers 130 (+4) / **260 (+5)** / 380 Hz, intake **−32** + 12·load dB | ref start-gate spectrogram: engine energy in moving 200–500 Hz ridges with a dotted pulse texture; ours was a smooth 100–250 Hz band under a flat 0.5–8 kHz wash |
+| Pro voicing (new) | — | pulse τ × 0.75, fp +25 Hz, pulse noise 0.25 (Rookie 0.15), lowpass +700 Hz, 380 Hz chamber → 430 Hz +4 dB, harmonic tilt −0.15, intake +2 dB. Limiter stays 10 000 / 9 500 on both classes (physics') — the Pro reaches it at 21 m/s through `gearFor(21)`, the Rookie at 20 | `v2/tuning.ts` CLASSES.pro (Fpeak 1000, τ 0.08, k 12 000 / 9 000) |
+| landing gain: `land.impulse` | ref 120 N·s, min 5, ^0.6 (v1 corpus p50 10, p75 30–60, max 210) | **ref 60**, min 5, ^0.6 — v2 corpus (1007 landings) p50 10.3, p75 20.2, p90 37.3, p97 63.5, max 225; the R3 2 m drop reads rear 42 / front 59 at 6 m/s, 15 / 47 at 12 (the servo's legs absorb the rest over the next ticks, so the touchdown tick under-reports: v1's ref left a 2 m drop at 0.59) | R3 landing table; probe |
+| landing thump: the compression spike | bottom-out = a 2.2 / 3.1 / 4.7 kHz **clang** at −16 dB + landing, "fires for real on hard landings" | **every drop ≥ 1 m runs the rear to 100 % and rides away** (R3 table: 1.5 / 2 / 3 m all 100 %, rebound ≤ 0.05) — so the bump stop *is* the landing: a deep stop knock (160 → 70 Hz + 1.1 kHz tap + BP 700 Hz burst, −6 dB, gain 0.5 + dC/dt/30) + the landing recipe at full gain; the metallic ring only on metal / grate | R3 landing table; probe max dC/dt 30.7 /s, maxRear 1.00 for h ≥ 1 m |
+| the hop | nothing hop-specific (thunks / bottom-outs only) | `hopPhase` edges: idle → preload = **creak** (190 → 150 Hz saw, 11 Hz AM, LP 900, −28 dB); preload → push = **snap** (BP 900 Hz 8 ms burst + 140 → 90 Hz + 480 → 420 Hz spring, −22 dB); airtime = whatever physics does to the free wheel (the rear spins up toward the limiter under gas — that is the free-rev, not an audio invention); landing = above | R3 hop row 0.46 / 0.74 / 0.29 m, `hopPhase` in `PhysicsState` |
+| Rookie wheelie control | — | **nothing audible by construction**: the assist trims *thrust*, not `throttleEff` or rpm; tested (rpm 6200 / load 1 pass through unchanged with the front lifting) | R4 `wheelieControl`, `debug().engine.assist` |
+| crash: engine | stall over 0.45 s from the live rpm, sag 55 % | physics parks rpm at idle and throttleEff at 0 **on the crash tick**; audio lets it die over **0.35 s** from 1500 (two putts) | probe: crash state rpm 1500, thrEff 0 |
+| crash: bike | frame scrape while sliding, clatter ticks | v2's crash brakes stop the bike in ≈ 0.1 s (probe: 0.05 m/s after the tick) — the scrape path stays but is rarely on; **ragdoll sensors** instead: a body whose frame-to-frame speed drops ≥ 2.5 m/s is a soft thud (torso / pelvis 90 → 50 Hz, limbs 140 → 80 Hz), **at most 3 inside 1.2 s**, then quiet | physics §8 ragdoll, `state.ragdoll` |
+| respawn | hard cut ≤ 5 ms + starter | unchanged (also cuts the crowd reactions and the slap-back line) | CONTRACT §2.8 |
+| wind | white HP 1.2 kHz, −40 + 16·wind dB, +6 airborne | **pink → BP 350 + 550·wind Hz** (+ HP 3 kHz hiss 12 dB under), −38 + 14·wind, +4 airborne | beats table: the landing beat's centroid was 1620 Hz against the reference's 153–287; the ambient bus alone read 8.5–10 kHz |
+
+### 10.2 Crowd (`dsp/crowd.ts`, model `crowdDensity`)
+
+The gates kit places people in three kinds of stand (`src/render/world/gates.ts` `crowdZone`): **start 30** over
+[sx − 9, sx + 7], **7 per checkpoint** over [x + 1.5, x + 6.5], **finish 34** over [fx − 7, fx + 9]. `setTrack` turns the
+compiled track into that list; every update the model measures `density = Σ (n / 30) / (1 + (d / 12 m)²)` from the
+bike's x to the nearest edge of each stand, clamped to 1 (1 at the start, 0.28 at a checkpoint, 0.05 sixty metres
+from anything; below 0.06 a stand is "out of earshot" and nothing reacts). The DSP:
+
+- **bed**: three "vowel" bands of pink noise (280 / 520 / 900 Hz, Q 2) each under its own seeded random-walk gain
+  (retargeted every 120 ms, τ 0.35 s), a little L/R decorrelation, −27 dB × density → −33 dBFS on its bus at the
+  start stands, < −70 dBFS 80 m out; the crowd bus is trimmed −3 dB, ducked with the game, sent 0.25 to the room.
+- **roar** on GO: +14 dB with a 1.5 kHz band, A 120 ms / hold 500 / D 1.4 s, gain = density (so a start with the bike
+  already 60 m down the track — a checkpoint restart — gets nothing).
+- **cheer** on a landing after **≥ 0.5 s** of air with no crash in the flight: +11 dB, bands shifted × 1.25, two or
+  three seeded whistles (2.3–2.9 kHz, 6 Hz vibrato), 120–180 ms after the touchdown. The corpus' airtimes > 50 ms are
+  p50 0.17 s / p90 0.73 s, so ~15 % of landings earn one.
+- **groan** on a crash (+220 ms): bands glide down × 0.72 with the 350 Hz "ooh" up 8 dB.
+- **applause** at the finish (+350 ms): a seeded clap train — 18 → 70 → 0 claps/s over 3.2 s, each a 3 ms burst through
+  BP 1.9 kHz alternating ±0.5 pan — over the bed lifted 9 dB; the finish always gets at least a thin scatter
+  (gain 0.3 + density) so a finish line without a stand still reads as one.
+- Deterministic: the crowd's noise, walks, whistles and clap timing come from one xorshift seeded from the track seed;
+  every restart cuts pending reactions.
+
+Measured (solo, start stands): roar +11.7 dB over the murmur, groan +4, applause +8 with a 9+ dB crest (claps).
+
+### 10.3 Ambience per biome (`dsp/ambience.ts` + `synth.ts` rooms)
+
+| biome (`def.meta.biome`) | bed (as §4.5) + round 3 | room (FDN fb / damping) |
+|--|--|--|
+| industrial | + **distant machinery**: a press thump every 1.15–1.35 s (70 → 45 Hz, −34 dB, sent 0.6 into the hall), a conveyor hum 90 / 135 Hz under a 0.4 Hz swell | **hall**: 0.74 / 2.8 kHz — the longest tail |
+| canyon | wind bed + birds; **slap-back**: engine + chassis into a 190 ms line, fb 0.35, LP 2.5 kHz, −9 dB send — a landing answers off the far wall (+3 dB in the 190–250 ms window, tested) | 0.60 / 3.5 kHz |
+| snow | **hush**: the bed 4 dB quieter and darker (LP 420 Hz) than the canyon; **gusts** every 5–9 s (pink BP 500 → 900 Hz rising over 0.9 s, falling 1.2 s) | 0.35 / 3 kHz — almost no room (shortest tail, tested) |
+| nightCity | traffic bed + neon saw + cricket; **pass-bys** every 7–13 s (brown noise LP 700 → 400 Hz, one side, 2.5 s) | 0.55 / 3.5 kHz |
+| foundry | furnace roar + crackle + clank; **breathing hiss** HP 3 kHz, −38 ± 4 dB at 0.3 Hz; **steam vents** alternating with the clanks | 0.70 / 2 kHz — big and very damped |
+
+### 10.4 Stingers and the music bed (`dsp/voices.ts` stab, `dsp/music.ts`)
+
+One family: two detuned saws + a triangle an octave down through a 2.8 kHz lowpass — a small brass — everything in
+**D**. Countdown = one D5 stab (587 Hz; onsets still ±8 ms, 1.000 s apart), GO = D6 / A5 / D5 stab + the whoosh,
+checkpoint = A5 → D6 (+90 ms) + the flame-jet, finish tick = the GO chord quiet, fanfare = D5 F#5 A5 D6 (tested
+within 3 % each). The finish fanfare resolves into the results bed because the bed is in the same key.
+
+**Music**: a procedural loop, no files. Decision: composed rather than a CC0 download — the brief allows CC0 with its
+licence committed, but a downloaded loop cannot be seeded per track, cannot be guaranteed free of a real artist's
+identity, and adds bytes to the 40 KB budget; a 250-line generator costs ~4 KB gz and is byte-identical per seed.
+92 bpm, 8 bars of 16ths, key of D. Front end (scene `menu`): D Aeolian, one of three progressions (i VI III VII ·
+i VII VI VII · i iv VI v) two bars each, a pad (3 notes × 2 detuned saws → a lowpass swept 600–1400 Hz at 0.08 Hz),
+a bass (sine + saw → LP 250 Hz) on a seeded euclidean E(5,16), a pluck arpeggio (triangle + 2nd harmonic, 220 ms)
+on a seeded 5-of-16 pattern over the chord tones. Results (scene `results`): D Mixolydian (I V vi IV · I IV I V ·
+I vi IV V), the same voices an octave brighter plus drums (kick 130 → 42 Hz on 1 and 3, hats on the off-8ths, a clap
+on 2 and 4). −4 dB bus, not ducked, fades 0.8 s in / 0.5 s out, restarts at step 0 on every scene change so a seed's
+menu always opens the same way; −22 dBFS RMS in the menu, −20 in results (tested −30..−14, in key by ≥ 6 dB
+Goertzel margin, byte-identical, different per seed).
+
+**Scene** (`AudioParams.scene`, `P_SCENE`): the model starts in `menu`, goes to `run` on the first `countdown` / `go`,
+to `results` **1.4 s after `finish`** (after the fanfare's last note), back to `run` on the next `restart`. The app
+can override with `audio.setScene('menu' | 'results' | 'run' | null)` (additive on `AudioSystem`; null = infer).
+Because the front end renders no frames (`Game.renderEnabled = false` → no `update()`), the worklet receives the
+scene by message (`{ scene }`) and runs the bed on its own clock; the fallback graph has no music (documented gap).
+`audio.setBike('rookie' | 'pro')` (additive) selects the voicing; `renderOffline` takes it from the recording header.
+
+### 10.5 Measured, not posed — the four beats vs the reference corpus (`tools/beats.ts`)
+
+The committed reference clips are silent; the beats were cut from the raw downloads
+(`reference/evolution-gameplay/raw/*.mp4`, AAC 44.1 kHz) at the manifest's timestamps with ffmpeg
+(`-ss/-to … -ac 2 -ar 48000 pcm_s16le`). Ours are rendered through the real v2 physics: **start-gate** =
+`flat-test-clear.json` with the countdown (9 s); **wheelie** = `wheelieHoldV3(40, 4)` on lab-flat-200 exactly as
+`r3.test.ts` drives it (8 s); **landing-2m** = lab-flat-200 with the bike teleported 2 m up at 8 m/s (then 3 m at
+12 m/s four seconds later), throttle 0.2 — the R3 landing table's row (8 s); **crash-respawn** =
+`flat-test/crash.json` with the 1.0 s auto-restart (7 s). Each rendered twice; the two WAVs' sha256 match on every
+beat and both classes. RMS/peak over the whole cut, centroid = energy-weighted mean over 4096-pt Hann frames above
+−50 dBFS.
+
+| beat | clip | s | RMS dBFS | peak dBFS | crest dB | centroid Hz |
+|--|--|--|--|--|--|--|
+| start-gate | **ours (rookie)** | 9.0 | −18.2 | −4.4 | 13.7 | 310 |
+| start-gate | ours (pro) | 9.0 | −20.3 | −4.8 | 15.6 | 445 |
+| start-gate | ref 01 D-license countdown-launch | 5.7 | −23.8 | −7.0 | 16.8 | 370 |
+| start-gate | ref 08 warehouse ready-go | 7.5 | −21.3 | −5.3 | 16.0 | 597 |
+| wheelie | **ours (rookie)** | 8.0 | −29.7 | −7.0 | 22.7 | 314 |
+| wheelie | ours (pro) | 8.0 | −32.7 | −8.7 | 24.0 | 451 |
+| wheelie | ref 02 D-license log ramps | 6.5 | −21.6 | −7.4 | 14.2 | 512 |
+| wheelie | ref 05 A-license obstacle climb | 7.0 | −23.4 | −8.7 | 14.7 | 427 |
+| landing-2m | **ours (rookie)** | 8.0 | −24.7 | −4.9 | 19.8 | 272 |
+| landing-2m | ours (pro) | 8.0 | −26.3 | −8.7 | 17.5 | 338 |
+| landing-2m | ref 12 rock steady big jump | 8.0 | −28.8 | −5.4 | 23.4 | 153 |
+| landing-2m | ref 14 roller coaster huge jump | 7.0 | −26.2 | −6.4 | 19.8 | 287 |
+| crash-respawn | **ours (rookie)** | 7.0 | −26.2 | −6.0 | 20.1 | 335 |
+| crash-respawn | ours (pro) | 7.0 | −27.7 | −6.6 | 21.2 | 471 |
+| crash-respawn | ref 04 A-license crash-checkpoint-respawn | 5.5 | −22.4 | −7.7 | 14.7 | 417 |
+| crash-respawn | ref 13 roller coaster crash-instant-restart | 7.0 | −17.4 | −0.6 | 16.8 | 554 |
+
+Before the round-3 mix changes (same beats, v1 engine level / wind): start 585 Hz, wheelie −32.1 dBFS / 716 Hz,
+landing 1620 Hz, crash 475 Hz — the wind and the intake wash were the brightness, the closed-throttle floor the
+quietness. Where we still differ: the **wheelie** is 7–8 dB quieter than the reference because v2's wheelie *is* a
+2 m/s balance on the slipping clutch at ~1700 rpm (physics' truth, `reportRpm`), while the reference clips are
+power wheelies over log ramps at speed — a physics/track difference, not an audio one; the **crash** cuts are 4–9 dB
+quieter than the reference (ref 13 is a barrel explosion peaking −0.6 dBFS); the references also carry the games'
+music under everything, which lifts their RMS and pulls their centroids down.
+
+**CPU** (plain node, `npx tsx`, best of 3 over the 17 s gauntlet, 800 samples per update): run scene **0.26–0.28
+ms per 60 Hz frame**, results scene (crowd + music + rooms all on) **0.37–0.39 ms** — under the 0.5 ms budget;
+`beats.ts` prints 0.28–0.40 ms on its cold first renders. Under vitest the same loop reads ~1.45× (worker + transform
+overhead), so the test gate is 0.8. Worklet chunk after round 3: 40.9 KB min / **13.3 KB gz** (round 2: 8.4 KB gz;
+budget 40 KB).
+
+WAVs and spectrograms: `npx tsx src/audio/tools/beats.ts <outDir> --ref <refWavDir> [--bike pro]` writes
+`<beat>-<bike>.wav`, `.spectrogram.png`, `ref-*.spectrogram.png` and `report-<bike>.json` (sha256, deterministic
+flag, the measures, ms per update).
+
+### 10.6 Tests (`pnpm vitest run src/audio`: 36)
+
+Model (19): golden stream hash re-stamped `0e821b2a87108a99` (the header grew: `scene`, `crowd`, `torque`, `bike`,
+`hop`; `P_HEADER` 20 → 28); v2 landing curve (10 → 0.34, 20 → 0.52, 42 → ≥ 0.78, 60 → 1); torque vs the class
+curves; the wheelie control's silence; the v2 clutch flag (3500 below 7 m/s, off above); hop creak + snap edges;
+crowd density geometry; roar / cheer (≥ 0.5 s air only) / groan / applause and their silence out of earshot; ≤ 3
+body thuds; scene inference and override. DSP (17): crowd bed level and silence, reactions' lift and the clap crest,
+music level / determinism / per-seed difference / in-key margin / silence in `run`, finish → results bed → cut by
+restart, the stinger family's fundamentals, canyon slap-back and the snow's short tail, the CPU gate; the round-2
+suite unchanged (snow bed re-levelled −31 dB after the hush pushed it under −45 dBFS).
+
+### 10.7 What still reads synthetic (the tells, from the spectrogram pairs)
+
+1. **The engine's top end is still too even.** The reference's 500 Hz–3 kHz is a *dotted* pulse texture with the
+   dots spreading as rpm rises; ours is denser and flatter (the harmonic bank's eight steady partials + the intake
+   noise). Round 3 moved the balance toward the pulses and cut the wash 6 dB; the next step is a per-cycle
+   variation of the pulse spectrum (a resonator excited per firing with seeded Q / centre jitter) instead of a bank.
+2. **The wheelie beat** cannot match the reference's power wheelie while v2's wheelie is a 2 m/s clutch balance —
+   physics / bot territory (a track with a log-ramp wheelie at 8–10 m/s would give the audio a real one).
+3. **The crowd** is a formant murmur; it has no words, no individual voices in the cheer beyond the whistles. It
+   reads as a crowd at −33 dBFS under an engine; solo'd it is obviously synthetic.
+4. **The music** is a competent loop, not a composition: no B section, no fills beyond the results' ghost kick.
+5. **Countdown pings**: the reference's are thin ~2.4 kHz pings; ours are D5 brass stabs by design (the family).
+   Worth an A/B on its own.
+6. Nothing here has been *heard* by a person yet — the blind audio A/B (P6 done line, ≥ 2/6) still needs the harness
+   owner's `harness/compare` audio pairs; `beats.ts` produces the clips.
+
+### 10.8 Requests
+
+- **core-game**: call `audio.setBike?.(bike)` where `Game.setBike` / `loadTrack` fixes the class, and
+  `audio.setScene?.('menu' | 'results' | 'run')` from `App.goto` / results / run entry (both optional; inference
+  covers the common path but a quit-to-menu after a run is only heard as `menu` if the app says so).
+- **harness**: `harness/compare` audio pairs from `beats.ts`'s WAVs (mux onto the clips with ffmpeg) for the blind
+  A/B; a `harness:audio` stage running `beats.ts` each round so the table above stays current.
+- **physics / tracks**: a power-wheelie beat (a log-ramp row at 8–10 m/s) if the wheelie A/B is to be meaningful.

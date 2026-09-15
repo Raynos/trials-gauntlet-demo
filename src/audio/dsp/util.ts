@@ -170,6 +170,11 @@ export class Fdn {
     this.fb = fb;
   }
 
+  /** Damping lowpass on the input (room brightness). */
+  setDamping(lpHz: number): void {
+    this.lp.lowpass(lpHz, 0.7);
+  }
+
   /** Hard cut: drop the tail (restart). */
   clear(): void {
     for (const l of this.lines) l.fill(0);
