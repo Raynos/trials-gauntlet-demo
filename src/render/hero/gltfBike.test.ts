@@ -58,6 +58,25 @@ function positionWheels(f: RenderFrame, rearCompression: number, frontCompressio
   }
 }
 
+/** Blender stores node transforms as IEEE-754 binary32 before glTF JSON serialization. Each
+ * authored coordinate therefore contributes at most half an ULP; mesh position quantization
+ * is irrelevant to these empty-node tests. For perpendicular fork residual, COM/top errors
+ * add directly, and endpoint errors rotate the axis by sin(theta) <= error / (length-error).
+ * Measure the physical slider residual separately and add only its actual value; this test
+ * bounds export disagreement rather than inventing a solver convergence tolerance. */
+const halfUlp = (v: number) => v === 0 ? 0 : 2 ** (Math.floor(Math.log2(Math.abs(v))) - 24);
+const pointError = (x: number, y: number) => Math.hypot(halfUlp(x), halfUlp(y));
+function forkExportBudget(travel: number): number {
+  const topError = pointError(1.08, .5), axleError = pointError(1.3, 0);
+  const comError = pointError(.585, .21), axisError = topError + axleError;
+  const length = Math.hypot(.22, .5);
+  return comError + topError + Math.abs(travel - length) * axisError / (length - axisError);
+}
+
+// The rear pivot and the axle's local translation store (+/-.43, +/-.10).
+// Their rounding affects the measured distance and the authored radius once each.
+const rearExportBudget = pointError(.585, .21) + 2 * pointError(.43, .10);
+
 function mechanismFrame(): RenderFrame {
   const f = new FrameBuilder().frame;
   f.bikeX = 4; f.bikeY = 2; f.dt = 1 / 60;
@@ -147,6 +166,11 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
     const renderer = { setTrack() {}, onEvent() {}, setQuality() {}, setBikeClass() {} } as unknown as GameRenderer;
     const game = new Game({ physics: createBikePhysicsV2(rec.header.physicsHz), renderer, physicsHz: rec.header.physicsHz, autoSkipCountdown: true, ghostEnabled: false });
     game.loadTrack(rec.header.trackId, rec.header.seed, rec.header.bike);
+    // Explicit authoring witness: these values must be the correctly rounded float32
+    // contract coordinates, rather than an arbitrary tolerance inferred from a failing run.
+    for (const [name, x, y] of [['attach_fork_top', 1.08, .5], ['attach_front_axle_rest', 1.3, 0], ['attach_chassis_com', .585, .21]] as const) {
+      expect(rig.get(name).position.toArray()).toEqual([Math.fround(x), Math.fround(y), 0]);
+    }
     const sourceQ = rig.get('shock_body').quaternion.clone();
     const sourceDir = rig.point('attach_shock_link').sub(rig.point('attach_shock_top')).normalize();
     const localForkAxis = rig.point('attach_fork_top').sub(rig.point('attach_front_axle_rest')).normalize();
@@ -156,7 +180,6 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
       const f = frames.build(game.getState(), 1);
       rig.bike.update(f); rig.bike.root.updateMatrixWorld(true);
       expectPhysicalAnchors(rig, f);
-      expect(rig.bike.debug.armLengthError).toBeLessThan(1e-6);
       expect(Math.abs(rig.bike.debug.angleCorrection)).toBeLessThan(.001);
       for (const [name, wheel] of [['wheel_rear', f.rear], ['wheel_front', f.front]] as const) {
         const m = rig.get(name).matrixWorld.elements, angle = Math.atan2(m[1]!, m[0]!);
@@ -165,7 +188,23 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
       }
       const file = rig.bike.root.getObjectByName('bike')!;
       const front = file.worldToLocal(rig.point('wheel_front')), top = file.worldToLocal(rig.point('attach_fork_top'));
-      expect(front.sub(top).cross(localForkAxis).length()).toBeLessThan(1e-8);
+      const c = Math.cos(f.bikeAngle), s = Math.sin(f.bikeAngle);
+      const x = (f.front.x - f.bikeX) * c + (f.front.y - f.bikeY) * s - .715;
+      const y = -(f.front.x - f.bikeX) * s + (f.front.y - f.bikeY) * c + .21;
+      const axis = BIKE_GEOMETRY_V2.forkAxis;
+      const arithmetic = 128 * Number.EPSILON * Math.max(1, Math.abs(f.bikeX), Math.abs(f.bikeY));
+      const physicalResidual = Math.abs(x * axis.y - y * axis.x);
+      const hinge = bikeTuningV2(rec.header.bike).suspension.rear.hinge!;
+      const rearX = (f.rear.x - f.bikeX) * c + (f.rear.y - f.bikeY) * s - hinge.pivot.x;
+      const rearY = -(f.rear.x - f.bikeX) * s + (f.rear.y - f.bikeY) * c - hinge.pivot.y;
+      const physicalRearResidual = Math.abs(Math.hypot(rearX, rearY) - hinge.radius);
+      // A separate physical closure requirement (also exercised by position.test.ts)
+      // must pass before evaluating the much smaller exported-node rounding budget.
+      expect(physicalRearResidual).toBeLessThan(2e-4);
+      expect(physicalResidual).toBeLessThan(2e-4);
+      expect(Math.abs(rig.bike.debug.armLengthError - physicalRearResidual)).toBeLessThan(rearExportBudget + arithmetic);
+      const travel = x * axis.x + y * axis.y;
+      expect(Math.abs(front.sub(top).cross(localForkAxis).length() - physicalResidual)).toBeLessThan(forkExportBudget(travel) + arithmetic);
       const direction = file.worldToLocal(rig.point('attach_shock_link')).sub(file.worldToLocal(rig.point('attach_shock_top'))).normalize();
       const expected = new THREE.Quaternion().setFromUnitVectors(sourceDir, direction).multiply(sourceQ);
       expect(rig.get('shock_body').quaternion.angleTo(expected)).toBeLessThan(1e-6);

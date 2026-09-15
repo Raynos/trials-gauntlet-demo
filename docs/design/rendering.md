@@ -1311,6 +1311,25 @@ working-tree physics; the round's clips use windows before those ticks (the b1 o
 
 ## 12. Known gaps after round 11 (what still reads non-AAA)
 
+### Blender branch round 3 — played hero review, 2026-09-15
+
+The final-solver street hop and crash/restart clips were played at 60 fps, followed
+by the Rising canyon start/launch at its native 60000/1001 cadence (source seconds
+719–727). This is a parent review, not a blind-critic score. Rider contacts now
+remain attached through the hop and restore on restart. The reference still
+reads more convincingly as clothing: shoulder, cuff and waist folds retain
+distinct planes while ours remains smooth and tubular at riding distance. The
+hood/neck overlap and elbow folds remain visible construction limits. The
+reference bike also has stronger seat/panel shapes and clearer material contrast;
+our reflective mechanical pieces do not yet produce the same finish.
+
+Connected torso/sleeve street v6 was played in native Blender through hang-back
+and landing absorption. Its armholes stay continuous, but this prototype is not
+yet in the public GLBs and does not close the art gate. Next: accept/reject the
+final street/race topology in motion, export through the protected sources,
+then judge garment folds and materials in the actual game. Evidence identity and
+remaining physical/phone gaps: `docs/evidence/blender-r3.json`.
+
 - **Industrial mids / highlights**: p50 0.20 vs 0.284, p99 0.53 vs 0.876 — with the high camera the
   window bank is out of frame and nothing pale is lit by the key; the far stacks (z −15 / −25) are a flat
   blue-grey wash. Wants pale lit surfaces at deck level and a far tier with structure. The b1 jib gantry

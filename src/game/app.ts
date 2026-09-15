@@ -102,7 +102,7 @@ export interface AppOptions {
   /** Outfit resolved at boot (including a URL override), shared with the renderer. */
   riderOutfit?: RiderOutfit | undefined;
   /** A committed cosmetic choice; changes clothing without restarting the bike or track. */
-  onRiderOutfitChange?: ((outfit: RiderOutfit) => void) | undefined;
+  onRiderOutfitChange?: ((outfit: RiderOutfit) => Promise<boolean>) | undefined;
   /** `?trace=1`: live InputFrame bars under the HUD timer (filming the phone). */
   trace?: boolean | undefined;
   /** `?lab=1`: the physics lab HUD on every track (it is automatic on `lab-*` tracks). */
@@ -351,10 +351,11 @@ export class App {
     this.garage = new GarageScreen(o.uiRoot, this.sfx, this.art, {
       previewBike: (b) => this.applyBike(b, false),
       setBike: (b) => this.applyBike(b, true),
-      setOutfit: (outfit) => {
+      setOutfit: async (outfit) => {
+        if (!await this.o.onRiderOutfitChange?.(outfit)) return false;
         this.riderOutfit = outfit;
         saveRiderOutfit(outfit);
-        this.o.onRiderOutfitChange?.(outfit);
+        return true;
       },
       back: () => this.goto('menu'),
     });

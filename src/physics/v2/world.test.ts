@@ -9,6 +9,7 @@ import type { InputFrame } from '../../core/types';
 import { createBikePhysicsV2 as createBikePhysics, F_SLOTS, NSCALAR, NU, U_SLOTS, type BikePhysicsWorldV2 } from './bike';
 import { drumTrack, gapTrack, hazardTrack, makeTrack, seesawTrack } from '../testTracks';
 import { stepN } from '../controllers';
+import { suspensionPoint } from './tuning';
 
 const HZ = 120;
 const deg = (r: number): number => (r * 180) / Math.PI;
@@ -26,6 +27,78 @@ function script(i: number): InputFrame {
 }
 
 const hash = (w: BikePhysicsWorldV2): string => hashPhysicsState(w.getState());
+
+describe('coupled suspension and rider equilibrium', () => {
+  it('supports the rider weight and settles with less than 0.1 mm/s body drift', () => {
+    const w = createBikePhysics(HZ);
+    w.loadTrack(makeTrack(), 1);
+    stepN(w, {}, 1200);
+    const d = w.debug();
+    for (const body of d.bodies.slice(0, 4)) expect(Math.hypot(body.vel.x, body.vel.y)).toBeLessThan(1e-4);
+    expect(Math.abs(d.rider.servoForce.y - w.tuning.rider.mass * w.tuning.gravity)).toBeLessThan(0.1);
+    for (const [side, spring] of Object.entries(w.tuning.suspension)) {
+      const measured = d.suspension[side as 'rear' | 'front'];
+      expect(Math.abs(measured.force - spring.k * (measured.compression + spring.preload))).toBeLessThan(0.1);
+    }
+  });
+
+  it('unpowered dampers and compressed springs dissipate energy and conserve internal impulse momentum', () => {
+    // No gravity, motor, rider muscle, aerodynamic drag or brake. Put the complete
+    // mechanism in free space: only its actual joints and suspension impulses remain.
+    for (const springK of [1e-8, 9000]) {
+      const w = createBikePhysics(HZ, {
+        gravity: 0,
+        suspension: { rear: { k: springK, preload: 0, kStop: 0 }, front: { k: springK, preload: 0, kStop: 0 } },
+        rider: { kp: 0, kd: 0, kpsi: 0, cpsi: 0, tauMax: 0, Fmax: 0, Katt: 0, cAtt: 0 },
+        aero: { cda: 0 }, engine: { Fpeak: 0, engineBrake: 0 }, brakes: { totalNm: 0 }, tyre: { rollRes: 0 },
+      });
+      w.loadTrack(makeTrack(), 1);
+      w.teleport({ pos: { x: 0, y: 20 }, angle: 0 });
+      const initial = w.snapshot();
+      const count = (initial.f64.length - NSCALAR) / 8;
+      const compression = springK > 1 ? 0.1 : 0;
+      for (let wheel = 0; wheel < 2; wheel++) {
+        const spring = wheel === 0 ? w.tuning.suspension.rear : w.tuning.suspension.front;
+        const p = suspensionPoint(spring, compression);
+        initial.f64[NSCALAR + wheel + 1] = initial.f64[NSCALAR]! + p.x;
+        initial.f64[NSCALAR + count + wheel + 1] = initial.f64[NSCALAR + count]! + p.y;
+      }
+      const masses = [w.tuning.chassis.mass, w.tuning.wheel.rearMass, w.tuning.wheel.frontMass, w.tuning.rider.mass];
+      const inertias = [w.tuning.chassis.inertia, w.tuning.wheel.rearInertia, w.tuning.wheel.frontInertia, w.tuning.rider.inertia];
+      const momentum = (f: Float64Array, positions: Float64Array) => {
+        let energy = 0, px = 0, py = 0, angular = 0;
+        for (let body = 0; body < 4; body++) {
+          const mass = masses[body]!, inertia = inertias[body]!;
+          const x = positions[NSCALAR + body]!, y = positions[NSCALAR + count + body]!;
+          const vx = f[NSCALAR + 2 * count + body]!, vy = f[NSCALAR + 3 * count + body]!, rate = f[NSCALAR + 5 * count + body]!;
+          energy += 0.5 * mass * (vx * vx + vy * vy) + 0.5 * inertia * rate * rate;
+          px += mass * vx; py += mass * vy;
+          angular += mass * (x * vy - y * vx) + inertia * rate;
+        }
+        return { energy, px, py, angular };
+      };
+      let seed = 32;
+      const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 2 ** 32; };
+      for (let sample = 0; sample < 200; sample++) {
+        const snap = { ...initial, f64: initial.f64.slice(), u8: initial.u8.slice() };
+        for (let body = 0; body < 4; body++) for (const column of [2, 3, 5]) snap.f64[NSCALAR + count * column + body] = (random() - 0.5) * (springK > 1 ? 0.1 : 20);
+        w.restore(snap);
+        const before = momentum(snap.f64, snap.f64);
+        w.step(quantizeInput({}));
+        // Angular impulse balance uses the force-application positions. The separate
+        // split-position pass does not alter velocity or add kinetic energy.
+        const after = momentum(w.snapshot().f64, snap.f64);
+        const d = w.debug();
+        const potentialBefore = springK * compression ** 2;
+        const potentialAfter = 0.5 * springK * (d.suspension.rear.compression ** 2 + d.suspension.front.compression ** 2);
+        expect(after.energy + potentialAfter).toBeLessThanOrEqual(before.energy + potentialBefore + 1e-8);
+        expect(Math.abs(after.px - before.px)).toBeLessThan(1e-9);
+        expect(Math.abs(after.py - before.py)).toBeLessThan(1e-9);
+        expect(Math.abs(after.angular - before.angular)).toBeLessThan(1e-8);
+      }
+    }
+  });
+});
 
 describe('determinism (§14.1)', () => {
   it('two fresh worlds hash identically tick for tick for 3000 ticks including the crash and the restart', () => {

@@ -74,7 +74,7 @@ describe('static (F1, §5)', () => {
     const s = stepN(w, {}, 240);
     const d = w.debug();
     feel('static.rearSagPct', s.wheels.rear.compression * 100, '28-32');
-    feel('static.frontSagPct', s.wheels.front.compression * 100, '24-28 (spec; see it.fails below)');
+    feel('static.frontSagPct', s.wheels.front.compression * 100, '24-28');
     feel('static.pitchDeg', deg(s.bike.angle), 'info: the two static sags on the spec axles pitch the frame ~2 deg nose-up');
     feel('static.comD', d.comDH.d, '~0.55 (§2)');
     feel('static.comH', d.comDH.h, '~0.79 (§2; CONTRACT 0.45 above the axle line)');
@@ -87,7 +87,7 @@ describe('static (F1, §5)', () => {
     expect(d.comDH.h).toBeGreaterThan(0.74);
     expect(d.comDH.h).toBeLessThan(0.84);
   });
-  it.fails('front sag 24-28 % (the table\'s front load ~490 N sprung on a 7500 N/m spring tilted 23 deg gives 16 %; the band needs k ~5400 or a heavier front)', () => {
+  it('front sag 24-28 % with the shared whole-body load and fixed fork axis', () => {
     const w = createBikePhysics(HZ);
     w.loadTrack(makeTrack(), 1, { bike: 'rookie' });
     const s = stepN(w, {}, 240);

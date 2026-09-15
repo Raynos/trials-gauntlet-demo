@@ -3,9 +3,11 @@ import { readFileSync } from 'node:fs';
 import { expandFrames, quantizeInput, type InputRecording } from '../../core/replay';
 import { Game, type GameCounters } from '../../game/game';
 import type { GameRenderer } from '../../render';
+import type { PhysicsSnapshot } from '../../core/types';
 import { makeTrack } from '../testTracks';
-import { createBikePhysicsV2 } from './bike';
-import { ankleGeometry, RIDER_ANKLE, RIDER_HIP, RIDER_PROFILE, RIDER_REACH, RIDER_TORSO_REST, riderServoWrench, type RiderServoKinematics } from './rider';
+import { createBikePhysicsV2, NSCALAR } from './bike';
+import { BIKE_GEOMETRY_V2 } from './tuning';
+import { ankleGeometry, makeRiderRigPose, riderRigFromHips, riderRigFromCOM, RIDER_ANKLE, RIDER_HIP, RIDER_PROFILE, RIDER_REACH, RIDER_TORSO_REST, riderServoWrench, type RiderServoKinematics } from './rider';
 import impact from './fixtures/e2-before-rider-impact.json';
 
 const dt = 1 / 120;
@@ -192,6 +194,121 @@ describe('rider servo physical invariants', () => {
         expect(end.u8).toEqual(first.u8);
       }
       first = end;
+    }
+  });
+});
+
+/** Exercise the actual internal joint solve in isolation, without ground forces, rider motors or
+ * integration disguising a momentum error. Raw snapshots are the independent measurement. */
+interface RiderConstraintProbe {
+  prepareRiderLimits(): void;
+  solveRiderLimits(): void;
+  projectRiderLimits(): void;
+  riderLimits: { mass: number; gap: number; impulse: number; nx: number; ny: number; jr: number }[];
+}
+function constraintWorld(x: number, y: number, degrees: number, com?: { x: number; y: number }) {
+  const world = createBikePhysicsV2(120);
+  world.loadTrack(makeTrack(), 1);
+  const snapshot = world.snapshot();
+  const n = (snapshot.f64.length - NSCALAR) / 8;
+  const set = (column: number, body: number, value: number) => { snapshot.f64[NSCALAR + column * n + body] = value; };
+  const torso = degrees * Math.PI / 180;
+  const rig = riderRigFromHips(x, y, torso, makeRiderRigPose());
+  set(0, 0, 0); set(1, 0, 20); set(4, 0, 0);
+  set(0, 3, (com ?? rig.com).x + BIKE_GEOMETRY_V2.chassisToAxle.x);
+  set(1, 3, 20 + (com ?? rig.com).y + BIKE_GEOMETRY_V2.chassisToAxle.y);
+  set(4, 3, torso - RIDER_TORSO_REST);
+  set(2, 0, -1); set(3, 0, 2); set(5, 0, -3);
+  set(2, 3, 5); set(3, 3, -4); set(5, 3, 6);
+  world.restore(snapshot);
+  return { world, probe: world as unknown as RiderConstraintProbe };
+}
+function snapshotPair(snapshot: PhysicsSnapshot): Bodies {
+  const n = (snapshot.f64.length - NSCALAR) / 8;
+  const body = (b: number) => {
+    const at = (column: number) => snapshot.f64[NSCALAR + column * n + b]!;
+    return { x: at(0), y: at(1), vx: at(2), vy: at(3), w: at(5), m: 1 / at(6), I: 1 / at(7) };
+  };
+  return { c: body(0), r: body(3) };
+}
+
+describe('rider constraints beyond their anatomical stops', () => {
+  const witnesses = [[-0.3, 1.05, 40], [-0.7, 0.6, 55], [-0.4, 0.35, 55], [0.1, 0.1, -160], [0.4, 0.1, -160]] as const;
+
+  it('retains all joint rows and conserves actual body momentum while removing violating velocity', () => {
+    for (const [x, y, degrees] of witnesses) {
+      const { world, probe } = constraintWorld(x, y, degrees);
+      probe.prepareRiderLimits();
+      for (const row of probe.riderLimits) expect(row.mass).toBeGreaterThan(0);
+      // Drive the most violated stop outward; otherwise an arbitrary velocity may already
+      // be separating and correctly need no unilateral impulse.
+      const violated = probe.riderLimits.reduce((a, b) => a.gap < b.gap ? a : b);
+      const moving = world.snapshot(), n = (moving.f64.length - NSCALAR) / 8;
+      for (const body of [0, 3]) for (const column of [2, 3, 5]) moving.f64[NSCALAR + column * n + body] = 0;
+      moving.f64[NSCALAR + 2 * n + 3] = -violated.nx;
+      moving.f64[NSCALAR + 3 * n + 3] = -violated.ny;
+      moving.f64[NSCALAR + 5 * n + 3] = -violated.jr;
+      world.restore(moving);
+      probe.prepareRiderLimits();
+      const before = conserved(snapshotPair(world.snapshot()));
+      for (let iteration = 0; iteration < 20; iteration++) probe.solveRiderLimits();
+      const after = conserved(snapshotPair(world.snapshot()));
+      expect(probe.riderLimits.some(row => row.impulse > 0)).toBe(true);
+      expect(after.px).toBeCloseTo(before.px, 9);
+      expect(after.py).toBeCloseTo(before.py, 9);
+      expect(after.L).toBeCloseTo(before.L, 8);
+      expect(after.energy).toBeLessThanOrEqual(before.energy + 1e-9);
+    }
+  });
+
+  it('recovers perturbed stops in the existing position pass without changing pair COM or velocities', () => {
+    // Moderate violations converge in one position solve. Severe folded witnesses need repeated
+    // recovery; measure their reduction separately rather than calling them instantly attached.
+    for (const [x, y, degrees] of witnesses.slice(0, 3)) {
+      const { world, probe } = constraintWorld(x, y, degrees);
+      const before = snapshotPair(world.snapshot());
+      probe.prepareRiderLimits();
+      expect(Math.min(...probe.riderLimits.map(row => row.gap))).toBeLessThan(-0.05);
+      probe.projectRiderLimits();
+      expect(Math.min(...probe.riderLimits.map(row => row.gap))).toBeGreaterThan(-1e-6);
+      const after = snapshotPair(world.snapshot());
+      for (const axis of ['x', 'y'] as const) {
+        expect(after.c.m * after.c[axis] + after.r.m * after.r[axis]).toBeCloseTo(before.c.m * before.c[axis] + before.r.m * before.r[axis], 9);
+      }
+      for (const name of ['c', 'r'] as const) for (const velocity of ['vx', 'vy', 'w'] as const) expect(after[name][velocity]).toBe(before[name][velocity]);
+    }
+  });
+
+  it('an unresolved inverse keeps physical recovery rows active instead of silently detaching', () => {
+    // An arbitrary COM, rather than one obtained from a forward pose, catches the residual
+    // fallback itself. The bounded solve retains a ~1mm residual at this extrapolated fold.
+    const com = { x: 0.2, y: 0.4 }, degrees = 100;
+    const rig = riderRigFromCOM(com.x, com.y, degrees * Math.PI / 180, makeRiderRigPose());
+    expect(rig.residual).toBeGreaterThan(1e-4);
+    expect(rig.residual).toBeLessThan(0.002);
+    const { world, probe } = constraintWorld(0, 0, degrees, com);
+    probe.prepareRiderLimits();
+    expect(probe.riderLimits.every(row => Number.isFinite(row.mass) && row.mass > 0)).toBe(true);
+    const violation = -Math.min(...probe.riderLimits.map(row => row.gap));
+    probe.projectRiderLimits();
+    expect(-Math.min(...probe.riderLimits.map(row => row.gap))).toBeLessThan(violation / 10);
+    for (const body of Object.values(snapshotPair(world.snapshot()))) expect(Object.values(body).every(Number.isFinite)).toBe(true);
+    // This deliberately checks recovery, not instant attachment of an arbitrary impossible
+    // starting configuration; normal reachable poses and impact attachment are checked above.
+  });
+
+  it('reduces severe folded violations below 0.5mm/rad with bounded repeated recovery', () => {
+    for (const [x, y, degrees] of witnesses.slice(3)) {
+      const { world, probe } = constraintWorld(x, y, degrees);
+      const saved = world.snapshot();
+      probe.prepareRiderLimits();
+      expect(Math.min(...probe.riderLimits.map(row => row.gap))).toBeLessThan(-0.3);
+      for (let iteration = 0; iteration < 60; iteration++) probe.projectRiderLimits();
+      expect(Math.min(...probe.riderLimits.map(row => row.gap))).toBeGreaterThan(-5e-4);
+      const end = world.snapshot();
+      world.restore(saved);
+      for (let iteration = 0; iteration < 60; iteration++) probe.projectRiderLimits();
+      expect(new Uint8Array(world.snapshot().f64.buffer)).toEqual(new Uint8Array(end.f64.buffer));
     }
   });
 });

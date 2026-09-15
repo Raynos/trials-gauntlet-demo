@@ -73,8 +73,8 @@ export interface GarageCallbacks {
   previewBike(b: BikeClass): void;
   /** Confirmed: persist. */
   setBike(b: BikeClass): void;
-  /** Confirmed clothing choice; cosmetic and independent of the bike class. */
-  setOutfit(outfit: RiderOutfit): void;
+  /** Load and commit clothing; false leaves the existing outfit selected. */
+  setOutfit(outfit: RiderOutfit): Promise<boolean>;
   back(): void;
 }
 
@@ -102,6 +102,9 @@ export class GarageScreen {
   private focusGroup: 'bike' | 'outfit' | 'back' = 'bike';
   private outfitFocus: RiderOutfit = DEFAULT_RIDER_OUTFIT;
   private currentOutfit: RiderOutfit = DEFAULT_RIDER_OUTFIT;
+  private pendingOutfit: RiderOutfit | null = null;
+  private failedOutfit: RiderOutfit | null = null;
+  private outfitRequest = 0;
 
   constructor(
     parent: HTMLElement,
@@ -262,8 +265,13 @@ export class GarageScreen {
       button.classList.toggle('on', this.focusGroup === 'outfit' && outfit === this.outfitFocus);
       button.classList.toggle('selected', outfit === this.currentOutfit);
       button.setAttribute('aria-pressed', String(outfit === this.currentOutfit));
+      button.setAttribute('aria-busy', String(outfit === this.pendingOutfit));
     }
-    const status = `${OUTFIT_LABEL[this.currentOutfit]} selected`;
+    const status = this.pendingOutfit
+      ? `Loading ${OUTFIT_LABEL[this.pendingOutfit]}…`
+      : this.failedOutfit
+        ? `Could not load ${OUTFIT_LABEL[this.failedOutfit]}. Select it to retry. ${OUTFIT_LABEL[this.currentOutfit]} selected.`
+        : `${OUTFIT_LABEL[this.currentOutfit]} selected`;
     if (this.outfitStatus.textContent !== status) this.outfitStatus.textContent = status;
     this.backButton.classList.toggle('on', this.focusGroup === 'back');
   }
@@ -286,10 +294,22 @@ export class GarageScreen {
     if (!this.canAct()) return;
     if (this.focusGroup === 'back') return this.back();
     if (this.focusGroup === 'outfit') {
-      this.currentOutfit = this.outfitFocus;
-      this.cb.setOutfit(this.currentOutfit);
-      this.sfx.confirm();
+      const outfit = this.outfitFocus;
+      if (this.pendingOutfit === outfit) return;
+      const request = ++this.outfitRequest;
+      this.pendingOutfit = outfit;
+      this.failedOutfit = null;
       this.paint();
+      void this.cb.setOutfit(outfit).catch(() => false).then((loaded) => {
+        if (request !== this.outfitRequest) return;
+        this.pendingOutfit = null;
+        this.failedOutfit = loaded ? null : outfit;
+        if (loaded) {
+          this.currentOutfit = outfit;
+          this.sfx.confirm();
+        }
+        this.paint();
+      });
       return;
     }
     this.current = this.focus;

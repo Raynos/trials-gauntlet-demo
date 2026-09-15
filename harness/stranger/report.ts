@@ -14,11 +14,12 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { median, srcFingerprint } from '../lib/metrics';
+import { median } from '../lib/metrics';
+import { strangerFingerprint } from './provenance';
 import { REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
 import type { AttemptLog, BestAttempt, StrangerSession } from '../lib/schema';
-import { createSim } from '../lib/sim';
+import { createProductionSim } from '../lib/production-sim';
 import { STRANGER_OUT, type PersistedState } from './session';
 
 export interface Death {
@@ -38,6 +39,7 @@ export interface SessionRow {
   status: 'done' | 'in-progress' | 'abandoned';
   stale: boolean;
   srcFingerprint: string | null;
+  replayVerified: boolean | null;
   strangerAttempts: number;
   cleared: boolean;
   finishTime: number | null;
@@ -87,8 +89,8 @@ function readJson<T>(f: string): T | null {
 
 export async function report(trackId: string, o: { fresh?: boolean } = {}): Promise<{ metrics: StrangerMetricsFile; markdown: string; jsonFile: string; mdFile: string }> {
   const fresh = o.fresh ?? true;
-  const sim = await createSim(trackId);
-  const fp = srcFingerprint();
+  const sim = createProductionSim(trackId);
+  const fp = strangerFingerprint();
   const placed = sim.compiled.placed;
   const nearest = (x: number): string | null => {
     let best: { kind: string; x: number } | null = null;
@@ -114,8 +116,9 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
           sessionId: done.sessionId,
           agent: done.agent,
           status: 'done',
-          stale: stamp !== fp,
+          stale: stamp !== fp || done.physics !== 'production-Game-v2',
           srcFingerprint: stamp,
+          replayVerified: done.replayVerified,
           strangerAttempts: done.strangerAttempts,
           cleared: done.cleared,
           finishTime: done.finishTime,
@@ -137,8 +140,9 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
         sessionId: st.sessionId,
         agent: st.agent,
         status: abandoned ? 'abandoned' : 'in-progress',
-        stale: false,
-        srcFingerprint: null,
+        stale: st.schema !== 2 || st.srcFingerprint !== fp || st.physics !== 'production-Game-v2',
+        srcFingerprint: st.srcFingerprint ?? null,
+        replayVerified: null,
         strangerAttempts: 1 + st.attempts.length,
         cleared: st.cleared,
         finishTime: st.finishTime,
@@ -153,7 +157,7 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
     }
   }
 
-  const counted = rows.filter((r) => r.status === 'done' && (!fresh || !r.stale));
+  const counted = rows.filter((r) => r.status === 'done' && r.replayVerified === true && (!fresh || !r.stale));
   const cleared = counted.filter((r) => r.cleared);
   const band = sim.track.meta?.attemptsBand ?? null;
   const med = (xs: number[]): number | null => (xs.length ? median(xs) : null);
@@ -215,7 +219,7 @@ export function toMarkdown(m: StrangerMetricsFile): string {
     const died = r.deaths.length ? r.deaths.map((d) => `${d.reason}@${d.x.toFixed(0)}m${d.obstacle ? ` (${d.obstacle.split(' @ ')[0]})` : ''}`).join(', ') : '—';
     const best = r.bestAttempt ? `#${r.bestAttempt.n} ${r.bestAttempt.cleared ? 'clear' : `${r.bestAttempt.x.toFixed(0)} m`} ticks ${r.bestAttempt.startTick}–${r.bestAttempt.endTick}` : '—';
     lines.push(
-      `| ${r.sessionId} | ${r.agent} | ${r.status}${r.stale ? ' (stale src)' : ''} | ${r.strangerAttempts} | ${r.cleared ? 'yes' : 'no'} | ${fmtS(r.finishTime)} | ${r.calls} | ${(r.wallMs / 60000).toFixed(1)} min | ${r.firstCheckpointCalls ?? '—'} | ${died} | ${best} |`,
+      `| ${r.sessionId} | ${r.agent} | ${r.status}${r.stale ? ' (stale src)' : ''}${r.status === 'done' && r.replayVerified !== true ? ' (replay unverified)' : ''} | ${r.strangerAttempts} | ${r.cleared ? 'yes' : 'no'} | ${fmtS(r.finishTime)} | ${r.calls} | ${(r.wallMs / 60000).toFixed(1)} min | ${r.firstCheckpointCalls ?? '—'} | ${died} | ${best} |`,
     );
   }
   if (m.deaths.total > 0) {

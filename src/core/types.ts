@@ -352,7 +352,8 @@ export type RiderOutfit = 'street' | 'race';
 
 /** Optional renderer capability for changing clothing without loading a different track. */
 export interface RiderOutfitRenderer {
-  setRiderOutfit?(outfit: RiderOutfit): void;
+  /** True only after the requested outfit is available for both detail levels. */
+  setRiderOutfit?(outfit: RiderOutfit): Promise<boolean>;
 }
 
 /**

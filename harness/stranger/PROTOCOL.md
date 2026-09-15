@@ -12,7 +12,7 @@ Rules of the game:
   you are already standing at the checkpoint, ready for the next `play`. **The clock keeps running**
   and your fault count goes up by one. Attempts = 1 + faults.
 - There is no undo. Time only goes forward. Every command is final.
-- Budget: **150 calls or 25 minutes** from `start`, whichever comes first. **Every command is a call**,
+- Budget: **150 calls or 25 minutes** from your first call, whichever comes first. **Every command is a call**,
   `look` and `status` included. When the budget is gone, `play`/`restart`/`reset` answer
   `{"budget":"exhausted"}`; call `done` at that point.
 
@@ -21,7 +21,7 @@ Rules of the game:
 Everything runs from the game's folder. Open a shell there and start your session:
 
 ```
-cd /Users/raynos/projects/game-demos/trials-gauntlet-demo
+cd /Users/raynos/projects/game-demos/trials-gauntlet-blender
 pnpm harness:stranger start --track b1-first-ride --agent <your-name>
 ```
 
@@ -43,11 +43,11 @@ pnpm harness:stranger <cmd> [args] --session <id>
 | command | what it does |
 | --- | --- |
 | `start --track <id> --agent <name>` | create your session (once). Prints the session id, the track card and the screen. |
-| `play "<slots>"` | drive for up to 40 slots of 1/8 s each. Prints a JSON summary, one trace line per slot (`x`, `vx`, angle, ground/AIR), **then the screen**. Stops early at a crash (after the auto-respawn) or at the finish. **This is the only command you normally need.** |
+| `play "<slots>"` | drive for up to 40 slots of 1/8 s each. Prints a JSON summary, one trace line per action (`x`, `vx`, angle, ground/AIR), **then the screen**. Stops early at a crash (after the auto-respawn) or at the finish. **This is the only command you normally need.** |
 | `look` | the track card and the screen again, without moving. Costs a call; `play` already shows you the screen, so you rarely need it. |
 | `status` | the JSON numbers only. |
 | `restart` | give up a **live** attempt: back to the last checkpoint, stationary (counts as a fault). Never needed after a crash — the crash already respawned you there. |
-| `reset` | back to the **start line**, checkpoints forgotten, faults kept (counts as a fault). Almost never worth it: a checkpoint respawn keeps your progress. |
+| `reset` | back to the **start line** with the game run clock and displayed faults reset; earlier failures still count toward your session attempts. Almost never worth it: a checkpoint respawn keeps your progress. |
 | `done` | end the session and write the result. Call it exactly once, when finished or stuck. |
 
 ## What you see
@@ -93,47 +93,34 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
 | `lb` | lean back (no gas) | rotate nose up in the air |
 | `lf` | lean forward (no gas) | rotate nose down in the air |
 | `t` | tap gas (a short blip, then coast for the rest of the slot) | inch forward, balance |
-| `h` | **the hop** (5 slots): light gas + lean back for 0.3 s, snap to lean forward for 0.22 s, tuck | onto a ledge or box about knee-high (rear wheel rises ~0.5 m); start it about a bike length before the face |
-| `wh` | **wheelie hold** (4 slots): holds the front wheel up at ~40 deg with the throttle, leaning a little back | after `gb` has lifted the front; chain `wh wh wh` to keep it up |
-| `ct` | **climb** (4 slots): base gas with neutral weight until the front wheel is on the face, then weight forward + gas | steep planks and steps around 40-45 deg; a front-heavy approach cannot climb them |
+| `h` | **hop** (6 slots, 0.75 s): full gas + back for 0.3 s, full gas + forward for 0.267 s, then gas off + back for 0.1 s; neutral for the remaining 0.083 s | preload, snap forward, then tuck; approach speed and takeoff position matter |
+| `wh` | **wheelie hold** (4 slots): targets a front-wheel angle of ~40 deg with the throttle, leaning a little back | after `gb` has lifted the front; read the resulting angle |
+| `ct` | **climb** (4 slots): base gas with neutral weight until the front wheel is on the face, then weight forward + gas | tries to move weight forward once the front wheel meets a rise; read the resulting angle |
 
-`h`, `wh` and `ct` count as 5 / 4 / 4 slots of the 40.
+`h`, `wh` and `ct` count as 6 / 4 / 4 slots of the 40.
 
 ## How the bike feels
 
-- **It is not quick off the line.** 0 to 16 m/s takes about 4 s of full gas on the flat; top speed is
-  20 m/s. Give run-ups the slots they need (`g32` is 4 s) and count on the ruler.
-- **Full gas with the weight back lifts the front.** Neutral (`g`) does not loop; `gb` held for more
-  than ~1 s does. The balance point of a wheelie is about 50 deg nose up with no lean, ~40 deg leaning
-  back a little (that is what `wh` regulates).
-- **The hop is a move, not a button:** lean back on light gas to load the bike (~0.3 s), then snap the
-  weight forward. `h` is that recipe; `gb2 gf2 lb1` is the same thing by hand.
-- **Drops are safe.** A 3 m drop at speed lands and rides away; a nose-down landing dips the front hard,
-  so come off a ledge with a touch of `lb`. Down a long ramp a held `lb` is fine (it rides any drop to
-  ~1.8 m); down a **stair flight** a held `lb` loops the bike — descend stairs on plain `g` or `c`, neutral.
-- **Stairs are shin-high steps** (0.15 m risers, flights of a few steps). Plain `g` rides a flight up or
-  down at any speed; a brake on or just before a step, or a lean held through the flight, is the only
-  way to fall on them. Do not wheelie into them, do not brake on them.
-- **Ledges you hop onto come ~6 m after their checkpoint.** That is hop speed (5-8 m/s) from a standing
-  start, so ride `g` from the checkpoint and start `h` about a bike length before the face. Arriving fast
-  (11+ m/s) and braking flat stands the bike on its front wheel into the face: brake early with the
-  weight back (`bb`), never at the face.
-- **Climbs are geometry.** Weight forward holds ~37 deg at a crawl; 40-45 deg needs the front wheel on
-  the face first and then the throw (`ct`); anything steeper wants speed.
-- **In the air, gas and brake are nudges; the lean is the control.** A gas tap lifts the nose ~6 deg in
-  half a second, a brake tap drops it ~15. A held lean *accelerates* the rotation (a full lean builds
-  ~170 deg/s in half a second) and letting go swings the bike another ~30 deg the other way (release a
-  lean-back and the nose pops up 30 more). So: lean briefly (`lb1`/`lf1`, at most 2 slots), release
-  early, and fly a beat with `c` before you correct again. Holding `lb` or `lf` for 4+ slots is a flip.
-- **Ramps and kickers.** Ride them with the weight forward (`gf`) and let go at the lip (`c`): the bike
-  leaves a knee-high kicker at about 8 m/s under full gas and lands level-ish on its own. Braking on the
-  ramp face or just before a riser drops the nose over the bars; slow down *before* the ramp, not on it.
+- **Gas and weight work together.** `gb` loads the rear and lifts the front; `gf` moves weight forward.
+  Watch the angle and speed after each action, especially near a ledge.
+- **Hop by loading, snapping forward, then tucking.** `h` uses the full-gas recipe above. From a settled
+  Rookie bike on flat ground, this recipe lifts both tyre bottoms more than 0.45 m and lands without a
+  fault. That is a flat-ground result, not a promise to clear every 0.45 m obstacle. Moving approaches,
+  slopes and Pro need their own timing. `gb2 gf2 lb1` has different durations and is not the same recipe.
+- **Brake early enough to settle before a face.** Landing attitude and approach speed affect recovery;
+  do not assume a drop, stair flight or ramp is safe at every speed.
+- **Make short corrections in the air.** Try `lb1` or `lf1`, release to `c`, and read the next angle.
+  A long held lean can over-rotate the bike.
+- **Discover the track by riding.** `wh` and `ct` are automatic wheelie/climb helpers, not guaranteed
+  solutions. Use the screen and trace to see whether they help on this approach.
+- **Session attempts survive full resets.** `faults` and `runTime` show the current game run. `attempt`
+  counts all failures in your session, including those before a full `reset`. Resetting does not erase
+  those failures from the final stranger result.
 
 ## Spending calls well
 
 - **Send the whole plan you are confident in, in one `play`.** The call stops by itself at a crash or
-  the finish, and unplayed slots cost nothing. A crash costs an attempt, never extra calls. Chopping a
-  plan into 4-slot pieces costs a call per piece and gains nothing you cannot read from the trace.
+  the finish, and unplayed slots cost nothing. A crash costs an attempt, never extra calls. Shorter calls cost more calls but let you react to a new angle or obstacle sooner.
 - **Do not `look` after a `play`** — the screen is already at the bottom of the `play` output. `look` is
   for when you want the track card back.
 - **Read the trace.** The angle column shows a wheelie or a flight developing slot by slot; `AIR`
@@ -147,41 +134,14 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
   controls (no gas, no lean, gentle brake) and rolls you to a stop on the run-out; the summary's
   `runOut` says where you stopped. Nothing after the line can cost a fault.
 
-## Example session
+## Example commands
 
-```
-$ pnpm harness:stranger look --session flat-test-20260914-002749
-track flat-test (beginner) "Flat Test Strip"
-checkpoints at x = 40, 80 m; finish at x = 120 m
-{"x":0.57,"y":0.48,"vx":0,"angle_deg":0,"grounded":false,"checkpoint":-1,"checkpointCount":2,"faults":0,"attempt":1,"runTime":0,"finishX":120,"distanceToFinish":119.43,...}
-view x -4..36 m, y -1.0..7.0 m  (B bike, | checkpoint, F finish, _/\ ground, # box, o drum, ~ seesaw, x hazard)
-(... 16 rows of side-view ...)
-__________B_____________________________________________________________________
-        0                   10                  20                  30
-$ pnpm harness:stranger play "g40" --session flat-test-20260914-002749
-{"attempt":1,"slots":"g40","slotsPlayed":40,"slotsRequested":40,"before":{"x":0.57,"vx":0,"angle_deg":0},"after":{"x":69.65,"vx":16.35,"angle_deg":36.7},"events":[{"t":3.167,"type":"checkpoint","index":0}],"checkpoint":0,"grounded":true,"faults":0,"runTime":5,"distanceToFinish":50.35,...}
-01 g   x=   0.6 vx=  0.5 ang=   2 ground
-02 g   x=   0.7 vx=  1.8 ang=   7 ground
-(... one line per slot ...)
-40 g   x=  69.7 vx= 16.4 ang=  37 ground
-view x 65..105 m, y -1.0..7.0 m  (B bike, | checkpoint, F finish, _/\ ground, # box, o drum, ~ seesaw, x hazard)
-                              |
-(... side-view from the new position: the next checkpoint is the | at x = 80 ...)
-          B                   |
-________________________________________________________________________________
-          70                  80                  90                  100
-$ pnpm harness:stranger play "g40" --session flat-test-20260914-002749
-{"attempt":1,"slots":"g40","slotsPlayed":25,"slotsRequested":40,...,"events":[{"t":5.592,"type":"checkpoint","index":1},{"t":8.067,"type":"finish"}],"finished":true,"note":"FINISHED at run time 8.0667s. Call 'done'."}
-$ pnpm harness:stranger done --session flat-test-20260914-002749
-stranger flat-test session=flat-test-20260914-002749 attempts=1 cleared=yes finish=8.067s calls=4 wall=41.2s
-DONE
+```sh
+pnpm harness:stranger look --session <your-session>
+pnpm harness:stranger play "c4 h c8" --session <your-session>
+pnpm harness:stranger status --session <your-session>
+pnpm harness:stranger done --session <your-session>
 ```
 
-A crash looks like this (the remaining slots are dropped; you are already back at the checkpoint):
-
-```
-{"attempt":1,"slots":"g40","slotsPlayed":20,"slotsRequested":40,...,"faults":1,"runTime":3.45,"faulted":{"reason":"crash","at":27.11,"respawnedAt":0.57,"respawnAfterS":1},"note":"crashed (crash) at x=27.1 after slot 20; the game respawned you 1.0 s later at checkpoint -1 (x=0.6), stationary, facing +x. Remaining 20 slot(s) were NOT played; your next play starts here."}
-```
-
-When you have finished the track, or you are stuck and out of ideas or budget, run `done` and then
-reply with the single word **DONE** followed by one sentence on what the hardest part was.
+This settles for half a second, performs one hop, then coasts for one second. Choose controls for
+what is on your screen; the example is not a track-clearing script.

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArtManifest } from './art';
+import type { RiderOutfit } from '../core/types';
 import { GarageScreen } from './garage';
 import { LIVE_DELAY_MS, resetLive, setLiveClock, tickLive } from './live';
 import type { UiSfx } from './sfx';
@@ -19,7 +20,7 @@ afterEach(() => {
 });
 
 function fixture() {
-  const cb = { previewBike: vi.fn(), setBike: vi.fn(), setOutfit: vi.fn(), back: vi.fn() };
+  const cb = { previewBike: vi.fn(), setBike: vi.fn(), setOutfit: vi.fn<(outfit: RiderOutfit) => Promise<boolean>>().mockResolvedValue(true), back: vi.fn() };
   const sfx = { tick: vi.fn(), confirm: vi.fn(), back: vi.fn() };
   const art = { whenReady: () => undefined } as unknown as ArtManifest;
   const garage = new GarageScreen(document.body, sfx as unknown as UiSfx, art, cb);
@@ -48,7 +49,7 @@ describe('garage rider outfits', () => {
     expect(garage.root.querySelector('[role="status"]')?.textContent).toBe('Race kit selected');
   });
 
-  it('commits a touch/click choice once through the outfit callback without changing the bike', () => {
+  it('commits a touch/click choice once through the outfit callback without changing the bike', async () => {
     const { garage, outfit, cb, makeLive } = fixture();
     garage.show('pro', 'street');
     makeLive();
@@ -57,7 +58,44 @@ describe('garage rider outfits', () => {
     expect(cb.setOutfit).toHaveBeenCalledExactlyOnceWith('race');
     expect(cb.setBike).not.toHaveBeenCalled();
     expect(cb.previewBike).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(outfit('race').getAttribute('aria-pressed')).toBe('true'));
     expect(outfit('race').getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('keeps the selected outfit during failure and supports an explicit retry', async () => {
+    const { garage, outfit, cb, makeLive } = fixture();
+    let finish!: (ok: boolean) => void;
+    cb.setOutfit.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+    garage.show('rookie', 'street');
+    makeLive();
+    outfit('race').click();
+    outfit('race').click();
+    expect(cb.setOutfit).toHaveBeenCalledTimes(1);
+    expect(outfit('street').getAttribute('aria-pressed')).toBe('true');
+    expect(outfit('race').getAttribute('aria-busy')).toBe('true');
+    expect(garage.root.querySelector('[role="status"]')?.textContent).toBe('Loading Race kit…');
+    finish(false);
+    await vi.waitFor(() => expect(garage.root.querySelector('[role="status"]')?.textContent).toContain('Select it to retry'));
+    expect(outfit('street').getAttribute('aria-pressed')).toBe('true');
+    outfit('race').click();
+    await vi.waitFor(() => expect(outfit('race').getAttribute('aria-pressed')).toBe('true'));
+    expect(cb.setOutfit).toHaveBeenCalledTimes(2);
+    expect(garage.root.querySelector('[role="status"]')?.textContent).toBe('Race kit selected');
+  });
+
+  it('ignores an older result after the player selects another outfit', async () => {
+    const { garage, outfit, cb, makeLive } = fixture();
+    let finish!: (ok: boolean) => void;
+    cb.setOutfit.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+    garage.show('rookie', 'street');
+    makeLive();
+    outfit('race').click();
+    outfit('street').click();
+    await vi.waitFor(() => expect(garage.root.querySelector('[role="status"]')?.textContent).toBe('Street selected'));
+    finish(true);
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
+    expect(outfit('street').getAttribute('aria-pressed')).toBe('true');
+    expect(outfit('race').getAttribute('aria-busy')).toBe('false');
   });
 
   it('shares directional and confirm navigation for keyboard/gamepad without committing focus', () => {

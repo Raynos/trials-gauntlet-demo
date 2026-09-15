@@ -203,7 +203,9 @@ describe('R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas'
       return { w, snapAt: 90 };
     };
     const a = run();
-    stepN(a.w, { throttle: 1 }, a.snapAt);
+    // Find an actual assisted state. A fixed historical tick can fall before or after
+    // intervention when the physical mass profile and suspension are corrected.
+    for (let tick = 0; tick < 240 && a.w.debug().engine.assist <= 0; tick++) stepN(a.w, { throttle: 1 }, 1);
     expect(a.w.debug().engine.assist).toBeGreaterThan(0);
     const snap = a.w.snapshot();
     const straight = stepN(a.w, { throttle: 1 }, 120);

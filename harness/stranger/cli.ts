@@ -24,12 +24,15 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { DEFAULT_BIKE, type BikeClass, type GameEvent, type InputFrame, type PhysicsState } from '../../src/core/types';
 import { parseBike } from '../lib/sim';
+import { ruleTicks } from '../../src/game/rules';
+import { strangerFingerprint } from './provenance';
 import { encodeJSON } from '../../src/core/replay';
-import { ACTIONS, COAST, RESTART_FRAME, formatActions, macroFrameAt, macroTicks, parseSlots, type MacroCtx } from '../bot/actions';
+import { ACTIONS, COAST, RESTART_FRAME, formatActions, macroFrameAt, macroTicks, parseSlots, type MacroCtx } from './controls';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
-import { attemptsFromEvents, countedFaults, faultsByCheckpoint, runMeta, srcFingerprint } from '../lib/metrics';
+import { attemptsFromEvents, countedFaults, faultsByCheckpoint, runMeta } from '../lib/metrics';
 import { REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
 import type { BestAttempt, StrangerSession } from '../lib/schema';
@@ -47,6 +50,7 @@ import {
   saveSession,
   stampId,
   wallMs,
+  verifySessionReplay,
   type LoadedSession,
   type PersistedEvent,
   type PersistedState,
@@ -79,9 +83,9 @@ interface Numbers {
   budget: { callsLeft: number; secondsLeft: number };
 }
 
-function numbers(s: LoadedSession): Numbers {
+export function numbers(s: LoadedSession): Numbers {
   const st = s.sim.state();
-  const faults = countedFaults(s.state.events).length;
+  const faults = s.sim.faults();
   const b = budgetLeft(s);
   return {
     x: round(st.bike.pos.x, 2),
@@ -92,14 +96,14 @@ function numbers(s: LoadedSession): Numbers {
     checkpoint: st.checkpoint,
     checkpointCount: s.sim.track.checkpoints.length,
     faults,
-    attempt: 1 + faults,
+    attempt: attemptsFromEvents(s.state.events),
     // The run clock freezes at the line (Game.runTime): the coast ticks after it do not count.
-    runTime: s.state.cleared && s.state.finishTime !== null ? s.state.finishTime : round(s.state.runTicks / s.state.physicsHz, 3),
+    runTime: round(s.sim.runTime(), 3),
     finishX: s.sim.track.finishX,
     distanceToFinish: round(s.sim.track.finishX - st.bike.pos.x, 2),
     cleared: s.state.cleared,
     finishTime: s.state.finishTime,
-    ...(s.state.cleared ? { runOut: { x: round(st.bike.pos.x, 2), stopped: isStopped(st), frozen: s.sim.rules.finishFrozen() } } : {}),
+    ...(s.state.cleared ? { runOut: { x: round(st.bike.pos.x, 2), stopped: isStopped(st), frozen: (s.sim.snap().counters.finishFrozen ?? false) } } : {}),
     budget: { callsLeft: b.callsLeft, secondsLeft: b.secondsLeft },
   };
 }
@@ -112,8 +116,8 @@ function isStopped(st: PhysicsState): boolean {
 const FINISH_COAST_MAX_S = 4;
 
 /**
- * Mirror of what the player watches after the line: the game feeds throttle 0 / lean 0 and a
- * 0 → 0.6 brake ramp (`Game.stepFinishCoast`, via `lib/rules.ts`), the bike rolls out and stops
+ * What the production game shows after the line: the game feeds throttle 0 / lean 0 and a
+ * 0 → 0.6 brake ramp (`Game.stepFinishCoast`), the bike rolls out and stops
  * on the run-out; a post-line fault is undone and the world freezes. The frames recorded here
  * are ignored by the finished game, so the replay hashes the same in the browser whatever they
  * hold; COAST keeps the recording honest about what the player did (let go).
@@ -121,12 +125,12 @@ const FINISH_COAST_MAX_S = 4;
 function finishCoast(s: LoadedSession): { seconds: number; stoppedAt: number; stopped: boolean; frozen: boolean } {
   const max = Math.round(FINISH_COAST_MAX_S * s.state.physicsHz);
   let n = 0;
-  while (n < max && s.sim.phase() === 'finished' && !s.sim.rules.finishFrozen() && !isStopped(s.sim.state())) {
+  while (n < max && s.sim.phase() === 'finished' && !(s.sim.snap().counters.finishFrozen ?? false) && !isStopped(s.sim.state())) {
     tick(s, COAST);
     n++;
   }
   const st = s.sim.state();
-  return { seconds: round(n / s.state.physicsHz, 2), stoppedAt: round(st.bike.pos.x, 2), stopped: isStopped(st), frozen: s.sim.rules.finishFrozen() };
+  return { seconds: round(n / s.state.physicsHz, 2), stoppedAt: round(st.bike.pos.x, 2), stopped: isStopped(st), frozen: (s.sim.snap().counters.finishFrozen ?? false) };
 }
 
 /** The side-view; once the run is over the finish line stays in frame beside the stopped bike. */
@@ -174,7 +178,7 @@ function compact(e: PersistedEvent): CompactEvent {
 }
 
 /** One recorded tick. Returns the persisted (non-land) events it produced. */
-function tick(s: LoadedSession, frame: InputFrame): PersistedEvent[] {
+export function tick(s: LoadedSession, frame: InputFrame): PersistedEvent[] {
   s.recorder.push(frame);
   const evs = s.sim.step(frame);
   s.state.runTicks++;
@@ -189,24 +193,20 @@ function tick(s: LoadedSession, frame: InputFrame): PersistedEvent[] {
     if (event.type === 'finish' && !s.state.cleared) {
       s.state.cleared = true;
       // The game's run clock (reset by a full restart, frozen at the line) — what the results panel shows.
-      s.state.finishTime = round(s.sim.runTime(), 4);
+      s.state.finishTime = s.sim.runTime();
     }
   }
   return out;
 }
 
 /**
- * If the sim is not riding at the expected checkpoint after a respawn, reset the
- * world directly and flag it: the recording cannot express that (never seen on the
- * real physics; kept as the safety net the metrics audit via `forcedResets`).
+ * A respawn must come from recorded production-Game inputs. An unexpected phase/checkpoint
+ * is a command failure; directly resetting physics would make the recording dishonest.
  */
 function ensureRiding(s: LoadedSession, checkpoint: number): boolean {
   const st = s.sim.state();
   if (s.sim.phase() === 'riding' && st.checkpoint === checkpoint) return false;
-  s.sim.world.reset(checkpoint);
-  s.sim.world.drainEvents();
-  s.state.forcedResets++;
-  return true;
+  throw new Error(`production Game did not respawn at checkpoint ${checkpoint}; refusing an unrecorded physics reset`);
 }
 
 /**
@@ -222,13 +222,13 @@ function respawn(s: LoadedSession, checkpoint: number): { events: PersistedEvent
 /**
  * What happens after a crash when the player does nothing: the bike tumbles and the
  * game respawns it at the checkpoint after `T.autoRespawn` (1.0 s) of run clock
- * (`harness/lib/rules.ts`, phase 'crashed'). Coast frames only: the player has let
+ * (`src/game/game.ts`, phase 'crashed'). Coast frames only: the player has let
  * go. Recorded, so a replay respawns at the same tick.
  */
 function autoRespawn(s: LoadedSession, checkpoint: number): { events: PersistedEvent[]; forcedReset: boolean; waitTicks: number } {
   const events: PersistedEvent[] = [];
   let waitTicks = 0;
-  const limit = s.sim.rules.T.autoRespawn + 2;
+  const limit = ruleTicks(s.state.physicsHz).autoRespawn + 2;
   while (s.sim.phase() === 'crashed' && waitTicks < limit) {
     events.push(...tick(s, COAST));
     waitTicks++;
@@ -257,9 +257,10 @@ interface PlayResult {
   note?: string;
 }
 
-function play(s: LoadedSession, text: string): { result: PlayResult; trace: string[] } {
+export function play(s: LoadedSession, text: string): { result: PlayResult; trace: string[] } {
   const ids = parseSlots(text, MAX_SLOTS);
   const before = brief(s.sim.state());
+  const requested = ids.reduce((sum, id) => sum + ACTIONS[id]!.slots, 0);
   const attemptAtStart = attemptsFromEvents(s.state.events);
   const events: PersistedEvent[] = [];
   const trace: string[] = [];
@@ -274,7 +275,9 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
     const ctx: MacroCtx = {};
     let slotFault: PersistedEvent | null = null;
     const marks: string[] = [];
+    let actionTicks = 0;
     for (let i = 0; i < macroTicks(id); i++) {
+      actionTicks++;
       const evs = tick(s, macroFrameAt(id, i, () => s.sim.state(), ctx));
       events.push(...evs);
       for (const e of evs) {
@@ -286,7 +289,7 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
     }
     if (finished) marks.push('FINISH');
     if (slotFault && slotFault.event.type === 'fault') marks.push(`CRASH (${slotFault.event.reason})`);
-    played++;
+    played += Math.ceil(actionTicks / 15);
     const st = s.sim.state();
     const g = st.wheels.rear.grounded || st.wheels.front.grounded;
     trace.push(
@@ -310,7 +313,7 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
       const waitS = round(r.waitTicks / s.state.physicsHz, 2);
       faulted = { reason, at: round(crashX, 2), respawnedAt: round(after.bike.pos.x, 2), respawnAfterS: waitS };
       if (r.forcedReset) faulted.forcedReset = true;
-      note = `crashed (${reason}) at x=${crashX.toFixed(1)} after slot ${played}; the game respawned you ${waitS.toFixed(1)} s later at checkpoint ${cp} (x=${after.bike.pos.x.toFixed(1)}), stationary, facing +x. Remaining ${ids.length - played} slot(s) were NOT played; your next play starts here.`;
+      note = `crashed (${reason}) at x=${crashX.toFixed(1)} after slot ${played}; the game respawned you ${waitS.toFixed(1)} s later at checkpoint ${cp} (x=${after.bike.pos.x.toFixed(1)}), stationary, facing +x. Remaining ${requested - played} slot(s) were NOT played; your next play starts here.`;
       break outer;
     }
   }
@@ -321,14 +324,14 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
     attempt: attemptAtStart,
     slots: formatActions(ids),
     slotsPlayed: played,
-    slotsRequested: ids.length,
+    slotsRequested: requested,
     before,
     after: brief(after),
     events: events.map(compact),
     checkpoint: after.checkpoint,
     grounded: after.wheels.rear.grounded || after.wheels.front.grounded,
-    faults: countedFaults(s.state.events).length,
-    runTime: round(s.state.runTicks / s.state.physicsHz, 3),
+    faults: s.sim.faults(),
+    runTime: round(s.sim.runTime(), 3),
     distanceToFinish: round(s.sim.track.finishX - after.bike.pos.x, 2),
     budget: { callsLeft: b.callsLeft, secondsLeft: b.secondsLeft },
   };
@@ -342,7 +345,7 @@ function play(s: LoadedSession, text: string): { result: PlayResult; trace: stri
   return { result, trace };
 }
 
-function restart(s: LoadedSession): Record<string, unknown> {
+export function restart(s: LoadedSession): Record<string, unknown> {
   const st = s.sim.state();
   const cp = st.checkpoint;
   endAttempt(s, 'restart', st);
@@ -356,16 +359,16 @@ function restart(s: LoadedSession): Record<string, unknown> {
     at: brief(after),
     events: r.events.map(compact),
     forcedReset: r.forcedReset,
-    faults: countedFaults(s.state.events).length,
+    faults: s.sim.faults(),
     attempt: attemptsFromEvents(s.state.events),
-    runTime: round(s.state.runTicks / s.state.physicsHz, 3),
+    runTime: round(s.sim.runTime(), 3),
     budget: { callsLeft: b.callsLeft, secondsLeft: b.secondsLeft },
     note: `back at checkpoint ${cp} (x=${after.bike.pos.x.toFixed(1)}), stationary; that cost one attempt. A crash respawns you here by itself: restart is only for giving up a live attempt.`,
   };
 }
 
 /** Back to the start line via the game's hold-restart rule (replayable). */
-function reset(s: LoadedSession): Record<string, unknown> {
+export function reset(s: LoadedSession): Record<string, unknown> {
   const st = s.sim.state();
   endAttempt(s, 'reset', st);
   // Hold restart for the game's full-restart hold time (0.6 s): the first tick is a
@@ -374,8 +377,8 @@ function reset(s: LoadedSession): Record<string, unknown> {
   const events: PersistedEvent[] = [];
   // Game rule: the hold cannot fire until the restart key has been released once since GO /
   // the last full restart (`holdFired` starts true). One coast tick releases it when needed.
-  if (s.sim.rules.counters().holdFired) events.push(...tick(s, COAST));
-  for (let i = 0; i < s.sim.rules.T.holdRestart; i++) events.push(...tick(s, RESTART_FRAME));
+  if (s.sim.snap().counters.holdFired) events.push(...tick(s, COAST));
+  for (let i = 0; i < ruleTicks(s.state.physicsHz).holdRestart; i++) events.push(...tick(s, RESTART_FRAME));
   events.push(...tick(s, COAST));
   beginAttempt(s);
   const r = { events, forcedReset: false };
@@ -385,11 +388,11 @@ function reset(s: LoadedSession): Record<string, unknown> {
     reset: true,
     at: brief(after),
     events: r.events.map(compact),
-    faults: countedFaults(s.state.events).length,
+    faults: s.sim.faults(),
     attempt: attemptsFromEvents(s.state.events),
-    runTime: round(s.state.runTicks / s.state.physicsHz, 3),
+    runTime: round(s.sim.runTime(), 3),
     budget: { callsLeft: b.callsLeft, secondsLeft: b.secondsLeft },
-    note: `back at the start line (x=${after.bike.pos.x.toFixed(1)}); checkpoints forgotten, faults kept, that cost one attempt.`,
+    note: `back at the start line (x=${after.bike.pos.x.toFixed(1)}); checkpoints forgotten, the game run clock and faults reset; this still counts toward your session attempts.`,
   };
 }
 
@@ -405,6 +408,7 @@ async function done(s: LoadedSession): Promise<{ session: StrangerSession; metri
   const attemptsBand = s.sim.track.meta?.attemptsBand ?? null;
   const b = budgetLeft(s);
   const wall = wallMs(s);
+  const replay = verifySessionReplay(s);
 
   // Recording: the whole run, one continuous input stream.
   const recRel = path.join('harness', 'inputs', st.trackId, `stranger-${st.sessionId}.json`);
@@ -427,7 +431,7 @@ async function done(s: LoadedSession): Promise<{ session: StrangerSession; metri
   }
 
   const session: StrangerSession = {
-    ...runMeta('stranger', new Date(st.startedAt), { physics: st.physics }),
+    ...runMeta('stranger', new Date(st.startedAt), { physics: st.physics, bike: st.bike, srcFingerprint: st.srcFingerprint }),
     kind: 'stranger',
     sessionId: st.sessionId,
     trackId: st.trackId,
@@ -442,15 +446,15 @@ async function done(s: LoadedSession): Promise<{ session: StrangerSession; metri
     faultsByCheckpoint: faultsByCheckpoint(faultCps, s.sim.track.checkpoints.length),
     firstCheckpointCalls: st.firstCheckpointCalls,
     recordingFile: recRel,
-    replayVerified: null,
-    replayFaults: null,
+    replayVerified: replay.verified,
+    replayFaults: replay.faults,
     attemptsBand,
-    pass: attemptsBand ? strangerAttempts <= 1.5 * attemptsBand[1] : null,
+    pass: attemptsBand ? st.cleared && replay.verified && strangerAttempts <= 1.5 * attemptsBand[1] : null,
     bestAttempt,
     log: st.log,
   };
   session.wallMs = wall;
-  writeJson(path.join(s.dir, 'session.json'), { ...session, forcedResets: st.forcedResets });
+  writeJson(path.join(s.dir, 'session.json'), { ...session, physicsHz: st.physicsHz, forcedResets: st.forcedResets });
 
   // The per-track metrics file is the aggregate of every session (stranger/report.ts).
   const { jsonFile: metricsFile } = await strangerReport(st.trackId);
@@ -501,7 +505,7 @@ async function prep(tracks: string[], agents: string[], round: string, bike: Bik
     }
   }
   const md = [
-    `# Stranger round ${round} — ${sessions.length} sessions (${agents.length} per track), created ${new Date().toISOString()}, src ${srcFingerprint()}`,
+    `# Stranger round ${round} — ${sessions.length} sessions (${agents.length} per track), created ${new Date().toISOString()}, src ${strangerFingerprint()}`,
     '',
     'One fresh agent per block, no other context (harness/stranger/run-stranger.md). After each replies DONE:',
     '',
@@ -512,7 +516,7 @@ async function prep(tracks: string[], agents: string[], round: string, bike: Bik
     ...sessions.flatMap((x) => [`## ${x.trackId} · ${x.agent} · \`${x.sessionId}\``, '', '---', '', spawnBlock(x.trackId, x.sessionId), '', '---', '']),
   ].join('\n');
   fs.writeFileSync(path.join(dir, 'spawn.md'), md);
-  writeJson(path.join(dir, 'manifest.json'), { round, createdAt: new Date().toISOString(), srcFingerprint: srcFingerprint(), tracks, agents, sessions, report: `pnpm harness:stranger report ${tracks.join(' ')}` });
+  writeJson(path.join(dir, 'manifest.json'), { round, createdAt: new Date().toISOString(), srcFingerprint: strangerFingerprint(), tracks, agents, sessions, report: `pnpm harness:stranger report ${tracks.join(' ')}` });
   return { dir, sessions };
 }
 
@@ -539,7 +543,7 @@ async function main(): Promise<number> {
       rows.push(`| ${id} | ${band} | ${m.sessions.length} | ${m.completed} | ${m.clearedCount} | ${m.medianAttempts ?? '—'} | ${m.medianFinishTime === null ? '—' : `${m.medianFinishTime.toFixed(1)} s`} | ${m.medianCalls ?? '—'} | ${m.pass === null ? 'n/a' : m.pass ? 'PASS' : 'FAIL'} |`);
     }
     if (ids.length > 1) {
-      console.log(`\n## Stranger summary — ${ids.length} tracks, src ${srcFingerprint()}${flagBool(flags, 'stale') ? ' (incl. stale)' : ''}\n`);
+      console.log(`\n## Stranger summary — ${ids.length} tracks, src ${strangerFingerprint()}${flagBool(flags, 'stale') ? ' (incl. stale)' : ''}\n`);
       console.log('| track | band | sessions | completed (fresh) | cleared | median attempts | median time | median calls | pass (≤ 1.5 × band top, all cleared) |');
       console.log('| --- | --- | --- | --- | --- | --- | --- | --- | --- |');
       for (const row of rows) console.log(row);
@@ -666,7 +670,7 @@ async function main(): Promise<number> {
   }
 }
 
-main().then(
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main().then(
   (code) => process.exit(code),
   (err: unknown) => {
     console.log(JSON.stringify({ error: (err as Error).message ?? String(err) }));

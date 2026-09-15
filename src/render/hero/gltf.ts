@@ -60,6 +60,12 @@ export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Prom
       );
     });
     cache.set(url, p);
+    // Share in-flight work and successful documents, but let an explicit retry fetch a
+    // failed file again. Caching null made a transient network error permanent for the page.
+    const request = p;
+    void request.then((g) => {
+      if (!g && cache.get(url) === request) cache.delete(url);
+    });
   }
   return p;
 }

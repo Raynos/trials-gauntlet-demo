@@ -235,7 +235,7 @@ export const RIDER_PROFILE = {
   mass: { headNeck: 0.0694, trunk: 0.4346, upperArm: 0.0271, forearm: 0.0162, hand: 0.0061, thigh: 0.1416, shin: 0.0433, foot: 0.0137 },
   comFraction: { headNeck: 0.5, trunk: 0.5, upperArm: 0.5772, forearm: 0.4574, thigh: 0.4095, shin: 0.4395 },
   poses: [
-    { lean: -1, hipX: -0.57, hipY: 0.60, torso: 55, head: 75 },
+    { lean: -1, hipX: -0.57, hipY: 0.48, torso: 55, head: 75 },
     { lean: 0, hipX: -0.28, hipY: 0.85, torso: 40, head: 66 },
     { lean: 1, hipX: -0.22, hipY: 0.90, torso: 26, head: 42 },
   ],
@@ -314,31 +314,87 @@ export function riderRigFromHips(hipX: number, hipY: number, torso: number, out:
   return out;
 }
 
-/** Inverse of the SAME mass map, not a second pose curve. Finite-difference Newton iterations
- * use a fixed initial guess derived from the neutral authored posture, so history cannot leak. */
+/** Inverse of the SAME mass map. A fixed initial guess and bounded, residual-decreasing
+ * Newton steps make the answer independent of call history. Outside the anatomical stops the
+ * extrapolated limb map can fold: Newton must not take an unbounded step or discard its best
+ * iterate. A gradient step handles a singular/non-descent Newton direction. If neither direction
+ * improves the fit, return the best finite pose with its honest residual; the constraint solver
+ * uses an explicit local continuation there instead of silently disabling the joint rows. */
 export function riderRigFromCOM(comX: number, comY: number, torso: number, out: RiderRigPose): RiderRigPose {
   const neutral = RIDER_PROFILE.poses[1];
   riderRigFromHips(neutral.hipX, neutral.hipY, torso, out);
   let hx = comX - (out.com.x - neutral.hipX);
   let hy = comY - (out.com.y - neutral.hipY);
   const epsilon = 1e-5;
-  for (let i = 0; i < 10; i++) {
+  const initialX = hx, initialY = hy;
+  let bestX = hx, bestY = hy, bestError = Infinity;
+  // Alternative seeds are only visited after an out-of-domain fold traps the first solve.
+  // They are fixed offsets, never a previous frame's pose or a random branch selection.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    if (attempt > 0) {
+      hx = initialX + (attempt === 3 ? -0.2 : attempt === 4 ? 0.2 : 0);
+      hy = initialY + (attempt === 1 ? -0.2 : attempt === 2 ? 0.2 : 0);
+    }
     riderRigFromHips(hx, hy, torso, out);
-    const cx = out.com.x, cy = out.com.y;
-    const ex = comX - cx, ey = comY - cy;
-    if (ex * ex + ey * ey < 1e-18) break;
-    riderRigFromHips(hx + epsilon, hy, torso, out);
-    const j00 = (out.com.x - cx) / epsilon, j10 = (out.com.y - cy) / epsilon;
-    riderRigFromHips(hx, hy + epsilon, torso, out);
-    const j01 = (out.com.x - cx) / epsilon, j11 = (out.com.y - cy) / epsilon;
-    const det = j00 * j11 - j01 * j10;
-    if (Math.abs(det) < 1e-8) break;
-    hx += (j11 * ex - j01 * ey) / det;
-    hy += (j00 * ey - j10 * ex) / det;
+    for (let i = 0; i < 20; i++) {
+      const cx = out.com.x, cy = out.com.y;
+      const ex = comX - cx, ey = comY - cy;
+      const error = ex * ex + ey * ey;
+      if (error < bestError) { bestError = error; bestX = hx; bestY = hy; }
+      if (error < 1e-18) break;
+      riderRigFromHips(hx + epsilon, hy, torso, out);
+      const j00 = (out.com.x - cx) / epsilon, j10 = (out.com.y - cy) / epsilon;
+      riderRigFromHips(hx, hy + epsilon, torso, out);
+      const j01 = (out.com.x - cx) / epsilon, j11 = (out.com.y - cy) / epsilon;
+      const det = j00 * j11 - j01 * j10;
+      let accepted = false;
+      for (let direction = 0; direction < 2 && !accepted; direction++) {
+        // The normalized gradient remains a descent direction when the inverse is singular.
+        if (direction === 0 && Math.abs(det) < 1e-8) continue;
+        let dx = direction === 0 ? (j11 * ex - j01 * ey) / det : j00 * ex + j10 * ey;
+        let dy = direction === 0 ? (j00 * ey - j10 * ex) / det : j01 * ex + j11 * ey;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        if (length > 0.25) { dx *= 0.25 / length; dy *= 0.25 / length; }
+        for (let backtrack = 0; backtrack < 10; backtrack++) {
+          riderRigFromHips(hx + dx, hy + dy, torso, out);
+          if ((comX - out.com.x) ** 2 + (comY - out.com.y) ** 2 < error) {
+            hx += dx; hy += dy;
+            accepted = true;
+            break;
+          }
+          dx *= 0.5; dy *= 0.5;
+        }
+      }
+      if (!accepted) break;
+    }
+    if (bestError < 1e-18) break;
   }
-  riderRigFromHips(hx, hy, torso, out);
+  riderRigFromHips(bestX, bestY, torso, out);
   out.residual = Math.sqrt((out.com.x - comX) ** 2 + (out.com.y - comY) ** 2);
   return out;
+}
+
+/** Chain-rule gradient of a joint gap with respect to the aggregate COM. Anatomically valid
+ * poses use the exact inverse Jacobian. At an out-of-domain fold or an unresolved inverse,
+ * continue the local mass map by holding elbow/knee positions fixed: the trunk, head and the
+ * proximal fractions of the upper arm/thigh still translate with the hips. That known positive
+ * mass fraction gives a finite, invertible recovery map. This is deliberately an approximation
+ * outside the domain, reported through the return value; it never claims to repair limb lengths
+ * or COM residuals by moving the visual rig independently of the physical bodies. */
+export function riderCOMGradient(j00: number, j01: number, j10: number, j11: number, residual: number, gx: number, gy: number, out: RigPoint): boolean {
+  const determinant = j00 * j11 - j01 * j10;
+  const regular = Math.abs(determinant) >= 1e-4 && residual <= 1e-4;
+  if (regular) {
+    out.x = (gx * j11 - gy * j10) / determinant;
+    out.y = (gy * j00 - gx * j01) / determinant;
+  } else {
+    const p = RIDER_PROFILE;
+    const movingMass = p.mass.trunk + p.mass.headNeck
+      + 2 * (p.mass.upperArm * (1 - p.comFraction.upperArm) + p.mass.thigh * (1 - p.comFraction.thigh));
+    out.x = gx / movingMass;
+    out.y = gy / movingMass;
+  }
+  return regular;
 }
 
 /** Neutral aggregate inertia: segment rods about their centroids plus parallel-axis terms.

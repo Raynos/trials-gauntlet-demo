@@ -296,7 +296,7 @@ function boot(): void {
           initialTrack,
           models: { rider: models.riderModel, bike: models.bikeModel },
           riderOutfit,
-          onRiderOutfitChange: (outfit) => (renderer as RiderOutfitRenderer).setRiderOutfit?.(outfit),
+          onRiderOutfitChange: (outfit) => (renderer as RiderOutfitRenderer).setRiderOutfit?.(outfit) ?? Promise.resolve(false),
           touchDebug: params.get('touchdebug') === '1',
           modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
           applyModels: (m) => {

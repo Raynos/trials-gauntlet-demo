@@ -69,7 +69,7 @@ export interface GameRenderer {
    * (materials only; no rebuild, no frame skipped).
    */
   setBikeClass?(c: BikeClass): void;
-  setRiderOutfit?(outfit: RiderOutfit): void;
+  setRiderOutfit?(outfit: RiderOutfit): Promise<boolean>;
 }
 
 export interface ThreeRendererOptions {
@@ -375,8 +375,8 @@ export class ThreeRenderer implements GameRenderer {
       if (want !== this.models || outfit !== this.riderOutfit) return;
       [this.gltf.bike, this.gltf.bikeLod] = [bike[0] ?? null, bike[1] ?? null];
       if (want.riderModel === 'gltf') {
-        if (!rider[0]) throw new Error(`Could not load ${outfit} rider outfit`);
-        [this.gltf.rider, this.gltf.riderLod] = [rider[0], rider[1] ?? null];
+        if (!rider[0] || !rider[1]) throw new Error(`Could not load both detail levels of ${outfit} rider outfit`);
+        [this.gltf.rider, this.gltf.riderLod] = [rider[0], rider[1]];
         this.riderDocumentOutfit = outfit;
       }
       this.applyModels();
@@ -388,10 +388,26 @@ export class ThreeRenderer implements GameRenderer {
       });
   }
 
-  setRiderOutfit(outfit: RiderOutfit): void {
-    if (outfit === this.riderOutfit) return;
+  async setRiderOutfit(outfit: RiderOutfit): Promise<boolean> {
+    const previous = this.riderDocumentOutfit ?? this.riderOutfit;
     this.riderOutfit = outfit;
-    if (this.models.riderModel === 'gltf') this.setModels(this.models);
+    // The procedural debug model has no clothing variants. Keep the preference honest.
+    if (this.models.riderModel !== 'gltf') {
+      this.riderOutfit = previous;
+      return false;
+    }
+    this.setModels(this.models);
+    // A model-settings change can supersede the request while loading the same outfit.
+    // Observe the current request before reporting that the installed documents are ready.
+    let pending: Promise<void>;
+    do {
+      pending = this.heroPending;
+      await pending;
+    } while (outfit === this.riderOutfit && pending !== this.heroPending);
+    const loaded = outfit === this.riderOutfit && this.models.riderModel === 'gltf'
+      && this.riderDocumentOutfit === outfit && !!this.gltf.rider && !!this.gltf.riderLod;
+    if (!loaded && outfit === this.riderOutfit) this.riderOutfit = previous;
+    return loaded;
   }
 
   /** The document the tier draws: `high` the authored file, `low` / `medium` the LOD twin when it loaded. */

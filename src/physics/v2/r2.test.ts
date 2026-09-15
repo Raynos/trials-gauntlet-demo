@@ -41,6 +41,8 @@ interface HopSpec {
   snapLean?: number;
   snapRate?: number;
   thrSnap?: number;
+  thrTuck?: number;
+  thrAfter?: number;
   /** The third movement: lean back for `tuckS` after the snap. */
   tuckS?: number;
   delayTicks?: number;
@@ -56,6 +58,9 @@ interface HopOut {
   maxPitch: number;
   maxComp: number;
   fault: string | null;
+  bothClearApex: number;
+  continuousClear: number;
+  sustainedLandPitch: number;
 }
 
 /** The reference flat hop from a standing start: preload lean -1 + throttle 0.3 for 0.3 s, snap to +1 held 0.22 s, tuck 0.1 s. */
@@ -73,9 +78,11 @@ function hop(h: HopSpec = {}): HopOut {
   const s0 = w.getState();
   const ry0 = s0.wheels.rear.pos.y;
   const fy0 = s0.wheels.front.pos.y;
-  const o: HopOut = { apexR: 0, apexF: 0, bothOff: 0, first: '', landPitch: NaN, minPitch: 99, maxPitch: -99, maxComp: 0, fault: null };
+  const o: HopOut = { apexR: 0, apexF: 0, bothOff: 0, first: '', landPitch: NaN, minPitch: 99, maxPitch: -99, maxComp: 0, fault: null, bothClearApex: 0, continuousClear: 0, sustainedLandPitch: NaN };
   let lean = preLean;
   let wasBothOff = false;
+  let clearTicks = 0;
+  let confirmedFlight = false;
   for (let i = 0; i < HZ * 3; i++) {
     const t = i / HZ - delay;
     let inp: Partial<InputFrame>;
@@ -84,8 +91,8 @@ function hop(h: HopSpec = {}): HopOut {
     else if (t < P + snapS) {
       lean = Math.min(snapLean, lean + rate / HZ);
       inp = { throttle: thrSnap, lean };
-    } else if (t < P + snapS + tuckS) inp = { throttle: 0.2, lean: -1 };
-    else inp = { throttle: 0.2, lean: 0 };
+    } else if (t < P + snapS + tuckS) inp = { throttle: h.thrTuck ?? 0.2, lean: -1 };
+    else inp = { throttle: h.thrAfter ?? 0.2, lean: 0 };
     w.step(quantizeInput(inp));
     const s = w.getState();
     if (s.faulted) {
@@ -98,6 +105,14 @@ function hop(h: HopSpec = {}): HopOut {
     const rg = s.wheels.rear.grounded;
     const fg = s.wheels.front.grounded;
     const p = deg(s.bike.angle);
+    // Contact flags can flicker for a tick during preload. A real hop must put both
+    // tyre bottoms above the flat floor continuously, before its landing is measured.
+    const clearance = Math.min(s.wheels.rear.pos.y, s.wheels.front.pos.y) - w.tuning.wheel.radius;
+    o.bothClearApex = Math.max(o.bothClearApex, clearance);
+    clearTicks = clearance > 0.02 ? clearTicks + 1 : 0;
+    o.continuousClear = Math.max(o.continuousClear, clearTicks / HZ);
+    if (clearTicks >= 6) confirmedFlight = true;
+    if (confirmedFlight && Number.isNaN(o.sustainedLandPitch) && (rg || fg)) o.sustainedLandPitch = p;
     if (t > P) {
       o.minPitch = Math.min(o.minPitch, p);
       o.maxPitch = Math.max(o.maxPitch, p);
@@ -113,6 +128,24 @@ function hop(h: HopSpec = {}): HopOut {
 }
 
 describe('the hop (R2 decision d; §9.5, §14.2, §14.3)', () => {
+  it('a binary keyboard/touch hop clears both tyres by 0.45 m, flies continuously for 0.35–0.6 s and lands within 20 degrees', () => {
+    // Full throttle + back for .3s, full throttle + forward for .267s, then release
+    // throttle and tuck for .1s. Every channel is binary, including the landing coast.
+    const r = hop({ P: 0.3, snapS: 32 / HZ, tuckS: 0.1, thrPre: 1, thrSnap: 1, thrTuck: 0, thrAfter: 0 });
+    feel('hop.binary.clearance', r.bothClearApex, '>= 0.45 m for BOTH tyre bottoms');
+    feel('hop.binary.continuousAir', r.continuousClear, '0.35-0.6 s with both bottoms > 2 cm');
+    feel('hop.binary.landing', r.sustainedLandPitch, 'within +-20 deg after sustained flight');
+    expect(r.fault).toBeNull();
+    expect(r.apexR).toBeGreaterThanOrEqual(0.45);
+    expect(r.apexR).toBeLessThanOrEqual(0.65);
+    expect(r.apexF).toBeGreaterThanOrEqual(0.6);
+    expect(r.apexF).toBeLessThanOrEqual(0.9);
+    expect(r.bothClearApex).toBeGreaterThanOrEqual(0.45);
+    expect(r.continuousClear).toBeGreaterThanOrEqual(0.35);
+    expect(r.continuousClear).toBeLessThanOrEqual(0.6);
+    expect(Math.abs(r.sustainedLandPitch)).toBeLessThan(20);
+  });
+
   it('reference flat hop from a standing start (0.3 s preload, full-travel snap held 0.22 s, 0.1 s tuck): rear apex 0.45-0.65 m, front leaves first, lands near level; both-wheels-off is 0.29 s against the 0.35-0.6 band (the front lands first: the bike noses down through the flight, see physics.md)', () => {
     const r = hop();
     feel('hop.ref.rearApex', r.apexR, '0.45-0.65 m');

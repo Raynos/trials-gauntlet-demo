@@ -3,12 +3,14 @@
 Owner: Codex Blender session. Branch: `blender-work`, in the explicitly authorized
 `trials-gauntlet-blender` worktree. Baseline: `56e3883` (2026-09-15).
 
-Status: **paused WIP at the user's request, 2026-09-15**. Round 1 is verified;
-the following checkpoint contains outfit sources/garage selection, shared rider
-mass/pose and fixed bike joints, with incomplete physics and visual validation.
-Typecheck, lint and production build pass; full tests: **22 failed, 618 passed,
-11 todo**. Continue from [the handoff](../BLENDER_HANDOFF.md). This is not ready
-to merge or deploy. Track this plan in `PLANS.md` at every commit.
+Status: **active WIP, resumed by the user 2026-09-15**. Round 3 establishes
+stable suspension/contacts, real outfit contracts, honest load retries and fresh
+production-Game evidence. Typecheck/lint/build pass; tests **18 failed, 673 passed,
+11 todo**. Rookie B1/B3/E2/M1 bots and two B1 strangers clear on attempt one;
+Pro bot entry, elbow-pole singularity, physics/performance requirements, authored
+art and actual iOS remain open. See [the handoff](../BLENDER_HANDOFF.md) and
+[round 3 manifest](../evidence/blender-r3.json). No merge or deployment yet.
+Track this plan in `PLANS.md` at every commit.
 
 ## Mandate and boundaries
 
@@ -167,7 +169,29 @@ different construction approach, not indefinite small tweaks.
 
 ## Evidence and reproducibility
 
-### Round 2 pause checkpoint
+### Round 3 continuation
+
+- Implicit suspension/contact and bounded rider block solve restore static support
+  and a genuine 0.5 m binary hop. Real joint projection preserves velocity bytes.
+- Forty production recordings / 165,355 ticks cover both bikes and all four outfit
+  GLBs. Joint drift peaks at 0.12 mm; float32 export disagreement has its own
+  derived budget. A real 1.9 mm COM witness reveals a singular elbow pole.
+- Fresh Rookie bot clears: B1 42.375 s, B3 33.575 s, E2 44.741667 s, M1 37.925 s,
+  one attempt / zero faults each. Persisted inputs replay byte-identically.
+- Two B1 strangers clear on attempt one, 50.4 / 53.9 s, with verified production
+  Game replay. The repaired stranger harness preserves Game clock/fault rules
+  while retaining cumulative session attempts across full resets.
+- Cold boot, complete browser/Node B1 replay equality, crash and next-tick restart
+  pass in headless Chromium. Actual presentation/device performance remains open.
+  Final-solver 60 fps hop and crash/restart clips are hash-bound and played.
+- Garage failure/retry, stale-request handling and Race/Pro/LOD behavior pass.
+  Connected shoulder topology is prototyped and played in Blender; protected
+  sources/public exports are still unchanged. Full garment/art review is pending.
+- Full check: typecheck/lint pass; 18 test failures (physics behavior and cost),
+  673 passes, 11 todo. Separate build passes. Sequential cost still misses the
+  riding and flight targets. No broad tolerance relaxation or golden repin.
+
+### Historical round 2 pause checkpoint
 
 Street/race sources and full/LOD exports, garage selection, content-addressed
 model URLs, a shared physical rider COM/rig profile, and a fixed-frame rear

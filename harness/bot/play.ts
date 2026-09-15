@@ -85,7 +85,7 @@ interface HistoryEntry {
   rootHash: string;
 }
 
-export function playTrack(sim: Sim, opts: PlayOptions): PlayResult {
+export function playTrack(sim: Omit<Sim, 'rules'>, opts: PlayOptions): PlayResult {
   const cfg = opts.config ?? configFor(opts.skill);
   const w = opts.weights ?? DEFAULT_WEIGHTS;
   const limits: PlayLimits = { ...DEFAULT_LIMITS, ...opts.limits };

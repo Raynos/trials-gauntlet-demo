@@ -9,7 +9,7 @@ read its calls while it plays.
 ## Before you spawn
 
 ```
-cd /Users/raynos/projects/game-demos/trials-gauntlet-demo
+cd /Users/raynos/projects/game-demos/trials-gauntlet-blender
 pnpm harness:stranger start --track <trackId> --agent <name>     # prints `session <id>`; optional — the stranger can also run start itself
 # or, for a whole round at once (2 strangers x 6 tracks):
 pnpm harness:stranger prep --tracks b1-first-ride,b2-lean-back,b3-kicker-row,e1-uphill-weight,e2-rear-wheel-first,e3-stairway --agents s1,s2 --round r3
@@ -31,7 +31,7 @@ the file below; read it in full, then follow its Setup section. Do not read, lis
 other file in that folder, do not look at its source code or git history, and do not search
 the web: the track is meant to be discovered by riding it.
 
-Briefing: `/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/stranger/PROTOCOL.md`
+Briefing: `/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/stranger/PROTOCOL.md`
 
 Track id: `<trackId>`
 Session id: `<sessionId>` (already created for you — skip `start`; pass `--session <sessionId>` on every command)
@@ -49,14 +49,25 @@ with the single word DONE followed by one sentence on what the hardest part was.
 ```
 pnpm harness:stranger report <trackId>          # aggregates every session -> harness/out/metrics/<trackId>.stranger.{json,md}
 pnpm harness:stranger report b1-first-ride b2-lean-back b3-kicker-row e1-uphill-weight e2-rear-wheel-first e3-stairway   # + one summary table
-pnpm harness:replay harness/inputs/<trackId>/stranger-<sessionId>.json     # browser replay of the whole session (proves the log)
 ```
 
 `report` prints one row per session (attempts, cleared, time to clear, calls, wall, where each
 attempt ended, the best attempt's tick window) and a where-they-died table by obstacle.
-Medians are over completed sessions on the current physics; sessions from an older src
-fingerprint are listed as `stale src` and excluded (`--stale` includes them). Pass =
-median attempts ≤ 1.5 × `meta.attemptsBand[1]` and every counted session cleared.
+New sessions use production `Game` with V2 at 120 Hz. `done` replays the entire recorded input
+stream through production Game and compares raw physics bytes, all counters and cumulative faults.
+Medians include only completed sessions with `replayVerified: true` and the current stranger SHA256
+fingerprint. Historical sessions remain visible as stale; `--stale` admits older verified sessions.
+Pass = median attempts ≤ 1.5 × `meta.attemptsBand[1]` and every counted session cleared.
+
+The stranger-local fingerprint covers physics, tracks, core types, actual `src/game/game.ts` rules,
+the production adapter, stranger code, control macros and `PROTOCOL.md`. A recording carries that
+fingerprint, explicit solver/rate/seed/class stamps and the production-rule tag. State schema 2
+rejects legacy mirror sessions or any changed source/header before resuming; preserve old evidence
+and create a new session. Freeze these inputs before spawning and keep them fixed through `done`.
+
+Displayed faults and run time belong to the current Game run. Session attempts retain failures
+across full resets. Saved attempt `startTick`/`endTick` values are recording input indices, including
+restart and finish-coast inputs; they are not the resettable Game clock.
 
 ## The stranger's best attempt as a clip
 
@@ -65,17 +76,27 @@ Every ended attempt has a replayable prefix recording
 that attempt) and `startTick`/`endTick` in `attempts/NNN.json`. `session.json.bestAttempt`
 names the clearing attempt (whole-session recording) or the furthest one:
 
-```
-pnpm harness:clip <trackId> --recording <bestAttempt.recordingFile> --from-tick <bestAttempt.startTick> --out harness/out/capture/stranger/<trackId>-<sessionId>
+Use the headless hero capture with the matching frozen production build:
+
+```sh
+pnpm exec tsx harness/hero-capture.mts <matching-frozen-build> <bestAttempt.recordingFile> harness/out/capture/stranger/<trackId>-<sessionId> <fromTick> <toTick> high street 60 1280x720
 ```
 
-About 25 s of wall per second of clip on this machine (SwiftShader at 1280×720, quality high).
-For the 6 s around one obstacle pass `--from-tick`/`--to-tick` (attempt ticks are in `attempts/NNN.json`).
-A recording only replays on the physics it was played on (`src=` stamp in its note = the session's
-`srcFingerprint`): if the working tree has moved on, capture from a `git archive HEAD` copy of the
-matching commit, pointing `--recording`/`--out` at absolute paths in this checkout.
+Choose explicit even tick boundaries for 60 fps capture from the 120 Hz recording, within its
+available inputs. The captured interval is `(fromTick,toTick]`; the harness renders the full prefix
+to preserve animation/camera history. It verifies consumed full/LOD model bytes against the frozen
+build's content-addressed model catalog and rejects procedural fallback assets. Repeat with `race`
+and the required quality/device viewport when needed. Play the resulting clips to judge the hero;
+this numeric session/replay audit alone makes no visual-quality claim.
+
+The frozen build must come from the source state recorded for that session. Keep its build/model
+hash manifest with the footage. If the source has moved on, use an already preserved matching build
+or mark capture unavailable; do not create another checkout or `git archive` copy. Build artifacts
+under ignored `harness/out/` are permitted in the existing checkout. Headless phone-sized Chromium
+does not establish actual iOS Safari performance.
 
 ## Re-judging after a physics or track change
 
-Old sessions stay on disk but drop out of the medians automatically (fingerprint mismatch).
-`trash harness/out/stranger/<trackId>/<sessionId>` removes one for good; then re-run `report`.
+Old sessions stay on disk and drop out of current medians automatically when their fingerprint
+changes. Preserve them for comparison. Run `prep` with a new round/session id and fresh agents;
+re-run `report` after those agents finish.

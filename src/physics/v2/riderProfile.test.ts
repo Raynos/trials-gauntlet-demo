@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { makeTrack } from '../testTracks';
 import { createBikePhysicsV2 } from './bike';
 import { BIKE_GEOMETRY_V2 } from './tuning';
-import { makeRiderRigPose, RIDER_PROFILE as P, riderProfileInertia, riderRigFromCOM, riderRigFromHips, type RigPoint } from './rider';
+import { makeRiderRigPose, RIDER_PROFILE as P, riderProfileInertia, riderCOMGradient, riderRigFromCOM, riderRigFromHips, type RigPoint } from './rider';
 
 function distance(a: RigPoint, b: RigPoint): number {
   return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -66,6 +66,56 @@ describe('one posed rider mass/geometry profile', () => {
           expect(inverse).toEqual(riderRigFromCOM(rig.com.x, rig.com.y, rig.torsoAngle, makeRiderRigPose()));
         }
     expect(checked).toBeGreaterThan(100);
+  });
+
+  it('bounded inversion covers a full-turn workspace, including formerly divergent folded poses', () => {
+    const rig = makeRiderRigPose(), inverse = makeRiderRigPose();
+    let worst = 0;
+    for (let degrees = -160; degrees <= 200; degrees += 10)
+      for (let ix = -15; ix <= 10; ix++)
+        for (let iy = -5; iy <= 18; iy++) {
+          riderRigFromHips(ix * 0.1, iy * 0.1, degrees * Math.PI / 180, rig);
+          riderRigFromCOM(rig.com.x, rig.com.y, rig.torsoAngle, inverse);
+          worst = Math.max(worst, Math.hypot(inverse.com.x - rig.com.x, inverse.com.y - rig.com.y));
+          expect(Number.isFinite(inverse.hips.x + inverse.hips.y)).toBe(true);
+        }
+    // 23,088 poses; the previous unbounded Newton solve diverged as far as 140 metres.
+    // The extrapolated map can have several roots outside the anatomical stops, so require
+    // the same COM rather than pretending an impossible pose has a unique inverse hip point.
+    expect(worst).toBeLessThan(1e-9);
+  });
+
+  it('COM gradients agree with independent inverse-map differences in the authored workspace', () => {
+    const rig = makeRiderRigPose(), probe = makeRiderRigPose(), gradient = { x: 0, y: 0, z: 0 };
+    const epsilon = 1e-6;
+    for (const pose of P.poses) {
+      riderRigFromHips(pose.hipX, pose.hipY, pose.torso * Math.PI / 180, rig);
+      riderRigFromHips(pose.hipX + epsilon, pose.hipY, rig.torsoAngle, probe);
+      const j00 = (probe.com.x - rig.com.x) / epsilon, j10 = (probe.com.y - rig.com.y) / epsilon;
+      riderRigFromHips(pose.hipX, pose.hipY + epsilon, rig.torsoAngle, probe);
+      const j01 = (probe.com.x - rig.com.x) / epsilon, j11 = (probe.com.y - rig.com.y) / epsilon;
+      // Squared hip-to-ankle distance is differentiated independently of the solver gap code.
+      const gx = 2 * (rig.hips.x - P.ankle.x), gy = 2 * (rig.hips.y - P.ankle.y);
+      expect(riderCOMGradient(j00, j01, j10, j11, 0, gx, gy, gradient)).toBe(true);
+      const squaredLeg = (x: number, y: number) => {
+        riderRigFromCOM(x, y, rig.torsoAngle, probe);
+        return (probe.hips.x - P.ankle.x) ** 2 + (probe.hips.y - P.ankle.y) ** 2;
+      };
+      expect(gradient.x).toBeCloseTo((squaredLeg(rig.com.x + epsilon, rig.com.y) - squaredLeg(rig.com.x - epsilon, rig.com.y)) / (2 * epsilon), 4);
+      expect(gradient.y).toBeCloseTo((squaredLeg(rig.com.x, rig.com.y + epsilon) - squaredLeg(rig.com.x, rig.com.y - epsilon)) / (2 * epsilon), 4);
+    }
+  });
+
+  it('singular or unresolved mass maps retain a bounded restoring continuation in every direction', () => {
+    const out = { x: 0, y: 0, z: 0 };
+    for (const [j00, j01, j10, j11, residual] of [[1, 1, 1, 1, 0], [1, 0, 0, 1e-8, 0], [1, 0, 0, 1, 0.02]]) {
+      for (let angle = 0; angle < 2 * Math.PI; angle += 0.2) {
+        const gx = Math.cos(angle), gy = Math.sin(angle);
+        expect(riderCOMGradient(j00!, j01!, j10!, j11!, residual!, gx, gy, out)).toBe(false);
+        expect(out.x * gx + out.y * gy).toBeGreaterThan(1);
+        expect(Math.hypot(out.x, out.y)).toBeLessThan(2);
+      }
+    }
   });
 
   it('both classes use the authored neutral mass target and map the real gravity sag through the same inverse', () => {

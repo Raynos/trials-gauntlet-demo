@@ -1,7 +1,8 @@
-# Blender hero handoff — paused WIP
+# Blender hero handoff — active WIP
 
-**2026-09-15. The user requested a pause and checkpoint commit. This branch is
-not ready to merge or deploy. The hero/physics mission is unfinished.**
+**2026-09-15. The user resumed work from the pause checkpoint. Round 3 repairs
+are verified below, with remaining failures preserved. This branch is not ready
+to merge or deploy. The hero/physics mission is unfinished.**
 
 Continue in `/Users/raynos/projects/game-demos/trials-gauntlet-blender`, branch
 `blender-work`. This existing worktree was explicitly authorized; do not create
@@ -22,8 +23,8 @@ for this checkpoint. The 12-hour follow-up automation is paused.
 - Audit inherited scripts, tests and documentation before relying on them.
   Browser evidence uses the headless harness; native Blender is authorized.
   Judge played clips, not posed stills. Actual iOS Safari remains a separate gate.
-- The latest instruction is to pause, preserve in-progress work, write this
-  handoff and commit. Do not describe that as mission completion.
+- The latest instruction is to read this handoff and continue. The persistent
+  rider/bike/animation/texture goal is active; the old follow-up automation remains paused.
 
 Read [the plan](plans/BLENDER_HERO.md), [plan status](plans/PLANS.md),
 `AGENTS.md` and `docs/mission.md` before resuming. The user supplied
@@ -31,7 +32,77 @@ Read [the plan](plans/BLENDER_HERO.md), [plan status](plans/PLANS.md),
 backward on Rear Wheel First, 1:18.433 and four faults. It is a symptom to
 reproduce; this checkpoint does **not** prove that specific finish bug fixed.
 
-## Checkpoint validation
+## Round 3 continuation — current evidence
+
+See [the durable evidence manifest](evidence/blender-r3.json) for source/model/build
+hashes, exact clocks, worst-case witnesses and replay results. Round 2 numbers
+below are historical and do not override this section.
+
+- TypeScript and repository ESLint pass. Combined tests: **18 failed, 673 passed,
+  11 todo**, six failed / 47 passed files. Separate production build passes.
+  Seventeen failures reproduce in the owned physics suites; the combined loaded
+  host also fails the ragdoll timing test, which passes in the sequential sample.
+  No green full-check claim, golden replacement or performance waiver is made.
+- Implicit spring/damping rows and a coupled bounded rider wrench now solve with
+  contacts. Rear/front sag is 29.31% / 27.19%; neutral drift is below 0.04 mm/s.
+  Coupled wheel/contact position projection closes joints without changing any
+  velocity bytes. Inverse COM recovery no longer silently drops all limit rows.
+- The production-Game census covers **40 recordings / 165,355 input ticks** and
+  actual full/LOD bikes plus both outfits. Every sample is finite. Worst physical
+  rear/front joint errors are 117.46 / 107.66 micrometres. Exported nodes agree
+  within separately derived float32 rounding budgets. Real socket errors stay
+  below 0.26 micrometres; no backwards-pole elbow was recorded.
+- **Open rider defect:** X1 Pro input tick 413 has a 1.896541 mm physical inverse
+  COM residual, matching 1.896586 mm independently measured rendered COM error.
+  A tightly folded arm aligns with the fixed elbow pole, making its projected
+  direction singular. The anatomical rows lack a minimum elbow opening. A
+  continuous-basis prototype is promising but is not in current physics yet.
+- Fresh Rookie bot B1/B3/E2/M1 clears all succeed on attempt one with zero faults:
+  42.375 / 33.575 / 44.741667 / 37.925 seconds. The serialized inputs replay with
+  identical raw physics arrays, complete Game counters and finish-clock bytes.
+  New recordings live in `harness/inputs/hero-r3/`; older inputs remain intact.
+- Pro B1/M1 bot searches fail after 15 attempts. They incorrectly launch using
+  wheelie-hold from rest. A separate binary full-gas/forward launch reaches 30 m
+  safely. Fix and remeasure controller entry before inferring a Pro launch defect.
+- **Two fresh B1 strangers both clear on attempt one**, in 50.4 / 53.9 seconds;
+  both recorded sessions verify raw production-Game replay. Their median attempts
+  is 1, within the 1–1 band. Other tracks/classes still need fresh strangers.
+  Two earlier empty sessions were rejected after a briefing edit, preserved as
+  stale, and excluded; neither contains riding.
+- `hero-ship.mts` passes cold boot, complete B1 clear with browser/Node equality at
+  all 5,085 ticks, crash and next-tick restart. Restart command 0.23 ms, resumed
+  movement next tick, fault retained. Software-GPU render latency was 136.8 ms;
+  this does not establish instant presentation or actual iOS performance.
+- Garage download failure now retains the installed outfit and saved selection;
+  retries fetch both full/LOD files. A real headless UI outage/retry test passes,
+  including Race persistence on Pro and low quality. Failed GLB cache entries
+  are evicted instead of preventing retries forever.
+- Fresh 60 fps hop and crash/restart clips from frozen `r3-dist` were played in
+  QuickTime. They render the full prefix at alpha 1, bind consumed GLB hashes,
+  and reject procedural fallback. Binary hop: rear/front apex 0.500 / 0.721 m,
+  0.450 s continuous flight, 14.5-degree landing, no fault. The exact user's
+  78.433-second/four-fault finish remains unreproduced without its recording.
+- `author_garments.py` creates connected torso/sleeve candidates while retaining
+  the original rig/actions/materials. Street v6 hang-back and landing were played
+  in native Blender. Shoulder seams are continuous; elbow folds and hood overlap
+  remain. Candidates are **not yet promoted** to the protected sources or public
+  models. All previous source/public asset hashes remain unchanged this round.
+
+Sequential cost on Apple M5 Max / Node 24.18.1: world tick p95 36.292 us against
+10; R3 block p50 12.894 us against 5; R5 flight/landing p50 38.042 us against 5.
+Ragdoll p95 66.83 us passes 80 in that sample. Own heavy jobs were idle, but
+unrelated desktop/trunk workloads remained; the failed costs still require work.
+
+Current local reports: `harness/out/physics-resume/REPORT.md`,
+`harness/out/rig-physics/X1_COM_ANALYSIS.md`,
+`harness/out/stranger/PRODUCTION-HANDOFF.md`,
+`harness/out/blender/resume-check.log`, `resume-final-build.log`,
+`resume-ship/report.json`, `hero-contracts-resume.json`,
+`r3-hop-street/evidence.json`, `r3-crash-street/evidence.json`.
+These large local artifacts are ignored; their durable summary and fingerprints
+are committed in `docs/evidence/blender-r3.json`.
+
+## Historical round 2 checkpoint validation
 
 The parent froze implementations, ran `pnpm check`, then separately ran
 `pnpm build` because the failed tests stop the chained check before its build.
@@ -74,7 +145,7 @@ The complete local logs are ignored files:
 `harness/out/blender/checkpoint/check.log` and `build.log`. They are available
 in this checkout, not carried by Git. Reproduce with the commands above.
 
-## What is committed at this pause
+## Historical round 2 implementation notes
 
 ### 1. Verified first repair — `53142ab`
 
@@ -227,26 +298,24 @@ downloads total 3,004,352 bytes, race 3,194,884, plus 840,284 shared boot-art
 bytes. Eight logical model files, including legacy rider assets, have verified
 content-addressed build outputs. Keep the one-byte inline budget margin in mind.
 
-## Resume in this order
+## Continue in this order
 
-1. Establish static equilibrium, suspension passivity and constraint behavior
-   with the final hinge/fork/contact solver. Resolve the inverse-map failure
-   policy and investigate every failed physics requirement. Measure cost.
-2. Run the complete real-bike geometry tests and fresh production replay census
-   against those exact physics/assets. Do not fit the rendered chassis to hide
-   attachment disagreement. Derive any float tolerance from export precision.
-3. Cover actual new street/race GLBs, both LODs/classes, with independent mass,
-   socket and joint checks. Reproduce the user's finish pose, landings, hops,
-   wheelies and crash/restart. Verify the rendered body follows the physical COM.
-4. Rebuild inadequate garment topology/deformations in the protected sources;
-   judge gameplay and close-view motion against native-rate reference clips.
-5. Record fresh actual-Game B1/B3/E2/M1 and Pro attempts, repeated-input raw-byte
-   replay, finish/counter equality and restart latency. Then a stranger and an
-   actual iOS Safari performance/playability report. No final solver clear has
-   yet been established; old input scripts may need new control strategies.
-6. Resolve outfit-load failure behavior, re-run `pnpm check`, cold boot, clear,
-   crash, instant restart, and full/LOD/cache-switch checks. Update the plan and
-   handoff with fresh commit/asset fingerprints before considering integration.
+1. Finish the pending scratch comparison of continuous elbow bend basis and a
+   minimum elbow-opening stop. Preserve authored poses, remove the real X1
+   singularity, and test derivatives, COM recovery, anatomy and replay bytes.
+2. Correct bot wheelie-hold entry and remeasure Pro clears. Investigate every
+   remaining behavior requirement separately: braking distance, drop attitude,
+   touchdown step, lab hop/climb and air-limit witnesses. Profile solver cost.
+3. Review final connected street/race candidates in native Blender, promote
+   accepted geometry through the protected workflow, export both LODs, and judge
+   textured gameplay against native-rate Trials footage. Elbow/crotch topology,
+   garment folds, material detail, helmet/hand/boot polish and shadows remain.
+4. Rerun real-GLB census and fresh bot/stranger attempts on the next frozen solver.
+   Use `harness/lib/production-sim.ts` and the corrected stranger schema, not the
+   legacy RunRules mirror. Keep session fingerprints fixed through `done`.
+5. Keep full checks and each third-round cold-boot/clear/crash/restart gate visible.
+   Actual iOS Safari, complete hero reference comparisons and integration review
+   remain necessary. Do not merge, push or deploy this WIP branch.
 
 ### Evidence pitfalls and local continuity
 

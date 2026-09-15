@@ -106,7 +106,14 @@ export interface TuningV2 {
      */
     wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number };
   };
-  brakes: { totalNm: number; frontFrac: number; brakeTau: number };
+  brakes: {
+    totalNm: number; frontFrac: number; brakeTau: number;
+    /** Rookie rear-lift protection modulates the front caliper using the live COM
+     * support moment and rear tyre braking. Fades at deliberate full lean. Pro = 0. */
+    liftControl: number;
+    /** Seconds of nose-down rate anticipated by caliper modulation. */
+    liftLookahead: number;
+  };
   aero: { cda: number; rho: number; chassisShare: number };
   rider: {
     mass: number;
@@ -154,6 +161,8 @@ export interface TuningV2 {
   };
   solver: {
     velIters: number;
+    /** Minimum coupled position sweeps; 0 disables projection. The solver may
+     * converge further, up to 64 sweeps, when wheel contacts and limb limits interact. */
     posIters: number;
     slop: number;
     specMargin: number;
@@ -186,11 +195,11 @@ const ROOKIE: TuningV2 = {
       axle: { x: 0, y: 0 }, // initialized from the hinge below
       axis: { x: -0.1 / BIKE_GEOMETRY_V2.swingRadius, y: 0.43 / BIKE_GEOMETRY_V2.swingRadius },
       hinge: { pivot: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.swingPivot.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.swingPivot.y }, radius: BIKE_GEOMETRY_V2.swingRadius, droopAngle: atan2(-0.1, -0.43) + BIKE_GEOMETRY_V2.rearReferenceCompression / BIKE_GEOMETRY_V2.swingRadius },
-      travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85,
+      travel: 0.26, k: 9000, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85,
     },
     front: {
       axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.front.x - BIKE_GEOMETRY_V2.forkAxis.x * BIKE_GEOMETRY_V2.frontReferenceCompression, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.front.y - BIKE_GEOMETRY_V2.forkAxis.y * BIKE_GEOMETRY_V2.frontReferenceCompression },
-      axis: { ...BIKE_GEOMETRY_V2.forkAxis }, travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85,
+      axis: { ...BIKE_GEOMETRY_V2.forkAxis }, travel: 0.24, k: 6500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85,
     },
   },
   tyre: {
@@ -216,7 +225,7 @@ const ROOKIE: TuningV2 = {
     clutchSpeed: 7,
     wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 },
   },
-  brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03 },
+  brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03, liftControl: 1, liftLookahead: 0.15 },
   aero: { cda: 0.75, rho: 1.225, chassisShare: 0.6 },
   rider: {
     mass: 75,
@@ -224,8 +233,8 @@ const ROOKIE: TuningV2 = {
     poses: [], // populated from the shared geometry/mass profile below, in chassis coordinates
     targetRateLin: 5.0,
     targetRateAng: 6.0,
-    kp: 45000,
-    kd: 4200,
+    kp: 75000,
+    kd: 1000,
     Fmax: 3200,
     // R3: ON, gated by intent. The concentric (closing) cap falls to 0.3 F_max = 960 N at 1 m/s of closing speed
     // while the pose target is still (a landing: the legs absorb, the 2-3 m drops ride away, R2's pogo loop is
@@ -252,7 +261,9 @@ const ROOKIE: TuningV2 = {
     headRadius: 0.15,
     torsoRadius: 0.13,
   },
-  solver: { velIters: 6, posIters: 2, slop: 0.005, specMargin: 0.02, posBeta: 0.5, jointBaumgarte: 0.3 },
+  // The compliant rider, two springs and tyre contacts must converge together: six
+  // iterations left 5.7 mm/s neutral drift; twelve brings it below 0.04 mm/s.
+  solver: { velIters: 12, posIters: 2, slop: 0.005, specMargin: 0.02, posBeta: 0.5, jointBaumgarte: 0.3 },
   ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },
   drum: { density: 60 },
 };
@@ -307,6 +318,7 @@ export const BIKE_PRESETS_V2: Readonly<Record<BikeClassV2, PartialTuningV2>> = O
   // Pro (R3): raw. 4 kg lighter, 1 000 N (0.71 g at the knot), a 0.06 s throttle (the launch kick the Rookie
   // filters), K_att 260 (less attitude assist), stiffer springs, 21 m/s. Loops at neutral under full gas (1.1 s).
   pro: {
+    brakes: { liftControl: 0 },
     chassis: { mass: 54 },
     suspension: { rear: { k: 12000 }, front: { k: 9000 } },
     engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 0, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 } },

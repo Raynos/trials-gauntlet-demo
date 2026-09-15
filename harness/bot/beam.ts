@@ -68,7 +68,7 @@ function isBanned(actions: number[], banned: number[][] | undefined): boolean {
   return false;
 }
 
-export function plan(sim: Sim, cfg: BeamConfig, w: ScoreWeights, opts: PlanOptions = {}): Plan {
+export function plan(sim: Omit<Sim, 'rules'>, cfg: BeamConfig, w: ScoreWeights, opts: PlanOptions = {}): Plan {
   const t0 = performance.now();
   const root = sim.snap();
   const rootTicks = sim.runTicks();
