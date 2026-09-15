@@ -7,7 +7,7 @@ Rider 1.78 m at 7.5 heads (head 0.237). AXLE coordinates: origin = axle midpoint
 | segment | length | note |
 |---|---|---|
 | torso (hip joint -> shoulder line) | 0.52 | acromion height for 1.78 m |
-| neck (shoulder line -> head/helmet centre) | 0.22 | helmet radius 0.13; helmet bottom sits 0.09 above the shoulder line = a visible neck |
+| neck (shoulder line -> head/helmet centre) | 0.22 | helmet shell radius 0.172 (H1 r2, was 0.14); shell bottom 0.09 above the shoulder line, the chin bar lower = a short visible neck over the brace |
 | upper arm | 0.32 | shoulder joint -> elbow |
 | forearm (elbow -> grip centre, fist included) | 0.30 | |
 | thigh | 0.46 | hip joint -> knee |

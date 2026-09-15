@@ -30,7 +30,7 @@ blender -b --python assets/blender/preview.py -- composite --lod
 blender -b --python assets/blender/decals.py                     # re-render the decal sheet (auto if missing)
 ```
 Options after `--`: `--no-bake` (flat materials, fast), `--size N` (atlas px), `--no-meshopt`, `--lod`,
-rider only: `--decimate 0.55` (body collapse ratio). Blender 5.2 at `/opt/homebrew/bin/blender`.
+Blender 5.2 at `/opt/homebrew/bin/blender`.
 Everything regenerates from scratch; `textures/decals.png` is rebuilt if absent.
 
 ## Budgets (measured)
@@ -38,11 +38,11 @@ Everything regenerates from scratch; `textures/decals.png` is rebuilt if absent.
 | file | tris | bytes (meshopt) | textures |
 |---|---|---|---|
 | `public/models/bike.glb` | 29 740 (wheels 6.6k + 7.2k incl. knobs, frame 3.1k, engine 2.1k, spokes 2 × 256, blur cards 2 × 128) | 1 180 724 | `bike_body_{rookie,pro}_albedo` 1024² JPEG, `bike_body_normal` / `_orm` 512², `bike_mech_albedo` 1024², `bike_mech_normal` / `_orm` 512², chain 64×32 PNG, spokecard 128² PNG |
-| `public/models/rider.glb` | 11 694  5 934 verts  19 joints  8 clips | 861 596 | `rider_{rookie,pro}_albedo` 1024² JPEG, `rider_normal` / `_orm` 512² |
+| `public/models/rider.glb` | 11 108 (body 3.6k lofted, gear 7.5k)  5 666 verts  19 joints  8 clips | 865 088 | `rider_{rookie,pro}_albedo` 1024² JPEG, `rider_normal` / `_orm` 512² |
 | `public/models/bike-lod.glb` | 5 824 (no knob geometry: the tread is in the normal map; 16 spokes) | 431 068 | same set at 512² albedo / 256² normal + ORM |
-| `public/models/rider-lod.glb` | 5 530  2 852 verts, same bones / clips | 493 436 | 512² albedo × 2 / 256² normal + ORM |
+| `public/models/rider-lod.glb` | 4 804  2 498 verts, same bones / clips (detail 0.5, no collapse needed) | 464 152 | 512² albedo × 2 / 256² normal + ORM |
 
-Hero pair 1.95 MB / 41.4k tris; LOD pair 0.90 MB / 11.4k tris. Normal + ORM are baked at half the
+Hero pair 1.95 MB / 40.8k tris; LOD pair 0.86 MB / 10.6k tris. Normal + ORM are baked at half the
 albedo size because `shrinkTextures` caps them at 512² anyway. Textures never exceed 1024².
 
 All four files use **`EXT_meshopt_compression`**: three.js needs
@@ -207,22 +207,46 @@ Every key is a canonical pose from RIDER_CHAIN.md (`POSES` + `pose_chain()` in b
 torso angle, head angle → 3D two-bone IK with the elbow pole (0.6, 0.5, ±1.0) and knee pole
 (1, 0.2, ∓0.15), hands pinned to the grips with the reach slide); clips are Bezier blends between them.
 
-**Mesh:** body = skin-modifier stick figure (27 verts, per-vertex radii) + subdivision ×2, collapsed
-to 0.55 (≈3.1k tris, continuous surface through hips/shoulders); gear merged into the same mesh:
-helmet (shell, chin bar, mouth vent, peak, goggle frame + proud mirrored lens, strap, rear vent), neck
-brace, collar, back-protector hump, shoulder caps, gloves (4 finger rings, coloured palm/cuff +
-strap), boots (shaft, foot, toe, sole, heel cup, coloured shin plate, 3 alloy buckles), knee braces
-(cup, shell, 2 hinges). Suit graphics are object-space in the bake materials: jersey main colour
-with side panels, a chest chevron and a shoulder yoke in the panel colour, coloured upper-arm
-sleeves with a cuff band on the forearms, pants with an outer-seam stripe, a dark belt / hem line,
-diagonal weave bump + low-frequency grime; sponsors and numbers are `decals.png` cells projected
-planar in object space (`common.decal`: patch axes, size, facing, depth bound). Skin (warm tone,
-noise) on the neck between collar and helmet.
+**Mesh (H1 round 2 — volume and silhouette on the same rig):** the body is lofted from measured
+cross sections (`loft` / `limb` in build_rider.py), no skin modifier:
 
-Weights: envelope blend (influence 1/(d/r)^4 over each bone segment, top 4, normalised) for the
-body skin; rigid groups for helmet (`head`), gloves (`hand.*`, cuff 70/30 with `forearm.*`), boots
-(`foot.*`, shaft `shin.*`), knee braces 50/50 `thigh.*`/`shin.*`, hump/collar/decals (`chest`).
-Checked in previews/rider-poses.png: no tearing at armpits/knees in any of the 8 clips.
+* **jersey shell** — 10 elliptical stations from a hem 6.5 cm *below* the belt (half-width 0.185,
+  hanging over the pants shell: a real step, dark hem band) through waist 0.166, chest 0.192 /
+  back 0.156 (back protector in the section), shoulder line 0.215 wide, traps, neck base;
+* **pants shell** — crotch → seat → hips (0.17 half-width) → belt, inside the jersey;
+* **arms** — one continuous 18-station tube per arm along shoulder→elbow→wrist (Catmull-Rom),
+  radii keyed by arc length: 0.052 inside the shell, deltoid 0.080, bicep 0.071, elbow 0.060 with a
+  0.078 guard bulge on the outside of the bend, forearm 0.058, wrist 0.046; sleeve material split at
+  the elbow;
+* **legs** — hip (0.104 lateral / 0.118 glute) → thigh 0.098 → knee 0.078 with a 0.100 knee-guard
+  bulge forward and a 2.2 cm outward shift off the tank → calf 0.070 → into the boot shaft;
+* **neck** — skin cylinder between the collar and the helmet;
+* **helmet** — shell radius **0.172** (round 4: 0.14; the reference helmet is ~1.25× that head), a
+  lathe with the lower half drawn in to the jaw (not a sphere), 200° chin bar flush at the cheeks and
+  thrust 5 cm forward at the mouth with a half-buried vent, peak = a 118° annular sector above the
+  goggles pitched nose-down, wrap-around goggle frame + proud mirror lens (torus sectors that follow
+  the shell), strap, two brow scoops, rear spoiler; the shell is pitched 10° up on the head bone so
+  the goggles face the track;
+* gear as before with volume: neck brace collar (0.115 ring), gloves = a bevelled **fist** around
+  the grip (no finger rings) + knuckle ridge + back plate + thumb + cuff and strap over the sleeve,
+  boots with a flared shaft (0.066 → 0.079 at the top, over the pants), ankle bellows, foot block, toe,
+  sole, heel cup, three buckles, coloured shin plate. Knee and elbow guards are volume under the
+  fabric, not external braces.
+
+Suit graphics are object-space in the bake materials as before (panels, chevron, yoke, sleeves,
+seam stripe, hem, weave, grime, projected decals). **Cloth folds are in the normal map**
+(`_folds`): sine creases ringing each joint (elbows, wrists, knees, crotch, hips, waist, armpits;
+3–4.5 cm spacing, wobbled by noise, gated by distance to the joint) plus a low-frequency wrinkle
+field, summed with the weave into one 3.5 mm bump — `rider_normal.jpg` went from 7 KB to 40 KB.
+
+Weights: assigned per loft station — pelvis / spine / chest along the torso, `chest`→`upperArm`
+over the first 10 cm of the arm, `upperArm`→`forearm` over ±5.5 cm at the elbow, `pelvis`→`thigh`
+at the hip, `thigh`→`shin` over ±6 cm at the knee; rigid groups for helmet (`head`), gloves
+(`hand.*`, cuff 70/30 with `forearm.*`), boots (`foot.*`, shaft `shin.*`), collar (`chest`). Checked
+in previews/rider-poses.png: no tearing at armpits / knees / elbows in any of the 8 clips (hang_back
+knees at 85°, sit_cruise 104°). The rig, rest pose, bone table, clips and variant names are
+byte-identical to round 4 (checked field by field against the HEAD glb) and `pnpm vitest run
+src/render` (hands on the grips, 16 tests) passes.
 
 ## Previews (assets/blender/previews)
 
@@ -245,8 +269,10 @@ Lighting in previews: one 4 W/m² sun + fill, AgX; the game's own grade will dif
   0.62 rad); physics/render should re-derive the sensors from RIDER_CHAIN.md `stand_attack`.
 * Normal maps are subtle (JPEG, 512²); most surface read comes from albedo + roughness.
 * No morph targets, no facial anything (helmet + goggles); the lens is part of the one rider mesh.
-* Body is still a smooth skin-modifier tube: no cloth folds, no jersey hanging loose, no gloves with
-  articulated fingers; the sleeve / pants seams are colour, not geometry.
+* Round-2 body: the jersey hem, sleeve cuffs, boot tops and glove cuffs are geometry now, but the
+  chin bar is still a torus sweep (a bulge, not a sculpted jaw), the neck brace a plain ring, the
+  fist a bevelled block, and the limbs are single tubes — the far elbow / knee crease in a deep bend
+  is a smooth fold, not a real crease. Still no fingers, no morphs, no facial anything.
 * Bike: no headlight (trials bikes do not have one), no brake lines/cables; the bake margin is 4 px,
   so a few island edges show a dark seam on the LOD at 512².
 * Decal sheet is 1024² for 14 cells: the 4-tile logo strips are ~460 px wide, so a 3 cm sponsor

@@ -237,13 +237,13 @@ def preview_composite():
         render(p, 1280, 720)
         bpy.data.objects.remove(cam)
         outs.append(p)
-    # side-by-side crop sheet like the hero crop grid: 400x260 crops around the bike, x2
+    # side-by-side crop sheet like the hero crop grid: 400x290 crops around the bike (lifted 22 px for the r2 helmet), x2
     import subprocess
 
     crops = []
     for p in outs:
         c = p.replace(".png", "-crop.png")
-        subprocess.run(["/opt/homebrew/bin/magick", p, "-gravity", "center", "-crop", "400x260+0+0", "+repage", "-resize", "200%", c], check=True)
+        subprocess.run(["/opt/homebrew/bin/magick", p, "-gravity", "center", "-crop", "400x290+0-22", "+repage", "-resize", "200%", c], check=True)
         crops.append(c)
     montage(crops, out("composite-gamesize"), 3)
 

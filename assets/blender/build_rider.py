@@ -9,8 +9,9 @@ hips (0.53, 0.74), shoulders (0.82, 1.15), grips (0.92, 0.78, z +-0.33), ankles 
 Bones are named exactly as the joint set the render drives:
   pelvis, spine, chest, neck, head, shoulder.L/R, upperArm.L/R, forearm.L/R, hand.L/R,
   thigh.L/R, shin.L/R, foot.L/R           (.L = rider's left = camera side, glTF +z)
-Body = skin-modifier stick figure + subdivision (one continuous quad skin), gear = merged
-primitives; weights are envelope-blended per bone with rigid groups for the hard parts.
+Body = lofted volumes (jersey shell over a pants shell, one continuous tube per limb with keyed
+radii, skin neck) + gear primitives in one MeshBuilder; weights per loft station (bone blends across
+each joint) with rigid groups for the hard parts (H1 round 2 — round 4 was a skin-modifier figure).
 Suit graphics: panels in object space + sponsor decals projected from textures/decals.png
 (decals.py); two colourways baked as two albedos -> KHR_materials_variants rider_rookie / rider_pro.
 `-- --lod` writes rider-lod.glb (<= 6k tris, 512 atlas).
@@ -34,7 +35,6 @@ LOD = "--lod" in ARGS  # public/models/rider-lod.glb: <= 6k tris, 512 atlas, sam
 SIZE = int(ARGS[ARGS.index("--size") + 1]) if "--size" in ARGS else (512 if LOD else 1024)
 MESHOPT = "--no-meshopt" not in ARGS
 FPS = 30
-BODY_DECIMATE = float(ARGS[ARGS.index("--decimate") + 1]) if "--decimate" in ARGS else (0.30 if LOD else 0.55)
 LOD_TRIS = 6000
 OUT_NAME = "rider-lod" if LOD else "rider"
 if LOD:
@@ -171,7 +171,7 @@ def write_chain_md(path):
     lines.append("## Segment lengths (m)\n")
     lines.append("| segment | length | note |\n|---|---|---|")
     lines.append(f"| torso (hip joint -> shoulder line) | {L['torso']:.2f} | acromion height for 1.78 m |")
-    lines.append(f"| neck (shoulder line -> head/helmet centre) | {L['neck']:.2f} | helmet radius {L['headR']:.2f}; helmet bottom sits 0.09 above the shoulder line = a visible neck |")
+    lines.append(f"| neck (shoulder line -> head/helmet centre) | {L['neck']:.2f} | helmet shell radius {HELMET_R:.3f} (H1 r2, was 0.14); shell bottom 0.09 above the shoulder line, the chin bar lower = a short visible neck over the brace |")
     lines.append(f"| upper arm | {L['upperArm']:.2f} | shoulder joint -> elbow |")
     lines.append(f"| forearm (elbow -> grip centre, fist included) | {L['forearm']:.2f} | |")
     lines.append(f"| thigh | {L['thigh']:.2f} | hip joint -> knee |")
@@ -322,7 +322,25 @@ def _torso_uv(m):
     return u, w, sep.outputs["Y"], C.math_node(m, "ABSOLUTE", sep.outputs["Y"])
 
 
-def _fabric(m, scale=900, strength=0.10):
+def _folds(m, sites, wrinkle=0.25):
+    """Cloth folds for the normal map: creases ringing each joint (sin along the limb axis, wobbled by
+    noise, gated by distance to the joint) + a low-frequency wrinkle field. sites: (centre, axis, radius,
+    spacing m)."""
+    P = C.texcoord(m).outputs["Object"]
+    wob = C.math_node(m, "MULTIPLY", C.noise_fac(m, scale=16, detail=2, rough=0.5), 7.0)
+    h = C.math_node(m, "MULTIPLY", C.noise_fac(m, scale=28, detail=3, rough=0.55), wrinkle)
+    for c, ax, r, spacing in sites:
+        d = C.vmath(m, "SUBTRACT", P, tuple(c))
+        along = C.vmath(m, "DOT_PRODUCT", d, tuple(ax.normalized()))
+        gate = C.math_node(m, "SUBTRACT", 1.0, C.math_node(m, "DIVIDE", C.vmath(m, "LENGTH", d), r), clamp=True)
+        gate = C.math_node(m, "MULTIPLY", gate, gate)
+        ph = C.math_node(m, "MULTIPLY_ADD", along, 2 * math.pi / spacing, wob)
+        s = C.math_node(m, "MULTIPLY_ADD", C.math_node(m, "SINE", ph), 0.5, 0.5)
+        h = C.math_node(m, "ADD", h, C.math_node(m, "MULTIPLY", s, gate))
+    return h
+
+
+def _fabric(m, scale=900, strength=0.10, folds=None):
     w = C.node(m, "ShaderNodeTexWave")
     w.wave_type = "BANDS"
     w.bands_direction = "DIAGONAL"
@@ -334,7 +352,11 @@ def _fabric(m, scale=900, strength=0.10):
     w2.inputs["Scale"].default_value = scale
     C.link(m, C.texcoord(m).outputs["Object"], w2.inputs["Vector"])
     weave = C.math_node(m, "MULTIPLY", w.outputs["Fac"], w2.outputs["Fac"])
-    C.bump(m, weave, strength=strength, distance=0.0004)
+    if folds is None:
+        C.bump(m, weave, strength=strength, distance=0.0004)
+    else:
+        # weave (0.4 mm) + folds (3 mm) into the one Normal input
+        C.bump(m, C.math_node(m, "MULTIPLY_ADD", weave, 0.12, folds), strength=0.8, distance=0.0035)
     return weave
 
 
@@ -361,11 +383,11 @@ def make_materials(sheet):
     JA, JB, PA = C.cw_rgb(m, "JA"), C.cw_rgb(m, "JB"), C.cw_rgb(m, "PA")
     LOGO_A, LOGO_B, NUM_BG, NUM_INK = C.cw_rgb(m, "LOGO_A"), C.cw_rgb(m, "LOGO_B"), C.cw_rgb(m, "NUM_BG"), C.cw_rgb(m, "NUM_INK")
     u, w, y, ay = _torso_uv(m)
-    u0 = 0.05  # belt line along the torso
+    u0 = -0.045  # jersey hem line along the torso (the shell hangs to -0.065, over the pants shell)
     above = C.math_node(m, "GREATER_THAN", u, u0)
     hem = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", u, u0 - 0.035), C.math_node(m, "LESS_THAN", u, u0 + 0.004))
     # side panels (JB) on the flanks up to the armpit, a JB chevron across the chest, JB yoke on the back
-    side = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", ay, 0.145), C.math_node(m, "LESS_THAN", u, u0 + 0.36))
+    side = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", ay, 0.150), C.math_node(m, "LESS_THAN", u, 0.42))
     chev_c = C.math_node(m, "MULTIPLY_ADD", ay, 0.55, 0.0)  # V: higher at the sides
     chev_lo = C.math_node(m, "ADD", chev_c, 0.24)
     chev_hi = C.math_node(m, "ADD", chev_c, 0.31)
@@ -391,7 +413,7 @@ def make_materials(sheet):
     col = _grime(m, col, 0.10)
     C.link(m, col, C.bsdf(m).inputs["Base Color"])
     C.link(m, C.math_node(m, "MULTIPLY_ADD", above, 0.04, 0.80), C.bsdf(m).inputs["Roughness"])
-    _fabric(m)
+    _fabric(m, folds=_folds(m, [(H + tor * 0.12, tor, 0.22, 0.045), (H - tor * 0.05, tor, 0.20, 0.03), (S - tor * 0.06 + Vector((0, -0.19, 0)), tor, 0.10, 0.03), (S - tor * 0.06 + Vector((0, 0.19, 0)), tor, 0.10, 0.03)]))
     M["bodycloth"] = m
 
     # ---- sleeves: upper arm JB with KESTREL along the outside, forearm JA with a JB cuff
@@ -409,7 +431,7 @@ def make_materials(sheet):
         col = C.decal(m, col, sheet, _DC["kestrel"], sh.lerp(el, 0.55) + n_out * 0.07, ua, va, 0.15, 0.04, LOGO_B, facing=n_out, min_facing=0.3)
     col = _grime(m, col, 0.10)
     C.link(m, col, C.bsdf(m).inputs["Base Color"])
-    _fabric(m)
+    _fabric(m, folds=_folds(m, [(REST["elbow." + s], REST["wrist." + s] - REST["shoulder." + s], 0.13, 0.03) for s in ("L", "R")]))
     M["sleeve_upper"] = m
     m = C.new_mat("sleeve_lower", (0.8, 0.8, 0.8, 1), rough=0.8)
     JA, JB = C.cw_rgb(m, "JA"), C.cw_rgb(m, "JB")
@@ -419,7 +441,7 @@ def make_materials(sheet):
     col = C.mix_rgb(m, cuff, JA, JB)
     col = _grime(m, col, 0.10)
     C.link(m, col, C.bsdf(m).inputs["Base Color"])
-    _fabric(m)
+    _fabric(m, folds=_folds(m, [(REST["elbow." + s], REST["wrist." + s] - REST["shoulder." + s], 0.13, 0.03) for s in ("L", "R")] + [(REST["wrist." + s] - (REST["wrist." + s] - REST["elbow." + s]).normalized() * 0.12, REST["wrist." + s] - REST["elbow." + s], 0.08, 0.025) for s in ("L", "R")]))
     M["sleeve_lower"] = m
 
     # ---- pants: PA with a PB stripe down the outer seam and APEX along the outer thigh
@@ -437,11 +459,13 @@ def make_materials(sheet):
         if sg > 0:
             ua = -ua
         va = n_out.cross(ua).normalized()
-        col = C.decal(m, col, sheet, _DC["apex"], hp.lerp(kn, 0.5) + n_out * 0.10, ua, va, 0.16, 0.045, LOGO_P, facing=n_out, min_facing=0.3)
+        col = C.decal(m, col, sheet, _DC["apex"], hp.lerp(kn, 0.5) + n_out * 0.14, ua, va, 0.16, 0.045, LOGO_P, facing=n_out, min_facing=0.3)
     col = _grime(m, col, 0.14, scale=12)
     C.link(m, col, C.bsdf(m).inputs["Base Color"])
-    f = C.noise_fac(m, scale=60, detail=3)
-    C.bump(m, f, strength=0.1, distance=0.0005)
+    sites = [(REST["knee." + s], REST["ankle." + s] - REST["hip." + s], 0.14, 0.035) for s in ("L", "R")]
+    sites.append((REST["hips"] - t * 0.12 + fwd * 0.06, t, 0.16, 0.035))  # crotch
+    sites += [(REST["hip." + s] - t * 0.03, REST["knee." + s] - REST["hip." + s], 0.12, 0.04) for s in ("L", "R")]
+    _fabric(m, scale=700, folds=_folds(m, sites, wrinkle=0.35))
     M["pants"] = m
 
     # ---- helmet: shell colour, centre stripe + rear chevrons, trimark on each side; glossy
@@ -452,12 +476,12 @@ def make_materials(sheet):
     sep = C.node(m, "ShaderNodeSeparateXYZ")
     C.link(m, C.texcoord(m).outputs["Object"], sep.inputs[0])
     ay = C.math_node(m, "ABSOLUTE", sep.outputs["Y"])
-    stripe = C.math_node(m, "LESS_THAN", ay, 0.016)
+    stripe = C.math_node(m, "LESS_THAN", ay, 0.021)
     col = C.mix_rgb(m, stripe, HELMET, HSTRIPE)
     for sg in (-1, 1):
         n_out = Vector((0, sg, 0))
-        col = C.decal(m, col, sheet, _DC["chevrons"], headC - fwd_h * 0.085 + n_out * 0.11 + hd * 0.01, (fwd_h if sg < 0 else -fwd_h), hd, 0.09, 0.09, HSTRIPE, facing=n_out - fwd_h * 0.4, min_facing=0.3)
-        col = C.decal(m, col, sheet, _DC["trimark"], headC + fwd_h * 0.02 + n_out * 0.13 + hd * 0.035, (fwd_h if sg < 0 else -fwd_h), hd, 0.07, 0.07, HLOGO, facing=n_out, min_facing=0.5)
+        col = C.decal(m, col, sheet, _DC["chevrons"], headC - fwd_h * 0.10 + n_out * 0.13 + hd * 0.04, (fwd_h if sg < 0 else -fwd_h), hd, 0.11, 0.11, HSTRIPE, facing=n_out - fwd_h * 0.4, min_facing=0.3)
+        col = C.decal(m, col, sheet, _DC["trimark"], headC + fwd_h * 0.03 + n_out * 0.15 + hd * 0.085, (fwd_h if sg < 0 else -fwd_h), hd, 0.08, 0.08, HLOGO, facing=n_out, min_facing=0.5)
     C.link(m, col, C.bsdf(m).inputs["Base Color"])
     C.set_metal_source(m, 0.0)
     C.bump(m, C.noise_fac(m, scale=400, detail=1), strength=0.02, distance=0.0003)
@@ -504,76 +528,225 @@ def make_materials(sheet):
     return M
 
 
-# ----------------------------------------------------------------------------- body (skin modifier)
-def build_body(J, M):
-    """Stick figure -> Skin modifier -> Subdivision; returns a plain mesh object of the body."""
-    me = bpy.data.meshes.new("body_stick")
+# ----------------------------------------------------------------------------- body (lofted volumes, H1 round 2)
+# Round 4 was a skin-modifier stick figure: every limb the same tube, no shoulders, no hem, paint-only
+# seams. Round 2 of H1 lofts the body from measured cross sections instead: a jersey shell that hangs
+# over a separate pants shell (a real hem), one continuous tube per limb with deltoid / bicep / elbow
+# pad / thigh / knee pad / calf radii keyed by arc length (guards under the fabric), a skin neck,
+# gloves that are a fist, boots with a flared shaft. Weights are assigned per loft station (bone
+# blends across each joint), so the same 19-joint rig deforms it without tearing.
+TAU = math.tau
+HELMET_R = 0.172  # shell radius; round 4 was 0.13 * 1.08 = 0.14 -> the reference helmet is ~1.2-1.3x that
+
+
+def smoothstep(x):
+    x = min(max(x, 0.0), 1.0)
+    return x * x * (3 - 2 * x)
+
+
+def blend2(s, s_joint, bw, a, b):
+    """Weights across a joint at arc length s_joint: bone a before, b after, blended over +-bw."""
+    w = smoothstep((s - s_joint + bw) / (2 * bw))
+    return {k: v for k, v in ((a, 1 - w), (b, w)) if v > 1e-3}
+
+
+def ring_pts(c, au, av, ru, rvf, rvb, seg):
+    """Elliptical section: half-width ru along au, rvf toward +av (front / bend outside), rvb toward -av."""
+    pts = []
+    for i in range(seg):
+        a = TAU * i / seg
+        ca, sa = math.cos(a), math.sin(a)
+        rv = rvf if sa >= 0 else rvb
+        pts.append(Vector(c) + au * (ru * ca) + av * (rv * sa))
+    return pts
+
+
+def loft(b, rings, weights, mats, cap_start=True, cap_end=True):
+    """Quad-strip the rings (equal length) into the MeshBuilder; weights: per-ring group dict,
+    mats: per-segment material (len(rings) - 1). Caps are n-gons (triangulated on export)."""
+    bm = b.bm
+    vr = []
+    for ring in rings:
+        vr.append([bm.verts.new(p) for p in ring])
+    bm.verts.index_update()
+    for k, vs in enumerate(vr):
+        for v in vs:
+            b.groups[v.index] = dict(weights[k])
+    seg = len(rings[0])
+    faces = []
+    for k in range(len(rings) - 1):
+        mi = b.mat_index(mats[k])
+        A, B = vr[k], vr[k + 1]
+        for i in range(seg):
+            j = (i + 1) % seg
+            try:
+                f = bm.faces.new([A[i], A[j], B[j], B[i]])
+            except ValueError:
+                continue
+            f.material_index = mi
+            f.smooth = True
+            faces.append(f)
+    for on, ring, mi in ((cap_start, vr[0], b.mat_index(mats[0])), (cap_end, vr[-1], b.mat_index(mats[-1]))):
+        if on:
+            try:
+                f = bm.faces.new(ring)
+                f.material_index = mi
+                f.smooth = True
+                faces.append(f)
+            except ValueError:
+                pass
+    bmesh.ops.recalc_face_normals(bm, faces=faces)
+    return faces
+
+
+def interp_keys(keys, s):
+    """keys: sorted (s, ru, rvf, rvb, out) -> linear interpolation at s."""
+    ss = [k[0] for k in keys]
+    return tuple(float(np.interp(s, ss, [k[i] for k in keys])) for i in range(1, 5))
+
+
+def limb(b, pts, keys_fn, bones_fn, mat_fn, seg, n, hint, s_max_fn=None, out_dir=None):
+    """One continuous lofted limb along the Catmull-Rom path through the joints `pts`.
+    keys_fn(sj) -> radius keys (s, lateral half-width, radius toward `hint` = the bend's outside,
+    radius away from it, outward centre shift) with sj = arc length of each joint; bones_fn(s, sj)
+    -> weights; mat_fn(s, sj) -> material. `out_dir` = lateral direction for the centre shift."""
+    path = C.catmull(pts, 12)
+    cum = [0.0]
+    for i in range(1, len(path)):
+        cum.append(cum[-1] + (path[i] - path[i - 1]).length)
+    sj = [cum[min(12 * k, len(cum) - 1)] for k in range(len(pts))]
+    s_max = s_max_fn(sj) if s_max_fn else cum[-1]
+    keys = sorted(keys_fn(sj))
+    rings, ws, ss = [], [], []
+    for k in range(n + 1):
+        s = s_max * k / n
+        i = min(int(np.searchsorted(cum, s, side="right")) - 1, len(path) - 2)
+        i = max(i, 0)
+        f = (s - cum[i]) / max(cum[i + 1] - cum[i], 1e-9)
+        c = path[i].lerp(path[i + 1], f)
+        tang = (path[i + 1] - path[i]).normalized()
+        au = Vector((0, 1, 0)) - tang * tang.y
+        au.normalize()
+        av = tang.cross(au)
+        if av.dot(hint) < 0:
+            av = -av
+        ru, rvf, rvb, out = interp_keys(keys, s)
+        if out and out_dir is not None:
+            c = c + out_dir * out
+        rings.append(ring_pts(c, au, av, ru, rvf, rvb, seg))
+        ws.append(bones_fn(s, sj))
+        ss.append(s)
+    mats = [mat_fn(0.5 * (ss[k] + ss[k + 1]), sj) for k in range(n)]
+    loft(b, rings, ws, mats)
+
+
+def build_body(J, M, b):
+    """Torso (jersey shell over a pants shell), arms, legs, neck into the MeshBuilder `b`."""
     H, S = J["hips"], J["shoulders"]
     t, hd = J["torsoDir"], J["headDir"]
     side = Vector((0, 1, 0))
-    fwd = Vector((t.z, 0, -t.x))  # perpendicular to the torso in XZ, pointing forward
-    verts = []
-    edges = []
-    radii = []
+    fwd = Vector((t.z, 0, -t.x))  # perpendicular to the torso in XZ, forward
 
-    def add(p, rx, ry=None):
-        verts.append(Vector(p))
-        radii.append((rx, rx if ry is None else ry))
-        return len(verts) - 1
+    def torso_w(u):
+        """pelvis / spine / chest along the torso (u from the hips, metres), as the bones are laid out."""
+        if u < 0.10:
+            w = blend2(u, 0.10, 0.05, "pelvis", "spine")
+        else:
+            w = blend2(u, 0.28, 0.06, "spine", "chest")
+        return w
 
-    def seg(a, b):
-        edges.append((a, b))
+    # ---- jersey shell: hem (below the belt, over the pants) -> waist -> chest -> shoulder line -> traps -> neck base
+    seg = C.S(24)
+    JER = [  # (u along t, ru lateral, rv front, rv back)
+        (-0.065, 0.185, 0.130, 0.135),
+        (-0.010, 0.178, 0.126, 0.132),
+        (0.060, 0.170, 0.124, 0.130),
+        (0.160, 0.166, 0.126, 0.134),
+        (0.260, 0.176, 0.132, 0.150),
+        (0.360, 0.192, 0.138, 0.156),
+        (0.440, 0.208, 0.136, 0.150),
+        (0.520, 0.215, 0.112, 0.128),
+        (0.560, 0.150, 0.088, 0.096),
+        (0.600, 0.085, 0.060, 0.062),
+    ]
+    rings, ws = [], []
+    for u, ru, rvf, rvb in JER:
+        c = H + t * u + fwd * (0.008 if u > 0.4 else 0.0)
+        rings.append(ring_pts(c, side, fwd, ru, rvf, rvb, seg))
+        w = torso_w(u) if u < 0.53 else {"chest": 0.75, "neck": 0.25}
+        ws.append(w)
+    loft(b, rings, ws, [M["bodycloth"]] * (len(rings) - 1))
+    # ---- pants shell: crotch -> seat -> hips -> belt (inside the jersey)
+    PAN = [
+        (-0.165, 0.055, 0.045, 0.050),
+        (-0.120, 0.125, 0.092, 0.108),
+        (-0.060, 0.160, 0.110, 0.122),
+        (0.000, 0.170, 0.114, 0.126),
+        (0.070, 0.166, 0.112, 0.122),
+    ]
+    rings, ws = [], []
+    for u, ru, rvf, rvb in PAN:
+        rings.append(ring_pts(H + t * u + fwd * 0.012, side, fwd, ru, rvf, rvb, seg))
+        ws.append({"pelvis": 1.0})
+    loft(b, rings, ws, [M["pants"]] * (len(rings) - 1))
+    # ---- neck (skin) between the collar and the helmet
+    add(b, prim_cylinder(0.056, 0.052, 0.15, seg=C.S(14)), Matrix.Translation(S + hd * 0.02) @ C.rot_frame(hd), M["skin"], {"neck": 0.7, "chest": 0.3})
 
-    # torso column: crotch -> hips -> belly -> chest -> neck base -> neck top -> skull
-    crotch = add(H - t * 0.13 + fwd * 0.01, 0.085, 0.055)
-    hips = add(H, 0.16, 0.115)
-    belly = add(H + t * 0.22, 0.155, 0.14)
-    chest = add(H + t * 0.40 - fwd * 0.01, 0.225, 0.17)
-    neckb = add(S + t * 0.01, 0.10, 0.085)
-    neckt = add(S + hd * 0.11, 0.058, 0.058)
-    skull = add(S + hd * 0.22, 0.085, 0.09)
-    for a, b in ((crotch, hips), (hips, belly), (belly, chest), (chest, neckb), (neckb, neckt), (neckt, skull)):
-        seg(a, b)
     for s, sg in (("L", -1), ("R", 1)):
-        sh = add(J["shoulder." + s] - side * (sg * 0.015), 0.078, 0.07)
-        ua = add(J["shoulder." + s].lerp(J["elbow." + s], 0.5), 0.07, 0.065)
-        el = add(J["elbow." + s], 0.054, 0.05)
-        fa = add(J["elbow." + s].lerp(J["wrist." + s], 0.55), 0.055, 0.051)
-        wr = add(J["wrist." + s] - (J["wrist." + s] - J["elbow." + s]).normalized() * 0.04, 0.041, 0.039)
-        for a, b in ((chest, sh), (sh, ua), (ua, el), (el, fa), (fa, wr)):
-            seg(a, b)
-        hp = add(J["hip." + s] - side * (sg * 0.005), 0.10, 0.095)
-        th = add(J["hip." + s].lerp(J["knee." + s], 0.5), 0.095, 0.09)
-        kn = add(J["knee." + s], 0.062, 0.06)
-        sn = add(J["knee." + s].lerp(J["ankle." + s], 0.5), 0.056, 0.054)
-        an = add(J["ankle." + s], 0.05, 0.05)
-        for a, b in ((hips, hp), (hp, th), (th, kn), (kn, sn), (sn, an)):
-            seg(a, b)
-    me.from_pydata(verts, edges, [])
-    me.update()
-    ob = bpy.data.objects.new("body_stick", me)
-    bpy.context.scene.collection.objects.link(ob)
-    mod = ob.modifiers.new("Skin", "SKIN")
-    mod.use_smooth_shade = True
-    mod.branch_smoothing = 0.35
-    sv = me.skin_vertices[0].data
-    for i, (rx, ry) in enumerate(radii):
-        sv[i].radius = (rx, ry)
-        sv[i].use_root = i == hips
-    sub = ob.modifiers.new("Sub", "SUBSURF")
-    sub.levels = 2
-    sub.render_levels = 2
-    dec = ob.modifiers.new("Dec", "DECIMATE")
-    dec.decimate_type = "COLLAPSE"
-    dec.ratio = BODY_DECIMATE
-    dec.use_collapse_triangulate = True
-    dg = bpy.context.evaluated_depsgraph_get()
-    ev = ob.evaluated_get(dg)
-    body_me = bpy.data.meshes.new_from_object(ev)
-    body = bpy.data.objects.new("body", body_me)
-    bpy.context.scene.collection.objects.link(body)
-    bpy.data.objects.remove(ob)
-    return body
+        out_dir = Vector((0, sg, 0))
+        # ---- arm: starts inside the jersey at the shoulder, deltoid, bicep, elbow pad on the outside, forearm, wrist
+        sh, el, wr = J["shoulder." + s], J["elbow." + s], J["wrist." + s]
+        p0 = sh.lerp(S, 0.28)
+        hint = el - sh.lerp(wr, 0.5)  # the outside of the elbow bend
+
+        def arm_keys(sj):
+            s1, s2, s3 = sj[1], sj[2], sj[3]
+            return [
+                (0.0, 0.052, 0.052, 0.052, 0),
+                (s1 + 0.035, 0.080, 0.082, 0.080, 0),   # deltoid
+                (s1 + 0.130, 0.071, 0.074, 0.070, 0),   # bicep / triceps
+                (s2 - 0.070, 0.063, 0.064, 0.062, 0),
+                (s2, 0.060, 0.078, 0.056, 0),           # elbow guard under the sleeve
+                (s2 + 0.060, 0.061, 0.066, 0.060, 0),
+                (s2 + 0.140, 0.058, 0.058, 0.057, 0),   # forearm
+                (s3, 0.046, 0.046, 0.046, 0),
+            ]
+
+        def arm_bones(sa, sj, s=s):
+            s1, s2 = sj[1], sj[2]
+            if sa < s1 + 0.10:
+                w = 0.55 * (1 - smoothstep((sa - s1 + 0.04) / 0.14))
+                return {"chest": w, "upperArm." + s: 1 - w}
+            return blend2(sa, s2, 0.055, "upperArm." + s, "forearm." + s)
+
+        limb(b, [p0, sh, el, wr], arm_keys, arm_bones, lambda sa, sj: M["sleeve_upper"] if sa < sj[2] + 0.02 else M["sleeve_lower"], C.S(18), C.S(18), hint, out_dir=out_dir)
+
+        # ---- leg: from inside the pelvis, glute / thigh, knee pad forward (shifted out off the tank), calf, into the boot
+        hp, kn, an = J["hip." + s], J["knee." + s], J["ankle." + s]
+        p0 = hp + t * 0.09
+        hint = kn - hp.lerp(an, 0.5)  # forward
+
+        def leg_keys(sj):
+            s1, s2, s3 = sj[1], sj[2], sj[3]
+            return [
+                (0.0, 0.092, 0.092, 0.098, 0),
+                (s1, 0.104, 0.104, 0.118, 0),           # hip / glute
+                (s1 + 0.180, 0.098, 0.102, 0.100, 0.006),
+                (s2 - 0.080, 0.085, 0.088, 0.084, 0.016),
+                (s2, 0.078, 0.100, 0.076, 0.022),       # knee guard under the pants
+                (s2 + 0.070, 0.075, 0.082, 0.074, 0.016),
+                (s2 + 0.170, 0.070, 0.070, 0.074, 0.006),  # calf
+                (s3 - 0.230, 0.066, 0.066, 0.066, 0),
+            ]
+
+        def leg_bones(sa, sj, s=s):
+            s1, s2 = sj[1], sj[2]
+            if sa < s1 + 0.10:
+                w = 0.5 * (1 - smoothstep((sa - s1 + 0.04) / 0.14))
+                return {"pelvis": w, "thigh." + s: 1 - w}
+            return blend2(sa, s2, 0.06, "thigh." + s, "shin." + s)
+
+        limb(b, [p0, hp, kn, an], leg_keys, leg_bones, lambda sa, sj: M["pants"], C.S(20), C.S(18), hint, s_max_fn=lambda sj: sj[3] - 0.235, out_dir=out_dir)
 
 
 # ----------------------------------------------------------------------------- gear (primitives)
@@ -583,7 +756,7 @@ def add(b, bm, M4, mat, group, sharp=None, smooth=True):
 
 
 def build_gear(J, M, b):
-    """Helmet, goggles, collar, back hump, gloves, boots, knee braces, number patches."""
+    """Helmet (MX shell, chin bar, peak, wrap-around goggles + strap, vents), neck brace, gloves (fist), boots."""
     S, H = J["shoulders"], J["hips"]
     t, hd = J["torsoDir"], J["headDir"]
     fwd_h = Vector((hd.z, 0, -hd.x))  # head forward
@@ -596,139 +769,69 @@ def build_gear(J, M, b):
         (fwd_h.z, 0, hd.z, headC.z),
         (0, 0, 0, 1),
     ))
-    R = L["headR"]
-    # helmet shell (slightly egg shaped: longer front-back, flatter sides), chin bar, vents, peak, goggles
-    add(b, prim_sphere(R * 1.08, seg=24, rings=14, scale=(1.08, 0.97, 1.02)), Mh @ Matrix.Translation((0.005, 0, 0.012)), M["helmet"], "head")
-    add(b, prim_box(0.13, 0.17, 0.075, bevel=0.03, segments=3), Mh @ Matrix.Translation((0.075, 0, -0.075)) @ Matrix.Rotation(0.15, 4, "Y"), M["helmet"], "head")
-    add(b, prim_box(0.035, 0.085, 0.03, bevel=0.008, segments=2), Mh @ Matrix.Translation((0.135, 0, -0.07)), M["armour"], "head", sharp=40)  # mouth vent
-    add(b, prim_box(0.16, 0.20, 0.008, bevel=0.003, segments=1), Mh @ Matrix.Translation((0.10, 0, 0.085)) @ Matrix.Rotation(0.42, 4, "Y"), M["helmet"], "head", sharp=30)  # peak
-    add(b, prim_box(0.045, 0.19, 0.072, bevel=0.022, segments=3), Mh @ Matrix.Translation((0.098, 0, 0.012)), M["armour"], "head")  # goggle frame
-    add(b, prim_box(0.036, 0.176, 0.062, bevel=0.018, segments=3), Mh @ Matrix.Translation((0.122, 0, 0.012)), M["visor"], "head")  # lens (proud of the frame)
-    add(b, prim_torus(R * 1.03, 0.012, seg=32, sides=6, scale_r=(1, 1)), Mh @ Matrix.Translation((0.0, 0, 0.012)) @ Matrix.Diagonal((1.08, 0.96, 1, 1)), M["armour"], "head")  # strap
-    add(b, prim_box(0.05, 0.06, 0.022, bevel=0.006), Mh @ Matrix.Translation((-0.10, 0, 0.06)) @ Matrix.Rotation(-0.5, 4, "Y"), M["armour"], "head", sharp=40)  # rear vent
-    # neck brace collar + back protector hump on the chest bone
+    R = HELMET_R
+    cz = 0.03  # shell centre above the head-bone centre (the chin bar hangs below)
+    # the shell is pitched 10 deg up on the head bone so the goggles face the track, not the front wheel
+    Mc = Mh @ Matrix.Translation((0.01, 0, cz)) @ Matrix.Rotation(-0.17, 4, "Y")
+    front = lambda deg: Matrix.Rotation(-math.radians(deg) / 2, 4, "Z")  # centre a torus sweep on +x  # noqa: E731
+    # shell: a lathe, round on top, the lower half drawn in toward the jaw (not a sphere), longer front-back
+    prof = [(0.0, 1.0), (0.42, 0.91), (0.72, 0.70), (0.90, 0.44), (0.985, 0.18), (1.0, -0.06), (0.97, -0.30), (0.90, -0.52), (0.80, -0.70), (0.66, -0.82), (0.45, -0.90), (0.0, -0.94)]
+    add(b, prim_lathe([(r * R, z * R) for r, z in prof], seg=32), Mc @ Matrix.Diagonal((1.06, 0.95, 1, 1)), M["helmet"], "head")
+    # chin bar: a 200 deg sweep at jaw height, flush with the shell at the cheeks, thrust forward at the mouth
+    add(b, prim_torus(R * 0.78, 0.040, seg=28, sides=10, sweep=math.radians(200), scale_r=(1.0, 1.4)), Mc @ Matrix.Translation((0.05, 0, -0.62 * R)) @ Matrix.Diagonal((1.22, 0.92, 1, 1)) @ front(200), M["helmet"], "head")
+    add(b, prim_box(0.04, 0.11, 0.05, bevel=0.012, segments=2), Mc @ Matrix.Translation((0.05 + (R * 0.78 + 0.028) * 1.22, 0, -0.62 * R)), M["armour"], "head", sharp=40)  # mouth vent, half buried in the bar
+    # peak: a flat annular sector above the goggles, a little nose-down on top of the head's own 24 deg
+    add(b, prim_torus(R * 0.98, 0.058, seg=20, sides=6, sweep=math.radians(118), scale_r=(1.0, 0.06)), Mc @ Matrix.Translation((0.035, 0, 0.72 * R)) @ Matrix.Rotation(0.30, 4, "Y") @ Matrix.Diagonal((1.0, 0.9, 1, 1)) @ front(118), M["helmet"], "head", sharp=30)
+    # goggles: frame + proud lens both follow the shell (torus sectors), strap around the shell
+    Mg = Mc @ Matrix.Translation((0.0, 0, 0.012)) @ Matrix.Diagonal((1.06, 0.95, 1, 1))
+    add(b, prim_torus(R * 1.02, 0.044, seg=16, sides=8, sweep=math.radians(120), scale_r=(0.55, 1.0)), Mg @ front(120), M["armour"], "head")
+    add(b, prim_torus(R * 1.05, 0.036, seg=16, sides=8, sweep=math.radians(108), scale_r=(0.40, 1.0)), Mg @ front(108), M["visor"], "head")
+    add(b, prim_torus(R * 1.0, 0.014, seg=32, sides=6, scale_r=(0.6, 1.9)), Mg, M["armour"], "head")  # strap
+    # vents: two brow scoops and a rear spoiler
+    for sg in (-1, 1):
+        add(b, prim_box(0.045, 0.03, 0.016, bevel=0.005), Mc @ Matrix.Translation((0.085, sg * 0.05, 0.86 * R)) @ Matrix.Rotation(0.75, 4, "Y"), M["armour"], "head", sharp=40)
+    add(b, prim_box(0.06, 0.13, 0.024, bevel=0.007), Mc @ Matrix.Translation((-0.86 * R, 0, 0.42 * R)) @ Matrix.Rotation(-0.55, 4, "Y"), M["armour"], "head", sharp=40)
+    # neck brace collar + a chest strap ring on the chest bone
     Mt = Matrix((
         (fwd_t.x, 0, t.x, S.x),
         (fwd_t.y, 1, t.y, S.y),
         (fwd_t.z, 0, t.z, S.z),
         (0, 0, 0, 1),
     ))
-    add(b, prim_torus(0.10, 0.024, seg=28, sides=8, scale_r=(1.1, 1)), Mt @ Matrix.Translation((-0.03, 0, -0.02)) @ Matrix.Diagonal((1.1, 1.3, 1, 1)), M["armour"], "chest")
-    add(b, prim_torus(0.068, 0.012, seg=20, sides=6), Mt @ Matrix.Translation((0.0, 0, 0.012)), M["armour"], "chest")
-    # back protector hump: part of the jersey (the back number + NORDVIK project onto it)
-    add(b, prim_sphere(0.085, seg=16, rings=10, scale=(0.6, 1.2, 1.4)), Mt @ Matrix.Translation((-0.115, 0, -0.16)), M["bodycloth"], lambda co: {"chest": 1.0})
-    # shoulder caps (jersey) so the deltoid reads
+    add(b, prim_torus(0.115, 0.028, seg=28, sides=8, scale_r=(1.1, 1)), Mt @ Matrix.Translation((-0.03, 0, -0.02)) @ Matrix.Diagonal((1.15, 1.3, 1, 1)), M["armour"], "chest")
+    add(b, prim_torus(0.072, 0.012, seg=20, sides=6), Mt @ Matrix.Translation((0.0, 0, 0.012)), M["armour"], "chest")
     for s, sg in (("L", -1), ("R", 1)):
-        sh = J["shoulder." + s]
-        add(b, prim_sphere(0.07, seg=14, rings=8, scale=(1, 0.9, 1)), Matrix.Translation(sh + V(0, -sg * 0.01, 0.005)), M["jersey"], {"upperArm." + s: 0.6, "chest": 0.4})
-        # -- glove: fist around the grip (bar axis = y): 4 finger rings + palm + thumb + cuff
+        # -- glove: a fist around the grip (bar axis = y), thumb, back-of-hand plate, cuff over the sleeve
         wr = J["wrist." + s]
         fd = (wr - J["elbow." + s]).normalized()
-        Mw = Matrix.Translation(wr)
-        for i in range(4):
-            add(b, prim_torus(0.026, 0.013, seg=14, sides=7), Mw @ Matrix.Translation((0, (i - 1.5) * 0.021, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"), M["gloves"], "hand." + s)
-        add(b, prim_box(0.06, 0.09, 0.055, bevel=0.018, segments=2), Matrix.Translation(wr - fd * 0.035), M["glove_top"], "hand." + s)
-        add(b, prim_cylinder(0.012, 0.012, 0.03, seg=8), Mw @ Matrix.Translation((0.02, -sg * 0.05, -0.005)) @ Matrix.Rotation(math.pi / 2, 4, "X"), M["gloves"], "hand." + s)
-        add(b, prim_cylinder(0.037, 0.041, 0.07, seg=12), Matrix.Translation(wr - fd * 0.10) @ C.rot_frame(fd), M["glove_top"], {"forearm." + s: 0.7, "hand." + s: 0.3})
-        add(b, prim_torus(0.041, 0.005, seg=14, sides=5), Matrix.Translation(wr - fd * 0.09) @ C.rot_frame(fd), M["armour"], {"forearm." + s: 0.7, "hand." + s: 0.3})
-        # -- boot: shaft up the shin, foot block on the peg, toe, sole, heel cup, 3 buckles + shin plate
+        ybar = (Vector((0, 1, 0)) - fd * fd.y).normalized()
+        zf = fd.cross(ybar)  # forward-ish = back of the hand
+        Mw = Matrix((
+            (fd.x, ybar.x, zf.x, wr.x),
+            (fd.y, ybar.y, zf.y, wr.y),
+            (fd.z, ybar.z, zf.z, wr.z),
+            (0, 0, 0, 1),
+        ))
+        add(b, prim_box(0.082, 0.100, 0.078, bevel=0.030, segments=3), Mw @ Matrix.Translation((0.012, 0, 0.004)), M["gloves"], "hand." + s)
+        add(b, prim_box(0.028, 0.092, 0.024, bevel=0.009, segments=2), Mw @ Matrix.Translation((-0.004, 0, 0.046)), M["gloves"], "hand." + s)  # knuckles
+        add(b, prim_box(0.055, 0.084, 0.024, bevel=0.009, segments=2), Mw @ Matrix.Translation((-0.028, 0, 0.036)), M["glove_top"], "hand." + s)  # back plate
+        add(b, prim_cylinder(0.015, 0.013, 0.046, seg=10), Mw @ Matrix.Translation((0.028, -sg * 0.045, -0.012)) @ Matrix.Rotation(-sg * math.pi / 2, 4, "X"), M["gloves"], "hand." + s)  # thumb
+        add(b, prim_cylinder(0.047, 0.053, 0.085, seg=14), Matrix.Translation(wr - fd * 0.115) @ C.rot_frame(fd), M["glove_top"], {"forearm." + s: 0.7, "hand." + s: 0.3})
+        add(b, prim_torus(0.052, 0.006, seg=14, sides=5), Matrix.Translation(wr - fd * 0.10) @ C.rot_frame(fd), M["armour"], {"forearm." + s: 0.7, "hand." + s: 0.3})
+        # -- boot: flared shaft over the pants, bellows, foot block on the peg, toe, sole, heel cup, 3 buckles + shin plate
         an, kn = J["ankle." + s], J["knee." + s]
         sd = (kn - an).normalized()
         shaft_len = 0.30
-        add(b, prim_lathe([(0.0, -0.01), (0.058, 0.0), (0.056, 0.12), (0.054, 0.24), (0.06, shaft_len), (0.0, shaft_len + 0.01)], seg=14), Matrix.Translation(an) @ C.rot_frame(sd), M["boots"], lambda co, an=an, sd=sd, s=s: {"shin." + s: 1.0} if (co - an).dot(sd) > 0.05 else {"shin." + s: 0.6, "foot." + s: 0.4})
+        add(b, prim_lathe([(0.0, -0.01), (0.066, 0.0), (0.064, 0.09), (0.063, 0.17), (0.070, 0.24), (0.079, shaft_len), (0.0, shaft_len + 0.008)], seg=16), Matrix.Translation(an) @ C.rot_frame(sd), M["boots"], lambda co, an=an, sd=sd, s=s: {"shin." + s: 1.0} if (co - an).dot(sd) > 0.05 else {"shin." + s: 0.6, "foot." + s: 0.4})
+        add(b, prim_torus(0.064, 0.012, seg=16, sides=6, scale_r=(1, 1.6)), Matrix.Translation(an + sd * 0.045) @ C.rot_frame(sd), M["armour"], {"shin." + s: 0.6, "foot." + s: 0.4})  # bellows
         Mf = Matrix.Translation(an)
-        add(b, prim_box(0.25, 0.105, 0.085, bevel=0.03, segments=3), Mf @ Matrix.Translation((0.055, 0, -0.048)), M["boots"], "foot." + s)
-        add(b, prim_box(0.09, 0.10, 0.06, bevel=0.028, segments=3), Mf @ Matrix.Translation((0.155, 0, -0.06)), M["boots"], "foot." + s)
-        add(b, prim_box(0.29, 0.11, 0.02, bevel=0.006), Mf @ Matrix.Translation((0.06, 0, -0.088)), M["sole"], "foot." + s, sharp=40)
-        add(b, prim_box(0.06, 0.11, 0.09, bevel=0.02), Mf @ Matrix.Translation((-0.055, 0, -0.04)), M["armour"], "foot." + s)
+        add(b, prim_box(0.26, 0.120, 0.095, bevel=0.034, segments=3), Mf @ Matrix.Translation((0.055, 0, -0.045)), M["boots"], "foot." + s)
+        add(b, prim_box(0.10, 0.112, 0.07, bevel=0.032, segments=3), Mf @ Matrix.Translation((0.165, 0, -0.058)), M["boots"], "foot." + s)
+        add(b, prim_box(0.30, 0.124, 0.022, bevel=0.007), Mf @ Matrix.Translation((0.065, 0, -0.088)), M["sole"], "foot." + s, sharp=40)
+        add(b, prim_box(0.07, 0.124, 0.10, bevel=0.024), Mf @ Matrix.Translation((-0.06, 0, -0.038)), M["armour"], "foot." + s)
         for by in (0.10, 0.18, 0.26):
-            add(b, prim_box(0.03, 0.12, 0.03, bevel=0.006), Matrix.Translation(an + sd * by) @ C.rot_frame(sd) @ Matrix.Translation((0.056, 0, 0)), M["alloy"], "shin." + s, sharp=40)
-        add(b, prim_box(0.03, 0.09, 0.26, bevel=0.012, segments=2), Matrix.Translation(an + sd * 0.17) @ C.rot_frame(sd) @ Matrix.Translation((0.05, 0, 0)), M["bootplate"], "shin." + s)
-        # -- knee brace: cup over the knee + hinge plates, on the knee (thigh/shin blend)
-        td = (kn - J["hip." + s]).normalized()
-        knee_fwd = Vector((td.z, 0, -td.x))
-        add(b, prim_sphere(0.062, seg=14, rings=8, scale=(0.9, 1.0, 1.1)), Matrix.Translation(kn + knee_fwd * 0.025 - td * 0.02), M["armour"], {"thigh." + s: 0.5, "shin." + s: 0.5})
-        add(b, prim_box(0.085, 0.09, 0.16, bevel=0.03, segments=3), Matrix.Translation(kn + knee_fwd * 0.03) @ C.rot_frame(sd), M["armour"], {"thigh." + s: 0.5, "shin." + s: 0.5})
-        for hs in (-1, 1):
-            add(b, prim_cylinder(0.022, 0.022, 0.010, seg=12), Matrix.Translation(kn + V(0, hs * 0.058, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"), M["alloy"], {"thigh." + s: 0.5, "shin." + s: 0.5}, sharp=40)
-        # -- hip pads / belt on the pelvis
-
-
-# ----------------------------------------------------------------------------- weights
-def envelope_weights(body, B, rigid_names=()):
-    """Bone-envelope weights: influence = 1 / (d / r)^4 over the bone segment, normalised, top 4."""
-    me = body.data
-    n = len(me.vertices)
-    co = np.empty(n * 3, dtype=np.float64)
-    me.vertices.foreach_get("co", co)
-    P = co.reshape(n, 3)
-    names = list(B.keys())
-    radii = dict(pelvis=0.14, spine=0.14, chest=0.16, neck=0.07, head=0.11)
-    for s in ("L", "R"):
-        radii.update({f"shoulder.{s}": 0.06, f"upperArm.{s}": 0.055, f"forearm.{s}": 0.045, f"hand.{s}": 0.04, f"thigh.{s}": 0.085, f"shin.{s}": 0.06, f"foot.{s}": 0.05})
-    infl = np.zeros((n, len(names)))
-    for j, name in enumerate(names):
-        h, t, _ = B[name]
-        h = np.array(h)
-        t = np.array(t)
-        d = t - h
-        L2 = float(d.dot(d))
-        u = np.clip(((P - h) @ d) / L2, 0.0, 1.0)
-        # bones with a small joint radius keep influence to their span; the torso column is
-        # allowed to reach a little past its ends to fill the hips/shoulders
-        closest = h + u[:, None] * d
-        dist = np.linalg.norm(P - closest, axis=1)
-        r = radii[name]
-        infl[:, j] = 1.0 / (1e-6 + (dist / r) ** 4)
-    # normalise, keep 4 strongest, drop < 2 %
-    idx = np.argsort(-infl, axis=1)[:, :4]
-    w = np.take_along_axis(infl, idx, axis=1)
-    w = w / w.sum(axis=1, keepdims=True)
-    w[w < 0.02] = 0
-    w = w / w.sum(axis=1, keepdims=True)
-    groups = {name: body.vertex_groups.new(name=name) for name in names}
-    for i in range(n):
-        for k in range(4):
-            if w[i, k] > 0:
-                groups[names[idx[i, k]]].add([i], float(w[i, k]), "REPLACE")
-
-
-def material_by_bone(body, M):
-    """Body skin faces: jersey above the belt, pants on pelvis/legs, sleeves on the arms, gloves at the wrists, skin on the neck."""
-    me = body.data
-    me.materials.clear()
-    mats = [M["bodycloth"], M["pants"], M["gloves"], M["skin"], M["boots"], M["sleeve_upper"], M["sleeve_lower"]]
-    for m in mats:
-        me.materials.append(m)
-    names = {g.index: g.name for g in body.vertex_groups}
-    dom = []
-    for v in me.vertices:
-        best, bw = None, -1
-        for g in v.groups:
-            if g.weight > bw:
-                bw, best = g.weight, names[g.group]
-        dom.append(best or "pelvis")
-    H, t = REST["hips"], REST["torsoDir"]
-    for p in me.polygons:
-        bones = [dom[i] for i in p.vertices]
-        b = max(set(bones), key=bones.count)
-        base = b.split(".")[0]
-        u = (Vector(p.center) - H).dot(t)
-        if base == "thigh" or (base in ("pelvis", "spine") and u < 0.06):
-            mi = 1
-        elif base == "shin":
-            mi = 4
-        elif base == "hand":
-            mi = 2
-        elif base in ("neck", "head"):
-            mi = 3
-        elif base == "upperArm":
-            mi = 5
-        elif base == "forearm":
-            mi = 6
-        else:
-            mi = 0
-        p.material_index = mi
+            add(b, prim_box(0.032, 0.135, 0.032, bevel=0.007), Matrix.Translation(an + sd * by) @ C.rot_frame(sd) @ Matrix.Translation((0.064, 0, 0)), M["alloy"], "shin." + s, sharp=40)
+        add(b, prim_box(0.03, 0.10, 0.26, bevel=0.012, segments=2), Matrix.Translation(an + sd * 0.17) @ C.rot_frame(sd) @ Matrix.Translation((0.058, 0, 0)), M["bootplate"], "shin." + s)
 
 
 # ----------------------------------------------------------------------------- posing + actions
@@ -845,19 +948,14 @@ def main():
     J = REST
     BONES = define_bones(J)
     arm = build_armature(BONES)
-    body = build_body(J, M)
-    envelope_weights(body, BONES)
-    material_by_bone(body, M)
-    gb = MeshBuilder("gear")
+    gb = MeshBuilder("rider")
+    build_body(J, M, gb)
+    body_tris = sum(len(f.verts) - 2 for f in gb.bm.faces)
     build_gear(J, M, gb)
-    gear = gb.build()
-    log("body tris", C.tri_count(body), "gear tris", C.tri_count(gear))
-    for p in gear.data.polygons:
+    body = gb.build()
+    log("body tris", body_tris, "gear tris", C.tri_count(body) - body_tris)
+    for p in body.data.polygons:
         p.use_smooth = True
-    # join gear into the body (vertex groups merge by name)
-    C.select_only([body, gear])
-    bpy.context.view_layer.objects.active = body
-    bpy.ops.object.join()
     body.name = "rider"
     body.data.name = "rider"
     if LOD:
