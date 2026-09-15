@@ -128,3 +128,68 @@ Whichever wins, the round that ships it needs a played clip on the phone harness
 - **Brake flash.** A held brake fills red and stays red; the "flash" is a one-shot `box-shadow` pulse on the `.held` transition, not a loop.
 - **Never above the wheel line.** Cap every control's top at 27 % of the height from the bottom on short screens (`html.short`), so a descent still shows the track ahead.
 - **Pause / restart unchanged.** They keep `reveal()` / `conceal()` and the ≥ .5 rule; new controls must not extend into their 56 × 44 rects (top band), which none of the five do.
+
+---
+
+# Round 2 — three hybrids of A and D (mockups, no decision)
+
+Round subject: the user's read of round 1 was *"some mix between A corner pads and D classic strip. A is too big — it takes up too much screen real estate; D is too plain / simple."* So this round keeps A's **presence** — real buttons with glyphs and a held state that is satisfying to look at — at D's **footprint** — one low band on the bottom edge, nothing tall, nothing that climbs into the track or the bike. The quarter zones stay the hit areas in all three; every control below is decoration inside its existing `.tz` column.
+
+- Contact sheet (current + A + D + F/G/H, labelled): `assets/design/controls/contact-sheet-r2.jpg`
+- Hybrids, full-res PNG as generated (1536×1024): `assets/design/controls/F-low-pads.png`, `G-strip-keys.png`, `H-edge-tabs.png`
+- Same generator and same shared scene brief as round 1 (`codex exec -i current-e1-run` at 1536); same input state in all three — **LEAN BACK held + GAS held**, LEAN FWD and BRAKE idle. Lean-held is drawn **amber** this round (round 1 used white for lean) so that the held lean reads as *the HUD colour*, distinct from brake red and gas green; whichever wins, the colour is one CSS variable.
+- Same 3:2-vs-2.17:1 caveat as round 1: a band that is 12 % of the mockup's height is ~8 % of the phone's. The *phone fit* lines below are the numbers to build, in CSS px on 932×430 (quarters 233 px wide, `sab` 21 px, wheel line y ≈ 300 px).
+
+| Dir | What it keeps from A | What it keeps from D | Footprint at 932×430 | Held reads by | Occlusion |
+|---|---|---|---|---|---|
+| **F** Low pads | Four separate rounded pads, glyph + label, liquid fill + glow | One low row on the bottom edge, nothing above it | 4 × 217×52 px pads, y = 357–409 → band 12 % of height | Two solid coloured blocks at the bottom corners of vision | Bottom 12 %, all four quarters; pads 93 % of the quarter width |
+| **G** Strip with keys | Distinct key caps that look pressable, glyph + label, held key goes solid | The continuous full-width strip and the faint held column wash | Strip 52 px + `sab` = 73 px, y = 357–430 → 17 % incl. safe area (12 % visible strip) | Key lights *and* the quarter tints 8 % — strongest peripheral cue of the three | Bottom 12 % continuous; the wash tints the whole quarter while held |
+| **H** Edge tabs | Real buttons with icons, held expands + glows + ring | The smallest possible band, most of the quarter transparent | 4 × 96×44 px pills, y = 365–409 → 10 %; each pill 41 % of its quarter's width | Small: two glowing pills in the corners; the ring is a detail cue | Bottom 10 % at four spots only; ~85 % of the bottom band stays clear |
+
+### F — "Low pads" (`F-low-pads.png`)
+
+**What it is.** A's four pads, shrunk in height only and lined up as one low row. Each pad fills its quarter minus 8 px gutters, so the row reads as four buttons, not a strip; the wide-and-short shape forces a horizontal layout — glyph left, small tracking-spaced label right — which is the pause-tile / `.btn` language. Glyphs: ◀ + bike on its rear wheel, bike nose-down + ▶, red brake disc, green throttle grip. Held: a fill rises from the bottom of the pad (amber / red / green), the glyph and label flip to black, the pad glows onto the dirt around it. Idle: frosted dark glass with a 1 px light border.
+
+**Phone fit.** Pads 217 × 52 px (`13.9rem × 3.33rem`), radius 12, bottom edge at `sab` = 21 px, top at y = 357 = 83 %; gutters 8 px (so the 25 % / 75 % seams fall in a gutter, and the 50 % seam too); glyph 24 px, label `.72rem` tracking .2em. The band is 12 % of the height against A's ~19 % (82 px pads + 33 px inset), and it sits fully under the wheel line (y 300) — 57 px of dirt between the wheels and the pads on flat ground. A descent can still put the track ahead behind the two right-hand pads, at idle opacity.
+
+**How held reads mid-run.** Nearly A's signal at two thirds of A's height: a 217 × 52 block going solid amber bottom-left and solid green bottom-right is still a luminance event in the periphery, and because the pads are wider than A's, the coloured area per pad (11 300 px²) is only 8 % smaller than A's (12 300 px²). What is lost is the *fill direction*: at 52 px tall the bottom-up liquid is a 120 ms flicker, not a gauge — the mockup already shows it as a near-full fill with a dark cap. Build it as a full fill with the glow as the animation carrier, or use a left-to-right wipe from the screen-edge side (outer pads) / seam side (inner pads) which reads as "from under the thumb".
+
+**Mockup vs. brief.** The generator idled the pads at ~60 % dark glass, not 25 %; that happens to be the right call for the sunlit E1 floor (§3, idle ≥ .5), so read the picture as the build target. The fill is drawn 90 % full rather than 75 %.
+
+**`.tz` mapping.** One `.tz-pad` child per column, positioned `left:8px; right:8px; bottom:var(--sab); height:3.33rem`; nothing crosses a seam so no cross-column element; `.held` on the column drives `.fill` + glow + glyph colour. Hit area is still the full quarter; a thumb in the empty quarter above the pad lights the pad, which is right (the pad *reports* the zone). No `reveal()` — nothing new is a button; `.touch-layer.under-overlay .tz { opacity:0 }` hides it under pause / results for free.
+
+**Cost.** Lowest of the three and lower than A: A's template minus the vertical layout — inline SVG glyph + `.fill` + label in `mk()` (~45 lines `touch.ts`), `.tz-pad` box, `.fill` `scaleY` or `scaleX` transform on `--t1`, glow `box-shadow`, three colour variables (~45 lines `styles.ts`). Half a day with the phone clip.
+
+### G — "Strip with keys" (`G-strip-keys.png`)
+
+**What it is.** D's continuous strip, made into a keyboard: a full-width dark glass strip with a 1 px lighter top edge, and four bevelled key caps inset into it (top highlight, darker bottom bevel), one centred per quarter, each ~75 % of its quarter wide. Icons + labels as F. A 2 px amber seam at the 50 % line separates the lean pair from the drive pair — the strip is the only direction that draws the *two-thumbs* structure explicitly. Held: the key cap goes solid in its colour with a black glyph, the bevel flattens (it looks pressed), it glows, **and** the quarter above it gets an 8 % column wash of the same colour, fading upward — D's held cue, dimmed to peripheral level.
+
+**Phone fit.** Strip 52 px (`3.33rem`) + `sab` → y = 357–430; keys 175 × 40 px inset 6 px from the strip's top edge and centred per quarter, radius 8; glyph 22 px, label `.72rem`; seam 2 px `--amber` at x = 466 from the strip's top edge to the bottom. The visible strip is 12 % of the height (D's was 13 % + `sab`); the column wash is `linear-gradient(to top, colour 8 % → transparent 55 %)` on the `.tz` column, i.e. ≤ 8 % alpha at the strip and gone by the wheel line — the mockup shows it about right on the green side (a faint tint on the fourth quarter) and nearly invisible on the amber side, which is what 8 % should look like over an amber floor.
+
+**How held reads mid-run.** Strongest of the three: the key is a solid coloured bar *and* the quarter itself shifts colour, so gas-held is visible without looking down even when the key is under the thumb. The trade is D's: the wash tints the track ahead in the fourth quarter for most of the run; 8 % is the ceiling, and the amber wash on an amber canyon is close to invisible (lean feedback then rests on the key alone, which is fine — lean is the input the player *feels*).
+
+**Mockup vs. brief.** Close. The generator put the bike glyph before the chevron on LEAN BACK (bike ◀ label) where the brief said chevron first; keep the chevron on the *outside* (◀ bike · bike ▶) in the build so the pair reads as a mirror. Strip drawn at ~70 % opacity again (as in D); build 40 % → `settled` 30 %.
+
+**`.tz` mapping.** The strip is one `::before` on the `.touch-layer` (full width, `pointer-events:none`, so it is not a hit rect and not a `.live` surface); the amber seam is that element's `border`/gradient at 50 %; each `.tz` column holds its key cap child and owns its `.held` wash — exactly today's `.held` background made into a gradient. Zero mismatch between what lights and what you can press, as in D. The seam matches `zoneAt`'s half rule (a finger never crosses it).
+
+**Cost.** Low. Key-cap template in `mk()` (~40 lines), strip `::before`, key bevel (two `box-shadow`s), `.held` key colour + gradient wash (~55 lines CSS). Half a day. One check on the phone: the wash repaints a 233 × 430 column every held frame — it is a plain background on an existing element (today's `.held` already does this at 7 % white), so no new cost, but confirm in the fps meter under load.
+
+### H — "Edge tabs" (`H-edge-tabs.png`)
+
+**What it is.** The least UI that is still buttons: four small pill tabs, two tucked into the bottom corners under the resting thumbs and two sitting either side of the 50 % seam, each with an icon inside a thin ring and a two-letter label (BK · FW · BR · GS). The rest of the quarter is clear. Held: the tab scales up ~20 %, goes solid in its colour with black icon and label, glows, and the ring round the icon becomes a thick progress arc; three 1 px hairlines at the 25 / 50 / 75 % seams appear from the bottom edge while any finger is down, so the hit geometry shows itself exactly when it matters and is gone otherwise.
+
+**Phone fit.** Pills 96 × 44 px (`6.15rem × 2.8rem`), fully rounded, bottom at `sab` = 21 → y = 365–409 (10 %); outer pills inset 12 px from the screen edges (centres at x = 60 / 872 — 56 px further out than A's, dead under the thumb tips), inner pills 8 px either side of x = 466 (centres 410 / 522); icon 22 px in a 30 px ring, label `.8rem`. Held scale 1.2 → 115 × 53, still under the wheel line by 180 px. Hairlines run from the bottom edge to y = 322 (25 % of the height), not full height.
+
+**How held reads mid-run.** Weakest of the three and the only one that risks failing the glance test: a 115 × 53 pill glowing in the corner is about half of F's coloured area and sits under the thumb that pressed it, so the visible cue is mostly the glow spill and the hairlines. The arc is a detail cue (and, as §3 says, binary — it snaps closed, it does not fill). What H buys is the cleanest screen of any direction in either round and the strongest "the corners are yours" thumb anchor. If chosen, add G's 8 % wash under it; at that point H is G without the strip.
+
+**Mockup vs. brief.** The generator over-drew two things: the pills are ~150 × 60 CSS-equivalent (the brief said 96 × 44) and the hairlines run almost to the HUD (brief: bottom quarter). Read the picture 35 % smaller and the lines a quarter as tall. Inner tabs are placed to the *brief*, straddling the centre with a gap, which the mockup shows correctly.
+
+**`.tz` mapping.** One `.tz-tab` child per column, anchored `left:12px` (back), `right:8px` (fwd), `left:8px` (brake), `right:12px` (throttle) — each stays inside its own column, so no cross-column element. The seam hairlines are the existing `.tz` `border-right` (already 1 px `rgba(255,255,255,.12)`, full height today): give it `border-image` / a `mask` so it shows only the bottom 25 %, and toggle its opacity from a `.touch-layer.any-held` class set in `paint()` when the held set is non-empty (one line). Hit area unchanged; the hairlines are the honest picture of it.
+
+**Cost.** Low-medium. Tab template (~40 lines), pill CSS with `transform: scale(1.2)` on `.held`, ring as an SVG circle with `stroke-dasharray` snapping over `--t1`, `.any-held` seam rule (~65 lines CSS, ~6 lines `paint()`). Half a day to a day, plus the on-boarding hint must say "hold anywhere in your quarter" because the pills look like the only targets.
+
+## Recommendation
+
+**G, "Strip with keys"** — it is the only one of the three that keeps the property the user liked in A (things that plainly read as buttons, a satisfying pressed state) *and* the property that made D worth mentioning (the quarter itself lights, so gas-held is seen without looking down), inside D's 12 % band. F is the safest translation of the user's words and half a day; pick it if the column wash on the canyon is unwanted. H is the prettiest screen but its held cue is under the thumb and it needs the wash anyway to pass the glance test, at which point it is G minus the strip.
+
+Whichever wins: idle ≥ .5 on the sunlit floor (§3), lean-held colour is one variable (amber here, white in round 1 — the user should say which), the chevrons sit on the outside of the lean pair, and the round that ships it needs the phone-harness clip from §2 (cold boot → GO → back + gas together, both cues lit → brake flash → corner restart).
