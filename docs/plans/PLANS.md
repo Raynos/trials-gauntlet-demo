@@ -1,5 +1,7 @@
 # What we are building — the plans and where each stands
 
+**Standing goal (set by the user 2026-09-14 evening): overnight build until every plan in this folder is complete and ready for `project/archive/`.** Completion = each plan's own done lines, judged by evidence (gate, strangers, blind critic, device report), never by the parent's feeling.
+
 One page, kept current by the parent at every commit. Percentages are against each plan's own
 "done" lines, not a feeling. Live build: https://trials-gauntlet-demo.vercel.app · pinned v0.1.0:
 https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
