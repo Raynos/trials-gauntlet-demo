@@ -1,9 +1,10 @@
 # Audio design — procedural Web Audio for the trials gauntlet
 
-Status: **round 3 implemented** (`src/audio/**`; retuned to **physics v2** R3–R5 — the clutch launch as `reportRpm`
-models it, torque from the class thrust curve, the landing on the bump stop, the hop from `hopPhase`, the crash as
-ragdoll sensors — plus the crowd, per-biome rooms, one stinger family and a procedural music bed; §10 below).
-Round 2 (v1 tuning) is the body of §1–§8; where §10 says a number changed, §10 wins. Owner paths: `src/audio/**`, this file.
+Status: **round 4 implemented** (`src/audio/**`; §11 — the engine is a per-firing resonator excitation with seeded
+jitter, misfires and a hunt, rendered in stereo; the landing is a suspension thump and settle; wind and tyres climb
+with speed; every one-shot varies per event so a crash and its replay are different sounds). Round 3 (§10) retuned
+everything to physics v2 and added the crowd, rooms, stingers and music. Round 2 (v1 tuning) is the body of §1–§8;
+where a later section says a number changed, the later section wins. Owner paths: `src/audio/**`, this file.
 Binding contract: `docs/design/CONTRACT.md` §2.3 (audio consumes `state.engine`, never
 re-derives rpm), §2.7 (`AudioSystem.update(state, dt, input)` + optional `renderOffline`),
 §2.8 (unlock on first touch/key). Where this file and CONTRACT disagree, CONTRACT wins.
@@ -484,3 +485,112 @@ suite unchanged (snow bed re-levelled −31 dB after the hush pushed it under �
 - **harness**: `harness/compare` audio pairs from `beats.ts`'s WAVs (mux onto the clips with ffmpeg) for the blind
   A/B; a `harness:audio` stage running `beats.ts` each round so the table above stays current.
 - **physics / tracks**: a power-wheelie beat (a log-ramp row at 8–10 m/s) if the wheelie A/B is to be meaningful.
+
+
+## 11. Round 4 — the engine fires, one pulse at a time (`src/audio/**`)
+
+The round-11 blind audio A/B (docs/design/harness-metrics.md, "Blind audio A/B") took the reference **11 of 12** and
+named the same tell eleven ways: *a metronomic, pinned-pitch, mono pulse train under a level that never moves, a
+click for a landing, and a crash that replays itself.* Every one of those was measurable, so this round measures
+them — before, after, and on the eight reference cuts — with `src/audio/tools/critic.ts`, and closes them.
+
+### 11.1 What changed, tell by tell
+
+| the critics' tell (verbatim) | what it was | round 4 |
+|--|--|--|
+| "every pulse the same … no per-cycle jitter" / "pitch-locked ~150 Hz tone amplitude-modulated by a metronomic 36.5 Hz pulse" | `EngineVoice` = 8 steady partials at n·fFire + one fixed-frequency (120 + 90·load Hz) exponential pulse; nothing varied cycle to cycle | **per-firing excitation** (`dsp/engine.ts`): each combustion is a 0.7 ms seeded burst into three resonators (pipe 95 Hz·(1 + 0.35·rev + 0.12·load), pipe 2 at 2.37× — inharmonic, body 330 + 260·load + 60·rev Hz) re-jittered ±2.5 % per firing; cycle period × (1 ± 5 % idle → ± 2.2 % load); amplitude ± 15 %; misfires at idle (p 0.05); a seeded hunt (17-cycle random walk, ± 3 % rate / ± 2.4 dB) below 25 % load; overrun pops (closed throttle > 2500 rpm, p 0.18) |
+| "nothing above 3 kHz" / "every 35 ms combustion pulse is a click that drops the whole spectrum by 25 dB" | the pulse *was* the whole engine; between pulses only the −32 dB intake wash | a per-pulse exhaust noise burst (HP 1.5 kHz → LP 2.5 + 5.5·load kHz, τ 2.5 + 3·load ms) and a continuous bed: decorrelated intake hiss gulped once per cycle (−46 + 14·load dB), a mechanical 1.1 kHz bed (−46 dB), valve ticks at 2·fFire |
+| "no stereo" (L/R 0.99, S/M 0.05–0.08) | the engine was a mono buffer added to both channels | the engine renders stereo: dry at pan −0.15, the exhaust path through a 30 ms tapped early-reflection line (5.9 / 13.7 / 27 ms right, 9.3 / 19.1 ms left, damped); the intake hiss is independent noise per ear; the wind rush is delayed 7.3 ms to the right ear with its own hiss; the tyres sit at ±0.35 |
+| "level never leaves a 4.6 dB window" / "no speed-linked wind or tyre noise rises" | wind −38 + 14·w dB and tyres −5 dB trim sat 16 dB under the engine at 19 m/s | wind −36 + 20·w dB (−44 → −29 dBFS over 0 → 19 m/s, measured), tyre trim −2 dB (−43 → −29 dBFS); the engine's level law is now −5 + 5·√load + torque + speed + 4·lug − 8·overrun dB over a per-pulse energy 4·(0.5 + 0.35·load + 0.15·lug)/(1 + 3·rev): idle ≈ −28 dBFS, WOT ≈ −16, overrun ≈ −34 — the three states are ≥ 6 dB apart with their own centroids |
+| "its landing is a 20 ms click followed by the bed getting quieter" / "a 50 ms blip standing in for the 2 m landing" | `landing` recipe: 180 → 55 Hz partial decaying in 0.14 s, brown noise 0.04 s, then a −6 dB duck on the whole game bus | **thump and settle**: 110 → 62 Hz body thump (0.4 s partial, 70 ms hold, 0.55 s envelope), the compression's brown whump (0.22 s), a 2–3.5 kHz chassis rattle 4 ms after, a new `scrub` transient (kind 27: 1.4–3.2 kHz rubber scrub with 48 Hz chatter, gain = the landing's, pitch = speed/20) — and **no duck on a landing** (the crash still ducks) |
+| "a wheelie with no throttle feathering" / "a dry, mono, unmodulated idle loop where a wheelie should be surging" | physics' truth: the v2 wheelie is a 2 m/s balance on the slipping clutch at 1550–1770 rpm, throttle 0.03–0.13 (probed: `state.engine.rpm` over the beat) — there is no rpm to surge with | a new model output **`lug`** (spare header slot 24: front up, rear down, < 6 m/s, throttle on, rpm < 2600) voices **load, not rpm**: +4 dB, heavier pulses, pipe Q 5 → 7, the deep hunt (± 6 % rate / ± 8 dB), more misfires, muffler +2.5 kHz, burst +8 dB — a laboured single held at the balance point. The beat's rpm (14.1 → 14.8 pulses/s) is physics'; see 11.5 |
+| "the identical impact sequence plays twice 1.8 s apart (r = 0.67)" | `flat-test/crash.json` replays the same crash after the 1.0 s auto-restart; every one-shot recipe was a pure function of (kind, gain, pitch), every partial started at phase 0 | **per-event variation** (`VoicePool.vary`): a second rng reseeded on every trigger from (seed, kind, occurrence index) — determinism kept (the same recording renders the same bytes) but the *n*-th crash never replays the first: impact / grunt / fault stamp / debris / ticks / body thuds / landing / starter all draw centres, decays and timing from it, and every physical one-shot's partials start at a per-event phase (the UI stinger family keeps phase 0 — a synth stab is phase-coherent by design). The crowd groans **once per crash** (`groanMinGapS` 4 s). The engine **dies** rather than fades: the crank runs 1500 → 150 rpm (`stallDrop` 0.9 over 0.5 s) under a 1 − k² gain — sparse slowing putts; the respawn is the starter + catch with its own whir length / pitch / chatter rate per respawn |
+| (start gate) "no clutch hold or limiter" | the limiter dropped 1 cycle in 3; at 83 firings/s the reflections and the ring bridged a 12 ms gap | the rev limiter cuts **two consecutive cycles in six** (same duty, a 24 ms gap), resets the pipe / body resonators and kills the intake gulp on a cut — an ignition-cut stutter (≥ 0.8 dB off the level, tested) |
+
+Model changes (`model/`): `lug`, `scratch.speed` (the scrub reads it — events carry no velocity), `lastGroanAt` kept
+across restarts, the landing duck removed, `crashFadeS` 0.35 → 0.5 / `stallDrop` 0.55 → 0.9. The golden stream hash
+is restamped `51351dbc623cc60f` (`lug` in the header; the transient stream gained `scrub`).
+
+### 11.2 Measured the way the critics judged — `tools/critic.ts`
+
+`npx tsx src/audio/tools/critic.ts <wav> [--repeat a0,a1,b0,b1]` prints, per WAV: **jitter %** (std / mean of the
+combustion-pulse onset intervals from the 60–400 Hz envelope over the steadiest 2 s, intervals kept within 0.6–1.6 T
+so a misfire or a double trigger is not timing) and **r1** (the envelope's autocorrelation at the firing period —
+1.00 = a metronome; timing jitter, misfires, amplitude jitter and hunting all pull it down); **level range** (p95 − p5 of
+200 ms RMS over the cut); **centroid** p10–p90 (4096-pt Hann frames above −55 dBFS); **L/R** Pearson correlation and
+side/mid RMS; energy **> 3 kHz** re the whole; the biggest **60–120 Hz onset** (band energy 150 ms after vs 150 ms
+before) with the 400 ms RMS envelope after it in 50 ms steps; and **repeat r**, the max normalised cross-correlation
+between two windows over ± 20 ms of lag. "Before" = round 3's WAVs (`beats.ts` at 5649aa6); "after" = the WAVs
+`pnpm harness:audio` rendered for this round's pairs; the references are `reference/evolution-gameplay/audio/*.wav`
+(they carry the games' music under the engine, which is why their r1 is low and their p10 centroid sits at 50 Hz).
+
+| clip | RMS dBFS | jitter % @ pulse, r1 | level range dB | centroid Hz p10–p90 | L/R corr / S/M | > 3 kHz dB | thump 60–120 Hz +dB [env re peak, 50 ms steps] | repeat r |
+|--|--|--|--|--|--|--|--|--|
+| start **before** | −18.2 | — @ 59 Hz, **0.75** | 21.3 | 170–376 | **1.00 / 0.05** | −19.3 | +5.2 [0 −6 −6 −6 −6 −4 −2 −4] | — |
+| start **after** | −19.0 | — @ 31 Hz, 0.59 | 12.0 | 191–626 | 0.65 / 0.46 | −15.7 | +5.0 [−5 −4 −4 −4 −2 0 −1 0] | — |
+| ref start-01 / 08 | −23.8 / −21.3 | — / — , 0.50 / 0.55 | 20.8 / 33.3 | 166–861 / 268–1117 | 0.86 / 0.28 · 0.62 / 0.49 | −19.4 / −14.2 | +12.0 / +18.6 | — |
+| wheelie **before** | −29.7 | **0.7 @ 14.7 Hz, 0.97** | 12.1 | 174–423 | **0.99 / 0.08** | −20.9 | +5.6 | — |
+| wheelie **after** | −20.0 | **6.7 @ 14.1 Hz, 0.74** | 8.2 | 165–299 | 0.59 / 0.56 | −24.4 | +11.4 [0 −4 −3 0 −4 −4 −1 −5] | — |
+| ref wheelie-02 / 05 | −21.6 / −23.4 | — (music) | 15.0 / 18.2 | 313–1131 / 276–817 | 0.84 / 0.43 · 0.87 / 0.43 | −15.3 / −19.7 | +22.7 / +12.9 | — |
+| landing **before** | −24.7 | — @ 37 Hz, 0.77 | **5.3** | 188–328 | **0.99 / 0.06** | −23.1 | **+5.5** [−3 −7 −8 −5 −6 −3 −1 0] | — |
+| landing **after** | −22.1 | — @ 38 Hz, 0.63 | 10.3 | 225–786 | 0.68 / 0.45 | −19.1 | **+15.0 @ 5.25 s [−4 0 −2 −8 −9 −11 −10 −12]** | — |
+| ref landing-12 / 14 | −28.8 / −26.2 | — | 16.9 / 21.7 | 48–507 / 50–666 | 1.00 / 0.05 · 1.00 / 0.03 | −24.2 / −22.9 | +10.3 [−4 0 0 −1 −2 −2 −7 −2] / +27.8 [−19 −6 0 −1 −2 −6 −9 −11] | — |
+| crash **before** | −26.2 | **0.9 @ 12.5 Hz, 0.92** | 19.4 | 167–670 | **0.99 / 0.07** | −18.6 | +14.0 | **0.66** |
+| crash **after** | −23.6 | **3.1 @ 12.4 Hz, 0.84** | 19.2 | 169–551 | 0.71 / 0.43 | −18.9 | +15.4 [−14 −12 −6 −4 0 −2 −1 −2] | **0.35** |
+| ref crash-04 / 13 | −22.4 / −17.4 | — , 0.47 / — | 16.1 / 32.2 | 263–915 / 146–812 | 0.92 / 0.38 · 1.00 / 0.01 | −18.5 / −19.9 | +16.5 / +25.7 | — |
+
+Read across: the pulse train's periodicity fell from a metronome's 0.92–0.97 to 0.74–0.84 with 3–7 % measured
+timing jitter (at 30–60 firings/s the pipe ring defeats onset picking, so r1 carries it: 0.59–0.60 vs 0.75–0.77);
+L/R went from 0.99–1.00 / 0.05–0.08 to 0.59–0.72 / 0.42–0.56 against the references' 0.62–0.92 / 0.28–0.49 (two of the
+reference cuts are themselves mono captures); the landing went from a +5.5 dB click to a +15.0 dB thump settling over
+350 ms; the crash's replay correlation from 0.66 to 0.35; the wheelie and landing level ranges from 12 / 5 dB to 8 / 10
+dB (the wheelie is discussed below). The launch's wind and tyre rise: ambient bus −44 → −29 dBFS and tyres −43 → −29
+over 2 → 19 m/s under an engine at −18 (`rise.ts` probe, 1 s windows). Reference spectrograms and ours:
+`harness/out/audio-beats/*.spectrogram.png`.
+
+`beats.ts` table (unchanged tool): start −19.0 dBFS / 474 Hz (r3 −18.2 / 310; ref −23.8 / 370, −21.3 / 597), wheelie
+**−20.0** / 234 (r3 −29.7 / 314; ref −21.6 / 512, −23.4 / 427), landing −22.1 / 368 (r3 −24.7 / 272; ref −28.8 / 153,
+−26.2 / 287), crash −23.6 / 279 (r3 −26.2 / 335; ref −22.4 / 417, −17.4 / 554). Every beat renders **byte-identically**
+twice in one process and across processes (`pnpm harness:audio` twice: start `cc53c2f4f340…`, wheelie
+`ae263d163473…` both runs).
+
+### 11.3 CPU and size
+
+The new engine is **cheaper** than the harmonic bank (no per-sample `sin`): 0.093 vs 0.117 ms per 800-sample frame
+alone (4000 rpm, load 0.5); the stereo wind costs +0.009 (a delayed tap, not a second generator). Whole mix in plain
+node (`renderScript` gauntlet, warm, best of 3) on a machine at **load average 27** while other agents ran: run scene
+**0.44 ms** per 60 Hz frame, results scene **0.57 ms** — under the 0.6 budget even so (round 3 measured 0.26–0.28 /
+0.37–0.39 on a quiet box; the vitest gate stays 0.8). `beats.ts` cold: 0.46–0.64 under the same load. Worklet chunk
+after this round: **44.2 KB min / 14.4 KB gz** (round 3: 40.9 / 13.3; budget 20 KB gz).
+
+### 11.4 Tests (`pnpm vitest run src/audio`: 38)
+
+Restamped golden hash; the stall test follows the new law (200 ms in: gain > 0.8, rpm < 1125; 500 ms: 0 / 150); the
+landing test asserts **no** duck (≤ 1.5 dB) while a crash still ducks 5–7 dB (read on the ambient bed); the limiter
+test reads the two-in-six stutter; the fundamental test allows the idle hunt (5 %); the canyon slap-back is read
+against the hall's same window (the landing no longer leaves a gap at 190 ms). New: the idle is a jittered stereo
+pulse train (12.5 pulses/s, ≥ 2 % jitter, r1 < 0.95, L/R < 0.9, S/M > 0.2) and the lug is louder and moves more than
+the idle; a crash and its replay 1.75 s later cross-correlate < 0.5 on the full mix.
+
+### 11.5 What still reads synthetic — and what is not audio's to fix
+
+1. **The wheelie beat is the physics.** `wheelieHoldV3(40, 4)` on lab-flat-200 holds 1550–1770 rpm at throttle
+   0.03–0.13 with the rear slipping 0.5–0.8 m/s for eight seconds; the reference wheelies are 5000+ rpm power
+   wheelies over log ramps with the rider feathering. `lug` makes ours a laboured, hunting single (8.2 dB of range,
+   6.7 % jitter, r1 0.74) — an honest voicing of a 2 m/s clutch balance, not a surge, because there is no rpm to
+   surge with (CONTRACT §2.3: audio never re-derives rpm). A power-wheelie beat (a log-ramp row at 8–10 m/s) is the
+   physics / tracks request that would make the two wheelie pairs meaningful.
+2. **The launch's dynamic range** is 12 dB against the references' 21–33: ours is a smooth pull from a −28 dBFS idle
+   to a −16 WOT; the references' start cuts carry READY/GO stingers and music under a much louder first burst.
+3. The **crowd** and **music** are as §10.7 left them (a formant murmur; a competent loop).
+4. The exhaust burst and intake are still filtered white noise; a granular "dotted" texture per pulse (short seeded
+   grains at 2–6 kHz) is the next step if the burst reads as hiss.
+5. The 20 kHz noise floor vs the captures' 12–14 kHz brick-wall (harness note) is a pair-build matter, not the synth's.
+
+### 11.6 Requests
+
+- **harness**: the six new pairs are `apair-audio-*-20260915-1514*` (wheelie-02 `151446-3063`, wheelie-05 `151448-8685`,
+  landing-12 `151449-731e`, landing-14 `151450-904b`, crash-04 `151451-eaec`, start-01 `151453-6af8`; the `1510*` and
+  `1512*` sets are earlier calibrations of the same round — discard); the audio rubric can now also ask the critic for jitter / L/R / thump numbers, since `critic.ts` prints them.
+- **physics / tracks**: a power-wheelie beat (above).
+- **core-game**: nothing new; `setBike` / `setScene` wiring as §10.8.

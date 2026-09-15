@@ -92,6 +92,15 @@ export interface Trigger {
 export class VoicePool {
   private readonly sr: number;
   private readonly rng: NoiseRng;
+  /**
+   * Per-event variation (round 4): reseeded on every trigger from (seed, kind, occurrence index), so the second
+   * crash / landing / respawn of a run never replays the first (the critics heard the identical impact sequence
+   * twice, r = 0.67) while a recording still renders byte-identically.
+   */
+  private readonly vary: NoiseRng;
+  private readonly varySeed: number;
+  private readonly counts = new Uint32Array(128);
+  private phased = false;
   private readonly voices: Voice[] = [];
   private readonly pg: [number, number] = [1, 0];
   /** Ordered onset log (sample index of first non-delayed sample), for tests. */
@@ -102,6 +111,8 @@ export class VoicePool {
   constructor(sr: number, seed: number, size = 16) {
     this.sr = sr;
     this.rng = new NoiseRng(seed);
+    this.vary = new NoiseRng(seed ^ 0x51ed);
+    this.varySeed = seed;
     for (let i = 0; i < size; i++) this.voices.push(new Voice(sr));
   }
 
@@ -179,7 +190,9 @@ export class VoicePool {
     v.pFEnd[i] = fEnd;
     v.pGlide[i] = glideS > 0 ? 1 - Math.exp(-1 / (glideS * this.sr * 0.3)) : 1;
     v.pDecay[i] = decayCoef(decayS, this.sr);
-    v.pPhase[i] = 0;
+    // round 4: a per-event start phase for the physical one-shots — two hits of the same recipe never line up
+    // sample for sample; the UI stinger family keeps phase 0 (a synth stab is phase-coherent by design)
+    v.pPhase[i] = this.phased ? this.vary.u() : 0;
     v.pWave[i] = wave;
     v.pDelay[i] = Math.round(delayS * this.sr);
   }
@@ -217,9 +230,19 @@ export class VoicePool {
   // Recipes (kind indices match params.TRANSIENT_KINDS)
   // ---------------------------------------------------------------------------
 
+  /** 1 ± amt, from the per-event stream. */
+  private v(amt: number): number {
+    return 1 + amt * this.vary.n();
+  }
+
   trigger(tr: Trigger): void {
     const { kind, gain, pitch, pan, delay } = tr;
     const surf = Math.round(pitch * 8);
+    const k = kind & 127;
+    const occurrence = this.counts[k]!;
+    this.counts[k] = occurrence + 1;
+    this.vary.reseed(this.varySeed ^ Math.imul(kind + 1, 0x9e3779b1) ^ Math.imul(occurrence + 1, 0x85ebca77));
+    this.phased = kind <= 8 || kind === 19 || kind === 20 || kind >= 25;
     switch (kind) {
       case 0: // landing
         this.landing(gain, surf, pan, delay);
@@ -227,6 +250,16 @@ export class VoicePool {
       case 1: // thunk
         this.landing(gain * 0.5, 0, pan, delay);
         break;
+      case 27: {
+        // tyre scrub after a touchdown (round 4): 1–4 kHz rubber scrubbing that rises with speed, a 40–55 Hz chatter
+        const v = this.alloc();
+        this.noise(v, 1, 0.16 + 0.16 * pitch, 0, 2, (1400 + 1800 * pitch) * this.v(0.12), 0.8);
+        v.amHz = 48 * this.v(0.2);
+        v.amDepth = 0.45;
+        this.env(v, 0.008, 0.04, 0.2 + 0.1 * pitch, 0.6);
+        this.finish(v, -21 + 7 * pitch, gain, pan, delay, BUS_CHASSIS, 0.05);
+        break;
+      }
       case 2: {
         // bottomOut (v2): the rear on its bump stop — a deep, dull stop knock (every drop >= 1 m does this and
         // rides away, so it must not read as a failure clang); the ring only on metal / grate
@@ -235,7 +268,7 @@ export class VoicePool {
         this.partial(v, 0.35, 1100, 1100, 0, 0.04);
         this.noise(v, 0.6, 0.02, 0, 2, 700, 1);
         this.env(v, 0.001, 0.005, 0.14, 0.3);
-        this.finish(v, -6, gain, pan, delay, BUS_CHASSIS, 0.12);
+        this.finish(v, -3, gain, pan, delay, BUS_CHASSIS, 0.12);
         if (surf === 2 || surf === 5) {
           const r = this.alloc();
           this.partial(r, 1, 2200, 2200, 0, 0.14);
@@ -247,25 +280,25 @@ export class VoicePool {
         break;
       }
       case 3: {
-        // impact
+        // impact (round 4: every partial, decay and ring detuned per event)
         const v = this.alloc();
-        this.partial(v, 1, 95, 40, 0.12, 0.25);
-        this.noise(v, 0.6, 0.08, 0, 2, 800, 1);
-        this.env(v, 0.001, 0, 0.3, 0.6);
+        this.partial(v, 1, 95 * this.v(0.18), 40 * this.v(0.15), 0.12 * this.v(0.4), 0.25 * this.v(0.3));
+        this.noise(v, 0.6, 0.08 * this.v(0.3), 0, 2, 800 * this.v(0.25), 1);
+        this.env(v, 0.001, 0, 0.3 * this.v(0.2), 0.6);
         this.finish(v, -10, gain, pan, delay, BUS_CHASSIS, 0.2);
         const r = this.alloc();
-        const det = 1 + (pitch - 0.5) * 0.008;
-        this.partial(r, 1, 1320 * det, 1320 * det, 0, 0.42);
-        this.partial(r, 0.7, 2070 * det, 2070 * det, 0, 0.3);
-        this.partial(r, 0.5, 3410 * det, 3410 * det, 0, 0.2);
+        const det = (1 + (pitch - 0.5) * 0.008) * this.v(0.05);
+        this.partial(r, 1, 1320 * det, 1320 * det, 0, 0.42 * this.v(0.3));
+        this.partial(r, 0.7, 2070 * det * this.v(0.03), 2070 * det, 0, 0.3 * this.v(0.3));
+        this.partial(r, 0.5, 3410 * det * this.v(0.04), 3410 * det, 0, 0.2 * this.v(0.3));
         this.env(r, 0.001, 0, 0.45, 0.8);
-        this.finish(r, -22, gain, pan, delay, BUS_CHASSIS, 0.3);
+        this.finish(r, -22, gain, pan, delay + 0.004 * this.vary.u(), BUS_CHASSIS, 0.3);
         break;
       }
       case 4: {
         // debris grain
         const v = this.alloc();
-        this.noise(v, 1, 0.012, 0, 2, 1000 + 3000 * pitch, 2);
+        this.noise(v, 1, 0.012 * this.v(0.4), 0, 2, (1000 + 3000 * pitch) * this.v(0.2), 2);
         this.env(v, 0.0005, 0.004, 0.012, 0.05);
         this.finish(v, -24, gain, pan, delay, BUS_CHASSIS, 0.1);
         break;
@@ -274,13 +307,13 @@ export class VoicePool {
         // grunt: glottal saw → formants
         const v = this.alloc();
         const second = pitch > 0.2;
-        const f0 = second ? 115 : 130;
-        const f1 = second ? 90 : 95;
-        const len = second ? 0.12 : 0.18;
+        const f0 = (second ? 115 : 130) * this.v(0.08);
+        const f1 = (second ? 90 : 95) * this.v(0.06);
+        const len = (second ? 0.12 : 0.18) * this.v(0.2);
         this.partial(v, 1, f0 * (1 + 0.03 * this.rng.n()), f1, len, 1, 1);
         v.formant = true;
-        v.f1.peaking(620, 8, 12);
-        v.f2.peaking(1150, 10, 8);
+        v.f1.peaking(620 * this.v(0.08), 8, 12);
+        v.f2.peaking(1150 * this.v(0.08), 10, 8);
         v.f3.peaking(2500, 12, 4);
         v.flp.lowpass(1200, 0.7);
         this.env(v, 0.008, 0.06, 0.14, len + 0.25);
@@ -288,10 +321,10 @@ export class VoicePool {
         break;
       }
       case 6: {
-        // fault stamp: slap + sub tap
+        // fault stamp: slap + sub tap (round 4: the sub's pitch, the slap's centre and decay vary per fault)
         const v = this.alloc();
-        this.noise(v, 1, 0.03, 0, 2, 2200, 0.8);
-        this.partial(v, 0.8, 60, 60, 0, 0.09);
+        this.noise(v, 1, 0.03 * this.v(0.25), 0, 2, 2200 * this.v(0.15), 0.8);
+        this.partial(v, 0.8, 60 * this.v(0.2), 60 * this.v(0.2), 0, 0.09 * this.v(0.3));
         this.env(v, 0.001, 0.01, 0.09, 0.25);
         this.finish(v, -10, gain, pan, delay, BUS_UI, 0.1);
         break;
@@ -300,13 +333,13 @@ export class VoicePool {
         // tick: wood joint (surf 1) / drum ridge (surf 2)
         const v = this.alloc();
         if (surf === 2) {
-          this.partial(v, 1, 1850, 1850, 0, 0.06);
-          this.noise(v, 0.5, 0.003, 0, 3, 3000, 0.7);
+          this.partial(v, 1, 1850 * this.v(0.06), 1850, 0, 0.06 * this.v(0.3));
+          this.noise(v, 0.5, 0.003, 0, 3, 3000 * this.v(0.15), 0.7);
           this.env(v, 0.0005, 0, 0.06, 0.12);
           this.finish(v, -24, gain, pan, delay, BUS_CHASSIS);
         } else {
-          this.noise(v, 1, 0.004, 0, 2, 1500, 2);
-          this.partial(v, 0.5, 220, 220, 0, 0.03);
+          this.noise(v, 1, 0.004 * this.v(0.3), 0, 2, 1500 * this.v(0.2), 2);
+          this.partial(v, 0.5, 220 * this.v(0.15), 220, 0, 0.03 * this.v(0.3));
           this.env(v, 0.0005, 0, 0.03, 0.08);
           this.finish(v, -22, gain, pan, delay, BUS_CHASSIS);
         }
@@ -391,23 +424,25 @@ export class VoicePool {
         this.killBuses(true, true, true);
         break;
       case 19: {
-        // starter: whir (chattering 90 Hz saw → LP) then the catch (a low thump)
+        // starter: whir (chattering 90 Hz saw → LP) then the catch (a low thump); round 4: the whir's length,
+        // pitch and chatter rate and the catch's moment vary per respawn
+        const whirS = 0.22 * this.v(0.2);
         const v = this.alloc();
-        this.partial(v, 1, 95, 140, 0.25, 0.3, 1);
-        v.gateHz = 14;
+        this.partial(v, 1, 95 * this.v(0.08), 140 * this.v(0.08), 0.25, 0.3, 1);
+        v.gateHz = 14 * this.v(0.12);
         v.gateDuty = 0.55;
         v.formant = true;
-        v.f1.peaking(300, 2, 4);
-        v.f2.peaking(900, 2, 2);
+        v.f1.peaking(300 * this.v(0.1), 2, 4);
+        v.f2.peaking(900 * this.v(0.1), 2, 2);
         v.f3.bypass();
         v.flp.lowpass(1600, 0.7);
-        this.env(v, 0.02, 0.22, 0.06, 0.4);
+        this.env(v, 0.02, whirS, 0.06, whirS + 0.2);
         this.finish(v, -22, gain, pan, delay, BUS_CHASSIS, 0.1);
         const c = this.alloc();
-        this.partial(c, 1, 140, 60, 0.08, 0.16);
-        this.noise(c, 0.5, 0.04, 2, 1, 500, 0.7);
+        this.partial(c, 1, 140 * this.v(0.1), 60, 0.08, 0.16 * this.v(0.2));
+        this.noise(c, 0.5, 0.04, 2, 1, 500 * this.v(0.2), 0.7);
         this.env(c, 0.002, 0, 0.18, 0.35);
-        this.finish(c, -16, gain, pan, delay + 0.26, BUS_CHASSIS, 0.1);
+        this.finish(c, -16, gain, pan, delay + whirS + 0.04, BUS_CHASSIS, 0.1);
         break;
       }
       case 20: {
@@ -447,8 +482,8 @@ export class VoicePool {
         // ragdoll body thud: torso / pelvis (pitch 0) heavy and low, a limb (pitch 0.6) lighter and shorter
         const limb = pitch > 0.3;
         const v = this.alloc();
-        this.partial(v, 1, limb ? 140 : 90, limb ? 80 : 50, 0.04, limb ? 0.07 : 0.12);
-        this.noise(v, limb ? 0.5 : 0.8, limb ? 0.02 : 0.03, 2, 1, 400, 0.7);
+        this.partial(v, 1, (limb ? 140 : 90) * this.v(0.12), (limb ? 80 : 50) * this.v(0.1), 0.04, (limb ? 0.07 : 0.12) * this.v(0.25));
+        this.noise(v, limb ? 0.5 : 0.8, (limb ? 0.02 : 0.03) * this.v(0.3), 2, 1, 400 * this.v(0.2), 0.7);
         this.env(v, 0.002, 0, limb ? 0.08 : 0.14, 0.3);
         this.finish(v, limb ? -18 : -14, gain, pan, delay, BUS_CHASSIS, 0.12);
         break;
@@ -528,15 +563,27 @@ export class VoicePool {
     }
   }
 
+  /**
+   * Landing = a suspension thump and settle (round 4), not a click: a 60–120 Hz body thump (110 → 62 Hz over
+   * 70 ms, 0.25 s decay, scaled by the compression through `gain`), the compression's brown whump under it, a
+   * 2–3.5 kHz chassis rattle transient 4 ms after; every centre and decay drawn per event. The tyre scrub is its
+   * own transient (kind 27) so it can carry the speed.
+   */
   private landing(gain: number, surf: number, pan: number, delay: number): void {
     const dirt = surf === 0 || surf === 7;
     const metal = surf === 2 || surf === 5;
     const v = this.alloc();
-    this.partial(v, dirt ? 0.7 : 1, 180, 55, 0.06, 0.14);
-    this.partial(v, 0.4, 92, 92, 0, 0.26);
-    this.noise(v, dirt ? 1.0 : 0.5, 0.04, 2, 1, 600, 0.7);
-    this.env(v, 0.002, 0, 0.3, 0.5);
-    this.finish(v, -12, gain, pan, delay, BUS_CHASSIS, 0.1);
+    this.partial(v, 1, 110 * this.v(0.22), 62 * this.v(0.15), 0.07 * this.v(0.4), 0.4 * this.v(0.35));
+    this.partial(v, 0.55, 78 * this.v(0.16), 74 * this.v(0.12), 0.2, 0.5 * this.v(0.35));
+    this.noise(v, dirt ? 1.1 : 0.7, 0.22, 2, 1, 220, 0.7);
+    this.env(v, 0.003, 0.07, 0.55, 0.9);
+    this.finish(v, -3, gain, pan, delay, BUS_CHASSIS, 0.1);
+    const r = this.alloc();
+    this.partial(r, 0.8, 1900 * this.v(0.1), 1900, 0, 0.03);
+    this.partial(r, 0.6, 3300 * this.v(0.1), 3300, 0, 0.02);
+    this.noise(r, 1, 0.035 * this.v(0.3), 0, 2, 2600 * this.v(0.15), 1.2);
+    this.env(r, 0.0005, 0.003, 0.04, 0.1);
+    this.finish(r, -26 + 5 * gain, gain, pan, delay + 0.004, BUS_CHASSIS, 0.15);
     if (metal) {
       const r = this.alloc();
       this.partial(r, 1, 1850, 1850, 0, 0.2);

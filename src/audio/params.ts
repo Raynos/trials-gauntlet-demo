@@ -54,6 +54,8 @@ export const TRANSIENT_KINDS = [
   'crowdApplause', // 24 applause at the finish
   'hop', // 25 the hop: pitch 0 = preload creak (suspension + rider loading), 1 = the snap (spring release)
   'bodyThud', // 26 a ragdoll body meeting the ground (soft, few)
+  // round 4
+  'scrub', // 27 tyre scrub after a touchdown: gain = landing gain, pitch = speed / 20
 ] as const;
 export type TransientKind = (typeof TRANSIENT_KINDS)[number];
 export const TK: Record<TransientKind, number> = Object.fromEntries(TRANSIENT_KINDS.map((k, i) => [k, i])) as Record<
@@ -122,6 +124,11 @@ export interface AudioParams {
   bike: number;
   /** hopPhase index: 0 idle 1 preload 2 push 3 recover. */
   hop: number;
+  /**
+   * 0..1 the engine labouring under the clutch balance of a wheelie (front up, rear down, < 6 m/s, throttle on,
+   * rpm < 2600): physics holds ~1700 rpm there, so the voice carries load, not rpm (round 4).
+   */
+  lug: number;
   transients: Transient[];
   transientCount: number;
 }
@@ -151,6 +158,7 @@ export function createParams(): AudioParams {
     torque: 0,
     bike: 0,
     hop: 0,
+    lug: 0,
     transients,
     transientCount: 0,
   };
@@ -193,6 +201,7 @@ export const P_CROWD = 20;
 export const P_TORQUE = 21;
 export const P_BIKE = 22;
 export const P_HOP = 23;
+export const P_LUG = 24;
 export const P_HEADER = 28;
 export const P_TRANSIENT_STRIDE = 5;
 export const PACKED_LENGTH = P_HEADER + MAX_TRANSIENTS * P_TRANSIENT_STRIDE;
@@ -222,6 +231,7 @@ export function packParams(p: AudioParams, out: Float32Array): Float32Array {
   out[P_TORQUE] = p.torque;
   out[P_BIKE] = p.bike;
   out[P_HOP] = p.hop;
+  out[P_LUG] = p.lug;
   for (let i = 0; i < p.transientCount; i++) {
     const t = p.transients[i]!;
     const o = P_HEADER + i * P_TRANSIENT_STRIDE;
@@ -244,11 +254,11 @@ export const ENGINE = {
   redlineRpm: 10000,
   /**
    * Crash (v2): physics parks rpm at idle and throttleEff at 0 on the crash tick and the bike stops within
-   * 0.1 s (crash brakes); audio presents the kill — gain to 0 and the audible pitch sagging by `stallDrop`
-   * over `crashFadeS` — two dying putts, then quiet.
+   * 0.1 s (crash brakes); audio presents the kill — the crank running down by `stallDrop` (1500 → 150 rpm:
+   * sparse, slowing putts) over `crashFadeS` under a gain of 1 − k² — an engine dying, then quiet (round 4).
    */
-  crashFadeS: 0.35,
-  stallDrop: 0.55,
+  crashFadeS: 0.5,
+  stallDrop: 0.9,
   /**
    * v2 `reportRpm`: below `clutchSpeed` m/s the reported rpm is max(wheel rpm, idle + throttleEff·(clutchRpm − idle))
    * — the slipping clutch. On the Rookie (throttle τ 0.15 s) that is a 1 s climb to 3500 and a hold to 7 m/s.
@@ -333,6 +343,8 @@ export const CROWD = {
   /** A landing after this much air, not crashed, earns a cheer. */
   cheerAirS: 0.5,
   groanDelayS: 0.22,
+  /** One groan per crash: a crash within this many seconds of the last groan gets none (round 4). */
+  groanMinGapS: 4,
   applauseDelayS: 0.35,
 } as const;
 

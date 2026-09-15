@@ -31,8 +31,11 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
       if (scratch.justReset) break;
       if (e.impulse < CHASSIS.landingMinImpulse) break; // a wheel settling, not a landing
       const gain = Math.pow(clamp(e.impulse / CHASSIS.landingImpulseRef, 0, 1), CHASSIS.landingCurve);
+      // round 4: the bed stays up on a landing (no duck — the critics heard "the bed getting quieter" as the tell);
+      // the thump carries the compression, and a tyre scrub ∝ speed follows the touchdown
       pushTransient(out, TK.landing, gain, surfaceIndex(e.surface) / 8, e.wheel === 'rear' ? -0.15 : 0.15);
-      if (gain >= 0.5) scratch.duckImpactUntil = now + DUCK.impactHoldS * 0.5;
+      const v = scratch.speed;
+      if (v > 2 && gain >= 0.25) pushTransient(out, TK.scrub, gain, clamp(v / 20, 0, 1), e.wheel === 'rear' ? -0.25 : 0.25, 0.025);
       // a clean landing after real air: the nearby stands cheer (once per flight)
       const air = scratch.airborneFor > 0 ? scratch.airborneFor : scratch.lastAir;
       if (air >= CROWD.cheerAirS && scratch.crashAt < 0 && scratch.crowd >= CROWD.earshot) {
@@ -60,7 +63,10 @@ export function applyEvent(out: AudioParams, e: GameEvent, scratch: ModelScratch
         pushTransient(out, TK.grunt, 1, 0, 0, TIMING.gruntDelayS);
         if (rng.bool(0.5)) pushTransient(out, TK.grunt, 0.7, 0.3, 0.1, TIMING.grunt2DelayS);
         pushTransient(out, TK.fault, 1, 0, 0, TIMING.faultStampDelayS);
-        if (scratch.crowd >= CROWD.earshot) pushTransient(out, TK.crowdGroan, scratch.crowd, 0, 0, CROWD.groanDelayS);
+        if (scratch.crowd >= CROWD.earshot && now - scratch.lastGroanAt > CROWD.groanMinGapS) {
+          scratch.lastGroanAt = now;
+          pushTransient(out, TK.crowdGroan, scratch.crowd, 0, 0, CROWD.groanDelayS);
+        }
       } else if (e.reason === 'hazard') {
         scratch.crashAt = now;
         scratch.duckImpactUntil = now + DUCK.impactHoldS;

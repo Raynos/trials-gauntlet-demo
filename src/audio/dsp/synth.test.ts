@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { GameEvent, PhysicsState } from '../../core/types';
 import { renderScript, type OfflineResult } from '../offline';
+import { critic, repeatR } from '../tools/critic';
 import { GAUNTLET, blankState, gauntletScript } from '../tools/fixture';
 
 const SR = 48000;
@@ -107,7 +108,8 @@ describe('TrialsSynth (offline, node)', () => {
       const got = fundamentalHz(x, from, to, want * 0.6, want * 1.6);
       errors.push(Math.abs(got - want) / want);
     });
-    expect(Math.max(...errors)).toBeLessThan(0.03);
+    // round 4: the idle hunts (a seeded ±3 % rate walk below 25 % load), so a 0.6 s read can sit up to ~4 % off
+    expect(Math.max(...errors)).toBeLessThan(0.05);
   });
 
   it('responds to a throttle blip within 20 ms', () => {
@@ -137,7 +139,7 @@ describe('TrialsSynth (offline, node)', () => {
     expect(reached).toBeLessThan(20);
   });
 
-  it('limiter stutter drops firing cycles: level modulates at rpm/360 Hz', () => {
+  it('limiter stutter drops firing cycles: two cuts in six at rpm/720 Hz, ≥ 0.8 dB off the level', () => {
     const r = renderScript(
       steady((s, t) => {
         s.engine.rpm = 9900;
@@ -181,7 +183,7 @@ describe('TrialsSynth (offline, node)', () => {
     expect(Math.abs(onsets[2]! - onsets[1]! - 1)).toBeLessThan(0.002);
   });
 
-  it('ducks the game bus by ~6 dB on a hard landing', () => {
+  it('a hard landing leaves the bed up (no duck: a thump on top, ≤ 1.5 dB dip after it) while a crash still ducks ~6 dB', () => {
     const at = 1.0;
     const r = renderScript(
       steady((s, t, emit) => {
@@ -195,10 +197,78 @@ describe('TrialsSynth (offline, node)', () => {
     const x = mono(r);
     const before = rmsDb(x, (at - 0.12) * SR, (at - 0.02) * SR);
     const during = rmsDb(x, (at + 0.05) * SR, (at + 0.14) * SR);
-    const after = rmsDb(x, (at + 0.8) * SR, (at + 0.95) * SR);
-    expect(before - during).toBeGreaterThan(5);
-    expect(before - during).toBeLessThan(7);
-    expect(Math.abs(before - after)).toBeLessThan(1);
+    expect(before - during).toBeLessThan(1.5);
+    const c = renderScript(
+      steady((s, t, emit) => {
+        s.engine.rpm = 6000;
+        s.engine.throttleEff = 0.7;
+        if (Math.abs(t - at) < 1e-6) emit({ type: 'fault', reason: 'crash', tick: 0, time: t });
+      }),
+      2.0,
+      { solo: 'ambient' },
+    );
+    // the ambient bed is level through the crash apart from the duck itself (the engine dies on its own)
+    const y = mono(c);
+    const tb = rmsDb(y, (at - 0.12) * SR, (at - 0.02) * SR);
+    const td = rmsDb(y, (at + 0.05) * SR, (at + 0.14) * SR);
+    expect(tb - td).toBeGreaterThan(5);
+    expect(tb - td).toBeLessThan(7);
+  });
+
+  it('round 4: the idle is a jittered stereo pulse train (≥ 2 % timing jitter, periodicity < 0.95, L/R < 0.9), the wheelie lug hunts', () => {
+    const r = renderScript(
+      steady((s) => {
+        s.engine.rpm = 1500;
+        s.engine.throttleEff = 0;
+      }),
+      4.0,
+      { solo: 'engine' },
+    );
+    const L = new Float32Array(r.pcm.length / 2);
+    const R = new Float32Array(r.pcm.length / 2);
+    for (let i = 0; i < L.length; i++) {
+      L[i] = r.pcm[2 * i]!;
+      R[i] = r.pcm[2 * i + 1]!;
+    }
+    const m = critic(L, R, SR);
+    expect(m.pulseHz).toBeGreaterThan(11);
+    expect(m.pulseHz).toBeLessThan(14.5);
+    expect(m.jitterPct).toBeGreaterThan(2);
+    expect(m.periodicity).toBeLessThan(0.95); // round 3's harmonic bank read 0.97 (a metronome); 3 % jitter reads ~0.93
+    expect(m.lrCorr).toBeLessThan(0.9);
+    expect(m.sideMid).toBeGreaterThan(0.2);
+    // the lug (front up, rear down, slow, throttle on, ~1700 rpm) is louder and moves more than the plain idle
+    const lug = renderScript(
+      steady((s) => {
+        s.engine.rpm = 1700;
+        s.engine.throttleEff = 0.1;
+        s.wheels.front.grounded = false;
+        s.wheels.rear.grounded = true;
+        s.bike.vel.x = 2;
+      }),
+      6.0,
+      { solo: 'engine' },
+    );
+    const x = mono(lug);
+    const idle = mono(r);
+    expect(rmsDb(x, 1 * SR, 6 * SR) - rmsDb(idle, 1 * SR, 4 * SR)).toBeGreaterThan(3);
+    const lm = critic(x, x, SR);
+    expect(lm.levelRangeDb).toBeGreaterThan(3);
+  });
+
+  it('round 4: a crash and its replay 1.75 s later are different sounds (mix cross-correlation < 0.5; one crowd groan)', () => {
+    const r = renderScript(
+      steady((s, t, emit) => {
+        s.engine.rpm = 4000;
+        s.engine.throttleEff = 0.8;
+        if (Math.abs(t - 1.0) < 1e-6 || Math.abs(t - 2.75) < 1e-6) emit({ type: 'fault', reason: 'crash', tick: 0, time: t });
+        if (Math.abs(t - 2.0) < 1e-6 || Math.abs(t - 3.75) < 1e-6) emit({ type: 'restart', checkpoint: 0, tick: 0 });
+      }),
+      5.0,
+      {},
+    );
+    const x = mono(r);
+    expect(repeatR(x, SR, 1.0, 2.0, 2.75, 3.75)).toBeLessThan(0.5);
   });
 
   it('restart hard-stops chassis voices within 10 ms; only the starter blip follows, no leaked tails', () => {
@@ -427,16 +497,16 @@ describe('TrialsSynth (offline, node)', () => {
         },
       );
       const x = mono(r);
-      // energy in the echo window vs the gap before it
-      const gap = rmsDb(x, 1.12 * SR, 1.18 * SR);
+      // energy in the echo window (round 4: the landing now settles over ~350 ms, so the echo is read against the
+      // same window in a room without the slap-back rather than against a gap that no longer exists)
       const slap = rmsDb(x, 1.19 * SR, 1.25 * SR);
       const t = rmsDb(x, 1.6 * SR, 2.0 * SR);
-      return { slap: slap - gap, tail: t };
+      return { slap, tail: t };
     };
     const canyon = tail(1);
     const snow = tail(2);
     const hall = tail(0);
-    expect(canyon.slap).toBeGreaterThan(3);
+    expect(canyon.slap - hall.slap).toBeGreaterThan(3);
     expect(snow.tail).toBeLessThan(hall.tail);
   });
 
