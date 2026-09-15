@@ -112,7 +112,25 @@ end event, the raw stream saying zero fingers, focus loss or the watchdog. (The 
 `releaseAll` on `gesturestart`, which dropped GAS the instant LEAN was pressed.) Verified with Chromium CDP
 `Input.dispatchTouchEvent` two- and three-point sequences and jsdom (`touch.test.ts`). Hit-testing runs in
 the *logical* frame (`toLogical`, §11 — identity today; rotate-to-play).
-Zone outlines fade in on first touch, sit at ~35 % opacity while touch is the active device and drop to 30 % three seconds after GO (§10); the HUD top band shifts to clear the two touch buttons (top-left ❚❚ pause, top-right ↻ Restart).
+**Touch controls: the strip with keys** (`assets/design/controls/SPEC.md` § Round 2, direction G; the user's pick). While touch
+is the active device the bottom edge carries one continuous dark-glass strip — `3.33rem` + the home-indicator inset (`--sab`):
+52 px at 932×430, 48 px at 844×390, i.e. 12 % of the height, always under the wheel line — at 40 % opacity idle, 30 % three
+seconds after GO (`settled`), with a 2 px amber seam at the 50 % line (the two-thumbs split a finger never crosses). Four key caps
+sit inset in it, one centred per quarter at 75 % of the quarter's width (175×40 px at 932×430; radius 8; bevelled): **◀ bike LEAN
+BACK** · **LEAN FWD bike ▶** (inline-SVG bike glyphs — rear wheel down / nose down — with the chevrons on the *outside* so the pair
+reads as a mirror) · **disc BRAKE** · **grip GAS**, glyph 22 px, label `.72rem` tracking .2em. Colours: the two LEAN keys share **one
+neutral scheme of equal weight** — cool steel `#d7e3ef` — neither primary nor secondary; BRAKE `#ff5a5a`; GAS `#5aff8c`. Idle,
+a key shows its colour on glyph + label over a 10 % white cap; **held**, the key goes solid in its colour with a black glyph,
+presses to `scale(.96)` and glows, and the key's *whole quarter column* takes an 8 % wash of the same colour fading to nothing
+by 55 % of the height, so the state reads in the periphery without looking down. Onset 40 ms, release fades over 80 ms; the
+settled state dims the strip only, never a held key. Feedback is driven by the existing per-frame `held` set (`paint()` toggles
+`.held` on the quarter column) — no timers, no new state. **The hit areas are unchanged**: the four full-height quarters
+(`zoneAt`), a thumb anywhere in the quarter lights that quarter's key; the strip is drawn by the layer root's pseudo-elements
+(`pointer-events: none`, not a hit rect, so no `.live` of its own) and hides under pause / results with the zones
+(`under-overlay`). The corner buttons (top-left ❚❚ pause, top-right ↻ Restart) are untouched, `.live`-gated as before, and the
+HUD top band shifts to clear them. Keyboard and gamepad never see the strip; they keep the HUD hints. Enforced by
+`harness/e2e/touch.mts` R7 (strip ≤ 13 % of the height, four keys, held colours, wash, hidden under the overlay) on both
+phone geometries.
 
 ## 4. HUD (`src/ui/`)
 

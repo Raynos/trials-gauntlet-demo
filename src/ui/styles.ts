@@ -559,21 +559,43 @@ export const HUD_CSS = /* css */ `
 .touch-layer.under-overlay, .touch-layer.under-overlay * { pointer-events: none !important; }
 .touch-layer.under-overlay .tz, .touch-layer.under-overlay .tz-btn { opacity: 0 !important; }
 
-/* ---- touch layer ------------------------------------------------------ */
-.touch-layer { position: absolute; inset: 0; pointer-events: none; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+/* ---- touch layer: G "strip with keys" (assets/design/controls/SPEC.md § Round 2, game.md §3) ---------------------- */
+/* Tokens: strip 3.33rem (52 px at 932×430, 48 px at 844×390) + the home-indicator inset; key = strip − 2 × 6 px. Key colours
+   as r,g,b triplets so the wash can take an alpha: the two LEAN keys share ONE neutral (cool steel, #d7e3ef), BRAKE red #ff5a5a,
+   GAS green #5aff8c. */
+.touch-layer { position: absolute; inset: 0; pointer-events: none; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; --strip-h: 3.33rem; --key-h: calc(var(--strip-h) - .77rem); --k-lean: 215,227,239; --k-brake: 255,90,90; --k-gas: 90,255,140; }
 .touch-layer * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; pointer-events: none; }
 .touch-debug { position: absolute; left: 50%; top: calc(5.2rem + var(--sat)); transform: translateX(-50%); margin: 0; padding: .4rem .6rem; background: rgba(0,0,0,.8); color: #9f9; font: 12px/1.35 var(--mono); border-radius: .3rem; pointer-events: none; white-space: pre; z-index: 5; }
 .touch-layer.on { pointer-events: auto; }
-.tz { position: absolute; display: flex; align-items: flex-end; justify-content: center; padding-bottom: calc(1.4rem + var(--sab)); font-family: var(--font); font-weight: 800; letter-spacing: .2em; font-size: .85rem; color: rgba(255,255,255,.55); opacity: 0; transition: opacity .25s, background .08s; border: 0 solid rgba(255,255,255,.12); }
-.touch-layer.on.visible .tz { opacity: .35; }
-.touch-layer.on.visible .tz.held { opacity: .8; background: rgba(255,255,255,.07); }
-.touch-layer.on.visible.settled .tz { opacity: .3; transition: opacity var(--t3) var(--ease), background .08s; }
-.touch-layer.on.visible.settled .tz.held { opacity: .55; }
-.tz-back { left: 0; top: 0; bottom: 0; width: 25%; border-right-width: 1px; }
-.tz-fwd { left: 25%; top: 0; bottom: 0; width: 25%; border-right-width: 1px; }
-.tz-brake { left: 50%; top: 0; bottom: 0; width: 25%; border-right-width: 1px; }
-.tz-throttle { left: 75%; top: 0; bottom: 0; width: 25%; }
-.tz-brake span { color: rgba(255,90,90,.85); } .tz-throttle span { color: rgba(90,255,140,.85); }
+/* The strip: one continuous band on the bottom edge, 40 % idle → 30 % settled, drawn by the layer root's pseudo-elements —
+   not an element, not a hit rect, so no .live of its own (the layer root takes the pointers and the quarter columns are the
+   hit areas, zoneAt). ::after is the amber seam at 50 %: the two-thumbs split a finger never crosses. Touch-only: it is drawn
+   only while the layer is .visible (touch is the active device); keyboard / pad keep the HUD hints. */
+.touch-layer::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--strip-h) + var(--sab)); background: #0a0c10; border-top: 1px solid rgba(255,255,255,.22); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.touch-layer::after { content: ''; position: absolute; left: calc(50% - 1px); width: 2px; bottom: 0; height: calc(var(--strip-h) + var(--sab)); background: var(--amber); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.touch-layer.on.visible::before { opacity: .4; }
+.touch-layer.on.visible::after { opacity: .7; }
+.touch-layer.on.visible.settled::before { opacity: .3; transition: opacity var(--t3) var(--ease); }
+.touch-layer.on.visible.settled::after { opacity: .5; transition: opacity var(--t3) var(--ease); }
+.touch-layer.under-overlay::before, .touch-layer.under-overlay::after { opacity: 0 !important; }
+.tz { position: absolute; display: flex; align-items: center; justify-content: center; font-family: var(--font); font-weight: 800; letter-spacing: .2em; font-size: .85rem; color: rgba(255,255,255,.55); opacity: 0; transition: opacity .25s, background .08s; }
+/* Quarter columns = the hit areas (unchanged), each carrying its key's colour; .held (paint(), from the pointer map every
+   frame — no timers) paints the column wash: 8 % of the key colour at the strip, gone by 55 % of the height (under the wheel
+   line), so the state reads peripherally without looking down. The column itself is drawn at 1 (the key carries the look);
+   under an overlay the .tz rule above zeroes it. */
+.tz-zone { top: 0; bottom: 0; width: 25%; --k: var(--k-lean); }
+.tz-back { left: 0; } .tz-fwd { left: 25%; } .tz-brake { left: 50%; --k: var(--k-brake); } .tz-throttle { left: 75%; --k: var(--k-gas); }
+.touch-layer.on.visible .tz-zone { opacity: 1; }
+.touch-layer.on.visible .tz-zone.held { background: linear-gradient(to top, rgba(var(--k), .08), rgba(var(--k), 0) 55%); }
+/* Key caps: 75 % of the quarter wide, inset 6 px from the strip's top edge and 6 px above the home indicator, radius 8,
+   bevelled (top highlight, darker bottom); glyph 22 px, label .72rem tracking .2em. */
+.tz-key { position: absolute; left: 12.5%; right: 12.5%; bottom: calc(var(--sab) + .385rem); height: var(--key-h); display: flex; align-items: center; justify-content: center; gap: .3rem; border-radius: 8px; color: rgb(var(--k)); background: rgba(255,255,255,.1); box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -2px 0 rgba(0,0,0,.45), 0 0 0 1px rgba(0,0,0,.35); font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; text-shadow: 0 1px 0 rgba(0,0,0,.6); transform-origin: 50% 100%; transition: background-color 80ms var(--ease), color 80ms var(--ease), transform 80ms var(--ease), box-shadow 80ms var(--ease), text-shadow 80ms; }
+.tz-key b, .tz-key i { display: inline-flex; align-items: center; gap: .05rem; }
+.tz-key svg { display: block; width: 22px; height: 22px; }
+.tz-key span { padding: 0 .1em; }
+/* Held: solid in its colour (neutral / neutral / red / green), black glyph, pressed to .96, glowing; the bevel flattens.
+   Onset is immediate (40 ms), the release fades over 80 ms. The settled state never dims this. */
+.tz-zone.held .tz-key { background: rgb(var(--k)); color: #0b0d11; text-shadow: none; transform: scale(.96); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 0 0 1px rgba(var(--k), .9), 0 0 22px -2px rgba(var(--k), .85); transition-duration: 40ms; }
 .tz-btn { top: calc(.7rem + var(--sat)); width: 56px; height: 44px; align-items: center; padding: 0; border-radius: .5rem; background: var(--slab); border: 1px solid var(--line); font-size: 1.2rem; letter-spacing: 0; opacity: 0; }
 .tz-restart { width: auto; padding: 0 .7rem; }
 .tz-restart span { display: inline-flex; align-items: center; gap: .4em; }

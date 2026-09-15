@@ -48,6 +48,27 @@ interface ActivePointer {
 
 const WATCHDOG_MS = 400;
 
+/** Inline strip-key glyphs (22 px, stroke = currentColor); the two bike silhouettes are one drawing mirrored. */
+const svg = (body: string): string =>
+  `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+const GLYPH = {
+  chevL: svg('<path d="M14.5 5.5 8 12l6.5 6.5"/>'),
+  chevR: svg('<path d="m9.5 5.5 6.5 6.5-6.5 6.5"/>'),
+  /** Rear wheel down, front wheel lifted: the bike on its back wheel. */
+  bikeBack: svg('<circle cx="6.5" cy="16.5" r="3.6"/><circle cx="18" cy="9.5" r="3.6"/><path d="M6.5 16.5 11 9h4.5M11 9l7 .5M9.5 9h-2"/>'),
+  /** Front wheel down, rear lifted: nose down. */
+  bikeFwd: svg('<circle cx="17.5" cy="16.5" r="3.6"/><circle cx="6" cy="9.5" r="3.6"/><path d="M17.5 16.5 13 9H8.5M13 9l-7 .5M14.5 9h2"/>'),
+  /** Brake disc. */
+  disc: svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.6"/><path d="M12 4.5V7M12 17v2.5M4.5 12H7M17 12h2.5"/>'),
+  /** Throttle grip with its bar end. */
+  grip: svg('<rect x="3" y="8.5" width="13" height="7" rx="3.5"/><path d="M16 12h5M7 8.5v7M10 8.5v7M13 8.5v7"/>'),
+};
+
+/** One key cap: `<b>` = leading glyphs, `<span>` = the label, `<i>` = trailing glyphs (empty parts are omitted). */
+function key(id: string, lead: string, label: string, trail: string): string {
+  return `<div class="tz-key tz-key-${id}">${lead ? `<b>${lead}</b>` : ''}<span>${label}</span>${trail ? `<i>${trail}</i>` : ''}</div>`;
+}
+
 export interface TouchInputOptions {
   /** Draw pointer ids + the live frame (URL `?touchdebug=1`). */
   debug?: boolean;
@@ -83,20 +104,22 @@ export class TouchInput implements InputSource {
     this.root = document.createElement('div');
     this.root.className = 'touch-layer';
     this.root.setAttribute('aria-hidden', 'true');
-    const mk = (cls: string, label: string): HTMLDivElement => {
+    const mk = (cls: string, html: string): HTMLDivElement => {
       const d = document.createElement('div');
       d.className = `tz ${cls}`;
-      d.innerHTML = `<span>${label}</span>`;
+      d.innerHTML = html;
       this.root.appendChild(d);
       return d;
     };
+    // The four quarter columns each hold one key cap of the bottom strip (design/controls G, game.md §3): the column is
+    // the hit area and the held column wash; the key is the visible affordance. Chevrons sit on the OUTSIDE of the lean pair.
     this.els = {
-      back: mk('tz-back', '◀ LEAN'),
-      fwd: mk('tz-fwd', 'LEAN ▶'),
-      brake: mk('tz-brake', 'BRAKE'),
-      throttle: mk('tz-throttle', 'GAS'),
-      pause: mk('tz-pause tz-btn', '❚❚'),
-      restart: mk('tz-restart tz-btn', '↻<small>Restart</small>'),
+      back: mk('tz-zone tz-back', key('back', `${GLYPH.chevL}${GLYPH.bikeBack}`, 'Lean back', '')),
+      fwd: mk('tz-zone tz-fwd', key('fwd', '', 'Lean fwd', `${GLYPH.bikeFwd}${GLYPH.chevR}`)),
+      brake: mk('tz-zone tz-brake', key('brake', GLYPH.disc, 'Brake', '')),
+      throttle: mk('tz-zone tz-throttle', key('throttle', GLYPH.grip, 'Gas', '')),
+      pause: mk('tz-pause tz-btn', '<span>❚❚</span>'),
+      restart: mk('tz-restart tz-btn', '<span>↻<small>Restart</small></span>'),
     };
     this.debugEl = options.debug ? document.createElement('pre') : null;
     if (this.debugEl) {

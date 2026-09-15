@@ -15,7 +15,9 @@
  *   R5  a scroll gesture on a scrollable screen (settings, track rows) never changes screen;
  *   R6  THE INVARIANT (docs/tasks/touch-navigation-invariant.md, src/ui/live.ts): across every phase transition, a tap
  *       changes the screen / phase only when its point is inside a `.live` element drawn at ≥ .5 opacity — a 12×6 grid
- *       at 0/50/100/200/400/800 ms after each transition — and every pause / restart hit rect equals its drawn rect.
+ *       at 0/50/100/200/400/800 ms after each transition — and every pause / restart hit rect equals its drawn rect;
+ *   R7  the strip with keys (design/controls G): one band ≤ 13 % of the height on the bottom edge, four keys, held key solid in its
+ *       colour (lean pair one neutral, brake red, gas green) + column wash, hidden under overlays; `--stills=<dir>` saves stills.
  */
 import { chromium, type BrowserContext, type Page } from 'playwright';
 import { startServer } from '../lib/server';
@@ -155,6 +157,63 @@ async function touchLayer(page: Page): Promise<{ on: boolean; visible: boolean; 
       zoneCss: [...document.querySelectorAll('.tz')].slice(0, 1).map((z) => { const cs = getComputedStyle(z); return cs.opacity + '/' + cs.visibility + '/' + cs.display + '/' + z.getBoundingClientRect().width; }).join(),
     };
   })()`) as Promise<{ on: boolean; visible: boolean; pauseVisible: boolean; restartVisible: boolean; zones: number; cls: string; zoneCss: string }>;
+}
+
+// ---------------------------------------------------------------------------------------------- R7: the strip with keys
+//
+// assets/design/controls/SPEC.md § Round 2 (G) + game.md §3: one band on the bottom edge (3.33rem + the home-indicator inset:
+// 52 px at 932×430, 48 px at 844×390 — capped here at 13 % of the height + the inset), 40 % idle → 30 % settled, four key caps
+// inside it; a held key goes solid in its colour (LEAN BACK and LEAN FWD one shared neutral, BRAKE red, GAS green), presses to
+// .96 and its whole quarter column takes the wash; everything hides under an overlay with the zones. The strip is the layer
+// root's ::before (not a hit rect), so it is read from the pseudo-element's computed style.
+
+const STRIP_MAX_H = (g: Geom): number => g.height * 0.13 + 1;
+/** Where to write the run-flow stills (`--stills=<dir>`; idle / held-back-gas / settled at each geometry). */
+const stillsDir = args.get('stills');
+
+interface StripInfo { w: number; h: number; top: number; bottom: number; op: number; keys: { id: string; w: number; h: number; top: number; bottom: number }[] }
+/** Jump every running CSS transition to its end: under SwiftShader the animation clock advances per (slow) frame, so a computed style read 150 ms after a class flip is still the transition's start value. */
+const FINISH = "document.getAnimations().forEach((a) => { try { a.finish(); } catch (e) {} });";
+async function strip(page: Page): Promise<StripInfo> {
+  return page.evaluate(`(() => {
+    ${FINISH}
+    const tl = document.querySelector('.touch-layer');
+    const cs = getComputedStyle(tl, '::before');
+    const lr = tl.getBoundingClientRect();
+    const h = parseFloat(cs.height) || 0, w = parseFloat(cs.width) || 0;
+    const keys = [...document.querySelectorAll('.tz-zone .tz-key')].map((k) => { const r = k.getBoundingClientRect(); return { id: k.className.replace(/.*tz-key-(\\w+).*/, '$1'), w: r.width, h: r.height, top: r.top, bottom: r.bottom }; });
+    return { w, h, top: lr.bottom - h, bottom: lr.bottom, op: parseFloat(cs.opacity), keys };
+  })()`) as Promise<StripInfo>;
+}
+
+interface KeyState { held: boolean; bg: string; color: string; scale: number; wash: boolean; colBg: string }
+/** Per zone: `.held`, the key's background colour, its transform scale, and whether the column carries the wash gradient. */
+async function keyStates(page: Page): Promise<Record<'back' | 'fwd' | 'brake' | 'throttle', KeyState>> {
+  return page.evaluate(`(() => {
+    ${FINISH}
+    const out = {};
+    for (const z of ['back', 'fwd', 'brake', 'throttle']) {
+      const col = document.querySelector('.tz-' + z);
+      const key = col.querySelector('.tz-key');
+      const ks = getComputedStyle(key), cs = getComputedStyle(col);
+      const m = /matrix\\(([-\\d.]+),/.exec(ks.transform);
+      out[z] = { held: col.classList.contains('held'), bg: ks.backgroundColor, color: ks.color, scale: m ? Math.round(parseFloat(m[1]) * 100) / 100 : 1, wash: cs.backgroundImage.includes('gradient'), colBg: cs.backgroundImage };
+    }
+    return out;
+  })()`) as Promise<Record<'back' | 'fwd' | 'brake' | 'throttle', KeyState>>;
+}
+
+const rgb = (s: string): [number, number, number] | null => { const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(s); return m ? [+m[1]!, +m[2]!, +m[3]!] : null; };
+const reddish = (s: string): boolean => { const c = rgb(s); return !!c && c[0] > 200 && c[1] < 140 && c[2] < 140; };
+const greenish = (s: string): boolean => { const c = rgb(s); return !!c && c[1] > 200 && c[0] < 140 && c[2] < 200; };
+/** A neutral: bright, and no channel more than 40 apart (a cool white / steel). */
+const neutral = (s: string): boolean => { const c = rgb(s); return !!c && Math.min(...c) > 180 && Math.max(...c) - Math.min(...c) < 40; };
+
+async function still(page: Page, g: Geom, name: string): Promise<void> {
+  if (!stillsDir) return;
+  const { mkdirSync } = await import('node:fs');
+  mkdirSync(stillsDir, { recursive: true });
+  await page.screenshot({ path: `${stillsDir}/${g.name}-${name}.png` });
 }
 
 async function scrollGesture(ctx: BrowserContext, page: Page, x: number, y0: number, dy: number): Promise<void> {
@@ -336,15 +395,50 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   expect(tl.pauseVisible && tl.restartVisible, flow, 'R4-buttons', `pause=${tl.pauseVisible} restart=${tl.restartVisible}`);
   await checkTargets(page, flow + ':run');
   await checkIsolation(page, flow + ':run');
+  // R7 — the strip with keys (design/controls G): one band on the bottom edge, ≤ SPEC's height, four keys in their colours.
+  const strip0 = await strip(page);
+  expect(strip0.h > 0 && strip0.h <= STRIP_MAX_H(g) && strip0.bottom >= g.height - 1 && strip0.w >= g.width - 1, flow, 'R7-strip', `strip ${strip0.w.toFixed(0)}×${strip0.h.toFixed(0)} bottom ${strip0.bottom.toFixed(0)} (max height ${STRIP_MAX_H(g).toFixed(0)})`);
+  expect(strip0.op >= 0.3 && strip0.op <= 0.5, flow, 'R7-strip-idle', `strip idle opacity ${strip0.op} (want .4)`);
+  expect(strip0.keys.length === 4 && strip0.keys.every((k) => k.w > 0 && k.h <= strip0.h && k.top >= strip0.top - 1 && k.bottom <= strip0.bottom + 1), flow, 'R7-keys', `keys ${JSON.stringify(strip0.keys)} inside strip top ${strip0.top.toFixed(0)}`);
+  await still(page, g, 'idle');
   // Hold gas on the right for 1 s: the bike must move.
   const x0 = await page.evaluate(() => (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1);
   const cdp = await ctx.newCDPSession(page);
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g.width * 0.9, y: g.height * 0.6 }] });
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g.width * 0.9, y: g.height * 0.6, id: 1 }] });
+  // Held GAS: the key lights green and its whole quarter carries the wash; the three idle keys do not.
+  await page.waitForTimeout(150);
+  const gasHeld = await keyStates(page);
+  expect(gasHeld.throttle.held && greenish(gasHeld.throttle.bg) && !gasHeld.brake.held && !gasHeld.back.held && !gasHeld.fwd.held, flow, 'R7-gas-key', `held right quarter: ${JSON.stringify(gasHeld)}`);
+  expect(gasHeld.throttle.wash && !gasHeld.brake.wash, flow, 'R7-gas-wash', `column wash gas=${gasHeld.throttle.wash} brake=${gasHeld.brake.wash} (${gasHeld.throttle.colBg})`);
+  expect(gasHeld.throttle.scale < 1 && gasHeld.brake.scale === 1, flow, 'R7-gas-press', `press scale gas=${gasHeld.throttle.scale} brake=${gasHeld.brake.scale}`);
   const moved = await page.waitForFunction((x) => ((window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1) > x + 1, x0, { timeout: 15000 }).then(() => true).catch(() => false);
+  // Second finger: LEAN BACK with GAS still down (the multi-touch P0) — both keys lit, then the still.
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g.width * 0.9, y: g.height * 0.6, id: 1 }, { x: g.width * 0.1, y: g.height * 0.6, id: 2 }] });
+  await page.waitForTimeout(150);
+  const both = await keyStates(page);
+  expect(both.throttle.held && both.back.held && !both.fwd.held && !both.brake.held, flow, 'R7-two-keys', `back+gas: ${JSON.stringify(both)}`);
+  await still(page, g, 'held-back-gas');
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  // LEAN FWD + BRAKE: the two lean keys' held colours are identical (one neutral scheme), brake is red.
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g.width * 0.4, y: g.height * 0.6, id: 3 }, { x: g.width * 0.6, y: g.height * 0.6, id: 4 }] });
+  await page.waitForTimeout(150);
+  const other = await keyStates(page);
+  expect(other.fwd.held && other.brake.held && !other.back.held && !other.throttle.held, flow, 'R7-fwd-brake', `fwd+brake: ${JSON.stringify(other)}`);
+  expect(other.fwd.bg === both.back.bg && neutral(other.fwd.bg), flow, 'R7-lean-neutral-equal', `lean held colours back=${both.back.bg} fwd=${other.fwd.bg}`);
+  expect(reddish(other.brake.bg), flow, 'R7-brake-red', `brake held colour ${other.brake.bg}`);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await page.waitForTimeout(200);
+  const released = await keyStates(page);
+  expect(!released.fwd.held && !released.brake.held && !released.fwd.wash && released.fwd.scale === 1, flow, 'R7-release', `after release: ${JSON.stringify(released)}`);
   await cdp.detach();
   const x1 = await page.evaluate(() => (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1);
   expect(moved, flow, 'gas-zone', `bike x ${x0.toFixed(1)} → ${x1.toFixed(1)} while holding the right half`);
+  // Settled (3 s of riding): the strip drops to ~.3, the keys stay drawn.
+  const settled = await waitFor(page, `document.querySelector('.touch-layer').classList.contains('settled')`, 20000);
+  if (settled) await page.waitForTimeout(450);
+  const strip1 = await strip(page);
+  expect(settled && strip1.op >= 0.2 && strip1.op < strip0.op && strip1.keys.length === 4, flow, 'R7-settled', `settled=${settled} strip opacity ${strip0.op} → ${strip1.op}, keys ${strip1.keys.length}`);
+  await still(page, g, 'settled');
   // Pause button → pause overlay, Resume → back riding, pause → Quit → menu.
   await waitFor(page, `document.querySelector('.touch-layer').classList.contains('live')`, 20000);
   await tapSel(page, flow, '.tz-pause');
@@ -354,6 +448,8 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   await page.waitForFunction(() => ![...document.querySelectorAll('.tz')].some((z) => parseFloat(getComputedStyle(z).opacity) > 0.05), null, { timeout: 5000 }).catch(() => undefined);
   const tlp = await touchLayer(page);
   expect(!tlp.pauseVisible && tlp.zones === 0, flow, 'R4-under-overlay', `zones/buttons still visible under the pause overlay (zones=${tlp.zones})`);
+  const stripP = await strip(page);
+  expect(stripP.op <= 0.05, flow, 'R7-strip-under-overlay', `strip opacity ${stripP.op} under the pause overlay`);
   await checkTargets(page, flow + ':pause');
   await tapSel(page, flow, '.pause-overlay.live .tile[data-id=resume]');
   await page.waitForFunction(() => !document.querySelector('.pause-overlay.show'), null, { timeout: 10000 }).catch(() => undefined);
@@ -634,7 +730,9 @@ async function flowHitRects(ctx: BrowserContext, url: string, g: Geom): Promise<
     const outer: [number, number][] = [[r.l - 6, r.t + 10], [r.r + 6, r.t + 10], [(r.l + r.r) / 2, r.b + 6]];
     const acted = async (x: number, y: number): Promise<boolean> => {
       if (kind === 'pause') {
-        // Pause is a tap (latched on pointerup): tap, then one app frame.
+        // Pause is a tap (latched on pointerup): tap, then one app frame. After the previous tap's pause + resume the layer
+        // is re-armed and `.live` lands only once ❚❚ has been drawn for 150 ms again (the invariant) — wait for it, don't race it.
+        await waitFor(page, `document.querySelector('.touch-layer').classList.contains('live')`, 5000);
         await tap(page, x, y);
         const s = await frameSig(page);
         if (s.paused) await page.evaluate(`window.__trials.app.togglePause(); window.__trials.app.frame()`);
