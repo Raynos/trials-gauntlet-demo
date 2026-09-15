@@ -249,6 +249,10 @@ export function clearAllBest(): number {
 export function loadQualityOverride(): QualityTier | 'auto' {
   try {
     const v = store()?.getItem(QUALITY_KEY);
+    // A phone never boots on a stored `high`: earlier builds' probe promoted phones to high and the
+    // manual override then stuck (the meter read "H" at 24–28 fps on a flagship). Auto re-probes from low.
+    const phone = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+    if (phone && v === 'high') return 'auto';
     return v === 'low' || v === 'medium' || v === 'high' ? v : 'auto';
   } catch {
     return 'auto';

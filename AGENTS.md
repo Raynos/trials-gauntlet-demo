@@ -11,3 +11,4 @@
 - Never announce completion while budget remains.
 - This game should be playable on mobile iOS safari & desktop.
 - Favor subagents over workflows where possible, as subagents are resumable.
+- Plans and their status live in `docs/PLANS.md` (kept current by the parent at every commit); the plans themselves: `docs/MEGA_PLAN.md`, `docs/design/physics-v2.md`, `docs/RIDER_ON_GLASS.md`.
