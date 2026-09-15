@@ -50,7 +50,8 @@ export function leanFromX(poses: PoseRow[], x: number): number {
 
 /**
  * Move the target (tx, ty, tpsi) toward the lean's pose with the speed caps (§9.2). Returns the new
- * target through `out`; hysteresis-free.
+ * target through `out`; hysteresis-free. `rateLin` / `rateAng` default to the table's ground rates; the
+ * world passes the air-limited rates (R5) when both wheels are off the ground.
  */
 export function advanceTarget(
   r: TuningV2['rider'],
@@ -60,17 +61,19 @@ export function advanceTarget(
   tpsi: number,
   lean: number,
   out: { x: number; y: number; psi: number },
+  rateLin: number = r.targetRateLin,
+  rateAng: number = r.targetRateAng,
 ): void {
   poseAt(r.poses, lean, out);
   const dx = out.x - tx;
   const dy = out.y - ty;
   const dl = Math.sqrt(dx * dx + dy * dy);
-  const stepL = r.targetRateLin * dt;
+  const stepL = rateLin * dt;
   if (dl > stepL) {
     out.x = tx + (dx / dl) * stepL;
     out.y = ty + (dy / dl) * stepL;
   }
-  const da = clamp(out.psi - tpsi, -r.targetRateAng * dt, r.targetRateAng * dt);
+  const da = clamp(out.psi - tpsi, -rateAng * dt, rateAng * dt);
   out.psi = tpsi + da;
 }
 

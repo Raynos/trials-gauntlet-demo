@@ -40,7 +40,7 @@ async function visibleScreens(page: Page): Promise<string[]> {
   return page.evaluate(() =>
     [...document.querySelectorAll<HTMLElement>('.screen')]
       .filter((el) => getComputedStyle(el).visibility !== 'hidden' && getComputedStyle(el).pointerEvents !== 'none')
-      .map((el) => (/(\w+)-screen/.exec(el.className) ?? [, el.className])[1] as string),
+      .map((el) => /(\w+)-screen/.exec(el.className)?.[1] ?? el.className),
   );
 }
 

@@ -99,6 +99,25 @@ export interface TuningV2 {
     /** R3 intent memory: the pose target's own travel, decaying with tau `servoIntentTau` s; at `servoIntentM` metres the closing cap is lifted to F_max. */
     servoIntentTau: number;
     servoIntentM: number;
+    /**
+     * R5 Rookie air limit: with BOTH wheels off the ground the pose target's travel rate falls from
+     * `targetRateLin` / `targetRateAng` to `airRateLin` / `airRateAng` (a rider in the air has no ground reaction to
+     * brace against; the 5 m/s hop throw is a grounded motion). The limit blends in and out over `airRateBlend` s
+     * (one scalar of memory, `airLimit` in F, so a wheel touching never snaps the rate), and while it is in, the
+     * target's creeping travel is not counted as intent (a rate-limited target cannot snap, so a landing out of a
+     * limited flight keeps the R3 concentric cap). `airRateGain` 0 = raw (the Pro); `debug().rider.airLimited` prints
+     * gain x blend.
+     */
+    airRateLin: number;
+    airRateAng: number;
+    airRateBlend: number;
+    airRateGain: number;
+    /**
+     * R5: extra attitude damping (§9.4 `cAtt`, N m s/rad) while the air limit is in (blended by the same gain x blend
+     * x (1 - intent)). 0 = the air is raw. Measured and NOT taken at 160 (physics.md v2 status R5): it meets the
+     * held-lean rate targets but halves the throttle / brake air nudges, which the parent held fixed.
+     */
+    airCattAdd: number;
     kpsi: number;
     cpsi: number;
     tauMax: number;
@@ -201,6 +220,13 @@ const ROOKIE: TuningV2 = {
     servoMinFrac: 0.3,
     servoIntentTau: 0.2,
     servoIntentM: 0.05,
+    // R5: in free air the full -1 -> 0 pose release is a 0.5 s move (0.39 m at 0.8 m/s) instead of 0.08 s; the swing's
+    // kick on the chassis falls 245 -> ~95 deg/s (physics.md v2 status R5). The blend is 0.1 s each way.
+    airRateLin: 0.8,
+    airRateAng: 1.0,
+    airRateBlend: 0.1,
+    airRateGain: 1,
+    airCattAdd: 0,
     kpsi: 2500,
     cpsi: 180,
     tauMax: 300,
@@ -258,7 +284,7 @@ export const BIKE_PRESETS_V2: Readonly<Record<BikeClassV2, PartialTuningV2>> = O
     wheel: { wheelbase: 1.28 },
     suspension: { rear: { axle: { x: -0.575, y: -0.21 }, k: 12000 }, front: { axle: { x: 0.705, y: -0.215 }, k: 9000 } },
     engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 0, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 } },
-    rider: { Katt: 260, cAtt: 29 },
+    rider: { Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
   },
 });
 

@@ -72,16 +72,18 @@ describe('determinism (§14.1)', () => {
     // applied input (3), rear slip (output). No hop phase timer, no slope memory, no airborne blend, no kappa,
     // no leg stop. R3 adds ONE slot, `targetMove`: the intent memory (the pose target's own travel, decaying over
     // ~0.2 s) that tells the servo a hop push from a landing recovery (physics.md v2 status R3, deviation 19).
-    // Adding a slot fails here until it is justified in physics-v2.md / physics.md.
+    // R5 adds ONE more, `airLimit`: the 0.1 s blend of the Rookie's airborne target-rate limit (physics.md v2 status
+    // R5, deviation 24) - the one "airborne blend" §12 forbade, taken by parent decision so a wheel touching never
+    // snaps the rider's rate. Adding a slot fails here until it is justified in physics-v2.md / physics.md.
     expect([...F_SLOTS]).toEqual([
       'tick', 'time', 'checkpoint', 'finishTime', 'throttleEff', 'brakeEff',
       'targetX', 'targetY', 'targetPsi', 'rearComp', 'frontComp', 'rearAir', 'frontAir',
       'rng0', 'rng1', 'rng2', 'rng3', 'seed', 'crashT',
       'ragRest0', 'ragRest1', 'ragRest2', 'ragRest3', 'ragRest4', 'ragRest5',
       'prevRearX', 'prevRearY', 'prevFrontX', 'prevFrontY', 'inThrottle', 'inBrake', 'inLean', 'rearSlip',
-      'targetMove',
+      'targetMove', 'airLimit',
     ]);
-    expect(NSCALAR).toBe(34);
+    expect(NSCALAR).toBe(35);
     expect([...U_SLOTS]).toEqual(['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase']);
     expect(NU).toBe(13);
     const w = createBikePhysics(HZ);

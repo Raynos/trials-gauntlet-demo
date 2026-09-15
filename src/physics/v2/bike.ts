@@ -45,7 +45,7 @@ export interface PhysicsDebugV2 {
   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
   /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
-  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number };
+  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number };
   /** The declared attitude torque applied this tick (N m). */
   attTorque: number;
   /** Pose target in the chassis frame. */
@@ -127,6 +127,7 @@ export const F_SLOTS = [
   'inLean',
   'rearSlip',
   'targetMove',
+  'airLimit',
 ] as const;
 const S_TICK = 0;
 const S_TIME = 1;
@@ -154,7 +155,8 @@ const S_IN_B = 30;
 const S_IN_L = 31;
 const S_REAR_SLIP = 32; // output
 const S_TGT_MOVE = 33; // R3 intent: decaying memory (tau servoIntentTau) of the pose target's own travel, metres
-export const NSCALAR = F_SLOTS.length; // 34
+const S_AIR_LIMIT = 34; // R5 air limit blend 0..1 (both wheels off the ground, +-dt/airRateBlend per tick)
+export const NSCALAR = F_SLOTS.length; // 35
 
 /** Flags (physics-v2.md §12). */
 export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase'] as const;
@@ -288,6 +290,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private dLegLen = 0;
   private dLegFrac = 1;
   private dIntent = 0;
+  // this tick's air limit (gain x blend x (1 - intent)), derived in step() from F; read by forces() and debug()
+  private airLim = 0;
   private dAtt = 0;
   private dTgtWx = 0;
   private dTgtWy = 0;
@@ -421,14 +425,30 @@ class WorldV2 implements BikePhysicsWorldV2 {
       const t = this.tuning;
       F[S_THROTTLE_EFF] = lag(F[S_THROTTLE_EFF]!, input.throttle, t.engine.throttleTau, dt);
       F[S_BRAKE_EFF] = lag(F[S_BRAKE_EFF]!, input.brake, t.brakes.brakeTau, dt);
-      // 2 pose target (reads F only)
-      advanceTarget(t.rider, dt, F[S_TGT_X]!, F[S_TGT_Y]!, F[S_TGT_PSI]!, input.lean, this.poseTmp);
+      // 2 pose target (reads F only). R5 air limit: with both wheels off the ground (last derive's air counters)
+      // the target's travel rate blends over airRateBlend s from the ground rates to the air rates; a rider in the
+      // air has nothing to brace the 5 m/s hop throw against, and the throw's reaction on the chassis (F_max x the
+      // grip lever / I_c, 43 deg/s per tick) was the round-8 "air kick". Continuous both ways; gain 0 = raw (Pro).
+      // A throw already in flight carries through: the limit is gated by (1 - intent), the R3 memory of the target's
+      // own travel, so a hop's snap that is still ramping when the wheels leave finishes at the ground rate (a rider
+      // who was braced when he started the throw), while a lean pressed in free air (the target still, intent 0)
+      // is limited from its first tick. Intent is earned on the ground only (below): in the air the memory decays,
+      // so the limit cannot talk itself down through the travel it allows.
+      const r = t.rider;
+      const bothAir = F[S_REAR_AIR]! > 0 && F[S_FRONT_AIR]! > 0 ? 1 : 0;
+      const dLim = dt / r.airRateBlend;
+      F[S_AIR_LIMIT] = clamp(bothAir, F[S_AIR_LIMIT]! - dLim, F[S_AIR_LIMIT]! + dLim);
+      const lim = r.airRateGain * F[S_AIR_LIMIT]! * (1 - clamp(F[S_TGT_MOVE]! / r.servoIntentM, 0, 1));
+      this.airLim = lim;
+      advanceTarget(r, dt, F[S_TGT_X]!, F[S_TGT_Y]!, F[S_TGT_PSI]!, input.lean, this.poseTmp, r.targetRateLin + (r.airRateLin - r.targetRateLin) * lim, r.targetRateAng + (r.airRateAng - r.targetRateAng) * lim);
       // intent (R3): how far the target itself has travelled lately. A rider who is MOVING his pose (the hop's
       // snap) may push at F_max whichever way the gap is closing; a rider holding a pose (a landing) has only the
-      // concentric cap (servoMinFrac at servoCloseV0) on the way back up, so the legs absorb instead of pogoing
+      // concentric cap (servoMinFrac at servoCloseV0) on the way back up, so the legs absorb instead of pogoing.
+      // R5 (Rookie, gain 1): travel with both wheels off the ground does not count - a rate-limited target cannot
+      // snap, and a landing out of a limited flight keeps the cap. The Pro (gain 0) counts as R3.
       const mdx = this.poseTmp.x - F[S_TGT_X]!;
       const mdy = this.poseTmp.y - F[S_TGT_Y]!;
-      F[S_TGT_MOVE] = F[S_TGT_MOVE]! * (1 - dt / t.rider.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy);
+      F[S_TGT_MOVE] = F[S_TGT_MOVE]! * (1 - dt / r.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy) * (1 - r.airRateGain * bothAir);
       F[S_TGT_X] = this.poseTmp.x;
       F[S_TGT_Y] = this.poseTmp.y;
       F[S_TGT_PSI] = this.poseTmp.psi;
@@ -436,6 +456,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
       F[S_THROTTLE_EFF] = 0;
       F[S_BRAKE_EFF] = 1;
       F[S_TGT_MOVE] = 0;
+      F[S_AIR_LIMIT] = 0;
+      this.airLim = 0;
       U[U_LIMITER] = 0;
     }
     this.forces(riding); // 3
@@ -629,6 +651,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
         legLen: this.dLegLen,
         legFrac: this.dLegFrac,
         intent: this.dIntent,
+        airLimited: this.airLim,
         poseTargetWorld: { x: this.dTgtWx, y: this.dTgtWy },
         lag: { x: this.px[RIDER]! - this.dTgtWx, y: this.py[RIDER]! - this.dTgtWy },
       },
@@ -786,6 +809,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     this.F[S_FRONT_COMP] = cf / sf.travel;
     this.F[S_REAR_AIR] = 0;
     this.F[S_FRONT_AIR] = 0;
+    this.F[S_AIR_LIMIT] = 0;
     this.F[S_PREV_RX] = rx;
     this.F[S_PREV_RY] = ry;
     this.F[S_PREV_FX] = this.px[FRONT]!;
@@ -1107,7 +1131,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
       av[RIDER] = av[RIDER]! + tq * dt * ii[RIDER]!;
       av[CHASSIS] = av[CHASSIS]! - tq * dt * ii[CHASSIS]!;
       // the declared attitude torque (§9.4): external, always on, printed
-      const att = -r.Katt * F[S_IN_L]! - r.cAtt * wC0;
+      const att = -r.Katt * F[S_IN_L]! - (r.cAtt + r.airCattAdd * this.airLim) * wC0;
       this.dAtt = att;
       av[CHASSIS] = av[CHASSIS]! + att * dt * ii[CHASSIS]!;
     }

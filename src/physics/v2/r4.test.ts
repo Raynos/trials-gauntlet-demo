@@ -103,6 +103,8 @@ function launch(cls: BikeClassV2, lean: number): { maxPitch: number; loopT: numb
 }
 
 const RAW: PartialTuningV2 = { engine: { wheelieControl: { gain: 0, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 } } };
+/** R5: the Rookie's airborne target-rate limit off (the R4 measurement of the raw swing). */
+const AIR_RAW: PartialTuningV2 = { rider: { airRateGain: 0 } };
 
 describe('R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swing, not the throttle', () => {
   it('throttle in the air is bounded by the wheel spin-up (<= 30 deg/s peak, 4-12 deg in 0.5 s) and brake in the air by the wheels\' spin momentum (-30..-60 deg/s peak) on both classes', () => {
@@ -121,12 +123,13 @@ describe('R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swin
     }
   });
 
-  it('a full pose swing in the air is the 200-400 deg/s step: releasing lean -1 to 0 kicks +230..260 deg/s within 0.07 s (43 deg/s per tick = F_max x the grip lever / I_chassis), pressing 0 to -1 dips the nose first (-140 deg/s) then K_att lifts it; genuine two-body dynamics, > 8x the throttle tap', () => {
+  it('a full pose swing in the air is the 200-400 deg/s step: releasing lean -1 to 0 kicks +230..260 deg/s within 0.07 s (43 deg/s per tick = F_max x the grip lever / I_chassis), pressing 0 to -1 dips the nose first (-140 deg/s) then K_att lifts it; genuine two-body dynamics, > 8x the throttle tap (raw: the Pro, and the Rookie with the R5 air limit off - r5.test.ts has the limited Rookie)', () => {
     for (const cls of BIKE_CLASSES_V2) {
-      const rel = air(cls, { lean: -1 }, { lean: 0 });
-      const press = air(cls, {}, { lean: -1 });
-      const both = air(cls, { lean: -1 }, { lean: 0, throttle: 1 });
-      const t = air(cls, {}, { throttle: 1 });
+      const raw = cls === 'rookie' ? AIR_RAW : undefined;
+      const rel = air(cls, { lean: -1 }, { lean: 0 }, raw);
+      const press = air(cls, {}, { lean: -1 }, raw);
+      const both = air(cls, { lean: -1 }, { lean: 0, throttle: 1 }, raw);
+      const t = air(cls, {}, { throttle: 1 }, raw);
       feel(`air.${cls}.swing-1to0`, `peak ${f(rel.peakRate, 0)} deg/s step ${f(rel.peakStep, 0)} /tick angle ${f(rel.ang05)} @0.5s`, 'measured: the kick (200-300)');
       feel(`air.${cls}.swing0to-1`, `peak ${f(press.peakRate, 0)} deg/s step ${f(press.peakStep, 0)} /tick angle ${f(press.ang05)} @0.5s rate@0.5 ${f(press.rate05, 0)}`, 'measured: dip then K_att');
       feel(`air.${cls}.swing-1to0+gas`, `peak ${f(both.peakRate, 0)} angle ${f(both.ang05)} @0.5s`, 'measured: swing + 20 of throttle');

@@ -5,6 +5,151 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R5 (the air limit: the swing is the servo's, the held lean is K_att's)
+
+**Finding.** The Rookie's rider servo is rate-limited in free air — with both wheels off the ground the pose target
+travels at 0.8 m/s instead of 5 (`rider.airRateLin/Ang`, blended over 0.1 s each way through one new `F` slot,
+`airLimit`, and gated by the R3 intent so a throw that began on the ground carries through) — which takes the
+−1 → 0 release kick from **+245 to +99 °/s (43 → 10 °/s per tick)** with every grounded row byte-identical (hop matrix,
+landing table, climb, wheelie hold, ramp rows: the FEEL diff against R4 is three air rows) and the throttle / brake air
+nudges untouched (+6.1° / −15.2°, the Pro raw at 234). But decomposing the R4 numbers with K_att and c_att zeroed shows
+the swing is only ~170 of the 245 and almost none of the angle: **the +31° at 0.3 s after a release is the momentum K_att
+pumped during the hold (r0 = +86 °/s, 86 × 0.3 s = 26°)**, and the held-lean rows (0 → −1: 171 °/s and +33° at
+0.5 s) are K_att's constant 300 N m / 265 °/s² — the limiter moves them 171 → 153 and 33 → 31. Of the parent's four
+free-air targets the servo owns one (peak ≤ 120: met, 99); the other three (release ≤ +15° at 0.3 s: 25.8; held
+rate ≤ 110: 153; held angle ≤ 22: 31.1) are the declared attitude torque's and no servo lever reaches them. The lever
+that does — extra attitude damping in the air, `rider.airCattAdd`, declared and measured at +160 (held rate 92 / 22.4°,
+release peak 80 / 16.8° at 0.3 s, a full second of held ±1 77° instead of 147°) — **halves the throttle / brake nudges
+(brake −15 → −7 per 0.5 s) and takes the FEEL air-control row to 24° (band 25–40)**, which the parent held fixed, so it
+ships at 0 (raw air) with the numbers below. Reflex `average`, Rookie, controller at HEAD (`air-level` still
+bang-bang): over 8 seeds gap 1, b1 1, b2 2.5, b3 4.5, e1 11, e2 10, e3 12 (R4: 1 / 1 / 4 / 14 / 21 / 36 / 30) with
+e2 and e3 now clearing 7/8 (R4 1/3 each); b1 and gap in band, b2 at the edge, b3 / e1 / e2 / e3 out — every remaining air
+death is a brake or gas tap with lean ±1 *held* through the flight (`air-brake-nose-down` at b3 box 416, e1 ramp 446,
+e2 ramp 506), i.e. K_att integrating a held lean, the controller's to release and the physics's to declare. The
+beginner's panic (1.5 m ledge, lean −1 held from the edge) **crashes on both classes with the limit on or off**, and the
+limiter is correctly out of it: the swing happens while the rear is still on the ledge (grounded, front hanging — a
+wheelie off the edge), K_att then holds +300 N m through 0.45 s of air and the bike lands rear-first at +24° /
++204 °/s and loops; lean −0.5 held lands +3° / 98 °/s and rides away, lean 0 lands −18° and rides. Cost 1.5–2.2 µs/tick
+p50 (p95 ≤ 3.4 at loadavg 17), gain 0 indistinguishable. `pnpm vitest run src/physics` 153 pass / 11 todo; typecheck
+clean; lint clean on `src/physics` (the one repo lint error is `harness/e2e/touch.mts`, not this round's).
+
+### Files (R5)
+
+- `src/physics/v2/tuning.ts` — `rider.airRateLin` 0.8 m/s, `airRateAng` 1.0 rad/s, `airRateBlend` 0.1 s, `airRateGain`
+  1 (Pro 0), `airCattAdd` 0 (the measured-and-not-taken option, both classes).
+- `src/physics/v2/bike.ts` — `F_SLOTS` gains `airLimit` (35 scalars): `lim ← lim ± dt/0.1` toward "both wheels off"
+  (the R4 air-tick counters), `airLim = gain × lim × (1 − intent)`; `advanceTarget` gets the blended rates; the intent
+  memory earns travel on the ground only (gain 1) so the limit cannot talk itself down through the travel it allows;
+  `debug().rider.airLimited`; the attitude torque's damping is `cAtt + airCattAdd × airLim`.
+- `src/physics/v2/rider.ts` — `advanceTarget(..., rateLin, rateAng)` (defaults = the ground rates).
+- `src/physics/v2/r5.test.ts` — 8 rows: free air per class, nudges identical to raw, hop / landing identical on/off,
+  continuity of the blend, snapshot through a limited flight, the panic ledge per class, cost.
+- `src/physics/v2/r4.test.ts` — the swing row measures the raw configuration (Pro; Rookie with `airRateGain` 0);
+  `world.test.ts` slot list 35 (deviation 24 below).
+
+### Free air per class (R4 bench: level at 10 m/s, `pre` 0.2 s, `post` 0.5 s; R4 → R5)
+
+| input | Rookie R4 | Rookie R5 | Pro (raw, = R4) | parent target (Rookie) |
+|--|--|--|--|--|
+| throttle tap: peak / angle 0.5 s | 20 / +6.1 | 20 / +6.1 | 23 / +7.7 | unchanged ✓ |
+| brake tap: peak / angle | −42 / −15.2 | −42 / −15.2 | −41 / −15.8 | unchanged ✓ |
+| release −1 → 0: peak / per tick / angle 0.3 s / 0.5 s | +245 / 43 / +31.2 / +39.3 | **+99 / 10 / +25.8 / +34.0** | +234 / 42 / +28.7 / +35.5 | ≤ 120 ✓ / — / ≤ +15 ✗ (K_att momentum) |
+| release + gas: peak / angle 0.5 s | 246 / +42.9 | **100 / +35.7** | 249 / +49.3 | — |
+| release +1 → 0: peak / angle 0.3 s | −221 / −30.4 | **−110 / −30.0** | −213 / −28.9 | — |
+| 0 → −1 held: first dip / rate 0.5 s / angle 0.5 s | −144 / 171 / +32.7 | −40 (limited swing) / 153 / +31.1 | −130 / 150 / +26.4 | ≤ 110 ✗ / ≤ +22 ✗ (K_att) |
+| 0 → +1 held: rate / angle 0.5 s | −174 / −41.2 | −174 / −41.0 | −158 / −37.1 | — |
+| −1 → +1 flip: peak / rate 0.5 s | 220 / −128 | −103 / −103 | 215 / −116 | — |
+
+Decomposition (K_att = c_att = 0 on the same bench, Rookie): press 0 → −1 peak −180 °/s and −21° (the pure swing),
+release +172 / +8°; with the limit the press is −40 / −17.5° at 0.5 s. The R4 release therefore reads: ~170 swing +
+~75 carried K_att momentum (r0 +86 °/s at the release) for the peak; ~26 of the 31° is the carried momentum.
+Air-rate sweep (release peak / angle 0.3 s): 2 m/s 149 / 30.5, 1.2 115 / 25.7, **0.8 99 / 25.8 (0.49 s per full pose
+change)**, 0.6 84 / 21.3, 0.4 75 / 19.6. Held 0 → −1 rate at 0.5 s: 171 / 172 / 153 / 152 / 153 — the rate limit does
+not touch it.
+
+### The air-damping option (`rider.airCattAdd`, measured, NOT taken)
+
+| airCattAdd | held 0 → −1: rate / angle 0.5 s · 1.0 s | release −1 → 0: peak / angle 0.3 s | held +1 1.0 s | brake / throttle nudge 0.5 s | FEEL air −1 @8 |
+|--|--|--|--|--|--|
+| 0 (shipped) | 153 / 31.1 · 284 / 147 | 99 / 25.8 | −156° | −15.2 / +6.1 | 35.6 (band 25–40) |
+| +80 | 125 / 27.4 · 187 / 112 | 91 / 21.9 | −120 | −10.2 / +4.9 | — |
+| +160 | 92 / 22.4 · 108 / 77 | 80 / 16.8 | −82 | **−7.3 / +4.0** | **24.0** |
+| +220 | 76 / 19.5 · 79 / 61 | 73 / 13.9 | −66 | −5.9 / +3.5 | — |
+
++160 meets three of the four targets within 2° and turns a second of held lean from a loop into 77°, but it is an
+external torque on the chassis rotation, so it also decays the throttle / brake impulses (the nudges the parent held
+fixed), drops the R3 class row under the FEEL band, and needs the conservation tests' `cAtt: 0` override extended
+(done: the row is additive). Reflex at +160 (3 seeds, 0.8 m/s): b2 3, b3 6, e1 9, e2 13, e3 14 — mixed against the
+limiter alone (3 / 9 / 13 / 7 / 16) inside the seed noise. Parent's call; it is one number.
+
+### Grounded rows (R4 → R5, `pnpm vitest run src/physics` FEEL diff; everything not listed prints identically)
+
+| row | R4 | R5 |
+|--|--|--|
+| hop ref / matrix (16 cells) / by preload / tuck / surfaces / quantum | 0.462 / as R3 / … | **identical to 3 decimals** (on/off equal: 0.462, 0.408 at −1@8, 0.444 at −0.5@16) |
+| landing table (12 rows) | all ride away | identical (3 m @6 lean +0.5 air-after 0.08 → 0.07 s) |
+| wheelie hold V3 (Rookie / Pro) | 11.5 s / 12.2 s | identical |
+| climb table, ramp rows (lean 0 / 0.2 / 0.4 / 1), touchdown, launches, balance ladder, 0 → 16 | — | identical |
+| air control 0.5 s lean −1 @8 / 14 / 20 | 36.8 / 37.5 / 36.9 | 35.6 / 36.3 / 35.6 (the limited swing; +1 side −37.3 → −37.3) |
+| R3 class row air −1 / +1 | 34.8 / −39.3 | 33.6 / −39.2 |
+| kickers 17–22 lean released, worst landing | 19.14 | 19.17 |
+| µs/tick p50 / p95 (alone, loadavg 17) | 2.5 / 4.0 | 1.5–2.2 / ≤ 3.4 (gain 0 the same) |
+
+The intent gate is what keeps the hop: without it the (−1, 8 /s) cell fell 0.408 → 0.381 and the 0.5 s-preload apex
+0.507 → 0.375 (the snap ramp still running at take-off was being limited); with the gate as first written (intent fed
+by the limited travel) a lean pressed during the 0.1 s blend-in escalated back to a full-rate throw — hence "intent is
+earned on the ground only".
+
+### Reflex `average`, Rookie, node, controller at HEAD (`air-level` not yet rate-aware; `scratchpad/physics-r5/reflex.mts`)
+
+| track | band / target | R4 (3 seeds) | R5 seeds 1000–1002 | R5 seeds 1003–1007 | R5 median (8) · clears | R5 death sites (owner) |
+|--|--|--|--|--|--|--|
+| gap-test | 1–3 | 1 | 1/1/1 | 1/1/1/1/1 | **1** · 8/8 | — |
+| b1-first-ride | 1 | 1 | 1/1/1 | 1/1/1/1/1 | **1** · 8/8 | — |
+| b2-lean-back | ≤ 2 | 4 | 2/3/3 | 2/4/2/1/3 | 2.5 · 8/8 | ground @ 35 nose-low ×2 (the first drop, geometry/controller); air-brake / air-gas ×1 each (controller) |
+| b3-kicker-row | ≤ 3 | 14 | 9/14/2 | 4/2/8/5/1 | 4.5 · 8/8 | box @ 416 air-brake-nose-down ×3, ramp @ 335 ×2 (controller: brake with +1 held; physics: K_att integrates the hold) |
+| e1-uphill-weight | ≤ 6 | 21 (2/3) | 13/14/9 | 15/5/11/11/3 | 11 · 8/8 | ramp @ 446 air-brake-nose-down ×7 (as b3), ramp @ 75 air-gas-nose-up ×3 (controller) |
+| e2-rear-wheel-first | ≤ 8 | 36 (1/3) | 7/27/7 | 12/19/8/37/4 | 10 · 7/8 | ramp @ 506 nose-high ×9 / air-gas ×9 / air-brake ×8 (the big rear-first ramp: controller + geometry) |
+| e3-stairway | ≤ 9 | 30 (1/3) | 16/36/2 | 6/14/4/20/10 | 12 · 7/8 | box @ 412 stuck-restart ×5, ramp-ride ×4 (geometry/controller, not air) |
+
+Air rate on the reflex (3 seeds 1000–1002 / 5 seeds 1003–1007 medians): 0.6 m/s b2 3, b3 8, e1 16, e2 3, e3 13;
+1.2 m/s b2 4 / 3, b3 7 / 5, e1 7 / 15, e2 4 / 16, e3 10 / 7 — indistinguishable from 0.8 inside the seed spread
+(e3 alone ranges 2–36); 0.8 is the value sized from the free-air target with margin.
+
+### The panic drop (1.5 m ledge at 10 m/s, input held from the edge through the landing; `r5.test.ts`)
+
+| class | lean −1 held | lean −0.5 held | lean 0 |
+|--|--|--|--|
+| Rookie R5 | lands +24° at +204 °/s → **crash** (R4 identical; airCattAdd +250: +17° / 137 → crash; K_att 150: −1° / 95 → loops after touchdown) | +3° / 98 °/s → rides | −18° / −16 → rides |
+| Pro | +25° / 201 → crash | +6° / 100 → rides | −13° / −5 → rides |
+
+Not met, and not the servo's: the front is over the edge while the rear is still on it, so the swing is grounded and
+the limit (correctly) never engages for it; the wheelie off the edge plus 0.45 s of K_att × (−1) lands the bike
+rear-first at 100 % travel with 200 °/s of nose-up and the rider at −1, and it loops. A landing-rideable "−1 held" needs
+K_att to fade with pitch or rate in the air (the same decision as `airCattAdd`), or the input to be released.
+
+### Further deviations (R5)
+
+24. **One new §12 slot, `airLimit`** — the "airborne blend" §12 forbids, taken on the parent's decision that a wheel
+    touching must never snap the rider's rate. 0..1, ±dt/0.1 per tick toward "both air counters > 0", zeroed with
+    the fault and by `placeBike`; the limit in effect is `gain × airLimit × (1 − intent)`. Snapshot round-trip through a
+    limited flight asserted (`r5.test.ts`); the foreign-snapshot suite unchanged and green.
+25. **Intent is earned on the ground only** on the Rookie (gain 1): `targetMove` accumulates the target's travel ×
+    (1 − gain × bothAir). The Pro accumulates as R3.
+
+### Requests
+
+- **parent (decision)**: the held-lean targets are K_att's. Options with numbers above: `airCattAdd` +160 (three of
+  four targets, the brake nudge −15 → −7, FEEL air −1 row 24 vs band 25) or accept 153 / 31 and let the controller
+  release. The panic row is the same decision.
+- **harness (reflex)**: the release kick is now 99 °/s in 10 °/s steps and a full pose change takes 0.5 s in the air —
+  `air-level` should command a lean *rate* against `pitch + rate × 0.25 s` and release 0.15 s early; every remaining
+  b3 / e1 / e2 death is a brake or gas tap with ±1 held. `debug().rider.airLimited` is the new HUD field.
+- **tracks**: b2's first drop (ground @ 35, nose-low ×2 of 8 seeds) and e3's box @ 412 (stuck ×5) are the two
+  non-air death sites left on the beginner courses.
+
+---
+
 ## v2 status — R4 (the round-8 reflex finding, the Rookie assist)
 
 **Finding.** Neither of the round-8 deaths is a solver artefact. Replaying the reflex traces tick by tick
