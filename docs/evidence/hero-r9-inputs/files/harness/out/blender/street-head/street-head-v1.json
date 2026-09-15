@@ -1,0 +1,27 @@
+{
+  "source": "harness/out/blender/mega-outfits/anatomy-v3/street-anatomy-v3d.blend",
+  "source_sha256": "43d181790444374d6b94dc1555eaf7d64bd59bdc0ba3deec1a3331c8a6225af6",
+  "anatomy_data_sha256": "7af8e8e724a51e1640f407c042d01f6dd180c3d08cd4a901eef563b074c9fa0c",
+  "script_sha256": "f81a84975b114d0fede5f7d8e8c7712d0d084550cfd6b585ac47bc36dc01ace4",
+  "output_sha256": "3a370e96380f2c428a640371a135e59ac960e1b791d36d50565fec1c68f17614",
+  "source_asset": "Blender CC0 Human Base Meshes v1.4.1 / realistic animation head + actual eyes",
+  "chin_to_crown_m": 0.23344024,
+  "hair_max_thickness_m": 0.0028,
+  "rig_actions_sockets_and_nonhead_meshes_unchanged": true,
+  "head_topology": {
+    "vertices": 3163,
+    "faces": 3144,
+    "components": [
+      3163
+    ],
+    "boundary_edges": 50,
+    "boundary_loops": [
+      50
+    ],
+    "nonmanifold_interior_edges": 0,
+    "degenerate_faces": 0,
+    "minimum_face_area": 1.5747032477975154e-07
+  },
+  "head_triangles": 6274,
+  "all_triangles": 43370
+}

@@ -1,0 +1,203 @@
+{
+  "round": 9,
+  "createdAt": "2026-09-15T22:11:58.202246+00:00",
+  "status": "assembled candidate reviewed; canonical assets not promoted; AAA goal unfinished",
+  "build": "harness/out/blender/mega-v8-dist",
+  "buildReport": "harness/out/blender/mega-v8-build/report.json",
+  "captures": {
+    "mega-v8-close-street": {
+      "evidence": "harness/out/blender/mega-v8-close-street/evidence.json",
+      "evidenceSha256": "cf597bd7d0d748d4b91c705b82152d910b3c453c4c072aaef21b5de088897eed",
+      "clip": "harness/out/blender/mega-v8-close-street/clip.mp4",
+      "clipSha256": "f4eecb262da2226000d63b6cc403f33b99208a6e3a4d391546add45c0cc76898",
+      "frames": 190,
+      "forcedRiderLod": false,
+      "heroDocs": [
+        "bike rider"
+      ],
+      "assetBytes": {
+        "models/a5982f0d0ef6b1fd/rider-street-df6f3d4cf513dc9d.glb": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853",
+        "models/a5982f0d0ef6b1fd/rider-street-lod-f6772e5459a5cb0b.glb": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e",
+        "models/524c1d6633dda697/bike-f18bfc01cb478a79.glb": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2",
+        "models/524c1d6633dda697/bike-lod-7a31cd455aba85cf.glb": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3"
+      }
+    },
+    "mega-v8-close-race": {
+      "evidence": "harness/out/blender/mega-v8-close-race/evidence.json",
+      "evidenceSha256": "e5fb6b6a69ff783b7b5b3f922e9f1bee082789a411534cebc91af546e23b774a",
+      "clip": "harness/out/blender/mega-v8-close-race/clip.mp4",
+      "clipSha256": "d8d6923ed1a778ea4403cf0dfba83cbf4a519ed0130adad7990c45670cf8e86a",
+      "frames": 190,
+      "forcedRiderLod": false,
+      "heroDocs": [
+        "bike rider"
+      ],
+      "assetBytes": {
+        "models/41d6d32f2f06b0d1/rider-race-f660ac40b063d2a3.glb": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33",
+        "models/41d6d32f2f06b0d1/rider-race-lod-e095ee00a701cf80.glb": "e095ee00a701cf806d875f1725c4fcc536a6676eeb1db5879f36967de6894aab",
+        "models/524c1d6633dda697/bike-f18bfc01cb478a79.glb": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2",
+        "models/524c1d6633dda697/bike-lod-7a31cd455aba85cf.glb": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3"
+      }
+    },
+    "mega-v8-lod-street": {
+      "evidence": "harness/out/blender/mega-v8-lod-street/evidence.json",
+      "evidenceSha256": "a08501c42877f2649ed72ef02a18a91c6f44c1564b61d8edb6ad8f56b3902842",
+      "clip": "harness/out/blender/mega-v8-lod-street/clip.mp4",
+      "clipSha256": "61b737ee2c3df4085ba517001be3c80cd289f1b0edb9297bc9597e3765453b9e",
+      "frames": 190,
+      "forcedRiderLod": true,
+      "heroDocs": [
+        "bike-lod rider-lod"
+      ],
+      "assetBytes": {
+        "models/a5982f0d0ef6b1fd/rider-street-df6f3d4cf513dc9d.glb": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853",
+        "models/a5982f0d0ef6b1fd/rider-street-lod-f6772e5459a5cb0b.glb": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e",
+        "models/524c1d6633dda697/bike-f18bfc01cb478a79.glb": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2",
+        "models/524c1d6633dda697/bike-lod-7a31cd455aba85cf.glb": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3"
+      }
+    },
+    "mega-v8-lod-race": {
+      "evidence": "harness/out/blender/mega-v8-lod-race/evidence.json",
+      "evidenceSha256": "969f13f1901079a17a22c3ca44049884389a953c878b2f088b75045b5b524769",
+      "clip": "harness/out/blender/mega-v8-lod-race/clip.mp4",
+      "clipSha256": "a425f50fa1b5b0eaacba582b3e0d616a99cdb858da044f3027ca32c2996886e5",
+      "frames": 190,
+      "forcedRiderLod": true,
+      "heroDocs": [
+        "bike-lod rider-lod"
+      ],
+      "assetBytes": {
+        "models/41d6d32f2f06b0d1/rider-race-f660ac40b063d2a3.glb": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33",
+        "models/41d6d32f2f06b0d1/rider-race-lod-e095ee00a701cf80.glb": "e095ee00a701cf806d875f1725c4fcc536a6676eeb1db5879f36967de6894aab",
+        "models/524c1d6633dda697/bike-f18bfc01cb478a79.glb": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2",
+        "models/524c1d6633dda697/bike-lod-7a31cd455aba85cf.glb": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3"
+      }
+    },
+    "mega-v8-game-street": {
+      "evidence": "harness/out/blender/mega-v8-game-street/evidence.json",
+      "evidenceSha256": "77eee8e93dec1a927a37d3401f136e8e0ac034535d35be74db8a817938e2947b",
+      "clip": "harness/out/blender/mega-v8-game-street/clip.mp4",
+      "clipSha256": "728b24b96c75e98fd369a8156653f3418b7145d729cdb8ccb63950e8fc21b8b1",
+      "frames": 190,
+      "camera": "production gameplay camera; sampled advancing playback reviewed by parent",
+      "assetBytes": {
+        "models/a5982f0d0ef6b1fd/rider-street-df6f3d4cf513dc9d.glb": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853",
+        "models/a5982f0d0ef6b1fd/rider-street-lod-f6772e5459a5cb0b.glb": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e",
+        "models/524c1d6633dda697/bike-f18bfc01cb478a79.glb": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2",
+        "models/524c1d6633dda697/bike-lod-7a31cd455aba85cf.glb": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3"
+      }
+    },
+    "mega-v8-game-race": {
+      "evidence": "harness/out/blender/mega-v8-game-race/evidence.json",
+      "evidenceSha256": "1136d4872999a9024d03aaed0d4ead6399910d15cfb74246795d8ce0cc918720",
+      "clip": "harness/out/blender/mega-v8-game-race/clip.mp4",
+      "clipSha256": "c78dfa95a8230a381c89c977b344d51f0e6b103e13c83f9682a86da43fd116bb",
+      "frames": 190,
+      "camera": "production gameplay camera; sampled advancing playback reviewed by parent",
+      "assetBytes": {
+        "models/41d6d32f2f06b0d1/rider-race-f660ac40b063d2a3.glb": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33",
+        "models/41d6d32f2f06b0d1/rider-race-lod-e095ee00a701cf80.glb": "e095ee00a701cf806d875f1725c4fcc536a6676eeb1db5879f36967de6894aab",
+        "models/524c1d6633dda697/bike-f18bfc01cb478a79.glb": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2",
+        "models/524c1d6633dda697/bike-lod-7a31cd455aba85cf.glb": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3"
+      }
+    }
+  },
+  "shipGates": {
+    "metal": {
+      "report": "harness/out/blender/mega-v8-ship-metal/report.json",
+      "sha256": "6b83f337a37c0dc8402b14c0115b412d40157f89ce73d6f758a7a06d41a88a23",
+      "pass": true,
+      "inputTicks": 4736,
+      "mismatchedTick": null,
+      "clear": {
+        "cleared": true,
+        "time": 39.46666666666667,
+        "faults": 0
+      },
+      "restart": {
+        "crashTick": 103,
+        "crashToRestartTicks": 1,
+        "restartStateTick": 0,
+        "restartPhase": "riding",
+        "faultsBefore": 1,
+        "faultsAfter": 1,
+        "commandMs": 0.19499993324279785,
+        "frameMs": 4.049999952316284,
+        "movesAfterTicks": 1,
+        "glError": 0,
+        "heroDoc": "bike rider"
+      },
+      "warnings": [
+        "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+      ],
+      "note": "Headless desktop browser; frameMs is CPU submission latency, not GPU completion or actual iOS presentation. Played capture is separate."
+    },
+    "webkit": {
+      "report": "harness/out/blender/mega-v8-ship-webkit/report.json",
+      "sha256": "19cd48883cc9ffbf5b5203f611ecaf4816f10fda7d0457d46cf2618800d93f90",
+      "pass": true,
+      "inputTicks": 4736,
+      "mismatchedTick": null,
+      "clear": {
+        "cleared": true,
+        "time": 39.46666666666667,
+        "faults": 0
+      },
+      "restart": {
+        "crashTick": 103,
+        "crashToRestartTicks": 1,
+        "restartStateTick": 0,
+        "restartPhase": "riding",
+        "faultsBefore": 1,
+        "faultsAfter": 1,
+        "commandMs": 0.23999999999978172,
+        "frameMs": 3.540000000000873,
+        "movesAfterTicks": 1,
+        "glError": 0,
+        "heroDoc": "bike rider"
+      },
+      "warnings": [
+        "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+      ],
+      "note": "Headless desktop browser; frameMs is CPU submission latency, not GPU completion or actual iOS presentation. Played capture is separate."
+    }
+  },
+  "playedReview": {
+    "method": "Native QuickTime advancing playback observed by parent; actual recorded gameplay and explicitly labelled inspection camera",
+    "streetFullTimes": [
+      2.633,
+      2.733
+    ],
+    "raceFullTimes": [
+      2.017,
+      2.1,
+      2.783,
+      2.867
+    ],
+    "streetLodTimes": [
+      2.65,
+      2.75
+    ],
+    "raceLodTimes": [
+      3.0,
+      3.15
+    ],
+    "finding": "Human face, smaller Race helmet and connected fitted garments improve the complete silhouette. Sampled full and LOD motion remains connected. Cloth, skin and helmet/boot surfaces still lack the detail and material depth of the targets. This is not full crash/animation or AAA acceptance.",
+    "normalStreetTimes": [
+      2.75,
+      2.967
+    ],
+    "normalRaceTimes": [
+      2.633,
+      2.867
+    ],
+    "normalFinding": "Both outfits remain distinct at ordinary gameplay scale; visible silhouette improvement, but surface detail largely disappears at the pulled-back camera. No claim of AAA target parity."
+  },
+  "remaining": [
+    "Compare remaining class/outfit combinations and full crash/animation range",
+    "Remaining animation and crash review",
+    "Actual iOS device performance",
+    "Canonical source/asset promotion after acceptance",
+    "Known R7 physics regressions remain parked"
+  ]
+}

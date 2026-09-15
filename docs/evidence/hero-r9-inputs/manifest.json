@@ -1,0 +1,716 @@
+{
+  "schema": "hero-r9-inputs-v1",
+  "scope": "Six parent-integrated R9 review candidates; no canonical promotion",
+  "integrated_manifest": "harness/out/blender/mega-v8-models.json",
+  "models": [
+    {
+      "path": "harness/out/blender/mega-bike/final-candidate/models/bike.glb",
+      "bytes": 1414848,
+      "sha256": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2",
+      "source_path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/mega-bike/final-candidate/source/bike.blend",
+      "source_sha256": "498c778ae2e496fd0d9af2a71a27340c0173117951a50d1ea6f15e1007b49025",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "triangles": 29940,
+        "meshes": 23,
+        "maxPositionError": 5.0215969990711564e-08,
+        "occlusionMaterials": 3,
+        "bounds": {
+          "min": [
+            -0.4000000059604645,
+            -0.3408759534358978,
+            -0.43760812282562256
+          ],
+          "max": [
+            1.6599665880203247,
+            0.85916668176651,
+            0.43760812282562256
+          ]
+        },
+        "bytes": 1414848
+      },
+      "audit_path": "harness/out/blender/mega-bike/final-candidate/models/bike.source.json"
+    },
+    {
+      "path": "harness/out/blender/mega-bike/final-candidate/models/bike-lod.glb",
+      "bytes": 506428,
+      "sha256": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3",
+      "source_path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/mega-bike/final-candidate/source/bike.blend",
+      "source_sha256": "498c778ae2e496fd0d9af2a71a27340c0173117951a50d1ea6f15e1007b49025",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "triangles": 5710,
+        "meshes": 23,
+        "maxPositionError": 5.0215969990711564e-08,
+        "occlusionMaterials": 3,
+        "bounds": {
+          "min": [
+            -0.40008029341697693,
+            -0.33818328380584717,
+            -0.4374558627605438
+          ],
+          "max": [
+            1.6525742709636688,
+            0.8612913712859154,
+            0.4374558627605438
+          ]
+        },
+        "bytes": 506428
+      },
+      "audit_path": "harness/out/blender/mega-bike/final-candidate/models/bike-lod.source.json"
+    },
+    {
+      "path": "harness/out/blender/street-head/finished-street/models-standard/rider-street.glb",
+      "bytes": 1488288,
+      "sha256": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853",
+      "source_path": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
+      "source_sha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "bytes": 1488288,
+        "triangles": 44734,
+        "vertices": 31437,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.870847523212433e-08,
+        "loadedWeightError": 4.1211023926734924e-08
+      },
+      "audit_path": "harness/out/blender/street-head/finished-street/models-standard/rider-street.source.json"
+    },
+    {
+      "path": "harness/out/blender/street-head/finished-street/models-standard/rider-street-lod.glb",
+      "bytes": 549956,
+      "sha256": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e",
+      "source_path": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
+      "source_sha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "bytes": 549956,
+        "triangles": 5880,
+        "vertices": 7129,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.870847523212433e-08,
+        "loadedWeightError": 3.329478204250336e-08
+      },
+      "audit_path": "harness/out/blender/street-head/finished-street/models-standard/rider-street-lod.source.json"
+    },
+    {
+      "path": "harness/out/blender/race-head/finished-race/models/rider-race.glb",
+      "bytes": 1514536,
+      "sha256": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33",
+      "source_path": "harness/out/blender/race-head/finished-race/race-assembled-v1.blend",
+      "source_sha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "bytes": 1514536,
+        "triangles": 44796,
+        "vertices": 31288,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.85920599102974e-08,
+        "loadedWeightError": 4.304456524550915e-08
+      },
+      "audit_path": "harness/out/blender/race-head/finished-race/models/rider-race.source.json"
+    },
+    {
+      "path": "harness/out/blender/race-head/finished-race/models/rider-race-lod.glb",
+      "bytes": 571952,
+      "sha256": "e095ee00a701cf806d875f1725c4fcc536a6676eeb1db5879f36967de6894aab",
+      "source_path": "harness/out/blender/race-head/finished-race/race-assembled-v1.blend",
+      "source_sha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "bytes": 571952,
+        "triangles": 5877,
+        "vertices": 6764,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.453207556158304e-08,
+        "loadedWeightError": 3.230525180697441e-08
+      },
+      "audit_path": "harness/out/blender/race-head/finished-race/models/rider-race-lod.source.json"
+    }
+  ],
+  "packed_final_sources": [
+    "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/mega-bike/final-candidate/source/bike.blend",
+    "harness/out/blender/race-head/finished-race/race-assembled-v1.blend",
+    "harness/out/blender/street-head/finished-street/street-assembled-v3.blend"
+  ],
+  "third_party": [
+    {
+      "name": "Blender Human Base Meshes v1.4.1",
+      "license": "CC0-1.0",
+      "author": "Dan Ulrich for selected realistic male body and animation head; Blender Studio/community distribution",
+      "url": "https://download.blender.org/demo/asset-bundles/human-base-meshes/human-base-meshes-bundle-v1.4.1.zip",
+      "archive_sha256": "811f43accbb31a88266d932f8f5563b2d13586fca0ba2693aad1f5fe582b3515",
+      "license_scope_note": "Embedded README declares provided assets CC0; separate Rain Rig CC-BY notice retained. No Rain rig/stylized geometry imported."
+    },
+    {
+      "name": "Poly Haven Cotton Jersey and Denim Fabric03",
+      "license": "CC0-1.0",
+      "authors": {
+        "colormass": "Photography",
+        "Rico Cilliers": "Processing"
+      },
+      "manifest": "files/harness/out/blender/hero-fabrics/license-manifest.json"
+    }
+  ],
+  "package_files": [
+    {
+      "package_path": "Blender-asset-metadata.json",
+      "bytes": 2181,
+      "sha256": "f511165a7a32aace4c3dd6df60872e3c2c43492792511ffb89197492a13e88ee"
+    },
+    {
+      "package_path": "Blender-bundle-License.txt",
+      "bytes": 147,
+      "sha256": "4ddc945c9d2c6a5306a04466345d539e5a1ed46a48ecf68df8d985128f1e78a3"
+    },
+    {
+      "package_path": "Blender-bundle-README.txt",
+      "bytes": 1100,
+      "sha256": "8708d99262179f480eeb8c2f8f8ff86ec9cd27dbbec962ef66f2ba58e122d4fe"
+    },
+    {
+      "package_path": "README.md",
+      "bytes": 4587,
+      "sha256": "7d854c29f3888d4531b2b82425f9ee0c5c6d70068443bddb0d8f620080a153b0"
+    },
+    {
+      "package_path": "THIRD-PARTY.md",
+      "bytes": 3284,
+      "sha256": "e04060adc62a096d040f672ef9340c97b43b0d9434d51a8057ed290c57659888"
+    },
+    {
+      "package_path": "files/assets/blender/author_bike_hero.py",
+      "bytes": 15251,
+      "sha256": "e29e38e4a51b124f46a65680f394056aa789cf0d4073f812d7d5cfeaba38c8d8",
+      "original_path": "assets/blender/author_bike_hero.py"
+    },
+    {
+      "package_path": "files/assets/blender/author_garments.py",
+      "bytes": 22390,
+      "sha256": "3f8c352d7388420aeffff219e190d829ebef14e76356b1602ee39fdd779c1239",
+      "original_path": "assets/blender/author_garments.py"
+    },
+    {
+      "package_path": "files/assets/blender/author_hood.py",
+      "bytes": 15226,
+      "sha256": "a71a6ccbd9d4c34b8cf04dc71d75ca90f0a2592f04cd07a229b970d4e621dcf2",
+      "original_path": "assets/blender/author_hood.py"
+    },
+    {
+      "package_path": "files/assets/blender/author_rider_hero.py",
+      "bytes": 16877,
+      "sha256": "3fb133676d9c0930da72fa59fb9d338fe556c1d6cf7afa9dc627a74d402bd598",
+      "original_path": "assets/blender/author_rider_hero.py"
+    },
+    {
+      "package_path": "files/assets/blender/author_street_head.py",
+      "bytes": 8965,
+      "sha256": "f81a84975b114d0fede5f7d8e8c7712d0d084550cfd6b585ac47bc36dc01ace4",
+      "original_path": "assets/blender/author_street_head.py"
+    },
+    {
+      "package_path": "files/assets/blender/bike_asset.py",
+      "bytes": 13536,
+      "sha256": "ed9ead63c531652b80f255242a88167bc7a87c6f63e4b07346f7375efc4252d2",
+      "original_path": "assets/blender/bike_asset.py"
+    },
+    {
+      "package_path": "files/assets/blender/build_bike.py",
+      "bytes": 60350,
+      "sha256": "199edda64f5cfb659be333e8bb8a46fadb8f709894799c28b953420ea4daa060",
+      "original_path": "assets/blender/build_bike.py"
+    },
+    {
+      "package_path": "files/assets/blender/build_rider.py",
+      "bytes": 54718,
+      "sha256": "28f528d9538ce1f8822399330729758a786859ef8a080a63f0d795a64a088175",
+      "original_path": "assets/blender/build_rider.py"
+    },
+    {
+      "package_path": "files/assets/blender/common.py",
+      "bytes": 38006,
+      "sha256": "06e0218c98105d8e0ea9d30fd80a758f3a4f4def9b48b0d6f857855ef5321653",
+      "original_path": "assets/blender/common.py"
+    },
+    {
+      "package_path": "files/assets/blender/fit_race_helmet.py",
+      "bytes": 7575,
+      "sha256": "7bd3e54f13a219e62bcbd22fece6289ff453ecc843f89d02a8306052955b059f",
+      "original_path": "assets/blender/fit_race_helmet.py"
+    },
+    {
+      "package_path": "files/assets/blender/rider_asset.py",
+      "bytes": 13642,
+      "sha256": "14948c4fd86bf850e0062018d8efb4bc0a8c5403bfc66b848a7945559a57a406",
+      "original_path": "assets/blender/rider_asset.py"
+    },
+    {
+      "package_path": "files/assets/blender/verify_rider_asset.mjs",
+      "bytes": 7908,
+      "sha256": "6578f358fe03183cf104bf4a48803306bf956876a50e9a10f7a7ae69d909aa6e",
+      "original_path": "assets/blender/verify_rider_asset.mjs"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-fabrics/README.md",
+      "bytes": 4672,
+      "sha256": "e2a18862382408ad193c56d8b18d2d7679c6eb7b2725f8f48aafc0149518b456",
+      "original_path": "harness/out/blender/hero-fabrics/README.md"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-fabrics/apply_source.py",
+      "bytes": 698,
+      "sha256": "0d6d8997c97fd16ffc8b25781a8dafce4505fd7ebd22b2fcd4333f46d93767fd",
+      "original_path": "harness/out/blender/hero-fabrics/apply_source.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-fabrics/cotton_jersey/official-info.json",
+      "bytes": 1210,
+      "sha256": "3b9ad2a667978cdff31f7a83b17d02dc2ce1cc44556599ae61dc8f749130ec47",
+      "original_path": "harness/out/blender/hero-fabrics/cotton_jersey/official-info.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-fabrics/denim_fabric_03/official-info.json",
+      "bytes": 1115,
+      "sha256": "cf2bf63107d6c7f15bb92bfb6254900f603098eaecc33cbd478b58e35109a74d",
+      "original_path": "harness/out/blender/hero-fabrics/denim_fabric_03/official-info.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-fabrics/fabrics.py",
+      "bytes": 5006,
+      "sha256": "4ab72f36b8fcae0c26eb4852bc2b33a2690c44dda7d7226f3aa9551bbd28970e",
+      "original_path": "harness/out/blender/hero-fabrics/fabrics.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-fabrics/license-manifest.json",
+      "bytes": 3841,
+      "sha256": "a4ee243ce97c224e37baaeb3d17bfa091f53e9315e1be0a395b2e58b7c3f73a2",
+      "original_path": "harness/out/blender/hero-fabrics/license-manifest.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-bike/final-candidate/README.md",
+      "bytes": 2524,
+      "sha256": "c7f2861039abbe7fae46d2312d8a6983a32f436bc766bf6abcab41d1e1d01667",
+      "original_path": "harness/out/blender/mega-bike/final-candidate/README.md"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-bike/final-candidate/models/bike-lod.source.json",
+      "bytes": 830,
+      "sha256": "afeceed3408fab37faadc5e0d822797ab49af3de79cd869512c54ed36702cdac",
+      "original_path": "harness/out/blender/mega-bike/final-candidate/models/bike-lod.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-bike/final-candidate/models/bike.source.json",
+      "bytes": 831,
+      "sha256": "91a713c33cb577ff432725918dce0c5e5ae02c14ca9abd7c6fde53c1e22b5730",
+      "original_path": "harness/out/blender/mega-bike/final-candidate/models/bike.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-bike/final-candidate/package-verification.json",
+      "bytes": 560,
+      "sha256": "96a16eb2628338807d27e3da531fe5f51296e040a64df011c05a03801407f059",
+      "original_path": "harness/out/blender/mega-bike/final-candidate/package-verification.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-bike/final-candidate/validation.json",
+      "bytes": 1532,
+      "sha256": "664dfacbbf586424141175a9ff5f3bcb6e0253020ef4a0cc1d16c3ff8d0e88bb",
+      "original_path": "harness/out/blender/mega-bike/final-candidate/validation.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-bike/final-candidate/verify.mjs",
+      "bytes": 3398,
+      "sha256": "2a07be30f3597fce7c2839cc8f502961d9c959a7b87ab521e6b75b677b971b5d",
+      "original_path": "harness/out/blender/mega-bike/final-candidate/verify.mjs"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-outfits/anatomy-v3/build_prototype.py",
+      "bytes": 7949,
+      "sha256": "45959012f73e432c9420402eed54859ac219f503b18d0ea320c823c588d7ee30",
+      "original_path": "harness/out/blender/mega-outfits/anatomy-v3/build_prototype.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-outfits/anatomy-v3/build_race_lower.py",
+      "bytes": 8682,
+      "sha256": "94d2a956e9f4f9e98c79a3aa8a3ac0dd4507c93a6524b39f3c769fc0a4db6a4d",
+      "original_path": "harness/out/blender/mega-outfits/anatomy-v3/build_race_lower.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-outfits/anatomy-v3/build_race_lower_v2.py",
+      "bytes": 8840,
+      "sha256": "7811f473da33761f91916a81275c543597437a3220b20737172f2df7fbd3486b",
+      "original_path": "harness/out/blender/mega-outfits/anatomy-v3/build_race_lower_v2.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-outfits/anatomy-v3/build_street_fit.py",
+      "bytes": 8864,
+      "sha256": "aebb78adddee79236f3fce4778f31a43e5f33ff1683782681bb377d8e4fb216e",
+      "original_path": "harness/out/blender/mega-outfits/anatomy-v3/build_street_fit.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-outfits/anatomy-v3/facesets.py",
+      "bytes": 607,
+      "sha256": "5d1cebf9d5a9199302f4d38b7ee22b22bfad8afef66830ad85eba90d32034fd0",
+      "original_path": "harness/out/blender/mega-outfits/anatomy-v3/facesets.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-outfits/anatomy-v3/inspect.py",
+      "bytes": 647,
+      "sha256": "f889615cfd9638adf743e2447c79e89c868616b5c22b24d7af3c26dcbc4f1efb",
+      "original_path": "harness/out/blender/mega-outfits/anatomy-v3/inspect.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-v8-models.json",
+      "bytes": 493,
+      "sha256": "b12b8583dfad386c2b95df7160ecf46f343d0e0058f6b4fa0246ee56c3e1f296",
+      "original_path": "harness/out/blender/mega-v8-models.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/race-head/finished-race/HANDOFF.md",
+      "bytes": 3479,
+      "sha256": "cc1efa69968b70dd1f6e2c57291538fdf49e47f01b6312a8f60cd0c3f7a0a23f",
+      "original_path": "harness/out/blender/race-head/finished-race/HANDOFF.md"
+    },
+    {
+      "package_path": "files/harness/out/blender/race-head/finished-race/ao-bindings.json",
+      "bytes": 772,
+      "sha256": "72c73600019799a44d1e394ed0c216eb5e9435b653861e9185f99d0bcc67367c",
+      "original_path": "harness/out/blender/race-head/finished-race/ao-bindings.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/race-head/finished-race/build.py",
+      "bytes": 7488,
+      "sha256": "746f96188dba136daf0d31808087d06366d2f77c8c8b41a3b85cc279c8e8fee3",
+      "original_path": "harness/out/blender/race-head/finished-race/build.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/race-head/finished-race/models/rider-race-lod.source.json",
+      "bytes": 817,
+      "sha256": "071a11a75f6f0378b2ee0389f13a84eb9353b48bba1794f5826b474475f13e97",
+      "original_path": "harness/out/blender/race-head/finished-race/models/rider-race-lod.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/race-head/finished-race/models/rider-race.source.json",
+      "bytes": 820,
+      "sha256": "fab1e39dfe81c7496c92d6c1ce834f02c44e4ef062fecedd6b4d5ca219a8eb7f",
+      "original_path": "harness/out/blender/race-head/finished-race/models/rider-race.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/race-head/finished-race/race-assembled-v1.json",
+      "bytes": 3967,
+      "sha256": "5c63f72dd966f4826b898e7ca7fbc5f67fc1339a1c765d44ece26a8acc87631c",
+      "original_path": "harness/out/blender/race-head/finished-race/race-assembled-v1.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/race-head/race-head-v1c.json",
+      "bytes": 5821,
+      "sha256": "803dab42ac28989691eda1fb1f5cbc80c06568fa35b1e8cb8ced679711617f10",
+      "original_path": "harness/out/blender/race-head/race-head-v1c.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/check_head.py",
+      "bytes": 1738,
+      "sha256": "766950ca6f4530ceb092830bc509109c4188178665098f205ead14aad90f9b88",
+      "original_path": "harness/out/blender/street-head/check_head.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/finished-street/HANDOFF.md",
+      "bytes": 4772,
+      "sha256": "b17821bc4ca4075e964dad3f73212a6e6ba48bb18c370e54068e7efef2ac91fe",
+      "original_path": "harness/out/blender/street-head/finished-street/HANDOFF.md"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/finished-street/build.py",
+      "bytes": 7750,
+      "sha256": "01086620c22fe22352f650f47aea7353bbeec5912b86968eaaead7b506f36445",
+      "original_path": "harness/out/blender/street-head/finished-street/build.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/finished-street/models-standard/rider-street-lod.source.json",
+      "bytes": 825,
+      "sha256": "5881ce08d174d1643d0ef88edcbdcccd40979ca177b78487a10912c063f8428a",
+      "original_path": "harness/out/blender/street-head/finished-street/models-standard/rider-street-lod.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/finished-street/models-standard/rider-street.source.json",
+      "bytes": 830,
+      "sha256": "5ce9d70bfb513f6e3a489d6692ad74a49bfbca98fc8d59a6558016087f0a1a74",
+      "original_path": "harness/out/blender/street-head/finished-street/models-standard/rider-street.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/finished-street/save_ao_policy.py",
+      "bytes": 1107,
+      "sha256": "e69c968bf85e0a686da2f0253fc980271247178620c2aa88784760f6d3f5dcc7",
+      "original_path": "harness/out/blender/street-head/finished-street/save_ao_policy.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/finished-street/street-assembled-v3.json",
+      "bytes": 556,
+      "sha256": "fc27251f9428bcd4e112bd26f6007036163fc3f6cfe947fe5892916409128248",
+      "original_path": "harness/out/blender/street-head/finished-street/street-assembled-v3.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/inspect_head.py",
+      "bytes": 1005,
+      "sha256": "1a51a529c16a5b881b65b7b08c5c3d1da0a3c160217009d398e1325fbeb363a2",
+      "original_path": "harness/out/blender/street-head/inspect_head.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/street-head/street-head-v1.json",
+      "bytes": 1001,
+      "sha256": "2e281de88723f22b3fd826a5ab043fa1c6e63d502ed4a04a48112d463e6ac58d",
+      "original_path": "harness/out/blender/street-head/street-head-v1.json"
+    },
+    {
+      "package_path": "verify.py",
+      "bytes": 837,
+      "sha256": "bed74dfa56d0c3fba4918652807c41f85df2ec8a0fe1aeb71cc4791b40d980c2"
+    }
+  ],
+  "workspace_files": [
+    {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/mega-bike/final-candidate/source/bike.blend",
+      "bytes": 985896,
+      "sha256": "498c778ae2e496fd0d9af2a71a27340c0173117951a50d1ea6f15e1007b49025"
+    },
+    {
+      "path": "harness/out/blender/hero-fabrics/cotton_jersey/cotton_jersey_diff_2k.png",
+      "bytes": 22809359,
+      "sha256": "56318041eea71a67fc45900885006c7f60555343d1786959e149f1bee6ec0ef3"
+    },
+    {
+      "path": "harness/out/blender/hero-fabrics/cotton_jersey/cotton_jersey_disp_2k.png",
+      "bytes": 7856739,
+      "sha256": "817cca5cda0ad26dd7b17c1e204d05ec6486b50bcaac0a11d954b0c19977957b"
+    },
+    {
+      "path": "harness/out/blender/hero-fabrics/cotton_jersey/cotton_jersey_nor_gl_2k.png",
+      "bytes": 22097465,
+      "sha256": "fea9a168b27ce3532b02c327ad7b61efa35a1e0f6abbd8c5ab7734ef3c24f053"
+    },
+    {
+      "path": "harness/out/blender/hero-fabrics/cotton_jersey/cotton_jersey_rough_2k.png",
+      "bytes": 8082759,
+      "sha256": "cdb70e71b0b0eab3792d98a862cf38ae5f5ac272bc102ceab0c29fd877195b91"
+    },
+    {
+      "path": "harness/out/blender/hero-fabrics/denim_fabric_03/denim_fabric_03_diff_2k.png",
+      "bytes": 23200557,
+      "sha256": "015d41739d4aabf01b4a9935074a76330499e829c037ccbb2e2a854ee37eda75"
+    },
+    {
+      "path": "harness/out/blender/hero-fabrics/denim_fabric_03/denim_fabric_03_disp_2k.png",
+      "bytes": 7765768,
+      "sha256": "162f70b291823bc252c29c1f59d5a6b3958911380c810d90a1616f46f12f139d"
+    },
+    {
+      "path": "harness/out/blender/hero-fabrics/denim_fabric_03/denim_fabric_03_nor_gl_2k.png",
+      "bytes": 22517958,
+      "sha256": "ea2843a37e2f065275f67fd1725d58d6c7e14081a0cac7033960fb4e1f1de714"
+    },
+    {
+      "path": "harness/out/blender/hero-fabrics/denim_fabric_03/denim_fabric_03_rough_2k.png",
+      "bytes": 7953668,
+      "sha256": "be6b5b36dc0ad0183a2c0659ce03f65aa9290cf304694e3e534f4c1e48758c46"
+    },
+    {
+      "path": "harness/out/blender/mega-bike/final-candidate/models/bike-lod.glb",
+      "bytes": 506428,
+      "sha256": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3"
+    },
+    {
+      "path": "harness/out/blender/mega-bike/final-candidate/models/bike.glb",
+      "bytes": 1414848,
+      "sha256": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/anatomy-v3/human-base-meshes-bundle-v1.4.1/human_base_meshes_bundle.blend",
+      "bytes": 49420489,
+      "sha256": "3c121505651140ceb4d69fd1d8923f7788ffadd81672f5be14845a5f2c75c137"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/anatomy-v3/human-base-meshes.zip",
+      "bytes": 50643039,
+      "sha256": "811f43accbb31a88266d932f8f5563b2d13586fca0ba2693aad1f5fe582b3515"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/anatomy-v3/male.json",
+      "bytes": 1006888,
+      "sha256": "91b9a69b0504943dd8af59c93e59473bd0b423a3351303e1c3670970bb04a47f"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/anatomy-v3/race-lower/race-lower-v1.blend",
+      "bytes": 1267035,
+      "sha256": "d8bdc099ca88d05fd639ccd1d67174107770a87cea5b0f8077b57dabd0c82223"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/anatomy-v3/race-lower/race-lower-v2.blend",
+      "bytes": 1247263,
+      "sha256": "6504a87540cf37f0702d5deb5c23f4965fbbc81eca974639f7357003db58920e"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/anatomy-v3/street-anatomy-v3b.blend",
+      "bytes": 1410578,
+      "sha256": "e6eaf71e88b3dd9f2674dfdeb412815ca99fcf70a545823c97f680c693de53c6"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/anatomy-v3/street-anatomy-v3d.blend",
+      "bytes": 1387063,
+      "sha256": "43d181790444374d6b94dc1555eaf7d64bd59bdc0ba3deec1a3331c8a6225af6"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/race-v2.blend",
+      "bytes": 1257726,
+      "sha256": "6be621b0690c0757b8d0cefe60336714fd64ab5219569ce84f2ec1a3408f68c5"
+    },
+    {
+      "path": "harness/out/blender/mega-outfits/street-v2.blend",
+      "bytes": 1172902,
+      "sha256": "0a86784b3ff32758ba13a42e92404b05d81ac4afcedcb0c112c974ab2dfd22ad"
+    },
+    {
+      "path": "harness/out/blender/race-head/finished-race/models/rider-race-lod.glb",
+      "bytes": 571952,
+      "sha256": "e095ee00a701cf806d875f1725c4fcc536a6676eeb1db5879f36967de6894aab"
+    },
+    {
+      "path": "harness/out/blender/race-head/finished-race/models/rider-race.glb",
+      "bytes": 1514536,
+      "sha256": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33"
+    },
+    {
+      "path": "harness/out/blender/race-head/finished-race/race-assembled-v1.blend",
+      "bytes": 1661269,
+      "sha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2"
+    },
+    {
+      "path": "harness/out/blender/race-head/race-head-v1c.blend",
+      "bytes": 1419578,
+      "sha256": "93dcfe655b3a042079e46af56b697025ec638028ab2072ba5ac54cac8e93d45a"
+    },
+    {
+      "path": "harness/out/blender/street-head/finished-street/models-standard/rider-street-lod.glb",
+      "bytes": 549956,
+      "sha256": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e"
+    },
+    {
+      "path": "harness/out/blender/street-head/finished-street/models-standard/rider-street.glb",
+      "bytes": 1488288,
+      "sha256": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853"
+    },
+    {
+      "path": "harness/out/blender/street-head/finished-street/street-assembled-v2.blend",
+      "bytes": 33218314,
+      "sha256": "cad233b6ebbbde3b3199e287f008584c840e929d8c26f2072476d4aae8509065"
+    },
+    {
+      "path": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
+      "bytes": 32761780,
+      "sha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220"
+    },
+    {
+      "path": "harness/out/blender/street-head/head-base.json",
+      "bytes": 495843,
+      "sha256": "7af8e8e724a51e1640f407c042d01f6dd180c3d08cd4a901eef563b074c9fa0c"
+    },
+    {
+      "path": "harness/out/blender/street-head/street-head-v1.blend",
+      "bytes": 1548348,
+      "sha256": "3a370e96380f2c428a640371a135e59ac960e1b791d36d50565fec1c68f17614"
+    },
+    {
+      "path": "package.json",
+      "bytes": 2250,
+      "sha256": "7a30f5741c20b71391edd49d38ecc0d30886bb09ab80972511c1dc5e69ddefa0"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "bytes": 76151,
+      "sha256": "2307aea31ffdac0b25a989a4d4f8656164f98703bf0811281e2fd968f439aac3"
+    }
+  ],
+  "limitations": [
+    "Large raw and packed sources are referenced by hash, not duplicated in this package.",
+    "Frozen recipe copies keep original path constants and require restored workspace prerequisites.",
+    "New exports can change container metadata; recorded hashes identify the frozen reviewed artifacts."
+  ]
+}

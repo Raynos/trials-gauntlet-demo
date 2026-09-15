@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Body Female - Primitive (Stylized)",
+    "author": "Paul Kotelevets",
+    "description": "Simple objects with subdivision modifiers. Easy for design sculpting and remeshing"
+  },
+  {
+    "name": "Body Female - Primitve (Realistic)",
+    "author": "Paul Kotelevets, Julien Kaspar",
+    "description": "Simple objects with subdivision modifiers. Easy for design sculpting and remeshing"
+  },
+  {
+    "name": "Body Female - Realistic",
+    "author": "Dan Ulrich",
+    "description": "Realistic scan data model with multiresolution details"
+  },
+  {
+    "name": "Body Female - Stylized",
+    "author": "Julien Kaspar",
+    "description": "Generic stylized topology. Based on the open source character \"Rain\""
+  },
+  {
+    "name": "Body Male - Primitve (Realistic)",
+    "author": "Paul Kotelevets, Julien Kaspar",
+    "description": "Simple objects with subdivision modifiers. Easy for design sculpting and remeshing"
+  },
+  {
+    "name": "Body Male - Primitve (Stylized)",
+    "author": "Paul Kotelevets",
+    "description": "Simple objects with subdivision modifiers. Easy for design sculpting and remeshing"
+  },
+  {
+    "name": "Body Male - Realistic",
+    "author": "Dan Ulrich",
+    "description": "Realistic scan data model with multiresolution details"
+  },
+  {
+    "name": "Body Male - Stylized",
+    "author": "Julien Kaspar",
+    "description": "Generic stylized topology. Based on the open source character \"Snow\""
+  },
+  {
+    "name": "Head (Animation) - Realistic",
+    "author": "Dan Ulrich",
+    "description": "Realistic scan data model with multiresolution details. Topology optimized for rigging and animation"
+  },
+  {
+    "name": "Head (Sculpting) - Realistic",
+    "author": "Dan Ulrich",
+    "description": "Realistic scan data model with multiresolution details. Topology is optimized for multiresolution sculpting"
+  },
+  {
+    "name": "Head - Primitives",
+    "author": "Paul Kotelevets, Julien Kaspar",
+    "description": "Simple objects with subdivision modifiers. Easy for design sculpting and remeshing"
+  },
+  {
+    "name": "Head - Stylized",
+    "author": "Julien Kaspar",
+    "description": "Generic stylized head topology"
+  }
+]

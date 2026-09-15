@@ -1,3 +1,13 @@
+# Round 9 assembled review — September 15
+
+All six final candidate GLBs are integrated in `harness/out/blender/mega-v8-dist`; manifest `mega-v8-models.json`. Canonical sources/models remain R7. Parent played both outfits full and explicitly enabled LOD in QuickTime. Better proportions and connected motion; still below AI target material/cloth finish, so no AAA acceptance or completion claim.
+
+Metal and desktop WebKit ship gates pass: 4,736 exact ticks, clear 39.46666666666667 s / zero faults, crash and restart/movement in one tick. Actual iOS is unverified. Durable evidence: `docs/evidence/blender-r9.json`; source/provenance package `docs/evidence/hero-r9-inputs/`; latest real clips at `harness/out/blender/progress/index.html`.
+
+Normal-camera Street/Race Rookie playback also reviewed: silhouette distinction survives but surface finish remains weak at playing scale. Next: remaining class/outfit combinations and motion/crash review, then accept/promote the complete package or identify one material whole-result gap. Do not resume unbounded physics micro-polish. Weekly remaining 57% at 22:04 UTC; 30% is a spending floor, early stop preferred once accepted.
+
+---
+
 # Blender hero handoff — active WIP
 
 **2026-09-15. Round 8 is an art-direction WIP checkpoint; canonical hero assets

@@ -1,0 +1,13 @@
+{
+  "source": "harness/out/blender/street-head/finished-street/street-assembled-v2.blend",
+  "source_sha256": "cad233b6ebbbde3b3199e287f008584c840e929d8c26f2072476d4aae8509065",
+  "output": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
+  "output_sha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220",
+  "only_change": "heroLocalAO scene JSON metadata",
+  "heroLocalAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "mesh_material_rig_action_socket_invariants_unchanged": true
+}
