@@ -173,7 +173,7 @@ function boot(): void {
     ui.id = 'ui';
     app.appendChild(ui);
     const bestTimes = new BestTimes();
-    const hud = new DomHud(ui, (id) => bestTimes.get(id));
+    const hud = new DomHud(ui, (id) => bestTimes.get(id), (id, bike) => bestTimes.board(id, bike));
     const game = new Game({
       physicsHz,
       physics,
@@ -255,7 +255,7 @@ function boot(): void {
         ui.id = 'ui';
         appRoot.appendChild(ui);
         const bestTimes = new BestTimes();
-        const hud = new DomHud(ui, (id) => bestTimes.get(id));
+        const hud = new DomHud(ui, (id) => bestTimes.get(id), (id, bike) => bestTimes.board(id, bike));
         const game = new Game({
           physicsHz,
           physics,

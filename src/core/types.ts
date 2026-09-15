@@ -332,6 +332,12 @@ export interface RunInfo {
    * never from wall time, so captures are frame-deterministic.
    */
   simTime: number;
+  /**
+   * Track entry hold (render r14 / game.md § entry hold): while the renderer is still compiling the biome
+   * behind its placeholder the countdown has not started; this names the biome being loaded (null otherwise)
+   * and `entryMs` is the wall ms the hold has run (a loader clock, not sim time — it is a label, nothing keys off it).
+   */
+  entry?: { biome: string; ms: number } | null;
 }
 
 export type Medal = 'platinum' | 'gold' | 'silver' | 'bronze';
@@ -370,6 +376,8 @@ export interface RunResult {
   targetTimeS: number | null;
   /** Bike class the run was ridden on (absent in pre-garage results / harness mirrors = rookie). */
   bike?: BikeClass;
+  /** 1-based place on the track's local leaderboard for this class (game.md § leaderboard); null = outside the top 5 / no store. */
+  rank?: number | null;
 }
 
 /**
@@ -527,6 +535,13 @@ export interface HookInfo {
   lastRender?: { prepMs?: number; hudMs: number; audioMs?: number; submitMs: number; syncMs: number };
   /** Which implementations main.ts composed, e.g. { physics: 'createBikePhysics', render: 'ThreeRenderer', audio: 'WebAudioSystem' }. */
   modules?: Record<string, string>;
+  /** `?perf=1` mirror: the renderer's `debugInfo()` scalars (tier, deviceClass, profile, dpr, canvasW/H, calls, tris, rtMpx, passes, shadowMap, heroTris, skippedFrames, stalePrograms, entryMs, entering …); null without a renderer debugInfo. */
+  render?: Record<string, unknown> | null;
+  /** The governor's last decision string (`App.qualityWhy`). */
+  qualityWhy?: string;
+  quality?: QualityTier;
+  /** Countdown held while the renderer compiles the track's biome (game.md § entry hold). */
+  entryHold?: boolean;
 }
 
 /**

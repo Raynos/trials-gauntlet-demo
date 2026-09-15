@@ -437,6 +437,8 @@ html.short .bc-art { display: none; }
 .fpsmeter { position: absolute; right: calc(.5rem + var(--sar)); top: calc(.15rem + var(--sat)); z-index: 7; pointer-events: none; font: 600 10px/1.4 var(--mono); letter-spacing: .04em; color: rgba(255,255,255,.55); text-shadow: 0 1px 2px rgba(0,0,0,.8); }
 .fpsmeter.bad { color: #ff7a5c; }
 .hud.touch ~ .fpsmeter, .touch-layer.on.visible ~ .fpsmeter { top: calc(4.2rem + var(--sat)); }
+/* Results on a phone: the meter leaves the top-right corner to the leaderboard (§18) and sits in the empty legend corner. */
+.hud.touch.results-on ~ .fpsmeter { top: auto; bottom: calc(.2rem + var(--sab)); }
 .toast { position: absolute; left: 50%; bottom: calc(var(--s5) + var(--sab)); transform: translate(-50%, 140%); z-index: 30; display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s2) var(--s2) var(--s4); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--plate), 0 18px 40px rgba(0,0,0,.6); opacity: 0; transition: transform var(--t3) var(--ease), opacity var(--t3) var(--ease); white-space: nowrap; }
 .toast.show { transform: translate(-50%, 0); opacity: 1; }
 .toast-dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: pulse 1.6s ease-in-out infinite; }
@@ -527,6 +529,8 @@ export const HUD_CSS = /* css */ `
 
 /* ---- kinetic banners ------------------------------------------------ */
 .banners { position: absolute; left: 0; right: 0; top: 30%; height: 0; display: flex; justify-content: center; pointer-events: none; }
+.banners .entry { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); white-space: nowrap; font: 700 1.1rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--amber); background: var(--slab-2); padding: .55em 1.2em; border-radius: .2em; opacity: 0; transition: opacity .15s; text-shadow: none; }
+.banners .entry.show { opacity: 1; }
 .banner { position: absolute; top: 0; transform: translate(-50%, -50%); left: 50%; white-space: nowrap; font-weight: 900; font-style: italic; letter-spacing: .02em; text-transform: uppercase; will-change: transform, opacity; opacity: 0; text-shadow: var(--outline-heavy); }
 .banner.count { font-size: 9rem; color: var(--amber); -webkit-text-stroke: .02em rgba(0,0,0,.9); paint-order: stroke fill; }
 .banner.go { font-size: 11rem; color: #fff; -webkit-text-stroke: .02em rgba(0,0,0,.9); paint-order: stroke fill; }
@@ -555,6 +559,25 @@ export const HUD_CSS = /* css */ `
 .results .pb.green { color: var(--green); }
 .results .pb em { font-style: normal; color: var(--red); }
 .results .medals { display: flex; gap: var(--s3); margin-top: var(--s2); }
+/* Local leaderboard (game.md § leaderboard): top-right of the title band, revealed with the medals. */
+.results .board { flex: 0 0 auto; min-width: 11rem; padding: var(--s2) var(--s3); background: var(--slab-2); border: 1px solid var(--line-2); border-radius: var(--r1); font-variant-numeric: tabular-nums; text-shadow: none; opacity: 0; transform: translateY(var(--s2)); transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); }
+.results .board[hidden] { display: none; }
+.results.stage-3 .board, .results.stage-4 .board, .results.stage-5 .board { opacity: 1; transform: none; }
+.results .board-head { font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: var(--s1); }
+.results .board-head em { font-style: normal; color: var(--green); }
+.results .board ol { list-style: none; margin: 0; padding: 0; display: grid; row-gap: 2px; }
+.results .board li { display: grid; grid-template-columns: 1.1em 1em 1fr auto; align-items: center; column-gap: .45em; font-size: .86rem; color: var(--ink); padding: .1em .35em; border-radius: 3px; }
+.results .board li.you { background: rgba(120,255,160,.14); box-shadow: inset 0 0 0 1px rgba(120,255,160,.45); }
+.results .board li .n { color: var(--ink-dim); font-size: .72rem; font-weight: 700; }
+.results .board li b { font-weight: 700; }
+.results .board li small { color: var(--ink-dim); font-size: .72rem; }
+.results .board .dot { display: block; width: .7em; height: .7em; border-radius: 50%; background: currentColor; box-shadow: inset 0 -1px 0 rgba(0,0,0,.4); }
+.results .board .dot.platinum { color: var(--plat); } .results .board .dot.gold { color: var(--gold); } .results .board .dot.silver { color: var(--silver); } .results .board .dot.bronze { color: var(--bronze); }
+/* Track card: the class in effect's top 5 as medal-coloured chips. */
+.card .board { display: flex; gap: 3px; flex-wrap: nowrap; overflow: hidden; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.card .board span { font-size: .58rem; font-weight: 700; line-height: 1; padding: 2px 3px; border-radius: 3px; background: rgba(0,0,0,.45); color: var(--ink); border-left: 3px solid currentColor; white-space: nowrap; }
+.card .board span.platinum { color: var(--plat); } .card .board span.gold { color: var(--gold); } .card .board span.silver { color: var(--silver); } .card .board span.bronze { color: var(--bronze); }
+.card .board span b { color: var(--ink); font-weight: 700; }
 .results .medal { display: flex; flex-direction: column; align-items: center; gap: var(--s1); text-align: center; opacity: .35; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: .7rem; text-shadow: var(--outline); transition: opacity var(--t2); }
 .results .medal i { display: block; width: 56px; height: 56px; border-radius: 50%; background: currentColor; box-shadow: inset 0 -4px 0 rgba(0,0,0,.35); background-size: cover; background-position: center; }
 .results .medal i.img { background-color: transparent; box-shadow: 0 2px 6px rgba(0,0,0,.5); }

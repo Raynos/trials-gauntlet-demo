@@ -11,7 +11,7 @@
  * loaded in the `menu` phase (the key art plate covers it once decoded).
  */
 import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RunResult, TrackDef, TrialsHook } from '../core/types';
-import type { AudioSystem } from '../audio';
+import type { AudioScene, AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
 import {
   ArtManifest,
@@ -188,7 +188,13 @@ export class App {
   private bikeChoice: BikeClass | null;
   /** Bike class of the last launched track (medium's default, and what the Garage opens on). */
   private lastRidden: BikeClass | null = null;
-  private qualityWhy: string;
+  /** The governor's last decision string; lives on the game so `hook.info().qualityWhy` and `?perf=1` read one value. */
+  private get qualityWhy(): string {
+    return this.game.qualityWhy;
+  }
+  private set qualityWhy(v: string) {
+    this.game.qualityWhy = v;
+  }
   private readonly bestTimes: BestTimes;
   private readonly tracks: TrackDef[];
   private screen: AppScreen = 'menu';
@@ -215,6 +221,8 @@ export class App {
   private screenAt = 0;
   private prevRestart = false;
   private prevThrottle = false;
+  /** Last scene handed to `audio.setScene` (music bed): deduplicated, optional on the interface. */
+  private audioScene: AudioScene | null = null;
 
   constructor(private readonly o: AppOptions) {
     this.game = o.game;
@@ -351,7 +359,7 @@ export class App {
     };
 
     this.menu = new MainMenuScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
-    this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
+    this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state, (id, bike) => this.bestTimes.board(id, bike));
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
     this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb, this.art);
     this.garage = new GarageScreen(o.uiRoot, this.sfx, this.art, {
@@ -498,9 +506,12 @@ export class App {
       if (phase !== 'finished' && !this.pause.visible) this.touch.setOverlay(false); // retry / next out of the results frame
       // First GO on this track load starts the run's telemetry window (full restarts keep it: time-to-clear is per track visit).
       if (phase === 'riding' && prev === 'countdown' && this.screen === 'run' && !this.collector.running) this.collector.begin();
+      // Retry / next out of the results: the bed goes back to the run scene with the countdown.
+      if ((phase === 'countdown' || phase === 'riding') && (this.screen === 'run' || this.screen === 'replay')) this.setAudioScene('run');
     };
     // Results: NEXT TRACK is live only when the next track is unlocked (this clear may have unlocked it).
     this.game.onResults = (r) => {
+      this.setAudioScene('results');
       this.hud.setNextEnabled(this.nextTrackEnabled(), this.nextTrackName());
       this.touch.setOverlay(true);
       this.logRun(r);
@@ -548,6 +559,7 @@ export class App {
       return;
     }
     this.screen = 'replay';
+    this.setAudioScene('run');
     this.screenAt = performance.now();
     this.hud.setReplay(true);
     this.replayBar.setDevice(this.mux.activeDevice() ?? 'keyboard');
@@ -701,6 +713,7 @@ export class App {
     if (this.replay.active) this.replay.close();
     this.screen = screen;
     this.screenAt = performance.now();
+    this.setAudioScene('menu');
     this.touch.setEnabled(false);
     this.pause.hide();
     this.menu.hide();
@@ -746,6 +759,7 @@ export class App {
     this.lastRidden = bike;
     this.screen = 'run';
     this.screenAt = performance.now();
+    this.setAudioScene('run');
     this.lastTrackId = id;
     try {
       localStorage.setItem(LAST_TRACK_KEY, id);
@@ -927,6 +941,13 @@ export class App {
     return this.screen === 'run' && this.game.phase() !== 'menu';
   }
 
+  /** Audio round 3 (additive): the app's scene for the music bed — `menu` for every front screen, `run` from launch / retry / replay, `results` when the panel lands. */
+  private setAudioScene(scene: AudioScene): void {
+    if (scene === this.audioScene) return;
+    this.audioScene = scene;
+    this.audio?.setScene?.(scene);
+  }
+
   /** The next ship track exists, is not this one, and its tier is unlocked (src/ui/progress.ts rule). */
   private nextTrackEnabled(): boolean {
     const ship = shipTracks(this.tracks, this.o.dev ?? false);
@@ -1066,6 +1087,8 @@ export class App {
       quality: this.game.qualityTier,
       qualityWhy: this.qualityWhy,
       dpr: dprCap(),
+      render: this.game.rendererDebug(),
+      entryHold: this.game.entryHeld,
     }));
   }
 

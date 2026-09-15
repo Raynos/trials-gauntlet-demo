@@ -8,7 +8,7 @@
  */
 import type { BikeClass, BiomeId, Medal, TrackDef, TrackTier } from '../core/types';
 import { BIOME_TINT, type ArtManifest } from './art';
-import type { BestEntry, FpsChoice, ModelChoice } from './best';
+import type { BestEntry, BoardEntry, FpsChoice, ModelChoice } from './best';
 import { formatTime } from './format';
 import type { QualityChoice } from './menu';
 import { labTracks, medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
@@ -428,6 +428,8 @@ export class TrackSelectScreen extends Screen {
     private readonly cb: FrontCallbacks,
     private readonly bestOf: (id: string) => BestEntry | null,
     private readonly state: () => FrontState,
+    /** Local leaderboard (game.md § leaderboard): the class in effect's top 5 on the card. */
+    private readonly boardOf?: (id: string, bike: BikeClass) => BoardEntry[],
   ) {
     super(parent, 'tracks-screen');
     const head = h('div', 'tracks-head');
@@ -534,7 +536,7 @@ export class TrackSelectScreen extends Screen {
       <div class="top"><span>${lab ? 'LAB' : escapeHtml(t.id.split('-')[0]!.toUpperCase())}</span>${ghost}${bikeTag}</div>
       ${lab ? '' : `<div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>`}${lockLine}
       <div class="body"><div class="name">${escapeHtml(t.name)}</div><div class="tech">${escapeHtml(t.meta?.technique ?? '')}</div>
-      <div class="times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div></div>`;
+      <div class="times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div>${lab ? '' : this.boardHtml(t.id)}</div>`;
     const artEl = el.querySelector<HTMLDivElement>('.art')!;
     const medalEl = el.querySelector<HTMLDivElement>('.medal')!;
     this.art.whenReady(() => {
@@ -550,6 +552,21 @@ export class TrackSelectScreen extends Screen {
       }
     });
     return el;
+  }
+
+  /** Top-5 chips for the class the next launch rides (`FrontState.bikeClass`), medal-coloured; nothing when the board is empty. */
+  private boardHtml(trackId: string): string {
+    const bike = this.state().bikeClass;
+    const rows = this.boardOf?.(trackId, bike) ?? [];
+    if (rows.length === 0) return '';
+    // Chips carry a short clock (`31.2`, `1:04.8`); the full time is the title.
+    const short = (t: number): string => {
+      const m = Math.floor(t / 60);
+      const sec = (t - m * 60).toFixed(1);
+      return m > 0 ? `${m}:${sec.padStart(4, '0')}` : sec;
+    };
+    const chips = rows.map((e, i) => `<span class="${e.medal}" title="#${i + 1} ${bike} · ${formatTime(e.time)} · ${e.faults} faults"><b>${short(e.time)}</b></span>`).join('');
+    return `<div class="board" data-bike="${bike}" data-rows="${rows.length}">${chips}</div>`;
   }
 
   private focusCard(r: number, c: number, tick: boolean): void {

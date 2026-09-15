@@ -5,7 +5,8 @@
  * simulated clock in `RunInfo.simTime`, so a capture at any cadence shows the
  * same frames and `animations: disabled` screenshots cannot hide a banner.
  */
-import type { GameEvent, InputDevice, Medal, PhysicsState, RunInfo, RunResult, TrackDef } from '../core/types';
+import type { BikeClass, GameEvent, InputDevice, Medal, PhysicsState, RunInfo, RunResult, TrackDef } from '../core/types';
+import { BOARD_SIZE, type BoardEntry } from './best';
 import { formatDelta, formatTime } from './format';
 import type { Hud, HudAction } from './index';
 import { conceal, isLive, reveal } from './live';
@@ -55,6 +56,10 @@ export class DomHud implements Hud {
   private stripMarks: HTMLDivElement[] = [];
   private readonly bannersEl: HTMLDivElement;
   private readonly banners: Banner[] = [];
+  /** Track entry hold (game.md § entry hold): "Loading <biome>… 1.2 s" where the 3 will be. */
+  private readonly entryEl: HTMLDivElement;
+  private entryOn = false;
+  private lastEntryText = '';
   private readonly hintsEl: HTMLDivElement;
   private readonly results: HTMLDivElement;
   private readonly resKicker: HTMLDivElement;
@@ -67,6 +72,8 @@ export class DomHud implements Hud {
   private readonly resFaults: HTMLDivElement;
   private readonly resPb: HTMLDivElement;
   private readonly resMedals: Record<'platinum' | 'gold' | 'silver' | 'bronze', HTMLDivElement>;
+  /** Local per-track leaderboard (game.md § leaderboard): top 5 for the class ridden, this run's row marked. */
+  private readonly resBoard: HTMLDivElement;
   private readonly splitEl: HTMLDivElement;
   private readonly flashEl: HTMLDivElement;
   private splitStart = -1;
@@ -104,8 +111,15 @@ export class DomHud implements Hud {
     }
   }
 
-  /** `_bestOf` is kept for the composition signature; the PB delta is stated by the results panel (from `RunResult`), never floated under the timer. */
-  constructor(parent: HTMLElement, _bestOf?: (trackId: string) => unknown) {
+  /**
+   * `_bestOf` is kept for the composition signature; the PB delta is stated by the results panel (from `RunResult`), never floated under the timer.
+   * `boardOf` is the local leaderboard source (`BestTimes.board`); without it the results panel shows no board.
+   */
+  constructor(
+    parent: HTMLElement,
+    _bestOf?: (trackId: string) => unknown,
+    private readonly boardOf?: (trackId: string, bike: BikeClass) => BoardEntry[],
+  ) {
     this.root = el('div', 'hud hidden');
 
     // Top band.
@@ -135,6 +149,8 @@ export class DomHud implements Hud {
 
     // Banners.
     this.bannersEl = el('div', 'banners');
+    this.entryEl = el('div', 'entry');
+    this.bannersEl.appendChild(this.entryEl);
     for (let i = 0; i < BANNER_POOL; i++) {
       const b = el('div', 'banner');
       this.bannersEl.appendChild(b);
@@ -147,7 +163,7 @@ export class DomHud implements Hud {
     // headline centred in the free band, tile row in the lower third, legend bottom-right.
     this.results = el('div', 'results');
     this.results.innerHTML = `
-      <div class="ov-head"><div class="ov-title"><div class="ov-kicker"></div><div class="ov-name"></div><div class="ov-stats"></div></div></div>
+      <div class="ov-head"><div class="ov-title"><div class="ov-kicker"></div><div class="ov-name"></div><div class="ov-stats"></div></div><div class="board" hidden></div></div>
       <div class="ov-free headline">
         <div class="row"><div class="time">0:00.000</div><div class="faults"><span>✕</span> 0 faults</div></div>
         <div class="pb"></div>
@@ -164,6 +180,7 @@ export class DomHud implements Hud {
     this.resTime = this.results.querySelector('.time') as HTMLDivElement;
     this.resFaults = this.results.querySelector('.faults') as HTMLDivElement;
     this.resPb = this.results.querySelector('.pb') as HTMLDivElement;
+    this.resBoard = this.results.querySelector('.board') as HTMLDivElement;
     this.resMedals = {
       bronze: this.results.querySelector('.medal.bronze') as HTMLDivElement,
       silver: this.results.querySelector('.medal.silver') as HTMLDivElement,
@@ -247,6 +264,23 @@ export class DomHud implements Hud {
       if (info.phase === 'countdown' || info.phase === 'menu') this.hideResults();
       // One technique line before GO only; nothing floats over play.
       this.hintsEl.classList.toggle('show', info.phase === 'countdown' && this.hintsEl.childElementCount > 0);
+    }
+    const entry = info.entry ?? null;
+    if (entry) {
+      // Tenths only: one text write per 100 ms of hold, none while the label is unchanged.
+      const text = `Loading ${entry.biome}\u2026 ${(Math.floor(entry.ms / 100) / 10).toFixed(1)} s`;
+      if (!this.entryOn) {
+        this.entryOn = true;
+        this.entryEl.classList.add('show');
+      }
+      if (text !== this.lastEntryText) {
+        this.lastEntryText = text;
+        this.entryEl.textContent = text;
+      }
+    } else if (this.entryOn) {
+      this.entryOn = false;
+      this.lastEntryText = '';
+      this.entryEl.classList.remove('show');
     }
     const pillVisible = this.simTime < this.deviceShowUntil;
     if (pillVisible !== this.deviceVisible) {
@@ -432,6 +466,7 @@ export class DomHud implements Hud {
       m.classList.toggle('earned', k === r.medal);
       (m.querySelector('small') as HTMLElement).textContent = thresholds[k];
     }
+    this.renderBoard(r);
     this.results.className = 'results show stage-0';
     // Tappable only once the TILES are drawn (stage-3 at 0.6 s, then their 240 ms rise) for the invariant's delay.
     reveal(this.results, { surface: this.resTiles.root, when: () => this.resultsStage >= 3 });
@@ -439,6 +474,24 @@ export class DomHud implements Hud {
     this.resTiles.setDisabled('next', !this.nextEnabled);
     this.resTiles.focusId(this.nextEnabled ? 'next' : 'retry');
     for (const b of this.banners) if (b.kind === 'finish') this.retire(b); // the panel restates it
+  }
+
+  /** The track's top 5 for the class ridden (`BestTimes.board`), medal dot per row, this run's row marked `you`. */
+  private renderBoard(r: RunResult): void {
+    const rows = this.boardOf?.(r.trackId, r.bike ?? 'rookie') ?? [];
+    if (rows.length === 0) {
+      this.resBoard.hidden = true;
+      this.resBoard.innerHTML = '';
+      return;
+    }
+    const bike = r.bike === 'pro' ? 'Pro' : 'Rookie';
+    const rank = r.rank ?? null;
+    const items = rows
+      .slice(0, BOARD_SIZE)
+      .map((e, i) => `<li class="${i + 1 === rank ? 'you' : ''}"><span class="n">${i + 1}</span><i class="dot ${e.medal}" title="${e.medal}"></i><b>${formatTime(e.time)}</b><small>${e.faults}✕</small></li>`)
+      .join('');
+    this.resBoard.innerHTML = `<div class="board-head">Top ${BOARD_SIZE} · ${bike}${rank ? ` · <em>#${rank}</em>` : ''}</div><ol>${items}</ol>`;
+    this.resBoard.hidden = false;
   }
 
   /** NEXT TRACK is disabled when the next track is locked / this is the last one (App decides); `name` labels the tile with the track ahead. */

@@ -88,6 +88,8 @@ export interface BestTimeStore {
   /** Entry for a bike class; without `bike` the track's best across classes. */
   get(trackId: string, bike?: BikeClass): BestRecord | null;
   put(trackId: string, result: RunResult, run: { splits: number[]; recording: string | null }): void;
+  /** Additive (P4 leaderboard): offer a finished run to the track's per-class top 5; its 1-based rank, or null. */
+  record?(trackId: string, result: RunResult): number | null;
 }
 
 export interface GameOptions {
@@ -228,6 +230,15 @@ export class Game {
   private finishRunTicks = 0;
   private faultCount = 0;
   private countdownTick = 0;
+  /**
+   * Track entry hold (render r14): `setTrack` compiles the new biome in tasks behind a fog placeholder and
+   * `whenReady()` resolves after it. While the renderer reports `entering`, the countdown does not tick and
+   * the HUD shows "loading <biome>…" instead of the 3 — the run clock, as always, starts at GO. The token
+   * drops a stale release (a newer load / GO / menu in between).
+   */
+  private entryHold = false;
+  private entryToken = 0;
+  private entryHoldAt = 0;
   private crashTicks = 0;
   private holdTicks = 0;
   private holdFired = false;
@@ -303,6 +314,9 @@ export class Game {
   /** Wall ms of the last loadTrack (reported through hook.info for the boot gate). */
   lastLoadMs = 0;
 
+  /** The app's governor writes its last decision here (`?perf=1`, `hook.info().qualityWhy`, the run log). */
+  qualityWhy = '';
+
   /** Bike class in effect for the next `loadTrack` (Garage choice / per-tier default; App sets it before loading). */
   get currentBike(): BikeClass {
     return this.bike;
@@ -339,6 +353,8 @@ export class Game {
     // renderer without it keeps the default livery and the garage card tint carries the colour.
     this.renderer.setBikeClass?.(this.bike);
     (this.audio as Partial<{ setTrack(t: CompiledTrack, seed: number): void }> | undefined)?.setTrack?.(compiled, this.seed);
+    // Audio round 3 (additive, optional): the bike class voices the engine; every load path passes through here.
+    this.audio?.setBike?.(this.bike);
     this.hud?.setTrack(track);
     this.loop.reset();
     this.input = { ...NEUTRAL_INPUT };
@@ -359,6 +375,8 @@ export class Game {
 
   /** Back to the menu phase: nothing ticks until the next loadTrack/startRun. */
   toMenu(): void {
+    this.entryHold = false;
+    this.entryToken++;
     this.setPhase('menu');
     this.pausedFlag = false;
   }
@@ -389,12 +407,41 @@ export class Game {
     } else {
       this.countdownTick = 0;
       this.setPhase('countdown');
-      this.emit({ type: 'countdown', n: 3 });
+      const token = ++this.entryToken;
+      const ready = this.rendererEntering() ? this.whenReady() : null;
+      if (ready) {
+        this.entryHold = true;
+        this.entryHoldAt = performance.now();
+        const release = (): void => {
+          if (token !== this.entryToken) return;
+          this.entryHold = false;
+          this.emit({ type: 'countdown', n: 3 });
+        };
+        ready.then(release, release);
+      } else this.emit({ type: 'countdown', n: 3 });
     }
+  }
+
+  /** The renderer is still compiling the current track's biome behind its placeholder (`debugInfo().entering`). */
+  private rendererEntering(): boolean {
+    const r = this.renderer as Partial<{ debugInfo(): { entering?: boolean } }>;
+    if (typeof r.debugInfo !== 'function') return false;
+    try {
+      return r.debugInfo().entering === true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Countdown held on the renderer's track entry (`?perf=1`, `hook.info().entryHold`, the e2e entry proof). */
+  get entryHeld(): boolean {
+    return this.entryHold;
   }
 
   /** GO: physics state becomes byte-identical to a fresh load; the run clock starts. */
   private go(): void {
+    this.entryHold = false;
+    this.entryToken++;
     this.physics.reset(-1);
     this.physics.drainEvents(); // swallow whatever reset produced: replays start here
     this.lastState = null;
@@ -633,6 +680,7 @@ export class Game {
         this.physics.step(NEUTRAL_INPUT);
         this.physics.drainEvents();
         this.lastState = null;
+        if (this.entryHold) return; // the biome is still compiling: the 3-2-1 waits for `whenReady()`
         this.countdownTick++;
         if (this.countdownTick % T.countdownBeat === 0) {
           const n = COUNTDOWN_BEATS - this.countdownTick / T.countdownBeat;
@@ -790,6 +838,8 @@ export class Game {
       bike: this.bike,
     };
     this.lastResult = result;
+    // Board before PB: a board with no rows seeds itself from the stored PB, which must still be the previous one.
+    result.rank = this.bestTimes?.record?.(track.id, result) ?? null;
     if (result.personalBest) this.bestTimes?.put(track.id, result, { splits: [...this.splits], recording: this.pbJson });
     // The panel's staged reveal is clocked from the HUD's sim time: anchor it to THIS tick, not to the last render
     // (a stepped sim — harness, e2e — would otherwise render straight into the final stage).
@@ -830,6 +880,7 @@ export class Game {
     info.checkpoint = state.checkpoint;
     info.checkpointCount = this.track?.checkpoints.length ?? 0;
     info.simTime = (this.loop.ticks + alpha) / this.physicsHz;
+    info.entry = this.entryHold ? { biome: this.track?.meta?.biome ?? 'world', ms: performance.now() - this.entryHoldAt } : null;
     this.renderer.setRunInfo?.(info);
     this.renderer.setGhost?.(this.ghostState());
     const skip = this.benchSkip;
