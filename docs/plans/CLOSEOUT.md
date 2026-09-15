@@ -30,9 +30,10 @@ already parallel. Targets: `--refresh-goldens` ≤ 5 min, reflex matrix ≤ 10 m
    (same round as the REVIEW button); **render round owed** (after perf #4b, same paths): read `setPiecesOf(def)`
    (tunnels / drops / fire / balance), draw `arch` decor, and on `p1-`…`p5-` ids place *every* biome set piece instead
    of the one id-gated pick — `docs/design/tracks.md` §7.3 is the list.
-2. **Level reviewer** (mobile) — `?review=<track>`: free camera (pan/zoom/fly along the track), six segments,
+2. **Level reviewer** (mobile) — **landed `06c39f0`, live**: a top-level REVIEW tab → picker → review UI (the user's call: a button, not a URL). Original brief: `?review=<track>`: free camera (pan/zoom/fly along the track), six segments,
    tap a segment to leave a comment (localStorage), **Copy review** → JSON the parent files under
    `docs/reviews/levels/<track>.md` and re-authors from. Also lists the biome's assets in the segment.
+   Owed: a renderer camera override (`setCameraOverride`) so pan moves the camera, not the parked bike, and vertical pan — a render round.
 3. Level selector redesign, garage upgrades — mockups after the pin; not in this window.
 
 ## Sequence in this window
