@@ -49,6 +49,7 @@
     "@types/jsdom": "^30.0.0",
     "@types/node": "^24.6.0",
     "@types/three": "0.186.0",
+    "agent-browser": "0.37.1",
     "eslint": "^9.39.5",
     "globals": "^16.5.0",
     "jsdom": "^26.1.0",
