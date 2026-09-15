@@ -4,20 +4,22 @@
  * is a compile error (`pnpm typecheck`), not a 44 %. `core` is the bundle's own size, compiled into the
  * inline script by the build (it is only known after the bundle exists).
  *
- * The inline loader receives the same two numbers as `__BOOT_TOTALS__` (vite.config.ts computes them from
+ * The inline loader receives one hero total per outfit and the shared art total as `__BOOT_TOTALS__` (vite.config.ts computes them from
  * the same lists and the same file sizes; `totals.test.ts` holds the two equal) so it need not bundle the table.
  */
 import { PUBLIC_BYTES } from './plan.generated';
-import { HERO_URLS, lodUrl } from '../render/hero/urls';
-import { BOOT_IDS } from '../render/art/boot-set';
+import { HERO_FILES_BY_OUTFIT } from '../render/hero/urls';
+import type { RiderOutfit } from '../core/types';
+import { declaredBootTotals } from './asset-totals';
 import type { ByteKey } from './steps';
 
 /** The glTF files `setModels` awaits (`Promise.all([full, lod])` per hero, src/render/index.ts). */
-export const HERO_FILES = [HERO_URLS.bike, lodUrl(HERO_URLS.bike), HERO_URLS.rider, lodUrl(HERO_URLS.rider)] as const;
+export const HERO_FILES = HERO_FILES_BY_OUTFIT.street;
 
-const sum = (ns: readonly number[]): number => ns.reduce((a, b) => a + b, 0);
+export const DECLARED_BOOT_TOTALS = declaredBootTotals((file) => PUBLIC_BYTES[file]);
 
-export const BOOT_BYTE_TOTALS: Readonly<Record<Exclude<ByteKey, 'core'>, number>> = {
-  heroModels: sum(HERO_FILES.map((f) => PUBLIC_BYTES[f])),
-  bootArt: sum(BOOT_IDS.map((id) => PUBLIC_BYTES[`art:${id}`])),
-};
+export function bootByteTotals(outfit: RiderOutfit): Readonly<Record<Exclude<ByteKey, 'core'>, number>> {
+  return { heroModels: DECLARED_BOOT_TOTALS.heroModels[outfit], bootArt: DECLARED_BOOT_TOTALS.bootArt };
+}
+
+export const BOOT_BYTE_TOTALS = bootByteTotals('street');

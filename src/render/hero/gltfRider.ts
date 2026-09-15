@@ -26,6 +26,7 @@ import { fogify } from '../lighting/environment';
 import { newChain, solveChain, type Chain } from '../rider/riderModel';
 import { countTriangles, prepareHeroMaterials } from './gltf';
 import { variantMaterialsFor } from './lod';
+import { makeRiderRigPose, riderRigFromCOM, RIDER_PROFILE, RIDER_TORSO_REST } from '../../physics/v2/rider';
 
 const SHIFT = 0.65; // axle-midpoint frame → file frame (rear axle origin)
 /** Landing squash weight from the summed grounded compression: 0 at the ridden sag, `max` at sag + span. */
@@ -76,7 +77,7 @@ export class GltfRider {
   readonly root = new THREE.Group();
   readonly triangles: number;
   readonly materials: THREE.MeshStandardMaterial[];
-  readonly debug = { armStretch: [1, 1], legStretch: [1, 1], handOnGrip: [true, true], wristErr: [0, 0], ankleErr: [0, 0], armLen: [0, 0], additiveWeight: 1, ragdollResidual: -1, ragdollBlend: 0, ragdollDetail: [] as string[], bones: 0, clips: [] as string[] };
+  readonly debug = { armStretch: [1, 1], legStretch: [1, 1], handOnGrip: [true, true], wristErr: [0, 0], gripErr: [0, 0], gripAngleErr: [0, 0], ankleErr: [0, 0], armLen: [0, 0], additiveWeight: 1, physicalPose: false, comResidual: 0, ragdollResidual: -1, ragdollBlend: 0, ragdollDetail: [] as string[], bones: 0, clips: [] as string[] };
   private readonly scene: THREE.Object3D;
   private readonly bones = new Map<string, THREE.Bone>();
   private readonly q0 = new Map<string, THREE.Quaternion>();
@@ -96,6 +97,13 @@ export class GltfRider {
     [0.46, 0.43],
     [0.46, 0.43],
   ];
+  /** New authored hands have anatomical wrists and separate palm contacts. Legacy assets use
+   * the wrist itself as their contact, represented by a zero offset and no socket. */
+  private readonly gripSockets: (THREE.Object3D | null)[] = [null, null];
+  private readonly gripOffsets = [new THREE.Vector3(), new THREE.Vector3()];
+  private readonly gripRestQ = [new THREE.Quaternion(), new THREE.Quaternion()];
+  private readonly wristTarget = new THREE.Vector3();
+  private readonly physicalRig = makeRiderRigPose();
   /** Ragdoll hand-over (round 9): last posed bone-local quaternions + pelvis world pose, blended out over 2–5 frames. */
   private readonly handover = { q: new Map<string, THREE.Quaternion>(), pelvisQ: new THREE.Quaternion(), pelvisP: new THREE.Vector3(), t0: -1, dur: 0, active: false };
   private armQ = new THREE.Quaternion();
@@ -206,6 +214,12 @@ export class GltfRider {
         const c = hd.getWorldPosition(new THREE.Vector3());
         this.armLen[i] = [a.distanceTo(b), b.distanceTo(c)];
         this.debug.armLen[i] = +(this.armLen[i]![0] + this.armLen[i]![1]).toFixed(3);
+        const socket = this.scene.getObjectByName(`gripSocket.${sd}`) ?? this.scene.getObjectByName(`gripSocket${sd}`);
+        if (socket) {
+          this.gripSockets[i] = socket;
+          socket.getWorldPosition(this.gripOffsets[i]!).sub(c);
+          socket.getWorldQuaternion(this.gripRestQ[i]!);
+        }
       }
       const thigh = this.bones.get(`thigh.${sd}`);
       const shin = this.bones.get(`shin.${sd}`);
@@ -325,6 +339,14 @@ export class GltfRider {
     // delta from this frame's base pose, never from the previous frame: accumulating a sub-mm
     // breathing key moved the shoulders 27 cm in a minute, even while handOnGrip stayed true.
     for (const [name, p] of this.restLocalP) this.bones.get(name)!.position.copy(p);
+    this.debug.physicalPose = f.riderBody.present && this.gripSockets.every(Boolean) && this.bike !== null;
+    if (this.debug.physicalPose) {
+      // The same weighted body/limb map as the solver: no second crouch curve, extra pose
+      // follower or additive pelvis movement can move the visible rider off its physical COM.
+      this.poseFromChain(this.chainFromBody(f));
+      this.debug.additiveWeight = 0;
+      return;
+    }
     const sim = f.riderBody.present;
     // Round 13 (H2): with physics v2 the drawn rider IS the simulated one — `f.rider` is derived
     // by physics from `riderBody` (lean = body x through the pose table, crouch = height below the
@@ -384,6 +406,37 @@ export class GltfRider {
       else this.pushT = -1;
     }
     if (rest > 0.01 || this.landT >= 0 || this.pushT >= 0) this.resolveContacts(c);
+  }
+
+  private chainFromBody(f: RenderFrame): Chain {
+    const bike = this.bike!;
+    const cosine = Math.cos(f.bikeAngle), sine = Math.sin(f.bikeAngle);
+    this.va.set(f.bikeX + f.riderBody.relX * cosine - f.riderBody.relY * sine,
+      f.bikeY + f.riderBody.relX * sine + f.riderBody.relY * cosine, 0);
+    bike.frame.worldToLocal(this.va);
+    const e = bike.frame.matrixWorld.elements;
+    const frameAngle = Math.atan2(e[1]!, e[0]!);
+    const relative = f.riderBody.relAngle + f.bikeAngle - frameAngle;
+    const torso = RIDER_TORSO_REST + Math.atan2(Math.sin(relative), Math.cos(relative));
+    const p = riderRigFromCOM(this.va.x, this.va.y, torso, this.physicalRig);
+    const c = this.chain;
+    c.hips.set(p.hips.x, p.hips.y, 0);
+    c.shoulders.set(p.shoulders.x, p.shoulders.y, 0);
+    c.head.set(p.head.x, p.head.y, 0);
+    c.torsoAngle = Math.PI / 2 - p.torsoAngle;
+    c.headAngle = p.headAngle - Math.PI / 2;
+    c.pelvisBottom.set(p.hips.x - .18 * Math.cos(torso), p.hips.y - .18 * Math.sin(torso), 0);
+    for (let i = 0; i < 2; i++) {
+      const sign = i === 0 ? 1 : -1;
+      c.shoulder[i]!.set(p.shoulders.x, p.shoulders.y, sign * RIDER_PROFILE.shoulderHalf);
+      c.hip[i]!.set(p.hips.x, p.hips.y, sign * RIDER_PROFILE.hipHalf);
+      c.elbow[i]!.set(p.elbow.x, p.elbow.y, sign * p.elbow.z);
+      c.knee[i]!.set(p.knee.x, p.knee.y, sign * p.knee.z);
+      c.hand[i]!.set(p.grip.x, p.grip.y, sign * p.grip.z);
+      c.ankle[i]!.set(p.ankle.x, p.ankle.y, sign * p.ankle.z);
+    }
+    this.debug.comResidual = p.residual;
+    return c;
   }
 
   /** World (file-space) rotation for a bone → local, in hierarchy order. */
@@ -497,7 +550,8 @@ export class GltfRider {
       // on the grip whenever it is reachable (round 8 aimed the fixed-length bones along the
       // chain's segments, which left the wrist up to 3.5 cm off at mid-lean).
       const ua = this.bones.get(`upperArm.${s}`);
-      const grip = c.hand[i]!;
+      // Hold the palm socket on the bar; the wrist is behind/above it, not at the grip center.
+      const grip = this.wristTarget.copy(c.hand[i]!).sub(this.gripOffsets[i]!);
       let S: THREE.Vector3 | null = null;
       if (ua && this.bike) {
         ua.updateWorldMatrix(true, false);
@@ -527,7 +581,22 @@ export class GltfRider {
         this.aim(`upperArm.${s}` as BoneName, this.vb.subVectors(c.elbow[i]!, c.shoulder[i]!));
         this.aim(`forearm.${s}` as BoneName, this.vb.subVectors(c.hand[i]!, c.elbow[i]!));
       }
-      this.rigid(`hand.${s}` as BoneName);
+      const socket = this.gripSockets[i];
+      if (socket) this.setWorld(`hand.${s}`, this.q0.get(`hand.${s}`)!);
+      else this.rigid(`hand.${s}` as BoneName);
+      if (socket && this.bike) {
+        socket.updateWorldMatrix(true, false);
+        socket.getWorldPosition(this.va);
+        this.bike.frame.worldToLocal(this.va);
+        this.debug.gripErr[i] = this.va.distanceTo(c.hand[i]!);
+        socket.getWorldQuaternion(this.qa);
+        this.bike.frame.getWorldQuaternion(this.qb).multiply(this.gripRestQ[i]!);
+        this.debug.gripAngleErr[i] = this.qa.angleTo(this.qb);
+        this.debug.handOnGrip[i] = this.debug.gripErr[i]! < .001 && this.debug.gripAngleErr[i]! < .01;
+      } else {
+        this.debug.gripErr[i] = this.debug.wristErr[i]!;
+        this.debug.gripAngleErr[i] = 0;
+      }
     }
   }
 
@@ -596,7 +665,8 @@ export class GltfRider {
       this.va.setFromMatrixPosition(bone.matrixWorld);
       this.bike.frame.worldToLocal(this.va);
       const [a, b] = (arm ? this.armLen : this.legLen)[i]!;
-      const d = this.va.distanceTo((arm ? c.hand : c.ankle)[i]!);
+      const target = arm ? this.wristTarget.copy(c.hand[i]!).sub(this.gripOffsets[i]!) : c.ankle[i]!;
+      const d = this.va.distanceTo(target);
       if (d > (a + b) * 0.995 || d < Math.abs(a - b) + 0.02) return false;
     }
     return true;

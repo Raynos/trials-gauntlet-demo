@@ -4,12 +4,13 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
-import { BOOT_IDS } from './src/render/art/boot-set';
-import { HERO_URLS, lodUrl } from './src/render/hero/urls';
+import { HERO_FILES_BY_OUTFIT } from './src/render/hero/urls';
+import { declaredBootTotals, type DeclaredBootTotals } from './src/boot/asset-totals';
+import { modelAssetsPlugin, type ModelAsset } from './src/boot/model-catalog';
 
 /** esbuild's own API (bundling the inline loader). Not a direct dependency: resolved through Vite's, so the two never disagree. */
 interface Esbuild {
-  build(o: { entryPoints: string[]; bundle: boolean; write: false; format: 'iife'; platform: 'browser'; target: string; minify: boolean; legalComments: 'none'; define: Record<string, string> }): Promise<{ outputFiles: { text: string }[] }>;
+  build(o: { entryPoints: string[]; bundle: boolean; write: false; format: 'iife'; platform: 'browser'; target: string; minify: boolean; charset: 'utf8'; legalComments: 'none'; define: Record<string, string> }): Promise<{ outputFiles: { text: string }[] }>;
 }
 const esbuild = createRequire(createRequire(import.meta.url).resolve('vite'))('esbuild') as Esbuild;
 
@@ -114,7 +115,7 @@ function publicItems(root: string): LoadItem[] {
 
 
 /** `src/boot/plan.generated.ts` from a walk of public/ — deterministic (sorted keys, no timestamp), so it only changes when the files do. */
-function writeBootPlanTable(root: string): { heroModels: number; bootArt: number } {
+export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAsset[]): DeclaredBootTotals {
   const pub = path.join(root, 'public');
   const rows = new Map<string, number>();
   const models = path.join(pub, 'models');
@@ -127,6 +128,9 @@ function writeBootPlanTable(root: string): { heroModels: number; bootArt: number
     };
     walk(models, '');
   }
+  // Model denominators describe the exact byte snapshots emitted/served by the catalog plugin,
+  // even if a source file is replaced while the rest of this table is being assembled.
+  for (const asset of modelAssets ?? []) rows.set(asset.logical, asset.bytes.length);
   try {
     const m = JSON.parse(fs.readFileSync(path.join(pub, 'art', 'manifest.json'), 'utf8')) as { assets?: Array<{ id?: string; path?: string; bytes?: number }> };
     for (const a of m.assets ?? []) {
@@ -155,18 +159,17 @@ function writeBootPlanTable(root: string): { heroModels: number; bootArt: number
   ].join('\n');
   const out = path.join(root, 'src', 'boot', 'plan.generated.ts');
   if (!fs.existsSync(out) || fs.readFileSync(out, 'utf8') !== src) fs.writeFileSync(out, src);
-  // The two declared totals the inline loader needs — the same sums src/boot/totals.ts makes over the same table.
+  // The inline needs one hero total per outfit and the shared art total, not the whole byte table.
   const need = (k: string): number => {
     const b = rows.get(k);
     if (b === undefined) throw new Error(`boot plan: ${k} is awaited by the boot but missing from public/`);
     return b;
   };
-  const heroFiles = [HERO_URLS.bike, lodUrl(HERO_URLS.bike), HERO_URLS.rider, lodUrl(HERO_URLS.rider)];
-  return { heroModels: heroFiles.reduce((n, f) => n + need(f), 0), bootArt: BOOT_IDS.reduce((n, id) => n + need(`art:${id}`), 0) };
+  return declaredBootTotals(need);
 }
 
 /** Bundle + (in build) minify `src/boot/inline.ts` with the core file list and the build sha compiled in. */
-async function buildInline(root: string, core: LoadItem[], totals: { heroModels: number; bootArt: number }, minify: boolean, id: string): Promise<string> {
+export async function buildInline(root: string, core: LoadItem[], totals: DeclaredBootTotals, minify: boolean, id: string): Promise<string> {
   const res = await esbuild.build({
     entryPoints: [path.join(root, 'src', 'boot', 'inline.ts')],
     bundle: true,
@@ -175,23 +178,25 @@ async function buildInline(root: string, core: LoadItem[], totals: { heroModels:
     platform: 'browser',
     target: 'es2020',
     minify,
+    charset: 'utf8',
     legalComments: 'none',
-    define: { __BOOT_CORE__: JSON.stringify(core.map((i) => ({ path: i.path, bytes: i.bytes }))), __BOOT_TOTALS__: JSON.stringify(totals), __BOOT_BUILD__: JSON.stringify(id) },
+    define: { __BOOT_CORE__: JSON.stringify(core.map((i) => [i.path, i.bytes])), __BOOT_TOTALS__: JSON.stringify(totals), __BOOT_BUILD__: JSON.stringify(id) },
   });
   const code = res.outputFiles[0]?.text.trim() ?? '';
   if (minify && Buffer.byteLength(code) > INLINE_BUDGET_BYTES) throw new Error(`inline loader is ${Buffer.byteLength(code)} B, budget ${INLINE_BUDGET_BYTES} B`);
   return code;
 }
 
-function loadManifest(id: string): Plugin {
+function loadManifest(id: string): Plugin[] {
   let root = process.cwd();
   let coreItems: LoadItem[] = [];
-  let totals = { heroModels: 0, bootArt: 0 };
-  return {
+  let totals: DeclaredBootTotals = { heroModels: { street: 0, race: 0 }, bootArt: 0 };
+  const required = [...new Set([...HERO_FILES_BY_OUTFIT.street, ...HERO_FILES_BY_OUTFIT.race])];
+  const modelAssets = modelAssetsPlugin(required, (assets, catalogRoot) => { totals = writeBootPlanTable(catalogRoot, assets); });
+  return [modelAssets, {
     name: 'trials:load-manifest',
     configResolved(c) {
       root = c.root;
-      totals = writeBootPlanTable(root);
     },
     generateBundle(_o, bundle) {
       const items: LoadItem[] = [];
@@ -200,8 +205,9 @@ function loadManifest(id: string): Plugin {
         const buf = item.type === 'chunk' ? Buffer.from(item.code) : Buffer.isBuffer(item.source) ? item.source : Buffer.from(item.source);
         const gz = /\.(png|webp|jpg|woff2|glb)$/.test(name) ? buf.length : gzipSync(buf).length;
         let phase: LoadItem['phase'] = 'core';
-        if (/worklet/.test(name)) phase = 'audio-worklet';
-        else if (/\.(glb|gltf)$/.test(name)) phase = 'models';
+        if (name === 'model-catalog.json') phase = 'other';
+        else if (/worklet/.test(name)) phase = 'audio-worklet';
+        else if (/\.(glb|gltf)$/.test(name)) phase = /-lod-[a-f0-9]{16}\.glb$/.test(name) ? 'models-lod' : 'models';
         const label = /three/.test(name) ? 'three.js' : item.type === 'chunk' && item.isEntry ? 'game (index.js)' : name.replace(/^assets\//, '');
         items.push({ path: `./${name}`, bytes: buf.length, gz, phase, label });
       }
@@ -215,7 +221,8 @@ function loadManifest(id: string): Plugin {
     // fetch and the module script it inserts afterwards share one cached body.
     configurePreviewServer(server) {
       server.middlewares.use((req, res, next) => {
-        if (req.url && /^\/assets\/.+-[\w-]{8}\.\w+$/.test(req.url.split('?')[0] ?? '')) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        const pathname = req.url?.split('?')[0] ?? '';
+        if (/^\/assets\/.+-[\w-]{8}\.\w+$/.test(pathname) || /^\/models\/.+\/[\w-]+-[a-f0-9]{16}\.glb$/.test(pathname)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         next();
       });
     },
@@ -238,7 +245,7 @@ function loadManifest(id: string): Plugin {
         return html;
       },
     },
-  };
+  }];
 }
 
 /**
@@ -291,7 +298,7 @@ export default defineConfig({
   // Relative base so the built bundle also works when served from a subpath
   // (Vercel preview folders, file listings, the harness preview server).
   base: './',
-  plugins: [bundleBudget(), loadManifest(buildId()), pwa(buildId())],
+  plugins: [bundleBudget(), ...loadManifest(buildId()), pwa(buildId())],
   build: {
     target: 'es2022',
     sourcemap: true,

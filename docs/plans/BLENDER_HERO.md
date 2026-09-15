@@ -3,11 +3,22 @@
 Owner: Codex Blender session. Branch: `blender-work`, in the explicitly authorized
 `trials-gauntlet-blender` worktree. Baseline: `56e3883` (2026-09-15).
 
-Status: first rig/integration repair implemented and checked; visual rebuild,
-mechanical reconstruction and final merge handoff remain open. Track this plan
-in `PLANS.md` at every commit.
+Status: **paused WIP at the user's request, 2026-09-15**. Round 1 is verified;
+the following checkpoint contains outfit sources/garage selection, shared rider
+mass/pose and fixed bike joints, with incomplete physics and visual validation.
+Typecheck, lint and production build pass; full tests: **22 failed, 618 passed,
+11 todo**. Continue from [the handoff](../BLENDER_HANDOFF.md). This is not ready
+to merge or deploy. Track this plan in `PLANS.md` at every commit.
 
 ## Mandate and boundaries
+
+**Pairing decision, 2026-09-15:** street rider with hoodie/jeans is the preferred
+default. Implement both street and motocross outfits and switch them in the
+garage. The user explicitly expanded this branch's scope to **fix the rider
+physics too** after seeing the independent body/pose findings. Corrected physics
+may change old finish times; repeated inputs on the corrected solver must still
+produce byte-identical results. Re-measure clearability rather than hiding
+trajectory changes by repinning old reports.
 
 The user assigned this session all Blender rider/bike work and its Three.js
 integration. Trials Fusion / Trials Rising gameplay is the quality reference.
@@ -15,9 +26,10 @@ Replace the existing model if its construction limits the result. Judge the
 hero in played gameplay, including close views, rather than posed turntables.
 
 This plan owns `assets/blender/**`, `public/models/**`, the hero rendering and
-pose integration, their tests, and the evidence needed to verify them. Physics,
-tracks, audio, navigation, and broad world rendering remain trunk concerns.
-Preserve replay trajectories and clock bytes. The first integration round also
+pose integration, their tests, and the evidence needed to verify them. The
+expanded scope includes rider physics and garage outfit selection; tracks,
+audio, unrelated navigation, and broad world rendering remain trunk concerns.
+The first integration round preserved replay trajectories and clock bytes and
 publishes the already-defined `riderBody` field from the physics getter; this is
 an interface repair, with no solver/tuning/layout change. Do not merge into
 trunk or deploy from this branch.
@@ -35,9 +47,11 @@ measurable gates; passing them does not by itself establish AAA quality.
 - `hero/gltf.ts` / `lod.ts` handle meshopt decoding, material variants, textures,
   spoke blur and whole-document LOD selection. `src/render/index.ts` integrates
   live/ghost instances, lighting, quality changes and replacement.
-- `assets/blender/build_{rider,bike}.py` and `common.py` generate geometry,
-  skinning, clips, atlases, `.blend` files and compressed GLBs. The `.blend`
-  files currently are generated outputs: regeneration overwrites hand edits.
+- `assets/blender/source/rider-{street,race}.blend` are now protected,
+  authoritative rider sources; `rider_asset.py` exports without overwriting
+  them. The legacy `build_{rider,bike}.py` and `common.py` generate geometry,
+  skinning, clips and atlases; legacy generated `.blend` files still overwrite
+  hand edits. Read the asset README before choosing an authoring path.
 - `harness` supplies recorded input, bots, strangers, deterministic replay,
   played captures, comparisons and the ship gate. Reference video manifests
   are tracked; their actual videos are ignored and were absent in this worktree.
@@ -152,6 +166,23 @@ the tracker with evidence and remaining work. Repeated visual tells require a
 different construction approach, not indefinite small tweaks.
 
 ## Evidence and reproducibility
+
+### Round 2 pause checkpoint
+
+Street/race sources and full/LOD exports, garage selection, content-addressed
+model URLs, a shared physical rider COM/rig profile, and a fixed-frame rear
+hinge/front fork implementation are committed as WIP. The full combined check
+has 20 physics failures and two full/LOD fork-alignment failures near float32
+precision; typecheck/lint and the separate build pass. Do not relax or repin
+the assertions as a group. See the handoff for the exact failure categories,
+source workflow, known numerical guard and continuation order.
+
+New outfit topology/materials, actual-GLB COM/socket pose tests, finish-bug
+reproduction, final mechanism replay census, fresh clearability, played
+comparisons and actual iOS remain open. Existing GLB rider tests exercise the
+legacy assets. The round-one results and baseline finish recordings below
+predate the changed physics and do not validate this checkpoint. The 12-hour
+follow-up is paused; no merge or deployment is authorized by this checkpoint.
 
 ### Round 1 results
 

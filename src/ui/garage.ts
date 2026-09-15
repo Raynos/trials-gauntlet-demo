@@ -7,11 +7,12 @@
  * Copy states the physics v2 R3 numbers (physics.md "v2 status — R3"). Selection persists
  * (`trials.bikeClass`); the per-tier default applies only until the player has picked once (rules.ts).
  */
-import type { BikeClass } from '../core/types';
+import type { BikeClass, RiderOutfit } from '../core/types';
 import type { ArtManifest } from './art';
 import { escapeHtml } from './front';
 import type { UiSfx } from './sfx';
-import { conceal, reveal } from './live';
+import { conceal, isLiveTarget, reveal } from './live';
+import { DEFAULT_RIDER_OUTFIT, OUTFIT_DETAIL, OUTFIT_LABEL, RIDER_OUTFITS } from './outfit';
 
 export interface BikeSpec {
   id: BikeClass;
@@ -72,6 +73,8 @@ export interface GarageCallbacks {
   previewBike(b: BikeClass): void;
   /** Confirmed: persist. */
   setBike(b: BikeClass): void;
+  /** Confirmed clothing choice; cosmetic and independent of the bike class. */
+  setOutfit(outfit: RiderOutfit): void;
   back(): void;
 }
 
@@ -90,9 +93,15 @@ function bar(label: string, v: number, text?: string): string {
 export class GarageScreen {
   readonly root: HTMLDivElement;
   private readonly cards = new Map<BikeClass, HTMLButtonElement>();
+  private readonly outfits = new Map<RiderOutfit, HTMLButtonElement>();
+  private readonly outfitStatus: HTMLSpanElement;
+  private readonly backButton: HTMLButtonElement;
   private readonly legend: HTMLDivElement;
   private focus: BikeClass = 'rookie';
   private current: BikeClass = 'rookie';
+  private focusGroup: 'bike' | 'outfit' | 'back' = 'bike';
+  private outfitFocus: RiderOutfit = DEFAULT_RIDER_OUTFIT;
+  private currentOutfit: RiderOutfit = DEFAULT_RIDER_OUTFIT;
 
   constructor(
     parent: HTMLElement,
@@ -101,12 +110,17 @@ export class GarageScreen {
     private readonly cb: GarageCallbacks,
   ) {
     this.root = h('div', 'screen garage-screen');
+    this.root.inert = true;
+    this.root.setAttribute('aria-hidden', 'true');
     // Art round 2: garage plate behind the card column (masked clear on the live-bike side), bike renders in the cards.
     const plate = h('div', 'plate-bg garage-plate');
     this.root.appendChild(plate);
     art.whenReady(() => art.applyBackground(plate, art.byId('garage-plate') ?? art.byId('results-garage')));
-    const head = h('div', 'garage-head', `<h1><small>Garage</small>Choose your bike</h1><div class="garage-sub">Applies to every track · change it here any time</div><div class="garage-tip">${escapeHtml(BALANCE_HINT)}</div>`);
+    const head = h('div', 'garage-head', `<h1><small>Garage</small>Customize your ride</h1><div class="garage-sub">Applies to every track · change it here any time</div><div class="garage-tip">${escapeHtml(BALANCE_HINT)}</div>`);
+    const customize = h('div', 'garage-customize');
     const row = h('div', 'garage-cards');
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', 'Bike class');
     for (const spec of [BIKE_SPECS.rookie, BIKE_SPECS.pro]) {
       const el = h('button', 'bike-card');
       el.type = 'button';
@@ -118,9 +132,21 @@ export class GarageScreen {
         <div class="bc-stats">${bar('Power', spec.power)}${bar('Grip', spec.grip)}${bar('Weight', spec.weight, spec.weightFeel)}</div>
         <div class="bc-note">${escapeHtml(spec.note)}</div>`;
       el.addEventListener('pointerenter', (e) => {
-        if (e.pointerType !== 'touch') this.setFocus(spec.id, true);
+        if (e.pointerType !== 'touch' && this.canAct(el)) this.setFocus(spec.id, true);
+      });
+      el.addEventListener('focus', () => {
+        if (!this.visible) return;
+        if (this.canAct(el)) this.setFocus(spec.id, false);
+        else {
+          // Tab may move while the screen is fading in. Remember its target, but wait for live
+          // activation before changing a preview or committing anything.
+          this.focusGroup = 'bike';
+          this.focus = spec.id;
+          this.paint();
+        }
       });
       el.addEventListener('click', () => {
+        if (!this.canAct(el)) return;
         this.setFocus(spec.id, false);
         this.confirm();
       });
@@ -129,12 +155,44 @@ export class GarageScreen {
       row.appendChild(el);
       this.cards.set(spec.id, el);
     }
-    this.legend = h('div', 'legend', `<span><kbd>←→</kbd>Bike</span><span><kbd>Enter</kbd>Select</span><span><kbd>Esc</kbd>Back</span>`);
-    this.root.append(h('div', 'grain'), head, row, this.legend);
-    const backBtn = h('button', 'backbtn', '<span>‹</span>Menu');
-    backBtn.type = 'button';
-    backBtn.addEventListener('click', () => this.back());
-    this.root.appendChild(backBtn);
+    const outfitPanel = h('div', 'garage-outfits');
+    const outfitHeading = h('div', 'outfit-heading', '<strong>Rider outfit</strong>');
+    this.outfitStatus = h('span', 'outfit-current');
+    this.outfitStatus.setAttribute('role', 'status');
+    outfitHeading.appendChild(this.outfitStatus);
+    const outfitRow = h('div', 'outfit-options');
+    outfitRow.setAttribute('role', 'group');
+    outfitRow.setAttribute('aria-label', 'Rider outfit');
+    for (const outfit of RIDER_OUTFITS) {
+      const button = h('button', 'outfit-button', `<strong>${OUTFIT_LABEL[outfit]}</strong><span>${OUTFIT_DETAIL[outfit]}</span>`);
+      button.type = 'button';
+      button.dataset['outfit'] = outfit;
+      button.addEventListener('pointerenter', (event) => {
+        if (event.pointerType !== 'touch' && this.canAct(button)) this.setOutfitFocus(outfit, true);
+      });
+      button.addEventListener('focus', () => { if (this.visible) this.setOutfitFocus(outfit, false); });
+      button.addEventListener('click', () => {
+        if (!this.canAct(button)) return;
+        this.setOutfitFocus(outfit, false);
+        this.confirm();
+      });
+      outfitRow.appendChild(button);
+      this.outfits.set(outfit, button);
+    }
+    outfitPanel.append(outfitHeading, outfitRow);
+    customize.append(row, outfitPanel);
+    this.legend = h('div', 'legend');
+    this.setDevice('keyboard');
+    this.root.append(h('div', 'grain'), head, customize, this.legend);
+    this.backButton = h('button', 'backbtn', '<span>‹</span>Menu');
+    this.backButton.type = 'button';
+    this.backButton.addEventListener('click', () => { if (this.canAct(this.backButton)) this.back(); });
+    this.backButton.addEventListener('focus', () => {
+      if (!this.visible) return;
+      this.focusGroup = 'back';
+      this.paint();
+    });
+    this.root.appendChild(this.backButton);
     parent.appendChild(this.root);
     this.paint();
   }
@@ -143,60 +201,107 @@ export class GarageScreen {
     return this.root.classList.contains('show');
   }
 
-  show(current: BikeClass): void {
+  show(current: BikeClass, outfit: RiderOutfit = DEFAULT_RIDER_OUTFIT): void {
     this.current = current;
     this.focus = current;
+    this.currentOutfit = this.outfitFocus = outfit;
+    this.focusGroup = 'bike';
     this.paint();
+    this.root.inert = false;
+    this.root.setAttribute('aria-hidden', 'false');
     this.root.classList.add('show');
     reveal(this.root);
   }
 
   hide(): void {
     conceal(this.root);
+    this.root.inert = true;
+    this.root.setAttribute('aria-hidden', 'true');
     this.root.classList.remove('show');
   }
 
   setDevice(d: 'keyboard' | 'gamepad' | 'touch' | null): void {
     this.legend.innerHTML =
       d === 'gamepad'
-        ? `<span><i class="pad">✚</i>Bike</span><span><i class="pad a">A</i>Select</span><span><i class="pad b">B</i>Back</span>`
+        ? `<span><i class="pad">✚</i>Choose bike / outfit</span><span><i class="pad a">A</i>Select</span><span><i class="pad b">B</i>Back</span>`
         : d === 'touch'
-          ? `<span>Tap a bike</span>`
-          : `<span><kbd>←→</kbd>Bike</span><span><kbd>Enter</kbd>Select</span><span><kbd>Esc</kbd>Back</span>`;
+          ? `<span>Tap a bike or outfit</span>`
+          : `<span><kbd>↑↓</kbd>Section</span><span><kbd>←→</kbd>Option</span><span><kbd>Enter</kbd>Select</span><span><kbd>Esc</kbd>Back</span>`;
+  }
+
+  private canAct(target: HTMLElement = this.root): boolean {
+    return this.visible && isLiveTarget(target);
   }
 
   /** Focus moves the preview too (the backdrop bike swaps class), so the player sees before they commit. */
   private setFocus(b: BikeClass, tick: boolean): void {
-    if (b === this.focus) return;
+    const changed = b !== this.focus;
+    const moved = changed || this.focusGroup !== 'bike';
+    this.focusGroup = 'bike';
     this.focus = b;
-    if (tick) this.sfx.tick();
-    this.cb.previewBike(b);
+    if (tick && moved) this.sfx.tick();
+    if (changed) this.cb.previewBike(b);
+    this.paint();
+  }
+
+  private setOutfitFocus(outfit: RiderOutfit, tick: boolean): void {
+    const moved = this.outfitFocus !== outfit || this.focusGroup !== 'outfit';
+    this.focusGroup = 'outfit';
+    this.outfitFocus = outfit;
+    if (tick && moved) this.sfx.tick();
     this.paint();
   }
 
   private paint(): void {
     for (const [id, el] of this.cards) {
-      el.classList.toggle('on', id === this.focus);
+      el.classList.toggle('on', this.focusGroup === 'bike' && id === this.focus);
       el.classList.toggle('selected', id === this.current);
+      el.setAttribute('aria-pressed', String(id === this.current));
     }
+    for (const [outfit, button] of this.outfits) {
+      button.classList.toggle('on', this.focusGroup === 'outfit' && outfit === this.outfitFocus);
+      button.classList.toggle('selected', outfit === this.currentOutfit);
+      button.setAttribute('aria-pressed', String(outfit === this.currentOutfit));
+    }
+    const status = `${OUTFIT_LABEL[this.currentOutfit]} selected`;
+    if (this.outfitStatus.textContent !== status) this.outfitStatus.textContent = status;
+    this.backButton.classList.toggle('on', this.focusGroup === 'back');
   }
 
   nav(dx: number, dy: number): void {
-    const d = dx || dy;
-    if (!d) return;
-    this.setFocus(this.focus === 'rookie' ? 'pro' : 'rookie', true);
+    if (!this.canAct() || (!dx && !dy)) return;
+    if (dy) {
+      const groups = ['bike', 'outfit', 'back'] as const;
+      const index = groups.indexOf(this.focusGroup);
+      this.focusGroup = groups[(index + (dy > 0 ? 1 : 2)) % groups.length]!;
+      this.sfx.tick();
+      this.paint();
+    } else if (this.focusGroup === 'bike') this.setFocus(this.focus === 'rookie' ? 'pro' : 'rookie', true);
+    else if (this.focusGroup === 'outfit') this.setOutfitFocus(this.outfitFocus === 'street' ? 'race' : 'street', true);
+    const target = this.focusGroup === 'bike' ? this.cards.get(this.focus) : this.focusGroup === 'outfit' ? this.outfits.get(this.outfitFocus) : this.backButton;
+    target?.focus();
   }
 
   confirm(): void {
+    if (!this.canAct()) return;
+    if (this.focusGroup === 'back') return this.back();
+    if (this.focusGroup === 'outfit') {
+      this.currentOutfit = this.outfitFocus;
+      this.cb.setOutfit(this.currentOutfit);
+      this.sfx.confirm();
+      this.paint();
+      return;
+    }
     this.current = this.focus;
     this.cb.setBike(this.focus);
     this.sfx.confirm();
     this.paint();
     const el = this.cards.get(this.focus);
-    el?.animate([{ transform: 'scale(1.03)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1.03)' }], { duration: 240, easing: 'ease-out' });
+    el?.animate?.([{ transform: 'scale(1.03)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1.03)' }], { duration: 240, easing: 'ease-out' });
   }
 
   back(): void {
+    if (!this.canAct()) return;
     // Leaving restores the committed class if the player only browsed.
     if (this.focus !== this.current) this.cb.previewBike(this.current);
     this.sfx.back();

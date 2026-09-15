@@ -1,0 +1,29 @@
+{
+  "source": "assets/blender/source/rider-race.blend",
+  "sourceSha256": "7edf2c496e9dd3fa5e6976fea3757ebcb449c02737dcf5392aad7c25ac6f0f55",
+  "exportSha256": "2a74696788009f5261d441ab92308bdc667f78f7bab8cb0e215b791bd93269d2",
+  "outfit": "race",
+  "lod": false,
+  "verified": {
+    "bytes": 934136,
+    "triangles": 10621,
+    "vertices": 9072,
+    "bones": 19,
+    "clips": [
+      "crouch",
+      "extend",
+      "forward_attack",
+      "hang_back",
+      "idle_breathe",
+      "land_absorb",
+      "sit_cruise",
+      "stand_attack"
+    ],
+    "variants": [
+      "rider_rookie",
+      "rider_pro"
+    ],
+    "maxWeightError": 2.9802322387695312e-08,
+    "loadedWeightError": 2.9802322387695312e-08
+  }
+}

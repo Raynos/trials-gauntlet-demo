@@ -12,9 +12,11 @@ import { createBootPlan } from './plan';
 import { createLoaderRenderer } from './render';
 import { streamBytes } from './stream';
 import type { BootWindow } from './handoff';
+import type { DeclaredBootTotals } from './asset-totals';
+import { selectedBootTotals } from './outfit';
 
-declare const __BOOT_CORE__: { path: string; bytes: number }[];
-declare const __BOOT_TOTALS__: { heroModels: number; bootArt: number };
+declare const __BOOT_CORE__: [path: string, bytes: number][];
+declare const __BOOT_TOTALS__: DeclaredBootTotals;
 declare const __BOOT_BUILD__: string;
 
 (function boot(): void {
@@ -37,40 +39,33 @@ declare const __BOOT_BUILD__: string;
 
   const core = __BOOT_CORE__;
   let coreTotal = 0;
-  for (const i of core) coreTotal += i.bytes;
-  const renderer = createLoaderRenderer(root, __BOOT_BUILD__);
-  const plan = createBootPlan(renderer.paint, { totals: { core: coreTotal, heroModels: __BOOT_TOTALS__.heroModels, bootArt: __BOOT_TOTALS__.bootArt } });
-  let failed = false;
+  for (const i of core) coreTotal += i[1];
+  const plan = createBootPlan(createLoaderRenderer(root, __BOOT_BUILD__).paint, { totals: { core: coreTotal, ...selectedBootTotals(__BOOT_TOTALS__, location.search) } });
   const fail = (m: string): void => {
-    if (failed) return;
-    failed = true;
-    plan.fail(m);
+    if (!plan.view.done && !plan.view.error) plan.fail(m);
   };
-  root.querySelector('.err button')?.addEventListener('click', () => location.reload());
-  window.addEventListener('error', (e) => {
-    if (!plan.view.done && e.message) fail(`Script error: ${e.message}`);
+  root.querySelector<HTMLButtonElement>('.err button')!.onclick = () => location.reload();
+  addEventListener('error', (e) => {
+    if (e.message) fail(e.message);
   });
-  window.addEventListener('unhandledrejection', (e: PromiseRejectionEvent) => {
-    if (!plan.view.done) fail(`Startup failed: ${e.reason?.message ?? e.reason}`);
+  addEventListener('unhandledrejection', (e: PromiseRejectionEvent) => {
+    fail(String(e.reason));
   });
 
   const reader = plan.reader('core');
-  const streamCore = async (): Promise<void> => {
-    // Four in flight, in manifest order; every chunk is counted by the reader that read it.
-    let idx = 0;
-    const worker = async (): Promise<void> => {
-      while (idx < core.length) {
-        const item = core[idx++]!;
-        await streamBytes(item.path, (d) => reader.add(d), item.bytes);
-      }
-    };
-    await Promise.all([worker(), worker(), worker(), worker()]);
+  // Four in flight, in manifest order; every chunk is counted by the reader that read it.
+  let idx = 0;
+  const worker = async (): Promise<void> => {
+    while (idx < core.length) {
+      const item = core[idx++]!;
+      await streamBytes(item[0], reader.add, item[1]);
+    }
   };
 
   plan
-    .step('core', streamCore)
+    .step('core', () => Promise.all([worker(), worker(), worker(), worker()]))
     .then((afterCore) => {
-      let release: () => void = () => undefined;
+      let release!: () => void;
       const evaluated = afterCore.step('evaluate', () => new Promise<void>((r) => (release = r)));
       evaluated.catch(() => undefined);
       (window as BootWindow).__boot = {
@@ -81,5 +76,5 @@ declare const __BOOT_BUILD__: string;
       };
       insertEntry(fail);
     })
-    .catch((e: unknown) => fail(`Download failed: ${e instanceof Error ? e.message : String(e)}`));
+    .catch((e: unknown) => fail(String(e)));
 })();

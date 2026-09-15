@@ -1,8 +1,8 @@
 # Blender hero assets: rider + bike (glTF)
 
-This directory builds the two glTF assets the render can load instead of the procedural
-Three.js bike/rider, to be compared side by side by a blind critic. Everything is generated
-by Python from scratch on every run (no hand-edited .blend); the .blend files are outputs.
+This directory builds the glTF assets the render loads for the bike and rider. Rider outfits have
+protected, editable Blender sources; their runtime GLBs and baked atlases are derived exports.
+The legacy `build_rider.py` and bike builder can still generate an initial asset from Python.
 
 ```
 assets/blender/
@@ -12,12 +12,66 @@ assets/blender/
                    text objects (Impact / DIN Condensed / Arial Black); cells in decals.CELLS
   build_bike.py    -> public/models/bike.glb  (+ `-- --lod` -> bike-lod.glb), bike.blend, textures/bike_*.jpg
   build_rider.py   -> public/models/rider.glb (+ `-- --lod` -> rider-lod.glb), rider.blend, textures/rider_*.jpg
+  rider_asset.py   protected rider seed/export commands; street is the default outfit
+  source/         rider-street.blend / rider-race.blend: authoritative editable sources
+  generated/      rider-{street,race}[-lod].blend: packed, baked export copies
+  verify_rider_asset.mjs  production meshopt decoder checks before output publication
   preview.py       Eevee renders of the EXPORTED .glb files -> previews/*.png (per colourway / LOD)
   textures/        baked atlases (JPEG), decals.png, chain_links.png, bike_spokecard.png
   previews/        turntables, rider-poses, composite-*, garage-*, compare-reference (suffix -pro / -lod)
 ```
 
-## Rebuild
+## Rider authoring and export
+
+Create each source once, then edit its parts, material graphs, and actions in Blender. `seed`
+refuses to overwrite an existing source. Only an intentional `seed --replace-source` replaces it.
+Street and race sources are separate; the selected outfit must match the source's saved metadata.
+
+```sh
+blender -b --python-exit-code 1 --python assets/blender/rider_asset.py -- seed --outfit street
+blender -b --python-exit-code 1 --python assets/blender/rider_asset.py -- seed --outfit race
+blender -b --python-exit-code 1 --python assets/blender/rider_asset.py -- export --outfit street
+blender -b --python-exit-code 1 --python assets/blender/rider_asset.py -- export --outfit street --lod
+blender -b --python-exit-code 1 --python assets/blender/rider_asset.py -- export --outfit race
+blender -b --python-exit-code 1 --python assets/blender/rider_asset.py -- export --outfit race --lod
+```
+
+Omitting `--outfit` selects `street`. Runtime paths are `public/models/rider-street.glb`,
+`rider-street-lod.glb`, `rider-race.glb`, and `rider-race-lod.glb`. Both outfits keep the
+`rider_rookie` / `rider_pro` material variants, independently of the outfit selection.
+
+The authoring source retains separate material regions, procedural material graphs, packed image
+dependencies, all eight actions, normalized weights, and a clean rest pose with animation disabled.
+Export loads that file and never runs the geometry builder or saves over the source. It joins a
+working copy, derives LOD by decimation, keeps the strongest four weights and normalizes them,
+bakes the material variants, and exports the existing actions. Its generated `.blend` also packs
+images, so it remains usable after the temporary bake directory is removed.
+
+The runtime contract is 19 exact deform bones, eight named actions, one skinned draw, and two
+material variants. Named empty sockets are retained. Extra deform bones, shape keys, Preserve
+Volume skinning, and other unapplied modifiers require an explicit export/runtime change; the
+pipeline rejects them. Keep the material graph's `BSDF` and `OUT` nodes used by the bake helper.
+
+Every output is staged first. `verify_rider_asset.mjs` checks the GLB metadata, decodes the actual
+meshopt vertex, index, skin, and animation data with the production loader, validates weight sums,
+and enforces the 6,000-triangle LOD limit. Only verified files replace final destinations. Each
+GLB has a `.source.json` report with source/output SHA-256 hashes and decoded counts. The source
+hash is checked again after export, including failure paths. Node.js and the installed repository
+dependencies are required; `--node` selects a Node executable.
+
+For a scratch export, set `--source`, `--models`, `--textures`, and `--generated` to paths under
+ignored `harness/out/`. `--size 256` is useful for pipeline checks; normal exports use 1024-pixel
+atlases, or 512 for LOD. Run the headless source-protection and roundtrip checks with:
+
+```sh
+python3 assets/blender/test_rider_asset.py
+```
+
+These tests create both sources in ignored temporary directories, add an authored socket, export
+full/LOD copies, inspect actual GLBs, and exercise overwrite, source-alias, invalid-weight,
+outfit-mismatch, and post-export validation failures. They do not alter committed assets.
+
+## Legacy rebuild and previews
 
 ```
 blender -b --python assets/blender/build_bike.py                 # ~6 s: two 1024 atlases, 3 albedo bakes
@@ -31,9 +85,18 @@ blender -b --python assets/blender/decals.py                     # re-render the
 ```
 Options after `--`: `--no-bake` (flat materials, fast), `--size N` (atlas px), `--no-meshopt`, `--lod`,
 Blender 5.2 at `/opt/homebrew/bin/blender`.
-Everything regenerates from scratch; `textures/decals.png` is rebuilt if absent.
+These legacy builder commands regenerate their outputs; `textures/decals.png` is rebuilt if absent.
+Use the protected workflow above to preserve rider authoring edits.
 
 ## Budgets (measured)
+
+Current branch checkpoint (unfinished; see `docs/BLENDER_HANDOFF.md`): bike
+29,780 triangles / 1,290,148 bytes; bike LOD 5,716 / 442,688; street rider
+8,621 / 794,352; street LOD 5,879 / 477,164; race rider 10,621 / 934,136;
+race LOD 5,879 / 527,912. The outfit `.source.json` reports bind counts to
+actual source/output hashes. **The tables and construction notes below are
+legacy baseline documentation**, including old geometry limitations; inspect
+the current masters and handoff before treating them as current measurements.
 
 | file | tris | bytes (meshopt) | textures |
 |---|---|---|---|

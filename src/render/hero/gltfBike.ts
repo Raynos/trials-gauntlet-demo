@@ -1,15 +1,12 @@
 /**
- * glTF bike (round 8): `public/models/bike.glb` driven exactly like the procedural bike.
- * File frame = rear axle at static sag (README): the scene sits at x −0.65 inside the
- * axle-midpoint `frame` group. Wheels spin at the physics wheel positions, `fork_lower`
- * slides along the fork axis to the front axle, `swingarm` aims at the rear axle,
- * `shock_body`/`shock_spring` stretch between the top mount and the swingarm link (spring
- * scaled), the chain texture scrolls with the rear spin, and the frame placement / visual
- * suspension is the shared `FramePlacer`.
+ * The glTF bike is a closed rigid mechanism driven by the physics wheel centers. Exported
+ * attachment markers define its rear-axle file frame, fork axis, swingarm and shock pivots.
+ * The fixed chassis frame is shared with physical rider contacts. The physical rear hinge
+ * and front slider keep the arm/fork coherent; shock and chain follow their actual endpoints.
  */
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { BIKE, ContactBlob, FramePlacer, type HeroBike } from '../bike/bikeModel';
+import { ContactBlob, FramePlacer, type HeroBike } from '../bike/bikeModel';
 import { WHEEL_RADIUS, type RenderFrame } from '../frame';
 import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
@@ -17,24 +14,41 @@ import { countTriangles, prepareHeroMaterials } from './gltf';
 import { SpokeBlur, variantMaterialsFor } from './lod';
 import type { BikeClass } from '../../core/types';
 
-const FILE = {
-  /** axle-midpoint frame → file frame (rear axle origin). */
-  shift: 0.65,
-  swingPivot: new THREE.Vector2(0.43, 0.1),
-  shockTop: new THREE.Vector2(0.6, 0.52),
-  shockRest: 0.6027,
-  chainLink: 0.0127,
-  rearSprocketR: 0.101,
-  frontSprocketR: 0.033,
-  frontAxle: new THREE.Vector2(1.3, 0),
-};
+/** A clockwise external-tangent belt, parametrized by arc-length fraction. */
+function beltPoint(u: number, rear: THREE.Vector3, rr: number, front: THREE.Vector3, fr: number, point: THREE.Vector3, normal: THREE.Vector3): number {
+  const dx = front.x - rear.x, dy = front.y - rear.y;
+  const distance = Math.hypot(dx, dy);
+  const phi = Math.atan2(dy, dx), alpha = Math.acos((rr - fr) / distance);
+  const top = phi + alpha, bottom = phi - alpha;
+  const tangent = Math.sqrt(distance * distance - (rr - fr) ** 2);
+  const frontArc = 2 * alpha * fr, total = 2 * tangent + frontArc + (Math.PI * 2 - 2 * alpha) * rr;
+  const v = (u - Math.floor(u)) * total;
+  let angle: number;
+  if (v < tangent) {
+    const k = v / tangent; angle = top;
+    point.set(rear.x + rr * Math.cos(top) + k * (dx + (fr - rr) * Math.cos(top)), rear.y + rr * Math.sin(top) + k * (dy + (fr - rr) * Math.sin(top)), rear.z);
+  } else if (v < tangent + frontArc) {
+    angle = top - (v - tangent) / fr;
+    point.set(front.x + fr * Math.cos(angle), front.y + fr * Math.sin(angle), rear.z);
+  } else if (v < 2 * tangent + frontArc) {
+    const k = (v - tangent - frontArc) / tangent; angle = bottom;
+    point.set(front.x + fr * Math.cos(bottom) + k * (-dx + (rr - fr) * Math.cos(bottom)), front.y + fr * Math.sin(bottom) + k * (-dy + (rr - fr) * Math.sin(bottom)), rear.z);
+  } else {
+    angle = bottom - (v - 2 * tangent - frontArc) / rr;
+    point.set(rear.x + rr * Math.cos(angle), rear.y + rr * Math.sin(angle), rear.z);
+  }
+  normal.set(Math.cos(angle), Math.sin(angle), 0);
+  return total;
+}
+
 
 export class GltfBike implements HeroBike {
   readonly root = new THREE.Group();
   readonly frame = new THREE.Group();
   readonly frameLocal = new THREE.Matrix4();
   readonly placer = new FramePlacer();
-  readonly exhaustTip = new THREE.Vector3(-0.83, 0.41, 0.15);
+  readonly exhaustTip = new THREE.Vector3();
+  readonly debug = { chassisShift: 0, angleCorrection: 0, frontTravel: 0, armLengthError: 0, shockLength: 0 };
   readonly triangles: number;
   /** The parsed document this instance was cloned from (`bike.glb` or `bike-lod.glb`): `applyModels` rebuilds on a tier change when it differs. */
   readonly source: GLTF;
@@ -52,6 +66,30 @@ export class GltfBike implements HeroBike {
   private livery: BikeClass = 'rookie';
   private readonly scene: THREE.Object3D;
   private readonly nodes: Record<string, THREE.Object3D | null>;
+  private readonly marks = new Map<string, THREE.Object3D>();
+  private readonly rest = new Map<string, THREE.Vector3>();
+  private readonly shift = new THREE.Vector3();
+  private readonly forkAxis = new THREE.Vector3();
+  private armLength = 0;
+  private readonly chassisOffset = new THREE.Vector3();
+  private readonly shockRestQ = new THREE.Quaternion();
+  private readonly shockRestDir = new THREE.Vector3();
+  private rodInset = 0;
+  private rodLength = 0;
+  private upperSeatOffset = 0;
+  private lowerSeatOffset = 0;
+  private springLength = 0;
+  private rearPitch = 0;
+  private frontPitch = 0;
+  private chainPitch = 0;
+  private chainRadius = 0;
+  private chainGeometry: THREE.BufferGeometry | null = null;
+  private readonly rearFile = new THREE.Vector3();
+  private readonly frontFile = new THREE.Vector3();
+  private readonly linkage = new THREE.Vector3();
+  private readonly rearSprocket = new THREE.Vector3();
+  private readonly beltCenter = new THREE.Vector3();
+  private readonly beltNormal = new THREE.Vector3();
   private readonly rearBlob = new ContactBlob();
   private readonly frontBlob = new ContactBlob();
   private readonly chainMap: THREE.Texture | null;
@@ -102,7 +140,28 @@ export class GltfBike implements HeroBike {
       }
       if (byClass.rookie && byClass.pro) this.variants.push({ mesh, byClass });
     });
-    this.scene.position.set(-FILE.shift, 0, 0);
+    this.scene.updateMatrixWorld(true);
+    for (const name of ['frame_origin', 'chassis_com', 'swing_pivot', 'swing_axle', 'shock_link', 'fork_top', 'front_axle_rest', 'rear_axle_rest', 'shock_top', 'shock_upper_seat', 'shock_lower_seat', 'shock_rod_top', 'shock_eye', 'countershaft', 'front_pitch', 'rear_sprocket', 'rear_pitch', 'exhaust_outlet']) {
+      const marker = this.scene.getObjectByName(`attach_${name}`);
+      if (!marker) throw new Error(`bike asset is missing attach_${name}; rebuild full and LOD together`);
+      this.marks.set(name, marker);
+      this.rest.set(name, this.scene.worldToLocal(marker.getWorldPosition(new THREE.Vector3())));
+    }
+    this.shift.copy(this.rest.get('frame_origin')!);
+    this.forkAxis.subVectors(this.rest.get('fork_top')!, this.rest.get('front_axle_rest')!).normalize();
+    this.v.subVectors(this.rest.get('swing_axle')!, this.rest.get('swing_pivot')!);
+    this.armLength = this.v.length();
+    this.chassisOffset.subVectors(this.shift, this.rest.get('chassis_com')!);
+    this.shockRestDir.subVectors(this.rest.get('shock_link')!, this.rest.get('shock_top')!).normalize();
+    this.upperSeatOffset = this.rest.get('shock_top')!.distanceTo(this.rest.get('shock_upper_seat')!);
+    this.lowerSeatOffset = this.rest.get('shock_link')!.distanceTo(this.rest.get('shock_lower_seat')!);
+    this.rodInset = this.rest.get('shock_top')!.distanceTo(this.rest.get('shock_rod_top')!);
+    this.rodLength = this.rest.get('shock_link')!.distanceTo(this.rest.get('shock_rod_top')!);
+    this.springLength = this.rest.get('shock_upper_seat')!.distanceTo(this.rest.get('shock_lower_seat')!);
+    this.rearPitch = this.rest.get('rear_pitch')!.distanceTo(this.rest.get('rear_sprocket')!);
+    this.frontPitch = this.rest.get('front_pitch')!.distanceTo(this.rest.get('countershaft')!);
+    this.exhaustTip.subVectors(this.rest.get('exhaust_outlet')!, this.shift);
+    this.scene.position.copy(this.shift).negate();
     this.frame.add(this.scene);
     this.root.add(this.frame, this.rearBlob.mesh, this.frontBlob.mesh);
     this.root.name = 'bike:gltf';
@@ -115,13 +174,26 @@ export class GltfBike implements HeroBike {
       swingarm: find('swingarm'),
       shockBody: find('shock_body'),
       shockSpring: find('shock_spring'),
+      shockShaft: find('shock_shaft'),
+      shockClevis: find('shock_clevis'),
       sprocketFront: find('sprocket_front'),
       chain: find('chain'),
     };
     const chain = this.nodes['chain'] as THREE.Mesh | null;
     const cm = chain?.material as THREE.MeshStandardMaterial | undefined;
-    this.chainMap = cm?.map ?? null;
-    if (this.chainMap) this.chainMap.wrapS = THREE.RepeatWrapping;
+    this.chainMap = cm?.map?.clone() ?? null;
+    if (cm && this.chainMap) {
+      cm.map = this.chainMap;
+      this.chainMap.wrapS = THREE.RepeatWrapping;
+      this.chainMap.needsUpdate = true;
+    }
+    if (!chain || !this.nodes['shockShaft'] || !this.nodes['shockClevis'] || !this.nodes['shockBody']) throw new Error('bike mechanism parts are missing');
+    this.chainPitch = Number(chain.userData['link_pitch']);
+    this.chainRadius = Number(chain.userData['tube_radius']);
+    if (!(this.chainPitch > 0 && this.chainRadius > 0)) throw new Error('bike chain parameters are missing');
+    this.chainGeometry = chain.geometry.clone();
+    chain.geometry = this.chainGeometry;
+    this.shockRestQ.copy(this.nodes['shockBody'].quaternion);
     for (const key of ['wheelRear', 'wheelFront'] as const) {
       const wheel = this.nodes[key];
       if (wheel) this.blurs.push(new SpokeBlur(wheel, this.materials));
@@ -131,51 +203,80 @@ export class GltfBike implements HeroBike {
   }
 
   update(f: RenderFrame): void {
-    this.placer.place(f, this.frame);
+    this.placeFromChassis(f);
     this.frameLocal.copy(this.frame.matrixWorld);
     const n = this.nodes;
-    // Wheels at the physics positions (file frame = frame-local + shift).
-    const ra = this.toLocal(f.rear.x, f.rear.y);
-    const rx = ra.x + FILE.shift;
-    const ry = ra.y;
-    const fa = this.toLocal(f.front.x, f.front.y);
-    const fx = fa.x + FILE.shift;
-    const fy = fa.y;
-    if (n['wheelRear']) {
-      n['wheelRear'].position.set(rx, ry, 0);
-      n['wheelRear'].rotation.z = -f.rear.spin;
-    }
-    if (n['wheelFront']) {
-      n['wheelFront'].position.set(fx, fy, 0);
-      n['wheelFront'].rotation.z = -f.front.spin;
-    }
-    // Spoke blur from the wheels' angular velocity (H2: never a timer).
+    // Physics spin is an absolute world angle. Remove the parent's rotation exactly once.
+    const rearAngle = -f.rear.spin - this.frame.rotation.z;
+    if (n['wheelRear']) { n['wheelRear'].position.copy(this.rearFile); n['wheelRear'].rotation.z = rearAngle; }
+    if (n['wheelFront']) { n['wheelFront'].position.copy(this.frontFile); n['wheelFront'].rotation.z = -f.front.spin - this.frame.rotation.z; }
     this.blurs[0]?.update(f.rear.spinVel);
     this.blurs[1]?.update(f.front.spinVel);
-    if (n['forkLower']) n['forkLower'].position.set(fx, fy, 0);
-    if (n['sprocketFront']) n['sprocketFront'].rotation.z = -f.rear.spin * (FILE.rearSprocketR / FILE.frontSprocketR);
-    // Swingarm aims at the rear axle (rest arm points at the rest axle).
-    const sp = FILE.swingPivot;
-    const restA = Math.atan2(-sp.y, -sp.x);
-    if (n['swingarm']) n['swingarm'].rotation.z = Math.atan2(ry - sp.y, rx - sp.x) - restA;
-    // Shock: local −y runs top mount → swingarm link; the coil scales with the length.
-    const lx = sp.x + (rx - sp.x) * BIKE.shockSwing;
-    const ly = sp.y + (ry - sp.y) * BIKE.shockSwing + 0.03;
-    const dx = lx - FILE.shockTop.x;
-    const dy = ly - FILE.shockTop.y;
-    const len = Math.hypot(dx, dy) || FILE.shockRest;
-    this.v.set(dx / len, dy / len, 0);
-    this.q.setFromUnitVectors(this.tmp3.set(0, -1, 0), this.v);
-    if (n['shockBody']) n['shockBody'].quaternion.copy(this.q);
-    if (n['shockSpring']) {
-      n['shockSpring'].quaternion.copy(this.q);
-      n['shockSpring'].scale.y = Math.max(0.55, Math.min(1.25, len / FILE.shockRest));
-    }
-    // Chain: u in link units.
-    if (this.chainMap) this.chainMap.offset.x = ((f.rear.spin * FILE.rearSprocketR) / FILE.chainLink) % 1;
-    // Contact blobs.
+    n['forkLower']!.position.copy(this.frontFile);
+    n['sprocketFront']!.rotation.z = rearAngle * this.rearPitch / this.frontPitch;
+    const pivot = this.rest.get('swing_pivot')!, axle = this.rest.get('swing_axle')!;
+    n['swingarm']!.rotation.z = Math.atan2(this.rearFile.y - pivot.y, this.rearFile.x - pivot.x) - Math.atan2(axle.y - pivot.y, axle.x - pivot.x);
+    this.debug.armLengthError = Math.abs(this.rearFile.distanceTo(pivot) - this.armLength);
+    // The lug is part of the rigid arm, including its offset perpendicular to that arm.
+    this.markerPoint('shock_link', this.linkage);
+    const top = this.rest.get('shock_top')!;
+    this.v.subVectors(this.linkage, top);
+    const length = this.v.length();
+    this.debug.shockLength = length;
+    this.v.multiplyScalar(1 / length);
+    this.q.setFromUnitVectors(this.shockRestDir, this.v).multiply(this.shockRestQ);
+    n['shockBody']!.quaternion.copy(this.q);
+    n['shockClevis']!.position.copy(this.linkage);
+    n['shockClevis']!.quaternion.copy(this.q);
+    n['shockShaft']!.position.copy(this.linkage);
+    n['shockShaft']!.quaternion.copy(this.q);
+    n['shockShaft']!.scale.y = (length - this.rodInset) / this.rodLength;
+    n['shockSpring']!.position.copy(top).addScaledVector(this.v, this.upperSeatOffset);
+    n['shockSpring']!.quaternion.copy(this.q);
+    n['shockSpring']!.scale.y = (length - this.upperSeatOffset - this.lowerSeatOffset) / this.springLength;
+    this.markerPoint('rear_sprocket', this.rearSprocket);
+    this.deformChain(rearAngle);
     this.placeContact(this.rearBlob, f.rear.x, f.rear.y, f.rear.grounded, f.rear.compression, f.bikeAngle);
     this.placeContact(this.frontBlob, f.front.x, f.front.y, f.front.grounded, f.front.compression, f.bikeAngle);
+  }
+
+  private markerPoint(name: string, out: THREE.Vector3): THREE.Vector3 {
+    return this.scene.worldToLocal(this.marks.get(name)!.getWorldPosition(out));
+  }
+
+  /** The same fixed chassis-to-asset frame used by physics rider contacts. Suspension
+   * belongs to the physical hinge/slider; it never moves the visual chassis or its grips.
+   * The exported COM marker is authoritative, including after a legacy-model hot swap.
+   */
+  private placeFromChassis(f: RenderFrame): void {
+    const offset = this.chassisOffset, c = Math.cos(f.bikeAngle), s = Math.sin(f.bikeAngle);
+    this.placer.originOffset.set(offset.x, offset.y);
+    this.placer.calibrated = true;
+    this.frame.position.set(f.bikeX + offset.x * c - offset.y * s, f.bikeY + offset.x * s + offset.y * c, offset.z);
+    this.frame.rotation.z = f.bikeAngle;
+    this.frame.updateMatrixWorld(true);
+    this.rearFile.set(f.rear.x, f.rear.y, 0); this.frame.worldToLocal(this.rearFile).add(this.shift);
+    this.frontFile.set(f.front.x, f.front.y, 0); this.frame.worldToLocal(this.frontFile).add(this.shift);
+    this.v.subVectors(this.frontFile, this.rest.get('front_axle_rest')!);
+    this.debug.frontTravel = this.v.dot(this.forkAxis);
+    this.debug.chassisShift = 0;
+    this.debug.angleCorrection = 0;
+  }
+
+  private deformChain(rearAngle: number): void {
+    const geometry = this.chainGeometry!;
+    const pos = geometry.getAttribute('position'), normal = geometry.getAttribute('normal'), uv = geometry.getAttribute('uv');
+    const front = this.rest.get('countershaft')!;
+    let length = 0;
+    for (let i = 0; i < pos.count; i++) {
+      length = beltPoint(uv.getX(i), this.rearSprocket, this.rearPitch, front, this.frontPitch, this.beltCenter, this.beltNormal);
+      const a = (1 - uv.getY(i)) * Math.PI * 2; // Blender UV v is flipped by glTF export
+      const radial = Math.cos(a), lateral = -Math.sin(a);
+      pos.setXYZ(i, this.beltCenter.x + this.beltNormal.x * this.chainRadius * radial, this.beltCenter.y + this.beltNormal.y * this.chainRadius * radial, this.beltCenter.z + this.chainRadius * lateral);
+      normal.setXYZ(i, this.beltNormal.x * radial, this.beltNormal.y * radial, lateral);
+    }
+    pos.needsUpdate = true; normal.needsUpdate = true;
+    if (this.chainMap) { this.chainMap.repeat.x = length / this.chainPitch; this.chainMap.offset.x = (rearAngle * this.rearPitch / this.chainPitch) % 1; }
   }
 
   private placeContact(b: ContactBlob, wx: number, wy: number, grounded: boolean, compression: number, bikeAngle: number): void {
@@ -213,5 +314,12 @@ export class GltfBike implements HeroBike {
   dispose(): void {
     for (const b of this.blurs) b.dispose();
     for (const m of this.materials) m.dispose();
+    this.chainMap?.dispose();
+    this.chainGeometry?.dispose();
+    for (const blob of [this.rearBlob, this.frontBlob]) {
+      blob.mesh.geometry.dispose();
+      const material = blob.mesh.material as THREE.MeshBasicMaterial;
+      material.map?.dispose(); material.dispose();
+    }
   }
 }

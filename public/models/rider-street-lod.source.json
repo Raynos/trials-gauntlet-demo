@@ -1,0 +1,29 @@
+{
+  "source": "assets/blender/source/rider-street.blend",
+  "sourceSha256": "5daa71da5f1f8cb2d39fb7d3fc0aa0eadd1ba3a74fd350b69a4b940683104376",
+  "exportSha256": "4d7c5974485a509bd7682ed49ee6c4acfc383263dbc9085f74417a52e8f6dbca",
+  "outfit": "street",
+  "lod": true,
+  "verified": {
+    "bytes": 477164,
+    "triangles": 5879,
+    "vertices": 5464,
+    "bones": 19,
+    "clips": [
+      "crouch",
+      "extend",
+      "forward_attack",
+      "hang_back",
+      "idle_breathe",
+      "land_absorb",
+      "sit_cruise",
+      "stand_attack"
+    ],
+    "variants": [
+      "rider_rookie",
+      "rider_pro"
+    ],
+    "maxWeightError": 2.9802322387695312e-08,
+    "loadedWeightError": 2.9802322387695312e-08
+  }
+}

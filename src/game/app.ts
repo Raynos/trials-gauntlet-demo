@@ -10,7 +10,7 @@
  * results. The menu renders over the live 3D scene with `BACKDROP_TRACK`
  * loaded in the `menu` phase (the key art plate covers it once decoded).
  */
-import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RunResult, TrackDef, TrialsHook } from '../core/types';
+import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RiderOutfit, RunResult, TrackDef, TrialsHook } from '../core/types';
 import type { AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
 import {
@@ -62,6 +62,7 @@ import {
 } from '../ui';
 import { tickLive } from '../ui/live';
 import { applyOrientation } from '../ui/orientation';
+import { loadRiderOutfit, saveRiderOutfit } from '../ui/outfit';
 import { BACKDROP_TRACK } from './flow';
 import { Percentiles, type Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
@@ -98,6 +99,10 @@ export interface AppOptions {
   perf?: boolean | undefined;
   /** Bike class changed (garage preview or track launch): the renderer may repaint the hero (`setBikeClass`). */
   onBikeChange?: ((bike: BikeClass) => void) | undefined;
+  /** Outfit resolved at boot (including a URL override), shared with the renderer. */
+  riderOutfit?: RiderOutfit | undefined;
+  /** A committed cosmetic choice; changes clothing without restarting the bike or track. */
+  onRiderOutfitChange?: ((outfit: RiderOutfit) => void) | undefined;
   /** `?trace=1`: live InputFrame bars under the HUD timer (filming the phone). */
   trace?: boolean | undefined;
   /** `?lab=1`: the physics lab HUD on every track (it is automatic on `lab-*` tracks). */
@@ -171,6 +176,7 @@ export class App {
   private telemetryOn: boolean;
   /** Garage choice (null = never picked: the per-tier default applies). */
   private bikeChoice: BikeClass | null;
+  private riderOutfit: RiderOutfit;
   /** Bike class of the last launched track (medium's default, and what the Garage opens on). */
   private lastRidden: BikeClass | null = null;
   private qualityWhy: string;
@@ -234,6 +240,7 @@ export class App {
     this.ghostOn = loadGhostEnabled();
     this.telemetryOn = loadTelemetryEnabled();
     this.bikeChoice = loadBikeChoice();
+    this.riderOutfit = o.riderOutfit ?? loadRiderOutfit();
     this.qualityWhy = this.qualityChoice === 'auto' ? 'pending probe' : 'manual (settings)';
     this.sfx = new UiSfx(this.audio as { context?: AudioContext | null } | undefined);
     this.sfx.setEnabled(this.soundOn);
@@ -344,6 +351,11 @@ export class App {
     this.garage = new GarageScreen(o.uiRoot, this.sfx, this.art, {
       previewBike: (b) => this.applyBike(b, false),
       setBike: (b) => this.applyBike(b, true),
+      setOutfit: (outfit) => {
+        this.riderOutfit = outfit;
+        saveRiderOutfit(outfit);
+        this.o.onRiderOutfitChange?.(outfit);
+      },
       back: () => this.goto('menu'),
     });
     this.onboard = new OnboardingCard(o.uiRoot, () => {
@@ -659,7 +671,7 @@ export class App {
       this.menu.show();
     } else if (screen === 'garage') {
       this.garage.setDevice(dev);
-      this.garage.show(this.bikeInEffect());
+      this.garage.show(this.bikeInEffect(), this.riderOutfit);
     } else if (screen === 'tracks') {
       this.tracksScreen.build(this.tracks);
       this.tracksScreen.setDevice(dev);

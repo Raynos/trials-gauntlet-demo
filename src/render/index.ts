@@ -6,7 +6,7 @@
  * captures of one recording are pixel-identical. See docs/design/rendering.md.
  */
 import * as THREE from 'three';
-import type { BikeClass, CameraDebug, CompiledTrack, GameEvent, GamePhase, PhysicsState, QualityTier, RenderStats } from '../core/types';
+import type { BikeClass, CameraDebug, CompiledTrack, GameEvent, GamePhase, PhysicsState, QualityTier, RenderStats, RiderOutfit } from '../core/types';
 import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
@@ -16,6 +16,7 @@ import type { PrepareStep } from '../boot/steps';
 import { isRiderLodEnabled, lodChoice, setRiderLodEnabled } from './hero/lod';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
+import { riderUrl } from './hero/urls';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { CameraRig } from './camera/rig';
 import { FrameBuilder } from './frame';
@@ -68,6 +69,7 @@ export interface GameRenderer {
    * (materials only; no rebuild, no frame skipped).
    */
   setBikeClass?(c: BikeClass): void;
+  setRiderOutfit?(outfit: RiderOutfit): void;
 }
 
 export interface ThreeRendererOptions {
@@ -82,6 +84,7 @@ export interface ThreeRendererOptions {
    */
   riderModel?: ModelChoice;
   bikeModel?: ModelChoice;
+  riderOutfit?: RiderOutfit;
   /** Boot plan: the DOWNLOAD counter for the hero glTF files the constructor starts fetching (docs/tasks/loading-progress-invariant.md). */
   heroBytes?: ByteProgress;
   /** Boot plan: the DOWNLOAD counter for the art pack's boot set; given, the constructor starts `art.load()` at once (the `bootArt` step awaits it). */
@@ -97,7 +100,7 @@ const WORLD_MESH = /^(props:|deck:|obstacles:|ribbon:)/;
 /** The surfaces the bike rides — the only shadow receivers on `low` (the deck AO skirt excluded). */
 const RIDE_SURFACE = /^(deck:(?!ao)|obstacles:|ribbon:)/;
 /** Hero parts too small to change the 512² silhouette on `low` (chain, sprockets, shock, pegs, spokes): no shadow draw there. */
-const HERO_SMALL = /^(chain|sprocket_(front|rear)|shock_(body|spring)|pegs|wheel_(front|rear)(_spokes|:spokes))$/;
+const HERO_SMALL = /^(chain|sprocket_(front|rear)|shock_(body|spring|shaft|clevis)|pegs|wheel_(front|rear)(_spokes|:spokes))$/;
 
 export interface RenderBudget {
   calls: number;
@@ -143,6 +146,8 @@ export class ThreeRenderer implements GameRenderer {
   private models: ModelChoices = { riderModel: 'proc', bikeModel: 'proc' };
   private readonly nearestScratch: number[] = [];
   private bikeClass: BikeClass = 'rookie';
+  private riderOutfit: RiderOutfit = 'street';
+  private riderDocumentOutfit: RiderOutfit | null = null;
   /** Parsed hero documents: the authored files and (round 13) their `-lod.glb` twins for `low` / `medium`. */
   private readonly gltf: { bike: GLTF | null; rider: GLTF | null; bikeLod: GLTF | null; riderLod: GLTF | null } = { bike: null, rider: null, bikeLod: null, riderLod: null };
   /** In-flight setModels (glTF load + swap); `whenReady` waits for it. */
@@ -237,6 +242,7 @@ export class ThreeRenderer implements GameRenderer {
     // meshes, the post chain, the procedural textures and the art pack are built by
     // `prepare()` in ≤ 16 ms tasks (or lazily by the first call that needs them).
     {
+      this.riderOutfit = options.riderOutfit ?? 'street';
       const riderModel: ModelChoice = options.riderModel ?? 'gltf';
       const bikeModel: ModelChoice = options.bikeModel ?? 'gltf';
       if (riderModel === 'gltf' || bikeModel === 'gltf') this.setModels({ riderModel, bikeModel }, options.heroBytes);
@@ -352,11 +358,27 @@ export class ThreeRenderer implements GameRenderer {
   setModels(m: ModelChoices, bytes?: ByteProgress): void {
     this.models = { riderModel: m.riderModel === 'gltf' ? 'gltf' : 'proc', bikeModel: m.bikeModel === 'gltf' ? 'gltf' : 'proc' };
     const want = this.models;
+    const outfit = this.riderOutfit;
     this.heroLoading++;
     const run = async (): Promise<void> => {
-      if (want.bikeModel === 'gltf' && !this.gltf.bike) [this.gltf.bike, this.gltf.bikeLod] = await Promise.all([loadGltf(HERO_URLS.bike, false, bytes), loadGltf(lodUrl(HERO_URLS.bike), true, bytes)]);
-      if (want.riderModel === 'gltf' && !this.gltf.rider) [this.gltf.rider, this.gltf.riderLod] = await Promise.all([loadGltf(HERO_URLS.rider, false, bytes), loadGltf(lodUrl(HERO_URLS.rider), true, bytes)]);
-      if (want !== this.models) return; // superseded
+      const url = riderUrl(outfit);
+      const [bike, rider] = await Promise.all([
+        want.bikeModel === 'gltf' && !this.gltf.bike
+          ? Promise.all([loadGltf(HERO_URLS.bike, false, bytes), loadGltf(lodUrl(HERO_URLS.bike), true, bytes)])
+          : Promise.resolve([this.gltf.bike, this.gltf.bikeLod]),
+        want.riderModel === 'gltf' && (!this.gltf.rider || this.riderDocumentOutfit !== outfit)
+          ? Promise.all([loadGltf(url, false, bytes), loadGltf(lodUrl(url), true, bytes)])
+          : Promise.resolve([this.gltf.rider, this.gltf.riderLod]),
+      ]);
+      // A superseded outfit request must not even overwrite the stored documents: a later
+      // quality change could otherwise resurrect the old outfit despite its swap being skipped.
+      if (want !== this.models || outfit !== this.riderOutfit) return;
+      [this.gltf.bike, this.gltf.bikeLod] = [bike[0] ?? null, bike[1] ?? null];
+      if (want.riderModel === 'gltf') {
+        if (!rider[0]) throw new Error(`Could not load ${outfit} rider outfit`);
+        [this.gltf.rider, this.gltf.riderLod] = [rider[0], rider[1] ?? null];
+        this.riderDocumentOutfit = outfit;
+      }
       this.applyModels();
     };
     this.heroPending = run()
@@ -364,6 +386,12 @@ export class ThreeRenderer implements GameRenderer {
       .then(() => {
         this.heroLoading--;
       });
+  }
+
+  setRiderOutfit(outfit: RiderOutfit): void {
+    if (outfit === this.riderOutfit) return;
+    this.riderOutfit = outfit;
+    if (this.models.riderModel === 'gltf') this.setModels(this.models);
   }
 
   /** The document the tier draws: `high` the authored file, `low` / `medium` the LOD twin when it loaded. */
@@ -1296,6 +1324,7 @@ export class ThreeRenderer implements GameRenderer {
     heroTris: number;
     heroDoc: string;
     heroShadow: 'hero-only' | 'world';
+    riderOutfit: RiderOutfit | null;
     trackCalls: number;
     trackTris: number;
     textureGenMs: number;
@@ -1336,6 +1365,7 @@ export class ThreeRenderer implements GameRenderer {
       shadowMap,
       heroTris: (this.bikeRef?.triangles ?? 0) + (this.riderRef?.triangles ?? 0),
       heroDoc: `${this.bikeRef instanceof GltfBike ? (this.bikeRef.source === this.gltf.bikeLod ? 'bike-lod' : 'bike') : 'bike-proc'} ${this.riderRef instanceof GltfRider ? (this.riderRef.source === this.gltf.riderLod ? 'rider-lod' : 'rider') : 'rider-proc'}`,
+      riderOutfit: this.riderRef instanceof GltfRider ? this.riderDocumentOutfit : null,
       heroShadow: this.lightingRig?.isHeroShadow ? 'hero-only' : 'world',
       trackCalls: this.world?.trackCalls ?? 0,
       trackTris: Math.round(this.world?.trackTris ?? 0),

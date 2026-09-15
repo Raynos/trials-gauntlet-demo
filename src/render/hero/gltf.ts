@@ -9,7 +9,7 @@ import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { prepareHero } from './lod';
 import { fogify } from '../lighting/environment';
-import { HERO_URLS, lodUrl } from './urls';
+import { HERO_URLS, lodUrl, modelAssetUrl } from './urls';
 import type { ByteProgress } from '../../boot/plan';
 
 export { HERO_URLS, lodUrl };
@@ -28,6 +28,7 @@ const cache = new Map<string, Promise<GLTF | null>>();
  * without `<wheel>_spokes`, `KHR_materials_variants` table) runs before anyone clones the document.
  */
 export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Promise<GLTF | null> {
+  url = modelAssetUrl(url);
   let p = cache.get(url);
   if (!p) {
     const loader = new GLTFLoader();

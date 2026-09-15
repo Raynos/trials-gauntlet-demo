@@ -216,7 +216,7 @@ def make_materials():
     # -- front fender: black plastic with NORDVIK on the nose (fork_upper object, origin = head_bot)
     m = C.new_mat("fender", (0.022, 0.022, 0.024, 1), rough=0.62, metal=0.0)
     a = math.radians(42)
-    c = (P["front"] + V(0.40 * math.cos(a), 0, 0.40 * math.sin(a))) - P["head_bot"]
+    c = V(0.40 * math.cos(a), 0, 0.40 * math.sin(a))
     col = C.decal(m, (0.022, 0.022, 0.024, 1), SHEET, _DC["nordvik"], c, Vector((0, 1, 0)), Vector((-math.sin(a), 0, math.cos(a))), 0.10, 0.028, (0.85, 0.85, 0.86, 1), facing=Vector((math.cos(a), 0, math.sin(a))), min_facing=0.4, depth=0.04)
     C.link(m, col, C.bsdf(m).inputs["Base Color"])
     C.bump(m, C.noise_fac(m, scale=300, detail=2), strength=0.06, distance=0.0005)
@@ -512,54 +512,75 @@ def chain_path(c1, r1, c2, r2, y):
     return pts
 
 
+def belt_sample(u, rear, rr, front, fr):
+    """Clockwise chain path: upper tangent rear -> front, then both sprocket wraps."""
+    d = front - rear
+    distance = math.hypot(d.x, d.z)
+    phi = math.atan2(d.z, d.x)
+    alpha = math.acos((rr - fr) / distance)
+    upper, lower = phi + alpha, phi - alpha
+    tangent = math.sqrt(distance * distance - (rr - fr) ** 2)
+    front_arc, rear_arc = 2 * alpha * fr, (C.TAU - 2 * alpha) * rr
+    total = 2 * tangent + front_arc + rear_arc
+    v = (u % 1) * total
+    if v < tangent:
+        k = v / tangent
+        a = rear + V(rr * math.cos(upper), 0, rr * math.sin(upper))
+        b = front + V(fr * math.cos(upper), 0, fr * math.sin(upper))
+        point, angle = a.lerp(b, k), upper
+    elif v < tangent + front_arc:
+        angle = upper - (v - tangent) / fr
+        point = front + V(fr * math.cos(angle), 0, fr * math.sin(angle))
+    elif v < 2 * tangent + front_arc:
+        k = (v - tangent - front_arc) / tangent
+        a = front + V(fr * math.cos(lower), 0, fr * math.sin(lower))
+        b = rear + V(rr * math.cos(lower), 0, rr * math.sin(lower))
+        point, angle = a.lerp(b, k), lower
+    else:
+        angle = lower - (v - 2 * tangent - front_arc) / rr
+        point = rear + V(rr * math.cos(angle), 0, rr * math.sin(angle))
+    return point, V(math.cos(angle), 0, math.sin(angle)), total
+
+
 def build_chain(M, c_rear, r_rear, c_front, r_front, y):
-    pts = chain_path(c_front, r_front, c_rear, r_rear, y)  # arcs: front wrap then rear wrap
-    # resample by arc length so links are even
-    total = sum((pts[(i + 1) % len(pts)] - pts[i]).length for i in range(len(pts)))
-    pitch = 0.0127
-    nlinks = int(round(total / pitch))
-    step = total / nlinks
-    dense = []
-    acc = 0.0
-    tgt = 0.0
-    i = 0
-    n = len(pts)
-    while len(dense) < nlinks:
-        a = pts[i % n]
-        bpt = pts[(i + 1) % n]
-        seg = (bpt - a).length
-        while tgt <= acc + seg + 1e-9 and len(dense) < nlinks:
-            t = (tgt - acc) / seg if seg > 0 else 0
-            dense.append(a.lerp(bpt, t))
-            tgt += step
-        acc += seg
-        i += 1
-    b = MeshBuilder("chain")
-    # ribbon: 4-sided tube, flattened in y
-    bm = prim_tube(dense, 0.006, sides=4, samples=1, closed=True, cap=False, smooth_path=False)
-    bmesh.ops.scale(bm, vec=(1, 1, 1), verts=bm.verts)
-    # flatten: scale local ring in the y direction by hand (ring verts alternate normal/binormal)
-    b.add(bm, Matrix.Identity(4), M["chain"], smooth=False)
-    bm.free()
-    ob = b.build()
-    # UVs: u along the loop in link units (texture tiles once per link), v across
-    me = ob.data
+    # UV.u is an arc-length fraction of the closed loop, UV.v identifies the tube corner.
+    # These stable parameters survive meshopt vertex reordering and let runtime deform the
+    # actual exported chain mesh; chain topology is excluded from collapse decimation.
+    count = 48 if LOD else 96
+    radius = 0.006
+    vertices, faces = [], []
+    for i in range(count):
+        point, normal, total = belt_sample(i / count, c_rear, r_rear, c_front, r_front)
+        point.y = y
+        for corner in range(4):
+            angle = C.TAU * corner / 4
+            vertices.append(point + normal * (radius * math.cos(angle)) + V(0, radius * math.sin(angle), 0))
+    for i in range(count):
+        for corner in range(4):
+            faces.append((i * 4 + corner, ((i + 1) % count) * 4 + corner,
+                          ((i + 1) % count) * 4 + (corner + 1) % 4, i * 4 + (corner + 1) % 4))
+    me = bpy.data.meshes.new("chain")
+    me.from_pydata(vertices, [], faces)
+    me.materials.append(M["chain"])
     uv = me.uv_layers.new(name="UVMap")
-    nv = len(me.vertices)
-    ring_count = nv // 4
-    # vertex k belongs to ring k//4, corner k%4 (see prim_tube ordering)
     for poly in me.polygons:
+        poly.use_smooth = True
+        ring = poly.index // 4
         for li in poly.loop_indices:
             vi = me.loops[li].vertex_index
-            ring = vi // 4
-            corner = vi % 4
-            u = ring
-            # avoid the wrap seam: the last ring's quad to ring 0 gets u = ring_count
-            if ring == 0 and any((me.loops[l2].vertex_index // 4) == ring_count - 1 for l2 in poly.loop_indices):
-                u = ring_count
-            v = [0.0, 0.5, 1.0, 0.5][corner]
-            uv.data[li].uv = (u, v)
-    set_origin(ob, c_rear)
+            index, corner = divmod(vi, 4)
+            u = 1.0 if ring == count - 1 and index == 0 else index / count
+            uv.data[li].uv = (u, corner / 4)
+    ob = bpy.data.objects.new("chain", me)
+    bpy.context.scene.collection.objects.link(ob)
+    ob["tube_radius"] = radius
+    ob["link_pitch"] = 0.0127
+    ob["rest_length"] = total
+    mapping = C.node(M["chain"], "ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (total / 0.0127, 1, 1)
+    tex = next(node for node in M["chain"].node_tree.nodes if node.type == "TEX_IMAGE")
+    C.link(M["chain"], C.texcoord(M["chain"]).outputs["UV"], mapping.inputs["Vector"])
+    C.link(M["chain"], mapping.outputs["Vector"], tex.inputs["Vector"])
     return ob
 
 
@@ -791,6 +812,8 @@ def build_swingarm(M):
         bm.free()
         # axle blocks
         add_box(b, ax + V(0.0, y, 0), (0.08, 0.03, 0.05), M["anod"], bevel=0.006)
+        # Machined axle end cap, centered on the actual axle rather than a decorative marker.
+        add_cyl(b, ax + V(0, s * 0.13, 0), ax + V(0, s * 0.15, 0), 0.015, 0.015, M["anod"], seg=16)
     # pivot barrel + cross brace ahead of the tyre
     add_cyl(b, pv + V(0, -0.13, 0), pv + V(0, 0.13, 0), 0.028, mat=alloy, seg=14)
     add_box(b, pv.lerp(ax, 0.30) + V(0, 0, 0.06), (0.06, 0.24, 0.05), alloy, bevel=0.01)
@@ -807,49 +830,43 @@ def build_swingarm(M):
 
 def build_shock(M):
     top = P["shock_top"]
-    pv, ax = P["pivot"], P["rear"]
-    bot = pv.lerp(ax, P["shock_swing"]) + V(0, 0, 0.03)
-    d = bot - top
-    L = d.length
-    n = d.normalized()
-    b = MeshBuilder("shock_body")
-    add_cyl(b, top - n * 0.02, top + n * 0.03, 0.03, 0.03, M["anod"], seg=14)  # top eye/mount
-    add_cyl(b, top + n * 0.03, top + n * 0.36, 0.026, 0.026, M["anod"], seg=14)  # body
-    add_cyl(b, top + n * 0.36, top + n * (L - 0.03), 0.012, 0.012, M["gold"], seg=10)  # shaft
-    add_cyl(b, top + n * (L - 0.04), top + n * L, 0.024, 0.024, M["anod"], seg=12)  # bottom clevis
-    # piggyback reservoir
+    bottom = P["pivot"].lerp(P["rear"], P["shock_swing"]) + V(0, 0, 0.03)
+    n = (bottom - top).normalized()
+    L = (bottom - top).length
     side = Vector((n.z, 0, -n.x))
+    b = MeshBuilder("shock_body")
+    add_cyl(b, top - n * 0.02, top + n * 0.03, 0.03, 0.03, M["anod"], seg=14)
+    add_cyl(b, top + n * 0.03, top + n * 0.36, 0.026, 0.026, M["anod"], seg=14)
+    add_cyl(b, top + n * 0.035, top + n * 0.05, 0.047, 0.047, M["anod"], seg=14)
     add_cyl(b, top + n * 0.05 + side * 0.05, top + n * 0.22 + side * 0.05, 0.02, 0.02, M["anod"], seg=12)
     add_cyl(b, top + n * 0.20 + side * 0.05, top + n * 0.28 + side * 0.05, 0.018, 0.012, M["red"], seg=12)
     body = finish(b, top)
-    # spring: coil from 0.05 to 0.38 along the axis
+    rod = MeshBuilder("shock_shaft")
+    add_cyl(rod, bottom, top + n * 0.32, 0.012, 0.012, M["gold"], seg=10)
+    shaft = finish(rod, bottom)
+    end = MeshBuilder("shock_clevis")
+    add_cyl(end, bottom - n * 0.04, bottom, 0.024, 0.024, M["anod"], seg=12)
+    add_cyl(end, bottom - n * 0.055, bottom - n * 0.04, 0.047, 0.047, M["anod"], seg=14)
+    clevis = finish(end, bottom)
     bs = MeshBuilder("shock_spring")
-    turns = 8
+    upper_seat, lower_seat = top + n * 0.05, bottom - n * 0.055
     pts = []
-    R = 0.040
-    steps = turns * 12
-    z0, z1 = 0.05, 0.38
-    u = side
-    w = n.cross(u)
+    steps = 48 if LOD else 96
     for i in range(steps + 1):
         t = i / steps
-        a = t * turns * C.TAU
-        pts.append(top + n * (z0 + (z1 - z0) * t) + u * (R * math.cos(a)) + w * (R * math.sin(a)))
+        angle = t * 8 * C.TAU
+        pts.append(upper_seat.lerp(lower_seat, t) + side * (0.04 * math.cos(angle)) + n.cross(side) * (0.04 * math.sin(angle)))
     add_tube(bs, pts, 0.0055, M["paint"], sides=6, samples=1, smooth=False)
-    # seats
-    add_cyl(bs, top + n * 0.035, top + n * 0.05, 0.047, 0.047, M["anod"], seg=14)
-    add_cyl(bs, top + n * 0.38, top + n * 0.395, 0.047, 0.047, M["anod"], seg=14)
-    spring = finish(bs, top)
-    # orient both so local -Y(glTF) / -Z(Blender) runs down the shock: rotate object so its local Z = -n
+    spring = finish(bs, upper_seat)
+    # Preserve this complete rest frame at runtime, including its roll around the shock axis.
     q = (-n).to_track_quat("Z", "Y")
-    for ob in (body, spring):
-        Mrot = q.to_matrix().to_4x4()
-        inv = Mrot.inverted()
+    for ob in (body, shaft, clevis, spring):
+        inv = q.to_matrix().to_4x4().inverted()
         for v in ob.data.vertices:
             v.co = inv @ v.co
         ob.rotation_mode = "QUATERNION"
         ob.rotation_quaternion = q
-    return body, spring, L
+    return body, shaft, clevis, spring, L
 
 
 def build_forks(M):
@@ -861,8 +878,8 @@ def build_forks(M):
     b = MeshBuilder("fork_upper")
     off = 0.10  # stanchion spacing from the steering axis
     for s in (-1, 1):
-        a0 = fa + n * 0.40 + side * (s * off)  # top of the lowers overlap
-        a1 = ht + n * 0.09 + side * (s * off)
+        a0 = fa + n * 0.34 + side * (s * off)  # top of the lowers overlap
+        a1 = hb + n * 0.30 + side * (s * off)
         add_cyl(b, a0, a1, 0.019, 0.019, M["gold"], seg=14)
         add_cyl(b, a1, a1 + n * 0.012, 0.022, 0.022, M["anod"], seg=12)  # fork caps
     q = n.to_track_quat("Z", "Y").to_matrix().to_4x4()
@@ -893,11 +910,12 @@ def build_forks(M):
             ring.append(fa + V(rr * math.cos(a), y, rr * math.sin(a)))
         secs.append(ring)
     bm = loft(secs)
-    b.add(bm, Matrix.Identity(4), M["fender"])
-    bm.free()
+    fender_geometry = bm
     upper = finish(b, hb)
     # ---- lower: sliders from the axle up, axle lugs, caliper (left), brake hose guide
     b = MeshBuilder("fork_lower")
+    b.add(fender_geometry, Matrix.Identity(4), M["fender"])
+    fender_geometry.free()
     for s in (-1, 1):
         a0 = fa + side * (s * off)
         add_cyl(b, a0 - n * 0.01, a0 + n * 0.42, 0.025, 0.024, M["anod"], seg=14)
@@ -975,8 +993,8 @@ def main():
     objs["engine"] = build_engine(M)
     objs["exhaust"] = build_exhaust(M)
     objs["swingarm"] = build_swingarm(M)
-    body, spring, shock_len = build_shock(M)
-    objs["shock_body"], objs["shock_spring"] = body, spring
+    body, shaft, clevis, spring, shock_len = build_shock(M)
+    objs["shock_body"], objs["shock_shaft"], objs["shock_clevis"], objs["shock_spring"] = body, shaft, clevis, spring
     upper, lower = build_forks(M)
     objs["fork_upper"], objs["fork_lower"] = upper, lower
     objs["handlebar"] = build_handlebar(M)
@@ -986,7 +1004,7 @@ def main():
     objs["wheel_front"].location = P["front"]
     objs["wheel_rear"].location = P["rear"]
     objs["sprocket_rear"] = build_sprocket("sprocket_rear", P["rear"] + V(0, -0.092, 0), 0.105, 42, 0.006, M, M["alloy"])
-    cs = V(0.47, -0.105, 0.135)  # countershaft
+    cs = V(0.47, -0.092, 0.135)  # countershaft and rear sprocket share the chain plane
     objs["sprocket_front"] = build_sprocket("sprocket_front", cs, 0.036, 11, 0.007, M, M["alloy"])
     objs["chain"] = build_chain(M, P["rear"], 0.101, cs, 0.033, -0.092)
 
@@ -1008,14 +1026,55 @@ def main():
             p.use_smooth = True
     bpy.context.view_layer.update()
 
+    # Exported attachment frames are the runtime contract; authored geometry and runtime
+    # share these exact hard points. Empty nodes survive both full and LOD exports.
+    markers = []
+    def marker(name, point, parent=root):
+        ob = bpy.data.objects.new(name, None)
+        bpy.context.scene.collection.objects.link(ob)
+        ob.parent = parent
+        ob.location = parent.matrix_world.inverted() @ Vector(point)
+        markers.append(ob)
+        return ob
+    root["mechanism_version"] = 3
+    root["meshopt_exp_bits"] = 20
+    marker("attach_frame_origin", V(WB / 2, 0, 0))
+    marker("attach_chassis_com", V(0.585, 0, 0.21))
+    marker("attach_swing_pivot", P["pivot"])
+    marker("attach_swing_axle", P["rear"], objs["swingarm"])
+    link = P["pivot"].lerp(P["rear"], P["shock_swing"]) + V(0, 0, 0.03)
+    marker("attach_shock_link", link, objs["swingarm"])
+    marker("attach_fork_top", P["head_bot"])
+    marker("attach_front_axle_rest", P["front"])
+    marker("attach_rear_axle_rest", P["rear"])
+    marker("attach_shock_top", P["shock_top"])
+    n = (link - P["shock_top"]).normalized()
+    marker("attach_shock_upper_seat", P["shock_top"] + n * 0.05, body)
+    marker("attach_shock_lower_seat", link - n * 0.055, clevis)
+    marker("attach_shock_rod_top", P["shock_top"] + n * 0.32, body)
+    marker("attach_shock_eye", link, clevis)
+    marker("attach_countershaft", cs)
+    marker("attach_front_pitch", cs + V(0.033, 0, 0))
+    rear_sprocket = P["rear"] + V(0, -0.092, 0)
+    marker("attach_rear_sprocket", rear_sprocket, objs["wheel_rear"])
+    marker("attach_rear_pitch", rear_sprocket + V(0.101, 0, 0), objs["wheel_rear"])
+    marker("attach_exhaust_outlet", V(-0.045, -0.165, 0.445), objs["exhaust"])
+    for suffix, sign in (("L", -1), ("R", 1)):
+        marker("attach_grip_" + suffix, P["grip"] + V(0, sign * P["grip_y"], 0))
+        marker("attach_peg_" + suffix, P["pegs"] + V(0, sign * P["peg_y"], 0))
+    bpy.context.view_layer.update()
+
     tris = {o.name: C.tri_count(o) for o in all_obs}
     log("tris", tris, "total", sum(tris.values()))
     if LOD:
-        total = sum(tris.values())
+        protected = {"chain", "swingarm", "fork_upper", "fork_lower", "shock_body", "shock_shaft", "shock_clevis", "shock_spring"}
+        protected.update(o.name for o in all_obs if o.name.endswith("_blur") or o.name.endswith("_spokes"))
+        fixed = sum(tris[name] for name in protected)
+        reducible = sum(tris.values()) - fixed
+        ratio = min(1.0, (LOD_TRIS - fixed) / reducible)
         for o in all_obs:
-            if o.name.endswith("_blur") or o.name.endswith("_spokes"):
-                continue
-            C.decimate_to(o, max(12, int(tris[o.name] * LOD_TRIS / total)))
+            if o.name not in protected:
+                C.decimate_to(o, max(12, int(tris[o.name] * ratio)))
         tris = {o.name: C.tri_count(o) for o in all_obs}
         log("lod tris", tris, "total", sum(tris.values()))
 
@@ -1037,7 +1096,16 @@ def main():
     blend_path = os.path.join(C.HERE, OUT_NAME + ".blend")
     bpy.ops.wm.save_as_mainfile(filepath=blend_path, compress=True)
     out = os.path.join(C.MODELS, OUT_NAME + ".glb")
-    size = C.export_glb(out, all_obs + [root], animations=False, meshopt=MESHOPT)
+    # Blender 5.2 defaults its exponential meshopt filter to 12 bits (~1 mm here),
+    # while empty-node attachments retain float precision. Keep the actual machined
+    # geometry coincident with those attachments. This setting is scoped to this export.
+    from io_scene_gltf2.io.exp import meshopt as encoder
+    previous_bits = encoder.EXP_FILTER_BITS
+    try:
+        encoder.EXP_FILTER_BITS = 20
+        size = C.export_glb(out, all_obs + markers + [root], animations=False, meshopt=MESHOPT)
+    finally:
+        encoder.EXP_FILTER_BITS = previous_bits
     info = C.gltf_summary(out)
     log("glb", info)
     with open(os.path.join(C.HERE, OUT_NAME + ".stats.txt"), "w") as f:

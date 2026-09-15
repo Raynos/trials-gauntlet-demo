@@ -1,11 +1,125 @@
 /**
- * Rider v2 (physics-v2.md §9): the pose table (lean -> COM offset + body angle in chassis space), the
- * rate-limited target, the bounded servo pair, and the drawn chain (RIDER_CHAIN.md port from v1) whose
- * hips follow the rider BODY, so the crash sensors sit on the simulated rider. Pure functions; the world
- * owns the state.
+ * Rider v2: the coupled internal servo wrench, one declared posed whole-body mass profile, and its
+ * forward/inverse geometry maps. Solver attachments, crash sensors and rendering use the same map.
+ * Pure functions; the world owns state. The articulated mass geometry uses a fixed aggregate-inertia
+ * approximation rather than claiming independently simulated limb kinetic energy.
  */
-import { clamp, cos, PI, sin } from '../dmath';
+import { atan2, clamp, cos, PI, sin } from '../dmath';
 import type { PoseRow, TuningV2 } from './tuning';
+
+/** Relative COM motion measured in a frame rotating with the chassis. Forces are world-space. */
+export interface RiderServoKinematics {
+  offsetX: number;
+  offsetY: number;
+  errorX: number;
+  errorY: number;
+  angleError: number;
+  relativeVX: number;
+  relativeVY: number;
+  relativeW: number;
+  invMassC: number;
+  invMassR: number;
+  invInertiaC: number;
+  invInertiaR: number;
+}
+
+export interface RiderServoWrench {
+  x: number;
+  y: number;
+  torque: number;
+}
+
+/** Minimize .5 Fᵀ B F - rhsᵀ F over a force disk, for symmetric positive B. */
+function forceInDisk(a: number, b: number, d: number, x: number, y: number, radius: number, out: RiderServoWrench): void {
+  if (radius <= 0) {
+    out.x = out.y = 0;
+    return;
+  }
+  const det = a * d - b * b;
+  out.x = (d * x - b * y) / det;
+  out.y = (a * y - b * x) / det;
+  if (out.x * out.x + out.y * out.y <= radius * radius) return;
+  // The active disk constraint adds lambda*I. norm(rhs)/radius is a conservative upper
+  // bracket since B is positive. Taking the upper endpoint stays inside the physical cap.
+  let lo = 0;
+  let hi = Math.sqrt(x * x + y * y) / radius;
+  for (let i = 0; i < 28; i++) {
+    const lambda = (lo + hi) / 2;
+    const aa = a + lambda;
+    const dd = d + lambda;
+    const determinant = aa * dd - b * b;
+    const fx = (dd * x - b * y) / determinant;
+    const fy = (aa * y - b * x) / determinant;
+    if (fx * fx + fy * fy > radius * radius) lo = lambda;
+    else hi = lambda;
+  }
+  const aa = a + hi;
+  const dd = d + hi;
+  const determinant = aa * dd - b * b;
+  out.x = (dd * x - b * y) / determinant;
+  out.y = (aa * y - b * x) / determinant;
+}
+
+/**
+ * Implicit PD control of relative COM position and body angle. The corresponding internal wrench
+ * is +F at the rider COM, -F at that SAME world point on the chassis, and an equal/opposite torque
+ * pair. This conserves linear/angular momentum while giving the rider only the commanded torque.
+ *
+ * For r = COM_R - COM_C and j = (-r.y,r.x), the relative-rate response is the symmetric matrix
+ * A = [[(imC+imR)I + iiC*j*jᵀ, iiC*j], [iiC*jᵀ, iiC+iiR]]. It is positive semidefinite.
+ * Solve (I + dt*(D+dt*K)*A) wrench = K*error - (D+dt*K)*relativeRate, including rotation/translation
+ * coupling. The old separate COM damper and off-center grip/peg forces added uncommanded rider
+ * torque, overwhelming the angular actuator. No post-step pose/velocity clamps are involved.
+ */
+export function riderServoWrench(
+  tuning: Pick<TuningV2['rider'], 'kp' | 'kd' | 'kpsi' | 'cpsi' | 'tauMax'>,
+  k: RiderServoKinematics,
+  dt: number,
+  maxForce: number,
+  out: RiderServoWrench,
+): RiderServoWrench {
+  const h = tuning.kd + dt * tuning.kp;
+  const ha = tuning.cpsi + dt * tuning.kpsi;
+  const mass = k.invMassC + k.invMassR;
+  const jx = -k.offsetY;
+  const jy = k.offsetX;
+  const ic = k.invInertiaC;
+  const a00 = mass + ic * jx * jx;
+  const a01 = ic * jx * jy;
+  const a02 = ic * jx;
+  const a11 = mass + ic * jy * jy;
+  const a12 = ic * jy;
+  const a22 = ic + k.invInertiaR;
+  if (h === 0) {
+    out.x = out.y = 0;
+    out.torque = clamp((tuning.kpsi * k.angleError - ha * k.relativeW) / (1 + dt * ha * a22), -tuning.tauMax, tuning.tauMax);
+    return out;
+  }
+  // Divide by the positive gains to obtain symmetric B = H^-1 + dt*A. The bounded
+  // convex minimum respects each actuator's capacity without scaling down an unrelated axis.
+  const b00 = 1 / h + dt * a00;
+  const b01 = dt * a01;
+  const b02 = dt * a02;
+  const b11 = 1 / h + dt * a11;
+  const b12 = dt * a12;
+  const rhs0 = tuning.kp / h * k.errorX - k.relativeVX;
+  const rhs1 = tuning.kp / h * k.errorY - k.relativeVY;
+  if (ha === 0) {
+    forceInDisk(b00, b01, b11, rhs0, rhs1, maxForce, out);
+    out.torque = 0;
+    return out;
+  }
+  const b22 = 1 / ha + dt * a22;
+  const rhs2 = tuning.kpsi / ha * k.angleError - k.relativeW;
+  // First eliminate the free angular coordinate and solve the force-disk problem. If its
+  // angular optimum violates a torque bound, convexity places the bounded optimum on that
+  // boundary; solve the force disk once more with the actual available angular torque.
+  forceInDisk(b00 - b02 * b02 / b22, b01 - b02 * b12 / b22, b11 - b12 * b12 / b22, rhs0 - b02 * rhs2 / b22, rhs1 - b12 * rhs2 / b22, maxForce, out);
+  const torque = (rhs2 - b02 * out.x - b12 * out.y) / b22;
+  out.torque = clamp(torque, -tuning.tauMax, tuning.tauMax);
+  if (out.torque !== torque) forceInDisk(b00, b01, b11, rhs0 - b02 * out.torque, rhs1 - b12 * out.torque, maxForce, out);
+  return out;
+}
 
 // ---------------------------------------------------------------------------
 // Pose table
@@ -88,7 +202,7 @@ export const CH = {
   torso: 0.52,
   neck: 0.22,
   upperArm: 0.32,
-  forearm: 0.3,
+  forearm: 0.27,
   thigh: 0.46,
   shin: 0.43,
   shoulderHalf: 0.21,
@@ -96,70 +210,209 @@ export const CH = {
   ankleUp: 0.09,
   ankleFwd: 0.01,
 };
-export const GRIP_X = 0.27;
-export const GRIP_Y = 0.78;
-const GRIP_Z = 0.33;
-export const PEG_X = -0.14;
-export const PEG_Y = 0.02;
-const PEG_Z = 0.2;
-const ANKLE_X = PEG_X + CH.ankleFwd;
-const ANKLE_Y = PEG_Y + CH.ankleUp;
-const CANON = {
-  stand_attack: { hipX: -0.28, hipY: 0.85, torso: 40, head: 66 },
-  hang_back: { hipX: -0.57, hipY: 0.6, torso: 55, head: 75 },
-  forward_attack: { hipX: -0.22, hipY: 0.9, torso: 26, head: 42 },
-};
-const ELBOW_POLE = { x: 0.6, y: 0.5, z: 1.0 };
-const KNEE_POLE = { x: 1, y: 0.2, z: -0.15 };
-const ARM_REACH = (CH.upperArm + CH.forearm) * 0.985;
-const ARM_NEAR = 0.18;
-const LEG_REACH = (CH.thigh + CH.shin) * 0.985;
-const DEG = PI / 180;
 
-/** Canonical hips / torso / head for a lean (linear blends, as physics targets are; the render keeps its ease). */
-export function canonicalPose(lean: number): { hipX: number; hipY: number; torso: number; head: number } {
-  const S = CANON.stand_attack;
-  const H = CANON.hang_back;
-  const F = CANON.forward_attack;
-  const back = lean < 0 ? -lean : 0;
-  const fwd = lean > 0 ? lean : 0;
-  return {
-    hipX: S.hipX + (H.hipX - S.hipX) * back + (F.hipX - S.hipX) * fwd,
-    hipY: S.hipY + (H.hipY - S.hipY) * back + (F.hipY - S.hipY) * fwd,
-    torso: (S.torso + (H.torso - S.torso) * back + (F.torso - S.torso) * fwd) * DEG,
-    head: (S.head + (H.head - S.head) * back + (F.head - S.head) * fwd) * DEG,
-  };
+/** One authoring profile for the solver and render. Mass fractions are the de Leva adult-male
+ * segment row (1996, doi:10.1016/0021-9290(95)00178-6); joint-centre geometry, trunk midpoint,
+ * head/neck midpoint and foot centroid are explicit game-model approximations. Both outfits
+ * represent the same 75 kg person. This does not claim exact human tissue density or variable
+ * multibody inertia: the dynamics keep one declared aggregate inertia per bike configuration. */
+export const RIDER_PROFILE = {
+  stature: 1.78,
+  torso: CH.torso,
+  headCenter: CH.neck,
+  headNeckLength: 0.35,
+  upperArm: CH.upperArm,
+  forearm: CH.forearm,
+  thigh: CH.thigh,
+  shin: CH.shin,
+  shoulderHalf: CH.shoulderHalf,
+  hipHalf: CH.hipHalf,
+  grip: { x: 0.27, y: 0.78, z: 0.33 },
+  peg: { x: -0.14, y: 0.02, z: 0.2 },
+  wristFromGrip: { x: -0.025, y: 0.055 },
+  ankle: { x: -0.13, y: 0.11, z: 0.2 },
+  footCentroidFromAnkle: { x: 0.06, y: -0.055 },
+  mass: { headNeck: 0.0694, trunk: 0.4346, upperArm: 0.0271, forearm: 0.0162, hand: 0.0061, thigh: 0.1416, shin: 0.0433, foot: 0.0137 },
+  comFraction: { headNeck: 0.5, trunk: 0.5, upperArm: 0.5772, forearm: 0.4574, thigh: 0.4095, shin: 0.4395 },
+  poses: [
+    { lean: -1, hipX: -0.57, hipY: 0.60, torso: 55, head: 75 },
+    { lean: 0, hipX: -0.28, hipY: 0.85, torso: 40, head: 66 },
+    { lean: 1, hipX: -0.22, hipY: 0.90, torso: 26, head: 42 },
+  ],
+} as const;
+
+export interface RigPoint { x: number; y: number; z: number; }
+export interface RiderRigPose {
+  hips: RigPoint;
+  shoulders: RigPoint;
+  head: RigPoint;
+  elbow: RigPoint;
+  wrist: RigPoint;
+  grip: RigPoint;
+  knee: RigPoint;
+  ankle: RigPoint;
+  com: RigPoint;
+  torsoAngle: number;
+  headAngle: number;
+  armReach: number;
+  legReach: number;
+  residual: number;
 }
 
-function ik3(ax: number, ay: number, az: number, bx: number, by: number, bz: number, l1: number, l2: number, px0: number, py0: number, pz0: number): [number, number] {
-  let dx = bx - ax;
-  let dy = by - ay;
-  let dz = bz - az;
-  let d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-  const max = (l1 + l2) * 0.995;
-  const min = Math.abs(l1 - l2) + 0.02;
-  if (d < 1e-6) return [ax + l1, ay];
-  if (d > max || d < min) {
-    const k = (d > max ? max : min) / d;
-    dx *= k;
-    dy *= k;
-    dz *= k;
-    d = d > max ? max : min;
+export function makeRiderRigPose(): RiderRigPose {
+  const point = (): RigPoint => ({ x: 0, y: 0, z: 0 });
+  return { hips: point(), shoulders: point(), head: point(), elbow: point(), wrist: point(), grip: point(), knee: point(), ankle: point(), com: point(), torsoAngle: 0, headAngle: 0, armReach: 0, legReach: 0, residual: 0 };
+}
+
+function profileJoint(ax: number, ay: number, az: number, bx: number, by: number, bz: number, l1: number, l2: number, px: number, py: number, pz: number, out: RigPoint): number {
+  const dx = bx - ax, dy = by - ay, dz = bz - az;
+  const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+  const ux = dx / (distance || 1), uy = dy / (distance || 1), uz = dz / (distance || 1);
+  // This extrapolates the mass map outside the reachable workspace so a physical constraint
+  // can evaluate its gradient. The reach ratio remains explicit; it does not move/clamp the body.
+  const d = clamp(distance, Math.abs(l1 - l2) + 1e-5, (l1 + l2) * 0.999999);
+  const along = (l1 * l1 - l2 * l2 + d * d) / (2 * d);
+  const height = Math.sqrt(Math.max(0, l1 * l1 - along * along));
+  const dot = px * ux + py * uy + pz * uz;
+  px -= ux * dot; py -= uy * dot; pz -= uz * dot;
+  const poleLength = Math.sqrt(px * px + py * py + pz * pz) || 1;
+  out.x = ax + ux * along + height * px / poleLength;
+  out.y = ay + uy * along + height * py / poleLength;
+  out.z = az + uz * along + height * pz / poleLength;
+  return distance / (l1 + l2);
+}
+
+/** Forward mass/geometry map, all positions in axle coordinates. Only the left limb is stored;
+ * the right mirrors z and contributes the same sagittal mass distribution. Angles are radians. */
+export function riderRigFromHips(hipX: number, hipY: number, torso: number, out: RiderRigPose): RiderRigPose {
+  const p = RIDER_PROFILE;
+  const degrees = torso * 180 / PI;
+  const headDegrees = degrees <= 40 ? degrees + 16 + 10 * clamp((degrees - 26) / 14, 0, 1) : degrees + 26 - 6 * clamp((degrees - 40) / 15, 0, 1);
+  const head = headDegrees * PI / 180;
+  out.hips.x = hipX; out.hips.y = hipY; out.hips.z = 0;
+  const sx = hipX + p.torso * cos(torso), sy = hipY + p.torso * sin(torso);
+  out.shoulders.x = sx; out.shoulders.y = sy; out.shoulders.z = 0;
+  out.head.x = sx + p.headCenter * cos(head); out.head.y = sy + p.headCenter * sin(head); out.head.z = 0;
+  out.grip.x = p.grip.x; out.grip.y = p.grip.y; out.grip.z = p.grip.z;
+  out.wrist.x = p.grip.x + p.wristFromGrip.x; out.wrist.y = p.grip.y + p.wristFromGrip.y; out.wrist.z = p.grip.z;
+  out.ankle.x = p.ankle.x; out.ankle.y = p.ankle.y; out.ankle.z = p.ankle.z;
+  out.armReach = profileJoint(sx, sy, p.shoulderHalf, out.wrist.x, out.wrist.y, out.wrist.z, p.upperArm, p.forearm, 0.6, 0.5, 1, out.elbow);
+  out.legReach = profileJoint(hipX, hipY, p.hipHalf, p.ankle.x, p.ankle.y, p.ankle.z, p.thigh, p.shin, 1, 0.2, -0.15, out.knee);
+  const m = p.mass, f = p.comFraction;
+  const ex = out.elbow.x, ey = out.elbow.y, wx = out.wrist.x, wy = out.wrist.y;
+  const kx = out.knee.x, ky = out.knee.y, ax = p.ankle.x, ay = p.ankle.y;
+  out.com.x = m.trunk * (hipX + (sx - hipX) * f.trunk) + m.headNeck * (sx + p.headNeckLength * f.headNeck * cos(head))
+    + 2 * (m.upperArm * (sx + (ex - sx) * f.upperArm) + m.forearm * (ex + (wx - ex) * f.forearm) + m.hand * p.grip.x
+      + m.thigh * (hipX + (kx - hipX) * f.thigh) + m.shin * (kx + (ax - kx) * f.shin) + m.foot * (ax + p.footCentroidFromAnkle.x));
+  out.com.y = m.trunk * (hipY + (sy - hipY) * f.trunk) + m.headNeck * (sy + p.headNeckLength * f.headNeck * sin(head))
+    + 2 * (m.upperArm * (sy + (ey - sy) * f.upperArm) + m.forearm * (ey + (wy - ey) * f.forearm) + m.hand * p.grip.y
+      + m.thigh * (hipY + (ky - hipY) * f.thigh) + m.shin * (ky + (ay - ky) * f.shin) + m.foot * (ay + p.footCentroidFromAnkle.y));
+  out.com.z = 0;
+  out.torsoAngle = torso;
+  out.headAngle = head;
+  out.residual = 0;
+  return out;
+}
+
+/** Inverse of the SAME mass map, not a second pose curve. Finite-difference Newton iterations
+ * use a fixed initial guess derived from the neutral authored posture, so history cannot leak. */
+export function riderRigFromCOM(comX: number, comY: number, torso: number, out: RiderRigPose): RiderRigPose {
+  const neutral = RIDER_PROFILE.poses[1];
+  riderRigFromHips(neutral.hipX, neutral.hipY, torso, out);
+  let hx = comX - (out.com.x - neutral.hipX);
+  let hy = comY - (out.com.y - neutral.hipY);
+  const epsilon = 1e-5;
+  for (let i = 0; i < 10; i++) {
+    riderRigFromHips(hx, hy, torso, out);
+    const cx = out.com.x, cy = out.com.y;
+    const ex = comX - cx, ey = comY - cy;
+    if (ex * ex + ey * ey < 1e-18) break;
+    riderRigFromHips(hx + epsilon, hy, torso, out);
+    const j00 = (out.com.x - cx) / epsilon, j10 = (out.com.y - cy) / epsilon;
+    riderRigFromHips(hx, hy + epsilon, torso, out);
+    const j01 = (out.com.x - cx) / epsilon, j11 = (out.com.y - cy) / epsilon;
+    const det = j00 * j11 - j01 * j10;
+    if (Math.abs(det) < 1e-8) break;
+    hx += (j11 * ex - j01 * ey) / det;
+    hy += (j00 * ey - j10 * ex) / det;
   }
-  const ux = dx / d;
-  const uy = dy / d;
-  const uz = dz / d;
-  const x = (l1 * l1 - l2 * l2 + d * d) / (2 * d);
-  const h = Math.sqrt(Math.max(0, l1 * l1 - x * x));
-  const pu = px0 * ux + py0 * uy + pz0 * uz;
-  let px = px0 - ux * pu;
-  let py = py0 - uy * pu;
-  const pz = pz0 - uz * pu;
-  const pl = Math.sqrt(px * px + py * py + pz * pz) || 1;
-  px /= pl;
-  py /= pl;
-  return [ax + ux * x + px * h, ay + uy * x + py * h];
+  riderRigFromHips(hx, hy, torso, out);
+  out.residual = Math.sqrt((out.com.x - comX) ** 2 + (out.com.y - comY) ** 2);
+  return out;
 }
+
+/** Neutral aggregate inertia: segment rods about their centroids plus parallel-axis terms.
+ * It remains fixed during motion; articulated segment kinetic energy is not simulated separately. */
+export function riderProfileInertia(mass: number): number {
+  const p = RIDER_PROFILE;
+  const pose = riderRigFromHips(p.poses[1].hipX, p.poses[1].hipY, p.poses[1].torso * PI / 180, makeRiderRigPose());
+  const m = p.mass, f = p.comFraction;
+  const contribution = (fraction: number, a: RigPoint, b: RigPoint, along: number, length: number): number => {
+    const x = a.x + (b.x - a.x) * along - pose.com.x;
+    const y = a.y + (b.y - a.y) * along - pose.com.y;
+    return mass * fraction * (x * x + y * y + length * length / 12);
+  };
+  const shoulder = { ...pose.shoulders, z: p.shoulderHalf };
+  const hip = { ...pose.hips, z: p.hipHalf };
+  const headTop = { x: pose.shoulders.x + p.headNeckLength * cos(pose.headAngle), y: pose.shoulders.y + p.headNeckLength * sin(pose.headAngle), z: 0 };
+  const foot = { x: pose.ankle.x + p.footCentroidFromAnkle.x, y: pose.ankle.y + p.footCentroidFromAnkle.y, z: pose.ankle.z };
+  return contribution(m.trunk, pose.hips, pose.shoulders, f.trunk, p.torso)
+    + contribution(m.headNeck, pose.shoulders, headTop, f.headNeck, p.headNeckLength)
+    + 2 * (contribution(m.upperArm, shoulder, pose.elbow, f.upperArm, p.upperArm)
+      + contribution(m.forearm, pose.elbow, pose.wrist, f.forearm, p.forearm)
+      + contribution(m.hand, pose.grip, pose.grip, 0, 0.1)
+      + contribution(m.thigh, hip, pose.knee, f.thigh, p.thigh)
+      + contribution(m.shin, pose.knee, pose.ankle, f.shin, p.shin)
+      + contribution(m.foot, foot, foot, 0, 0.26));
+}
+/** Body angle zero is the authored neutral torso, 40 degrees above chassis-forward. */
+export const RIDER_TORSO_REST = RIDER_PROFILE.poses[1].torso * PI / 180;
+/** Unilateral limb limits. The 3D side separation is removed from the planar solver reach. */
+export const RIDER_REACH = {
+  armMax: Math.sqrt(((CH.upperArm + CH.forearm) * 0.995) ** 2 - (RIDER_PROFILE.grip.z - CH.shoulderHalf) ** 2),
+  legMax: Math.sqrt(((CH.thigh + CH.shin) * 0.995) ** 2 - (RIDER_PROFILE.ankle.z - CH.hipHalf) ** 2),
+  // Interior knee angle >= 40 degrees (140 degrees flexion); this is a joint stop, not a COM clamp.
+  legMin: Math.sqrt(CH.thigh ** 2 + CH.shin ** 2 - 2 * CH.thigh * CH.shin * cos(40 * PI / 180) - (RIDER_PROFILE.ankle.z - CH.hipHalf) ** 2),
+};
+/** Broad boot/ankle articulation envelope relative to the chassis: shin stays above the sole,
+ * from 60 degrees forward of up to 30 degrees behind. These are explicit joint stops. */
+export const RIDER_ANKLE = { min: 30 * PI / 180, max: 120 * PI / 180 };
+/** Signed torso-to-thigh opening: knees cannot fold through the chest or behind the pelvis. */
+export const RIDER_HIP = { min: 45 * PI / 180, max: 170 * PI / 180 };
+
+export interface AnkleGeometry { angle: number; dx: number; dy: number; thighAngle: number; thighDx: number; thighDy: number; }
+
+/** The forward-bending planar knee, and d(ankle angle)/d(hip position), with ankle at (0,0).
+ * Differentiating |K|=shin and |H-K|=thigh gives dα = (H-K)·dH / ((H-K)·J K).
+ * Returns false outside the triangle workspace; the distance stops own that boundary. */
+export function ankleGeometry(hx: number, hy: number, out: AnkleGeometry): boolean {
+  const d = Math.sqrt(hx * hx + hy * hy);
+  if (d <= Math.abs(CH.thigh - CH.shin) || d >= CH.thigh + CH.shin) return false;
+  const along = (CH.shin ** 2 + d * d - CH.thigh ** 2) / (2 * d);
+  const height = Math.sqrt(Math.max(0, CH.shin ** 2 - along * along));
+  // Keep the oriented knee branch. Choosing a new branch when hip.y crosses zero would
+  // teleport the knee through its ankle stop and let the body swing under the pegs.
+  const kx = hx / d * along + hy / d * height;
+  const ky = hy / d * along - hx / d * height;
+  const tx = hx - kx;
+  const ty = hy - ky;
+  const denominator = -tx * ky + ty * kx;
+  if (Math.abs(denominator) < 1e-8) return false;
+  out.angle = atan2(ky, kx);
+  out.dx = tx / denominator;
+  out.dy = ty / denominator;
+  const vx = -tx;
+  const vy = -ty;
+  const factor = (vx * kx + vy * ky) / (CH.thigh * CH.thigh);
+  out.thighAngle = atan2(vy, vx);
+  out.thighDx = factor * out.dx + vy / (CH.thigh * CH.thigh);
+  out.thighDy = factor * out.dy - vx / (CH.thigh * CH.thigh);
+  return true;
+}
+export const GRIP_X = RIDER_PROFILE.grip.x;
+export const GRIP_Y = RIDER_PROFILE.grip.y;
+export const PEG_X = RIDER_PROFILE.peg.x;
+export const PEG_Y = RIDER_PROFILE.peg.y;
 
 export interface ChainOut {
   /** World points: 0 hips, 1 shoulders, 2 head centre, 3 elbow, 4 hand, 5 knee, 6 ankle. */
@@ -173,86 +426,4 @@ export interface ChainOut {
   /** Axle-frame hips of the drawn figure (for armExtend). */
   hipAx: number;
   hipAy: number;
-}
-
-/**
- * Build the chain in world space. `hipDx/hipDy` is the body's deviation from its target in the axle
- * frame (added to the canonical hips), `torsoLag` the body angle's lag behind its target (rad, + = the
- * torso is pitched back relative to the pose). (fx, fy, c, s) is the chassis pose; (ox, oy) the axle
- * origin in the chassis frame.
- */
-export function buildChain(
-  lean: number,
-  hipDx: number,
-  hipDy: number,
-  torsoLag: number,
-  fx: number,
-  fy: number,
-  c: number,
-  s: number,
-  ox: number,
-  oy: number,
-  out: ChainOut,
-): void {
-  const p = canonicalPose(lean);
-  let hx = p.hipX + hipDx;
-  let hy = p.hipY + hipDy;
-  const torso = clamp(p.torso + torsoLag, 12 * DEG, 80 * DEG);
-  const head = Math.max(p.head + torsoLag, torso + 12 * DEG);
-  const tdx = cos(torso);
-  const tdy = sin(torso);
-  let sx = hx + tdx * CH.torso;
-  let sy = hy + tdy * CH.torso;
-  {
-    const d = Math.sqrt((hx - ANKLE_X) * (hx - ANKLE_X) + (hy - ANKLE_Y) * (hy - ANKLE_Y));
-    if (d > LEG_REACH) {
-      const k = (d - LEG_REACH) / d;
-      hx += (ANKLE_X - hx) * k;
-      hy += (ANKLE_Y - hy) * k;
-      sx = hx + tdx * CH.torso;
-      sy = hy + tdy * CH.torso;
-    }
-  }
-  {
-    const dzs = GRIP_Z - CH.shoulderHalf;
-    const reachXY = Math.sqrt(Math.max(0, ARM_REACH * ARM_REACH - dzs * dzs));
-    const ddx = GRIP_X - sx;
-    const ddy = GRIP_Y - sy;
-    const d = Math.sqrt(ddx * ddx + ddy * ddy);
-    if (d > reachXY || d < ARM_NEAR) {
-      const k = (d - (d > reachXY ? reachXY : ARM_NEAR)) / (d || 1e-6);
-      sx += ddx * k;
-      sy += ddy * k;
-      hx += ddx * k;
-      hy += ddy * k;
-    }
-  }
-  const hsx = cos(head);
-  const hsy = sin(head);
-  const hdx = sx + hsx * CH.neck;
-  const hdy = sy + hsy * CH.neck;
-  const [ex, ey] = ik3(sx, sy, CH.shoulderHalf, GRIP_X, GRIP_Y, GRIP_Z, CH.upperArm, CH.forearm, ELBOW_POLE.x, ELBOW_POLE.y, ELBOW_POLE.z);
-  const [kx, ky] = ik3(hx, hy, CH.hipHalf, ANKLE_X, ANKLE_Y, PEG_Z, CH.thigh, CH.shin, KNEE_POLE.x, KNEE_POLE.y, KNEE_POLE.z);
-  const put = (i: number, ax: number, ay: number): void => {
-    const lx = ax + ox;
-    const ly = ay + oy;
-    out.x[i] = fx + lx * c - ly * s;
-    out.y[i] = fy + lx * s + ly * c;
-  };
-  put(0, hx, hy);
-  put(1, sx, sy);
-  put(2, hdx, hdy);
-  put(3, ex, ey);
-  put(4, GRIP_X, GRIP_Y);
-  put(5, kx, ky);
-  put(6, ANKLE_X, ANKLE_Y);
-  const tl = Math.sqrt((sx - hx) * (sx - hx) + (sy - hy) * (sy - hy)) || 1;
-  const dxl = (sx - hx) / tl;
-  const dyl = (sy - hy) / tl;
-  out.dx = dxl * c - dyl * s;
-  out.dy = dxl * s + dyl * c;
-  out.hx = hsx * c - hsy * s;
-  out.hy = hsx * s + hsy * c;
-  out.hipAx = hx;
-  out.hipAy = hy;
 }
