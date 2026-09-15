@@ -18,7 +18,7 @@ The percentages below remain plan estimates, not audited completion of the READM
 | **Mega plan (v0.2.0)** | `docs/plans/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
 | **Physics v2** | `docs/plans/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
 | **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | two ledgers | **G (Opus) 100 — closed · H (Astra) — on `blender-work`** | H: the branch merge (`docs/tasks/blender-branch-merge.md`) + a critic round; the plan archives when H closes |
-| **Perf (60 on high, on a phone)** | `docs/plans/PERF.md` | bench + 100× plan, then a cut loop; phone-high tier + 60-cap governor | phase 2, cuts #0/#1/#5/#3/#4a landed | 70 | #4b atlas; then the ledger archives and the rest becomes `PERF-BACKLOG.md` |
+| **Perf (60 on high, on a phone)** | `project/archive/PERF.md` (closed 2026-09-15, `831e9c4`) · live backlog `docs/plans/PERF-BACKLOG.md` | bench + 100× plan, then a cut loop; phone-high tier + 60-cap governor | **done — archived**: phone-high tier live, 60-cap governor live, bench + WebKit gate + ship-gate G11, ledger through cut #4b (b1 phone-high 205 → 123 calls, 6.57 → 1.59 Mpx; model 35 → 8.8 ms on the user's phone) | 100 | the backlog's next cut (#4 remainder, 123 → ≤ 100) whenever a perf owner is spawned |
 | **P0 task** | `docs/tasks/touch-navigation-invariant.md` | nothing tappable unless drawn | landed `18df821` (5184-tap grid, 0 ghosts) | 95 | the user confirms on the phone |
 
 ## Device instruments on this machine (no more asks to the user)
@@ -52,7 +52,7 @@ The user handed the hero (rider + bike look, AAA graphics) to a Codex agent in t
 `trials-gauntlet-blender`. Rules and the test-merge result are in `docs/tasks/blender-branch-merge.md`: the
 merge is conflict-free today but the branch's solver changes fail 17 physics acceptance tests, so physics
 merges only through the physics owner's protocol; render/assets/garage merge once green. Rider on Glass
-Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF.md) and does not touch `src/render/hero/**`.
+Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF-BACKLOG.md) and does not touch `src/render/hero/**`.
 
 ## Status per pillar (mega plan)
 

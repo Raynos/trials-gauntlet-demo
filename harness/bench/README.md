@@ -1,6 +1,6 @@
 # `harness/bench` — the perf bench (performance owner)
 
-Repeatable, deterministic, comparable across commits. Every number in `docs/plans/PERF.md` comes from here.
+Repeatable, deterministic, comparable across commits. Every number in `project/archive/PERF.md` comes from here.
 
 | command | what | output |
 |---|---|---|

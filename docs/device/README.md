@@ -1,6 +1,6 @@
 # Device reports — `?bench=1` on the phone
 
-The headless bench (`harness/bench`, `docs/plans/PERF.md`) measures the frame on this machine's SwiftShader; the
+The headless bench (`harness/bench`, `project/archive/PERF.md`) measures the frame on this machine's SwiftShader; the
 phone's floor (24–28 fps in the garage at a 30 cap, worst frame 66 ms — `PERF.md` §0) is somewhere it cannot
 see. `?bench=1` is the instrument that runs **on the device** and hands back the numbers. One report per round
 is filed here as `docs/device/<date>-<sha>.md` (Rider on Glass G2); the ship gate reads the latest (G5).

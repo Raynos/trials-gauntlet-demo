@@ -13,5 +13,6 @@ Rules
 - Never archive by copying; never archive scratch (`harness/out`, scratchpads are not in the repo).
 
 Contents
-- (empty — the first entries will be `docs/plans/MEGA_PLAN.md` at the v0.2.0 pin and
+- `PERF.md` — the perf plan, closed 2026-09-15 at cut #4b (`831e9c4`); the live remainder is `docs/plans/PERF-BACKLOG.md`.
+- (next: `docs/plans/physics-v2.md` at the `physics-v2-final` tag, `docs/plans/MEGA_PLAN.md` at the v0.2.0 pin,
   `docs/tasks/touch-navigation-invariant.md` once the user confirms it on the phone)

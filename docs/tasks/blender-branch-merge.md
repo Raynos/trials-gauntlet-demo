@@ -33,7 +33,7 @@ agent working there. Rounds 3–4 are committed (`e3eef69`); round 5 is in progr
    captures of the b1 golden are md5-identical; the blind critic's next round judges the result.
 3. **Astra merges `main` into `blender-work` at least once per round** (the perf owner's cuts and the
    loader/menu/controls work must not be redone on the branch); conflicts in `src/render/index.ts` are
-   theirs to resolve against `docs/plans/PERF.md` (performance wins are not reverted for looks).
+   theirs to resolve against `project/archive/PERF.md` (performance wins are not reverted for looks).
 4. Nothing from the branch is deployed until it is on `main`; deploys stay clean-`git archive HEAD` of `main`.
 
 ## To close
