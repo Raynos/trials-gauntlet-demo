@@ -10,3 +10,8 @@ reference/*/clips/
 assets/art/raw/
 !harness/out/trailer/
 !harness/out/timelapse/
+!harness/out/bench/
+harness/out/bench/*
+!harness/out/bench/latest.md
+!harness/out/bench/ledger.jsonl
+!harness/out/bench/profile-latest.md
