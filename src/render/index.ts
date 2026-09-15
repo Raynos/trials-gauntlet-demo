@@ -30,6 +30,7 @@ import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
 import { groundFloorY, profileY } from './world/track';
 import { stabilizePrograms, type MaterialKindsReport } from './util/materialKinds';
+import { tagBloomers } from './post/emissiveBloom';
 import { HALL } from './world/hall';
 import { buildRideSurfaces } from './world/deck';
 
@@ -69,6 +70,8 @@ export interface GameRenderer {
    * (materials only; no rebuild, no frame skipped).
    */
   setBikeClass?(c: BikeClass): void;
+  /** CONTRACT §2.7 (perf cut #3): the app's device class — `high` on a phone is the phone-high pass list (docs/plans/PERF.md §3.1). */
+  setDeviceClass?(c: 'phone' | 'desktop'): void;
 }
 
 export interface ThreeRendererOptions {
@@ -199,6 +202,8 @@ export class ThreeRenderer implements GameRenderer {
    * the physics tick, alpha, tSim, phase, runTime, checkpoint, the ghost's tick and the camera's pose;
    * every scene mutation calls `invalidate()`; `SKIP_MAX` consecutive skips force a redraw as a valve.
    */
+  private deviceClass: 'phone' | 'desktop' = 'desktop';
+  private bloomers = 0;
   private frameDirty = true;
   private skipRun = 0;
   private skippedFrames = 0;
@@ -235,7 +240,7 @@ export class ThreeRenderer implements GameRenderer {
     });
     this.tier = options.quality ?? 'high';
     this.devicePixelRatio = options.pixelRatio ?? Math.min(window.devicePixelRatio || 1, 2);
-    this.pixelRatio = tierPixelRatio(this.tier, this.devicePixelRatio, this.width);
+    this.pixelRatio = tierPixelRatio(this.tier, this.devicePixelRatio, this.width, this.phoneHigh);
     this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     // ACES + the biome grade live in the composite pass on the HDR tiers; three applies `toneMapping`
@@ -281,7 +286,7 @@ export class ThreeRenderer implements GameRenderer {
   private get lighting(): LightingRig {
     if (!this.lightingRig) {
       this.lightingRig = new LightingRig(this.renderer, this.scene);
-      this.lightingRig.setQuality(this.tier);
+      this.lightingRig.setQuality(this.shadowTier);
     }
     return this.lightingRig;
   }
@@ -296,7 +301,7 @@ export class ThreeRenderer implements GameRenderer {
   private get post(): PostChain {
     if (!this.postRef) {
       this.postRef = new PostChain(this.renderer, this.scene, this.rig.camera);
-      this.postRef.setQuality(this.tier);
+      this.postRef.setQuality(this.tier, this.phoneHigh);
       this.postRef.setSize(this.width, this.height, this.pixelRatio);
       this.postRef.applyBiome(this.biome);
     }
@@ -386,11 +391,11 @@ export class ThreeRenderer implements GameRenderer {
 
   /** The document the tier draws: `high` the authored file, `low` / `medium` the LOD twin when it loaded. */
   private bikeDoc(): GLTF | null {
-    return lodChoice(this.tier) === 'lod' ? this.gltf.bikeLod ?? this.gltf.bike : this.gltf.bike;
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier) === 'lod' ? this.gltf.bikeLod ?? this.gltf.bike : this.gltf.bike;
   }
 
   private riderDoc(): GLTF | null {
-    return lodChoice(this.tier, 'rider') === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier, 'rider') === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
   }
 
   /** Round 14: rider LOD gate for `low` / `medium` (default off — see `hero/lod.ts lodChoice`); rebuilds the hero when the document changes. */
@@ -838,7 +843,7 @@ export class ThreeRenderer implements GameRenderer {
 
     const group = new THREE.Group();
     group.name = 'world';
-    PropBatch.CHUNK_M = this.tier === 'low' ? 80 : 40; // round 12: fewer chunk draws per riding frame on the phone tier
+    PropBatch.CHUNK_M = this.tier === 'low' || this.phoneHigh ? 80 : 40; // round 12: fewer chunk draws per riding frame on the phone tier
     const ribbons = buildRideSurfaces(track, this.biome, this.lib);
     const obstacles = buildObstacles(track, this.lib);
     const gates = buildGates(track, this.biome, this.lib, art);
@@ -1004,8 +1009,35 @@ export class ThreeRenderer implements GameRenderer {
   setQuality(tier: QualityTier): void {
     if (tier === this.tier) return;
     this.tier = tier;
-    this.postRef?.setQuality(tier);
-    this.lightingRig?.setQuality(tier);
+    this.applyQuality();
+  }
+
+  /** Perf cut #3: phone vs desktop decides what `high` means (`phoneHigh`); the app calls this once at boot. */
+  setDeviceClass(c: 'phone' | 'desktop'): void {
+    if (c === this.deviceClass) return;
+    this.deviceClass = c;
+    this.applyQuality();
+  }
+
+  /**
+   * Phone-high (PERF.md §3.1, by the device report's model: ≈ 14 ms on the user's iPhone vs 17.6 with a
+   * 1024² world shadow): LDR straight to the canvas at DPR ≤ 1.5, the hero-only 512² shadow, an emissive-only
+   * bloom at 1/8 res, no SSAO / HDR / composite, volumetrics + decals on, no scatter, no hall shafts, 80 m
+   * prop chunks, the LOD hero, full textures.
+   */
+  private get phoneHigh(): boolean {
+    return this.deviceClass === 'phone' && this.tier === 'high';
+  }
+
+  /** The lighting rig's shadow tier for the current profile (phone-high runs low's hero-only map). */
+  private get shadowTier(): QualityTier {
+    return this.phoneHigh ? 'low' : this.tier;
+  }
+
+  private applyQuality(): void {
+    const tier = this.tier;
+    this.postRef?.setQuality(tier, this.phoneHigh);
+    this.lightingRig?.setQuality(this.shadowTier);
     this.emitters.countScale = tier === 'low' ? 0.5 : 1;
     this.emitters.ambientEnabled = tier !== 'low';
     // Round 12: the tier owns the canvas resolution (low ≤ 1.0 DPR / 1600 px, medium ≤ 1.25, high ≤ 2).
@@ -1036,9 +1068,11 @@ export class ThreeRenderer implements GameRenderer {
    */
   private applyTierVisibility(): void {
     const low = this.tier === 'low';
+    const heroShadow = this.shadowTier === 'low'; // perf cut #3: phone-high casts the hero only, like low
+    const phoneHigh = this.phoneHigh;
     this.scene.traverse((o) => {
       if (!o.name) return;
-      if (tierManaged(o.name)) o.visible = !tierHides(o.name, this.tier);
+      if (tierManaged(o.name)) o.visible = !tierHides(o.name, this.tier, phoneHigh);
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       if (HERO_SMALL.test(o.name)) {
@@ -1051,11 +1085,12 @@ export class ThreeRenderer implements GameRenderer {
       if (ud.castHigh === undefined) ud.castHigh = o.castShadow;
       if (ud.receiveHigh === undefined) ud.receiveHigh = o.receiveShadow;
       // Medium shadow casters (`tierCasts`): props by name; low: no world caster at all.
-      o.castShadow = !low && ud.castHigh && (!o.name.startsWith('props:') || tierCasts(o.name, this.tier));
-      o.receiveShadow = ud.receiveHigh && (!low || RIDE_SURFACE.test(o.name));
+      o.castShadow = !heroShadow && ud.castHigh && (!o.name.startsWith('props:') || tierCasts(o.name, this.tier));
+      o.receiveShadow = ud.receiveHigh && (!heroShadow || RIDE_SURFACE.test(o.name));
     });
     // Perf cut #0: no per-frame program re-acquisition (single-pass transparents, per-kind clones, per-kind depth materials).
     this.programReport = stabilizePrograms(this.scene, this.lib);
+    if (phoneHigh) this.bloomers = tagBloomers(this.scene); // perf cut #3: the emissive-only bloom's sources
     this.invalidate(); // perf cut #1: a build / hero swap / tier change reaches the pixels
   }
 
@@ -1290,7 +1325,7 @@ export class ThreeRenderer implements GameRenderer {
     // Round 12: the tier caps the host's ratio — low ≤ 1.0 and ≤ 1600 px wide, medium ≤ 1.25,
     // high ≤ 2 — and the canvas itself is sized by it (the browser upscales the canvas; the
     // composite no longer writes a full-DPR frame).
-    const pr = tierPixelRatio(this.tier, this.devicePixelRatio, width);
+    const pr = tierPixelRatio(this.tier, this.devicePixelRatio, width, this.phoneHigh);
     if (pr !== this.pixelRatio) {
       this.pixelRatio = pr;
       this.renderer.setPixelRatio(pr);
@@ -1387,6 +1422,10 @@ export class ThreeRenderer implements GameRenderer {
     stabilized: MaterialKindsReport;
     /** Perf cut #1: frames `render()` did not draw because nothing reaching the pixels changed. */
     skippedFrames: number;
+    /** Perf cut #3: the device class the app declared and the profile `high` resolves to. */
+    deviceClass: 'phone' | 'desktop';
+    profile: 'phone-high' | QualityTier;
+    bloomers: number;
     /** Round 14: last track entry — wall ms from `setTrack` to ready, and its breakdown (`entryStats`). */
     entryMs: number;
     entry: ThreeRenderer['entryStats'];
@@ -1429,6 +1468,9 @@ export class ThreeRenderer implements GameRenderer {
       stalePrograms: this.staleProgramCount(),
       stabilized: this.programReport,
       skippedFrames: this.skippedFrames,
+      deviceClass: this.deviceClass,
+      profile: this.phoneHigh ? 'phone-high' : this.tier,
+      bloomers: this.bloomers,
       entryMs: this.entryStats.ms,
       entry: this.entryStats,
       entering: this.entering,

@@ -19,14 +19,17 @@ export type WorldDetail = 'low' | 'medium' | 'high';
  */
 const HIDE_LOW = /^(props:(lampcone|lightcone|lampstreak|parbeam-[mc]|puddle|oilstain|decal:(poster|sign|graffiti|tyremark)[^:]*)(:|$)|fx:|deck:ao(:|$))/; // round 14: + the under-deck AO skirt (28 k transparent tris on b1)
 const HIDE_LEAN = /^props:(gravel|bolt|paper|plankend|leaf)(:|$)/;
-export function tierHides(name: string, tier: WorldDetail): boolean {
+export function tierHides(name: string, tier: WorldDetail, phoneHigh = false): boolean {
+  // Perf cut #3: phone-high keeps the volumetrics and decals but not the scatter, and not the hall's
+  // eight full-height additive shafts (the largest overdraw on a tile GPU; the lamp cones stay).
+  if (phoneHigh) return HIDE_LEAN.test(name) || name.startsWith('fx:shaft');
   if (tier === 'high') return false;
   if (HIDE_LEAN.test(name)) return true;
   return tier === 'low' && HIDE_LOW.test(name);
 }
 /** True when the name is one the tier rules ever touch (so `applyTierVisibility` never flips anything else). */
 export function tierManaged(name: string): boolean {
-  return HIDE_LOW.test(name) || HIDE_LEAN.test(name);
+  return HIDE_LOW.test(name) || HIDE_LEAN.test(name) || name.startsWith('fx:shaft');
 }
 /**
  * Shadow casters on `medium` (one 1024² map): the hero, the deck and the deck-level volumes the

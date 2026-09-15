@@ -21,7 +21,7 @@ import os from 'node:os';
 import type { Browser, Page } from 'playwright';
 import type { QualityTier } from '../../src/core/types';
 import { percentile } from '../lib/report';
-import { gpuWork, phoneEstimate } from './model';
+import { effectiveMpx, gpuWork, phoneEstimate } from './model';
 import { PAGE_BENCH_SRC } from './page';
 import type { LedgerRow } from './report';
 
@@ -143,7 +143,7 @@ export interface IdleResult {
 }
 
 export async function runIdle(browser: Browser, url: string, opts: IdleOptions, log: (l: string) => void): Promise<IdleResult[]> {
-  const ctx = await browser.newContext({ viewport: { width: 932, height: 430 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: PHONE_UA });
+  const ctx = await browser.newContext({ viewport: { width: 874, height: 330 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: PHONE_UA });
   const out: IdleResult[] = [];
   try {
     await ctx.addInitScript(RAF_SHIM);
@@ -182,7 +182,7 @@ export async function runIdle(browser: Browser, url: string, opts: IdleOptions, 
         const calls = Math.round(stats(held.synced.map((s) => s.calls)).p50);
         const tris = Math.round(stats(held.synced.map((s) => s.tris)).p50);
         const work = gpuWork(held.passes, calls, tris);
-        const est = phoneEstimate(held.debug.rtMpx, calls, tris, held.texturesMB);
+        const est = phoneEstimate(effectiveMpx(held.passes), calls, tris, held.texturesMB);
         const raster = stats(held.synced.map((s) => s.raster));
         const row: LedgerRow = {
           sha: opts.sha,
