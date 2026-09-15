@@ -1,7 +1,7 @@
 # Blender hero handoff — active WIP
 
-**2026-09-15. The user resumed work from the pause checkpoint. Round 4 integration is verified below,
-with remaining failures preserved. This branch is not ready
+**2026-09-15. Round 5 is a verified WIP checkpoint; use the latest commit for its
+identity. Round 4 is `e3eef69`. Remaining failures are preserved below. This branch is not ready
 to merge or deploy. The hero/physics mission is unfinished.**
 
 Continue in `/Users/raynos/projects/game-demos/trials-gauntlet-blender`, branch
@@ -12,6 +12,13 @@ another checkout. The baseline was `56e3883`; the first verified repair is
 for this checkpoint. The 12-hour follow-up automation is paused.
 
 ## User decisions and scope
+
+- **Usage stop, 2026-09-15:** continue building until Codex weekly usage reaches
+  **30% remaining**, then preserve a committed handoff and pause work without
+  declaring the full mission complete. Check `openusage codex` periodically;
+  latest CLI reading at 18:52:39 UTC was **73% remaining**. The user selected
+  **medium** reasoning and requested medium for teammates; explicitly use medium
+  for newly spawned agents. Existing running agents have no in-place effort control.
 
 - Codex owns Blender rider/bike assets, animation and their Three.js integration.
   Trials Fusion / Rising gameplay is the reference. Rebuild inadequate geometry.
@@ -32,7 +39,61 @@ Read [the plan](plans/BLENDER_HERO.md), [plan status](plans/PLANS.md),
 backward on Rear Wheel First, 1:18.433 and four faults. It is a symptom to
 reproduce; this checkpoint does **not** prove that specific finish bug fixed.
 
-## Round 4 continuation — current evidence
+## Round 5 — verified checkpoint
+
+See [the durable manifest](evidence/blender-r5.json). The final build is
+`harness/out/blender/r5-dist`. No push, merge or deployment.
+
+- Bounded coupled continuation closes the anatomical gaps at the existing
+  -1e-6 tolerance after the ordinary solve, preserving velocity bytes. Ordered
+  multiplication replaces the progressive stop cubic: the isolated old
+  Chromium/WebKit divergence at input 284 disappears. Physics SHA is
+  `2099f24bfc7a7e0fcc7a5a1647bd33e55930389c76f56e10d1fd805237f89b47`.
+- All **72 recordings / 340,983 ticks** repeat raw F64/U8 and complete Game
+  counters exactly. Actual decoded full/LOD bikes and both outfits stay finite;
+  rendered COM mismatch peaks at 0.115 micrometres. Physical rear/front joint
+  errors stay below 91/67 micrometres. Final batches agree across 181 bound files.
+  This does not prove universal nonlinear closure or ragdoll collision repair.
+- Eight fresh B1/B3/E2/M1 bots clear on both classes. Seven clear first attempt;
+  Rookie M1 takes two attempts / one fault. Inputs are in `harness/inputs/hero-r5/`.
+  All **72,525 fresh bot/stranger ticks** compare exactly against Node in
+  headless Chromium and desktop WebKit, including crashes and restarts.
+- Both fresh B3 strangers clear first attempt. M1 takes **7 and 14 attempts**;
+  median **10.5 is outside the intended 5–9 band**. The harness's looser 13.5
+  pass threshold is separate. Late failures cluster around the final ledges/gap.
+- Renderer-owned retirement waits for all pending material-program variants
+  before disposing detached owners. Metal 3/3 and SwiftShader 3/3 pass with GL0
+  and full program reclamation; the promoted-asset integration run also passes.
+  WebKit reclaims everything but has no unresolved overlap burst, so that race
+  coverage is inconclusive. **Inherited context restoration remains broken**:
+  old geometry/texture disposal listeners delete lost-context allocations.
+  Baseline and candidate reproduce it; candidate has no stale program queries.
+  See `harness/out/blender/r5-retirement/REPORT.md`.
+- Compact Street hood and control cables are promoted after native Blender and
+  gameplay review. Normal full/LOD exports match the reviewed scratch GLBs
+  byte-for-byte. Other Street geometry and exact bones/actions/sockets remain;
+  Race/legacy are unchanged. The brake hose follows the fork at constant
+  centerline length using instance-owned geometry. Actual decoded endpoints
+  stay within 1.39 micrometres across the corpus; 98 full-travel poses pass.
+  Surface arc error (0.836 micrometres) is separate from internal centerline
+  error (0.0341 micrometres). Hood audits cover 321 authored frames and 4,356
+  sampled riding poses, with zero sampled crossings; no continuous proof.
+- Parent played final high Street hop and low Race M1 endo/ragdoll/restart.
+  Attached limbs stay coherent; normal attachment returns after restart. Low M1
+  still reports 146,344 track triangles against the 80,000 cap. Review loops are
+  explicitly repeated footage, not longer recorded gameplay.
+- Full check: **17 failed, 707 passed, 11 todo**; six failed / 54 passed files.
+  Application/harness TypeScript and repository lint pass; separate build passes.
+  Physics behavior/cost requirements remain red; no tolerance or golden changes.
+
+Remaining: cloth/jeans/waist, helmet/material detail and reference comparison;
+braking/drop/hop/climb/air behavior and cost; M1 target-band learnability;
+whole-renderer context restoration; inherited crashed pelvis/seesaw penetration
+of 99.34 mm beyond slop; actual iOS Safari. No iPhone is connected here. The exact
+user E2 78.433 s / four-fault finish remains unreproduced without its inputs.
+**Round 6 requires the cold-boot/clear/crash/instant-restart ship gate.**
+
+## Round 4 continuation — committed evidence
 
 The current tracked physics has a **35-degree minimum elbow opening**. This
 excludes the fixed-pole singularity while retaining the authored poses and pole.
@@ -397,25 +458,21 @@ content-addressed build outputs. Keep the one-byte inline budget margin in mind.
 
 ## Continue in this order
 
-1. Implement and verify the bounded anatomy convergence continuation researched
-   in round 4. Preserve the existing solution when all gaps meet the bar;
-   measure conservation, contact closure, invalid-state recovery and replay
-   bytes. Do not hide the introduced ankle/hip deficits with relaxed tolerances.
-2. Fix the independently reproduced pending-program deletion warning. Retain
-   asynchronous compilation and resource cleanup, then repeat actual rapid
-   transitions on Metal and SwiftShader with errors visible.
-3. Continue native Blender garment work from the promoted connected shoulder/
-   elbow masters. Rejected trousers still pinch at the saddle and knees.
-   Hood/neck, waist, cloth folds and material detail need played reference
-   comparisons before further promotion. Investigate remaining physics behavior
-   requirements separately: braking, drop attitude, touchdown, lab hop/climb,
-   air limits and solver cost.
-4. Rerun real-GLB census and fresh bot/stranger attempts on the next frozen solver.
-   Use `harness/lib/production-sim.ts` and the corrected stranger schema, not the
-   legacy RunRules mirror. Keep session fingerprints fixed through `done`.
-5. Keep full checks and each third-round cold-boot/clear/crash/restart gate visible.
-   Actual iOS Safari, complete hero reference comparisons and integration review
-   remain necessary. Do not merge, push or deploy this WIP branch.
+1. Run Round 6's frozen-build cold-boot/clear/crash/instant-restart gate. Keep
+   actual iOS distinct from desktop WebKit; no iPhone is connected here.
+2. Reconstruct remaining garment/helmet forms and cloth material detail from the
+   promoted sources. Rejected connected trousers pinch at saddle and knees;
+   change the construction/weighting approach and judge played motion.
+3. Repair remaining physics behavior/cost from explicit witnesses. M1 strangers
+   exceed the target band; separate controller/visibility difficulties from
+   solver faults. Tracks and broad world edits remain trunk scope.
+4. Fix inherited context-generation disposal listeners using preserved baseline
+   and final traces in `r5-retirement/REPORT.md`. Keep normal pending-program
+   retirement, asynchronous compilation and errors visible.
+5. After physics changes, repeat relevant raw bytes, actual model checks and
+   fresh clearability on frozen sources. After art changes, rebuild the catalog
+   and verify consumed full/LOD bytes. Parent updates evidence/plans and makes
+   one commit per round. No merge, push or deployment.
 
 ### Evidence pitfalls and local continuity
 

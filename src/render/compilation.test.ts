@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ThreeRenderer } from './index';
+import { ResourceRetirement } from './resourceRetirement';
 
 afterEach(() => vi.useRealTimers());
 
@@ -21,7 +22,7 @@ function fixture(scene: THREE.Scene) {
   };
   const post = { sceneTarget: compileTarget as THREE.WebGLRenderTarget | null, setQuality: () => { post.sceneTarget = null; } };
   const fields = { scene, renderer: gl, postRef: post, rig: { camera: new THREE.PerspectiveCamera() },
-    compilePending: Promise.resolve(), tier: 'high', lightingRig: null, emitters: {}, bikeRef: null, riderRef: null,
+    compilePending: Promise.resolve(), sceneEpoch: 0, tier: 'high', lightingRig: null, emitters: {}, bikeRef: null, riderRef: null,
     resize: vi.fn(), applyTierVisibility: vi.fn() };
   const renderer = Object.assign(Object.create(ThreeRenderer.prototype) as object, fields) as unknown as ThreeRenderer;
   return { renderer, compiler: renderer as unknown as Compiler, fields, gl, calls, originalTarget, compileTarget,
@@ -137,5 +138,60 @@ describe('isolated shader compilation', () => {
     f.calls[1]!.resolve();
     await vi.runAllTimersAsync();
     await next;
+  });
+
+  it('detaches and invalidates queued source batches before snapshotting retirement, even if compilation rejects', async () => {
+    const scene = new THREE.Scene(), group = new THREE.Group(), oldMat = new THREE.MeshBasicMaterial();
+    const mesh = new THREE.Mesh(new THREE.BufferGeometry(), oldMat);
+    group.add(mesh); scene.add(group);
+    const f = fixture(scene), reference = { program: {} };
+    let ready = false;
+    const context = { isContextLost: () => false, getExtension: () => ({ COMPLETION_STATUS_KHR: 0x91b1 }), getProgramParameter: () => ready };
+    const retirement = new ResourceRetirement(context as unknown as WebGL2RenderingContext, vi.fn());
+    Object.assign(f.gl, { properties: { get: (m: THREE.Material) => m === oldMat ? { programs: new Map([['original', reference]]) } : {} } });
+    Object.assign(f.renderer, { retirement, world: { group } });
+    const first = f.compiler.compileMaterials([oldMat]);
+    const rejected = expect(first).rejects.toThrow('compile failed');
+    await Promise.resolve();
+    const queuedOld = f.compiler.compileMaterials([oldMat]);
+    const dispose = vi.fn(); oldMat.addEventListener('dispose', dispose);
+    (f.renderer as unknown as { clearWorld(): void }).clearWorld();
+    expect(group.parent).toBeNull();
+    expect(dispose).not.toHaveBeenCalled();
+    const nextMat = new THREE.MeshBasicMaterial();
+    scene.add(new THREE.Mesh(new THREE.BufferGeometry(), nextMat));
+    const next = f.compiler.compileMaterials([nextMat]);
+    f.calls[0]!.reject(new Error('compile failed'));
+    await rejected;
+    await queuedOld;
+    await Promise.resolve();
+    expect(f.calls).toHaveLength(2); // stale queuedOld never creates a program variant
+    expect(meshMaterials(f.calls[1]!.batch)).toEqual(new Set([nextMat]));
+    expect(dispose).not.toHaveBeenCalled();
+    ready = true;
+    f.calls[1]!.resolve();
+    await vi.runAllTimersAsync();
+    await Promise.all([next, retirement.whenIdle()]);
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(retirement.stats.pending).toBe(0);
+  });
+
+  it('disposes once before boot despite unstarted art and unresolved model downloads', async () => {
+    const f = fixture(new THREE.Scene());
+    const never = new Promise<void>(() => {}), dispose = vi.fn();
+    const context = { isContextLost: () => false, getExtension: () => null };
+    const retirement = new ResourceRetirement(context as unknown as WebGL2RenderingContext, vi.fn());
+    Object.assign(f.gl, { info: { programs: [] }, dispose, getContext: () => context });
+    const art = { whenSettled: never, dispose: vi.fn(), onRequestSettled: null as (() => void) | null, onProgress: null };
+    Object.assign(f.renderer, { retirement, art, prepared: never, heroPending: never, artRequest: never, lib: { dispose: vi.fn() },
+      postRef: null, world: null, ghost: null, emitters: { systems: [] }, canvas: { remove: vi.fn(), removeEventListener: vi.fn() } });
+    f.renderer.dispose();
+    f.renderer.dispose();
+    await f.renderer.whenReady();
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(art.dispose).toHaveBeenCalledOnce();
+    art.onRequestSettled!(); // A late bitmap decode is reclaimed without a scene rebuild.
+    expect(art.dispose).toHaveBeenCalledTimes(2);
+    expect(retirement.stats.pending).toBe(0);
   });
 });

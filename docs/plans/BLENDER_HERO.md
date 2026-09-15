@@ -3,16 +3,15 @@
 Owner: Codex Blender session. Branch: `blender-work`, in the explicitly authorized
 `trials-gauntlet-blender` worktree. Baseline: `56e3883` (2026-09-15).
 
-Status: **active WIP, resumed by the user 2026-09-15**. Round 4 excludes the
-elbow-pole singularity, restores fresh Pro clearability, and promotes connected
-shoulders/elbows plus a readable seat pad after played review. Typecheck/lint
-and separate build pass; tests **18 failed, 686 passed, 11 todo**. Pro B1/B3/E2/M1
-and replacement Rookie B3/M1 bots clear on attempt one. Two fresh B3 strangers
-also clear first attempt; two M1 strangers each clear in eight attempts (band 5–9).
-Coupled anatomical closure, remaining physics/cost, cloth detail and actual iOS
-remain open. See [the handoff](../BLENDER_HANDOFF.md) and
-[round 4 manifest](../evidence/blender-r4.json). No merge or deployment yet.
-Track this plan in `PLANS.md` at every commit.
+Status: **active WIP, Round 5 checkpoint**. Coupled anatomy closes at the existing
+bar; all 340,983 corpus ticks repeat exactly. Fresh bot/stranger inputs match
+Node/Chromium/WebKit over 72,525 ticks. Compact hood and articulated cables are
+promoted after playback. All eight bots clear; B3 stranger median is 1, while M1
+median 10.5 exceeds the intended 5–9 band. Typecheck/lint/build pass; tests are
+**17 failed, 707 passed, 11 todo**. Cloth/helmet/material quality, physics behavior
+and cost, context restoration, and actual iOS remain open. Round 6 ship gate is
+due. See [handoff](../BLENDER_HANDOFF.md) and [evidence](../evidence/blender-r5.json).
+No merge or deployment. Track this plan in `PLANS.md` at every commit.
 
 ## Mandate and boundaries
 

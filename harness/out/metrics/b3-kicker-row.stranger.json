@@ -7,15 +7,15 @@
     2
   ],
   "physics": "production-Game-v2",
-  "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
-  "updatedAt": "2026-09-15T17:45:09.278Z",
+  "srcFingerprint": "660ec5171777707c623024f3c43263cde1cf339912b5c51fccd1d7b319bfb230",
+  "updatedAt": "2026-09-15T19:01:00.286Z",
   "includeStale": false,
   "sessions": [
     {
       "sessionId": "b3-kicker-row-20260915-123737",
       "agent": "blender-r4-s1",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
       "replayVerified": true,
       "strangerAttempts": 1,
@@ -46,7 +46,7 @@
       "sessionId": "b3-kicker-row-20260915-124041",
       "agent": "blender-r4-s2",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
       "replayVerified": true,
       "strangerAttempts": 1,
@@ -72,14 +72,76 @@
       },
       "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-124041.json",
       "deaths": []
+    },
+    {
+      "sessionId": "b3-kicker-row-20260915-134303",
+      "agent": "blender-r5-s1",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "660ec5171777707c623024f3c43263cde1cf339912b5c51fccd1d7b319bfb230",
+      "replayVerified": true,
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 37.375,
+      "calls": 17,
+      "wallMs": 82203,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 0,
+        "endTick": 4847,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-134303.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-134303.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "b3-kicker-row-20260915-134958",
+      "agent": "blender-r5-s2",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "660ec5171777707c623024f3c43263cde1cf339912b5c51fccd1d7b319bfb230",
+      "replayVerified": true,
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 37.958333333333336,
+      "calls": 22,
+      "wallMs": 155765,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 0,
+        "endTick": 4900,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-134958.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-134958.json",
+      "deaths": []
     }
   ],
   "completed": 2,
   "clearedCount": 2,
   "medianAttempts": 1,
-  "medianFinishTime": 36.725,
-  "medianCalls": 26,
-  "medianWallMs": 253341.5,
+  "medianFinishTime": 37.66666666666667,
+  "medianCalls": 19.5,
+  "medianWallMs": 118984,
   "pass": true,
   "deaths": {
     "total": 0,

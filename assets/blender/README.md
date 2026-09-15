@@ -90,13 +90,23 @@ Use the protected workflow above to preserve rider authoring edits.
 
 ## Budgets (measured)
 
-Current branch checkpoint (unfinished; see `docs/BLENDER_HANDOFF.md`): bike
-29,780 triangles / 1,290,148 bytes; bike LOD 5,716 / 442,688; street rider
-8,621 / 794,352; street LOD 5,879 / 477,164; race rider 10,621 / 934,136;
-race LOD 5,879 / 527,912. The outfit `.source.json` reports bind counts to
-actual source/output hashes. **The tables and construction notes below are
-legacy baseline documentation**, including old geometry limitations; inspect
-the current masters and handoff before treating them as current measurements.
+Round 5 branch checkpoint (unfinished; see `docs/BLENDER_HANDOFF.md`): bike
+30,460 triangles / 1,315,952 bytes; bike LOD 5,720 / 444,248; Street rider
+9,269 / 784,284; Street LOD 5,879 / 474,960. Race full/LOD are unchanged from
+Round 4; exact counts and hashes are in their `.source.json` reports. Normal
+exports reproduce the parent-played scratch assets byte-for-byte.
+
+`author_hood.py` creates the compact folded-back Street hood while preserving
+all other geometry, rig, actions, sockets and materials. The protected Street
+source now contains that accepted hood. `brake_hose` is a separate authored tube
+with `hose_stations`, `hose_length`, `hose_segments` and `hose_radius` metadata.
+Runtime bends instance-owned vertices at constant centerline length from fixed
+guide to fork caliper. Clutch/throttle lines stay rigid to `handlebar`. This adds
+one mesh and uses the existing mechanical material. Actual-model tests cover
+full travel, deformation history, UV/topology preservation and disposal.
+
+**The tables and construction notes below are legacy baseline documentation**;
+inspect current masters and handoff before treating them as current measurements.
 
 | file | tris | bytes (meshopt) | textures |
 |---|---|---|---|

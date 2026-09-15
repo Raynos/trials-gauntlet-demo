@@ -9,7 +9,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | plan | file | goal | status | % | next gate |
 |---|---|---|---|---|---|
 | **The brief** | `README.md` | a 2.5D Trials-quality bike game, deterministic, 60 fps, desktop + iOS Safari | in build | — | — |
-| **Blender hero (branch)** | `docs/plans/BLENDER_HERO.md` | rider/bike models, animation and Three.js integration to the Trials reference; Codex owns Blender on `blender-work` | active round 4: elbow pole excluded; fresh Pro B1/B3/E2/M1 and Rookie B3/M1 bots clear first attempt; B3/M1 stranger medians 1/8 in band; shoulders/elbows and seat pad promoted after playback; typecheck/lint/build pass, tests 18 fail / 686 pass / 11 todo | — | coupled anatomical closure, cloth detail, remaining physics/cost and actual iOS; see handoff; not ready to merge |
+| **Blender hero (branch)** | `docs/plans/BLENDER_HERO.md` | rider/bike models, animation and Three.js integration to the Trials reference; Codex owns Blender on `blender-work` | round 5 checkpoint: anatomy closes; 340,983 raw replay ticks; 72,525 fresh ticks exact across Node/Chromium/WebKit; hood/cables promoted; all eight bots clear; B3 median 1, M1 median 10.5 outside target; tests 17 fail / 707 pass / 11 todo | — | round 6 ship gate; cloth/helmet/material detail, physics/cost, context restoration and actual iOS; no merge |
 | **Mega plan (v0.2.0)** | `docs/plans/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
 | **Physics v2** | `docs/plans/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
 | **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | round 1 (H1 rider kit landed `47f0455`) | 15 | H3 hero shadow + G4 stamped auto-deploy, then device report #1 |
@@ -20,6 +20,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 
 | date | decision |
 |---|---|
+| 09-15 | Blender session: continue at medium reasoning until OpenUsage Codex weekly usage reaches 30% remaining, then checkpoint and pause; new teammates also use medium |
 | 09-15 | Resume the Blender branch from the handoff; continue the active rider/bike/animation/texture mission |
 | 09-15 | Pause the Blender branch at a checkpoint, preserve in-progress work, commit and provide a continuation handoff. The mission remains unfinished; the 12-hour follow-up is paused |
 | 09-15 | Blender session pairing: **street rider (hoodie/jeans) is the default vibe; implement street and race outfits with a garage switch. Codex also owns the necessary rider physics corrections**, explicitly authorized after the body/pose mismatch was demonstrated |

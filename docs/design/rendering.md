@@ -1311,6 +1311,35 @@ working-tree physics; the round's clips use windows before those ticks (the b1 o
 
 ## 12. Known gaps after round 11 (what still reads non-AAA)
 
+### Blender branch round 5 — played hero review, 2026-09-15
+
+The compact Street hood now folds below the helmet and keeps a coherent back
+silhouette through crouch, extension and landing. Connected shoulders/elbows
+remain intact. Authored control cables add a small mechanical detail; the front
+brake hose follows suspension travel without visible popping. Parent played
+scratch full/LOD and final high Street / low Race clips before this checkpoint.
+The Race clip includes an endo, ragdoll and return to attached riding after
+checkpoint restart. These are incremental improvements, not a reference win.
+
+The strongest remaining tells are smooth cloth with shallow folds, unresolved
+jeans/crotch/knee construction and waistband silhouette, and simplified helmet,
+glove/boot forms and material detail. The camera pulls away markedly during
+riding. World/track complexity remains trunk scope; low M1 still reports 146,344
+track triangles against 80,000. Actual iOS performance remains unmeasured.
+The final 38-pair/reference battery has not been run for this branch.
+
+All 340,983 corpus ticks repeat exactly with finite actual full/LOD models;
+worst rendered COM mismatch is 0.115 micrometres and grip/sole errors stay below
+0.256/0.189 micrometres. Decoded hose endpoints stay below 1.39 micrometres.
+These numerical contracts support attachment; they do not establish art quality.
+See [Round 5 evidence](../evidence/blender-r5.json) for hashes and played windows.
+
+Normal pending-program retirement now passes Metal and SwiftShader stress with
+complete reclamation. Whole-renderer context restoration remains faulty because
+some surviving resources retain disposal listeners for the lost GL generation.
+Both baseline and candidate reproduce this distinct failure. The headless
+desktop WebKit control does not establish actual-iOS or pending-link race coverage.
+
 ### Blender branch round 3 — played hero review, 2026-09-15
 
 The final-solver street hop and crash/restart clips were played at 60 fps, followed

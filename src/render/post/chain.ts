@@ -571,6 +571,7 @@ export class PostChain {
     this.target.dispose();
     this.ao.dispose();
     this.bloom.dispose();
+    this.composite.dispose();
     this.renderer.setRenderTarget(null);
   }
 }

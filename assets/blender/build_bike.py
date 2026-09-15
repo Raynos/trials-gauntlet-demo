@@ -957,7 +957,42 @@ def build_handlebar(M):
     add_box(b, bar + V(0, 0, -0.008), (0.04, 0.10, 0.03), M["anod"], bevel=0.006)
     # throttle housing, kill switch
     add_cyl(b, bar + V(-0.03, 0.25, 0.01), bar + V(-0.028, 0.26, 0.01), 0.02, 0.02, M["black"], seg=12)
+    # Control lines remain with the chassis. The separate front brake hose below
+    # has a fixed guide and a moving caliper endpoint, so suspension cannot detach it.
+    add_tube(b, [bar + V(0.0, -0.235, 0.012), V(0.99, -0.21, 0.72),
+                 V(0.86, -0.16, 0.62), V(0.74, -0.14, 0.44), V(0.68, 0.145, 0.34)],
+             0.003, M["black"], sides=6, samples=3)
+    add_tube(b, [bar + V(-0.03, 0.25, 0.01), V(0.90, 0.18, 0.68),
+                 V(0.76, 0.13, 0.60), V(0.61, 0.02, 0.55)],
+             0.0027, M["black"], sides=6, samples=3)
+    add_tube(b, [bar + V(0.02, 0.235, 0.012), V(1.07, 0.16, 0.85),
+                 V(1.12, -0.04, 0.84), V(1.07, -0.105, 0.73)],
+             0.0032, M["black"], sides=6, samples=3)
     return finish(b, bar)
+
+
+def build_brake_hose(M):
+    """Authored tube stations retained as extras for length-preserving runtime bending.
+    Metadata uses exported glTF axes (+X forward, +Y up, +Z camera side).
+    """
+    start = Vector((1.07, 0.73, 0.105))
+    end_b = P["front"] + FORK_DIR * 0.075 + V(0.05, -0.105, 0)
+    end = Vector((end_b.x, end_b.z, -end_b.y))
+    segments = 24 if not LOD else 12
+    chord = end - start
+    bulge = Vector((-chord.y, chord.x, 0)).normalized()
+    def curve(amplitude):
+        return [start.lerp(end, i / segments) + bulge * (amplitude * math.sin(math.pi * i / segments)) for i in range(segments + 1)]
+    points = curve(0.13)
+    length = sum((b - a).length for a, b in zip(points, points[1:]))
+    b = MeshBuilder("brake_hose")
+    add_tube(b, [V(p.x, -p.z, p.y) for p in points], 0.0032, M["black"], sides=6, smooth=False)
+    ob = finish(b, (0, 0, 0))
+    ob["hose_stations"] = [v for p in points for v in p]
+    ob["hose_length"] = length
+    ob["hose_segments"] = segments
+    ob["hose_radius"] = 0.0032
+    return ob
 
 
 def build_pegs(M):
@@ -1000,6 +1035,7 @@ def main():
     upper, lower = build_forks(M)
     objs["fork_upper"], objs["fork_lower"] = upper, lower
     objs["handlebar"] = build_handlebar(M)
+    objs["brake_hose"] = build_brake_hose(M)
     objs["pegs"] = build_pegs(M)
     objs["wheel_rear"], objs["wheel_rear_spokes"], objs["wheel_rear_blur"] = build_wheel("wheel_rear", M, 0.228, 0.112, disc_side=+1)
     objs["wheel_front"], objs["wheel_front_spokes"], objs["wheel_front_blur"] = build_wheel("wheel_front", M, 0.262, 0.078, disc_side=-1)
@@ -1069,7 +1105,7 @@ def main():
     tris = {o.name: C.tri_count(o) for o in all_obs}
     log("tris", tris, "total", sum(tris.values()))
     if LOD:
-        protected = {"chain", "swingarm", "fork_upper", "fork_lower", "shock_body", "shock_shaft", "shock_clevis", "shock_spring"}
+        protected = {"chain", "brake_hose", "swingarm", "fork_upper", "fork_lower", "shock_body", "shock_shaft", "shock_clevis", "shock_spring"}
         protected.update(o.name for o in all_obs if o.name.endswith("_blur") or o.name.endswith("_spokes"))
         fixed = sum(tris[name] for name in protected)
         reducible = sum(tris.values()) - fixed

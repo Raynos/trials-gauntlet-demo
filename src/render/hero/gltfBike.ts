@@ -12,6 +12,7 @@ import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
 import { countTriangles, prepareHeroMaterials } from './gltf';
 import { SpokeBlur, variantMaterialsFor } from './lod';
+import { BrakeHose } from './brakeHose';
 import type { BikeClass } from '../../core/types';
 
 /** A clockwise external-tangent belt, parametrized by arc-length fraction. */
@@ -84,6 +85,7 @@ export class GltfBike implements HeroBike {
   private chainPitch = 0;
   private chainRadius = 0;
   private chainGeometry: THREE.BufferGeometry | null = null;
+  private readonly brakeHose: BrakeHose | null;
   private readonly rearFile = new THREE.Vector3();
   private readonly frontFile = new THREE.Vector3();
   private readonly linkage = new THREE.Vector3();
@@ -193,6 +195,8 @@ export class GltfBike implements HeroBike {
     if (!(this.chainPitch > 0 && this.chainRadius > 0)) throw new Error('bike chain parameters are missing');
     this.chainGeometry = chain.geometry.clone();
     chain.geometry = this.chainGeometry;
+    const hose = this.scene.getObjectByName('brake_hose') as THREE.Mesh | undefined;
+    this.brakeHose = hose ? new BrakeHose(hose) : null;
     this.shockRestQ.copy(this.nodes['shockBody'].quaternion);
     for (const key of ['wheelRear', 'wheelFront'] as const) {
       const wheel = this.nodes[key];
@@ -213,6 +217,8 @@ export class GltfBike implements HeroBike {
     this.blurs[0]?.update(f.rear.spinVel);
     this.blurs[1]?.update(f.front.spinVel);
     n['forkLower']!.position.copy(this.frontFile);
+    const axleRest = this.rest.get('front_axle_rest')!;
+    this.brakeHose?.update(this.frontFile.x - axleRest.x, this.frontFile.y - axleRest.y);
     n['sprocketFront']!.rotation.z = rearAngle * this.rearPitch / this.frontPitch;
     const pivot = this.rest.get('swing_pivot')!, axle = this.rest.get('swing_axle')!;
     n['swingarm']!.rotation.z = Math.atan2(this.rearFile.y - pivot.y, this.rearFile.x - pivot.x) - Math.atan2(axle.y - pivot.y, axle.x - pivot.x);
@@ -316,6 +322,7 @@ export class GltfBike implements HeroBike {
     for (const m of this.materials) m.dispose();
     this.chainMap?.dispose();
     this.chainGeometry?.dispose();
+    this.brakeHose?.dispose();
     for (const blob of [this.rearBlob, this.frontBlob]) {
       blob.mesh.geometry.dispose();
       const material = blob.mesh.material as THREE.MeshBasicMaterial;

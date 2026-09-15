@@ -3,18 +3,18 @@ import { decodeJSON, iterateFrames } from '../src/core/replay';
 import type { QualityTier } from '../src/core/types';
 import type { HeroHarnessWindow } from './hero-browser';
 // Played hero capture with full prefix rendering, exact timestamps and consumed-model byte proofs.
-// Run: tsx harness/hero-capture.mts build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal]
+// Run: tsx harness/hero-capture.mts build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal|webkit]
 import { createServer } from 'node:http';
 import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
 
 const [buildArg, recordingArg, outArg, fromArg, toArg, quality = 'high', outfit = 'street', fpsArg = '60', size = '1280x720', angleBackend = 'swiftshader'] = process.argv.slice(2);
-if (!buildArg || !recordingArg || !outArg) throw new Error('build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal]');
+if (!buildArg || !recordingArg || !outArg) throw new Error('build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal|webkit]');
 if (!['street', 'race'].includes(outfit) || !['low', 'medium', 'high'].includes(quality)) throw new Error('invalid outfit or quality');
-if (!['swiftshader', 'metal'].includes(angleBackend)) throw new Error('unsupported ANGLE backend');
+if (!['swiftshader', 'metal', 'webkit'].includes(angleBackend)) throw new Error('unsupported graphics backend');
 const [width, height] = size.split('x').map(Number);
 if (!width || !height || ![width, height].every(Number.isSafeInteger)) throw new Error('integer widthxheight required');
 const build = path.resolve(buildArg), out = path.resolve(outArg);
@@ -66,8 +66,10 @@ const server = createServer(async (req, res) => {
 });
 await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
 const addr = server.address() as { port: number };
-const launchArgs = [`--use-angle=${angleBackend}`, ...(angleBackend === 'swiftshader' ? ['--enable-unsafe-swiftshader'] : []), '--enable-webgl', '--ignore-gpu-blocklist', '--mute-audio'];
-const browser = await chromium.launch({ headless: true, args: launchArgs });
+const launchArgs = angleBackend === 'webkit' ? [] : [`--use-angle=${angleBackend}`, ...(angleBackend === 'swiftshader' ? ['--enable-unsafe-swiftshader'] : []), '--enable-webgl', '--ignore-gpu-blocklist', '--mute-audio'];
+const browser = await (angleBackend === 'webkit' ? webkit : chromium).launch({ headless: true, args: launchArgs });
+const browserIdentity = { browser: angleBackend === 'webkit' ? 'webkit' : 'chromium', browserVersion: browser.version(),
+  ...(angleBackend === 'webkit' ? {} : { chromium: browser.version() }) };
 const errors: string[] = [], responses: Promise<void>[] = [], downloads: Record<string, string> = {};
 const servedFiles: Record<string, string> = {};
 const responseFailures: string[] = [];
@@ -161,7 +163,7 @@ try {
       userAgent: navigator.userAgent,
     };
   });
-  if (!(angleBackend === 'metal' ? /Metal/ : /SwiftShader/i).test(graphics.renderer)) throw new Error(`requested ${angleBackend}, received ${graphics.renderer}`);
+  if (angleBackend !== 'webkit' && !(angleBackend === 'metal' ? /Metal/ : /SwiftShader/i).test(graphics.renderer)) throw new Error(`requested ${angleBackend}, received ${graphics.renderer}`);
   const captureStarted = performance.now();
   const trace: Record<string, unknown>[] = [];
   let frame = 0;
@@ -202,13 +204,13 @@ try {
   if (modelProof.errors.length) throw new Error(modelProof.errors.join('\n'));
   Object.assign(downloads, modelProof.hashes);
   for (const name of Object.keys(assetBytes)) if (downloads[name] !== assetBytes[name]) throw new Error(`download bytes differ for ${name}`);
-  const report = { build, buildFiles, servedFiles, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), assetBytes, downloads, physics, hz, fps, from, to, firstFrameInputTick: from + ticksPerFrame, interval: '(from,to]', frames: frame, prefixRendered: true, renderAlpha: 1, setup: 'await scene readiness between class, track and quality changes', quality, outfit, width, height, graphics: { requestedBackend: angleBackend, launchArgs, chromium: browser.version(), hostPlatform: process.platform, ...graphics }, captureWallMs: performance.now() - captureStarted, errors, trace };
+  const report = { build, buildFiles, servedFiles, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), assetBytes, downloads, physics, hz, fps, from, to, firstFrameInputTick: from + ticksPerFrame, interval: '(from,to]', frames: frame, prefixRendered: true, renderAlpha: 1, setup: 'await scene readiness between class, track and quality changes', quality, outfit, width, height, graphics: { requestedBackend: angleBackend, launchArgs, ...browserIdentity, hostPlatform: process.platform, ...graphics }, captureWallMs: performance.now() - captureStarted, errors, trace };
   await writeFile(path.join(out, 'evidence.json'), JSON.stringify(report, null, 2));
   const ff = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-framerate', String(fps), '-i', path.join(out, 'frames', 'frame-%05d.png'), '-frames:v', String(frame), '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', path.join(out, 'clip.mp4')], { encoding: 'utf8' });
   if (ff.status !== 0) throw new Error(ff.stderr);
   console.log(JSON.stringify({ out, frames: frame, assetBytes, errors, final: trace.at(-1) }));
 } catch (error) {
-  await writeFile(path.join(out, 'failure.json'), JSON.stringify({ build, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), requestedBackend: angleBackend, launchArgs, chromium: browser.version(), errors, executionErrors, responseFailures, failure: error instanceof Error ? error.message : String(error) }, null, 2));
+  await writeFile(path.join(out, 'failure.json'), JSON.stringify({ build, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), requestedBackend: angleBackend, launchArgs, ...browserIdentity, errors, executionErrors, responseFailures, failure: error instanceof Error ? error.message : String(error) }, null, 2));
   throw error;
 } finally {
   await browser.close();

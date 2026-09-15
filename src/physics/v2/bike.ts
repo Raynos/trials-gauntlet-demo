@@ -320,6 +320,11 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private readonly servoWrench = { x: 0, y: 0, torque: 0 };
   /** Per-step constraint workspace, cleared before every solve (not persistent simulation state). */
   private readonly riderLimits = Array.from({ length: 8 }, () => ({ rx: 0, ry: 0, cx: 0, cy: 0, nx: 0, ny: 0, jr: 0, jc: 0, gap: 0, mass: 0, minVelocity: 0, impulse: 0 }));
+  // Allocation-free, per-call block workspace. Every used entry is overwritten before reading.
+  private readonly riderGram = new Float64Array(64);
+  private readonly riderBlockMatrix = new Float64Array(12);
+  private readonly riderBlockIds = new Uint8Array(3);
+  private readonly riderBlockImpulse = new Float64Array(3);
   private readonly rigPose = makeRiderRigPose();
   private readonly rigProbe = makeRiderRigPose();
   private rigKeyX = Number.NaN;
@@ -1010,7 +1015,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
       let stiffness = st.k;
       const over = comp - st.stopStart * st.travel;
       if (over > 0) {
-        force += st.kStop * over ** 3 / st.travel ** 2;
+        // Keep integer powers in ordered IEEE754 products: libm pow varies across engines.
+        force += st.kStop * (over * over * over) / st.travel ** 2;
         stiffness += 3 * st.kStop * over ** 2 / st.travel ** 2;
       }
       const damping = this.sRate[w]! > 0 ? st.cComp : st.cReb;
@@ -1763,6 +1769,106 @@ class WorldV2 implements BikePhysicsWorldV2 {
     return worst;
   }
 
+  /** Solve one candidate active set of the unilateral mass Gram system. Anatomical rows
+   * have only three relative coordinates, so an independent active set has at most three
+   * members. Stable index order and partial pivoting make degenerate choices deterministic. */
+  private riderBlockCandidate(n: number, i: number, j: number, k: number, regularizer: number): boolean {
+    const ids = this.riderBlockIds, a = this.riderBlockMatrix, impulse = this.riderBlockImpulse;
+    const gram = this.riderGram, rows = this.riderLimits;
+    ids[0] = i; ids[1] = j; ids[2] = k;
+    for (let r = 0; r < n; r++) {
+      const id = ids[r]!, diagonal = gram[id * 8 + id]!;
+      if (!(diagonal > 1e-12)) return false;
+      for (let c = 0; c < n; c++) {
+        const other = ids[c]!;
+        // Normalize mixed metre/radian rows before numerical rank decisions.
+        a[r * 4 + c] = gram[id * 8 + other]! / Math.sqrt(diagonal * gram[other * 8 + other]!) + (r === c ? regularizer : 0);
+      }
+      a[r * 4 + n] = -rows[id]!.gap / Math.sqrt(diagonal);
+    }
+    for (let column = 0; column < n; column++) {
+      let pivot = column;
+      for (let row = column + 1; row < n; row++) if (Math.abs(a[row * 4 + column]!) > Math.abs(a[pivot * 4 + column]!)) pivot = row;
+      if (!(Math.abs(a[pivot * 4 + column]!) > 1e-12)) return false;
+      if (pivot !== column) for (let c = column; c <= n; c++) {
+        const value = a[column * 4 + c]!;
+        a[column * 4 + c] = a[pivot * 4 + c]!; a[pivot * 4 + c] = value;
+      }
+      for (let row = column + 1; row < n; row++) {
+        const factor = a[row * 4 + column]! / a[column * 4 + column]!;
+        for (let c = column; c <= n; c++) a[row * 4 + c] = a[row * 4 + c]! - factor * a[column * 4 + c]!;
+      }
+    }
+    for (let row = n - 1; row >= 0; row--) {
+      let value = a[row * 4 + n]!;
+      for (let c = row + 1; c < n; c++) value -= a[row * 4 + c]! * impulse[c]!;
+      value /= a[row * 4 + row]!;
+      if (!(value >= 0) || !Number.isFinite(value)) return false;
+      impulse[row] = value;
+    }
+    for (let row = 0; row < n; row++) impulse[row] = impulse[row]! / Math.sqrt(gram[ids[row]! * 8 + ids[row]!]!);
+    for (let row = 0; row < 8; row++) {
+      let gap = rows[row]!.gap;
+      for (let c = 0; c < n; c++) {
+        const id = ids[c]!;
+        gap += (gram[row * 8 + id]! + (row === id ? regularizer * gram[row * 8 + row]! : 0)) * impulse[c]!;
+      }
+      if (!(gap >= -1e-7)) return false;
+    }
+    return true;
+  }
+
+  /** Bounded Newton continuation for a position pass whose sequential rows did not close.
+   * Regularized subsets supply a direction when the exact linearization is infeasible;
+   * they do not soften the joint. Only newly evaluated nonlinear gaps can end the solve. */
+  private projectRiderBlock(): number {
+    this.prepareRiderLimits(false);
+    const rows = this.riderLimits, gram = this.riderGram;
+    let worst = 0;
+    for (let i = 0; i < 8; i++) worst = Math.max(worst, -rows[i]!.gap);
+    if (worst <= 1e-6) return worst;
+    for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
+      const a = rows[i]!, b = rows[j]!;
+      gram[i * 8 + j] = (this.im[RIDER]! + this.im[CHASSIS]!) * (a.nx * b.nx + a.ny * b.ny)
+        + this.ii[RIDER]! * a.jr * b.jr + this.ii[CHASSIS]! * a.jc * b.jc;
+    }
+    let count = 0;
+    for (let attempt = 0; attempt < 4 && count === 0; attempt++) {
+      const regularizer = attempt === 0 ? 0 : attempt === 1 ? 1e-6 : attempt === 2 ? 1e-4 : 0.01;
+      for (let i = 0; i < 8 && count === 0; i++) if (this.riderBlockCandidate(1, i, 0, 0, regularizer)) count = 1;
+      for (let i = 0; i < 8 && count === 0; i++) for (let j = i + 1; j < 8 && count === 0; j++) if (this.riderBlockCandidate(2, i, j, 0, regularizer)) count = 2;
+      for (let i = 0; i < 8 && count === 0; i++) for (let j = i + 1; j < 8 && count === 0; j++) for (let k = j + 1; k < 8 && count === 0; k++) if (this.riderBlockCandidate(3, i, j, k, regularizer)) count = 3;
+    }
+    if (count === 0) {
+      // An impossible/singular local model is not success. Take one bounded unilateral
+      // recovery step, then let the coupled pass rebuild the actual geometry.
+      let largest = 0;
+      for (let i = 0; i < 8; i++) {
+        const q = rows[i]!, correction = -q.gap * Math.sqrt(q.mass);
+        if (q.gap < -1e-6 && correction > largest) {
+          largest = correction; this.riderBlockIds[0] = i; this.riderBlockImpulse[0] = -q.gap * q.mass; count = 1;
+        }
+      }
+    }
+    let x = 0, y = 0, r = 0, c = 0;
+    for (let i = 0; i < count; i++) {
+      const q = rows[this.riderBlockIds[i]!]!, impulse = this.riderBlockImpulse[i]!;
+      x += q.nx * impulse; y += q.ny * impulse; r += q.jr * impulse; c += q.jc * impulse;
+    }
+    const scale = 1 / Math.max(1, Math.sqrt(x * x + y * y) * Math.max(this.im[RIDER]!, this.im[CHASSIS]!) / 0.01,
+      Math.abs(r * this.ii[RIDER]!) / 0.02, Math.abs(c * this.ii[CHASSIS]!) / 0.02);
+    x *= scale; y *= scale; r *= scale; c *= scale;
+    if (Number.isFinite(x + y + r + c)) {
+      this.px[RIDER] = this.px[RIDER]! + x * this.im[RIDER]!;
+      this.py[RIDER] = this.py[RIDER]! + y * this.im[RIDER]!;
+      this.an[RIDER] = this.an[RIDER]! + r * this.ii[RIDER]!;
+      this.px[CHASSIS] = this.px[CHASSIS]! - x * this.im[CHASSIS]!;
+      this.py[CHASSIS] = this.py[CHASSIS]! - y * this.im[CHASSIS]!;
+      this.an[CHASSIS] = this.an[CHASSIS]! - c * this.ii[CHASSIS]!;
+    }
+    return worst;
+  }
+
   private solveRagdollJoints(damp: boolean): void {
     const dt = this.dt;
     const bj = this.tuning.solver.jointBaumgarte;
@@ -1857,6 +1963,17 @@ class WorldV2 implements BikePhysicsWorldV2 {
    * contact penetrations beyond `slop`, each linearised about the collide-time pose. Velocities untouched.
    */
   private positionPass(): void {
+    this.positionSolve(false);
+    if (this.tuning.solver.posIters <= 0 || this.U[U_FAULT] !== 0) return;
+    // The ordinary pass refreshes every anatomical gap after its last correction. Preserve
+    // its exact operation order and result whenever it already meets the physical tolerance.
+    for (let i = 0; i < 8; i++) if (this.riderLimits[i]!.gap < -1e-6) {
+      this.positionSolve(true);
+      break;
+    }
+  }
+
+  private positionSolve(anatomyBlock: boolean): void {
     const t = this.tuning;
     if (t.solver.posIters <= 0) return;
     const im = this.im;
@@ -1979,7 +2096,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
           an[B] = an[B]! - ii[B]! * rnB * lambda;
         }
       }
-      if (this.U[U_FAULT] === 0) worst = Math.max(worst, this.projectRiderLimits(1));
+      if (this.U[U_FAULT] === 0) worst = Math.max(worst, anatomyBlock ? this.projectRiderBlock() : this.projectRiderLimits(1));
       if (it + 1 >= t.solver.posIters && worst < 1e-6) break;
     }
   }

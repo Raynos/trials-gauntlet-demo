@@ -2,14 +2,14 @@
 // URLs identify the snapshotted full/LOD pair and each file's actual bytes.
 export const MODEL_ASSETS = {
   "models/bike-lod.glb": {
-    "url": "models/72b2548aeb24808d/bike-lod-a64d762183da9fdc.glb",
-    "bytes": 443800,
-    "sha256": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7"
+    "url": "models/0faca8ae35f15b10/bike-lod-c614c99f1956b359.glb",
+    "bytes": 444248,
+    "sha256": "c614c99f1956b359c4c56ac9d5180a1938ff5a21d0f42eeb02ab2b0f23937db1"
   },
   "models/bike.glb": {
-    "url": "models/72b2548aeb24808d/bike-0f3267de654f0035.glb",
-    "bytes": 1290288,
-    "sha256": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7"
+    "url": "models/0faca8ae35f15b10/bike-60ce3998f3204b88.glb",
+    "bytes": 1315952,
+    "sha256": "60ce3998f3204b888eb300608534f567ac3e7a8d79d17b277c99d7ad51839b37"
   },
   "models/rider-lod.glb": {
     "url": "models/4fc1486a94f956ce/rider-lod-f88a6b9f9b86f2bb.glb",
@@ -27,14 +27,14 @@ export const MODEL_ASSETS = {
     "sha256": "ee10c0372847d42138aafddc911e561be7fb9da20e01475d5aa5fe8b2d99f6fb"
   },
   "models/rider-street-lod.glb": {
-    "url": "models/3f2e42bfb67cef9b/rider-street-lod-272d6933529e962e.glb",
-    "bytes": 461704,
-    "sha256": "272d6933529e962ed8ca9c61229a50b7c27d2e889f2e78f8778969b101f60399"
+    "url": "models/f0e98c92279ca706/rider-street-lod-c8e3aa9e378e64d1.glb",
+    "bytes": 474960,
+    "sha256": "c8e3aa9e378e64d197b33d6732d9cd34b0ca4b5d6b1bb7b2fa23876917d68358"
   },
   "models/rider-street.glb": {
-    "url": "models/3f2e42bfb67cef9b/rider-street-2d5ab2bef843318b.glb",
-    "bytes": 803080,
-    "sha256": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6"
+    "url": "models/f0e98c92279ca706/rider-street-6241a16167203c6a.glb",
+    "bytes": 784284,
+    "sha256": "6241a16167203c6a09f2207ee6bdee356ad13928d96cf898e4a0b411507bc946"
   },
   "models/rider.glb": {
     "url": "models/4fc1486a94f956ce/rider-158f2dbd9ac845c2.glb",
