@@ -524,7 +524,7 @@ export class TrackSelectScreen extends Screen {
     const medal = best?.medal;
     const ahead = best && target ? best.time <= target : false;
     // A stored PB recording: the ghost tag doubles as the "Watch PB" control (click / V / pad Y opens the replay viewer).
-    const ghost = best?.recording ? `<em class="ghost watch" title="Watch the personal best">${this.state().ghost ? 'PB ghost' : 'PB'} · ▶ Watch</em>` : '';
+    const ghost = best?.recording ? `<em class="ghost watch" title="Watch the personal best">▶ ${this.state().ghost ? 'Ghost' : 'PB'}</em>` : '';
     const prev = TIER_ORDER[TIER_ORDER.indexOf(t.tier) - 1];
     const bikeTag = best?.bike === 'pro' ? '<em class="bike">Pro</em>' : '';
     // Locked: the card itself states the unlock rule (the row head says it too, but a thumb lands on the card).

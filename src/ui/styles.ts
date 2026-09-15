@@ -151,7 +151,7 @@ export const FRONT_CSS = /* css */ `
 
 /* ---- track select ----------------------------------------------------- */
 .tracks-screen { background: linear-gradient(90deg, rgba(6,7,9,.88) 0%, rgba(6,7,9,.6) 40%, rgba(6,7,9,.35) 100%); }
-.tracks-head { position: absolute; left: calc(calc(5 * var(--vw)) + var(--sal)); right: calc(calc(5 * var(--vw)) + var(--sar)); top: calc(var(--s5) + var(--sat)); display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s4); }
+.tracks-head { position: absolute; left: calc(calc(5 * var(--vw)) + var(--sal)); right: calc(calc(5 * var(--vw)) + var(--sar) + 8.5rem); /* the MENU pill lives in the last 8.5rem */ top: calc(var(--s5) + var(--sat)); display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s4); }
 .tracks-head h1 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.2rem; line-height: .9; text-transform: uppercase; letter-spacing: .01em; }
 .tracks-head h1 small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .34em; color: var(--amber); margin-bottom: .35em; }
 .tracks-totals { display: flex; gap: var(--s4); font-size: .9rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; align-items: center; }
@@ -175,7 +175,7 @@ export const FRONT_CSS = /* css */ `
 .card .tint::after { content: attr(data-badge); position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%) rotate(-8deg); font-family: var(--display); font-style: italic; font-weight: 900; font-size: 3.2rem; color: rgba(255,255,255,.08); letter-spacing: .02em; text-transform: uppercase; }
 .card .veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.18) 0%, transparent 35%, rgba(4,5,7,.55) 60%, rgba(4,5,7,.94) 100%); }
 .card .top { position: absolute; left: var(--s3); right: var(--s3); top: var(--s2); display: flex; justify-content: space-between; align-items: center; font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); text-shadow: var(--outline); }
-.card .top em.ghost { font-style: normal; color: var(--ink); background: rgba(255,255,255,.14); border-radius: 3px; padding: 1px 6px; margin-right: 2.1rem; letter-spacing: .1em; }
+.card .top em.ghost { font-style: normal; color: var(--ink); background: rgba(255,255,255,.14); border-radius: 3px; padding: 1px 6px; margin-right: 2.1rem; letter-spacing: .1em; white-space: nowrap; }
 .card .medal { position: absolute; right: var(--s2); top: var(--s2); width: 1.7rem; height: 1.7rem; border-radius: 50%; background-size: cover; background-position: center; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
 .card .medal.none { background: rgba(255,255,255,.06); border: 1px dashed var(--line); box-shadow: none; }
 .card .medal.plain { background: currentColor; box-shadow: inset 0 -3px 0 rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.6); }
@@ -397,7 +397,7 @@ html.short .bc-art { display: none; }
 .bc-stats .stat em { font-style: normal; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .bc-note { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); padding-top: var(--s2); border-top: 1px solid var(--line-2); }
 .bike-card.on .bc-note { color: var(--ink-dim); }
-.card .top em.bike { font-style: normal; color: #0b1a2e; background: var(--blue); border-radius: 3px; padding: 1px 6px; margin-right: 2.1rem; letter-spacing: .1em; font-weight: 700; }
+.card .top em.bike { font-style: normal; color: #0b1a2e; background: var(--blue); border-radius: 3px; padding: 1px 6px; margin-right: 2.1rem; letter-spacing: .1em; font-weight: 700; white-space: nowrap; }
 .card .top em.ghost + em.bike { margin-left: -1.9rem; }
 .card .lockline { position: absolute; left: var(--s3); right: var(--s3); top: 36%; transform: translateY(-50%); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); font-weight: 700; text-shadow: var(--outline); display: flex; align-items: center; gap: .45em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card .lockline::before { content: ""; flex: 0 0 auto; width: 1em; height: 1em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E") center / contain no-repeat; }
