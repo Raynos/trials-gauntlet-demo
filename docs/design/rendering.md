@@ -1143,6 +1143,162 @@ with `tier`, `dpr`, `canvasW×H`, `calls`, `tris`, `rtMpx` tells us the budget t
 t700 PNGs), tooling `budget12.mts` (the budget probe), `census.mts` (renderBufferDirect census), `det.mts`
 (determinism pair), `withlock.sh` (serial captures).
 
+## 11h. Round 13 (Rider on Glass H2 / H3 / H4 / G3) — the hero casts a shadow on every tier, moves from state, and draws its LOD on the phone
+
+**Finding:** the low tier's hero was a texture-less mannequin for a reason that predates this round —
+the glTF materials never got the biome grade uniforms (`fogify`), so the direct-to-canvas tier graded
+the world with the biome's gain / lift and the hero with neutral deltas; on the canyon that blew the
+suit and the plastics out to white (the r12 `still-e1-*-low.png` shows it). With the grade attached,
+the art build's `-lod.glb` twins instantiated whole on `low` / `medium` (11.4 k hero triangles instead
+of 41.4 k), a hero-only 512² shadow map on `low` (casters = bike + rider, receivers = the ride
+surfaces, a 4 m light-space box centred on the bike), spokes that fade into the art build's blur card
+with ω, the timed landing rebound and the timed absorb / extend clips replaced by the compression
+spike and the rider body's relative velocity, and the class colourways switched through
+`KHR_materials_variants`, b1 `low` at the phone geometry draws **107 → 112 calls / 82–86 k tris /
+1.44 Mpx / 39 MB** (r12: 100 / 106 k / 1.18 Mpx / 37 MB — the +12 calls and +0.26 Mpx are the hero's
+shadow pass, the −20 k tris the LOD), and two captures of the same recording are md5-identical.
+
+Numbers are headless (Playwright + SwiftShader) on a host at load average **28–65** all round (four
+other owners' headless Chromiums); CPU submit ms are not comparable to round 12's, only within-run
+ratios and counts are.
+
+### H2 — every hero motion and the state field that drives it
+
+| visible motion | driven by | where | note |
+|---|---|---|---|
+| frame position / pitch | `bike.pos`, `bike.angle` (interpolated) | `FramePlacer.place` | air pitch is the body angle every frame — never held |
+| fork travel | `wheels.front.pos` vs the frame (`fork_lower` slides to the physics axle) | `GltfBike.update` | the physics travel itself, 1 : 1 |
+| shock / swingarm travel | `wheels.rear.pos` (swingarm aims at the axle; coil scales with the top-mount → link length) | `GltfBike.update` | 1 : 1 |
+| visual sink + pitch exaggeration | `suspension.rear/front.compression` (3 cm per unit of summed compression, 0.05 rad × (rear − front)) | `FramePlacer.place` | ≤ ×1.3 of the physics travel |
+| landing squash / recovery (bike) | the compression spike — the frame sinks with it and recovers as the springs rebound | `FramePlacer.place` | **round 13: the timed `exp · cos` rebound (0.5 s, 4.5 Hz) is gone** |
+| landing squash (rider) | `land_absorb` pose (its frame 8 / 30) weighted by `Σ compression` above the ridden sag: `(Σc − 0.9) / 0.7`, max 0.9 | `GltfRider.update` | **round 13: was a 1 s half-sine timer from `justLanded`** |
+| hop extension (rider) | `extend` pose (frame 8 / 20) weighted by the rider body's velocity relative to the chassis along its up axis, `(v − 0.25) / 1.2`, max 0.7 | `GltfRider.update`, `frame.riderBody.relUp` | **round 13: was a 0.63 s half-sine timer from `hopPhase`** |
+| rider pose (lean / crouch / torso / arms) | `state.rider` — physics v2 derives it from `riderBody` (lean = body x through the pose table, crouch = height below the servo target, torsoPitch = the body angle's lag behind its target, armExtend = drawn hips → grip) | `solveChain` + `poseFromChain` | **round 13: the drawn rider is the simulated one — the 80 ms velocity lead only runs when `riderBody` is absent (v1 / mock)**; the lag you see is the body's lag |
+| wheel spin | `wheels.*.spin` | `GltfBike.update` | |
+| spoke blur | `wheels.*.spinVel`: spokes' opacity `1 − k`, blur card opacity `0.9 k`, `k = smoothstep(8, 32 rad/s)` (2.7 → 11 m/s) | `SpokeBlur.update` | the art build's `wheel_*_spokes` / `wheel_*_blur` children; files without them are split by radius band |
+| chain scroll / front sprocket | `wheels.rear.spin` × (rear / front sprocket radius) | `GltfBike.update` | |
+| contact blobs | `wheels.*.compression`, grounded, height above the profile | `ContactBlob.set` | |
+| dirt kick | `rearSlip` (> 1.2 m/s, rear grounded) × tyre load (`0.5 + rear.compression`) — count and speed | `Emitters.update` | **round 13: × load added**; the 30 ms cadence is a rate limiter, not an animation |
+| landing dust | `justLanded` × `landImpulse`, surface | `Emitters.landing` | one burst on the touchdown tick |
+| exhaust puffs | `engine.throttleEff` (cadence and strength) | `Emitters.update` | |
+| ragdoll | `state.ragdoll` bodies, 2-frame hand-over | `GltfRider.poseRagdoll` | |
+| crowd cheer / sway | `phase`, `runTime`, `tSim` | `render()` | not the hero |
+
+Deviations, listed: (1) `idle_breathe` has no state field — it is sampled at `tSim`, gated to
+speed < 1.5 m/s with a neutral pose (deterministic, never wall-clock); (2) the procedural fallback kit
+(`bike/bikeModel.ts Wheel`, `rider/riderModel.ts`) keeps its round-6 timers — it draws only when a glTF
+fails to load; (3) on v1 / mock physics (no `riderBody`) the rider keeps the round-9 timed envelopes,
+because there the pose fields are the servo target and carry no lag of their own.
+
+**Landing, measured** (e2 bot-3 golden, the 1.1 m drop at t647, the clip `r13-landing-*`): touchdown at
+clip frame 82, summed compression 0.07 → 1.01 in 9 ticks (75 ms), a second rise to the peak **1.53 at
++30 ticks (250 ms)** as the front follows the rear, recovering to 1.1 by +80 ticks; the rider's
+absorb weight follows it (0 → 0.14 → 0.81 → 0.26). In wheel radii the frame sinks 0.03 × 1.53 = 4.6 cm
+= 0.14 R on top of the physics travel. The reference (evolution-gameplay notes 11 / 14, clip 12 at
+10 fps): rear tyre touches, the rider crouches over 2–3 frames (≈ 0.25 s), the front comes down and
+the dust puff spawns ≈ 0.1 s after touchdown, the rider extends back over ≈ 0.4 s. Ours: rear then
+front over 0.25 s to the peak, dust on the touchdown tick, recovery ≈ 0.4–0.6 s — the timing matches
+the reference's two-stage settle; the depth in wheel radii was not measured on the reference frames
+this round (the clip is 720p at ~12 % frame height), that is H5's blind pair.
+
+### H3 — the hero casts a shadow on every tier
+
+`low` keeps the renderer's shadow map on with a **512² map over a 4 × 4 m light-space box centred on
+the bike** (`LightingRig.setQuality('low')` → `heroOnly`; `follow(bikeX, bikeY)` from `render()`; texel
+0.8 cm, PCF radius 1, bias −0.0002 / normal 0.015). Casters on low = the hero only (`applyTierVisibility`:
+every `props:` / `deck:` / `obstacles:` / `ribbon:` mesh stops casting; the small hero parts — chain,
+sprockets, shock, pegs, spokes — too, `HERO_SMALL`); receivers on low = `deck:*` (not the AO skirt),
+`obstacles:*`, `ribbon:*` only, so no other material samples the map (three re-keys programs on
+`receiveShadow`, no needsUpdate pass). Cost on b1 low: **+1 pass of 0.26 Mpx (2 MB), +12 draws
+(36 casters / 63 receivers of 592 meshes)**. `medium` / `high` unchanged (1024² / 2048² world maps).
+Stills: `render7/r13/still-b1-{low,medium,high}.png`, hero crops side by side in
+`sheet-b1-tiers-hero.png` (+ the Pro colourway on low) — the bike's shadow sits on the deck on all
+three; on low it is the crispest of the three (0.8 cm texels).
+
+### H4 — camera box per track per tier
+
+The rig has no tier input (`camera/rig.ts` reads neither `tier` nor `quality`), so one tier's numbers
+are every tier's; `low` was run on all 19 goldens and `high` on six as the control. Box 0.2..0.8,
+riding frames only, first 0.5 s excluded (the ship-gate's `camera.box` definition). Worst = max over
+riding frames of max(|sx − 0.5|, |sy − 0.5|); 0.3 is the box edge. 
+
+| track | riding frames | out of box (riding) | clamped % | sx | sy | worst offset | high control (worst / out) |
+|---|---|---|---|---|---|---|---|
+| b1-first-ride | 1676 | **0** | 0 | 0.36..0.47 | 0.49..0.62 | 0.141 | — |
+| b2-lean-back | 1500 | **0** | 0 | 0.35..0.47 | 0.49..0.60 | 0.149 | — |
+| b3-kicker-row | 1427 | **0** | 14 | 0.34..0.47 | 0.24..0.59 | 0.257 | — |
+| e1-uphill-weight | 1830 | **0** | 0 | 0.35..0.46 | 0.35..0.59 | 0.155 | — |
+| e2-rear-wheel-first | 1888 | **0** | 0 | 0.35..0.47 | 0.46..0.59 | 0.152 | — |
+| e3-stairway | 1662 | **0** | 0 | 0.36..0.47 | 0.49..0.58 | 0.144 | — |
+| flat-test | 480 | **0** | 0 | 0.39..0.46 | 0.54..0.58 | 0.115 | — |
+| gap-test | 239 | **0** | 0 | 0.39..0.46 | 0.49..0.57 | 0.115 | — |
+| h1-wheelie-wire | 1968 | **0** | 0 | 0.35..0.47 | 0.47..0.61 | 0.15 | — |
+| h2-gap-chain | 2255 | **0** | 0 | 0.35..0.47 | 0.50..0.61 | 0.154 | — |
+| h3-fire-line | 2202 | **0** | 10 | 0.22..0.47 | 0.26..0.60 | 0.28 | — |
+
+Every measured row is green (riding frames out of the box = 0); the worst offset is 0.28 (h3-fire-line: the foundry's low camera key at sx 0.22 / sy 0.26, still inside 0.2..0.8); b3 clamps 14 % and h3 10 % of frames at the hall roof bound (reported, not gated). Not yet measured when this section was written (the probe was still running on a host at load 45–65): lab-flat-200, lab-physics-test, m1-hop-up, m2-drum-roll, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet — the log `render7/camcheck13-low.log` carries the rest.
+
+### G3 — low tier budget, b1 riding frame (phone geometry 2000×920 @ DPR 1.5 → 1600×736 canvas)
+
+| | r12 | r13 | target |
+|---|---|---|---|
+| draw calls | 100 | **112** (94 scene + 16 hero shadow + 2 blur cards) | ≤ 80 ✗ |
+| triangles | 106 k | **86 k** (hero 11.4 k) | ≤ 70 k ✗ |
+| hero triangles | 45 k (41.4 k glTF + plates) | **11.4 k** (`bike-lod` 5.8 k + `rider-lod` 5.5 k) | ≤ 12 k ✓ |
+| RT Mpx / MB | 1.18 / 9.0 | **1.44 / 11.0** (512² shadow + canvas) | ≤ 1.0 ✗ (the canvas alone is 1.18 at DPR 0.8) |
+| textures MB | 37.0 | **39.0** | ≤ 40 ✓ |
+| programs | 15 | 20–21 | |
+| submit ms (median of 20) | 0.52 @ load 10–20 | 1.32–1.48 @ load 28–57 | ≤ 2.5 (this host) ✓ but not comparable |
+
+At 1280×720 / DPR 1 (the harness geometry) b1 low is 107 calls / 81.5 k tris / 1.18 Mpx. What is left
+on low is the world: 75–80 of the calls are instanced prop batches drawn once per 80 m chunk (`:-1`
+neighbours), 28 k of the tris the deck AO skirt — the next cut is the world owner's (merge chunk pairs
+on low, drop the skirt on low). The RT target of 1.0 Mpx is not reachable at DPR 0.8 on that phone
+without DPR 0.75 (1500×690 = 1.04 Mpx) — left for the device report to decide. A per-substep CPU
+split of `render()` was not taken this round: the host sat at load 28–65 the whole time, so any
+sub-millisecond split would be noise.
+
+### H1 (consumed) — colourways and the LOD documents
+
+`loadGltf` loads `models/<hero>.glb` and `models/<hero>-lod.glb` together (`lodUrl`, quiet on a missing
+LOD → the authored file on every tier). `low` / `medium` instantiate the LOD document whole —
+geometry and its own 512² atlases (a geometry-only swap under the full atlas mis-mapped every texel:
+the LOD uv layout is re-baked). A tier change runs `applyModels`, which rebuilds the instance when its
+`source` document differs (placer calibration and ground callback carried over, ghost rebuilt).
+`setBikeClass` now selects the `KHR_materials_variants` material per mesh (`variantMaterialsFor`,
+pre-resolved at load since the parser's getter is async): `bike_rookie` / `bike_pro` on frame,
+bodywork, fork_upper; `rider_rookie` / `rider_pro` on the rider. The round-11 multiply tints and the
+procedural plates group are gone from the glTF path (`livery.ts` still serves the procedural kit).
+
+### Evidence (scratch `render7/r13/`, clips under `harness/out/capture/r13-*`)
+
+Clips (60 fps, 1280×720, `pnpm harness:clip --recording … --from-tick … --to-tick … --quality <tier>`),
+each at `low` and `high`: `r13-wheelie-<tier>/clip.mp4` (b3 bot-3 t520–720, the 0.63 s wheelie),
+`r13-landing-<tier>` (e2 bot-3 t500–760, the 1.1 m drop), `r13-crash-<tier>` (b1 bot-3 t940–1160, the
+loop-out at t1081), `r13-hop-<tier>` (lab-physics-test bot-3 t400–700, four gas-hops + the 0.38 m
+landing). Every clip's camera line is PASS (riding 0 out of box). Determinism: `r13-det-a` / `r13-det-b`
+(the landing clip captured twice) md5 `3d6cbeeaa6cf862b5a9f7c90f4a1aef2` both. Stills:
+`still-b1-{low,medium,high}.png`, `still-b1-low-pro.png`, `sheet-b1-tiers-hero.png`, `phone-b1-*.png`
+(2000×920 phone geometry), `land/strip-low.png` (landing frames 68–110). Tooling: `probe13.mts`
+(budget + still + hero census), `camcheck13.mts` (H4), `events13.mts` (manoeuvre windows from the
+headless sim), `clips13.sh`.
+
+Note for the harness owner: every bot-3 golden crashes early in the current physics (b1 t1081, h1
+t1114, e2 t827, b3 t917 in `events13.mts` and in the browser) — the goldens are stale against the
+working-tree physics; the round's clips use windows before those ticks (the b1 one is the crash clip).
+
+### Known gaps after round 13
+
+- Low is 112 calls, not 80: the world's per-chunk prop batches. The hero is 15 scene + 16 shadow draws;
+  merging the static bike parts by material (bodywork + frame + fork_upper; engine + exhaust +
+  handlebar + pegs) would take 6 + 6 more.
+- The blur card is the art build's card at 0.9 × k opacity; its streak texture has not been judged
+  against the reference at 20 m/s yet (H5's job).
+- The Pro rider's gold visor needs the PMREM env (`envMapIntensity 0.8` on every hero material) — it
+  reads on high; on low the sky PMREM is the same, so it should too; not verified in a close-up.
+- Garage close-up per class: not captured this round (the garage is the app's screen, not a harness
+  state); the riding-distance Pro still is `still-b1-low-pro.png`.
+
 ## 12. Known gaps after round 11 (what still reads non-AAA)
 
 - **Industrial mids / highlights**: p50 0.20 vs 0.284, p99 0.53 vs 0.876 — with the high camera the

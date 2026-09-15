@@ -7,6 +7,8 @@
 import type * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { prepareHero } from './lod';
+import { fogify } from '../lighting/environment';
 
 export type ModelChoice = 'proc' | 'gltf';
 export interface ModelChoices {
@@ -16,8 +18,17 @@ export interface ModelChoices {
 
 const cache = new Map<string, Promise<GLTF | null>>();
 
-/** Load + parse once; a failed load resolves null (the caller keeps the procedural model). */
-export function loadGltf(url: string): Promise<GLTF | null> {
+/** `models/bike.glb` → `models/bike-lod.glb` (the art build's ≤ 6 k-tri twin: same nodes / rig / clips / material names, its own 512² atlases). */
+export function lodUrl(url: string): string {
+  return url.replace(/\.glb$/, '-lod.glb');
+}
+
+/**
+ * Load + parse once; a failed load resolves null (the caller keeps the procedural model, or — for a
+ * `-lod.glb` — the authored file on every tier). Round 13: `prepareHero` (spoke split for files
+ * without `<wheel>_spokes`, `KHR_materials_variants` table) runs before anyone clones the document.
+ */
+export function loadGltf(url: string, quiet = false): Promise<GLTF | null> {
   let p = cache.get(url);
   if (!p) {
     const loader = new GLTFLoader();
@@ -27,11 +38,13 @@ export function loadGltf(url: string): Promise<GLTF | null> {
         url,
         (g) => {
           shrinkTextures(g.scene);
-          resolve(g);
+          prepareHero(g)
+            .catch((err: unknown) => console.warn(`[render] hero prepare for ${url} failed:`, err))
+            .then(() => resolve(g));
         },
         undefined,
         (err) => {
-          console.warn(`[render] glTF ${url} failed:`, err);
+          if (!quiet) console.warn(`[render] glTF ${url} failed:`, err);
           resolve(null);
         },
       );
@@ -102,6 +115,10 @@ export function prepareHeroMaterials(root: THREE.Object3D, complete: (m: THREE.M
       const std = mat as THREE.MeshStandardMaterial;
       if (std.isMeshStandardMaterial) {
         complete(std);
+        // Round 13: the biome grade uniforms (`fogify`) — without them the direct-to-canvas tier
+        // graded the hero with neutral deltas while the world got the biome's gain / lift, which
+        // blew the hero out to white on the canyon's low tier (r12 stills show it too).
+        fogify(std);
         std.envMapIntensity = 0.8;
         out.push(std);
       }

@@ -126,22 +126,21 @@ export class ContactBlob {
 /**
  * Frame placement shared by both hero bikes: origin = bike.pos + R(angle) · originOffset
  * (calibrated to the axle midpoint on the first grounded frame), plus the visual suspension
- * exaggeration (≤ ×1.3 of the physics travel): sink 3 cm per unit of summed compression,
- * pitch 0.05 rad × (rear − front), and a ≤ 4 cm rebound overshoot after a hard landing.
+ * exaggeration (≤ ×1.3 of the physics travel): sink 3 cm per unit of summed compression and
+ * pitch 0.05 rad × (rear − front). Round 13 (H2): the landing rebound is no longer a timed
+ * `exp · cos` overshoot — physics v2's suspension already overshoots and settles, and the sink
+ * term follows `suspension.*.compression` directly, so the squash and its recovery ARE the
+ * compression spike (see rendering.md §11h, the motion → state table).
  */
 export class FramePlacer {
   /** bike.pos → axle midpoint, in frame-local coords (calibrated). */
   readonly originOffset = new THREE.Vector2(0.065, -0.27);
   calibrated = false;
-  private landT = -1;
-  private landAmp = 0;
 
-  /** Copy calibration + landing state from another placer (hot swap keeps the frame origin). */
+  /** Copy calibration from another placer (hot swap keeps the frame origin). */
   copyFrom(o: FramePlacer): void {
     this.originOffset.copy(o.originOffset);
     this.calibrated = o.calibrated;
-    this.landT = o.landT;
-    this.landAmp = o.landAmp;
   }
 
   place(f: RenderFrame, frame: THREE.Object3D): void {
@@ -157,18 +156,7 @@ export class FramePlacer {
     }
     const rc = f.rear.grounded ? f.rear.compression : 0;
     const fc = f.front.grounded ? f.front.compression : 0;
-    if (f.cut) this.landT = -1;
-    if (f.justLanded && f.landImpulse > 1.5) {
-      this.landT = f.tSim;
-      this.landAmp = Math.min(0.04, f.landImpulse * 0.01);
-    }
-    let rebound = 0;
-    if (this.landT >= 0) {
-      const lt = f.tSim - this.landT;
-      if (lt < 0.5) rebound = -this.landAmp * Math.exp(-lt / 0.14) * Math.cos(2 * Math.PI * 4.5 * lt);
-      else this.landT = -1;
-    }
-    const sink = -0.03 * (rc + fc) + rebound;
+    const sink = -0.03 * (rc + fc);
     const ox = this.originOffset.x;
     const oy = this.originOffset.y + sink;
     frame.position.set(f.bikeX + ox * c - oy * s, f.bikeY + ox * s + oy * c, 0);

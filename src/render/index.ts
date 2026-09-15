@@ -10,7 +10,8 @@ import type { BikeClass, CameraDebug, CompiledTrack, GameEvent, GamePhase, Physi
 import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
-import { HERO_URLS, loadGltf, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
+import { HERO_URLS, loadGltf, lodUrl, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
+import { lodChoice } from './hero/lod';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -76,6 +77,13 @@ export interface ThreeRendererOptions {
 
 type HeroRider = RiderModel | GltfRider;
 
+/** World meshes whose shadow roles the tier rules manage (round 13): props, deck, obstacles, ribbons. */
+const WORLD_MESH = /^(props:|deck:|obstacles:|ribbon:)/;
+/** The surfaces the bike rides — the only shadow receivers on `low` (the deck AO skirt excluded). */
+const RIDE_SURFACE = /^(deck:(?!ao)|obstacles:|ribbon:)/;
+/** Hero parts too small to change the 512² silhouette on `low` (chain, sprockets, shock, pegs, spokes): no shadow draw there. */
+const HERO_SMALL = /^(chain|sprocket_(front|rear)|shock_(body|spring)|pegs|wheel_(front|rear)(_spokes|:spokes))$/;
+
 export interface RenderBudget {
   calls: number;
   triangles: number;
@@ -120,7 +128,8 @@ export class ThreeRenderer implements GameRenderer {
   private models: ModelChoices = { riderModel: 'proc', bikeModel: 'proc' };
   private readonly nearestScratch: number[] = [];
   private bikeClass: BikeClass = 'rookie';
-  private readonly gltf: { bike: GLTF | null; rider: GLTF | null } = { bike: null, rider: null };
+  /** Parsed hero documents: the authored files and (round 13) their `-lod.glb` twins for `low` / `medium`. */
+  private readonly gltf: { bike: GLTF | null; rider: GLTF | null; bikeLod: GLTF | null; riderLod: GLTF | null } = { bike: null, rider: null, bikeLod: null, riderLod: null };
   /** In-flight setModels (glTF load + swap); `whenReady` waits for it. */
   private heroPending: Promise<void> = Promise.resolve();
   private heroLoading = 0;
@@ -318,8 +327,8 @@ export class ThreeRenderer implements GameRenderer {
     const want = this.models;
     this.heroLoading++;
     const run = async (): Promise<void> => {
-      if (want.bikeModel === 'gltf' && !this.gltf.bike) this.gltf.bike = await loadGltf(HERO_URLS.bike);
-      if (want.riderModel === 'gltf' && !this.gltf.rider) this.gltf.rider = await loadGltf(HERO_URLS.rider);
+      if (want.bikeModel === 'gltf' && !this.gltf.bike) [this.gltf.bike, this.gltf.bikeLod] = await Promise.all([loadGltf(HERO_URLS.bike), loadGltf(lodUrl(HERO_URLS.bike), true)]);
+      if (want.riderModel === 'gltf' && !this.gltf.rider) [this.gltf.rider, this.gltf.riderLod] = await Promise.all([loadGltf(HERO_URLS.rider), loadGltf(lodUrl(HERO_URLS.rider), true)]);
       if (want !== this.models) return; // superseded
       this.applyModels();
     };
@@ -330,12 +339,23 @@ export class ThreeRenderer implements GameRenderer {
       });
   }
 
+  /** The document the tier draws: `high` the authored file, `low` / `medium` the LOD twin when it loaded. */
+  private bikeDoc(): GLTF | null {
+    return lodChoice(this.tier) === 'lod' ? this.gltf.bikeLod ?? this.gltf.bike : this.gltf.bike;
+  }
+
+  private riderDoc(): GLTF | null {
+    return lodChoice(this.tier) === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
+  }
+
   private makeBike(choice: ModelChoice): HeroBike {
-    return choice === 'gltf' && this.gltf.bike ? new GltfBike(this.gltf.bike, this.lib) : new BikeModel(this.lib);
+    const doc = this.bikeDoc();
+    return choice === 'gltf' && doc ? new GltfBike(doc, this.lib) : new BikeModel(this.lib);
   }
 
   private makeRider(choice: ModelChoice): HeroRider {
-    return choice === 'gltf' && this.gltf.rider ? new GltfRider(this.gltf.rider, this.lib) : new RiderModel(this.lib);
+    const doc = this.riderDoc();
+    return choice === 'gltf' && doc ? new GltfRider(doc, this.lib) : new RiderModel(this.lib);
   }
 
   private kindOfBike(b: HeroBike): ModelChoice {
@@ -350,7 +370,10 @@ export class ThreeRenderer implements GameRenderer {
     const wantBike = this.models.bikeModel === 'gltf' && this.gltf.bike ? 'gltf' : 'proc';
     const wantRider = this.models.riderModel === 'gltf' && this.gltf.rider ? 'gltf' : 'proc';
     let changed = false;
-    if (this.kindOfBike(this.bike) !== wantBike) {
+    // Round 13: a tier change swaps the document (authored ↔ LOD) — same rebuild as a model change.
+    const bikeStale = this.bike instanceof GltfBike && this.bike.source !== this.bikeDoc();
+    const riderStale = this.rider instanceof GltfRider && this.rider.source !== this.riderDoc();
+    if (this.kindOfBike(this.bike) !== wantBike || bikeStale) {
       const next = this.makeBike(wantBike);
       if (this.tier === 'low') shrinkTextures(next.root, 512, 256);
       next.setLivery(this.bikeClass);
@@ -364,11 +387,12 @@ export class ThreeRenderer implements GameRenderer {
       old.dispose();
       changed = true;
     }
-    if (this.kindOfRider(this.rider) !== wantRider) {
+    if (this.kindOfRider(this.rider) !== wantRider || riderStale) {
       const old = this.rider;
       old.detach();
       this.scene.remove(old.root);
       const next = this.makeRider(wantRider);
+      if (next instanceof GltfRider) next.setLivery(this.bikeClass);
       next.attach(this.bike);
       if (this.tier === 'low') shrinkTextures(this.bike.root, 512, 256); // after attach: the glTF rider hangs under the bike frame
       this.scene.add(next.root);
@@ -376,6 +400,7 @@ export class ThreeRenderer implements GameRenderer {
       old.dispose();
       changed = true;
     }
+    if (changed) this.applyTierVisibility(); // round 13: the new hero instance takes the tier's shadow roles
     if (changed && this.ghost) {
       // The ghost follows the same choice (ghost tint works for both kits).
       const gs = this.ghostState;
@@ -787,6 +812,7 @@ export class ThreeRenderer implements GameRenderer {
     // The hero may not exist yet (built lazily by `ensureHero` / swapped by `applyModels`): both
     // paths read `bikeClass`, so a call before the first frame still lands.
     this.bikeRef?.setLivery(this.bikeClass);
+    if (this.riderRef instanceof GltfRider) this.riderRef.setLivery(this.bikeClass);
   }
 
   setQuality(tier: QualityTier): void {
@@ -798,17 +824,12 @@ export class ThreeRenderer implements GameRenderer {
     this.emitters.ambientEnabled = tier !== 'low';
     // Round 12: the tier owns the canvas resolution (low ≤ 1.0 DPR / 1600 px, medium ≤ 1.25, high ≤ 2).
     this.resize(this.width, this.height);
+    // Round 13 (H3): the shadow map stays on for every tier — `low` runs the hero-only 512² map
+    // (casters = bike + rider, receivers = the ride surfaces; `applyTierVisibility`). Three re-keys
+    // a program on `receiveShadow`, so no material flag is needed.
     this.applyTierVisibility();
-    // Shadows off on low: materials must recompile to drop the shadow sampling. (The tone-mapping
-    // variant swap of the direct-to-canvas tier needs no flag: three re-keys programs on it.)
-    const shadows = tier !== 'low';
-    if (this.renderer.shadowMap.enabled !== shadows) {
-      this.renderer.shadowMap.enabled = shadows;
-      this.scene.traverse((o) => {
-        const m = (o as THREE.Mesh).material;
-        for (const mat of Array.isArray(m) ? m : m ? [m] : []) mat.needsUpdate = true;
-      });
-    }
+    // Round 13 (G3): the hero draws the LOD document on low / medium (rebuilt here when it differs).
+    if (this.bikeRef && this.riderRef && (this.gltf.bike || this.gltf.rider)) this.applyModels();
     if (tier === 'low') {
       // Texture budget on low (≤ 40 MB): halve the hero atlases and the world's art / skins in
       // place. Not undone by a later step-up — the phone's medium runs on the same bitmaps, and a
@@ -820,19 +841,35 @@ export class ThreeRenderer implements GameRenderer {
     }
   }
 
-  /** Round 12: per-tier visibility of the volumetric / scatter batches (`world/props.ts tierHides`). Reversible; only touches names the rules manage. */
+  /**
+   * Round 12: per-tier visibility of the volumetric / scatter batches (`world/props.ts tierHides`).
+   * Round 13 (H3): per-tier shadow roles for the world — on `low` nothing in the world casts (the
+   * 512² map is the hero's) and only the ride surfaces (`deck:*`, `obstacles:*`, `ribbon:*`, not
+   * the AO skirt) receive, so no other material samples the map. Reversible: the built flags are
+   * remembered in `userData` and `medium` / `high` restore them.
+   */
   private applyTierVisibility(): void {
+    const low = this.tier === 'low';
     this.scene.traverse((o) => {
       if (!o.name) return;
       if (tierManaged(o.name)) o.visible = !tierHides(o.name, this.tier);
-      // Medium shadow casters (`tierCasts`): remember the built flag so `high` restores it.
-      if (o.name.startsWith('props:') && (o as THREE.Mesh).isMesh) {
-        const ud = o.userData as { castHigh?: boolean };
-        if (ud.castHigh === undefined) ud.castHigh = o.castShadow;
-        o.castShadow = ud.castHigh && tierCasts(o.name, this.tier);
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      if (HERO_SMALL.test(o.name)) {
+        o.castShadow = !low;
+        return;
       }
+      const world = WORLD_MESH.test(o.name);
+      if (!world) return;
+      const ud = o.userData as { castHigh?: boolean; receiveHigh?: boolean };
+      if (ud.castHigh === undefined) ud.castHigh = o.castShadow;
+      if (ud.receiveHigh === undefined) ud.receiveHigh = o.receiveShadow;
+      // Medium shadow casters (`tierCasts`): props by name; low: no world caster at all.
+      o.castShadow = !low && ud.castHigh && (!o.name.startsWith('props:') || tierCasts(o.name, this.tier));
+      o.receiveShadow = ud.receiveHigh && (!low || RIDE_SURFACE.test(o.name));
     });
   }
+
 
   camera(): CameraDebug {
     return this.rig.debug();
@@ -862,7 +899,8 @@ export class ThreeRenderer implements GameRenderer {
 
     this.rig.update(f);
     const cam = this.rig.camera;
-    this.lighting.follow(this.rig.targetX, this.rig.targetY, this.rig.distance > 20);
+    if (this.lighting.isHeroShadow) this.lighting.follow(f.bikeX, f.bikeY, false);
+    else this.lighting.follow(this.rig.targetX, this.rig.targetY, this.rig.distance > 20);
 
     this.bike.update(f);
     this.rider.update(f);
@@ -1089,6 +1127,10 @@ export class ThreeRenderer implements GameRenderer {
     rtMB: number;
     rtPasses: string;
     shadowMap: number;
+    /** Round 13: hero triangles drawn at this tier, which documents (authored / lod), and the low map's mode. */
+    heroTris: number;
+    heroDoc: string;
+    heroShadow: 'hero-only' | 'world';
     trackCalls: number;
     trackTris: number;
     textureGenMs: number;
@@ -1121,6 +1163,9 @@ export class ThreeRenderer implements GameRenderer {
       rtMB: +(bytes / 1048576).toFixed(1),
       rtPasses: writes.map((w) => `${w.name} ${w.width}×${w.height}`).join(' | '),
       shadowMap,
+      heroTris: (this.bikeRef?.triangles ?? 0) + (this.riderRef?.triangles ?? 0),
+      heroDoc: `${this.bikeRef instanceof GltfBike ? (this.bikeRef.source === this.gltf.bikeLod ? 'bike-lod' : 'bike') : 'bike-proc'} ${this.riderRef instanceof GltfRider ? (this.riderRef.source === this.gltf.riderLod ? 'rider-lod' : 'rider') : 'rider-proc'}`,
+      heroShadow: this.lightingRig?.isHeroShadow ? 'hero-only' : 'world',
       trackCalls: this.world?.trackCalls ?? 0,
       trackTris: Math.round(this.world?.trackTris ?? 0),
       textureGenMs: this.textureGenMs,

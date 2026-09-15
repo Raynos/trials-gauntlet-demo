@@ -133,7 +133,8 @@ export class Emitters {
         }
       } else if (surf !== 'concrete' && surf !== 'wood' && surf !== 'rubber') {
         this.lastDirtT = t;
-        const n = Math.min(10, Math.round(2 + f.rearSlip * 1.5));
+        // Round 13 (H2): dust ← slip × load — the puff count scales with the rear wheel's compression (tyre load).
+        const n = Math.min(10, Math.round((2 + f.rearSlip * 1.5) * (0.5 + f.rear.compression)));
         Object.assign(b, { x: f.rear.x - 0.25, y: f.rear.y - 0.28, z: 0, count: n, life: [0.35, 1.0], size: [0.1, 0.45], vx: -f.velX * 0.35 - 1.6 - f.rearSlip * 0.4, vy: 0.7, vz: 0, spread: 0.5, jitter: 0.06, color: DUST_COLOR[surf] ?? 0x9c8462, gravityScale: 1 });
         this.dust.emit(b, t, rng);
       }

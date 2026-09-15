@@ -12,10 +12,10 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { BIKE, ContactBlob, FramePlacer, type HeroBike } from '../bike/bikeModel';
 import { WHEEL_RADIUS, type RenderFrame } from '../frame';
 import type { MaterialLibrary } from '../materials/library';
+import { fogify } from '../lighting/environment';
 import { countTriangles, prepareHeroMaterials } from './gltf';
+import { SpokeBlur, variantMaterialsFor } from './lod';
 import type { BikeClass } from '../../core/types';
-import { applyPlate, LIVERIES } from '../bike/livery';
-import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 const FILE = {
   /** axle-midpoint frame → file frame (rear axle origin). */
@@ -36,28 +36,34 @@ export class GltfBike implements HeroBike {
   readonly placer = new FramePlacer();
   readonly exhaustTip = new THREE.Vector3(-0.83, 0.41, 0.15);
   readonly triangles: number;
+  /** The parsed document this instance was cloned from (`bike.glb` or `bike-lod.glb`): `applyModels` rebuilds on a tier change when it differs. */
+  readonly source: GLTF;
   readonly contacts: THREE.Object3D[];
   ground: ((x: number) => { y: number; angle: number }) | null = null;
   /** Materials of this instance (for ghost tinting). */
   readonly materials: THREE.MeshStandardMaterial[];
-  /** Livery targets (round 11): own clones of the atlas material for the plastics and the frame, + add-on plates. */
-  private readonly liveryMats: { body: THREE.MeshStandardMaterial | null; frame: THREE.MeshStandardMaterial | null; plate: THREE.MeshStandardMaterial };
-  private readonly atlasBody = new THREE.Color(1, 1, 1);
-  private readonly atlasFrame = new THREE.Color(1, 1, 1);
-  private atlasBodyRough = 1;
-  private readonly tint = new THREE.Color();
+  /**
+   * Round 13 (H1 colourways): per mesh, the instance's own completed clone of each
+   * `KHR_materials_variants` material (`bike_rookie` / `bike_pro` → `bike_body_*` on frame,
+   * bodywork, fork_upper). `setLivery` swaps them; nothing is tinted and the plates + class digit
+   * are baked in the atlas. Empty for a file without variants (then the livery is a no-op).
+   */
+  private readonly variants: { mesh: THREE.Mesh; byClass: Partial<Record<BikeClass, THREE.Material>> }[] = [];
   private livery: BikeClass = 'rookie';
   private readonly scene: THREE.Object3D;
   private readonly nodes: Record<string, THREE.Object3D | null>;
   private readonly rearBlob = new ContactBlob();
   private readonly frontBlob = new ContactBlob();
   private readonly chainMap: THREE.Texture | null;
+  /** Round 13 (H2): spoke opacity + blur disc per wheel from `spinVel`. */
+  private readonly blurs: SpokeBlur[] = [];
   private readonly q = new THREE.Quaternion();
   private readonly v = new THREE.Vector3();
   private readonly tmp3 = new THREE.Vector3();
   private readonly tmp2 = new THREE.Vector2();
 
   constructor(gltf: GLTF, lib: MaterialLibrary) {
+    this.source = gltf;
     this.scene = gltf.scene.clone(true);
     // Clone materials so the live bike and the ghost tint independently.
     const matMap = new Map<THREE.Material, THREE.Material>();
@@ -72,51 +78,32 @@ export class GltfBike implements HeroBike {
       }
       m.material = c;
     });
-    // Livery: the plastics and the frame get their own atlas clones so a class tint touches
-    // nothing else (engine, wheels, exhaust stay as authored).
-    const own = (name: string): THREE.MeshStandardMaterial | null => {
-      const mesh = this.scene.getObjectByName(name) as THREE.Mesh | undefined;
-      const src = mesh?.material as THREE.MeshStandardMaterial | undefined;
-      if (!mesh || !src?.isMeshStandardMaterial) return null;
-      const c = src.clone();
-      mesh.material = c;
-      return c;
-    };
-    const bodyMat = own('bodywork');
-    const frameMat = own('frame');
     this.materials = prepareHeroMaterials(this.scene, (m) => lib.complete(m));
-    if (bodyMat) {
-      this.atlasBody.copy(bodyMat.color);
-      this.atlasBodyRough = bodyMat.roughness;
-    }
-    if (frameMat) this.atlasFrame.copy(frameMat.color);
-    // Add-on number plates (the atlas has none): front plate off the bars, one per side under the seat.
-    const plateMat = lib.deriveHero('numberPlate');
-    applyPlate(plateMat, 'rookie');
-    this.liveryMats = { body: bodyMat, frame: frameMat, plate: plateMat };
-    this.materials.push(plateMat);
-    const plates = new THREE.Group();
-    plates.name = 'plates';
-    const front = new THREE.Mesh(new RoundedBoxGeometry(0.012, 0.17, 0.16, 2, 0.02), plateMat);
-    front.position.set(0.43, 0.8, 0);
-    front.rotation.z = -0.35;
-    plates.add(front);
-    for (const sd of [-1, 1]) {
-      const side = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.006, 20).rotateX(Math.PI / 2), plateMat);
-      side.scale.set(1.15, 1, 1);
-      side.position.set(-0.5, 0.42, sd * 0.13);
-      side.rotation.y = sd * 0.08;
-      plates.add(side);
-    }
-    plates.traverse((o) => {
-      const m = o as THREE.Mesh;
-      if (m.isMesh) {
-        m.castShadow = true;
-        m.frustumCulled = false;
+    // Colourways: one completed clone per (mesh, variant); the rookie slot material stays the
+    // mesh's current one so a file without variants keeps rendering as authored.
+    this.scene.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const table = variantMaterialsFor(gltf, mesh.name);
+      if (!table.size) return;
+      const byClass: Partial<Record<BikeClass, THREE.Material>> = {};
+      for (const [name, src] of table) {
+        const cls = /_pro$/.test(name) ? 'pro' : /_rookie$/.test(name) ? 'rookie' : null;
+        if (!cls) continue;
+        const own = src.clone();
+        const std = own as THREE.MeshStandardMaterial;
+        if (std.isMeshStandardMaterial) {
+          lib.complete(std);
+          fogify(std);
+          std.envMapIntensity = 0.8;
+          this.materials.push(std);
+        }
+        byClass[cls] = own;
       }
+      if (byClass.rookie && byClass.pro) this.variants.push({ mesh, byClass });
     });
     this.scene.position.set(-FILE.shift, 0, 0);
-    this.frame.add(this.scene, plates);
+    this.frame.add(this.scene);
     this.root.add(this.frame, this.rearBlob.mesh, this.frontBlob.mesh);
     this.root.name = 'bike:gltf';
     this.contacts = [this.rearBlob.mesh, this.frontBlob.mesh];
@@ -135,6 +122,11 @@ export class GltfBike implements HeroBike {
     const cm = chain?.material as THREE.MeshStandardMaterial | undefined;
     this.chainMap = cm?.map ?? null;
     if (this.chainMap) this.chainMap.wrapS = THREE.RepeatWrapping;
+    for (const key of ['wheelRear', 'wheelFront'] as const) {
+      const wheel = this.nodes[key];
+      if (wheel) this.blurs.push(new SpokeBlur(wheel, this.materials));
+    }
+    this.setLivery('rookie', true);
     this.triangles = countTriangles(this.scene);
   }
 
@@ -157,6 +149,9 @@ export class GltfBike implements HeroBike {
       n['wheelFront'].position.set(fx, fy, 0);
       n['wheelFront'].rotation.z = -f.front.spin;
     }
+    // Spoke blur from the wheels' angular velocity (H2: never a timer).
+    this.blurs[0]?.update(f.rear.spinVel);
+    this.blurs[1]?.update(f.front.spinVel);
     if (n['forkLower']) n['forkLower'].position.set(fx, fy, 0);
     if (n['sprocketFront']) n['sprocketFront'].rotation.z = -f.rear.spin * (FILE.rearSprocketR / FILE.frontSprocketR);
     // Swingarm aims at the rear axle (rest arm points at the rest axle).
@@ -205,21 +200,18 @@ export class GltfBike implements HeroBike {
     return out.set(x, y, z).applyMatrix4(this.frameLocal);
   }
 
-  setLivery(cls: BikeClass): void {
-    if (cls === this.livery) return;
+  /** Round 13: the class colourway is the file's `KHR_materials_variants` material (no tint, plates baked). */
+  setLivery(cls: BikeClass, force = false): void {
+    if (cls === this.livery && !force) return;
     this.livery = cls;
-    const L = LIVERIES[cls];
-    const M = this.liveryMats;
-    if (M.body) {
-      M.body.color.copy(this.atlasBody).multiply(this.tint.setRGB(L.gltfBody[0], L.gltfBody[1], L.gltfBody[2]));
-      M.body.roughness = Math.min(1, this.atlasBodyRough * L.gltfBodyRough);
+    for (const v of this.variants) {
+      const m = v.byClass[cls];
+      if (m) v.mesh.material = m;
     }
-    if (M.frame) M.frame.color.copy(this.atlasFrame).multiply(this.tint.setRGB(L.gltfFrame[0], L.gltfFrame[1], L.gltfFrame[2]));
-    applyPlate(M.plate, cls);
   }
 
   dispose(): void {
+    for (const b of this.blurs) b.dispose();
     for (const m of this.materials) m.dispose();
-    this.frame.getObjectByName('plates')?.traverse((o) => (o as THREE.Mesh).geometry?.dispose?.());
   }
 }

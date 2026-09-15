@@ -37,6 +37,14 @@ export interface RenderFrame {
   rear: WheelView;
   front: WheelView;
   rider: { lean: number; crouch: number; torsoPitch: number; armExtend: number };
+  /**
+   * Physics v2's simulated rider body (`PhysicsState.riderBody`), in the bike frame (round 13, H2):
+   * `present` false on v1 / mock physics (the renderer then falls back to the pose-only path).
+   * `relX/relY` = rider COM − bike.pos rotated into the chassis frame; `relAngle` = ψ_R − bike angle;
+   * `relUp` = rider velocity relative to the chassis along the chassis up axis (m/s, + = rising off
+   * the bike — the hop push); `angVel` = the body's angular velocity (rad/s, world).
+   */
+  riderBody: { present: boolean; relX: number; relY: number; relAngle: number; relUp: number; angVel: number };
   /** Physics hop state machine (glTF rider plays `extend` on 'push'). */
   hopPhase: 'idle' | 'preload' | 'push' | 'recover';
   throttle: number;
@@ -90,6 +98,7 @@ export class FrameBuilder {
     rear: { x: 0, y: 0, spin: 0, spinVel: 0, compression: 0, grounded: true },
     front: { x: 0, y: 0, spin: 0, spinVel: 0, compression: 0, grounded: true },
     rider: { lean: 0, crouch: 0, torsoPitch: 0, armExtend: 0 },
+    riderBody: { present: false, relX: 0, relY: 0, relAngle: 0, relUp: 0, angVel: 0 },
     hopPhase: 'idle',
     throttle: 0,
     throttleEff: 0,
@@ -150,6 +159,24 @@ export class FrameBuilder {
     f.rider.torsoPitch = lerp(prev.rider.torsoPitch, cur.rider.torsoPitch, a);
     f.rider.armExtend = lerp(prev.rider.armExtend, cur.rider.armExtend, a);
     f.hopPhase = cur.hopPhase ?? 'idle';
+    const rb = f.riderBody;
+    const cb = cur.riderBody;
+    const pb = prev.riderBody ?? cb;
+    if (cb && pb) {
+      rb.present = true;
+      const dx = lerp(pb.pos.x, cb.pos.x, a) - f.bikeX;
+      const dy = lerp(pb.pos.y, cb.pos.y, a) - f.bikeY;
+      rb.relX = dx * c + dy * s;
+      rb.relY = -dx * s + dy * c;
+      rb.relAngle = lerpAngle(pb.angle, cb.angle, a) - f.bikeAngle;
+      const rvx = lerp(pb.vel.x, cb.vel.x, a) - f.velX;
+      const rvy = lerp(pb.vel.y, cb.vel.y, a) - f.velY;
+      rb.relUp = -rvx * s + rvy * c;
+      rb.angVel = lerp(pb.angVel, cb.angVel, a);
+    } else {
+      rb.present = false;
+      rb.relX = rb.relY = rb.relAngle = rb.relUp = rb.angVel = 0;
+    }
 
     f.throttle = cur.input?.throttle ?? 0;
     f.throttleEff = cur.engine?.throttleEff ?? f.throttle;

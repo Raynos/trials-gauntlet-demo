@@ -288,15 +288,27 @@ export class LightingRig {
     scene.fog = new THREE.Fog(0x000000, 30, 150);
   }
 
+  /** Round 13 (H3): `low` runs a hero-only 512² map over a 4 m box around the bike (`follow(…, hero)`). */
+  private heroOnly = false;
+  get isHeroShadow(): boolean {
+    return this.heroOnly;
+  }
+
   setQuality(tier: 'low' | 'medium' | 'high'): void {
-    const size = tier === 'high' ? 2048 : 1024; // round 12: medium is the phone step-up tier — one 1024² cascade
+    // round 12: medium is the phone step-up tier — one 1024² cascade; round 13: low is the hero's own 512² map.
+    const size = tier === 'high' ? 2048 : tier === 'medium' ? 1024 : 512;
     if (size !== this.shadowSize) {
       this.shadowSize = size;
       this.sun.shadow.mapSize.set(size, size);
       this.sun.shadow.map?.dispose();
       this.sun.shadow.map = null;
     }
-    this.sun.shadow.radius = tier === 'high' ? 3 : 1.5;
+    this.heroOnly = tier === 'low';
+    this.frustumW = 0; // force the frustum rebuild on the next follow
+    this.sun.shadow.radius = tier === 'high' ? 3 : tier === 'medium' ? 1.5 : 1;
+    // Texels: high 1.4 cm, medium 2.7 cm, low 0.8 cm (4 m / 512) — the bias scales with them.
+    this.sun.shadow.bias = tier === 'low' ? -0.0002 : -0.0004;
+    this.sun.shadow.normalBias = tier === 'low' ? 0.015 : 0.03;
   }
 
   apply(b: Biome): void {
@@ -334,8 +346,11 @@ export class LightingRig {
    * increments so edges do not crawl as the camera pans.
    */
   follow(targetX: number, targetY: number, wide: boolean): void {
-    const w = wide ? 48 : 28;
-    const h = wide ? 30 : 18;
+    // Hero-only (low): a 4 x 4 m light-space box centred on the bike itself (the caller passes the
+    // bike position, not the camera target) — the hero's shadow falls inside it whatever the sun's
+    // elevation, because the box axis is the light direction.
+    const w = this.heroOnly ? 4 : wide ? 48 : 28;
+    const h = this.heroOnly ? 4 : wide ? 30 : 18;
     if (w !== this.frustumW || this.sun.shadow.camera.right !== w / 2) {
       this.frustumW = w;
       const sc = this.sun.shadow.camera;

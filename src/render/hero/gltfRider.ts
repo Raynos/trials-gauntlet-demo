@@ -16,14 +16,20 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js';
-import type { RagdollBody } from '../../core/types';
+import type { BikeClass, RagdollBody } from '../../core/types';
 import type { HeroBike } from '../bike/bikeModel';
 import type { RenderFrame } from '../frame';
 import type { MaterialLibrary } from '../materials/library';
+import { fogify } from '../lighting/environment';
 import { newChain, solveChain, type Chain } from '../rider/riderModel';
 import { countTriangles, prepareHeroMaterials } from './gltf';
+import { variantMaterialsFor } from './lod';
 
 const SHIFT = 0.65; // axle-midpoint frame → file frame (rear axle origin)
+/** Landing squash weight from the summed grounded compression: 0 at the ridden sag, `max` at sag + span. */
+const LAND = { sag: 0.9, span: 0.7, max: 0.9 };
+/** Hop extension weight from the rider body's relative upward speed (m/s). */
+const EXTEND = { v0: 0.25, span: 1.2, max: 0.7 };
 const ORDER = ['pelvis', 'spine', 'chest', 'neck', 'head', 'shoulder.L', 'upperArm.L', 'forearm.L', 'hand.L', 'shoulder.R', 'upperArm.R', 'forearm.R', 'hand.R', 'thigh.L', 'shin.L', 'foot.L', 'thigh.R', 'shin.R', 'foot.R'] as const;
 type BoneName = (typeof ORDER)[number];
 
@@ -88,6 +94,12 @@ export class GltfRider {
   private bike: HeroBike | null = null;
   private inRagdoll = false;
   private readonly lead = { lean: 0, leanV: 0, torso: 0, torsoV: 0, arm: 0, armV: 0, crouch: 0, crouchV: 0 };
+  /** The parsed document this instance was cloned from (`rider.glb` or `rider-lod.glb`). */
+  readonly source: GLTF;
+  /** Round 13 (H1 colourways): `rider_rookie` / `rider_pro` variant materials per mesh, own completed clones. */
+  private readonly variants: { mesh: THREE.Mesh; byClass: Partial<Record<BikeClass, THREE.Material>> }[] = [];
+  private livery: BikeClass = 'rookie';
+  /** v1 / mock physics only (no `riderBody`): the additive clips run on these timers. */
   private landT = -1;
   private landW = 0.45;
   private pushT = -1;
@@ -105,6 +117,7 @@ export class GltfRider {
   private readonly ID = new THREE.Quaternion();
 
   constructor(gltf: GLTF, lib: MaterialLibrary) {
+    this.source = gltf;
     this.scene = cloneSkeleton(gltf.scene);
     const matMap = new Map<THREE.Material, THREE.Material>();
     this.scene.traverse((o) => {
@@ -119,6 +132,28 @@ export class GltfRider {
       m.material = c;
     });
     this.materials = prepareHeroMaterials(this.scene, (m) => lib.complete(m));
+    this.scene.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const table = variantMaterialsFor(gltf, mesh.name);
+      if (!table.size) return;
+      const byClass: Partial<Record<BikeClass, THREE.Material>> = {};
+      for (const [name, src] of table) {
+        const cls = /_pro$/.test(name) ? 'pro' : /_rookie$/.test(name) ? 'rookie' : null;
+        if (!cls) continue;
+        const own = src.clone();
+        const std = own as THREE.MeshStandardMaterial;
+        if (std.isMeshStandardMaterial) {
+          lib.complete(std);
+          fogify(std);
+          std.envMapIntensity = 0.8;
+          this.materials.push(std);
+        }
+        byClass[cls] = own;
+      }
+      if (byClass.rookie && byClass.pro) this.variants.push({ mesh, byClass });
+    });
+    this.setLivery('rookie', true);
     this.scene.position.set(-SHIFT, 0, 0);
     this.root.name = 'rider:gltf';
     this.triangles = countTriangles(this.scene);
@@ -168,6 +203,16 @@ export class GltfRider {
     for (const c of gltf.animations) {
       this.clips.set(c.name, sampler(c));
       this.debug.clips.push(c.name);
+    }
+  }
+
+  /** Round 13 (H1): the suit colourway is the file's `KHR_materials_variants` material (`rider_rookie` / `rider_pro`). */
+  setLivery(cls: BikeClass, force = false): void {
+    if (cls === this.livery && !force) return;
+    this.livery = cls;
+    for (const v of this.variants) {
+      const m = v.byClass[cls];
+      if (m) v.mesh.material = m;
     }
   }
 
@@ -238,34 +283,56 @@ export class GltfRider {
     }
     if (this.inRagdoll && this.bike) this.attach(this.bike);
     this.handover.active = false;
-    const r = {
-      lean: this.spring('lean', f.rider.lean, f.dt, f.cut),
-      torsoPitch: this.spring('torso', f.rider.torsoPitch, f.dt, f.cut),
-      armExtend: this.spring('arm', f.rider.armExtend, f.dt, f.cut),
-      crouch: this.spring('crouch', f.rider.crouch, f.dt, f.cut),
-    };
+    const sim = f.riderBody.present;
+    // Round 13 (H2): with physics v2 the drawn rider IS the simulated one — `f.rider` is derived
+    // by physics from `riderBody` (lean = body x through the pose table, crouch = height below the
+    // servo target, torsoPitch = the body angle's lag behind its target), so the pose lag is the
+    // body's real lag and nothing here extrapolates it. The 80 ms velocity lead only runs on v1 /
+    // mock physics, where the pose fields are the servo target itself.
+    const r = sim
+      ? f.rider
+      : {
+          lean: this.spring('lean', f.rider.lean, f.dt, f.cut),
+          torsoPitch: this.spring('torso', f.rider.torsoPitch, f.dt, f.cut),
+          armExtend: this.spring('arm', f.rider.armExtend, f.dt, f.cut),
+          crouch: this.spring('crouch', f.rider.crouch, f.dt, f.cut),
+        };
     const c = solveChain(r, this.chain);
     this.poseFromChain(c);
-    // Additive clips.
+    // Additive clips. Breathing is the one motion with no state field: sampled at simulated time,
+    // gated to a near-standstill with a neutral pose (deterministic, never wall-clock).
+    const rest = Math.max(0, Math.min(1, (1.5 - f.speed) / 1.1)) * Math.max(0, 1 - Math.abs(r.lean) * 2) * Math.max(0, 1 - r.crouch * 2);
+    if (rest > 0.01) this.additive('idle_breathe', f.tSim, rest, true);
+    const land = this.clips.get('land_absorb');
+    const ext = this.clips.get('extend');
+    if (sim) {
+      // Landing squash ← the suspension compression spike: the clip's absorb pose (its frame 8 of
+      // 30) weighted by the summed compression above the ridden sag — it deepens as the springs
+      // load and recovers as they rebound, on physics' own timeline.
+      const load = (f.rear.grounded ? f.rear.compression : 0) + (f.front.grounded ? f.front.compression : 0);
+      const wLand = Math.min(1, Math.max(0, (load - LAND.sag) / LAND.span)) * LAND.max;
+      if (land && wLand > 0.005) this.additive('land_absorb', land.duration * (8 / 30), wLand, false);
+      // Hop extension ← the rider body rising off the chassis (relative velocity along the bike's up
+      // axis): the clip's extended pose (frame 8 of 20) weighted by that speed.
+      const wExt = Math.min(1, Math.max(0, (f.riderBody.relUp - EXTEND.v0) / EXTEND.span)) * EXTEND.max;
+      if (ext && wExt > 0.005) this.additive('extend', ext.duration * (8 / 20), wExt, false);
+      return;
+    }
+    // v1 / mock physics fallback: the round-9 timed envelopes.
     if (f.justLanded && f.landImpulse > 1.5) {
       this.landT = f.tSim;
       this.landW = Math.min(0.9, 0.35 + 0.22 * (f.landImpulse - 1.5));
     }
     if (f.hopPhase === 'push' && this.lastHop !== 'push') this.pushT = f.tSim;
     this.lastHop = f.hopPhase;
-    const rest = Math.max(0, Math.min(1, (1.5 - f.speed) / 1.1)) * Math.max(0, 1 - Math.abs(r.lean) * 2) * Math.max(0, 1 - r.crouch * 2);
-    if (rest > 0.01) this.additive('idle_breathe', f.tSim, rest, true);
     if (this.landT >= 0) {
       const t = f.tSim - this.landT;
-      const s = this.clips.get('land_absorb');
-      // Round 9: weight scales with the landing impulse (0.35 at 1.5 → 0.9 at 4+), half-sine over the clip.
-      if (s && t < s.duration) this.additive('land_absorb', t, this.landW * Math.sin(Math.PI * Math.min(1, t / s.duration)), false);
+      if (land && t < land.duration) this.additive('land_absorb', t, this.landW * Math.sin(Math.PI * Math.min(1, t / land.duration)), false);
       else this.landT = -1;
     }
     if (this.pushT >= 0) {
       const t = f.tSim - this.pushT;
-      const s = this.clips.get('extend');
-      if (s && t < s.duration) this.additive('extend', t, 0.7 * Math.sin(Math.PI * Math.min(1, t / s.duration)), false);
+      if (ext && t < ext.duration) this.additive('extend', t, 0.7 * Math.sin(Math.PI * Math.min(1, t / ext.duration)), false);
       else this.pushT = -1;
     }
   }
