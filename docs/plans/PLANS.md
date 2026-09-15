@@ -21,12 +21,25 @@ The percentages below remain plan estimates, not audited completion of the READM
 | **Perf (60 on high, on a phone)** | `docs/plans/PERF.md` (being written) | a benchmark suite and a 100× plan, then a measure → cut → measure loop until an iPhone holds 60 fps on `high`; 10× fallback | phase 1: bench + plan | 0 | bench repeatable ±5 %, plan sums to 100× on paper, first cut |
 | **P0 task** | `docs/tasks/touch-navigation-invariant.md` | nothing tappable unless drawn | landed `18df821` (5184-tap grid, 0 ghosts) | 95 | the user confirms on the phone |
 
+## Device instruments on this machine (no more asks to the user)
+
+- `docs/device/2026-09-15-5649aa6.md` — device report #1 (the user's iPhone), the calibration baseline.
+- **Playwright WebKit** (`~/Library/Caches/ms-playwright/webkit-2336`) — macOS WebKit renders WebGL through
+  ANGLE-on-Metal, the same stack as iOS Safari; `harness/hero-webkit.mts` (in flight) is the hero gate on it.
+- **iOS Simulator** — runtime iOS 26.5 installed, device `trials-iphone` (iPhone 16 Pro,
+  `F3058DD5-DCB6-4D86-93CC-6E56A785B788`): `xcrun simctl boot … && xcrun simctl openurl … <url> && xcrun simctl io
+  … screenshot out.png` gives a real Mobile Safari frame (portrait only from the CLI — it lands on the rotate prompt;
+  landscape needs the Simulator UI or a WebDriver session). `agent-browser -p ios` needs `safaridriver --enable`
+  (sudo) — not done.
+- `agent-browser` (Vercel) — global (`~/Library/pnpm`), dotfiles `agent-browser/install.sh`, devDependency here.
+
 ## Decisions taken by the user
 
 | date | decision |
 |---|---|
 | 09-14 | Main menu → **B Broadcast** (`assets/design/menu/B-broadcast.jpg`, SPEC in `assets/design/menu/SPEC.md`) — core-game builds it |
 | 09-14 | Plans live in `docs/plans/`; completed/stale docs go to `project/archive/` |
+| 09-15 | **The user runs no more benchmarks**; mobile is capped at 60 with a governor Auto that climbs to high; the machine self-measures (WebKit, simulator, bench) |
 | 09-15 | Hero/graphics → Codex Astra 6 on `blender-work`; `main` keeps physics/tracks/harness/core/perf; merge rules in `docs/tasks/blender-branch-merge.md` |
 | 09-15 | Touch controls → **G strip with keys** (`assets/design/controls/G-strip-keys.png`, SPEC § Round 2); colours: GAS green, BRAKE red, **the two LEAN keys equal weight in one shared neutral scheme** (neither primary nor secondary) |
 | 09-15 | Loading screen → **B Odometer**, but keeping **two bars with two percentages** (DOWNLOAD / SETUP as parallel tracks) and **two detail lines**, one per track; both numbers monotone and ending at 100 by the loader invariant (`docs/tasks/loading-progress-invariant.md`) |
