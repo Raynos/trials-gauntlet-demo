@@ -803,8 +803,15 @@ export class Game {
     this.onResults?.(result);
   }
 
-  /** Timing of the most recent render pass (hook.info().lastRender). */
-  readonly lastRender = { hudMs: 0, submitMs: 0, syncMs: 0 };
+  /**
+   * Timing of the most recent render pass (hook.info().lastRender; `?bench=1` per-frame split): HUD DOM writes,
+   * `audio.update`, the renderer submit. Four `performance.now()` calls per frame, no allocation.
+   */
+  readonly lastRender = { prepMs: 0, hudMs: 0, audioMs: 0, submitMs: 0, syncMs: 0 };
+  /** The most recent `advance()`: physics ticks run and their ms (advance total minus the render pass). */
+  readonly lastAdvance = { ticks: 0, physicsMs: 0, totalMs: 0 };
+  /** `?bench=1&no=hud|audio|render`: skip one leg of the render pass so the device report can bisect the frame. */
+  readonly benchSkip = { hud: false, audio: false, render: false };
 
   /**
    * Front-end screens that fully cover the canvas (the Broadcast menu's key art) switch the WebGL
@@ -825,14 +832,23 @@ export class Game {
     info.simTime = (this.loop.ticks + alpha) / this.physicsHz;
     this.renderer.setRunInfo?.(info);
     this.renderer.setGhost?.(this.ghostState());
-    this.hud?.setRun(info);
-    this.hud?.update(state, this.ghostState());
-    this.audio?.update(state, dt, this.effectiveInput());
+    const skip = this.benchSkip;
+    const tPrep = performance.now();
+    if (!skip.hud) {
+      this.hud?.setRun(info);
+      this.hud?.update(state, this.ghostState());
+    }
     const tHud = performance.now();
-    const ms = this.renderer.render(state, alpha);
-    this.lastRender.hudMs = tHud - tStart;
-    this.lastRender.submitMs = performance.now() - tHud;
-    this.lastRender.syncMs = 0;
+    if (!skip.audio) this.audio?.update(state, dt, this.effectiveInput());
+    const tAudio = performance.now();
+    const ms = skip.render ? 0 : this.renderer.render(state, alpha);
+    const tEnd = performance.now();
+    const lr = this.lastRender;
+    lr.prepMs = tPrep - tStart;
+    lr.hudMs = skip.hud ? 0 : tHud - tPrep;
+    lr.audioMs = skip.audio ? 0 : tAudio - tHud;
+    lr.submitMs = skip.render ? 0 : tEnd - tAudio;
+    lr.syncMs = 0;
     return ms;
   }
 
@@ -855,20 +871,24 @@ export class Game {
 
   /** Real-time entry: feed elapsed seconds. Paused or in the menu: render only. */
   advance(elapsedSeconds: number): void {
+    const t0 = performance.now();
+    const ticks0 = this.loop.ticks;
+    const lr = this.lastRender;
+    lr.prepMs = lr.hudMs = lr.audioMs = lr.submitMs = 0; // a skipped render (renderEnabled false) reports zeros, not the last frame's
     if (this.pausedFlag || this.phaseValue === 'menu') {
       this.loop.renderOnce();
-      return;
-    }
-    if (this.playbackFrames) {
+    } else if (this.playbackFrames) {
       this.loop.advance(elapsedSeconds * this.playbackSpeed);
       // The run is over and the finish coast has settled: hold the last frame (the transport shows ↺).
       if (this.phaseValue === 'finished' && this.resultsTicks >= this.ticks.finishBrake + this.physicsHz) {
         this.pausedFlag = true;
         this.playbackEnded = true;
       }
-      return;
-    }
-    this.loop.advance(elapsedSeconds);
+    } else this.loop.advance(elapsedSeconds);
+    const total = performance.now() - t0;
+    this.lastAdvance.totalMs = total;
+    this.lastAdvance.ticks = this.loop.ticks - ticks0;
+    this.lastAdvance.physicsMs = Math.max(0, total - lr.prepMs - lr.hudMs - lr.audioMs - lr.submitMs);
   }
 
   // -- replay viewer (docs/design/game.md §16) --------------------------------------
@@ -1114,6 +1134,21 @@ export class Game {
 
   stats(): RenderStats {
     return this.renderer.stats();
+  }
+
+  /** The renderer's `debugInfo()` when it has one (tier, dpr, canvas, calls, tris, rtMpx, …; `?bench=1` snapshots it per scenario). */
+  rendererDebug(): Record<string, unknown> | null {
+    const r = this.renderer as Partial<{ debugInfo(): Record<string, unknown> }>;
+    if (typeof r.debugInfo !== 'function') return null;
+    try {
+      const d = r.debugInfo();
+      // The scalar fields only: the prepare timeline / entry stats / art census are boot diagnostics, not per-frame cost.
+      const out: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(d)) if (typeof v !== 'object' || v === null) out[k] = v;
+      return out;
+    } catch {
+      return null;
+    }
   }
 
   resize(width: number, height: number, pixelRatio?: number): void {

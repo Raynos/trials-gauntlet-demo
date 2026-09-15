@@ -7,6 +7,8 @@
  *   pnpm harness:e2e --only=run --geom=iphone15promax
  *   pnpm harness:e2e --only=grid
  *   pnpm harness:e2e --only=boot        the loading screen at LTE / 3G × SW × art pack (harness/e2e/boot.mts)
+ *   pnpm harness:e2e --only=bench       `?bench=1&quick=1`: the on-device benchmark's instrument, report and toggles (harness/e2e/bench.mts)
+ *   pnpm harness:e2e --only=benchfull   the whole eight-scenario list once (~4 min; the report to harness/out/bench/device-full.md)
  *
  * Rules the suite enforces (each is a past phone bug):
  *   R1  after a screen change, only the new screen's elements are hit-testable (visibility isolation);
@@ -20,9 +22,11 @@
  *   R7  the strip with keys (design/controls G): one band ≤ 13 % of the height on the bottom edge, four keys, held key solid in its
  *       colour (lean pair one neutral, brake red, gas green) + column wash, hidden under overlays; `--stills=<dir>` saves stills.
  */
+import fs from 'node:fs';
 import { chromium, type BrowserContext, type Page } from 'playwright';
 import { startServer } from '../lib/server';
 import { bootSuite } from './boot.mjs';
+import { benchFull, benchSuite } from './bench.mjs';
 
 type Geom = { name: string; width: number; height: number; dpr: number };
 const GEOMS: Geom[] = [
@@ -783,6 +787,30 @@ if (!only || only === 'boot') {
 const server = await startServer({});
 const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 try {
+  if (!only || only === 'bench') {
+    console.log('== bench (?bench=1&quick=1, iphone15promax)');
+    const r = await benchSuite(browser, server.url, { verbose });
+    checks += r.checks;
+    for (const f of r.fails) fails.push({ flow: 'bench', rule: 'bench', detail: f });
+    if (r.report) {
+      fs.mkdirSync('harness/out/bench', { recursive: true });
+      fs.writeFileSync('harness/out/bench/device-quick.md', r.text);
+      fs.writeFileSync('harness/out/bench/device-quick.json', JSON.stringify(r.report, null, 1));
+      console.log(`  bench quick run ${(r.ms / 1000).toFixed(1)} s → harness/out/bench/device-quick.{md,json}`);
+    }
+  }
+  if (only === 'benchfull') {
+    console.log('== benchfull (?bench=1, all eight scenarios, iphone15promax)');
+    const r = await benchFull(browser, server.url, { verbose });
+    checks += r.checks;
+    for (const f of r.fails) fails.push({ flow: 'benchfull', rule: 'benchfull', detail: f });
+    if (r.report) {
+      fs.mkdirSync('harness/out/bench', { recursive: true });
+      fs.writeFileSync('harness/out/bench/device-full.md', r.text);
+      fs.writeFileSync('harness/out/bench/device-full.json', JSON.stringify(r.report, null, 1));
+      console.log(`  bench full run ${(r.ms / 1000).toFixed(1)} s → harness/out/bench/device-full.{md,json}`);
+    }
+  }
   for (const g of GEOMS) {
     if (geomFilter && g.name !== geomFilter) continue;
     const ctx = await browser.newContext({ viewport: { width: g.width, height: g.height }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });

@@ -411,6 +411,29 @@ html.short .bc-art { display: none; }
 .perf { position: absolute; left: calc(.8rem + var(--sal)); top: calc(4.4rem + var(--sat)); margin: 0; padding: .35rem .55rem; z-index: 6; pointer-events: none; font: 11px/1.4 var(--mono); color: #cfe; background: rgba(0,0,0,.72); border: 1px solid var(--line-2); border-radius: var(--r1); white-space: pre; text-shadow: none; }
 
 /* ---- update toast (service worker has a newer build) ---- */
+/* ?bench=1 (src/game/bench.ts): START card, one status line under the meter while it runs, the report panel at the end. */
+.bench { position: absolute; inset: 0; pointer-events: none; z-index: 40; }
+.bench-card, .bench-report { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto; background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: 0 18px 50px rgba(0,0,0,.55); color: var(--ink); }
+.bench-card { width: min(34rem, calc(100vw - 2rem)); padding: var(--s4) var(--s5); display: flex; flex-direction: column; gap: var(--s2); }
+.bench-card h2 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.5rem; line-height: 1; text-transform: uppercase; }
+.bench-card ol { margin: 0; padding-left: 1.4em; columns: 2; font: 600 .8rem/1.5 var(--mono); color: var(--ink-dim); }
+.bench-card ol small { color: var(--ink-mute); }
+.bench-card p { margin: 0; font-size: .82rem; color: var(--ink-dim); }
+.bench-card .btn { align-self: flex-start; }
+.bench-card[hidden], .bench-report[hidden], .bench-status[hidden] { display: none; }
+.bench-status { position: absolute; right: calc(.5rem + var(--sar)); top: calc(1.6rem + var(--sat)); font: 600 10px/1.4 var(--mono); letter-spacing: .04em; color: var(--amber); text-shadow: 0 1px 2px rgba(0,0,0,.8); }
+.hud.touch ~ .bench .bench-status, .touch-layer.on.visible ~ .bench .bench-status { top: calc(5.6rem + var(--sat)); }
+.bench-report { width: min(60rem, calc(100vw - 1.5rem)); max-height: calc(100vh - 1.5rem); padding: var(--s3) var(--s4); display: flex; flex-direction: column; gap: var(--s2); overflow: hidden; }
+.bench-dev { font: 10px/1.4 var(--mono); color: var(--ink-dim); }
+.bench-tablewrap { overflow: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line-2); border-radius: var(--r1); }
+.bench-report table { border-collapse: collapse; font: 10px/1.3 var(--mono); white-space: nowrap; }
+.bench-report th, .bench-report td { padding: .25em .55em; text-align: right; border-bottom: 1px solid var(--line-2); }
+.bench-report th:first-child, .bench-report td:first-child { text-align: left; }
+.bench-report th { color: var(--amber); font-weight: 700; position: sticky; top: 0; background: var(--slab-3); }
+.bench-btns { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.bench-btns .btn { font-size: .78rem; padding: var(--s2) var(--s4); }
+.bench-note { font: 11px/1.3 var(--mono); color: var(--ink-dim); }
+.bench-report textarea { width: 100%; min-height: 6rem; font: 10px/1.3 var(--mono); background: rgba(0,0,0,.5); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r1); }
 .fpsmeter { position: absolute; right: calc(.5rem + var(--sar)); top: calc(.15rem + var(--sat)); z-index: 7; pointer-events: none; font: 600 10px/1.4 var(--mono); letter-spacing: .04em; color: rgba(255,255,255,.55); text-shadow: 0 1px 2px rgba(0,0,0,.8); }
 .fpsmeter.bad { color: #ff7a5c; }
 .hud.touch ~ .fpsmeter, .touch-layer.on.visible ~ .fpsmeter { top: calc(4.2rem + var(--sat)); }

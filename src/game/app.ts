@@ -62,13 +62,16 @@ import {
 } from '../ui';
 import { tickLive } from '../ui/live';
 import { applyOrientation } from '../ui/orientation';
+import { copyText } from '../ui/clipboard';
+import { Bench, type BenchOptions, type FrameSplit } from './bench';
+import { FrameCadence } from './cadence';
 import { BACKDROP_TRACK } from './flow';
 import { Percentiles, type Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
 import { NavLog, type NavContext } from './navlog';
 import { ReplaySession, type ReplaySource } from './replay';
 import { defaultBikeForTier } from './rules';
-import { RunCollector, RunLog } from './telemetry';
+import { BenchLog, RunCollector, RunLog } from './telemetry';
 
 export interface AppOptions {
   game: Game;
@@ -104,6 +107,8 @@ export interface AppOptions {
   lab?: boolean | undefined;
   /** Solver in effect + exported versions (hidden dev Settings row, `?physics=v1|v2`). */
   physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[]; live?: PhysicsVersion | undefined } | undefined;
+  /** `?bench=1`: the on-device benchmark (src/game/bench.ts) — a START card over the menu, the scenarios, the report. */
+  bench?: BenchOptions | undefined;
 }
 
 const PROBE_FRAMES = 60;
@@ -163,6 +168,15 @@ export class App {
   private replayMuted = false;
   private readonly frameMs = new Percentiles(120);
   private readonly runLog = new RunLog();
+  private readonly benchLog = new BenchLog();
+  private readonly bench: Bench | null;
+  /** Per-frame split of `tickFrame` (reused; `?bench=1` reads it after every rendered frame). */
+  private readonly frameSplit: FrameSplit = { totalMs: 0, pollMs: 0, advanceMs: 0, physicsMs: 0, ticks: 0, hudMs: 0, audioMs: 0, submitMs: 0, otherMs: 0 };
+  /** Bench: cap forced for the current scenario (else the Settings / phone rule). */
+  private capOverride: 30 | 60 | null = null;
+  /** Bench `&no=touch`: the layer stays hidden whatever the device. */
+  private touchHidden = false;
+  private readonly cadence = new FrameCadence();
   private readonly collector = new RunCollector();
   /** Navigation instrument (docs/tasks/touch-navigation-invariant.md §1): what fired quit / pause / goto / restart, from where. */
   readonly navLog = new NavLog();
@@ -181,6 +195,7 @@ export class App {
   /** Frame cap (Settings · Frame rate). 'auto' = 30 on phones, 60 elsewhere; the RAF loop skips frames to match. */
   private fpsChoice: FpsChoice;
   private lastRenderAt = 0;
+  private capInEffect = 0;
   /** Lightweight FPS meter, top-right, always on: rendered frames per second and the quality tier letter. */
   private readonly fpsEl: HTMLDivElement;
   private fpsFrames = 0;
@@ -390,6 +405,40 @@ export class App {
     });
     mountRotatePrompt(o.uiRoot);
     this.menu.setTracks(shipTracks(this.tracks, o.dev ?? false));
+    this.bench = o.bench
+      ? new Bench(
+          o.uiRoot,
+          {
+            game: this.game,
+            audio: this.audio,
+            gotoMenu: () => (this.screen === 'run' ? this.quit('bench') : this.goto('menu')),
+            gotoGarage: () => {
+              if (this.screen === 'run') this.quit('bench');
+              this.goto('garage');
+            },
+            startB1: () => this.play('b1-first-ride'),
+            rideB1: (json) => {
+              if (this.screen !== 'run' || this.game.currentTrack?.id !== 'b1-first-ride') this.play('b1-first-ride');
+              this.game.startPlayback(json, { ghost: false });
+            },
+            setCapOverride: (hz) => {
+              this.capOverride = hz;
+              this.cadence.reset();
+            },
+            currentCap: () => this.frameCapHz(),
+            setTouchHidden: (hidden) => {
+              this.touchHidden = hidden;
+              this.touch.setVisible(this.mux.activeDevice() === 'touch' && !hidden);
+            },
+            qualityWhy: () => this.qualityWhy,
+            build: BUILD_STAMP.replace(/^build /, ''),
+            physics: o.physics?.live ?? 'mock',
+          },
+          o.bench,
+          (r) => this.benchLog.append(r),
+        )
+      : null;
+    if (this.bench) this.probeDone = true; // the tier is pinned for the run: the bench forces tiers per scenario itself
 
     // Telemetry: every fault is a death at the bike's x (the state after the faulting step) with the last second of input.
     this.game.onEvent((e) => {
@@ -552,6 +601,13 @@ export class App {
     };
   }
 
+  /** `window.__trials.bench` (`?bench=1` only): start, state, the finished report. */
+  benchApi(): NonNullable<TrialsHook['bench']> | undefined {
+    const b = this.bench;
+    if (!b) return undefined;
+    return { start: () => b.start(), state: () => b.state(), report: () => b.report(), text: () => b.text() };
+  }
+
   /** Harness / QA surface (`window.__trials.replay`). */
   replayApi(): { open(json?: string): boolean; seek(tick: number): void; info(): ReturnType<ReplaySession['info']>; close(): void } {
     return {
@@ -592,11 +648,17 @@ export class App {
     }
     this.lastNow = performance.now();
     const frame = (now: number): void => {
-      // Frame cap: skip RAF callbacks until the cap interval has elapsed (2 ms slack so a 60 Hz RAF
-      // renders every second frame and a 120 Hz one every fourth). Physics is fixed-step, so the
-      // skipped frames' time is simply consumed by the next advance.
+      // Frame cap: a phase-locked cadence (src/game/cadence.ts) — a render is due every 1000/cap ms from
+      // the first one, whatever RAF slot it lands on, so a 30 cap on a 60 or 120 Hz display holds 30 flat
+      // instead of slipping to 24–28 after each frame that overran its slot (PERF.md §0 F4). Physics is
+      // fixed-step, so the skipped frames' time is simply consumed by the next advance.
+      this.bench?.raf(now);
       const cap = this.frameCapHz();
-      if (now - this.lastRenderAt < 1000 / cap - 2) {
+      if (cap !== this.capInEffect) {
+        this.capInEffect = cap;
+        this.cadence.reset();
+      }
+      if (!this.cadence.shouldRender(now, cap)) {
         this.raf = requestAnimationFrame(frame);
         return;
       }
@@ -606,6 +668,7 @@ export class App {
       this.lastNow = now;
       this.tickFrame(elapsed);
       this.meterFrame(now, sinceRender);
+      this.bench?.frame(now, this.frameSplit);
       this.raf = requestAnimationFrame(frame);
     };
     this.raf = requestAnimationFrame(frame);
@@ -705,7 +768,7 @@ export class App {
     this.touch.setOverlay(false);
     this.hud.setNextEnabled(this.nextTrackEnabled(), this.nextTrackName());
     // First launch ever: one card (gas / brake / lean), the countdown waits behind it.
-    if (!loadOnboarded()) {
+    if (!loadOnboarded() && !this.bench) {
       this.game.setPaused(true);
       this.onboard.show(this.mux.activeDevice());
     }
@@ -768,32 +831,14 @@ export class App {
     if (this.telemetryOn) this.runLog.append(entry);
   }
 
-  private async copyRunLog(): Promise<boolean> {
-    const json = this.runLog.exportJson(BUILD_STAMP);
-    try {
-      await navigator.clipboard.writeText(json);
-      return true;
-    } catch {
-      try {
-        const ta = document.createElement('textarea');
-        ta.value = json;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        const ok = document.execCommand('copy');
-        ta.remove();
-        return ok;
-      } catch {
-        return false;
-      }
-    }
+  private copyRunLog(): Promise<boolean> {
+    return copyText(this.runLog.exportJson(BUILD_STAMP, this.benchLog.read()));
   }
 
   private async shareRunLog(): Promise<boolean> {
     if (typeof navigator.share !== 'function') return this.copyRunLog();
     try {
-      await navigator.share({ title: 'Trials Gauntlet run log', text: this.runLog.exportJson(BUILD_STAMP) });
+      await navigator.share({ title: 'Trials Gauntlet run log', text: this.runLog.exportJson(BUILD_STAMP, this.benchLog.read()) });
       return true;
     } catch {
       return false; // AbortError (sheet dismissed) or unsupported payload
@@ -906,9 +951,32 @@ export class App {
 
   // -- per frame ----------------------------------------------------------------
 
+  /** One app frame with its split bracketed into `frameSplit` (four `performance.now()` calls; the game adds its own). */
   private tickFrame(elapsed: number, render = true): void {
+    const sp = this.frameSplit;
+    const t0 = performance.now();
+    this.tickFrameInner(elapsed, render, t0);
+    const t1 = performance.now();
+    const lr = this.game.lastRender;
+    const la = this.game.lastAdvance;
+    sp.totalMs = t1 - t0;
+    sp.physicsMs = la.physicsMs;
+    sp.ticks = la.ticks;
+    sp.hudMs = lr.hudMs;
+    sp.audioMs = lr.audioMs;
+    sp.submitMs = lr.submitMs;
+    // `other` = the app shell's housekeeping plus the game's state prep (getState / run info / ghost) before the HUD.
+    sp.otherMs = Math.max(0, sp.totalMs - sp.pollMs - sp.advanceMs) + lr.prepMs;
+  }
+
+  private tickFrameInner(elapsed: number, render: boolean, t0: number): void {
+    const sp = this.frameSplit;
+    sp.pollMs = sp.advanceMs = 0;
+    this.game.lastAdvance.ticks = 0;
+    this.game.lastAdvance.physicsMs = 0;
     if (this.perf) this.perf.root.hidden = !(this.screen === 'run' && !this.pause.visible && this.game.phase() !== 'finished' && !this.onboard.visible);
     const { frame, meta } = this.mux.poll();
+    sp.pollMs = performance.now() - t0;
     const restartEdge = frame.restart === true && !this.prevRestart;
     const throttleEdge = frame.throttle > 0 && !this.prevThrottle;
     if (performance.now() - this.screenAt < SCREEN_GRACE_MS && this.screen !== 'run') {
@@ -976,7 +1044,11 @@ export class App {
     const dev = this.mux.activeDevice();
     if (dev) this.hud.setDevice(dev, this.mux.idleFrames() < DEVICE_SHOW_FRAMES);
 
-    if (render) this.game.advance(elapsed);
+    if (render) {
+      const tA = performance.now();
+      this.game.advance(elapsed);
+      sp.advanceMs = performance.now() - tA;
+    }
     if (this.probeArmed && !this.probeDone && !this.game.paused()) this.recordProbe(elapsed * 1000);
     this.settleTouch(elapsed);
     if (this.inRun() && !this.game.paused()) {
@@ -1021,7 +1093,7 @@ export class App {
   }
 
   private onDevice(d: InputDevice): void {
-    this.touch.setVisible(d === 'touch');
+    this.touch.setVisible(d === 'touch' && !this.touchHidden);
     this.hud.setDevice(d, true);
     for (const s of [this.menu, this.tracksScreen, this.settings]) s.setDevice(d);
     this.garage.setDevice(d);
@@ -1032,6 +1104,7 @@ export class App {
 
   /** Cap in effect: the Settings choice, else 30 on phones and 60 elsewhere. */
   private frameCapHz(): 30 | 60 {
+    if (this.capOverride) return this.capOverride;
     if (this.fpsChoice === '30') return 30;
     if (this.fpsChoice === '60') return 60;
     return isPhone() ? 30 : 60;

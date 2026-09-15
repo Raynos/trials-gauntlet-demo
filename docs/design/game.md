@@ -572,6 +572,33 @@ Two numbers, DOWNLOAD and SETUP (the user's decision: "B Odometer" with both tra
   (`manual (settings)` / `probe median 16.6 ms` / `pending probe`). Hidden under pause / results / menus.
   Headless note: `--disable-frame-rate-limit` makes RAF fire back-to-back so headless FPS reads are not evidence;
   the phone capture (WebKit iPhone 14: 60 fps, 16.6 / 18.7 ms, PHYS 20 / 60 µs at 5 µs resolution) is.
+- `?bench=1` (`src/game/bench.ts`; how the user runs it: `docs/device/README.md`) — the on-device benchmark (Rider on
+  Glass G2). A START card over the menu (the tap unlocks audio), then eight scenarios with no input, 20 s each after a
+  2 s settle: `menu` (canvas covered, render off), `garage`, `b1 start line`, `b1 ride` (the committed bot-3 golden
+  through `Game.startPlayback`; served from `public/bench/b1-bot-3.json`, a copy `bench.test.ts` holds equal to
+  `harness/inputs/b1-first-ride/bot-3.json`), `b1 ride` at low / medium / high forced, `b1 ride` at cap 60.
+  `&quick=1` = menu + garage at 3 s (the e2e). Toggles honoured inside the same list so runs compare row for row:
+  `&no=audio` (skip `audio.update`, suspend the context), `&no=hud` (no HUD DOM writes), `&no=render` (skip
+  `renderer.render`), `&no=touch`, `&cap=60`. Per rendered frame the app records `FrameSplit` — `App.tickFrame` is
+  bracketed into poll / advance / other and `Game.render` into prep / hud / audio / submit (`Game.lastRender`,
+  `Game.lastAdvance`: four `performance.now()` calls each, a reused object, no allocation) — plus every RAF
+  callback's interval (the display's cadence, 120 on ProMotion), long tasks (`PerformanceObserver`, Chrome only),
+  heap (Chrome only). Per scenario: fps, fps first / last 5 s (the thermal proxy, quoted for `b1 ride · high`),
+  dropped (> 1.5 × the cap period), worst, p50 / p95 / max of the interval and each leg, `debugInfo()` scalars
+  (tier, dpr, canvas, calls, tris, rtMpx; calls / tris 0 when nothing rendered). The report (`BenchReport`, `kind:
+  'trials-bench'`) is shown as a table in the game's face with **Copy report** (`src/ui/clipboard.ts`, the same
+  gesture-safe path as the run log) and **Share**, as one string = markdown table + a fenced JSON block
+  (`formatReport`), appended to `localStorage['trials.benchlog']` (last 10) and exported with the run log as
+  `bench`. `window.__trials.bench = { start, state, report, text }` drives it headlessly; `pnpm harness:e2e
+  --only=bench` proves the instrument (the START tap, both scenarios, the panel, Copy `.live`, every field, the
+  toggles changing the split), `--only=benchfull` runs all eight once. The FPS meter stays up throughout; a status
+  line under it (two dirty-checked writes per second) shows scenario / tier / cap / seconds.
+- Frame cap cadence (`src/game/cadence.ts`, `FrameCadence`): the RAF loop renders when `now >= nextDue − slack`
+  and then `nextDue += period` — phase-locked, so a frame that overruns its slot is followed by an early one and a
+  30 cap holds 30 on a 60 or 120 Hz display; slack = half the measured RAF interval (EMA) so a due time between two
+  slots takes the earlier; more than two periods behind (tab hidden, a long task) resyncs to `now` instead of
+  bursting. The old rule (`now − lastRenderAt >= period − 2`) re-based on whatever late slot it landed on and lost a
+  slot for good each time (`cadence.test.ts`: the same overrun pattern gives 300 vs < 290 frames in 10 s).
 
 ## 15. PWA: manifest, icons, service worker, update toast
 

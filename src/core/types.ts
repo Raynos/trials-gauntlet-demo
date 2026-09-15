@@ -524,7 +524,7 @@ export interface HookInfo {
   /** Wall ms of the most recent loadTrack (compile + physics + renderer.setTrack + audio.setTrack). */
   loadTrackMs?: number;
   /** Breakdown of the most recent render(): HUD DOM work, renderer submit, GPU sync (when sync=true). */
-  lastRender?: { hudMs: number; submitMs: number; syncMs: number };
+  lastRender?: { prepMs?: number; hudMs: number; audioMs?: number; submitMs: number; syncMs: number };
   /** Which implementations main.ts composed, e.g. { physics: 'createBikePhysics', render: 'ThreeRenderer', audio: 'WebAudioSystem' }. */
   modules?: Record<string, string>;
 }
@@ -605,6 +605,16 @@ export interface TrialsHook {
     togglePause(): void;
     screen(): string;
     paused(): boolean;
+  };
+  /**
+   * `?bench=1` (front-end page only, docs/device/README.md): the on-device benchmark — start it (the same as the START
+   * tap), read its state, and the finished report (null until the last scenario ends).
+   */
+  bench?: {
+    start(): void;
+    state(): { running: boolean; done: boolean; scenario: string | null; index: number; total: number };
+    report(): unknown | null;
+    text(): string | null;
   };
   /** Replay viewer (front-end page only): open the viewer on a recording (default: the last run), read its transport, or close it. */
   replay?: {

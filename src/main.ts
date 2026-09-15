@@ -18,6 +18,8 @@
  *   ?updatetoast=1  show the "Update available" toast at once (capture / QA of the PWA reload path)
  *   ?trace=1        live InputFrame bars (gas / brake / lean) under the HUD timer — for filming the phone
  *   ?lab=1          physics lab HUD + ghost of the last attempt on every track (automatic on `lab-*` tracks)
+ *   ?bench=1        the on-device benchmark (src/game/bench.ts, docs/device/README.md): START card → scenarios → Copy report;
+ *                   `&quick=1` (menu + garage, 3 s), `&no=audio,hud,render,touch`, `&cap=60`
  */
 import { DEFAULT_PHYSICS_HZ, type PhysicsVersion } from './core';
 import * as audioMod from './audio';
@@ -27,6 +29,7 @@ import type { AudioSystem } from './audio';
 import type { PhysicsWorld } from './physics';
 import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, installHook, type HookExtras } from './game';
+import { parseBenchParams } from './game/bench';
 import { resolveBoot } from './game/flow';
 import { registerServiceWorker } from './game/pwa';
 import { getTrack } from './tracks';
@@ -304,6 +307,7 @@ function boot(): void {
           trace: params.get('trace') === '1',
           lab: params.get('lab') === '1',
           physics: { current: params.get('physics') === 'v1' ? 'v1' : params.get('physics') === 'v2' ? 'v2' : 'default', available: physicsVersions(), live: physicsVersion },
+          bench: parseBenchParams(params) ?? undefined,
           // Per-class livery when the render owner exports it (`setBikeClass(bike)`); otherwise the garage card carries the colour.
           onBikeChange: (bike) => {
             const r = renderer as Partial<{ setBikeClass(b: 'rookie' | 'pro'): void }>;
@@ -315,6 +319,8 @@ function boot(): void {
         hook.replay = shell.replayApi();
         hook.navLog = () => shell.navLog.all();
         hook.app = shell.testApi();
+        const benchApi = shell.benchApi();
+        if (benchApi) hook.bench = benchApi;
         if (import.meta.env.PROD && params.get('sw') !== '0') registerServiceWorker((reload) => shell.showUpdate(reload));
         if (params.get('updatetoast') === '1') setTimeout(() => shell.showUpdate(() => location.reload()), 1500);
         return shell;

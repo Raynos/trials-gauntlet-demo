@@ -84,6 +84,7 @@ export class DomHud implements Hud {
   private lastTimerText = '';
   private lastFaults = -1;
   private flipUntil = -1;
+  private flipOn = false;
   private pendingCrashAt = -1;
   private crashBanner: Banner | null = null;
   private phase: RunInfo['phase'] = 'menu';
@@ -262,7 +263,11 @@ export class DomHud implements Hud {
       this.lastFaults = info.faults;
       this.faultsN.textContent = String(info.faults);
     }
-    this.faultsEl.classList.toggle('flip', this.simTime < this.flipUntil);
+    const flip = this.simTime < this.flipUntil;
+    if (flip !== this.flipOn) {
+      this.flipOn = flip; // dirty-checked: this was the one HUD write that ran every frame of every run
+      this.faultsEl.classList.toggle('flip', flip);
+    }
 
     this.animateSplit();
     this.animateFlash();
