@@ -1235,8 +1235,16 @@ riding frames of max(|sx − 0.5|, |sy − 0.5|); 0.3 is the box edge.
 | h1-wheelie-wire | 1968 | **0** | 0 | 0.35..0.47 | 0.47..0.61 | 0.15 | — |
 | h2-gap-chain | 2255 | **0** | 0 | 0.35..0.47 | 0.50..0.61 | 0.154 | — |
 | h3-fire-line | 2202 | **0** | 10 | 0.22..0.47 | 0.26..0.60 | 0.28 | — |
+| lab-flat-200 | 722 | **0** | 0 | 0.39..0.46 | 0.54..0.59 | 0.115 | — |
+| lab-physics-test | 462 | **0** | 0 | 0.38..0.46 | 0.47..0.61 | 0.119 | — |
+| m1-hop-up | 2068 | **0** | 1 | 0.37..0.46 | 0.50..0.67 | 0.167 | — |
+| m2-drum-roll | 2925 | **0** | 0 | 0.35..0.46 | 0.42..0.68 | 0.177 | — |
+| m3-see-saw | 2702 | **0** | 7 | 0.24..0.46 | 0.38..0.65 | 0.259 | — |
+| x1-vertical-limit | 3352 | **0** | 0 | 0.35..0.46 | 0.24..0.73 | 0.257 | — |
+| x2-pipe-dream | 3098 | **0** | 9 | 0.30..0.46 | 0.24..0.66 | 0.26 | — |
+| x3-gauntlet | 1916 | **0** | 5 | 0.26..0.47 | 0.31..0.59 | 0.239 | — |
 
-Every measured row is green (riding frames out of the box = 0); the worst offset is 0.28 (h3-fire-line: the foundry's low camera key at sx 0.22 / sy 0.26, still inside 0.2..0.8); b3 clamps 14 % and h3 10 % of frames at the hall roof bound (reported, not gated). Not yet measured when this section was written (the probe was still running on a host at load 45–65): lab-flat-200, lab-physics-test, m1-hop-up, m2-drum-roll, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet — the log `render7/camcheck13-low.log` carries the rest.
+Every measured row is green (riding frames out of the box = 0); the worst offset is 0.28 (h3-fire-line: the foundry's low camera key at sx 0.22 / sy 0.26, still inside 0.2..0.8); b3 clamps 14 % and h3 10 % of frames at the hall roof bound (reported, not gated).
 
 ### G3 — low tier budget, b1 riding frame (phone geometry 2000×920 @ DPR 1.5 → 1600×736 canvas)
 
