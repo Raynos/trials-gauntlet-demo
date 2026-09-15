@@ -194,6 +194,8 @@
           },
           done: function () {
             if (finished) return;
+            for (var ph in bg) { var g = bg[ph]; if (g.need && g.done < g.total) { g.need = false; g.total = Math.max(g.done, 1); if (g.done) setRow(g.label, KB(g.done), 'ok bg'); } }
+            paint();
             api.step('Ready', 0);
             setRow('Ready', ((performance.now() - t0) / 1000).toFixed(1) + ' s', 'ok');
             finished = true;
@@ -240,6 +242,8 @@
           var need = { models: 1 }; /* the glTF hero waits for these; title key art, menu and world art hot-swap in (the title shows its gradient until the plate lands) */
           items.forEach(function (i) { if (i.phase in labels) { byTail[i.path.replace(/^\.?\//, '')] = i; var g = bg[i.phase] || (bg[i.phase] = { label: labels[i.phase], done: 0, total: 0, seen: {}, need: !!need[i.phase] }); g.total += i.bytes; } });
           function take(list) { list.forEach(function (e) { var tail = e.name.replace(/^[a-z]+:\/\/[^/]+\//, '').split('?')[0]; var i = byTail[tail]; if (!i || bg[i.phase].seen[tail]) return; bg[i.phase].seen[tail] = 1; bg[i.phase].done += i.bytes; }); }
+          try { if (performance.setResourceTimingBufferSize) performance.setResourceTimingBufferSize(4000); } catch (e) {}
+          try { performance.addEventListener('resourcetimingbufferfull', function () { try { performance.setResourceTimingBufferSize(8000); } catch (e) {} }); } catch (e) {}
           try { take(performance.getEntriesByType('resource')); new PerformanceObserver(function (l) { take(l.getEntries()); }).observe({ type: 'resource', buffered: true }); } catch (e) {}
         }
         var manifestUrl = root.getAttribute('data-manifest');

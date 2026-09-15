@@ -47,7 +47,7 @@ interface LoadItem {
   path: string;
   bytes: number;
   gz: number;
-  phase: 'core' | 'title' | 'menu' | 'world' | 'models' | 'audio-worklet' | 'other';
+  phase: 'core' | 'title' | 'menu' | 'world' | 'models' | 'models-lod' | 'audio-worklet' | 'other';
   label?: string;
 }
 
@@ -90,7 +90,7 @@ function publicItems(root: string): LoadItem[] {
         if (e.isDirectory()) walk(path.join(dir, e.name), `${rel}/${e.name}`);
         else {
           const b = fs.statSync(path.join(dir, e.name)).size;
-          items.push({ path: `./models${rel}/${e.name}`, bytes: b, gz: b, phase: 'models', label: e.name });
+          items.push({ path: `./models${rel}/${e.name}`, bytes: b, gz: b, phase: /-lod\.glb$/.test(e.name) ? 'models-lod' : 'models', label: e.name });
         }
       }
     };
