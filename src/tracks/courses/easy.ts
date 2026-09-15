@@ -75,8 +75,9 @@ export const E1 = course('e1-uphill-weight', 'Uphill Weight', 'easy')
   .checkpoint() // ~400 m
   .flat(20) // the demand's run-up: v2 13.2 m/s from the spawn
   .camera({ mode: 'side', zoomBias: -0.4 })
-  .kickerPlank({ angleDeg: 45, rise: 3.7 }) // the demand (round 7 / physics v2: was steepPlank 48 — on v2 nothing but the bot's hop move tops 50 deg, the concave fillet made 40-45 worse, and 45 over a 0.3 m 20 deg kicker foot is TOP at 8 m/s for the naive rider on both classes)
-  .box({ width: 6, height: 3.7 })
+  .kickerPlank({ angleDeg: 45, rise: 3.1 }) // the demand (round 7 / physics v2: was steepPlank 48 — on v2 nothing but the bot's hop move tops 50 deg, the concave fillet made 40-45 worse, and 45 over a 0.3 m 20 deg kicker foot is TOP at 8 m/s for the naive rider on both classes)
+  .ramp({ length: 2, height: 0.6, curve: -0.4 }, { base: 3.1 }) // round 8: a convex crest rolls the climb over onto the box. Reflex `average` on R5 died 28 x 9 seeds at this top: it tops the face at ~3.5 m/s and LAUNCHES off the plank's top edge (both wheels in the air 1.2 s over the box, +22 -> +190 deg whatever the rider does; a wider box changed nothing because the bike never touched it). Fixture (scratch tracks8/e1crest.mts, 6 seeds): plain 45 4/5/11/7/10/3, this crest 1/1/2/3/1/1; a 2.5-3 m crest at curve -0.6 is a launch hump (3/6/5/6/6/3)
+  .box({ width: 8.6, height: 3.7 }) // the crest + box keep the round-7 footprint so nothing downstream moves
   .ramp({ length: 22, height: 3.7, direction: 'down' }) // was a -40 deg plank onto flat: a 40 deg kink at its foot
   .camera({ mode: 'side' })
   .flat(8)
@@ -101,7 +102,7 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .meta({
     biome: 'canyon',
     technique: 'rear-wheel-first gap landing',
-    demands: 'gap onto a landing ramp and an 8 m platform, immediately a second gap from a kicker on the platform',
+    demands: 'gap onto a long landing ramp, immediately a second gap from a kicker on the platform',
     attemptsBand: [3, 5],
     targetTimeS: 70, // round 7 gold (physics v2): skill-3 bot 43.46 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
@@ -159,13 +160,13 @@ export const E2 = course('e2-rear-wheel-first', 'Rear Wheel First', 'easy')
   .camera({ mode: 'high34' })
   .ramp({ length: 5, height: 1.5 }) // the demand
   .gap({ width: 5 })
-  .ramp({ length: 5, height: 0.6 }) // landing ramp onto the platform (was a 0.6 m box edge: 12 deaths)
-  .box({ width: 8, height: 0.6 }) // 8 m to settle and gas (was 6 with the kicker on it: 3 m of platform)
-  .ramp({ length: 4, height: 1.0 }, { base: 0.6 }) // 14 deg (round 7: was 3 x 1.0 = 18.4 deg; v2 loops the gas-held rider off lips >= 17 deg below 10 m/s)
-  .gap({ width: 4.5 }) // round 7: 4.5 from ~9 m/s on the platform (was 5; before that 6 onto flat: 28 deaths short of the far lip)
+  .ramp({ length: 12, height: 0.6 }) // round 8: a 2.9 deg landing ramp that runs almost to the kicker (was 5 x 0.6 + an 8 m flat platform: the reflex rider landing at ~10 m/s rebounded off the ramp-to-platform kink and flew the flat platform with the gas on, 27 x 9 seeds at 506 m; fixture tracks8/e2fix.mts, 9 seeds: 5 x 0.6 + 10 m flat 3/3/17/4/16/2/3/1/2, this shape 6/2/6/3/2/1/2/7/5)
+  .box({ width: 3, height: 0.6 })
+  .ramp({ length: 5, height: 1.0 }, { base: 0.6 }) // 11 deg (round 8: was 4 x 1.0 = 14 deg; measured: a brake tap in the air off 5 x 1.0 lands the gapLanding at +1..+17 deg, off 4 x 1.0 at -9..-19; round 7: was 3 x 1.0 = 18.4 deg)
+  .gap({ width: 4 }) // round 8: 4 (was 4.5; round 7: 5; before that 6 onto flat: 28 deaths short of the far lip)
   .gapLanding(1.0, 6, 8, 10)
   .camera({ mode: 'side' })
-  .flat(12)
+  .flat(9.5) // round 8: 2.5 m shorter so the re-shaped demand moves nothing downstream
   .bumpRow(2, 0.3, 16)
   .flat(6)
   .rollers(20, 0.25, 3)
@@ -187,22 +188,33 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .meta({
     biome: 'canyon',
     technique: 'stairs: gas up, brake down',
-    demands: '8 x 0.25 m steps up at speed (0.6 m runs), 8 steps down ending at a 2 m gap',
+    demands: '8 x 0.15 m steps up at speed (0.6 m runs), 8 steps down at a 0.5 m run, a 1.5 m gap onto a landing ramp',
     attemptsBand: [3, 6],
     targetTimeS: 70, // round 7 gold (physics v2): skill-3 bot 41.44 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
   .camera({ mode: 'side' })
-  .flat(20)
-  .rollers(20, 0.25, 3)
+  // Round 8 (stranger round 4: e3 15.5 attempts against 3-6, one of two sessions never finished; every death on a
+  // flight): a 0.25 m riser is a 75 deg face to a 0.34 m wheel, so once the front lifts every riser the rear hits
+  // accelerates the loop — the replayed r4 recordings loop on PLAIN GAS at 10 m/s (lean 0) and on gas + lean +1 at
+  // 7 m/s on the 3 x 0.25 flight, and off the 6-step flight with no input at all. Measured (scratch tracks8/stairs.mts,
+  // Rookie, up over a box and down): 0.15 m risers at a 0.6 m run (14 deg) ride plain gas, coast, gas-forward-to-the-
+  // lip-then-coast and brake-down at 5-14 m/s on 0.75 / 1.2 m flights (pitch <= 32 deg); a held forward lean down a
+  // >= 1.5 m flight endos (the physics R5 held-lean drop row), so no flight is taller than 1.2 m; above 14 m/s the
+  // forward-lean riders die on every geometry, so the first flight is 22 m from the line (~13.5 m/s) and every other
+  // one 16 m past its checkpoint. The two 0.9 m barrels at the foot of flight 2 (three of the six replayed deaths at
+  // 176-180 m) are gone. The pit is 1.5 m onto a gapLanding: a rider coasting off the descent at 8 m/s clears it,
+  // half gas after the brake clears it; 2 m onto flat wanted >= 10 m/s (the rear wheel caught the far lip).
   .flat(6)
-  .checkpoint() // ~46 m
-  .flat(16) // checkpoint rule: 15 m before a flight up
+  .checkpoint() // ~6 m: the start-line lesson; a plain-gas rider reaches the first flight at ~13.5 m/s
+  .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 3, height: 0.25, length: 0.6 }) // the first flight: 0.75 m at 22.6 deg (round 7: 0.6 m runs everywhere — a 26.6 deg flight lifted the v2 nose over the top: 59 nose-high deaths at the second flight)
+  .stair({ count: 5, height: 0.15, length: 0.6 }) // the first flight: 0.75 m at 14 deg
   .box({ width: 6, height: 0.75 })
-  .stair({ count: 3, height: 0.25, length: 0.5, direction: 'down' })
+  .stair({ count: 5, height: 0.15, length: 0.6, direction: 'down' })
   .flat(12)
   .camera({ mode: 'side' })
+  .rollers(20, 0.25, 3)
+  .flat(4)
   .wave(28, 1.5, 16)
   .flat(4)
   .bumpRow(2, 0.3, 16)
@@ -210,22 +222,21 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~135 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 6, height: 0.25, length: 0.6 }) // 22.6 deg, 1.5 m (round 7: was 0.5 runs; before that 6 x 0.4 from 3 m: 95 deaths)
-  .box({ width: 6, height: 1.5 }) // round 7: 6 m on top (was 4) so the nose settles before the descent
-  .stair({ count: 6, height: 0.25, length: 0.5, direction: 'down' })
-  .barrel({ count: 2, spacing: 0.7, burning: false })
-  .flat(12)
+  .stair({ count: 8, height: 0.15, length: 0.6 }) // 1.2 m at 14 deg (round 7: 6 x 0.25 at 0.6; before that 6 x 0.4 from 3 m: 95 deaths)
+  .box({ width: 6, height: 1.2 })
+  .stair({ count: 8, height: 0.15, length: 0.6, direction: 'down' })
+  .flat(12) // round 8: the two barrels that stood here are gone
   .camera({ mode: 'side' })
   .tabletop(6, 8, 1.0)
   .flat(6)
   .rollers(20, 0.25, 3)
   .flat(6)
-  .checkpoint() // ~215 m
+  .checkpoint() // ~235 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 6, height: 0.25, length: 0.6 }) // a flight at speed
-  .box({ width: 6, height: 1.5 })
-  .stair({ count: 6, height: 0.25, length: 0.5, direction: 'down' })
+  .stair({ count: 8, height: 0.15, length: 0.6 }) // a flight at speed: 8 m on top so a 14 m/s launch still lands on the box
+  .box({ width: 8, height: 1.2 })
+  .stair({ count: 8, height: 0.15, length: 0.6, direction: 'down' })
   .flat(12)
   .camera({ mode: 'side' })
   .bumpRow(3, 0.3, 16)
@@ -234,14 +245,15 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .flat(4)
   .rollers(20, 0.25, 3)
   .flat(6)
-  .checkpoint() // ~330 m
+  .checkpoint() // ~384 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 8, height: 0.25, length: 0.6 }) // the demand: 2.0 m, eight risers at speed (round 7: 0.6 runs; was 7 x 0.45 once)
-  .box({ width: 4, height: 2.0 })
-  .stair({ count: 8, height: 0.25, length: 0.5, direction: 'down' })
-  .flat(6) // checkpoint rule: the stair descent + 6 m is 15 m of effective run-up for the gap
-  .gap({ width: 2 }) // brake on the stairs, release before the lip
+  .stair({ count: 8, height: 0.15, length: 0.6 }) // the demand: eight risers at speed onto a 4 m top
+  .box({ width: 4, height: 1.2 })
+  .stair({ count: 8, height: 0.15, length: 0.5, direction: 'down' }) // 16.7 deg down: brake, release before the lip
+  .flat(6)
+  .gap({ width: 1.5 }) // round 8: 1.5 m onto a landing ramp (was 2 m onto flat: the rear wheel caught the far lip below 10 m/s)
+  .gapLanding(0.4, 4, 4, 6)
   .camera({ mode: 'side' })
   .flat(12)
   .wave(28, 1.5, 16)

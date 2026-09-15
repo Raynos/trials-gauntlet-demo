@@ -259,9 +259,12 @@ export const CHECKPOINT_RULE = {
   /**
    * Walls / ledges at least this tall want the run-up. Round 4: 0.6 (stationary hop apex 0.74 x 0.8); round 5:
    * 0.45 — the reflex player's practised hop is a rolling one (M1: a 0.55 ledge 3 m past a checkpoint was 85
-   * stuck-restarts, the same ledge from 16 m 5).
+   * stuck-restarts, the same ledge from 16 m 5). Round 8 (physics v2): 0.65 — on v2 a ledge up to 0.6 m is a rolling
+   * hop whose window is 5-8 m/s, reached in 4-8 m from a spawn, and MORE run-up arrives above the window: measured on a
+   * 0.45 ledge + 1.5 m hop across (scratch tracks8/m1fix.mts, 6 seeds), reflex `average` total attempts 15 from 6 m,
+   * 58 from 8, 51 from 10, 72 from 12, 64 from 16 (`good` 18 / 39 / 45 / 25 / 24). Taller ledges keep the run-up want.
    */
-  hopHeight: 0.45,
+  hopHeight: 0.65,
   /** Free-standing up-ramps at least this tall are kickers a stranger treats as a jump. */
   kickerHeight: 1.0,
   /**

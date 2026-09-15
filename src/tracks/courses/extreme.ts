@@ -223,7 +223,7 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .meta({
     biome: 'foundry',
     technique: 'everything, in order',
-    demands: '45 deg plank over a kicker foot, drop cascade, stairs into a gap, hop ledge, spinning drum, 22 deg see-saw landing, lip climb + rails, lipped gap chain, fire, 60 deg plank, pole caps',
+    demands: '45 deg plank over a kicker foot, drop cascade, 0.15 m stairs into a gap, hop ledge, spinning drum, 22 deg see-saw landing, lip climb + rails, lipped gap chain, fire, 60 deg plank, pole caps',
     attemptsBand: [60, 80],
     targetTimeS: 90, // round 7 gold (physics v2): skill-3 bot 45.08 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
   })
@@ -249,9 +249,9 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .rollers(20, 0.25, 3)
   .flat(16)
   // E3 stairs: 8 x 0.25 up at speed, 8 x 0.25 down into a 2 m gap
-  .stair({ count: 8, height: 0.25, length: 0.6 }) // E3's demand as re-authored for v2 (22.6 deg runs)
-  .box({ width: 4, height: 2.0 })
-  .stair({ count: 8, height: 0.25, length: 0.5, direction: 'down' })
+  .stair({ count: 8, height: 0.15, length: 0.6 }) // E3's demand as re-authored in round 8: 0.15 m risers at 14 deg (a 0.25 m riser is a 75 deg face to the wheel — once the front lifts every riser the rear hits accelerates the loop; the r4 strangers looped on plain gas), same footprint
+  .box({ width: 4, height: 1.2 })
+  .stair({ count: 8, height: 0.15, length: 0.5, direction: 'down' })
   .flat(6) // checkpoint rule: descent + 6 m is 15 m of effective run-up
   .gap({ width: 2 })
   .flat(14) // checkpoint rule: >= 8 m past the landing zone
@@ -318,7 +318,8 @@ export const X3 = course('x3-gauntlet', 'The Gauntlet', 'extreme')
   .flat(18) // checkpoint rule: 20 m before a steep plank
   .setPiece('climb', 'The Stack')
   .camera({ mode: 'side-tight', pitch: (12 * Math.PI) / 180 })
-  .steepPlank({ angleDeg: 60, rise: 4.5 })
+  .steepPlank({ angleDeg: 60, rise: 3.9 })
+  .ramp({ length: 2, height: 0.6, curve: -0.4 }, { base: 3.9 }) // round 8: a convex crest rolls the 60 deg face over onto the box. On R4/R5 the skill-3 Rookie bot no longer cleared x3 (50 attempts, 47 identical crashes at 477.0 m = 0.8 m past the plank top: it launches off the top edge, and from the CP5 spawn its player memory bans every line it has, so it plays gas into the same crash); the finale fixture (scratch tracks8/x3fin.mts) clears in 1 / 1 / 2 with this crest at 20 / 24 / 30 m run-ins where the plain top looped 15 x at 30 m and a 2 x 0.8 / curve -0.5 crest stuck the bot at the caps
   .box({ width: 3, height: 4.5 })
   .camera({ mode: 'low' })
   .poleRow([4.5, 4.5, 4.5], 1.7)

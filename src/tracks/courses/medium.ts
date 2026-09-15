@@ -44,11 +44,11 @@ export const M1 = course('m1-hop-up', 'Hop Up', 'medium')
   .wave(28, 1.5, 16)
   .flat(6)
   .checkpoint() // ~120 m
-  .flat(16)
+  .flat(6) // round 8: 6 m (was 16): the v2 hop window is 5-8 m/s and 16 m of gas arrives at 12 — the reflex braked into a stoppie and endoed into the face (ledge @ 119: 53 `average` deaths x 3 seeds); fixture: 6 m is 4 x better than 16 for `average`
   .camera({ mode: 'side-tight' })
   .ledge({ height: 0.45, length: 4 }) // hop up, settle, hop across (round 7: 0.45, was 0.5 — 116 v2 reflex deaths front-into-the-face here; before that 0.55 + a 1.5 m ledge into the gap)
   .gap({ width: 1.5, depth: 2 })
-  .flat(6)
+  .flat(16) // +10 so nothing downstream moves
   .camera({ mode: 'side' })
   .bumpRow(3, 0.3, 16)
   .flat(4)
@@ -59,15 +59,13 @@ export const M1 = course('m1-hop-up', 'Hop Up', 'medium')
   .rollers(20, 0.25, 3)
   .flat(6)
   .checkpoint() // ~245 m
-  .flat(16) // 15 m from the spawn (checkpoint rule): the two-stage rise, 0.9 in two hops
+  .flat(8) // round 8: 8 m (was 16): arrive inside the hop window; the two-stage rise in two hops
   .camera({ mode: 'side-tight' })
-  .ledge({ height: 0.45, length: 5 })
-  .ledge({ height: 0.85, length: 4 }) // second stage: a 0.4 m rise (round 7: was 0.9 = 0.45)
-  .ramp({ length: 8, height: 0.85, direction: 'down' })
-  .flat(12)
-  .ledge({ height: 0.45, length: 4 })
-  .gap({ width: 2, depth: 2 })
-  .flat(6)
+  .ledge({ height: 0.4, length: 8 }) // round 8: 0.4 over 8 m (was 0.45 over 5): this two-stage was the hardest thing on the track — harder than the demand (fixture, 6 seeds: as built `good` 1/30/1/5/26/4, `average` 5/7/24/4/wall/1; the demand's 0.3 / 0.6 / ramp / 0.9 shape 1/1/1/1/1/1 for both)
+  .ledge({ height: 0.75, length: 4 }) // second stage: a 0.35 m rise from a settled top (fixture: `good` 2/2/5/10/3/1, `average` 3/3/1/1/9/2)
+  .ramp({ length: 8, height: 0.75, direction: 'down' })
+  .flat(17) // +5 so the shorter run-in and the longer first stage move nothing downstream
+  .flat(12) // round 8: the 0.45 ledge + 2 m hop-across that stood here is gone — a hop-across right after a hop-up, reached downhill off the two-stage, was the track's wall for `average` (fixture tracks8/m1fix.mts, 6 seeds: any shape of it 167-258 total attempts vs 17 without; `good` 41-324 vs 13); the demand carries the same move with a 6 m settle and a landing lip and clears 1/1/1/1/1/1
   .camera({ mode: 'side' })
   .rollers(20, 0.25, 3)
   .flat(6)
@@ -249,7 +247,7 @@ export const M3 = course('m3-see-saw', 'See-Saw', 'medium')
   .camera({ mode: 'low', cut: true })
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 3 })
-  .seesaw({ length: 8, height: 1.6 }) // 21.8 deg (round 7: was 8 x 2.0 = 29 deg, the crash board); land rear-first on the resting near end: it dips, you roll up, it tips
+  .seesaw({ length: 8, height: 1.6 }) // 21.8 deg (round 7: was 8 x 2.0 = 29 deg, the crash board); land rear-first on the resting near end: it dips, you roll up, it tips (round 8: an 8 x 1.3 = 17.5 deg board was tried for the reflex `good` tip-air deaths at 410 m — 12 vs 13 over 9 seeds, inside the noise, so it stays; see tracks.md round 8)
   .flat(14) // ride the tip down, then build speed for the thin landings (round 7: 14 m, was 10; once a 3 m gap off the tipping board onto a plank at 2.0: walled)
   .ramp({ length: 6, height: 1.5 }) // 14 deg (round 7)
   .gap({ width: 3 })

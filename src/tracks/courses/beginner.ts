@@ -129,8 +129,8 @@ export const B2 = course('b2-lean-back', 'Lean Back', 'beginner')
   .flat(6)
   .ramp({ length: 12, height: 1.2 }) // 5.7 deg (was 6 x 1.2 = 11.3 deg: looped at the box lip at 6 m/s)
   .box({ width: 4, height: 1.2 })
-  .stair({ count: 4, height: 0.3, length: 0.6, direction: 'down' }) // lean back, no brake
-  .flat(12)
+  .ramp({ length: 9.6, height: 1.2, direction: 'down' }) // round 8: an 8 x h down-ramp (was 4 x 0.3 stairs at 26.6 deg): the panic-drop rule — a held lean-back (gas off) rides every drop to 1.8 m off a >= 8 x h ramp and loops down ANY stair flight >= 1.0 m at every speed (scratch tracks8/panic.mts); stranger r4 b2 s1 looped on the other flight at 433 m with exactly that input
+  .flat(4.8) // 7.2 m shorter: nothing downstream moves
   .wave(26, 1.2, 16)
   .flat(6)
   .stepDowns(15, 6, [1.5, 1.0, 0.5]) // cascade: three 0.5 m drops in a row (was a 14 deg ramp up: looped on the face at 8 m/s)
@@ -141,8 +141,8 @@ export const B2 = course('b2-lean-back', 'Lean Back', 'beginner')
   .flat(6)
   .ramp({ length: 10, height: 1.0 })
   .box({ width: 8, height: 1.0 })
-  .stair({ count: 3, height: 0.33, length: 0.6, direction: 'down' })
-  .flat(12)
+  .ramp({ length: 8, height: 1.0, direction: 'down' }) // round 8: 8 x h ramp (was 3 x 0.33 stairs at 28.8 deg — stranger r4 s1: 'a lean-back blip on the second knee-high step at 16 m/s pitched to 86 deg and looped')
+  .flat(5.8) // 6.2 m shorter: nothing downstream moves
   .bumpRow(2, 0.3, 16)
   .flat(6)
   .wave(28, 1.5, 16)
@@ -196,8 +196,8 @@ export const B3 = course('b3-kicker-row', 'Kicker Row', 'beginner')
   .flat(8)
   .checkpoint() // ~118 m
   .flat(16)
-  .ramp({ length: 4, height: 1.2 }) // 17 deg: level the bike in the air
-  .flat(8)
+  .ramp({ length: 6, height: 1.2 }) // 11 deg (round 8: was 4 x 1.2 = 17 deg — reflex `average` on R5 died on its landing at 170 m 4 of 21 attempts, a nose-high exit then a brake tap in the air; measured: the brake tap at 10-14 m/s lands on a <= 11.3 deg lip and endoes off 16.7 deg at 14 m/s; the flat behind it is 2 m shorter so nothing downstream moves and the r5 stranger recordings stay byte-valid)
+  .flat(6)
   .slope(16, -1.2)
   .flat(10)
   .bumpRow(2, 0.25, 16) // round 6: was a convex humpRow — the novice reflex player launched nose-down off it 10 m before the 1.5 kicker
