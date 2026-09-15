@@ -1,0 +1,31 @@
+{
+  "source": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/hero-r10-bike/source/bike.blend",
+  "sourceSha256": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b",
+  "exportSha256": "007a9069412f899b8548429be499f5b82a54ea2e3e33022392a7228f1d4f2081",
+  "lod": true,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "lodBudget": 6000,
+  "verified": {
+    "triangles": 5710,
+    "meshes": 23,
+    "maxPositionError": 5.0215969990711564e-08,
+    "occlusionMaterials": 3,
+    "bounds": {
+      "min": [
+        -0.40008029341697693,
+        -0.33818328380584717,
+        -0.4374558627605438
+      ],
+      "max": [
+        1.6525742709636688,
+        0.8612913712859154,
+        0.4374558627605438
+      ]
+    },
+    "bytes": 485656
+  }
+}

@@ -1,13 +1,18 @@
 {
   "source": "assets/blender/source/rider-race.blend",
-  "sourceSha256": "16aedaa735e89be182c5a82713d095f5d8c992f1ebdbdffee7a81b6ee9989d71",
-  "exportSha256": "cf2cb35c140a7ea7495eb90731d5ce7d030b832378d48a1a405ea234e8d33a0e",
+  "sourceSha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2",
+  "exportSha256": "e095ee00a701cf806d875f1725c4fcc536a6676eeb1db5879f36967de6894aab",
   "outfit": "race",
   "lod": true,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
   "verified": {
-    "bytes": 526004,
-    "triangles": 5879,
-    "vertices": 5873,
+    "bytes": 571952,
+    "triangles": 5877,
+    "vertices": 6764,
     "bones": 19,
     "clips": [
       "crouch",
@@ -23,7 +28,13 @@
       "rider_rookie",
       "rider_pro"
     ],
-    "maxWeightError": 8.940696716308594e-08,
-    "loadedWeightError": 3.5564880818128586e-08
+    "maxWeightError": 8.453207556158304e-08,
+    "loadedWeightError": 3.230525180697441e-08
+  },
+  "reviewedExportSource": "harness/out/blender/race-head/finished-race/race-assembled-v1.blend",
+  "promotionAudit": {
+    "originalReport": "harness/out/blender/race-head/finished-race/models/rider-race-lod.source.json",
+    "originalReportSha256": "071a11a75f6f0378b2ee0389f13a84eb9353b48bba1794f5826b474475f13e97",
+    "method": "Reviewed bytes copied unchanged; canonical source path relabeled."
   }
 }

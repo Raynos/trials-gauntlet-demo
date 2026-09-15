@@ -1,0 +1,32 @@
+{
+  "assets": [
+    {
+      "name": "bike",
+      "bytes": 1394072,
+      "hashes": {
+        "canonical": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+        "lodFixedArtifact": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+        "frozenBuild": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+        "catalog": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec"
+      }
+    },
+    {
+      "name": "bike-lod",
+      "bytes": 472872,
+      "hashes": {
+        "canonical": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502",
+        "lodFixedArtifact": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502",
+        "frozenBuild": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502",
+        "catalog": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502"
+      }
+    }
+  ],
+  "testLog": "harness/out/blender/r10-fixed-tests.log",
+  "testLogSha256": "2debb2e8911cf0ee837e4cb6eef845dff2f4d640de7a2a6931f119ad99910ce2",
+  "testLogReports": {
+    "filesPassed": 4,
+    "testsPassed": 45,
+    "bikeMechanismTests": 16
+  },
+  "scope": "Hash comparison plus inspection of pre-existing successful test log; tests were not rerun in this subtask."
+}

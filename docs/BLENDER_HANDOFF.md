@@ -1,3 +1,17 @@
+# Round 10 continuation — authoritative latest status
+
+Canonical assets now contain R9 fitted Street/Race riders and R10 corrected bike/card with protected LOD mechanism interfaces. See `docs/evidence/blender-r10.json` and `hero-r10-promotion.json`. R10 rider surface experiments were NOT selected. Latest build: `harness/out/blender/r10-fixed-dist`; Metal ship report: `r10-fixed-ship-metal/report.json`. Focused asset tests 45/45, typecheck/build pass. Known physics failures and actual iOS verification remain open.
+
+User approved all FIVE target concepts as independent outfits, plus official img2threejs installation/use. Current runtime still has TWO outfits and TWO bike classes. Shared skill `~/.agents/skills/img2threejs` version2.0.0 pinned6e60b5e22419464b4853e01ddb6c0e6f6659a733; character plugin v0.2.0 installed. Continue from `.img2threejs/state.json` with `forge/next.py`; image analysis is recorded under `assets/design/hero-targets/reconstruction/`. Do not generate geometry before required spec gates. The game uses Blender/Three.js, but this requested reconstruction is code-authored with explicit terminal export if needed.
+
+Five-preset integration design: `harness/out/blender/five-outfit-integration.md`. Fire Truck pipeline review: `harness/out/blender/fire-truck-pipeline-review.md`; use measurement/provenance practices, not historical gate bypasses. Current gallery publicly deployed to https://trials-rider-progress.vercel.app, separate from the game. User explicitly rejected download-only delivery. No game merge/push/deployment performed.
+
+Weekly remaining53% at2026-09-15 22:58:11 UTC via OpenUsage. Medium effort. Stop at30% remaining or earlier once accepted; do not burn toward the floor. Parent visual judgment remains below requested AAA quality. Goal is active.
+
+---
+
+## Historical checkpoints (superseded where above differs)
+
 # Round 9 assembled review — September 15
 
 All six final candidate GLBs are integrated in `harness/out/blender/mega-v8-dist`; manifest `mega-v8-models.json`. Canonical sources/models remain R7. Parent played both outfits full and explicitly enabled LOD in QuickTime. Better proportions and connected motion; still below AI target material/cloth finish, so no AAA acceptance or completion claim.

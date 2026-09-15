@@ -13,13 +13,40 @@ assets/blender/
   build_bike.py    -> public/models/bike.glb  (+ `-- --lod` -> bike-lod.glb), bike.blend, textures/bike_*.jpg
   build_rider.py   -> public/models/rider.glb (+ `-- --lod` -> rider-lod.glb), rider.blend, textures/rider_*.jpg
   rider_asset.py   protected rider seed/export commands; street is the default outfit
-  source/         rider-street.blend / rider-race.blend: authoritative editable sources
+  source/         rider-street.blend / rider-race.blend / bike.blend: editable masters
   generated/      rider-{street,race}[-lod].blend: packed, baked export copies
   verify_rider_asset.mjs  production meshopt decoder checks before output publication
   preview.py       Eevee renders of the EXPORTED .glb files -> previews/*.png (per colourway / LOD)
   textures/        baked atlases (JPEG), decals.png, chain_links.png, bike_spokecard.png
   previews/        turntables, rider-poses, composite-*, garage-*, compare-reference (suffix -pro / -lod)
 ```
+
+## Current authored package (R10 integration)
+
+The canonical sources are `source/rider-street.blend`, `source/rider-race.blend`, and
+`source/bike.blend`. Street uses a visible human head and fitted cotton/denim; Race uses the
+compact helmet and fitted technical outfit. The bike source retains the rebuilt engine/body
+and a translucent spinning-spoke card. Both garage bike classes share geometry and select
+independent Rookie/Pro material variants.
+
+These sources supersede procedural seeding for ongoing authoring. Do not regenerate them with
+`build_rider.py` or `build_bike.py`. Export riders with the commands below; export the bike with
+`blender -b --python-exit-code 1 --python assets/blender/bike_asset.py -- export` (add `--lod`
+for reduced detail). All sources save `heroLocalAO` distance .025 m, samples 32, strength .8.
+The standard exporters read that policy and pack AO into the existing ORM red channel.
+
+The R10 promotion copied exact reviewed source/model bytes; it was not a new export. Runtime
+audit files retain the original report path/hash and explicitly relabel the canonical source.
+See `docs/evidence/hero-r10-promotion.json` for lineage. The R9 riders were retained because the
+R10 extra garment/gear experiment did not demonstrate enough visible improvement.
+
+Human base geometry/eyes and photographed cotton/denim are third-party inputs. Their provenance,
+licenses and scope are preserved in `docs/evidence/hero-r9-inputs/THIRD-PARTY.md`; all needed images
+are packed in the editable sources. Detailed recipes and immutable prerequisite hashes are in
+that package and `docs/evidence/hero-r10-inputs/`. The source files are the durable authoring masters.
+
+Visual quality still falls below the AI design targets. Actual iOS performance and the remaining
+motion/contact issues are open; source promotion is not goal completion.
 
 ## Rider authoring and export
 

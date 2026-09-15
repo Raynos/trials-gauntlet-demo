@@ -1,13 +1,18 @@
 {
   "source": "assets/blender/source/rider-street.blend",
-  "sourceSha256": "3452c94a9ccbd3e330b8a19384be1c78c931254cceb013c4b895d37a4268e4d6",
-  "exportSha256": "1ee21f29d89680af8ef570acb9252c856c1092a1d36ada8f66d04c0f676bf6ad",
+  "sourceSha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220",
+  "exportSha256": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e",
   "outfit": "street",
   "lod": true,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
   "verified": {
-    "bytes": 483952,
+    "bytes": 549956,
     "triangles": 5880,
-    "vertices": 5445,
+    "vertices": 7129,
     "bones": 19,
     "clips": [
       "crouch",
@@ -23,7 +28,13 @@
       "rider_rookie",
       "rider_pro"
     ],
-    "maxWeightError": 8.940696716308594e-08,
-    "loadedWeightError": 2.9802322387695312e-08
+    "maxWeightError": 8.870847523212433e-08,
+    "loadedWeightError": 3.329478204250336e-08
+  },
+  "reviewedExportSource": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
+  "promotionAudit": {
+    "originalReport": "harness/out/blender/street-head/finished-street/models-standard/rider-street-lod.source.json",
+    "originalReportSha256": "5881ce08d174d1643d0ef88edcbdcccd40979ca177b78487a10912c063f8428a",
+    "method": "Reviewed bytes copied unchanged; canonical source path relabeled."
   }
 }

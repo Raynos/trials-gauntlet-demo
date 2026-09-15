@@ -14,6 +14,8 @@ import sys
 import tempfile
 from pathlib import Path
 import bpy
+import bmesh
+from mathutils import Vector
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 import common as C
 from rider_asset import publish
@@ -126,6 +128,99 @@ def adopt(args):
  if digest(original)!=original_hash: raise RuntimeError('Input was altered during adoption.')
  C.log('adopted protected bike source',source,digest(source))
 
+def detach_interface_components(ob):
+ """Preserve whole manufactured pieces, not isolated witness vertices.
+
+ Fork cylinders and swingarm axle caps are disconnected components in the
+ authored assembly. Their exact surfaces define moving mechanical interfaces;
+ collapse-decimation may not move or remove any of their vertices.
+ """
+ if ob.name not in {'fork_upper', 'fork_lower', 'swingarm'}:
+  return None
+ scene = bpy.context.scene
+ axle = scene.objects['attach_front_axle_rest'].matrix_world.translation
+ top = scene.objects['attach_fork_top'].matrix_world.translation
+ axis = (top - axle).normalized()
+ rear = scene.objects['attach_rear_axle_rest'].matrix_world.translation
+ bm = bmesh.new()
+ bm.from_mesh(ob.data)
+ bm.verts.ensure_lookup_table()
+ seeds = set()
+ for v in bm.verts:
+  p = ob.matrix_world @ v.co
+  if ob.name == 'swingarm':
+   q = p - rear
+   if abs(abs(q.y) - .15) < 1e-5 and math.hypot(q.x, q.z) < .016:
+    seeds.add(v)
+  else:
+   q = p - axle
+   along = q.dot(axis)
+   for sign in (-1, 1):
+    radial = (q - axis * along - Vector((0, sign * .10, 0))).length
+    rings = ((.34, .019),) if ob.name == 'fork_upper' else ((-.01, .025), (.42, .024))
+    if any(abs(along - station) < 1e-5 and abs(radial - radius) < 1e-5 for station, radius in rings):
+     seeds.add(v)
+ # Expand to entire connected components, retaining caps and all intermediate
+ # surface vertices, including authored edits inside the manufactured piece.
+ keep = set(seeds)
+ pending = list(seeds)
+ while pending:
+  v = pending.pop()
+  for edge in v.link_edges:
+   other = edge.other_vert(v)
+   if other not in keep:
+    keep.add(other)
+    pending.append(other)
+ if not keep:
+  bm.free()
+  raise RuntimeError(f'Missing authored mechanical interface on {ob.name}; update the interface contract explicitly.')
+ keep_indices = {v.index for v in keep}
+ protected = ob.copy()
+ protected.data = ob.data.copy()
+ protected.name = ob.name + ':preserved_interfaces'
+ bpy.context.scene.collection.objects.link(protected)
+ bmesh.ops.delete(bm, geom=list(keep), context='VERTS')
+ bm.to_mesh(ob.data)
+ bm.free()
+ bm = bmesh.new()
+ bm.from_mesh(protected.data)
+ bm.verts.ensure_lookup_table()
+ bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.index not in keep_indices], context='VERTS')
+ bm.to_mesh(protected.data)
+ bm.free()
+ return protected
+
+
+def derive_lod(meshes, budget):
+ """Spend LOD budget only after reserving deformation and interface topology."""
+ protected_names = {'chain', 'brake_hose', 'wheel_front_blur', 'wheel_rear_blur',
+                    'wheel_front_spokes', 'wheel_rear_spokes',
+                    'shock_body', 'shock_shaft', 'shock_clevis'}
+ interfaces = {}
+ for ob in meshes:
+  preserved = detach_interface_components(ob)
+  if preserved is not None:
+   interfaces[ob.name] = preserved
+ fixed = sum(C.tri_count(ob) for ob in meshes if ob.name in protected_names)
+ fixed += sum(C.tri_count(ob) for ob in interfaces.values())
+ reducible = sum(C.tri_count(ob) for ob in meshes if ob.name not in protected_names)
+ minimum = fixed + 12 * (len(meshes) - len(protected_names))
+ if budget <= minimum:
+  raise RuntimeError(f'LOD budget {budget} cannot retain {fixed} interface/deformation triangles.')
+ ratio = min(1, (budget - fixed - 100) / reducible)
+ for ob in meshes:
+  if ob.name not in protected_names:
+   C.decimate_to(ob, max(12, int(C.tri_count(ob) * ratio)))
+  if ob.name in interfaces:
+   C.select_only([ob, interfaces[ob.name]])
+   bpy.context.view_layer.objects.active = ob
+   bpy.ops.object.join()
+ total = sum(C.tri_count(ob) for ob in meshes)
+ if total > budget:
+  raise RuntimeError(f'LOD exceeded budget before baking: {total} > {budget}')
+ C.log('LOD preserved mechanical interfaces', dict(reservedTriangles=fixed, totalTriangles=total, budget=budget))
+
+
 def export(args):
  source=args.source.resolve();source_hash=digest(source)
  stem='bike'+('-lod' if args.lod else '')
@@ -138,13 +233,8 @@ def export(args):
  ao = local_ao_settings(bpy.context.scene)
  ao_kwargs = {'ao_' + key: value for key, value in ao.items()}
  if args.lod:
-  protected={'chain','brake_hose','wheel_front_blur','wheel_rear_blur','wheel_front_spokes','wheel_rear_spokes'}
-  fixed=sum(C.tri_count(o) for o in meshes if o.name in protected)
-  reducible=sum(C.tri_count(o) for o in meshes if o.name not in protected)
-  if args.lod_tris<=fixed+12*(len(meshes)-len(protected)): raise RuntimeError('LOD budget too small for protected deformation topology.')
-  ratio=min(1,(args.lod_tris-fixed-100)/reducible)
-  for o in meshes:
-   if o.name not in protected: C.decimate_to(o,max(12,int(C.tri_count(o)*ratio)))
+  derive_lod(meshes, args.lod_tris)
+
  body=[o for o in meshes if o.name in BODY]
  mech=[o for o in meshes if o.name not in BODY|{'chain','wheel_front_blur','wheel_rear_blur'}]
  C.unwrap_all(body,angle=66,margin=.002);C.unwrap_all(mech,angle=66,margin=.0015)

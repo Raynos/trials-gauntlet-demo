@@ -1,0 +1,41 @@
+{
+  "originalSourceSha256": "498c778ae2e496fd0d9af2a71a27340c0173117951a50d1ea6f15e1007b49025",
+  "sourceSha256": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b",
+  "spokes": 32,
+  "diameterMetres": 0.0036,
+  "cardLayers": 2,
+  "runtimeOpacity": 0.9,
+  "rgbaSize": 128,
+  "samples": [
+    {
+      "radius": 0.08,
+      "physicalCoverage": 0.22918311805232927,
+      "textureAlpha": 0.1355980255083041,
+      "combinedOpacity": 0.22918311805232927
+    },
+    {
+      "radius": 0.12,
+      "physicalCoverage": 0.15278874536821954,
+      "textureAlpha": 0.08839911815656366,
+      "combinedOpacity": 0.15278874536821951
+    },
+    {
+      "radius": 0.16,
+      "physicalCoverage": 0.11459155902616464,
+      "textureAlpha": 0.0655983944460106,
+      "combinedOpacity": 0.11459155902616458
+    },
+    {
+      "radius": 0.2,
+      "physicalCoverage": 0.09167324722093172,
+      "textureAlpha": 0.05215357994488702,
+      "combinedOpacity": 0.09167324722093173
+    },
+    {
+      "radius": 0.23,
+      "physicalCoverage": 0.07971586714863627,
+      "textureAlpha": 0.04520621364896776,
+      "combinedOpacity": 0.07971586714863632
+    }
+  ]
+}

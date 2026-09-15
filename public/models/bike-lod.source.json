@@ -1,0 +1,37 @@
+{
+  "source": "assets/blender/source/bike.blend",
+  "sourceSha256": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b",
+  "exportSha256": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502",
+  "lod": true,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "lodBudget": 6000,
+  "verified": {
+    "triangles": 5706,
+    "meshes": 23,
+    "maxPositionError": 5.0215969990711564e-08,
+    "occlusionMaterials": 3,
+    "bounds": {
+      "min": [
+        -0.40008029341697693,
+        -0.33818328380584717,
+        -0.4374558627605438
+      ],
+      "max": [
+        1.659042239189148,
+        0.8612913712859154,
+        0.4374558627605438
+      ]
+    },
+    "bytes": 472872
+  },
+  "reviewedExportSource": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/hero-r10-bike/source/bike.blend",
+  "promotionAudit": {
+    "originalReport": "harness/out/blender/hero-r10-bike/lod-fixed/models/bike-lod.source.json",
+    "originalReportSha256": "f4f5a58ba60f01c884ad26f83ead66efac3c106e1e71959868f699c5a05b97db",
+    "method": "Corrected mechanical-interface LOD copied unchanged; canonical source path relabeled."
+  }
+}

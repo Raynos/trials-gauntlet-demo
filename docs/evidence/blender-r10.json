@@ -1,0 +1,53 @@
+{
+  "round": 10,
+  "status": "integrated baseline; target reconstruction incomplete",
+  "selection": "R9 fitted riders; R10 corrected bike/spoke card; exact mechanical interfaces protected in bike LOD",
+  "rejected": "R10 rider surface experiments: parent played review did not justify added geometry",
+  "models": [
+    {
+      "path": "public/models/rider-street.glb",
+      "bytes": 1488288,
+      "sha256": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853"
+    },
+    {
+      "path": "public/models/rider-street-lod.glb",
+      "bytes": 549956,
+      "sha256": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e"
+    },
+    {
+      "path": "public/models/rider-race.glb",
+      "bytes": 1514536,
+      "sha256": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33"
+    },
+    {
+      "path": "public/models/rider-race-lod.glb",
+      "bytes": 571952,
+      "sha256": "e095ee00a701cf806d875f1725c4fcc536a6676eeb1db5879f36967de6894aab"
+    },
+    {
+      "path": "public/models/bike.glb",
+      "bytes": 1394072,
+      "sha256": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec"
+    },
+    {
+      "path": "public/models/bike-lod.glb",
+      "bytes": 472872,
+      "sha256": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502"
+    }
+  ],
+  "tests": {
+    "focused": "harness/out/blender/r10-fixed-tests.log: 45/45, four files",
+    "typecheck": "harness/out/blender/r10-typecheck.log",
+    "build": "harness/out/blender/r10-fixed-build.log",
+    "ship": "harness/out/blender/r10-fixed-ship-metal/report.json",
+    "scope": "Headless desktop Metal Street; 4736 exact snapshots, zero-fault clear, next-tick restart; not iOS proof"
+  },
+  "gallery": "https://trials-rider-progress.vercel.app",
+  "remaining": [
+    "five independent presets and genuine open-face geometry",
+    "reference likeness and material quality",
+    "animation/contact acceptance through played evidence",
+    "actual iOS performance",
+    "known R7 physics/contact regressions"
+  ]
+}

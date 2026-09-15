@@ -1,0 +1,274 @@
+{
+  "source": "harness/out/blender/race-head/finished-race/race-assembled-v1.blend",
+  "source_sha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2",
+  "output_sha256": "7cc326b400630bb3b4fecb7b5c2829e0fd92a470db9fa6dd31387610b5c34d51",
+  "script_sha256": "783cc4431e7a7a5c34cd9b30e852a39a0fc7e59db6841058ea3e67eb684196c5",
+  "rig_actions_sockets_unchanged": true,
+  "fixed_meshes": [
+    "rider:articulated race boots",
+    "rider:glove_top",
+    "rider:gloves",
+    "rider:hero glove construction",
+    "rider:human eyebrows",
+    "rider:human head and neck",
+    "rider:iris.L",
+    "rider:iris.R",
+    "rider:pants",
+    "rider:race articulated knee panels",
+    "rider:sclera.L",
+    "rider:sclera.R"
+  ],
+  "all_original_material_graphs_unchanged": true,
+  "vent_faces": 12,
+  "vent_depth_m": 0.003,
+  "max_jersey_displacement_m": 0.0019644735777393763,
+  "seam_segments": 649,
+  "boot_buckle_frames": 4,
+  "base_boot_contact_and_weights_unchanged": true,
+  "heroLocalAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "pose_checks": [
+    {
+      "action": "crouch",
+      "frame": 1,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "crouch",
+      "frame": 15,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "crouch",
+      "frame": 30,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 1,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 10,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 20,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 1,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 15,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 30,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 1,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 15,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 30,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 1,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 61,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 121,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 1,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 15,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 30,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 1,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 15,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 30,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 1,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 15,
+      "finite": true,
+      "helmet_human_crossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 30,
+      "finite": true,
+      "helmet_human_crossings": 0
+    }
+  ],
+  "topologies": {
+    "rider:constructed_helmet": {
+      "vertices": 1695,
+      "faces": 1582,
+      "components": [
+        4,
+        4,
+        6,
+        6,
+        82,
+        91,
+        156,
+        1346
+      ],
+      "boundary_edges": 108,
+      "boundary_loops": [
+        4,
+        4,
+        18,
+        82
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 1.5231726138154045e-05
+    },
+    "rider:anatomical race jersey": {
+      "vertices": 8352,
+      "faces": 8178,
+      "components": [
+        8352
+      ],
+      "boundary_edges": 308,
+      "boundary_loops": [
+        44,
+        44,
+        72,
+        148
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 3.0022652026673313e-06
+    },
+    "rider:r10 construction details": {
+      "vertices": 3630,
+      "faces": 3513,
+      "components": [
+        10,
+        10,
+        10,
+        10,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        35,
+        35,
+        35,
+        35,
+        45,
+        45,
+        55,
+        55,
+        95,
+        95,
+        95,
+        95,
+        95,
+        100,
+        100,
+        135,
+        135,
+        155,
+        155,
+        165,
+        165,
+        240,
+        250,
+        460,
+        465
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 3.757352828870353e-08
+    }
+  },
+  "triangles": 51996,
+  "visual_verdict": "Parent plays and judges; no quality acceptance claim"
+}

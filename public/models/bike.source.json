@@ -1,0 +1,37 @@
+{
+  "source": "assets/blender/source/bike.blend",
+  "sourceSha256": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b",
+  "exportSha256": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+  "lod": false,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "lodBudget": null,
+  "verified": {
+    "triangles": 29940,
+    "meshes": 23,
+    "maxPositionError": 5.0215969990711564e-08,
+    "occlusionMaterials": 3,
+    "bounds": {
+      "min": [
+        -0.4000000059604645,
+        -0.3408759534358978,
+        -0.43760812282562256
+      ],
+      "max": [
+        1.6599665880203247,
+        0.85916668176651,
+        0.43760812282562256
+      ]
+    },
+    "bytes": 1394072
+  },
+  "reviewedExportSource": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/hero-r10-bike/source/bike.blend",
+  "promotionAudit": {
+    "originalReport": "harness/out/blender/hero-r10-bike/models/bike.source.json",
+    "originalReportSha256": "65418b2fc41f6262ad7d9929cceb6457d67a290a18174fbf0b52d552f70436bc",
+    "method": "Reviewed bytes copied unchanged; canonical source path relabeled."
+  }
+}

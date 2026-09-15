@@ -1,0 +1,34 @@
+{
+  "source": "harness/out/blender/hero-r10-street/street-r10-v1.blend",
+  "sourceSha256": "230ac42c9195ade85bc4c225d4c5b777332a6b85c042f57e2a6f839bebc714bd",
+  "exportSha256": "1ec3ba061c2c194e368917bfab75a9f88792e6b3f0a4949927f85cb5ab5dbd06",
+  "outfit": "street",
+  "lod": true,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "verified": {
+    "bytes": 555996,
+    "triangles": 5879,
+    "vertices": 7431,
+    "bones": 19,
+    "clips": [
+      "crouch",
+      "extend",
+      "forward_attack",
+      "hang_back",
+      "idle_breathe",
+      "land_absorb",
+      "sit_cruise",
+      "stand_attack"
+    ],
+    "variants": [
+      "rider_rookie",
+      "rider_pro"
+    ],
+    "maxWeightError": 8.870847523212433e-08,
+    "loadedWeightError": 3.329478204250336e-08
+  }
+}

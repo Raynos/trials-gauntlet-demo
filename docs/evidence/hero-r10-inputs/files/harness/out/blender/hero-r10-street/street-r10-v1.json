@@ -1,0 +1,520 @@
+{
+  "source": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
+  "source_sha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220",
+  "output_sha256": "230ac42c9195ade85bc4c225d4c5b777332a6b85c042f57e2a6f839bebc714bd",
+  "script_sha256": "1b935574f1c4f348f68730bf64904a953b3063aa9c5a19fd6af09bb56bb4cb45",
+  "unchanged_original_weights": true,
+  "unchanged_face_rig_actions_sockets_contacts": true,
+  "maximum_top_offset_m": 0.0042726650521611315,
+  "maximum_denim_offset_m": 0.0027513782885042817,
+  "finite_clip_samples": [
+    [
+      "crouch",
+      1
+    ],
+    [
+      "crouch",
+      15
+    ],
+    [
+      "crouch",
+      30
+    ],
+    [
+      "extend",
+      1
+    ],
+    [
+      "extend",
+      10
+    ],
+    [
+      "extend",
+      20
+    ],
+    [
+      "forward_attack",
+      1
+    ],
+    [
+      "forward_attack",
+      15
+    ],
+    [
+      "forward_attack",
+      30
+    ],
+    [
+      "hang_back",
+      1
+    ],
+    [
+      "hang_back",
+      15
+    ],
+    [
+      "hang_back",
+      30
+    ],
+    [
+      "idle_breathe",
+      1
+    ],
+    [
+      "idle_breathe",
+      61
+    ],
+    [
+      "idle_breathe",
+      121
+    ],
+    [
+      "land_absorb",
+      1
+    ],
+    [
+      "land_absorb",
+      15
+    ],
+    [
+      "land_absorb",
+      30
+    ],
+    [
+      "sit_cruise",
+      1
+    ],
+    [
+      "sit_cruise",
+      15
+    ],
+    [
+      "sit_cruise",
+      30
+    ],
+    [
+      "stand_attack",
+      1
+    ],
+    [
+      "stand_attack",
+      15
+    ],
+    [
+      "stand_attack",
+      30
+    ]
+  ],
+  "topology": {
+    "rider:trainer_rubber": {
+      "vertices": 52,
+      "faces": 24,
+      "components": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        20,
+        20
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 0.0006000000867061317
+    },
+    "rider:folded hood": {
+      "vertices": 1514,
+      "faces": 1512,
+      "components": [
+        1514
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 1.9003744000656297e-06
+    },
+    "rider:denim": {
+      "vertices": 3871,
+      "faces": 3808,
+      "components": [
+        3871
+      ],
+      "boundary_edges": 128,
+      "boundary_loops": [
+        40,
+        40,
+        48
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 3.161905624438077e-05
+    },
+    "rider:cotton_laces": {
+      "vertices": 228,
+      "faces": 188,
+      "components": [
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        42,
+        42
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 1.3743599993176758e-05
+    },
+    "rider:glove_top": {
+      "vertices": 248,
+      "faces": 228,
+      "components": [
+        28,
+        28,
+        96,
+        96
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 9.774029422260355e-06
+    },
+    "rider:gloves": {
+      "vertices": 844,
+      "faces": 780,
+      "components": [
+        70,
+        70,
+        88,
+        88,
+        88,
+        88,
+        88,
+        88,
+        88,
+        88
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 4.5969325583428144e-05
+    },
+    "rider:trainer_upper": {
+      "vertices": 156,
+      "faces": 124,
+      "components": [
+        78,
+        78
+      ],
+      "boundary_edges": 28,
+      "boundary_loops": [
+        14,
+        14
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 0.00015750009333714843
+    },
+    "rider:hero footwear construction": {
+      "vertices": 742,
+      "faces": 660,
+      "components": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        24,
+        24,
+        24,
+        24,
+        54,
+        54,
+        54,
+        54,
+        85,
+        85,
+        85,
+        85
+      ],
+      "boundary_edges": 64,
+      "boundary_loops": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 5.1075992324456365e-09
+    },
+    "rider:hero glove construction": {
+      "vertices": 498,
+      "faces": 476,
+      "components": [
+        25,
+        25,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 2.701221717416047e-07
+    },
+    "rider:anatomical sweatshirt": {
+      "vertices": 8352,
+      "faces": 8178,
+      "components": [
+        8352
+      ],
+      "boundary_edges": 308,
+      "boundary_loops": [
+        44,
+        44,
+        72,
+        148
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 3.0022652026673313e-06
+    },
+    "rider:human head and neck": {
+      "vertices": 3163,
+      "faces": 3144,
+      "components": [
+        3163
+      ],
+      "boundary_edges": 50,
+      "boundary_loops": [
+        50
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 1.5747032477975154e-07
+    },
+    "rider:short hair prototype": {
+      "vertices": 326,
+      "faces": 287,
+      "components": [
+        326
+      ],
+      "boundary_edges": 76,
+      "boundary_loops": [
+        76
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 4.144481135881506e-05
+    },
+    "rider:iris.L": {
+      "vertices": 400,
+      "faces": 400,
+      "components": [
+        400
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 7.985725147818812e-08
+    },
+    "rider:iris.R": {
+      "vertices": 400,
+      "faces": 400,
+      "components": [
+        400
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 7.985610750438354e-08
+    },
+    "rider:sclera.L": {
+      "vertices": 546,
+      "faces": 544,
+      "components": [
+        546
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 3.885381545387645e-07
+    },
+    "rider:sclera.R": {
+      "vertices": 546,
+      "faces": 544,
+      "components": [
+        546
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 3.885381545387645e-07
+    },
+    "rider:human eyebrows": {
+      "vertices": 80,
+      "faces": 74,
+      "components": [
+        40,
+        40
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 4.998709755454911e-06
+    },
+    "rider:anatomical sweatshirt pocket": {
+      "vertices": 189,
+      "faces": 172,
+      "components": [
+        54,
+        135
+      ],
+      "boundary_edges": 26,
+      "boundary_loops": [
+        26
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 2.876894768633065e-06
+    },
+    "rider:constructed jean pockets": {
+      "vertices": 250,
+      "faces": 224,
+      "components": [
+        30,
+        30,
+        95,
+        95
+      ],
+      "boundary_edges": 36,
+      "boundary_loops": [
+        18,
+        18
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 2.8768777156074066e-06
+    },
+    "rider:short hair directional clumps": {
+      "vertices": 532,
+      "faces": 456,
+      "components": [
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28,
+        28
+      ],
+      "boundary_edges": 152,
+      "boundary_loops": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 1.0996244782290887e-05
+    },
+    "rider:R10 garment opening construction": {
+      "vertices": 1560,
+      "faces": 1548,
+      "components": [
+        225,
+        225,
+        365,
+        745
+      ],
+      "boundary_edges": 0,
+      "boundary_loops": [],
+      "nonmanifold_interior_edges": 0,
+      "degenerate_faces": 0,
+      "minimum_face_area": 5.314670488587581e-06
+    }
+  },
+  "heroLocalAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "triangles": 47838
+}

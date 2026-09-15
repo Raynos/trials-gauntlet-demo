@@ -1,0 +1,569 @@
+{
+  "schema": "hero-r10-inputs-v1",
+  "scope": "Six R10 review candidates; no canonical promotion",
+  "repository_commit_at_snapshot": "6ed2798f388a9f61f32f6d045ff8b96485562683",
+  "integrated_manifest": "harness/out/blender/mega-v10-models.json",
+  "authoring_scripts": [
+    "harness/out/blender/hero-r10-street/build.py",
+    "harness/out/blender/hero-r10-race/build.py",
+    "harness/out/blender/hero-r10-bike/author-spoke-card.py"
+  ],
+  "models": [
+    {
+      "path": "harness/out/blender/hero-r10-bike/models/bike.glb",
+      "bytes": 1394072,
+      "sha256": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+      "source_path": "harness/out/blender/hero-r10-bike/source/bike.blend",
+      "source_sha256": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "triangles": 29940,
+        "meshes": 23,
+        "maxPositionError": 5.0215969990711564e-08,
+        "occlusionMaterials": 3,
+        "bounds": {
+          "min": [
+            -0.4000000059604645,
+            -0.3408759534358978,
+            -0.43760812282562256
+          ],
+          "max": [
+            1.6599665880203247,
+            0.85916668176651,
+            0.43760812282562256
+          ]
+        },
+        "bytes": 1394072
+      },
+      "audit_path": "harness/out/blender/hero-r10-bike/models/bike.source.json"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-bike/models/bike-lod.glb",
+      "bytes": 485656,
+      "sha256": "007a9069412f899b8548429be499f5b82a54ea2e3e33022392a7228f1d4f2081",
+      "source_path": "harness/out/blender/hero-r10-bike/source/bike.blend",
+      "source_sha256": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "triangles": 5710,
+        "meshes": 23,
+        "maxPositionError": 5.0215969990711564e-08,
+        "occlusionMaterials": 3,
+        "bounds": {
+          "min": [
+            -0.40008029341697693,
+            -0.33818328380584717,
+            -0.4374558627605438
+          ],
+          "max": [
+            1.6525742709636688,
+            0.8612913712859154,
+            0.4374558627605438
+          ]
+        },
+        "bytes": 485656
+      },
+      "audit_path": "harness/out/blender/hero-r10-bike/models/bike-lod.source.json"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-street/models/rider-street.glb",
+      "bytes": 1575688,
+      "sha256": "45b228d094234adcd0d08d2bd2a1429678f7adf29426b84b75555ed090d385ae",
+      "source_path": "harness/out/blender/hero-r10-street/street-r10-v1.blend",
+      "source_sha256": "230ac42c9195ade85bc4c225d4c5b777332a6b85c042f57e2a6f839bebc714bd",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "bytes": 1575688,
+        "triangles": 47838,
+        "vertices": 34504,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.870847523212433e-08,
+        "loadedWeightError": 4.1211023926734924e-08
+      },
+      "audit_path": "harness/out/blender/hero-r10-street/models/rider-street.source.json"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-street/models/rider-street-lod.glb",
+      "bytes": 555996,
+      "sha256": "1ec3ba061c2c194e368917bfab75a9f88792e6b3f0a4949927f85cb5ab5dbd06",
+      "source_path": "harness/out/blender/hero-r10-street/street-r10-v1.blend",
+      "source_sha256": "230ac42c9195ade85bc4c225d4c5b777332a6b85c042f57e2a6f839bebc714bd",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "bytes": 555996,
+        "triangles": 5879,
+        "vertices": 7431,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.870847523212433e-08,
+        "loadedWeightError": 3.329478204250336e-08
+      },
+      "audit_path": "harness/out/blender/hero-r10-street/models/rider-street-lod.source.json"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-race/models/rider-race.glb",
+      "bytes": 1736300,
+      "sha256": "c3b5aec7b20ef808d7cbba4e6e6308a5a91f9c545a0f64e839df3bb7fdc485b0",
+      "source_path": "harness/out/blender/hero-r10-race/race-surface-v2.blend",
+      "source_sha256": "7cc326b400630bb3b4fecb7b5c2829e0fd92a470db9fa6dd31387610b5c34d51",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "bytes": 1736300,
+        "triangles": 51996,
+        "vertices": 40273,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.85920599102974e-08,
+        "loadedWeightError": 4.304456524550915e-08
+      },
+      "audit_path": "harness/out/blender/hero-r10-race/models/rider-race.source.json"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-race/models/rider-race-lod.glb",
+      "bytes": 616700,
+      "sha256": "7fd860d0a56c1c8503af6ef615e3c5363274ea5273dfc50910e1b03acb146190",
+      "source_path": "harness/out/blender/hero-r10-race/race-surface-v2.blend",
+      "source_sha256": "7cc326b400630bb3b4fecb7b5c2829e0fd92a470db9fa6dd31387610b5c34d51",
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      },
+      "verified": {
+        "bytes": 616700,
+        "triangles": 5871,
+        "vertices": 9379,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 1.1741940397769213e-07,
+        "loadedWeightError": 3.364402800798416e-08
+      },
+      "audit_path": "harness/out/blender/hero-r10-race/models/rider-race-lod.source.json"
+    }
+  ],
+  "packed_sources": [
+    {
+      "path": "harness/out/blender/hero-r10-bike/source/bike.blend",
+      "bytes": 964996,
+      "sha256": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-race/race-surface-v2.blend",
+      "bytes": 1700876,
+      "sha256": "7cc326b400630bb3b4fecb7b5c2829e0fd92a470db9fa6dd31387610b5c34d51"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-street/street-r10-v1.blend",
+      "bytes": 32853989,
+      "sha256": "230ac42c9195ade85bc4c225d4c5b777332a6b85c042f57e2a6f839bebc714bd"
+    }
+  ],
+  "third_party_inheritance": {
+    "package": "../hero-r9-inputs",
+    "record": "../hero-r9-inputs/THIRD-PARTY.md",
+    "manifest_sha256": "457b660f4db190ba95c2401c6da379a9823ae860d33108ac6bbd14c4ca7a62e7",
+    "new_external_assets": false
+  },
+  "workspace_files": [
+    {
+      "path": "harness/out/blender/hero-r10-bike/models/bike.glb",
+      "bytes": 1394072,
+      "sha256": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-bike/source/bike.blend",
+      "bytes": 964996,
+      "sha256": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-bike/models/bike.source.json",
+      "bytes": 819,
+      "sha256": "65418b2fc41f6262ad7d9929cceb6457d67a290a18174fbf0b52d552f70436bc"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-bike/models/bike-lod.glb",
+      "bytes": 485656,
+      "sha256": "007a9069412f899b8548429be499f5b82a54ea2e3e33022392a7228f1d4f2081"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-bike/models/bike-lod.source.json",
+      "bytes": 818,
+      "sha256": "d65a9cbb7feaf3402c0c0ade47d84e6392b8e0bb0077cccebfd162dd41859bd2"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-street/models/rider-street.glb",
+      "bytes": 1575688,
+      "sha256": "45b228d094234adcd0d08d2bd2a1429678f7adf29426b84b75555ed090d385ae"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-street/street-r10-v1.blend",
+      "bytes": 32853989,
+      "sha256": "230ac42c9195ade85bc4c225d4c5b777332a6b85c042f57e2a6f839bebc714bd"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-street/models/rider-street.source.json",
+      "bytes": 812,
+      "sha256": "f0ded2628efcc37b9fa357b34953e815ab4260744e24694a0a57e4cbbf0d701f"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-street/models/rider-street-lod.glb",
+      "bytes": 555996,
+      "sha256": "1ec3ba061c2c194e368917bfab75a9f88792e6b3f0a4949927f85cb5ab5dbd06"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-street/models/rider-street-lod.source.json",
+      "bytes": 807,
+      "sha256": "688bb8888b09350bc4d6d9b4ec2dc8169050d6d0928e4b3214393ac3751a2d80"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-race/models/rider-race.glb",
+      "bytes": 1736300,
+      "sha256": "c3b5aec7b20ef808d7cbba4e6e6308a5a91f9c545a0f64e839df3bb7fdc485b0"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-race/race-surface-v2.blend",
+      "bytes": 1700876,
+      "sha256": "7cc326b400630bb3b4fecb7b5c2829e0fd92a470db9fa6dd31387610b5c34d51"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-race/models/rider-race.source.json",
+      "bytes": 808,
+      "sha256": "c378edcebd990ff777b1f34b96003e6754160f75a49677d265134f39ac32ecdb"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-race/models/rider-race-lod.glb",
+      "bytes": 616700,
+      "sha256": "7fd860d0a56c1c8503af6ef615e3c5363274ea5273dfc50910e1b03acb146190"
+    },
+    {
+      "path": "harness/out/blender/hero-r10-race/models/rider-race-lod.source.json",
+      "bytes": 806,
+      "sha256": "3986cfb5ad55f10c66506c92d1baca5dbf619ee40378702fee6732ea945f7415"
+    },
+    {
+      "path": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
+      "bytes": 32761780,
+      "sha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220"
+    },
+    {
+      "path": "harness/out/blender/race-head/finished-race/race-assembled-v1.blend",
+      "bytes": 1661269,
+      "sha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2"
+    },
+    {
+      "path": "harness/out/blender/mega-bike/final-candidate/source/bike.blend",
+      "bytes": 985896,
+      "sha256": "498c778ae2e496fd0d9af2a71a27340c0173117951a50d1ea6f15e1007b49025"
+    },
+    {
+      "path": "docs/evidence/hero-r9-inputs/manifest.json",
+      "bytes": 29305,
+      "sha256": "457b660f4db190ba95c2401c6da379a9823ae860d33108ac6bbd14c4ca7a62e7"
+    },
+    {
+      "path": "docs/evidence/hero-r9-inputs/THIRD-PARTY.md",
+      "bytes": 3284,
+      "sha256": "e04060adc62a096d040f672ef9340c97b43b0d9434d51a8057ed290c57659888"
+    }
+  ],
+  "package_files": [
+    {
+      "package_path": "PROMOTION.md",
+      "bytes": 2564,
+      "sha256": "13847e46d4acb7933f58806d61eeba7534bdb1ef7c5f2b63f962afafe0c1fb9b"
+    },
+    {
+      "package_path": "README.md",
+      "bytes": 5357,
+      "sha256": "e5f270ff9319c5071a9c1462d5e951969eabfdcf8e75e41d4921dd13b081fd65"
+    },
+    {
+      "package_path": "files/assets/blender/author_garments.py",
+      "bytes": 22390,
+      "sha256": "3f8c352d7388420aeffff219e190d829ebef14e76356b1602ee39fdd779c1239",
+      "original_path": "assets/blender/author_garments.py"
+    },
+    {
+      "package_path": "files/assets/blender/author_hood.py",
+      "bytes": 15226,
+      "sha256": "a71a6ccbd9d4c34b8cf04dc71d75ca90f0a2592f04cd07a229b970d4e621dcf2",
+      "original_path": "assets/blender/author_hood.py"
+    },
+    {
+      "package_path": "files/assets/blender/author_rider_hero.py",
+      "bytes": 16877,
+      "sha256": "3fb133676d9c0930da72fa59fb9d338fe556c1d6cf7afa9dc627a74d402bd598",
+      "original_path": "assets/blender/author_rider_hero.py"
+    },
+    {
+      "package_path": "files/assets/blender/bike_asset.py",
+      "bytes": 13536,
+      "sha256": "ed9ead63c531652b80f255242a88167bc7a87c6f63e4b07346f7375efc4252d2",
+      "original_path": "assets/blender/bike_asset.py"
+    },
+    {
+      "package_path": "files/assets/blender/build_rider.py",
+      "bytes": 54718,
+      "sha256": "28f528d9538ce1f8822399330729758a786859ef8a080a63f0d795a64a088175",
+      "original_path": "assets/blender/build_rider.py"
+    },
+    {
+      "package_path": "files/assets/blender/common.py",
+      "bytes": 38006,
+      "sha256": "06e0218c98105d8e0ea9d30fd80a758f3a4f4def9b48b0d6f857855ef5321653",
+      "original_path": "assets/blender/common.py"
+    },
+    {
+      "package_path": "files/assets/blender/decals.py",
+      "bytes": 9261,
+      "sha256": "3c688f5068c60a85494e7b5ac7c7c73d55b3e1c97eed7121ec3b7ccf1b580a0b",
+      "original_path": "assets/blender/decals.py"
+    },
+    {
+      "package_path": "files/assets/blender/rider_asset.py",
+      "bytes": 13642,
+      "sha256": "14948c4fd86bf850e0062018d8efb4bc0a8c5403bfc66b848a7945559a57a406",
+      "original_path": "assets/blender/rider_asset.py"
+    },
+    {
+      "package_path": "files/assets/blender/rider_forms.py",
+      "bytes": 8827,
+      "sha256": "31d999dd91fdee3e9f42346b1d40d84e5f66a215e2f0ebaaaab571f6ae9d230d",
+      "original_path": "assets/blender/rider_forms.py"
+    },
+    {
+      "package_path": "files/assets/blender/verify_rider_asset.mjs",
+      "bytes": 7908,
+      "sha256": "6578f358fe03183cf104bf4a48803306bf956876a50e9a10f7a7ae69d909aa6e",
+      "original_path": "assets/blender/verify_rider_asset.mjs"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-bike/README.md",
+      "bytes": 2471,
+      "sha256": "abe443c522dcbdc07037ff707132df3ad1db01a3784712be096bcca82b87d1d2",
+      "original_path": "harness/out/blender/hero-r10-bike/README.md"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-bike/author-spoke-card.py",
+      "bytes": 2605,
+      "sha256": "3495947986aab6a5c3f9fdc92808ab23d577a45a4db6fb62aeffc01116e20979",
+      "original_path": "harness/out/blender/hero-r10-bike/author-spoke-card.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-bike/coverage.json",
+      "bytes": 1155,
+      "sha256": "b55697704baa3f63e94a9ceb1eb4508d30b42830fc6e91e540cd766fde4142b3",
+      "original_path": "harness/out/blender/hero-r10-bike/coverage.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-bike/models/bike-lod.source.json",
+      "bytes": 818,
+      "sha256": "d65a9cbb7feaf3402c0c0ade47d84e6392b8e0bb0077cccebfd162dd41859bd2",
+      "original_path": "harness/out/blender/hero-r10-bike/models/bike-lod.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-bike/models/bike.source.json",
+      "bytes": 819,
+      "sha256": "65418b2fc41f6262ad7d9929cceb6457d67a290a18174fbf0b52d552f70436bc",
+      "original_path": "harness/out/blender/hero-r10-bike/models/bike.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-bike/texture-validation.json",
+      "bytes": 326,
+      "sha256": "5c1531b2391b7e7635ac3c521236eabd38f5efa0fef8238f60d048944b324381",
+      "original_path": "harness/out/blender/hero-r10-bike/texture-validation.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-bike/validation.json",
+      "bytes": 1532,
+      "sha256": "d822970b63f29388af9162e851f0c156662ca95c630b7104ce86d5826acdb902",
+      "original_path": "harness/out/blender/hero-r10-bike/validation.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-bike/verify.mjs",
+      "bytes": 3349,
+      "sha256": "2ff46c6c1723115c244db4d9623e90c1f81b2342936dea85e13306e67a40f481",
+      "original_path": "harness/out/blender/hero-r10-bike/verify.mjs"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-race/README.md",
+      "bytes": 4231,
+      "sha256": "00017552dcd54ccfabeb755c9656a64bbcabd841ffbe262482475900622bfa32",
+      "original_path": "harness/out/blender/hero-r10-race/README.md"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-race/ao-bindings.json",
+      "bytes": 795,
+      "sha256": "66214d236694421c180c4e00da92c41a01436ed0989d25340ad42c051580e4b9",
+      "original_path": "harness/out/blender/hero-r10-race/ao-bindings.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-race/build.py",
+      "bytes": 9473,
+      "sha256": "783cc4431e7a7a5c34cd9b30e852a39a0fc7e59db6841058ea3e67eb684196c5",
+      "original_path": "harness/out/blender/hero-r10-race/build.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-race/check_source.py",
+      "bytes": 1501,
+      "sha256": "f4395ad37594cb6845a5c0718b47a8c3a5153e54cfc99856727c73a442ec257d",
+      "original_path": "harness/out/blender/hero-r10-race/check_source.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-race/focused-checks.json",
+      "bytes": 564,
+      "sha256": "6675fdcf9a9b518d130cc65728850e7e75adcb50c2d3fbae77df2c075417ab98",
+      "original_path": "harness/out/blender/hero-r10-race/focused-checks.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-race/models/rider-race-lod.source.json",
+      "bytes": 806,
+      "sha256": "3986cfb5ad55f10c66506c92d1baca5dbf619ee40378702fee6732ea945f7415",
+      "original_path": "harness/out/blender/hero-r10-race/models/rider-race-lod.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-race/models/rider-race.source.json",
+      "bytes": 808,
+      "sha256": "c378edcebd990ff777b1f34b96003e6754160f75a49677d265134f39ac32ecdb",
+      "original_path": "harness/out/blender/hero-r10-race/models/rider-race.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-race/race-surface-v2.json",
+      "bytes": 5614,
+      "sha256": "156ca7018fa8612bfc1294c9037d188712075bf5745bfa8cdf2794d973178c94",
+      "original_path": "harness/out/blender/hero-r10-race/race-surface-v2.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-street/HANDOFF.md",
+      "bytes": 3190,
+      "sha256": "4c7bf040a1f0f1056a4f89941f2b0e276e9c10b69b31c6ea190f7c4d13c36dc9",
+      "original_path": "harness/out/blender/hero-r10-street/HANDOFF.md"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-street/build.py",
+      "bytes": 10249,
+      "sha256": "1b935574f1c4f348f68730bf64904a953b3063aa9c5a19fd6af09bb56bb4cb45",
+      "original_path": "harness/out/blender/hero-r10-street/build.py"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-street/models/rider-street-lod.source.json",
+      "bytes": 807,
+      "sha256": "688bb8888b09350bc4d6d9b4ec2dc8169050d6d0928e4b3214393ac3751a2d80",
+      "original_path": "harness/out/blender/hero-r10-street/models/rider-street-lod.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-street/models/rider-street.source.json",
+      "bytes": 812,
+      "sha256": "f0ded2628efcc37b9fa357b34953e815ab4260744e24694a0a57e4cbbf0d701f",
+      "original_path": "harness/out/blender/hero-r10-street/models/rider-street.source.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-street/output-checks.json",
+      "bytes": 1398,
+      "sha256": "fcafd217425b37e9b8dbe917e55cb2d7513715a0e4a0e00c59153a29a08fcfe0",
+      "original_path": "harness/out/blender/hero-r10-street/output-checks.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/hero-r10-street/street-r10-v1.json",
+      "bytes": 9685,
+      "sha256": "c3778e7590a6d940349d5ab87078d283ff022ef209de61984bb1b1400a8c9544",
+      "original_path": "harness/out/blender/hero-r10-street/street-r10-v1.json"
+    },
+    {
+      "package_path": "files/harness/out/blender/mega-v10-models.json",
+      "bytes": 407,
+      "sha256": "9d1ca8381561c096221ec1cd936ad1095efe65b2db0e1fb76b532a3fe7b5a570",
+      "original_path": "harness/out/blender/mega-v10-models.json"
+    },
+    {
+      "package_path": "files/package.json",
+      "bytes": 2250,
+      "sha256": "7a30f5741c20b71391edd49d38ecc0d30886bb09ab80972511c1dc5e69ddefa0",
+      "original_path": "package.json"
+    },
+    {
+      "package_path": "files/pnpm-lock.yaml",
+      "bytes": 76151,
+      "sha256": "2307aea31ffdac0b25a989a4d4f8656164f98703bf0811281e2fd968f439aac3",
+      "original_path": "pnpm-lock.yaml"
+    },
+    {
+      "package_path": "verify.py",
+      "bytes": 837,
+      "sha256": "bed74dfa56d0c3fba4918652807c41f85df2ec8a0fe1aeb71cc4791b40d980c2"
+    }
+  ]
+}

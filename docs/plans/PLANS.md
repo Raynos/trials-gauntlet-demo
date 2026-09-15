@@ -9,7 +9,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | plan | file | goal | status | % | next gate |
 |---|---|---|---|---|---|
 | **The brief** | `README.md` | a 2.5D Trials-quality bike game, deterministic, 60 fps, desktop + iOS Safari | in build | — | — |
-| **Blender hero (branch)** | `docs/plans/BLENDER_HERO.md` | rider/bike models, animation and Three.js integration to the Trials reference; Codex owns Blender on `blender-work` | round 9 assembled candidate: face-visible Street, compact Race helmet, fitted garments and protected detailed bike; full + LOD and normal-camera played; Metal/WebKit exact clear/crash/restart pass; canonical assets remain R7 | — | remaining class/motion review, then whole-package promotion; material finish below AI targets; actual iOS and known R7 physics regressions open; no merge |
+| **Blender hero (branch)** | `docs/plans/BLENDER_HERO.md` | rider/bike models, animation and Three.js integration to the Trials reference; Codex owns Blender on `blender-work` | round 10 integrated baseline: R9 fitted riders, corrected bike spoke card and protected LOD interfaces; 45 focused checks pass; current Metal exact clear/crash/restart passes | — | implement all five approved independent outfits through img2threejs; surface/likeness below targets; actual iOS and known R7 physics regressions open; no merge |
 | **Mega plan (v0.2.0)** | `docs/plans/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
 | **Physics v2** | `docs/plans/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
 | **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | round 1 (H1 rider kit landed `47f0455`) | 15 | H3 hero shadow + G4 stamped auto-deploy, then device report #1 |
@@ -20,6 +20,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 
 | date | decision |
 |---|---|
+| 09-15 | Implement all five generated designs as independently selectable outfits. Official img2threejs 2.0.0 + character plugin installed; first reference analysis underway. Public before/after gallery: https://trials-rider-progress.vercel.app (gallery only, not a game deployment) |
 | 09-15 | Street needs a visible face: try bareheaded or small open-face headgear. Five generated screenshot targets live in `assets/design/hero-targets/`; select a target, perform one coherent finish pass, then review real gameplay. Stop earlier if accepted; 30% weekly remaining is a spending floor, not a target to consume |
 | 09-15 | Zoom out from small repair rounds: coherent AAA visual rebuild of both rider outfits and bike family in parallel; show real before/after photos and videos. Pause nonblocking physics experiments and judge whole assembled candidates |
 | 09-15 | Investigate live iPhone benchmark arms folding backward; isolated additive-translation accumulation and prepared a main-compatible hotfix, with current-main integration tracked separately |
@@ -61,3 +62,9 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | 09-14 | not 60 fps, drops from 30 to 24–28 on a flagship, meter "H" | FPS meter; phone starts low; render r12 fill-rate cuts; stored `high` ignored on phones | `733c830`, `12a29f2`, this commit |
 | 09-14 | cleared b1 and b2 on the phone; recovery feels hard | R5 airborne limit; strangers r4 pass b1–e2 | `e8f2ec7`, `166d4d7` |
 | 09-14 | taps on invisible buttons navigate (results Menu under the gas thumb) | the `.live` invariant, 5184-tap grid | `18df821` |
+
+## Round 10 integrated baseline — September 15
+
+Canonical sources/models now contain the selected R9 fitted Street/Race assembly and R10 bike with corrected spoke opacity. Extra R10 rider folds/vents were reviewed and rejected: the gain did not justify their added geometry. Bike LOD reduction now preserves complete fork/swingarm/shock interfaces; both failures were repaired in the exporter, without weakening tests. 45/45 focused asset checks, typecheck and build pass. Latest frozen build `r10-fixed-dist` passes the Metal ship gate: 4,736 exact ticks, zero-fault clear 39.46666666666667 s, crash and next-tick restart/movement, zero GL errors. Desktop evidence does not establish iOS performance.
+
+Public gallery: https://trials-rider-progress.vercel.app. Four current combinations plus an extra action are explicitly distinguished from the five AI concepts. The next reconstruction is tracked in `.img2threejs/state.json`; all five presets remain unimplemented. Evidence: `docs/evidence/blender-r10.json`. Weekly remaining 53% at 22:58 UTC. Goal remains active; 30% is the spending floor.

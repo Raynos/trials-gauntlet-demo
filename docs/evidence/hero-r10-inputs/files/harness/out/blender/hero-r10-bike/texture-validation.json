@@ -1,0 +1,18 @@
+[
+  {
+    "asset": "bike",
+    "allNonSpokeImagesByteIdentical": true,
+    "materials": 5,
+    "images": 9,
+    "textures": 11,
+    "cardAlphaMode": "BLEND"
+  },
+  {
+    "asset": "bike-lod",
+    "allNonSpokeImagesByteIdentical": true,
+    "materials": 5,
+    "images": 9,
+    "textures": 11,
+    "cardAlphaMode": "BLEND"
+  }
+]
