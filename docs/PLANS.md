@@ -7,10 +7,10 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | plan | file | goal | status | % | next gate |
 |---|---|---|---|---|---|
 | **The brief** | `README.md` | a 2.5D Trials-quality bike game, deterministic, 60 fps, desktop + iOS Safari | in build | — | — |
-| **Mega plan (v0.2.0)** | `docs/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~65 | strangers r4 in band on beginner + easy → blind critic r3 → pin v0.2.0 |
-| **Physics v2** | `docs/design/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~80 vs the plan, ~60 vs "learnable by a human" | reflex `average` in band b1–b3 + strangers r4 → freeze tag |
+| **Mega plan (v0.2.0)** | `docs/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
+| **Physics v2** | `docs/design/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
 | **Rider on Glass** | `docs/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | round 1 | 5 | H3 hero shadow + G4 stamped auto-deploy, then device report #1 |
-| **P0 task** | `docs/tasks/touch-navigation-invariant.md` | nothing tappable unless drawn | in flight (core-game #4) | — | tap-grid test green, the user confirms on the phone |
+| **P0 task** | `docs/tasks/touch-navigation-invariant.md` | nothing tappable unless drawn | landed `18df821` (5184-tap grid, 0 ghosts) | 95 | the user confirms on the phone |
 
 ## Status per pillar (mega plan)
 
@@ -19,7 +19,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | P0 physics v2 | 80 | human-rate learnability (R5 → strangers), lab hop air margin |
 | P1 hero moves like 145 kg | 65 | blind critic r3 on v2 + render r11/r12 (moved to Rider on Glass H5) |
 | P2 world reads as a place | 60 | per-biome blind verdict; exteriors need the track on structure over terrain |
-| P3 clearable by real people | 40 | reflex `average` in band 1/16 → R5 result pending; strangers r4 running; user cleared b1, b2 on the phone (2026-09-14) |
+| P3 clearable by real people | 60 | **strangers r4 pass b1–e2 on v2** (1 · 2.5 · 3 · 5.5 · 6.5), e3 fails 15.5 → tracks r8; reflex `average` in band 8/16; user cleared b1, b2 on the phone (2026-09-14) |
 | P4 complete game | 80 | audio mix round, local per-track leaderboard, onboarding proof with a stranger |
 | P5 evidence | 70 | blind critic lapsed since render r8; v0.2.0 not pinned |
 
@@ -35,4 +35,5 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | 09-14 | settings rows unlabeled, "reload twice" | lab HUD `.lab` class collision | `e55c4dd` |
 | 09-14 | scroll in settings → track select; taps hit hidden buttons | hidden screens out of hit-testing; hidden replay bar was live at z 5; **P0 invariant task open** | `e55c4dd`, `cf13f8b` |
 | 09-14 | not 60 fps, drops from 30 to 24–28 on a flagship, meter "H" | FPS meter; phone starts low; render r12 fill-rate cuts; stored `high` ignored on phones | `733c830`, `12a29f2`, this commit |
-| 09-14 | cleared b1 and b2 on the phone; recovery feels hard | — (R5 airborne limit shipped; strangers r4 measuring) | `e8f2ec7` |
+| 09-14 | cleared b1 and b2 on the phone; recovery feels hard | R5 airborne limit; strangers r4 pass b1–e2 | `e8f2ec7`, `166d4d7` |
+| 09-14 | taps on invisible buttons navigate (results Menu under the gas thumb) | the `.live` invariant, 5184-tap grid | `18df821` |
