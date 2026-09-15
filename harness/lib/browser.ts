@@ -5,6 +5,7 @@
  * creation fails silently and three throws. We try the modern flag set first
  * and fall back to the legacy `--use-gl=angle` spelling.
  */
+import { spawnSync } from 'node:child_process';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 
 export interface WebGLProbe {
@@ -118,7 +119,20 @@ export async function launchBrowser(options: LaunchOptions = {}): Promise<Launch
         flagSet: name,
         probe,
         close: async () => {
-          await b.close().catch(() => undefined);
+          // Round 12: after concurrent contexts (pooled verification) `browser.close()` was seen to never resolve
+          // while the headless shell stayed up; bound it and kill the process if it does not go on its own.
+          let timer: NodeJS.Timeout | null = null;
+          await Promise.race([
+            b.close().catch(() => undefined),
+            new Promise<void>((resolve) => {
+              timer = setTimeout(() => {
+                // Playwright spawns the browser as our direct child; no pid is exposed, so kill by parent pid.
+                spawnSync('pkill', ['-9', '-P', String(process.pid), '-f', 'chrom']);
+                resolve();
+              }, 15_000);
+            }),
+          ]);
+          if (timer) clearTimeout(timer);
         },
       };
     } catch (err) {
@@ -127,4 +141,20 @@ export async function launchBrowser(options: LaunchOptions = {}): Promise<Launch
     }
   }
   throw new Error(`Could not launch headless Chromium with WebGL2:\n  ${errors.join('\n  ')}`);
+}
+
+/**
+ * A page in its own BrowserContext (round 12): concurrent gate sections / verifications must not share
+ * storage (the game writes settings + PBs), so every page that runs next to another gets a context of its own.
+ * Close with `closeIsolated(page)`.
+ */
+export async function isolatedPage(launched: LaunchedBrowser, o: { width?: number; height?: number } = {}): Promise<Page> {
+  const ctx = await launched.browser.newContext({ viewport: { width: o.width ?? 1280, height: o.height ?? 720 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
+  return ctx.newPage();
+}
+
+export async function closeIsolated(page: Page): Promise<void> {
+  const ctx = page.context();
+  await page.close().catch(() => undefined);
+  await ctx.close().catch(() => undefined);
 }

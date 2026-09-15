@@ -19,7 +19,7 @@
  * x ranges with what the segment shows.
  */
 import type { TrackDef, TrackMeta } from '../../core/types';
-import { course, CourseBuilder } from '../author';
+import { course, type CourseBuilder } from '../author';
 
 /** Playground ids: `p1-` ... `p9-`. */
 export const PLAYGROUND_ID_PREFIX = /^p\d-/;

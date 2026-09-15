@@ -23,10 +23,20 @@ export interface BrowserRun {
 export class BrowserVerifier {
   private server: GameServer | null = null;
   private launched: LaunchedBrowser | null = null;
+  private opening: Promise<{ server: GameServer; launched: LaunchedBrowser }> | null = null;
 
   constructor(private readonly opts: { dev?: boolean; build?: boolean; verbose?: boolean } = {}) {}
 
-  async open(): Promise<{ server: GameServer; launched: LaunchedBrowser }> {
+  /**
+   * One server + one browser no matter how many `run()`s start together (round 12: five concurrent runs each
+   * saw `launched == null`, launched five Chromiums + five preview servers, and the four that were never
+   * closed kept the process alive after the work was done).
+   */
+  open(): Promise<{ server: GameServer; launched: LaunchedBrowser }> {
+    return (this.opening ??= this.openOnce());
+  }
+
+  private async openOnce(): Promise<{ server: GameServer; launched: LaunchedBrowser }> {
     if (!this.server) {
       this.server = await startServer({ dev: this.opts.dev ?? false, forceBuild: this.opts.build ?? false, freeze: !this.opts.dev });
       const st = distIsStale();
@@ -38,10 +48,15 @@ export class BrowserVerifier {
     return { server: this.server, launched: this.launched };
   }
 
-  /** Fresh page per run so nothing leaks between recordings. */
+  /**
+   * Fresh context + page per run so nothing leaks between recordings — and so `run` can be called
+   * concurrently (round 12: `refreshGoldens` / the gate verify N recordings at once on one Chromium;
+   * pages in one context would share storage and the game's settings/PB writes).
+   */
   async run(rec: InputRecording): Promise<BrowserRun> {
     const { server, launched } = await this.open();
-    const page = await launched.context.newPage();
+    const ctx = await launched.browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
+    const page = await ctx.newPage();
     try {
       // A recording stamped v1 is replayed on the page's v1 solver (`?physics=v1`, src/main.ts); everything else on the default.
       await openGame(page, server.url, rec.header.physics === 'v1' ? { query: { physics: 'v1' } } : {});
@@ -64,6 +79,7 @@ export class BrowserVerifier {
       }, json);
     } finally {
       await page.close();
+      await ctx.close();
     }
   }
 
@@ -72,5 +88,6 @@ export class BrowserVerifier {
     await this.server?.close();
     this.launched = null;
     this.server = null;
+    this.opening = null;
   }
 }

@@ -85,7 +85,8 @@ export function plan(sim: Sim, cfg: BeamConfig, w: ScoreWeights, opts: PlanOptio
   const [cx, cvx, ca] = cfg.cells;
 
   outer: for (let d = 0; d < cfg.depth; d++) {
-    if (d > 0 && performance.now() - t0 > cfg.budgetMs) break;
+    // A tick budget (`--budget-ticks`) is deterministic across processes and cores; the wall budget is the default.
+    if (d > 0 && (cfg.budgetTicks !== undefined ? ticks >= cfg.budgetTicks : performance.now() - t0 > cfg.budgetMs)) break;
     const cells = new Map<string, Node>();
     const finishedChildren: Node[] = [];
     let anyClean = false;

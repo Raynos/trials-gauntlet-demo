@@ -28,6 +28,7 @@ import { InputRecorder, decodeBinary, encodeBinary, encodeJSON, expandFrames, fr
 import type { InputFrame, PhysicsState } from '../../src/core/types';
 import { decodeSnapshot, encodeSnapshot } from '../../src/game/hook';
 import { flagBool, flagNum, parseArgs } from '../lib/args';
+import { closeIsolated, isolatedPage } from '../lib/browser';
 import { openGame } from '../lib/hook';
 import { diffState, runMeta } from '../lib/metrics';
 import { HARNESS_DIR } from '../lib/paths';
@@ -175,10 +176,10 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
   // D1 cross-load
   const loadsRes: BrowserRunResult[] = [];
   for (let i = 0; i < loads; i++) {
-    const page = await launched.context.newPage();
+    const page = await isolatedPage(launched);
     await openGame(page, server.url);
     loadsRes.push(await runInPage(page, json));
-    await page.close();
+    await closeIsolated(page);
   }
   const first = loadsRes[0]!;
   push({
@@ -202,10 +203,10 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
   // D3 node vs browser
   let d3: DeterminismCheck = { id: 'D3', name: 'node-vs-browser', pass: hA === first.hash, hashes: [hA, first.hash], note: `physics=${simA.physicsName}` };
   if (!d3.pass) {
-    const page = await launched.context.newPage();
+    const page = await isolatedPage(launched);
     await openGame(page, server.url);
     const b = await bisectNodeVsBrowser(page, rec);
-    await page.close();
+    await closeIsolated(page);
     d3 = { ...d3, firstDivergentTick: b.firstDivergentTick, diffPaths: b.diffPaths, note: `first divergent tick ${b.firstDivergentTick}: ${b.diffPaths.slice(0, 6).join(', ')}` };
   }
   push(d3);
@@ -276,7 +277,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
 
   // D4b snapshot round trip in the browser through the hook's base64 path
   {
-    const page = await launched.context.newPage();
+    const page = await isolatedPage(launched);
     await openGame(page, server.url);
     const r = await page.evaluate(
       ([fr, id, seed, bike]) => {
@@ -310,7 +311,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
       },
       [frames, rec.header.trackId, rec.header.seed, rec.header.bike ?? 'rookie'] as const,
     );
-    await page.close();
+    await closeIsolated(page);
     let pass = true;
     for (let i = 0; i < r.length; i += 2) if (r[i] !== r[i + 1]) pass = false;
     push({ id: 'D4b', name: 'snapshot-browser', pass, hashes: r.filter((_, i) => i % 2 === 0) });
@@ -318,7 +319,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
 
   // D5 chunking (browser)
   {
-    const page = await launched.context.newPage();
+    const page = await isolatedPage(launched);
     await openGame(page, server.url);
     const r = await page.evaluate(
       ([runs, id, seed, j, bike]) => {
@@ -344,13 +345,13 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
       },
       [rec.runs, rec.header.trackId, rec.header.seed, json, rec.header.bike ?? 'rookie'] as const,
     );
-    await page.close();
+    await closeIsolated(page);
     push({ id: 'D5', name: 'chunking', pass: r.every((h) => h === r[0]), hashes: r, note: 'chunks 1,7,15,120 + runRecording' });
   }
 
   // D7 no state leak (browser): other seed, 600 ticks, then the recording
   {
-    const page = await launched.context.newPage();
+    const page = await isolatedPage(launched);
     await openGame(page, server.url);
     const r = await page.evaluate(
       ([id, seed, j, bike]) => {
@@ -365,7 +366,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
       },
       [rec.header.trackId, rec.header.seed, json, rec.header.bike ?? 'rookie'] as const,
     );
-    await page.close();
+    await closeIsolated(page);
     push({ id: 'D7', name: 'no-state-leak', pass: r === first.hash, hashes: [r, first.hash] });
   }
 

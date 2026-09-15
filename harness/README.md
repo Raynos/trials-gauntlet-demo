@@ -41,6 +41,56 @@ All browser commands accept `--dev` (Vite dev server), `--build` (rebuild
 first), `--json`, `--verbose`. Thresholds live **only** in
 `gate/thresholds.json` (CONTRACT §3).
 
+## Wall-clock (round 12): pools, `--jobs`, and what still bounds it
+
+None of the sweeps were parallel before round 12: one process, one track at a time, on an 18-core box. Now every
+independent cell runs on a pool and the outputs are merged back in the serial order (`lib/pool.ts`):
+
+| command | what runs in parallel | `--jobs` default |
+| --- | --- | --- |
+| `harness:bot --all-tracks`, `harness:bot <track> --all --seeds N` | every (track, seed, skill) cell in a persistent `tsx bot.ts --worker` child; the parent replays each worker's recording itself (`workerHashOk`, the `pool:` line) | `min(cells, cores - 2)` |
+| `harness:reflex --all-tracks`, `harness:reflex <track> --seeds N` | every (bike, skill, track, seed) cell in a persistent `tsx reflex.ts --worker` child; one metrics write per (bike, track) | `min(cells, cores - 2)` |
+| `harness:bot --refresh-goldens` | node replays first (in order), then the goldens that need the browser on N contexts of one Chromium (`BrowserVerifier.run` = one context per recording) | `(cores - 2) / 3` |
+| `harness:gate` | correctness sections (clear, Pro clears, crash/fault, determinism D1–D8, the camera-box clip child) on a pool, the timing chain (boot → restart → heap/perf) next to it; `--quiet-timing` runs the chain after the pool; report + JSON keep the G1..G11 order, lines print as sections finish with their loadavg | `(cores - 2) / 3` |
+| `harness:e2e` | the boot suite alone first (throttled network on the wall clock), then bench, desktop, review, front/run/entry/hitrects per geometry and the transition grid split by transition (`flowGrid(..., { k, of })`) as parallel Playwright contexts | `(cores - 2) / 3` |
+
+`--jobs 1` is the old serial path everywhere (in-process, no children). **Load guidance:** the host is shared — the
+node pools leave 2 cores; browser pools take a third of that because a SwiftShader page rasterises on several threads
+(16 pages booting the game together on this box starved every boot past the 180 s loader timeout). The gate's timing
+rows (`boot.*`, `restart.frameMsP95`, `perf.render*`) and the e2e boot suite are wall-clock measurements: read them
+against the loadavg printed next to them, or use `--quiet-timing` / `--jobs 1`.
+
+**Determinism under the pool.** A reflex run is a pure function of (track, seed, skill, bike); the bot's search is
+wall-budgeted (`budgetMs` per plan, `--track-wall-s` per track), so its result depends on how much CPU each plan
+got — serially or not. `--budget-ticks N` swaps the plan budget for a tick budget and drops the wall cap unless
+`--track-wall-s` is given: then a sweep is byte-identical from any process or core count. Either way the parent
+replays every worker recording in its own process and compares hashes (`workerHashOk`).
+
+Measured on this machine (18 cores, the frozen working tree of 2026-09-15, **loadavg 55–90 throughout**: another
+owner's goldens/strangers/battery runs shared the box, so every wall below is pessimistic and CPU-seconds are given):
+
+| job | before wall (CPU-s, loadavg) | after wall (CPU-s, loadavg) | jobs | identical outputs |
+| --- | --- | --- | --- | --- |
+| `bot --all-tracks --tracks flat-test,gap-test --skill 2 --seeds 2 --budget-ticks 40000` (4 cells) | 21.5 s (8.0, ~60) | 12.6 s (12.7, ~60) | 4 workers | yes: per-cell nodeHash / attempts / finish / plans / ticks byte-equal (`6de6eb39ecb1b323` ×2, `d73a8f3337a89b07` ×2); every `worker=ok` |
+| `bot --all-tracks` 6 cells incl. b1 (`--budget-ticks 20000`) | — | 125 s = the longest cell (b1, 115 s) | 6 workers | `worker=ok` 6/6 |
+| `reflex --all-tracks --skill all --seeds 3` (153 cells, rookie) | 17.4 s (18, ~25) old code; 66.9 s (25.6, ~54) same code `--jobs 1` while CPU-starved | 20.9 s (55, ~60: ~30 CPU-s is 16 worker start-ups) | 16 workers | yes: `reflex.md` tables + every `<track>.reflex.json` bySkill (attempts, medians, clears, finish times) byte-equal, two runs |
+| `bot --refresh-goldens` (36 stale goldens re-proved in the browser) | 32.8 s (117, ~25) | 24.1 s (113, ~17) | 5 contexts | yes: the 36 RESTAMPED + 2 STALE rows and the restamped headers identical |
+| `harness:gate` (full, 30 checks) | 964 s (4 106, 70–90) | 977 s (4 468, 90→23; ran next to the serial e2e baseline) | pool 6 + timing chain | same 26 pass / same 3 SwiftShader timing fails (`boot.firstFrameMs`, `restart.frameMsP95`, `perf.renderSyncedMsP95` fail in both runs at this load) + G10 reflex band; sections: heap 813 s, camera 530 s, boot 128 s, determinism 69 s, restart 34 s, clear/clearPro/crash 25 s each |
+| `harness:e2e` (full) | 2 327 s (1 898, 60–75), 523/528 | 564 s (3 000, 12–35): boot alone 226 s + pool 338 s | 5 contexts | same failure classes (2–3 × `menu→tracks R6-establish` flake, `bench garage debugInfo`); 5 076 vs 5 112 grid taps (re-establish count varies run to run); the after run also carries the new `review` flow (4 fails: feature not in the frozen dist) |
+
+The `--jobs 16` first cut of the e2e (one context per flow) starved every page past the loader timeout — that is the
+measurement behind the `(cores - 2) / 3` browser default and the boot suite running alone. The gate did not get
+faster under this load: its **heap/perf section (60 s of play on one page) is 813 s of the 977 s** and the camera clip
+child 530 s; the pool moved everything else under them. `--quick` (10 s of play, no camera) is the < 8 min gate today;
+a full gate under 8 min needs a shorter `--heap-seconds` or a cheaper synced render, which is a thresholds decision.
+
+What still bounds wall-clock: **SwiftShader's per-frame cost** — one page is ~3 cores and a rendered frame is
+200–300 ms, so the camera-box clip (30 s at 20 fps), the e2e boot suite (8 throttled boots) and the review flow are
+each a single 5–10 min pole no pool shortens; the gate's timing chain is serial by construction (its numbers are the
+check); a bot cell is one beam search (`--track-wall-s` caps it) and a track with 2 seeds is 2 cells, so a sweep's
+floor is the longest cell. The reflex matrix and the golden refresh are now bounded by worker start-up (~1.5 s of
+tsx compile per worker) and the browser boot (~10–20 s per verification under load), respectively.
+
 ## Round workflow (what the parent runs)
 
 ```

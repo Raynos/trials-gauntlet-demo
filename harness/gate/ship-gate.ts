@@ -25,7 +25,7 @@
  *
  * Wall-clock (round 12). The checks do not share a page, so they run as sections on one Chromium (one context per
  * page): the correctness sections (clear, Pro clears, crash/fault, determinism D1-D8, the camera-box clip child)
- * on a pool of `--jobs` (default cores - 2), and the timing sections (boot, restart, heap/perf) as one serial
+ * on a pool of `--jobs` (default (cores - 2) / 3: a SwiftShader page is ~3 cores), and the timing sections (boot, restart, heap/perf) as one serial
  * chain next to them — their notes carry the loadavg; `--quiet-timing` runs that chain after the pool instead.
  * Lines print as sections finish; the report (JSON + the summary block) keeps the G1..G10 order.
  */
@@ -41,9 +41,9 @@ import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
 import { closeIsolated, isolatedPage } from '../lib/browser';
 import { openGame, readHeap } from '../lib/hook';
 import { chooseGolden, pickGolden } from '../lib/golden';
-import { gitHead, percentileOf, runMeta, srcFingerprint } from '../lib/metrics';
+import { gitHead, percentileOf, runMeta, srcFingerprint, fingerprintMatches } from '../lib/metrics';
 import { DIST_DIR, HARNESS_DIR, REPO_ROOT } from '../lib/paths';
-import { defaultJobs, loadLine, mapPool } from '../lib/pool';
+import { defaultBrowserJobs, loadLine, mapPool } from '../lib/pool';
 import { loadRecording } from '../lib/recording';
 import { writeJson } from '../lib/report';
 import type { DeterminismReport, GateCheck, GateReport, GateReflexRow, GateStrangerRow, ReflexTrackMetrics } from '../lib/schema';
@@ -78,7 +78,7 @@ export function reflexRows(tracks: readonly string[], factor: number, skill: 'no
     if (!fs.existsSync(file)) continue;
     const m = JSON.parse(fs.readFileSync(file, 'utf8')) as ReflexTrackMetrics;
     const row = m.bySkill.find((r) => r.skill === skill);
-    const fresh = m.srcFingerprint === fp && row ? row : null;
+    const fresh = fingerprintMatches(m.srcFingerprint, fp) && row ? row : null;
     const band = m.attemptsBand ?? null;
     const limit = band ? factor * band[1] : null;
     rows.push({
@@ -135,7 +135,7 @@ export function strangerRows(tracks: readonly string[], factor: number): GateStr
     // The band is authored for the tier's default bike; the report records which class its medians count.
     const bike = m.bike ?? 'rookie';
     const onBike = m.sessions.filter((x) => (x.bike ?? 'rookie') === bike);
-    const fresh = onBike.filter((x) => x.status === 'done' && x.srcFingerprint === fp);
+    const fresh = onBike.filter((x) => x.status === 'done' && fingerprintMatches(x.srcFingerprint, fp));
     const censored = onBike.filter((x) => x.status !== 'done').length;
     const attempts = fresh.map((x) => x.strangerAttempts).sort((a, b) => a - b);
     const median = attempts.length ? (attempts.length % 2 ? attempts[(attempts.length - 1) / 2]! : (attempts[attempts.length / 2 - 1]! + attempts[attempts.length / 2]!) / 2) : null;
@@ -420,7 +420,7 @@ async function main(): Promise<void> {
         },
         [crashFrames, crash.header.trackId, crash.header.seed, crash.header.physicsHz] as const,
       );
-      await page.close();
+      await closeIsolated(page);
       report.crash = { recording: crashFile, faultTick: r.faultTick, faultTime: r.faultTime, reason: r.reason as FaultReason | null };
       const within = r.faultTime !== null && r.faultTime <= num('crash.faultWithinS');
       check({ id: 'crash.faultWithinS', value: r.faultTime, limit: num('crash.faultWithinS'), pass: within, unit: 's', note: `reason=${r.reason}` });
@@ -480,7 +480,7 @@ async function main(): Promise<void> {
         },
         [trackId] as const,
       );
-      await page.close();
+      await closeIsolated(page);
       const movesOk = r.movesAfterTicks <= num('restart.movesWithinTicks');
       report.restart = { ticks: r.ticksOk ? 1 : null, wallMs: r.wallMs, frameMs: r.frameMs, noCountdown: movesOk, movesOnFirstTick: r.movesOnFirstTick, movesAfterTicks: r.movesAfterTicks };
       check({ id: 'restart.ticks', value: r.ticksOk ? 1 : -1, limit: num('restart.ticks'), pass: r.ticksOk, note: 'tick==0 && faulted==null after exactly one tick, 20 reps' });
@@ -547,7 +547,7 @@ async function main(): Promise<void> {
       }
       const heapAfter = await readHeap(page);
       const stats = await page.evaluate(() => window.__trials!.stats());
-      await page.close();
+      await closeIsolated(page);
       const growthMB = (heapAfter.jsHeapUsed - heapBefore.jsHeapUsed) / (1024 * 1024);
       report.heap = { beforeMB: heapBefore.jsHeapUsed / 1048576, afterMB: heapAfter.jsHeapUsed / 1048576, growthMB, seconds: heapSeconds };
       const physUs = physicsMs.map((m) => (m * 1000) / tpf);
@@ -680,7 +680,7 @@ async function main(): Promise<void> {
 
     // Schedule (round 12). Correctness sections on a pool; the timing chain (boot -> restart -> heap/perf) runs
     // next to it by default (their notes carry the loadavg), or after it with --quiet-timing.
-    const jobs = defaultJobs(6, flags);
+    const jobs = defaultBrowserJobs(6, flags);
     const quietTiming = flagBool(flags, 'quiet-timing');
     console.log(`sections: pool of ${jobs} (clear, clearPro, crash, determinism, camera, bundle) ${quietTiming ? 'then' : '+'} timing chain (boot, restart, heap); ${loadLine()}`);
     const tGate = performance.now();
@@ -729,7 +729,7 @@ async function main(): Promise<void> {
       stranger: report.stranger!,
       reflex: report.reflex!,
       reflexPro: report.reflexPro!,
-      device: report.device,
+      ...(report.device ? { device: report.device } : {}),
       clearPro: report.clearPro ?? [],
     };
     if (goldenHash) full.clear.hash = goldenHash;
