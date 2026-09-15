@@ -278,6 +278,9 @@ export class ThreeRenderer implements GameRenderer {
       this.rebuildIfArtLanded();
     };
     (window as unknown as { __render?: ThreeRenderer }).__render = this; // debug handle for the harness
+    (window as unknown as { __setMerge?: (on: boolean) => void }).__setMerge = (on) => {
+      PropBatch.MERGE = on; // perf cut #4 A/B switch (harness only; takes effect on the next setTrack)
+    };
     performance.mark?.('render:ctor');
   }
 
@@ -1087,6 +1090,16 @@ export class ThreeRenderer implements GameRenderer {
       // Medium shadow casters (`tierCasts`): props by name; low: no world caster at all.
       o.castShadow = !heroShadow && ud.castHigh && (!o.name.startsWith('props:') || tierCasts(o.name, this.tier));
       o.receiveShadow = ud.receiveHigh && (!heroShadow || RIDE_SURFACE.test(o.name));
+    });
+    // Perf cut #4: the world's unnamed meshes (gate plaques, lamps, hall singles) kept their built `castShadow` and were
+    // drawn into the hero-only 512² map whenever they fell inside its 4 m box (9 draws a frame at the start gate).
+    const world = this.scene.getObjectByName('world');
+    world?.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || o.name) return;
+      const ud = o.userData as { castHigh?: boolean };
+      if (ud.castHigh === undefined) ud.castHigh = o.castShadow;
+      o.castShadow = !heroShadow && ud.castHigh;
     });
     // Perf cut #0: no per-frame program re-acquisition (single-pass transparents, per-kind clones, per-kind depth materials).
     this.programReport = stabilizePrograms(this.scene, this.lib);
