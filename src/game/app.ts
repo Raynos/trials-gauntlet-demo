@@ -12,7 +12,7 @@
  */
 import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RunResult, TrackDef, TrialsHook } from '../core/types';
 import type { AudioSystem } from '../audio';
-import { getTrack, isLabTrackId, listTrackIds } from '../tracks';
+import { getTrack, listTrackIds } from '../tracks';
 import {
   ArtManifest,
   BUILD_STAMP,
@@ -127,8 +127,13 @@ export function dprCap(): number {
 export type AppScreen = FrontScreen | 'run' | 'replay';
 
 /** Physics lab HUD + ghost of the last attempt: every `lab-*` track (MEGA_PLAN P0 §3), or any track with `?lab=1`. */
+/**
+ * The physics lab HUD (gauges, traces, last-hop readout) is a developer instrument: it shows only with
+ * `?lab=1`, never automatically on the lab tracks — the user found it noise over the results panel.
+ */
 export function isLabTrack(id: string, force = false): boolean {
-  return force || isLabTrackId(id) || getTrack(id)?.meta?.hints?.[0] === 'physics';
+  void id;
+  return force;
 }
 
 export class App {
