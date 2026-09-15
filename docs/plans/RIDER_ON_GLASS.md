@@ -24,6 +24,15 @@ Safety net unchanged: v0.1.0 is pinned at https://trials-gauntlet-v0-1-0.vercel.
 > invariant and its tap-grid test as a gate; 60 fps on the low tier as a hard threshold; deploys stamped
 > with the commit and automatic.
 
+## Two ledgers (2026-09-15): Opus owns G, Astra owns H
+
+| half | owner | % | closes when |
+|---|---|---|---|
+| **Pillar G — glass** | Opus 5 (this session) | **95** | G1 ✓ (`18df821`), G2 ✓ (`cfc98f8`, device report #1 filed), G3 ✓ (60 fps on the default tier measured on the user's iPhone: low 59.5; the governor climbs to phone-high, `ed0cf50`/`682d05c`), G4 ✓ (commit-stamped clean-HEAD deploys), G5 → the WebKit hero gate + bench rows in the ship gate (parent, this window) |
+| **Pillar H — the hero** | Codex Astra 6, branch `blender-work` | Astra reports | the branch merges under `docs/tasks/blender-branch-merge.md` (physics tests green) and a blind critic round picks ours ≥ 2/6 on the merged hero with no weight/suspension/lag/camera tell |
+
+The plan archives when both halves are closed.
+
 ## Pillar H — the hero
 
 Owners: render (hero materials, lighting, camera, secondary animation), blender (`assets/blender`,
