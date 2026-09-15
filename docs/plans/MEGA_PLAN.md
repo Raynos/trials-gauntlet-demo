@@ -97,3 +97,45 @@ Owner: harness + producers.
 
 Rules unchanged: owners own paths; the parent commits per round with the finding; a recorded
 input replays byte-identical or the physics is broken; evidence is played, never posed.
+
+## Amendments (2026-09-14 late — the brief diffed against the plans; items the brief demands that no plan line carried)
+
+### P6 — Sound at AAA (new pillar; the brief: "from textures to physics to sound")
+Owner: audio (`src/audio/**`, `docs/design/audio.md`), judged blind against reference gameplay audio.
+- The procedural mix was tuned to **v1** (1.4 g impulses, auto-clutch, `c6523b4`); v2 changed rpm/thrust
+  curves, landing impulses, the hop and the crash. Round 3: retune every model input to the v2 FEEL tables,
+  the hop (preload creak → snap → airtime silence → landing), the rider body (grunts are not in scope; the
+  suspension is), v2's stall-free launch.
+- What is missing entirely: crowd (start gate roar, cheer on a clean landing, groan on a crash, from the
+  gates kit's crowd count), ambience per biome (hall reverb tail, canyon wind, snow hush, city traffic bed,
+  foundry roar) driven by `def.meta.biome`, a countdown/finish stinger set, and a **music bed** for the front
+  end and results (composed procedurally or licensed CC0 — no unlicensed audio; the choice documented).
+- Done = a blind A/B of our gameplay audio against the reference corpus' audio tracks (the clips have sound
+  even though the frame analysis ignored it) on wheelie / landing / crash / start beats: ours picked ≥ 2/6
+  with no tell naming "synthetic engine", "no crowd", "no room"; the mix stays byte-identical offline.
+
+### P5 amendments — the critic cadence and the final bar
+- **Blind clip-vs-clip every round, every area** (the brief's loop rule, lapsed since render r8): each render,
+  physics, tracks or audio round ends with `harness/compare` pairs judged by a fresh critic; the verdict and
+  the named tells are the first lines of the next brief. The parent does not commit a round without them
+  once RoG H5 is live.
+- **"Change approach when an area stops improving"**: two consecutive rounds with the same tell = the next
+  round is a different approach (a new owner brief, a new technique, or the reference re-read), never a
+  third polish pass.
+- **The final bar ("absolutely wowed")**: a closing battery of 24 blind pairs — 6 manoeuvres (wheelie, hop,
+  landing, crash, climb, flight) × 4 biomes — plus 8 "world" pairs (stills-in-motion) and 6 audio pairs.
+  v0.2.0 may pin at H5's ≥ 2/6; the brief's bar is **≥ 50 % preferred on the battery** with no tell repeated
+  across three pairs. Until that number exists, no plan is complete.
+
+### P3 amendments — the owed hard/extreme design and desktop proof
+- Tracks r7 listed what it still owes to the storyboards: H1 roof climbs + scaffold-tunnel drop, H3 second
+  tunnel row, X1 summit cap probe, H2 apron jump, the eight §5 validators. They are P3 items, not notes.
+- **Desktop is a target too** (the brief): the e2e suite gets a keyboard flow (title → run → crash → restart
+  → finish → results → next) and a gamepad flow at 1280×720 and 1920×1080; the ship gate runs it.
+
+### G-side numbers the brief mandates (added to Rider on Glass G5)
+- **Fast loads, measured on the device**: cold boot to the menu ≤ 4 s on LTE (the loader's own clock), warm
+  ≤ 1.5 s, track entry ≤ 1.0 s with no black frame (render r14's `entryMs`), reported by `?bench=1`.
+- **Bounded memory on iOS**: JS heap ≤ 120 MB steady, GPU textures ≤ 96 MB high / 40 MB low, no growth over a
+  10-minute session (the gate's 60 s row extended to 600 s once a week), no Safari reload from memory pressure
+  in a stranger-length session on the device.

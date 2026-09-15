@@ -32,7 +32,8 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | P2 world reads as a place | 60 | per-biome blind verdict; exteriors need the track on structure over terrain |
 | P3 clearable by real people | 60 | **strangers r4 pass b1–e2 on v2** (1 · 2.5 · 3 · 5.5 · 6.5), e3 fails 15.5 → tracks r8; reflex `average` in band 8/16; user cleared b1, b2 on the phone (2026-09-14) |
 | P4 complete game | 80 | audio mix round, local per-track leaderboard, onboarding proof with a stranger |
-| P5 evidence | 70 | blind critic lapsed since render r8; v0.2.0 not pinned |
+| P5 evidence | 60 | blind critic lapsed since render r8 (cadence rule now written); v0.2.0 not pinned; the final 38-pair battery not run |
+| P6 sound at AAA (added) | 25 | mix tuned to v1; no crowd / ambience / music; no blind audio A/B |
 
 ## Field reports from the phone (the user's iPhone, LTE)
 
