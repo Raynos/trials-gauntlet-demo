@@ -950,7 +950,7 @@ decision above.
 
 ---
 
-Status: **round 11 — wave 1 of the mega build** (eleventh physics owner; P1 of `docs/plans/MEGA_PLAN.md`). Shipped:
+Status: **round 11 — wave 1 of the mega build** (eleventh physics owner; P1 of `project/archive/MEGA_PLAN.md`). Shipped:
 (1) **Two bikes** as tuning presets: `BikeClass = 'rookie' | 'pro'`, `BIKE_PRESETS`, `bikeTuning(cls, over?)` in `tuning.ts`;
 `loadTrack(track, seed, opts?: { bike?: BikeClass })` (additive on `PhysicsWorld`, default `'rookie'`; `BikePhysicsWorld.bike`
 reports it). **Rookie** is the round-10 table (ECU wheelie control, the 4.2 kg/m drag governor, soft clutch): the flat-test

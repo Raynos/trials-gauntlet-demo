@@ -1,5 +1,14 @@
 # The mega build — v0.1.0 → v0.2.0
 
+**Closed: 2026-09-15 · tag `v0.2.0` (`b52dfd0`) · https://trials-gauntlet-v0-2-0.vercel.app.** Every pillar's proxy
+number is recorded in `RELEASES.md` (the v0.2.0 row carries all six mission lines) and `docs/design/harness-metrics.md`
+Round 12. The bars this plan could not close — wowed against the real thing (battery 5 / 36), the PS4 picture, the hero
+as a person, sound as a recording, fun — live in `docs/mission.md`; the next build starts from those numbers, not from
+this file. What remains actionable from here went to owners: track sinks (h2 255–265 m, h3 505 m, x3 505–525 m) to
+tracks; the camera that owes nothing to the bike, the landing settle and the statue rider to render / hero (Astra,
+`docs/tasks/blender-branch-merge.md`); the engine loop to audio; the perf remainder to `docs/plans/PERF-BACKLOG.md`.
+
+
 Safety net: **v0.1.0** is pinned at https://trials-gauntlet-v0-1-0.vercel.app (tag `v0.1.0`,
 `94ecb43`). Anything below that regresses feel or clearability is reverted, not argued with.
 
