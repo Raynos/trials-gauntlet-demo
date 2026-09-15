@@ -30,11 +30,11 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | pillar | % | what is left |
 |---|---|---|
 | P0 physics v2 | 80 | human-rate learnability (R5 → strangers), lab hop air margin |
-| P1 hero moves like 145 kg | 65 | blind critic r3 on v2 + render r11/r12 (moved to Rider on Glass H5) |
+| P1 hero moves like 145 kg | 70 | blind critic r3: ours 2/6 (count met), tells still name camera pull-out, hero shadow on high, rigid rider → render r14 |
 | P2 world reads as a place | 60 | per-biome blind verdict; exteriors need the track on structure over terrain |
-| P3 clearable by real people | 60 | **strangers r4 pass b1–e2 on v2** (1 · 2.5 · 3 · 5.5 · 6.5), e3 fails 15.5 → tracks r8; reflex `average` in band 8/16; user cleared b1, b2 on the phone (2026-09-14) |
+| P3 clearable by real people | 75 | **strangers pass beginner, easy AND medium on v2** (r4 b1–e2 1 · 2.5 · 3 · 5.5 · 6.5; r5 e3 1, m1 7.5, m2 4, m3 8 — all in band); hard/extreme not yet ridden by strangers; reflex `average` in band 10/16; user cleared b1, b2 on the phone |
 | P4 complete game | 80 | audio mix round, local per-track leaderboard, onboarding proof with a stranger |
-| P5 evidence | 60 | blind critic lapsed since render r8 (cadence rule now written); v0.2.0 not pinned; the final 38-pair battery not run |
+| P5 evidence | 70 | blind critic cadence restored (r3 run, 6 pairs); v0.2.0 not pinned; the final 38-pair battery not run |
 | P6 sound at AAA (added) | 25 | mix tuned to v1; no crowd / ambience / music; no blind audio A/B |
 
 ## Field reports from the phone (the user's iPhone, LTE)
