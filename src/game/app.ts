@@ -35,6 +35,8 @@ import {
   loadModelChoice,
   loadOnboarded,
   loadQualityOverride,
+  loadHeldTier,
+  saveHeldTier,
   loadFpsChoice,
   saveFpsChoice,
   type FpsChoice,
@@ -111,7 +113,6 @@ export interface AppOptions {
   bench?: BenchOptions | undefined;
 }
 
-const PROBE_FRAMES = 60;
 const DEVICE_SHOW_FRAMES = 90;
 const LAST_TRACK_KEY = 'trials.lastTrack';
 const TOUCH_SETTLE_S = 3;
@@ -204,9 +205,6 @@ export class App {
   private soundOn: boolean;
   private volume: number;
   private ghostOn: boolean;
-  private probe: number[] = [];
-  private probeArmed = false;
-  private probeDone = false;
   private lastNow = 0;
   private raf = 0;
   private audioUnlocked = false;
@@ -438,7 +436,7 @@ export class App {
           (r) => this.benchLog.append(r),
         )
       : null;
-    if (this.bench) this.probeDone = true; // the tier is pinned for the run: the bench forces tiers per scenario itself
+    // Under the bench the governor is off (`governFrame` returns when `this.bench`): scenarios pin their tiers.
 
     // Telemetry: every fault is a death at the bike's x (the state after the faulting step) with the last second of input.
     this.game.onEvent((e) => {
@@ -468,12 +466,13 @@ export class App {
     this.game.setGhostEnabled(this.ghostOn);
     if (this.qualityChoice !== 'auto') {
       this.game.setQuality(this.qualityChoice);
-      this.probeDone = true;
-    } else if (isPhone()) {
-      // Phones start on `low` and the probe may only step up (a 60 fps start line then bloom + SSAO
-      // + shadows at 3000 px wide was the "not 60, dropping frames" report); desktops probe from high.
-      this.game.setQuality('low');
-      this.qualityWhy = 'phone default (low), probe may step up';
+    } else {
+      // Auto is a governor, not a one-shot probe (the user: "auto shifts around based on FPS; high if
+      // possible"). Start at the tier this device last held for 30 s, else medium on a phone / high on
+      // desktop; the governor climbs to high while the frame holds and steps down the moment it does not.
+      const start = loadHeldTier() ?? (isPhone() ? 'medium' : 'high');
+      this.game.setQuality(start);
+      this.qualityWhy = `governor start ${start}${loadHeldTier() ? ' (held last session)' : ''}`;
     }
 
     const unlock = (): void => {
@@ -493,7 +492,6 @@ export class App {
     this.fit();
 
     this.game.onPhase = (phase, prev) => {
-      if (phase === 'riding' && !this.probeDone) this.probeArmed = true; // probe the first 60 frames after GO
       // From the line on the run is over for the thumbs: the layer is inert now, not when the panel lands 0.4 s later
       // (a corner tap in that window used to be an unconfirmed quit / a full restart).
       if (phase === 'finished') this.touch.setOverlay(true);
@@ -668,6 +666,7 @@ export class App {
       this.lastNow = now;
       this.tickFrame(elapsed);
       this.meterFrame(now, sinceRender);
+      this.governFrame(now, sinceRender);
       this.bench?.frame(now, this.frameSplit);
       this.raf = requestAnimationFrame(frame);
     };
@@ -1049,7 +1048,6 @@ export class App {
       this.game.advance(elapsed);
       sp.advanceMs = performance.now() - tA;
     }
-    if (this.probeArmed && !this.probeDone && !this.game.paused()) this.recordProbe(elapsed * 1000);
     this.settleTouch(elapsed);
     if (this.inRun() && !this.game.paused()) {
       this.collector.frame(elapsed * 1000);
@@ -1102,12 +1100,11 @@ export class App {
     this.pause.setDevice(d);
   }
 
-  /** Cap in effect: the Settings choice, else 30 on phones and 60 elsewhere. */
+  /** Cap in effect: the Settings choice, else 60 everywhere (device report #1: low holds 59.5 fps on the phone). */
   private frameCapHz(): 30 | 60 {
     if (this.capOverride) return this.capOverride;
     if (this.fpsChoice === '30') return 30;
-    if (this.fpsChoice === '60') return 60;
-    return isPhone() ? 30 : 60;
+    return 60;
   }
 
   /** FPS meter: rendered frames over the last 500 ms, the worst frame interval in that window, the tier letter. Two DOM writes per second. */
@@ -1128,39 +1125,75 @@ export class App {
 
   // -- quality ------------------------------------------------------------------
 
-  /** Median RAF interval over the first 60 frames after GO → tier (60 fps high, 30 fps medium, else low). */
-  private recordProbe(frameMs: number): void {
-    this.probe.push(frameMs);
-    if (this.probe.length < PROBE_FRAMES) return;
-    this.probeDone = true;
-    const sorted = [...this.probe].sort((a, b) => a - b);
-    const median = sorted[sorted.length >> 1] ?? 0;
-    const cap = this.frameCapHz();
-    const budget = 1000 / cap;
-    // Measured against the cap in effect: a phone capped at 30 that holds 33 ms is "medium"-worthy at
-    // most; it never probes into `high` (shadows + SSAO + bloom at full DPR).
-    let tier: QualityTier = median <= budget * 1.05 ? 'high' : median <= budget * 2 ? 'medium' : 'low';
-    // Phones probe like desktops but never into `high` yet; the perf owner's job (docs/plans/PERF.md) is to make
-    // every tier hold 60 on a phone — Auto is not allowed to hide that by pinning low.
-    if (isPhone() && tier === 'high') tier = 'medium';
-    if (this.qualityChoice === 'auto') {
-      this.game.setQuality(tier);
-      this.qualityWhy = `probe median ${median.toFixed(1)} ms at cap ${cap}`;
+  /**
+   * The quality governor (Auto). Every rendered frame's interval feeds a 2 s window; at the window's end:
+   *   p95 > 1.3 × budget or drops > 8 %  → step DOWN now (a stutter beats sustained lag), 10 s cooldown;
+   *   p95 ≤ 1.1 × budget and drops < 2 % for 4 consecutive windows → step UP, but only at a safe moment
+   *   (not riding: countdown / menu / garage / pause / results) because a tier change recompiles materials.
+   * The first second after any change is ignored (the recompile itself would read as drops). A tier held
+   * for 30 s is remembered per device so the next boot starts there. Manual settings disable it.
+   */
+  private govWindowAt = 0;
+  private govIntervals: number[] = [];
+  private govGoodWindows = 0;
+  private govChangedAt = 0;
+  private govLastDownAt = 0;
+  private govHeldSince = 0;
+  private governFrame(now: number, sinceRender: number): void {
+    if (this.qualityChoice !== 'auto' || this.bench) return;
+    if (now - this.govChangedAt < 1000) return; // recompile shadow
+    if (sinceRender > 0) this.govIntervals.push(sinceRender);
+    if (!this.govWindowAt) this.govWindowAt = now;
+    if (now - this.govWindowAt < 2000) return;
+    const n = this.govIntervals.length;
+    this.govWindowAt = now;
+    if (n < 10) {
+      this.govIntervals = [];
+      return;
     }
-    this.probe = [];
-    this.probeArmed = false;
+    const sorted = this.govIntervals.slice().sort((a, b) => a - b);
+    const p95 = sorted[Math.min(n - 1, Math.floor(n * 0.95))]!;
+    const budget = 1000 / this.frameCapHz();
+    const drops = sorted.filter((x) => x > budget * 1.5).length / n;
+    this.govIntervals = [];
+    const order: QualityTier[] = ['low', 'medium', 'high'];
+    const cur = this.game.qualityTier;
+    const i = order.indexOf(cur);
+    const riding = this.inRun() && this.game.phase() === 'riding' && !this.game.paused();
+    if (p95 > budget * 1.3 || drops > 0.08) {
+      this.govGoodWindows = 0;
+      this.govHeldSince = now;
+      if (i > 0) {
+        this.game.setQuality(order[i - 1]!);
+        this.govChangedAt = now;
+        this.govLastDownAt = now;
+        this.qualityWhy = `governor ↓ ${order[i - 1]} (p95 ${p95.toFixed(1)} ms, drops ${(drops * 100).toFixed(0)} %)`;
+      }
+      return;
+    }
+    if (p95 <= budget * 1.1 && drops < 0.02) {
+      this.govGoodWindows++;
+      if (now - this.govHeldSince > 30000) saveHeldTier(cur);
+      if (this.govGoodWindows >= 4 && i < 2 && !riding && now - this.govLastDownAt > 10000) {
+        this.game.setQuality(order[i + 1]!);
+        this.govChangedAt = now;
+        this.govGoodWindows = 0;
+        this.govHeldSince = now;
+        this.qualityWhy = `governor ↑ ${order[i + 1]} (p95 ${p95.toFixed(1)} ms held ${4 * 2} s)`;
+      }
+    } else {
+      this.govGoodWindows = 0;
+    }
   }
 
   private chooseQuality(q: QualityChoice): void {
     this.qualityChoice = q;
     saveQualityOverride(q);
     if (q === 'auto') {
-      this.probeDone = false;
-      this.probe = [];
-      this.probeArmed = this.game.phase() === 'riding';
-      this.qualityWhy = 'pending probe';
+      this.govGoodWindows = 0;
+      this.govChangedAt = performance.now();
+      this.qualityWhy = 'governor (auto)';
     } else {
-      this.probeDone = true;
       this.game.setQuality(q);
       this.qualityWhy = 'manual (settings)';
     }

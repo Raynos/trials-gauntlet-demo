@@ -60,6 +60,8 @@ export {
   loadOnboarded,
   saveOnboarded,
   loadFpsChoice,
+  loadHeldTier,
+  saveHeldTier,
   saveFpsChoice,
   type FpsChoice,
   LastRuns,
