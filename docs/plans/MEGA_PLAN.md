@@ -110,9 +110,9 @@ Owner: audio (`src/audio/**`, `docs/design/audio.md`), judged blind against refe
   gates kit's crowd count), ambience per biome (hall reverb tail, canyon wind, snow hush, city traffic bed,
   foundry roar) driven by `def.meta.biome`, a countdown/finish stinger set, and a **music bed** for the front
   end and results (composed procedurally or licensed CC0 — no unlicensed audio; the choice documented).
-- Done = a blind A/B of our gameplay audio against the reference corpus' audio tracks (the clips have sound
-  even though the frame analysis ignored it) on wheelie / landing / crash / start beats: ours picked ≥ 2/6
-  with no tell naming "synthetic engine", "no crowd", "no room"; the mix stays byte-identical offline.
+- Done = the v2 retune, crowd, per-biome room, stingers and music bed shipped and byte-identical offline, and
+  a blind audio A/B against the reference corpus' audio on wheelie / landing / crash / start beats *run and
+  recorded* (target ≥ 2/6, tells named). The bar — "could be a recording" — lives in `docs/mission.md` §5.
 
 ### P5 amendments — the critic cadence and the final bar
 - **Blind clip-vs-clip every round, every area** (the brief's loop rule, lapsed since render r8): each render,
@@ -122,10 +122,9 @@ Owner: audio (`src/audio/**`, `docs/design/audio.md`), judged blind against refe
 - **"Change approach when an area stops improving"**: two consecutive rounds with the same tell = the next
   round is a different approach (a new owner brief, a new technique, or the reference re-read), never a
   third polish pass.
-- **The final bar ("absolutely wowed")**: a closing battery of 24 blind pairs — 6 manoeuvres (wheelie, hop,
-  landing, crash, climb, flight) × 4 biomes — plus 8 "world" pairs (stills-in-motion) and 6 audio pairs.
-  v0.2.0 may pin at H5's ≥ 2/6; the brief's bar is **≥ 50 % preferred on the battery** with no tell repeated
-  across three pairs. Until that number exists, no plan is complete.
+- **The final bar ("absolutely wowed") lives in `docs/mission.md` §1.** This plan's done line is the proxy:
+  the 38-pair battery (24 manoeuvres × biomes, 8 world, 6 audio) is *run* at v0.2.0 and its number recorded
+  in `RELEASES.md` with the named tells; v0.2.0 pins at H5's ≥ 2/6 on hero pairs.
 
 ### P3 amendments — the owed hard/extreme design and desktop proof
 - Tracks r7 listed what it still owes to the storyboards: H1 roof climbs + scaffold-tunnel drop, H3 second

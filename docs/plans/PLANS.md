@@ -2,7 +2,7 @@
 
 **Standing goal (set by the user 2026-09-14 evening): overnight build until every plan in this folder is complete and ready for `project/archive/`.** Completion = each plan's own done lines, judged by evidence (gate, strangers, blind critic, device report), never by the parent's feeling.
 
-One page, kept current by the parent at every commit. Percentages are against each plan's own
+One page, kept current by the parent at every commit. The bars no plan can close (wowed vs the real game, PS4 picture, the hero as a person, desktop-high at 60 on a phone, sound as a recording, fun) live in `docs/mission.md`; plans carry their measurable proxies. Percentages are against each plan's own
 "done" lines, not a feeling. Live build: https://trials-gauntlet-demo.vercel.app · pinned v0.1.0:
 https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 

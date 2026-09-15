@@ -31,7 +31,7 @@ the glTF rider/bike sources), pose (`src/render/rider/pose.ts`), harness (blind 
 
 | item | done means |
 |---|---|
-| H1 A real rider | glTF rider with a textured suit (fictional sponsor set), helmet with visor reflection, gloves/boots, skin shading with a proper normal/roughness set; no flat yellow anywhere at riding distance or in the garage close-up |
+| H1 A real rider | glTF rider with a textured suit (fictional sponsor set), helmet with visor reflection, gloves/boots, skin shading with a proper normal/roughness set; no flat colour at riding distance; body/limb volume and a chunkier helmet so the riding-distance two-up no longer reads "tube figure" (round 2). The bar — a critic cannot tell which rider is ours — is `docs/mission.md` §3 |
 | H2 Everything from physics state | fork + shock travel from `suspension.*.compression`, wheel blur from wheel ω, rider pose lag from `riderBody` (v2's simulated rider — the drawn rider *is* the simulated one), landing squash from the compression spike, dust from tyre slip × load, chain/sprocket from wheel ω; a table in `rendering.md` mapping each visible motion to the state field that drives it, none from timers |
 | H3 The hero casts a shadow on every tier | one directional key light per biome; on `low` a hero-only shadow (a 512² caster-limited map or a projected contact blob that follows compression), never "no shadow" |
 | H4 Camera never loses the bike | the gate's camera box row green on every track at every tier; air camera keeps the landing zone in frame; no frame in a stranger session with the bike outside [0.2, 0.8]² |
@@ -46,7 +46,7 @@ Owners: core-game (device loop, stamp, bench), render (60 fps low tier), harness
 |---|---|
 | G1 The input invariant | `docs/tasks/touch-navigation-invariant.md` closed: nothing is hit-testable unless drawn at ≥ 0.5 opacity for ≥ 150 ms; the tap-grid transition test in `harness/e2e` is a ship-gate row |
 | G2 A device loop | `?bench=1` runs a fixed 30 s replay on b1 on the device and shows fps p50/p95/min, worst frame, tier, DPR, render-target Mpx, JS heap, a thermal proxy (fps at 0–5 s vs 25–30 s) and the touch/navigation log on screen with a **Copy report** button; the report also lands in the run telemetry. Every round ends with a report from the user's iPhone pasted into `docs/device/<date>-<commit>.md` |
-| G3 60 fps on `low` | on the reference device (the user's iPhone) the bench shows p95 ≤ 16.7 ms on `low` for 30 s with no thermal fall-off; the phone default cap moves 30 → 60 only when the device report says so |
+| G3 60 fps on the phone's default tier | on the reference device (the user's iPhone) the bench shows p95 ≤ 16.7 ms on the tier Auto picks, for 30 s with no thermal fall-off; the phone default cap moves 30 → 60 only when the device report says so. `PERF.md` climbs from there toward medium and a phone-`high`; the desktop-high-at-60 bar is `docs/mission.md` §4 |
 | G4 Stamped, automatic deploys | the build stamp is the commit (`BUILD <sha7> · <date>`), never `dev`, from `git rev-parse` at build time; `pnpm deploy` does the clean-`git archive HEAD` production deploy and appends the sha + URL to `RELEASES.md`'s live line; the parent runs it after every commit on `main` |
 | G5 Real numbers in the gate | ship-gate gains rows from the last device report (`device.fpsP95Low`, `device.thermalDrop`, `device.navWithoutTarget = 0`), informational until three reports exist, then thresholds |
 

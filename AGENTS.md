@@ -13,3 +13,4 @@
 - Favor subagents over workflows where possible, as subagents are resumable.
 - Plans and their status live in `docs/plans/PLANS.md` (kept current by the parent at every commit); the plans themselves: `docs/plans/MEGA_PLAN.md`, `docs/plans/physics-v2.md`, `docs/plans/RIDER_ON_GLASS.md`.
 - Completed plans and permanently stale docs are archived under `project/archive/` (rules in its README); status docs never move.
+- `docs/mission.md` holds the bars no plan can close; plans carry measurable proxies and may cite a mission line as their bar.
