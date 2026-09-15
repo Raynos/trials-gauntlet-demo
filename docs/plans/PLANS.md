@@ -47,10 +47,10 @@ Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF.md) and d
 | P0 physics v2 | 80 | human-rate learnability (R5 → strangers), lab hop air margin |
 | P1 hero moves like 145 kg | 70 | blind critic r3: ours 2/6 (count met), tells still name camera pull-out, hero shadow on high, rigid rider → render r14 |
 | P2 world reads as a place | 60 | per-biome blind verdict; exteriors need the track on structure over terrain |
-| P3 clearable by real people | 75 | **strangers pass beginner, easy AND medium on v2** (r4 b1–e2 1 · 2.5 · 3 · 5.5 · 6.5; r5 e3 1, m1 7.5, m2 4, m3 8 — all in band); hard/extreme not yet ridden by strangers; reflex `average` in band 10/16; user cleared b1, b2 on the phone |
+| P3 clearable by real people | 85 | strangers pass beginner, easy, medium; **hard ridden (r6, Pro default): h1 16 in band, h2 10 / h3 16 / x1 18.5 / x3 19 under band, 13/13 cleared** → bands or tracks (tracks r10); **the user has cleared all 6 beginner + easy tracks on the phone (2026-09-15)**; the audit's point stands: AI strangers are a proxy, not human learnability |
 | P4 complete game | 80 | audio mix round, local per-track leaderboard, onboarding proof with a stranger |
 | P5 evidence | 70 | blind critic cadence restored (r3 run, 6 pairs); v0.2.0 not pinned; the final 38-pair battery not run |
-| P6 sound at AAA (added) | 25 | mix tuned to v1; no crowd / ambience / music; no blind audio A/B |
+| P6 sound at AAA (added) | 40 | r3 retuned to v2 + crowd/rooms/stingers/music shipped; **blind audio A/B ours 1/12** — tell: metronomic pinned-pitch mono pulse train, click for a landing → audio r4 (per-firing jitter, stereo, landing thump, no respawn re-trigger) |
 
 ## Field reports from the phone (the user's iPhone, LTE)
 
@@ -65,4 +65,7 @@ Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF.md) and d
 | 09-14 | scroll in settings → track select; taps hit hidden buttons | hidden screens out of hit-testing; hidden replay bar was live at z 5; **P0 invariant task open** | `e55c4dd`, `cf13f8b` |
 | 09-14 | not 60 fps, drops from 30 to 24–28 on a flagship, meter "H" | FPS meter; phone starts low; render r12 fill-rate cuts; stored `high` ignored on phones | `733c830`, `12a29f2`, this commit |
 | 09-14 | cleared b1 and b2 on the phone; recovery feels hard | R5 airborne limit; strangers r4 pass b1–e2 | `e8f2ec7`, `166d4d7` |
+| 09-15 | **6/15 cleared on the phone** (all beginner + easy; e3 on Pro) | — | screenshot 14:40 |
+| 09-15 | garage still under 30 fps after the canvas-CSS removal | `?bench=1` device instrument + phase-locked cap | `cfc98f8` |
+| 09-15 | MENU pill over the medal totals | header inset | `8efc682` |
 | 09-14 | taps on invisible buttons navigate (results Menu under the gas thumb) | the `.live` invariant, 5184-tap grid | `18df821` |
