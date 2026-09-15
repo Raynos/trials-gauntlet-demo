@@ -1065,9 +1065,9 @@ export class App {
     // Measured against the cap in effect: a phone capped at 30 that holds 33 ms is "medium"-worthy at
     // most; it never probes into `high` (shadows + SSAO + bloom at full DPR).
     let tier: QualityTier = median <= budget * 1.05 ? 'high' : median <= budget * 2 ? 'medium' : 'low';
-    // Phones stay on low in Auto until a device report (RIDER_ON_GLASS G2/G3) says medium holds the cap: the
-    // user's flagship read 28 fps / 57-60 ms worst on M after the probe stepped it up.
-    if (isPhone()) tier = 'low';
+    // Phones probe like desktops but never into `high` yet; the perf owner's job (docs/plans/PERF.md) is to make
+    // every tier hold 60 on a phone — Auto is not allowed to hide that by pinning low.
+    if (isPhone() && tier === 'high') tier = 'medium';
     if (this.qualityChoice === 'auto') {
       this.game.setQuality(tier);
       this.qualityWhy = `probe median ${median.toFixed(1)} ms at cap ${cap}`;
