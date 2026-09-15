@@ -1,0 +1,192 @@
+{
+  "srcFingerprint": "a6d63cfd",
+  "startedAt": "2026-09-15T14:24:02.443Z",
+  "clears": [
+    {
+      "track": "flat-test",
+      "bike": "rookie",
+      "choice": {
+        "file": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-3.json",
+        "fresh": false,
+        "stamp": "db68bbeb",
+        "candidates": 1
+      },
+      "hash": "b002d139195b5757",
+      "finishTime": 8.566666666666666,
+      "faults": 0
+    },
+    {
+      "track": "b1-first-ride",
+      "bike": "rookie",
+      "choice": {
+        "file": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/b1-first-ride/bot-3.json",
+        "fresh": false,
+        "stamp": "db68bbeb",
+        "candidates": 1
+      },
+      "hash": "14f314acf2c5be93",
+      "finishTime": 41.55833333333333,
+      "faults": 0
+    },
+    {
+      "track": "flat-test",
+      "bike": "pro",
+      "choice": {
+        "file": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-3-pro.json",
+        "fresh": false,
+        "stamp": "db68bbeb",
+        "candidates": 1
+      },
+      "hash": "9defa8078708cfc7",
+      "finishTime": 8.041666666666666,
+      "faults": 0
+    },
+    {
+      "track": "b1-first-ride",
+      "bike": "pro",
+      "choice": {
+        "file": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/b1-first-ride/bot-3-pro.json",
+        "fresh": false,
+        "stamp": "db68bbeb",
+        "candidates": 1
+      },
+      "hash": "49ce97f9fa86a3d5",
+      "finishTime": 37.733333333333334,
+      "faults": 0
+    }
+  ],
+  "determinism": {
+    "schema": 1,
+    "kind": "determinism",
+    "runId": "20260915-092402-e52aa0",
+    "startedAt": "2026-09-15T14:24:02.444Z",
+    "wallMs": 6798,
+    "git": "56e3883",
+    "srcFingerprint": "a6d63cfd",
+    "node": "v24.18.1",
+    "chromium": "151.0.7922.34",
+    "physics": "bikePhysicsFactory-v2",
+    "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/flat-test/bot-3.json",
+    "ticks": 1028,
+    "checks": [
+      {
+        "id": "D1",
+        "name": "cross-load",
+        "pass": true,
+        "hashes": [
+          "b002d139195b5757",
+          "b002d139195b5757"
+        ],
+        "note": "2 loads, finish=8.566666666666666"
+      },
+      {
+        "id": "D2",
+        "name": "cross-encoding",
+        "pass": true,
+        "hashes": [
+          "b002d139195b5757",
+          "b002d139195b5757"
+        ]
+      },
+      {
+        "id": "D3",
+        "name": "node-vs-browser",
+        "pass": true,
+        "hashes": [
+          "b002d139195b5757",
+          "b002d139195b5757"
+        ],
+        "note": "physics=bikePhysicsFactory-v2"
+      },
+      {
+        "id": "D4",
+        "name": "snapshot-node",
+        "pass": true,
+        "hashes": [
+          "48545398c627cd93",
+          "57c9bfb0a6dfee70",
+          "91ba52e27b1a415b",
+          "b65cb2f76fbed564"
+        ]
+      },
+      {
+        "id": "D4c",
+        "name": "foreign-snapshot",
+        "pass": true,
+        "hashes": [
+          "48545398c627cd93",
+          "57c9bfb0a6dfee70",
+          "91ba52e27b1a415b",
+          "b65cb2f76fbed564"
+        ]
+      },
+      {
+        "id": "D4b",
+        "name": "snapshot-browser",
+        "pass": true,
+        "hashes": [
+          "48545398c627cd93",
+          "57c9bfb0a6dfee70",
+          "91ba52e27b1a415b"
+        ]
+      },
+      {
+        "id": "D5",
+        "name": "chunking",
+        "pass": true,
+        "hashes": [
+          "b002d139195b5757",
+          "b002d139195b5757",
+          "b002d139195b5757",
+          "b002d139195b5757",
+          "b002d139195b5757"
+        ],
+        "note": "chunks 1,7,15,120 + runRecording"
+      },
+      {
+        "id": "D7",
+        "name": "no-state-leak",
+        "pass": true,
+        "hashes": [
+          "b002d139195b5757",
+          "b002d139195b5757"
+        ]
+      },
+      {
+        "id": "D8",
+        "name": "pinned-hash",
+        "pass": true,
+        "hashes": [
+          "92e2f93ab49cd0b2",
+          "92e2f93ab49cd0b2"
+        ],
+        "note": "pinned physics=bikePhysicsFactory-v2"
+      }
+    ],
+    "pass": true
+  },
+  "browser": {
+    "version": "151.0.7922.34",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "boot": {
+    "bootMs": 120.93812500000058,
+    "domContentLoadedMs": 64.85999989509583,
+    "loadEventMs": 120.0849997997284,
+    "jsHeapUsed": 26790396,
+    "jsHeapTotal": 35192832
+  },
+  "crashRestart": {
+    "fault": {
+      "type": "fault",
+      "reason": "crash",
+      "tick": 90,
+      "time": 0.75
+    },
+    "before": "crashed",
+    "after": "riding",
+    "restartWallMs": 0.24000000953674316,
+    "movementTicks": 5,
+    "velocity": 0.06909694175642009
+  }
+}

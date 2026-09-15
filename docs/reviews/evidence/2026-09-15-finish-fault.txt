@@ -1,0 +1,12 @@
+before { frontX: 119.99, finishX: 120 }
+after {
+  phase: 'finished',
+  faults: 0,
+  frontX: 120.05222803777669,
+  physicsFault: 'crash',
+  finishTime: 0.008333333333333333,
+  events: [
+    { type: 'checkpoint', index: 0, tick: 0, time: 0 },
+    { type: 'finish', tick: 1, time: 0.008333333333333333 }
+  ]
+}

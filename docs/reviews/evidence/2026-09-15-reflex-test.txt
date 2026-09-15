@@ -1,0 +1,33 @@
+
+ RUN  v3.2.7 /Users/raynos/projects/game-demos/trials-gauntlet-demo
+
+ ❯ harness/reflex/reflex.test.ts (7 tests | 1 failed) 131ms
+   ✓ reflex bot > is deterministic for (track, seed, skill) and its recording replays to the same state 60ms
+   ✓ reflex bot > draws a reaction delay inside the skill range and glances at the skill rate 0ms
+   ✓ reflex bot > sees the ground the way the screen shows it: a pit reads as a pit, a ramp as a slope, a box as a face 22ms
+   ✓ reflex bot > learns locally: a fault slows the approach to that section only 0ms
+   ✓ see-saw model (round 11) > perceives the board under the bike: on it, its angle and rate, the distance to the far end, tipping 31ms
+   ✓ see-saw model (round 11) > rides a tipping board hands-still (seesaw-ride: lean 0, no brake, gentle gas, no drop rule) and flies the tip-air hands-off (seesaw-tip-air) 11ms
+   × section memory: a stall teaches "more speed, commit" (round 11) > a restart fault after a fast first crash lifts the section back to >= 1 speed and clears the throttle cap, and logs it 5ms
+     → expected 1.1 to be greater than 1.1
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  harness/reflex/reflex.test.ts > section memory: a stall teaches "more speed, commit" (round 11) > a restart fault after a fast first crash lifts the section back to >= 1 speed and clears the throttle cap, and logs it
+AssertionError: expected 1.1 to be greater than 1.1
+ ❯ harness/reflex/reflex.test.ts:171:35
+    169|     // A second stall asks for more still; the approach bucket (3 m ba…
+    170|     m.stalled(229, 1.0);
+    171|     expect(m.get(230).speedScale).toBeGreaterThan(1.1);
+       |                                   ^
+    172|     expect(m.get(224).speedScale).toBeGreaterThanOrEqual(1);
+    173|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  09:22:25
+   Duration  655ms (transform 216ms, setup 0ms, collect 299ms, tests 131ms, environment 0ms, prepare 49ms)
+

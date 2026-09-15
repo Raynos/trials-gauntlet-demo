@@ -1,0 +1,20 @@
+
+> trials-gauntlet-demo@0.1.0 harness:e2e /Users/raynos/projects/game-demos/trials-gauntlet-demo
+> tsx harness/e2e/touch.mts --only=run --geom=iphone15promax
+
+== iphone15promax 932×430
+  FAIL boot pageerror: Unexpected token '<'
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForFunction: Timeout 180000ms exceeded.
+    at boot (/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/e2e/touch.mts:237:14)
+    at async flowRun (/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/e2e/touch.mts:375:16)
+    at async <anonymous> (/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/e2e/touch.mts:791:34) {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v24.18.1
+ ELIFECYCLE  Command failed with exit code 1.

@@ -6,6 +6,12 @@ One page, kept current by the parent at every commit. The bars no plan can close
 "done" lines, not a feeling. Live build: https://trials-gauntlet-demo.vercel.app · pinned v0.1.0:
 https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 
+## Independent audit — 2026-09-15
+
+The [game audit](../reviews/game-audit-2026-09-15.md) and separate [physics-library review](../reviews/physics-library-audit-2026-09-15.md) review `56e3883` plus the existing working-tree changes, physics/track fingerprint `a6d63cfd`. **Release readiness is blocked:** a fresh production build emits an invalid inline loader (`vite.config.ts:228`), and the required test suite has one reflex-memory failure. Development-harness replay passes 9/9 determinism checks; flat-test and b1 clear on both bikes; manual restart returns to riding in one tick. No game fixes landed in this audit round.
+
+The percentages below remain plan estimates, not audited completion of the README. Newer evidence supersedes several older notes: hard AI-stranger runs now exist; X1 has only one completed run; crowd/ambience/music and audio comparisons exist, with all 11 recorded audio verdicts preferring the reference. AI-stranger metrics do not establish human learnability. Auto phones still cap at 30 fps, and current-source real-device 60 fps proof remains outstanding. Next release gate: fix production boot and the failing check, then repeat production startup, crash/restart and real-player/device validation. The proposed engine comparison is research scope only; no migration has been selected.
+
 | plan | file | goal | status | % | next gate |
 |---|---|---|---|---|---|
 | **The brief** | `README.md` | a 2.5D Trials-quality bike game, deterministic, 60 fps, desktop + iOS Safari | in build | — | — |

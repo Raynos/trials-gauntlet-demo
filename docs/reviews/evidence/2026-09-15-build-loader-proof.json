@@ -1,0 +1,9 @@
+{
+  "originalScriptParses": true,
+  "replacementTokenOffset": 1751,
+  "originalContext": "e=w(),o=0,t=0,s=k.map(T=>{let E=l.get(T),$=E.state===\"ok\";return $&&t++,o+=_[T].weight*($?1:E.state===\"on\"?E.fraction:0),{key:T,label:_[T].label,state:E.st",
+  "stringReplacementCorruptsScript": true,
+  "callbackReplacementPreservesScript": true,
+  "actualBuildContext": "e=w(),o=0,t=0,s=k.map(T=>{let E=l.get(T),$=E.state===\"ok\";return <script id=\"boot\"></script>&t++,o+=_[T].weight*($?1:E.state===\"on\"?E.fraction:0),{key:T,label:_[T].label,state",
+  "source": "vite.config.ts:228"
+}
