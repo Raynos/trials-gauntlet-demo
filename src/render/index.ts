@@ -1177,9 +1177,10 @@ export class ThreeRenderer implements GameRenderer {
     const cam = this.rig.camera;
     if (this.unchangedFrame(f, alpha, cam)) {
       // Perf cut #1: identical to the last drawn frame — the canvas keeps it; no traversal, no draws.
+      // `renderer.info` is left alone: it keeps the last DRAWN frame's calls / tris, which is what
+      // `debugInfo()` documents (a reset here read 0 in the static garage, e2e `garage debugInfo calls`).
       this.skipRun++;
       this.skippedFrames++;
-      this.renderer.info.reset();
       return performance.now() - t0;
     }
     this.skipRun = 0;
@@ -1413,7 +1414,7 @@ export class ThreeRenderer implements GameRenderer {
     devicePixelRatio: number;
     canvasW: number;
     canvasH: number;
-    /** Last frame's draw calls / triangles (all passes, `info.autoReset = false`). */
+    /** Last DRAWN frame's draw calls / triangles (all passes, `info.autoReset = false`; a frame cut #1 skipped leaves them as they were). */
     calls: number;
     tris: number;
     /** Render-target pixels written per frame (Mpx) and the same in MB (colour + depth), shadow map included; `rtPasses` lists them. */
