@@ -261,11 +261,13 @@ describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
 
   it('ground profile is strictly increasing in x and every gap has a hazard', () => {
     for (let i = 1; i < def.profile.length; i++) expect((def.profile[i] as Vec2).x).toBeGreaterThan((def.profile[i - 1] as Vec2).x);
-    const gaps = def.obstacles.filter((o) => o.kind === 'gap' && (o.params?.['hazard'] ?? 'water') !== 'none').length; // a lab pit is dry by design
+    const gapHazard = (o: TrackDef['obstacles'][number]): string => String(o.params?.['hazard'] ?? 'water');
+    const gaps = def.obstacles.filter((o) => o.kind === 'gap' && gapHazard(o) !== 'none' && gapHazard(o) !== 'fire').length; // a lab pit is dry by design
+    const fireGaps = def.obstacles.filter((o) => o.kind === 'gap' && gapHazard(o) === 'fire').length; // round 9: X2's big roller launches over the melt
     const pits = track.hazards.filter((h) => h.kind === 'water' || h.kind === 'kill').length;
     expect(pits).toBe(gaps);
     const barrels = def.obstacles.filter((o) => o.kind === 'barrel').reduce((n, o) => n + ((o.params?.burning ?? true) ? Number(o.params?.count ?? 1) : 0), 0);
-    expect(track.hazards.filter((h) => h.kind === 'fire')).toHaveLength(barrels);
+    expect(track.hazards.filter((h) => h.kind === 'fire')).toHaveLength(barrels + fireGaps);
   });
 
   it('prints the course summary', () => {

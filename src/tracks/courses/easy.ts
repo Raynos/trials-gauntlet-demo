@@ -208,10 +208,10 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~6 m: the start-line lesson; a plain-gas rider reaches the first flight at ~13.5 m/s
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 5, height: 0.15, length: 0.6 }) // the first flight: 0.75 m at 14 deg
+  .stair({ count: 6, height: 0.125, length: 0.8 }) // the first flight: 0.75 m at 8.9 deg // round 9 (stranger r5: 53-59 deg nose-up at 15+ m/s under plain gas on the flights reached at flow speed): 0.12 m risers at a 0.8 m run (8.5 deg) hold <= 21 deg under plain gas from 14 to 20 m/s where 0.15 x 0.6 read 47 / 38 / 53 deg and looped at 20 (tracks8/stairs.mts re-run at 14-20); the extra length comes out of the flat after each flight
   .box({ width: 6, height: 0.75 })
   .stair({ count: 5, height: 0.15, length: 0.6, direction: 'down' })
-  .flat(12)
+  .flat(10.2)
   .camera({ mode: 'side' })
   .rollers(20, 0.25, 3)
   .flat(4)
@@ -222,10 +222,10 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~135 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 8, height: 0.15, length: 0.6 }) // 1.2 m at 14 deg (round 7: 6 x 0.25 at 0.6; before that 6 x 0.4 from 3 m: 95 deaths)
+  .stair({ count: 10, height: 0.12, length: 0.8 }) // 1.2 m at 8.5 deg (round 9; round 8: 8 x 0.15 at 0.6; round 7: 6 x 0.25 at 0.6; before that 6 x 0.4 from 3 m: 95 deaths)
   .box({ width: 6, height: 1.2 })
   .stair({ count: 8, height: 0.15, length: 0.6, direction: 'down' })
-  .flat(12) // round 8: the two barrels that stood here are gone
+  .flat(8.8) // round 8: the two barrels that stood here are gone; round 9: 3.2 m shorter for the longer flight
   .camera({ mode: 'side' })
   .tabletop(6, 8, 1.0)
   .flat(6)
@@ -234,10 +234,10 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~235 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 8, height: 0.15, length: 0.6 }) // a flight at speed: 8 m on top so a 14 m/s launch still lands on the box
+  .stair({ count: 10, height: 0.12, length: 0.8 }) // a flight at speed: 8 m on top so a 14 m/s launch still lands on the box
   .box({ width: 8, height: 1.2 })
   .stair({ count: 8, height: 0.15, length: 0.6, direction: 'down' })
-  .flat(12)
+  .flat(8.8)
   .camera({ mode: 'side' })
   .bumpRow(3, 0.3, 16)
   .flat(4)
@@ -248,10 +248,10 @@ export const E3 = course('e3-stairway', 'Stairway', 'easy')
   .checkpoint() // ~384 m
   .flat(16)
   .camera({ mode: 'side-tight', zoomBias: -0.6 })
-  .stair({ count: 8, height: 0.15, length: 0.6 }) // the demand: eight risers at speed onto a 4 m top
+  .stair({ count: 10, height: 0.12, length: 0.8 }) // the demand: ten risers at speed onto a 4 m top
   .box({ width: 4, height: 1.2 })
   .stair({ count: 8, height: 0.15, length: 0.5, direction: 'down' }) // 16.7 deg down: brake, release before the lip
-  .flat(6)
+  .flat(6) // the checkpoint rule wants 15 m of flat-or-descending before the pit (the demand grows 3.2 m; the earlier flights absorb theirs)
   .gap({ width: 1.5 }) // round 8: 1.5 m onto a landing ramp (was 2 m onto flat: the rear wheel caught the far lip below 10 m/s)
   .gapLanding(0.4, 4, 4, 6)
   .camera({ mode: 'side' })

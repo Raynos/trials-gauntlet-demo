@@ -33,6 +33,18 @@ tunnel, H3's second tunnel row and re-sequencing, X1's summit cap probe, H2's ap
 `checkpointSpacing`), and every `[wave 2 probe]` except the ones §0 now answers (the 40 deg roll-off + 7 deg
 descent at 6 / 10 / 13 m/s is measured as the drop table: neutral rides, a held +0.5 does not).
 
+## Round 9 status — the storyboards are the courses (with the v2 amendments the reflex and the bot forced)
+
+Built (`tracks.md` §2 round-9 table): H1 beats 1-8 (roof climbs, the wire, the roll-off into the scaffold tunnel; the wire tightens 2.5 -> 2.0 and
+the demand wall has an 8 m top), H2 beats 1-9 (the tunnel under the stacks, chain B stepping up, the stack climb, the crane jump, the stands; the
+kicker is 6 x 1.5 over 5 m of water — §0 sizing — and chain C ends on a landing incline, not the see-saw), H3 beats 1-9 (the pour pair in the 60 m
+foundry tunnel, the demand stop without the hop-gap), X1 beats 1-8 with **three 45 deg faces instead of four 45-60 deg ones** (on v2 nothing but the
+skill-3 bot's hop move tops 50 deg, and each face's exit costs the reflex ~5 attempts — four summed past the band), the caps as a taught -> rising ->
+summit-ridge row at box height rather than 1.7 m hops from a standing start (0/9), the ice cave and a 56 m glissade (the 800 m cap), X2 beats 1-9 with
+a three-top pipe run (five tops walled every seed) and the melt pit, X3 with the grounded cascade entry and the summit stack (the 60 deg plank is
+gone with X1's). Every `[wave 2 probe]` is answered in `tracks.md` §0 (round 9 rows). Not built: the `[Pro?]` re-probe (every number is Rookie) and
+the m1-m3 gantries (§8).
+
 ## 0. Conventions and constraints used below
 
 - Intended bike: **Pro** (no wheelie assist, real CdA, sharper throttle — MEGA_PLAN P1). Every

@@ -49,11 +49,11 @@
     "finishX": 616.1
   },
   "e3-stairway": {
-    "hash": "01b82b5323235fe8",
+    "hash": "c0451ab68206f608",
     "colliders": 32,
     "hazards": 1,
     "obstacles": 24,
-    "finishX": 540.5
+    "finishX": 543.7
   },
   "m1-hop-up": {
     "hash": "2aa21256a0b430e2",
@@ -77,46 +77,46 @@
     "finishX": 504.1
   },
   "h1-wheelie-wire": {
-    "hash": "026e77e290f43739",
+    "hash": "f443f76227be344a",
     "colliders": 20,
-    "hazards": 36,
-    "obstacles": 50,
-    "finishX": 598.4
+    "hazards": 30,
+    "obstacles": 46,
+    "finishX": 622.3
   },
   "h2-gap-chain": {
-    "hash": "63de706b9d5f461b",
-    "colliders": 81,
-    "hazards": 19,
-    "obstacles": 79,
-    "finishX": 634.3
+    "hash": "6f7110fcbf6e4b15",
+    "colliders": 64,
+    "hazards": 14,
+    "obstacles": 63,
+    "finishX": 636.8
   },
   "h3-fire-line": {
-    "hash": "005ab32a0296f395",
-    "colliders": 62,
-    "hazards": 22,
-    "obstacles": 31,
-    "finishX": 552.4
+    "hash": "b3304725886fc03f",
+    "colliders": 63,
+    "hazards": 26,
+    "obstacles": 30,
+    "finishX": 615.2
   },
   "x1-vertical-limit": {
-    "hash": "5d4a7df730465670",
-    "colliders": 58,
+    "hash": "cd1451008b6850dd",
+    "colliders": 62,
     "hazards": 3,
-    "obstacles": 41,
-    "finishX": 745.116478
+    "obstacles": 44,
+    "finishX": 744.172729
   },
   "x2-pipe-dream": {
-    "hash": "decf927eb393038b",
-    "colliders": 58,
-    "hazards": 8,
-    "obstacles": 46,
-    "finishX": 515.7
+    "hash": "5895dbb70a461f9d",
+    "colliders": 62,
+    "hazards": 5,
+    "obstacles": 47,
+    "finishX": 563.6
   },
   "x3-gauntlet": {
-    "hash": "50d6dccc249b40ef",
-    "colliders": 66,
-    "hazards": 18,
-    "obstacles": 54,
-    "finishX": 508.371912
+    "hash": "dcb0df6b032a98af",
+    "colliders": 67,
+    "hazards": 17,
+    "obstacles": 56,
+    "finishX": 569.048486
   },
   "lab-physics-test": {
     "hash": "f99707f44193c58b",

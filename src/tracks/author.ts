@@ -1021,9 +1021,10 @@ export class CourseBuilder {
    * short jump meets an 11 deg incline instead of the box face (H2's box edges were 50 + 36 deaths
    * for the good reflex player; with lips and 8 m platforms chain A clears in 1-14).
    */
-  platform(width: number, height: number, kicker: { length?: number; height?: number; landing?: number; landingLength?: number } = {}): this {
+  platform(width: number, height: number, kicker: { length?: number; height?: number; landing?: number; landingLength?: number; curve?: number } = {}): this {
     const kl = kicker.length ?? 1.5;
     const kh = kicker.height ?? 0.4;
+    const curve = kicker.curve ?? 0.3; // round 9: H2 / X3 chains pass `curve: 0, length: 2` — the curve-0.3 1.5 x 0.4 lip is a 15 deg+ concave launch that loops the gas-through-the-lip rider (reflex `good` chain B 6/9 -> 8/9, median 6 -> 1 with straight 2 x 0.4 kickers)
     const lip = kicker.landing ?? 0;
     if (lip > 0) {
       const ll = kicker.landingLength ?? 2;
@@ -1032,7 +1033,7 @@ export class CourseBuilder {
     } else {
       this.box({ width: width - kl, height });
     }
-    return this.ramp({ length: kl, height: kh, curve: 0.3 }, { base: height });
+    return this.ramp({ length: kl, height: kh, curve }, { base: height });
   }
 
   /**

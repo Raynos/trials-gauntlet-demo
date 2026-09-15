@@ -124,6 +124,6 @@ export const PUBLIC_BYTES = {
   "art:wordmark-plate": 74066,
   "models/bike-lod.glb": 431068,
   "models/bike.glb": 1180724,
-  "models/rider-lod.glb": 493436,
-  "models/rider.glb": 861612,
+  "models/rider-lod.glb": 464152,
+  "models/rider.glb": 865088,
 } as const;
