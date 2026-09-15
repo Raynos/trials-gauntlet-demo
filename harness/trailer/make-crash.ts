@@ -24,8 +24,10 @@ async function main(): Promise<void> {
   const holdS = flagNum(flags, 'hold', 1.6);
   const hz = golden.header.physicsHz;
   const base = expandFrames(golden);
-  const sim = await createSim(trackId, golden.header.seed, hz);
-  const rec = new InputRecorder({ version: 1, trackId, seed: golden.header.seed, physicsHz: hz, note: `trailer crash src=${srcFingerprint()}` });
+  // The golden's bike class and solver (v0.2.0: the hard/extreme goldens are Pro on physics v2).
+  const bike = golden.header.bike;
+  const sim = await createSim(trackId, golden.header.seed, hz, { bike });
+  const rec = new InputRecorder({ version: 1, trackId, seed: golden.header.seed, physicsHz: hz, ...(bike ? { bike } : {}), ...(golden.header.physics ? { physics: golden.header.physics } : {}), note: `trailer crash bike=${bike ?? 'rookie'} src=${srcFingerprint()}` });
   const frames: InputFrame[] = [];
   const push = (f: InputFrame): void => {
     frames.push(f);
@@ -34,10 +36,11 @@ async function main(): Promise<void> {
   };
   let i = 0;
   for (; i < Math.round(until * hz) && i < base.length; i++) push(base[i]!);
-  // Loop out.
+  // Loop out (or, mid-air, over-rotate: `--lean` -1 = back, 1 = forward).
+  const lean = flagNum(flags, 'lean', -1);
   let crashTick = -1;
   for (let k = 0; k < 6 * hz; k++) {
-    push({ throttle: 1, brake: 0, lean: -1 });
+    push({ throttle: 1, brake: 0, lean });
     if (sim.state().faulted) {
       crashTick = frames.length;
       break;

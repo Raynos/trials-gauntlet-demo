@@ -11,7 +11,7 @@ Public copies: **https://trials-gauntlet-media.vercel.app/** (this folder deploy
 | version | pin | files |
 |---|---|---|
 | **v0.1.0** | `94ecb43`, 2026-09-14 | `trailer.mp4` (53 s, 1280×720, the web encode of cut `a1dd083`), `trailer-15s.mp4` (the 15 s cut), `trailer-sheet.jpg` (contact sheet), `trailer.cutlist.json` (beats → source recordings), `timelapse.mp4` (54 s build montage through `f837365`) |
-| **v0.2.0** | pending | `trailer.mp4`, `trailer-15s.mp4`, `trailer-sheet.jpg`, `trailer.cutlist.json` from the v0.2.0 cut (`harness/trailer/beats-v2.json`, 13 beats); `timelapse.mp4` = the wave-4 montage |
+| **v0.2.0** | pin pending (trailer cut on `9979b1b`, 2026-09-15) | `trailer.mp4`, `trailer-15s.mp4`, `trailer-sheet.jpg`, `trailer.cutlist.json` from the v0.2.0 cut (`harness/trailer/beats-v2.json`, 13 beats); `timelapse.mp4` = the wave-4 montage |
 
 Per version, the convention: `trailer.mp4` (full cut, web encode ≤ 30 MB), `trailer-15s.mp4`, `trailer-sheet.jpg`,
 `trailer.cutlist.json`, `timelapse.mp4` (the build montage up to the pin), optional `notes.md`.

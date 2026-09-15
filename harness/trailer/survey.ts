@@ -18,13 +18,15 @@ async function main(): Promise<void> {
   const out: Record<string, unknown> = {};
   for (const id of ids) {
     const dir = path.join(HARNESS_DIR, 'inputs', id);
-    const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^bot-[0-3]\.json$/.test(f)).sort().reverse() : [];
+    // Hard/extreme tracks: the Pro golden rides the storyboard set pieces (physics v2); else the rookie golden.
+    const pro = /^[hx]\d-/.test(id) && fs.existsSync(path.join(dir, 'bot-3-pro.json'));
+    const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => (pro ? /^bot-3-pro\.json$/ : /^bot-[0-3]\.json$/).test(f)).sort().reverse() : [];
     const def = getTrack(id);
     console.log(`\n== ${id} biome=${def?.meta?.biome} finishX=${def ? 'n/a' : ''} recordings=${files.join(',')} src=${srcFingerprint()}`);
     for (const f of files) {
       const file = path.join(dir, f);
       const rec = loadRecording(file);
-      const sim = await createSim(id, rec.header.seed, rec.header.physicsHz);
+      const sim = await createSim(id, rec.header.seed, rec.header.physicsHz, { bike: rec.header.bike });
       const frames = expandFrames(rec);
       const hz = rec.header.physicsHz;
       const lines: string[] = [];
@@ -49,7 +51,7 @@ async function main(): Promise<void> {
         }
       }
       const st = sim.state();
-      console.log(` -- ${f} ticks=${frames.length} (${(frames.length / hz).toFixed(1)}s) finished=${st.finishTime !== null} faults=${sim.faults()} stamp=${recordingFingerprint(file)} ${recordingFingerprint(file) === srcFingerprint() ? 'CURRENT' : 'stale'}`);
+      console.log(` -- ${f} bike=${rec.header.bike ?? 'rookie'} ticks=${frames.length} (${(frames.length / hz).toFixed(1)}s) finished=${st.finishTime !== null} faults=${sim.faults()} stamp=${recordingFingerprint(file)} ${recordingFingerprint(file) === srcFingerprint() ? 'CURRENT' : 'stale'}`);
       for (const l of lines) console.log(l);
       out[`${id}/${f}`] = lines;
       break; // best-skill file only

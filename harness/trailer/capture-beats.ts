@@ -9,6 +9,10 @@
  * beats.json: [{ id, recording, startTick, endTick, countdown?: boolean, hud?: boolean }]
  *   countdown: open the page with ?countdown=1 so the 3-2-1-GO plays before the recording (adds 3 s of ticks).
  *   hud: page.screenshot (DOM HUD included) instead of canvas grab (default true).
+ *   fps: per-beat override of --fps (60 for a slow-mo source).
+ *   phone: capture in an iPhone-geometry mobile context (coarse pointer -> the touch layer draws) at phoneWidth x
+ *          phoneHeight CSS px (default 932x430) with deviceScaleFactor 2, so the G touch controls are in frame.
+ *   The bike class comes from the recording header (`bike: 'pro'` for the hard/extreme Pro goldens, v0.2.0).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -29,6 +33,10 @@ interface Beat {
   countdown?: boolean;
   hud?: boolean;
   quality?: 'low' | 'medium' | 'high';
+  fps?: number;
+  phone?: boolean;
+  phoneWidth?: number;
+  phoneHeight?: number;
 }
 
 async function main(): Promise<void> {
@@ -37,7 +45,7 @@ async function main(): Promise<void> {
   if (!listFile) throw new Error('usage: capture-beats.ts beats.json');
   const beats = JSON.parse(fs.readFileSync(listFile, 'utf8')) as Beat[];
   const only = typeof flags['only'] === 'string' ? new Set(flags['only'].split(',')) : null;
-  const fps = flagNum(flags, 'fps', 60);
+  const defaultFps = flagNum(flags, 'fps', 60);
   const width = flagNum(flags, 'width', 1280);
   const height = flagNum(flags, 'height', 720);
   const outRoot = path.resolve(flagStr(flags, 'out', 'harness/out/trailer/beats'));
@@ -46,11 +54,22 @@ async function main(): Promise<void> {
   const server = await startServer({ dev: false });
   const launched = await launchBrowser({ width, height });
   const pages = new Map<string, { hook: HookClient; page: typeof launched.page }>();
-  const pageFor = async (countdown: boolean) => {
-    const key = countdown ? 'cd' : 'plain';
+  const pageFor = async (countdown: boolean, phone?: Beat) => {
+    const key = phone ? 'phone' : countdown ? 'cd' : 'plain';
     let p = pages.get(key);
     if (!p) {
-      const page = key === 'plain' ? launched.page : await launched.context.newPage();
+      let page = launched.page;
+      if (key === 'cd') page = await launched.context.newPage();
+      if (key === 'phone') {
+        const ctx = await launched.browser.newContext({
+          viewport: { width: phone!.phoneWidth ?? 932, height: phone!.phoneHeight ?? 430 },
+          deviceScaleFactor: 2,
+          isMobile: true,
+          hasTouch: true,
+          userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+        });
+        page = await ctx.newPage();
+      }
       await openGame(page, server.url, { query: countdown ? { countdown: '1' } : {} });
       p = { hook: new HookClient(page), page };
       pages.set(key, p);
@@ -63,11 +82,13 @@ async function main(): Promise<void> {
       const t0 = performance.now();
       const rec = loadRecording(beat.recording);
       const hz = rec.header.physicsHz;
+      const fps = beat.fps ?? defaultFps;
       const tpf = hz / fps;
       const frames = expandFrames(rec);
-      const { hook, page } = await pageFor(beat.countdown ?? false);
+      const { hook, page } = await pageFor(beat.countdown ?? false, beat.phone ? beat : undefined);
+      await hook.setBike(rec.header.bike ?? 'rookie');
       if (!(await hook.loadTrack(rec.header.trackId, rec.header.seed))) throw new Error(`unknown track ${rec.header.trackId}`);
-      await hook.resize(width, height);
+      if (!beat.phone) await hook.resize(width, height);
       await hook.setQuality(beat.quality ?? 'high');
       // Countdown pages: the first 3 s of ticks are the countdown (input ignored) — prepend neutral frames.
       const preroll = beat.countdown ? 3 * hz : 0;

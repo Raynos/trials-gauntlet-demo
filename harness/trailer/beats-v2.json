@@ -1,0 +1,15 @@
+[
+  {"id": "cold", "recording": "harness/out/trailer/recordings-v0.2.0/b1-first-ride.json", "startTick": 120, "endTick": 700, "countdown": true},
+  {"id": "hop", "recording": "harness/out/trailer/recordings-v0.2.0/m1-hop-up.json", "startTick": 1064, "endTick": 1260},
+  {"id": "landing", "recording": "harness/out/trailer/recordings-v0.2.0/e2-rear-wheel-first.json", "startTick": 1596, "endTick": 1876},
+  {"id": "wheelie", "recording": "harness/out/trailer/recordings-v0.2.0/h1-wheelie-wire.json", "startTick": 4816, "endTick": 5240},
+  {"id": "drop", "recording": "harness/out/trailer/recordings-v0.2.0/h1-wheelie-wire.json", "startTick": 5556, "endTick": 5920},
+  {"id": "apron", "recording": "harness/out/trailer/recordings-v0.2.0/h2-gap-chain.json", "startTick": 3348, "endTick": 3660},
+  {"id": "pour", "recording": "harness/out/trailer/recordings-v0.2.0/h3-fire-line.json", "startTick": 4500, "endTick": 4960},
+  {"id": "face", "recording": "harness/out/trailer/recordings-v0.2.0/x1-vertical-limit.json", "startTick": 500, "endTick": 940},
+  {"id": "stack", "recording": "harness/out/trailer/recordings-v0.2.0/x3-gauntlet.json", "startTick": 5330, "endTick": 5720},
+  {"id": "crash", "recording": "harness/out/trailer/recordings-v0.2.0/x1-vertical-limit-crash.json", "startTick": 5064, "endTick": 5680},
+  {"id": "canyon", "recording": "harness/out/trailer/recordings-v0.2.0/e2-rear-wheel-first.json", "startTick": 4240, "endTick": 4620},
+  {"id": "finish", "recording": "harness/out/trailer/recordings-v0.2.0/h1-wheelie-wire.json", "startTick": 6140, "endTick": 6620},
+  {"id": "phone", "recording": "harness/out/trailer/recordings-v0.2.0/h2-gap-chain.json", "startTick": 3348, "endTick": 3560, "phone": true}
+]
