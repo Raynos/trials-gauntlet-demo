@@ -247,6 +247,14 @@ export class GltfRider {
   }
 
   update(f: RenderFrame): void {
+    // Every bone-local position back to the bind pose before the frame is posed. `additive()` adds the
+    // clips' position deltas onto `b.position`; the rotations are re-posed absolutely by `poseFromChain`
+    // every frame, the positions never were — so `idle_breathe`'s chest / shoulder rise (a loop with a
+    // non-zero mean) accumulated once per RENDERED frame: 12 mm of shoulder drift over a 20 s start-line
+    // idle at 60 fps, 2.6 m after the phone's three-minute `?bench=1`, the IK then out of reach and
+    // pointing both arms at grips it could not touch (the "arm sticking out sideways" on iOS, WebKit and
+    // Chromium alike). Per rendered frame, so the harness's one render per 10 ticks never showed it.
+    this.restorePositions();
     if (f.cut) {
       this.landT = -1;
       this.pushT = -1;
@@ -339,6 +347,14 @@ export class GltfRider {
       else this.pushT = -1;
     }
     if (rest > 0.01 || this.landT >= 0 || this.pushT >= 0) this.resolveArms(c);
+  }
+
+  /** Bind-pose bone-local positions (the pelvis is re-set by the pose right after; the rest must not move). */
+  private restorePositions(): void {
+    for (const [name, p] of this.restLocalP) {
+      const b = this.bones.get(name);
+      if (b) b.position.copy(p);
+    }
   }
 
   /** World (file-space) rotation for a bone → local, in hierarchy order. */

@@ -33,6 +33,7 @@
     "harness:bench:profile": "tsx harness/bench/profile.ts",
     "harness:critic-prompt": "tsx harness/compare/critic-prompt.ts",
     "harness:audio": "tsx harness/compare/audio.ts",
+    "harness:hero-webkit": "tsx harness/hero-webkit.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
