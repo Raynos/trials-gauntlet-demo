@@ -1311,6 +1311,23 @@ working-tree physics; the round's clips use windows before those ticks (the b1 o
 
 ## 12. Known gaps after round 11 (what still reads non-AAA)
 
+### Blender branch round 6 — restored motion and knee diagnosis, 2026-09-15
+
+Parent played high Street and low Race hops through an explicit context loss at
+input 370. Both resume with coherent assets, lighting and motion, GL0 and 190
+unique simulation frames. Restoration wall time is omitted from those fixed-rate
+clips; they do not measure interruption length or actual iOS presentation.
+Repeated-generation, real loading interruption and disposal-while-lost controls
+now pass. Normal asynchronous program retirement retains its prior stress gates.
+
+The connected Street trouser candidate has smoother knee folds through native
+landing and seated animation, but still reads as smooth tubes around the waist
+and legs. It is not promoted: 801 sampled gameplay poses self-intersect, and fresh
+production/GLB/Blender checks trace extreme cases to the shared inward knee pole.
+Round 7 must repair the shared body geometry and mass map before garment approval.
+The existing helmet/material/detail and reference-comparison gaps remain.
+See [Round 6 evidence](../evidence/blender-r6.json).
+
 ### Blender branch round 5 — played hero review, 2026-09-15
 
 The compact Street hood now folds below the helmet and keeps a coherent back

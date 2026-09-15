@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ThreeRenderer } from './index';
 import { ResourceRetirement } from './resourceRetirement';
+import { releaseSceneAllocations } from './contextResources';
 
 afterEach(() => vi.useRealTimers());
 
@@ -138,6 +139,28 @@ describe('isolated shader compilation', () => {
     f.calls[1]!.resolve();
     await vi.runAllTimersAsync();
     await next;
+  });
+
+  it('recovers a failed compile across loss without starting work against the lost generation', async () => {
+    const scene = new THREE.Scene(), material = new THREE.MeshBasicMaterial();
+    scene.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
+    const f = fixture(scene);
+    const failed = f.compiler.compileMaterials([material]);
+    const rejected = expect(failed).rejects.toThrow('driver failure');
+    await Promise.resolve();
+    Object.assign(f.renderer, { contextUnavailable: true, sceneEpoch: 1 });
+    releaseSceneAllocations([scene]);
+    f.calls[0]!.reject(new Error('driver failure'));
+    await rejected;
+    await f.compiler.compileMaterials([material]);
+    expect(f.calls).toHaveLength(1);
+    Object.assign(f.renderer, { contextUnavailable: false });
+    const restored = f.compiler.compileMaterials([material]);
+    await Promise.resolve();
+    expect(f.calls).toHaveLength(2);
+    f.calls[1]!.resolve();
+    await vi.runAllTimersAsync();
+    await restored;
   });
 
   it('detaches and invalidates queued source batches before snapshotting retirement, even if compilation rejects', async () => {

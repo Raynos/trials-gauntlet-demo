@@ -1,3 +1,4 @@
+import { releaseSceneAllocations } from './contextResources';
 /**
  * Render contract + ThreeRenderer facade (CONTRACT.md §2.7).
  *
@@ -144,15 +145,40 @@ export class ThreeRenderer implements GameRenderer {
   private terminalPrograms = { deleted: 0, contextReleased: 0 };
   /** Invalidates queued compile batches before detached owners can be retired. */
   private sceneEpoch = 0;
+  private contextUnavailable = false;
+  private restored: Promise<void> = Promise.resolve();
+  private resolveRestored: (() => void) | null = null;
   private readonly onContextLost = (): void => {
+    this.contextUnavailable = true;
+    this.restored = new Promise(resolve => { this.resolveRestored = resolve; });
     this.sceneEpoch++;
     this.entryToken++;
     this.entering = false;
     this.retirement.contextLost();
+    // Three's loss listener ran first, but initGLContext runs only on restoration.
+    // Release every surviving owner now, including inactive full/LOD document resources.
+    releaseSceneAllocations([this.scene, ...Object.values(this.gltf).flatMap(doc => doc ? [doc.scene] : [])]);
+    this.lib.dispose();
+    this.art.releaseGPU();
+    this.postRef?.dispose();
+    this.postRef = null;
+    this.lightingRig?.dispose();
+    this.lightingRig = null;
+    this.lightingApplied = false;
+    this.scene.environment = null;
+    this.scene.background = null;
   };
   private readonly onContextRestored = (): void => {
+    this.contextUnavailable = false;
     this.retirement.contextRestored();
-    if (!this.disposed && this.track) this.beginEntry();
+    if (!this.disposed) {
+      this.ensureLighting();
+      if (this.track) this.lighting.setFloor(groundFloorY(this.track.def.profile, this.biome.interior));
+      if (this.artBackground) this.scene.background = this.artBackground;
+      if (this.track) this.beginEntry();
+    }
+    this.resolveRestored?.();
+    this.resolveRestored = null;
   };
   private readonly scene = new THREE.Scene();
   private readonly lib: MaterialLibrary;
@@ -296,7 +322,7 @@ export class ThreeRenderer implements GameRenderer {
 
   /** Sky + PMREM for the current biome (GPU work; once per biome change). */
   private ensureLighting(): void {
-    if (this.lightingApplied) return;
+    if (this.contextUnavailable || this.lightingApplied) return;
     this.lightingApplied = true;
     this.lighting.apply(this.biome);
   }
@@ -535,10 +561,12 @@ export class ThreeRenderer implements GameRenderer {
    */
   whenReady(): Promise<void> {
     if (this.disposal) return this.disposal;
+    if (this.contextUnavailable) return this.restored.then(() => this.whenReady());
     const req = this.artRequest;
     const entry = this.entryPending;
     return Promise.all([this.art.whenSettled, req, this.heroPending, entry, this.retirement.whenIdle()]).then(() => {
       if (this.disposal) return this.disposal;
+      if (this.contextUnavailable) return this.whenReady();
       if (this.artRequest !== req || this.entryPending !== entry) return this.whenReady();
       // Round 10: the settle callback only rebuilds an undrawn world; do the same here so a
       // caller that awaits `whenReady()` right after `setTrack` gets the art-complete world
@@ -596,6 +624,7 @@ export class ThreeRenderer implements GameRenderer {
     };
     const work = async (): Promise<void> => {
       const activeStep = (key: PrepareStep, task: (progress: StepProgress) => Promise<void>): Promise<void> => run(key, async (progress) => {
+        await this.restored;
         if (!this.disposed) await task(progress);
       });
       // The boot art set: started by the constructor (with the plan's reader) or here; awaited by the `bootArt` step.
@@ -669,6 +698,8 @@ export class ThreeRenderer implements GameRenderer {
         this.post.renderSceneOnly();
         await yieldFrame();
         if (this.disposed) return;
+        await this.restored;
+        if (this.disposed) return;
         mark('firstframe:world');
         p.set(1, 2, 'post chain');
         this.post.render();
@@ -706,7 +737,7 @@ export class ThreeRenderer implements GameRenderer {
    */
   private compileMaterials(mats: THREE.Material[], report?: (done: number, total: number) => void, abort?: () => boolean): Promise<number> {
     const epoch = this.sceneEpoch;
-    const stale = (): boolean => this.disposed || epoch !== this.sceneEpoch || !!abort?.();
+    const stale = (): boolean => this.disposed || this.contextUnavailable || epoch !== this.sceneEpoch || !!abort?.();
     const run = async (): Promise<number> => {
       let ms = 0;
       const chunk = 2;
@@ -778,7 +809,7 @@ export class ThreeRenderer implements GameRenderer {
    * resolves after it; `render()` paints the placeholder until then (play mode).
    */
   private beginEntry(): void {
-    if (this.disposed) return;
+    if (this.disposed || this.contextUnavailable) return;
     const token = ++this.entryToken;
     const t0 = performance.now();
     const st = this.entryStats;
@@ -872,8 +903,8 @@ export class ThreeRenderer implements GameRenderer {
     const biome = biomeFor(track.def.meta?.biome);
     if (biome !== this.biome || !this.lightingApplied) {
       this.biome = biome;
-      this.lightingApplied = true;
-      this.lighting.apply(biome);
+      this.lightingApplied = false;
+      this.ensureLighting();
     }
     // Per-track art (round 9): request what this biome draws beyond the boot set (other
     // plates + skies, wall decals, the night crowd). `whenReady()` waits for it; if it lands
@@ -1132,7 +1163,7 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   render(state: PhysicsState, alpha: number): number {
-    if (this.disposed) return 0;
+    if (this.disposed || this.contextUnavailable) return 0;
     const t0 = performance.now();
     if (!this.booted) {
       if (this.lazyBoot) {
@@ -1465,6 +1496,8 @@ export class ThreeRenderer implements GameRenderer {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.resolveRestored?.();
+    this.resolveRestored = null;
     this.entryToken++;
     this.sceneEpoch++;
     const art = this.art;

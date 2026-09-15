@@ -310,8 +310,13 @@ export class ArtLibrary {
     return t;
   }
 
+  /** Invalidate GPU listeners on context loss without closing reusable decoded images. */
+  releaseGPU(): void {
+    for (const t of this.textures.values()) { t.dispose(); t.needsUpdate = true; }
+  }
+
   dispose(): void {
-    for (const t of this.textures.values()) t.dispose();
+    this.releaseGPU();
     this.textures.clear();
     for (const b of this.bitmaps.values()) b.close?.();
     this.bitmaps.clear();

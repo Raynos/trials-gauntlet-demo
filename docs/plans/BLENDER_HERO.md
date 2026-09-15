@@ -3,14 +3,17 @@
 Owner: Codex Blender session. Branch: `blender-work`, in the explicitly authorized
 `trials-gauntlet-blender` worktree. Baseline: `56e3883` (2026-09-15).
 
-Status: **active WIP, Round 5 checkpoint**. Coupled anatomy closes at the existing
-bar; all 340,983 corpus ticks repeat exactly. Fresh bot/stranger inputs match
-Node/Chromium/WebKit over 72,525 ticks. Compact hood and articulated cables are
-promoted after playback. All eight bots clear; B3 stranger median is 1, while M1
-median 10.5 exceeds the intended 5–9 band. Typecheck/lint/build pass; tests are
-**17 failed, 707 passed, 11 todo**. Cloth/helmet/material quality, physics behavior
-and cost, context restoration, and actual iOS remain open. Round 6 ship gate is
-due. See [handoff](../BLENDER_HANDOFF.md) and [evidence](../evidence/blender-r5.json).
+Status: **active WIP, Round 6 checkpoint**. Context recovery passes repeated Metal
+loss, production loading interruption and disposal while lost; normal retirement
+remains green. Final Metal/WebKit ship gates each match all 4,767 B1 ticks, clear,
+crash and resume movement one tick after restart. Parent played high Street/low
+Race restored motion. Connected trousers remain unpromoted: shared knee IK crosses
+the legs in measured poses. Exact production/GLB witnesses lead Round 7. Physics
+and assets remain at Round 5, with its 340,983 exact corpus ticks and 72,525 fresh
+cross-engine ticks. B3 stranger median 1; M1 median 10.5 outside 5–9. Typecheck,
+lint and build pass; tests **17 failed, 711 passed, 11 todo**. Knee/cloth/helmet
+quality, physics behavior/cost and actual iOS remain open. See
+[handoff](../BLENDER_HANDOFF.md) and [evidence](../evidence/blender-r6.json).
 No merge or deployment. Track this plan in `PLANS.md` at every commit.
 
 ## Mandate and boundaries

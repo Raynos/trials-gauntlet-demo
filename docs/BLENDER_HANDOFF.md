@@ -1,7 +1,7 @@
 # Blender hero handoff — active WIP
 
-**2026-09-15. Round 5 is a verified WIP checkpoint; use the latest commit for its
-identity. Round 4 is `e3eef69`. Remaining failures are preserved below. This branch is not ready
+**2026-09-15. Round 6 is a verified WIP checkpoint; use the latest commit for its
+identity. Round 5 is `8985e7f`. Remaining failures are preserved below. This branch is not ready
 to merge or deploy. The hero/physics mission is unfinished.**
 
 Continue in `/Users/raynos/projects/game-demos/trials-gauntlet-blender`, branch
@@ -16,7 +16,7 @@ for this checkpoint. The 12-hour follow-up automation is paused.
 - **Usage stop, 2026-09-15:** continue building until Codex weekly usage reaches
   **30% remaining**, then preserve a committed handoff and pause work without
   declaring the full mission complete. Check `openusage codex` periodically;
-  latest CLI reading at 18:52:39 UTC was **73% remaining**. The user selected
+  latest CLI reading at 19:31:34 UTC was **70% remaining**. The user selected
   **medium** reasoning and requested medium for teammates; explicitly use medium
   for newly spawned agents. Existing running agents have no in-place effort control.
 
@@ -39,7 +39,54 @@ Read [the plan](plans/BLENDER_HERO.md), [plan status](plans/PLANS.md),
 backward on Rear Wheel First, 1:18.433 and four faults. It is a symptom to
 reproduce; this checkpoint does **not** prove that specific finish bug fixed.
 
-## Round 5 — verified checkpoint
+## Round 6 — context recovery and ship gate
+
+See [the durable manifest](evidence/blender-r6.json). The final integrated build
+is `harness/out/blender/r6-dist`; context stress and played captures use the
+separately frozen `r6-context-final-dist`. Their compiled application source
+contents and assets match exactly; build metadata differs. No physics, protected
+Blender source, public model, track, dependency, golden or tolerance changed.
+
+- Lost-context disposal now runs while the original Three allocation managers
+  still own their listeners. CPU geometry and images remain available for
+  reupload; generated lighting and post targets rebuild after restoration.
+  The R5 negative control has 101 stale deletes and GL1282. Three final Metal
+  runs each survive two loss/restore generations with zero stale deletes or GL
+  errors and 28/28 owners reclaimed. Production `prepare()` interrupted between
+  its first scene and post draws recovers; disposal while lost releases its
+  readiness waiters. Normal retirement still passes Metal 3/3 and SwiftShader
+  3/3. Desktop WebKit and SwiftShader warm restoration pass; actual iOS is open.
+- Baseline and final cold-boot/clear/crash/restart gates pass in Metal and desktop
+  WebKit. Each replays all 4,767 B1 ticks against Node's physics bytes and complete
+  serialized Game counters, clears in 39.725 s with zero faults, crashes at probe
+  tick 105, restarts in one tick and moves on the next tick. Final restart commands
+  take 0.195/0.180 ms; first-render CPU submissions take 4.01/4.72 ms. These are
+  headless measurements, not actual iOS or GPU presentation latency.
+- Parent played high Street and low Race hop recovery, inputs (180,560] at 60 fps.
+  Each original has 190 unique frames. Context loss is between input 370 and 372;
+  simulation pauses while restoration completes, so that wall-time gap is absent
+  from the simulation-time clip. Models, lighting and motion remain coherent.
+  Four-copy review loops are explicitly repeated footage.
+- A connected Street trouser candidate clears all 321 authored frames but fails
+  801/4,356 recorded poses. It is **not exported or promoted**. Independent current
+  replay proves the shared knee IK turns inward: M1 tick 3319 reverses knee sides;
+  E2 tick 4284 leaves only 4.93 mm between centers. Actual GLB and independent
+  Blender reconstruction agree within 0.499 micrometres. The pole is not singular.
+  `harness/out/blender/r6-trousers/KNEE-DIAGNOSIS.md` contains exact witnesses and a
+  shared sagittal bend-basis proposal; its COM and anatomical limits must agree.
+- All 17 prior physics assertions remain red: full check is **17 failed, 711
+  passed, 11 todo**. TypeScript, lint and separate build pass. Twenty focused
+  lifecycle/loading tests pass. Physics diagnosis classifies each failure in
+  `harness/out/rig-physics/round6/REPORT.md`; no assertion was waived. Forward-lean
+  braking has an isolated external-torque interaction, but its M1 causality is
+  unproven and no braking change shipped.
+
+Round 7 priority: repair shared knee construction/COM/limits together, then re-run
+raw replay, constraints, actual full/LOD models, trouser audits and clearability.
+The Round 5 stranger measurements still apply to unchanged physics: B3 median 1;
+M1 median 10.5 remains outside 5–9. Keep all remaining quality/cost/device gaps open.
+
+## Round 5 — verified checkpoint (historical)
 
 See [the durable manifest](evidence/blender-r5.json). The final build is
 `harness/out/blender/r5-dist`. No push, merge or deployment.
@@ -458,17 +505,16 @@ content-addressed build outputs. Keep the one-byte inline budget margin in mind.
 
 ## Continue in this order
 
-1. Run Round 6's frozen-build cold-boot/clear/crash/instant-restart gate. Keep
-   actual iOS distinct from desktop WebKit; no iPhone is connected here.
-2. Reconstruct remaining garment/helmet forms and cloth material detail from the
-   promoted sources. Rejected connected trousers pinch at saddle and knees;
-   change the construction/weighting approach and judge played motion.
+1. Repair the shared knee bend basis and consistent COM/limit derivatives from
+   the exact Round 6 witnesses. Do not offset rendered knees independently.
+2. Re-audit the connected trouser candidate on the corrected recorded poses,
+   then judge native/game motion before promotion. Continue waist/helmet forms
+   and cloth/material detail from protected sources.
 3. Repair remaining physics behavior/cost from explicit witnesses. M1 strangers
    exceed the target band; separate controller/visibility difficulties from
    solver faults. Tracks and broad world edits remain trunk scope.
-4. Fix inherited context-generation disposal listeners using preserved baseline
-   and final traces in `r5-retirement/REPORT.md`. Keep normal pending-program
-   retirement, asynchronous compilation and errors visible.
+4. Preserve Round 6's context-generation and normal pending-program retirement
+   regressions. Actual iOS remains a separate gate; no iPhone is connected here.
 5. After physics changes, repeat relevant raw bytes, actual model checks and
    fresh clearability on frozen sources. After art changes, rebuild the catalog
    and verify consumed full/LOD bytes. Parent updates evidence/plans and makes
