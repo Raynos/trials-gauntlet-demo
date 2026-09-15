@@ -229,7 +229,7 @@
         var bg = {}, byTail = {};
         function watchBackground(items) {
           var labels = { world: 'World art (renderer, background)', menu: 'Menu art (background)', models: 'Models (background)', title: 'Title art (background)' };
-          var need = { title: 1, models: 1 }; /* the title screen and the glTF hero wait for these; menu / world art hot-swap in */
+          var need = { models: 1 }; /* the glTF hero waits for these; title key art, menu and world art hot-swap in (the title shows its gradient until the plate lands) */
           items.forEach(function (i) { if (i.phase in labels) { byTail[i.path.replace(/^\.?\//, '')] = i; var g = bg[i.phase] || (bg[i.phase] = { label: labels[i.phase], done: 0, total: 0, seen: {}, need: !!need[i.phase] }); g.total += i.bytes; } });
           function take(list) { list.forEach(function (e) { var tail = e.name.replace(/^[a-z]+:\/\/[^/]+\//, '').split('?')[0]; var i = byTail[tail]; if (!i || bg[i.phase].seen[tail]) return; bg[i.phase].seen[tail] = 1; bg[i.phase].done += i.bytes; }); }
           try { take(performance.getEntriesByType('resource')); new PerformanceObserver(function (l) { take(l.getEntries()); }).observe({ type: 'resource', buffered: true }); } catch (e) {}
