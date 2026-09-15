@@ -3,6 +3,7 @@
  * committed `harness/out/metrics/`. Self-describing: `schema` + `kind`.
  * See docs/design/harness-metrics.md §8.
  */
+import type { GateDeviceRows } from '../gate/device-rows';
 import type { FaultReason } from '../../src/core/types';
 
 export interface RunMeta {
@@ -312,6 +313,8 @@ export interface GateReport extends RunMeta {
   reflex?: { srcFingerprint: string; armed: boolean; minSeeds: number; rows: GateReflexRow[] };
   /** G10 third row (round 7): the same reflex medians on the Pro bike (`<track>.pro.reflex.json`); informational, the band is authored for Rookie. */
   reflexPro?: { srcFingerprint: string; armed: boolean; minSeeds: number; rows: GateReflexRow[] };
+  /** G11 (Rider on Glass G5): the newest filed device report + WebKit hero run, summarised (`harness/gate/device-rows.ts`). */
+  device?: GateDeviceRows;
   /** G2b (round 7): Pro-bike clears by golden replay (`bot-3-pro.json`) on flat-test and b1, pinned under `<track>:pro` in expected.json. */
   clearPro?: Array<{ trackId: string; recording: string | null; finishTime: number | null; expected: number | null; hash: string | null; expectedHash: string | null; faults: number; fresh: boolean | null }>;
 }

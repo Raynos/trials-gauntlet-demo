@@ -17,7 +17,7 @@ The percentages below remain plan estimates, not audited completion of the READM
 | **The brief** | `README.md` | a 2.5D Trials-quality bike game, deterministic, 60 fps, desktop + iOS Safari | in build | — | — |
 | **Mega plan (v0.2.0)** | `docs/plans/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
 | **Physics v2** | `docs/plans/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
-| **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | two ledgers | **G (Opus) 95 · H (Astra) — on `blender-work`** | G5 gate rows; H: the branch merge + a critic round |
+| **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | two ledgers | **G (Opus) 100 — closed · H (Astra) — on `blender-work`** | H: the branch merge (`docs/tasks/blender-branch-merge.md`) + a critic round; the plan archives when H closes |
 | **Perf (60 on high, on a phone)** | `docs/plans/PERF.md` | bench + 100× plan, then a cut loop; phone-high tier + 60-cap governor | phase 2, cuts #0/#1/#5/#3/#4a landed | 70 | #4b atlas; then the ledger archives and the rest becomes `PERF-BACKLOG.md` |
 | **P0 task** | `docs/tasks/touch-navigation-invariant.md` | nothing tappable unless drawn | landed `18df821` (5184-tap grid, 0 ghosts) | 95 | the user confirms on the phone |
 
