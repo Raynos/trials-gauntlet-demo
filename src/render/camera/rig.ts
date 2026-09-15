@@ -181,7 +181,10 @@ export class CameraRig {
     const zoomT = this.zoom >= 1 ? 1 : 0;
     const fastT = this.zoom === 0 ? 0 : smoothstep(10, 18, speed);
     const airT = smoothstep(0, 0.7, f.airTime);
-    const wideT = Math.max(fastT, airWide * 0.7);
+    // Round 14: the air no longer widens the state (was `max(fastT, airWide * 0.7)`): on the b3
+    // flights the rig pulled back until the bike was 4 % of the frame; the reference barely changes
+    // distance in the air and lets the bike rise. Air handling is the aim + a ≤ 20 % pull-back below.
+    const wideT = fastT;
     const moving = Math.abs(f.velX) > 0.5 ? Math.sign(f.velX) : 1;
     const p: Params = {
       // Round 11: the pull-back floor rises 0.14 → 0.16 (a 16 m/s bot frame read the bike at
@@ -295,7 +298,10 @@ export class CameraRig {
     // Lookahead: ≤ 2.5 m and ≤ 8 % of the visible width at the target frame (round 11: in the
     // wide frame 2.5 m was 12 % of the width and pushed the bike onto the box edge).
     const lookCap = Math.min(2.5, 0.08 * (RIDER_HEIGHT / Math.max(0.03, p.heightFrac)) * this.aspect);
-    const lookTarget = f.finished ? 0 : Math.min(lookCap, Math.max(-1.5, f.velX * 0.15));
+    // Round 14: in the air the look-ahead doubles (≤ 16 % of the width) — the landing zone enters
+    // the frame by looking ahead, not by pulling back.
+    const airLook = f.airborne && !f.crashed ? smoothstep(0, 0.3, f.airTime) : 0;
+    const lookTarget = f.finished ? 0 : Math.min(lookCap * (1 + airLook), Math.max(-1.5, f.velX * (0.15 + 0.15 * airLook)));
     const fxT = followTarget.x;
     // In the air (round 5, critic: "ground leaves the frame"): aim between the bike and the
     // landing zone and pull back with height, so the ground line stays in the bottom third.
@@ -308,7 +314,9 @@ export class CameraRig {
       const gy = this.ground(f.bikeX + Math.max(0, f.velX) * 0.6);
       const above = Math.max(0, f.bikeY - 0.55 - gy);
       fyT -= 0.5 * above * airQ;
-      p.heightFrac *= Math.max(0.3, 1.9 / (1.9 + 1.1 * above * airQ));
+      // Round 14: distance grows ≤ 20 % in the air (was ≤ 3.3×); the bike climbs toward the top of
+      // the [0.2, 0.8] box and the box clamp slides the aim up after it instead of widening.
+      p.heightFrac *= Math.max(1 / 1.2, 1.9 / (1.9 + 1.1 * above * airQ));
     }
     if (cut) {
       this.fx.snap(fxT);
@@ -388,7 +396,9 @@ export class CameraRig {
       let sv = this.screenY.x - dv;
       // First widen: a bike more than 0.3 off the aim point wants a wider frame, not a slide.
       const over = Math.max(Math.abs(su - 0.5), Math.abs(sv - 0.5)) - 0.3;
-      if (over > 0) {
+      // Round 14: airborne the widen is skipped (the slide below keeps the bike on the band); on the
+      // ground it stays (a wall of obstacles ahead reads better wide than slid).
+      if (over > 0 && !(f.airborne && !f.crashed)) {
         const k = Math.min(2.5, 1 + over * 4);
         this.heightFrac.snap(Math.max(0.03, hf / k));
         halfH *= k;

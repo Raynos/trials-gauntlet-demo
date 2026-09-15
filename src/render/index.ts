@@ -11,6 +11,8 @@ import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
 import { HERO_URLS, loadGltf, lodUrl, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
+import type { ByteProgress, StepRunner } from '../boot/plan';
+import type { PrepareStep } from '../boot/steps';
 import { isRiderLodEnabled, lodChoice, setRiderLodEnabled } from './hero/lod';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
@@ -29,6 +31,9 @@ import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
 import { groundFloorY, profileY } from './world/track';
 import { HALL } from './world/hall';
 import { buildRideSurfaces } from './world/deck';
+
+/** One frame later (rAF, or a macrotask without one) — the ≤ 16 ms task boundary for `prepare()` and track entry. */
+const yieldFrame = (): Promise<void> => new Promise((r) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => r()) : setTimeout(r, 0)));
 
 export interface GameRenderer {
   readonly canvas: HTMLCanvasElement;
@@ -50,8 +55,12 @@ export interface GameRenderer {
   setGhost?(state: PhysicsState | null): void;
   /** Resolves when the current track's art and any requested hero model are in (frame 0 is then final). */
   whenReady?(): Promise<void>;
-  /** Cooperative startup for a loading screen: chunked ≤ 16 ms tasks, `report(done, total, label)`. */
-  prepare?(report: (done: number, total: number, label?: string) => void): Promise<void>;
+  /**
+   * Cooperative startup for the loading screen: chunked ≤ 16 ms tasks, each sub-step run through the boot
+   * plan's `run(key, work)` (keys = `PREPARE_STEPS`). The downloads it awaits (hero glTF, boot art set) start
+   * in the constructor with the plan's readers (`heroBytes`, `artBytes`).
+   */
+  prepare?(run: StepRunner<PrepareStep>): Promise<void>;
   /**
    * v2 additive (render, round 11): repaint the hero to the bike class livery — Rookie = blue
    * plastics, white plate #7; Pro = charcoal / gunmetal / raw alloy, yellow plate #1. Applies to
@@ -73,6 +82,12 @@ export interface ThreeRendererOptions {
    */
   riderModel?: ModelChoice;
   bikeModel?: ModelChoice;
+  /** Boot plan: the DOWNLOAD counter for the hero glTF files the constructor starts fetching (docs/tasks/loading-progress-invariant.md). */
+  heroBytes?: ByteProgress;
+  /** Boot plan: the DOWNLOAD counter for the art pack's boot set; given, the constructor starts `art.load()` at once (the `bootArt` step awaits it). */
+  artBytes?: ByteProgress;
+  /** Boot plan `after` list: per-track art requested after the boot set (never in a number). */
+  onTrackArt?: (done: number, total: number, label: string) => void;
 }
 
 type HeroRider = RiderModel | GltfRider;
@@ -144,8 +159,6 @@ export class ThreeRenderer implements GameRenderer {
   private artRequest: Promise<void> = Promise.resolve();
   private artIds: string[] = [];
   private artBackground: THREE.Texture | null = null;
-  /** Loader callback kept after `prepare` for the background phases (per-track art). */
-  private report: (done: number, total: number, label?: string) => void = () => undefined;
   private lightingApplied = false;
   private width = 1280;
   /**
@@ -181,6 +194,17 @@ export class ThreeRenderer implements GameRenderer {
   private readonly ghostFrames = new FrameBuilder();
   /** Wall-clock ms spent generating textures (diagnostic only). */
   textureGenMs = 0;
+  /**
+   * Round 14 track entry: after `setTrack` the new world's textures are uploaded and its materials
+   * compiled against the tier's scene target in ≤ 16 ms tasks (`beginEntry`); `whenReady()` waits
+   * for it and `render()` paints the fog placeholder meanwhile (play mode), so the countdown never
+   * runs over black frames while the GPU compiles the biome at its first draw.
+   */
+  private entryToken = 0;
+  private entryPending: Promise<void> = Promise.resolve();
+  private entering = false;
+  /** Last entry's cost: wall ms from `setTrack` to ready, compile / texture task ms, textures uploaded (count, MB), programs after. */
+  readonly entryStats = { biome: '', ms: 0, compileMs: 0, textureMs: 0, warmMs: 0, textures: 0, texturesMB: 0, materials: 0, programs: 0, programsBefore: 0 };
 
   constructor(parent: HTMLElement, options: ThreeRendererOptions = {}) {
     this.canvas = document.createElement('canvas');
@@ -215,12 +239,15 @@ export class ThreeRenderer implements GameRenderer {
     {
       const riderModel: ModelChoice = options.riderModel ?? 'gltf';
       const bikeModel: ModelChoice = options.bikeModel ?? 'gltf';
-      if (riderModel === 'gltf' || bikeModel === 'gltf') this.setModels({ riderModel, bikeModel });
+      if (riderModel === 'gltf' || bikeModel === 'gltf') this.setModels({ riderModel, bikeModel }, options.heroBytes);
     }
-    // Art progress goes to whatever loader callback `prepare` installed (per-track requests
-    // after boot show as a background phase: "World art · canyon 3/4 (0.12 / 0.20 MB)").
-    const mb = (b: number): string => `${(b / (1024 * 1024)).toFixed(2)} MB`;
-    this.art.onProgress = (d, t, label, bytes, bytesTotal) => this.report(d, t, `${label === 'art pack' ? 'Art pack' : `World art · ${label}`} ${d}/${t} (${mb(bytes)} / ${mb(bytesTotal)})`);
+    // The boot art set (showcase plate, container skins, banners, crowd) starts now, under every boot step,
+    // its bytes counted by the library's own read loop; `prepare()`'s `bootArt` step awaits it.
+    if (options.artBytes) void this.art.load(options.artBytes);
+    // Per-track art requested after the boot set is background: the loader's `after` list, never a number.
+    // (The boot set itself reports its bytes through the reader `prepare()` hands to `art.load()`.)
+    const onTrackArt = options.onTrackArt;
+    if (onTrackArt) this.art.onProgress = (_d, _t, label, bytes, bytesTotal) => { if (label !== 'art pack') onTrackArt(bytes, bytesTotal, label); };
     this.art.onRequestSettled = () => {
       // Determinism: a world that has already been drawn is never swapped mid-run (a capture is
       // all-art or all-procedural); the next setTrack picks the pack up. Callers that need the
@@ -322,13 +349,13 @@ export class ThreeRenderer implements GameRenderer {
    * particles are untouched. A swap is a render-only event; with `?bike=gltf` the glTF is
    * loaded before `ready`, so captures are deterministic.
    */
-  setModels(m: ModelChoices): void {
+  setModels(m: ModelChoices, bytes?: ByteProgress): void {
     this.models = { riderModel: m.riderModel === 'gltf' ? 'gltf' : 'proc', bikeModel: m.bikeModel === 'gltf' ? 'gltf' : 'proc' };
     const want = this.models;
     this.heroLoading++;
     const run = async (): Promise<void> => {
-      if (want.bikeModel === 'gltf' && !this.gltf.bike) [this.gltf.bike, this.gltf.bikeLod] = await Promise.all([loadGltf(HERO_URLS.bike), loadGltf(lodUrl(HERO_URLS.bike), true)]);
-      if (want.riderModel === 'gltf' && !this.gltf.rider) [this.gltf.rider, this.gltf.riderLod] = await Promise.all([loadGltf(HERO_URLS.rider), loadGltf(lodUrl(HERO_URLS.rider), true)]);
+      if (want.bikeModel === 'gltf' && !this.gltf.bike) [this.gltf.bike, this.gltf.bikeLod] = await Promise.all([loadGltf(HERO_URLS.bike, false, bytes), loadGltf(lodUrl(HERO_URLS.bike), true, bytes)]);
+      if (want.riderModel === 'gltf' && !this.gltf.rider) [this.gltf.rider, this.gltf.riderLod] = await Promise.all([loadGltf(HERO_URLS.rider, false, bytes), loadGltf(lodUrl(HERO_URLS.rider), true, bytes)]);
       if (want !== this.models) return; // superseded
       this.applyModels();
     };
@@ -438,8 +465,9 @@ export class ThreeRenderer implements GameRenderer {
    */
   whenReady(): Promise<void> {
     const req = this.artRequest;
-    return Promise.all([this.art.whenSettled, req, this.heroPending]).then(() => {
-      if (this.artRequest !== req) return this.whenReady();
+    const entry = this.entryPending;
+    return Promise.all([this.art.whenSettled, req, this.heroPending, entry]).then(() => {
+      if (this.artRequest !== req || this.entryPending !== entry) return this.whenReady();
       // Round 10: the settle callback only rebuilds an undrawn world; do the same here so a
       // caller that awaits `whenReady()` right after `setTrack` gets the art-complete world
       // even when the settle fired before `setTrack` finished wiring it.
@@ -460,26 +488,22 @@ export class ThreeRenderer implements GameRenderer {
   readonly prepareTimeline: { step: string; ms: number; bytes: number }[] = [];
 
   /**
-   * Cooperative startup for the loading screen (round 9). The constructor made only the WebGL
-   * context; this builds everything else in tasks of ≤ 16 ms (or one GPU call) and reports
-   * `(done, total, label)` for the loader's row. Idempotent. `render()` before this resolves
-   * still draws (lazy builds + a synchronous texture fallback; the harness path never calls
-   * prepare). Steps: art pack boot set (fetch + createImageBitmap off-thread, bytes reported) ·
-   * hero meshes (bike, rider as two tasks) · lighting (sky → PMREM) · post chain · procedural
-   * materials (painters in row bands, 12 ms budget) · hero glTF (if requested) · shaders
-   * (`compileAsync`, two materials per task) · one warm-up frame through the post chain.
-   * The per-track art beyond the boot set is requested by `setTrack` and reported through the
-   * same callback as a background phase.
+   * Cooperative startup for the loading screen (round 9; boot plan since docs/tasks/loading-progress-invariant.md).
+   * The constructor made only the WebGL context; this builds everything else in tasks of ≤ 16 ms (or one
+   * GPU call), each sub-step run through the boot plan's `run(key, work)` — finishing a step IS reporting
+   * it, and the plan (main.ts) cannot call `done()` until every `PREPARE_STEPS` key has run. Bytes of the
+   * boot art set are counted by the art library's own read loop, the hero glTF bytes by three's FileLoader,
+   * both into readers the constructor received (`artBytes`, `heroBytes`), both downloads started there. No cap races any step: the boot art
+   * set and the hero models are needed, so they are awaited (the per-track art beyond the boot set is
+   * background, `options.onTrackArt`). Idempotent. `render()` before this resolves draws a placeholder;
+   * only the plan starts this work (the harness path never calls prepare).
+   * Steps: hero meshes (bike, rider as two tasks) · lighting (sky → PMREM) · post chain · procedural
+   * materials (painters in row bands, 12 ms budget) · hero glTF · boot art set · shaders (`compileAsync`,
+   * two materials per task) · one warm-up frame through the post chain.
    */
-  prepare(reportArg: (done: number, total: number, label?: string) => void = () => undefined): Promise<void> {
-    // The first menu frame may have started prepare() with the no-op reporter before main.ts
-    // called it with the loader's; rebind so the running steps report to the newest callback.
-    this.report = reportArg;
+  prepare(run: StepRunner<PrepareStep>): Promise<void> {
     if (this.prepared) return this.prepared;
     this.preparing = true;
-    const report = (done: number, total: number, label?: string): void => this.report?.(done, total, label);
-    const yieldFrame = (): Promise<void> => new Promise((r) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => r()) : setTimeout(r, 0)));
-    const mb = (b: number): string => `${(b / (1024 * 1024)).toFixed(2)} MB`;
     const timeline = this.prepareTimeline;
     let stepT0 = performance.now();
     let stepBytes = 0;
@@ -490,126 +514,244 @@ export class ThreeRenderer implements GameRenderer {
       stepT0 = now;
       stepBytes = 0;
     };
-    const run = async (): Promise<void> => {
-      // 1. Art pack boot set: the showcase biome's plate, container skins, banners, crowd
-      //    (fetch + decode are off the main thread; only bookkeeping runs here).
+    const work = async (): Promise<void> => {
+      // The boot art set: started by the constructor (with the plan's reader) or here; awaited by the `bootArt` step.
       const artP = this.art.load();
-      report(0, 1, 'Art pack');
       await yieldFrame();
       mark('art:start');
-      // 2. Hero meshes: two tasks (each is one procedural kit's geometry).
-      report(0, 2, 'Hero meshes · bike');
-      if (!this.bikeRef) {
-        this.bikeRef = new BikeModel(this.lib);
-        this.scene.add(this.bikeRef.root);
-        if (this.track) this.bindGround(this.track);
-      }
-      await yieldFrame();
-      mark('hero:bike');
-      report(1, 2, 'Hero meshes · rider');
-      this.ensureHero();
-      await yieldFrame();
-      mark('hero:rider');
-      // 3. Lighting: sky texture + PMREM (GPU; the first shader compile on software GL is long).
-      report(0, 1, 'Lighting · sky environment');
-      this.ensureLighting();
-      await yieldFrame();
-      mark('lighting');
-      // 4. Post chain (targets + shader materials; compiled by the warm-up frame below).
-      report(0, 1, 'Post chain');
-      void this.post;
-      await yieldFrame();
-      mark('post:create');
-      // 5. Procedural materials in 12 ms slices (a 512² painter is 50–65 ms whole on a slow host).
-      const n = this.lib.jobCount;
-      while (this.lib.jobsDone < n) {
-        report(this.lib.generateProgress * 100, 100, `Materials · ${this.lib.currentJobName} ${this.lib.jobsDone + 1}/${n}`);
-        this.lib.generateStep(12);
-        await yieldFrame();
-      }
-      report(100, 100, `Materials ${n}/${n}`);
-      this.textureGenMs = this.lib.generateMs;
-      stepBytes = this.lib.textureBytes;
-      mark('materials');
-      // 6. Hero glTF (only when requested).
-      if (this.models.bikeModel === 'gltf' || this.models.riderModel === 'gltf') {
-        report(0, 1, `Loading ${this.models.riderModel === 'gltf' ? 'rider' : 'bike'} model`);
-        await this.heroPending;
-        report(1, 1, 'Hero models');
-        mark('hero:gltf');
-      }
-      // 7. The boot art: wait briefly, never block the title on it — on LTE the pack (MB) arrives
-      //    long after the shaders are ready; it hot-swaps in when it lands (`whenReady()` guards
-      //    the first run and the harness captures).
-      const artWait = Promise.race([artP.then(() => true), new Promise<boolean>((r) => setTimeout(() => r(false), 1500))]);
-      const artIn = await artWait;
-      stepBytes = this.art.bytesDelivered;
-      report(1, 1, artIn ? `Art pack ${this.art.progress.done}/${this.art.progress.total} (${mb(this.art.bytesDelivered)})` : `Art pack ${this.art.progress.done}/${this.art.progress.total} (${mb(this.art.bytesDelivered)}) · continues in the background`);
-      mark('art:settled');
-      await yieldFrame();
-      // 8. Shaders: compile what is in the scene (hero + the world if a track is set) in chunks.
-      report(0, 1, 'Shaders');
-      const mats: THREE.Material[] = [];
-      const seen = new Set<THREE.Material>();
-      this.scene.traverse((o) => {
-        const m = (o as THREE.Mesh).material;
-        for (const mat of Array.isArray(m) ? m : m ? [m] : []) if (!seen.has(mat)) {
-          seen.add(mat);
-          mats.push(mat);
+      await run('heroMeshes', async (p) => {
+        p.set(0, 2, 'bike');
+        if (!this.bikeRef) {
+          this.bikeRef = new BikeModel(this.lib);
+          this.scene.add(this.bikeRef.root);
+          if (this.track) this.bindGround(this.track);
         }
+        await yieldFrame();
+        mark('hero:bike');
+        p.set(1, 2, 'rider');
+        this.ensureHero();
+        await yieldFrame();
+        mark('hero:rider');
       });
-      const r = this.renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
-      if (r.compileAsync) {
-        // Two materials per call: on a real driver each call is a handful of ms; software GL
-        // compiles the first standard program synchronously (seconds) — not splittable from JS.
-        const chunk = 2;
-        for (let i = 0; i < mats.length; i += chunk) {
-          const keep = new Set(mats.slice(i, i + chunk));
-          const hidden: THREE.Object3D[] = [];
-          this.scene.traverse((o) => {
-            const m = (o as THREE.Mesh).material;
-            if (!m) return;
-            const list = Array.isArray(m) ? m : [m];
-            if (!list.some((x) => keep.has(x)) && o.visible) {
-              o.visible = false;
-              hidden.push(o);
-            }
-          });
-          try {
-            // Bind the HDR scene target: program parameters include the output colour space, and a
-            // compile against the canvas would build a second (sRGB) variant of every material.
-            this.renderer.setRenderTarget(this.post.sceneTarget);
-            await r.compileAsync(this.scene, this.rig.camera);
-          } finally {
-            this.renderer.setRenderTarget(null);
-            for (const o of hidden) o.visible = true;
-          }
-          const d = Math.min(mats.length, i + chunk);
-          report(d, mats.length, `Shaders ${d}/${mats.length} programs`);
+      await run('lighting', async (p) => {
+        p.detail('sky environment');
+        this.ensureLighting();
+        await yieldFrame();
+        mark('lighting');
+      });
+      await run('postChain', async () => {
+        void this.post;
+        await yieldFrame();
+        mark('post:create');
+      });
+      await run('materials', async (p) => {
+        // Procedural materials in 12 ms slices (a 512² painter is 50–65 ms whole on a slow host).
+        const n = this.lib.jobCount;
+        while (this.lib.jobsDone < n) {
+          p.set(this.lib.generateProgress * 100, 100, `${this.lib.currentJobName} ${this.lib.jobsDone + 1}/${n}`);
+          this.lib.generateStep(12);
           await yieldFrame();
         }
-      }
-      mark('shaders');
-      // 9. First frame, two rows: the plain scene (shadow-depth programs + the GPU's first
-      // draw of every pipeline) and then the composer (screen-quad shaders compileAsync cannot
-      // reach). Nothing is captured from either. On software GL (SwiftShader) these are the
-      // seconds-long tasks — the driver JITs each pipeline at its first draw; no JS split exists.
-      report(0, 2, 'First frame · world + shadows');
-      this.renderer.info.autoReset = false;
-      this.post.renderSceneOnly();
-      await yieldFrame();
-      mark('firstframe:world');
-      report(1, 2, 'First frame · post chain');
-      this.post.render();
-      await yieldFrame();
-      mark('firstframe:post');
-      report(2, 2, 'Ready');
+        p.set(100, 100, `${n}/${n}`);
+        this.textureGenMs = this.lib.generateMs;
+        stepBytes = this.lib.textureBytes;
+        mark('materials');
+      });
+      await run('heroModels', async (p) => {
+        if (this.models.bikeModel === 'gltf' || this.models.riderModel === 'gltf') {
+          p.detail(this.models.riderModel === 'gltf' && this.models.bikeModel === 'gltf' ? 'bike + rider' : this.models.riderModel === 'gltf' ? 'rider' : 'bike');
+          await this.heroPending;
+        }
+        mark('hero:gltf');
+      });
+      await run('bootArt', async (p) => {
+        await artP;
+        stepBytes = this.art.bytesDelivered;
+        p.detail(`${this.art.progress.done}/${this.art.progress.total} in`);
+        mark('art:settled');
+        await yieldFrame();
+      });
+      await run('shaders', async (p) => {
+        // Compile what is in the scene (hero + the world if a track is set) in chunks.
+        await this.compileMaterials(this.collectMaterials(this.scene), (d, n) => p.set(d, n, `${d}/${n} programs`));
+        mark('shaders');
+      });
+      await run('firstFrame', async (p) => {
+        // Two rows: the plain scene (shadow-depth programs + the GPU's first draw of every pipeline) and then
+        // the composer (screen-quad shaders compileAsync cannot reach). On software GL these are the
+        // seconds-long tasks — the driver JITs each pipeline at its first draw; no JS split exists.
+        p.set(0, 2, 'world + shadows');
+        this.renderer.info.autoReset = false;
+        this.post.renderSceneOnly();
+        await yieldFrame();
+        mark('firstframe:world');
+        p.set(1, 2, 'post chain');
+        this.post.render();
+        await yieldFrame();
+        mark('firstframe:post');
+      });
     };
-    this.prepared = run().finally(() => {
+    this.prepared = work().finally(() => {
       this.preparing = false;
       this.booted = true;
     });
     return this.prepared;
+  }
+
+  /** Every distinct material under `root` (array materials flattened). */
+  private collectMaterials(root: THREE.Object3D): THREE.Material[] {
+    const mats: THREE.Material[] = [];
+    const seen = new Set<THREE.Material>();
+    root.traverse((o) => {
+      const m = (o as THREE.Mesh).material;
+      for (const mat of Array.isArray(m) ? m : m ? [m] : []) if (!seen.has(mat)) {
+        seen.add(mat);
+        mats.push(mat);
+      }
+    });
+    return mats;
+  }
+
+  /**
+   * Compile `mats` in tasks of two materials (`compileAsync`; on a real driver a handful of ms
+   * each, on software GL the first standard program is seconds and not splittable from JS),
+   * against the tier's scene target (program parameters include the output colour space and
+   * tone mapping, so a compile against the wrong target builds a variant the frame never uses).
+   * Returns the summed task ms. `abort()` (round 14 entry) stops between tasks.
+   */
+  private async compileMaterials(mats: THREE.Material[], report?: (done: number, total: number) => void, abort?: () => boolean): Promise<number> {
+    const r = this.renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
+    if (!r.compileAsync) return 0;
+    let ms = 0;
+    const chunk = 2;
+    for (let i = 0; i < mats.length; i += chunk) {
+      if (abort?.()) break;
+      const t0 = performance.now();
+      const keep = new Set(mats.slice(i, i + chunk));
+      const hidden: THREE.Object3D[] = [];
+      this.scene.traverse((o) => {
+        const m = (o as THREE.Mesh).material;
+        if (!m) return;
+        const list = Array.isArray(m) ? m : [m];
+        if (!list.some((x) => keep.has(x)) && o.visible) {
+          o.visible = false;
+          hidden.push(o);
+        }
+      });
+      try {
+        this.renderer.setRenderTarget(this.post.sceneTarget);
+        await r.compileAsync(this.scene, this.rig.camera);
+      } finally {
+        this.renderer.setRenderTarget(null);
+        for (const o of hidden) o.visible = true;
+      }
+      ms += performance.now() - t0;
+      report?.(Math.min(mats.length, i + chunk), mats.length);
+      await yieldFrame();
+    }
+    return ms;
+  }
+
+  /** Textures a material set samples (maps + the scene background), each once. */
+  private collectTextures(mats: THREE.Material[]): THREE.Texture[] {
+    const out: THREE.Texture[] = [];
+    const seen = new Set<THREE.Texture>();
+    const add = (t: unknown): void => {
+      if (t instanceof THREE.Texture && !seen.has(t)) {
+        seen.add(t);
+        out.push(t);
+      }
+    };
+    for (const m of mats) {
+      for (const v of Object.values(m as unknown as Record<string, unknown>)) add(v);
+      const u = (m as THREE.ShaderMaterial).uniforms;
+      if (u) for (const k of Object.keys(u)) add(u[k]!.value);
+    }
+    add(this.scene.background);
+    return out;
+  }
+
+  /**
+   * Round 14: the biome's GPU cost moved off the first draw. Uploads the world's textures and
+   * compiles its materials in ≤ 16 ms tasks; a newer `setTrack` cancels the job. `whenReady()`
+   * resolves after it; `render()` paints the placeholder until then (play mode).
+   */
+  private beginEntry(): void {
+    const token = ++this.entryToken;
+    const t0 = performance.now();
+    const st = this.entryStats;
+    st.biome = this.biome.id;
+    st.programsBefore = this.renderer.info.programs?.length ?? 0;
+    st.ms = st.compileMs = st.textureMs = st.warmMs = st.textures = st.texturesMB = st.materials = st.programs = 0;
+    this.entering = true;
+    const stale = (): boolean => token !== this.entryToken;
+    const run = async (): Promise<void> => {
+      if (!this.booted) {
+        // Boot: `prepare()` compiles the whole scene (step 8) and uploads at its warm-up frame.
+        await (this.prepared ?? Promise.resolve());
+        if (stale()) return;
+      }
+      await yieldFrame();
+      if (stale()) return;
+      const world = this.world;
+      if (!world) return;
+      const mats = this.collectMaterials(world.group);
+      st.materials = mats.length;
+      // 1. Textures: `initTexture` uploads without a draw, ≤ 16 ms per task.
+      const texs = this.collectTextures(mats);
+      let t1 = performance.now();
+      let bytes = 0;
+      for (const t of texs) {
+        if (stale()) return;
+        const img = t.image as { width?: number; height?: number } | undefined;
+        if (img?.width && img.height) bytes += img.width * img.height * 4 * 1.33;
+        const ta = performance.now();
+        this.renderer.initTexture(t);
+        st.textureMs += performance.now() - ta;
+        st.textures++;
+        if (performance.now() - t1 > 12) {
+          await yieldFrame();
+          t1 = performance.now();
+        }
+      }
+      st.texturesMB = +(bytes / 1048576).toFixed(1);
+      // 2. Programs: the world's materials against the tier's target.
+      st.compileMs = await this.compileMaterials(mats, undefined, stale);
+      if (stale()) return;
+      await yieldFrame();
+      if (stale()) return;
+      // 3. Warm-up: one scene pass into the tier's target with culling off — a driver that builds
+      //    its pipelines at the first draw (SwiftShader; ANGLE's per-state pipeline objects) does
+      //    it here, for every mesh, not on the countdown's first frame. On the bypass tier the
+      //    target is the canvas: cleared to the placeholder before this task yields, so it is
+      //    never composited.
+      const culled: THREE.Object3D[] = [];
+      world.group.traverse((o) => {
+        if ((o as THREE.Mesh).isMesh && o.frustumCulled) {
+          o.frustumCulled = false;
+          culled.push(o);
+        }
+      });
+      const tw = performance.now();
+      try {
+        this.post.renderSceneOnly();
+        this.finish(); // GPU-side completion (pipeline builds, uploads) belongs to the entry, not to the countdown's first frame
+      } finally {
+        for (const o of culled) o.frustumCulled = true;
+        if (this.post.sceneTarget === null) this.placeholderFrame();
+      }
+      st.warmMs = +(performance.now() - tw).toFixed(1);
+      st.programs = this.renderer.info.programs?.length ?? 0;
+    };
+    const p = run()
+      .catch((err) => console.warn('[render] track entry failed', err))
+      .then(() => {
+        if (token !== this.entryToken) return;
+        this.entering = false;
+        st.ms = +(performance.now() - t0).toFixed(1);
+        performance.mark?.('render:entry');
+      });
+    this.entryPending = p;
   }
 
   /** A cheap clear in the biome's fog colour while `prepare()` is still building the core. */
@@ -745,6 +887,7 @@ export class ThreeRenderer implements GameRenderer {
     if (this.world.trackCalls > 20 || this.world.trackTris > 80_000) {
       console.warn(`[render] track budget: ${this.world.trackCalls} calls / ${Math.round(this.world.trackTris)} tris (cap 20 / 80k)`);
     }
+    this.beginEntry();
   }
 
   onEvent(e: GameEvent): void {
@@ -753,6 +896,7 @@ export class ThreeRenderer implements GameRenderer {
     if (e.type === 'restart') {
       this.frames.invalidate();
       this.ghostFrames.invalidate();
+      this.flashT = -1; // round 14: a restart is a time cut — the finish flash of the previous run must not follow it
     }
   }
 
@@ -886,8 +1030,8 @@ export class ThreeRenderer implements GameRenderer {
     const t0 = performance.now();
     if (!this.booted) {
       if (this.lazyBoot) {
-        // Play mode: the loader owns the wait; draw a placeholder until `prepare()` is done.
-        if (!this.prepared) void this.prepare();
+        // Play mode: the boot plan owns `prepare()` (main.ts); draw a placeholder until it is done.
+        // (This used to start prepare() itself with a no-op reporter — incident (a) in the task doc.)
         this.placeholderFrame();
         return performance.now() - t0;
       }
@@ -900,6 +1044,12 @@ export class ThreeRenderer implements GameRenderer {
         this.textureGenMs = this.lib.generateMs;
       }
       if (!this.preparing) this.booted = true;
+    }
+    if (this.entering && this.lazyBoot) {
+      // Round 14: the new world's programs are still compiling in `beginEntry`'s tasks; a draw now
+      // would block on them (the black frames under the running HUD). Fog until `whenReady()`.
+      this.placeholderFrame();
+      return performance.now() - t0;
     }
     const f = this.frames.build(state, alpha);
     this.lastTSim = f.tSim;
@@ -994,9 +1144,19 @@ export class ThreeRenderer implements GameRenderer {
     // line (round 9) speed effects are off: no smear, no chromatic aberration on the coasting hold.
     this.rig.bikeScreen(this.bikeUV); // round 12: no per-frame `debug()` object
     const speedFx = f.finished ? 0 : f.speed;
-    const smear = Math.min(8, Math.max(0, (speedFx - 9) * 1.1));
+    const smear = Math.min(4, Math.max(0, (speedFx - 9) * 0.55)); // round 14: halved (was 8 px max) and rim-only in the composite
     const dl = Math.hypot(f.velX, f.velY) || 1;
-    const flash = this.flashT >= 0 ? Math.max(0, 1 - (f.tSim - this.flashT) / 0.2) : 0;
+    // Finish flash: 0.2 s from the finish, on the sim clock, forward only. Round 14: a replay of the
+    // run just finished restarts `tSim` at 0 with `flashT` still at the finish time — the old
+    // `1 − (tSim − flashT) / 0.2` made that `uFlash` 20–200 and the composite's `mix(col, 1, uFlash)`
+    // painted the whole HDR frame white with cyan specks where a channel overshot negative (the
+    // phone's replay viewer on `medium`). A clock behind the flash ends the flash.
+    let flash = 0;
+    if (this.flashT >= 0) {
+      const since = f.tSim - this.flashT;
+      if (since < 0 || since >= 0.2) this.flashT = -1;
+      else flash = 1 - since / 0.2;
+    }
     this.post.setDynamics(speedFx, this.bikeUV.x, this.bikeUV.y, smear, f.velX / dl, -f.velY / dl, flash);
 
     this.renderer.info.autoReset = false;
@@ -1142,6 +1302,10 @@ export class ThreeRenderer implements GameRenderer {
     passes: number;
     /** Round 14: programs held by scene materials that are not their current one (memory only; never released mid-session). */
     stalePrograms: number;
+    /** Round 14: last track entry — wall ms from `setTrack` to ready, and its breakdown (`entryStats`). */
+    entryMs: number;
+    entry: ThreeRenderer['entryStats'];
+    entering: boolean;
     art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean; trackComplete: boolean; trackIds: number; builtAtFrame: number; frames: number };
     prepare: { step: string; ms: number; bytes: number }[];
   } {
@@ -1178,6 +1342,9 @@ export class ThreeRenderer implements GameRenderer {
       textureGenMs: this.textureGenMs,
       passes: this.postRef?.info.passes ?? 0,
       stalePrograms: this.staleProgramCount(),
+      entryMs: this.entryStats.ms,
+      entry: this.entryStats,
+      entering: this.entering,
       art: { settled: this.art.settled, ok: this.art.ok, loadMs: Math.round(this.art.loadMs), deliveredMB: +(this.art.bytesDelivered / (1024 * 1024)).toFixed(2), inWorld: this.world?.withArt ?? false, trackComplete: this.art.requested(this.artIds), trackIds: this.artIds.length, builtAtFrame: this.world?.builtAtFrame ?? -1, frames: this.frameCount },
     };
   }

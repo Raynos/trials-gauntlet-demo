@@ -806,7 +806,14 @@ export class Game {
   /** Timing of the most recent render pass (hook.info().lastRender). */
   readonly lastRender = { hudMs: 0, submitMs: 0, syncMs: 0 };
 
+  /**
+   * Front-end screens that fully cover the canvas (the Broadcast menu's key art) switch the WebGL
+   * frame off: on a phone the covered canvas still cost a full tier frame plus a compositor copy.
+   */
+  renderEnabled = true;
+
   private render(alpha: number, dt: number): number {
+    if (!this.renderEnabled) return 0;
     const tStart = performance.now();
     const state = this.getState();
     const info = this.runInfo;

@@ -31,7 +31,12 @@ import { resolveBoot } from './game/flow';
 import { registerServiceWorker } from './game/pwa';
 import { getTrack } from './tracks';
 import { ArtManifest, BestTimes, DomHud, injectStyles, loadModelChoice, type ModelChoice } from './ui';
-import { fontsReady, getLoader, nextPaint, streamBytes } from './ui/loader';
+import { nextPaint } from './ui/loader';
+import { takeBootPlan } from './boot/handoff';
+import { streamBytes } from './boot/stream';
+import { PREPARE_STEPS } from './boot/steps';
+import { delegate, type ByteProgress, type StepRunner } from './boot/plan';
+import type { PrepareStep } from './boot/steps';
 
 type AnyModule = Record<string, unknown>;
 
@@ -76,10 +81,17 @@ function modelChoices(params: URLSearchParams): ModelChoices {
   };
 }
 
-function makeRenderer(parent: HTMLElement, harness: boolean, models: ModelChoices): { renderer: GameRenderer; kind: string } {
+/** Boot-plan hooks the renderer takes at construction: the hero glTF byte counter and the per-track art `after` item. */
+interface RendererBootHooks {
+  heroBytes: ByteProgress;
+  artBytes: ByteProgress;
+  onTrackArt: (done: number, total: number, label: string) => void;
+}
+
+function makeRenderer(parent: HTMLElement, harness: boolean, models: ModelChoices, boot?: RendererBootHooks): { renderer: GameRenderer; kind: string } {
   const m = renderMod as AnyModule;
   // riderModel / bikeModel: 'proc' | 'gltf' — the render owner reads them; unknown keys are ignored today.
-  const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness, ...models };
+  const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness, ...models, ...(boot ?? {}) };
   const create = m['createRenderer'];
   if (typeof create === 'function') {
     return { renderer: (create as (p: HTMLElement, o: typeof opts) => GameRenderer)(parent, opts), kind: 'createRenderer' };
@@ -126,8 +138,8 @@ interface Composed {
   renderer: GameRenderer;
 }
 
-/** Renderer-side startup work the render owner may expose (texture generation that yields between jobs). */
-type Preparable = Partial<{ prepare(report: (done: number, total: number, label?: string) => void): Promise<void> | void }>;
+/** Renderer-side startup work run through the boot plan (`PREPARE_STEPS`, src/render/index.ts `prepare`). */
+type Preparable = Partial<{ prepare(run: StepRunner<PrepareStep>): Promise<void> }>;
 
 function boot(): void {
   const params = new URLSearchParams(location.search);
@@ -205,147 +217,136 @@ function boot(): void {
   return;
 
   /**
-   * Normal play: staged boot reported to the inline loader (index.html), one
-   * yield per step so the page repaints between the CPU-heavy pieces
-   * (renderer + WebGL context, physics, audio, track compile, texture prep).
+   * Normal play: the boot, step by step, on the boot plan the inline loader created (src/boot/plan.ts;
+   * docs/tasks/loading-progress-invariant.md). Every await is a `plan.step(...)`; the plan's type loses
+   * each key as it runs, so `done()` only compiles once every step in `BOOT_STEPS` has run here (the
+   * renderer's eight `PREPARE_STEPS` are delegated through `delegate()` and verified at runtime).
+   * One `nextPaint()` at the start of each step so the loader paints the step before its CPU work.
    */
   async function bootFront(): Promise<void> {
-    const loader = getLoader();
-    loader.plan(14); // 10 steps, World textures weighs 4 and Key art 2 (SETUP bar weights)
+    const plan = await takeBootPlan();
     try {
-      loader.step('WebGL renderer');
-      await nextPaint();
-      const { renderer, kind: renderKind } = makeRenderer(appRoot, false, models);
-      loader.step('Physics world');
-      await nextPaint();
-      const { make: makePhysics, kind: physicsKind, version: physicsVersion } = physicsFactory(params.get('physics'));
-      const physics = makePhysics(physicsHz);
-      loader.step('Audio');
-      await nextPaint();
-      const audioParts = makeAudio(makePhysics, params.get('audio') === '0');
-      if (audioParts.extras.renderOffline) extras.renderOffline = audioParts.extras.renderOffline;
-      loader.step('Game + HUD');
-      await nextPaint();
-      const ui = document.createElement('div');
-      ui.id = 'ui';
-      appRoot.appendChild(ui);
-      const bestTimes = new BestTimes();
-      const hud = new DomHud(ui, (id) => bestTimes.get(id));
-      const game = new Game({
-        physicsHz,
-        physics,
-        renderer,
-        hud,
-        audio: audioParts.audio,
-        bestTimes,
-        autoSkipCountdown: false,
-        physicsFactory: makePhysics,
-        autoRecord: true,
-        ghostEnabled: true,
-        physicsVersion,
+      const sRenderer = await plan.step('renderer', async () => {
+        await nextPaint();
+        // The two downloads boot awaits (hero glTF, boot art set) start in the renderer's constructor, each with its
+        // DOWNLOAD reader; per-track art after the boot set is an `after` item.
+        return makeRenderer(appRoot, false, models, { heroBytes: plan.reader('heroModels'), artBytes: plan.reader('bootArt'), onTrackArt: (done, total) => plan.after('trackArt', done, total) });
       });
-      extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind, rider: models.riderModel, bike: models.bikeModel };
-      console.info(`[trials] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=false`);
-      const art = new ArtManifest();
-      const artLoad = art.load();
-      loader.step('Front end + first resize');
-      await nextPaint();
-      const shell = new App({
-        game,
-        hud,
-        bestTimes,
-        audio: audioParts.audio,
-        uiRoot: ui,
-        sceneRoot: appRoot,
-        dev: route.dev,
-        resize: (w, h, dpr) => renderer.resize(w, h, dpr),
-        initialTrack,
-        models: { rider: models.riderModel, bike: models.bikeModel },
-        touchDebug: params.get('touchdebug') === '1',
-        modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
-        applyModels: (m) => {
-          const r = renderer as Partial<{ setModels(o: ModelChoices): void }>;
-          if (typeof r.setModels !== 'function') return false;
-          r.setModels({ riderModel: m.rider, bikeModel: m.bike });
-          return true;
-        },
-        art,
-        perf: params.get('perf') === '1',
-        trace: params.get('trace') === '1',
-        lab: params.get('lab') === '1',
-        physics: { current: params.get('physics') === 'v1' ? 'v1' : params.get('physics') === 'v2' ? 'v2' : 'default', available: physicsVersions(), live: physicsVersion },
-        // Per-class livery when the render owner exports it (`setBikeClass(bike)`); otherwise the garage card carries the colour.
-        onBikeChange: (bike) => {
-          const r = renderer as Partial<{ setBikeClass(b: 'rookie' | 'pro'): void }>;
-          if (typeof r.setBikeClass === 'function') r.setBikeClass(bike);
-        },
+      const { renderer, kind: renderKind } = sRenderer.value;
+      const sPhysics = await sRenderer.step('physics', async () => {
+        await nextPaint();
+        const f = physicsFactory(params.get('physics'));
+        return { ...f, physics: f.make(physicsHz) };
       });
-      const hook = installHook(game, false, extras);
-      hook.lastRun = () => game.lastRunRecording()?.json ?? null;
-      hook.replay = shell.replayApi();
-      hook.navLog = () => shell.navLog.all();
-      hook.app = shell.testApi();
-      if (import.meta.env.PROD && params.get('sw') !== '0') registerServiceWorker((reload) => shell.showUpdate(reload));
-      if (params.get('updatetoast') === '1') setTimeout(() => shell.showUpdate(() => location.reload()), 1500);
-      const trackName = getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track';
-      loader.step(`Track: ${trackName}`);
-      await nextPaint();
-      shell.start(); // loads the track (compile + physics + renderer world) and shows the menu
-      console.info(`[trials] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
-      // The first WebGL frame (shader compile, texture upload) is the biggest single task of boot: give it its own row.
-      loader.step('First frame (shaders)');
-      await nextPaint();
-      await nextPaint();
-      const prep = (renderer as Preparable).prepare;
-      loader.step('World textures', 4);
-      await nextPaint();
-      if (typeof prep === 'function') {
-        // The renderer reports (done, total, label) per sub-step, each restarting at 0. Map the known
-        // sub-step order onto one monotone 0..100 so the SETUP bar never runs backwards.
-        const phases = ['Art pack', 'Hero meshes', 'Lighting', 'Post chain', 'Materials', 'Loading', 'Hero models', 'Shaders', 'First frame', 'Ready'];
-        let best = 0;
-        await prep.call(renderer, (done, total, label) => {
-          const idx = Math.max(0, phases.findIndex((ph) => (label ?? '').startsWith(ph)));
-          const frac = total > 0 ? Math.min(1, done / total) : 0;
-          best = Math.max(best, ((idx + frac) / phases.length) * 100);
-          loader.progress(label ? `World textures · ${label.replace(/\s*\d+(\.\d+)?\s*\/\s*\d+.*$/, '')}` : 'World textures', best, 100);
+      const { make: makePhysics, kind: physicsKind, version: physicsVersion, physics } = sPhysics.value;
+      const sAudio = await sPhysics.step('audio', async () => {
+        await nextPaint();
+        const a = makeAudio(makePhysics, params.get('audio') === '0');
+        if (a.extras.renderOffline) extras.renderOffline = a.extras.renderOffline;
+        return a;
+      });
+      const audioParts = sAudio.value;
+      const sGame = await sAudio.step('game', async () => {
+        await nextPaint();
+        const ui = document.createElement('div');
+        ui.id = 'ui';
+        appRoot.appendChild(ui);
+        const bestTimes = new BestTimes();
+        const hud = new DomHud(ui, (id) => bestTimes.get(id));
+        const game = new Game({
+          physicsHz,
+          physics,
+          renderer,
+          hud,
+          audio: audioParts.audio,
+          bestTimes,
+          autoSkipCountdown: false,
+          physicsFactory: makePhysics,
+          autoRecord: true,
+          ghostEnabled: true,
+          physicsVersion,
         });
-      }
-      loader.step('Fonts');
-      await nextPaint();
-      await fontsReady();
-      loader.step('Key art', 2);
-      await nextPaint();
-      await Promise.race([artLoad, new Promise((r) => setTimeout(r, 3000))]);
-      const key = art.keyart('industrial');
-      if (key) {
-        const item = (await loadManifestItem(key.src)) ?? null;
-        // Prefetch the key art with live bytes, but never hold the menu on it past 2.5 s — the
-        // menu's CSS background finishes the download on its own.
-        await Promise.race([
-          streamBytes(key.src, (done, total) => loader.progress('Key art', done, total, 'B'), item?.bytes ?? 0),
-          new Promise((r) => setTimeout(r, 2500)),
-        ]);
-      }
-      loader.done();
+        extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind, rider: models.riderModel, bike: models.bikeModel };
+        console.info(`[trials] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=false`);
+        return { ui, bestTimes, hud, game };
+      });
+      const { ui, bestTimes, hud, game } = sGame.value;
+      const sFront = await sGame.step('front', async () => {
+        await nextPaint();
+        const art = new ArtManifest();
+        // Key art is background: streamed into the browser cache with its bytes on the `after` list, never awaited
+        // (the menu's CSS background finishes the download on its own and hot-swaps the plate in).
+        void art.load().then(() => {
+          const key = art.keyart('industrial');
+          if (key) streamBytes(key.src, (_d, got, total) => plan.after('keyArt', got, total), key.bytes ?? 0).catch(() => undefined);
+        });
+        const shell = new App({
+          game,
+          hud,
+          bestTimes,
+          audio: audioParts.audio,
+          uiRoot: ui,
+          sceneRoot: appRoot,
+          dev: route.dev,
+          resize: (w, h, dpr) => renderer.resize(w, h, dpr),
+          initialTrack,
+          models: { rider: models.riderModel, bike: models.bikeModel },
+          touchDebug: params.get('touchdebug') === '1',
+          modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
+          applyModels: (m) => {
+            const r = renderer as Partial<{ setModels(o: ModelChoices): void }>;
+            if (typeof r.setModels !== 'function') return false;
+            r.setModels({ riderModel: m.rider, bikeModel: m.bike });
+            return true;
+          },
+          art,
+          perf: params.get('perf') === '1',
+          trace: params.get('trace') === '1',
+          lab: params.get('lab') === '1',
+          physics: { current: params.get('physics') === 'v1' ? 'v1' : params.get('physics') === 'v2' ? 'v2' : 'default', available: physicsVersions(), live: physicsVersion },
+          // Per-class livery when the render owner exports it (`setBikeClass(bike)`); otherwise the garage card carries the colour.
+          onBikeChange: (bike) => {
+            const r = renderer as Partial<{ setBikeClass(b: 'rookie' | 'pro'): void }>;
+            if (typeof r.setBikeClass === 'function') r.setBikeClass(bike);
+          },
+        });
+        const hook = installHook(game, false, extras);
+        hook.lastRun = () => game.lastRunRecording()?.json ?? null;
+        hook.replay = shell.replayApi();
+        hook.navLog = () => shell.navLog.all();
+        hook.app = shell.testApi();
+        if (import.meta.env.PROD && params.get('sw') !== '0') registerServiceWorker((reload) => shell.showUpdate(reload));
+        if (params.get('updatetoast') === '1') setTimeout(() => shell.showUpdate(() => location.reload()), 1500);
+        return shell;
+      });
+      const shell = sFront.value;
+      const sTrack = await sFront.step('track', async (p) => {
+        p.detail(getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track');
+        await nextPaint();
+        shell.start(); // loads the track (compile + physics + renderer world) and shows the menu
+        console.info(`[trials] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
+        await nextPaint();
+      });
+      // The renderer's eight steps (hero meshes … first frame), delegated: its runner accepts only those keys
+      // and the plan throws if it resolves with one of them not complete.
+      const sPrepared = await delegate(sTrack, PREPARE_STEPS, async (run) => {
+        const prep = (renderer as Preparable).prepare;
+        if (typeof prep === 'function') return prep.call(renderer, run);
+        // A renderer without prepare(): the steps run as no-ops so the plan (and the number) is the same shape.
+        for (const key of PREPARE_STEPS) await run(key, () => undefined);
+      });
+      const sFonts = await sPrepared.step('fonts', async () => {
+        await nextPaint();
+        // The fonts are in the core set the inline loader streamed; this is the decode, not a download. No cap.
+        const f = (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts;
+        if (f) await f.ready;
+      });
+      sFonts.done();
     } catch (e) {
       console.error('[trials] boot failed', e);
-      loader.fail(`Startup failed: ${e instanceof Error ? e.message : String(e)}`);
+      plan.fail(`Startup failed: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
-}
-
-/** Expected byte count for a URL from the build's load manifest (null in dev / on a miss). */
-let loadManifestCache: Promise<Array<{ path: string; bytes: number }> | null> | null = null;
-async function loadManifestItem(url: string): Promise<{ path: string; bytes: number } | null> {
-  loadManifestCache ??= fetch('./load-manifest.json', { cache: 'force-cache' })
-    .then((r) => (r.ok ? (r.json() as Promise<{ items: Array<{ path: string; bytes: number }> }>) : null))
-    .then((m) => m?.items ?? null)
-    .catch(() => null);
-  const items = await loadManifestCache;
-  if (!items) return null;
-  const tail = url.replace(/^\.?\//, '');
-  return items.find((i) => i.path.replace(/^\.?\//, '') === tail) ?? null;
 }
 
 boot();

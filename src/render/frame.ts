@@ -131,7 +131,11 @@ export class FrameBuilder {
     let prev = this.prev;
     // A reset drops tick to 0 (or the state object is from a different run);
     // interpolating across it would smear the hard cut, so snap.
-    const cut = this.firstFrame || prev === null || cur.tick < prev.tick || cur.time < prev.time;
+    // Round 14 (critic r3 "fault-respawn: the camera is still sliding into the checkpoint frame a
+    // second after the cut"): a respawn that keeps the run clock teleports the bike; more than 6 m
+    // between consecutive states (360 m/s at 60 Hz) is never a ride, so it is a cut too.
+    const teleport = prev !== null && Math.hypot(cur.bike.pos.x - prev.bike.pos.x, cur.bike.pos.y - prev.bike.pos.y) > 6;
+    const cut = this.firstFrame || prev === null || cur.tick < prev.tick || cur.time < prev.time || teleport;
     if (cut || prev === null) prev = cur;
     const a = cut ? 1 : Math.min(1, Math.max(0, alpha));
 

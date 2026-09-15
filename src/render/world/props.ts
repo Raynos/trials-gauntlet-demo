@@ -17,7 +17,7 @@ export type WorldDetail = 'low' | 'medium' | 'high';
  * tile GPU. `low` and `medium`: the deck scatter (gravel, bolts, paper, plank ends, leaves) —
  * 6–8 calls of sub-pixel detail at the riding zoom.
  */
-const HIDE_LOW = /^(props:(lampcone|lightcone|lampstreak|parbeam-[mc]|puddle|oilstain|decal:(poster|sign|graffiti|tyremark)[^:]*)(:|$)|fx:)/;
+const HIDE_LOW = /^(props:(lampcone|lightcone|lampstreak|parbeam-[mc]|puddle|oilstain|decal:(poster|sign|graffiti|tyremark)[^:]*)(:|$)|fx:|deck:ao(:|$))/; // round 14: + the under-deck AO skirt (28 k transparent tris on b1)
 const HIDE_LEAN = /^props:(gravel|bolt|paper|plankend|leaf)(:|$)/;
 export function tierHides(name: string, tier: WorldDetail): boolean {
   if (tier === 'high') return false;

@@ -78,12 +78,20 @@ const COMPOSITE = {
       // HDR scene + the bloom composite (was added into the HDR buffer by a full-res pass).
       vec3 c = texture2D(tDiffuse, uv).rgb;
       if (uBloom > 0.0) c += texture2D(tBloom, uv).rgb;
-      return c;
+      // Round 14 guard: a non-finite or runaway texel (a half-float overflow, an undefined
+      // sample) is dropped to black rather than allowed to paint the frame; 64× white is
+      // already fully white after ACES, so the cap changes no visible frame.
+#if __VERSION__ >= 300
+      if (any(isnan(c)) || any(isinf(c))) c = vec3(0.0);
+#endif
+      return clamp(c, 0.0, 64.0);
     }
     vec3 sampleScene(vec2 uv) {
-      // Directional smear (background), masked out around the bike so it stays sharp.
+      // Directional smear (background), masked out around the bike so it stays sharp. Round 14:
+      // also confined to the outer frame (radial falloff from 0.3 to 0.7 of the half-diagonal) —
+      // the bike and the near track are sharp at any speed; only the frame's rim streaks.
       vec2 d = (uv - uBikeUV) * vec2(uAspect, 1.0);
-      float mask = smoothstep(0.12, 0.34, length(d));
+      float mask = smoothstep(0.12, 0.34, length(d)) * smoothstep(0.3, 0.7, length((uv - 0.5) * vec2(uAspect, 1.0)) * 1.1);
       vec2 s = uSmear * mask;
       if (dot(s, s) < 1e-12) return scene(uv);
       vec3 acc = vec3(0.0);
@@ -107,7 +115,8 @@ const COMPOSITE = {
       float r2 = dot(c, c);
       vec3 col;
       if (uChroma > 0.0) {
-        vec2 off = c * uChroma * r2 * 4.0;
+        // Round 14: the aberration is the frame's rim only (it read as every edge doubled at 12+ m/s).
+        vec2 off = c * uChroma * r2 * 4.0 * smoothstep(0.35, 0.7, length(c * vec2(uAspect, 1.0)));
         col.r = sampleScene(uv + off).r;
         col.g = sampleScene(uv).g;
         col.b = sampleScene(uv - off).b;
@@ -126,8 +135,8 @@ const COMPOSITE = {
       // Vignette.
       float v = 1.0 - uVignette * smoothstep(0.45, 1.1, length(c) * 1.4142);
       col *= v;
-      // Flash (finish / impact).
-      col = mix(col, vec3(1.0), uFlash);
+      // Flash (finish / impact); the uniform is clamped on both sides (round 14).
+      col = mix(col, vec3(1.0), clamp(uFlash, 0.0, 1.0));
       // Triangular dither to kill banding in the fog.
       float n = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
       col += (n - 0.5) / 255.0;
@@ -516,12 +525,16 @@ export class PostChain {
   /** Per-frame dynamics. `smearPx` is the background smear length in pixels along (dx, dy). */
   setDynamics(speed: number, bikeU: number, bikeV: number, smearPx: number, dirX: number, dirY: number, flash: number): void {
     const u = this.composite.uniforms;
-    u.uChroma!.value = 0.006 * Math.min(1, Math.max(0, (speed - 8) / 8));
-    (u.uBikeUV!.value as THREE.Vector2).set(bikeU, 1 - bikeV);
-    const px = this.tier === 'low' ? 0 : smearPx;
-    (u.uSmear!.value as THREE.Vector2).set((px * dirX) / this.width, (px * dirY) / this.height);
-    u.uFlash!.value = flash;
-    (gradeUniforms.uGradeC.value as THREE.Vector4).w = flash;
+    // Round 14: every per-frame uniform is finite and in range before it reaches a shader — a
+    // NaN bike UV (the bike behind a replay camera) or a flash > 1 must never paint the frame.
+    const fin = (v: number, lo: number, hi: number, d: number): number => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d);
+    u.uChroma!.value = 0.003 * fin((speed - 8) / 8, 0, 1, 0); // round 14: halved
+    (u.uBikeUV!.value as THREE.Vector2).set(fin(bikeU, -2, 3, 0.5), fin(1 - bikeV, -2, 3, 0.5));
+    const px = this.tier === 'low' ? 0 : fin(smearPx, 0, 64, 0);
+    (u.uSmear!.value as THREE.Vector2).set(fin((px * dirX) / this.width, -0.1, 0.1, 0), fin((px * dirY) / this.height, -0.1, 0.1, 0));
+    const fl = fin(flash, 0, 1, 0);
+    u.uFlash!.value = fl;
+    (gradeUniforms.uGradeC.value as THREE.Vector4).w = fl;
   }
 
   render(): void {

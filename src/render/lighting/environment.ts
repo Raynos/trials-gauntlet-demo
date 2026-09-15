@@ -114,7 +114,7 @@ vec3 CustomToneMapping( vec3 color ) {
   col = mix( vec3( l ), col, 1.0 + uGradeA.w );
   vec2 c = gl_FragCoord.xy * uGradeC.yz - 0.5;
   col *= 1.0 - uGradeC.x * smoothstep( 0.45, 1.1, length( c ) * 1.4142 );
-  col = mix( col, vec3( 1.0 ), uGradeC.w );
+  col = mix( col, vec3( 1.0 ), clamp( uGradeC.w, 0.0, 1.0 ) );
   float n = fract( sin( dot( gl_FragCoord.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
   col += ( n - 0.5 ) / 255.0;
   return clamp( col, 0.0, 1.0 );

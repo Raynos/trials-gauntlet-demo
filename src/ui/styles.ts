@@ -64,12 +64,11 @@ html { font-size: clamp(13px, calc(1.25 * var(--vw)) + 4px, 18px); }
 }
 #ui button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
 #ui button:focus { outline: none; }
-/* Title backdrop drift: the renderer's menu camera is static, so the canvas itself drifts (12 s ease, mirrored). */
-#app.drift canvas { animation: drift 12s var(--ease) infinite alternate; transform-origin: 45% 58%; }
-/* The idle camera parks the bike at x≈45 %; the drift also carries it right of the wordmark (≈62 %). */
-@keyframes drift { from { transform: scale(1.06) translate(13%, .6%); } to { transform: scale(1.14) translate(11%, -.8%); } }
-@keyframes drift-phone { from { transform: scale(1.08) translate(20%, .6%); } to { transform: scale(1.16) translate(18%, -.8%); } }
-#app.dim canvas { filter: saturate(.85) brightness(.9); transition: filter var(--t3) var(--ease); }
+/* No CSS transform, filter or animation ever touches the WebGL canvas: on iOS each one costs a full-canvas
+   compositor copy per frame (PERF.md §0 — the garage read 24–30 fps at a 30 cap with nothing moving).
+   The menu covers the canvas with its key art and the game stops rendering under it. */
+#app.covered canvas { visibility: hidden; }
+#app.dim::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: rgba(6,7,9,.16); }
 `;
 
 export const FRONT_CSS = /* css */ `
@@ -374,7 +373,7 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 html.short .bc-art { display: none; }
 /* ---- garage (two bike cards left, the live 3D bike is the preview on the right) ---- */
 .garage-screen { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.86) 38%, rgba(6,7,9,.25) 62%, rgba(6,7,9,.1) 100%); }
-#app.garage canvas { transform: scale(1.25) translate(28%, -2%); transform-origin: 45% 58%; transition: transform var(--t3) var(--ease); }
+/* Garage framing is the renderer's job (a camera preset), never a CSS transform on the canvas. */
 .garage-head { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat)); display: flex; flex-direction: column; gap: var(--s1); }
 .garage-head h1 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.2rem; line-height: .9; text-transform: uppercase; letter-spacing: .01em; }
 .garage-head h1 small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .34em; color: var(--amber); margin-bottom: .35em; }
@@ -434,7 +433,7 @@ html.short .bc-art { display: none; }
 .ob-tip { font-size: .74rem; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
 .ob-card .btn { align-self: flex-end; min-height: 48px; }
 html.short .garage-cards { top: calc(var(--s3) + var(--sat) + 3.4rem); bottom: calc(var(--s4) + var(--sab)); width: min(32rem, calc(54 * var(--vw))); gap: var(--s2); }
-html.short #app.garage canvas { transform: scale(1.3) translate(30%, -4%); }
+html.short /* Garage framing is the renderer's job (a camera preset), never a CSS transform on the canvas. */
 html.short .garage-head { top: calc(var(--s3) + var(--sat)); }
 html.short .garage-head h1 { font-size: 1.6rem; }
 html.short .garage-sub { display: none; }
@@ -636,7 +635,6 @@ html.short .settings-wrap h1 { font-size: 1.8rem; }
 html.short .setting { min-height: 46px; padding: var(--s1) var(--s3); }
 html.short .setting .lab { font-size: 1.05rem; }
 html.short .setting .lab small { display: none; }
-html.short #app.drift canvas { animation-name: drift-phone; }
 html.short .legend { bottom: calc(var(--s2) + var(--sab)); font-size: .72rem; }
 html.short .corner-brand { bottom: calc(var(--s2) + var(--sab)); }
 html.short .overlay, html.short .results { padding: calc(var(--s4) + var(--sat)) calc(var(--s5) + var(--sar)) calc(var(--s3) + var(--sab)) calc(var(--s5) + var(--sal)); row-gap: var(--s2); }
@@ -664,7 +662,6 @@ html.narrow .banner.go { font-size: 8rem; }
 html.narrow .banner.finish { font-size: 3rem; }
 html.narrow .settings-wrap { grid-template-columns: 1fr; }
 @media (prefers-reduced-motion: reduce) {
-  #app.drift canvas { animation: none; }
   .overlay.show .tile, .overlay.show .visuals, .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) both; }
   .results .time, .results .faults, .results .medals, .results .pb, .results .tiles, .results .ov-foot { transform: none; }
   .menu-keyart.loaded, .menu-chip i { animation: none; }

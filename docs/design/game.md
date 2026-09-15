@@ -425,45 +425,87 @@ only).
 - Native-style landscape lock is not available to a web app on iOS (no `screen.orientation.lock()` outside
   fullscreen video); if it is ever wanted again, the whole rotation lives in orientation.ts + one CSS rule.
 
-## 12. Loading screen (`index.html` inline loader, `src/ui/loader.ts`, `vite.config.ts` `loadManifest`)
+## 12. Loading screen (`src/boot/**`, `index.html`, `vite.config.ts` `trials:load-manifest`)
 
-User (3G, round 3): white then black for many seconds. Now:
+> **Progress is the boot sequence's own declaration of work done over work declared, and the loader can
+> only display it.** (docs/tasks/loading-progress-invariant.md — the seven-incident review that led here.)
 
-- **Inline first paint.** `index.html` carries `<style>` + `<div id="loader">` (dark ground, wordmark as plain text
-  in the system font, amber bar, KB counter, item list, elapsed s, throughput) and a ≤ 6 KB classic script
-  (5.6 KB minified at build by the plugin) — no webfont, no bundle, no art. Verified in WebKit iPhone at
-  DOMContentLoaded (≈ 320 ms on the LAN) and Chromium 3G at 0.5 s.
-- **Byte-accurate download.** The plugin emits `dist/load-manifest.json`: every chunk/asset + the public files the
-  first screens need, with raw and gzip bytes and a `phase` (`core` = entry + three + fonts; `title` = key art,
-  wordmark plate, art manifest; `menu` = cards/medals; `world` = renderer plates/skies/stencils; `models`;
-  `audio-worklet`). The loader fetches it (`no-cache`), streams the `core` set (4 in flight) with
-  `fetch` + `ReadableStream`, counting decoded bytes against the manifest and estimating wire bytes with each
-  file's gzip ratio ("Downloading 345 KB / 1.29 MB (≈ 407 KB gz on the wire)", "≈ 715 kbps on the wire"), then
-  inserts the entry `<script type="module">`. The build strips Vite's own module/modulepreload tags and puts the
-  entry URL in `#loader[data-entry]`; the preview server marks hashed assets immutable like the production host,
-  so the module request is a cache hit — measured wire bytes per core file ≈ one gzip copy (three 188 KB vs
-  192 KB gz, index 176 vs 178, fonts 15–16). Dev server (no manifest): straight boot. `?harness=1`: loader removed
-  before anything else, entry inserted at once.
-- **Boot steps** (`main.ts` `bootFront`, `window.__loader.step/progress/done/fail`): WebGL renderer · Physics
-  world · Audio · Game + HUD · Front end + first resize · Track: First Ride · First frame (shaders) · World
-  textures (`renderer.prepare(report)` when the render owner exports it — forwarded as numeric progress) · Fonts
-  (`document.fonts.ready`, 4 s cap) · Title art (key art streamed with KB progress) → `done()` = 240 ms
-  crossfade. One `nextPaint()` (rAF + macrotask) between steps so the loader repaints. Background phases
-  (`world`, `menu`, `models`) are counted from Resource Timing against the manifest totals as their files
-  complete ("World art (renderer, background) 1.2 / 2.77 MB").
-- **Freeze detection.** `PerformanceObserver('longtask')` (Chromium) attributes each long task by start time to
-  the running step; > 50 ms is logged, > 100 ms puts a red mark on the step. Measured headless (SwiftShader,
-  so GPU-bound numbers are inflated): WebGL renderer 125–176 ms, Game + HUD / front end ≈ 0.6–1.0 s (renderer
-  resize + post buffers), Track: First Ride 73–101 ms, **First frame (shaders) 8–10 s** under SwiftShader. Those
-  freezes are inside other owners' constructors / the GPU driver and cannot be chunked from this layer — the
-  red marks are the hand-off to the render / physics owners (`renderer.prepare` yielding between texture jobs).
-- **Failure.** Manifest/core fetch error, module error or an unhandled rejection during boot → error text + a
-  "⟳ Retry" button (reload); never a blank page.
-- **3G measurement** (Chromium, CDP 750 kbps / 100 ms RTT, preview build): loader with numbers at 0.5 s; core
-  1.29 MB (407 KB on the wire) done at 4.8 s; title at ≈ 67–73 s in headless — dominated by the renderer's
-  2.8 MB of background world art contending for the link (≈ 30 s of 3G on its own) plus SwiftShader frames.
-  Recommendation for the render owner: defer / trim world art until after the title, or load the showcase
-  biome only.
+Two numbers, DOWNLOAD and SETUP (the user's decision: "B Odometer" with both tracks kept, `assets/design/loading/SPEC.md`
+§B), each an arithmetic identity over one typed table, each non-decreasing by construction and each exactly 1 when
+`done()` is called — not by policy, by `Σx/Σx`.
+
+- **The plan** (`src/boot/plan.ts`, `createBootPlan`). `steps.ts` declares every await of the boot once:
+  `STEP_INFO` (17 keys in run order, label + SETUP weight; `core` weighs 0), `BYTE_INFO` (the three DOWNLOAD
+  sources — `core`, `heroModels`, `bootArt` — each with the step whose completion *closes* it), `PREPARE_STEPS`
+  (the eight the renderer runs), `AFTER_KEYS` (background items: key art, per-track art).
+  `setup = Σ w·f / Σ w` where a step's `f` is 1 once its `work()` resolved (finishing IS reporting), its clamped
+  monotone sub-progress `done / (total + 1)` while running (completion is the last unit, so a running step never
+  reads complete — no "100 % but not done"), 0 before. `download = Σ credited / Σ total` over byte sources whose
+  totals are declared before the first byte; `credited` grows only by the deltas the reader that reads the bytes adds
+  (`plan.reader(key).add(n)`) and becomes `total` when the closing step completes. `done()` requires every step
+  complete and throws otherwise, so both sums are 1 by arithmetic; nothing is reclassified, capped, timed out or
+  flagged "needed" — a source is in the number because it is in the table, complete because its step is.
+  `Math.max(prev, next)` on both published fractions is the assertion that no later edit can make the screen run
+  backwards; the property test proves the arithmetic never needs it.
+- **Exhaustive by type.** `Plan<Remaining>`: `plan.step(key, work)` returns `Plan<Exclude<Remaining, key>> & { value }`,
+  and `done` is typed `never` until `Remaining` is `never` — a step dropped from `main.ts` is "This expression is not
+  callable"; a repeated step is "not assignable". The renderer's eight steps are delegated (`delegate(plan,
+  PREPARE_STEPS, body)`): `prepare(run)` receives a `StepRunner<PrepareStep>` that accepts only those keys, and the
+  delegate throws if it resolves with any of them incomplete (runtime; the property test covers it). There is no
+  reporter field to rebind (incident (a)): a `StepProgress` is bound to its step and ignores reports after completion.
+- **Bytes come from the reader that reads them.** The inline script streams the core set (entry, three, CSS, fonts —
+  the list and its byte total compiled in by the build) with a `ReadableStream` and adds each chunk; the art library's
+  own read loop (`readBlob`, `src/render/art/library.ts`) adds each chunk of the boot set; three's `FileLoader`
+  `onProgress` adds the hero glTF bytes (`loadGltf(url, quiet, bytes)`). Both needed downloads start in the renderer
+  constructor (`heroBytes`, `artBytes` options) so they run under every boot step. Resource Timing,
+  `PerformanceObserver('resource')`, `byTail`, `take()`, buffer sizing, the `need` map and the done-time
+  reclassification are gone; the long-task observer stays only to put a red mark on the step's row in the log.
+- **Declared totals from the build.** `trials:load-manifest` walks `public/` and writes `src/boot/plan.generated.ts`
+  (`PUBLIC_BYTES`, literal keys: models by path, art by `art:<id>`; committed, deterministic, regenerated every build /
+  dev start). `src/boot/totals.ts` sums it through `HERO_URLS` + `lodUrl` (`src/render/hero/urls.ts`) and `BOOT_IDS`
+  (`src/render/art/boot-set.ts`) — typed lookups, so a renamed glb or a dropped art id fails `pnpm typecheck`. The
+  plugin computes the same two sums for the inline (`__BOOT_TOTALS__`; `totals.test.ts` holds them equal) and compiles
+  the core list (`__BOOT_CORE__`) and the sha (`__BOOT_BUILD__`; a production build with no sha fails rather than
+  stamping `dev`). `dist/load-manifest.json` is still emitted — it is the service worker's precache list, not the loader's.
+- **Caps became decisions.** The boot art set and the hero glTF are *needed*: steps `bootArt` / `heroModels`, awaited
+  with no cap. Key art and per-track art are *background*: `plan.after(key, done, total)` items rendered under
+  "Streams in after start", never in a number, and there is no flag that could promote one. Fonts: `document.fonts.ready`,
+  no timeout (the files are in the core set already). No `setTimeout` race decides whether any step is done.
+- **The inline loader is TypeScript** (`src/boot/inline.ts` → bundled by esbuild through the plugin into
+  `<script id="boot">`, ≤ 8 KB minified, asserted by the build; 8.2 KB today). It paints with the first HTML bytes
+  (markup + CSS in `index.html`, system font, no art), creates THE plan, runs `core` and starts `evaluate` (script
+  parse + evaluate — it ends when `main.ts` calls `takeBootPlan()`, `src/boot/handoff.ts`), then `main.ts` continues
+  the same plan object: renderer · physics · audio · game · front · track · [heroMeshes · lighting · postChain ·
+  materials · heroModels · bootArt · shaders · firstFrame] · fonts · `done()`. `?harness=1`: loader removed, entry
+  inserted, no plan (the harness owns the clock). Dev server: same script with an empty core list.
+- **The renderer** (`src/boot/render.ts`, `createLoaderRenderer`) is a dumb painter of `ProgressView`: wordmark badge
+  (the Broadcast plate) with the build sha; two three-quarter-ring gauges with drum digits (three columns of 0–9,
+  translated one way only), DOWNLOAD amber / SETUP blue; one live line each (`core bundle · 729 KB / 1.53 MB`;
+  `World textures · dirt 512² 1/11 · 41 %`); done steps folded into `✓ 12 of 17 done`; the full row log (one row per
+  step key, ms when done, `after` rows with ↓, never ✓) inside a native `<details>` closed by default; error text +
+  Retry replaces the live line. Percentages are `Math.floor(× 100)`: 100 exactly when the fraction is 1, never a
+  rounded 99.6. The digits move only when a number changes; the footer clock is the only thing on a timer. It
+  publishes what it painted as `#loader[data-download]`, `[data-setup]`, `[data-done]` for the tests.
+- **Tests.** `src/boot/plan.test.ts` — the invariant as a property over 3 000 random event sequences (starts in any
+  order, sub-progress with restarts / total 0 / NaN / negative / late, byte deltas of any sign, `after` noise):
+  both fractions non-decreasing at every published view, `setup` < 1 until the last weighted step, both exactly 1 on
+  `done()`, `done()` throws while a step is open, a delegate that skips a key throws, `after` never moves a fraction
+  (identical fraction sequences with and without them). `src/boot/render.test.ts` (jsdom, the real `index.html` markup)
+  — integers only, 100 only at fraction 1, lines and count follow the view, `after` rows never done-styled.
+  `harness/e2e/boot.mts` (`pnpm harness:e2e --only=boot`) — headless boots of `dist/` at LTE (12 Mbps / 70 ms) and 3G
+  (750 kbps / 100 ms) × service worker absent / installed (second load) × art pack present / absent (a copy of dist
+  with `art/` renamed), sampling the painted integers every 50 ms: B1 non-decreasing; B2 100/100 and `data-done` on
+  the last sample before the loader leaves; B3 the stuck detector — DOWNLOAD unchanged for > 2 s of live page time
+  while ≥ 64 KB of the bytes it counts arrived at the browser (CDP `Network.dataReceived`, a test instrument), and a
+  5 s nothing-moves hang rule; B5 no page error, no ✓ on an `after` row. "Live page time" is the loader's own footer
+  clock, so a main-thread freeze (SwiftShader's WebGL context, the first track) is reported, not judged — a frozen page
+  paints nothing, so nothing on it can lie. Leave time and time-to-DOWNLOAD-100 are reported (headless numbers are
+  SwiftShader's; the phone clip is the phone's). Three stills (portrait 430×932) at SETUP ≥ 20 / 70 % and at 100/100 in
+  `harness/out/boot/`.
+- **Known costs, not lies** (measured in the boot e2e): the two heroes load sequentially in `setModels`
+  (`src/render/index.ts`, render's), and menu / key / track art (`after`) share the link with the needed bytes — on a
+  throttled LTE the needed 3.6 MB get roughly half the bandwidth. Both are wall-time work for their owners; the number
+  is honest either way.
 
 ## 13. Garage and the two bikes (wave 1, MEGA_PLAN P1/P4)
 

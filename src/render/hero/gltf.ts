@@ -9,6 +9,10 @@ import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { prepareHero } from './lod';
 import { fogify } from '../lighting/environment';
+import { HERO_URLS, lodUrl } from './urls';
+import type { ByteProgress } from '../../boot/plan';
+
+export { HERO_URLS, lodUrl };
 
 export type ModelChoice = 'proc' | 'gltf';
 export interface ModelChoices {
@@ -18,21 +22,19 @@ export interface ModelChoices {
 
 const cache = new Map<string, Promise<GLTF | null>>();
 
-/** `models/bike.glb` → `models/bike-lod.glb` (the art build's ≤ 6 k-tri twin: same nodes / rig / clips / material names, its own 512² atlases). */
-export function lodUrl(url: string): string {
-  return url.replace(/\.glb$/, '-lod.glb');
-}
-
 /**
  * Load + parse once; a failed load resolves null (the caller keeps the procedural model, or — for a
  * `-lod.glb` — the authored file on every tier). Round 13: `prepareHero` (spoke split for files
  * without `<wheel>_spokes`, `KHR_materials_variants` table) runs before anyone clones the document.
  */
-export function loadGltf(url: string, quiet = false): Promise<GLTF | null> {
+export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Promise<GLTF | null> {
   let p = cache.get(url);
   if (!p) {
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
+    // Boot plan (docs/tasks/loading-progress-invariant.md): the reader — three's FileLoader — reports its own
+    // bytes, forwarded as deltas; nothing observes the network after the fact.
+    let reported = 0;
     p = new Promise<GLTF | null>((resolve) => {
       loader.load(
         url,
@@ -42,7 +44,14 @@ export function loadGltf(url: string, quiet = false): Promise<GLTF | null> {
             .catch((err: unknown) => console.warn(`[render] hero prepare for ${url} failed:`, err))
             .then(() => resolve(g));
         },
-        undefined,
+        bytes
+          ? (e) => {
+              if (e.loaded > reported) {
+                bytes.add(e.loaded - reported);
+                reported = e.loaded;
+              }
+            }
+          : undefined,
         (err) => {
           if (!quiet) console.warn(`[render] glTF ${url} failed:`, err);
           resolve(null);
@@ -95,8 +104,6 @@ export function shrinkTextures(root: THREE.Object3D, albedoMax = 1024, otherMax 
     }
   });
 }
-
-export const HERO_URLS = { bike: 'models/bike.glb', rider: 'models/rider.glb' } as const;
 
 /** Every mesh casts + receives; materials get the library's neutral map set so they share the standard program. */
 export function prepareHeroMaterials(root: THREE.Object3D, complete: (m: THREE.MeshStandardMaterial) => void): THREE.MeshStandardMaterial[] {

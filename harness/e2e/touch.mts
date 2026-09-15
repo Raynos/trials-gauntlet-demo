@@ -6,6 +6,7 @@
  *   pnpm harness:e2e            all flows, both geometries (the transition grid on the first geometry; --grid=all for both)
  *   pnpm harness:e2e --only=run --geom=iphone15promax
  *   pnpm harness:e2e --only=grid
+ *   pnpm harness:e2e --only=boot        the loading screen at LTE / 3G × SW × art pack (harness/e2e/boot.mts)
  *
  * Rules the suite enforces (each is a past phone bug):
  *   R1  after a screen change, only the new screen's elements are hit-testable (visibility isolation);
@@ -21,6 +22,7 @@
  */
 import { chromium, type BrowserContext, type Page } from 'playwright';
 import { startServer } from '../lib/server';
+import { bootSuite } from './boot.mjs';
 
 type Geom = { name: string; width: number; height: number; dpr: number };
 const GEOMS: Geom[] = [
@@ -767,6 +769,17 @@ async function flowHitRects(ctx: BrowserContext, url: string, g: Geom): Promise<
 // ---------------------------------------------------------------------------------------------- main
 
 const gridTotals: GridStats[] = [];
+// The loading screen a stranger boots through (docs/tasks/loading-progress-invariant.md): its own servers and browser.
+if (!only || only === 'boot') {
+  console.log('== boot');
+  for (const r of await bootSuite({}, { stillsDir: 'harness/out/boot' })) {
+    checks++;
+    if (r.fails.length) {
+      fails.push({ flow: 'boot', rule: `${r.config.net}/sw=${r.config.sw}/art=${r.config.art}`, detail: r.fails.join('; ') });
+      console.log(`  FAIL boot ${r.config.net}/sw=${r.config.sw}/art=${r.config.art}: ${r.fails.join('; ')}`);
+    }
+  }
+}
 const server = await startServer({});
 const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 try {

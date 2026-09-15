@@ -18,6 +18,10 @@
  * ImageBitmap), so canvas compositing goes through `drawArt`, which flips back.
  */
 import * as THREE from 'three';
+import { BOOT_IDS, COMMON_IDS, HALL_SKIN_IDS } from './boot-set';
+import type { ByteProgress } from '../../boot/plan';
+
+export { BOOT_IDS };
 
 export type ArtKind = 'stencil' | 'mask' | 'sign' | 'graffiti' | 'banner' | 'crowd' | 'plate-far' | 'sky' | string;
 
@@ -42,10 +46,6 @@ const SKIP_PREFIX = 'art/menu/';
 /** Assets the art owner rejected in the manifest (`rejected[]`) — never fetched, never drawn. */
 const REJECTED = new Set(['stencil-apex', 'stencil-taro', 'tyremark-straight', 'mask-rivet-drips', 'mask-rust-streaks']);
 
-/** What every track shows near its start gate (barrier strips, flags, crowd, deck decals). */
-const COMMON_IDS = ['banner-vortex-oil', 'banner-kestrel-tyres', 'banner-nordvik', 'banner-apex-suspension', 'banner-bolt-energy', 'banner-ironworks-series', 'crowd-day', 'tyremark-arc'];
-/** The hall's container skins (industrial + foundry). */
-const HALL_SKIN_IDS = ['stencil-hkr', 'stencil-nordvik', 'stencil-weights', 'stencil-hazard', 'stencil-serial', 'stencil-arrows', 'mask-edge-grime', 'mask-grime-spatter'];
 /** Back-wall decals (industrial + foundry): not needed for the title, requested with the track. */
 const HALL_DECAL_IDS = ['poster-trials-night', 'poster-tyres', 'sign-hard-hat', 'sign-overhead-crane', 'sign-forklift', 'sign-exit', 'graffiti-rise', 'graffiti-grind', 'graffiti-nofear', 'graffiti-skull', 'graffiti-tag-wall', 'graffiti-wheel'];
 
@@ -67,8 +67,6 @@ export function idsFor(biome: string): string[] {
   }
 }
 
-/** The boot set: the showcase biome (industrial) minus its back-wall decals. */
-export const BOOT_IDS: readonly string[] = [...COMMON_IDS, ...HALL_SKIN_IDS, 'plate-industrial'];
 
 export class ArtLibrary {
   readonly entries = new Map<string, ArtEntry>();
@@ -145,7 +143,7 @@ export class ArtLibrary {
   }
 
   /** Fetch + decode one asset (memoised; a failure resolves and leaves the item procedural). */
-  private fetchOne(e: ArtEntry): Promise<void> {
+  private fetchOne(e: ArtEntry, bytes?: ByteProgress): Promise<void> {
     const had = this.fetches.get(e.id);
     if (had) return had;
     const p = (async () => {
@@ -154,7 +152,7 @@ export class ArtLibrary {
         const url = e.path.startsWith('art/') ? this.base + e.path.slice(4) : this.base + e.path;
         const res = await fetch(url, { cache: 'force-cache' });
         if (!res.ok) return;
-        const blob = await res.blob();
+        const blob = bytes ? await readBlob(res, bytes) : await res.blob();
         const bmp = await createImageBitmap(blob, { imageOrientation: 'flipY', premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
         this.bitmaps.set(e.id, bmp);
         this.bytesDelivered += e.bytes || blob.size;
@@ -173,7 +171,7 @@ export class ArtLibrary {
    * Fetch a set of ids (those not already in flight), reporting `label` progress with bytes.
    * Resolves when every one has decoded or failed. Ids the manifest does not list are ignored.
    */
-  async request(ids: readonly string[], label = 'art'): Promise<void> {
+  async request(ids: readonly string[], label = 'art', reader?: ByteProgress): Promise<void> {
     await this.loadManifest();
     // Boot priority: a per-track request queues behind the boot set so the title's art is
     // not contending with canyon's sky on a slow link.
@@ -215,7 +213,7 @@ export class ArtLibrary {
     await Promise.all([
       ...inFlight,
       ...wanted.map(async (e) => {
-        await this.fetchOne(e);
+        await this.fetchOne(e, reader);
         done++;
         if (this.bitmaps.has(e.id)) bytes += e.bytes;
         progress(done, bytes);
@@ -250,8 +248,8 @@ export class ArtLibrary {
     return b;
   }
 
-  /** Kick off the boot load: manifest + the showcase set (idempotent). */
-  load(): Promise<void> {
+  /** Kick off the boot load: manifest + the showcase set (idempotent). `bytes`: the boot plan's reader for the set (docs/tasks/loading-progress-invariant.md). */
+  load(bytes?: ByteProgress): Promise<void> {
     if (this.started) return this.whenSettled;
     this.started = true;
     const t0 = typeof performance !== 'undefined' ? performance.now() : 0;
@@ -262,7 +260,7 @@ export class ArtLibrary {
       for (const fn of this.listeners) fn();
       this.listeners.length = 0;
     };
-    return this.request(BOOT_IDS, 'art pack')
+    return this.request(BOOT_IDS, 'art pack', bytes)
       .catch(() => undefined)
       .then(finish);
   }
@@ -362,4 +360,23 @@ export function tintMask(bmp: ImageBitmap, w: number, h: number, color: string, 
 export function pickId(ids: string[], key: number): string | null {
   if (!ids.length) return null;
   return ids[((key % ids.length) + ids.length) % ids.length]!;
+}
+
+/** Read a response body chunk by chunk, reporting each chunk's bytes to the boot plan, and hand back the Blob `createImageBitmap` wants. */
+async function readBlob(res: Response, bytes: ByteProgress): Promise<Blob> {
+  const type = res.headers.get('content-type') ?? '';
+  if (!res.body) {
+    const blob = await res.blob();
+    bytes.add(blob.size);
+    return blob;
+  }
+  const reader = res.body.getReader();
+  const parts: BlobPart[] = [];
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    parts.push(value);
+    bytes.add(value.byteLength);
+  }
+  return new Blob(parts, { type });
 }

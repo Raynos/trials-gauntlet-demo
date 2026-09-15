@@ -489,7 +489,8 @@ export class App {
     this.setOverlay(false);
     this.touch.setEnabled(false);
     this.touch.setOverlay(false);
-    this.o.sceneRoot?.classList.remove('drift', 'dim', 'garage');
+    this.o.sceneRoot?.classList.remove('covered', 'dim', 'garage');
+    this.game.renderEnabled = true;
     const vol = this.soundOn ? this.volume : 0;
     this.audio?.setMasterVolume(0); // the load / rewind cues stay silent
     const name = getTrack(JSON.parse(src.json).header?.trackId as string)?.name ?? this.game.currentTrack?.name ?? '';
@@ -646,7 +647,10 @@ export class App {
     this.credits.hide();
     this.garage.hide();
     const scene = this.o.sceneRoot;
-    scene?.classList.toggle('drift', screen === 'menu');
+    // The menu's key art covers the canvas: no WebGL frame at all while it is up (PERF.md #1 —
+    // the phone paid a full tier frame plus a compositor copy for an invisible canvas).
+    scene?.classList.toggle('covered', screen === 'menu');
+    this.game.renderEnabled = screen !== 'menu';
     scene?.classList.toggle('dim', screen !== 'menu' && screen !== 'garage');
     scene?.classList.toggle('garage', screen === 'garage');
     const dev = this.mux.activeDevice();
@@ -686,7 +690,8 @@ export class App {
     } catch {
       /* storage unavailable */
     }
-    this.o.sceneRoot?.classList.remove('drift', 'dim', 'garage');
+    this.o.sceneRoot?.classList.remove('covered', 'dim', 'garage');
+    this.game.renderEnabled = true;
     this.menu.hide();
     this.garage.hide();
     this.settings.hide();
