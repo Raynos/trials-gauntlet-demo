@@ -1432,7 +1432,29 @@ bike (it climbs to the top band and the camera follows it up); the landing zone 
 air; the pitch tilt remains only as the last resort when the hall roof clamps the camera (b3 apex),
 because a clamped camera cannot slide. H4 re-run below.
 
-CAMCHECK_TABLE
+H4 after the change, `low`, 1280×720, every golden (19 tracks; b1–e3 at 1280×720, the rest at 640×360; host load 21–43): **0 riding frames out of the box** in total.
+
+| track | frames | riding | riding out of box | clamped % | bike sx | bike sy | worst offset |
+|---|---|---|---|---|---|---|---|
+| b1-first-ride | 2494 | 2463 | 0 | 0 | 0.35..0.46 | 0.49..0.66 | 0.164 |
+| b2-lean-back | 2316 | 1905 | 0 | 0 | 0.31..0.47 | 0.44..0.62 | 0.187 |
+| b3-kicker-row | 2053 | 1723 | 0 | 12 | 0.30..0.47 | 0.34..0.60 | 0.205 |
+| e1-uphill-weight | 2971 | 2848 | 0 | 0 | 0.28..0.47 | 0.22..0.72 | 0.285 |
+| e2-rear-wheel-first | 2651 | 2620 | 0 | 0 | 0.33..0.46 | 0.40..0.64 | 0.172 |
+| e3-stairway | 2509 | 2478 | 0 | 0 | 0.33..0.46 | 0.40..0.66 | 0.166 |
+| flat-test | 514 | 483 | 0 | 0 | 0.38..0.46 | 0.53..0.58 | 0.119 |
+| gap-test | 345 | 314 | 0 | 0 | 0.33..0.46 | 0.43..0.59 | 0.166 |
+| h1-wheelie-wire | 2869 | 2838 | 0 | 0 | 0.33..0.46 | 0.37..0.67 | 0.174 |
+| h2-gap-chain | 3012 | 2981 | 0 | 0 | 0.29..0.46 | 0.40..0.63 | 0.206 |
+| h3-fire-line | 2530 | 2499 | 0 | 10 | 0.29..0.46 | 0.24..0.63 | 0.26 |
+| lab-flat-200 | 757 | 726 | 0 | 0 | 0.38..0.46 | 0.53..0.59 | 0.119 |
+| lab-physics-test | 493 | 462 | 0 | 0 | 0.35..0.46 | 0.47..0.61 | 0.146 |
+| m1-hop-up | 2075 | 2044 | 0 | 0 | 0.34..0.46 | 0.46..0.67 | 0.169 |
+| m2-drum-roll | 2957 | 2925 | 0 | 0 | 0.30..0.46 | 0.32..0.68 | 0.201 |
+| m3-see-saw | 2734 | 2702 | 0 | 0 | 0.29..0.46 | 0.33..0.65 | 0.205 |
+| x1-vertical-limit | 3383 | 3352 | 0 | 0 | 0.28..0.46 | 0.22..0.74 | 0.275 |
+| x2-pipe-dream | 3130 | 3098 | 0 | 3 | 0.31..0.46 | 0.24..0.67 | 0.26 |
+| x3-gauntlet | 2894 | 2863 | 0 | 6 | 0.30..0.46 | 0.22..0.64 | 0.276 |
 
 ### Low budget — every golden at the phone geometry (2000×920 @ DPR 1.5 → 1600×736), riding frame
 
@@ -1441,11 +1463,30 @@ tris on b1). Not taken: merging the per-chunk prop batches (the remaining 75–8
 draw per prop kind per 80 m chunk with its `:-1` neighbour; a per-chunk merge by material is the world
 owner's next cut) and a medium-tier container skin set.
 
-BUDGET_TABLE
+`low`, phone geometry 2000×920 @ DPR 1.5 (canvas 1600x736), glTF hero (full rider, bike LOD), riding frame; SwiftShader submit ms are this host's at the load shown. Calls 81–127, textures 26.3–41.4 MB.
+
+| track | tick | calls | tris | hero tris | RT Mpx / MB | textures MB | programs | submit ms (med / p95) | speed m/s | load |
+|---|---|---|---|---|---|---|---|---|---|---|
+| b1-first-ride | 700 | 109 | 97.3 k | 17.5 k | 1.44 / 11 | 39 | 30 | 0.88 / 1.28 | 14.5 | 41.2 |
+| b2-lean-back | 700 | 121 | 95.4 k | 17.5 k | 1.44 / 11 | 39.4 | 29 | 0.85 / 1.45 | 14.9 | 38.9 |
+| b3-kicker-row | 700 | 106 | 115.4 k | 17.5 k | 1.44 / 11 | 39.4 | 30 | 0.56 / 0.99 | 17.5 | 35.3 |
+| e1-uphill-weight | 600 | 109 | 94.1 k | 17.5 k | 1.44 / 11 | 33 | 25 | 0.74 / 1.34 | 13 | 32.3 |
+| e2-rear-wheel-first | 700 | 84 | 100.9 k | 17.5 k | 1.44 / 11 | 33 | 26 | 0.65 / 1.22 | 13.4 | 28.7 |
+| e3-stairway | 700 | 81 | 90.9 k | 17.5 k | 1.44 / 11 | 37 | 26 | 0.7 / 1.29 | 13.7 | 25.7 |
+| m1-hop-up | 700 | 99 | 104.3 k | 17.5 k | 1.44 / 11 | 39.4 | 30 | 0.48 / 0.75 | 14.2 | 26.4 |
+| m2-drum-roll | 600 | 113 | 100.4 k | 17.5 k | 1.44 / 11 | 26.6 | 25 | 0.53 / 0.95 | 14.3 | 24.7 |
+| m3-see-saw | 700 | 100 | 96.1 k | 17.5 k | 1.44 / 11 | 36.7 | 30 | 0.62 / 1.01 | 13.2 | 21.6 |
+| h1-wheelie-wire | 700 | 88 | 59.1 k | 17.5 k | 1.44 / 11 | 40.4 | 30 | 0.5 / 0.81 | 14 | 18.7 |
+| h2-gap-chain | 700 | 94 | 66.3 k | 17.5 k | 1.44 / 11 | 40.1 | 30 | 0.62 / 0.78 | 14.6 | 16.3 |
+| h3-fire-line | 700 | 125 | 120.5 k | 17.5 k | 1.44 / 11 | 40.7 | 30 | 0.66 / 1.05 | 14.1 | 14.4 |
+| x1-vertical-limit | 700 | 98 | 101.7 k | 17.5 k | 1.44 / 11 | 26.3 | 25 | 0.65 / 1.23 | 8.7 | 13.5 |
+| x2-pipe-dream | 700 | 104 | 104.0 k | 17.5 k | 1.44 / 11 | 40.7 | 30 | 0.63 / 1 | 15.2 | 13.8 |
+| x3-gauntlet | 700 | 104 | 99.0 k | 17.5 k | 1.44 / 11 | 41.4 | 30 | 0.66 / 1.31 | 7.7 | 12.5 |
+| flat-test | 700 | 127 | 122.6 k | 17.5 k | 1.44 / 11 | 38.7 | 30 | 0.53 / 0.82 | 18.4 | 11.4 |
 
 ### Determinism, checks
 
-DET_LINE `pnpm typecheck`, `pnpm lint`, `pnpm vitest run src/render` (16) green.
+Determinism: captures of the b1 bot-3 golden on `low` (15 canvas PNGs, every 100 ticks to 1500; four runs on the final build, t700 `d2665d5bf840493d3b2e4d679343b3c4`) hash `dc63947be93236a9860565ca17752f00` / `dc63947be93236a9860565ca17752f00` (identical); e2 on `medium` `a924fcf844c91565cf5c28c5a1d8c2e2` / `a924fcf844c91565cf5c28c5a1d8c2e2` (identical; t700 `a6fcd8546b9813531a261f3d5d221fdf`). One low capture in the first pair differed before the chunk compile went synchronous (see `compileMaterials`); after it, 3 / 3 identical. The budget table has 16 of the 17 rows: the chain was killed before `gap-test`. `pnpm typecheck`, `pnpm lint`, `pnpm vitest run src/render` (16) green.
 
 ### Evidence (scratch `render8/`)
 

@@ -29,6 +29,7 @@ import { PropBatch, tierCasts, tierHides, tierManaged } from './world/props';
 import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
 import { groundFloorY, profileY } from './world/track';
+import { stabilizePrograms, type MaterialKindsReport } from './util/materialKinds';
 import { HALL } from './world/hall';
 import { buildRideSurfaces } from './world/deck';
 
@@ -97,6 +98,8 @@ const WORLD_MESH = /^(props:|deck:|obstacles:|ribbon:)/;
 /** The surfaces the bike rides — the only shadow receivers on `low` (the deck AO skirt excluded). */
 const RIDE_SURFACE = /^(deck:(?!ao)|obstacles:|ribbon:)/;
 /** Hero parts too small to change the 512² silhouette on `low` (chain, sprockets, shock, pegs, spokes): no shadow draw there. */
+/** Perf cut #1: consecutive identical frames skipped before one is drawn anyway (a valve for mutations the key cannot see). */
+const SKIP_MAX = 30;
 const HERO_SMALL = /^(chain|sprocket_(front|rear)|shock_(body|spring)|pegs|wheel_(front|rear)(_spokes|:spokes))$/;
 
 export interface RenderBudget {
@@ -186,6 +189,21 @@ export class ThreeRenderer implements GameRenderer {
   private readonly contextKind: string;
   private readonly syncPixel = new Uint8Array(4);
   private readonly tmp = new THREE.Vector3();
+  /** Perf cut #0: what `stabilizePrograms` did on the last scene change (`debugInfo().stabilized`). */
+  private programReport: MaterialKindsReport = { singlePass: 0, split: 0, depth: 0 };
+  /**
+   * Perf cut #1 (docs/plans/PERF.md §3.2 #1): a frame whose inputs equal the last drawn frame's is not
+   * drawn. The renderer is a pure function of (state, alpha, simulated time, camera, scene mutations):
+   * on the garage / menu / pause / results screens the state is frozen, so after the rig settles every
+   * frame is identical — and the user's iPhone paid 0.8 ms of JS + 112 draws for each one. The key is
+   * the physics tick, alpha, tSim, phase, runTime, checkpoint, the ghost's tick and the camera's pose;
+   * every scene mutation calls `invalidate()`; `SKIP_MAX` consecutive skips force a redraw as a valve.
+   */
+  private frameDirty = true;
+  private skipRun = 0;
+  private skippedFrames = 0;
+  private readonly lastKey = { tick: -1, alpha: -1, tSim: -1, phase: 'menu' as GamePhase, runTime: -1, ghostTick: -1, checkpoint: -1 };
+  private readonly lastCam = new Float64Array(9);
   private lastCheckpoint = -1;
   // Ghost (CONTRACT §2.7 setGhost): a second bike+rider with ghosted materials, no
   // shadow, no particles, no contact blobs; nothing else in the scene reads it.
@@ -613,15 +631,13 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   /**
-   * Compile `mats` in tasks of two materials (`compileAsync`; on a real driver a handful of ms
-   * each, on software GL the first standard program is seconds and not splittable from JS),
+   * Compile `mats` in tasks of two materials (`compile`; on a real driver a handful of ms each,
+   * on software GL the first standard program is seconds and not splittable from JS),
    * against the tier's scene target (program parameters include the output colour space and
    * tone mapping, so a compile against the wrong target builds a variant the frame never uses).
    * Returns the summed task ms. `abort()` (round 14 entry) stops between tasks.
    */
   private async compileMaterials(mats: THREE.Material[], report?: (done: number, total: number) => void, abort?: () => boolean): Promise<number> {
-    const r = this.renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
-    if (!r.compileAsync) return 0;
     let ms = 0;
     const chunk = 2;
     for (let i = 0; i < mats.length; i += chunk) {
@@ -640,7 +656,12 @@ export class ThreeRenderer implements GameRenderer {
       });
       try {
         this.renderer.setRenderTarget(this.post.sceneTarget);
-        await r.compileAsync(this.scene, this.rig.camera);
+        // Synchronous `compile` (round 14): `compileAsync` polls on a timer between the hide above
+        // and the restore below, and a harness `render()` landing in that gap drew a frame with the
+        // other chunks missing (one low capture in three differed). `compile` issues the links in
+        // this task; a parallel-compile driver finishes them in the background and the entry's
+        // warm-up + `finish()` waits for them.
+        this.renderer.compile(this.scene, this.rig.camera);
       } finally {
         this.renderer.setRenderTarget(null);
         for (const o of hidden) o.visible = true;
@@ -748,6 +769,7 @@ export class ThreeRenderer implements GameRenderer {
       .then(() => {
         if (token !== this.entryToken) return;
         this.entering = false;
+        this.invalidate();
         st.ms = +(performance.now() - t0).toFixed(1);
         performance.mark?.('render:entry');
       });
@@ -831,6 +853,17 @@ export class ThreeRenderer implements GameRenderer {
     harmonizeUv1(group);
     if (this.tier === 'low') shrinkTextures(group, 512, 256);
     this.scene.add(group);
+    // Perf cut #5 (PERF.md §3.2 #5): the world's ~1 240 nodes never move — compute their matrices once and
+    // stop three recomposing every one of them each frame (`updateMatrixWorld` recurses regardless of
+    // `matrixWorldAutoUpdate` in r186; it is `matrixAutoUpdate` that costs). The nodes that do move — see-saw
+    // and drum roots, the picked melt / lamp lights and their targets — stay automatic, so `render()` needs
+    // no manual matrix calls and cannot miss one.
+    group.updateMatrixWorld(true);
+    group.traverse((o) => {
+      o.matrixAutoUpdate = false;
+    });
+    for (const o of obstacles.seesaws.values()) o.matrixAutoUpdate = true;
+    for (const o of obstacles.drums.values()) o.matrixAutoUpdate = true;
     this.applyTierVisibility();
     this.world = {
       group,
@@ -891,6 +924,7 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   onEvent(e: GameEvent): void {
+    this.invalidate(); // perf cut #1: events spawn particles / flash / cut history
     this.emitters.onEvent(e);
     if (e.type === 'finish') this.flashT = this.lastTSim;
     if (e.type === 'restart') {
@@ -959,6 +993,7 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   setBikeClass(c: BikeClass): void {
+    this.invalidate(); // perf cut #1: a livery change in a frozen garage frame
     this.bikeClass = c === 'pro' ? 'pro' : 'rookie';
     // The hero may not exist yet (built lazily by `ensureHero` / swapped by `applyModels`): both
     // paths read `bikeClass`, so a call before the first frame still lands.
@@ -1019,8 +1054,44 @@ export class ThreeRenderer implements GameRenderer {
       o.castShadow = !low && ud.castHigh && (!o.name.startsWith('props:') || tierCasts(o.name, this.tier));
       o.receiveShadow = ud.receiveHigh && (!low || RIDE_SURFACE.test(o.name));
     });
+    // Perf cut #0: no per-frame program re-acquisition (single-pass transparents, per-kind clones, per-kind depth materials).
+    this.programReport = stabilizePrograms(this.scene, this.lib);
+    this.invalidate(); // perf cut #1: a build / hero swap / tier change reaches the pixels
   }
 
+
+  /** Perf cut #1: the next `render()` must draw (a scene mutation the frame key cannot see). */
+  invalidate(): void {
+    this.frameDirty = true;
+  }
+
+  /** Perf cut #1: true when nothing that reaches the pixels changed since the last drawn frame. Records the new key either way. */
+  private unchangedFrame(f: { tick: number; tSim: number; checkpoint: number }, alpha: number, cam: THREE.PerspectiveCamera): boolean {
+    const k = this.lastKey;
+    const c = this.lastCam;
+    const p = cam.position;
+    const q = cam.quaternion;
+    const same =
+      !this.frameDirty &&
+      this.skipRun < SKIP_MAX &&
+      k.tick === f.tick &&
+      k.alpha === alpha &&
+      k.tSim === f.tSim &&
+      k.phase === this.phase &&
+      k.runTime === this.runTime &&
+      k.checkpoint === f.checkpoint &&
+      k.ghostTick === (this.ghostState ? this.ghostState.tick : -1) &&
+      c[0] === p.x && c[1] === p.y && c[2] === p.z && c[3] === q.x && c[4] === q.y && c[5] === q.z && c[6] === q.w && c[7] === cam.fov && c[8] === cam.zoom;
+    k.tick = f.tick;
+    k.alpha = alpha;
+    k.tSim = f.tSim;
+    k.phase = this.phase;
+    k.runTime = this.runTime;
+    k.checkpoint = f.checkpoint;
+    k.ghostTick = this.ghostState ? this.ghostState.tick : -1;
+    c[0] = p.x; c[1] = p.y; c[2] = p.z; c[3] = q.x; c[4] = q.y; c[5] = q.z; c[6] = q.w; c[7] = cam.fov; c[8] = cam.zoom;
+    return same;
+  }
 
   camera(): CameraDebug {
     return this.rig.debug();
@@ -1056,6 +1127,15 @@ export class ThreeRenderer implements GameRenderer {
 
     this.rig.update(f);
     const cam = this.rig.camera;
+    if (this.unchangedFrame(f, alpha, cam)) {
+      // Perf cut #1: identical to the last drawn frame — the canvas keeps it; no traversal, no draws.
+      this.skipRun++;
+      this.skippedFrames++;
+      this.renderer.info.reset();
+      return performance.now() - t0;
+    }
+    this.skipRun = 0;
+    this.frameDirty = false;
     if (this.lighting.isHeroShadow) this.lighting.follow(f.bikeX, f.bikeY, false);
     else this.lighting.follow(this.rig.targetX, this.rig.targetY, this.rig.distance > 20);
 
@@ -1203,6 +1283,7 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   resize(width: number, height: number, pixelRatio?: number): void {
+    this.invalidate(); // perf cut #1
     if (pixelRatio !== undefined) this.devicePixelRatio = pixelRatio;
     this.width = width;
     this.height = height;
@@ -1302,6 +1383,10 @@ export class ThreeRenderer implements GameRenderer {
     passes: number;
     /** Round 14: programs held by scene materials that are not their current one (memory only; never released mid-session). */
     stalePrograms: number;
+    /** Perf cut #0 (`util/materialKinds.ts`): transparents forced single-pass, meshes re-pointed at a per-kind clone, casters given a per-kind depth material. */
+    stabilized: MaterialKindsReport;
+    /** Perf cut #1: frames `render()` did not draw because nothing reaching the pixels changed. */
+    skippedFrames: number;
     /** Round 14: last track entry — wall ms from `setTrack` to ready, and its breakdown (`entryStats`). */
     entryMs: number;
     entry: ThreeRenderer['entryStats'];
@@ -1342,6 +1427,8 @@ export class ThreeRenderer implements GameRenderer {
       textureGenMs: this.textureGenMs,
       passes: this.postRef?.info.passes ?? 0,
       stalePrograms: this.staleProgramCount(),
+      stabilized: this.programReport,
+      skippedFrames: this.skippedFrames,
       entryMs: this.entryStats.ms,
       entry: this.entryStats,
       entering: this.entering,

@@ -113,7 +113,8 @@ export interface PhoneEstimate {
 
 /** `texMBTouched`: resident texture MB × the fraction a riding frame samples (≈ 0.5 — half the world's skins are behind the camera or in another chunk). */
 export function phoneEstimate(rtMpx: number, calls: number, tris: number, texMBResident: number, touchedFraction = 0.5): PhoneEstimate {
-  const fill = PHONE.A * rtMpx;
+  // A skipped frame (perf cut #1: 0 draws) writes no render target either.
+  const fill = calls === 0 && tris === 0 ? 0 : PHONE.A * rtMpx;
   const draws = PHONE.B * calls;
   const trisMs = PHONE.C * (tris / 1000);
   const textures = PHONE.D * texMBResident * touchedFraction;
