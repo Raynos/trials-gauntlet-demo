@@ -19,6 +19,23 @@ agent working there. Rounds 3–4 are committed (`e3eef69`); round 5 is in progr
   Those tests are the rows strangers were measured against (beginner/easy/medium in band, hard r9).
   Astra's own handoff says "some broader physics tests remain red".
 
+## Test merge #2, 2026-09-15 18:40 (`main` = `ce9fca3` / v0.2.0, branch = `405f894` + 7 uncommitted files)
+
+- `blender-work` is **35 commits behind `main`** and has never merged it. The merge now **conflicts in 16 files**:
+  `src/game/app.ts`, `src/physics/v2/{bike,tuning}.ts`, `src/physics/v2/feel.test.ts`, `src/render/index.ts`,
+  `src/render/post/chain.ts`, `src/render/hero/gltfRider.test.ts`, `harness/stranger/{cli,report}.ts`,
+  `docs/plans/PLANS.md` and six stranger metrics files.
+- The branch's physics footprint grew to **18 files, +6 704 / −415** in `src/physics/v2` (bike.ts, rider.ts, tuning.ts
+  rewritten; `feel`/`r2`/`r3`/`r4` tests edited — a test edit is a numbered deviation under rule 1, not a merge).
+  With the conflicts left unresolved, 15 of 21 physics test files fail on the merged tree.
+- Since `main` pinned v0.2.0 on physics R6 (tag `physics-v2-final`, goldens + strangers + battery all measured on it),
+  **the branch's dynamics changes cannot land as-is**. Rule 1 stands: export-only physics additions merge; dynamics
+  changes are a physics-owner round with the R-tables, goldens and strangers re-run — or they are dropped.
+- Next step is Astra's (rule 3): merge `main` into `blender-work`, keep `main`'s `src/physics/**` wholesale (take
+  "ours" from `main` for every physics conflict), keep `main`'s `src/render/index.ts` perf cuts (#0–#4b) and the
+  reviewer/menu work in `src/game/app.ts`, then re-run `pnpm typecheck && pnpm lint && pnpm vitest run`. When that is
+  green the parent merges the hero/assets/garage set and runs the critic round (Pillar H, `RIDER_ON_GLASS.md`).
+
 ## Rules for the merge (so the hero work lands without losing the physics evidence)
 
 1. **Physics changes come through the physics owner's protocol or not at all.** A change to
