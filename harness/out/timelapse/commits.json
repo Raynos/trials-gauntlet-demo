@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-14T23:08:16.469Z",
+  "updatedAt": "2026-09-15T00:23:27.713Z",
   "commits": [
     {
       "sha": "bca9515abf20db18649a2fbdd5ba793106cd0840",
@@ -2381,6 +2381,106 @@
         "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/e55c4dd3c30e72fac366fa608fcd355784eaaece/clip.mp4",
         "clipFrames": 120,
         "wallMs": 64686.465958999994,
+        "notes": []
+      }
+    },
+    {
+      "sha": "fc17e77ba986be4831e86d18f6518772e017da28",
+      "short": "fc17e77",
+      "date": "2026-09-14T18:13:47-05:00",
+      "subject": "Harness r8: goldens/gate re-pinned on physics v2 (Rookie clears all 17 courses, Pro walled on m3/x1; heap under limit, D4c on v2), recordings carry the solver stamp, bot gains hop/wheelie/climb-throw macros, reflex bot retuned to v2 (b2 27 -> 8, b3 37 -> 12) but the average player is still over band on 12/16 courses — the v2 on-ramp front lift and air-throttle kick are the recurring death; wave-2 montage",
+      "index": 97,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/fc17e77ba986be4831e86d18f6518772e017da28/dist",
+        "wallMs": 4187.707334
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/fc17e77ba986be4831e86d18f6518772e017da28/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/fc17e77ba986be4831e86d18f6518772e017da28/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/fc17e77ba986be4831e86d18f6518772e017da28/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/fc17e77ba986be4831e86d18f6518772e017da28/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 61121.913417,
+        "notes": []
+      }
+    },
+    {
+      "sha": "12a29f2bd2c21760568004385dba14e18065b37f",
+      "short": "12a29f2",
+      "date": "2026-09-14T18:54:43-05:00",
+      "subject": "Render r12: the phone frame was fill rate — every tier composited to a 3000x1380 canvas, medium's bloom really ran at 1500x690, UnrealBloom re-wrote the full HDR frame and merged decks were never culled; low now draws to a <= 1.0 DPR canvas with the grade as tone mapping (no HDR target/bloom/composite), medium = quarter bloom + 1024 shadows at <= 1.25 DPR, decks chunked per 40 m — b1 low 5.2 -> 1.18 Mpx/frame, 157 -> 100 calls, 234k -> 106k tris, 70 -> 37 MB textures; replays byte-identical",
+      "index": 98,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/12a29f2bd2c21760568004385dba14e18065b37f/dist",
+        "wallMs": 4272.800000000003
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/12a29f2bd2c21760568004385dba14e18065b37f/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/12a29f2bd2c21760568004385dba14e18065b37f/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/12a29f2bd2c21760568004385dba14e18065b37f/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/12a29f2bd2c21760568004385dba14e18065b37f/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 72001.125625,
+        "notes": []
+      }
+    },
+    {
+      "sha": "bdf9f0c68b23a9e208d34af842c900104830fb2d",
+      "short": "bdf9f0c",
+      "date": "2026-09-14T18:58:08-05:00",
+      "subject": "Physics v2 R4: neither round-8 death is a solver artefact — the 200-400 deg/s 'air-throttle kick' is the rider pose swing on lean release (throttle alone 20 deg/s) and the on-ramp lift is slope geometry (a 20 deg kicker drops the lift threshold 0.6 g -> 0.22 g); Rookie gains a declared memoryless wheelie control that turns the kicker exit from 66 deg/+163 into 17 deg/-62 with hop/landing/hold/climb rows held; reflex average b1 3 -> 1, e1 34 -> 21; Pro m3/x1 walls were tracks, cleared in 1 on r7",
+      "index": 99,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/bdf9f0c68b23a9e208d34af842c900104830fb2d/dist",
+        "wallMs": 4213.188790999993
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/bdf9f0c68b23a9e208d34af842c900104830fb2d/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/bdf9f0c68b23a9e208d34af842c900104830fb2d/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/bdf9f0c68b23a9e208d34af842c900104830fb2d/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/bdf9f0c68b23a9e208d34af842c900104830fb2d/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 67846.20091700001,
+        "notes": []
+      }
+    },
+    {
+      "sha": "e05153e8a43876aa1e8ee00bb5d7ad2b05d791c9",
+      "short": "e05153e",
+      "date": "2026-09-14T19:10:45-05:00",
+      "subject": "Loader: DOWNLOAD counts only bytes the game waits for (core + models); the title key art is a capped prefetch that hot-swaps in, so it no longer holds the bar at 88 % after start",
+      "index": 100,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/e05153e8a43876aa1e8ee00bb5d7ad2b05d791c9/dist",
+        "wallMs": 4325.453582999995
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/e05153e8a43876aa1e8ee00bb5d7ad2b05d791c9/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/e05153e8a43876aa1e8ee00bb5d7ad2b05d791c9/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/e05153e8a43876aa1e8ee00bb5d7ad2b05d791c9/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/e05153e8a43876aa1e8ee00bb5d7ad2b05d791c9/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 67104.550208,
         "notes": []
       }
     }

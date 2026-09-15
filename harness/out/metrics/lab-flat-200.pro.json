@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "lab-flat-200",
   "bike": "pro",
-  "updatedAt": "2026-09-15T00:40:48.664Z",
-  "physics": "bikePhysicsFactory-v2",
+  "updatedAt": "2026-09-14T20:00:42.168Z",
+  "physics": "bikePhysicsFactory",
   "attemptsBand": [
     1,
     1
@@ -14,20 +14,14 @@
     {
       "skill": 3,
       "seeds": [
-        2522286987,
-        2522286988,
-        2522286989
+        2522286987
       ],
       "attempts": [
-        1,
-        1,
         1
       ],
       "median": 1,
       "finishTimes": [
-        11.9,
-        11.9,
-        11.9
+        9.575
       ]
     }
   ],
@@ -35,8 +29,6 @@
   "shaped": null,
   "singleWall": null,
   "runs": [
-    "20260914-194005-55ded7",
-    "20260914-194018-4c28ea",
-    "20260914-194031-d30d5a"
+    "20260914-150026-197e08"
   ]
 }

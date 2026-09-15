@@ -87,11 +87,227 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 9 status — the reflex controller learns the v2 air (rate-aware lean, early release), stranger round 4 passes b1–e2 on R4 and R5, e3 is the stairway that no human proxy clears
+
+**Finding.** The round-8 deaths were the controller's, as physics R4 said: `air-level` mapped pitch error to a lean that
+saturated at ±1 and held it through the reaction lag, a bang-bang controller on a double integrator. The controller now
+regulates the pitch it *will* have a reaction plus 0.25 s later (`e + rate × lead`, lean = that / 18°), leans at most
+half unless the predicted error is beyond 35°, never holds a full press longer than 0.3 s, lets go 0.15 s before the
+predicted zero crossing minus the ~30° the release itself swings the chassis (`air-release`), and keeps the hands
+light for 0.3 s after a release (`air-settle`); gas and brake became nudges on top of the lean (`air-gas-nose-up` no
+longer forces lean −1). On the Rookie the ramp pose is +0.8–1 (`ramp-ride`), on the Pro +1 with a third throttle above
+9 m/s. Three ground rules fell out of the e3 traces: `coast-into-rise` (no front brake into a ≥ 25° rise within a
+reaction + 0.3 s — the brake 1.3 m before a 27° flight was −13 → −109° in 0.35 s), `stair-bounce` (both wheels off a
+tread for a moment is a bounce, gas stays on — the throttle was cut on every step and the bike stalled at 1 m/s), and
+stairs are not ramps (a per-cell riser count, `Ahead.risers`; the +1 pose on risers noses the front into every step).
+Rookie `average`, seeds 1000–1002 on the frozen R4 (bdf9f0c), physics owner's R4 table → this round: gap 1 → 1 · b1
+1 → 1 · **b2 4 → 2 · b3 14 → 4 · e1 21 → 9 · e2 36 → 11 · e3 30 → 10**, every seed clears (R4: e1 2/3, e2 1/3, e3
+1/3). The full matrix on the same tree: **9 of 16 courses over band (round 8: 12)**, b2 and m2 back in band, e1/e2/e3
+at 8 each (bands 2–4 / 3–5 / 3–6). Physics R5 (e8f2ec7, the airborne rider rate limit) landed mid-round; on it the
+matrix reads b3 7 · e1 7 · e2 10 · e3 35 · m3 10 with **8 of 16 over band**, and a nine-seed run (1000–1008) gives b2 3 ·
+b3 4 · e1 11 · e2 19 · e3 10 · m2 8 · m3 32 — the 3-seed medians on e2/e3/m3 swing by 3× with the seed, so the matrix
+is a coarse instrument on those three. **Stranger round 4 (12 sessions, Rookie, frozen R4): b1 1 · b2 2.5 · b3 3 · e1
+5.5 · e2 6.5 all PASS (≤ 1.5 × band top, every session cleared); e3 15.5 FAIL** (20 and 11-not-cleared; both died on the
+0.25 m stair flights at 165 / 407 m and the 2 m pit after the descent). The R5 delta on b1–b3 (6 sessions): 1 · 2 · 3,
+all PASS. Every stranger names the same thing the reflex traces show: *any lean held into or through the lip flips the
+bike*; the ones who cleared rode kickers on plain gas and coasted the flight. The reflex bot and the strangers now agree
+on b1–e2 within a factor of 1.5; e3 is the outlier for both (reflex 8–35, strangers 11–20+, band 3–6) — a tracks
+question, not a controller one.
+
+| piece | as built |
+|---|---|
+| **reflex air rules** (`reflex/controller.ts` `AIR`, `decide()`) | `air-level`: `ePred = (pitch − target) + rate × (reactionS + 0.25)`, lean = ePred / 18 × gain, cap ±0.5 (±1 beyond 35°, for ≤ 0.3 s), `air-release` when `e + rate × (reactionS + 0.15) − 30 × leanHeld` crosses zero, `air-settle` (±0.25) for 0.3 s after; brake nudge beyond +30 predicted and still rising, gas nudge below −30 and falling; `touchdown` unchanged. `ramp-ride`: Rookie +0.8 + 0.2 × gain, Pro +1 and thr 0.3 above 9 m/s; stairs (`risers ≥ 2`) keep +0.4 × gain. New ground rules `coast-into-rise` (thr 0.5, no brake), `stair-bounce` (thr ≥ 0.8, lean −0.2..+0.4). `ControllerOptions.bike` (play.ts passes `sim.bike`, browser.ts too). `ReflexPlayOptions.onTick(tick, intent, keys)` for traces. |
+| **perception** (`reflex/perceive.ts`) | `Ahead.roughDeg` (max − min per-cell slope over −1..+2 m) and `Ahead.risers` (cells > 40° following a cell < 8°): a 0.25 m / 0.6 m stair flight counts 2–4 risers, a kicker or a 45° plank base 0–1. |
+| **stranger** (`stranger/PROTOCOL.md`, `session.ts`, `cli.ts`, `report.ts`) | "How the bike feels" gains the R4 air rule (gas/brake are nudges: +6 / −15° per half second; a held lean accelerates, ~170 °/s in 0.5 s; a release swings ~30° the other way — lean ≤ 2 slots, release early, fly a beat on `c`) and the ramp rule (weight forward, let go at the lip, ~8 m/s off a knee-high kicker under full gas, never brake on the face or before a riser). **Budget from the first call**: `state.firstCallAt` is set on the first CLI call and `wallMs` / the report's wall count from it — a `prep`-created session used to burn its 25 min while it waited to be spawned (r4 e3 s2 was handed 5 min). |
+| **shared checkout** | Two `git archive` copies in `scratchpad/harness8/`: `tree` = bdf9f0c (src 3d5fd16f; the controller work, the R4 matrix, stranger r4, the Rookie golden sweep, the physics-suite) and `tree5` = e8f2ec7 (src 74f5de4d = HEAD 8ea3b7d's fingerprint, physics R5; the HEAD matrix, stranger r5, the golden refresh + stale re-runs, the gate `--pin`, the browser reflex). A `sync.sh` overlays `harness/` (minus `out/` and `inputs/`) — the first version rsync'd `inputs/` with `--delete` and wiped the r4 stranger recordings and half the Rookie goldens in `tree` at 19:38; the recordings were re-emitted from the sessions' persisted recorder state (`rebuild-rec.mts`; e1 s1 replays deterministic `bba70471a3866d8a`), the goldens re-proved on `tree5` anyway. **Rule: never `--delete` into a tree that writes `inputs/`.** |
+| **`?perf=1` overlay** | On the live build (headless, `?track=b1-first-ride&perf=1`, 120 ticks + render) `hook.info()` exposes none of `tier, dpr, canvasW/H, rtMpx, rtMB, rtPasses, shadowMap`, the hook has no `debugInfo`/`renderer`, and the `pre.perf` element is not in the DOM (the overlay is created only by `App` when `o.perf` is set, and `?perf=1` did not reach it through the harness boot). `PerfSample` (`src/ui/perf.ts`) carries only frameMs / physicsUs / stats / quality / qualityWhy / dpr, and `app.ts` builds it from `game.qualityTier` + `dprCap()`, never from `renderer.debugInfo()`. **Core-game request**: wire `debugInfo()` into `PerfSample` (and mirror it in `HookInfo`, so the harness can assert the tier/DPR/render-target rows the render owner measures). |
+| **timelapse** | Ledger 96 → 100 commits (fc17e77, 12a29f2, bdf9f0c, e05153e built + captured, 5.3 min niced); `progress-stills.mp4`, `progress-clips.mp4` (13 milestones, 54 s), `progress.gif` re-rendered. No montage. |
+
+### Reflex matrix on HEAD e8f2ec7 (physics R5; `harness:reflex --all-tracks --bike both --skill novice,average,good --seeds 3`, 40 s wall, loadavg 7; full tables in `out/metrics/reflex.md`). Column "R4" = Rookie average on bdf9f0c with the same controller
+
+Median attempts over 3 seeds (clears / 3); death site = the obstacle that took the most Rookie `average` attempts, with the rule the rider was executing.
+
+| track | band | R4 Rookie avg | Rookie novice | Rookie average | Rookie good | Pro novice | Pro average | Pro good | Rookie average death site | out of band (Rookie avg, HEAD) |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| gap-test | 1–3 | 1 | 1 (3/3) | 1 (3/3) | 1 (3/3) | 3 (3/3) | 7 (3/3) | 4 (3/3) | — | in band |
+| b1-first-ride | 1–1 | 1 | 2 (3/3) | 1 (3/3) | 1 (3/3) | 1 (3/3) | 9 (3/3) | 2 (3/3) | — | in band |
+| b2-lean-back | 1–2 | 1 | 3 (3/3) | 1 (3/3) | 1 (3/3) | 30 (1/3) | 13 (3/3) | 7 (3/3) | ground @ 575 m ×1 (air-gas-nose-up) | in band |
+| b3-kicker-row | 1–2 | 4 | 9 (3/3) | 7 (3/3) | 4 (3/3) | 41 (1/3) | 25 (3/3) | 20 (3/3) | ground @ 170 m ×4 (air-brake-nose-down) | 7 > 2 |
+| e1-uphill-weight | 2–4 | 8 | 18 (2/3) | 7 (3/3) | 8 (3/3) | 36 (0/3) | 32 (3/3) | 20 (2/3) | ramp @ 445.9 m ×5 (air-brake-nose-down) | 7 > 4 |
+| e2-rear-wheel-first | 3–5 | 8 | 26 (1/3) | 10 (2/3) | 7 (3/3) | 46 (0/3) | 38 (0/3) | 22 (3/3) | ramp @ 506.4 m ×20 (air-brake-nose-down) | 10 > 5 |
+| e3-stairway | 3–6 | 8 | 19 (2/3) | 35 (1/3) | 14 (3/3) | 47 (0/3) | 44 (0/3) | 35 (1/3) | box @ 411.6 m ×34 (stuck-restart) | 35 > 6 |
+| m1-hop-up | 5–9 | 42 | 46 (0/3) | 49 (1/3) | 17 (2/3) | 51 (0/3) | 48 (0/3) | 48 (0/3) | ledge @ 119.0 m ×53 (air-brake-nose-down) | 49 > 9 |
+| m2-drum-roll | 6–12 | 9 | 25 (3/3) | 7 (3/3) | 7 (3/3) | 41 (0/3) | 44 (0/3) | 27 (3/3) | drum @ 53.2 m ×3 (air-gas-nose-up) | in band |
+| m3-see-saw | 8–12 | 33 | 34 (1/3) | 10 (2/3) | 11 (3/3) | 40 (0/3) | 44 (1/3) | 33 (2/3) | ground @ 410 m ×12 (air-brake-nose-down) | in band (9-seed 32) |
+| h1-wheelie-wire | 10–18 | 47 | 45 (0/3) | 50 (0/3) | 50 (0/3) | 47 (0/3) | 49 (0/3) | 43 (0/3) | wall @ 175.8 m ×65 (nose-low) | 50 > 18 |
+| h2-gap-chain | 14–22 | 44 | 42 (0/3) | 43 (0/3) | 42 (0/3) | 49 (0/3) | 46 (0/3) | 43 (0/3) | ramp @ 62.0 m ×32 (air-gas-nose-up) | 43 > 22 |
+| h3-fire-line | 18–25 | 26 | 34 (0/3) | 31 (0/3) | 15 (2/3) | 41 (0/3) | 46 (0/3) | 39 (0/3) | gap @ 489.2 m ×24 (air-gas-nose-up) | 31 > 25 |
+| x1-vertical-limit | 30–45 | 32 | 30 (0/3) | 32 (0/3) | 32 (0/3) | 38 (0/3) | 38 (0/3) | 35 (0/3) | ramp @ 227.9 m ×22 (stuck-restart) | in band (cap) |
+| x2-pipe-dream | 40–60 | 47 | 40 (0/3) | 38 (0/3) | 33 (0/3) | 45 (0/3) | 38 (0/3) | 43 (0/3) | drum @ 370.0 m ×44 (air-gas-nose-up) | in band (cap) |
+| x3-gauntlet | 60–80 | 30 | 23 (0/3) | 31 (0/3) | 31 (0/3) | 46 (0/3) | 38 (0/3) | 38 (0/3) | ramp @ 60.2 m ×47 (air-brake-nose-down) | under (cap, 0/3) |
+| lab-flat-200 | 1–1 | 1 | 1 (3/3) | 1 (3/3) | 1 (3/3) | 4 (3/3) | 2 (3/3) | 3 (3/3) | — | in band |
+| lab-physics-test | 3–8 | 1 | 2 (3/3) | 1 (3/3) | 1 (3/3) | 14 (3/3) | 2 (3/3) | 2 (3/3) | — | in band |
+
+**Out of band for the tracks owner (Rookie `average`, HEAD e8f2ec7, 8 of 16):** b3 7 [1–2] ground @ 170 m (air-brake-nose-down) ·
+e1 7 [2–4] ramp @ 445.9 m, the 45° demand plank (air-brake-nose-down) · e2 10 [3–5] ramp @ 506.4 m (air-brake-nose-down) ·
+e3 35 [3–6] box @ 411.6 m / stair @ 406.8 m (stuck-restart, air-brake) · m1 49 [5–9] ledge @ 119.0 m (air-brake-nose-down) ·
+h1 50 [10–18] wall @ 175.8 m (nose-low) · h2 43 [14–22] ramp @ 62.0 m (air-gas-nose-up) · h3 31 [18–25] gap @ 489.2 m
+(air-gas-nose-up). On the frozen R4 the same list was b3 4, e1 8, e2 8, e3 8, m1 42, m3 33, h1 47, h2 44, h3 26 (9 of 16).
+The recurring air death is now the *brake* nudge on a nose-high exit (`air-brake-nose-down`), not the lean.
+
+Nine seeds (1000–1008), Rookie `average`, HEAD: gap 1 · b1 1 · b2 3 (2/3/3/2/4/2/1/3/3) · b3 4 (2/4/2/4/2/8/5/1/12) · e1 11
+(13/14/9/15/5/11/11/3/6) · e2 19 (34/38/22/12/19/8/37/4/10, 7/9) · e3 10 (7/20/4/6/14/4/20/10/28) · m1 44 (1/9) · m2 8 · m3 32
+(35/36/10/13/32/34/5/33/22, 4/9).
+
+### Stranger round 4 — Rookie, 12 sessions on the frozen R4 (bdf9f0c, src 3d5fd16f), prompt = `run-stranger.md` block verbatim, PROTOCOL with the R4 feel notes; loadavg 4–7 at spawn (sweeps pushed it to 10–16 during the later sessions)
+
+| session | attempts | cleared | time | calls | wall | died at (nearest obstacle) | what the stranger said |
+|---|---:|---|---:|---:|---:|---|---|
+| b1 s1 | 1 | yes | 49.0 s | 13 | 2.4 min | — | braked blind before every rise; the 35 m window never shows the next feature |
+| b1 s2 | 1 | yes | 42.8 s | 12 | 5.5 min | — | same: braking to ~10 m/s before a ramp whose far side is not visible |
+| b2 s1 | 2 | yes | 49.4 s | 15 | 3.0 min | 433 m | a lean-back blip on the second knee-high step at 16 m/s pitched to 86° and looped |
+| b2 s2 | 3 | yes | 68.6 s | 27 | 11.9 min | 118, 304 m | chaining a second hop while still airborne loops; one hop at 8–10 m/s and let the bounce carry |
+| b3 s1 | 4 | yes | 60.8 s | 22 | 7.1 min | 87, 239, 358 m | any `lb`/`lf` in flight is a runaway flip; gas through the lip, pure coast in the air, half gas after landing |
+| b3 s2 | 2 | yes | 45.8 s | 26 | 15.5 min | 240 m | the same lip recipe gave +29° on one gap and −34° on the next; rode the tallest kicker blind with gas held |
+| e1 s1 | 6 | yes | 82.5 s | 25 | 10.0 min | 236, 212, 211, 320, 445 m | releasing the forward lean at the lip is violent and slot-sensitive: one slot early = backflip, one late = nose-plant |
+| e1 s2 | 5 | yes | 104.1 s | 29 | 18.8 min | 129, 77, 257, 526 m | release `gf` on the last grounded slot and fly neutral; full gas on the flats turned a creeping wheelie into a launch 14 m from the line |
+| e2 s1 | 7 | yes | 86.0 s | 50 | 12.2 min | 72, 55, 55, 199, 324, 537 m | exit angle depends on whether the last `gf`/`lb` slot straddles the lip; `gf` to the lip, `c` one slot, `gb2` mid-flight |
+| e2 s2 | 6 | yes | 86.4 s | 24 | 17.7 min | 69, 75, 278, 194, 531 m | full-gas flight off one kicker lands nose-down on the next ramp; brake to 7–8 m/s before the kicker |
+| e3 s1 | 20 | yes | 184.6 s | 68 | 19.5 min | 72, 66, 64, 177, 168, 164, 178, 277, 416, 411 … m | the 2 m pit after the four-step descent (rear wheel catches the far lip), the stairs (a 0.5 m step endoes or loops at any speed; only an 11 m/s wheelie entry got up) |
+| e3 s2 | 11 | **no** (420 m) | — | 33 | 24.4 min | 78, 71, 176, 165, 166, 166, 412, 415, 415 … m | the last flight at 411 m has a razor-thin speed window; the session had ~5 of its 25 min left when spawned (budget counted from `prep` — fixed) |
+
+| track | band | sessions | cleared | median attempts | median time | median calls | pass (≤ 1.5 × band top, all cleared) | reflex average (HEAD / R4) |
+|---|---|---:|---:|---:|---:|---:|---|---|
+| b1-first-ride | 1–1 | 2 | 2 | **1** | 45.9 s | 12.5 | PASS | 1 / 1 |
+| b2-lean-back | 1–2 | 2 | 2 | **2.5** | 59.0 s | 21 | PASS | 1 / 1 |
+| b3-kicker-row | 1–2 | 2 | 2 | **3** | 53.3 s | 24 | PASS | 7 / 4 |
+| e1-uphill-weight | 2–4 | 2 | 2 | **5.5** | 93.3 s | 27 | PASS | 7 / 8 |
+| e2-rear-wheel-first | 3–5 | 2 | 2 | **6.5** | 86.2 s | 37 | PASS | 10 / 8 |
+| e3-stairway | 3–6 | 2 | 1 | **15.5** | 184.6 s | 50.5 | **FAIL** | 35 / 8 |
+
+**R5 delta (e8f2ec7, src 74f5de4d, 6 sessions, b1–b3):** b1 s1 1 (45.0 s, 12 calls) · b1 s2 1 (43.4 s, 12) · b2 s1 2 (54.2 s, 24; crash @ 309 m)
+· b2 s2 2 (51.1 s, 14; crash @ 286 m) · b3 s1 2 (43.1 s, 13; crash @ 348 m) · b3 s2 4 (61.4 s, 24; crashes @ 93, 95, 239 m) →
+**medians 1 · 2 · 3, all PASS** (R4: 1 · 2.5 · 3). The b3 s2 stranger's sentence is the round in one line: "unlearning the briefing's
+'lean forward to level' hint — any forward lean at or before the lip set off a −12°/slot nose-down rotation that ended in a
+flip every time, while riding every kicker under plain neutral `g` and coasting off the ledges gave a self-levelling ~22° exit."
+Every r4/r5 recording is in `inputs/<track>/stranger-<session>.json` (the r4 set re-emitted from the persisted recorder,
+see shared checkout) and the sessions under `out/stranger/<track>/<session>/`; m1–m3 were prepped and not played (no budget
+left after the R5 re-run) — their empty sessions were removed.
+
+### Goldens, skill 3, one seed, every clear browser-verified (node hash == page hash), physics v2
+
+**Frozen R4 (bdf9f0c, src 3d5fd16f), Rookie** (`scratchpad/harness8/goldens-rookie.log`, loadavg 6–14): flat-test 1 / 8.567 s
+`b002d139195b5757` · b1 1 / 41.692 `03325ac729f14b08` · gap-test 1 / 5.733 `c84c86357e8cdab4` · b2 1 / 38.633 `301e53d6f9a70998`
+· b3 1 / 33.850 `2667b6743d2e28be` · e1 1 / 43.917 `1c8ff35582dd706c` · e2 1 / 43.642 `77f93a52fa06696d` · e3 1 / 41.983
+`ef285d777768a62b` · m1 1 / 36.433 `4d2903aac9a14cdb` · m2 1 / 38.292 `a9df31b550bae5f0` · m3 1 / 39.992 `bc777139c657d054` ·
+h1 1 / 47.000 `81b44838ae2ad8ad` · h2 1 / 48.917 `eb4bab4d2c8acd0f` · h3 1 / 44.983 `94b5442e912327a6` · x1 1 / 58.475
+`2004089409805c63` · x2 2 / 48.292 `18e201c03050891e` · **x3 timeout (32 attempts, 490.4 m = 97 %, walled at the 483.6 m pole
+— cleared in ≤ 2 on R3/round 8; R4's ramp-exit speed cut is the suspect)** · lab-flat-200 1 / 12.608 `013540711e622464` ·
+lab-physics-test 1 / 8.108 `ba4883eaf138be13`. **Pro** (round-8 sweep in `harness7/tree2`, R3 physics — the Pro is untouched
+by R4 and R5, so `--refresh-goldens` on e8f2ec7 restamped all 19 with node == browser; `m3-see-saw` Pro golden re-proved
+here, 1 attempt): copied back into `inputs/*/bot-3-pro.json`.
+
+**HEAD e8f2ec7 = 8ea3b7d for the fingerprint (src 74f5de4d; 8ea3b7d adds only `src/ui/best.ts`, outside the fingerprint's physics/tracks/core/rules walk)** — `--refresh-goldens`: fresh 0, restamped 20 (19 Pro + lab-physics-test Rookie), stale 18
+(every Rookie golden with a flight: R5 changes the Rookie in the air); the 18 were re-run at skill 3 (`chain5.log`):
+
+| track | bike | attempts | finish s | hash | node == browser |
+|---|---|---:|---:|---|---|
+| flat-test | rookie | 1 | 8.567 | `b002d139195b5757` | true |
+| gap-test | rookie | 1 | 5.742 | `8f6dcf4f496674d7` | true |
+| b1-first-ride | rookie | 1 | 41.558 | `14f314acf2c5be93` | true |
+| b2-lean-back | rookie | 1 | 38.600 | `04ae10347dd93f10` | true |
+| b3-kicker-row | rookie | 1 | 34.217 | `17d1d387997533fc` | true |
+| e1-uphill-weight | rookie | 2 | 49.517 | `3fde83b238440d7a` | true |
+| e2-rear-wheel-first | rookie | 2 | 51.033 | `d5a74c4778a22399` | true |
+| e3-stairway | rookie | 1 | 42.117 | `4ac3e6218f610379` | true |
+| m1-hop-up | rookie | 1 | 34.983 | `446c44e26cc8be55` | true |
+| m2-drum-roll | rookie | 2 | 49.283 | `db7668fb4e1745da` | true |
+| m3-see-saw | rookie | 2 | 45.567 | `56bbf3dcc5a90def` | true |
+| h1-wheelie-wire | rookie | 1 | 47.808 | `07b9874f7323e2f7` | true |
+| h2-gap-chain | rookie | 1 | 50.200 | `dd03317cff597066` | true |
+| h3-fire-line | rookie | 1 | 42.167 | `afae7c08886f8897` | true |
+| x1-vertical-limit | rookie | 1 | 56.375 | `3f0411b1ff4a9cac` | true |
+| x2-pipe-dream | rookie | 3 | 52.158 | `6f3c9b724ec167bc` | true |
+| x3-gauntlet | rookie | 50 (cap) | — | — | walled at the 479.2 m gap, 478.9 m = 95 %; skill-3 clears in ≤ 2 on R3 — **stale golden kept** (stamp 93e6caa5) |
+| lab-physics-test | rookie | 1 | 8.217 | `ee96e73911b121cd` | true |
+
+The 20 restamped: every `bot-3-pro.json` (Pro unchanged since R3: byte-identical replays, including `m3-see-saw` 38.267 s from the round-8 sweep) and the Rookie `lab-flat-200` / `lab-physics-test`. `gate/expected.json` re-pinned on 74f5de4d: Rookie flat-test 8.5667 s `b002d139195b5757`, `clear.pro.flat` 8.0417 s `9defa8078708cfc7`, `clear.pro.b1` 37.733 s `49ce97f9fa86a3d5`.
+
+### Ship gate (`harness:gate --pin --heap-seconds 60`, frozen HEAD e8f2ec7, src 74f5de4d)
+
+**22/26 (NO-SHIP on the three SwiftShader rows + the reflex row), wall 1635 s, loadavg 40 at boot → 55 at the end (the stale re-runs, a browser-verified sweep and another owner's Playwright jobs shared the box; every timing row is contention-pessimistic).**
+
+```
+PASS  boot.readyP50Ms              137.89ms  (limit 300ms)  runs 137/237/144/138/113 min 113 loadavg 40.2/18
+FAIL  boot.firstFrameMs            11775.80ms  (limit 4000ms)  ready -> first synced frame; SwiftShader limit; ship target 900ms NOT met (informational on this machine)
+PASS  clear.golden                 true  (limit true)  bot-3.json finish=8.566666666666666 run=8.567 faults=0
+PASS  clear.finishTimeBitEqual     true  (limit true)  expected 8.566666666666666
+PASS  clear.hashOk                 true  (limit true)  b002d139195b5757 vs pinned b002d139195b5757
+PASS  clear.pro.flat               true  (limit true)  bot-3-pro.json (src matches) finish=8.041666666666666 faults=0 hash 9defa8078708cfc7 vs pinned 9defa8078708cfc7 (expected finish 8.04166666666666
+PASS  clear.pro.b1                 true  (limit true)  bot-3-pro.json (src matches) finish=37.733333333333334 faults=0 hash 49ce97f9fa86a3d5 vs pinned 49ce97f9fa86a3d5 (expected finish 37.733333333333
+PASS  crash.faultWithinS           0.75s  (limit 8s)  reason=crash
+PASS  fault.toControlMs            50ms  (limit 500ms)  crash tick -> restart mash on the next tick -> bike moving; auto-respawn path 1042 ms (CONTRACT §2.8: 1.0 s)
+PASS  restart.ticks                1  (limit 1)  tick==0 && faulted==null after exactly one tick, 20 reps
+PASS  restart.wallMsP95            0.14ms  (limit 5ms)
+FAIL  restart.frameMsP95           692.32ms  (limit 150ms)  restart -> synced frame; SwiftShader limit; ship target 33ms NOT met (informational on this machine)
+PASS  restart.noCountdown          1 ticks  (limit 12 ticks)  worst of 20 reps: held throttle after the restart tick until the bike rolls (a countdown would be 360+); first-tick roll yes; game faults=
+PASS  heap.growthMBPer60s          -6.33MB  (limit 5MB)  over 60s of play
+PASS  perf.drawCallsMax            194  (limit 300)
+PASS  perf.trianglesMax            159427  (limit 500000)
+PASS  perf.texturesMBMax           68.93MB  (limit 96MB)
+PASS  perf.physicsUsPerTickP95     32.50us  (limit 60us)
+PASS  perf.renderSubmitMsP95       2.63ms  (limit 4ms)
+FAIL  perf.renderSyncedMsP95       16963.70ms  (limit 250ms)  render + readPixels sync; SwiftShader limit; ship target 16ms NOT met (informational on this machine)
+PASS  bundle.jsGzipKB              436.63KB  (limit 600KB)  dist 16251 KB raw
+PASS  determinism.pass             true  (limit true)  9/9 checks
+PASS  camera.box                   0frames out of box while riding  (limit 0frames out of box while riding)  bot-3.json; clamped 36.8 % (reported); 509 s; camera: PASS out-of-box 0/704 (riding 0), cla
+PASS  stranger.medianAttempts      b1 1/1.5 · b2 2/3 · b3 3/3 · e1 -/6 (0 fresh)  (limit 1.5)  median attempts / (1.5 x band top) on src 74f5de4d; informational until every track has >= 2 completed se
+FAIL  reflex.medianAttempts        b1 1/1.5 · b2 1/3 · b3 7/3 · e1 7/6  (limit 1.5)  reflex bot (average) median attempts / (1.5 x band top) on src 74f5de4d; armed: outside band
+PASS  reflex.medianAttempts.pro    b1 9/1.5 · b2 13/3 · b3 25/3 · e1 32/6  (limit 1.5)  reflex bot (average) on the Pro bike, same tracks and band; informational (the band is Rookie's): 0/4 within ban
+NO-SHIP: 22/26 checks pass, track=flat-test, physics=bikePhysicsFactory-v2, wall=1635s
+```
+
+`camera.box` is green with the round-8 parser fix (0/704 riding frames out of the box, clamped 36.8 % — reported, not gated; the render owner's b3 rig still sits on its track bounds a third of the ride). `stranger.medianAttempts` reads the r5 sessions on 74f5de4d (b1 1 · b2 2 · b3 3; e1 has no session on this src). `reflex.medianAttempts` armed and outside band on b3 (7 / 3) and e1 (7 / 6). **`harness:reflex b1-first-ride --seeds 1 --browser 1` on HEAD: node run 1 attempt / 56.675 s, `runRecording` browser hash `516d2488ca778e20` IDENTICAL, but the live-keys run fails at `fake clock: expected the countdown after pauseAt, got 'menu'` — the live page opened with `?track=` reaches `ready` and stays on the menu phase after the 30 s fast-forward (the front-screen flow changed under the driver since round 7; `src/game/navlog.ts` is mid-flight in the working tree). Open item; the round-7 live-keys numbers stand.**
+
+### Physics-suite baseline on v2 (`harness:physics-suite --bike both --tag v2-bdf9f0c`, frozen bdf9f0c; the machine carried the Rookie golden sweep, 12 strangers and the tree5 chain, loadavg 7 → 33)
+
+**REJECT: 18 pass, 6 fail, 8 info; wall 2168 s; report `out/physics-suite/20260915T001716Z-bikePhysicsFactory-v2-v2-bdf9f0c.{json,md}` (+ `latest.*`).** The six: `feel.envelope` 74/94 in band (the physics owner's own bands: hop.ref.bothOffS 0.292 [0.35–0.6], frontSag 16.8 % [24–28], launch t16 4.48 s [3.5–4.2], wheelie hold rows, lab hop margins −0.06 / −0.04 [≥ 0.1] — the same list as the v1 baseline's `see it.fails`); `determinism.rookie.D1-D8` 8/9 — D8 only, the pin predated the R4 goldens (re-pinned by the gate above; D1–D7 + D4c pass); `reflex.rookie.b3 / e1 / e2` 4 / 8 / 8 vs bands 1–2 / 2–4 / 3–5 (the finding; b1 1, b2 1, e3 8 PASS); `camera.b3` — the clip was green (`PASS out-of-box 0/979, clamped 12.1 %`) and the suite's parser wanted a `camera:` line; **fixed in `physics-suite.ts` after the run** (the gate's round-8 fix mirrored), so the next suite reads 19 pass / 5 fail. Passes: identity, `feel.vitest` 12/12, Pro D1–D8 9/9 + both snapshot probes 600/600, the naive sweep, skill-3 clears browser-verified on b1/e1/m1/h1/x1 both classes (Pro e1 3 attempts, everything else 1), stranger smoke 8/8. Against the v1 baseline (`20260914T192455Z-…-v1-42bdfe0`, 2042 s): same instrument set, v2 clears x1 on both classes where v1 walled the Pro. This suite is on **bdf9f0c (R4)**; the R5 tree got the gate and the matrix but not a second suite (37 min at loadavg 30+).
+
+### Timelapse
+
+Ledger appended 96 → 100 (fc17e77 harness r8, 12a29f2 render r12, bdf9f0c physics R4, e05153e loader — every commit built +
+captured; 5.3 min, niced); `progress-stills.mp4` / `progress-clips.mp4` (13 milestones, 54.0 s, 34.3 MB) / `progress.gif`
+(11.6 MB) re-rendered. cf13f8b and e8f2ec7 landed after the pass and are the next holder's first two ledger rows.
+
+### Open
+
+- **e3-stairway is out of band for every human proxy** (strangers 20 / 11-not-cleared vs band 3–6; reflex average 8 on R4,
+  35 on R5 with a 3-seed spread of 7–28): the 0.25 m flights at 165 and 407 m and the 2 m pit after the descent. Tracks owner:
+  the stair flights want either a longer tread (the reflex rider stalls at 1 m/s when the gas is chopped on the risers) or a
+  lower riser; the strangers' working line was an 11 m/s wheelie entry, which is not a beginner move.
+- **Rookie x3-gauntlet no longer clears at skill 3 on R4/R5** (32 attempts, walled at the 483.6 m pole, 97 %): the R4 assist
+  takes 1–2 m/s off every kicker exit and x3's last section is authored to the old exit speed. Tracks / physics owners.
+- **Reflex 3-seed medians are noisy on e2 / e3 / m3** (seed spread 4–38, 4–28, 5–36): the matrix should run 9 seeds on those
+  three, or the bands should be judged on the 9-seed median. The 40 s matrix makes 9 seeds cheap.
+- **`air-brake-nose-down` is now the recurring death** (b3 170 m, e1 446 m, e2 506 m, m1 119 m, x3 60 m): the brake nudge
+  fires on a nose-high exit and the R4 table says a brake tap is −15° per half second — the rule may be right and the exits
+  too high (Rookie kicker lip 17°, +1 pose 15°), or the nudge lands as the rear wheel skims the ramp. Next holder: trace the
+  five sites with `scratchpad/harness8/trace.mts` before touching the rule.
+- **`?perf=1` overlay does not carry `debugInfo()`** (see the table): core-game request — `PerfSample` + `HookInfo` need
+  `tier / dpr / canvasW / canvasH / rtMpx / rtMB / rtPasses / shadowMap`.
+- The Pro `average` rows are 7–46 on every course but flat/lab (b1 9, b2 13, b3 25, e1 32): the Pro has no ramp assist and
+  the reflex Pro ramp move (+1, thr 0.3 above 9 m/s) did not close it. The bands are authored for the Rookie; the Pro
+  rows stay informational.
+- `harness:reflex --browser` still drives the live game on its default bike (rookie) only.
+- `sync.sh --delete` over `inputs/` (see shared checkout): the harness owner's overlay script must exclude `inputs/` and
+  `out/`; documented in the table, fixed in the script.
+
 ## Round 8 status — harness on physics v2: goldens/gate re-pinned, reflex bot retuned to v2, the human-like measure still out of band on 12 of 16 courses
 
-**Finding.** On physics v2 the search bot clears every course on the Rookie (x1/x3 included, which v1 never did) and
-all but **m3** (walled at the 204.6 m ramp) and **x1** (walled in the first 60 m) on the Pro, in ≤ 3 attempts; the
-human-like instrument did not survive the flip: the reflex `average` player, within band on every beginner/easy track
+**Finding.** On physics v2 with tracks r7 the search bot clears **all 19 tracks on both classes in ≤ 3 attempts**
+(3 seeds, 600 s wall, byte-identical across seeds; on the pre-r7 tracks the Pro was walled on m3 @ 204.6 m and x1 @
+60 m, and v1 never cleared Rookie x1/x3) — the bot is no longer the constraint anywhere; the human-like instrument did
+not survive the flip: the reflex `average` player, within band on every beginner/easy track
 on v1, was **outside `attemptsBand` on 15 of 17 courses** on the first v2 run (b2 27 [1–2], b3 37, e1 35, m1 51 cap …).
 The traces (`out/reflex/<track>/*.rec.json` replayed tick by tick) show one mechanism: on the v2 Rookie **full gas on a
 17–22° kicker at 10 m/s lifts the front at 100–200 °/s** (the slope unloads the front wheel), the loop-out reflex
@@ -120,22 +336,32 @@ band, the reflex table describes the v2 Rookie's on-ramp behaviour, not the trac
 
 | track | Rookie attempts | Rookie finish s | Rookie hash | Pro attempts | Pro finish s | Pro hash | note |
 |---|---:|---:|---|---:|---:|---|---|
-| flat-test | 1 | 8.492 | `01bb78027557a102` | — | — | — |  |
-| b1-first-ride | 1 | 40.425 | `e504886f80b8220e` | — | — | — |  |
-| gap-test | 1 | 5.483 | `7bdb317d023daee8` | — | — | — |  |
-| b2-lean-back | 1 | 38.633 | `5a004c5f522d7fdc` | — | — | — |  |
-| b3-kicker-row | 1 | 32.608 | `a1abffd78451fab7` | — | — | — |  |
-| e1-uphill-weight | 1 | 42.125 | `f97a6a950de20c14` | — | — | — |  |
-| e2-rear-wheel-first | 1 | 43.958 | `a0c3327c7217ac95` | — | — | — |  |
+| flat-test | 1 | 8.492 | `01bb78027557a102` | 1 | 8.042 | `9defa8078708cfc7` |  |
+| b1-first-ride | 1 | 40.425 | `e504886f80b8220e` | 1 | 37.733 | `49ce97f9fa86a3d5` |  |
+| gap-test | 1 | 5.483 | `7bdb317d023daee8` | 1 | 5.275 | `34036ceeec4f0b63` |  |
+| b2-lean-back | 1 | 38.633 | `5a004c5f522d7fdc` | 1 | 36.042 | `1b9bda72654a3122` |  |
+| b3-kicker-row | 1 | 32.608 | `a1abffd78451fab7` | 1 | 30.933 | `49f5577526091eff` |  |
+| e1-uphill-weight | 1 | 42.125 | `f97a6a950de20c14` | 3 | 50.933 | `e15424aa80849d66` |  |
+| e2-rear-wheel-first | 1 | 43.958 | `a0c3327c7217ac95` | 2 | 48.583 | `f50b6bcbdbc2537b` |  |
+| e3-stairway | 1 | 42.192 | `e7fe07e5184bb4c3` | 2 | 43.392 | `04b619a28d7f372b` |  |
+| m1-hop-up | 1 | 33.808 | `863d0eba06d95c59` | 1 | 32.958 | `01b43734856a5ac6` |  |
+| m2-drum-roll | 1 | 38.617 | `3fe8940514f2d599` | 1 | 33.000 | `6638b0e183172c5a` |  |
+| m3-see-saw | 1 | 40.708 | `ba85ad388537b606` | 1 | 38.267 | `3dde998cff52f104` |  |
+| h1-wheelie-wire | 1 | 46.300 | `19f1f4bf1d290fa8` | 1 | 43.975 | `63ae70eb87c9b594` |  |
+| h2-gap-chain | 2 | 52.967 | `b52b6c14b9f39e17` | 2 | 51.200 | `d8d5bc6b1e0e8b08` |  |
+| h3-fire-line | 2 | 49.200 | `f0019f680f3b1edc` | 3 | 50.025 | `c55c0fe4347e8f08` |  |
+| x1-vertical-limit | 2 | 62.558 | `7de19ffb492e8e92` | 1 | 55.825 | `8e580c404664b2c6` |  |
+| x2-pipe-dream | 1 | 40.625 | `eda4a3917fc0505d` | 1 | 41.650 | `5aa8b29e4f65c331` |  |
+| x3-gauntlet | 1 | 42.433 | `46d89f2166be9e8a` | 1 | 42.458 | `7fb47f7a7308877b` |  |
+| lab-flat-200 | 1 | 12.533 | `af9baed0d0bbf9cf` | 1 | 11.900 | `c995e804e8430b3c` |  |
+| lab-physics-test | 1 | 8.100 | `c90e61213bb3a91f` | 1 | 7.550 | `6b09bcb04f0512be` |  |
 
-The three seeds gave byte-identical finishes on every course that had landed when this was written (these lines carry
-no seeded element), so the 3-seed median equals the single run. The sweep was still running at write-up time
-(`scratchpad/harness7/goldens3.log`, Rookie then Pro, 600 s wall per run, 1–3 min per course); a syncer copied each
-`bot-3*.json` and `<track>[.pro].json` into the working tree as it landed. **Whoever commits: check `goldens3.log` for
-`=== done`, rsync `tree2/harness/inputs/` and `tree2/harness/out/metrics/<track>*.json` once more, then
-`pnpm harness:bot --refresh-goldens` on the final tree.** On the previous HEAD (45f6b62, before tracks r7, one seed) the
-same instrument gave: Rookie 17/17 courses in ≤ 2 attempts (x1 and x3 included), Pro m3 50 (cap, 204.6 m ramp) and x1
-48 (cap, 8 %), every other Pro course in ≤ 3 (m2 3, h2/h3/x2 2).
+The sweep finished at 19:41 (0 node/browser mismatches, `--refresh-goldens` afterwards: 38/38 fresh, 19/19 tracks
+proven on both classes). The three seeds gave byte-identical finishes on every course (these lines carry no seeded
+element), so the 3-seed median equals the single run; the tracks owner's x1 3 → 32 → 2 swing is metre-level authoring
+sensitivity, not seed noise. Slowest clears: Pro e1 3 attempts / 50.9 s, Pro h3 3 / 50.0 s, Rookie x1 2 / 62.6 s. On
+the previous HEAD (45f6b62, before tracks r7, one seed) the same instrument gave Pro m3 50 (cap, 204.6 m ramp) and Pro
+x1 48 (cap, 8 %); every other course ≤ 3.
 
 ### Ship gate (`harness:gate --pin --heap-seconds 60`, frozen HEAD 733c830, src 93e6caa5)
 
@@ -221,12 +447,18 @@ the 26.7 MB render): 94ecb43 v0.1.0 → fcff90a the hop → e220331 R3 landing �
 
 ### Open
 
+- **HEAD moved again while this was written: physics v2 R5 (e8f2ec7) landed after the sweep** — every number above is
+  on 733c830 / src 93e6caa5 and is stale against R5's physics (the R5 commit quotes the retuned reflex bot on its own
+  tree: e2 36 → 10, e3 30 → 12, b3 14 → 4.5, e1 21 → 11, b1 1). Next holder, in a frozen HEAD copy: `pnpm harness:bot
+  --refresh-goldens --build`, then `harness:bot <track> --bike <class> --skill 3 --seeds 3` for whatever went stale,
+  `harness:gate --pin`, the reflex matrix, and the physics-suite. `typecheck`/`lint` are clean for `harness/**` proper;
+  the only failures in the tree are in the untracked scratch file `harness/e2e/_repro.mts` (another owner's, 5 `any`s
+  and one TS2345) — not mine to fix, do not commit it.
 - **Reflex bot vs v2 is still uncalibrated**: the four defects are fixed and the beginner rows moved 3–4× (b2 27 → 8,
   b3 37 → 12), but 12/16 courses stay over band with `air-gas-nose-up` / `air-brake-nose-down` / `nose-low` as the
   cause. Either the air rules are still too coarse for v2 (the physics owner should confirm the 200–400 °/s air kick on
   a rear-wheel ramp touch is intended) or the bands are v1 bands. Stranger round 4 decides; re-prep it on the final HEAD.
-- **Pro cannot clear m3 (204.6 m ramp) or x1 (first 60 m, open ground)** at skill 3 on v2 — tracks owner; x1 Pro
-  cleared in 1 on v1. Rookie clears every course.
+- Pro m3/x1 blockers are gone with tracks r7 (both 1 attempt on 733c830); nothing is bot-blocked.
 - 3-seed medians: on flat-test / gap-test / b1 the three seeds give byte-identical finishes (the tracks have no seeded
   element), so seed spread only appears where a course is seeded; the x1 3 → 32 → 2 swing the tracks owner saw is
   metre-level authoring sensitivity, not seed noise.

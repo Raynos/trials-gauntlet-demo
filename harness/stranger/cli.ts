@@ -572,6 +572,7 @@ async function main(): Promise<number> {
   // Every call counts, and counts even if it throws below (pristine = pre-call state for that case).
   const pristine = JSON.stringify(s.state);
   s.state.calls++;
+  if (!s.state.firstCallAt) s.state.firstCallAt = new Date().toISOString();
   const argText = positional.slice(1).join(' ');
   appendLog(s, `${cmd}${argText ? ` ${JSON.stringify(argText)}` : ''}`);
 

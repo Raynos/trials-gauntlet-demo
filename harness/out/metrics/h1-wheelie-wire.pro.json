@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "h1-wheelie-wire",
   "bike": "pro",
-  "updatedAt": "2026-09-15T00:19:45.859Z",
-  "physics": "bikePhysicsFactory-v2",
+  "updatedAt": "2026-09-14T18:58:42.088Z",
+  "physics": "bikePhysicsFactory",
   "attemptsBand": [
     10,
     18
@@ -14,29 +14,25 @@
     {
       "skill": 3,
       "seeds": [
-        1831771780,
-        1831771781,
-        1831771782
+        1831771780
       ],
       "attempts": [
-        1,
-        1,
-        1
+        2
       ],
-      "median": 1,
+      "median": 2,
       "finishTimes": [
-        43.975,
-        43.975,
-        43.975
+        32.958333333333336
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": null,
+  "singleWall": {
+    "checkpoint": 1,
+    "share": 1
+  },
   "runs": [
-    "20260914-191541-4544fa",
-    "20260914-191655-e5c402",
-    "20260914-191815-836b27"
+    "20260914-135243-29c273",
+    "20260914-135655-9fb543"
   ]
 }

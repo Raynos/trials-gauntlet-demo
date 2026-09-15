@@ -9,7 +9,7 @@ import { quantizeInput } from '../../src/core/replay';
 import type { FaultReason, InputFrame, PhysicsState } from '../../src/core/types';
 import { countedFaults, type TimedEvent } from '../lib/metrics';
 import type { Sim } from '../lib/sim';
-import { ReflexController, type Keys, type SkillName, type SkillParams } from './controller';
+import { ReflexController, type Intent, type Keys, type SkillName, type SkillParams } from './controller';
 import { SectionMemory } from './memory';
 import { perceive } from './perceive';
 import { buildProfile, type GroundProfile } from './profile';
@@ -58,6 +58,8 @@ export interface ReflexPlayOptions {
   params?: Partial<SkillParams>;
   memory?: SectionMemory;
   log?: (line: string) => void;
+  /** Per-tick tap (round 9 tracing): the rule the rider is executing and the intent behind the keys. */
+  onTick?: (tick: number, intent: Intent, keys: Keys) => void;
 }
 
 export function keysToFrame(k: Keys): InputFrame {
@@ -102,7 +104,7 @@ export function playReflex(sim: Sim, o: ReflexPlayOptions): ReflexPlayResult {
   const hz = sim.hz;
   const profile = buildProfile(sim.compiled);
   const memory = o.memory ?? new SectionMemory();
-  const ctrl = new ReflexController({ skill: o.skill, seed: o.seed, memory, ...(o.params ? { params: o.params } : {}) });
+  const ctrl = new ReflexController({ skill: o.skill, seed: o.seed, memory, bike: sim.bike, ...(o.params ? { params: o.params } : {}) });
   const log = o.log ?? (() => undefined);
   const cap = o.attemptsCap ?? 50;
   const maxTicks = Math.round((o.maxSimSeconds ?? 300) * hz);
@@ -126,6 +128,7 @@ export function playReflex(sim: Sim, o: ReflexPlayOptions): ReflexPlayResult {
       glances++;
     }
     const keys = ctrl.keysAt(t);
+    o.onTick?.(tick, ctrl.currentIntent(), keys);
     const frame = keysToFrame(keys);
     const ev = sim.step(frame);
     frames.push(frame);

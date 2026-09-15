@@ -143,7 +143,7 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
         cleared: st.cleared,
         finishTime: st.finishTime,
         calls: st.calls,
-        wallMs: Date.now() - new Date(st.startedAt).getTime(),
+        wallMs: Date.now() - new Date(st.firstCallAt ?? st.startedAt).getTime(),
         firstCheckpointCalls: st.firstCheckpointCalls,
         faultsByCheckpoint: [],
         bestAttempt: null,

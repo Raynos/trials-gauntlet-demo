@@ -270,7 +270,10 @@ async function main(): Promise<void> {
       const args = [path.join(HARNESS_DIR, 'clip.ts'), CAMERA_TRACK, '--out', clipDir, '--fps', quick ? '20' : '30', '--quality', quick ? 'low' : 'high'];
       if (g) args.push('--recording', g.file);
       const r = await run(TSX, args, { timeoutMs: 40 * 60_000 });
-      const line = /^camera: .*$/m.exec(r.stdout + r.stderr)?.[0] ?? null;
+      // clip.ts prints the assertion as a `camera: ...` line or as the `camera  PASS/FAIL ...` row of its summary table
+      // (round 9: the gate's round-8 parser fix, mirrored — the suite had failed the row on a green clip).
+      const out = r.stdout + r.stderr;
+      const line = /^camera: .*$/m.exec(out)?.[0] ?? /camera\s+(?:PASS|FAIL) out-of-box[^\n]*/.exec(out)?.[0]?.replace(/^camera\s+/, 'camera: ') ?? null;
       const pass = line ? line.startsWith('camera: PASS') : null;
       report.camera = { trackId: CAMERA_TRACK, golden: g?.file ?? null, pass, line, clip: fs.existsSync(path.join(clipDir, 'clip.mp4')) ? path.join(clipDir, 'clip.mp4') : null };
       check({ section: 'camera', id: CAMERA_TRACK.split('-')[0]!, verdict: pass === true ? 'PASS' : pass === false ? 'FAIL' : 'FAIL', value: pass, note: line ? `${line.slice(0, 220)} (${(r.ms / 1000).toFixed(0)} s)` : `no camera line; clip exit ${r.code}: ${(r.stderr || r.stdout).trim().split('\n').slice(-2).join(' | ')}` });

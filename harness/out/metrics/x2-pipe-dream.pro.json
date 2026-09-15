@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "x2-pipe-dream",
   "bike": "pro",
-  "updatedAt": "2026-09-15T00:36:10.237Z",
-  "physics": "bikePhysicsFactory-v2",
+  "updatedAt": "2026-09-14T19:05:35.221Z",
+  "physics": "bikePhysicsFactory",
   "attemptsBand": [
     40,
     60
@@ -14,29 +14,24 @@
     {
       "skill": 3,
       "seeds": [
-        2290459156,
-        2290459157,
-        2290459158
+        2290459156
       ],
       "attempts": [
-        1,
-        1,
-        1
+        2
       ],
-      "median": 1,
+      "median": 2,
       "finishTimes": [
-        41.65,
-        41.65,
-        41.65
+        32.858333333333334
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": null,
+  "singleWall": {
+    "checkpoint": 1,
+    "share": 1
+  },
   "runs": [
-    "20260914-193248-5512d8",
-    "20260914-193353-8ed919",
-    "20260914-193457-63839f"
+    "20260914-140409-7b44b6"
   ]
 }

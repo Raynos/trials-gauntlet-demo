@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "x1-vertical-limit",
   "bike": "rookie",
-  "updatedAt": "2026-09-14T23:42:05.316Z",
+  "updatedAt": "2026-09-15T01:08:52.553Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     30,
@@ -14,32 +14,21 @@
     {
       "skill": 3,
       "seeds": [
-        2756386537,
-        2756386538,
-        2756386539
+        2756386537
       ],
       "attempts": [
-        2,
-        2,
-        2
+        1
       ],
-      "median": 2,
+      "median": 1,
       "finishTimes": [
-        62.55833333333333,
-        62.55833333333333,
-        62.55833333333333
+        56.375
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": {
-    "checkpoint": 2,
-    "share": 1
-  },
+  "singleWall": null,
   "runs": [
-    "20260914-183703-eab045",
-    "20260914-183857-432e01",
-    "20260914-184046-47b07b"
+    "20260914-200643-1c5662"
   ]
 }

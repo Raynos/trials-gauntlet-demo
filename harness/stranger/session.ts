@@ -48,6 +48,9 @@ export interface PersistedState {
   seed: number;
   agent: string;
   startedAt: string;
+  /** Round 9: wall time of the stranger's first call. A `prep`-created session may sit for half an hour before its
+   *  stranger is spawned; the minutes budget counts from here, not from `startedAt` (r4 e3 s2 was handed 5 of 25 min). */
+  firstCallAt?: string;
   physicsHz: number;
   physics: string;
   /** Calls made so far (every command counts, `start` included). */
@@ -221,7 +224,7 @@ export function appendLog(s: LoadedSession, line: string): void {
 }
 
 export function wallMs(s: LoadedSession): number {
-  return Date.now() - new Date(s.state.startedAt).getTime();
+  return Date.now() - new Date(s.state.firstCallAt ?? s.state.startedAt).getTime();
 }
 
 export function budgetLeft(s: LoadedSession): { callsLeft: number; secondsLeft: number; exhausted: boolean } {

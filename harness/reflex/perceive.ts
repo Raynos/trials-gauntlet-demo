@@ -44,6 +44,12 @@ export interface Ahead {
   nextSlopeDeg: number;
   /** Ground height 1 m ahead relative to the ground under the bike (m): the step the front wheel meets. */
   stepAhead: number;
+  /** Surface roughness under and just ahead of the bike (deg): max minus min per-cell slope over -1..+2 m. A smooth
+   *  kicker reads ~0, a 0.25 m stair flight ~45 (riser cells vertical, tread cells flat). */
+  roughDeg: number;
+  /** Stair risers over -1..+2 m: steep cells (> 40 deg) that follow a flat cell (< 8 deg). A ramp base counts 1,
+   *  a flight 2+ — what tells a ramp from stairs (round 9). */
+  risers: number;
 }
 
 export interface Observation {
@@ -183,6 +189,24 @@ export function perceive(st: PhysicsState, phase: GamePhase, t: number, profile:
   }
 
   const nextSlopeDeg = profile.slopeAt(x + 0.65 + 1.5, 0.5, st) * RAD;
+  let roughMin = Infinity;
+  let roughMax = -Infinity;
+  let risers = 0;
+  let prevCell = NaN;
+  for (let d = -1; d < 2 - 1e-9; d += GRID) {
+    const g0 = profile.heightAt(x + d, st);
+    const g1c = profile.heightAt(x + d + GRID, st);
+    if (!Number.isFinite(g0) || !Number.isFinite(g1c)) {
+      prevCell = NaN;
+      continue;
+    }
+    const sc = Math.atan2(g1c - g0, GRID) * RAD;
+    if (sc < roughMin) roughMin = sc;
+    if (sc > roughMax) roughMax = sc;
+    if (sc > 40 && prevCell < 8) risers++;
+    prevCell = sc;
+  }
+  const roughDeg = roughMax > roughMin ? roughMax - roughMin : 0;
   const g1 = profile.heightAt(x + 1.0, st);
   const stepAhead = Number.isFinite(g1) ? g1 - base : -99;
 
@@ -225,6 +249,8 @@ export function perceive(st: PhysicsState, phase: GamePhase, t: number, profile:
       landingDist,
       nextSlopeDeg,
       stepAhead,
+      roughDeg,
+      risers,
     },
     checkpointAhead,
     finishAhead: track.finishX - x,

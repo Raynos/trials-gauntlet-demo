@@ -155,7 +155,7 @@ export class ReflexBrowser {
       // Node-side model of the same track for perception (geometry only) and for the replay check.
       const sim = await createSim(trackId);
       const profile = buildProfile(sim.compiled);
-      const ctrl = new ReflexController({ skill: o.skill, seed: o.seed, memory: new SectionMemory() });
+      const ctrl = new ReflexController({ skill: o.skill, seed: o.seed, memory: new SectionMemory(), bike: sim.bike });
       const cap = o.attemptsCap ?? 50;
       const maxWallS = o.maxWallS ?? 400;
       const faults: ReflexFault[] = [];

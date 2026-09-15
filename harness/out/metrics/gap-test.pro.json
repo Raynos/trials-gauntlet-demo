@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "gap-test",
   "bike": "pro",
-  "updatedAt": "2026-09-14T23:52:20.641Z",
-  "physics": "bikePhysicsFactory-v2",
+  "updatedAt": "2026-09-14T18:32:50.946Z",
+  "physics": "bikePhysicsFactory",
   "attemptsBand": [
     1,
     3
@@ -14,20 +14,14 @@
     {
       "skill": 3,
       "seeds": [
-        2308543150,
-        2308543151,
-        2308543152
+        2308543150
       ],
       "attempts": [
-        1,
-        1,
         1
       ],
       "median": 1,
       "finishTimes": [
-        5.275,
-        5.275,
-        5.275
+        3.533333333333333
       ]
     }
   ],
@@ -35,8 +29,6 @@
   "shaped": null,
   "singleWall": null,
   "runs": [
-    "20260914-185211-7f8318",
-    "20260914-185213-13afe8",
-    "20260914-185216-2293ca"
+    "20260914-133248-d70f72"
   ]
 }

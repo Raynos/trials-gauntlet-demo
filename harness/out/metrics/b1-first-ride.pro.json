@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "b1-first-ride",
   "bike": "pro",
-  "updatedAt": "2026-09-14T23:52:11.201Z",
+  "updatedAt": "2026-09-14T22:58:40.916Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -37,9 +37,6 @@
   "runs": [
     "20260914-175455-3a5a1e",
     "20260914-175608-d48b73",
-    "20260914-175722-af5ca7",
-    "20260914-184913-82e43a",
-    "20260914-185011-28893c",
-    "20260914-185109-edd595"
+    "20260914-175722-af5ca7"
   ]
 }

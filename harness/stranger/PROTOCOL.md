@@ -112,6 +112,14 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
   so come off a ledge with a touch of `lb`.
 - **Climbs are geometry.** Weight forward holds ~37 deg at a crawl; 40-45 deg needs the front wheel on
   the face first and then the throw (`ct`); anything steeper wants speed.
+- **In the air, gas and brake are nudges; the lean is the control.** A gas tap lifts the nose ~6 deg in
+  half a second, a brake tap drops it ~15. A held lean *accelerates* the rotation (a full lean builds
+  ~170 deg/s in half a second) and letting go swings the bike another ~30 deg the other way (release a
+  lean-back and the nose pops up 30 more). So: lean briefly (`lb1`/`lf1`, at most 2 slots), release
+  early, and fly a beat with `c` before you correct again. Holding `lb` or `lf` for 4+ slots is a flip.
+- **Ramps and kickers.** Ride them with the weight forward (`gf`) and let go at the lip (`c`): the bike
+  leaves a knee-high kicker at about 8 m/s under full gas and lands level-ish on its own. Braking on the
+  ramp face or just before a riser drops the nose over the bars; slow down *before* the ramp, not on it.
 
 ## Spending calls well
 
