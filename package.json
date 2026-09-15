@@ -29,6 +29,8 @@
     "harness:snapshot-probe": "tsx harness/gate/snapshot-probe.ts",
     "harness:physics-suite": "tsx harness/physics-suite.ts",
     "harness:e2e": "tsx harness/e2e/touch.mts",
+    "harness:bench": "tsx harness/bench/bench.ts",
+    "harness:bench:profile": "tsx harness/bench/profile.ts",
     "harness:critic-prompt": "tsx harness/compare/critic-prompt.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

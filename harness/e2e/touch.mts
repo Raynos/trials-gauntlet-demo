@@ -178,13 +178,56 @@ async function boot(ctx: BrowserContext, url: string): Promise<Page> {
   return page;
 }
 
+/** Boot lands on the main menu (the "Broadcast" screen; there is no title step): assert it, then prove the reveal invariant on PLAY. */
 async function toMenu(page: Page, flow: string, g: Geom): Promise<void> {
-  expect((await visibleScreens(page)).join() === 'title', flow, 'start', `expected title, got ${await visibleScreens(page)}`);
-  await waitFor(page, `!!document.querySelector('.title-screen.live')`);
-  await tap(page, g.width / 2, g.height / 2);
-  await waitFor(page, `!!document.querySelector('.menu-screen.show')`, 10000);
+  expect((await visibleScreens(page)).join() === 'menu', flow, 'start', `expected menu at boot, got ${await visibleScreens(page)}`);
+  await waitFor(page, `!!document.querySelector('.menu-screen.live')`, 10000);
+  expect(await page.evaluate(() => !!document.querySelector('.menu-screen.live')), flow, 'boot-menu-live', 'menu never went live after boot');
+  await checkPlayReveal(page, flow, g);
+}
+
+/**
+ * The invariant on the menu's primary control: re-enter the menu (credits → menu through the hook, the same `goto` a
+ * pill tap takes) and, in the same evaluate as the goto, PLAY must NOT be live and a tap on it must not navigate; once
+ * live.ts has seen the band drawn for 150 ms it IS live and the same tap opens track select.
+ */
+async function checkPlayReveal(page: Page, flow: string, g: Geom): Promise<void> {
+  await page.evaluate(`window.__trials.app.goto('credits')`);
+  await waitFor(page, `!!document.querySelector('.credits-screen.live')`, 10000);
+  const before = await page.evaluate(`(() => {
+    window.__trials.app.goto('menu');
+    const play = document.querySelector('.menu-screen .menu-item[data-id=play]');
+    const r = play.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    const live = !!(hit && hit.closest('.live') && hit.closest('.menu-screen'));
+    // A finger lands on whatever hit-testing resolves at the point (pointer-events: none until .live), never on PLAY itself.
+    const init = { bubbles: true, cancelable: true, composed: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, pointerId: 9, pointerType: 'touch', isPrimary: true, button: 0 };
+    if (hit) {
+      hit.dispatchEvent(new PointerEvent('pointerdown', init));
+      hit.dispatchEvent(new PointerEvent('pointerup', init));
+      hit.dispatchEvent(new MouseEvent('click', init));
+    }
+    window.__trials.app.frame();
+    return { live, screen: window.__trials.app.screen(), menuLive: !!document.querySelector('.menu-screen.live'), hit: hit ? hit.tagName + '.' + hit.className : '(none)', w: r.width, h: r.height };
+  })()`) as { live: boolean; screen: string; menuLive: boolean; hit: string; w: number; h: number };
+  expect(!before.live && !before.menuLive, flow, 'R6-play-not-live-before-reveal', `PLAY hit-testable as live right after goto(menu): ${JSON.stringify(before)}`);
+  expect(before.screen === 'menu', flow, 'R6-play-dead-tap', `a tap on PLAY before its reveal navigated to ${before.screen}`);
+  expect(before.w >= 88 && before.h >= 44, flow, 'R3-play-size', `PLAY tab is ${before.w.toFixed(0)}×${before.h.toFixed(0)} (< 88×44)`);
+  await waitFor(page, `!!document.querySelector('.menu-screen.live')`, 10000);
+  const after = await page.evaluate(`(() => {
+    const play = document.querySelector('.menu-screen .menu-item[data-id=play]');
+    const r = play.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    let o = 1;
+    for (let e = hit; e && e !== document.body; e = e.parentElement) { const cs = getComputedStyle(e); o *= parseFloat(cs.opacity) || 0; }
+    return { live: !!(hit && hit.closest('.live') && play.contains(hit)), opacity: o, ticker: getComputedStyle(document.querySelector('.menu-ticker')).pointerEvents };
+  })()`) as { live: boolean; opacity: number; ticker: string };
+  expect(after.live && after.opacity >= 0.5, flow, 'R6-play-live-after-reveal', `PLAY not live once the menu is: ${JSON.stringify(after)}`);
+  expect(after.ticker === 'none', flow, 'ticker-not-tappable', `ticker pointer-events = ${after.ticker}`);
+  // The band is in the bottom quarter on every geometry (the thumb arc): PLAY's centre below 70 % of the height.
+  const cy = await centre(page, '.menu-screen.live .menu-item[data-id=play]');
+  expect(cy && cy.y > g.height * 0.7, flow, 'band-low', `PLAY centre at y=${cy?.y.toFixed(0)} of ${g.height}`);
   await page.waitForTimeout(300);
-  expect((await visibleScreens(page)).join() === 'menu', flow, 'title→menu', `got ${await visibleScreens(page)}`);
 }
 
 /** Tap a main-menu item once the menu is live (the invariant: not before it has been drawn 150 ms). */
@@ -215,7 +258,7 @@ async function flowFront(ctx: BrowserContext, url: string, g: Geom): Promise<voi
   await toMenu(page, flow, g);
   await checkTargets(page, flow);
   await checkIsolation(page, flow);
-  // R2: the tap that opened the menu must not have picked an item (menu is still the screen 500 ms later — asserted above).
+  expect((await visibleScreens(page)).join() === 'menu', flow, 'R2-stay-menu', `left the menu by itself: ${await visibleScreens(page)}`);
 
   // Menu → Play → track select, and stay there.
   await menuItem(page, flow, 'Play');

@@ -1,13 +1,14 @@
 /**
- * Browser app shell: front end (title → menu → track select / settings /
+ * Browser app shell: front end (main menu → track select / garage / settings /
  * credits) ⇄ runs (countdown → riding → pause / results), input mux → game,
  * RAF driver, quality probe, mobile rules (DPR cap, audio unlock, visibility
  * pause). Nothing in here touches determinism: the game only ever sees
  * quantized InputFrames and simulated seconds.
  *
- * Flow (`App.screen`): `title` → `menu` → `tracks` | `settings` | `credits`;
- * `run` (countdown…) → pause overlay → results. The title and menu render
- * over the live 3D scene with `BACKDROP_TRACK` loaded in the `menu` phase.
+ * Flow (`App.screen`): boot lands on `menu` (no title step) → `tracks` |
+ * `garage` | `settings` | `credits`; `run` (countdown…) → pause overlay →
+ * results. The menu renders over the live 3D scene with `BACKDROP_TRACK`
+ * loaded in the `menu` phase (the key art plate covers it once decoded).
  */
 import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RunResult, TrackDef, TrialsHook } from '../core/types';
 import type { AudioSystem } from '../audio';
@@ -25,7 +26,6 @@ import {
   PerfOverlay,
   ReplayBar,
   SettingsScreen,
-  TitleScreen,
   TraceBars,
   TrackSelectScreen,
   UiSfx,
@@ -139,7 +139,6 @@ export class App {
   private readonly touch: TouchInput;
   private readonly sfx: UiSfx;
   private readonly art: ArtManifest;
-  private readonly title: TitleScreen;
   private readonly menu: MainMenuScreen;
   private readonly tracksScreen: TrackSelectScreen;
   private readonly settings: SettingsScreen;
@@ -172,7 +171,7 @@ export class App {
   private qualityWhy: string;
   private readonly bestTimes: BestTimes;
   private readonly tracks: TrackDef[];
-  private screen: AppScreen = 'title';
+  private screen: AppScreen = 'menu';
   private qualityChoice: QualityChoice;
   /** Frame cap (Settings · Frame rate). 'auto' = 30 on phones, 60 elsewhere; the RAF loop skips frames to match. */
   private fpsChoice: FpsChoice;
@@ -333,8 +332,7 @@ export class App {
       },
     };
 
-    this.title = new TitleScreen(o.uiRoot, this.art, () => this.goto('menu'));
-    this.menu = new MainMenuScreen(o.uiRoot, this.sfx, cb, bestOf, state);
+    this.menu = new MainMenuScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
     this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
     this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb, this.art);
@@ -478,7 +476,6 @@ export class App {
     this.replayReturn = fromResults ? { from: 'results', snap: this.game.snapshot(), counters: this.game.counters(), result: this.game.result() } : { from: 'tracks' };
     this.hud.hideResults();
     this.pause.hide();
-    this.title.hide();
     this.menu.hide();
     this.garage.hide();
     this.settings.hide();
@@ -585,7 +582,7 @@ export class App {
     if (this.o.initialTrack && getTrack(this.o.initialTrack)) this.play(this.o.initialTrack);
     else {
       this.loadBackdrop(BACKDROP_TRACK);
-      this.goto('title');
+      this.goto('menu');
     }
     this.lastNow = performance.now();
     const frame = (now: number): void => {
@@ -627,7 +624,7 @@ export class App {
     if (!fresh && this.game.currentTrack?.id === id) this.game.startRun();
     else this.game.loadTrack(id);
     this.game.toMenu();
-    this.hud.hideNow(); // no HUD frame (timer, "3" banner) under the title / menu
+    this.hud.hideNow(); // no HUD frame (timer, "3" banner) under the menu
     setTimeout(() => this.audio?.setMasterVolume(vol), 60);
   }
 
@@ -638,19 +635,17 @@ export class App {
     this.screenAt = performance.now();
     this.touch.setEnabled(false);
     this.pause.hide();
-    this.title.hide();
     this.menu.hide();
     this.tracksScreen.hide();
     this.settings.hide();
     this.credits.hide();
     this.garage.hide();
     const scene = this.o.sceneRoot;
-    scene?.classList.toggle('drift', screen === 'title' || screen === 'menu');
-    scene?.classList.toggle('dim', screen !== 'title' && screen !== 'garage');
+    scene?.classList.toggle('drift', screen === 'menu');
+    scene?.classList.toggle('dim', screen !== 'menu' && screen !== 'garage');
     scene?.classList.toggle('garage', screen === 'garage');
     const dev = this.mux.activeDevice();
-    if (screen === 'title') this.title.show();
-    else if (screen === 'menu') {
+    if (screen === 'menu') {
       this.menu.setDevice(dev);
       this.menu.show();
     } else if (screen === 'garage') {
@@ -687,7 +682,6 @@ export class App {
       /* storage unavailable */
     }
     this.o.sceneRoot?.classList.remove('drift', 'dim', 'garage');
-    this.title.hide();
     this.menu.hide();
     this.garage.hide();
     this.settings.hide();
@@ -743,6 +737,7 @@ export class App {
       setTimeout(() => this.audio?.setMasterVolume(vol), 60);
     }
     this.o.onBikeChange?.(b);
+    this.menu.setBike(b);
   }
 
   // -- telemetry ------------------------------------------------------------------
@@ -940,10 +935,7 @@ export class App {
       this.game.advance(0);
       return;
     }
-    if (this.screen === 'title') {
-      // Any key / pad button / touch (the title root also listens to pointerdown).
-      if (meta.active || meta.confirm || meta.pause || meta.back || frame.throttle > 0 || frame.brake > 0 || frame.lean !== 0) this.title.anyInput();
-    } else if (this.screen !== 'run') {
+    if (this.screen !== 'run') {
       const s = this.screen === 'menu' ? this.menu : this.screen === 'garage' ? this.garage : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.credits;
       if (meta.navX || meta.navY) s.nav(meta.navX, meta.navY);
       if (meta.confirm) s.confirm();

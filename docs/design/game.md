@@ -226,39 +226,78 @@ State is cloned lazily once per tick (`getState()` hands out the same object unt
 nothing hashes per tick, and events fan out synchronously per *event* (checkpoint/fault/land are
 rare) — those were the suspects and they are not on the profile.
 
-## 10. Front end (title → menu → track select → run)
+## 10. Front end (main menu → track select → run)
 
-Flow (`App.screen`): `title` → `menu` → `tracks` | `settings` | `credits`; `run` (countdown…) → pause
-overlay → results. Routing is pure (`src/game/flow.ts`, tested): `?harness=1` never builds the front end
-(hook-only; a track is loaded in the boot macrotask as before — verified in the built page: zero `.screen`
-nodes, `phase()==='riding'`), `?track=<id>` skips straight into that track, `?dev=1` unlocks every tier and
-lists the harness `*-test` strips. Everything else opens the title.
+Flow (`App.screen`): boot lands on `menu` → `tracks` | `garage` | `settings` | `credits`; `run`
+(countdown…) → pause overlay → results. **There is no title screen**: the user asked whether the start
+screen and the main menu need to be different screens and the answer was no — the "press any key" step
+was a second tap that did nothing the menu's first tap can't do (audio unlock, PWA toast, rotate prompt all
+hang off the App, not a screen). `TitleScreen` is retired; `App.screen` has no `title`. Routing is pure
+(`src/game/flow.ts`, tested): `?harness=1` never builds the front end (hook-only; a track is loaded in the
+boot macrotask as before — verified in the built page: zero `.screen` nodes, `phase()==='riding'`),
+`?track=<id>` skips straight into that track, `?dev=1` unlocks every tier and lists the harness `*-test`
+strips. Everything else opens the menu.
 
-Design rule (user): "less buttons, more design". Title = key art + wordmark + one pulse line. Menu = three
-items. Track select = the cards are the interface. Settings = one panel of segmented rows. No control that
-can be removed stays.
+Design rule (user): "less buttons, more design". Menu = direction B "Broadcast" from
+`assets/design/menu/SPEC.md` (user's pick): one band of controls in the thumb arc under full-bleed key art.
+Track select = the cards are the interface. Settings = one panel of segmented rows. No control that can be
+removed stays.
 
 - **Backdrop**: `b1-first-ride` loaded and held in the `menu` phase (nothing ticks, renderer's idle 3/4
-  camera) under title and menu. Entering the menu from a run (`quit`) calls `startRun()` (physics
+  camera) under the menu. Entering the menu from a run (`quit`) calls `startRun()` (physics
   `reset(-1)` + a `restart{-1}` event so the renderer cuts ragdoll/particles) then `toMenu()`, with the
   master volume muted for 60 ms so the countdown cue the reset emits stays silent — the bike always sits
   upright at the start line, never a frozen crash (verified: play → crash → pause → Main menu capture).
   The renderer's menu camera is static, so the *canvas* drifts (`#app.drift canvas`, 12 s eased scale
-  1.06→1.14 with a +13 % x offset that carries the bike right of the wordmark; +20 % on short phones).
-- **Title** (`TitleScreen`): key art (`kind:'keyart'`, biome `industrial`, `2x` variant on DPR > 1.5 or
-  wide viewports) *over* the canvas at 55 % — the WebGL canvas is opaque so "behind" is impossible —
-  mirrored (`scaleX(-1)`) so its hero lands right of the wordmark, masked clear on the wordmark side,
-  bottom-up scrim `linear-gradient(180deg, transparent 35%, rgba(6,7,9,.92))`, faint SVG-noise grain (no
-  blend mode — `mix-blend-mode` doubled compositor cost). Wordmark **TRIALS GAUNTLET** (one name; the old
-  "Physics trials / Gauntlet" lockup is gone) in Barlow Condensed 900 italic (`public/fonts/*.woff2`,
-  15.5 + 14.9 + 14.7 KB latin subsets, OFL), amber gradient fill + `--bevel` + emissive drop-shadow,
-  tracking −0.01em. "PRESS ANY KEY · TAP TO START" pulses at 1.6 s. Build stamp (short git sha + build
-  time from Vite `define`) bottom-right at 40 %. No buttons. Any key / pad button / stick / tap → 200 ms
-  rise-out → menu.
-- **Main menu** (`MainMenuScreen` + `FocusList`): Play / Settings / Credits in the display face at 2.4 rem
-  (1.6 rem on short phones), amber selection bar sliding at `--t1`, items rising at `--t2` with 40 ms
-  stagger, one quiet career line under the list ("n of 15 tracks cleared · next up X"). Focus by arrows /
-  d-pad / stick edges / pointer hover with tick cues; confirm / back cues. Esc/B/Backspace → title.
+  1.06→1.14 with a +13 % x offset; +20 % on short phones) — visible only until the key art plate decodes over
+  it (and in the Garage, which shows the scene).
+- **Main menu — "Broadcast"** (`MainMenuScreen` + `FocusList`, `.menu-*` rules in `styles.ts`; mockup
+  `assets/design/menu/B-broadcast.jpg` is a direction study, not pixel truth). A TV sports package:
+  - *Key art* (`.menu-keyart`): the industrial plate (`kind:'keyart'`, `2x` on DPR > 1.5 / wide) full-bleed
+    *over* the canvas (the WebGL canvas is opaque so "behind" is impossible), mirrored (`scaleX(-1)`) so the
+    rider lands right of the badge, `cover` at `50% 10%` so the helmet clears the top on 16:9 / 19.5:9 crops,
+    a soft top + bottom vignette (`::after`) for the badge and band, a 28 s Ken Burns (`scale 1 → 1.06`,
+    off under `prefers-reduced-motion`). Until the plate decodes the live 3D scene shows through (the
+    biome tint is the `background-image` fallback, set as `backgroundImage` — never the `background`
+    shorthand, which resets `background-size` and drew the plate at natural size, a 2× zoom); a 404 leaves
+    the scene, never a broken image. The live scene above the band on wide screens was considered and not
+    done: the still covers the canvas, and a second layout for one geometry is not worth the split (SPEC's
+    honest note). The band covers the plate's floor, not its hero.
+  - *Lower third* (`.menu-band`): a dark slab in the bottom quarter (`--tab-h` = clamp 52–92 px by 15 vh
+    + `--ticker-h` 24–30 px + safe-area bottom; 92 / 84 / 122 px at 932×430 / 844×390 / 1280×720), a 2 px
+    amber top edge, left inset 7 vw. The `FocusList` renders horizontally (`axis 'x'`): **PLAY · GARAGE ·
+    SETTINGS** in the display face (clamp 1.7–2.6 rem, 1.45–2.1 rem short; the rule is `#ui .menu-item` —
+    `#ui button { font: inherit }` outranks a bare class), each tab ≥ 88 × 44 (measured 93 × 65 / 89 × 59 /
+    119 × 92 for PLAY), gap 40 px (24 px short) so one thumb never spans two; CREDITS as a `minor` item in
+    small caps pushed to the band's right end. The amber `.menu-bar` is the active tab's **underline**
+    (4 px, slides at `--t1`, takes the tab's width). Keyboard / pad: ←/→ (and ↑/↓) move, Enter/A confirm;
+    hover-focus with tick cues. Esc/B on the menu does nothing (boot screen: nowhere further back).
+  - *Ticker* (`.menu-ticker`, `pointer-events: none`, never a control): `BEST TIMES · FIRST RIDE 0:34.230 ·
+    LEAN BACK --:-- · …` from `bestOf()` over `shipTracks()` in tier order, rebuilt on every `show`. After
+    layout the screen measures the row: wider than the screen → the row is duplicated and translates by
+    −50 % at ≈ 60 px/s (`--ticker-s`), a seamless loop; narrower → static. Paused under
+    `prefers-reduced-motion`.
+  - *Badge* (`.menu-badge` → `.menu-plate` + `.wordmark` + `.menu-build`): the wordmark **TRIALS GAUNTLET**
+    (Barlow Condensed 900 italic, amber gradient fill + bevel; `public/fonts/*.woff2`, OFL) on a dark
+    slanted plate top-left (`clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%)`, a 5 px amber
+    leading edge as an inset shadow — the gradient text is its own `background-clip: text`, so the plate
+    is a wrapper, not the wordmark's own background). Under it the build stamp, tiny at 55 %:
+    `BUILD <sha7> · <date>` (`BUILD_STAMP_SHORT`; the sha is `git rev-parse --short HEAD` via Vite `define`,
+    `dev` only when git is unavailable — the still at 932×430 reads the HEAD of the build that made it).
+  - *Chip* (`.menu-chip`, top-right, `pointer-events: none`): `● ROOKIE BIKE` / `● PRO BIKE`, the class in
+    effect (`MainMenuScreen.setBike`, called from `applyBike` so a Garage change updates it live). The
+    mockup's `● LIVE` word is dropped: the menu is a still, and "LIVE" would be a claim; the pulsing amber
+    dot stays as the decoration.
+  - *First-tap duties the title used to hold*: audio unlock is the App's first `pointerdown` / `keydown`
+    anywhere (unchanged); the onboarding flag is untouched; the PWA update toast (`.toast`, z 30) and the
+    portrait rotate prompt (`.rotate`, z 28) sit above the menu as before. The ticker and chip never take
+    pointers, so the only tappables on the boot screen are the four tabs.
+  - *Invariant* (`src/ui/live.ts`): the screen root goes through `reveal()`; nothing in the band is
+    hit-testable until the root has been drawn ≥ .5 for 150 ms. `harness/e2e/touch.mts` `toMenu` asserts
+    boot lands on `menu`, then `checkPlayReveal`: re-enter the menu through `goto` and, in the same
+    evaluate, PLAY is not inside a `.live` element, a tap at its point (dispatched at the hit-tested element,
+    as a finger would land) leaves `screen === 'menu'`, PLAY is ≥ 88 × 44 and its centre is below 70 % of
+    the height; once `.menu-screen.live`, the hit at PLAY's centre is PLAY at opacity 1.
 - **Track select** (`TrackSelectScreen`): tier rows as text headings (label, blurb, done/total, padlock
   line when locked) over horizontal card carousels. Card = art (`kind:'track-card'`, fallback tier card,
   fallback biome-tinted gradient with a ghosted tier badge), medal disc (manifest icon, tinted disc, or a
@@ -295,15 +334,15 @@ can be removed stays.
 - **Reload game**: on the portrait prompt (§11), the last row of the pause menu and the last row of Settings
   ("⟳ Reload game"; `hardReload` clears SW caches + sessionStorage and reloads with a cache-busting query —
   home-screen standalone mode has no browser chrome). Never top-right: the in-run top-right ↻ is restart and
-  nothing else lives up there. The build stamp stays on the prompt, in Settings and on the title corner.
-- **Title any-key**: the title leaves on the gesture's *end* (`pointerup`), not `pointerdown`, so the same
-  tap's `click` can't land on the menu item that appears under the finger 200 ms later; and for 150 ms after
-  any screen change the shell drops confirm/back/nav edges (`SCREEN_GRACE_MS`), so the key that changed
-  screens never acts twice.
-- **Title first**: `loadBackdrop` calls `DomHud.hideNow()` after `toMenu()` — HUD hidden with no fade and the
+  nothing else lives up there. The build stamp stays on the prompt, in Settings and under the menu badge.
+- **Screen-change grace**: for 250 ms after any screen change the shell drops confirm/back/nav edges
+  (`SCREEN_GRACE_MS`), so the key that changed screens never acts twice; taps are governed by the invariant
+  above (`.live`), not by a timer.
+- **Menu first**: `loadBackdrop` calls `DomHud.hideNow()` after `toMenu()` — HUD hidden with no fade and the
   countdown banner the backdrop load spawned retired — so neither the boot crossfade nor run → menu ever shows a
-  HUD frame under the title / menu (verified frame by frame: `.hud hidden` opacity 0 from the first HUD frame
-  through loader removal, title `.show` before the loader goes `out`; `?harness=1` still builds zero screens).
+  HUD frame under the menu (`?harness=1` still builds zero screens). The menu is shown before the loader
+  goes out, so it is already live when the loader lifts; the loader's "Key art" step prefetches the plate so
+  the first frame after the loader is usually the still, not the scene.
 - **Run → menu** (`quit`, from pause or the results panel): exactly the cold-boot path — `loadTrack(b1)`
   afresh (renderer `setTrack`: world rebuilt, particles / finish flash cleared, camera cut to the idle
   framing), `toMenu()`, HUD `hidden`, touch layer off (`.tz` outlines and buttons only render while the layer

@@ -92,8 +92,6 @@ export const FRONT_CSS = /* css */ `
 .scrim { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 35%, rgba(6,7,9,.92)); }
 .scrim.side { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.82) 34%, rgba(6,7,9,.35) 62%, rgba(6,7,9,.2) 100%), linear-gradient(180deg, rgba(6,7,9,.35), transparent 30%, transparent 70%, rgba(6,7,9,.9)); }
 /* Key art is mirrored so its hero (authored left of centre) lands right of the wordmark; the mask (local coords, pre-flip) clears the wordmark side. */
-.keyart { position: absolute; inset: 0; pointer-events: none; background-size: cover; background-position: 50% 40%; opacity: 0; transition: opacity var(--t3) var(--ease); transform: scaleX(-1); -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent 90%); mask-image: linear-gradient(90deg, #000 55%, transparent 90%); }
-.keyart.loaded { opacity: .55; }
 .grain { position: absolute; inset: 0; pointer-events: none; opacity: .05; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .wordmark { font-family: var(--display); font-style: italic; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; line-height: .86; color: var(--amber); text-shadow: var(--bevel); background: linear-gradient(180deg, #ffd98a 0%, #ffb020 42%, #ff8a1f 70%, #c9641a 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 .03em 0 #6b3a05) drop-shadow(0 .07em .05em rgba(0,0,0,.6)) drop-shadow(0 0 .5em rgba(255,150,30,.28)); }
 .wordmark small { display: block; font-size: .28em; letter-spacing: .48em; line-height: 1; margin: 0 0 .28em .08em; color: var(--ink); background: none; -webkit-text-fill-color: var(--ink); text-shadow: var(--outline); font-weight: 900; }
@@ -108,38 +106,49 @@ export const FRONT_CSS = /* css */ `
 .corner-brand { position: absolute; left: calc(var(--s5) + var(--sal)); bottom: calc(var(--s4) + var(--sab)); font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.1rem; letter-spacing: .02em; text-transform: uppercase; color: var(--ink-dim); }
 .corner-brand b { color: var(--amber); }
 
-/* ---- title ------------------------------------------------------------ */
-.title-screen .wordmark { position: absolute; left: calc(calc(6 * var(--vw)) + var(--sal)); bottom: calc(22% + var(--sab)); font-size: clamp(4rem, calc(11.5 * var(--vw)), 9.5rem); }
-.title-screen .press { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal) + .3rem); bottom: calc(13% + var(--sab)); font-size: 1rem; letter-spacing: .38em; text-transform: uppercase; color: var(--ink); font-weight: 700; animation: pulse 1.6s ease-in-out infinite; text-shadow: var(--outline); }
-.title-screen .press i { display: inline-block; width: .55em; height: .55em; margin-right: .9em; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); vertical-align: 5%; }
 @keyframes pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
-.title-screen .build { position: absolute; right: calc(var(--s5) + var(--sar)); bottom: calc(var(--s4) + var(--sab)); font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink); opacity: .4; }
-.title-screen.leave .wordmark, .title-screen.leave .press { transition: transform var(--t2) var(--ease), opacity var(--t2) var(--ease); transform: translateY(-12px); opacity: 0; }
 
-/* ---- main menu -------------------------------------------------------- */
-.menu-screen .wordmark { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(9% + var(--sat)); font-size: clamp(2.2rem, calc(5.6 * var(--vw)), 4.2rem); }
-.menu-list { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(9% + var(--sat) + clamp(5rem, calc(12 * var(--vw)), 9rem)); display: flex; flex-direction: column; gap: var(--s1); width: min(24rem, calc(60 * var(--vw))); }
-.menu-item { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 44px; padding: var(--s2) var(--s5) var(--s2) var(--s5); border: 0; background: transparent; text-align: left; cursor: pointer; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.4rem; line-height: 1; text-transform: uppercase; letter-spacing: .005em; color: var(--ink-dim); transition: color var(--t1) var(--ease), transform var(--t2) var(--ease), opacity var(--t2) var(--ease); }
-.menu-item small { font-family: var(--font); font-style: normal; font-weight: 500; font-size: .9rem; letter-spacing: .06em; text-transform: none; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
-.menu-item.on { color: var(--ink); transform: translateX(var(--s3)); text-shadow: 0 2px 10px rgba(0,0,0,.6); }
-.menu-item.on small { color: var(--ink-dim); }
-.menu-item.on::before { content: ""; position: absolute; left: calc(-1 * var(--s3)); top: 12%; bottom: 12%; width: 4px; border-radius: 2px; background: var(--amber); box-shadow: 0 0 12px var(--amber); }
-.menu-item[disabled] { opacity: .35; cursor: default; }
-.mini-seg { display: inline-flex; gap: 0; border: 1px solid var(--line-2); border-radius: var(--r1); overflow: hidden; margin-top: 3px; }
-.mini-seg b { font-weight: 700; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; padding: 3px 10px; color: var(--ink-mute); }
+/* ---- main menu: direction B "Broadcast" (assets/design/menu/SPEC.md §B) ---- */
+/* Boot lands here (no title step). Key art full-bleed over the live scene; every control in the lower-third band. */
+.menu-screen { --tab-h: clamp(52px, calc(15 * var(--vh)), 92px); --ticker-h: clamp(24px, calc(6.5 * var(--vh)), 30px); }
+.menu-keyart { position: absolute; inset: 0; pointer-events: none; background-size: cover; background-position: 50% 10%; opacity: 0; transform: scaleX(-1); transition: opacity var(--t3) var(--ease); }
+.menu-keyart.loaded { opacity: 1; animation: kenburns 28s var(--ease) infinite alternate; }
+@keyframes kenburns { from { transform: scaleX(-1) scale(1); } to { transform: scaleX(-1) scale(1.06); } }
+.menu-keyart::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6,7,9,.42), transparent 28%, transparent 72%, rgba(6,7,9,.55)); }
+/* Badge plate top-left: the wordmark on a dark slanted plate with an amber leading edge, the build stamp tiny under it. */
+.menu-badge { position: absolute; left: calc(var(--s4) + var(--sal)); top: calc(var(--s4) + var(--sat)); display: flex; flex-direction: column; align-items: flex-start; gap: var(--s1); pointer-events: none; }
+.menu-plate { background: rgba(9,11,15,.92); box-shadow: inset 5px 0 0 var(--amber), 0 6px 20px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); padding: .3em 1.5em .25em 1em; font-size: clamp(1.6rem, calc(3.4 * var(--vw)), 2.6rem); }
+.menu-plate .wordmark { font-size: 1em; line-height: .9; white-space: nowrap; filter: drop-shadow(0 .03em 0 #6b3a05) drop-shadow(0 .05em .04em rgba(0,0,0,.5)); }
+.menu-build { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ink); opacity: .55; text-shadow: var(--outline); padding-left: .4rem; font-variant-numeric: tabular-nums; }
+/* Bike-class chip top-right: information, not a control (the Garage tab changes it). */
+.menu-chip { position: absolute; right: calc(var(--s4) + var(--sar)); top: calc(var(--s4) + var(--sat)); display: inline-flex; align-items: center; gap: .6em; min-height: 32px; padding: 0 1.1em 0 1em; background: rgba(9,11,15,.88); clip-path: polygon(.5em 0, 100% 0, calc(100% - .5em) 100%, 0 100%); font-size: .78rem; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--ink); pointer-events: none; }
+.menu-chip i { width: .55em; height: .55em; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: pulse 1.6s ease-in-out infinite; }
+/* Lower third: the slab, an amber top edge, the tabs; the ticker sits in its bottom strip. */
+.menu-band { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--tab-h) + var(--ticker-h) + var(--sab)); padding: 0 calc(var(--s4) + var(--sar)) calc(var(--ticker-h) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); background: linear-gradient(180deg, rgba(9,11,15,.84), rgba(9,11,15,.95)); border-top: 2px solid var(--amber); box-shadow: 0 -14px 34px rgba(0,0,0,.4); display: flex; align-items: stretch; }
+.menu-list.tabs { position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--s6); width: 100%; height: var(--tab-h); }
+#ui .menu-item { position: relative; display: flex; flex-direction: row; align-items: center; justify-content: center; min-height: 44px; min-width: 88px; padding: 0 var(--s4); border: 0; background: transparent; cursor: pointer; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1.7rem, calc(4.2 * var(--vw)), 2.6rem); line-height: 1; text-transform: uppercase; letter-spacing: .005em; color: var(--ink-dim); transition: color var(--t1) var(--ease); }
+#ui .menu-item small { display: none; }
+#ui .menu-item.on { color: var(--ink); text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+#ui .menu-item.minor { margin-left: auto; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .78rem; letter-spacing: .3em; color: var(--ink-mute); }
+#ui .menu-item.minor.on { color: var(--ink); }
+#ui .menu-item[disabled] { opacity: .35; cursor: default; }
+.mini-seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: var(--r1); overflow: hidden; }
+.mini-seg b { padding: 4px 8px; font-weight: 700; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); }
 .mini-seg b.on { background: var(--amber); color: var(--amber-ink); }
-.menu-bar { position: absolute; left: 0; width: 0; height: 44px; border-radius: var(--r2); background: linear-gradient(90deg, rgba(255,176,32,.22), rgba(255,176,32,.02) 70%, transparent); pointer-events: none; transition: transform var(--t1) var(--ease), width var(--t1) var(--ease), height var(--t1) var(--ease), opacity var(--t2); opacity: 0; }
+/* The focus bar is the active tab's underline: slides along the row at --t1, takes the tab's width. */
+.menu-bar { position: absolute; left: 0; bottom: 0; width: 0; height: 4px; border-radius: 2px; background: var(--amber); box-shadow: 0 0 12px var(--amber); pointer-events: none; transition: transform var(--t1) var(--ease), width var(--t1) var(--ease), opacity var(--t2); opacity: 0; }
 .menu-bar.on { opacity: 1; }
-.menu-screen .show .menu-item { animation: rise var(--t2) var(--ease) both; }
-.menu-screen .menu-item:nth-child(2) { animation-delay: 40ms; } .menu-screen .menu-item:nth-child(3) { animation-delay: 80ms; } .menu-screen .menu-item:nth-child(4) { animation-delay: 120ms; } .menu-screen .menu-item:nth-child(5) { animation-delay: 160ms; }
-.menu-foot { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal) + var(--s5)); bottom: calc(10% + var(--sab)); font-size: .9rem; letter-spacing: .08em; color: var(--ink-mute); }
-.menu-side { display: none; }
-.menu-side h3 { margin: 0; font-size: .72rem; letter-spacing: .3em; text-transform: uppercase; color: var(--amber); font-weight: 700; }
-.menu-side .big { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.7rem; line-height: 1; }
-.menu-side .row2 { display: flex; justify-content: space-between; gap: var(--s3); font-size: .9rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
-.menu-side .medals { display: flex; gap: var(--s2); margin-top: var(--s1); }
-.menu-side .medals span { display: inline-flex; align-items: center; gap: .35em; font-size: .85rem; font-weight: 700; }
-.menu-side .medals i { width: .8em; height: .8em; border-radius: 50%; background: currentColor; box-shadow: inset 0 -2px 0 rgba(0,0,0,.35); }
+.menu-screen.show .menu-item { animation: rise var(--t2) var(--ease) both; }
+.menu-screen .menu-item:nth-child(3) { animation-delay: 40ms; } .menu-screen .menu-item:nth-child(4) { animation-delay: 80ms; } .menu-screen .menu-item:nth-child(5) { animation-delay: 120ms; }
+/* Ticker: best times for the shipped tracks in tier order; scrolls only when wider than the screen (the screen sets .scroll after measuring). Never a control. */
+.menu-ticker { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--ticker-h) + var(--sab)); padding-bottom: var(--sab); background: rgba(4,5,7,.96); border-top: 1px solid var(--line-2); overflow: hidden; pointer-events: none; display: flex; align-items: center; }
+.menu-ticker-track { flex: 0 0 auto; display: inline-flex; align-items: center; white-space: nowrap; padding-left: calc(calc(7 * var(--vw)) + var(--sal)); font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.menu-ticker-track span { display: inline-flex; align-items: center; gap: .6em; }
+.menu-ticker-track span + span::before { content: ""; width: 1px; height: 1em; background: var(--line); margin: 0 1.6em; }
+.menu-ticker-track b { color: var(--ink); font-weight: 700; }
+.menu-ticker-track .head { color: var(--amber); }
+.menu-ticker.scroll .menu-ticker-track { padding-left: 0; animation: ticker var(--ticker-s, 30s) linear infinite; }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* ---- track select ----------------------------------------------------- */
 .tracks-screen { background: linear-gradient(90deg, rgba(6,7,9,.88) 0%, rgba(6,7,9,.6) 40%, rgba(6,7,9,.35) 100%); }
@@ -588,14 +597,11 @@ export const HUD_CSS = /* css */ `
 @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate.armed { display: flex; } }
 
 /* Short landscape phones (844×390): tighter type, single-row menus above the fold. html.short = logical height ≤ 500 px (orientation.ts). */
-html.short .title-screen .wordmark { font-size: clamp(3rem, calc(9.5 * var(--vw)), 5.2rem); bottom: calc(24% + var(--sab)); }
-html.short .title-screen .press { bottom: calc(11% + var(--sab)); font-size: .85rem; }
-html.short .menu-screen .wordmark { font-size: clamp(1.8rem, calc(4.6 * var(--vw)), 2.6rem); top: calc(7% + var(--sat)); }
-html.short .menu-list { top: calc(7% + var(--sat) + 3.6rem); gap: 0; width: min(20rem, calc(48 * var(--vw))); }
-html.short .menu-item { font-size: 1.6rem; padding-top: var(--s1); padding-bottom: var(--s1); gap: 0; }
-html.short .menu-item small { font-size: .78rem; }
-html.short .menu-side { bottom: calc(14% + var(--sab)); padding: var(--s3) var(--s4); }
-html.short .menu-side .big { font-size: 1.3rem; }
+html.short .menu-plate { font-size: clamp(1.35rem, calc(3 * var(--vw)), 2rem); }
+html.short #ui .menu-item { font-size: clamp(1.45rem, calc(3.8 * var(--vw)), 2.1rem); }
+html.short #ui .menu-item.minor { font-size: .72rem; }
+html.short .menu-list.tabs { gap: var(--s5); }
+html.short .menu-chip { min-height: 28px; font-size: .7rem; }
 html.short .tracks-head { top: calc(var(--s3) + var(--sat)); }
 html.short .tracks-head h1 { font-size: 1.8rem; }
 html.short .tiers { top: calc(var(--s3) + var(--sat) + 3.2rem); bottom: calc(var(--s5) + var(--sab)); }
@@ -604,7 +610,6 @@ html.short .card { width: clamp(10.5rem, calc(19 * var(--vw)), 13rem); }
 html.short .card .name { font-size: 1.15rem; }
 html.short .settings-wrap { padding-top: calc(var(--s3) + var(--sat)); padding-bottom: calc(var(--s4) + var(--sab)); gap: var(--s2); grid-template-columns: minmax(16rem, 30rem); }
 html.short .settings-foot .controls-line { display: none; }
-html.short .menu-foot { bottom: calc(8% + var(--sab)); font-size: .8rem; }
 html.short .settings-wrap h1 { font-size: 1.8rem; }
 html.short .setting { min-height: 46px; padding: var(--s1) var(--s3); }
 html.short .setting .lab { font-size: 1.05rem; }
@@ -640,7 +645,8 @@ html.narrow .settings-wrap { grid-template-columns: 1fr; }
   #app.drift canvas { animation: none; }
   .overlay.show .tile, .overlay.show .visuals, .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) both; }
   .results .time, .results .faults, .results .medals, .results .pb, .results .tiles, .results .ov-foot { transform: none; }
-  .title-screen .press { animation: none; opacity: 1; }
+  .menu-keyart.loaded, .menu-chip i { animation: none; }
+  .menu-ticker.scroll .menu-ticker-track { animation: none; }
 }
 `;
 

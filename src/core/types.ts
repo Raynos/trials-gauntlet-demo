@@ -601,7 +601,7 @@ export interface TrialsHook {
   app?: {
     frame(): void;
     play(trackId: string): void;
-    goto(screen: 'title' | 'menu' | 'tracks' | 'settings' | 'garage' | 'credits'): void;
+    goto(screen: 'menu' | 'tracks' | 'settings' | 'garage' | 'credits'): void;
     togglePause(): void;
     screen(): string;
     paused(): boolean;

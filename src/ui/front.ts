@@ -1,6 +1,7 @@
 /**
- * Front end (docs/design/game.md §10): title → main menu → track select /
- * settings / credits. Plain DOM over the live 3D canvas; every screen drives
+ * Front end (docs/design/game.md §10): main menu ("Broadcast", boot lands on
+ * it — there is no title step) → track select / garage / settings / credits.
+ * Plain DOM over the live 3D canvas; every screen drives
  * focus itself (keyboard arrows, d-pad/stick edges, pointer hover, tap) and
  * exposes `nav / confirm / back` for the app shell. Targets ≥ 44 px, safe-area
  * aware, tokens from styles.ts only.
@@ -14,7 +15,7 @@ import { labTracks, medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, 
 import type { UiSfx } from './sfx';
 import { conceal, reveal } from './live';
 
-export type FrontScreen = 'title' | 'menu' | 'garage' | 'tracks' | 'settings' | 'credits';
+export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits';
 
 export interface FrontCallbacks {
   /** Track select confirmed a card (called ≈180 ms into the card's fly-up so the scene swaps under it). */
@@ -69,6 +70,8 @@ export const GAME_NAME = 'Trials Gauntlet';
 declare const __BUILD_ID__: string | undefined;
 declare const __BUILD_TIME__: string | undefined;
 export const BUILD_STAMP = `build ${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}${typeof __BUILD_TIME__ === 'string' ? ' · ' + __BUILD_TIME__ : ''}`;
+/** Menu stamp: `build <sha7> · <date>` (the time of day dropped; the sha is `git rev-parse --short HEAD` at build time, `dev` only without git). */
+export const BUILD_STAMP_SHORT = BUILD_STAMP.replace(/ \d\d:\d\dZ?$/, '');
 
 /** Clear anything that could pin an old build (SW caches, session state), then reload. Settings and PBs stay. */
 export async function hardReload(): Promise<void> {
@@ -150,68 +153,7 @@ abstract class Screen {
 }
 
 // ---------------------------------------------------------------------------
-// Title
-// ---------------------------------------------------------------------------
-
-export class TitleScreen extends Screen {
-  private readonly keyart: HTMLDivElement;
-  private leaving = false;
-
-  constructor(parent: HTMLElement, art: ArtManifest, private readonly onStart: () => void) {
-    super(parent, 'title-screen');
-    this.keyart = h('div', 'keyart');
-    this.root.append(
-      this.keyart,
-      h('div', 'scrim'),
-      h('div', 'grain'),
-      h('div', 'wordmark rise', `${GAME_NAME.split(' ')[0]}<br>${GAME_NAME.split(' ').slice(1).join(' ')}`),
-      h('div', 'press rise', '<i></i>Press any key · Tap to start'),
-      h('div', 'build', escapeHtml(BUILD_STAMP)),
-    );
-    // Leave on the gesture's END: a pointerdown-triggered transition let the same tap's click land
-    // on whichever menu item had appeared under the finger 200 ms later (the "double fire").
-    let armed = false;
-    this.root.addEventListener('pointerdown', () => (armed = true), { passive: true });
-    this.root.addEventListener('pointerup', () => {
-      if (armed) this.start();
-      armed = false;
-    }, { passive: true });
-    this.root.addEventListener('pointercancel', () => (armed = false), { passive: true });
-    art.whenReady(() => art.applyBackground(this.keyart, art.keyart('industrial')));
-  }
-
-  private start(): void {
-    if (!this.visible || this.leaving) return;
-    this.leaving = true;
-    this.root.classList.add('leave');
-    setTimeout(() => {
-      this.leaving = false;
-      this.onStart();
-    }, 200);
-  }
-
-  override show(): void {
-    this.leaving = false;
-    super.show();
-  }
-
-  /** Any key / pad button / tap. */
-  anyInput(): void {
-    this.start();
-  }
-  nav(): void {
-    this.start();
-  }
-  confirm(): void {
-    this.start();
-  }
-  back(): void {
-    this.start();
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Vertical list with an eased amber bar (main menu, pause share the CSS)
+// Focus list with an eased amber bar: vertical (column) or horizontal (the menu's tabs, bar = underline)
 // ---------------------------------------------------------------------------
 
 export interface ListItem {
@@ -219,6 +161,8 @@ export interface ListItem {
   label: string;
   note?: string;
   disabled?: boolean;
+  /** Secondary item (the menu's CREDITS): small caps, pushed to the far end of a horizontal list. */
+  minor?: boolean;
 }
 
 export class FocusList {
@@ -229,7 +173,7 @@ export class FocusList {
   onChange: ((id: string) => void) | null = null;
   onPick: ((id: string) => void) | null = null;
 
-  constructor(parent: HTMLElement, private readonly sfx: UiSfx, cls = 'menu-list') {
+  constructor(parent: HTMLElement, private readonly sfx: UiSfx, cls = 'menu-list', private readonly axis: 'x' | 'y' = 'y') {
     this.root = h('div', cls);
     this.bar = h('div', 'menu-bar');
     this.root.appendChild(this.bar);
@@ -250,7 +194,7 @@ export class FocusList {
     this.items = items;
     for (const el of [...this.root.querySelectorAll('.menu-item')]) el.remove();
     items.forEach((it, i) => {
-      const b = h('button', 'menu-item', `${escapeHtml(it.label)}${it.note ? `<small>${escapeHtml(it.note)}</small>` : ''}`);
+      const b = h('button', it.minor ? 'menu-item minor' : 'menu-item', `${escapeHtml(it.label)}${it.note ? `<small>${escapeHtml(it.note)}</small>` : ''}`);
       b.type = 'button';
       b.dataset['i'] = String(i);
       b.dataset['id'] = it.id;
@@ -327,9 +271,15 @@ export class FocusList {
       return;
     }
     if (!animate) this.bar.style.transition = 'none';
-    this.bar.style.transform = `translateY(${b.offsetTop}px)`;
-    this.bar.style.height = `${b.offsetHeight}px`;
-    this.bar.style.width = `${Math.max(this.root.clientWidth, b.offsetWidth + 24)}px`;
+    if (this.axis === 'x') {
+      // Underline: the bar slides along the row and takes the focused tab's width (height from CSS).
+      this.bar.style.transform = `translateX(${b.offsetLeft}px)`;
+      this.bar.style.width = `${b.offsetWidth}px`;
+    } else {
+      this.bar.style.transform = `translateY(${b.offsetTop}px)`;
+      this.bar.style.height = `${b.offsetHeight}px`;
+      this.bar.style.width = `${Math.max(this.root.clientWidth, b.offsetWidth + 24)}px`;
+    }
     this.bar.classList.add('on');
     if (!animate) {
       void this.bar.offsetHeight;
@@ -343,28 +293,52 @@ export class FocusList {
 // Main menu
 // ---------------------------------------------------------------------------
 
+/**
+ * Main menu, direction B "Broadcast" (assets/design/menu/SPEC.md §B): the boot screen — there is no
+ * title step. Full-bleed key art (the industrial plate, mirrored so the rider lands right of the badge,
+ * hot-swapped in over the live scene by the art library), a lower-third slab with PLAY · GARAGE ·
+ * SETTINGS as horizontal tabs (CREDITS small at the band's far end), a best-times ticker along the
+ * bottom edge, the wordmark on an angled badge plate top-left with the build stamp under it, and a
+ * bike-class chip top-right. Every control lives in the band: the thumb arc from either corner.
+ */
 export class MainMenuScreen extends Screen {
   private readonly list: FocusList;
-  private readonly side: HTMLDivElement;
+  private readonly keyart: HTMLDivElement;
+  private readonly ticker: HTMLDivElement;
+  private readonly tickerTrack: HTMLDivElement;
+  private readonly chip: HTMLDivElement;
   private tracks: TrackDef[] = [];
+  /** One copy of the ticker row; layout() doubles it only while it scrolls. */
+  private tickerHtml = '';
 
   constructor(
     parent: HTMLElement,
     sfx: UiSfx,
+    art: ArtManifest,
     private readonly cb: FrontCallbacks,
     private readonly bestOf: (id: string) => BestEntry | null,
     private readonly state: () => FrontState,
   ) {
     super(parent, 'menu-screen');
-    this.root.append(h('div', 'scrim side'), h('div', 'grain'), h('div', 'wordmark', GAME_NAME));
-    this.list = new FocusList(this.root, sfx);
-    this.side = h('div', 'menu-foot');
-    this.root.append(this.side);
+    this.keyart = h('div', 'menu-keyart');
+    this.keyart.style.backgroundImage = BIOME_TINT.industrial; // never the shorthand: it would reset background-size
+    // The wordmark's gradient is its own background (clip: text), so the slanted plate is a wrapper around it.
+    const badge = h('div', 'menu-badge');
+    const plate = h('div', 'menu-plate');
+    plate.appendChild(h('div', 'wordmark', GAME_NAME));
+    badge.append(plate, h('div', 'menu-build', escapeHtml(BUILD_STAMP_SHORT)));
+    this.chip = h('div', 'menu-chip');
+    const band = h('div', 'menu-band');
+    this.list = new FocusList(band, sfx, 'menu-list tabs', 'x');
+    this.ticker = h('div', 'menu-ticker');
+    this.tickerTrack = h('div', 'menu-ticker-track');
+    this.ticker.appendChild(this.tickerTrack);
+    this.root.append(this.keyart, h('div', 'grain'), badge, this.chip, band, this.ticker);
     this.list.setItems([
       { id: 'play', label: 'Play' },
       { id: 'garage', label: 'Garage' },
       { id: 'settings', label: 'Settings' },
-      { id: 'credits', label: 'Credits' },
+      { id: 'credits', label: 'Credits', minor: true },
     ]);
     this.list.onPick = (id) => {
       if (id === 'play') this.cb.goto('tracks');
@@ -372,34 +346,61 @@ export class MainMenuScreen extends Screen {
       else if (id === 'settings') this.cb.goto('settings');
       else if (id === 'credits') this.cb.goto('credits');
     };
+    art.whenReady(() => art.applyBackground(this.keyart, art.keyart('industrial')));
+    window.addEventListener('resize', () => {
+      if (this.visible) this.layout();
+    });
   }
 
   setTracks(tracks: TrackDef[]): void {
     this.tracks = tracks;
   }
 
+  /** Bike class in effect (the Garage changed it, or a tier default applied): the top-right chip follows. */
+  setBike(bike: BikeClass): void {
+    this.chip.innerHTML = `<i></i>${escapeHtml(BIKE_NAME[bike])} bike`;
+  }
+
   override show(): void {
     super.show();
     const s = this.state();
-    const medalOf: MedalOf = (t) => this.bestOf(t)?.medal ?? null;
-    const totals = medalTotals(this.tracks, medalOf);
-    const next = nextTrack(this.tracks, medalOf, s.dev, s.lastPlayed);
-    // One quiet line of career state under the list; no panel, no buttons.
-    this.side.textContent = next ? `${totals.cleared} of ${totals.total} tracks cleared · next up ${next.name}` : '';
-    this.list.setNote('garage', `${BIKE_NAME[s.bikeClass]} bike`);
+    this.setBike(s.bikeClass);
+    // Ticker: the shipped tracks in tier order, each with its best time or a dash; never a control.
+    const cells = shipTracks(this.tracks).map((t) => {
+      const b = this.bestOf(t.id);
+      return `<span>${escapeHtml(t.name)} <b>${b ? formatTime(b.time) : '--:--'}</b></span>`;
+    });
+    this.tickerHtml = `<span class="head">Best times</span>${cells.join('')}`;
+    this.tickerTrack.innerHTML = this.tickerHtml;
     this.list.focusId('play');
-    requestAnimationFrame(() => this.list.render(false));
+    requestAnimationFrame(() => this.layout());
   }
 
-  nav(_dx: number, dy: number): void {
-    this.list.move(dy);
+  /** Re-measure: the underline under the focused tab, and whether the ticker is wider than the screen (only then does it scroll). */
+  private layout(): void {
+    this.list.render(false);
+    this.ticker.classList.remove('scroll');
+    this.tickerTrack.style.removeProperty('--ticker-s');
+    this.tickerTrack.innerHTML = this.tickerHtml; // measure one copy (a resize would otherwise re-measure a doubled row and double it again)
+    const over = this.tickerTrack.scrollWidth - this.ticker.clientWidth;
+    if (over > 4) {
+      // Two copies of the row and a translate by half: a seamless loop at ~60 px/s.
+      const w = this.tickerTrack.scrollWidth;
+      this.tickerTrack.innerHTML = this.tickerHtml + this.tickerHtml;
+      this.tickerTrack.style.setProperty('--ticker-s', `${Math.max(12, Math.round(w / 60))}s`);
+      this.ticker.classList.add('scroll');
+    }
+  }
+
+  nav(dx: number, dy: number): void {
+    // Tabs run left → right; up/down walk them too so a d-pad in either habit works.
+    this.list.move(dx || dy);
   }
   confirm(): void {
     this.list.pick();
   }
-  back(): void {
-    this.cb.goto('title');
-  }
+  /** Boot screen: Esc / B has nowhere further back to go. */
+  back(): void {}
 }
 
 // ---------------------------------------------------------------------------

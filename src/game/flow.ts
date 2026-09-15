@@ -1,17 +1,17 @@
 /**
  * Boot routing (docs/design/game.md §10): which front-end the page opens on.
- * Pure so it is unit-tested: `?harness=1` never sees the title/menu (the whole
+ * Pure so it is unit-tested: `?harness=1` never sees the menu (the whole
  * evidence harness drives the game through `window.__trials` and expects a
  * track to be loaded), `?track=<id>` skips straight into that track, anything
- * else opens the title screen. `?dev=1` unlocks every tier and shows the test
+ * else opens the main menu (boot lands on it; there is no title step). `?dev=1` unlocks every tier and shows the test
  * strips in track select.
  */
 export interface BootRoute {
-  /** `harness`: no App shell at all, hook only. `run`: App, straight into `track`. `front`: title screen. */
+  /** `harness`: no App shell at all, hook only. `run`: App, straight into `track`. `front`: main menu. */
   mode: 'harness' | 'run' | 'front';
   track: string | null;
   dev: boolean;
-  /** Track used as the title / menu backdrop. */
+  /** Track used as the menu backdrop. */
   backdrop: string;
 }
 

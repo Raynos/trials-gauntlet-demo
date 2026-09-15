@@ -10,7 +10,7 @@
  *   ?ghost=1        run the PB ghost world in harness mode too (off by default there: one world per µs/tick)
  *   ?rider=gltf|proc, ?bike=gltf|proc   rider / bike model (default gltf; a stored settings choice otherwise)
  *   ?touchdebug=1   overlay showing active touch pointers and the live InputFrame
- *   ?track=<id>     start straight into a track (skips the title / menu)
+ *   ?track=<id>     start straight into a track (skips the menu)
  *   ?dev=1          unlock every tier in track select and list the harness test strips
  *   ?hz=<n>         physics rate (default 120)
  *   ?perf=1         fps / frame ms / physics µs / draw-call overlay (top-left, under the pause button)
@@ -211,7 +211,7 @@ function boot(): void {
    */
   async function bootFront(): Promise<void> {
     const loader = getLoader();
-    loader.plan(14); // 10 steps, World textures weighs 4 and Title art 2 (SETUP bar weights)
+    loader.plan(14); // 10 steps, World textures weighs 4 and Key art 2 (SETUP bar weights)
     try {
       loader.step('WebGL renderer');
       await nextPaint();
@@ -290,7 +290,7 @@ function boot(): void {
       const trackName = getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track';
       loader.step(`Track: ${trackName}`);
       await nextPaint();
-      shell.start(); // loads the track (compile + physics + renderer world) and shows the title
+      shell.start(); // loads the track (compile + physics + renderer world) and shows the menu
       console.info(`[trials] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
       // The first WebGL frame (shader compile, texture upload) is the biggest single task of boot: give it its own row.
       loader.step('First frame (shaders)');
@@ -314,16 +314,16 @@ function boot(): void {
       loader.step('Fonts');
       await nextPaint();
       await fontsReady();
-      loader.step('Title art', 2);
+      loader.step('Key art', 2);
       await nextPaint();
       await Promise.race([artLoad, new Promise((r) => setTimeout(r, 3000))]);
       const key = art.keyart('industrial');
       if (key) {
         const item = (await loadManifestItem(key.src)) ?? null;
-        // Prefetch the key art with live bytes, but never hold the title on it past 2.5 s — the
-        // title's CSS background finishes the download on its own.
+        // Prefetch the key art with live bytes, but never hold the menu on it past 2.5 s — the
+        // menu's CSS background finishes the download on its own.
         await Promise.race([
-          streamBytes(key.src, (done, total) => loader.progress('Title art', done, total, 'B'), item?.bytes ?? 0),
+          streamBytes(key.src, (done, total) => loader.progress('Key art', done, total, 'B'), item?.bytes ?? 0),
           new Promise((r) => setTimeout(r, 2500)),
         ]);
       }
