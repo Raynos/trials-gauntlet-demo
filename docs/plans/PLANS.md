@@ -9,7 +9,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | plan | file | goal | status | % | next gate |
 |---|---|---|---|---|---|
 | **The brief** | `README.md` | a 2.5D Trials-quality bike game, deterministic, 60 fps, desktop + iOS Safari | in build | — | — |
-| **Blender hero (branch)** | `docs/plans/BLENDER_HERO.md` | rider/bike models, animation and Three.js integration to the Trials reference; Codex owns Blender on `blender-work` | round 6 checkpoint: repeated context recovery and loading/disposal controls pass; Metal/WebKit ship gates match 4,767 ticks and restart next tick; physics/assets unchanged; trousers expose shared inward knee IK; tests 17 fail / 711 pass / 11 todo; M1 median 10.5 still outside target | — | shared knee geometry/COM/limits, cloth/helmet/material detail, physics/cost and actual iOS; no merge |
+| **Blender hero (branch)** | `docs/plans/BLENDER_HERO.md` | rider/bike models, animation and Three.js integration to the Trials reference; Codex owns Blender on `blender-work` | round 7 checkpoint: shared knee geometry repaired, connected trousers promoted after playback; 84 recordings / 407,983 ticks repeat; 67,000 fresh ticks match V8/WebKit; B3 stranger median 1, M1 median 9 (n=2 each); Metal/WebKit clear/crash/restart pass; tests 19 fail / 714 pass / 11 todo, including 2 new hop regressions | — | hop landing/continuity regressions, cloth/helmet/material detail, physics/cost and actual iOS; no merge |
 | **Mega plan (v0.2.0)** | `docs/plans/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
 | **Physics v2** | `docs/plans/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
 | **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | round 1 (H1 rider kit landed `47f0455`) | 15 | H3 hero shadow + G4 stamped auto-deploy, then device report #1 |
@@ -20,6 +20,9 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 
 | date | decision |
 |---|---|
+| 09-15 | Zoom out from small repair rounds: coherent AAA visual rebuild of both rider outfits and bike family in parallel; show real before/after photos and videos. Pause nonblocking physics experiments and judge whole assembled candidates |
+| 09-15 | Investigate live iPhone benchmark arms folding backward; isolated additive-translation accumulation and prepared a main-compatible hotfix, with current-main integration tracked separately |
+| 09-15 | Install official agent-browser CLI/skill for headless use in project, home and dotfiles; pinned 0.37.1 setup committed in dotfiles `6d96d38`; deterministic game harness remains the replay authority |
 | 09-15 | Blender session: continue at medium reasoning until OpenUsage Codex weekly usage reaches 30% remaining, then checkpoint and pause; new teammates also use medium |
 | 09-15 | Resume the Blender branch from the handoff; continue the active rider/bike/animation/texture mission |
 | 09-15 | Pause the Blender branch at a checkpoint, preserve in-progress work, commit and provide a continuation handoff. The mission remains unfinished; the 12-hour follow-up is paused |

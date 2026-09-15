@@ -3,18 +3,53 @@
 Owner: Codex Blender session. Branch: `blender-work`, in the explicitly authorized
 `trials-gauntlet-blender` worktree. Baseline: `56e3883` (2026-09-15).
 
-Status: **active WIP, Round 6 checkpoint**. Context recovery passes repeated Metal
-loss, production loading interruption and disposal while lost; normal retirement
-remains green. Final Metal/WebKit ship gates each match all 4,767 B1 ticks, clear,
-crash and resume movement one tick after restart. Parent played high Street/low
-Race restored motion. Connected trousers remain unpromoted: shared knee IK crosses
-the legs in measured poses. Exact production/GLB witnesses lead Round 7. Physics
-and assets remain at Round 5, with its 340,983 exact corpus ticks and 72,525 fresh
-cross-engine ticks. B3 stranger median 1; M1 median 10.5 outside 5–9. Typecheck,
-lint and build pass; tests **17 failed, 711 passed, 11 todo**. Knee/cloth/helmet
-quality, physics behavior/cost and actual iOS remain open. See
-[handoff](../BLENDER_HANDOFF.md) and [evidence](../evidence/blender-r6.json).
+Status: **active WIP, Round 7 checkpoint**. One oriented sagittal knee construction
+now drives rendered geometry, center of mass and anatomical limits together.
+Connected Street/Race trousers are promoted after native Blender and gameplay
+playback; all four canonical GLBs match the reviewed candidates byte for byte.
+All 84 recordings / 407,983 ticks repeat raw physics and Game counters. The final
+actual-model census passes; 67,000 fresh bot/stranger ticks also match Node,
+Chromium and desktop WebKit. All eight fresh bots clear. B3 strangers take 1/1
+attempts; M1 takes 10/8, median 9 at the edge of the 5–9 band (n=2).
+Final Metal/WebKit ship gates each match 4,736 B1 ticks, clear in 39.466667 s,
+crash and move one tick after restart. Typecheck, lint and build pass; tests
+**19 failed, 714 passed, 11 todo** include two new, unwaived hop regressions.
+Cloth/helmet/material quality, physics behavior/cost and actual iOS remain open.
+See [handoff](../BLENDER_HANDOFF.md) and [evidence](../evidence/blender-r7.json).
 No merge or deployment. Track this plan in `PLANS.md` at every commit.
+
+## Visual mega build — user direction, September 15
+
+The user judged four hours of small repairs insufficient visible progress and
+requested a substantial, coherent rebuild toward the PS4 Pro Trials reference.
+The current rider remains a simplified character; the current garage has two
+physics classes sharing one bike mesh. Preserve the working rig and mechanical
+foundation and spend the next build on what the player can see.
+
+| Workstream | Complete result | Owner |
+|---|---|---|
+| Rider, Street | Convincing hoodie/jeans silhouette, shaped sleeves and garment drape, constructed pockets/cuffs, denim and knit material response, gloves/trainers, curved helmet | `mega_outfits` |
+| Rider, Race | Purposeful jersey/pant panel construction, protective shapes, race boots/gloves, distinct technical materials and graphics, matching curved helmet | `mega_outfits` |
+| Bike family | Slim angular trials silhouette, separated saddle/bodywork, open frame, credible engine/exhaust/suspension assemblies, clearly separated metal/plastic/rubber, deliberate Rookie/Pro liveries | `mega_bike` |
+| Assembly and presentation | Full/LOD exports integrated with the real renderer; both outfits × both classes shown in consistent gameplay and close motion views; clear before/after media shared with the user | Parent |
+
+Build whole candidates in parallel. The first visual decision is whether the
+assembled hero is substantially better at normal riding distance, not how many
+small details were added. Review silhouette, material response, garment motion
+and mechanical credibility together against the Trials reference. Readable forms
+take priority over texture noise or invisible fasteners. Keep ordinary game
+lighting in the comparison; label inspection-camera views separately.
+
+Preserve bone/action/socket and physical hardpoint contracts. Run focused export,
+attachment and replay checks for changed parts, then one integrated gate for the
+assembled candidate. Resume physics work when it blocks the visual result; the
+19 failing behavior/cost assertions stay recorded. Do not silently weaken them.
+Each accepted whole candidate gets a checkpoint with played media. Continue until
+the weekly allowance reaches 30% remaining; keep teammates at medium effort.
+
+Current progress gallery: `harness/out/blender/progress/index.html`. The user has
+seen actual Street and Race gameplay frames and can compare the prior/current
+clips. Keep sharing visible results as the complete candidates arrive.
 
 ## Mandate and boundaries
 

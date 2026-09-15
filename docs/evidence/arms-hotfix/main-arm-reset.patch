@@ -1,0 +1,13 @@
+--- a/src/render/hero/gltfRider.ts
++++ b/src/render/hero/gltfRider.ts
+@@ -385,6 +385,10 @@
+   }
+ 
+   private poseFromChain(c: Chain): void {
++    // Clip translations are frame-local deltas; do not accumulate them across draws or cuts.
++    for (const [name, position] of this.restLocalP) {
++      this.bones.get(name)!.position.copy(position);
++    }
+     const torso = this.va.set(Math.sin(c.torsoAngle), Math.cos(c.torsoAngle), 0);
+     const tx = torso.x;
+     const ty = torso.y;

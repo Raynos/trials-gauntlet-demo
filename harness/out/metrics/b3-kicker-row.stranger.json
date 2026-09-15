@@ -7,8 +7,8 @@
     2
   ],
   "physics": "production-Game-v2",
-  "srcFingerprint": "660ec5171777707c623024f3c43263cde1cf339912b5c51fccd1d7b319bfb230",
-  "updatedAt": "2026-09-15T19:01:00.286Z",
+  "srcFingerprint": "343e462df40a0a92b221bb66fbf92ea2c4085539c66d130caca09f5832b76f19",
+  "updatedAt": "2026-09-15T19:54:42.460Z",
   "includeStale": false,
   "sessions": [
     {
@@ -77,7 +77,7 @@
       "sessionId": "b3-kicker-row-20260915-134303",
       "agent": "blender-r5-s1",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "660ec5171777707c623024f3c43263cde1cf339912b5c51fccd1d7b319bfb230",
       "replayVerified": true,
       "strangerAttempts": 1,
@@ -108,7 +108,7 @@
       "sessionId": "b3-kicker-row-20260915-134958",
       "agent": "blender-r5-s2",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "660ec5171777707c623024f3c43263cde1cf339912b5c51fccd1d7b319bfb230",
       "replayVerified": true,
       "strangerAttempts": 1,
@@ -134,14 +134,76 @@
       },
       "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-134958.json",
       "deaths": []
+    },
+    {
+      "sessionId": "b3-kicker-row-20260915-144820",
+      "agent": "blender-r7-b3-s1",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "343e462df40a0a92b221bb66fbf92ea2c4085539c66d130caca09f5832b76f19",
+      "replayVerified": true,
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 36.733333333333334,
+      "calls": 14,
+      "wallMs": 53349,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 0,
+        "endTick": 4766,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-144820.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-144820.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "b3-kicker-row-20260915-145124",
+      "agent": "blender-r7-b3-s2",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "343e462df40a0a92b221bb66fbf92ea2c4085539c66d130caca09f5832b76f19",
+      "replayVerified": true,
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 37.016666666666666,
+      "calls": 19,
+      "wallMs": 197430,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 0,
+        "endTick": 4805,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-145124.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-145124.json",
+      "deaths": []
     }
   ],
   "completed": 2,
   "clearedCount": 2,
   "medianAttempts": 1,
-  "medianFinishTime": 37.66666666666667,
-  "medianCalls": 19.5,
-  "medianWallMs": 118984,
+  "medianFinishTime": 36.875,
+  "medianCalls": 16.5,
+  "medianWallMs": 125389.5,
   "pass": true,
   "deaths": {
     "total": 0,

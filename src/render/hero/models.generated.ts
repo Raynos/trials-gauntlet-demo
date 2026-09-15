@@ -17,24 +17,24 @@ export const MODEL_ASSETS = {
     "sha256": "f88a6b9f9b86f2bb320035e2ef87e444f12fb1616d77977aef83208770fec652"
   },
   "models/rider-race-lod.glb": {
-    "url": "models/94d0b38f5b71b15a/rider-race-lod-87997ed13eedcc62.glb",
-    "bytes": 537144,
-    "sha256": "87997ed13eedcc62d72d65ca6c39f970619d8d5d19b9b8f7f5fb7fd48df7e53f"
+    "url": "models/06528d132352da7e/rider-race-lod-cf2cb35c140a7ea7.glb",
+    "bytes": 526004,
+    "sha256": "cf2cb35c140a7ea7495eb90731d5ce7d030b832378d48a1a405ea234e8d33a0e"
   },
   "models/rider-race.glb": {
-    "url": "models/94d0b38f5b71b15a/rider-race-ee10c0372847d421.glb",
-    "bytes": 923456,
-    "sha256": "ee10c0372847d42138aafddc911e561be7fb9da20e01475d5aa5fe8b2d99f6fb"
+    "url": "models/06528d132352da7e/rider-race-0ec93e0225a2f1c8.glb",
+    "bytes": 905404,
+    "sha256": "0ec93e0225a2f1c8fc840c02128eada3da6a4df0bdc312c576c6ba3ebf74d172"
   },
   "models/rider-street-lod.glb": {
-    "url": "models/f0e98c92279ca706/rider-street-lod-c8e3aa9e378e64d1.glb",
-    "bytes": 474960,
-    "sha256": "c8e3aa9e378e64d197b33d6732d9cd34b0ca4b5d6b1bb7b2fa23876917d68358"
+    "url": "models/d9162d6494521c9f/rider-street-lod-1ee21f29d89680af.glb",
+    "bytes": 483952,
+    "sha256": "1ee21f29d89680af8ef570acb9252c856c1092a1d36ada8f66d04c0f676bf6ad"
   },
   "models/rider-street.glb": {
-    "url": "models/f0e98c92279ca706/rider-street-6241a16167203c6a.glb",
-    "bytes": 784284,
-    "sha256": "6241a16167203c6a09f2207ee6bdee356ad13928d96cf898e4a0b411507bc946"
+    "url": "models/d9162d6494521c9f/rider-street-7c73f2794995ce5c.glb",
+    "bytes": 787852,
+    "sha256": "7c73f2794995ce5c68f6390daf7cf4865be3e595346ed9d16244f0171220d878"
   },
   "models/rider.glb": {
     "url": "models/4fc1486a94f956ce/rider-158f2dbd9ac845c2.glb",

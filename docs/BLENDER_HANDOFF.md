@@ -1,7 +1,7 @@
 # Blender hero handoff — active WIP
 
-**2026-09-15. Round 6 is a verified WIP checkpoint; use the latest commit for its
-identity. Round 5 is `8985e7f`. Remaining failures are preserved below. This branch is not ready
+**2026-09-15. Round 7 is a verified WIP checkpoint; use the latest commit for its
+identity. Round 6 is `1555f69`. Remaining failures are preserved below. This branch is not ready
 to merge or deploy. The hero/physics mission is unfinished.**
 
 Continue in `/Users/raynos/projects/game-demos/trials-gauntlet-blender`, branch
@@ -16,7 +16,7 @@ for this checkpoint. The 12-hour follow-up automation is paused.
 - **Usage stop, 2026-09-15:** continue building until Codex weekly usage reaches
   **30% remaining**, then preserve a committed handoff and pause work without
   declaring the full mission complete. Check `openusage codex` periodically;
-  latest CLI reading at 19:31:34 UTC was **70% remaining**. The user selected
+  latest CLI reading at 20:24:41 UTC was **65% remaining**. The user selected
   **medium** reasoning and requested medium for teammates; explicitly use medium
   for newly spawned agents. Existing running agents have no in-place effort control.
 
@@ -39,7 +39,88 @@ Read [the plan](plans/BLENDER_HERO.md), [plan status](plans/PLANS.md),
 backward on Rear Wheel First, 1:18.433 and four faults. It is a symptom to
 reproduce; this checkpoint does **not** prove that specific finish bug fixed.
 
-## Round 6 — context recovery and ship gate
+## Round 7 — shared knees, connected trousers and fresh play
+
+See [the durable manifest](evidence/blender-r7.json). Final build:
+`harness/out/blender/r7-dist`; final integration details:
+`harness/out/blender/r7-final-verification/HANDOFF.md`.
+
+- Replaced the inward projected knee pole with an exact three-dimensional
+  two-link construction whose bend stays in the sagittal plane. The same map
+  supplies geometry, center of mass and production anatomical limits. Thigh/shin
+  lengths remain exact; no limit, tuning or tolerance was loosened. Historical
+  invalid-COM fixtures now resolve, so their tests check recovery; a separate
+  out-of-domain witness retains coverage of the failed-inverse differential.
+- All **84 recordings / 407,983 ticks** repeat raw F64/U8 and complete Game
+  counters, preserving velocity bytes through positional repair. The final
+  full/LOD bike and Street/Race census stays finite: knee side margin at least
+  146.8726 mm, rendered COM error at most 0.111 micrometres, rig grip/sole errors
+  below 0.249/0.188 micrometres. These are rig anchors, not glove/boot surfaces.
+  Attached constraints stay above -1e-6. Crashed pelvis/seesaw penetration remains
+  open, now 99.8575 mm beyond slop; fresh stranger crashes reach 16.8765 mm.
+- Changed dynamics are explicit: only 6 of the 20 formerly finishing base-corpus
+  recordings still finish, and none of the eight old Round 5 bot recordings do.
+  Eight fresh B1/B3/E2/M1 bots clear on both classes; seven take one attempt and
+  B1 Pro takes two. All **67,000 fresh bot/stranger ticks** match Node, Chromium
+  and desktop WebKit byte for byte. Old recordings were retained unchanged.
+- Fresh B3 strangers clear in **1/1 attempts**. M1 takes **10/8 attempts**,
+  median **9**, at the edge of the intended 5–9 band. Two samples do not prove a
+  robust improvement from 10.5. M1 exploration includes collision faces omitted
+  from the ASCII observation. One B3 session includes about 97 seconds of agent
+  queue/prompt delay; wall time is not human reaction latency.
+- Street/Race trousers now have a connected waist/crotch/knee shell, shaped
+  waistband and restrained folds. Each outfit clears all 321 authored frames and
+  21,012 sampled corrected riding poses without sampled trouser self-crossings.
+  Upper-layer overlap at the waist remains; the changed topology means crossing
+  counts are not a physical severity comparison. Parent played both native
+  Blender actions and high Street/low Race gameplay hops. Canonical exports
+  match all four reviewed GLBs exactly. Parent also played the fresh low Race
+  M1 impact and automatic respawn: clothing stays connected and the ridden pose
+  returns; the abrupt somersault remains a physics-quality gap. Fabrics, waist and helmet still look
+  simplified; this is an incremental improvement, not the AAA bar.
+- Final Metal and desktop WebKit cold-boot/clear/crash/restart gates pass. Both
+  match every one of 4,736 fresh B1 ticks and clear in 39.466667 s with zero faults.
+  The separate crash probe crashes at tick 103, restarts in one tick and moves on
+  the next tick. Restart command/first-render CPU times are 0.230/6.195 ms and
+  0.220/3.920 ms. These are not GPU presentation or actual iOS measurements.
+- Full check remains **19 failed, 714 passed, 11 todo**: 17 inherited failures
+  plus two new ones. Rookie binary-hop landing pitch is **21.994 degrees** against
+  the unchanged 20-degree bar; neighboring analog preloads jump **47.23 mm** in
+  rear-wheel apex against the 40 mm continuity bar. Neither was waived. Frozen
+  scratch diagnosis traces the extra pitch to changed hip-limit impulse timing
+  and chassis leverage; higher solver iterations and five simple interventions
+  failed to repair it. Continue from
+  `harness/out/rig-physics/round8-hop-diagnosis/REPORT.md`.
+
+### Live phone arm report and tooling
+
+The user's three new B1 benchmark screenshots are reproduced on the live legacy
+build: additive bone translations accumulate across draws and benchmark cuts.
+The isolated reset-only candidate stops the backward arm drift in real played
+benchmark footage and preserves physics replay bytes. Details and integration
+status live in [the arm handoff](evidence/arms-hotfix/HANDOFF.md). Main is changing
+concurrently and now contains its own reset; do not blindly apply the older patch
+or merge this entire WIP branch to get the hotfix. Exact original iOS behavior
+and the older E2 78.433 s / four-fault finish remain separate reproduction gaps.
+
+Official agent-browser 0.37.1 plus Chrome and the upstream skill are installed.
+Canonical personal files live in `~/projects/dotfiles`, commit `6d96d38`;
+home/project skill links are ignored personal configuration. A named headless
+session passed a real fill/click/read smoke check. Use the CLI for exploration;
+the deterministic harness still owns physics replay and capture evidence.
+
+Latest user steering: zoom out and build a coherent AAA visual upgrade instead
+of spending more rounds on small repairs. Physics investigation is paused with
+all failures preserved. Two builders now own the complete outfit and bike visual
+rebuild; see the Visual mega build section in `docs/plans/BLENDER_HERO.md`.
+The curved helmet now has valid Street/Race v2 scratch sources, awaiting parent
+played review, with no export/promotion. `author_helmet.py` remains outside this
+checkpoint; read `harness/out/blender/r8-helmet/HANDOFF.md`.
+The user requested visible progress: `harness/out/blender/progress/index.html`
+contains both outfits, before/after videos and the arm fix.
+The next formal every-third-round ship gate is Round 9. Actual iOS remains open.
+
+## Round 6 — context recovery and ship gate (historical)
 
 See [the durable manifest](evidence/blender-r6.json). The final integrated build
 is `harness/out/blender/r6-dist`; context stress and played captures use the

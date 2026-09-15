@@ -1,13 +1,13 @@
 {
   "source": "assets/blender/source/rider-street.blend",
-  "sourceSha256": "ce60c64922ce18b84daffb8bdd6ca583f1eaebdff5653726cb9ec0cf656d5a2d",
-  "exportSha256": "c8e3aa9e378e64d197b33d6732d9cd34b0ca4b5d6b1bb7b2fa23876917d68358",
+  "sourceSha256": "3452c94a9ccbd3e330b8a19384be1c78c931254cceb013c4b895d37a4268e4d6",
+  "exportSha256": "1ee21f29d89680af8ef570acb9252c856c1092a1d36ada8f66d04c0f676bf6ad",
   "outfit": "street",
   "lod": true,
   "verified": {
-    "bytes": 474960,
-    "triangles": 5879,
-    "vertices": 5576,
+    "bytes": 483952,
+    "triangles": 5880,
+    "vertices": 5445,
     "bones": 19,
     "clips": [
       "crouch",

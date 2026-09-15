@@ -1,6 +1,6 @@
 """Bounded connected trouser reconstruction; scratch sources only, never publishes.
 
-Retains exact waist/cuffs and non-trouser meshes. Replaces the bent knee strip
+Retains exact cuffs and non-trouser meshes; tailors the waist and upper legs. Replaces the bent knee strip
 with a broad cubic surface and grades joint weights by longitudinal position.
 Uses the existing pelvis split seam, with a new continuous hip weight field.
 """
@@ -26,10 +26,16 @@ def reconstruct(ob, arm):
     region=bm.verts.layers.int.get('author_crotch')
     for cuff in [c for c in J.boundary_groups(bm) if len(c)==20]:
         rings=J.walk_rings(G.boundary_cycle(cuff),14)
-        a,b=rings[3],rings[13]
+        side='L' if J.center(cuff).y<0 else 'R'
+        thigh=arm.data.bones['thigh.'+side]
+        direction=(thigh.tail_local-thigh.head_local).normalized()
+        # Both outfits end the knee strip on actual upper-thigh fabric, not
+        # Race's shorter retained strip's curved crotch connector.
+        end=min(range(9,14),key=lambda k:abs((J.center(rings[k])-thigh.head_local).dot(direction)-.285))
+        a,b=rings[3],rings[end]
         c0,c3=J.center(a),J.center(b)
         d0=(J.center(rings[4])-J.center(rings[2])).normalized()
-        d1=(J.center(rings[14])-J.center(rings[12])).normalized()
+        d1=-direction
         c1,c2=c0+d0*.13,c3-d1*.13
         axes=[]
         for ring,c,tangent in ((a,c0,d0),(b,c3,d1)):
@@ -38,7 +44,7 @@ def reconstruct(ob, arm):
             if (ring[1].co-c).dot(v)<0:v=-v
             axes.append((u,v))
         material=a[0].link_faces[0].material_index
-        bmesh.ops.delete(bm,geom=[v for r in rings[4:13] for v in r],context='VERTS')
+        bmesh.ops.delete(bm,geom=[v for r in rings[4:end] for v in r],context='VERTS')
         side='L' if c0.y<0 else 'R'
         knee=arm.data.bones['shin.'+side].head_local
         new=[a]
@@ -60,6 +66,51 @@ def reconstruct(ob, arm):
                 vertex=bm.verts.new(c+radial*radius);vertex[region]=1;ring.append(vertex)
             new.append(ring)
         new.append(b);J.bridge(bm,new,material)
+    # A fitted waist has a short band and a shaped seat, rather than continuing
+    # the torso's broad tube all the way into both thighs.
+    waist=next(G.boundary_cycle(c) for c in J.boundary_groups(bm) if len(c)==24)
+    hip_origin=arm.data.bones['pelvis'].head_local
+    torso=(arm.data.bones['pelvis'].tail_local-hip_origin).normalized()
+    waist_center=J.center(waist)
+    for v in waist:
+        v.co=waist_center+(v.co-waist_center)*.90-torso*.022
+    waist_strips=J.walk_rings(waist,2)
+    if len(waist_strips)!=3:raise RuntimeError('Expected waist, hip, seat rings')
+    middle,seat=waist_strips[1:]
+    # Fit through the hips with a rear yoke curve. The top ring remains open;
+    # all new band faces are sewn into the same trouser shell.
+    for a,b,c in zip(waist,middle,seat):
+        b.co=c.co.lerp(a.co,.52)
+    material=waist[0].link_faces[0].material_index
+    band=[]
+    for top,low in zip(waist,middle):
+        v=bm.verts.new(top.co.lerp(low.co,.24));v[region]=1;band.append(v)
+    old=set(f for v in waist for f in v.link_faces if any(w in middle for w in f.verts))
+    bmesh.ops.delete(bm,geom=list(old),context='FACES_ONLY')
+    for edge in list(bm.edges):
+        if not edge.link_faces:bm.edges.remove(edge)
+    J.bridge(bm,[waist,band,middle],material)
+    # Upper-leg tailoring: wider front/back panels with a quieter side seam,
+    # plus a restrained diagonal ease fold above the knee. This changes the
+    # surface itself rather than painting folds into a texture.
+    for cuff in [c for c in J.boundary_groups(bm) if len(c)==20]:
+        side='L' if J.center(cuff).y<0 else 'R';sign=-1 if side=='L' else 1
+        thigh=arm.data.bones['thigh.'+side]
+        axis=(thigh.tail_local-thigh.head_local).normalized()
+        front=Vector((-axis.z,0,axis.x)).normalized()
+        for ring in J.walk_rings(G.boundary_cycle(cuff),30):
+            c=J.center(ring);station=(c-thigh.head_local).dot(axis)
+            fade=J.smooth((station-.11)/.09)*(1-J.smooth((station-.33)/.10))
+            if fade<=0:continue
+            for v in ring:
+                radial=v.co-c
+                # Anatomical front panel and tapered side seam replace an
+                # approximately circular tube cross-section.
+                v.co.y=c.y+radial.y*(1-.12*fade)
+                v.co+=front*(radial.dot(front)*.09*fade)
+                angle=math.atan2(radial.dot(front),sign*radial.y)
+                fold=.0025*fade*math.exp(-((station-(.29+.015*math.sin(angle)))/.023)**2)
+                v.co+=radial.normalized()*fold*max(0,math.sin(angle))
     # Common analytic weight field across the seam and rebuilt knees. Each
     # vertex has pelvis + same-side thigh/shin, with no abrupt ring assignments.
     for vertex in bm.verts:
@@ -82,7 +133,7 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     args=p.parse_args(sys.argv[sys.argv.index('--')+1:]);source=args.source.resolve();output=args.output.resolve()
     root=Path(__file__).resolve().parents[2]
-    if not output.is_relative_to(root/'harness/out/blender/r6-trousers') or output.exists() or output==source:raise RuntimeError('Fresh scratch output required')
+    if not any(output.is_relative_to(root/'harness/out/blender'/round_name) for round_name in ('r6-trousers','r7-trousers')) or output.exists() or output==source:raise RuntimeError('Fresh scratch output required')
     protected={str(f):G.sha(f) for f in (root/'assets/blender/source').glob('*.blend')};source_hash=G.sha(source)
     bpy.ops.wm.open_mainfile(filepath=str(source));arm=bpy.data.objects['rider_rig'];G.pipeline.clear_pose(arm)
     ob=bpy.data.objects['rider:denim' if bpy.context.scene.get('heroOutfit')=='street' else 'rider:pants']

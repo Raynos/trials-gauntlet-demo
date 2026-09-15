@@ -282,6 +282,27 @@ function profileJoint(ax: number, ay: number, az: number, bx: number, by: number
   return distance / (l1 + l2);
 }
 
+/** Exact 3D leg triangle with one oriented sagittal bend, mirrored for the other leg.
+ * Unlike a projected fixed pole, v=(-dy,dx,0)/planar never drives the knee inward.
+ * The anatomical reach interval bounds planar >= .285m and knee.z to [.1468,.1608]m.
+ * Outside triangle reach retain the explicit mass-map extrapolation used by the arm. */
+function sagittalKnee(hipX: number, hipY: number, out: RigPoint): number {
+  const p = RIDER_PROFILE;
+  const dx = p.ankle.x - hipX, dy = p.ankle.y - hipY, dz = p.ankle.z - p.hipHalf;
+  const planar = Math.sqrt(dx * dx + dy * dy);
+  const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+  const d = clamp(distance, Math.abs(p.thigh - p.shin) + 1e-5, (p.thigh + p.shin) * 0.999999);
+  const along = (p.thigh * p.thigh - p.shin * p.shin + d * d) / (2 * d);
+  const height = Math.sqrt(Math.max(0, p.thigh * p.thigh - along * along));
+  // There is no unique sagittal direction at zero planar reach, outside the permitted domain.
+  const vx = planar > 0 ? -dy / planar : 1;
+  const vy = planar > 0 ? dx / planar : 0;
+  out.x = hipX + dx / distance * along + height * vx;
+  out.y = hipY + dy / distance * along + height * vy;
+  out.z = p.hipHalf + dz / distance * along;
+  return distance / (p.thigh + p.shin);
+}
+
 /** Forward mass/geometry map, all positions in axle coordinates. Only the left limb is stored;
  * the right mirrors z and contributes the same sagittal mass distribution. Angles are radians. */
 export function riderRigFromHips(hipX: number, hipY: number, torso: number, out: RiderRigPose): RiderRigPose {
@@ -297,7 +318,7 @@ export function riderRigFromHips(hipX: number, hipY: number, torso: number, out:
   out.wrist.x = p.grip.x + p.wristFromGrip.x; out.wrist.y = p.grip.y + p.wristFromGrip.y; out.wrist.z = p.grip.z;
   out.ankle.x = p.ankle.x; out.ankle.y = p.ankle.y; out.ankle.z = p.ankle.z;
   out.armReach = profileJoint(sx, sy, p.shoulderHalf, out.wrist.x, out.wrist.y, out.wrist.z, p.upperArm, p.forearm, 0.6, 0.5, 1, out.elbow);
-  out.legReach = profileJoint(hipX, hipY, p.hipHalf, p.ankle.x, p.ankle.y, p.ankle.z, p.thigh, p.shin, 1, 0.2, -0.15, out.knee);
+  out.legReach = sagittalKnee(hipX, hipY, out.knee);
   const m = p.mass, f = p.comFraction;
   const ex = out.elbow.x, ey = out.elbow.y, wx = out.wrist.x, wy = out.wrist.y;
   const kx = out.knee.x, ky = out.knee.y, ax = p.ankle.x, ay = p.ankle.y;
@@ -443,7 +464,8 @@ export const RIDER_HIP = { min: 45 * PI / 180, max: 170 * PI / 180 };
 
 export interface AnkleGeometry { angle: number; dx: number; dy: number; thighAngle: number; thighDx: number; thighDy: number; }
 
-/** The forward-bending planar knee, and d(ankle angle)/d(hip position), with ankle at (0,0).
+/** Legacy planar diagnostic, not the shared 3D mass map or the production constraint geometry.
+ * The forward-bending planar knee, and d(ankle angle)/d(hip position), with ankle at (0,0).
  * Differentiating |K|=shin and |H-K|=thigh gives dα = (H-K)·dH / ((H-K)·J K).
  * Returns false outside the triangle workspace; the distance stops own that boundary. */
 export function ankleGeometry(hx: number, hy: number, out: AnkleGeometry): boolean {

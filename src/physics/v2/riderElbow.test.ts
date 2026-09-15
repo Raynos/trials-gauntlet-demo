@@ -32,25 +32,6 @@ function physicalRig(world: ReturnType<typeof createBikePhysicsV2>): RiderRigPos
 }
 const armGap = (p: RiderRigPose) => Math.hypot(p.shoulders.x - p.wrist.x, p.shoulders.y - p.wrist.y) - RIDER_REACH.armMin;
 
-/** Independently sum segment centroids after moving hips/torso while elbows and knees stay
- * fixed. This tests the declared recovery differential, including its angular coordinate. */
-function fixedJointCOM(base: RiderRigPose, x: number, y: number, torso: number): { x: number; y: number } {
-  const pose = riderRigFromHips(x, y, torso, makeRiderRigPose()), out = { x: 0, y: 0 };
-  const add = (mass: number, a: { x: number; y: number }, b: { x: number; y: number }, fraction: number) => {
-    out.x += mass * (a.x + fraction * (b.x - a.x));
-    out.y += mass * (a.y + fraction * (b.y - a.y));
-  };
-  add(P.mass.trunk, pose.hips, pose.shoulders, P.comFraction.trunk);
-  add(P.mass.headNeck, pose.shoulders, { x: pose.shoulders.x + P.headNeckLength * Math.cos(pose.headAngle), y: pose.shoulders.y + P.headNeckLength * Math.sin(pose.headAngle) }, P.comFraction.headNeck);
-  add(2 * P.mass.upperArm, pose.shoulders, base.elbow, P.comFraction.upperArm);
-  add(2 * P.mass.forearm, base.elbow, base.wrist, P.comFraction.forearm);
-  add(2 * P.mass.hand, base.grip, base.grip, 0);
-  add(2 * P.mass.thigh, pose.hips, base.knee, P.comFraction.thigh);
-  add(2 * P.mass.shin, base.knee, base.ankle, P.comFraction.shin);
-  add(2 * P.mass.foot, { x: base.ankle.x + P.footCentroidFromAnkle.x, y: base.ankle.y + P.footCentroidFromAnkle.y }, base.ankle, 0);
-  return out;
-}
-
 describe('minimum elbow opening', () => {
   it('excludes the pole singularity with a geometric margin while every authored target stays inside the stops', () => {
     expect(RIDER_ELBOW_MIN).toBe(35 * Math.PI / 180);
@@ -107,20 +88,15 @@ describe('minimum elbow opening', () => {
     expect(largestElbowStep).toBeLessThan(5e-6);
   });
 
-  it('the invalid saved X1 state uses the declared fixed-joint angular differential and escapes the singular map', () => {
+  it('the saved X1 state now resolves its mass map and recovers its invalid elbow', () => {
     const { world, probe } = restoreWitness();
-    const rig = physicalRig(world), epsilon = 1e-6;
-    expect(rig.residual).toBeGreaterThan(0.0018);
+    const rig = physicalRig(world);
+    expect(rig.residual).toBeLessThan(1e-9);
     probe.prepareRiderLimits();
     const row = probe.riderLimits[7]!;
     expect(row.gap).toBeLessThan(-0.04);
-    const state = world.getState(), c = Math.cos(state.bike.angle), s = Math.sin(state.bike.angle);
-    const nx = row.nx * c + row.ny * s, ny = -row.nx * s + row.ny * c;
-    const plus = fixedJointCOM(rig, rig.hips.x, rig.hips.y, rig.torsoAngle + epsilon), minus = fixedJointCOM(rig, rig.hips.x, rig.hips.y, rig.torsoAngle - epsilon);
-    const angleX = (plus.x - minus.x) / (2 * epsilon), angleY = (plus.y - minus.y) / (2 * epsilon);
-    const plusGap = armGap(riderRigFromHips(rig.hips.x, rig.hips.y, rig.torsoAngle + epsilon, makeRiderRigPose()));
-    const minusGap = armGap(riderRigFromHips(rig.hips.x, rig.hips.y, rig.torsoAngle - epsilon, makeRiderRigPose()));
-    expect(row.jr).toBeCloseTo((plusGap - minusGap) / (2 * epsilon) - nx * angleX - ny * angleY, 4);
+    // This saved pose remains below elbowMin, outside the smooth valid workspace.
+    // Its old failed-inverse fallback no longer applies; check actual recovery below.
     const before = world.snapshot(), n = (before.f64.length - NSCALAR) / 8;
     probe.projectRiderLimits();
     const after = world.snapshot(), recovered = physicalRig(world);

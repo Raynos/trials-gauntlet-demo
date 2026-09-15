@@ -7,7 +7,7 @@ import type { PhysicsSnapshot } from '../../core/types';
 import { makeTrack } from '../testTracks';
 import { createBikePhysicsV2, NSCALAR } from './bike';
 import { BIKE_GEOMETRY_V2 } from './tuning';
-import { ankleGeometry, makeRiderRigPose, riderRigFromHips, riderRigFromCOM, RIDER_ANKLE, RIDER_HIP, RIDER_PROFILE, RIDER_REACH, RIDER_TORSO_REST, riderServoWrench, type RiderServoKinematics } from './rider';
+import { ankleGeometry, makeRiderRigPose, riderRigFromHips, riderRigFromCOM, RIDER_ANKLE, RIDER_HIP, RIDER_PROFILE, RIDER_REACH, RIDER_TORSO_REST, riderServoWrench, type RiderServoKinematics, type RiderRigPose } from './rider';
 import impact from './fixtures/e2-before-rider-impact.json';
 
 const dt = 1 / 120;
@@ -202,6 +202,10 @@ describe('rider servo physical invariants', () => {
  * integration disguising a momentum error. Raw snapshots are the independent measurement. */
 interface RiderConstraintProbe {
   prepareRiderLimits(): void;
+  updateRiderRig(): RiderRigPose;
+  positionPass(): void;
+  projectRiderBlock(): number;
+  nC: number;
   solveRiderLimits(): void;
   projectRiderLimits(): void;
   riderLimits: { mass: number; gap: number; impulse: number; nx: number; ny: number; jr: number }[];
@@ -279,13 +283,12 @@ describe('rider constraints beyond their anatomical stops', () => {
     }
   });
 
-  it('an unresolved inverse keeps physical recovery rows active instead of silently detaching', () => {
-    // An arbitrary COM, rather than one obtained from a forward pose, catches the residual
-    // fallback itself. The bounded solve retains a ~1mm residual at this extrapolated fold.
+  it('the formerly unresolved COM now recovers exactly and retains physical recovery rows', () => {
+    // Keep the historical arbitrary COM witness. The shared sagittal knee now resolves
+    // its inverse; do not require a failed mass map merely to exercise fallback.
     const com = { x: 0.2, y: 0.4 }, degrees = 100;
     const rig = riderRigFromCOM(com.x, com.y, degrees * Math.PI / 180, makeRiderRigPose());
-    expect(rig.residual).toBeGreaterThan(1e-4);
-    expect(rig.residual).toBeLessThan(0.002);
+    expect(rig.residual).toBeLessThan(1e-9);
     const { world, probe } = constraintWorld(0, 0, degrees, com);
     probe.prepareRiderLimits();
     expect(probe.riderLimits.every(row => Number.isFinite(row.mass) && row.mass > 0)).toBe(true);
@@ -297,18 +300,77 @@ describe('rider constraints beyond their anatomical stops', () => {
     // starting configuration; normal reachable poses and impact attachment are checked above.
   });
 
-  it('reduces severe folded violations below 0.5mm/rad with bounded repeated recovery', () => {
+  it('a separate out-of-domain fold retains the declared fixed-joint angular recovery differential', () => {
+    // Independent COM-grid witness, not a forced failure of the now-resolved historical COMs.
+    const { probe } = constraintWorld(0, 0, -160, { x: -.3, y: 0 });
+    const rig = probe.updateRiderRig(), epsilon = 1e-6, p = RIDER_PROFILE;
+    expect(rig.residual).toBeGreaterThan(1e-4);
+    probe.prepareRiderLimits();
+    expect(probe.riderLimits.every(row => Number.isFinite(row.mass) && row.mass > 0)).toBe(true);
+    const fixedCOM = (torso: number) => {
+      const pose = riderRigFromHips(rig.hips.x, rig.hips.y, torso, makeRiderRigPose());
+      const out = { x: 0, y: 0 };
+      const add = (mass: number, a: { x: number; y: number }, b: { x: number; y: number }, fraction: number) => {
+        out.x += mass * (a.x + fraction * (b.x - a.x));
+        out.y += mass * (a.y + fraction * (b.y - a.y));
+      };
+      add(p.mass.trunk, pose.hips, pose.shoulders, p.comFraction.trunk);
+      add(p.mass.headNeck, pose.shoulders, { x: pose.shoulders.x + p.headNeckLength * Math.cos(pose.headAngle), y: pose.shoulders.y + p.headNeckLength * Math.sin(pose.headAngle) }, p.comFraction.headNeck);
+      add(2 * p.mass.upperArm, pose.shoulders, rig.elbow, p.comFraction.upperArm);
+      add(2 * p.mass.forearm, rig.elbow, rig.wrist, p.comFraction.forearm);
+      add(2 * p.mass.hand, rig.grip, rig.grip, 0);
+      add(2 * p.mass.thigh, pose.hips, rig.knee, p.comFraction.thigh);
+      add(2 * p.mass.shin, rig.knee, rig.ankle, p.comFraction.shin);
+      add(2 * p.mass.foot, { x: rig.ankle.x + p.footCentroidFromAnkle.x, y: rig.ankle.y + p.footCentroidFromAnkle.y }, rig.ankle, 0);
+      return out;
+    };
+    const plus = fixedCOM(rig.torsoAngle + epsilon), minus = fixedCOM(rig.torsoAngle - epsilon);
+    const armGap = (angle: number) => {
+      const pose = riderRigFromHips(rig.hips.x, rig.hips.y, angle, makeRiderRigPose());
+      return Math.hypot(pose.shoulders.x - pose.wrist.x, pose.shoulders.y - pose.wrist.y) - RIDER_REACH.armMin;
+    };
+    const row = probe.riderLimits[7]!;
+    expect(row.jr).toBeCloseTo((armGap(rig.torsoAngle + epsilon) - armGap(rig.torsoAngle - epsilon)) / (2 * epsilon)
+      - row.nx * (plus.x - minus.x) / (2 * epsilon) - row.ny * (plus.y - minus.y) / (2 * epsilon), 4);
+  });
+
+  it('the production position pass closes severe folds with bounded continuation and exact velocity/replay bytes', () => {
     for (const [x, y, degrees] of witnesses.slice(3)) {
       const { world, probe } = constraintWorld(x, y, degrees);
-      const saved = world.snapshot();
+      const saved = world.snapshot(), n = (saved.f64.length - NSCALAR) / 8;
+      // The isolated-row witness previously left its wheels at the spawn. PositionPass
+      // solves the complete assembly, so place those same wheels at neutral axle offsets.
+      for (const body of [1, 2]) {
+        saved.f64[NSCALAR + body] = (body === 1 ? -0.65 : 0.65) + BIKE_GEOMETRY_V2.chassisToAxle.x;
+        saved.f64[NSCALAR + n + body] = 20 + BIKE_GEOMETRY_V2.chassisToAxle.y;
+      }
+      world.restore(saved); probe.nC = 0;
       probe.prepareRiderLimits();
       expect(Math.min(...probe.riderLimits.map(row => row.gap))).toBeLessThan(-0.3);
-      for (let iteration = 0; iteration < 60; iteration++) probe.projectRiderLimits();
-      expect(Math.min(...probe.riderLimits.map(row => row.gap))).toBeGreaterThan(-5e-4);
+      let blocks = 0;
+      const block = probe.projectRiderBlock.bind(probe);
+      probe.projectRiderBlock = () => { blocks++; return block(); };
+      // Isolated ordinary rows omit the already-shipping coupled continuation. At x=.1,
+      // 60 isolated calls leave a 1.404mm leg deficit; measure the actual production path.
+      probe.positionPass();
+      expect(blocks).toBeGreaterThan(0);
+      expect(blocks).toBeLessThanOrEqual(64);
+      probe.prepareRiderLimits();
+      expect(Math.min(...probe.riderLimits.map(row => row.gap))).toBeGreaterThanOrEqual(-1e-6);
       const end = world.snapshot();
-      world.restore(saved);
-      for (let iteration = 0; iteration < 60; iteration++) probe.projectRiderLimits();
+      for (const column of [2, 3, 5]) {
+        const bytes = (s: PhysicsSnapshot) => new Uint8Array(s.f64.slice(NSCALAR + column * n, NSCALAR + (column + 1) * n).buffer);
+        expect(bytes(end)).toEqual(bytes(saved));
+      }
+      const state = world.getState(), c = Math.cos(state.bike.angle), s = Math.sin(state.bike.angle), g = BIKE_GEOMETRY_V2;
+      const axle = (p: { x: number; y: number }) => ({ x: (p.x - state.bike.pos.x) * c + (p.y - state.bike.pos.y) * s - g.chassisToAxle.x, y: -(p.x - state.bike.pos.x) * s + (p.y - state.bike.pos.y) * c - g.chassisToAxle.y });
+      const rear = axle(state.wheels.rear.pos), front = axle(state.wheels.front.pos);
+      expect(Math.abs(Math.hypot(rear.x - g.swingPivot.x, rear.y - g.swingPivot.y) - g.swingRadius)).toBeLessThan(2e-6);
+      expect(Math.abs((front.x - .65) * g.forkAxis.y - front.y * g.forkAxis.x)).toBeLessThan(2e-6);
+      world.restore(saved); probe.nC = 0;
+      probe.positionPass();
       expect(new Uint8Array(world.snapshot().f64.buffer)).toEqual(new Uint8Array(end.f64.buffer));
+      expect(world.snapshot().u8).toEqual(end.u8);
     }
   });
 });

@@ -1,0 +1,33 @@
+--- a/src/render/hero/gltfRider.ts
++++ b/src/render/hero/gltfRider.ts
+@@ -247,14 +247,6 @@
+   }
+ 
+   update(f: RenderFrame): void {
+-    // Every bone-local position back to the bind pose before the frame is posed. `additive()` adds the
+-    // clips' position deltas onto `b.position`; the rotations are re-posed absolutely by `poseFromChain`
+-    // every frame, the positions never were — so `idle_breathe`'s chest / shoulder rise (a loop with a
+-    // non-zero mean) accumulated once per RENDERED frame: 12 mm of shoulder drift over a 20 s start-line
+-    // idle at 60 fps, 2.6 m after the phone's three-minute `?bench=1`, the IK then out of reach and
+-    // pointing both arms at grips it could not touch (the "arm sticking out sideways" on iOS, WebKit and
+-    // Chromium alike). Per rendered frame, so the harness's one render per 10 ticks never showed it.
+-    this.restorePositions();
+     if (f.cut) {
+       this.landT = -1;
+       this.pushT = -1;
+@@ -401,6 +393,15 @@
+   }
+ 
+   private poseFromChain(c: Chain): void {
++    // Preserve the previous posed transforms for the ragdoll handover snapshot.
++    // Every bone-local position back to the bind pose before the frame is posed. `additive()` adds the
++    // clips' position deltas onto `b.position`; the rotations are re-posed absolutely by `poseFromChain`
++    // every frame, the positions never were — so `idle_breathe`'s chest / shoulder rise (a loop with a
++    // non-zero mean) accumulated once per RENDERED frame: 12 mm of shoulder drift over a 20 s start-line
++    // idle at 60 fps, 2.6 m after the phone's three-minute `?bench=1`, the IK then out of reach and
++    // pointing both arms at grips it could not touch (the "arm sticking out sideways" on iOS, WebKit and
++    // Chromium alike). Per rendered frame, so the harness's one render per 10 ticks never showed it.
++    this.restorePositions();
+     const torso = this.va.set(Math.sin(c.torsoAngle), Math.cos(c.torsoAngle), 0);
+     const tx = torso.x;
+     const ty = torso.y;

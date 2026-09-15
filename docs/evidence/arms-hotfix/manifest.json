@@ -1,0 +1,621 @@
+{
+  "version": 1,
+  "createdUTC": "2026-09-15T20:37:10.394596Z",
+  "scope": "Historical live arm-drift causal fix and current-main reset-placement follow-up. Main checkout not modified.",
+  "artifacts": [
+    {
+      "path": "docs/evidence/arms-hotfix/HANDOFF.md",
+      "bytes": 5379,
+      "sha256": "f6bad286561960e7192d80b79fa626a43b1ce82693026b633fd821640a47174c",
+      "trackedIntent": true
+    },
+    {
+      "path": "docs/evidence/arms-hotfix/current-main-ragdoll-preserve.patch",
+      "bytes": 2020,
+      "sha256": "7a1010171c559a4dee71f9d8c154d0d43e33de35579ad448e938185f59f7ee36",
+      "trackedIntent": true
+    },
+    {
+      "path": "docs/evidence/arms-hotfix/main-arm-reset.patch",
+      "bytes": 485,
+      "sha256": "fddb82869fdd6fdb8aa3f9f765d42c12190901e5a2d85d0bb444dcee617b4fb0",
+      "trackedIntent": true
+    },
+    {
+      "path": "docs/evidence/arms-hotfix/verify.py",
+      "bytes": 812,
+      "sha256": "8626d1243e0df9dc24fd8ef8be4108aa3c62f1bbf8200f2521f78b5cba1b6f8a",
+      "trackedIntent": true
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/HANDOFF.md",
+      "bytes": 4165,
+      "sha256": "962060f247225f4aff5cfd7a309e72fd0006843941e915151d5eaba986417d43",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/baseline.ts",
+      "bytes": 27597,
+      "sha256": "9b5248543453e32f4904def8ca501cd3c5a1f658c8a52d103f8099cfafd0eb1f",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/baseline.ts",
+      "bytes": 27597,
+      "sha256": "9b5248543453e32f4904def8ca501cd3c5a1f658c8a52d103f8099cfafd0eb1f",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/continuity-results.json",
+      "bytes": 4506,
+      "sha256": "7270d8117a232cd9149aa776732567d634a98cf6e4465eb15a578fef37fa1b69",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/continuity.ts",
+      "bytes": 2594,
+      "sha256": "1581eda55bce7aecbbc40017ae338235fd5e1f1bc580bf1b2aff4fcea77b7446",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video/poseFromChain/page@f58fe294a88982b50572519dc0ba5b13.webm",
+      "bytes": 1579659,
+      "sha256": "9df1b3a6d2173aa4d8a5a1f2f8a1a13052d4755ef6c6fb29d9c65ea9fcac3a9b",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video/poseFromChain/report.json",
+      "bytes": 86057,
+      "sha256": "88897523024e68ed559444e008b0ba2646f0c4d2a6419da6f010921d6daf7a34",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video/poseFromChain/review.json",
+      "bytes": 575,
+      "sha256": "33ba727cd43bd9ff788adb1832dea2e39974a38c4391621d2de3eea987d6d6ac",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video/poseFromChain/review.mp4",
+      "bytes": 5474987,
+      "sha256": "ab62f7334f9f653e73d75765c90eeb065566ca18de9ea4475ce6cfde7988503e",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video/update/page@9cdfe1608247355536e70427a018f5af.webm",
+      "bytes": 1578963,
+      "sha256": "5a0467d9c5738a9db8c27d9a40205190c77823946c7dd4bc4e7957a0f0be9812",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video/update/report.json",
+      "bytes": 86046,
+      "sha256": "31bd8a451934122efc561e88c59cbaaaed80c5f24c0a04f35290e7703d0d10f0",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video/update/review.json",
+      "bytes": 561,
+      "sha256": "74c73840381de390c5998d8b51a88a35e1403f1d1da63ca8f3faf360ea64c869",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video/update/review.mp4",
+      "bytes": 5452639,
+      "sha256": "ca578313640369073a01cc8cdee5d4eeb483c1c0e3a7b5785cad90b0e4573991",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/crash-video.mts",
+      "bytes": 3612,
+      "sha256": "7adf2c0ee000de0143983e36084f515e2caff903bea6d128760e940566420d1b",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/loadRig.ts",
+      "bytes": 1986,
+      "sha256": "b5eefcaf3dde01a842aae13fdd78a29d08412f591ee400a423555cd79f66941b",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/probe.ts",
+      "bytes": 4683,
+      "sha256": "b66f23fd026f6cce8f04e0f3c5d92e50f1707d394ad9a8d00178bd38cd4eb003",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/regression-results.json",
+      "bytes": 476,
+      "sha256": "e54fe645efb8896fa607045c8044d54035a941ee39f5f99cf0ab41a58728524b",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/regression.ts",
+      "bytes": 3307,
+      "sha256": "60d726ef789bdef80e0af84e586a2cdab51e908b7d4784d7b7028f44abf7e698",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/relocated.ts",
+      "bytes": 28716,
+      "sha256": "5a1cccfc0beb87a253206bc21ab98441ef172e796c06745909babfd70a6dac5f",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/reset.ts",
+      "bytes": 28635,
+      "sha256": "3bc657c8754c0944c99141ccbd4dee308b44d43dafa37e56aab8a2926efdf884",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/current-main/results.json",
+      "bytes": 97104,
+      "sha256": "7eaa56f6881d96440b2dcce204fd99ab7dd13ad0a22992cceca0bc956cb14731",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/loadRig.ts",
+      "bytes": 1986,
+      "sha256": "b5eefcaf3dde01a842aae13fdd78a29d08412f591ee400a423555cd79f66941b",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/main-arm-reset.patch",
+      "bytes": 485,
+      "sha256": "fddb82869fdd6fdb8aa3f9f765d42c12190901e5a2d85d0bb444dcee617b4fb0",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/probe.ts",
+      "bytes": 4683,
+      "sha256": "b66f23fd026f6cce8f04e0f3c5d92e50f1707d394ad9a8d00178bd38cd4eb003",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/regression-results.json",
+      "bytes": 476,
+      "sha256": "e54fe645efb8896fa607045c8044d54035a941ee39f5f99cf0ab41a58728524b",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/regression.ts",
+      "bytes": 3307,
+      "sha256": "60d726ef789bdef80e0af84e586a2cdab51e908b7d4784d7b7028f44abf7e698",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/reset.ts",
+      "bytes": 27696,
+      "sha256": "79925344b08d5f87387ba6c34af76512cf60af601e4ed7d63694ad8d9d828ab9",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-hotfix/results.json",
+      "bytes": 97104,
+      "sha256": "573eb6d4dac71262d3f8431b1e9b28ef46abdaf7aa3c24c05e3c8d5cfd482297",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live/cap60-review.json",
+      "bytes": 452,
+      "sha256": "7d0fe74443864c60231132cabe3c26f9aae683e3b00982b8597b6c223bb9c53e",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live/cap60-review.mp4",
+      "bytes": 10460916,
+      "sha256": "eb5656ca23ac93378eca7767f62f77b8db82d4b3d58c147719c0012a7ba2ce95",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live/page@42115fa89a6f64b58a9c9d2c44619bf1.webm",
+      "bytes": 32913303,
+      "sha256": "8dc463a22173c03dba46cd488a0e15de1e3cc2cf5735b308578284238186919f",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live/probe-patched.mts",
+      "bytes": 3664,
+      "sha256": "2af35b72d8be8f3994670dadcf08a291dfcaa34ab3eace6b99555459bb157a89",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live/probe.mts",
+      "bytes": 2742,
+      "sha256": "7c18f2606dce8853fb6d17bf59494e8f160ffccbd972bf27face476b070e8ac2",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live/report.json",
+      "bytes": 1587082,
+      "sha256": "67d6cb3d60702466689d2d1e5b35372709106a968b348105ac56cf4f17b4f016",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live-patched/cap60-review.json",
+      "bytes": 460,
+      "sha256": "c07d76f3213e89be3e2168fa9a06eb362be29d79a11f38e1230299c72886c99f",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live-patched/cap60-review.mp4",
+      "bytes": 10416987,
+      "sha256": "629c8a45dc056d2a4810321063056864d6e6fb7df5de7433b6ed44588477c034",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live-patched/page@d9e9440acf7f7a85fbdeedb90c9df500.webm",
+      "bytes": 32621223,
+      "sha256": "2007fb0f13473cca1aa310936985a8ac409b97c5f87d4fa36a643ebe2a05e7dd",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-live-patched/report.json",
+      "bytes": 1663073,
+      "sha256": "49a8d55356a5b272b1f64eb3ff9b1cec6fa2672e864c6b3eb742fd70f9432208",
+      "trackedIntent": false
+    },
+    {
+      "path": "harness/out/blender/arms-user/manifest.json",
+      "bytes": 1069,
+      "sha256": "160dbd92c8a4702379e120b62664814826fe949f98ae1c3c3e81ea197c59a66c",
+      "trackedIntent": false
+    }
+  ],
+  "originalNumericRun": {
+    "sourceSha256": {
+      "src/render/hero/gltfRider.ts": "5ea7bf46cc0989f9927d6a6d0ec766e730dcdaa358ef6160d1e73cd778e9b468",
+      "src/game/bench.ts": "41ae417b620a76da43f24a231df893574f6a313338b5bd469941b71130e4c673",
+      "public/bench/b1-bot-3.json": "b5e04545cd66068b7216e5c8ff8d9c9d4f9cbbc344498dc40ade2d4acac1edb0",
+      "public/models/rider.glb": "158f2dbd9ac845c2d9df6588df7bfebcf42434a8206f7febab33fa0e97f349aa",
+      "public/models/rider-lod.glb": "f88a6b9f9b86f2bb320035e2ef87e444f12fb1616d77977aef83208770fec652"
+    },
+    "rows": 12,
+    "finalStateSHA256": "693a634317881e73fe25f646bbbde2b6707b76505c748ce344518714ded93f64",
+    "finishTime": 41.55833333333333,
+    "limitations": "Node matrices are not played evidence; extreme reach remains."
+  },
+  "currentMain": {
+    "sourceSha256": {
+      "src/render/hero/gltfRider.ts": "bc5f2999ffe7f798d879099c94f0ba023713389a457503fee0d60265a14ac7c8",
+      "src/game/bench.ts": "41ae417b620a76da43f24a231df893574f6a313338b5bd469941b71130e4c673",
+      "public/bench/b1-bot-3.json": "b5e04545cd66068b7216e5c8ff8d9c9d4f9cbbc344498dc40ade2d4acac1edb0",
+      "public/models/rider.glb": "158f2dbd9ac845c2d9df6588df7bfebcf42434a8206f7febab33fa0e97f349aa",
+      "public/models/rider-lod.glb": "f88a6b9f9b86f2bb320035e2ef87e444f12fb1616d77977aef83208770fec652"
+    },
+    "checkedRendererSHA256": "bc5f2999ffe7f798d879099c94f0ba023713389a457503fee0d60265a14ac7c8",
+    "differenceFromOriginal": "Only update-entry restorePositions() call/comment and new bind-local-position reset helper. Current main already fixes accumulation.",
+    "statusBefore": " M docs/design/rendering.md\n M docs/plans/PERF.md\n M harness/bench/model.ts\n M harness/out/bench/latest.md\n M harness/out/bench/ledger.jsonl\n M package.json\n M src/render/hero/gltfRider.ts\n M src/render/index.ts\n M src/render/materials/library.ts\n?? harness/bench/det.ts\n?? harness/hero-webkit.mts\n?? output/\n?? src/render/hero/gltfRider.test.ts\n?? src/render/util/materialKinds.ts\n",
+    "statusAfter": " M docs/design/rendering.md\n M docs/plans/PERF.md\n M harness/bench/model.ts\n M harness/out/bench/latest.md\n M harness/out/bench/ledger.jsonl\n M package.json\n M src/render/hero/gltfRider.ts\n M src/render/index.ts\n M src/render/materials/library.ts\n?? harness/bench/det.ts\n?? harness/hero-webkit.mts\n?? output/\n?? src/render/hero/gltfRider.test.ts\n?? src/render/util/materialKinds.ts\n",
+    "unchangedDuringReadOnlyCheck": true,
+    "applyChecks": {
+      "main-arm-reset.patch": {
+        "exitCode": 0,
+        "output": ""
+      },
+      "current-main-ragdoll-preserve.patch": {
+        "exitCode": 0,
+        "output": ""
+      }
+    },
+    "originalPatchRole": "Historical alternate for original unpatched source; do not apply atop current main.",
+    "relocationPatchRole": "Current candidate: same restorePositions() call moves to poseFromChain; its explanation moves with it."
+  },
+  "liveBench": {
+    "build": "5649aa6 \u00b7 2026-09-15 19:37Z",
+    "consumedResponseSHA256": {
+      "https://trials-gauntlet-demo.vercel.app/assets/three-BvL_Dm3l.js": "b346421ff5b0d276905011e3c1612e64eed244f13d9f8ab9ce6ae48550a84547",
+      "https://trials-gauntlet-demo.vercel.app/assets/index-CirHvs6M.js": "c1ab502265526ebfaea12925595a09a0a01aeedc6660227eb48d21d0fae8b532",
+      "https://trials-gauntlet-demo.vercel.app/models/bike-lod.glb": "162ad310ef8285541984fb2a1c9d38848d4d60e76ecc53e289205711723cd0a1",
+      "https://trials-gauntlet-demo.vercel.app/art/manifest.json": "d97db7742e8b8c3c2a745c660bd1ce649d2861973abd0fda418ce5c5217ec354",
+      "https://trials-gauntlet-demo.vercel.app/models/bike.glb": "817b81b0536b5f91ca08799aeab36afb9d3b3a4d17d4f2073bd944d1333a7dbc",
+      "https://trials-gauntlet-demo.vercel.app/models/rider-lod.glb": "f88a6b9f9b86f2bb320035e2ef87e444f12fb1616d77977aef83208770fec652",
+      "https://trials-gauntlet-demo.vercel.app/models/rider.glb": "158f2dbd9ac845c2d9df6588df7bfebcf42434a8206f7febab33fa0e97f349aa",
+      "https://trials-gauntlet-demo.vercel.app/assets/worklet-CGfMzgEo.js": "558437a40c35d7311c716e648a993c721076f45f3b1b1cd4031e9364221915fc",
+      "https://trials-gauntlet-demo.vercel.app/bench/b1-bot-3.json": "b5e04545cd66068b7216e5c8ff8d9c9d4f9cbbc344498dc40ade2d4acac1edb0"
+    },
+    "responsesIdentical": true,
+    "sampleCounts": [
+      350,
+      348
+    ],
+    "scenarioCounts": [
+      8,
+      8
+    ],
+    "errors": [
+      [],
+      []
+    ],
+    "candidatePatch": {
+      "method": "Restore every saved bind local bone position at entry to poseFromChain, before this frame applies any clip delta.",
+      "applied": 1,
+      "calls": 9088,
+      "appliedAt": 2234.8049998283386
+    },
+    "review": {
+      "reviewer": "parent",
+      "player": "native QuickTime",
+      "baselineTrailingArmSimulationSeconds": [
+        1.958,
+        8.275
+      ],
+      "candidateHandsAtBarsSimulationSeconds": [
+        1.792,
+        5.242
+      ],
+      "clipStartVideoSeconds": 160,
+      "clipDurationSeconds": 12
+    },
+    "maxSampledWristErrorMeters": {
+      "baseline": 2.4848,
+      "candidate": 0.1271
+    },
+    "platform": "Headless desktop Chromium Metal with phone-like geometry, not on-device iOS Safari"
+  },
+  "currentMainCrashAudit": {
+    "numericRows": [
+      {
+        "asset": "rider.glb",
+        "fps": 30,
+        "tick": 92,
+        "time": 0.7666666666666666,
+        "cut": false,
+        "witnesses": [
+          {
+            "variant": "candidate-pose-entry",
+            "before": [
+              1.6080549795186725,
+              0.331108220590779,
+              0
+            ],
+            "snapshot": [
+              1.6080549795186725,
+              0.331108220590779,
+              0
+            ],
+            "snapshotDisplacement": 0,
+            "firstCrashPose": [
+              1.6080549795186725,
+              0.331108220590779,
+              0
+            ],
+            "firstCrashDisplacement": 0,
+            "residual": 0.292
+          },
+          {
+            "variant": "current-update-entry",
+            "before": [
+              1.6080549795186725,
+              0.331108220590779,
+              0
+            ],
+            "snapshot": [
+              1.2388144528777327,
+              0.23049956586910203,
+              0
+            ],
+            "snapshotDisplacement": 0.3827018002557398,
+            "firstCrashPose": [
+              1.2388144528777327,
+              0.23049956586910203,
+              0
+            ],
+            "firstCrashDisplacement": 0.3827018002557398,
+            "residual": 0.514
+          }
+        ]
+      },
+      {
+        "asset": "rider.glb",
+        "fps": 60,
+        "tick": 90,
+        "time": 0.75,
+        "cut": false,
+        "witnesses": [
+          {
+            "variant": "candidate-pose-entry",
+            "before": [
+              1.4575821109242564,
+              0.31547349526875434,
+              0
+            ],
+            "snapshot": [
+              1.4575821109242564,
+              0.31547349526875434,
+              0
+            ],
+            "snapshotDisplacement": 0,
+            "firstCrashPose": [
+              1.4575821109242564,
+              0.31547349526875434,
+              0
+            ],
+            "firstCrashDisplacement": 0,
+            "residual": 0.311
+          },
+          {
+            "variant": "current-update-entry",
+            "before": [
+              1.4575821109242564,
+              0.31547349526875434,
+              0
+            ],
+            "snapshot": [
+              1.0776082628389827,
+              0.26988909261344807,
+              0
+            ],
+            "snapshotDisplacement": 0.38269839690567264,
+            "firstCrashPose": [
+              1.0776082628389827,
+              0.26988909261344807,
+              0
+            ],
+            "firstCrashDisplacement": 0.38269839690567264,
+            "residual": 0.543
+          }
+        ]
+      },
+      {
+        "asset": "rider-lod.glb",
+        "fps": 30,
+        "tick": 92,
+        "time": 0.7666666666666666,
+        "cut": false,
+        "witnesses": [
+          {
+            "variant": "candidate-pose-entry",
+            "before": [
+              1.6080549795186725,
+              0.331108220590779,
+              0
+            ],
+            "snapshot": [
+              1.6080549795186725,
+              0.331108220590779,
+              0
+            ],
+            "snapshotDisplacement": 0,
+            "firstCrashPose": [
+              1.6080549795186725,
+              0.331108220590779,
+              0
+            ],
+            "firstCrashDisplacement": 0,
+            "residual": 0.292
+          },
+          {
+            "variant": "current-update-entry",
+            "before": [
+              1.6080549795186725,
+              0.331108220590779,
+              0
+            ],
+            "snapshot": [
+              1.2388144528777327,
+              0.23049956586910203,
+              0
+            ],
+            "snapshotDisplacement": 0.3827018002557398,
+            "firstCrashPose": [
+              1.2388144528777327,
+              0.23049956586910203,
+              0
+            ],
+            "firstCrashDisplacement": 0.3827018002557398,
+            "residual": 0.514
+          }
+        ]
+      },
+      {
+        "asset": "rider-lod.glb",
+        "fps": 60,
+        "tick": 90,
+        "time": 0.75,
+        "cut": false,
+        "witnesses": [
+          {
+            "variant": "candidate-pose-entry",
+            "before": [
+              1.4575821109242564,
+              0.31547349526875434,
+              0
+            ],
+            "snapshot": [
+              1.4575821109242564,
+              0.31547349526875434,
+              0
+            ],
+            "snapshotDisplacement": 0,
+            "firstCrashPose": [
+              1.4575821109242564,
+              0.31547349526875434,
+              0
+            ],
+            "firstCrashDisplacement": 0,
+            "residual": 0.311
+          },
+          {
+            "variant": "current-update-entry",
+            "before": [
+              1.4575821109242564,
+              0.31547349526875434,
+              0
+            ],
+            "snapshot": [
+              1.0776082628389827,
+              0.26988909261344807,
+              0
+            ],
+            "snapshotDisplacement": 0.38269839690567264,
+            "firstCrashPose": [
+              1.0776082628389827,
+              0.26988909261344807,
+              0
+            ],
+            "firstCrashDisplacement": 0.38269839690567264,
+            "residual": 0.543
+          }
+        ]
+      }
+    ],
+    "liveLocalIntervention": {
+      "consumedResponseSHA256": {
+        "https://trials-gauntlet-demo.vercel.app/assets/index--blJzZjS.js": "3933425a2b559fccba12c01cd25b414e853f244039f960889e5729ed8e2f92b0",
+        "https://trials-gauntlet-demo.vercel.app/assets/three-BvL_Dm3l.js": "b346421ff5b0d276905011e3c1612e64eed244f13d9f8ab9ce6ae48550a84547",
+        "https://trials-gauntlet-demo.vercel.app/models/bike-lod.glb": "162ad310ef8285541984fb2a1c9d38848d4d60e76ecc53e289205711723cd0a1",
+        "https://trials-gauntlet-demo.vercel.app/models/bike.glb": "817b81b0536b5f91ca08799aeab36afb9d3b3a4d17d4f2073bd944d1333a7dbc",
+        "https://trials-gauntlet-demo.vercel.app/art/manifest.json": "d97db7742e8b8c3c2a745c660bd1ce649d2861973abd0fda418ce5c5217ec354",
+        "https://trials-gauntlet-demo.vercel.app/models/rider-lod.glb": "f88a6b9f9b86f2bb320035e2ef87e444f12fb1616d77977aef83208770fec652",
+        "https://trials-gauntlet-demo.vercel.app/models/rider.glb": "158f2dbd9ac845c2d9df6588df7bfebcf42434a8206f7febab33fa0e97f349aa"
+      },
+      "responsesIdentical": true,
+      "entryWitnesses": [
+        {
+          "tick": 90,
+          "time": 0.7416666666666667,
+          "before": [
+            1.4560322468264573,
+            0.47994595935874845,
+            0
+          ],
+          "snapshot": [
+            1.0740218912999935,
+            0.45702385450789285,
+            0
+          ],
+          "displacement": 0.38269744527531,
+          "wall": 6820.825000047684
+        },
+        {
+          "tick": 90,
+          "time": 0.7416666666666667,
+          "before": [
+            1.4560322468264573,
+            0.47994595935874845,
+            0
+          ],
+          "snapshot": [
+            1.4560322468264573,
+            0.47994595935874845,
+            0
+          ],
+          "displacement": 0,
+          "wall": 7245.110000133514
+        }
+      ],
+      "errors": [
+        [],
+        []
+      ],
+      "playedReview": {
+        "parentPlayed": true,
+        "application": "QuickTime Player",
+        "observations": "Update-entry clip played through simulation0.725\u21920.808s; pose-entry clip through0.792\u21920.867s. Both show abrupt tumbling. Entry preservation is established by the accompanying transform witnesses; no broad natural-crash claim."
+      },
+      "method": "Unchanged live legacy bundle; local reset-at-update vs reset-at-poseFromChain wrappers. RAF advances real physics through hooks; actual video, no authored repeated frames."
+    }
+  },
+  "nodeHandOnGripLimitation": "No falsely-green actual wrist error above 1 cm in sampled Node probe."
+}
