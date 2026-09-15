@@ -1,6 +1,6 @@
 # Trials bike physics: what the real games do
 
-Author: physics architect. Purpose: the factual base for `physics-audit.md` and `docs/design/physics-v2.md`.
+Author: physics architect. Purpose: the factual base for `physics-audit.md` and `docs/plans/physics-v2.md`.
 Every statement is tagged **[S]** sourced (URL given), **[I]** inferred from sourced facts or from first
 principles, or **[M]** measured by us on the reference corpus (`reference/techniques/`, 720p 29.97 fps
 cuts of RedLynx's own University of Trials lesson videos and one skill game; frame indices are 0-based

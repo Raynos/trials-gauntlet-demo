@@ -1,5 +1,5 @@
 /**
- * Physics lab HUD (MEGA_PLAN P0 §3; docs/design/physics-v2.md §15): on `lab-*` tracks (and `?lab=1`) a
+ * Physics lab HUD (MEGA_PLAN P0 §3; docs/plans/physics-v2.md §15): on `lab-*` tracks (and `?lab=1`) a
  * compact monospace panel bottom-left. Numbers: pitch°, pitch rate °/s, speed m/s, rear slip m/s, rider
  * COM offset (`RiderPose.lean` / crouch), hop phase, airtime, attempt counter. Gauges (canvas): rear /
  * front compression bars with the bump-stop zone marked; τ_att (declared attitude torque) signed bar;

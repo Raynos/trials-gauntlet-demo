@@ -736,7 +736,7 @@ export class SettingsScreen extends Screen {
     seg('telemetry', 'Run log', 'Keeps attempts, faults and crash spots on this device only', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().telemetry ? 'on' : 'off'), (v) => this.cb.setTelemetry(v === 'on'));
     const phys = s().physics;
     if (s().dev && phys && phys.available.length > 0 && this.cb.setPhysics) {
-      // Hidden dev row (physics v2 A/B, docs/design/physics-v2.md §16.2): reloads the page with `?physics=`.
+      // Hidden dev row (physics v2 A/B, docs/plans/physics-v2.md §16.2): reloads the page with `?physics=`.
       const opts = [{ v: 'default', l: phys.current === 'default' && phys.live ? `Default (${phys.live.toUpperCase()})` : 'Default' }, ...phys.available.map((v) => ({ v, l: v.toUpperCase() }))];
       const live = phys.live ? `Live solver: ${phys.live.toUpperCase()}` : 'Live solver: mock';
       seg('physics', 'Physics', `${live} · dev A/B — reloads the page`, opts, () => phys.current, (v) => this.cb.setPhysics?.(v as 'default' | 'v1' | 'v2'));

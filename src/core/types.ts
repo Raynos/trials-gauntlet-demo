@@ -229,7 +229,7 @@ export interface RiderPose {
 }
 
 /**
- * Physics v2 (docs/design/physics-v2.md §16.6): the simulated rider body — world position of its COM,
+ * Physics v2 (docs/plans/physics-v2.md §16.6): the simulated rider body — world position of its COM,
  * angle ψ_R, velocities. Lives at `PhysicsState.riderBody` rather than `rider.body`: `RiderPose` is
  * iterated as four numbers by render's `PoseFollower`, so a nested object there is not additive.
  */

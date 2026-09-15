@@ -1,5 +1,5 @@
 /**
- * Physics v2 world (docs/design/physics-v2.md). Bike + rigid rider, 120 Hz semi-implicit Euler,
+ * Physics v2 world (docs/plans/physics-v2.md). Bike + rigid rider, 120 Hz semi-implicit Euler,
  * sequential impulses (6 velocity + 2 split-impulse position iterations), speculative contacts, no
  * warm starting, no Baumgarte in the velocity pass. Implements PhysicsWorld (CONTRACT §2.3) with v1's
  * determinism substrate: every mutable scalar lives in `F` (Float64Array) / `U` (Uint8Array), SoA

@@ -18,7 +18,7 @@ rising front; bunny hops reproduce deterministically. Ours reached playability t
 patches (1.4 g, drag governor, ECU wheelie assist, airborne blend). So:
 1. A Fable 5.1 (xhigh) architect produces `docs/research/trials-bike-physics.md` (≥ 4 real
    Trials games, frame-analysed bunny hops from the corpus, sourced), `docs/research/physics-audit.md`
-   (every hack and knife-edge in the current solver) and `docs/design/physics-v2.md` (a complete
+   (every hack and knife-edge in the current solver) and `docs/plans/physics-v2.md` (a complete
    ground-up design with parameter table, validation suite and the physics test level spec).
 2. Physics is reimplemented from scratch to that design behind the same `PhysicsWorld` contract.
 3. A short **Physics Test Level** (`lab-physics-test`): flat run-up, one challenging bunny-hop

@@ -1,5 +1,5 @@
 /**
- * Physics v2 parameter table (docs/design/physics-v2.md §13). One model, N bikes: the class rows below
+ * Physics v2 parameter table (docs/plans/physics-v2.md §13). One model, N bikes: the class rows below
  * change masses, thrust, gearing, wheelbase, spring rates and K_att; nothing in the solver reads the class.
  * Units SI. Chassis frame: origin at the chassis COM, x along the frame axis.
  */

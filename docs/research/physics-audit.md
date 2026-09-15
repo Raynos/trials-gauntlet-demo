@@ -32,7 +32,7 @@ monotone, learnable responses — and it does not reproduce the three behaviours
    at 2.30 s — because the hop state machine engages at lean ≤ −0.5 and changes the leg forces, so "lean
    −1" is a different plant from "lean −0.3".
 
-Everything below is the itemised case. The recommendation is the rewrite in `docs/design/physics-v2.md`,
+Everything below is the itemised case. The recommendation is the rewrite in `docs/plans/physics-v2.md`,
 keeping the parts of v1 that are genuinely good (§5).
 
 ## 1. What v1 is (as built)

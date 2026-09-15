@@ -1,5 +1,5 @@
 /**
- * Physics contract. Physics v2 (docs/design/physics-v2.md) is the shipped default from R3 on
+ * Physics contract. Physics v2 (docs/plans/physics-v2.md) is the shipped default from R3 on
  * (`createBikePhysics` = `createBikePhysicsV2`); v1 stays importable as `createBikePhysicsV1` for two
  * rounds so the harness can A/B (`?physics=v1`), then it is deleted (§16.2).
  */
