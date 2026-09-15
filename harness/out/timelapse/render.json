@@ -1,10 +1,13 @@
 {
-  "renderedAt": "2026-09-15T07:34:49.644Z",
+  "renderedAt": "2026-09-15T22:06:43.375Z",
   "milestones": [
+    "18df821",
+    "20d463d",
+    "c053ac4",
     "0f14d3d",
-    "6081104",
-    "d0c65be",
-    "56e3883"
+    "56e3883",
+    "2b48370",
+    "682d05c"
   ],
   "skipped": [
     {
@@ -20,25 +23,28 @@
   ],
   "stills": {
     "file": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/progress-stills.mp4",
-    "seconds": 170.2,
-    "bytes": 13067600,
-    "commits": 135
+    "seconds": 189.4,
+    "bytes": 14175950,
+    "commits": 151
   },
   "clips": {
     "file": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/progress-clips.mp4",
-    "seconds": 18,
-    "bytes": 18057459,
+    "seconds": 30,
+    "bytes": 26365620,
     "commits": [
+      "18df821",
+      "20d463d",
+      "c053ac4",
       "0f14d3d",
-      "6081104",
-      "d0c65be",
-      "56e3883"
+      "56e3883",
+      "2b48370",
+      "682d05c"
     ]
   },
   "gif": {
     "file": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/progress.gif",
-    "seconds": 170.16,
-    "bytes": 13453606,
+    "seconds": 189.41,
+    "bytes": 13672946,
     "fps": 12,
     "colors": 128
   }

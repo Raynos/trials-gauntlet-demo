@@ -18,7 +18,10 @@ pnpm harness:stranger prep --tracks b1-first-ride,b2-lean-back,b3-kicker-row,e1-
 ```
 
 Creating the session yourself pins the track and the session id; the stranger then never
-picks a track. The stranger's `look` shows what the game's menu and HUD show (tier, name,
+picks a track. **Bike (round 12):** `prep` and `start` default to the tier's bike (`defaultBikeForTier`: Rookie on beginner /
+easy, Pro on hard / extreme) — the class the menu gives a player and the class the band and the report assume; `--bike`
+overrides for an informational Rookie-on-hard / Pro-on-easy round. Check `state.json`'s recording header (`bike=`) before
+spawning. The stranger's `look` shows what the game's menu and HUD show (tier, name,
 `meta.technique`, beginner `meta.hints`, checkpoint xs, finish x) and nothing else. Use a distinct `--agent` per stranger (`s1`, `s2`, ...). Run at least two
 strangers per track before judging it.
 

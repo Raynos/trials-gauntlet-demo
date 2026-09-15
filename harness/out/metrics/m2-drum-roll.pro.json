@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "m2-drum-roll",
   "bike": "pro",
-  "updatedAt": "2026-09-14T18:45:35.963Z",
-  "physics": "bikePhysicsFactory",
+  "updatedAt": "2026-09-15T21:10:03.281Z",
+  "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     6,
     12
@@ -17,21 +17,18 @@
         3505190447
       ],
       "attempts": [
-        50
+        1
       ],
-      "median": 50,
+      "median": 1,
       "finishTimes": [
-        null
+        37.55833333333333
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": {
-    "checkpoint": 3,
-    "share": 1
-  },
+  "singleWall": null,
   "runs": [
-    "20260914-134201-d2a85e"
+    "20260915-160855-a753f1"
   ]
 }

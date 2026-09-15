@@ -26,6 +26,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { DEFAULT_BIKE, type BikeClass, type GameEvent, type InputFrame, type PhysicsState } from '../../src/core/types';
 import { parseBike } from '../lib/sim';
+import { getTrack } from '../../src/tracks';
+import { defaultBikeForTier } from '../../src/game/rules';
 import { encodeJSON } from '../../src/core/replay';
 import { ACTIONS, COAST, RESTART_FRAME, formatActions, macroFrameAt, macroTicks, parseSlots, type MacroCtx } from '../bot/actions';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
@@ -144,7 +146,7 @@ function trackCard(s: LoadedSession): string {
   const t = s.sim.track;
   const lines = [`track ${t.id} (${t.tier}) "${t.name}"${t.meta?.technique ? ` — technique: ${t.meta.technique}` : ''}`];
   // The bike picker is on the menu: the player knows which class they took to the line.
-  lines.push(`bike: ${s.sim.bike === 'pro' ? 'Pro (no wheelie ECU — the loop is yours at every lean; 22 m/s top)' : 'Rookie (wheelie ECU; 20 m/s top)'}`);
+  lines.push(`bike: ${s.sim.bike === 'pro' ? 'Pro (wheelie ECU on the ground, raw in the air — the loop is yours at every lean and every airborne gas; 22 m/s top)' : 'Rookie (wheelie ECU; 20 m/s top)'}`);
   const hints = t.tier === 'beginner' && t.meta?.hints?.length ? t.meta.hints : null;
   if (hints) lines.push(`hints: ${hints.join(' · ')}`);
   lines.push(`checkpoints at x = ${t.checkpoints.map((c) => c.x).join(', ')} m; finish at x = ${t.finishX} m`);
@@ -490,7 +492,18 @@ function spawnBlock(trackId: string, sessionId: string): string {
  * Parent side: one fresh session per agent x track (so the stranger never picks a track or
  * an id), plus the exact prompt per session. Nothing here counts as a call.
  */
-async function prep(tracks: string[], agents: string[], round: string, bike: BikeClass = DEFAULT_BIKE): Promise<{ dir: string; sessions: Array<{ trackId: string; sessionId: string; agent: string }> }> {
+/**
+ * Round 12: the bike a stranger rides when `--bike` is not given is the TIER'S default (the menu's
+ * default; `defaultBikeForTier`): Rookie on beginner / easy, Pro on hard / extreme, `DEFAULT_BIKE` on
+ * medium. Round 12's first hard round rode nine Rookie sessions because `prep` defaulted to Rookie.
+ */
+export function bikeForTrack(trackId: string, flag: unknown): BikeClass {
+  const t = getTrack(trackId);
+  const tierDefault = t ? defaultBikeForTier(t.tier, null) : DEFAULT_BIKE;
+  return parseBike(flag, tierDefault);
+}
+
+async function prep(tracks: string[], agents: string[], round: string, bikeFlag: unknown): Promise<{ dir: string; sessions: Array<{ trackId: string; sessionId: string; agent: string }> }> {
   const dir = path.join(STRANGER_OUT, 'rounds', round);
   fs.mkdirSync(dir, { recursive: true });
   const sessions: Array<{ trackId: string; sessionId: string; agent: string; seed: number; attemptsBand: [number, number] | null }> = [];
@@ -498,6 +511,7 @@ async function prep(tracks: string[], agents: string[], round: string, bike: Bik
   for (const trackId of tracks) {
     for (const agent of agents) {
       const sessionId = `${trackId}-${round}-${agent}-${stamp}`;
+      const bike = bikeForTrack(trackId, bikeFlag);
       const s = await createSession({ trackId, agent, sessionId, bike });
       saveSession(s);
       sessions.push({ trackId, sessionId, agent, seed: s.state.seed, attemptsBand: s.sim.track.meta?.attemptsBand ?? null });
@@ -555,7 +569,7 @@ async function main(): Promise<number> {
     if (tracks.length === 0) throw new Error('usage: prep --tracks a,b [--agents s1,s2] [--round r3]');
     const agents = listFlag('agents');
     const round = flagStr(flags, 'round', `r${stampId(new Date())}`);
-    const r = await prep(tracks, agents.length ? agents : ['s1', 's2'], round, parseBike(flags['bike']));
+    const r = await prep(tracks, agents.length ? agents : ['s1', 's2'], round, flags['bike']);
     for (const x of r.sessions) console.log(`${x.trackId.padEnd(20)} ${x.agent.padEnd(4)} ${x.sessionId}`);
     console.log(`prep: ${r.sessions.length} sessions; paste blocks in ${path.join(r.dir, 'spawn.md')}; manifest ${path.join(r.dir, 'manifest.json')}`);
     return 0;
@@ -565,7 +579,7 @@ async function main(): Promise<number> {
 
   let s: LoadedSession;
   if (cmd === 'start') {
-    const opts: Parameters<typeof createSession>[0] = { trackId: trackFlag ?? 'flat-test', agent, bike: parseBike(flags['bike']) };
+    const opts: Parameters<typeof createSession>[0] = { trackId: trackFlag ?? 'flat-test', agent, bike: bikeForTrack(trackFlag ?? 'flat-test', flags['bike']) };
     if (typeof flags['seed'] === 'string') opts.seed = flagNum(flags, 'seed', 0) >>> 0;
     if (sessionFlag) opts.sessionId = sessionFlag;
     s = await createSession(opts);

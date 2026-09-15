@@ -130,12 +130,14 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
   ramp face or just before a riser drops the nose over the bars; slow down *before* the ramp, not on it.
 
 - **Pro bike (the default on hard and extreme; the track card says which you have).** Same thrust as
-  the Rookie up to 16 m/s, a little more on top (22 m/s), but **no wheelie ECU**: nothing catches a loop
-  for you. **Plain `g` from a standstill loops the Pro in about six slots** (every round-7 stranger lost
-  its first attempt 4 m from the line this way): launch and cruise on `gf` or `hg`, and gas a landing only
-  once the suspension has settled (`c1` first). Full gas with any lean-back loops it in about 1.5 s; a
-  wheelie is held by feathering the gas around 40-50 deg and never by holding `gb`. Everything else above
-  holds for the Rookie; on the Pro, read "neutral `g` does not loop" as "at speed".
+  the Rookie up to 16 m/s, a little more on top (22 m/s). On the ground it has the same wheelie ECU as
+  the Rookie: plain `g` from a standstill lifts the front to about 30 deg and rides a power wheelie
+  down on its own — it does not loop. Lean-back under gas is still you, not the ECU: `gb` (full lean-back)
+  from rest loops in about 0.6 s, even a quarter lean-back in 1.4 s. **In the air the Pro is raw** (no ECU): a lean
+  press first swings the nose the *other* way for the first slot (`lb` dips the nose about 10 deg in
+  0.1 s before it lifts; `lf` lifts it a touch before it drops), so judge a lean by its second slot, not
+  its first, and prefer one held lean to a train of taps. Gas a landing once the suspension has
+  settled (`c1` first). Everything else above holds for the Rookie.
 - **Roof climbs and wire (hard).** A 1.0-1.4 m wall with a row of slots on top is ridden with the front
   wheel UP before the first slot and held there (`wh` or short `gb` bursts): the front drops into a slot
   and stops you dead. A long thin balance beam wants a straight, steady `g` at 5-8 m/s, no lean.

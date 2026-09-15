@@ -1,7 +1,7 @@
 /**
  * Blind AUDIO A/B pairs (harness round 11; docs/design/audio.md §10.5 / §10.8 "harness" request).
  *
- *   pnpm harness:audio [--seed N] [--coin balanced|plain] [--bike pro] [--beats-only | --pairs-only]
+ *   pnpm harness:audio [--seed N] [--coin balanced|plain] [--lowpass 14000] [--bike pro] [--beats-only | --pairs-only]
  *                      [--out harness/out/compare] [--beats-dir harness/out/audio-beats] [--ref reference/evolution-gameplay/audio]
  *
  * (a) renders the four beats via `npx tsx src/audio/tools/beats.ts <beatsDir> --ref <refDir> [--bike pro]`
@@ -121,11 +121,18 @@ export interface Loudness {
 }
 
 /** First-pass loudnorm measurement over [0, lenS) of a WAV. */
-export async function measureLoudness(file: string, lenS: number): Promise<Loudness> {
+/** `lowpass=f=<Hz>,` when a low-pass is asked for (0 = none). Round 12: 14 kHz on BOTH sides by default — the
+ * reference captures brick-wall at 12–14 kHz (a codec tell round 11's critics could have named) and ours has a
+ * 20 kHz floor; measured AFTER the filter so the −23 LUFS match holds on what the critic hears. */
+export function lowpassChain(hz: number): string {
+  return hz > 0 ? `lowpass=f=${Math.round(hz)},` : '';
+}
+
+export async function measureLoudness(file: string, lenS: number, lowpassHz = 0): Promise<Loudness> {
   const { stderr } = await runFfmpeg(resolveFfmpeg(), [
     '-hide_banner', '-nostats', '-nostdin',
     '-i', file,
-    '-af', `atrim=0:${lenS.toFixed(3)},asetpts=PTS-STARTPTS,loudnorm=print_format=json`,
+    '-af', `atrim=0:${lenS.toFixed(3)},asetpts=PTS-STARTPTS,${lowpassChain(lowpassHz)}loudnorm=print_format=json`,
     '-f', 'null', '-',
   ]);
   const m = /\{\s*"input_i"[\s\S]*?\}/.exec(stderr);
@@ -147,20 +154,21 @@ export interface NormalizedWav {
   lenS: number;
   gainDb: number;
   measured: Loudness;
+  lowpassHz: number;
 }
 
-/** Trim [0, lenS), apply one gain, write 48 kHz stereo pcm_s16le. */
-export async function normalizeWav(input: string, out: string, lenS: number): Promise<NormalizedWav> {
-  const measured = await measureLoudness(input, lenS);
+/** Trim [0, lenS), optional low-pass (both sides get the same one), apply one gain, write 48 kHz stereo pcm_s16le. */
+export async function normalizeWav(input: string, out: string, lenS: number, lowpassHz = 0): Promise<NormalizedWav> {
+  const measured = await measureLoudness(input, lenS, lowpassHz);
   const gainDb = gainDbFor(measured);
   await runFfmpeg(resolveFfmpeg(), [
     '-y', '-hide_banner', '-loglevel', 'error', '-nostdin',
     '-i', input,
-    '-af', `atrim=0:${lenS.toFixed(3)},asetpts=PTS-STARTPTS,volume=${gainDb.toFixed(3)}dB`,
+    '-af', `atrim=0:${lenS.toFixed(3)},asetpts=PTS-STARTPTS,${lowpassChain(lowpassHz)}volume=${gainDb.toFixed(3)}dB`,
     '-ac', '2', '-ar', '48000', '-c:a', 'pcm_s16le',
     out,
   ]);
-  return { file: out, lenS, gainDb, measured };
+  return { file: out, lenS, gainDb, measured, lowpassHz };
 }
 
 /**
@@ -240,7 +248,11 @@ export interface AudioPairOptions {
   beatsDir?: string;
   refDir?: string;
   outDir?: string;
+  /** Low-pass (Hz) applied to both sides before the loudness match; 0 = none. Default `DEFAULT_LOWPASS_HZ`. */
+  lowpassHz?: number;
 }
+
+export const DEFAULT_LOWPASS_HZ = 14000;
 
 export interface AudioPairResult {
   id: string;
@@ -259,6 +271,7 @@ export interface AudioPairResult {
   gainRefDb: number;
   loudOurs: Loudness;
   loudRef: Loudness;
+  lowpassHz: number;
 }
 
 export async function buildAudioPair(opts: AudioPairOptions): Promise<AudioPairResult> {
@@ -280,7 +293,8 @@ export async function buildAudioPair(opts: AudioPairOptions): Promise<AudioPairR
   const [srcA, srcB] = left === 'ours' ? [ours, ref] : [ref, ours];
   const wavA = path.join(outDir, `apair-${id}-A.wav`);
   const wavB = path.join(outDir, `apair-${id}-B.wav`);
-  const [normA, normB] = await Promise.all([normalizeWav(srcA, wavA, lenS), normalizeWav(srcB, wavB, lenS)]);
+  const lowpassHz = opts.lowpassHz ?? DEFAULT_LOWPASS_HZ;
+  const [normA, normB] = await Promise.all([normalizeWav(srcA, wavA, lenS, lowpassHz), normalizeWav(srcB, wavB, lenS, lowpassHz)]);
 
   const pairMp4 = path.join(outDir, `apair-${id}.mp4`);
   await runFfmpeg(resolveFfmpeg(), [
@@ -330,6 +344,7 @@ export async function buildAudioPair(opts: AudioPairOptions): Promise<AudioPairR
     lenS, lenOursS, lenRefS,
     gainOursDb: oursNorm.gainDb, gainRefDb: refNorm.gainDb,
     loudOurs: oursNorm.measured, loudRef: refNorm.measured,
+    lowpassHz,
   };
 }
 
@@ -343,6 +358,8 @@ async function main(): Promise<void> {
   if (!Number.isFinite(seedBase)) fail('--seed must be a number');
   const coin = flagStr(flags, 'coin', 'balanced');
   if (coin !== 'balanced' && coin !== 'plain') fail('--coin must be balanced|plain');
+  const lowpassHz = typeof flags['lowpass'] === 'string' ? Number(flags['lowpass']) : DEFAULT_LOWPASS_HZ;
+  if (!Number.isFinite(lowpassHz) || lowpassHz < 0) fail('--lowpass must be a frequency in Hz (0 = none)');
   const beatsOnly = flagBool(flags, 'beats-only');
   const pairsOnly = flagBool(flags, 'pairs-only');
   if (beatsOnly && pairsOnly) fail('--beats-only and --pairs-only are exclusive');
@@ -362,7 +379,7 @@ async function main(): Promise<void> {
   for (let k = 0; k < AUDIO_PAIRS.length; k++) {
     const p = AUDIO_PAIRS[k]!;
     const res = await buildAudioPair({
-      beat: p.beat, ref: p.ref, seed: seedBase + k, bike, beatsDir, refDir, outDir,
+      beat: p.beat, ref: p.ref, seed: seedBase + k, bike, beatsDir, refDir, outDir, lowpassHz,
       ...(sides ? { left: sides[k]! } : {}),
     });
     results.push(res);
@@ -372,6 +389,7 @@ async function main(): Promise<void> {
       tag: res.tag,
       seed: res.seed,
       coin,
+      lowpassHz: res.lowpassHz,
       lenS: res.lenS.toFixed(3),
       lenOursS: res.lenOursS.toFixed(3),
       lenRefS: res.lenRefS.toFixed(3),

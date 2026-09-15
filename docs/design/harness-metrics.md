@@ -87,6 +87,242 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 12 status — the v0.2.0 candidate battery is run: ours 5 / 36 (manoeuvre 2 / 22, world 1 / 8, audio 2 / 6; two climb cells unfillable), the tell on 18 pairs is a camera that owes nothing to the bike; the R6 Pro re-proved on 17 of 19 goldens (x1 / x3 cracked, e1 / x2 wall the bot); strangers on the R6 Pro: h1 8 · h3 10 UNDER band, x1 34.5 PASS, h2 and x3 FAIL on one DNF each; the fingerprint hashes only what the sim imports
+
+**Finding.** The P5 proxy for v0.2.0 ran for the first time, on HEAD 682d05c at `high` against the reference corpus, 36 of 38 pairs
+(24 manoeuvre cells → 22: no matrix track holds a ≥ 30° face for 0.6 s, so climb-industrial / climb-nightcity have no clip, and the
+canyon / snow climbs are 0.41–0.46 s at 40–45° "RELAXED" cells; 8 world; 6 audio). One fresh critic per pair, sides by seed (ours
+was A 18 times, B 18 times), answers sealed, rubric `RUBRIC.md`: **ours 5 / 36 — manoeuvre 2 / 22 (hop-industrial, crash-industrial),
+world 1 / 8 (world-snow-2), audio 2 / 6 (both landings)**. Every one of the five is a critic reading a flaw in the reference window (a
+wheelie hold where a hop was cut, a ragdoll whose respawn falls outside the window, a replay-cam freeze + hard cut, two reference
+landing cuts read as "sub-only sine thuds" / "gated stabs"); on the 31 pairs where the reference showed the manoeuvre cleanly the
+count is 0. The tells that repeat, counted per pair (`battery-v0.2.0.jsonl`): **(1) the camera is not motivated by the bike — 18 pairs**
+("constant-rate orbit indifferent to the jump", "bolted / welded to the bike, the world scrolls at one rate", "top-down framing throws
+away pitch, travel and settle", "pulls back in six frames", "a scripted orbit that owes nothing to the bike"); **(2) no compression,
+rebound or settle on touchdown and a pitch that parks — 14 pairs** ("the rear touches, the front drifts down at a constant rate and
+the bike simply rolls on", "flat pitch through the air", "locks the wheelie to a fixed angle within half a second"); **(3) the rider is a
+statue — 9 pairs** ("no lag, no lean-back, no counter-lean", "fully extended on the same frame the bike pitches", and in all three
+counted crashes "rider and bike tumble as one welded object, no separation of masses"); **(4) foreground / near-plane geometry crossing
+the frame — 6 pairs** ("one-frame dark wedges", "a foreground tree fully hides the bike and its landing", "lost for 0.7 s behind an
+un-culled box", one-frame light pops); **(5) the engine is a metronomic pulse train on a pinned fundamental — all 4 audio pairs the
+reference took**, the round-11 tell verbatim; the two audio wins are the r4 landing knock ("a textbook suspension hit: +20 dB 60–200 Hz,
+a second wheel hit 100 ms later, 175 ms settle" — said of OURS). P5's "two rounds, same tell → change approach" now applies to the
+camera (rounds 10, 12) and the rider (rounds 10, 12). **Strangers, round 8, the R6 Pro (`prep` now defaults to the tier's bike):**
+h1 **8** (8, 8, 8; band 10–18) UNDER-BAND · h2 **FAIL** (6 DNF at 266 m, 10, 5; band 14–22) · h3 **10** (13, 9, 10; band 18–25) UNDER-BAND ·
+x1 **34.5** (15, 54; band 30–45) **PASS** · x3 **FAIL** (26 DNF at 525 m, 23; band 60–80). The 4 m standstill death is gone (0 / 13 first
+attempts at `arch @ 3.0 m`, was 9 / 9); what the Pro strangers die on now is the raw air: "any gas or lean held while airborne loops it",
+"a lean released as the wheels leave the lip swings the nose the other way". A first hard round of nine sessions rode the **Rookie**
+because `prep` defaulted to it (informational rows: h1 5 / 16 / 3, h2 4 / 3 / 3, h3 6 / 21 / 8; x1 10 / 5, x3 13 / 11 — every one under
+its band). **Goldens:** `--refresh-goldens --build` restamped all 19 Rookie goldens node == browser (65175e2d → 6412a755; no Rookie hash
+moved, as R6 said) and staled all 19 Pro goldens; re-proved 17 (x1 Pro 2 / 60.917 s and x3 Pro 2 / 52.325 s — the round-11 walls are
+gone), **e1 Pro walls at 220.5 m on three seeds and x2 Pro at 442.9 m (the drum)**. **Gate 22 / 26 NO-SHIP** (the three SwiftShader rows at
+loadavg 65 + the reflex row), Pro clears pinned on the R6 Pro. **`srcFingerprint` narrowed** to what the sim imports; it caught two
+non-physics moves this round (a core hook-type edit, a new-track commit) and a stale-alias table keeps every proven session counted.
+Timelapse 140 → 153, `progress-wave4.mp4` 30.0 s / 19.6 MB.
+
+| piece | as built |
+|---|---|
+| **battery** (`compare/battery.mts`, new; `battery.test.ts` 7 cases) | replays a recording in node and prints the manoeuvre anchors — wheelie (rear down, front up, pitch ≥ 20° for ≥ 0.5 s), hop (both wheels off a near-flat surface, air 0.2–0.7 s, apex < 1.2 m), landing (touchdown after ≥ 0.8 s air), crash (fault tick), climb (rear-wheel trajectory ≥ 30° for ≥ 0.6 s; `--climb-deg/--climb-hold` survey flags), flight (air ≥ 1.0 s); `out/compare/battery/{plan,plan-c,cells,pairs}.json`, `manifest.{json,md}` (cell, track, recording, anchor tick / s, ref, ref anchor, tag, seed, pairId, note — no side information), `refcuts/` (five pre-cut world reference windows). Captures `out/capture/battery/<cell>/` at `high` 1280×720 @ 60, 4.0–4.3 s, anchor + 2.5 s ≤ length (the round-10 rule), 250–520 s wall each at loadavg 55–87. Pairs by `pair.ts --mask --align`, seeds 1201–1232 in matrix order. Record: `out/metrics/battery-v0.2.0.jsonl` (38 rows: pick, unmasked winner, ours side, confidence, the tell, the reasons, criteria, cell metadata; two `unfilled` rows). |
+| **audio A/B** (`compare/audio.ts`) | `--lowpass <Hz>` (default **14000**, `0` = off): `lowpass=f=N` on BOTH sides before the loudness measurement and the gain, so the −23 LUFS match holds on what the critic hears and round 11's codec tell (ours has a 20 kHz floor, the captures brick-wall at 12–14 kHz) is gone; `lowpassHz` in the printout and the result. Six pairs `--coin balanced --seed 1211` on the r4 beats. |
+| **fingerprint** (`lib/metrics.ts`, `metrics.test.ts` new) | `simFingerprint(root)` hashes `src/physics/**`, `src/tracks/**`, `src/game/rules.ts` and only the three runtime core modules `hash.ts` / `replay.ts` / `rng.ts` (not `types.ts`, `loop.ts`, `index.ts`, `.d.ts`, `.test.ts`); `SIM_IDENTICAL_STAMPS` maps the current stamp to earlier stamps proven sim-identical (a golden restamp node == browser, or a recording replay); **`fingerprintMatches(stamp, fp)`** is the comparison in `golden.ts` (stale / restamp), `stranger/report.ts` (stale rows), `reflex.ts` (row carry-over), `gate/ship-gate.ts` (fresh stranger / reflex rows). Table: `7e836cbe` (HEAD 88401ed) ← `817dddd2` (682d05c under this hash), `6412a755` / `6f0cbe22` (682d05c under the old hash, the second with +15 hook-type lines in `types.ts`), `2e249552` / `d3f20790` (two working-tree states of fa62eae; the x3 p2 recording replays to `5bd588d5cec2a135` on 682d05c and 88401ed, node == browser). The test proves a `types.ts` / `loop.ts` / `.d.ts` / `.test.ts` edit leaves the stamp alone and a physics / track / rules / runtime-core edit moves it. |
+| **stranger bike default** (`stranger/cli.ts` `bikeForTrack`) | `prep` and `start` without `--bike` ride `defaultBikeForTier(track.tier)` — Rookie on beginner / easy, Pro on hard / extreme (the menu's default, the class the band and the report assume); `--bike` still overrides. `README.md` §0 and `run-stranger.md` say so. Round 12's first nine hard sessions and four extreme sessions rode the Rookie because the old default was Rookie. |
+| **stranger briefing** (`PROTOCOL.md`, the card in `cli.ts`) | the Pro paragraph is R6: plain `g` from rest lifts to ~30° and rides a power wheelie down (no loop); `gb` from rest loops in ~0.6 s, a quarter lean-back in 1.4 s; in the air the Pro is raw and a lean press first swings the nose the *other* way for one slot (`lb` dips −10° in 0.1 s before it lifts) — judge a lean by its second slot, prefer one held lean to a tap train. Card line: "Pro (wheelie ECU on the ground, raw in the air — the loop is yours at every lean and every airborne gas; 22 m/s top)". |
+| **shared checkout** | `scratchpad/harness11/frozen` = `git archive 682d05c` + `pnpm install --offline`, `VERCEL_GIT_COMMIT_SHA` exported for the build (goldens, re-prove lanes, gate, matrix, battery captures, the x3 replay proof); strangers in MAIN (PROTOCOL's `cd`). MAIN's `src` was edited by three owners during the round: `types.ts` (+15, moved the old-hash stamp), `courses/playgrounds.ts` (mid-write it was a missing module for ~4 min and every stranger command in MAIN threw — three extreme sessions lost clock, then HEAD moved 682d05c → 88401ed), `harness/trailer/features.ts` (another owner's in-flight edit; `pnpm typecheck` fails on it and on `playgrounds.ts:22` — not this round's files). |
+
+### Goldens, skill 3, one seed, browser-verified, frozen 682d05c (src 6412a755 old hash = 817dddd2 new hash), loadavg 9–20
+
+`--refresh-goldens --build` (17 s): **fresh 0, restamped 19** (every `bot-3.json`, 65175e2d → 6412a755, node == browser; finish times
+byte-identical to round 11 — flat 8.567, gap 5.742, b1 41.558, b2 38.417, b3 33.067, e1 55.192 / 3, e2 44.175, e3 39.558, m1 34.583,
+m2 49.283 / 2, m3 45.567 / 2, h1 50.508 / 2, h2 45.667, h3 47.125, x1 54.600, x2 56.767 / 3, x3 44.450, labs 8.217 / 12.608), **stale 19**
+(every `bot-3-pro.json` "no longer finishes": the R6 Pro carries the ECU on the ground, so every Pro recording where the front topped
+out under gas diverges — flat at 2.4 m, b1 at 238 m, e1 at 24.9 m, x1 at 13.2 m …). Re-proved (`harness:bot <t> --skill 3 --bike pro`,
+extreme `--max-sim-seconds 1800 --track-wall-s 900`), every one `verified=true`: flat 1 / 8.400 `53d5e2de0447d118` · gap 1 / 5.683 · b1
+1 / 39.092 `43b27d8e8dc0f1cb` · b2 1 / 36.842 · b3 1 / 31.358 · e2 2 / 48.400 · e3 (lane A, proven) · m1 1 / 32.767 · m2 1 / 37.558 ·
+m3 1 / 38.167 · h1 2 / 52.150 · h2 1 / 41.808 · h3 3 / 57.908 · **x1 2 / 60.917 `8cabb0b28f467b55`** (round 11: 50 attempts at 447.8 m)
+· **x3 2 / 52.325 `6dafbfdf275e4718`** (round 11: 50 at 72.2 m) · lab-physics 1 / 8.217-class · lab-flat-200 proven. **Not re-proved:
+e1 Pro — seeds 847839319 / …320 / …321: 37 / 29 / 50 attempts, all `crash @ 220.5 m (ground)`, maxX 323.1 (59 %), 900 s wall each; x2
+Pro — 50 attempts, 79 %, `crash @ 442.9 m (drum @ 442.2)`** (a 3-seed retry ran into the retire; log `scratchpad/harness11/logs/reprove-D.log`).
+36 golden files changed in `harness/inputs/` (19 restamps + 17 re-proofs); e1 / x2 Pro keep their 65175e2d stamps.
+
+### Ship gate (`harness:gate --pin --heap-seconds 60`, frozen 682d05c, loadavg 17 at boot → 65 at the end: 13 strangers, three SwiftShader captures and the timelapse shared the box)
+
+**22 / 26 NO-SHIP, wall 1865 s** (round 11: 24 / 26 at loadavg 9–31; the two extra fails are SwiftShader wall rows under 3× the load).
+boot.readyP50 113.9 ms (limit 300; 104 / 114 / 181 / 113 / 137) · **firstFrame 9564 ms FAIL** (SwiftShader, informational; 3468 in round 11)
+· clear.golden / bitEqual / hashOk PASS (`b002d139195b5757`) · **clear.pro.flat PASS `53d5e2de0447d118` · clear.pro.b1 PASS `43b27d8e8dc0f1cb`
+(re-pinned on the R6 Pro, `expected.json` 6 lines)** · crash.faultWithinS 0.75 s · fault.toControlMs 50 ms (auto-respawn 1042 ms) ·
+restart.ticks 1 · restart.wallMsP95 0.17 ms · **restart.frameMsP95 641 ms FAIL** (SwiftShader) · restart.noCountdown 1 tick · heap −5.38 MB
+/ 60 s · draw calls 187 (198) · triangles 156 717 · textures 76.9 MB · physics 32.5 µs/tick p95 · renderSubmit 2.92 ms · **renderSynced
+20 655 ms FAIL** (SwiftShader) · bundle 469.3 KB gz (dist 17 474 KB) · determinism 9 / 9 · camera.box PASS 0 / 681 riding frames, clamped
+28.2 % (924 s at that load) · stranger.medianAttempts "no armed track" (the frozen tree's `out/metrics` predates this round's sessions;
+MAIN's reports are below) · **reflex.medianAttempts FAIL b1 1 / 1.5 · b2 2 / 3 · b3 4 / 3 · e1 8 / 6** (unchanged since round 9) · reflex
+Pro informational **b1 2 · b2 2 · b3 9 · e1 17** (round 11: 2 · 7 · 12 · 50 — the R6 Pro). Log `scratchpad/harness11/logs/gate.log`, report
+`out/metrics/ship-gate.json`, `out/gate/`.
+
+### Stranger round 8 — hard and extreme on the R6 Pro (the tier's default), src 817dddd2 / 7e836cbe; prompt = `run-stranger.md` block verbatim; loadavg 20 at spawn, 50–80 during
+
+| session | bike | attempts | cleared | time | calls | wall | died at | what the stranger said |
+|---|---|---:|---|---:|---:|---:|---|---|
+| h1 p1 | Pro | 8 | yes | 128.4 s | 56 | 11.8 min | 172, 183, 219 (gap), 223 (gap, hazard), 216 (gap), 365 (gap), 512 (gap) | the roof-edge drops onto the slot rows: `wh` off the 1.5 m ledges pumped the nose to 80°+ in the air (three loops); the slots are ridable on two wheels at 8+ m/s — the killers are a stopped wheel over a slot and the roof stairs above ~10 m/s |
+| h1 p2 | Pro | 8 | yes | 153.6 s | 51 | 16.1 min | 106, 107, 217 (gap), 232 (gap, hazard), 355 (gap), 521 (gap, hazard), 556 | the pit rows after each rooftop drop: `wh` overshoots or bleeds all its speed entered off a landing; arrive at 8+ m/s nose up, brake-tap on touchdown to knock the wheelie back to ~30°, then let `wh` hold it at 5–7 m/s |
+| h1 p3 | Pro | 8 | yes | 150.8 s | 57 | 14.9 min | 101, 175, 174, 547, 532 (gap) ×2, 558 | the third lip's 1.5 m drop into a 20 m hazard-slot row launches the wheelie past 50°, where `wh` bleeds the speed and the Pro loops at a crawl (four faults); coast the drop with no lean, start `wh` after touchdown |
+| h2 p1 | Pro | 6 | **no** (266 m of 637) | — | 54 | 17.5 min | 81 (gap), 73 (ramp), 266 (ramp), 265 (gap, hazard), 245 (ramp) | the second gap chain after CP1: 6 m platforms too short to rebuild speed, the bike bounces airborne 2–3 slots after every touchdown so any lean-forward under gas nose-dives, the pits end in a vertical wall — gave up |
+| h2 p2 | Pro | 10 | yes | 162.9 s | 79 | 17.6 min | 86 ×2, 84, 100, 97, 355, 361, 254 (gap), 257 (ramp) | any lean tap or full gas at low speed after a landing swung the nose into a loop or a nose-dive; carry speed and overfly every second kicker |
+| h2 p3 | Pro | 5 | yes | 82.0 s | 28 | 7.9 min | 257 (ramp), 260 (box), 267 (ramp), 285 | the chain at 214–268 m punishes speed: at 14 m/s a flight overshot onto the next kicker's face and looped; thread the five gaps at 8–11 m/s, coast every flight |
+| h3 p1 | Pro | 13 | yes | 181.7 s | 66 | 16.0 min | 99, 69, 250 (ledge), 262, 255, 295, 370 (ramp), 383 (restart), 506 (ledge), 492 (ramp), 503 (ledge), 504 (restart) | the two-tier 0.45 + 0.5 m ledge at 505 / 508 m after the fifth fire jump, invisible at the ASCII row resolution: the Pro loops the instant it is airborne under gas, so every hop had to be a crawl |
+| h3 p2 | Pro | 9 | yes | 102.8 s | 51 | 14.8 min | 84, 235 (ramp, hazard), 406 (arch) ×2, 410 (arch), 408 (arch), 341, 470 (ramp) | the fourth fire pit (393–400 m): off the lip at the same ~12 m/s and attitude as pits 2–3 the bike is thrown into a violent pitch rotation no lean or brake counters; cleared when a full backflip completed before touchdown |
+| h3 p3 | Pro | 10 | yes | 127.3 s | 60 | 14.3 min | 81, 68, 71, 235 (ramp), 514, 508 (ledge), 506 (ledge), 507 (ledge), 506 (ledge) | the knee-high ledge at ~505 m: the speed bump in front of it kills any fast approach; the hop only works started ~1 m before the face at ~6 m/s (5 of 9 faults) |
+| x1 p1 | Pro | 15 | yes | 162.2 s | 62 | 17.1 min | 6, 32 (plank) ×2, 43 (ramp), 36 (box), 114 (pole) ×3, 235 (restart), 424 (pole), 432 (box), 427 (pole), 480, 406 | the pillar-cap rows: the rear drops into the first slot or the front slams the raised third cap; a ramp-hop landing onto the first cap with the front lifted carried it across; the 45° faces need ~10.7 m/s at the foot, weight forward, lean released one slot into the crest flight |
+| x1 p2 | Pro | 54 | yes | 618.8 s | 328 | 66.2 min | 45–57 ×8 (ramp / ground), 86–92 ×3, 113–114 (pole) ×2, 111 (gap, restart), 245–270 ×9 (ramp @ 249–251 ×4), 354, 472, 428–429 (pole) ×6, 530–535 ×11, 605 ×3 … | the plateau after each 45° climb: the crest launches the Pro into a rear-wheel balance that any gas or coast tips into a loop, and the plateau ends in an invisible dip-and-lip that front-flips at speed and loops at a crawl; ~40 of 53 faults finding the one line |
+| x3 p1 | Pro | 26 | **no** (525 m of 569, all six CPs) | — | 136 | 50.0 min | 85 (box), 192 (ledge), 196 (gap), 220 (ramp), 244, 302 (wall), 297 (ramp), 301 (wall, restart), 312 (gap), 506 (box), 520 (arch) ×3, 516 (arch) ×2, 514 (arch), 524 (pole), 524 (restart), 525 (pole), 523 (pole), 505 (box) ×2, 511, 525 (pole) | the final stack after the 4 m face: raw in-air pitch off the crest, a hidden launch pad on the plateau at ~516 m that throws the bike up with no input, then a bridge of free-spinning drums over a hazard pit with zero traction — every crossing stalled or looped at the same gap between drums 2 and 3 |
+| x3 p2 | Pro | 23 | yes | 220.5 s | 88 | 33.6 min | 80 (box), 193 (ledge), 196 (gap) ×2, 198 (gap, hazard), 192 (ledge) ×2, 194 (ledge), 291 (ramp), 284, 307–315 (gap) ×5, 361 (ramp), 444 (ramp, hazard), 469, 513 (arch), 511 (arch), 536 | the platform-into-hazard-trenches after the see-saw (~10 attempts): the ramp top has a knee-high lip (a hop, not speed) and the trenches must be crossed with the front held up after a rear-first landing |
+
+Rookie, informational (the first hard round; `prep` defaulted to Rookie): h1 **5 / 16 / 3** (61.7–244.7 s), h2 **4 / 3 / 3**, h3 **6 / 21 / 8**,
+x1 **10 / 5**, x3 **13 / 11** — 13 / 13 cleared, every median under its band (h1 5, h2 3, h3 8, x1 7.5, x3 12). The harness CLI in MAIN
+was down for ~4 min mid-round (the tracks owner's `playgrounds` module missing); x1 p2 / x3 p1 / x3 p2 lost that clock and two calls each.
+
+| track | band | asserted (Pro) | n | cleared | median attempts | median time | median calls | verdict | Rookie (informational) | reflex `average` (Rookie / Pro) |
+|---|---|---|---:|---:|---:|---:|---:|---|---|---|
+| h1-wheelie-wire | 10–18 | 10 ≤ med ≤ 27 | 3 | 3 | **8** (8, 8, 8) | 150.8 s | 56 | UNDER-BAND (was 16 PASS on the r11 Pro) | 5 (5, 16, 3) | 25 / 26 |
+| h2-gap-chain | 14–22 | 14 ≤ med ≤ 33 | 3 | 2 | **6** (6 DNF, 10, 5) | 122.5 s | 54 | **FAIL** (a counted session did not clear; was 10 UNDER) | 3 (4, 3, 3) | 46 (2/3) / 51 (1/3) |
+| h3-fire-line | 18–25 | 18 ≤ med ≤ 37.5 | 3 | 3 | **10** (13, 9, 10) | 127.3 s | 60 | UNDER-BAND (was 16 UNDER) | 8 (6, 21, 8) | 7 / 24 |
+| x1-vertical-limit | 30–45 | 30 ≤ med ≤ 67.5 | 2 | 2 | **34.5** (15, 54) | 390.5 s | 195 | **PASS** (was 18.5 UNDER) | 7.5 (10, 5) | 21 (9/9) / 51 (4/9) |
+| x3-gauntlet | 60–80 | 60 ≤ med ≤ 120 | 2 | 1 | **24.5** (26 DNF, 23) | 220.5 s | 112 | **FAIL** (was 19 UNDER) | 12 (13, 11) | 34 (6/9) / 51 (3/9) |
+
+**Death table for the tracks owner (Pro, counted sessions, 5 m bins).** h1 (21): 215 ×2, 105 ×2, 175 ×2, 530 ×2, 170, 185, 220, 225, 365,
+510 … — spread across the slot rows, no single sink (round 11's `gap @ 362.3 ×10` is gone: 355 ×1, 365 ×1). h2 (18): **265 ×3 + 255 ×3 +
+245 (the climbing chain's third platform: 7)**, 85 ×3 + 80 + 75 (chain A: 5), 100, 95, 355, 360 — the same two sinks as round 11, and
+the DNF sat in the first. h3 (29): **505 ×6 (the two-tier ledge after the fifth fire jump, "invisible at the ASCII row resolution" — the
+round-10 / 11 `view.ts` glyph item a third time)**, 70 ×3, 235 ×2, 405 ×2 + 410 ×2 (the fourth fire kicker), 100, 250–260 ×3, 295 …
+x1 (67): **430 ×9 (the poles @ 428.9)**, 530 ×6 + 535 ×5 (the third plateau's dip-and-lip), 115 ×5 (pole @ 114), 250 ×4 (face 2), 45–55
+×9 (face 1's approach), 605 ×3, 30 ×2. x3 (47): **195 ×5 + 190 ×3 (the hop ledge @ 192.9, the reflex bot's `stuck-restart` site)**, 525
+×5 + 520 ×3 + 515 ×4 + 510 ×2 + 505 ×3 (the drum bridge / arch stack at 505–525: 17, both sessions), 310 ×4 + 305 ×2 + 300 ×2 (the gap
+after the see-saw). For the tracks owner: h1 and h3 are under their bands on the default bike (8 vs 10–18, 10 vs 18–25) — bands or
+tracks; h2's second chain (245–268 m) and x3's drum bridge (516–525 m: "a hidden launch pad on the plateau at ~516 m that throws the
+bike up with no input", then "drums with zero traction") each ended a session; x1 is in band with a 15 / 54 spread (n = 2). For physics:
+the Pro's raw air is now the whole story of every hard / extreme fault list ("any gas or lean held while airborne loops it").
+
+### Blind audio A/B round 2 (P6) — six `apair-` pairs on the r4 beats, one fresh critic each, `--coin balanced --seed 1211`, 14 kHz low-pass both sides, −23 LUFS
+
+r4 beats table (changed from r3): start −19.0 dBFS / 474 Hz centroid (r3 −18.2 / 310; ref −23.8 / 370 and −21.3 / 597) · wheelie −20.0 /
+234 (r3 −29.7) · landing −22.1 / 368 (r3 −24.7 / 272; ref −28.8 / 153, −26.2 / 287) · crash −23.6 / 279 (r3 −26.2). Sides: ours = A on
+wheelie ×2 and start, ref = A on landing ×2 and crash.
+
+| pair | A | pick (real) | right? | conf | the tell (verbatim `nonAAA`) |
+|---|---|---|---|---:|---|
+| wheelie-02 | ours | B = ref | yes | 0.80 | "A is a metronomic ~14 Hz click train ringing a resonance locked at ~100 Hz for the entire clip, with nothing above 1 kHz and no pitch or timbre movement, where a held wheelie should surge and sag every half second and brighten on each surge." |
+| wheelie-05 | ours | B = ref | yes | 0.80 | "A's engine is a single harmonic stack pinned at 106 Hz for seven seconds with a metronomic 14 Hz pulse train and no timbral change under its level dips - a static synth loop, not an rpm that is being feathered." |
+| landing-2m-12 | ref | **B = ours** | **no** | 0.80 | (against the reference) "A's landing is a run of pure sub-60 Hz sine thuds with the 60-200 Hz compression knock and the metallic tick 20-30 dB below or absent, i.e. a low oscillator with a gain envelope rather than a suspension bottoming out." — of ours: "a textbook suspension hit: the 60–200 Hz band jumps −35 → −14.8 dB in 25 ms, a 200–2 kHz knock, a second wheel hit at 5.375 s, back to −29 dB by 5.45 s (~175 ms settle)"; still noted "A is effectively mono (L/R 0.99)" — of the reference cut |
+| landing-2m-14 | ref | **B = ours** | **no** | 0.78 | (against the reference) "A's engine is a dead-center mono, pitch-locked pure harmonic stack (152 Hz held to within a hertz with exact integer partials) that switches off between events instead of a continuous combustion-pulse bed that loads and unloads through the landing." — of ours: "a continuous combustion-pulse texture (27.1 ms, 36.9 Hz, r = 0.72), inharmonic partials, fundamental climbs 99 → 135 Hz then drops to 66–83 Hz at the thump (+18 dB, −20 dB in 240 ms)" |
+| crash-respawn-04 | ref | A = ref | yes | 0.76 | "B's respawn engine is a pitch-locked 106 Hz harmonic stack chopped by a metronomic 12.5 Hz amplitude pulse (80 ms +-2 ms) with almost nothing above 2 kHz and no crank or rpm climb, appearing at full steady idle in its first 80 ms." (+ "a two-note synth chime 1250 / 2000 Hz repeated identically twice", "3 + 4 evenly spaced identical thuds after a linear −33 dB/s engine fade") |
+| start-gate-01 | ours | B = ref | yes | 0.80 | "A's idle is a perfectly periodic 12.0 Hz combustion pulse on a fundamental pinned to 106.7 Hz with no cycle-to-cycle jitter and nothing above 4 kHz, the fingerprint of an oscillator, not a recorded engine." (+ "countdown pings at 1.004 / 2.004 / 3.003 s, 587 / 587 / 1175 Hz sine-like, L/R 0.95–1.00") |
+
+**Tally: ours 2 / 6 (round 11: 1 / 12).** P6's done line (≥ 2 / 6) is met on the count; the honest read is that the r4 landing knock is
+real (both landing critics measured a two-stage 60–200 Hz knock with a settle on OUR side and named the reference cuts' mono, gated
+engine as the synth) while **the engine tell is unchanged and unanimous on the four engine beats: a metronomic 12–14 Hz pulse on a
+fundamental pinned at 100–107 Hz, no per-cycle jitter, no rpm motion, nothing above 1–4 kHz** — round 11's list (1), (3) verbatim; the
+stereo tell moved from "near-mono 0.99" to "a decorrelated widener (L/R 0.59–0.62, side/mid 1.0–1.13) rather than a placed mix"; the
+respawn now names a synth chime and a linear gain fade instead of the r3 re-trigger. The 14 kHz tell did not appear.
+
+### The 38-pair battery (P5's v0.2.0 proxy) — HEAD 682d05c at `high`, 30 video + 6 audio pairs, `out/metrics/battery-v0.2.0.jsonl`, manifest `out/compare/battery/manifest.md`
+
+| category | ours / n | cells |
+|---|---|---|
+| manoeuvre — wheelie | 0 / 4 | industrial ref · canyon ref · snow ref · nightCity ref |
+| manoeuvre — hop | 1 / 4 | **industrial ours** (ref window: a rear-wheel hold, "never hops") · canyon ref · snow ref · nightCity ref |
+| manoeuvre — landing | 0 / 4 | industrial ref · canyon ref · snow ref · nightCity ref |
+| manoeuvre — crash | 1 / 4 | **industrial ours** (ref window: the ragdoll never respawns) · canyon ref · snow ref · nightCity ref |
+| manoeuvre — climb | 0 / 2 (+2 unfilled) | canyon ref (RELAXED 0.46 s @ 40°) · snow ref (RELAXED 0.41 s @ 45°) · industrial / nightCity: no ≥ 18° upslope held 0.5 s on b1 / b3 / h1 / h2 / h3 |
+| world | 1 / 8 | industrial 0 / 2 · canyon 0 / 2 · **snow 1 / 2** (world-snow-2: the reference window was a crash + freeze + cut) · nightCity 0 / 2 |
+| audio | 2 / 6 | wheelie 0 / 2 · landing 2 / 2 · crash 0 / 1 · start 0 / 1 |
+| **total** | **5 / 36 judged (5 / 38 with the two unfilled)** | by biome: industrial 2 / 7 · canyon 0 / 8 · snow 1 / 8 · nightCity 0 / 7; sides: ours A 18 (won 0), ours B 18 (won 5); confidences 0.55–0.90 |
+
+Per-pair picks and tells (the sealed side, the critic's pick, the unmasked winner, `nonAAA` verbatim): `out/metrics/battery-v0.2.0.jsonl`;
+the same table prints from `scratchpad/harness11/battery_tally.py`. The repeated tells, each quoted from ≥ 3 pairs, for the render /
+camera / rider owners (the P5 rule: rounds 10 and 12 name the same camera and rider tells, so the next round is a different approach):
+
+1. **Camera (18 pairs).** "one slow constant orbit indifferent to the jump" (flight-industrial) · "pans at roughly constant speed through
+   the takeoff, apex and landing instead of leading, widening or dipping with the bike" (flight-canyon) · "a locked overhead follow that
+   scrolls at constant speed regardless of what the bike does … a token sliding over a map" (hop-canyon) · "near top-down framing throws
+   away every landing tell - pitch, suspension travel, settle and rider lag are all invisible" (landing-canyon) · "a slow scripted camera
+   orbit that owes nothing to the bike" (hop-snow) · "pulls back from a bike-sized framing to a wide high-angle shot in ~6 frames …
+   lets a foreground tree occlude the landing entirely" (wheelie-snow) · "loses the subject entirely for ~0.7 s behind un-culled
+   foreground geometry and then makes an unmotivated side-to-overhead sweep" (flight-nightcity) · "bolted to the bike with no lead or
+   ease — a cursor on a scrolling background" (world-canyon-1) · "welded to the bike: the world scrolls at one constant rate" (world-
+   nightcity-2) · "effectively bolted to the bike" (world-nightcity-1) · "keeps zooming out for a second and a half after the cut while
+   the bike sits frozen" (crash-canyon) — plus landing-snow, hop-nightcity, landing-nightcity, flight-snow, climb-snow, world-snow-1,
+   world-industrial-1.
+2. **No compression / rebound / settle; a pitch that parks (14 pairs).** "the rear touches, the front drifts down at a constant rate for
+   ~0.4 s and the bike simply rolls on with no compression, rebound or camera response" (landing-industrial) · "the pitch snaps to its
+   airborne angle right off the lip … no visible rebound on the rear-first touchdown" (flight-industrial) · "flies and lands like a
+   rigid sprite on a curve — flat pitch through the air, a drop landing with no squat, rebound or settle" (hop-snow) · "locks the wheelie
+   to a fixed angle and freezes the rider pose within half a second of launch; the pitch reaches its target with no overshoot" (wheelie-
+   nightcity) · "parked upright on the lip for a fifth of a second before it drops … compression-free touchdown" (landing-nightcity) ·
+   "coasts nose-up at nearly constant height and pitch for a second and a half" (climb-snow) · "floaty for its height and its landing
+   is inert" (flight-snow) · every world pair: "never loads or unloads — no squat on throttle, no overshoot, no settle".
+3. **The rider is a statue; in a crash rider and bike are one body (9 pairs).** "a statue — no lag, no lean-back, no counter-lean"
+   (wheelie-canyon) · "a rigid mannequin: pitch changes on the ramp and in the air without any matching lean" (climb-canyon) · "the rider
+   never moves on the bike" (flight-industrial) · "welded to the bike so the flight has no secondary motion" (flight-canyon) · "reaches
+   full lean-back on the same frame the bike pitches" (wheelie-snow) · "rider and bike tumble as one welded object with no independent
+   momentum, which is the single biggest 'prototype' tell" (crash-canyon) · "the rider never leaves the bike and the pair pops out of
+   existence two frames before the cut" (crash-snow) · "the rider never leaves the bike, the pair comes to rest in ~2 frames with no
+   settle or dust" (crash-nightcity).
+4. **Geometry crossing the frame; one-frame pops (6 pairs).** "two isolated one-frame dark wedges crossing the frame" (wheelie-
+   industrial) · "a black near-camera wedge (overhead beam clipping the near plane) sweeps across the whole frame in two frames" (world-
+   industrial-2) · "a foreground tree sweeps across the frame and completely covers the bike" (world-snow-1) · the tree in wheelie-snow,
+   the box in flight-nightcity, "orange glows appear and vanish for single frames" (crash-nightcity).
+5. **Audio: the engine (4 / 4 engine pairs)** — above.
+
+What the critics credited on our side, for the record: dust at the rear patch 2–3 frames after touchdown (landing-industrial, flight-
+industrial, flight-canyon — round 10's missing cue is present), the crash-to-control span ("moving 6 frames after impact", crash-
+nightcity; "hard cut … no fade", every crash), rear-wheel-first landings on every landing / flight pair, and the r4 landing knock.
+
+### Reflex matrix on HEAD (`--all-tracks --bike both --skill novice,average,good --seeds 3 --noisy … --noisy-seeds 9`, 600 s / extreme 1800 s), frozen 682d05c, 85 s wall at loadavg ~10
+
+**Rookie `average` is byte-identical to round 11 on every track** (same seeds, same physics: the R6 change is Pro-only, the goldens
+said so first) — b3 4 (3, 4, 6) · e1 8 (6, 10, 8) · e2 8 (9 / 9) · e3 2 · m1 9 · m2 8 · m3 21 (6 / 9) · h1 25 · h2 46 (2 / 3) · h3 7 ·
+x1 21 (9 / 9) · x2 28 (6 / 9) · x3 34 (6 / 9). **Out of band (Rookie `average`): b3 4 / 2 · e1 8 / 4 · e2 8 / 5 · m3 21 / 12 · h1 25 / 18 ·
+h2 46 / 22 = 6 over band (unchanged), x1 21 under 30–45, x2 / x3 in band on 6 / 9 clears.** The Pro `average` row is the R6 Pro and
+moved everywhere: b1 2 → 2 · b2 7 → **2** · b3 12 → **9** · e1 50 → **17** · e2 29 → **20** · e3 14 → **2** · m1 25 → **11** · m2 21 → **11** ·
+m3 51 → **13 (8 / 9)** · h1 51 → **26 (3 / 3)** · h2 51 → 51 (1 / 3) · h3 51 → **24 (3 / 3)** · x1 51 (0 / 9) → 51 (4 / 9) · x2 51 → 51 (2 / 9)
+· x3 51 (0 / 9) → 51 (3 / 9). Full tables with every death rule in `out/metrics/reflex.md` (38 `*.reflex.json`, copied from the frozen tree).
+
+### Timelapse
+
+`--since 6053c55 --clips milestones --milestones 0f14d3d,20d463d,c053ac4,18df821,56e3883,2b48370,682d05c`, niced, 46.5 min at
+loadavg 50–80 (13 commits built + captured, 222–300 s each): **ledger 140 → 153**, `progress-stills.mp4` 151 stills / 14.2 MB,
+`progress-clips.mp4` 30.0 s / 7 milestones (c053ac4 predates the ledger's capture window and renders from its still), gif 13.7 MB.
+**`harness/out/timelapse/progress-wave4.mp4`: 30.0 s, 19.6 MB** (crf 22 re-encode of the 26.4 MB render): 0f14d3d loader invariant →
+20d463d menu → c053ac4 controls → 18df821 touch invariant → 56e3883 tracks r9 → 2b48370 arms → 682d05c phone-high → 88401ed (the latest,
+appended by the renderer).
+
+### Open
+
+- **Battery 5 / 36, and 0 on the pairs where the reference showed the manoeuvre.** Two rounds with the same tell on the camera (10,
+  12) and the rider (10, 12): P5 says the next round is a different approach, not a third polish pass. The list above is the brief:
+  a camera whose every move is caused by the bike (lead with speed, widen with height, ease, never a constant-rate orbit, never
+  top-down over a landing, never through foreground geometry); suspension travel and a damped settle that read at 640 px; a rider
+  that lags, leads and separates in a crash. Re-run the identical 36 pairs (same cells, same anchors, same refs — `manifest.json`)
+  on the next render / rider round; the number to move is the manoeuvre row.
+- **Two climb cells cannot be filled on the r9 curriculum**: no track holds a ≥ 30° face for 0.6 s (the faces are 40–45° kickers left
+  after 0.3–0.46 s). Either the tracks owner authors one sustained climb per biome (the reference's quarter-pipe / long plank) or
+  the battery's climb row is redefined as "face + crest" (the RELAXED cells).
+- **Strangers on the R6 Pro: h1 8 / h3 10 under band, h2 and x3 FAIL on one DNF each, x1 PASS at n = 2 (15, 54).** The 4 m standstill
+  death is gone; the raw Pro air is now every fault list. For the tracks owner: h2's second chain (245–268), h3's two-tier ledge at
+  505 (invisible on the stranger screen — third round running), x3's 516 m launch pad + drum bridge. For physics: "any gas or lean
+  held while airborne loops it" ×5 sessions; x1 p2's "an in-air `bf` is the only thing that reliably drops the nose".
+- **Audio 2 / 6**: the engine's metronomic pulse / pinned fundamental is unanimous for the second round (rounds 11, 12 — the P5 rule
+  applies to the engine too); the landing knock is done.
+- **e1 Pro / x2 Pro goldens stale**: the skill-3 bot walls at 220.5 m (three seeds) and 442.9 m.
+- **Reflex out-of-band list unchanged** (Rookie `average`): b3 4 / 2 · e1 8 / 4 · e2 8 / 5 · m3 21 / 12 · h1 25 / 18 · h2 46 / 22; the gate's
+  reflex row has failed on b3 / e1 since round 9.
+- **The fingerprint is per-tree, not per-track.** Adding a track (fa62eae) moves every session's stamp; the alias table is the
+  workaround. The right shape is `physics + rules + runtime core + this track's course file` per recording.
+- **Shared-checkout hazards this round**: MAIN's stranger CLI threw for ~4 min on a half-written `src/tracks/courses/playgrounds.ts`
+  (three extreme sessions lost clock); `pnpm typecheck` fails on two other owners' in-flight files (`harness/trailer/features.ts`,
+  `playgrounds.ts:22`). Strangers should run from a frozen tree too (PROTOCOL's `cd` would need a per-round path).
+- Sub-0.5 m ledges invisible on the stranger screen (h3 505 m, again): the `view.ts` glyph item, third round.
+- Round 11's items still open: the Pro's first-slot air swing (now in the briefing), audit §3 (the stranger is an AI proxy).
+
 ## Round 11 status — the hard tier ridden by strangers for the first time (Pro: h1 16 in band, h2 10 / h3 16 / x1 18.5 / x3 19 UNDER band, 13/13 cleared); the blind audio critic takes the reference 11 of 12 and names one tell — a metronomic, pinned-pitch, mono engine; the stranger verdict is now a census (n, censored, the exact bound); live-keys reflex fixed; goldens re-proved on tracks r9 (x1 / x3 Pro wall the bot)
 
 **Finding.** Stranger round 7 on src `a6d63cfd` (tracks r9; HEAD 56e3883 → 6053c55, fingerprint unchanged), the tier's default

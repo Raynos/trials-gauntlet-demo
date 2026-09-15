@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "x3-gauntlet",
   "bike": "pro",
-  "updatedAt": "2026-09-15T03:17:41.175Z",
+  "updatedAt": "2026-09-15T21:17:44.982Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     60,
@@ -17,18 +17,22 @@
         264835977
       ],
       "attempts": [
-        1
+        2
       ],
-      "median": 1,
+      "median": 2,
       "finishTimes": [
-        42.791666666666664
+        52.325
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": null,
+  "singleWall": {
+    "checkpoint": 4,
+    "share": 1
+  },
   "runs": [
-    "20260914-221438-89862f"
+    "20260914-221438-89862f",
+    "20260915-161611-10db40"
   ]
 }

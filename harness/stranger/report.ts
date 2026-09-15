@@ -14,7 +14,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { median, srcFingerprint } from '../lib/metrics';
+import { median, srcFingerprint, fingerprintMatches } from '../lib/metrics';
 import { REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
 import type { AttemptLog, BestAttempt, StrangerSession } from '../lib/schema';
@@ -153,7 +153,7 @@ export async function report(trackId: string, o: { fresh?: boolean; bike?: 'rook
           agent: done.agent,
           bike: done.bike ?? bikeOfRecording(done.recordingFile),
           status: 'done',
-          stale: stamp !== fp,
+          stale: !fingerprintMatches(stamp, fp),
           srcFingerprint: stamp,
           strangerAttempts: done.strangerAttempts,
           cleared: done.cleared,

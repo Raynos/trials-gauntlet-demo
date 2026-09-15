@@ -88,6 +88,12 @@ export interface BeamConfig {
   commit: number;
   cells: [number, number, number];
   budgetMs: number;
+  /**
+   * Round 12 (`--budget-ticks`): stop a plan after this many simulated ticks instead of after `budgetMs` of wall.
+   * A tick budget makes the search a pure function of (track, seed, skill) — the same bytes from any process or
+   * core count — which is what the pooled sweep's identity proof rests on. Absent = the wall budget (default).
+   */
+  budgetTicks?: number;
 }
 
 export interface ScoreWeights {
@@ -135,6 +141,8 @@ export interface BotRunReport extends RunMeta {
   nodeHash: string;
   /** First tick where a straight replay of `recordingFile` stops matching the committed play's per-tick hash (null = retraces exactly). */
   playReplayDivergence?: { tick: number; x: number; playHash: string; replayHash: string } | null;
+  /** Pooled run (round 12): the parent replayed the worker's recording in its own process and got `nodeHash` (null = ran in-process). */
+  workerHashOk?: boolean | null;
   browserHash: string | null;
   browserVerified: boolean | null;
 }

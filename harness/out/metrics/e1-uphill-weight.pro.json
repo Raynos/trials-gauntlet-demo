@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "e1-uphill-weight",
   "bike": "pro",
-  "updatedAt": "2026-09-15T03:01:58.917Z",
+  "updatedAt": "2026-09-15T21:16:09.675Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     2,
@@ -17,18 +17,22 @@
         847839319
       ],
       "attempts": [
-        3
+        50
       ],
-      "median": 3,
+      "median": 50,
       "finishTimes": [
-        50.71666666666667
+        null
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": null,
+  "singleWall": {
+    "checkpoint": 2,
+    "share": 0.9795918367346939
+  },
   "runs": [
-    "20260914-220018-1c23af"
+    "20260914-220018-1c23af",
+    "20260915-161126-495dfe"
   ]
 }

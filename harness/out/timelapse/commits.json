@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T19:03:46.737Z",
+  "updatedAt": "2026-09-15T22:03:33.170Z",
   "commits": [
     {
       "sha": "bca9515abf20db18649a2fbdd5ba793106cd0840",
@@ -3454,6 +3454,320 @@
         "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/6053c553c20297ca10bd9ef2f30ba786aceb3c1f/clip.mp4",
         "clipFrames": 120,
         "wallMs": 115494.02387499998,
+        "notes": []
+      }
+    },
+    {
+      "sha": "cfc98f89f904af4a78d588255b8c951991bce270",
+      "short": "cfc98f8",
+      "date": "2026-09-15T14:24:57-05:00",
+      "subject": "Core: ?bench=1 is the on-device instrument — eight 20 s scenarios (menu / garage / b1 start / b1 ride x current, low, medium, high, cap 60) record the frame split (poll / physics / HUD / audio / submit / other) from the RAF loop with &no=audio|hud|render|touch and &cap=60 bisect toggles, a Copy/Share report (markdown + JSON) filed under docs/device; the frame cap is phase-locked (a 30 cap holds 30 at 60 and 120 Hz rAF; the free-running rule lost a slot per overrun), the HUD's one un-dirty-checked per-frame write is gone; e2e --only=bench 105/105",
+      "index": 141,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/cfc98f89f904af4a78d588255b8c951991bce270/dist",
+        "wallMs": 5407.381333
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/cfc98f89f904af4a78d588255b8c951991bce270/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/cfc98f89f904af4a78d588255b8c951991bce270/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/cfc98f89f904af4a78d588255b8c951991bce270/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 88503.351791,
+        "notes": []
+      }
+    },
+    {
+      "sha": "8efc6826759f70315d201f64a22dc17cb92bc315",
+      "short": "8efc682",
+      "date": "2026-09-15T14:36:22-05:00",
+      "subject": "Track select: the header leaves room for the MENU pill (it sat over the medal totals); card tags one line (▶ Ghost / ▶ PB, Pro) never wrap",
+      "index": 142,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/8efc6826759f70315d201f64a22dc17cb92bc315/dist",
+        "wallMs": 5823.591125000006
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/8efc6826759f70315d201f64a22dc17cb92bc315/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/8efc6826759f70315d201f64a22dc17cb92bc315/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/8efc6826759f70315d201f64a22dc17cb92bc315/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 85527.72375,
+        "notes": []
+      }
+    },
+    {
+      "sha": "763b28efa807742aa5d3fc68df1c20cece8c0f0a",
+      "short": "763b28e",
+      "date": "2026-09-15T14:36:23-05:00",
+      "subject": "Harness r11: the hard tier ridden by strangers for the first time — Pro (the tier's default) h1 16 in band, h2 10 / h3 16 / x1 18.5 / x3 19 under band, 13/13 cleared, every Pro first attempt lost at 4 m (plain gas loops the Pro from a standstill); blind audio A/B ours 1/12 (the tell: a metronomic pinned-pitch mono pulse train, a click for a landing, the respawn re-triggering the same render); the stranger verdict is a census (n, censored, exact bound) and the gate's stranger row covers all 15 courses; see-saw model m3 average 34 -> 21, good 18 -> 8; stall memory reconciled; live-keys reflex fixed (driver bug); goldens 36 restamped + 12 re-proved; gate 24/26",
+      "index": 143,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/763b28efa807742aa5d3fc68df1c20cece8c0f0a/dist",
+        "wallMs": 5819.23550000001
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/763b28efa807742aa5d3fc68df1c20cece8c0f0a/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/763b28efa807742aa5d3fc68df1c20cece8c0f0a/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/763b28efa807742aa5d3fc68df1c20cece8c0f0a/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 81187.80087499999,
+        "notes": []
+      }
+    },
+    {
+      "sha": "5649aa6c8a75c1834a2a844e98e31734c6462d4c",
+      "short": "5649aa6",
+      "date": "2026-09-15T14:36:54-05:00",
+      "subject": "Plans: P3 85 (hard tier ridden; the user cleared beginner + easy on the phone), P6 40 with the audio A/B verdict",
+      "index": 144,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/5649aa6c8a75c1834a2a844e98e31734c6462d4c/dist",
+        "wallMs": 5934.2910000000265
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/5649aa6c8a75c1834a2a844e98e31734c6462d4c/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/5649aa6c8a75c1834a2a844e98e31734c6462d4c/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/5649aa6c8a75c1834a2a844e98e31734c6462d4c/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 108212.39979200001,
+        "notes": []
+      }
+    },
+    {
+      "sha": "ed0cf50d13cd9b1a21fd78bf309fe111904804c3",
+      "short": "ed0cf50",
+      "date": "2026-09-15T15:13:32-05:00",
+      "subject": "Auto is a governor, and 60 is the cap everywhere: device report #1 (iPhone, iOS 18.7) shows low holding 59.5 fps and every tier a flat 30 — the garage floor was the free-running cap plus CSS on the canvas; Auto now starts at the tier the device last held (else medium on phones, high on desktop), steps down within 2 s when p95 > 1.3x budget or drops > 8 %, climbs to high after 8 s of clean frames at a safe moment, and remembers the held tier; the user runs no more benchmarks",
+      "index": 145,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/ed0cf50d13cd9b1a21fd78bf309fe111904804c3/dist",
+        "wallMs": 7794.4463749999995
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ed0cf50d13cd9b1a21fd78bf309fe111904804c3/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ed0cf50d13cd9b1a21fd78bf309fe111904804c3/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/ed0cf50d13cd9b1a21fd78bf309fe111904804c3/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 160018.97491699998,
+        "notes": []
+      }
+    },
+    {
+      "sha": "b81e91789fe956dae49576fc20638ec696e67c18",
+      "short": "b81e917",
+      "date": "2026-09-15T15:13:35-05:00",
+      "subject": "Physics R6: a same-tick crash on the line voids the finish (audit §5, Game unchanged); the Pro carries the ground ECU — plain gas lifts 32 deg and rides, no loop from a standstill; lean -0.25 still loops 1.36 s; air stays raw; the Pro's 'inverted first slot' is the raw pose swing with correct signs; the plank 'hop' is a bottomed-landing rebound at the cap (intent 0); the acceptance suite is 157/157 with zero it.fails / it.todo; Pro goldens move, Rookie goldens do not",
+      "index": 146,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/b81e91789fe956dae49576fc20638ec696e67c18/dist",
+        "wallMs": 6979.668082999997
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/b81e91789fe956dae49576fc20638ec696e67c18/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/b81e91789fe956dae49576fc20638ec696e67c18/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/b81e91789fe956dae49576fc20638ec696e67c18/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 222051.27145899995,
+        "notes": []
+      }
+    },
+    {
+      "sha": "c5c35c6eaf1457f4f3b33c2370aa390ee65d49b7",
+      "short": "c5c35c6",
+      "date": "2026-09-15T15:18:40-05:00",
+      "subject": "agent-browser (Vercel) as a devDependency for the harness — Chrome via CDP and iOS simulators; installed globally and in dotfiles too",
+      "index": 147,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/c5c35c6eaf1457f4f3b33c2370aa390ee65d49b7/dist",
+        "wallMs": 11581.390000000014
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/c5c35c6eaf1457f4f3b33c2370aa390ee65d49b7/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/c5c35c6eaf1457f4f3b33c2370aa390ee65d49b7/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/c5c35c6eaf1457f4f3b33c2370aa390ee65d49b7/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 246145.86458299996,
+        "notes": []
+      }
+    },
+    {
+      "sha": "d655850cacd27f9f888bb688bca1d5e59c3f9874",
+      "short": "d655850",
+      "date": "2026-09-15T15:18:40-05:00",
+      "subject": "Audio r4: the engine fires one pulse at a time — per-firing resonator excitation with seeded jitter (0.7 -> 3-7 %, periodicity 0.97 -> 0.74-0.84), misfires, hunt and overrun pops; stereo (L/R 0.99 -> 0.59-0.72); the landing a 110 -> 62 Hz suspension thump + rattle + scrub settling over 350 ms (+5.5 -> +15 dB, no duck); wind/tyres climb 15 dB with speed; every one-shot varies per event so the crash replay correlates 0.66 -> 0.35; critic.ts measures the tells; CPU 0.44/0.57 ms, worklet 14.4 KB gz",
+      "index": 148,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/d655850cacd27f9f888bb688bca1d5e59c3f9874/dist",
+        "wallMs": 9036.048040999915
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/d655850cacd27f9f888bb688bca1d5e59c3f9874/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/d655850cacd27f9f888bb688bca1d5e59c3f9874/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/d655850cacd27f9f888bb688bca1d5e59c3f9874/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 300365.2166249999,
+        "notes": []
+      }
+    },
+    {
+      "sha": "29dabdadec6c3e75bfcae34d91e9cfa5c9280e83",
+      "short": "29dabda",
+      "date": "2026-09-15T15:38:27-05:00",
+      "subject": "Perf cuts #0/#1/#5: three re-acquired a shader program 30x/frame (two-pass transparent DoubleSide, darkSteel across mesh kinds, one shared shadow depth material) — now 0, draws CPU -25 % high / -35 % medium, calls 205 -> 194; a frame whose inputs equal the last drawn frame is not drawn — the garage draws 2 frames per 2.5 s instead of ~75 (0.73 -> 0.005 ms, 112 -> 0 calls); the static world's 1240 nodes stop recomposing matrices; riding pixels byte-identical, b1 clip camera PASS 0/2553; PERF.md ledger rows 1-3",
+      "index": 149,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/29dabdadec6c3e75bfcae34d91e9cfa5c9280e83/dist",
+        "wallMs": 13560.07595800003
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/29dabdadec6c3e75bfcae34d91e9cfa5c9280e83/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/29dabdadec6c3e75bfcae34d91e9cfa5c9280e83/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/29dabdadec6c3e75bfcae34d91e9cfa5c9280e83/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 267643.38295800006,
+        "notes": []
+      }
+    },
+    {
+      "sha": "a20509c0deaa1e77d7ecfc53718694a396b83cd5",
+      "short": "a20509c",
+      "date": "2026-09-15T15:40:09-05:00",
+      "subject": "Contract: setDeviceClass — the app tells the renderer phone vs desktop at boot so high can be the phone-high pass list (PERF.md §3.1); never inferred from DPR",
+      "index": 150,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/a20509c0deaa1e77d7ecfc53718694a396b83cd5/dist",
+        "wallMs": 17826.264292000094
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a20509c0deaa1e77d7ecfc53718694a396b83cd5/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a20509c0deaa1e77d7ecfc53718694a396b83cd5/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/a20509c0deaa1e77d7ecfc53718694a396b83cd5/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 269257.09970799997,
+        "notes": []
+      }
+    },
+    {
+      "sha": "29317504ea19dd313cf77ea35bc66b9ea06b3385",
+      "short": "2931750",
+      "date": "2026-09-15T15:45:39-05:00",
+      "subject": "Plans: device instruments on this machine (WebKit, iOS simulator, agent-browser) and the no-more-benchmarks decision",
+      "index": 151,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/29317504ea19dd313cf77ea35bc66b9ea06b3385/dist",
+        "wallMs": 9852.052957999986
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/29317504ea19dd313cf77ea35bc66b9ea06b3385/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/29317504ea19dd313cf77ea35bc66b9ea06b3385/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/29317504ea19dd313cf77ea35bc66b9ea06b3385/still-4.0s.png"
+        },
+        "clipFrames": 120,
+        "wallMs": 220348.0291670002,
+        "notes": []
+      }
+    },
+    {
+      "sha": "2b483700e34bf8ea6cd5a704b804749c40851fd8",
+      "short": "2b48370",
+      "date": "2026-09-15T15:56:17-05:00",
+      "subject": "Rider arms on the phone were per-rendered-frame accumulation, not Metal: GltfRider.additive() added each clip's position delta onto bone.position every drawn frame and nothing re-set positions, so idle_breathe's non-zero-mean shoulder rise drifted the shoulders 2.6 m over a 3-minute session and the arm IK pointed the arms at them — invisible to every SwiftShader gate (one render per 10 ticks); restorePositions() each frame, a 3600-frame regression test, and pnpm harness:hero-webkit — a WebKit (ANGLE-on-Metal) hero gate over the phone's ?bench=1 flow (258 cm -> 0.03 cm)",
+      "index": 152,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/2b483700e34bf8ea6cd5a704b804749c40851fd8/dist",
+        "wallMs": 10276.103499999736
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/2b483700e34bf8ea6cd5a704b804749c40851fd8/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/2b483700e34bf8ea6cd5a704b804749c40851fd8/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/2b483700e34bf8ea6cd5a704b804749c40851fd8/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/2b483700e34bf8ea6cd5a704b804749c40851fd8/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 201746.7357089999,
+        "notes": []
+      }
+    },
+    {
+      "sha": "682d05c416580da7b45327856c8e63730bda0dfc",
+      "short": "682d05c",
+      "date": "2026-09-15T15:59:11-05:00",
+      "subject": "Perf cut #3: high on a phone is its own pass list — LDR straight to the canvas at DPR 1.5, the hero-only 512 shadow, an emissive-only bloom at 1/8 res, no SSAO/HDR/composite, volumetrics + decals on, LOD hero — b1 205 calls / 179k tris / 6.57 Mpx / 17 passes -> 148 / 86k / 1.14 effective Mpx / 5 passes; the model recalibrated from device report #1 (4.4 ms/Mpx + 0.02/draw + 1.0) puts phone-high at 9.3 ms on the user's iPhone (old high 35); WebKit/Metal measures it <= medium; desktop tiers byte-identical",
+      "index": 153,
+      "build": {
+        "status": "ok",
+        "dist": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/builds/682d05c416580da7b45327856c8e63730bda0dfc/dist",
+        "wallMs": 13386.92799999984
+      },
+      "capture": {
+        "status": "ok",
+        "track": "b1-first-ride",
+        "stills": {
+          "0.5": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/682d05c416580da7b45327856c8e63730bda0dfc/still-0.5s.png",
+          "2.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/682d05c416580da7b45327856c8e63730bda0dfc/still-2.0s.png",
+          "4.0": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/682d05c416580da7b45327856c8e63730bda0dfc/still-4.0s.png"
+        },
+        "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/timelapse/captures/682d05c416580da7b45327856c8e63730bda0dfc/clip.mp4",
+        "clipFrames": 120,
+        "wallMs": 222655.75100000016,
         "notes": []
       }
     }

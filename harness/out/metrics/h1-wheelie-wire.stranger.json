@@ -7,9 +7,9 @@
     18
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "65175e2d",
-  "updatedAt": "2026-09-15T19:32:09.060Z",
-  "includeStale": true,
+  "srcFingerprint": "7e836cbe",
+  "updatedAt": "2026-09-15T22:34:53.906Z",
+  "includeStale": false,
   "sessions": [
     {
       "sessionId": "h1-wheelie-wire-r7-p1-20260915-021350",
@@ -982,21 +982,597 @@
           "calls": 127
         }
       ]
+    },
+    {
+      "sessionId": "h1-wheelie-wire-r8-p1-20260915-160757",
+      "agent": "p1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "6f0cbe22",
+      "strangerAttempts": 5,
+      "cleared": true,
+      "finishTime": 73.7333,
+      "calls": 25,
+      "wallMs": 464268,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        3,
+        0,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 5,
+        "cleared": true,
+        "x": 622.3,
+        "startTick": 7217,
+        "endTick": 9217,
+        "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8-p1-20260915-160757.json"
+      },
+      "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8-p1-20260915-160757.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 235.523,
+          "checkpoint": 1,
+          "obstacle": "gap @ 234.3 m",
+          "calls": 7
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 220.234,
+          "checkpoint": 1,
+          "obstacle": "gap @ 219.3 m",
+          "calls": 8
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 220.484,
+          "checkpoint": 1,
+          "obstacle": "gap @ 219.3 m",
+          "calls": 12
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 507.102,
+          "checkpoint": 3,
+          "obstacle": "gap @ 512.5 m",
+          "calls": 20
+        }
+      ]
+    },
+    {
+      "sessionId": "h1-wheelie-wire-r8-p2-20260915-160757",
+      "agent": "p2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "817dddd2",
+      "strangerAttempts": 16,
+      "cleared": true,
+      "finishTime": 244.7333,
+      "calls": 88,
+      "wallMs": 968095,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        4,
+        7,
+        3,
+        0
+      ],
+      "bestAttempt": {
+        "n": 16,
+        "cleared": true,
+        "x": 622.3,
+        "startTick": 27023,
+        "endTick": 29718,
+        "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8-p2-20260915-160757.json"
+      },
+      "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8-p2-20260915-160757.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 177.794,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 10
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 227.245,
+          "checkpoint": 1,
+          "obstacle": "gap @ 228.3 m",
+          "calls": 18
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 211.3,
+          "checkpoint": 1,
+          "obstacle": "wall @ 210.3 m",
+          "calls": 21
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 213.054,
+          "checkpoint": 1,
+          "obstacle": "gap @ 219.3 m",
+          "calls": 23
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 220.146,
+          "checkpoint": 1,
+          "obstacle": "gap @ 219.3 m",
+          "calls": 25
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 354.526,
+          "checkpoint": 2,
+          "obstacle": "gap @ 359.8 m",
+          "calls": 34
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 354.321,
+          "checkpoint": 2,
+          "obstacle": "gap @ 359.8 m",
+          "calls": 36
+        },
+        {
+          "n": 8,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 467.12,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 41
+        },
+        {
+          "n": 9,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 464.353,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 47
+        },
+        {
+          "n": 10,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 464.728,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 53
+        },
+        {
+          "n": 11,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 464.73,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 58
+        },
+        {
+          "n": 12,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 465.666,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 63
+        },
+        {
+          "n": 13,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 501.226,
+          "checkpoint": 3,
+          "obstacle": "wall @ 501.5 m",
+          "calls": 71
+        },
+        {
+          "n": 14,
+          "endedBy": "fault",
+          "reason": "hazard",
+          "x": 512.965,
+          "checkpoint": 3,
+          "obstacle": "gap @ 512.5 m",
+          "calls": 74
+        },
+        {
+          "n": 15,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 560.766,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 79
+        }
+      ]
+    },
+    {
+      "sessionId": "h1-wheelie-wire-r8-p3-20260915-160757",
+      "agent": "p3",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "6f0cbe22",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 61.675,
+      "calls": 32,
+      "wallMs": 336481,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 622.3,
+        "startTick": 6800,
+        "endTick": 7753,
+        "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8-p3-20260915-160757.json"
+      },
+      "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8-p3-20260915-160757.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 362.13,
+          "checkpoint": 2,
+          "obstacle": "gap @ 362.3 m",
+          "calls": 18
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 578.177,
+          "checkpoint": 4,
+          "obstacle": null,
+          "calls": 29
+        }
+      ]
+    },
+    {
+      "sessionId": "h1-wheelie-wire-r8p-p1-20260915-162624",
+      "agent": "p1",
+      "bike": "pro",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "817dddd2",
+      "strangerAttempts": 8,
+      "cleared": true,
+      "finishTime": 128.4,
+      "calls": 56,
+      "wallMs": 709285,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        2,
+        3,
+        1,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 8,
+        "cleared": true,
+        "x": 622.3,
+        "startTick": 13825,
+        "endTick": 15827,
+        "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8p-p1-20260915-162624.json"
+      },
+      "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8p-p1-20260915-162624.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 172.493,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 12
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 182.716,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 20
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 218.554,
+          "checkpoint": 1,
+          "obstacle": "gap @ 219.3 m",
+          "calls": 28
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "hazard",
+          "x": 222.815,
+          "checkpoint": 1,
+          "obstacle": "gap @ 222.3 m",
+          "calls": 31
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 215.82,
+          "checkpoint": 1,
+          "obstacle": "gap @ 219.3 m",
+          "calls": 32
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 364.705,
+          "checkpoint": 2,
+          "obstacle": "gap @ 364.8 m",
+          "calls": 44
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 512.21,
+          "checkpoint": 3,
+          "obstacle": "gap @ 512.5 m",
+          "calls": 50
+        }
+      ]
+    },
+    {
+      "sessionId": "h1-wheelie-wire-r8p-p2-20260915-162624",
+      "agent": "p2",
+      "bike": "pro",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "817dddd2",
+      "strangerAttempts": 8,
+      "cleared": true,
+      "finishTime": 153.6417,
+      "calls": 51,
+      "wallMs": 966111,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        2,
+        2,
+        1,
+        2,
+        0
+      ],
+      "bestAttempt": {
+        "n": 8,
+        "cleared": true,
+        "x": 622.3,
+        "startTick": 16562,
+        "endTick": 18807,
+        "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8p-p2-20260915-162624.json"
+      },
+      "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8p-p2-20260915-162624.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 105.941,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 5
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 106.728,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 8
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 217.258,
+          "checkpoint": 1,
+          "obstacle": "gap @ 219.3 m",
+          "calls": 17
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "hazard",
+          "x": 231.988,
+          "checkpoint": 1,
+          "obstacle": "gap @ 231.3 m",
+          "calls": 19
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 355.331,
+          "checkpoint": 2,
+          "obstacle": "gap @ 359.8 m",
+          "calls": 27
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "hazard",
+          "x": 520.58,
+          "checkpoint": 3,
+          "obstacle": "gap @ 520.0 m",
+          "calls": 42
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 556.305,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 45
+        }
+      ]
+    },
+    {
+      "sessionId": "h1-wheelie-wire-r8p-p3-20260915-162624",
+      "agent": "p3",
+      "bike": "pro",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "817dddd2",
+      "strangerAttempts": 8,
+      "cleared": true,
+      "finishTime": 150.75,
+      "calls": 57,
+      "wallMs": 893131,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        3,
+        0,
+        0,
+        4,
+        0
+      ],
+      "bestAttempt": {
+        "n": 8,
+        "cleared": true,
+        "x": 622.3,
+        "startTick": 16344,
+        "endTick": 18452,
+        "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8p-p3-20260915-162624.json"
+      },
+      "recordingFile": "harness/inputs/h1-wheelie-wire/stranger-h1-wheelie-wire-r8p-p3-20260915-162624.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 100.729,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 6
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 175.476,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 16
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 174.054,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 20
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 546.645,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 39
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 531.984,
+          "checkpoint": 3,
+          "obstacle": "gap @ 532.5 m",
+          "calls": 42
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 531.674,
+          "checkpoint": 3,
+          "obstacle": "gap @ 532.5 m",
+          "calls": 47
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 558.403,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 51
+        }
+      ]
     }
   ],
   "bike": "pro",
   "completed": 3,
   "clearedCount": 3,
-  "medianAttempts": 16,
-  "medianFinishTime": 143.9,
-  "medianCalls": 55,
-  "medianWallMs": 653364,
+  "medianAttempts": 8,
+  "medianFinishTime": 150.75,
+  "medianCalls": 56,
+  "medianWallMs": 893131,
   "census": {
     "n": 3,
     "minSessions": 2,
     "censored": [],
-    "staleExcluded": 0,
-    "otherBikeExcluded": 3
+    "staleExcluded": 3,
+    "otherBikeExcluded": 6
   },
   "asserted": {
     "band": [
@@ -1006,154 +1582,97 @@
     "factor": 1.5,
     "limit": 27
   },
-  "verdict": "PASS",
-  "pass": true,
+  "verdict": "UNDER-BAND",
+  "pass": false,
   "deaths": {
-    "total": 42,
+    "total": 21,
     "byReason": {
-      "crash": 39,
+      "crash": 18,
       "hazard": 3
     },
     "byObstacle": [
       {
         "obstacle": "ground",
-        "count": 11,
+        "count": 10,
         "xs": [
-          22.6,
-          546,
-          555.4,
-          19.5,
-          375.5,
-          11.5,
-          176.7,
-          171.6,
-          325.7,
-          385,
-          503.9
-        ]
-      },
-      {
-        "obstacle": "gap @ 362.3 m",
-        "count": 6,
-        "xs": [
-          361.6,
-          361.1,
-          361.1,
-          363.1,
-          361.1,
-          362.5
+          172.5,
+          182.7,
+          105.9,
+          106.7,
+          556.3,
+          100.7,
+          175.5,
+          174.1,
+          546.6,
+          558.4
         ]
       },
       {
         "obstacle": "gap @ 219.3 m",
-        "count": 5,
-        "xs": [
-          220.2,
-          217,
-          214.3,
-          219.2,
-          213.9
-        ]
-      },
-      {
-        "obstacle": "arch @ 3.0 m",
         "count": 3,
         "xs": [
-          4.1,
-          4.1,
-          4.1
-        ]
-      },
-      {
-        "obstacle": "gap @ 524.5 m",
-        "count": 3,
-        "xs": [
-          524.2,
-          525.1,
-          523.7
-        ]
-      },
-      {
-        "obstacle": "gap @ 51.0 m",
-        "count": 2,
-        "xs": [
-          50,
-          51.9
-        ]
-      },
-      {
-        "obstacle": "gap @ 359.8 m",
-        "count": 2,
-        "xs": [
-          360.7,
-          360.2
-        ]
-      },
-      {
-        "obstacle": "gap @ 364.8 m",
-        "count": 2,
-        "xs": [
-          363.8,
-          364.4
+          218.6,
+          215.8,
+          217.3
         ]
       },
       {
         "obstacle": "gap @ 532.5 m",
         "count": 2,
         "xs": [
-          533.2,
-          533.1
+          532,
+          531.7
         ]
       },
       {
-        "obstacle": "gap @ 56.0 m",
+        "obstacle": "gap @ 222.3 m",
         "count": 1,
         "xs": [
-          56.6
+          222.8
         ]
       },
       {
-        "obstacle": "ramp @ 267.3 m",
+        "obstacle": "gap @ 364.8 m",
         "count": 1,
         "xs": [
-          264.6
+          364.7
         ]
       },
       {
-        "obstacle": "gap @ 53.5 m",
+        "obstacle": "gap @ 512.5 m",
         "count": 1,
         "xs": [
-          53.5
-        ]
-      },
-      {
-        "obstacle": "ramp @ 206.8 m",
-        "count": 1,
-        "xs": [
-          203.5
+          512.2
         ]
       },
       {
         "obstacle": "gap @ 231.3 m",
         "count": 1,
         "xs": [
-          231.9
+          232
         ]
       },
       {
-        "obstacle": "gap @ 225.3 m",
+        "obstacle": "gap @ 359.8 m",
         "count": 1,
         "xs": [
-          224.3
+          355.3
+        ]
+      },
+      {
+        "obstacle": "gap @ 520.0 m",
+        "count": 1,
+        "xs": [
+          520.6
         ]
       }
     ],
     "byCheckpoint": [
-      6,
-      6,
-      10,
-      12,
-      8,
+      0,
+      7,
+      5,
+      2,
+      7,
       0
     ]
   }

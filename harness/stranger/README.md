@@ -14,6 +14,7 @@ cleared, band[0] <= median <= 1.5 x band[1]) · `FAIL` (median above the limit o
 (all cleared, median below the authored floor — easier than authored; within the ship limit, a tracks note) · `INSUFFICIENT`
 (n < 2) · `n/a` (no band).
 
+0. **Bike.** `start` / `prep` default to the tier's bike (`defaultBikeForTier`, round 12); `--bike rookie|pro` overrides. Round 12's first hard round rode nine Rookie sessions because the old default was Rookie — they stand as informational rows.
 1. Either create the session yourself (`pnpm harness:stranger start --track <id> --agent <name>` prints the session id and the first `look`) or let the stranger do it — PROTOCOL.md's Setup section tells it to run `start` on `b1-first-ride` unless you name another track. Node physics only, no browser; state lives in `harness/out/stranger/<track>/<id>/` (`state.json`, `attempts/NNN.json`, `log.txt`).
 2. Spawn a **fresh** agent (no repo context, no `src/`, no bot output). Its whole prompt is `PROTOCOL.md` verbatim, optionally plus one line naming the track (and the session id if you created it). Nothing else.
 3. It plays with `pnpm harness:stranger <cmd> --session <id>` (env `TRIALS_STRANGER_SESSION=<id>` also works). Every call reloads the sim from the snapshot, so calls are independent processes but the run is continuous; there is no undo.

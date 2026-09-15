@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AUDIO_PAIRS, audioPairFilter, audioTag, bareId, beatOfAudioTag, gainDbFor, sidesFor } from './audio';
+import { AUDIO_PAIRS, DEFAULT_LOWPASS_HZ, audioPairFilter, audioTag, bareId, beatOfAudioTag, gainDbFor, lowpassChain, sidesFor } from './audio';
 import { tagOfPairId } from './critic-prompt';
 import { unmask } from './log';
 import { coinLeft, makePairId } from './pair';
@@ -77,5 +77,13 @@ describe('the black picture filter', () => {
     expect(f).toContain('apad=pad_dur=1.000');
     expect(f).toContain('concat=n=2:v=0:a=1');
     expect((f.match(/color=0xffd166/g) ?? []).length).toBe(16);
+  });
+});
+
+describe('lowpass (round 12)', () => {
+  it('is a 14 kHz low-pass by default and nothing at 0', () => {
+    expect(DEFAULT_LOWPASS_HZ).toBe(14000);
+    expect(lowpassChain(DEFAULT_LOWPASS_HZ)).toBe('lowpass=f=14000,');
+    expect(lowpassChain(0)).toBe('');
   });
 });

@@ -1,8 +1,8 @@
-# Reflex bot — skill novice / average / good, 3 seed(s), bikes rookie + pro, src 65175e2d, 2026-09-15T19:32:22.118Z, wall 79 s
+# Reflex bot — skill novice / average / good, 3 seed(s), bikes rookie + pro, src 6412a755, 2026-09-15T21:11:42.594Z, wall 85 s
 
 attempts = 1 + faults (all reasons); cap 50; sim cap 600 s (extreme tier 1800 s). Rookie = `<track>.reflex.json`, Pro = `<track>.pro.reflex.json`; the band is authored for the tier's default bike (average). Death sites: nearest placed obstacle (name @ x) with the rule the rider was executing.
 
-## Rookie bike — skill novice, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 65175e2d, 2026-09-15T19:32:22.118Z, wall 13 s
+## Rookie bike — skill novice, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 6412a755, 2026-09-15T21:11:42.594Z, wall 15 s
 
 Reaction 230–280 ms, glances 20 Hz, pitch noise ±3°, speed noise ±7%, taps 100 ms, lapses every ~6 s.
 
@@ -28,7 +28,7 @@ Reaction 230–280 ms, glances 20 Hz, pitch noise ±3°, speed noise ±7%, taps 
 | lab-physics-test | medium | 3–8 | 1, 1, 1 | 1 | 3/3 | 11.1 s | 100% | — |
 | lab-flat-200 | beginner | 1–1 | 1, 1, 1 | 1 | 3/3 | 21.2 s | 100% | — |
 
-## Rookie bike — skill average, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 65175e2d, 2026-09-15T19:32:35.442Z, wall 10 s
+## Rookie bike — skill average, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 6412a755, 2026-09-15T21:11:57.701Z, wall 12 s
 
 Reaction 180–220 ms, glances 25 Hz, pitch noise ±2°, speed noise ±5%, taps 80 ms, lapses every ~10 s.
 
@@ -54,7 +54,7 @@ Reaction 180–220 ms, glances 25 Hz, pitch noise ±2°, speed noise ±5%, taps 
 | lab-physics-test | medium | 3–8 | 1, 1, 1 | 1 | 3/3 | 9.8 s | 100% | — |
 | lab-flat-200 | beginner | 1–1 | 1, 1, 1 | 1 | 3/3 | 18.0 s | 100% | — |
 
-## Rookie bike — skill good, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 65175e2d, 2026-09-15T19:32:45.414Z, wall 12 s
+## Rookie bike — skill good, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 6412a755, 2026-09-15T21:12:09.624Z, wall 12 s
 
 Reaction 150–170 ms, glances 30 Hz, pitch noise ±1.5°, speed noise ±4%, taps 70 ms, lapses every ~20 s.
 
@@ -80,89 +80,89 @@ Reaction 150–170 ms, glances 30 Hz, pitch noise ±1.5°, speed noise ±4%, tap
 | lab-physics-test | medium | 3–8 | 1, 1, 1 | 1 | 3/3 | 9.0 s | 100% | — |
 | lab-flat-200 | beginner | 1–1 | 1, 1, 1 | 1 | 3/3 | 15.9 s | 100% | — |
 
-## Pro bike — skill novice, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 65175e2d, 2026-09-15T19:32:56.984Z, wall 16 s
+## Pro bike — skill novice, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 6412a755, 2026-09-15T21:12:21.831Z, wall 16 s
 
 Reaction 230–280 ms, glances 20 Hz, pitch noise ±3°, speed noise ±7%, taps 100 ms, lapses every ~6 s.
 
 | track | tier | band | attempts (seeds) | median | clears | time to clear (median) | best % | where it died (count · rule) |
 |---|---|---|---|---:|---|---:|---:|---|
-| flat-test | beginner | — | 1, 4, 2 | 2 | 3/3 | 17.0 s | 100% | ground @ 10 m ×2 (air-short); ground @ 5 m ×1 (air-short); ground @ 25 m ×1 (air-short) |
-| gap-test | beginner | 1–3 | 2, 5, 5 | 5 | 3/3 | 20.1 s | 100% | ground @ 10 m ×2 (air-short); ground @ 15 m ×2 (air-short); ramp @ 30.0 m ×2 (air-short) |
-| b1-first-ride | beginner | 1–1 | 9, 2, 2 | 2 | 3/3 | 79.2 s | 100% | ground @ 15 m ×2 (air-short); ground @ 5 m ×1 (nose-high); ground @ 10 m ×1 (air-short) |
-| b2-lean-back | beginner | 1–2 | 8, 10, 24 | 10 | 3/3 | 146.4 s | 100% | box @ 411.2 m ×4 (nose-high); ground @ 5 m ×3 (nose-high); ramp @ 114.6 m ×3 (air-short) |
-| b3-kicker-row | beginner | 1–2 | 25, 45, 15 | 25 | 3/3 | 201.1 s | 100% | ramp @ 334.8 m ×7 (nose-high); ramp @ 399.8 m ×7 (air-short); box @ 415.8 m ×7 (nose-low) |
-| e1-uphill-weight | easy | 2–4 | 51, 51, 51 | 51 | 0/3 | — | 76% | ramp @ 211.0 m ×21 (air-short); ground @ 215 m ×15 (air-short); ramp @ 200.2 m ×9 (nose-high) |
-| e2-rear-wheel-first | easy | 3–5 | 51, 27, 51, 51, 51, 48, 51, 51, 51 | 51 | 2/9 | 284.1 s | 100% | ramp @ 57.0 m ×38 (air-short); box @ 72.0 m ×31 (air-short); box @ 183.2 m ×26 (air-short) |
-| e3-stairway | easy | 3–6 | 43, 16, 40, 34, 27, 34, 30, 27, 25 | 30 | 9/9 | 256.5 s | 100% | gap @ 422.2 m ×28 (air-short); stair @ 250.8 m ×16 (air-short); stair @ 266.8 m ×13 (air-short) |
-| m1-hop-up | medium | 5–9 | 37, 51, 13, 24, 51, 16, 51, 15, 48 | 37 | 6/9 | 149.7 s | 100% | ledge @ 109.0 m ×65 (stuck-restart); gap @ 113.0 m ×23 (air-short); ledge @ 272.3 m ×21 (air-short) |
-| m2-drum-roll | medium | 6–12 | 51, 51, 51 | 51 | 0/3 | — | 91% | drum @ 40.0 m ×16 (nose-high); drum @ 47.6 m ×15 (air-short); ramp @ 311.2 m ×14 (air-short) |
-| m3-see-saw | medium | 8–12 | 51, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 0/9 | — | 87% | ground @ 190 m ×36 (seesaw-tip-air); ramp @ 202.6 m ×36 (air-short); ground @ 195 m ×24 (air-short) |
-| h1-wheelie-wire | hard | 10–18 | 51, 51, 51 | 51 | 0/3 | — | 65% | gap @ 219.3 m ×47 (air-short); gap @ 222.3 m ×16 (nose-high); gap @ 225.3 m ×9 (air-short) |
-| h2-gap-chain | hard | 14–22 | 51, 51, 51 | 51 | 0/3 | — | 16% | ramp @ 62.0 m ×32 (air-gas-nose-up); ramp @ 73.0 m ×24 (air-gas-nose-up); box @ 65.0 m ×18 (air-short) |
-| h3-fire-line | hard | 18–25 | 51, 51, 51 | 51 | 0/3 | — | 83% | ledge @ 252.0 m ×21 (nose-low); ground @ 210 m ×11 (air-short); ground @ 35 m ×9 (air-short) |
-| x1-vertical-limit | extreme | 30–45 | 51, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 0/9 | — | 79% | ground @ 245 m ×35 (air-short); pole @ 114.3 m ×23 (air-gas-nose-up); pole @ 425.7 m ×22 (air-gas-nose-up) |
-| x2-pipe-dream | extreme | 40–60 | 51, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 0/9 | — | 83% | ramp @ 74.6 m ×99 (air-short); ramp @ 62.6 m ×56 (air-short); box @ 213.2 m ×26 (air-short) |
-| x3-gauntlet | extreme | 60–80 | 51, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 0/9 | — | 89% | box @ 52.1 m ×68 (air-short); ground @ 55 m ×59 (air-short); ramp @ 48.0 m ×41 (air-short) |
-| lab-physics-test | medium | 3–8 | 7, 1, 11 | 7 | 3/3 | 39.1 s | 100% | ground @ 50 m ×3 (air-short); ground @ 10 m ×2 (air-short); ground @ 15 m ×2 (nose-high) |
-| lab-flat-200 | beginner | 1–1 | 2, 3, 2 | 2 | 3/3 | 25.3 s | 100% | ground @ 10 m ×2 (nose-high); ground @ 5 m ×1 (nose-high); ground @ 115 m ×1 (nose-high) |
+| flat-test | beginner | — | 1, 1, 1 | 1 | 3/3 | 13.3 s | 100% | — |
+| gap-test | beginner | 1–3 | 1, 1, 1 | 1 | 3/3 | 8.0 s | 100% | — |
+| b1-first-ride | beginner | 1–1 | 1, 3, 2 | 2 | 3/3 | 72.6 s | 100% | ground @ 80 m ×1 (nose-low); ground @ 105 m ×1 (air-short); ground @ 560 m ×1 (nose-low) |
+| b2-lean-back | beginner | 1–2 | 2, 4, 6 | 4 | 3/3 | 99.7 s | 100% | ground @ 365 m ×3 (air-short); ground @ 5 m ×1 (nose-high); drum @ 27.0 m ×1 (nose-low) |
+| b3-kicker-row | beginner | 1–2 | 14, 1, 14 | 14 | 3/3 | 142.7 s | 100% | ramp @ 409.8 m ×3 (air-brake-nose-down); ground @ 200 m ×2 (nose-low); ground @ 345 m ×2 (nose-low) |
+| e1-uphill-weight | easy | 2–4 | 15, 21, 10 | 15 | 3/3 | 165.4 s | 100% | ramp @ 75.2 m ×3 (nose-low); ramp @ 309.7 m ×3 (air-short); box @ 441.3 m ×3 (air-short) |
+| e2-rear-wheel-first | easy | 3–5 | 17, 25, 31, 28, 36, 49, 21, 46, 27 | 28 | 9/9 | 302.3 s | 100% | box @ 505.4 m ×39 (air-short); box @ 525.4 m ×21 (air-brake-nose-down); ramp @ 493.4 m ×17 (air-gas-nose-up) |
+| e3-stairway | easy | 3–6 | 6, 5, 6, 10, 3, 6, 5, 7, 6 | 6 | 9/9 | 98.1 s | 100% | ramp @ 423.7 m ×5 (air-short); ramp @ 192.8 m ×4 (nose-high); ground @ 60 m ×3 (air-gas-nose-up) |
+| m1-hop-up | medium | 5–9 | 9, 15, 33, 17, 10, 16, 28, 18, 21 | 17 | 9/9 | 152.2 s | 100% | ledge @ 109.0 m ×35 (stuck-restart); ledge @ 272.3 m ×21 (stuck-restart); ledge @ 280.3 m ×16 (air-short) |
+| m2-drum-roll | medium | 6–12 | 51, 23, 15 | 23 | 2/3 | 183.3 s | 100% | ramp @ 311.2 m ×14 (air-short); ramp @ 422.4 m ×12 (air-short); ramp @ 412.4 m ×8 (air-short) |
+| m3-see-saw | medium | 8–12 | 51, 51, 10, 26, 51, 51, 12, 8, 23 | 26 | 5/9 | 150.8 s | 100% | ground @ 405 m ×55 (air-brake-nose-down); ground @ 410 m ×37 (air-short); box @ 438.9 m ×31 (air-gas-nose-up) |
+| h1-wheelie-wire | hard | 10–18 | 19, 37, 18 | 19 | 3/3 | 197.8 s | 100% | gap @ 219.3 m ×21 (air-short); gap @ 512.5 m ×5 (air-short); gap @ 515.0 m ×5 (air-short) |
+| h2-gap-chain | hard | 14–22 | 51, 51, 51 | 51 | 0/3 | — | 45% | ramp @ 234.8 m ×40 (air-gas-nose-up); ramp @ 223.8 m ×24 (air-gas-nose-up); ramp @ 62.0 m ×13 (air-gas-nose-up) |
+| h3-fire-line | hard | 18–25 | 15, 51, 51 | 51 | 1/3 | 174.2 s | 100% | ledge @ 252.0 m ×23 (nose-low); ramp @ 483.0 m ×13 (air-brake-nose-down); ramp @ 236.0 m ×11 (air-gas-nose-up) |
+| x1-vertical-limit | extreme | 30–45 | 51, 46, 49, 51, 51, 51, 7, 51, 51 | 51 | 3/9 | 386.2 s | 100% | pole @ 427.3 m ×64 (air-gas-nose-up); pole @ 425.7 m ×58 (air-gas-nose-up); pole @ 428.9 m ×57 (pit-lip) |
+| x2-pipe-dream | extreme | 40–60 | 48, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 1/9 | 401.2 s | 100% | ramp @ 74.6 m ×53 (air-short); ramp @ 437.2 m ×44 (air-short); ramp @ 62.6 m ×40 (air-short) |
+| x3-gauntlet | extreme | 60–80 | 21, 35, 51, 50, 51, 27, 51, 51, 51 | 51 | 4/9 | 292.1 s | 100% | ledge @ 192.9 m ×90 (stuck-restart); ground @ 275 m ×38 (air-short); ground @ 280 m ×32 (air-short) |
+| lab-physics-test | medium | 3–8 | 2, 2, 2 | 2 | 3/3 | 14.9 s | 100% | ground @ 65 m ×2 (air-gas-nose-up); ground @ 15 m ×1 (nose-high) |
+| lab-flat-200 | beginner | 1–1 | 3, 1, 1 | 1 | 3/3 | 21.3 s | 100% | ground @ 15 m ×1 (nose-high); ground @ 20 m ×1 (air-short) |
 
-## Pro bike — skill average, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 65175e2d, 2026-09-15T19:33:12.760Z, wall 14 s
+## Pro bike — skill average, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 6412a755, 2026-09-15T21:12:38.050Z, wall 15 s
 
 Reaction 180–220 ms, glances 25 Hz, pitch noise ±2°, speed noise ±5%, taps 80 ms, lapses every ~10 s.
 
 | track | tier | band | attempts (seeds) | median | clears | time to clear (median) | best % | where it died (count · rule) |
 |---|---|---|---|---:|---|---:|---:|---|
-| flat-test | beginner | — | 2, 2, 2 | 2 | 3/3 | 14.2 s | 100% | ground @ 10 m ×3 (air-short) |
-| gap-test | beginner | 1–3 | 2, 7, 4 | 4 | 3/3 | 17.9 s | 100% | ramp @ 30.0 m ×4 (air-short); ground @ 10 m ×3 (air-short); gap @ 34.0 m ×1 (air-short) |
-| b1-first-ride | beginner | 1–1 | 2, 8, 2 | 2 | 3/3 | 59.2 s | 100% | ground @ 10 m ×4 (nose-high); ground @ 75 m ×1 (nose-high); ground @ 85 m ×1 (touchdown) |
-| b2-lean-back | beginner | 1–2 | 7, 6, 9 | 7 | 3/3 | 85.9 s | 100% | drum @ 18.0 m ×3 (nose-high); box @ 271.8 m ×3 (nose-high); ground @ 10 m ×2 (nose-high) |
-| b3-kicker-row | beginner | 1–2 | 9, 12, 16 | 12 | 3/3 | 106.0 s | 100% | ramp @ 423.8 m ×6 (air-short); box @ 415.8 m ×4 (air-short); ground @ 10 m ×3 (nose-high) |
-| e1-uphill-weight | easy | 2–4 | 35, 51, 50 | 50 | 2/3 | 365.6 s | 100% | ramp @ 449.9 m ×12 (air-short); ramp @ 75.2 m ×11 (air-short); ramp @ 211.0 m ×10 (air-short) |
-| e2-rear-wheel-first | easy | 3–5 | 33, 37, 34, 24, 28, 27, 51, 29, 25 | 29 | 8/9 | 243.3 s | 100% | box @ 505.4 m ×25 (air-short); ramp @ 191.2 m ×22 (air-short); box @ 72.0 m ×16 (air-short) |
-| e3-stairway | easy | 3–6 | 17, 9, 22, 5, 14, 17, 6, 8, 18 | 14 | 9/9 | 128.3 s | 100% | stair @ 151.2 m ×13 (nose-high); stair @ 250.8 m ×9 (air-short); stair @ 400.2 m ×9 (air-short) |
-| m1-hop-up | medium | 5–9 | 16, 17, 31, 38, 10, 22, 34, 32, 25 | 25 | 9/9 | 173.3 s | 100% | ledge @ 109.0 m ×45 (stuck-restart); gap @ 113.0 m ×14 (air-gas-nose-up); ledge @ 280.3 m ×13 (air-short) |
-| m2-drum-roll | medium | 6–12 | 14, 51, 21 | 21 | 2/3 | 150.8 s | 100% | drum @ 47.6 m ×16 (air-short); drum @ 53.2 m ×14 (air-short); ramp @ 295.0 m ×7 (nose-high) |
-| m3-see-saw | medium | 8–12 | 51, 37, 51, 51, 51, 51, 51, 51, 46 | 51 | 2/9 | 321.5 s | 100% | ground @ 410 m ×72 (air-short); ramp @ 202.6 m ×44 (air-short); ramp @ 421.4 m ×19 (air-short) |
-| h1-wheelie-wire | hard | 10–18 | 51, 51, 51 | 51 | 0/3 | — | 91% | gap @ 219.3 m ×19 (air-short); gap @ 359.8 m ×14 (air-short); gap @ 512.5 m ×14 (air-short) |
-| h2-gap-chain | hard | 14–22 | 51, 51, 51 | 51 | 0/3 | — | 88% | ramp @ 234.8 m ×25 (air-gas-nose-up); ramp @ 245.8 m ×14 (air-brake-nose-down); ramp @ 223.8 m ×10 (air-gas-nose-up) |
-| h3-fire-line | hard | 18–25 | 30, 51, 51 | 51 | 1/3 | 229.6 s | 100% | ledge @ 252.0 m ×15 (nose-low); ledge @ 505.0 m ×10 (nose-low); ground @ 255 m ×8 (air-short) |
-| x1-vertical-limit | extreme | 30–45 | 51, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 0/9 | — | 84% | ground @ 245 m ×77 (air-short); pole @ 114.3 m ×26 (air-gas-nose-up); ramp @ 255.7 m ×25 (air-short) |
-| x2-pipe-dream | extreme | 40–60 | 51, 51, 51, 51, 24, 51, 51, 51, 51 | 51 | 1/9 | 215.2 s | 100% | ramp @ 74.6 m ×64 (air-short); box @ 213.2 m ×37 (air-short); box @ 216.2 m ×25 (air-short) |
-| x3-gauntlet | extreme | 60–80 | 51, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 0/9 | — | 94% | ramp @ 64.1 m ×52 (air-short); box @ 52.1 m ×47 (air-short); ledge @ 192.9 m ×40 (stuck-restart) |
-| lab-physics-test | medium | 3–8 | 2, 2, 1 | 2 | 3/3 | 12.3 s | 100% | ground @ 5 m ×1 (air-short); ground @ 10 m ×1 (air-short) |
-| lab-flat-200 | beginner | 1–1 | 2, 2, 2 | 2 | 3/3 | 20.7 s | 100% | ground @ 5 m ×2 (air-short); ground @ 10 m ×1 (air-short) |
+| flat-test | beginner | — | 1, 2, 1 | 1 | 3/3 | 11.6 s | 100% | ground @ 15 m ×1 (nose-high) |
+| gap-test | beginner | 1–3 | 1, 1, 1 | 1 | 3/3 | 7.4 s | 100% | — |
+| b1-first-ride | beginner | 1–1 | 2, 2, 1 | 2 | 3/3 | 63.9 s | 100% | ground @ 470 m ×1 (air-short); ground @ 565 m ×1 (air-short) |
+| b2-lean-back | beginner | 1–2 | 5, 1, 2 | 2 | 3/3 | 61.2 s | 100% | ground @ 35 m ×1 (air-short); ramp @ 78.6 m ×1 (nose-high); ground @ 155 m ×1 (nose-low) |
+| b3-kicker-row | beginner | 1–2 | 7, 9, 9 | 9 | 3/3 | 105.7 s | 100% | ground @ 350 m ×3 (air-short); ground @ 85 m ×2 (touchdown); ground @ 240 m ×2 (air-short) |
+| e1-uphill-weight | easy | 2–4 | 17, 29, 17 | 17 | 3/3 | 187.0 s | 100% | ramp @ 449.9 m ×7 (air-short); ramp @ 75.2 m ×5 (nose-low); box @ 441.3 m ×5 (air-short) |
+| e2-rear-wheel-first | easy | 3–5 | 19, 17, 30, 9, 36, 19, 20, 43, 23 | 20 | 9/9 | 191.2 s | 100% | box @ 505.4 m ×32 (air-short); ramp @ 191.2 m ×25 (air-short); box @ 525.4 m ×14 (air-short) |
+| e3-stairway | easy | 3–6 | 3, 2, 4, 2, 4, 5, 2, 2, 2 | 2 | 9/9 | 64.0 s | 100% | ramp @ 178.8 m ×2 (nose-high); ground @ 275 m ×2 (air-short); ground @ 60 m ×1 (air-short) |
+| m1-hop-up | medium | 5–9 | 12, 11, 7, 8, 11, 4, 10, 17, 11 | 11 | 9/9 | 110.3 s | 100% | ledge @ 109.0 m ×23 (stuck-restart); gap @ 113.0 m ×9 (air-short); ledge @ 280.3 m ×9 (air-short) |
+| m2-drum-roll | medium | 6–12 | 7, 17, 11 | 11 | 3/3 | 124.8 s | 100% | drum @ 47.6 m ×4 (air-short); drum @ 53.2 m ×3 (air-brake-nose-down); ramp @ 412.4 m ×3 (air-gas-nose-up) |
+| m3-see-saw | medium | 8–12 | 13, 38, 51, 8, 8, 34, 9, 27, 9 | 13 | 8/9 | 127.0 s | 100% | ground @ 410 m ×61 (air-short); ground @ 405 m ×22 (seesaw-tip-air); ramp @ 421.4 m ×20 (air-short) |
+| h1-wheelie-wire | hard | 10–18 | 26, 34, 10 | 26 | 3/3 | 240.6 s | 100% | gap @ 219.3 m ×15 (air-short); gap @ 512.5 m ×12 (air-short); gap @ 515.0 m ×6 (air-short) |
+| h2-gap-chain | hard | 14–22 | 26, 51, 51 | 51 | 1/3 | 244.6 s | 100% | ramp @ 234.8 m ×19 (air-gas-nose-up); ramp @ 223.8 m ×14 (air-brake-nose-down); ramp @ 245.8 m ×12 (air-gas-nose-up) |
+| h3-fire-line | hard | 18–25 | 24, 15, 32 | 24 | 3/3 | 211.6 s | 100% | ledge @ 252.0 m ×9 (air-short); ramp @ 483.0 m ×7 (air-short); ramp @ 401.4 m ×6 (air-short) |
+| x1-vertical-limit | extreme | 30–45 | 45, 51, 16, 51, 35, 51, 51, 51, 36 | 51 | 4/9 | 300.1 s | 100% | ground @ 245 m ×63 (air-short); pole @ 114.3 m ×30 (air-gas-nose-up); ground @ 585 m ×25 (air-short) |
+| x2-pipe-dream | extreme | 40–60 | 33, 51, 51, 25, 51, 51, 51, 51, 51 | 51 | 2/9 | 265.5 s | 100% | ramp @ 437.2 m ×83 (air-short); drum @ 362.6 m ×36 (air-gas-nose-up); drum @ 445.8 m ×33 (air-gas-nose-up) |
+| x3-gauntlet | extreme | 60–80 | 51, 51, 51, 51, 46, 51, 51, 39, 31 | 51 | 3/9 | 322.4 s | 100% | box @ 52.1 m ×42 (air-short); ledge @ 192.9 m ×38 (stuck-restart); ground @ 280 m ×33 (air-short) |
+| lab-physics-test | medium | 3–8 | 2, 1, 1 | 1 | 3/3 | 10.8 s | 100% | ground @ 85 m ×1 (nose-high) |
+| lab-flat-200 | beginner | 1–1 | 1, 1, 1 | 1 | 3/3 | 18.9 s | 100% | — |
 
-## Pro bike — skill good, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 65175e2d, 2026-09-15T19:33:27.002Z, wall 14 s
+## Pro bike — skill good, 3 seed(s) (9 on e2-rear-wheel-first, e3-stairway, m1-hop-up, m3-see-saw, x1-vertical-limit, x2-pipe-dream, x3-gauntlet), physics bikePhysicsFactory-v2, src 6412a755, 2026-09-15T21:12:53.086Z, wall 15 s
 
 Reaction 150–170 ms, glances 30 Hz, pitch noise ±1.5°, speed noise ±4%, taps 70 ms, lapses every ~20 s.
 
 | track | tier | band | attempts (seeds) | median | clears | time to clear (median) | best % | where it died (count · rule) |
 |---|---|---|---|---:|---|---:|---:|---|
-| flat-test | beginner | — | 2, 2, 2 | 2 | 3/3 | 12.8 s | 100% | ground @ 10 m ×3 (nose-high) |
-| gap-test | beginner | 1–3 | 2, 5, 2 | 2 | 3/3 | 10.1 s | 100% | ground @ 10 m ×2 (air-short); ramp @ 30.0 m ×2 (air-short); ground @ 5 m ×1 (nose-high) |
-| b1-first-ride | beginner | 1–1 | 2, 2, 2 | 2 | 3/3 | 52.2 s | 100% | ground @ 10 m ×3 (air-short) |
-| b2-lean-back | beginner | 1–2 | 5, 6, 12 | 6 | 3/3 | 74.3 s | 100% | box @ 271.8 m ×4 (nose-high); drum @ 18.0 m ×2 (nose-high); ground @ 265 m ×2 (air-short) |
-| b3-kicker-row | beginner | 1–2 | 7, 10, 16 | 10 | 3/3 | 89.8 s | 100% | ramp @ 150.0 m ×4 (nose-high); ground @ 10 m ×3 (nose-high); ramp @ 314.8 m ×3 (nose-high) |
-| e1-uphill-weight | easy | 2–4 | 35, 20, 24 | 24 | 3/3 | 174.5 s | 100% | ramp @ 300.0 m ×11 (nose-high); ramp @ 449.9 m ×9 (air-short); ramp @ 211.0 m ×6 (air-short) |
-| e2-rear-wheel-first | easy | 3–5 | 33, 36, 17, 15, 33, 25, 36, 23, 33 | 33 | 9/9 | 258.7 s | 100% | ramp @ 191.2 m ×28 (air-short); box @ 505.4 m ×22 (air-short); box @ 183.2 m ×15 (air-short) |
-| e3-stairway | easy | 3–6 | 8, 13, 10, 7, 12, 10, 11, 19, 12 | 11 | 9/9 | 104.8 s | 100% | stair @ 151.2 m ×17 (nose-high); ground @ 10 m ×8 (air-short); ramp @ 178.8 m ×8 (nose-high) |
-| m1-hop-up | medium | 5–9 | 10, 23, 7, 20, 29, 20, 18, 23, 24 | 20 | 9/9 | 151.9 s | 100% | ledge @ 109.0 m ×22 (stuck-restart); gap @ 113.0 m ×12 (nose-high); ledge @ 363.3 m ×11 (air-short) |
-| m2-drum-roll | medium | 6–12 | 32, 29, 26 | 29 | 3/3 | 245.9 s | 100% | ramp @ 431.4 m ×13 (air-short); seesaw @ 432.2 m ×8 (seesaw-approach); ramp @ 311.2 m ×6 (air-short) |
-| m3-see-saw | medium | 8–12 | 39, 34, 40, 20, 51, 51, 46, 51, 51 | 46 | 5/9 | 300.6 s | 100% | ground @ 410 m ×91 (air-short); ramp @ 421.4 m ×48 (nose-high); ramp @ 202.6 m ×32 (nose-high) |
-| h1-wheelie-wire | hard | 10–18 | 37, 20, 51 | 37 | 2/3 | 229.8 s | 100% | gap @ 219.3 m ×37 (air-short); gap @ 517.5 m ×8 (air-short); gap @ 222.3 m ×6 (air-short) |
-| h2-gap-chain | hard | 14–22 | 41, 28, 51 | 41 | 2/3 | 308.5 s | 100% | ramp @ 234.8 m ×9 (air-gas-nose-up); ramp @ 245.8 m ×9 (air-gas-nose-up); ramp @ 73.0 m ×5 (air-gas-nose-up) |
-| h3-fire-line | hard | 18–25 | 34, 36, 19 | 34 | 3/3 | 261.8 s | 100% | ledge @ 505.0 m ×17 (nose-low); ramp @ 401.4 m ×7 (air-short); ground @ 40 m ×5 (nose-high) |
-| x1-vertical-limit | extreme | 30–45 | 51, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 0/9 | — | 79% | ground @ 245 m ×109 (touchdown); ramp @ 46.1 m ×41 (air-short); ramp @ 255.7 m ×34 (nose-high) |
-| x2-pipe-dream | extreme | 40–60 | 44, 40, 51, 51, 46, 51, 51, 51, 51 | 51 | 3/9 | 354.2 s | 100% | ramp @ 437.2 m ×57 (nose-high); box @ 213.2 m ×31 (air-short); ramp @ 197.4 m ×30 (nose-high) |
-| x3-gauntlet | extreme | 60–80 | 51, 51, 51, 51, 51, 51, 51, 51, 51 | 51 | 0/9 | — | 98% | ramp @ 64.1 m ×111 (air-short); ground @ 55 m ×53 (air-short); box @ 52.1 m ×45 (air-short) |
-| lab-physics-test | medium | 3–8 | 2, 2, 2 | 2 | 3/3 | 11.5 s | 100% | ground @ 10 m ×3 (air-short) |
-| lab-flat-200 | beginner | 1–1 | 2, 3, 2 | 2 | 3/3 | 18.5 s | 100% | ground @ 10 m ×3 (touchdown); ground @ 15 m ×1 (nose-high) |
+| flat-test | beginner | — | 1, 1, 1 | 1 | 3/3 | 10.8 s | 100% | — |
+| gap-test | beginner | 1–3 | 1, 2, 1 | 1 | 3/3 | 7.1 s | 100% | ground @ 40 m ×1 (touchdown) |
+| b1-first-ride | beginner | 1–1 | 1, 1, 1 | 1 | 3/3 | 49.9 s | 100% | — |
+| b2-lean-back | beginner | 1–2 | 1, 1, 3 | 1 | 3/3 | 51.4 s | 100% | drum @ 18.0 m ×1 (nose-high); ground @ 585 m ×1 (nose-low) |
+| b3-kicker-row | beginner | 1–2 | 5, 9, 6 | 6 | 3/3 | 78.5 s | 100% | box @ 415.8 m ×3 (air-short); ground @ 115 m ×1 (nose-low); ground @ 135 m ×1 (air-short) |
+| e1-uphill-weight | easy | 2–4 | 15, 20, 9 | 15 | 3/3 | 148.9 s | 100% | ramp @ 449.9 m ×5 (air-short); ramp @ 211.0 m ×4 (air-short); ramp @ 309.7 m ×3 (touchdown) |
+| e2-rear-wheel-first | easy | 3–5 | 10, 17, 18, 10, 15, 4, 8, 15, 19 | 15 | 9/9 | 149.9 s | 100% | box @ 183.2 m ×13 (air-short); ramp @ 191.2 m ×8 (air-short); box @ 525.4 m ×8 (air-short) |
+| e3-stairway | easy | 3–6 | 4, 1, 3, 5, 6, 9, 5, 2, 3 | 4 | 9/9 | 67.3 s | 100% | gap @ 422.2 m ×6 (nose-high); ground @ 275 m ×3 (air-short); ground @ 280 m ×3 (air-short) |
+| m1-hop-up | medium | 5–9 | 7, 13, 8, 4, 8, 15, 5, 18, 8 | 8 | 9/9 | 83.8 s | 100% | ledge @ 109.0 m ×19 (stuck-restart); gap @ 113.0 m ×6 (air-short); ledge @ 280.3 m ×5 (air-short) |
+| m2-drum-roll | medium | 6–12 | 7, 9, 19 | 9 | 3/3 | 107.8 s | 100% | ramp @ 311.2 m ×10 (air-short); drum @ 303.6 m ×5 (nose-high); ramp @ 431.4 m ×3 (air-short) |
+| m3-see-saw | medium | 8–12 | 47, 26, 26, 7, 51, 51, 19, 9, 51 | 26 | 6/9 | 194.1 s | 100% | ground @ 410 m ×81 (air-short); ground @ 405 m ×42 (air-short); ramp @ 421.4 m ×39 (air-short) |
+| h1-wheelie-wire | hard | 10–18 | 13, 24, 51 | 24 | 2/3 | 188.3 s | 100% | gap @ 512.5 m ×19 (touchdown); gap @ 517.5 m ×12 (nose-high); gap @ 515.0 m ×9 (nose-low) |
+| h2-gap-chain | hard | 14–22 | 51, 19, 28 | 28 | 2/3 | 226.2 s | 100% | ramp @ 552.6 m ×23 (air-gas-nose-up); box @ 544.6 m ×11 (nose-high); ramp @ 541.6 m ×10 (air-gas-nose-up) |
+| h3-fire-line | hard | 18–25 | 28, 18, 37 | 28 | 3/3 | 233.2 s | 100% | ramp @ 483.0 m ×14 (air-short); ledge @ 505.0 m ×13 (air-short); ramp @ 499.0 m ×9 (touchdown) |
+| x1-vertical-limit | extreme | 30–45 | 50, 51, 51, 51, 51, 51, 51, 43, 51 | 51 | 2/9 | 396.6 s | 100% | ground @ 245 m ×106 (touchdown); ground @ 585 m ×47 (air-short); pole @ 114.3 m ×28 (air-gas-nose-up) |
+| x2-pipe-dream | extreme | 40–60 | 12, 35, 51, 15, 24, 51, 35, 51, 51 | 35 | 5/9 | 223.9 s | 100% | ramp @ 437.2 m ×80 (nose-high); drum @ 445.8 m ×34 (air-gas-nose-up); drum @ 362.6 m ×28 (air-gas-nose-up) |
+| x3-gauntlet | extreme | 60–80 | 51, 51, 51, 51, 51, 44, 51, 51, 33 | 51 | 2/9 | 297.9 s | 100% | ramp @ 48.0 m ×50 (nose-high); box @ 52.1 m ×50 (air-short); ground @ 55 m ×37 (air-short) |
+| lab-physics-test | medium | 3–8 | 1, 1, 2 | 1 | 3/3 | 9.7 s | 100% | ground @ 15 m ×1 (nose-high) |
+| lab-flat-200 | beginner | 1–1 | 1, 1, 1 | 1 | 3/3 | 16.4 s | 100% | — |
 
 ## Calibration against the stranger sessions (Rookie)
 
 | track | band | stranger median attempts (sessions, src) | reflex average median (seeds) | ratio | stranger time to clear | reflex time to clear | stranger deaths (top) | reflex deaths (top) |
 |---|---|---|---|---:|---:|---:|---|---|
-| b1-first-ride | 1–1 | 1 (2, 74f5de4d) | 1 (1, 1, 1) | 1.00 | 44.2 s | 56.7 s | — | — |
-| b2-lean-back | 1–2 | 2 (2, 74f5de4d) | 2 (2, 2, 1) | 1.00 | 52.6 s | 65.3 s | ground ×2 | ground @ 155 m ×1; ground @ 575 m ×1 |
-| b3-kicker-row | 1–2 | 3 (2, 74f5de4d) | 4 (3, 4, 6) | 1.33 | 52.3 s | 67.9 s | ground ×4 | ground @ 355 m ×2; ramp @ 409.8 m ×2; ramp @ 423.8 m ×2 |
-| e1-uphill-weight | 2–4 | 8 (6, 73762476/c83b6ca8/51d42b25/5394d725) | 8 (6, 10, 8) | 1.00 | 103.1 s | 102.8 s | — | ramp @ 449.9 m ×11; ramp @ 75.2 m ×2; ground @ 80 m ×1 |
+| b1-first-ride | 1–1 | 1 (11, d698717f/73762476/c83b6ca8/68e975a6/3d5fd16f/74f5de4d) | 1 (1, 1, 1) | 1.00 | 51.4 s | 56.7 s | ground ×10 | — |
+| b2-lean-back | 1–2 | 2.5 (8, 73762476/81ade223/68e975a6/3d5fd16f/74f5de4d) | 2 (2, 2, 1) | 0.80 | 53.5 s | 65.3 s | ground ×9; drum @ 18.0 m ×2; ramp @ 322.2 m ×1 | ground @ 155 m ×1; ground @ 575 m ×1 |
+| b3-kicker-row | 1–2 | 3.5 (10, 73762476/c83b6ca8/68e975a6/d39d492b/3d5fd16f/74f5de4d) | 4 (3, 4, 6) | 1.14 | 61.1 s | 67.9 s | ground ×28; ramp @ 150.0 m ×4; ramp @ 36.0 m ×3 | ground @ 355 m ×2; ramp @ 409.8 m ×2; ramp @ 423.8 m ×2 |
+| e1-uphill-weight | 2–4 | 7 (8, 73762476/c83b6ca8/51d42b25/5394d725/3d5fd16f) | 8 (6, 10, 8) | 1.14 | 99.2 s | 102.8 s | ground ×12; ramp @ 300.0 m ×7; ramp @ 309.7 m ×5 | ramp @ 449.9 m ×11; ramp @ 75.2 m ×2; ground @ 80 m ×1 |

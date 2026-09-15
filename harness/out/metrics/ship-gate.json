@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260915-141002-12890a",
-  "startedAt": "2026-09-15T19:10:02.547Z",
-  "wallMs": 705211,
+  "runId": "20260915-162027-1046bf",
+  "startedAt": "2026-09-15T21:20:27.800Z",
+  "wallMs": 1865319,
   "git": "unknown",
-  "srcFingerprint": "a6d63cfd",
+  "srcFingerprint": "817dddd2",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
   "trackId": "flat-test",
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": true,
   "build": {
-    "distBytes": 17712825,
-    "jsGzipBytes": 468964,
-    "buildMs": 1858.0249999999999
+    "distBytes": 17893043,
+    "jsGzipBytes": 480555,
+    "buildMs": 0
   },
   "browser": {
     "version": "151.0.7922.34",
@@ -24,17 +24,17 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 177.890625,
+      "value": 113.89587500000016,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 110/686/127/178/1321 min 110 loadavg 14.67/18"
+      "note": "runs 104/114/181/113/137 min 104 loadavg 23.66/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 3467.9100000858307,
+      "value": 9564.369999885559,
       "limit": 4000,
-      "pass": true,
+      "pass": false,
       "unit": "ms",
       "note": "ready -> first synced frame; SwiftShader limit; ship target 900ms NOT met (informational on this machine)",
       "shipLimit": 900,
@@ -66,14 +66,14 @@
       "value": true,
       "limit": true,
       "pass": true,
-      "note": "bot-3-pro.json (src matches) finish=8.041666666666666 faults=0 hash 9defa8078708cfc7 vs pinned 9defa8078708cfc7 (expected finish 8.041666666666666)"
+      "note": "bot-3-pro.json (src matches) finish=8.4 faults=0 hash 53d5e2de0447d118 vs pinned 53d5e2de0447d118 (expected finish 8.4)"
     },
     {
       "id": "clear.pro.b1",
       "value": true,
       "limit": true,
       "pass": true,
-      "note": "bot-3-pro.json (src matches) finish=37.733333333333334 faults=0 hash 49ce97f9fa86a3d5 vs pinned 49ce97f9fa86a3d5 (expected finish 37.733333333333334)"
+      "note": "bot-3-pro.json (src matches) finish=39.09166666666667 faults=0 hash 43b27d8e8dc0f1cb vs pinned 43b27d8e8dc0f1cb (expected finish 39.09166666666667)"
     },
     {
       "id": "crash.faultWithinS",
@@ -100,20 +100,20 @@
     },
     {
       "id": "restart.wallMsP95",
-      "value": 0.12999987602233887,
+      "value": 0.1700000762939453,
       "limit": 5,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "restart.frameMsP95",
-      "value": 3.879999876022339,
+      "value": 641.295000076294,
       "limit": 150,
-      "pass": true,
+      "pass": false,
       "unit": "ms",
-      "note": "restart -> synced frame; SwiftShader limit; ship target 33ms met",
+      "note": "restart -> synced frame; SwiftShader limit; ship target 33ms NOT met (informational on this machine)",
       "shipLimit": 33,
-      "shipPass": true
+      "shipPass": false
     },
     {
       "id": "restart.noCountdown",
@@ -125,7 +125,7 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": -15.496768951416016,
+      "value": -5.378704071044922,
       "limit": 5,
       "pass": true,
       "unit": "MB",
@@ -133,13 +133,13 @@
     },
     {
       "id": "perf.drawCallsMax",
-      "value": 198,
+      "value": 187,
       "limit": 300,
       "pass": true
     },
     {
       "id": "perf.trianglesMax",
-      "value": 158567,
+      "value": 156717,
       "limit": 500000,
       "pass": true
     },
@@ -152,21 +152,21 @@
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 24.99997615814209,
+      "value": 32.50002861022949,
       "limit": 60,
       "pass": true,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 2.559999942779541,
+      "value": 2.9200000762939453,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 8144.034999847412,
+      "value": 20655.349999904633,
       "limit": 250,
       "pass": false,
       "unit": "ms",
@@ -176,11 +176,11 @@
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 457.97265625,
+      "value": 469.2919921875,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 17298 KB raw"
+      "note": "dist 17474 KB raw"
     },
     {
       "id": "determinism.pass",
@@ -195,56 +195,56 @@
       "limit": 0,
       "pass": true,
       "unit": "frames out of box while riding",
-      "note": "bot-3.json; clamped 28.2 % (reported); 343 s; camera: PASS out-of-box 0/681 (riding 0), clamped 192 (28.2%), max|roll| 2.8e-17"
+      "note": "bot-3.json; clamped 28.2 % (reported); 924 s; camera: PASS out-of-box 0/681 (riding 0), clamped 192 (28.2%), max|roll| 2.8e-17"
     },
     {
       "id": "stranger.medianAttempts",
-      "value": "h1 16/27 (n=3) · h2 10/33 (n=3, under band) · h3 16/37.5 (n=3, under band)",
+      "value": "no armed track",
       "limit": 1.5,
       "pass": true,
-      "note": "median attempts / (1.5 x band top), every counted session cleared, on src a6d63cfd and the tier's default bike; armed 3/15 tracks (>= 2 completed): all armed within the limit; informational (unarmed): b1 0 fresh, b2 0 fresh, b3 0 fresh, e1 0 fresh, e2 0 fresh, e3 0 fresh, m1 0 fresh, m2 0 fresh, m3 0 fresh, x1 1 fresh+1 censored, x2 no report, x3 0 fresh+2 censored"
+      "note": "median attempts / (1.5 x band top), every counted session cleared, on src 817dddd2 and the tier's default bike; armed 0/15 tracks (>= 2 completed); informational (unarmed): b1 0 fresh+2 censored, b2 0 fresh+2 censored, b3 0 fresh+2 censored, e1 0 fresh+2 censored, e2 0 fresh+2 censored, e3 0 fresh+2 censored, m1 0 fresh, m2 0 fresh, m3 0 fresh, h1 0 fresh, h2 0 fresh, h3 0 fresh, x1 0 fresh+1 censored, x2 no report, x3 0 fresh+2 censored"
     },
     {
       "id": "reflex.medianAttempts",
       "value": "b1 1/1.5 · b2 2/3 · b3 4/3 · e1 8/6",
       "limit": 1.5,
       "pass": false,
-      "note": "reflex bot (average) median attempts / (1.5 x band top) on src a6d63cfd; armed: outside band"
+      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 817dddd2; armed: outside band"
     },
     {
       "id": "reflex.medianAttempts.pro",
-      "value": "b1 2/1.5 · b2 7/3 · b3 12/3 · e1 50/6 (not all cleared)",
+      "value": "b1 2/1.5 · b2 2/3 · b3 9/3 · e1 17/6",
       "limit": 1.5,
       "pass": true,
-      "note": "reflex bot (average) on the Pro bike, same tracks and band; informational (the band is Rookie's): 0/4 within band"
+      "note": "reflex bot (average) on the Pro bike, same tracks and band; informational (the band is Rookie's): 1/4 within band"
     }
   ],
-  "failed": 2,
+  "failed": 4,
   "pass": false,
   "boot": {
     "runs": [
-      109.96675000000005,
-      685.9755420000001,
-      126.85908399999971,
-      177.890625,
-      1321.1676660000012
+      104.03454099999999,
+      113.89587500000016,
+      181.46150000000125,
+      113.27799999999843,
+      137.4343749999971
     ],
-    "p50": 177.890625,
-    "min": 109.96675000000005,
-    "max": 1321.1676660000012,
+    "p50": 113.89587500000016,
+    "min": 104.03454099999999,
+    "max": 181.46150000000125,
     "firstFrameMs": [
-      3467.9100000858307,
-      10309.34500002861,
-      7213.070000171661,
-      3250.6200001239777,
-      3230.6749999523163
+      8356.354999780655,
+      9564.369999885559,
+      10008.06500005722,
+      10208.91000008583,
+      9152.950000047684
     ],
-    "loadavg1": 14.67,
+    "loadavg1": 23.66,
     "cores": 18,
     "retried": false
   },
   "clear": {
-    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/flat-test/bot-3.json",
+    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness11/frozen/harness/inputs/flat-test/bot-3.json",
     "finishTime": 8.566666666666666,
     "expected": 8.566666666666666,
     "hash": "b002d139195b5757",
@@ -253,7 +253,7 @@
     "hashOk": true
   },
   "crash": {
-    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/flat-test/crash.json",
+    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness11/frozen/harness/inputs/flat-test/crash.json",
     "faultTick": 90,
     "faultTime": 0.75,
     "reason": "crash"
@@ -261,48 +261,48 @@
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0.22499990463256836,
-      0.12999987602233887,
-      0.1099998950958252,
-      0.06999993324279785,
+      0.21499991416931152,
+      0.16499996185302734,
+      0.1700000762939453,
+      0.09999990463256836,
+      0.1100001335144043,
+      0.10500001907348633,
       0.08500003814697266,
+      0.08500003814697266,
+      0.07500004768371582,
       0.07499980926513672,
-      0.05500006675720215,
-      0.059999942779541016,
-      0.05500006675720215,
-      0.04500007629394531,
-      0.039999961853027344,
-      0.03500008583068848,
+      0.06000018119812012,
+      0.05499982833862305,
+      0.05499982833862305,
       0.04999995231628418,
-      0.039999961853027344,
-      0.039999961853027344,
-      0.034999847412109375,
-      0.03000020980834961,
-      0.034999847412109375,
-      0.039999961853027344,
-      0.034999847412109375
+      0.059999942779541016,
+      0.07500004768371582,
+      0.05500006675720215,
+      0.05000019073486328,
+      0.06500005722045898,
+      0.06000018119812012
     ],
     "frameMs": [
-      2206.4299998283386,
-      3.879999876022339,
-      3.694999933242798,
-      3.56499981880188,
-      3.3949999809265137,
-      2.9649999141693115,
-      2.9100000858306885,
-      3.119999885559082,
-      3.115000009536743,
-      2.945000171661377,
-      2.875,
-      2.6449999809265137,
-      2.924999952316284,
-      3.0899999141693115,
-      2.9100000858306885,
-      2.625,
-      2.630000114440918,
-      2.9049999713897705,
-      3,
-      3.125
+      1700.0999999046326,
+      530.664999961853,
+      480.70500016212463,
+      383.64999985694885,
+      440.30000019073486,
+      449.625,
+      387.35000014305115,
+      389.0150001049042,
+      541.789999961853,
+      406.30999994277954,
+      447.8550000190735,
+      454.5349998474121,
+      370.97000002861023,
+      483.5849997997284,
+      441.07999992370605,
+      335.710000038147,
+      490.62000012397766,
+      444.03000020980835,
+      368.5150001049042,
+      641.295000076294
     ],
     "noCountdown": true,
     "movesOnFirstTick": true,
@@ -315,31 +315,31 @@
     "autoRespawnMs": 1041.6666666666667
   },
   "heap": {
-    "beforeMB": 33.569969177246094,
-    "afterMB": 18.073200225830078,
-    "growthMB": -15.496768951416016,
+    "beforeMB": 26.111942291259766,
+    "afterMB": 20.733238220214844,
+    "growthMB": -5.378704071044922,
     "seconds": 60
   },
   "perf": {
-    "drawCalls": 198,
-    "triangles": 158567,
+    "drawCalls": 187,
+    "triangles": 156717,
     "texturesMB": 76.92539831542965,
-    "physicsUsPerTickP95": 24.99997615814209,
-    "renderSubmitMsP95": 2.559999942779541,
-    "renderSyncedMsP95": 8144.034999847412
+    "physicsUsPerTickP95": 32.50002861022949,
+    "renderSubmitMsP95": 2.9200000762939453,
+    "renderSyncedMsP95": 20655.349999904633
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260915-141555-f1570b",
-    "startedAt": "2026-09-15T19:15:55.271Z",
-    "wallMs": 9983,
+    "runId": "20260915-163512-108861",
+    "startedAt": "2026-09-15T21:35:12.211Z",
+    "wallMs": 56861,
     "git": "unknown",
-    "srcFingerprint": "a6d63cfd",
+    "srcFingerprint": "817dddd2",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
     "physics": "bikePhysicsFactory-v2",
-    "recordingFile": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/flat-test/bot-3.json",
+    "recordingFile": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness11/frozen/harness/inputs/flat-test/bot-3.json",
     "ticks": 1028,
     "checks": [
       {
@@ -438,8 +438,8 @@
     "pass": true
   },
   "stranger": {
-    "srcFingerprint": "a6d63cfd",
-    "armed": true,
+    "srcFingerprint": "817dddd2",
+    "armed": false,
     "minSessions": 2,
     "rows": [
       {
@@ -451,8 +451,8 @@
         ],
         "limit": 1.5,
         "completedFresh": 0,
-        "completedAny": 2,
-        "censored": 0,
+        "completedAny": 11,
+        "censored": 2,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -468,8 +468,8 @@
         ],
         "limit": 3,
         "completedFresh": 0,
-        "completedAny": 2,
-        "censored": 0,
+        "completedAny": 8,
+        "censored": 2,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -485,8 +485,8 @@
         ],
         "limit": 3,
         "completedFresh": 0,
-        "completedAny": 2,
-        "censored": 0,
+        "completedAny": 10,
+        "censored": 2,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -502,8 +502,8 @@
         ],
         "limit": 6,
         "completedFresh": 0,
-        "completedAny": 6,
-        "censored": 0,
+        "completedAny": 8,
+        "censored": 2,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -519,8 +519,8 @@
         ],
         "limit": 7.5,
         "completedFresh": 0,
-        "completedAny": 2,
-        "censored": 0,
+        "completedAny": 4,
+        "censored": 2,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -536,8 +536,8 @@
         ],
         "limit": 9,
         "completedFresh": 0,
-        "completedAny": 4,
-        "censored": 0,
+        "completedAny": 8,
+        "censored": 2,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
@@ -603,18 +603,14 @@
           18
         ],
         "limit": 27,
-        "completedFresh": 3,
+        "completedFresh": 0,
         "completedAny": 3,
         "censored": 0,
-        "medianAttempts": 16,
-        "allCleared": true,
-        "pass": true,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
         "belowBand": false,
-        "sessions": [
-          "h1-wheelie-wire-r7-p1-20260915-021350",
-          "h1-wheelie-wire-r7-p2-20260915-021350",
-          "h1-wheelie-wire-r7-p3-20260915-021350"
-        ]
+        "sessions": []
       },
       {
         "trackId": "h2-gap-chain",
@@ -624,18 +620,14 @@
           22
         ],
         "limit": 33,
-        "completedFresh": 3,
+        "completedFresh": 0,
         "completedAny": 3,
         "censored": 0,
-        "medianAttempts": 10,
-        "allCleared": true,
-        "pass": true,
-        "belowBand": true,
-        "sessions": [
-          "h2-gap-chain-r7-p1-20260915-021350",
-          "h2-gap-chain-r7-p2-20260915-021350",
-          "h2-gap-chain-r7-p3-20260915-021350"
-        ]
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
       },
       {
         "trackId": "h3-fire-line",
@@ -645,18 +637,14 @@
           25
         ],
         "limit": 37.5,
-        "completedFresh": 3,
+        "completedFresh": 0,
         "completedAny": 3,
         "censored": 0,
-        "medianAttempts": 16,
-        "allCleared": true,
-        "pass": true,
-        "belowBand": true,
-        "sessions": [
-          "h3-fire-line-r7-p1-20260915-021350",
-          "h3-fire-line-r7-p2-20260915-021350",
-          "h3-fire-line-r7-p3-20260915-021350"
-        ]
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
       },
       {
         "trackId": "x1-vertical-limit",
@@ -666,16 +654,14 @@
           45
         ],
         "limit": 67.5,
-        "completedFresh": 1,
-        "completedAny": 1,
+        "completedFresh": 0,
+        "completedAny": 2,
         "censored": 1,
-        "medianAttempts": 11,
-        "allCleared": true,
-        "pass": true,
-        "belowBand": true,
-        "sessions": [
-          "x1-vertical-limit-r7-extreme-p1-20260915-021351"
-        ]
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
       },
       {
         "trackId": "x3-gauntlet",
@@ -686,7 +672,7 @@
         ],
         "limit": 120,
         "completedFresh": 0,
-        "completedAny": 0,
+        "completedAny": 2,
         "censored": 2,
         "medianAttempts": null,
         "allCleared": false,
@@ -697,7 +683,7 @@
     ]
   },
   "reflex": {
-    "srcFingerprint": "a6d63cfd",
+    "srcFingerprint": "817dddd2",
     "armed": true,
     "minSeeds": 3,
     "rows": [
@@ -709,7 +695,7 @@
           1
         ],
         "limit": 1.5,
-        "srcFingerprint": "a6d63cfd",
+        "srcFingerprint": "6412a755",
         "seedsFresh": 3,
         "medianAttempts": 1,
         "medianFinishTime": 56.65833333333333,
@@ -725,7 +711,7 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "a6d63cfd",
+        "srcFingerprint": "6412a755",
         "seedsFresh": 3,
         "medianAttempts": 2,
         "medianFinishTime": 65.28333333333333,
@@ -741,7 +727,7 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "a6d63cfd",
+        "srcFingerprint": "6412a755",
         "seedsFresh": 3,
         "medianAttempts": 4,
         "medianFinishTime": 67.94166666666666,
@@ -757,7 +743,7 @@
           4
         ],
         "limit": 6,
-        "srcFingerprint": "a6d63cfd",
+        "srcFingerprint": "6412a755",
         "seedsFresh": 3,
         "medianAttempts": 8,
         "medianFinishTime": 102.775,
@@ -768,7 +754,7 @@
     ]
   },
   "reflexPro": {
-    "srcFingerprint": "a6d63cfd",
+    "srcFingerprint": "817dddd2",
     "armed": true,
     "minSeeds": 3,
     "rows": [
@@ -780,13 +766,13 @@
           1
         ],
         "limit": 1.5,
-        "srcFingerprint": "a6d63cfd",
+        "srcFingerprint": "6412a755",
         "seedsFresh": 3,
         "medianAttempts": 2,
-        "medianFinishTime": 59.225,
+        "medianFinishTime": 63.916666666666664,
         "allCleared": true,
         "pass": false,
-        "deadliest": "ground @ 10 m ×4"
+        "deadliest": "ground @ 470 m ×1"
       },
       {
         "trackId": "b2-lean-back",
@@ -796,13 +782,13 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "a6d63cfd",
+        "srcFingerprint": "6412a755",
         "seedsFresh": 3,
-        "medianAttempts": 7,
-        "medianFinishTime": 85.91666666666667,
+        "medianAttempts": 2,
+        "medianFinishTime": 61.21666666666667,
         "allCleared": true,
-        "pass": false,
-        "deadliest": "drum @ 18.0 m ×3"
+        "pass": true,
+        "deadliest": "ground @ 35 m ×1"
       },
       {
         "trackId": "b3-kicker-row",
@@ -812,13 +798,13 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "a6d63cfd",
+        "srcFingerprint": "6412a755",
         "seedsFresh": 3,
-        "medianAttempts": 12,
-        "medianFinishTime": 105.95,
+        "medianAttempts": 9,
+        "medianFinishTime": 105.7,
         "allCleared": true,
         "pass": false,
-        "deadliest": "ramp @ 423.8 m ×6"
+        "deadliest": "ground @ 350 m ×3"
       },
       {
         "trackId": "e1-uphill-weight",
@@ -828,34 +814,34 @@
           4
         ],
         "limit": 6,
-        "srcFingerprint": "a6d63cfd",
+        "srcFingerprint": "6412a755",
         "seedsFresh": 3,
-        "medianAttempts": 50,
-        "medianFinishTime": 365.6,
-        "allCleared": false,
+        "medianAttempts": 17,
+        "medianFinishTime": 186.99166666666667,
+        "allCleared": true,
         "pass": false,
-        "deadliest": "ramp @ 449.9 m ×12"
+        "deadliest": "ramp @ 449.9 m ×7"
       }
     ]
   },
   "clearPro": [
     {
       "trackId": "flat-test",
-      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/flat-test/bot-3-pro.json",
-      "finishTime": 8.041666666666666,
-      "expected": 8.041666666666666,
-      "hash": "9defa8078708cfc7",
-      "expectedHash": "9defa8078708cfc7",
+      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness11/frozen/harness/inputs/flat-test/bot-3-pro.json",
+      "finishTime": 8.4,
+      "expected": 8.4,
+      "hash": "53d5e2de0447d118",
+      "expectedHash": "53d5e2de0447d118",
       "faults": 0,
       "fresh": true
     },
     {
       "trackId": "b1-first-ride",
-      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/b1-first-ride/bot-3-pro.json",
-      "finishTime": 37.733333333333334,
-      "expected": 37.733333333333334,
-      "hash": "49ce97f9fa86a3d5",
-      "expectedHash": "49ce97f9fa86a3d5",
+      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness11/frozen/harness/inputs/b1-first-ride/bot-3-pro.json",
+      "finishTime": 39.09166666666667,
+      "expected": 39.09166666666667,
+      "hash": "43b27d8e8dc0f1cb",
+      "expectedHash": "43b27d8e8dc0f1cb",
       "faults": 0,
       "fresh": true
     }
