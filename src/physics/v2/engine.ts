@@ -72,8 +72,14 @@ export function limiterLatch(e: TuningV2['engine'], r: number, v: number, latche
  * the lean: back from -`leanFull` to -`leanOff`, forward from `leanFwdFull` to `leanFwdOff` (the applied lean input, as
  * K_att reads it). Pure, memoryless.
  */
-export function wheelieTrim(wc: TuningV2['engine']['wheelieControl'], w: number, frontComp: number, loopMargin: number, lean: number): number {
+export function wheelieTrim(wc: TuningV2['engine']['wheelieControl'], w: number, frontComp: number, loopMargin: number, lean: number, bothAir = false): number {
   if (wc.gain <= 0) return 0;
+  // R6: `airGain` x in free air (both wheels off the ground): Rookie 1 (the assist bounds the throttle nose-up in the
+  // air, R4), Pro 0 (the air is raw; the Pro's ECU is a ground launch / wheelie control). A speed fade was measured
+  // and rejected (physics.md v2 status R6): any fade that ends below 16 m/s hands a held wheelie back to the raw engine
+  // and it loops, and above 12 m/s the curve cannot lift the front anyway.
+  const sg = bothAir ? wc.airGain : 1;
+  if (sg <= 0) return 0;
   const lf = lean < 0 ? (wc.leanOff + lean) / (wc.leanOff - wc.leanFull) : (wc.leanFwdOff - lean) / (wc.leanFwdOff - wc.leanFwdFull);
   const leanGate = lf < 0 ? 0 : lf > 1 ? 1 : lf;
   if (leanGate <= 0) return 0;
@@ -84,5 +90,5 @@ export function wheelieTrim(wc: TuningV2['engine']['wheelieControl'], w: number,
   const rate = rr < 0 ? 0 : rr > 1 ? 1 : rr;
   const mm = (wc.margin1 - loopMargin) / (wc.margin1 - wc.margin0);
   const margin = mm < 0 ? 0 : mm > 1 ? 1 : mm;
-  return wc.gain * leanGate * unload * (rate > margin ? rate : margin);
+  return wc.gain * sg * leanGate * unload * (rate > margin ? rate : margin);
 }

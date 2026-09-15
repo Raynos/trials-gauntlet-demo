@@ -84,8 +84,8 @@ describe('determinism (§14.1)', () => {
       'targetMove', 'airLimit',
     ]);
     expect(NSCALAR).toBe(35);
-    expect([...U_SLOTS]).toEqual(['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase']);
-    expect(NU).toBe(13);
+    expect([...U_SLOTS]).toEqual(['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid']);
+    expect(NU).toBe(14);
     const w = createBikePhysics(HZ);
     w.loadTrack(makeTrack(), 1);
     const s = w.snapshot();

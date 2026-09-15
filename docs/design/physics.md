@@ -5,6 +5,203 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R6 (the line is crossed upright, the Pro lifts and does not loop, the suite says what it asserts)
+
+**Finding.** Three things the audit and harness r11 named are now defined and measured instead of assumed. **(1) A fault
+in the tick the front wheel crosses the finish line voids the finish** (§8.1 below): the solver evaluates the crash
+sensors before the crossing, and a same-tick fault with the wheel ≤ one radius (0.34 m) past the line emits `fault`
+only (`finishTime` stays null, `debug().finishVoided`); the audit probe that scored a fault-free 1/120 s clear now
+reads `crashed`, 1 fault, through an unchanged Game. **(2) The Pro's standstill loop was open-loop physics with no
+open-loop cure**: the thrust curve is a knife edge (F(4–8 m/s) 0.85 loops in 1.0 s, 0.80 lifts 8° and never wheelies), a
+slower throttle (0.10–0.15 s) only moves the loop from 0.95 to 1.21 s, and a speed-faded trim hands a held wheelie back
+to the raw engine and loops at the release (6→10 m/s: 2.44 s; 8→14: 3.83 s; 10→16: 4.93 s) — because a wheelie under
+constant thrust has no stable angle (§10). So **the Pro carries the R4 ECU on the ground** (`wheelieControl.gain` 1,
+the Rookie's margins / rates / lean fade) **with `airGain` 0 (its air stays raw)**: plain gas from rest at lean 0 lifts
+to **31.8° at 0.93 s and rides a 16–32° power wheelie down at 14 m/s**, 1 s / 2 s throttle ramps 31°, gas from an 8 m/s
+roll 26°, no loop; lean −0.25 / −0.5 / −1 still loop in 1.36 / 0.67 / 0.57 s (the fade: leaning back is the rider);
+the 20° kicker at 10 m/s full gas lean 0 leaves the lip at 22° / −75 °/s instead of 76° / +178. **(3) Nothing flips
+sign in the Pro's air**: held lean gives +28 / −35° in 0.5 s (Rookie +34 / −38), K_att prints +292 / −320 N m; what
+the x3 strangers read on their first slot is the raw pose swing — a lean −1 press dips the Pro's nose **−4.8° at
+0.05 s and −10.2° at 0.1 s (−140 °/s)** before K_att lifts it (the Rookie's R5 air limit makes that −0.1°), and a 50 ms
+tap nets +3°. The "hop machine on planks": with constant lean-0 keys **the intent slot cannot arm** (the pose target is
+a function of the lean input alone); the m3 `push` at 402 m is the rider's rebound after a bottomed landing on the
+board at the 0.3 F_max cap (bench: ≤ 695 N, the rear lifts off 0.6 s after touchdown at vy ≤ 1.3 m/s, no fault at
+≤ 0.4 throttle on both classes) — a readout, not a throw — and the x3 +263..+427 °/s is a −1/0 lean pulse train
+(67–100 ms pulses) that preloads the body for real, so every preload gate that keeps the R3 hop matrix passes it; the
+gate ships declared at 0 (`servoIntentBackM`, table below). The acceptance suite has **no `it.fails` and no `it.todo`**:
+five `it.fails` rows became one pass (0 → 16 in 3.98 s, the R1 4.47 was the helper's 0.5 s settle) and four numbered
+deviations, the 30° recovery promises what it asserts (< 30° at 0.5 s, < 15° at 1.0 s: −4.9°), the eleven todos are
+triaged (one became a test), and the lean-only 45° hold the audit measured at 3.167 s is not reachable by any K_att
+(1500 = 5× holds 2.7 s and takes the air row to 143° per 0.5 s) — the wheelie-hold requirement is the throttle-actuated
+anticipation row (40 ± 8 for 11.5 / 12.2 s as shipped; 45 ± 8 for 12.1 s on both with the ECU off).
+`pnpm vitest run src/physics` **157 pass / 0 todo / 0 fails**; typecheck and lint clean; loadavg 12–18 throughout.
+
+### Files (R6)
+
+- `src/physics/v2/bike.ts` — `derive()`: the fault block runs before the finish block; the crossing tick's rule
+  (§8.1); `U_SLOTS` gains `finishVoid` (14 slots, deviation 26); `debug().finishVoided`; the trim call passes the R4
+  air counters (`bothAir`); the preload gate on the intent memory (`servoIntentBackM`, off at 0).
+- `src/physics/v2/engine.ts` — `wheelieTrim(..., bothAir)`: × `airGain` in free air.
+- `src/physics/v2/tuning.ts` — `engine.wheelieControl.airGain` (Rookie 1, Pro 0); the Pro preset's `gain` 0 → 1;
+  `rider.servoIntentBackM` 0.
+- `src/physics/v2/r6.test.ts` — 9 rows: the precedence rule (probe fixture, the > R exception, a clean crossing,
+  snapshot across the crossing tick), the Pro launch (gas / ramps / from a roll; Rookie unchanged), the air-sign table
+  per class, the see-saw landing rows + the gate knob, the 40 / 45° holds.
+- `src/physics/v2/feel.test.ts` — the triage (table below); `launch()` times from the launch, not the load.
+- `src/physics/v2/r3.test.ts` — the Pro class row asserts the R6 launch; the four `it.todo` removed.
+  `src/physics/v2/r4.test.ts` — the raw-ramp row uses the gain-0 override for the Pro and adds the R6 Pro row.
+  `src/physics/v2/world.test.ts` — the slot list.
+
+### §8.1 Finish / fault precedence (the crossing tick)
+
+| case (one tick, front wheel vs `finishX`, R = 0.34) | events | `finishTime` | `debug().finishVoided` | Game (unchanged) |
+|--|--|--|--|--|
+| crosses, no fault | `finish` | set | false | finished |
+| crosses AND a fault this tick, wheel ≤ R past the line | **`fault` only** | **null** | **true** | crashed, +1 fault |
+| crosses AND a fault this tick, wheel > R past the line | `finish`, `fault` | set | false | finished (the fault is a post-finish tumble) |
+| fault in a later tick | `fault` (after an earlier `finish`) | set | false | finished (as before) |
+
+Audit probe (`docs/reviews/evidence/2026-09-15-finish-fault-probe.ts`, front wheel 119.99 → 120.052 in a nose-down
+pose): **before** `phase finished, faults 0, finishTime 1/120 s, events [finish]`; **after** `phase crashed, faults 1,
+finishTime null, events [fault]`. The > R exception is unreachable in play (the wheel moves ≤ 0.175 m per tick at
+21 m/s; a natural 8 m/s crossing puts it 0.07–0.08 m past the line), so in play a same-tick fault always voids; the
+rule is a tick rule, and a crash one tick after the crossing is a finish (the boundary is stated, not hidden). No
+Game change: it already ignores a `fault` after `finish` and never sees a `finish` when the crossing is voided.
+Goldens: no committed recording crashes on the line (a voided finish would have shown as a finish with a crash pose);
+none move for (1).
+
+### Acceptance-row triage (audit §4): every former `it.fails` / `it.todo`
+
+| row | was | now | why |
+|--|--|--|--|
+| front sag 24–28 % | `it.fails` (16.8 %) | **removed**; printed with the band in the static row | deviation 27: the table's ~490 N front load on a 7 500 N/m spring tilted 23° is 16.8 %; the band needs k ≈ 5 400 or a heavier front, i.e. a re-tune of every trajectory for a static number nobody rides |
+| 0 → 16 m/s at lean +0.25 in 3.5–4.2 s | `it.fails` (4.47) | **passes: 3.975 s**, asserted | the R1 4.47 was the helper's clock from the load (0.5 s settle); R3's knot made it 3.98 |
+| constant-input lean-back wheelie ≥ 3 s | `it.fails` (0.63 s) | **removed** | CONTRACT 2.5: open-loop diverges in 1–2 s (asserted in r3 `openLoopDiverge` 1.29 / 1.13 s); the spec row contradicts the contract |
+| lean-actuated hold, throttle 0.5, 45 ± 8 for ≥ 10 s | `it.fails` (3.167 s accumulated at a 15° target) | **removed**; measured as info in r6 (0.42 / 0.44 s, loops) | deviation 31: not reachable by lean alone — table below; the hold requirement is r3's throttle-actuated row (40 ± 8, 11.5 / 12.2 s) and r6's 45 ± 8 with the ECU off (12.1 s both) |
+| hard-back brake ≤ 5.0 m | `it.fails` (5.64) | **removed**; the passing row asserts ≤ 6 m with the spec beside it | deviation 29: 5.0 m is the toy's 650 N m; ours is 560 N m = 0.9 g (R1 brake table) |
+| 30° recovery, throttle cut: < 15° at 0.5 s | asserted < 30 (24.6) while printing < 15 | **promise changed**: < 30° at 0.5 s AND < 15° at 1.0 s (−4.9°), both asserted | deviation 28: R1's 0.0 was the 0.04 s throttle; the Rookie's 0.15 s throttle keeps thrust ~0.3 s after the cut (R3 deviation 21) |
+| 20° recovery, throttle held: < 15° | asserted < 30 (4.4) | asserted < 30, title says so (4.4 measured) | R3 note kept (24.6 was the pre-R4 number; 4.4 now) |
+| 7 feel todos (front-wheel lift onto a ledge, 60° rear-wheel hop, 0.9 m rolling hop, 65° pogo, scripted-lean balance, plank-to-plank, drop-in) | `it.todo` | **removed** | clip techniques = bot / lab benchmarks (CONTRACT §3); the physics rows they exercise are asserted: hop apex / matrix (r2, r3), landings (r3), wheelie hold (r3, r6), kickers (r2), climb (r3); the scripted-lean balance is the lean-only hold (deviation 31) |
+| r3 todos: pogo at the balance, 0.9 m ledge with `ledgeHopper`, clips 01/07/18 | `it.todo` | **removed** | as above |
+| r3 todo: see-saw re-check at cReb 250 | `it.todo` | **a test** (r6 see-saw landing rows, 12 cells) | rides at 3–5 m/s / ≤ 0.4 throttle on both classes; full gas up the board crashes on both (an ECU wheelie into the tipping end) |
+
+### The Pro launch (flat, from rest unless stated; before = R3–R5 raw Pro → after = R6; Rookie unchanged)
+
+| input | Pro before | **Pro after** | Rookie (R4 = R6) |
+|--|--|--|--|
+| full gas lean 0: max pitch / loop / 0 → 16 | loop **0.95 s** | **31.8° at 0.93 s, no loop, 4.94 s** | 6.7°, no loop, 3.97 s |
+| full gas lean +0.25 / +0.5 / +1 | loop 1.38 / 5.5° / 6.1° | 30.3° / 5.5° / 6.1° | 6.0 / 5.9 / 5.9 |
+| full gas lean −0.25 / −0.5 / −1 (loop) | 0.78 / 0.65 / 0.56 s | **1.36 / 0.67 / 0.57 s** | 1.86 / 0.83 / 0.63 |
+| throttle 0.3 / 0.5 / 0.7 lean 0 | 3.8 / 4.7 / 5.3° | same | 3.7 / 4.8 / 5.5 |
+| ramp 0 → 1 over 1 s / 2 s, lean 0 | loop 1.91 / 2.87 s | **31.3° / 30.5°, no loop** | 6.1 / 6.0 |
+| full gas lean 0 from an 8 m/s roll | loop 1.54 s | **26.3° (20.6 peak from 13 m/s), no loop** | 5.7° |
+| 0 → 16 at lean +0.5 / top | 3.25 s / 21.03 | 3.26 s / 21.03 | 3.97 / 20.0 |
+| 20° kicker @10 full gas lean 0: over slope / lip / rate / v | 52.9 / 75.8° / +178 / 9.8 | **12.6 / 22.2° / −75 / 7.7** (assist max 1.0) | 11.7 / 16.7 / −62 / 7.8 |
+| open-loop divergence | 1.63 s | 1.13 s (band 1–2) | 1.29 |
+| hop ref / matrix | 0.49; matrix as R3 | 0.49; within 0.01 | 0.46; identical |
+| landing table / touchdown step | all ride; ≤ 58 °/s per tick | all ride (air-after 0.06–0.07 s); ≤ 58 | identical |
+| climb table | 45@2 stall 36 %, 50@6 46 % | 37 % / 44 % (±2 %) | identical |
+| lab hop @7 / 8 / 9 margin | crash / −0.15 / −0.15 | **cleared 0.23** / −0.14 / −0.16 | identical |
+| air rows (throttle / brake tap, swings, held lean) | R5 | **identical** (`airGain` 0) | identical |
+
+Levers measured and rejected: thrust curve F(4–8 m/s) 0.95 / 0.90 / 0.85 loop at 0.97 / 0.98 / 1.00 s, 0.80 lifts 7.8°
+(no wheelie at all); flat F 0.90 / 0.85 loop 1.17 / 1.43 s; throttle τ 0.10 / 0.12 / 0.15 s loop 1.00 / 1.07 / 1.21 s;
+tighter ECU margins (0.25/0.08, 0.2/0.05, 0.15/0.03 with rates 1.5–5 rad/s) all loop 1.05–1.13 s (the margin trims
+too late to arrest the rate); a speed fade of the trim (6→10, 8→14, 10→16 m/s) loops at the release (2.44 / 3.83 /
+4.93 s), 12→18 is a no-op (the curve cannot lift the front above 12 m/s). **What the Pro still is:** raw air (no rate
+limit, K_att 260, the 234 °/s release kick), 0.08 s throttle (the 32° launch lift the Rookie's 0.15 s filters to
+6.7°), lean −0.25 loops in 1.36 s (Rookie 1.86), 21 m/s, 4 kg lighter, stiffer springs, hops 5–10 % higher; leaning
+forward is now the fast launch (t16 4.12 s at +0.25 vs 4.94 at 0), which is the Trials Pro.
+
+### Air-sign table (level free air at 10 m/s; pitch change in degrees at 0.05 / 0.1 / 0.5 s from the press; first-tick rate)
+
+| input | Rookie | Pro | verdict |
+|--|--|--|--|
+| lean −1 held | −0.1 / −0.0 / **+34.1** (first −2 °/s) | −4.8 / −10.2 / **+28.1** (first −95 °/s, peak dip −140) | sign right on both; the Pro dips first |
+| lean +1 held | +0.2 / +0.1 / **−38.2** (first +3) | +4.5 / +5.0 / **−35.3** (first +102) | sign right on both; the Pro lifts first |
+| lean −1 tap 50 ms | −0.1 / +1.0 / +5.6 | −4.8 / −2.8 / **+3.1** | a Pro single-slot `lb` is a wash |
+| lean −1 tap 125 ms | −0.1 / −0.0 / +16.5 | −4.8 / −10.2 / +13.5 | the Pro reads inverted for its first 0.15 s |
+| lean +1 tap 50 ms | +0.2 / −1.1 / −10.2 | +4.5 / +0.4 / −11.4 | — |
+| throttle 1 / brake 1 held 0.5 s | +6.5 / −14.9 | +7.9 / −15.6 | R4 |
+| `attTorque` at lean −1 / +1 | +300 / −305 N m | +292 / −320 N m | −K_att × lean, no flip |
+| **option, not taken** (parent decision R5): Pro `rider.airRateGain` 1 | — | −0.3 / −0.6 / +12.7 (125 ms tap); held −1 +26.8, +1 −35.0 | kills the first-slot inversion; held rows within 1.5°; grounded rows byte-identical by R5's gate |
+
+### The hop machine on planks (m3 402 m: `seesaw {8, 1.6}` = 21.2°, pivot 1.6, landed rear-first from the 3 m gap)
+
+| bench (lean 0 keys, land rear-first at +25° from 1.5 m) | Rookie 3 / 4 / 5 m/s, thr 0 → 0.4 | Pro 3 / 4 / 5 m/s |
+|--|--|--|
+| max intent through landing + rebound | **0.00** everywhere | 0.00 |
+| `push` readout (rider closing on his target > 0.5 m/s) | 33–42 ticks (0.3 s) | 35–46 |
+| servo lift on the chassis (pull-down on the rider) | ≤ 695 N (0.3 F_max = 960 + gravity 736 bounds it) | ≤ 595 |
+| rear leaves the board (the rebound) vy | 0.2 / 0.5–0.6 / 0.9–1.0 m/s | 0.3–0.6 / 0.6–0.9 / 0.9–1.3 |
+| fault | none | none |
+| the same at full gas, 5 m/s | crash (an ECU-held 26° wheelie up the board into the tipping end: leaves at 28° / +57 °/s, lands 55°) | crash |
+
+Sequence (Rookie 5 m/s, gas): touchdown 0.23 s → rear bottomed 100 % for 0.17 s while the servo absorbs at **F_max
+(3.1–3.2 kN, its opening side, which no gate limits: the legs catching the rider)** → 0.45–0.72 s `push` = the rider
+closing back on the target under the R3 cap (750–990 N) while the rear spring returns (rear 100 → 36 %) → 0.75–0.82 s
+the servo pulls the rider down at +389..+412 N and the rear lifts off the board at vy 1.2 → touches down 0.1 s later
+and rides on. The board's exit crash is the throttle (the m3 lesson: ≤ 0.4). The x3 window (t 92.10–92.58) is a −1/0
+pulse train from the `seesaw-ride` rule's −0.5 (2–3 samples per state): each toggle moves the pose target 0.39 m ≥
+the 5 cm intent threshold, so R3's rule arms it — correctly: a 67–100 ms pulse at −1 moves the body 0.2 m back, a
+physical preload.
+
+**The preload gate** `rider.servoIntentBackM` (target travel counts toward intent only while the rider body sits ≥ M
+behind the neutral pose; Rookie flat bench):
+
+| M (m) | ref hop | −0.25 / −0.5 / −1 preload × 8 / 16 per s | −1/0 train 67 ms pulses: peak rate / intent | 100 ms pulses | 25 ms pulses |
+|--|--|--|--|--|--|
+| 0 (ships) | 0.462 | 0.28/0.33 0.35/0.44 0.40/0.49 | 211 °/s / 1.00 | 248 / 1.00 | 103 / 1.00 |
+| 0.05 | 0.459 | 0.28/0.33 0.35/0.44 0.40/0.48 | 199 / 1.00 | 250 / 1.00 | 101 / 1.00 |
+| 0.075 | 0.460 | 0.26/0.31 0.35/0.44 0.39/0.48 | 181 / 1.00 | 232 / 1.00 | **86 / 0.00** |
+| 0.15 | 0.468 | **0.08/0.07** 0.35/0.45 0.38/0.48 | 163 / 1.00 | 217 / 1.00 | 86 / 0.00 |
+
+Every M that keeps the R3 matrix (≤ 0.075) still arms on the trains a human or the reflex can type (≥ 67 ms); M 0.15
+kills the −0.25 preload row (the −0.25 pose is 7.5 cm behind neutral). The kick on the board is not the intent-gated
+lift anyway — it is the throw's reaction (F_max on the opening side, R4) plus K_att. Ships at 0: declared, measured,
+the Rookie goldens untouched; the train is the controller's (harness r11 already made tip-air hands-off).
+
+### Further deviations (R6)
+
+26. **One new `U` slot, `finishVoid`** (§12: cross-tick state) so a voided crossing is reportable after the tick;
+    `NU` 13 → 14, the snapshot's `u8` grows one byte (the foreign-snapshot suite green; live snapshots only).
+27. **Front sag 16.8 % vs the 24–28 % band** — printed, not asserted (the R1 front-spring inconsistency; the lever is
+    k 7 500 → ~5 400 or a heavier front, a re-tune of every trajectory).
+28. **The 30° throttle-cut recovery promises < 30° at 0.5 s and < 15° at 1.0 s** (24.6 / −4.9) instead of < 15 at
+    0.5 s: the Rookie's 0.15 s throttle (deviation 21).
+29. **Hard-back brake ≤ 6 m** (5.64) instead of the toy's ≤ 5.0 m at 650 N m: ours is 560 N m (0.9 g).
+30. **A wheelie held above ~40° at lean > −0.5 is trimmed by the ECU on both classes** (its loop-margin term: the
+    combined COM's lead over the rear axle at 45° is under `margin0` 0.2 m): the V3 hold at 45° parks the lean at
+    −0.20 / −0.12 (assist fully on) and the front drops in 0.3 s; at 40° (park −0.43 / −0.38, assist 23 %) 11.5 /
+    12.2 s in band; at 45° with the ECU off 12.14 / 12.12 s. The spec's 45° band is the raw bike's. New for the Pro.
+31. **The lean-only hold at a fixed throttle is not a requirement this model can meet**: at throttle 0.5 (0.33 g) the
+    equilibrium at 45° needs lean ≈ +0.6 and the lean's authority (±0.125 m of COM, K_att 300) through the pose path
+    and 100 ms cannot hold the 0.3 s e-fold — 60 Hz / 100 ms, kp 0.03–0.08, ki 0–0.05, horizon 0.2–0.3: longest
+    in-band run 0.28–0.32 s, loop in 1.5–3 s on both classes; 10 Hz the same; from rest the same. K_att 600 / 1000 /
+    1500: 0.65 / 2.08 / 2.74 s in band, and the held-lean air row goes 34 → 73 / 110 / 143° per 0.5 s (band 25–40),
+    lean −0.25 loops in 1.46 / 1.27 / 1.17 s. The pose table's rear reach (deviation 22) is the other lever and was
+    rejected in R3 for the same air / knife costs.
+
+### Requests
+
+- **harness**: **the Pro goldens move** (every Pro recording where the front tops out under gas — h1–h3, x1–x3,
+  and any Pro golden on the beginner / easy / medium tracks); the Rookie goldens do not (FEEL diff: no Rookie row
+  changed). The Pro bot lines authored against "partial gas, +1 on kickers" still work (the trim only cuts what
+  would loop). The stranger card's Pro note ("plain `g` from standstill loops") is now wrong: plain gas lifts to ~30°
+  and rides. Re-measure h2 / h3 under-band on the new Pro before the bands move. `debug().finishVoided` is a new HUD
+  field; the see-saw and plank deaths labelled by `hopPhase: push` need the servo force fraction (`debug().rider.legFrac`
+  / `intent`) beside them to mean "a hop".
+- **parent (decision)**: Pro `rider.airRateGain` 0 → 1 (one number) removes the first-slot inversion the x3 strangers
+  read (−10.2 → −0.6° at 0.1 s) with the held rows within 1.5° and every grounded row byte-identical; R5 declared the
+  Pro's air raw, so it stays 0 until you say otherwise. The 45° wheelie under the ECU (deviation 30) is the other call:
+  `margin0` 0.2 → 0.12 would let the Rookie / Pro hold 45° at lean −0.2 and would move the R4 ramp rows.
+- **tracks**: m3's board at 402 m and x3's at 280 m: the landing rebound lifts the rear 0.6 s after touchdown at
+  ≤ 1.3 m/s (no fault); the death is the throttle up the 21° board (a wheelie into the tipping end). The 3 m gap that
+  feeds the board is what makes the landing bottom out (rear 100 % for 0.17 s).
+- **core**: nothing. `GameEvent` unchanged; `PhysicsState` unchanged.
+
+---
+
 ## v2 status — R5 (the air limit: the swing is the servo's, the held lean is K_att's)
 
 **Finding.** The Rookie's rider servo is rate-limited in free air — with both wheels off the ground the pose target
@@ -1420,6 +1617,17 @@ and half a front brake (7.6). Measured (`RAGDOLL` row, `world.test.ts`): a 7 m/s
 loop-out crash — bike travel 3.2 m and at rest 1.1 s after the fault (5.3 m / 1.5 s
 without the crash brakes), limb angle spread 129 deg, hip swing 110 deg, head thrown
 2.1 m. `reset()` rebuilds everything from the spawn in one tick.
+
+### 8.1 Finish / fault precedence (R6)
+
+The run finishes when the front wheel's centre reaches `finishX`; `finish` carries the crossing tick's time. Within one
+tick the fault sensors are evaluated **before** the crossing. A fault in the crossing tick with the front wheel no more
+than one wheel radius past the line voids the finish: only `fault` is emitted, `finishTime` stays null, `U.finishVoid`
+= 1 (`debug().finishVoided`) — Trials: you cross the line upright. A fault in the crossing tick with the wheel already
+more than one radius past the line is a crash after the finish: `finish` then `fault` (Game treats a fault after its
+finish as a post-finish tumble). At 21 m/s the wheel moves 0.175 m per tick, so in play a same-tick fault always voids;
+a fault in any later tick leaves the finish standing. Asserted in `r6.test.ts` (the audit probe fixture, the > R
+exception, a clean crossing, snapshot across the crossing tick).
 
 ## 9. Determinism rules
 

@@ -77,7 +77,7 @@ export interface TuningV2 {
      * (`debug().engine.assist`), linear, the same on the ground and in the air (in the air the front is topped out
      * and the trim bounds the throttle's nose-up). `gain` 0 = raw (the Pro).
      */
-    wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number };
+    wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number; /** R6: trim multiplier with both wheels off the ground (Rookie 1: the assist bounds the throttle nose-up in the air; Pro 0: the air is raw). */ airGain: number };
   };
   brakes: { totalNm: number; frontFrac: number; brakeTau: number };
   aero: { cda: number; rho: number; chassisShare: number };
@@ -99,6 +99,12 @@ export interface TuningV2 {
     /** R3 intent memory: the pose target's own travel, decaying with tau `servoIntentTau` s; at `servoIntentM` metres the closing cap is lifted to F_max. */
     servoIntentTau: number;
     servoIntentM: number;
+    /**
+     * R6 preload gate (measured, see physics.md v2 status R6): the pose target's travel counts toward intent only
+     * while the rider BODY sits at least this far behind the neutral pose (chassis-frame x, metres) - "an armed hop
+     * needs the preload". 0 = R3 (all travel counts).
+     */
+    servoIntentBackM: number;
     /**
      * R5 Rookie air limit: with BOTH wheels off the ground the pose target's travel rate falls from
      * `targetRateLin` / `targetRateAng` to `airRateLin` / `airRateAng` (a rider in the air has no ground reaction to
@@ -184,7 +190,7 @@ const ROOKIE: TuningV2 = {
     gear: 17.8,
     clutchRpm: 3500,
     clutchSpeed: 7,
-    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 },
+    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
   },
   brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03 },
   aero: { cda: 0.75, rho: 1.225, chassisShare: 0.6 },
@@ -220,6 +226,7 @@ const ROOKIE: TuningV2 = {
     servoMinFrac: 0.3,
     servoIntentTau: 0.2,
     servoIntentM: 0.05,
+    servoIntentBackM: 0,
     // R5: in free air the full -1 -> 0 pose release is a 0.5 s move (0.39 m at 0.8 m/s) instead of 0.08 s; the swing's
     // kick on the chassis falls 245 -> ~95 deg/s (physics.md v2 status R5). The blend is 0.1 s each way.
     airRateLin: 0.8,
@@ -277,13 +284,18 @@ const gearFor = (top: number): number => 10000 / ((top / 0.34) * (60 / (2 * Math
 
 export const BIKE_PRESETS_V2: Readonly<Record<BikeClassV2, PartialTuningV2>> = Object.freeze({
   rookie: {},
-  // Pro (R3): raw. 4 kg lighter, 1 000 N (0.71 g at the knot), a 0.06 s throttle (the launch kick the Rookie
-  // filters), K_att 260 (less attitude assist), stiffer springs, 21 m/s. Loops at neutral under full gas (1.1 s).
+  // Pro (R3): raw. 4 kg lighter, 1 000 N (0.71 g at the knot), a 0.08 s throttle (the launch kick the Rookie
+  // filters), K_att 260 (less attitude assist), stiffer springs, 21 m/s. R6: the R4 ECU trim on the GROUND (same
+  // margins / rates / lean fade as the Rookie; `airGain` 0 keeps the air raw): plain gas from a standstill at lean 0
+  // lifts to ~32 deg and rides a 16-32 deg power wheelie down at 14 m/s instead of looping in 0.95 s (harness r11:
+  // every Pro stranger lost its first attempt at 4 m); full gas at lean <= -0.25 still loops (0.56 / 0.66 / 1.35 s
+  // at -1 / -0.5 / -0.25). No open-loop lever gives "lifts hard, does not loop": the thrust curve is a knife edge
+  // (F(4-8) 0.85 loops at 1.0 s, 0.80 lifts 8 deg) and a speed fade of the trim loops at the release (R6 status).
   pro: {
     chassis: { mass: 54 },
     wheel: { wheelbase: 1.28 },
     suspension: { rear: { axle: { x: -0.575, y: -0.21 }, k: 12000 }, front: { axle: { x: 0.705, y: -0.215 }, k: 9000 } },
-    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 0, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 } },
+    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
     rider: { Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
   },
 });

@@ -55,6 +55,8 @@ export interface PhysicsDebugV2 {
   balancePitch: number;
   riderChain: { hips: Vec2; shoulders: Vec2; head: Vec2; elbow: Vec2; hand: Vec2; knee: Vec2; foot: Vec2; torsoDir: Vec2; headDir: Vec2 };
   crashCause: 'sensor' | 'oob' | 'hazard' | null;
+  /** R6 (physics.md §8.1): true when the run faulted in the tick the front wheel crossed the finish line with the wheel no more than one radius past it - the crossing did not count (no `finish` event, `finishTime` null). */
+  finishVoided: boolean;
 }
 
 export interface TeleportPose {
@@ -159,7 +161,7 @@ const S_AIR_LIMIT = 34; // R5 air limit blend 0..1 (both wheels off the ground, 
 export const NSCALAR = F_SLOTS.length; // 35
 
 /** Flags (physics-v2.md §12). */
-export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase'] as const;
+export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid'] as const;
 const U_FINISHED = 0;
 const U_FAULT = 1; // 0 none, 1 crash, 2 oob, 3 restart, 4 timeout, 5 hazard
 const U_LIMITER = 2;
@@ -173,7 +175,8 @@ const U_ASLEEP = 9;
 const U_CRASH_PENDING = 10; // written and read inside one step (collide -> derive)
 const U_CRASH_CAUSE = 11; // 1 sensor, 4 oob, 5 hazard
 const U_HOP = 12; // derived output: 0 idle 1 preload 2 push 3 recover
-export const NU = U_SLOTS.length; // 13
+const U_FINISH_VOID = 13; // R6 physics.md §8.1: 1 when a fault in the crossing tick (front wheel <= R past the line) voided the finish
+export const NU = U_SLOTS.length; // 14
 
 const FAULTS: (FaultReason | null)[] = [null, 'crash', 'out-of-bounds', 'restart', 'timeout', 'hazard'];
 const HOPS: HopPhase[] = ['idle', 'preload', 'push', 'recover'];
@@ -310,6 +313,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
 
   private readonly chain: ChainOut = { x: new Float64Array(7), y: new Float64Array(7), dx: 0, dy: 1, hx: 0, hy: 1, hipAx: 0, hipAy: 0 };
   private readonly poseTmp = { x: 0, y: 0, psi: 0 };
+  private readonly poseTmp2 = { x: 0, y: 0, psi: 0 };
   private axleOrgX = 0;
   private axleOrgY = 0;
 
@@ -448,7 +452,18 @@ class WorldV2 implements BikePhysicsWorldV2 {
       // snap, and a landing out of a limited flight keeps the cap. The Pro (gain 0) counts as R3.
       const mdx = this.poseTmp.x - F[S_TGT_X]!;
       const mdy = this.poseTmp.y - F[S_TGT_Y]!;
-      F[S_TGT_MOVE] = F[S_TGT_MOVE]! * (1 - dt / r.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy) * (1 - r.airRateGain * bothAir);
+      // R6 preload gate (servoIntentBackM > 0): travel counts only while the rider body is behind the neutral pose
+      let preload = 1;
+      if (r.servoIntentBackM > 0) {
+        const c0 = cos(this.an[CHASSIS]!);
+        const s0 = sin(this.an[CHASSIS]!);
+        const rx = this.px[RIDER]! - this.px[CHASSIS]!;
+        const ry = this.py[RIDER]! - this.py[CHASSIS]!;
+        const bodyX = rx * c0 + ry * s0;
+        poseAt(r.poses, 0, this.poseTmp2);
+        preload = bodyX <= this.poseTmp2.x - r.servoIntentBackM ? 1 : 0;
+      }
+      F[S_TGT_MOVE] = F[S_TGT_MOVE]! * (1 - dt / r.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy) * (1 - r.airRateGain * bothAir) * preload;
       F[S_TGT_X] = this.poseTmp.x;
       F[S_TGT_Y] = this.poseTmp.y;
       F[S_TGT_PSI] = this.poseTmp.psi;
@@ -661,6 +676,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
       balancePitch: this.balancePitch(leanFromX(t.rider.poses, F[S_TGT_X]!), 0),
       riderChain: { hips: p(0), shoulders: p(1), head: p(2), elbow: p(3), hand: p(4), knee: p(5), foot: p(6), torsoDir: { x: this.chain.dx, y: this.chain.dy }, headDir: { x: this.chain.hx, y: this.chain.hy } },
       crashCause: CAUSES[this.U[U_CRASH_CAUSE]!] ?? null,
+      finishVoided: this.U[U_FINISH_VOID] === 1,
     };
   }
 
@@ -1001,7 +1017,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
         const mR = t.rider.mass;
         dLive = (mc * px[CHASSIS]! + mr * px[REAR]! + mf * px[FRONT]! + mR * px[RIDER]!) / (mc + mr + mf + mR) - px[REAR]!;
       }
-      const trim = wheelieTrim(wc, wC0, this.sComp[1]!, dLive, F[S_IN_L]!);
+      // R6: `airGain` x in free air (both R4 air counters > 0): the Pro's ECU is ground-only, its air stays raw.
+      const trim = wheelieTrim(wc, wC0, this.sComp[1]!, dLive, F[S_IN_L]!, F[S_REAR_AIR]! > 0 && F[S_FRONT_AIR]! > 0);
       this.dAssist = trim;
       const tq = driveTorque(t.engine, R, vRim, te, U[U_LIMITER] === 1, trim);
       this.dEngineTq = tq;
@@ -1861,13 +1878,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
         F[S_CHECKPOINT] = next;
         this.events.push({ type: 'checkpoint', index: next, tick, time: F[S_TIME]! });
       }
-      if (U[U_FINISHED] === 0 && frontX >= track.def.finishX) {
-        U[U_FINISHED] = 1;
-        F[S_FINISH_TIME] = (tick + 1) * dt;
-        this.events.push({ type: 'finish', tick: tick + 1, time: (tick + 1) * dt });
-      }
-
-      // crash rules (§11): body sensors, hazard, out of bounds. Nothing else.
+      // crash rules (§11): body sensors, hazard, out of bounds. Nothing else. Evaluated BEFORE the finish so the
+      // crossing tick's precedence rule (R6, physics.md §8.1) can read it.
       let fault = 0;
       let cause = 0;
       if (U[U_CRASH_PENDING] === 1) {
@@ -1895,6 +1907,22 @@ class WorldV2 implements BikePhysicsWorldV2 {
               break outer;
             }
           }
+        }
+      }
+      // finish (R6 precedence, physics.md §8.1): the front wheel crossing the line finishes the run - unless a fault lands in
+      // the same tick with the wheel no more than one wheel radius past the line, in which case the crash is ON
+      // the line and voids the finish (Trials: you cross upright). A fault with the wheel already > R past the
+      // line is a crash after the finish: `finish` is emitted first, then `fault`, and the consumer (Game) treats a
+      // fault after its finish as a post-finish tumble. At 21 m/s the wheel moves 0.175 m per tick, so in natural
+      // play the exception is unreachable and a same-tick fault always voids; teleports (the audit probe) reach it.
+      const finishX = track.def.finishX;
+      if (U[U_FINISHED] === 0 && frontX >= finishX) {
+        if (fault !== 0 && frontX - finishX <= R) {
+          U[U_FINISH_VOID] = 1;
+        } else {
+          U[U_FINISHED] = 1;
+          F[S_FINISH_TIME] = (tick + 1) * dt;
+          this.events.push({ type: 'finish', tick: tick + 1, time: (tick + 1) * dt });
         }
       }
       if (fault !== 0) {
