@@ -20,6 +20,15 @@ import { writeJson } from '../lib/report';
 import type { AttemptLog, BestAttempt, StrangerSession } from '../lib/schema';
 import { createSim } from '../lib/sim';
 import { STRANGER_OUT, type PersistedState } from './session';
+import { defaultBikeForTier } from '../../src/game/rules';
+import type { InputRecording } from '../../src/core/replay';
+
+/** Older session.json files (before round 11) carry the bike only in the recording header. */
+function bikeOfRecording(file: string | null): 'rookie' | 'pro' {
+  if (!file) return 'rookie';
+  const rec = readJson<InputRecording>(path.isAbsolute(file) ? file : path.join(REPO_ROOT, file));
+  return rec?.header.bike ?? 'rookie';
+}
 
 export interface Death {
   n: number;
@@ -32,9 +41,15 @@ export interface Death {
   calls: number;
 }
 
+/** The bound PASS asserts: median attempts <= PASS_FACTOR x the authored band top (CONTRACT §3). */
+export const PASS_FACTOR = 1.5;
+/** A verdict needs at least this many completed sessions on the current src and bike (README: "at least two"). */
+export const MIN_SESSIONS = 2;
+
 export interface SessionRow {
   sessionId: string;
   agent: string;
+  bike: 'rookie' | 'pro';
   status: 'done' | 'in-progress' | 'abandoned';
   stale: boolean;
   srcFingerprint: string | null;
@@ -60,6 +75,8 @@ export interface StrangerMetricsFile {
   updatedAt: string;
   includeStale: boolean;
   sessions: SessionRow[];
+  /** Bike class the medians count (round 11): `--bike`, else the tier's default. */
+  bike?: 'rookie' | 'pro';
   /** Completed sessions counted in the medians. */
   completed: number;
   clearedCount: number;
@@ -67,7 +84,28 @@ export interface StrangerMetricsFile {
   medianFinishTime: number | null;
   medianCalls: number | null;
   medianWallMs: number | null;
-  /** median attempts <= 1.5 x attemptsBand[1] and every counted session cleared; null without a band or sessions. */
+  /**
+   * Round 11 (audit §4): the census behind the verdict — completed sessions on this src and bike (`n`), sessions
+   * still open or abandoned (censored: they say nothing about attempts-to-clear and are NOT in the median), sessions
+   * excluded as stale src or the other bike class, and the exact bound asserted.
+   */
+  census: {
+    n: number;
+    minSessions: number;
+    censored: { sessionId: string; status: 'in-progress' | 'abandoned'; attemptsSoFar: number; calls: number }[];
+    staleExcluded: number;
+    otherBikeExcluded: number;
+  };
+  /** What PASS asserts: band[0] <= median <= factor x band[1], every counted session cleared, n >= minSessions. */
+  asserted: { band: [number, number]; factor: number; limit: number } | null;
+  /**
+   * PASS = the assertion holds; FAIL = median above the limit or a counted session did not clear; UNDER-BAND = every
+   * session cleared and the median sits below the authored band (easier than authored: a tracks note, not a ship
+   * blocker — the gate treats it as within the limit); INSUFFICIENT = fewer than minSessions completed on this src;
+   * n/a = no band.
+   */
+  verdict: 'PASS' | 'FAIL' | 'UNDER-BAND' | 'INSUFFICIENT' | 'n/a';
+  /** verdict === 'PASS' (kept for older readers); null when INSUFFICIENT / n/a. */
   pass: boolean | null;
   deaths: {
     total: number;
@@ -85,7 +123,7 @@ function readJson<T>(f: string): T | null {
   }
 }
 
-export async function report(trackId: string, o: { fresh?: boolean } = {}): Promise<{ metrics: StrangerMetricsFile; markdown: string; jsonFile: string; mdFile: string }> {
+export async function report(trackId: string, o: { fresh?: boolean; bike?: 'rookie' | 'pro' } = {}): Promise<{ metrics: StrangerMetricsFile; markdown: string; jsonFile: string; mdFile: string }> {
   const fresh = o.fresh ?? true;
   const sim = await createSim(trackId);
   const fp = srcFingerprint();
@@ -113,6 +151,7 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
         rows.push({
           sessionId: done.sessionId,
           agent: done.agent,
+          bike: done.bike ?? bikeOfRecording(done.recordingFile),
           status: 'done',
           stale: stamp !== fp,
           srcFingerprint: stamp,
@@ -136,6 +175,7 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
       rows.push({
         sessionId: st.sessionId,
         agent: st.agent,
+        bike: st.recording.header.bike ?? 'rookie',
         status: abandoned ? 'abandoned' : 'in-progress',
         stale: false,
         srcFingerprint: null,
@@ -153,7 +193,15 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
     }
   }
 
-  const counted = rows.filter((r) => r.status === 'done' && (!fresh || !r.stale));
+  // The band is authored for the tier's default bike (`defaultBikeForTier`): medians count that class
+  // unless `--bike` says otherwise; the other class's rows stay in the table, marked.
+  const bike = o.bike ?? defaultBikeForTier(sim.track.tier, null);
+  const counted = rows.filter((r) => r.status === 'done' && (!fresh || !r.stale) && r.bike === bike);
+  const censored = rows
+    .filter((r): r is SessionRow & { status: 'in-progress' | 'abandoned' } => r.status !== 'done' && r.bike === bike)
+    .map((r) => ({ sessionId: r.sessionId, status: r.status, attemptsSoFar: r.strangerAttempts, calls: r.calls }));
+  const staleExcluded = rows.filter((r) => r.status === 'done' && fresh && r.stale && r.bike === bike).length;
+  const otherBikeExcluded = rows.filter((r) => r.status === 'done' && r.bike !== bike).length;
   const cleared = counted.filter((r) => r.cleared);
   const band = sim.track.meta?.attemptsBand ?? null;
   const med = (xs: number[]): number | null => (xs.length ? median(xs) : null);
@@ -170,6 +218,14 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
   }
   const byObstacle = [...byObstacleMap.entries()].map(([obstacle, xs]) => ({ obstacle, count: xs.length, xs: xs.map((x) => Math.round(x * 10) / 10) })).sort((a, b) => b.count - a.count);
   const medianAttempts = med(counted.map((r) => r.strangerAttempts));
+  const asserted = band ? { band, factor: PASS_FACTOR, limit: PASS_FACTOR * band[1] } : null;
+  let verdict: StrangerMetricsFile['verdict'] = 'n/a';
+  if (asserted && medianAttempts !== null) {
+    if (counted.length < MIN_SESSIONS) verdict = 'INSUFFICIENT';
+    else if (!counted.every((r) => r.cleared) || medianAttempts > asserted.limit) verdict = 'FAIL';
+    else if (medianAttempts < asserted.band[0]) verdict = 'UNDER-BAND';
+    else verdict = 'PASS';
+  } else if (asserted) verdict = 'INSUFFICIENT';
   const metrics: StrangerMetricsFile = {
     schema: 2,
     kind: 'stranger-metrics',
@@ -180,13 +236,17 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
     updatedAt: new Date().toISOString(),
     includeStale: !fresh,
     sessions: rows,
+    bike,
     completed: counted.length,
     clearedCount: cleared.length,
     medianAttempts,
     medianFinishTime: med(cleared.map((r) => r.finishTime!).filter((t) => t !== null)),
     medianCalls: med(counted.map((r) => r.calls)),
     medianWallMs: med(counted.map((r) => r.wallMs)),
-    pass: band && counted.length && medianAttempts !== null ? medianAttempts <= 1.5 * band[1] && counted.every((r) => r.cleared) : null,
+    census: { n: counted.length, minSessions: MIN_SESSIONS, censored, staleExcluded, otherBikeExcluded },
+    asserted,
+    verdict,
+    pass: verdict === 'PASS' ? true : verdict === 'FAIL' || verdict === 'UNDER-BAND' ? false : null,
     deaths: { total: counted.reduce((a, r) => a + r.deaths.length, 0), byReason, byObstacle, byCheckpoint },
   };
 
@@ -203,19 +263,20 @@ export async function report(trackId: string, o: { fresh?: boolean } = {}): Prom
 export function toMarkdown(m: StrangerMetricsFile): string {
   const fmtS = (t: number | null): string => (t === null ? '—' : `${t.toFixed(1)} s`);
   const lines: string[] = [];
-  lines.push(`# Stranger — ${m.trackId} (${m.physics}, src ${m.srcFingerprint}, ${m.updatedAt})`);
+  lines.push(`# Stranger — ${m.trackId} (${m.physics}, src ${m.srcFingerprint}, ${m.updatedAt}${m.bike ? `, medians on ${m.bike}` : ''})`);
   lines.push('');
+  const c = m.census;
   lines.push(
-    `completed ${m.completed} · cleared ${m.clearedCount}/${m.completed} · median attempts ${m.medianAttempts ?? '—'}${m.attemptsBand ? ` (band ${m.attemptsBand[0]}–${m.attemptsBand[1]}, pass ≤ ${(1.5 * m.attemptsBand[1]).toFixed(1)})` : ' (no band)'} · median time to clear ${fmtS(m.medianFinishTime)} · median calls ${m.medianCalls ?? '—'} · median wall ${m.medianWallMs === null ? '—' : `${(m.medianWallMs / 60000).toFixed(1)} min`} · pass ${m.pass === null ? 'n/a' : m.pass ? 'YES' : 'NO'}`,
+    `**${m.verdict}** — n = ${c.n} completed${m.bike ? ` on ${m.bike}` : ''} (min ${c.minSessions}) · cleared ${m.clearedCount}/${c.n} · median attempts ${m.medianAttempts ?? '—'}${m.asserted ? ` · asserted ${m.asserted.band[0]} ≤ median ≤ ${m.asserted.limit.toFixed(1)} (${m.asserted.factor} × band top ${m.asserted.band[1]}) and every counted session cleared` : ' · no band'} · censored ${c.censored.length}${c.censored.length ? ` (${c.censored.map((x) => `${x.sessionId} ${x.status} at attempt ${x.attemptsSoFar}`).join('; ')})` : ''} · excluded: ${c.staleExcluded} stale src, ${c.otherBikeExcluded} other bike · median time to clear ${fmtS(m.medianFinishTime)} · median calls ${m.medianCalls ?? '—'} · median wall ${m.medianWallMs === null ? '—' : `${(m.medianWallMs / 60000).toFixed(1)} min`}`,
   );
   lines.push('');
-  lines.push('| session | agent | status | attempts | cleared | time to clear | calls | wall | 1st cp call | died at | best attempt |');
-  lines.push('|---|---|---|---:|---|---:|---:|---:|---:|---|---|');
+  lines.push('| session | agent | bike | status | attempts | cleared | time to clear | calls | wall | 1st cp call | died at | best attempt |');
+  lines.push('|---|---|---|---|---:|---|---:|---:|---:|---:|---|---|');
   for (const r of m.sessions) {
     const died = r.deaths.length ? r.deaths.map((d) => `${d.reason}@${d.x.toFixed(0)}m${d.obstacle ? ` (${d.obstacle.split(' @ ')[0]})` : ''}`).join(', ') : '—';
     const best = r.bestAttempt ? `#${r.bestAttempt.n} ${r.bestAttempt.cleared ? 'clear' : `${r.bestAttempt.x.toFixed(0)} m`} ticks ${r.bestAttempt.startTick}–${r.bestAttempt.endTick}` : '—';
     lines.push(
-      `| ${r.sessionId} | ${r.agent} | ${r.status}${r.stale ? ' (stale src)' : ''} | ${r.strangerAttempts} | ${r.cleared ? 'yes' : 'no'} | ${fmtS(r.finishTime)} | ${r.calls} | ${(r.wallMs / 60000).toFixed(1)} min | ${r.firstCheckpointCalls ?? '—'} | ${died} | ${best} |`,
+      `| ${r.sessionId} | ${r.agent} | ${r.bike}${m.bike && r.bike !== m.bike ? ' (not counted)' : ''} | ${r.status}${r.stale ? ' (stale src)' : ''} | ${r.strangerAttempts} | ${r.cleared ? 'yes' : 'no'} | ${fmtS(r.finishTime)} | ${r.calls} | ${(r.wallMs / 60000).toFixed(1)} min | ${r.firstCheckpointCalls ?? '—'} | ${died} | ${best} |`,
     );
   }
   if (m.deaths.total > 0) {

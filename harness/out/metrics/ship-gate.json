@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260914-221742-c3559a",
-  "startedAt": "2026-09-15T03:17:42.600Z",
-  "wallMs": 1667286,
+  "runId": "20260915-141002-12890a",
+  "startedAt": "2026-09-15T19:10:02.547Z",
+  "wallMs": 705211,
   "git": "unknown",
-  "srcFingerprint": "db68bbeb",
+  "srcFingerprint": "a6d63cfd",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
   "trackId": "flat-test",
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": true,
   "build": {
-    "distBytes": 17484491,
-    "jsGzipBytes": 451726,
-    "buildMs": 0
+    "distBytes": 17712825,
+    "jsGzipBytes": 468964,
+    "buildMs": 1858.0249999999999
   },
   "browser": {
     "version": "151.0.7922.34",
@@ -24,17 +24,17 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 120.51862500000061,
+      "value": 177.890625,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 116/121/220/107/155 min 107 loadavg 44.83/18"
+      "note": "runs 110/686/127/178/1321 min 110 loadavg 14.67/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 17233.144999980927,
+      "value": 3467.9100000858307,
       "limit": 4000,
-      "pass": false,
+      "pass": true,
       "unit": "ms",
       "note": "ready -> first synced frame; SwiftShader limit; ship target 900ms NOT met (informational on this machine)",
       "shipLimit": 900,
@@ -100,20 +100,20 @@
     },
     {
       "id": "restart.wallMsP95",
-      "value": 0.1399998664855957,
+      "value": 0.12999987602233887,
       "limit": 5,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "restart.frameMsP95",
-      "value": 1161.6849999427795,
+      "value": 3.879999876022339,
       "limit": 150,
-      "pass": false,
+      "pass": true,
       "unit": "ms",
-      "note": "restart -> synced frame; SwiftShader limit; ship target 33ms NOT met (informational on this machine)",
+      "note": "restart -> synced frame; SwiftShader limit; ship target 33ms met",
       "shipLimit": 33,
-      "shipPass": false
+      "shipPass": true
     },
     {
       "id": "restart.noCountdown",
@@ -125,7 +125,7 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": -5.367286682128906,
+      "value": -15.496768951416016,
       "limit": 5,
       "pass": true,
       "unit": "MB",
@@ -139,7 +139,7 @@
     },
     {
       "id": "perf.trianglesMax",
-      "value": 159739,
+      "value": 158567,
       "limit": 500000,
       "pass": true
     },
@@ -152,21 +152,21 @@
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 30.00009059906006,
+      "value": 24.99997615814209,
       "limit": 60,
       "pass": true,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 2.875,
+      "value": 2.559999942779541,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 18427.759999990463,
+      "value": 8144.034999847412,
       "limit": 250,
       "pass": false,
       "unit": "ms",
@@ -176,11 +176,11 @@
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 441.138671875,
+      "value": 457.97265625,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 17075 KB raw"
+      "note": "dist 17298 KB raw"
     },
     {
       "id": "determinism.pass",
@@ -195,56 +195,56 @@
       "limit": 0,
       "pass": true,
       "unit": "frames out of box while riding",
-      "note": "bot-3.json; clamped 34.4 % (reported); 454 s; camera: PASS out-of-box 0/681 (riding 0), clamped 234 (34.4%), max|roll| 2.8e-17"
+      "note": "bot-3.json; clamped 28.2 % (reported); 343 s; camera: PASS out-of-box 0/681 (riding 0), clamped 192 (28.2%), max|roll| 2.8e-17"
     },
     {
       "id": "stranger.medianAttempts",
-      "value": "b1 -/1.5 (0 fresh) · b2 -/3 (0 fresh) · b3 -/3 (0 fresh) · e1 -/6 (0 fresh)",
+      "value": "h1 16/27 (n=3) · h2 10/33 (n=3, under band) · h3 16/37.5 (n=3, under band)",
       "limit": 1.5,
       "pass": true,
-      "note": "median attempts / (1.5 x band top) on src db68bbeb; informational until every track has >= 2 completed sessions on this src"
+      "note": "median attempts / (1.5 x band top), every counted session cleared, on src a6d63cfd and the tier's default bike; armed 3/15 tracks (>= 2 completed): all armed within the limit; informational (unarmed): b1 0 fresh, b2 0 fresh, b3 0 fresh, e1 0 fresh, e2 0 fresh, e3 0 fresh, m1 0 fresh, m2 0 fresh, m3 0 fresh, x1 1 fresh+1 censored, x2 no report, x3 0 fresh+2 censored"
     },
     {
       "id": "reflex.medianAttempts",
       "value": "b1 1/1.5 · b2 2/3 · b3 4/3 · e1 8/6",
       "limit": 1.5,
       "pass": false,
-      "note": "reflex bot (average) median attempts / (1.5 x band top) on src db68bbeb; armed: outside band"
+      "note": "reflex bot (average) median attempts / (1.5 x band top) on src a6d63cfd; armed: outside band"
     },
     {
       "id": "reflex.medianAttempts.pro",
-      "value": "b1 2/1.5 · b2 7/3 · b3 12/3 · e1 36/6 (not all cleared)",
+      "value": "b1 2/1.5 · b2 7/3 · b3 12/3 · e1 50/6 (not all cleared)",
       "limit": 1.5,
       "pass": true,
       "note": "reflex bot (average) on the Pro bike, same tracks and band; informational (the band is Rookie's): 0/4 within band"
     }
   ],
-  "failed": 4,
+  "failed": 2,
   "pass": false,
   "boot": {
     "runs": [
-      115.98483400000009,
-      120.51862500000061,
-      220.49254199999996,
-      106.94958400000178,
-      154.80187500000466
+      109.96675000000005,
+      685.9755420000001,
+      126.85908399999971,
+      177.890625,
+      1321.1676660000012
     ],
-    "p50": 120.51862500000061,
-    "min": 106.94958400000178,
-    "max": 220.49254199999996,
+    "p50": 177.890625,
+    "min": 109.96675000000005,
+    "max": 1321.1676660000012,
     "firstFrameMs": [
-      22900.889999866486,
-      17233.144999980927,
-      17634.21499991417,
-      14240.625,
-      13498.805000066757
+      3467.9100000858307,
+      10309.34500002861,
+      7213.070000171661,
+      3250.6200001239777,
+      3230.6749999523163
     ],
-    "loadavg1": 44.83,
+    "loadavg1": 14.67,
     "cores": 18,
     "retried": false
   },
   "clear": {
-    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness9/tree/harness/inputs/flat-test/bot-3.json",
+    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/flat-test/bot-3.json",
     "finishTime": 8.566666666666666,
     "expected": 8.566666666666666,
     "hash": "b002d139195b5757",
@@ -253,7 +253,7 @@
     "hashOk": true
   },
   "crash": {
-    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness9/tree/harness/inputs/flat-test/crash.json",
+    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/flat-test/crash.json",
     "faultTick": 90,
     "faultTime": 0.75,
     "reason": "crash"
@@ -261,48 +261,48 @@
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0.2049999237060547,
-      0.1399998664855957,
-      0.13000011444091797,
-      0.09000015258789062,
-      0.10000014305114746,
-      0.08000016212463379,
-      0.07500004768371582,
-      0.07500004768371582,
+      0.22499990463256836,
+      0.12999987602233887,
+      0.1099998950958252,
+      0.06999993324279785,
+      0.08500003814697266,
+      0.07499980926513672,
       0.05500006675720215,
-      0.05499982833862305,
+      0.059999942779541016,
       0.05500006675720215,
-      0.04999995231628418,
-      0.04999995231628418,
-      0.059999942779541016,
-      0.04499983787536621,
-      0.059999942779541016,
-      0.039999961853027344,
       0.04500007629394531,
-      0.04499983787536621,
-      0.04499983787536621
+      0.039999961853027344,
+      0.03500008583068848,
+      0.04999995231628418,
+      0.039999961853027344,
+      0.039999961853027344,
+      0.034999847412109375,
+      0.03000020980834961,
+      0.034999847412109375,
+      0.039999961853027344,
+      0.034999847412109375
     ],
     "frameMs": [
-      2493.829999923706,
-      760.2349998950958,
-      822.6749999523163,
-      891.2200000286102,
-      968.9750001430511,
-      926.2000000476837,
-      769.9100000858307,
-      845.710000038147,
-      969,
-      892.8199999332428,
-      901.914999961853,
-      956.6499998569489,
-      962.2999999523163,
-      977.3300001621246,
-      771.2699999809265,
-      1004.9099998474121,
-      859.0199999809265,
-      888.8949999809265,
-      791.2549998760223,
-      1161.6849999427795
+      2206.4299998283386,
+      3.879999876022339,
+      3.694999933242798,
+      3.56499981880188,
+      3.3949999809265137,
+      2.9649999141693115,
+      2.9100000858306885,
+      3.119999885559082,
+      3.115000009536743,
+      2.945000171661377,
+      2.875,
+      2.6449999809265137,
+      2.924999952316284,
+      3.0899999141693115,
+      2.9100000858306885,
+      2.625,
+      2.630000114440918,
+      2.9049999713897705,
+      3,
+      3.125
     ],
     "noCountdown": true,
     "movesOnFirstTick": true,
@@ -315,31 +315,31 @@
     "autoRespawnMs": 1041.6666666666667
   },
   "heap": {
-    "beforeMB": 27.207012176513672,
-    "afterMB": 21.839725494384766,
-    "growthMB": -5.367286682128906,
+    "beforeMB": 33.569969177246094,
+    "afterMB": 18.073200225830078,
+    "growthMB": -15.496768951416016,
     "seconds": 60
   },
   "perf": {
     "drawCalls": 198,
-    "triangles": 159739,
+    "triangles": 158567,
     "texturesMB": 76.92539831542965,
-    "physicsUsPerTickP95": 30.00009059906006,
-    "renderSubmitMsP95": 2.875,
-    "renderSyncedMsP95": 18427.759999990463
+    "physicsUsPerTickP95": 24.99997615814209,
+    "renderSubmitMsP95": 2.559999942779541,
+    "renderSyncedMsP95": 8144.034999847412
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260914-223727-31d376",
-    "startedAt": "2026-09-15T03:37:27.524Z",
-    "wallMs": 28207,
+    "runId": "20260915-141555-f1570b",
+    "startedAt": "2026-09-15T19:15:55.271Z",
+    "wallMs": 9983,
     "git": "unknown",
-    "srcFingerprint": "db68bbeb",
+    "srcFingerprint": "a6d63cfd",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
     "physics": "bikePhysicsFactory-v2",
-    "recordingFile": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness9/tree/harness/inputs/flat-test/bot-3.json",
+    "recordingFile": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/flat-test/bot-3.json",
     "ticks": 1028,
     "checks": [
       {
@@ -438,12 +438,13 @@
     "pass": true
   },
   "stranger": {
-    "srcFingerprint": "db68bbeb",
-    "armed": false,
+    "srcFingerprint": "a6d63cfd",
+    "armed": true,
     "minSessions": 2,
     "rows": [
       {
         "trackId": "b1-first-ride",
+        "bike": "rookie",
         "attemptsBand": [
           1,
           1
@@ -451,13 +452,16 @@
         "limit": 1.5,
         "completedFresh": 0,
         "completedAny": 2,
+        "censored": 0,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
+        "belowBand": false,
         "sessions": []
       },
       {
         "trackId": "b2-lean-back",
+        "bike": "rookie",
         "attemptsBand": [
           1,
           2
@@ -465,13 +469,16 @@
         "limit": 3,
         "completedFresh": 0,
         "completedAny": 2,
+        "censored": 0,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
+        "belowBand": false,
         "sessions": []
       },
       {
         "trackId": "b3-kicker-row",
+        "bike": "rookie",
         "attemptsBand": [
           1,
           2
@@ -479,13 +486,16 @@
         "limit": 3,
         "completedFresh": 0,
         "completedAny": 2,
+        "censored": 0,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
+        "belowBand": false,
         "sessions": []
       },
       {
         "trackId": "e1-uphill-weight",
+        "bike": "rookie",
         "attemptsBand": [
           2,
           4
@@ -493,15 +503,201 @@
         "limit": 6,
         "completedFresh": 0,
         "completedAny": 6,
+        "censored": 0,
         "medianAttempts": null,
         "allCleared": false,
         "pass": null,
+        "belowBand": false,
+        "sessions": []
+      },
+      {
+        "trackId": "e2-rear-wheel-first",
+        "bike": "rookie",
+        "attemptsBand": [
+          3,
+          5
+        ],
+        "limit": 7.5,
+        "completedFresh": 0,
+        "completedAny": 2,
+        "censored": 0,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
+      },
+      {
+        "trackId": "e3-stairway",
+        "bike": "rookie",
+        "attemptsBand": [
+          3,
+          6
+        ],
+        "limit": 9,
+        "completedFresh": 0,
+        "completedAny": 4,
+        "censored": 0,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
+      },
+      {
+        "trackId": "m1-hop-up",
+        "bike": "rookie",
+        "attemptsBand": [
+          5,
+          9
+        ],
+        "limit": 13.5,
+        "completedFresh": 0,
+        "completedAny": 2,
+        "censored": 0,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
+      },
+      {
+        "trackId": "m2-drum-roll",
+        "bike": "rookie",
+        "attemptsBand": [
+          6,
+          12
+        ],
+        "limit": 18,
+        "completedFresh": 0,
+        "completedAny": 2,
+        "censored": 0,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
+      },
+      {
+        "trackId": "m3-see-saw",
+        "bike": "rookie",
+        "attemptsBand": [
+          8,
+          12
+        ],
+        "limit": 18,
+        "completedFresh": 0,
+        "completedAny": 2,
+        "censored": 0,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
+      },
+      {
+        "trackId": "h1-wheelie-wire",
+        "bike": "pro",
+        "attemptsBand": [
+          10,
+          18
+        ],
+        "limit": 27,
+        "completedFresh": 3,
+        "completedAny": 3,
+        "censored": 0,
+        "medianAttempts": 16,
+        "allCleared": true,
+        "pass": true,
+        "belowBand": false,
+        "sessions": [
+          "h1-wheelie-wire-r7-p1-20260915-021350",
+          "h1-wheelie-wire-r7-p2-20260915-021350",
+          "h1-wheelie-wire-r7-p3-20260915-021350"
+        ]
+      },
+      {
+        "trackId": "h2-gap-chain",
+        "bike": "pro",
+        "attemptsBand": [
+          14,
+          22
+        ],
+        "limit": 33,
+        "completedFresh": 3,
+        "completedAny": 3,
+        "censored": 0,
+        "medianAttempts": 10,
+        "allCleared": true,
+        "pass": true,
+        "belowBand": true,
+        "sessions": [
+          "h2-gap-chain-r7-p1-20260915-021350",
+          "h2-gap-chain-r7-p2-20260915-021350",
+          "h2-gap-chain-r7-p3-20260915-021350"
+        ]
+      },
+      {
+        "trackId": "h3-fire-line",
+        "bike": "pro",
+        "attemptsBand": [
+          18,
+          25
+        ],
+        "limit": 37.5,
+        "completedFresh": 3,
+        "completedAny": 3,
+        "censored": 0,
+        "medianAttempts": 16,
+        "allCleared": true,
+        "pass": true,
+        "belowBand": true,
+        "sessions": [
+          "h3-fire-line-r7-p1-20260915-021350",
+          "h3-fire-line-r7-p2-20260915-021350",
+          "h3-fire-line-r7-p3-20260915-021350"
+        ]
+      },
+      {
+        "trackId": "x1-vertical-limit",
+        "bike": "pro",
+        "attemptsBand": [
+          30,
+          45
+        ],
+        "limit": 67.5,
+        "completedFresh": 1,
+        "completedAny": 1,
+        "censored": 1,
+        "medianAttempts": 11,
+        "allCleared": true,
+        "pass": true,
+        "belowBand": true,
+        "sessions": [
+          "x1-vertical-limit-r7-extreme-p1-20260915-021351"
+        ]
+      },
+      {
+        "trackId": "x3-gauntlet",
+        "bike": "pro",
+        "attemptsBand": [
+          60,
+          80
+        ],
+        "limit": 120,
+        "completedFresh": 0,
+        "completedAny": 0,
+        "censored": 2,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
         "sessions": []
       }
     ]
   },
   "reflex": {
-    "srcFingerprint": "db68bbeb",
+    "srcFingerprint": "a6d63cfd",
     "armed": true,
     "minSeeds": 3,
     "rows": [
@@ -513,7 +709,7 @@
           1
         ],
         "limit": 1.5,
-        "srcFingerprint": "db68bbeb",
+        "srcFingerprint": "a6d63cfd",
         "seedsFresh": 3,
         "medianAttempts": 1,
         "medianFinishTime": 56.65833333333333,
@@ -529,7 +725,7 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "db68bbeb",
+        "srcFingerprint": "a6d63cfd",
         "seedsFresh": 3,
         "medianAttempts": 2,
         "medianFinishTime": 65.28333333333333,
@@ -545,7 +741,7 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "db68bbeb",
+        "srcFingerprint": "a6d63cfd",
         "seedsFresh": 3,
         "medianAttempts": 4,
         "medianFinishTime": 67.94166666666666,
@@ -561,7 +757,7 @@
           4
         ],
         "limit": 6,
-        "srcFingerprint": "db68bbeb",
+        "srcFingerprint": "a6d63cfd",
         "seedsFresh": 3,
         "medianAttempts": 8,
         "medianFinishTime": 102.775,
@@ -572,7 +768,7 @@
     ]
   },
   "reflexPro": {
-    "srcFingerprint": "db68bbeb",
+    "srcFingerprint": "a6d63cfd",
     "armed": true,
     "minSeeds": 3,
     "rows": [
@@ -584,7 +780,7 @@
           1
         ],
         "limit": 1.5,
-        "srcFingerprint": "db68bbeb",
+        "srcFingerprint": "a6d63cfd",
         "seedsFresh": 3,
         "medianAttempts": 2,
         "medianFinishTime": 59.225,
@@ -600,7 +796,7 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "db68bbeb",
+        "srcFingerprint": "a6d63cfd",
         "seedsFresh": 3,
         "medianAttempts": 7,
         "medianFinishTime": 85.91666666666667,
@@ -616,7 +812,7 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "db68bbeb",
+        "srcFingerprint": "a6d63cfd",
         "seedsFresh": 3,
         "medianAttempts": 12,
         "medianFinishTime": 105.95,
@@ -632,20 +828,20 @@
           4
         ],
         "limit": 6,
-        "srcFingerprint": "db68bbeb",
+        "srcFingerprint": "a6d63cfd",
         "seedsFresh": 3,
-        "medianAttempts": 36,
-        "medianFinishTime": null,
+        "medianAttempts": 50,
+        "medianFinishTime": 365.6,
         "allCleared": false,
         "pass": false,
-        "deadliest": "ramp @ 75.2 m ×10"
+        "deadliest": "ramp @ 449.9 m ×12"
       }
     ]
   },
   "clearPro": [
     {
       "trackId": "flat-test",
-      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness9/tree/harness/inputs/flat-test/bot-3-pro.json",
+      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/flat-test/bot-3-pro.json",
       "finishTime": 8.041666666666666,
       "expected": 8.041666666666666,
       "hash": "9defa8078708cfc7",
@@ -655,7 +851,7 @@
     },
     {
       "trackId": "b1-first-ride",
-      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness9/tree/harness/inputs/b1-first-ride/bot-3-pro.json",
+      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/f8d5e168-4022-47f3-b796-362acd49ca35/scratchpad/harness10/frozen2/harness/inputs/b1-first-ride/bot-3-pro.json",
       "finishTime": 37.733333333333334,
       "expected": 37.733333333333334,
       "hash": "49ce97f9fa86a3d5",

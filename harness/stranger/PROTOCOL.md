@@ -129,6 +129,25 @@ A `play` string is a list of slot codes, each with an optional repeat count. Eac
   leaves a knee-high kicker at about 8 m/s under full gas and lands level-ish on its own. Braking on the
   ramp face or just before a riser drops the nose over the bars; slow down *before* the ramp, not on it.
 
+- **Pro bike (the default on hard and extreme; the track card says which you have).** Same thrust as
+  the Rookie up to 16 m/s, a little more on top (22 m/s), but **no wheelie ECU**: nothing catches a loop
+  for you. **Plain `g` from a standstill loops the Pro in about six slots** (every round-7 stranger lost
+  its first attempt 4 m from the line this way): launch and cruise on `gf` or `hg`, and gas a landing only
+  once the suspension has settled (`c1` first). Full gas with any lean-back loops it in about 1.5 s; a
+  wheelie is held by feathering the gas around 40-50 deg and never by holding `gb`. Everything else above
+  holds for the Rookie; on the Pro, read "neutral `g` does not loop" as "at speed".
+- **Roof climbs and wire (hard).** A 1.0-1.4 m wall with a row of slots on top is ridden with the front
+  wheel UP before the first slot and held there (`wh` or short `gb` bursts): the front drops into a slot
+  and stops you dead. A long thin balance beam wants a straight, steady `g` at 5-8 m/s, no lean.
+- **Apron jumps (hard).** A long flat apron into a kicker over water: full gas from the spawn, weight
+  forward on the ramp (`gf`), let go at the lip (`c`), land rear-first (`lb1` early in the flight, then
+  `c`). Coming off the gas on the apron is how you come up short.
+- **Tunnel rows (hard).** Two barrel rows a few metres apart under a roof: set the speed before the
+  first row and do NOT brake between them; a brake between rows plants the front into the second.
+- **Extreme climbs.** Every big face is 45 deg over a knee-high kicker foot: weight forward, steady gas,
+  let the face take the speed — the crest is won at ~3 m/s with the nose down, not up. Steeper faces
+  are not on the menu.
+
 ## Spending calls well
 
 - **Send the whole plan you are confident in, in one `play`.** The call stops by itself at a crash or

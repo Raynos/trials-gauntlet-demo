@@ -1,11 +1,11 @@
-# Stranger — m1-hop-up (bikePhysicsFactory-v2, src db68bbeb, 2026-09-15T03:12:20.401Z)
+# Stranger — m1-hop-up (bikePhysicsFactory-v2, src 65175e2d, 2026-09-15T19:32:09.431Z, medians on rookie)
 
-completed 2 · cleared 2/2 · median attempts 7.5 (band 5–9, pass ≤ 13.5) · median time to clear 79.7 s · median calls 31 · median wall 8.0 min · pass YES
+**PASS** — n = 2 completed on rookie (min 2) · cleared 2/2 · median attempts 7.5 · asserted 5 ≤ median ≤ 13.5 (1.5 × band top 9) and every counted session cleared · censored 0 · excluded: 0 stale src, 0 other bike · median time to clear 79.7 s · median calls 31 · median wall 8.0 min
 
-| session | agent | status | attempts | cleared | time to clear | calls | wall | 1st cp call | died at | best attempt |
-|---|---|---|---:|---|---:|---:|---:|---:|---|---|
-| m1-hop-up-r6-s1-20260914-215809 | s1 | done | 8 | yes | 81.3 s | 33 | 9.1 min | 4 | crash@114m (gap), crash@112m (gap), crash@272m (ledge), crash@280m (ledge), crash@289m, crash@284m (ramp), crash@367m (ledge) | #8 clear ticks 7939–10110 |
-| m1-hop-up-r6-s2-20260914-215809 | s2 | done | 7 | yes | 78.0 s | 29 | 6.9 min | 3 | crash@116m, crash@109m (ledge), crash@269m (ledge), crash@273m (ledge), crash@281m (ledge), crash@368m (ledge) | #7 clear ticks 7545–9698 |
+| session | agent | bike | status | attempts | cleared | time to clear | calls | wall | 1st cp call | died at | best attempt |
+|---|---|---|---|---:|---|---:|---:|---:|---:|---|---|
+| m1-hop-up-r6-s1-20260914-215809 | s1 | rookie | done (stale src) | 8 | yes | 81.3 s | 33 | 9.1 min | 4 | crash@114m (gap), crash@112m (gap), crash@272m (ledge), crash@280m (ledge), crash@289m, crash@284m (ramp), crash@367m (ledge) | #8 clear ticks 7939–10110 |
+| m1-hop-up-r6-s2-20260914-215809 | s2 | rookie | done (stale src) | 7 | yes | 78.0 s | 29 | 6.9 min | 3 | crash@116m, crash@109m (ledge), crash@269m (ledge), crash@273m (ledge), crash@281m (ledge), crash@368m (ledge) | #7 clear ticks 7545–9698 |
 
 Where they died (13 ended attempts over counted sessions):
 

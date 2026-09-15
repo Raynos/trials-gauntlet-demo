@@ -21,3 +21,17 @@ Log and unmask the verdict (the critic must never run this):
 It validates the JSON (bad shape -> winner `invalid`), unseals the answer (chmod 600 -> read -> 000), appends a `CompareVerdict`
 to `harness/out/metrics/compare.jsonl`, and prints the unmasked result (`ours`/`ref`/`tie`/`invalid`) and per-tag stats:
 n, oursWinRate = wins/(n - ties - invalid), positionBias = |P(A wins) - 0.5|.
+
+## Audio pairs (`audio.ts`, round 11)
+
+    pnpm harness:audio [--seed N] [--bike pro] [--beats-only | --pairs-only] [--out harness/out/compare]
+
+Renders the four beats (`src/audio/tools/beats.ts` -> `harness/out/audio-beats/`, table printed) against the reference cuts in
+`reference/evolution-gameplay/audio/` (see its README for the raw file and `-ss/-to` of each), then builds six sealed pairs
+(`AUDIO_PAIRS`): `apair-<id>.mp4` (black 640x384 picture, the same label bar - one square while A plays, two while B - and clock;
+audio = A, 1.0 s silence, B), `apair-<id>-A.wav` / `-B.wav` (both trimmed to `min(len)` <= 8 s from t = 0, each brought to
+-23 LUFS integrated with ONE linear gain capped at -1 dBFS peak - no compression), `apair-<id>-sheet.jpg` (spectrograms, A above B,
+identical axes, no labels) and `apair-<id>.answer.json` (chmod 000). Sides: `--coin balanced` (default) shuffles three ours-A / three ref-A with `Rng(seed)`; `--coin plain` uses `coinLeft(seed + k)` per pair. The id is
+`audio-<beat>-<refNN>-<stamp>-<hex>` so `harness:critic-prompt <id>` (which emits the audio prompt: black by design, WAV / sheet
+paths, measure-don't-listen, the `audio` rubric) and `harness:log-verdict <id>` work unchanged. For an audio pair `winner` is the
+side the critic believes is the REAL game, so `winnerUnmasked = ours` means the critic took ours for the real one.

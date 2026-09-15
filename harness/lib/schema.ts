@@ -191,6 +191,8 @@ export interface StrangerSession extends RunMeta {
   trackId: string;
   seed: number;
   agent: string;
+  /** Bike class the session was ridden on (round 11; absent = rookie). */
+  bike?: 'rookie' | 'pro';
   cleared: boolean;
   attempts: AttemptLog[];
   /** attempts-to-clear = 1 + faults (restart/reset/crash), CONTRACT §3. */
@@ -337,10 +339,15 @@ export interface GateStrangerRow {
   /** Sessions completed on the working tree's src fingerprint (the only ones that count). */
   completedFresh: number;
   completedAny: number;
+  /** Round 11: bike class the row counts (the tier's default), and sessions open / abandoned on it (not in the median). */
+  bike?: 'rookie' | 'pro';
+  censored?: number;
   medianAttempts: number | null;
   allCleared: boolean;
   /** null = nothing to judge yet */
   pass: boolean | null;
+  /** Round 11: median under the authored band (easier than authored; within the ship limit, flagged for the tracks owner). */
+  belowBand?: boolean;
   sessions: string[];
 }
 

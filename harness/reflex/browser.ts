@@ -153,6 +153,19 @@ export class ReflexBrowser {
       });
       await page.goto(url.toString(), { waitUntil: 'commit' });
       await page.waitForFunction(() => window.__trials?.ready === true, undefined, { timeout: 30_000 });
+      // Round 11: `ready` is set when the hook installs (boot step `front`), BEFORE `App.start()` runs in the `track`
+      // step behind `nextPaint()` (rAF + setTimeout). With the fake clock installed, `pauseAt` below freezes the clock,
+      // so a boot still downloading art when it fires never gets its next paint: `start()` never runs, the screen stays
+      // at its initial 'menu' and the nav log is empty — round 9's 'menu', round 10's 'title'. The clock runs in real
+      // time until paused, so wait for the run itself (`?track=` -> `play()` -> countdown) before touching it.
+      try {
+        await page.waitForFunction(() => window.__trials?.phase?.() === 'countdown', undefined, { timeout: 90_000 });
+      } catch {
+        const why = (await page.evaluate(
+          `(() => { const t = window.__trials; const app = t && t.app; return JSON.stringify({ search: location.search, phase: t && t.phase ? t.phase() : null, screen: app && app.screen ? app.screen() : null, nav: t && t.navLog ? t.navLog().slice(-8) : null, boot: (document.getElementById('boot') || document.querySelector('[data-boot]') || {}).textContent || null }); })()`,
+        )) as string;
+        throw new Error(`live game: \`?track=\` did not reach the countdown within 90 s (app ${why})`);
+      }
       if (virtual) {
         // pauseAt fast-forwards to the target (rAF fires sparsely, each frame clamped to 0.25 s of game time by the
         // App), so a target well past the slowest boot costs a little countdown, never the GO.
@@ -251,7 +264,7 @@ export class ReflexBrowser {
                 pitchDeg: ctx.pitchDeg,
                 speed: ctx.speed,
                 airborne: ctx.airborne,
-                rule: ctrl.currentIntent().rule,
+                rule: e.reason === 'restart' ? 'stuck-restart' : ctrl.currentIntent().rule,
                 obstacle: nearestObstacle(sim, g.st.bike.pos.x),
                 lesson,
               };

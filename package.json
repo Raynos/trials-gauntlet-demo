@@ -32,6 +32,7 @@
     "harness:bench": "tsx harness/bench/bench.ts",
     "harness:bench:profile": "tsx harness/bench/profile.ts",
     "harness:critic-prompt": "tsx harness/compare/critic-prompt.ts",
+    "harness:audio": "tsx harness/compare/audio.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"

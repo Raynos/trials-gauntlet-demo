@@ -150,7 +150,9 @@ export function playReflex(sim: Sim, o: ReflexPlayOptions): ReflexPlayResult {
           pitchDeg: ctx.pitchDeg,
           speed: ctx.speed,
           airborne: ctx.airborne,
-          rule: ctrl.currentIntent().rule,
+          // A `restart` fault while riding is the rider's own stall-restart (`stuck-restart`): label it so, whatever
+          // intent a newer glance wrote while the key was held (round 11).
+          rule: e.reason === 'restart' ? 'stuck-restart' : ctrl.currentIntent().rule,
           obstacle: nearestObstacle(sim, before.bike.pos.x),
           lesson,
         };

@@ -87,7 +87,20 @@ export function reflexRows(tracks: readonly string[], factor: number, skill: 'no
 }
 
 /** The tracks a stranger round judges (harness-metrics.md §3). */
-export const STRANGER_TRACKS = ['b1-first-ride', 'b2-lean-back', 'b3-kicker-row', 'e1-uphill-weight'] as const;
+/** The reflex row's four judged tracks (G10 second row; the reflex bot's `average` medians are recorded for these). */
+export const REFLEX_TRACKS = ['b1-first-ride', 'b2-lean-back', 'b3-kicker-row', 'e1-uphill-weight'] as const;
+/**
+ * G10 stranger row (round 11, audit §4): every course with an authored `attemptsBand` — the whole curriculum, every
+ * tier — not the first four. Each track arms on its own once >= stranger.minSessions completed sessions exist on this
+ * src and the tier's default bike; unarmed tracks are listed as informational in the note, never as a pass.
+ */
+export const STRANGER_TRACKS = [
+  'b1-first-ride', 'b2-lean-back', 'b3-kicker-row',
+  'e1-uphill-weight', 'e2-rear-wheel-first', 'e3-stairway',
+  'm1-hop-up', 'm2-drum-roll', 'm3-see-saw',
+  'h1-wheelie-wire', 'h2-gap-chain', 'h3-fire-line',
+  'x1-vertical-limit', 'x2-pipe-dream', 'x3-gauntlet',
+] as const;
 
 /** G2b: the tracks the gate clears on the Pro bike by golden replay (round 7). */
 export const PRO_CLEAR_TRACKS = ['flat-test', 'b1-first-ride'] as const;
@@ -104,22 +117,31 @@ export function strangerRows(tracks: readonly string[], factor: number): GateStr
     if (!fs.existsSync(file)) continue;
     const m = JSON.parse(fs.readFileSync(file, 'utf8')) as {
       attemptsBand?: [number, number] | null;
-      sessions: Array<{ sessionId: string; status: string; srcFingerprint: string | null; strangerAttempts: number; cleared: boolean }>;
+      bike?: 'rookie' | 'pro';
+      sessions: Array<{ sessionId: string; status: string; srcFingerprint: string | null; strangerAttempts: number; cleared: boolean; bike?: 'rookie' | 'pro' }>;
     };
-    const fresh = m.sessions.filter((x) => x.status === 'done' && x.srcFingerprint === fp);
+    // The band is authored for the tier's default bike; the report records which class its medians count.
+    const bike = m.bike ?? 'rookie';
+    const onBike = m.sessions.filter((x) => (x.bike ?? 'rookie') === bike);
+    const fresh = onBike.filter((x) => x.status === 'done' && x.srcFingerprint === fp);
+    const censored = onBike.filter((x) => x.status !== 'done').length;
     const attempts = fresh.map((x) => x.strangerAttempts).sort((a, b) => a - b);
     const median = attempts.length ? (attempts.length % 2 ? attempts[(attempts.length - 1) / 2]! : (attempts[attempts.length / 2 - 1]! + attempts[attempts.length / 2]!) / 2) : null;
     const band = m.attemptsBand ?? null;
     const limit = band ? factor * band[1] : null;
     rows.push({
       trackId,
+      bike,
       attemptsBand: band,
       limit,
       completedFresh: fresh.length,
-      completedAny: m.sessions.filter((x) => x.status === 'done').length,
+      completedAny: onBike.filter((x) => x.status === 'done').length,
+      censored,
       medianAttempts: median,
       allCleared: fresh.length > 0 && fresh.every((x) => x.cleared),
+      // The ship bound is the upper one: a median under the authored band (UNDER-BAND in the report) is within it.
       pass: median === null || limit === null ? null : median <= limit && fresh.every((x) => x.cleared),
+      belowBand: median !== null && band !== null && median < band[0],
       sessions: fresh.map((x) => x.sessionId),
     });
   }
@@ -546,25 +568,31 @@ async function main(): Promise<void> {
       check({ id: 'camera.box', value: Number.isFinite(riding) ? riding : null, limit: 0, pass, unit: 'frames out of box while riding', note: line ? `${g ? path.basename(g.file) : 'no golden'}; clamped ${Number.isFinite(clampedPct) ? clampedPct : '?'} % (reported); ${((performance.now() - t0) / 1000).toFixed(0)} s; ${line.slice(0, 200)}` : `no camera line; clip exit ${r.code}: ${r.out.trim().split('\n').slice(-2).join(' | ').slice(0, 200)}` });
     }
 
-    // G10 stranger: the four judged tracks, on the physics in the working tree right now.
+    // G10 stranger: every banded course, on the physics in the working tree right now. Each track arms on its own
+    // (>= minSessions completed on this src + default bike); the check fails if ANY armed track is outside its
+    // limit or did not clear, and the note names the tracks that are still informational and every censored session.
     const stranger = strangerRows(STRANGER_TRACKS, num('stranger.attemptsBandFactor'));
     const minSessions = num('stranger.minSessions') || 2;
-    const armed = stranger.length === STRANGER_TRACKS.length && stranger.every((r) => r.completedFresh >= minSessions);
-    const allPass = stranger.every((r) => r.pass === true);
-    const summary = stranger.map((r) => `${r.trackId.split('-')[0]} ${r.medianAttempts ?? '-'}/${r.limit ?? '-'}${r.completedFresh < minSessions ? ` (${r.completedFresh} fresh)` : ''}`).join(' · ');
+    const armedRows = stranger.filter((r) => r.completedFresh >= minSessions);
+    const unarmed = STRANGER_TRACKS.filter((t) => !armedRows.some((r) => r.trackId === t));
+    const armed = armedRows.length > 0;
+    const allPass = armedRows.every((r) => r.pass === true);
+    const short = (t: string): string => t.split('-')[0]!;
+    const summary = armedRows.map((r) => `${short(r.trackId)} ${r.medianAttempts ?? '-'}/${r.limit ?? '-'} (n=${r.completedFresh}${r.censored ? `, ${r.censored} censored` : ''}${r.belowBand ? ', under band' : ''})`).join(' · ');
+    const unarmedNote = unarmed.map((t) => { const r = stranger.find((x) => x.trackId === t); return `${short(t)} ${r ? `${r.completedFresh} fresh${r.censored ? `+${r.censored} censored` : ''}` : 'no report'}`; }).join(', ');
     check({
       id: 'stranger.medianAttempts',
-      value: summary || 'no stranger metrics',
+      value: summary || 'no armed track',
       limit: num('stranger.attemptsBandFactor'),
       pass: armed ? allPass : true,
-      note: `median attempts / (${num('stranger.attemptsBandFactor')} x band top) on src ${srcFingerprint()}; ${armed ? `armed: ${allPass ? 'all four within band' : 'outside band'}` : `informational until every track has >= ${minSessions} completed sessions on this src`}`,
+      note: `median attempts / (${num('stranger.attemptsBandFactor')} x band top), every counted session cleared, on src ${srcFingerprint()} and the tier's default bike; armed ${armedRows.length}/${STRANGER_TRACKS.length} tracks (>= ${minSessions} completed)${armed ? `: ${allPass ? 'all armed within the limit' : `OUTSIDE: ${armedRows.filter((r) => r.pass !== true).map((r) => short(r.trackId)).join(', ')}`}` : ''}; informational (unarmed): ${unarmedNote || 'none'}`,
     });
     report.stranger = { srcFingerprint: srcFingerprint(), armed, minSessions, rows: stranger };
 
-    // G10, second row: the reflex bot (average) on the same tracks, seeds recorded on this src.
-    const reflex = reflexRows(STRANGER_TRACKS, num('reflex.attemptsBandFactor') || 1.5);
+    // G10, second row: the reflex bot (average) on the four judged tracks, seeds recorded on this src.
+    const reflex = reflexRows(REFLEX_TRACKS, num('reflex.attemptsBandFactor') || 1.5);
     const minSeeds = num('reflex.minSeeds') || 3;
-    const reflexArmed = reflex.length === STRANGER_TRACKS.length && reflex.every((r) => r.seedsFresh >= minSeeds);
+    const reflexArmed = reflex.length === REFLEX_TRACKS.length && reflex.every((r) => r.seedsFresh >= minSeeds);
     const reflexPass = reflex.every((r) => r.pass === true);
     const reflexSummary = reflex.map((r) => `${r.trackId.split('-')[0]} ${r.medianAttempts ?? '-'}/${r.limit ?? '-'}${r.seedsFresh < minSeeds ? ` (${r.seedsFresh} fresh)` : ''}`).join(' · ');
     check({
@@ -578,8 +606,8 @@ async function main(): Promise<void> {
 
     // G10, third row: the same reflex medians on the Pro bike. Informational by design — the attempts band is
     // authored for the tier's default bike (Rookie on beginner/easy) — but reported per track so a Pro regression is visible.
-    const reflexPro = reflexRows(STRANGER_TRACKS, num('reflex.attemptsBandFactor') || 1.5, 'average', 'pro');
-    const reflexProArmed = reflexPro.length === STRANGER_TRACKS.length && reflexPro.every((r) => r.seedsFresh >= minSeeds);
+    const reflexPro = reflexRows(REFLEX_TRACKS, num('reflex.attemptsBandFactor') || 1.5, 'average', 'pro');
+    const reflexProArmed = reflexPro.length === REFLEX_TRACKS.length && reflexPro.every((r) => r.seedsFresh >= minSeeds);
     const reflexProSummary = reflexPro.length ? reflexPro.map((r) => `${r.trackId.split('-')[0]} ${r.medianAttempts ?? '-'}/${r.limit ?? '-'}${r.seedsFresh < minSeeds ? ` (${r.seedsFresh} fresh)` : ''}${r.allCleared ? '' : ' (not all cleared)'}`).join(' · ') : 'no <track>.pro.reflex.json yet';
     check({
       id: 'reflex.medianAttempts.pro',

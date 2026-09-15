@@ -7,15 +7,16 @@
     12
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "db68bbeb",
-  "updatedAt": "2026-09-15T03:12:20.437Z",
-  "includeStale": false,
+  "srcFingerprint": "65175e2d",
+  "updatedAt": "2026-09-15T19:32:09.444Z",
+  "includeStale": true,
   "sessions": [
     {
       "sessionId": "m2-drum-roll-r6-s1-20260914-215809",
       "agent": "s1",
+      "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "db68bbeb",
       "strangerAttempts": 4,
       "cleared": true,
@@ -72,8 +73,9 @@
     {
       "sessionId": "m2-drum-roll-r6-s2-20260914-215809",
       "agent": "s2",
+      "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "db68bbeb",
       "strangerAttempts": 4,
       "cleared": true,
@@ -128,13 +130,30 @@
       ]
     }
   ],
+  "bike": "rookie",
   "completed": 2,
   "clearedCount": 2,
   "medianAttempts": 4,
   "medianFinishTime": 71.5,
   "medianCalls": 31.5,
   "medianWallMs": 409475.5,
-  "pass": true,
+  "census": {
+    "n": 2,
+    "minSessions": 2,
+    "censored": [],
+    "staleExcluded": 0,
+    "otherBikeExcluded": 0
+  },
+  "asserted": {
+    "band": [
+      6,
+      12
+    ],
+    "factor": 1.5,
+    "limit": 18
+  },
+  "verdict": "UNDER-BAND",
+  "pass": false,
   "deaths": {
     "total": 6,
     "byReason": {

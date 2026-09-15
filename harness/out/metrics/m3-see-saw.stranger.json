@@ -7,15 +7,16 @@
     12
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "db68bbeb",
-  "updatedAt": "2026-09-15T03:12:20.459Z",
-  "includeStale": false,
+  "srcFingerprint": "65175e2d",
+  "updatedAt": "2026-09-15T19:32:09.452Z",
+  "includeStale": true,
   "sessions": [
     {
       "sessionId": "m3-see-saw-r6-s1-20260914-215809",
       "agent": "s1",
+      "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "db68bbeb",
       "strangerAttempts": 5,
       "cleared": true,
@@ -81,8 +82,9 @@
     {
       "sessionId": "m3-see-saw-r6-s2-20260914-215809",
       "agent": "s2",
+      "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "db68bbeb",
       "strangerAttempts": 11,
       "cleared": true,
@@ -200,12 +202,29 @@
       ]
     }
   ],
+  "bike": "rookie",
   "completed": 2,
   "clearedCount": 2,
   "medianAttempts": 8,
   "medianFinishTime": 97.16665,
   "medianCalls": 34.5,
   "medianWallMs": 627784,
+  "census": {
+    "n": 2,
+    "minSessions": 2,
+    "censored": [],
+    "staleExcluded": 0,
+    "otherBikeExcluded": 0
+  },
+  "asserted": {
+    "band": [
+      8,
+      12
+    ],
+    "factor": 1.5,
+    "limit": 18
+  },
+  "verdict": "PASS",
   "pass": true,
   "deaths": {
     "total": 14,

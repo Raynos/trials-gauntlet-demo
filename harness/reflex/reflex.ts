@@ -1,7 +1,7 @@
 /**
  * The reflex bot (a person holding keys): the primary attempts-to-clear instrument.
  *
- *   pnpm harness:reflex <trackId> [--skill novice|average|good] [--seeds 3] [--attempts-cap 50] [--max-sim-seconds 300]
+ *   pnpm harness:reflex <trackId> [--skill novice|average|good] [--seeds 3] [--attempts-cap 50] [--max-sim-seconds 300] [--max-sim-seconds-extreme 1800]
  *                       [--browser N] [--no-verify] [--build] [--dev] [--verbose]
  *   pnpm harness:reflex --all-tracks [--skill average] [--seeds 3] [--tracks a,b] [--noisy a,b --noisy-seeds 9]
  *   pnpm harness:reflex --calibrate                      # reflex (average) vs the stranger medians on b1/b2/b3/e1
@@ -298,7 +298,11 @@ async function browserRuns(trackId: string, skill: SkillName, n: number, flags: 
 async function runTrack(trackId: string, skills: SkillName[], seeds: number, flags: ReturnType<typeof parseArgs>['flags'], bike: BikeClass = DEFAULT_BIKE): Promise<{ metrics: ReflexTrackMetrics; runs: RunOnce[] }> {
   const probe = await createSim(trackId, undefined, undefined, { bike });
   const baseSeed = flags.seed !== undefined ? flagNum(flags, 'seed', probe.seed) : probe.seed;
-  const o = { attemptsCap: flagNum(flags, 'attempts-cap', 50), maxSimSeconds: flagNum(flags, 'max-sim-seconds', 300), verbose: flagBool(flags, 'verbose'), bike };
+  // Round 11 (tracks r9 request a): the extreme tier clears at 24-50 attempts x ~40 s; `--max-sim-seconds-extreme` (default
+  // 1800) caps its runs separately from `--max-sim-seconds` (300) so one matrix invocation covers both.
+  const simCap = flagNum(flags, 'max-sim-seconds', 300);
+  const simCapExtreme = flagNum(flags, 'max-sim-seconds-extreme', Math.max(simCap, 1800));
+  const o = { attemptsCap: flagNum(flags, 'attempts-cap', 50), maxSimSeconds: probe.track.tier === 'extreme' ? simCapExtreme : simCap, verbose: flagBool(flags, 'verbose'), bike };
   const bySkill = new Map<SkillName, ReflexRunReport[]>();
   const all: RunOnce[] = [];
   for (const skill of skills) {
@@ -422,7 +426,7 @@ async function main(): Promise<void> {
     const md = [
       `# Reflex bot — skill ${skillList.join(' / ')}, ${seeds} seed(s), bikes ${bikes.join(' + ')}, src ${srcFingerprint()}, ${started.toISOString()}, wall ${((Date.now() - started.getTime()) / 1000).toFixed(0)} s`,
       '',
-      `attempts = 1 + faults (all reasons); cap ${flagNum(flags, 'attempts-cap', 50)}; sim cap ${flagNum(flags, 'max-sim-seconds', 300)} s. Rookie = \`<track>.reflex.json\`, Pro = \`<track>.pro.reflex.json\`; the band is authored for the tier's default bike (average). Death sites: nearest placed obstacle (name @ x) with the rule the rider was executing.`,
+      `attempts = 1 + faults (all reasons); cap ${flagNum(flags, 'attempts-cap', 50)}; sim cap ${flagNum(flags, 'max-sim-seconds', 300)} s (extreme tier ${flagNum(flags, 'max-sim-seconds-extreme', Math.max(flagNum(flags, 'max-sim-seconds', 300), 1800))} s). Rookie = \`<track>.reflex.json\`, Pro = \`<track>.pro.reflex.json\`; the band is authored for the tier's default bike (average). Death sites: nearest placed obstacle (name @ x) with the rule the rider was executing.`,
       '',
       ...sections,
       `## Calibration against the stranger sessions (Rookie)`,

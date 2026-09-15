@@ -143,6 +143,8 @@ function view(s: LoadedSession): string {
 function trackCard(s: LoadedSession): string {
   const t = s.sim.track;
   const lines = [`track ${t.id} (${t.tier}) "${t.name}"${t.meta?.technique ? ` — technique: ${t.meta.technique}` : ''}`];
+  // The bike picker is on the menu: the player knows which class they took to the line.
+  lines.push(`bike: ${s.sim.bike === 'pro' ? 'Pro (no wheelie ECU — the loop is yours at every lean; 22 m/s top)' : 'Rookie (wheelie ECU; 20 m/s top)'}`);
   const hints = t.tier === 'beginner' && t.meta?.hints?.length ? t.meta.hints : null;
   if (hints) lines.push(`hints: ${hints.join(' · ')}`);
   lines.push(`checkpoints at x = ${t.checkpoints.map((c) => c.x).join(', ')} m; finish at x = ${t.finishX} m`);
@@ -433,6 +435,7 @@ async function done(s: LoadedSession): Promise<{ session: StrangerSession; metri
     trackId: st.trackId,
     seed: st.seed,
     agent: st.agent,
+    bike: s.sim.bike,
     cleared: st.cleared,
     attempts: st.attempts,
     strangerAttempts,
@@ -520,7 +523,7 @@ async function main(): Promise<number> {
   const { positional, flags } = parseArgs();
   const cmd = positional[0];
   if (!cmd || flags['help'] === true) {
-    console.log('usage: cli.ts <start|look|status|play "<slots>"|restart|reset|done> [--track id] [--session id] [--agent name] [--seed N]\n       cli.ts report <trackId> [<trackId>...] [--stale]   (parent side: aggregate every session of each track)\n       cli.ts prep --tracks a,b [--agents s1,s2] [--round r3]   (parent side: fresh sessions + paste-ready prompts)');
+    console.log('usage: cli.ts <start|look|status|play "<slots>"|restart|reset|done> [--track id] [--session id] [--agent name] [--seed N] [--bike rookie|pro]\n       cli.ts report <trackId> [<trackId>...] [--stale]   (parent side: aggregate every session of each track)\n       cli.ts prep --tracks a,b [--agents s1,s2] [--round r3] [--bike rookie|pro]   (parent side: fresh sessions + paste-ready prompts)');
     return cmd ? 0 : 1;
   }
   const trackFlag = typeof flags['track'] === 'string' ? flags['track'] : undefined;
@@ -531,17 +534,18 @@ async function main(): Promise<number> {
     if (ids.length === 0) throw new Error('usage: report <trackId> [<trackId>...] [--tracks a,b] [--stale]');
     const rows: string[] = [];
     for (const id of ids) {
-      const r = await strangerReport(id, { fresh: !flagBool(flags, 'stale') });
+      const r = await strangerReport(id, { fresh: !flagBool(flags, 'stale'), ...(flags['bike'] !== undefined ? { bike: parseBike(flags['bike']) } : {}) });
       console.log(r.markdown);
-      console.log(`report: ${r.jsonFile} (+ .md) sessions=${r.metrics.sessions.length} completed=${r.metrics.completed} median attempts=${r.metrics.medianAttempts ?? '-'} pass=${r.metrics.pass ?? 'n/a'}`);
       const m = r.metrics;
+      console.log(`report: ${r.jsonFile} (+ .md) sessions=${m.sessions.length} n=${m.census.n} (${m.bike ?? 'rookie'}, min ${m.census.minSessions}) censored=${m.census.censored.length} median attempts=${m.medianAttempts ?? '-'} verdict=${m.verdict}`);
       const band = m.attemptsBand ? `${m.attemptsBand[0]}–${m.attemptsBand[1]}` : '—';
-      rows.push(`| ${id} | ${band} | ${m.sessions.length} | ${m.completed} | ${m.clearedCount} | ${m.medianAttempts ?? '—'} | ${m.medianFinishTime === null ? '—' : `${m.medianFinishTime.toFixed(1)} s`} | ${m.medianCalls ?? '—'} | ${m.pass === null ? 'n/a' : m.pass ? 'PASS' : 'FAIL'} |`);
+      const asserted = m.asserted ? `${m.asserted.band[0]} ≤ med ≤ ${m.asserted.limit}` : '—';
+      rows.push(`| ${id} | ${m.bike ?? 'rookie'} | ${band} | ${asserted} | ${m.sessions.length} | ${m.census.n} | ${m.census.censored.length} | ${m.clearedCount}/${m.census.n} | ${m.medianAttempts ?? '—'} | ${m.medianFinishTime === null ? '—' : `${m.medianFinishTime.toFixed(1)} s`} | ${m.medianCalls ?? '—'} | ${m.verdict} |`);
     }
     if (ids.length > 1) {
       console.log(`\n## Stranger summary — ${ids.length} tracks, src ${srcFingerprint()}${flagBool(flags, 'stale') ? ' (incl. stale)' : ''}\n`);
-      console.log('| track | band | sessions | completed (fresh) | cleared | median attempts | median time | median calls | pass (≤ 1.5 × band top, all cleared) |');
-      console.log('| --- | --- | --- | --- | --- | --- | --- | --- | --- |');
+      console.log('| track | bike | band | asserted | sessions | n (completed, this src + bike) | censored | cleared | median attempts | median time | median calls | verdict |');
+      console.log('| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |');
       for (const row of rows) console.log(row);
     }
     return 0;
