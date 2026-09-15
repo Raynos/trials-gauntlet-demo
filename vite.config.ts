@@ -225,7 +225,10 @@ function loadManifest(id: string): Plugin {
         // The inline loader: TypeScript, bundled; minified with the core list compiled in for the build (≤ 8 KB budget asserted).
         const code = await buildInline(root, ctx.bundle ? coreItems : [], totals, !!ctx.bundle, id);
         if (!html.includes('<script id="boot"></script>')) throw new Error('index.html: <script id="boot"></script> missing');
-        html = html.replace('<script id="boot"></script>', `<script>${code}</script>`);
+        // Function replacer: a string replacement would interpret `$&` / `$'` inside the minified code
+        // (the 2026-09-15 audit's P1 — `$&&t++` re-inserted the placeholder markup into the script).
+        html = html.replace('<script id="boot"></script>', () => `<script>${code}</script>`);
+        if (/<script>[^]*?<script id="boot">/.test(html)) throw new Error('index.html: loader insertion corrupted');
         // Take over the entry: the loader inserts it once the core set is in cache (dev: straight away).
         let entry: string | null = null;
         html = html.replace(/\s*<script type="module"[^>]*src="([^"]+)"[^>]*><\/script>/g, (m, src: string) => {

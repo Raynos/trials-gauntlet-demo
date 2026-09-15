@@ -1307,6 +1307,206 @@ working-tree physics; the round's clips use windows before those ticks (the b1 o
 - Garage close-up per class: not captured this round (the garage is the app's screen, not a harness
   state); the riding-distance Pro still is `still-b1-low-pro.png`.
 
+## 11i. Round 14 — the phone's three live bugs (rider arms, track entry, replay white-out), the air camera, the low budget
+
+**Finding:** all three bugs the user's iPhone showed were renderer state, not assets or physics: the
+round-11 program prune handed three a destroyed GL program (bind-pose arms on `medium` / `low`), a
+biome's shaders compiled at the countdown's first draw (black frames with the HUD running), and the
+finish flash's clock ran backwards into the replay (`uFlash` 20–200 → a white frame with cyan specks).
+Numbers are headless (Playwright + SwiftShader, host load average 17–48 — other owners' headless
+Chromium the whole round); SwiftShader ms are not phone ms, the counts are.
+
+### The rider's arms on `medium` / `low` — `pruneStalePrograms` (`index.ts`, `hero/lod.ts`, `hero/gltfRider.ts`)
+
+The phone drew the rider with both arms as rigid tubes out to the side and, in one frame, the torso
+facing backwards — the skinned mesh in its bind pose. `rider-lod.glb` was the suspect (round 13 put the
+LOD document on the phone tiers); it is clean: byte-identical joint order, bind rotations, inverse bind
+matrices, hierarchy and the 8 clips against `rider.glb`; decoded meshopt skin weights sum to 1 with the
+same per-joint bounding boxes; the live deploy's file md5 matched the tree; and the hands-on-grips probe
+(hand-bone world position against the chain's grip point in bike-frame coordinates, b1 bot-3 golden,
+105 samples to t1050) puts the LOD and the full rider within **0.7 mm** of each other at `low` and
+`medium`.
+
+The cause was the loader. Round 11's `pruneStalePrograms` (three frames after each world build)
+spliced `renderer.info.programs` and called `program.destroy()` on every program a scene material held
+but was not currently drawing with. three r186 also keeps a private `programsMap` (cacheKey → program)
+that the prune could not reach, so the destroyed wrapper stayed acquirable: the next material that hit
+that cacheKey — an instanced prop batch, the spoke material, the LOD hero rebuilt on a tier change —
+was handed a wrapper whose `program` was `undefined`; three bound no program, and every uniform and VAO
+upload after it ran against corrupt state. On the app's real boot path (loader → `prepare()` → menu →
+play; iPhone geometry; `trials.quality=medium`) Chromium logs 12 × `INVALID_OPERATION: no valid shader
+program in use` / `uniformMatrix4fv: location is not from the associated program` starting exactly the
+frame after the prune, and 0 with the prune stubbed. SwiftShader drops those draws; the phone's ANGLE
+on Metal drew the skinned rider with stale attribute state. It never reproduced in the harness because
+the harness never runs `prepare()`'s compile pass, so no material ever had a stale program to prune;
+`high` on the phone was luck of which cacheKeys were re-acquired.
+
+- The prune is gone. `debugInfo().stalePrograms` counts the same programs read-only (memory only;
+  nothing releases a program mid-session any more).
+- Hotfix rule: the rider draws the full `rider.glb` on every tier (`lodChoice(tier, 'rider')`,
+  `riderLodEnabled` default off, `ThreeRenderer.setRiderLod(true)` to flip; the bike LOD has no skin
+  and stays). The rider LOD returns to the phone tiers on the first device report after this deploy.
+- Found by the gate: round 13's additive landing squash (`land_absorb` at weight ≤ 0.9 from the
+  compression spike) and hop extension were blended *after* the arm IK and lifted both hands up to
+  18 cm off the grips around a hard landing (b1 golden t720, full and LOD rider alike). `update()` now
+  poses the chain, blends the clips onto torso / legs / head (`ARM_CHAIN` skipped), then re-solves
+  both arms from the posed shoulders (`refreshWorldQ` → `solveArm`): landing frames are back to 0 cm.
+- Still open (pose / physics owners): at the hop push (b1 t150–170, t900–920) the physics rider body
+  rises until the grips are 5–12 cm beyond the rig's 62 cm arm reach — pure `wristErr`, identical on
+  both documents. The gate criterion is therefore "0 cm whenever reachable; LOD within 1 mm of full".
+
+### Track entry — the biome compiles behind the placeholder, not under the countdown (`index.ts beginEntry`)
+
+Entering e2 from the menu, the HUD timer ran at 0:02 over a black world for seconds (24 fps / worst
+64 ms on `low`): boot had prepared the industrial hall; a biome change at `setTrack` compiled the
+canyon's programs and uploaded its textures at the first draw. Now `setTrack` builds the world and
+starts `beginEntry()`: the world's textures (`renderer.initTexture`, ≤ 12 ms per task), then its
+materials through the shared `compileMaterials` (two per task, `compileAsync` against the tier's scene
+target — the canvas on `low`, the HDR target above), then one warm-up scene pass with frustum culling
+off and a `finish()` (a driver that builds its pipelines at the first draw — SwiftShader, ANGLE's
+per-state pipeline objects — does it here, for every mesh), cleared to the fog placeholder before the
+task yields so it is never composited. A newer `setTrack` cancels the job by token. `whenReady()`
+resolves after it; while it runs, `render()` in play mode paints the fog placeholder (the harness path
+keeps its synchronous first frame). `debugInfo().entryMs` and `entry` (compile / texture / warm-up ms,
+textures and MB uploaded, materials, programs before → after) are the loader's numbers; the core-game
+owner holds the countdown on `whenReady()`.
+
+Per-biome entry, `low`, 1280×720, one session entering each biome from the previous one (host load
+24–42). "First draw" is the first `render()` after `whenReady()` — the frame the countdown would have
+shown; "steady" the one after it.
+
+| biome (track) | before: first draw | after: first draw | steady | entry job ms = compile + textures + warm-up | materials | programs | textures uploaded |
+|---|---|---|---|---|---|---|---|
+| industrial (b1, boot) | 6491 | 862 | 253 | 4423 = 462 + 0 + 3867 | 58 | 10 → 30 | 32 (13.8 MB) |
+| canyon (e2) | 8267 | 237 | 145 | 6435 = 373 + 0 + 5952 | 54 | 28 → 38 | 43 (27.0 MB) |
+| snow (m2) | 2828 | 228 | 100 | 1971 = 383 + 0 + 1463 | 52 | 31 → 37 | 39 (20.7 MB) |
+| foundry (h3) | 5953 | 244 | 135 | 4469 = 744 + 0 + 3637 | 89 | 40 → 54 | 53 (33.2 MB) |
+| nightCity (h1) | 8103 | 125 | 100 | 6155 = 538 + 0 + 5494 | 69 | 53 → 66 | 52 (34.5 MB) |
+| industrial again (b2) | 1908 | 197 | 173 | 1832 = 501 + 0 + 1250 | 63 | 56 → 67 | 51 (31.7 MB) |
+
+On this host the warm-up dominates because SwiftShader JIT-compiles every pipeline at its first draw;
+on the phone the same cost is the Metal shader compile at link, which `compileMaterials` spreads over
+≤ 16 ms tasks. The texture column is ≈ 0 ms because the world's bitmaps are already GPU-resident from
+the procedural set; a fresh boot's upload (29 textures, 33 MB) measured 3.06 s in the boot entry.
+
+### Replay white-out on `medium` — the finish flash's clock (`index.ts render`, `post/chain.ts`, `lighting/environment.ts`)
+
+The composite ends with `mix(col, 1, uFlash)`; `uFlash = 1 − (tSim − flashT) / 0.2` with `flashT` set at
+the finish event and cleared only by `setTrack`. Opening the replay of the run just finished restarts
+`tSim` at 0 with `flashT` still at the finish time — for a 5 s run `uFlash = 21`, for a 40 s run 201:
+the whole HDR frame mixes past white, and channels of the brightest emissives overshoot negative and
+clamp to 0 — the user's "pure white with cyan / blue specks, HUD intact" (`render8/white-medium-before.png`:
+mean luminance 1.000, 100 % of 288 samples white; `flash14.mts` runs the golden to t600, fires
+`finish`, restarts, samples). `low` has the same `mix` inside every material's tone map but its sky
+background bypasses it, so it never went *fully* white. Fixed at the source and guarded downstream:
+
+- the flash follows the sim clock forward only (`since < 0 || since ≥ 0.2` ends it) and a `restart`
+  event clears `flashT` (a restart is a time cut) — replay frame back to mean 0.244 (`medium`) /
+  0.274 (`low`), the finish flash itself still 1.0 at the finish instant;
+- every per-frame composite uniform is finite and in range before it reaches a shader
+  (`setDynamics`: chroma, bike UV, smear, flash — a NaN bike UV from a bike behind a replay camera
+  falls back to the centre);
+- the composite's `scene()` drops a non-finite texel to black (`isnan` / `isinf` under GLSL ES 3.0)
+  and caps the HDR sample at 64× white (already fully white after ACES — no visible frame changes);
+  `uFlash` and `uGradeC.w` are clamped to [0, 1] in GLSL too.
+
+The replay camera modes were not the cause: a 30 s app-path run through game → wide → fixed with two
+seeks (`replay14.mts`, 343 frames sampled) never exceeded mean luminance 0.376 once the flash was fixed.
+
+### Speed smear and aberration on `medium` (`post/chain.ts`, `index.ts`)
+
+Every b3 frame above 12 m/s read as the whole frame doubled: the chromatic aberration reached 15 px at
+the edge of the 2500 px medium canvas and the 5-tap smear (8 px) ran over the whole frame outside the
+bike mask. Both halved (`uChroma` 0.006 → 0.003, smear 8 → 4 px max) and confined to the rim by a
+radial falloff (smear from 0.3 to 0.7 of the half-diagonal, aberration from 0.35 to 0.7): the bike and
+the near track are sharp at any speed; only the frame's rim streaks. `low` was never smeared.
+
+### Air camera — ≤ 20 % pull-back, the bike climbs the box (`camera/rig.ts`)
+
+On the b3 flights the rig pulled back until the bike was ≈ 4 % of the frame: the `above`-driven
+height-fraction factor (to ×3.3 distance) stacked with the box clamp's "first widen" snap (k to 2.5)
+and the air state's wide framing (0.26 → 0.19). Now: the air adds nothing to the wide state; the air
+pull-back is capped at ×1.2 distance; airborne, the box clamp never widens but slides the aim after the
+bike (it climbs to the top band and the camera follows it up); the landing zone enters by look-ahead
+(doubled in the air, ≤ 16 % of the width) rather than by distance. Pitch and roll are untouched by the
+air; the pitch tilt remains only as the last resort when the hall roof clamps the camera (b3 apex),
+because a clamped camera cannot slide. H4 re-run below.
+
+CAMCHECK_TABLE
+
+### Low budget — every golden at the phone geometry (2000×920 @ DPR 1.5 → 1600×736), riding frame
+
+New cut this round: the under-deck AO skirt is hidden on `low` (`tierHides deck:ao`; 28 k transparent
+tris on b1). Not taken: merging the per-chunk prop batches (the remaining 75–80 calls are one instanced
+draw per prop kind per 80 m chunk with its `:-1` neighbour; a per-chunk merge by material is the world
+owner's next cut) and a medium-tier container skin set.
+
+BUDGET_TABLE
+
+### Determinism, checks
+
+DET_LINE `pnpm typecheck`, `pnpm lint`, `pnpm vitest run src/render` (16) green.
+
+### Evidence (scratch `render8/`)
+
+`app/medfix-03.png`, `app/lowfix-*.png` (b1 riding stills on the app path at the iPhone geometry after
+the fix, hands on the grips), `still-b1-medium-before.png` (harness path, LOD rider — already correct
+there, which is what pointed at the app-only path), `white-medium-before.png` / `white-{medium,low}-after.png`,
+`still-b3-medium-speed.png` (medium at speed after the smear cut), `still-b3-low-air.png`,
+`phone-e2-low.png`, `camcheck14-low.log`, `table14-low.jsonl`, `det/`. Tooling: `app14.mts` (app-path
+probe with GL-error stacks, `--audit` lists the prune's victims, `--noprune`), `grip14.mts` (hands-on-
+grips gate, `--riderlod`, `--switch-from`), `entry14.mts` (per-biome entry cost, `--before`),
+`flash14.mts`, `replay14.mts`, `glbdiff.mjs` / `skindiff.mjs` / `layout.mjs` (rider vs rider-lod:
+skeleton, decoded skin weights, buffer layout), `chain14.sh` (serial captures).
+
+### Blind critic round 3 (six critics, r13 hero, harness r10; tally 2/6) — the tells, answered
+
+1. *big-jump-landing (ref 0.90): "camera runs away from the action: an unmotivated, ever-widening pull-out
+   to a top-down angle shrinks the bike to a dot, so the landing has no readable pitch, compression,
+   rebound or dust — the camera never eases back in to sell the touchdown."* — The air camera above. By
+   construction the bike now stays ≥ 0.26 / 1.2 = **21.7 % of frame height** through any flight (the
+   roof-clamp FOV boost of +12° can take that to 15.6 % on b3's apex; the ≥ 8 % floor holds either way),
+   the pitch never changes with the air, and the pull-back is a function of height above the landing
+   ground, so it eases back continuously on the way down — the touchdown is framed at the riding
+   distance. b3 riding frames now sit at sy 0.34–0.60 (was 0.24–0.59), worst offset 0.205 (was 0.257).
+2. *world-canyon (ref 0.72): "one-frame checkpoint push-in with a scene-wide blur burst — the camera changes
+   scale instantly instead of easing."* — Not closed this round. The instant scale change is a
+   track-authored `CameraKey.cut` (the key snaps its weight) and the round-11 "first widen" snap of the
+   box clamp on the ground; the blur burst is the composite smear over a frame whose scale just
+   changed. Proposed: ease authored cuts over 0.25 s unless the key is a real cut (a respawn), and hold
+   the smear at 0 for 0.3 s after any snap. Render owner, next round.
+3. *fault-respawn: "after the cut the camera is still sliding into the checkpoint frame for over a second
+   and the bike is not yet moving — the restart reads late."* — A respawn that keeps the run clock never
+   registered as a cut (`frame.ts` cut = clock went backwards). A teleport now is one: more than 6 m
+   between consecutive states snaps the rig, the pose lead and the interpolation. Not yet judged on a
+   clip (the goldens fault late; the harness owner's respawn clip is the evidence to take).
+4. *world-industrial (ref 0.75): "it casts no shadow… a sprite on a rail" at `high` on b1 dirt.* — Not
+   investigated this round (the round went to the phone's three live bugs). Suspects in order: the
+   2048² map over the whole caster set puts ≈ 14 mm per texel under the bike on b1, the dirt deck's
+   normal-mapped roughness lifts the shadowed texel, and `shadow.bias` was tuned against the round-12
+   hero-only map. Render owner: a `high` b1 still with the hero shadow measured (contact-shadow contrast
+   under the rear wheel) before anything is retuned.
+5. *three pairs: the rider is rigid — "no sway / lag / crouch", "rider never moves relative to the frame".*
+   — Wired in round 13 (H2: lean = rider body x, crouch = height below the servo target, torso pitch =
+   the body angle's lag) but its amplitude has not been measured in a clip. This round's grip probe saw
+   `armStretch` move only 0.705–0.717 over the b1 golden. Pose / physics owners: the rider body's
+   travel on the b1 golden (x, height, angle) against the reference's, then the pose table's gain.
+6. *"no dust at the rear patch after touchdown."* — Emitters: the landing burst keys off `justLanded` /
+   `landImpulse`; on `low` the ambient set is off and `countScale` is 0.5, and the burst is culled with
+   the system when nothing is alive. Not touched this round; a landing clip at `low` and `high` with
+   the particle census is the next check (render owner).
+
+### Known gaps after round 14
+
+- The rider LOD is off on the phone tiers until a device report confirms the prune fix (hero 17 k tris
+  on `low` instead of 11.4 k).
+- Hop-push reach: the rider body rises past the arm's 62 cm on the push (5–12 cm `wristErr`, b1
+  t160 / t910) — pose / physics owners.
+- Entry's warm-up + `finish()` is one task (the phone's per-pipeline builds for one frame); the
+  loader covers it, but it is the one non-16 ms step left in a track change.
+- The medium smear / aberration cut is judged on one still; H5's blind pairs should include a 12+ m/s
+  medium frame.
+
 ## 12. Known gaps after round 11 (what still reads non-AAA)
 
 - **Industrial mids / highlights**: p50 0.20 vs 0.284, p99 0.53 vs 0.876 — with the high camera the
