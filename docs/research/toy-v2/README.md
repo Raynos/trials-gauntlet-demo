@@ -15,7 +15,7 @@ Runs (each file is the raw stdout):
   within 0.8 s; lean 0 at 3.5 s).
 - `run4-design-params.md` — **the design's parameters except engine and brakes** (`F_peak` 780 N with the falling curve, `K_att` 180,
   `c_att` 20, pose table shifted +0.08 m, `F_max` 2600 N, springs 8500 / 0.26 m). This is the run quoted in
-  `docs/plans/physics-v2.md` §9.5, §10 and §14.
+  `project/archive/physics-v2.md` §9.5, §10 and §14.
 
 Rows: T0 static COM geometry per lean; T1 full throttle from rest per lean; T2 snap-forward from a wheelie;
 T3 lean step on the ground; T4 stationary hop sweeps (preload, snap speed, throttle through the snap, snap

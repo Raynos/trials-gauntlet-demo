@@ -14,5 +14,6 @@ Rules
 
 Contents
 - `PERF.md` — the perf plan, closed 2026-09-15 at cut #4b (`831e9c4`); the live remainder is `docs/plans/PERF-BACKLOG.md`.
-- (next: `docs/plans/physics-v2.md` at the `physics-v2-final` tag, `docs/plans/MEGA_PLAN.md` at the v0.2.0 pin,
+- `physics-v2.md` — the physics v2 design, closed 2026-09-15 at tag `physics-v2-final` (R6); status lives on in `docs/design/physics.md`.
+- (next: `docs/plans/MEGA_PLAN.md` at the v0.2.0 pin,
   `docs/tasks/touch-navigation-invariant.md` once the user confirms it on the phone)

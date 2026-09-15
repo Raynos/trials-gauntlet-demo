@@ -1,7 +1,7 @@
 # Rider on Glass — the second mega plan
 
 Two themes from the outside review (Fable 5.1, 2026-09-14 evening), built in parallel with
-`docs/plans/MEGA_PLAN.md` (v0.2.0) and `docs/plans/physics-v2.md`: **the rider and bike are the hero**, and
+`docs/plans/MEGA_PLAN.md` (v0.2.0) and `project/archive/physics-v2.md`: **the rider and bike are the hero**, and
 **the game is proven on a phone, not a laptop**. "Rider on Glass": the thing in the middle of the
 screen, on the piece of glass in the player's hand.
 

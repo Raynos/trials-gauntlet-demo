@@ -1,5 +1,14 @@
 # Physics v2: bike + rider, from the ground up
 
+**Closed: 2026-09-15 · tag `physics-v2-final` (R6).** Built as designed in six rounds (R1 solver → R6 same-tick crash /
+Pro ground ECU), default since `9b4275c`; 157/157 physics tests with no masked rows; strangers pass beginner–medium in
+band and ride hard/extreme on the R6 Pro (harness r12: h1 8 / h3 10 under band, x1 34.5 in band, h2 / x3 one DNF each
+— track sinks, `docs/design/harness-metrics.md` Round 12); Rookie goldens unchanged since R3, Pro re-proved 17/19
+(e1 / x2 Pro: the bot walls, not the physics). The living status is `docs/design/physics.md`; the bars this plan
+cannot close (learnable by a human in one evening, feel) are `docs/mission.md` §1 / §6. This file is the design as
+built — deviations are numbered in `docs/design/physics.md`.
+
+
 Owner: physics (to be built by the next physics owner from this document). Author: physics architect.
 Status: **design — not built**. Where this file disagrees with `docs/design/CONTRACT.md`, the CONTRACT wins;
 §16 lists the CONTRACT rows this design asks the core-game owner to amend. Evidence base:
