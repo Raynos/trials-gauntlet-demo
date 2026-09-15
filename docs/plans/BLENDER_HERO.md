@@ -44,12 +44,73 @@ Preserve bone/action/socket and physical hardpoint contracts. Run focused export
 attachment and replay checks for changed parts, then one integrated gate for the
 assembled candidate. Resume physics work when it blocks the visual result; the
 19 failing behavior/cost assertions stay recorded. Do not silently weaken them.
-Each accepted whole candidate gets a checkpoint with played media. Continue until
-the weekly allowance reaches 30% remaining; keep teammates at medium effort.
+Each accepted whole candidate gets a checkpoint with played media. The weekly
+30% remaining allowance is a spending floor, not a target to consume; stop earlier
+when the deliverable is accepted. Keep teammates at medium effort.
 
 Current progress gallery: `harness/out/blender/progress/index.html`. The user has
 seen actual Street and Race gameplay frames and can compare the prior/current
 clips. Keep sharing visible results as the complete candidates arrive.
+
+### Round 8 assembly in progress
+
+The first assembled candidate is preserved as `mega-v1-dist`. Parent played
+Street and Race; the narrower bike silhouette improved, but the bright rounded
+engine and padded sleeve rings did not meet the visual bar. The second bike
+reconstructs the complete engine/exhaust and now has a protected source exporter.
+Race has a separate tall-boot/pant candidate. Street uses Blender's CC0 realistic
+human surface for connected shoulders and arms; close playback exposed a poor
+upper-arm fit, so this source is still a prototype, not a promoted asset.
+
+The renderer previously disabled shadow reception on every hero mesh. A candidate
+enables it so assembled parts shade one another. Short-distance baked occlusion
+and scanned fabric inputs are being integrated to give the same geometry a
+convincing material response. Current canonical sources/GLBs remain Round 7;
+preview builds temporarily stage candidates and restore canonical bytes.
+
+Accept one coherent assembly after played ordinary-camera and labelled close
+inspection clips of both outfits and classes. Check human shoulder/elbow shape,
+garment fit, boot articulation, engine construction and material separation
+together. Then derive and inspect LOD from the protected sources, run focused
+contract checks and one integrated gameplay gate, and commit Round 8 with the
+source/export/media hashes. Existing physics regressions remain explicit and
+parked unless they block this visual result.
+
+### Finish line and current design decision
+
+Latest user direction: the Street helmet is too large and hides the character's
+face. Explore a bare head or small open-face design. The user also asked for a
+finite end state and would prefer stopping with more than 30% weekly remaining.
+The previous open-ended "keep polishing while budget remains" approach is
+superseded by a target selection, one coherent finish pass, and a visual review.
+
+Five OpenAI-generated target screenshots are saved in
+`assets/design/hero-targets/index.html`, with source screenshot references,
+prompts and output hashes. These are design concepts, not implementation evidence.
+Street alternatives are 1 (bare head / mustard), 2 (small open-face / charcoal),
+and 4 (bare head / charcoal). Race references 3/5 show Rookie/Pro. Selection is
+pending; all builders are parked rather than refining the rejected helmet.
+
+The bounded asset deliverable closes when:
+
+- The selected Street face/head design, Race outfit, and both bike class liveries
+  are implemented in editable protected sources and reproducible full/LOD GLBs.
+- Played ordinary-camera and close gameplay show believable head/body proportions,
+  continuous shoulders/elbows, fitted garments, articulated boots, and convincing
+  cloth/plastic/metal/rubber response. No hanging shoulder mass, detached limb,
+  oversized Street helmet or obvious texture/geometry failure remains.
+- Both outfits/classes load and switch, the actual rig/attachment/export checks
+  pass, and cold boot, track clear, crash and instant restart work. Recorded input
+  repeats exact physics/clock bytes. No hidden fallback or new runtime error.
+- The user accepts the real before/after footage against the chosen design.
+  Generated imagery alone cannot satisfy this gate. Actual iOS evidence and any
+  unresolved physics failures must remain explicitly reported, not called passed.
+
+Parent's verbal estimate of about 40% visual completion is an informal judgment,
+not a measured score or promise of photoreal reference parity. It does not count
+generated targets as progress on the actual models. At the next assembled review,
+report these checklist outcomes and stop for a decision if the visual bar is still
+missed; do not start unlimited small iterations automatically.
 
 ## Mandate and boundaries
 

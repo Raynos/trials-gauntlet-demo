@@ -71,6 +71,26 @@ These tests create both sources in ignored temporary directories, add an authore
 full/LOD copies, inspect actual GLBs, and exercise overwrite, source-alias, invalid-weight,
 outfit-mismatch, and post-export validation failures. They do not alter committed assets.
 
+## Protected bike sources
+
+`bike_asset.py` copies an authored full assembly into a protected source with
+`adopt --input <authored.blend> --source <new-source.blend>`. It refuses replacement
+of an existing source. The default protected path is `source/bike.blend`; Round 8
+currently has only scratch candidates, so adoption is still pending visual review.
+
+`export --source <source.blend>` derives full output; add `--lod` for a source-derived
+LOD, with `--lod-tris 6000` by default. Use `--models`, `--textures` and `--generated`
+for scratch destinations. Exports modify working copies only, preserve the 23 named
+parts and attachment metadata, stage all files, and use the production Meshopt/GLTF
+decoder before publication. The source hash must remain unchanged. Flexible chain,
+hose and spoke/card topology are protected during LOD decimation.
+
+Local crease occlusion is opt-in: call
+`common.configure_local_ao(distance=0.025, samples=32, strength=0.8)` before export.
+It packs same-object, short-range AO into the existing ORM red channel and exports
+glTF occlusion using the same texture. Distance zero retains legacy export bytes.
+This adds no image or draw but its visual strength requires played evaluation.
+
 ## Legacy rebuild and previews
 
 ```

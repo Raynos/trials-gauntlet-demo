@@ -1,7 +1,7 @@
 # Blender hero handoff — active WIP
 
-**2026-09-15. Round 7 is a verified WIP checkpoint; use the latest commit for its
-identity. Round 6 is `1555f69`. Remaining failures are preserved below. This branch is not ready
+**2026-09-15. Round 8 is an art-direction WIP checkpoint; canonical hero assets
+remain Round 7 (`2691c97`). Round 6 is `1555f69`. Remaining failures are preserved below. This branch is not ready
 to merge or deploy. The hero/physics mission is unfinished.**
 
 Continue in `/Users/raynos/projects/game-demos/trials-gauntlet-blender`, branch
@@ -13,10 +13,11 @@ for this checkpoint. The 12-hour follow-up automation is paused.
 
 ## User decisions and scope
 
-- **Usage stop, 2026-09-15:** continue building until Codex weekly usage reaches
-  **30% remaining**, then preserve a committed handoff and pause work without
-  declaring the full mission complete. Check `openusage codex` periodically;
-  latest CLI reading at 20:24:41 UTC was **65% remaining**. The user selected
+- **Latest budget direction, 2026-09-15:** the user wants a finite finish line
+  and would prefer stopping well before **30% remaining**. Treat 30% as the
+  spending floor, not a target to consume. Choose a generated design target,
+  perform one coherent finish pass, then review actual gameplay before further
+  iteration. Latest `openusage codex` at 21:23:14 UTC was **59% remaining**. The user selected
   **medium** reasoning and requested medium for teammates; explicitly use medium
   for newly spawned agents. Existing running agents have no in-place effort control.
 
@@ -38,6 +39,73 @@ Read [the plan](plans/BLENDER_HERO.md), [plan status](plans/PLANS.md),
 [this finish-screen bug](evidence/rear-wheel-first-finish-arms.jpg): arms folded
 backward on Rear Wheel First, 1:18.433 and four faults. It is a symptom to
 reproduce; this checkpoint does **not** prove that specific finish bug fixed.
+
+## Round 8 — target design and whole-hero candidates
+
+**Current next decision:** the user rejects the large face-hiding Street helmet.
+Five requested OpenAI image-generation edits of real screenshots are saved at
+`assets/design/hero-targets/index.html`; prompt set and hashes sit alongside them.
+These are aspirational targets, not implemented screenshots. The user is choosing
+Street 1 (bare head / mustard), 2 (small open-face helmet / charcoal), or 4 (bare
+head / charcoal). Parent recommends 1, with 3/5 for Race. Do not keep refining the
+rejected Street helmet while this decision is pending. Builders are parked.
+The explicit finish checklist is in `docs/plans/BLENDER_HERO.md`.
+
+### Actual progress and remaining visual problems
+
+- `harness/out/blender/progress/index.html` contains actual before/after clips.
+  `mega-v1-dist` preserves the first whole assembled candidate. Parent played
+  Street and Race: angular slim bike body improves silhouette, but the engine
+  remained a shiny egg and the hoodie's radial folds looked padded.
+- `mega-bike/source-v2/bike-hero.blend` rebuilds engine/exhaust masses. New
+  `assets/blender/bike_asset.py` adopts a protected source and derives full/LOD
+  without rerunning geometry builders. Scratch protected exports have 29,940 and
+  5,710 triangles. Named nodes, mechanical metadata and markers pass production
+  decoding checks. The source-derived LOD is distinct from the procedural LOD.
+- `mega-outfits/anatomy-v3/street-anatomy-v3d.blend` uses Blender CC0 realistic male
+  torso/arm topology, with continuous shoulder/elbow weights. It is not accepted:
+  the shoulder/axilla remains too bulky. Runtime frame-262 diagnosis finds correct
+  32/27 cm arm segments and no flipped pole or disconnected weighted span. The
+  20 cm shoulder envelope and camera foreshortening explain the hanging mass.
+  See `anatomy-v3/ARM-DIAGNOSIS.md`; fix tailoring, not physics as a visual disguise.
+- Race `anatomy-v3/race-lower/race-lower-v1.blend` has tall articulated boots and
+  matching pants. Parent played the close hop at sim 2.683→2.750 s: continuous
+  motion/contact, but blunt boot shapes. `race-lower-v2.blend` rounds the main
+  boot shell at the same triangle budget and removes noisy old pant graphics;
+  its `models-v2/rider-race.glb` passed decoding but is unreviewed.
+- `src/render/hero/gltf.ts` now allows hero surfaces to receive scene shadows.
+  Parent played it in the close Race candidate. `common.py` adds explicitly
+  opt-in same-object short-distance AO in existing ORM red and glTF occlusion
+  wiring. Default-disabled output reproduces the previous protected bike bytes.
+  `mega-bike/ao-models/bike.glb` has real sampled AO and no extra textures/draws;
+  visual strength is unreviewed. See `mega-bike/AO-HANDOFF.md`.
+- `hero-fabrics/README.md` has CC0 photographed cotton/denim maps and a helper
+  preserving class colors, garment geometry and runtime atlas count. Provider
+  hashes and a smoke export pass. Whole-rider integration is still pending.
+
+All abbreviated candidate paths above are under ignored `harness/out/blender/`.
+Canonical `assets/blender/source/` and `public/models/` remain Round 7. Candidate
+exports, extraction data, cloth inputs and playback footage are retained locally;
+do not mistake the tracked author scripts for promoted or fully reproducible
+final art. Preserve the needed source inputs with the accepted asset at promotion.
+
+### Frozen assembly and verification
+
+Latest fully captured assembly is `mega-v4-dist`: protected bike exports, Street
+v3d full, Race lower-v1 full, prior v2 rider LODs, hero shadow reception enabled.
+The rider LODs have not caught up with new full meshes; this is a preview only.
+`mega-v4-close-street` and `mega-v4-close-race` contain 190 real frames, 60 fps,
+1280×720, full-prefix replay of `(180,560]`. Close capture uses a labelled camera
+following current skinned bounds; normal-camera readability is a separate view.
+`hero-close-capture.mts` and its README preserve that inspection setup.
+
+Each preview uses `stage-hero-preview.py`: temporary model staging, normal build,
+then unconditional exact restoration of all six public GLBs and both generated
+tables. R7 and candidate traces through v3 close/shadow have byte-equal recorded
+physics JSON, clocks and phases at all 190 sampled ticks. This visual work adds
+no physics change. R7's 19 test failures remain explicitly open; do not rerun the
+entire physics census merely to assess a material edit. Next formal ship gate is
+Round 9; run one integrated asset/gameplay gate before final delivery.
 
 ## Round 7 — shared knees, connected trousers and fresh play
 

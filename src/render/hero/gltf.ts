@@ -112,7 +112,7 @@ export function shrinkTextures(root: THREE.Object3D, albedoMax = 1024, otherMax 
   });
 }
 
-/** Every mesh casts + receives; materials get the library's neutral map set so they share the standard program. */
+/** Hero surfaces cast and receive the scene light's shadow; materials share the standard program. */
 export function prepareHeroMaterials(root: THREE.Object3D, complete: (m: THREE.MeshStandardMaterial) => void): THREE.MeshStandardMaterial[] {
   const out: THREE.MeshStandardMaterial[] = [];
   const seen = new Set<THREE.Material>();
@@ -120,7 +120,9 @@ export function prepareHeroMaterials(root: THREE.Object3D, complete: (m: THREE.M
     const m = o as THREE.Mesh;
     if (!m.isMesh) return;
     m.castShadow = true;
-    m.receiveShadow = false;
+    // A rider's arms must shade the torso, and the frame must shade the motor.
+    // Without this the assembled hero stays uniformly lit despite its construction.
+    m.receiveShadow = true;
     m.frustumCulled = false;
     const mats = Array.isArray(m.material) ? m.material : [m.material];
     for (const mat of mats) {

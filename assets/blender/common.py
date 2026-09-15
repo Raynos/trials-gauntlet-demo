@@ -486,12 +486,37 @@ def _detach(nodes_added):
         m.node_tree.nodes.remove(n)
 
 
-def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, margin=4, orm_size=None, variants=None):
+# Explicit process-local opt-in. Existing exports remain byte-compatible until a
+# caller enables local AO; source files do not need to be modified to try it.
+LOCAL_AO = dict(distance=0.0, samples=32, strength=0.8)
+
+
+def configure_local_ao(distance=0.025, samples=32, strength=0.8):
+    """Enable short-range, same-object AO for subsequent atlas bakes (metres).
+
+    A 2.5 cm radius picks out seams and cast recesses without baking broad shadows
+    between separately articulated parts. Set distance=0 to retain legacy output.
+    """
+    if not math.isfinite(distance) or distance < 0 or not 1 <= samples <= 256 or not 0 <= strength <= 1:
+        raise ValueError("AO requires finite distance >= 0, 1..256 samples and strength 0..1")
+    LOCAL_AO.update(distance=distance, samples=int(samples), strength=strength)
+
+
+def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, margin=4, orm_size=None, variants=None,
+               ao_distance=None, ao_samples=None, ao_strength=None):
     """Bake base colour (emission swap), NORMAL (tangent), ROUGHNESS and METALLIC (emission swap) of
     every material on `obs` into `prefix`_albedo.jpg / _normal.jpg / _orm.jpg. Returns dict of paths.
     `variants` = [(suffix, fn)]: fn() is called before each albedo bake (apply_colourway) and the
     albedo is saved as `prefix`_<suffix>_albedo.jpg; the result then has paths["albedo:<suffix>"]
-    and paths["albedo"] = the first variant. Normal / ORM are baked once (shared)."""
+    and paths["albedo"] = the first variant. Normal / ORM are baked once (shared).
+    AO is opt-in through configure_local_ao() or ao_distance in metres; it uses
+    same-object rays and shares the ORM red channel. ao_samples/ao_strength may
+    override the process settings. Enabled output includes paths["occlusion"]."""
+    ao_distance = LOCAL_AO["distance"] if ao_distance is None else ao_distance
+    ao_samples = LOCAL_AO["samples"] if ao_samples is None else ao_samples
+    ao_strength = LOCAL_AO["strength"] if ao_strength is None else ao_strength
+    if not math.isfinite(ao_distance) or ao_distance < 0 or not 1 <= ao_samples <= 256 or not 0 <= ao_strength <= 1:
+        raise ValueError("Invalid local AO bake settings")
     os.makedirs(out_dir, exist_ok=True)
     sc = bpy.context.scene
     sc.render.engine = "CYCLES"
@@ -515,9 +540,11 @@ def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, ma
     def run(kind, img, **kw):
         added = _attach_bake_target(mats, img)
         t0 = time.time()
-        bpy.ops.object.bake(type=kind, **kw)
-        log(f"bake {kind} {img.size[0]}px {time.time() - t0:.1f}s")
-        _detach(added)
+        try:
+            bpy.ops.object.bake(type=kind, **kw)
+            log(f"bake {kind} {img.size[0]}px {time.time() - t0:.1f}s")
+        finally:
+            _detach(added)
 
     def emit_swap(socket_name, img, default_from):
         """Bake a Principled input as emission (works for metals, unlike the DIFFUSE colour pass)."""
@@ -563,7 +590,36 @@ def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, ma
     sc.render.bake.normal_space = "TANGENT"
     run("NORMAL", nrm)
 
-    # compose ORM = (1, roughness, metallic)
+    # A shader AO node gives a bounded ray distance and same-object visibility;
+    # the global AO render pass cannot express that local-only contract.
+    ao = None
+    if ao_distance > 0 and ao_strength > 0:
+        ao = _bake_image(prefix + "_local_ao", osize, (1, 1, 1, 1))
+        restore = []
+        try:
+            for m in mats:
+                nt = m.node_tree
+                out = nt.nodes["OUT"]
+                previous = [(edge.from_socket, edge.to_socket) for edge in out.inputs["Surface"].links]
+                occ = nt.nodes.new("ShaderNodeAmbientOcclusion")
+                occ.samples = int(ao_samples)
+                occ.only_local = True
+                occ.inside = False
+                occ.inputs["Distance"].default_value = ao_distance
+                em = nt.nodes.new("ShaderNodeEmission")
+                restore.append((nt, out, previous, occ, em))
+                nt.links.new(occ.outputs["AO"], em.inputs["Color"])
+                nt.links.new(em.outputs[0], out.inputs["Surface"])
+            run("EMIT", ao)
+            log(f"local AO distance={ao_distance}m samples={ao_samples} strength={ao_strength}")
+        finally:
+            for nt, out, previous, occ, em in restore:
+                nt.nodes.remove(em)
+                nt.nodes.remove(occ)
+                for source, destination in previous:
+                    nt.links.new(source, destination)
+
+    # compose ORM = (local occlusion or 1, roughness, metallic)
     orm = _bake_image(prefix + "_orm", osize)
     r = np.empty(osize * osize * 4, dtype=np.float32)
     rough.pixels.foreach_get(r)
@@ -571,6 +627,10 @@ def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, ma
     met.pixels.foreach_get(mt)
     px = np.empty(osize * osize * 4, dtype=np.float32)
     px[0::4] = 1.0
+    if ao is not None:
+        ap = np.empty(osize * osize * 4, dtype=np.float32)
+        ao.pixels.foreach_get(ap)
+        px[0::4] = 1.0 - ao_strength * (1.0 - np.clip(ap[0::4], 0.0, 1.0))
     px[1::4] = r[0::4]
     px[2::4] = mt[0::4]
     px[3::4] = 1.0
@@ -591,6 +651,8 @@ def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, ma
         log("saved", p, f"{os.path.getsize(p) / 1024:.0f} KB")
     if "albedo" not in paths and albs:
         paths["albedo"] = paths[f"albedo:{albs[0][0]}"]
+    if ao is not None:
+        paths["occlusion"] = paths["orm"]
     return paths
 
 
@@ -614,6 +676,20 @@ def atlas_material(name, paths, albedo="albedo"):
     link(m, to.outputs["Color"], sep.inputs[0])
     link(m, sep.outputs["Green"], b.inputs["Roughness"])
     link(m, sep.outputs["Blue"], b.inputs["Metallic"])
+    if paths.get("occlusion"):
+        # Official glTF exporter convention: this named group/input is metadata
+        # for glTF AO. Reuse the SAME image node as metallic/roughness so the
+        # exporter emits one packed ORM image and no additional draw/texture.
+        group_name = "glTF Material Output"
+        group = bpy.data.node_groups.get(group_name)
+        if group is None:
+            group = bpy.data.node_groups.new(group_name, "ShaderNodeTree")
+            group.interface.new_socket(name="Occlusion", in_out="INPUT", socket_type="NodeSocketFloat")
+        settings = node(m, "ShaderNodeGroup", "GLTF_OCCLUSION")
+        settings.node_tree = group
+        if "Occlusion" not in settings.inputs:
+            raise RuntimeError("Existing glTF Material Output group has no Occlusion input")
+        link(m, sep.outputs["Red"], settings.inputs["Occlusion"])
     tn = node(m, "ShaderNodeTexImage")
     tn.image = bpy.data.images.load(paths["normal"], check_existing=True)
     tn.image.colorspace_settings.name = "Non-Color"
