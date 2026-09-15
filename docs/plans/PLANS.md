@@ -10,6 +10,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | **Mega plan (v0.2.0)** | `docs/plans/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
 | **Physics v2** | `docs/plans/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
 | **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | round 1 (H1 rider kit landed `47f0455`) | 15 | H3 hero shadow + G4 stamped auto-deploy, then device report #1 |
+| **Perf (60 on high, on a phone)** | `docs/plans/PERF.md` (being written) | a benchmark suite and a 100× plan, then a measure → cut → measure loop until an iPhone holds 60 fps on `high`; 10× fallback | phase 1: bench + plan | 0 | bench repeatable ±5 %, plan sums to 100× on paper, first cut |
 | **P0 task** | `docs/tasks/touch-navigation-invariant.md` | nothing tappable unless drawn | landed `18df821` (5184-tap grid, 0 ghosts) | 95 | the user confirms on the phone |
 
 ## Decisions taken by the user
@@ -17,7 +18,8 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | date | decision |
 |---|---|
 | 09-14 | Main menu → **B Broadcast** (`assets/design/menu/B-broadcast.jpg`, SPEC in `assets/design/menu/SPEC.md`) — core-game builds it |
-| 09-14 | Plans live in `docs/plans/` |
+| 09-14 | Plans live in `docs/plans/`; completed/stale docs go to `project/archive/` |
+| 09-14 | Phones are **not** pinned to low in Auto — a perf owner makes the tiers fast instead (60 on high is the goal) |
 
 ## Status per pillar (mega plan)
 
