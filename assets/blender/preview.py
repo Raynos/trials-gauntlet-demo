@@ -23,6 +23,36 @@ ARGS = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
 WHAT = ARGS[0] if ARGS and not ARGS[0].startswith("--") else "all"
 SIZE = int(ARGS[ARGS.index("--size") + 1]) if "--size" in ARGS else 900
 QUICK = "--quick" in ARGS
+VARIANT = ARGS[ARGS.index("--variant") + 1] if "--variant" in ARGS else "rookie"  # rookie | pro
+LOD = "--lod" in ARGS  # preview the *-lod.glb files
+SUFFIX = ("" if VARIANT == "rookie" else f"-{VARIANT}") + ("-lod" if LOD else "")
+
+
+def model(name):
+    return os.path.join(C.MODELS, f"{name}-lod.glb" if LOD else f"{name}.glb")
+
+
+def out(name):
+    """previews/<name><suffix>.png"""
+    return os.path.join(C.PREVIEWS, f"{name}{SUFFIX}.png")
+
+
+def select_variant(objs, variant):
+    """Pick a KHR_materials_variants colourway on imported meshes (the importer stores the mappings
+    on the mesh; variant names are `<file>_<variant>`, e.g. rider_pro / bike_pro)."""
+    sc = bpy.data.scenes[0]
+    idx = None
+    for v in sc.gltf2_KHR_materials_variants_variants:
+        if v.name.endswith("_" + variant):
+            idx = v.variant_idx
+    if idx is None:
+        return
+    for o in objs:
+        if o.type != "MESH":
+            continue
+        for vp in o.data.gltf2_variant_mesh_data:
+            if any(vv.variant.variant_idx == idx for vv in vp.variants) and vp.material:
+                o.data.materials[vp.material_slot_index] = vp.material
 
 # render frame (glTF) -> Blender: x -> x, y -> z, z -> -y
 
@@ -65,10 +95,11 @@ def setup_world():
     return sc
 
 
-def import_glb(path, name):
+def import_glb(path, name, variant=None):
     before = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=path)
     new = [o for o in bpy.data.objects if o not in before]
+    select_variant(new, variant or VARIANT)
     roots = [o for o in new if o.parent is None or o.parent not in new]
     grp = bpy.data.objects.new(name, None)
     bpy.context.scene.collection.objects.link(grp)
@@ -132,10 +163,10 @@ def views(target, dist, prefix, extra_rows=None):
 
 def preview_bike():
     setup_world()
-    grp, objs = import_glb(os.path.join(C.MODELS, "bike.glb"), "bike_import")
+    grp, objs = import_glb(model("bike"), "bike_import")
     target = (0.65, 0, 0.30)
     outs = views(target, 2.6, "bike")
-    montage(outs, os.path.join(C.PREVIEWS, "bike-turntable.png"), 2)
+    montage(outs, out("bike-turntable"), 2)
 
 
 def find_armature(objs):
@@ -163,11 +194,11 @@ def set_action(arm, name, frame):
 
 def preview_rider():
     setup_world()
-    grp, objs = import_glb(os.path.join(C.MODELS, "rider.glb"), "rider_import")
+    grp, objs = import_glb(model("rider"), "rider_import")
     arm = find_armature(objs)
     target = (0.55, 0, 0.75)
     outs = views(target, 3.2, "rider")
-    montage(outs, os.path.join(C.PREVIEWS, "rider-turntable.png"), 2)
+    montage(outs, out("rider-turntable"), 2)
     if arm is None:
         return
     poses = [("stand_attack", 1), ("hang_back", 15), ("forward_attack", 15), ("crouch", 12), ("extend", 8), ("land_absorb", 10), ("idle_breathe", 60), ("sit_cruise", 15)]
@@ -182,31 +213,31 @@ def preview_rider():
 
         subprocess.run(["/opt/homebrew/bin/magick", p, "-gravity", "north", "-pointsize", "28", "-fill", "white", "-annotate", "+0+10", name, p], check=True)
         outs.append(p)
-    montage(outs, os.path.join(C.PREVIEWS, "rider-poses.png"), 4)
+    montage(outs, out("rider-poses"), 4)
 
 
 def preview_composite():
     setup_world()
-    import_glb(os.path.join(C.MODELS, "bike.glb"), "bike_import")
-    grp, objs = import_glb(os.path.join(C.MODELS, "rider.glb"), "rider_import")
+    import_glb(model("bike"), "bike_import")
+    grp, objs = import_glb(model("rider"), "rider_import")
     arm = find_armature(objs)
     if arm:
         set_action(arm, "stand_attack", 1)
     target = (0.65, 0, 0.62)
     # full-frame hero
     cam = camera_at(target, 20, 15, 5.4)
-    p_hero = os.path.join(C.PREVIEWS, "composite.png")
+    p_hero = out("composite")
     render(p_hero, 1280, 720)
     bpy.data.objects.remove(cam)
-    # game framing: bike ~ 11 % of frame width (rider+bike ~ 25 % height) and tight (~40 % height)
+    # game framing: rider ~ 15 % of frame height (the riding zoom), rider+bike ~ 25 % and tight ~40 %
     outs = []
-    for label, dist, tz in (("25pct", 18.0, 0.62), ("40pct", 11.3, 0.78)):
+    for label, dist, tz in (("15pct", 12.2, 0.62), ("25pct", 18.0, 0.62), ("40pct", 11.3, 0.78)):
         cam = camera_at((target[0], 0, tz), 20, 15, dist)
-        p = os.path.join(C.PREVIEWS, f"composite-{label}.png")
+        p = out(f"composite-{label}")
         render(p, 1280, 720)
         bpy.data.objects.remove(cam)
         outs.append(p)
-    # side-by-side crop sheet like the hero crop grid: 400x300 crops around the bike
+    # side-by-side crop sheet like the hero crop grid: 400x260 crops around the bike, x2
     import subprocess
 
     crops = []
@@ -214,7 +245,35 @@ def preview_composite():
         c = p.replace(".png", "-crop.png")
         subprocess.run(["/opt/homebrew/bin/magick", p, "-gravity", "center", "-crop", "400x260+0+0", "+repage", "-resize", "200%", c], check=True)
         crops.append(c)
-    montage(crops, os.path.join(C.PREVIEWS, "composite-gamesize.png"), 2)
+    montage(crops, out("composite-gamesize"), 3)
+
+
+def preview_garage():
+    """Garage close-up: rider on the bike, 3/4 front, studio grey, 1280x960 — the menu / garage view."""
+    sc = setup_world()
+    sc.world.node_tree.nodes["Background"].inputs[0].default_value = (0.12, 0.13, 0.15, 1)
+    sc.world.node_tree.nodes["Background"].inputs[1].default_value = 0.5
+    bpy.data.objects["ground"].data.materials[0].node_tree.nodes["BSDF"].inputs["Base Color"].default_value = (0.09, 0.09, 0.10, 1)
+    rim = bpy.data.lights.new("rim", "SUN")
+    rim.energy = 3.0
+    rim.angle = math.radians(5)
+    ro = bpy.data.objects.new("rim", rim)
+    sc.collection.objects.link(ro)
+    ro.rotation_euler = Euler((math.radians(65), math.radians(10), math.radians(-160)))
+    import_glb(model("bike"), "bike_import")
+    grp, objs = import_glb(model("rider"), "rider_import")
+    arm = find_armature(objs)
+    if arm:
+        set_action(arm, "stand_attack", 1)
+    shots = [("front34", (0.72, 0, 0.72), 42, 8, 3.0), ("side", (0.62, 0, 0.70), 8, 6, 3.4), ("rear34", (0.55, 0, 0.80), -48, 12, 3.0), ("helmet", (0.86, 0, 1.30), 35, 5, 1.1)]
+    outs = []
+    for label, target, yaw, pitch, dist in shots:
+        cam = camera_at(target, yaw, pitch, dist)
+        p = os.path.join(C.PREVIEWS, f"_garage-{label}{SUFFIX}.png")
+        render(p, 900, 900)
+        bpy.data.objects.remove(cam)
+        outs.append(p)
+    montage(outs, out("garage"), 2)
 
 
 def preview_compare():
@@ -232,8 +291,8 @@ def preview_compare():
     subprocess.run(["/opt/homebrew/bin/magick", os.path.join(tmp, "ref-wheelie.png"), "-crop", "240x240+310+290", "+repage", "-resize", "500x500", os.path.join(tmp, "ref-hangback.png")], check=True)
     subprocess.run(["/opt/homebrew/bin/magick", os.path.join(tmp, "ref-go.png"), "-crop", "240x240+250+280", "+repage", "-resize", "500x500", os.path.join(tmp, "ref-forward.png")], check=True)
     setup_world()
-    bike, bobjs = import_glb(os.path.join(C.MODELS, "bike.glb"), "bike_import")
-    rider, robjs = import_glb(os.path.join(C.MODELS, "rider.glb"), "rider_import")
+    bike, bobjs = import_glb(model("bike"), "bike_import")
+    rider, robjs = import_glb(model("rider"), "rider_import")
     arm = find_armature(robjs)
     shots = [
         ("attack", "stand_attack", 30, 0.0, 42, 16, 3.5, (0.55, 0, 0.70)),
@@ -265,7 +324,7 @@ def preview_compare():
     labels = ["reference: start-gate attack", "ours: stand_attack", "reference: finish-line side", "ours: stand_attack side", "reference: GO hang-forward", "ours: forward_attack", "reference: wheelie hang-back", "ours: hang_back (bike +38 deg)"]
     for t, l in zip(tiles, labels):
         subprocess.run(["/opt/homebrew/bin/magick", t, "-gravity", "north", "-pointsize", "22", "-fill", "white", "-undercolor", "#00000080", "-annotate", "+0+6", l, t], check=True)
-    montage(tiles, os.path.join(C.PREVIEWS, "compare-reference.png"), 2)
+    montage(tiles, out("compare-reference"), 2)
 
 
 if __name__ == "__main__":
@@ -278,3 +337,5 @@ if __name__ == "__main__":
         preview_composite()
     if WHAT in ("compare", "all") and os.path.exists(os.path.join(C.MODELS, "rider.glb")):
         preview_compare()
+    if WHAT in ("garage", "all") and os.path.exists(os.path.join(C.MODELS, "rider.glb")):
+        preview_garage()

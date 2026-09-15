@@ -486,9 +486,12 @@ def _detach(nodes_added):
         m.node_tree.nodes.remove(n)
 
 
-def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, margin=4, orm_size=None):
-    """Bake DIFFUSE colour, NORMAL (tangent), ROUGHNESS and METALLIC (via emission swap) of every
-    material on `obs` into `prefix`_albedo.jpg / _normal.jpg / _orm.jpg. Returns dict of paths."""
+def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, margin=4, orm_size=None, variants=None):
+    """Bake base colour (emission swap), NORMAL (tangent), ROUGHNESS and METALLIC (emission swap) of
+    every material on `obs` into `prefix`_albedo.jpg / _normal.jpg / _orm.jpg. Returns dict of paths.
+    `variants` = [(suffix, fn)]: fn() is called before each albedo bake (apply_colourway) and the
+    albedo is saved as `prefix`_<suffix>_albedo.jpg; the result then has paths["albedo:<suffix>"]
+    and paths["albedo"] = the first variant. Normal / ORM are baked once (shared)."""
     os.makedirs(out_dir, exist_ok=True)
     sc = bpy.context.scene
     sc.render.engine = "CYCLES"
@@ -539,9 +542,14 @@ def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, ma
             nt.nodes.remove(em)
             nt.links.new(nt.nodes["BSDF"].outputs[0], nt.nodes["OUT"].inputs[0])
 
-    # albedo (base colour as emission)
-    alb = _bake_image(prefix + "_albedo", size, (0.5, 0.5, 0.5, 1), non_color=False)
-    emit_swap("Base Color", alb, lambda v: tuple(v))
+    # albedo (base colour as emission), once per colourway
+    albs = []
+    for suffix, fn in (variants or [(None, None)]):
+        if fn:
+            fn()
+        alb = _bake_image(prefix + (f"_{suffix}" if suffix else "") + "_albedo", size, (0.5, 0.5, 0.5, 1), non_color=False)
+        emit_swap("Base Color", alb, lambda v: tuple(v))
+        albs.append((suffix, alb))
     # roughness + metallic at the (smaller) ORM size
     osize = orm_size or size
     rough = _bake_image(prefix + "_rough", osize)
@@ -567,8 +575,11 @@ def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, ma
     px[2::4] = mt[0::4]
     px[3::4] = 1.0
     orm.pixels.foreach_set(px)
-    for img, key in ((alb, "albedo"), (nrm, "normal"), (orm, "orm")):
-        p = os.path.join(out_dir, f"{prefix}_{key}.jpg")
+    saves = [(nrm, "normal", f"{prefix}_normal.jpg"), (orm, "orm", f"{prefix}_orm.jpg")]
+    for suffix, alb in albs:
+        saves.append((alb, f"albedo:{suffix}" if suffix else "albedo", f"{prefix}_{suffix}_albedo.jpg" if suffix else f"{prefix}_albedo.jpg"))
+    for img, key, fname in saves:
+        p = os.path.join(out_dir, fname)
         # raw pixel save (no view transform): albedo is already sRGB bytes, the others are data
         img.filepath_raw = p
         img.file_format = "JPEG"
@@ -578,22 +589,25 @@ def bake_atlas(obs, size, out_dir, prefix, jpeg_quality=90, normal_size=None, ma
             img.save()
         paths[key] = p
         log("saved", p, f"{os.path.getsize(p) / 1024:.0f} KB")
+    if "albedo" not in paths and albs:
+        paths["albedo"] = paths[f"albedo:{albs[0][0]}"]
     return paths
 
 
-def atlas_material(name, paths):
-    """One export material: Principled BSDF fed by the baked atlas (glTF-friendly wiring)."""
+def atlas_material(name, paths, albedo="albedo"):
+    """One export material: Principled BSDF fed by the baked atlas (glTF-friendly wiring).
+    Images are shared between materials built from the same paths (one glTF image each)."""
     m = new_mat(name)
     nt = m.node_tree
     b = bsdf(m)
     tc = node(m, "ShaderNodeTexCoord")
     ta = node(m, "ShaderNodeTexImage")
-    ta.image = bpy.data.images.load(paths["albedo"])
+    ta.image = bpy.data.images.load(paths[albedo], check_existing=True)
     ta.image.colorspace_settings.name = "sRGB"
     link(m, tc.outputs["UV"], ta.inputs["Vector"])
     link(m, ta.outputs["Color"], b.inputs["Base Color"])
     to = node(m, "ShaderNodeTexImage")
-    to.image = bpy.data.images.load(paths["orm"])
+    to.image = bpy.data.images.load(paths["orm"], check_existing=True)
     to.image.colorspace_settings.name = "Non-Color"
     link(m, tc.outputs["UV"], to.inputs["Vector"])
     sep = node(m, "ShaderNodeSeparateColor")
@@ -601,7 +615,7 @@ def atlas_material(name, paths):
     link(m, sep.outputs["Green"], b.inputs["Roughness"])
     link(m, sep.outputs["Blue"], b.inputs["Metallic"])
     tn = node(m, "ShaderNodeTexImage")
-    tn.image = bpy.data.images.load(paths["normal"])
+    tn.image = bpy.data.images.load(paths["normal"], check_existing=True)
     tn.image.colorspace_settings.name = "Non-Color"
     link(m, tc.outputs["UV"], tn.inputs["Vector"])
     nm = node(m, "ShaderNodeNormalMap")
@@ -701,3 +715,184 @@ def gltf_summary(path):
         "extensions": js.get("extensionsUsed", []),
     }
     return info
+
+
+# --------------------------------------------------------------------------- colourways + decals
+def cw_rgb(m, key, value=(1, 1, 1, 1)):
+    """A named RGB node (`CW_<key>`) so apply_colourway() can recolour every material before a bake."""
+    n = node(m, "ShaderNodeRGB", "CW_" + key)
+    n.outputs[0].default_value = value
+    return n.outputs[0]
+
+
+def cw_value(m, key, value=0.0):
+    n = node(m, "ShaderNodeValue", "CW_" + key)
+    n.outputs[0].default_value = value
+    return n.outputs[0]
+
+
+def apply_colourway(cw, mats=None):
+    """Set every CW_* node in every material from the colourway dict (RGB or scalar values)."""
+    for m in (mats or bpy.data.materials):
+        if not m.use_nodes:
+            continue
+        for n in m.node_tree.nodes:
+            if not n.name.startswith("CW_"):
+                continue
+            key = n.name[3:]
+            if key not in cw:
+                continue
+            v = cw[key]
+            if n.bl_idname == "ShaderNodeRGB":
+                n.outputs[0].default_value = (v[0], v[1], v[2], 1.0) if len(v) == 3 else tuple(v)
+            else:
+                n.outputs[0].default_value = float(v)
+
+
+def vmath(m, op, a, b=None, scale=None):
+    n = node(m, "ShaderNodeVectorMath")
+    n.operation = op
+    for i, val in enumerate((a, b)):
+        if val is None:
+            continue
+        if hasattr(val, "links"):
+            link(m, val, n.inputs[i])
+        else:
+            n.inputs[i].default_value = tuple(val)
+    if scale is not None:
+        n.inputs["Scale"].default_value = scale
+    return n.outputs[1] if op in ("DOT_PRODUCT", "LENGTH", "DISTANCE") else n.outputs[0]
+
+
+def proj(m, centre, ua, va, size_u, size_v, facing=None, min_facing=0.12, coord="Object", depth=0.10):
+    """Planar projection in object space: returns (su, sv, inside) sockets, su/sv in 0..1 across a
+    size_u x size_v patch centred at `centre` with axes ua/va (unit vectors). `facing` = the
+    direction the surface must face (normal . facing > min_facing) so a chest decal never also
+    prints on the back."""
+    d = vmath(m, "SUBTRACT", texcoord(m).outputs[coord], tuple(centre))
+    u = vmath(m, "DOT_PRODUCT", d, tuple(Vector(ua).normalized()))
+    v = vmath(m, "DOT_PRODUCT", d, tuple(Vector(va).normalized()))
+    su = math_node(m, "MULTIPLY_ADD", u, 1.0 / size_u, 0.5)
+    sv = math_node(m, "MULTIPLY_ADD", v, 1.0 / size_v, 0.5)
+    inside = math_node(m, "MULTIPLY", math_node(m, "MULTIPLY", math_node(m, "GREATER_THAN", su, 0.0), math_node(m, "LESS_THAN", su, 1.0)), math_node(m, "MULTIPLY", math_node(m, "GREATER_THAN", sv, 0.0), math_node(m, "LESS_THAN", sv, 1.0)))
+    if facing is not None:
+        geo = m.node_tree.nodes.get("GEO") or node(m, "ShaderNodeNewGeometry", "GEO")
+        fn = tuple(Vector(facing).normalized())
+        # |n . facing|: winding-independent (thin shells, lofts); the depth bound below keeps a
+        # decal off the far side of a limb or body
+        f = math_node(m, "ABSOLUTE", vmath(m, "DOT_PRODUCT", geo.outputs["Normal"], fn))
+        inside = math_node(m, "MULTIPLY", inside, math_node(m, "GREATER_THAN", f, min_facing))
+        # depth bound along the projection so a shared material never prints the decal on another
+        # part that merely lines up behind the patch
+        dd = math_node(m, "ABSOLUTE", vmath(m, "DOT_PRODUCT", d, fn))
+        inside = math_node(m, "MULTIPLY", inside, math_node(m, "LESS_THAN", dd, depth))
+    return su, sv, inside
+
+
+def decal_alpha(m, sheet, cell, su, sv, inside, cell_key=None):
+    """Sample the decal sheet cell (u0, v0, u1, v1) at (su, sv); returns the alpha socket (0 outside).
+    With `cell_key`, the cell origin comes from CW_<key>_u / CW_<key>_v value nodes (per-colourway
+    digit) and only the cell size is fixed."""
+    u0, v0, u1, v1 = cell
+    if cell_key:
+        ou = cw_value(m, cell_key + "_u", u0)
+        ov = cw_value(m, cell_key + "_v", v0)
+    else:
+        ou, ov = u0, v0
+    cu = math_node(m, "MULTIPLY_ADD", su, u1 - u0, ou)
+    cv = math_node(m, "MULTIPLY_ADD", sv, v1 - v0, ov)
+    comb = node(m, "ShaderNodeCombineXYZ")
+    link(m, cu, comb.inputs[0])
+    link(m, cv, comb.inputs[1])
+    t = node(m, "ShaderNodeTexImage")
+    t.image = sheet
+    t.interpolation = "Linear"
+    t.extension = "EXTEND"
+    link(m, comb.outputs[0], t.inputs["Vector"])
+    return math_node(m, "MULTIPLY", t.outputs["Alpha"], inside)
+
+
+def decal(m, col, sheet, cell, centre, ua, va, size_u, size_v, tint, facing=None, cell_key=None, min_facing=0.12, depth=0.10):
+    """Composite a tinted sheet cell over the colour socket `col`; returns the new colour socket."""
+    su, sv, inside = proj(m, centre, ua, va, size_u, size_v, facing=facing, min_facing=min_facing, depth=depth)
+    a = decal_alpha(m, sheet, cell, su, sv, inside, cell_key=cell_key)
+    return mix_rgb(m, a, col, tint)
+
+
+def patch(m, col, centre, ua, va, size_u, size_v, tint, facing=None, min_facing=0.12, depth=0.10):
+    """A plain rectangular colour panel in the same projection space (number-plate background)."""
+    su, sv, inside = proj(m, centre, ua, va, size_u, size_v, facing=facing, min_facing=min_facing, depth=depth)
+    return mix_rgb(m, inside, col, tint)
+
+
+# --------------------------------------------------------------------------- detail level (LOD builds)
+DETAIL = 1.0
+
+
+def set_detail(d):
+    global DETAIL
+    DETAIL = d
+
+
+def S(n, lo=3):
+    """Scale a segment count by the current detail level."""
+    return max(lo, int(round(n * DETAIL)))
+
+
+def scaled(fn, keys=("seg", "rings", "sides", "samples"), lo=3, seg_keys=("segments",)):
+    """Wrap a primitive so its segment keyword arguments follow DETAIL (bevel `segments` floor 1)."""
+
+    def w(*a, **k):
+        if DETAIL != 1.0:
+            for key in keys:
+                if key in k:
+                    k[key] = max(lo, int(round(k[key] * DETAIL)))
+            for key in seg_keys:
+                if key in k:
+                    k[key] = max(1, int(round(k[key] * DETAIL)))
+        return fn(*a, **k)
+
+    return w
+
+
+def decimate_to(ob, max_tris, min_ratio=0.05):
+    """Collapse-decimate a mesh object in place (UVs, vertex groups kept) to at most max_tris."""
+    t = tri_count(ob)
+    if t <= max_tris:
+        return t
+    mod = ob.modifiers.new("LOD", "DECIMATE")
+    mod.decimate_type = "COLLAPSE"
+    mod.ratio = max(min_ratio, max_tris / t * 0.98)
+    mod.use_collapse_triangulate = True
+    bpy.context.view_layer.objects.active = ob
+    select_only([ob])
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    ob.data.validate(verbose=False, clean_customdata=False)  # collapse can leave degenerate loops
+    return tri_count(ob)
+
+
+# --------------------------------------------------------------------------- KHR_materials_variants
+def setup_variants(objs, variants):
+    """variants: list of (variant_name, {object_name: material}) — every listed object's slot 0 maps
+    to that material under that variant (exported as KHR_materials_variants; slot 0 stays the first
+    variant's material as the default)."""
+    prefs = bpy.context.preferences.addons["io_scene_gltf2"].preferences
+    prefs.KHR_materials_variants_ui = True
+    sc = bpy.data.scenes[0]
+    sc.gltf2_KHR_materials_variants_variants.clear()
+    for i, (name, _) in enumerate(variants):
+        v = sc.gltf2_KHR_materials_variants_variants.add()
+        v.variant_idx = i
+        v.name = name
+    for ob in objs:
+        me = ob.data
+        me.gltf2_variant_mesh_data.clear()
+        for i, (name, mapping) in enumerate(variants):
+            mat = mapping.get(ob.name)
+            if mat is None:
+                continue
+            vp = me.gltf2_variant_mesh_data.add()
+            vp.material_slot_index = 0
+            vp.material = mat
+            vv = vp.variants.add()
+            vv.variant.variant_idx = i

@@ -1,0 +1,23 @@
+tris=5530
+glb_bytes=493436
+bones (rest head -> tail, rear-axle frame, Blender x,y,z):
+  pelvis       parent=-            head=(0.355,0.000,0.837) tail=(0.447,0.000,0.914) len=0.120
+  spine        parent=pelvis       head=(0.447,0.000,0.914) tail=(0.584,0.000,1.030) len=0.180
+  chest        parent=spine        head=(0.584,0.000,1.030) tail=(0.768,0.000,1.184) len=0.240
+  neck         parent=chest        head=(0.768,0.000,1.184) tail=(0.809,0.000,1.276) len=0.100
+  head         parent=neck         head=(0.809,0.000,1.276) tail=(0.915,0.000,1.513) len=0.260
+  shoulder.L   parent=chest        head=(0.768,-0.040,1.174) tail=(0.768,-0.210,1.184) len=0.170
+  upperArm.L   parent=shoulder.L   head=(0.768,-0.210,1.184) tail=(0.949,-0.442,1.057) len=0.320
+  forearm.L    parent=upperArm.L   head=(0.949,-0.442,1.057) tail=(0.920,-0.330,0.780) len=0.300
+  hand.L       parent=forearm.L    head=(0.920,-0.330,0.780) tail=(0.911,-0.297,0.697) len=0.090
+  shoulder.R   parent=chest        head=(0.768,0.040,1.174) tail=(0.768,0.210,1.184) len=0.170
+  upperArm.R   parent=shoulder.R   head=(0.768,0.210,1.184) tail=(0.949,0.442,1.057) len=0.320
+  forearm.R    parent=upperArm.R   head=(0.949,0.442,1.057) tail=(0.920,0.330,0.780) len=0.300
+  hand.R       parent=forearm.R    head=(0.920,0.330,0.780) tail=(0.911,0.297,0.697) len=0.090
+  thigh.L      parent=pelvis       head=(0.370,-0.090,0.850) tail=(0.671,-0.115,0.503) len=0.460
+  shin.L       parent=thigh.L      head=(0.671,-0.115,0.503) tail=(0.520,-0.200,0.110) len=0.430
+  foot.L       parent=shin.L       head=(0.520,-0.200,0.110) tail=(0.710,-0.200,0.035) len=0.204
+  thigh.R      parent=pelvis       head=(0.370,0.090,0.850) tail=(0.671,0.115,0.503) len=0.460
+  shin.R       parent=thigh.R      head=(0.671,0.115,0.503) tail=(0.520,0.200,0.110) len=0.430
+  foot.R       parent=shin.R       head=(0.520,0.200,0.110) tail=(0.710,0.200,0.035) len=0.204
+gltf={'bytes': 493436, 'triangles': 5530, 'nodes': ['head', 'neck', 'hand.L', 'forearm.L', 'upperArm.L', 'shoulder.L', 'hand.R', 'forearm.R', 'upperArm.R', 'shoulder.R', 'chest', 'spine', 'foot.L', 'shin.L', 'thigh.L', 'foot.R', 'shin.R', 'thigh.R', 'pelvis', 'rider', 'rider_rig'], 'meshes': ['rider'], 'materials': ['rider_rookie', 'rider_pro'], 'images': [('image/jpeg', 'rider-lod_normal'), ('image/jpeg', 'rider-lod_rookie_albedo'), ('image/jpeg', 'rider-lod_orm'), ('image/jpeg', 'rider-lod_pro_albedo')], 'animations': ['crouch', 'extend', 'forward_attack', 'hang_back', 'idle_breathe', 'land_absorb', 'sit_cruise', 'stand_attack'], 'skins': [('rider_rig', 19)], 'extensions': ['EXT_meshopt_compression', 'KHR_materials_variants']}

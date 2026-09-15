@@ -8,6 +8,9 @@ gets +x forward, +y up, +z camera. Wheelbase 1.30, wheel radius 0.34.
 Every named object keeps its own origin (documented in README.md) so the render can
 rotate the swingarm about its pivot, slide fork_lower along the fork axis, spin the
 wheels about their axles and scale shock_spring along its axis.
+Two atlases (bike_body_<cw> for frame / bodywork / fork_upper with plates + sponsors, baked per
+colourway -> KHR_materials_variants bike_rookie / bike_pro; bike_mech for the rest), spokes as
+child meshes + `<wheel>_blur` alpha cards; `-- --lod` writes bike-lod.glb (<= 6k tris).
 """
 import math
 import os
@@ -24,8 +27,24 @@ from common import MeshBuilder, V, log, prim_box, prim_cylinder, prim_lathe, pri
 
 ARGS = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
 NO_BAKE = "--no-bake" in ARGS
-SIZE = int(ARGS[ARGS.index("--size") + 1]) if "--size" in ARGS else 2048
+LOD = "--lod" in ARGS  # public/models/bike-lod.glb: <= 6k tris, 512 atlases, same nodes / materials / variants
+SIZE = int(ARGS[ARGS.index("--size") + 1]) if "--size" in ARGS else (512 if LOD else 1024)
 MESHOPT = "--no-meshopt" not in ARGS
+LOD_TRIS = 5800
+OUT_NAME = "bike-lod" if LOD else "bike"
+if LOD:
+    C.set_detail(0.5)
+prim_box, prim_cylinder, prim_lathe, prim_sphere, prim_torus, prim_tube = (C.scaled(f) for f in (prim_box, prim_cylinder, prim_lathe, prim_sphere, prim_torus, prim_tube))
+
+# colourways = the render's bike liveries (src/render/bike/livery.ts): Rookie metallic blue, white
+# plate, black 7; Pro charcoal plastics, gunmetal frame, yellow plate, red 1. Baked as two body
+# albedos -> KHR_materials_variants bike_rookie / bike_pro on frame / bodywork / fork_upper.
+COLOURWAYS = dict(
+    rookie=dict(PAINT=(0.02, 0.11, 0.62), FRAME=(0.02, 0.11, 0.62), PLATE=(0.86, 0.87, 0.87), INK=(0.07, 0.07, 0.08), LOGO=(0.92, 0.92, 0.93), num_u=0.0, num_v=2 / 8),
+    pro=dict(PAINT=(0.05, 0.05, 0.055), FRAME=(0.14, 0.15, 0.17), PLATE=(0.95, 0.76, 0.10), INK=(0.78, 0.14, 0.10), LOGO=(0.92, 0.72, 0.05), num_u=2 / 8, num_v=2 / 8),
+)
+_DC = None
+SHEET = None
 
 WB = 1.30
 R_WHEEL = 0.34
@@ -49,21 +68,67 @@ FORK_DIR = (P["head_bot"] - P["front"]).normalized()  # along the fork, upward
 FORK_ANGLE = math.atan2(-FORK_DIR.x, FORK_DIR.z)  # rake from vertical (rad)
 
 # ------------------------------------------------------------------------- materials
-def make_materials():
-    M = {}
-    # -- metallic blue paint with edge wear and micro flake
-    m = C.new_mat("paint_blue", (0.02, 0.11, 0.62, 1), rough=0.32, metal=0.25)
-    geo = C.node(m, "ShaderNodeNewGeometry")
+def paint_material(name, cw_key, decals_fn=None):
+    """Metallic paint in the colourway colour with Pointiness edge wear and micro flake; `decals_fn(m, col)`
+    composites the sponsor decals (object space of the part the material is on)."""
+    m = C.new_mat(name, (0.02, 0.11, 0.62, 1), rough=0.32, metal=0.25)
+    base = C.cw_rgb(m, cw_key)
+    geo = C.node(m, "ShaderNodeNewGeometry", "GEO")
     wear = C.ramp(m, geo.outputs["Pointiness"], [(0.50, (0, 0, 0, 1)), (0.58, (0, 0, 0, 1)), (0.66, (1, 1, 1, 1))])
     grain = C.noise_fac(m, scale=180, detail=2)
     wear_mask = C.math_node(m, "MULTIPLY", C.math_node(m, "MULTIPLY", wear, grain), 1.6, clamp=True)
-    flake = C.ramp(m, C.noise_fac(m, scale=900, detail=1), [(0.35, (0.025, 0.11, 0.62, 1)), (0.65, (0.035, 0.13, 0.70, 1))])
-    col = C.mix_rgb(m, wear_mask, flake, (0.55, 0.56, 0.58, 1))
+    bright = C.mix_rgb(m, 1.0, base, (1.18, 1.18, 1.18, 1), blend="MULTIPLY")
+    flake = C.mix_rgb(m, C.ramp(m, C.noise_fac(m, scale=900, detail=1), [(0.35, (0, 0, 0, 1)), (0.65, (1, 1, 1, 1))]), base, bright)
+    col = flake
+    if decals_fn:
+        col = decals_fn(m, col)
+    col = C.mix_rgb(m, wear_mask, col, (0.55, 0.56, 0.58, 1))
     C.link(m, col, C.bsdf(m).inputs["Base Color"])
     C.set_metal_source(m, C.math_node(m, "MULTIPLY_ADD", wear_mask, 0.7, 0.25, clamp=True))
     C.link(m, C.math_node(m, "MULTIPLY_ADD", wear_mask, 0.15, 0.30), C.bsdf(m).inputs["Roughness"])
     C.bump(m, C.noise_fac(m, scale=600, detail=1), strength=0.04, distance=0.001)
-    M["paint"] = m
+    return m
+
+
+def body_decals(m, col):
+    """Sponsors on the bodywork (object origin = rear axle): VORTEX OIL on both shrouds, BOLT ENERGY
+    across the tank top, APEX on the rear fender sides, class digit on both side plates."""
+    LOGO, INK = C.cw_rgb(m, "LOGO"), C.cw_rgb(m, "INK")
+    for sg in (-1, 1):
+        n_out = Vector((0, sg, 0))
+        ua = Vector((1, 0, 0)) if sg < 0 else Vector((-1, 0, 0))
+        col = C.decal(m, col, SHEET, _DC["vortex"], Vector((0.82, sg * 0.14, 0.50)), ua, Vector((0, 0, 1)), 0.17, 0.045, LOGO, facing=n_out, min_facing=0.35, depth=0.10)
+        col = C.decal(m, col, SHEET, _DC["apex"], Vector((-0.10, sg * 0.07, 0.43)), ua, Vector((0, 0, 1)), 0.09, 0.025, LOGO, facing=n_out, min_facing=0.35, depth=0.05)
+        # side plate digit (plates are M["plate"] faces; the projection is shared so the digit lands on them)
+    col = C.decal(m, col, SHEET, _DC["bolt"], Vector((0.80, 0, 0.765)), Vector((0, 1, 0)), Vector((-1, 0, 0)), 0.16, 0.04, LOGO, facing=Vector((0, 0, 1)), min_facing=0.5, depth=0.05)
+    return col
+
+
+def plate_material():
+    """Number plates: colourway plate colour with the class digit on both side plates (bodywork object,
+    origin = rear axle) and the front plate (fork_upper object, origin = head_bot)."""
+    m = C.new_mat("plate", (0.85, 0.86, 0.86, 1), rough=0.45, metal=0.0)
+    PLATE, INK = C.cw_rgb(m, "PLATE"), C.cw_rgb(m, "INK")
+    col = C.mix_rgb(m, C.math_node(m, "MULTIPLY", C.noise_fac(m, scale=30, detail=2), 0.12), PLATE, (0.3, 0.3, 0.3, 1))
+    for sg in (-1, 1):
+        n_out = Vector((0, sg, 0))
+        ua = Vector((1, 0, 0)) if sg < 0 else Vector((-1, 0, 0))
+        va = Matrix.Rotation(-0.15, 4, "Y") @ Vector((0, 0, 1))
+        col = C.decal(m, col, SHEET, _DC["d7"], Vector((0.06, sg * 0.092, 0.445)), ua, va, 0.082, 0.108, INK, facing=n_out, min_facing=0.5, depth=0.03, cell_key="num")
+    # front plate (fork_upper local): centre = plate centre - head_bot, readable from the front
+    n = FORK_DIR
+    f = Vector((n.z, 0, -n.x))
+    c = n * 0.03 + f * 0.054
+    col = C.decal(m, col, SHEET, _DC["d7"], c, Vector((0, 1, 0)), n, 0.095, 0.125, INK, facing=f, min_facing=0.5, depth=0.03, cell_key="num")
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
+    return m
+
+
+def make_materials():
+    M = {}
+    # -- metallic paint (plastics) + frame paint, colourway driven; sponsors on the plastics
+    M["paint"] = paint_material("paint", "PAINT", body_decals)
+    M["frame_paint"] = paint_material("frame_paint", "FRAME")
     # -- brushed alloy (swingarm, hubs, clamps, levers)
     m = C.new_mat("alloy_brushed", (0.62, 0.63, 0.65, 1), rough=0.38, metal=1.0)
     n = C.node(m, "ShaderNodeTexNoise")
@@ -92,11 +157,26 @@ def make_materials():
     # -- gold anodised stanchions
     m = C.new_mat("anodised_gold", (0.78, 0.55, 0.22, 1), rough=0.18, metal=1.0)
     M["gold"] = m
-    # -- rubber
+    # -- rubber: grain + a knob-row bump in wheel polar coordinates (object origin = axle, axis y), so
+    # the tread reads in the normal map between the geometric knobs and on the knob-less LOD tyre
     m = C.new_mat("rubber", (0.016, 0.016, 0.016, 1), rough=0.88, metal=0.0)
     f = C.noise_fac(m, scale=120, detail=3, rough=0.6)
-    C.bump(m, f, strength=0.3, distance=0.001)
-    C.link(m, C.ramp(m, f, [(0.3, (0.012, 0.012, 0.012, 1)), (0.7, (0.03, 0.03, 0.028, 1))]), C.bsdf(m).inputs["Base Color"])
+    sep = C.node(m, "ShaderNodeSeparateXYZ")
+    C.link(m, C.texcoord(m).outputs["Object"], sep.inputs[0])
+    ang = C.math_node(m, "ARCTAN2", sep.outputs["Z"], sep.outputs["X"])
+    row = C.math_node(m, "FLOOR", C.math_node(m, "MULTIPLY_ADD", sep.outputs["Y"], 1 / 0.03, 0.5))
+    parity = C.math_node(m, "MULTIPLY", C.math_node(m, "MODULO", C.math_node(m, "ABSOLUTE", row), 2.0), 0.5)
+    au = C.math_node(m, "FRACT", C.math_node(m, "MULTIPLY_ADD", ang, 30 / C.TAU, parity))
+    av = C.math_node(m, "FRACT", C.math_node(m, "MULTIPLY_ADD", sep.outputs["Y"], 1 / 0.03, 0.5))
+    band = lambda x: C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", x, 0.22), C.math_node(m, "LESS_THAN", x, 0.78))  # noqa: E731
+    knob = C.math_node(m, "MULTIPLY", band(au), band(av))
+    # only on the tread (radius > rim + a bit): r = length(x, z)
+    r = C.math_node(m, "SQRT", C.math_node(m, "ADD", C.math_node(m, "MULTIPLY", sep.outputs["X"], sep.outputs["X"]), C.math_node(m, "MULTIPLY", sep.outputs["Z"], sep.outputs["Z"])))
+    knob = C.math_node(m, "MULTIPLY", knob, C.math_node(m, "GREATER_THAN", r, 0.30))
+    height = C.math_node(m, "MULTIPLY_ADD", knob, 0.6, C.math_node(m, "MULTIPLY", f, 0.4))
+    C.bump(m, height, strength=0.45, distance=0.003)
+    C.link(m, C.ramp(m, C.math_node(m, "MULTIPLY_ADD", knob, 0.5, C.math_node(m, "MULTIPLY", f, 0.5)), [(0.3, (0.012, 0.012, 0.012, 1)), (0.7, (0.03, 0.03, 0.028, 1))]), C.bsdf(m).inputs["Base Color"])
+    C.link(m, C.math_node(m, "MULTIPLY_ADD", knob, -0.12, 0.90), C.bsdf(m).inputs["Roughness"])
     M["rubber"] = m
     # -- stainless header with heat tint near the port (object x > 0.7 and z > 0.4 is hot)
     m = C.new_mat("steel_header", (0.45, 0.45, 0.47, 1), rough=0.35, metal=1.0)
@@ -114,20 +194,57 @@ def make_materials():
     C.link(m, C.texcoord(m).outputs["Object"], w.inputs["Vector"])
     C.bump(m, w.outputs["Fac"], strength=0.15, distance=0.0005)
     M["seat"] = m
-    # -- white plastic (number plate)
-    m = C.new_mat("plastic_white", (0.85, 0.86, 0.86, 1), rough=0.45, metal=0.0)
-    M["white"] = m
+    # -- number plates (colourway colour + class digit)
+    M["white"] = plate_material()
+    # -- fork guards: black plastic with IRONWORKS down the front (fork_lower object, origin = front axle)
+    m = C.new_mat("guard", (0.022, 0.022, 0.024, 1), rough=0.6, metal=0.0)
+    n = FORK_DIR
+    f = Vector((n.z, 0, -n.x))
+    col = C.mix_rgb(m, C.math_node(m, "MULTIPLY", C.noise_fac(m, scale=40, detail=2), 0.15), (0.022, 0.022, 0.024, 1), (0.05, 0.05, 0.052, 1))
+    for sg in (-1, 1):
+        c = n * 0.24 + Vector((0, sg * 0.10, 0)) + f * 0.036
+        col = C.decal(m, col, SHEET, _DC["ironworks"], c, n, Vector((0, -sg, 0)), 0.20, 0.045, (0.85, 0.85, 0.86, 1), facing=f, min_facing=0.5, depth=0.03)
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
+    M["guard"] = m
+    # -- swingarm alloy with IRONWORKS on the camera-side arm (swingarm object, origin = pivot)
+    m = C.new_mat("alloy_swing", (0.62, 0.63, 0.65, 1), rough=0.38, metal=1.0)
+    c = (P["pivot"].lerp(P["rear"], 0.5) - P["pivot"]) + Vector((0, -0.134, 0.0))
+    col = C.decal(m, (0.62, 0.63, 0.65, 1), SHEET, _DC["nordvik"], c, Vector((1, 0, 0)), Vector((0, 0, 1)), 0.14, 0.035, (0.05, 0.05, 0.06, 1), facing=Vector((0, -1, 0)), min_facing=0.5, depth=0.03)
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
+    C.link(m, C.math_node(m, "MULTIPLY_ADD", C.noise_fac(m, scale=400, detail=1), 0.15, 0.30), C.bsdf(m).inputs["Roughness"])
+    M["alloy_swing"] = m
+    # -- front fender: black plastic with NORDVIK on the nose (fork_upper object, origin = head_bot)
+    m = C.new_mat("fender", (0.022, 0.022, 0.024, 1), rough=0.62, metal=0.0)
+    a = math.radians(42)
+    c = (P["front"] + V(0.40 * math.cos(a), 0, 0.40 * math.sin(a))) - P["head_bot"]
+    col = C.decal(m, (0.022, 0.022, 0.024, 1), SHEET, _DC["nordvik"], c, Vector((0, 1, 0)), Vector((-math.sin(a), 0, math.cos(a))), 0.10, 0.028, (0.85, 0.85, 0.86, 1), facing=Vector((math.cos(a), 0, math.sin(a))), min_facing=0.4, depth=0.04)
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
+    C.bump(m, C.noise_fac(m, scale=300, detail=2), strength=0.06, distance=0.0005)
+    M["fender"] = m
     # -- red anodised accents (chain guide, caliper)
     m = C.new_mat("anodised_red", (0.55, 0.05, 0.04, 1), rough=0.3, metal=0.8)
     M["red"] = m
-    # -- steel disc (brake rotors)
+    # -- steel disc (brake rotors): turned rings + two rows of drilled holes (wheel polar coords)
     m = C.new_mat("steel_disc", (0.55, 0.55, 0.56, 1), rough=0.35, metal=1.0)
     ring = C.node(m, "ShaderNodeTexWave")
     ring.wave_type = "RINGS"
     ring.rings_direction = "SPHERICAL"
     ring.inputs["Scale"].default_value = 40
     C.link(m, C.texcoord(m).outputs["Object"], ring.inputs["Vector"])
-    C.bump(m, ring.outputs["Fac"], strength=0.2, distance=0.0003)
+    sep = C.node(m, "ShaderNodeSeparateXYZ")
+    C.link(m, C.texcoord(m).outputs["Object"], sep.inputs[0])
+    ang = C.math_node(m, "ARCTAN2", sep.outputs["Z"], sep.outputs["X"])
+    r = C.math_node(m, "SQRT", C.math_node(m, "ADD", C.math_node(m, "MULTIPLY", sep.outputs["X"], sep.outputs["X"]), C.math_node(m, "MULTIPLY", sep.outputs["Z"], sep.outputs["Z"])))
+    rr = C.math_node(m, "MULTIPLY_ADD", r, 1 / 0.024, 0.0)
+    row = C.math_node(m, "FLOOR", rr)
+    parity = C.math_node(m, "MULTIPLY", C.math_node(m, "MODULO", row, 2.0), 0.5)
+    au = C.math_node(m, "SUBTRACT", C.math_node(m, "FRACT", C.math_node(m, "MULTIPLY_ADD", ang, 18 / C.TAU, parity)), 0.5)
+    av = C.math_node(m, "SUBTRACT", C.math_node(m, "FRACT", rr), 0.5)
+    d2 = C.math_node(m, "ADD", C.math_node(m, "MULTIPLY", au, au), C.math_node(m, "MULTIPLY", av, av))
+    hole = C.math_node(m, "MULTIPLY", C.math_node(m, "LESS_THAN", d2, 0.045), C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", r, 0.05), C.math_node(m, "LESS_THAN", r, 0.096)))
+    C.link(m, C.mix_rgb(m, hole, (0.55, 0.55, 0.56, 1), (0.06, 0.06, 0.06, 1)), C.bsdf(m).inputs["Base Color"])
+    C.link(m, C.math_node(m, "MULTIPLY_ADD", hole, 0.5, 0.32), C.bsdf(m).inputs["Roughness"])
+    C.bump(m, C.math_node(m, "MULTIPLY_ADD", hole, -1.0, C.math_node(m, "MULTIPLY", ring.outputs["Fac"], 0.3)), strength=0.5, distance=0.0008)
     M["disc"] = m
     return M
 
@@ -169,7 +286,7 @@ def superellipse_ring(center, half_w, half_h, n=16, power=2.6, top_bias=0.0, til
 
 
 def add_cyl(b, a, c, r1, r2=None, mat=None, seg=12, cap=True, group=None, sharp=None):
-    bm, M = C.cyl_between(a, c, r1, r2, seg=seg, cap=cap)
+    bm, M = C.cyl_between(a, c, r1, r2, seg=C.S(seg), cap=cap)
     b.add(bm, M, mat, group=group, sharp_angle=sharp)
     bm.free()
 
@@ -242,7 +359,8 @@ def build_wheel(name, M, rim_r, section, disc_side, sprocket_side=None):
     # knobs: 3 rows (centre + 2 shoulders), alternating offsets
     knob_n = 30 if section > 0.09 else 26
     kh = 0.011  # knob height
-    for row, (wy, tilt, kx, ky) in enumerate([(0.0, 0.0, 0.026, hw * 0.55), (hw * 0.62, 0.75, 0.020, hw * 0.5), (-hw * 0.62, -0.75, 0.020, hw * 0.5)]):
+    rows = [] if LOD else [(0.0, 0.0, 0.026, hw * 0.55), (hw * 0.62, 0.75, 0.020, hw * 0.5), (-hw * 0.62, -0.75, 0.020, hw * 0.5)]
+    for row, (wy, tilt, kx, ky) in enumerate(rows):
         for i in range(knob_n):
             a = C.TAU * (i + (0.5 if row else 0.0)) / knob_n
             if row == 0 and i % 2:
@@ -268,8 +386,10 @@ def build_wheel(name, M, rim_r, section, disc_side, sprocket_side=None):
     bm = prim_cylinder(0.014, 0.014, 0.19, seg=8)
     b.add(bm, ROT_Z2Y @ Matrix.Translation((0, 0, -0.095)), M["anod"])
     bm.free()
-    # spokes: 32, alternating sides and cross-2 lacing
-    ns = 32
+    # spokes: 32 (LOD 16), alternating sides and cross-2 lacing — a separate child mesh
+    # `<wheel>_spokes` so the render can hide it at speed and show the blur card instead
+    bs = MeshBuilder(name + "_spokes")
+    ns = 32 if not LOD else 16
     for i in range(ns):
         a = C.TAU * i / ns
         side = 1 if i % 2 == 0 else -1
@@ -277,7 +397,9 @@ def build_wheel(name, M, rim_r, section, disc_side, sprocket_side=None):
         a_hub = a + cross * (C.TAU / ns) * 2.0
         hub = Vector((0.048 * math.cos(a_hub), side * 0.046, 0.048 * math.sin(a_hub)))
         rim = Vector(((rim_r - 0.018) * math.cos(a), side * 0.004, (rim_r - 0.018) * math.sin(a)))
-        add_cyl(b, hub, rim, 0.0018, 0.0018, M["alloy"], seg=4, cap=False)
+        bm, M4 = C.cyl_between(hub, rim, 0.0018, 0.0018, seg=3 if LOD else 4, cap=False)
+        bs.add(bm, M4, M["alloy"])
+        bm.free()
     # disc rotor
     ds = disc_side
     bm = prim_lathe([(0.03, -0.0025), (0.105, -0.0025), (0.105, 0.0025), (0.03, 0.0025)], seg=36, closed=True)
@@ -288,7 +410,60 @@ def build_wheel(name, M, rim_r, section, disc_side, sprocket_side=None):
         a = C.TAU * i / 6
         add_box(b, Vector((0.05 * math.cos(a), ds * 0.068, 0.05 * math.sin(a))), (0.045, 0.006, 0.012), M["anod"], rot=Matrix.Rotation(-a, 4, "Y"), bevel=0.001, seg=1)
     ob = finish(b, (0, 0, 0))
-    return ob
+    spokes = finish(bs, (0, 0, 0))
+    spokes.parent = ob
+    # blur card: a flat annulus hub -> rim with the radial-streak alpha texture, both faces
+    bc = MeshBuilder(name + "_blur")
+    for sd in (-1, 1):
+        bm = prim_lathe([(0.052, sd * 0.008), (rim_r - 0.016, sd * 0.008)], seg=32, cap=False)
+        if sd < 0:
+            bmesh.ops.reverse_faces(bm, faces=bm.faces)
+        bc.add(bm, ROT_Z2Y, M["spokecard"])
+        bm.free()
+    card = finish(bc, (0, 0, 0))
+    card.parent = ob
+    uv = card.data.uv_layers.new(name="UVMap")
+    Rr = rim_r
+    for poly in card.data.polygons:
+        for li in poly.loop_indices:
+            co = card.data.vertices[card.data.loops[li].vertex_index].co
+            uv.data[li].uv = (0.5 + co.x / (2 * Rr), 0.5 + co.z / (2 * Rr))
+    return ob, spokes, card
+
+
+def spokecard_material():
+    """128x128 RGBA radial-streak card (grey, alpha) for the at-speed wheel: `bike_spokecard`, glTF BLEND."""
+    n = 128
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
+    x = (xx + 0.5) / n - 0.5
+    y = (yy + 0.5) / n - 0.5
+    r = np.sqrt(x * x + y * y) * 2  # 0 at centre, 1 at the rim
+    ang = np.arctan2(y, x)
+    rng = np.random.default_rng(7)
+    streak = 0.5 + 0.5 * np.sin(ang * 32 + rng.uniform(0, 6.28)) * 0.6 + 0.2 * np.sin(ang * 96 + 1.3)
+    streak = np.clip(streak, 0, 1)
+    ring = np.clip((r - 0.22) / 0.06, 0, 1) * np.clip((0.97 - r) / 0.05, 0, 1)
+    alpha = ring * (0.30 + 0.30 * streak)
+    px = np.zeros((n, n, 4), dtype=np.float32)
+    px[..., 0] = px[..., 1] = px[..., 2] = 0.55 + 0.25 * streak
+    px[..., 3] = alpha
+    img = bpy.data.images.new("bike_spokecard", n, n, alpha=True)
+    img.pixels.foreach_set(px.ravel())
+    p = os.path.join(C.BAKE_DIR, "bike_spokecard.png")
+    os.makedirs(C.BAKE_DIR, exist_ok=True)
+    img.filepath_raw = p
+    img.file_format = "PNG"
+    img.save()
+    m = C.new_mat("bike_spokecard", rough=0.5, metal=0.6)
+    m.blend_method = "BLEND"
+    m.use_backface_culling = False
+    t = C.node(m, "ShaderNodeTexImage")
+    t.image = bpy.data.images.load(p)
+    t.image.alpha_mode = "STRAIGHT"
+    t.extension = "EXTEND"
+    C.link(m, t.outputs["Color"], C.bsdf(m).inputs["Base Color"])
+    C.link(m, t.outputs["Alpha"], C.bsdf(m).inputs["Alpha"])
+    return m
 
 
 def build_sprocket(name, centre, r, teeth, thick, M, mat):
@@ -423,7 +598,7 @@ def chain_material():
 def build_frame(M):
     b = MeshBuilder("frame")
     hb, ht, pv = P["head_bot"], P["head_top"], P["pivot"]
-    paint = M["paint"]
+    paint = M["frame_paint"]
     # head tube along the fork axis, from a bit below head_bot to a bit above head_top
     add_cyl(b, hb - FORK_DIR * 0.02, ht + FORK_DIR * 0.02, 0.032, 0.032, paint, seg=14)
     # twin spars: from the head tube, out and back over the engine, down to the pivot plates
@@ -525,9 +700,9 @@ def build_bodywork(M):
         bm = loft(secs)
         b.add(bm, Matrix.Identity(4), paint, sharp_angle=50)
         bm.free()
-    # side number panels under the seat
+    # side number plates on the rear fender flanks, behind the rider's legs (readable from the riding camera)
     for s in (-1, 1):
-        add_box(b, V(0.22, s * 0.085, 0.42), (0.20, 0.008, 0.11), M["white"], bevel=0.02, rot=Matrix.Rotation(s * 0.1, 4, "X") @ Matrix.Rotation(-0.25, 4, "Y"))
+        add_box(b, V(0.06, s * 0.088, 0.445), (0.19, 0.008, 0.12), M["white"], bevel=0.015, rot=Matrix.Rotation(s * 0.06, 4, "X") @ Matrix.Rotation(-0.15, 4, "Y"))
     # rear fender tail light stub / mud flap
     add_box(b, V(-0.14, 0, 0.36), (0.06, 0.12, 0.03), M["black"], bevel=0.008, rot=Matrix.Rotation(0.8, 4, "Y"))
     return finish(b, (0, 0, 0))
@@ -600,7 +775,7 @@ def build_swingarm(M):
     b = MeshBuilder("swingarm")
     pv = P["pivot"]
     ax = P["rear"]
-    alloy = M["alloy"]
+    alloy = M["alloy_swing"]
     for s in (-1, 1):
         y = s * 0.115
         # tapered box beam pivot -> axle
@@ -698,8 +873,11 @@ def build_forks(M):
         add_cyl(b, ht + n * 0.05 + side * (s * 0.035), P["bar"] + side * (s * 0.035) - V(0, 0, 0.02), 0.014, 0.014, M["anod"], seg=10)
     # steering stem nut
     add_cyl(b, ht + n * 0.05, ht + n * 0.075, 0.02, 0.02, M["anod"], seg=10)
-    # front number plate hanging off the lower clamp
-    add_box(b, hb + n * 0.02 + V(0.03, 0, 0), (0.008, 0.20, 0.17), M["white"], bevel=0.02, rot=q)
+    # front number plate ahead of the lower clamp, facing forward (box axes under q: x -> -y, y -> f, z -> n)
+    f = Vector((n.z, 0, -n.x))
+    add_box(b, hb + n * 0.03 + f * 0.05, (0.20, 0.008, 0.17), M["white"], bevel=0.015, rot=q)
+    for s in (-1, 1):  # plate stays
+        add_cyl(b, hb + n * 0.03 + f * 0.048 + side * (s * 0.06), hb + n * 0.03 + side * (s * 0.06), 0.005, 0.005, M["anod"], seg=6)
     # front fender on the lower clamp: arch over the tyre
     secs = []
     for i in range(8):
@@ -715,7 +893,7 @@ def build_forks(M):
             ring.append(fa + V(rr * math.cos(a), y, rr * math.sin(a)))
         secs.append(ring)
     bm = loft(secs)
-    b.add(bm, Matrix.Identity(4), M["black"])
+    b.add(bm, Matrix.Identity(4), M["fender"])
     bm.free()
     upper = finish(b, hb)
     # ---- lower: sliders from the axle up, axle lugs, caliper (left), brake hose guide
@@ -727,6 +905,10 @@ def build_forks(M):
         add_box(b, a0, (0.06, 0.03, 0.05), M["anod"], bevel=0.008, rot=q)  # axle lug
         # fender/brace bosses
     add_cyl(b, fa + side * (-off - 0.02), fa + side * (off + 0.02), 0.011, 0.011, M["alloy"], seg=8)  # axle
+    # fork guards: plastic plates ahead of the sliders (sponsor down the front)
+    f = Vector((n.z, 0, -n.x))
+    for s in (-1, 1):
+        add_box(b, fa + n * 0.24 + side * (s * off) + f * 0.032, (0.006, 0.062, 0.30), M["guard"], bevel=0.003, rot=q, seg=1)
     # caliper on the left, ahead of the slider at disc radius
     add_box(b, fa + n * 0.075 + V(0.05, -0.085, 0), (0.06, 0.035, 0.07), M["red"], bevel=0.008, rot=q)
     lower = finish(b, fa)
@@ -778,9 +960,15 @@ def build_pegs(M):
 
 # ------------------------------------------------------------------------- main
 def main():
+    global SHEET, _DC
+    import decals as D
+
     C.reset_scene()
+    SHEET = D.ensure_sheet()
+    _DC = D.CELLS
     M = make_materials()
     M["chain"] = chain_material()
+    M["spokecard"] = spokecard_material()
     objs = {}
     objs["frame"] = build_frame(M)
     objs["bodywork"] = build_bodywork(M)
@@ -793,8 +981,8 @@ def main():
     objs["fork_upper"], objs["fork_lower"] = upper, lower
     objs["handlebar"] = build_handlebar(M)
     objs["pegs"] = build_pegs(M)
-    objs["wheel_rear"] = build_wheel("wheel_rear", M, 0.228, 0.112, disc_side=+1)
-    objs["wheel_front"] = build_wheel("wheel_front", M, 0.262, 0.078, disc_side=-1)
+    objs["wheel_rear"], objs["wheel_rear_spokes"], objs["wheel_rear_blur"] = build_wheel("wheel_rear", M, 0.228, 0.112, disc_side=+1)
+    objs["wheel_front"], objs["wheel_front_spokes"], objs["wheel_front_blur"] = build_wheel("wheel_front", M, 0.262, 0.078, disc_side=-1)
     objs["wheel_front"].location = P["front"]
     objs["wheel_rear"].location = P["rear"]
     objs["sprocket_rear"] = build_sprocket("sprocket_rear", P["rear"] + V(0, -0.092, 0), 0.105, 42, 0.006, M, M["alloy"])
@@ -807,7 +995,8 @@ def main():
     root = bpy.data.objects.new("bike", None)
     bpy.context.scene.collection.objects.link(root)
     for o in all_obs:
-        o.parent = root
+        if o.parent is None:
+            o.parent = root
     hier = dict(sprocket_rear="wheel_rear")  # spins with the wheel
     for child, par in hier.items():
         o = objs[child]
@@ -821,20 +1010,37 @@ def main():
 
     tris = {o.name: C.tri_count(o) for o in all_obs}
     log("tris", tris, "total", sum(tris.values()))
+    if LOD:
+        total = sum(tris.values())
+        for o in all_obs:
+            if o.name.endswith("_blur") or o.name.endswith("_spokes"):
+                continue
+            C.decimate_to(o, max(12, int(tris[o.name] * LOD_TRIS / total)))
+        tris = {o.name: C.tri_count(o) for o in all_obs}
+        log("lod tris", tris, "total", sum(tris.values()))
 
-    atlas_obs = [o for o in all_obs if o.name != "chain"]
-    C.unwrap_all(atlas_obs, angle=66, margin=0.0015)
+    # two atlases: the livery-dependent body set (two albedos -> variants) and the shared mechanicals
+    body_names = ("frame", "bodywork", "fork_upper")
+    body_obs = [o for o in all_obs if o.name in body_names]
+    mech_obs = [o for o in all_obs if o.name not in body_names and o.name != "chain" and not o.name.endswith("_blur")]
+    C.unwrap_all(body_obs, angle=66, margin=0.002)
+    C.unwrap_all(mech_obs, angle=66, margin=0.0015)
+    C.apply_colourway(COLOURWAYS["rookie"])
     if not NO_BAKE:
-        paths = C.bake_atlas(atlas_obs, SIZE, C.BAKE_DIR, "bike", jpeg_quality=86, normal_size=min(SIZE, 1024), orm_size=min(SIZE, 1024))
-        atlas = C.atlas_material("bike_atlas", paths)
-        C.assign_atlas(atlas_obs, atlas)
-    blend_path = os.path.join(C.HERE, "bike.blend")
+        variants = [(cw, (lambda cw=cw: C.apply_colourway(COLOURWAYS[cw]))) for cw in ("rookie", "pro")]
+        pb = C.bake_atlas(body_obs, SIZE, C.BAKE_DIR, OUT_NAME + "_body", jpeg_quality=86, normal_size=SIZE // 2, orm_size=SIZE // 2, variants=variants)
+        pm = C.bake_atlas(mech_obs, SIZE, C.BAKE_DIR, OUT_NAME + "_mech", jpeg_quality=86, normal_size=SIZE // 2, orm_size=SIZE // 2)
+        body_mats = {cw: C.atlas_material(f"bike_body_{cw}", pb, albedo=f"albedo:{cw}") for cw in ("rookie", "pro")}
+        C.assign_atlas(body_obs, body_mats["rookie"])
+        C.assign_atlas(mech_obs, C.atlas_material("bike_mech", pm))
+        C.setup_variants(body_obs, [(f"bike_{cw}", {n: body_mats[cw] for n in body_names}) for cw in ("rookie", "pro")])
+    blend_path = os.path.join(C.HERE, OUT_NAME + ".blend")
     bpy.ops.wm.save_as_mainfile(filepath=blend_path, compress=True)
-    out = os.path.join(C.MODELS, "bike.glb")
+    out = os.path.join(C.MODELS, OUT_NAME + ".glb")
     size = C.export_glb(out, all_obs + [root], animations=False, meshopt=MESHOPT)
     info = C.gltf_summary(out)
     log("glb", info)
-    with open(os.path.join(C.HERE, "bike.stats.txt"), "w") as f:
+    with open(os.path.join(C.HERE, OUT_NAME + ".stats.txt"), "w") as f:
         f.write(f"tris_per_object={tris}\ntotal_tris={sum(tris.values())}\nglb_bytes={size}\nshock_len={shock_len:.4f}\nfork_rake_deg={math.degrees(FORK_ANGLE):.2f}\n")
         f.write(f"gltf={info}\n")
 

@@ -11,6 +11,9 @@ Bones are named exactly as the joint set the render drives:
   thigh.L/R, shin.L/R, foot.L/R           (.L = rider's left = camera side, glTF +z)
 Body = skin-modifier stick figure + subdivision (one continuous quad skin), gear = merged
 primitives; weights are envelope-blended per bone with rigid groups for the hard parts.
+Suit graphics: panels in object space + sponsor decals projected from textures/decals.png
+(decals.py); two colourways baked as two albedos -> KHR_materials_variants rider_rookie / rider_pro.
+`-- --lod` writes rider-lod.glb (<= 6k tris, 512 atlas).
 """
 import math
 import os
@@ -27,10 +30,16 @@ from common import MeshBuilder, V, log, prim_box, prim_cylinder, prim_lathe, pri
 
 ARGS = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
 NO_BAKE = "--no-bake" in ARGS
-SIZE = int(ARGS[ARGS.index("--size") + 1]) if "--size" in ARGS else 1024
+LOD = "--lod" in ARGS  # public/models/rider-lod.glb: <= 6k tris, 512 atlas, same bones / clips / material names
+SIZE = int(ARGS[ARGS.index("--size") + 1]) if "--size" in ARGS else (512 if LOD else 1024)
 MESHOPT = "--no-meshopt" not in ARGS
 FPS = 30
-BODY_DECIMATE = float(ARGS[ARGS.index("--decimate") + 1]) if "--decimate" in ARGS else 0.55
+BODY_DECIMATE = float(ARGS[ARGS.index("--decimate") + 1]) if "--decimate" in ARGS else (0.30 if LOD else 0.55)
+LOD_TRIS = 6000
+OUT_NAME = "rider-lod" if LOD else "rider"
+if LOD:
+    C.set_detail(0.5)
+prim_box, prim_cylinder, prim_lathe, prim_sphere, prim_torus, prim_tube = (C.scaled(f) for f in (prim_box, prim_cylinder, prim_lathe, prim_sphere, prim_torus, prim_tube))
 
 # ---- rider chain (assets/blender/RIDER_CHAIN.md), measured from the reference; +0.65 x -> rear-axle frame
 X0 = 0.65
@@ -204,8 +213,15 @@ def write_chain_md(path):
     lines.append("`extend` (hop push) and `land_absorb` (touchdown) are the two transient poses the clips pass through; `stand_attack` is the rest pose of rider.glb.\n")
     lines.append("## Clips = blends between canonical poses (30 fps)\n")
     lines.append("stand_attack: hold. hang_back / forward_attack / crouch / sit_cruise: stand_attack -> pose at f15 -> hold to f30. extend: crouch -> extend at f8 -> stand_attack at f20. land_absorb: extend -> land_absorb at f8 -> stand_attack at f30. idle_breathe: stand_attack with hips +-1.5 cm, torso +-1.5 deg, head +-2 deg over 4 s (cyclic).\n")
+    # keep anything other owners appended below the generated part (pose.ts curves, studies)
+    tail = ""
+    if os.path.exists(path):
+        old = open(path).read()
+        marker = "\n## Curves between"
+        if marker in old:
+            tail = old[old.index(marker):]
     with open(path, "w") as f:
-        f.write("\n".join(lines))
+        f.write("\n".join(lines) + tail)
 
 
 REST = chain()
@@ -265,149 +281,227 @@ def build_armature(B):
     return ob
 
 
-# ----------------------------------------------------------------------------- materials
-def make_materials():
-    M = {}
-    m = C.new_mat("jersey", (0.93, 0.66, 0.04, 1), rough=0.82)
+# ----------------------------------------------------------------------------- colourways
+# Two colourways matching the render's bike liveries (src/render/bike/livery.ts): Rookie = blue /
+# white #7, Pro = charcoal / yellow #1. Every CW_* key below is a named node in the bake materials;
+# the albedo is baked once per colourway (normal + ORM shared) and exported as KHR_materials_variants
+# `rider_rookie` / `rider_pro`.
+_DC = None  # decal sheet image (decals.CELLS)
+COLOURWAYS = dict(
+    rookie=dict(
+        JA=(0.78, 0.79, 0.80), JB=(0.03, 0.12, 0.62),           # jersey main / panels + sleeves
+        PA=(0.03, 0.07, 0.30), PB=(0.78, 0.79, 0.80),           # pants main / seam stripe
+        LOGO_A=(0.03, 0.04, 0.10), LOGO_B=(0.92, 0.92, 0.93), LOGO_P=(0.85, 0.86, 0.88),
+        NUM_BG=(0.03, 0.12, 0.62), NUM_INK=(0.92, 0.92, 0.93),
+        HELMET=(0.82, 0.83, 0.84), HSTRIPE=(0.03, 0.12, 0.62), HLOGO=(0.03, 0.12, 0.62),
+        VISOR=(0.20, 0.26, 0.36), GLOVE=(0.03, 0.12, 0.62), BOOTPLATE=(0.03, 0.12, 0.62),
+        num_u=0.0, num_v=2 / 8,                                  # decals.CELLS['d7'] origin
+    ),
+    pro=dict(
+        JA=(0.045, 0.045, 0.05), JB=(0.92, 0.72, 0.05),
+        PA=(0.03, 0.03, 0.033), PB=(0.92, 0.72, 0.05),
+        LOGO_A=(0.92, 0.72, 0.05), LOGO_B=(0.05, 0.05, 0.055), LOGO_P=(0.92, 0.72, 0.05),
+        NUM_BG=(0.92, 0.72, 0.05), NUM_INK=(0.72, 0.10, 0.06),
+        HELMET=(0.06, 0.06, 0.065), HSTRIPE=(0.92, 0.72, 0.05), HLOGO=(0.92, 0.72, 0.05),
+        VISOR=(0.80, 0.60, 0.30), GLOVE=(0.92, 0.72, 0.05), BOOTPLATE=(0.92, 0.72, 0.05),
+        num_u=2 / 8, num_v=2 / 8,                                # decals.CELLS['d1'] origin
+    ),
+)
+SKIN = (0.55, 0.36, 0.26, 1)
+
+
+def _torso_uv(m):
+    """Object-space torso coordinates: u along the torso from the hips, w forward, y lateral."""
+    H, t = REST["hips"], REST["torsoDir"]
+    fwd = Vector((t.z, 0, -t.x))
+    sep = C.node(m, "ShaderNodeSeparateXYZ")
+    C.link(m, C.texcoord(m).outputs["Object"], sep.inputs[0])
+    d = C.vmath(m, "SUBTRACT", C.texcoord(m).outputs["Object"], tuple(H))
+    u = C.vmath(m, "DOT_PRODUCT", d, tuple(t))
+    w = C.vmath(m, "DOT_PRODUCT", d, tuple(fwd))
+    return u, w, sep.outputs["Y"], C.math_node(m, "ABSOLUTE", sep.outputs["Y"])
+
+
+def _fabric(m, scale=900, strength=0.10):
     w = C.node(m, "ShaderNodeTexWave")
     w.wave_type = "BANDS"
     w.bands_direction = "DIAGONAL"
-    w.inputs["Scale"].default_value = 900
+    w.inputs["Scale"].default_value = scale
     C.link(m, C.texcoord(m).outputs["Object"], w.inputs["Vector"])
     w2 = C.node(m, "ShaderNodeTexWave")
     w2.wave_type = "BANDS"
     w2.bands_direction = "X"
-    w2.inputs["Scale"].default_value = 900
+    w2.inputs["Scale"].default_value = scale
     C.link(m, C.texcoord(m).outputs["Object"], w2.inputs["Vector"])
     weave = C.math_node(m, "MULTIPLY", w.outputs["Fac"], w2.outputs["Fac"])
-    C.bump(m, weave, strength=0.12, distance=0.0004)
-    f = C.noise_fac(m, scale=25, detail=2)
-    C.link(m, C.ramp(m, f, [(0.3, (0.90, 0.62, 0.03, 1)), (0.7, (0.97, 0.72, 0.08, 1))]), C.bsdf(m).inputs["Base Color"])
-    M["jersey"] = m
+    C.bump(m, weave, strength=strength, distance=0.0004)
+    return weave
+
+
+def _grime(m, col, amount=0.12, scale=18):
+    """Low-frequency dirt / wear so a flat panel is never one value."""
+    f = C.noise_fac(m, scale=scale, detail=3, rough=0.6)
+    dark = C.mix_rgb(m, 1.0, col, (0.0, 0.0, 0.0, 1), blend="MULTIPLY")
+    return C.mix_rgb(m, C.math_node(m, "MULTIPLY", f, amount), col, C.mix_rgb(m, 0.55, col, (0.02, 0.02, 0.02, 1)))
+
+
+def make_materials(sheet):
+    import decals as D
+
+    global _DC
+    _DC = D.CELLS
+    S, H = REST["shoulders"], REST["hips"]
+    t = REST["torsoDir"]
+    fwd = Vector((t.z, 0, -t.x))
+    up = Vector((0, 0, 1))
+    M = {}
+
+    # ---- torso: jersey above the belt, pants below; panels; sponsors front + back; numbers
+    m = C.new_mat("bodycloth", (0.8, 0.8, 0.8, 1), rough=0.8)
+    JA, JB, PA = C.cw_rgb(m, "JA"), C.cw_rgb(m, "JB"), C.cw_rgb(m, "PA")
+    LOGO_A, LOGO_B, NUM_BG, NUM_INK = C.cw_rgb(m, "LOGO_A"), C.cw_rgb(m, "LOGO_B"), C.cw_rgb(m, "NUM_BG"), C.cw_rgb(m, "NUM_INK")
+    u, w, y, ay = _torso_uv(m)
+    u0 = 0.05  # belt line along the torso
+    above = C.math_node(m, "GREATER_THAN", u, u0)
+    hem = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", u, u0 - 0.035), C.math_node(m, "LESS_THAN", u, u0 + 0.004))
+    # side panels (JB) on the flanks up to the armpit, a JB chevron across the chest, JB yoke on the back
+    side = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", ay, 0.145), C.math_node(m, "LESS_THAN", u, u0 + 0.36))
+    chev_c = C.math_node(m, "MULTIPLY_ADD", ay, 0.55, 0.0)  # V: higher at the sides
+    chev_lo = C.math_node(m, "ADD", chev_c, 0.24)
+    chev_hi = C.math_node(m, "ADD", chev_c, 0.31)
+    chev = C.math_node(m, "MULTIPLY", C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", u, chev_lo), C.math_node(m, "LESS_THAN", u, chev_hi)), C.math_node(m, "GREATER_THAN", w, 0.0))
+    yoke = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", u, 0.43), C.math_node(m, "LESS_THAN", w, -0.02))
+    jcol = C.mix_rgb(m, side, JA, JB)
+    jcol = C.mix_rgb(m, chev, jcol, JB)
+    jcol = C.mix_rgb(m, yoke, jcol, JB)
+    col = C.mix_rgb(m, above, PA, jcol)
+    col = C.mix_rgb(m, hem, col, (0.06, 0.06, 0.07, 1))
+    # decals: chest VORTEX OIL, right-chest number, belly BOLT ENERGY, back NORDVIK + number plate
+    tor = REST["torsoDir"]
+    front = S - tor * 0.13 + fwd * 0.12
+    col = C.decal(m, col, sheet, _DC["vortex"], front, Vector((0, 1, 0)), tor, 0.26, 0.065, LOGO_A, facing=fwd)
+    col = C.decal(m, col, sheet, _DC["bolt"], S - tor * 0.37 + fwd * 0.11, Vector((0, 1, 0)), tor, 0.22, 0.055, LOGO_A, facing=fwd)
+    numc = S - tor * 0.235 + fwd * 0.125 + Vector((0, -0.07, 0))  # right chest (anatomical right = -y)
+    col = C.patch(m, col, numc, Vector((0, 1, 0)), tor, 0.085, 0.10, NUM_BG, facing=fwd)
+    col = C.decal(m, col, sheet, _DC["d7"], numc, Vector((0, 1, 0)), tor, 0.06, 0.09, NUM_INK, facing=fwd, cell_key="num")
+    back = S - tor * 0.20 - fwd * 0.12
+    col = C.decal(m, col, sheet, _DC["nordvik"], S - tor * 0.06 - fwd * 0.11, -Vector((0, 1, 0)), tor, 0.24, 0.06, LOGO_B, facing=-fwd)
+    col = C.patch(m, col, back, -Vector((0, 1, 0)), tor, 0.21, 0.23, NUM_BG, facing=-fwd)
+    col = C.decal(m, col, sheet, _DC["d7"], back, -Vector((0, 1, 0)), tor, 0.14, 0.21, NUM_INK, facing=-fwd, cell_key="num")
+    col = _grime(m, col, 0.10)
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
+    C.link(m, C.math_node(m, "MULTIPLY_ADD", above, 0.04, 0.80), C.bsdf(m).inputs["Roughness"])
+    _fabric(m)
+    M["bodycloth"] = m
+
+    # ---- sleeves: upper arm JB with KESTREL along the outside, forearm JA with a JB cuff
+    m = C.new_mat("sleeve_upper", (0.2, 0.2, 0.6, 1), rough=0.8)
+    JA, JB, LOGO_B = C.cw_rgb(m, "JA"), C.cw_rgb(m, "JB"), C.cw_rgb(m, "LOGO_B")
+    col = JB
+    for s, sg in (("L", -1), ("R", 1)):
+        sh, el = REST["shoulder." + s], REST["elbow." + s]
+        ua = (el - sh).normalized()
+        n_out = Vector((0, sg, 0))
+        va = n_out.cross(ua).normalized()
+        if sg > 0:
+            ua = -ua  # read left-to-right from the rider's right side too
+            va = n_out.cross(ua).normalized()
+        col = C.decal(m, col, sheet, _DC["kestrel"], sh.lerp(el, 0.55) + n_out * 0.07, ua, va, 0.15, 0.04, LOGO_B, facing=n_out, min_facing=0.3)
+    col = _grime(m, col, 0.10)
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
+    _fabric(m)
+    M["sleeve_upper"] = m
+    m = C.new_mat("sleeve_lower", (0.8, 0.8, 0.8, 1), rough=0.8)
+    JA, JB = C.cw_rgb(m, "JA"), C.cw_rgb(m, "JB")
+    dl = C.vmath(m, "DISTANCE", C.texcoord(m).outputs["Object"], tuple(REST["wrist.L"]))
+    dr = C.vmath(m, "DISTANCE", C.texcoord(m).outputs["Object"], tuple(REST["wrist.R"]))
+    cuff = C.math_node(m, "LESS_THAN", C.math_node(m, "MINIMUM", dl, dr), 0.11)
+    col = C.mix_rgb(m, cuff, JA, JB)
+    col = _grime(m, col, 0.10)
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
+    _fabric(m)
+    M["sleeve_lower"] = m
+
+    # ---- pants: PA with a PB stripe down the outer seam and APEX along the outer thigh
     m = C.new_mat("pants", (0.05, 0.09, 0.30, 1), rough=0.78)
+    PA, PB, LOGO_P = C.cw_rgb(m, "PA"), C.cw_rgb(m, "PB"), C.cw_rgb(m, "LOGO_P")
+    sep = C.node(m, "ShaderNodeSeparateXYZ")
+    C.link(m, C.texcoord(m).outputs["Object"], sep.inputs[0])
+    ay = C.math_node(m, "ABSOLUTE", sep.outputs["Y"])
+    seam = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", ay, 0.168), C.math_node(m, "LESS_THAN", ay, 0.20))
+    col = C.mix_rgb(m, seam, PA, PB)
+    for s, sg in (("L", -1), ("R", 1)):
+        hp, kn = REST["hip." + s], REST["knee." + s]
+        ua = (kn - hp).normalized()
+        n_out = Vector((0, sg, 0))
+        if sg > 0:
+            ua = -ua
+        va = n_out.cross(ua).normalized()
+        col = C.decal(m, col, sheet, _DC["apex"], hp.lerp(kn, 0.5) + n_out * 0.10, ua, va, 0.16, 0.045, LOGO_P, facing=n_out, min_facing=0.3)
+    col = _grime(m, col, 0.14, scale=12)
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
     f = C.noise_fac(m, scale=60, detail=3)
     C.bump(m, f, strength=0.1, distance=0.0005)
-    C.link(m, C.ramp(m, f, [(0.3, (0.045, 0.08, 0.27, 1)), (0.7, (0.06, 0.11, 0.34, 1))]), C.bsdf(m).inputs["Base Color"])
     M["pants"] = m
-    # body cloth: jersey above the belt line, pants below (object-space plane through the hips,
-    # normal = torso direction) with a dark hem band; one material so the split is a clean line
-    m = C.new_mat("bodycloth", (0.93, 0.66, 0.04, 1), rough=0.8)
-    H, t = REST["hips"], REST["torsoDir"]
-    sep = C.node(m, "ShaderNodeSeparateXYZ")
-    C.link(m, C.texcoord(m).outputs["Object"], sep.inputs[0])
-    ux = C.math_node(m, "MULTIPLY", sep.outputs["X"], t.x)
-    uz = C.math_node(m, "MULTIPLY", sep.outputs["Z"], t.z)
-    u = C.math_node(m, "ADD", ux, uz)
-    u0 = H.x * t.x + H.z * t.z + 0.05
-    above = C.math_node(m, "GREATER_THAN", u, u0)
-    hem = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", u, u0 - 0.035), C.math_node(m, "LESS_THAN", u, u0))
-    fj = C.noise_fac(m, scale=25, detail=2)
-    jcol = C.ramp(m, fj, [(0.3, (0.90, 0.62, 0.03, 1)), (0.7, (0.97, 0.72, 0.08, 1))])
-    fp = C.noise_fac(m, scale=60, detail=3)
-    pcol = C.ramp(m, fp, [(0.3, (0.045, 0.08, 0.27, 1)), (0.7, (0.06, 0.11, 0.34, 1))])
-    # jersey graphics: dark-blue side panels (|y| > 0.125 on the torso, u 0.06..0.40) and a
-    # white chest band at u 0.30..0.34, so the shirt reads as printed race gear, not a blank tube
-    ay = C.math_node(m, "ABSOLUTE", sep.outputs["Y"])
-    side_panel = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", ay, 0.15), C.math_node(m, "LESS_THAN", u, u0 + 0.30))
-    side_panel = C.math_node(m, "MULTIPLY", side_panel, C.math_node(m, "LESS_THAN", ay, 0.19))
-    band = C.math_node(m, "MULTIPLY", C.math_node(m, "GREATER_THAN", u, u0 + 0.26), C.math_node(m, "LESS_THAN", u, u0 + 0.30))
-    jcol = C.mix_rgb(m, side_panel, jcol, pcol)
-    jcol = C.mix_rgb(m, band, jcol, (0.90, 0.90, 0.90, 1))
-    col = C.mix_rgb(m, above, pcol, jcol)
-    col = C.mix_rgb(m, hem, col, (0.08, 0.08, 0.09, 1))
-    C.link(m, col, C.bsdf(m).inputs["Base Color"])
-    C.link(m, C.math_node(m, "MULTIPLY_ADD", above, 0.05, 0.78), C.bsdf(m).inputs["Roughness"])
-    w = C.node(m, "ShaderNodeTexWave")
-    w.wave_type = "BANDS"
-    w.bands_direction = "DIAGONAL"
-    w.inputs["Scale"].default_value = 900
-    C.link(m, C.texcoord(m).outputs["Object"], w.inputs["Vector"])
-    C.bump(m, w.outputs["Fac"], strength=0.08, distance=0.0003)
-    M["bodycloth"] = m
-    m = C.new_mat("helmet", (0.03, 0.12, 0.62, 1), rough=0.22)
-    # white centre stripe: |y| < 0.02 on the shell (object coords)
+
+    # ---- helmet: shell colour, centre stripe + rear chevrons, trimark on each side; glossy
+    m = C.new_mat("helmet", (0.8, 0.8, 0.8, 1), rough=0.20)
+    HELMET, HSTRIPE, HLOGO = C.cw_rgb(m, "HELMET"), C.cw_rgb(m, "HSTRIPE"), C.cw_rgb(m, "HLOGO")
+    headC, hd = REST["head"], REST["headDir"]
+    fwd_h = Vector((hd.z, 0, -hd.x))
     sep = C.node(m, "ShaderNodeSeparateXYZ")
     C.link(m, C.texcoord(m).outputs["Object"], sep.inputs[0])
     ay = C.math_node(m, "ABSOLUTE", sep.outputs["Y"])
-    stripe = C.math_node(m, "LESS_THAN", ay, 0.018)
-    col = C.mix_rgb(m, stripe, (0.03, 0.12, 0.62, 1), (0.92, 0.92, 0.92, 1))
+    stripe = C.math_node(m, "LESS_THAN", ay, 0.016)
+    col = C.mix_rgb(m, stripe, HELMET, HSTRIPE)
+    for sg in (-1, 1):
+        n_out = Vector((0, sg, 0))
+        col = C.decal(m, col, sheet, _DC["chevrons"], headC - fwd_h * 0.085 + n_out * 0.11 + hd * 0.01, (fwd_h if sg < 0 else -fwd_h), hd, 0.09, 0.09, HSTRIPE, facing=n_out - fwd_h * 0.4, min_facing=0.3)
+        col = C.decal(m, col, sheet, _DC["trimark"], headC + fwd_h * 0.02 + n_out * 0.13 + hd * 0.035, (fwd_h if sg < 0 else -fwd_h), hd, 0.07, 0.07, HLOGO, facing=n_out, min_facing=0.5)
     C.link(m, col, C.bsdf(m).inputs["Base Color"])
-    C.set_metal_source(m, 0.15)
+    C.set_metal_source(m, 0.0)
+    C.bump(m, C.noise_fac(m, scale=400, detail=1), strength=0.02, distance=0.0003)
     M["helmet"] = m
-    M["visor"] = C.new_mat("visor", (0.05, 0.06, 0.08, 1), rough=0.08, metal=0.6)
+    # visor / goggle lens: a dark (rookie) or gold (pro) mirror — metal 1, rough 0.06 so three's
+    # PMREM environment gives it a specular highlight at any angle
+    m = C.new_mat("visor", (0.1, 0.1, 0.1, 1), rough=0.06, metal=1.0)
+    C.link(m, C.cw_rgb(m, "VISOR"), C.bsdf(m).inputs["Base Color"])
+    M["visor"] = m
+    # gloves: coloured back / cuff, black fingers + palm with a knuckle bump
     m = C.new_mat("gloves", (0.03, 0.03, 0.032, 1), rough=0.6)
     C.bump(m, C.noise_fac(m, scale=200, detail=2), strength=0.15, distance=0.0004)
     M["gloves"] = m
+    m = C.new_mat("glove_top", (0.2, 0.2, 0.6, 1), rough=0.65)
+    C.link(m, _grime(m, C.cw_rgb(m, "GLOVE"), 0.15, scale=40), C.bsdf(m).inputs["Base Color"])
+    C.bump(m, C.noise_fac(m, scale=200, detail=2), strength=0.12, distance=0.0004)
+    M["glove_top"] = m
+    # boots: black leather with buckles; coloured shin plate carrying IRONWORKS
     m = C.new_mat("boots", (0.02, 0.02, 0.022, 1), rough=0.45)
     C.bump(m, C.noise_fac(m, scale=90, detail=3, rough=0.7), strength=0.2, distance=0.0006)
+    C.link(m, _grime(m, (0.025, 0.025, 0.027, 1), 0.2, scale=30), C.bsdf(m).inputs["Base Color"])
     M["boots"] = m
+    m = C.new_mat("bootplate", (0.2, 0.2, 0.6, 1), rough=0.35)
+    BOOTPLATE, LOGO_B = C.cw_rgb(m, "BOOTPLATE"), C.cw_rgb(m, "LOGO_B")
+    col = BOOTPLATE
+    for s, sg in (("L", -1), ("R", 1)):
+        an, kn = REST["ankle." + s], REST["knee." + s]
+        sd = (kn - an).normalized()
+        n_out = Vector((0, sg, 0))
+        col = C.decal(m, col, sheet, _DC["ironworks"], an + sd * 0.19 + Vector((0.065, 0, 0)), Vector((0, sg, 0)) if False else sd, n_out.cross(sd).normalized(), 0.12, 0.03, LOGO_B, facing=Vector((1, 0, 0)), min_facing=0.4)
+    C.link(m, col, C.bsdf(m).inputs["Base Color"])
+    M["bootplate"] = m
     M["sole"] = C.new_mat("sole", (0.09, 0.085, 0.075, 1), rough=0.9)
     m = C.new_mat("armour", (0.10, 0.10, 0.11, 1), rough=0.4)
     C.bump(m, C.noise_fac(m, scale=150, detail=1), strength=0.05, distance=0.0004)
     M["armour"] = m
     M["alloy"] = C.new_mat("alloy_r", (0.6, 0.6, 0.62, 1), rough=0.35, metal=1.0)
-    M["skin"] = C.new_mat("balaclava", (0.02, 0.02, 0.02, 1), rough=0.85)
-    # number patch: image texture drawn in numpy (white 27 on jersey yellow with a dark hem)
-    M["number"] = number_material()
+    # skin: the neck between the collar and the helmet (the only skin a trials rider shows)
+    m = C.new_mat("skin", SKIN, rough=0.55)
+    f = C.noise_fac(m, scale=80, detail=2)
+    C.link(m, C.ramp(m, f, [(0.3, (0.50, 0.32, 0.23, 1)), (0.7, (0.60, 0.40, 0.29, 1))]), C.bsdf(m).inputs["Base Color"])
+    M["skin"] = m
+    M["jersey"] = M["sleeve_upper"]  # shoulder caps / back hump take the panel colour
     return M
-
-
-DIGITS = {
-    "2": ["1111", "0001", "1111", "1000", "1111"],
-    "7": ["1111", "0001", "0010", "0100", "0100"],
-}
-
-
-def number_material(text="27"):
-    w, h = 128, 128
-    px = np.zeros((h, w, 4), dtype=np.float32)
-    px[..., :3] = (0.93, 0.66, 0.04)
-    px[..., 3] = 1
-    px[:14, :, :3] = (0.05, 0.09, 0.30)  # hem (bottom in Blender image coords = row 0)
-    cell = 16
-    x0 = 20
-    for d in text:
-        rows = DIGITS[d]
-        for r, row in enumerate(rows):
-            for c, ch in enumerate(row):
-                if ch == "1":
-                    y0 = h - 22 - (r + 1) * cell
-                    px[y0 : y0 + cell, x0 + c * cell : x0 + (c + 1) * cell, :3] = (0.97, 0.97, 0.97)
-        x0 += 5 * cell
-    img = bpy.data.images.new("rider_number", w, h)
-    img.pixels.foreach_set(px.ravel())
-    os.makedirs(C.BAKE_DIR, exist_ok=True)
-    p = os.path.join(C.BAKE_DIR, "rider_number.png")
-    img.filepath_raw = p
-    img.file_format = "PNG"
-    img.save()
-    m = C.new_mat("number", rough=0.8)
-    t = C.node(m, "ShaderNodeTexImage")
-    t.image = bpy.data.images.load(p)
-    t.interpolation = "Closest"
-    uvn = C.node(m, "ShaderNodeUVMap")
-    uvn.uv_map = "UVNum"
-    C.link(m, uvn.outputs["UV"], t.inputs["Vector"])
-    C.link(m, t.outputs["Color"], C.bsdf(m).inputs["Base Color"])
-    return m
-
-
-def apply_number_uvs(body, M):
-    me = body.data
-    uv = me.uv_layers.new(name="UVNum")
-    mi = [i for i, m in enumerate(me.materials) if m == M["number"]]
-    for p in me.polygons:
-        if p.material_index not in mi:
-            continue
-        c = Vector(p.center)
-        best = min(NUMBER_PATCHES, key=lambda pd: (pd[0] - c).length)
-        centre, ua, va, size = best
-        for li in p.loop_indices:
-            co = me.vertices[me.loops[li].vertex_index].co
-            d = co - centre
-            uv.data[li].uv = (0.5 + d.dot(ua) / size, 0.5 + d.dot(va) / size)
-    me.uv_layers["UVMap"].active_render = True
-    me.uv_layers.active_index = 0
 
 
 # ----------------------------------------------------------------------------- body (skin modifier)
@@ -508,8 +602,8 @@ def build_gear(J, M, b):
     add(b, prim_box(0.13, 0.17, 0.075, bevel=0.03, segments=3), Mh @ Matrix.Translation((0.075, 0, -0.075)) @ Matrix.Rotation(0.15, 4, "Y"), M["helmet"], "head")
     add(b, prim_box(0.035, 0.085, 0.03, bevel=0.008, segments=2), Mh @ Matrix.Translation((0.135, 0, -0.07)), M["armour"], "head", sharp=40)  # mouth vent
     add(b, prim_box(0.16, 0.20, 0.008, bevel=0.003, segments=1), Mh @ Matrix.Translation((0.10, 0, 0.085)) @ Matrix.Rotation(0.42, 4, "Y"), M["helmet"], "head", sharp=30)  # peak
-    add(b, prim_box(0.05, 0.19, 0.075, bevel=0.025, segments=3), Mh @ Matrix.Translation((0.10, 0, 0.012)), M["armour"], "head")  # goggle frame
-    add(b, prim_box(0.03, 0.17, 0.055, bevel=0.02, segments=3), Mh @ Matrix.Translation((0.118, 0, 0.012)), M["visor"], "head")  # lens
+    add(b, prim_box(0.045, 0.19, 0.072, bevel=0.022, segments=3), Mh @ Matrix.Translation((0.098, 0, 0.012)), M["armour"], "head")  # goggle frame
+    add(b, prim_box(0.036, 0.176, 0.062, bevel=0.018, segments=3), Mh @ Matrix.Translation((0.122, 0, 0.012)), M["visor"], "head")  # lens (proud of the frame)
     add(b, prim_torus(R * 1.03, 0.012, seg=32, sides=6, scale_r=(1, 1)), Mh @ Matrix.Translation((0.0, 0, 0.012)) @ Matrix.Diagonal((1.08, 0.96, 1, 1)), M["armour"], "head")  # strap
     add(b, prim_box(0.05, 0.06, 0.022, bevel=0.006), Mh @ Matrix.Translation((-0.10, 0, 0.06)) @ Matrix.Rotation(-0.5, 4, "Y"), M["armour"], "head", sharp=40)  # rear vent
     # neck brace collar + back protector hump on the chest bone
@@ -520,13 +614,9 @@ def build_gear(J, M, b):
         (0, 0, 0, 1),
     ))
     add(b, prim_torus(0.10, 0.024, seg=28, sides=8, scale_r=(1.1, 1)), Mt @ Matrix.Translation((-0.03, 0, -0.02)) @ Matrix.Diagonal((1.1, 1.3, 1, 1)), M["armour"], "chest")
-    add(b, prim_torus(0.068, 0.012, seg=20, sides=6), Mt @ Matrix.Translation((0.0, 0, 0.012)), M["pants"], "chest")
-    add(b, prim_sphere(0.085, seg=16, rings=10, scale=(0.6, 1.2, 1.4)), Mt @ Matrix.Translation((-0.115, 0, -0.16)), M["jersey"], lambda co: {"chest": 1.0})
-    # number patch on the back (a decal quad floating 4 mm off the hump) and a small one on the chest
-    add(b, prim_box(0.004, 0.20, 0.20, bevel=0.0, segments=1), Mt @ Matrix.Translation((-0.165, 0, -0.14)), M["number"], "chest", smooth=False)
-    NUMBER_PATCHES.append((Mt @ Vector((-0.165, 0, -0.14)), Vector((0, -1, 0)), t, 0.20))
-    add(b, prim_box(0.004, 0.13, 0.13, bevel=0.0, segments=1), Mt @ Matrix.Translation((0.128, 0, -0.16)) @ Matrix.Rotation(-0.15, 4, "Y"), M["number"], "chest", smooth=False)
-    NUMBER_PATCHES.append((Mt @ Vector((0.128, 0, -0.16)), Vector((0, 1, 0)), t, 0.13))
+    add(b, prim_torus(0.068, 0.012, seg=20, sides=6), Mt @ Matrix.Translation((0.0, 0, 0.012)), M["armour"], "chest")
+    # back protector hump: part of the jersey (the back number + NORDVIK project onto it)
+    add(b, prim_sphere(0.085, seg=16, rings=10, scale=(0.6, 1.2, 1.4)), Mt @ Matrix.Translation((-0.115, 0, -0.16)), M["bodycloth"], lambda co: {"chest": 1.0})
     # shoulder caps (jersey) so the deltoid reads
     for s, sg in (("L", -1), ("R", 1)):
         sh = J["shoulder." + s]
@@ -537,9 +627,9 @@ def build_gear(J, M, b):
         Mw = Matrix.Translation(wr)
         for i in range(4):
             add(b, prim_torus(0.026, 0.013, seg=14, sides=7), Mw @ Matrix.Translation((0, (i - 1.5) * 0.021, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"), M["gloves"], "hand." + s)
-        add(b, prim_box(0.06, 0.09, 0.055, bevel=0.018, segments=2), Matrix.Translation(wr - fd * 0.035), M["gloves"], "hand." + s)
+        add(b, prim_box(0.06, 0.09, 0.055, bevel=0.018, segments=2), Matrix.Translation(wr - fd * 0.035), M["glove_top"], "hand." + s)
         add(b, prim_cylinder(0.012, 0.012, 0.03, seg=8), Mw @ Matrix.Translation((0.02, -sg * 0.05, -0.005)) @ Matrix.Rotation(math.pi / 2, 4, "X"), M["gloves"], "hand." + s)
-        add(b, prim_cylinder(0.037, 0.041, 0.07, seg=12), Matrix.Translation(wr - fd * 0.10) @ C.rot_frame(fd), M["gloves"], {"forearm." + s: 0.7, "hand." + s: 0.3})
+        add(b, prim_cylinder(0.037, 0.041, 0.07, seg=12), Matrix.Translation(wr - fd * 0.10) @ C.rot_frame(fd), M["glove_top"], {"forearm." + s: 0.7, "hand." + s: 0.3})
         add(b, prim_torus(0.041, 0.005, seg=14, sides=5), Matrix.Translation(wr - fd * 0.09) @ C.rot_frame(fd), M["armour"], {"forearm." + s: 0.7, "hand." + s: 0.3})
         # -- boot: shaft up the shin, foot block on the peg, toe, sole, heel cup, 3 buckles + shin plate
         an, kn = J["ankle." + s], J["knee." + s]
@@ -553,7 +643,7 @@ def build_gear(J, M, b):
         add(b, prim_box(0.06, 0.11, 0.09, bevel=0.02), Mf @ Matrix.Translation((-0.055, 0, -0.04)), M["armour"], "foot." + s)
         for by in (0.10, 0.18, 0.26):
             add(b, prim_box(0.03, 0.12, 0.03, bevel=0.006), Matrix.Translation(an + sd * by) @ C.rot_frame(sd) @ Matrix.Translation((0.056, 0, 0)), M["alloy"], "shin." + s, sharp=40)
-        add(b, prim_box(0.03, 0.09, 0.26, bevel=0.012, segments=2), Matrix.Translation(an + sd * 0.17) @ C.rot_frame(sd) @ Matrix.Translation((0.05, 0, 0)), M["boots"], "shin." + s)
+        add(b, prim_box(0.03, 0.09, 0.26, bevel=0.012, segments=2), Matrix.Translation(an + sd * 0.17) @ C.rot_frame(sd) @ Matrix.Translation((0.05, 0, 0)), M["bootplate"], "shin." + s)
         # -- knee brace: cup over the knee + hinge plates, on the knee (thigh/shin blend)
         td = (kn - J["hip." + s]).normalized()
         knee_fwd = Vector((td.z, 0, -td.x))
@@ -604,10 +694,10 @@ def envelope_weights(body, B, rigid_names=()):
 
 
 def material_by_bone(body, M):
-    """Body skin faces: jersey above the belt, pants on pelvis/legs, gloves at the wrists, balaclava on the neck."""
+    """Body skin faces: jersey above the belt, pants on pelvis/legs, sleeves on the arms, gloves at the wrists, skin on the neck."""
     me = body.data
     me.materials.clear()
-    mats = [M["bodycloth"], M["bodycloth"], M["gloves"], M["skin"], M["boots"]]
+    mats = [M["bodycloth"], M["pants"], M["gloves"], M["skin"], M["boots"], M["sleeve_upper"], M["sleeve_lower"]]
     for m in mats:
         me.materials.append(m)
     names = {g.index: g.name for g in body.vertex_groups}
@@ -632,6 +722,10 @@ def material_by_bone(body, M):
             mi = 2
         elif base in ("neck", "head"):
             mi = 3
+        elif base == "upperArm":
+            mi = 5
+        elif base == "forearm":
+            mi = 6
         else:
             mi = 0
         p.material_index = mi
@@ -743,8 +837,11 @@ def build_actions(arm):
 # ----------------------------------------------------------------------------- main
 def main():
     global BONES
+    import decals as D
+
     C.reset_scene()
-    M = make_materials()
+    sheet = D.ensure_sheet()
+    M = make_materials(sheet)
     J = REST
     BONES = define_bones(J)
     arm = build_armature(BONES)
@@ -763,7 +860,8 @@ def main():
     bpy.ops.object.join()
     body.name = "rider"
     body.data.name = "rider"
-    # clean: merge doubles inside the skin body only would change gear; leave as is.
+    if LOD:
+        log("lod decimate", C.tri_count(body), "->", C.decimate_to(body, LOD_TRIS))
     mod = body.modifiers.new("Armature", "ARMATURE")
     mod.object = arm
     body.parent = arm
@@ -771,24 +869,27 @@ def main():
     tris = C.tri_count(body)
     log("rider tris", tris, "verts", len(body.data.vertices))
 
-    write_chain_md(os.path.join(C.HERE, "RIDER_CHAIN.md"))
+    if not LOD:
+        write_chain_md(os.path.join(C.HERE, "RIDER_CHAIN.md"))
     C.unwrap_all([body], angle=66, margin=0.002)
-    apply_number_uvs(body, M)
+    C.apply_colourway(COLOURWAYS["rookie"])
     if not NO_BAKE:
-        paths = C.bake_atlas([body], SIZE, C.BAKE_DIR, "rider", jpeg_quality=88, normal_size=SIZE, orm_size=SIZE)
-        atlas = C.atlas_material("rider_atlas", paths)
-        C.assign_atlas([body], atlas)
+        variants = [(cw, (lambda cw=cw: C.apply_colourway(COLOURWAYS[cw]))) for cw in ("rookie", "pro")]
+        paths = C.bake_atlas([body], SIZE, C.BAKE_DIR, OUT_NAME, jpeg_quality=88, normal_size=SIZE // 2, orm_size=SIZE // 2, variants=variants)
+        mats = {cw: C.atlas_material(f"rider_{cw}", paths, albedo=f"albedo:{cw}") for cw in ("rookie", "pro")}
+        C.assign_atlas([body], mats["rookie"])
+        C.setup_variants([body], [(f"rider_{cw}", {"rider": mats[cw]}) for cw in ("rookie", "pro")])
     actions = build_actions(arm)
     log("actions", list(actions))
     # rest pose for the file
     bpy.context.scene.frame_set(1)
-    blend_path = os.path.join(C.HERE, "rider.blend")
+    blend_path = os.path.join(C.HERE, OUT_NAME + ".blend")
     bpy.ops.wm.save_as_mainfile(filepath=blend_path, compress=True)
-    out = os.path.join(C.MODELS, "rider.glb")
+    out = os.path.join(C.MODELS, OUT_NAME + ".glb")
     size = C.export_glb(out, [arm, body], animations=True, meshopt=MESHOPT)
     info = C.gltf_summary(out)
     log("glb", info)
-    with open(os.path.join(C.HERE, "rider.stats.txt"), "w") as f:
+    with open(os.path.join(C.HERE, OUT_NAME + ".stats.txt"), "w") as f:
         f.write(f"tris={tris}\nglb_bytes={size}\n")
         f.write("bones (rest head -> tail, rear-axle frame, Blender x,y,z):\n")
         for n in BONE_ORDER:

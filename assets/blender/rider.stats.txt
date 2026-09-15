@@ -1,5 +1,5 @@
-tris=11718
-glb_bytes=856184
+tris=11694
+glb_bytes=861612
 bones (rest head -> tail, rear-axle frame, Blender x,y,z):
   pelvis       parent=-            head=(0.355,0.000,0.837) tail=(0.447,0.000,0.914) len=0.120
   spine        parent=pelvis       head=(0.447,0.000,0.914) tail=(0.584,0.000,1.030) len=0.180
@@ -20,4 +20,4 @@ bones (rest head -> tail, rear-axle frame, Blender x,y,z):
   thigh.R      parent=pelvis       head=(0.370,0.090,0.850) tail=(0.671,0.115,0.503) len=0.460
   shin.R       parent=thigh.R      head=(0.671,0.115,0.503) tail=(0.520,0.200,0.110) len=0.430
   foot.R       parent=shin.R       head=(0.520,0.200,0.110) tail=(0.710,0.200,0.035) len=0.204
-gltf={'bytes': 856184, 'triangles': 11718, 'nodes': ['head', 'neck', 'hand.L', 'forearm.L', 'upperArm.L', 'shoulder.L', 'hand.R', 'forearm.R', 'upperArm.R', 'shoulder.R', 'chest', 'spine', 'foot.L', 'shin.L', 'thigh.L', 'foot.R', 'shin.R', 'thigh.R', 'pelvis', 'rider', 'rider_rig'], 'meshes': ['rider'], 'materials': ['rider_atlas'], 'images': [('image/jpeg', 'rider_normal'), ('image/jpeg', 'rider_albedo'), ('image/jpeg', 'rider_orm')], 'animations': ['crouch', 'extend', 'forward_attack', 'hang_back', 'idle_breathe', 'land_absorb', 'sit_cruise', 'stand_attack'], 'skins': [('rider_rig', 19)], 'extensions': ['EXT_meshopt_compression']}
+gltf={'bytes': 861612, 'triangles': 11694, 'nodes': ['head', 'neck', 'hand.L', 'forearm.L', 'upperArm.L', 'shoulder.L', 'hand.R', 'forearm.R', 'upperArm.R', 'shoulder.R', 'chest', 'spine', 'foot.L', 'shin.L', 'thigh.L', 'foot.R', 'shin.R', 'thigh.R', 'pelvis', 'rider', 'rider_rig'], 'meshes': ['rider'], 'materials': ['rider_rookie', 'rider_pro'], 'images': [('image/jpeg', 'rider_normal'), ('image/jpeg', 'rider_rookie_albedo'), ('image/jpeg', 'rider_orm'), ('image/jpeg', 'rider_pro_albedo')], 'animations': ['crouch', 'extend', 'forward_attack', 'hang_back', 'idle_breathe', 'land_absorb', 'sit_cruise', 'stand_attack'], 'skins': [('rider_rig', 19)], 'extensions': ['EXT_meshopt_compression', 'KHR_materials_variants']}
