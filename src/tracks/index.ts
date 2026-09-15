@@ -4,12 +4,18 @@
  * shown under a "Lab" section by core-game).
  */
 import type { TrackDef } from '../core/types';
-import { ALL_TRACKS, CURRICULUM, FLAT_TEST_TRACK, GAP_TEST_TRACK, LAB_FLAT_200, LAB_PHYSICS_TEST, LAB_TRACKS } from './courses';
+import { ALL_TRACKS, CURRICULUM, FLAT_TEST_TRACK, GAP_TEST_TRACK, LAB_FLAT_200, LAB_PHYSICS_TEST, LAB_TRACKS, PLAYGROUND_TRACKS } from './courses';
 
-export { FLAT_TEST_TRACK, GAP_TEST_TRACK, CURRICULUM, ALL_TRACKS, LAB_PHYSICS_TEST, LAB_FLAT_200, LAB_TRACKS };
+export { FLAT_TEST_TRACK, GAP_TEST_TRACK, CURRICULUM, ALL_TRACKS, LAB_PHYSICS_TEST, LAB_FLAT_200, LAB_TRACKS, PLAYGROUND_TRACKS };
+export { PLAYGROUND_ID_PREFIX, isPlaygroundTrackId, segmentsOf } from './courses/playgrounds';
+export type { TrackSegment } from './courses/playgrounds';
+export { SHIP_SEGMENTS } from './segments';
 export { LAB_TAKEOFF, LAB_PIT, LAB_CREST } from './courses/lab';
 
-/** Lab tracks are `lab-*`; the track select lists them last under "Lab". */
+/**
+ * Lab tracks are `lab-*`; the track select lists them last under "Lab". Playground tracks are `p<n>-*`
+ * (`isPlaygroundTrackId`): a "Playgrounds" row above Lab, always open, outside medals and progression.
+ */
 export function isLabTrackId(id: string): boolean {
   return id.startsWith('lab-');
 }

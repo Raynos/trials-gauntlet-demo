@@ -183,8 +183,9 @@ and open in course order. They land in `meta.setPieces` (`TracksMeta = TrackMeta
 read with `setPiecesOf(def)` from `src/tracks` until core adds the field to `TrackMeta` — requested)
 and `describeTrack` prints them. Metadata only: no collider, no hash. Typical: `.arch({ style:
 'start' }).setPiece('start', 'grid').flat(28).endSetPiece().checkpoint()` ... `.setPiece('air', 'the
-crane jump')` ... `.arch({ style: 'finish' }).finish()`. No course carries decor or set pieces yet
-(wave 1 is design-only); wave 2 authors them per the storyboards.
+crane jump')` ... `.arch({ style: 'finish' }).finish()`. Wave 2 authored them on hard / extreme per the storyboards and
+round 10 on every playground (§7); as of round 10 the render reads NONE of them (§7 inventory: gates, crowd and
+the biome set piece come from positions and the track id) — the render hooks are requested in §7.3.
 
 Builder-enforced: solids and gaps stand on level ground and never overlap each other's
 footprints; ground slopes <= 40 deg (steeper is a plank or ramp); profile x increasing;
@@ -939,3 +940,153 @@ profile), with the same restart path as a course:
 
 When physics-v2 §14 passes, the tracks owner re-measures §0 from these two tracks (physics-v2 §16.4)
 and re-authors the kickers built for the 1.4 g plant.
+
+## 7. Playgrounds (`src/tracks/courses/playgrounds.ts`; tracks round 10, CLOSEOUT "Next milestones -> 1")
+
+One BEGINNER course per biome so the user can ride every biome without finishing the game. Ids `p<n>-*`
+(`isPlaygroundTrackId`, `PLAYGROUND_TRACKS` from `src/tracks`); registry order fixtures, curriculum, playgrounds,
+lab. `meta.playground = true`, `meta.segments` = six review segments (`segmentsOf(def)`: `{from, to, label}`, the
+level reviewer's walk). Not in `CURRICULUM`: outside medals, progression and the tier-escalation test; the §5
+validators, the checkpoint rule, the finish run-out and the golden hash apply like any course. Front end
+(core, requested): a **"Playgrounds" row above Lab**, always open, no medals — `progress.ts` `shipTracks` must
+exclude `isPlaygroundTrackId` (else they land in the Beginner row and count toward medal totals) and `front.ts
+build()` mirrors the Lab row with head "Playgrounds · one beginner course per biome · every asset · no medals".
+
+**The brief, per course.** 440-505 m, skill-3 bot 32-35 s (x 1.6 = 51-56 s for a stranger; `targetTimeS` 70,
+non-binding — no medals), beginner band: reflex `novice` <= 3 over 9 seeds, `average` 1-2 over 3, bot 1. Every
+beginner-legal primitive at least once: straight 11 deg kickers (4 x 0.8, 6 x 1.2) landing on falling ground
+(B3), grounded hills (`smooth` / `descent` / `wave` / `plateau` at 20 m/s, B1), a 2 m `smallGap`, a 0.3 m-proud
+sunk drum or log (`bumpDrum`), an 18-20 deg plank onto a container / crate or 0.12 x 0.8 stairs onto a deck,
+a <= 22 deg see-saw (`seesawEntry` 6 x 0.8 = 15 deg or 8 x 1.2 = 16.7 deg, 14 m of flat after it), a 0.3 m kerb
+(rolls) or the 0.35 / 0.4 m kerb hop 8 m past a spawn, a 1.0-1.2 m drop off a straight 10-12 x h down-ramp
+(panic-drop rule), rollers / `bumpRow`. Start gate + crowd + finish arch on all five (render draws them from
+`start.pos.x` / `finishX`; every checkpoint is a gate + plaque + spectators + flame jets, so each course has four).
+
+**What the render actually reads (inventory, this round).** Nothing under `src/render/` reads `setPieces`,
+`arch` or `tunnel` (they compile to zero-collider `placed` entries and draw nothing); the biome kits are ambient
+density recipes over the whole span, the event kit hangs off start / checkpoint / finish x, and each biome's ONE
+"set piece" is chosen by a hard-coded `track.def.id` prefix at 45 % of the span (industrial `b2` container arch /
+`b3` crane hook / `m1` forklift / else jib gantry; canyon `e1` water tower / `e2` pickups / `e3` mine portal /
+else `seed % 3`; snow `m2` lift station / `x1` lodge / else `seed % 2`; nightCity `h2` crane / else rail spur +
+train + billboard; foundry `m3` rolling mill / `x2` pipe rack / `x3` furnace wall / else ladle over the line).
+Obstacle skins are biome-agnostic and follow `surface`: `box` metal = container, wood = plywood crate; ledge /
+wall / stair concrete = asphalt + kerb stones in nightCity; wood ramps / planks = boards on trestles; `drum` =
+cable spool in a cradle; `logpile` = log cylinders; `gap` water = dark pool, fire = emissive grate, kill = nothing.
+So the playgrounds place every asset they CAN through geometry and author the rest as set-piece / decor metadata,
+and the table lists what render must add so the metadata shows.
+
+| course | biome | finish | bot (skill 3) | reflex `novice` (9 seeds) | `average` (3) | segments (x m: what it shows) |
+|---|---|---:|---:|---|---|---|
+| `p1-container-yard` "Container Yard" | industrial | 504 m | 1 att, 35.8 s | median **2** (9,3,2,1,1,2,1,4,1), 9/9 | **2** (2,2,1) | 0-68 grid, stands, first hill under the crane rail · 68-160 kicker 1 onto the downslope, two sunk oil drums, rollers · 160-272 the 2 m gap and kicker 2 through the container rows · 272-369 the 0.35 kerb hop, the plank onto a container, the 1.0 m drop · 369-454 the scaffold tunnel under the stacks, the plateau · 454-504 the wave home under the crowd bridge |
+| `p2-canyon-run` "Canyon Run" | canyon | 494 m | 1 att, 34.4 s | median **3** (2,1,3,4,1,1,4,4,4), 9/9 | **2** (1,2,3) | 0-68 grid, light towers, braziers, the mesa plateau · 68-182 kicker pair, the rut road · 182-291 fat logs, the 2 m water gap, the 0.3 rock shelf · 291-391 the mine stairs onto a plywood deck, the 15 deg see-saw · 391-444 the water-tower drop (1.2 m, 12 x h) · 444-494 the wave home past the bleachers |
+| `p3-snow-line` "Snow Line" | snow | 488 m | 1 att, 34.4 s | median **2** (1,1,2,2,2,2,2,5,4), 9/9 | **1** (1,1,2) | 0-68 grid, string lights, braziers, first hill between the trees · 68-182 kicker pair, rollers through the banks · 182-297 the log kerb (a 3-log pile behind a straight ramp), two half-buried logs, the 2 m pond gap · 297-399 the crate (18 deg plank up, 1.0 m drop off its ramp), the 0.3 step · 399-438 the see-saw under the lift line · 438-488 the ice tunnel and the wave home |
+| `p4-night-circuit` "Night Circuit" | nightCity | 498 m | 1 att, 35.0 s | median **3** (3,1,1,5,4,9,1,2,4), 9/9 | **2** (5,1,2) | 0-52 grid: lighting truss, police cars, the zebra crossing, two 0.3 kerbs · 52-231 the hill, the subway stairs onto a concrete deck, the kicker pair · 231-313 the flooded cut (2 m gap), the rooftop plateau · 313-402 the 0.4 kerb hop, the 15 deg see-saw · 402-448 the loading-bay drop (1.0 m, 10 x h) · 448-498 the wave home under the crowd bridge |
+| `p5-foundry-floor` "Foundry Floor" | foundry | 443 m | 1 att, 32.2 s | median **1** (1,2,2,1,3,1,1,2,1), 9/9 | **1** (3,1,1) | 0-68 grid, beacons, first hill under the ladles · 68-174 kicker pair on steel, the sunk spools · 174-252 the fire gap, the pipe-duct plateau · 252-354 the container (20 deg steel plank up, 1.0 m drop off its ramp), the grating step · 354-393 the see-saw over the trough · 393-443 the wave home under the pour |
+
+Measured on the shipped reflex controller, Rookie, node-only, cap 50 / 300 s (`harness/out/metrics/p*.reflex.json`,
+scratch `tracks10/*.log`); bot goldens `harness/inputs/p*/bot-3.json`. Re-authored from the first pass: P1's 0.4 m
+kerb hop 8 m past CP2 was 17 novice deaths (median 4) -> 0.35 (median 2); P2's r 0.3 half-logs 6 m past CP1 were
+9 nose-low deaths and the curve-0.3 water-gap kicker 8 m after them 5 nose-up deaths -> r 0.5 wood drums (B2's bump)
+and 16 m to the kicker; P3's `logStep` (curve-0.3 lip to the log tops) hit at 12 m/s was 7 nose-up deaths -> a
+straight 4 x 0.6 wood ramp onto the pile, 16 m past the spawn (the checkpoint rule reads a ramped pile as a launch).
+
+### 7.1 Primitive checklist (x m of the obstacle)
+
+| primitive | p1 | p2 | p3 | p4 | p5 |
+|---|---|---|---|---|---|
+| kicker 4 x 0.8 (11 deg) -> `slope(12, -0.8)` | 84 | 84 | 84 | 133 | 84 (steel) |
+| kicker 6 x 1.2 (11 deg) -> `slope(16, -1.2)` | 196 | 118 | 118 | 167 | 118 (steel) |
+| hill `smooth(16, 1.2)` + `descent(16, 1.2, 20)` | 24-64 | (mesa `plateau(15, 8, 1.0)` 24-62) | 24-64 | 58-98 | 24-64 |
+| `plateau` (grounded tabletop) | 391-425 (0.8) | 24-62 (1.0) | - | 269-307 (1.0) | 210-244 (0.8, in the duct) |
+| `wave(28, 1.5, 16)` / `wave(36, 1.5, 20)` finale | 331 / 454 | 349 / 444 | 359 / 438 (ice tunnel) | - / 448 | 315 / 393 |
+| `rollers(20, 0.25, 3)` / `bumpRow` | 134 / 226, 435 | 148 / 262 | 148 / 271 | 205 / 372 | - / - |
+| 2 m gap (`smallGap(4, 1.0, 2)`) | 176 (water) | 214 (water) | 239 (water, "the pond") | 247 (water, "the flooded cut") | 190 (**fire**) |
+| sunk drum / log `bumpDrum(r, 0.3)` | 116, 125 (r 0.5 metal) | 188, 197 (r 0.5 wood) | 214, 222 (r 0.3 wood) | - | 156, 165 (r 0.5 metal spools) |
+| log pile (`logpile` 3 x r 0.3, straight ramp) | - | - | 198-204 | - | - |
+| plank <= 22 deg onto a box | 302 (18 deg wood -> metal container) | - | 313 (18 deg wood -> plywood crate) | - | 268 (20 deg steel -> container) |
+| stairs 0.12 x 0.8 x 5 onto a 0.6 deck | - | 307 (wood) | - | 106 (concrete) | - |
+| see-saw <= 22 deg (`seesawEntry`) | - | 334 (6 x 0.8, 15 deg) | 415 (8 x 1.2, 16.7 deg) | 343 (6 x 0.8) | 370 (8 x 1.2, steel) |
+| kerb 0.3 m (rolls) | - | 234 (concrete shelf) | 344 (wood step) | 24, 39 (concrete kerbs) | 299 (grate step) |
+| kerb HOP (0.35 / 0.4) 8 m past a spawn | 280 (0.35) | - | - | 321 (0.4) | - |
+| drop >= 8 x h ramp | 305-321 (1.0, 10 x h) | 409-431 (1.2, 12 x h, "the tower deck") | 316-332 (1.0, 10 x h) | 418-436 (1.0, 10 x h, "the loading bay") | 271-287 (1.0, 10 x h) |
+| checkpoints | 68 / 160 / 272 / 369 | 68 / 182 / 291 / 391 | 68 / 182 / 297 / 399 | 52 / 231 / 313 / 402 | 68 / 174 / 252 / 354 |
+
+Not placed anywhere (not beginner-legal): `wall` / `steppedWall` (a lip climb), `pole` rows (a hop target),
+`barrel` (0.9 m of solid, or fire — H3's speed commitment), `drumStep` (r >= 0.6), `kickerPlank` / `steepPlank`
+(>= 36 deg), stairs down (a flight down is the panic-drop loop), `gap` > 3 m.
+
+### 7.2 Asset checklist per biome (asset -> how it shows / what render must add)
+
+Legend: **auto** = render draws it from the biome id, the span or the gate positions (nothing to author);
+**placed @ x** = this course puts the geometry that triggers it there; **META** = authored as `setPiece` / `arch` /
+`tunnel` metadata that render does not read yet — the render owner adds the hook (listed at the end).
+
+**p1 industrial** — hall shell (brick, skylights, trusses, crane rail + hook, catwalk, light shafts, graffiti) auto;
+under-deck containers / pallets auto; container rows, racks, pallets, drums, tyres, cones, tool carts, gas bottles,
+reels, crates, sodium lamps + follow spots + lamp cones, oil stains, paper, bolts auto (density recipe over 504 m,
+keep-outs at the 4 gates); the jib gantry + banners set piece auto (default id branch, 45 % = ~227 m, inside the
+container-row segment); start scaffold stands + tarp banner + cones + white drums auto @ 2 / finish @ 507; start gate
++ 30-crowd + sponsor barrier + grandstand auto @ 0; checkpoint gates + plaques + jets @ 68 / 160 / 272 / 369; finish
+gate + confetti + fireworks @ 504. Placed: metal **container** (box) @ 305; **wood boards** (plank 302, ramps
+84 / 196 catch) ; **cable spools** (drums) @ 116 / 125; **concrete kerb** @ 280; **water pit** @ 180; dirt bed with
+plywood kerbs (interior dirt) everywhere. META: `arch start` @ 3, `tunnel scaffold` 375-399 ("Under the Stacks"),
+`arch crowd` @ 493 (the crowd bridge), `arch finish` @ 501, set pieces start / tunnel / finish.
+
+**p2 canyon** — strata tiers, mesas, big formations, far shoulders, foreground outcrops auto; boulders, rubble,
+scrub, snags, split-rail fence, tyre walls, bales, tyre stacks, red drums, spools, sand discs, ruts, contact shadows
+auto; the id-gated set piece: **`seed % 3` of water tower + windmill / rusted pickups + drum dump / mine portal +
+spools** auto @ 45 % (~222 m — the water-gap segment); light towers + generator + braziers + bleachers auto @ 0 and
+494; fire barrels every ~70 m auto; rutted ochre dirt ribbon with rock edging auto; dust + heat haze auto. Placed:
+**wood logs** (r 0.5 wood drums) @ 188 / 197, **water pit** @ 218, **rock shelf** (concrete ledge) @ 234, **mine
+stairs** (wood) @ 307 onto a **plywood deck** (wood box) @ 311, **see-saw** @ 335, the **water-tower deck** (wood box
+1.2) @ 409. META: `arch start` @ 3, `drop` set piece 397-432 ("The Tower Deck"), `arch crowd` @ 483, `arch
+finish` @ 491. Not placeable: the OTHER two of the three canyon set pieces (render picks one per seed).
+
+**p3 snow** — conifers (near / far / ridge lines), snow banks, gravel, ice patches, ruts, crates with snow lids,
+posts, fences, lanterns + follow spots, log piles, sleds, blue drums, cabins every 24-40 m, snowfall, floor fog
+auto; packed-snow trail with **split-log kerbs** auto (ground dirt -> snow); string lights over the gate + braziers
+auto @ 0 / 488, braziers at every checkpoint; the id-gated set piece **`seed % 2` of lift station + pylons + chairs
+/ lodge + ice curtain** auto @ 45 % (~220 m). Placed: **log pile** (logpile 3 x r 0.3) @ 202 behind a wood ramp,
+**half-buried logs** @ 214 / 222, **pond** (water pit) @ 243, **plywood crate** (wood box) @ 316 with the wood plank
+@ 313, **wood step** (ledge) @ 344, **see-saw** @ 416 (set piece "The Lift Line" 415-424 so the lift station reads
+here when render honours it). META: `arch start` @ 3, `tunnel ice` 438-458 ("The Ice Cave"), `arch crowd` @ 477,
+`arch finish` @ 485, `balance` / `tunnel` set pieces. Not placeable: the other snow set piece.
+
+**p4 nightCity** — facades, second row, rooftop kit, shopfronts, lit skyline, street kit (cars, police cars with
+lightbars, box truck, dumpsters, bollards, hydrants, newsboxes, jersey barriers, scaffold + hoardings, fire
+escapes, awnings, AC units, traffic lights, bus shelter, food cart, signs, manholes, lane paint, puddles, cones,
+fire barrels), street lights + cones + wet streaks, neon signs + reflections, the elevated rail viaduct, embers
+auto; zebra crossings auto @ 20 and 480; police cars at the gates @ -7 / 507; lighting truss + par cans + LED wall
+auto @ 0 / 498; the id-gated set piece **rail spur bridge + 4-car train + neon billboard** auto @ 45 % (~224 m,
+the kicker-pair / stairs segment). Placed: **concrete kerbs** (asphalt + kerb-stone skin) @ 24 / 39 / 321 with
+concrete down-ramps, **subway stairs** (concrete) @ 106 onto a **concrete deck** @ 110, **flooded cut** (water pit)
+@ 251, **rooftop plateau** 269-307, **see-saw** @ 344, **loading-bay container** (metal box) @ 418. META: `arch
+start` @ 3, `drop` set piece 408-436 ("The Loading Bay"), `arch crowd` @ 487, `arch finish` @ 495. Not placeable:
+the tower crane + hoarded site (the `h2` branch).
+
+**p5 foundry** — riveted-steel hall, sooty clerestory, orange panes, red light shafts, pouring ladles with melt
+streams + spark fountains, furnaces on plinths, chimney stacks, vertical pipe, pipe runs, scaffold (every 9-14 m),
+two molten troughs along the span, slag pots, heat haze, embers, 4 melt lights auto; red beacons auto @ 1.5 and
+445; the id-gated set piece **ladle over the line** auto (default branch, 45 % = ~199 m — right over the fire gap);
+crowd atlas in the foundry palette. Placed: **steel ramps** (metal) @ 84 / 118 / 190 / 277 / 305, **spools** (metal
+drums) @ 156 / 165, **fire pit** (gap hazard fire: emissive grate strip) @ 194, **container** (metal box) @ 271 with
+the **steel plank** @ 268, **grating step** (ledge surface grate) @ 299, **steel see-saw** @ 371. META: `arch
+start` @ 3, `fire` set piece 190-196 ("The Melt"), `tunnel pipe` 210-240 ("The Duct"), `balance` 370-379 ("The
+Trough"), `arch pipe` @ 432 (the exit duct), `arch finish` @ 440. Not placeable: the rolling mill / pipe rack /
+furnace wall set pieces (m3 / x2 / x3 branches); burning barrels (hard tier).
+
+### 7.3 What render must add for the META rows (routed by the parent)
+
+1. Read `setPiecesOf(def)`: `start` / `finish` already coincide with the gate positions; `tunnel` -> a covered
+   stretch in the biome's style (P1 scaffold 375-399, P3 ice 438-458, P5 pipe 210-240); `drop` -> the camera
+   pull-out + a drop-edge dressing (P2 397, P4 408); `fire` -> the melt / sparks emphasis (P5 190); `balance` ->
+   the lift station over P3's board (415), the trough under P5's (370).
+2. Read the `arch` / `tunnel` decor kinds (`isDecorKind`, `params.style`): `start` gantry @ 3 on all five (today the
+   start gate comes from `start.pos.x - 1`, so this may simply be skipped), `crowd` = the spectator bridge @ 483-493
+   on P1-P4, `pipe` = the exit duct @ 432 on P5, `finish` over the line.
+3. Playground ids in the id-gated set-piece switch: for `p1-` / `p2-` / `p3-` / `p4-` / `p5-` place EVERY set
+   piece of the biome (at 25 / 50 / 75 % of the span, or one per review segment) instead of one — the user's ask is
+   "every unique model of the biome in one level", and today canyon / snow / nightCity / foundry each show one of
+   two to four.
+4. Foundry grating strips (`deck.ts`, ground `metal`) never fire because the ground is always dirt; the P5 `grate`
+   ledge @ 299 is the one grate on the course.

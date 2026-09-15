@@ -6,14 +6,14 @@
  */
 import { describe, expect, it } from 'vitest';
 import { course } from './author';
-import { CURRICULUM } from './index';
+import { CURRICULUM, PLAYGROUND_TRACKS } from './index';
 import { checkCheckpointSpacing, checkHopHeights, checkLips, checkMedalsMonotone, checkPanicDrop, checkRunout, checkRunupJumps, checkSeesaws, validateCourse } from './validate';
 
 const fx = (id: string, tier: 'beginner' | 'easy' | 'medium' | 'hard' | 'extreme' = 'easy') =>
   course(id, id, tier).meta({ biome: 'industrial', technique: 'fixture', attemptsBand: [1, 5], targetTimeS: 30 }).camera({ mode: 'side' });
 
 describe('§5 validators over the curriculum', () => {
-  for (const t of CURRICULUM) {
+  for (const t of [...CURRICULUM, ...PLAYGROUND_TRACKS]) {
     it(`${t.id} passes every per-track rule`, () => {
       expect(validateCourse(t)).toEqual([]);
     });

@@ -118,6 +118,41 @@
     "obstacles": 56,
     "finishX": 569.048486
   },
+  "p1-container-yard": {
+    "hash": "ff682526064d0601",
+    "colliders": 19,
+    "hazards": 1,
+    "obstacles": 17,
+    "finishX": 503.877684
+  },
+  "p2-canyon-run": {
+    "hash": "7ca086566699c6e1",
+    "colliders": 26,
+    "hazards": 1,
+    "obstacles": 21,
+    "finishX": 493.6
+  },
+  "p3-snow-line": {
+    "hash": "626e6e1e19416ce4",
+    "colliders": 27,
+    "hazards": 1,
+    "obstacles": 21,
+    "finishX": 488.277684
+  },
+  "p4-night-circuit": {
+    "hash": "2473ed2345fcfbbf",
+    "colliders": 30,
+    "hazards": 1,
+    "obstacles": 23,
+    "finishX": 498.2
+  },
+  "p5-foundry-floor": {
+    "hash": "62441dbb288a26da",
+    "colliders": 22,
+    "hazards": 1,
+    "obstacles": 19,
+    "finishX": 442.547477
+  },
   "lab-physics-test": {
     "hash": "f99707f44193c58b",
     "colliders": 9,
