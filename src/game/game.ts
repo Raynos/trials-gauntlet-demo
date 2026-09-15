@@ -791,6 +791,14 @@ export class Game {
     };
     this.lastResult = result;
     if (result.personalBest) this.bestTimes?.put(track.id, result, { splits: [...this.splits], recording: this.pbJson });
+    // The panel's staged reveal is clocked from the HUD's sim time: anchor it to THIS tick, not to the last render
+    // (a stepped sim — harness, e2e — would otherwise render straight into the final stage).
+    const info = this.runInfo;
+    info.runTime = this.runTime();
+    info.faults = this.faultCount;
+    info.phase = this.phaseValue;
+    info.simTime = this.loop.ticks / this.physicsHz;
+    this.hud?.setRun(info);
     this.hud?.showResults(result);
     this.onResults?.(result);
   }

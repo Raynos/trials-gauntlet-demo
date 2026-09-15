@@ -430,6 +430,36 @@ export interface RunTelemetry {
   /** Frame ms p50 / p95 over the run. */
   frameMs: { p50: number; p95: number };
   build: string;
+  /** Every navigation (quit / pause / resume / goto / restart) during the run with what triggered it (docs/tasks/touch-navigation-invariant.md §1). */
+  nav?: NavEvent[];
+}
+
+/**
+ * One navigation the app performed, with everything needed to tell a legitimate tap from a ghost one:
+ * the trigger (DOM event + target, or the polled meta flag + device), the UI state it acted on, how long
+ * the current screen had been up, the last pointerdown, and whether the trigger's target was `.live`
+ * and drawn at ≥ 0.5 opacity at the time (the invariant: `false` here is a bug).
+ */
+export interface NavEvent {
+  /** performance.now() ms. */
+  at: number;
+  kind: 'quit' | 'pause' | 'resume' | 'goto' | 'restart';
+  /** Destination screen (`goto`) or restart flavour. */
+  to?: string;
+  /** `click button.tile.on[menu]`, `pointerdown div.tz.tz-pause`, `poll:touch:pause`, … */
+  trigger: string;
+  screen: string;
+  phase: string;
+  /** Results reveal stage (-1 when the panel is down). */
+  stage: number;
+  /** ms since the current screen appeared (`screenAt`). */
+  sinceScreenMs: number;
+  /** Last pointerdown: logical x/y, ms before this event, target description. */
+  down: { x: number; y: number; agoMs: number; target: string } | null;
+  /** Effective (ancestor-multiplied) opacity of the trigger target at the time, 1 for non-DOM triggers. */
+  opacity: number;
+  /** The trigger target (or the pointerdown target for polled triggers) was inside a `.live` element drawn at ≥ 0.5 opacity. */
+  targetLive: boolean;
 }
 
 export type InputDevice = 'keyboard' | 'gamepad' | 'touch';
@@ -565,6 +595,17 @@ export interface TrialsHook {
   setBike?(bike: BikeClass): void;
   /** Last finished run's recording (GO → finish, JSON) — what "Watch replay" plays; null before a clear. */
   lastRun?(): string | null;
+  /** Front-end page only: every navigation this page performed (docs/tasks/touch-navigation-invariant.md §1). */
+  navLog?(): NavEvent[];
+  /** Front-end page only (harness/e2e): drive the app shell synchronously — one app frame (input poll + advance 0 s + live tick), the flow methods, the state. */
+  app?: {
+    frame(): void;
+    play(trackId: string): void;
+    goto(screen: 'title' | 'menu' | 'tracks' | 'settings' | 'garage' | 'credits'): void;
+    togglePause(): void;
+    screen(): string;
+    paused(): boolean;
+  };
   /** Replay viewer (front-end page only): open the viewer on a recording (default: the last run), read its transport, or close it. */
   replay?: {
     open(recordingJson?: string): boolean;

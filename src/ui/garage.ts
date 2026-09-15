@@ -11,6 +11,7 @@ import type { BikeClass } from '../core/types';
 import type { ArtManifest } from './art';
 import { escapeHtml } from './front';
 import type { UiSfx } from './sfx';
+import { conceal, reveal } from './live';
 
 export interface BikeSpec {
   id: BikeClass;
@@ -147,9 +148,11 @@ export class GarageScreen {
     this.focus = current;
     this.paint();
     this.root.classList.add('show');
+    reveal(this.root);
   }
 
   hide(): void {
+    conceal(this.root);
     this.root.classList.remove('show');
   }
 

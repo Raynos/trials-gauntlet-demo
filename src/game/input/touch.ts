@@ -24,8 +24,16 @@
  *
  * Coordinates: every hit-test goes through `toLogical` (src/ui/orientation.ts),
  * an identity today (rotate-to-play; forced landscape was abandoned, game.md §11).
+ *
+ * The pause / restart buttons obey the touch-navigation invariant (src/ui/live.ts): their rects
+ * are hit-tested only while the layer is `.live` (enabled, on the touch device, no overlay up,
+ * and the buttons observed drawn for 150 ms) AND the button is drawn at >= .5 opacity right now.
+ * Otherwise a corner tap is just the zone under it. Pause fires on pointerUP inside the rect (a
+ * tap, not a touch-down), and a finger that leaves a button's rect is dead until it lifts — it
+ * never becomes gas.
  */
 import type { InputFrame } from '../../core/types';
+import { LIVE_OPACITY, conceal, effectiveOpacity, isLive, reveal } from '../../ui/live';
 import { isForcedLandscape, logicalRect, toLogical, type Point } from '../../ui/orientation';
 import { clearMeta, type InputSource, type MetaButtons } from './types';
 
@@ -53,6 +61,8 @@ export class TouchInput implements InputSource {
   private readonly pointers = new Map<number, ActivePointer>();
   private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false };
   private enabled = false;
+  private visible = false;
+  private underOverlay = false;
   private readonly els: Record<Exclude<Zone, 'none'>, HTMLDivElement>;
   private readonly debugEl: HTMLPreElement | null;
   private readonly now: () => number;
@@ -64,6 +74,8 @@ export class TouchInput implements InputSource {
   private lastRelease = '';
   /** Safari gesture events seen (debug): they are swallowed, never a release. */
   private gestures = 0;
+  /** Last navigation lines (the app's NavLog) for the debug overlay. */
+  private readonly notes: string[] = [];
   private readonly pt: Point = { x: 0, y: 0 };
 
   constructor(parent: HTMLElement, options: TouchInputOptions = {}) {
@@ -123,12 +135,15 @@ export class TouchInput implements InputSource {
     this.enabled = on;
     this.root.classList.toggle('on', on);
     if (!on) this.releaseAll('disabled');
+    this.armButtons();
   }
 
   /** An overlay (pause / results) is up: zones and buttons neither draw nor take pointers, and any held finger is released. */
   setOverlay(on: boolean): void {
+    this.underOverlay = on;
     this.root.classList.toggle('under-overlay', on);
     if (on) this.releaseAll('overlay');
+    this.armButtons();
   }
 
   /** 3 s into a run the zone outlines/labels drop to ~30 % so play is not under a diagram. */
@@ -137,7 +152,29 @@ export class TouchInput implements InputSource {
   }
 
   setVisible(on: boolean): void {
+    this.visible = on;
     this.root.classList.toggle('visible', on);
+    this.armButtons();
+  }
+
+  /** The buttons' reveal watch: `.live` on the layer once ❚❚ has been drawn for the invariant's delay; dropped the instant they stop being drawn. */
+  private armButtons(): void {
+    if (this.enabled && this.visible && !this.underOverlay) {
+      if (!isLive(this.root)) reveal(this.root, { surface: this.els.pause });
+    } else conceal(this.root);
+  }
+
+  /** A button takes this point only while the layer is live and the button is drawn (>= .5 opacity) right now. */
+  private buttonAt(el: HTMLDivElement, x: number, y: number): boolean {
+    return isLive(this.root) && inside(el, x, y) && effectiveOpacity(el) >= LIVE_OPACITY;
+  }
+
+  /** Debug overlay line (the app's navigation instrument): last six kept. */
+  note(line: string): void {
+    if (!this.debugEl) return;
+    this.notes.push(line);
+    if (this.notes.length > 6) this.notes.shift();
+    this.paintDebug();
   }
 
   /** Active pointer count (tests / debug). */
@@ -158,10 +195,13 @@ export class TouchInput implements InputSource {
     const w = this.root.clientWidth || (isForcedLandscape() ? window.innerHeight : window.innerWidth);
     const h = this.root.clientHeight || (isForcedLandscape() ? window.innerWidth : window.innerHeight);
     if (current === undefined) {
-      if (inside(this.els.restart, x, y)) return 'restart';
-      if (inside(this.els.pause, x, y)) return 'pause';
+      if (this.buttonAt(this.els.restart, x, y)) return 'restart';
+      if (this.buttonAt(this.els.pause, x, y)) return 'pause';
     } else if (current === 'restart' || current === 'pause') {
-      return current; // buttons latch to the pointer that pressed them
+      // A button holds the pointer only while it stays on the button; sliding off cancels the press for good (never into gas).
+      return inside(this.els[current], x, y) ? current : 'none';
+    } else if (current === 'none') {
+      return 'none';
     }
     if (y < 0 || y > h || x < 0 || x > w) return 'none';
     const fx = x / w;
@@ -188,7 +228,6 @@ export class TouchInput implements InputSource {
     const zone = this.zoneAt(e.clientX, e.clientY, undefined);
     this.pointers.set(e.pointerId, { zone, type: e.pointerType, since: this.now() });
     this.meta.active = true;
-    if (zone === 'pause') this.meta.pause = true;
     this.paint();
   };
 
@@ -209,6 +248,8 @@ export class TouchInput implements InputSource {
   };
 
   private readonly onUp = (e: PointerEvent): void => {
+    // Pause is a TAP: it fires on the up of a pointer that went down on ❚❚ and is still on it (a cancel or a slide-off is nothing).
+    if (e.type === 'pointerup' && this.pointers.get(e.pointerId)?.zone === 'pause') this.meta.pause = true;
     this.release(e.pointerId, e.type);
   };
 
@@ -232,7 +273,9 @@ export class TouchInput implements InputSource {
     this.rawTouches = e.touches.length;
     this.rawTouchAt = this.now();
     if ((e.type === 'touchend' || e.type === 'touchcancel') && e.touches.length === 0) {
-      // No fingers on the glass: nothing can be held, whatever the pointer stream said.
+      // No fingers on the glass: nothing can be held, whatever the pointer stream said. Should this end arrive
+      // before the pointerup (belt and braces), a finger still on ❚❚ is a completed tap.
+      if (e.type === 'touchend' && this.has('pause')) this.meta.pause = true;
       this.releaseAll(e.type);
     }
   };
@@ -312,7 +355,8 @@ export class TouchInput implements InputSource {
     this.debugEl!.textContent =
       `touch ${this.enabled ? 'on' : 'off'}  raw fingers ${this.rawTouches}  releases ${this.releases} (${this.lastRelease || '-'})  gestures ${this.gestures}` +
       `${isForcedLandscape() ? `  forced-landscape ${window.innerWidth}x${window.innerHeight} -> ${this.root.clientWidth}x${this.root.clientHeight}` : ''}\n` +
-      `${ps}\nthr ${f.throttle} brk ${f.brake} lean ${f.lean} restart ${f.restart ? 1 : 0}`;
+      `${ps}\nthr ${f.throttle} brk ${f.brake} lean ${f.lean} restart ${f.restart ? 1 : 0}` +
+      (this.notes.length ? `\nnav:\n${this.notes.join('\n')}` : '');
   }
 
   pollMeta(): MetaButtons {

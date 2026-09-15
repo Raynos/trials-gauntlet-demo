@@ -283,6 +283,8 @@ function boot(): void {
       const hook = installHook(game, false, extras);
       hook.lastRun = () => game.lastRunRecording()?.json ?? null;
       hook.replay = shell.replayApi();
+      hook.navLog = () => shell.navLog.all();
+      hook.app = shell.testApi();
       if (import.meta.env.PROD && params.get('sw') !== '0') registerServiceWorker((reload) => shell.showUpdate(reload));
       if (params.get('updatetoast') === '1') setTimeout(() => shell.showUpdate(() => location.reload()), 1500);
       const trackName = getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track';

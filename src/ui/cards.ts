@@ -7,6 +7,7 @@
  */
 import type { InputDevice } from '../core/types';
 import { BALANCE_HINT } from './garage';
+import { conceal, reveal } from './live';
 
 function h<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, html?: string): HTMLElementTagNameMap[K] {
   const e = document.createElement(tag);
@@ -33,9 +34,11 @@ export class UpdateToast {
 
   show(): void {
     this.root.classList.add('show');
+    reveal(this.root);
   }
 
   hide(): void {
+    conceal(this.root);
     this.root.classList.remove('show');
   }
 
@@ -73,6 +76,7 @@ export class OnboardingCard {
   show(device: InputDevice | null): void {
     this.lines.innerHTML = ONBOARD_LINES[device ?? 'keyboard'].map((l) => `<div>${l}</div>`).join('');
     this.root.classList.add('show');
+    reveal(this.root);
   }
 
   setDevice(device: InputDevice): void {
@@ -81,6 +85,7 @@ export class OnboardingCard {
 
   dismiss(): void {
     if (!this.visible) return;
+    conceal(this.root);
     this.root.classList.remove('show');
     this.onDone();
   }

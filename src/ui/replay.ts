@@ -8,6 +8,7 @@
 import type { ReplayCameraMode } from '../core/types';
 import { formatTime } from './format';
 import { tileIconSvg } from './tiles';
+import { conceal, reveal } from './live';
 
 export interface ReplayBarState {
   tick: number;
@@ -138,11 +139,13 @@ export class ReplayBar {
     this.lastPlay = '';
     this.lastNow = '';
     this.root.classList.add('show');
+    reveal(this.root);
   }
 
   hide(): void {
     this.visible = false;
     this.dragging = false;
+    conceal(this.root);
     this.root.classList.remove('show');
   }
 

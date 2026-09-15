@@ -8,6 +8,7 @@
 import type { GameEvent, InputDevice, Medal, PhysicsState, RunInfo, RunResult, TrackDef } from '../core/types';
 import { formatDelta, formatTime } from './format';
 import type { Hud, HudAction } from './index';
+import { conceal, isLive, reveal } from './live';
 import { TileRow } from './tiles';
 
 type BannerKind = 'count' | 'go' | 'crash' | 'cp' | 'finish';
@@ -175,7 +176,10 @@ export class DomHud implements Hud {
       { id: 'replay', label: 'Watch replay', icon: 'play' },
       { id: 'menu', label: 'Menu', icon: 'door' },
     ]);
-    this.resTiles.onPick = (id) => this.onAction?.(id as HudAction);
+    // A click can only reach a tile through `.results.live` (styles.ts), and live lands from stage-3; this is the same gate for anything else that calls pick().
+    this.resTiles.onPick = (id) => {
+      if (this.resultsInteractive()) this.onAction?.(id as HudAction);
+    };
     const foot = el('div', 'ov-foot');
     this.resLegend = el('div', 'legend');
     this.resLegend.innerHTML = RESULTS_LEGEND.keyboard;
@@ -385,7 +389,7 @@ export class DomHud implements Hud {
     const stage = age < 0.15 ? 0 : age < 0.35 ? 1 : age < 0.6 ? 2 : age < 0.9 ? 3 : age < 1.1 ? 4 : 5;
     if (stage !== this.resultsStage) {
       this.resultsStage = stage;
-      this.results.className = `results show stage-${stage}`;
+      this.results.className = `results show stage-${stage}${isLive(this.results) ? ' live' : ''}`;
     }
   }
 
@@ -424,6 +428,8 @@ export class DomHud implements Hud {
       (m.querySelector('small') as HTMLElement).textContent = thresholds[k];
     }
     this.results.className = 'results show stage-0';
+    // Tappable only once the TILES are drawn (stage-3 at 0.6 s, then their 240 ms rise) for the invariant's delay.
+    reveal(this.results, { surface: this.resTiles.root, when: () => this.resultsStage >= 3 });
     this.root.classList.add('results-on');
     this.resTiles.setDisabled('next', !this.nextEnabled);
     this.resTiles.focusId(this.nextEnabled ? 'next' : 'retry');
@@ -441,6 +447,11 @@ export class DomHud implements Hud {
   /** Tiles are on screen (stage ≥ 3, 0.6 s after `showResults`): pad / keyboard may drive them. */
   resultsInteractive(): boolean {
     return this.resultsAt >= 0 && this.resultsStage >= 3;
+  }
+
+  /** Results reveal stage 0..5, -1 while the panel is down (instrument). */
+  stage(): number {
+    return this.resultsAt >= 0 ? this.resultsStage : -1;
   }
 
   resultsMove(dx: number): void {
@@ -496,6 +507,7 @@ export class DomHud implements Hud {
   }
 
   hideResults(): void {
+    conceal(this.results);
     if (this.results.classList.contains('show')) {
       // Hard cut on retry / next / menu: the frame is gone the same tick the world resets.
       this.results.style.transition = 'none';

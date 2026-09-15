@@ -10,6 +10,7 @@ import { BUILD_STAMP, GAME_NAME, escapeHtml, hardReload } from './front';
 import { TileRow } from './tiles';
 import { logicalRect } from './orientation';
 import type { UiSfx } from './sfx';
+import { conceal, reveal } from './live';
 
 export type QualityChoice = QualityTier | 'auto';
 
@@ -217,6 +218,7 @@ export class PauseMenu {
       this.stats.innerHTML = stats;
     }
     this.root.classList.add('show');
+    reveal(this.root);
     this.row = 1;
     this.tiles.focusId('resume');
     this.disarmReload();
@@ -228,6 +230,7 @@ export class PauseMenu {
   hide(): void {
     if (!this.root.classList.contains('show')) return;
     // Hard cut: no 240 ms fade before a restart / quit (SPEC §6).
+    conceal(this.root);
     this.root.style.transition = 'none';
     this.root.classList.remove('show', 'leaving');
     void this.root.offsetHeight;
@@ -238,6 +241,7 @@ export class PauseMenu {
   /** Resume: the game unpauses on this frame; the overlay fades over --t1. */
   fadeOut(): void {
     if (!this.root.classList.contains('show')) return;
+    conceal(this.root); // dead from the first frame of the fade
     this.root.classList.add('leaving');
     this.disarmReload();
     setTimeout(() => {

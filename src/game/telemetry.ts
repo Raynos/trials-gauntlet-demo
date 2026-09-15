@@ -7,7 +7,7 @@
  * The app owns the collection (`RunCollector`): deaths with the bike x at the fault tick,
  * frame-time percentiles from the RAF loop, the quality tier and the reason it was chosen.
  */
-import type { BikeClass, FaultReason, InputTraceRun, Medal, PhysicsVersion, QualityTier, RunTelemetry } from '../core/types';
+import type { BikeClass, FaultReason, InputTraceRun, Medal, NavEvent, PhysicsVersion, QualityTier, RunTelemetry } from '../core/types';
 import { Percentiles } from './game';
 
 export const RUNLOG_KEY = 'trials.runlog';
@@ -85,6 +85,8 @@ export function describeDevice(): string {
 export class RunCollector {
   readonly frameMs = new Percentiles(600);
   deaths: RunTelemetry['deaths'] = [];
+  /** Navigations during the window (docs/tasks/touch-navigation-invariant.md §1). */
+  navs: NavEvent[] = [];
   private startedAt = 0;
   private active = false;
 
@@ -93,6 +95,7 @@ export class RunCollector {
     this.active = true;
     this.startedAt = performance.now();
     this.deaths = [];
+    this.navs = [];
     this.frameMs.reset();
   }
 
@@ -113,6 +116,11 @@ export class RunCollector {
 
   frame(ms: number): void {
     if (this.active && ms > 0) this.frameMs.push(ms);
+  }
+
+  /** A navigation (pause / quit / restart / goto) while the window is open. */
+  nav(e: NavEvent): void {
+    if (this.active && this.navs.length < 200) this.navs.push(e);
   }
 
   finish(o: {
@@ -146,6 +154,7 @@ export class RunCollector {
       fps,
       frameMs: { p50: Math.round(f.p50 * 10) / 10, p95: Math.round(f.p95 * 10) / 10 },
       build: o.build,
+      ...(this.navs.length > 0 ? { nav: this.navs.slice() } : {}),
     };
   }
 }

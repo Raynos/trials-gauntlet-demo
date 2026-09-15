@@ -12,6 +12,7 @@ import { formatTime } from './format';
 import type { QualityChoice } from './menu';
 import { labTracks, medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
+import { conceal, reveal } from './live';
 
 export type FrontScreen = 'title' | 'menu' | 'garage' | 'tracks' | 'settings' | 'credits';
 
@@ -116,12 +117,15 @@ abstract class Screen {
     return this.root.classList.contains('show');
   }
 
+  /** Drawn now (the fade starts); tappable only once live.ts has seen it drawn for the invariant's delay. */
   show(): void {
     this.root.classList.remove('leave');
     this.root.classList.add('show');
+    reveal(this.root);
   }
 
   hide(): void {
+    conceal(this.root);
     this.root.classList.remove('show', 'leave');
   }
 

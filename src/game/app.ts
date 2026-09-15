@@ -9,7 +9,7 @@
  * `run` (countdown…) → pause overlay → results. The title and menu render
  * over the live 3D scene with `BACKDROP_TRACK` loaded in the `menu` phase.
  */
-import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RunResult, TrackDef } from '../core/types';
+import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RunResult, TrackDef, TrialsHook } from '../core/types';
 import type { AudioSystem } from '../audio';
 import { getTrack, isLabTrackId, listTrackIds } from '../tracks';
 import {
@@ -60,10 +60,12 @@ import {
   type ModelChoice,
   type QualityChoice,
 } from '../ui';
+import { tickLive } from '../ui/live';
 import { applyOrientation } from '../ui/orientation';
 import { BACKDROP_TRACK } from './flow';
 import { Percentiles, type Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
+import { NavLog, type NavContext } from './navlog';
 import { ReplaySession, type ReplaySource } from './replay';
 import { defaultBikeForTier } from './rules';
 import { RunCollector, RunLog } from './telemetry';
@@ -109,7 +111,7 @@ const DEVICE_SHOW_FRAMES = 90;
 const LAST_TRACK_KEY = 'trials.lastTrack';
 const TOUCH_SETTLE_S = 3;
 
-/** Grace after a screen change during which menu buttons (confirm/back/nav) are ignored: the edge that changed screens must not act twice. */
+/** Grace after a screen change during which the polled menu buttons (keyboard / pad confirm, back, nav) are ignored: the edge that changed screens must not act twice. */
 const SCREEN_GRACE_MS = 250;
 
 export function isPhone(): boolean {
@@ -158,6 +160,10 @@ export class App {
   private readonly frameMs = new Percentiles(120);
   private readonly runLog = new RunLog();
   private readonly collector = new RunCollector();
+  /** Navigation instrument (docs/tasks/touch-navigation-invariant.md §1): what fired quit / pause / goto / restart, from where. */
+  readonly navLog = new NavLog();
+  /** Set by the app right before it asks the game for a full restart, so the game's `restart` event names the trigger. */
+  private restartVia: string | null = null;
   private telemetryOn: boolean;
   /** Garage choice (null = never picked: the per-tier default applies). */
   private bikeChoice: BikeClass | null;
@@ -207,21 +213,8 @@ export class App {
       this.lastTrackId = null;
     }
 
-    // One gesture, one screen: a click that arrives within SCREEN_GRACE_MS of a screen change is the
-    // tail of the tap that caused the change (pointerdown on the old screen, click delivered to whatever
-    // is under the finger on the new one). Swallow it at the capture phase, for every screen alike.
-    o.uiRoot.addEventListener(
-      'click',
-      (e) => {
-        if (performance.now() - this.screenAt >= SCREEN_GRACE_MS) return;
-        const t = e.target as HTMLElement | null;
-        if (t && t.closest('.screen')) {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-      },
-      { capture: true },
-    );
+    // No click swallow here: a new screen takes pointers only once it is `.live` (src/ui/live.ts, >= 150 ms
+    // after it is drawn), so the tail of the tap that changed screens cannot land on it.
     this.touch = new TouchInput(o.uiRoot, { debug: o.touchDebug ?? false });
     this.mux.add(new KeyboardInput()).add(new GamepadInput()).add(this.touch);
     this.mux.onDeviceChange = (d) => this.onDevice(d);
@@ -370,16 +363,16 @@ export class App {
     });
     this.replay = new ReplaySession(this.game, this.replayBar, () => this.leaveReplay());
     this.pause = new PauseMenu(o.uiRoot, this.sfx, {
-      resume: () => this.resume(),
+      resume: () => this.resume('pause:resume'),
       restartTrack: () => {
         // Hard cut (SPEC §6): overlay gone on the same frame the world resets.
         this.pause.hide();
         this.setOverlay(false);
         this.game.setPaused(false);
         this.lastNow = performance.now();
-        this.game.restartFromStart();
+        this.fullRestart('pause:restart');
       },
-      quit: () => this.quit(),
+      quit: () => this.quit('pause:quit'),
       ...(o.modelsSupported
         ? {
             models: {
@@ -397,16 +390,26 @@ export class App {
 
     // Telemetry: every fault is a death at the bike's x (the state after the faulting step) with the last second of input.
     this.game.onEvent((e) => {
-      if (e.type !== 'fault' || this.game.inPlayback()) return;
+      if (this.game.inPlayback()) return;
+      if (e.type === 'restart' && e.checkpoint === -1 && this.inRun()) {
+        // Full restart during a run (results tile, pause tile, throttle edge on the results, or the held ↻): the phase is still the old one here.
+        this.navLog.record('restart', this.navContext(), this.restartVia ?? (this.prevRestart ? `poll:${this.mux.activeDevice() ?? '?'}:restart-hold` : 'game'));
+        this.restartVia = null;
+      }
+      if (e.type !== 'fault') return;
       const st = this.game.getState();
       this.collector.death(st.bike.pos.x, e.reason, st.checkpoint, this.game.recentInput());
     });
+    this.navLog.onEntry = (n) => {
+      this.collector.nav(n);
+      this.touch.note(NavLog.line(n));
+    };
 
     this.hud.onAction = (a) => {
-      if (a === 'retry') this.game.restartFromStart();
+      if (a === 'retry') this.fullRestart('results:retry');
       else if (a === 'next') this.play(this.nextTrackId());
-      else if (a === 'menu') this.quit();
-      else if (a === 'pause') this.togglePause();
+      else if (a === 'menu') this.quit('results:menu');
+      else if (a === 'pause') this.togglePause('hud:pause');
       else if (a === 'replay') this.watchLastRun();
     };
 
@@ -429,7 +432,7 @@ export class App {
     window.addEventListener('pointerdown', unlock, { passive: true });
     window.addEventListener('keydown', unlock);
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden && this.inRun() && !this.game.paused()) this.togglePause();
+      if (document.hidden && this.inRun() && !this.game.paused()) this.togglePause('visibilitychange');
       if (document.hidden && this.screen === 'replay') this.game.setPaused(true);
     });
     window.addEventListener('resize', () => this.fit());
@@ -439,6 +442,9 @@ export class App {
 
     this.game.onPhase = (phase, prev) => {
       if (phase === 'riding' && !this.probeDone) this.probeArmed = true; // probe the first 60 frames after GO
+      // From the line on the run is over for the thumbs: the layer is inert now, not when the panel lands 0.4 s later
+      // (a corner tap in that window used to be an unconfirmed quit / a full restart).
+      if (phase === 'finished') this.touch.setOverlay(true);
       if (phase !== 'finished' && !this.pause.visible) this.touch.setOverlay(false); // retry / next out of the results frame
       // First GO on this track load starts the run's telemetry window (full restarts keep it: time-to-clear is per track visit).
       if (phase === 'riding' && prev === 'countdown' && this.screen === 'run' && !this.collector.running) this.collector.begin();
@@ -528,6 +534,21 @@ export class App {
     this.goto('tracks');
   }
 
+  /** Harness / e2e surface (`window.__trials.app`): one synchronous app frame, the flow methods, the state. */
+  testApi(): NonNullable<TrialsHook['app']> {
+    return {
+      frame: () => {
+        this.tickFrame(0, false); // input poll + flow only: no render (a SwiftShader frame per call would dominate the e2e)
+        tickLive();
+      },
+      play: (id) => this.play(id),
+      goto: (s) => this.goto(s),
+      togglePause: () => this.togglePause('hook'),
+      screen: () => this.screen,
+      paused: () => this.game.paused(),
+    };
+  }
+
   /** Harness / QA surface (`window.__trials.replay`). */
   replayApi(): { open(json?: string): boolean; seek(tick: number): void; info(): ReturnType<ReplaySession['info']>; close(): void } {
     return {
@@ -611,6 +632,7 @@ export class App {
   }
 
   goto(screen: FrontScreen): void {
+    this.navLog.record('goto', this.navContext(), null, screen);
     if (this.replay.active) this.replay.close();
     this.screen = screen;
     this.screenAt = performance.now();
@@ -790,7 +812,8 @@ export class App {
    * then the menu fades in over it. Re-arming the finished track in place left
    * its frozen finish state under the menu (user screenshot, round 3).
    */
-  private quit(): void {
+  private quit(via: string): void {
+    this.navLog.record('quit', this.navContext(), via);
     this.game.setPaused(false);
     this.pause.hide();
     this.setOverlay(false);
@@ -801,17 +824,21 @@ export class App {
   }
 
   /** Resume: the game unpauses on this frame; the overlay fades over --t1 while the HUD fades back over --t2 (SPEC §6). */
-  private resume(): void {
+  private resume(via: string): void {
+    this.navLog.record('resume', this.navContext(), via);
+    this.screenAt = performance.now();
     this.pause.fadeOut();
     this.setOverlay(false);
     this.game.setPaused(false);
     this.lastNow = performance.now();
   }
 
-  private togglePause(): void {
+  private togglePause(via: string): void {
     if (!this.inRun() || this.onboard.visible) return;
-    if (this.game.paused()) this.resume();
+    if (this.game.paused()) this.resume(via);
     else {
+      this.navLog.record('pause', this.navContext(), via);
+      this.screenAt = performance.now();
       this.game.setPaused(true);
       const t = this.game.currentTrack;
       const st = this.game.getState();
@@ -827,6 +854,17 @@ export class App {
       });
       this.setOverlay(true);
     }
+  }
+
+  /** Full restart asked by the UI (results / pause tile, throttle edge on the results): the game's `restart` event logs it under `via`. */
+  private fullRestart(via: string): void {
+    this.restartVia = via;
+    this.game.restartFromStart();
+    this.restartVia = null;
+  }
+
+  private navContext(): NavContext {
+    return { screen: this.screen, phase: this.game.phase(), stage: this.hud.stage(), screenAt: this.screenAt };
   }
 
   /** Pause overlay up: HUD top band hidden, touch layer inert (a tile tap must not rev), scene dimmed 50 %. */
@@ -863,7 +901,7 @@ export class App {
 
   // -- per frame ----------------------------------------------------------------
 
-  private tickFrame(elapsed: number): void {
+  private tickFrame(elapsed: number, render = true): void {
     if (this.perf) this.perf.root.hidden = !(this.screen === 'run' && !this.pause.visible && this.game.phase() !== 'finished' && !this.onboard.visible);
     const { frame, meta } = this.mux.poll();
     const restartEdge = frame.restart === true && !this.prevRestart;
@@ -913,21 +951,22 @@ export class App {
       else if (meta.alt && 'alt' in s) s.alt();
     } else if (this.pause.visible) {
       if (meta.navX || meta.navY) this.pause.move(meta.navX, meta.navY);
-      if (meta.pause || meta.back) this.resume();
+      if (meta.pause || meta.back) this.resume(`poll:${this.mux.activeDevice() ?? '?'}:${meta.pause ? 'pause' : 'back'}`);
       else if (meta.confirm) this.pause.confirm();
       else if (restartEdge) this.pause.restartShortcut(); // R (keyboard) = RESTART while paused; B is back → resume
     } else if (this.game.phase() === 'finished') {
-      // Results (SPEC §5): Esc/Start = MENU from the line on; once the tiles are up (0.6 s) ←/→ move, Enter/A pick,
-      // a throttle *edge* is retry (never a held gas across the line); R / B / Backspace retry through the game's own
-      // restart edge at any time, so retry stays one press from the moment the timer freezes.
+      // Results (SPEC §5): once the tiles are up (0.6 s) Esc/Start = MENU, ←/→ move, Enter/A pick, a throttle *edge*
+      // is retry (never a held gas across the line); R / B / Backspace retry through the game's own restart edge at
+      // any time, so retry stays one press from the moment the timer freezes. Before the tiles are up a pause press is
+      // ignored: the invariant says nothing navigates without a drawn control (the touch layer is inert from the line).
       const live = this.hud.resultsInteractive();
       if (live && meta.navX) this.hud.resultsMove(meta.navX);
-      if (meta.pause) this.quit();
+      if (live && meta.pause) this.quit(`poll:${this.mux.activeDevice() ?? '?'}:pause`);
       else if (live && meta.confirm) this.hud.resultsConfirm();
-      else if (live && throttleEdge) this.game.restartFromStart();
+      else if (live && throttleEdge) this.fullRestart(`poll:${this.mux.activeDevice() ?? '?'}:throttle-edge`);
       else this.game.setInput(frame);
     } else {
-      if (meta.pause) this.togglePause();
+      if (meta.pause) this.togglePause(`poll:${this.mux.activeDevice() ?? '?'}:pause`);
       this.game.setInput(frame);
     }
     this.prevRestart = frame.restart === true;
@@ -935,7 +974,7 @@ export class App {
     const dev = this.mux.activeDevice();
     if (dev) this.hud.setDevice(dev, this.mux.idleFrames() < DEVICE_SHOW_FRAMES);
 
-    this.game.advance(elapsed);
+    if (render) this.game.advance(elapsed);
     if (this.probeArmed && !this.probeDone && !this.game.paused()) this.recordProbe(elapsed * 1000);
     this.settleTouch(elapsed);
     if (this.inRun() && !this.game.paused()) {

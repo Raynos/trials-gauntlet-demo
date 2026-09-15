@@ -74,12 +74,18 @@ html { font-size: clamp(13px, calc(1.25 * var(--vw)) + 4px, 18px); }
 
 export const FRONT_CSS = /* css */ `
 /* ---- shared front-end pieces ---------------------------------------- */
-/* Hidden screens are OUT of hit-testing and the accessibility tree, not merely transparent: visibility: hidden
-   (delayed until the fade-out ends) on top of pointer-events: none, so no tap, scroll, focus or click can reach a
-   screen that is not the current one. */
-.screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
-.screen.show { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity var(--t2) var(--ease), visibility 0s; }
-.screen:not(.show) *, .overlay:not(.show) *, .onboard:not(.show) *, .results:not(.show) *, .replay:not(.show) * { pointer-events: none !important; }
+/* THE INVARIANT (docs/tasks/touch-navigation-invariant.md, src/ui/live.ts): nothing is hit-testable unless it is
+   drawn at >= .5 opacity and has been for >= 150 ms. .show decides what is DRAWN (the fade); .live, which only
+   live.ts toggles after the reveal has been observed drawn, decides what TAKES POINTERS. Every surface that owns
+   tappables — screens, the pause overlay, the onboarding card, the results frame, the replay bar, the toast — is
+   pointer-events: none (itself and, !important, every descendant) until .live. Hidden surfaces are also OUT of
+   hit-testing and the accessibility tree: visibility: hidden (delayed until the fade-out ends). Opacity alone is
+   never a visibility state. */
+.screen, .overlay, .onboard, .results, .replay, .toast { pointer-events: none; }
+.screen:not(.live) *, .overlay:not(.live) *, .onboard:not(.live) *, .results:not(.live) *, .replay:not(.live) *, .toast:not(.live) * { pointer-events: none !important; }
+.screen.live, .overlay.live, .onboard.live, .results.live, .replay.live, .toast.live { pointer-events: auto; }
+.screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
+.screen.show { opacity: 1; visibility: visible; transition: opacity var(--t2) var(--ease), visibility 0s; }
 .overlay:not(.show), .onboard:not(.show), .results:not(.show), .replay:not(.show) { visibility: hidden; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
 .screen.show .rise { animation: rise var(--t2) var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
@@ -239,9 +245,9 @@ export const FRONT_CSS = /* css */ `
 /* ---- overlay frame: pause + results (assets/design/pause/SPEC.md, direction A "low action bar") ----
    Full-frame grid, flat scrim (no left-weighted gradient), safe-area padding; title block top-left,
    Visuals chips top-right, free band, tile row centred on the viewport in the lower third, corners. */
-.overlay { position: absolute; inset: 0; z-index: 1; display: grid; grid-template-rows: auto 1fr auto auto; grid-template-columns: 100%; row-gap: var(--s3); background: rgba(6,7,9,.5); opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease); padding: calc(var(--s6) + var(--sat)) calc(calc(7 * var(--vw)) + var(--sar)) calc(var(--s5) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); }
-.overlay.show { opacity: 1; pointer-events: auto; }
-.overlay.leaving { opacity: 0; pointer-events: none; transition: opacity var(--t1) var(--ease); }
+.overlay { position: absolute; inset: 0; z-index: 1; display: grid; grid-template-rows: auto 1fr auto auto; grid-template-columns: 100%; row-gap: var(--s3); background: rgba(6,7,9,.5); opacity: 0; transition: opacity var(--t2) var(--ease); padding: calc(var(--s6) + var(--sat)) calc(calc(7 * var(--vw)) + var(--sar)) calc(var(--s5) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); }
+.overlay.show { opacity: 1; }
+.overlay.leaving { opacity: 0; transition: opacity var(--t1) var(--ease); }
 .ov-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s4); min-width: 0; }
 .ov-title { display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
 .ov-kicker { font-size: .72rem; letter-spacing: .34em; text-transform: uppercase; color: var(--amber); font-weight: 700; text-shadow: var(--outline); }
@@ -284,7 +290,7 @@ export const FRONT_CSS = /* css */ `
 @supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) { html:not(.short) .pause-overlay.show { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); } }
 
 /* ---- replay viewer (docs/design/game.md §16): kicker top-left, transport bar in the lower band ---- */
-.replay { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity var(--t2) var(--ease); z-index: 5; }
+.replay { position: absolute; inset: 0; opacity: 0; transition: opacity var(--t2) var(--ease); z-index: 5; }
 .replay.show { opacity: 1; visibility: visible; transition: opacity var(--t2) var(--ease), visibility 0s; }
 .replay .rp-head { position: absolute; left: calc(var(--s5) + var(--sal)); top: calc(var(--s5) + var(--sat)); display: flex; flex-direction: column; gap: 2px; }
 .replay .ov-kicker { color: var(--amber); }
@@ -400,16 +406,16 @@ html.short .bc-art { display: none; }
 .fpsmeter { position: absolute; right: calc(.5rem + var(--sar)); top: calc(.15rem + var(--sat)); z-index: 7; pointer-events: none; font: 600 10px/1.4 var(--mono); letter-spacing: .04em; color: rgba(255,255,255,.55); text-shadow: 0 1px 2px rgba(0,0,0,.8); }
 .fpsmeter.bad { color: #ff7a5c; }
 .hud.touch ~ .fpsmeter, .touch-layer.on.visible ~ .fpsmeter { top: calc(4.2rem + var(--sat)); }
-.toast { position: absolute; left: 50%; bottom: calc(var(--s5) + var(--sab)); transform: translate(-50%, 140%); z-index: 30; display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s2) var(--s2) var(--s4); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--plate), 0 18px 40px rgba(0,0,0,.6); opacity: 0; pointer-events: none; transition: transform var(--t3) var(--ease), opacity var(--t3) var(--ease); white-space: nowrap; }
-.toast.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.toast { position: absolute; left: 50%; bottom: calc(var(--s5) + var(--sab)); transform: translate(-50%, 140%); z-index: 30; display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s2) var(--s2) var(--s4); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--plate), 0 18px 40px rgba(0,0,0,.6); opacity: 0; transition: transform var(--t3) var(--ease), opacity var(--t3) var(--ease); white-space: nowrap; }
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
 .toast-dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: pulse 1.6s ease-in-out infinite; }
 .toast-text { display: flex; flex-direction: column; line-height: 1.15; }
 .toast-text b { font-weight: 700; letter-spacing: .04em; }
 .toast-text small { font-size: .74rem; color: var(--ink-mute); }
 
 /* ---- onboarding card (first launch, over the first countdown, game paused) ---- */
-.onboard { position: absolute; inset: 0; z-index: 25; display: flex; align-items: center; justify-content: center; background: rgba(6,7,9,.55); opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease); padding: var(--s4); }
-.onboard.show { opacity: 1; pointer-events: auto; }
+.onboard { position: absolute; inset: 0; z-index: 25; display: flex; align-items: center; justify-content: center; background: rgba(6,7,9,.55); opacity: 0; transition: opacity var(--t2) var(--ease); padding: var(--s4); }
+.onboard.show { opacity: 1; }
 .ob-card { width: min(34rem, 100%); display: flex; flex-direction: column; gap: var(--s3); padding: var(--s5); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r3); box-shadow: var(--plate), 0 24px 60px rgba(0,0,0,.6); }
 .ob-card h2 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.4rem; line-height: .9; text-transform: uppercase; }
 .ob-lines { display: flex; flex-direction: column; gap: var(--s2); font-size: .98rem; color: var(--ink-dim); line-height: 1.35; }
@@ -445,7 +451,7 @@ html.short .perf { top: calc(3.6rem + var(--sat)); font-size: 10px; }
 export const HUD_CSS = /* css */ `
 /* ---- top band ------------------------------------------------------- */
 .hud { position: absolute; inset: 0; opacity: 1; transition: opacity var(--t2) var(--ease); z-index: 2; pointer-events: none; }
-.hud .results.show { pointer-events: auto; }
+.hud .results.live { pointer-events: auto; }
 .hud.hidden { opacity: 0; }
 .hud-top {
   position: absolute; left: 0; right: 0; top: 0;
@@ -504,8 +510,9 @@ export const HUD_CSS = /* css */ `
 .hints kbd { font-family: var(--font); font-weight: 800; background: rgba(255,255,255,.12); border: 1px solid var(--line); border-bottom-width: 2px; padding: .05em .45em; border-radius: .25em; margin-right: .35em; font-size: .9em; }
 
 /* ---- results: the same frame as pause (title block, headline centred in the free band, tiles) ---- */
-.results { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto auto; grid-template-columns: 100%; row-gap: var(--s3); padding: calc(var(--s6) + var(--sat)) calc(calc(7 * var(--vw)) + var(--sar)) calc(var(--s5) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); background: rgba(6,7,9,0); opacity: 0; pointer-events: none; transition: opacity var(--t2) var(--ease), background var(--t3) var(--ease); }
-.results.show { opacity: 1; pointer-events: auto; }
+.results { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto auto; grid-template-columns: 100%; row-gap: var(--s3); padding: calc(var(--s6) + var(--sat)) calc(calc(7 * var(--vw)) + var(--sar)) calc(var(--s5) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); background: rgba(6,7,9,0); opacity: 0; transition: opacity var(--t2) var(--ease), background var(--t3) var(--ease); }
+.results.show { opacity: 1; }
+/* The tiles are the results' tappables: .live lands on the frame only once THEY are drawn (stage-3 + the reveal watch on .tiles, hud.ts). */
 .results.stage-3, .results.stage-4, .results.stage-5 { background: rgba(6,7,9,.35); }
 .results .headline { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s2); text-align: center; min-height: 0; }
 .results .headline .row { display: flex; align-items: baseline; gap: var(--s4); }
@@ -562,7 +569,8 @@ export const HUD_CSS = /* css */ `
 .tz-restart { width: auto; padding: 0 .7rem; }
 .tz-restart span { display: inline-flex; align-items: center; gap: .4em; }
 .tz-restart small { font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
-.touch-layer.on.visible .tz-btn { opacity: .9; }
+/* Buttons stay drawn at .9 after the zones settle (the .settled .tz rule above is 0,5,0 and used to beat this 0,4,0 rule → .3, under the invariant's .5 with a live 56×44 hit rect). */
+.touch-layer.on.visible .tz-btn, .touch-layer.on.visible.settled .tz-btn { opacity: .9; }
 .tz-btn.held { background: rgba(255,255,255,.25); }
 .tz-restart { right: calc(.8rem + var(--sar)); }
 .tz-pause { left: calc(.8rem + var(--sal)); }
