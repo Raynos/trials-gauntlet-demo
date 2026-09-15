@@ -26,6 +26,10 @@ already parallel. Targets: `--refresh-goldens` ≤ 5 min, reflex matrix ≤ 10 m
    `p3-snow`, `p4-city`, `p5-foundry`), each cramming every asset, set piece and feature of its biome into a
    fun course (jumps, hills, gaps, drums, planks) at beginner band (novice ≤ 3, in a "Playgrounds" row above
    Lab, open from the start) — so the user can play every biome without finishing the game.
+   **Status 17:40:** courses landed (`fa62eae`, p1–p5, novice median 1–3, bot 1); the Playgrounds row is with core #10
+   (same round as the REVIEW button); **render round owed** (after perf #4b, same paths): read `setPiecesOf(def)`
+   (tunnels / drops / fire / balance), draw `arch` decor, and on `p1-`…`p5-` ids place *every* biome set piece instead
+   of the one id-gated pick — `docs/design/tracks.md` §7.3 is the list.
 2. **Level reviewer** (mobile) — `?review=<track>`: free camera (pan/zoom/fly along the track), six segments,
    tap a segment to leave a comment (localStorage), **Copy review** → JSON the parent files under
    `docs/reviews/levels/<track>.md` and re-authors from. Also lists the biome's assets in the segment.
