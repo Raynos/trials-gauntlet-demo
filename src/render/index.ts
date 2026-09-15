@@ -527,6 +527,8 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   private prepared: Promise<void> | null = null;
+  /** A superseded entry must finish its in-flight GPU poll before another compile starts. */
+  private compilePending: Promise<void> = Promise.resolve();
   private preparing = false;
   /** `prepare()` timeline: [label, ms, bytes] per step (diagnostic; `debugInfo().prepare`). */
   readonly prepareTimeline: { step: string; ms: number; bytes: number }[] = [];
@@ -663,37 +665,51 @@ export class ThreeRenderer implements GameRenderer {
    * tone mapping, so a compile against the wrong target builds a variant the frame never uses).
    * Returns the summed task ms. `abort()` (round 14 entry) stops between tasks.
    */
-  private async compileMaterials(mats: THREE.Material[], report?: (done: number, total: number) => void, abort?: () => boolean): Promise<number> {
-    const r = this.renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
-    if (!r.compileAsync) return 0;
-    let ms = 0;
-    const chunk = 2;
-    for (let i = 0; i < mats.length; i += chunk) {
-      if (abort?.()) break;
-      const t0 = performance.now();
-      const keep = new Set(mats.slice(i, i + chunk));
-      const hidden: THREE.Object3D[] = [];
-      this.scene.traverse((o) => {
-        const m = (o as THREE.Mesh).material;
-        if (!m) return;
-        const list = Array.isArray(m) ? m : [m];
-        if (!list.some((x) => keep.has(x)) && o.visible) {
-          o.visible = false;
-          hidden.push(o);
+  private compileMaterials(mats: THREE.Material[], report?: (done: number, total: number) => void, abort?: () => boolean): Promise<number> {
+    const run = async (): Promise<number> => {
+      let ms = 0;
+      const chunk = 2;
+      for (let i = 0; i < mats.length; i += chunk) {
+        if (abort?.()) break;
+        const t0 = performance.now();
+        const keep = new Set(mats.slice(i, i + chunk));
+        const batch = new THREE.Group();
+        this.scene.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          const material = mesh.material;
+          if (!material) return;
+          const selected = (Array.isArray(material) ? material : [material]).filter((m) => keep.has(m));
+          if (!selected.length) return;
+          // compile() traverses invisible meshes too. Detached, non-recursive clones restrict
+          // the batch without touching live visibility/parents, and retain skin/instance/morph
+          // flags, geometry, skeleton and shadow roles used to choose the actual shader variant.
+          const copy = mesh.clone(false);
+          copy.material = Array.isArray(material) ? selected : selected[0]!;
+          batch.add(copy);
+        });
+        const r = this.renderer;
+        const previous = r.getRenderTarget(), face = r.getActiveCubeFace(), mip = r.getActiveMipmapLevel();
+        let pending: Promise<unknown>;
+        try {
+          r.setRenderTarget(this.post.sceneTarget);
+          // Program creation is synchronous; the promise only polls readiness. Use the real
+          // target scene for lights/fog/environment, and restore GL target state before yielding.
+          pending = r.compileAsync(batch, this.rig.camera, this.scene);
+        } finally {
+          r.setRenderTarget(previous, face, mip);
         }
-      });
-      try {
-        this.renderer.setRenderTarget(this.post.sceneTarget);
-        await r.compileAsync(this.scene, this.rig.camera);
-      } finally {
-        this.renderer.setRenderTarget(null);
-        for (const o of hidden) o.visible = true;
+        await pending;
+        if (abort?.()) break;
+        ms += performance.now() - t0;
+        report?.(Math.min(mats.length, i + chunk), mats.length);
+        await yieldFrame();
       }
-      ms += performance.now() - t0;
-      report?.(Math.min(mats.length, i + chunk), mats.length);
-      await yieldFrame();
-    }
-    return ms;
+      return ms;
+    };
+    const pending = this.compilePending.then(run);
+    // A failed old request must not poison later track/quality requests.
+    this.compilePending = pending.then(() => undefined, () => undefined);
+    return pending;
   }
 
   /** Textures a material set samples (maps + the scene background), each once. */

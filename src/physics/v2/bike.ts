@@ -20,7 +20,7 @@ import { atan2, clamp, cos, sin, wrapAngle, HALF_PI } from '../dmath';
 import { BIKE_GEOMETRY_V2, bikeTuningV2, suspensionPoint, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
 import { driveTorque, lag, limiterLatch, reportRpm, thrustFrac, wheelieTrim } from './engine';
 import { brushImpulse, tyreMu } from './tyre';
-import { advanceTarget, GRIP_X, GRIP_Y, leanFromX, makeRiderRigPose, PEG_X, PEG_Y, poseAt, RIDER_ANKLE, RIDER_HIP, RIDER_REACH, RIDER_TORSO_REST, riderCOMGradient, riderRigFromCOM, riderRigFromHips, riderServoWrench, type ChainOut, type RiderRigPose, type RiderServoKinematics } from './rider';
+import { advanceTarget, GRIP_X, GRIP_Y, leanFromX, makeRiderRigPose, PEG_X, PEG_Y, poseAt, RIDER_ANKLE, RIDER_HIP, RIDER_REACH, RIDER_TORSO_REST, RIDER_PROFILE, riderCOMGradient, riderRigFromCOM, riderRigFromHips, riderServoWrench, type ChainOut, type RiderRigPose, type RiderServoKinematics } from './rider';
 
 // ---------------------------------------------------------------------------
 // Public extras
@@ -319,16 +319,16 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private readonly servoKinematics: RiderServoKinematics = { offsetX: 0, offsetY: 0, errorX: 0, errorY: 0, angleError: 0, relativeVX: 0, relativeVY: 0, relativeW: 0, invMassC: 0, invMassR: 0, invInertiaC: 0, invInertiaR: 0 };
   private readonly servoWrench = { x: 0, y: 0, torque: 0 };
   /** Per-step constraint workspace, cleared before every solve (not persistent simulation state). */
-  private readonly riderLimits = Array.from({ length: 7 }, () => ({ rx: 0, ry: 0, cx: 0, cy: 0, nx: 0, ny: 0, jr: 0, jc: 0, gap: 0, mass: 0, minVelocity: 0, impulse: 0 }));
+  private readonly riderLimits = Array.from({ length: 8 }, () => ({ rx: 0, ry: 0, cx: 0, cy: 0, nx: 0, ny: 0, jr: 0, jc: 0, gap: 0, mass: 0, minVelocity: 0, impulse: 0 }));
   private readonly rigPose = makeRiderRigPose();
   private readonly rigProbe = makeRiderRigPose();
   private rigKeyX = Number.NaN;
   private rigKeyY = Number.NaN;
   private rigKeyAngle = Number.NaN;
-  private readonly rigGaps = new Float64Array(7);
-  private readonly rigGapX = new Float64Array(7);
-  private readonly rigGapY = new Float64Array(7);
-  private readonly rigGapAngle = new Float64Array(7);
+  private readonly rigGaps = new Float64Array(8);
+  private readonly rigGapX = new Float64Array(8);
+  private readonly rigGapY = new Float64Array(8);
+  private readonly rigGapAngle = new Float64Array(8);
   private axleOrgX = 0;
   private axleOrgY = 0;
 
@@ -1661,6 +1661,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     out[4] = RIDER_ANKLE.max - ankle;
     out[5] = hip - RIDER_HIP.min;
     out[6] = RIDER_HIP.max - hip;
+    out[7] = arm - RIDER_REACH.armMin;
   }
 
   private prepareRiderLimits(resetImpulse = true): void {
@@ -1677,7 +1678,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const j01 = (probe.com.x - cx) / epsilon, j11 = (probe.com.y - cy) / epsilon;
     this.riderRigGaps(probe, this.rigGapY);
     riderRigFromHips(hx, hy, angle + epsilon, probe);
-    const bx = (probe.com.x - cx) / epsilon, by = (probe.com.y - cy) / epsilon;
+    let bx = (probe.com.x - cx) / epsilon, by = (probe.com.y - cy) / epsilon;
+    let fixedAngle = false;
     this.riderRigGaps(probe, this.rigGapAngle);
     const c = cos(this.an[CHASSIS]!), s = sin(this.an[CHASSIS]!);
     const rx = this.px[RIDER]! - this.px[CHASSIS]!, ry = this.py[RIDER]! - this.py[CHASSIS]!;
@@ -1689,8 +1691,20 @@ class WorldV2 implements BikePhysicsWorldV2 {
       const gy = (this.rigGapY[i]! - gap) / epsilon;
       const ga = (this.rigGapAngle[i]! - gap) / epsilon;
       // Chain rule through the inverse whole-body mass map: H = COM^-1(C, angle).
-      riderCOMGradient(j00, j01, j10, j11, rig.residual, gx, gy, probe.com);
+      const regular = riderCOMGradient(j00, j01, j10, j11, rig.residual, gx, gy, probe.com);
       const nx = probe.com.x, ny = probe.com.y;
+      if (!regular && !fixedAngle) {
+        // Use the SAME fixed-elbow/knee continuation for d(COM)/d(torso) as for translation.
+        // Only the trunk, head/neck and proximal upper-arm fractions move with the shoulder;
+        // the head/neck centroid also rotates about it. Retaining the singular full-map angle
+        // slope here would turn a bounded recovery row into an almost immovable angular row.
+        const p = RIDER_PROFILE;
+        const shoulderWeight = p.mass.trunk * p.comFraction.trunk + p.mass.headNeck + 2 * p.mass.upperArm * (1 - p.comFraction.upperArm);
+        const headWeight = p.mass.headNeck * p.headNeckLength * p.comFraction.headNeck;
+        bx = (shoulderWeight * (probe.shoulders.x - rig.shoulders.x) + headWeight * (cos(probe.headAngle) - cos(rig.headAngle))) / epsilon;
+        by = (shoulderWeight * (probe.shoulders.y - rig.shoulders.y) + headWeight * (sin(probe.headAngle) - sin(rig.headAngle))) / epsilon;
+        fixedAngle = true;
+      }
       const angular = ga - nx * bx - ny * by;
       q.nx = nx * c - ny * s;
       q.ny = nx * s + ny * c;

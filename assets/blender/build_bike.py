@@ -680,9 +680,11 @@ def build_bodywork(M):
     bm = loft(secs)
     b.add(bm, Matrix.Identity(4), paint)
     bm.free()
-    # seat pad: from x 0.55 back to 0.05, a flatter black slab on top of the unit
+    # Seat cover sits above the painted shell, with its lower edge embedded a few
+    # millimetres. The old leading rings were wholly buried under the tank loft:
+    # at x=.50 the black top was .602 while the blue shell reached .610.
     secs = []
-    for (x, hw, hh, zc) in [(0.56, 0.06, 0.010, 0.612), (0.50, 0.075, 0.016, 0.586), (0.40, 0.078, 0.016, 0.567), (0.30, 0.076, 0.015, 0.558), (0.20, 0.072, 0.014, 0.551), (0.10, 0.066, 0.012, 0.545), (0.04, 0.05, 0.008, 0.538)]:
+    for (x, hw, hh, zc) in [(0.56, 0.063, 0.014, 0.655), (0.50, 0.075, 0.018, 0.622), (0.40, 0.080, 0.018, 0.598), (0.30, 0.080, 0.018, 0.583), (0.20, 0.076, 0.018, 0.573), (0.10, 0.070, 0.015, 0.563), (0.04, 0.05, 0.008, 0.548)]:
         secs.append(superellipse_ring(V(x, 0, zc), hw, hh, n=16, power=3.0))
     bm = loft(secs)
     b.add(bm, Matrix.Identity(4), M["seat"])

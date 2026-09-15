@@ -1,7 +1,7 @@
 # Blender hero handoff — active WIP
 
-**2026-09-15. The user resumed work from the pause checkpoint. Round 3 repairs
-are verified below, with remaining failures preserved. This branch is not ready
+**2026-09-15. The user resumed work from the pause checkpoint. Round 4 integration is verified below,
+with remaining failures preserved. This branch is not ready
 to merge or deploy. The hero/physics mission is unfinished.**
 
 Continue in `/Users/raynos/projects/game-demos/trials-gauntlet-blender`, branch
@@ -32,7 +32,104 @@ Read [the plan](plans/BLENDER_HERO.md), [plan status](plans/PLANS.md),
 backward on Rear Wheel First, 1:18.433 and four faults. It is a symptom to
 reproduce; this checkpoint does **not** prove that specific finish bug fixed.
 
-## Round 3 continuation — current evidence
+## Round 4 continuation — current evidence
+
+The current tracked physics has a **35-degree minimum elbow opening**. This
+excludes the fixed-pole singularity while retaining the authored poses and pole.
+Failed inverse recovery now uses consistent bounded translation and angular
+COM derivatives. Six focused elbow tests and the 32-test rider/position group
+pass. Fifty recordings / 206,359 ticks repeat with exact final raw physics and
+complete Game counter bytes; maximum inverse residual is below 1e-9 m.
+
+Remaining anatomical deficits are explicit: gap-test Pro ankle minimum is
+-0.0026824963 rad at tick 616 and hip minimum is -0.0020886820 rad at tick 617;
+H3 Rookie arm maximum is -2.2243376e-6 m at tick 4467. The ankle/hip deficits
+were introduced by the extra coupling. A bounded coupled continuation that
+activates only after the existing solve leaves a gap below -1e-6 closes the
+scratch census, but **is not in production**. Research and exact reproduction
+commands: `harness/out/rig-physics/ROUND4_RIDER_RESEARCH.md`.
+
+The bot now admits wheelie-hold only from a moving rear-wheel balance, retains
+distinct physical rider/pitch states, and commits only evaluated macro prefixes.
+The score and bike dynamics were not changed for the bot repair. Six fresh
+production-Game searches clear on attempt one with zero faults; all **25,576
+recorded ticks** replay with identical physics/counter bytes:
+
+| Track | Pro | Rookie fresh replacement |
+| --- | ---: | ---: |
+| B1 | 37.116667 s | — |
+| B3 | 32.875 s | 33.808333 s |
+| E2 | 42.425 s | — |
+| M1 | 31.583333 s | 35.325 s |
+
+Old round-3 B3/M1 Rookie inputs no longer clear under the new stop; they remain
+intact. New inputs are in `harness/inputs/hero-r4/`. Search results depend on a
+wall-clock deadline; serialized playback itself is deterministic. Two fresh B3
+strangers both clear first attempt with zero faults, in 36.216667 / 37.233333 s;
+median attempts 1, within the 1–2 band. Two fresh M1 strangers each clear in eight
+attempts / seven faults, 133.383333 / 87.091667 s; median attempts 8, within 5–9.
+All four verify raw production replay. The second M1 session's wall time includes
+an initial wait for an agent slot; it is not a reaction-time measurement.
+
+The bike seat was buried in the bodywork near x=.50 m (old seat top .602 m,
+body top .610 m). Its loft now clears the body without changing mechanical
+markers. Full/LOD assets and catalog were rebuilt; 16 actual GLB geometry tests
+pass. The parent played `r4-seat-hop-street/clip.mp4` and accepts the more
+readable pad silhouette as an incremental improvement.
+
+Connected shoulder/elbow candidates were played in native Blender for both
+outfits. All 19 bones, eight actions, sockets and material graphs are retained.
+Their measured 35–175-degree elbow sweeps have no sampled regional crossings.
+Both protected rider masters and all four public full/LOD GLBs are now promoted
+after native and actual game playback. Normal exports from the promoted masters
+are byte-identical to the reviewed scratch GLBs. Connected trousers are rejected
+for now: street/race landing
+still has 4/7 saddle crossings; inherited knee folds also remain. The hood,
+waist and cloth material/detail still need work.
+
+`hero-capture.mts` retains SwiftShader by default and supports explicit Metal,
+recording actual renderer/browser identity and failing on any WebGL error.
+A 190-frame Metal hop passes asset proofs and matches all 280 simulation samples
+from the SwiftShader clip. Some initial Metal captures fail at tick 2 with
+`glGetProgramiv: Program object expected`. Confirmed compilation defects are
+corrected: actual material batches replace ineffective visibility masking,
+compiler jobs serialize, and the render target restores before asynchronous
+waits. Three regressions fail on the baseline and pass with the patch. Three
+rapid-transition runs per build still reproduce GL1281 on both baseline and
+final; simultaneous compiles fall from two (four in the pilot) to one. No
+JavaScript query after program deletion was found. Scratch raw-WebGL controls
+point to pending asynchronous link/deletion on the Metal backend: waiting for
+completion before deletion prevents the warning. This is a round-5 lead, not
+an implemented fix. The visual harness now waits
+for scene readiness between setup changes; this does not exercise rapid changes.
+No actual iOS or sustained 60 fps claim follows from capture.
+
+The parent also played round-3 `r3-e2-finish-street/clip.mp4`: this 44.741667 s,
+zero-fault finish keeps normal arm attachment/bending through the camera move.
+It is not the user's exact 78.433 s / four-fault reproduction.
+
+Current integration check: **18 failed, 686 passed, 11 todo**, six failed / 50
+passed files. TypeScript and ESLint pass; separate production build passes.
+The failed tests remain explicit physics behavior and cost requirements. No
+thresholds or golden recordings were relaxed. The actual exported model census
+covers **58 recordings / 255,345 input ticks** in two disjoint batches, all
+finite with unchanged source hashes; all 69 shared source hashes agree.
+Worst rendered whole-body COM mismatch is **0.114 micrometres**, down
+from round 3's 1.897 millimetres. Hand/sole errors remain below 0.256 / 0.189
+micrometres; no backward-pole elbow appears. Physical rear/front attachment
+maxima are 90.89 / 66.73 micrometres, both inside the existing 0.2 mm bar.
+
+See [round 4 evidence](evidence/blender-r4.json). The final build is frozen in
+`harness/out/blender/r4-dist`; the earlier asset-only review build is
+`r4-elbows-dist`. The parent also played final-build low-quality Race at
+844×390 and a high-quality B3 Street stranger takeoff/landing. Four stream-copy
+repeats made each short clip easier to review; original cadence and input
+windows remain separate in the manifest. Both retain normal limb attachment.
+B3 still reports 145,668 track triangles against the 80,000 cap. Round 4 is a
+verified WIP checkpoint; the remaining GPU warning and anatomy deficits carry
+into round 5.
+
+## Round 3 continuation — committed evidence
 
 See [the durable evidence manifest](evidence/blender-r3.json) for source/model/build
 hashes, exact clocks, worst-case witnesses and replay results. Round 2 numbers
@@ -300,16 +397,19 @@ content-addressed build outputs. Keep the one-byte inline budget margin in mind.
 
 ## Continue in this order
 
-1. Finish the pending scratch comparison of continuous elbow bend basis and a
-   minimum elbow-opening stop. Preserve authored poses, remove the real X1
-   singularity, and test derivatives, COM recovery, anatomy and replay bytes.
-2. Correct bot wheelie-hold entry and remeasure Pro clears. Investigate every
-   remaining behavior requirement separately: braking distance, drop attitude,
-   touchdown step, lab hop/climb and air-limit witnesses. Profile solver cost.
-3. Review final connected street/race candidates in native Blender, promote
-   accepted geometry through the protected workflow, export both LODs, and judge
-   textured gameplay against native-rate Trials footage. Elbow/crotch topology,
-   garment folds, material detail, helmet/hand/boot polish and shadows remain.
+1. Implement and verify the bounded anatomy convergence continuation researched
+   in round 4. Preserve the existing solution when all gaps meet the bar;
+   measure conservation, contact closure, invalid-state recovery and replay
+   bytes. Do not hide the introduced ankle/hip deficits with relaxed tolerances.
+2. Fix the independently reproduced pending-program deletion warning. Retain
+   asynchronous compilation and resource cleanup, then repeat actual rapid
+   transitions on Metal and SwiftShader with errors visible.
+3. Continue native Blender garment work from the promoted connected shoulder/
+   elbow masters. Rejected trousers still pinch at the saddle and knees.
+   Hood/neck, waist, cloth folds and material detail need played reference
+   comparisons before further promotion. Investigate remaining physics behavior
+   requirements separately: braking, drop attitude, touchdown, lab hop/climb,
+   air limits and solver cost.
 4. Rerun real-GLB census and fresh bot/stranger attempts on the next frozen solver.
    Use `harness/lib/production-sim.ts` and the corrected stranger schema, not the
    legacy RunRules mirror. Keep session fingerprints fixed through `done`.

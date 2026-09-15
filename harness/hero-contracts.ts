@@ -1,6 +1,6 @@
 /** Read-only production-Game / decoded-GLB census. This measures attachment and mass mapping;
  * it is neither visual evidence nor proof that inherited controls clear the changed solver.
- * Run: pnpm exec tsx harness/hero-contracts.ts [output.json]
+ * Run: pnpm exec tsx harness/hero-contracts.ts [output.json] [additional-recording.json ...]
  */
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
@@ -38,7 +38,7 @@ for (const dir of await readdir('harness/inputs', { withFileTypes: true })) if (
   for (const file of await readdir(`harness/inputs/${dir.name}`)) if (/^bot-3(?:-pro)?\.json$/.test(file)) inputs.push(`harness/inputs/${dir.name}/${file}`);
 }
 inputs.push('harness/inputs/flat-test/crash.json', 'harness/inputs/flat-test/restart-tap.json');
-inputs.sort();
+inputs = [...new Set([...inputs, ...process.argv.slice(3)])].sort();
 if (process.env['HERO_CENSUS_INPUT']) inputs = inputs.filter(path => path.includes(process.env['HERO_CENSUS_INPUT']!));
 if (!inputs.length) throw new Error('No recordings match HERO_CENSUS_INPUT');
 const sources = [...await sourceFiles('src/physics'), ...await sourceFiles('src/game'), ...await sourceFiles('src/core'), ...await sourceFiles('src/tracks'),

@@ -3,7 +3,7 @@ import { decodeJSON, iterateFrames } from '../src/core/replay';
 import type { QualityTier } from '../src/core/types';
 import type { HeroHarnessWindow } from './hero-browser';
 // Played hero capture with full prefix rendering, exact timestamps and consumed-model byte proofs.
-// Run: tsx harness/hero-capture.mts build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight]
+// Run: tsx harness/hero-capture.mts build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal]
 import { createServer } from 'node:http';
 import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -11,9 +11,10 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { chromium } from 'playwright';
 
-const [buildArg, recordingArg, outArg, fromArg, toArg, quality = 'high', outfit = 'street', fpsArg = '60', size = '1280x720'] = process.argv.slice(2);
-if (!buildArg || !recordingArg || !outArg) throw new Error('build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight]');
+const [buildArg, recordingArg, outArg, fromArg, toArg, quality = 'high', outfit = 'street', fpsArg = '60', size = '1280x720', angleBackend = 'swiftshader'] = process.argv.slice(2);
+if (!buildArg || !recordingArg || !outArg) throw new Error('build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal]');
 if (!['street', 'race'].includes(outfit) || !['low', 'medium', 'high'].includes(quality)) throw new Error('invalid outfit or quality');
+if (!['swiftshader', 'metal'].includes(angleBackend)) throw new Error('unsupported ANGLE backend');
 const [width, height] = size.split('x').map(Number);
 if (!width || !height || ![width, height].every(Number.isSafeInteger)) throw new Error('integer widthxheight required');
 const build = path.resolve(buildArg), out = path.resolve(outArg);
@@ -65,7 +66,8 @@ const server = createServer(async (req, res) => {
 });
 await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
 const addr = server.address() as { port: number };
-const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--enable-webgl', '--ignore-gpu-blocklist', '--mute-audio'] });
+const launchArgs = [`--use-angle=${angleBackend}`, ...(angleBackend === 'swiftshader' ? ['--enable-unsafe-swiftshader'] : []), '--enable-webgl', '--ignore-gpu-blocklist', '--mute-audio'];
+const browser = await chromium.launch({ headless: true, args: launchArgs });
 const errors: string[] = [], responses: Promise<void>[] = [], downloads: Record<string, string> = {};
 const servedFiles: Record<string, string> = {};
 const responseFailures: string[] = [];
@@ -117,8 +119,14 @@ try {
   await page.waitForFunction(() => window.__trials?.ready === true);
   await page.evaluate(async header => {
     const t = window.__trials!;
+    const r = (window as unknown as HeroHarnessWindow).__render;
+    // Visual replay starts from a settled scene. Rapid track/tier switching is a separate
+    // lifecycle test; do not overlap those warmups while preparing a deterministic clip.
+    await r.whenReady();
     t.setBike!(header.bike ?? 'rookie');
+    await r.whenReady();
     if (!await t.loadTrack(header.trackId, header.seed)) throw new Error('track did not load');
+    await r.whenReady();
     t.skipCountdown();
     if (t.info().physicsHz !== header.physicsHz || t.info().bike !== (header.bike ?? 'rookie') || t.info().seed !== header.seed) throw new Error('recording rate/class/seed does not match running simulation');
     const expectedFactory = (header.physics ?? 'v1') === 'v2' ? 'createBikePhysicsV2' : 'createBikePhysicsV1';
@@ -141,6 +149,20 @@ try {
     const render = r.render.bind(r);
     r.render = state => render(state, 1);
   }, { tier: quality as QualityTier, width, height });
+  const graphics = await page.evaluate(() => {
+    const r = (window as unknown as HeroHarnessWindow).__render;
+    const gl = r.debug.renderer.getContext();
+    const extension = gl.getExtension('WEBGL_debug_renderer_info');
+    if (!extension) throw new Error('renderer identity unavailable');
+    return {
+      vendor: String(gl.getParameter(extension.UNMASKED_VENDOR_WEBGL)),
+      renderer: String(gl.getParameter(extension.UNMASKED_RENDERER_WEBGL)),
+      version: String(gl.getParameter(gl.VERSION)),
+      userAgent: navigator.userAgent,
+    };
+  });
+  if (!(angleBackend === 'metal' ? /Metal/ : /SwiftShader/i).test(graphics.renderer)) throw new Error(`requested ${angleBackend}, received ${graphics.renderer}`);
+  const captureStarted = performance.now();
   const trace: Record<string, unknown>[] = [];
   let frame = 0;
   // EVERY preceding rendered frame is evaluated: no cold camera/rig at the clip start.
@@ -151,7 +173,7 @@ try {
       t.render(true);
       const d = r.debug, gl = d.renderer.getContext();
       const glError = gl.getError();
-      if (glError !== gl.NO_ERROR) throw new Error(`WebGL error ${glError}`);
+      if (glError !== gl.NO_ERROR) throw new Error(`WebGL error ${glError} at simulation tick ${t.getState().tick}`);
       const state = t.getState();
       const renderedTime = r.frames.frame.tSim;
       if (Math.abs(renderedTime - state.time) > 1e-9) throw new Error(`display time ${renderedTime} differs from state time ${state.time}`);
@@ -180,11 +202,14 @@ try {
   if (modelProof.errors.length) throw new Error(modelProof.errors.join('\n'));
   Object.assign(downloads, modelProof.hashes);
   for (const name of Object.keys(assetBytes)) if (downloads[name] !== assetBytes[name]) throw new Error(`download bytes differ for ${name}`);
-  const report = { build, buildFiles, servedFiles, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), assetBytes, downloads, physics, hz, fps, from, to, firstFrameInputTick: from + ticksPerFrame, interval: '(from,to]', frames: frame, prefixRendered: true, renderAlpha: 1, quality, outfit, width, height, errors, trace };
+  const report = { build, buildFiles, servedFiles, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), assetBytes, downloads, physics, hz, fps, from, to, firstFrameInputTick: from + ticksPerFrame, interval: '(from,to]', frames: frame, prefixRendered: true, renderAlpha: 1, setup: 'await scene readiness between class, track and quality changes', quality, outfit, width, height, graphics: { requestedBackend: angleBackend, launchArgs, chromium: browser.version(), hostPlatform: process.platform, ...graphics }, captureWallMs: performance.now() - captureStarted, errors, trace };
   await writeFile(path.join(out, 'evidence.json'), JSON.stringify(report, null, 2));
   const ff = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-framerate', String(fps), '-i', path.join(out, 'frames', 'frame-%05d.png'), '-frames:v', String(frame), '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', path.join(out, 'clip.mp4')], { encoding: 'utf8' });
   if (ff.status !== 0) throw new Error(ff.stderr);
   console.log(JSON.stringify({ out, frames: frame, assetBytes, errors, final: trace.at(-1) }));
+} catch (error) {
+  await writeFile(path.join(out, 'failure.json'), JSON.stringify({ build, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), requestedBackend: angleBackend, launchArgs, chromium: browser.version(), errors, executionErrors, responseFailures, failure: error instanceof Error ? error.message : String(error) }, null, 2));
+  throw error;
 } finally {
   await browser.close();
   await new Promise<void>(resolve => server.close(() => resolve()));

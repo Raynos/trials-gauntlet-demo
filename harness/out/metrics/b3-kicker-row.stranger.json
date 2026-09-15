@@ -6,139 +6,90 @@
     1,
     2
   ],
-  "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "74f5de4d",
-  "updatedAt": "2026-09-15T00:40:48.064Z",
+  "physics": "production-Game-v2",
+  "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
+  "updatedAt": "2026-09-15T17:45:09.278Z",
   "includeStale": false,
   "sessions": [
     {
-      "sessionId": "b3-kicker-row-r5-s1-20260914-192920",
-      "agent": "s1",
+      "sessionId": "b3-kicker-row-20260915-123737",
+      "agent": "blender-r4-s1",
       "status": "done",
       "stale": false,
-      "srcFingerprint": "74f5de4d",
-      "strangerAttempts": 2,
+      "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
+      "replayVerified": true,
+      "strangerAttempts": 1,
       "cleared": true,
-      "finishTime": 43.1333,
-      "calls": 13,
-      "wallMs": 269317,
-      "firstCheckpointCalls": 2,
+      "finishTime": 36.21666666666667,
+      "calls": 28,
+      "wallMs": 272278,
+      "firstCheckpointCalls": 3,
       "faultsByCheckpoint": [
         0,
         0,
         0,
-        1,
+        0,
         0
       ],
       "bestAttempt": {
-        "n": 2,
+        "n": 1,
         "cleared": true,
         "x": 471.8,
-        "startTick": 3219,
-        "endTick": 5506,
-        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r5-s1-20260914-192920.json"
+        "startTick": 0,
+        "endTick": 4710,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-123737.json"
       },
-      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r5-s1-20260914-192920.json",
-      "deaths": [
-        {
-          "n": 1,
-          "endedBy": "fault",
-          "reason": "crash",
-          "x": 348.092,
-          "checkpoint": 2,
-          "obstacle": null,
-          "calls": 7
-        }
-      ]
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-123737.json",
+      "deaths": []
     },
     {
-      "sessionId": "b3-kicker-row-r5-s2-20260914-192920",
-      "agent": "s2",
+      "sessionId": "b3-kicker-row-20260915-124041",
+      "agent": "blender-r4-s2",
       "status": "done",
       "stale": false,
-      "srcFingerprint": "74f5de4d",
-      "strangerAttempts": 4,
+      "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
+      "replayVerified": true,
+      "strangerAttempts": 1,
       "cleared": true,
-      "finishTime": 61.4167,
+      "finishTime": 37.233333333333334,
       "calls": 24,
-      "wallMs": 155716,
-      "firstCheckpointCalls": 2,
+      "wallMs": 234405,
+      "firstCheckpointCalls": 3,
       "faultsByCheckpoint": [
         0,
-        2,
-        1,
+        0,
+        0,
         0,
         0
       ],
       "bestAttempt": {
-        "n": 4,
+        "n": 1,
         "cleared": true,
         "x": 471.8,
-        "startTick": 4183,
-        "endTick": 7697,
-        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r5-s2-20260914-192920.json"
+        "startTick": 0,
+        "endTick": 4829,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-124041.json"
       },
-      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r5-s2-20260914-192920.json",
-      "deaths": [
-        {
-          "n": 1,
-          "endedBy": "fault",
-          "reason": "crash",
-          "x": 93.304,
-          "checkpoint": 0,
-          "obstacle": null,
-          "calls": 4
-        },
-        {
-          "n": 2,
-          "endedBy": "fault",
-          "reason": "crash",
-          "x": 95.198,
-          "checkpoint": 0,
-          "obstacle": null,
-          "calls": 6
-        },
-        {
-          "n": 3,
-          "endedBy": "fault",
-          "reason": "crash",
-          "x": 239.162,
-          "checkpoint": 1,
-          "obstacle": null,
-          "calls": 14
-        }
-      ]
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-124041.json",
+      "deaths": []
     }
   ],
   "completed": 2,
   "clearedCount": 2,
-  "medianAttempts": 3,
-  "medianFinishTime": 52.275,
-  "medianCalls": 18.5,
-  "medianWallMs": 212516.5,
+  "medianAttempts": 1,
+  "medianFinishTime": 36.725,
+  "medianCalls": 26,
+  "medianWallMs": 253341.5,
   "pass": true,
   "deaths": {
-    "total": 4,
-    "byReason": {
-      "crash": 4
-    },
-    "byObstacle": [
-      {
-        "obstacle": "ground",
-        "count": 4,
-        "xs": [
-          348.1,
-          93.3,
-          95.2,
-          239.2
-        ]
-      }
-    ],
+    "total": 0,
+    "byReason": {},
+    "byObstacle": [],
     "byCheckpoint": [
       0,
-      2,
-      1,
-      1,
+      0,
+      0,
+      0,
       0
     ]
   }

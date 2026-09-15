@@ -423,8 +423,13 @@ export function riderProfileInertia(mass: number): number {
 }
 /** Body angle zero is the authored neutral torso, 40 degrees above chassis-forward. */
 export const RIDER_TORSO_REST = RIDER_PROFILE.poses[1].torso * PI / 180;
+/** Minimum interior elbow opening (145 degrees maximum flexion), a declared game joint stop.
+ * With the fixed .12m shoulder/wrist side separation this keeps the arm pole projection above
+ * .247 in norm; its singular direction occurs at .152263m reach, below this .183713m stop. */
+export const RIDER_ELBOW_MIN = 35 * PI / 180;
 /** Unilateral limb limits. The 3D side separation is removed from the planar solver reach. */
 export const RIDER_REACH = {
+  armMin: Math.sqrt(CH.upperArm ** 2 + CH.forearm ** 2 - 2 * CH.upperArm * CH.forearm * cos(RIDER_ELBOW_MIN) - (RIDER_PROFILE.grip.z - CH.shoulderHalf) ** 2),
   armMax: Math.sqrt(((CH.upperArm + CH.forearm) * 0.995) ** 2 - (RIDER_PROFILE.grip.z - CH.shoulderHalf) ** 2),
   legMax: Math.sqrt(((CH.thigh + CH.shin) * 0.995) ** 2 - (RIDER_PROFILE.ankle.z - CH.hipHalf) ** 2),
   // Interior knee angle >= 40 degrees (140 degrees flexion); this is a joint stop, not a COM clamp.

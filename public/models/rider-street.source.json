@@ -1,13 +1,13 @@
 {
   "source": "assets/blender/source/rider-street.blend",
-  "sourceSha256": "5daa71da5f1f8cb2d39fb7d3fc0aa0eadd1ba3a74fd350b69a4b940683104376",
-  "exportSha256": "a8821c681c0d92c9a52e607bf498a474aff9d162f704c8b1c8e4c748e01a1e3d",
+  "sourceSha256": "153e1e778efd5cc0b4c5d5bf4725a1fe6a386d50c63eebbd5a7efafc17928ff1",
+  "exportSha256": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6",
   "outfit": "street",
   "lod": false,
   "verified": {
-    "bytes": 794352,
-    "triangles": 8621,
-    "vertices": 7163,
+    "bytes": 803080,
+    "triangles": 8657,
+    "vertices": 7200,
     "bones": 19,
     "clips": [
       "crouch",
@@ -23,7 +23,7 @@
       "rider_rookie",
       "rider_pro"
     ],
-    "maxWeightError": 2.9802322387695312e-08,
+    "maxWeightError": 8.940696716308594e-08,
     "loadedWeightError": 2.9802322387695312e-08
   }
 }

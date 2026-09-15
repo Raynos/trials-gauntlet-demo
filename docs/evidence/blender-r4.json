@@ -1,0 +1,3048 @@
+{
+  "round": 4,
+  "date": "2026-09-15",
+  "status": "WIP; mission unfinished; no merge, push or deployment",
+  "checks": {
+    "typecheck": "pass",
+    "eslint": "pass",
+    "vitest": {
+      "failed": 18,
+      "passed": 686,
+      "todo": 11,
+      "filesFailed": 6,
+      "filesPassed": 50
+    },
+    "checkLog": {
+      "path": "harness/out/blender/r4-check.log",
+      "sha256": "7d0d600f263548ffc5441f2ea3bb90833356e8a3dc8250910997772f73895ff5"
+    },
+    "failures": [
+      "src/physics/v2/feel.test.ts > static (F1, \u00a75) > sits at rest at static sag; rear sag 28-32 %",
+      "src/physics/v2/feel.test.ts > brakes (\u00a78) > neutral: 10 -> 0 in <= 7 m, rear lifts <= 0.6 s, pitch >= -25 deg (a settling stoppie); hard-forward endos",
+      "src/physics/v2/feel.test.ts > air control (\u00a79.4, \u00a714.2) > 0.5 s at 8 / 14 / 20 m/s: lean -1 +25..+40, lean +1 -25..-40, throttle +8..+15 at 8 m/s falling to ~0 at the limiter, brake -12..-40 rising with speed, none within +-5",
+      "src/physics/v2/r2.test.ts > the hop (R2 decision d; \u00a79.5, \u00a714.2, \u00a714.3) > reference flat hop from a standing start (0.3 s preload, full-travel snap held 0.22 s, 0.1 s tuck): rear apex 0.45-0.65 m, front leaves first, lands near level; both-wheels-off is 0.29 s against the 0.35-0.6 band (the front lands first: the bike noses down through the flight, see physics.md)",
+      "src/physics/v2/r2.test.ts > landing absorption (R2 decision d; \u00a79.5) > a 1.5 m flat drop at 6 m/s, level: the rear compresses >= 80 % and returns to sag, the rider sinks and comes back, no fault; a 3 m drop with the rider forward bottoms out with a bounded buck (no fault, rebound < 0.15 m, pitch within +-30); at lean 0 the 2 m drop pogos 0.2 m and 2.5-3 m loops (R3)",
+      "src/physics/v2/r2.test.ts > lab-physics-test (\u00a715) > a correct hop at 8-9 m/s gets onto the ledge (+0.4 m across the 3 m pit) and rides on - the rear meets the ledge corner and rolls over it (the >= 0.1 m clear-air margin is not met, see the comment); rolling it off at the same speed puts the front wheel into the ledge face and endos (\u00a715 called the miss survivable; it is not on this plant - a crash, never a clear)",
+      "src/physics/v2/r3.test.ts > landing (R3 decision 1): the intent gate separates a landing recovery from the hop push > drops of 1.5 / 2 / 3 m at 6 and 12 m/s, lean 0 and +0.5, both classes: land and ride away, no fault, rebound < 0.15 m, pitch within -35..+35 (R2: 2 m at lean 0 rebounded 0.6 m, 2.5-3 m looped)",
+      "src/physics/v2/r3.test.ts > climbs with the Trials technique (R3 decision 3) > rookie tops a 4 m 45 deg plank from a crawl (2 m/s) and at 5 m/s: front rolls onto the face at neutral, gas, then the weight is thrown to +1; 50 deg needs 6 m/s; pro table printed (its momentum rows 55-60 are not made by this controller: the base transition at 6-10 m/s, not the geometry, is where it fails)",
+      "src/physics/v2/r3.test.ts > lab-physics-test hop per class (R3 decision 5) > the lip hop at 7 / 8 / 9 m/s: clears onto the ledge on both classes at 8-9; the margin over the ledge corner is printed (spec wants >= 0.1 m of clear air)",
+      "src/physics/v2/r3.test.ts > cost (R3 decision 7) > riding: <= 5 us/tick p95 over 20k ticks (node)",
+      "src/physics/v2/r4.test.ts > R4 mechanism 2: the round-8 \"air-throttle kick\" is the rider pose swing, not the throttle > a rear touchdown pitched 20 deg above a 20 deg ramp passes sin(20) of the normal impulse rigidly through the slider: <= 60 deg/s per tick at 1-2 m/s of approach, gas on or off (genuine, a landing, not a solver spike)",
+      "src/physics/v2/r4.test.ts > R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > a 20 deg slope lowers the front-lift threshold from ~0.6 g to ~0.22 g: raw (Pro, or the Rookie with the assist off) full gas at lean 0 wheelies 40-55 deg over the slope and leaves a 6 m lip at 65-80 deg nose-up rotating 150+ deg/s",
+      "src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > Rookie, free air at 10 m/s: releasing lean -1 -> 0 kicks <= 120 deg/s (R4: +245) in steps <= 15 deg/s per tick (R4: 43); with gas on top <= 125; the limit reads 1 on the HUD. The held-lean rows are K_att's and move little (0 -> -1: rate at 0.5 s 171 -> ~153, angle 33 -> ~31)",
+      "src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > grounded rows hold: the reference hop (snap ramping past take-off) and the landing table are identical with the limit on and off (the intent gate carries a ground-started throw through the air; a still target at landing keeps the R3 cap)",
+      "src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > continuous: the limit blends in over 0.1 s of both-wheels-off and out over 0.1 s after the first touch - never a step > dt/0.1 per tick; a lean pressed while airborne is limited from its first tick (no escalation through the travel it allows)",
+      "src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > cost: a limited flight and its landing tick at <= 5 us/tick p50 (node, shared host)",
+      "src/physics/v2/world.test.ts > performance > riding: \u00b5s/tick p95 <= 10 over 20k ticks (node, \u00a714.1)",
+      "src/physics/v2/world.test.ts > performance > ragdolling: \u00b5s/tick p95 <= 80 (crash every 2.5 s)"
+    ],
+    "separateBuild": "pass",
+    "buildLog": {
+      "path": "harness/out/blender/r4-final-build.log",
+      "sha256": "1ae3cfcdb453e7fadf3e28f7b6cc98d57236a7f903a25badd3e4d3a9e20e0ad5"
+    }
+  },
+  "physics": {
+    "minimumElbowOpeningDegrees": 35,
+    "projectedPoleNormLowerBound": 0.247032785,
+    "poseMapAndAuthoredTargets": "unchanged from round3; extra physical stop excludes singular domain",
+    "savedX1Fixture": {
+      "path": "src/physics/v2/fixtures/x1-elbow-pole.json",
+      "sha256": "2be8478da244f5ecd4d6f72337d27898e31fdd34cd4841643be46108a1eb9508"
+    },
+    "productionCensus": {
+      "report": {
+        "path": "harness/out/rig-physics/round4-rider-census.json",
+        "sha256": "9fed412e7edc3fa0f97a28cbb19268e7354752f06b72b3be735fb7a670991fad"
+      },
+      "recordings": 50,
+      "inputTicks": 206359,
+      "sourceSha256": {
+        "src/physics/v2/bike.ts": "3358aa116da34c02c7c4a20018f212d89e9d7f34ffb0306893b51ba60ada669b",
+        "src/physics/v2/rider.ts": "271813e14c9238b74bb403fcc528aab987522f12c63336f56ededfa03e198eaa",
+        "src/physics/v2/tuning.ts": "833cdaf20720718ef775af378056394ad3788578a08a3c4c3595a2a387d39a72",
+        "src/game/game.ts": "96ee5a9ad3fd1d2810008c8090aa80a1b5d5fe06977e32b5d27af114c3fdf271",
+        "harness/inputs/b1-first-ride/bot-3-pro.json": "918193e93f5f6d34d1ad635b51c39dfe56ee8ef198e6cb82d48ffb9868ee003a",
+        "harness/inputs/b1-first-ride/bot-3.json": "029aa8bea4906ceb68fa730fc6bf247c4d118dacf3611054487d90e1bd835849",
+        "harness/inputs/b2-lean-back/bot-3-pro.json": "9dbc5863ec62736d2102967108cf438f19a848528617a4ca6704401e0491a4dd",
+        "harness/inputs/b2-lean-back/bot-3.json": "5e80676bea0a08b900a5776863f9ea84fceeb158888b415058c804250be0d6ad",
+        "harness/inputs/b3-kicker-row/bot-3-pro.json": "77596d24404d0adf53ea88b936359284d1dece9d2dba4e177f70084de9d723cf",
+        "harness/inputs/b3-kicker-row/bot-3.json": "31688bdc713042d3551fd2c28ad3bbdbe2d80349d30c10e47907a41ce7f8aa00",
+        "harness/inputs/e1-uphill-weight/bot-3-pro.json": "3b1f04f69b9e4bdf57dbfcb1f4733107779beb8c9eaa77358a460c52d749b140",
+        "harness/inputs/e1-uphill-weight/bot-3.json": "f9c4544f1e1b31c9a69fbf2460780b8db037026c4e24060f583a5b29531f2eed",
+        "harness/inputs/e2-rear-wheel-first/bot-3-pro.json": "6d093042503f78db68ed24a96babe8d83d4590538d375c18332e709878233a58",
+        "harness/inputs/e2-rear-wheel-first/bot-3.json": "c4534bed90f98a027124d393183c1fc2a7cc028ff2182d99c6fe68cfb83f5b1e",
+        "harness/inputs/e3-stairway/bot-3-pro.json": "f8c58d6a7414404dd4e4d0c93bc03383e265129486bcd6fe2e54ee3735c097c4",
+        "harness/inputs/e3-stairway/bot-3.json": "9074cc3b62ec2471e4ca3505792d8670319bf3f3fd2b7d6de55f38654947aa0e",
+        "harness/inputs/flat-test/bot-3-pro.json": "38d5c2c8ea46d2f1985a7758067a60a4b609b0af7ac5d9bd41f472285e469c1c",
+        "harness/inputs/flat-test/bot-3.json": "90664901cf7abd6773c93f99b295c9bc3d5621bc9411c757e6736c7dbb61ce71",
+        "harness/inputs/gap-test/bot-3-pro.json": "1e661e9dff2fadd66c2529fbbf9f11f16a7537d15e5f079eea952d349778820f",
+        "harness/inputs/gap-test/bot-3.json": "aa12a55654ddf76481d95455acc9fe7738b6065eafb883a0c40d8e4806fdbef4",
+        "harness/inputs/h1-wheelie-wire/bot-3-pro.json": "65dc88b487b2310cf190636fa38aa14185efd32823f3b3ba1ce72c6e8ae398a8",
+        "harness/inputs/h1-wheelie-wire/bot-3.json": "6574905935484167e54d664c3b648f003e532c50fedfc2be4f4af0c7d9fd8c97",
+        "harness/inputs/h2-gap-chain/bot-3-pro.json": "acdecc6a575bcfd3e15e61e15bca1537acbf729ea599015617b174eee6ddcc44",
+        "harness/inputs/h2-gap-chain/bot-3.json": "c02e74b2dae1acf0b97144d423f2ae4aeb53559a431fb6d45c113716baab08fb",
+        "harness/inputs/h3-fire-line/bot-3-pro.json": "94cd3a0eb9153b77c8b06d0f987b7baee0b1d3d68fdc2b105ddc89ebe312f82c",
+        "harness/inputs/h3-fire-line/bot-3.json": "72051ed433fc04652954cde806cdb047369150132566ef58762204f5ab8908aa",
+        "harness/inputs/lab-flat-200/bot-3-pro.json": "16d1563609b7da9fdfd52f51284b1f0115df985e530556809e88ab92d5a2852d",
+        "harness/inputs/lab-flat-200/bot-3.json": "5b6ea9b856feb3c9084d320937771938d6537ea615e0e471aba00976b5f3c891",
+        "harness/inputs/lab-physics-test/bot-3-pro.json": "b086cc6fe35c82a1ec7904f45cdacfe8a2d00600abd6f34a6e557a30e1ae69a9",
+        "harness/inputs/lab-physics-test/bot-3.json": "226e20dd0a581341818b8e4583859eeaeee14c8890f6a306c438894a24198ca0",
+        "harness/inputs/m1-hop-up/bot-3-pro.json": "0d3bf58a6e46279cb3c90b8af17974c301d5372a0c3018922de8bb8aa0b7a0f9",
+        "harness/inputs/m1-hop-up/bot-3.json": "889c415b9187d6f02cac9273fb9a5a5d59cc24ce9eeeb8e541b7dd0bd345baa0",
+        "harness/inputs/m2-drum-roll/bot-3-pro.json": "829230b75351c3624dc910879302863eda7a4de846be7b5bb80cad32775ece4e",
+        "harness/inputs/m2-drum-roll/bot-3.json": "973b178e85932b4b54948b38bfb39a037e8264f60568acee8e6a04b618dafbf2",
+        "harness/inputs/m3-see-saw/bot-3-pro.json": "5eba50d0f56453f3371f3cf5a946023bad975b1a7d49ff0e9c9a2069f1d0e44a",
+        "harness/inputs/m3-see-saw/bot-3.json": "cecb4d86ffee8c469ab10302c50113041acbc60e7c21ff8bec9c072d3c150fd0",
+        "harness/inputs/x1-vertical-limit/bot-3-pro.json": "76f0b3d60a898fffb2832f23d42e296df735904b710c9a36b0a47cfbf4d109ae",
+        "harness/inputs/x1-vertical-limit/bot-3.json": "c6318780daec0d0ac23ca16f76113e6b783d44b69b904bf9a052c176ead75c6c",
+        "harness/inputs/x2-pipe-dream/bot-3-pro.json": "383860b5c6b1eac808386376b29fe42732b67526921168283d88ff9fe15d11d6",
+        "harness/inputs/x2-pipe-dream/bot-3.json": "9bfef86386af67aa40772a9c7e8b01d35d6dc9b3338e1da93e97ec8d4c3a412e",
+        "harness/inputs/x3-gauntlet/bot-3-pro.json": "91edbdaef9d4de4368495aa2b606e89f291047ef989797c18d807d5bbfdd8563",
+        "harness/inputs/x3-gauntlet/bot-3.json": "c2e80bdf28757a5cd9afa1d92d512d67fe22f99a9861d89eebc91334646d6fad",
+        "harness/inputs/flat-test/crash.json": "7b79d3756c85ade6dfa858e893347564735f2e82e1df43d4b4d68b9e3c6fe6b0",
+        "harness/inputs/flat-test/restart-tap.json": "d4ea342a70ac7252dd3387f1ff675fb287ebac253da7faed9f06c4abd4ef4c18",
+        "harness/inputs/hero-r3/b1-first-ride-pro.rec.json": "ca06c2a2ea54b8b110ea37beabdcc7f24044afe4dcdb8000af11ce831a8ca74a",
+        "harness/inputs/hero-r3/b1-first-ride-rookie.rec.json": "df25770558935f48a1506c65a067871388758ad775b24e7d6015c9b73167eb10",
+        "harness/inputs/hero-r3/b3-kicker-row-rookie.rec.json": "ee9f1e7e34240262113d619fc44946cb4830ee3f3aee4d26a409dbd5509e57ba",
+        "harness/inputs/hero-r3/crash-restart.json": "d5f233b982bbe4446eaaf0cdd7452a698605d1511f8fdcd02f69c6d0a963b4de",
+        "harness/inputs/hero-r3/e2-rear-wheel-first-rookie.rec.json": "9d3ff552825eb58f0d2efba8dfd10e89c739a759af715c517592585f541dedaa",
+        "harness/inputs/hero-r3/hop-binary.json": "3f51d7016f60dfd7425c03b09655e5b10647ba6dd7cdbe0a18e76b8e4c98b06e",
+        "harness/inputs/hero-r3/m1-hop-up-pro.rec.json": "6700190fa70ddf0819578b238b65b2458d7296b9895f8644a1a272ddf1692188",
+        "harness/inputs/hero-r3/m1-hop-up-rookie.rec.json": "82efa2079c075fde806e6e3ea00dea3bad0482812e3349c1cbb1f018f97629ba",
+        "harness/inputs/b1-first-ride/stranger-b1-first-ride-blender-r3b-s1-20260915-120338.json": "369ca8755e8612f9b660f359b3e4d452c09a098ba6e23ab60297b22397336dcb",
+        "harness/inputs/b1-first-ride/stranger-b1-first-ride-blender-r3b-s2-20260915-120338.json": "f9dac88c09ec42fae9a084847575c0028c301ab9d1d2776d1ecb71e752565fba"
+      },
+      "repeatedBytesEqual": true,
+      "attachedSamples": 163273,
+      "inverseResidualMax": 9.999421009602672e-10,
+      "gapMinima": [
+        {
+          "value": -2.2243376265329573e-06,
+          "inputTick": 4467,
+          "recording": "harness/inputs/h3-fire-line/bot-3.json"
+        },
+        {
+          "value": -5.564677397762452e-07,
+          "inputTick": 335,
+          "recording": "harness/inputs/m1-hop-up/bot-3-pro.json"
+        },
+        {
+          "value": -9.778249521752436e-07,
+          "inputTick": 2885,
+          "recording": "harness/inputs/x3-gauntlet/bot-3-pro.json"
+        },
+        {
+          "value": -0.0026824963027400894,
+          "inputTick": 616,
+          "recording": "harness/inputs/gap-test/bot-3-pro.json"
+        },
+        {
+          "value": -9.838075194501528e-07,
+          "inputTick": 4902,
+          "recording": "harness/inputs/x1-vertical-limit/bot-3.json"
+        },
+        {
+          "value": -0.002088682036059941,
+          "inputTick": 617,
+          "recording": "harness/inputs/gap-test/bot-3-pro.json"
+        },
+        {
+          "value": 0.029559681375051383,
+          "inputTick": 791,
+          "recording": "harness/inputs/e2-rear-wheel-first/bot-3-pro.json"
+        },
+        {
+          "value": -9.273456662017843e-07,
+          "inputTick": 3810,
+          "recording": "harness/inputs/h3-fire-line/bot-3-pro.json"
+        }
+      ]
+    },
+    "freshFiveCensus": {
+      "report": {
+        "path": "harness/out/rig-physics/round4-fresh-rider-census.json",
+        "sha256": "4c2494d42124dc62e7186cdec1bee977099358378427adc1981647a731f9d827"
+      },
+      "recordings": 5,
+      "inputTicks": 21631,
+      "sourceSha256": {
+        "src/physics/v2/bike.ts": "3358aa116da34c02c7c4a20018f212d89e9d7f34ffb0306893b51ba60ada669b",
+        "src/physics/v2/rider.ts": "271813e14c9238b74bb403fcc528aab987522f12c63336f56ededfa03e198eaa",
+        "src/physics/v2/tuning.ts": "833cdaf20720718ef775af378056394ad3788578a08a3c4c3595a2a387d39a72",
+        "src/game/game.ts": "96ee5a9ad3fd1d2810008c8090aa80a1b5d5fe06977e32b5d27af114c3fdf271",
+        "harness/out/blender/hero-r4-bot/diverse-final/b1-first-ride-pro.rec.json": "2f5bb01e056068573aa67e6df1aba8ca58a320300e11c321f1a06ab52431a2db",
+        "harness/out/blender/hero-r4-bot/diverse-final/b3-kicker-row-rookie.rec.json": "05fdbfe50cc29e2b8e31727af319868ce886ef331e2f440c3a1c2a2d4b082e5d",
+        "harness/out/blender/hero-r4-bot/diverse-final/e2-rear-wheel-first-pro.rec.json": "3c20c416e754589b8b242ed8e07d26a61387340cea1156e0a4e0e3fede4e9c7a",
+        "harness/out/blender/hero-r4-bot/diverse-final/m1-hop-up-pro.rec.json": "e107d53dfd43227dbb48f93c8db2eb47d936b95eb57d473ec9fcd76c85bfa96d",
+        "harness/out/blender/hero-r4-bot/diverse-final/m1-hop-up-rookie.rec.json": "4b4bab0db4ebd1f0bd511a83cf087a3bb9968a364300831896a9147fa5109a34"
+      },
+      "repeatedBytesEqual": true,
+      "attachedSamples": 21631,
+      "inverseResidualMax": 9.995878853439877e-10,
+      "gapMinima": [
+        {
+          "value": -9.606266840878064e-07,
+          "inputTick": 4275,
+          "recording": "harness/out/blender/hero-r4-bot/diverse-final/e2-rear-wheel-first-pro.rec.json"
+        },
+        {
+          "value": 0.058211758683781256,
+          "inputTick": 2899,
+          "recording": "harness/out/blender/hero-r4-bot/diverse-final/b3-kicker-row-rookie.rec.json"
+        },
+        {
+          "value": -4.7133627822937285e-07,
+          "inputTick": 2295,
+          "recording": "harness/out/blender/hero-r4-bot/diverse-final/e2-rear-wheel-first-pro.rec.json"
+        },
+        {
+          "value": -3.0349227320147776e-07,
+          "inputTick": 2837,
+          "recording": "harness/out/blender/hero-r4-bot/diverse-final/b3-kicker-row-rookie.rec.json"
+        },
+        {
+          "value": 0.29750714195728234,
+          "inputTick": 4273,
+          "recording": "harness/out/blender/hero-r4-bot/diverse-final/e2-rear-wheel-first-pro.rec.json"
+        },
+        {
+          "value": -9.011161363758902e-07,
+          "inputTick": 948,
+          "recording": "harness/out/blender/hero-r4-bot/diverse-final/b3-kicker-row-rookie.rec.json"
+        },
+        {
+          "value": 1.061754445170106,
+          "inputTick": 2866,
+          "recording": "harness/out/blender/hero-r4-bot/diverse-final/b3-kicker-row-rookie.rec.json"
+        },
+        {
+          "value": -9.066372873567374e-07,
+          "inputTick": 2300,
+          "recording": "harness/out/blender/hero-r4-bot/diverse-final/e2-rear-wheel-first-pro.rec.json"
+        }
+      ]
+    },
+    "remainingDefect": "New coupled stop leaves ankle/hip gaps -0.0026824963/-0.0020886820 rad at gap-test Pro ticks616/617; not waived. H3 Rookie extended-arm deficit2.2243376e-6m.",
+    "scratchFallback": "NOT in production. Bounded coupled continuation only after existing solve leaves gap<-1e-6;50/206359 corpus ticks activate. Requires next-round implementation and review.",
+    "research": {
+      "path": "harness/out/rig-physics/ROUND4_RIDER_RESEARCH.md",
+      "sha256": "b8c5cf947dda45436eeb819e7981caaea6ad2d0e6751894b70fb1c6057c664a1"
+    },
+    "inactiveStopCost": [
+      {
+        "variant": "baseline",
+        "p50": 6.374999999934516,
+        "p95": 15.99999999996271,
+        "mean": 8.215907933332806,
+        "hash": "ad6456cc77302cc702dc387cdaa13f8b7b12031d01ff23b7ff2a6394aa2c37f1"
+      },
+      {
+        "variant": "candidate",
+        "p50": 6.459000000177184,
+        "p95": 15.917000000172266,
+        "mean": 8.304036766666071,
+        "hash": "ad6456cc77302cc702dc387cdaa13f8b7b12031d01ff23b7ff2a6394aa2c37f1"
+      },
+      {
+        "variant": "candidate",
+        "p50": 6.458000000066022,
+        "p95": 16.208000000005995,
+        "mean": 8.24223136666674,
+        "hash": "ad6456cc77302cc702dc387cdaa13f8b7b12031d01ff23b7ff2a6394aa2c37f1"
+      },
+      {
+        "variant": "baseline",
+        "p50": 6.374999999934516,
+        "p95": 15.208000000029642,
+        "mean": 8.060764300000612,
+        "hash": "ad6456cc77302cc702dc387cdaa13f8b7b12031d01ff23b7ff2a6394aa2c37f1"
+      },
+      {
+        "variant": "baseline",
+        "p50": 6.458999999722437,
+        "p95": 15.750000000025466,
+        "mean": 8.17425753333343,
+        "hash": "ad6456cc77302cc702dc387cdaa13f8b7b12031d01ff23b7ff2a6394aa2c37f1"
+      },
+      {
+        "variant": "candidate",
+        "p50": 6.541000000197528,
+        "p95": 15.707999999904132,
+        "mean": 8.254284499999521,
+        "hash": "ad6456cc77302cc702dc387cdaa13f8b7b12031d01ff23b7ff2a6394aa2c37f1"
+      }
+    ]
+  },
+  "bot": {
+    "sourceManifestsEqual": true,
+    "results": [
+      {
+        "trackId": "b1-first-ride",
+        "bike": "pro",
+        "outcome": "finished",
+        "attempts": 1,
+        "faults": 0,
+        "runTime": 37.11666666666667,
+        "inputTicks": 4454,
+        "sourceUnchanged": true,
+        "replayMismatch": null,
+        "searchMismatch": null,
+        "finalEqual": true,
+        "runTimeBytes": "efeeeeeeee8e4240",
+        "recordingSha256": "2f5bb01e056068573aa67e6df1aba8ca58a320300e11c321f1a06ab52431a2db",
+        "repeatedSnapshotSha256": "0d9b562a9749a086e1c5edeb8a28c51e396be2a426c3606b48bc3303d51f2311"
+      },
+      {
+        "trackId": "b3-kicker-row",
+        "bike": "pro",
+        "outcome": "finished",
+        "attempts": 1,
+        "faults": 0,
+        "runTime": 32.875,
+        "inputTicks": 3945,
+        "sourceUnchanged": true,
+        "replayMismatch": null,
+        "searchMismatch": null,
+        "finalEqual": true,
+        "runTimeBytes": "0000000000704040",
+        "recordingSha256": "747c1c13d727105378511a4a153c01f63cde4954df76b24fa16c4ba958f742eb",
+        "repeatedSnapshotSha256": "8ba5421187311914788aec1faaed85f0d467c031f9d16ae7e06fe7e92e600028"
+      },
+      {
+        "trackId": "b3-kicker-row",
+        "bike": "rookie",
+        "outcome": "finished",
+        "attempts": 1,
+        "faults": 0,
+        "runTime": 33.80833333333333,
+        "inputTicks": 4057,
+        "sourceUnchanged": true,
+        "replayMismatch": null,
+        "searchMismatch": null,
+        "finalEqual": true,
+        "runTimeBytes": "7777777777e74040",
+        "recordingSha256": "05fdbfe50cc29e2b8e31727af319868ce886ef331e2f440c3a1c2a2d4b082e5d",
+        "repeatedSnapshotSha256": "c2238e3e75665d7884176d87d85fcbafb214fc536fc71ca4464b193d2cd3cd38"
+      },
+      {
+        "trackId": "e2-rear-wheel-first",
+        "bike": "pro",
+        "outcome": "finished",
+        "attempts": 1,
+        "faults": 0,
+        "runTime": 42.425,
+        "inputTicks": 5091,
+        "sourceUnchanged": true,
+        "replayMismatch": null,
+        "searchMismatch": null,
+        "finalEqual": true,
+        "runTimeBytes": "6666666666364540",
+        "recordingSha256": "3c20c416e754589b8b242ed8e07d26a61387340cea1156e0a4e0e3fede4e9c7a",
+        "repeatedSnapshotSha256": "f8506c542adb6313230ae99bceb8213d7941edcf1c2c1ada935d38713f2b811f"
+      },
+      {
+        "trackId": "m1-hop-up",
+        "bike": "pro",
+        "outcome": "finished",
+        "attempts": 1,
+        "faults": 0,
+        "runTime": 31.583333333333332,
+        "inputTicks": 3790,
+        "sourceUnchanged": true,
+        "replayMismatch": null,
+        "searchMismatch": null,
+        "finalEqual": true,
+        "runTimeBytes": "5555555555953f40",
+        "recordingSha256": "e107d53dfd43227dbb48f93c8db2eb47d936b95eb57d473ec9fcd76c85bfa96d",
+        "repeatedSnapshotSha256": "55e78f09349ac7f79af3192bb83be424c02ff8993346bdfd37dde2d9d712323e"
+      },
+      {
+        "trackId": "m1-hop-up",
+        "bike": "rookie",
+        "outcome": "finished",
+        "attempts": 1,
+        "faults": 0,
+        "runTime": 35.325,
+        "inputTicks": 4239,
+        "sourceUnchanged": true,
+        "replayMismatch": null,
+        "searchMismatch": null,
+        "finalEqual": true,
+        "runTimeBytes": "9a99999999a94140",
+        "recordingSha256": "4b4bab0db4ebd1f0bd511a83cf087a3bb9968a364300831896a9147fa5109a34",
+        "repeatedSnapshotSha256": "5ca313caaf15cb38a68a8fde505f0176f053006091c0408972c8880d544c894a"
+      }
+    ],
+    "sourceSha256": {
+      "src/core/global.d.ts": "1f2767e2338eefb93ade7f17dbe657d70c9788dd34582f8aecce0b93d18c1d3a",
+      "src/core/hash.ts": "f758f4dfb8bcb640f4b6ce2db7700643fc17f13a4fe7fe27d4de8e12ae7ae2a0",
+      "src/core/index.ts": "dea1afac94ef91c32e5fcff1e51025d9c25989ad6846b0ef68f0fa718ece0662",
+      "src/core/loop.ts": "007652dc6e1f32f0b80b0fccfa1c2dc66ad57c7b9d621b91a10451382e14b6ac",
+      "src/core/replay.ts": "070bd25ce17a84d4364cf68e738d73b64656a310e6315f58973ad27e9ef64402",
+      "src/core/rng.ts": "776d0713e1a6714809ee97311d228f5bd33fef592b8ae60aba9d806f08312fd3",
+      "src/core/types.ts": "29b6a08926d92035c78b6c30f421080103b6ec857a3ca4c1e4fceacf46b2861e",
+      "src/game/app.ts": "269194116cdf12123a3518025880c13f4dbccec9b2f3535e91e3498d9c01ab46",
+      "src/game/flow.ts": "2a0968e484aed4549d48f3ca941b1ea96f78b31379877a4d85c4d45c6b28522b",
+      "src/game/game.ts": "96ee5a9ad3fd1d2810008c8090aa80a1b5d5fe06977e32b5d27af114c3fdf271",
+      "src/game/ghost.ts": "0d46ed005ca8bcc62a22072d8bd9ae58ca87ea363bf3c897d4b9ad91988313d6",
+      "src/game/hook.ts": "8b621cfd3f75c223141b4e3946a05041b9cb12979354847ae70fc38be74759e2",
+      "src/game/index.ts": "28ac3222af5ac3816f54dc7d6b1bb55c5df5f35ee92f2690c4de65d56d0d3afc",
+      "src/game/input/gamepad.ts": "be880bfb586865a6f4c6614b4d8bf375c969dd83d72db737f25c8ad96f6be6a1",
+      "src/game/input/index.ts": "982af85c34982c5c86b96330ed35e61fd053ae97e85ba6e5190254112cb9a178",
+      "src/game/input/keyboard.ts": "95c115fd4be79f3382c481a1d2fe9d1ad57b11e22eb1159d4ccc108dcf5d4787",
+      "src/game/input/mux.ts": "72bfcd3582a417fa062807f6c52b595e1c070d986add762241ccfafd3e9e6246",
+      "src/game/input/touch.ts": "36b914911b72b234afc1af20ad0de67e44f8dda52645f05c2463d757db315de7",
+      "src/game/input/types.ts": "b44ed9110cbddc7725b8ccadb98a7ae1e155f683ecb0ce302b073d8306f3e258",
+      "src/game/mockPhysics.ts": "3704a05a75fb9741482232465d9b650f401e62cd4dd075754786e4735d0c0993",
+      "src/game/navlog.ts": "f6efdd89284447035cfe2e023cb598e2be6c747ddd87d477c0cadef0184ac89d",
+      "src/game/pwa.ts": "78911938e02acc68ce81de7c46615d1256025f8f932559ede169335d121f36a2",
+      "src/game/raf.ts": "24a2c93fbaa28716c43ce59938862a152e2a6b1f199a3cde673c8749efd3af93",
+      "src/game/replay.ts": "bac8d9605e2ca0b2f03dd145e937699c373ced3911aa3807d84f4c17e430c684",
+      "src/game/rules.ts": "1cbd88cdc12ec944782a15122010aae077bdfe343a8c035ce07311e21054522a",
+      "src/game/telemetry.ts": "9e20f386f8368e5c80e410bb70b7503d96abc4308a491463c55bd886452bc23c",
+      "src/physics/bike.ts": "34510352158b4312877cc96060430fd5c8722f6fa6399489fb3c0af207919f16",
+      "src/physics/collision.ts": "50dc3d78a86d991164e6f391af29b491437c47245a8d75835891141669dfaf2c",
+      "src/physics/controllers/index.ts": "5db9db3f3b8234afbe488e3a37286a5e91009e2584f63124cb91cdd8c13925bb",
+      "src/physics/dmath.ts": "b0f5e4536ba39ad4d1e53e4da9a9b89412f75594e206815e7ccc08f726f2893e",
+      "src/physics/index.ts": "36c7ae2948508ceba4657b3d64f088ff50e65ea1a450c2018332c25b49f786cb",
+      "src/physics/testTracks.ts": "9c8fab04235d957675225c6e914e94213dfb11fd1d1fad4d645de4a40a55c668",
+      "src/physics/tools/trackSweep.ts": "732be3f1e6951c17f74b6a281dedef825dc0c6829c2ebcc97f244e5b341703c7",
+      "src/physics/tuning.ts": "745b4b6edcad08df9cdaffbc16d740bb3887adc5f3de8d67a69462dbc863d6a0",
+      "src/physics/v2/bike.ts": "3358aa116da34c02c7c4a20018f212d89e9d7f34ffb0306893b51ba60ada669b",
+      "src/physics/v2/engine.ts": "1b44c8c9551d75c36d0a8ee1ceaedde97d8bc3514d9451e41095f0dcafc9caee",
+      "src/physics/v2/rider.ts": "271813e14c9238b74bb403fcc528aab987522f12c63336f56ededfa03e198eaa",
+      "src/physics/v2/tuning.ts": "833cdaf20720718ef775af378056394ad3788578a08a3c4c3595a2a387d39a72",
+      "src/physics/v2/tyre.ts": "335b249e98295f708da1d3899527d09bd00b2a6b391de39b5e1fbfc7251b9498",
+      "src/tracks/author.ts": "6f3126657e312ddee9cb17f401af91c7464e2f3a88749072c634153186facc5c",
+      "src/tracks/compile.ts": "bc487c49d020c39cba6436500c9998ffee50e1408ec903ccc5408e7886ba13f7",
+      "src/tracks/courses/beginner.ts": "929d70d78610f750708f1f14cd1686c45184b7c00ee98281752828f1513589a8",
+      "src/tracks/courses/easy.ts": "b97617f649c0f1bbfa5b118219fb421b306f0ccbfd1d8a1a695308c04d0c5cd8",
+      "src/tracks/courses/extreme.ts": "b018f674eeffebf221a34dd4d88d897dc3b49822b03cce41f9c9abd71922ba8f",
+      "src/tracks/courses/hard.ts": "061f64c1f65056271a193d0cfe6b7594f637865315026be07bba8378241d22a5",
+      "src/tracks/courses/index.ts": "9f378e94b4632766efdb5fabf295c8c8510d106eb3359a7b063ee9e6fbe2f29e",
+      "src/tracks/courses/lab.ts": "a143168eced7303b03b77695a8e964d26af7e6261b5b32ca926a57dcfd160756",
+      "src/tracks/courses/medium.ts": "0e8b8df08ad803d629a9ec0a222505ea055c5a8f3f593534363cf258be526f5e",
+      "src/tracks/courses/test-tracks.ts": "a8be2d0767ff39552b4aa6a4e11f4b9fbc85ab0b4b7d3a71cd1c3408dcb61f20",
+      "src/tracks/describe.ts": "2fcd0a06b5ef8604e03450d5efd6b35c5973d65ab780ee5ab4f9c51f25b39d38",
+      "src/tracks/geometry.ts": "2698b394fb49145642576251ad56900e37ecc281f7a6cd30210fd643515e0be9",
+      "src/tracks/index.ts": "c790eaca85c007674874d83d7dd3e15867bfb7daeda33b38b1ca98416d5d3a8d",
+      "src/tracks/kinds.ts": "22bba597b581b16eeaf6243a951c71be264bb04b00781fd505b7065b8676b4a4",
+      "src/tracks/validate.ts": "aa92bd789c592b9690704c4d0dff3ba14a3b4cdd503f25bc3bb752cf9819bf8b",
+      "harness/bot/actions.ts": "e87c02f589f5f80576ed284c20898318b5aa46648267fe8c86dee3c579935437",
+      "harness/bot/beam.ts": "0acebb5e6eb68b69c5c81f8d159933fda0ff33a9c8274afd70acaf0b3e6b5e54",
+      "harness/bot/bot.ts": "fb0bb2a269fe60f1ae373dfa9e4f829f62eb4a9ef28aee379c5f18fe3d000459",
+      "harness/bot/play.ts": "f9558098f8fd488828eda3263c61559f6aca8dc07a702c93b80c987fb50a39af",
+      "harness/bot/score.ts": "4c0cdc18a77932af3b354c63ddbf4fe728db380497105ac885c1f9dbc76df2b1",
+      "harness/lib/args.ts": "a5fee0020da2aa8af6e4eb49580661bac040d1400328e1c593b08ebabba7e7a2",
+      "harness/lib/browser.ts": "03b62387cb53de001278fc2eda9adf81c66b21fd7f64decf5e7d05028a25016a",
+      "harness/lib/ffmpeg.ts": "4222e679ea02eb7751dc22c34cdd4fb6c4a127d166ab246821d534d2c6061490",
+      "harness/lib/golden.ts": "0d9bcde15f139234c97447ecbe79e6b96fe24a1bf9148961f760a865854b86db",
+      "harness/lib/hook.ts": "dac00b80216debf348cc927b78b64ba93eb1492e1313f110f4ede962a0b74177",
+      "harness/lib/index.ts": "134907279a8f57d9f91bef432c1ec50c8c9175ebd5e7efd4241ed1ba23c2dd3f",
+      "harness/lib/metrics.ts": "1f5294473d2e01a29aa97294105d13a97bad58f9b9bdc9acdb09ff2270465789",
+      "harness/lib/paths.ts": "5c18902dbd2d1fab11ba6893c29ee7508a2f78205e849c060f71f902ecd85fac",
+      "harness/lib/production-sim.ts": "fa114959150fea6964ab81931d9f5cffd56c45c8e8767fcf3a8c8806d15ec26d",
+      "harness/lib/recording.ts": "375d3d25c0f22cad3e48187a8332cf0e3aaf91b9a9b7c87b6f85691a711de4fd",
+      "harness/lib/report.ts": "7e732e54d0984e8a2cac99fd5c6fa941cddfe142c7c2e4cdeba0cc1816d554ab",
+      "harness/lib/rules.ts": "df96e69413e408524b34703168f22e21d30bfed44a2970aac7e6354b7ac73629",
+      "harness/lib/schema.ts": "f0ecbb8f28ccd067a36abd516c729b87eab87843de3239818dd614117ca93ed4",
+      "harness/lib/server.ts": "cc7ce514df9b6dd2c5bc3c063fb5a4089574917bf927490a68f5e5a6095e2e28",
+      "harness/lib/sim.ts": "51c9f26cf7146b68f52aab6d9cdbb767f2641a61a05e9422812e20a116a3c3b8",
+      "harness/lib/synth.ts": "1e5f73b5fdad8d1bde43f5d947b090fc2e9bccb0d90b46efa17d8939a409e220",
+      "harness/lib/verify.ts": "036b5b16696a49dfc2a33ca297a3d9d3194d4c1f6c274eb843a8579aca62039a",
+      "harness/hero-play.ts": "89fc4a648660f04ad67440718cc52ebc231a42ef723a2b5493ff47103ed911c0",
+      "package.json": "7a30f5741c20b71391edd49d38ecc0d30886bb09ab80972511c1dc5e69ddefa0",
+      "pnpm-lock.yaml": "2307aea31ffdac0b25a989a4d4f8656164f98703bf0811281e2fd968f439aac3"
+    }
+  },
+  "strangers": [
+    {
+      "sessionId": "b3-kicker-row-20260915-123737",
+      "trackId": "b3-kicker-row",
+      "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
+      "bike": "rookie",
+      "seed": 4115132233,
+      "cleared": true,
+      "strangerAttempts": 1,
+      "finishTime": 36.21666666666667,
+      "calls": 28,
+      "wallMs": 272278,
+      "replayVerified": true,
+      "replayFaults": 0,
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-123737.json",
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 0,
+        "endTick": 4710,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-123737.json"
+      },
+      "attemptsBand": [
+        1,
+        2
+      ],
+      "session": {
+        "path": "harness/out/stranger/b3-kicker-row/b3-kicker-row-20260915-123737/session.json",
+        "sha256": "3fcde8252c98ffc0f831857864eb2b2c85a2708cecbc3117a50ba09cfdb1180d"
+      },
+      "recordingSha256": "e4bc92564fa32d9757b0b8332597527b1230ce915a7ec84866e784fb3effb519"
+    },
+    {
+      "sessionId": "b3-kicker-row-20260915-124041",
+      "trackId": "b3-kicker-row",
+      "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
+      "bike": "rookie",
+      "seed": 4115132233,
+      "cleared": true,
+      "strangerAttempts": 1,
+      "finishTime": 37.233333333333334,
+      "calls": 24,
+      "wallMs": 234405,
+      "replayVerified": true,
+      "replayFaults": 0,
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-124041.json",
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 0,
+        "endTick": 4829,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-124041.json"
+      },
+      "attemptsBand": [
+        1,
+        2
+      ],
+      "session": {
+        "path": "harness/out/stranger/b3-kicker-row/b3-kicker-row-20260915-124041/session.json",
+        "sha256": "47bce6d1ba1a356681f37529eedd310963021293852ef7d30b2ae3ebc250b0f7"
+      },
+      "recordingSha256": "815b0b1e63b5d5222e9471f99e2de846812e08b9f5f70ae0be10e0afad786291"
+    },
+    {
+      "sessionId": "m1-hop-up-20260915-124509",
+      "trackId": "m1-hop-up",
+      "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
+      "bike": "rookie",
+      "seed": 1909798049,
+      "cleared": true,
+      "strangerAttempts": 8,
+      "finishTime": 133.38333333333333,
+      "calls": 54,
+      "wallMs": 406949,
+      "replayVerified": true,
+      "replayFaults": 7,
+      "recordingFile": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124509.json",
+      "bestAttempt": {
+        "n": 8,
+        "cleared": true,
+        "x": 481,
+        "startTick": 13044,
+        "endTick": 16266,
+        "recordingFile": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124509.json"
+      },
+      "attemptsBand": [
+        5,
+        9
+      ],
+      "session": {
+        "path": "harness/out/stranger/m1-hop-up/m1-hop-up-20260915-124509/session.json",
+        "sha256": "9ad209688595a2024c8835441d4edac40a4aafe5b9b0ca3408070fe15c0c9f7e"
+      },
+      "recordingSha256": "06f86777b4d6c1a997eea46f31028ddc7d38093b3ce8500fc86c16d131cd6592"
+    },
+    {
+      "sessionId": "m1-hop-up-20260915-124906",
+      "trackId": "m1-hop-up",
+      "srcFingerprint": "52793462b621d6a3ebd1e1ccd4366e650472b939492b8429cba1cdcb6c58c27e",
+      "bike": "rookie",
+      "seed": 1909798049,
+      "cleared": true,
+      "strangerAttempts": 8,
+      "finishTime": 87.09166666666667,
+      "calls": 43,
+      "wallMs": 1034327,
+      "replayVerified": true,
+      "replayFaults": 7,
+      "recordingFile": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+      "bestAttempt": {
+        "n": 8,
+        "cleared": true,
+        "x": 481,
+        "startTick": 8290,
+        "endTick": 10718,
+        "recordingFile": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json"
+      },
+      "attemptsBand": [
+        5,
+        9
+      ],
+      "session": {
+        "path": "harness/out/stranger/m1-hop-up/m1-hop-up-20260915-124906/session.json",
+        "sha256": "b61f64958746ba73bbe6e8cb5af098180764bba5849bb8dcbb9b10346944078c"
+      },
+      "recordingSha256": "a91c0c4c4ad1978f6ba857447b92ee7eacbcbe1cf2d1e046dd929486177c7518",
+      "wallTimeCaveat": "Includes initial agent-slot queue wait; not a reaction-time measurement."
+    }
+  ],
+  "riderPromotion": [
+    {
+      "outfit": "street",
+      "candidate": "harness/out/blender/connected-garments/rider-street-elbows-v4.blend",
+      "source": "assets/blender/source/rider-street.blend",
+      "sha256": "153e1e778efd5cc0b4c5d5bf4725a1fe6a386d50c63eebbd5a7efafc17928ff1",
+      "parentVerdict": "Accepted incremental shoulder/elbow continuity after native Blender and played full GLB hop/finish review; trousers and hood unchanged."
+    },
+    {
+      "outfit": "race",
+      "candidate": "harness/out/blender/connected-garments/rider-race-elbows-v3.blend",
+      "source": "assets/blender/source/rider-race.blend",
+      "sha256": "2ef9ef4df75b64cf729aa0751b7d6ff245ddde2991c4d0f0a2edd85f5da7e121",
+      "parentVerdict": "Accepted incremental shoulder/elbow continuity after native Blender and played full GLB hop/finish review; trousers and hood unchanged."
+    }
+  ],
+  "riderPublished": [
+    {
+      "file": "public/models/rider-street.glb",
+      "sha256": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6",
+      "bytes": 803080,
+      "sameAsPlayedScratch": true
+    },
+    {
+      "file": "public/models/rider-street-lod.glb",
+      "sha256": "272d6933529e962ed8ca9c61229a50b7c27d2e889f2e78f8778969b101f60399",
+      "bytes": 461704,
+      "sameAsPlayedScratch": true
+    },
+    {
+      "file": "public/models/rider-race.glb",
+      "sha256": "ee10c0372847d42138aafddc911e561be7fb9da20e01475d5aa5fe8b2d99f6fb",
+      "bytes": 923456,
+      "sameAsPlayedScratch": true
+    },
+    {
+      "file": "public/models/rider-race-lod.glb",
+      "sha256": "87997ed13eedcc62d72d65ca6c39f970619d8d5d19b9b8f7f5fb7fd48df7e53f",
+      "bytes": 537144,
+      "sameAsPlayedScratch": true
+    }
+  ],
+  "riderExportVerification": {
+    "results": [
+      {
+        "file": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-elbows-export/models/rider-street.glb",
+        "sha256": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6",
+        "source": "harness/out/blender/connected-garments/rider-street-elbows-v4.blend",
+        "sourceSha256": "153e1e778efd5cc0b4c5d5bf4725a1fe6a386d50c63eebbd5a7efafc17928ff1",
+        "baseline": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-seat-dist/models/rider-street.glb",
+        "baselineSha256": "a8821c681c0d92c9a52e607bf498a474aff9d162f704c8b1c8e4c748e01a1e3d",
+        "bytes": 803080,
+        "triangles": 8657,
+        "vertices": 7200,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.940696716308594e-08,
+        "loadedWeightError": 2.9802322387695312e-08,
+        "sockets": [
+          {
+            "name": "gripSocket.L",
+            "parent": "hand.L",
+            "translation": [
+              -0.016034290194511414,
+              0.04464413598179817,
+              -0.03741367161273956
+            ],
+            "rotation": [
+              0.6969594955444336,
+              0.45957258343696594,
+              0.45957261323928833,
+              0.30304059386253357
+            ],
+            "scale": [
+              0.9999998807907104,
+              0.9999999403953552,
+              0.9999998807907104
+            ]
+          },
+          {
+            "name": "gripSocket.R",
+            "parent": "hand.R",
+            "translation": [
+              -0.01603454351425171,
+              0.04464402794837952,
+              -0.037413522601127625
+            ],
+            "rotation": [
+              0.6969594359397888,
+              0.4595726430416107,
+              0.4595726430416107,
+              0.3030405044555664
+            ],
+            "scale": [
+              0.9999998807907104,
+              0.9999998807907104,
+              1
+            ]
+          },
+          {
+            "name": "soleSocket.L",
+            "parent": "foot.L",
+            "translation": [
+              -0.028328297659754753,
+              0.0197046659886837,
+              -0.07176525145769119
+            ],
+            "rotation": [
+              0.6835832595825195,
+              0.465077668428421,
+              0.46507757902145386,
+              0.3164166212081909
+            ],
+            "scale": [
+              1.0000001192092896,
+              0.9999997615814209,
+              0.9999999403953552
+            ]
+          },
+          {
+            "name": "soleSocket.R",
+            "parent": "foot.R",
+            "translation": [
+              -0.028328396379947662,
+              0.019704656675457954,
+              -0.07176518440246582
+            ],
+            "rotation": [
+              0.6835832595825195,
+              0.46507757902145386,
+              0.465077668428421,
+              0.3164166212081909
+            ],
+            "scale": [
+              0.9999997615814209,
+              0.9999998807907104,
+              0.9999997019767761
+            ]
+          }
+        ],
+        "decodedInverseBindMatricesAndAnimationSamplesExact": true
+      },
+      {
+        "file": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-elbows-export/models/rider-street-lod.glb",
+        "sha256": "272d6933529e962ed8ca9c61229a50b7c27d2e889f2e78f8778969b101f60399",
+        "source": "harness/out/blender/connected-garments/rider-street-elbows-v4.blend",
+        "sourceSha256": "153e1e778efd5cc0b4c5d5bf4725a1fe6a386d50c63eebbd5a7efafc17928ff1",
+        "baseline": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-seat-dist/models/rider-street-lod.glb",
+        "baselineSha256": "4d7c5974485a509bd7682ed49ee6c4acfc383263dbc9085f74417a52e8f6dbca",
+        "bytes": 461704,
+        "triangles": 5880,
+        "vertices": 5336,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.940696716308594e-08,
+        "loadedWeightError": 2.9802322387695312e-08,
+        "sockets": [
+          {
+            "name": "gripSocket.L",
+            "parent": "hand.L",
+            "translation": [
+              -0.016034290194511414,
+              0.04464413598179817,
+              -0.03741367161273956
+            ],
+            "rotation": [
+              0.6969594955444336,
+              0.45957258343696594,
+              0.45957261323928833,
+              0.30304059386253357
+            ],
+            "scale": [
+              0.9999998807907104,
+              0.9999999403953552,
+              0.9999998807907104
+            ]
+          },
+          {
+            "name": "gripSocket.R",
+            "parent": "hand.R",
+            "translation": [
+              -0.01603454351425171,
+              0.04464402794837952,
+              -0.037413522601127625
+            ],
+            "rotation": [
+              0.6969594359397888,
+              0.4595726430416107,
+              0.4595726430416107,
+              0.3030405044555664
+            ],
+            "scale": [
+              0.9999998807907104,
+              0.9999998807907104,
+              1
+            ]
+          },
+          {
+            "name": "soleSocket.L",
+            "parent": "foot.L",
+            "translation": [
+              -0.028328297659754753,
+              0.0197046659886837,
+              -0.07176525145769119
+            ],
+            "rotation": [
+              0.6835832595825195,
+              0.465077668428421,
+              0.46507757902145386,
+              0.3164166212081909
+            ],
+            "scale": [
+              1.0000001192092896,
+              0.9999997615814209,
+              0.9999999403953552
+            ]
+          },
+          {
+            "name": "soleSocket.R",
+            "parent": "foot.R",
+            "translation": [
+              -0.028328396379947662,
+              0.019704656675457954,
+              -0.07176518440246582
+            ],
+            "rotation": [
+              0.6835832595825195,
+              0.46507757902145386,
+              0.465077668428421,
+              0.3164166212081909
+            ],
+            "scale": [
+              0.9999997615814209,
+              0.9999998807907104,
+              0.9999997019767761
+            ]
+          }
+        ],
+        "decodedInverseBindMatricesAndAnimationSamplesExact": true
+      },
+      {
+        "file": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-elbows-export/models/rider-race.glb",
+        "sha256": "ee10c0372847d42138aafddc911e561be7fb9da20e01475d5aa5fe8b2d99f6fb",
+        "source": "harness/out/blender/connected-garments/rider-race-elbows-v3.blend",
+        "sourceSha256": "2ef9ef4df75b64cf729aa0751b7d6ff245ddde2991c4d0f0a2edd85f5da7e121",
+        "baseline": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-seat-dist/models/rider-race.glb",
+        "baselineSha256": "2a74696788009f5261d441ab92308bdc667f78f7bab8cb0e215b791bd93269d2",
+        "bytes": 923456,
+        "triangles": 10657,
+        "vertices": 9039,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.940696716308594e-08,
+        "loadedWeightError": 2.9802322387695312e-08,
+        "sockets": [
+          {
+            "name": "gripSocket.L",
+            "parent": "hand.L",
+            "translation": [
+              -0.016034290194511414,
+              0.04464413598179817,
+              -0.03741367161273956
+            ],
+            "rotation": [
+              0.6969594955444336,
+              0.45957258343696594,
+              0.45957261323928833,
+              0.30304059386253357
+            ],
+            "scale": [
+              0.9999998807907104,
+              0.9999999403953552,
+              0.9999998807907104
+            ]
+          },
+          {
+            "name": "gripSocket.R",
+            "parent": "hand.R",
+            "translation": [
+              -0.01603454351425171,
+              0.04464402794837952,
+              -0.037413522601127625
+            ],
+            "rotation": [
+              0.6969594359397888,
+              0.4595726430416107,
+              0.4595726430416107,
+              0.3030405044555664
+            ],
+            "scale": [
+              0.9999998807907104,
+              0.9999998807907104,
+              1
+            ]
+          },
+          {
+            "name": "soleSocket.L",
+            "parent": "foot.L",
+            "translation": [
+              -0.028328297659754753,
+              0.0197046659886837,
+              -0.07176525145769119
+            ],
+            "rotation": [
+              0.6835832595825195,
+              0.465077668428421,
+              0.46507757902145386,
+              0.3164166212081909
+            ],
+            "scale": [
+              1.0000001192092896,
+              0.9999997615814209,
+              0.9999999403953552
+            ]
+          },
+          {
+            "name": "soleSocket.R",
+            "parent": "foot.R",
+            "translation": [
+              -0.028328396379947662,
+              0.019704656675457954,
+              -0.07176518440246582
+            ],
+            "rotation": [
+              0.6835832595825195,
+              0.46507757902145386,
+              0.465077668428421,
+              0.3164166212081909
+            ],
+            "scale": [
+              0.9999997615814209,
+              0.9999998807907104,
+              0.9999997019767761
+            ]
+          }
+        ],
+        "decodedInverseBindMatricesAndAnimationSamplesExact": true
+      },
+      {
+        "file": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-elbows-export/models/rider-race-lod.glb",
+        "sha256": "87997ed13eedcc62d72d65ca6c39f970619d8d5d19b9b8f7f5fb7fd48df7e53f",
+        "source": "harness/out/blender/connected-garments/rider-race-elbows-v3.blend",
+        "sourceSha256": "2ef9ef4df75b64cf729aa0751b7d6ff245ddde2991c4d0f0a2edd85f5da7e121",
+        "baseline": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-seat-dist/models/rider-race-lod.glb",
+        "baselineSha256": "05619c1f0faacaad488c831d17de1c42c3a4caa4140bec055f9317df9ca392da",
+        "bytes": 537144,
+        "triangles": 5879,
+        "vertices": 6109,
+        "bones": 19,
+        "clips": [
+          "crouch",
+          "extend",
+          "forward_attack",
+          "hang_back",
+          "idle_breathe",
+          "land_absorb",
+          "sit_cruise",
+          "stand_attack"
+        ],
+        "variants": [
+          "rider_rookie",
+          "rider_pro"
+        ],
+        "maxWeightError": 8.940696716308594e-08,
+        "loadedWeightError": 2.9802322387695312e-08,
+        "sockets": [
+          {
+            "name": "gripSocket.L",
+            "parent": "hand.L",
+            "translation": [
+              -0.016034290194511414,
+              0.04464413598179817,
+              -0.03741367161273956
+            ],
+            "rotation": [
+              0.6969594955444336,
+              0.45957258343696594,
+              0.45957261323928833,
+              0.30304059386253357
+            ],
+            "scale": [
+              0.9999998807907104,
+              0.9999999403953552,
+              0.9999998807907104
+            ]
+          },
+          {
+            "name": "gripSocket.R",
+            "parent": "hand.R",
+            "translation": [
+              -0.01603454351425171,
+              0.04464402794837952,
+              -0.037413522601127625
+            ],
+            "rotation": [
+              0.6969594359397888,
+              0.4595726430416107,
+              0.4595726430416107,
+              0.3030405044555664
+            ],
+            "scale": [
+              0.9999998807907104,
+              0.9999998807907104,
+              1
+            ]
+          },
+          {
+            "name": "soleSocket.L",
+            "parent": "foot.L",
+            "translation": [
+              -0.028328297659754753,
+              0.0197046659886837,
+              -0.07176525145769119
+            ],
+            "rotation": [
+              0.6835832595825195,
+              0.465077668428421,
+              0.46507757902145386,
+              0.3164166212081909
+            ],
+            "scale": [
+              1.0000001192092896,
+              0.9999997615814209,
+              0.9999999403953552
+            ]
+          },
+          {
+            "name": "soleSocket.R",
+            "parent": "foot.R",
+            "translation": [
+              -0.028328396379947662,
+              0.019704656675457954,
+              -0.07176518440246582
+            ],
+            "rotation": [
+              0.6835832595825195,
+              0.46507757902145386,
+              0.465077668428421,
+              0.3164166212081909
+            ],
+            "scale": [
+              0.9999997615814209,
+              0.9999998807907104,
+              0.9999997019767761
+            ]
+          }
+        ],
+        "decodedInverseBindMatricesAndAnimationSamplesExact": true
+      }
+    ],
+    "protectedSourcesUnchanged": true,
+    "reviewedCandidatesUnchanged": true
+  },
+  "reviewBuildProvenance": {
+    "path": "harness/out/blender/r4-elbows-export/build-provenance.json",
+    "sha256": "72de74d36123fc612056bf18119fa529c0b2b1c7f8644cc5116a6617dbd3378a"
+  },
+  "seat": {
+    "finding": "Atx=.50 old black pad top.602m lay beneath bluebody top.610m; newloft raises pad while retaining mechanical markers.",
+    "geometryTests": 16,
+    "geometryLog": {
+      "path": "harness/out/blender/r4-bike-seat/geometry-tests.log",
+      "sha256": "cafad222a6332de25061353dbf034bc06d7d850afd954e8bd0995f3e199f92d8"
+    },
+    "parentVerdict": "Played binary hop shows readable separate pad; accepted incremental improvement."
+  },
+  "compiler": {
+    "finding": "Visibility did not restrict Three compile traversal; live visibility and target were held across readiness waits.",
+    "change": "Detached actual material batches, real target scene, target restored before await, serialized jobs.",
+    "regressions": 3,
+    "baseline": "all three fail against previous HEAD and pass with patch",
+    "report": {
+      "path": "harness/out/blender/compile-race/REPORT.md",
+      "sha256": "536d1e98afe62cb7d69cc070a60c629580d2400cb6b045a82b08c889ce7e1d4e"
+    },
+    "metalInvalidProgramAttribution": "open; settled capture does not test rapid lifecycle changes",
+    "stress": {
+      "report": {
+        "path": "harness/out/blender/compile-race/STRESS_REPORT.md",
+        "sha256": "1eb4f58b96ec688bc3af688f1602c6bef5d69a5b41e1f18bd45fd391fc504b1a"
+      },
+      "runs": [
+        {
+          "build": "baseline",
+          "run": 0,
+          "warnings": 108,
+          "gl1281": true,
+          "maxCompile": 2,
+          "overlapBursts": 11,
+          "queryAfterDelete": 0,
+          "assetsMatch": true,
+          "unchanged": true,
+          "reportSha256": "40486bce2c2b7453337e66ec55c61a4b1543e091a7029660d3b4ae5ace2a99e9"
+        },
+        {
+          "build": "baseline",
+          "run": 1,
+          "warnings": 72,
+          "gl1281": true,
+          "maxCompile": 2,
+          "overlapBursts": 11,
+          "queryAfterDelete": 0,
+          "assetsMatch": true,
+          "unchanged": true,
+          "reportSha256": "44e43d6b9cb7f4d362a99a7dc4dd18f4353831686bdb75b7a255e1a944c36bdb"
+        },
+        {
+          "build": "baseline",
+          "run": 2,
+          "warnings": 60,
+          "gl1281": true,
+          "maxCompile": 2,
+          "overlapBursts": 11,
+          "queryAfterDelete": 0,
+          "assetsMatch": true,
+          "unchanged": true,
+          "reportSha256": "f5df1a7ae56b058ca4b736a22a162dedced7a3a5966371b16822866000b9dba2"
+        },
+        {
+          "build": "final",
+          "run": 0,
+          "warnings": 12,
+          "gl1281": true,
+          "maxCompile": 1,
+          "overlapBursts": 11,
+          "queryAfterDelete": 0,
+          "assetsMatch": true,
+          "unchanged": true,
+          "reportSha256": "8ea6450189f812af90c7bdb3ad31980d247fc09ed9ffccd63c2d0c41a6686e53"
+        },
+        {
+          "build": "final",
+          "run": 1,
+          "warnings": 36,
+          "gl1281": true,
+          "maxCompile": 1,
+          "overlapBursts": 11,
+          "queryAfterDelete": 0,
+          "assetsMatch": true,
+          "unchanged": true,
+          "reportSha256": "af34200a1606a7c3f35fe449826c6abafe1340f2363d96c44ea3cc692486c31d"
+        },
+        {
+          "build": "final",
+          "run": 2,
+          "warnings": 36,
+          "gl1281": true,
+          "maxCompile": 1,
+          "overlapBursts": 11,
+          "queryAfterDelete": 0,
+          "assetsMatch": true,
+          "unchanged": true,
+          "reportSha256": "f236a6234e2107e02417511598d98589830b8b00385a4aeb67170a0b8ba49aaf"
+        }
+      ],
+      "finding": "All three baseline and three final Metal rapid-transition runs reproduce GL1281 at the first tick-2 check. Maximum concurrent compiles: baseline 2 in each repeated run (4 in pilot), final 1. No JavaScript query after deletion was observed. Serialization is verified; GL1281 remains open."
+    },
+    "attribution": {
+      "report": {
+        "path": "harness/out/blender/compile-race/ATTRIBUTION_REPORT.md",
+        "sha256": "b214be310716c7ef7367f322ebc59e3eb4c73645d0d195af6fabbbc15481f5bb"
+      },
+      "evidence": {
+        "stress-repeated": [
+          {
+            "file": "stress-repeated/baseline-0.json",
+            "sha256": "40486bce2c2b7453337e66ec55c61a4b1543e091a7029660d3b4ae5ace2a99e9",
+            "build": "baseline",
+            "run": 0,
+            "invalidProgramWarnings": 108,
+            "allConsoleWarnings": 120,
+            "glErrors": [
+              1281,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 2,
+            "overlapBursts": 11,
+            "deferredDelete": null,
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2",
+            "stressScriptSha256": "54de66fce73d83f0764e44d852b310d04a15b2ad4dfb30a457a9ac04d048e75c"
+          },
+          {
+            "file": "stress-repeated/baseline-1.json",
+            "sha256": "44e43d6b9cb7f4d362a99a7dc4dd18f4353831686bdb75b7a255e1a944c36bdb",
+            "build": "baseline",
+            "run": 1,
+            "invalidProgramWarnings": 72,
+            "allConsoleWarnings": 84,
+            "glErrors": [
+              1281,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 2,
+            "overlapBursts": 11,
+            "deferredDelete": null,
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2",
+            "stressScriptSha256": "54de66fce73d83f0764e44d852b310d04a15b2ad4dfb30a457a9ac04d048e75c"
+          },
+          {
+            "file": "stress-repeated/baseline-2.json",
+            "sha256": "f5df1a7ae56b058ca4b736a22a162dedced7a3a5966371b16822866000b9dba2",
+            "build": "baseline",
+            "run": 2,
+            "invalidProgramWarnings": 60,
+            "allConsoleWarnings": 72,
+            "glErrors": [
+              1281,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 2,
+            "overlapBursts": 11,
+            "deferredDelete": null,
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2",
+            "stressScriptSha256": "54de66fce73d83f0764e44d852b310d04a15b2ad4dfb30a457a9ac04d048e75c"
+          },
+          {
+            "file": "stress-repeated/final-0.json",
+            "sha256": "8ea6450189f812af90c7bdb3ad31980d247fc09ed9ffccd63c2d0c41a6686e53",
+            "build": "final",
+            "run": 0,
+            "invalidProgramWarnings": 12,
+            "allConsoleWarnings": 25,
+            "glErrors": [
+              1281,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 1,
+            "overlapBursts": 11,
+            "deferredDelete": null,
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2",
+            "stressScriptSha256": "54de66fce73d83f0764e44d852b310d04a15b2ad4dfb30a457a9ac04d048e75c"
+          },
+          {
+            "file": "stress-repeated/final-1.json",
+            "sha256": "af34200a1606a7c3f35fe449826c6abafe1340f2363d96c44ea3cc692486c31d",
+            "build": "final",
+            "run": 1,
+            "invalidProgramWarnings": 36,
+            "allConsoleWarnings": 48,
+            "glErrors": [
+              1281,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 1,
+            "overlapBursts": 11,
+            "deferredDelete": null,
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2",
+            "stressScriptSha256": "54de66fce73d83f0764e44d852b310d04a15b2ad4dfb30a457a9ac04d048e75c"
+          },
+          {
+            "file": "stress-repeated/final-2.json",
+            "sha256": "f236a6234e2107e02417511598d98589830b8b00385a4aeb67170a0b8ba49aaf",
+            "build": "final",
+            "run": 2,
+            "invalidProgramWarnings": 36,
+            "allConsoleWarnings": 48,
+            "glErrors": [
+              1281,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 1,
+            "overlapBursts": 11,
+            "deferredDelete": null,
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2",
+            "stressScriptSha256": "54de66fce73d83f0764e44d852b310d04a15b2ad4dfb30a457a9ac04d048e75c"
+          }
+        ],
+        "stress-defer-delete": [
+          {
+            "file": "stress-defer-delete/baseline-0.json",
+            "sha256": "3a0d4170271bb76c61e35867202c92006b7330328b90774aabba35aa7330d2e3",
+            "build": "baseline",
+            "run": 0,
+            "invalidProgramWarnings": 0,
+            "allConsoleWarnings": 12,
+            "glErrors": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 3,
+            "overlapBursts": 11,
+            "deferredDelete": {
+              "requests": 132,
+              "immediate": 64,
+              "deferred": 68,
+              "deleted": 132,
+              "pending": 0,
+              "maxPending": 23
+            },
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "1ad73a34e280ce4a83e3ded70f84cead8691c9e3de749bf1c528106d0b76964e",
+            "stressScriptSha256": "a6645ffc640e570bf03754de7126b4138acfff3af4d48ee33a69faab5420a579"
+          },
+          {
+            "file": "stress-defer-delete/baseline-1.json",
+            "sha256": "d18c56b3bddeb1cb34898a8b1168a009b38a55bd0769e043ba67957fe42b3625",
+            "build": "baseline",
+            "run": 1,
+            "invalidProgramWarnings": 0,
+            "allConsoleWarnings": 12,
+            "glErrors": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 2,
+            "overlapBursts": 11,
+            "deferredDelete": {
+              "requests": 132,
+              "immediate": 69,
+              "deferred": 63,
+              "deleted": 132,
+              "pending": 0,
+              "maxPending": 23
+            },
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "1ad73a34e280ce4a83e3ded70f84cead8691c9e3de749bf1c528106d0b76964e",
+            "stressScriptSha256": "a6645ffc640e570bf03754de7126b4138acfff3af4d48ee33a69faab5420a579"
+          },
+          {
+            "file": "stress-defer-delete/baseline-2.json",
+            "sha256": "a69848349cf9fce9a10f4ee99d53fd6363b134ec2b88ba2a42e6c062fd18a05f",
+            "build": "baseline",
+            "run": 2,
+            "invalidProgramWarnings": 0,
+            "allConsoleWarnings": 12,
+            "glErrors": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 2,
+            "overlapBursts": 11,
+            "deferredDelete": {
+              "requests": 132,
+              "immediate": 69,
+              "deferred": 63,
+              "deleted": 132,
+              "pending": 0,
+              "maxPending": 24
+            },
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "1ad73a34e280ce4a83e3ded70f84cead8691c9e3de749bf1c528106d0b76964e",
+            "stressScriptSha256": "a6645ffc640e570bf03754de7126b4138acfff3af4d48ee33a69faab5420a579"
+          },
+          {
+            "file": "stress-defer-delete/final-0.json",
+            "sha256": "c00f4eca48d0da931bca80ea834b8838b32e01b87bba61300116d6d2e462564d",
+            "build": "final",
+            "run": 0,
+            "invalidProgramWarnings": 0,
+            "allConsoleWarnings": 13,
+            "glErrors": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 1,
+            "overlapBursts": 11,
+            "deferredDelete": {
+              "requests": 37,
+              "immediate": 21,
+              "deferred": 16,
+              "deleted": 37,
+              "pending": 0,
+              "maxPending": 4
+            },
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "1ad73a34e280ce4a83e3ded70f84cead8691c9e3de749bf1c528106d0b76964e",
+            "stressScriptSha256": "a6645ffc640e570bf03754de7126b4138acfff3af4d48ee33a69faab5420a579"
+          },
+          {
+            "file": "stress-defer-delete/final-1.json",
+            "sha256": "3f48c835a7203d03cb28f12d9901f127e7de8e2ac7f9f7e9745ed90577631652",
+            "build": "final",
+            "run": 1,
+            "invalidProgramWarnings": 0,
+            "allConsoleWarnings": 13,
+            "glErrors": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 1,
+            "overlapBursts": 11,
+            "deferredDelete": {
+              "requests": 37,
+              "immediate": 21,
+              "deferred": 16,
+              "deleted": 37,
+              "pending": 0,
+              "maxPending": 4
+            },
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "1ad73a34e280ce4a83e3ded70f84cead8691c9e3de749bf1c528106d0b76964e",
+            "stressScriptSha256": "a6645ffc640e570bf03754de7126b4138acfff3af4d48ee33a69faab5420a579"
+          },
+          {
+            "file": "stress-defer-delete/final-2.json",
+            "sha256": "2163fd6847009d09088b163e12956f1211eeba420f07b4c14b86e4f2088c1b08",
+            "build": "final",
+            "run": 2,
+            "invalidProgramWarnings": 0,
+            "allConsoleWarnings": 12,
+            "glErrors": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "maxCompile": 1,
+            "overlapBursts": 11,
+            "deferredDelete": {
+              "requests": 37,
+              "immediate": 21,
+              "deferred": 16,
+              "deleted": 37,
+              "pending": 0,
+              "maxPending": 5
+            },
+            "unchanged": true,
+            "assetsMatch": true,
+            "failure": null,
+            "entryErrors": [],
+            "sourceTraceSha256": "1ad73a34e280ce4a83e3ded70f84cead8691c9e3de749bf1c528106d0b76964e",
+            "stressScriptSha256": "a6645ffc640e570bf03754de7126b4138acfff3af4d48ee33a69faab5420a579"
+          }
+        ],
+        "raw-program-controls": [
+          {
+            "file": "raw-program-controls/metal-0-delete-without-extension.json",
+            "sha256": "2b90e058992c70bb7f2c8ede4dd5cd8db3e41cb100b220f3a41874435fd9bcdc",
+            "backend": "metal",
+            "run": 0,
+            "mode": "delete-without-extension",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "delete-without-extension",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/metal-0-delete-without-query.json",
+            "sha256": "423db59c6a602ff7ead4f2721d51bfe4eb2255874500a760412bb160956c7044",
+            "backend": "metal",
+            "run": 0,
+            "mode": "delete-without-query",
+            "invalidProgramWarnings": 96,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "delete-without-query",
+              "khrEnabled": true,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                1281,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/metal-0-query-wait-delete.json",
+            "sha256": "4beccafa812b146ec37ad93962b5c2d960cf2c3ab61929f059fbb5caab6953d5",
+            "backend": "metal",
+            "run": 0,
+            "mode": "query-wait-delete",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "query-wait-delete",
+              "khrEnabled": true,
+              "initialError": 0,
+              "falseAtFirst": 8,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 16,
+              "linkedOk": 8
+            },
+            "queryCounts": {
+              "91b1:false": 16,
+              "91b1:true": 8,
+              "8b82:true": 8
+            },
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/metal-1-delete-without-extension.json",
+            "sha256": "cf6847e895bbf55d74d3d8683d9013c0ce0ce1d1b7c9876617b2e34a287dd269",
+            "backend": "metal",
+            "run": 1,
+            "mode": "delete-without-extension",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "delete-without-extension",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/metal-1-delete-without-query.json",
+            "sha256": "c78b28258b5f2fd2e4fbeb30465032ebaad144bda34c3671c2c667627eb59edc",
+            "backend": "metal",
+            "run": 1,
+            "mode": "delete-without-query",
+            "invalidProgramWarnings": 96,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "delete-without-query",
+              "khrEnabled": true,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                1281,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/metal-1-query-wait-delete.json",
+            "sha256": "e6a3e5c3cafa1db70afe6a6bad2513a6e731e0560958edc168fb3109ec655d65",
+            "backend": "metal",
+            "run": 1,
+            "mode": "query-wait-delete",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "query-wait-delete",
+              "khrEnabled": true,
+              "initialError": 0,
+              "falseAtFirst": 8,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 16,
+              "linkedOk": 8
+            },
+            "queryCounts": {
+              "91b1:false": 16,
+              "91b1:true": 8,
+              "8b82:true": 8
+            },
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/metal-2-delete-without-extension.json",
+            "sha256": "c102cd21c4389508d55942a1e2d040172064796f6c0844de4dc0d051ebf1ee20",
+            "backend": "metal",
+            "run": 2,
+            "mode": "delete-without-extension",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "delete-without-extension",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/metal-2-delete-without-query.json",
+            "sha256": "800bb0e7199f2d7ee2495348a5653a7871724b1b880e820b9010afe66c51d7db",
+            "backend": "metal",
+            "run": 2,
+            "mode": "delete-without-query",
+            "invalidProgramWarnings": 96,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "delete-without-query",
+              "khrEnabled": true,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                1281,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/metal-2-query-wait-delete.json",
+            "sha256": "08a076a6f4e4317a8475013d8cd8d566df94660e1da533944c3af17dd1c397d3",
+            "backend": "metal",
+            "run": 2,
+            "mode": "query-wait-delete",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+              "mode": "query-wait-delete",
+              "khrEnabled": true,
+              "initialError": 0,
+              "falseAtFirst": 8,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 16,
+              "linkedOk": 8
+            },
+            "queryCounts": {
+              "91b1:false": 16,
+              "91b1:true": 8,
+              "8b82:true": 8
+            },
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-0-delete-without-extension.json",
+            "sha256": "6d8f2f9b5a573401b56443a03c7c8cfa4f1a7455fbfe05c0c2ede567dc9e3d2d",
+            "backend": "swiftshader",
+            "run": 0,
+            "mode": "delete-without-extension",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "delete-without-extension",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-0-delete-without-query.json",
+            "sha256": "ddaa1c398387992d250370947c3f8871a71622b5506792b8725472cb55c76231",
+            "backend": "swiftshader",
+            "run": 0,
+            "mode": "delete-without-query",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "delete-without-query",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-0-query-wait-delete.json",
+            "sha256": "7050a929f657cc43406ed767eccf0961763407ffd37ba0188e732c85d09dbc1f",
+            "backend": "swiftshader",
+            "run": 0,
+            "mode": "query-wait-delete",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "query-wait-delete",
+              "skip": "KHR extension unavailable"
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-1-delete-without-extension.json",
+            "sha256": "0a288e26af7aa182fbe8ee05da6e2558d00221de9ea1b0e36867afadac99195a",
+            "backend": "swiftshader",
+            "run": 1,
+            "mode": "delete-without-extension",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "delete-without-extension",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-1-delete-without-query.json",
+            "sha256": "d14956f89b8e115adb7d1d7f7f0760d90e3b2892bb6453b793dd7987d2ee034a",
+            "backend": "swiftshader",
+            "run": 1,
+            "mode": "delete-without-query",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "delete-without-query",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-1-query-wait-delete.json",
+            "sha256": "3779d8dd7798c44cc998bb20a6eed82fed7722c74821edfbb42b95eaffc8b7af",
+            "backend": "swiftshader",
+            "run": 1,
+            "mode": "query-wait-delete",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "query-wait-delete",
+              "skip": "KHR extension unavailable"
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-2-delete-without-extension.json",
+            "sha256": "598d332923f039c4f4227cce1a5195f7985e77f246e8a48a3ec67be591a0d883",
+            "backend": "swiftshader",
+            "run": 2,
+            "mode": "delete-without-extension",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "delete-without-extension",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-2-delete-without-query.json",
+            "sha256": "69ab0b7756daf81a5ddb7cb2fe455a5e104152b7073600ec08b9cdc831530f7c",
+            "backend": "swiftshader",
+            "run": 2,
+            "mode": "delete-without-query",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "delete-without-query",
+              "khrEnabled": false,
+              "initialError": 0,
+              "falseAtFirst": 0,
+              "errors": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "pollCount": 0,
+              "linkedOk": 0
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          },
+          {
+            "file": "raw-program-controls/swiftshader-2-query-wait-delete.json",
+            "sha256": "de39cdc974588be0522e87ef1eb5a58bb917f3e1879711cd29327cb60bce5061",
+            "backend": "swiftshader",
+            "run": 2,
+            "mode": "query-wait-delete",
+            "invalidProgramWarnings": 0,
+            "info": {
+              "hardware": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+              "mode": "query-wait-delete",
+              "skip": "KHR extension unavailable"
+            },
+            "queryCounts": {},
+            "queryAfterDelete": 0,
+            "scriptSha256": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+            "traceSha256": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2"
+          }
+        ],
+        "harnessFiles": {
+          "stress.mts": "54de66fce73d83f0764e44d852b310d04a15b2ad4dfb30a457a9ac04d048e75c",
+          "stress-defer-delete.mts": "a6645ffc640e570bf03754de7126b4138acfff3af4d48ee33a69faab5420a579",
+          "program-trace.js": "21185b9766200e54e295f4e77b41d57fcce00831efae9e91e7d5920a2d07edb2",
+          "program-trace-defer-delete.js": "1ad73a34e280ce4a83e3ded70f84cead8691c9e3de749bf1c528106d0b76964e",
+          "raw-program-lifecycle.mts": "0ecb8d9a38e8d2bee7a24e4807692ef26e091ea40fd263207dedf713508cfe15",
+          "raw-program-lifecycle-pilot.mts": "0e977313d9b85889699fa645d619af958c3e9739042efae51db831ed9358447a",
+          "raw-program-lifecycle-repeated-v1.mts": "7e9c8585ebe53b7bd212693e6d38e36107d7d492563b28183e2a0b943b15dde2"
+        }
+      },
+      "productionFix": false,
+      "finding": "Pending parallel program link/deletion is sufficient to trigger Metal GL1281 with zero JavaScript parameter queries. Diagnostic deletion deferral passes all six actual-game stress runs and eventually deletes every requested program. Production ownership/lifecycle implementation remains round 5."
+    }
+  },
+  "playedClips": [
+    {
+      "movie": {
+        "path": "harness/out/blender/r3-e2-finish-street/clip.mp4",
+        "sha256": "e319c91228451e716411a501f85a0a66571b4603cfdab028c9de278678a4698d"
+      },
+      "evidence": {
+        "path": "harness/out/blender/r3-e2-finish-street/evidence.json",
+        "sha256": "5de0c06afcb3e2cdf114d050ae24791d2b646039842f8831b11a9993b4a4749c"
+      },
+      "parentPlayback": "QuickTime",
+      "parentVerdict": "Round3Rookie finish camera, normal attached arm bend; historicalsolver.",
+      "build": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r3-dist",
+      "recordingSha256": "149a7315dd9132aba6ca973bca18c4878e77fbae15c3baa294ef7969c916040f",
+      "assetBytes": {
+        "models/68b48e596eb3db90/rider-street-a8821c681c0d92c9.glb": "a8821c681c0d92c9a52e607bf498a474aff9d162f704c8b1c8e4c748e01a1e3d",
+        "models/68b48e596eb3db90/rider-street-lod-4d7c5974485a509b.glb": "4d7c5974485a509bd7682ed49ee6c4acfc383263dbc9085f74417a52e8f6dbca",
+        "models/fdfd26aa67e74047/bike-3adaec2825297e8c.glb": "3adaec2825297e8c85f20cf1b764ce1db1d7e7261e582fa78f4f8d467f1359d2",
+        "models/fdfd26aa67e74047/bike-lod-0970caf926ad78af.glb": "0970caf926ad78af4df7b1cb29f263c4021daf01940193d3dd7c79caec1b8f3f"
+      },
+      "physics": "v2",
+      "hz": 120,
+      "fps": 60,
+      "from": 5200,
+      "to": 5660,
+      "frames": 230,
+      "prefixRendered": true,
+      "renderAlpha": 1,
+      "quality": "high",
+      "outfit": "street",
+      "width": 1280,
+      "height": 720,
+      "graphics": null,
+      "setup": null
+    },
+    {
+      "movie": {
+        "path": "harness/out/blender/r4-seat-hop-street/clip.mp4",
+        "sha256": "68e5eb3bc0b540b0c7f7e81e51944700f610bf5d4521f7fab7c2b3e75d7b4b62"
+      },
+      "evidence": {
+        "path": "harness/out/blender/r4-seat-hop-street/evidence.json",
+        "sha256": "ed9365d2a820bdf21c9e74957b999f9fcc87981291ceefd1d7f92269d40220a7"
+      },
+      "parentPlayback": "QuickTime",
+      "parentVerdict": "New seat pad readable through takeoff/landing.",
+      "build": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-seat-dist",
+      "recordingSha256": "3f51d7016f60dfd7425c03b09655e5b10647ba6dd7cdbe0a18e76b8e4c98b06e",
+      "assetBytes": {
+        "models/68b48e596eb3db90/rider-street-a8821c681c0d92c9.glb": "a8821c681c0d92c9a52e607bf498a474aff9d162f704c8b1c8e4c748e01a1e3d",
+        "models/68b48e596eb3db90/rider-street-lod-4d7c5974485a509b.glb": "4d7c5974485a509bd7682ed49ee6c4acfc383263dbc9085f74417a52e8f6dbca",
+        "models/72b2548aeb24808d/bike-0f3267de654f0035.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+        "models/72b2548aeb24808d/bike-lod-a64d762183da9fdc.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7"
+      },
+      "physics": "v2",
+      "hz": 120,
+      "fps": 60,
+      "from": 180,
+      "to": 560,
+      "frames": 190,
+      "prefixRendered": true,
+      "renderAlpha": 1,
+      "quality": "high",
+      "outfit": "street",
+      "width": 1280,
+      "height": 720,
+      "graphics": null,
+      "setup": null
+    },
+    {
+      "movie": {
+        "path": "harness/out/blender/r4-seat-hop-metal-verified/clip.mp4",
+        "sha256": "1ae93cdc97d3aaa79dfe90e8c7329aa2bdcc0d73d4df94e40b4c1cf3cb27c024"
+      },
+      "evidence": {
+        "path": "harness/out/blender/r4-seat-hop-metal-verified/evidence.json",
+        "sha256": "69e6f69bc685cb480c3faaa70c9164ce5956cf19621aab4940ff35dc5c6f0478"
+      },
+      "parentPlayback": "QuickTime",
+      "parentVerdict": "Same simulation sequence on measured Metal backend.",
+      "build": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-seat-dist",
+      "recordingSha256": "3f51d7016f60dfd7425c03b09655e5b10647ba6dd7cdbe0a18e76b8e4c98b06e",
+      "assetBytes": {
+        "models/68b48e596eb3db90/rider-street-a8821c681c0d92c9.glb": "a8821c681c0d92c9a52e607bf498a474aff9d162f704c8b1c8e4c748e01a1e3d",
+        "models/68b48e596eb3db90/rider-street-lod-4d7c5974485a509b.glb": "4d7c5974485a509bd7682ed49ee6c4acfc383263dbc9085f74417a52e8f6dbca",
+        "models/72b2548aeb24808d/bike-0f3267de654f0035.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+        "models/72b2548aeb24808d/bike-lod-a64d762183da9fdc.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7"
+      },
+      "physics": "v2",
+      "hz": 120,
+      "fps": 60,
+      "from": 180,
+      "to": 560,
+      "frames": 190,
+      "prefixRendered": true,
+      "renderAlpha": 1,
+      "quality": "high",
+      "outfit": "street",
+      "width": 1280,
+      "height": 720,
+      "graphics": {
+        "requestedBackend": "metal",
+        "launchArgs": [
+          "--use-angle=metal",
+          "--enable-webgl",
+          "--ignore-gpu-blocklist",
+          "--mute-audio"
+        ],
+        "chromium": "151.0.7922.34",
+        "hostPlatform": "darwin",
+        "vendor": "Google Inc. (Apple)",
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36"
+      },
+      "setup": null
+    },
+    {
+      "movie": {
+        "path": "harness/out/blender/r4-elbows-hop-street/clip.mp4",
+        "sha256": "7e395ff30750ec444e002b6db5cfb07f13ee8119f6c2062c75d0c0d2f0928f18"
+      },
+      "evidence": {
+        "path": "harness/out/blender/r4-elbows-hop-street/evidence.json",
+        "sha256": "8f4dbb4a9db29ded6824d99c47d8764a9e7905151e9c0fe179b39a439ca724d9"
+      },
+      "parentPlayback": "QuickTime",
+      "parentVerdict": "Continuous shoulders/sleeves through hop; cloth still smooth.",
+      "build": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-elbows-dist",
+      "recordingSha256": "3f51d7016f60dfd7425c03b09655e5b10647ba6dd7cdbe0a18e76b8e4c98b06e",
+      "assetBytes": {
+        "models/3f2e42bfb67cef9b/rider-street-2d5ab2bef843318b.glb": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6",
+        "models/3f2e42bfb67cef9b/rider-street-lod-272d6933529e962e.glb": "272d6933529e962ed8ca9c61229a50b7c27d2e889f2e78f8778969b101f60399",
+        "models/72b2548aeb24808d/bike-0f3267de654f0035.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+        "models/72b2548aeb24808d/bike-lod-a64d762183da9fdc.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7"
+      },
+      "physics": "v2",
+      "hz": 120,
+      "fps": 60,
+      "from": 180,
+      "to": 560,
+      "frames": 190,
+      "prefixRendered": true,
+      "renderAlpha": 1,
+      "quality": "high",
+      "outfit": "street",
+      "width": 1280,
+      "height": 720,
+      "graphics": {
+        "requestedBackend": "swiftshader",
+        "launchArgs": [
+          "--use-angle=swiftshader",
+          "--enable-unsafe-swiftshader",
+          "--enable-webgl",
+          "--ignore-gpu-blocklist",
+          "--mute-audio"
+        ],
+        "chromium": "151.0.7922.34",
+        "hostPlatform": "darwin",
+        "vendor": "Google Inc. (Google)",
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36"
+      },
+      "setup": null
+    },
+    {
+      "movie": {
+        "path": "harness/out/blender/r4-elbows-hop-race/clip.mp4",
+        "sha256": "1943747b9627b828810cd7936a05daf48063b08a949d888bf787a8696c1c0bde"
+      },
+      "evidence": {
+        "path": "harness/out/blender/r4-elbows-hop-race/evidence.json",
+        "sha256": "e4eede21346c7100786041ed55e80ea5003e09d7d21787871c5cdee5b0e9064f"
+      },
+      "parentPlayback": "Finder Quick Look",
+      "parentVerdict": "Played race crouch/takeoff/landing; improved sleeve continuity, knee/waist forms still limited.",
+      "build": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-elbows-dist",
+      "recordingSha256": "3f51d7016f60dfd7425c03b09655e5b10647ba6dd7cdbe0a18e76b8e4c98b06e",
+      "assetBytes": {
+        "models/94d0b38f5b71b15a/rider-race-ee10c0372847d421.glb": "ee10c0372847d42138aafddc911e561be7fb9da20e01475d5aa5fe8b2d99f6fb",
+        "models/94d0b38f5b71b15a/rider-race-lod-87997ed13eedcc62.glb": "87997ed13eedcc62d72d65ca6c39f970619d8d5d19b9b8f7f5fb7fd48df7e53f",
+        "models/72b2548aeb24808d/bike-0f3267de654f0035.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+        "models/72b2548aeb24808d/bike-lod-a64d762183da9fdc.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7"
+      },
+      "physics": "v2",
+      "hz": 120,
+      "fps": 60,
+      "from": 180,
+      "to": 560,
+      "frames": 190,
+      "prefixRendered": true,
+      "renderAlpha": 1,
+      "quality": "high",
+      "outfit": "race",
+      "width": 1280,
+      "height": 720,
+      "graphics": {
+        "requestedBackend": "swiftshader",
+        "launchArgs": [
+          "--use-angle=swiftshader",
+          "--enable-unsafe-swiftshader",
+          "--enable-webgl",
+          "--ignore-gpu-blocklist",
+          "--mute-audio"
+        ],
+        "chromium": "151.0.7922.34",
+        "hostPlatform": "darwin",
+        "vendor": "Google Inc. (Google)",
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36"
+      },
+      "setup": null
+    },
+    {
+      "movie": {
+        "path": "harness/out/blender/r4-elbows-e2-pro-street/clip.mp4",
+        "sha256": "9c4d61a32250de5a1057f6e86415a7ca3865d3cf6bbc7de8d8a7e4071f2e983f"
+      },
+      "evidence": {
+        "path": "harness/out/blender/r4-elbows-e2-pro-street/evidence.json",
+        "sha256": "ff519db40cf7a524f956f56688304be45f5387462b12c9010f89e486f5e44953"
+      },
+      "parentPlayback": "Finder Quick Look",
+      "parentVerdict": "Pro finish42.425s/zero faults; attached normal arm bend through camera move.",
+      "build": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-elbows-dist",
+      "recordingSha256": "14972a0a3bc3f3984aed6084742332ead8c2cdfc3e2a2ef4d5caed80e9d60c2c",
+      "assetBytes": {
+        "models/3f2e42bfb67cef9b/rider-street-2d5ab2bef843318b.glb": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6",
+        "models/3f2e42bfb67cef9b/rider-street-lod-272d6933529e962e.glb": "272d6933529e962ed8ca9c61229a50b7c27d2e889f2e78f8778969b101f60399",
+        "models/72b2548aeb24808d/bike-0f3267de654f0035.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+        "models/72b2548aeb24808d/bike-lod-a64d762183da9fdc.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7"
+      },
+      "physics": "v2",
+      "hz": 120,
+      "fps": 60,
+      "from": 4900,
+      "to": 5360,
+      "frames": 230,
+      "prefixRendered": true,
+      "renderAlpha": 1,
+      "quality": "high",
+      "outfit": "street",
+      "width": 1280,
+      "height": 720,
+      "graphics": {
+        "requestedBackend": "metal",
+        "launchArgs": [
+          "--use-angle=metal",
+          "--enable-webgl",
+          "--ignore-gpu-blocklist",
+          "--mute-audio"
+        ],
+        "chromium": "151.0.7922.34",
+        "hostPlatform": "darwin",
+        "vendor": "Google Inc. (Apple)",
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36"
+      },
+      "setup": "await scene readiness between class, track and quality changes"
+    },
+    {
+      "movie": {
+        "path": "harness/out/blender/r4-final-low-race-hop/clip.mp4",
+        "sha256": "9de9757e633fb158aa6ddbd3366e9c78b258d1bcdf86027ff4c24be2f6c267e7"
+      },
+      "evidence": {
+        "path": "harness/out/blender/r4-final-low-race-hop/evidence.json",
+        "sha256": "62dd35271943300ac77929732949d4d7188806a782111358e8410451e50fb0d3"
+      },
+      "parentPlayback": "Finder Quick Look, four stream-copy repeats of the original clip for review",
+      "reviewLoop": {
+        "source": "clip.mp4",
+        "sourceSha256": "9de9757e633fb158aa6ddbd3366e9c78b258d1bcdf86027ff4c24be2f6c267e7",
+        "review": "review-loop.mp4",
+        "reviewSha256": "27d6dd8dd6418f56bdb9e46b3e962f5f01f65692361226083386ed262919cfae",
+        "repetitions": 4,
+        "method": "Stream-copy four repeats for native playback review only. Original capture cadence/trace remains in evidence.json; this is not a longer recorded input."
+      },
+      "parentVerdict": "Played Race crouch/extension/settling at phone viewport size with low-quality LOD; attached limbs and continuous sleeve silhouette. Smooth cloth detail remains; this is desktop Metal, not iOS.",
+      "build": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-dist",
+      "recordingSha256": "3f51d7016f60dfd7425c03b09655e5b10647ba6dd7cdbe0a18e76b8e4c98b06e",
+      "assetBytes": {
+        "models/94d0b38f5b71b15a/rider-race-ee10c0372847d421.glb": "ee10c0372847d42138aafddc911e561be7fb9da20e01475d5aa5fe8b2d99f6fb",
+        "models/94d0b38f5b71b15a/rider-race-lod-87997ed13eedcc62.glb": "87997ed13eedcc62d72d65ca6c39f970619d8d5d19b9b8f7f5fb7fd48df7e53f",
+        "models/72b2548aeb24808d/bike-0f3267de654f0035.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+        "models/72b2548aeb24808d/bike-lod-a64d762183da9fdc.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7"
+      },
+      "physics": "v2",
+      "hz": 120,
+      "fps": 60,
+      "from": 180,
+      "to": 560,
+      "frames": 190,
+      "prefixRendered": true,
+      "renderAlpha": 1,
+      "quality": "low",
+      "outfit": "race",
+      "width": 844,
+      "height": 390,
+      "graphics": {
+        "requestedBackend": "metal",
+        "launchArgs": [
+          "--use-angle=metal",
+          "--enable-webgl",
+          "--ignore-gpu-blocklist",
+          "--mute-audio"
+        ],
+        "chromium": "151.0.7922.34",
+        "hostPlatform": "darwin",
+        "vendor": "Google Inc. (Apple)",
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36"
+      },
+      "setup": "await scene readiness between class, track and quality changes",
+      "errors": []
+    },
+    {
+      "movie": {
+        "path": "harness/out/blender/r4-final-b3-stranger-street/clip.mp4",
+        "sha256": "80e035e659a7adfc4cb2b46fb29f4e5b00421f59853cf44076ec6b699955d095"
+      },
+      "evidence": {
+        "path": "harness/out/blender/r4-final-b3-stranger-street/evidence.json",
+        "sha256": "3b581450340dac7493e85a9d7d5617e418d94d5338d03063841ce1f839149245"
+      },
+      "parentPlayback": "Finder Quick Look, four stream-copy repeats of the original clip for review",
+      "reviewLoop": {
+        "source": "clip.mp4",
+        "sourceSha256": "80e035e659a7adfc4cb2b46fb29f4e5b00421f59853cf44076ec6b699955d095",
+        "review": "review-loop.mp4",
+        "reviewSha256": "1d299e49156c4e2ce2d1f7a9f4ec40bbec7933c9a4da1bdb9f30e924cb0c6e37",
+        "repetitions": 4,
+        "method": "Stream-copy four repeats for native playback review only. Original capture cadence/trace remains in evidence.json; this is not a longer recorded input."
+      },
+      "parentVerdict": "Played recorded stranger takeoff, airborne movement and landing on B3; attached normal arms and readable seat. Garment folds and waist/hood remain limited.",
+      "build": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/r4-dist",
+      "recordingSha256": "e4bc92564fa32d9757b0b8332597527b1230ce915a7ec84866e784fb3effb519",
+      "assetBytes": {
+        "models/3f2e42bfb67cef9b/rider-street-2d5ab2bef843318b.glb": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6",
+        "models/3f2e42bfb67cef9b/rider-street-lod-272d6933529e962e.glb": "272d6933529e962ed8ca9c61229a50b7c27d2e889f2e78f8778969b101f60399",
+        "models/72b2548aeb24808d/bike-0f3267de654f0035.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+        "models/72b2548aeb24808d/bike-lod-a64d762183da9fdc.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7"
+      },
+      "physics": "v2",
+      "hz": 120,
+      "fps": 60,
+      "from": 440,
+      "to": 840,
+      "frames": 200,
+      "prefixRendered": true,
+      "renderAlpha": 1,
+      "quality": "high",
+      "outfit": "street",
+      "width": 1280,
+      "height": 720,
+      "graphics": {
+        "requestedBackend": "metal",
+        "launchArgs": [
+          "--use-angle=metal",
+          "--enable-webgl",
+          "--ignore-gpu-blocklist",
+          "--mute-audio"
+        ],
+        "chromium": "151.0.7922.34",
+        "hostPlatform": "darwin",
+        "vendor": "Google Inc. (Apple)",
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36"
+      },
+      "setup": "await scene readiness between class, track and quality changes",
+      "errors": [
+        "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+      ]
+    }
+  ],
+  "rejectedGarments": {
+    "streetJeans": "rider-street-jeans-v9.blend",
+    "raceJeans": "rider-race-jeans-v5.blend",
+    "landingSaddleCrossings": [
+      4,
+      7
+    ],
+    "sitCruiseInheritedKneeCrossings": [
+      24,
+      26
+    ],
+    "promoted": false
+  },
+  "limitations": [
+    "Exact user E2 finish78.433s/fourfaults still lacks matching recorded inputs.",
+    "No AAA/PS4 visual-quality verdict. Hood/waist/cloth folds/material detail remain.",
+    "No actual iOS or sustained60fps device evidence.",
+    "Fullcheck remains red. Anatomy/landing/braking/air-control/hop/performance work remains.",
+    "B3 final high-quality capture reports track budget 145668 triangles over the existing 80000 cap; 11 calls is within the 20-call cap. The known budget warning is retained."
+  ],
+  "assetCensus": {
+    "report": {
+      "path": "harness/out/blender/r4-hero-contracts.json",
+      "sha256": "9a64e3489773db8fedbda9eb23b242788f3098629836e0680a0e830d6adb1e5c"
+    },
+    "recordings": 57,
+    "inputTicks": 244627,
+    "sourceSha256": {
+      "src/physics/bike.ts": "34510352158b4312877cc96060430fd5c8722f6fa6399489fb3c0af207919f16",
+      "src/physics/collision.ts": "50dc3d78a86d991164e6f391af29b491437c47245a8d75835891141669dfaf2c",
+      "src/physics/controllers/index.ts": "5db9db3f3b8234afbe488e3a37286a5e91009e2584f63124cb91cdd8c13925bb",
+      "src/physics/dmath.ts": "b0f5e4536ba39ad4d1e53e4da9a9b89412f75594e206815e7ccc08f726f2893e",
+      "src/physics/index.ts": "36c7ae2948508ceba4657b3d64f088ff50e65ea1a450c2018332c25b49f786cb",
+      "src/physics/testTracks.ts": "9c8fab04235d957675225c6e914e94213dfb11fd1d1fad4d645de4a40a55c668",
+      "src/physics/tools/trackSweep.ts": "732be3f1e6951c17f74b6a281dedef825dc0c6829c2ebcc97f244e5b341703c7",
+      "src/physics/tuning.ts": "745b4b6edcad08df9cdaffbc16d740bb3887adc5f3de8d67a69462dbc863d6a0",
+      "src/physics/v2/bike.ts": "3358aa116da34c02c7c4a20018f212d89e9d7f34ffb0306893b51ba60ada669b",
+      "src/physics/v2/engine.ts": "1b44c8c9551d75c36d0a8ee1ceaedde97d8bc3514d9451e41095f0dcafc9caee",
+      "src/physics/v2/rider.ts": "271813e14c9238b74bb403fcc528aab987522f12c63336f56ededfa03e198eaa",
+      "src/physics/v2/tuning.ts": "833cdaf20720718ef775af378056394ad3788578a08a3c4c3595a2a387d39a72",
+      "src/physics/v2/tyre.ts": "335b249e98295f708da1d3899527d09bd00b2a6b391de39b5e1fbfc7251b9498",
+      "src/game/app.ts": "269194116cdf12123a3518025880c13f4dbccec9b2f3535e91e3498d9c01ab46",
+      "src/game/flow.ts": "2a0968e484aed4549d48f3ca941b1ea96f78b31379877a4d85c4d45c6b28522b",
+      "src/game/game.ts": "96ee5a9ad3fd1d2810008c8090aa80a1b5d5fe06977e32b5d27af114c3fdf271",
+      "src/game/ghost.ts": "0d46ed005ca8bcc62a22072d8bd9ae58ca87ea363bf3c897d4b9ad91988313d6",
+      "src/game/hook.ts": "8b621cfd3f75c223141b4e3946a05041b9cb12979354847ae70fc38be74759e2",
+      "src/game/index.ts": "28ac3222af5ac3816f54dc7d6b1bb55c5df5f35ee92f2690c4de65d56d0d3afc",
+      "src/game/input/gamepad.ts": "be880bfb586865a6f4c6614b4d8bf375c969dd83d72db737f25c8ad96f6be6a1",
+      "src/game/input/index.ts": "982af85c34982c5c86b96330ed35e61fd053ae97e85ba6e5190254112cb9a178",
+      "src/game/input/keyboard.ts": "95c115fd4be79f3382c481a1d2fe9d1ad57b11e22eb1159d4ccc108dcf5d4787",
+      "src/game/input/mux.ts": "72bfcd3582a417fa062807f6c52b595e1c070d986add762241ccfafd3e9e6246",
+      "src/game/input/touch.ts": "36b914911b72b234afc1af20ad0de67e44f8dda52645f05c2463d757db315de7",
+      "src/game/input/types.ts": "b44ed9110cbddc7725b8ccadb98a7ae1e155f683ecb0ce302b073d8306f3e258",
+      "src/game/mockPhysics.ts": "3704a05a75fb9741482232465d9b650f401e62cd4dd075754786e4735d0c0993",
+      "src/game/navlog.ts": "f6efdd89284447035cfe2e023cb598e2be6c747ddd87d477c0cadef0184ac89d",
+      "src/game/pwa.ts": "78911938e02acc68ce81de7c46615d1256025f8f932559ede169335d121f36a2",
+      "src/game/raf.ts": "24a2c93fbaa28716c43ce59938862a152e2a6b1f199a3cde673c8749efd3af93",
+      "src/game/replay.ts": "bac8d9605e2ca0b2f03dd145e937699c373ced3911aa3807d84f4c17e430c684",
+      "src/game/rules.ts": "1cbd88cdc12ec944782a15122010aae077bdfe343a8c035ce07311e21054522a",
+      "src/game/telemetry.ts": "9e20f386f8368e5c80e410bb70b7503d96abc4308a491463c55bd886452bc23c",
+      "src/core/global.d.ts": "1f2767e2338eefb93ade7f17dbe657d70c9788dd34582f8aecce0b93d18c1d3a",
+      "src/core/hash.ts": "f758f4dfb8bcb640f4b6ce2db7700643fc17f13a4fe7fe27d4de8e12ae7ae2a0",
+      "src/core/index.ts": "dea1afac94ef91c32e5fcff1e51025d9c25989ad6846b0ef68f0fa718ece0662",
+      "src/core/loop.ts": "007652dc6e1f32f0b80b0fccfa1c2dc66ad57c7b9d621b91a10451382e14b6ac",
+      "src/core/replay.ts": "070bd25ce17a84d4364cf68e738d73b64656a310e6315f58973ad27e9ef64402",
+      "src/core/rng.ts": "776d0713e1a6714809ee97311d228f5bd33fef592b8ae60aba9d806f08312fd3",
+      "src/core/types.ts": "29b6a08926d92035c78b6c30f421080103b6ec857a3ca4c1e4fceacf46b2861e",
+      "src/tracks/author.ts": "6f3126657e312ddee9cb17f401af91c7464e2f3a88749072c634153186facc5c",
+      "src/tracks/compile.ts": "bc487c49d020c39cba6436500c9998ffee50e1408ec903ccc5408e7886ba13f7",
+      "src/tracks/courses/beginner.ts": "929d70d78610f750708f1f14cd1686c45184b7c00ee98281752828f1513589a8",
+      "src/tracks/courses/easy.ts": "b97617f649c0f1bbfa5b118219fb421b306f0ccbfd1d8a1a695308c04d0c5cd8",
+      "src/tracks/courses/extreme.ts": "b018f674eeffebf221a34dd4d88d897dc3b49822b03cce41f9c9abd71922ba8f",
+      "src/tracks/courses/hard.ts": "061f64c1f65056271a193d0cfe6b7594f637865315026be07bba8378241d22a5",
+      "src/tracks/courses/index.ts": "9f378e94b4632766efdb5fabf295c8c8510d106eb3359a7b063ee9e6fbe2f29e",
+      "src/tracks/courses/lab.ts": "a143168eced7303b03b77695a8e964d26af7e6261b5b32ca926a57dcfd160756",
+      "src/tracks/courses/medium.ts": "0e8b8df08ad803d629a9ec0a222505ea055c5a8f3f593534363cf258be526f5e",
+      "src/tracks/courses/test-tracks.ts": "a8be2d0767ff39552b4aa6a4e11f4b9fbc85ab0b4b7d3a71cd1c3408dcb61f20",
+      "src/tracks/describe.ts": "2fcd0a06b5ef8604e03450d5efd6b35c5973d65ab780ee5ab4f9c51f25b39d38",
+      "src/tracks/geometry.ts": "2698b394fb49145642576251ad56900e37ecc281f7a6cd30210fd643515e0be9",
+      "src/tracks/index.ts": "c790eaca85c007674874d83d7dd3e15867bfb7daeda33b38b1ca98416d5d3a8d",
+      "src/tracks/kinds.ts": "22bba597b581b16eeaf6243a951c71be264bb04b00781fd505b7065b8676b4a4",
+      "src/tracks/validate.ts": "aa92bd789c592b9690704c4d0dff3ba14a3b4cdd503f25bc3bb752cf9819bf8b",
+      "src/render/hero/gltf.ts": "610ceb00243b51ae1d2ecf7b0947f82710a3909f51987e57ea1a8346f3918bdc",
+      "src/render/hero/gltfBike.ts": "4ba70c365690b100efe424f4f3429dbbf21ecc82ed2d17fdefad7fd9a30d1b8f",
+      "src/render/hero/gltfRider.ts": "b055526df43d586314c23f6b387c5dabf96f03c3fbb64f057c8dac72f10441a5",
+      "src/render/hero/gltfTestUtils.ts": "d3fb87d3bb948087a8f0bef5b2dfe3edcffa02fe23a2588db7cbf0a2da42d2d2",
+      "src/render/hero/lod.ts": "a5f570ef25d467f541da623534d5d7eb71a1db58a5817c50d6825530d6d9c073",
+      "src/render/hero/models.generated.ts": "71ef004f967b204f8153208b36fb99108d38e62b752ffc89bdefbd2bfcc78302",
+      "src/render/hero/urls.ts": "7a2908a18b8194a17c2ded87e2ab663ded7041877e69ef8ee84e327faefbf7c0",
+      "src/render/frame.ts": "3fe694ee3ce7ea731b140ef9b5cbfce7cc6942092aa10cb2a34d977f498e6e19",
+      "harness/hero-contracts.ts": "fbaf7189c67a42e5ae3cccb189044cb2470b322bbb6bfa7af542a9ed7e304a96",
+      "public/models/bike.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+      "public/models/bike-lod.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7",
+      "public/models/rider-street.glb": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6",
+      "public/models/rider-street-lod.glb": "272d6933529e962ed8ca9c61229a50b7c27d2e889f2e78f8778969b101f60399",
+      "public/models/rider-race.glb": "ee10c0372847d42138aafddc911e561be7fb9da20e01475d5aa5fe8b2d99f6fb",
+      "public/models/rider-race-lod.glb": "87997ed13eedcc62d72d65ca6c39f970619d8d5d19b9b8f7f5fb7fd48df7e53f",
+      "harness/inputs/b1-first-ride/bot-3-pro.json": "918193e93f5f6d34d1ad635b51c39dfe56ee8ef198e6cb82d48ffb9868ee003a",
+      "harness/inputs/b1-first-ride/bot-3.json": "029aa8bea4906ceb68fa730fc6bf247c4d118dacf3611054487d90e1bd835849",
+      "harness/inputs/b2-lean-back/bot-3-pro.json": "9dbc5863ec62736d2102967108cf438f19a848528617a4ca6704401e0491a4dd",
+      "harness/inputs/b2-lean-back/bot-3.json": "5e80676bea0a08b900a5776863f9ea84fceeb158888b415058c804250be0d6ad",
+      "harness/inputs/b3-kicker-row/bot-3-pro.json": "77596d24404d0adf53ea88b936359284d1dece9d2dba4e177f70084de9d723cf",
+      "harness/inputs/b3-kicker-row/bot-3.json": "31688bdc713042d3551fd2c28ad3bbdbe2d80349d30c10e47907a41ce7f8aa00",
+      "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-123737.json": "e4bc92564fa32d9757b0b8332597527b1230ce915a7ec84866e784fb3effb519",
+      "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260915-124041.json": "815b0b1e63b5d5222e9471f99e2de846812e08b9f5f70ae0be10e0afad786291",
+      "harness/inputs/e1-uphill-weight/bot-3-pro.json": "3b1f04f69b9e4bdf57dbfcb1f4733107779beb8c9eaa77358a460c52d749b140",
+      "harness/inputs/e1-uphill-weight/bot-3.json": "f9c4544f1e1b31c9a69fbf2460780b8db037026c4e24060f583a5b29531f2eed",
+      "harness/inputs/e2-rear-wheel-first/bot-3-pro.json": "6d093042503f78db68ed24a96babe8d83d4590538d375c18332e709878233a58",
+      "harness/inputs/e2-rear-wheel-first/bot-3.json": "c4534bed90f98a027124d393183c1fc2a7cc028ff2182d99c6fe68cfb83f5b1e",
+      "harness/inputs/e3-stairway/bot-3-pro.json": "f8c58d6a7414404dd4e4d0c93bc03383e265129486bcd6fe2e54ee3735c097c4",
+      "harness/inputs/e3-stairway/bot-3.json": "9074cc3b62ec2471e4ca3505792d8670319bf3f3fd2b7d6de55f38654947aa0e",
+      "harness/inputs/flat-test/bot-3-pro.json": "38d5c2c8ea46d2f1985a7758067a60a4b609b0af7ac5d9bd41f472285e469c1c",
+      "harness/inputs/flat-test/bot-3.json": "90664901cf7abd6773c93f99b295c9bc3d5621bc9411c757e6736c7dbb61ce71",
+      "harness/inputs/flat-test/crash.json": "7b79d3756c85ade6dfa858e893347564735f2e82e1df43d4b4d68b9e3c6fe6b0",
+      "harness/inputs/flat-test/restart-tap.json": "d4ea342a70ac7252dd3387f1ff675fb287ebac253da7faed9f06c4abd4ef4c18",
+      "harness/inputs/gap-test/bot-3-pro.json": "1e661e9dff2fadd66c2529fbbf9f11f16a7537d15e5f079eea952d349778820f",
+      "harness/inputs/gap-test/bot-3.json": "aa12a55654ddf76481d95455acc9fe7738b6065eafb883a0c40d8e4806fdbef4",
+      "harness/inputs/h1-wheelie-wire/bot-3-pro.json": "65dc88b487b2310cf190636fa38aa14185efd32823f3b3ba1ce72c6e8ae398a8",
+      "harness/inputs/h1-wheelie-wire/bot-3.json": "6574905935484167e54d664c3b648f003e532c50fedfc2be4f4af0c7d9fd8c97",
+      "harness/inputs/h2-gap-chain/bot-3-pro.json": "acdecc6a575bcfd3e15e61e15bca1537acbf729ea599015617b174eee6ddcc44",
+      "harness/inputs/h2-gap-chain/bot-3.json": "c02e74b2dae1acf0b97144d423f2ae4aeb53559a431fb6d45c113716baab08fb",
+      "harness/inputs/h3-fire-line/bot-3-pro.json": "94cd3a0eb9153b77c8b06d0f987b7baee0b1d3d68fdc2b105ddc89ebe312f82c",
+      "harness/inputs/h3-fire-line/bot-3.json": "72051ed433fc04652954cde806cdb047369150132566ef58762204f5ab8908aa",
+      "harness/inputs/hero-r3/b1-first-ride-pro.rec.json": "ca06c2a2ea54b8b110ea37beabdcc7f24044afe4dcdb8000af11ce831a8ca74a",
+      "harness/inputs/hero-r3/b1-first-ride-rookie.rec.json": "df25770558935f48a1506c65a067871388758ad775b24e7d6015c9b73167eb10",
+      "harness/inputs/hero-r3/b3-kicker-row-rookie.rec.json": "ee9f1e7e34240262113d619fc44946cb4830ee3f3aee4d26a409dbd5509e57ba",
+      "harness/inputs/hero-r3/crash-restart.json": "d5f233b982bbe4446eaaf0cdd7452a698605d1511f8fdcd02f69c6d0a963b4de",
+      "harness/inputs/hero-r3/e2-rear-wheel-first-rookie.rec.json": "9d3ff552825eb58f0d2efba8dfd10e89c739a759af715c517592585f541dedaa",
+      "harness/inputs/hero-r3/hop-binary.json": "3f51d7016f60dfd7425c03b09655e5b10647ba6dd7cdbe0a18e76b8e4c98b06e",
+      "harness/inputs/hero-r3/m1-hop-up-pro.rec.json": "6700190fa70ddf0819578b238b65b2458d7296b9895f8644a1a272ddf1692188",
+      "harness/inputs/hero-r3/m1-hop-up-rookie.rec.json": "82efa2079c075fde806e6e3ea00dea3bad0482812e3349c1cbb1f018f97629ba",
+      "harness/inputs/hero-r4/b1-first-ride-pro.rec.json": "2f5bb01e056068573aa67e6df1aba8ca58a320300e11c321f1a06ab52431a2db",
+      "harness/inputs/hero-r4/b3-kicker-row-pro.rec.json": "747c1c13d727105378511a4a153c01f63cde4954df76b24fa16c4ba958f742eb",
+      "harness/inputs/hero-r4/b3-kicker-row-rookie.rec.json": "05fdbfe50cc29e2b8e31727af319868ce886ef331e2f440c3a1c2a2d4b082e5d",
+      "harness/inputs/hero-r4/e2-rear-wheel-first-pro.rec.json": "3c20c416e754589b8b242ed8e07d26a61387340cea1156e0a4e0e3fede4e9c7a",
+      "harness/inputs/hero-r4/m1-hop-up-pro.rec.json": "e107d53dfd43227dbb48f93c8db2eb47d936b95eb57d473ec9fcd76c85bfa96d",
+      "harness/inputs/hero-r4/m1-hop-up-rookie.rec.json": "4b4bab0db4ebd1f0bd511a83cf087a3bb9968a364300831896a9147fa5109a34",
+      "harness/inputs/lab-flat-200/bot-3-pro.json": "16d1563609b7da9fdfd52f51284b1f0115df985e530556809e88ab92d5a2852d",
+      "harness/inputs/lab-flat-200/bot-3.json": "5b6ea9b856feb3c9084d320937771938d6537ea615e0e471aba00976b5f3c891",
+      "harness/inputs/lab-physics-test/bot-3-pro.json": "b086cc6fe35c82a1ec7904f45cdacfe8a2d00600abd6f34a6e557a30e1ae69a9",
+      "harness/inputs/lab-physics-test/bot-3.json": "226e20dd0a581341818b8e4583859eeaeee14c8890f6a306c438894a24198ca0",
+      "harness/inputs/m1-hop-up/bot-3-pro.json": "0d3bf58a6e46279cb3c90b8af17974c301d5372a0c3018922de8bb8aa0b7a0f9",
+      "harness/inputs/m1-hop-up/bot-3.json": "889c415b9187d6f02cac9273fb9a5a5d59cc24ce9eeeb8e541b7dd0bd345baa0",
+      "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124509.json": "06f86777b4d6c1a997eea46f31028ddc7d38093b3ce8500fc86c16d131cd6592",
+      "harness/inputs/m2-drum-roll/bot-3-pro.json": "829230b75351c3624dc910879302863eda7a4de846be7b5bb80cad32775ece4e",
+      "harness/inputs/m2-drum-roll/bot-3.json": "973b178e85932b4b54948b38bfb39a037e8264f60568acee8e6a04b618dafbf2",
+      "harness/inputs/m3-see-saw/bot-3-pro.json": "5eba50d0f56453f3371f3cf5a946023bad975b1a7d49ff0e9c9a2069f1d0e44a",
+      "harness/inputs/m3-see-saw/bot-3.json": "cecb4d86ffee8c469ab10302c50113041acbc60e7c21ff8bec9c072d3c150fd0",
+      "harness/inputs/x1-vertical-limit/bot-3-pro.json": "76f0b3d60a898fffb2832f23d42e296df735904b710c9a36b0a47cfbf4d109ae",
+      "harness/inputs/x1-vertical-limit/bot-3.json": "c6318780daec0d0ac23ca16f76113e6b783d44b69b904bf9a052c176ead75c6c",
+      "harness/inputs/x2-pipe-dream/bot-3-pro.json": "383860b5c6b1eac808386376b29fe42732b67526921168283d88ff9fe15d11d6",
+      "harness/inputs/x2-pipe-dream/bot-3.json": "9bfef86386af67aa40772a9c7e8b01d35d6dc9b3338e1da93e97ec8d4c3a412e",
+      "harness/inputs/x3-gauntlet/bot-3-pro.json": "91edbdaef9d4de4368495aa2b606e89f291047ef989797c18d807d5bbfdd8563",
+      "harness/inputs/x3-gauntlet/bot-3.json": "c2e80bdf28757a5cd9afa1d92d512d67fe22f99a9861d89eebc91334646d6fad"
+    },
+    "sourceUnchanged": true,
+    "allFinite": true,
+    "maxima": {
+      "bikes.wheel": {
+        "value": 2.4492194301459084e-13,
+        "inputTick": 4421,
+        "phase": "riding",
+        "input": "harness/inputs/hero-r4/b1-first-ride-pro.rec.json",
+        "asset": "bike.glb"
+      },
+      "bikes.wheelAngle": {
+        "value": 2.2543157202242076e-13,
+        "inputTick": 3974,
+        "phase": "riding",
+        "input": "harness/inputs/hero-r3/b1-first-ride-rookie.rec.json",
+        "asset": "bike.glb"
+      },
+      "bikes.swingAxle": {
+        "value": 9.086727975946738e-05,
+        "inputTick": 1827,
+        "phase": "crashed",
+        "input": "harness/inputs/h1-wheelie-wire/bot-3.json",
+        "asset": "bike.glb"
+      },
+      "bikes.shockEye": {
+        "value": 2.2953422713352973e-13,
+        "inputTick": 4019,
+        "phase": "riding",
+        "input": "harness/inputs/hero-r4/b1-first-ride-pro.rec.json",
+        "asset": "bike.glb"
+      },
+      "bikes.fork": {
+        "value": 6.675617550269686e-05,
+        "inputTick": 1827,
+        "phase": "crashed",
+        "input": "harness/inputs/h1-wheelie-wire/bot-3.json",
+        "asset": "bike.glb"
+      },
+      "bikes.rearPhysical": {
+        "value": 9.088951350832986e-05,
+        "inputTick": 1827,
+        "phase": "crashed",
+        "input": "harness/inputs/h1-wheelie-wire/bot-3.json",
+        "asset": "bike.glb"
+      },
+      "bikes.frontPhysical": {
+        "value": 6.672721654121111e-05,
+        "inputTick": 1827,
+        "phase": "crashed",
+        "input": "harness/inputs/h1-wheelie-wire/bot-3.json",
+        "asset": "bike.glb"
+      },
+      "riders.grip": {
+        "value": 2.5599570013528787e-07,
+        "inputTick": 4903,
+        "phase": "riding",
+        "input": "harness/inputs/x1-vertical-limit/bot-3.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.sole": {
+        "value": 1.886342594766925e-07,
+        "inputTick": 4901,
+        "phase": "riding",
+        "input": "harness/inputs/x1-vertical-limit/bot-3.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.length": {
+        "value": 1.841110294220627e-07,
+        "inputTick": 869,
+        "phase": "riding",
+        "input": "harness/inputs/x3-gauntlet/bot-3-pro.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.com": {
+        "value": 1.1362800162178651e-07,
+        "inputTick": 337,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/bot-3-pro.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.elbowBackwards": {
+        "value": 0,
+        "inputTick": 0,
+        "phase": "",
+        "input": "harness/inputs/b1-first-ride/bot-3-pro.json",
+        "asset": "rider-street.glb"
+      }
+    }
+  },
+  "finalBuildInventory": {
+    "path": "harness/out/blender/r4-dist-inventory.json",
+    "sha256": "f2267786b269dffb616341d60f1ed01e6282a63b3f22add8d23149f904cfb7a3"
+  },
+  "finalSourceSha256": {
+    "src/physics/v2/rider.ts": "271813e14c9238b74bb403fcc528aab987522f12c63336f56ededfa03e198eaa",
+    "src/physics/v2/bike.ts": "3358aa116da34c02c7c4a20018f212d89e9d7f34ffb0306893b51ba60ada669b",
+    "src/render/index.ts": "b564dfbcc4d7b6c08a438b89f59daa9179694768b6c8bdc5b1a85071f39d2d78",
+    "src/render/compilation.test.ts": "df4b57506d0ebbbef79c9264432cc1b6644858fcae6d91610800d03ceaad8be8",
+    "harness/hero-capture.mts": "65db283b9e3005bc0f84db7b5342d5763c25eec85cbf97ac39ecb7af6d801a24",
+    "harness/hero-contracts.ts": "fbaf7189c67a42e5ae3cccb189044cb2470b322bbb6bfa7af542a9ed7e304a96",
+    "harness/bot/actions.ts": "e87c02f589f5f80576ed284c20898318b5aa46648267fe8c86dee3c579935437",
+    "harness/bot/beam.ts": "0acebb5e6eb68b69c5c81f8d159933fda0ff33a9c8274afd70acaf0b3e6b5e54",
+    "harness/bot/beam.test.ts": "3b1cae8e22f22bb1136259fe48f44d151a9df3aff12a93d9cb90bb53a971a8f1",
+    "assets/blender/author_garments.py": "3f8c352d7388420aeffff219e190d829ebef14e76356b1602ee39fdd779c1239",
+    "assets/blender/author_garment_joints.py": "4b67db0baec54bb2f258109646ec89b4ca254b356b872bde32a28f13dcfb00f2",
+    "assets/blender/build_bike.py": "1e1ace686923f6b2a46411042c976cd1b370f44ec5a8c8316fbd8453dcfe7a61",
+    "assets/blender/source/rider-street.blend": "153e1e778efd5cc0b4c5d5bf4725a1fe6a386d50c63eebbd5a7efafc17928ff1",
+    "assets/blender/source/rider-race.blend": "2ef9ef4df75b64cf729aa0751b7d6ff245ddde2991c4d0f0a2edd85f5da7e121",
+    "assets/blender/bike.blend": "1578e56313d06a831bc1c28adf6297238144c7089695e86ff532eaa673ba99fe",
+    "assets/blender/bike-lod.blend": "3dc61e3b4073e1fe7a0a2031b578ac00805363bf881e88b387041ae49837931a",
+    "src/render/hero/models.generated.ts": "71ef004f967b204f8153208b36fb99108d38e62b752ffc89bdefbd2bfcc78302",
+    "src/boot/plan.generated.ts": "72cc302224f8519bbb8d9c0903015cde280e292e8beb96ab084e981408f1988c"
+  },
+  "strangerMetrics": {
+    "b3-kicker-row": {
+      "medianAttempts": 1,
+      "medianFinishSeconds": 36.725,
+      "reports": [
+        {
+          "path": "harness/out/metrics/b3-kicker-row.stranger.json",
+          "sha256": "e6abca984ddfc29d3063f4cdb90fe61c091357d449213eba17a00be6ab96a8fe"
+        },
+        {
+          "path": "harness/out/metrics/b3-kicker-row.stranger.md",
+          "sha256": "16b569c04cb4007c4c9512a91fef293e039aafb7906f1af09c0ac7ea6d40de4f"
+        }
+      ]
+    },
+    "m1-hop-up": {
+      "medianAttempts": 8,
+      "medianFinishSeconds": 110.2375,
+      "reports": [
+        {
+          "path": "harness/out/metrics/m1-hop-up.stranger.json",
+          "sha256": "d6e607e331a351e63ca8d7b98bae49183754f0ef4fbdf6dc04548a94c5eaade8"
+        },
+        {
+          "path": "harness/out/metrics/m1-hop-up.stranger.md",
+          "sha256": "a1e45781be5c88925594d032088392fb9cfaf7bf12888473036866748eab07cc"
+        }
+      ]
+    }
+  },
+  "additionalAssetCensus": {
+    "report": {
+      "path": "harness/out/blender/r4-hero-contracts-m1-second.json",
+      "sha256": "e51d6507dd36150d72fb5b5f045ac39d860126c35396a9194263d474b7cb872d"
+    },
+    "recordings": 1,
+    "inputTicks": 10718,
+    "sourceSha256": {
+      "src/physics/bike.ts": "34510352158b4312877cc96060430fd5c8722f6fa6399489fb3c0af207919f16",
+      "src/physics/collision.ts": "50dc3d78a86d991164e6f391af29b491437c47245a8d75835891141669dfaf2c",
+      "src/physics/controllers/index.ts": "5db9db3f3b8234afbe488e3a37286a5e91009e2584f63124cb91cdd8c13925bb",
+      "src/physics/dmath.ts": "b0f5e4536ba39ad4d1e53e4da9a9b89412f75594e206815e7ccc08f726f2893e",
+      "src/physics/index.ts": "36c7ae2948508ceba4657b3d64f088ff50e65ea1a450c2018332c25b49f786cb",
+      "src/physics/testTracks.ts": "9c8fab04235d957675225c6e914e94213dfb11fd1d1fad4d645de4a40a55c668",
+      "src/physics/tools/trackSweep.ts": "732be3f1e6951c17f74b6a281dedef825dc0c6829c2ebcc97f244e5b341703c7",
+      "src/physics/tuning.ts": "745b4b6edcad08df9cdaffbc16d740bb3887adc5f3de8d67a69462dbc863d6a0",
+      "src/physics/v2/bike.ts": "3358aa116da34c02c7c4a20018f212d89e9d7f34ffb0306893b51ba60ada669b",
+      "src/physics/v2/engine.ts": "1b44c8c9551d75c36d0a8ee1ceaedde97d8bc3514d9451e41095f0dcafc9caee",
+      "src/physics/v2/rider.ts": "271813e14c9238b74bb403fcc528aab987522f12c63336f56ededfa03e198eaa",
+      "src/physics/v2/tuning.ts": "833cdaf20720718ef775af378056394ad3788578a08a3c4c3595a2a387d39a72",
+      "src/physics/v2/tyre.ts": "335b249e98295f708da1d3899527d09bd00b2a6b391de39b5e1fbfc7251b9498",
+      "src/game/app.ts": "269194116cdf12123a3518025880c13f4dbccec9b2f3535e91e3498d9c01ab46",
+      "src/game/flow.ts": "2a0968e484aed4549d48f3ca941b1ea96f78b31379877a4d85c4d45c6b28522b",
+      "src/game/game.ts": "96ee5a9ad3fd1d2810008c8090aa80a1b5d5fe06977e32b5d27af114c3fdf271",
+      "src/game/ghost.ts": "0d46ed005ca8bcc62a22072d8bd9ae58ca87ea363bf3c897d4b9ad91988313d6",
+      "src/game/hook.ts": "8b621cfd3f75c223141b4e3946a05041b9cb12979354847ae70fc38be74759e2",
+      "src/game/index.ts": "28ac3222af5ac3816f54dc7d6b1bb55c5df5f35ee92f2690c4de65d56d0d3afc",
+      "src/game/input/gamepad.ts": "be880bfb586865a6f4c6614b4d8bf375c969dd83d72db737f25c8ad96f6be6a1",
+      "src/game/input/index.ts": "982af85c34982c5c86b96330ed35e61fd053ae97e85ba6e5190254112cb9a178",
+      "src/game/input/keyboard.ts": "95c115fd4be79f3382c481a1d2fe9d1ad57b11e22eb1159d4ccc108dcf5d4787",
+      "src/game/input/mux.ts": "72bfcd3582a417fa062807f6c52b595e1c070d986add762241ccfafd3e9e6246",
+      "src/game/input/touch.ts": "36b914911b72b234afc1af20ad0de67e44f8dda52645f05c2463d757db315de7",
+      "src/game/input/types.ts": "b44ed9110cbddc7725b8ccadb98a7ae1e155f683ecb0ce302b073d8306f3e258",
+      "src/game/mockPhysics.ts": "3704a05a75fb9741482232465d9b650f401e62cd4dd075754786e4735d0c0993",
+      "src/game/navlog.ts": "f6efdd89284447035cfe2e023cb598e2be6c747ddd87d477c0cadef0184ac89d",
+      "src/game/pwa.ts": "78911938e02acc68ce81de7c46615d1256025f8f932559ede169335d121f36a2",
+      "src/game/raf.ts": "24a2c93fbaa28716c43ce59938862a152e2a6b1f199a3cde673c8749efd3af93",
+      "src/game/replay.ts": "bac8d9605e2ca0b2f03dd145e937699c373ced3911aa3807d84f4c17e430c684",
+      "src/game/rules.ts": "1cbd88cdc12ec944782a15122010aae077bdfe343a8c035ce07311e21054522a",
+      "src/game/telemetry.ts": "9e20f386f8368e5c80e410bb70b7503d96abc4308a491463c55bd886452bc23c",
+      "src/core/global.d.ts": "1f2767e2338eefb93ade7f17dbe657d70c9788dd34582f8aecce0b93d18c1d3a",
+      "src/core/hash.ts": "f758f4dfb8bcb640f4b6ce2db7700643fc17f13a4fe7fe27d4de8e12ae7ae2a0",
+      "src/core/index.ts": "dea1afac94ef91c32e5fcff1e51025d9c25989ad6846b0ef68f0fa718ece0662",
+      "src/core/loop.ts": "007652dc6e1f32f0b80b0fccfa1c2dc66ad57c7b9d621b91a10451382e14b6ac",
+      "src/core/replay.ts": "070bd25ce17a84d4364cf68e738d73b64656a310e6315f58973ad27e9ef64402",
+      "src/core/rng.ts": "776d0713e1a6714809ee97311d228f5bd33fef592b8ae60aba9d806f08312fd3",
+      "src/core/types.ts": "29b6a08926d92035c78b6c30f421080103b6ec857a3ca4c1e4fceacf46b2861e",
+      "src/tracks/author.ts": "6f3126657e312ddee9cb17f401af91c7464e2f3a88749072c634153186facc5c",
+      "src/tracks/compile.ts": "bc487c49d020c39cba6436500c9998ffee50e1408ec903ccc5408e7886ba13f7",
+      "src/tracks/courses/beginner.ts": "929d70d78610f750708f1f14cd1686c45184b7c00ee98281752828f1513589a8",
+      "src/tracks/courses/easy.ts": "b97617f649c0f1bbfa5b118219fb421b306f0ccbfd1d8a1a695308c04d0c5cd8",
+      "src/tracks/courses/extreme.ts": "b018f674eeffebf221a34dd4d88d897dc3b49822b03cce41f9c9abd71922ba8f",
+      "src/tracks/courses/hard.ts": "061f64c1f65056271a193d0cfe6b7594f637865315026be07bba8378241d22a5",
+      "src/tracks/courses/index.ts": "9f378e94b4632766efdb5fabf295c8c8510d106eb3359a7b063ee9e6fbe2f29e",
+      "src/tracks/courses/lab.ts": "a143168eced7303b03b77695a8e964d26af7e6261b5b32ca926a57dcfd160756",
+      "src/tracks/courses/medium.ts": "0e8b8df08ad803d629a9ec0a222505ea055c5a8f3f593534363cf258be526f5e",
+      "src/tracks/courses/test-tracks.ts": "a8be2d0767ff39552b4aa6a4e11f4b9fbc85ab0b4b7d3a71cd1c3408dcb61f20",
+      "src/tracks/describe.ts": "2fcd0a06b5ef8604e03450d5efd6b35c5973d65ab780ee5ab4f9c51f25b39d38",
+      "src/tracks/geometry.ts": "2698b394fb49145642576251ad56900e37ecc281f7a6cd30210fd643515e0be9",
+      "src/tracks/index.ts": "c790eaca85c007674874d83d7dd3e15867bfb7daeda33b38b1ca98416d5d3a8d",
+      "src/tracks/kinds.ts": "22bba597b581b16eeaf6243a951c71be264bb04b00781fd505b7065b8676b4a4",
+      "src/tracks/validate.ts": "aa92bd789c592b9690704c4d0dff3ba14a3b4cdd503f25bc3bb752cf9819bf8b",
+      "src/render/hero/gltf.ts": "610ceb00243b51ae1d2ecf7b0947f82710a3909f51987e57ea1a8346f3918bdc",
+      "src/render/hero/gltfBike.ts": "4ba70c365690b100efe424f4f3429dbbf21ecc82ed2d17fdefad7fd9a30d1b8f",
+      "src/render/hero/gltfRider.ts": "b055526df43d586314c23f6b387c5dabf96f03c3fbb64f057c8dac72f10441a5",
+      "src/render/hero/gltfTestUtils.ts": "d3fb87d3bb948087a8f0bef5b2dfe3edcffa02fe23a2588db7cbf0a2da42d2d2",
+      "src/render/hero/lod.ts": "a5f570ef25d467f541da623534d5d7eb71a1db58a5817c50d6825530d6d9c073",
+      "src/render/hero/models.generated.ts": "71ef004f967b204f8153208b36fb99108d38e62b752ffc89bdefbd2bfcc78302",
+      "src/render/hero/urls.ts": "7a2908a18b8194a17c2ded87e2ab663ded7041877e69ef8ee84e327faefbf7c0",
+      "src/render/frame.ts": "3fe694ee3ce7ea731b140ef9b5cbfce7cc6942092aa10cb2a34d977f498e6e19",
+      "harness/hero-contracts.ts": "fbaf7189c67a42e5ae3cccb189044cb2470b322bbb6bfa7af542a9ed7e304a96",
+      "public/models/bike.glb": "0f3267de654f00351f88750a7745a4be9ccf9e55961922da572eb195df7ffec7",
+      "public/models/bike-lod.glb": "a64d762183da9fdce14d8eb85fd2d0656f0a38d35f041899fa0d3c3f4844afe7",
+      "public/models/rider-street.glb": "2d5ab2bef843318b0ae7897943ebcab8a56c643527eb962be68aac45bab104d6",
+      "public/models/rider-street-lod.glb": "272d6933529e962ed8ca9c61229a50b7c27d2e889f2e78f8778969b101f60399",
+      "public/models/rider-race.glb": "ee10c0372847d42138aafddc911e561be7fb9da20e01475d5aa5fe8b2d99f6fb",
+      "public/models/rider-race-lod.glb": "87997ed13eedcc62d72d65ca6c39f970619d8d5d19b9b8f7f5fb7fd48df7e53f",
+      "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json": "a91c0c4c4ad1978f6ba857447b92ee7eacbcbe1cf2d1e046dd929486177c7518"
+    },
+    "sourceUnchanged": true,
+    "allFinite": true,
+    "maxima": {
+      "bikes.wheel": {
+        "value": 1.2110859098666069e-13,
+        "inputTick": 6774,
+        "phase": "crashed",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "bike.glb"
+      },
+      "bikes.wheelAngle": {
+        "value": 1.0585405005216568e-13,
+        "inputTick": 4946,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "bike.glb"
+      },
+      "bikes.swingAxle": {
+        "value": 4.2693420257083534e-05,
+        "inputTick": 8260,
+        "phase": "crashed",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "bike.glb"
+      },
+      "bikes.shockEye": {
+        "value": 1.1859094492531964e-13,
+        "inputTick": 6743,
+        "phase": "crashed",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "bike.glb"
+      },
+      "bikes.fork": {
+        "value": 8.34719676320872e-06,
+        "inputTick": 346,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "bike.glb"
+      },
+      "bikes.rearPhysical": {
+        "value": 4.267119011092113e-05,
+        "inputTick": 8260,
+        "phase": "crashed",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "bike.glb"
+      },
+      "bikes.frontPhysical": {
+        "value": 8.339717322961016e-06,
+        "inputTick": 346,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "bike.glb"
+      },
+      "riders.grip": {
+        "value": 2.3670559797466315e-07,
+        "inputTick": 4956,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.sole": {
+        "value": 1.6887507000099545e-07,
+        "inputTick": 2507,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.length": {
+        "value": 1.8248619132466004e-07,
+        "inputTick": 1954,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.com": {
+        "value": 1.0695172635645018e-07,
+        "inputTick": 1954,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.elbowBackwards": {
+        "value": 0,
+        "inputTick": 0,
+        "phase": "",
+        "input": "harness/inputs/m1-hop-up/stranger-m1-hop-up-20260915-124906.json",
+        "asset": "rider-street.glb"
+      }
+    }
+  },
+  "combinedAssetCensus": {
+    "recordings": 58,
+    "inputTicks": 255345,
+    "commonSourceHashes": 69,
+    "commonSourceHashesEqual": true,
+    "sourceUnchanged": true,
+    "maxima": {
+      "bikes.wheel": {
+        "value": 2.4492194301459084e-13,
+        "inputTick": 4421,
+        "phase": "riding",
+        "input": "harness/inputs/hero-r4/b1-first-ride-pro.rec.json",
+        "asset": "bike.glb"
+      },
+      "bikes.wheelAngle": {
+        "value": 2.2543157202242076e-13,
+        "inputTick": 3974,
+        "phase": "riding",
+        "input": "harness/inputs/hero-r3/b1-first-ride-rookie.rec.json",
+        "asset": "bike.glb"
+      },
+      "bikes.swingAxle": {
+        "value": 9.086727975946738e-05,
+        "inputTick": 1827,
+        "phase": "crashed",
+        "input": "harness/inputs/h1-wheelie-wire/bot-3.json",
+        "asset": "bike.glb"
+      },
+      "bikes.shockEye": {
+        "value": 2.2953422713352973e-13,
+        "inputTick": 4019,
+        "phase": "riding",
+        "input": "harness/inputs/hero-r4/b1-first-ride-pro.rec.json",
+        "asset": "bike.glb"
+      },
+      "bikes.fork": {
+        "value": 6.675617550269686e-05,
+        "inputTick": 1827,
+        "phase": "crashed",
+        "input": "harness/inputs/h1-wheelie-wire/bot-3.json",
+        "asset": "bike.glb"
+      },
+      "bikes.rearPhysical": {
+        "value": 9.088951350832986e-05,
+        "inputTick": 1827,
+        "phase": "crashed",
+        "input": "harness/inputs/h1-wheelie-wire/bot-3.json",
+        "asset": "bike.glb"
+      },
+      "bikes.frontPhysical": {
+        "value": 6.672721654121111e-05,
+        "inputTick": 1827,
+        "phase": "crashed",
+        "input": "harness/inputs/h1-wheelie-wire/bot-3.json",
+        "asset": "bike.glb"
+      },
+      "riders.grip": {
+        "value": 2.5599570013528787e-07,
+        "inputTick": 4903,
+        "phase": "riding",
+        "input": "harness/inputs/x1-vertical-limit/bot-3.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.sole": {
+        "value": 1.886342594766925e-07,
+        "inputTick": 4901,
+        "phase": "riding",
+        "input": "harness/inputs/x1-vertical-limit/bot-3.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.length": {
+        "value": 1.841110294220627e-07,
+        "inputTick": 869,
+        "phase": "riding",
+        "input": "harness/inputs/x3-gauntlet/bot-3-pro.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.com": {
+        "value": 1.1362800162178651e-07,
+        "inputTick": 337,
+        "phase": "riding",
+        "input": "harness/inputs/m1-hop-up/bot-3-pro.json",
+        "asset": "rider-street.glb"
+      },
+      "riders.elbowBackwards": {
+        "value": 0,
+        "inputTick": 0,
+        "phase": "",
+        "input": "harness/inputs/b1-first-ride/bot-3-pro.json",
+        "asset": "rider-street.glb"
+      }
+    }
+  }
+}

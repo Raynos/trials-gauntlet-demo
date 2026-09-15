@@ -3,13 +3,15 @@
 Owner: Codex Blender session. Branch: `blender-work`, in the explicitly authorized
 `trials-gauntlet-blender` worktree. Baseline: `56e3883` (2026-09-15).
 
-Status: **active WIP, resumed by the user 2026-09-15**. Round 3 establishes
-stable suspension/contacts, real outfit contracts, honest load retries and fresh
-production-Game evidence. Typecheck/lint/build pass; tests **18 failed, 673 passed,
-11 todo**. Rookie B1/B3/E2/M1 bots and two B1 strangers clear on attempt one;
-Pro bot entry, elbow-pole singularity, physics/performance requirements, authored
-art and actual iOS remain open. See [the handoff](../BLENDER_HANDOFF.md) and
-[round 3 manifest](../evidence/blender-r3.json). No merge or deployment yet.
+Status: **active WIP, resumed by the user 2026-09-15**. Round 4 excludes the
+elbow-pole singularity, restores fresh Pro clearability, and promotes connected
+shoulders/elbows plus a readable seat pad after played review. Typecheck/lint
+and separate build pass; tests **18 failed, 686 passed, 11 todo**. Pro B1/B3/E2/M1
+and replacement Rookie B3/M1 bots clear on attempt one. Two fresh B3 strangers
+also clear first attempt; two M1 strangers each clear in eight attempts (band 5–9).
+Coupled anatomical closure, remaining physics/cost, cloth detail and actual iOS
+remain open. See [the handoff](../BLENDER_HANDOFF.md) and
+[round 4 manifest](../evidence/blender-r4.json). No merge or deployment yet.
 Track this plan in `PLANS.md` at every commit.
 
 ## Mandate and boundaries

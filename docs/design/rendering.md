@@ -1511,3 +1511,45 @@ The played landing comparison still shows the rounded helmet/brace, simplified
 garments and limited physical pose read. Art, mechanical attachment defects,
 physical-to-visual pose mapping, actual-device validation and a trustworthy
 blind comparison pipeline remain open. No H5 win-rate increase is claimed.
+
+## 15. Blender branch round 4 — connected sleeves and physical attachment
+
+The parent played native Blender hang-back/landing actions and actual exported
+Street/Race hop clips. Connected armholes remove the former overlapping sleeve
+join. Wider graded elbow loops keep a continuous bend through compression and
+extension. These are accepted incremental improvements and are now in both
+protected rider sources plus all four full/LOD exports. Nineteen bones, eight
+actions and four sockets retain exact bind/action data. The game still needs
+cloth folds, material variation, a better hood/neck overlap, waist and knee work;
+this is not an AAA verdict or a new blind-critic score.
+
+The parent's played Pro Rear Wheel First finish (42.425 s, zero faults) keeps
+normal arm attachment through the result-camera move. The 35-degree physical
+elbow stop excludes the earlier fixed-pole singularity. Across 58 recordings /
+255,345 ticks, actual full/LOD rendered COM mismatch is at most 0.114 micrometres;
+hand/sole errors stay below 0.256 / 0.189 micrometres. The exact user's older
+78.433 s / four-fault finish still lacks matching inputs.
+
+The bike pad previously disappeared into the blue body. Raising its loft makes
+the black seat readable during played takeoff/landing without moving mechanical
+markers. Full/LOD geometry tests retain their original physical tolerances.
+
+Connected trouser prototypes remain rejected: landing still has four street /
+seven race saddle crossing pairs, and inherited knees fold through themselves.
+The promoted rider sources retain the previous trousers. Reference cloth planes
+and detailed bike material separation still set the visual target.
+
+Shader warmup now builds actual two-material batches, preserving skinning,
+instancing and real scene lighting. It no longer leaves live visibility or the
+render target changed over asynchronous waits; jobs serialize. The three new
+deferred regressions fail against the old implementation and pass with this
+change. Rapid transitions still produce Metal invalid-program warnings in all
+three runs of each frozen build. Raw WebGL controls identify pending parallel
+link/deletion as a sufficient trigger; diagnostic deletion deferral prevents
+all warnings in six game stress runs. That workaround is not in production.
+Capture records the actual GPU/backend, awaits settled
+setup and rejects WebGL errors; headless desktop evidence is not an iOS result.
+
+Exact source/model/build hashes, played clips and open limits are in
+`docs/evidence/blender-r4.json`. Full check: 18 failed / 686 passed / 11 todo;
+typecheck, lint and separate build pass.

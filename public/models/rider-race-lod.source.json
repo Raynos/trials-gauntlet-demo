@@ -1,13 +1,13 @@
 {
   "source": "assets/blender/source/rider-race.blend",
-  "sourceSha256": "7edf2c496e9dd3fa5e6976fea3757ebcb449c02737dcf5392aad7c25ac6f0f55",
-  "exportSha256": "05619c1f0faacaad488c831d17de1c42c3a4caa4140bec055f9317df9ca392da",
+  "sourceSha256": "2ef9ef4df75b64cf729aa0751b7d6ff245ddde2991c4d0f0a2edd85f5da7e121",
+  "exportSha256": "87997ed13eedcc62d72d65ca6c39f970619d8d5d19b9b8f7f5fb7fd48df7e53f",
   "outfit": "race",
   "lod": true,
   "verified": {
-    "bytes": 527912,
+    "bytes": 537144,
     "triangles": 5879,
-    "vertices": 6126,
+    "vertices": 6109,
     "bones": 19,
     "clips": [
       "crouch",
@@ -23,7 +23,7 @@
       "rider_rookie",
       "rider_pro"
     ],
-    "maxWeightError": 2.9802322387695312e-08,
+    "maxWeightError": 8.940696716308594e-08,
     "loadedWeightError": 2.9802322387695312e-08
   }
 }

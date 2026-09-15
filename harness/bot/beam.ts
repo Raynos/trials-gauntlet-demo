@@ -2,7 +2,7 @@
  * Beam search over macro-actions using the node sim's snapshot/restore.
  *
  * Per depth, every frontier node is restored and every action rolled out for
- * HOLD ticks. Children are deduped on a coarse (x, vx, angle, grounded) cell
+ * HOLD ticks. Children are deduped on coarse motion, rider pose and wheel-contact cells
  * keeping the best score, then the top `width` survive. A child that
  * finishes ends the search immediately (earliest finish on the run clock
  * wins). A child whose rollout emitted a `fault` is kept but scored
@@ -68,6 +68,50 @@ function isBanned(actions: number[], banned: number[][] | undefined): boolean {
   return false;
 }
 
+/**
+ * Include rotation over the next decision interval and the actual rider COM/torso in the bike frame.
+ * Equal pitch alone merges a falling nose with a rising one; equal input lean does not mean the rider
+ * has reached the same pose. The 5 cm COM bins resolve the rider's measured fore/aft travel.
+ */
+export function motionCell(st: PhysicsState, cfg: BeamConfig, hz: number): string {
+  const [cx, cvx, ca] = cfg.cells;
+  const parts = [Math.round(st.bike.pos.x / cx), Math.round(st.bike.vel.x / cvx),
+    Math.round(st.bike.angle / ca), Math.round(st.bike.angVel * HOLD / hz / ca),
+    (st.wheels.rear.grounded ? 1 : 0) | (st.wheels.front.grounded ? 2 : 0)];
+  const rider = st.riderBody;
+  if (rider) {
+    const dx = rider.pos.x - st.bike.pos.x, dy = rider.pos.y - st.bike.pos.y;
+    const c = Math.cos(st.bike.angle), s = Math.sin(st.bike.angle);
+    parts.push(Math.round((c * dx + s * dy) / 0.05), Math.round((-s * dx + c * dy) / 0.05),
+      Math.round((rider.angle - st.bike.angle) / ca));
+  }
+  return parts.join('|');
+}
+
+/**
+ * Reserve survivors for different physical balance states before filling spare places by score.
+ * Otherwise many fast, rising, rearward variants crowd out a forward rider whose benefit appears
+ * later. The bands use one configured pitch cell and one COM cell; action names never enter them.
+ */
+export function selectFrontier<T extends { state: PhysicsState; score: number }>(
+  candidates: Iterable<T>, cfg: BeamConfig, hz: number,
+): T[] {
+  const ranked = [...candidates].sort((a, b) => b.score - a.score);
+  const band = (value: number, cell: number): number => value > cell ? 1 : value < -cell ? -1 : 0;
+  const representatives = new Map<string, T>();
+  for (const node of ranked) {
+    const st = node.state, rider = st.riderBody;
+    const riderX = rider ? Math.cos(st.bike.angle) * (rider.pos.x - st.bike.pos.x) +
+      Math.sin(st.bike.angle) * (rider.pos.y - st.bike.pos.y) : 0;
+    const key = [band(st.bike.angle, cfg.cells[2]), band(st.bike.angVel * HOLD / hz, cfg.cells[2]),
+      band(riderX, 0.05)].join('|');
+    if (!representatives.has(key)) representatives.set(key, node);
+  }
+  const first = [...representatives.values()], selected = new Set(first);
+  return [...first, ...ranked.filter((node) => !selected.has(node))]
+    .slice(0, cfg.width).sort((a, b) => b.score - a.score);
+}
+
 export function plan(sim: Omit<Sim, 'rules'>, cfg: BeamConfig, w: ScoreWeights, opts: PlanOptions = {}): Plan {
   const t0 = performance.now();
   const root = sim.snap();
@@ -82,7 +126,6 @@ export function plan(sim: Omit<Sim, 'rules'>, cfg: BeamConfig, w: ScoreWeights, 
   let finishRunTick: number | null = null;
   let allFault = false;
   let depthReached = 0;
-  const [cx, cvx, ca] = cfg.cells;
 
   outer: for (let d = 0; d < cfg.depth; d++) {
     if (d > 0 && performance.now() - t0 > cfg.budgetMs) break;
@@ -93,6 +136,8 @@ export function plan(sim: Omit<Sim, 'rules'>, cfg: BeamConfig, w: ScoreWeights, 
       if (node.faulted) continue; // do not expand past a fault; the fault is real
       const choices = node.pending ? [node.pending.aid] : allowed;
       for (const aid of choices) {
+        const canStart = ACTIONS[aid]?.canStart;
+        if (!node.pending && canStart && !canStart(node.state)) continue;
         const actions = node.pending ? node.actions : [...node.actions, aid];
         if (!node.pending && isBanned(actions, opts.banned)) continue;
         sim.restore(node.snap);
@@ -124,7 +169,7 @@ export function plan(sim: Omit<Sim, 'rules'>, cfg: BeamConfig, w: ScoreWeights, 
           continue;
         }
         if (!faulted) anyClean = true;
-        const key = `${Math.round(st.bike.pos.x / cx)}|${Math.round(st.bike.vel.x / cvx)}|${Math.round(st.bike.angle / ca)}|${st.wheels.rear.grounded || st.wheels.front.grounded ? 1 : 0}|${faulted ? 1 : 0}${child.pending ? `|p${child.pending.aid}:${child.pending.at}` : ''}`;
+        const key = `${motionCell(st, cfg, sim.hz)}|${faulted ? 1 : 0}${child.pending ? `|p${child.pending.aid}:${child.pending.at}` : ''}`;
         const prev = cells.get(key);
         if (!prev || child.score > prev.score) cells.set(key, child);
       }
@@ -137,17 +182,20 @@ export function plan(sim: Omit<Sim, 'rules'>, cfg: BeamConfig, w: ScoreWeights, 
       finishRunTick = best.runTicks;
       break outer;
     }
-    const next = [...cells.values()].sort((a, b) => b.score - a.score).slice(0, cfg.width);
+    const next = selectFrontier(cells.values(), cfg, sim.hz);
     if (next.length === 0) break;
     if (d === 0 && !anyClean) allFault = true;
     frontier = next;
-    best = next[0]!;
+    // A deadline may leave a technique only partly simulated. Retain a candidate with a complete
+    // first action, so committed play never runs an unseen remainder of a multi-slot macro.
+    const committable = next.find((node) => !node.pending || node.actions.length > 1);
+    if (committable) best = committable;
     if (allFault) break; // nothing survives the first step; commit to the best x anyway
   }
 
   sim.restore(root);
   return {
-    actions: best.actions,
+    actions: best.pending ? best.actions.slice(0, -1) : best.actions,
     score: best.score,
     expanded,
     ticks,
