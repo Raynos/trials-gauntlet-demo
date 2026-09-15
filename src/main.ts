@@ -28,7 +28,7 @@ import * as renderMod from './render';
 import type { AudioSystem } from './audio';
 import type { PhysicsWorld } from './physics';
 import type { GameRenderer } from './render';
-import { App, Game, MockPhysics, installHook, type HookExtras } from './game';
+import { App, Game, MockPhysics, installHook, isPhone, type HookExtras } from './game';
 import { parseBenchParams } from './game/bench';
 import { resolveBoot } from './game/flow';
 import { registerServiceWorker } from './game/pwa';
@@ -314,6 +314,12 @@ function boot(): void {
             if (typeof r.setBikeClass === 'function') r.setBikeClass(bike);
           },
         });
+        // Device class for the renderer's tier definitions (PERF.md §3.1: phone-high is a different pass list
+        // than desktop-high); the app decides from the coarse-pointer/short-side rule, the renderer never guesses from DPR.
+        {
+          const r = renderer as Partial<{ setDeviceClass(c: 'phone' | 'desktop'): void }>;
+          if (typeof r.setDeviceClass === 'function') r.setDeviceClass(isPhone() ? 'phone' : 'desktop');
+        }
         const hook = installHook(game, false, extras);
         hook.lastRun = () => game.lastRunRecording()?.json ?? null;
         hook.replay = shell.replayApi();
