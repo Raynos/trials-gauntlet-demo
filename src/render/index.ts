@@ -11,7 +11,7 @@ import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
 import { HERO_URLS, loadGltf, lodUrl, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
-import { lodChoice } from './hero/lod';
+import { isRiderLodEnabled, lodChoice, setRiderLodEnabled } from './hero/lod';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -345,7 +345,14 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   private riderDoc(): GLTF | null {
-    return lodChoice(this.tier) === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
+    return lodChoice(this.tier, 'rider') === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
+  }
+
+  /** Round 14: rider LOD gate for `low` / `medium` (default off — see `hero/lod.ts lodChoice`); rebuilds the hero when the document changes. */
+  setRiderLod(on: boolean): void {
+    if (on === isRiderLodEnabled()) return;
+    setRiderLodEnabled(on);
+    if (this.bikeRef && this.riderRef && this.gltf.rider) this.applyModels();
   }
 
   private makeBike(choice: ModelChoice): HeroBike {
@@ -996,39 +1003,37 @@ export class ThreeRenderer implements GameRenderer {
     this.renderer.info.reset();
     this.post.render();
     this.frameCount++;
-    // Round 11 program census: three keeps every program a material ever compiled with until the
-    // material is disposed, and a handful of world materials (the deck AO decal, the light shafts,
-    // the lamp cones) compile once during boot / the art-landed rebuild with a texture-channel
-    // state they no longer have — 3 dead programs on b1 (47 → 42 → 39 with the other cuts). Once
-    // per world, three frames after it was built, drop each material's non-current programs.
-    if (this.world && this.frameCount === this.world.builtAtFrame + 3) this.pruneStalePrograms();
     return performance.now() - t0;
   }
 
-  /** Release the programs a material is no longer using (see `render()`); a no-op on a clean session. */
-  private pruneStalePrograms(): void {
-    type Prog = { cacheKey: string; usedTimes: number; destroy(): void };
-    const list = this.renderer.info.programs as unknown as Prog[] | null;
-    if (!list) return;
+  /**
+   * Round 14: programs a scene material holds but is not currently drawing with (compiled once by
+   * `prepare()` / a rebuild under a texture-channel or target state the material no longer has).
+   * Read-only census for `debugInfo()` — round 11's `pruneStalePrograms` destroyed these GL
+   * programs and spliced `info.programs`, but three r186 also keeps a private cacheKey → program
+   * map, so the destroyed wrapper stayed acquirable: the next material (an instanced prop, the
+   * spoke material, the rebuilt LOD hero on a tier change) that hit that cacheKey was handed a
+   * wrapper whose `program` was `undefined`, three bound no program, and every uniform / VAO
+   * upload after it ran against corrupt state — `INVALID_OPERATION` in Chromium, and on the
+   * phone (ANGLE on Metal) the skinned rider drew with stale attribute bindings: rigid arms in
+   * the bind pose, hands off the grips, the torso facing backwards on `medium` / `low`. A dead
+   * program costs memory only; nothing here releases one any more.
+   */
+  private staleProgramCount(): number {
+    type Prog = { id: number };
     const seen = new Set<THREE.Material>();
+    let n = 0;
     this.scene.traverse((o) => {
       const m = (o as THREE.Mesh).material;
       for (const mat of Array.isArray(m) ? m : m ? [m] : []) {
         if (seen.has(mat)) continue;
         seen.add(mat);
         const p = this.renderer.properties.get(mat) as { programs?: Map<string, Prog>; currentProgram?: Prog } | undefined;
-        if (!p?.programs || p.programs.size < 2 || !p.currentProgram) continue;
-        for (const [key, prog] of p.programs) {
-          if (prog === p.currentProgram) continue;
-          p.programs.delete(key);
-          if (--prog.usedTimes === 0) {
-            const i = list.indexOf(prog);
-            if (i >= 0) list.splice(i, 1);
-            prog.destroy();
-          }
-        }
+        if (!p?.programs || !p.currentProgram) continue;
+        for (const prog of p.programs.values()) if (prog !== p.currentProgram) n++;
       }
     });
+    return n;
   }
 
   finish(): void {
@@ -1135,6 +1140,8 @@ export class ThreeRenderer implements GameRenderer {
     trackTris: number;
     textureGenMs: number;
     passes: number;
+    /** Round 14: programs held by scene materials that are not their current one (memory only; never released mid-session). */
+    stalePrograms: number;
     art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean; trackComplete: boolean; trackIds: number; builtAtFrame: number; frames: number };
     prepare: { step: string; ms: number; bytes: number }[];
   } {
@@ -1170,6 +1177,7 @@ export class ThreeRenderer implements GameRenderer {
       trackTris: Math.round(this.world?.trackTris ?? 0),
       textureGenMs: this.textureGenMs,
       passes: this.postRef?.info.passes ?? 0,
+      stalePrograms: this.staleProgramCount(),
       art: { settled: this.art.settled, ok: this.art.ok, loadMs: Math.round(this.art.loadMs), deliveredMB: +(this.art.bytesDelivered / (1024 * 1024)).toFixed(2), inWorld: this.world?.withArt ?? false, trackComplete: this.art.requested(this.artIds), trackIds: this.artIds.length, builtAtFrame: this.world?.builtAtFrame ?? -1, frames: this.frameCount },
     };
   }

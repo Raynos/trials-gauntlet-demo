@@ -30,6 +30,8 @@ const SHIFT = 0.65; // axle-midpoint frame → file frame (rear axle origin)
 const LAND = { sag: 0.9, span: 0.7, max: 0.9 };
 /** Hop extension weight from the rider body's relative upward speed (m/s). */
 const EXTEND = { v0: 0.25, span: 1.2, max: 0.7 };
+/** Bones the arm IK owns; additive clips leave them alone so the hands stay on the grips. */
+const ARM_CHAIN = /^(shoulder|upperArm|forearm|hand)\./;
 const ORDER = ['pelvis', 'spine', 'chest', 'neck', 'head', 'shoulder.L', 'upperArm.L', 'forearm.L', 'hand.L', 'shoulder.R', 'upperArm.R', 'forearm.R', 'hand.R', 'thigh.L', 'shin.L', 'foot.L', 'thigh.R', 'shin.R', 'foot.R'] as const;
 type BoneName = (typeof ORDER)[number];
 
@@ -316,6 +318,7 @@ export class GltfRider {
       // axis): the clip's extended pose (frame 8 of 20) weighted by that speed.
       const wExt = Math.min(1, Math.max(0, (f.riderBody.relUp - EXTEND.v0) / EXTEND.span)) * EXTEND.max;
       if (ext && wExt > 0.005) this.additive('extend', ext.duration * (8 / 20), wExt, false);
+      if (rest > 0.01 || wLand > 0.005 || wExt > 0.005) this.resolveArms(c);
       return;
     }
     // v1 / mock physics fallback: the round-9 timed envelopes.
@@ -335,6 +338,7 @@ export class GltfRider {
       if (ext && t < ext.duration) this.additive('extend', t, 0.7 * Math.sin(Math.PI * Math.min(1, t / ext.duration)), false);
       else this.pushT = -1;
     }
+    if (rest > 0.01 || this.landT >= 0 || this.pushT >= 0) this.resolveArms(c);
   }
 
   /** World (file-space) rotation for a bone → local, in hierarchy order. */
@@ -394,6 +398,22 @@ export class GltfRider {
     this.aim('head', this.vb.set(Math.sin(ha), Math.cos(ha), 0));
     for (let i = 0; i < 2; i++) {
       const s = i === 0 ? 'L' : 'R';
+      this.solveArm(c, i);
+      this.aim(`thigh.${s}` as BoneName, this.vb.subVectors(c.knee[i]!, c.hip[i]!));
+      this.aim(`shin.${s}` as BoneName, this.vb.subVectors(c.ankle[i]!, c.knee[i]!));
+      // Boots stay level on the pegs: rest world rotation.
+      this.setWorld(`foot.${s}`, this.q0.get(`foot.${s}`)!);
+    }
+  }
+
+  /**
+   * One arm from the chain: shoulder rigid on the chest, two-bone IK to the grip, hand rigid.
+   * Round 14: also re-run after the additive clips (`refreshWorldQ` first) so the landing squash
+   * and hop extension move the torso and legs while the wrists stay on the grips.
+   */
+  private solveArm(c: Chain, i: number): void {
+    {
+      const s = i === 0 ? 'L' : 'R';
       this.rigid(`shoulder.${s}` as BoneName);
       // Arms (round 9): two-bone IK in the RIG's bone lengths from the rig's posed shoulder
       // joint to the chain's grip point, with the chain's elbow as the pole — the wrist lands
@@ -431,19 +451,44 @@ export class GltfRider {
         this.aim(`forearm.${s}` as BoneName, this.vb.subVectors(c.hand[i]!, c.elbow[i]!));
       }
       this.rigid(`hand.${s}` as BoneName);
-      this.aim(`thigh.${s}` as BoneName, this.vb.subVectors(c.knee[i]!, c.hip[i]!));
-      this.aim(`shin.${s}` as BoneName, this.vb.subVectors(c.ankle[i]!, c.knee[i]!));
-      // Boots stay level on the pegs: rest world rotation.
-      this.setWorld(`foot.${s}`, this.q0.get(`foot.${s}`)!);
     }
   }
 
-  /** Blend a clip's bone-local delta (from its first frame) onto the current pose. */
+  /** File-space world rotations of every chain bone from the bones' current locals (after additive clips moved them). */
+  private refreshWorldQ(): void {
+    for (const name of ORDER) {
+      const b = this.bones.get(name);
+      if (!b) continue;
+      const parent = this.parentOf.get(name) ?? null;
+      const pq = parent ? this.worldQ.get(parent) : this.armQ;
+      let wq = this.worldQ.get(name);
+      if (!wq) {
+        wq = new THREE.Quaternion();
+        this.worldQ.set(name, wq);
+      }
+      wq.copy(pq ?? this.ID).multiply(b.quaternion);
+    }
+  }
+
+  /** After the additive clips: the arms again, from wherever the clips left the shoulders. */
+  private resolveArms(c: Chain): void {
+    this.refreshWorldQ();
+    for (let i = 0; i < 2; i++) this.solveArm(c, i);
+  }
+
+  /**
+   * Blend a clip's bone-local delta (from its first frame) onto the current pose. Round 14: never
+   * the arm chain (`shoulder` → `hand`) — the IK has just put the wrists on the grips, and the
+   * landing squash at its 0.9 weight rotated the shoulders enough to lift both hands 18 cm off
+   * them for the frames around a hard landing (b1 golden t720, full and LOD rider alike); the
+   * torso / legs / head still take the clip.
+   */
   private additive(name: string, t: number, w: number, loop: boolean): void {
     const s = this.clips.get(name);
     if (!s || w <= 0) return;
     const tt = loop ? t % s.duration : Math.min(t, s.duration - 1e-4);
     for (const [node, r] of s.rot) {
+      if (ARM_CHAIN.test(node)) continue;
       const b = this.bones.get(node);
       if (!b) continue;
       const v = r.interp.evaluate(tt) as Float32Array;

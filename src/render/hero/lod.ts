@@ -127,9 +127,27 @@ export function variantMaterialsFor(gltf: GLTF, meshName: string): Map<string, T
   return variantTable.get(gltf)?.get(meshName) ?? new Map();
 }
 
-/** Triangle count of a subtree — `high` counts the authored file, `low` / `medium` the LOD one. */
-export function lodChoice(tier: 'low' | 'medium' | 'high'): 'full' | 'lod' {
-  return tier === 'high' ? 'full' : 'lod';
+/**
+ * Which document a tier instantiates: `high` the authored file, `low` / `medium` the LOD twin.
+ * Round 14: the rider LOD is gated (`riderLodEnabled`, default off) after the phone showed the
+ * `medium` rider with rigid bind-pose arms. The cause was the renderer's program prune, not the
+ * asset (`rider-lod.glb` carries the same 19-joint skeleton, bind pose, inverse bind matrices and
+ * clips as `rider.glb`, and the hands-on-grips probe holds ≤ 0.5 cm on it at low and medium), but
+ * the LOD returns to the phone tiers only once a device report confirms the fix; the bike LOD has
+ * no skin and stays on. `ThreeRenderer.setRiderLod(true)` (or `?riderlod=1` through the app) turns it on.
+ */
+export function lodChoice(tier: 'low' | 'medium' | 'high', kind: 'bike' | 'rider' = 'bike'): 'full' | 'lod' {
+  if (tier === 'high') return 'full';
+  return kind === 'rider' && !riderLodEnabled ? 'full' : 'lod';
+}
+
+let riderLodEnabled = false;
+/** Gate for the rider LOD on `low` / `medium` (see `lodChoice`). */
+export function setRiderLodEnabled(on: boolean): void {
+  riderLodEnabled = on;
+}
+export function isRiderLodEnabled(): boolean {
+  return riderLodEnabled;
 }
 
 // ---------------------------------------------------------------------------
