@@ -26,6 +26,7 @@ import { PostChain, tierPixelRatio, type PassWrite } from './post/chain';
 import { RiderModel } from './rider/riderModel';
 import { buildBiomeKit } from './world/biomeKit';
 import { PropBatch, tierCasts, tierHides, tierManaged } from './world/props';
+import { shrinkSkinArrays } from './world/skinArray';
 import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
 import { groundFloorY, profileY } from './world/track';
@@ -280,6 +281,9 @@ export class ThreeRenderer implements GameRenderer {
     (window as unknown as { __render?: ThreeRenderer }).__render = this; // debug handle for the harness
     (window as unknown as { __setMerge?: (on: boolean) => void }).__setMerge = (on) => {
       PropBatch.MERGE = on; // perf cut #4 A/B switch (harness only; takes effect on the next setTrack)
+    };
+    (window as unknown as { __setSkinArray?: (on: boolean) => void }).__setSkinArray = (on) => {
+      PropBatch.SKIN_ARRAY = on; // perf cut #4b A/B switch (harness only; takes effect on the next setTrack)
     };
     performance.mark?.('render:ctor');
   }
@@ -732,8 +736,8 @@ export class ThreeRenderer implements GameRenderer {
       let bytes = 0;
       for (const t of texs) {
         if (stale()) return;
-        const img = t.image as { width?: number; height?: number } | undefined;
-        if (img?.width && img.height) bytes += img.width * img.height * 4 * 1.33;
+        const img = t.image as { width?: number; height?: number; depth?: number } | undefined;
+        if (img?.width && img.height) bytes += img.width * img.height * (img.depth ?? 1) * 4 * 1.33; // perf cut #4b: an array counts every layer
         const ta = performance.now();
         this.renderer.initTexture(t);
         st.textureMs += performance.now() - ta;
@@ -859,7 +863,10 @@ export class ThreeRenderer implements GameRenderer {
       for (const m of mats) if ((m as THREE.MeshStandardMaterial).isMeshStandardMaterial) this.lib.complete(m as THREE.MeshStandardMaterial);
     });
     harmonizeUv1(group);
-    if (this.tier === 'low') shrinkTextures(group, 512, 256);
+    if (this.tier === 'low') {
+      shrinkTextures(group, 512, 256);
+      shrinkSkinArrays(group, 512); // perf cut #4b: the container skin array, layer by layer
+    }
     this.scene.add(group);
     // Perf cut #5 (PERF.md §3.2 #5): the world's ~1 240 nodes never move — compute their matrices once and
     // stop three recomposing every one of them each frame (`updateMatrixWorld` recurses regardless of
@@ -1058,7 +1065,10 @@ export class ThreeRenderer implements GameRenderer {
       // (`bikeRef`, not the getter: a phone sets `low` before `prepare()` has built the hero — that build must stay in the loader's chunked tasks.)
       if (this.bikeRef) shrinkTextures(this.bikeRef.root, 512, 256);
       if (this.riderRef) shrinkTextures(this.riderRef.root, 512, 256);
-      if (this.world) shrinkTextures(this.world.group, 512, 256);
+      if (this.world) {
+        shrinkTextures(this.world.group, 512, 256);
+        shrinkSkinArrays(this.world.group, 512); // perf cut #4b: the container skin array, layer by layer
+      }
     }
   }
 
@@ -1593,11 +1603,12 @@ export function estimateTextureMB(scene: THREE.Scene): number {
         bytes += delivered;
         return;
       }
-      const img = value.image as { width?: number; height?: number } | undefined;
+      const img = value.image as { width?: number; height?: number; depth?: number } | undefined;
       const w = img?.width ?? 0;
       const h = img?.height ?? 0;
+      const d = img?.depth ?? 1; // perf cut #4b: a DataArrayTexture is w × h × layers
       const bpp = value.type === THREE.FloatType ? 16 : value.type === THREE.HalfFloatType ? 8 : 4;
-      bytes += w * h * bpp * (value.generateMipmaps ? 1.333 : 1);
+      bytes += w * h * d * bpp * (value.generateMipmaps ? 1.333 : 1);
     }
   };
   scene.traverse((obj) => {

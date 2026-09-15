@@ -109,6 +109,8 @@ export class PropBatch {
   static CHUNK_M = 40;
   /** Perf cut #4: bake same-material batches per chunk (`buildBatches`); off = one InstancedMesh per batch per chunk (the A/B switch). */
   static MERGE = true;
+  /** Perf cut #4b: same-size skins share one array texture + one material (`world/skinArray.ts`), so the skin batches bake into one draw per chunk; off = one material per skin (the A/B switch). */
+  static SKIN_ARRAY = true;
 
   /**
    * One `InstancedMesh` per 40 m of x, each with a computed bounding sphere and frustum

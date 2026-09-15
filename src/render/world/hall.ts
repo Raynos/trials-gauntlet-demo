@@ -21,6 +21,7 @@ import { profileY } from './track';
 import { SUPPORT_SLOT, supportLedgeY } from './deck';
 import { drawArt, pickId, tintMask, type ArtLibrary } from '../art/library';
 import type { WorldDetail } from './props';
+import { applySkinArray, skinArrayTexture, withSkinIndex } from './skinArray';
 import {
   PropBatch,
   bakeAO,
@@ -537,18 +538,32 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
   // (rust × logo × door side × stripe), each its own batch (8 calls, one program).
   const skinBatches: PropBatch[] = [];
   const contGeo = bakeAO(containerGeometry(), 2.59, 0.4);
+  const skins: THREE.CanvasTexture[] = [];
   for (let i = 0; i < 8; i++) {
-    const skin = containerSkin(rng, { rust: i % 3, logo: i, doorLeft: (i & 1) === 1, stripe: i % 4 === 3 }, art);
+    skins.push(containerSkin(rng, { rust: i % 3, logo: i, doorLeft: (i & 1) === 1, stripe: i % 4 === 3 }, art));
     out.textureBytes += 1024 * 512 * 4 * 1.33;
-    // Round 11: every skin on its own derived material (skin 0 used to be painted onto the shared
-    // library `container` material, which the texture generator then overwrote on the session's
-    // first world and which leaked into every other biome's containers afterwards).
+  }
+  if (PropBatch.SKIN_ARRAY) {
+    // Perf cut #4b: the eight skins are layers of one array texture on ONE material, each batch's
+    // geometry carrying its layer index — `buildBatches` then bakes all eight into one draw per chunk
+    // (8 → 1 on every visible chunk; the same bytes, the same texels, hardware repeat kept).
     const m = lib.derive('container');
-    m.map = skin;
-    m.needsUpdate = true;
+    m.name = 'containerSkins';
     m.vertexColors = true;
-    fogify(m);
-    skinBatches.push(new PropBatch(`container${i}`, contGeo, m));
+    applySkinArray(m, skinArrayTexture(skins.map((t) => t.image as HTMLCanvasElement), skins[0]!));
+    for (let i = 0; i < 8; i++) skinBatches.push(new PropBatch(`container${i}`, withSkinIndex(contGeo, i), m));
+  } else {
+    for (let i = 0; i < 8; i++) {
+      // Round 11: every skin on its own derived material (skin 0 used to be painted onto the shared
+      // library `container` material, which the texture generator then overwrote on the session's
+      // first world and which leaked into every other biome's containers afterwards).
+      const m = lib.derive('container');
+      m.map = skins[i]!;
+      m.needsUpdate = true;
+      m.vertexColors = true;
+      fogify(m);
+      skinBatches.push(new PropBatch(`container${i}`, contGeo, m));
+    }
   }
   const palette = [0x1f5a4a, 0x7a2418, 0x1e3d66, 0x46463e, 0x8a5a1e, 0x2e5a2a, 0x5a2a52, 0x2f4f6e, 0x6a6a62]; // round 10: deeper, more saturated (the pale set read as a grey wall at 18 m)
   const pick = (): number => palette[rng.int(0, palette.length - 1)]!;

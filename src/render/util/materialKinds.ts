@@ -25,6 +25,7 @@
  */
 import * as THREE from 'three';
 import type { MaterialLibrary } from '../materials/library';
+import { depthPatchFor, inheritDepthPatch } from '../world/skinArray';
 
 export interface MaterialKindsReport {
   singlePass: number;
@@ -53,6 +54,7 @@ function cloneForKind(src: THREE.Material, lib: MaterialLibrary | null): THREE.M
   clone.onBeforeCompile = src.onBeforeCompile;
   clone.customProgramCacheKey = src.customProgramCacheKey;
   clone.userData.kindCloneOf = src.uuid;
+  inheritDepthPatch(src, clone);
   return clone;
 }
 
@@ -112,6 +114,7 @@ export function stabilizePrograms(root: THREE.Object3D, lib: MaterialLibrary | n
     if (!depth) {
       depth = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
       depth.name = `depth:${m.name || m.type}:${kind}`;
+      depthPatchFor(m)?.(depth); // perf cut #4b: an array-textured material's depth twin must not sample its map
       cache[kind] = depth;
     }
     mesh.customDepthMaterial = depth;
