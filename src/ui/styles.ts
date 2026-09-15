@@ -319,6 +319,7 @@ export const FRONT_CSS = /* css */ `
 .rp-bar .rp-exit span { margin-left: 6px; }
 .replay .rp-legend { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--s5) + var(--sab) + 72px); white-space: nowrap; }
 .hud.replay-on .hud-track, .hud.replay-on .hud-device, .hud.replay-on .hints { opacity: 0; }
+.hud.review-on { visibility: hidden; }
 .replay.touch .rp-legend { display: none; }
 html.short .rp-bar { bottom: calc(var(--s3) + var(--sab)); padding: var(--s1) var(--s2); gap: var(--s1); }
 html.short .rp-bar button { min-height: 44px; min-width: 44px; font-size: .75rem; }
@@ -715,7 +716,79 @@ html.narrow .settings-wrap { grid-template-columns: 1fr; }
 }
 `;
 
-export const UI_CSS = TOKENS_CSS + FRONT_CSS + HUD_CSS;
+
+export const REVIEW_CSS = /* css */ `
+/* ---- Level reviewer (docs/design/game.md §21) ---- */
+/* Five tabs on the menu band: a step down from the four-tab size so PLAY · GARAGE · REVIEW · SETTINGS fit at 844 px. */
+#ui .menu-list.tabs .menu-item { font-size: clamp(1.45rem, calc(3.55 * var(--vw)), 2.4rem); min-width: 88px; padding: 0 var(--s3); }
+.menu-list.tabs { gap: var(--s5); }
+.review-pick-screen { background: linear-gradient(90deg, rgba(6,7,9,.95) 0%, rgba(6,7,9,.88) 55%, rgba(6,7,9,.62) 100%); display: flex; flex-direction: column; padding: calc(var(--s4) + var(--sat)) calc(var(--s5) + var(--sar)) calc(var(--s3) + var(--sab)) calc(var(--s5) + var(--sal)); }
+.rvp-head { flex: 0 0 auto; display: flex; flex-direction: column; gap: 2px; padding-right: 8rem; }
+.rvp-head .ov-kicker { color: var(--amber); }
+.rvp-head .ov-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.6rem; line-height: 1; text-transform: uppercase; }
+.rvp-head .ov-stats { color: var(--ink-dim); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+.rvp-rows { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; margin-top: var(--s3); display: flex; flex-direction: column; gap: var(--s1); padding-right: var(--s2); }
+#ui .rvp-row { -webkit-appearance: none; appearance: none; flex: 0 0 auto; display: grid; grid-template-columns: 6.2rem 1fr auto; grid-template-rows: auto auto; column-gap: var(--s3); align-items: center; min-height: 48px; padding: var(--s2) var(--s3); border: 1px solid var(--line-2); border-radius: var(--r1); background: rgba(255,255,255,.04); color: var(--ink); text-align: left; cursor: pointer; font-family: var(--font); }
+#ui .rvp-row.on { border-color: var(--amber); background: rgba(255,176,32,.1); }
+#ui .rvp-row .tier { grid-row: 1 / span 2; font-size: .68rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--amber); }
+#ui .rvp-row .name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.15rem; line-height: 1; text-transform: uppercase; }
+#ui .rvp-row .id { grid-column: 2; font-size: .68rem; letter-spacing: .1em; color: var(--ink-mute); }
+#ui .rvp-row .noted { grid-column: 3; grid-row: 1 / span 2; font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+#ui .rvp-row .noted.some { color: var(--green); }
+/* The overlay: nothing takes a pointer until live.ts has seen it drawn; the stage is inert while riding (the strip owns the finger). */
+.review-ui { position: absolute; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; z-index: 5; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
+.review-ui.show { opacity: 1; visibility: visible; transition: opacity var(--t2) var(--ease), visibility 0s; }
+.review-ui:not(.live) * { pointer-events: none !important; }
+.review-ui.live .rv-stage, .review-ui.live button, .review-ui.live textarea { pointer-events: auto; }
+.review-ui.riding .rv-stage { pointer-events: none !important; }
+.rv-stage { position: absolute; inset: 0; touch-action: none; cursor: grab; }
+.rv-stage:active { cursor: grabbing; }
+.rv-top { position: absolute; left: calc(var(--s4) + var(--sal)); right: calc(var(--s4) + var(--sar)); top: calc(var(--s3) + var(--sat)); display: flex; align-items: flex-start; gap: var(--s3); pointer-events: none; }
+.rv-head { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 0; }
+.rv-head .ov-kicker { color: var(--amber); }
+.rv-head .ov-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.3rem; line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rv-head .ov-stats { color: var(--ink-dim); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rv-strip { display: flex; gap: var(--s1); padding: var(--s1); border-radius: var(--r2); background: rgba(9,11,15,.82); border: 1px solid var(--line); box-shadow: var(--plate); }
+#ui .rv-seg { -webkit-appearance: none; appearance: none; width: 44px; height: 44px; border: 1px solid transparent; border-radius: var(--r1); background: transparent; color: var(--ink-dim); font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.2rem; cursor: pointer; position: relative; }
+#ui .rv-seg.noted::after { content: ""; position: absolute; right: 5px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+#ui .rv-seg.on { background: var(--amber); color: var(--amber-ink); }
+#ui .rv-seg.on.noted::after { background: var(--amber-ink); }
+#ui .rv-exit { -webkit-appearance: none; appearance: none; flex: 0 0 auto; display: inline-flex; align-items: center; gap: .35em; min-height: 44px; padding: 0 1.1rem 0 .8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--slab); color: var(--ink); font: 700 .82rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+#ui .rv-exit span { font-size: 1.3em; line-height: 1; margin-top: -.1em; }
+/* Notes card bottom-left: never wider than 40 % of the view, so the track centre stays clear. */
+.rv-card { position: absolute; left: calc(var(--s4) + var(--sal)); bottom: calc(var(--s3) + var(--sab)); width: min(340px, calc(40 * var(--vw))); max-height: calc(100% - 96px - var(--sat) - var(--sab)); overflow-y: auto; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s3); border-radius: var(--r2); background: rgba(9,11,15,.86); border: 1px solid var(--line); box-shadow: var(--plate); transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); }
+.review-ui.notes-off .rv-card, .review-ui.riding .rv-card { opacity: 0; transform: translateY(12px); }
+.review-ui.notes-off .rv-card *, .review-ui.riding .rv-card * { pointer-events: none !important; }
+.rv-seg-title { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.05rem; line-height: 1; text-transform: uppercase; display: flex; align-items: baseline; gap: .5em; }
+.rv-seg-title b { color: var(--amber); }
+.rv-seg-title span { margin-left: auto; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .7rem; letter-spacing: .1em; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+.rv-kinds { display: flex; flex-wrap: wrap; gap: 4px; }
+.rv-kinds span { font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-dim); background: rgba(255,255,255,.06); border-radius: 3px; padding: 2px 6px; }
+.rv-kinds span b { color: var(--ink); margin-left: .3em; }
+.rv-kinds span.none { background: transparent; color: var(--ink-mute); }
+.rv-rate { display: flex; gap: 2px; }
+#ui .rv-star { -webkit-appearance: none; appearance: none; width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink-mute); font-size: 1.5rem; line-height: 1; cursor: pointer; }
+#ui .rv-star.on { color: var(--amber); text-shadow: 0 0 10px rgba(255,176,32,.5); }
+.rv-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+#ui .rv-tag { -webkit-appearance: none; appearance: none; min-height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-dim); font: 700 .7rem/1 var(--font); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+#ui .rv-tag.on { background: var(--amber); border-color: transparent; color: var(--amber-ink); }
+#ui .rv-comment { -webkit-appearance: none; appearance: none; width: 100%; box-sizing: border-box; resize: none; border: 1px solid var(--line); border-radius: var(--r1); background: rgba(255,255,255,.06); color: var(--ink); font: 500 .9rem/1.3 var(--font); padding: var(--s2); -webkit-user-select: text; user-select: text; }
+#ui .rv-comment:focus { outline: none; border-color: var(--amber); }
+.rv-actions { display: flex; gap: var(--s2); }
+#ui .rv-actions button, #ui .rv-bar button { -webkit-appearance: none; appearance: none; border: 1px solid var(--line); background: var(--slab-3); color: var(--ink); border-radius: var(--r1); min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; padding: 0 var(--s3); transition: background var(--t1), color var(--t1); }
+#ui .rv-actions button.flash { background: var(--green); color: #062; border-color: transparent; }
+#ui .rv-actions .rv-copy { flex: 1 1 auto; }
+.rv-bar { position: absolute; right: calc(var(--s4) + var(--sar)); bottom: calc(var(--s3) + var(--sab)); display: flex; gap: var(--s2); padding: var(--s1); border-radius: var(--r2); background: rgba(9,11,15,.82); border: 1px solid var(--line); box-shadow: var(--plate); }
+#ui .rv-bar button.on { background: var(--amber); color: var(--amber-ink); border-color: transparent; }
+#ui .rv-bar .rv-zoom { font-size: 1.3rem; padding: 0; }
+.review-ui.riding .rv-bar .rv-notes, .review-ui.riding .rv-bar .rv-fly, .review-ui.riding .rv-bar .rv-zoom { display: none; }
+/* Short phones (390 high): the card shrinks to the essentials. */
+html.short .rv-card { width: min(300px, calc(38 * var(--vw))); gap: var(--s1); padding: var(--s2); }
+html.short .rv-kinds { max-height: 2.6em; overflow: hidden; }
+html.short #ui .rv-comment { font-size: .85rem; }
+`;
+
+export const UI_CSS = TOKENS_CSS + FRONT_CSS + HUD_CSS + REVIEW_CSS;
 
 let injected = false;
 export function injectStyles(): void {

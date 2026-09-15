@@ -25,6 +25,8 @@ import {
   PauseMenu,
   PerfOverlay,
   ReplayBar,
+  ReviewPanel,
+  ReviewPickScreen,
   SettingsScreen,
   TraceBars,
   TrackSelectScreen,
@@ -72,6 +74,7 @@ import { Percentiles, type Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
 import { NavLog, type NavContext } from './navlog';
 import { ReplaySession, type ReplaySource } from './replay';
+import { ReviewSession } from './review';
 import { defaultBikeForTier } from './rules';
 import { BenchLog, RunCollector, RunLog } from './telemetry';
 
@@ -111,6 +114,8 @@ export interface AppOptions {
   physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[]; live?: PhysicsVersion | undefined } | undefined;
   /** `?bench=1`: the on-device benchmark (src/game/bench.ts) — a START card over the menu, the scenarios, the report. */
   bench?: BenchOptions | undefined;
+  /** `?review=<track>`: deep link straight into the level reviewer on that track (docs/design/game.md §21). */
+  initialReview?: string | undefined;
 }
 
 const DEVICE_SHOW_FRAMES = 90;
@@ -130,7 +135,7 @@ export function dprCap(): number {
   return Math.min(dpr, isPhone() ? 1.5 : 2);
 }
 
-export type AppScreen = FrontScreen | 'run' | 'replay';
+export type AppScreen = FrontScreen | 'run' | 'replay' | 'reviewer';
 
 /** Physics lab HUD + ghost of the last attempt: every `lab-*` track (MEGA_PLAN P0 §3), or any track with `?lab=1`. */
 /**
@@ -162,6 +167,9 @@ export class App {
   private readonly lastRuns = new LastRuns();
   private readonly replayBar: ReplayBar;
   private readonly replay: ReplaySession;
+  private readonly reviewPick: ReviewPickScreen;
+  private readonly reviewPanel: ReviewPanel;
+  private readonly review: ReviewSession;
   private readonly labPanel: LabPanel;
   private readonly traceBars: TraceBars | null;
   /** Where the viewer returns to on exit, and the finished run it interrupted (restored so the results panel comes back). */
@@ -386,6 +394,39 @@ export class App {
       exit: () => this.replay.exit(),
     });
     this.replay = new ReplaySession(this.game, this.replayBar, () => this.leaveReplay());
+
+    // Level reviewer (docs/design/game.md §21): REVIEW on the menu → the picker → the review UI on one track.
+    this.review = new ReviewSession(this.game, {
+      onView: (v) => this.reviewPanel.update(v),
+      onRide: (on) => {
+        this.touch.setEnabled(on);
+        this.touch.setOverlay(false);
+        this.hud.setReview(!on);
+        if (!on) this.hud.hideNow();
+      },
+    });
+    this.reviewPick = new ReviewPickScreen(o.uiRoot, this.sfx, { pick: (id) => this.enterReview(id), back: () => this.goto('menu') }, (id) => this.review.store.count(id));
+    this.reviewPanel = new ReviewPanel(o.uiRoot, {
+      jump: (i) => this.review.jumpTo(i),
+      pan: (dx, w) => this.review.panPx(dx, w),
+      zoom: (f) => this.review.zoomBy(f),
+      fly: () => this.review.toggleFly(),
+      ride: () => this.review.toggleRide(),
+      copy: () => copyText(this.review.export(BUILD_STAMP).text),
+      share: async () => {
+        const nav = navigator as Partial<Navigator>;
+        if (typeof nav.share !== 'function') return false;
+        try {
+          await nav.share({ title: `Level review · ${this.game.currentTrack?.name ?? ''}`, text: this.review.export(BUILD_STAMP).text });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      exit: () => this.leaveReview(),
+      note: (i) => this.review.note(i),
+      save: (i, n) => void this.review.saveNote(i, n),
+    });
     this.pause = new PauseMenu(o.uiRoot, this.sfx, {
       resume: () => this.resume('pause:resume'),
       restartTrack: () => {
@@ -596,6 +637,77 @@ export class App {
     this.goto('tracks');
   }
 
+  // -- level reviewer (docs/design/game.md §21) -------------------------------------------
+
+  /** Picker row / `?review=`: load the track under the review UI (nothing racing, the bike parked at segment 1). */
+  private enterReview(trackId: string, seg = 0): boolean {
+    if (!getTrack(trackId)) return false;
+    if (this.replay.active) this.replay.close();
+    if (this.review.active) this.review.close();
+    this.collector.abandon();
+    this.hud.hideResults();
+    this.pause.hide();
+    this.menu.hide();
+    this.garage.hide();
+    this.settings.hide();
+    this.credits.hide();
+    this.tracksScreen.hide();
+    this.reviewPick.hide();
+    this.setOverlay(false);
+    this.touch.setEnabled(false);
+    this.touch.setOverlay(false);
+    this.o.sceneRoot?.classList.remove('covered', 'dim', 'garage');
+    this.game.renderEnabled = true;
+    this.setLab(trackId);
+    const vol = this.soundOn ? this.volume : 0;
+    this.audio?.setMasterVolume(0); // the load's countdown cue stays silent
+    if (!this.review.open(trackId, seg)) {
+      this.audio?.setMasterVolume(vol);
+      return false;
+    }
+    this.hud.hideNow();
+    this.hud.setReplay(true);
+    this.hud.setReview(true);
+    this.screen = 'reviewer';
+    this.screenAt = performance.now();
+    this.setAudioScene('menu');
+    this.reviewPanel.show();
+    this.reviewPanel.update(this.review.view());
+    setTimeout(() => this.audio?.setMasterVolume(vol), 60);
+    return true;
+  }
+
+  /** ‹ Tracks / Esc: back to the picker (the row's noted count refreshed). */
+  private leaveReview(): void {
+    if (!this.review.active) return;
+    this.reviewPanel.hide();
+    this.review.close();
+    this.hud.setReplay(false);
+    this.hud.setReview(false);
+    this.hud.hideNow();
+    this.loadBackdrop(BACKDROP_TRACK, true);
+    this.goto('review');
+  }
+
+  /** Harness / QA surface (`window.__trials.review`): the reviewer's state and controls without a pointer. */
+  reviewApi(): NonNullable<TrialsHook['review']> {
+    return {
+      open: (id, seg) => this.enterReview(id, seg ?? 0),
+      close: () => this.leaveReview(),
+      active: () => this.review.active,
+      view: () => {
+        const v = this.review.view();
+        return { trackId: v.trackId, seg: v.seg, x: v.x, dist: v.dist, flying: v.flying, riding: v.riding, segments: v.segments.map((s) => ({ i: s.i, from: s.from, to: s.to, label: s.label, kinds: Object.fromEntries(s.kinds) })) };
+      },
+      jump: (i) => this.review.jumpTo(i),
+      pan: (m) => this.review.panM(m),
+      zoom: (f) => this.review.zoomBy(f),
+      fly: () => this.review.toggleFly(),
+      ride: () => this.review.toggleRide(),
+      export: () => this.review.export(BUILD_STAMP),
+    };
+  }
+
   /** Harness / e2e surface (`window.__trials.app`): one synchronous app frame, the flow methods, the state. */
   testApi(): NonNullable<TrialsHook['app']> {
     return {
@@ -651,7 +763,9 @@ export class App {
     // screens and the touch layer now (onDeviceChange only fires on a change).
     const d0 = this.mux.activeDevice();
     if (d0) this.onDevice(d0);
-    if (this.o.initialTrack && getTrack(this.o.initialTrack)) this.play(this.o.initialTrack);
+    if (this.o.initialReview && this.enterReview(this.o.initialReview)) {
+      /* the reviewer owns the scene */
+    } else if (this.o.initialTrack && getTrack(this.o.initialTrack)) this.play(this.o.initialTrack);
     else {
       this.loadBackdrop(BACKDROP_TRACK);
       this.goto('menu');
@@ -711,6 +825,13 @@ export class App {
   goto(screen: FrontScreen): void {
     this.navLog.record('goto', this.navContext(), null, screen);
     if (this.replay.active) this.replay.close();
+    if (this.review.active) {
+      this.reviewPanel.hide();
+      this.review.close();
+      this.hud.setReplay(false);
+      this.hud.setReview(false);
+      this.hud.hideNow();
+    }
     this.screen = screen;
     this.screenAt = performance.now();
     this.setAudioScene('menu');
@@ -721,6 +842,7 @@ export class App {
     this.settings.hide();
     this.credits.hide();
     this.garage.hide();
+    this.reviewPick.hide();
     const scene = this.o.sceneRoot;
     // The menu's key art covers the canvas: no WebGL frame at all while it is up (PERF.md #1 —
     // the phone paid a full tier frame plus a compositor copy for an invisible canvas).
@@ -742,6 +864,10 @@ export class App {
     } else if (screen === 'settings') {
       this.settings.setDevice(dev);
       this.settings.show();
+    } else if (screen === 'review') {
+      this.reviewPick.build(listTrackIds().map((id) => getTrack(id)!).filter((t) => !!t));
+      this.reviewPick.setDevice(dev);
+      this.reviewPick.show();
     } else this.credits.show();
   }
 
@@ -752,6 +878,13 @@ export class App {
     const bike = this.bikeChoice ?? defaultBikeForTier(def.tier, this.lastRidden);
     this.collector.abandon();
     if (this.replay.active) this.replay.close();
+    if (this.review.active) {
+      this.reviewPanel.hide();
+      this.review.close();
+      this.hud.setReplay(false);
+      this.hud.setReview(false);
+    }
+    this.reviewPick.hide();
     this.setLab(id);
     if (!this.game.loadTrack(id, undefined, bike)) return;
     // Always on launch (materials only, no rebuild): a garage browse may have left the hero in the other livery.
@@ -1025,6 +1158,29 @@ export class App {
       }
       return;
     }
+    if (this.screen === 'reviewer') {
+      // Level reviewer: Esc / B / pause = back to the picker; V / Y = fly; while riding the frame drives the bike,
+      // otherwise held lean pans the probe (12 m/s) and ←/→ nav jumps a segment.
+      if (meta.back || meta.pause) {
+        this.leaveReview();
+        return;
+      }
+      if (meta.alt) this.review.toggleFly();
+      if (this.review.view().riding) {
+        this.game.setInput(frame);
+      } else {
+        if (frame.lean !== 0 && elapsed > 0) this.review.panM(frame.lean * 12 * elapsed);
+        if (meta.navX) this.review.jumpTo(this.review.view().seg + meta.navX);
+        if (meta.confirm) this.review.toggleRide();
+      }
+      this.prevRestart = frame.restart === true;
+      this.prevThrottle = frame.throttle > 0;
+      this.review.frame(elapsed);
+      this.game.advance(elapsed);
+      this.settleTouch(elapsed);
+      this.labPanel.update(performance.now());
+      return;
+    }
     if (this.onboard.visible) {
       // First-launch card: any confirm / back / gas edge dismisses it; nothing reaches the game meanwhile.
       if (meta.confirm || meta.back || meta.pause || throttleEdge || restartEdge) this.onboard.dismiss();
@@ -1034,7 +1190,7 @@ export class App {
       return;
     }
     if (this.screen !== 'run') {
-      const s = this.screen === 'menu' ? this.menu : this.screen === 'garage' ? this.garage : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.credits;
+      const s = this.screen === 'menu' ? this.menu : this.screen === 'garage' ? this.garage : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.screen === 'review' ? this.reviewPick : this.credits;
       if (meta.navX || meta.navY) s.nav(meta.navX, meta.navY);
       if (meta.confirm) s.confirm();
       else if (meta.back || meta.pause) s.back();

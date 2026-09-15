@@ -24,6 +24,7 @@ import {
   type BikeClass,
   type CameraDebug,
   type CompiledTrack,
+  type Vec2,
   type GameEvent,
   type GameEventListener,
   type GamePhase,
@@ -40,7 +41,7 @@ import {
 import type { AudioSystem } from '../audio';
 import type { PhysicsWorld } from '../physics';
 import type { GameRenderer } from '../render';
-import { DEFAULT_TRACK_ID, compileTrack, getTrack } from '../tracks';
+import { DEFAULT_TRACK_ID, compileTrack, getTrack, profileQuery } from '../tracks';
 import type { Hud } from '../ui';
 import { GhostRunner } from './ghost';
 import { COUNTDOWN_BEATS, FINISH_BRAKE, medalFor, ruleTicks, targetForBike, targetTimeOf, type RunResult } from './rules';
@@ -307,6 +308,33 @@ export class Game {
     return this.track;
   }
 
+  /** The compiled track the physics / renderer hold (the level reviewer reads its `placed` list); null before the first load. */
+  get compiledTrack(): CompiledTrack | null {
+    return this.compiled;
+  }
+
+  /** Authored ground height under x (the profile, before gap pits); 0 without a track. */
+  groundY(x: number): number {
+    return this.track ? profileQuery(this.track.profile).y(x) : 0;
+  }
+
+  /**
+   * Level reviewer (docs/design/game.md §21): park the bike upright on the ground at x, at rest, on the
+   * live physics world's `teleport` (v2). The camera rig follows the bike, so this IS the reviewer's pan —
+   * there is no free-camera hook in the renderer. False when the solver has no `teleport` (v1 / mock).
+   */
+  teleportBike(x: number): boolean {
+    const p = this.physics as Partial<{ teleport(pose: { pos: Vec2; angle: number; vel?: Vec2; angVel?: number }): void; tuning: { wheel: { radius: number } } }>;
+    if (!this.track || typeof p.teleport !== 'function') return false;
+    const r = p.tuning?.wheel?.radius ?? 0.35;
+    const g = profileQuery(this.track.profile);
+    const angle = Math.atan2(g.y(x + 0.6) - g.y(x - 0.6), 1.2);
+    p.teleport({ pos: { x: x - Math.sin(angle) * r, y: g.y(x) + Math.cos(angle) * r }, angle, vel: { x: 0, y: 0 }, angVel: 0 });
+    this.physics.drainEvents();
+    this.lastState = null;
+    return true;
+  }
+
   get currentSeed(): number {
     return this.seed;
   }
@@ -379,6 +407,24 @@ export class Game {
     this.entryToken++;
     this.setPhase('menu');
     this.pausedFlag = false;
+  }
+
+  /**
+   * Level reviewer (docs/design/game.md §21): the bike alive but held — the `countdown` phase with the entry hold
+   * pinned, so physics steps with neutral input, nothing counts, the 3-2-1 never starts, and the camera rig gets
+   * sim time to follow the parked probe (a paused world has dt = 0 and the rig never moves). Off = back to `menu`.
+   */
+  setParked(on: boolean): void {
+    if (on) {
+      this.entryToken++;
+      this.entryHold = true;
+      this.entryHoldAt = performance.now();
+      this.countdownTick = 0;
+      this.pausedFlag = false;
+      this.setPhase('countdown');
+    } else {
+      this.toMenu();
+    }
   }
 
   /** Re-arm the current track from its start (used by the menu's Play). */

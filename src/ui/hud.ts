@@ -559,6 +559,11 @@ export class DomHud implements Hud {
     this.root.classList.toggle('replay-on', on);
   }
 
+  /** Level reviewer parked (docs/design/game.md §21): the whole HUD is off — the held world is not a run; RIDE turns it back on. */
+  setReview(on: boolean): void {
+    this.root.classList.toggle('review-on', on);
+  }
+
   /** Pause overlay up: the whole HUD top band hides (SPEC §6); banners stay. */
   setOverlay(on: boolean): void {
     this.root.classList.toggle('under-overlay', on);

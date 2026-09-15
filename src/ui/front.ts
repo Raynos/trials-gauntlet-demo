@@ -11,11 +11,11 @@ import { BIOME_TINT, type ArtManifest } from './art';
 import type { BestEntry, BoardEntry, FpsChoice, ModelChoice } from './best';
 import { formatTime } from './format';
 import type { QualityChoice } from './menu';
-import { labTracks, medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
+import { labTracks, medalTotals, nextTrack, playgroundTracks, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
 import { conceal, reveal } from './live';
 
-export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits';
+export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits' | 'review';
 
 export interface FrontCallbacks {
   /** Track select confirmed a card (called ≈180 ms into the card's fly-up so the scene swaps under it). */
@@ -107,7 +107,7 @@ const LEGEND_PAD = `<span><i class="pad">✚</i>Move</span><span><i class="pad a
 const LEGEND_TOUCH = `<span>Tap to select</span><span>Swipe rows</span>`;
 
 /** Base screen: root element, show/hide with the shared fade, a device-aware legend. */
-abstract class Screen {
+export abstract class Screen {
   readonly root: HTMLDivElement;
   protected legend: HTMLDivElement | null = null;
 
@@ -337,12 +337,14 @@ export class MainMenuScreen extends Screen {
     this.list.setItems([
       { id: 'play', label: 'Play' },
       { id: 'garage', label: 'Garage' },
+      { id: 'review', label: 'Review' },
       { id: 'settings', label: 'Settings' },
       { id: 'credits', label: 'Credits', minor: true },
     ]);
     this.list.onPick = (id) => {
       if (id === 'play') this.cb.goto('tracks');
       else if (id === 'garage') this.cb.goto('garage');
+      else if (id === 'review') this.cb.goto('review');
       else if (id === 'settings') this.cb.goto('settings');
       else if (id === 'credits') this.cb.goto('credits');
     };
@@ -476,6 +478,23 @@ export class TrackSelectScreen extends Screen {
       rowEl.appendChild(car);
       this.tiers.appendChild(rowEl);
       this.rows.push({ tier: lab[0]!.tier, el: rowEl, cards, locked: false });
+    }
+    // Playgrounds (tracks round 10): one beginner course per biome, right after Lab so every biome is reachable without finishing anything.
+    const playgrounds = playgroundTracks(tracks);
+    if (playgrounds.length > 0) {
+      const rowEl = h('div', 'tier-row playground-row');
+      rowEl.innerHTML = `<div class="tier-head"><b>Playgrounds</b><span>One beginner course per biome · every asset · always open · no medals</span></div>`;
+      const car = h('div', 'carousel');
+      const cards: CardRef[] = [];
+      const r = this.rows.length;
+      playgrounds.forEach((t, c) => {
+        const el = this.card(t, false, r, c, true);
+        car.appendChild(el);
+        cards.push({ el, track: t, locked: false });
+      });
+      rowEl.appendChild(car);
+      this.tiers.appendChild(rowEl);
+      this.rows.push({ tier: playgrounds[0]!.tier, el: rowEl, cards, locked: false });
     }
     for (const tier of TIER_ORDER) {
       const list = tracksInTier(ship, tier);

@@ -750,3 +750,58 @@ preview reload, replay header, `hook.setBike`); `App.setAudioScene` calls `audio
 `menu` from `goto()` (every front screen), `run` from `play()`, the replay viewer, and the `countdown` / `riding` phase
 inside a run (retry / next out of the results), `results` when `onResults` fires. Both are optional on `AudioSystem`;
 `NullAudio` and older systems are no-ops.
+
+## 21. Level reviewer (core #10; `src/game/review.ts`, `src/ui/review.ts`, `harness/e2e/review.mts`)
+
+The user's ask: "go into the level and kind of play it, see it, jump around, pan around, and then annotate comments on
+the segments of the level — break each level up into six segments, let me annotate comments on the segments, and let
+you iterate and rebuild the levels." It is a **first-class screen, not a URL**: a top-level **REVIEW** tab on the
+Broadcast menu (PLAY · GARAGE · REVIEW · SETTINGS · credits; the five tabs step the tab font down one notch so they fit
+at 844 px, every tab still ≥ 88 × 44) opens the **level picker** (`ReviewPickScreen`, `.review-pick-screen`: one row per
+track — curriculum, playgrounds `p<n>-*`, lab — with its tier, id and `n / 6 noted`), and a row opens the **review UI**
+(`ReviewPanel`, `.review-ui`) on that track. ‹ Tracks returns to the picker, ‹ Menu to the menu, all through `goto` /
+the `.live` rule. `?review=<track>` deep-links to the same UI (the e2e uses it); nothing hides behind `?dev=1`.
+
+**The world under it.** `ReviewSession.open` loads the track and calls `Game.setParked(true)`: the `countdown` phase
+with the entry hold pinned — physics steps with neutral input, nothing counts (no faults, no run clock, no 3-2-1), the
+HUD is off (`Hud.setReview`). The bike is the **probe**: it is parked at the segment start (`Game.teleportBike(x)`: rear
+wheel on the authored profile, angle from the local slope, at rest, on the v2 world's `teleport`) and re-pinned every
+frame, so a tick inside an obstacle or a slope never moves it.
+
+**Camera, honestly.** The renderer has no free-camera hook (`GameRenderer.setCameraOverride` is still unimplemented), so
+"pan" moves the probe and the rig follows it — that is why the world must be held rather than paused: the rig smooths in
+sim time, and a paused world (dt = 0) never moves the camera at all (a > 6 m teleport is a hard cut; small ones froze —
+the first e2e run caught it). Zoom drives the rig's public `setKeys` (one full-track `CameraKey` with `dist` 5–34 m)
+through `renderer.debug.rig`, the replay viewer's seam; the track's own keys are restored on exit. **Vertical pan is not
+offered** — it needs the render hook. One finger / mouse drag pans along the track (1.1 × dist metres per view width),
+pinch / wheel / −+ zoom, **FLY** advances the probe at 8 m/s to the finish, **RIDE** starts a run at the probe (GO, no
+countdown, the strip enabled, the HUD back) and a crash's respawn or R returns the bike to the segment start; **PARK**
+(the same button) holds the world again where the bike is. Keyboard: held lean pans, ←/→ jump a segment, Enter =
+ride / park, V = fly, Esc = back to the picker.
+
+**Six segments.** `reviewSegments(def, placed)`: a playground's `meta.segments` (`segmentsOf`), else the ship table
+(`SHIP_SEGMENTS`, `src/tracks/segments.ts`: six labelled beats per curriculum track), else six equal x-ranges start →
+finish. Each segment counts the compiled `placed` kinds inside it (most frequent first) — the notes card shows them under
+the label and range. The strip along the top (1–6, 44 px, tap to jump, the current one amber, a green dot on noted ones)
+and the card (bottom-left, ≤ 40 % of the width, two-line kinds on short phones) never cover the track centre; the toolbar
+sits bottom-right (Notes · Fly · Ride · − · +).
+
+**Annotations.** Per segment: rating 1–5 (★, tap again to clear), quick tags `too hard` · `too easy` · `boring` ·
+`unreadable` · `camera` · `asset missing` · `fun`, a comment box (the keyboard input ignores editable targets — before
+this, typing `a d w s r space` in the box fed the game). Saved to `localStorage` `trials.review.<track>` → `{ [i]:
+{rating, tags, comment, at} }` on every tap / 400 ms after typing / blur / segment change; empties are dropped. **Copy
+review** puts one string on the clipboard (`copyText`, iOS-safe): a markdown table, then the JSON in a fence —
+`{track, name, build, segments:[{i, from, to, label, rating, tags, comment}], at}`; **Share** goes through
+`navigator.share` when present. The parent files it under `docs/reviews/levels/<track>.md` and re-authors from it.
+
+**Harness.** `window.__trials.review` = `{open, close, active, view, jump, pan(m), zoom, fly, ride, export}`;
+`pnpm harness:e2e --only=review` (phone 932×430 + 844×390, desktop 1280×720): the REVIEW tab is on the menu and the five
+tabs fit → picker rows with `n / 6 noted` → First Ride → six buttons, tap 4 → segment 4 current, in range, titled → rate
+4 ★, tag, type → the strip's noted dot → Copy → the clipboard's JSON (`segments[3]`) carries the note → localStorage →
+a finger drag moves the probe and the camera (+x for a leftward drag) → FLY advances → RIDE drops the bike at the probe
+(< 3 m) and 1.5 s of held gas moves it → PARK → ‹ Tracks (the row now `1 / 6 noted`) → ‹ Menu → `?review=` deep link;
+desktop: mouse drag pans, wheel zooms, Esc leaves. `--only=` takes a comma list (`--only=review,front,run`).
+
+**Owed to render.** `setCameraOverride({mode:'free', x, y, dist})` — with it the probe stays parked where it is, the
+drag pans both axes, and the world can be paused for real; `src/game/review.ts` switches on the hook's presence the way
+`src/game/replay.ts` does.

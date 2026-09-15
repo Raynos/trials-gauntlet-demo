@@ -621,6 +621,20 @@ export interface TrialsHook {
     screen(): string;
     paused(): boolean;
   };
+  /** Level reviewer (docs/design/game.md §21; `window.__trials.review`): open a track under the review UI, read / drive its view, the Copy review payload. */
+  review?: {
+    open(trackId: string, seg?: number): boolean;
+    close(): void;
+    active(): boolean;
+    view(): { trackId: string; seg: number; x: number; dist: number; flying: boolean; riding: boolean; segments: { i: number; from: number; to: number; label: string; kinds: Record<string, number> }[] };
+    jump(seg: number): void;
+    /** Move the probe by metres. */
+    pan(m: number): void;
+    zoom(factor: number): void;
+    fly(): void;
+    ride(): void;
+    export(): { data: unknown; text: string };
+  };
   /**
    * `?bench=1` (front-end page only, docs/device/README.md): the on-device benchmark — start it (the same as the START
    * tap), read its state, and the finished report (null until the last scenario ends).

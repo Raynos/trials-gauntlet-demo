@@ -308,6 +308,7 @@ function boot(): void {
           lab: params.get('lab') === '1',
           physics: { current: params.get('physics') === 'v1' ? 'v1' : params.get('physics') === 'v2' ? 'v2' : 'default', available: physicsVersions(), live: physicsVersion },
           bench: parseBenchParams(params) ?? undefined,
+          initialReview: params.get('review') ?? undefined,
           // Per-class livery when the render owner exports it (`setBikeClass(bike)`); otherwise the garage card carries the colour.
           onBikeChange: (bike) => {
             const r = renderer as Partial<{ setBikeClass(b: 'rookie' | 'pro'): void }>;
@@ -323,6 +324,7 @@ function boot(): void {
         const hook = installHook(game, false, extras);
         hook.lastRun = () => game.lastRunRecording()?.json ?? null;
         hook.replay = shell.replayApi();
+        hook.review = shell.reviewApi();
         hook.navLog = () => shell.navLog.all();
         hook.app = shell.testApi();
         const benchApi = shell.benchApi();
