@@ -9,6 +9,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | plan | file | goal | status | % | next gate |
 |---|---|---|---|---|---|
 | **The brief** | `README.md` | a 2.5D Trials-quality bike game, deterministic, 60 fps, desktop + iOS Safari | in build | — | — |
+| **Blender hero (branch)** | `docs/plans/BLENDER_HERO.md` | rider/bike models, animation and Three.js integration to the Trials reference; Codex owns Blender on `blender-work` | round 1: rig drift/contact repair + missing V2 body export; 596 tests pass, 23,017 production ticks preserve snapshot/clock bytes | — | mechanical joint closure and reference-led mesh/pose reconstruction; trustworthy H5 and actual-device evidence still open |
 | **Mega plan (v0.2.0)** | `docs/plans/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
 | **Physics v2** | `docs/plans/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
 | **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | round 1 (H1 rider kit landed `47f0455`) | 15 | H3 hero shadow + G4 stamped auto-deploy, then device report #1 |
@@ -19,6 +20,7 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 
 | date | decision |
 |---|---|
+| 09-15 | Codex owns all Blender rider/bike work and Three.js hero integration on the explicitly authorized `blender-work` worktree; may rebuild assets; final branch includes a merge handoff for the trunk agent |
 | 09-14 | Main menu → **B Broadcast** (`assets/design/menu/B-broadcast.jpg`, SPEC in `assets/design/menu/SPEC.md`) — core-game builds it |
 | 09-14 | Plans live in `docs/plans/`; completed/stale docs go to `project/archive/` |
 | 09-15 | Touch controls → **G strip with keys** (`assets/design/controls/G-strip-keys.png`, SPEC § Round 2); colours: GAS green, BRAKE red, **the two LEAN keys equal weight in one shared neutral scheme** (neither primary nor secondary) |

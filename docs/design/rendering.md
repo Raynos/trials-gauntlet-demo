@@ -1,5 +1,7 @@
 # Rendering design — Trials Rising-on-PS4 look in Three.js at 60 fps
 
+Current hero findings and corrections to older reports: **§14, Blender branch round 1**.
+
 Scope: `src/render/**` only. Consumes `CompiledTrack`, `PhysicsState`, `GameEvent`
 from `src/core/types.ts`; implements CONTRACT §2.7 `GameRenderer` in `src/render/index.ts`
 (`setTrack(CompiledTrack)`, `render(state, alpha)`, `onEvent`, `setQuality`, `camera()`,
@@ -1434,3 +1436,59 @@ pnpm harness:perf                                                        # calls
 ```
 Scratch scripts (snap / probe / timing / ghost / biome grid / camera curve) live in the render
 owner's scratchpad (`scratchpad/render2/*.mts`), not in the repo.
+
+## 14. Blender branch round 1 — the rig drifted and the V2 animation path was never active
+
+2026-09-15, baseline `56e3883`, branch `blender-work`. Full audit and next work:
+`docs/plans/BLENDER_HERO.md`. This is an integration repair, not a hero-art completion.
+
+**Correction to round 13's H2 claims:** V2's getter did not publish `riderBody`,
+although the type and render consumer existed. Real V2 play therefore took the
+legacy spring/timed-clip path. The getter now copies the existing rider SoA
+values; no physics solver, tuning, snapshot layout or hash algorithm changed.
+
+The real compressed rider exposed errors that the procedural chain tests missed:
+tiny shoulder translation samples accumulated to 27.4 cm over a minute; landing
+layers moved ankle anchors 13.9 cm off their targets. Fixed joint translations
+now reset from the bind rig and only pelvis translation is layered. Rotations
+are normalized. Full-pose landing and extension clips now use `stand_attack` as
+their common additive reference, rather than subtracting their crouch/extension
+opening poses. Both arms and legs solve with actual exported segment lengths;
+unreachable extra motion is attenuated toward the base pose. `ankleErr` and
+`additiveWeight` expose the result instead of hard-coding successful contacts.
+
+Independent review also reproduced false extension during rigid chassis
+rotation: local X -0.28 m at -6 rad/s yielded 1.68 m/s of apparent upward motion.
+`FrameBuilder` now subtracts angular point velocity; finite-difference trajectory
+tests verify zero extension for rigid motion and retain real relative movement.
+
+Validation: **40 test files, 596 passed, 11 todo**, with typecheck/lint/build
+passing. New tests load both committed GLBs through MeshoptDecoder and check
+bone matrices across 30/60/120 fps histories, 60-second idle, repeated timestamps,
+ragdoll/reset, actual wrist/ankle origins, bind-derived segment lengths, scales
+and transient-reference semantics. An independent reviewer scanned 23,100 pose
+combinations without contact errors over 0.1 mm.
+
+An independent browser comparison of the actual compiled **Game** checked
+**23,017 V2 input ticks** across b1/b3/e2/m1 Rookie, b3 Pro and two crash/restart
+patterns. Every solver snapshot byte, Game counter, clock byte, phase and fault
+count matched baseline. The published state differs only by `riderBody`;
+canonical hashes intentionally change because the hasher already includes that
+optional field. Old hash pins require an explicit schema-aware migration, not
+blind regeneration. Run-clock finish values remain byte-identical. B3's physics
+finish field and Game run clock differ by one ULP in **both** versions because
+one multiplies by 1/120 and the other divides by 120; compare like fields.
+
+The inherited evidence harness also has proven clock/history, fault-counter,
+solver-selection, fallback and frame-padding defects; a passing old gate is not
+used as proof of this repair. The ignored `harness/out/blender` probes serve
+frozen content-hashed builds, verify consumed model bytes and actual glTF
+instances, preserve the rendered lead-in and explicitly sample alpha=1 at
+30 fps. They record state time, displayed time and actual rig anchors. These
+are controlled renderer checks, not proof of production interpolation, glove/
+boot surface contact, blind AAA preference, or iOS device performance.
+
+The played landing comparison still shows the rounded helmet/brace, simplified
+garments and limited physical pose read. Art, mechanical attachment defects,
+physical-to-visual pose mapping, actual-device validation and a trustworthy
+blind comparison pipeline remain open. No H5 win-rate increase is claimed.

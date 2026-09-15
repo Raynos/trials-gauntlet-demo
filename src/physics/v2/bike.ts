@@ -44,7 +44,7 @@ export interface PhysicsDebugV2 {
   contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; mu: number; surface: SurfaceKind }[];
   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
-  /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
+  /** The simulated `PhysicsState.riderBody` with additional servo diagnostics. */
   rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number };
   /** The declared attitude torque applied this tick (N m). */
   attTorque: number;
@@ -517,6 +517,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
         front: { pos: { x: px[FRONT]!, y: py[FRONT]! }, spin: -an[FRONT]!, spinVel: -av[FRONT]!, compression: F[S_FRONT_COMP]!, grounded: U[U_FRONT_GND] === 1 },
       },
       rider: pose,
+      riderBody: { pos: { x: px[RIDER]!, y: py[RIDER]! }, vel: { x: this.vx[RIDER]!, y: this.vy[RIDER]! }, angle: an[RIDER]!, angVel: av[RIDER]! },
       checkpoint: F[S_CHECKPOINT]!,
       finished: U[U_FINISHED] === 1,
       faulted: fault,

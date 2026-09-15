@@ -41,8 +41,8 @@ export interface RenderFrame {
    * Physics v2's simulated rider body (`PhysicsState.riderBody`), in the bike frame (round 13, H2):
    * `present` false on v1 / mock physics (the renderer then falls back to the pose-only path).
    * `relX/relY` = rider COM − bike.pos rotated into the chassis frame; `relAngle` = ψ_R − bike angle;
-   * `relUp` = rider velocity relative to the chassis along the chassis up axis (m/s, + = rising off
-   * the bike — the hop push); `angVel` = the body's angular velocity (rad/s, world).
+   * `relUp` = rider velocity relative to the rotating chassis at the rider's position, along
+   * chassis up (m/s, + = rising off the bike); `angVel` = body angular velocity (rad/s, world).
    */
   riderBody: { present: boolean; relX: number; relY: number; relAngle: number; relUp: number; angVel: number };
   /** Physics hop state machine (glTF rider plays `extend` on 'push'). */
@@ -175,7 +175,9 @@ export class FrameBuilder {
       rb.relAngle = lerpAngle(pb.angle, cb.angle, a) - f.bikeAngle;
       const rvx = lerp(pb.vel.x, cb.vel.x, a) - f.velX;
       const rvy = lerp(pb.vel.y, cb.vel.y, a) - f.velY;
-      rb.relUp = -rvx * s + rvy * c;
+      // Subtract the chassis's velocity at this point, not just its origin. A rider rigidly
+      // carried through a wheelie has no relative extension: d(localY)/dt includes -omega*localX.
+      rb.relUp = -rvx * s + rvy * c - lerp(prev.bike.angVel, cur.bike.angVel, a) * rb.relX;
       rb.angVel = lerp(pb.angVel, cb.angVel, a);
     } else {
       rb.present = false;
