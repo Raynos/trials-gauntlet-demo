@@ -5,9 +5,9 @@
   "bike": "rookie",
   "tier": "medium",
   "technique": "the bunny hop",
-  "updatedAt": "2026-09-14T22:50:04.910Z",
+  "updatedAt": "2026-09-15T00:27:55.934Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "93e6caa5",
+  "srcFingerprint": "74f5de4d",
   "attemptsBand": [
     3,
     8
@@ -22,45 +22,35 @@
         3707397685
       ],
       "attempts": [
+        3,
         1,
-        4,
         2
       ],
       "medianAttempts": 2,
       "clears": 3,
       "finishTimes": [
-        11.716666666666667,
-        23.3,
-        15.691666666666666
+        17.608333333333334,
+        11.6,
+        13.316666666666666
       ],
-      "medianFinishTime": 15.691666666666666,
-      "bestX": 104.62771574505103,
+      "medianFinishTime": 13.316666666666666,
+      "bestX": 104.60217406003866,
       "deaths": [
         {
-          "obstacle": "ground @ 15 m",
-          "x": 15,
+          "obstacle": "ground @ 70 m",
+          "x": 70,
           "count": 2,
           "reasons": {
             "crash": 2
           },
           "rules": {
-            "nose-high": 2
-          }
-        },
-        {
-          "obstacle": "ground @ 25 m",
-          "x": 25,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
+            "air-gas-nose-up": 1,
             "nose-high": 1
           }
         },
         {
-          "obstacle": "ground @ 85 m",
-          "x": 85,
+          "obstacle": "ground @ 65 m",
+          "x": 65,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -71,9 +61,9 @@
         }
       ],
       "runs": [
-        "20260914-174952-dc558f",
-        "20260914-174952-4f4a92",
-        "20260914-174952-c84f55"
+        "20260914-192744-379886",
+        "20260914-192744-415c78",
+        "20260914-192744-9cbe47"
       ]
     },
     {
@@ -84,69 +74,24 @@
         3707397685
       ],
       "attempts": [
-        2,
-        3,
-        2
+        1,
+        1,
+        1
       ],
-      "medianAttempts": 2,
+      "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        14.391666666666667,
-        18.35,
-        14.783333333333333
+        9.758333333333333,
+        9.691666666666666,
+        9.75
       ],
-      "medianFinishTime": 14.783333333333333,
-      "bestX": 105.19571382790973,
-      "deaths": [
-        {
-          "obstacle": "ground @ 20 m",
-          "x": 20,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-high": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 25 m",
-          "x": 25,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-high": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 85 m",
-          "x": 85,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-brake-nose-down": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 90 m",
-          "x": 90,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
-          }
-        }
-      ],
+      "medianFinishTime": 9.75,
+      "bestX": 105.23840094485234,
+      "deaths": [],
       "runs": [
-        "20260914-174958-6ef385",
-        "20260914-174958-13201f",
-        "20260914-174958-aadcb5"
+        "20260914-192750-8fbc94",
+        "20260914-192750-b13f7b",
+        "20260914-192750-12e0ea"
       ]
     },
     {
@@ -164,17 +109,17 @@
       "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        10.266666666666667,
-        10,
-        9.241666666666667
+        9.15,
+        9.1,
+        9.141666666666667
       ],
-      "medianFinishTime": 10,
-      "bestX": 105.75433787536882,
+      "medianFinishTime": 9.141666666666667,
+      "bestX": 105.77855496109493,
       "deaths": [],
       "runs": [
-        "20260914-175004-3f504a",
-        "20260914-175004-2bb8a5",
-        "20260914-175004-935eb0"
+        "20260914-192755-61e38f",
+        "20260914-192755-5c9aff",
+        "20260914-192755-21cb82"
       ]
     }
   ]

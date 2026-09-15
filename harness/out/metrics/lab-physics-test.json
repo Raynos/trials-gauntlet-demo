@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "lab-physics-test",
   "bike": "rookie",
-  "updatedAt": "2026-09-14T20:00:26.047Z",
-  "physics": "bikePhysicsFactory",
+  "updatedAt": "2026-09-14T23:48:57.075Z",
+  "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     3,
     8
@@ -12,29 +12,22 @@
   "targetAttempts": 8,
   "curve": [
     {
-      "skill": 2,
-      "seeds": [
-        3707397683
-      ],
-      "attempts": [
-        1
-      ],
-      "median": 1,
-      "finishTimes": [
-        6.4
-      ]
-    },
-    {
       "skill": 3,
       "seeds": [
-        3707397683
+        3707397683,
+        3707397684,
+        3707397685
       ],
       "attempts": [
+        1,
+        1,
         1
       ],
       "median": 1,
       "finishTimes": [
-        6.466666666666667
+        8.1,
+        8.1,
+        8.1
       ]
     }
   ],
@@ -42,7 +35,8 @@
   "shaped": null,
   "singleWall": null,
   "runs": [
-    "20260914-143211-29063d",
-    "20260914-150017-9e9b22"
+    "20260914-184842-1c3565",
+    "20260914-184846-010046",
+    "20260914-184850-a18d04"
   ]
 }

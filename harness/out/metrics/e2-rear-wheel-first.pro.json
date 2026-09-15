@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "e2-rear-wheel-first",
   "bike": "pro",
-  "updatedAt": "2026-09-14T18:39:40.943Z",
-  "physics": "bikePhysicsFactory",
+  "updatedAt": "2026-09-15T00:03:41.304Z",
+  "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     3,
     5
@@ -14,21 +14,32 @@
     {
       "skill": 3,
       "seeds": [
-        2125781358
+        2125781358,
+        2125781359,
+        2125781360
       ],
       "attempts": [
-        1
+        2,
+        2,
+        2
       ],
-      "median": 1,
+      "median": 2,
       "finishTimes": [
-        29.8
+        48.583333333333336,
+        48.583333333333336,
+        48.583333333333336
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": null,
+  "singleWall": {
+    "checkpoint": 3,
+    "share": 1
+  },
   "runs": [
-    "20260914-133822-3c50de"
+    "20260914-190019-10bcfc",
+    "20260914-190120-871aa2",
+    "20260914-190231-5e8861"
   ]
 }

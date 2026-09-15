@@ -5,9 +5,9 @@
   "bike": "pro",
   "tier": "hard",
   "technique": "sustained wheelie and the lip climb",
-  "updatedAt": "2026-09-14T22:50:23.549Z",
+  "updatedAt": "2026-09-15T00:28:16.117Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "93e6caa5",
+  "srcFingerprint": "74f5de4d",
   "attemptsBand": [
     10,
     18
@@ -22,11 +22,11 @@
         1831771782
       ],
       "attempts": [
-        48,
-        50,
-        51
+        41,
+        51,
+        47
       ],
-      "medianAttempts": 50,
+      "medianAttempts": 47,
       "clears": 0,
       "finishTimes": [
         null,
@@ -34,79 +34,96 @@
         null
       ],
       "medianFinishTime": null,
-      "bestX": 227.80043740807582,
+      "bestX": 361.3701418059794,
       "deaths": [
         {
           "obstacle": "wall @ 175.8 m",
           "x": 175.8,
-          "count": 55,
+          "count": 33,
           "reasons": {
-            "crash": 55
+            "crash": 31,
+            "restart": 2
           },
           "rules": {
-            "nose-low": 19,
-            "air-brake-nose-down": 6,
-            "air-gas-nose-up": 22,
-            "nose-high": 6,
-            "air-level": 2
+            "nose-high": 4,
+            "nose-low": 14,
+            "air-gas-nose-up": 9,
+            "air-brake-nose-down": 4,
+            "stuck-restart": 2
           }
         },
         {
           "obstacle": "ramp @ 172.8 m",
           "x": 172.8,
-          "count": 30,
+          "count": 26,
           "reasons": {
-            "crash": 25,
-            "restart": 5
+            "crash": 24,
+            "restart": 2
           },
           "rules": {
-            "air-brake-nose-down": 16,
-            "stuck-restart": 2,
-            "nose-high": 10,
-            "launch": 2
+            "air-brake-nose-down": 13,
+            "nose-high": 11,
+            "stuck-restart": 1,
+            "launch": 1
           }
         },
         {
           "obstacle": "gap @ 184.8 m",
           "x": 184.8,
-          "count": 20,
+          "count": 14,
           "reasons": {
-            "crash": 19,
+            "crash": 13,
             "hazard": 1
           },
           "rules": {
-            "nose-high": 5,
+            "air-brake-nose-down": 8,
+            "launch": 2,
+            "touchdown": 1,
             "air-gas-nose-up": 2,
-            "air-brake-nose-down": 11,
-            "launch": 1,
             "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 356.0 m",
+          "x": 356,
+          "count": 13,
+          "reasons": {
+            "hazard": 3,
+            "crash": 10
+          },
+          "rules": {
+            "nose-low": 3,
+            "hop-preload": 1,
+            "air-brake-nose-down": 3,
+            "drop-ahead-lean-back": 1,
+            "touchdown": 1,
+            "air-gas-nose-up": 2,
+            "nose-high": 1,
+            "air-level": 1
+          }
+        },
+        {
+          "obstacle": "wall @ 348.0 m",
+          "x": 348,
+          "count": 7,
+          "reasons": {
+            "crash": 7
+          },
+          "rules": {
+            "air-brake-nose-down": 3,
+            "nose-low": 3,
+            "air-gas-nose-up": 1
           }
         },
         {
           "obstacle": "ground @ 40 m",
           "x": 40,
-          "count": 6,
+          "count": 4,
           "reasons": {
-            "crash": 6
+            "crash": 4
           },
           "rules": {
-            "touchdown": 1,
-            "air-brake-nose-down": 3,
-            "nose-high": 1,
-            "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 160 m",
-          "x": 160,
-          "count": 6,
-          "reasons": {
-            "crash": 1,
-            "restart": 5
-          },
-          "rules": {
-            "air-brake-nose-down": 1,
-            "respawn": 5
+            "air-brake-nose-down": 4
           }
         },
         {
@@ -120,7 +137,7 @@
           "rules": {
             "nose-low": 2,
             "air-brake-nose-down": 1,
-            "nose-high": 1
+            "hop-preload": 1
           }
         },
         {
@@ -128,13 +145,38 @@
           "x": 187.8,
           "count": 4,
           "reasons": {
-            "crash": 3,
-            "hazard": 1
+            "crash": 4
           },
           "rules": {
-            "air-brake-nose-down": 2,
-            "nose-low": 1,
-            "hop-preload": 1
+            "air-brake-nose-down": 1,
+            "nose-high": 1,
+            "nose-low": 2
+          }
+        },
+        {
+          "obstacle": "ramp @ 344.0 m",
+          "x": 344,
+          "count": 4,
+          "reasons": {
+            "crash": 3,
+            "restart": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1,
+            "nose-high": 2,
+            "steep-ahead": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 51.0 m",
+          "x": 51,
+          "count": 3,
+          "reasons": {
+            "crash": 3
+          },
+          "rules": {
+            "nose-high": 2,
+            "air-brake-nose-down": 1
           }
         },
         {
@@ -145,7 +187,8 @@
             "crash": 3
           },
           "rules": {
-            "nose-high": 3
+            "nose-high": 2,
+            "air-brake-nose-down": 1
           }
         },
         {
@@ -160,38 +203,51 @@
           }
         },
         {
-          "obstacle": "gap @ 51.0 m",
-          "x": 51,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "nose-high": 2
-          }
-        },
-        {
-          "obstacle": "gap @ 53.5 m",
-          "x": 53.5,
+          "obstacle": "gap @ 68.5 m",
+          "x": 68.5,
           "count": 2,
           "reasons": {
             "crash": 2
           },
           "rules": {
             "air-brake-nose-down": 1,
-            "nose-high": 1
+            "hop-tuck": 1
           }
         },
         {
-          "obstacle": "gap @ 190.8 m",
-          "x": 190.8,
+          "obstacle": "ground @ 85 m",
+          "x": 85,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-brake-nose-down": 1,
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 193.8 m",
+          "x": 193.8,
           "count": 2,
           "reasons": {
             "hazard": 1,
             "crash": 1
           },
           "rules": {
-            "hop-preload": 1,
+            "air-gas-nose-up": 1,
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 335 m",
+          "x": 335,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "nose-high": 1,
             "air-brake-nose-down": 1
           }
         },
@@ -218,19 +274,19 @@
           }
         },
         {
-          "obstacle": "gap @ 56.0 m",
-          "x": 56,
+          "obstacle": "ground @ 45 m",
+          "x": 45,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "cruise": 1
+            "air-brake-nose-down": 1
           }
         },
         {
-          "obstacle": "gap @ 58.5 m",
-          "x": 58.5,
+          "obstacle": "gap @ 56.0 m",
+          "x": 56,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -240,19 +296,8 @@
           }
         },
         {
-          "obstacle": "gap @ 68.5 m",
-          "x": 68.5,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "hop-preload": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 70 m",
-          "x": 70,
+          "obstacle": "ground @ 80 m",
+          "x": 80,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -262,30 +307,41 @@
           }
         },
         {
-          "obstacle": "ground @ 85 m",
-          "x": 85,
+          "obstacle": "gap @ 190.8 m",
+          "x": 190.8,
           "count": 1,
           "reasons": {
-            "crash": 1
+            "hazard": 1
           },
           "rules": {
             "nose-low": 1
           }
         },
         {
-          "obstacle": "ground @ 140 m",
-          "x": 140,
+          "obstacle": "gap @ 196.8 m",
+          "x": 196.8,
+          "count": 1,
+          "reasons": {
+            "hazard": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 205 m",
+          "x": 205,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "air-brake-nose-down": 1
+            "nose-high": 1
           }
         },
         {
-          "obstacle": "ground @ 220 m",
-          "x": 220,
+          "obstacle": "ground @ 210 m",
+          "x": 210,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -302,14 +358,25 @@
             "crash": 1
           },
           "rules": {
-            "air-brake-nose-down": 1
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 361.0 m",
+          "x": 361,
+          "count": 1,
+          "reasons": {
+            "hazard": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
           }
         }
       ],
       "runs": [
-        "20260914-175009-79797b",
-        "20260914-175009-85531d",
-        "20260914-175009-159329"
+        "20260914-192800-a9410b",
+        "20260914-192801-254b39",
+        "20260914-192801-bfa84b"
       ]
     },
     {
@@ -320,11 +387,11 @@
         1831771782
       ],
       "attempts": [
-        41,
-        51,
-        51
+        45,
+        50,
+        49
       ],
-      "medianAttempts": 51,
+      "medianAttempts": 49,
       "clears": 0,
       "finishTimes": [
         null,
@@ -332,127 +399,99 @@
         null
       ],
       "medianFinishTime": null,
-      "bestX": 194.81953282166873,
+      "bestX": 362.4191642291355,
       "deaths": [
         {
           "obstacle": "wall @ 175.8 m",
           "x": 175.8,
-          "count": 51,
+          "count": 47,
           "reasons": {
-            "crash": 51
-          },
-          "rules": {
-            "air-brake-nose-down": 13,
-            "nose-low": 18,
-            "air-gas-nose-up": 16,
-            "nose-high": 4
-          }
-        },
-        {
-          "obstacle": "ramp @ 172.8 m",
-          "x": 172.8,
-          "count": 14,
-          "reasons": {
-            "crash": 13,
+            "crash": 46,
             "restart": 1
           },
           "rules": {
-            "nose-high": 7,
-            "nose-low": 1,
-            "air-brake-nose-down": 5,
-            "stuck-restart": 1
+            "nose-high": 6,
+            "nose-low": 17,
+            "air-brake-nose-down": 10,
+            "air-gas-nose-up": 13,
+            "air-level": 1
           }
         },
         {
           "obstacle": "gap @ 184.8 m",
           "x": 184.8,
-          "count": 12,
+          "count": 25,
           "reasons": {
-            "hazard": 1,
-            "crash": 11
+            "crash": 22,
+            "hazard": 3
           },
           "rules": {
-            "hop-preload": 1,
-            "air-brake-nose-down": 6,
-            "touchdown": 1,
-            "air-gas-nose-up": 1,
-            "nose-low": 1,
-            "launch": 1,
-            "nose-high": 1
+            "air-brake-nose-down": 9,
+            "hop-snap": 1,
+            "nose-low": 3,
+            "air-gas-nose-up": 5,
+            "nose-high": 3,
+            "air-level": 1,
+            "touchdown": 2,
+            "launch": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 172.8 m",
+          "x": 172.8,
+          "count": 19,
+          "reasons": {
+            "crash": 14,
+            "restart": 5
+          },
+          "rules": {
+            "air-brake-nose-down": 8,
+            "nose-high": 5,
+            "steep-ahead": 1,
+            "stuck-restart": 4,
+            "air-level": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 356.0 m",
+          "x": 356,
+          "count": 6,
+          "reasons": {
+            "crash": 5,
+            "hazard": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 2,
+            "nose-high": 2,
+            "hop-snap": 1,
+            "air-brake-nose-down": 1
           }
         },
         {
           "obstacle": "gap @ 51.0 m",
           "x": 51,
-          "count": 10,
+          "count": 5,
           "reasons": {
-            "crash": 10
+            "crash": 5
           },
           "rules": {
-            "nose-high": 3,
-            "nose-low": 1,
-            "air-brake-nose-down": 3,
             "air-gas-nose-up": 2,
-            "touchdown": 1
+            "air-brake-nose-down": 3
           }
         },
         {
-          "obstacle": "gap @ 58.5 m",
-          "x": 58.5,
-          "count": 6,
-          "reasons": {
-            "hazard": 1,
-            "crash": 5
-          },
-          "rules": {
-            "air-gas-nose-up": 1,
-            "nose-high": 3,
-            "air-brake-nose-down": 1,
-            "nose-low": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 40 m",
-          "x": 40,
+          "obstacle": "gap @ 187.8 m",
+          "x": 187.8,
           "count": 5,
           "reasons": {
-            "crash": 5
+            "hazard": 5
           },
           "rules": {
+            "climbing": 1,
             "touchdown": 1,
-            "nose-low": 2,
-            "air-gas-nose-up": 1,
-            "air-brake-nose-down": 1
-          }
-        },
-        {
-          "obstacle": "gap @ 56.0 m",
-          "x": 56,
-          "count": 5,
-          "reasons": {
-            "crash": 4,
-            "hazard": 1
-          },
-          "rules": {
             "air-brake-nose-down": 1,
-            "nose-low": 1,
-            "air-gas-nose-up": 1,
             "hop-preload": 1,
-            "hop-tuck": 1
-          }
-        },
-        {
-          "obstacle": "gap @ 66.0 m",
-          "x": 66,
-          "count": 5,
-          "reasons": {
-            "crash": 5
-          },
-          "rules": {
-            "nose-high": 1,
-            "nose-low": 2,
-            "air-brake-nose-down": 1,
-            "touchdown": 1
+            "steep-ahead": 1
           }
         },
         {
@@ -468,61 +507,56 @@
           }
         },
         {
-          "obstacle": "gap @ 63.5 m",
-          "x": 63.5,
-          "count": 3,
-          "reasons": {
-            "hazard": 1,
-            "crash": 2
-          },
-          "rules": {
-            "hop-snap": 1,
-            "air-brake-nose-down": 1,
-            "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 75 m",
-          "x": 75,
+          "obstacle": "gap @ 53.5 m",
+          "x": 53.5,
           "count": 3,
           "reasons": {
             "crash": 3
           },
           "rules": {
-            "touchdown": 1,
-            "nose-high": 1,
-            "air-brake-nose-down": 1
+            "nose-high": 2,
+            "air-gas-nose-up": 1
           }
         },
         {
-          "obstacle": "gap @ 190.8 m",
-          "x": 190.8,
-          "count": 3,
-          "reasons": {
-            "hazard": 2,
-            "crash": 1
-          },
-          "rules": {
-            "nose-high": 1,
-            "launch": 1,
-            "air-brake-nose-down": 1
-          }
-        },
-        {
-          "obstacle": "gap @ 53.5 m",
-          "x": 53.5,
+          "obstacle": "gap @ 56.0 m",
+          "x": 56,
           "count": 2,
           "reasons": {
             "crash": 2
           },
           "rules": {
-            "air-brake-nose-down": 1,
-            "nose-low": 1
+            "nose-low": 1,
+            "air-brake-nose-down": 1
           }
         },
         {
-          "obstacle": "ground @ 80 m",
-          "x": 80,
+          "obstacle": "gap @ 58.5 m",
+          "x": 58.5,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-level": 1,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 61.0 m",
+          "x": 61,
+          "count": 2,
+          "reasons": {
+            "hazard": 1,
+            "crash": 1
+          },
+          "rules": {
+            "nose-low": 2
+          }
+        },
+        {
+          "obstacle": "ground @ 75 m",
+          "x": 75,
           "count": 2,
           "reasons": {
             "crash": 2
@@ -532,8 +566,8 @@
           }
         },
         {
-          "obstacle": "ground @ 85 m",
-          "x": 85,
+          "obstacle": "gap @ 190.8 m",
+          "x": 190.8,
           "count": 2,
           "reasons": {
             "crash": 2
@@ -543,38 +577,40 @@
           }
         },
         {
-          "obstacle": "ground @ 100 m",
-          "x": 100,
+          "obstacle": "gap @ 193.8 m",
+          "x": 193.8,
+          "count": 2,
+          "reasons": {
+            "hazard": 1,
+            "crash": 1
+          },
+          "rules": {
+            "cruise": 1,
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 344.0 m",
+          "x": 344,
           "count": 2,
           "reasons": {
             "crash": 2
           },
           "rules": {
-            "nose-low": 1,
+            "nose-high": 1,
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "wall @ 348.0 m",
+          "x": 348,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-brake-nose-down": 1,
             "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 105 m",
-          "x": 105,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "air-brake-nose-down": 2
-          }
-        },
-        {
-          "obstacle": "gap @ 187.8 m",
-          "x": 187.8,
-          "count": 2,
-          "reasons": {
-            "hazard": 2
-          },
-          "rules": {
-            "launch": 1,
-            "climbing": 1
           }
         },
         {
@@ -589,14 +625,36 @@
           }
         },
         {
-          "obstacle": "gap @ 61.0 m",
-          "x": 61,
+          "obstacle": "ground @ 40 m",
+          "x": 40,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 63.5 m",
+          "x": 63.5,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
             "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 66.0 m",
+          "x": 66,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "hop-snap": 1
           }
         },
         {
@@ -618,12 +676,23 @@
             "crash": 1
           },
           "rules": {
-            "air-brake-nose-down": 1
+            "nose-high": 1
           }
         },
         {
-          "obstacle": "ground @ 95 m",
-          "x": 95,
+          "obstacle": "ground @ 80 m",
+          "x": 80,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 205 m",
+          "x": 205,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -633,8 +702,8 @@
           }
         },
         {
-          "obstacle": "ground @ 125 m",
-          "x": 125,
+          "obstacle": "ground @ 215 m",
+          "x": 215,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -644,8 +713,19 @@
           }
         },
         {
-          "obstacle": "ground @ 130 m",
-          "x": 130,
+          "obstacle": "ground @ 220 m",
+          "x": 220,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 335 m",
+          "x": 335,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -655,8 +735,8 @@
           }
         },
         {
-          "obstacle": "gap @ 193.8 m",
-          "x": 193.8,
+          "obstacle": "gap @ 361.0 m",
+          "x": 361,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -667,9 +747,9 @@
         }
       ],
       "runs": [
-        "20260914-175016-0f50cb",
-        "20260914-175016-4ac2ae",
-        "20260914-175016-52221b"
+        "20260914-192808-c369fd",
+        "20260914-192808-10dd67",
+        "20260914-192809-f053fd"
       ]
     },
     {
@@ -680,11 +760,11 @@
         1831771782
       ],
       "attempts": [
+        42,
         51,
-        51,
-        51
+        43
       ],
-      "medianAttempts": 51,
+      "medianAttempts": 43,
       "clears": 0,
       "finishTimes": [
         null,
@@ -692,51 +772,21 @@
         null
       ],
       "medianFinishTime": null,
-      "bestX": 358.723712497701,
+      "bestX": 546.0015525194536,
       "deaths": [
         {
           "obstacle": "wall @ 175.8 m",
           "x": 175.8,
-          "count": 50,
+          "count": 43,
           "reasons": {
-            "crash": 50
+            "crash": 43
           },
           "rules": {
-            "air-gas-nose-up": 22,
-            "nose-low": 18,
-            "air-brake-nose-down": 7,
-            "nose-high": 3
-          }
-        },
-        {
-          "obstacle": "ramp @ 172.8 m",
-          "x": 172.8,
-          "count": 20,
-          "reasons": {
-            "crash": 17,
-            "restart": 3
-          },
-          "rules": {
-            "nose-high": 10,
-            "air-brake-nose-down": 6,
-            "cruise": 1,
-            "touchdown": 1,
-            "stuck-restart": 1,
-            "steep-ahead": 1
-          }
-        },
-        {
-          "obstacle": "wall @ 348.0 m",
-          "x": 348,
-          "count": 20,
-          "reasons": {
-            "crash": 20
-          },
-          "rules": {
-            "air-gas-nose-up": 10,
-            "nose-low": 7,
+            "air-brake-nose-down": 2,
+            "nose-high": 3,
+            "nose-low": 23,
+            "air-gas-nose-up": 13,
             "air-level": 1,
-            "nose-high": 1,
             "touchdown": 1
           }
         },
@@ -745,80 +795,175 @@
           "x": 184.8,
           "count": 17,
           "reasons": {
-            "crash": 17
-          },
-          "rules": {
-            "air-brake-nose-down": 9,
-            "nose-high": 3,
-            "nose-low": 2,
-            "air-gas-nose-up": 3
-          }
-        },
-        {
-          "obstacle": "gap @ 356.0 m",
-          "x": 356,
-          "count": 14,
-          "reasons": {
-            "crash": 12,
+            "crash": 15,
             "hazard": 2
           },
           "rules": {
-            "air-brake-nose-down": 6,
-            "climbing": 1,
-            "nose-high": 6,
+            "air-brake-nose-down": 7,
+            "nose-low": 4,
+            "nose-high": 2,
+            "hop-preload": 2,
+            "touchdown": 2
+          }
+        },
+        {
+          "obstacle": "ramp @ 172.8 m",
+          "x": 172.8,
+          "count": 9,
+          "reasons": {
+            "crash": 9
+          },
+          "rules": {
+            "nose-high": 3,
+            "air-gas-nose-up": 2,
+            "air-brake-nose-down": 3,
             "touchdown": 1
           }
         },
         {
-          "obstacle": "ground @ 40 m",
-          "x": 40,
+          "obstacle": "gap @ 190.8 m",
+          "x": 190.8,
+          "count": 5,
+          "reasons": {
+            "hazard": 5
+          },
+          "rules": {
+            "nose-high": 2,
+            "hop-preload": 1,
+            "launch": 1,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "wall @ 531.2 m",
+          "x": 531.2,
+          "count": 5,
+          "reasons": {
+            "crash": 5
+          },
+          "rules": {
+            "air-brake-nose-down": 1,
+            "nose-low": 2,
+            "air-gas-nose-up": 2
+          }
+        },
+        {
+          "obstacle": "gap @ 542.2 m",
+          "x": 542.2,
+          "count": 5,
+          "reasons": {
+            "crash": 3,
+            "hazard": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "hop-preload": 1,
+            "air-brake-nose-down": 2,
+            "hop-tuck": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 51.0 m",
+          "x": 51,
+          "count": 4,
+          "reasons": {
+            "crash": 4
+          },
+          "rules": {
+            "air-brake-nose-down": 2,
+            "nose-low": 1,
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 66.0 m",
+          "x": 66,
+          "count": 4,
+          "reasons": {
+            "crash": 4
+          },
+          "rules": {
+            "air-gas-nose-up": 2,
+            "air-level": 1,
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 538.2 m",
+          "x": 538.2,
           "count": 4,
           "reasons": {
             "crash": 4
           },
           "rules": {
             "air-gas-nose-up": 1,
-            "air-brake-nose-down": 1,
-            "nose-high": 1,
-            "touchdown": 1
+            "nose-low": 1,
+            "air-level": 1,
+            "nose-high": 1
           }
         },
         {
-          "obstacle": "gap @ 58.5 m",
-          "x": 58.5,
-          "count": 4,
+          "obstacle": "gap @ 61.0 m",
+          "x": 61,
+          "count": 3,
           "reasons": {
-            "crash": 4
+            "crash": 3
           },
           "rules": {
-            "nose-high": 2,
-            "air-gas-nose-up": 2
+            "air-gas-nose-up": 1,
+            "air-brake-nose-down": 2
           }
         },
         {
-          "obstacle": "ramp @ 344.0 m",
-          "x": 344,
-          "count": 4,
+          "obstacle": "gap @ 68.5 m",
+          "x": 68.5,
+          "count": 3,
           "reasons": {
-            "crash": 4
+            "hazard": 2,
+            "crash": 1
           },
           "rules": {
-            "nose-high": 3,
+            "touchdown": 1,
+            "hop-snap": 1,
             "air-brake-nose-down": 1
           }
         },
         {
-          "obstacle": "gap @ 51.0 m",
-          "x": 51,
+          "obstacle": "gap @ 187.8 m",
+          "x": 187.8,
           "count": 3,
           "reasons": {
-            "crash": 2,
-            "hazard": 1
+            "hazard": 1,
+            "crash": 2
           },
           "rules": {
-            "nose-high": 1,
-            "nose-low": 1,
-            "hop-preload": 1
+            "hop-tuck": 1,
+            "air-brake-nose-down": 1,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "wall @ 348.0 m",
+          "x": 348,
+          "count": 3,
+          "reasons": {
+            "crash": 3
+          },
+          "rules": {
+            "nose-high": 2,
+            "air-gas-nose-up": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 356.0 m",
+          "x": 356,
+          "count": 3,
+          "reasons": {
+            "crash": 3
+          },
+          "rules": {
+            "air-gas-nose-up": 2,
+            "nose-high": 1
           }
         },
         {
@@ -829,86 +974,71 @@
             "crash": 2
           },
           "rules": {
-            "touchdown": 1,
+            "air-brake-nose-down": 1,
             "nose-high": 1
           }
         },
         {
-          "obstacle": "gap @ 190.8 m",
-          "x": 190.8,
+          "obstacle": "ground @ 40 m",
+          "x": 40,
           "count": 2,
           "reasons": {
-            "hazard": 2
+            "crash": 2
           },
           "rules": {
-            "nose-high": 1,
-            "climbing": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 35 m",
-          "x": 35,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
+            "nose-low": 1,
             "nose-high": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 45 m",
-          "x": 45,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "gap @ 53.5 m",
-          "x": 53.5,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-brake-nose-down": 1
           }
         },
         {
           "obstacle": "gap @ 56.0 m",
           "x": 56,
-          "count": 1,
+          "count": 2,
           "reasons": {
-            "hazard": 1
+            "crash": 2
           },
           "rules": {
-            "climbing": 1
-          }
-        },
-        {
-          "obstacle": "gap @ 61.0 m",
-          "x": 61,
-          "count": 1,
-          "reasons": {
-            "hazard": 1
-          },
-          "rules": {
+            "air-brake-nose-down": 1,
             "air-gas-nose-up": 1
           }
         },
         {
-          "obstacle": "gap @ 63.5 m",
-          "x": 63.5,
-          "count": 1,
+          "obstacle": "gap @ 58.5 m",
+          "x": 58.5,
+          "count": 2,
           "reasons": {
+            "hazard": 1,
+            "crash": 1
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "hop-tuck": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 196.8 m",
+          "x": 196.8,
+          "count": 2,
+          "reasons": {
+            "crash": 1,
             "hazard": 1
           },
           "rules": {
-            "hop-preload": 1
+            "nose-low": 1,
+            "launch": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 526.2 m",
+          "x": 526.2,
+          "count": 2,
+          "reasons": {
+            "restart": 1,
+            "crash": 1
+          },
+          "rules": {
+            "stuck-restart": 1,
+            "air-brake-nose-down": 1
           }
         },
         {
@@ -919,12 +1049,56 @@
             "crash": 1
           },
           "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 90 m",
+          "x": 90,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 200 m",
+          "x": 200,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
             "air-brake-nose-down": 1
           }
         },
         {
-          "obstacle": "gap @ 196.8 m",
-          "x": 196.8,
+          "obstacle": "ground @ 210 m",
+          "x": 210,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 232.8 m",
+          "x": 232.8,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 270 m",
+          "x": 270,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -934,8 +1108,8 @@
           }
         },
         {
-          "obstacle": "gap @ 199.8 m",
-          "x": 199.8,
+          "obstacle": "ramp @ 344.0 m",
+          "x": 344,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -945,21 +1119,43 @@
           }
         },
         {
-          "obstacle": "gap @ 358.5 m",
-          "x": 358.5,
+          "obstacle": "gap @ 361.0 m",
+          "x": 361,
           "count": 1,
           "reasons": {
-            "hazard": 1
+            "crash": 1
           },
           "rules": {
-            "hop-preload": 1
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "gap @ 540.2 m",
+          "x": 540.2,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
+          }
+        },
+        {
+          "obstacle": "arch @ 545.2 m",
+          "x": 545.2,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-brake-nose-down": 1
           }
         }
       ],
       "runs": [
-        "20260914-175023-ad41f2",
-        "20260914-175023-216cc4",
-        "20260914-175023-863f35"
+        "20260914-192815-f5ff00",
+        "20260914-192815-128639",
+        "20260914-192815-38d3ef"
       ]
     }
   ]
