@@ -19,6 +19,8 @@ The independent viewer now renders the complete existing Blender-authored mustar
 
 Round 11 adds a [whole-body pose review](../../prototypes/hero-garage/reports/full-rider-pose-review.json) and [updated full-scene screenshot](../../prototypes/hero-garage/captures/full-rider-bike-a4/webkit-full.png). All three motion clips load and repeat deterministically in headless WebKit. Lowered elbows improve the pose; seated support, garment deformation and contact shadows remain provisional.
 
+Round 12 adds looping forward/rear motion, a bounded garment surface correction, precise floor alignment, and parked wheel cleanup. The [whole-scene review](../../prototypes/hero-garage/reports/whole-scene-round12-review.json) keeps garment/seat quality open. A 30-second WebKit orbit records **p95 26 ms**, failing the 16.7 ms desktop target. The frozen game ship gate passes 1,038 identical replay ticks, an 8.65-second clear and one-tick restart.
+
 Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest user-reported allowance is 27% remaining, with the 20% reserve unchanged.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)

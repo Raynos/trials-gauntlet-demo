@@ -1,0 +1,227 @@
+{
+  "createdAt": "2026-09-16T12:41:43.422Z",
+  "scope": "GLB structure; no art or deformation acceptance",
+  "assets": [
+    {
+      "file": "public/assets/street01-rider-cloth.glb",
+      "sha256": "4311175fbae4844beb093762fa5c9964ce58e356ac0f39f0928c8d99d91663ed",
+      "bytes": 2578868,
+      "generator": "Khronos glTF Blender I/O v5.2.40",
+      "triangles": 44734,
+      "primitives": 1,
+      "materials": [
+        {
+          "name": "rider_rookie",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "rider_pro",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        }
+      ],
+      "uvPrimitives": 1,
+      "normalPrimitives": 1,
+      "skins": [
+        {
+          "name": "rider_rig",
+          "joints": 19
+        }
+      ],
+      "animations": [
+        {
+          "name": "forward_attack",
+          "channels": 57
+        },
+        {
+          "name": "hang_back",
+          "channels": 57
+        },
+        {
+          "name": "sit_cruise",
+          "channels": 57
+        }
+      ],
+      "morphPrimitiveCount": 0,
+      "textures": [
+        {
+          "index": 0,
+          "name": "rider-street_normal",
+          "encodedBytes": 18105,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 1,
+          "name": "rider-street_orm",
+          "encodedBytes": 123838,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 2,
+          "name": "rider-street_rookie_albedo",
+          "encodedBytes": 225620,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 3,
+          "name": "rider-street_pro_albedo",
+          "encodedBytes": 195424,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        }
+      ],
+      "estimatedImageResidencyBytes": 13981008,
+      "limits": "RGBA8 full-mip image estimate excludes render targets, shadow maps, buffers, duplicate uploads, driver allocations. No compressed GPU format assumed. UV presence does not establish unwrap quality."
+    },
+    {
+      "file": "public/assets/street01-bike.glb",
+      "sha256": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+      "bytes": 1394072,
+      "generator": "Khronos glTF Blender I/O v5.2.40",
+      "triangles": 29940,
+      "primitives": 23,
+      "materials": [
+        {
+          "name": "bike_body_rookie",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "bike_body_pro",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "bike_mech",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "chain_links",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "bike_spokecard",
+          "alphaMode": "BLEND",
+          "doubleSided": true
+        }
+      ],
+      "uvPrimitives": 23,
+      "normalPrimitives": 23,
+      "skins": [],
+      "animations": [],
+      "morphPrimitiveCount": 0,
+      "textures": [
+        {
+          "index": 0,
+          "name": "bike_body_normal",
+          "encodedBytes": 6610,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 1,
+          "name": "bike_body_orm",
+          "encodedBytes": 77620,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 2,
+          "name": "bike_body_rookie_albedo",
+          "encodedBytes": 169773,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 3,
+          "name": "bike_body_pro_albedo",
+          "encodedBytes": 167782,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 4,
+          "name": "bike_mech_normal",
+          "encodedBytes": 10881,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 5,
+          "name": "bike_mech_orm",
+          "encodedBytes": 103134,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 6,
+          "name": "bike_mech_albedo",
+          "encodedBytes": 163323,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 7,
+          "name": "chain_links",
+          "encodedBytes": 450,
+          "width": 64,
+          "height": 32,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 10924
+        },
+        {
+          "index": 8,
+          "name": "bike_spokecard",
+          "encodedBytes": 8133,
+          "width": 128,
+          "height": 128,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 87380
+        }
+      ],
+      "estimatedImageResidencyBytes": 22467916,
+      "limits": "RGBA8 full-mip image estimate excludes render targets, shadow maps, buffers, duplicate uploads, driver allocations. No compressed GPU format assumed. UV presence does not establish unwrap quality."
+    }
+  ]
+}

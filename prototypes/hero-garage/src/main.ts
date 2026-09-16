@@ -81,6 +81,7 @@ let ready=false, error:string|null=null, selectedCamera:CameraName='face', light
 let activeClip:string|null=null, duration=0, time=0, playing=false, orbitAngle=0;
 let presetOffset = new THREE.Vector3(1,.2,3);
 let loadMilliseconds=0;
+let grounding: {coarseMinY:number;preciseMinY:number;assemblyOffsetY:number;finalMinY:number}|null=null;
 const captureMode=new URLSearchParams(location.search).has('capture');
 let frameTimes:number[]=[];
 let renderSuppressed=false;
@@ -159,7 +160,7 @@ function setFrame(frame:{time:number;orbit:number;lighting?:LightingName}){
 }
 function diagnostics(){
   const sizes=renderer.getDrawingBufferSize(new THREE.Vector2());const sorted=[...frameTimes].sort((a,b)=>a-b);
-  return {ready,error,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
+  return {ready,error,grounding,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
 }
 const api={get ready(){return ready;},get error(){return error;},setCamera,setComparison,setLighting,setTime,setOrbit,setFrame,setClip,setPlaying,getDiagnostics:diagnostics,get state(){return diagnostics();}};
 Object.assign(window,{__garage:api,__heroGarage:api});
@@ -199,12 +200,12 @@ async function boot(){
       setStatus(`Loading ${asset.label}…`);
       const gltf=await loader.loadAsync(asset.url);
       const root=gltf.scene;if(asset.position)root.position.fromArray(asset.position);if(asset.rotation)root.rotation.set(...asset.rotation);if(asset.scale!==undefined)root.scale.setScalar(asset.scale);
-      root.traverse(object=>{if(object instanceof THREE.Mesh){object.castShadow=true;object.receiveShadow=true;}});
+      root.traverse(object=>{if(object instanceof THREE.Mesh){object.castShadow=true;object.receiveShadow=true;if(asset.kind==='bike'&&object.name.endsWith('_blur'))object.visible=false;}});
       hero.add(root);loaded.push({asset,root,mixer:new THREE.AnimationMixer(root),clips:gltf.animations});
     }
     // Set the assembled bike's lowest geometry on the floor without changing rider/bike alignment.
     const bikeRoot=loaded.find(item=>item.asset.kind==='bike')?.root;
-    if(bikeRoot){const bikeBounds=new THREE.Box3().setFromObject(bikeRoot);hero.position.y-=bikeBounds.min.y;hero.updateMatrixWorld(true);}
+    if(bikeRoot){const coarseMinY=new THREE.Box3().setFromObject(bikeRoot).min.y;const preciseMinY=new THREE.Box3().setFromObject(bikeRoot,true).min.y;hero.position.y-=preciseMinY;hero.updateMatrixWorld(true);grounding={coarseMinY,preciseMinY,assemblyOffsetY:hero.position.y,finalMinY:new THREE.Box3().setFromObject(bikeRoot,true).min.y};}
     fitAssetShadows();
     const clipNames=[...new Set(loaded.flatMap(item=>item.clips.map(c=>c.name)))];
     for(const name of clipNames){const button=document.createElement('button');button.dataset.clip=name;button.textContent=({sit_cruise:'Seated neutral',forward_attack:'Forward rise',hang_back:'Rearward shift'} as Record<string,string>)[name]??name.replaceAll('_',' ');button.setAttribute('aria-pressed','false');$('#clips').append(button);}

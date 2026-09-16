@@ -1,0 +1,50 @@
+{
+  "sourceSHA256": "dc1ea7a77a840281a3bfb6f015d47fb3fa687233fbc1ddf4c17081ebd70f6834",
+  "outputSHA256": "4311175fbae4844beb093762fa5c9964ce58e356ac0f39f0928c8d99d91663ed",
+  "garmentVerticesMatched": 14690,
+  "surfaceVerticesMoved": 14676,
+  "maxDisplacementM": 0.033844605220442074,
+  "necklineVerticesTapered": 873,
+  "seamVerticesWeightNormalized": 4795,
+  "topologyChanged": false,
+  "notes": [
+    "Bounded local 2mm Laplacian smoothing plus upper neckline width taper (max20%).",
+    "Coincident garment UV seam groups receive identical averaged normalized skin weights.",
+    "Garment shading normals smoothed across UV splits; non-garment custom normals retained.",
+    "No skeleton edits; forward/rear actions extended to120frames for smooth out-and-back loops. No hair/beard edits. Geometric seated support is unchanged except local 2mm surface smoothing; visual support remains review item."
+  ],
+  "exportedReimportVerification": {
+    "forward_attack": {
+      "maxGripErrorM": 1.0679050008755277e-06,
+      "maxSoleAuthoredContactErrorM": 1.342557618229754e-06,
+      "sampledFrames": 120
+    },
+    "hang_back": {
+      "maxGripErrorM": 1.1103115087865089e-06,
+      "maxSoleAuthoredContactErrorM": 1.1509217907695041e-06,
+      "sampledFrames": 120
+    },
+    "sit_cruise": {
+      "maxGripErrorM": 5.990192664337689e-07,
+      "maxSoleAuthoredContactErrorM": 9.65252837371245e-07,
+      "sampledFrames": 120
+    }
+  },
+  "sourceTextureBytesIdentical": true,
+  "triangleCounts": {
+    "source": 44734,
+    "candidate": 44734
+  },
+  "loopEndpointVerification": {
+    "forward_attack": {
+      "maxEndpointBoneMatrixDifference": 0.0
+    },
+    "hang_back": {
+      "maxEndpointBoneMatrixDifference": 0.0
+    },
+    "sit_cruise": {
+      "maxEndpointBoneMatrixDifference": 0.0
+    }
+  },
+  "animationLoopRecipe": "Forward/rear: original 40-frame outward segment, 20-frame target hold, 40-frame reversed return, 20-frame neutral hold; seated clip steady."
+}
