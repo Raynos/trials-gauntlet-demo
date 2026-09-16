@@ -1,0 +1,12 @@
+{
+  "baseCommit": "2f3d3dc3a8a6fab4b58622559d3e714b8257d0d9",
+  "patchSha256": "ebf62c6ee98f5611455648770793be792cbe751f86c6e423d304ecaf46397a71",
+  "status": "rejected-for-merge",
+  "geometryTests": 6,
+  "rendererTests": 36,
+  "broadTests": {
+    "pass": 227,
+    "fail": 15
+  },
+  "reason": "Authored seating changes actual COM travel and torque enough to regress hop, landing, climbing, perturbation and golden clears. Preserve R7, isolate retuning."
+}

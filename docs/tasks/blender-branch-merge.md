@@ -1,3 +1,12 @@
+# R15 integration update — September 16, 2026
+
+Latest user authorization: merge verified asset branch into trunk; keep the fresh garage production effort separate.
+`blender-work` now contains main through `998c429`. `src/physics/**`, main game/track/bot/golden state and main performance work are preserved. Five-outfit assets and selection are ready: 814 checks, 20 outfit combinations/outage/retry, WebKit byte-identical flat/B1 clear/crash/restart. Detailed reports and exclusions: `docs/BLENDER_HANDOFF.md` and `docs/evidence/hero-r15/`.
+
+**Do not interpret this as a pose/AAA sign-off.** The shared seated profile produced 15 handling failures and is retained only as a rejected-candidate patch/evidence. Retuning must use the physics-owner protocol below. Metal shader-query initialization remains a documented browser-specific issue; desktop WebKit passes do not establish real iOS performance.
+
+---
+
 # Task: merging the Codex `blender-work` branch (Astra 6) into `main`
 
 Status: MERGE #3 READY on branch `astra-merge` (2026-09-15, merge owner) — see "Merge #3" below; the parent fast-forwards `main` if green. Owner: parent (merge), Astra 6 (branch).

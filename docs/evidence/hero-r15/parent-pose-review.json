@@ -1,0 +1,8 @@
+{
+  "decision": "preserve design candidate; reject for integration pending physics retuning",
+  "review": "Parent played the actual 180-720 input-tick recording in QuickTime, observed seated neutral, forward stand/lean, back shuffle/extended arms and neutral recovery. Elbows sit closer to body; forward garment shoulder/hood deformation remains visibly crude. Not AAA approval.",
+  "clip": "harness/out/blender/r15-pose-played/clip.mp4",
+  "clipSha256": "fe3d6e9c509ec021b85310f3a3af7a8ca761381bda19c59de56d50836f46d81d",
+  "captureEvidence": "harness/out/blender/r15-pose-played/evidence.json",
+  "physicsStatus": "15 broad test failures; unmerged patch in seated-candidate.patch"
+}

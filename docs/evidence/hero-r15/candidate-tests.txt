@@ -1,0 +1,1015 @@
+
+ RUN  v3.2.7 /Users/raynos/projects/game-demos/trials-gauntlet-blender
+
+stdout | src/physics/feel.test.ts > static settle (F1) > sits level at static sag and comes to rest
+FEEL settle.pitchDeg = 0.790 [|pitch| < 1]
+FEEL settle.rearComp = 0.271 [0.08-0.35]
+FEEL settle.frontComp = 0.254 [0.03-0.35]
+FEEL settle.speed = 0.000 [< 0.01]
+
+stdout | src/physics/feel.test.ts > launch and top speed (C2) > 0 -> 16 m/s on flat dirt in <= 3.5 s and limiter-bound top speed ~20 m/s
+FEEL launch.t16 = 2.192 [<= 3.5 s]
+FEEL launch.topSpeed = 20.351 [19-21 m/s]
+FEEL launch.maxPitchDeg = 8.340 [info]
+
+stdout | src/physics/feel.test.ts > stranger launch and speed governor (round 2) > thr=1 lean=+0.4 held constant finishes flat-test without a fault
+FEEL stranger.thr1.lean0.4.finish = 7.042 [> 0, no fault]
+
+stdout | src/physics/classes.test.ts > two bikes (round 11): Rookie is the round-10 tuning, Pro the honest one > Pro: 0 -> 16 <= 3.0 s, limiter-bound top ~22 m/s; lean >= 0.4 at full gas never loops; lean 0 loops after >= 1.2 s (no wheelie control: that is the skill); partial throttle has no governor
+FEEL pro.thr1.lean0.loopAt = 1.467 [>= 1.2 s (Rookie: never, 38 deg wheelie)]
+FEEL pro.thr1.lean0.4.maxPitchDeg = 7.523 [< 15, finishes]
+FEEL pro.thr1.lean0.4.t16 = 1.400 [<= 3.0 s]
+FEEL pro.thr1.lean0.4.top = 22.072 [21-23 m/s (limiter at 22.0)]
+FEEL pro.thr1.lean0.2.maxPitchDeg = 8.903 [info]
+FEEL pro.thr1.lean1.top = 21.126 [info]
+FEEL pro.thr0.3.top = 21.987 [no governor: reaches the limiter (Rookie 11 m/s)]
+
+stdout | src/physics/v2/r6.test.ts > R6 physics.md §8.1: same-tick finish / fault precedence (audit §5) > a fault in the tick the front wheel crosses the line, with the wheel <= one radius past it, VOIDS the finish: only `fault` is emitted, finishTime stays null (the audit probe: before R6 `finish` came first and Game scored a fault-free 1/120 s clear)
+FEEL finish.sameTick.onTheLine = fault frontPast 0.052 finishTime null faulted crash voided true [fault only, finishTime null, voided]
+
+stdout | src/physics/v2/r6.test.ts > R6 physics.md §8.1: same-tick finish / fault precedence (audit §5) > the exception: a fault in the crossing tick with the wheel already > R past the line is a crash AFTER the finish - `finish` then `fault`, finishTime set (reachable only by teleport: at 21 m/s the wheel moves 0.175 m per tick)
+FEEL finish.sameTick.pastR = finish,fault frontPast 0.422 finishTime 0.008333333333333333 voided false [finish,fault; finishTime set; not voided]
+
+stdout | src/physics/classes.test.ts > two bikes (round 11): Rookie is the round-10 tuning, Pro the honest one > Pro: 55 / 60 deg planks climb as on Rookie, 65 stalls; stationary hop 0.6-0.7 m; the 0.9 m ledge at 5 m/s
+FEEL pro.climb.55 = true 1.02 s [top (Rookie 1.77 s)]
+FEEL pro.climb.60 = true 2.27 s [top (Rookie 2.91 s)]
+FEEL pro.climb.65 = false maxY 0.26 [stalls]
+FEEL pro.hop.rearApex = 0.687 [0.6-0.7 m (Rookie 0.676)]
+FEEL pro.ledge0.9 = made [made (10 of 36 hopper combos; Rookie 12 of 36)]
+
+stdout | src/physics/v2/r2.test.ts > the hop (R2 decision d; §9.5, §14.2, §14.3) > reference flat hop from a standing start (0.3 s preload, full-travel snap held 0.22 s, 0.1 s tuck): rear apex 0.45-0.65 m, front leaves first, lands near level; both-wheels-off is 0.29 s against the 0.35-0.6 band (the front lands first: the bike noses down through the flight, see physics.md)
+FEEL hop.ref.rearApex = 0.504 [0.45-0.65 m]
+FEEL hop.ref.frontApex = 0.241 [info (0.6-0.9 spec)]
+FEEL hop.ref.bothOffS = 0.133 [0.35-0.6 s (spec; measured short: the nose drops in flight)]
+FEEL hop.ref.firstOff = front [front]
+FEEL hop.ref.landPitchDeg = -5.129 [info (level-ish)]
+FEEL hop.ref.pitchRange = -26.2..22.5 [info]
+FEEL hop.ref.maxRearCompPct = 100.000 [info (bottoms at 100)]
+
+stdout | src/physics/feel.test.ts > stranger launch and speed governor (round 2) > thr=1 lean=0 held from rest lifts the front into a self-limiting wheelie (30-40 deg, never loops) and reaches the finish (round 8: pitch-aware drive; round 7 looped at 2.26 s / x 24 m, every stranger's first crash); lean -0.3 the same
+FEEL wheelieControl.thr1.lean0.maxPitchDeg = 38.033 [25-42 (a wheelie, not a loop)]
+FEEL wheelieControl.thr1.lean0.plateauDeg = 37.5..38.0 [info (pitch band after 3 s)]
+FEEL wheelieControl.thr1.lean0.finish = 9.308 [> 0, no fault (120 m)]
+FEEL wheelieControl.thr1.lean0.top = 13.914 [info (the wheelie costs top speed)]
+FEEL wheelieControl.thr1.lean-0.3.maxPitchDeg = 39.176 [25-42]
+FEEL wheelieControl.thr1.lean-0.3.finish = 9.042 [> 0, no fault]
+
+stdout | src/physics/v2/r3.test.ts > landing (R3 decision 1): the intent gate separates a landing recovery from the hop push > drops of 1.5 / 2 / 3 m at 6 and 12 m/s, lean 0 and +0.5, both classes: land and ride away, no fault, rebound < 0.15 m, pitch within -35..+35 (R2: 2 m at lean 0 rebounded 0.6 m, 2.5-3 m looped)
+FEEL land.rookie.1.5m@6.lean0 = rear 100% pitch 1..10 rebound 0.00 air-after 0.00 s rides away [rides away, rebound < 0.15, pitch within +-35]
+FEEL land.rookie.1.5m@6.lean0.5 = rear 85% pitch -10..5 rebound 0.00 air-after 0.00 s rides away [rides away, rebound < 0.15, pitch within +-35]
+FEEL land.rookie.2m@6.lean0 = rear 100% pitch 1..11 rebound 0.00 air-after 0.00 s rides away [rides away, rebound < 0.15, pitch within +-35]
+FEEL land.rookie.2m@6.lean0.5 = rear 88% pitch -17..7 rebound 0.00 air-after 0.00 s rides away [rides away, rebound < 0.15, pitch within +-35]
+FEEL land.rookie.3m@6.lean0 = rear 100% pitch -15..14 rebound 0.26 air-after 0.00 s crash [rides away, rebound < 0.15, pitch within +-35]
+
+stdout | src/physics/v2/r3.test.ts > landing (R3 decision 1): the intent gate separates a landing recovery from the hop push > the gate is the difference: with the closing cap off (R2) the 2 m drop at lean 0 pogos > 0.4 m and 3 m loops; with it on the hop keeps >= 97 % of its apex (the snap moves the target, the landing does not)
+FEEL land.capOff.2m.rebound = 0.216 [> 0.4 (the R2 pogo)]
+FEEL land.capOff.3m.result = crash [crash (the R2 loop)]
+
+stdout | src/physics/v2/r2.test.ts > the hop (R2 decision d; §9.5, §14.2, §14.3) > the third lean-back (tuck) lifts the rear a further ~0.1 m; throttle through the snap changes the apex continuously (and slightly down: the rear spins and the nose rises)
+FEEL hop.tuck.gain = -0.066 [0.1-0.2 m (parent); measured]
+FEEL hop.throttleThroughSnap.apex = 0.531 / 0.504 / 0.456 / 0.410 [thr 0 / 0.3 / 0.6 / 1: continuous]
+
+stdout | src/physics/v2/feel.test.ts > static (F1, §5) > sits at rest at static sag; rear sag 28-32 %
+FEEL static.rearSagPct = 28.673 [28-32]
+FEEL static.frontSagPct = 17.779 [spec 24-28; measured ~16.7 (R6 deviation 27: the table's front load on a 7500 N/m spring tilted 23 deg; not asserted)]
+FEEL static.pitchDeg = 1.738 [info: the two static sags on the spec axles pitch the frame ~2 deg nose-up]
+FEEL static.comD = 0.518 [~0.55 (§2)]
+FEEL static.comH = 0.770 [~0.79 (§2; CONTRACT 0.45 above the axle line)]
+FEEL static.balancePitchDeg = 51.338 [info: atan(d/h) at lean 0; CONTRACT says 40-50]
+FEEL static.speed = 0.001 [< 0.01]
+
+stdout | src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > Rookie, free air at 10 m/s: releasing lean -1 -> 0 kicks <= 120 deg/s (R4: +245) in steps <= 15 deg/s per tick (R4: 43); with gas on top <= 125; the limit reads 1 on the HUD. The held-lean rows are K_att's and move little (0 -> -1: rate at 0.5 s 171 -> ~153, angle 33 -> ~31)
+FEEL r5.rookie.release-1to0 = peak 92 deg/s (raw 244) step 9/tick (raw -46) angle 21.5 @0.3s (raw 19.5) 29.6 @0.5s lim 1.00 [peak <= 120, step <= 15; angle @0.3 <= 15 asked (K_att momentum: not met)]
+FEEL r5.rookie.release+gas = peak 92 angle 32.2 @0.5s [peak <= 125]
+FEEL r5.rookie.press0to-1 = peak 166 rate@0.5 166 (raw 160) angle@0.5 39.3 (raw 39.6) [rate <= 110 / angle <= 22 asked (K_att: not met)]
+FEEL r5.rookie.press0to+1 = peak -164 rate@0.5 -164 angle@0.5 -39.4 [info]
+
+stdout | src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > Pro stays raw: gain 0, the limit reads 0 through the flight, the release kick is R4's 200-300 deg/s
+FEEL r5.pro.release-1to0 = peak 234 step -46/tick lim 0.00 [raw: 200-300, lim 0]
+
+stdout | src/physics/v2/r6.test.ts > R6 physics.md §8.1: same-tick finish / fault precedence (audit §5) > a clean crossing is untouched: `finish` at the crossing tick, no fault, not voided; and the run stays `finished` (the fault sensors keep running after the line, a later tumble is a post-finish fault Game ignores)
+FEEL finish.clean = finish yes time 10.166666666666666 faulted null voided false frontPast 0.078 [finish, no fault, not voided]
+
+stdout | src/physics/v2/r3.test.ts > classes as parameter rows (R3 decision 2): rookie forgiving, pro raw > rookie: full gas at lean 0 lifts <= 10 deg and never loops (loop-out needs a lean back: -0.25 loops in ~1.1 s, -0.5 in ~0.8 s; the parent asked -0.5 or harder: the critical lean sits between 0 and -0.25 on this table, see physics.md); 0 -> 16 <= 4.2 s; top 20
+FEEL class.rookie.launch = 1:5.8deg 0.5:5.8deg 0.25:5.9deg 0:6.2deg -0.25:loop 2.02s -0.5:loop 0.91s -1:loop 0.60s [lean: max pitch or loop time]
+FEEL class.rookie.t16 = 3.975 [<= 4.2 s]
+FEEL class.rookie.top = 20.033 [20 +- 0.5]
+FEEL class.rookie.sag = 21.8 / 27.9 [info: rear / front % at speed]
+
+stdout | src/physics/v2/feel.test.ts > launch, top speed, the lean ladder (§7, §10, §14.2) > top speed 20 +- 0.5 m/s at the limiter; lean +0.25 launch lifts the front <= 10 deg and finishes 120 m
+FEEL launch.lean+0.25.t16 = 3.975 [3.5-4.2 s (R3: the low-speed knot; R1 measured 4.47)]
+FEEL launch.lean+0.25.topSpeed = 20.025 [19.5-20.5]
+FEEL launch.lean+0.25.maxPitchDeg = 5.909 [<= 10]
+FEEL launch.lean+0.25.finish120 = 8.892 [> 0, no fault]
+FEEL launch.lean+0.5.maxPitchDeg = 5.787 [<= 10]
+FEEL launch.lean+1.maxPitchDeg = 5.750 [<= 10]
+
+stdout | src/physics/v2/r2.test.ts > the hop (R2 decision d; §9.5, §14.2, §14.3) > preload time: the apex rises with the preload up to the maximum rear load (~0.4 s) and falls past it ("release when the load is at its maximum")
+FEEL hop.byPreloadS.apex = 0.15:0.358 0.2:0.415 0.25:0.472 0.3:0.504 0.35:0.491 0.4:0.473 0.5:0.425 [rising to a peak near the max load]
+
+stdout | src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > the throttle / brake air nudges are untouched on both classes (throttle +4..12 deg per 0.5 s, brake -8..-25): the limit is on the rider, not the wheels
+FEEL r5.rookie.nudges = throttle 6.3 (raw 6.3) brake -15.5 (raw -15.5) @0.5s [identical to raw]
+FEEL r5.pro.nudges = throttle 8.0 (raw 8.0) brake -16.1 (raw -16.1) @0.5s [identical to raw]
+
+stdout | src/physics/v2/feel.test.ts > launch, top speed, the lean ladder (§7, §10, §14.2) > full throttle at lean 0 never loops and finishes 120 m (spec band: a 45-65 deg self-limiting wheelie; §10's own d/h analysis puts any sustained lift past ~32 deg on the far side of the balance point, so the honest bike does not lift at neutral on the mid row)
+FEEL launch.lean0.maxPitchDeg = 6.226 [spec 45-65; consistent model: <= 10 (no sustained lift possible without a loop)]
+FEEL launch.lean0.loopT = -1.000 [never (-1)]
+FEEL launch.lean0.pitchAt16 = 4.536 [< 20]
+FEEL launch.lean0.finish120 = 8.892 [> 0]
+
+stdout | src/physics/classes.test.ts > two bikes (round 11): Rookie is the round-10 tuning, Pro the honest one > wheelie PD hold: the throttle-only PD (60 Hz, 100 ms) balances by accelerating - Rookie 12 s to the drag limit at 11 m/s, Pro until the limiter cuts at 22 m/s (>= 3.5 s); neither holds 10 s at a held speed (12.4 (0))
+FEEL pd.rookie.held = 12.0 s at 11.2 m/s [>= 10 s]
+FEEL pd.pro.held = 4.2 s at 22.0 m/s [>= 3.5 s, drops at the limiter (~22 m/s)]
+
+stdout | src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > grounded rows hold: the reference hop (snap ramping past take-off) and the landing table are identical with the limit on and off (the intent gate carries a ground-started throw through the air; a still target at landing keeps the R3 cap)
+FEEL r5.hop.-1@Infinity.on/off = 0.504 / 0.504 [equal to 3 decimals (R3 matrix)]
+FEEL r5.hop.-1@8.on/off = 0.249 / 0.249 [equal to 3 decimals (R3 matrix)]
+
+stdout | src/physics/feel.test.ts > stranger launch and speed governor (round 2) > looping is deliberate: thr=1 with lean <= -0.5 (the wheelie control is off) still loops (lean -0.5 at ~1.4 s; lean -1 at 2.4 s: sitting all the way back at full throttle is the hop preload and the crouched rider loops when he stands back up); the control never touches partial throttle
+FEEL loop.thr1.leanBack.at = 2.492 [loops (design ~0.7-1.2 s; 2.4: the preload crouch delays it, 12.4 (0b))]
+FEEL loop.thr1.lean-0.5.at = 1.367 [loops <= 1.5 s]
+FEEL loop.thr0.7.lean0.maxPitchDeg = 6.992 [< 15 (front stays down)]
+
+stdout | src/physics/classes.test.ts > Rookie wheelie control on crests, bumps and lips (round 11, strangers on b1/b2/b3) > full gas at lean 0 over a 20 x 2 m cosine crest: Rookie stays under 45 deg and never faults; Pro loops (the skill)
+FEEL crest.rookie.maxPitchDeg = 42.281 [<= 45, no fault (round 10: 43 with the front memory, 60-120 on b1 per the strangers)]
+FEEL crest.pro = crash max 142 [loops]
+
+stdout | src/physics/v2/feel.test.ts > launch, top speed, the lean ladder (§7, §10, §14.2) > full throttle at lean -0.25 / -0.5 / -1 lifts the front and loops with a loop time monotone in lean; -1 within ~1.3 s (spec: 60-75 deg hold >= 3 s / loops >= 2 s / loops <= 1 s - the hold row is not reachable by a rigid body at constant input, CONTRACT 2.5 "open-loop diverges in 1-2 s")
+FEEL launch.lean-0.25.loopT = 2.017 [monotone in lean (spec: hold / >= 2 s)]
+FEEL launch.lean-0.5.loopT = 0.908 [monotone in lean (spec: hold / >= 2 s)]
+FEEL launch.lean-1.loopT = 0.600 [<= 1.3 s]
+
+stdout | src/physics/feel.test.ts > stranger launch and speed governor (round 2) > partial throttle tops out below the limiter: thr 0.3 ~ 11-13, thr 0.6 ~ 16-18, thr 1 ~ 20 m/s
+FEEL governor.thr0.3.top = 10.963 [11-13 m/s]
+FEEL governor.thr0.6.top = 17.801 [16-18 m/s]
+FEEL governor.thr1.top = 18.656 [18-21 m/s (lean +1: the rear is nearly unloaded at speed and spins, round 9: the drag field acts through the low lean-+1 COM)]
+FEEL governor.thr1.lean1.t16 = 2.983 [<= 4.5 s (full forward lean unloads the rear off the line)]
+
+stdout | src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > continuous: the limit blends in over 0.1 s of both-wheels-off and out over 0.1 s after the first touch - never a step > dt/0.1 per tick; a lean pressed while airborne is limited from its first tick (no escalation through the travel it allows)
+FEEL r5.blend = peak 0.96 max step/tick 0.081 at landing 0.96 -> 0 after [step <= 1/12 + eps; peak 1]
+
+stdout | src/physics/v2/r6.test.ts > R6: the Pro launch (ground ECU, raw air) > pro: plain gas from a standstill at lean 0 lifts 25-40 deg and does not loop; 1 s and 2 s throttle ramps at lean 0 do not loop; full gas at lean 0 from an 8 m/s roll does not loop; the ECU is off in the air (airGain 0: the Pro air rows are R5's); the Rookie rows are R4's (6-7 deg, never loops)
+FEEL pro.launch.gas1.lean0 = max 33.0 deg loop - t16 4.93 [25-40 deg, no loop (R3-R5: loop 0.95 s)]
+FEEL pro.launch.ramp1s.lean0 = max 32.8 loop - [no loop]
+FEEL pro.launch.ramp2s.lean0 = max 31.0 loop - [no loop]
+FEEL pro.launch.gas1.from8 = max 26.2 loop - [no loop (R3-R5: loop 1.5 s)]
+FEEL rookie.launch.gas1.lean0 = max 6.2 loop - t16 3.97 [R4: 6.7 deg, no loop, 3.97 s]
+
+stdout | src/physics/feel.test.ts > brakes (C4) > stops from 10 m/s without an endo (lean back)
+FEEL brake.stopDist.leanBack = 3.140 [<= 4.5 m]
+FEEL brake.minPitchDeg.leanBack = -7.582 [> -30]
+
+stdout | src/physics/v2/r2.test.ts > the hop (R2 decision d; §9.5, §14.2, §14.3) > monotone in preload depth (lean -0.25 / -0.5 / -0.75 / -1 at a fixed 0.3 s) at snap rates >= 8 units/s and in snap speed (4 / 8 / 16 lean units per s) at every depth, no crash anywhere; the one-tick snap is within 10 % of the fastest ramp (a 4 units/s snap is no hop: 0.07-0.28 m)
+FEEL hop.matrix.preLean-0.25 = 0.081 / 0.206 / 0.213 / 0.249 [snap rate 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.matrix.preLean-0.5 = 0.105 / 0.202 / 0.251 / 0.339 [snap rate 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.matrix.preLean-0.75 = 0.114 / 0.203 / 0.287 / 0.413 [snap rate 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.matrix.preLean-1 = 0.083 / 0.249 / 0.411 / 0.504 [snap rate 4 / 8 / 16 / one-tick: apex m]
+
+stdout | src/physics/feel.test.ts > brakes (C4) > full brake at neutral lean does not flip the bike
+FEEL brake.stopDist.lean0 = 5.087 [info]
+
+stdout | src/physics/world.test.ts > ragdoll feel (round 4, blind critic: "slides off as a stiff plank") > crashed bike at 7 m/s scrubs to rest within 3.5 m (rear locked by the stalled engine); limbs tumble independently (spread > 60 deg) and the rider is thrown clear of the bike
+RAGDOLL 7 m/s: bike travel 2.47 m, stopped after 1.10 s, limb angle spread 86 deg, hip swing 93 deg, head travel 0.66 m
+
+stdout | src/physics/feel.test.ts > bunny hop technique (C5) > stationary hop from lean-back preload + snap forward: rear apex 0.55-0.75 m, phases visible
+FEEL hop.rearApex = 0.671 [0.55-0.75 m]
+FEEL hop.airtime = 0.525 [0.45-0.9 s]
+FEEL hop.phases = idle>preload>push>recover [idle>preload>push>recover]
+
+stdout | src/physics/classes.test.ts > Rookie wheelie control on crests, bumps and lips (round 11, strangers on b1/b2/b3) > full gas at lean 0 off a 4 x 0.8 kicker at 8 and 11 m/s: Rookie lands and rides away (round 10 looped at 128 deg: the lip read as a 90 deg climb and the rear spun to the limiter in the air); Pro loops
+FEEL kicker4x0.8.8.rookie = rides away max 65 [no fault (the 50-65 deg peak is the ballistic launch attitude; the asked <= 45 is open)]
+FEEL kicker4x0.8.8.pro = crash max 128 [loops]
+FEEL kicker4x0.8.11.rookie = rides away max 65 [no fault (the 50-65 deg peak is the ballistic launch attitude; the asked <= 45 is open)]
+FEEL kicker4x0.8.11.pro = crash max 132 [loops]
+
+stdout | src/physics/world.test.ts > ragdoll spawn continuity (round 6, blind critic: "limbs pop at the crash tick") > loop-out crash at 7 m/s and a nose-plant: every ragdoll body sits on the drawn chain of the previous tick (< 2 cm / 5 deg after the frame's one-tick motion) and carries the bike's velocity
+RAGDOLL spawn continuity (loop, sensor): max body offset 0.22 cm, max axis error 0.37 deg, torso velocity vs the frame's rigid field 1.72 m/s (= rider mass relative motion)
+RAGDOLL spawn continuity (plant, sensor): max body offset 0.14 cm, max axis error 0.27 deg, torso velocity vs the frame's rigid field 1.38 m/s (= rider mass relative motion)
+
+stdout | src/physics/world.test.ts > rider chain vs the reference (round 10: the chain is pose.ts's, checked against RIDER_CHAIN.md's canonical joint tables) > hands on the grips and ankles on the pegs in every pose; hips / shoulders / head / elbow / knee within 3 cm and torso / head angles within 5 deg of stand_attack (lean 0), hang_back (lean -1), forward_attack (lean +1) and hang_back + crouch (a held preload)
+CHAIN stand_attack (pose lean 0.00 crouch 0.00 torsoPitch -0.002): joint error cm hips 0.0, shoulders 0.1, head 0.1, elbow 0.0, knee 0.1; torso 40.0 vs 40 deg, head 66.0 vs 66; hand off grip 0.0 mm, ankle off peg 0.0 mm
+CHAIN hang_back (pose lean -1.00 crouch 0.00 torsoPitch -0.013): joint error cm hips 0.0, shoulders 0.4, head 0.4, elbow 0.5, knee 0.0; torso 55.5 vs 55 deg, head 75.0 vs 75; hand off grip 0.0 mm, ankle off peg 0.0 mm
+CHAIN forward_attack (pose lean 1.00 crouch 0.00 torsoPitch 0.009): joint error cm hips 0.0, shoulders 0.2, head 0.2, elbow 0.1, knee 0.1; torso 25.8 vs 26 deg, head 42.1 vs 42; hand off grip 0.0 mm, ankle off peg 0.0 mm
+CHAIN hang_back_crouch (pose lean -1.00 crouch 1.00 torsoPitch -0.012): joint error cm hips 0.0, shoulders 0.4, head 0.5, elbow 0.2, knee 0.0; torso 50.0 vs 50 deg, head 62.0 vs 62; hand off grip 0.0 mm, ankle off peg 0.0 mm
+
+stdout | src/physics/v2/feel.test.ts > launch, top speed, the lean ladder (§7, §10, §14.2) > snap-forward corrects a rising front: from a 20 deg wheelie with the throttle HELD the snap to +1 brings the pitch below 15 deg within 0.5 s and never loops; from 30 deg it needs the throttle closed with the snap (spec asked for 30 deg with the throttle held - not reachable: at 30 deg nose-up every pose has d/h(theta) < a/g); from 40 deg nothing saves it
+FEEL snap.from20.throttleHeld.pitchAt0.5s = 13.726 [< 30 deg at 0.5 s, no loop (R3: 24.6, the knot pushes through the correction; R1 3.2)]
+FEEL snap.from30.throttleHeld.max = 90.528 [info (spec < 15 at 0.5 s; loops: true)]
+FEEL snap.from30.throttle0.pitchAt0.5s = 40.350 [< 30 deg at 0.5 s and < 15 deg at 1.0 s, no loop (R6 deviation 28: the spec's < 15 at 0.5 s was R1's 0.04 s throttle; the Rookie's 0.15 s throttle keeps the thrust ~0.3 s after the cut)]
+FEEL snap.from30.throttle0.pitchAt1.0s = -5.967 [< 15 deg]
+FEEL snap.from30.throttle0.3.pitchAt0.5s = 51.377 [info (hovers near the throttle-0.3 balance ~27 deg first)]
+FEEL snap.from40.throttle0.loops = 1.000 [info (1 = loops: past the recovery envelope)]
+
+stdout | src/physics/v2/r3.test.ts > classes as parameter rows (R3 decision 2): rookie forgiving, pro raw > pro (R6): full gas at lean 0 from a standstill lifts hard (25-40 deg) and rides the power wheelie down without looping (R3-R5 looped in 0.95 s: harness r11 lost every Pro first attempt at 4 m), +0.25 / +0.5 / +1 do not loop, lean -0.25 / -0.5 / -1 loop in < 1.5 s (the lean fade: leaning back is the rider taking over); 0 -> 16 < rookie at +0.5; top 21
+FEEL class.pro.launch = 1:5.9deg 0.5:5.4deg 0.25:5.5deg 0:33.0deg -0.25:loop 1.37s -0.5:loop 0.71s -1:loop 0.52s [lean: max pitch or loop time]
+FEEL class.pro.t16 = 3.258 [info (< rookie)]
+FEEL class.pro.top = 21.027 [21 +- 0.5]
+
+stdout | src/physics/feel.test.ts > bunny hop technique (C5) > 5 m/s run-up onto a 0.9 m ledge: wheelie held at 45 deg so the front meets the lip, snap 1.3 m out, rear follows, rides away (round 6: 6 of 80 hopper parameter combos make it at 1.4 g)
+FEEL ledge.0.9.made = yes [yes]
+FEEL ledge.0.9.rearLiftAtWall = 1.063 [info (>= 0.9 needed: the plate no longer hooks the edge)]
+FEEL ledge.0.9.landPitchDeg = -11.061 [info]
+FEEL ledge.0.9.rideAway = yes [yes]
+FEEL ledge.0.9.fault = none [none]
+
+stdout | src/physics/classes.test.ts > Rookie wheelie control on crests, bumps and lips (round 11, strangers on b1/b2/b3) > full gas at lean 0 from rest into a row of 0.3 m-proud r 0.5 drums: reports (both builds nose over at 13-17 m/s: a bump launch, not a wheelie-control case)
+FEEL drumRow@12.rookie = crash pitch -130..20 [info (round 10: the same)]
+FEEL drumRow@30.rookie = crash pitch -123..35 [info (round 10: the same)]
+
+stdout | src/physics/v2/r6.test.ts > R6: the air-sign table per class (harness r11: "Pro in-air lean reads inverted on its first slot") > held lean has the documented sign on both classes (-1 nose-up +25..+40 in 0.5 s, +1 nose-down), K_att does not flip (attTorque -K x lean); the Pro's FIRST 0.1 s is inverted by the raw pose swing (-1 dips -10 deg before K_att lifts it; the Rookie's R5 air limit makes it -0.1): the strangers' reading is the swing, not a sign bug
+FEEL air.rookie.held-1 = first 2 °/s, 0.1 / 0.9 / 42.2 deg at 0.05 / 0.1 / 0.5 s [+25..+40 at 0.5 s]
+FEEL air.rookie.held+1 = first 3 °/s, 0.1 / -0.0 / -36.6 [-25..-40 at 0.5 s]
+FEEL air.rookie.tap50ms-1 = 0.1 / 1.4 / 5.8 [info: the first-slot read]
+FEEL air.rookie.tap50ms+1 = 0.1 / -1.1 / -10.5 [info]
+FEEL air.rookie.tap125ms-1 = 0.1 / 0.9 / 16.6 [info]
+
+stdout | src/physics/feel.test.ts > bunny hop technique (C5) > 5 m/s run-up onto a 0.5 m ledge is makeable
+FEEL ledge.0.5.made = yes [yes]
+
+stdout | src/physics/feel.test.ts > climb (C6) > sustains a 55 deg plank with lean forward (climber: pop, walk the rear into the corner, throttle as the pitch loop)
+FEEL climb.55.top = yes [yes]
+FEEL climb.55.time = 1.775 [info (4 m plank)]
+FEEL climb.55.fault = none [none]
+
+stdout | src/physics/v2/r3.test.ts > classes as parameter rows (R3 decision 2): rookie forgiving, pro raw > both classes: coasting balance by lean, air control in 0.5 s at 8 m/s (rookie in the 25-40 band; pro has less attitude assist, K_att 260), open-loop divergence 1-2 s
+FEEL class.rookie.balanceDeg.byLean = 26.2 / 40.3 / 51.3 / 60.6 / 69.0 [lean -1 / -0.5 / 0 / 0.5 / 1]
+FEEL class.rookie.air0.5s.lean-1/+1 = 41.7 / -36.8 [+25..40 / -25..-40]
+FEEL class.rookie.openLoopDivergeS = 1.325 [1-2 s]
+FEEL class.pro.balanceDeg.byLean = 26.6 / 39.6 / 49.7 / 58.2 / 65.7 [lean -1 / -0.5 / 0 / 0.5 / 1]
+FEEL class.pro.air0.5s.lean-1/+1 = 36.1 / -31.4 [less than the rookie]
+FEEL class.pro.openLoopDivergeS = 1.175 [1-2 s]
+
+stdout | src/physics/v2/feel.test.ts > brakes (§8) > neutral: 10 -> 0 in <= 7 m, rear lifts <= 0.6 s, pitch >= -25 deg (a settling stoppie); hard-forward endos
+FEEL brake.neutral.dist = 6.841 [<= 7 m (from 9.9 m/s)]
+FEEL brake.neutral.rearOffS = 0.217 [<= 0.6 s]
+FEEL brake.neutral.minPitchDeg = -8.270 [>= -25]
+FEEL brake.hardForward.result = crash [endo (crash)]
+FEEL brake.hardForward.rearOffS = 0.675 [info]
+
+stdout | src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > the beginner's panic (1.5 m ledge, lean -1 held from the edge through the landing) is NOT the servo's: the swing happens with the rear still on the ledge, then K_att holds +300 N m through 0.45 s of air and the rear-first landing at 100 % travel loops - a crash on both classes with the limit on or off; lean -0.5 held rides away (measured for the parent)
+FEEL r5.panic.rookie.lean-1@10 = lands 27 deg at 189 deg/s -> rides (raw: 27 / 189 -> rides) lim 0.86 [measured: crash either way (K_att), not the servo]
+FEEL r5.panic.rookie.lean-0.5/0@10 = 5 deg / 93 deg/s -> rides | lean 0: -19 / -15 -> rides [rides away]
+FEEL r5.panic.pro.lean-1@10 = lands 24 deg at 175 deg/s -> rides (raw: 24 / 175 -> rides) lim 0.00 [measured: crash either way (K_att), not the servo]
+FEEL r5.panic.pro.lean-0.5/0@10 = 3 deg / 59 deg/s -> rides | lean 0: -18 / -12 -> rides [rides away]
+
+stdout | src/physics/feel.test.ts > climb (C6) > climbs >= 2.5 m of a 60 deg plank with lean forward without a fault (round 7: crests the 3.46 m plank in 3.0 s; round 6 hung at 2.96 m)
+FEEL climb.60.maxY = 3.464 [>= 2.5 m of 3.46]
+FEEL climb.60.top = yes [yes]
+FEEL climb.60.time = 2.908 [info (4 m plank)]
+FEEL climb.60.fault = none [none]
+
+stdout | src/physics/v2/feel.test.ts > brakes (§8) > hard-back: 10 -> 0 in <= 6 m with the rear down or off <= 0.3 s (spec <= 5.0 m: R6 deviation 29, the toy's 650 N m; ours is 560 N m = 0.9 g, 5.64 m)
+FEEL brake.hardBack.dist = 5.352 [<= 6 m asserted (spec 5.0 at 650 N m)]
+FEEL brake.hardBack.rearOffS = 0.133 [<= 0.3 s]
+FEEL brake.hardBack.minPitchDeg = -7.022 [info]
+
+stdout | src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > cost: a limited flight and its landing tick at <= 5 us/tick p50 (node, shared host)
+FEEL r5.cost.usPerTick.p50 = 5.250 [<= 5]
+
+stdout | src/physics/feel.test.ts > climb (C6) > stalls on a 65 deg plank and rolls back without a fault
+FEEL climb.65.top = no [no]
+FEEL climb.65.rollback = 0.397 [> 0.2 m (stalls at the base corner, comes back down on the front wheel)]
+FEEL climb.65.fault = none [none]
+
+ ❯ src/physics/v2/r5.test.ts (8 tests | 3 failed) 482ms
+   × R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > Rookie, free air at 10 m/s: releasing lean -1 -> 0 kicks <= 120 deg/s (R4: +245) in steps <= 15 deg/s per tick (R4: 43); with gas on top <= 125; the limit reads 1 on the HUD. The held-lean rows are K_att's and move little (0 -> -1: rate at 0.5 s 171 -> ~153, angle 33 -> ~31) 44ms
+     → expected 165.55903982896098 to be less than 160.38202973547783
+   ✓ R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > Pro stays raw: gain 0, the limit reads 0 through the flight, the release kick is R4's 200-300 deg/s 16ms
+   ✓ R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > the throttle / brake air nudges are untouched on both classes (throttle +4..12 deg per 0.5 s, brake -8..-25): the limit is on the rider, not the wheels 31ms
+   × R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > grounded rows hold: the reference hop (snap ramping past take-off) and the landing table are identical with the limit on and off (the intent gate carries a ground-started throw through the air; a still target at landing keeps the R3 cap) 56ms
+     → expected 0.2490019489490835 to be greater than or equal to 0.38
+   ✓ R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > continuous: the limit blends in over 0.1 s of both-wheels-off and out over 0.1 s after the first touch - never a step > dt/0.1 per tick; a lean pressed while airborne is limited from its first tick (no escalation through the travel it allows) 59ms
+   ✓ R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > nothing hidden: a snapshot taken mid-flight with the limit in and a lean change under way replays hash-equal to the straight run through the landing (airLimit is in F; the foreign-snapshot suite covers the rest) 41ms
+   ✓ R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > the beginner's panic (1.5 m ledge, lean -1 held from the edge through the landing) is NOT the servo's: the swing happens with the rear still on the ledge, then K_att holds +300 N m through 0.45 s of air and the rear-first landing at 100 % travel loops - a crash on both classes with the limit on or off; lean -0.5 held rides away (measured for the parent) 219ms
+   × R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > cost: a limited flight and its landing tick at <= 5 us/tick p50 (node, shared host) 15ms
+     → expected 5.250000000160071 to be less than or equal to 5
+stdout | src/physics/feel.test.ts > climb (C6) > does not climb a 70 deg plank by riding
+FEEL climb.70.top = no [no]
+
+stdout | src/physics/feel.test.ts > wheelie balance (C7) > balance pitch at lean 0 is 40-50 deg; lean moves it
+FEEL wheelie.balanceDeg.lean0 = 48.442 [40-50]
+FEEL wheelie.balanceDeg.leanBack = 38.055 [< lean0]
+FEEL wheelie.balanceDeg.leanFwd = 70.197 [> lean0]
+FEEL wheelie.balanceDeg.accel3 = 36.120 [< lean0 (gas lifts the nose)]
+
+stdout | src/physics/feel.test.ts > wheelie balance (C7) > open loop diverges in 1-2 s from a 0.5 deg error, in the direction of the error
+FEEL wheelie.openLoopLeave.+0.5 = 0.775 [1-2 s]
+FEEL wheelie.openLoopLeave.-0.5 = 0.767 [1-2 s]
+
+stdout | src/physics/v2/feel.test.ts > air control (§9.4, §14.2) > 0.5 s at 8 / 14 / 20 m/s: lean -1 +25..+40, lean +1 -25..-40, throttle +8..+15 at 8 m/s falling to ~0 at the limiter, brake -12..-40 rising with speed, none within +-5
+FEEL air.8.none = -1.221 [+-5]
+FEEL air.8.lean-1 = 43.642 [+25..+40]
+FEEL air.8.lean+1 = -34.887 [-25..-40]
+FEEL air.8.throttle = 8.444 [+8..+15]
+FEEL air.8.brake = -12.216 [-12..-40, rising with speed]
+
+ ❯ src/physics/v2/feel.test.ts (8 tests | 2 failed) 563ms
+   ✓ static (F1, §5) > sits at rest at static sag; rear sag 28-32 % 13ms
+   ✓ launch, top speed, the lean ladder (§7, §10, §14.2) > top speed 20 +- 0.5 m/s at the limiter; lean +0.25 launch lifts the front <= 10 deg and finishes 120 m 46ms
+   ✓ launch, top speed, the lean ladder (§7, §10, §14.2) > full throttle at lean 0 never loops and finishes 120 m (spec band: a 45-65 deg self-limiting wheelie; §10's own d/h analysis puts any sustained lift past ~32 deg on the far side of the balance point, so the honest bike does not lift at neutral on the mid row) 13ms
+   ✓ launch, top speed, the lean ladder (§7, §10, §14.2) > full throttle at lean -0.25 / -0.5 / -1 lifts the front and loops with a loop time monotone in lean; -1 within ~1.3 s (spec: 60-75 deg hold >= 3 s / loops >= 2 s / loops <= 1 s - the hold row is not reachable by a rigid body at constant input, CONTRACT 2.5 "open-loop diverges in 1-2 s") 109ms
+   × launch, top speed, the lean ladder (§7, §10, §14.2) > snap-forward corrects a rising front: from a 20 deg wheelie with the throttle HELD the snap to +1 brings the pitch below 15 deg within 0.5 s and never loops; from 30 deg it needs the throttle closed with the snap (spec asked for 30 deg with the throttle held - not reachable: at 30 deg nose-up every pose has d/h(theta) < a/g); from 40 deg nothing saves it 196ms
+     → expected 13.725943066287861 to be greater than 30
+   ✓ brakes (§8) > neutral: 10 -> 0 in <= 7 m, rear lifts <= 0.6 s, pitch >= -25 deg (a settling stoppie); hard-forward endos 43ms
+   ✓ brakes (§8) > hard-back: 10 -> 0 in <= 6 m with the rear down or off <= 0.3 s (spec <= 5.0 m: R6 deviation 29, the toy's 650 N m; ours is 560 N m = 0.9 g, 5.64 m) 29ms
+   × air control (§9.4, §14.2) > 0.5 s at 8 / 14 / 20 m/s: lean -1 +25..+40, lean +1 -25..-40, throttle +8..+15 at 8 m/s falling to ~0 at the limiter, brake -12..-40 rising with speed, none within +-5 113ms
+     → expected 43.64207287277802 to be less than or equal to 40
+stdout | src/physics/feel.test.ts > wheelie balance (C7) > PD controller (60 Hz, 100 ms latency) holds a balance-point wheelie >= 10 s with the rider sat back past the wheelie control (44 deg at lean -0.5, kp 0.1 kd 0.03; round 7: 6 s at 45 deg / lean -0.3 and no gain pair held); at neutral-ish lean the control itself parks the nose at 33-37 deg whatever the PD asks for
+FEEL wheelie.pdHeld = 12.000 [>= 10 s (44 deg target, lean -0.5: the pure plant, control off)]
+FEEL wheelie.pdRmsErrDeg = 6.431 [< 12 (a real balance-point hold)]
+FEEL wheelie.pdBandDeg = 35.4..54.5 [info (after 2 s)]
+FEEL wheelie.pdLeanSaturated = 0.000 [< 0.2]
+FEEL wheelie.pdNeutral.held = 12.000 [info (45 deg target parks the lean at -0.3: the wheelie control holds it)]
+FEEL wheelie.pdNeutral.bandDeg = 16.1..32.2 [info (the control plateau, below the 45 asked)]
+
+stdout | src/physics/v2/r3.test.ts > hop matrix per class (R3): the intent gate keeps R2's hop > reference hop >= 0.45 m, front leaves first, lands within +-20 on both classes; matrix preload -0.25..-1 x snap 4 / 8 / 16 / one-tick
+FEEL hop.rookie.ref = apex 0.50 first front both-off 0.13 s land -5.1 [>= 0.45 m, front, level]
+FEEL hop.rookie.matrix.preLean-0.25 = 0.08 / 0.21 / 0.21 / 0.25 [snap 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.rookie.matrix.preLean-0.5 = 0.10 / 0.20 / 0.25 / 0.34 [snap 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.rookie.matrix.preLean-0.75 = 0.11 / 0.20 / 0.29 / 0.41 [snap 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.rookie.matrix.preLean-1 = 0.08 / 0.25 / 0.41 / 0.50 [snap 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.pro.ref = apex 0.54 first front both-off 0.23 s land 1.8 [>= 0.45 m, front, level]
+FEEL hop.pro.matrix.preLean-0.25 = 0.08 / 0.22 / 0.23 / 0.27 [snap 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.pro.matrix.preLean-0.5 = 0.11 / 0.21 / 0.27 / 0.37 [snap 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.pro.matrix.preLean-0.75 = 0.12 / 0.21 / 0.32 / 0.46 [snap 4 / 8 / 16 / one-tick: apex m]
+FEEL hop.pro.matrix.preLean-1 = 0.12 / 0.28 / 0.47 / 0.54 [snap 4 / 8 / 16 / one-tick: apex m]
+
+stdout | src/physics/feel.test.ts > landing recovery (F6) > rides away from a 2 m drop at 6 m/s for every pitch in [-5, +40] deg; reports the survivable range
+FEEL landing.survivablePitchDeg = -30..60 [includes -5..35 (design asks 40)]
+FEEL landing.rearFirstFrom = -10.000 [info]
+
+stdout | src/physics/v2/r6.test.ts > R6: the hop machine on planks (harness r11 m3 @ 410 / x3 @ 280 traces) and the preload gate > lean-0 keys never arm the intent slot (the pose target is a function of the lean alone): the m3 `push` at 402 m is the rider's rebound after a bottomed landing on the board, at the 0.3 F_max cap - a readout, not a throw; at <= 0.4 throttle the landing rides on both classes at 3-5 m/s
+FEEL seesaw.land.rookie.v3.thr0 = intent max 0.00 push 0 t rear-off vy -0.0 lift 700 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.rookie.v3.thr0.4 = intent max 0.00 push 0 t rear-off vy 0.3 lift 578 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.rookie.v4.thr0 = intent max 0.00 push 0 t rear-off vy 0.3 lift 647 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.rookie.v4.thr0.4 = intent max 0.00 push 0 t rear-off vy 0.6 lift 553 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.rookie.v5.thr0 = intent max 0.00 push 0 t rear-off vy 0.7 lift 600 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.rookie.v5.thr0.4 = intent max 0.00 push 0 t rear-off vy 1.0 lift 552 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.pro.v3.thr0 = intent max 0.00 push 0 t rear-off vy 0.1 lift 589 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.pro.v3.thr0.4 = intent max 0.00 push 0 t rear-off vy 0.5 lift 576 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.pro.v4.thr0 = intent max 0.00 push 0 t rear-off vy 0.4 lift 590 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.pro.v4.thr0.4 = intent max 0.00 push 0 t rear-off vy 0.8 lift 577 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.pro.v5.thr0 = intent max 0.00 push 0 t rear-off vy 0.8 lift 591 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.pro.v5.thr0.4 = intent max 0.00 push 0 t rear-off vy 1.2 lift 578 N [intent 0, no fault, lift <= 0.3 F_max + gravity]
+FEEL seesaw.land.gas1.v5 = rookie rides / pro crash [info: full gas up the 21 deg board holds an ECU wheelie into the tipping end (the m3 lesson: <= 0.4 throttle)]
+
+stdout | src/physics/world.test.ts > performance > riding: µs/tick p95 <= 60 over 20k ticks (node)
+PERF riding: p95 3.5 us/tick, mean 13.9 us/tick
+
+stdout | src/physics/feel.test.ts > landing envelope audit (round 3) > drop 1.5/2.5/3.5 m at 0/4/8 m/s and pitch -20/0/+20/+40: prints survival, peak compression, bottom-out; flat 1.5 and 2.5 m drops survive
+LAND 1.5m 0m/s -20deg: OK  first F comp R0.94 F0.94 pitch -11..3
+LAND 1.5m 0m/s +0deg: OK  first R comp R1.00 F0.97 BOTTOM pitch 0..13
+LAND 1.5m 0m/s +20deg: OK  first R comp R0.94 F0.97 pitch -0..30
+LAND 1.5m 0m/s +40deg: OK  first R comp R1.00 F0.95 BOTTOM pitch -0..41
+LAND 1.5m 4m/s -20deg: OK  first F comp R1.00 F0.93 BOTTOM pitch -11..3
+LAND 1.5m 4m/s +0deg: OK  first R comp R0.90 F0.97 pitch -0..12
+LAND 1.5m 4m/s +20deg: OK  first R comp R0.91 F0.96 pitch -0..31
+LAND 1.5m 4m/s +40deg: OK  first R comp R0.97 F0.97 pitch -1..41
+LAND 1.5m 8m/s -20deg: OK  first F comp R0.98 F0.93 pitch -12..3
+LAND 1.5m 8m/s +0deg: OK  first R comp R0.91 F0.99 BOTTOM pitch -0..10
+LAND 1.5m 8m/s +20deg: OK  first R comp R0.99 F0.97 BOTTOM pitch -1..31
+LAND 1.5m 8m/s +40deg: OK  first R comp R0.89 F0.99 BOTTOM pitch -1..41
+LAND 2.5m 0m/s -20deg: OK  first F comp R1.00 F1.00 BOTTOM pitch -3..4
+LAND 2.5m 0m/s +0deg: OK  first R comp R1.00 F1.00 BOTTOM pitch -0..20
+LAND 2.5m 0m/s +20deg: OK  first R comp R0.96 F1.00 BOTTOM pitch 0..35
+LAND 2.5m 0m/s +40deg: OK  first R comp R1.00 F1.00 BOTTOM pitch 0..42
+LAND 2.5m 4m/s -20deg: OK  first F comp R1.00 F1.00 BOTTOM pitch -4..4
+LAND 2.5m 4m/s +0deg: OK  first R comp R0.96 F1.00 BOTTOM pitch 0..17
+LAND 2.5m 4m/s +20deg: OK  first R comp R0.96 F1.00 BOTTOM pitch 0..35
+LAND 2.5m 4m/s +40deg: OK  first R comp R0.97 F1.00 BOTTOM pitch 0..42
+LAND 2.5m 8m/s -20deg: OK  first F comp R1.00 F1.00 BOTTOM pitch -7..3
+LAND 2.5m 8m/s +0deg: OK  first R comp R1.00 F0.98 BOTTOM pitch 0..14
+LAND 2.5m 8m/s +20deg: OK  first R comp R0.95 F1.00 BOTTOM pitch 0..35
+LAND 2.5m 8m/s +40deg: OK  first R comp R1.00 F0.99 BOTTOM pitch 0..42
+LAND 3.5m 0m/s -20deg: OK  first R comp R0.97 F1.00 BOTTOM pitch 0..5
+LAND 3.5m 0m/s +0deg: OK  first R comp R1.00 F1.00 BOTTOM pitch -1..25
+LAND 3.5m 0m/s +20deg: OK  first R comp R1.00 F1.00 BOTTOM pitch -1..38
+LAND 3.5m 0m/s +40deg: OK  first R comp R0.95 F1.00 BOTTOM pitch 0..43
+LAND 3.5m 4m/s -20deg: OK  first R comp R0.99 F1.00 BOTTOM pitch 1..4
+LAND 3.5m 4m/s +0deg: OK  first R comp R1.00 F1.00 BOTTOM pitch -0..22
+LAND 3.5m 4m/s +20deg: OK  first R comp R1.00 F1.00 BOTTOM pitch -0..39
+LAND 3.5m 4m/s +40deg: OK  first R comp R1.00 F1.00 BOTTOM pitch -0..42
+LAND 3.5m 8m/s -20deg: OK  first F comp R1.00 F1.00 BOTTOM pitch -3..4
+LAND 3.5m 8m/s +0deg: OK  first R comp R0.99 F1.00 BOTTOM pitch 0..18
+LAND 3.5m 8m/s +20deg: OK  first R comp R1.00 F1.00 BOTTOM pitch 0..39
+LAND 3.5m 8m/s +40deg: OK  first R comp R1.00 F1.00 BOTTOM pitch -0..43
+
+stdout | src/physics/feel.test.ts > nose-down landings (round 4) > 3.5 m at 8 m/s nose-down -20/-40: a free front wheel kicks the nose back up (rides away, ~400 deg/s whip); the brake grabbed on landing endos
+FEEL landing.noseDown.-20.free = rides away pitch -3..4 rate 428 [rides away (vertical impulse ahead of the COM pitches nose-up)]
+FEEL landing.noseDown.-20.brake = rides away pitch -15..2 [dives past -15, rides away (round 11; -40 in round 9)]
+FEEL landing.noseDown.-40.free = rides away pitch -23..6 rate 510 [rides away (vertical impulse ahead of the COM pitches nose-up)]
+FEEL landing.noseDown.-40.brake = rides away pitch -34..4 [dives past -30 (round 11: the air-dragged front meets the ground spinning; round 9 endoed)]
+
+stdout | src/physics/feel.test.ts > air control (F9) > brake pitches nose-down, throttle nose-up, lean back nose-up (0.5 s airborne)
+FEEL air.brake0.5s.pitchDeg = -13.480 [-10..-30]
+FEEL air.throttle0.5s.pitchDeg = 14.831 [+5..+30]
+FEEL air.leanBack0.5s.pitchDeg = 26.745 [> 0]
+
+stdout | src/physics/v2/r4.test.ts > R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swing, not the throttle > throttle in the air is bounded by the wheel spin-up (<= 30 deg/s peak, 4-12 deg in 0.5 s) and brake in the air by the wheels' spin momentum (-30..-60 deg/s peak) on both classes
+FEEL air.rookie.throttleTap = peak 20 deg/s step 2 /tick angle 6.3 @0.5s [peak <= 30, 4..12 deg]
+FEEL air.rookie.brakeTap = peak -43 deg/s step 9 /tick angle -15.5 @0.5s [peak -30..-60, -8..-25 deg]
+FEEL air.pro.throttleTap = peak 23 deg/s step -2 /tick angle 8.0 @0.5s [peak <= 30, 4..12 deg]
+FEEL air.pro.brakeTap = peak -42 deg/s step 7 /tick angle -16.1 @0.5s [peak -30..-60, -8..-25 deg]
+
+stdout | src/physics/feel.test.ts > air control (F9) > airPitch controller lands within 15 deg of a target after a 4 m drop (round 6: from -5 deg; at 1.4 g the drop is 0.76 s of air and the authority for -20 -> +15 is not there, see F9 for the per-input numbers)
+FEEL air.controlledLandingPitchDeg = 13.561 [15 +- 15]
+
+stdout | src/physics/v2/r4.test.ts > R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swing, not the throttle > a full pose swing in the air is the 200-400 deg/s step: releasing lean -1 to 0 kicks +230..260 deg/s within 0.07 s (43 deg/s per tick = F_max x the grip lever / I_chassis), pressing 0 to -1 dips the nose first (-140 deg/s) then K_att lifts it; genuine two-body dynamics, > 8x the throttle tap (raw: the Pro, and the Rookie with the R5 air limit off - r5.test.ts has the limited Rookie)
+FEEL air.rookie.swing-1to0 = peak 244 deg/s step -46 /tick angle 28.0 @0.5s [measured: the kick (200-300)]
+FEEL air.rookie.swing0to-1 = peak 160 deg/s step 44 /tick angle 39.6 @0.5s rate@0.5 160 [measured: dip then K_att]
+FEEL air.rookie.swing-1to0+gas = peak 245 angle 34.7 @0.5s [measured: swing + 20 of throttle]
+FEEL air.pro.swing-1to0 = peak 234 deg/s step -46 /tick angle 24.3 @0.5s [measured: the kick (200-300)]
+FEEL air.pro.swing0to-1 = peak 141 deg/s step 43 /tick angle 33.7 @0.5s rate@0.5 141 [measured: dip then K_att]
+FEEL air.pro.swing-1to0+gas = peak 245 angle 38.3 @0.5s [measured: swing + 20 of throttle]
+
+stdout | src/physics/classes.test.ts > one-way plank straddle (round 11, tracks.md 6.1: the m3 wedge) > a 9 m/s arrival with the rear wheel anywhere from 0.7 m below to level with a one-way plank (front on top) lands on it or falls past it, never hangs (round 10: 9 of 45 hung with the rear wheel through the board)
+FEEL wedge.9ms = on 34 fell 11 hang 0 of 45 [hang 0]
+
+ ✓ src/physics/classes.test.ts (8 tests) 1053ms
+   ✓ one-way plank straddle (round 11, tracks.md 6.1: the m3 wedge) > a 9 m/s arrival with the rear wheel anywhere from 0.7 m below to level with a one-way plank (front on top) lands on it or falls past it, never hangs (round 10: 9 of 45 hung with the rear wheel through the board)  504ms
+stdout | src/physics/feel.test.ts > weight: airtime at 1.4 g (round 6, blind critics: "2.2 s of airtime with frozen pitch off a 45 deg ramp") > stationary hop ~0.6 s of air at a 0.6-0.7 m apex; a 1 m 45 deg kicker gives ~1.0-1.2 s at 10 m/s; 2 m drop falls in ~0.5 s (was 0.62)
+FEEL airtime.hop = 0.525 s at 0.67 m [0.45-0.7 s, 0.6-0.7 m (was 0.56 s / 0.62 m at 9.81)]
+FEEL airtime.kicker45.1m.6ms = 0.600 s (lip 3.4 m/s, launch pitch 83, drift -83 deg, crash) [info (was 1.06 / 1.49 at 9.81)]
+FEEL airtime.kicker45.1m.10ms = 0.892 s (lip 6.5 m/s, launch pitch 53, drift 49 deg, crash) [1.0-1.2 s (was 1.40 at 9.81)]
+FEEL airtime.kicker45.1m.14ms = 1.058 s (lip 9.4 m/s, launch pitch 40, drift 25 deg, lands) [info (was 1.06 / 1.49 at 9.81)]
+FEEL airtime.drop2m = 0.508 [~0.5 s (was 0.62 at 9.81)]
+
+stdout | src/physics/v2/r4.test.ts > R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swing, not the throttle > a rear touchdown pitched 20 deg above a 20 deg ramp passes sin(20) of the normal impulse rigidly through the slider: <= 60 deg/s per tick at 1-2 m/s of approach, gas on or off (genuine, a landing, not a solver spike)
+FEEL touchdown.rookie.vn1.thr1 = step 58 deg/s per tick, peak N 2956 N [<= 60 per tick]
+FEEL touchdown.rookie.vn2.thr1 = step 45 deg/s per tick, peak N 3378 N [<= 60 per tick]
+FEEL touchdown.rookie.vn1.thr0 = step 63 deg/s per tick, peak N 2863 N [<= 60 per tick]
+
+stdout | src/physics/feel.test.ts > suspension that reads (round 6, blind critics: "no squat on the ramp, no compression or rebound at touchdown") > static sag 25-30 % of travel both ends; 1.5 m drop compresses >= 80 % then rebounds past sag and returns (one damped cycle); 3 m drop bottoms out and bucks (chassis lifts 5-10 cm, pitch kicks 3-5 deg)
+FEEL susp.sag = R 0.273 F 0.253 [0.25-0.30 (was 0.10 / 0.24)]
+FEEL susp.drop1.5 = peak R 0.90 F 0.97, rebound to 0.20 at +0.31 s, back to sag at +0.38 s [peak >= 0.8, rebound below sag, one cycle ~0.5 s]
+FEEL susp.drop3.buck = bottom 0 ticks, chassis lift 18.7 cm, pitch kick 14.3 deg [bottoms; lift 5-25 cm (asked 5-10; the whole bike hops off a 9 m/s impact); kick 3-15 deg]
+
+stdout | src/physics/v2/r6.test.ts > R6: the hop machine on planks (harness r11 m3 @ 410 / x3 @ 280 traces) and the preload gate > the x3 +263..+427 deg/s on the board is a -1/0 lean pulse train (67-100 ms pulses), each pulse a real body preload: the preload gate `servoIntentBackM` (intent only while the body is >= M behind neutral) keeps the R3 hop matrix at 0.05 (ref within 0.01) and still arms on the train; at 0.15 it kills the -0.25 preload row; it ships at 0 (declared, measured)
+FEEL gate.hop.ref = M0 0.504 M0.05 0.471 [R3 0.462; within 0.01]
+FEEL gate.hop.pre-0.25@8 = M0 0.19 M0.05 0.18 M0.15 0.08 [R3 0.29; 0.15 kills it]
+FEEL gate.train8/8 = M0 peak 194 intent 1.00; M0.05 173 / 1.00; M0.15 174 / 1.00; 3/3 @ M0.075 86 / 0.00 [the 67 ms train arms at every M that keeps the matrix]
+
+stdout | src/physics/feel.test.ts > suspension that reads (round 6, blind critics: "no squat on the ramp, no compression or rebound at touchdown") > throttle squat: full throttle from rest adds >= 20 % of travel to the rear for >= 0.3 s; braking dive: hard front brake from 10 m/s compresses the front >= 50 %
+FEEL susp.squat = sag 0.27 -> peak 0.83, >= sag+0.20 for 0.80 s [>= +0.20 for >= 0.3 s]
+FEEL susp.dive = sag 0.25 -> peak 0.69 (lean 0) [>= 0.50]
+
+stdout | src/physics/feel.test.ts > drums and logs (round 4) > a 0.3 m-proud sunk drum (M2 bump, r 0.5 depth 0.7) rolls over with constant lean 0.4 + throttle at 3/5/8 m/s
+DRUM sunk r0.5 d0.7 3m/s const: OVER @2.5s - minV 8.5 park 0.0s spin 0.0
+DRUM sunk r0.5 d0.7 5m/s const: OVER @2.3s - minV 9.0 park 0.0s spin 0.0
+DRUM sunk r0.5 d0.7 8m/s const: OVER @2.1s - minV 9.5 park 0.0s spin 0.0
+
+stdout | src/physics/feel.test.ts > drums and logs (round 4) > a 0.3 m log (0.6 m tall, b2) is a wall to a constant lean at 3/5 m/s (parks or crashes; round 7: at 8 m/s the damped-leg landing lets it bounce over) and crosses with a front lift at 3/5/8 m/s
+DRUM log r0.3 3m/s const: no - minV -1.7 park 5.6s spin 0.0
+DRUM log r0.3 3m/s lean-1: OVER @2.8s - minV 1.6 park 0.0s spin 0.0
+DRUM log r0.3 3m/s lift: OVER @4.3s - minV 1.3 park 0.0s spin 0.0
+DRUM log r0.3 5m/s const: no crash minV -0.6 park 0.1s spin 0.0
+DRUM log r0.3 5m/s lean-1: OVER @2.6s - minV 2.2 park 0.0s spin 0.0
+DRUM log r0.3 5m/s lift: OVER @3.2s - minV 1.2 park 0.0s spin 0.0
+DRUM log r0.3 8m/s const: no - minV -1.7 park 5.4s spin 0.0
+DRUM log r0.3 8m/s lean-1: OVER @2.3s - minV 2.0 park 0.0s spin 0.0
+DRUM log r0.3 8m/s lift: OVER @2.5s - minV 1.7 park 0.0s spin 0.0
+
+stdout | src/physics/feel.test.ts > drums and logs (round 4) > a rolling 0.3 m log spins under the tyre (> 1 rad) and still crosses with a front lift
+DRUM log r0.3 rolls 3m/s lift: OVER @4.3s - minV 1.2 park 0.0s spin 28.9
+DRUM log r0.3 rolls 5m/s lift: OVER @3.3s - minV 0.8 park 0.0s spin 33.6
+
+stdout | src/physics/world.test.ts > performance > ragdolling: µs/tick p95 <= 80 (crash every 2.5 s, 20k ticks)
+PERF ragdoll: p95 2.7 us/tick, mean 7.4 us/tick (ragdolling 10% of ticks)
+
+ ✓ src/physics/world.test.ts (18 tests) 1207ms
+   ✓ performance > riding: µs/tick p95 <= 60 over 20k ticks (node)  347ms
+stdout | src/physics/v2/r3.test.ts > climbs with the Trials technique (R3 decision 3) > rookie tops a 4 m 45 deg plank from a crawl (2 m/s) and at 5 m/s: front rolls onto the face at neutral, gas, then the weight is thrown to +1; 50 deg needs 6 m/s; pro table printed (its momentum rows 55-60 are not made by this controller: the base transition at 6-10 m/s, not the geometry, is where it fails)
+FEEL climb.rookie.table = 40@2:TOP 45@2:stall 76% 45@5:stall 75% 50@5:stall 35% 50@6:FAULT 55@6:stall 18% 55@8:stall 27% 60@8:stall 20% [TOP / stall %]
+FEEL climb.pro.table = 40@2:FAULT 45@2:stall 38% 45@5:FAULT 50@5:stall 34% 50@6:FAULT 55@6:stall 24% 55@8:stall 36% 60@8:stall 26% [TOP / stall %]
+
+stdout | src/physics/v2/r3.test.ts > climbs with the Trials technique (R3 decision 3) > the constant-speed climb limit is geometry, atan(d/h) at lean +1 (the front load on a slope is d cos - h sin): 37 deg on this table; steeper is a momentum climb
+FEEL climb.rookie.crawlLimitDeg = 37.762 [info: atan(d/h) at lean +1]
+FEEL climb.pro.crawlLimitDeg = 36.808 [info: atan(d/h) at lean +1]
+
+stdout | src/physics/v2/r4.test.ts > R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > a 20 deg slope lowers the front-lift threshold from ~0.6 g to ~0.22 g: raw (either class with the ECU off; R6: the Pro carries the ground ECU too, so its raw row is the gain-0 override) full gas at lean 0 wheelies 40-55 deg over the slope and leaves a 6 m lip at 65-80 deg nose-up rotating 150+ deg/s; the R6 Pro (ECU on the ground) leaves the same lip <= 25 deg
+FEEL ramp20@10.proRaw.lean0 = over slope 54.6 lip pitch 77.7 rate 196 v 9.9 [raw (R3-R5 Pro): loops off the lip]
+FEEL ramp20@10.rookieRaw.lean0 = over slope 42.3 lip pitch 63.6 rate 150 v 9.8 [R3 Rookie (assist off)]
+FEEL ramp20@10.pro.lean0 = over slope 12.2 lip pitch 26.2 rate -75 v 7.7 assist max 1.00 [R6 Pro (ground ECU): lip <= 25]
+
+stdout | src/physics/v2/r2.test.ts > the hop (R2 decision d; §9.5, §14.2, §14.3) > continuous: one preload-lean quantum changes the apex by < 3 cm; a 1-tick-late snap loses <= 15 %; identical on dirt / wood / metal / concrete
+FEEL hop.quantumJump = 0.009 [< 0.03 m]
+FEEL hop.oneTickLate.ratio = 0.999 [>= 0.85]
+FEEL hop.oneTickEarly.ratio = 0.995 [info]
+FEEL hop.surfaces.apex = 0.504 / 0.504 / 0.504 / 0.503 [identical]
+
+stdout | src/physics/v2/r2.test.ts > the hop (R2 decision d; §9.5, §14.2, §14.3) > seated (no preload): a snap from neutral pops the rear ~0.2 m off the front wheel with both wheels off for only ~0.04 s - a pivot, not a hop (parent asked rear <= 0.1 m: not met, the rear-apex metric counts the nose-down pivot)
+FEEL hop.seated.rearApex = 0.166 [<= 0.1 m (parent); measured]
+FEEL hop.seated.bothOffS = 0.033 [info: ~0.04 s]
+
+stdout | src/physics/v2/r4.test.ts > R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > Rookie (wheelie control on): the same ramp at lean 0 lifts <= 15 deg over the slope, leaves the lip <= 25 deg nose-up with the nose already coming down (rate <= 0) and no brake; the lean-forward technique (+1, assist faded out) gives the same picture with 1 m/s more lip speed
+FEEL ramp20@10.rookie.lean0 = over slope 11.0 lip pitch 20.2 rate -61 v 7.8 assist max 0.78 [lean 0: over <= 15, lip <= 25, rate <= 0]
+FEEL ramp20@10.rookie.lean0.2 = over slope 9.8 lip pitch 17.6 rate -68 v 8.2 assist max 0.60 [lean 0: over <= 15, lip <= 25, rate <= 0]
+FEEL ramp20@10.rookie.lean0.4 = over slope 8.2 lip pitch 17.3 rate -68 v 8.5 assist max 0.45 [lean 0: over <= 15, lip <= 25, rate <= 0]
+FEEL ramp20@10.rookie.lean1 = over slope 3.8 lip pitch 9.0 rate -55 v 8.1 assist max 0.00 [lean 0: over <= 15, lip <= 25, rate <= 0]
+
+stdout | src/physics/v2/r2.test.ts > wheelie balance and hold (R2 decision b; §10) > the coasting balance pitch is about the rear AXLE with the attitude torque in the moment balance: ~50 deg at lean 0 on the mid row, monotone in lean, spanning ~27 deg (lean -1) to ~69 deg (lean +1); the front lifts at lean 0 only above a/g = d/h = 0.64
+FEEL wheelie.coastBalanceDeg.byLean = 26.2 / 40.3 / 51.3 / 60.6 / 69.0 [lean -1 / -0.5 / 0 / 0.5 / 1]
+FEEL wheelie.coast.from40.pitchAfter0.3s = 27.784 [falls (< p)]
+FEEL wheelie.coast.from60.pitchAfter0.3s = 66.673 [rises (> p)]
+
+stdout | src/physics/v2/r3.test.ts > wheelie hold with anticipation (R3 decision 4) > a 60 Hz / 100 ms controller that leads the pitch by 0.25 s (pitch + rate x horizon) holds 40 +- 8 deg for >= 10 s of 12 on both classes without looping; the R2 PD on the current pitch loops against the Rookie's 0.15 s throttle
+FEEL wheelie.rookie.hold.inBandS = 11.783 [>= 10 s within +-8 of 40]
+FEEL wheelie.rookie.hold.frontUpS = 12.500 [info]
+FEEL wheelie.rookie.hold.meanDeg = 39.982 [info]
+FEEL wheelie.rookie.hold.vmax = 7.255 [info]
+FEEL wheelie.pro.hold.inBandS = 12.500 [>= 10 s within +-8 of 40]
+FEEL wheelie.pro.hold.frontUpS = 12.500 [info]
+FEEL wheelie.pro.hold.meanDeg = 39.842 [info]
+FEEL wheelie.pro.hold.vmax = 6.839 [info]
+
+stdout | src/physics/feel.test.ts > drums and logs (round 4) > drums of r 0.45 / 0.6 / 0.9 standing on the ground: report (geometry: the face bulges into the frame underside, so a front lift hangs the bash plate on the face; these need a hop, a kicker or a sunk base)
+DRUM drum r0.45 3m/s const: no crash minV -2.3 park 0.0s spin 0.0
+DRUM drum r0.45 3m/s lift: no crash minV -0.2 park 0.1s spin 0.0
+DRUM drum r0.45 5m/s const: no crash minV -0.7 park 0.1s spin 0.0
+DRUM drum r0.45 5m/s lift: no - minV -0.9 park 5.4s spin 0.0
+DRUM drum r0.45 8m/s const: no crash minV -2.0 park 0.1s spin 0.0
+DRUM drum r0.45 8m/s lift: no - minV -1.5 park 6.1s spin 0.0
+DRUM drum r0.6 3m/s const: no crash minV -1.1 park 0.1s spin 0.0
+DRUM drum r0.6 3m/s lift: no crash minV -1.2 park 0.0s spin 0.0
+DRUM drum r0.6 5m/s const: no crash minV -1.2 park 0.1s spin 0.0
+DRUM drum r0.6 5m/s lift: no - minV -1.1 park 5.8s spin 0.0
+DRUM drum r0.6 8m/s const: no crash minV -1.4 park 0.1s spin 0.0
+DRUM drum r0.6 8m/s lift: no - minV -1.5 park 6.2s spin 0.0
+DRUM drum r0.9 3m/s const: no crash minV -1.6 park 0.0s spin 0.0
+DRUM drum r0.9 3m/s lift: no - minV -0.5 park 4.8s spin 0.0
+DRUM drum r0.9 5m/s const: no crash minV -1.5 park 0.0s spin 0.0
+DRUM drum r0.9 5m/s lift: no - minV -0.8 park 5.7s spin 0.0
+DRUM drum r0.9 8m/s const: no crash minV -1.9 park 0.0s spin 0.0
+DRUM drum r0.9 8m/s lift: no - minV -1.2 park 6.1s spin 0.0
+
+stdout | src/physics/feel.test.ts > rider pose from the rider mass (round 4, blind critic: "rider bolted to bike") > a lean step 0 -> +1 reaches 90 % of the pose in 0.15-0.35 s (a 0.73 m shift of 75 kg under the 2 kN brace cap: 0.28 s, no overshoot); the pose settles at the input; torsoPitch is the transient only and crouch the hop preload only (round 10, RIDER_CHAIN.md "Curves")
+FEEL pose.lean.t90.fwd = 0.267 [0.15-0.35 s (design asked 0.10-0.15; the brace cap sets it)]
+FEEL pose.lean.overshoot.fwd = 0.000 [0-0.1 (slight)]
+FEEL pose.lean.t90.back = 0.250 [0.15-0.35 s]
+FEEL pose.lean.overshoot.back = 0.000 [0-0.1]
+FEEL pose.torso.transientPeak.fwd = 0.273 [info (rad; the swing lagging the lean, + = pitched forward)]
+FEEL pose.torso.transientPeak.back = -0.287 [info]
+FEEL pose.torso.settleT.fwd = 0.508 [< 0.75 s (back within 0.02 rad)]
+FEEL pose.torso.settled.fwd = 0.001 [|x| < 0.03 (no steady lean bias; was -0.34 per unit lean)]
+FEEL pose.torso.settled.back = -0.012 [|x| < 0.03]
+FEEL pose.crouch.leanOnly.fwd = 0.000 [0 (a lean is not a crouch; was 1.0 at lean >= 0.6)]
+FEEL pose.crouch.leanOnly.back = 1.000 [0 (was 0.67 at lean -1; throttle 0.3 is the hop threshold, lean -1 preloads)]
+FEEL pose.lean.settle.fwd = 0.982 [0.9-1]
+
+stdout | src/physics/feel.test.ts > rider pose from the rider mass (round 4, blind critic: "rider bolted to bike") > crouch reports the hop preload alone: 0 through a lean-forward and a lean-back below the hop threshold, the eased preload state during one
+FEEL pose.crouch.leanSweep = 0.000 [0 (lean -1 then +1 at 9 m/s, throttle 0.25: no hop, no crouch)]
+FEEL pose.crouch.preload0.3s = 1.000 [0.9-1 (0.3 s into a preload: crouchTime 0.25 s, eased)]
+
+stdout | src/physics/v2/r6.test.ts > R6: the wheelie hold at 45 deg (audit §4: the lean-only row) > the throttle-actuated anticipation controller (R3 V3, 60 Hz / 100 ms) holds 40 +- 8 deg for >= 10 s of 12 on both classes as shipped, and 45 +- 8 deg for >= 10 s on both with the ECU off (the spec's 45 band is the raw bike's: at 45 the park lean is -0.2 / -0.12 where the ECU's loop-margin term trims the throttle and the front drops - R6 deviation 30); the lean-only controller at a fixed throttle 0.5 (the audit row) loops within 3 s on both - printed, not a requirement of this model (R6 deviation 31: even K_att 1500 holds 2.7 s and costs the air band)
+FEEL hold.rookie.throttleV3.40 = inBand 11.78 s vmax 7.3 [>= 10 s within +-8 of 40 (R3 row)]
+FEEL hold.rookie.throttleV3.45 = inBand 0.35 s vmax 20.0 [info: the ECU trims a wheelie held above ~40 at lean > -0.5]
+FEEL hold.rookie.throttleV3.45.ecuOff = inBand 12.14 s vmax 6.9 [>= 10 s within +-8 of 45 (raw bike)]
+FEEL hold.rookie.leanOnly.45.thr0.5 = inBand 0.80 s vmax 5.8 LOOP [info: the audit row (10 s) is not reachable by lean alone]
+FEEL hold.pro.throttleV3.40 = inBand 12.50 s vmax 6.8 [>= 10 s within +-8 of 40 (R3 row)]
+FEEL hold.pro.throttleV3.45 = inBand 0.34 s vmax 21.0 [info: the ECU trims a wheelie held above ~40 at lean > -0.5]
+FEEL hold.pro.throttleV3.45.ecuOff = inBand 12.24 s vmax 6.1 [>= 10 s within +-8 of 45 (raw bike)]
+FEEL hold.pro.leanOnly.45.thr0.5 = inBand 0.42 s vmax 5.5 LOOP [info: the audit row (10 s) is not reachable by lean alone]
+
+ ❯ src/physics/v2/r6.test.ts (9 tests | 1 failed) 1192ms
+   ✓ R6 physics.md §8.1: same-tick finish / fault precedence (audit §5) > a fault in the tick the front wheel crosses the line, with the wheel <= one radius past it, VOIDS the finish: only `fault` is emitted, finishTime stays null (the audit probe: before R6 `finish` came first and Game scored a fault-free 1/120 s clear) 5ms
+   ✓ R6 physics.md §8.1: same-tick finish / fault precedence (audit §5) > the exception: a fault in the crossing tick with the wheel already > R past the line is a crash AFTER the finish - `finish` then `fault`, finishTime set (reachable only by teleport: at 21 m/s the wheel moves 0.175 m per tick) 1ms
+   ✓ R6 physics.md §8.1: same-tick finish / fault precedence (audit §5) > a clean crossing is untouched: `finish` at the crossing tick, no fault, not voided; and the run stays `finished` (the fault sensors keep running after the line, a later tumble is a post-finish fault Game ignores) 93ms
+   ✓ R6 physics.md §8.1: same-tick finish / fault precedence (audit §5) > the rule is a tick rule: a natural crossing at 8 m/s puts the wheel 0.07 m past the line; the void needs the fault in THAT tick (a crash the next tick is post-finish) - snapshot / restore across the crossing tick is byte-identical 17ms
+   ✓ R6: the Pro launch (ground ECU, raw air) > pro: plain gas from a standstill at lean 0 lifts 25-40 deg and does not loop; 1 s and 2 s throttle ramps at lean 0 do not loop; full gas at lean 0 from an 8 m/s roll does not loop; the ECU is off in the air (airGain 0: the Pro air rows are R5's); the Rookie rows are R4's (6-7 deg, never loops) 145ms
+   × R6: the air-sign table per class (harness r11: "Pro in-air lean reads inverted on its first slot") > held lean has the documented sign on both classes (-1 nose-up +25..+40 in 0.5 s, +1 nose-down), K_att does not flip (attTorque -K x lean); the Pro's FIRST 0.1 s is inverted by the raw pose swing (-1 dips -10 deg before K_att lifts it; the Rookie's R5 air limit makes it -0.1): the strangers' reading is the swing, not a sign bug 185ms
+     → expected 42.20403437376927 to be less than or equal to 40
+   ✓ R6: the hop machine on planks (harness r11 m3 @ 410 / x3 @ 280 traces) and the preload gate > lean-0 keys never arm the intent slot (the pose target is a function of the lean alone): the m3 `push` at 402 m is the rider's rebound after a bottomed landing on the board, at the 0.3 F_max cap - a readout, not a throw; at <= 0.4 throttle the landing rides on both classes at 3-5 m/s  362ms
+   ✓ R6: the hop machine on planks (harness r11 m3 @ 410 / x3 @ 280 traces) and the preload gate > the x3 +263..+427 deg/s on the board is a -1/0 lean pulse train (67-100 ms pulses), each pulse a real body preload: the preload gate `servoIntentBackM` (intent only while the body is >= M behind neutral) keeps the R3 hop matrix at 0.05 (ref within 0.01) and still arms on the train; at 0.15 it kills the -0.25 preload row; it ships at 0 (declared, measured) 182ms
+   ✓ R6: the wheelie hold at 45 deg (audit §4: the lean-only row) > the throttle-actuated anticipation controller (R3 V3, 60 Hz / 100 ms) holds 40 +- 8 deg for >= 10 s of 12 on both classes as shipped, and 45 +- 8 deg for >= 10 s on both with the ECU off (the spec's 45 band is the raw bike's: at 45 the park lean is -0.2 / -0.12 where the ECU's loop-margin term trims the throttle and the front drops - R6 deviation 30); the lean-only controller at a fixed throttle 0.5 (the audit row) loops within 3 s on both - printed, not a requirement of this model (R6 deviation 31: even K_att 1500 holds 2.7 s and costs the air band) 199ms
+ ✓ src/render/hero/gltfRider.test.ts (12 tests) 947ms
+   ✓ rider.glb runtime contact and pose invariants > samples idle without accumulating shoulder translations, including repeated timestamps and a cut  332ms
+stdout | src/physics/v2/r4.test.ts > R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > the assist is a neutral-lean safety, not a governor: it fades out by |lean| 0.5, so the Rookie still loops under gas at lean -0.5 (~0.8 s) and -1, loops slower at -0.25, and the R3 hop / wheelie hold / climb throw rows stand (r3.test.ts)
+FEEL launch.rookie.lean0 = max pitch 6.2 loop nan [<= 10 deg, no loop]
+FEEL launch.rookie.lean-0.25 = loop 2.02 s [info (R3: 1.10)]
+FEEL launch.rookie.lean-0.5 = loop 0.91 s [loops (R3: 0.82)]
+
+stdout | src/physics/feel.test.ts > seesaw (round 4, the compiled `seesaw` kind) > L6 h1.0: rides up the resting end (the 0.12 m board lip is a step, not a wall), the board does not move until the front passes the pivot, tips in 0.3-1.0 s (clips 16/17: ~0.5 s), rides off at 3/5/8 m/s
+SEESAW L6 h1.0 3m/s: OVER @7.6s - tip 0.48s limit 18 deg, reached -18, moved before the pivot 0.00 deg, lip 0.12 m park 0.0s
+SEESAW L6 h1.0 5m/s: OVER @4.7s - tip 0.53s limit 18 deg, reached -18, moved before the pivot 0.00 deg, lip 0.12 m park 0.0s
+SEESAW L6 h1.0 8m/s: OVER @3.2s - tip 0.56s limit 18 deg, reached -16, moved before the pivot 0.01 deg, lip 0.12 m park 0.0s
+
+ ❯ src/physics/v2/r4.test.ts (7 tests | 2 failed) 355ms
+   ✓ R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swing, not the throttle > throttle in the air is bounded by the wheel spin-up (<= 30 deg/s peak, 4-12 deg in 0.5 s) and brake in the air by the wheels' spin momentum (-30..-60 deg/s peak) on both classes 22ms
+   ✓ R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swing, not the throttle > a full pose swing in the air is the 200-400 deg/s step: releasing lean -1 to 0 kicks +230..260 deg/s within 0.07 s (43 deg/s per tick = F_max x the grip lever / I_chassis), pressing 0 to -1 dips the nose first (-140 deg/s) then K_att lifts it; genuine two-body dynamics, > 8x the throttle tap (raw: the Pro, and the Rookie with the R5 air limit off - r5.test.ts has the limited Rookie) 22ms
+   × R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swing, not the throttle > a rear touchdown pitched 20 deg above a 20 deg ramp passes sin(20) of the normal impulse rigidly through the slider: <= 60 deg/s per tick at 1-2 m/s of approach, gas on or off (genuine, a landing, not a solver spike) 71ms
+     → expected 62.963835983404806 to be less than or equal to 60
+   × R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > a 20 deg slope lowers the front-lift threshold from ~0.6 g to ~0.22 g: raw (either class with the ECU off; R6: the Pro carries the ground ECU too, so its raw row is the gain-0 override) full gas at lean 0 wheelies 40-55 deg over the slope and leaves a 6 m lip at 65-80 deg nose-up rotating 150+ deg/s; the R6 Pro (ECU on the ground) leaves the same lip <= 25 deg 93ms
+     → expected 26.210517809340296 to be less than or equal to 25
+   ✓ R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > Rookie (wheelie control on): the same ramp at lean 0 lifts <= 15 deg over the slope, leaves the lip <= 25 deg nose-up with the nose already coming down (rate <= 0) and no brake; the lean-forward technique (+1, assist faded out) gives the same picture with 1 m/s more lip speed 37ms
+   ✓ R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > the assist is a neutral-lean safety, not a governor: it fades out by |lean| 0.5, so the Rookie still loops under gas at lean -0.5 (~0.8 s) and -1, loops slower at -0.25, and the R3 hop / wheelie hold / climb throw rows stand (r3.test.ts) 90ms
+   ✓ R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > nothing remembered: a snapshot restored mid-ramp with the assist active replays hash-equal to the straight run 19ms
+ ✓ src/render/hero/gltfRiderAdditive.test.ts (3 tests) 304ms
+stdout | src/physics/v2/r2.test.ts > wheelie balance and hold (R2 decision b; §10) > open-loop divergence from the balance is 1-2 s (CONTRACT 2.5): parked at the coasting balance +2 deg with constant throttle 0.1, the pitch leaves the +-10 deg band in 1-2 s
+FEEL wheelie.openLoop.divergeS = 1.325 [1-2 s]
+
+ ✓ src/physics/snapshot.test.ts (3 tests) 1410ms
+   ✓ snapshot fidelity under search load (CONTRACT 2.3) > probe: rollouts + restore every 15 ticks never change the next tick, across brake, hop, seesaw, drum, crash, ragdoll and restart  749ms
+   ✓ snapshot fidelity under search load (CONTRACT 2.3) > foreign snapshot in between: run to k, restore a snapshot from another trajectory/world, restore k, step to N == straight run  392ms
+stdout | src/physics/v2/r2.test.ts > wheelie balance and hold (R2 decision b; §10) > a 60 Hz / 100 ms lean + throttle + rear-brake controller keeps the front wheel up ~10 s without looping (target 40 deg: the pitch rides 20-45 deg, mean ~31, 5.9 s inside +-8; the parent's 40 +- 8 for >= 10 s is NOT met - the 100 ms latency against the 0.3 s e-fold leaves a +-9 deg limit cycle and the mean throttle drifts the speed up)
+FEEL wheelie.hold60Hz100ms.frontUpS = 12.500 [>= 10 s of 12]
+FEEL wheelie.hold60Hz100ms.inBandS = 11.800 [>= 10 s within +-8 deg (parent; not met)]
+FEEL wheelie.hold60Hz100ms.meanPitchDeg = 39.983 [info]
+FEEL wheelie.hold60Hz100ms.firstFrontDownS = -1.000 [never (-1)]
+FEEL wheelie.hold60Hz100ms.vmax = 7.254 [info (the mean throttle drifts the speed up)]
+
+stdout | src/physics/v2/r3.test.ts > lab-physics-test hop per class (R3 decision 5) > the lip hop at 7 / 8 / 9 m/s: clears onto the ledge on both classes at 8-9; the margin over the ledge corner is printed (spec wants >= 0.1 m of clear air)
+FEEL lab.rookie.hop@7 = NOT cleared margin 0.69 apex 2.30 land -34 crash [cleared, margin >= 0.1]
+FEEL lab.rookie.hop@8 = cleared margin 0.26 apex 1.87 land -15  [cleared, margin >= 0.1]
+FEEL lab.rookie.hop@9 = cleared margin -0.08 apex 1.45 land -5  [cleared, margin >= 0.1]
+FEEL lab.pro.hop@7 = NOT cleared margin 0.66 apex 2.38 land -34 crash [cleared, margin >= 0.1]
+FEEL lab.pro.hop@8 = cleared margin 0.32 apex 1.75 land -21  [cleared, margin >= 0.1]
+FEEL lab.pro.hop@9 = cleared margin -0.13 apex 1.62 land -4  [cleared, margin >= 0.1]
+
+stdout | src/physics/feel.test.ts > seesaw (round 4, the compiled `seesaw` kind) > the curriculum boards (L6 h0.8 entry, L8 h1.2 entry, L6 h1.5 entry, L8 h2.0 bare, L5 h1.0 bare) all ride over at 5 m/s
+SEESAW L6 h0.8 entry 5m/s: OVER @4.6s - tip 0.43s limit 14 deg, reached -14, moved before the pivot 0.00 deg, lip 0.12 m park 0.0s
+SEESAW L8 h1.2 entry 5m/s: OVER @5.2s - tip 0.53s limit 17 deg, reached -17, moved before the pivot 0.00 deg, lip 0.12 m park 0.0s
+SEESAW L6 h1.5 entry 5m/s: OVER @5.0s - tip 0.73s limit 29 deg, reached -29, moved before the pivot 0.00 deg, lip 0.12 m park 0.0s
+SEESAW L8 h2 bare 5m/s: OVER @5.7s - tip 0.84s limit 29 deg, reached -29, moved before the pivot 0.00 deg, lip 0.12 m park 0.0s
+SEESAW L5 h1 bare 5m/s: OVER @4.5s - tip 0.58s limit 22 deg, reached -22, moved before the pivot 0.01 deg, lip 0.12 m park 0.0s
+
+ ✓ src/physics/feel.test.ts (36 tests) 1396ms
+stdout | src/physics/v2/r2.test.ts > landing absorption (R2 decision d; §9.5) > a 1.5 m flat drop at 6 m/s, level: the rear compresses >= 80 % and returns to sag, the rider sinks and comes back, no fault; a 3 m drop with the rider forward bottoms out with a bounded buck (no fault, rebound < 0.15 m, pitch within +-30); at lean 0 the 2 m drop pogos 0.2 m and 2.5-3 m loops (R3)
+FEEL land.1.5m.maxRearCompPct = 100.000 [>= 80]
+FEEL land.1.5m.maxFrontCompPct = 72.060 [info]
+FEEL land.1.5m.riderSink = 0.984 [info (crouch 0..1)]
+FEEL land.1.5m.settledCompPct = 32.075 [~29 (sag)]
+FEEL land.1.5m.pitchRange = 1.0..9.9 [info]
+FEEL land.3m.lean+0.5.maxRearCompPct = 85.855 [100 (bottoms)]
+FEEL land.3m.lean+0.5.reboundM = 0.000 [< 0.15 m]
+FEEL land.3m.lean+0.5.pitchRange = -30.1..7.6 [within +-30]
+FEEL land.3m.lean+0.5.result = rides away [no fault]
+FEEL land.3m.lean0.result = crash [info: loops (R3)]
+FEEL land.2m.lean0.reboundM = 0.000 [info: the rider-servo pogo (R3)]
+FEEL land.2m.lean0.result = rides away [no fault]
+
+ ✓ src/physics/dmath.test.ts (3 tests) 63ms
+stdout | src/physics/v2/world.test.ts > performance > riding: µs/tick p95 <= 10 over 20k ticks (node, §14.1)
+PERF riding us/tick p95 = 5.29 [<= 10]
+
+stdout | src/physics/v2/property.test.ts > bounded response (§14.1) > flat dirt: 200 reachable states x 6 one-quantum perturbations: per-tick |dv| <= 0.02 m/s, |dw| <= 0.05 rad/s; 30-tick divergence <= 10x
+PROP bounded flat dirt: n 920 (0 contact-onset ticks) per-tick dv 2.22e-3 dw 3.95e-2; 30-tick dv 0.0036 dw 0.0284
+
+ ✓ src/render/hero/brakeHose.test.ts (4 tests) 1575ms
+   ✓ bike.glb brake hose > keeps the decoded tube attached to the fixed guide and moving caliper over full fork travel  659ms
+   ✓ bike-lod.glb brake hose > keeps the decoded tube attached to the fixed guide and moving caliper over full fork travel  777ms
+ ✓ src/physics/v2/riderIntent.test.ts (6 tests) 225ms
+ ✓ src/render/hero/gltfLoading.test.ts (1 test) 2ms
+stdout | src/physics/v2/world.test.ts > performance > ragdolling: µs/tick p95 <= 80 (crash every 2.5 s)
+PERF ragdoll us/tick p95 = 11.25 [<= 80]
+
+ ✓ src/physics/v2/world.test.ts (15 tests) 1495ms
+   ✓ determinism (§14.1) > two fresh worlds hash identically tick for tick for 3000 ticks including the crash and the restart  393ms
+   ✓ determinism (§14.1) > restore(snapshot()) at 13 points then 400 ticks hash-equal to the straight run  392ms
+   ✓ performance > riding: µs/tick p95 <= 10 over 20k ticks (node, §14.1)  302ms
+stdout | src/physics/v2/r2.test.ts > climbs (R2 decision c: crawl <= 45 dropped to the 0.6 g truth; 50-60 with entry speed; 65+ needs a hop) > plank table, 4 m wood: crawl (2 m/s entry) and a 6 m/s entry with the rider forward - the crawl limit at a_peak 0.61 g is 35 deg (40 stalls half way), 6 m/s tops 40 and stalls 45 at 62 %; 50-60 are NOT made on 6 m/s (parent row c needs more entry speed or thrust); 55-65 stall at the base, no fault
+FEEL climb.table = 30deg@2m/s:TOP 30deg@6m/s:TOP 35deg@2m/s:TOP 35deg@6m/s:TOP 40deg@2m/s:stall 46% 40deg@6m/s:TOP 45deg@2m/s:FAULT 45deg@6m/s:FAULT 50deg@2m/s:stall 19% 50deg@6m/s:stall 25% 55deg@2m/s:stall 0% 55deg@6m/s:stall 0% 60deg@2m/s:stall 0% 60deg@6m/s:stall 0% 65deg@2m/s:stall 0% 65deg@6m/s:stall 0% [TOP / stall %]
+
+stdout | src/physics/v2/r3.test.ts > cost (R3 decision 7) > riding: <= 5 us/tick p95 over 20k ticks (node)
+FEEL cost.usPerTick.p50 = 4.719 [<= 5]
+FEEL cost.usPerTick.p95 = 40.796 [info: 2.7-3.0 alone; the full parallel suite pushes it past 5 on a shared host]
+
+ ❯ src/physics/v2/r3.test.ts (12 tests | 3 failed) 1596ms
+   × landing (R3 decision 1): the intent gate separates a landing recovery from the hop push > drops of 1.5 / 2 / 3 m at 6 and 12 m/s, lean 0 and +0.5, both classes: land and ride away, no fault, rebound < 0.15 m, pitch within -35..+35 (R2: 2 m at lean 0 rebounded 0.6 m, 2.5-3 m looped) 52ms
+     → rookie 3 m @ 6 lean 0: expected 'crash' to be null
+   × landing (R3 decision 1): the intent gate separates a landing recovery from the hop push > the gate is the difference: with the closing cap off (R2) the 2 m drop at lean 0 pogos > 0.4 m and 3 m loops; with it on the hop keeps >= 97 % of its apex (the snap moves the target, the landing does not) 15ms
+     → expected 'crash' to be null
+   ✓ landing (R3 decision 1): the intent gate separates a landing recovery from the hop push > snapshot round-trip through a landing: restore at the touchdown tick, then 240 ticks hash-equal to the straight run (the intent slot is in F) 13ms
+   ✓ classes as parameter rows (R3 decision 2): rookie forgiving, pro raw > rookie: full gas at lean 0 lifts <= 10 deg and never loops (loop-out needs a lean back: -0.25 loops in ~1.1 s, -0.5 in ~0.8 s; the parent asked -0.5 or harder: the critical lean sits between 0 and -0.25 on this table, see physics.md); 0 -> 16 <= 4.2 s; top 20 58ms
+   ✓ classes as parameter rows (R3 decision 2): rookie forgiving, pro raw > pro (R6): full gas at lean 0 from a standstill lifts hard (25-40 deg) and rides the power wheelie down without looping (R3-R5 looped in 0.95 s: harness r11 lost every Pro first attempt at 4 m), +0.25 / +0.5 / +1 do not loop, lean -0.25 / -0.5 / -1 loop in < 1.5 s (the lean fade: leaning back is the rider taking over); 0 -> 16 < rookie at +0.5; top 21  321ms
+   ✓ classes as parameter rows (R3 decision 2): rookie forgiving, pro raw > both classes: coasting balance by lean, air control in 0.5 s at 8 m/s (rookie in the 25-40 band; pro has less attitude assist, K_att 260), open-loop divergence 1-2 s 39ms
+   ✓ hop matrix per class (R3): the intent gate keeps R2's hop > reference hop >= 0.45 m, front leaves first, lands within +-20 on both classes; matrix preload -0.25..-1 x snap 4 / 8 / 16 / one-tick 271ms
+   × climbs with the Trials technique (R3 decision 3) > rookie tops a 4 m 45 deg plank from a crawl (2 m/s) and at 5 m/s: front rolls onto the face at neutral, gas, then the weight is thrown to +1; 50 deg needs 6 m/s; pro table printed (its momentum rows 55-60 are not made by this controller: the base transition at 6-10 m/s, not the geometry, is where it fails) 354ms
+     → expected false to be true // Object.is equality
+   ✓ climbs with the Trials technique (R3 decision 3) > the constant-speed climb limit is geometry, atan(d/h) at lean +1 (the front load on a slope is d cos - h sin): 37 deg on this table; steeper is a momentum climb 2ms
+   ✓ wheelie hold with anticipation (R3 decision 4) > a 60 Hz / 100 ms controller that leads the pitch by 0.25 s (pitch + rate x horizon) holds 40 +- 8 deg for >= 10 s of 12 on both classes without looping; the R2 PD on the current pitch loops against the Rookie's 0.15 s throttle 57ms
+   ✓ lab-physics-test hop per class (R3 decision 5) > the lip hop at 7 / 8 / 9 m/s: clears onto the ledge on both classes at 8-9; the margin over the ledge corner is printed (spec wants >= 0.1 m of clear air) 142ms
+   ✓ cost (R3 decision 7) > riding: <= 5 us/tick p95 over 20k ticks (node) 270ms
+ ✓ src/physics/v2/snapshot.test.ts (3 tests) 1601ms
+   ✓ snapshot fidelity under search load (CONTRACT 2.3) > probe: rollouts + restore every 15 ticks never change the next tick, across brake, hop, seesaw, drum, crash, ragdoll and restart  959ms
+   ✓ snapshot fidelity under search load (CONTRACT 2.3) > foreign snapshot in between: run to k, restore a snapshot from another trajectory/world, restore k, step to N == straight run  464ms
+ ✓ src/render/hero/gltfRiderMaterials.test.ts (4 tests) 6ms
+stdout | src/physics/v2/r2.test.ts > kickers (R2 decision e) > curriculum kickers 17-22 deg, 1 m tall, at 8 / 11 / 14 m/s, lean +0.25 on the ground: with the lean HELD in the air the bike nose-dives (K_att -75 N m for 1-2 s of flight: -25 at 11 m/s, -50..-80 and a crash at 14 - the parent row as stated fights the declared air control); with the lean released to 0 in the air every 8 / 11 m/s row lands within +-20 deg of flat with no fault (14 m/s is a 1.7 s flight and needs air control)
+FEEL kicker.leanHeld.table = 17deg@8: launch 10 land -19 air 0.65s | 17deg@11: launch 20 land 20 air 0.88s | 17deg@14: launch 21 land -59 air 1.26s | 20deg@8: launch 19 land -24 air 0.79s | 20deg@11: launch 23 land -42 air 1.08s | 20deg@14: launch 24 land -71 air 1.21s FAULT | 22deg@8: launch 23 land -24 air 0.83s | 22deg@11: launch 25 land -52 air 1.07s | 22deg@14: launch 26 land -71 air 1.23s FAULT [info]
+FEEL kicker.leanHeld.worstLandPitchDeg = 58.859 [info]
+FEEL kicker.leanHeld.faults = 2.000 [info]
+FEEL kicker.leanReleased.table = 17deg@8: launch 10 land -8 air 0.58s | 17deg@11: launch 20 land 19 air 0.92s | 20deg@8: launch 19 land -5 air 0.75s | 20deg@11: launch 23 land -7 air 1.05s | 22deg@8: launch 23 land -1 air 0.82s | 22deg@11: launch 25 land -13 air 1.07s [landing pitch within +-20 of flat, no fault]
+FEEL kicker.leanReleased.worstLandPitchDeg = 19.193 [<= 20]
+FEEL kicker.leanReleased.faults = 0.000 [0]
+FEEL kicker.leanReleased@14.table = 17deg@14: launch 21 land -14 air 1.14s | 20deg@14: launch 24 land -19 air 1.22s | 22deg@14: launch 26 land -17 air 1.23s [info]
+
+stdout | src/physics/v2/r2.test.ts > lab-physics-test (§15) > a correct hop at 8-9 m/s gets onto the ledge (+0.4 m across the 3 m pit) and rides on - the rear meets the ledge corner and rolls over it (the >= 0.1 m clear-air margin is not met, see the comment); rolling it off at the same speed puts the front wheel into the ledge face and endos (§15 called the miss survivable; it is not on this plant - a crash, never a clear)
+FEEL lab.hop@8.cleared = 1.000 [1]
+FEEL lab.hop@8.marginM = 0.356 [>= 0.1]
+FEEL lab.hop@8.apexM = 1.865 [info (rear centre above the run-up)]
+FEEL lab.hop@8.airS = 0.342 [info]
+FEEL lab.hop@8.landPitchDeg = -15.038 [info]
+FEEL lab.roll@8.result = crash [not cleared (§15 said no fault; measured: endo on the face)]
+FEEL lab.hop@9.cleared = 1.000 [1]
+FEEL lab.hop@9.marginM = 0.024 [>= 0.1]
+FEEL lab.hop@9.apexM = 1.446 [info (rear centre above the run-up)]
+FEEL lab.hop@9.airS = 0.192 [info]
+FEEL lab.hop@9.landPitchDeg = -4.756 [info]
+FEEL lab.roll@9.result = crash [not cleared (§15 said no fault; measured: endo on the face)]
+
+ ❯ src/physics/v2/r2.test.ts (13 tests | 1 failed) 1745ms
+   × the hop (R2 decision d; §9.5, §14.2, §14.3) > reference flat hop from a standing start (0.3 s preload, full-travel snap held 0.22 s, 0.1 s tuck): rear apex 0.45-0.65 m, front leaves first, lands near level; both-wheels-off is 0.29 s against the 0.35-0.6 band (the front lands first: the bike noses down through the flight, see physics.md) 29ms
+     → expected 0.13333333333333333 to be greater than or equal to 0.15
+   ✓ the hop (R2 decision d; §9.5, §14.2, §14.3) > the third lean-back (tuck) lifts the rear a further ~0.1 m; throttle through the snap changes the apex continuously (and slightly down: the rear spins and the nose rises) 46ms
+   ✓ the hop (R2 decision d; §9.5, §14.2, §14.3) > preload time: the apex rises with the preload up to the maximum rear load (~0.4 s) and falls past it ("release when the load is at its maximum") 84ms
+   ✓ the hop (R2 decision d; §9.5, §14.2, §14.3) > monotone in preload depth (lean -0.25 / -0.5 / -0.75 / -1 at a fixed 0.3 s) at snap rates >= 8 units/s and in snap speed (4 / 8 / 16 lean units per s) at every depth, no crash anywhere; the one-tick snap is within 10 % of the fastest ramp (a 4 units/s snap is no hop: 0.07-0.28 m) 166ms
+   ✓ the hop (R2 decision d; §9.5, §14.2, §14.3) > continuous: one preload-lean quantum changes the apex by < 3 cm; a 1-tick-late snap loses <= 15 %; identical on dirt / wood / metal / concrete  837ms
+   ✓ the hop (R2 decision d; §9.5, §14.2, §14.3) > seated (no preload): a snap from neutral pops the rear ~0.2 m off the front wheel with both wheels off for only ~0.04 s - a pivot, not a hop (parent asked rear <= 0.1 m: not met, the rear-apex metric counts the nose-down pivot) 5ms
+   ✓ wheelie balance and hold (R2 decision b; §10) > the coasting balance pitch is about the rear AXLE with the attitude torque in the moment balance: ~50 deg at lean 0 on the mid row, monotone in lean, spanning ~27 deg (lean -1) to ~69 deg (lean +1); the front lifts at lean 0 only above a/g = d/h = 0.64 3ms
+   ✓ wheelie balance and hold (R2 decision b; §10) > open-loop divergence from the balance is 1-2 s (CONTRACT 2.5): parked at the coasting balance +2 deg with constant throttle 0.1, the pitch leaves the +-10 deg band in 1-2 s 134ms
+   ✓ wheelie balance and hold (R2 decision b; §10) > a 60 Hz / 100 ms lean + throttle + rear-brake controller keeps the front wheel up ~10 s without looping (target 40 deg: the pitch rides 20-45 deg, mean ~31, 5.9 s inside +-8; the parent's 40 +- 8 for >= 10 s is NOT met - the 100 ms latency against the 0.3 s e-fold leaves a +-9 deg limit cycle and the mean throttle drifts the speed up) 17ms
+   ✓ landing absorption (R2 decision d; §9.5) > a 1.5 m flat drop at 6 m/s, level: the rear compresses >= 80 % and returns to sag, the rider sinks and comes back, no fault; a 3 m drop with the rider forward bottoms out with a bounded buck (no fault, rebound < 0.15 m, pitch within +-30); at lean 0 the 2 m drop pogos 0.2 m and 2.5-3 m loops (R3) 24ms
+   ✓ climbs (R2 decision c: crawl <= 45 dropped to the 0.6 g truth; 50-60 with entry speed; 65+ needs a hop) > plank table, 4 m wood: crawl (2 m/s entry) and a 6 m/s entry with the rider forward - the crawl limit at a_peak 0.61 g is 35 deg (40 stalls half way), 6 m/s tops 40 and stalls 45 at 62 %; 50-60 are NOT made on 6 m/s (parent row c needs more entry speed or thrust); 55-65 stall at the base, no fault 239ms
+   ✓ kickers (R2 decision e) > curriculum kickers 17-22 deg, 1 m tall, at 8 / 11 / 14 m/s, lean +0.25 on the ground: with the lean HELD in the air the bike nose-dives (K_att -75 N m for 1-2 s of flight: -25 at 11 m/s, -50..-80 and a crash at 14 - the parent row as stated fights the declared air control); with the lean released to 0 in the air every 8 / 11 m/s row lands within +-20 deg of flat with no fault (14 m/s is a 1.7 s flight and needs air control) 114ms
+   ✓ lab-physics-test (§15) > a correct hop at 8-9 m/s gets onto the ledge (+0.4 m across the 3 m pit) and rides on - the rear meets the ledge corner and rolls over it (the >= 0.1 m clear-air margin is not met, see the comment); rolling it off at the same speed puts the front wheel into the ledge face and endos (§15 called the miss survivable; it is not on this plant - a crash, never a clear) 46ms
+stdout | src/physics/v2/property.test.ts > bounded response (§14.1) > 30 deg kicker: 200 reachable states x 6 one-quantum perturbations: per-tick |dv| <= 0.02 m/s, |dw| <= 0.05 rad/s; 30-tick divergence <= 10x
+PROP bounded 30 deg kicker: n 913 (0 contact-onset ticks) per-tick dv 2.23e-3 dw 4.45e-1; 30-tick dv 0.1101 dw 0.0624
+
+stdout | src/physics/v2/property.test.ts > bounded response (§14.1) > 60 deg plank: 200 reachable states x 6 one-quantum perturbations: per-tick |dv| <= 0.02 m/s, |dw| <= 0.05 rad/s; 30-tick divergence <= 10x
+PROP bounded 60 deg plank: n 907 (0 contact-onset ticks) per-tick dv 3.56e-3 dw 3.91e-2; 30-tick dv 0.0074 dw 0.0224
+
+stdout | src/physics/v2/property.test.ts > monotone responses (§14.1) > throttle -> acceleration is non-decreasing at every speed 0-19 m/s, both wheels down (lean +0.5)
+PROP monotone throttle: worst neighbour step 0.0000 m/s2 (>= -0.01)
+
+stdout | src/physics/v2/property.test.ts > monotone responses (§14.1) > lean -> equilibrium pitch (max over 0.5-4 s from rest, past the pose transient) is non-increasing in lean at throttle 0.4 / 0.7 / 1.0 (A§2.7 P6)
+PROP monotone lean thr 0.4: max pitch by lean +1..-1 = 5.6 4.9 4.1 3.5 4.0 4.9 5.8 10.1 180.0
+PROP monotone lean thr 0.7: max pitch by lean +1..-1 = 5.7 4.9 4.7 5.1 5.4 6.0 7.7 180.0 180.0
+PROP monotone lean thr 1: max pitch by lean +1..-1 = 5.8 5.6 5.8 5.9 6.2 180.0 180.0 180.0 180.0
+
+stdout | src/physics/v2/property.test.ts > conservation (§14.1) > free flight, K_att 0, no drag: every velocity-level force is a pair - angular momentum of C+Wr+Wf+R about the system COM is constant to 1e-6 under a lean and throttle sequence (position pass off)
+PROP conservation (velocity pass only): L0 -15.7189 N m s, max |dL| 5.15e-13
+
+stdout | src/physics/v2/property.test.ts > conservation (§14.1) > with the split-impulse position pass on, the slider projections leak <= 2e-3 N m s over 1 s (a geometric projection, not a force; documented in physics.md)
+PROP conservation (with position pass): L0 -15.7190 N m s, max |dL| 1.64e-2
+
+stdout | src/physics/v2/property.test.ts > stability of the accelerating bike with weight forward (§10) > at 6 m/s, full throttle, lean +0.5: a +6 deg / +0.5 rad/s pitch perturbation decays back toward the riding equilibrium within 1.5 s, no loop
+PROP stability: dpitch 0.25/0.5/1.0/1.5/2.0 s = 2.5 / 5.4 / 4.8 / 3.9 / 3.5 deg, peak 10.4
+
+stdout | src/physics/v2/property.test.ts > stability of the accelerating bike with weight forward (§10) > the pitch-alone linearisation is unstable (e-fold ~0.3 s) but the lean input has authority over it: the static balance pitch rises monotonically with lean and spans >= 7 deg
+PROP balance pitch by lean -1..+1 = 26.2 40.3 51.3 60.6 69.0 deg
+
+ ✓ src/render/hero/gltfBike.test.ts (16 tests) 2191ms
+   ✓ bike.glb articulated geometry > preserves wheel world angles, fixed fork alignment, and shock roll through a production replay  1503ms
+   ✓ bike-lod.glb articulated geometry > preserves wheel world angles, fixed fork alignment, and shock roll through a production replay  571ms
+stdout | src/physics/v2/property.test.ts > learnable (§14.3) > proportional failure: the reference hop delayed by 1/2/4/8 ticks degrades smoothly, never to a crash
+LEARN hop apex ref 0.472 m; delayed 1/2/4/8 ticks 0.472 0.472 0.472 0.472
+
+stdout | src/physics/v2/property.test.ts > learnable (§14.3) > R2: the snap at half the target rate (2.5 of 5 m/s) keeps most of the apex, at 1.5 m/s (the spec's "half") a third: the body, not the target, is the limit at F_max 3200 (spec band 55-75 % at half rate; the slow snap is the learnable failure, continuous, never a crash)
+LEARN half-rate snap 0.268 of 0.472 m (57 %) [55-75 %]; 1.5 m/s 0.093 (20 %)
+
+ ✓ src/render/hero/gltfRiderPhysical.test.ts (36 tests) 2311ms
+   ✓ rider-openface.glb physical pose > rookie follows actual production Game playback through the E2 impact window  556ms
+stdout | src/physics/v2/property.test.ts > learnable (§14.3) > no knife edge in the input space: preload lean -1..-0.3 and throttle 0.2..0.6 swept in quanta give a continuous apex (neighbour jump <= 0.03 m)
+LEARN knife edge: lean sweep (every 2 quanta) 0.472 0.488 0.467 0.440 0.417 0.397 0.380 0.363 0.341 0.317 0.294 0.270; throttle sweep 0.486 0.492 0.499 0.504 0.493 0.485 0.476 0.467 0.465 0.481 0.475 0.474 0.469; max neighbour jump 0.0124 m
+
+stdout | src/physics/v2/property.test.ts > learnable (§14.3) > same move, same result on any surface: the reference hop apex on dirt / wood / concrete within 5 %
+LEARN surfaces: dirt / wood / concrete apex 0.472 / 0.472 / 0.472 m
+
+ ❯ src/physics/v2/property.test.ts (14 tests | 1 failed) 2764ms
+   ✓ bounded response (§14.1) > flat dirt: 200 reachable states x 6 one-quantum perturbations: per-tick |dv| <= 0.02 m/s, |dw| <= 0.05 rad/s; 30-tick divergence <= 10x  1420ms
+   × bounded response (§14.1) > 30 deg kicker: 200 reachable states x 6 one-quantum perturbations: per-tick |dv| <= 0.02 m/s, |dw| <= 0.05 rad/s; 30-tick divergence <= 10x 476ms
+     → expected 0.44510234403874094 to be less than or equal to 0.09
+   ✓ bounded response (§14.1) > 60 deg plank: 200 reachable states x 6 one-quantum perturbations: per-tick |dv| <= 0.02 m/s, |dw| <= 0.05 rad/s; 30-tick divergence <= 10x  359ms
+   ✓ monotone responses (§14.1) > throttle -> acceleration is non-decreasing at every speed 0-19 m/s, both wheels down (lean +0.5) 111ms
+   ✓ monotone responses (§14.1) > lean -> equilibrium pitch (max over 0.5-4 s from rest, past the pose transient) is non-increasing in lean at throttle 0.4 / 0.7 / 1.0 (A§2.7 P6) 101ms
+   ✓ conservation (§14.1) > free flight, K_att 0, no drag: every velocity-level force is a pair - angular momentum of C+Wr+Wf+R about the system COM is constant to 1e-6 under a lean and throttle sequence (position pass off) 6ms
+   ✓ conservation (§14.1) > with the split-impulse position pass on, the slider projections leak <= 2e-3 N m s over 1 s (a geometric projection, not a force; documented in physics.md) 5ms
+   ✓ stability of the accelerating bike with weight forward (§10) > at 6 m/s, full throttle, lean +0.5: a +6 deg / +0.5 rad/s pitch perturbation decays back toward the riding equilibrium within 1.5 s, no loop 5ms
+   ✓ stability of the accelerating bike with weight forward (§10) > the pitch-alone linearisation is unstable (e-fold ~0.3 s) but the lean input has authority over it: the static balance pitch rises monotonically with lean and spans >= 7 deg 1ms
+   ✓ learnable (§14.3) > same input -> identical trajectory (hash), including after loadTrack of the same track in a used world 40ms
+   ✓ learnable (§14.3) > proportional failure: the reference hop delayed by 1/2/4/8 ticks degrades smoothly, never to a crash 18ms
+   ✓ learnable (§14.3) > R2: the snap at half the target rate (2.5 of 5 m/s) keeps most of the apex, at 1.5 m/s (the spec's "half") a third: the body, not the target, is the limit at F_max 3200 (spec band 55-75 % at half rate; the slow snap is the learnable failure, continuous, never a crash) 14ms
+   ✓ learnable (§14.3) > no knife edge in the input space: preload lean -1..-0.3 and throttle 0.2..0.6 swept in quanta give a continuous apex (neighbour jump <= 0.03 m) 200ms
+   ✓ learnable (§14.3) > same move, same result on any surface: the reference hop apex on dirt / wood / concrete within 5 % 6ms
+stdout | src/physics/v2/r7.test.ts > R7: the rider body is held, exported and deterministic (every bot golden, both classes) > pose band: rotation within 0.35 rad on >= 94 % of riding ticks per golden; recovery band |COM - target| <= 0.15 m and |psi err| <= 0.35 rad on EVERY riding tick >= 120 ticks after the last over-demand tick (> F_max / m_R over 6 ticks); no COM excursion > 0.35 m longer than 180 ticks; no coasting push (>= 60 unchanged input ticks)
+R7 band: 48 goldens, 129035 riding ticks; over-demand 34008 (26.4 %); outside psi 13357 (10.351 %), outside COM 4199 (3.254 %); recovered ticks 8206 (6.4 %) outside 27, max COM 0.115 m psi 0.362 rad; excursions > 0.35 m: 33, longest m1-hop-up/bot-3-pro.json 0.32 s @848, p2-canyon-run/bot-3-pro.json 0.17 s @905, m3-see-saw/bot-3-pro.json 0.16 s @2404; worst COM 6: x3-gauntlet/bot-3.json psi 0.73 com 0.37 out 337/228 of 3478 @4136 | gap-test/bot-3-pro.json psi 0.53 com 0.46 out 56/43 of 656 @626 | m1-hop-up/bot-3.json psi 1.00 com 0.57 out 356/164 of 2834 @3569 | p3-snow-line/bot-3.json psi 0.68 com 0.37 out 172/161 of 2799 @3146 | h3-fire-line/bot-3-pro.json psi 0.82 com 0.44 out 413/200 of 3580 @3534 | m1-hop-up/bot-3-pro.json psi 1.07 com 0.59 out 400/139 of 2628 @879
+
+ ❯ src/physics/v2/r7.test.ts (3 tests | 2 failed) 3001ms
+   ✓ R7: the rider body is held, exported and deterministic (every bot golden, both classes) > lists goldens for both classes 1ms
+   × R7: the rider body is held, exported and deterministic (every bot golden, both classes) > pose band: rotation within 0.35 rad on >= 94 % of riding ticks per golden; recovery band |COM - target| <= 0.15 m and |psi err| <= 0.35 rad on EVERY riding tick >= 120 ticks after the last over-demand tick (> F_max / m_R over 6 ticks); no COM excursion > 0.35 m longer than 180 ticks; no coasting push (>= 60 unchanged input ticks) 2859ms
+     → b1-first-ride/bot-3.json finishes: expected false to be true // Object.is equality
+   × R7: the rider body is held, exported and deterministic (every bot golden, both classes) > the exported body hashes identically across two replays (b1 Rookie + Pro, e2 Rookie + Pro) 141ms
+     → b1-first-ride/bot-3.json finishes: expected false to be true // Object.is equality
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/physics/v2/feel.test.ts > launch, top speed, the lean ladder (§7, §10, §14.2) > snap-forward corrects a rising front: from a 20 deg wheelie with the throttle HELD the snap to +1 brings the pitch below 15 deg within 0.5 s and never loops; from 30 deg it needs the throttle closed with the snap (spec asked for 30 deg with the throttle held - not reachable: at 30 deg nose-up every pose has d/h(theta) < a/g); from 40 deg nothing saves it
+AssertionError: expected 13.725943066287861 to be greater than 30
+ ❯ src/physics/v2/feel.test.ts:178:25
+    176|     // R3: 24.6 deg at 0.5 s (R2: 3.2). The Rookie's 0.15 s throttle n…
+    177|     // low-speed knot 1.07 pushes the nose harder through the correcti…
+    178|     expect(held20.at05).toBeGreaterThan(30); // R7: 44.6 (was 24.6) - …
+       |                         ^
+    179|     expect(cut30.loop).toBe(false);
+    180|     // R3: 24.6 at 0.5 s (R2: 0.0): the Rookie's 0.15 s throttle lag k…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  src/physics/v2/feel.test.ts > air control (§9.4, §14.2) > 0.5 s at 8 / 14 / 20 m/s: lean -1 +25..+40, lean +1 -25..-40, throttle +8..+15 at 8 m/s falling to ~0 at the limiter, brake -12..-40 rising with speed, none within +-5
+AssertionError: expected 43.64207287277802 to be less than or equal to 40
+ ❯ src/physics/v2/feel.test.ts:255:20
+    253|       expect(Math.abs(none)).toBeLessThanOrEqual(5);
+    254|       expect(back).toBeGreaterThanOrEqual(25);
+    255|       expect(back).toBeLessThanOrEqual(40);
+       |                    ^
+    256|       expect(fwd).toBeLessThanOrEqual(-25);
+    257|       expect(fwd).toBeGreaterThanOrEqual(-40);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  src/physics/v2/property.test.ts > bounded response (§14.1) > 30 deg kicker: 200 reachable states x 6 one-quantum perturbations: per-tick |dv| <= 0.02 m/s, |dw| <= 0.05 rad/s; 30-tick divergence <= 10x
+AssertionError: expected 0.44510234403874094 to be less than or equal to 0.09
+ ❯ src/physics/v2/property.test.ts:128:21
+    126|       // R7: the pair acts on the chassis as if at the rider COM, 0.62…
+    127|       // pegs): 180 N x 0.62 / 11 kg m^2 x dt = 0.084 rad/s per tick (…
+    128|       expect(maxDw).toBeLessThanOrEqual(0.09);
+       |                     ^
+    129|       expect(maxDv30).toBeLessThanOrEqual(0.2);
+    130|       expect(maxDw30).toBeLessThanOrEqual(0.5);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  src/physics/v2/r2.test.ts > the hop (R2 decision d; §9.5, §14.2, §14.3) > reference flat hop from a standing start (0.3 s preload, full-travel snap held 0.22 s, 0.1 s tuck): rear apex 0.45-0.65 m, front leaves first, lands near level; both-wheels-off is 0.29 s against the 0.35-0.6 band (the front lands first: the bike noses down through the flight, see physics.md)
+AssertionError: expected 0.13333333333333333 to be greater than or equal to 0.15
+ ❯ src/physics/v2/r2.test.ts:130:23
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  src/physics/v2/r3.test.ts > landing (R3 decision 1): the intent gate separates a landing recovery from the hop push > drops of 1.5 / 2 / 3 m at 6 and 12 m/s, lean 0 and +0.5, both classes: land and ride away, no fault, rebound < 0.15 m, pitch within -35..+35 (R2: 2 m at lean 0 rebounded 0.6 m, 2.5-3 m looped)
+AssertionError: rookie 3 m @ 6 lean 0: expected 'crash' to be null
+
+- Expected: 
+null
+
++ Received: 
+"crash"
+
+ ❯ src/physics/v2/r3.test.ts:241:64
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  src/physics/v2/r3.test.ts > landing (R3 decision 1): the intent gate separates a landing recovery from the hop push > the gate is the difference: with the closing cap off (R2) the 2 m drop at lean 0 pogos > 0.4 m and 3 m loops; with it on the hop keeps >= 97 % of its apex (the snap moves the target, the landing does not)
+AssertionError: expected 'crash' to be null
+
+- Expected: 
+null
+
++ Received: 
+"crash"
+
+ ❯ src/physics/v2/r3.test.ts:259:24
+    257|     // R7 coasting-push row); the control arm is re-derived
+    258|     expect(off2.rebound).toBeGreaterThan(0.2);
+    259|     expect(off3.fault).toBeNull();
+       |                        ^
+    260|     const on = hop('rookie').apexR;
+    261|     const off = hop('rookie', {}, CAP_OFF).apexR;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  src/physics/v2/r3.test.ts > climbs with the Trials technique (R3 decision 3) > rookie tops a 4 m 45 deg plank from a crawl (2 m/s) and at 5 m/s: front rolls onto the face at neutral, gas, then the weight is thrown to +1; 50 deg needs 6 m/s; pro table printed (its momentum rows 55-60 are not made by this controller: the base transition at 6-10 m/s, not the geometry, is where it fails)
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/physics/v2/r3.test.ts:439:42
+    437|     // crawl rows are pinned; 45@5 / 50@5-6 are printed (R3 measured 7…
+    438|     expect(table['rookie.40@2']!.topped).toBe(true);
+    439|     expect(table['rookie.45@2']!.topped).toBe(true);
+       |                                          ^
+    440|   });
+    441| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  src/physics/v2/r4.test.ts > R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swing, not the throttle > a rear touchdown pitched 20 deg above a 20 deg ramp passes sin(20) of the normal impulse rigidly through the slider: <= 60 deg/s per tick at 1-2 m/s of approach, gas on or off (genuine, a landing, not a solver spike)
+AssertionError: expected 62.963835983404806 to be less than or equal to 60
+ ❯ src/physics/v2/r4.test.ts:149:38
+    147|         const r = touchdown(cls, vn, thr);
+    148|         feel(`touchdown.${cls}.vn${vn}.thr${thr}`, `step ${f(r.peakSte…
+    149|         expect(Math.abs(r.peakStep)).toBeLessThanOrEqual(60);
+       |                                      ^
+    150|       }
+    151|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+ FAIL  src/physics/v2/r4.test.ts > R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas > a 20 deg slope lowers the front-lift threshold from ~0.6 g to ~0.22 g: raw (either class with the ECU off; R6: the Pro carries the ground ECU too, so its raw row is the gain-0 override) full gas at lean 0 wheelies 40-55 deg over the slope and leaves a 6 m lip at 65-80 deg nose-up rotating 150+ deg/s; the R6 Pro (ECU on the ground) leaves the same lip <= 25 deg
+AssertionError: expected 26.210517809340296 to be less than or equal to 25
+ ❯ src/physics/v2/r4.test.ts:168:28
+    166|     expect(pro.assistMax).toBe(0);
+    167|     expect(raw.assistMax).toBe(0);
+    168|     expect(proR6.lipPitch).toBeLessThanOrEqual(25);
+       |                            ^
+    169|     expect(proR6.assistMax).toBeGreaterThan(0.5);
+    170|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+
+ FAIL  src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > Rookie, free air at 10 m/s: releasing lean -1 -> 0 kicks <= 120 deg/s (R4: +245) in steps <= 15 deg/s per tick (R4: 43); with gas on top <= 125; the limit reads 1 on the HUD. The held-lean rows are K_att's and move little (0 -> -1: rate at 0.5 s 171 -> ~153, angle 33 -> ~31)
+AssertionError: expected 165.55903982896098 to be less than 160.38202973547783
+ ❯ src/physics/v2/r5.test.ts:137:26
+    135|     expect(rel.limMin).toBeGreaterThan(0.99);
+    136|     // the held rows: bounded by K_att, the limit takes ~10 % off
+    137|     expect(press.rate05).toBeLessThan(pressRaw.rate05);
+       |                          ^
+    138|     expect(press.rate05).toBeGreaterThan(130);
+    139|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+
+ FAIL  src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > grounded rows hold: the reference hop (snap ramping past take-off) and the landing table are identical with the limit on and off (the intent gate carries a ground-started throw through the air; a still target at landing keeps the R3 cap)
+AssertionError: expected 0.2490019489490835 to be greater than or equal to 0.38
+ ❯ src/physics/v2/r5.test.ts:167:18
+    165|       feel(`r5.hop.${preLean}@${rate}.on/off`, `${f(on, 3)} / ${f(off,…
+    166|       expect(on).toBeCloseTo(off, 2); // R7: 0.6083 vs 0.6078 (the int…
+    167|       expect(on).toBeGreaterThanOrEqual(0.38);
+       |                  ^
+    168|     }
+    169|     for (const [h, v, lean] of [[1.5, 6, 0], [2, 12, 0], [3, 6, 0.5]] …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+
+ FAIL  src/physics/v2/r5.test.ts > R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not > cost: a limited flight and its landing tick at <= 5 us/tick p50 (node, shared host)
+AssertionError: expected 5.250000000160071 to be less than or equal to 5
+ ❯ src/physics/v2/r5.test.ts:275:17
+    273|     const p50 = times[Math.floor(times.length * 0.5)]!;
+    274|     feel('r5.cost.usPerTick.p50', p50, '<= 5');
+    275|     expect(p50).toBeLessThanOrEqual(5);
+       |                 ^
+    276|   });
+    277| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/15]⎯
+
+ FAIL  src/physics/v2/r6.test.ts > R6: the air-sign table per class (harness r11: "Pro in-air lean reads inverted on its first slot") > held lean has the documented sign on both classes (-1 nose-up +25..+40 in 0.5 s, +1 nose-down), K_att does not flip (attTorque -K x lean); the Pro's FIRST 0.1 s is inverted by the raw pose swing (-1 dips -10 deg before K_att lifts it; the Rookie's R5 air limit makes it -0.1): the strangers' reading is the swing, not a sign bug
+AssertionError: expected 42.20403437376927 to be less than or equal to 40
+ ❯ src/physics/v2/r6.test.ts:183:25
+    181|       feel(`air.${cls}.tap125ms-1`, `${f(b125.at05, 1)} / ${f(b125.at1…
+    182|       expect(back.at50).toBeGreaterThanOrEqual(25);
+    183|       expect(back.at50).toBeLessThanOrEqual(40);
+       |                         ^
+    184|       expect(fwd.at50).toBeLessThanOrEqual(-25);
+    185|       expect(fwd.at50).toBeGreaterThanOrEqual(-40);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/15]⎯
+
+ FAIL  src/physics/v2/r7.test.ts > R7: the rider body is held, exported and deterministic (every bot golden, both classes) > pose band: rotation within 0.35 rad on >= 94 % of riding ticks per golden; recovery band |COM - target| <= 0.15 m and |psi err| <= 0.35 rad on EVERY riding tick >= 120 ticks after the last over-demand tick (> F_max / m_R over 6 ticks); no COM excursion > 0.35 m longer than 180 ticks; no coasting push (>= 60 unchanged input ticks)
+AssertionError: b1-first-ride/bot-3.json finishes: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/physics/v2/r7.test.ts:251:50
+    249|       );
+    250|       for (const r of rows) {
+    251|         expect(r.finished, `${r.file} finishes`).toBe(true);
+       |                                                  ^
+    252|         expect(r.coastingPush, `${r.file} push on a coasting bike`).to…
+    253|         // the wind-up is gone (before R7 the E2 Rookie body was outsi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/15]⎯
+
+ FAIL  src/physics/v2/r7.test.ts > R7: the rider body is held, exported and deterministic (every bot golden, both classes) > the exported body hashes identically across two replays (b1 Rookie + Pro, e2 Rookie + Pro)
+AssertionError: b1-first-ride/bot-3.json finishes: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/physics/v2/r7.test.ts:280:49
+    278|       expect(r1.ticks).toBe(r2.ticks);
+    279|       expect(h1).toEqual(h2);
+    280|       expect(r1.finished, `${g.file} finishes`).toBe(true);
+       |                                                 ^
+    281|     }
+    282|   }, 60_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/15]⎯
+
+
+ Test Files  8 failed | 15 passed (23)
+      Tests  15 failed | 227 passed (242)
+   Start at  20:59:53
+   Duration  3.94s (transform 2.02s, setup 0ms, collect 7.29s, tests 27.48s, environment 2ms, prepare 2.17s)
+

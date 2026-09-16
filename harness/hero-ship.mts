@@ -60,11 +60,11 @@ await new Promise<void>((resolve, reject) => { server.once('error', reject); ser
 const url = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
 const args = backend === 'webkit' ? [] : [`--use-angle=${backend}`, ...(backend === 'swiftshader' ? ['--enable-unsafe-swiftshader'] : []), '--enable-webgl', '--ignore-gpu-blocklist', '--mute-audio'];
 let browser: Browser | null = null;
+const errors: string[] = [], warnings: string[] = [];
 try {
   browser = await (backend === 'webkit' ? webkit : chromium).launch({ headless: true, args });
   const page = await browser.newPage({ viewport: { width: 960, height: 540 }, deviceScaleFactor: 1 });
   page.setDefaultTimeout(45_000);
-  const errors: string[] = [], warnings: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', m => {
     if (m.type() === 'error') errors.push(m.text());
@@ -110,7 +110,8 @@ try {
         t.setInput(frame); t.step(1);
         if (i % 2 === 1) {
           t.render(true);
-          if ((window as unknown as HeroHarnessWindow).__render.debug.renderer.getContext().getError() !== 0) throw new Error('GL error during clear');
+          const glError = (window as unknown as HeroHarnessWindow).__render.debug.renderer.getContext().getError();
+          if (glError !== 0) throw new Error(`GL error ${glError} during clear at state tick ${t.getState().tick}`);
         }
         return t.snapshot();
       });
@@ -164,6 +165,6 @@ try {
   if (!pass) throw new Error('Round boot/clear/crash/restart gate failed; inspect report');
 } catch (error) {
   await writeFile(`${output}/failure.json`, JSON.stringify({ pass: false, backend, build, buildFiles, compiledSourceHashes,
-    inputFile, inputSha256: sha(inputBytes), error: error instanceof Error ? error.stack : String(error) }, null, 2) + '\n');
+    inputFile, inputSha256: sha(inputBytes), errors, warnings, error: error instanceof Error ? error.stack : String(error) }, null, 2) + '\n');
   throw error;
 } finally { await browser?.close(); await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); }
