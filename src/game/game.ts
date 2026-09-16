@@ -24,6 +24,7 @@ import {
   type BikeClass,
   type CameraDebug,
   type CompiledTrack,
+  type Vec2,
   type GameEvent,
   type GameEventListener,
   type GamePhase,
@@ -40,7 +41,7 @@ import {
 import type { AudioSystem } from '../audio';
 import type { PhysicsWorld } from '../physics';
 import type { GameRenderer } from '../render';
-import { DEFAULT_TRACK_ID, compileTrack, getTrack } from '../tracks';
+import { DEFAULT_TRACK_ID, compileTrack, getTrack, profileQuery } from '../tracks';
 import type { Hud } from '../ui';
 import { GhostRunner } from './ghost';
 import { COUNTDOWN_BEATS, FINISH_BRAKE, medalFor, ruleTicks, targetForBike, targetTimeOf, type RunResult } from './rules';
@@ -88,6 +89,8 @@ export interface BestTimeStore {
   /** Entry for a bike class; without `bike` the track's best across classes. */
   get(trackId: string, bike?: BikeClass): BestRecord | null;
   put(trackId: string, result: RunResult, run: { splits: number[]; recording: string | null }): void;
+  /** Additive (P4 leaderboard): offer a finished run to the track's per-class top 5; its 1-based rank, or null. */
+  record?(trackId: string, result: RunResult): number | null;
 }
 
 export interface GameOptions {
@@ -228,6 +231,15 @@ export class Game {
   private finishRunTicks = 0;
   private faultCount = 0;
   private countdownTick = 0;
+  /**
+   * Track entry hold (render r14): `setTrack` compiles the new biome in tasks behind a fog placeholder and
+   * `whenReady()` resolves after it. While the renderer reports `entering`, the countdown does not tick and
+   * the HUD shows "loading <biome>…" instead of the 3 — the run clock, as always, starts at GO. The token
+   * drops a stale release (a newer load / GO / menu in between).
+   */
+  private entryHold = false;
+  private entryToken = 0;
+  private entryHoldAt = 0;
   private crashTicks = 0;
   private holdTicks = 0;
   private holdFired = false;
@@ -296,12 +308,42 @@ export class Game {
     return this.track;
   }
 
+  /** The compiled track the physics / renderer hold (the level reviewer reads its `placed` list); null before the first load. */
+  get compiledTrack(): CompiledTrack | null {
+    return this.compiled;
+  }
+
+  /** Authored ground height under x (the profile, before gap pits); 0 without a track. */
+  groundY(x: number): number {
+    return this.track ? profileQuery(this.track.profile).y(x) : 0;
+  }
+
+  /**
+   * Level reviewer (docs/design/game.md §21): park the bike upright on the ground at x, at rest, on the
+   * live physics world's `teleport` (v2). The camera rig follows the bike, so this IS the reviewer's pan —
+   * there is no free-camera hook in the renderer. False when the solver has no `teleport` (v1 / mock).
+   */
+  teleportBike(x: number): boolean {
+    const p = this.physics as Partial<{ teleport(pose: { pos: Vec2; angle: number; vel?: Vec2; angVel?: number }): void; tuning: { wheel: { radius: number } } }>;
+    if (!this.track || typeof p.teleport !== 'function') return false;
+    const r = p.tuning?.wheel?.radius ?? 0.35;
+    const g = profileQuery(this.track.profile);
+    const angle = Math.atan2(g.y(x + 0.6) - g.y(x - 0.6), 1.2);
+    p.teleport({ pos: { x: x - Math.sin(angle) * r, y: g.y(x) + Math.cos(angle) * r }, angle, vel: { x: 0, y: 0 }, angVel: 0 });
+    this.physics.drainEvents();
+    this.lastState = null;
+    return true;
+  }
+
   get currentSeed(): number {
     return this.seed;
   }
 
   /** Wall ms of the last loadTrack (reported through hook.info for the boot gate). */
   lastLoadMs = 0;
+
+  /** The app's governor writes its last decision here (`?perf=1`, `hook.info().qualityWhy`, the run log). */
+  qualityWhy = '';
 
   /** Bike class in effect for the next `loadTrack` (Garage choice / per-tier default; App sets it before loading). */
   get currentBike(): BikeClass {
@@ -339,6 +381,8 @@ export class Game {
     // renderer without it keeps the default livery and the garage card tint carries the colour.
     this.renderer.setBikeClass?.(this.bike);
     (this.audio as Partial<{ setTrack(t: CompiledTrack, seed: number): void }> | undefined)?.setTrack?.(compiled, this.seed);
+    // Audio round 3 (additive, optional): the bike class voices the engine; every load path passes through here.
+    this.audio?.setBike?.(this.bike);
     this.hud?.setTrack(track);
     this.loop.reset();
     this.input = { ...NEUTRAL_INPUT };
@@ -359,8 +403,28 @@ export class Game {
 
   /** Back to the menu phase: nothing ticks until the next loadTrack/startRun. */
   toMenu(): void {
+    this.entryHold = false;
+    this.entryToken++;
     this.setPhase('menu');
     this.pausedFlag = false;
+  }
+
+  /**
+   * Level reviewer (docs/design/game.md §21): the bike alive but held — the `countdown` phase with the entry hold
+   * pinned, so physics steps with neutral input, nothing counts, the 3-2-1 never starts, and the camera rig gets
+   * sim time to follow the parked probe (a paused world has dt = 0 and the rig never moves). Off = back to `menu`.
+   */
+  setParked(on: boolean): void {
+    if (on) {
+      this.entryToken++;
+      this.entryHold = true;
+      this.entryHoldAt = performance.now();
+      this.countdownTick = 0;
+      this.pausedFlag = false;
+      this.setPhase('countdown');
+    } else {
+      this.toMenu();
+    }
   }
 
   /** Re-arm the current track from its start (used by the menu's Play). */
@@ -389,12 +453,41 @@ export class Game {
     } else {
       this.countdownTick = 0;
       this.setPhase('countdown');
-      this.emit({ type: 'countdown', n: 3 });
+      const token = ++this.entryToken;
+      const ready = this.rendererEntering() ? this.whenReady() : null;
+      if (ready) {
+        this.entryHold = true;
+        this.entryHoldAt = performance.now();
+        const release = (): void => {
+          if (token !== this.entryToken) return;
+          this.entryHold = false;
+          this.emit({ type: 'countdown', n: 3 });
+        };
+        ready.then(release, release);
+      } else this.emit({ type: 'countdown', n: 3 });
     }
+  }
+
+  /** The renderer is still compiling the current track's biome behind its placeholder (`debugInfo().entering`). */
+  private rendererEntering(): boolean {
+    const r = this.renderer as Partial<{ debugInfo(): { entering?: boolean } }>;
+    if (typeof r.debugInfo !== 'function') return false;
+    try {
+      return r.debugInfo().entering === true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Countdown held on the renderer's track entry (`?perf=1`, `hook.info().entryHold`, the e2e entry proof). */
+  get entryHeld(): boolean {
+    return this.entryHold;
   }
 
   /** GO: physics state becomes byte-identical to a fresh load; the run clock starts. */
   private go(): void {
+    this.entryHold = false;
+    this.entryToken++;
     this.physics.reset(-1);
     this.physics.drainEvents(); // swallow whatever reset produced: replays start here
     this.lastState = null;
@@ -633,6 +726,7 @@ export class Game {
         this.physics.step(NEUTRAL_INPUT);
         this.physics.drainEvents();
         this.lastState = null;
+        if (this.entryHold) return; // the biome is still compiling: the 3-2-1 waits for `whenReady()`
         this.countdownTick++;
         if (this.countdownTick % T.countdownBeat === 0) {
           const n = COUNTDOWN_BEATS - this.countdownTick / T.countdownBeat;
@@ -790,6 +884,8 @@ export class Game {
       bike: this.bike,
     };
     this.lastResult = result;
+    // Board before PB: a board with no rows seeds itself from the stored PB, which must still be the previous one.
+    result.rank = this.bestTimes?.record?.(track.id, result) ?? null;
     if (result.personalBest) this.bestTimes?.put(track.id, result, { splits: [...this.splits], recording: this.pbJson });
     // The panel's staged reveal is clocked from the HUD's sim time: anchor it to THIS tick, not to the last render
     // (a stepped sim — harness, e2e — would otherwise render straight into the final stage).
@@ -803,8 +899,15 @@ export class Game {
     this.onResults?.(result);
   }
 
-  /** Timing of the most recent render pass (hook.info().lastRender). */
-  readonly lastRender = { hudMs: 0, submitMs: 0, syncMs: 0 };
+  /**
+   * Timing of the most recent render pass (hook.info().lastRender; `?bench=1` per-frame split): HUD DOM writes,
+   * `audio.update`, the renderer submit. Four `performance.now()` calls per frame, no allocation.
+   */
+  readonly lastRender = { prepMs: 0, hudMs: 0, audioMs: 0, submitMs: 0, syncMs: 0 };
+  /** The most recent `advance()`: physics ticks run and their ms (advance total minus the render pass). */
+  readonly lastAdvance = { ticks: 0, physicsMs: 0, totalMs: 0 };
+  /** `?bench=1&no=hud|audio|render`: skip one leg of the render pass so the device report can bisect the frame. */
+  readonly benchSkip = { hud: false, audio: false, render: false };
 
   /**
    * Front-end screens that fully cover the canvas (the Broadcast menu's key art) switch the WebGL
@@ -823,16 +926,26 @@ export class Game {
     info.checkpoint = state.checkpoint;
     info.checkpointCount = this.track?.checkpoints.length ?? 0;
     info.simTime = (this.loop.ticks + alpha) / this.physicsHz;
+    info.entry = this.entryHold ? { biome: this.track?.meta?.biome ?? 'world', ms: performance.now() - this.entryHoldAt } : null;
     this.renderer.setRunInfo?.(info);
     this.renderer.setGhost?.(this.ghostState());
-    this.hud?.setRun(info);
-    this.hud?.update(state, this.ghostState());
-    this.audio?.update(state, dt, this.effectiveInput());
+    const skip = this.benchSkip;
+    const tPrep = performance.now();
+    if (!skip.hud) {
+      this.hud?.setRun(info);
+      this.hud?.update(state, this.ghostState());
+    }
     const tHud = performance.now();
-    const ms = this.renderer.render(state, alpha);
-    this.lastRender.hudMs = tHud - tStart;
-    this.lastRender.submitMs = performance.now() - tHud;
-    this.lastRender.syncMs = 0;
+    if (!skip.audio) this.audio?.update(state, dt, this.effectiveInput());
+    const tAudio = performance.now();
+    const ms = skip.render ? 0 : this.renderer.render(state, alpha);
+    const tEnd = performance.now();
+    const lr = this.lastRender;
+    lr.prepMs = tPrep - tStart;
+    lr.hudMs = skip.hud ? 0 : tHud - tPrep;
+    lr.audioMs = skip.audio ? 0 : tAudio - tHud;
+    lr.submitMs = skip.render ? 0 : tEnd - tAudio;
+    lr.syncMs = 0;
     return ms;
   }
 
@@ -855,20 +968,24 @@ export class Game {
 
   /** Real-time entry: feed elapsed seconds. Paused or in the menu: render only. */
   advance(elapsedSeconds: number): void {
+    const t0 = performance.now();
+    const ticks0 = this.loop.ticks;
+    const lr = this.lastRender;
+    lr.prepMs = lr.hudMs = lr.audioMs = lr.submitMs = 0; // a skipped render (renderEnabled false) reports zeros, not the last frame's
     if (this.pausedFlag || this.phaseValue === 'menu') {
       this.loop.renderOnce();
-      return;
-    }
-    if (this.playbackFrames) {
+    } else if (this.playbackFrames) {
       this.loop.advance(elapsedSeconds * this.playbackSpeed);
       // The run is over and the finish coast has settled: hold the last frame (the transport shows ↺).
       if (this.phaseValue === 'finished' && this.resultsTicks >= this.ticks.finishBrake + this.physicsHz) {
         this.pausedFlag = true;
         this.playbackEnded = true;
       }
-      return;
-    }
-    this.loop.advance(elapsedSeconds);
+    } else this.loop.advance(elapsedSeconds);
+    const total = performance.now() - t0;
+    this.lastAdvance.totalMs = total;
+    this.lastAdvance.ticks = this.loop.ticks - ticks0;
+    this.lastAdvance.physicsMs = Math.max(0, total - lr.prepMs - lr.hudMs - lr.audioMs - lr.submitMs);
   }
 
   // -- replay viewer (docs/design/game.md §16) --------------------------------------
@@ -1114,6 +1231,21 @@ export class Game {
 
   stats(): RenderStats {
     return this.renderer.stats();
+  }
+
+  /** The renderer's `debugInfo()` when it has one (tier, dpr, canvas, calls, tris, rtMpx, …; `?bench=1` snapshots it per scenario). */
+  rendererDebug(): Record<string, unknown> | null {
+    const r = this.renderer as Partial<{ debugInfo(): Record<string, unknown> }>;
+    if (typeof r.debugInfo !== 'function') return null;
+    try {
+      const d = r.debugInfo();
+      // The scalar fields only: the prepare timeline / entry stats / art census are boot diagnostics, not per-frame cost.
+      const out: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(d)) if (typeof v !== 'object' || v === null) out[k] = v;
+      return out;
+    } catch {
+      return null;
+    }
   }
 
   resize(width: number, height: number, pixelRatio?: number): void {

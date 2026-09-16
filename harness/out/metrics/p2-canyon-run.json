@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "p2-canyon-run",
+  "bike": "rookie",
+  "updatedAt": "2026-09-15T22:18:13.457Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "targetAttempts": 2,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        1374220946
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        34.425
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260915-170219-8d28f4",
+    "20260915-171402-a83608"
+  ]
+}

@@ -17,10 +17,10 @@ import type { PhysicsWorld } from '../index';
 import { CollisionWorld, circleVsPrim, PrimKind, type Manifold, type Prim } from '../collision';
 import { SURFACES } from '../tuning';
 import { atan2, clamp, cos, sin, wrapAngle, HALF_PI } from '../dmath';
-import { BIKE_GEOMETRY_V2, bikeTuningV2, suspensionPoint, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
+import { bikeTuningV2, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
 import { driveTorque, lag, limiterLatch, reportRpm, thrustFrac, wheelieTrim } from './engine';
 import { brushImpulse, tyreMu } from './tyre';
-import { advanceTarget, GRIP_X, GRIP_Y, leanFromX, makeRiderRigPose, PEG_X, PEG_Y, poseAt, RIDER_ANKLE, RIDER_HIP, RIDER_REACH, RIDER_TORSO_REST, RIDER_PROFILE, riderCOMGradient, riderRigFromCOM, riderRigFromHips, riderServoWrench, type ChainOut, type RiderRigPose, type RiderServoKinematics } from './rider';
+import { advanceTarget, buildChain, canonicalPose, GRIP_X, GRIP_Y, leanFromX, PEG_X, PEG_Y, poseAt, type ChainOut } from './rider';
 
 // ---------------------------------------------------------------------------
 // Public extras
@@ -43,9 +43,8 @@ export interface PhysicsDebugV2 {
   bodies: ({ id: string } & BodyDebug)[];
   contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; mu: number; surface: SurfaceKind }[];
   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
-  brakes: { rearTorqueNm: number; frontTorqueNm: number; /** Actual front-caliper demand trimmed by rear-lift protection, 0..1. */ assist: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
-  /** The simulated `PhysicsState.riderBody` with additional servo diagnostics. */
+  /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
   rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number };
   /** The declared attitude torque applied this tick (N m). */
   attTorque: number;
@@ -56,6 +55,8 @@ export interface PhysicsDebugV2 {
   balancePitch: number;
   riderChain: { hips: Vec2; shoulders: Vec2; head: Vec2; elbow: Vec2; hand: Vec2; knee: Vec2; foot: Vec2; torsoDir: Vec2; headDir: Vec2 };
   crashCause: 'sensor' | 'oob' | 'hazard' | null;
+  /** R6 (physics.md §8.1): true when the run faulted in the tick the front wheel crossed the finish line with the wheel no more than one radius past it - the crossing did not count (no `finish` event, `finishTime` null). */
+  finishVoided: boolean;
 }
 
 export interface TeleportPose {
@@ -160,7 +161,7 @@ const S_AIR_LIMIT = 34; // R5 air limit blend 0..1 (both wheels off the ground, 
 export const NSCALAR = F_SLOTS.length; // 35
 
 /** Flags (physics-v2.md §12). */
-export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase'] as const;
+export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid'] as const;
 const U_FINISHED = 0;
 const U_FAULT = 1; // 0 none, 1 crash, 2 oob, 3 restart, 4 timeout, 5 hazard
 const U_LIMITER = 2;
@@ -174,7 +175,8 @@ const U_ASLEEP = 9;
 const U_CRASH_PENDING = 10; // written and read inside one step (collide -> derive)
 const U_CRASH_CAUSE = 11; // 1 sensor, 4 oob, 5 hazard
 const U_HOP = 12; // derived output: 0 idle 1 preload 2 push 3 recover
-export const NU = U_SLOTS.length; // 13
+const U_FINISH_VOID = 13; // R6 physics.md §8.1: 1 when a fault in the crossing tick (front wheel <= R past the line) voided the finish
+export const NU = U_SLOTS.length; // 14
 
 const FAULTS: (FaultReason | null)[] = [null, 'crash', 'out-of-bounds', 'restart', 'timeout', 'hazard'];
 const HOPS: HopPhase[] = ['idle', 'preload', 'push', 'recover'];
@@ -275,11 +277,6 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private readonly sPerp = new Float64Array(2);
   private readonly sRate = new Float64Array(2);
   private readonly sForce = new Float64Array(2);
-  private readonly sSpringGamma = new Float64Array(2);
-  private readonly sSpringBias = new Float64Array(2);
-  private readonly sSpringImpulse = new Float64Array(2);
-  private servoMaxForce = 0;
-  private brakeAssist = 0;
   private readonly sLimLo = new Float64Array(2);
   private readonly sLimHi = new Float64Array(2);
   private readonly sBrake = new Float64Array(2);
@@ -316,24 +313,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
 
   private readonly chain: ChainOut = { x: new Float64Array(7), y: new Float64Array(7), dx: 0, dy: 1, hx: 0, hy: 1, hipAx: 0, hipAy: 0 };
   private readonly poseTmp = { x: 0, y: 0, psi: 0 };
-  private readonly servoKinematics: RiderServoKinematics = { offsetX: 0, offsetY: 0, errorX: 0, errorY: 0, angleError: 0, relativeVX: 0, relativeVY: 0, relativeW: 0, invMassC: 0, invMassR: 0, invInertiaC: 0, invInertiaR: 0 };
-  private readonly servoWrench = { x: 0, y: 0, torque: 0 };
-  /** Per-step constraint workspace, cleared before every solve (not persistent simulation state). */
-  private readonly riderLimits = Array.from({ length: 8 }, () => ({ rx: 0, ry: 0, cx: 0, cy: 0, nx: 0, ny: 0, jr: 0, jc: 0, gap: 0, mass: 0, minVelocity: 0, impulse: 0 }));
-  // Allocation-free, per-call block workspace. Every used entry is overwritten before reading.
-  private readonly riderGram = new Float64Array(64);
-  private readonly riderBlockMatrix = new Float64Array(12);
-  private readonly riderBlockIds = new Uint8Array(3);
-  private readonly riderBlockImpulse = new Float64Array(3);
-  private readonly rigPose = makeRiderRigPose();
-  private readonly rigProbe = makeRiderRigPose();
-  private rigKeyX = Number.NaN;
-  private rigKeyY = Number.NaN;
-  private rigKeyAngle = Number.NaN;
-  private readonly rigGaps = new Float64Array(8);
-  private readonly rigGapX = new Float64Array(8);
-  private readonly rigGapY = new Float64Array(8);
-  private readonly rigGapAngle = new Float64Array(8);
+  private readonly poseTmp2 = { x: 0, y: 0, psi: 0 };
   private axleOrgX = 0;
   private axleOrgY = 0;
 
@@ -472,7 +452,18 @@ class WorldV2 implements BikePhysicsWorldV2 {
       // snap, and a landing out of a limited flight keeps the cap. The Pro (gain 0) counts as R3.
       const mdx = this.poseTmp.x - F[S_TGT_X]!;
       const mdy = this.poseTmp.y - F[S_TGT_Y]!;
-      F[S_TGT_MOVE] = F[S_TGT_MOVE]! * (1 - dt / r.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy) * (1 - r.airRateGain * bothAir);
+      // R6 preload gate (servoIntentBackM > 0): travel counts only while the rider body is behind the neutral pose
+      let preload = 1;
+      if (r.servoIntentBackM > 0) {
+        const c0 = cos(this.an[CHASSIS]!);
+        const s0 = sin(this.an[CHASSIS]!);
+        const rx = this.px[RIDER]! - this.px[CHASSIS]!;
+        const ry = this.py[RIDER]! - this.py[CHASSIS]!;
+        const bodyX = rx * c0 + ry * s0;
+        poseAt(r.poses, 0, this.poseTmp2);
+        preload = bodyX <= this.poseTmp2.x - r.servoIntentBackM ? 1 : 0;
+      }
+      F[S_TGT_MOVE] = F[S_TGT_MOVE]! * (1 - dt / r.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy) * (1 - r.airRateGain * bothAir) * preload;
       F[S_TGT_X] = this.poseTmp.x;
       F[S_TGT_Y] = this.poseTmp.y;
       F[S_TGT_PSI] = this.poseTmp.psi;
@@ -541,7 +532,6 @@ class WorldV2 implements BikePhysicsWorldV2 {
         front: { pos: { x: px[FRONT]!, y: py[FRONT]! }, spin: -an[FRONT]!, spinVel: -av[FRONT]!, compression: F[S_FRONT_COMP]!, grounded: U[U_FRONT_GND] === 1 },
       },
       rider: pose,
-      riderBody: { pos: { x: px[RIDER]!, y: py[RIDER]! }, vel: { x: this.vx[RIDER]!, y: this.vy[RIDER]! }, angle: an[RIDER]!, angVel: av[RIDER]! },
       checkpoint: F[S_CHECKPOINT]!,
       finished: U[U_FINISHED] === 1,
       faulted: fault,
@@ -585,8 +575,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const [cr, cf] = this.staticSags();
     const sr = t.suspension.rear;
     const sf = t.suspension.front;
-    const rear = suspensionPoint(sr, cr);
-    const front = suspensionPoint(sf, cf);
+    const rear = { x: sr.axle.x + sr.axis.x * cr, y: sr.axle.y + sr.axis.y * cr };
+    const front = { x: sf.axle.x + sf.axis.x * cf, y: sf.axle.y + sf.axis.y * cf };
     poseAt(t.rider.poses, lean, this.poseTmp);
     const M = this.totalMass();
     const cx = (t.wheel.rearMass * rear.x + t.wheel.frontMass * front.x + t.rider.mass * this.poseTmp.x) / M;
@@ -665,7 +655,6 @@ class WorldV2 implements BikePhysicsWorldV2 {
       bodies,
       contacts,
       engine: { rpm: reportRpm(t.engine, R, vRim, F[S_THROTTLE_EFF]!), torqueNm: this.dEngineTq, thrustN: this.dThrust, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]!, brakeEff: F[S_BRAKE_EFF]!, assist: this.dAssist },
-      brakes: { rearTorqueNm: this.sBrake[0]! / this.dt, frontTorqueNm: this.sBrake[1]! / this.dt, assist: this.brakeAssist },
       suspension: {
         rear: { compression: this.sComp[0]!, rate: this.sRate[0]!, force: this.sForce[0]! },
         front: { compression: this.sComp[1]!, rate: this.sRate[1]!, force: this.sForce[1]! },
@@ -687,6 +676,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
       balancePitch: this.balancePitch(leanFromX(t.rider.poses, F[S_TGT_X]!), 0),
       riderChain: { hips: p(0), shoulders: p(1), head: p(2), elbow: p(3), hand: p(4), knee: p(5), foot: p(6), torsoDir: { x: this.chain.dx, y: this.chain.dy }, headDir: { x: this.chain.hx, y: this.chain.hy } },
       crashCause: CAUSES[this.U[U_CRASH_CAUSE]!] ?? null,
+      finishVoided: this.U[U_FINISH_VOID] === 1,
     };
   }
 
@@ -740,43 +730,44 @@ class WorldV2 implements BikePhysicsWorldV2 {
     }
   }
 
+  /** Static vertical ground load on wheel 0 (rear) / 1 (front): neutral pose, level, zero-compression geometry. */
+  private staticLoad(which: number): number {
+    const t = this.tuning;
+    const sr = t.suspension.rear;
+    const sf = t.suspension.front;
+    const L = sf.axle.x - sr.axle.x;
+    const M = this.totalMass();
+    const W = M * this.g;
+    poseAt(t.rider.poses, 0, this.poseTmp);
+    const cx = (t.wheel.rearMass * sr.axle.x + t.wheel.frontMass * sf.axle.x + t.rider.mass * this.poseTmp.x) / M - sr.axle.x;
+    const nf = (W * cx) / L;
+    return which === 0 ? W - nf : nf;
+  }
+
   /**
    * Static sag of a wheel's spring under a vertical ground load `N`: the unsprung wheel carries its own
    * weight, and on a tilted slider the spring sees `axis.y` of the sprung share (the slider's
    * perpendicular constraint carries the rest).
    */
-  private staticSag(s: SuspensionV2, N: number, wheelMass: number, guess = 0): number {
-    let compression = guess;
-    for (let i = 0; i < 8; i++) {
-      const vertical = s.hinge ? -cos(s.hinge.droopAngle - compression / s.hinge.radius) : s.axis.y;
-      compression = clamp((N - wheelMass * this.g) * vertical / s.k - s.preload, 0, s.travel);
-    }
-    return compression;
+  private staticSag(s: SuspensionV2, N: number, wheelMass: number): number {
+    const sprung = (N - wheelMass * this.g) * s.axis.y;
+    return clamp(sprung / s.k - s.preload, 0, s.travel);
   }
 
   /** Static sags (m) of rear / front at the neutral pose. */
   private staticSags(): [number, number] {
     const t = this.tuning;
-    const mass = this.totalMass();
-    poseAt(t.rider.poses, 0, this.poseTmp);
-    let rear = 0, front = 0;
-    for (let i = 0; i < 16; i++) {
-      const r = suspensionPoint(t.suspension.rear, rear), f = suspensionPoint(t.suspension.front, front);
-      const angle = atan2(r.y - f.y, f.x - r.x);
-      const mx = (t.wheel.rearMass * r.x + t.wheel.frontMass * f.x + t.rider.mass * this.poseTmp.x) / mass;
-      const my = (t.wheel.rearMass * r.y + t.wheel.frontMass * f.y + t.rider.mass * this.poseTmp.y) / mass;
-      const width = Math.sqrt((f.x - r.x) ** 2 + (f.y - r.y) ** 2);
-      const frontLoad = mass * this.g * ((mx - r.x) * cos(angle) - (my - r.y) * sin(angle)) / width;
-      rear = this.staticSag(t.suspension.rear, mass * this.g - frontLoad, t.wheel.rearMass, rear);
-      front = this.staticSag(t.suspension.front, frontLoad, t.wheel.frontMass, front);
-    }
-    return [rear, front];
+    return [this.staticSag(t.suspension.rear, this.staticLoad(0), t.wheel.rearMass), this.staticSag(t.suspension.front, this.staticLoad(1), t.wheel.frontMass)];
   }
 
-  /** One fixed authoring frame for mechanics, rider attachments, sensors and rendering. */
+  /** Render axle frame origin in the chassis frame (axle midpoint at static sag), as v1. */
   private axleOrigin(): void {
-    this.axleOrgX = BIKE_GEOMETRY_V2.chassisToAxle.x;
-    this.axleOrgY = BIKE_GEOMETRY_V2.chassisToAxle.y;
+    const t = this.tuning;
+    const sr = t.suspension.rear;
+    const sf = t.suspension.front;
+    const [cr, cf] = this.staticSags();
+    this.axleOrgX = 0.5 * (sr.axle.x + sr.axis.x * cr + sf.axle.x + sf.axis.x * cf);
+    this.axleOrgY = 0.5 * (sr.axle.y + sr.axis.y * cr + sf.axle.y + sf.axis.y * cf);
   }
 
   /**
@@ -790,9 +781,10 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const sr = t.suspension.rear;
     const sf = t.suspension.front;
     const [cr, cf] = this.staticSags();
-    const rearPoint = suspensionPoint(sr, cr), frontPoint = suspensionPoint(sf, cf);
-    const rlx = rearPoint.x, rly = rearPoint.y;
-    const flx = frontPoint.x, fly = frontPoint.y;
+    const rlx = sr.axle.x + sr.axis.x * cr;
+    const rly = sr.axle.y + sr.axis.y * cr;
+    const flx = sf.axle.x + sf.axis.x * cf;
+    const fly = sf.axle.y + sf.axis.y * cf;
     // chassis angle that puts both axles on the ground line
     const a = angle + atan2(rly - fly, flx - rlx);
     const c = cos(a);
@@ -813,7 +805,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     this.F[S_TGT_Y] = this.poseTmp.y;
     this.F[S_TGT_PSI] = this.poseTmp.psi;
     // the body sits its static servo sag below the target, so the spawn is at rest
-    const sag = t.rider.kp > 0 ? (t.rider.mass * this.g) / t.rider.kp : 0;
+    const sag = (t.rider.mass * this.g) / t.rider.kp;
     const bx = this.poseTmp.x;
     const by = this.poseTmp.y;
     this.px[RIDER] = fx + bx * c - by * s;
@@ -860,7 +852,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const s = sin(this.an[CHASSIS]!);
     const dx = this.px[RIDER]! - this.px[CHASSIS]!;
     const dy = this.py[RIDER]! - this.py[CHASSIS]!;
-    return { x: dx * c + dy * s, y: -dx * s + dy * c, psi: wrapAngle(this.an[RIDER]! - this.an[CHASSIS]!) };
+    return { x: dx * c + dy * s, y: -dx * s + dy * c, psi: this.an[RIDER]! - this.an[CHASSIS]! };
   }
 
   /**
@@ -874,49 +866,28 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const l = this.riderLocal();
     const lean = leanFromX(r.poses, l.x);
     const crouch = clamp((F[S_TGT_Y]! - l.y) / 0.3, 0, 1);
-    const torsoLag = wrapAngle(l.psi - F[S_TGT_PSI]!);
-    const rig = this.updateRiderRig();
+    const torsoLag = l.psi - F[S_TGT_PSI]!;
+    const cp = canonicalPose(lean);
+    const hx = cp.hipX;
+    const hy = cp.hipY + (l.y - F[S_TGT_Y]!);
+    const d = Math.sqrt((GRIP_X - hx) * (GRIP_X - hx) + (GRIP_Y - hy) * (GRIP_Y - hy));
     return {
       lean,
       crouch,
       torsoPitch: clamp(-torsoLag, -0.9, 0.9),
-      armExtend: clamp((rig.armReach - 0.8) / 0.2, 0, 1),
+      armExtend: clamp((d - 0.55) / 0.31, 0, 1),
     };
   }
 
   /** The drawn chain in world space from the rider body (sensors + ragdoll spawn live on it). */
   private buildRiderChain(): void {
-    const rig = this.updateRiderRig();
+    const r = this.tuning.rider;
+    const F = this.F;
+    const l = this.riderLocal();
+    const lean = leanFromX(r.poses, l.x);
     const c = cos(this.an[CHASSIS]!);
     const s = sin(this.an[CHASSIS]!);
-    const points = [rig.hips, rig.shoulders, rig.head, rig.elbow, rig.grip, rig.knee, rig.ankle];
-    for (let i = 0; i < points.length; i++) {
-      const p = points[i]!;
-      const x = p.x + this.axleOrgX;
-      const y = p.y + this.axleOrgY;
-      this.chain.x[i] = this.px[CHASSIS]! + x * c - y * s;
-      this.chain.y[i] = this.py[CHASSIS]! + x * s + y * c;
-    }
-    this.chain.dx = cos(this.an[CHASSIS]! + rig.torsoAngle);
-    this.chain.dy = sin(this.an[CHASSIS]! + rig.torsoAngle);
-    this.chain.hx = cos(this.an[CHASSIS]! + rig.headAngle);
-    this.chain.hy = sin(this.an[CHASSIS]! + rig.headAngle);
-    this.chain.hipAx = rig.hips.x;
-    this.chain.hipAy = rig.hips.y;
-  }
-
-  private updateRiderRig(): RiderRigPose {
-    const local = this.riderLocal();
-    const x = local.x - this.axleOrgX;
-    const y = local.y - this.axleOrgY;
-    const angle = RIDER_TORSO_REST + local.psi;
-    if (x !== this.rigKeyX || y !== this.rigKeyY || angle !== this.rigKeyAngle) {
-      riderRigFromCOM(x, y, angle, this.rigPose);
-      this.rigKeyX = x;
-      this.rigKeyY = y;
-      this.rigKeyAngle = angle;
-    }
-    return this.rigPose;
+    buildChain(lean, 0, l.y - F[S_TGT_Y]!, l.psi - F[S_TGT_PSI]!, this.px[CHASSIS]!, this.py[CHASSIS]!, c, s, this.axleOrgX, this.axleOrgY, this.chain);
   }
 
   // -- step phases ----------------------------------------------------------
@@ -929,35 +900,6 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const rx = pxw - this.px[b]!;
     const ry = pyw - this.py[b]!;
     this.av[b] = this.av[b]! + this.ii[b]! * (rx * fy - ry * fx) * dt;
-  }
-
-  /** Compression coordinate and its world gradient; radial error for the rear hinge,
-   * perpendicular error for the front fork. The same geometry is used by every solver phase. */
-  private suspensionGeometry(w: number): void {
-    const st = w === 0 ? this.tuning.suspension.rear : this.tuning.suspension.front;
-    const body = w === 0 ? REAR : FRONT;
-    const angle = this.an[CHASSIS]!;
-    const c = cos(angle), s = sin(angle);
-    const local = st.hinge?.pivot ?? st.axle;
-    const x = this.px[CHASSIS]! + local.x * c - local.y * s;
-    const y = this.py[CHASSIS]! + local.x * s + local.y * c;
-    const dx = this.px[body]! - x, dy = this.py[body]! - y;
-    if (st.hinge) {
-      const d2 = Math.max(1e-12, dx * dx + dy * dy);
-      const d = Math.sqrt(d2);
-      this.sNx[w] = dx / d;
-      this.sNy[w] = dy / d;
-      this.sAx[w] = st.hinge.radius * dy / d2;
-      this.sAy[w] = -st.hinge.radius * dx / d2;
-      this.sComp[w] = st.hinge.radius * wrapAngle(st.hinge.droopAngle - atan2(dy, dx) + angle);
-      this.sPerp[w] = d - st.hinge.radius;
-    } else {
-      const ax = st.axis.x * c - st.axis.y * s, ay = st.axis.x * s + st.axis.y * c;
-      this.sAx[w] = ax; this.sAy[w] = ay;
-      this.sNx[w] = -ay; this.sNy[w] = ax;
-      this.sComp[w] = dx * ax + dy * ay;
-      this.sPerp[w] = -dx * ay + dy * ax;
-    }
   }
 
   private forces(riding: boolean): void {
@@ -981,6 +923,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const wC0 = av[CHASSIS]!;
     const vRx0 = vx[RIDER]!;
     const vRy0 = vy[RIDER]!;
+    const wR0 = av[RIDER]!;
 
     // gravity
     const nb = this.nBodies;
@@ -993,38 +936,53 @@ class WorldV2 implements BikePhysicsWorldV2 {
 
     // suspension pass 1: geometry and rates from pre-impulse velocities (both wheels first)
     for (let w = 0; w < 2; w++) {
+      const st = w === 0 ? t.suspension.rear : t.suspension.front;
       const wb = w === 0 ? REAR : FRONT;
-      this.suspensionGeometry(w);
-      const ax = this.sAx[w]!, ay = this.sAy[w]!;
+      const ax = st.axis.x * c - st.axis.y * s;
+      const ay = st.axis.x * s + st.axis.y * c;
+      const arx = fx + st.axle.x * c - st.axle.y * s;
+      const ary = fy + st.axle.x * s + st.axle.y * c;
+      const dx = px[wb]! - arx;
+      const dy = py[wb]! - ary;
       const rx = px[wb]! - fx;
       const ry = py[wb]! - fy;
       const wf = av[CHASSIS]!;
       const relx = vx[wb]! - (vx[CHASSIS]! - wf * ry);
       const rely = vy[wb]! - (vy[CHASSIS]! + wf * rx);
+      this.sAx[w] = ax;
+      this.sAy[w] = ay;
+      this.sNx[w] = -ay;
+      this.sNy[w] = ax;
+      this.sComp[w] = dx * ax + dy * ay;
+      this.sPerp[w] = -dx * ay + dy * ax;
       this.sRate[w] = relx * ax + rely * ay;
     }
-    // Springs are compliant constraint rows in the contact solve. Backward Euler uses
-    // the END-of-tick compression/rate, so a ground reaction is included in damping and
-    // a stationary spring still supports k * compression. Applying an isolated damping
-    // impulse before contact solving incorrectly depends on the wheel's free inverse mass.
+    // suspension pass 2: spring + damper + cubic bump stop as an impulse pair; rolling resistance
     for (let w = 0; w < 2; w++) {
       const st = w === 0 ? t.suspension.rear : t.suspension.front;
       const wb = w === 0 ? REAR : FRONT;
+      const ax = this.sAx[w]!;
+      const ay = this.sAy[w]!;
       const comp = this.sComp[w]!;
+      const rate = this.sRate[w]!;
+      const rx = px[wb]! - fx;
+      const ry = py[wb]! - fy;
       let force = st.k * (comp + st.preload);
-      let stiffness = st.k;
       const over = comp - st.stopStart * st.travel;
-      if (over > 0) {
-        // Keep integer powers in ordered IEEE754 products: libm pow varies across engines.
-        force += st.kStop * (over * over * over) / st.travel ** 2;
-        stiffness += 3 * st.kStop * over ** 2 / st.travel ** 2;
-      }
-      const damping = this.sRate[w]! > 0 ? st.cComp : st.cReb;
-      const compliance = damping + dt * stiffness;
-      this.sSpringGamma[w] = compliance > 0 ? 1 / (dt * compliance) : 0;
-      this.sSpringBias[w] = compliance > 0 ? force / compliance : 0;
-      this.sSpringImpulse[w] = 0;
-      this.sForce[w] = 0;
+      if (over > 0) force += (st.kStop * over * over * over) / (st.travel * st.travel);
+      const cd = rate > 0 ? st.cComp : st.cReb;
+      let damp = cd * rate * dt;
+      const mRed = 1 / (im[wb]! + im[CHASSIS]!);
+      const maxDamp = mRed * Math.abs(rate);
+      damp = clamp(damp, -maxDamp, maxDamp);
+      const J = force * dt + damp;
+      this.sForce[w] = J / dt;
+      vx[wb] = vx[wb]! - J * ax * im[wb]!;
+      vy[wb] = vy[wb]! - J * ay * im[wb]!;
+      vx[CHASSIS] = vx[CHASSIS]! + J * ax * im[CHASSIS]!;
+      vy[CHASSIS] = vy[CHASSIS]! + J * ay * im[CHASSIS]!;
+      av[CHASSIS] = av[CHASSIS]! + ii[CHASSIS]! * (rx * J * ay - ry * J * ax);
+      // rolling resistance on a wheel that carried ground load last tick, against this tick's spring load
       if ((w === 0 ? U[U_REAR_GND] : U[U_FRONT_GND]) === 1 && force > 0) {
         const wv = av[wb]!;
         const tq = -t.tyre.rollRes * force * R * clamp(wv / 0.05, -1, 1);
@@ -1059,7 +1017,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
         const mR = t.rider.mass;
         dLive = (mc * px[CHASSIS]! + mr * px[REAR]! + mf * px[FRONT]! + mR * px[RIDER]!) / (mc + mr + mf + mR) - px[REAR]!;
       }
-      const trim = wheelieTrim(wc, wC0, this.sComp[1]!, dLive, F[S_IN_L]!);
+      // R6: `airGain` x in free air (both R4 air counters > 0): the Pro's ECU is ground-only, its air stays raw.
+      const trim = wheelieTrim(wc, wC0, this.sComp[1]!, dLive, F[S_IN_L]!, F[S_REAR_AIR]! > 0 && F[S_FRONT_AIR]! > 0);
       this.dAssist = trim;
       const tq = driveTorque(t.engine, R, vRim, te, U[U_LIMITER] === 1, trim);
       this.dEngineTq = tq;
@@ -1081,10 +1040,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
       vy[RIDER] = vy[RIDER]! - kr * sr * vRy0 * dt * im[RIDER]!;
     }
 
-    // Rider servo: a coupled relative-COM/angle wrench. The linear pair acts at the rider
-    // COM on both bodies; the angular pair supplies only the commanded relative rotation.
-    // Grip/peg forces previously added a second, uncontrolled torque to the rider (2.3 kNm
-    // versus a 300 Nm opposing actuator on e2), although the controller damped COM velocity.
+    // rider servo (§9.3): bounded force toward the target point, bounded torque toward the target
+    // angle; both as collinear pairs at the pegs (the leg-line component) and the grip (the rest)
     {
       const r = t.rider;
       const tx = F[S_TGT_X]!;
@@ -1093,40 +1050,103 @@ class WorldV2 implements BikePhysicsWorldV2 {
       const twy = fy + tx * s + ty * c;
       this.dTgtWx = twx;
       this.dTgtWy = twy;
+      const rtx = twx - fx;
+      const rty = twy - fy;
+      const vtx = vCx0 - wC0 * rty;
+      const vty = vCy0 + wC0 * rtx;
+      // hips from the body, pegs and grip from the chassis; the leg line hips -> peg
+      const cr = cos(this.an[RIDER]!);
+      const srr = sin(this.an[RIDER]!);
+      const hipx = px[RIDER]! - (r.comFromHips.x * cr - r.comFromHips.y * srr);
+      const hipy = py[RIDER]! - (r.comFromHips.x * srr + r.comFromHips.y * cr);
+      const plx = r.peg.x + this.axleOrgX;
+      const ply = r.peg.y + this.axleOrgY;
+      const pegx = fx + plx * c - ply * s;
+      const pegy = fy + plx * s + ply * c;
+      const glx = r.grip.x + this.axleOrgX;
+      const gly = r.grip.y + this.axleOrgY;
+      const gripx = fx + glx * c - gly * s;
+      const gripy = fy + glx * s + gly * c;
+      let ux = pegx - hipx;
+      let uy = pegy - hipy;
+      const ul = Math.sqrt(ux * ux + uy * uy);
+      if (ul > 1e-6) {
+        ux /= ul;
+        uy /= ul;
+      } else {
+        ux = -s;
+        uy = c;
+      }
+      // implicit damping: F = kp e - kd (v_rel0 + dt A F), A the pair's response of (v_R - v_T) to F
+      // with the leg / arm split (rank-1 rotational term through the chassis inertia); explicit damping at
+      // kd 4200 is unstable against the chassis's rotational compliance at the grip (c dt / m_eff > 2)
       const ex = twx - px[RIDER]!;
       const ey = twy - py[RIDER]!;
-      const rx = px[RIDER]! - fx;
-      const ry = py[RIDER]! - fy;
-      // Use the velocity at the ACTUAL rider COM in the rotating chassis frame, not at
-      // the servo target. Common rigid rotation must produce zero relative velocity even
-      // when the body is displaced from its target. Include this tick's external impulses.
-      const vrx = vx[RIDER]! - vx[CHASSIS]! + av[CHASSIS]! * ry;
-      const vry = vy[RIDER]! - vy[CHASSIS]! - av[CHASSIS]! * rx;
-      const rig = this.updateRiderRig();
-      this.dLegLen = Math.sqrt((rig.ankle.x - rig.hips.x) ** 2 + (rig.ankle.y - rig.hips.y) ** 2);
-      // Keep the existing finite muscle-force envelope and intent-dependent absorption.
+      const vrx = vRx0 - vtx;
+      const vry = vRy0 - vty;
+      const mRed = im[RIDER]! + im[CHASSIS]!;
+      const rpx = pegx - fx;
+      const rpy = pegy - fy;
+      const rgx = gripx - fx;
+      const rgy = gripy - fy;
+      // torque on C per unit F: q . F with q = -(r_peg x (u u^T .)) - (r_grip x ((I - u u^T) .))
+      const cpu = rpx * uy - rpy * ux; // r_peg x u
+      const cgu = rgx * uy - rgy * ux; // r_grip x u
+      // r_grip x F = rgx Fy - rgy Fx ; F_arm = F - u (u.F)
+      const qx = -(cpu * ux + (-rgy - cgu * ux));
+      const qy = -(cpu * uy + (rgx - cgu * uy));
+      // v_T change per unit torque impulse: omega x r_T = (-rty, rtx); v_rel = v_R - v_T loses it
+      const pxx = rty;
+      const pyy = -rtx;
+      const kI = ii[CHASSIS]!;
+      const a = r.kd * dt;
+      // M = I + a A, A = mRed I + kI p q^T  (2x2)
+      const m11 = 1 + a * (mRed + kI * pxx * qx);
+      const m12 = a * kI * pxx * qy;
+      const m21 = a * kI * pyy * qx;
+      const m22 = 1 + a * (mRed + kI * pyy * qy);
+      // damping part implicit (F_d (I + a A) = -kd v_rel0), spring part explicit (omega dt = 0.31)
+      const bx = -r.kd * vrx;
+      const by = -r.kd * vry;
+      const det = m11 * m22 - m12 * m21;
+      let Fx = r.kp * ex + (bx * m22 - m12 * by) / det;
+      let Fy = r.kp * ey + (m11 * by - m21 * bx) / det;
+      // force-velocity (R2, Hill-like): the servo can pull the body toward its target at full F_max only
+      // while the gap is opening or closing slowly; the cap falls linearly with the closing speed to
+      // `servoMinFrac` F_max at `servoCloseV0`. The hop's push is an opening gap (the target runs ahead of
+      // the body) and keeps F_max; a big landing drives the body 0.3 m below a static target and would
+      // otherwise fire it (and the bike) back up at F_max - the 0.6 m pogo rebound of R2's first 2 m drop.
       const el = Math.sqrt(ex * ex + ey * ey);
       const vClose = el > 1e-6 ? (vrx * ex + vry * ey) / el : 0;
       const hill = clamp(1 - vClose / r.servoCloseV0, r.servoMinFrac, 1);
       const intent = clamp(F[S_TGT_MOVE]! / r.servoIntentM, 0, 1);
       const fl = hill + (1 - hill) * intent;
+      const fmax = r.Fmax * fl;
+      this.dLegLen = ul;
       this.dLegFrac = fl;
       this.dIntent = intent;
-      const k = this.servoKinematics;
-      k.offsetX = rx;
-      k.offsetY = ry;
-      k.errorX = ex;
-      k.errorY = ey;
-      k.angleError = wrapAngle(this.an[CHASSIS]! + F[S_TGT_PSI]! - this.an[RIDER]!);
-      k.relativeVX = vrx;
-      k.relativeVY = vry;
-      k.relativeW = av[RIDER]! - av[CHASSIS]!;
-      k.invMassC = im[CHASSIS]!;
-      k.invMassR = im[RIDER]!;
-      k.invInertiaC = ii[CHASSIS]!;
-      k.invInertiaR = ii[RIDER]!;
-      this.servoMaxForce = r.Fmax * fl;
-      this.dServoFx = this.dServoFy = this.dServoTq = 0;
+      const fm = Math.sqrt(Fx * Fx + Fy * Fy);
+      if (fm > fmax) {
+        Fx *= fmax / fm;
+        Fy *= fmax / fm;
+      }
+      this.dServoFx = Fx;
+      this.dServoFy = Fy;
+      const along = Fx * ux + Fy * uy;
+      const legx = along * ux;
+      const legy = along * uy;
+      const armx = Fx - legx;
+      const army = Fy - legy;
+      this.forceAt(RIDER, pegx, pegy, legx, legy);
+      this.forceAt(CHASSIS, pegx, pegy, -legx, -legy);
+      this.forceAt(RIDER, gripx, gripy, armx, army);
+      this.forceAt(CHASSIS, gripx, gripy, -armx, -army);
+      // angular servo
+      const errA = this.an[CHASSIS]! + F[S_TGT_PSI]! - this.an[RIDER]!;
+      const tq = clamp(r.kpsi * errA + r.cpsi * (wC0 - wR0), -r.tauMax, r.tauMax);
+      this.dServoTq = tq;
+      av[RIDER] = av[RIDER]! + tq * dt * ii[RIDER]!;
+      av[CHASSIS] = av[CHASSIS]! - tq * dt * ii[CHASSIS]!;
       // the declared attitude torque (§9.4): external, always on, printed
       const att = -r.Katt * F[S_IN_L]! - (r.cAtt + r.airCattAdd * this.airLim) * wC0;
       this.dAtt = att;
@@ -1380,7 +1400,6 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const ii = this.ii;
     const W = this.totalMass() * this.g;
     const Cs = t.tyre.Cs;
-    this.brakeAssist = 0;
 
     for (let w = 0; w < 2; w++) {
       this.sLimLo[w] = 0;
@@ -1395,7 +1414,6 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const fy = this.py[CHASSIS]!;
     const wheelB = WHEEL_BODIES;
     const brakeIn = riding ? this.F[S_BRAKE_EFF]! : 1;
-    if (riding) this.prepareRiderLimits();
 
     for (let it = 0; it < iters; it++) {
       // --- sliders: bilateral perpendicular constraint, then travel limits (no restitution, no Baumgarte)
@@ -1422,19 +1440,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
         const st = w === 0 ? t.suspension.rear : t.suspension.front;
         const comp = this.sComp[w]!;
         const ra = rx * ay - ry * ax;
-        const massA = 1 / ((im[wb]! + im[CHASSIS]!) * (ax * ax + ay * ay) + ii[CHASSIS]! * ra * ra);
-        const gamma = this.sSpringGamma[w]!;
-        if (gamma > 0) {
-          const rate = (vx[wb]! - vx[CHASSIS]! + av[CHASSIS]! * ry) * ax + (vy[wb]! - vy[CHASSIS]! - av[CHASSIS]! * rx) * ay;
-          const impulse = -(rate + this.sSpringBias[w]! + gamma * this.sSpringImpulse[w]!) / (1 / massA + gamma);
-          this.sSpringImpulse[w] = this.sSpringImpulse[w]! + impulse;
-          this.sForce[w] = -this.sSpringImpulse[w]! / dt;
-          vx[wb] = vx[wb]! + impulse * ax * im[wb]!;
-          vy[wb] = vy[wb]! + impulse * ay * im[wb]!;
-          vx[CHASSIS] = vx[CHASSIS]! - impulse * ax * im[CHASSIS]!;
-          vy[CHASSIS] = vy[CHASSIS]! - impulse * ay * im[CHASSIS]!;
-          av[CHASSIS] = av[CHASSIS]! - ii[CHASSIS]! * ra * impulse;
-        }
+        const massA = 1 / (im[wb]! + im[CHASSIS]! + ii[CHASSIS]! * ra * ra);
         if (comp < 0.03) {
           const relx = vx[wb]! - (vx[CHASSIS]! - av[CHASSIS]! * ry);
           const rely = vy[wb]! - (vy[CHASSIS]! + av[CHASSIS]! * rx);
@@ -1572,44 +1578,13 @@ class WorldV2 implements BikePhysicsWorldV2 {
         }
       }
 
-      // --- brakes: torque-capped spin locks wheel <-> chassis. Rookie rear-lift
-      // protection modulates the front caliper using the same contact loads as the tyres.
+      // --- brakes: torque-capped spin locks wheel <-> chassis (§8: no caps of any kind while riding)
       if (brakeIn > 0) {
-        let frontLimit = Infinity;
-        const assist = riding ? t.brakes.liftControl * clamp((0.8 - Math.abs(this.F[S_IN_L]!)) / 0.3, 0, 1) : 0;
-        if (assist > 0) {
-          let frontContact = -1, rearBrake = 0;
-          for (let i = 0; i < nC; i++) {
-            if (this.cA[i] === FRONT && this.cLn[i]! > 0 && (frontContact < 0 || this.cLn[i]! > this.cLn[frontContact]!)) frontContact = i;
-            if (this.cA[i] === REAR) rearBrake += Math.max(0, this.cLt[i]!) / dt;
-          }
-          if (frontContact >= 0) {
-            const mass = this.totalMass();
-            const mx = (t.chassis.mass * this.px[CHASSIS]! + t.wheel.rearMass * this.px[REAR]! + t.wheel.frontMass * this.px[FRONT]! + t.rider.mass * this.px[RIDER]!) / mass;
-            const my = (t.chassis.mass * this.py[CHASSIS]! + t.wheel.rearMass * this.py[REAR]! + t.wheel.frontMass * this.py[FRONT]! + t.rider.mass * this.py[RIDER]!) / mass;
-            const nx = this.cNx[frontContact]!, ny = this.cNy[frontContact]!;
-            const dx = mx - this.px[FRONT]! - this.cRAx[frontContact]!;
-            const dy = my - this.py[FRONT]! - this.cRAy[frontContact]!;
-            const height = dx * nx + dy * ny;
-            if (height > 0.1) {
-              // Gravity supplies M*g*(-dx) of righting moment about the front contact.
-              // Braking has lever height; retain a 10% margin before rear-wheel lift.
-              const margin = -dx + Math.min(0, av[CHASSIS]!) * height * t.brakes.liftLookahead;
-              const safeForce = Math.max(0, 0.9 * mass * this.g * margin / height);
-              frontLimit = Math.max(0, safeForce - rearBrake) * t.wheel.radius;
-            }
-          }
-        }
         for (let w = 0; w < 2; w++) {
           const wb = wheelB[w]!;
           let maxNm = t.brakes.totalNm * (w === 0 ? 1 - t.brakes.frontFrac : t.brakes.frontFrac);
           if (!riding) maxNm *= w === 0 ? t.ragdoll.crashRearBrake : t.ragdoll.crashFrontBrake;
-          let maxJ = brakeIn * maxNm * dt;
-          if (w === 1 && Number.isFinite(frontLimit)) {
-            const trim = assist * Math.max(0, maxJ - frontLimit * dt);
-            this.brakeAssist = maxJ > 0 ? trim / maxJ : 0;
-            maxJ -= trim;
-          }
+          const maxJ = brakeIn * maxNm * dt;
           const rel = av[wb]! - av[CHASSIS]!;
           const mass = 1 / (ii[wb]! + ii[CHASSIS]!);
           let lambda = -mass * rel;
@@ -1622,251 +1597,9 @@ class WorldV2 implements BikePhysicsWorldV2 {
         }
       }
 
-      if (riding) {
-        // Re-evaluate the same bounded implicit actuator against the contact/suspension
-        // solution. Remove its previous iterate first, then apply the new TOTAL wrench;
-        // this is a block Gauss-Seidel solve, never six successive muscle impulses.
-        this.forceAt(RIDER, this.px[RIDER]!, this.py[RIDER]!, -this.dServoFx, -this.dServoFy);
-        this.forceAt(CHASSIS, this.px[RIDER]!, this.py[RIDER]!, this.dServoFx, this.dServoFy);
-        av[RIDER] = av[RIDER]! - this.dServoTq * dt * ii[RIDER]!;
-        av[CHASSIS] = av[CHASSIS]! + this.dServoTq * dt * ii[CHASSIS]!;
-        const k = this.servoKinematics;
-        k.relativeVX = vx[RIDER]! - vx[CHASSIS]! + av[CHASSIS]! * k.offsetY;
-        k.relativeVY = vy[RIDER]! - vy[CHASSIS]! - av[CHASSIS]! * k.offsetX;
-        k.relativeW = av[RIDER]! - av[CHASSIS]!;
-        const wrench = riderServoWrench(t.rider, k, dt, this.servoMaxForce, this.servoWrench);
-        this.dServoFx = wrench.x;
-        this.dServoFy = wrench.y;
-        this.dServoTq = wrench.torque;
-        this.forceAt(RIDER, this.px[RIDER]!, this.py[RIDER]!, wrench.x, wrench.y);
-        this.forceAt(CHASSIS, this.px[RIDER]!, this.py[RIDER]!, -wrench.x, -wrench.y);
-        av[RIDER] = av[RIDER]! + wrench.torque * dt * ii[RIDER]!;
-        av[CHASSIS] = av[CHASSIS]! - wrench.torque * dt * ii[CHASSIS]!;
-      }
-
-      // The rider's finite muscle force cannot stop an impact before arms/legs reach their
-      // anatomical limits. These unilateral impulses transmit that load through the attached
-      // limbs, conserving momentum; they do not teleport or clamp the body's coordinates.
-      if (riding) this.solveRiderLimits();
-
       // --- ragdoll joints (as v1)
       if (rag) this.solveRagdollJoints(it === 0);
     }
-  }
-
-  private riderRigGaps(rig: RiderRigPose, out: Float64Array): void {
-    const arm = Math.sqrt((rig.wrist.x - rig.shoulders.x) ** 2 + (rig.wrist.y - rig.shoulders.y) ** 2);
-    const leg = Math.sqrt((rig.ankle.x - rig.hips.x) ** 2 + (rig.ankle.y - rig.hips.y) ** 2);
-    const ankle = atan2(rig.knee.y - rig.ankle.y, rig.knee.x - rig.ankle.x);
-    const thigh = atan2(rig.knee.y - rig.hips.y, rig.knee.x - rig.hips.x);
-    const hip = wrapAngle(rig.torsoAngle - thigh);
-    out[0] = RIDER_REACH.armMax - arm;
-    out[1] = RIDER_REACH.legMax - leg;
-    out[2] = leg - RIDER_REACH.legMin;
-    out[3] = ankle - RIDER_ANKLE.min;
-    out[4] = RIDER_ANKLE.max - ankle;
-    out[5] = hip - RIDER_HIP.min;
-    out[6] = RIDER_HIP.max - hip;
-    out[7] = arm - RIDER_REACH.armMin;
-  }
-
-  private prepareRiderLimits(resetImpulse = true): void {
-    const rig = this.updateRiderRig();
-    const probe = this.rigProbe;
-    const hx = rig.hips.x, hy = rig.hips.y, angle = rig.torsoAngle;
-    const cx = rig.com.x, cy = rig.com.y;
-    const epsilon = 1e-5;
-    this.riderRigGaps(rig, this.rigGaps);
-    riderRigFromHips(hx + epsilon, hy, angle, probe);
-    const j00 = (probe.com.x - cx) / epsilon, j10 = (probe.com.y - cy) / epsilon;
-    this.riderRigGaps(probe, this.rigGapX);
-    riderRigFromHips(hx, hy + epsilon, angle, probe);
-    const j01 = (probe.com.x - cx) / epsilon, j11 = (probe.com.y - cy) / epsilon;
-    this.riderRigGaps(probe, this.rigGapY);
-    riderRigFromHips(hx, hy, angle + epsilon, probe);
-    let bx = (probe.com.x - cx) / epsilon, by = (probe.com.y - cy) / epsilon;
-    let fixedAngle = false;
-    this.riderRigGaps(probe, this.rigGapAngle);
-    const c = cos(this.an[CHASSIS]!), s = sin(this.an[CHASSIS]!);
-    const rx = this.px[RIDER]! - this.px[CHASSIS]!, ry = this.py[RIDER]! - this.py[CHASSIS]!;
-    for (let i = 0; i < this.riderLimits.length; i++) {
-      const q = this.riderLimits[i]!;
-      if (resetImpulse) q.impulse = 0;
-      const gap = this.rigGaps[i]!;
-      const gx = (this.rigGapX[i]! - gap) / epsilon;
-      const gy = (this.rigGapY[i]! - gap) / epsilon;
-      const ga = (this.rigGapAngle[i]! - gap) / epsilon;
-      // Chain rule through the inverse whole-body mass map: H = COM^-1(C, angle).
-      const regular = riderCOMGradient(j00, j01, j10, j11, rig.residual, gx, gy, probe.com);
-      const nx = probe.com.x, ny = probe.com.y;
-      if (!regular && !fixedAngle) {
-        // Use the SAME fixed-elbow/knee continuation for d(COM)/d(torso) as for translation.
-        // Only the trunk, head/neck and proximal upper-arm fractions move with the shoulder;
-        // the head/neck centroid also rotates about it. Retaining the singular full-map angle
-        // slope here would turn a bounded recovery row into an almost immovable angular row.
-        const p = RIDER_PROFILE;
-        const shoulderWeight = p.mass.trunk * p.comFraction.trunk + p.mass.headNeck + 2 * p.mass.upperArm * (1 - p.comFraction.upperArm);
-        const headWeight = p.mass.headNeck * p.headNeckLength * p.comFraction.headNeck;
-        bx = (shoulderWeight * (probe.shoulders.x - rig.shoulders.x) + headWeight * (cos(probe.headAngle) - cos(rig.headAngle))) / epsilon;
-        by = (shoulderWeight * (probe.shoulders.y - rig.shoulders.y) + headWeight * (sin(probe.headAngle) - sin(rig.headAngle))) / epsilon;
-        fixedAngle = true;
-      }
-      const angular = ga - nx * bx - ny * by;
-      q.nx = nx * c - ny * s;
-      q.ny = nx * s + ny * c;
-      q.jr = angular;
-      q.jc = angular + rx * q.ny - ry * q.nx;
-      // The same local continuation accounts for any honest inverse residual. Keep joint
-      // recovery active; an unresolved mass map must never silently detach the whole rider.
-      q.gap = gap + nx * (this.rigKeyX - cx) + ny * (this.rigKeyY - cy);
-      const response = (this.im[RIDER]! + this.im[CHASSIS]!) * (q.nx * q.nx + q.ny * q.ny) + this.ii[RIDER]! * q.jr * q.jr + this.ii[CHASSIS]! * q.jc * q.jc;
-      q.mass = response > 1e-12 ? 1 / response : 0;
-      q.minVelocity = -Math.max(0, q.gap) / this.dt;
-    }
-  }
-
-  private solveRiderLimits(): void {
-    for (const q of this.riderLimits) {
-      if (q.mass === 0) continue;
-      const velocity = (this.vx[RIDER]! - this.vx[CHASSIS]!) * q.nx + (this.vy[RIDER]! - this.vy[CHASSIS]!) * q.ny + this.av[RIDER]! * q.jr - this.av[CHASSIS]! * q.jc;
-      const proposed = q.mass * (q.minVelocity - velocity);
-      const accumulated = Math.max(0, q.impulse + proposed);
-      const impulse = accumulated - q.impulse;
-      q.impulse = accumulated;
-      this.vx[RIDER] = this.vx[RIDER]! + impulse * q.nx * this.im[RIDER]!;
-      this.vy[RIDER] = this.vy[RIDER]! + impulse * q.ny * this.im[RIDER]!;
-      this.av[RIDER] = this.av[RIDER]! + impulse * q.jr * this.ii[RIDER]!;
-      this.vx[CHASSIS] = this.vx[CHASSIS]! - impulse * q.nx * this.im[CHASSIS]!;
-      this.vy[CHASSIS] = this.vy[CHASSIS]! - impulse * q.ny * this.im[CHASSIS]!;
-      this.av[CHASSIS] = this.av[CHASSIS]! - impulse * q.jc * this.ii[CHASSIS]!;
-    }
-  }
-
-  /** The same joint Jacobians in the existing split-position pass. Ground/slider projection
-   * moves the chassis after velocity solving; the attached rider must participate in that
-   * projection too. Corrections are shared by inverse mass/inertia, never a rider-only clamp. */
-  private projectRiderLimits(passes = 4): number {
-    let worst = 0;
-    for (let pass = 0; pass < passes; pass++) {
-      this.prepareRiderLimits(false);
-      let corrected = false;
-      for (let i = 0; i < this.riderLimits.length; i++) {
-        const q = this.riderLimits[i]!;
-        if (q.mass === 0 || q.gap >= -1e-6) continue;
-        worst = Math.max(worst, -q.gap);
-        const impulse = -q.gap * q.mass;
-        this.px[RIDER] = this.px[RIDER]! + impulse * q.nx * this.im[RIDER]!;
-        this.py[RIDER] = this.py[RIDER]! + impulse * q.ny * this.im[RIDER]!;
-        this.an[RIDER] = this.an[RIDER]! + impulse * q.jr * this.ii[RIDER]!;
-        this.px[CHASSIS] = this.px[CHASSIS]! - impulse * q.nx * this.im[CHASSIS]!;
-        this.py[CHASSIS] = this.py[CHASSIS]! - impulse * q.ny * this.im[CHASSIS]!;
-        this.an[CHASSIS] = this.an[CHASSIS]! - impulse * q.jc * this.ii[CHASSIS]!;
-        corrected = true;
-        this.prepareRiderLimits(false);
-      }
-      if (!corrected) break;
-    }
-    return worst;
-  }
-
-  /** Solve one candidate active set of the unilateral mass Gram system. Anatomical rows
-   * have only three relative coordinates, so an independent active set has at most three
-   * members. Stable index order and partial pivoting make degenerate choices deterministic. */
-  private riderBlockCandidate(n: number, i: number, j: number, k: number, regularizer: number): boolean {
-    const ids = this.riderBlockIds, a = this.riderBlockMatrix, impulse = this.riderBlockImpulse;
-    const gram = this.riderGram, rows = this.riderLimits;
-    ids[0] = i; ids[1] = j; ids[2] = k;
-    for (let r = 0; r < n; r++) {
-      const id = ids[r]!, diagonal = gram[id * 8 + id]!;
-      if (!(diagonal > 1e-12)) return false;
-      for (let c = 0; c < n; c++) {
-        const other = ids[c]!;
-        // Normalize mixed metre/radian rows before numerical rank decisions.
-        a[r * 4 + c] = gram[id * 8 + other]! / Math.sqrt(diagonal * gram[other * 8 + other]!) + (r === c ? regularizer : 0);
-      }
-      a[r * 4 + n] = -rows[id]!.gap / Math.sqrt(diagonal);
-    }
-    for (let column = 0; column < n; column++) {
-      let pivot = column;
-      for (let row = column + 1; row < n; row++) if (Math.abs(a[row * 4 + column]!) > Math.abs(a[pivot * 4 + column]!)) pivot = row;
-      if (!(Math.abs(a[pivot * 4 + column]!) > 1e-12)) return false;
-      if (pivot !== column) for (let c = column; c <= n; c++) {
-        const value = a[column * 4 + c]!;
-        a[column * 4 + c] = a[pivot * 4 + c]!; a[pivot * 4 + c] = value;
-      }
-      for (let row = column + 1; row < n; row++) {
-        const factor = a[row * 4 + column]! / a[column * 4 + column]!;
-        for (let c = column; c <= n; c++) a[row * 4 + c] = a[row * 4 + c]! - factor * a[column * 4 + c]!;
-      }
-    }
-    for (let row = n - 1; row >= 0; row--) {
-      let value = a[row * 4 + n]!;
-      for (let c = row + 1; c < n; c++) value -= a[row * 4 + c]! * impulse[c]!;
-      value /= a[row * 4 + row]!;
-      if (!(value >= 0) || !Number.isFinite(value)) return false;
-      impulse[row] = value;
-    }
-    for (let row = 0; row < n; row++) impulse[row] = impulse[row]! / Math.sqrt(gram[ids[row]! * 8 + ids[row]!]!);
-    for (let row = 0; row < 8; row++) {
-      let gap = rows[row]!.gap;
-      for (let c = 0; c < n; c++) {
-        const id = ids[c]!;
-        gap += (gram[row * 8 + id]! + (row === id ? regularizer * gram[row * 8 + row]! : 0)) * impulse[c]!;
-      }
-      if (!(gap >= -1e-7)) return false;
-    }
-    return true;
-  }
-
-  /** Bounded Newton continuation for a position pass whose sequential rows did not close.
-   * Regularized subsets supply a direction when the exact linearization is infeasible;
-   * they do not soften the joint. Only newly evaluated nonlinear gaps can end the solve. */
-  private projectRiderBlock(): number {
-    this.prepareRiderLimits(false);
-    const rows = this.riderLimits, gram = this.riderGram;
-    let worst = 0;
-    for (let i = 0; i < 8; i++) worst = Math.max(worst, -rows[i]!.gap);
-    if (worst <= 1e-6) return worst;
-    for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
-      const a = rows[i]!, b = rows[j]!;
-      gram[i * 8 + j] = (this.im[RIDER]! + this.im[CHASSIS]!) * (a.nx * b.nx + a.ny * b.ny)
-        + this.ii[RIDER]! * a.jr * b.jr + this.ii[CHASSIS]! * a.jc * b.jc;
-    }
-    let count = 0;
-    for (let attempt = 0; attempt < 4 && count === 0; attempt++) {
-      const regularizer = attempt === 0 ? 0 : attempt === 1 ? 1e-6 : attempt === 2 ? 1e-4 : 0.01;
-      for (let i = 0; i < 8 && count === 0; i++) if (this.riderBlockCandidate(1, i, 0, 0, regularizer)) count = 1;
-      for (let i = 0; i < 8 && count === 0; i++) for (let j = i + 1; j < 8 && count === 0; j++) if (this.riderBlockCandidate(2, i, j, 0, regularizer)) count = 2;
-      for (let i = 0; i < 8 && count === 0; i++) for (let j = i + 1; j < 8 && count === 0; j++) for (let k = j + 1; k < 8 && count === 0; k++) if (this.riderBlockCandidate(3, i, j, k, regularizer)) count = 3;
-    }
-    if (count === 0) {
-      // An impossible/singular local model is not success. Take one bounded unilateral
-      // recovery step, then let the coupled pass rebuild the actual geometry.
-      let largest = 0;
-      for (let i = 0; i < 8; i++) {
-        const q = rows[i]!, correction = -q.gap * Math.sqrt(q.mass);
-        if (q.gap < -1e-6 && correction > largest) {
-          largest = correction; this.riderBlockIds[0] = i; this.riderBlockImpulse[0] = -q.gap * q.mass; count = 1;
-        }
-      }
-    }
-    let x = 0, y = 0, r = 0, c = 0;
-    for (let i = 0; i < count; i++) {
-      const q = rows[this.riderBlockIds[i]!]!, impulse = this.riderBlockImpulse[i]!;
-      x += q.nx * impulse; y += q.ny * impulse; r += q.jr * impulse; c += q.jc * impulse;
-    }
-    const scale = 1 / Math.max(1, Math.sqrt(x * x + y * y) * Math.max(this.im[RIDER]!, this.im[CHASSIS]!) / 0.01,
-      Math.abs(r * this.ii[RIDER]!) / 0.02, Math.abs(c * this.ii[CHASSIS]!) / 0.02);
-    x *= scale; y *= scale; r *= scale; c *= scale;
-    if (Number.isFinite(x + y + r + c)) {
-      this.px[RIDER] = this.px[RIDER]! + x * this.im[RIDER]!;
-      this.py[RIDER] = this.py[RIDER]! + y * this.im[RIDER]!;
-      this.an[RIDER] = this.an[RIDER]! + r * this.ii[RIDER]!;
-      this.px[CHASSIS] = this.px[CHASSIS]! - x * this.im[CHASSIS]!;
-      this.py[CHASSIS] = this.py[CHASSIS]! - y * this.im[CHASSIS]!;
-      this.an[CHASSIS] = this.an[CHASSIS]! - c * this.ii[CHASSIS]!;
-    }
-    return worst;
   }
 
   private solveRagdollJoints(damp: boolean): void {
@@ -1963,19 +1696,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
    * contact penetrations beyond `slop`, each linearised about the collide-time pose. Velocities untouched.
    */
   private positionPass(): void {
-    this.positionSolve(false);
-    if (this.tuning.solver.posIters <= 0 || this.U[U_FAULT] !== 0) return;
-    // The ordinary pass refreshes every anatomical gap after its last correction. Preserve
-    // its exact operation order and result whenever it already meets the physical tolerance.
-    for (let i = 0; i < 8; i++) if (this.riderLimits[i]!.gap < -1e-6) {
-      this.positionSolve(true);
-      break;
-    }
-  }
-
-  private positionSolve(anatomyBlock: boolean): void {
     const t = this.tuning;
-    if (t.solver.posIters <= 0) return;
     const im = this.im;
     const ii = this.ii;
     const px = this.px;
@@ -1983,81 +1704,52 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const an = this.an;
     const slop = t.solver.slop;
     const beta = t.solver.posBeta;
-    const projectWheel = (wb: number, error: number, nx: number, ny: number): void => {
-      const rx = px[wb]! - px[CHASSIS]!, ry = py[wb]! - py[CHASSIS]!;
-      const angular = rx * ny - ry * nx;
-      const response = (im[wb]! + im[CHASSIS]!) * (nx * nx + ny * ny) + ii[CHASSIS]! * angular * angular;
-      let impulse = -error / response;
-      let contact = -1, deficit = 0;
-      // An isolated joint correction otherwise pushes the light wheel into the ground, then
-      // the ground correction opens the joint again. Select the contact that this
-      // correction would violate and solve its normal row together with the joint row.
-      for (let i = 0; i < this.nC; i++) {
-        if (this.cA[i] !== wb) continue;
-        const cx = this.cNx[i]!, cy = this.cNy[i]!;
-        const rn = this.cRAx[i]! * cy - this.cRAy[i]! * cx;
-        let sep = this.cSep0[i]! + (px[wb]! - this.p0x[wb]!) * cx + (py[wb]! - this.p0y[wb]!) * cy + (an[wb]! - this.a0[wb]!) * rn;
-        const other = this.cB[i]!;
-        if (other >= 0) {
-          const rnOther = this.cRBx[i]! * cy - this.cRBy[i]! * cx;
-          sep -= (px[other]! - this.p0x[other]!) * cx + (py[other]! - this.p0y[other]!) * cy + (an[other]! - this.a0[other]!) * rnOther;
-        }
-        const predicted = sep + im[wb]! * (nx * cx + ny * cy) * impulse + slop;
-        if (predicted < deficit) { deficit = predicted; contact = i; }
-      }
-      let groundImpulse = 0, cx = 0, cy = 0, rn = 0, rnOther = 0, other = -1;
-      if (contact >= 0) {
-        cx = this.cNx[contact]!; cy = this.cNy[contact]!;
-        rn = this.cRAx[contact]! * cy - this.cRAy[contact]! * cx;
-        let sep = this.cSep0[contact]! + (px[wb]! - this.p0x[wb]!) * cx + (py[wb]! - this.p0y[wb]!) * cy + (an[wb]! - this.a0[wb]!) * rn;
-        other = this.cB[contact]!;
-        if (other >= 0) {
-          rnOther = this.cRBx[contact]! * cy - this.cRBy[contact]! * cx;
-          sep -= (px[other]! - this.p0x[other]!) * cx + (py[other]! - this.p0y[other]!) * cy + (an[other]! - this.a0[other]!) * rnOther;
-        }
-        const coupling = im[wb]! * (nx * cx + ny * cy);
-        const contactResponse = (im[wb]! + (other >= 0 ? im[other]! : 0)) * (cx * cx + cy * cy)
-          + ii[wb]! * rn * rn + (other >= 0 ? ii[other]! * rnOther * rnOther : 0);
-        const determinant = response * contactResponse - coupling * coupling;
-        const candidate = (response * (-sep - slop) + coupling * error) / determinant;
-        if (determinant > 1e-12 && candidate > 0) {
-          impulse = (-error * contactResponse + coupling * (sep + slop)) / determinant;
-          groundImpulse = candidate;
-        }
-      }
-      px[wb] = px[wb]! + (impulse * nx + groundImpulse * cx) * im[wb]!;
-      py[wb] = py[wb]! + (impulse * ny + groundImpulse * cy) * im[wb]!;
-      an[wb] = an[wb]! + groundImpulse * rn * ii[wb]!;
-      if (other >= 0) {
-        px[other] = px[other]! - groundImpulse * cx * im[other]!;
-        py[other] = py[other]! - groundImpulse * cy * im[other]!;
-        an[other] = an[other]! - groundImpulse * rnOther * ii[other]!;
-      }
-      px[CHASSIS] = px[CHASSIS]! - impulse * nx * im[CHASSIS]!;
-      py[CHASSIS] = py[CHASSIS]! - impulse * ny * im[CHASSIS]!;
-      an[CHASSIS] = an[CHASSIS]! - impulse * angular * ii[CHASSIS]!;
-    };
-    // Rider/contact corrections also move the chassis. Solve the complete coupled set until
-    // corrections converge; finishing with a wheel-only snap would reopen the contacts/joints.
-    for (let it = 0; it < Math.max(t.solver.posIters, 64); it++) {
-      let worst = 0;
+    for (let it = 0; it < t.solver.posIters; it++) {
+      const c = cos(an[CHASSIS]!);
+      const s = sin(an[CHASSIS]!);
+      const fx = px[CHASSIS]!;
+      const fy = py[CHASSIS]!;
       for (let w = 0; w < 2; w++) {
         const st = w === 0 ? t.suspension.rear : t.suspension.front;
         const wb = w === 0 ? REAR : FRONT;
-        this.suspensionGeometry(w);
-        // Rear: radial length; front: perpendicular fork-line error.
+        const ax = st.axis.x * c - st.axis.y * s;
+        const ay = st.axis.x * s + st.axis.y * c;
+        const nx = -ay;
+        const ny = ax;
+        const arx = fx + st.axle.x * c - st.axle.y * s;
+        const ary = fy + st.axle.x * s + st.axle.y * c;
+        const dx = px[wb]! - arx;
+        const dy = py[wb]! - ary;
+        const rx = px[wb]! - fx;
+        const ry = py[wb]! - fy;
+        // perpendicular drift: remove it fully
         {
-          const nx = this.sNx[w]!, ny = this.sNy[w]!;
-          worst = Math.max(worst, Math.abs(this.sPerp[w]!));
-          projectWheel(wb, this.sPerp[w]!, nx, ny);
+          const perp = dx * nx + dy * ny;
+          const rn = rx * ny - ry * nx;
+          const mass = 1 / (im[wb]! + im[CHASSIS]! + ii[CHASSIS]! * rn * rn);
+          const lambda = -perp * mass;
+          px[wb] = px[wb]! + lambda * nx * im[wb]!;
+          py[wb] = py[wb]! + lambda * ny * im[wb]!;
+          px[CHASSIS] = px[CHASSIS]! - lambda * nx * im[CHASSIS]!;
+          py[CHASSIS] = py[CHASSIS]! - lambda * ny * im[CHASSIS]!;
+          an[CHASSIS] = an[CHASSIS]! - ii[CHASSIS]! * rn * lambda;
         }
-        this.suspensionGeometry(w);
-        const comp = this.sComp[w]!;
-        const error = comp < 0 ? comp : comp > st.travel ? comp - st.travel : 0;
-        if (error !== 0) {
-          worst = Math.max(worst, Math.abs(error));
-          const ax = this.sAx[w]!, ay = this.sAy[w]!;
-          projectWheel(wb, error, ax, ay);
+        // travel
+        {
+          const comp = dx * ax + dy * ay;
+          const ra = rx * ay - ry * ax;
+          const massA = 1 / (im[wb]! + im[CHASSIS]! + ii[CHASSIS]! * ra * ra);
+          let err = 0;
+          if (comp < 0) err = comp;
+          else if (comp > st.travel) err = comp - st.travel;
+          if (err !== 0) {
+            const lambda = -err * massA;
+            px[wb] = px[wb]! + lambda * ax * im[wb]!;
+            py[wb] = py[wb]! + lambda * ay * im[wb]!;
+            px[CHASSIS] = px[CHASSIS]! - lambda * ax * im[CHASSIS]!;
+            py[CHASSIS] = py[CHASSIS]! - lambda * ay * im[CHASSIS]!;
+            an[CHASSIS] = an[CHASSIS]! - ii[CHASSIS]! * ra * lambda;
+          }
         }
       }
       for (let sI = 0; sI < this.nSeesaw; sI++) {
@@ -2083,7 +1775,6 @@ class WorldV2 implements BikePhysicsWorldV2 {
           sep -= (px[B]! - this.p0x[B]!) * nx + (py[B]! - this.p0y[B]!) * ny + (an[B]! - this.a0[B]!) * rnB;
         }
         if (sep >= -slop) continue;
-        worst = Math.max(worst, -sep - slop);
         let corr = -beta * (sep + slop);
         if (corr > 0.2) corr = 0.2;
         const lambda = corr * this.cMassN[i]!;
@@ -2096,8 +1787,6 @@ class WorldV2 implements BikePhysicsWorldV2 {
           an[B] = an[B]! - ii[B]! * rnB * lambda;
         }
       }
-      if (this.U[U_FAULT] === 0) worst = Math.max(worst, anatomyBlock ? this.projectRiderBlock() : this.projectRiderLimits(1));
-      if (it + 1 >= t.solver.posIters && worst < 1e-6) break;
     }
   }
 
@@ -2114,8 +1803,13 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const prevRearComp = F[S_REAR_COMP]!;
     for (let w = 0; w < 2; w++) {
       const st = w === 0 ? t.suspension.rear : t.suspension.front;
-      this.suspensionGeometry(w);
-      F[w === 0 ? S_REAR_COMP : S_FRONT_COMP] = clamp(this.sComp[w]! / st.travel, 0, 1);
+      const wb = w === 0 ? REAR : FRONT;
+      const ax = st.axis.x * c - st.axis.y * s;
+      const ay = st.axis.x * s + st.axis.y * c;
+      const arx = this.px[CHASSIS]! + st.axle.x * c - st.axle.y * s;
+      const ary = this.py[CHASSIS]! + st.axle.x * s + st.axle.y * c;
+      const comp = (this.px[wb]! - arx) * ax + (this.py[wb]! - ary) * ay;
+      F[w === 0 ? S_REAR_COMP : S_FRONT_COMP] = clamp(comp / st.travel, 0, 1);
     }
 
     let rearLn = 0;
@@ -2184,13 +1878,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
         F[S_CHECKPOINT] = next;
         this.events.push({ type: 'checkpoint', index: next, tick, time: F[S_TIME]! });
       }
-      if (U[U_FINISHED] === 0 && frontX >= track.def.finishX) {
-        U[U_FINISHED] = 1;
-        F[S_FINISH_TIME] = (tick + 1) * dt;
-        this.events.push({ type: 'finish', tick: tick + 1, time: (tick + 1) * dt });
-      }
-
-      // crash rules (§11): body sensors, hazard, out of bounds. Nothing else.
+      // crash rules (§11): body sensors, hazard, out of bounds. Nothing else. Evaluated BEFORE the finish so the
+      // crossing tick's precedence rule (R6, physics.md §8.1) can read it.
       let fault = 0;
       let cause = 0;
       if (U[U_CRASH_PENDING] === 1) {
@@ -2218,6 +1907,22 @@ class WorldV2 implements BikePhysicsWorldV2 {
               break outer;
             }
           }
+        }
+      }
+      // finish (R6 precedence, physics.md §8.1): the front wheel crossing the line finishes the run - unless a fault lands in
+      // the same tick with the wheel no more than one wheel radius past the line, in which case the crash is ON
+      // the line and voids the finish (Trials: you cross upright). A fault with the wheel already > R past the
+      // line is a crash after the finish: `finish` is emitted first, then `fault`, and the consumer (Game) treats a
+      // fault after its finish as a post-finish tumble. At 21 m/s the wheel moves 0.175 m per tick, so in natural
+      // play the exception is unreachable and a same-tick fault always voids; teleports (the audit probe) reach it.
+      const finishX = track.def.finishX;
+      if (U[U_FINISHED] === 0 && frontX >= finishX) {
+        if (fault !== 0 && frontX - finishX <= R) {
+          U[U_FINISH_VOID] = 1;
+        } else {
+          U[U_FINISHED] = 1;
+          F[S_FINISH_TIME] = (tick + 1) * dt;
+          this.events.push({ type: 'finish', tick: tick + 1, time: (tick + 1) * dt });
         }
       }
       if (fault !== 0) {

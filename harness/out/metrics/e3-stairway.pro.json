@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "e3-stairway",
   "bike": "pro",
-  "updatedAt": "2026-09-15T03:09:22.260Z",
+  "updatedAt": "2026-09-15T21:19:23.538Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     3,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        38.275
+        37.875
       ]
     }
   ],
@@ -29,6 +29,7 @@
   "shaped": null,
   "singleWall": null,
   "runs": [
-    "20260914-220646-c0b59f"
+    "20260914-220646-c0b59f",
+    "20260915-161745-f7bf34"
   ]
 }

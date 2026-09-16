@@ -9,10 +9,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { expandFrames, type InputRecording } from '../../src/core/replay';
-import { srcFingerprint } from './metrics';
+import { srcFingerprint, fingerprintMatches } from './metrics';
 import { HARNESS_DIR } from './paths';
 import { loadRecording, saveRecording } from './recording';
-import { createSimFor } from './sim';
+import { mapPool } from './pool';
+import { createSimFor, type Sim } from './sim';
 import { DEFAULT_BIKE, type BikeClass } from '../../src/core/types';
 
 export const GOLDEN_ORDER = ['bot-oracle.json', 'bot-3.json', 'bot-2.json', 'bot-1.json', 'bot-0.json'] as const;
@@ -61,7 +62,7 @@ export function chooseGolden(trackId: string, bike: BikeClass = DEFAULT_BIKE): G
   const present = goldenOrder(bike).map((name) => path.join(dir, name)).filter((f) => fs.existsSync(f));
   const fp = srcFingerprint();
   const stamped = present.map((file) => ({ file, stamp: recordingFingerprint(file) }));
-  const match = stamped.find((s) => s.stamp === fp);
+  const match = stamped.find((s) => fingerprintMatches(s.stamp, fp));
   if (match) return { file: match.file, fresh: true, stamp: match.stamp, candidates: present.length };
   const newest = [...stamped].sort((a, b) => fs.statSync(b.file).mtimeMs - fs.statSync(a.file).mtimeMs)[0];
   if (newest) return { file: newest.file, fresh: false, stamp: newest.stamp, candidates: present.length };
@@ -94,9 +95,14 @@ export async function refreshGoldens(
   trackIds: string[],
   verify: (rec: InputRecording) => Promise<{ hash: string; finishTime: number | null; faults: number }>,
   log: (l: string) => void = () => undefined,
+  o: { jobs?: number } = {},
 ): Promise<GoldenRefresh[]> {
   const fp = srcFingerprint();
+  // Pass 1 (node, in order): every golden replays here first; only the ones that still finish on a stale stamp
+  // need the browser. Pass 2 runs those `jobs` at a time (round 12: one Chromium, one context per recording).
+  const pending: Array<{ row: GoldenRefresh; rec: InputRecording; name: string; physicsVersion: Sim["physicsVersion"] }> = [];
   const out: GoldenRefresh[] = [];
+  const line = (row: GoldenRefresh, name: string): string => `${row.result.toUpperCase().padEnd(9)} ${row.trackId.padEnd(20)} ${name.padEnd(14)} ${row.note}`;
   for (const trackId of trackIds) {
     const dir = path.join(HARNESS_DIR, 'inputs', trackId);
     for (const name of [...goldenOrder('rookie'), ...goldenOrder('pro')]) {
@@ -113,27 +119,34 @@ export async function refreshGoldens(
       const finished = sim.phase() === 'finished';
       const finishTime = finished ? sim.runTime() : null;
       const row: GoldenRefresh = { trackId, file, stamp, result: 'stale', finishTime, attempts: 1 + faults, nodeHash, browserHash: null, note: '' };
-      if (stamp === fp && rec.header.physics === sim.physicsVersion) {
+      out.push(row);
+      if (fingerprintMatches(stamp, fp) && rec.header.physics === sim.physicsVersion) {
         row.result = 'fresh';
         row.note = 'already stamped with the working tree (src + physics)';
       } else if (!finished) {
         row.note = `no longer finishes on src=${fp} (${(sim.state().bike.pos.x).toFixed(1)} m, ${row.attempts} attempts)`;
       } else {
-        const b = await verify(rec);
-        row.browserHash = b.hash;
-        if (b.hash !== nodeHash) row.note = `node ${nodeHash} != browser ${b.hash} (stale dist? pass --build)`;
-        else {
-          const note = `${(rec.header.note ?? '').replace(/\s*\bsrc=[0-9a-f]{8}\b/, '').replace(/\s*\brestamped-from=[0-9a-f]{8}\b/, '')} src=${fp} restamped-from=${stamp ?? 'unstamped'}`.trim();
-          // A re-proved golden also gains the solver stamp it now demonstrably runs on (core r7 `header.physics`).
-          saveRecording(file, { ...rec, header: { ...rec.header, ...(sim.physicsVersion ? { physics: sim.physicsVersion } : {}), note } });
-          row.result = 'restamped';
-          row.note = `finish ${finishTime?.toFixed(3)} s, ${row.attempts} attempt(s), node == browser; ${stamp ?? 'unstamped'} -> ${fp}`;
-        }
+        pending.push({ row, rec, name, physicsVersion: sim.physicsVersion });
+        continue;
       }
-      log(`${row.result.toUpperCase().padEnd(9)} ${trackId.padEnd(20)} ${name.padEnd(14)} ${row.note}`);
-      out.push(row);
+      log(line(row, name));
     }
   }
+  if (pending.length) log(`${pending.length} golden(s) to re-prove in the browser, ${Math.max(1, o.jobs ?? 1)} at a time`);
+  await mapPool(pending, Math.max(1, o.jobs ?? 1), async ({ row, rec, name, physicsVersion }) => {
+    const b = await verify(rec);
+    row.browserHash = b.hash;
+    if (b.hash !== row.nodeHash) row.note = `node ${row.nodeHash} != browser ${b.hash} (stale dist? pass --build)`;
+    else {
+      const stamp = row.stamp;
+      const note = `${(rec.header.note ?? '').replace(/\s*\bsrc=[0-9a-f]{8}\b/, '').replace(/\s*\brestamped-from=[0-9a-f]{8}\b/, '')} src=${fp} restamped-from=${stamp ?? 'unstamped'}`.trim();
+      // A re-proved golden also gains the solver stamp it now demonstrably runs on (core r7 `header.physics`).
+      saveRecording(row.file, { ...rec, header: { ...rec.header, ...(physicsVersion ? { physics: physicsVersion } : {}), note } });
+      row.result = 'restamped';
+      row.note = `finish ${row.finishTime?.toFixed(3)} s, ${row.attempts} attempt(s), node == browser; ${stamp ?? 'unstamped'} -> ${fp}`;
+    }
+    log(line(row, name));
+  });
   return out;
 }
 

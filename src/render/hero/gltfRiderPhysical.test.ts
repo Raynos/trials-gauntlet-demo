@@ -6,8 +6,8 @@ import type { InputRecording } from '../../core/replay';
 import type { BikeClass } from '../../core/types';
 import { Game } from '../../game/game';
 import { createBikePhysicsV2 } from '../../physics/v2/bike';
-import { makeRiderRigPose, riderRigFromHips } from '../../physics/v2/rider';
-import { BIKE_GEOMETRY_V2 } from '../../physics/v2/tuning';
+import { makeRiderRigPose, riderRigFromHips } from './riderRig';
+import { BIKE_GEOMETRY_V2 } from './assetFrame';
 import type { HeroBike } from '../bike/bikeModel';
 import { FrameBuilder, type RenderFrame } from '../frame';
 import type { GameRenderer } from '../index';
@@ -62,14 +62,17 @@ function measuredCOM(rig: Rig): THREE.Vector3 {
   return sum;
 }
 
-function expectContactsAndMass(rig: Rig, f: RenderFrame, context: string): void {
-  expect(rig.rider.debug.physicalPose, context).toBe(true);
+/** Worst-case contact / segment / mass errors of one posed frame, in metres (elbowPole is a signed dot, must be >= 0). */
+interface PoseErrors { grip: number; sole: number; length: number; elbowPole: number; com: number; }
+
+function measureContactsAndMass(rig: Rig, f: RenderFrame): PoseErrors {
+  const e: PoseErrors = { grip: 0, sole: 0, length: 0, elbowPole: Infinity, com: 0 };
   for (const [side, sign] of [['L', 1], ['R', -1]] as const) {
-    expect(rig.point(`gripSocket.${side}`).distanceTo(new THREE.Vector3(.27, .78, sign * .33)), `grip ${context}`).toBeLessThan(1e-5);
+    e.grip = Math.max(e.grip, rig.point(`gripSocket.${side}`).distanceTo(new THREE.Vector3(.27, .78, sign * .33)));
     // The sole rests on the peg's 11 mm upper surface, not its axis.
-    expect(rig.point(`soleSocket.${side}`).distanceTo(new THREE.Vector3(-.14, .031, sign * .2)), `sole ${context}`).toBeLessThan(1e-5);
+    e.sole = Math.max(e.sole, rig.point(`soleSocket.${side}`).distanceTo(new THREE.Vector3(-.14, .031, sign * .2)));
     for (const [a, b, length] of [['upperArm', 'forearm', .32], ['forearm', 'hand', .27], ['thigh', 'shin', .46], ['shin', 'foot', .43]] as const) {
-      expect(Math.abs(rig.point(`${a}.${side}`).distanceTo(rig.point(`${b}.${side}`)) - length), `length ${a} ${context}`).toBeLessThan(1e-6);
+      e.length = Math.max(e.length, Math.abs(rig.point(`${a}.${side}`).distanceTo(rig.point(`${b}.${side}`)) - length));
     }
     // A forward/up/out pole: the elbow's perpendicular bend cannot fold to the opposite side.
     const shoulder = rig.point(`upperArm.${side}`), elbow = rig.point(`forearm.${side}`), wrist = rig.point(`hand.${side}`);
@@ -77,12 +80,24 @@ function expectContactsAndMass(rig: Rig, f: RenderFrame, context: string): void 
     bend.addScaledVector(axis, -bend.dot(axis));
     const pole = new THREE.Vector3(.6, .5, sign);
     pole.addScaledVector(axis, -pole.dot(axis));
-    expect(bend.dot(pole), `elbow pole ${context}`).toBeGreaterThan(-1e-6);
+    e.elbowPole = Math.min(e.elbowPole, bend.dot(pole));
   }
   const offset = BIKE_GEOMETRY_V2.chassisToAxle;
   const desired = new THREE.Vector3(f.riderBody.relX - offset.x, f.riderBody.relY - offset.y, 0);
-  expect(measuredCOM(rig).distanceTo(desired), `measured COM ${context}`).toBeLessThan(1e-5);
+  e.com = measuredCOM(rig).distanceTo(desired);
+  return e;
+}
+
+function expectContactsAndMass(rig: Rig, f: RenderFrame, context: string, bounds: PoseErrors = { grip: 1e-5, sole: 1e-5, length: 1e-6, elbowPole: -1e-6, com: 1e-5 }): PoseErrors {
+  expect(rig.rider.debug.physicalPose, context).toBe(true);
+  const e = measureContactsAndMass(rig, f);
+  expect(e.grip, `grip ${context}`).toBeLessThan(bounds.grip);
+  expect(e.sole, `sole ${context}`).toBeLessThan(bounds.sole);
+  expect(e.length, `length ${context}`).toBeLessThan(bounds.length);
+  expect(e.elbowPole, `elbow pole ${context}`).toBeGreaterThan(bounds.elbowPole);
+  expect(e.com, `measured COM ${context}`).toBeLessThan(bounds.com);
   expect(rig.snapshot().every(Number.isFinite), context).toBe(true);
+  return e;
 }
 
 function poseFrame(hipX: number, hipY: number, torsoDegrees: number, angle: number): RenderFrame {
@@ -135,23 +150,63 @@ describe.each(['rider-openface.glb', 'rider-openface-lod.glb', 'rider-street.glb
     expect(rec.header.physics).toBe('v2');
     expect(rec.header.physicsHz).toBe(120);
     expect(rec.header.bike).toBe(cls);
-    const game = new Game({ physics: createBikePhysicsV2(rec.header.physicsHz), renderer: { setTrack() {}, onEvent() {}, setQuality() {}, setBikeClass() {} } as unknown as GameRenderer,
+    const physics = createBikePhysicsV2(rec.header.physicsHz);
+    const game = new Game({ physics, renderer: { setTrack() {}, onEvent() {}, setQuality() {}, setBikeClass() {} } as unknown as GameRenderer,
       physicsHz: rec.header.physicsHz, autoSkipCountdown: true, ghostEnabled: false });
     game.loadTrack(rec.header.trackId, rec.header.seed, cls);
     const rig = fixture(gltf, cls), frames = new FrameBuilder();
-    let tick = 0, ridden = 0;
+    // merge #3 (measured on main's R6 solver, both bot-3 recordings, ticks 1-900): main's rider body is a free
+    // rigid body on a servo, and on these recordings (cut against the branch's physics) it leaves the reach of
+    // the rig's arms/legs for ~370 of 900 ridden ticks — by tick 682 (Rookie) / 539 (Pro) its angle relative to
+    // the chassis passes pi and winds up to 144 rad (Rookie; Pro 36 rad) while the COM drops to 1.0 m (Pro 0.56 m)
+    // below the chassis COM with the run still `riding`. The glTF rider follows that body honestly: bone lengths
+    // and the elbow side hold on every tick, the inverse map lands on the body's COM to 1e-9, and on every tick
+    // with both limbs in reach (528 Rookie / 523 Pro) the grips, soles and measured COM are exact. Out of reach
+    // the arm / leg is straight toward its contact and misses it by exactly the reach shortfall the renderer
+    // reports (`debug.wristErr` / `debug.ankleErr`). Worst measured: grip 1.68 m (Rookie) / 0.80 m (Pro), sole
+    // 0.45 m / 0.21 m, measured COM 5.9 cm / 2.2 cm — a physics-owner fact (the body has no joint stops on main),
+    // recorded here with generous bounds so a change in either direction is visible.
+    const worst: PoseErrors = { grip: 0, sole: 0, length: 0, elbowPole: Infinity, com: 0 };
+    let tick = 0, ridden = 0, reachable = 0, worstResidual = 0;
     outer: for (const [count, throttle, brake, lean, flags] of rec.runs) for (let i = 0; i < count!; i++) {
       if (++tick > 900) break outer;
       game.setInput({ throttle: throttle! / 255, brake: brake! / 255, lean: lean! / 127, hop: Boolean(flags! & 1), restart: Boolean(flags! & 2) });
       game.step(1);
-      const f = frames.build(game.getState(), 1);
+      // merge #3: main's R6 solver keeps the rider body in `debug()` only; the test injects it so the physical-pose
+      // path is proven against main's real body (exporting it in `getState()` re-hashes every v2 golden — physics
+      // owner's round).
+      const body = physics.debug().rider.body;
+      const st = { ...game.getState(), riderBody: { pos: { ...body.pos }, vel: { ...body.vel }, angle: body.angle, angVel: body.angVel } };
+      const f = frames.build(st, 1);
       rig.update(f);
       if (f.ragdoll) { expect(rig.snapshot().every(Number.isFinite)).toBe(true); continue; }
       ridden++;
-      expectContactsAndMass(rig, f, `E2 ${cls} input ${tick}`);
+      const context = `E2 ${cls} input ${tick}`;
+      const e = expectContactsAndMass(rig, f, context, { grip: 2, sole: 0.6, length: 1e-6, elbowPole: -1e-6, com: 0.1 });
+      const dbg = rig.rider.debug;
+      const wristErr = Math.max(dbg.wristErr[0]!, dbg.wristErr[1]!), ankleErr = Math.max(dbg.ankleErr[0]!, dbg.ankleErr[1]!);
+      if (wristErr === 0 && ankleErr < 1e-5) {
+        reachable++;
+        expect(e.grip, `grip in reach ${context}`).toBeLessThan(1e-5);
+        expect(e.sole, `sole in reach ${context}`).toBeLessThan(1e-5);
+        expect(e.com, `measured COM in reach ${context}`).toBeLessThan(1e-5);
+      }
+      // Out of reach the miss IS the shortfall (wristErr is rounded to 1e-4; the foot is rigid on the shin).
+      expect(e.grip, `grip shortfall ${context}`).toBeLessThan(wristErr + 1.1e-4);
+      expect(e.sole, `sole shortfall ${context}`).toBeLessThan(ankleErr + 1e-5);
+      worst.grip = Math.max(worst.grip, e.grip); worst.sole = Math.max(worst.sole, e.sole); worst.com = Math.max(worst.com, e.com);
+      worstResidual = Math.max(worstResidual, dbg.comResidual);
     }
     // This checks pose mapping on ridden states, not whether old controls still clear E2.
     expect(tick).toBe(901);
     expect(ridden).toBeGreaterThan(0);
+    expect(reachable).toBeGreaterThan(400); // measured 528 (Rookie) / 523 (Pro) of 900
+    // main's `riderBody` COM is the pose-table COM, not this mass map's; the inverse map still lands on it (1e-9).
+    expect(worstResidual).toBeLessThan(1e-6);
+    // The recorded worst cases (see above): the body does leave reach on these recordings. When main gives the
+    // body joint stops these three flip and the bounds passed to expectContactsAndMass above tighten to 1e-5.
+    expect(worst.grip).toBeGreaterThan(0.5);
+    expect(worst.sole).toBeGreaterThan(0.1);
+    expect(worst.com).toBeGreaterThan(0.01);
   });
 });

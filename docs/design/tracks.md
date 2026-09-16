@@ -1,6 +1,6 @@
 # Track system and curriculum
 
-Status: **tracks round 9 (physics v2 R5, strangers r5)** — the hard and extreme tiers are the storyboards, authored to the v2 envelope and held to reflex `good` over 9 seeds + the skill-3 bot: H1 climbs the roofline (+6 m) to the parapet wire and drops off the roof into the scaffold tunnel, H2 climbs the container stack to the crane jump, H3 runs the pour tunnel's fire pair, X1 gains +6 m to a summit cap ridge and a glissade, X2's mill duct, melt pit and three-top pipe run, X3's grounded cascade entry and the summit stack. Reflex `good` (was 0/9 on all but h3): **h1 10 (7/9) · h2 9 (7/9) · h3 11 (9/9) · x1 33 (9/9) · x2 4/9 at 9-24 · x3 29 (6/9)**; bot 2 / 1 / 1 / 1 / 3 / 2. Three physics facts drove the shapes: on v2 the reflex clears 45 deg faces (9/9, median 3) and nothing steeper (40 and 42 deg kicker planks launch it, 50-60 deg are the bot's hop move) so every X face is 45 deg and the escalation is height; the curve-0.3 platform kicker loops the gas-through-the-lip rider (straight 2 x 0.4: chain B 2/9 -> 8/9) and any LEVEL chain with 3-4 m gaps or a see-saw finish is a reflex wall while a stepping-up chain is not; a convex crest on a plank top walls the skill-3 bot (12/12, 60/60). The eight §5 validators are code (`validate.ts`, 24 tests). E3's up-flights are 0.12 x 0.8 (plain gas <= 21 deg from 14 to 20 m/s; 0.15 x 0.6 read 47 / 38 / 53 deg and looped at 20 — the strangers' 53-59 deg). Round-9 table in §2. Previous: **tracks round 8 (physics v2 R5, strangers r4)** — the stairway that no human proxy cleared is re-authored on a measured fact: a 0.25 m riser is a 75 deg face to a 0.34 m wheel, so once the front lifts every riser the rear hits accelerates the loop (the replayed r4 stranger recordings loop on PLAIN GAS at 10 m/s and on gas + lean +1 at 7 m/s; the 22.6 deg flight launches the bike off its top with no input at all); every E3 / X3 flight is now 0.15 m risers at a 0.6 m run (14 deg), no flight is taller than 1.2 m, the barrels at flight 2's foot are gone and the pit is 1.5 m onto a landing ramp — reflex `average` 35 -> 3 (9 seeds, 9/9), `good` 14 -> 1, eight naive riders (plain gas, governed gas, coast-in-air) clear it in one attempt. X3's Rookie clear is back (skill-3 bot 50 attempts capped at 95 % -> 2 attempts, 48.2 s) with a convex crest at the 60 deg plank top; the same crest on E1's 45 deg demand (the reflex launched off the plank top and backflipped over the box, 28 deaths x 9 seeds) and the v2 hop rule (a 0.45 ledge wants 6 m of run-up, not 16 — the hop window is 5-8 m/s) put m1 `average` 49 -> 7 and `good` 22 -> 7. Two new §0 rules: the stair riser (0.15) and the panic drop (a held lean-back rides every drop to 1.8 m off a >= 8 x h down-ramp and loops down any stair flight >= 1.0 m — B2's two stair descents are ramps now). Round-8 table in §2. Previous: **tracks round 7 (physics v2)** — every §0 number re-measured on `physics-v2` (v1 column kept one round; the flip changed the envelope the courses were built on: run-ups are shorter not longer, 22 deg lips loop the gas-through-the-lip rider, the crawl climb limit is 37 deg with 45 only over a 0.3 m kicker foot, the hop-able ledge is 0.3-0.6 m, and every 29 deg see-saw crashes every rider); `FEEL` now interpolates the measured run-up curve; `kickerPlank` replaces `steepPlank` on every plank <= 45 deg; the lab ledge is 0.10 m lower; all 15 courses re-authored to those limits (§2 "Round 7" table), medal targets re-derived from the v2 skill-3 bot; hard / extreme carry the storyboard set pieces and gantries (markers + decor only — the roof climbs, tunnels and re-sequencing of §5 are still owed). The reflex bot is not yet a v2 instrument (§0 last row) and the harness owner is re-tuning it concurrently, so the attempts table is a same-controller before / after, not a band verdict. Previous: physics-v2 P0 (round 8) — the two lab tracks (§6); mega build wave 1 (round 7) — the storyboards and the `arch` / `tunnel` / `setPieces` vocabulary; round 6 — X3 at 500 m, X1 around a 45 deg opener, finish run-out + catch.
+Status: **tracks round 11 (physics v2 R6, harness r12 strangers on the Pro)** — the three r12 death sinks replayed from the stranger recordings and re-authored legible: H2's chains A / B on 12 m platforms (3 m landing + 7 m flat + 2 m kicker; on 3 m of flat the Pro was on the gas over the next lip at 5-7 m/s and looped), H3's stop is a 12 m brake zone, hump, 6 m and ONE 0.5 x 6 m kerb under a gantry (the 8 m zone never slowed a 13 m/s landing and the 0.45 + 0.25 pair was invisible at the stranger view's 0.5 m row) with 16 m between the pour rows (12 m: 0 of 6 naive Pro riders survive lip 2), X3's hop ledge 8 m, 8 m of top before the kill slots (the summit stays the proven 16 m shape: a 20 m top was tried and the Pro bot walled identically on both) — and the summit's "hidden launch pad at 516 m" is the physics hop machine entering `push` on a coasting bike (routed). Round-11 section in §2. Previous: **tracks round 9 (physics v2 R5, strangers r5)** — the hard and extreme tiers are the storyboards, authored to the v2 envelope and held to reflex `good` over 9 seeds + the skill-3 bot: H1 climbs the roofline (+6 m) to the parapet wire and drops off the roof into the scaffold tunnel, H2 climbs the container stack to the crane jump, H3 runs the pour tunnel's fire pair, X1 gains +6 m to a summit cap ridge and a glissade, X2's mill duct, melt pit and three-top pipe run, X3's grounded cascade entry and the summit stack. Reflex `good` (was 0/9 on all but h3): **h1 10 (7/9) · h2 9 (7/9) · h3 11 (9/9) · x1 33 (9/9) · x2 4/9 at 9-24 · x3 29 (6/9)**; bot 2 / 1 / 1 / 1 / 3 / 2. Three physics facts drove the shapes: on v2 the reflex clears 45 deg faces (9/9, median 3) and nothing steeper (40 and 42 deg kicker planks launch it, 50-60 deg are the bot's hop move) so every X face is 45 deg and the escalation is height; the curve-0.3 platform kicker loops the gas-through-the-lip rider (straight 2 x 0.4: chain B 2/9 -> 8/9) and any LEVEL chain with 3-4 m gaps or a see-saw finish is a reflex wall while a stepping-up chain is not; a convex crest on a plank top walls the skill-3 bot (12/12, 60/60). The eight §5 validators are code (`validate.ts`, 24 tests). E3's up-flights are 0.12 x 0.8 (plain gas <= 21 deg from 14 to 20 m/s; 0.15 x 0.6 read 47 / 38 / 53 deg and looped at 20 — the strangers' 53-59 deg). Round-9 table in §2. Previous: **tracks round 8 (physics v2 R5, strangers r4)** — the stairway that no human proxy cleared is re-authored on a measured fact: a 0.25 m riser is a 75 deg face to a 0.34 m wheel, so once the front lifts every riser the rear hits accelerates the loop (the replayed r4 stranger recordings loop on PLAIN GAS at 10 m/s and on gas + lean +1 at 7 m/s; the 22.6 deg flight launches the bike off its top with no input at all); every E3 / X3 flight is now 0.15 m risers at a 0.6 m run (14 deg), no flight is taller than 1.2 m, the barrels at flight 2's foot are gone and the pit is 1.5 m onto a landing ramp — reflex `average` 35 -> 3 (9 seeds, 9/9), `good` 14 -> 1, eight naive riders (plain gas, governed gas, coast-in-air) clear it in one attempt. X3's Rookie clear is back (skill-3 bot 50 attempts capped at 95 % -> 2 attempts, 48.2 s) with a convex crest at the 60 deg plank top; the same crest on E1's 45 deg demand (the reflex launched off the plank top and backflipped over the box, 28 deaths x 9 seeds) and the v2 hop rule (a 0.45 ledge wants 6 m of run-up, not 16 — the hop window is 5-8 m/s) put m1 `average` 49 -> 7 and `good` 22 -> 7. Two new §0 rules: the stair riser (0.15) and the panic drop (a held lean-back rides every drop to 1.8 m off a >= 8 x h down-ramp and loops down any stair flight >= 1.0 m — B2's two stair descents are ramps now). Round-8 table in §2. Previous: **tracks round 7 (physics v2)** — every §0 number re-measured on `physics-v2` (v1 column kept one round; the flip changed the envelope the courses were built on: run-ups are shorter not longer, 22 deg lips loop the gas-through-the-lip rider, the crawl climb limit is 37 deg with 45 only over a 0.3 m kicker foot, the hop-able ledge is 0.3-0.6 m, and every 29 deg see-saw crashes every rider); `FEEL` now interpolates the measured run-up curve; `kickerPlank` replaces `steepPlank` on every plank <= 45 deg; the lab ledge is 0.10 m lower; all 15 courses re-authored to those limits (§2 "Round 7" table), medal targets re-derived from the v2 skill-3 bot; hard / extreme carry the storyboard set pieces and gantries (markers + decor only — the roof climbs, tunnels and re-sequencing of §5 are still owed). The reflex bot is not yet a v2 instrument (§0 last row) and the harness owner is re-tuning it concurrently, so the attempts table is a same-controller before / after, not a band verdict. Previous: physics-v2 P0 (round 8) — the two lab tracks (§6); mega build wave 1 (round 7) — the storyboards and the `arch` / `tunnel` / `setPieces` vocabulary; round 6 — X3 at 500 m, X1 around a 45 deg opener, finish run-out + catch.
 `docs/design/CONTRACT.md` wins over this file; the executable form is `src/core/types.ts`
 (`TrackDef`, `TrackMeta`, `CameraKey`, `CompiledTrack`, `Collider`, `HazardZone`,
 `PlacedObstacle`) and `src/tracks/index.ts`. Metres, seconds, radians unless a param is
@@ -183,8 +183,9 @@ and open in course order. They land in `meta.setPieces` (`TracksMeta = TrackMeta
 read with `setPiecesOf(def)` from `src/tracks` until core adds the field to `TrackMeta` — requested)
 and `describeTrack` prints them. Metadata only: no collider, no hash. Typical: `.arch({ style:
 'start' }).setPiece('start', 'grid').flat(28).endSetPiece().checkpoint()` ... `.setPiece('air', 'the
-crane jump')` ... `.arch({ style: 'finish' }).finish()`. No course carries decor or set pieces yet
-(wave 1 is design-only); wave 2 authors them per the storyboards.
+crane jump')` ... `.arch({ style: 'finish' }).finish()`. Wave 2 authored them on hard / extreme per the storyboards and
+round 10 on every playground (§7); as of round 10 the render reads NONE of them (§7 inventory: gates, crowd and
+the biome set piece come from positions and the track id) — the render hooks are requested in §7.3.
 
 Builder-enforced: solids and gaps stand on level ground and never overlap each other's
 footprints; ground slopes <= 40 deg (steeper is a plank or ramp); profile x increasing;
@@ -456,6 +457,67 @@ double, E3 8 x 0.25 stairs, M1 hop + 16 m to the shelf drum, M3 see-saw landing 
 shape, H1 `steppedWall` 1.4 + rails, H2 lipped 5.5 m chain, H3 6 barrels onto a landing ramp, X1 60
 deg plank + caps, X2 chain, finale). Reflex `good` best 63 % (walled at the H2 chain, 464 m).
 Target 60-80, 200 s.
+
+### Round 11 (physics v2 R6, harness r12 strangers on the Pro) — the h2 / h3 / x3 death sinks replayed, named and re-authored legible
+
+The instrument is harness round 12's stranger table (`harness-metrics.md` "Stranger round 8", Pro, the hard / extreme default bike): **h2 FAIL**
+(one DNF; 255-265 m x7 + 75-85 m x5), **h3 10 under band 18-25** (505 m x6 + 405 / 410 m x4), **x3 FAIL** (one DNF; 505-525 m x17 + 190 / 195 m x8 +
+300-310 m x8). Every sink was reproduced by replaying the r12 Pro recordings (`harness/inputs/<track>/stranger-*-r8p-*.json`) through the node sim and
+printing the fault tick, x, speed, pitch and the 1.5 s of input before it (scratch `tracks11/faults.mts`, `pad.mts`); the "why" below is what the
+trace says, not what the stranger said. Rule kept from round 9: the fix makes the death **legible and recoverable**, not the obstacle easier for the bot.
+
+| track · sink (r12 deaths) | the why (from the replay) | what moved (x, primitive) |
+|---|---|---|
+| **h2** chain B 245-268 m (x7, the DNF) and chain A 75-85 m (x5) | every platform was 3 m landing ramp + **3 m box** + 2 m kicker: the rider touched down and was on the gas OVER the next lip 1 m later at 5-7 m/s — the §0 "gas through the lip at <= 10 m/s loops the Pro" case (p2 #8: pitch 43 -> 88 -> 140 on the kicker at 6.6 m/s; p1 #3/#5 the same at 4-7 m/s); the fast line (p3 #1, 14 m/s) overflew the 8 m platform and landed on the next kicker's face (pitch 189). A 3 m box has no speed window: slow loops, fast overshoots | chain A and chain B platforms **8 -> 12 m** (`platform(12, h, { landing 0.4, landingLength 3, length 2, curve 0 })`: 3 m landing + **7 m flat** + 2 m kicker) — land, settle, gas to 8-10, coast the lip; a 14 m/s overfly lands on flat. Chain B's step **0.3 -> 0.2** (1.2 / 1.4 / 1.6 / 1.8, exit box 2.2, the 10 x 2.2 curved down-ramp); gaps 3 / 3 / 3 / 2 and 4 / 3 / 3 / 2 / 3 unchanged. Track 637 -> 665 m, CP 28 / 211 / 406 / 536 |
+| **h3** the stop at 505 m (x6, "invisible at the ASCII row resolution") | the 8 m "brake zone" followed a landing at 12-13 m/s and hard-back from 13 m/s is ~10 m: no stranger was slow at the hump, so the hump launched the still-fast bike and the 0.45 face 3 m later took the front wheel nose-first (p1 #9, p3 #9: 12 m/s, pitch -146); from a crawl the 0.45 + 0.25 pair was two hops 3 m apart whose second gas loops the Pro (p3 #6/#7/#8: pitch 140-166 at 1 m/s). The stranger view is 16 rows over >= 8 m — a cell is >= 0.5 m, so a 0.45 kerb and a 0.25 step draw as at most one row or none | `flat(8) hump flat(3) ledge 0.45 x 3 ledge 0.7 x 4 ramp 6 x 0.7` -> **`flat(12)` brake zone, hump, `flat(6)`, `arch girder` (span 6, height 4) over the approach, ONE `ledge 0.5 x 6`, `ramp 6 x 0.5 down`**: 13 m/s hard-back fits in 12 m, a bike still fast at the hump lands with 6 m to spare, one readable 6 m block in the hop band (0.3-0.6 at 5 m/s, 0.45-0.7 at 8), the gantry lights the edge in the render |
+| **h3** Ladle 4 = the pour pair's second lip at 405 / 410 m (x4) | lip 2 was taken with lip 1's rear-first landing pitch still on (p2 #3-#6: 32 deg nose-up ON the 22 deg ramp face at 11 m/s, then 98 -> 177 -> 553 in the air: a backflip). Probe (`tracks11/pair.mts`, Pro, six naive riders: gas held / gas then coast / coast in air / `gb` / `gf` / brake tap): with **12 m** between the rows **0 of 6 clear** (pitch after lip 2 117-367); with 16 m 3 of 6 (the three gas-then-coast riders); with 20 m 3 of 6 incl. the stranger's `gb`. Even the clears rotate 150-215 deg — a full backflip completing before touchdown, which is what p2 said cleared it: the Pro's raw air off a 22 deg lip at 12-13 m/s, a physics item | the flat between the pour rows **12 -> 16 m** (20 gave the reflex Rookie novice 0/3 and nothing to the Pro rows). Track 615 -> 625 m, CP 28 / 201 / 334 / 451 |
+| **x3** the hop ledge 190 / 195 m (x8; the reflex bot's `stuck-restart` site) | from the standing start 6 m back the hop lands at 3-4 m/s with the front high and the 1.5 m gap came 4 m later: a second hop with no window (p2: 192 / 193 / 194 (ledge), 196 / 198 (gap) x7) | `ledge 0.5 x 4` -> **x 8** (the flat after the gap 26 -> 22 so the shelf drum stays 16 m past it) |
+| **x3** the kill slots 300-315 m (x8) | `steppedWall 1.4` then **2 m** to the first 0.7 m kill slot: no room to set the wheelie after the hop up (p2 "the trenches must be crossed with the front held up after a rear-first landing", 307-315 x5) — the round-9 H1 finding (46 of 67 deaths on a 4 m top -> 8 m) | `flat(2)` -> **`flat(8)`** after the wall |
+| **x3** the summit 505-525 m (x17, the DNF) | three things, in order: (1) the climb macro's hop at the foot of the 45 / 4.5 face leaves the crest at ~5 m/s vertical and lands 6-8 m along the top nose-down (vy -7.6; #17 / #21 / #24 at 510-513); (2) **the "hidden launch pad at ~516 m that throws the bike up with no input" is real and is physics**: p1 tick 18585, both wheels down on the box, throttle / brake / lean all 0 for 30+ ticks (the slots were `g12 c8`, `c2 g20 c10`, `c8 b4 c2`), the hop state machine enters `push` 1.4 s after that landing and lifts the bike (vy +3.3), then the raw-air pitch-up (w 0.3 -> 4.8 rad/s with zero input) loops it (#11-#14, #16 at 515-520); (3) the caps at a crawl under gas (#18 / #20: pitch 140 at 2-5 m/s) | **nothing at the summit stands changed**: a 20 m box was tried (the caps 12 m past the crest landing instead of 8) and the skill-3 Pro bot walled at 50 attempts with 98 % of its faults after CP5 — then walled **byte-identically** (plans 2149, ticks 183.9M, maxX 527.0 = the crest landing zone on the top) with the box back at 16 m, so the box length was never the variable: the Pro bot dies where the hop misfire fires. The r12 golden itself was a coin flip (r11: 50 attempts at 72 m; r12: 2). (2) is routed to physics with the tick; the face, the 16 m top, the caps at box height and the 3 m exit box are the round-9 proven shape |
+| **h3** Ladle 2's stop 252-258 m (r12 x3; the first tracks11 stranger x5 of 9) | the same fault as the demand stop: 8 m of "brake zone" after a 12-13 m/s landing, then a 0.45 kerb with a **4 m top** — the tracks11 stranger landed the hop and the Pro's post-hop nose-up looped on the top three times (254 / 256 / 258 m, "the `h` hop tolerates ~0.5 m of start-position error at 7-8 m/s, and after landing on top the Pro's raw airborne pitch needed slot-by-slot corrections") | `flat(8) ledge 0.45 x 4 flat(12)` -> **`flat(12) ledge 0.45 x 8 flat(8)`** (the kerb's face 252 -> 256 m, CP2 334 -> 338, CP3 -> 455, finish 629 m) |
+
+Reflex matrix on the final geometry (`harness:reflex --all-tracks --tracks h2,h3,x3 --bike both --skill novice,average,good --seeds 3 --jobs 6`, loadavg 4-11; r12
+baseline in brackets, same seeds; the three-track table is in scratch `tracks11/reflex-final-h2h3x3.md`, `out/metrics/reflex.md` keeps the all-tracks r12 table),
+median attempts (clears):
+
+| track | Rookie novice | Rookie average | Rookie good | Pro novice | Pro average | Pro good |
+|---|---|---|---|---|---|---|
+| h2 | 11 (3/3) | **28** (1/3) [46 (2/3)] | 19 (2/3) | 35 (0/3) | **33** (0/3) [51 (1/3)] | 16 (2/3) |
+| h3 | 33 (0/3) [18 (3/3)] | **22** (2/3) [7 (3/3)] | 16 (3/3) [12] | 36 (0/3) [51 (1/3)] | **38** (1/3) [24 (3/3)] | 12 (2/3) [28 (3/3)] |
+| x3 | 32 (2/3) | **24** (3/3) [34 (6/9)] | 29 (3/3) | 51 (1/3) | **39** (2/3) [51 (3/9)] | 51 (0/3) |
+
+The reflex is not the metric and its h3 rows swing with the seed (Pro `good` 9 / 40 / 12; the Pro rows are dominated by Ladle 4's landing ramp `air-short`, which the
+baseline also had x7-14); what it says that matters: h2's deaths left chains A / B (top deaths now the demand chain C's kickers @ 570-592, `air-gas-nose-up`),
+h3's two kerbs cost the reflex the `air-short` hops the old two-tier did, and x3's Rookie `average` 34 -> 24 with the hop ledge still its top death (`stuck-restart`).
+**Bot (skill 3, one seed, browser-verified goldens, node hash == page hash after a `pnpm build` — the first pass verified against the stale `dist/` and
+mismatched on every cell):** h2 Rookie **2** / 51.300 s, h2 Pro **1** / 43.042 s, h3 Rookie **1** / 52.108 s, h3 Pro **4** / 61.450 s, x3 Rookie **2** / 53.458 s;
+**x3 Pro NOT re-proved** (50 attempts at 16 m and at 20 m, identical search, maxX 527 — the old `bot-3-pro.json` stays in place with its r12 stamp for the parent to
+re-run or retire). Medal targets unchanged (bot x 1.6 stays under 85 / 85 / 95 s).
+
+**Strangers (Pro, the metric; `pnpm harness:stranger prep --round tracks11` + `start`, PROTOCOL verbatim, no other context; two per track):**
+
+| track | session | geometry | attempts | cleared | time | calls | died at |
+|---|---|---|---:|---|---:|---:|---|
+| h2 | t11 | final (h2 unchanged after src c1edd25c; its collider hash `98647438be6695da` is the same on both fingerprints, the report calls the sessions stale-src only because h3 / x3 moved the tree hash) | **3** | yes | 71.0 s | 31 | 571 (chain C kicker), 597 (chain C box) — **chains A / B: 0** (r12: 12 over three sessions incl. the DNF) |
+| h2 | t11b | final | **6** | yes | 90.4 s | 43 | chain A 71 / 72 / 72 / 88 (the Pro's lip: "any lean at the lip loops or dives; plain `g` through the face and lip, then `c`"), chain C 583 — chain B: 0 |
+| h3 | t11 | interim (pour pair 16 m, new demand stop; Ladle 2 still 8 m + 0.45 x 4) | 10 | **no** (516 m; the 25 min clock ran out — `prep` starts the clock, the agent lost ~4 min reading) | — | 82 | Ladle 2's kerb 252 + 254 / 256 / 258 on its top (x5), 80, 290, pour row 2's barrels 396 (x1), hump 508, the new kerb 516 (x1) — **the 505 sink x6 -> 1** |
+| h3 | t11b | final | **11** | yes | 143.3 s | 68 | Ladle 2's kerb 255 / 255 / 255 / 256 (x4), 70, 106, 372 (pour row 1 landing), 420, the demand kerb 520 x2 |
+| x3 | t11 | interim (20 m summit box) | **17** | yes | 174.9 s | 64 | opener 58 / 61 / 65 / 75 / 89 (x5), 158, hop ledge 192 x3 + gap 195, 260, slots 309 (x1), 469, summit 515 / 516 / 547 (x3; r12 x17) |
+| x3 | t11b | final (16 m) | 23 | **no** (522 m, all six CPs) | — | 67 | summit 512 x2 + 517-522 x8 ("every crest at 2-7 m/s left the Pro airborne 10+ slots with a steadily accelerating nose-up rotation no input could arrest" — the zero-input w 0.3 -> 4.8 rad/s in the replay), wall 300-302 x3 + slots 308 / 309 x2, ledge gap 195 x3, 65, 269, 296, 472 |
+
+Read: **h2's sink is gone** (chain B 0 deaths in two sessions, chain A 4 in one; 3 and 6 attempts vs r12's 6 DNF / 10 / 5, median 4.5 — under the 14-22 band, the
+Pro reads it as a hard-tier flow track). **h3's 505 m two-tier is gone** (1 + 2 deaths at the readable kerb vs 6) and the residual sink is the Pro's hop onto any
+knee-high kerb (Ladle 2: 5 + 4), which is the r12 physics note in track form; one DNF on the clock, 11 on the final geometry, vs r12's 13 / 9 / 10. **x3's kill
+slots** 8 -> 1 + 5 and its **hop ledge** 8 -> 4 + 3; the **summit stays the extreme wall** (3 on the 20 m top, 10 on the 16 m) and it is the physics item, not the
+geometry: with the box at 16 or 20 the Pro's crest flight rotates under zero input, and the hop machine fires on the coasting bike after the landing. x3 17 / 23 DNF vs
+r12 26 DNF / 23 — the band is 60-80, so the DNFs are budget walls (150 calls / 25 min at a summit that costs 10 attempts), not difficulty. Strangers' recordings:
+`harness/inputs/<track>/stranger-*-tracks11-t11-*.json` and `stranger-<track>-20260915-{185758,191128}.json`; `harness/out/metrics/<track>.stranger.json` carries
+every session (the interim-geometry ones as stale-src rows).
+
+Bands stand as authored (14-22 / 18-25 / 60-80): the census rule needs n >= 2 on one fingerprint and the final-geometry sessions are one per track (h2's two are
+on the same h2 geometry); the round asks for the death table to move, and it did — the next stranger round re-sets the bands if the medians hold (h2 reads as ~5, under band). Also this round: the playground `p1-container-yard`
+is displayed as "Yard Playground" (it shared h2's "Container Yard" on the level selector; ids and goldens unchanged); review segments (`segments.ts`)
+re-cut to the new x's; `golden.json` bumped for the three tracks.
 
 ### Round 9 (physics v2 R5, strangers r5) — hard / extreme as designed courses; per track: set pieces, technique, reflex `good` before -> after, bot, medals, stranger-readiness
 
@@ -939,3 +1001,153 @@ profile), with the same restart path as a course:
 
 When physics-v2 §14 passes, the tracks owner re-measures §0 from these two tracks (physics-v2 §16.4)
 and re-authors the kickers built for the 1.4 g plant.
+
+## 7. Playgrounds (`src/tracks/courses/playgrounds.ts`; tracks round 10, CLOSEOUT "Next milestones -> 1")
+
+One BEGINNER course per biome so the user can ride every biome without finishing the game. Ids `p<n>-*`
+(`isPlaygroundTrackId`, `PLAYGROUND_TRACKS` from `src/tracks`); registry order fixtures, curriculum, playgrounds,
+lab. `meta.playground = true`, `meta.segments` = six review segments (`segmentsOf(def)`: `{from, to, label}`, the
+level reviewer's walk). Not in `CURRICULUM`: outside medals, progression and the tier-escalation test; the §5
+validators, the checkpoint rule, the finish run-out and the golden hash apply like any course. Front end
+(core, requested): a **"Playgrounds" row above Lab**, always open, no medals — `progress.ts` `shipTracks` must
+exclude `isPlaygroundTrackId` (else they land in the Beginner row and count toward medal totals) and `front.ts
+build()` mirrors the Lab row with head "Playgrounds · one beginner course per biome · every asset · no medals".
+
+**The brief, per course.** 440-505 m, skill-3 bot 32-35 s (x 1.6 = 51-56 s for a stranger; `targetTimeS` 70,
+non-binding — no medals), beginner band: reflex `novice` <= 3 over 9 seeds, `average` 1-2 over 3, bot 1. Every
+beginner-legal primitive at least once: straight 11 deg kickers (4 x 0.8, 6 x 1.2) landing on falling ground
+(B3), grounded hills (`smooth` / `descent` / `wave` / `plateau` at 20 m/s, B1), a 2 m `smallGap`, a 0.3 m-proud
+sunk drum or log (`bumpDrum`), an 18-20 deg plank onto a container / crate or 0.12 x 0.8 stairs onto a deck,
+a <= 22 deg see-saw (`seesawEntry` 6 x 0.8 = 15 deg or 8 x 1.2 = 16.7 deg, 14 m of flat after it), a 0.3 m kerb
+(rolls) or the 0.35 / 0.4 m kerb hop 8 m past a spawn, a 1.0-1.2 m drop off a straight 10-12 x h down-ramp
+(panic-drop rule), rollers / `bumpRow`. Start gate + crowd + finish arch on all five (render draws them from
+`start.pos.x` / `finishX`; every checkpoint is a gate + plaque + spectators + flame jets, so each course has four).
+
+**What the render actually reads (inventory, this round).** Nothing under `src/render/` reads `setPieces`,
+`arch` or `tunnel` (they compile to zero-collider `placed` entries and draw nothing); the biome kits are ambient
+density recipes over the whole span, the event kit hangs off start / checkpoint / finish x, and each biome's ONE
+"set piece" is chosen by a hard-coded `track.def.id` prefix at 45 % of the span (industrial `b2` container arch /
+`b3` crane hook / `m1` forklift / else jib gantry; canyon `e1` water tower / `e2` pickups / `e3` mine portal /
+else `seed % 3`; snow `m2` lift station / `x1` lodge / else `seed % 2`; nightCity `h2` crane / else rail spur +
+train + billboard; foundry `m3` rolling mill / `x2` pipe rack / `x3` furnace wall / else ladle over the line).
+Obstacle skins are biome-agnostic and follow `surface`: `box` metal = container, wood = plywood crate; ledge /
+wall / stair concrete = asphalt + kerb stones in nightCity; wood ramps / planks = boards on trestles; `drum` =
+cable spool in a cradle; `logpile` = log cylinders; `gap` water = dark pool, fire = emissive grate, kill = nothing.
+So the playgrounds place every asset they CAN through geometry and author the rest as set-piece / decor metadata,
+and the table lists what render must add so the metadata shows.
+
+| course | biome | finish | bot (skill 3) | reflex `novice` (9 seeds) | `average` (3) | segments (x m: what it shows) |
+|---|---|---:|---:|---|---|---|
+| `p1-container-yard` "Yard Playground" (round 11: was "Container Yard", the h2 name; the level selector shows both) | industrial | 504 m | 1 att, 35.8 s | median **2** (9,3,2,1,1,2,1,4,1), 9/9 | **2** (2,2,1) | 0-68 grid, stands, first hill under the crane rail · 68-160 kicker 1 onto the downslope, two sunk oil drums, rollers · 160-272 the 2 m gap and kicker 2 through the container rows · 272-369 the 0.35 kerb hop, the plank onto a container, the 1.0 m drop · 369-454 the scaffold tunnel under the stacks, the plateau · 454-504 the wave home under the crowd bridge |
+| `p2-canyon-run` "Canyon Run" | canyon | 494 m | 1 att, 34.4 s | median **3** (2,1,3,4,1,1,4,4,4), 9/9 | **2** (1,2,3) | 0-68 grid, light towers, braziers, the mesa plateau · 68-182 kicker pair, the rut road · 182-291 fat logs, the 2 m water gap, the 0.3 rock shelf · 291-391 the mine stairs onto a plywood deck, the 15 deg see-saw · 391-444 the water-tower drop (1.2 m, 12 x h) · 444-494 the wave home past the bleachers |
+| `p3-snow-line` "Snow Line" | snow | 488 m | 1 att, 34.4 s | median **2** (1,1,2,2,2,2,2,5,4), 9/9 | **1** (1,1,2) | 0-68 grid, string lights, braziers, first hill between the trees · 68-182 kicker pair, rollers through the banks · 182-297 the log kerb (a 3-log pile behind a straight ramp), two half-buried logs, the 2 m pond gap · 297-399 the crate (18 deg plank up, 1.0 m drop off its ramp), the 0.3 step · 399-438 the see-saw under the lift line · 438-488 the ice tunnel and the wave home |
+| `p4-night-circuit` "Night Circuit" | nightCity | 498 m | 1 att, 35.0 s | median **3** (3,1,1,5,4,9,1,2,4), 9/9 | **2** (5,1,2) | 0-52 grid: lighting truss, police cars, the zebra crossing, two 0.3 kerbs · 52-231 the hill, the subway stairs onto a concrete deck, the kicker pair · 231-313 the flooded cut (2 m gap), the rooftop plateau · 313-402 the 0.4 kerb hop, the 15 deg see-saw · 402-448 the loading-bay drop (1.0 m, 10 x h) · 448-498 the wave home under the crowd bridge |
+| `p5-foundry-floor` "Foundry Floor" | foundry | 443 m | 1 att, 32.2 s | median **1** (1,2,2,1,3,1,1,2,1), 9/9 | **1** (3,1,1) | 0-68 grid, beacons, first hill under the ladles · 68-174 kicker pair on steel, the sunk spools · 174-252 the fire gap, the pipe-duct plateau · 252-354 the container (20 deg steel plank up, 1.0 m drop off its ramp), the grating step · 354-393 the see-saw over the trough · 393-443 the wave home under the pour |
+
+Measured on the shipped reflex controller, Rookie, node-only, cap 50 / 300 s (`harness/out/metrics/p*.reflex.json`,
+scratch `tracks10/*.log`); bot goldens `harness/inputs/p*/bot-3.json`. Re-authored from the first pass: P1's 0.4 m
+kerb hop 8 m past CP2 was 17 novice deaths (median 4) -> 0.35 (median 2); P2's r 0.3 half-logs 6 m past CP1 were
+9 nose-low deaths and the curve-0.3 water-gap kicker 8 m after them 5 nose-up deaths -> r 0.5 wood drums (B2's bump)
+and 16 m to the kicker; P3's `logStep` (curve-0.3 lip to the log tops) hit at 12 m/s was 7 nose-up deaths -> a
+straight 4 x 0.6 wood ramp onto the pile, 16 m past the spawn (the checkpoint rule reads a ramped pile as a launch).
+
+### 7.1 Primitive checklist (x m of the obstacle)
+
+| primitive | p1 | p2 | p3 | p4 | p5 |
+|---|---|---|---|---|---|
+| kicker 4 x 0.8 (11 deg) -> `slope(12, -0.8)` | 84 | 84 | 84 | 133 | 84 (steel) |
+| kicker 6 x 1.2 (11 deg) -> `slope(16, -1.2)` | 196 | 118 | 118 | 167 | 118 (steel) |
+| hill `smooth(16, 1.2)` + `descent(16, 1.2, 20)` | 24-64 | (mesa `plateau(15, 8, 1.0)` 24-62) | 24-64 | 58-98 | 24-64 |
+| `plateau` (grounded tabletop) | 391-425 (0.8) | 24-62 (1.0) | - | 269-307 (1.0) | 210-244 (0.8, in the duct) |
+| `wave(28, 1.5, 16)` / `wave(36, 1.5, 20)` finale | 331 / 454 | 349 / 444 | 359 / 438 (ice tunnel) | - / 448 | 315 / 393 |
+| `rollers(20, 0.25, 3)` / `bumpRow` | 134 / 226, 435 | 148 / 262 | 148 / 271 | 205 / 372 | - / - |
+| 2 m gap (`smallGap(4, 1.0, 2)`) | 176 (water) | 214 (water) | 239 (water, "the pond") | 247 (water, "the flooded cut") | 190 (**fire**) |
+| sunk drum / log `bumpDrum(r, 0.3)` | 116, 125 (r 0.5 metal) | 188, 197 (r 0.5 wood) | 214, 222 (r 0.3 wood) | - | 156, 165 (r 0.5 metal spools) |
+| log pile (`logpile` 3 x r 0.3, straight ramp) | - | - | 198-204 | - | - |
+| plank <= 22 deg onto a box | 302 (18 deg wood -> metal container) | - | 313 (18 deg wood -> plywood crate) | - | 268 (20 deg steel -> container) |
+| stairs 0.12 x 0.8 x 5 onto a 0.6 deck | - | 307 (wood) | - | 106 (concrete) | - |
+| see-saw <= 22 deg (`seesawEntry`) | - | 334 (6 x 0.8, 15 deg) | 415 (8 x 1.2, 16.7 deg) | 343 (6 x 0.8) | 370 (8 x 1.2, steel) |
+| kerb 0.3 m (rolls) | - | 234 (concrete shelf) | 344 (wood step) | 24, 39 (concrete kerbs) | 299 (grate step) |
+| kerb HOP (0.35 / 0.4) 8 m past a spawn | 280 (0.35) | - | - | 321 (0.4) | - |
+| drop >= 8 x h ramp | 305-321 (1.0, 10 x h) | 409-431 (1.2, 12 x h, "the tower deck") | 316-332 (1.0, 10 x h) | 418-436 (1.0, 10 x h, "the loading bay") | 271-287 (1.0, 10 x h) |
+| checkpoints | 68 / 160 / 272 / 369 | 68 / 182 / 291 / 391 | 68 / 182 / 297 / 399 | 52 / 231 / 313 / 402 | 68 / 174 / 252 / 354 |
+
+Not placed anywhere (not beginner-legal): `wall` / `steppedWall` (a lip climb), `pole` rows (a hop target),
+`barrel` (0.9 m of solid, or fire — H3's speed commitment), `drumStep` (r >= 0.6), `kickerPlank` / `steepPlank`
+(>= 36 deg), stairs down (a flight down is the panic-drop loop), `gap` > 3 m.
+
+### 7.2 Asset checklist per biome (asset -> how it shows / what render must add)
+
+Legend: **auto** = render draws it from the biome id, the span or the gate positions (nothing to author);
+**placed @ x** = this course puts the geometry that triggers it there; **META** = authored as `setPiece` / `arch` /
+`tunnel` metadata that render does not read yet — the render owner adds the hook (listed at the end).
+
+**p1 industrial** — hall shell (brick, skylights, trusses, crane rail + hook, catwalk, light shafts, graffiti) auto;
+under-deck containers / pallets auto; container rows, racks, pallets, drums, tyres, cones, tool carts, gas bottles,
+reels, crates, sodium lamps + follow spots + lamp cones, oil stains, paper, bolts auto (density recipe over 504 m,
+keep-outs at the 4 gates); the jib gantry + banners set piece auto (default id branch, 45 % = ~227 m, inside the
+container-row segment); start scaffold stands + tarp banner + cones + white drums auto @ 2 / finish @ 507; start gate
++ 30-crowd + sponsor barrier + grandstand auto @ 0; checkpoint gates + plaques + jets @ 68 / 160 / 272 / 369; finish
+gate + confetti + fireworks @ 504. Placed: metal **container** (box) @ 305; **wood boards** (plank 302, ramps
+84 / 196 catch) ; **cable spools** (drums) @ 116 / 125; **concrete kerb** @ 280; **water pit** @ 180; dirt bed with
+plywood kerbs (interior dirt) everywhere. META: `arch start` @ 3, `tunnel scaffold` 375-399 ("Under the Stacks"),
+`arch crowd` @ 493 (the crowd bridge), `arch finish` @ 501, set pieces start / tunnel / finish.
+
+**p2 canyon** — strata tiers, mesas, big formations, far shoulders, foreground outcrops auto; boulders, rubble,
+scrub, snags, split-rail fence, tyre walls, bales, tyre stacks, red drums, spools, sand discs, ruts, contact shadows
+auto; the id-gated set piece: **`seed % 3` of water tower + windmill / rusted pickups + drum dump / mine portal +
+spools** auto @ 45 % (~222 m — the water-gap segment); light towers + generator + braziers + bleachers auto @ 0 and
+494; fire barrels every ~70 m auto; rutted ochre dirt ribbon with rock edging auto; dust + heat haze auto. Placed:
+**wood logs** (r 0.5 wood drums) @ 188 / 197, **water pit** @ 218, **rock shelf** (concrete ledge) @ 234, **mine
+stairs** (wood) @ 307 onto a **plywood deck** (wood box) @ 311, **see-saw** @ 335, the **water-tower deck** (wood box
+1.2) @ 409. META: `arch start` @ 3, `drop` set piece 397-432 ("The Tower Deck"), `arch crowd` @ 483, `arch
+finish` @ 491. Not placeable: the OTHER two of the three canyon set pieces (render picks one per seed).
+
+**p3 snow** — conifers (near / far / ridge lines), snow banks, gravel, ice patches, ruts, crates with snow lids,
+posts, fences, lanterns + follow spots, log piles, sleds, blue drums, cabins every 24-40 m, snowfall, floor fog
+auto; packed-snow trail with **split-log kerbs** auto (ground dirt -> snow); string lights over the gate + braziers
+auto @ 0 / 488, braziers at every checkpoint; the id-gated set piece **`seed % 2` of lift station + pylons + chairs
+/ lodge + ice curtain** auto @ 45 % (~220 m). Placed: **log pile** (logpile 3 x r 0.3) @ 202 behind a wood ramp,
+**half-buried logs** @ 214 / 222, **pond** (water pit) @ 243, **plywood crate** (wood box) @ 316 with the wood plank
+@ 313, **wood step** (ledge) @ 344, **see-saw** @ 416 (set piece "The Lift Line" 415-424 so the lift station reads
+here when render honours it). META: `arch start` @ 3, `tunnel ice` 438-458 ("The Ice Cave"), `arch crowd` @ 477,
+`arch finish` @ 485, `balance` / `tunnel` set pieces. Not placeable: the other snow set piece.
+
+**p4 nightCity** — facades, second row, rooftop kit, shopfronts, lit skyline, street kit (cars, police cars with
+lightbars, box truck, dumpsters, bollards, hydrants, newsboxes, jersey barriers, scaffold + hoardings, fire
+escapes, awnings, AC units, traffic lights, bus shelter, food cart, signs, manholes, lane paint, puddles, cones,
+fire barrels), street lights + cones + wet streaks, neon signs + reflections, the elevated rail viaduct, embers
+auto; zebra crossings auto @ 20 and 480; police cars at the gates @ -7 / 507; lighting truss + par cans + LED wall
+auto @ 0 / 498; the id-gated set piece **rail spur bridge + 4-car train + neon billboard** auto @ 45 % (~224 m,
+the kicker-pair / stairs segment). Placed: **concrete kerbs** (asphalt + kerb-stone skin) @ 24 / 39 / 321 with
+concrete down-ramps, **subway stairs** (concrete) @ 106 onto a **concrete deck** @ 110, **flooded cut** (water pit)
+@ 251, **rooftop plateau** 269-307, **see-saw** @ 344, **loading-bay container** (metal box) @ 418. META: `arch
+start` @ 3, `drop` set piece 408-436 ("The Loading Bay"), `arch crowd` @ 487, `arch finish` @ 495. Not placeable:
+the tower crane + hoarded site (the `h2` branch).
+
+**p5 foundry** — riveted-steel hall, sooty clerestory, orange panes, red light shafts, pouring ladles with melt
+streams + spark fountains, furnaces on plinths, chimney stacks, vertical pipe, pipe runs, scaffold (every 9-14 m),
+two molten troughs along the span, slag pots, heat haze, embers, 4 melt lights auto; red beacons auto @ 1.5 and
+445; the id-gated set piece **ladle over the line** auto (default branch, 45 % = ~199 m — right over the fire gap);
+crowd atlas in the foundry palette. Placed: **steel ramps** (metal) @ 84 / 118 / 190 / 277 / 305, **spools** (metal
+drums) @ 156 / 165, **fire pit** (gap hazard fire: emissive grate strip) @ 194, **container** (metal box) @ 271 with
+the **steel plank** @ 268, **grating step** (ledge surface grate) @ 299, **steel see-saw** @ 371. META: `arch
+start` @ 3, `fire` set piece 190-196 ("The Melt"), `tunnel pipe` 210-240 ("The Duct"), `balance` 370-379 ("The
+Trough"), `arch pipe` @ 432 (the exit duct), `arch finish` @ 440. Not placeable: the rolling mill / pipe rack /
+furnace wall set pieces (m3 / x2 / x3 branches); burning barrels (hard tier).
+
+### 7.3 What render must add for the META rows (routed by the parent)
+
+1. Read `setPiecesOf(def)`: `start` / `finish` already coincide with the gate positions; `tunnel` -> a covered
+   stretch in the biome's style (P1 scaffold 375-399, P3 ice 438-458, P5 pipe 210-240); `drop` -> the camera
+   pull-out + a drop-edge dressing (P2 397, P4 408); `fire` -> the melt / sparks emphasis (P5 190); `balance` ->
+   the lift station over P3's board (415), the trough under P5's (370).
+2. Read the `arch` / `tunnel` decor kinds (`isDecorKind`, `params.style`): `start` gantry @ 3 on all five (today the
+   start gate comes from `start.pos.x - 1`, so this may simply be skipped), `crowd` = the spectator bridge @ 483-493
+   on P1-P4, `pipe` = the exit duct @ 432 on P5, `finish` over the line.
+3. Playground ids in the id-gated set-piece switch: for `p1-` / `p2-` / `p3-` / `p4-` / `p5-` place EVERY set
+   piece of the biome (at 25 / 50 / 75 % of the span, or one per review segment) instead of one — the user's ask is
+   "every unique model of the biome in one level", and today canyon / snow / nightCity / foundry each show one of
+   two to four.
+4. Foundry grating strips (`deck.ts`, ground `metal`) never fire because the ground is always dirt; the P5 `grate`
+   ledge @ 299 is the one grate on the course.

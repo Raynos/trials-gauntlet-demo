@@ -5,9 +5,9 @@
   "bike": "pro",
   "tier": "beginner",
   "technique": "envelope measurement",
-  "updatedAt": "2026-09-15T03:06:08.832Z",
+  "updatedAt": "2026-09-15T21:13:08.037Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "db68bbeb",
+  "srcFingerprint": "6412a755",
   "attemptsBand": [
     1,
     1
@@ -22,147 +22,20 @@
         2522286989
       ],
       "attempts": [
-        2,
         3,
-        2
+        1,
+        1
       ],
-      "medianAttempts": 2,
+      "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        25.25,
-        26.966666666666665,
-        24.75
+        29.975,
+        20.875,
+        21.3
       ],
-      "medianFinishTime": 25.25,
-      "bestX": 204.6800954984516,
+      "medianFinishTime": 21.3,
+      "bestX": 204.58684550470335,
       "deaths": [
-        {
-          "obstacle": "ground @ 10 m",
-          "x": 10,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "nose-high": 1,
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 5 m",
-          "x": 5,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-high": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 115 m",
-          "x": 115,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-high": 1
-          }
-        }
-      ],
-      "runs": [
-        "20260914-220533-3b2a90",
-        "20260914-220533-fa8c83",
-        "20260914-220533-07eb65"
-      ]
-    },
-    {
-      "skill": "average",
-      "seeds": [
-        2522286987,
-        2522286988,
-        2522286989
-      ],
-      "attempts": [
-        2,
-        2,
-        2
-      ],
-      "medianAttempts": 2,
-      "clears": 3,
-      "finishTimes": [
-        21.025,
-        20.725,
-        20.35
-      ],
-      "medianFinishTime": 20.725,
-      "bestX": 205.22471603056613,
-      "deaths": [
-        {
-          "obstacle": "ground @ 5 m",
-          "x": 5,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "air-short": 2
-          }
-        },
-        {
-          "obstacle": "ground @ 10 m",
-          "x": 10,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        }
-      ],
-      "runs": [
-        "20260914-220553-f6dfaa",
-        "20260914-220553-9d1114",
-        "20260914-220553-a470ae"
-      ]
-    },
-    {
-      "skill": "good",
-      "seeds": [
-        2522286987,
-        2522286988,
-        2522286989
-      ],
-      "attempts": [
-        2,
-        3,
-        2
-      ],
-      "medianAttempts": 2,
-      "clears": 3,
-      "finishTimes": [
-        18.4,
-        21.516666666666666,
-        18.491666666666667
-      ],
-      "medianFinishTime": 18.491666666666667,
-      "bestX": 206.17711453924073,
-      "deaths": [
-        {
-          "obstacle": "ground @ 10 m",
-          "x": 10,
-          "count": 3,
-          "reasons": {
-            "crash": 3
-          },
-          "rules": {
-            "touchdown": 1,
-            "air-short": 1,
-            "nose-high": 1
-          }
-        },
         {
           "obstacle": "ground @ 15 m",
           "x": 15,
@@ -173,12 +46,79 @@
           "rules": {
             "nose-high": 1
           }
+        },
+        {
+          "obstacle": "ground @ 20 m",
+          "x": 20,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-short": 1
+          }
         }
       ],
       "runs": [
-        "20260914-220608-0f4023",
-        "20260914-220608-7fc48c",
-        "20260914-220608-d5a412"
+        "20260915-161238-82199d",
+        "20260915-161238-4703d6",
+        "20260915-161238-7bcae7"
+      ]
+    },
+    {
+      "skill": "average",
+      "seeds": [
+        2522286987,
+        2522286988,
+        2522286989
+      ],
+      "attempts": [
+        1,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        18.9,
+        18.108333333333334,
+        18.858333333333334
+      ],
+      "medianFinishTime": 18.858333333333334,
+      "bestX": 205.31592111375528,
+      "deaths": [],
+      "runs": [
+        "20260915-161253-891343",
+        "20260915-161253-8e7ff0",
+        "20260915-161253-0950d8"
+      ]
+    },
+    {
+      "skill": "good",
+      "seeds": [
+        2522286987,
+        2522286988,
+        2522286989
+      ],
+      "attempts": [
+        1,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        16.541666666666668,
+        16.358333333333334,
+        16.008333333333333
+      ],
+      "medianFinishTime": 16.358333333333334,
+      "bestX": 206.33940138504354,
+      "deaths": [],
+      "runs": [
+        "20260915-161308-57cad4",
+        "20260915-161308-280fa6",
+        "20260915-161308-c775be"
       ]
     }
   ]

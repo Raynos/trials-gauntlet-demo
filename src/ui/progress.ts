@@ -4,6 +4,7 @@
  * unlocks everything. Pure functions so the lock rule is unit-tested.
  */
 import type { Medal, TrackDef, TrackTier } from '../core/types';
+import { isPlaygroundTrackId } from '../tracks';
 
 export const TIER_ORDER: readonly TrackTier[] = ['beginner', 'easy', 'medium', 'hard', 'extreme'];
 export const TIER_LABEL: Record<TrackTier, string> = { beginner: 'Beginner', easy: 'Easy', medium: 'Medium', hard: 'Hard', extreme: 'Extreme' };
@@ -26,10 +27,19 @@ export function labTracks(tracks: readonly TrackDef[]): TrackDef[] {
   return tracks.filter(isLabTrack);
 }
 
-/** Authored tracks only (no lab tracks), tier order, stable within a tier. */
+/** Playground courses (`p<n>-*`, tracks round 10): one beginner course per biome, always open, outside medals and progression. */
+export function isPlaygroundTrack(t: TrackDef): boolean {
+  return isPlaygroundTrackId(t.id);
+}
+
+export function playgroundTracks(tracks: readonly TrackDef[]): TrackDef[] {
+  return tracks.filter(isPlaygroundTrack);
+}
+
+/** Authored tracks only (no lab tracks, no playgrounds), tier order, stable within a tier. */
 export function shipTracks(tracks: readonly TrackDef[], includeTest = false): TrackDef[] {
   return tracks
-    .filter((t) => !isLabTrack(t) && (includeTest || !t.id.endsWith('-test')))
+    .filter((t) => !isLabTrack(t) && !isPlaygroundTrack(t) && (includeTest || !t.id.endsWith('-test')))
     .slice()
     .sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier) || Number(a.id.endsWith('-test')) - Number(b.id.endsWith('-test')));
 }

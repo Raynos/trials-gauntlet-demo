@@ -11,7 +11,7 @@
  * loaded in the `menu` phase (the key art plate covers it once decoded).
  */
 import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RiderOutfit, RunResult, TrackDef, TrialsHook } from '../core/types';
-import type { AudioSystem } from '../audio';
+import type { AudioScene, AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
 import {
   ArtManifest,
@@ -25,6 +25,8 @@ import {
   PauseMenu,
   PerfOverlay,
   ReplayBar,
+  ReviewPanel,
+  ReviewPickScreen,
   SettingsScreen,
   TraceBars,
   TrackSelectScreen,
@@ -35,6 +37,8 @@ import {
   loadModelChoice,
   loadOnboarded,
   loadQualityOverride,
+  loadHeldTier,
+  saveHeldTier,
   loadFpsChoice,
   saveFpsChoice,
   type FpsChoice,
@@ -63,13 +67,17 @@ import {
 import { tickLive } from '../ui/live';
 import { applyOrientation } from '../ui/orientation';
 import { loadRiderOutfit, saveRiderOutfit } from '../ui/outfit';
+import { copyText } from '../ui/clipboard';
+import { Bench, type BenchOptions, type FrameSplit } from './bench';
+import { FrameCadence } from './cadence';
 import { BACKDROP_TRACK } from './flow';
 import { Percentiles, type Game } from './game';
 import { GamepadInput, InputMux, KeyboardInput, TouchInput } from './input';
 import { NavLog, type NavContext } from './navlog';
 import { ReplaySession, type ReplaySource } from './replay';
+import { ReviewSession } from './review';
 import { defaultBikeForTier } from './rules';
-import { RunCollector, RunLog } from './telemetry';
+import { BenchLog, RunCollector, RunLog } from './telemetry';
 
 export interface AppOptions {
   game: Game;
@@ -109,9 +117,12 @@ export interface AppOptions {
   lab?: boolean | undefined;
   /** Solver in effect + exported versions (hidden dev Settings row, `?physics=v1|v2`). */
   physics?: { current: 'default' | 'v1' | 'v2'; available: ('v1' | 'v2')[]; live?: PhysicsVersion | undefined } | undefined;
+  /** `?bench=1`: the on-device benchmark (src/game/bench.ts) — a START card over the menu, the scenarios, the report. */
+  bench?: BenchOptions | undefined;
+  /** `?review=<track>`: deep link straight into the level reviewer on that track (docs/design/game.md §21). */
+  initialReview?: string | undefined;
 }
 
-const PROBE_FRAMES = 60;
 const DEVICE_SHOW_FRAMES = 90;
 const LAST_TRACK_KEY = 'trials.lastTrack';
 const TOUCH_SETTLE_S = 3;
@@ -129,7 +140,7 @@ export function dprCap(): number {
   return Math.min(dpr, isPhone() ? 1.5 : 2);
 }
 
-export type AppScreen = FrontScreen | 'run' | 'replay';
+export type AppScreen = FrontScreen | 'run' | 'replay' | 'reviewer';
 
 /** Physics lab HUD + ghost of the last attempt: every `lab-*` track (MEGA_PLAN P0 §3), or any track with `?lab=1`. */
 /**
@@ -161,6 +172,9 @@ export class App {
   private readonly lastRuns = new LastRuns();
   private readonly replayBar: ReplayBar;
   private readonly replay: ReplaySession;
+  private readonly reviewPick: ReviewPickScreen;
+  private readonly reviewPanel: ReviewPanel;
+  private readonly review: ReviewSession;
   private readonly labPanel: LabPanel;
   private readonly traceBars: TraceBars | null;
   /** Where the viewer returns to on exit, and the finished run it interrupted (restored so the results panel comes back). */
@@ -168,6 +182,15 @@ export class App {
   private replayMuted = false;
   private readonly frameMs = new Percentiles(120);
   private readonly runLog = new RunLog();
+  private readonly benchLog = new BenchLog();
+  private readonly bench: Bench | null;
+  /** Per-frame split of `tickFrame` (reused; `?bench=1` reads it after every rendered frame). */
+  private readonly frameSplit: FrameSplit = { totalMs: 0, pollMs: 0, advanceMs: 0, physicsMs: 0, ticks: 0, hudMs: 0, audioMs: 0, submitMs: 0, otherMs: 0 };
+  /** Bench: cap forced for the current scenario (else the Settings / phone rule). */
+  private capOverride: 30 | 60 | null = null;
+  /** Bench `&no=touch`: the layer stays hidden whatever the device. */
+  private touchHidden = false;
+  private readonly cadence = new FrameCadence();
   private readonly collector = new RunCollector();
   /** Navigation instrument (docs/tasks/touch-navigation-invariant.md §1): what fired quit / pause / goto / restart, from where. */
   readonly navLog = new NavLog();
@@ -179,7 +202,13 @@ export class App {
   private riderOutfit: RiderOutfit;
   /** Bike class of the last launched track (medium's default, and what the Garage opens on). */
   private lastRidden: BikeClass | null = null;
-  private qualityWhy: string;
+  /** The governor's last decision string; lives on the game so `hook.info().qualityWhy` and `?perf=1` read one value. */
+  private get qualityWhy(): string {
+    return this.game.qualityWhy;
+  }
+  private set qualityWhy(v: string) {
+    this.game.qualityWhy = v;
+  }
   private readonly bestTimes: BestTimes;
   private readonly tracks: TrackDef[];
   private screen: AppScreen = 'menu';
@@ -187,6 +216,7 @@ export class App {
   /** Frame cap (Settings · Frame rate). 'auto' = 30 on phones, 60 elsewhere; the RAF loop skips frames to match. */
   private fpsChoice: FpsChoice;
   private lastRenderAt = 0;
+  private capInEffect = 0;
   /** Lightweight FPS meter, top-right, always on: rendered frames per second and the quality tier letter. */
   private readonly fpsEl: HTMLDivElement;
   private fpsFrames = 0;
@@ -195,9 +225,6 @@ export class App {
   private soundOn: boolean;
   private volume: number;
   private ghostOn: boolean;
-  private probe: number[] = [];
-  private probeArmed = false;
-  private probeDone = false;
   private lastNow = 0;
   private raf = 0;
   private audioUnlocked = false;
@@ -208,6 +235,8 @@ export class App {
   private screenAt = 0;
   private prevRestart = false;
   private prevThrottle = false;
+  /** Last scene handed to `audio.setScene` (music bed): deduplicated, optional on the interface. */
+  private audioScene: AudioScene | null = null;
 
   constructor(private readonly o: AppOptions) {
     this.game = o.game;
@@ -345,7 +374,7 @@ export class App {
     };
 
     this.menu = new MainMenuScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
-    this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
+    this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state, (id, bike) => this.bestTimes.board(id, bike));
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
     this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb, this.art);
     this.garage = new GarageScreen(o.uiRoot, this.sfx, this.art, {
@@ -378,6 +407,39 @@ export class App {
       exit: () => this.replay.exit(),
     });
     this.replay = new ReplaySession(this.game, this.replayBar, () => this.leaveReplay());
+
+    // Level reviewer (docs/design/game.md §21): REVIEW on the menu → the picker → the review UI on one track.
+    this.review = new ReviewSession(this.game, {
+      onView: (v) => this.reviewPanel.update(v),
+      onRide: (on) => {
+        this.touch.setEnabled(on);
+        this.touch.setOverlay(false);
+        this.hud.setReview(!on);
+        if (!on) this.hud.hideNow();
+      },
+    });
+    this.reviewPick = new ReviewPickScreen(o.uiRoot, this.sfx, { pick: (id) => this.enterReview(id), back: () => this.goto('menu') }, (id) => this.review.store.count(id));
+    this.reviewPanel = new ReviewPanel(o.uiRoot, {
+      jump: (i) => this.review.jumpTo(i),
+      pan: (dx, w) => this.review.panPx(dx, w),
+      zoom: (f) => this.review.zoomBy(f),
+      fly: () => this.review.toggleFly(),
+      ride: () => this.review.toggleRide(),
+      copy: () => copyText(this.review.export(BUILD_STAMP).text),
+      share: async () => {
+        const nav = navigator as Partial<Navigator>;
+        if (typeof nav.share !== 'function') return false;
+        try {
+          await nav.share({ title: `Level review · ${this.game.currentTrack?.name ?? ''}`, text: this.review.export(BUILD_STAMP).text });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      exit: () => this.leaveReview(),
+      note: (i) => this.review.note(i),
+      save: (i, n) => void this.review.saveNote(i, n),
+    });
     this.pause = new PauseMenu(o.uiRoot, this.sfx, {
       resume: () => this.resume('pause:resume'),
       restartTrack: () => {
@@ -403,6 +465,40 @@ export class App {
     });
     mountRotatePrompt(o.uiRoot);
     this.menu.setTracks(shipTracks(this.tracks, o.dev ?? false));
+    this.bench = o.bench
+      ? new Bench(
+          o.uiRoot,
+          {
+            game: this.game,
+            audio: this.audio,
+            gotoMenu: () => (this.screen === 'run' ? this.quit('bench') : this.goto('menu')),
+            gotoGarage: () => {
+              if (this.screen === 'run') this.quit('bench');
+              this.goto('garage');
+            },
+            startB1: () => this.play('b1-first-ride'),
+            rideB1: (json) => {
+              if (this.screen !== 'run' || this.game.currentTrack?.id !== 'b1-first-ride') this.play('b1-first-ride');
+              this.game.startPlayback(json, { ghost: false });
+            },
+            setCapOverride: (hz) => {
+              this.capOverride = hz;
+              this.cadence.reset();
+            },
+            currentCap: () => this.frameCapHz(),
+            setTouchHidden: (hidden) => {
+              this.touchHidden = hidden;
+              this.touch.setVisible(this.mux.activeDevice() === 'touch' && !hidden);
+            },
+            qualityWhy: () => this.qualityWhy,
+            build: BUILD_STAMP.replace(/^build /, ''),
+            physics: o.physics?.live ?? 'mock',
+          },
+          o.bench,
+          (r) => this.benchLog.append(r),
+        )
+      : null;
+    // Under the bench the governor is off (`governFrame` returns when `this.bench`): scenarios pin their tiers.
 
     // Telemetry: every fault is a death at the bike's x (the state after the faulting step) with the last second of input.
     this.game.onEvent((e) => {
@@ -432,12 +528,13 @@ export class App {
     this.game.setGhostEnabled(this.ghostOn);
     if (this.qualityChoice !== 'auto') {
       this.game.setQuality(this.qualityChoice);
-      this.probeDone = true;
-    } else if (isPhone()) {
-      // Phones start on `low` and the probe may only step up (a 60 fps start line then bloom + SSAO
-      // + shadows at 3000 px wide was the "not 60, dropping frames" report); desktops probe from high.
-      this.game.setQuality('low');
-      this.qualityWhy = 'phone default (low), probe may step up';
+    } else {
+      // Auto is a governor, not a one-shot probe (the user: "auto shifts around based on FPS; high if
+      // possible"). Start at the tier this device last held for 30 s, else medium on a phone / high on
+      // desktop; the governor climbs to high while the frame holds and steps down the moment it does not.
+      const start = loadHeldTier() ?? (isPhone() ? 'medium' : 'high');
+      this.game.setQuality(start);
+      this.qualityWhy = `governor start ${start}${loadHeldTier() ? ' (held last session)' : ''}`;
     }
 
     const unlock = (): void => {
@@ -457,16 +554,18 @@ export class App {
     this.fit();
 
     this.game.onPhase = (phase, prev) => {
-      if (phase === 'riding' && !this.probeDone) this.probeArmed = true; // probe the first 60 frames after GO
       // From the line on the run is over for the thumbs: the layer is inert now, not when the panel lands 0.4 s later
       // (a corner tap in that window used to be an unconfirmed quit / a full restart).
       if (phase === 'finished') this.touch.setOverlay(true);
       if (phase !== 'finished' && !this.pause.visible) this.touch.setOverlay(false); // retry / next out of the results frame
       // First GO on this track load starts the run's telemetry window (full restarts keep it: time-to-clear is per track visit).
       if (phase === 'riding' && prev === 'countdown' && this.screen === 'run' && !this.collector.running) this.collector.begin();
+      // Retry / next out of the results: the bed goes back to the run scene with the countdown.
+      if ((phase === 'countdown' || phase === 'riding') && (this.screen === 'run' || this.screen === 'replay')) this.setAudioScene('run');
     };
     // Results: NEXT TRACK is live only when the next track is unlocked (this clear may have unlocked it).
     this.game.onResults = (r) => {
+      this.setAudioScene('results');
       this.hud.setNextEnabled(this.nextTrackEnabled(), this.nextTrackName());
       this.touch.setOverlay(true);
       this.logRun(r);
@@ -514,6 +613,7 @@ export class App {
       return;
     }
     this.screen = 'replay';
+    this.setAudioScene('run');
     this.screenAt = performance.now();
     this.hud.setReplay(true);
     this.replayBar.setDevice(this.mux.activeDevice() ?? 'keyboard');
@@ -550,6 +650,77 @@ export class App {
     this.goto('tracks');
   }
 
+  // -- level reviewer (docs/design/game.md §21) -------------------------------------------
+
+  /** Picker row / `?review=`: load the track under the review UI (nothing racing, the bike parked at segment 1). */
+  private enterReview(trackId: string, seg = 0): boolean {
+    if (!getTrack(trackId)) return false;
+    if (this.replay.active) this.replay.close();
+    if (this.review.active) this.review.close();
+    this.collector.abandon();
+    this.hud.hideResults();
+    this.pause.hide();
+    this.menu.hide();
+    this.garage.hide();
+    this.settings.hide();
+    this.credits.hide();
+    this.tracksScreen.hide();
+    this.reviewPick.hide();
+    this.setOverlay(false);
+    this.touch.setEnabled(false);
+    this.touch.setOverlay(false);
+    this.o.sceneRoot?.classList.remove('covered', 'dim', 'garage');
+    this.game.renderEnabled = true;
+    this.setLab(trackId);
+    const vol = this.soundOn ? this.volume : 0;
+    this.audio?.setMasterVolume(0); // the load's countdown cue stays silent
+    if (!this.review.open(trackId, seg)) {
+      this.audio?.setMasterVolume(vol);
+      return false;
+    }
+    this.hud.hideNow();
+    this.hud.setReplay(true);
+    this.hud.setReview(true);
+    this.screen = 'reviewer';
+    this.screenAt = performance.now();
+    this.setAudioScene('menu');
+    this.reviewPanel.show();
+    this.reviewPanel.update(this.review.view());
+    setTimeout(() => this.audio?.setMasterVolume(vol), 60);
+    return true;
+  }
+
+  /** ‹ Tracks / Esc: back to the picker (the row's noted count refreshed). */
+  private leaveReview(): void {
+    if (!this.review.active) return;
+    this.reviewPanel.hide();
+    this.review.close();
+    this.hud.setReplay(false);
+    this.hud.setReview(false);
+    this.hud.hideNow();
+    this.loadBackdrop(BACKDROP_TRACK, true);
+    this.goto('review');
+  }
+
+  /** Harness / QA surface (`window.__trials.review`): the reviewer's state and controls without a pointer. */
+  reviewApi(): NonNullable<TrialsHook['review']> {
+    return {
+      open: (id, seg) => this.enterReview(id, seg ?? 0),
+      close: () => this.leaveReview(),
+      active: () => this.review.active,
+      view: () => {
+        const v = this.review.view();
+        return { trackId: v.trackId, seg: v.seg, x: v.x, dist: v.dist, flying: v.flying, riding: v.riding, segments: v.segments.map((s) => ({ i: s.i, from: s.from, to: s.to, label: s.label, kinds: Object.fromEntries(s.kinds) })) };
+      },
+      jump: (i) => this.review.jumpTo(i),
+      pan: (m) => this.review.panM(m),
+      zoom: (f) => this.review.zoomBy(f),
+      fly: () => this.review.toggleFly(),
+      ride: () => this.review.toggleRide(),
+      export: () => this.review.export(BUILD_STAMP),
+    };
+  }
+
   /** Harness / e2e surface (`window.__trials.app`): one synchronous app frame, the flow methods, the state. */
   testApi(): NonNullable<TrialsHook['app']> {
     return {
@@ -563,6 +734,13 @@ export class App {
       screen: () => this.screen,
       paused: () => this.game.paused(),
     };
+  }
+
+  /** `window.__trials.bench` (`?bench=1` only): start, state, the finished report. */
+  benchApi(): NonNullable<TrialsHook['bench']> | undefined {
+    const b = this.bench;
+    if (!b) return undefined;
+    return { start: () => b.start(), state: () => b.state(), report: () => b.report(), text: () => b.text() };
   }
 
   /** Harness / QA surface (`window.__trials.replay`). */
@@ -598,18 +776,26 @@ export class App {
     // screens and the touch layer now (onDeviceChange only fires on a change).
     const d0 = this.mux.activeDevice();
     if (d0) this.onDevice(d0);
-    if (this.o.initialTrack && getTrack(this.o.initialTrack)) this.play(this.o.initialTrack);
+    if (this.o.initialReview && this.enterReview(this.o.initialReview)) {
+      /* the reviewer owns the scene */
+    } else if (this.o.initialTrack && getTrack(this.o.initialTrack)) this.play(this.o.initialTrack);
     else {
       this.loadBackdrop(BACKDROP_TRACK);
       this.goto('menu');
     }
     this.lastNow = performance.now();
     const frame = (now: number): void => {
-      // Frame cap: skip RAF callbacks until the cap interval has elapsed (2 ms slack so a 60 Hz RAF
-      // renders every second frame and a 120 Hz one every fourth). Physics is fixed-step, so the
-      // skipped frames' time is simply consumed by the next advance.
+      // Frame cap: a phase-locked cadence (src/game/cadence.ts) — a render is due every 1000/cap ms from
+      // the first one, whatever RAF slot it lands on, so a 30 cap on a 60 or 120 Hz display holds 30 flat
+      // instead of slipping to 24–28 after each frame that overran its slot (PERF.md §0 F4). Physics is
+      // fixed-step, so the skipped frames' time is simply consumed by the next advance.
+      this.bench?.raf(now);
       const cap = this.frameCapHz();
-      if (now - this.lastRenderAt < 1000 / cap - 2) {
+      if (cap !== this.capInEffect) {
+        this.capInEffect = cap;
+        this.cadence.reset();
+      }
+      if (!this.cadence.shouldRender(now, cap)) {
         this.raf = requestAnimationFrame(frame);
         return;
       }
@@ -619,6 +805,8 @@ export class App {
       this.lastNow = now;
       this.tickFrame(elapsed);
       this.meterFrame(now, sinceRender);
+      this.governFrame(now, sinceRender);
+      this.bench?.frame(now, this.frameSplit);
       this.raf = requestAnimationFrame(frame);
     };
     this.raf = requestAnimationFrame(frame);
@@ -650,8 +838,16 @@ export class App {
   goto(screen: FrontScreen): void {
     this.navLog.record('goto', this.navContext(), null, screen);
     if (this.replay.active) this.replay.close();
+    if (this.review.active) {
+      this.reviewPanel.hide();
+      this.review.close();
+      this.hud.setReplay(false);
+      this.hud.setReview(false);
+      this.hud.hideNow();
+    }
     this.screen = screen;
     this.screenAt = performance.now();
+    this.setAudioScene('menu');
     this.touch.setEnabled(false);
     this.pause.hide();
     this.menu.hide();
@@ -659,6 +855,7 @@ export class App {
     this.settings.hide();
     this.credits.hide();
     this.garage.hide();
+    this.reviewPick.hide();
     const scene = this.o.sceneRoot;
     // The menu's key art covers the canvas: no WebGL frame at all while it is up (PERF.md #1 —
     // the phone paid a full tier frame plus a compositor copy for an invisible canvas).
@@ -680,6 +877,10 @@ export class App {
     } else if (screen === 'settings') {
       this.settings.setDevice(dev);
       this.settings.show();
+    } else if (screen === 'review') {
+      this.reviewPick.build(listTrackIds().map((id) => getTrack(id)!).filter((t) => !!t));
+      this.reviewPick.setDevice(dev);
+      this.reviewPick.show();
     } else this.credits.show();
   }
 
@@ -690,6 +891,13 @@ export class App {
     const bike = this.bikeChoice ?? defaultBikeForTier(def.tier, this.lastRidden);
     this.collector.abandon();
     if (this.replay.active) this.replay.close();
+    if (this.review.active) {
+      this.reviewPanel.hide();
+      this.review.close();
+      this.hud.setReplay(false);
+      this.hud.setReview(false);
+    }
+    this.reviewPick.hide();
     this.setLab(id);
     if (!this.game.loadTrack(id, undefined, bike)) return;
     // Always on launch (materials only, no rebuild): a garage browse may have left the hero in the other livery.
@@ -697,6 +905,7 @@ export class App {
     this.lastRidden = bike;
     this.screen = 'run';
     this.screenAt = performance.now();
+    this.setAudioScene('run');
     this.lastTrackId = id;
     try {
       localStorage.setItem(LAST_TRACK_KEY, id);
@@ -718,7 +927,7 @@ export class App {
     this.touch.setOverlay(false);
     this.hud.setNextEnabled(this.nextTrackEnabled(), this.nextTrackName());
     // First launch ever: one card (gas / brake / lean), the countdown waits behind it.
-    if (!loadOnboarded()) {
+    if (!loadOnboarded() && !this.bench) {
       this.game.setPaused(true);
       this.onboard.show(this.mux.activeDevice());
     }
@@ -781,32 +990,14 @@ export class App {
     if (this.telemetryOn) this.runLog.append(entry);
   }
 
-  private async copyRunLog(): Promise<boolean> {
-    const json = this.runLog.exportJson(BUILD_STAMP);
-    try {
-      await navigator.clipboard.writeText(json);
-      return true;
-    } catch {
-      try {
-        const ta = document.createElement('textarea');
-        ta.value = json;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        const ok = document.execCommand('copy');
-        ta.remove();
-        return ok;
-      } catch {
-        return false;
-      }
-    }
+  private copyRunLog(): Promise<boolean> {
+    return copyText(this.runLog.exportJson(BUILD_STAMP, this.benchLog.read()));
   }
 
   private async shareRunLog(): Promise<boolean> {
     if (typeof navigator.share !== 'function') return this.copyRunLog();
     try {
-      await navigator.share({ title: 'Trials Gauntlet run log', text: this.runLog.exportJson(BUILD_STAMP) });
+      await navigator.share({ title: 'Trials Gauntlet run log', text: this.runLog.exportJson(BUILD_STAMP, this.benchLog.read()) });
       return true;
     } catch {
       return false; // AbortError (sheet dismissed) or unsupported payload
@@ -896,6 +1087,13 @@ export class App {
     return this.screen === 'run' && this.game.phase() !== 'menu';
   }
 
+  /** Audio round 3 (additive): the app's scene for the music bed — `menu` for every front screen, `run` from launch / retry / replay, `results` when the panel lands. */
+  private setAudioScene(scene: AudioScene): void {
+    if (scene === this.audioScene) return;
+    this.audioScene = scene;
+    this.audio?.setScene?.(scene);
+  }
+
   /** The next ship track exists, is not this one, and its tier is unlocked (src/ui/progress.ts rule). */
   private nextTrackEnabled(): boolean {
     const ship = shipTracks(this.tracks, this.o.dev ?? false);
@@ -919,9 +1117,32 @@ export class App {
 
   // -- per frame ----------------------------------------------------------------
 
+  /** One app frame with its split bracketed into `frameSplit` (four `performance.now()` calls; the game adds its own). */
   private tickFrame(elapsed: number, render = true): void {
+    const sp = this.frameSplit;
+    const t0 = performance.now();
+    this.tickFrameInner(elapsed, render, t0);
+    const t1 = performance.now();
+    const lr = this.game.lastRender;
+    const la = this.game.lastAdvance;
+    sp.totalMs = t1 - t0;
+    sp.physicsMs = la.physicsMs;
+    sp.ticks = la.ticks;
+    sp.hudMs = lr.hudMs;
+    sp.audioMs = lr.audioMs;
+    sp.submitMs = lr.submitMs;
+    // `other` = the app shell's housekeeping plus the game's state prep (getState / run info / ghost) before the HUD.
+    sp.otherMs = Math.max(0, sp.totalMs - sp.pollMs - sp.advanceMs) + lr.prepMs;
+  }
+
+  private tickFrameInner(elapsed: number, render: boolean, t0: number): void {
+    const sp = this.frameSplit;
+    sp.pollMs = sp.advanceMs = 0;
+    this.game.lastAdvance.ticks = 0;
+    this.game.lastAdvance.physicsMs = 0;
     if (this.perf) this.perf.root.hidden = !(this.screen === 'run' && !this.pause.visible && this.game.phase() !== 'finished' && !this.onboard.visible);
     const { frame, meta } = this.mux.poll();
+    sp.pollMs = performance.now() - t0;
     const restartEdge = frame.restart === true && !this.prevRestart;
     const throttleEdge = frame.throttle > 0 && !this.prevThrottle;
     if (performance.now() - this.screenAt < SCREEN_GRACE_MS && this.screen !== 'run') {
@@ -950,6 +1171,29 @@ export class App {
       }
       return;
     }
+    if (this.screen === 'reviewer') {
+      // Level reviewer: Esc / B / pause = back to the picker; V / Y = fly; while riding the frame drives the bike,
+      // otherwise held lean pans the probe (12 m/s) and ←/→ nav jumps a segment.
+      if (meta.back || meta.pause) {
+        this.leaveReview();
+        return;
+      }
+      if (meta.alt) this.review.toggleFly();
+      if (this.review.view().riding) {
+        this.game.setInput(frame);
+      } else {
+        if (frame.lean !== 0 && elapsed > 0) this.review.panM(frame.lean * 12 * elapsed);
+        if (meta.navX) this.review.jumpTo(this.review.view().seg + meta.navX);
+        if (meta.confirm) this.review.toggleRide();
+      }
+      this.prevRestart = frame.restart === true;
+      this.prevThrottle = frame.throttle > 0;
+      this.review.frame(elapsed);
+      this.game.advance(elapsed);
+      this.settleTouch(elapsed);
+      this.labPanel.update(performance.now());
+      return;
+    }
     if (this.onboard.visible) {
       // First-launch card: any confirm / back / gas edge dismisses it; nothing reaches the game meanwhile.
       if (meta.confirm || meta.back || meta.pause || throttleEdge || restartEdge) this.onboard.dismiss();
@@ -959,7 +1203,7 @@ export class App {
       return;
     }
     if (this.screen !== 'run') {
-      const s = this.screen === 'menu' ? this.menu : this.screen === 'garage' ? this.garage : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.credits;
+      const s = this.screen === 'menu' ? this.menu : this.screen === 'garage' ? this.garage : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.screen === 'review' ? this.reviewPick : this.credits;
       if (meta.navX || meta.navY) s.nav(meta.navX, meta.navY);
       if (meta.confirm) s.confirm();
       else if (meta.back || meta.pause) s.back();
@@ -989,8 +1233,11 @@ export class App {
     const dev = this.mux.activeDevice();
     if (dev) this.hud.setDevice(dev, this.mux.idleFrames() < DEVICE_SHOW_FRAMES);
 
-    if (render) this.game.advance(elapsed);
-    if (this.probeArmed && !this.probeDone && !this.game.paused()) this.recordProbe(elapsed * 1000);
+    if (render) {
+      const tA = performance.now();
+      this.game.advance(elapsed);
+      sp.advanceMs = performance.now() - tA;
+    }
     this.settleTouch(elapsed);
     if (this.inRun() && !this.game.paused()) {
       this.collector.frame(elapsed * 1000);
@@ -1009,6 +1256,8 @@ export class App {
       quality: this.game.qualityTier,
       qualityWhy: this.qualityWhy,
       dpr: dprCap(),
+      render: this.game.rendererDebug(),
+      entryHold: this.game.entryHeld,
     }));
   }
 
@@ -1034,7 +1283,7 @@ export class App {
   }
 
   private onDevice(d: InputDevice): void {
-    this.touch.setVisible(d === 'touch');
+    this.touch.setVisible(d === 'touch' && !this.touchHidden);
     this.hud.setDevice(d, true);
     for (const s of [this.menu, this.tracksScreen, this.settings]) s.setDevice(d);
     this.garage.setDevice(d);
@@ -1043,11 +1292,11 @@ export class App {
     this.pause.setDevice(d);
   }
 
-  /** Cap in effect: the Settings choice, else 30 on phones and 60 elsewhere. */
+  /** Cap in effect: the Settings choice, else 60 everywhere (device report #1: low holds 59.5 fps on the phone). */
   private frameCapHz(): 30 | 60 {
+    if (this.capOverride) return this.capOverride;
     if (this.fpsChoice === '30') return 30;
-    if (this.fpsChoice === '60') return 60;
-    return isPhone() ? 30 : 60;
+    return 60;
   }
 
   /** FPS meter: rendered frames over the last 500 ms, the worst frame interval in that window, the tier letter. Two DOM writes per second. */
@@ -1068,39 +1317,75 @@ export class App {
 
   // -- quality ------------------------------------------------------------------
 
-  /** Median RAF interval over the first 60 frames after GO → tier (60 fps high, 30 fps medium, else low). */
-  private recordProbe(frameMs: number): void {
-    this.probe.push(frameMs);
-    if (this.probe.length < PROBE_FRAMES) return;
-    this.probeDone = true;
-    const sorted = [...this.probe].sort((a, b) => a - b);
-    const median = sorted[sorted.length >> 1] ?? 0;
-    const cap = this.frameCapHz();
-    const budget = 1000 / cap;
-    // Measured against the cap in effect: a phone capped at 30 that holds 33 ms is "medium"-worthy at
-    // most; it never probes into `high` (shadows + SSAO + bloom at full DPR).
-    let tier: QualityTier = median <= budget * 1.05 ? 'high' : median <= budget * 2 ? 'medium' : 'low';
-    // Phones probe like desktops but never into `high` yet; the perf owner's job (docs/plans/PERF.md) is to make
-    // every tier hold 60 on a phone — Auto is not allowed to hide that by pinning low.
-    if (isPhone() && tier === 'high') tier = 'medium';
-    if (this.qualityChoice === 'auto') {
-      this.game.setQuality(tier);
-      this.qualityWhy = `probe median ${median.toFixed(1)} ms at cap ${cap}`;
+  /**
+   * The quality governor (Auto). Every rendered frame's interval feeds a 2 s window; at the window's end:
+   *   p95 > 1.3 × budget or drops > 8 %  → step DOWN now (a stutter beats sustained lag), 10 s cooldown;
+   *   p95 ≤ 1.1 × budget and drops < 2 % for 4 consecutive windows → step UP, but only at a safe moment
+   *   (not riding: countdown / menu / garage / pause / results) because a tier change recompiles materials.
+   * The first second after any change is ignored (the recompile itself would read as drops). A tier held
+   * for 30 s is remembered per device so the next boot starts there. Manual settings disable it.
+   */
+  private govWindowAt = 0;
+  private govIntervals: number[] = [];
+  private govGoodWindows = 0;
+  private govChangedAt = 0;
+  private govLastDownAt = 0;
+  private govHeldSince = 0;
+  private governFrame(now: number, sinceRender: number): void {
+    if (this.qualityChoice !== 'auto' || this.bench) return;
+    if (now - this.govChangedAt < 1000) return; // recompile shadow
+    if (sinceRender > 0) this.govIntervals.push(sinceRender);
+    if (!this.govWindowAt) this.govWindowAt = now;
+    if (now - this.govWindowAt < 2000) return;
+    const n = this.govIntervals.length;
+    this.govWindowAt = now;
+    if (n < 10) {
+      this.govIntervals = [];
+      return;
     }
-    this.probe = [];
-    this.probeArmed = false;
+    const sorted = this.govIntervals.slice().sort((a, b) => a - b);
+    const p95 = sorted[Math.min(n - 1, Math.floor(n * 0.95))]!;
+    const budget = 1000 / this.frameCapHz();
+    const drops = sorted.filter((x) => x > budget * 1.5).length / n;
+    this.govIntervals = [];
+    const order: QualityTier[] = ['low', 'medium', 'high'];
+    const cur = this.game.qualityTier;
+    const i = order.indexOf(cur);
+    const riding = this.inRun() && this.game.phase() === 'riding' && !this.game.paused();
+    if (p95 > budget * 1.3 || drops > 0.08) {
+      this.govGoodWindows = 0;
+      this.govHeldSince = now;
+      if (i > 0) {
+        this.game.setQuality(order[i - 1]!);
+        this.govChangedAt = now;
+        this.govLastDownAt = now;
+        this.qualityWhy = `governor ↓ ${order[i - 1]} (p95 ${p95.toFixed(1)} ms, drops ${(drops * 100).toFixed(0)} %)`;
+      }
+      return;
+    }
+    if (p95 <= budget * 1.1 && drops < 0.02) {
+      this.govGoodWindows++;
+      if (now - this.govHeldSince > 30000) saveHeldTier(cur);
+      if (this.govGoodWindows >= 4 && i < 2 && !riding && now - this.govLastDownAt > 10000) {
+        this.game.setQuality(order[i + 1]!);
+        this.govChangedAt = now;
+        this.govGoodWindows = 0;
+        this.govHeldSince = now;
+        this.qualityWhy = `governor ↑ ${order[i + 1]} (p95 ${p95.toFixed(1)} ms held ${4 * 2} s)`;
+      }
+    } else {
+      this.govGoodWindows = 0;
+    }
   }
 
   private chooseQuality(q: QualityChoice): void {
     this.qualityChoice = q;
     saveQualityOverride(q);
     if (q === 'auto') {
-      this.probeDone = false;
-      this.probe = [];
-      this.probeArmed = this.game.phase() === 'riding';
-      this.qualityWhy = 'pending probe';
+      this.govGoodWindows = 0;
+      this.govChangedAt = performance.now();
+      this.qualityWhy = 'governor (auto)';
     } else {
-      this.probeDone = true;
       this.game.setQuality(q);
       this.qualityWhy = 'manual (settings)';
     }

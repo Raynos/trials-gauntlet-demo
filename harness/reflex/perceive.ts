@@ -70,9 +70,32 @@ export interface Observation {
   /** Slope of the ground between where the rear and front wheels stand (deg): the pitch a bike at rest on it would have. */
   terrainPitchDeg: number;
   ahead: Ahead;
+  /**
+   * Round 11: the see-saw the bike is on or over (its projected span covers the bike x), or null. A rider on a board
+   * sees it move: the board's angle and angular rate ARE on screen (a plank hanging 1.5 m up on approach, the board
+   * levelling under the wheels). `tipping` = the board is rotating toward the far (+x) end faster than `SEESAW_TIP_RATE`.
+   */
+  seesaw: SeesawSeen | null;
   checkpointAhead: number | null;
   finishAhead: number;
 }
+
+export interface SeesawSeen {
+  /** The bike x is within the plank's projected span AND the plank is the ground under it. */
+  onBoard: boolean;
+  /** Airborne and not over a board: this is the board the ballistic arc lands on (`toFarEnd` from the bike, not the landing point). */
+  landing: boolean;
+  /** Board angle (deg, +ve = the far end up: the rest pose). */
+  angleDeg: number;
+  /** Board angular rate (deg/s, negative = the far end going down = tipping under a bike headed +x). */
+  rateDeg: number;
+  /** Metres to the far (+x) end of the plank's projected span. */
+  toFarEnd: number;
+  tipping: boolean;
+}
+
+/** A board rotating toward the far end faster than this (deg/s) is tipping (the m3 demand board tips at ~140 deg/s). */
+export const SEESAW_TIP_RATE = 8;
 
 const WHEEL_R = 0.34;
 
@@ -210,6 +233,21 @@ export function perceive(st: PhysicsState, phase: GamePhase, t: number, profile:
   const g1 = profile.heightAt(x + 1.0, st);
   const stepAhead = Number.isFinite(g1) ? g1 - base : -99;
 
+  // The board under the bike, else (airborne) the board the ballistic arc lands on.
+  const under = profile.seesawAt(x, st);
+  const landingBoard = under === null && airborne ? profile.seesawAt(x + landingDist, st) : null;
+  const board = under ?? landingBoard;
+  const seesaw: SeesawSeen | null = board
+    ? {
+        onBoard: under !== null && under.isGround && (st.wheels.rear.grounded || st.wheels.front.grounded) && y - under.top - WHEEL_R < 1.0,
+        landing: under === null,
+        angleDeg: board.angle * RAD,
+        rateDeg: board.angVel * RAD,
+        toFarEnd: board.toFarEnd + (under === null ? landingDist : 0),
+        tipping: board.angVel * RAD < -SEESAW_TIP_RATE,
+      }
+    : null;
+
   let checkpointAhead: number | null = null;
   for (const cp of track.checkpoints) {
     if (cp.x > x) {
@@ -252,6 +290,7 @@ export function perceive(st: PhysicsState, phase: GamePhase, t: number, profile:
       roughDeg,
       risers,
     },
+    seesaw,
     checkpointAhead,
     finishAhead: track.finishX - x,
   };

@@ -123,19 +123,51 @@ export function gitHead(): string {
 }
 
 /**
- * FNV-1a over the *working-tree* sources that decide a simulation result
- * (src/physics, src/tracks, src/core, src/game/rules.ts). One shared checkout
- * means HEAD alone does not identify what ran; two reports with different
- * fingerprints are not comparable.
+ * FNV-1a over the *working-tree* sources that decide a simulation result. One shared checkout
+ * means HEAD alone does not identify what ran; two reports with different fingerprints are not
+ * comparable.
+ *
+ * Round 12 (harness-metrics.md Round 11 open item): the hash covers only what the sim IMPORTS —
+ * `src/physics/**`, `src/tracks/**`, `src/game/rules.ts` and the three runtime core modules
+ * (`hash.ts`, `replay.ts`, `rng.ts`). Not `src/core/types.ts` / `global.d.ts` / `loop.ts` /
+ * `index.ts`: a hook-interface type (cfc98f8) cannot change a physics result, yet it restamped
+ * 36 goldens and 22 stranger sessions stale in round 11. `.test.ts` and `.d.ts` are skipped.
+ * `SIM_IDENTICAL_STAMPS` lists earlier stamps PROVEN sim-identical to the current one (a golden
+ * restamp with node == browser on every track); `fingerprintMatches()` is the comparison every
+ * consumer uses, so a change of the hashed set never orphans a proven session.
  */
+export const SIM_FINGERPRINT_DIRS = ['src/physics', 'src/tracks'] as const;
+export const SIM_FINGERPRINT_FILES = ['src/game/rules.ts', 'src/core/hash.ts', 'src/core/replay.ts', 'src/core/rng.ts'] as const;
+/**
+ * current fingerprint -> earlier stamps proven identical. `6412a755` was the round-12 stamp of this
+ * same tree under the old hash (all of src/core): 19/19 Rookie goldens node == browser, the same
+ * physics bytes. Prune an entry once nothing on disk carries the old stamp.
+ */
+export const SIM_IDENTICAL_STAMPS: Readonly<Record<string, readonly string[]>> = {
+  // 817dddd2 = HEAD 682d05c under this hash; 6412a755 / 6f0cbe22 = the same tree under the old all-of-src/core hash
+  // (6f0cbe22: +15 lines of hook types in types.ts). 7e836cbe = HEAD 88401ed: fa62eae ADDED src/tracks/courses/playgrounds.ts
+  // + segments.ts and registered them (`git diff 682d05c..88401ed -- src/physics src/tracks src/game/rules.ts` touches no
+  // existing course, no physics, no rules line), so every earlier track simulates byte-identically; the p1–p5 playgrounds
+  // themselves have no earlier stamp to inherit.
+  // 2e249552 / d3f20790: two working-tree states of fa62eae while it was being written (x3 strangers r8p p1 / p2 ran `done`
+  // under them); x3 p2's session recording replays to hash 5bd588d5cec2a135 on 682d05c and on 88401ed, node == browser.
+  '7e836cbe': ['817dddd2', '6412a755', '6f0cbe22', '2e249552', 'd3f20790'],
+  '817dddd2': ['6412a755', '6f0cbe22'],
+};
 let cachedFp: string | null = null;
 /** Recomputed every call (to detect edits while a long run is in flight). */
 export function freshFingerprint(): string {
   cachedFp = null;
   return srcFingerprint();
 }
-export function srcFingerprint(root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..')): string {
-  if (cachedFp) return cachedFp;
+/** True when `stamp` is the current fingerprint or one proven sim-identical to it. */
+export function fingerprintMatches(stamp: string | null | undefined, fp = srcFingerprint()): boolean {
+  if (!stamp) return false;
+  if (stamp === fp) return true;
+  return (SIM_IDENTICAL_STAMPS[fp] ?? []).includes(stamp);
+}
+/** The hash itself, over `root`; `srcFingerprint()` caches it for the repo. */
+export function simFingerprint(root: string): string {
   let h = 0x811c9dc5;
   const mix = (buf: Uint8Array): void => {
     for (let i = 0; i < buf.length; i++) {
@@ -143,21 +175,29 @@ export function srcFingerprint(root = path.resolve(path.dirname(new URL(import.m
       h = Math.imul(h, 0x01000193) >>> 0;
     }
   };
+  const isSource = (name: string): boolean => /\.ts$/.test(name) && !/\.test\.ts$/.test(name) && !/\.d\.ts$/.test(name);
+  const file = (p: string): void => {
+    mix(new TextEncoder().encode(path.relative(root, p)));
+    mix(fs.readFileSync(p));
+  };
   const walk = (dir: string): void => {
     if (!fs.existsSync(dir)) return;
     for (const e of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
       const p = path.join(dir, e.name);
       if (e.isDirectory()) walk(p);
-      else if (/\.ts$/.test(e.name) && !/\.test\.ts$/.test(e.name)) {
-        mix(new TextEncoder().encode(path.relative(root, p)));
-        mix(fs.readFileSync(p));
-      }
+      else if (isSource(e.name)) file(p);
     }
   };
-  for (const d of ['src/physics', 'src/tracks', 'src/core']) walk(path.join(root, d));
-  const rules = path.join(root, 'src/game/rules.ts');
-  if (fs.existsSync(rules)) mix(fs.readFileSync(rules));
-  cachedFp = (h >>> 0).toString(16).padStart(8, '0');
+  for (const d of SIM_FINGERPRINT_DIRS) walk(path.join(root, d));
+  for (const f of SIM_FINGERPRINT_FILES) {
+    const p = path.join(root, f);
+    if (fs.existsSync(p)) file(p);
+  }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+export function srcFingerprint(root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..')): string {
+  if (cachedFp) return cachedFp;
+  cachedFp = simFingerprint(root);
   return cachedFp;
 }
 

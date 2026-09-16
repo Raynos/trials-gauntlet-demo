@@ -31,6 +31,7 @@ import {
   P_HEADER,
   P_LIMITER,
   P_LOAD,
+  P_LUG,
   P_RPM,
   P_SKID,
   P_TRANSIENT_COUNT,
@@ -51,7 +52,7 @@ const BLOCK = 128;
 
 export const TRIMS = {
   engine: dbToGain(-6),
-  tyres: dbToGain(-5),
+  tyres: dbToGain(-2),
   chassis: dbToGain(0),
   ambient: dbToGain(-4),
   crowd: dbToGain(-3),
@@ -113,7 +114,7 @@ export class TrialsSynth {
   private limEnv = 0;
   private readonly limRel: number;
   // scratch buffers (mono + stereo per bus)
-  private readonly bEngine = new Float32Array(BLOCK);
+  private readonly bEngine: [Float32Array, Float32Array] = [new Float32Array(BLOCK), new Float32Array(BLOCK)];
   private readonly bTyreR = new Float32Array(BLOCK);
   private readonly bTyreF = new Float32Array(BLOCK);
   private readonly bChain = new Float32Array(BLOCK);
@@ -150,8 +151,9 @@ export class TrialsSynth {
     this.slapLp = new Biquad(sampleRate);
     this.slapLp.lowpass(2500, 0.7);
     this.buses = [this.bChassis, this.bUi, this.bAmbient];
-    panGains(-0.15, this.panR);
-    panGains(0.15, this.panF);
+    // round 4: the tyres sit apart by their travel — rear left, front right
+    panGains(-0.35, this.panR);
+    panGains(0.35, this.panF);
     this.kMaster = smoothCoef(0.02, sampleRate);
     this.kDuckAtt = smoothCoef(0.015, sampleRate);
     this.kDuckRel = smoothCoef(0.12, sampleRate);
@@ -173,7 +175,7 @@ export class TrialsSynth {
 
   /** Apply one packed AudioParams frame; transients are queued immediately. */
   setParams(p: Float32Array): void {
-    this.engine.set(p[P_RPM]!, p[P_LOAD]!, p[P_LIMITER]! > 0.5, p[P_ENGINE_GAIN]!, p[P_CLUTCH]!, p[P_SPEED]!, p[P_TORQUE]!, Math.round(p[P_BIKE]!));
+    this.engine.set(p[P_RPM]!, p[P_LOAD]!, p[P_LIMITER]! > 0.5, p[P_ENGINE_GAIN]!, p[P_CLUTCH]!, p[P_SPEED]!, p[P_TORQUE]!, Math.round(p[P_BIKE]!), p[P_LUG]!);
     this.tyres[0].set(p[P_TYRE_SPEED]!, p[P_TYRE_SURFACE]!);
     this.tyres[1].set(p[P_TYRE_SPEED + 1]!, p[P_TYRE_SURFACE + 1]!);
     this.skid.set(p[P_SKID]!);
@@ -224,11 +226,13 @@ export class TrialsSynth {
   }
 
   private block(L: Float32Array, R: Float32Array, off: number, n: number): void {
-    const bE = this.bEngine;
+    const bEL = this.bEngine[0];
+    const bER = this.bEngine[1];
     const bR = this.bTyreR;
     const bF = this.bTyreF;
     const bC = this.bChain;
-    bE.fill(0, 0, n);
+    bEL.fill(0, 0, n);
+    bER.fill(0, 0, n);
     bR.fill(0, 0, n);
     bF.fill(0, 0, n);
     bC.fill(0, 0, n);
@@ -240,7 +244,7 @@ export class TrialsSynth {
     this.bCrowd[1].fill(0, 0, n);
     this.bMusic[0].fill(0, 0, n);
     this.bMusic[1].fill(0, 0, n);
-    this.engine.process(bE, 0, n);
+    this.engine.process(bEL, bER, 0, n);
     this.tyres[0].process(bR, 0, n);
     this.tyres[1].process(bF, 0, n);
     this.skid.process(bR, 0, n);
@@ -286,7 +290,9 @@ export class TrialsSynth {
       const dt = this.duckTarget;
       this.duckGain += (dt - this.duckGain) * (dt < this.duckGain ? kA : kR);
 
-      const e = bE[i]! * gE;
+      const eL = bEL[i]! * gE;
+      const eR = bER[i]! * gE;
+      const e = (eL + eR) * 0.5;
       const tyre = (bR[i]! + bC[i]!) * gT;
       const tyreF = bF[i]! * gT;
       const crowdL = crL[i]! * gCr;
@@ -300,8 +306,8 @@ export class TrialsSynth {
         slap[this.slapPos] = this.slapLp.process((e + (cL[i]! + cR[i]!) * 0.5 * gC) * TRIMS.slapSend + rd * TRIMS.slapFeedback);
         if (++this.slapPos >= slapLen) this.slapPos = 0;
       }
-      const gameL = e + tyre * pr[0] + tyreF * pf[0] + cL[i]! * gC + aL[i]! * gA + crowdL + echo * 0.8;
-      const gameR = e + tyre * pr[1] + tyreF * pf[1] + cR[i]! * gC + aR[i]! * gA + crowdR + echo;
+      const gameL = eL + tyre * pr[0] + tyreF * pf[0] + cL[i]! * gC + aL[i]! * gA + crowdL + echo * 0.8;
+      const gameR = eR + tyre * pr[1] + tyreF * pf[1] + cR[i]! * gC + aR[i]! * gA + crowdR + echo;
       const uiL = uL[i]! * gU;
       const uiR = uR[i]! * gU;
       let send = (uiL + uiR) * TRIMS.reverbUi + (cL[i]! + cR[i]!) * gC * TRIMS.reverbChassis + (crowdL + crowdR) * TRIMS.reverbCrowd;

@@ -26,7 +26,7 @@ import { fogify } from '../lighting/environment';
 import { newChain, solveChain, type Chain } from '../rider/riderModel';
 import { countTriangles, prepareHeroMaterials } from './gltf';
 import { variantMaterialsFor } from './lod';
-import { makeRiderRigPose, riderRigFromCOM, RIDER_PROFILE, RIDER_TORSO_REST } from '../../physics/v2/rider';
+import { makeRiderRigPose, riderRigFromCOM, RIDER_PROFILE, RIDER_TORSO_REST } from './riderRig';
 
 /** Asset material names; deliberately independent of bike physics class. */
 export type RiderMaterialVariant = 'rider_rookie' | 'rider_pro';

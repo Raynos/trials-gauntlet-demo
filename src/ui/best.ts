@@ -17,14 +17,37 @@ export interface BestEntry {
   recording?: string;
 }
 
+/** One row of the local per-track leaderboard (game.md § leaderboard). */
+export interface BoardEntry {
+  time: number;
+  faults: number;
+  medal: Medal;
+  /** ISO time the run finished ('' for a row seeded from a pre-board PB). */
+  at: string;
+}
+
+/** Rows kept per track per class. */
+export const BOARD_SIZE = 5;
+
 const PREFIX = 'trials.best.';
 const QUALITY_KEY = 'trials.quality';
 const FPS_KEY = 'trials.fps';
+const HELD_KEY = 'trials.heldTier';
 const MEDAL_RANK: Record<Medal, number> = { bronze: 1, silver: 2, gold: 3, platinum: 4 };
 
 /** Storage key per track and bike class: rookie keeps the legacy key so pre-garage PBs survive; pro gets a suffix. */
 export function bestKey(trackId: string, bike: BikeClass): string {
   return bike === 'pro' ? `${PREFIX}${trackId}@pro` : PREFIX + trackId;
+}
+
+/** `trials.best.<trackId>[@pro]#board`: under the best-times prefix so Reset progress clears it with the PBs. */
+export function boardKey(trackId: string, bike: BikeClass): string {
+  return `${bestKey(trackId, bike)}#board`;
+}
+
+/** Board order: faster first; equal times, fewer faults first. */
+export function boardOrder(a: BoardEntry, b: BoardEntry): number {
+  return a.time - b.time || a.faults - b.faults;
 }
 
 function store(): Storage | null {
@@ -79,7 +102,65 @@ export class BestTimes {
 
   clear(): void {
     this.cache.clear();
+    this.boards.clear();
     clearAllBest();
+  }
+
+  // -- local per-track leaderboard (MEGA_PLAN P4; additive: the PB entries above are untouched) --------------------
+
+  private readonly boards = new Map<string, BoardEntry[]>();
+
+  /**
+   * The best `BOARD_SIZE` finished runs on a track for a bike class, fastest first. A track with a PB from
+   * before the board existed shows that PB as its one row, so old progress is never a blank board.
+   */
+  board(trackId: string, bike: BikeClass): BoardEntry[] {
+    const key = boardKey(trackId, bike);
+    const cached = this.boards.get(key);
+    if (cached) return cached;
+    let rows: BoardEntry[] = [];
+    try {
+      const raw = store()?.getItem(key);
+      const o = raw ? (JSON.parse(raw) as unknown) : null;
+      if (Array.isArray(o)) {
+        rows = o
+          .filter((e): e is BoardEntry => !!e && typeof e === 'object' && typeof (e as BoardEntry).time === 'number' && typeof (e as BoardEntry).faults === 'number')
+          .map((e) => ({ time: e.time, faults: e.faults, medal: e.medal in MEDAL_RANK ? e.medal : 'bronze', at: typeof e.at === 'string' ? e.at : '' }))
+          .sort(boardOrder)
+          .slice(0, BOARD_SIZE);
+      }
+    } catch {
+      rows = [];
+    }
+    if (rows.length === 0) {
+      const pb = this.read(trackId, bike);
+      if (pb) rows = [{ time: pb.time, faults: pb.faults, medal: pb.medal, at: '' }];
+    }
+    this.boards.set(key, rows);
+    return rows;
+  }
+
+  /**
+   * Insert a finished run; returns its 1-based rank when it made the board, else null. Every clear is
+   * offered (a PB is rank 1 by construction); ties keep the earlier run ahead.
+   */
+  record(trackId: string, r: RunResult, at: string = new Date().toISOString()): number | null {
+    const bike: BikeClass = r.bike ?? 'rookie';
+    const row: BoardEntry = { time: r.time, faults: r.faults, medal: r.medal, at };
+    const rows = [...this.board(trackId, bike)];
+    let i = rows.findIndex((e) => boardOrder(row, e) < 0);
+    if (i < 0) i = rows.length;
+    if (i >= BOARD_SIZE) return null;
+    rows.splice(i, 0, row);
+    rows.length = Math.min(rows.length, BOARD_SIZE);
+    const key = boardKey(trackId, bike);
+    this.boards.set(key, rows);
+    try {
+      store()?.setItem(key, JSON.stringify(rows));
+    } catch {
+      /* storage unavailable: the in-memory board still serves this session */
+    }
+    return i + 1;
   }
 
   put(trackId: string, r: RunResult, run?: { splits: number[]; recording: string | null }): void {
@@ -259,7 +340,26 @@ export function loadQualityOverride(): QualityTier | 'auto' {
   }
 }
 
-/** Frame cap: 'auto' = 30 on phones, 60 elsewhere (`src/game/app.ts frameCapHz`). */
+/** The highest tier the governor saw this device hold for 30 s (Auto's start tier next boot). */
+export function loadHeldTier(): QualityTier | null {
+  try {
+    const v = store()?.getItem(HELD_KEY);
+    return v === 'low' || v === 'medium' || v === 'high' ? v : null;
+  } catch {
+    return null;
+  }
+}
+export function saveHeldTier(t: QualityTier): void {
+  try {
+    const cur = loadHeldTier();
+    const rank = { low: 0, medium: 1, high: 2 };
+    if (!cur || rank[t] >= rank[cur]) store()?.setItem(HELD_KEY, t);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** Frame cap: 'auto' = 60 (`src/game/app.ts frameCapHz`). */
 export type FpsChoice = 'auto' | '30' | '60';
 export function loadFpsChoice(): FpsChoice {
   try {

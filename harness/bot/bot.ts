@@ -5,6 +5,12 @@
  *                    [--max-attempts 50] [--max-sim-seconds 300] [--track-wall-s 120] [--no-verify] [--crash-probe]
  *                    [--dev] [--build] [--verbose]
  *   pnpm harness:bot --all-tracks [--skill 2 | --skill 2,3] [--seeds 2] [--track-wall-s 120]   -> out/metrics/sweep.json + sweep.md
+ *   Wall-clock (round 12): every track x seed (x skill) cell is an independent, deterministic node run, so the sweep,
+ *   `--all --seeds N` and `--refresh-goldens` run them on a pool: `--jobs N` (default min(cells, cores - 2); 1 = the
+ *   old serial path) streams them to persistent `tsx harness/bot/bot.ts --worker` children and merges the reports in the serial
+ *   order; the parent replays every worker's recording itself (`workerHashOk`). `--budget-ticks N` swaps the per-plan
+ *   wall budget for a tick budget so a sweep is byte-identical from any process or core count (the default wall budget
+ *   depends on how much CPU each plan got). `--refresh-goldens` verifies on `--jobs` browser pages at once.
  *   pnpm harness:bot --refresh-goldens [--tracks a,b] [--build]   re-prove every inputs/<track>/bot-*.json on the
  *                    working tree (node replay finishes, node hash == browser hash) and re-stamp it; goldens that
  *                    no longer finish are reported STALE and need a bot run (lib/golden.ts refreshGoldens)
@@ -19,7 +25,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { InputRecorder, quantizeInput, type InputRecording } from '../../src/core/replay';
+import { expandFrames, InputRecorder, quantizeInput, type InputRecording } from '../../src/core/replay';
 import { DEFAULT_BIKE, type BikeClass, type InputFrame } from '../../src/core/types';
 import { flagBool, flagNum, parseArgs } from '../lib/args';
 import { faultsByCheckpoint, freshFingerprint, median, percentileOf, restartEdges, runMeta, srcFingerprint } from '../lib/metrics';
@@ -28,7 +34,9 @@ import { recordingHeader, saveRecording } from '../lib/recording';
 import { fail, writeJson } from '../lib/report';
 import type { Blocker, BotRunReport, Skill, SweepReport, SweepRow, TrackBotMetrics } from '../lib/schema';
 import { goldenSuffix, refreshGoldens } from '../lib/golden';
-import { createSim, listSimTracks, parseBike, type Sim } from '../lib/sim';
+import { defaultBrowserJobs, defaultJobs, loadLine, runWorkerLoop, WorkerPool } from '../lib/pool';
+import { loadRecording } from '../lib/recording';
+import { createSim, createSimFor, listSimTracks, parseBike, type Sim } from '../lib/sim';
 import { BrowserVerifier } from '../lib/verify';
 import { formatActions } from './actions';
 import { configFor, playTrack } from './play';
@@ -63,6 +71,63 @@ export interface RunOnce {
   recording: InputRecording;
 }
 
+export interface RunOnceOptions {
+  budgetMs?: number;
+  /** Deterministic plan budget in simulated ticks (`--budget-ticks`); replaces `budgetMs` when set. */
+  budgetTicks?: number;
+  maxAttempts?: number;
+  maxSimSeconds?: number;
+  maxWallMs?: number;
+  verbose?: boolean;
+  bike?: BikeClass;
+}
+
+/** One pool cell: what a `--job` worker needs to reproduce `runOnce` in its own process. */
+export interface BotJob {
+  trackId: string;
+  seed: number;
+  skill: Skill;
+  opts: RunOnceOptions;
+}
+
+/**
+ * Run the cells on `jobs` workers (child `tsx bot.ts --job`), results in cell order. `jobs <= 1` runs them
+ * in-process, serially, as before. Each worker's recording is replayed here, in the parent, and must hash
+ * to the worker's `nodeHash`: the same bytes from two processes is the determinism the pool rests on.
+ */
+export async function runJobs(cells: BotJob[], jobs: number, onDone: (r: RunOnce) => void = printRunLineOf): Promise<RunOnce[]> {
+  if (jobs <= 1 || cells.length <= 1) {
+    const out: RunOnce[] = [];
+    for (const c of cells) {
+      const r = await runOnce(c.trackId, c.seed, c.skill, c.opts);
+      onDone(r);
+      out.push(r);
+    }
+    return out;
+  }
+  const pool = new WorkerPool<BotJob, BotRunReport>('harness/bot/bot.ts', jobs, { tag: 'bot' });
+  const reports = await pool.run(cells, (report) => printRunLine(report));
+  const out: RunOnce[] = [];
+  for (const [i, report] of reports.entries()) {
+    const c = cells[i]!;
+    const recording = loadRecording(report.recordingFile);
+    const sim = await createSimFor(recording);
+    const replay = sim.run(expandFrames(recording));
+    report.workerHashOk = replay.hash === report.nodeHash;
+    if (!report.workerHashOk) console.error(`  [bot] WARNING worker ${c.trackId} seed=${c.seed} skill=${skillLabel(c.skill)}: parent replay ${replay.hash} != worker ${report.nodeHash} — the sim is not deterministic across processes`);
+    const r = { report, recording };
+    if (onDone !== printRunLineOf) onDone(r);
+    out.push(r);
+  }
+  const bad = out.filter((r) => r.report.workerHashOk === false).length;
+  console.log(`pool: ${cells.length} cells on ${jobs} workers, parent replay == worker hash for ${cells.length - bad}/${cells.length}`);
+  return out;
+}
+
+function printRunLineOf(r: RunOnce): void {
+  printRunLine(r.report);
+}
+
 /** Locate a fault against the placed obstacles: nearest one within [-2, +8] m ahead. */
 export function locateBlocker(sim: Sim, f: { reason: Blocker['reason']; x: number; checkpoint: number; runTime: number }): Blocker {
   let best: Blocker['obstacle'] = null;
@@ -83,12 +148,12 @@ export async function runOnce(
   trackId: string,
   seed: number,
   skill: Skill,
-  o: { budgetMs?: number; maxAttempts?: number; maxSimSeconds?: number; maxWallMs?: number; verbose?: boolean; bike?: BikeClass },
+  o: RunOnceOptions,
 ): Promise<RunOnce> {
   const started = new Date();
   const bike = o.bike ?? DEFAULT_BIKE;
   const sim = await createSim(trackId, seed, undefined, { bike });
-  const config = configFor(skill, o.budgetMs);
+  const config = o.budgetTicks !== undefined ? { ...configFor(skill, o.budgetMs), budgetTicks: o.budgetTicks } : configFor(skill, o.budgetMs);
   const limits: Partial<{ maxAttempts: number; maxSimSeconds: number; maxWallMs: number }> = {};
   if (o.maxAttempts !== undefined) limits.maxAttempts = o.maxAttempts;
   if (o.maxSimSeconds !== undefined) limits.maxSimSeconds = o.maxSimSeconds;
@@ -174,9 +239,10 @@ function fmtTicks(n: number): string {
 export function printRunLine(r: BotRunReport): void {
   const fin = r.finishTime === null ? 'none' : r.finishTime.toFixed(3);
   const ver = r.browserVerified === null ? 'skipped' : r.browserVerified ? 'yes' : 'NO';
+  const wk = r.workerHashOk === undefined || r.workerHashOk === null ? '' : ` worker=${r.workerHashOk ? 'ok' : 'HASH-MISMATCH'}`;
   const blk = r.firstBlocker ? ` blocker=${r.firstBlocker.reason}@${r.firstBlocker.x.toFixed(1)}m${r.firstBlocker.obstacle ? `(${r.firstBlocker.obstacle.kind}@${r.firstBlocker.obstacle.x.toFixed(1)})` : '(ground)'}` : '';
   console.log(
-    `bot ${r.trackId} skill=${skillLabel(r.skill)} seed=${r.seed} attempts=${r.attempts} outcome=${r.outcome} finish=${fin} maxX=${r.maxX.toFixed(1)} (${(r.progress * 100).toFixed(0)}%)${blk} plans=${r.search.plans} ticks=${fmtTicks(r.search.ticksSimulated)} wall=${(r.wallMs / 1000).toFixed(1)}s verified=${ver}`,
+    `bot ${r.trackId} skill=${skillLabel(r.skill)} seed=${r.seed} attempts=${r.attempts} outcome=${r.outcome} finish=${fin} maxX=${r.maxX.toFixed(1)} (${(r.progress * 100).toFixed(0)}%)${blk} plans=${r.search.plans} ticks=${fmtTicks(r.search.ticksSimulated)} wall=${(r.wallMs / 1000).toFixed(1)}s verified=${ver}${wk}`,
   );
 }
 
@@ -324,22 +390,30 @@ export async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds:
   const ids = listSimTracks().filter((id) => !only || only.includes(id));
   const rows: SweepRow[] = [];
   const bike = parseBike(flags.bike);
+  const budgetTicks = flags['budget-ticks'] !== undefined ? flagNum(flags, 'budget-ticks', 0) : undefined;
   const first = await createSim(ids[0]!, undefined, undefined, { bike });
-  console.log(`sweep: physics=${first.physicsName} src=${srcFingerprint()} bike=${bike} skill=${skillLabel(skill)} seeds=${seeds} trackWall=${trackWallS}s tracks=${ids.length}`);
   const fp0 = srcFingerprint();
+  // Every (track, seed) is an independent node run: one pool over all of them, merged back per track in order.
+  const cells: BotJob[] = [];
+  const cellOpts = (): RunOnceOptions => {
+    // With a tick budget the per-track wall cap is only kept when asked for: a wall cap would re-introduce the clock.
+    const o: RunOnceOptions = { verbose: flagBool(flags, 'verbose'), bike };
+    if (budgetTicks === undefined || flags['track-wall-s'] !== undefined) o.maxWallMs = trackWallS * 1000;
+    if (budget !== undefined) o.budgetMs = budget;
+    if (budgetTicks !== undefined) o.budgetTicks = budgetTicks;
+    return o;
+  };
   for (const id of ids) {
-    const sim = await createSim(id);
-    const runs: RunOnce[] = [];
-    const t0 = performance.now();
-    if (freshFingerprint() !== fp0) console.error(`WARNING src/physics|tracks changed on disk during the sweep (${fp0} -> ${freshFingerprint()}); this process still runs the code it loaded at start. Re-run the sweep.`);
-    for (let k = 0; k < seeds; k++) {
-      const seed = (sim.seed + k) >>> 0;
-      const o: Parameters<typeof runOnce>[3] = { maxWallMs: trackWallS * 1000, verbose: flagBool(flags, 'verbose'), bike };
-      if (budget !== undefined) o.budgetMs = budget;
-      const r = await runOnce(id, seed, skill, o);
-      runs.push(r);
-      printRunLine(r.report);
-    }
+    const sim = await createSim(id, undefined, undefined, { bike });
+    for (let k = 0; k < seeds; k++) cells.push({ trackId: id, seed: (sim.seed + k) >>> 0, skill, opts: cellOpts() });
+  }
+  const jobs = defaultJobs(cells.length, flags);
+  console.log(`sweep: physics=${first.physicsName} src=${fp0} bike=${bike} skill=${skillLabel(skill)} seeds=${seeds} trackWall=${trackWallS}s${budgetTicks !== undefined ? ` budgetTicks=${budgetTicks}` : ''} tracks=${ids.length} cells=${cells.length} jobs=${jobs} ${loadLine()}`);
+  const all = await runJobs(cells, jobs);
+  if (freshFingerprint() !== fp0) console.error(`WARNING src/physics|tracks changed on disk during the sweep (${fp0} -> ${freshFingerprint()}); the workers ran the code they loaded at start. Re-run the sweep.`);
+  for (const id of ids) {
+    const sim = await createSim(id, undefined, undefined, { bike });
+    const runs = all.filter((r) => r.report.trackId === id);
     const reps = runs.map((r) => r.report);
     const bestX = Math.max(...reps.map((r) => r.maxX));
     // First blocker: from the run that got least far (the wall), else the earliest fault.
@@ -369,13 +443,14 @@ export async function sweep(flags: ReturnType<typeof parseArgs>['flags'], seeds:
       firstBlocker: blockers[0] ?? null,
       replayFaithful: reps.every((r) => !r.playReplayDivergence),
       replayDivergenceX: reps.map((r) => r.playReplayDivergence?.x).find((x): x is number => x !== undefined) ?? null,
-      wallMs: performance.now() - t0,
+      // Per-track wall = the sum of its runs' walls (the cells ran on a pool; the sweep's own wall is in the header).
+      wallMs: reps.reduce((a, r) => a + r.wallMs, 0),
       runs: reps.map((r) => r.runId),
     });
     updateTrackMetrics(sim, new Map([[skill, runs]]));
     // Golden per track when it cleared (node-hash only; verify in the browser with harness:replay / gate).
     const best = bestOf(runs);
-    if (best && best.report.outcome === 'finished') saveRecording(goldenFile(id, skill), best.recording);
+    if (best && best.report.outcome === 'finished') saveRecording(goldenFile(id, skill, bike), best.recording);
   }
   const report: SweepReport = {
     ...runMeta('sweep', started, { physics: first.physicsName, bike: first.bike }),
@@ -420,6 +495,11 @@ async function sweepAll(flags: ReturnType<typeof parseArgs>['flags'], seeds: num
 
 async function main(): Promise<void> {
   const { positional, flags } = parseArgs();
+  if (flagBool(flags, 'worker')) {
+    // Pool worker: cells arrive on stdin, one report per `@@job` line (the recording is on disk at report.recordingFile).
+    await runWorkerLoop<BotJob, BotRunReport>(async (job) => (await runOnce(job.trackId, job.seed, job.skill, job.opts)).report);
+    return;
+  }
   const allTracks = flagBool(flags, 'all-tracks');
   const trackId = positional[0];
   if (!trackId && !allTracks && !flagBool(flags, 'refresh-goldens')) fail('usage: harness/bot/bot.ts <trackId> [--skill 0..3] [--oracle] [--all] [--seeds N] [--budget ms] | --all-tracks | --refresh-goldens [--tracks a,b]');
@@ -427,9 +507,11 @@ async function main(): Promise<void> {
   if (flagBool(flags, 'refresh-goldens')) {
     const ids = typeof flags['tracks'] === 'string' ? (flags['tracks'] as string).split(',').map((x) => x.trim()).filter(Boolean) : listSimTracks();
     const verifier = new BrowserVerifier({ dev: flagBool(flags, 'dev'), build: flagBool(flags, 'build'), verbose: flagBool(flags, 'verbose') });
+    // SwiftShader rasterises on several threads: one verifying page ~ 3 cores (lib/pool.ts defaultBrowserJobs).
+    const jobs = defaultBrowserJobs(ids.length * 2, flags);
     try {
-      console.log(`refresh-goldens: src=${srcFingerprint()} tracks=${ids.length}`);
-      const rows = await refreshGoldens(ids, (rec) => verifier.run(rec), (l) => console.log(`  ${l}`));
+      console.log(`refresh-goldens: src=${srcFingerprint()} tracks=${ids.length} jobs=${jobs} ${loadLine()}`);
+      const rows = await refreshGoldens(ids, (rec) => verifier.run(rec), (l) => console.log(`  ${l}`), { jobs });
       const n = (r: string): number => rows.filter((x) => x.result === r).length;
       // A track is covered when at least one of its goldens is proven on this src; stale lower-skill
       // files are leftovers of older physics (the picker ignores them), not a failure by themselves.
@@ -466,21 +548,19 @@ async function main(): Promise<void> {
   }
 
   const bySkill = new Map<Skill, RunOnce[]>();
-  const runOpts: Parameters<typeof runOnce>[3] = { verbose, bike };
+  const runOpts: RunOnceOptions = { verbose, bike };
   if (budget !== undefined) runOpts.budgetMs = budget;
+  if (flags['budget-ticks'] !== undefined) runOpts.budgetTicks = flagNum(flags, 'budget-ticks', 0);
   if (flags['max-attempts'] !== undefined) runOpts.maxAttempts = flagNum(flags, 'max-attempts', 50);
   if (flags['max-sim-seconds'] !== undefined) runOpts.maxSimSeconds = flagNum(flags, 'max-sim-seconds', 300);
   if (flags['track-wall-s'] !== undefined) runOpts.maxWallMs = flagNum(flags, 'track-wall-s', 120) * 1000;
-  for (const skill of skills) {
-    const runs: RunOnce[] = [];
-    for (let k = 0; k < seeds; k++) {
-      const seed = (baseSeed + k) >>> 0;
-      const r = await runOnce(track, seed, skill, runOpts);
-      runs.push(r);
-      printRunLine(r.report);
-    }
-    bySkill.set(skill, runs);
-  }
+  // skills x seeds on the pool (one cell = one node run), merged back per skill in order.
+  const cells: BotJob[] = [];
+  for (const skill of skills) for (let k = 0; k < seeds; k++) cells.push({ trackId: track, seed: (baseSeed + k) >>> 0, skill, opts: runOpts });
+  const jobs = defaultJobs(cells.length, flags);
+  if (jobs > 1) console.log(`bot ${track}: ${cells.length} cells on ${jobs} workers, ${loadLine()}`);
+  const all = await runJobs(cells, jobs);
+  for (const skill of skills) bySkill.set(skill, all.filter((r) => r.report.skill === skill));
 
   // Golden recordings: best run per skill, browser-verified unless --no-verify.
   let verifier: BrowserVerifier | null = null;

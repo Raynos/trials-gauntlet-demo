@@ -154,3 +154,79 @@ by something the bike did.
 If the tag is not listed (e.g. `rear-wheel-balance`), score the `general` set
 plus whatever from the closest listed manoeuvre applies, and say in `reasons`
 which set you used.
+
+## Audio pairs (`apair-<id>`) — "which one is the real game's audio?"
+
+An `apair-` pair is SOUND only. The picture is black by design: only the label
+bar (one square = A, two squares = B) and the clock are drawn, so there is
+nothing to see and nothing visual to lean on. Judge what you can measure in the
+audio: you cannot hear, so analyse the WAVs (ffmpeg / ffprobe / sox / python
+numpy: spectrograms, RMS envelopes, onset times, pitch tracks, spectral
+centroid, crest factor, band energies) and read the spectrogram sheet.
+
+- `apair-<id>.mp4` — 640x384 @ 30 fps, one audio stream (AAC): **A first**, then
+  1.0 s of silence, then **B**. The bar shows one square while A plays and two
+  while B plays; the amber clock spans the whole file.
+- `apair-<id>-A.wav`, `apair-<id>-B.wav` — the two clips, 48 kHz stereo 16-bit,
+  the same length (min of the two, at most 8 s), each loudness-matched to the
+  same integrated level with ONE linear gain (no compression, dynamics intact).
+  Absolute level is therefore not a signal; relative dynamics, spectrum and
+  timing are.
+- `apair-<id>-sheet.jpg` — two spectrograms, **A on top, B below**, identical
+  axes (20 Hz–12 kHz log frequency, 80 dB range), no other labelling.
+- Both were cut from longer material; neither is aligned to the other's events.
+  A missing event inside the window is not a fault by itself.
+
+Question: **Which of A and B is the real game's audio?** Name the one tell that
+makes the other synthetic. Output the same JSON as every pair: `winner` = the
+side you believe is the real game, `confidence`, `reasons[]` (measured,
+with times and numbers), `nonAAA` = **the one tell that makes the synthetic one
+synthetic** (one sentence, sound terms only). `criteria` is optional for audio
+pairs; if you include it, use the ids below (5 = indistinguishable from a
+shipped Trials title, 1 = obviously synthesized).
+
+### `audio` — applied to every audio pair
+
+| id | what a 5 looks like | what a 1 looks like |
+| --- | --- | --- |
+| `engine-pitch-and-load` | Engine pitch follows rpm continuously with a combustion pulse texture whose harmonics spread and blur as rpm rises; load (throttle) changes the timbre (brighter, more intake / exhaust bark), not just the level | A steady harmonic stack or a smooth band that slides in pitch; partials too even, too clean, no per-cycle variation; load only changes volume |
+| `clutch-and-launch` | The launch has a clutch phase: rpm climbs and holds while speed catches up, then a long pull to the limiter; a limiter is a ragged cut, not a clean ceiling | Rpm and speed move as one; the launch is a linear sweep; nothing holds, nothing cuts |
+| `suspension-and-chassis` | Landings and bumps are a low thump (a compression knock, 60–200 Hz) with a mechanical tick, scaled by the drop; small bumps read as chassis rattle | Landings are a generic boom or a click; every impact is the same sample at the same size; nothing between the big hit and silence |
+| `tyre-and-surface` | Rolling and slip make a surface-dependent noise bed (dirt grit, wood knock, metal ring) tied to speed and wheel slip | No surface at all, or one broadband hiss that ignores speed and slip |
+| `impact-and-ragdoll` | A crash is a cluster of distinct body / bike hits with their own sizes and spacing (2–5 events over ~1 s), the engine dies or idles, then it goes quiet | One thud, or a dense pile of identical thuds; the engine keeps running unchanged through the crash |
+| `ambience-and-crowd` | A room and a place: reverb / slap-back that fits the space, a crowd with individual voices and reactions, distant world sounds | Dry, or one static noise bed; a crowd that is a formant hum with no voices |
+| `mix-balance-and-dynamics` | The engine sits in a mix with music / UI / ambience at plausible relative levels; crest factor and loudness range are those of a produced game mix | Everything at one level, or one element dominating; crest factor extreme (a compressor-less synth) or flat; long stretches of near-identical spectrum |
+
+### `audio-start-gate`
+
+Countdown 3-2-1-GO (1.0 s per beat) and the launch. A 5: the countdown pings
+are thin, evenly spaced UI tones (expect ~1.0 s apart); a crowd roar or musical
+sting on GO; the engine goes from idle through a clutch hold to a long pull; the
+rear tyre spins up on dirt. Look at: onset spacing of the pings, rpm (fundamental)
+trajectory after GO, whether speed-linked noise (wind / tyre) rises with it.
+
+### `audio-wheelie`
+
+A held wheelie / rear-wheel balance. A 5: the engine sits high and modulates as
+the rider feathers the throttle to hold the balance, with small rpm surges and
+sags every 0.3–0.8 s; no landings, little wind. Look at: pitch-track variance
+and its rate, whether the modulation is throttle-shaped (fast up, slower down),
+and whether the timbre changes with the surges rather than only the level.
+
+### `audio-landing-2m`
+
+A big drop / jump landing. A 5: airtime is quieter and windier, the engine free-
+revs or idles in the air, the touchdown is a heavy suspension thump (low knock,
+compression, then a settle over ~0.5 s) with tyre / dirt scrub after it, and the
+engine loads up again as the bike rides away. Look at: the pre-landing dip, the
+impact's low-band energy and length, the settle, and what the engine does before
+and after the touchdown.
+
+### `audio-crash-respawn`
+
+A crash, a ragdoll, and a respawn. A 5: the impact is a cluster of distinct
+thuds and a bike clatter, the engine dies or drops to idle on the crash, the
+crowd groans, then a hard cut to silence / restart and the engine starts again
+within ~1 s. Look at: the number and spacing of impact events, the engine's
+behaviour across the crash, the cut's cleanness (no tail, no click) and the
+restart's onset.

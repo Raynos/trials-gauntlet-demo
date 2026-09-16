@@ -3,8 +3,8 @@
   "kind": "track-bot-metrics",
   "trackId": "m3-see-saw",
   "bike": "pro",
-  "updatedAt": "2026-09-14T18:52:42.989Z",
-  "physics": "bikePhysicsFactory",
+  "updatedAt": "2026-09-15T21:11:08.408Z",
+  "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     8,
     12
@@ -17,21 +17,18 @@
         1066951255
       ],
       "attempts": [
-        50
+        1
       ],
-      "median": 50,
+      "median": 1,
       "finishTimes": [
-        null
+        38.166666666666664
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": {
-    "checkpoint": 1,
-    "share": 1
-  },
+  "singleWall": null,
   "runs": [
-    "20260914-134536-92ec19"
+    "20260915-161003-a39396"
   ]
 }

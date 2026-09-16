@@ -5,9 +5,9 @@
   "bike": "pro",
   "tier": "beginner",
   "technique": "",
-  "updatedAt": "2026-09-15T03:05:53.750Z",
+  "updatedAt": "2026-09-15T21:12:53.107Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "db68bbeb",
+  "srcFingerprint": "6412a755",
   "attemptsBand": null,
   "finishX": 120,
   "bySkill": [
@@ -20,57 +20,23 @@
       ],
       "attempts": [
         1,
-        4,
-        2
+        1,
+        1
       ],
-      "medianAttempts": 2,
+      "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        13.35,
-        24.908333333333335,
-        16.983333333333334
+        13.3,
+        13.316666666666666,
+        13.55
       ],
-      "medianFinishTime": 16.983333333333334,
-      "bestX": 124.42883604033966,
-      "deaths": [
-        {
-          "obstacle": "ground @ 10 m",
-          "x": 10,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "air-short": 2
-          }
-        },
-        {
-          "obstacle": "ground @ 5 m",
-          "x": 5,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 25 m",
-          "x": 25,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        }
-      ],
+      "medianFinishTime": 13.316666666666666,
+      "bestX": 124.12865733508686,
+      "deaths": [],
       "runs": [
-        "20260914-220515-114132",
-        "20260914-220515-038532",
-        "20260914-220515-3b77be"
+        "20260915-161221-c486d0",
+        "20260915-161221-99f4e9",
+        "20260915-161221-69684d"
       ]
     },
     {
@@ -81,37 +47,36 @@
         3277865879
       ],
       "attempts": [
+        1,
         2,
-        2,
-        2
+        1
       ],
-      "medianAttempts": 2,
+      "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        14.033333333333333,
-        14.166666666666666,
-        14.258333333333333
+        11.625,
+        15.291666666666666,
+        11.516666666666667
       ],
-      "medianFinishTime": 14.166666666666666,
-      "bestX": 125.25183804137444,
+      "medianFinishTime": 11.625,
+      "bestX": 125.23177585342128,
       "deaths": [
         {
-          "obstacle": "ground @ 10 m",
-          "x": 10,
-          "count": 3,
+          "obstacle": "ground @ 15 m",
+          "x": 15,
+          "count": 1,
           "reasons": {
-            "crash": 3
+            "crash": 1
           },
           "rules": {
-            "air-short": 2,
             "nose-high": 1
           }
         }
       ],
       "runs": [
-        "20260914-220533-672ecc",
-        "20260914-220533-4df772",
-        "20260914-220533-05e7b8"
+        "20260915-161238-bd5258",
+        "20260915-161238-995faa",
+        "20260915-161238-4fa972"
       ]
     },
     {
@@ -122,36 +87,24 @@
         3277865879
       ],
       "attempts": [
-        2,
-        2,
-        2
+        1,
+        1,
+        1
       ],
-      "medianAttempts": 2,
+      "medianAttempts": 1,
       "clears": 3,
       "finishTimes": [
-        12.591666666666667,
-        12.833333333333334,
-        12.858333333333333
+        10.4,
+        10.991666666666667,
+        10.841666666666667
       ],
-      "medianFinishTime": 12.833333333333334,
-      "bestX": 126.1725089746071,
-      "deaths": [
-        {
-          "obstacle": "ground @ 10 m",
-          "x": 10,
-          "count": 3,
-          "reasons": {
-            "crash": 3
-          },
-          "rules": {
-            "nose-high": 3
-          }
-        }
-      ],
+      "medianFinishTime": 10.841666666666667,
+      "bestX": 126.20391812050994,
+      "deaths": [],
       "runs": [
-        "20260914-220553-c2fbcd",
-        "20260914-220553-4e3460",
-        "20260914-220553-91bd87"
+        "20260915-161253-d8d14b",
+        "20260915-161253-dc2047",
+        "20260915-161253-59e8e6"
       ]
     }
   ]

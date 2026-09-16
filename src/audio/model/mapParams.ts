@@ -72,6 +72,12 @@ export interface ModelScratch {
   duckUiUntil: number;
   /** Time the crash happened (engine fades), or -1. */
   crashAt: number;
+  /** Time of the last crowd groan (kept across restarts: one groan per crash, never a re-trigger). */
+  lastGroanAt: number;
+  /** Smoothed wheelie lug (see AudioParams.lug). */
+  lug: number;
+  /** Bike speed at the last update (m/s) — the landing scrub reads it (events carry no velocity). */
+  speed: number;
   /** Time the finish happened (ambience fades), or -1. */
   finishAt: number;
   /** Set on restart; suppresses edge detectors on the very next update. */
@@ -115,6 +121,9 @@ export function createScratch(): ModelScratch {
     duckImpactUntil: -1,
     duckUiUntil: -1,
     crashAt: -1,
+    lastGroanAt: -1e9,
+    lug: 0,
+    speed: 0,
     finishAt: -1,
     justReset: true,
     biome: 0,
@@ -136,10 +145,11 @@ export function createScratch(): ModelScratch {
 /** Reset per-segment memory (restart); keeps the clock, biome, bike, stands and scene. */
 export function resetScratch(s: ModelScratch, keepTime = true): void {
   const time = keepTime ? s.time : 0;
-  const { biome, bike, stands, scene, sceneOverride } = s;
+  const { biome, bike, stands, scene, sceneOverride, lastGroanAt } = s;
   const fresh = createScratch();
   Object.assign(s, fresh);
   s.time = time;
+  s.lastGroanAt = lastGroanAt;
   s.prevStateTime = 0;
   s.biome = biome;
   s.bike = bike;
@@ -197,6 +207,7 @@ export function mapParams(
   const vx = state.bike.vel.x;
   const vy = state.bike.vel.y;
   const speed = Math.sqrt(vx * vx + vy * vy);
+  scratch.speed = speed;
   const rear = state.wheels.rear;
   const front = state.wheels.front;
 
@@ -209,10 +220,12 @@ export function mapParams(
   const rimV = Math.abs(rear.spinVel) * WHEEL_RADIUS;
   out.torque = out.load * torqueFrac(scratch.bike, rimV);
   if (scratch.crashAt >= 0) {
-    // The kill: physics parks rpm at idle and throttleEff at 0 on the crash tick; we let it die audibly.
+    // The kill: physics parks rpm at idle and throttleEff at 0 on the crash tick; we let it die audibly —
+    // round 4: the crank runs down (rpm × (1 − stallDrop·k) → a few slowing, sparse putts) under a gain that
+    // holds and then falls (1 − k²), so the crash is an engine dying, not a fade.
     const k = clamp((now - scratch.crashAt) / ENGINE.crashFadeS, 0, 1);
-    out.engineGain = 1 - k;
-    out.rpm = state.engine.rpm * (1 - ENGINE.stallDrop * k);
+    out.engineGain = 1 - k * k;
+    out.rpm = Math.max(150, state.engine.rpm * (1 - ENGINE.stallDrop * k));
     out.load = 0;
     out.torque = 0;
     out.limiter = 0;
@@ -233,6 +246,12 @@ export function mapParams(
   out.tyreSurface[1] = frontGround ? surfaceIndex(frontSurf) : -1;
 
   out.speed = clamp(speed / 20, 0, 1);
+  // the wheelie's clutch balance (round 4): front up, rear down, slow, throttle on, the crank near idle — physics
+  // holds ~1700 rpm here (reportRpm), so the engine voices the load it is under rather than a pitch it has not got
+  const lugOn = scratch.crashAt < 0 && !front.grounded && rear.grounded && speed < 6 && out.load > 0.02 && state.engine.rpm < 2600;
+  const kLug = step > 0 ? 1 - Math.exp(-step / 0.15) : 0;
+  scratch.lug += ((lugOn ? 1 : 0) - scratch.lug) * kLug;
+  out.lug = scratch.lug < 0.01 ? 0 : scratch.lug;
   // slipping clutch (v2 reportRpm): the crank is held at clutchRpm under throttle while the wheel is below clutchSpeed
   const clutchOn =
     scratch.crashAt < 0 &&

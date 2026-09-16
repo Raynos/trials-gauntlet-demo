@@ -1,7 +1,7 @@
 # Rider on Glass — the second mega plan
 
 Two themes from the outside review (Fable 5.1, 2026-09-14 evening), built in parallel with
-`docs/plans/MEGA_PLAN.md` (v0.2.0) and `docs/plans/physics-v2.md`: **the rider and bike are the hero**, and
+`project/archive/MEGA_PLAN.md` (v0.2.0) and `project/archive/physics-v2.md`: **the rider and bike are the hero**, and
 **the game is proven on a phone, not a laptop**. "Rider on Glass": the thing in the middle of the
 screen, on the piece of glass in the player's hand.
 
@@ -23,6 +23,15 @@ Safety net unchanged: v0.1.0 is pinned at https://trials-gauntlet-v0-1-0.vercel.
 > where every round ends with a real iPhone run that records fps, thermal and the touch log; the input
 > invariant and its tap-grid test as a gate; 60 fps on the low tier as a hard threshold; deploys stamped
 > with the commit and automatic.
+
+## Two ledgers (2026-09-15): Opus owns G, Astra owns H
+
+| half | owner | % | closes when |
+|---|---|---|---|
+| **Pillar G — glass** | Opus 5 (this session) | **100** | G1 ✓ (`18df821`), G2 ✓ (`cfc98f8`, device report #1 filed), G3 ✓ (60 fps on the default tier measured on the user's iPhone: low 59.5; the governor climbs to phone-high, `ed0cf50`/`682d05c`), G4 ✓ (commit-stamped clean-HEAD deploys), G5 ✓ (ship-gate G11: `device.fpsLow60` 59.5, `device.thermalDropPct` −0.7, `device.worstMsHigh` 81 from the newest `docs/device` report — informational until three reports — and `hero.webkit.driftMaxMm` 2.1 ≤ 5 as a real check; `harness/gate/device-rows.ts`). **Pillar G closed.** |
+| **Pillar H — the hero** | Codex Astra 6, branch `blender-work` | Astra reports | the branch merges under `docs/tasks/blender-branch-merge.md` (physics tests green) and a blind critic round picks ours ≥ 2/6 on the merged hero with no weight/suspension/lag/camera tell |
+
+The plan archives when both halves are closed.
 
 ## Pillar H — the hero
 
@@ -48,7 +57,7 @@ Owners: core-game (device loop, stamp, bench), render (60 fps low tier), harness
 | G2 A device loop | `?bench=1` runs a fixed 30 s replay on b1 on the device and shows fps p50/p95/min, worst frame, tier, DPR, render-target Mpx, JS heap, a thermal proxy (fps at 0–5 s vs 25–30 s) and the touch/navigation log on screen with a **Copy report** button; the report also lands in the run telemetry. Every round ends with a report from the user's iPhone pasted into `docs/device/<date>-<commit>.md` |
 | G3 60 fps on the phone's default tier | on the reference device (the user's iPhone) the bench shows p95 ≤ 16.7 ms on the tier Auto picks, for 30 s with no thermal fall-off; the phone default cap moves 30 → 60 only when the device report says so. `PERF.md` climbs from there toward medium and a phone-`high`; the desktop-high-at-60 bar is `docs/mission.md` §4 |
 | G4 Stamped, automatic deploys | the build stamp is the commit (`BUILD <sha7> · <date>`), never `dev`, from `git rev-parse` at build time; `pnpm deploy` does the clean-`git archive HEAD` production deploy and appends the sha + URL to `RELEASES.md`'s live line; the parent runs it after every commit on `main` |
-| G5 Real numbers in the gate | ship-gate gains rows from the last device report (`device.fpsP95Low`, `device.thermalDrop`, `device.navWithoutTarget = 0`), informational until three reports exist, then thresholds |
+| G5 Real numbers in the gate | ✓ ship-gate G11 (`harness/gate/device-rows.ts`): `device.fpsLow60` / `device.thermalDropPct` / `device.worstMsHigh` from the newest `docs/device` report, informational until `device.minReports` = 3 reports exist, then `thresholds.json` limits (55 fps, 10 %); `hero.webkit.driftMaxMm ≤ 5` is a real check whenever a `pnpm harness:hero-webkit` run exists. (`navWithoutTarget` is the NavLog's own e2e row, `harness/e2e/touch.mts --only=grid`, already in the gate flow.) |
 
 ## Sequence (overnight, parallel with MEGA_PLAN wave 3 and physics R6+)
 

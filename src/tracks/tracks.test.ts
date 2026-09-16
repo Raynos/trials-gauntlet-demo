@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { Collider, ColliderPolyline, CompiledTrack, TrackDef, TrackObstacle, Vec2 } from '../core/types';
-import { ALL_TRACKS, CURRICULUM, LAB_FLAT_200, LAB_PHYSICS_TEST, LAB_TRACKS, compileTrack, describeTrack, getTrack, isLabTrackId, listTrackIds } from './index';
+import { ALL_TRACKS, CURRICULUM, LAB_FLAT_200, LAB_PHYSICS_TEST, LAB_TRACKS, PLAYGROUND_TRACKS, SHIP_SEGMENTS, compileTrack, describeTrack, getTrack, isLabTrackId, isPlaygroundTrackId, listTrackIds, segmentsOf } from './index';
 import { CHECKPOINT_RULE, FEEL, FINISH_RUNOUT, SPAWN_CLEAR_AHEAD, SPAWN_CLEAR_BEHIND, auditCheckpoints, validateFinishRunout } from './author';
 import { cancelSharedEdges, segmentsCross, type OwnedEdge } from './geometry';
 import { OBSTACLE_KINDS, footprint, type ObstacleKind } from './kinds';
@@ -93,7 +93,7 @@ describe('registry', () => {
     ]);
     expect(listTrackIds()).toContain('flat-test');
     expect(listTrackIds()).toContain('gap-test');
-    expect(listTrackIds()).toHaveLength(19);
+    expect(listTrackIds()).toHaveLength(24);
     for (const id of listTrackIds()) expect(getTrack(id)?.id).toBe(id);
   });
 
@@ -104,6 +104,47 @@ describe('registry', () => {
     expect(LAB_TRACKS.map((t) => t.id)).toEqual(['lab-physics-test', 'lab-flat-200']);
     expect(CURRICULUM.some((t) => isLabTrackId(t.id))).toBe(false);
     for (const t of LAB_TRACKS) expect(t.meta?.hints).toEqual(['physics']);
+  });
+
+  it('playgrounds (tracks round 10): one beginner course per biome, `p<n>-*`, listed between the curriculum and the lab, six review segments each', () => {
+    expect(PLAYGROUND_TRACKS.map((t) => t.id)).toEqual(['p1-container-yard', 'p2-canyon-run', 'p3-snow-line', 'p4-night-circuit', 'p5-foundry-floor']);
+    expect(PLAYGROUND_TRACKS.map((t) => t.meta?.biome)).toEqual(['industrial', 'canyon', 'snow', 'nightCity', 'foundry']);
+    const ids = listTrackIds();
+    expect(ids.filter(isPlaygroundTrackId)).toEqual(PLAYGROUND_TRACKS.map((t) => t.id));
+    expect(ids.slice(-7, -2)).toEqual(PLAYGROUND_TRACKS.map((t) => t.id));
+    expect(CURRICULUM.some((t) => isPlaygroundTrackId(t.id))).toBe(false);
+    expect(LAB_TRACKS.some((t) => isPlaygroundTrackId(t.id))).toBe(false);
+    for (const t of PLAYGROUND_TRACKS) {
+      expect(t.tier).toBe('beginner');
+      expect((t.meta as { playground?: boolean }).playground).toBe(true);
+      expect(t.finishX).toBeGreaterThanOrEqual(400);
+      expect(t.finishX).toBeLessThanOrEqual(550);
+      const segs = segmentsOf(t);
+      expect(segs).toHaveLength(6);
+      expect(segs[0]!.from).toBe(0);
+      expect(segs[5]!.to).toBe(t.finishX);
+      for (let i = 1; i < segs.length; i++) {
+        expect(segs[i]!.from).toBe(segs[i - 1]!.to);
+        expect(segs[i]!.to).toBeGreaterThan(segs[i]!.from);
+      }
+      // every biome asset the vocabulary can place: a start / crowd-or-pipe / finish arch and at least one set piece
+      const styles = t.obstacles.filter((o) => o.kind === 'arch').map((o) => o.params?.style);
+      expect(styles).toContain('start');
+      expect(styles).toContain('finish');
+      expect(t.checkpoints.length).toBe(4);
+    }
+  });
+
+  it('review segments (tracks round 10): six contiguous segments per ship track, ending on the finish line', () => {
+    for (const t of CURRICULUM) {
+      const segs = SHIP_SEGMENTS[t.id];
+      expect(segs, t.id).toBeDefined();
+      expect(segs).toHaveLength(6);
+      expect(segs![0]!.from).toBe(0);
+      expect(Math.abs(segs![5]!.to - t.finishX)).toBeLessThanOrEqual(0.5);
+      for (let i = 1; i < 6; i++) expect(segs![i]!.from).toBe(segs![i - 1]!.to);
+    }
+    expect(Object.keys(SHIP_SEGMENTS).sort()).toEqual(CURRICULUM.map((t) => t.id).sort());
   });
 
   it('tiers escalate: attempts bands and target times are non-decreasing through the curriculum', () => {

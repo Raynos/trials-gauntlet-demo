@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "kind": "track-reflex-metrics",
+  "trackId": "p5-foundry-floor",
+  "bike": "rookie",
+  "tier": "beginner",
+  "technique": "the foundry kit at beginner pace",
+  "updatedAt": "2026-09-15T22:02:16.024Z",
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "d3f20790",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "finishX": 442.547477,
+  "bySkill": [
+    {
+      "skill": "novice",
+      "seeds": [
+        1610333913,
+        1610333914,
+        1610333915,
+        1610333916,
+        1610333917,
+        1610333918,
+        1610333919,
+        1610333920,
+        1610333921
+      ],
+      "attempts": [
+        1,
+        2,
+        2,
+        1,
+        3,
+        1,
+        1,
+        2,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 9,
+      "finishTimes": [
+        50.075,
+        61.3,
+        54.15,
+        50.18333333333333,
+        67.46666666666667,
+        50.36666666666667,
+        51.391666666666666,
+        63.608333333333334,
+        50.49166666666667
+      ],
+      "medianFinishTime": 51.391666666666666,
+      "bestX": 447.19082811807505,
+      "deaths": [
+        {
+          "obstacle": "ground @ 140 m",
+          "x": 140,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 170 m",
+          "x": 170,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-short": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 190.0 m",
+          "x": 190,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-low": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 304.7 m",
+          "x": 304.747477,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-short": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 310 m",
+          "x": 310,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-short": 1
+          }
+        }
+      ],
+      "runs": [
+        "20260915-170209-8ee11e",
+        "20260915-170210-270362",
+        "20260915-170211-229ce6",
+        "20260915-170211-0b149c",
+        "20260915-170211-d03c5b",
+        "20260915-170212-34781d",
+        "20260915-170212-b612b3",
+        "20260915-170212-3db291",
+        "20260915-170212-cbc749"
+      ]
+    },
+    {
+      "skill": "average",
+      "seeds": [
+        1610333913,
+        1610333914,
+        1610333915
+      ],
+      "attempts": [
+        3,
+        1,
+        1
+      ],
+      "medianAttempts": 1,
+      "clears": 3,
+      "finishTimes": [
+        67.61666666666666,
+        44.391666666666666,
+        44.016666666666666
+      ],
+      "medianFinishTime": 44.391666666666666,
+      "bestX": 447.75631571658613,
+      "deaths": [
+        {
+          "obstacle": "ground @ 170 m",
+          "x": 170,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "nose-low": 2
+          }
+        }
+      ],
+      "runs": [
+        "20260915-170215-0c3218",
+        "20260915-170215-87e4dd",
+        "20260915-170215-a357db"
+      ]
+    }
+  ]
+}

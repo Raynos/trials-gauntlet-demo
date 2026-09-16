@@ -56,16 +56,48 @@ export class RunLog {
     }
   }
 
-  /** Pretty JSON with a small header so a pasted log is self-describing. */
-  exportJson(build: string): string {
+  /** Pretty JSON with a small header so a pasted log is self-describing; `bench` = the device bench reports on this device (`?bench=1`). */
+  exportJson(build: string, bench: unknown[] = []): string {
     const runs = this.read();
-    return JSON.stringify({ kind: 'trials-runlog', v: 1, build, exportedAt: new Date().toISOString(), runs }, null, 1);
+    return JSON.stringify({ kind: 'trials-runlog', v: 1, build, exportedAt: new Date().toISOString(), runs, ...(bench.length ? { bench } : {}) }, null, 1);
   }
 
   /** Per-track summary for the settings row ("12 runs · 3 tracks"). */
   summary(): { runs: number; tracks: number } {
     const runs = this.read();
     return { runs: runs.length, tracks: new Set(runs.map((r) => r.track)).size };
+  }
+}
+
+export const BENCHLOG_KEY = 'trials.benchlog';
+export const BENCHLOG_MAX = 10;
+
+/** `?bench=1` reports on this device (src/game/bench.ts), newest last, bounded; exported with the run log. */
+export class BenchLog {
+  constructor(private readonly key = BENCHLOG_KEY, private readonly max = BENCHLOG_MAX) {}
+
+  read(): unknown[] {
+    const s = store();
+    if (!s) return [];
+    try {
+      const raw = s.getItem(this.key);
+      const v = raw ? (JSON.parse(raw) as unknown) : [];
+      return Array.isArray(v) ? v : [];
+    } catch {
+      return [];
+    }
+  }
+
+  append(report: unknown): unknown[] {
+    const all = this.read();
+    all.push(report);
+    if (all.length > this.max) all.splice(0, all.length - this.max);
+    try {
+      store()?.setItem(this.key, JSON.stringify(all));
+    } catch {
+      /* quota / unavailable */
+    }
+    return all;
   }
 }
 

@@ -1,56 +1,71 @@
 /**
- * Single-cylinder 250 cc 4-stroke trials engine (Montesa 4RT / Beta Evo 4T
- * character): a soft, low "putt-putt" thump at 1500 rpm idle, a hard throaty
- * bark with intake honk when the throttle opens, muffled top end, no
- * two-stroke ring.
+ * Single-cylinder 250 cc 4-stroke trials engine (Montesa 4RT / Beta Evo 4T character), round 4:
+ * **per-firing resonator excitation** instead of a harmonic bank.
  *
  *   fFire = rpm / 120           (one power stroke per two revolutions)
  *   idle 1500 rpm → 12.5 Hz, redline 10 000 rpm → 83.3 Hz
  *
- * Per firing cycle:
- *   exhaust pulse   A·exp(−t/τ)·(0.7·sin(2π·fp·t) + noise), τ 10 ms at idle → 4 ms at load,
- *                   fp 120 + 90·load Hz, through muffler resonances 130 / 380 Hz and a
- *                   load-opened lowpass (1400 + 3200·load Hz)
- *   intake honk     the same pulse train into an airbox resonator (380 + 300·load Hz, Q 5),
- *                   gain ∝ load² — silent at idle, the "honk" of a blip
- *   harmonic bank   partials 1..8 at n·fFire, tilt k = 1.6 − 0.8·load, weight 0.4 + 0.6·load
- *   valve train     1 ms click at 2·fFire (cam), −34 dB — the mechanical ticking under idle
- *   intake noise    white → BP 700 + 1200·load Hz, −26 + 12·load dB
- * Rev limiter: every 3rd cycle emits nothing. Clutch slip: gated 2.8 kHz whine with 30 Hz
- * chatter while the auto-clutch holds the crank. All randomness from the seeded NoiseRng.
- *
- * Round 3 (v2): `torque` (throttleEff × the class thrust curve at the rim speed) drives the bark —
- * pulse amplitude, honk and 3 dB of level — so the engine goes from torque-y at 5 m/s to a thinner,
- * higher scream at 18 m/s where v2's curve has fallen to 0.4 (the harmonic brightness follows rpm as
- * before). `bike` 1 = Pro voicing: shorter pulses (τ × 0.75), fp +25 Hz, more noise in the pulse, the
- * lowpass 700 Hz more open, the 380 Hz chamber up at 430 Hz, a flatter harmonic tilt — raspier; the
- * limiter rpm is physics' (10 000 on both classes; the Pro reaches it at 21 m/s through its gearing).
+ * Every combustion event is a seeded, jittered excitation — never the same twice:
+ *   timing      the period of each cycle × (1 + j·n), j = 5 % at idle → 2.2 % at full load (+1.5 % lugging),
+ *               plus a seeded "hunt" (per-cycle random walk, ~17-cycle memory, ±3 % rate / ±2.4 dB level; ±6 % / ±8 dB
+ *               lugging) below 25 % load — the surge and sag of a single at a balance point
+ *   amplitude   × (1 + 0.15·n) (±15 %), misfire at idle (p 0.05: a weak pop, no exhaust burst), overrun pops
+ *               (closed throttle above 2500 rpm, p 0.18: × 2.2 with a long burble burst)
+ *   excitation  a 0.7 ms burst (DC kick + 60 % noise) into three resonators whose centres move with rpm and load
+ *               and are re-jittered ±2.5 % per firing:
+ *                 pipe 1  95 Hz · (1 + 0.35·rev + 0.12·load)   Q 5 → 7 lugging   (the exhaust note)
+ *                 pipe 2  2.37 × pipe 1                        Q 4               (second pipe mode, inharmonic)
+ *                 body    330 + 260·load + 60·rev Hz           Q 3               (airbox / muffler can honk)
+ *               then the muffler lowpass 1400 + 3800·load Hz and the 40 Hz highpass
+ *   exhaust burst  per firing, noise × exp(−t/τ), τ 2.5 + 3·load ms, HP 1.5 kHz → LP 2.5 + 5.5·load kHz:
+ *               the "shh" of each pulse, energy to 6–8 kHz under load
+ * Continuous bed (so the spectrum never drops to nothing between pulses):
+ *   intake      two decorrelated noise → BP 600 + 1600·load Hz (Q 0.9), −46 + 14·load dB, gulped once per cycle
+ *   mechanical  noise → BP 1.1 kHz (Q 0.6) −46 dB; valve-train ticks at 2·fFire −36 dB
+ *   clutch slip gated 2.8 kHz whine with 30 Hz chatter while the auto-clutch holds the crank (round 2)
+ * Level law (dB, before the bus trim): −5 + 5·√load + torque + speed + 4·lug − 8·overrun, on a per-pulse energy of
+ *   4·(0.5 + 0.35·load + 0.15·lug) / (1 + 3·rev) — the pulse density (6.7× idle → redline) carries the rpm loudness:
+ *   measured on the engine bus, idle ≈ −30 dBFS, full load at 3000 ≈ −20, redline WOT ≈ −14, overrun ≈ −36 with pops —
+ *   three states ≥ 6 dB apart with their own centroids.
+ * `lug` (model: front wheel up, rear down, < 6 m/s, throttle on, rpm < 2600 — the v2 wheelie is a 2 m/s clutch
+ * balance at ~1700 rpm) voices load, not rpm: +4 dB, heavier pulses, higher pipe Q, the deep hunt, more misfires, muffler +2.5 kHz, burst +8 dB.
+ * Stereo: the dry voice slightly left (pan −0.15); the exhaust path also feeds a 30 ms tapped line whose taps
+ * return mostly right (5.9 / 13.7 / 27 ms) and some left (9.3 / 19.1 ms), damped — early reflections off the
+ * course; the intake hiss is independent noise per channel. Rev limiter: two cycles in every six emit nothing (an ignition-cut stutter).
+ * All randomness from the seeded NoiseRng; no allocation after construction.
  */
 import { Biquad, NoiseRng, TWO_PI, clamp, dbToGain, smoothCoef } from './util';
 
-const PARTIALS = 8;
 const IDLE = 1500;
 const REDLINE = 10000;
+/** Early-reflection taps (ms) and their L / R gains. */
+const TAPS_MS = [5.9, 9.3, 13.7, 19.1, 27.0] as const;
+const TAPS_L = [0.06, 0.24, 0.05, 0.16, 0.04] as const;
+const TAPS_R = [0.38, 0.05, 0.28, 0.04, 0.12] as const;
 
 export class EngineVoice {
   private readonly sr: number;
   private readonly rng: NoiseRng;
+  // firing scheduler
   private phase = 0;
   private cycle = 0;
-  private pulseEnv = 0;
-  private pulseDecay = 0;
-  private pulseT = 0;
-  private pulseF = 150;
-  private pulseNoise = 0.3;
-  private honkEnv = 0;
-  private honkDecay = 0;
+  private periodMul = 1;
+  private hunt = 0;
+  // per-firing excitation
+  private excEnv = 0;
+  private burstEnv = 0;
+  private burstDecay = 0;
+  private gulp = 0;
+  private gulpDecay = 0;
   private valveEnv = 0;
+  // targets / smoothed
   private rpmTarget = IDLE;
   private loadTarget = 0;
   private gainTarget = 1;
   private clutchTarget = 0;
   private speedTarget = 0;
   private torqueTarget = 0;
+  private lugTarget = 0;
   private bike = 0;
   private limiter = false;
   private rpm = IDLE;
@@ -59,26 +74,41 @@ export class EngineVoice {
   private clutch = 0;
   private speed = 0;
   private torque = 0;
+  private lug = 0;
   private readonly kRpm: number;
   private readonly kLoad: number;
   private readonly kGain: number;
   private readonly kSlow: number;
-  private readonly harmGain = new Float64Array(PARTIALS);
-  private readonly r130: Biquad;
-  private readonly r260: Biquad;
-  private readonly r380: Biquad;
+  // resonators + filters
+  private readonly pipe1: Biquad;
+  private readonly pipe2: Biquad;
+  private readonly body: Biquad;
   private readonly lp: Biquad;
   private readonly hp: Biquad;
-  private readonly honk: Biquad;
-  private readonly intake: Biquad;
+  private readonly burstHp: Biquad;
+  private readonly burstLp: Biquad;
+  private readonly intakeL: Biquad;
+  private readonly intakeR: Biquad;
+  private readonly mech: Biquad;
   private readonly whineBp: Biquad;
   private whinePhase = 0;
   private chatterPhase = 0;
   private whineDetune = 1;
-  private intakeGain = 0;
-  private honkGain = 0;
+  // early reflections
+  private readonly refl: Float32Array;
+  private reflPos = 0;
+  private readonly tapOff: Int32Array;
+  private reflLpL = 0;
+  private reflLpR = 0;
+  // block coefficients
   private level = 0;
-  private harmLevel = 0;
+  private intakeGain = 0;
+  private burstGain = 0;
+  private pulseAmp = 0;
+  private overrun = false;
+  private f1 = 95;
+  private f3 = 330;
+  private q1 = 5;
 
   constructor(sr: number, seed: number) {
     this.sr = sr;
@@ -87,36 +117,39 @@ export class EngineVoice {
     this.kLoad = smoothCoef(0.004, sr);
     this.kGain = smoothCoef(0.005, sr);
     this.kSlow = smoothCoef(0.03, sr);
-    this.r130 = new Biquad(sr);
-    this.r130.peaking(130, 3, 4);
-    // round 3: a second chamber resonance at 260 Hz — the reference start-gate spectrogram carries its engine energy
-    // in moving 200–500 Hz ridges, ours sat in a too-smooth 100–250 Hz band (beats table / spectrograms)
-    this.r260 = new Biquad(sr);
-    this.r260.peaking(260, 2.5, 5);
-    this.r380 = new Biquad(sr);
-    this.r380.peaking(380, 2.5, 3);
+    this.pipe1 = new Biquad(sr);
+    this.pipe2 = new Biquad(sr);
+    this.body = new Biquad(sr);
     this.lp = new Biquad(sr);
     this.hp = new Biquad(sr);
     this.hp.highpass(40, 0.7);
-    this.honk = new Biquad(sr);
-    this.intake = new Biquad(sr);
+    this.burstHp = new Biquad(sr);
+    this.burstHp.highpass(1500, 0.7);
+    this.burstLp = new Biquad(sr);
+    this.intakeL = new Biquad(sr);
+    this.intakeR = new Biquad(sr);
+    this.mech = new Biquad(sr);
+    this.mech.bandpass(1100, 0.6);
     this.whineBp = new Biquad(sr);
     this.whineBp.bandpass(2800, 6);
+    const maxTap = Math.ceil((TAPS_MS[TAPS_MS.length - 1]! / 1000) * sr) + 2;
+    this.refl = new Float32Array(maxTap);
+    this.tapOff = new Int32Array(TAPS_MS.length);
+    for (let i = 0; i < TAPS_MS.length; i++) this.tapOff[i] = Math.round((TAPS_MS[i]! / 1000) * sr);
     this.setBlockCoefs();
+    this.retune(1);
   }
 
-  set(rpm: number, load: number, limiter: boolean, gain: number, clutch = 0, speed = 0, torque = load, bike = 0): void {
-    this.rpmTarget = clamp(rpm, 200, 14000);
+  set(rpm: number, load: number, limiter: boolean, gain: number, clutch = 0, speed = 0, torque = load, bike = 0, lug = 0): void {
+    this.rpmTarget = clamp(rpm, 150, 14000);
     this.loadTarget = clamp(load, 0, 1);
     this.limiter = limiter;
     this.gainTarget = clamp(gain, 0, 1);
     this.clutchTarget = clamp(clutch, 0, 1);
     this.speedTarget = clamp(speed, 0, 1);
     this.torqueTarget = clamp(torque, 0, 1);
-    if (bike !== this.bike) {
-      this.bike = bike;
-      this.r380.peaking(bike === 1 ? 430 : 380, 2.5, bike === 1 ? 4 : 3);
-    }
+    this.lugTarget = clamp(lug, 0, 1);
+    this.bike = bike;
   }
 
   /** Current smoothed rpm (for tests). */
@@ -127,143 +160,170 @@ export class EngineVoice {
   private setBlockCoefs(): void {
     const load = this.load;
     const pro = this.bike === 1;
-    const torque = this.torque;
-    this.lp.lowpass(1400 + 3200 * load + (pro ? 700 : 0), 0.8);
-    this.honk.bandpass(380 + 300 * load, 5);
-    this.honkGain = 1.8 * load * load * (0.55 + 0.45 * torque);
-    this.intake.bandpass(700 + 1200 * load, 1);
-    // intake noise 6 dB lower than v1 (−32 + 12·load): the flat 500 Hz–8 kHz wash was the loudest synthetic tell
-    this.intakeGain = dbToGain(-32 + 12 * load + (pro ? 2 : 0));
-    const k = 1.6 - 0.8 * load - (pro ? 0.15 : 0);
-    let sum = 0;
-    for (let n = 1; n <= PARTIALS; n++) {
-      let g = Math.pow(n, -k);
-      if ((n & 1) === 0) g *= 0.8;
-      this.harmGain[n - 1] = g;
-      sum += g;
-    }
-    this.harmLevel = ((0.4 + 0.6 * load) * 0.8) / sum;
+    const lug = this.lug;
     const revNorm = clamp((this.rpm - IDLE) / (REDLINE - IDLE), 0, 1);
-    // closed-throttle floor −14 dB (v1 −18): the reference wheelie / coast beats keep the engine present (beats table)
-    this.level = dbToGain(-14 + 6 * load + 3 * torque + 2 * revNorm + 2 * this.speed) * this.gain;
+    this.overrun = load < 0.08 && this.rpm > 2500;
+    this.lp.lowpass(1400 + 3800 * load + 2500 * lug + (pro ? 700 : 0), 0.8);
+    this.burstLp.lowpass(2500 + 5500 * load + (pro ? 800 : 0), 0.7);
+    const fi = 600 + 1600 * load;
+    this.intakeL.bandpass(fi, 0.9);
+    this.intakeR.bandpass(fi * 1.07, 0.9);
+    this.intakeGain = dbToGain(-46 + 14 * load + 6 * lug + (pro ? 2 : 0));
+    this.burstGain = dbToGain(-34 + 10 * load + 8 * lug + (pro ? 3 : 0));
+    // per-pulse energy: up with load and lug, down with rev (the pulse density carries the loudness: 6.7× more
+    // firings at redline than at idle), 4 = the exciter gain that puts the idle pulse's ring at −12 dB
+    this.pulseAmp = ((4 * (0.5 + 0.35 * load + 0.15 * lug)) / (1 + 3 * revNorm)) * (pro ? 1.1 : 1);
+    this.f1 = 95 * (1 + 0.35 * revNorm + 0.12 * load) * (pro ? 1.12 : 1);
+    this.f3 = 330 + 260 * load + 60 * revNorm + (pro ? 50 : 0);
+    this.q1 = 5 + 2 * lug;
+    this.level =
+      dbToGain(-5 + 5 * Math.sqrt(load) + this.torque + this.speed + 4 * lug - (this.overrun ? 8 : 0) + (80 + 60 * lug) * this.hunt) *
+      this.gain;
   }
 
-  /** Adds `n` mono samples into `out` starting at `off`. */
-  process(out: Float32Array, off: number, n: number): void {
+  /** Per-firing retune of the resonators: centres jittered ±2.5 %, Q with the load. */
+  private retune(j: number): void {
+    const f1 = this.f1 * j;
+    this.pipe1.bandpass(f1, this.q1);
+    this.pipe2.bandpass(f1 * 2.37 * (2 - j), 4);
+    this.body.bandpass(this.f3 * (0.5 + 0.5 * j), 3);
+  }
+
+  /** Adds `n` samples into L / R starting at `off`. */
+  process(L: Float32Array, R: Float32Array, off: number, n: number): void {
     this.rpm += (this.rpmTarget - this.rpm) * (1 - Math.pow(1 - this.kRpm, n));
     this.load += (this.loadTarget - this.load) * (1 - Math.pow(1 - this.kLoad, n));
     this.gain += (this.gainTarget - this.gain) * (1 - Math.pow(1 - this.kGain, n));
     this.clutch += (this.clutchTarget - this.clutch) * (1 - Math.pow(1 - this.kSlow, n));
     this.speed += (this.speedTarget - this.speed) * (1 - Math.pow(1 - this.kSlow, n));
     this.torque += (this.torqueTarget - this.torque) * (1 - Math.pow(1 - this.kLoad, n));
+    this.lug += (this.lugTarget - this.lug) * (1 - Math.pow(1 - this.kSlow, n));
     this.setBlockCoefs();
     if (this.level < 1e-5 && this.clutch < 1e-3) return;
 
     const sr = this.sr;
     const dt = 1 / sr;
     const fFire = this.rpm / 120;
-    const dPhase = fFire / sr;
-    const hg = this.harmGain;
-    const harmLevel = this.harmLevel;
     const load = this.load;
-    const pro = this.bike === 1;
-    const pulseAmp = 0.45 + 0.3 * load + 0.25 * this.torque;
-    const tau = (0.01 - 0.006 * load) * (pro ? 0.75 : 1);
-    const pulseFTarget = 120 + 90 * load + (pro ? 25 : 0);
-    const pulseNoiseBase = pro ? 0.25 : 0.15;
+    const lug = this.lug;
     const level = this.level;
     const intakeGain = this.intakeGain;
-    const honkGain = this.honkGain;
-    const valveGain = dbToGain(-34);
+    const burstGain = this.burstGain;
+    const mechGain = dbToGain(-46);
+    const valveGain = dbToGain(-36);
     const valveDecay = Math.exp(-dt / 0.0008);
+    const excDecay = Math.exp(-dt / 0.0007);
+    const jitter = 0.05 - 0.028 * load + 0.015 * lug;
+    const huntOn = load < 0.25 || lug > 0.3;
     const whineGain = dbToGain(-30) * this.clutch;
-    if (this.clutch > 1e-3) {
-      this.whineDetune = clamp(this.whineDetune + 0.002 * this.rng.n(), 0.97, 1.03);
-    }
+    if (this.clutch > 1e-3) this.whineDetune = clamp(this.whineDetune + 0.002 * this.rng.n(), 0.97, 1.03);
     const dWhine = (2800 * this.whineDetune) / sr;
     const dChatter = 30 / sr;
+    const refl = this.refl;
+    const reflLen = refl.length;
+    const taps = this.tapOff;
+    const dryL = 0.79;
+    const dryR = 0.61;
 
     for (let i = 0; i < n; i++) {
       // -- firing cycle ---------------------------------------------------------
       const prev = this.phase;
-      this.phase += dPhase;
+      this.phase += (fFire * this.periodMul * (1 + this.hunt)) / sr;
       if (this.phase >= 1) {
         this.phase -= 1;
         this.cycle++;
-        const cut = this.limiter && this.cycle % 3 === 0;
-        if (!cut) {
-          let amp = pulseAmp * (1 + 0.08 * this.rng.n());
-          let t = tau;
-          // overrun pop on a closed throttle
-          if (load < 0.08 && this.rpm > 3200 && this.rng.u() < 0.12) {
-            amp *= 2.0;
-            t *= 1.6;
+        // next period: per-cycle timing jitter and the slow hunt
+        this.periodMul = 1 + jitter * this.rng.n();
+        // the hunt: a per-cycle random walk (time constant ~17 cycles), ±4 % of rate, deeper under lug
+        if (huntOn) this.hunt = clamp(this.hunt * 0.94 + (0.01 + 0.008 * lug) * this.rng.n(), -0.03 - 0.03 * lug, 0.03 + 0.03 * lug);
+        else this.hunt *= 0.9;
+        // rev limiter: two consecutive cuts in every six cycles (1/3 duty, a 24 ms gap at redline the early reflections
+        // cannot bridge — one cut in three was smeared over by the 6–27 ms taps)
+        const cut = this.limiter && this.cycle % 6 < 2;
+        if (cut) {
+          // ignition cut: no charge, no intake gulp; the pipe ring is damped so the gap is heard (the limiter stutter)
+          this.gulp = -0.6;
+          this.pipe1.reset();
+          this.pipe2.reset();
+          this.body.reset();
+        } else {
+          let amp = this.pulseAmp * (1 + 0.15 * this.rng.n());
+          let burst = 1;
+          let tauB = 0.0025 + 0.003 * load;
+          if (load < 0.12 && this.rpm < 2200 && this.rng.u() < 0.05 + 0.03 * lug) {
+            amp *= 0.2; // misfire: a weak pop, no exhaust burst
+            burst = 0;
+          } else if (this.overrun && this.rng.u() < 0.18) {
+            amp *= 2.2; // overrun pop / burble
+            burst = 2.5;
+            tauB = 0.012;
           }
-          this.pulseEnv = amp;
-          this.pulseDecay = Math.exp(-dt / t);
-          this.pulseT = 0;
-          this.pulseF = pulseFTarget;
-          this.pulseNoise = pulseNoiseBase + 0.3 * load;
-          this.honkEnv = amp;
-          this.honkDecay = Math.exp(-dt / 0.003);
+          this.excEnv = amp;
+          this.burstEnv = amp * burst;
+          this.burstDecay = Math.exp(-dt / tauB);
+          this.retune(1 + 0.025 * this.rng.n());
         }
+        if (!cut) this.gulp = 1;
+        this.gulpDecay = Math.exp(-dt / (0.3 / Math.max(5, fFire)));
         this.valveEnv = 1;
       }
-      // second valve click mid-cycle (exhaust cam)
       if (prev < 0.5 && this.phase >= 0.5) this.valveEnv = 0.7;
 
-      // -- exhaust pulse --------------------------------------------------------
-      let pulse = 0;
-      let honkIn = 0;
-      if (this.pulseEnv > 1e-4) {
-        const w = this.rng.n();
-        pulse = this.pulseEnv * (0.7 * Math.sin(TWO_PI * this.pulseF * this.pulseT) + this.pulseNoise * w);
-        this.pulseEnv *= this.pulseDecay;
-        this.pulseT += dt;
-        if (this.honkEnv > 1e-4) {
-          honkIn = this.honkEnv * w;
-          this.honkEnv *= this.honkDecay;
-        }
+      // -- excitation → resonators → muffler --------------------------------------
+      let exc = 0;
+      let burst = 0;
+      if (this.excEnv > 1e-4) {
+        exc = this.excEnv * (1 + 0.6 * this.rng.n());
+        this.excEnv *= excDecay;
       }
+      if (this.burstEnv > 1e-4) {
+        burst = this.burstEnv * this.rng.n();
+        this.burstEnv *= this.burstDecay;
+      }
+      let ex = this.pipe1.process(exc) * 5.5 + this.pipe2.process(exc) * 2.0 + this.body.process(exc) * 1.4;
+      ex = this.hp.process(this.lp.process(ex));
+      ex += this.burstLp.process(this.burstHp.process(burst)) * burstGain * 6;
 
-      // -- harmonic bank --------------------------------------------------------
-      let h = 0;
-      const ph = this.phase * TWO_PI;
-      for (let k = 0; k < PARTIALS; k++) h += hg[k]! * Math.sin(ph * (k + 1));
-      h *= harmLevel;
-
-      // -- exhaust path ---------------------------------------------------------
-      // more pulse than bank (v1 1.7 / 0.6): the dotted pulse texture of a single is what the spectrogram shows
-      let x = pulse * 2.0 + h * 0.45;
-      x = this.r130.process(x);
-      x = this.r260.process(x);
-      x = this.r380.process(x);
-      x = this.lp.process(x);
-      x = this.hp.process(x);
-
-      // -- intake: honk resonator + noise -----------------------------------------
-      x += this.honk.process(honkIn) * honkGain;
-      x += this.intake.process(this.rng.n()) * intakeGain;
-
-      // -- valve train ----------------------------------------------------------
+      // -- continuous bed: intake (decorrelated), mechanical, valve train ---------------
+      const g = (0.45 + 0.55 * this.gulp) * intakeGain;
+      this.gulp *= this.gulpDecay;
+      const inL = this.intakeL.process(this.rng.n()) * g;
+      const inR = this.intakeR.process(this.rng.n()) * g;
+      let bed = this.mech.process(this.rng.n()) * mechGain;
       if (this.valveEnv > 1e-3) {
-        x += this.valveEnv * this.rng.n() * valveGain;
+        bed += this.valveEnv * this.rng.n() * valveGain;
         this.valveEnv *= valveDecay;
       }
-      x *= level;
 
       // -- clutch slip whine -----------------------------------------------------
+      let whine = 0;
       if (whineGain > 1e-6) {
         this.whinePhase += dWhine;
         if (this.whinePhase >= 1) this.whinePhase -= 1;
         this.chatterPhase += dChatter;
         if (this.chatterPhase >= 1) this.chatterPhase -= 1;
         const chatter = 0.6 + 0.4 * Math.sin(this.chatterPhase * TWO_PI);
-        const tone = Math.sin(this.whinePhase * TWO_PI) * 0.5 + this.whineBp.process(this.rng.n()) * 2;
-        x += tone * chatter * whineGain;
+        whine = (Math.sin(this.whinePhase * TWO_PI) * 0.5 + this.whineBp.process(this.rng.n()) * 2) * chatter * whineGain;
       }
 
-      out[off + i] = out[off + i]! + x;
+      // -- stereo: dry slightly left, early reflections of the exhaust path -----------
+      const dry = (ex + bed) * level + whine;
+      refl[this.reflPos] = ex * level;
+      let rl = 0;
+      let rr = 0;
+      for (let k = 0; k < 5; k++) {
+        let p = this.reflPos - taps[k]!;
+        if (p < 0) p += reflLen;
+        const v = refl[p]!;
+        rl += v * TAPS_L[k]!;
+        rr += v * TAPS_R[k]!;
+      }
+      if (++this.reflPos >= reflLen) this.reflPos = 0;
+      this.reflLpL += (rl - this.reflLpL) * 0.3;
+      this.reflLpR += (rr - this.reflLpR) * 0.3;
+
+      L[off + i] = L[off + i]! + dry * dryL + this.reflLpL + inL * level;
+      R[off + i] = R[off + i]! + dry * dryR + this.reflLpR + inR * level;
     }
   }
 }

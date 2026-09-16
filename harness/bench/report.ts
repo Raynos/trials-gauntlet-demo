@@ -137,7 +137,7 @@ export function writeLatest(file: string, rows: LedgerRow[], ledger: LedgerRow[]
   out.push(`# Bench — ${rows[0]?.label ? `${rows[0].label} — ` : ''}${shas}${rows[0]?.dirty ? ' (dirty tree)' : ''}`);
   out.push('');
   out.push(
-    `${rows[0]?.at.slice(0, 16).replace('T', ' ') ?? ''} UTC · ${meta.frames} frames/run (60 fps, 2 ticks/frame) · GPU proxy ${meta.gpuSamples} isolated synced frames at the full canvas · CPU pass at ${meta.full ? 'the full canvas' : 'a ¼-size canvas (CPU submit is pixel-independent)'} · ${meta.wallMin.toFixed(1)} min wall · loadavg per row · deltas vs ${prevSha ? `\`${prevSha}\`` : 'nothing (first ledger entry)'}. **SwiftShader raster ms are a proxy, not phone ms.** Phone ms = model (\`harness/bench/model.ts\`: ${PHONE.A}·rtMpx + ${PHONE.B}·calls + ${PHONE.C}·ktris + ${PHONE.D}·texMB/2 + ${PHONE.E}; ±${PHONE.confidence * 100} % until the device report).`,
+    `${rows[0]?.at.slice(0, 16).replace('T', ' ') ?? ''} UTC · ${meta.frames} frames/run (60 fps, 2 ticks/frame) · GPU proxy ${meta.gpuSamples} isolated synced frames at the full canvas · CPU pass at ${meta.full ? 'the full canvas' : 'a ¼-size canvas (CPU submit is pixel-independent)'} · ${meta.wallMin.toFixed(1)} min wall · loadavg per row · deltas vs ${prevSha ? `\`${prevSha}\`` : 'nothing (first ledger entry)'}. **SwiftShader raster ms are a proxy, not phone ms.** Phone ms = model (\`harness/bench/model.ts\`, recalibrated from device report #1: ${PHONE.A}·effMpx + ${PHONE.B}·calls + ${PHONE.C}·ktris + ${PHONE.E}; ±${PHONE.confidence * 100} %). Phone geometry = 874×330 @ 3 with the phone device class since 2026-09-15 (was 932×430).`,
   );
   out.push('');
   const idle = rows.filter((r) => r.key.startsWith('idle-'));

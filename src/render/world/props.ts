@@ -19,14 +19,17 @@ export type WorldDetail = 'low' | 'medium' | 'high';
  */
 const HIDE_LOW = /^(props:(lampcone|lightcone|lampstreak|parbeam-[mc]|puddle|oilstain|decal:(poster|sign|graffiti|tyremark)[^:]*)(:|$)|fx:|deck:ao(:|$))/; // round 14: + the under-deck AO skirt (28 k transparent tris on b1)
 const HIDE_LEAN = /^props:(gravel|bolt|paper|plankend|leaf)(:|$)/;
-export function tierHides(name: string, tier: WorldDetail): boolean {
+export function tierHides(name: string, tier: WorldDetail, phoneHigh = false): boolean {
+  // Perf cut #3: phone-high keeps the volumetrics and decals but not the scatter, and not the hall's
+  // eight full-height additive shafts (the largest overdraw on a tile GPU; the lamp cones stay).
+  if (phoneHigh) return HIDE_LEAN.test(name) || name.startsWith('fx:shaft');
   if (tier === 'high') return false;
   if (HIDE_LEAN.test(name)) return true;
   return tier === 'low' && HIDE_LOW.test(name);
 }
 /** True when the name is one the tier rules ever touch (so `applyTierVisibility` never flips anything else). */
 export function tierManaged(name: string): boolean {
-  return HIDE_LOW.test(name) || HIDE_LEAN.test(name);
+  return HIDE_LOW.test(name) || HIDE_LEAN.test(name) || name.startsWith('fx:shaft');
 }
 /**
  * Shadow casters on `medium` (one 1024² map): the hero, the deck and the deck-level volumes the
@@ -34,13 +37,14 @@ export function tierManaged(name: string): boolean {
  * other prop batch (lamps, chains, rails, trusses, scatter, cards) stops casting: it was one
  * shadow draw per chunk for shadows a 1024² map over 28 m cannot resolve.
  */
-const CAST_MEDIUM = /^props:(container\d*|support-(container|crate|stack)|crate|drum|drum-far|drumlying|setdrum|pallet|pallet-far|stack|tyres|tyres-far|boxtruck|policecar|forklift|slagpot|ladle|furnace|mould)(:|$)/;
+const CAST_MEDIUM = /^props:(merged:cast|container\d*|support-(container|crate|stack)|crate|drum|drum-far|drumlying|setdrum|pallet|pallet-far|stack|tyres|tyres-far|boxtruck|policecar|forklift|slagpot|ladle|furnace|mould)(:|$)/;
 export function tierCasts(name: string, tier: WorldDetail): boolean {
   return tier === 'high' || !name.startsWith('props:') || CAST_MEDIUM.test(name);
 }
 
 export class PropBatch {
-  private readonly items: { m: THREE.Matrix4; c: THREE.Color | null }[] = [];
+  /** Instances (matrix + optional colour); read by `buildBatches` for the merged path. */
+  readonly items: { m: THREE.Matrix4; c: THREE.Color | null }[] = [];
   constructor(
     readonly name: string,
     readonly geometry: THREE.BufferGeometry,
@@ -103,6 +107,10 @@ export class PropBatch {
    *  Round 12: 80 m when the world is built on `low` (`ThreeRenderer` sets it before the build) —
    *  a riding frame straddles one boundary less often, ≈ 25 fewer draws on the foundry tracks. */
   static CHUNK_M = 40;
+  /** Perf cut #4: bake same-material batches per chunk (`buildBatches`); off = one InstancedMesh per batch per chunk (the A/B switch). */
+  static MERGE = true;
+  /** Perf cut #4b: same-size skins share one array texture + one material (`world/skinArray.ts`), so the skin batches bake into one draw per chunk; off = one material per skin (the A/B switch). */
+  static SKIN_ARRAY = true;
 
   /**
    * One `InstancedMesh` per 40 m of x, each with a computed bounding sphere and frustum
@@ -151,6 +159,113 @@ export class PropBatch {
     }
     return group;
   }
+}
+
+/** Perf cut #4: batches whose baked copy would exceed this many triangles stay instanced. */
+const MERGE_MAX_TRIS = 60_000;
+
+/**
+ * Perf cut #4 (docs/plans/PERF.md §3.2 #4): build every batch, but bake the batches that share one
+ * material (and the same tier rules) into ONE mesh per 40 / 80 m chunk instead of one InstancedMesh
+ * per batch per chunk — on b1 the hall structure alone was 13 darkSteel batches / 29 draws a frame,
+ * rustSteel / pallet / barrelRed / hazardTape / plank / tyre another 30. Instance colours bake into
+ * the vertex colour attribute (the batch materials already read vertex colours), matrices into the
+ * positions, so the pixels are the ones the instanced draw produced. Per-chunk frustum culling is
+ * kept. Batches hidden or shadow-gated by name (`tierHides` / `tierCasts`) merge only with batches
+ * of the same rule, under a name the rules recognise (`props:merged:cast:*` casts on medium).
+ */
+export function buildBatches(batches: PropBatch[]): { objects: THREE.Object3D[]; merged: number; mergedDraws: number } {
+  const objects: THREE.Object3D[] = [];
+  if (!PropBatch.MERGE) {
+    for (const b of batches) {
+      const g = b.build();
+      if (g) objects.push(g);
+    }
+    return { objects, merged: 0, mergedDraws: 0 };
+  }
+  const groups = new Map<string, PropBatch[]>();
+  for (const b of batches) {
+    const name = `props:${b.name}`;
+    const tris = triCount(b.geometry) * b.count;
+    const managed = HIDE_LOW.test(name) || HIDE_LEAN.test(name);
+    const mat = b.material as THREE.MeshStandardMaterial;
+    if (managed || b.count === 0 || tris > MERGE_MAX_TRIS || !mat.isMeshStandardMaterial || !mat.vertexColors) {
+      const g = b.build();
+      if (g) objects.push(g);
+      continue;
+    }
+    const key = `${b.material.uuid}|${CAST_MEDIUM.test(name) ? 'cast' : 'nocast'}|${b.shadows ? 's' : 'n'}`;
+    let list = groups.get(key);
+    if (!list) groups.set(key, (list = []));
+    list.push(b);
+  }
+  let merged = 0;
+  let mergedDraws = 0;
+  for (const [key, list] of groups) {
+    if (list.length < 2) {
+      const g = list[0]!.build();
+      if (g) objects.push(g);
+      continue;
+    }
+    const casts = key.includes('|cast|');
+    const shadows = list[0]!.shadows;
+    const material = list[0]!.material;
+    const perChunk = new Map<number, THREE.BufferGeometry[]>();
+    let ok = true;
+    for (const b of list) {
+      const src = b.geometry.getAttribute('color') ? b.geometry : b.geometry.clone();
+      if (!src.getAttribute('color')) src.setAttribute('color', new THREE.BufferAttribute(new Float32Array(src.getAttribute('position').count * 3).fill(1), 3));
+      for (const it of b.items) {
+        const k = Math.floor(it.m.elements[12]! / PropBatch.CHUNK_M);
+        const g = src.clone();
+        g.applyMatrix4(it.m);
+        if (it.c) {
+          const col = g.getAttribute('color') as THREE.BufferAttribute;
+          for (let i = 0; i < col.count; i++) col.setXYZ(i, col.getX(i) * it.c.r, col.getY(i) * it.c.g, col.getZ(i) * it.c.b);
+        }
+        // mergeGeometries needs one attribute set: drop what the others lack.
+        let l = perChunk.get(k);
+        if (!l) perChunk.set(k, (l = []));
+        l.push(g);
+      }
+    }
+    // Common attribute set across the group.
+    const names = new Set<string>();
+    for (const l of perChunk.values()) for (const g of l) for (const n of Object.keys(g.attributes)) names.add(n);
+    const common = [...names].filter((n) => [...perChunk.values()].every((l) => l.every((g) => g.getAttribute(n))));
+    const built: THREE.Object3D[] = [];
+    for (const [k, l] of [...perChunk.entries()].sort((a, b) => a[0] - b[0])) {
+      for (const g of l) for (const n of Object.keys(g.attributes)) if (!common.includes(n)) g.deleteAttribute(n);
+      const indexed = l.every((g) => !!g.index);
+      const parts = indexed ? l : l.map((g) => (g.index ? g.toNonIndexed() : g));
+      const m = mergeGeometries(parts, false);
+      if (!m) {
+        ok = false;
+        break;
+      }
+      const mesh = new THREE.Mesh(m, material);
+      mesh.name = `props:merged:${casts ? 'cast' : 'nocast'}:${(material as THREE.Material).name || 'mat'}:${k}`;
+      mesh.castShadow = shadows;
+      mesh.receiveShadow = shadows;
+      mesh.frustumCulled = true;
+      m.computeBoundingSphere();
+      built.push(mesh);
+    }
+    if (!ok) {
+      for (const b of list) {
+        const g = b.build();
+        if (g) objects.push(g);
+      }
+      continue;
+    }
+    const group = new THREE.Group();
+    group.name = `props:merged:${casts ? 'cast' : 'nocast'}:${(material as THREE.Material).name || 'mat'}`;
+    for (const mesh of built) group.add(mesh);
+    objects.push(group);
+    merged += list.length;
+    mergedDraws += built.length;
+  }
+  return { objects, merged, mergedDraws };
 }
 
 /** Triangles in a geometry. */

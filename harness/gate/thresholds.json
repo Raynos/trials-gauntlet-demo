@@ -26,6 +26,11 @@
   "stranger.minSessions": 2,
   "reflex.attemptsBandFactor": 1.5,
   "reflex.minSeeds": 3,
+  "device.minReports": 3,
+  "device.fpsLow60Min": 55,
+  "device.thermalDropPctMax": 10,
+  "device.worstMsHighMax": 50,
+  "hero.driftMaxMm": 5,
   "swiftshader": {
     "boot.firstFrameMs": 4000,
     "restart.frameMsP95": 150,

@@ -1,40 +1,59 @@
 # What we are building — the plans and where each stands
 
-**Standing goal (set by the user 2026-09-14 evening): overnight build until every plan in this folder is complete and ready for `project/archive/`.** Completion = each plan's own done lines, judged by evidence (gate, strangers, blind critic, device report), never by the parent's feeling.
+**Standing goal: build every plan in this folder to completion and archive it. The 3-hour close-out contract is `docs/plans/CLOSEOUT.md` (2026-09-15 16:30).** Completion = each plan's own done lines, judged by evidence (gate, strangers, blind critic, device report), never by the parent's feeling.
 
 One page, kept current by the parent at every commit. The bars no plan can close (wowed vs the real game, PS4 picture, the hero as a person, desktop-high at 60 on a phone, sound as a recording, fun) live in `docs/mission.md`; plans carry their measurable proxies. Percentages are against each plan's own
 "done" lines, not a feeling. Live build: https://trials-gauntlet-demo.vercel.app · pinned v0.1.0:
 https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 
+## Independent audit — 2026-09-15
+
+The [game audit](../reviews/game-audit-2026-09-15.md) and separate [physics-library review](../reviews/physics-library-audit-2026-09-15.md) review `56e3883` plus the existing working-tree changes, physics/track fingerprint `a6d63cfd`. **Release readiness is blocked:** a fresh production build emits an invalid inline loader (`vite.config.ts:228`), and the required test suite has one reflex-memory failure. Development-harness replay passes 9/9 determinism checks; flat-test and b1 clear on both bikes; manual restart returns to riding in one tick. No game fixes landed in this audit round.
+
+The percentages below remain plan estimates, not audited completion of the README. Newer evidence supersedes several older notes: hard AI-stranger runs now exist; X1 has only one completed run; crowd/ambience/music and audio comparisons exist, with all 11 recorded audio verdicts preferring the reference. AI-stranger metrics do not establish human learnability. Auto phones still cap at 30 fps, and current-source real-device 60 fps proof remains outstanding. Next release gate: fix production boot and the failing check, then repeat production startup, crash/restart and real-player/device validation. The proposed engine comparison is research scope only; no migration has been selected.
+
 | plan | file | goal | status | % | next gate |
 |---|---|---|---|---|---|
 | **The brief** | `README.md` | a 2.5D Trials-quality bike game, deterministic, 60 fps, desktop + iOS Safari | in build | — | — |
-| **Blender hero (branch)** | `docs/plans/BLENDER_HERO.md` | rider/bike models, animation and Three.js integration to the Trials reference; Codex owns Blender on `blender-work` | R10 integrated baseline; R11 four independent presets built, production boot bug fixed, all 16 preset/bike/LOD runtime combinations pass; first procedural blockout generated; initial head/hair sampling defects corrected, second geometry gate pending; parent accepted corrected charcoal palette only; coherent body field rendered but fidelity/budget fail; R12 fifth openface family integrated; 20 combinations and outage/retry pass, fresh Metal ship gate passes; compact headgear accepted only; procedural run stopped at 3/3 corrections, user direction pending; R13 five-outfit gallery verified, arm contact diagnosis passes sampled traces but local sleeve fairing rejected; overall AAA quality unfinished | — | implement all five approved independent outfits through img2threejs; surface/likeness below targets; actual iOS and known R7 physics regressions open; no merge |
-| **Mega plan (v0.2.0)** | `docs/plans/MEGA_PLAN.md` | five pillars: hero motion, world as place, clearable by people, complete game, evidence | wave 3 | ~70 | e3 re-author + stranger re-run → blind critic r3 → pin v0.2.0 |
-| **Physics v2** | `docs/plans/physics-v2.md` + status in `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | R5 shipped, default since `9b4275c` | ~85 vs the plan, ~75 vs "learnable by a human" (strangers pass b1–e2) | e3 + medium stranger round → freeze tag `physics-v2-r5` |
-| **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | round 1 (H1 rider kit landed `47f0455`) | 15 | H3 hero shadow + G4 stamped auto-deploy, then device report #1 |
-| **Perf (60 on high, on a phone)** | `docs/plans/PERF.md` (being written) | a benchmark suite and a 100× plan, then a measure → cut → measure loop until an iPhone holds 60 fps on `high`; 10× fallback | phase 1: bench + plan | 0 | bench repeatable ±5 %, plan sums to 100× on paper, first cut |
+| **Hero merge and garage prototype** | `docs/plans/HERO_GARAGE_PRODUCTION.md` | Merge playable rider improvements; independently produce one high-fidelity Blender character/bike | Reconciling latest trunk; five outfits implemented on branch; seated/lean/elbow redesign requires validation on trunk architecture; garage production plan written, art not yet built | — | Preserve trunk physics/performance; played pose review, full merge gates; then head and curly-hair milestone in standalone prototype |
+| **Mega plan (v0.2.0)** | `project/archive/MEGA_PLAN.md` (closed 2026-09-15, tag `v0.2.0` `b52dfd0`) | five pillars: hero motion, world as place, clearable by people, complete game, evidence | **done — pinned + archived**: https://trials-gauntlet-v0-2-0.vercel.app; every mission line's number in the `RELEASES.md` row (battery 5 / 36, audio 2 / 6, strangers in band to medium, 59.5 fps low on the phone) | 100 | the next plan starts from `docs/mission.md` numbers |
+| **Physics v2** | `project/archive/physics-v2.md` (closed 2026-09-15, tag `physics-v2-final`) · living status `docs/design/physics.md` | ground-up two-body physics: validated per tick, learnable, reproducible | **done — archived**: R6, 157/157 tests no masked rows, default since `9b4275c`; strangers beginner–medium in band, hard/extreme ridden on Pro; Rookie goldens stable since R3, Pro 17/19 re-proved | 100 | none — track sinks (h2 255–265 m, h3 505 m, x3 505–525 m) are the tracks owner's; human learnability is `mission.md` §1 |
+| **Rider on Glass** | `docs/plans/RIDER_ON_GLASS.md` | the rider and bike are the hero; the game is proven on a phone | G closed; **H: Astra's hero merged to `main` (`bdba62d`, merge #3 on main's terms, every gate green, deployed)** but the blind critic reads **0/6** — the rider body is never exported from `PhysicsState`, so the merged physical rig is dormant and the rider is still a pose-table statue | **G 100 · H open** | physics R7 (in flight): fix the rider-body wind-up, export + hash `riderBody`, restamp goldens → hero flips `chainFromBody` → critic round ≥ 2/6 → archive |
+| **Perf (60 on high, on a phone)** | `project/archive/PERF.md` (closed 2026-09-15, `831e9c4`) · live backlog `docs/plans/PERF-BACKLOG.md` | bench + 100× plan, then a cut loop; phone-high tier + 60-cap governor | **done — archived**: phone-high tier live, 60-cap governor live, bench + WebKit gate + ship-gate G11, ledger through cut #4b (b1 phone-high 205 → 123 calls, 6.57 → 1.59 Mpx; model 35 → 8.8 ms on the user's phone) | 100 | the backlog's next cut (#4 remainder, 123 → ≤ 100) whenever a perf owner is spawned |
 | **P0 task** | `docs/tasks/touch-navigation-invariant.md` | nothing tappable unless drawn | landed `18df821` (5184-tap grid, 0 ghosts) | 95 | the user confirms on the phone |
+
+## Device instruments on this machine (no more asks to the user)
+
+- `docs/device/2026-09-15-5649aa6.md` — device report #1 (the user's iPhone), the calibration baseline.
+- **Playwright WebKit** (`~/Library/Caches/ms-playwright/webkit-2336`) — macOS WebKit renders WebGL through
+  ANGLE-on-Metal, the same stack as iOS Safari; `harness/hero-webkit.mts` (in flight) is the hero gate on it.
+- **iOS Simulator** — runtime iOS 26.5 installed, device `trials-iphone` (iPhone 16 Pro,
+  `F3058DD5-DCB6-4D86-93CC-6E56A785B788`): `xcrun simctl boot … && xcrun simctl openurl … <url> && xcrun simctl io
+  … screenshot out.png` gives a real Mobile Safari frame (portrait only from the CLI — it lands on the rotate prompt;
+  landscape needs the Simulator UI or a WebDriver session). `agent-browser -p ios` needs `safaridriver --enable`
+  (sudo) — not done.
+- `agent-browser` (Vercel) — global (`~/Library/pnpm`), dotfiles `agent-browser/install.sh`, devDependency here.
 
 ## Decisions taken by the user
 
 | date | decision |
 |---|---|
-| 09-15 | Implement all five generated designs as independently selectable outfits. Official img2threejs 2.0.0 + character plugin installed; first reference analysis underway. Public before/after gallery: https://trials-rider-progress.vercel.app (gallery only, not a game deployment) |
-| 09-15 | Street needs a visible face: try bareheaded or small open-face headgear. Five generated screenshot targets live in `assets/design/hero-targets/`; select a target, perform one coherent finish pass, then review real gameplay. Stop earlier if accepted; 30% weekly remaining is a spending floor, not a target to consume |
-| 09-15 | Zoom out from small repair rounds: coherent AAA visual rebuild of both rider outfits and bike family in parallel; show real before/after photos and videos. Pause nonblocking physics experiments and judge whole assembled candidates |
-| 09-15 | Investigate live iPhone benchmark arms folding backward; isolated additive-translation accumulation and prepared a main-compatible hotfix, with current-main integration tracked separately |
-| 09-15 | Install official agent-browser CLI/skill for headless use in project, home and dotfiles; pinned 0.37.1 setup committed in dotfiles `6d96d38`; deterministic game harness remains the replay authority |
-| 09-15 | Blender session: continue at medium reasoning until OpenUsage Codex weekly usage reaches 30% remaining, then checkpoint and pause; new teammates also use medium |
-| 09-15 | Resume the Blender branch from the handoff; continue the active rider/bike/animation/texture mission |
-| 09-15 | Pause the Blender branch at a checkpoint, preserve in-progress work, commit and provide a continuation handoff. The mission remains unfinished; the 12-hour follow-up is paused |
-| 09-15 | Blender session pairing: **street rider (hoodie/jeans) is the default vibe; implement street and race outfits with a garage switch. Codex also owns the necessary rider physics corrections**, explicitly authorized after the body/pose mismatch was demonstrated |
-| 09-15 | Codex owns all Blender rider/bike work and Three.js hero integration on the explicitly authorized `blender-work` worktree; may rebuild assets; final branch includes a merge handoff for the trunk agent |
 | 09-14 | Main menu → **B Broadcast** (`assets/design/menu/B-broadcast.jpg`, SPEC in `assets/design/menu/SPEC.md`) — core-game builds it |
 | 09-14 | Plans live in `docs/plans/`; completed/stale docs go to `project/archive/` |
+| 09-15 | **The user runs no more benchmarks**; mobile is capped at 60 with a governor Auto that climbs to high; the machine self-measures (WebKit, simulator, bench) |
+| 09-15 | Hero/graphics → Codex Astra 6 on `blender-work`; `main` keeps physics/tracks/harness/core/perf; merge rules in `docs/tasks/blender-branch-merge.md` |
 | 09-15 | Touch controls → **G strip with keys** (`assets/design/controls/G-strip-keys.png`, SPEC § Round 2); colours: GAS green, BRAKE red, **the two LEAN keys equal weight in one shared neutral scheme** (neither primary nor secondary) |
 | 09-15 | Loading screen → **B Odometer**, but keeping **two bars with two percentages** (DOWNLOAD / SETUP as parallel tracks) and **two detail lines**, one per track; both numbers monotone and ending at 100 by the loader invariant (`docs/tasks/loading-progress-invariant.md`) |
+| 09-15 | **Level review is a top-level REVIEW button on the main menu** (next to PLAY / GARAGE / SETTINGS) that opens a review level picker → the review UI (free camera, six segments, comments, Copy review); `?review=<track>` survives only as a deep link for e2e. Core #10 builds it. |
 | 09-14 | Phones are **not** pinned to low in Auto — a perf owner makes the tiers fast instead (60 on high is the goal) |
+
+## Parallel branch — `blender-work` (Codex Astra 6, since 2026-09-15)
+
+The user handed the hero (rider + bike look, AAA graphics) to a Codex agent in the worktree
+`trials-gauntlet-blender`. Rules and the test-merge result are in `docs/tasks/blender-branch-merge.md`: the
+merge is conflict-free today but the branch's solver changes fail 17 physics acceptance tests, so physics
+merges only through the physics owner's protocol; render/assets/garage merge once green. Rider on Glass
+Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF-BACKLOG.md) and does not touch `src/render/hero/**`.
 
 ## Status per pillar (mega plan)
 
@@ -43,10 +62,10 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | P0 physics v2 | 80 | human-rate learnability (R5 → strangers), lab hop air margin |
 | P1 hero moves like 145 kg | 70 | blind critic r3: ours 2/6 (count met), tells still name camera pull-out, hero shadow on high, rigid rider → render r14 |
 | P2 world reads as a place | 60 | per-biome blind verdict; exteriors need the track on structure over terrain |
-| P3 clearable by real people | 75 | **strangers pass beginner, easy AND medium on v2** (r4 b1–e2 1 · 2.5 · 3 · 5.5 · 6.5; r5 e3 1, m1 7.5, m2 4, m3 8 — all in band); hard/extreme not yet ridden by strangers; reflex `average` in band 10/16; user cleared b1, b2 on the phone |
+| P3 clearable by real people | 85 | strangers pass beginner, easy, medium; **hard ridden (r6, Pro default): h1 16 in band, h2 10 / h3 16 / x1 18.5 / x3 19 under band, 13/13 cleared** → bands or tracks (tracks r10); **the user has cleared all 6 beginner + easy tracks on the phone (2026-09-15)**; the audit's point stands: AI strangers are a proxy, not human learnability |
 | P4 complete game | 80 | audio mix round, local per-track leaderboard, onboarding proof with a stranger |
 | P5 evidence | 70 | blind critic cadence restored (r3 run, 6 pairs); v0.2.0 not pinned; the final 38-pair battery not run |
-| P6 sound at AAA (added) | 25 | mix tuned to v1; no crowd / ambience / music; no blind audio A/B |
+| P6 sound at AAA (added) | 40 | r3 retuned to v2 + crowd/rooms/stingers/music shipped; **blind audio A/B ours 1/12** — tell: metronomic pinned-pitch mono pulse train, click for a landing → audio r4 (per-firing jitter, stereo, landing thump, no respawn re-trigger) |
 
 ## Field reports from the phone (the user's iPhone, LTE)
 
@@ -61,14 +80,8 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 | 09-14 | scroll in settings → track select; taps hit hidden buttons | hidden screens out of hit-testing; hidden replay bar was live at z 5; **P0 invariant task open** | `e55c4dd`, `cf13f8b` |
 | 09-14 | not 60 fps, drops from 30 to 24–28 on a flagship, meter "H" | FPS meter; phone starts low; render r12 fill-rate cuts; stored `high` ignored on phones | `733c830`, `12a29f2`, this commit |
 | 09-14 | cleared b1 and b2 on the phone; recovery feels hard | R5 airborne limit; strangers r4 pass b1–e2 | `e8f2ec7`, `166d4d7` |
+| 09-15 | **6/15 cleared on the phone** (all beginner + easy; e3 on Pro) | — | screenshot 14:40 |
+| 09-15 | garage still under 30 fps after the canvas-CSS removal | `?bench=1` device instrument + phase-locked cap | `cfc98f8` |
+| 09-15 | MENU pill over the medal totals | header inset | `8efc682` |
+| 09-15 | Astra's `blender-work` hero merged on main's terms (merge #3: main's physics/perf/menu, the branch's hero/assets/garage/outfits; 781/781, hero-webkit PASS, e2e 399/399); critic 0/6 → the `riderBody` export is the blocker | physics R7 | `bdba62d` |
 | 09-14 | taps on invisible buttons navigate (results Menu under the gas thumb) | the `.live` invariant, 5184-tap grid | `18df821` |
-
-## Round 10 integrated baseline — September 15
-
-Canonical sources/models now contain the selected R9 fitted Street/Race assembly and R10 bike with corrected spoke opacity. Extra R10 rider folds/vents were reviewed and rejected: the gain did not justify their added geometry. Bike LOD reduction now preserves complete fork/swingarm/shock interfaces; both failures were repaired in the exporter, without weakening tests. 45/45 focused asset checks, typecheck and build pass. Latest frozen build `r10-fixed-dist` passes the Metal ship gate: 4,736 exact ticks, zero-fault clear 39.46666666666667 s, crash and next-tick restart/movement, zero GL errors. Desktop evidence does not establish iOS performance.
-
-Public gallery: https://trials-rider-progress.vercel.app. Four current combinations plus an extra action are explicitly distinguished from the five AI concepts. The next reconstruction is tracked in `.img2threejs/state.json`; all five presets remain unimplemented. Evidence: `docs/evidence/blender-r10.json`. Weekly remaining 53% at 22:58 UTC. Goal remains active; 30% is the spending floor.
-
-Round 11 WIP: first target analysis, observed seated landmarks, local evidence search and quality assessment recorded; 20 detail mappings await concrete spec fields. Explicit rider palette API added, 40 focused tests pass; runtime still uses two outfits and compatibility bike-class coloring. No new model fidelity claim.
-
-Round 11 reconstruction WIP:45 components and20 mapped details authored. Seven material evidence records wired; strict validation retains3 issues (intake review and eye/thread materials). Neutral generated turnaround supplies additional design views. No generated factory or improved runtime model yet. Rig decoding parity verified against production loader. Four supported independent palette presets are under implementation; open-face remains missing geometry.

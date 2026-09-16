@@ -1,6 +1,6 @@
 /**
  * Stranger session persistence. Each CLI call is a fresh node process: it
- * loads `state.json`, restores the physics snapshot into a new production `Game`,
+ * loads `state.json`, restores the physics snapshot into a new `createSim`,
  * does one thing, and writes `state.json` back. Time only goes forward.
  *
  * Layout: harness/out/stranger/<trackId>/<sessionId>/
@@ -13,13 +13,10 @@ import path from 'node:path';
 import type { GameEvent, PhysicsState } from '../../src/core/types';
 import { InputRecorder, encodeJSON, iterateFrames, type InputRecording } from '../../src/core/replay';
 import type { BikeClass } from '../../src/core/types';
-import type { SimSnapshot } from '../lib/sim';
-import { createProductionSim, equalProductionSnapshots, type ProductionSim } from '../lib/production-sim';
-import { getTrack } from '../../src/tracks';
-import { DEFAULT_PHYSICS_HZ } from '../../src/core/types';
-import type { GameCounters } from '../../src/game/game';
+import { createSim, type Sim, type SimSnapshot } from '../lib/sim';
+import type { RulesCounters } from '../lib/rules';
 import { type TimedEvent } from '../lib/metrics';
-import { strangerFingerprint } from './provenance';
+import { recordingHeader } from '../lib/recording';
 import type { AttemptLog } from '../lib/schema';
 import { OUT_DIR, REPO_ROOT } from '../lib/paths';
 import { writeJson } from '../lib/report';
@@ -32,8 +29,8 @@ export interface SnapshotB64 {
   v: 1;
   f64: string;
   u8: string;
-  /** Run-rule counters (phase, run clock, latches) — see production Game.counters(). */
-  counters: GameCounters;
+  /** Run-rule counters (phase, run clock, latches) — see harness/lib/rules.ts. */
+  counters: RulesCounters;
 }
 
 /** Only the events that matter for attempts/metrics are persisted (no `land`). */
@@ -44,11 +41,8 @@ export type PersistedEvent = TimedEvent & {
 };
 
 export interface PersistedState {
-  schema: 2;
+  schema: 1;
   kind: 'stranger-state';
-  /** SHA256 over actual production rules, physics, tracks and stranger controls. */
-  srcFingerprint: string;
-  bike: BikeClass;
   sessionId: string;
   trackId: string;
   seed: number;
@@ -61,7 +55,7 @@ export interface PersistedState {
   physics: string;
   /** Calls made so far (every command counts, `start` included). */
   calls: number;
-  /** Recording input cursor: never resets and includes finish coast. Game owns the run clock. */
+  /** Continuous run clock in ticks (never resets; Trials rules). */
   runTicks: number;
   snapshot: SnapshotB64;
   recording: InputRecording;
@@ -81,7 +75,7 @@ export interface PersistedState {
 export interface LoadedSession {
   dir: string;
   state: PersistedState;
-  sim: ProductionSim;
+  sim: Sim;
   recorder: InputRecorder;
 }
 
@@ -140,21 +134,15 @@ export async function createSession(opts: {
   bike?: BikeClass;
 }): Promise<LoadedSession> {
   const now = new Date();
-  const track = getTrack(opts.trackId);
-  if (!track) throw new Error(`Unknown track: ${opts.trackId}`);
-  const sim = createProductionSim(opts.trackId, opts.bike ?? 'rookie', (opts.seed ?? track.seed) >>> 0, DEFAULT_PHYSICS_HZ);
-  const fingerprint = strangerFingerprint();
+  const sim = await createSim(opts.trackId, opts.seed, undefined, { bike: opts.bike });
   const sessionId = opts.sessionId ?? `${opts.trackId}-${stampId(now)}`;
   const dir = sessionDir(opts.trackId, sessionId);
   if (fs.existsSync(path.join(dir, 'state.json'))) throw new Error(`session already exists: ${sessionId}`);
   fs.mkdirSync(path.join(dir, 'attempts'), { recursive: true });
-  const recorder = new InputRecorder({ version: 1, trackId: sim.track.id, seed: sim.seed, physicsHz: sim.hz, bike: sim.bike, physics: 'v2',
-    note: `stranger ${sessionId} agent=${opts.agent} bike=${sim.bike} physics=v2 rules=production-Game src=${fingerprint}` });
+  const recorder = new InputRecorder(recordingHeader(sim, `stranger ${sessionId} agent=${opts.agent}`));
   const state: PersistedState = {
-    schema: 2,
+    schema: 1,
     kind: 'stranger-state',
-    srcFingerprint: fingerprint,
-    bike: sim.bike,
     sessionId,
     trackId: opts.trackId,
     seed: sim.seed,
@@ -210,17 +198,12 @@ export function resolveSessionDir(sessionId: string | undefined, trackId: string
 
 export async function loadSession(dir: string): Promise<LoadedSession> {
   const raw = JSON.parse(fs.readFileSync(path.join(dir, 'state.json'), 'utf8')) as PersistedState;
-  if (raw.kind !== 'stranger-state' || raw.schema !== 2) throw new Error(`incompatible legacy stranger state in ${dir}; preserve it and start a new production Game session`);
-  if (raw.physics !== 'production-Game-v2' || raw.srcFingerprint !== strangerFingerprint()) {
-    throw new Error('production rules/physics/controls changed since session start; preserve this session and start a new one');
+  if (raw.kind !== 'stranger-state' || raw.schema !== 1) throw new Error(`bad state file in ${dir}`);
+  // state.json keeps the header as an object (no decode), so `bike` survives there.
+  const sim = await createSim(raw.trackId, raw.seed, raw.physicsHz, { bike: raw.recording.header.bike });
+  if (sim.physicsName !== raw.physics) {
+    throw new Error(`physics changed since session start (${raw.physics} -> ${sim.physicsName}); start a new session`);
   }
-  const header = raw.recording.header;
-  if (raw.physicsHz !== DEFAULT_PHYSICS_HZ || header.physicsHz !== raw.physicsHz || header.physics !== 'v2'
-      || header.version !== 1 || header.trackId !== raw.trackId || header.seed !== raw.seed
-      || (raw.bike !== 'rookie' && raw.bike !== 'pro') || header.bike !== raw.bike || raw.snapshot.v !== 1) {
-    throw new Error('session recording/snapshot track, seed, rate, class or solver stamp does not match its production state');
-  }
-  const sim = createProductionSim(raw.trackId, raw.bike, raw.seed, raw.physicsHz);
   sim.restore(decodeSnapshot(raw.snapshot));
   const recorder = new InputRecorder({ ...raw.recording.header });
   for (const f of iterateFrames(raw.recording)) recorder.push(f);
@@ -228,21 +211,9 @@ export async function loadSession(dir: string): Promise<LoadedSession> {
 }
 
 export function saveSession(s: LoadedSession): void {
-  if (s.state.srcFingerprint !== strangerFingerprint()) throw new Error('source changed during stranger command; session was not saved');
   s.state.snapshot = encodeSnapshot(s.sim.snap());
   s.state.recording = s.recorder.toRecording();
   writeJson(path.join(s.dir, 'state.json'), s.state);
-}
-
-/** Final replay uses the same production run state machine and compares raw solver bytes
- * plus all counters. Full resets do not erase the cumulative event-based attempt metric. */
-export function verifySessionReplay(s: LoadedSession): { verified: boolean; faults: number } {
-  if (s.state.srcFingerprint !== strangerFingerprint()) throw new Error('source changed before stranger replay verification');
-  const replay = createProductionSim(s.state.trackId, s.state.bike, s.state.seed, s.state.physicsHz);
-  const result = replay.run(iterateFrames(s.recorder.toRecording()));
-  const faults = result.events.filter(event => event.type === 'fault').length;
-  const expectedFaults = s.state.events.filter(event => event.event.type === 'fault').length;
-  return { verified: equalProductionSnapshots(replay.snap(), s.sim.snap()) && faults === expectedFaults, faults };
 }
 
 export function appendLog(s: LoadedSession, line: string): void {
@@ -286,7 +257,7 @@ export function endAttempt(
     checkpoint: st.checkpoint,
     x: round(st.bike.pos.x, 3),
     simTime: round(st.time, 4),
-    runTime: s.sim.runTime(),
+    runTime: round(s.state.runTicks / s.state.physicsHz, 4),
     wallMs: wallMs(s),
     calls: s.state.calls,
     startTick: s.state.attemptStartTick ?? 0,

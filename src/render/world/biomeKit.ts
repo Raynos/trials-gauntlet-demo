@@ -26,6 +26,7 @@ import {
   rockGeometry,
   setColors,
   triCount,
+  buildBatches,
   trussGeometry, // round 11 nightCity crane jib
   tyreStackGeometry,
   // round 11 exterior kit (canyon / snow)
@@ -1999,13 +2000,15 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
     drawCalls++;
     triangles += 2;
   }
+  // Perf cut #4: batches sharing a material bake into one mesh per chunk (`buildBatches`).
+  const built = buildBatches(batches);
+  for (const o of built.objects) group.add(o);
   for (const b of batches) {
-    const im = b.build();
-    if (!im) continue;
-    group.add(im);
+    if (b.count === 0) continue;
     drawCalls++;
     triangles += triCount(b.geometry) * b.count;
   }
+  drawCalls -= Math.max(0, built.merged - built.mergedDraws);
   for (const l of lights) group.add(l);
   return { group, drawCalls, triangles, textureBytes, flicker, lights, scroll, fountains, lamps };
 }

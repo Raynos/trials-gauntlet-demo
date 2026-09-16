@@ -208,6 +208,9 @@ interface GameRenderer {                 // existing +
   // bike. Materials only (no rebuild, no frame skipped); default 'rookie' when never called. core-game calls
   // it on garage preview and track launch (`App.onBikeChange`).
   setBikeClass?(c: BikeClass): void;
+  // v2 additive: perf (PERF.md §3.1). The app tells the renderer the device class once at boot; `high` on a
+  // phone is its own pass list (LDR at DPR 2, emissive-only bloom, no SSAO, 1024² shadow). Never inferred from DPR.
+  setDeviceClass?(c: 'phone' | 'desktop'): void;
 }
 interface AudioSystem {                  // existing +
   update(state: PhysicsState, dt: number, input: InputFrame): void;

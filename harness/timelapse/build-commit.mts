@@ -67,7 +67,9 @@ export async function buildCommit(ref: string, outdir = BUILDS_DIR, force = fals
   // pointer at the real repo so the stamp shows this commit's sha is NOT
   // possible without checking out — leave `dev`; the caption carries the sha.
 
-  const env = { CI: 'true', NODE_ENV: 'production' };
+  // A `git archive` export has no .git: since 0f14d3d `vite.config.ts` refuses a production build with no sha to
+  // stamp unless `VERCEL_GIT_COMMIT_SHA` names it (the loader / menu badge). Hand it the commit being built.
+  const env = { CI: 'true', NODE_ENV: 'production', VERCEL_GIT_COMMIT_SHA: sha };
   log(`build ${short}: pnpm install --offline --frozen-lockfile`);
   let install = await run('pnpm', ['install', '--offline', '--frozen-lockfile', '--ignore-scripts=false'], {
     cwd: exportDir,

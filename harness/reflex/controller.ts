@@ -161,6 +161,52 @@ export const AIR = {
   gasBelowDeg: 30,
 } as const;
 
+/**
+ * See-saw constants (round 11, tracks r9 request b / the round-10 m3 trace): the board's angular rate is on screen, so a
+ * rider on a tipping board holds the pose he had and lets the board set the exit; in the air right after it he holds ONE
+ * lean against the pitch rate the board handed him (pitch 20, rate -123 deg/s leaving the m3 demand board at 5.5 m/s),
+ * no taps, no re-grabs, until the touchdown rule takes the landing.
+ */
+export const SEESAW = {
+  /** Seconds after leaving a tipping board that count as tip-air. */
+  tipAirS: 0.6,
+  /**
+   * Tip-air lean mode — MEASURED on m3 x18 seeds, median attempts (clears) `good` / `average`:
+   *   'off'   hands off (lean 0, no taps) .............................. 7.5 (14/18) / 21 (11/18)
+   *   'leave' one lean against the rate at the moment of leaving, held to the zero crossing or touchdown:
+   *           0.4 -> 25.5 (12/18) / 37 (7/18) · 0.6 -> 30 (10/18) / 35 (6/18) · 0.8 -> 19.5 (12/18) / 37 (3/18)
+   *   'judge' lean from the rotation watched over `judgeS`, x `leanPerRate`: 1/500 29.5 · 1/250 19 · 1/120 25.5 (good)
+   * Every held lean loses to hands-off by 2-4x: the keys are a -1/0 tap train and each tap is a kick plus a swing on a
+   * bike the board just rotated; the rider mass alone damps the inherited rate (-178 -> -55 deg/s in 0.16 s hands-off).
+   */
+  mode: 'off' as 'off' | 'leave' | 'judge',
+  /** Mode 'leave': |lean| held and the |rate| (deg/s) below which nothing is held. */
+  leaveLean: 0.6,
+  leaveRateMin: 60,
+  /**
+   * Lean per deg/s of inherited pitch rate for the held tip-air lean. MEASURED 0 (round 11, m3 `good` x18, median /
+   * clears): hands-off 7.5 (15/18); 1/500 29.5 (9/18); 1/250 19 (13/18); 1/120 25.5 (11/18); -1/250 32.5 (10/18). Any
+   * lean in that air is a -1/0 tap train (sigma-delta) and every tap is a kick plus a swing on a bike the board just
+   * rotated; the rider mass alone damps the inherited rate (-178 -> -55 deg/s in 0.16 s hands-off in the trace). Kept as
+   * a knob with its numbers: the mechanism (judged over `judgeS`, capped) is in place for a future holder.
+   */
+  leanPerRate: 0,
+  /** |lean| cap of the held tip-air lean. */
+  leanCap: 1,
+  /** Throttle duty while riding a board (measured m3 `good` x18: 0 -> 24.5, 0.2 -> 13, 0.4 -> 7.5, 0.6 -> 17). */
+  rideThrottle: 0.4,
+  /** Lean while riding a board with the nose well down (a stoppie on the plank; gas off) — else exactly 0. Measured m3 x18 good / average: with 7.5 / 21, without 29.5 / 31.5. */
+  rideLeanBack: -0.5,
+  /** The held tip-air lean is set from the rotation watched over this long after leaving the board (s). */
+  judgeS: 0.1,
+  /** A "drop" this close beyond the plank's far end IS the far end. */
+  farEndSlackM: 1.0,
+  /** Seconds a glance may be off the board before the leave is no longer "just now". */
+  leaveWindowS: 0.2,
+  /** Ballistic time-to-land under which a landing onto a board is flown hands-off (s; x18: lean kept 8.5, lean >= 0 7.5, off 8.5). */
+  approachS: 0.45,
+} as const;
+
 export class ReflexController {
   readonly P: SkillParams;
   readonly memory: SectionMemory;
@@ -192,6 +238,10 @@ export class ReflexController {
   private airLean = 0;
   private airFullSince = -Infinity;
   private airReleasedAt = -Infinity;
+  /** See-saw state (round 11): the last glance on a board (obs time) and whether it was tipping; the held tip-air lean. */
+  private boardSeenT = -Infinity;
+  private boardTipping = false;
+  private tipAir: { leftT: number; pitch0: number; rate0: number; lean: number; judged: boolean } | null = null;
   readonly bike: BikeClass;
   ruleCounts = new Map<string, number>();
 
@@ -257,7 +307,15 @@ export class ReflexController {
     this.airLean = 0;
     this.airFullSince = -Infinity;
     this.airReleasedAt = -Infinity;
+    this.boardSeenT = -Infinity;
+    this.boardTipping = false;
+    this.tipAir = null;
     this.intent = { throttle: 0, brake: 0, lean: 0, restart: false, rule: 'respawn' };
+  }
+
+  /** Seconds since the bike left a tipping see-saw (observation clock), else Infinity. Test / trace hook. */
+  tipAirS(nowObsT: number): number {
+    return this.tipAir ? nowObsT - this.tipAir.leftT : Infinity;
   }
 
   /** Learn from a fault (called by the driver with the true fault position). */
@@ -333,6 +391,36 @@ export class ReflexController {
     const a = o.ahead;
     const timeTo = (d: number | null): number => (d === null ? Infinity : d / Math.max(2, v));
     let rule = 'cruise';
+
+    // --- see-saw (round 11) -------------------------------------------------
+    // On the board: remember it and whether it is tipping. Just off a tipping board and airborne: tip-air begins with
+    // one held lean against the pitch rate the board handed over. Grounded again, or past `tipAirS`: tip-air is over.
+    const ss = o.seesaw;
+    const onBoard = ss !== null && ss.onBoard && grounded;
+    if (onBoard) {
+      this.boardSeenT = o.t;
+      this.boardTipping = ss.tipping || (this.boardTipping && ss.rateDeg < 0);
+    } else if (this.tipAir === null && this.boardTipping && !grounded && ((ss !== null && !ss.landing) || o.t - this.boardSeenT <= SEESAW.leaveWindowS)) {
+      // Hands off first; the lean is judged from the rotation watched over `judgeS` (the glance rate is an EMA that still
+      // carries the board's tipping rate at the moment of leaving — round-11 trace: it read -82 deg/s on a bike leaving at +17).
+      // Mode 'leave': the lean opposes the pitch rate seen at the moment of leaving (|rate| >= leaveRateMin), held until the
+      // rate crosses zero or the touchdown. Mode 'judge': hands off first, the lean set from the rotation watched over `judgeS`.
+      const leaveLean = SEESAW.mode === 'leave' && Math.abs(o.pitchRateDeg) >= SEESAW.leaveRateMin ? -Math.sign(o.pitchRateDeg) * SEESAW.leaveLean : 0;
+      this.tipAir = { leftT: o.t, pitch0: o.pitchDeg, rate0: o.pitchRateDeg, lean: leaveLean, judged: SEESAW.mode === 'leave' };
+      this.boardTipping = false;
+    }
+    if (this.tipAir && (grounded || o.t - this.tipAir.leftT > SEESAW.tipAirS)) {
+      this.tipAir = null;
+      this.boardTipping = false;
+    }
+    if (this.tipAir && !this.tipAir.judged && o.t - this.tipAir.leftT >= SEESAW.judgeS) {
+      const rate = (o.pitchDeg - this.tipAir.pitch0) / Math.max(SEESAW.judgeS, o.t - this.tipAir.leftT);
+      this.tipAir.lean = clamp(rate * SEESAW.leanPerRate * g, -SEESAW.leanCap, SEESAW.leanCap);
+      this.tipAir.judged = true;
+    }
+    // The held lean is let go once the rate it opposed has crossed zero (mode 'leave').
+    if (this.tipAir && this.tipAir.lean !== 0 && SEESAW.mode === 'leave' && o.pitchRateDeg * this.tipAir.rate0 < 0) this.tipAir.lean = 0;
+    const tipAir = this.tipAir !== null && airborne;
 
     // Sections cleared cleanly: note it (memory relaxes).
     const b = SectionMemory.bucketOf(o.x);
@@ -432,7 +520,9 @@ export class ReflexController {
         rule = 'climbing';
       }
     }
-    if (a.dropDist !== null && timeTo(a.dropDist) < lead * 0.7 && a.dropDepth > 0.8) {
+    // The far end of a see-saw reads as a >= 0.8 m drop: it is not one (the board comes down with the bike).
+    const dropIsFarEnd = ss !== null && !ss.landing && a.dropDist !== null && a.dropDist <= ss.toFarEnd + SEESAW.farEndSlackM;
+    if (a.dropDist !== null && !dropIsFarEnd && timeTo(a.dropDist) < lead * 0.7 && a.dropDepth > 0.8) {
       // Drop ahead: weight back, ease the gas so the front does not dive off the edge.
       lean = Math.min(lean, -0.5 * g);
       thr = Math.min(thr, 0.4);
@@ -461,7 +551,10 @@ export class ReflexController {
     // starts on ground steeper than 8 deg, and a preload under way is dropped the moment the ground tilts up.
     const onRamp = slopeUnder > 8;
     if (this.hop?.phase === 'preload' && onRamp) this.hop = null;
-    if (!this.hop && grounded && !onRamp && a.faceDist !== null && a.faceDist < v * 0.4 + 1.0 + mem.leadS * v && t - this.lastHopT > 1.2) {
+    // Round 11: a face across a pit or beyond a drop is the far wall, not a hop target (m3 396 m: the pit's take-off lip
+    // read the demand board's near end as a face and the preload's lean -1 was held into the flight).
+    const faceBeyondGap = a.faceDist !== null && ((a.dropDist !== null && a.dropDist < a.faceDist) || (a.pitDist !== null && a.pitDist < a.faceDist));
+    if (!this.hop && grounded && !onRamp && !faceBeyondGap && a.faceDist !== null && a.faceDist < v * 0.4 + 1.0 + mem.leadS * v && t - this.lastHopT > 1.2) {
       this.hop = { phase: 'preload', until: t + 0.3 };
       this.lastHopT = t;
     }
@@ -484,6 +577,18 @@ export class ReflexController {
       brk = 0;
       rule = 'nose-low';
     }
+    if (onBoard) {
+      // seesaw-ride: hold the pose — lean exactly 0 (a lean-back tap under gas is the physics' hop preload, and its
+      // 0.6 s 'recover' frees the rear to spin in the air after the board: the nose-up drift of the round-11 trace),
+      // gentle gas, no brake, no hop, no ramp throw; a stoppie on the board (nose well down) is caught with the gas OFF.
+      // The board sets the exit (round-10 m3 trace: the ramp pose / drop rule / preload on the plank were the 410 deaths).
+      this.hop = null;
+      brk = 0;
+      const stoppie = pp - slopeUnder < -18;
+      thr = stoppie ? 0 : Math.min(thr, SEESAW.rideThrottle);
+      lean = stoppie ? SEESAW.rideLeanBack : 0;
+      rule = 'seesaw-ride';
+    }
     // Everyone learns this first: gas + lean back on the ground is a loop-out. Only a
     // deliberate lift (pit lip, step, wall face) combines them.
     const deliberateLift = rule === 'pit-lip' || rule === 'hop-preload' || rule === 'hop-tuck';
@@ -499,7 +604,22 @@ export class ReflexController {
 
     // --- in the air -----------------------------------------------------------
     const stairBounce = airborne && o.height < 0.6 && a.risers >= 2 && Math.max(o.slopeHereDeg, o.terrainPitchDeg) > 15;
-    if (stairBounce) {
+    if (tipAir && this.tipAir) {
+      // seesaw-tip-air: one held lean against the inherited pitch rate, no gas / brake taps, no re-grabs; the touchdown
+      // rule (descending onto ground within ~0.25 s) takes the landing as it does for any flight.
+      const landingSoon = o.vy < -0.5 && o.height / Math.max(1, -o.vy) < 0.25;
+      thr = 0;
+      brk = 0;
+      if (landingSoon) {
+        lean = 0;
+        rule = 'touchdown';
+        this.landingUntil = t + 0.15;
+      } else {
+        lean = this.tipAir.lean;
+        rule = 'seesaw-tip-air';
+      }
+      this.airLean = lean;
+    } else if (stairBounce) {
       // Both wheels off the treads for a moment is a bounce, not a flight: the gas stays on and the weight neutral
       // (round 9 e3 trace: throttle cut on every bounce, 10 -> 1 m/s up a 6-step flight, stall or loop at the top).
       thr = Math.max(thr, 0.8);
@@ -558,6 +678,14 @@ export class ReflexController {
         lean = clamp(Math.max(lean, 0), 0, 0.5);
         rule = 'touchdown';
         this.landingUntil = t + 0.15;
+      } else if (ss !== null && ss.landing && tLand < SEESAW.approachS) {
+        // seesaw-approach (round 11): landing on a board — hands off early. A lean-back tap under a gas nudge in the
+        // last half second is the physics' hop preload the moment the rear meets the plank; its push threw the bike off
+        // the tipping board nose-up (m3 trace: preload at touchdown, push 0.2 s later, +200 deg/s in the tip-air).
+        lean = clamp(lean, 0, 0.5);
+        thr = 0;
+        brk = 0;
+        rule = 'seesaw-approach';
       } else if (shortAir) {
         // (The lean stays: a neutral-lean variant read m3 36 / e2 10 against 34 / 8 on nine seeds.)
         rule = 'air-short';
@@ -579,8 +707,10 @@ export class ReflexController {
 
     if (grounded && t < this.landingUntil && lean < 0) lean = 0;
 
-    // Section bias (memory) and caps.
-    lean = clamp(lean + mem.leanBias, -1, 1);
+    // Section bias (memory) and caps. A see-saw is ridden as the rule says: no learned bias on the board or in its tip-air
+    // (a -0.3 bias is a lean-back tap every third beat — the physics' hop preload under gas).
+    const seesawRule = rule === 'seesaw-ride' || rule === 'seesaw-tip-air' || rule === 'seesaw-approach';
+    lean = clamp(lean + (seesawRule ? 0 : mem.leanBias), -1, 1);
     thr = Math.min(thr, mem.throttleCap);
     if (Math.abs(lean) < 0.12) lean = 0;
     return { throttle: clamp(thr, 0, 1), brake: brk, lean, restart: false, rule };

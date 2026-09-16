@@ -17,9 +17,14 @@ export class Ambience {
   private readonly hiss: Biquad;
   private readonly neonLp: Biquad;
   private readonly windHp: Biquad;
+  private readonly windHpR: Biquad;
   private readonly windBp: Biquad;
+  /** 7.3 ms delayed copy of the bandpassed rush for the right ear (decorrelates the 350–900 Hz band at no cost). */
+  private readonly windDelay: Float32Array;
+  private windPos = 0;
   private readonly windColour = new NoiseColour();
   private windF = 350;
+  private windHi = 0.25;
   private biome = -1;
   private gainTarget = 1;
   private gain = 0;
@@ -61,8 +66,11 @@ export class Ambience {
     // against the reference's 150–300 Hz
     this.windHp = new Biquad(sr);
     this.windHp.highpass(3000, 0.7);
+    this.windHpR = new Biquad(sr);
+    this.windHpR.highpass(3400, 0.7);
     this.windBp = new Biquad(sr);
     this.windBp.bandpass(350, 0.8);
+    this.windDelay = new Float32Array(Math.max(1, Math.round(0.0073 * sr)));
     this.hissHp = new Biquad(sr);
     this.hissHp.highpass(3000, 0.7);
     this.kGain = smoothCoef(0.05, sr);
@@ -76,7 +84,9 @@ export class Ambience {
     }
     this.gainTarget = clamp(ambientGain, 0, 1);
     const w = clamp(wind, 0, 1);
-    this.windTarget = dbToGain(-38 + 14 * w + (airborne ? 4 : 0)) * (wind > 0.01 ? 1 : 0);
+    // round 4: 20 dB of rise over the speed range (was 14) to ≈ −28 dBFS at 14 m/s, so the wind is heard climbing with the launch
+    this.windTarget = dbToGain(-36 + 20 * w + (airborne ? 3 : 0)) * (wind > 0.01 ? 1 : 0);
+    this.windHi = 0.25 + 0.25 * w;
     const f = 350 + 550 * w;
     if (Math.abs(f - this.windF) > 10) {
       this.windF = f;
@@ -234,10 +244,17 @@ export class Ambience {
         l *= g;
         r *= g;
       }
-      // speed wind (not gated by ambientGain: it belongs to the bike)
-      const wind = (this.windBp.process(this.windColour.pink(wR)) * 2.5 + this.windHp.process(wR) * 0.25) * this.wind;
-      l += wind;
-      r += wind;
+      // speed wind (not gated by ambientGain: it belongs to the bike); round 4: a stereo rush — the left and right
+      // ears get their own noise (the rush past a helmet is uncorrelated above a few hundred Hz), the hiss climbs with speed
+      const wW = this.rng.n();
+      const rush = this.windBp.process(this.windColour.pink(wR));
+      const rushR = this.windDelay[this.windPos]!;
+      this.windDelay[this.windPos] = rush;
+      if (++this.windPos >= this.windDelay.length) this.windPos = 0;
+      const windL = (rush * 2.5 + this.windHp.process(wR) * this.windHi) * this.wind;
+      const windR = (rushR * 2.5 + this.windHpR.process(wW) * this.windHi) * this.wind;
+      l += windL;
+      r += windR;
       L[off + i] = L[off + i]! + l;
       R[off + i] = R[off + i]! + r;
     }

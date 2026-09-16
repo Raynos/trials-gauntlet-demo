@@ -21,6 +21,7 @@ import { Pass, FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js'
 import type { QualityTier } from '../../core/types';
 import type { Biome } from '../biomes';
 import { gradeUniforms } from '../lighting/environment';
+import { EmissiveBloom } from './emissiveBloom';
 
 const COMPOSITE = {
   uniforms: {
@@ -365,8 +366,9 @@ class BloomPass extends UnrealBloomPass {
 }
 
 /** Pixel-ratio cap per tier: low ≤ 1.0 and ≤ 1600 px wide (a 2000-CSS-px phone renders 1600×736), medium ≤ 1.25, high ≤ 2. */
-export function tierPixelRatio(tier: QualityTier, devicePixelRatio: number, cssWidth: number): number {
+export function tierPixelRatio(tier: QualityTier, devicePixelRatio: number, cssWidth: number, phoneHigh = false): number {
   if (tier === 'low') return Math.min(devicePixelRatio, 1, 1600 / Math.max(1, cssWidth));
+  if (phoneHigh) return Math.min(devicePixelRatio, 1.5); // perf cut #3: phone-high draws LDR at ≤ 1.5 (874 CSS px → 1311×495)
   if (tier === 'medium') return Math.min(devicePixelRatio, 1.25);
   return Math.min(devicePixelRatio, 2);
 }
@@ -393,6 +395,9 @@ export class PostChain {
   private target: THREE.WebGLRenderTarget;
   /** `low`: no chain at all — `render()` draws the scene to the canvas (three tone-maps + grades in-material). */
   bypass = false;
+  /** Perf cut #3: `high` on a phone — the bypass path plus an emissive-only bloom (`post/emissiveBloom.ts`). */
+  phoneHigh = false;
+  private emissive: EmissiveBloom | null = null;
 
   constructor(
     private readonly renderer: THREE.WebGLRenderer,
@@ -422,12 +427,14 @@ export class PostChain {
     this.ao.setCamera(camera as THREE.PerspectiveCamera);
   }
 
-  setQuality(tier: QualityTier): void {
+  setQuality(tier: QualityTier, phoneHigh = false): void {
     this.tier = tier;
-    this.bypass = tier === 'low';
-    this.bloom.enabled = tier !== 'low';
+    this.phoneHigh = phoneHigh && tier === 'high';
+    this.bypass = tier === 'low' || this.phoneHigh;
+    this.bloom.enabled = !this.bypass;
     this.composite.uniforms.uBloom!.value = this.bloom.enabled ? 1.0 : 0.0;
-    const high = tier === 'high';
+    if (this.phoneHigh && !this.emissive) this.emissive = new EmissiveBloom(this.renderer);
+    const high = tier === 'high' && !this.phoneHigh;
     this.ao.enabled = high;
     this.composite.uniforms.uAO!.value = high ? 1.0 : 0.0;
     // Attach / detach the depth texture on both composer buffers; dispose so three re-allocates them.
@@ -453,6 +460,7 @@ export class PostChain {
     if (this.bypass) {
       this.composer.setPixelRatio(1);
       this.composer.setSize(2, 2);
+      this.emissive?.setSize(pw, ph);
     } else {
       this.composer.setPixelRatio(pixelRatio);
       this.composer.setSize(width, height);
@@ -478,6 +486,7 @@ export class PostChain {
     const ph = Math.max(1, Math.floor(this.height * this.pixelRatio));
     if (this.bypass) {
       out.push({ name: 'scene→canvas', width: pw, height: ph, bytesPerPixel: 8 });
+      if (this.phoneHigh && this.emissive) out.push(...this.emissive.passes, { name: 'bloom:add→canvas', width: pw, height: ph, bytesPerPixel: 4 });
       return out;
     }
     const rt = this.composer.renderTarget1;
@@ -509,6 +518,10 @@ export class PostChain {
     u.uContrast!.value = b.contrast ?? 1.0;
     u.uVignette!.value = b.vignette;
     this.bloom.strength = b.bloomStrength;
+    if (this.emissive) {
+      this.emissive.strength = b.bloomStrength;
+      this.emissive.exposure = b.exposure;
+    }
     (u.uHaze!.value as THREE.Vector3).set(b.heatHaze ?? 0, b.heatHazeV ?? 0.45, 0);
     // Same grade for the direct-to-canvas tier (deltas from neutral, see `gradeUniforms`).
     this.renderer.toneMappingExposure = b.exposure;
@@ -541,6 +554,7 @@ export class PostChain {
     if (this.bypass) {
       this.renderer.setRenderTarget(null);
       this.renderer.render(this.scene, this.camera);
+      if (this.phoneHigh && this.emissive) this.emissive.render(this.scene, this.camera);
       return;
     }
     this.composer.render();
@@ -563,7 +577,7 @@ export class PostChain {
   }
 
   get info(): { passes: number } {
-    return { passes: this.bypass ? 1 : this.composer.passes.filter((p) => p.enabled).length };
+    return { passes: this.bypass ? (this.phoneHigh ? 5 : 1) : this.composer.passes.filter((p) => p.enabled).length };
   }
 
   dispose(): void {
@@ -571,7 +585,8 @@ export class PostChain {
     this.target.dispose();
     this.ao.dispose();
     this.bloom.dispose();
-    this.composite.dispose();
+    this.emissive?.dispose();
+    this.composite.dispose(); // merge #3 (blender-work): the composite ShaderPass material was never released
     this.renderer.setRenderTarget(null);
   }
 }

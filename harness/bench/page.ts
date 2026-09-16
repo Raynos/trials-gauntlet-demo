@@ -87,7 +87,7 @@ declare global {
   interface Window {
     __bench?: {
       install(): void;
-      setTier(tier: string, w: number, h: number, dpr: number): void;
+      setTier(tier: string, w: number, h: number, dpr: number, device?: 'phone' | 'desktop'): void;
       warm(frames: number): void;
       cpuPass(inputs: unknown[], ticksPerFrame: number, frames: number, drainEvery: number, sampleEvery: number, blockedMs: number): CpuPassResult;
       gpuPass(inputs: unknown[], ticksPerFrame: number, sampleFrames: number[]): GpuPassResult;
@@ -135,8 +135,9 @@ export const PAGE_BENCH_SRC = `window.__bench = (function () {
     sm.render = function (a, b, c) { acc.inShadow = 1; var t0 = performance.now(); smr(a, b, c); acc.shadow += performance.now() - t0; acc.inShadow = 0; };
     r.__benchWrapped = true;
   }
-  function setTier(tier, w, h, dpr) {
+  function setTier(tier, w, h, dpr, device) {
     var t = T(); var r = R();
+    if (device && typeof r.setDeviceClass === 'function') r.setDeviceClass(device);
     t.setQuality(tier);
     r.resize(w, h, dpr);
   }
@@ -181,6 +182,7 @@ export const PAGE_BENCH_SRC = `window.__bench = (function () {
     return { frames: frames, data: Array.prototype.slice.call(data), blocked: blocked, samples: samples, programs: st.programs, texturesMB: st.texturesMB, finalHash: t.hashState(), finalTick: t.frame() };
   }
   function gpuPass(inputs, tpf, sampleFrames) {
+    // A skipped frame (perf cut #1) resets info to 0 — the first sample follows a fresh step, so it always draws.
     var t = T(); var r = R();
     var out = [];
     var info = r.renderer.info;

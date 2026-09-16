@@ -12,6 +12,14 @@ const FWD = ['ArrowRight', 'KeyD'];
 const RESTART = ['Enter', 'KeyR', 'Backspace', 'NumpadEnter'];
 const TRACKED = new Set([...THROTTLE, ...BRAKE, ...BACK, ...FWD, ...RESTART, 'Escape', 'Space', 'KeyV']);
 
+/** The event target is a text field (input / textarea / contenteditable): the game must not read or swallow its keys. */
+export function isEditable(t: EventTarget | null): boolean {
+  if (!t || typeof (t as Element).tagName !== 'string') return false;
+  const el = t as HTMLElement;
+  const tag = el.tagName;
+  return tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT' || el.isContentEditable === true;
+}
+
 export class KeyboardInput implements InputSource {
   readonly device = 'keyboard' as const;
   private readonly down = new Set<string>();
@@ -19,6 +27,8 @@ export class KeyboardInput implements InputSource {
   private readonly onDown = (e: KeyboardEvent): void => {
     if (e.repeat) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    // A text field has the keyboard (the level reviewer's comment box): letters, space and Enter are text, not gas / confirm. Escape still leaves.
+    if (isEditable(e.target) && e.code !== 'Escape') return;
     if (TRACKED.has(e.code)) e.preventDefault();
     this.down.add(e.code);
     this.meta.active = true;

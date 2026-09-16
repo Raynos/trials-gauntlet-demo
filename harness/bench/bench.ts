@@ -45,7 +45,7 @@ import { loadRecording } from '../lib/recording';
 import { ensureOut, percentile, writeJson } from '../lib/report';
 import { distIsStale, startServer, type GameServer } from '../lib/server';
 import { runIdle, type IdleResult } from './idle';
-import { gpuWork, phoneEstimate } from './model';
+import { effectiveMpx, gpuWork, phoneEstimate } from './model';
 import { FRAME_FIELDS, PAGE_BENCH_SRC, type CpuPassResult, type FrameField, type GpuPassResult } from './page';
 import { appendLedger, readLedger, writeLatest, type LedgerRow } from './report';
 
@@ -66,9 +66,9 @@ export interface Geometry {
   dpr: number;
 }
 
-/** The user's iPhone class (932×430 CSS @ 3) and the harness desktop geometry. */
+/** The user's iPhone (device report #1: 874×330 CSS @ 3; was 932×430 before 2026-09-15) and the harness desktop geometry. A `phone` geometry also declares the phone device class (`setDeviceClass`), so `high` is the phone-high profile. */
 export const GEOMETRIES: Record<string, Geometry> = {
-  phone: { name: 'phone', cssW: 932, cssH: 430, dpr: 3 },
+  phone: { name: 'phone', cssW: 874, cssH: 330, dpr: 3 },
   desktop: { name: 'desktop', cssW: 1280, cssH: 720, dpr: 1 },
 };
 
@@ -216,16 +216,17 @@ export async function runMatrix(opts: BenchOptions, log: (l: string) => void, se
             await page.setViewportSize({ width: geom.cssW, height: geom.cssH });
             await page.waitForFunction(([w, h]) => innerWidth === w && innerHeight === h, [geom.cssW, geom.cssH] as const);
             await page.evaluate(() => new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res))));
-            await page.evaluate(([t, w, h, d]) => window.__bench!.setTier(t as QualityTier, w as number, h as number, d as number), [tier, geom.cssW, geom.cssH, geom.dpr] as const);
+            const device = geom.name === 'phone' ? 'phone' : 'desktop';
+            await page.evaluate(([t, w, h, d, dc]) => window.__bench!.setTier(t as QualityTier, w as number, h as number, d as number, dc as 'phone' | 'desktop'), [tier, geom.cssW, geom.cssH, geom.dpr, device] as const);
             await page.evaluate(() => window.__bench!.install());
             await page.evaluate(() => window.__bench!.warm(8));
             const gpu = await page.evaluate(([ins, k, sf]) => window.__bench!.gpuPass(ins as unknown[], k as number, sf as number[]), [inputs, tpf, spread(opts.frames, opts.gpuSamples)] as const);
-            const expectedPr = tier === 'low' ? Math.min(geom.dpr, 1, 1600 / geom.cssW) : tier === 'medium' ? Math.min(geom.dpr, 1.25) : Math.min(geom.dpr, 2);
+            const expectedPr = tier === 'low' ? Math.min(geom.dpr, 1, 1600 / geom.cssW) : tier === 'medium' ? Math.min(geom.dpr, 1.25) : Math.min(geom.dpr, device === 'phone' ? 1.5 : 2);
             if (Math.abs(gpu.dpr - expectedPr) > 0.01) log(`WARNING ${key}: canvas pixel ratio ${gpu.dpr} != tier cap ${expectedPr} (a resize event landed after setTier) — row invalid`);
             // -- CPU pass (quarter canvas unless --full) --
             await hook.loadTrack(trackId);
             const scale = opts.full ? 1 : 0.25;
-            await page.evaluate(([t, w, h, d]) => window.__bench!.setTier(t as QualityTier, w as number, h as number, d as number), [tier, Math.round(geom.cssW * scale), Math.round(geom.cssH * scale), geom.dpr] as const);
+            await page.evaluate(([t, w, h, d, dc]) => window.__bench!.setTier(t as QualityTier, w as number, h as number, d as number, dc as 'phone' | 'desktop'), [tier, Math.round(geom.cssW * scale), Math.round(geom.cssH * scale), geom.dpr, device] as const);
             await page.evaluate(() => window.__bench!.warm(30));
             const heap0 = await forcedHeap(page);
             const cpu = await page.evaluate(
@@ -243,7 +244,7 @@ export async function runMatrix(opts: BenchOptions, log: (l: string) => void, se
             const gCalls = Math.round(summarize(gpu.samples.map((s) => s.calls)).p50);
             const gTris = Math.round(summarize(gpu.samples.map((s) => s.tris)).p50);
             const work = gpuWork(gpu.passes, gCalls, gTris);
-            const est = phoneEstimate(gpu.rtMpx, gCalls, gTris, gpu.texturesMB);
+            const est = phoneEstimate(effectiveMpx(gpu.passes), gCalls, gTris, gpu.texturesMB);
             const cpuCanvas = cpu.samples[0] ? `${cpu.samples[0].canvasW}×${cpu.samples[0].canvasH}` : '?';
             const res: RunResult = {
               key,

@@ -34,7 +34,8 @@ sim.run(branch); const branchFinish = sim.snap();
 sim.restore(root); sim.run(branch);
 if (!equalProductionSnapshots(branchFinish, sim.snap())) throw new Error('Production branch restoration is not byte-identical');
 sim.reload();
-const result = playTrack(sim, { skill: 3, config: { ...configFor(3, 150), width: 16, depth: 24 },
+// `main`'s bot never reads `Sim.rules` (the production Game owns the rules); the type still lists it.
+const result = playTrack(sim as unknown as Parameters<typeof playTrack>[0], { skill: 3, config: { ...configFor(3, 150), width: 16, depth: 24 },
   limits: { maxAttempts: 15, maxSimSeconds: 240, maxWallMs }, log: line => console.log(`${trackId}/${bike}: ${line}`) });
 const recorder = new InputRecorder({ version: 1, trackId, bike, seed: 1, physicsHz: 120, physics: 'v2',
   note: 'Fresh production Game search; repeated serialized input verified with full snapshot/counter bytes. See adjacent report for exact solver source hashes.' });

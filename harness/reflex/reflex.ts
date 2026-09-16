@@ -1,10 +1,15 @@
 /**
  * The reflex bot (a person holding keys): the primary attempts-to-clear instrument.
  *
- *   pnpm harness:reflex <trackId> [--skill novice|average|good] [--seeds 3] [--attempts-cap 50] [--max-sim-seconds 300]
+ *   pnpm harness:reflex <trackId> [--skill novice|average|good] [--seeds 3] [--attempts-cap 50] [--max-sim-seconds 300] [--max-sim-seconds-extreme 1800]
  *                       [--browser N] [--no-verify] [--build] [--dev] [--verbose]
  *   pnpm harness:reflex --all-tracks [--skill average] [--seeds 3] [--tracks a,b] [--noisy a,b --noisy-seeds 9]
  *   pnpm harness:reflex --calibrate                      # reflex (average) vs the stranger medians on b1/b2/b3/e1
+ *
+ * Wall-clock (round 12): a reflex run is a pure function of (track, seed, skill, bike) in node, so the matrix
+ * (bike x skill x track x seed) and a single track's skills x seeds run as cells streamed to a pool of
+ * persistent `tsx harness/reflex/reflex.ts --worker` children — `--jobs N`, default min(cells, cores - 2), 1 = serial
+ * in-process — and are merged back in the serial order; the tables and medians are byte-identical to `--jobs 1`.
  *
  * Writes per run  harness/out/reflex/<trackId>/<runId>-<skill>.json (+ .rec.json)   ReflexRunReport + recording
  *        summary  harness/out/metrics/<trackId>.reflex.json                          ReflexTrackMetrics (committed)
@@ -12,16 +17,16 @@
  *        browser  harness/out/reflex/<trackId>/<runId>-browser-<skill>.json (+ .rec.json)   --browser N live runs
  */
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { InputRecorder, type InputRecording } from '../../src/core/replay';
 import type { InputFrame } from '../../src/core/types';
 import { flagBool, flagNum, flagStr, parseArgs } from '../lib/args';
-import { faultsByCheckpoint, median, runMeta, srcFingerprint } from '../lib/metrics';
+import { faultsByCheckpoint, median, runMeta, srcFingerprint, fingerprintMatches } from '../lib/metrics';
 import { HARNESS_DIR } from '../lib/paths';
-import { recordingHeader, saveRecording } from '../lib/recording';
+import { loadRecording, recordingHeader, saveRecording } from '../lib/recording';
 import { fail, writeJson } from '../lib/report';
 import type { ReflexDeath, ReflexRunReport, ReflexSkill, ReflexTrackMetrics } from '../lib/schema';
+import { defaultJobs, loadLine, runWorkerLoop, WorkerPool } from '../lib/pool';
 import { createSim, listSimTracks, parseBike, type Sim } from '../lib/sim';
 import { DEFAULT_BIKE, type BikeClass } from '../../src/core/types';
 import { BrowserVerifier } from '../lib/verify';
@@ -58,7 +63,41 @@ export interface RunOnce {
   recording: InputRecording;
 }
 
-export async function runOnce(trackId: string, seed: number, skill: SkillName, o: { attemptsCap?: number; maxSimSeconds?: number; verbose?: boolean; bike?: BikeClass }): Promise<RunOnce> {
+export interface RunOnceOptions {
+  attemptsCap?: number;
+  maxSimSeconds?: number;
+  verbose?: boolean;
+  bike?: BikeClass;
+}
+
+/** One pool cell (`--job`): everything a worker needs to reproduce `runOnce` in its own process. */
+export interface ReflexJob {
+  trackId: string;
+  seed: number;
+  skill: SkillName;
+  opts: RunOnceOptions;
+}
+
+/**
+ * Cells on `jobs` workers, results in cell order; `jobs <= 1` = serial, in-process. The worker writes the
+ * report + recording under out/reflex/ as `runOnce` always did; the parent reads the report back off the
+ * `@@job` line and keeps `replayFaithful` (the worker's own fresh-sim replay of its frames) as the proof.
+ */
+export async function runJobs(cells: ReflexJob[], jobs: number, onDone: (r: ReflexRunReport) => void = printRunLine): Promise<ReflexRunReport[]> {
+  if (jobs <= 1 || cells.length <= 1) {
+    const out: ReflexRunReport[] = [];
+    for (const c of cells) {
+      const r = (await runOnce(c.trackId, c.seed, c.skill, c.opts)).report;
+      onDone(r);
+      out.push(r);
+    }
+    return out;
+  }
+  const pool = new WorkerPool<ReflexJob, ReflexRunReport>('harness/reflex/reflex.ts', jobs, { tag: 'reflex' });
+  return pool.run(cells, (r) => onDone(r));
+}
+
+export async function runOnce(trackId: string, seed: number, skill: SkillName, o: RunOnceOptions): Promise<RunOnce> {
   const started = new Date();
   const bike = o.bike ?? DEFAULT_BIKE;
   const sim = await createSim(trackId, seed, undefined, { bike });
@@ -150,7 +189,7 @@ function updateTrackMetrics(sim: Sim, bySkill: Map<SkillName, ReflexRunReport[]>
   const fp = srcFingerprint();
   const rows = new Map<string, ReflexTrackMetrics['bySkill'][number]>();
   // Rows from an earlier run on the same physics + src survive; a src change starts over.
-  if (prev && prev.physics === sim.physicsName && prev.srcFingerprint === fp) for (const r of prev.bySkill) rows.set(r.skill, r);
+  if (prev && prev.physics === sim.physicsName && fingerprintMatches(prev.srcFingerprint, fp)) for (const r of prev.bySkill) rows.set(r.skill, r);
   for (const [skill, reps] of bySkill) {
     const finishTimes = reps.map((r) => r.finishTime);
     const cleared = finishTimes.filter((t): t is number => t !== null);
@@ -182,7 +221,7 @@ function updateTrackMetrics(sim: Sim, bySkill: Map<SkillName, ReflexRunReport[]>
     finishX: sim.track.finishX,
     bySkill: order.map((s) => rows.get(s)).filter((r): r is ReflexTrackMetrics['bySkill'][number] => r !== undefined),
   };
-  const b = browser && browser.length ? browser : prev && prev.physics === sim.physicsName && prev.srcFingerprint === fp ? null : null;
+  const b = browser && browser.length ? browser : prev && prev.physics === sim.physicsName && fingerprintMatches(prev.srcFingerprint, fp) ? null : null;
   if (b) {
     metrics.browser = {
       runs: b.map((r) => r.runId),
@@ -192,7 +231,7 @@ function updateTrackMetrics(sim: Sim, bySkill: Map<SkillName, ReflexRunReport[]>
       fps: b.map((r) => r.live?.fps ?? 0),
       roundTrips: b.map((r) => r.live?.roundTrip ?? false),
     };
-  } else if (prev?.browser && prev.physics === sim.physicsName && prev.srcFingerprint === fp) {
+  } else if (prev?.browser && prev.physics === sim.physicsName && fingerprintMatches(prev.srcFingerprint, fp)) {
     metrics.browser = prev.browser;
   }
   writeJson(reflexMetricsFile(sim.track.id, sim.bike), metrics);
@@ -298,19 +337,20 @@ async function browserRuns(trackId: string, skill: SkillName, n: number, flags: 
 async function runTrack(trackId: string, skills: SkillName[], seeds: number, flags: ReturnType<typeof parseArgs>['flags'], bike: BikeClass = DEFAULT_BIKE): Promise<{ metrics: ReflexTrackMetrics; runs: RunOnce[] }> {
   const probe = await createSim(trackId, undefined, undefined, { bike });
   const baseSeed = flags.seed !== undefined ? flagNum(flags, 'seed', probe.seed) : probe.seed;
-  const o = { attemptsCap: flagNum(flags, 'attempts-cap', 50), maxSimSeconds: flagNum(flags, 'max-sim-seconds', 300), verbose: flagBool(flags, 'verbose'), bike };
+  // Round 11 (tracks r9 request a): the extreme tier clears at 24-50 attempts x ~40 s; `--max-sim-seconds-extreme` (default
+  // 1800) caps its runs separately from `--max-sim-seconds` (300) so one matrix invocation covers both.
+  const simCap = flagNum(flags, 'max-sim-seconds', 300);
+  const simCapExtreme = flagNum(flags, 'max-sim-seconds-extreme', Math.max(simCap, 1800));
+  const o: RunOnceOptions = { attemptsCap: flagNum(flags, 'attempts-cap', 50), maxSimSeconds: probe.track.tier === 'extreme' ? simCapExtreme : simCap, verbose: flagBool(flags, 'verbose'), bike };
   const bySkill = new Map<SkillName, ReflexRunReport[]>();
-  const all: RunOnce[] = [];
-  for (const skill of skills) {
-    const reps: ReflexRunReport[] = [];
-    for (let k = 0; k < seeds; k++) {
-      const r = await runOnce(trackId, (baseSeed + k) >>> 0, skill, o);
-      printRunLine(r.report);
-      reps.push(r.report);
-      all.push(r);
-    }
-    bySkill.set(skill, reps);
-  }
+  // skills x seeds are independent cells: a pool of workers, merged back per skill in order.
+  const cells: ReflexJob[] = [];
+  for (const skill of skills) for (let k = 0; k < seeds; k++) cells.push({ trackId, seed: (baseSeed + k) >>> 0, skill, opts: o });
+  const jobs = defaultJobs(cells.length, flags);
+  if (jobs > 1) console.log(`reflex ${trackId}: ${cells.length} cells on ${jobs} workers, ${loadLine()}`);
+  const reports = await runJobs(cells, jobs);
+  for (const skill of skills) bySkill.set(skill, reports.filter((r) => r.skill === skill));
+  const all: RunOnce[] = reports.map((report) => ({ report, recording: loadRecording(report.recordingFile) }));
   // Browser verification of one recording (the best finished run) through runRecording: node hash == browser hash.
   if (!flagBool(flags, 'no-verify') && !flagBool(flags, 'all-tracks')) {
     const best = [...all].sort((a, b) => (a.report.outcome === 'finished' ? 0 : 1) - (b.report.outcome === 'finished' ? 0 : 1) || a.report.attempts - b.report.attempts)[0];
@@ -378,6 +418,11 @@ export function calibrationMarkdown(tracks: readonly string[], skill: ReflexSkil
 
 async function main(): Promise<void> {
   const { positional, flags } = parseArgs();
+  if (flagBool(flags, 'worker')) {
+    // Pool worker: cells arrive on stdin; one report per `@@job` line, the recording is on disk at report.recordingFile.
+    await runWorkerLoop<ReflexJob, ReflexRunReport>(async (job) => (await runOnce(job.trackId, job.seed, job.skill, job.opts)).report);
+    return;
+  }
   const seeds = Math.max(1, flagNum(flags, 'seeds', 3));
   const skill = parseSkill(flags);
   if (flagBool(flags, 'calibrate')) {
@@ -400,15 +445,42 @@ async function main(): Promise<void> {
     const skillList: SkillName[] = skillFlag === 'all' ? ['novice', 'average', 'good'] : skillFlag.split(',').map((x) => parseSkill({ skill: x.trim() }));
     const paramsLine = (sk: SkillName): string =>
       `Reaction ${SKILLS[sk].reactionS.map((s) => `${(s * 1000).toFixed(0)}`).join('–')} ms, glances ${SKILLS[sk].perceiveHz} Hz, pitch noise ±${SKILLS[sk].pitchNoiseDeg}°, speed noise ±${(SKILLS[sk].speedNoiseFrac * 100).toFixed(0)}%, taps ${(SKILLS[sk].tapS * 1000).toFixed(0)} ms, lapses every ~${SKILLS[sk].lapseMeanS} s.`;
+    // Round 12: the whole matrix is one pool of independent cells (bike x skill x track x seed), merged back per
+    // (bike, track) in the serial order; each (bike, track) metrics file is written once with every skill.
+    const simCap = flagNum(flags, 'max-sim-seconds', 300);
+    const simCapExtreme = flagNum(flags, 'max-sim-seconds-extreme', Math.max(simCap, 1800));
+    const cells: ReflexJob[] = [];
+    const probes = new Map<string, Sim>();
+    for (const bike of bikes) {
+      for (const id of ids) {
+        const probe = await createSim(id, undefined, undefined, { bike });
+        probes.set(`${bike}/${id}`, probe);
+        const baseSeed = flags.seed !== undefined ? flagNum(flags, 'seed', probe.seed) : probe.seed;
+        const o: RunOnceOptions = { attemptsCap: flagNum(flags, 'attempts-cap', 50), maxSimSeconds: probe.track.tier === 'extreme' ? simCapExtreme : simCap, verbose: flagBool(flags, 'verbose'), bike };
+        const n = noisy.has(id) ? noisySeeds : seeds;
+        for (const sk of skillList) for (let k = 0; k < n; k++) cells.push({ trackId: id, seed: (baseSeed + k) >>> 0, skill: sk, opts: o });
+      }
+    }
+    const jobs = defaultJobs(cells.length, flags);
+    console.log(`reflex sweep: bikes=${bikes.join(',')} skills=${skillList.join(',')} seeds=${seeds} src=${srcFingerprint()} tracks=${ids.length} cells=${cells.length} jobs=${jobs} ${loadLine()}`);
+    const reports = await runJobs(cells, jobs);
+    const cellIndex = new Map(cells.map((c, i) => [c, i]));
+    const reportOf = (c: ReflexJob): ReflexRunReport => reports[cellIndex.get(c)!]!;
+    const metricsByBikeTrack = new Map<string, ReflexTrackMetrics>();
+    for (const bike of bikes) {
+      for (const id of ids) {
+        const bySkill = new Map<SkillName, ReflexRunReport[]>();
+        for (const sk of skillList) bySkill.set(sk, cells.filter((c) => c.opts.bike === bike && c.trackId === id && c.skill === sk).map(reportOf));
+        metricsByBikeTrack.set(`${bike}/${id}`, updateTrackMetrics(probes.get(`${bike}/${id}`)!, bySkill));
+      }
+    }
     for (const bike of bikes) {
       for (const sk of skillList) {
-        const rows: ReflexTrackMetrics[] = [];
-        const t0 = new Date();
-        console.log(`reflex sweep: bike=${bike} skill=${sk} seeds=${seeds} src=${srcFingerprint()} tracks=${ids.length} loadavg=${os.loadavg().map((l) => l.toFixed(1)).join(' ')}`);
-        for (const id of ids) rows.push((await runTrack(id, [sk], noisy.has(id) ? noisySeeds : seeds, flags, bike)).metrics);
+        const rows = ids.map((id) => metricsByBikeTrack.get(`${bike}/${id}`)!);
+        const runsWallS = cells.filter((c) => c.opts.bike === bike && c.skill === sk).reduce((a, c) => a + reportOf(c).wallMs, 0) / 1000;
         sections.push(
           [
-            `## ${bike === 'pro' ? 'Pro' : 'Rookie'} bike — skill ${sk}, ${seeds} seed(s)${noisy.size ? ` (${noisySeeds} on ${[...noisy].join(', ')})` : ''}, physics ${rows[0]?.physics ?? '?'}, src ${srcFingerprint()}, ${t0.toISOString()}, wall ${((Date.now() - t0.getTime()) / 1000).toFixed(0)} s`,
+            `## ${bike === 'pro' ? 'Pro' : 'Rookie'} bike — skill ${sk}, ${seeds} seed(s)${noisy.size ? ` (${noisySeeds} on ${[...noisy].join(', ')})` : ''}, physics ${rows[0]?.physics ?? '?'}, src ${srcFingerprint()}, ${started.toISOString()}, runs wall ${runsWallS.toFixed(0)} s (${jobs} workers)`,
             '',
             paramsLine(sk),
             '',
@@ -416,13 +488,13 @@ async function main(): Promise<void> {
             '',
           ].join('\n'),
         );
-        console.log(`\n${tableMarkdown(rows, sk)}`);
+        console.log(`\n## ${bike} / ${sk}\n${tableMarkdown(rows, sk)}`);
       }
     }
     const md = [
       `# Reflex bot — skill ${skillList.join(' / ')}, ${seeds} seed(s), bikes ${bikes.join(' + ')}, src ${srcFingerprint()}, ${started.toISOString()}, wall ${((Date.now() - started.getTime()) / 1000).toFixed(0)} s`,
       '',
-      `attempts = 1 + faults (all reasons); cap ${flagNum(flags, 'attempts-cap', 50)}; sim cap ${flagNum(flags, 'max-sim-seconds', 300)} s. Rookie = \`<track>.reflex.json\`, Pro = \`<track>.pro.reflex.json\`; the band is authored for the tier's default bike (average). Death sites: nearest placed obstacle (name @ x) with the rule the rider was executing.`,
+      `attempts = 1 + faults (all reasons); cap ${flagNum(flags, 'attempts-cap', 50)}; sim cap ${flagNum(flags, 'max-sim-seconds', 300)} s (extreme tier ${flagNum(flags, 'max-sim-seconds-extreme', Math.max(flagNum(flags, 'max-sim-seconds', 300), 1800))} s). Rookie = \`<track>.reflex.json\`, Pro = \`<track>.pro.reflex.json\`; the band is authored for the tier's default bike (average). Death sites: nearest placed obstacle (name @ x) with the rule the rider was executing.`,
       '',
       ...sections,
       `## Calibration against the stranger sessions (Rookie)`,

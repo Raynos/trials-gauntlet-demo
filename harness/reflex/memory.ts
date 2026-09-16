@@ -23,6 +23,8 @@ export interface SectionParams {
   throttleCap: number;
   faults: number;
   clears: number;
+  /** Stall-restarts in this section (round 11). */
+  stalls?: number;
 }
 
 export interface FaultContext {
@@ -61,8 +63,9 @@ export class SectionMemory {
     this.m.set(bucket, p);
   }
 
-  /** Learn from a fault: the approach bucket(s) and the fault bucket. */
+  /** Learn from a fault: the approach bucket(s) and the fault bucket. A `restart` fault is the rider's own stall-restart. */
   learn(c: FaultContext, learnRate = 1): Adjustment[] {
+    if (c.reason === 'restart') return this.stalled(c.x, c.speed, learnRate);
     const out: Adjustment[] = [];
     const approachX = c.x - Math.max(3, Math.min(14, c.speed * 0.9));
     const buckets = new Set<number>([SectionMemory.bucketOf(approachX), SectionMemory.bucketOf(c.x)]);
@@ -100,6 +103,36 @@ export class SectionMemory {
           p.speedScale += 0.3 * learnRate;
           note += ` (retry faster ${p.speedScale.toFixed(2)})`;
         }
+      });
+      const adj = { bucket: b, note: `x≈${b * BUCKET}: ${note}` };
+      out.push(adj);
+      this.log.push(adj);
+    }
+    return out;
+  }
+
+  /**
+   * A stall (no progress, the rider hit restart) under a feature at x — round 11 (tracks r9 request c): the lesson is
+   * the OPPOSITE of a fast first crash's "slower". A fast first arrival taught "slower: speed 0.85" and every stall after it
+   * taught nothing, so the reflex sat under the x1 50 deg face at a crawl it clears from a spawn. Now: the speed scale comes
+   * back to >= 1 (and a notch more each time), the throttle cap is lifted, the lean bias is trimmed toward neutral, for the
+   * fault bucket and the approach bucket (3..14 m back, a stall is slow so mostly 3 m: the bucket before the face).
+   */
+  stalled(x: number, speed: number, learnRate = 1): Adjustment[] {
+    const out: Adjustment[] = [];
+    const approachX = x - Math.max(3, Math.min(14, speed * 0.9));
+    const buckets = new Set<number>([SectionMemory.bucketOf(approachX), SectionMemory.bucketOf(x)]);
+    for (const b of buckets) {
+      let note = '';
+      this.edit(b, (p) => {
+        p.faults++;
+        p.stalls = (p.stalls ?? 0) + 1;
+        // A stall under a face means "commit": back to at least the default approach speed, plus 0.1 per stall
+        // (stall #1 -> 1.1, #2 -> 1.2, ...; the 1.6 clamp holds) — the opposite of the first fast crash's "slower".
+        p.speedScale = Math.max(1, p.speedScale) + 0.1 * learnRate;
+        p.throttleCap = 1;
+        p.leanBias *= 0.5;
+        note = `stalled: speed ${p.speedScale.toFixed(2)} thr cap 1 lean ${p.leanBias.toFixed(2)} (stall #${p.stalls})`;
       });
       const adj = { bucket: b, note: `x≈${b * BUCKET}: ${note}` };
       out.push(adj);

@@ -1,0 +1,24 @@
+
+ RUN  v3.2.7 /Users/raynos/projects/game-demos/trials-gauntlet-demo
+
+stdout | src/physics/v2/feel.test.ts > launch, top speed, the lean ladder (§7, §10, §14.2) > lean-actuated wheelie hold (spec: a 10 Hz / 100 ms controller on lean only, throttle fixed 0.5, holds 45 +- 8 deg for >= 10 s at 3-6 m/s). Measured: loops in ~1.6 s at 10 Hz / 100 ms and only a 60 Hz / 0 ms controller holds the front up at all - the pose path (target rate cap + servo, ~0.2 s) plus the reaction delay exceeds the 0.3 s e-fold; the §10 "5-10 Hz with margin" claim does not survive the input lag. The balance band at throttle 0.5 is 17-22 deg on this table, not 45
+FEEL wheelie.leanActuated.10Hz100ms.heldS = 3.167 [>= 10 s within +-8 deg (spec)]
+FEEL wheelie.leanActuated.10Hz100ms.loopT = -1.000 [never (-1)]
+FEEL wheelie.leanActuated.60Hz0ms.heldS = 3.867 [info: the ideal controller]
+FEEL wheelie.leanActuated.60Hz0ms.frontDownS = 4.133 [info: time the ideal controller let the front touch]
+FEEL wheelie.leanActuated.60Hz0ms.loopT = -1.000 [never (-1)]
+
+stdout | src/physics/v2/feel.test.ts > launch, top speed, the lean ladder (§7, §10, §14.2) > snap-forward corrects a rising front: from a 20 deg wheelie with the throttle HELD the snap to +1 brings the pitch below 15 deg within 0.5 s and never loops; from 30 deg it needs the throttle closed with the snap (spec asked for 30 deg with the throttle held - not reachable: at 30 deg nose-up every pose has d/h(theta) < a/g); from 40 deg nothing saves it
+FEEL snap.from20.throttleHeld.pitchAt0.5s = 4.423 [< 15 deg, no loop]
+FEEL snap.from30.throttleHeld.max = 91.518 [info (spec < 15 at 0.5 s; loops: true)]
+FEEL snap.from30.throttle0.pitchAt0.5s = 24.644 [< 15 deg, no loop]
+FEEL snap.from30.throttle0.3.pitchAt0.5s = 40.224 [info (hovers near the throttle-0.3 balance ~27 deg first)]
+FEEL snap.from40.throttle0.loops = 1.000 [info (1 = loops: past the recovery envelope)]
+
+ ✓ src/physics/v2/feel.test.ts (20 tests | 18 skipped) 45ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 18 skipped (20)
+   Start at  09:40:14
+   Duration  345ms (transform 96ms, setup 0ms, collect 121ms, tests 45ms, environment 0ms, prepare 42ms)
+

@@ -3,14 +3,15 @@
   "kind": "stranger-metrics",
   "trackId": "flat-test",
   "attemptsBand": null,
-  "physics": "bikePhysicsFactory",
-  "srcFingerprint": "0faf782f",
-  "updatedAt": "2026-09-14T07:32:35.035Z",
-  "includeStale": false,
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "65175e2d",
+  "updatedAt": "2026-09-15T19:32:09.453Z",
+  "includeStale": true,
   "sessions": [
     {
       "sessionId": "flat-test-20260914-002749",
       "agent": "fake",
+      "bike": "rookie",
       "status": "done",
       "stale": true,
       "srcFingerprint": null,
@@ -42,6 +43,7 @@
     {
       "sessionId": "flat-test-20260914-010849",
       "agent": "smoke",
+      "bike": "rookie",
       "status": "done",
       "stale": true,
       "srcFingerprint": null,
@@ -91,8 +93,9 @@
     {
       "sessionId": "flat-test-r3test",
       "agent": "r3test",
+      "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "0faf782f",
       "strangerAttempts": 6,
       "cleared": false,
@@ -163,24 +166,39 @@
       ]
     }
   ],
-  "completed": 1,
-  "clearedCount": 0,
-  "medianAttempts": 6,
-  "medianFinishTime": null,
+  "bike": "rookie",
+  "completed": 3,
+  "clearedCount": 1,
+  "medianAttempts": 2,
+  "medianFinishTime": 12.3833,
   "medianCalls": 7,
   "medianWallMs": 1898,
+  "census": {
+    "n": 3,
+    "minSessions": 2,
+    "censored": [],
+    "staleExcluded": 0,
+    "otherBikeExcluded": 0
+  },
+  "asserted": null,
+  "verdict": "n/a",
   "pass": null,
   "deaths": {
-    "total": 5,
+    "total": 9,
     "byReason": {
-      "crash": 4,
-      "restart": 1
+      "restart": 3,
+      "crash": 5,
+      "reset": 1
     },
     "byObstacle": [
       {
         "obstacle": "ground",
-        "count": 5,
+        "count": 9,
         "xs": [
+          18.2,
+          5.2,
+          0.6,
+          0.6,
           4.3,
           0.6,
           11.5,
@@ -190,7 +208,7 @@
       }
     ],
     "byCheckpoint": [
-      5,
+      9,
       0,
       0
     ]

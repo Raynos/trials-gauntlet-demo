@@ -1,6 +1,6 @@
 # `harness/bench` — the perf bench (performance owner)
 
-Repeatable, deterministic, comparable across commits. Every number in `docs/plans/PERF.md` comes from here.
+Repeatable, deterministic, comparable across commits. Every number in `project/archive/PERF.md` comes from here.
 
 | command | what | output |
 |---|---|---|
@@ -8,6 +8,9 @@ Repeatable, deterministic, comparable across commits. Every number in `docs/plan
 | `pnpm harness:bench --repeat 2` | the same twice in one process + a spread table (the ±5 % proof) | `latest.md` gains a Repeatability section |
 | `pnpm harness:bench --tiers low --tracks b1,h3 --geoms phone --frames 300 --no-idle` | a subset (any flag) | |
 | `pnpm harness:bench:profile [--tiers high,low] [--track b1] [--frames 300] [--dist]` | V8 sampling CPU profile + sampling heap (allocation) profile of the frame, against the Vite dev server (real names) | `profile-latest.md`, `profile-<sha>-<tier>-<track>.json` |
+| `pnpm exec tsx harness/bench/webkit.ts [--track b1] [--tiers low,medium,high] [--frames 240] [--geom phone]` | Metal-path proxy: Playwright WebKit (ANGLE-on-Metal, this Mac's GPU), every frame synced — tier ratios on the same driver family as iOS Safari | `webkit-latest.md` |
+| `pnpm exec tsx harness/bench/det.ts [--track b1] [--tiers high,low] [--geom desktop\|phone] [--label X]` | determinism pair: two fresh pages, canvas md5 at 15 ticks per tier, stills at first / middle / last | `det/<label>/` |
+| `pnpm exec tsx harness/bench/ab.ts [--switch skinArray\|merge] [--track b1] [--tiers high,medium,low] [--geom phone\|desktop] [--ticks 400,800,1200]` | in-page A/B of a cut behind a harness switch (cut #4b's skin array, cut #4a's merge): same page, same golden, off then on, calls / tris / GL error per tick + the pixel diff (px differing, px beyond 8/255, max delta, bbox) — the pixel-neutrality comparator | stdout, stills in `ab/<switch>-<track>-<geom>/` |
 | `pnpm exec tsx harness/bench/diag-programs.ts [--track b1] [--tiers high,low]` | program-churn diagnostic: which materials make three re-acquire a program per draw, and why (two-pass DoubleSide, shared across instanced/plain/skinned, needsUpdate) | stdout |
 
 Flags: `--quick` (loop preset: phone geometry, b1/h3/e2, 300 frames, 6 GPU samples — ≈ 12 min at loadavg 30) · `--report-only [--label X]` (rebuild `latest.md` from the ledger without running) · `--tiers high,medium,low` · `--tracks b1,b3,e2,m2,h1,h3,x1` (short ids, or full track ids) · `--geoms phone,desktop,<w>x<h>@<dpr>` · `--frames 600` · `--gpu-samples 10` · `--full` (CPU pass at the full canvas) · `--label "…"` · `--build` (rebuild dist first) · `--dev` (vite dev server) · `--no-idle` · `--no-matrix` · `--drain-every 30` · `--sample-every 30`.

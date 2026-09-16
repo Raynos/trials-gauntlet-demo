@@ -332,6 +332,12 @@ export interface RunInfo {
    * never from wall time, so captures are frame-deterministic.
    */
   simTime: number;
+  /**
+   * Track entry hold (render r14 / game.md § entry hold): while the renderer is still compiling the biome
+   * behind its placeholder the countdown has not started; this names the biome being loaded (null otherwise)
+   * and `entryMs` is the wall ms the hold has run (a loader clock, not sim time — it is a label, nothing keys off it).
+   */
+  entry?: { biome: string; ms: number } | null;
 }
 
 export type Medal = 'platinum' | 'gold' | 'silver' | 'bronze';
@@ -380,6 +386,8 @@ export interface RunResult {
   targetTimeS: number | null;
   /** Bike class the run was ridden on (absent in pre-garage results / harness mirrors = rookie). */
   bike?: BikeClass;
+  /** 1-based place on the track's local leaderboard for this class (game.md § leaderboard); null = outside the top 5 / no store. */
+  rank?: number | null;
 }
 
 /**
@@ -534,9 +542,16 @@ export interface HookInfo {
   /** Wall ms of the most recent loadTrack (compile + physics + renderer.setTrack + audio.setTrack). */
   loadTrackMs?: number;
   /** Breakdown of the most recent render(): HUD DOM work, renderer submit, GPU sync (when sync=true). */
-  lastRender?: { hudMs: number; submitMs: number; syncMs: number };
+  lastRender?: { prepMs?: number; hudMs: number; audioMs?: number; submitMs: number; syncMs: number };
   /** Which implementations main.ts composed, e.g. { physics: 'createBikePhysics', render: 'ThreeRenderer', audio: 'WebAudioSystem' }. */
   modules?: Record<string, string>;
+  /** `?perf=1` mirror: the renderer's `debugInfo()` scalars (tier, deviceClass, profile, dpr, canvasW/H, calls, tris, rtMpx, passes, shadowMap, heroTris, skippedFrames, stalePrograms, entryMs, entering …); null without a renderer debugInfo. */
+  render?: Record<string, unknown> | null;
+  /** The governor's last decision string (`App.qualityWhy`). */
+  qualityWhy?: string;
+  quality?: QualityTier;
+  /** Countdown held while the renderer compiles the track's biome (game.md § entry hold). */
+  entryHold?: boolean;
 }
 
 /**
@@ -615,6 +630,30 @@ export interface TrialsHook {
     togglePause(): void;
     screen(): string;
     paused(): boolean;
+  };
+  /** Level reviewer (docs/design/game.md §21; `window.__trials.review`): open a track under the review UI, read / drive its view, the Copy review payload. */
+  review?: {
+    open(trackId: string, seg?: number): boolean;
+    close(): void;
+    active(): boolean;
+    view(): { trackId: string; seg: number; x: number; dist: number; flying: boolean; riding: boolean; segments: { i: number; from: number; to: number; label: string; kinds: Record<string, number> }[] };
+    jump(seg: number): void;
+    /** Move the probe by metres. */
+    pan(m: number): void;
+    zoom(factor: number): void;
+    fly(): void;
+    ride(): void;
+    export(): { data: unknown; text: string };
+  };
+  /**
+   * `?bench=1` (front-end page only, docs/device/README.md): the on-device benchmark — start it (the same as the START
+   * tap), read its state, and the finished report (null until the last scenario ends).
+   */
+  bench?: {
+    start(): void;
+    state(): { running: boolean; done: boolean; scenario: string | null; index: number; total: number };
+    report(): unknown | null;
+    text(): string | null;
   };
   /** Replay viewer (front-end page only): open the viewer on a recording (default: the last run), read its transport, or close it. */
   replay?: {

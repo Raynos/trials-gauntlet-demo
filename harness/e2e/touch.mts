@@ -6,7 +6,18 @@
  *   pnpm harness:e2e            all flows, both geometries (the transition grid on the first geometry; --grid=all for both)
  *   pnpm harness:e2e --only=run --geom=iphone15promax
  *   pnpm harness:e2e --only=grid
+ *   pnpm harness:e2e --only=entry       track entry hold on e1 (canyon): no frame after GO with the placeholder, `?perf=1` overlay fields + rate
  *   pnpm harness:e2e --only=boot        the loading screen at LTE / 3G × SW × art pack (harness/e2e/boot.mts)
+ *   pnpm harness:e2e --only=bench       `?bench=1&quick=1`: the on-device benchmark's instrument, report and toggles (harness/e2e/bench.mts)
+ *   pnpm harness:e2e --only=benchfull   the whole eight-scenario list once (~4 min; the report to harness/out/bench/device-full.md)
+ *   pnpm harness:e2e --only=desktop     keyboard + gamepad at 1280×720 / 1920×1080 in a desktop context (harness/e2e/desktop.mts)
+ *   pnpm harness:e2e --jobs=N           wall-clock (round 12): the flows (boot, bench, desktop, front/run/entry/hitrects per
+ *                                       geometry, the transition grid split by transition) run as parallel Playwright contexts,
+ *                                       at most N at once (default (cores - 2) / 3 — a SwiftShader page is ~3 cores; --jobs=1 =
+ *                                       the old serial order). The boot suite (throttled network, wall-clock freeze detection)
+ *                                       runs alone before the pool. The check and failure totals do not depend on N; the
+ *                                       per-flow lines interleave by completion.
+ *   pnpm harness:e2e --only=review      the level reviewer: REVIEW tab → picker → segments / note / Copy review / pan / fly / ride (harness/e2e/review.mts)
  *
  * Rules the suite enforces (each is a past phone bug):
  *   R1  after a screen change, only the new screen's elements are hit-testable (visibility isolation);
@@ -20,9 +31,14 @@
  *   R7  the strip with keys (design/controls G): one band ≤ 13 % of the height on the bottom edge, four keys, held key solid in its
  *       colour (lean pair one neutral, brake red, gas green) + column wash, hidden under overlays; `--stills=<dir>` saves stills.
  */
+import fs from 'node:fs';
 import { chromium, type BrowserContext, type Page } from 'playwright';
+import { defaultBrowserJobs, loadLine, mapPool } from '../lib/pool';
 import { startServer } from '../lib/server';
 import { bootSuite } from './boot.mjs';
+import { benchFull, benchSuite } from './bench.mjs';
+import { desktopSuite } from './desktop.mjs';
+import { reviewSuite } from './review.mjs';
 
 type Geom = { name: string; width: number; height: number; dpr: number };
 const GEOMS: Geom[] = [
@@ -31,10 +47,15 @@ const GEOMS: Geom[] = [
 ];
 const args = new Map(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=') as [string, string]));
 const only = args.get('only');
+/** `--only=a,b` runs several flows. */
+const onlyList = only ? only.split(',').filter(Boolean) : null;
+const wants = (k: string): boolean => !onlyList || onlyList.includes(k);
 const geomFilter = args.get('geom');
 const gridScope = args.get('grid') ?? 'first';
 /** Debug: cap the transition instances per transition (`--instances=2`) and log every establish step (`--verbose=1`). */
 const gridInstances = Number(args.get('instances') ?? 0) || 0;
+/** Parallel contexts (round 12): `--jobs=N`, default (cores - 2) / 3 — a SwiftShader page is ~3 cores. */
+const jobs = defaultBrowserJobs(64, { ...(args.has('jobs') ? { jobs: args.get('jobs')! } : {}) });
 const verbose = args.get('verbose') === '1';
 const log = (m: string): void => { if (verbose) console.log(`    ${new Date().toISOString().slice(11, 23)} ${m}`); };
 
@@ -468,6 +489,65 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   await page.close();
 }
 
+// ---------------------------------------------------------------------------------------------- track entry hold
+//
+// docs/design/game.md § entry hold (render r14's request): entering a track whose biome is not the one on screen, the renderer
+// compiles it behind a fog placeholder (`debugInfo().entering`) and the countdown waits for `whenReady()`. Proof, sampled every
+// RAF through `hook.info()`: (a) the countdown never beats while `entering`; (b) NO frame after GO has the placeholder up;
+// (c) `entryMs` is reported; (d) the HUD showed the "Loading canyon…" label while holding; (e) the `?perf=1` overlay writes ≤ 2/s.
+async function flowEntry(ctx: BrowserContext, url: string, g: Geom): Promise<void> {
+  const flow = `entry@${g.name}`;
+  const page = await ctx.newPage();
+  page.on('pageerror', (e) => expect(false, flow, 'pageerror', e.message));
+  await page.addInitScript(() => { try { localStorage.setItem('trials.onboarded', '1'); } catch { /* none */ } });
+  await page.goto(`${url}/?sw=0&perf=1`);
+  await page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 180000 });
+  await waitFor(page, `!!document.querySelector('.menu-screen.live')`, 20000);
+  // Boot prepared the industrial hall (b1); e1 is canyon — a biome change, the case the phone showed.
+  const track = 'e1-uphill-weight';
+  await page.evaluate(`(() => {
+    const w = window; const t = w.__trials; w.__entryLog = []; w.__perfWrites = [];
+    const sample = () => {
+      const i = t.info(); const r = i.render || {}; const hud = document.querySelector('.hud .entry');
+      const ov = document.querySelector('.perf');
+      w.__entryLog.push({ t: performance.now(), ph: t.phase(), en: r.entering === true, hold: i.entryHold === true, ms: r.entryMs, rt: t.runTime(),
+        label: hud && hud.classList.contains('show') ? hud.textContent : null, banner: [...document.querySelectorAll('.banner')].some((b) => parseFloat(getComputedStyle(b).opacity) > 0.5 && /^[123]$/.test(b.textContent || '')),
+        perf: ov ? ov.textContent : null });
+      const riding = w.__entryLog.filter((e) => e.ph === 'riding' || e.ph === 'crashed').length;
+      if (w.__entryLog.length < 6000 && riding < 90) requestAnimationFrame(sample); else w.__entryDone = true;
+    };
+    t.app.play('${track}');
+    requestAnimationFrame(sample);
+  })()`);
+  const done = await waitFor(page, `window.__entryDone === true`, 120000);
+  type Row = { t: number; ph: string; en: boolean; hold: boolean; ms: number; rt: number; label: string | null; banner: boolean; perf: string | null };
+  const log = (await page.evaluate(`window.__entryLog`)) as Row[];
+  const info = (await page.evaluate(`window.__trials.info()`)) as { render?: Record<string, unknown>; entryHold?: boolean; qualityWhy?: string; quality?: string };
+  expect(done, flow, 'entry-sampled', `sampler did not finish: ${log.length} rows, last ${JSON.stringify(log.at(-1))}`);
+  const held = log.filter((r) => r.hold);
+  const afterGo = log.filter((r) => r.ph === 'riding' || r.ph === 'crashed' || r.ph === 'finished');
+  const placeholderAfterGo = afterGo.filter((r) => r.en);
+  const beatWhileEntering = log.filter((r) => r.en && r.banner);
+  const goRow = log.find((r) => r.ph === 'riding');
+  expect(afterGo.length >= 60, flow, 'entry-reached-go', `only ${afterGo.length} frames after GO (${log.length} sampled)`);
+  expect(placeholderAfterGo.length === 0, flow, 'entry-no-placeholder-after-go', `${placeholderAfterGo.length} frames after GO with the placeholder up (first ${JSON.stringify(placeholderAfterGo[0])})`);
+  expect(beatWhileEntering.length === 0, flow, 'entry-no-beat-while-entering', `${beatWhileEntering.length} frames showed a countdown digit while the renderer was entering`);
+  const entryMs = Number(info.render?.['entryMs'] ?? goRow?.ms ?? 0);
+  expect(entryMs > 0, flow, 'entry-ms-reported', `debugInfo().entryMs = ${entryMs}`);
+  expect(held.length === 0 || held.some((r) => r.label && /loading canyon/i.test(r.label)), flow, 'entry-hud-label', `held ${held.length} frames; labels seen: ${JSON.stringify([...new Set(held.map((r) => r.label))].slice(0, 4))}`);
+  expect(held.every((r) => r.rt === 0 && r.ph === 'countdown'), flow, 'entry-clock-at-zero', `run clock / phase moved during the hold: ${JSON.stringify(held.find((r) => r.rt !== 0 || r.ph !== 'countdown'))}`);
+  // `?perf=1`: the overlay names the render fields and the governor decision; distinct texts over the riding stretch ≤ 2 per second.
+  const ride = afterGo.filter((r) => r.perf);
+  const distinct = ride.reduce((n, r, i) => (i > 0 && r.perf !== ride[i - 1]!.perf ? n + 1 : n), 0);
+  const span = ride.length > 1 ? (ride.at(-1)!.t - ride[0]!.t) / 1000 : 0;
+  const perfText = ride.at(-1)?.perf ?? '';
+  expect(/RENDER \w+ · (phone|desktop)\/[\w-]+ · dpr [\d.]+ · \d+×\d+/.test(perfText) && /calls .* tris .* rt .* Mpx .* passes .* shadow \d+/.test(perfText) && /hero .* skipped \d+ .* stale \d+ .* entry \d+ ms/.test(perfText) && /governor|manual/.test(perfText), flow, 'perf-overlay-fields', `overlay text:\n${perfText}`);
+  expect(span < 1 || distinct / span <= 2.05, flow, 'perf-overlay-rate', `${distinct} overlay text changes over ${span.toFixed(1)} s`);
+  expect(typeof info.render?.['tier'] === 'string' && typeof info.render?.['calls'] === 'number' && typeof info.qualityWhy === 'string' && typeof info.entryHold === 'boolean', flow, 'hook-info-render', `hook.info(): ${JSON.stringify({ render: info.render, qualityWhy: info.qualityWhy, entryHold: info.entryHold })}`);
+  console.log(`  entry ${g.name}: ${log.length} frames sampled, held ${held.length}, entering ${log.filter((r) => r.en).length}, after GO ${afterGo.length} (placeholder ${placeholderAfterGo.length}), entryMs ${entryMs}, label ${JSON.stringify(held.find((r) => r.label)?.label ?? null)}, perf changes ${distinct}/${span.toFixed(1)} s`);
+  await page.close();
+}
+
 // ---------------------------------------------------------------------------------------------- R6: the transition grid
 //
 // docs/tasks/touch-navigation-invariant.md §4. For each transition — ride→crash, ride→finish, finish→results stage 0..5,
@@ -650,7 +730,8 @@ function transitions(page: Page, g: Geom): Transition[] {
 
 interface GridStats { taps: number; changes: number; legit: number; violations: number }
 
-async function flowGrid(ctx: BrowserContext, url: string, g: Geom): Promise<GridStats> {
+/** `shard` (round 12): run only the transitions with index % of === k, so the grid splits across contexts by transition. */
+async function flowGrid(ctx: BrowserContext, url: string, g: Geom, shard: { k: number; of: number } = { k: 0, of: 1 }): Promise<GridStats> {
   const flow = `grid@${g.name}`;
   const page = await ctx.newPage();
   page.on('pageerror', (e) => expect(false, flow, 'pageerror', e.message));
@@ -661,7 +742,8 @@ async function flowGrid(ctx: BrowserContext, url: string, g: Geom): Promise<Grid
   const points: { x: number; y: number }[] = [];
   for (let j = 0; j < GRID_ROWS; j++) for (let i = 0; i < GRID_COLS; i++) points.push({ x: Math.round(((i + 0.5) / GRID_COLS) * g.width), y: Math.round(((j + 0.5) / GRID_ROWS) * g.height) });
   const stats: GridStats = { taps: 0, changes: 0, legit: 0, violations: 0 };
-  for (const tr of transitions(page, g)) {
+  for (const [ti, tr] of transitions(page, g).entries()) {
+    if (ti % shard.of !== shard.k) continue;
     // Pairs (point, offset), each once; an instance serves one slot per offset with GRID_PER_SLOT points.
     const pairs: { p: number; o: number }[] = [];
     for (let o = 0; o < GRID_OFFSETS.length; o++) for (let p = 0; p < points.length; p++) pairs.push({ p: (p + o * 5) % points.length, o });
@@ -769,8 +851,31 @@ async function flowHitRects(ctx: BrowserContext, url: string, g: Geom): Promise<
 // ---------------------------------------------------------------------------------------------- main
 
 const gridTotals: GridStats[] = [];
+const GRID_TRANSITIONS = 6; // transitions(page, g).length: the grid splits across this many contexts by transition
+const server = await startServer({});
+const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const t0all = Date.now();
+type Task = { name: string; run: () => Promise<void> };
+const tasks: Task[] = [];
+const phoneCtx = (g: Geom): Promise<BrowserContext> =>
+  browser.newContext({ viewport: { width: g.width, height: g.height }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
+/** One phone flow in a context of its own (flows no longer share a context: they run next to each other). */
+const phoneTask = (name: string, g: Geom, fn: (ctx: BrowserContext) => Promise<void>): Task => ({
+  name,
+  run: async () => {
+    const ctx = await phoneCtx(g);
+    try {
+      await fn(ctx);
+    } finally {
+      await ctx.close();
+    }
+  },
+});
 // The loading screen a stranger boots through (docs/tasks/loading-progress-invariant.md): its own servers and browser.
-if (!only || only === 'boot') {
+// It measures a throttled network on the wall clock and flags main-thread freezes, so it runs ALONE, before the pool
+// (next to 15 other pages it reported freezes that are the box's, not the loader's).
+if (wants('boot')) {
+  const t0 = Date.now();
   console.log('== boot');
   for (const r of await bootSuite({}, { stillsDir: 'harness/out/boot' })) {
     checks++;
@@ -779,24 +884,104 @@ if (!only || only === 'boot') {
       console.log(`  FAIL boot ${r.config.net}/sw=${r.config.sw}/art=${r.config.art}: ${r.fails.join('; ')}`);
     }
   }
+  console.log(`  flow boot: ${((Date.now() - t0) / 1000).toFixed(0)} s (alone)`);
 }
-const server = await startServer({});
-const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+if (wants('bench')) {
+  tasks.push({
+    name: 'bench',
+    run: async () => {
+      console.log('== bench (?bench=1&quick=1, iphone15promax)');
+      const r = await benchSuite(browser, server.url, { verbose });
+      checks += r.checks;
+      for (const f of r.fails) fails.push({ flow: 'bench', rule: 'bench', detail: f });
+      if (r.report) {
+        fs.mkdirSync('harness/out/bench', { recursive: true });
+        fs.writeFileSync('harness/out/bench/device-quick.md', r.text);
+        fs.writeFileSync('harness/out/bench/device-quick.json', JSON.stringify(r.report, null, 1));
+        console.log(`  bench quick run ${(r.ms / 1000).toFixed(1)} s → harness/out/bench/device-quick.{md,json}`);
+      }
+    },
+  });
+}
+if (onlyList?.includes('benchfull')) {
+  tasks.push({
+    name: 'benchfull',
+    run: async () => {
+      console.log('== benchfull (?bench=1, all eight scenarios, iphone15promax)');
+      const r = await benchFull(browser, server.url, { verbose });
+      checks += r.checks;
+      for (const f of r.fails) fails.push({ flow: 'benchfull', rule: 'benchfull', detail: f });
+      if (r.report) {
+        fs.mkdirSync('harness/out/bench', { recursive: true });
+        fs.writeFileSync('harness/out/bench/device-full.md', r.text);
+        fs.writeFileSync('harness/out/bench/device-full.json', JSON.stringify(r.report, null, 1));
+        console.log(`  bench full run ${(r.ms / 1000).toFixed(1)} s → harness/out/bench/device-full.{md,json}`);
+      }
+    },
+  });
+}
+if (wants('desktop')) {
+  tasks.push({
+    name: 'desktop',
+    run: async () => {
+      console.log('== desktop');
+      const r = await desktopSuite(browser, server.url, { verbose });
+      checks += r.checks;
+      for (const f of r.fails) fails.push({ flow: 'desktop', rule: 'desktop', detail: f });
+    },
+  });
+}
+if (wants('review')) {
+  tasks.push({
+    name: 'review',
+    run: async () => {
+      console.log('== review');
+      const r = await reviewSuite(browser, server.url, { verbose });
+      checks += r.checks;
+      for (const f of r.fails) fails.push({ flow: 'review', rule: 'review', detail: f });
+    },
+  });
+}
+const gridShards = new Map<string, GridStats[]>();
+for (const g of GEOMS) {
+  if (geomFilter && g.name !== geomFilter) continue;
+  if (wants('front')) tasks.push(phoneTask(`front@${g.name}`, g, (ctx) => flowFront(ctx, server.url, g)));
+  if (wants('run')) tasks.push(phoneTask(`run@${g.name}`, g, (ctx) => flowRun(ctx, server.url, g)));
+  if ((wants('entry')) && g === GEOMS[0]) tasks.push(phoneTask(`entry@${g.name}`, g, (ctx) => flowEntry(ctx, server.url, g)));
+  if (wants('hitrects')) tasks.push(phoneTask(`hitrects@${g.name}`, g, (ctx) => flowHitRects(ctx, server.url, g)));
+  if ((wants('grid')) && (gridScope === 'all' || gridShards.size === 0)) {
+    const shards: GridStats[] = [];
+    gridShards.set(g.name, shards);
+    const of = Math.max(1, Math.min(GRID_TRANSITIONS, jobs));
+    for (let k = 0; k < of; k++) {
+      tasks.push(phoneTask(`grid@${g.name} ${k + 1}/${of}`, g, async (ctx) => {
+        shards.push(await flowGrid(ctx, server.url, g, { k, of }));
+      }));
+    }
+  }
+}
+console.log(`e2e: ${tasks.length} flows on up to ${jobs} contexts (${tasks.map((t) => t.name).join(', ')}); ${loadLine()}`);
 try {
-  for (const g of GEOMS) {
-    if (geomFilter && g.name !== geomFilter) continue;
-    const ctx = await browser.newContext({ viewport: { width: g.width, height: g.height }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
-    console.log(`== ${g.name} ${g.width}×${g.height}`);
-    if (!only || only === 'front') await flowFront(ctx, server.url, g);
-    if (!only || only === 'run') await flowRun(ctx, server.url, g);
-    if (!only || only === 'hitrects') await flowHitRects(ctx, server.url, g);
-    if ((!only || only === 'grid') && (gridScope === 'all' || gridTotals.length === 0)) gridTotals.push(await flowGrid(ctx, server.url, g));
-    await ctx.close();
+  // Longest flows first (the grid shards, bench, boot) so the tail is short; a flow that throws is a FAIL row, not a crash.
+  const longFirst = (t: Task): number => (/^(grid|review)/.test(t.name) ? 0 : /^(bench|desktop)/.test(t.name) ? 1 : 2);
+  const ordered = jobs > 1 ? [...tasks].sort((a, b) => longFirst(a) - longFirst(b)) : tasks;
+  await mapPool(ordered, jobs, async (t) => {
+    const t0 = Date.now();
+    try {
+      await t.run();
+    } catch (err) {
+      expect(false, t.name, 'threw', err instanceof Error ? (err.stack ?? err.message) : String(err));
+    }
+    console.log(`  flow ${t.name}: ${((Date.now() - t0) / 1000).toFixed(0)} s`);
+  });
+  for (const shards of gridShards.values()) {
+    gridTotals.push(shards.reduce((a, b) => ({ taps: a.taps + b.taps, changes: a.changes + b.changes, legit: a.legit + b.legit, violations: a.violations + b.violations }), { taps: 0, changes: 0, legit: 0, violations: 0 }));
   }
 } finally {
   await browser.close();
   await server.close();
 }
+console.log(`e2e wall ${((Date.now() - t0all) / 1000).toFixed(0)} s on up to ${jobs} contexts; ${loadLine()}`);
 for (const t of gridTotals) console.log(`transition grid: ${t.taps} taps, ${t.changes} state changes (${t.legit} legitimate, ${t.violations} ghost)`);
 console.log(`\ntouch e2e: ${checks - fails.length}/${checks} checks pass, ${fails.length} fail`);
 for (const f of fails) console.log(`  ✗ ${f.flow} ${f.rule}: ${f.detail}`);

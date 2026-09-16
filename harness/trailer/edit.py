@@ -31,6 +31,7 @@ AMBER2 = (255, 138, 31)
 INK = (243, 245, 248)
 BG = (7, 8, 10)
 
+TIMELAPSE = None
 BPM = 124.0
 BEAT = 60 / BPM
 BAR = 4 * BEAT
@@ -220,17 +221,19 @@ def overlay_text(text, accent_words=(), size=92):
     return img
 
 
-def end_card_frames(n, url='trials-gauntlet-demo.vercel.app'):
-    wm = wordmark(170)
+def end_card_frames(n, url='trials-gauntlet-demo.vercel.app', version=None):
+    """Wordmark + URL; with `version` ('v0.2.0 · 90f0622') a build line sits under the wordmark (the v0.2.0 title card)."""
+    wm = wordmark(150 if version else 170)
     fu = font('BarlowCondensed-Bold.woff2', 46)
     fk = font('BarlowCondensed-Bold.woff2', 24)
+    fv = font('BarlowCondensed-Bold.woff2', 40)
     frames = []
     for i in range(n):
         img = Image.new('RGBA', (W, H), BG + (255,))
         a = int(255 * min(1, i / 4))
         layer = wm.copy()
         layer.putalpha(layer.getchannel('A').point(lambda v: v * a // 255))
-        img.alpha_composite(layer, ((W - wm.width) // 2, int(H * 0.16)))
+        img.alpha_composite(layer, ((W - wm.width) // 2, int(H * (0.08 if version else 0.16))))
         d = ImageDraw.Draw(img)
         ua = int(255 * np.clip((i - 6) / 6, 0, 1))
         spaced = ' '.join(url)
@@ -241,8 +244,77 @@ def end_card_frames(n, url='trials-gauntlet-demo.vercel.app'):
         d.text(((W - tk) / 2, int(H * 0.80)), k, font=fk, fill=AMBER + (ua,))
         # amber rule
         d.rectangle(((W - 160) / 2, int(H * 0.66), (W + 160) / 2, int(H * 0.66) + 4), fill=AMBER + (ua,))
+        if version:
+            va = int(255 * np.clip((i - 3) / 5, 0, 1))
+            vt = '  '.join(version)
+            tv = d.textlength(vt, font=fv)
+            d.text(((W - tv) / 2, int(H * 0.565)), vt, font=fv, fill=AMBER + (va,))
         frames.append(np.asarray(img.convert('RGB')))
     return frames
+
+
+def menu_frames(plate_path, n, z0=1.08, z1=1.15):
+    """Ken Burns on the Broadcast menu plate: a slow push-in (the crop also drops the headless perf chip top-right)."""
+    plate = Image.open(plate_path).convert('RGB')
+    pw, ph = plate.size
+    frames = []
+    for i in range(n):
+        u = i / max(1, n - 1)
+        z = z0 + (z1 - z0) * (1 - (1 - u) ** 2)
+        cw, ch = pw / z, ph / z
+        cx, cy = pw * 0.52, ph * 0.50
+        x0, y0 = cx - cw / 2, cy - ch / 2
+        img = plate.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.LANCZOS)
+        a = min(1.0, i / 3)
+        arr = np.asarray(img).astype(np.float32) * a
+        frames.append(arr.astype(np.uint8))
+    return frames
+
+
+def phone_card_frame(clip_rgb, i, lines=('PLAYS IN YOUR BROWSER', 'DESKTOP  ·  iPHONE  ·  GAMEPAD'), accent=('BROWSER',)):
+    """The platform card with the live phone capture (touch controls in frame) inside a rounded device bezel."""
+    img = Image.new('RGBA', (W, H), BG + (255,))
+    d = ImageDraw.Draw(img)
+    fb = font('BarlowCondensed-BlackItalic.woff2', 72)
+    fs = font('BarlowCondensed-Bold.woff2', 26)
+    # device: 62 % of the width, 19.5:9
+    dw = int(W * 0.62)
+    dh = int(dw * 430 / 932)
+    dx, dy = (W - dw) // 2, int(H * 0.36)
+    a = int(255 * min(1, i / 4))
+    clip = Image.fromarray(clip_rgb).resize((dw, dh), Image.LANCZOS)
+    mask = Image.new('L', (dw, dh), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, dw - 1, dh - 1), radius=int(dh * 0.11), fill=a)
+    bez = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(bez).rounded_rectangle((dx - 10, dy - 10, dx + dw + 10, dy + dh + 10), radius=int(dh * 0.11) + 10, fill=(24, 26, 30, a), outline=(70, 74, 80, a), width=2)
+    img.alpha_composite(bez)
+    img.paste(clip, (dx, dy), mask)
+    # text above the device
+    y = int(H * 0.10)
+    words = lines[0].split(' ')
+    widths = [d.textlength(wd, font=fb) for wd in words]
+    space = d.textlength(' ', font=fb)
+    x = (W - (sum(widths) + space * (len(words) - 1))) / 2
+    for wd, ww in zip(words, widths):
+        col = AMBER if wd in accent else INK
+        d.text((x + 2, y + 4), wd, font=fb, fill=(0, 0, 0, a))
+        d.text((x, y), wd, font=fb, fill=col + (a,))
+        x += ww + space
+    sa = int(255 * np.clip((i - 3) / 4, 0, 1))
+    tw = d.textlength(lines[1], font=fs)
+    d.text(((W - tw) / 2, int(H * 0.235)), lines[1], font=fs, fill=INK + (sa,))
+    return np.asarray(img.convert('RGB'))
+
+
+def timelapse_frames(mp4, seconds, tmpdir):
+    """Last `seconds` of an external mp4 (the harness owner's progress montage) as RGB frames at FPS, via ffmpeg."""
+    os.makedirs(tmpdir, exist_ok=True)
+    dur = float(subprocess.check_output(['/opt/homebrew/bin/ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', mp4]).decode().strip())
+    ss = max(0.0, dur - seconds)
+    subprocess.check_call([FFMPEG, '-y', '-loglevel', 'error', '-ss', f'{ss:.3f}', '-i', mp4, '-t', f'{seconds:.3f}', '-vf', f'fps={FPS},scale={W}:{H}:force_original_aspect_ratio=decrease,pad={W}:{H}:(ow-iw)/2:(oh-ih)/2',
+                           os.path.join(tmpdir, 'tl-%04d.png')])
+    files = sorted(f for f in os.listdir(tmpdir) if f.startswith('tl-'))
+    return [np.asarray(Image.open(os.path.join(tmpdir, f)).convert('RGB')) for f in files]
 
 
 # ---------------------------------------------------------------- sources
@@ -319,6 +391,54 @@ def build_timeline(cut):
         t = add(t, bar(0.5), kind='clip', beat='crash', in_s=3.8, gain=0.9, overlay=('EVERY CRASH IS A RESTART', ('RESTART',)))
         t = add(t, bar(1), kind='clip', beat='fire', in_s=0.55, gain=0.9, lift=1.25)
         t = add(t, 2.5, kind='end', fade_out=0.4)
+        return S, t
+
+    if cut == 'v2-social':
+        # 15 s v0.2.0 social cut on music-15 (drops 0,5 breaks 3.5 end 6.5): title, hop, stack slow-mo, summit crash -> respawn, rooftop drop, end card.
+        t = 0.0
+        t = add(t, bar(0.5), kind='title')
+        t = add(t, bar(0.5), kind='clip', beat='hop', in_s=0.35, gain=0.9)
+        t = add(t, bar(0.5), kind='clip', beat='landing', in_s=0.9, gain=0.9)
+        t = add(t, bar(2), kind='clip', beat='stack', in_s=0.0, gain=0.9, lift=1.2,
+                remap=[(0.0, 1.05, 1.0), (1.05, 1.65, 0.35), (1.65, 2.6, 1.0)], punch=True)
+        t = add(t, bar(1.5), kind='clip', beat='crash', in_s=0.1, gain=1.0, music_cut=(2.07, None))
+        t = add(t, bar(0.5), kind='clip', beat='crash', in_s=3.5, gain=0.9, overlay=('EVERY CRASH IS A RESTART', ('RESTART',)))
+        t = add(t, bar(1), kind='clip', beat='drop', in_s=0.2, gain=0.9)
+        t = add(t, 2.5, kind='end', fade_out=0.4)
+        return S, t
+
+    if cut == 'v2':
+        # v0.2.0 (physics v2 + Pro, r9 storyboards, r13/14 render, r4 audio, the Broadcast menu). Same 26-bar grid as
+        # v0.1.0: drop 1 = bar 4 (the hop), break = bar 12 (card), drop 2 = bar 15 (the respawn hard cut), break = bar 23.
+        t = 0.0
+        t = add(t, bar(0.5), kind='black')
+        t = add(t, bar(2.5), kind='clip', beat='cold', in_s=0.0, gain=1.0, fade_in=0.4)                       # b1 gate, crowd, 3-2-1-GO
+        t = add(t, bar(1), kind='title')
+        t = add(t, bar(0.5), kind='clip', beat='hop', in_s=0.35, gain=0.9)                                      # m1: the hop onto the ledge (air 0.6-0.75 s in)
+        t = add(t, bar(1), kind='clip', beat='landing', in_s=0.2, gain=0.9)                                      # e2: 1.24 s air, the 2 m rear-wheel landing at 1.62 s in
+        t = add(t, bar(1.5), kind='clip', beat='wheelie', in_s=0.5, gain=0.9)                                    # h1 Pro: 2.7 s wheelie onto the wire
+        t = add(t, bar(1), kind='clip', beat='face', in_s=0.0, gain=0.9)                                         # x1 Face 1: the 45 deg face, snow
+        # x3 The Stack: 1.82 s / 9 m drop; slow x0.3 through the apex with the tracked punch-in
+        t = add(t, bar(2.5), kind='clip', beat='stack', in_s=0.0, gain=0.9, lift=1.2,
+                remap=[(0.0, 1.05, 1.0), (1.05, 1.75, 0.3), (1.75, 3.2, 1.0)], punch=True)
+        t = add(t, bar(1), kind='clip', beat='apron', in_s=0.3, gain=0.9)                                        # h2: the crane jump, night city
+        t = add(t, bar(1), kind='clip', beat='canyon', in_s=0.1, gain=0.9)                                       # e2: canyon table-top, sunset mesas
+        t = add(t, bar(1), kind='card', lines=['15 TRACKS · 5 BIOMES · 2 BIKES'], accent=('15', '5', '2'), big=112, reveal=0.0)
+        # x1 The Summit (make-crash.ts off the Pro golden at 42.3 s): 1.9 s of air from 15 m, lands on the head at 2.07 s in
+        # (rec 44.37 s); music cut, 0.8 s of ragdoll to the bar, then the hard cut to the respawned bike = drop 2
+        t = add(t, bar(1.5), kind='clip', beat='crash', in_s=0.1, gain=1.0, music_cut=(2.07, None))
+        t = add(t, bar(1), kind='clip', beat='crash', in_s=3.5, gain=0.9, overlay=('EVERY CRASH IS A RESTART', ('RESTART',)))
+        t = add(t, bar(1.5), kind='clip', beat='drop', in_s=0.0, gain=0.9)                                       # h1 The Drop: rooftop roll-off into the scaffold tunnel
+        t = add(t, bar(2), kind='clip', beat='pour', in_s=0.0, gain=0.9, lift=1.22)                              # h3 The Pour: the tunnel rows, then the 1.6 s fire jump
+        t = add(t, bar(1), kind='clip', beat='face', in_s=1.7, gain=0.9)                                         # x1: the wheelie up the face
+        t = add(t, bar(1.5), kind='menu')                                                                        # the Broadcast menu (2.9 s push-in)
+        t = add(t, bar(0.5), kind='clip', beat='canyon', in_s=1.85, gain=0.9)                                    # e2: the second canyon jump
+        t = add(t, bar(0.5), kind='clip', beat='hop', in_s=0.66, gain=0.9)                                       # m1: off the ledge
+        t = add(t, bar(1), kind='phonecard', beat='phone', in_s=0.0, gain=0.7)                                   # iPhone geometry, G touch controls
+        t = add(t, bar(2), kind='clip', beat='finish', in_s=0.13, gain=1.0)                                      # h1 finish arch: fireworks, results
+        if TIMELAPSE:
+            t = add(t, 3.0, kind='timelapse')
+        t = add(t, 3.5, kind='end', fade_out=0.5)
         return S, t
 
     t = 0.0
@@ -417,7 +537,7 @@ def mix_audio(segments, total, beats, music_path, out_wav):
     sfx = np.zeros((n, 2), np.float32)
     music_gate = np.ones(n, np.float32)
     for seg in segments:
-        if seg['kind'] != 'clip':
+        if seg['kind'] not in ('clip', 'phonecard'):
             continue
         b = beats[seg['beat']]
         i0 = int(seg['t0'] * SR)
@@ -480,8 +600,9 @@ def render(args):
     segments, total = build_timeline(args.cut)
     beats = {}
     for s in segments:
-        if s['kind'] == 'clip' and s['beat'] not in beats:
+        if s['kind'] in ('clip', 'phonecard') and s['beat'] not in beats:
             beats[s['beat']] = Beat(args.beats, s['beat'])
+    version = f'v{args.version} · {args.sha}' if args.version else None
     nframes = int(round(total * FPS))
     print(f'timeline: {len(segments)} segments, {total:.2f} s, {nframes} frames', file=sys.stderr)
     for s in segments:
@@ -525,13 +646,27 @@ def render(args):
         elif kind == 'card':
             key = ('card', tuple(seg['lines']), n_seg)
             if key not in card_cache:
-                card_cache[key] = text_card(seg['lines'], n_seg, seg.get('accent', ()), reveal=seg.get('reveal', 0.0))
+                card_cache[key] = text_card(seg['lines'], n_seg, seg.get('accent', ()), big=seg.get('big', 140), reveal=seg.get('reveal', 0.0))
             img = card_cache[key][min(local, n_seg - 1)]
         elif kind == 'end':
             key = ('end', n_seg)
             if key not in card_cache:
-                card_cache[key] = end_card_frames(n_seg)
+                card_cache[key] = end_card_frames(n_seg, version=version)
             img = card_cache[key][min(local, n_seg - 1)]
+        elif kind == 'menu':
+            key = ('menu', n_seg)
+            if key not in card_cache:
+                card_cache[key] = menu_frames(os.path.join(args.beats, 'menu', 'menu-0.png'), n_seg)
+            img = card_cache[key][min(local, n_seg - 1)]
+        elif kind == 'timelapse':
+            key = ('timelapse', n_seg)
+            if key not in card_cache:
+                card_cache[key] = timelapse_frames(TIMELAPSE, seg['t1'] - seg['t0'], args.out + '.tl')
+            fr = card_cache[key]
+            img = fr[min(local, len(fr) - 1)] if fr else np.zeros((H, W, 3), np.uint8)
+        elif kind == 'phonecard':
+            b = beats[seg['beat']]
+            img = phone_card_frame(b.frame(round((seg['in_s'] + dt) * b.fps)), local)
         else:
             b = beats[seg['beat']]
             src_t = seg['in_s'] + remap_time(seg, dt)
@@ -586,8 +721,8 @@ def render(args):
         if img.shape[0] != H or img.shape[1] != W:
             img = np.asarray(Image.fromarray(img).resize((W, H), Image.LANCZOS))
         proc.stdin.write(np.ascontiguousarray(img).tobytes())
-        if local == n_seg // 2 and kind == 'clip':
-            sheet_frames.append((seg['beat'], img))
+        if local == n_seg // 2 and kind in ('clip', 'phonecard', 'menu'):
+            sheet_frames.append((seg.get('beat', kind), img))
         if k % 150 == 0:
             print(f'  frame {k}/{nframes} t={t:.1f}s {kind} {seg.get("beat", "")}', file=sys.stderr)
     proc.stdin.close()
@@ -617,10 +752,16 @@ def main():
     ap.add_argument('--beats', default='harness/out/trailer/beats')
     ap.add_argument('--music', default='harness/out/trailer/music.wav')
     ap.add_argument('--out', default='harness/out/trailer/trailer.mp4')
-    ap.add_argument('--cut', default='full', choices=['full', 'social'])
+    ap.add_argument('--cut', default='full', choices=['full', 'social', 'v2', 'v2-social'])
     ap.add_argument('--height', type=int, default=720)
     ap.add_argument('--sheet', default=None)
-    render(ap.parse_args())
+    ap.add_argument('--version', default=None, help='e.g. 0.2.0: adds "v0.2.0 · <sha>" to the end card')
+    ap.add_argument('--sha', default=None)
+    ap.add_argument('--timelapse', default=None, help='mp4 whose last 3 s splice in before the end card (v2 cut), if it exists')
+    a = ap.parse_args()
+    global TIMELAPSE
+    TIMELAPSE = a.timelapse if a.timelapse and os.path.exists(a.timelapse) else None
+    render(a)
 
 
 if __name__ == '__main__':

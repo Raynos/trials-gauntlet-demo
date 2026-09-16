@@ -39,7 +39,7 @@ describe('mapParams (pure model)', () => {
     const a = runGauntlet();
     const b = runGauntlet();
     expect(a.hash).toBe(b.hash);
-    expect(a.hash).toBe('0e821b2a87108a99');
+    expect(a.hash).toBe('51351dbc623cc60f');
   });
 
   it('emits every transient family across the gauntlet in causal order', () => {
@@ -112,7 +112,7 @@ describe('mapParams (pure model)', () => {
     expect(kinds.filter((k) => k === TK.bottomOut)).toHaveLength(1);
   });
 
-  it('stalls the engine within 450 ms of a crash (gain → 0, pitch sags) and restores it on restart', () => {
+  it('stalls the engine within 500 ms of a crash (the crank runs down to 150 rpm under a gain that holds then falls) and restores it on restart', () => {
     const out = createParams();
     const scratch = createScratch();
     const rng = new Rng(9);
@@ -121,14 +121,14 @@ describe('mapParams (pure model)', () => {
     applyEvent(out, { type: 'fault', reason: 'crash', tick: 0, time: 0 }, scratch, rng);
     s.time = 12 / 60;
     mapParams(out, s, undefined, 1 / 60, scratch, rng);
-    expect(out.engineGain).toBeGreaterThan(0.3);
-    expect(out.rpm).toBeLessThan(1500); // sagging while it dies
+    expect(out.engineGain).toBeGreaterThan(0.8); // 1 − k² holds the level while the putts slow
+    expect(out.rpm).toBeLessThan(1500 * 0.75); // the crank already running down (200 ms: 1500 → 960)
     for (let i = 13; i <= 30; i++) {
       s.time = i / 60;
       mapParams(out, s, undefined, 1 / 60, scratch, rng);
     }
     expect(out.engineGain).toBe(0);
-    expect(out.rpm).toBeCloseTo(1500 * (1 - 0.55));
+    expect(out.rpm).toBe(150); // max(150, 1500 × (1 − 0.9))
     expect(out.duckDb).toBe(0); // 500 ms > 300 ms hold
     applyEvent(out, { type: 'restart', checkpoint: -1, tick: 0 }, scratch, rng);
     s.time = 0;

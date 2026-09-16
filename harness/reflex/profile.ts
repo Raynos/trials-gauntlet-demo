@@ -11,6 +11,23 @@ import type { Collider, CompiledTrack, PhysicsState, Vec2 } from '../../src/core
 
 export const GRID = 0.25;
 
+/** A see-saw plank as the rider sees it at one instant (round 11): the board under or spanning x. */
+export interface SeesawUnder {
+  id: number;
+  pivot: Vec2;
+  halfLength: number;
+  /** Current angle (rad, +CCW: the rest pose has the far (+x) end up). */
+  angle: number;
+  /** Angular rate (rad/s, +CCW: negative = the far end going down). */
+  angVel: number;
+  /** Plank top y at x. */
+  top: number;
+  /** Metres from x to the far (+x) end of the plank's projected span. */
+  toFarEnd: number;
+  /** The plank is the ground under x (its top is the highest surface there). */
+  isGround: boolean;
+}
+
 export interface GroundProfile {
   minX: number;
   maxX: number;
@@ -20,6 +37,8 @@ export interface GroundProfile {
   slopeAt(x: number, half?: number, st?: PhysicsState): number;
   /** True when x lies inside a hazard zone footprint (fire/water/kill) at ground level. */
   hazardAt(x: number): boolean;
+  /** The see-saw whose projected span covers x (the board's current pose from `st`), or null. */
+  seesawAt(x: number, st?: PhysicsState): SeesawUnder | null;
 }
 
 export function buildProfile(compiled: CompiledTrack): GroundProfile {
@@ -127,6 +146,21 @@ export function buildProfile(compiled: CompiledTrack): GroundProfile {
     return Math.max(a, seesawAt(x, st));
   };
 
+  const seesawUnder = (x: number, st?: PhysicsState): SeesawUnder | null => {
+    for (const s of seesaws) {
+      const live = st?.seesaws.find((q) => q.id === s.id);
+      const angle = live?.angle ?? 0;
+      const angVel = live?.angVel ?? 0;
+      const ca = Math.cos(angle);
+      const half = s.halfLength * Math.abs(ca);
+      if (x < s.pivot.x - half || x > s.pivot.x + half) continue;
+      const u = (x - s.pivot.x) / (ca === 0 ? 1e-9 : ca);
+      const top = s.pivot.y + u * Math.sin(angle) + s.thickness;
+      return { id: s.id, pivot: s.pivot, halfLength: s.halfLength, angle, angVel, top, toFarEnd: s.pivot.x + half - x, isGround: top >= staticAt(x) - 0.02 };
+    }
+    return null;
+  };
+
   return {
     minX,
     maxX,
@@ -141,5 +175,6 @@ export function buildProfile(compiled: CompiledTrack): GroundProfile {
       const i = Math.round((x - minX) / GRID);
       return i >= 0 && i < n && hazardCells[i] === 1;
     },
+    seesawAt: seesawUnder,
   };
 }

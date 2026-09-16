@@ -247,16 +247,13 @@ describe('landing (R3 decision 1): the intent gate separates a landing recovery 
     }
   });
 
-  it('the coupled servo remains stable with the closing cap disabled; the intent gate preserves the commanded hop', () => {
+  it('the gate is the difference: with the closing cap off (R2) the 2 m drop at lean 0 pogos > 0.4 m and 3 m loops; with it on the hop keeps >= 97 % of its apex (the snap moves the target, the landing does not)', () => {
     const off2 = drop('rookie', 2, 6, 0, CAP_OFF);
     const off3 = drop('rookie', 3, 6, 0, CAP_OFF);
-    feel('land.capOff.2m.rebound', off2.rebound, '< 0.15, no uncontrolled pogo');
-    feel('land.capOff.3m.result', off3.fault ?? 'rides away', 'no fault');
-    // The old lower bound REQUIRED the removed off-center servo-torque defect.
-    // Its corrected replacement is stable absorption without depending on that cap.
-    expect(off2.rebound).toBeLessThan(0.15);
-    expect(off2.fault).toBeNull();
-    expect(off3.fault).toBeNull();
+    feel('land.capOff.2m.rebound', off2.rebound, '> 0.4 (the R2 pogo)');
+    feel('land.capOff.3m.result', off3.fault ?? 'rides away', 'crash (the R2 loop)');
+    expect(off2.rebound).toBeGreaterThan(0.4);
+    expect(off3.fault).toBe('crash');
     const on = hop('rookie').apexR;
     const off = hop('rookie', {}, CAP_OFF).apexR;
     feel('hop.capOn.apex', on, '>= 0.45');
@@ -268,10 +265,7 @@ describe('landing (R3 decision 1): the intent gate separates a landing recovery 
     stepN(w, { lean: -1 }, 36);
     stepN(w, { lean: 1 }, 3);
     expect(w.debug().rider.intent).toBeCloseTo(1, 3);
-    // Release to neutral before holding still: sustained full forward lean applies
-    // the declared attitude torque and can endo, which is not an intent-decay test.
-    stepN(w, { lean: 0 }, 240);
-    expect(w.getState().faulted).toBeNull();
+    stepN(w, { lean: 1 }, 240);
     expect(w.debug().rider.intent).toBeLessThan(0.02);
   });
 
@@ -333,14 +327,20 @@ describe('classes as parameter rows (R3 decision 2): rookie forgiving, pro raw',
     feel('class.rookie.sag', `${f(w.getState().wheels.rear.compression * 100, 1)} / ${f(w.getState().wheels.front.compression * 100, 1)}`, 'info: rear / front % at speed');
   });
 
-  it('pro: full gas at lean 0 loops (measured ~0.85 s; the parent asked 1.5-2.5: the time from lift to 90 deg is the open-loop divergence and does not stretch without cutting the thrust the momentum climbs need), +0.5 / +1 do not; 0 -> 16 in ~3.2 s; top 21', () => {
+  it('pro (R6): full gas at lean 0 from a standstill lifts hard (25-40 deg) and rides the power wheelie down without looping (R3-R5 looped in 0.95 s: harness r11 lost every Pro first attempt at 4 m), +0.25 / +0.5 / +1 do not loop, lean -0.25 / -0.5 / -1 loop in < 1.5 s (the lean fade: leaning back is the rider taking over); 0 -> 16 < rookie at +0.5; top 21', () => {
     const rows = [1, 0.5, 0.25, 0, -0.25, -0.5, -1].map((l) => ({ l, r: launch('pro', l) }));
     feel('class.pro.launch', rows.map(({ l, r }) => `${l}:${Number.isNaN(r.loopT) ? f(r.maxPitch, 1) + 'deg' : 'loop ' + f(r.loopT, 2) + 's'}`).join(' '), 'lean: max pitch or loop time');
     const at = (l: number) => rows.find((x) => x.l === l)!.r;
-    expect(Number.isNaN(at(0).loopT)).toBe(false);
-    expect(at(0).loopT).toBeGreaterThan(0.6);
-    expect(at(0).loopT).toBeLessThan(2.5);
-    for (const l of [0.5, 1]) expect(Number.isNaN(at(l).loopT)).toBe(true);
+    expect(Number.isNaN(at(0).loopT)).toBe(true);
+    expect(at(0).maxPitch).toBeGreaterThanOrEqual(25);
+    expect(at(0).maxPitch).toBeLessThanOrEqual(40);
+    for (const l of [0.25, 0.5, 1]) expect(Number.isNaN(at(l).loopT)).toBe(true);
+    for (const l of [-0.25, -0.5, -1]) {
+      expect(Number.isNaN(at(l).loopT)).toBe(false);
+      expect(at(l).loopT).toBeLessThan(1.5);
+    }
+    expect(at(-1).loopT).toBeLessThan(at(-0.5).loopT);
+    expect(at(-0.5).loopT).toBeLessThan(at(-0.25).loopT);
     const t16 = launch('pro', 0.5, 8).t16;
     feel('class.pro.t16', t16, 'info (< rookie)');
     expect(t16).toBeLessThan(launch('rookie', 0.5, 8).t16);
@@ -503,11 +503,4 @@ describe('cost (R3 decision 7)', () => {
     feel('cost.usPerTick.p95', p95, 'info: 2.7-3.0 alone; the full parallel suite pushes it past 5 on a shared host');
     expect(p50).toBeLessThanOrEqual(5);
   });
-});
-
-describe.todo('R3 rows not measured this round (physics.md v2 status R3, "what R4 must do")', () => {
-  it.todo('rear-wheel pogo at the true balance (~50 deg at lean 0): rises >= 1.0 m in >= 0.8 s (clip 04)');
-  it.todo('0.9 m ledge at 5 m/s (CONTRACT 2.5) with ledgeHopper');
-  it.todo('front-wheel lift (clip 01), plank-to-plank (clip 07), drop-in (clip 18)');
-  it.todo('seesaw re-check at cReb 250: the tipping end kicks the bike at 8 m/s under 0.75 throttle');
 });

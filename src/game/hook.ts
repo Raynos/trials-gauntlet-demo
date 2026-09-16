@@ -40,6 +40,11 @@ export function installHook(source: Game | (() => Game), harness: boolean, extra
       readyAtMs: Math.round(readyAtMs * 10) / 10,
       loadTrackMs: Math.round(g().lastLoadMs * 10) / 10,
       lastRender: { ...g().lastRender },
+      // `?perf=1` mirror (game.md § perf overlay): the renderer's debugInfo scalars, the governor's decision, the entry hold.
+      render: g().rendererDebug(),
+      qualityWhy: g().qualityWhy,
+      quality: g().qualityTier,
+      entryHold: g().entryHeld,
       ...(extras.modules ? { modules: extras.modules } : {}),
     }),
     step: (n = 1) => g().step(n),

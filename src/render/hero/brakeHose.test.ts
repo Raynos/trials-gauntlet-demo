@@ -1,7 +1,7 @@
 import { relative, resolve } from 'node:path';
 import * as THREE from 'three';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { BIKE_GEOMETRY_V2 } from '../../physics/v2/tuning';
+import { BIKE_GEOMETRY_V2 } from './assetFrame';
 import { BrakeHose } from './brakeHose';
 import { loadRig } from './gltfTestUtils';
 

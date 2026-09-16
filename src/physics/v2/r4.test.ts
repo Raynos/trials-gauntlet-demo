@@ -153,16 +153,20 @@ describe('R4 mechanism 2: the round-8 "air-throttle kick" is the rider pose swin
 });
 
 describe('R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas', () => {
-  it('a 20 deg slope lowers the front-lift threshold from ~0.6 g to ~0.22 g: raw (Pro, or the Rookie with the assist off) full gas at lean 0 wheelies 40-55 deg over the slope and leaves a 6 m lip at 65-80 deg nose-up rotating 150+ deg/s', () => {
-    const pro = ramp('pro', 20, 10, 0);
+  it('a 20 deg slope lowers the front-lift threshold from ~0.6 g to ~0.22 g: raw (either class with the ECU off; R6: the Pro carries the ground ECU too, so its raw row is the gain-0 override) full gas at lean 0 wheelies 40-55 deg over the slope and leaves a 6 m lip at 65-80 deg nose-up rotating 150+ deg/s; the R6 Pro (ECU on the ground) leaves the same lip <= 25 deg', () => {
+    const pro = ramp('pro', 20, 10, 0, 1, 6, RAW);
     const raw = ramp('rookie', 20, 10, 0, 1, 6, RAW);
-    feel('ramp20@10.pro.lean0', `over slope ${f(pro.overSlope)} lip pitch ${f(pro.lipPitch)} rate ${f(pro.lipRate, 0)} v ${f(pro.lipV)}`, 'raw: loops off the lip');
+    const proR6 = ramp('pro', 20, 10, 0);
+    feel('ramp20@10.proRaw.lean0', `over slope ${f(pro.overSlope)} lip pitch ${f(pro.lipPitch)} rate ${f(pro.lipRate, 0)} v ${f(pro.lipV)}`, 'raw (R3-R5 Pro): loops off the lip');
     feel('ramp20@10.rookieRaw.lean0', `over slope ${f(raw.overSlope)} lip pitch ${f(raw.lipPitch)} rate ${f(raw.lipRate, 0)} v ${f(raw.lipV)}`, 'R3 Rookie (assist off)');
+    feel('ramp20@10.pro.lean0', `over slope ${f(proR6.overSlope)} lip pitch ${f(proR6.lipPitch)} rate ${f(proR6.lipRate, 0)} v ${f(proR6.lipV)} assist max ${f(proR6.assistMax, 2)}`, 'R6 Pro (ground ECU): lip <= 25');
     expect(pro.overSlope).toBeGreaterThan(40);
     expect(pro.lipRate).toBeGreaterThan(150);
     expect(raw.overSlope).toBeGreaterThan(35);
     expect(pro.assistMax).toBe(0);
     expect(raw.assistMax).toBe(0);
+    expect(proR6.lipPitch).toBeLessThanOrEqual(25);
+    expect(proR6.assistMax).toBeGreaterThan(0.5);
   });
 
   it('Rookie (wheelie control on): the same ramp at lean 0 lifts <= 15 deg over the slope, leaves the lip <= 25 deg nose-up with the nose already coming down (rate <= 0) and no brake; the lean-forward technique (+1, assist faded out) gives the same picture with 1 m/s more lip speed', () => {
@@ -203,9 +207,7 @@ describe('R4 mechanism 1 + the Rookie assist: on-ramp front lift under full gas'
       return { w, snapAt: 90 };
     };
     const a = run();
-    // Find an actual assisted state. A fixed historical tick can fall before or after
-    // intervention when the physical mass profile and suspension are corrected.
-    for (let tick = 0; tick < 240 && a.w.debug().engine.assist <= 0; tick++) stepN(a.w, { throttle: 1 }, 1);
+    stepN(a.w, { throttle: 1 }, a.snapAt);
     expect(a.w.debug().engine.assist).toBeGreaterThan(0);
     const snap = a.w.snapshot();
     const straight = stepN(a.w, { throttle: 1 }, 120);

@@ -4,30 +4,12 @@
  * Units SI. Chassis frame: origin at the chassis COM, x along the frame axis.
  */
 import type { SurfaceKind, Vec2 } from '../../core/types';
-import { makeRiderRigPose, RIDER_PROFILE, riderProfileInertia, riderRigFromHips } from './rider';
-import { atan2, cos, sin } from '../dmath';
-
-/** Fixed common geometry, matching the exported bike's attachment markers. Coordinates of
- * parts are in the reference axle/asset frame; chassisToAxle converts them to chassis space. */
-export const BIKE_GEOMETRY_V2 = {
-  chassisToAxle: { x: 0.065, y: -0.21 },
-  wheelbase: 1.3,
-  rear: { x: -0.65, y: 0 },
-  front: { x: 0.65, y: 0 },
-  swingPivot: { x: -0.22, y: 0.1 },
-  swingRadius: Math.sqrt(0.43 ** 2 + 0.1 ** 2),
-  rearReferenceCompression: 0.07,
-  frontReferenceCompression: 0.05,
-  forkAxis: { x: -0.22 / Math.sqrt(0.22 ** 2 + 0.5 ** 2), y: 0.5 / Math.sqrt(0.22 ** 2 + 0.5 ** 2) },
-} as const;
 
 export interface SuspensionV2 {
   /** Chassis-frame axle rest point (compression 0). */
   axle: Vec2;
   /** Chassis-frame unit direction the wheel moves when compressing. */
   axis: Vec2;
-  /** Rear wheel path: a true circle, compression measured as arc length from full droop. */
-  hinge?: { pivot: Vec2; radius: number; droopAngle: number };
   travel: number;
   k: number;
   /** Metres of extra compression the spring is preloaded by. */
@@ -37,15 +19,6 @@ export interface SuspensionV2 {
   /** Cubic bump stop `kStop * max(0, c - stopStart*travel)^3 / travel^2` (§5). */
   kStop: number;
   stopStart: number;
-}
-
-/** Chassis-local wheel center for a suspension coordinate (metres of fork/arc travel). */
-export function suspensionPoint(s: SuspensionV2, compression: number): Vec2 {
-  if (s.hinge) {
-    const angle = s.hinge.droopAngle - compression / s.hinge.radius;
-    return { x: s.hinge.pivot.x + s.hinge.radius * cos(angle), y: s.hinge.pivot.y + s.hinge.radius * sin(angle) };
-  }
-  return { x: s.axle.x + s.axis.x * compression, y: s.axle.y + s.axis.y * compression };
 }
 
 export interface PoseRow {
@@ -104,22 +77,17 @@ export interface TuningV2 {
      * (`debug().engine.assist`), linear, the same on the ground and in the air (in the air the front is topped out
      * and the trim bounds the throttle's nose-up). `gain` 0 = raw (the Pro).
      */
-    wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number };
+    wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number; /** R6: trim multiplier with both wheels off the ground (Rookie 1: the assist bounds the throttle nose-up in the air; Pro 0: the air is raw). */ airGain: number };
   };
-  brakes: {
-    totalNm: number; frontFrac: number; brakeTau: number;
-    /** Rookie rear-lift protection modulates the front caliper using the live COM
-     * support moment and rear tyre braking. Fades at deliberate full lean. Pro = 0. */
-    liftControl: number;
-    /** Seconds of nose-down rate anticipated by caliper modulation. */
-    liftLookahead: number;
-  };
+  brakes: { totalNm: number; frontFrac: number; brakeTau: number };
   aero: { cda: number; rho: number; chassisShare: number };
   rider: {
     mass: number;
     inertia: number;
     /** Pose table, ascending in lean; linear between rows (§9.1). */
     poses: PoseRow[];
+    /** Rider COM relative to the hips in the body frame (§9.1: 0.03 ahead, 0.10 above). */
+    comFromHips: Vec2;
     targetRateLin: number;
     targetRateAng: number;
     kp: number;
@@ -131,6 +99,12 @@ export interface TuningV2 {
     /** R3 intent memory: the pose target's own travel, decaying with tau `servoIntentTau` s; at `servoIntentM` metres the closing cap is lifted to F_max. */
     servoIntentTau: number;
     servoIntentM: number;
+    /**
+     * R6 preload gate (measured, see physics.md v2 status R6): the pose target's travel counts toward intent only
+     * while the rider BODY sits at least this far behind the neutral pose (chassis-frame x, metres) - "an armed hop
+     * needs the preload". 0 = R3 (all travel counts).
+     */
+    servoIntentBackM: number;
     /**
      * R5 Rookie air limit: with BOTH wheels off the ground the pose target's travel rate falls from
      * `targetRateLin` / `targetRateAng` to `airRateLin` / `airRateAng` (a rider in the air has no ground reaction to
@@ -153,6 +127,9 @@ export interface TuningV2 {
     kpsi: number;
     cpsi: number;
     tauMax: number;
+    /** Axle-frame peg and grip points (the legs-line split, §9.3). */
+    peg: Vec2;
+    grip: Vec2;
     /** The declared attitude torque (§9.4). */
     Katt: number;
     cAtt: number;
@@ -161,8 +138,6 @@ export interface TuningV2 {
   };
   solver: {
     velIters: number;
-    /** Minimum coupled position sweeps; 0 disables projection. The solver may
-     * converge further, up to 64 sweeps, when wheel contacts and limb limits interact. */
     posIters: number;
     slop: number;
     specMargin: number;
@@ -191,16 +166,8 @@ const ROOKIE: TuningV2 = {
   },
   wheel: { radius: 0.34, rearMass: 8, rearInertia: 0.55, frontMass: 7, frontInertia: 0.45, wheelbase: 1.3 },
   suspension: {
-    rear: {
-      axle: { x: 0, y: 0 }, // initialized from the hinge below
-      axis: { x: -0.1 / BIKE_GEOMETRY_V2.swingRadius, y: 0.43 / BIKE_GEOMETRY_V2.swingRadius },
-      hinge: { pivot: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.swingPivot.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.swingPivot.y }, radius: BIKE_GEOMETRY_V2.swingRadius, droopAngle: atan2(-0.1, -0.43) + BIKE_GEOMETRY_V2.rearReferenceCompression / BIKE_GEOMETRY_V2.swingRadius },
-      travel: 0.26, k: 9000, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85,
-    },
-    front: {
-      axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.front.x - BIKE_GEOMETRY_V2.forkAxis.x * BIKE_GEOMETRY_V2.frontReferenceCompression, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.front.y - BIKE_GEOMETRY_V2.forkAxis.y * BIKE_GEOMETRY_V2.frontReferenceCompression },
-      axis: { ...BIKE_GEOMETRY_V2.forkAxis }, travel: 0.24, k: 6500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85,
-    },
+    rear: { axle: { x: -0.585, y: -0.21 }, axis: { x: 0.12, y: 0.99 }, travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85 },
+    front: { axle: { x: 0.715, y: -0.215 }, axis: { x: -0.4, y: 0.92 }, travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85 },
   },
   tyre: {
     Cs: 9000,
@@ -223,18 +190,33 @@ const ROOKIE: TuningV2 = {
     gear: 17.8,
     clutchRpm: 3500,
     clutchSpeed: 7,
-    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 },
+    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
   },
-  brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03, liftControl: 1, liftLookahead: 0.15 },
+  brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03 },
   aero: { cda: 0.75, rho: 1.225, chassisShare: 0.6 },
   rider: {
     mass: 75,
-    inertia: riderProfileInertia(75),
-    poses: [], // populated from the shared geometry/mass profile below, in chassis coordinates
+    inertia: 9,
+    poses: [
+      // x column: the toy's (docs/research/toy-v2, riderTarget), which is what §10's ladder was measured
+      // with; the printed §9.1 column (-0.44/-0.30/-0.15/-0.12/-0.09) puts d/h at neutral ON a_peak/g and
+      // full gas at lean 0 becomes a coin flip between no lift and a 3 s loop (physics.md v2 status).
+      // R3 measured and REJECTED two forward tables (physics.md v2 status R3): over the bars at +1 (x 0.42,
+      // d/h 1.13, the 48 deg crawl geometry) turns the snap to +1 into a 1.3-1.5 m throw with a 0.36 m knife
+      // between lean quanta and unloads the rear at +0.5; a moderate one (0 -> -0.06, +1 -> 0.24) still costs
+      // the half-rate snap (55 -> 22 %) and the knife row (0.03 -> 0.07 m) for ~3 deg of crawl geometry the
+      // climb bench cannot see (45 deg from a crawl tops on THIS table with the lift-then-throw technique).
+      { lean: -1, x: -0.42, y: 0.37, psi: 0.17 },
+      { lean: -0.5, x: -0.27, y: 0.5, psi: 0.08 },
+      { lean: 0, x: -0.12, y: 0.62, psi: 0 },
+      { lean: 0.5, x: -0.03, y: 0.65, psi: -0.12 },
+      { lean: 1, x: 0.06, y: 0.67, psi: -0.24 },
+    ],
+    comFromHips: { x: 0.03, y: 0.1 },
     targetRateLin: 5.0,
     targetRateAng: 6.0,
-    kp: 75000,
-    kd: 1000,
+    kp: 45000,
+    kd: 4200,
     Fmax: 3200,
     // R3: ON, gated by intent. The concentric (closing) cap falls to 0.3 F_max = 960 N at 1 m/s of closing speed
     // while the pose target is still (a landing: the legs absorb, the 2-3 m drops ride away, R2's pogo loop is
@@ -244,6 +226,7 @@ const ROOKIE: TuningV2 = {
     servoMinFrac: 0.3,
     servoIntentTau: 0.2,
     servoIntentM: 0.05,
+    servoIntentBackM: 0,
     // R5: in free air the full -1 -> 0 pose release is a 0.5 s move (0.39 m at 0.8 m/s) instead of 0.08 s; the swing's
     // kick on the chassis falls 245 -> ~95 deg/s (physics.md v2 status R5). The blend is 0.1 s each way.
     airRateLin: 0.8,
@@ -254,6 +237,8 @@ const ROOKIE: TuningV2 = {
     kpsi: 2500,
     cpsi: 180,
     tauMax: 300,
+    peg: { x: -0.14, y: 0.02 },
+    grip: { x: 0.27, y: 0.78 },
     // §13 initial 180 / 20 gave +16 / -22 deg of air authority in 0.5 s against the §14.2 band of 25-40;
     // 300 / 33 (K/c = 9 rad/s kept) meets it (physics.md v2 status)
     Katt: 300,
@@ -261,28 +246,12 @@ const ROOKIE: TuningV2 = {
     headRadius: 0.15,
     torsoRadius: 0.13,
   },
-  // The compliant rider, two springs and tyre contacts must converge together: six
-  // iterations left 5.7 mm/s neutral drift; twelve brings it below 0.04 mm/s.
-  solver: { velIters: 12, posIters: 2, slop: 0.005, specMargin: 0.02, posBeta: 0.5, jointBaumgarte: 0.3 },
+  solver: { velIters: 6, posIters: 2, slop: 0.005, specMargin: 0.02, posBeta: 0.5, jointBaumgarte: 0.3 },
   ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },
   drum: { density: 60 },
 };
 
 /** The reference row = the Rookie (R3: R2's "mid" table is the Rookie baseline; the game's BikeClass has no mid). */
-ROOKIE.suspension.rear.axle = suspensionPoint(ROOKIE.suspension.rear, 0);
-
-/** The authoring frame is fixed on the chassis, never refitted to the current wheel positions. */
-function profileTargets(t: TuningV2): void {
-  const pose = makeRiderRigPose();
-  const rows = RIDER_PROFILE.poses.map((p) => {
-    riderRigFromHips(p.hipX, p.hipY, p.torso * Math.PI / 180, pose);
-    return { lean: p.lean, x: pose.com.x, y: pose.com.y, psi: (p.torso - RIDER_PROFILE.poses[1].torso) * Math.PI / 180 };
-  });
-  const ox = BIKE_GEOMETRY_V2.chassisToAxle.x, oy = BIKE_GEOMETRY_V2.chassisToAxle.y;
-  t.rider.poses = rows.map((row) => ({ ...row, x: row.x + ox, y: row.y + oy }));
-}
-
-profileTargets(ROOKIE);
 export const DEFAULT_TUNING_V2: Readonly<TuningV2> = Object.freeze(ROOKIE);
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? (T[K] extends unknown[] ? T[K] : DeepPartial<T[K]>) : T[K] };
@@ -315,20 +284,22 @@ const gearFor = (top: number): number => 10000 / ((top / 0.34) * (60 / (2 * Math
 
 export const BIKE_PRESETS_V2: Readonly<Record<BikeClassV2, PartialTuningV2>> = Object.freeze({
   rookie: {},
-  // Pro (R3): raw. 4 kg lighter, 1 000 N (0.71 g at the knot), a 0.06 s throttle (the launch kick the Rookie
-  // filters), K_att 260 (less attitude assist), stiffer springs, 21 m/s. Loops at neutral under full gas (1.1 s).
+  // Pro (R3): raw. 4 kg lighter, 1 000 N (0.71 g at the knot), a 0.08 s throttle (the launch kick the Rookie
+  // filters), K_att 260 (less attitude assist), stiffer springs, 21 m/s. R6: the R4 ECU trim on the GROUND (same
+  // margins / rates / lean fade as the Rookie; `airGain` 0 keeps the air raw): plain gas from a standstill at lean 0
+  // lifts to ~32 deg and rides a 16-32 deg power wheelie down at 14 m/s instead of looping in 0.95 s (harness r11:
+  // every Pro stranger lost its first attempt at 4 m); full gas at lean <= -0.25 still loops (0.56 / 0.66 / 1.35 s
+  // at -1 / -0.5 / -0.25). No open-loop lever gives "lifts hard, does not loop": the thrust curve is a knife edge
+  // (F(4-8) 0.85 loops at 1.0 s, 0.80 lifts 8 deg) and a speed fade of the trim loops at the release (R6 status).
   pro: {
-    brakes: { liftControl: 0 },
     chassis: { mass: 54 },
-    suspension: { rear: { k: 12000 }, front: { k: 9000 } },
-    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 0, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9 } },
+    wheel: { wheelbase: 1.28 },
+    suspension: { rear: { axle: { x: -0.575, y: -0.21 }, k: 12000 }, front: { axle: { x: 0.705, y: -0.215 }, k: 9000 } },
+    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
     rider: { Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
   },
 });
 
 export function bikeTuningV2(cls: BikeClassV2, over?: PartialTuningV2): TuningV2 {
-  const tuning = mergeTuningV2(Object.freeze(mergeTuningV2(DEFAULT_TUNING_V2, BIKE_PRESETS_V2[cls])), over);
-  if (!over?.rider?.poses) profileTargets(tuning);
-  if (over?.rider?.inertia === undefined) tuning.rider.inertia = riderProfileInertia(tuning.rider.mass);
-  return tuning;
+  return mergeTuningV2(Object.freeze(mergeTuningV2(DEFAULT_TUNING_V2, BIKE_PRESETS_V2[cls])), over);
 }

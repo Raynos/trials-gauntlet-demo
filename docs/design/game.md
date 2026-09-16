@@ -68,6 +68,29 @@ may emit it.
 `phase()` is unchanged; the run clock is tick-driven so it stops with the ticks). `visibilitychange` →
 hidden pauses. Harness mode never pauses.
 
+### 1a. Track entry hold (render r14 → core 13; `Game.beginRun`, `entryHeld`, `RunInfo.entry`)
+
+The renderer's `setTrack` compiles the new biome behind a fog placeholder in ≤ 16 ms tasks (`beginEntry`,
+rendering.md §11i) and `whenReady()` resolves after it; `render()` paints the placeholder while
+`debugInfo().entering` is true. Before this round the HUD timer counted "3-2-1" over that fog — the user's e2
+screenshot: a running countdown on a black world. Now `beginRun` (every load path and full restart that is not
+harness-mode) reads `debugInfo().entering` once: **when the renderer is entering, the countdown phase is entered but
+held** — `countdownTick` does not advance, no beat is emitted, the run clock stays 0 — until `whenReady()` resolves;
+the release emits the `3` and the countdown runs exactly as before. A token drops a stale release (a newer
+`loadTrack`, `skipCountdown` / GO, or `toMenu` in between). A restart in place (no `setTrack`) or a stub renderer is
+not entering and counts down synchronously, as every existing test expects (`entry.test.ts`). Physics still steps
+neutral input during the hold, as it does through the countdown; GO resets it either way, so nothing
+determinism-relevant depends on the hold's length.
+
+While held the game writes `RunInfo.entry = { biome, ms }` (the biome id from `track.meta`, wall ms since the hold began —
+a loader clock, a label only) and the HUD shows `Loading canyon… 1.2 s` (`.hud .entry`, tenths, one text write per
+100 ms) where the `3` will land; `hook.info().entryHold` and `?perf=1`'s `entry … ms (holding)` expose the same state.
+Proof (`pnpm harness:e2e --only=entry`, `flowEntry`): boot to the menu (industrial hall prepared), `app.play('e1-uphill-weight')`
+(canyon — a biome change), sample every RAF through `hook.info()` for 90 frames after GO: frames after GO with the
+placeholder (`render.entering`) up = **0**, no countdown digit drawn while entering, run clock 0 and phase `countdown` for
+every held frame, the HUD label seen, `entryMs` reported (SwiftShader: 137 frames sampled, 28 held, entryMs 9508;
+the phone's number is rendering.md §11i's table, 237 ms first draw on canyon).
+
 ## 2. Determinism rules for this layer
 
 - All timers (`countdownTick`, `crashTicks`, `holdTicks`, `resultsTicks`, `runTicks`) are integers
@@ -566,12 +589,47 @@ Two numbers, DOWNLOAD and SETUP (the user's decision: "B Odometer" with both tra
 - Default ON; Settings → **Run log** On/Off (`trials.telemetry`), **Export run log** Copy (clipboard JSON,
   `{ kind: 'trials-runlog', v: 1, build, exportedAt, runs }`) / Share (Web Share API text — iOS share sheet;
   the button is hidden where `navigator.share` is absent). Nothing leaves the device otherwise.
-- `?perf=1` (`src/ui/perf.ts`): a monospace box top-left under the pause button, repainted 4×/s: `FPS · frame
+- `?perf=1` (`src/ui/perf.ts`, **§ perf overlay**): a monospace box top-left under the pause button: `FPS · frame
   ms p50/p95`, `PHYS µs/tick p50/p95` (`Game.perfTiming` times each `physics.step` only with the flag on —
-  no per-tick `performance.now` otherwise), `DRAW calls · tris · MB tex` from `stats()`, `TIER · dpr · why`
-  (`manual (settings)` / `probe median 16.6 ms` / `pending probe`). Hidden under pause / results / menus.
+  no per-tick `performance.now` otherwise), `DRAW calls · tris · MB tex` from `stats()`, `TIER · dpr · why` (the
+  governor's last decision string, `App.qualityWhy` — `governor start high (held last session)` / `governor ↓ medium
+  (p95 38.1 ms, drops 21 %)` / `governor ↑ high (p95 12.0 ms held 8 s)` / `manual (settings)`), then three `RENDER`
+  lines from the renderer's `debugInfo()` scalars (`Game.rendererDebug()`, core round 13): `tier · deviceClass/profile ·
+  dpr · canvasW×H`, `calls · tris · rt Mpx · passes · shadow`, `hero tris · skipped (frames not drawn) · stale (programs)
+  · entry ms` with ` (holding)` while the countdown waits on the track entry (§ entry hold). **Dirty-checked**: the
+  sample is taken every `PERF_PAINT_MS` = 500 ms and the `<pre>` is written only when the text changed, so ≤ 2 DOM
+  writes/s (`PerfOverlay.writes` counts them; `perf.test.ts` pins the lines). `hook.info()` carries the same values —
+  `render` (the scalars), `qualityWhy`, `quality`, `entryHold` — so a headless run asserts them; the e2e `entry` flow
+  checks the field set and that the overlay text changed ≤ 2×/s over the ride. Hidden under pause / results / menus.
   Headless note: `--disable-frame-rate-limit` makes RAF fire back-to-back so headless FPS reads are not evidence;
   the phone capture (WebKit iPhone 14: 60 fps, 16.6 / 18.7 ms, PHYS 20 / 60 µs at 5 µs resolution) is.
+- `?bench=1` (`src/game/bench.ts`; how the user runs it: `docs/device/README.md`) — the on-device benchmark (Rider on
+  Glass G2). A START card over the menu (the tap unlocks audio), then eight scenarios with no input, 20 s each after a
+  2 s settle: `menu` (canvas covered, render off), `garage`, `b1 start line`, `b1 ride` (the committed bot-3 golden
+  through `Game.startPlayback`; served from `public/bench/b1-bot-3.json`, a copy `bench.test.ts` holds equal to
+  `harness/inputs/b1-first-ride/bot-3.json`), `b1 ride` at low / medium / high forced, `b1 ride` at cap 60.
+  `&quick=1` = menu + garage at 3 s (the e2e). Toggles honoured inside the same list so runs compare row for row:
+  `&no=audio` (skip `audio.update`, suspend the context), `&no=hud` (no HUD DOM writes), `&no=render` (skip
+  `renderer.render`), `&no=touch`, `&cap=60`. Per rendered frame the app records `FrameSplit` — `App.tickFrame` is
+  bracketed into poll / advance / other and `Game.render` into prep / hud / audio / submit (`Game.lastRender`,
+  `Game.lastAdvance`: four `performance.now()` calls each, a reused object, no allocation) — plus every RAF
+  callback's interval (the display's cadence, 120 on ProMotion), long tasks (`PerformanceObserver`, Chrome only),
+  heap (Chrome only). Per scenario: fps, fps first / last 5 s (the thermal proxy, quoted for `b1 ride · high`),
+  dropped (> 1.5 × the cap period), worst, p50 / p95 / max of the interval and each leg, `debugInfo()` scalars
+  (tier, dpr, canvas, calls, tris, rtMpx; calls / tris 0 when nothing rendered). The report (`BenchReport`, `kind:
+  'trials-bench'`) is shown as a table in the game's face with **Copy report** (`src/ui/clipboard.ts`, the same
+  gesture-safe path as the run log) and **Share**, as one string = markdown table + a fenced JSON block
+  (`formatReport`), appended to `localStorage['trials.benchlog']` (last 10) and exported with the run log as
+  `bench`. `window.__trials.bench = { start, state, report, text }` drives it headlessly; `pnpm harness:e2e
+  --only=bench` proves the instrument (the START tap, both scenarios, the panel, Copy `.live`, every field, the
+  toggles changing the split), `--only=benchfull` runs all eight once. The FPS meter stays up throughout; a status
+  line under it (two dirty-checked writes per second) shows scenario / tier / cap / seconds.
+- Frame cap cadence (`src/game/cadence.ts`, `FrameCadence`): the RAF loop renders when `now >= nextDue − slack`
+  and then `nextDue += period` — phase-locked, so a frame that overruns its slot is followed by an early one and a
+  30 cap holds 30 on a 60 or 120 Hz display; slack = half the measured RAF interval (EMA) so a due time between two
+  slots takes the earlier; more than two periods behind (tab hidden, a long task) resyncs to `now` instead of
+  bursting. The old rule (`now − lastRenderAt >= period − 2`) re-based on whatever late slot it landed on and lost a
+  slot for good each time (`cadence.test.ts`: the same overrun pattern gives 300 vs < 290 frames in 10 s).
 
 ## 15. PWA: manifest, icons, service worker, update toast
 
@@ -650,3 +708,100 @@ Two numbers, DOWNLOAD and SETUP (the user's decision: "B Odometer" with both tra
   Settings that reloads with the choice and states the live solver in its subtitle (*Live solver: V2 · dev
   A/B — reloads the page*; the Default option reads *Default (V2)*). `hook.info().modules.physics` names the
   factory used (`createBikePhysicsV1` under `?physics=v1`). PBs and ghosts are per solver — see §8.
+
+## 18. Local per-track leaderboard (MEGA_PLAN P4; `src/ui/best.ts` `BestTimes.board / record`)
+
+- **Store** (additive; the PB entries and every reader of `get()` are untouched): `trials.best.<trackId>#board` and
+  `trials.best.<trackId>@pro#board` hold `BoardEntry[]` = `{ time, faults, medal, at }` (ISO finish time, `''` for a
+  seeded row), fastest first, ties by fewer faults, at most `BOARD_SIZE` = 5. The key sits under the best-times prefix
+  so **Reset progress** (`clearAllBest`) wipes it with the PBs; a corrupt value reads as an empty board. A track with
+  a PB from before the board existed shows that PB as its one row (seeded on first read), so old progress is never a
+  blank board. Nothing leaves the device: no network, no identity.
+- **Recording**: `Game.publishResults` offers every clear to `bestTimes.record(track, result)` (optional on
+  `BestTimeStore`) *before* it stores a new PB — the seed must still be the previous PB — and writes the 1-based
+  place into `RunResult.rank` (null when outside the top 5 or without a store).
+- **Results panel** (`DomHud.renderBoard`, `.results .board`, top-right of the title band, revealed with the medals
+  at stage 3): `TOP 5 · ROOKIE · #2`, rows `n · medal dot · time · faults✕`, this run's row marked `.you`. The HUD gets
+  the source as `new DomHud(ui, bestOf, (id, bike) => bestTimes.board(id, bike))` (`main.ts`).
+- **Track card** (`TrackSelectScreen.boardHtml`, `.card .board`): the class the next launch rides
+  (`FrontState.bikeClass`) as up to five medal-coloured chips `1 0:42.36 · 2 0:44.10 …`; hidden when the board is empty;
+  lab cards carry none. There is no Watch popover on the card (the `▶ PB` tag opens the replay viewer directly), so no
+  "your runs" list was added there; the `LastRuns` store (§16) still holds the last finished run for the viewer.
+- Tests: `best.test.ts` (ranking, per-class boards, persistence, the PB seed without a duplicate, ties, reset, corrupt
+  data); the shape is asserted by the desktop / run e2e through the results panel's `.board` rows.
+
+## 19. Desktop proof (MEGA_PLAN P3 amendment; `harness/e2e/desktop.mts`, `pnpm harness:e2e --only=desktop`)
+
+Desktop is a target too: the suite runs the same screens as the touch flow at **1280×720 and 1920×1080** in a
+desktop Chromium context (no touch, fine pointer) twice — a **keyboard** flow (real `page.keyboard` presses: menu →
+tracks → run → crash → restart → finish → results → next; Esc pauses / resumes) and a **gamepad** flow with a
+synthetic pad: Playwright cannot emulate one, so the harness defines `navigator.getGamepads` to return a scripted
+`Gamepad` (standard mapping; A confirm, B back / restart, Start pause, RT gas, d-pad nav) the way the live-keys instrument
+injects keys, and edges it through the app's own poll. Asserted: the expected single front screen after every
+transition and none during a run, the legends carry keyboard `<kbd>` glyphs / pad `.pad` glyphs for the active device
+(front screens, pause, results), the touch strip / layer is never `.on` on desktop, faults / clock / phase per step. It
+is part of the default `pnpm harness:e2e` list (front / run / entry / hitrects / grid / bench / boot / desktop) and the
+ship gate's e2e row.
+
+## 20. Audio hooks (audio round 3, additive)
+
+`Game.loadTrack` calls `audio.setBike?.(bike)` after the renderer's `setBikeClass` (every load path: launch, garage
+preview reload, replay header, `hook.setBike`); `App.setAudioScene` calls `audio.setScene?.(scene)` deduplicated —
+`menu` from `goto()` (every front screen), `run` from `play()`, the replay viewer, and the `countdown` / `riding` phase
+inside a run (retry / next out of the results), `results` when `onResults` fires. Both are optional on `AudioSystem`;
+`NullAudio` and older systems are no-ops.
+
+## 21. Level reviewer (core #10; `src/game/review.ts`, `src/ui/review.ts`, `harness/e2e/review.mts`)
+
+The user's ask: "go into the level and kind of play it, see it, jump around, pan around, and then annotate comments on
+the segments of the level — break each level up into six segments, let me annotate comments on the segments, and let
+you iterate and rebuild the levels." It is a **first-class screen, not a URL**: a top-level **REVIEW** tab on the
+Broadcast menu (PLAY · GARAGE · REVIEW · SETTINGS · credits; the five tabs step the tab font down one notch so they fit
+at 844 px, every tab still ≥ 88 × 44) opens the **level picker** (`ReviewPickScreen`, `.review-pick-screen`: one row per
+track — curriculum, playgrounds `p<n>-*`, lab — with its tier, id and `n / 6 noted`), and a row opens the **review UI**
+(`ReviewPanel`, `.review-ui`) on that track. ‹ Tracks returns to the picker, ‹ Menu to the menu, all through `goto` /
+the `.live` rule. `?review=<track>` deep-links to the same UI (the e2e uses it); nothing hides behind `?dev=1`.
+
+**The world under it.** `ReviewSession.open` loads the track and calls `Game.setParked(true)`: the `countdown` phase
+with the entry hold pinned — physics steps with neutral input, nothing counts (no faults, no run clock, no 3-2-1), the
+HUD is off (`Hud.setReview`). The bike is the **probe**: it is parked at the segment start (`Game.teleportBike(x)`: rear
+wheel on the authored profile, angle from the local slope, at rest, on the v2 world's `teleport`) and re-pinned every
+frame, so a tick inside an obstacle or a slope never moves it.
+
+**Camera, honestly.** The renderer has no free-camera hook (`GameRenderer.setCameraOverride` is still unimplemented), so
+"pan" moves the probe and the rig follows it — that is why the world must be held rather than paused: the rig smooths in
+sim time, and a paused world (dt = 0) never moves the camera at all (a > 6 m teleport is a hard cut; small ones froze —
+the first e2e run caught it). Zoom drives the rig's public `setKeys` (one full-track `CameraKey` with `dist` 5–34 m)
+through `renderer.debug.rig`, the replay viewer's seam; the track's own keys are restored on exit. **Vertical pan is not
+offered** — it needs the render hook. One finger / mouse drag pans along the track (1.1 × dist metres per view width),
+pinch / wheel / −+ zoom, **FLY** advances the probe at 8 m/s to the finish, **RIDE** starts a run at the probe (GO, no
+countdown, the strip enabled, the HUD back) and a crash's respawn or R returns the bike to the segment start; **PARK**
+(the same button) holds the world again where the bike is. Keyboard: held lean pans, ←/→ jump a segment, Enter =
+ride / park, V = fly, Esc = back to the picker.
+
+**Six segments.** `reviewSegments(def, placed)`: a playground's `meta.segments` (`segmentsOf`), else the ship table
+(`SHIP_SEGMENTS`, `src/tracks/segments.ts`: six labelled beats per curriculum track), else six equal x-ranges start →
+finish. Each segment counts the compiled `placed` kinds inside it (most frequent first) — the notes card shows them under
+the label and range. The strip along the top (1–6, 44 px, tap to jump, the current one amber, a green dot on noted ones)
+and the card (bottom-left, ≤ 40 % of the width, two-line kinds on short phones) never cover the track centre; the toolbar
+sits bottom-right (Notes · Fly · Ride · − · +).
+
+**Annotations.** Per segment: rating 1–5 (★, tap again to clear), quick tags `too hard` · `too easy` · `boring` ·
+`unreadable` · `camera` · `asset missing` · `fun`, a comment box (the keyboard input ignores editable targets — before
+this, typing `a d w s r space` in the box fed the game). Saved to `localStorage` `trials.review.<track>` → `{ [i]:
+{rating, tags, comment, at} }` on every tap / 400 ms after typing / blur / segment change; empties are dropped. **Copy
+review** puts one string on the clipboard (`copyText`, iOS-safe): a markdown table, then the JSON in a fence —
+`{track, name, build, segments:[{i, from, to, label, rating, tags, comment}], at}`; **Share** goes through
+`navigator.share` when present. The parent files it under `docs/reviews/levels/<track>.md` and re-authors from it.
+
+**Harness.** `window.__trials.review` = `{open, close, active, view, jump, pan(m), zoom, fly, ride, export}`;
+`pnpm harness:e2e --only=review` (phone 932×430 + 844×390, desktop 1280×720): the REVIEW tab is on the menu and the five
+tabs fit → picker rows with `n / 6 noted` → First Ride → six buttons, tap 4 → segment 4 current, in range, titled → rate
+4 ★, tag, type → the strip's noted dot → Copy → the clipboard's JSON (`segments[3]`) carries the note → localStorage →
+a finger drag moves the probe and the camera (+x for a leftward drag) → FLY advances → RIDE drops the bike at the probe
+(< 3 m) and 1.5 s of held gas moves it → PARK → ‹ Tracks (the row now `1 / 6 noted`) → ‹ Menu → `?review=` deep link;
+desktop: mouse drag pans, wheel zooms, Esc leaves. `--only=` takes a comma list (`--only=review,front,run`).
+
+**Owed to render.** `setCameraOverride({mode:'free', x, y, dist})` — with it the probe stays parked where it is, the
+drag pans both axes, and the world can be paused for real; `src/game/review.ts` switches on the hook's presence the way
+`src/game/replay.ts` does.

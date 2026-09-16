@@ -142,6 +142,12 @@ export class MaterialLibrary {
     return this.mats.has(name);
   }
 
+  /** The library name of a material instance (identity), or null for a derived / local one. */
+  nameOf(m: THREE.Material): string | null {
+    for (const [name, mat] of this.mats) if (mat === m) return name;
+    return null;
+  }
+
   surface(kind: SurfaceKind): THREE.MeshStandardMaterial {
     return this.get(SURFACE_MATERIAL[kind] ?? 'dirt');
   }

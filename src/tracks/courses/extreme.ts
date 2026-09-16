@@ -280,9 +280,9 @@ export const X3 = course('x3-gauntlet', 'The Stack', 'extreme')
   .setPiece('tunnel', 'Hall Two')
   .tunnel({ length: 50, style: 'concrete', lit: true })
   .camera({ mode: 'side-tight' })
-  .ledge({ height: 0.5, length: 4 })
+  .ledge({ height: 0.5, length: 8 }) // round 11: 4 -> 8 m. From the standing start 6 m back the hop lands at 3-4 m/s with the front high, and the 1.5 m gap came 4 m later: a second hop with no window (r12 Pro strangers 190 / 195 m x8, the reflex bot's stuck-restart site). 8 m is room to land, settle and gas to the 6-8 m/s that carries the gap on the rear wheel
   .gap({ width: 1.5, depth: 2 })
-  .flat(26) // checkpoint rule: 16 m to the shelf drum
+  .flat(22) // checkpoint rule: 16 m to the shelf drum
   // M2 spinning drum from its shelf
   .drumStep({ radius: 0.8, rolls: true }, { exit: true })
   .endSetPiece()
@@ -296,7 +296,7 @@ export const X3 = course('x3-gauntlet', 'The Stack', 'extreme')
   .flat(16) // a board leaves ~5 m/s: 16 m to build speed for the lip climb
   // H1 lip climb (A line) or ramp + 0.3 m hop (B line), straight into the rails
   .steppedWall({ height: 1.4, width: 4, lip: 0.2 }, 0.3)
-  .flat(2)
+  .flat(8) // round 11: 2 -> 8 m (the round-9 H1 finding: slots straight off the 1.4 wall's hop on a 4 m top were 46 of 67 deaths -> 8 m top). The r12 strangers died 300-315 m x8 "the trenches must be crossed with the front held up after a rear-first landing": 2 m from the wall top to the first kill slot is no room to set the wheelie
   .gap({ width: 0.7, depth: 1.5, hazard: 'kill' })
   .flat(1.3)
   .gap({ width: 0.7, depth: 1.5, hazard: 'kill' })
@@ -342,7 +342,7 @@ export const X3 = course('x3-gauntlet', 'The Stack', 'extreme')
   .setPiece('climb', 'The Stack')
   .camera({ mode: 'side-tight', pitch: (12 * Math.PI) / 180 })
   .kickerPlank({ angleDeg: 45, rise: 4.5 })
-  .box({ width: 16, height: 4.5 })
+  .box({ width: 16, height: 4.5 }) // round 11: stays 16 m. The r12 Pro strangers' summit (505-525 m x17, the DNF) replayed: the climb macro's hop at the foot leaves the crest at ~5 m/s vertical and lands 6-8 m along the top nose-down (vy -7.6); the "hidden launch pad at ~516 m that throws the bike up with no input" is the physics hop machine entering `push` 1.4 s after that landing with every input at zero (p1 tick 18585, both wheels down, vy +3.3) — routed to physics. A 20 m top was tried and WALLED the skill-3 Pro bot (50 attempts, 98 % of faults after CP5; 16 m = 2 attempts on the R6 Pro in harness r12), so the proven shape stands
   .arch({ style: 'pipe' }) // the exit through the hall roof
   .camera({ mode: 'low' })
   .poleRow([4.5, 4.5, 4.5], 1.1) // the chimney caps

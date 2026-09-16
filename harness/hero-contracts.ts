@@ -10,7 +10,7 @@ import type { InputRecording } from '../src/core/replay';
 import { iterateFrames } from '../src/core/replay';
 import { Game } from '../src/game/game';
 import { createBikePhysicsV2 } from '../src/physics/v2/bike';
-import { BIKE_GEOMETRY_V2 } from '../src/physics/v2/tuning';
+import { BIKE_GEOMETRY_V2 } from '../src/render/hero/assetFrame';
 import { FrameBuilder, type RenderFrame } from '../src/render/frame';
 import type { GameRenderer } from '../src/render/index';
 import { GltfBike } from '../src/render/hero/gltfBike';

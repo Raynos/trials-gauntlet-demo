@@ -37,8 +37,6 @@ export interface Macro {
   slots: number;
   /** Closed-loop technique macro (round 8): the frame comes from `control`, not `frame`. */
   control?: MacroControl;
-  /** Physical entry condition used by the search. Explicit stranger inputs remain unrestricted. */
-  canStart?: (state: PhysicsState) => boolean;
   /** Fixed frame script for an open-loop multi-slot macro (length `slots * HOLD`). */
   script?: readonly InputFrame[];
 }
@@ -61,8 +59,8 @@ function script(name: string, code: string, slots: number, parts: [seconds: numb
   while (out.length < total) out.push(COAST_FRAME);
   return { id: nextId++, name, code, frame: out[0]!, holdTicks: total, slots, script: out };
 }
-function closed(name: string, code: string, slots: number, control: MacroControl, canStart?: Macro['canStart']): Macro {
-  return { id: nextId++, name, code, frame: COAST_FRAME, holdTicks: slots * HOLD, slots, control, ...(canStart ? { canStart } : {}) };
+function closed(name: string, code: string, slots: number, control: MacroControl): Macro {
+  return { id: nextId++, name, code, frame: COAST_FRAME, holdTicks: slots * HOLD, slots, control };
 }
 
 /**
@@ -72,7 +70,7 @@ function closed(name: string, code: string, slots: number, control: MacroControl
  * Speed is held at whatever the macro started with. Entry is not its job: `gas-back` lifts the front first.
  */
 const wheelieHold: MacroControl = (st, tick, ctx) => {
-  if (ctx.v0 === undefined) ctx.v0 = st.bike.vel.x;
+  if (ctx.v0 === undefined) ctx.v0 = Math.max(3, st.bike.vel.x);
   const pitch = st.bike.angle * DEG;
   const rate = st.bike.angVel * DEG;
   const err = 40 - (pitch + rate * 0.25);
@@ -121,8 +119,7 @@ export const ACTIONS: readonly Macro[] = [
     [0.22, { throttle: 0.5, lean: 1 }],
     [0.1, { throttle: 0.3, lean: -1 }],
   ]),
-  closed('wheelie-hold', 'wh', 4, wheelieHold, (st) =>
-    st.wheels.rear.grounded && !st.wheels.front.grounded && st.bike.angle > 0 && st.bike.vel.x > 0),
+  closed('wheelie-hold', 'wh', 4, wheelieHold), // 0.5 s of the anticipating hold; chain it
   closed('climb-throw', 'ct', 4, climbThrow), // base gas at neutral, throw when the front is on the face
 ];
 

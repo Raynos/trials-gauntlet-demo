@@ -32,6 +32,9 @@
     "harness:bench": "tsx harness/bench/bench.ts",
     "harness:bench:profile": "tsx harness/bench/profile.ts",
     "harness:critic-prompt": "tsx harness/compare/critic-prompt.ts",
+    "harness:audio": "tsx harness/compare/audio.ts",
+    "harness:hero-webkit": "tsx harness/hero-webkit.mts",
+    "media:deploy": "cd project/releases && vercel deploy --prod --yes",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
@@ -48,6 +51,7 @@
     "@types/jsdom": "^30.0.0",
     "@types/node": "^24.6.0",
     "@types/three": "0.186.0",
+    "agent-browser": "0.37.1",
     "eslint": "^9.39.5",
     "globals": "^16.5.0",
     "jsdom": "^26.1.0",

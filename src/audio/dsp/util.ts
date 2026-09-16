@@ -22,6 +22,17 @@ export class NoiseRng {
   constructor(seed: number) {
     this.s = (seed >>> 0) || 0x9e3779b9;
   }
+  /** Re-seed (per-event variation: the same event index always draws the same values). */
+  reseed(seed: number): void {
+    let x = (seed >>> 0) || 0x9e3779b9;
+    // one mixing round so neighbouring seeds do not start neighbouring sequences
+    x ^= x >>> 16;
+    x = Math.imul(x, 0x7feb352d) >>> 0;
+    x ^= x >>> 15;
+    x = Math.imul(x, 0x846ca68b) >>> 0;
+    x ^= x >>> 16;
+    this.s = x || 0x9e3779b9;
+  }
   /** Uniform in [0, 1). */
   u(): number {
     let x = this.s;

@@ -102,6 +102,19 @@ export function readAnswer(answerFile: string): PairAnswer {
   }
 }
 
+/**
+ * The sealed answer for a pair id: `pair-<id>.answer.json` (video pairs) or `apair-<id>.answer.json`
+ * (audio pairs, harness round 11). A leading `pair-` / `apair-` on the id is tolerated.
+ */
+export function resolveAnswerFile(outDir: string, pairId: string): string {
+  const id = pairId.replace(/^a?pair-/, '');
+  const candidates = pairId.startsWith('apair-')
+    ? [`apair-${id}.answer.json`, `pair-${id}.answer.json`]
+    : [`pair-${id}.answer.json`, `apair-${id}.answer.json`];
+  for (const c of candidates) if (fs.existsSync(path.join(outDir, c))) return path.join(outDir, c);
+  return path.join(outDir, candidates[0]!);
+}
+
 export function unmask(winner: CompareVerdict['winner'], left: 'ours' | 'ref'): CompareVerdict['winnerUnmasked'] {
   if (winner === 'tie' || winner === 'invalid') return winner;
   const right: 'ours' | 'ref' = left === 'ours' ? 'ref' : 'ours';
@@ -162,12 +175,12 @@ export interface LogOptions {
 export function logVerdict(pairId: string, raw: unknown, opts: LogOptions = {}): { record: CompareVerdict; validation: Validation; stats: TagStats } {
   const outDir = opts.outDir ?? path.join(OUT_DIR, 'compare');
   const jsonl = opts.jsonl ?? COMPARE_JSONL;
-  const answer = readAnswer(path.join(outDir, `pair-${pairId}.answer.json`));
+  const answer = readAnswer(resolveAnswerFile(outDir, pairId));
   const validation = validateVerdict(raw);
   const v: Partial<CriticVerdict> = validation.ok ? validation.verdict : validation.partial;
   const winner: CompareVerdict['winner'] = validation.ok ? validation.verdict.winner : 'invalid';
   const record: CompareVerdict = {
-    pairId,
+    pairId: answer.pairId ?? pairId,
     tag: answer.tag,
     critic: opts.critic ?? 'unknown',
     at: new Date().toISOString(),

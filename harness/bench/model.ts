@@ -45,6 +45,7 @@ export function passWeight(name: string): number {
   if (name.startsWith('shadow')) return 0.5;
   if (name.startsWith('scene')) return 2.5;
   if (name.startsWith('ao')) return 1.5;
+  if (name.startsWith('bloom:add')) return 0.3;
   if (name.startsWith('bloom:bright')) return 1.0;
   if (name.startsWith('bloom:composite')) return 1.2;
   if (name.startsWith('bloom')) return 1.0;
@@ -87,21 +88,38 @@ export function gpuWork(passes: PassWrite[], calls: number, tris: number): GpuWo
   return { weightedMB, rawMB, mpx, byPass, msGpu };
 }
 
-/** Phone frame model coefficients (ms). */
+/**
+ * Phone frame model coefficients (ms) — recalibrated 2026-09-15 from device report #1
+ * (docs/device/2026-09-15-5649aa6.md; iPhone, iOS 18.7, 874×330 @ 3):
+ *   low  at cap 60: 59.5 fps, JS tick 2.1 ms, 116 calls / 125 ktris / 0.55 Mpx (holds, ~14 ms spare)
+ *   high at cap 30: interval p95 47 ms, 207 calls / 262 ktris / 6.57 Mpx (2048² shadow, SSAO, HDR) — ≈ 35–45 ms
+ *   medium at cap 30: holds, 184 calls / 191 ktris / 2.08 Mpx (≤ 33 ms; unmeasured at 60)
+ * The JS frame is 2.1 ms (the cap-30 `submit` of ~5 ms is driver back-pressure, not JS), so E + B·calls ≈ 2.2;
+ * the fill term carries the GPU: (40 − 6) / (6.57 − 0.55) ≈ 4.4 ms per raw Mpx written, shadow included
+ * (a depth-only 2048² map is not free on this GPU). Cross-check: medium → 14.7 ms (60 fps borderline —
+ * consistent with "holds 30, unmeasured at 60"); phone-high (PERF.md §3.1) → ≈ 10 ms.
+ */
 export const PHONE = {
-  /** ms per Mpx of render-target writes (pass-averaged; the scene pass dominates). */
-  A: 0.9,
-  /** ms per draw call on the main thread (three.js + Safari + ANGLE/Metal encode). */
-  B: 0.03,
+  /** ms per effective Mpx of render-target writes (`effectiveMpx`: raw px, the trivial additive bloom pass at 0.3). */
+  A: 4.4,
+  /** ms per draw call on the main thread (Safari three.js + ANGLE/Metal encode). */
+  B: 0.02,
   /** ms per 1000 triangles. */
-  C: 0.006,
-  /** ms per MB of texture touched per frame. */
-  D: 0.02,
-  /** constant: Game.render + HUD DOM + audio + RAF/compositor. */
-  E: 5.5,
-  /** ± on the estimate, as a fraction, until the device report lands. */
-  confidence: 0.4,
+  C: 0.004,
+  /** ms per MB of texture touched per frame (unresolved by the report; kept small). */
+  D: 0.0,
+  /** constant: Game.render + HUD DOM + audio + RAF (the report's 2.1 ms JS minus B·116). */
+  E: 1.0,
+  /** ± on the estimate: three device points, one of them (high) a bound not a reading. */
+  confidence: 0.25,
 } as const;
+
+/** Raw Mpx written per frame with the pass' cost class: a plain additive quad over the canvas counts 0.3, everything else 1. */
+export function effectiveMpx(passes: PassWrite[]): number {
+  let mpx = 0;
+  for (const p of passes) mpx += ((p.width * p.height) / 1e6) * (p.name.startsWith('bloom:add') ? 0.3 : 1);
+  return mpx;
+}
 
 export interface PhoneEstimate {
   ms: number;
@@ -113,7 +131,8 @@ export interface PhoneEstimate {
 
 /** `texMBTouched`: resident texture MB × the fraction a riding frame samples (≈ 0.5 — half the world's skins are behind the camera or in another chunk). */
 export function phoneEstimate(rtMpx: number, calls: number, tris: number, texMBResident: number, touchedFraction = 0.5): PhoneEstimate {
-  const fill = PHONE.A * rtMpx;
+  // A skipped frame (perf cut #1: 0 draws) writes no render target either.
+  const fill = calls === 0 && tris === 0 ? 0 : PHONE.A * rtMpx;
   const draws = PHONE.B * calls;
   const trisMs = PHONE.C * (tris / 1000);
   const textures = PHONE.D * texMBResident * touchedFraction;

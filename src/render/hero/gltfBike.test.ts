@@ -5,7 +5,8 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { Game } from '../../game/game';
 import { createBikePhysicsV2 } from '../../physics/v2/bike';
-import { BIKE_GEOMETRY_V2, bikeTuningV2, suspensionPoint } from '../../physics/v2/tuning';
+import { bikeTuningV2 } from '../../physics/v2/tuning';
+import { BIKE_GEOMETRY_V2, suspensionPoint } from './assetFrame';
 import { GRIP_X, GRIP_Y, PEG_X, PEG_Y } from '../../physics/v2/rider';
 import type { GameRenderer } from '../index';
 import { FrameBuilder, type RenderFrame } from '../frame';
@@ -77,11 +78,23 @@ function forkExportBudget(travel: number): number {
 // Their rounding affects the measured distance and the authored radius once each.
 const rearExportBudget = pointError(.585, .21) + 2 * pointError(.43, .10);
 
+/** Merge #3: on `main` the asset's axle markers are the solver's REST axles (compression 0; the Rookie rear exactly,
+ * the front 5 mm off) — the branch's `rearReferenceCompression` / `frontReferenceCompression` (7 cm / 5 cm of
+ * sag at the markers) described its own solver. The neutral mechanism frame is therefore compression 0. */
 function mechanismFrame(): RenderFrame {
   const f = new FrameBuilder().frame;
   f.bikeX = 4; f.bikeY = 2; f.dt = 1 / 60;
-  positionWheels(f, BIKE_GEOMETRY_V2.rearReferenceCompression, BIKE_GEOMETRY_V2.frontReferenceCompression);
+  positionWheels(f, 0, 0);
   return f;
+}
+
+/** Chassis-local rear wheel -> the asset swingarm arc: how far `main`'s straight-axis wheel sits off the arm's end. */
+function arcError(f: RenderFrame): number {
+  const c = Math.cos(f.bikeAngle), s = Math.sin(f.bikeAngle);
+  const pivot = BIKE_GEOMETRY_V2.swingPivot, offset = BIKE_GEOMETRY_V2.chassisToAxle;
+  const x = (f.rear.x - f.bikeX) * c + (f.rear.y - f.bikeY) * s - offset.x - pivot.x;
+  const y = -(f.rear.x - f.bikeX) * s + (f.rear.y - f.bikeY) * c - offset.y - pivot.y;
+  return Math.abs(Math.hypot(x, y) - BIKE_GEOMETRY_V2.swingRadius);
 }
 
 function expectPhysicalAnchors(rig: ReturnType<typeof fixture>, f: RenderFrame): void {
@@ -143,20 +156,34 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
     expect(clevisEnd.length()).toBeLessThan(1e-4);
     const armScale = swing.scale.clone();
     const f = mechanismFrame();
-    rig.bike.update(f);
+    rig.bike.update(f); rig.bike.root.updateMatrixWorld(true);
+    // At main's rest (compression 0) the arm's axle block IS the rear wheel: the marker is the solver's rest axle.
+    const restBlock = blockCenter.clone().applyMatrix4(swing.matrixWorld);
+    expect(Math.hypot(restBlock.x - f.rear.x, restBlock.y - f.rear.y)).toBeLessThan(2e-4);
+    let worstBlock = 0;
     for (let i = 0; i <= 40; i++) {
       f.cut = false;
       positionWheels(f, .13 + .13 * Math.sin(i / 12), .12 + .12 * Math.sin(i / 10));
       f.rear.spin = i * .3; f.front.spin = i * .2;
       rig.bike.update(f); rig.bike.root.updateMatrixWorld(true);
       const block = blockCenter.clone().applyMatrix4(swing.matrixWorld);
-      expect(Math.hypot(block.x - f.rear.x, block.y - f.rear.y)).toBeLessThan(2e-4);
+      // Merge #3: `main` moves the rear wheel on the straight axis (0.12, 0.99) from the rest axle, which is a CHORD
+      // of the asset's swingarm arc (it meets the arc at compression 0 and again at 0.303 m, past the 0.26 travel).
+      // The rigid arm aims at the wheel, so its block misses the wheel by exactly the chord's sagitta — the same
+      // number `debug.armLengthError` reports and `arcError` computes from the frame: 2.67 cm at mid-travel (0.15 m),
+      // measured; 1.27 cm at full 0.26 m travel. The branch's hinge (`< 2e-4` here) has no solver behind it on main.
+      const blockError = Math.hypot(block.x - f.rear.x, block.y - f.rear.y);
+      worstBlock = Math.max(worstBlock, blockError);
+      expect(Math.abs(blockError - arcError(f))).toBeLessThan(rearExportBudget + 2e-4);
+      expect(Math.abs(blockError - rig.bike.debug.armLengthError)).toBeLessThan(2e-4);
       expect(swing.scale.equals(armScale)).toBe(true);
       const bottom = clevisEnd.clone().applyMatrix4(rig.mesh('shock_clevis').matrixWorld);
       expect(bottom.distanceTo(rig.point('attach_shock_link'))).toBeLessThan(2e-4);
       expect(rodBottom.clone().applyMatrix4(rig.mesh('shock_shaft').matrixWorld).distanceTo(bottom)).toBeLessThan(2e-4);
       expect(rodTop.clone().applyMatrix4(rig.mesh('shock_shaft').matrixWorld).distanceTo(rig.point('attach_shock_rod_top'))).toBeLessThan(2e-4);
     }
+    expect(worstBlock).toBeLessThan(.03); // measured 0.0267 m (Rookie rear, compression 0.15)
+    expect(worstBlock).toBeGreaterThan(.02); // the chord is real: when main gains the hinge this tightens to 2e-4
   });
 
   it('preserves wheel world angles, fixed fork alignment, and shock roll through a production replay', async () => {
@@ -175,6 +202,7 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
     const sourceDir = rig.point('attach_shock_link').sub(rig.point('attach_shock_top')).normalize();
     const localForkAxis = rig.point('attach_fork_top').sub(rig.point('attach_front_axle_rest')).normalize();
     const pose: number[] = [];
+    let worstArm = 0, worstFront = 0;
     for (const [count, throttle, brake, lean, flags] of rec.runs) for (let i = 0; i < count!; i++) {
       game.setInput({ throttle: throttle! / 255, brake: brake! / 255, lean: lean! / 127, restart: Boolean(flags! & 2), hop: Boolean(flags! & 1) }); game.step(1);
       const f = frames.build(game.getState(), 1);
@@ -194,14 +222,20 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
       const axis = BIKE_GEOMETRY_V2.forkAxis;
       const arithmetic = 128 * Number.EPSILON * Math.max(1, Math.abs(f.bikeX), Math.abs(f.bikeY));
       const physicalResidual = Math.abs(x * axis.y - y * axis.x);
-      const hinge = bikeTuningV2(rec.header.bike).suspension.rear.hinge!;
-      const rearX = (f.rear.x - f.bikeX) * c + (f.rear.y - f.bikeY) * s - hinge.pivot.x;
-      const rearY = -(f.rear.x - f.bikeX) * s + (f.rear.y - f.bikeY) * c - hinge.pivot.y;
-      const physicalRearResidual = Math.abs(Math.hypot(rearX, rearY) - hinge.radius);
-      // A separate physical closure requirement (also exercised by position.test.ts)
-      // must pass before evaluating the much smaller exported-node rounding budget.
-      expect(physicalRearResidual).toBeLessThan(2e-4);
-      expect(physicalResidual).toBeLessThan(2e-4);
+      // Merge #3: `main`'s physics moves the rear wheel on a straight axis (tuning.ts `suspension.rear.axis`), not
+      // on the swingarm's arc — the branch's hinge closure (`physicalRearResidual < 2e-4`) has no solver behind
+      // it here. The arm-length error is the wheel's distance off the arc; record its worst value instead.
+      const pivot = BIKE_GEOMETRY_V2.swingPivot, radius = BIKE_GEOMETRY_V2.swingRadius;
+      const rearX = (f.rear.x - f.bikeX) * c + (f.rear.y - f.bikeY) * s - .065 - pivot.x;
+      const rearY = -(f.rear.x - f.bikeX) * s + (f.rear.y - f.bikeY) * c + .21 - pivot.y;
+      const physicalRearResidual = Math.abs(Math.hypot(rearX, rearY) - radius);
+      worstArm = Math.max(worstArm, rig.bike.debug.armLengthError);
+      worstFront = Math.max(worstFront, physicalResidual);
+      // Merge #3: `main`'s front slider is the axis (-0.4, 0.92) from the rest axle (0.715, -0.215) — 5 mm below the
+      // asset's fork-line marker (0.715, -0.21) and 0.26 deg off the asset's fork axis — so the wheel rides up to
+      // 2.6 mm off the glb's fork line over this replay (worst measured 0.00263 m at full compression; the first
+      // failing frame was 0.00182 m; the branch's slider held 2e-4). The rear arm-length error peaks at 0.0294 m.
+      expect(physicalResidual).toBeLessThan(5e-3);
       expect(Math.abs(rig.bike.debug.armLengthError - physicalRearResidual)).toBeLessThan(rearExportBudget + arithmetic);
       const travel = x * axis.x + y * axis.y;
       expect(Math.abs(front.sub(top).cross(localForkAxis).length() - physicalResidual)).toBeLessThan(forkExportBudget(travel) + arithmetic);
@@ -211,6 +245,9 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
       pose.push(rig.bike.debug.frontTravel);
     }
     expect(Math.max(...pose) - Math.min(...pose)).toBeGreaterThan(.05);
+    // The straight-axis / arc mismatch over a b3 replay (merge #3 gap list): the wheel stays within 5 cm of the arm's end.
+    expect(worstArm).toBeLessThan(.05);
+    expect(worstFront).toBeGreaterThan(1e-3); // the 5 mm rest offset is real; when main adopts the asset's fork line this tightens to 2e-4
   });
 
   it('repeats the same rigid pose after arbitrary history, including a reset and unchanged timestamps', () => {
@@ -244,8 +281,20 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
     const markerOffset = rig.point('attach_frame_origin').sub(rig.point('attach_chassis_com'));
     expect(markerOffset.distanceTo(new THREE.Vector3(BIKE_GEOMETRY_V2.chassisToAxle.x, BIKE_GEOMETRY_V2.chassisToAxle.y, 0))).toBeLessThan(1e-7);
     expect(rig.point('attach_front_axle_rest').distanceTo(rig.point('attach_rear_axle_rest'))).toBeCloseTo(BIKE_GEOMETRY_V2.wheelbase, 6);
+    // Merge #3: the asset was authored on the Rookie row. `main`'s Pro row (tuning.ts BIKE_PRESETS_V2.pro) pulls both
+    // rest axles 1 cm inboard (rear -0.575, front 0.705; wheelbase 1.28), so only the Rookie's rest axles are the
+    // asset's markers (rear exactly, front 5 mm low); the Pro's wheels sit 1 cm (rear) / 1.1 cm (front) off them.
+    const axleOffset = { rookie: { rear: 0, front: 5e-3, wheelbase: 0 }, pro: { rear: 1e-2, front: Math.hypot(1e-2, 5e-3), wheelbase: -0.02 } } as const;
+    for (const bike of ['rookie', 'pro'] as const) {
+      const t = bikeTuningV2(bike);
+      expect(t.wheel.wheelbase).toBeCloseTo(BIKE_GEOMETRY_V2.wheelbase + axleOffset[bike].wheelbase, 12);
+      const offset = BIKE_GEOMETRY_V2.chassisToAxle;
+      const rearRest = new THREE.Vector3(t.suspension.rear.axle.x - offset.x, t.suspension.rear.axle.y - offset.y, 0);
+      const frontRest = new THREE.Vector3(t.suspension.front.axle.x - offset.x, t.suspension.front.axle.y - offset.y, 0);
+      expect(rearRest.distanceTo(new THREE.Vector3(BIKE_GEOMETRY_V2.rear.x, BIKE_GEOMETRY_V2.rear.y, 0))).toBeCloseTo(axleOffset[bike].rear, 12);
+      expect(frontRest.distanceTo(new THREE.Vector3(BIKE_GEOMETRY_V2.front.x, BIKE_GEOMETRY_V2.front.y, 0))).toBeCloseTo(axleOffset[bike].front, 12);
+    }
     for (const bike of ['rookie', 'pro'] as const) for (const angle of [-2.2, 0, .7, 3.1]) {
-      expect(bikeTuningV2(bike).wheel.wheelbase).toBe(BIKE_GEOMETRY_V2.wheelbase);
       const f = mechanismFrame(); f.bikeAngle = angle;
       const matrices: number[][] = [];
       for (const [rear, front] of [[0, 0], [.07, .05], [.26, .24]]) {
@@ -255,9 +304,13 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
         f.cut = matrices.length % 2 === 0;
         rig.bike.update(f); rig.bike.root.updateMatrixWorld(true);
         expectPhysicalAnchors(rig, f);
-        if (rear === BIKE_GEOMETRY_V2.rearReferenceCompression && front === BIKE_GEOMETRY_V2.frontReferenceCompression) {
-          expect(rig.point('attach_rear_axle_rest').distanceTo(new THREE.Vector3(f.rear.x, f.rear.y, 0))).toBeLessThan(1e-6);
-          expect(rig.point('attach_front_axle_rest').distanceTo(new THREE.Vector3(f.front.x, f.front.y, 0))).toBeLessThan(1e-6);
+        if (rear === 0 && front === 0) {
+          // At `main`'s rest (compression 0) the markers are the wheels: Rookie rear exact, front the 5 mm; Pro 1 cm inboard.
+          const rearMarker = rig.point('attach_rear_axle_rest').distanceTo(new THREE.Vector3(f.rear.x, f.rear.y, 0));
+          const frontMarker = rig.point('attach_front_axle_rest').distanceTo(new THREE.Vector3(f.front.x, f.front.y, 0));
+          expect(Math.abs(rearMarker - axleOffset[bike].rear)).toBeLessThan(1e-6);
+          expect(Math.abs(frontMarker - axleOffset[bike].front)).toBeLessThan(1e-6);
+          if (bike === 'rookie') { expect(rearMarker).toBeLessThan(1e-6); expect(frontMarker).toBeLessThan(6e-3); }
         }
         expect(rig.bike.frame.rotation.z).toBe(angle);
         expect(rig.bike.debug.chassisShift).toBe(0); expect(rig.bike.debug.angleCorrection).toBe(0);

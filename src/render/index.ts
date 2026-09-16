@@ -1,4 +1,3 @@
-import { releaseSceneAllocations } from './contextResources';
 /**
  * Render contract + ThreeRenderer facade (CONTRACT.md §2.7).
  *
@@ -12,13 +11,13 @@ import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
 import { HERO_URLS, loadGltf, lodUrl, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
-import type { ByteProgress, StepProgress, StepRunner } from '../boot/plan';
+import type { ByteProgress, StepRunner } from '../boot/plan';
 import type { PrepareStep } from '../boot/steps';
 import { isRiderLodEnabled, lodChoice, setRiderLodEnabled, variantMaterialsFor } from './hero/lod';
 import { DEFAULT_RIDER_OUTFIT, normalizeRiderOutfit, riderPreset } from '../core/riderPresets';
+import { riderUrl } from './hero/urls';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
-import { riderUrl } from './hero/urls';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { CameraRig } from './camera/rig';
 import { FrameBuilder } from './frame';
@@ -29,12 +28,14 @@ import { PostChain, tierPixelRatio, type PassWrite } from './post/chain';
 import { RiderModel } from './rider/riderModel';
 import { buildBiomeKit } from './world/biomeKit';
 import { PropBatch, tierCasts, tierHides, tierManaged } from './world/props';
+import { shrinkSkinArrays } from './world/skinArray';
 import { buildGates, type Gates } from './world/gates';
 import { buildObstacles, type ObstacleMeshes } from './world/obstacles';
 import { groundFloorY, profileY } from './world/track';
+import { stabilizePrograms, type MaterialKindsReport } from './util/materialKinds';
+import { tagBloomers } from './post/emissiveBloom';
 import { HALL } from './world/hall';
 import { buildRideSurfaces } from './world/deck';
-import { materialPrograms, releaseTerminalPrograms, ResourceRetirement } from './resourceRetirement';
 
 /** One frame later (rAF, or a macrotask without one) — the ≤ 16 ms task boundary for `prepare()` and track entry. */
 const yieldFrame = (): Promise<void> => new Promise((r) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => r()) : setTimeout(r, 0)));
@@ -72,7 +73,10 @@ export interface GameRenderer {
    * (materials only; no rebuild, no frame skipped).
    */
   setBikeClass?(c: BikeClass): void;
+  /** Merge #3 (blender-work): cosmetic rider outfit swap (both detail levels reloaded); resolves true once installed. */
   setRiderOutfit?(outfit: RiderOutfit): Promise<boolean>;
+  /** CONTRACT §2.7 (perf cut #3): the app's device class — `high` on a phone is the phone-high pass list (docs/plans/PERF.md §3.1). */
+  setDeviceClass?(c: 'phone' | 'desktop'): void;
 }
 
 export interface ThreeRendererOptions {
@@ -87,6 +91,7 @@ export interface ThreeRendererOptions {
    */
   riderModel?: ModelChoice;
   bikeModel?: ModelChoice;
+  /** Rider clothing (`street` default; the garage / `?outfit=` choice). */
   riderOutfit?: RiderOutfit;
   /** Boot plan: the DOWNLOAD counter for the hero glTF files the constructor starts fetching (docs/tasks/loading-progress-invariant.md). */
   heroBytes?: ByteProgress;
@@ -103,6 +108,8 @@ const WORLD_MESH = /^(props:|deck:|obstacles:|ribbon:)/;
 /** The surfaces the bike rides — the only shadow receivers on `low` (the deck AO skirt excluded). */
 const RIDE_SURFACE = /^(deck:(?!ao)|obstacles:|ribbon:)/;
 /** Hero parts too small to change the 512² silhouette on `low` (chain, sprockets, shock, pegs, spokes): no shadow draw there. */
+/** Perf cut #1: consecutive identical frames skipped before one is drawn anyway (a valve for mutations the key cannot see). */
+const SKIP_MAX = 30;
 const HERO_SMALL = /^(chain|sprocket_(front|rear)|shock_(body|spring|shaft|clevis)|pegs|wheel_(front|rear)(_spokes|:spokes))$/;
 
 export interface RenderBudget {
@@ -140,47 +147,6 @@ interface World {
 export class ThreeRenderer implements GameRenderer {
   readonly canvas: HTMLCanvasElement;
   private readonly renderer: THREE.WebGLRenderer;
-  private readonly retirement: ResourceRetirement;
-  private disposed = false;
-  private disposal: Promise<void> | null = null;
-  private terminalPrograms = { deleted: 0, contextReleased: 0 };
-  /** Invalidates queued compile batches before detached owners can be retired. */
-  private sceneEpoch = 0;
-  private contextUnavailable = false;
-  private restored: Promise<void> = Promise.resolve();
-  private resolveRestored: (() => void) | null = null;
-  private readonly onContextLost = (): void => {
-    this.contextUnavailable = true;
-    this.restored = new Promise(resolve => { this.resolveRestored = resolve; });
-    this.sceneEpoch++;
-    this.entryToken++;
-    this.entering = false;
-    this.retirement.contextLost();
-    // Three's loss listener ran first, but initGLContext runs only on restoration.
-    // Release every surviving owner now, including inactive full/LOD document resources.
-    releaseSceneAllocations([this.scene, ...Object.values(this.gltf).flatMap(doc => doc ? [doc.scene] : [])]);
-    this.lib.dispose();
-    this.art.releaseGPU();
-    this.postRef?.dispose();
-    this.postRef = null;
-    this.lightingRig?.dispose();
-    this.lightingRig = null;
-    this.lightingApplied = false;
-    this.scene.environment = null;
-    this.scene.background = null;
-  };
-  private readonly onContextRestored = (): void => {
-    this.contextUnavailable = false;
-    this.retirement.contextRestored();
-    if (!this.disposed) {
-      this.ensureLighting();
-      if (this.track) this.lighting.setFloor(groundFloorY(this.track.def.profile, this.biome.interior));
-      if (this.artBackground) this.scene.background = this.artBackground;
-      if (this.track) this.beginEntry();
-    }
-    this.resolveRestored?.();
-    this.resolveRestored = null;
-  };
   private readonly scene = new THREE.Scene();
   private readonly lib: MaterialLibrary;
   private lightingRig: LightingRig | null = null;
@@ -235,6 +201,23 @@ export class ThreeRenderer implements GameRenderer {
   private readonly contextKind: string;
   private readonly syncPixel = new Uint8Array(4);
   private readonly tmp = new THREE.Vector3();
+  /** Perf cut #0: what `stabilizePrograms` did on the last scene change (`debugInfo().stabilized`). */
+  private programReport: MaterialKindsReport = { singlePass: 0, split: 0, depth: 0 };
+  /**
+   * Perf cut #1 (docs/plans/PERF.md §3.2 #1): a frame whose inputs equal the last drawn frame's is not
+   * drawn. The renderer is a pure function of (state, alpha, simulated time, camera, scene mutations):
+   * on the garage / menu / pause / results screens the state is frozen, so after the rig settles every
+   * frame is identical — and the user's iPhone paid 0.8 ms of JS + 112 draws for each one. The key is
+   * the physics tick, alpha, tSim, phase, runTime, checkpoint, the ghost's tick and the camera's pose;
+   * every scene mutation calls `invalidate()`; `SKIP_MAX` consecutive skips force a redraw as a valve.
+   */
+  private deviceClass: 'phone' | 'desktop' = 'desktop';
+  private bloomers = 0;
+  private frameDirty = true;
+  private skipRun = 0;
+  private skippedFrames = 0;
+  private readonly lastKey = { tick: -1, alpha: -1, tSim: -1, phase: 'menu' as GamePhase, runTime: -1, ghostTick: -1, checkpoint: -1 };
+  private readonly lastCam = new Float64Array(9);
   private lastCheckpoint = -1;
   // Ghost (CONTRACT §2.7 setGhost): a second bike+rider with ghosted materials, no
   // shadow, no particles, no contact blobs; nothing else in the scene reads it.
@@ -266,7 +249,7 @@ export class ThreeRenderer implements GameRenderer {
     });
     this.tier = options.quality ?? 'high';
     this.devicePixelRatio = options.pixelRatio ?? Math.min(window.devicePixelRatio || 1, 2);
-    this.pixelRatio = tierPixelRatio(this.tier, this.devicePixelRatio, this.width);
+    this.pixelRatio = tierPixelRatio(this.tier, this.devicePixelRatio, this.width, this.phoneHigh);
     this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     // ACES + the biome grade live in the composite pass on the HDR tiers; three applies `toneMapping`
@@ -275,9 +258,6 @@ export class ThreeRenderer implements GameRenderer {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     const gl = this.renderer.getContext();
-    this.retirement = new ResourceRetirement(gl, (error) => console.error('[render] resource retirement failed', error));
-    this.canvas.addEventListener('webglcontextlost', this.onContextLost);
-    this.canvas.addEventListener('webglcontextrestored', this.onContextRestored);
     this.contextKind = gl instanceof WebGL2RenderingContext ? 'webgl2' : 'webgl';
     this.rendererString = describeRenderer(gl);
 
@@ -308,6 +288,12 @@ export class ThreeRenderer implements GameRenderer {
       this.rebuildIfArtLanded();
     };
     (window as unknown as { __render?: ThreeRenderer }).__render = this; // debug handle for the harness
+    (window as unknown as { __setMerge?: (on: boolean) => void }).__setMerge = (on) => {
+      PropBatch.MERGE = on; // perf cut #4 A/B switch (harness only; takes effect on the next setTrack)
+    };
+    (window as unknown as { __setSkinArray?: (on: boolean) => void }).__setSkinArray = (on) => {
+      PropBatch.SKIN_ARRAY = on; // perf cut #4b A/B switch (harness only; takes effect on the next setTrack)
+    };
     performance.mark?.('render:ctor');
   }
 
@@ -316,14 +302,14 @@ export class ThreeRenderer implements GameRenderer {
   private get lighting(): LightingRig {
     if (!this.lightingRig) {
       this.lightingRig = new LightingRig(this.renderer, this.scene);
-      this.lightingRig.setQuality(this.tier);
+      this.lightingRig.setQuality(this.shadowTier);
     }
     return this.lightingRig;
   }
 
   /** Sky + PMREM for the current biome (GPU work; once per biome change). */
   private ensureLighting(): void {
-    if (this.contextUnavailable || this.lightingApplied) return;
+    if (this.lightingApplied) return;
     this.lightingApplied = true;
     this.lighting.apply(this.biome);
   }
@@ -331,7 +317,7 @@ export class ThreeRenderer implements GameRenderer {
   private get post(): PostChain {
     if (!this.postRef) {
       this.postRef = new PostChain(this.renderer, this.scene, this.rig.camera);
-      this.postRef.setQuality(this.tier);
+      this.postRef.setQuality(this.tier, this.phoneHigh);
       this.postRef.setSize(this.width, this.height, this.pixelRatio);
       this.postRef.applyBiome(this.biome);
     }
@@ -403,7 +389,6 @@ export class ThreeRenderer implements GameRenderer {
    * loaded before `ready`, so captures are deterministic.
    */
   setModels(m: ModelChoices, bytes?: ByteProgress): void {
-    if (this.disposed) return;
     this.models = { riderModel: m.riderModel === 'gltf' ? 'gltf' : 'proc', bikeModel: m.bikeModel === 'gltf' ? 'gltf' : 'proc' };
     const want = this.models;
     const outfit = this.riderOutfit;
@@ -418,9 +403,9 @@ export class ThreeRenderer implements GameRenderer {
           ? Promise.all([loadGltf(url, false, bytes), loadGltf(lodUrl(url), true, bytes)])
           : Promise.resolve([this.gltf.rider, this.gltf.riderLod]),
       ]);
-      // A superseded outfit request must not even overwrite the stored documents: a later
+      // A superseded request (models or outfit) must not even overwrite the stored documents: a later
       // quality change could otherwise resurrect the old outfit despite its swap being skipped.
-      if (this.disposed || want !== this.models || outfit !== this.riderOutfit) return;
+      if (want !== this.models || outfit !== this.riderOutfit) return;
       if (want.riderModel === 'gltf') {
         if (!rider[0] || !rider[1]) throw new Error(`Could not load both detail levels of ${outfit} rider outfit`);
         // Validate both documents before any installed identity or live material changes.
@@ -449,8 +434,8 @@ export class ThreeRenderer implements GameRenderer {
       });
   }
 
+  /** Merge #3 (blender-work): swap the rider's clothing. Reloads both detail levels; false if the procedural rider is up or the load failed. */
   async setRiderOutfit(outfit: RiderOutfit): Promise<boolean> {
-    if (this.disposed) return false;
     const canonical = normalizeRiderOutfit(outfit);
     if (!canonical) return false;
     outfit = canonical;
@@ -477,16 +462,15 @@ export class ThreeRenderer implements GameRenderer {
 
   /** The document the tier draws: `high` the authored file, `low` / `medium` the LOD twin when it loaded. */
   private bikeDoc(): GLTF | null {
-    return lodChoice(this.tier) === 'lod' ? this.gltf.bikeLod ?? this.gltf.bike : this.gltf.bike;
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier) === 'lod' ? this.gltf.bikeLod ?? this.gltf.bike : this.gltf.bike;
   }
 
   private riderDoc(): GLTF | null {
-    return lodChoice(this.tier, 'rider') === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier, 'rider') === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
   }
 
   /** Round 14: rider LOD gate for `low` / `medium` (default off — see `hero/lod.ts lodChoice`); rebuilds the hero when the document changes. */
   setRiderLod(on: boolean): void {
-    if (this.disposed) return;
     if (on === isRiderLodEnabled()) return;
     setRiderLodEnabled(on);
     if (this.bikeRef && this.riderRef && this.gltf.rider) this.applyModels();
@@ -527,7 +511,6 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   private applyModels(): void {
-    if (this.disposed) return;
     const wantBike = this.models.bikeModel === 'gltf' && this.gltf.bike ? 'gltf' : 'proc';
     const wantRider = this.models.riderModel === 'gltf' && this.gltf.rider ? 'gltf' : 'proc';
     let changed = false;
@@ -535,7 +518,6 @@ export class ThreeRenderer implements GameRenderer {
     const bikeStale = this.bike instanceof GltfBike && this.bike.source !== this.bikeDoc();
     const riderStale = this.rider instanceof GltfRider && this.rider.source !== this.riderDoc();
     if (this.kindOfBike(this.bike) !== wantBike || bikeStale) {
-      this.sceneEpoch++;
       const next = this.makeBike(wantBike);
       if (this.tier === 'low') shrinkTextures(next.root, 512, 256);
       next.setLivery(this.bikeClass);
@@ -546,11 +528,10 @@ export class ThreeRenderer implements GameRenderer {
       this.scene.add(next.root);
       this.bike = next;
       this.rider.attach(next);
-      this.retireObject(old.root, () => old.dispose());
+      old.dispose();
       changed = true;
     }
     if (this.kindOfRider(this.rider) !== wantRider || riderStale) {
-      this.sceneEpoch++;
       const old = this.rider;
       const next = this.makeRider(wantRider);
       old.detach();
@@ -559,7 +540,7 @@ export class ThreeRenderer implements GameRenderer {
       if (this.tier === 'low') shrinkTextures(this.bike.root, 512, 256); // after attach: the glTF rider hangs under the bike frame
       this.scene.add(next.root);
       this.rider = next;
-      this.retireObject(old.root, () => old.dispose());
+      old.dispose();
       changed = true;
     }
     // Palette siblings reuse the same GLTF document and live skeleton.
@@ -570,9 +551,9 @@ export class ThreeRenderer implements GameRenderer {
     if (changed && this.ghost) {
       // The ghost follows the same choice (ghost tint works for both kits).
       const gs = this.ghostState;
-      const old = this.ghost;
-      this.scene.remove(old.root);
-      this.retireObject(old.root, () => { old.bike.dispose(); old.rider.dispose(); for (const mat of old.mats) mat.dispose(); });
+      this.scene.remove(this.ghost.root);
+      this.ghost.bike.dispose();
+      this.ghost.rider.dispose();
       this.ghost = this.buildGhost();
       this.ghost.root.visible = gs !== null;
     }
@@ -596,36 +577,25 @@ export class ThreeRenderer implements GameRenderer {
    * is art-complete). Nothing here reads the wall clock.
    */
   whenReady(): Promise<void> {
-    if (this.disposal) return this.disposal;
-    if (this.contextUnavailable) return this.restored.then(() => this.whenReady());
     const req = this.artRequest;
     const entry = this.entryPending;
-    return Promise.all([this.art.whenSettled, req, this.heroPending, entry, this.retirement.whenIdle()]).then(() => {
-      if (this.disposal) return this.disposal;
-      if (this.contextUnavailable) return this.whenReady();
+    return Promise.all([this.art.whenSettled, req, this.heroPending, entry]).then(() => {
       if (this.artRequest !== req || this.entryPending !== entry) return this.whenReady();
       // Round 10: the settle callback only rebuilds an undrawn world; do the same here so a
       // caller that awaits `whenReady()` right after `setTrack` gets the art-complete world
       // even when the settle fired before `setTrack` finished wiring it.
       this.rebuildIfArtLanded();
-      return this.retirement.whenIdle().then(() => {
-        if (this.disposal) return this.disposal;
-        if (this.artRequest !== req || this.entryPending !== entry) return this.whenReady();
-        return undefined;
-      });
+      return undefined;
     });
   }
 
   /** Rebuild the world with the pack if it settled after the build and nothing has been drawn since. */
   private rebuildIfArtLanded(): void {
-    if (this.disposed) return;
     const w = this.world;
     if (this.track && w && this.art.ok && w.builtAtFrame === this.frameCount && w.artKey !== this.artKey()) this.setTrack(this.track);
   }
 
   private prepared: Promise<void> | null = null;
-  /** A superseded entry must finish its in-flight GPU poll before another compile starts. */
-  private compilePending: Promise<void> = Promise.resolve();
   private preparing = false;
   /** `prepare()` timeline: [label, ms, bytes] per step (diagnostic; `debugInfo().prepare`). */
   readonly prepareTimeline: { step: string; ms: number; bytes: number }[] = [];
@@ -645,7 +615,6 @@ export class ThreeRenderer implements GameRenderer {
    * two materials per task) · one warm-up frame through the post chain.
    */
   prepare(run: StepRunner<PrepareStep>): Promise<void> {
-    if (this.disposed) return Promise.resolve();
     if (this.prepared) return this.prepared;
     this.preparing = true;
     const timeline = this.prepareTimeline;
@@ -659,15 +628,11 @@ export class ThreeRenderer implements GameRenderer {
       stepBytes = 0;
     };
     const work = async (): Promise<void> => {
-      const activeStep = (key: PrepareStep, task: (progress: StepProgress) => Promise<void>): Promise<void> => run(key, async (progress) => {
-        await this.restored;
-        if (!this.disposed) await task(progress);
-      });
       // The boot art set: started by the constructor (with the plan's reader) or here; awaited by the `bootArt` step.
       const artP = this.art.load();
       await yieldFrame();
       mark('art:start');
-      await activeStep('heroMeshes', async (p) => {
+      await run('heroMeshes', async (p) => {
         p.set(0, 2, 'bike');
         if (!this.bikeRef) {
           this.bikeRef = new BikeModel(this.lib);
@@ -675,28 +640,27 @@ export class ThreeRenderer implements GameRenderer {
           if (this.track) this.bindGround(this.track);
         }
         await yieldFrame();
-        if (this.disposed) return;
         mark('hero:bike');
         p.set(1, 2, 'rider');
         this.ensureHero();
         await yieldFrame();
         mark('hero:rider');
       });
-      await activeStep('lighting', async (p) => {
+      await run('lighting', async (p) => {
         p.detail('sky environment');
         this.ensureLighting();
         await yieldFrame();
         mark('lighting');
       });
-      await activeStep('postChain', async () => {
+      await run('postChain', async () => {
         void this.post;
         await yieldFrame();
         mark('post:create');
       });
-      await activeStep('materials', async (p) => {
+      await run('materials', async (p) => {
         // Procedural materials in 12 ms slices (a 512² painter is 50–65 ms whole on a slow host).
         const n = this.lib.jobCount;
-        while (!this.disposed && this.lib.jobsDone < n) {
+        while (this.lib.jobsDone < n) {
           p.set(this.lib.generateProgress * 100, 100, `${this.lib.currentJobName} ${this.lib.jobsDone + 1}/${n}`);
           this.lib.generateStep(12);
           await yieldFrame();
@@ -706,26 +670,26 @@ export class ThreeRenderer implements GameRenderer {
         stepBytes = this.lib.textureBytes;
         mark('materials');
       });
-      await activeStep('heroModels', async (p) => {
+      await run('heroModels', async (p) => {
         if (this.models.bikeModel === 'gltf' || this.models.riderModel === 'gltf') {
           p.detail(this.models.riderModel === 'gltf' && this.models.bikeModel === 'gltf' ? 'bike + rider' : this.models.riderModel === 'gltf' ? 'rider' : 'bike');
           await this.heroPending;
         }
         mark('hero:gltf');
       });
-      await activeStep('bootArt', async (p) => {
+      await run('bootArt', async (p) => {
         await artP;
         stepBytes = this.art.bytesDelivered;
         p.detail(`${this.art.progress.done}/${this.art.progress.total} in`);
         mark('art:settled');
         await yieldFrame();
       });
-      await activeStep('shaders', async (p) => {
+      await run('shaders', async (p) => {
         // Compile what is in the scene (hero + the world if a track is set) in chunks.
         await this.compileMaterials(this.collectMaterials(this.scene), (d, n) => p.set(d, n, `${d}/${n} programs`));
         mark('shaders');
       });
-      await activeStep('firstFrame', async (p) => {
+      await run('firstFrame', async (p) => {
         // Two rows: the plain scene (shadow-depth programs + the GPU's first draw of every pipeline) and then
         // the composer (screen-quad shaders compileAsync cannot reach). On software GL these are the
         // seconds-long tasks — the driver JITs each pipeline at its first draw; no JS split exists.
@@ -733,9 +697,6 @@ export class ThreeRenderer implements GameRenderer {
         this.renderer.info.autoReset = false;
         this.post.renderSceneOnly();
         await yieldFrame();
-        if (this.disposed) return;
-        await this.restored;
-        if (this.disposed) return;
         mark('firstframe:world');
         p.set(1, 2, 'post chain');
         this.post.render();
@@ -745,7 +706,7 @@ export class ThreeRenderer implements GameRenderer {
     };
     this.prepared = work().finally(() => {
       this.preparing = false;
-      this.booted = !this.disposed;
+      this.booted = true;
     });
     return this.prepared;
   }
@@ -765,59 +726,46 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   /**
-   * Compile `mats` in tasks of two materials (`compileAsync`; on a real driver a handful of ms
-   * each, on software GL the first standard program is seconds and not splittable from JS),
+   * Compile `mats` in tasks of two materials (`compile`; on a real driver a handful of ms each,
+   * on software GL the first standard program is seconds and not splittable from JS),
    * against the tier's scene target (program parameters include the output colour space and
    * tone mapping, so a compile against the wrong target builds a variant the frame never uses).
    * Returns the summed task ms. `abort()` (round 14 entry) stops between tasks.
    */
-  private compileMaterials(mats: THREE.Material[], report?: (done: number, total: number) => void, abort?: () => boolean): Promise<number> {
-    const epoch = this.sceneEpoch;
-    const stale = (): boolean => this.disposed || this.contextUnavailable || epoch !== this.sceneEpoch || !!abort?.();
-    const run = async (): Promise<number> => {
-      let ms = 0;
-      const chunk = 2;
-      for (let i = 0; i < mats.length; i += chunk) {
-        if (stale()) break;
-        const t0 = performance.now();
-        const keep = new Set(mats.slice(i, i + chunk));
-        const batch = new THREE.Group();
-        this.scene.traverse((o) => {
-          const mesh = o as THREE.Mesh;
-          const material = mesh.material;
-          if (!material) return;
-          const selected = (Array.isArray(material) ? material : [material]).filter((m) => keep.has(m));
-          if (!selected.length) return;
-          // compile() traverses invisible meshes too. Detached, non-recursive clones restrict
-          // the batch without touching live visibility/parents, and retain skin/instance/morph
-          // flags, geometry, skeleton and shadow roles used to choose the actual shader variant.
-          const copy = mesh.clone(false);
-          copy.material = Array.isArray(material) ? selected : selected[0]!;
-          batch.add(copy);
-        });
-        const r = this.renderer;
-        const previous = r.getRenderTarget(), face = r.getActiveCubeFace(), mip = r.getActiveMipmapLevel();
-        let pending: Promise<unknown>;
-        try {
-          r.setRenderTarget(this.post.sceneTarget);
-          // Program creation is synchronous; the promise only polls readiness. Use the real
-          // target scene for lights/fog/environment, and restore GL target state before yielding.
-          pending = r.compileAsync(batch, this.rig.camera, this.scene);
-        } finally {
-          r.setRenderTarget(previous, face, mip);
+  private async compileMaterials(mats: THREE.Material[], report?: (done: number, total: number) => void, abort?: () => boolean): Promise<number> {
+    let ms = 0;
+    const chunk = 2;
+    for (let i = 0; i < mats.length; i += chunk) {
+      if (abort?.()) break;
+      const t0 = performance.now();
+      const keep = new Set(mats.slice(i, i + chunk));
+      const hidden: THREE.Object3D[] = [];
+      this.scene.traverse((o) => {
+        const m = (o as THREE.Mesh).material;
+        if (!m) return;
+        const list = Array.isArray(m) ? m : [m];
+        if (!list.some((x) => keep.has(x)) && o.visible) {
+          o.visible = false;
+          hidden.push(o);
         }
-        await pending;
-        if (stale()) break;
-        ms += performance.now() - t0;
-        report?.(Math.min(mats.length, i + chunk), mats.length);
-        await yieldFrame();
+      });
+      try {
+        this.renderer.setRenderTarget(this.post.sceneTarget);
+        // Synchronous `compile` (round 14): `compileAsync` polls on a timer between the hide above
+        // and the restore below, and a harness `render()` landing in that gap drew a frame with the
+        // other chunks missing (one low capture in three differed). `compile` issues the links in
+        // this task; a parallel-compile driver finishes them in the background and the entry's
+        // warm-up + `finish()` waits for them.
+        this.renderer.compile(this.scene, this.rig.camera);
+      } finally {
+        this.renderer.setRenderTarget(null);
+        for (const o of hidden) o.visible = true;
       }
-      return ms;
-    };
-    const pending = this.compilePending.then(run);
-    // A failed old request must not poison later track/quality requests.
-    this.compilePending = pending.then(() => undefined, () => undefined);
-    return pending;
+      ms += performance.now() - t0;
+      report?.(Math.min(mats.length, i + chunk), mats.length);
+      await yieldFrame();
+    }
+    return ms;
   }
 
   /** Textures a material set samples (maps + the scene background), each once. */
@@ -845,7 +793,6 @@ export class ThreeRenderer implements GameRenderer {
    * resolves after it; `render()` paints the placeholder until then (play mode).
    */
   private beginEntry(): void {
-    if (this.disposed || this.contextUnavailable) return;
     const token = ++this.entryToken;
     const t0 = performance.now();
     const st = this.entryStats;
@@ -872,8 +819,8 @@ export class ThreeRenderer implements GameRenderer {
       let bytes = 0;
       for (const t of texs) {
         if (stale()) return;
-        const img = t.image as { width?: number; height?: number } | undefined;
-        if (img?.width && img.height) bytes += img.width * img.height * 4 * 1.33;
+        const img = t.image as { width?: number; height?: number; depth?: number } | undefined;
+        if (img?.width && img.height) bytes += img.width * img.height * (img.depth ?? 1) * 4 * 1.33; // perf cut #4b: an array counts every layer
         const ta = performance.now();
         this.renderer.initTexture(t);
         st.textureMs += performance.now() - ta;
@@ -917,6 +864,7 @@ export class ThreeRenderer implements GameRenderer {
       .then(() => {
         if (token !== this.entryToken) return;
         this.entering = false;
+        this.invalidate();
         st.ms = +(performance.now() - t0).toFixed(1);
         performance.mark?.('render:entry');
       });
@@ -933,14 +881,13 @@ export class ThreeRenderer implements GameRenderer {
   // -- contract -------------------------------------------------------------
 
   setTrack(track: CompiledTrack): void {
-    if (this.disposed) return;
     this.clearWorld();
     this.track = track;
     const biome = biomeFor(track.def.meta?.biome);
     if (biome !== this.biome || !this.lightingApplied) {
       this.biome = biome;
-      this.lightingApplied = false;
-      this.ensureLighting();
+      this.lightingApplied = true;
+      this.lighting.apply(biome);
     }
     // Per-track art (round 9): request what this biome draws beyond the boot set (other
     // plates + skies, wall decals, the night crowd). `whenReady()` waits for it; if it lands
@@ -986,7 +933,7 @@ export class ThreeRenderer implements GameRenderer {
 
     const group = new THREE.Group();
     group.name = 'world';
-    PropBatch.CHUNK_M = this.tier === 'low' ? 80 : 40; // round 12: fewer chunk draws per riding frame on the phone tier
+    PropBatch.CHUNK_M = this.tier === 'low' || this.phoneHigh ? 80 : 40; // round 12: fewer chunk draws per riding frame on the phone tier
     const ribbons = buildRideSurfaces(track, this.biome, this.lib);
     const obstacles = buildObstacles(track, this.lib);
     const gates = buildGates(track, this.biome, this.lib, art);
@@ -999,8 +946,22 @@ export class ThreeRenderer implements GameRenderer {
       for (const m of mats) if ((m as THREE.MeshStandardMaterial).isMeshStandardMaterial) this.lib.complete(m as THREE.MeshStandardMaterial);
     });
     harmonizeUv1(group);
-    if (this.tier === 'low') shrinkTextures(group, 512, 256);
+    if (this.tier === 'low') {
+      shrinkTextures(group, 512, 256);
+      shrinkSkinArrays(group, 512); // perf cut #4b: the container skin array, layer by layer
+    }
     this.scene.add(group);
+    // Perf cut #5 (PERF.md §3.2 #5): the world's ~1 240 nodes never move — compute their matrices once and
+    // stop three recomposing every one of them each frame (`updateMatrixWorld` recurses regardless of
+    // `matrixWorldAutoUpdate` in r186; it is `matrixAutoUpdate` that costs). The nodes that do move — see-saw
+    // and drum roots, the picked melt / lamp lights and their targets — stay automatic, so `render()` needs
+    // no manual matrix calls and cannot miss one.
+    group.updateMatrixWorld(true);
+    group.traverse((o) => {
+      o.matrixAutoUpdate = false;
+    });
+    for (const o of obstacles.seesaws.values()) o.matrixAutoUpdate = true;
+    for (const o of obstacles.drums.values()) o.matrixAutoUpdate = true;
     this.applyTierVisibility();
     this.world = {
       group,
@@ -1061,6 +1022,7 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   onEvent(e: GameEvent): void {
+    this.invalidate(); // perf cut #1: events spawn particles / flash / cut history
     this.emitters.onEvent(e);
     if (e.type === 'finish') this.flashT = this.lastTSim;
     if (e.type === 'restart') {
@@ -1129,7 +1091,7 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   setBikeClass(c: BikeClass): void {
-    if (this.disposed) return;
+    this.invalidate(); // perf cut #1: a livery change in a frozen garage frame
     this.bikeClass = c === 'pro' ? 'pro' : 'rookie';
     // The hero may not exist yet (built lazily by `ensureHero` / swapped by `applyModels`): both
     // paths read `bikeClass`, so a call before the first frame still lands.
@@ -1137,11 +1099,37 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   setQuality(tier: QualityTier): void {
-    if (this.disposed) return;
     if (tier === this.tier) return;
     this.tier = tier;
-    this.postRef?.setQuality(tier);
-    this.lightingRig?.setQuality(tier);
+    this.applyQuality();
+  }
+
+  /** Perf cut #3: phone vs desktop decides what `high` means (`phoneHigh`); the app calls this once at boot. */
+  setDeviceClass(c: 'phone' | 'desktop'): void {
+    if (c === this.deviceClass) return;
+    this.deviceClass = c;
+    this.applyQuality();
+  }
+
+  /**
+   * Phone-high (PERF.md §3.1, by the device report's model: ≈ 14 ms on the user's iPhone vs 17.6 with a
+   * 1024² world shadow): LDR straight to the canvas at DPR ≤ 1.5, the hero-only 512² shadow, an emissive-only
+   * bloom at 1/8 res, no SSAO / HDR / composite, volumetrics + decals on, no scatter, no hall shafts, 80 m
+   * prop chunks, the LOD hero, full textures.
+   */
+  private get phoneHigh(): boolean {
+    return this.deviceClass === 'phone' && this.tier === 'high';
+  }
+
+  /** The lighting rig's shadow tier for the current profile (phone-high runs low's hero-only map). */
+  private get shadowTier(): QualityTier {
+    return this.phoneHigh ? 'low' : this.tier;
+  }
+
+  private applyQuality(): void {
+    const tier = this.tier;
+    this.postRef?.setQuality(tier, this.phoneHigh);
+    this.lightingRig?.setQuality(this.shadowTier);
     this.emitters.countScale = tier === 'low' ? 0.5 : 1;
     this.emitters.ambientEnabled = tier !== 'low';
     // Round 12: the tier owns the canvas resolution (low ≤ 1.0 DPR / 1600 px, medium ≤ 1.25, high ≤ 2).
@@ -1159,7 +1147,10 @@ export class ThreeRenderer implements GameRenderer {
       // (`bikeRef`, not the getter: a phone sets `low` before `prepare()` has built the hero — that build must stay in the loader's chunked tasks.)
       if (this.bikeRef) shrinkTextures(this.bikeRef.root, 512, 256);
       if (this.riderRef) shrinkTextures(this.riderRef.root, 512, 256);
-      if (this.world) shrinkTextures(this.world.group, 512, 256);
+      if (this.world) {
+        shrinkTextures(this.world.group, 512, 256);
+        shrinkSkinArrays(this.world.group, 512); // perf cut #4b: the container skin array, layer by layer
+      }
     }
   }
 
@@ -1172,9 +1163,11 @@ export class ThreeRenderer implements GameRenderer {
    */
   private applyTierVisibility(): void {
     const low = this.tier === 'low';
+    const heroShadow = this.shadowTier === 'low'; // perf cut #3: phone-high casts the hero only, like low
+    const phoneHigh = this.phoneHigh;
     this.scene.traverse((o) => {
       if (!o.name) return;
-      if (tierManaged(o.name)) o.visible = !tierHides(o.name, this.tier);
+      if (tierManaged(o.name)) o.visible = !tierHides(o.name, this.tier, phoneHigh);
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       if (HERO_SMALL.test(o.name)) {
@@ -1187,18 +1180,64 @@ export class ThreeRenderer implements GameRenderer {
       if (ud.castHigh === undefined) ud.castHigh = o.castShadow;
       if (ud.receiveHigh === undefined) ud.receiveHigh = o.receiveShadow;
       // Medium shadow casters (`tierCasts`): props by name; low: no world caster at all.
-      o.castShadow = !low && ud.castHigh && (!o.name.startsWith('props:') || tierCasts(o.name, this.tier));
-      o.receiveShadow = ud.receiveHigh && (!low || RIDE_SURFACE.test(o.name));
+      o.castShadow = !heroShadow && ud.castHigh && (!o.name.startsWith('props:') || tierCasts(o.name, this.tier));
+      o.receiveShadow = ud.receiveHigh && (!heroShadow || RIDE_SURFACE.test(o.name));
     });
+    // Perf cut #4: the world's unnamed meshes (gate plaques, lamps, hall singles) kept their built `castShadow` and were
+    // drawn into the hero-only 512² map whenever they fell inside its 4 m box (9 draws a frame at the start gate).
+    const world = this.scene.getObjectByName('world');
+    world?.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || o.name) return;
+      const ud = o.userData as { castHigh?: boolean };
+      if (ud.castHigh === undefined) ud.castHigh = o.castShadow;
+      o.castShadow = !heroShadow && ud.castHigh;
+    });
+    // Perf cut #0: no per-frame program re-acquisition (single-pass transparents, per-kind clones, per-kind depth materials).
+    this.programReport = stabilizePrograms(this.scene, this.lib);
+    if (phoneHigh) this.bloomers = tagBloomers(this.scene); // perf cut #3: the emissive-only bloom's sources
+    this.invalidate(); // perf cut #1: a build / hero swap / tier change reaches the pixels
   }
 
+
+  /** Perf cut #1: the next `render()` must draw (a scene mutation the frame key cannot see). */
+  invalidate(): void {
+    this.frameDirty = true;
+  }
+
+  /** Perf cut #1: true when nothing that reaches the pixels changed since the last drawn frame. Records the new key either way. */
+  private unchangedFrame(f: { tick: number; tSim: number; checkpoint: number }, alpha: number, cam: THREE.PerspectiveCamera): boolean {
+    const k = this.lastKey;
+    const c = this.lastCam;
+    const p = cam.position;
+    const q = cam.quaternion;
+    const same =
+      !this.frameDirty &&
+      this.skipRun < SKIP_MAX &&
+      k.tick === f.tick &&
+      k.alpha === alpha &&
+      k.tSim === f.tSim &&
+      k.phase === this.phase &&
+      k.runTime === this.runTime &&
+      k.checkpoint === f.checkpoint &&
+      k.ghostTick === (this.ghostState ? this.ghostState.tick : -1) &&
+      c[0] === p.x && c[1] === p.y && c[2] === p.z && c[3] === q.x && c[4] === q.y && c[5] === q.z && c[6] === q.w && c[7] === cam.fov && c[8] === cam.zoom;
+    k.tick = f.tick;
+    k.alpha = alpha;
+    k.tSim = f.tSim;
+    k.phase = this.phase;
+    k.runTime = this.runTime;
+    k.checkpoint = f.checkpoint;
+    k.ghostTick = this.ghostState ? this.ghostState.tick : -1;
+    c[0] = p.x; c[1] = p.y; c[2] = p.z; c[3] = q.x; c[4] = q.y; c[5] = q.z; c[6] = q.w; c[7] = cam.fov; c[8] = cam.zoom;
+    return same;
+  }
 
   camera(): CameraDebug {
     return this.rig.debug();
   }
 
   render(state: PhysicsState, alpha: number): number {
-    if (this.disposed || this.contextUnavailable) return 0;
     const t0 = performance.now();
     if (!this.booted) {
       if (this.lazyBoot) {
@@ -1228,6 +1267,16 @@ export class ThreeRenderer implements GameRenderer {
 
     this.rig.update(f);
     const cam = this.rig.camera;
+    if (this.unchangedFrame(f, alpha, cam)) {
+      // Perf cut #1: identical to the last drawn frame — the canvas keeps it; no traversal, no draws.
+      // `renderer.info` is left alone: it keeps the last DRAWN frame's calls / tris, which is what
+      // `debugInfo()` documents (a reset here read 0 in the static garage, e2e `garage debugInfo calls`).
+      this.skipRun++;
+      this.skippedFrames++;
+      return performance.now() - t0;
+    }
+    this.skipRun = 0;
+    this.frameDirty = false;
     if (this.lighting.isHeroShadow) this.lighting.follow(f.bikeX, f.bikeY, false);
     else this.lighting.follow(this.rig.targetX, this.rig.targetY, this.rig.distance > 20);
 
@@ -1375,14 +1424,14 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   resize(width: number, height: number, pixelRatio?: number): void {
-    if (this.disposed) return;
+    this.invalidate(); // perf cut #1
     if (pixelRatio !== undefined) this.devicePixelRatio = pixelRatio;
     this.width = width;
     this.height = height;
     // Round 12: the tier caps the host's ratio — low ≤ 1.0 and ≤ 1600 px wide, medium ≤ 1.25,
     // high ≤ 2 — and the canvas itself is sized by it (the browser upscales the canvas; the
     // composite no longer writes a full-DPR frame).
-    const pr = tierPixelRatio(this.tier, this.devicePixelRatio, width);
+    const pr = tierPixelRatio(this.tier, this.devicePixelRatio, width, this.phoneHigh);
     if (pr !== this.pixelRatio) {
       this.pixelRatio = pr;
       this.renderer.setPixelRatio(pr);
@@ -1457,7 +1506,7 @@ export class ThreeRenderer implements GameRenderer {
     devicePixelRatio: number;
     canvasW: number;
     canvasH: number;
-    /** Last frame's draw calls / triangles (all passes, `info.autoReset = false`). */
+    /** Last DRAWN frame's draw calls / triangles (all passes, `info.autoReset = false`; a frame cut #1 skipped leaves them as they were). */
     calls: number;
     tris: number;
     /** Render-target pixels written per frame (Mpx) and the same in MB (colour + depth), shadow map included; `rtPasses` lists them. */
@@ -1477,12 +1526,18 @@ export class ThreeRenderer implements GameRenderer {
     passes: number;
     /** Round 14: programs held by scene materials that are not their current one (memory only; never released mid-session). */
     stalePrograms: number;
+    /** Perf cut #0 (`util/materialKinds.ts`): transparents forced single-pass, meshes re-pointed at a per-kind clone, casters given a per-kind depth material. */
+    stabilized: MaterialKindsReport;
+    /** Perf cut #1: frames `render()` did not draw because nothing reaching the pixels changed. */
+    skippedFrames: number;
+    /** Perf cut #3: the device class the app declared and the profile `high` resolves to. */
+    deviceClass: 'phone' | 'desktop';
+    profile: 'phone-high' | QualityTier;
+    bloomers: number;
     /** Round 14: last track entry — wall ms from `setTrack` to ready, and its breakdown (`entryStats`). */
     entryMs: number;
     entry: ThreeRenderer['entryStats'];
     entering: boolean;
-    retirement: ResourceRetirement['stats'];
-    terminalPrograms: ThreeRenderer['terminalPrograms'];
     art: { settled: boolean; ok: boolean; loadMs: number; deliveredMB: number; inWorld: boolean; trackComplete: boolean; trackIds: number; builtAtFrame: number; frames: number };
     prepare: { step: string; ms: number; bytes: number }[];
   } {
@@ -1521,79 +1576,37 @@ export class ThreeRenderer implements GameRenderer {
       textureGenMs: this.textureGenMs,
       passes: this.postRef?.info.passes ?? 0,
       stalePrograms: this.staleProgramCount(),
+      stabilized: this.programReport,
+      skippedFrames: this.skippedFrames,
+      deviceClass: this.deviceClass,
+      profile: this.phoneHigh ? 'phone-high' : this.tier,
+      bloomers: this.bloomers,
       entryMs: this.entryStats.ms,
       entry: this.entryStats,
       entering: this.entering,
-      retirement: { ...this.retirement.stats },
-      terminalPrograms: { ...this.terminalPrograms },
       art: { settled: this.art.settled, ok: this.art.ok, loadMs: Math.round(this.art.loadMs), deliveredMB: +(this.art.bytesDelivered / (1024 * 1024)).toFixed(2), inWorld: this.world?.withArt ?? false, trackComplete: this.art.requested(this.artIds), trackIds: this.artIds.length, builtAtFrame: this.world?.builtAtFrame ?? -1, frames: this.frameCount },
     };
   }
 
   dispose(): void {
-    if (this.disposed) return;
-    this.disposed = true;
-    this.resolveRestored?.();
-    this.resolveRestored = null;
-    this.entryToken++;
-    this.sceneEpoch++;
-    const art = this.art;
-    // A late decode can still add CPU bitmaps. Reclaim them when that request settles,
-    // without rebuilding the scene or holding GPU teardown on an unstarted/stalled fetch.
-    this.art.onRequestSettled = () => art.dispose();
-    this.art.onProgress = null;
     this.clearWorld();
-    const bike = this.bikeRef, rider = this.riderRef, ghost = this.ghost;
-    for (const owner of [bike, rider]) if (owner) {
-      this.scene.remove(owner.root);
-      this.retireObject(owner.root, () => owner.dispose());
-    }
-    if (ghost) {
-      this.scene.remove(ghost.root);
-      this.retireObject(ghost.root, () => { ghost.bike.dispose(); ghost.rider.dispose(); for (const mat of ghost.mats) mat.dispose(); });
-    }
+    this.postRef?.dispose();
+    this.lightingRig?.dispose();
+    this.lib.dispose();
+    this.art.dispose();
+    this.artBackground?.dispose();
+    for (const s of this.emitters.systems) s.dispose();
+    this.renderer.dispose();
     this.canvas.remove();
-    this.disposal = (async () => {
-      // Source epochs and disposed guards stop queued batches and late boot/model callbacks.
-      // Only already-started GPU work owns a lifetime here; unrelated network work cannot
-      // delay destruction (art.whenSettled need not ever resolve if boot never started).
-      await this.compilePending;
-      this.retirement.retire(this.renderer.info.programs ?? [], () => {
-        this.postRef?.dispose();
-        this.lightingRig?.dispose();
-        this.lib.dispose();
-        this.art.dispose();
-        this.artBackground?.dispose();
-        for (const s of this.emitters.systems) s.dispose();
-        this.renderer.dispose();
-        this.terminalPrograms = releaseTerminalPrograms(this.renderer, this.renderer.getContext().isContextLost());
-      });
-      try { await this.retirement.whenIdle(); } finally {
-        this.canvas.removeEventListener('webglcontextlost', this.onContextLost);
-        this.canvas.removeEventListener('webglcontextrestored', this.onContextRestored);
-      }
-    })();
-    void this.disposal.catch((error) => console.error('[render] disposal failed', error));
   }
 
   // -- internals ------------------------------------------------------------
 
-  /** Call only after detaching the old instance and advancing sceneEpoch. Compilation takes
-   * its meshes from the live scene at each batch, and queued work with an old epoch is skipped.
-   * Thus no later batch can create a new owned-material variant after this snapshot. Shared
-   * library materials retain their normal Three refcounts; the owner decides what to dispose. */
-  private retireObject(root: THREE.Object3D, dispose: () => void): void {
-    this.retirement.retire(materialPrograms(this.renderer, this.collectMaterials(root)), dispose);
-  }
-
   private clearWorld(): void {
-    this.sceneEpoch++;
     const w = this.world;
     if (!w) return;
     this.scene.remove(w.group);
-    this.world = null;
-    const owned = this.collectMaterials(w.group).filter((material) => !material.name);
-    this.retirement.retire(materialPrograms(this.renderer, owned), () => w.group.traverse((o) => {
+    w.group.traverse((o) => {
       const m = o as THREE.Mesh;
       if (m.geometry) m.geometry.dispose();
       const mats = Array.isArray(m.material) ? m.material : m.material ? [m.material] : [];
@@ -1606,7 +1619,8 @@ export class ThreeRenderer implements GameRenderer {
           (mat as THREE.Material).dispose();
         }
       }
-    }));
+    });
+    this.world = null;
   }
 }
 
@@ -1675,11 +1689,12 @@ export function estimateTextureMB(scene: THREE.Scene): number {
         bytes += delivered;
         return;
       }
-      const img = value.image as { width?: number; height?: number } | undefined;
+      const img = value.image as { width?: number; height?: number; depth?: number } | undefined;
       const w = img?.width ?? 0;
       const h = img?.height ?? 0;
+      const d = img?.depth ?? 1; // perf cut #4b: a DataArrayTexture is w × h × layers
       const bpp = value.type === THREE.FloatType ? 16 : value.type === THREE.HalfFloatType ? 8 : 4;
-      bytes += w * h * bpp * (value.generateMipmaps ? 1.333 : 1);
+      bytes += w * h * d * bpp * (value.generateMipmaps ? 1.333 : 1);
     }
   };
   scene.traverse((obj) => {

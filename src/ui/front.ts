@@ -8,14 +8,14 @@
  */
 import type { BikeClass, BiomeId, Medal, TrackDef, TrackTier } from '../core/types';
 import { BIOME_TINT, type ArtManifest } from './art';
-import type { BestEntry, FpsChoice, ModelChoice } from './best';
+import type { BestEntry, BoardEntry, FpsChoice, ModelChoice } from './best';
 import { formatTime } from './format';
 import type { QualityChoice } from './menu';
-import { labTracks, medalTotals, nextTrack, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
+import { labTracks, medalTotals, nextTrack, playgroundTracks, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
 import { conceal, reveal } from './live';
 
-export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits';
+export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits' | 'review';
 
 export interface FrontCallbacks {
   /** Track select confirmed a card (called ≈180 ms into the card's fly-up so the scene swaps under it). */
@@ -107,7 +107,7 @@ const LEGEND_PAD = `<span><i class="pad">✚</i>Move</span><span><i class="pad a
 const LEGEND_TOUCH = `<span>Tap to select</span><span>Swipe rows</span>`;
 
 /** Base screen: root element, show/hide with the shared fade, a device-aware legend. */
-abstract class Screen {
+export abstract class Screen {
   readonly root: HTMLDivElement;
   protected legend: HTMLDivElement | null = null;
 
@@ -337,12 +337,14 @@ export class MainMenuScreen extends Screen {
     this.list.setItems([
       { id: 'play', label: 'Play' },
       { id: 'garage', label: 'Garage' },
+      { id: 'review', label: 'Review' },
       { id: 'settings', label: 'Settings' },
       { id: 'credits', label: 'Credits', minor: true },
     ]);
     this.list.onPick = (id) => {
       if (id === 'play') this.cb.goto('tracks');
       else if (id === 'garage') this.cb.goto('garage');
+      else if (id === 'review') this.cb.goto('review');
       else if (id === 'settings') this.cb.goto('settings');
       else if (id === 'credits') this.cb.goto('credits');
     };
@@ -428,6 +430,8 @@ export class TrackSelectScreen extends Screen {
     private readonly cb: FrontCallbacks,
     private readonly bestOf: (id: string) => BestEntry | null,
     private readonly state: () => FrontState,
+    /** Local leaderboard (game.md § leaderboard): the class in effect's top 5 on the card. */
+    private readonly boardOf?: (id: string, bike: BikeClass) => BoardEntry[],
   ) {
     super(parent, 'tracks-screen');
     const head = h('div', 'tracks-head');
@@ -474,6 +478,23 @@ export class TrackSelectScreen extends Screen {
       rowEl.appendChild(car);
       this.tiers.appendChild(rowEl);
       this.rows.push({ tier: lab[0]!.tier, el: rowEl, cards, locked: false });
+    }
+    // Playgrounds (tracks round 10): one beginner course per biome, right after Lab so every biome is reachable without finishing anything.
+    const playgrounds = playgroundTracks(tracks);
+    if (playgrounds.length > 0) {
+      const rowEl = h('div', 'tier-row playground-row');
+      rowEl.innerHTML = `<div class="tier-head"><b>Playgrounds</b><span>One beginner course per biome · every asset · always open · no medals</span></div>`;
+      const car = h('div', 'carousel');
+      const cards: CardRef[] = [];
+      const r = this.rows.length;
+      playgrounds.forEach((t, c) => {
+        const el = this.card(t, false, r, c, true);
+        car.appendChild(el);
+        cards.push({ el, track: t, locked: false });
+      });
+      rowEl.appendChild(car);
+      this.tiers.appendChild(rowEl);
+      this.rows.push({ tier: playgrounds[0]!.tier, el: rowEl, cards, locked: false });
     }
     for (const tier of TIER_ORDER) {
       const list = tracksInTier(ship, tier);
@@ -524,7 +545,7 @@ export class TrackSelectScreen extends Screen {
     const medal = best?.medal;
     const ahead = best && target ? best.time <= target : false;
     // A stored PB recording: the ghost tag doubles as the "Watch PB" control (click / V / pad Y opens the replay viewer).
-    const ghost = best?.recording ? `<em class="ghost watch" title="Watch the personal best">${this.state().ghost ? 'PB ghost' : 'PB'} · ▶ Watch</em>` : '';
+    const ghost = best?.recording ? `<em class="ghost watch" title="Watch the personal best">▶ ${this.state().ghost ? 'Ghost' : 'PB'}</em>` : '';
     const prev = TIER_ORDER[TIER_ORDER.indexOf(t.tier) - 1];
     const bikeTag = best?.bike === 'pro' ? '<em class="bike">Pro</em>' : '';
     // Locked: the card itself states the unlock rule (the row head says it too, but a thumb lands on the card).
@@ -534,7 +555,7 @@ export class TrackSelectScreen extends Screen {
       <div class="top"><span>${lab ? 'LAB' : escapeHtml(t.id.split('-')[0]!.toUpperCase())}</span>${ghost}${bikeTag}</div>
       ${lab ? '' : `<div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>`}${lockLine}
       <div class="body"><div class="name">${escapeHtml(t.name)}</div><div class="tech">${escapeHtml(t.meta?.technique ?? '')}</div>
-      <div class="times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div></div>`;
+      <div class="times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div>${lab ? '' : this.boardHtml(t.id)}</div>`;
     const artEl = el.querySelector<HTMLDivElement>('.art')!;
     const medalEl = el.querySelector<HTMLDivElement>('.medal')!;
     this.art.whenReady(() => {
@@ -550,6 +571,21 @@ export class TrackSelectScreen extends Screen {
       }
     });
     return el;
+  }
+
+  /** Top-5 chips for the class the next launch rides (`FrontState.bikeClass`), medal-coloured; nothing when the board is empty. */
+  private boardHtml(trackId: string): string {
+    const bike = this.state().bikeClass;
+    const rows = this.boardOf?.(trackId, bike) ?? [];
+    if (rows.length === 0) return '';
+    // Chips carry a short clock (`31.2`, `1:04.8`); the full time is the title.
+    const short = (t: number): string => {
+      const m = Math.floor(t / 60);
+      const sec = (t - m * 60).toFixed(1);
+      return m > 0 ? `${m}:${sec.padStart(4, '0')}` : sec;
+    };
+    const chips = rows.map((e, i) => `<span class="${e.medal}" title="#${i + 1} ${bike} · ${formatTime(e.time)} · ${e.faults} faults"><b>${short(e.time)}</b></span>`).join('');
+    return `<div class="board" data-bike="${bike}" data-rows="${rows.length}">${chips}</div>`;
   }
 
   private focusCard(r: number, c: number, tick: boolean): void {
@@ -697,8 +733,8 @@ export class SettingsScreen extends Screen {
       el.addEventListener('pointerenter', () => this.focusRow(this.rows.findIndex((r) => r.el === el), true));
     };
 
-    seg('quality', 'Quality', 'Auto probes the first second of riding', [{ v: 'auto', l: 'Auto' }, { v: 'low', l: 'Low' }, { v: 'medium', l: 'Med' }, { v: 'high', l: 'High' }], () => s().quality, (v) => this.cb.setQuality(v as QualityChoice));
-    seg('fps', 'Frame rate', 'Auto = 30 on phones, 60 on desktop · the meter top-right shows what you get', [{ v: 'auto', l: `Auto (${s().fpsInEffect})` }, { v: '30', l: '30' }, { v: '60', l: '60' }], () => s().fps, (v) => this.cb.setFps(v as FpsChoice));
+    seg('quality', 'Quality', 'Auto climbs to High while the frame holds 60 and steps down when it does not', [{ v: 'auto', l: 'Auto' }, { v: 'low', l: 'Low' }, { v: 'medium', l: 'Med' }, { v: 'high', l: 'High' }], () => s().quality, (v) => this.cb.setQuality(v as QualityChoice));
+    seg('fps', 'Frame rate', 'Auto = 60 · the meter top-right shows what you get', [{ v: 'auto', l: `Auto (${s().fpsInEffect})` }, { v: '30', l: '30' }, { v: '60', l: '60' }], () => s().fps, (v) => this.cb.setFps(v as FpsChoice));
     seg('sound', 'Sound', 'Engine, impacts, menu cues', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().sound ? 'on' : 'off'), (v) => this.cb.setSound(v === 'on'));
 
     // Volume slider row.

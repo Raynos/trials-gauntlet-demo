@@ -3,6 +3,7 @@
  * committed `harness/out/metrics/`. Self-describing: `schema` + `kind`.
  * See docs/design/harness-metrics.md §8.
  */
+import type { GateDeviceRows } from '../gate/device-rows';
 import type { FaultReason } from '../../src/core/types';
 
 export interface RunMeta {
@@ -87,6 +88,12 @@ export interface BeamConfig {
   commit: number;
   cells: [number, number, number];
   budgetMs: number;
+  /**
+   * Round 12 (`--budget-ticks`): stop a plan after this many simulated ticks instead of after `budgetMs` of wall.
+   * A tick budget makes the search a pure function of (track, seed, skill) — the same bytes from any process or
+   * core count — which is what the pooled sweep's identity proof rests on. Absent = the wall budget (default).
+   */
+  budgetTicks?: number;
 }
 
 export interface ScoreWeights {
@@ -134,6 +141,8 @@ export interface BotRunReport extends RunMeta {
   nodeHash: string;
   /** First tick where a straight replay of `recordingFile` stops matching the committed play's per-tick hash (null = retraces exactly). */
   playReplayDivergence?: { tick: number; x: number; playHash: string; replayHash: string } | null;
+  /** Pooled run (round 12): the parent replayed the worker's recording in its own process and got `nodeHash` (null = ran in-process). */
+  workerHashOk?: boolean | null;
   browserHash: string | null;
   browserVerified: boolean | null;
 }
@@ -191,6 +200,8 @@ export interface StrangerSession extends RunMeta {
   trackId: string;
   seed: number;
   agent: string;
+  /** Bike class the session was ridden on (round 11; absent = rookie). */
+  bike?: 'rookie' | 'pro';
   cleared: boolean;
   attempts: AttemptLog[];
   /** attempts-to-clear = 1 + faults (restart/reset/crash), CONTRACT §3. */
@@ -310,6 +321,8 @@ export interface GateReport extends RunMeta {
   reflex?: { srcFingerprint: string; armed: boolean; minSeeds: number; rows: GateReflexRow[] };
   /** G10 third row (round 7): the same reflex medians on the Pro bike (`<track>.pro.reflex.json`); informational, the band is authored for Rookie. */
   reflexPro?: { srcFingerprint: string; armed: boolean; minSeeds: number; rows: GateReflexRow[] };
+  /** G11 (Rider on Glass G5): the newest filed device report + WebKit hero run, summarised (`harness/gate/device-rows.ts`). */
+  device?: GateDeviceRows;
   /** G2b (round 7): Pro-bike clears by golden replay (`bot-3-pro.json`) on flat-test and b1, pinned under `<track>:pro` in expected.json. */
   clearPro?: Array<{ trackId: string; recording: string | null; finishTime: number | null; expected: number | null; hash: string | null; expectedHash: string | null; faults: number; fresh: boolean | null }>;
 }
@@ -337,10 +350,15 @@ export interface GateStrangerRow {
   /** Sessions completed on the working tree's src fingerprint (the only ones that count). */
   completedFresh: number;
   completedAny: number;
+  /** Round 11: bike class the row counts (the tier's default), and sessions open / abandoned on it (not in the median). */
+  bike?: 'rookie' | 'pro';
+  censored?: number;
   medianAttempts: number | null;
   allCleared: boolean;
   /** null = nothing to judge yet */
   pass: boolean | null;
+  /** Round 11: median under the authored band (easier than authored; within the ship limit, flagged for the tracks owner). */
+  belowBand?: boolean;
   sessions: string[];
 }
 
