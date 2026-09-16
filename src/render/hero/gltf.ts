@@ -94,7 +94,13 @@ export function shrinkTextures(root: THREE.Object3D, albedoMax = 1024, otherMax 
         if (!img || img.data) continue; // DataTextures (procedural 512² sets) are not canvas-drawable
         const w = img.width ?? 0;
         const h = img.height ?? 0;
-        const max = key === 'map' || key === 'emissiveMap' ? albedoMax : otherMax;
+        let max = key === 'map' || key === 'emissiveMap' ? albedoMax : otherMax;
+        // The rider's albedo is a tightly packed UV atlas (thin garment strips on black, no dilation). Halved to
+        // 512 and mipmapped, the black gutters and the neighbouring islands bleed into the hoodie and the head:
+        // black / blue / white patches over the whole torso in the garage at `low` (the user's desktop screenshot,
+        // 2026-09-16; bisected texture by texture — a 1024 canvas or 512 without mips draws clean, 512 with mips
+        // does not). Skinned meshes keep their albedo at 1024; the data maps still halve.
+        if ((mesh as THREE.SkinnedMesh).isSkinnedMesh && (key === 'map' || key === 'emissiveMap')) max = Math.max(max, 1024);
         if (!w || !h || Math.max(w, h) <= max) continue;
         const k = max / Math.max(w, h);
         const c = document.createElement('canvas');
