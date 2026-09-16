@@ -7,8 +7,8 @@
     1
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "089e0885",
-  "updatedAt": "2026-09-16T03:24:27.575Z",
+  "srcFingerprint": "24a246e0",
+  "updatedAt": "2026-09-16T04:10:30.185Z",
   "includeStale": false,
   "sessions": [
     {
@@ -343,7 +343,7 @@
       "agent": "s1",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "089e0885",
       "strangerAttempts": 1,
       "cleared": true,
@@ -373,7 +373,7 @@
       "agent": "s2",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "089e0885",
       "strangerAttempts": 1,
       "cleared": true,
@@ -396,6 +396,66 @@
         "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r14b-s2-20260915-220131.json"
       },
       "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r14b-s2-20260915-220131.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "b1-first-ride-r15-s1-20260915-225608",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "24a246e0",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 44.6333,
+      "calls": 15,
+      "wallMs": 100821,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 583,
+        "startTick": 0,
+        "endTick": 5644,
+        "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r15-s1-20260915-225608.json"
+      },
+      "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r15-s1-20260915-225608.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "b1-first-ride-r15-s2-20260915-225608",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "24a246e0",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 46.5833,
+      "calls": 15,
+      "wallMs": 94853,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 583,
+        "startTick": 0,
+        "endTick": 5883,
+        "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r15-s2-20260915-225608.json"
+      },
+      "recordingFile": "harness/inputs/b1-first-ride/stranger-b1-first-ride-r15-s2-20260915-225608.json",
       "deaths": []
     },
     {
@@ -479,7 +539,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 106922789,
+      "wallMs": 109685399,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -527,7 +587,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 106922765,
+      "wallMs": 109685375,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -629,9 +689,9 @@
   "completed": 2,
   "clearedCount": 2,
   "medianAttempts": 1,
-  "medianFinishTime": 41.8375,
-  "medianCalls": 12,
-  "medianWallMs": 145838.5,
+  "medianFinishTime": 45.6083,
+  "medianCalls": 15,
+  "medianWallMs": 97837,
   "census": {
     "n": 2,
     "minSessions": 2,
@@ -649,7 +709,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 14,
+    "staleExcluded": 16,
     "otherBikeExcluded": 0
   },
   "asserted": {

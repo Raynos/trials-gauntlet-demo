@@ -7,8 +7,8 @@
     5
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "089e0885",
-  "updatedAt": "2026-09-16T03:24:27.626Z",
+  "srcFingerprint": "24a246e0",
+  "updatedAt": "2026-09-16T04:10:30.230Z",
   "includeStale": false,
   "sessions": [
     {
@@ -139,7 +139,7 @@
       "agent": "s1",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "089e0885",
       "strangerAttempts": 1,
       "cleared": true,
@@ -170,7 +170,7 @@
       "agent": "s2",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "089e0885",
       "strangerAttempts": 2,
       "cleared": true,
@@ -203,6 +203,106 @@
           "checkpoint": 2,
           "obstacle": null,
           "calls": 11
+        }
+      ]
+    },
+    {
+      "sessionId": "e2-rear-wheel-first-r15-s1-20260915-225608",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "24a246e0",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 58.2833,
+      "calls": 22,
+      "wallMs": 344009,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 616.1,
+        "startTick": 3925,
+        "endTick": 7312,
+        "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r15-s1-20260915-225608.json"
+      },
+      "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r15-s1-20260915-225608.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 191.229,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 191.2 m",
+          "calls": 6
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 318.116,
+          "checkpoint": 2,
+          "obstacle": "box @ 316.2 m",
+          "calls": 12
+        }
+      ]
+    },
+    {
+      "sessionId": "e2-rear-wheel-first-r15-s2-20260915-225608",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "24a246e0",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 64.0417,
+      "calls": 25,
+      "wallMs": 237886,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 616.1,
+        "startTick": 4638,
+        "endTick": 8000,
+        "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r15-s2-20260915-225608.json"
+      },
+      "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r15-s2-20260915-225608.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 258.797,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 264.2 m",
+          "calls": 8
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 328.24,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 13
         }
       ]
     },
@@ -344,7 +444,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 106922727,
+      "wallMs": 109685331,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -448,7 +548,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 106922716,
+      "wallMs": 109685319,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -536,10 +636,10 @@
   "bike": "rookie",
   "completed": 2,
   "clearedCount": 2,
-  "medianAttempts": 1.5,
-  "medianFinishTime": 48.8292,
-  "medianCalls": 21.5,
-  "medianWallMs": 235956,
+  "medianAttempts": 3,
+  "medianFinishTime": 61.1625,
+  "medianCalls": 23.5,
+  "medianWallMs": 290947.5,
   "census": {
     "n": 2,
     "minSessions": 2,
@@ -557,7 +657,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 7,
+    "staleExcluded": 9,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -568,27 +668,48 @@
     "factor": 1.5,
     "limit": 7.5
   },
-  "verdict": "UNDER-BAND",
-  "pass": false,
+  "verdict": "PASS",
+  "pass": true,
   "deaths": {
-    "total": 1,
+    "total": 4,
     "byReason": {
-      "crash": 1
+      "crash": 4
     },
     "byObstacle": [
+      {
+        "obstacle": "ramp @ 191.2 m",
+        "count": 1,
+        "xs": [
+          191.2
+        ]
+      },
+      {
+        "obstacle": "box @ 316.2 m",
+        "count": 1,
+        "xs": [
+          318.1
+        ]
+      },
+      {
+        "obstacle": "ramp @ 264.2 m",
+        "count": 1,
+        "xs": [
+          258.8
+        ]
+      },
       {
         "obstacle": "ground",
         "count": 1,
         "xs": [
-          324.4
+          328.2
         ]
       }
     ],
     "byCheckpoint": [
       0,
       0,
-      0,
-      1,
+      2,
+      2,
       0
     ]
   }

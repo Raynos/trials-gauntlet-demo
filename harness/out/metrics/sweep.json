@@ -1,18 +1,18 @@
 {
   "schema": 1,
   "kind": "sweep",
-  "runId": "20260915-220110-8fee1e",
-  "startedAt": "2026-09-16T03:01:10.882Z",
-  "wallMs": 415376,
-  "git": "5b6d21c",
-  "srcFingerprint": "089e0885",
+  "runId": "20260915-225448-e09a7c",
+  "startedAt": "2026-09-16T03:54:48.833Z",
+  "wallMs": 375796,
+  "git": "1308fbf",
+  "srcFingerprint": "24a246e0",
   "node": "v24.18.1",
   "physics": "bikePhysicsFactory-v2",
   "bike": "pro",
   "skill": 3,
   "seeds": 1,
   "budgetMs": null,
-  "trackWallS": 400,
+  "trackWallS": 600,
   "rows": [
     {
       "trackId": "flat-test",
@@ -24,15 +24,15 @@
       "seeds": [
         3277865877
       ],
-      "bestX": 119.32460409899365,
-      "bestPct": 0.9943717008249471,
+      "bestX": 119.31909251930338,
+      "bestPct": 0.9943257709941948,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        8.058333333333334
+        7.9
       ],
       "outcomes": [
         "finished"
@@ -40,9 +40,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 21460,
+      "wallMs": 6387,
       "runs": [
-        "20260915-220112-a85005"
+        "20260915-225449-832202"
       ]
     },
     {
@@ -58,15 +58,15 @@
       "seeds": [
         2308543150
       ],
-      "bestX": 56.30614093972443,
-      "bestPct": 0.9878270340302532,
+      "bestX": 56.356348516897285,
+      "bestPct": 0.9887078687174963,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        5.466666666666667
+        5.133333333333334
       ],
       "outcomes": [
         "finished"
@@ -74,9 +74,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 12244,
+      "wallMs": 2720,
       "runs": [
-        "20260915-220112-f38681"
+        "20260915-225449-61a325"
       ]
     },
     {
@@ -92,15 +92,15 @@
       "seeds": [
         138717428
       ],
-      "bestX": 582.374375452771,
-      "bestPct": 0.9989268875690754,
+      "bestX": 582.3091122187814,
+      "bestPct": 0.9988149437714946,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        38.141666666666666
+        37.96666666666667
       ],
       "outcomes": [
         "finished"
@@ -108,9 +108,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 235492,
+      "wallMs": 115932,
       "runs": [
-        "20260915-220112-9c4df6"
+        "20260915-225449-c68acf"
       ]
     },
     {
@@ -126,15 +126,15 @@
       "seeds": [
         3802965488
       ],
-      "bestX": 591.5128752312183,
-      "bestPct": 0.9988397082594027,
+      "bestX": 591.5155965790675,
+      "bestPct": 0.998844303578297,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        37.641666666666666
+        36.625
       ],
       "outcomes": [
         "finished"
@@ -142,9 +142,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 229614,
+      "wallMs": 109996,
       "runs": [
-        "20260915-220112-68a9ce"
+        "20260915-225449-c6570e"
       ]
     },
     {
@@ -160,15 +160,15 @@
       "seeds": [
         4115132233
       ],
-      "bestX": 471.0756514209733,
-      "bestPct": 0.9984647126345343,
+      "bestX": 471.09316207593804,
+      "bestPct": 0.9985018272063121,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        30.933333333333334
+        31.183333333333334
       ],
       "outcomes": [
         "finished"
@@ -176,9 +176,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 147689,
+      "wallMs": 77689,
       "runs": [
-        "20260915-220113-7a1c1d"
+        "20260915-225449-d4390a"
       ]
     },
     {
@@ -194,15 +194,15 @@
       "seeds": [
         847839319
       ],
-      "bestX": 543.1992766775805,
-      "bestPct": 0.998726230146324,
+      "bestX": 543.1748339470186,
+      "bestPct": 0.9986812897401107,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        42.53333333333333
+        42.25833333333333
       ],
       "outcomes": [
         "finished"
@@ -210,9 +210,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 253566,
+      "wallMs": 126519,
       "runs": [
-        "20260915-220112-3edfa2"
+        "20260915-225449-d38776"
       ]
     },
     {
@@ -228,15 +228,15 @@
       "seeds": [
         2125781358
       ],
-      "bestX": 615.4324437326337,
-      "bestPct": 0.9989164806567663,
+      "bestX": 615.3694274495742,
+      "bestPct": 0.9988141981002665,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        40.475
+        39.3
       ],
       "outcomes": [
         "finished"
@@ -244,9 +244,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 231340,
+      "wallMs": 116975,
       "runs": [
-        "20260915-220112-03a19f"
+        "20260915-225449-6f4a95"
       ]
     },
     {
@@ -262,15 +262,15 @@
       "seeds": [
         3073702004
       ],
-      "bestX": 543.1017445091186,
-      "bestPct": 0.9988996588359731,
+      "bestX": 542.9879536178651,
+      "bestPct": 0.9986903689863252,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        36.88333333333333
+        37.40833333333333
       ],
       "outcomes": [
         "finished"
@@ -278,9 +278,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 235939,
+      "wallMs": 115595,
       "runs": [
-        "20260915-220113-995778"
+        "20260915-225449-e40752"
       ]
     },
     {
@@ -296,15 +296,15 @@
       "seeds": [
         1909798049
       ],
-      "bestX": 480.3788750296945,
-      "bestPct": 0.9987086798954147,
+      "bestX": 480.2589483716582,
+      "bestPct": 0.9984593521240296,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        30.933333333333334
+        30.758333333333333
       ],
       "outcomes": [
         "finished"
@@ -312,9 +312,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 168044,
+      "wallMs": 92391,
       "runs": [
-        "20260915-220112-dd89e3"
+        "20260915-225452-13f84b"
       ]
     },
     {
@@ -330,15 +330,15 @@
       "seeds": [
         3505190447
       ],
-      "bestX": 487.5339336038047,
-      "bestPct": 0.9986356689959129,
+      "bestX": 487.46715244693723,
+      "bestPct": 0.9984988784246973,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        37.06666666666667
+        35.34166666666667
       ],
       "outcomes": [
         "finished"
@@ -346,9 +346,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 220810,
+      "wallMs": 113445,
       "runs": [
-        "20260915-220112-717141"
+        "20260915-225455-c4f88b"
       ]
     },
     {
@@ -364,15 +364,15 @@
       "seeds": [
         1066951255
       ],
-      "bestX": 503.4317935987178,
-      "bestPct": 0.9986744566528819,
+      "bestX": 503.39553654378676,
+      "bestPct": 0.9986025323225287,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        36.94166666666667
+        36.44166666666667
       ],
       "outcomes": [
         "finished"
@@ -380,9 +380,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 244272,
+      "wallMs": 111648,
       "runs": [
-        "20260915-220112-a33898"
+        "20260915-225607-b124b6"
       ]
     },
     {
@@ -398,15 +398,15 @@
       "seeds": [
         1831771780
       ],
-      "bestX": 621.5677975957643,
-      "bestPct": 0.9988233932118984,
+      "bestX": 621.6695711492307,
+      "bestPct": 0.9989869374083734,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        43.583333333333336
+        44.041666666666664
       ],
       "outcomes": [
         "finished"
@@ -414,9 +414,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 262071,
+      "wallMs": 126396,
       "runs": [
-        "20260915-220112-3746f0"
+        "20260915-225624-4b1b9a"
       ]
     },
     {
@@ -432,15 +432,15 @@
       "seeds": [
         4247919438
       ],
-      "bestX": 664.2029490434703,
-      "bestPct": 0.9991019089101539,
+      "bestX": 664.074811985844,
+      "bestPct": 0.9989091636369496,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        43.2
+        42.75833333333333
       ],
       "outcomes": [
         "finished"
@@ -448,9 +448,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 241611,
+      "wallMs": 124916,
       "runs": [
-        "20260915-220113-41190a"
+        "20260915-225639-21d2ea"
       ]
     },
     {
@@ -466,15 +466,15 @@
       "seeds": [
         3173388572
       ],
-      "bestX": 628.4784681341013,
-      "bestPct": 0.998853255140021,
+      "bestX": 628.5662822818113,
+      "bestPct": 0.9989928199011622,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        42.583333333333336
+        44.65
       ],
       "outcomes": [
         "finished"
@@ -482,9 +482,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 240711,
+      "wallMs": 112569,
       "runs": [
-        "20260915-220112-4f67f6"
+        "20260915-225645-77b884"
       ]
     },
     {
@@ -500,8 +500,8 @@
       "seeds": [
         2756386537
       ],
-      "bestX": 599.6535366104924,
-      "bestPct": 0.8057988599183032,
+      "bestX": 599.6505216597222,
+      "bestPct": 0.8057948085057041,
       "clears": 0,
       "attempts": [
         1
@@ -511,13 +511,13 @@
         null
       ],
       "outcomes": [
-        "wallTimeout"
+        "timeout"
       ],
       "firstBlocker": {
         "reason": "stuck",
-        "x": 599.6535366104924,
+        "x": 599.6505216597222,
         "checkpoint": -1,
-        "runTime": 145.875,
+        "runTime": 300.375,
         "obstacle": {
           "kind": "pole",
           "x": 600.172729,
@@ -526,9 +526,9 @@
       },
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 400302,
+      "wallMs": 258600,
       "runs": [
-        "20260915-220113-dacd40"
+        "20260915-225645-d3c7cd"
       ]
     },
     {
@@ -544,15 +544,15 @@
       "seeds": [
         2290459156
       ],
-      "bestX": 562.8817768199987,
-      "bestPct": 0.9987256508516654,
+      "bestX": 562.9087689242665,
+      "bestPct": 0.9987735431587411,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        42.275
+        40.7
       ],
       "outcomes": [
         "finished"
@@ -560,9 +560,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 243094,
+      "wallMs": 126668,
       "runs": [
-        "20260915-220113-48ef47"
+        "20260915-225646-0bb853"
       ]
     },
     {
@@ -578,35 +578,25 @@
       "seeds": [
         264835977
       ],
-      "bestX": 530.7420762882193,
-      "bestPct": 0.9229518713804932,
-      "clears": 0,
+      "bestX": 574.3973412868419,
+      "bestPct": 0.998867669893912,
+      "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        null
+        43.4
       ],
       "outcomes": [
-        "wallTimeout"
+        "finished"
       ],
-      "firstBlocker": {
-        "reason": "stuck",
-        "x": 530.7420762882193,
-        "checkpoint": -1,
-        "runTime": 232,
-        "obstacle": {
-          "kind": "pole",
-          "x": 531.248486,
-          "index": 46
-        }
-      },
+      "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 400371,
+      "wallMs": 108404,
       "runs": [
-        "20260915-220125-82c0c6"
+        "20260915-225649-16a028"
       ]
     },
     {
@@ -622,15 +612,15 @@
       "seeds": [
         1476616191
       ],
-      "bestX": 503.2229629438486,
-      "bestPct": 0.9987006349418892,
+      "bestX": 503.2717530676666,
+      "bestPct": 0.9987974642426646,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        33.53333333333333
+        32.88333333333333
       ],
       "outcomes": [
         "finished"
@@ -638,9 +628,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 182763,
+      "wallMs": 82621,
       "runs": [
-        "20260915-220134-2ab50d"
+        "20260915-225656-3a1f66"
       ]
     },
     {
@@ -656,8 +646,8 @@
       "seeds": [
         1374220946
       ],
-      "bestX": 492.88559127631487,
-      "bestPct": 0.9985526565565536,
+      "bestX": 492.96908330189797,
+      "bestPct": 0.9987218057169731,
       "clears": 1,
       "attempts": [
         1
@@ -672,9 +662,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 128836,
+      "wallMs": 80217,
       "runs": [
-        "20260915-220340-5bad56"
+        "20260915-225758-32a312"
       ]
     },
     {
@@ -690,15 +680,15 @@
       "seeds": [
         2782902853
       ],
-      "bestX": 487.5857737212972,
-      "bestPct": 0.9985829574003164,
+      "bestX": 487.6758973611627,
+      "bestPct": 0.99876753196274,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        31.816666666666666
+        31.891666666666666
       ],
       "outcomes": [
         "finished"
@@ -706,9 +696,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 119866,
+      "wallMs": 73749,
       "runs": [
-        "20260915-220401-d170f2"
+        "20260915-225818-a0a36f"
       ]
     },
     {
@@ -724,15 +714,15 @@
       "seeds": [
         1052590580
       ],
-      "bestX": 497.5290798737202,
-      "bestPct": 0.9986533116694505,
+      "bestX": 497.5373282464132,
+      "bestPct": 0.9986698680176901,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        33.233333333333334
+        32.35
       ],
       "outcomes": [
         "finished"
@@ -740,9 +730,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 98449,
+      "wallMs": 74832,
       "runs": [
-        "20260915-220437-576ed7"
+        "20260915-225831-74fbeb"
       ]
     },
     {
@@ -758,15 +748,15 @@
       "seeds": [
         1610333913
       ],
-      "bestX": 441.9234115683423,
-      "bestPct": 0.9985898339407826,
+      "bestX": 441.90615388859055,
+      "bestPct": 0.9985508377185721,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        29.25
+        29.041666666666668
       ],
       "outcomes": [
         "finished"
@@ -774,9 +764,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 76944,
+      "wallMs": 58174,
       "runs": [
-        "20260915-220453-47e421"
+        "20260915-225837-acab09"
       ]
     },
     {
@@ -792,15 +782,15 @@
       "seeds": [
         3707397683
       ],
-      "bestX": 99.28029029690707,
-      "bestPct": 0.9928029029690707,
+      "bestX": 99.38548603289206,
+      "bestPct": 0.9938548603289206,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        7.725
+        7.5
       ],
       "outcomes": [
         "finished"
@@ -808,9 +798,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 14439,
+      "wallMs": 7385,
       "runs": [
-        "20260915-220502-c11445"
+        "20260915-225837-650041"
       ]
     },
     {
@@ -826,15 +816,15 @@
       "seeds": [
         2522286987
       ],
-      "bestX": 199.33886651945383,
-      "bestPct": 0.9966943325972691,
+      "bestX": 199.40794239070718,
+      "bestPct": 0.9970397119535359,
       "clears": 1,
       "attempts": [
         1
       ],
       "attemptsMedian": 1,
       "finishTimes": [
-        11.875
+        11.758333333333333
       ],
       "outcomes": [
         "finished"
@@ -842,9 +832,9 @@
       "firstBlocker": null,
       "replayFaithful": true,
       "replayDivergenceX": null,
-      "wallMs": 18079,
+      "wallMs": 11027,
       "runs": [
-        "20260915-220504-200094"
+        "20260915-225844-4450a5"
       ]
     }
   ],
@@ -855,18 +845,18 @@
     {
       "schema": 1,
       "kind": "sweep",
-      "runId": "20260915-220110-8fee1e",
-      "startedAt": "2026-09-16T03:01:10.882Z",
-      "wallMs": 415376,
-      "git": "5b6d21c",
-      "srcFingerprint": "089e0885",
+      "runId": "20260915-225448-e09a7c",
+      "startedAt": "2026-09-16T03:54:48.833Z",
+      "wallMs": 375796,
+      "git": "1308fbf",
+      "srcFingerprint": "24a246e0",
       "node": "v24.18.1",
       "physics": "bikePhysicsFactory-v2",
       "bike": "pro",
       "skill": 3,
       "seeds": 1,
       "budgetMs": null,
-      "trackWallS": 400,
+      "trackWallS": 600,
       "rows": [
         {
           "trackId": "flat-test",
@@ -878,15 +868,15 @@
           "seeds": [
             3277865877
           ],
-          "bestX": 119.32460409899365,
-          "bestPct": 0.9943717008249471,
+          "bestX": 119.31909251930338,
+          "bestPct": 0.9943257709941948,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            8.058333333333334
+            7.9
           ],
           "outcomes": [
             "finished"
@@ -894,9 +884,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 21460,
+          "wallMs": 6387,
           "runs": [
-            "20260915-220112-a85005"
+            "20260915-225449-832202"
           ]
         },
         {
@@ -912,15 +902,15 @@
           "seeds": [
             2308543150
           ],
-          "bestX": 56.30614093972443,
-          "bestPct": 0.9878270340302532,
+          "bestX": 56.356348516897285,
+          "bestPct": 0.9887078687174963,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            5.466666666666667
+            5.133333333333334
           ],
           "outcomes": [
             "finished"
@@ -928,9 +918,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 12244,
+          "wallMs": 2720,
           "runs": [
-            "20260915-220112-f38681"
+            "20260915-225449-61a325"
           ]
         },
         {
@@ -946,15 +936,15 @@
           "seeds": [
             138717428
           ],
-          "bestX": 582.374375452771,
-          "bestPct": 0.9989268875690754,
+          "bestX": 582.3091122187814,
+          "bestPct": 0.9988149437714946,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            38.141666666666666
+            37.96666666666667
           ],
           "outcomes": [
             "finished"
@@ -962,9 +952,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 235492,
+          "wallMs": 115932,
           "runs": [
-            "20260915-220112-9c4df6"
+            "20260915-225449-c68acf"
           ]
         },
         {
@@ -980,15 +970,15 @@
           "seeds": [
             3802965488
           ],
-          "bestX": 591.5128752312183,
-          "bestPct": 0.9988397082594027,
+          "bestX": 591.5155965790675,
+          "bestPct": 0.998844303578297,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            37.641666666666666
+            36.625
           ],
           "outcomes": [
             "finished"
@@ -996,9 +986,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 229614,
+          "wallMs": 109996,
           "runs": [
-            "20260915-220112-68a9ce"
+            "20260915-225449-c6570e"
           ]
         },
         {
@@ -1014,15 +1004,15 @@
           "seeds": [
             4115132233
           ],
-          "bestX": 471.0756514209733,
-          "bestPct": 0.9984647126345343,
+          "bestX": 471.09316207593804,
+          "bestPct": 0.9985018272063121,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            30.933333333333334
+            31.183333333333334
           ],
           "outcomes": [
             "finished"
@@ -1030,9 +1020,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 147689,
+          "wallMs": 77689,
           "runs": [
-            "20260915-220113-7a1c1d"
+            "20260915-225449-d4390a"
           ]
         },
         {
@@ -1048,15 +1038,15 @@
           "seeds": [
             847839319
           ],
-          "bestX": 543.1992766775805,
-          "bestPct": 0.998726230146324,
+          "bestX": 543.1748339470186,
+          "bestPct": 0.9986812897401107,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            42.53333333333333
+            42.25833333333333
           ],
           "outcomes": [
             "finished"
@@ -1064,9 +1054,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 253566,
+          "wallMs": 126519,
           "runs": [
-            "20260915-220112-3edfa2"
+            "20260915-225449-d38776"
           ]
         },
         {
@@ -1082,15 +1072,15 @@
           "seeds": [
             2125781358
           ],
-          "bestX": 615.4324437326337,
-          "bestPct": 0.9989164806567663,
+          "bestX": 615.3694274495742,
+          "bestPct": 0.9988141981002665,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            40.475
+            39.3
           ],
           "outcomes": [
             "finished"
@@ -1098,9 +1088,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 231340,
+          "wallMs": 116975,
           "runs": [
-            "20260915-220112-03a19f"
+            "20260915-225449-6f4a95"
           ]
         },
         {
@@ -1116,15 +1106,15 @@
           "seeds": [
             3073702004
           ],
-          "bestX": 543.1017445091186,
-          "bestPct": 0.9988996588359731,
+          "bestX": 542.9879536178651,
+          "bestPct": 0.9986903689863252,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            36.88333333333333
+            37.40833333333333
           ],
           "outcomes": [
             "finished"
@@ -1132,9 +1122,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 235939,
+          "wallMs": 115595,
           "runs": [
-            "20260915-220113-995778"
+            "20260915-225449-e40752"
           ]
         },
         {
@@ -1150,15 +1140,15 @@
           "seeds": [
             1909798049
           ],
-          "bestX": 480.3788750296945,
-          "bestPct": 0.9987086798954147,
+          "bestX": 480.2589483716582,
+          "bestPct": 0.9984593521240296,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            30.933333333333334
+            30.758333333333333
           ],
           "outcomes": [
             "finished"
@@ -1166,9 +1156,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 168044,
+          "wallMs": 92391,
           "runs": [
-            "20260915-220112-dd89e3"
+            "20260915-225452-13f84b"
           ]
         },
         {
@@ -1184,15 +1174,15 @@
           "seeds": [
             3505190447
           ],
-          "bestX": 487.5339336038047,
-          "bestPct": 0.9986356689959129,
+          "bestX": 487.46715244693723,
+          "bestPct": 0.9984988784246973,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            37.06666666666667
+            35.34166666666667
           ],
           "outcomes": [
             "finished"
@@ -1200,9 +1190,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 220810,
+          "wallMs": 113445,
           "runs": [
-            "20260915-220112-717141"
+            "20260915-225455-c4f88b"
           ]
         },
         {
@@ -1218,15 +1208,15 @@
           "seeds": [
             1066951255
           ],
-          "bestX": 503.4317935987178,
-          "bestPct": 0.9986744566528819,
+          "bestX": 503.39553654378676,
+          "bestPct": 0.9986025323225287,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            36.94166666666667
+            36.44166666666667
           ],
           "outcomes": [
             "finished"
@@ -1234,9 +1224,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 244272,
+          "wallMs": 111648,
           "runs": [
-            "20260915-220112-a33898"
+            "20260915-225607-b124b6"
           ]
         },
         {
@@ -1252,15 +1242,15 @@
           "seeds": [
             1831771780
           ],
-          "bestX": 621.5677975957643,
-          "bestPct": 0.9988233932118984,
+          "bestX": 621.6695711492307,
+          "bestPct": 0.9989869374083734,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            43.583333333333336
+            44.041666666666664
           ],
           "outcomes": [
             "finished"
@@ -1268,9 +1258,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 262071,
+          "wallMs": 126396,
           "runs": [
-            "20260915-220112-3746f0"
+            "20260915-225624-4b1b9a"
           ]
         },
         {
@@ -1286,15 +1276,15 @@
           "seeds": [
             4247919438
           ],
-          "bestX": 664.2029490434703,
-          "bestPct": 0.9991019089101539,
+          "bestX": 664.074811985844,
+          "bestPct": 0.9989091636369496,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            43.2
+            42.75833333333333
           ],
           "outcomes": [
             "finished"
@@ -1302,9 +1292,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 241611,
+          "wallMs": 124916,
           "runs": [
-            "20260915-220113-41190a"
+            "20260915-225639-21d2ea"
           ]
         },
         {
@@ -1320,15 +1310,15 @@
           "seeds": [
             3173388572
           ],
-          "bestX": 628.4784681341013,
-          "bestPct": 0.998853255140021,
+          "bestX": 628.5662822818113,
+          "bestPct": 0.9989928199011622,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            42.583333333333336
+            44.65
           ],
           "outcomes": [
             "finished"
@@ -1336,9 +1326,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 240711,
+          "wallMs": 112569,
           "runs": [
-            "20260915-220112-4f67f6"
+            "20260915-225645-77b884"
           ]
         },
         {
@@ -1354,8 +1344,8 @@
           "seeds": [
             2756386537
           ],
-          "bestX": 599.6535366104924,
-          "bestPct": 0.8057988599183032,
+          "bestX": 599.6505216597222,
+          "bestPct": 0.8057948085057041,
           "clears": 0,
           "attempts": [
             1
@@ -1365,13 +1355,13 @@
             null
           ],
           "outcomes": [
-            "wallTimeout"
+            "timeout"
           ],
           "firstBlocker": {
             "reason": "stuck",
-            "x": 599.6535366104924,
+            "x": 599.6505216597222,
             "checkpoint": -1,
-            "runTime": 145.875,
+            "runTime": 300.375,
             "obstacle": {
               "kind": "pole",
               "x": 600.172729,
@@ -1380,9 +1370,9 @@
           },
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 400302,
+          "wallMs": 258600,
           "runs": [
-            "20260915-220113-dacd40"
+            "20260915-225645-d3c7cd"
           ]
         },
         {
@@ -1398,15 +1388,15 @@
           "seeds": [
             2290459156
           ],
-          "bestX": 562.8817768199987,
-          "bestPct": 0.9987256508516654,
+          "bestX": 562.9087689242665,
+          "bestPct": 0.9987735431587411,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            42.275
+            40.7
           ],
           "outcomes": [
             "finished"
@@ -1414,9 +1404,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 243094,
+          "wallMs": 126668,
           "runs": [
-            "20260915-220113-48ef47"
+            "20260915-225646-0bb853"
           ]
         },
         {
@@ -1432,35 +1422,25 @@
           "seeds": [
             264835977
           ],
-          "bestX": 530.7420762882193,
-          "bestPct": 0.9229518713804932,
-          "clears": 0,
+          "bestX": 574.3973412868419,
+          "bestPct": 0.998867669893912,
+          "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            null
+            43.4
           ],
           "outcomes": [
-            "wallTimeout"
+            "finished"
           ],
-          "firstBlocker": {
-            "reason": "stuck",
-            "x": 530.7420762882193,
-            "checkpoint": -1,
-            "runTime": 232,
-            "obstacle": {
-              "kind": "pole",
-              "x": 531.248486,
-              "index": 46
-            }
-          },
+          "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 400371,
+          "wallMs": 108404,
           "runs": [
-            "20260915-220125-82c0c6"
+            "20260915-225649-16a028"
           ]
         },
         {
@@ -1476,15 +1456,15 @@
           "seeds": [
             1476616191
           ],
-          "bestX": 503.2229629438486,
-          "bestPct": 0.9987006349418892,
+          "bestX": 503.2717530676666,
+          "bestPct": 0.9987974642426646,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            33.53333333333333
+            32.88333333333333
           ],
           "outcomes": [
             "finished"
@@ -1492,9 +1472,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 182763,
+          "wallMs": 82621,
           "runs": [
-            "20260915-220134-2ab50d"
+            "20260915-225656-3a1f66"
           ]
         },
         {
@@ -1510,8 +1490,8 @@
           "seeds": [
             1374220946
           ],
-          "bestX": 492.88559127631487,
-          "bestPct": 0.9985526565565536,
+          "bestX": 492.96908330189797,
+          "bestPct": 0.9987218057169731,
           "clears": 1,
           "attempts": [
             1
@@ -1526,9 +1506,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 128836,
+          "wallMs": 80217,
           "runs": [
-            "20260915-220340-5bad56"
+            "20260915-225758-32a312"
           ]
         },
         {
@@ -1544,15 +1524,15 @@
           "seeds": [
             2782902853
           ],
-          "bestX": 487.5857737212972,
-          "bestPct": 0.9985829574003164,
+          "bestX": 487.6758973611627,
+          "bestPct": 0.99876753196274,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            31.816666666666666
+            31.891666666666666
           ],
           "outcomes": [
             "finished"
@@ -1560,9 +1540,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 119866,
+          "wallMs": 73749,
           "runs": [
-            "20260915-220401-d170f2"
+            "20260915-225818-a0a36f"
           ]
         },
         {
@@ -1578,15 +1558,15 @@
           "seeds": [
             1052590580
           ],
-          "bestX": 497.5290798737202,
-          "bestPct": 0.9986533116694505,
+          "bestX": 497.5373282464132,
+          "bestPct": 0.9986698680176901,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            33.233333333333334
+            32.35
           ],
           "outcomes": [
             "finished"
@@ -1594,9 +1574,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 98449,
+          "wallMs": 74832,
           "runs": [
-            "20260915-220437-576ed7"
+            "20260915-225831-74fbeb"
           ]
         },
         {
@@ -1612,15 +1592,15 @@
           "seeds": [
             1610333913
           ],
-          "bestX": 441.9234115683423,
-          "bestPct": 0.9985898339407826,
+          "bestX": 441.90615388859055,
+          "bestPct": 0.9985508377185721,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            29.25
+            29.041666666666668
           ],
           "outcomes": [
             "finished"
@@ -1628,9 +1608,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 76944,
+          "wallMs": 58174,
           "runs": [
-            "20260915-220453-47e421"
+            "20260915-225837-acab09"
           ]
         },
         {
@@ -1646,15 +1626,15 @@
           "seeds": [
             3707397683
           ],
-          "bestX": 99.28029029690707,
-          "bestPct": 0.9928029029690707,
+          "bestX": 99.38548603289206,
+          "bestPct": 0.9938548603289206,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            7.725
+            7.5
           ],
           "outcomes": [
             "finished"
@@ -1662,9 +1642,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 14439,
+          "wallMs": 7385,
           "runs": [
-            "20260915-220502-c11445"
+            "20260915-225837-650041"
           ]
         },
         {
@@ -1680,15 +1660,15 @@
           "seeds": [
             2522286987
           ],
-          "bestX": 199.33886651945383,
-          "bestPct": 0.9966943325972691,
+          "bestX": 199.40794239070718,
+          "bestPct": 0.9970397119535359,
           "clears": 1,
           "attempts": [
             1
           ],
           "attemptsMedian": 1,
           "finishTimes": [
-            11.875
+            11.758333333333333
           ],
           "outcomes": [
             "finished"
@@ -1696,9 +1676,9 @@
           "firstBlocker": null,
           "replayFaithful": true,
           "replayDivergenceX": null,
-          "wallMs": 18079,
+          "wallMs": 11027,
           "runs": [
-            "20260915-220504-200094"
+            "20260915-225844-4450a5"
           ]
         }
       ]

@@ -5,9 +5,9 @@
   "bike": "rookie",
   "tier": "beginner",
   "technique": "the foundry kit at beginner pace",
-  "updatedAt": "2026-09-16T03:24:31.040Z",
+  "updatedAt": "2026-09-16T04:10:28.655Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "089e0885",
+  "srcFingerprint": "24a246e0",
   "attemptsBand": [
     1,
     2
@@ -29,34 +29,34 @@
       ],
       "attempts": [
         1,
+        5,
         1,
         2,
-        2,
-        4,
-        1,
         2,
         3,
+        2,
+        4,
         3
       ],
       "medianAttempts": 2,
       "clears": 9,
       "finishTimes": [
-        44.25833333333333,
-        44.15833333333333,
-        51.875,
-        45.925,
-        64.38333333333334,
-        44.24166666666667,
-        56.583333333333336,
-        60.40833333333333,
-        56.93333333333333
+        43.50833333333333,
+        76.04166666666667,
+        44.016666666666666,
+        56.475,
+        55.858333333333334,
+        61.00833333333333,
+        50.791666666666664,
+        67.00833333333334,
+        67.49166666666666
       ],
-      "medianFinishTime": 51.875,
-      "bestX": 448.07563737381315,
+      "medianFinishTime": 56.475,
+      "bestX": 447.98513569490933,
       "deaths": [
         {
-          "obstacle": "ground @ 135 m",
-          "x": 135,
+          "obstacle": "ground @ 170 m",
+          "x": 170,
           "count": 4,
           "reasons": {
             "crash": 4
@@ -67,6 +67,18 @@
           }
         },
         {
+          "obstacle": "ground @ 175 m",
+          "x": 175,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "nose-low": 1,
+            "air-short": 1
+          }
+        },
+        {
           "obstacle": "tunnel @ 210.0 m",
           "x": 210,
           "count": 2,
@@ -74,12 +86,25 @@
             "crash": 2
           },
           "rules": {
-            "nose-low": 2
+            "nose-low": 1,
+            "nose-high": 1
           }
         },
         {
-          "obstacle": "ground @ 170 m",
-          "x": 170,
+          "obstacle": "ledge @ 298.7 m",
+          "x": 298.747477,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "air-gas-nose-up": 1,
+            "air-short": 1
+          }
+        },
+        {
+          "obstacle": "ramp @ 118.0 m",
+          "x": 118,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -89,25 +114,25 @@
           }
         },
         {
-          "obstacle": "ground @ 175 m",
-          "x": 175,
+          "obstacle": "drum @ 165.0 m",
+          "x": 165,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "nose-low": 1
+            "air-short": 1
           }
         },
         {
-          "obstacle": "ground @ 245 m",
-          "x": 245,
+          "obstacle": "ground @ 200 m",
+          "x": 200,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "nose-low": 1
+            "touchdown": 1
           }
         },
         {
@@ -123,15 +148,15 @@
         }
       ],
       "runs": [
-        "20260915-222430-cf283a",
-        "20260915-222430-94894d",
-        "20260915-222430-a26728",
-        "20260915-222430-2aae48",
-        "20260915-222430-74d073",
-        "20260915-222430-33b608",
-        "20260915-222430-8eddd7",
-        "20260915-222430-47161e",
-        "20260915-222430-e7a6f9"
+        "20260915-231028-150a19",
+        "20260915-231028-e4a33a",
+        "20260915-231028-c6aa05",
+        "20260915-231028-0b23fb",
+        "20260915-231028-329669",
+        "20260915-231028-669b49",
+        "20260915-231028-77db52",
+        "20260915-231028-5b253b",
+        "20260915-231028-259fc6"
       ]
     }
   ]

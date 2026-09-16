@@ -255,7 +255,9 @@ describe('landing (R3 decision 1): the intent gate separates a landing recovery 
     // R7: with the rider body held (linkage couple) the cap-off pogo is 0.247 m at 2 m and the 3 m drop rides away (R3 measured
     // 0.4+ and a loop: the torso wind-up fed the R2 pogo). The cap still separates a landing from a hop (the on-rows and the
     // R7 coasting-push row); the control arm is re-derived
-    expect(off2.rebound).toBeGreaterThan(0.2);
+    // R9 (Astra's elbow stop, armMin 0.10 m, physics.md v2 status R9): the cap-off 2 m pogo is 0.204 -> 0.176 m (the folded
+    // arm is a strut on the rebound); the cap-on row is 0.01 m, so the gate still separates a landing from a hop by 17x
+    expect(off2.rebound).toBeGreaterThan(0.15);
     expect(off3.fault).toBeNull();
     const on = hop('rookie').apexR;
     const off = hop('rookie', {}, CAP_OFF).apexR;

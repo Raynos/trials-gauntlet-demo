@@ -206,7 +206,9 @@ describe.each(['rider-openface.glb', 'rider-openface-lod.glb', 'rider-street.glb
     // Physics R8 gave the body its hard seat / tank / reach limits (`solveHold`), so the recorded worst cases flipped:
     // the body stays within the rig's reach on both classes (measured worst grip shortfall 0.111 / 0.118 m, the
     // 50 ms impact ticks before the thrown-rider fault). Before R8 these read > 0.5 / > 0.1 / > 0.01.
-    expect(worst.grip).toBeLessThan(0.2);
+    // Physics R9 (Astra's hinged rear path + elbow stop landed; physics.md v2 status R9): the Rookie E2 window's worst grip
+    // shortfall is 0.111 -> 0.239 m (the Pro's stays under 0.2) - one impact tick of the re-searched golden's rear-first slam.
+    expect(worst.grip).toBeLessThan(0.25);
     expect(worst.sole).toBeLessThan(0.1);
     expect(worst.com).toBeLessThan(0.1);
   });

@@ -127,7 +127,10 @@ describe('the hop (R2 decision d; §9.5, §14.2, §14.3)', () => {
     expect(r.apexR).toBeLessThanOrEqual(0.65);
     expect(r.first).toBe('front');
     // R7 (physics.md v2 status R7: the linkage couple holds the rider body; the old value rode on the torso winding up 2.5 rad in the reference hop): 0.29 -> 0.183 s (the rear now clears 0.61 m and the front comes down first)
-    expect(r.bothOff).toBeGreaterThanOrEqual(0.15);
+    // R9 (Astra's hinged rear path, physics.md v2 status R9): 0.175 -> 0.092 s. R8's 0.175 was 0.067 s of flight plus a
+    // front-wheel bounce off a -13 deg touchdown; on the swingarm arc the bike lands at -7 deg and does not bounce, so the
+    // both-off time is the flight alone. The apex (0.603 -> 0.596) and the front-first order are unchanged.
+    expect(r.bothOff).toBeGreaterThanOrEqual(0.05);
     expect(Math.abs(r.landPitch)).toBeLessThan(20);
   });
 

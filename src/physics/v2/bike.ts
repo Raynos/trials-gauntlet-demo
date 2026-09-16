@@ -11,16 +11,16 @@
  *
  * Cross-tick state (§12), all of it: the `S_*` / `U_*` slots below. `snapshot.test.ts` asserts the list.
  */
-import type { CompiledTrack, FaultReason, GameEvent, InputFrame, PhysicsSnapshot, PhysicsState, RagdollBody, SurfaceKind, Vec2 } from '../../core/types';
+import type { CompiledTrack, FaultReason, GameEvent, InputFrame, PhysicsSnapshot, PhysicsState, RagdollBody, RiderBody, SurfaceKind, Vec2 } from '../../core/types';
 import { Rng } from '../../core/rng';
 import type { PhysicsWorld } from '../index';
 import { CollisionWorld, circleVsPrim, PrimKind, type Manifold, type Prim } from '../collision';
 import { SURFACES } from '../tuning';
 import { atan2, clamp, cos, sin, wrapAngle, HALF_PI } from '../dmath';
-import { bikeTuningV2, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
+import { bikeTuningV2, suspensionPoint, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
 import { driveTorque, lag, limiterLatch, reportRpm, thrustFrac, wheelieTrim } from './engine';
 import { brushImpulse, tyreMu } from './tyre';
-import { advanceTarget, buildChain, canonicalPose, GRIP_X, GRIP_Y, leanFromX, PEG_X, PEG_Y, poseAt, type ChainOut } from './rider';
+import { advanceTarget, buildChain, canonicalPose, drawnBody, GRIP_X, GRIP_Y, leanFromX, PEG_X, PEG_Y, poseAt, type ChainOut } from './rider';
 
 // ---------------------------------------------------------------------------
 // Public extras
@@ -43,9 +43,11 @@ export interface PhysicsDebugV2 {
   bodies: ({ id: string } & BodyDebug)[];
   contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; mu: number; surface: SurfaceKind }[];
   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
+  /** R8 Astra port: the brake torques applied this tick (N m) and the front caliper's lift-control trim 0..1 (Rookie assist; 0 on the Pro). */
+  brakes: { rearTorqueNm: number; frontTorqueNm: number; assist: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
   /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
-  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number; /** R8 hold envelope: this tick's constraint impulses (N s) on the four one-sided limits and the grip force they imply (`gripJ` / gripTau, N; a fault above hold.gripN) */ hold: { legJ: number; armJ: number; seatJ: number; tankJ: number; gripF: number } };
+  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number; /** R8 hold envelope: this tick's constraint impulses (N s) on the four one-sided limits and the grip force they imply (`gripJ` / gripTau, N; a fault above hold.gripN) */ hold: { legJ: number; armJ: number; seatJ: number; tankJ: number; /** R8 Astra port: the elbow stop's impulse (the arm's minimum length) */ elbowJ: number; gripF: number } };
   /** The declared attitude torque applied this tick (N m). */
   attTorque: number;
   /** Pose target in the chassis frame. */
@@ -290,6 +292,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
   // debug scratch of the last force pass
   private dEngineTq = 0;
   private dAssist = 0;
+  private dBrakeAssist = 0;
   private dThrust = 0;
   private dServoFx = 0;
   private dServoFy = 0;
@@ -298,9 +301,9 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private dLegFrac = 1;
   private dIntent = 0;
   // R8 hold envelope: accumulated impulses this tick (leg reach, arm reach, seat, tank)
-  private readonly holdLam = new Float64Array(4);
+  private readonly holdLam = new Float64Array(5);
   // seat / tank friction impulses (Coulomb, hold.mu x the normal impulse)
-  private readonly holdLamT = new Float64Array(4);
+  private readonly holdLamT = new Float64Array(5);
   // this tick's air limit (gain x blend x (1 - intent)), derived in step() from F; read by forces() and debug()
   private airLim = 0;
   private dAtt = 0;
@@ -582,7 +585,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
       // R7: the simulated rider body (world SI: COM position, angle psi_R, velocities) - the hero rig poses from it
       // (`render/frame.ts` derives the chassis-relative values); frozen at the crash pose once the ragdoll owns the
       // rider (im = 0). Part of the replay contract: `hashPhysicsState` hashes it whenever present.
-      riderBody: { pos: { x: px[RIDER]!, y: py[RIDER]! }, angle: an[RIDER]!, vel: { x: this.vx[RIDER]!, y: this.vy[RIDER]! }, angVel: av[RIDER]! },
+      riderBody: { pos: { x: px[RIDER]!, y: py[RIDER]! }, angle: an[RIDER]!, vel: { x: this.vx[RIDER]!, y: this.vy[RIDER]! }, angVel: av[RIDER]!, drawn: this.riderDrawn() },
       checkpoint: F[S_CHECKPOINT]!,
       finished: U[U_FINISHED] === 1,
       faulted: fault,
@@ -626,8 +629,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const [cr, cf] = this.staticSags();
     const sr = t.suspension.rear;
     const sf = t.suspension.front;
-    const rear = { x: sr.axle.x + sr.axis.x * cr, y: sr.axle.y + sr.axis.y * cr };
-    const front = { x: sf.axle.x + sf.axis.x * cf, y: sf.axle.y + sf.axis.y * cf };
+    const rear = suspensionPoint(sr, cr);
+    const front = suspensionPoint(sf, cf);
     poseAt(t.rider.poses, lean, this.poseTmp);
     const M = this.totalMass();
     const cx = (t.wheel.rearMass * rear.x + t.wheel.frontMass * front.x + t.rider.mass * this.poseTmp.x) / M;
@@ -706,6 +709,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
       bodies,
       contacts,
       engine: { rpm: reportRpm(t.engine, R, vRim, F[S_THROTTLE_EFF]!), torqueNm: this.dEngineTq, thrustN: this.dThrust, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]!, brakeEff: F[S_BRAKE_EFF]!, assist: this.dAssist },
+      brakes: { rearTorqueNm: this.sBrake[0]! / this.dt, frontTorqueNm: this.sBrake[1]! / this.dt, assist: this.dBrakeAssist },
       suspension: {
         rear: { compression: this.sComp[0]!, rate: this.sRate[0]!, force: this.sForce[0]! },
         front: { compression: this.sComp[1]!, rate: this.sRate[1]!, force: this.sForce[1]! },
@@ -718,7 +722,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
         legFrac: this.dLegFrac,
         intent: this.dIntent,
         airLimited: this.airLim,
-        hold: { legJ: this.holdLam[0]!, armJ: this.holdLam[1]!, seatJ: this.holdLam[2]!, tankJ: this.holdLam[3]!, gripF: F[S_GRIP_J]! / t.rider.hold.gripTau },
+        hold: { legJ: this.holdLam[0]!, armJ: this.holdLam[1]!, seatJ: this.holdLam[2]!, tankJ: this.holdLam[3]!, elbowJ: this.holdLam[4]!, gripF: F[S_GRIP_J]! / t.rider.hold.gripTau },
         poseTargetWorld: { x: this.dTgtWx, y: this.dTgtWy },
         lag: { x: this.px[RIDER]! - this.dTgtWx, y: this.py[RIDER]! - this.dTgtWy },
       },
@@ -782,44 +786,54 @@ class WorldV2 implements BikePhysicsWorldV2 {
     }
   }
 
-  /** Static vertical ground load on wheel 0 (rear) / 1 (front): neutral pose, level, zero-compression geometry. */
-  private staticLoad(which: number): number {
-    const t = this.tuning;
-    const sr = t.suspension.rear;
-    const sf = t.suspension.front;
-    const L = sf.axle.x - sr.axle.x;
-    const M = this.totalMass();
-    const W = M * this.g;
-    poseAt(t.rider.poses, 0, this.poseTmp);
-    const cx = (t.wheel.rearMass * sr.axle.x + t.wheel.frontMass * sf.axle.x + t.rider.mass * this.poseTmp.x) / M - sr.axle.x;
-    const nf = (W * cx) / L;
-    return which === 0 ? W - nf : nf;
-  }
-
   /**
    * Static sag of a wheel's spring under a vertical ground load `N`: the unsprung wheel carries its own
    * weight, and on a tilted slider the spring sees `axis.y` of the sprung share (the slider's
-   * perpendicular constraint carries the rest).
+   * perpendicular constraint carries the rest). On the hinge (R8 Astra port) the axis is the arc's tangent AT
+   * the sag, so the sag is iterated (8 fixed-point steps from `guess`; the tangent turns 0.2 rad over the travel).
    */
-  private staticSag(s: SuspensionV2, N: number, wheelMass: number): number {
-    const sprung = (N - wheelMass * this.g) * s.axis.y;
-    return clamp(sprung / s.k - s.preload, 0, s.travel);
+  private staticSag(s: SuspensionV2, N: number, wheelMass: number, guess = 0): number {
+    let compression = guess;
+    for (let i = 0; i < 8; i++) {
+      const vertical = s.hinge ? -cos(s.hinge.droopAngle - compression / s.hinge.radius) : s.axis.y;
+      compression = clamp(((N - wheelMass * this.g) * vertical) / s.k - s.preload, 0, s.travel);
+    }
+    return compression;
   }
 
-  /** Static sags (m) of rear / front at the neutral pose. */
+  /**
+   * Static sags (m) of rear / front at the neutral pose: the wheel loads from the moment balance about the SAGGED
+   * axles (level ground through both contacts), iterated with the sags (R8 Astra port, 405f894; before, the split
+   * was taken on the zero-compression geometry, 1-2 % off on a 26 cm arc).
+   */
   private staticSags(): [number, number] {
     const t = this.tuning;
-    return [this.staticSag(t.suspension.rear, this.staticLoad(0), t.wheel.rearMass), this.staticSag(t.suspension.front, this.staticLoad(1), t.wheel.frontMass)];
+    const mass = this.totalMass();
+    poseAt(t.rider.poses, 0, this.poseTmp);
+    let rear = 0;
+    let front = 0;
+    for (let i = 0; i < 16; i++) {
+      const r = suspensionPoint(t.suspension.rear, rear);
+      const f = suspensionPoint(t.suspension.front, front);
+      const angle = atan2(r.y - f.y, f.x - r.x);
+      const mx = (t.wheel.rearMass * r.x + t.wheel.frontMass * f.x + t.rider.mass * this.poseTmp.x) / mass;
+      const my = (t.wheel.rearMass * r.y + t.wheel.frontMass * f.y + t.rider.mass * this.poseTmp.y) / mass;
+      const width = Math.sqrt((f.x - r.x) ** 2 + (f.y - r.y) ** 2);
+      const frontLoad = (mass * this.g * ((mx - r.x) * cos(angle) - (my - r.y) * sin(angle))) / width;
+      rear = this.staticSag(t.suspension.rear, mass * this.g - frontLoad, t.wheel.rearMass, rear);
+      front = this.staticSag(t.suspension.front, frontLoad, t.wheel.frontMass, front);
+    }
+    return [rear, front];
   }
 
   /** Render axle frame origin in the chassis frame (axle midpoint at static sag), as v1. */
   private axleOrigin(): void {
     const t = this.tuning;
-    const sr = t.suspension.rear;
-    const sf = t.suspension.front;
     const [cr, cf] = this.staticSags();
-    this.axleOrgX = 0.5 * (sr.axle.x + sr.axis.x * cr + sf.axle.x + sf.axis.x * cf);
-    this.axleOrgY = 0.5 * (sr.axle.y + sr.axis.y * cr + sf.axle.y + sf.axis.y * cf);
+    const rear = suspensionPoint(t.suspension.rear, cr);
+    const front = suspensionPoint(t.suspension.front, cf);
+    this.axleOrgX = 0.5 * (rear.x + front.x);
+    this.axleOrgY = 0.5 * (rear.y + front.y);
   }
 
   /**
@@ -833,10 +847,12 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const sr = t.suspension.rear;
     const sf = t.suspension.front;
     const [cr, cf] = this.staticSags();
-    const rlx = sr.axle.x + sr.axis.x * cr;
-    const rly = sr.axle.y + sr.axis.y * cr;
-    const flx = sf.axle.x + sf.axis.x * cf;
-    const fly = sf.axle.y + sf.axis.y * cf;
+    const rearPoint = suspensionPoint(sr, cr);
+    const frontPoint = suspensionPoint(sf, cf);
+    const rlx = rearPoint.x;
+    const rly = rearPoint.y;
+    const flx = frontPoint.x;
+    const fly = frontPoint.y;
     // chassis angle that puts both axles on the ground line
     const a = angle + atan2(rly - fly, flx - rlx);
     const c = cos(a);
@@ -931,6 +947,21 @@ class WorldV2 implements BikePhysicsWorldV2 {
     };
   }
 
+  /**
+   * R9: the drawn pose for the hero (`riderBody.drawn`) - Astra's seated table at the effective lean with the same two
+   * excursion numbers the sensor chain draws (height below the target, angle behind it). Pure in the body's state;
+   * not hashed (`hashPhysicsState` lists its fields), so the physics and every golden are byte-identical with or
+   * without it. The sensor chain stays on the physical table (`buildRiderChain`).
+   */
+  private riderDrawn(): NonNullable<RiderBody['drawn']> {
+    const r = this.tuning.rider;
+    const F = this.F;
+    const l = this.riderLocal();
+    const out = { pose: 'seated' as 'seated' | 'back' | 'forward', blend: 0, hips: { x: 0, y: 0 }, torso: 0, head: 0 };
+    drawnBody(leanFromX(r.poses, l.x), l.y - F[S_TGT_Y]!, l.psi - F[S_TGT_PSI]!, out);
+    return out;
+  }
+
   /** The drawn chain in world space from the rider body (sensors + ragdoll spawn live on it). */
   private buildRiderChain(): void {
     const r = this.tuning.rider;
@@ -952,6 +983,47 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const rx = pxw - this.px[b]!;
     const ry = pyw - this.py[b]!;
     this.av[b] = this.av[b]! + this.ii[b]! * (rx * fy - ry * fx) * dt;
+  }
+
+  /**
+   * Suspension geometry of wheel `w` from the current positions (R8 Astra port, 405f894): the compression
+   * coordinate `sComp`, the direction it grows along `sA` (world), the bilateral constraint's direction `sN` and
+   * its error `sPerp`. Straight slider: `sA` the axis, `sN` its perpendicular, `sPerp` the drift off the line. Hinge
+   * (the rear swingarm): `sA` the arc's tangent, `sN` the radial direction from the pivot and `sPerp` the arm-length
+   * error `d - radius`, `sComp` the arc length from full droop. One function for the force pass, the velocity
+   * solve, the position pass and derive(), so every phase sees the same path.
+   */
+  private suspensionGeometry(w: number): void {
+    const st = w === 0 ? this.tuning.suspension.rear : this.tuning.suspension.front;
+    const body = w === 0 ? REAR : FRONT;
+    const angle = this.an[CHASSIS]!;
+    const c = cos(angle);
+    const s = sin(angle);
+    const local = st.hinge ? st.hinge.pivot : st.axle;
+    const x = this.px[CHASSIS]! + local.x * c - local.y * s;
+    const y = this.py[CHASSIS]! + local.x * s + local.y * c;
+    const dx = this.px[body]! - x;
+    const dy = this.py[body]! - y;
+    if (st.hinge) {
+      const d2 = Math.max(1e-12, dx * dx + dy * dy);
+      const d = Math.sqrt(d2);
+      this.sNx[w] = dx / d;
+      this.sNy[w] = dy / d;
+      // tangent in the sense of growing compression (the arm angle falls as the wheel rises)
+      this.sAx[w] = (st.hinge.radius * dy) / d2;
+      this.sAy[w] = (-st.hinge.radius * dx) / d2;
+      this.sComp[w] = st.hinge.radius * wrapAngle(st.hinge.droopAngle - atan2(dy, dx) + angle);
+      this.sPerp[w] = d - st.hinge.radius;
+    } else {
+      const ax = st.axis.x * c - st.axis.y * s;
+      const ay = st.axis.x * s + st.axis.y * c;
+      this.sAx[w] = ax;
+      this.sAy[w] = ay;
+      this.sNx[w] = -ay;
+      this.sNy[w] = ax;
+      this.sComp[w] = dx * ax + dy * ay;
+      this.sPerp[w] = -dx * ay + dy * ax;
+    }
   }
 
   private forces(riding: boolean): void {
@@ -988,25 +1060,15 @@ class WorldV2 implements BikePhysicsWorldV2 {
 
     // suspension pass 1: geometry and rates from pre-impulse velocities (both wheels first)
     for (let w = 0; w < 2; w++) {
-      const st = w === 0 ? t.suspension.rear : t.suspension.front;
       const wb = w === 0 ? REAR : FRONT;
-      const ax = st.axis.x * c - st.axis.y * s;
-      const ay = st.axis.x * s + st.axis.y * c;
-      const arx = fx + st.axle.x * c - st.axle.y * s;
-      const ary = fy + st.axle.x * s + st.axle.y * c;
-      const dx = px[wb]! - arx;
-      const dy = py[wb]! - ary;
+      this.suspensionGeometry(w);
+      const ax = this.sAx[w]!;
+      const ay = this.sAy[w]!;
       const rx = px[wb]! - fx;
       const ry = py[wb]! - fy;
       const wf = av[CHASSIS]!;
       const relx = vx[wb]! - (vx[CHASSIS]! - wf * ry);
       const rely = vy[wb]! - (vy[CHASSIS]! + wf * rx);
-      this.sAx[w] = ax;
-      this.sAy[w] = ay;
-      this.sNx[w] = -ay;
-      this.sNy[w] = ax;
-      this.sComp[w] = dx * ax + dy * ay;
-      this.sPerp[w] = -dx * ay + dy * ax;
       this.sRate[w] = relx * ax + rely * ay;
     }
     // suspension pass 2: spring + damper + cubic bump stop as an impulse pair; rolling resistance
@@ -1473,6 +1535,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const fy = this.py[CHASSIS]!;
     const wheelB = WHEEL_BODIES;
     const brakeIn = riding ? this.F[S_BRAKE_EFF]! : 1;
+    this.dBrakeAssist = 0;
 
     for (let it = 0; it < iters; it++) {
       // --- sliders: bilateral perpendicular constraint, then travel limits (no restitution, no Baumgarte)
@@ -1647,13 +1710,48 @@ class WorldV2 implements BikePhysicsWorldV2 {
         }
       }
 
-      // --- brakes: torque-capped spin locks wheel <-> chassis (§8: no caps of any kind while riding)
+      // --- brakes: torque-capped spin locks wheel <-> chassis (§8: no caps of any kind while riding). R8 Astra port
+      // (405f894): the Rookie's rear-lift protection trims the front caliper from the same contact loads the tyres
+      // see - the total braking force that would lift the rear about the front contact patch (gravity's righting
+      // moment M g x the COM's lever behind the patch over the COM's height above it, 10 % margin, the nose-down
+      // rate anticipated over `liftLookahead`), less the rear tyre's braking force, is the front caliper's ceiling;
+      // faded out with |lean| 0.5 -> 0.8 (brake + lean +1 is still the stoppie). Pro: liftControl 0.
       if (brakeIn > 0) {
+        let frontLimit = Infinity;
+        const assist = riding ? t.brakes.liftControl * clamp((0.8 - Math.abs(this.F[S_IN_L]!)) / 0.3, 0, 1) : 0;
+        if (assist > 0) {
+          let frontContact = -1;
+          let rearBrake = 0;
+          for (let i = 0; i < nC; i++) {
+            if (this.cA[i] === FRONT && this.cLn[i]! > 0 && (frontContact < 0 || this.cLn[i]! > this.cLn[frontContact]!)) frontContact = i;
+            if (this.cA[i] === REAR) rearBrake += Math.max(0, this.cLt[i]!) / dt;
+          }
+          if (frontContact >= 0) {
+            const mass = this.totalMass();
+            const mx = (t.chassis.mass * this.px[CHASSIS]! + t.wheel.rearMass * this.px[REAR]! + t.wheel.frontMass * this.px[FRONT]! + t.rider.mass * this.px[RIDER]!) / mass;
+            const my = (t.chassis.mass * this.py[CHASSIS]! + t.wheel.rearMass * this.py[REAR]! + t.wheel.frontMass * this.py[FRONT]! + t.rider.mass * this.py[RIDER]!) / mass;
+            const nx = this.cNx[frontContact]!;
+            const ny = this.cNy[frontContact]!;
+            const dx = mx - this.px[FRONT]! - this.cRAx[frontContact]!;
+            const dy = my - this.py[FRONT]! - this.cRAy[frontContact]!;
+            const height = dx * nx + dy * ny;
+            if (height > 0.1) {
+              const margin = -dx + Math.min(0, av[CHASSIS]!) * height * t.brakes.liftLookahead;
+              const safeForce = Math.max(0, (0.9 * mass * this.g * margin) / height);
+              frontLimit = Math.max(0, safeForce - rearBrake) * t.wheel.radius;
+            }
+          }
+        }
         for (let w = 0; w < 2; w++) {
           const wb = wheelB[w]!;
           let maxNm = t.brakes.totalNm * (w === 0 ? 1 - t.brakes.frontFrac : t.brakes.frontFrac);
           if (!riding) maxNm *= w === 0 ? t.ragdoll.crashRearBrake : t.ragdoll.crashFrontBrake;
-          const maxJ = brakeIn * maxNm * dt;
+          let maxJ = brakeIn * maxNm * dt;
+          if (w === 1 && Number.isFinite(frontLimit)) {
+            const trim = assist * Math.max(0, maxJ - frontLimit * dt);
+            this.dBrakeAssist = maxJ > 0 ? trim / maxJ : 0;
+            maxJ -= trim;
+          }
           const rel = av[wb]! - av[CHASSIS]!;
           const mass = 1 / (ii[wb]! + ii[CHASSIS]!);
           let lambda = -mass * rel;
@@ -1706,7 +1804,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     // seat and tank: the hips in the chassis frame
     const hipLx = (hipx - fx) * c + (hipy - fy) * s;
     const hipLy = -(hipx - fx) * s + (hipy - fy) * c;
-    for (let k = 0; k < 4; k++) {
+    for (let k = 0; k < 5; k++) {
       // rider anchor (ax, ay), chassis anchor (bx, by), the direction n along which the gap C grows, and C itself
       let ax: number;
       let ay: number;
@@ -1728,6 +1826,29 @@ class WorldV2 implements BikePhysicsWorldV2 {
         nx = -dx / d;
         ny = -dy / d;
         C = (k === 0 ? h.legReach : h.armReach) - d;
+      } else if (k === 4) {
+        // elbow stop (R8 Astra port, 405f894): C = |chest - grip| - armMin, grows as the chest moves away from the grip -
+        // the folded arm is a strut; the hands push on the bars (a front slam pitching the body onto the bars)
+        if (h.armMin <= 0) continue;
+        ax = chx;
+        ay = chy;
+        bx = gripx;
+        by = gripy;
+        const dx = ax - bx;
+        const dy = ay - by;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 1e-6) continue;
+        // R9: the strut only acts with the chest ABOVE the grip line (chassis up): off at and below the bar, full `armMinFade`
+        // above it. Above the line the push has an upward component and, the chest being ahead of the body COM, rights the body;
+        // with the chest under the bar the push points down and forms a couple with the linear servo's pull on the COM (600-900 N
+        // x 0.41 m) that the 300 N m torque cap cannot break - x3 Pro 74-81 m held the torso flat, 37-44 deg forward, for 0.6 s
+        // at 12-14 m/s with the torque pinned (physics.md v2 status R9). Below the bar the hands hang: R8's behaviour.
+        const chestUp = -dx * s + dy * c;
+        const armMinEff = h.armMin * clamp(chestUp / h.armMinFade, 0, 1);
+        if (armMinEff <= 0) continue;
+        nx = dx / d;
+        ny = dy / d;
+        C = d - armMinEff;
       } else if (k === 2) {
         // seat: C = hips height above the seat line, chassis up; the reaction on the chassis at the seat under the hips
         ax = hipx;
@@ -1770,7 +1891,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
       vx[CHASSIS] = vx[CHASSIS]! - lambda * nx * im[CHASSIS]!;
       vy[CHASSIS] = vy[CHASSIS]! - lambda * ny * im[CHASSIS]!;
       av[CHASSIS] = av[CHASSIS]! - ii[CHASSIS]! * rnb * lambda;
-      if (k < 2 || acc <= 0) continue;
+      if (k < 2 || k === 4 || acc <= 0) continue;
       // seat / tank friction: the body does not slide along the seat it is pressed onto (a 15 g rear-first landing
       // slid the hips 0.2 m back along a frictionless seat until the arms snapped taut - a thrown rider that was not)
       {
@@ -1900,26 +2021,17 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const slop = t.solver.slop;
     const beta = t.solver.posBeta;
     for (let it = 0; it < t.solver.posIters; it++) {
-      const c = cos(an[CHASSIS]!);
-      const s = sin(an[CHASSIS]!);
-      const fx = px[CHASSIS]!;
-      const fy = py[CHASSIS]!;
       for (let w = 0; w < 2; w++) {
         const st = w === 0 ? t.suspension.rear : t.suspension.front;
         const wb = w === 0 ? REAR : FRONT;
-        const ax = st.axis.x * c - st.axis.y * s;
-        const ay = st.axis.x * s + st.axis.y * c;
-        const nx = -ay;
-        const ny = ax;
-        const arx = fx + st.axle.x * c - st.axle.y * s;
-        const ary = fy + st.axle.x * s + st.axle.y * c;
-        const dx = px[wb]! - arx;
-        const dy = py[wb]! - ary;
-        const rx = px[wb]! - fx;
-        const ry = py[wb]! - fy;
-        // perpendicular drift: remove it fully
+        // perpendicular drift (the arm-length error on the hinge): remove it fully
+        this.suspensionGeometry(w);
         {
-          const perp = dx * nx + dy * ny;
+          const nx = this.sNx[w]!;
+          const ny = this.sNy[w]!;
+          const rx = px[wb]! - px[CHASSIS]!;
+          const ry = py[wb]! - py[CHASSIS]!;
+          const perp = this.sPerp[w]!;
           const rn = rx * ny - ry * nx;
           const mass = 1 / (im[wb]! + im[CHASSIS]! + ii[CHASSIS]! * rn * rn);
           const lambda = -perp * mass;
@@ -1929,9 +2041,14 @@ class WorldV2 implements BikePhysicsWorldV2 {
           py[CHASSIS] = py[CHASSIS]! - lambda * ny * im[CHASSIS]!;
           an[CHASSIS] = an[CHASSIS]! - ii[CHASSIS]! * rn * lambda;
         }
-        // travel
+        // travel (re-read after the drift fix: on the hinge the tangent turned with it)
+        this.suspensionGeometry(w);
         {
-          const comp = dx * ax + dy * ay;
+          const ax = this.sAx[w]!;
+          const ay = this.sAy[w]!;
+          const rx = px[wb]! - px[CHASSIS]!;
+          const ry = py[wb]! - py[CHASSIS]!;
+          const comp = this.sComp[w]!;
           const ra = rx * ay - ry * ax;
           const massA = 1 / (im[wb]! + im[CHASSIS]! + ii[CHASSIS]! * ra * ra);
           let err = 0;
@@ -1998,13 +2115,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const prevRearComp = F[S_REAR_COMP]!;
     for (let w = 0; w < 2; w++) {
       const st = w === 0 ? t.suspension.rear : t.suspension.front;
-      const wb = w === 0 ? REAR : FRONT;
-      const ax = st.axis.x * c - st.axis.y * s;
-      const ay = st.axis.x * s + st.axis.y * c;
-      const arx = this.px[CHASSIS]! + st.axle.x * c - st.axle.y * s;
-      const ary = this.py[CHASSIS]! + st.axle.x * s + st.axle.y * c;
-      const comp = (this.px[wb]! - arx) * ax + (this.py[wb]! - ary) * ay;
-      F[w === 0 ? S_REAR_COMP : S_FRONT_COMP] = clamp(comp / st.travel, 0, 1);
+      this.suspensionGeometry(w);
+      F[w === 0 ? S_REAR_COMP : S_FRONT_COMP] = clamp(this.sComp[w]! / st.travel, 0, 1);
     }
 
     let rearLn = 0;

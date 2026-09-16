@@ -83,7 +83,7 @@ function hopApex(cls: BikeClassV2, preLean: number, snapRate: number, over?: Par
 }
 
 /** Flat drop of `h` m at `v` m/s, level, `lean` held from release through the landing (R3's `drop`). */
-function drop(cls: BikeClassV2, h: number, v: number, lean: number, over?: PartialTuningV2, seconds = 3): { maxRear: number; minPitch: number; maxPitch: number; fault: string | null; rebound: number; limAtLand: number; limTrace: number[] } {
+function drop(cls: BikeClassV2, h: number, v: number, lean: number, over?: PartialTuningV2, seconds = 3): { maxRear: number; minPitch: number; maxPitch: number; fault: string | null; rebound: number; limAtLand: number; limTrace: number[]; groundTrace: boolean[] } {
   const w = flatWorld(cls, over);
   const s0 = w.getState();
   w.teleport({ pos: { x: s0.wheels.rear.pos.x, y: s0.wheels.rear.pos.y + h }, angle: (5 * Math.PI) / 180, vel: { x: v, y: 0 } });
@@ -95,10 +95,12 @@ function drop(cls: BikeClassV2, h: number, v: number, lean: number, over?: Parti
   let y0 = NaN;
   let limAtLand = NaN;
   const limTrace: number[] = [];
+  const groundTrace: boolean[] = [];
   const s = stepN(w, { throttle: 0.2, lean }, Math.round(HZ * seconds), (st) => {
     const g = st.wheels.rear.grounded || st.wheels.front.grounded;
     const lim = w.debug().rider.airLimited;
     limTrace.push(lim);
+    groundTrace.push(g);
     if (g && !landed) {
       landed = true;
       limAtLand = lim;
@@ -111,7 +113,7 @@ function drop(cls: BikeClassV2, h: number, v: number, lean: number, over?: Parti
       rebound = Math.max(rebound, st.wheels.rear.pos.y - y0);
     }
   });
-  return { maxRear, minPitch, maxPitch, fault: s.faulted, rebound, limAtLand, limTrace };
+  return { maxRear, minPitch, maxPitch, fault: s.faulted, rebound, limAtLand, limTrace, groundTrace };
 }
 
 describe('R5: the Rookie air limit (rider.airRate*) - the pose swing in free air is rate-limited, the throw on the ground is not', () => {
@@ -188,7 +190,17 @@ describe('R5: the Rookie air limit (rider.airRate*) - the pose swing in free air
     // 4 cm of travel earns intent 0.83 that decays with the 0.2 s tau through the flight - a bench artefact
     expect(peak).toBeGreaterThan(0.9);
     expect(maxStep).toBeLessThanOrEqual(1 / 12 + 1e-9);
-    expect(d.limTrace[d.limTrace.length - 1]).toBe(0);
+    // R9 (Astra's hinged rear path, physics.md v2 status R9): the blend-out is asserted from the touch, not at the 1.2 s mark. The
+    // 40 deg nose-up rear-first landing rebounds and pitches nose-down; on the arc the rear un-weights for 0.1 s at 1.13 s (R8 had
+    // it at 1-2 % compression there), so the limit reads 0.83 at 1.2 s. The blend-out itself: 0 within 0.12 s of the first touch,
+    // and 0 for >= 0.3 s after it (0.717-1.10 s).
+    const landAt = d.limTrace.findIndex((_, i) => i > 0 && d.groundTrace[i]!);
+    const zeroAt = d.limTrace.findIndex((v, i) => i >= landAt && v === 0);
+    expect(landAt).toBeGreaterThan(0);
+    expect(zeroAt - landAt).toBeLessThanOrEqual(15);
+    let zeroRun = 0;
+    for (let i = zeroAt; i < d.limTrace.length && d.limTrace[i] === 0; i++) zeroRun++;
+    expect(zeroRun).toBeGreaterThanOrEqual(36);
     // a pose pressed in free air stays limited: peak rate of a 0 -> -1 press with a still target is < the raw dip
     const press = air('rookie', {}, { lean: -1 });
     const raw = air('rookie', {}, { lean: -1 }, AIR_RAW);

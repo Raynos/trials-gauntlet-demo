@@ -87,6 +87,35 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 15 (physics R9) — strangers on Astra's physics (swingarm arc, elbow stop, Rookie lift control; seated pose drawn): b1–e3 on the Rookie, src 24a246e0, two fresh strangers per track, 12 / 12 cleared; e2 back in band
+
+Physics R9 (`physics.md` v2 status R9: Astra's `405f894` hinged rear path + fork axis, elbow stop at 0.10 m blended in above the
+bar, Rookie brake lift control, and the drawn / physical pose split) is a dynamics change, so b1–e3 re-run with strangers, **n = 2
+per track**: twelve sessions, `prep --round r15 --agents s1,s2`, prompt = `run-stranger.md` block verbatim, spawned in parallel
+(the box also carried the two golden sweeps and the reflex run; 1.1–5.7 min wall, 11–25 calls). **Every session cleared;
+verdicts from `harness:stranger report` (n = 2, censored = the two abandoned r4 shells per track):**
+
+| track | band | asserted | attempts (s1, s2) | median | verdict | time to clear | calls | died at | what the strangers said |
+|---|---|---|---|---:|---|---|---:|---|---|
+| b1-first-ride | 1–1 | 1 ≤ med ≤ 1.5 | 1, 1 | **1** | PASS (R14: 1) | 44.6 / 46.6 s | 15 / 15 | — | both name judging the brake before the 2 m hump at 511–541 m; both stopped upright, no fault |
+| b2-lean-back | 1–2 | 1 ≤ med ≤ 3 | 1, 1 | **1** | PASS (R14: 1) | 43.7 / 49.2 s | 19 / 23 | — | a one-slot `lb` before the second hump's descent pitched to 45° nose-up in the air and came back level; s2 braked and hopped the first three stair flights before learning plain gas rides them |
+| b3-kicker-row | 1–2 | 1 ≤ med ≤ 3 | 2, 1 | **1.5** | PASS (R14: 2) | 42.1 / 34.6 s | 18 / 14 | 335 m (ramp) | `gf` held one slot past the x ≈ 316 kicker's lip at 17 m/s → nose-down through the flight (s1's one crash); s2 landed the double gap at 318–342 m at −30° then left the second lip at 10 m/s, 45° nose-up, to a rear-wheel landing |
+| e1-uphill-weight | 2–4 | 2 ≤ med ≤ 6 | 3, 2 | **2.5** | PASS (R14: 2) | 64.0 / 55.9 s | 19 / 18 | 437 m (plank), 461 m; 216 m | the 40–45° faces: 15 m/s launches clean over the crest (one full front-flip that landed); the fix both found is bleed to ~11 m/s, weight forward on the face, release at the lip; s1 also looped gassing the descent from a crawl after the x ≈ 436 face |
+| e2-rear-wheel-first | 3–5 | 3 ≤ med ≤ 7.5 | 3, 3 | **3** | **PASS** (R14: 1.5, under) | 58.3 / 64.0 s | 22 / 25 | 191 m (ramp), 318 m (box); 259 m (ramp), 328 m | both: a single `lb` tap on a long flight keeps rotating into a loop; s1 settled on a `lb1 c1 lf1 c` pulse that lands rear-wheel-first at 10–30°, s2 dropped the lean and coasted level off each lip |
+| e3-stairway | 3–6 | 3 ≤ med ≤ 9 | 1, 1 | **1** | **UNDER-BAND** (R14: 1, under) | 40.5 / 40.5 s | 11 / 11 | — | held full gas through every flight both ways (both distrusted the card's "brake down"), the 1 m pit at x ≈ 422 cleared on momentum; identical 5 185-tick clears |
+
+Census: 12 / 12 cleared, medians b1 1 · b2 1 · b3 1.5 · e1 2.5 · e2 3 · e3 1 against bands 1–1 · 1–2 · 1–2 · 2–4 · 3–5 · 3–6.
+**e2 is back inside its band** (1.5 → 3 at n = 2: the strangers' in-air `lb` loops the Rookie on the hinge more readily than on
+the slider — the R5 air limit is unchanged, the touchdown is the arc's); **e3 stays under** as at R13 / R14 — easier than
+authored, within the ship limit, a tracks note. The gate's `stranger.medianAttempts` row reads the same census (PASS).
+Recordings `harness/inputs/<track>/stranger-<track>-r15-s{1,2}-20260915-225608.json` (not browser-replayed this round);
+reports `harness/out/metrics/<track>.stranger.{json,md}`.
+
+Alongside, on the same src: goldens 47 / 47 on disk browser-proved (48 / 48 hash-identical node == browser including the
+sweep-1 x1 Pro before it went stale; x1 Pro open — a search stall at 599.7 m, `physics.md` R9), determinism 9 / 9 (D8
+`afee0f1094a0587c`), gate `--quick` 27 / 30 (the three SwiftShader timing rows), reflex 9 seeds clears 9 / 9 on every track with
+no beginner / easy median worse by more than 1 (`physics.md` R9).
+
 ## Round 14 (physics R8) — strangers on the rider who sits on the bike: b1–e3 on the Rookie (the tier's default), src 089e0885, two fresh strangers per track, 12 / 12 cleared; b1 back in band (the R13 brake endo is gone from a stranger's hands), e2 / e3 UNDER band as in R13
 
 Physics R8 (`physics.md` v2 status R8: the hold envelope — seat, tank, leg and arm reach as hard one-sided limits with

@@ -5,8 +5,8 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { Game } from '../../game/game';
 import { createBikePhysicsV2 } from '../../physics/v2/bike';
-import { bikeTuningV2 } from '../../physics/v2/tuning';
-import { BIKE_GEOMETRY_V2, suspensionPoint } from './assetFrame';
+import { bikeTuningV2, suspensionPoint } from '../../physics/v2/tuning';
+import { BIKE_GEOMETRY_V2 } from './assetFrame';
 import { GRIP_X, GRIP_Y, PEG_X, PEG_Y } from '../../physics/v2/rider';
 import type { GameRenderer } from '../index';
 import { FrameBuilder, type RenderFrame } from '../frame';
@@ -182,8 +182,9 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
       expect(rodBottom.clone().applyMatrix4(rig.mesh('shock_shaft').matrixWorld).distanceTo(bottom)).toBeLessThan(2e-4);
       expect(rodTop.clone().applyMatrix4(rig.mesh('shock_shaft').matrixWorld).distanceTo(rig.point('attach_shock_rod_top'))).toBeLessThan(2e-4);
     }
-    expect(worstBlock).toBeLessThan(.03); // measured 0.0267 m (Rookie rear, compression 0.15)
-    expect(worstBlock).toBeGreaterThan(.02); // the chord is real: when main gains the hinge this tightens to 2e-4
+    // Physics R9 (Astra's hinge): the solver moves the rear wheel on the asset's swingarm arc, so the rigid arm's axle
+    // block is the wheel at every compression (before R9 the straight axis was a chord of the arc: 0.0267 m at 0.15 m).
+    expect(worstBlock).toBeLessThan(2e-4);
   });
 
   it('preserves wheel world angles, fixed fork alignment, and shock roll through a production replay', async () => {
@@ -247,7 +248,7 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
     expect(Math.max(...pose) - Math.min(...pose)).toBeGreaterThan(.05);
     // The straight-axis / arc mismatch over a b3 replay (merge #3 gap list): the wheel stays within 5 cm of the arm's end.
     expect(worstArm).toBeLessThan(.05);
-    expect(worstFront).toBeGreaterThan(1e-3); // the 5 mm rest offset is real; when main adopts the asset's fork line this tightens to 2e-4
+    expect(worstFront).toBeLessThan(1e-3); // Physics R9: the front rides the asset's fork line (rest offset 0, residual < 1 mm)
   });
 
   it('repeats the same rigid pose after arbitrary history, including a reset and unchanged timestamps', () => {
@@ -284,7 +285,9 @@ describe.each(['bike.glb', 'bike-lod.glb'])('%s articulated geometry', (file) =>
     // Merge #3: the asset was authored on the Rookie row. `main`'s Pro row (tuning.ts BIKE_PRESETS_V2.pro) pulls both
     // rest axles 1 cm inboard (rear -0.575, front 0.705; wheelbase 1.28), so only the Rookie's rest axles are the
     // asset's markers (rear exactly, front 5 mm low); the Pro's wheels sit 1 cm (rear) / 1.1 cm (front) off them.
-    const axleOffset = { rookie: { rear: 0, front: 5e-3, wheelbase: 0 }, pro: { rear: 1e-2, front: Math.hypot(1e-2, 5e-3), wheelbase: -0.02 } } as const;
+    // Physics R9: both classes share the asset's rest axles and wheelbase (the Pro's 1 cm-inboard axles / 1.28 m wheelbase
+    // went with Astra's geometry port; before R9 the offsets were rookie front 5 mm, pro rear 1 cm / front 1.1 cm / -0.02 m).
+    const axleOffset = { rookie: { rear: 0, front: 0, wheelbase: 0 }, pro: { rear: 0, front: 0, wheelbase: 0 } } as const;
     for (const bike of ['rookie', 'pro'] as const) {
       const t = bikeTuningV2(bike);
       expect(t.wheel.wheelbase).toBeCloseTo(BIKE_GEOMETRY_V2.wheelbase + axleOffset[bike].wheelbase, 12);

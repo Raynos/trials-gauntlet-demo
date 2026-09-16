@@ -41,7 +41,11 @@ const RECOVER_TICKS = 60;
 const DEMAND_W = 6;
 const EXCURSION_M = 0.35;
 const EXCURSION_MAX_TICKS = 60;
-const SLOP = 0.05;
+// R8: 0.05 (worst 0.046 under the seat line on 46 goldens). R9 (physics.md v2 status R9): 0.08 - the x1 / x3 Pro goldens that
+// R8 could not search land the tracks' 5 m deck drop rear-first at -10 m/s (x1 599 m: seat impulse 768 N s, hips 0.130 = 7.0 cm
+// under the line; x3 528 m: 213 N s, 2.6 cm). The velocity-bias limit's penetration under that slam is what it is (F dt^2 / (m beta));
+// the sit is the seat taking the body, and the drawn pose (riderBody.drawn) never draws it below the seat.
+const SLOP = 0.08;
 const deg = (r: number): number => (r * 180) / Math.PI;
 
 function feel(name: string, value: number | string, band: string): void {
@@ -130,10 +134,16 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
     faults: [],
   };
   const demandG = r.Fmax / (r.mass * G);
+  // R9: the angular demand too - the servo's torque limit over the body's inertia (300 / 9 = 33 rad/s^2). R8's conditioner read only
+  // the linear demand, so an air whip whose chassis turns at 300 deg/s with the lean toggling (x3 Pro, 355-359 m: torque at +-300
+  // N m, COM on target at 0.04 m, angle 0.73 rad behind) counted as recovered ticks the servo could not have recovered on.
+  const demandA = r.tauMax / r.inertia;
   let ptx = Number.NaN;
   let pty = Number.NaN;
+  let pta = Number.NaN;
   const vhx: number[] = [];
   const vhy: number[] = [];
+  const vha: number[] = [];
   let lastOver = -1e9;
   let tick = 0;
   let excursion = 0;
@@ -155,8 +165,10 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
     prevPhase = ph;
     if (ph !== 'riding' || !s.riderBody) {
       ptx = Number.NaN;
+      pta = Number.NaN;
       vhx.length = 0;
       vhy.length = 0;
+      vha.length = 0;
       lastOver = -1e9;
       endExcursion();
       continue;
@@ -172,16 +184,20 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
     const tpsi = w.F[8]!;
     const twx = s.bike.pos.x + tx * c - ty * sn;
     const twy = s.bike.pos.y + tx * sn + ty * c;
+    const twa = s.bike.angle + tpsi;
     if (!Number.isNaN(ptx)) {
       vhx.push((twx - ptx) / DT);
       vhy.push((twy - pty) / DT);
+      vha.push((twa - pta) / DT);
       if (vhx.length > DEMAND_W + 1) {
         vhx.shift();
         vhy.shift();
+        vha.shift();
       }
       if (vhx.length === DEMAND_W + 1) {
         const demand = Math.hypot((vhx[DEMAND_W]! - vhx[0]!) / (DEMAND_W * DT), (vhy[DEMAND_W]! - vhy[0]!) / (DEMAND_W * DT) + G) / G;
-        if (demand > demandG) {
+        const demandAng = Math.abs((vha[DEMAND_W]! - vha[0]!) / (DEMAND_W * DT));
+        if (demand > demandG || demandAng > demandA) {
           lastOver = tick;
           row.overDemand++;
         }
@@ -189,6 +205,7 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
     }
     ptx = twx;
     pty = twy;
+    pta = twa;
     // the envelope in the chassis frame
     const rel = s.riderBody.angle - s.bike.angle;
     const cr = Math.cos(rel);
@@ -305,8 +322,8 @@ interface BrakeOut {
 }
 
 /** Cruise to v, then full brake at `lean` for `holdS` (then `after` input) for up to 4 s. */
-function brake(cls: BikeClassV2, v: number, lean: number, brace: number, holdS = 4, after: { brake: number; lean: number } = { brake: 1, lean }): BrakeOut {
-  const w = flatWorld(cls, { rider: { brakeBrace: brace } });
+function brake(cls: BikeClassV2, v: number, lean: number, brace: number, holdS = 4, after: { brake: number; lean: number } = { brake: 1, lean }, liftControl?: number): BrakeOut {
+  const w = flatWorld(cls, { rider: { brakeBrace: brace }, ...(liftControl === undefined ? {} : { brakes: { liftControl } }) });
   const v0 = cruise(w, v);
   const o: BrakeOut = { v0, stopT: Number.NaN, minPitch: 99, rearOffS: 0, firstRearOffS: Number.NaN, fault: null };
   for (let i = 0; i < HZ * 4; i++) {
@@ -442,11 +459,20 @@ describe('R8: the hold envelope, the thrown rider and the brake brace', () => {
         expect(b.minPitch).toBeGreaterThanOrEqual(-15);
         expect(b.rearOffS).toBeLessThan(0.4);
       }
-      const before = brake(cls, 15, 0, 0);
-      feel(`r8.brake.${cls}.v15.lean0.noBrace`, `pitch min ${before.minPitch.toFixed(0)} rear-off ${before.rearOffS.toFixed(2)} s ${before.fault ?? 'upright'}`, 'R7: endo');
-      expect(before.fault).not.toBeNull();
+      // R9 (Astra's hinged rear path, physics.md v2 status R9): with the brace AND the lift control off the 15 m/s stop no longer
+      // endos on either class - the swingarm angle turns part of the rear brake force into compression and moves its reaction to the
+      // pivot, so the bike rides the lift edge (Rookie 2.02 s, -14.8 deg, rear off 1.08 s; Pro 2.02 s, -13.7 deg, rear off 1.22 s)
+      // instead of going over (R7 / R8 on the slider: crash 1.39-1.62 s). The row is informational; the brace's job is the rear-off
+      // time (1.08-1.22 s -> 0.16 s) and the pitch (-14 -> -7 deg), asserted above.
+      const before = brake(cls, 15, 0, 0, 4, undefined, 0);
+      feel(`r8.brake.${cls}.v15.lean0.noBrace.noLift`, `stop ${before.stopT.toFixed(2)} s pitch min ${before.minPitch.toFixed(0)} rear-off ${before.rearOffS.toFixed(2)} s ${before.fault ?? 'upright'}`, 'info (R7 slider: endo; R9 hinge: rides the lift edge)');
+      expect(before.rearOffS).toBeGreaterThan(0.5);
       const stoppie = brake(cls, 10, 1, 0.5, 0.2, { brake: 0, lean: 0 });
+      // the brace-off control keeps the class's lift control (R9): Astra's Rookie lift control ends the stoppie 0.06-0.08 s sooner
+      // and is the same with the brace on and off; the brace itself moves nothing on a +1 lean
       const stoppieR7 = brake(cls, 10, 1, 0, 0.2, { brake: 0, lean: 0 });
+      const stoppieNoLift = brake(cls, 10, 1, 0.5, 0.2, { brake: 0, lean: 0 }, 0);
+      feel(`r8.stoppie.${cls}.v10.lean+1.noLift`, `off ${stoppieNoLift.rearOffS.toFixed(2)} s ${stoppieNoLift.fault ?? 'rides away'}`, 'info: Rookie 0.06-0.08 s longer without the lift control (Pro identical)');
       feel(`r8.stoppie.${cls}.v10.lean+1.0.2s`, `rear lifts @${stoppie.firstRearOffS.toFixed(2)} s, off ${stoppie.rearOffS.toFixed(2)} s, pitch min ${stoppie.minPitch.toFixed(0)} ${stoppie.fault ?? 'rides away'} | brace off: off ${stoppieR7.rearOffS.toFixed(2)} s ${stoppieR7.fault ?? 'rides away'}`, 'rear off within 0.2 s for >= 0.5 s, no fault, same with the brace off');
       expect(stoppie.firstRearOffS).toBeLessThanOrEqual(0.2);
       expect(stoppie.rearOffS).toBeGreaterThanOrEqual(0.5);

@@ -131,6 +131,77 @@ export function canonicalPose(lean: number): { hipX: number; hipY: number; torso
   };
 }
 
+// ---------------------------------------------------------------------------
+// R9: the DRAWN pose table (Astra's seated candidate, docs/evidence/hero-r15/seated-candidate.patch `RIDER_PROFILE.poses`
+// / `RIDER_SEAT`), split from the PHYSICAL one. The servo holds `tuning.rider.poses` (R8's table: a standing neutral
+// 0.32 m above the seat line, the only table on which the hop / landing / wheelie rows are green - physics.md R8
+// ledger row 5 measured the seated table as the servo target three ways and every one crashed the lab hop). What the
+// hero draws is THIS table at the same lean, with the physical body's own excursion (the landing sit, the whip) added
+// on top and the sink limited to the room the drawn hips have above the seat. Axle frame (as `CANON`), degrees.
+//   seated : pelvis on the seat (hips 0.715, torso 65 deg: the pelvis bottom 0.18 m down the torso sits at the seat top)
+//   forward: rise off the seat and lean the torso in (hips +0.14 x / +0.195 y, torso 28 deg)
+//   back   : hips 0.36 m rearward off the seat's back edge, arms extended to the bars (torso 40 deg)
+// The crash sensors and the ragdoll spawn stay on the physical chain (`buildChain`, `CANON`): moving them to this
+// table is a physics change (the head sensor moves ~0.3 m at neutral) and is R10's, with its own golden re-search.
+// ---------------------------------------------------------------------------
+
+export type DrawnPoseId = 'seated' | 'back' | 'forward';
+export interface DrawnPoseRow {
+  hipX: number;
+  hipY: number;
+  /** degrees */
+  torso: number;
+  head: number;
+}
+export const DRAWN: Readonly<Record<DrawnPoseId, Readonly<DrawnPoseRow>>> = Object.freeze({
+  back: Object.freeze({ hipX: -0.7, hipY: 0.6, torso: 40, head: 66 }),
+  seated: Object.freeze({ hipX: -0.34, hipY: 0.715, torso: 65, head: 85 }),
+  forward: Object.freeze({ hipX: -0.2, hipY: 0.91, torso: 28, head: 46 }),
+});
+/** The seat under the drawn hips (axle frame): its span and the top the seated pelvis rests on. */
+export const DRAWN_SEAT = Object.freeze({ rearX: -0.54, frontX: -0.05, topY: 0.5686, pelvisDrop: 0.18 });
+
+/** The effective lean as (pose id, blend 0..1): the drawn table is a function of these two alone. */
+export function drawnPoseId(lean: number): { pose: DrawnPoseId; blend: number } {
+  const l = clamp(lean, -1, 1);
+  if (l < 0) return { pose: 'back', blend: -l };
+  if (l > 0) return { pose: 'forward', blend: l };
+  return { pose: 'seated', blend: 0 };
+}
+
+/** Drawn hips / torso / head (axle frame, radians) for a pose id and blend: linear from `seated` toward the id's row. */
+export function drawnPose(pose: DrawnPoseId, blend: number, out: { hipX: number; hipY: number; torso: number; head: number }): void {
+  const S = DRAWN.seated;
+  const T = DRAWN[pose];
+  const b = pose === 'seated' ? 0 : clamp(blend, 0, 1);
+  out.hipX = S.hipX + (T.hipX - S.hipX) * b;
+  out.hipY = S.hipY + (T.hipY - S.hipY) * b;
+  out.torso = (S.torso + (T.torso - S.torso) * b) * DEG;
+  out.head = (S.head + (T.head - S.head) * b) * DEG;
+}
+
+/**
+ * The drawn body for the hero (`PhysicsState.riderBody.drawn`): the drawn table at the effective lean plus the physical
+ * body's excursion - `dy` its height below (< 0) / above its own target, `torsoLag` its angle behind its target - the
+ * same two numbers `buildChain` draws. A downward excursion is drawn only as far as the drawn hips can sink before the
+ * pelvis is on the seat (the forward pose has 0.195 m; the seated pose none: the physical body's 0.32 m of sit is the
+ * seat taking the weight, not the hips passing through it); off the seat's span (the back pose) the sink is drawn whole.
+ * Pure: (lean, dy, torsoLag) -> the same drawn body on every call.
+ */
+export function drawnBody(lean: number, dy: number, torsoLag: number, out: { pose: DrawnPoseId; blend: number; hips: { x: number; y: number }; torso: number; head: number }): void {
+  const id = drawnPoseId(lean);
+  drawnPose(id.pose, id.blend, drawnTmp);
+  out.pose = id.pose;
+  out.blend = id.blend;
+  const onSeat = drawnTmp.hipX >= DRAWN_SEAT.rearX && drawnTmp.hipX <= DRAWN_SEAT.frontX;
+  const room = onSeat ? Math.max(0, drawnTmp.hipY - DRAWN.seated.hipY) : Infinity;
+  out.hips.x = drawnTmp.hipX;
+  out.hips.y = drawnTmp.hipY + Math.max(dy, -room);
+  out.torso = clamp(drawnTmp.torso + torsoLag, 12 * DEG, 80 * DEG);
+  out.head = Math.max(drawnTmp.head + torsoLag, out.torso + 12 * DEG);
+}
+const drawnTmp = { hipX: 0, hipY: 0, torso: 0, head: 0 };
+
 function ik3(ax: number, ay: number, az: number, bx: number, by: number, bz: number, l1: number, l2: number, px0: number, py0: number, pz0: number): [number, number] {
   let dx = bx - ax;
   let dy = by - ay;

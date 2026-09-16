@@ -5,9 +5,9 @@
   "bike": "rookie",
   "tier": "beginner",
   "technique": "the night-city kit at beginner pace",
-  "updatedAt": "2026-09-16T03:24:31.040Z",
+  "updatedAt": "2026-09-16T04:10:28.655Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "089e0885",
+  "srcFingerprint": "24a246e0",
   "attemptsBand": [
     1,
     2
@@ -28,83 +28,48 @@
         1052590588
       ],
       "attempts": [
+        2,
+        4,
         4,
         1,
-        3,
-        1,
-        3,
+        2,
         1,
         2,
-        3,
-        5
+        1,
+        2
       ],
-      "medianAttempts": 3,
+      "medianAttempts": 2,
       "clears": 9,
       "finishTimes": [
-        72.25833333333334,
-        51.53333333333333,
-        88.45,
-        52.025,
-        59.03333333333333,
-        52.30833333333333,
-        61.083333333333336,
-        64.48333333333333,
-        109.09166666666667
+        66.63333333333334,
+        98.55,
+        82.15,
+        50.50833333333333,
+        69.30833333333334,
+        51.44166666666667,
+        62.375,
+        51.4,
+        65.18333333333334
       ],
-      "medianFinishTime": 61.083333333333336,
-      "bestX": 503.60949105822533,
+      "medianFinishTime": 65.18333333333334,
+      "bestX": 503.5610259927601,
       "deaths": [
-        {
-          "obstacle": "ledge @ 321.0 m",
-          "x": 321,
-          "count": 7,
-          "reasons": {
-            "restart": 5,
-            "crash": 2
-          },
-          "rules": {
-            "stuck-restart": 5,
-            "nose-low": 1,
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 215 m",
-          "x": 215,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "air-short": 1,
-            "nose-low": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 145 m",
-          "x": 145,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        },
         {
           "obstacle": "ground @ 225 m",
           "x": 225,
-          "count": 1,
+          "count": 3,
           "reasons": {
-            "crash": 1
+            "crash": 3
           },
           "rules": {
+            "nose-low": 1,
+            "air-gas-nose-up": 1,
             "air-short": 1
           }
         },
         {
-          "obstacle": "ground @ 230 m",
-          "x": 230,
+          "obstacle": "ledge @ 39.0 m",
+          "x": 39,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -114,14 +79,58 @@
           }
         },
         {
-          "obstacle": "ground @ 260 m",
-          "x": 260,
+          "obstacle": "ground @ 150 m",
+          "x": 150,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-high": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 180 m",
+          "x": 180,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
             "air-short": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 185 m",
+          "x": 185,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "touchdown": 1
+          }
+        },
+        {
+          "obstacle": "ground @ 220 m",
+          "x": 220,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "air-short": 1
+          }
+        },
+        {
+          "obstacle": "ledge @ 321.0 m",
+          "x": 321,
+          "count": 1,
+          "reasons": {
+            "crash": 1
+          },
+          "rules": {
+            "nose-low": 1
           }
         },
         {
@@ -132,20 +141,20 @@
             "crash": 1
           },
           "rules": {
-            "air-short": 1
+            "nose-low": 1
           }
         }
       ],
       "runs": [
-        "20260915-222430-1b07ed",
-        "20260915-222430-28327f",
-        "20260915-222430-204358",
-        "20260915-222430-3d3bef",
-        "20260915-222430-0162b0",
-        "20260915-222430-893705",
-        "20260915-222430-931f76",
-        "20260915-222430-c8cdc3",
-        "20260915-222430-ed6e5a"
+        "20260915-231028-155187",
+        "20260915-231028-6ce4dd",
+        "20260915-231028-4f12ab",
+        "20260915-231028-4311b8",
+        "20260915-231028-88edaf",
+        "20260915-231028-8a969c",
+        "20260915-231028-4f93d9",
+        "20260915-231028-318771",
+        "20260915-231028-8457f0"
       ]
     }
   ]

@@ -7,8 +7,8 @@
     2
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "089e0885",
-  "updatedAt": "2026-09-16T03:24:27.595Z",
+  "srcFingerprint": "24a246e0",
+  "updatedAt": "2026-09-16T04:10:30.205Z",
   "includeStale": false,
   "sessions": [
     {
@@ -510,7 +510,7 @@
       "agent": "s1",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "089e0885",
       "strangerAttempts": 2,
       "cleared": true,
@@ -551,7 +551,7 @@
       "agent": "s2",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "089e0885",
       "strangerAttempts": 2,
       "cleared": true,
@@ -586,6 +586,78 @@
           "calls": 3
         }
       ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r15-s1-20260915-225608",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "24a246e0",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 42.1167,
+      "calls": 18,
+      "wallMs": 223099,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 2994,
+        "endTick": 5366,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r15-s1-20260915-225608.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r15-s1-20260915-225608.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 334.598,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 334.8 m",
+          "calls": 11
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r15-s2-20260915-225608",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "24a246e0",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 34.65,
+      "calls": 14,
+      "wallMs": 104038,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 0,
+        "endTick": 4478,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r15-s2-20260915-225608.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r15-s2-20260915-225608.json",
+      "deaths": []
     },
     {
       "sessionId": "b3-kicker-row-r3-s1-20260914-113731",
@@ -698,7 +770,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 106922734,
+      "wallMs": 109685345,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -775,7 +847,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 106922727,
+      "wallMs": 109685338,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -927,10 +999,10 @@
   "bike": "rookie",
   "completed": 2,
   "clearedCount": 2,
-  "medianAttempts": 2,
-  "medianFinishTime": 43.44585,
-  "medianCalls": 14.5,
-  "medianWallMs": 179008.5,
+  "medianAttempts": 1.5,
+  "medianFinishTime": 38.38335,
+  "medianCalls": 16,
+  "medianWallMs": 163568.5,
   "census": {
     "n": 2,
     "minSessions": 2,
@@ -948,7 +1020,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 13,
+    "staleExcluded": 15,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -962,25 +1034,24 @@
   "verdict": "PASS",
   "pass": true,
   "deaths": {
-    "total": 2,
+    "total": 1,
     "byReason": {
-      "crash": 2
+      "crash": 1
     },
     "byObstacle": [
       {
-        "obstacle": "ground",
-        "count": 2,
+        "obstacle": "ramp @ 334.8 m",
+        "count": 1,
         "xs": [
-          94.2,
-          94.4
+          334.6
         ]
       }
     ],
     "byCheckpoint": [
       0,
-      2,
       0,
       0,
+      1,
       0
     ]
   }

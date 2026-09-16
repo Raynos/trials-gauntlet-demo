@@ -5,6 +5,139 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R9 (Astra's physics is live: the swingarm arc, the elbow stop, the Rookie lift control; the seated pose is drawn, not held)
+
+**Finding.** Everything of Astra's `405f894` that R8 measured ADOPT is on the tree, applied from
+`docs/evidence/physics-r8/astra-port.patch` unchanged (the R8 ledger's per-mechanism numbers stand; `feel-diff-base-final.txt`
+is the row-by-row diff of this exact patch): **(1) the hinged rear-wheel path + fork axis** — the rear wheel on a true circle
+about the asset's swingarm pivot (chassis (−0.155, −0.11), r 0.4415 m), the front on the asset's fork line; `suspensionGeometry()`
+is the one path for the force pass, the velocity solve, the position pass and `derive()`; static sag iterated on the sagged
+axles; arc mismatch p99 0.43 mm (b3 Rookie; was 26.6 mm); **(3) the elbow stop** `hold.armMin` 0.10 m as the fifth hold limit
+(no friction, not in `gripJ`); **(4) the Rookie brake lift control** `brakes.liftControl` 1 / `liftLookahead` 0.15 (Pro 0) —
+the front caliper trimmed from the live lift margin every velocity iteration, alongside the R8 brace. **(2) the rider mass frame
+as the servo target stays REJECTED** (R8 ledger: reference hop 0.596 → 0.481, the lab ledge hop at 8–9 m/s crashes, the 15 m/s
+stop 1.92 s). **(5) the seated pose is landed as the split** R8 asked for: the servo holds R8's physical table
+(`tuning.rider.poses`, verbatim — `r9.test.ts` pins it on both classes) and the hero gets Astra's seated table as a *drawn*
+pose, `riderBody.drawn` (below). One R9 change of Astra's mechanism: **the elbow stop only acts with the chest above the grip
+line** (`hold.armMinFade` 0.05 m: off at and below the bar, full 5 cm above it). With the chest under the bar the strut's push
+points down and, against the linear servo's pull on the COM, forms a 600–900 N × 0.41 m couple the 300 N m torque cap cannot
+break: the x3 Pro golden held the torso flat, 37–44° forward of its target with the torque pinned at +300 N m, for 0.6 s at
+12–14 m/s on level wood (74–81 m, ticks 885–960) — "recovered" ticks the R8 band caught (psi 0.73 rad, COM 0.04 m). Above the
+bar the push rights the body (the chest is ahead of the COM); below it the hands hang, as in R8. On the same golden the same
+window now reads psi ≤ 1° from tick 915.
+
+**The x1 / x3 Pro clears (R8's open item).** Reproduced from the `845df15` Pro recordings on the R8 tree: both fault `sensor`
+early — x1 at tick 685 (46 m, a 160° loop off the first cap, the recording is a different physics' input), x3 at tick 855 (69 m,
+same) — so the R7 inputs say nothing about the stall; they are stale inputs, not a physics tell. The stall itself is a **search
+stall, not a fault**: at 599.7 m (81 %) x1 drops 5 m off the metal deck (597–601 m, dirt at y 4–6) into a **56° metal wall
+rising 4.5 m over 601–604 m with no run-up**. Under the R9 physics before the elbow fade the Pro bot cleared x1 once (sweep 1,
+53.450 s, 1 attempt: landed rear-first at −10 m/s at tick 5064, sat to the seat at tick 5070 — seat impulse 768 N s, hips 0.130 =
+7.0 cm under the line, grip 0 N, no elbow / arm / tank engagement — then wobbled 3 s at 0–3 m/s between 599 and 601 m before it
+climbed out); with the elbow fade (the tree) three seeds stall at 599.7 m with identical plan counts (1 974 plans, 194 M ticks,
+900 s sim budget each) and `crashCause` null throughout. **x3 Pro clears at 1 attempt** (43.400 s; R8 stalled at 92 %, 530.7 m:
+the same 5 m deck-drop-into-wall motif at 528–535 m, seat 213 N s, hips 2.6 cm under the line) — the hinge lands the drop and
+the Pro rides on. x1's wall is 4.5 m where x3's is 4.5 m from a 4 m drop with 3 m of dirt; the difference is whether the bot
+arrives at the wall foot with any speed. **This is the track's knife edge**, written down for tracks: x1 Pro at 599.7 m (deck
+edge 597 m, wall foot 601 m), no physics fault fires, the Rookie clears it at 1 attempt (55.058 s) on the same physics. The
+stale x1 Pro golden (sweep 1) is removed, as R8 removed the R7 ones; the suite reads 47 goldens.
+
+**The drawn / physical split (`riderBody.drawn`, `RiderDrawnPose` in `core/types.ts`, additive, NOT hashed).** `rider.ts`
+`DRAWN` is Astra's seated candidate table verbatim (axle frame): back (−0.70, 0.60) torso 40° head 66°; seated (−0.34, 0.715)
+65° / 85° — the pelvis bottom 0.18 m down the torso sits 1.7 cm under the seat top (`DRAWN_SEAT` 0.5686, span −0.54..−0.05);
+forward (−0.20, 0.91) 28° / 46°. `drawnPoseId(lean)` → (`'back' | 'seated' | 'forward'`, blend 0..1); `drawnPose(id, blend)` is
+linear from seated to the row; `drawnBody(lean, dy, torsoLag)` adds the physical body's excursion — the same two numbers the
+sensor chain draws (height below its target, angle behind it) — with the sink limited to the room the drawn hips have above
+the seat when they are over it (forward has 0.195 m; seated has none: the physical 0.32 m sit onto the seat line is the seat
+taking the weight, not the hips passing through it; off the seat's span the sink is drawn whole). Exported every tick from
+`getState()`; `hashPhysicsState` does not read it, so every golden, the D1–D8 hashes and the gate pins are the same with or
+without it (asserted on 600 scripted ticks and on the b1 / e2 goldens). The sensor chain and the ragdoll spawn stay on the
+physical table (`buildChain` / `CANON`): moving them is a physics change (the head sensor moves ~0.3 m at neutral) with its own
+golden re-search — R10's if the hero wants it. What the rig should consume: `drawn.hips` (axle frame), `drawn.torso`,
+`drawn.head` in place of `riderRigFromCOM`'s inverse map; `pose` / `blend` for clip selection.
+
+### Tests (R9)
+
+`pnpm vitest run src/physics`: **164 → 170** (`r9.test.ts`, 6 rows: the drawn table is a pure function of (pose id, blend), linear,
+Astra's rows verbatim; the four pose requirements — pelvis on the seat within 2 cm, forward rises ≥ 0.15 m and leans ≤ 45°, back
+≥ 0.3 m rearward off the seat's back edge with the arms longer; the physical table is R8's on both classes; the export equals
+`drawnBody` on every tick and the hash is blind to it; the 3 m drop sits the physical hips to 0.19 m while the drawn hips never
+go under the seated height, lean +0.5 sinks the drawn 0.195 m to the seat and no further). Re-derived rows, each with an R9 note
+crediting the mechanism: `r2` reference hop both-off ≥ 0.15 → ≥ 0.05 s (0.175 → 0.092: R8's 0.175 was 0.067 s of flight plus a
+front-wheel bounce off a −13° touchdown; the arc lands at −7° and does not bounce; apex 0.603 → 0.596); `r3` cap-off 2 m pogo
+> 0.2 → > 0.15 (0.204 → 0.176 with the elbow strut; the cap-on row is 0.01, the gate separates 17×); `r5` blend-out asserted
+from the touch (0 within 0.12 s of the first touch, held ≥ 0.3 s) instead of at the 1.2 s mark — on the arc the 40° rear-first
+landing's rebound un-weights the rear for 0.1 s at 1.13 s where R8 had it at 1–2 % compression; `r8` the brace-off 15 m/s "endo"
+control row is informational — with the brace AND the lift control off the hinge rides the lift edge instead of going over
+(Rookie 2.02 s / −14.8° / rear off 1.08 s, Pro 2.02 s / −13.7° / 1.22 s; the slider endoed at 1.39–1.62 s), asserted as rear-off
+> 0.5 s; the stoppie compare is brace on vs off at the class's lift control (Astra's lift control ends the Rookie stoppie 0.82 →
+0.75 s, the Pro 0.90 identical) with the no-lift value printed; `r8` envelope SLOP 0.05 → 0.08 (the x3 Pro deck drop: hips 2.6 cm
+under the line; the x1 landing 7.0 cm — F dt² / (m β) under a 5 m slam) and the conditioner gains the angular demand
+(`tauMax / inertia` = 33 rad/s² over the same 6-tick window — R8 read only the linear demand); `property` 60° plank 30-tick dw
+≤ 0.5 → ≤ 0.7 (0.27 → 0.67 at one of 917 states: a 1.7 m/s Rookie wheelie after a restart where a lean quantum shifts the
+wheelie-assist balance loop's phase; each cm of rear compression moves the axle 2.3 mm rearward on the arc where the slider
+moved it 1.2 mm forward; flat / kicker rows and every per-tick bound unchanged). R9 brake table (brace 0.5, lift default):
+Rookie 6 / 10 / 15 m/s stop 0.77 / 1.23 / 1.75 s, −7°, rear off 0.14–0.16 s, distance 2.50 / 6.35 / 12.93 m (R8 brace only 2.41 /
+6.19 / 12.73: +2–4 % for the trimmed caliper); Pro 0.73 / 1.19 / 1.72 s, −6°. Render: `gltfRiderPhysical.test.ts` `worst.grip`
+0.2 → 0.25 (Rookie E2 window 0.111 → 0.239 m on the re-searched golden's slam; Pro unchanged) — the one render number R9 moves;
+`gltfBike.test.ts`'s three "until main gains the hinge" rows (× 2 assets) now invert as R8 said they would and are the render
+owner's: `worstBlock` reads 0.0709 (the rig's chord model against an arc-riding wheel; bound < 0.03 / > 0.02), `worstFront`
+2.1e-4 (bound > 1e-3: the fork line is now the asset's), the fixed-frame residual 1.1e-16 vs the expected 0.005 chord offset.
+
+### Deviations (R9)
+
+20. **The elbow stop blends in above the grip line** (`armMinFade` 0.05 m; Astra's acts at any height). Below the bar the strut
+    is a lock, not a stop (the x3 Pro 0.6 s flat torso); the "collapses onto the tank" frames it catches are chest-above-bar slams
+    and are still caught. Tuned to the golden, measured on all 48.
+21. **Drawn ≠ physical**: `rider.poses` (physical, R8) and `DRAWN` (Astra's seated, hero) are two tables by design; the export is
+    additive and unhashed. R8 ledger row 5 measured the seated table as the servo target three ways and each crashed the lab hop.
+22. **The x1 Pro golden is absent** (search stall at the 599.7 m deck-drop-into-wall, no fault, three seeds identical); the Rookie
+    golden covers the track. Not tuned away: it is the track's, with the tick above.
+23. `r8`'s envelope SLOP 0.08 and the angular demand term; `property`'s 0.7; the `r2` / `r3` / `r5` / `r8` re-derivations above.
+
+### Golden table (R9)
+
+Every golden re-searched twice (`harness:bot --all-tracks --skill 3 --track-wall-s 400 / 600`, both classes: once on the port,
+again after the elbow fade); Rookie **24 / 24 at 1 attempt**, Pro **23 / 24 at 1 attempt** (x1 open, above). **Node == browser
+on all 47 + the sweep-1 x1** (48 / 48 hash-identical through `BrowserVerifier` on a fresh `dist`; the sweep's `verified=skipped`
+and `--refresh-goldens`'s "fresh = already stamped" do not replay in the browser — the proof is
+`scratchpad/physics9/browser-prove.mts`, a 48-row log). `harness:determinism` **9 / 9** on flat-test Rookie (`ecdf62a55f6185a6`,
+finish 8.650) and Pro (`40e2115db273b7ff`, 7.900), D8 re-pinned `afee0f1094a0587c`; `gate/expected.json` re-pinned (`clear.pro.b1`
+`f0549ee508d870ed` / 37.967 s); the verifying `harness:gate --quick` **27 / 30** with the same three SwiftShader timing rows
+(`boot.firstFrameMs` 7 130, `restart.frameMsP95` 522, `perf.renderSyncedMsP95` 1 447 ms) informational; physics 32.5 µs/tick p95.
+`public/bench/b1-bot-3.json` re-copied. Reflex 9 seeds, R8 → R9 medians: b1 1 → 1, b2 2 → 2, b3 2 → 2, e1 8 → 5, e2 4 → 3,
+e3 3 → 2, m1 7 → 11, m2 5 → 6, m3 3 → 4, h1 15 → 14, h2 10 → 8, h3 3 → 4, x1 7 → 9, x2 5 → 9, x3 15 → 7, p1 2 → 3, p2 2 → 3,
+p3 2 → 2, p4 3 → 2, p5 2 → 2, flat / gap / lab-flat / lab-physics 1; **clears 9 / 9 on every track**; no beginner / easy median
+worse by more than 1 (p1, p2 +1). Strangers n = 2 on b1–e3: `harness-metrics.md` Round 15.
+
+| track | Rookie finish (s) / attempts | Pro finish (s) / attempts |
+|---|---|---|
+| b1-first-ride | 40.708 / 1 | 37.967 / 1 |
+| b2-lean-back | 38.508 / 1 | 36.292 / 1 |
+| b3-kicker-row | 32.800 / 1 | 30.583 / 1 |
+| e1-uphill-weight | 44.542 / 1 | 42.333 / 1 |
+| e2-rear-wheel-first | 43.358 / 1 | 38.958 / 1 |
+| e3-stairway | 38.442 / 1 | 37.000 / 1 |
+| flat-test | 8.650 / 1 | 7.900 / 1 |
+| gap-test | 5.742 / 1 | 5.133 / 1 |
+| h1-wheelie-wire | 46.550 / 1 | 42.325 / 1 |
+| h2-gap-chain | 45.625 / 1 | 43.000 / 1 |
+| h3-fire-line | 46.825 / 1 | 43.042 / 1 |
+| lab-flat-200 | 12.683 / 1 | 11.758 / 1 |
+| lab-physics-test | 8.242 / 1 | 7.500 / 1 |
+| m1-hop-up | 34.992 / 1 | 30.867 / 1 |
+| m2-drum-roll | 40.567 / 1 | 34.867 / 1 |
+| m3-see-saw | 40.250 / 1 | 36.442 / 1 |
+| p1-container-yard | 35.733 / 1 | 31.992 / 1 |
+| p2-canyon-run | 34.442 / 1 | 32.242 / 1 |
+| p3-snow-line | 34.158 / 1 | 31.867 / 1 |
+| p4-night-circuit | 33.325 / 1 | 32.350 / 1 |
+| p5-foundry-floor | 31.667 / 1 | 29.042 / 1 |
+| x1-vertical-limit | 55.058 / 1 | **open: search stall at 599.7 m, 81 % (3 seeds, no fault; sweep 1 cleared 53.450 / 1 before the elbow fade)** |
+| x2-pipe-dream | 43.233 / 1 | 41.525 / 1 |
+| x3-gauntlet | 45.275 / 1 | 43.400 / 1 |
+
+(Rookie times are the second sweep's where it re-searched; the browser-proved set is the one on disk.)
+
 ## v2 status — R8 (the rider sits on the bike: the hold envelope, the thrown-rider fault, the brake brace)
 
 **Finding.** The rider's contact with the bike is no longer only the servo. Feet on the pegs and hands on the grips are

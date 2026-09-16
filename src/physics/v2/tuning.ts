@@ -4,12 +4,43 @@
  * Units SI. Chassis frame: origin at the chassis COM, x along the frame axis.
  */
 import type { SurfaceKind, Vec2 } from '../../core/types';
+import { atan2, cos, sin } from '../dmath';
+
+/**
+ * The bike glb's authored attachment frame (Astra, 405f894 `BIKE_GEOMETRY_V2`; on main it lived in
+ * `src/render/hero/assetFrame.ts` as a description of the asset only). Coordinates are in the asset's reference
+ * (axle) frame; `chassisToAxle` places that frame on the chassis COM. R8 Astra port: the solver is built from it
+ * again - the rear wheel swings on `swingPivot` / `swingRadius` (a true circle, the swingarm's arc; before this the
+ * rear moved on the straight axis (0.12, 0.99), a chord of that arc, and the wheel left the arm's end by up to
+ * 27-37 mm over a golden - docs/tasks/blender-branch-merge.md merge #3) and the fork slides on `forkAxis` through
+ * the asset's fork marker. Deviation from Astra: compression 0 (full droop) stays at the asset's reference axle
+ * markers (main's rest axles, Rookie rear (-0.585, -0.21) exact), not `rearReferenceCompression` along the arc past
+ * them, so the rest geometry, the spring rates and the static sag of R8 are kept and only the PATH changes.
+ */
+export const BIKE_GEOMETRY_V2 = {
+  chassisToAxle: { x: 0.065, y: -0.21 },
+  wheelbase: 1.3,
+  rear: { x: -0.65, y: 0 },
+  front: { x: 0.65, y: 0 },
+  swingPivot: { x: -0.22, y: 0.1 },
+  swingRadius: Math.sqrt(0.43 ** 2 + 0.1 ** 2),
+  rearReferenceCompression: 0.07,
+  frontReferenceCompression: 0.05,
+  forkAxis: { x: -0.22 / Math.sqrt(0.22 ** 2 + 0.5 ** 2), y: 0.5 / Math.sqrt(0.22 ** 2 + 0.5 ** 2) },
+} as const;
 
 export interface SuspensionV2 {
   /** Chassis-frame axle rest point (compression 0). */
   axle: Vec2;
-  /** Chassis-frame unit direction the wheel moves when compressing. */
+  /** Chassis-frame unit direction the wheel moves when compressing (for a hinge: the arc's tangent at compression 0). */
   axis: Vec2;
+  /**
+   * Rear wheel path as a true circle about the swingarm pivot (Astra, 405f894): compression is the arc length from
+   * full droop (`droopAngle`, the arm's angle at compression 0); the wheel's chassis-frame centre is
+   * `suspensionPoint()`. The slider's bilateral constraint becomes the arm's length, its travel limits act along the
+   * tangent. Absent = a straight axis from `axle` along `axis`.
+   */
+  hinge?: { pivot: Vec2; radius: number; droopAngle: number };
   travel: number;
   k: number;
   /** Metres of extra compression the spring is preloaded by. */
@@ -20,6 +51,22 @@ export interface SuspensionV2 {
   kStop: number;
   stopStart: number;
 }
+
+/** Chassis-local wheel centre for a suspension coordinate (metres of fork / arc travel). Astra, 405f894. */
+export function suspensionPoint(s: SuspensionV2, compression: number): Vec2 {
+  if (s.hinge) {
+    const angle = s.hinge.droopAngle - compression / s.hinge.radius;
+    return { x: s.hinge.pivot.x + s.hinge.radius * cos(angle), y: s.hinge.pivot.y + s.hinge.radius * sin(angle) };
+  }
+  return { x: s.axle.x + s.axis.x * compression, y: s.axle.y + s.axis.y * compression };
+}
+
+/** The asset's swingarm as the rear suspension's hinge, in the chassis frame: pivot, arm length, droop at compression 0 = the reference axle. */
+const REAR_HINGE = {
+  pivot: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.swingPivot.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.swingPivot.y },
+  radius: BIKE_GEOMETRY_V2.swingRadius,
+  droopAngle: atan2(BIKE_GEOMETRY_V2.rear.y - BIKE_GEOMETRY_V2.swingPivot.y, BIKE_GEOMETRY_V2.rear.x - BIKE_GEOMETRY_V2.swingPivot.x),
+};
 
 export interface PoseRow {
   lean: number;
@@ -79,7 +126,22 @@ export interface TuningV2 {
      */
     wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number; /** R6: trim multiplier with both wheels off the ground (Rookie 1: the assist bounds the throttle nose-up in the air; Pro 0: the air is raw). */ airGain: number };
   };
-  brakes: { totalNm: number; frontFrac: number; brakeTau: number };
+  brakes: {
+    totalNm: number;
+    frontFrac: number;
+    brakeTau: number;
+    /**
+     * R8 Astra port (405f894 "rookie brake lift control"): the Rookie's front caliper is trimmed against rear lift
+     * every velocity iteration from the live loads - the combined COM's lever behind the front contact patch
+     * (gravity's righting moment) against the braking force's lever (the COM height above the patch), less what the
+     * rear tyre already brakes, with a 10 % margin; the trim fades out with |lean| from 0.5 to 0.8 (a deliberate
+     * full lean is the rider taking over: brake + lean +1 is still the stoppie). An ECU/ABS-like assist, like
+     * `engine.wheelieControl`; the physics' own brace (`rider.brakeBrace`) is the rider moving back. Pro = 0.
+     */
+    liftControl: number;
+    /** Seconds of nose-down pitch rate anticipated by the caliper trim (the rate term the static margin cannot see). */
+    liftLookahead: number;
+  };
   aero: { cda: number; rho: number; chassisShare: number };
   rider: {
     mass: number;
@@ -169,7 +231,7 @@ export interface TuningV2 {
      * fault (`crashCause` 'thrown'). The two compression limits (seat, tank) never fault: a hard landing sits the
      * rider down.
      */
-    hold: { legReach: number; armReach: number; seatY: number; tankX: number; chest: Vec2; posBeta: number; /** Coulomb friction on the seat and tank contacts (the knees clamp the bike; the body does not slide along the seat it is pressed onto). */ mu: number; gripN: number; gripTau: number };
+    hold: { legReach: number; armReach: number; /** R8 Astra port (405f894 `RIDER_ELBOW_MIN`, "an elbow stop removed singular poses"): the arm's minimum length, chest (shoulders) to grip, as a fifth one-sided limit - the elbows fold to 35 deg interior at most (145 deg of flexion), the hands push on the bars beyond that. 0 = off. */ armMin: number; /** R9: the elbow stop's blend-in above the grip line (chassis up, m): off with the chest at or below the bar, full this far above it; the arms push the body off the bars from above, they do not lift it from under them. */ armMinFade: number; seatY: number; tankX: number; chest: Vec2; posBeta: number; /** Coulomb friction on the seat and tank contacts (the knees clamp the bike; the body does not slide along the seat it is pressed onto). */ mu: number; gripN: number; gripTau: number };
   };
   solver: {
     velIters: number;
@@ -201,8 +263,21 @@ const ROOKIE: TuningV2 = {
   },
   wheel: { radius: 0.34, rearMass: 8, rearInertia: 0.55, frontMass: 7, frontInertia: 0.45, wheelbase: 1.3 },
   suspension: {
-    rear: { axle: { x: -0.585, y: -0.21 }, axis: { x: 0.12, y: 0.99 }, travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85 },
-    front: { axle: { x: 0.715, y: -0.215 }, axis: { x: -0.4, y: 0.92 }, travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85 },
+    // R8 Astra port (405f894): the rear wheel on the asset's swingarm arc (rest axle (-0.585, -0.21) = the reference
+    // marker, the arc's tangent there (-0.23, 0.97) - the old straight axis (0.12, 0.99) was a chord of this arc),
+    // the front on the asset's fork line through its marker (0.715, -0.21) along forkAxis (-0.403, 0.915; was
+    // (0.715, -0.215) / (-0.4, 0.92): 5 mm and 0.26 deg off the glb). Rates, travel, damping: R7's.
+    rear: {
+      axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.rear.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.rear.y },
+      axis: { x: sin(REAR_HINGE.droopAngle), y: -cos(REAR_HINGE.droopAngle) },
+      hinge: { pivot: { ...REAR_HINGE.pivot }, radius: REAR_HINGE.radius, droopAngle: REAR_HINGE.droopAngle },
+      travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85,
+    },
+    front: {
+      axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.front.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.front.y },
+      axis: { ...BIKE_GEOMETRY_V2.forkAxis },
+      travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85,
+    },
   },
   tyre: {
     Cs: 9000,
@@ -227,7 +302,7 @@ const ROOKIE: TuningV2 = {
     clutchSpeed: 7,
     wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
   },
-  brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03 },
+  brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03, liftControl: 1, liftLookahead: 0.15 },
   aero: { cda: 0.75, rho: 1.225, chassisShare: 0.6 },
   rider: {
     mass: 75,
@@ -288,7 +363,16 @@ const ROOKIE: TuningV2 = {
     // (0.52); tankX 0.25 = 0.24 m ahead of the +1 hips (0.007), 8 cm behind the grip (0.33). chest = hips + 0.52 m of
     // torso at the canonical 40 deg, body frame. gripN 2500 N over 50 ms: a rider hangs on at 3.4 g of steady pull, and
     // is torn off by a 1.7 m/s snap of the reach (75 kg x 1.7 m/s / 0.05 s).
-    hold: { legReach: 0.876, armReach: 0.62, seatY: 0.2, tankX: 0.25, chest: { x: 0.368, y: 0.234 }, posBeta: 0.4, mu: 0.8, gripN: 2500, gripTau: 0.05 },
+    // armMin: the anatomical 35 deg elbow is 0.144 m planar (3D 0.187 m with main's 0.32 / 0.30 arm, the 0.12 m grip-to-shoulder
+    // side offset removed) but main's pose table already folds the neutral elbow to 52 deg (shoulders 0.245 m from the grip) and the
+    // R2 snap to +1 swings the chest under 0.144 m: at 0.144 the stop cut the reference hop 0.596 -> 0.535 m and split the r5
+    // hop on/off identity (0.535 / 0.556). 0.10 m = Astra's IK-singularity guard (the elbow pole flips at 0.152 m 3D = 0.093 m
+    // planar): the hop and snap rows are untouched, the shoulders never pass through the bars (0.4 % of golden riding ticks,
+    // slams; before, those ticks put the chest inside the grip point - the "collapses onto the tank" tell).
+    // armMinFade 0.05 (R9): with the chest under the grip line the strut's push points down and, against the linear servo's pull
+    // on the COM, forms a couple the 300 N m torque cap cannot break (x3 Pro 74-81 m: torso flat, 0.6 s); the stop is off at and
+    // below the bar and full 5 cm above it - a front slam onto the bars from above is still caught, the tank collapse is R8's.
+    hold: { legReach: 0.876, armReach: 0.62, armMin: 0.1, armMinFade: 0.05, seatY: 0.2, tankX: 0.25, chest: { x: 0.368, y: 0.234 }, posBeta: 0.4, mu: 0.8, gripN: 2500, gripTau: 0.05 },
   },
   solver: { velIters: 6, posIters: 2, slop: 0.005, specMargin: 0.02, posBeta: 0.5, jointBaumgarte: 0.3 },
   ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },
@@ -336,9 +420,11 @@ export const BIKE_PRESETS_V2: Readonly<Record<BikeClassV2, PartialTuningV2>> = O
   // at -1 / -0.5 / -0.25). No open-loop lever gives "lifts hard, does not loop": the thrust curve is a knife edge
   // (F(4-8) 0.85 loops at 1.0 s, 0.80 lifts 8 deg) and a speed fade of the trim loops at the release (R6 status).
   pro: {
+    brakes: { liftControl: 0 },
     chassis: { mass: 54 },
-    wheel: { wheelbase: 1.28 },
-    suspension: { rear: { axle: { x: -0.575, y: -0.21 }, k: 12000 }, front: { axle: { x: 0.705, y: -0.215 }, k: 9000 } },
+    // R8 Astra port: one asset, one geometry - the Pro rides the same swingarm arc and fork line (wheelbase 1.30;
+    // R3's 1.28 put its axles 1.0 / 1.1 cm inboard of the glb's markers and its rear 37 mm off the arm's end).
+    suspension: { rear: { k: 12000 }, front: { k: 9000 } },
     engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
     rider: { Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
   },
