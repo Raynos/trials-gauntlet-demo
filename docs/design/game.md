@@ -269,7 +269,7 @@ rare) — those were the suspects and they are not on the profile.
 
 ## 10. Front end (main menu → track select → run)
 
-Flow (`App.screen`): boot lands on `menu` → `tracks` | `garage` | `settings` | `credits`; `run`
+Flow (`App.screen`): boot lands on `menu` → `tracks` | `garage` | `review` | `settings` | `credits`; `run`
 (countdown…) → pause overlay → results. **There is no title screen**: the user asked whether the start
 screen and the main menu need to be different screens and the answer was no — the "press any key" step
 was a second tap that did nothing the menu's first tap can't do (audio unlock, PWA toast, rotate prompt all
@@ -281,7 +281,7 @@ strips. Everything else opens the menu.
 
 Design rule (user): "less buttons, more design". Menu = direction B "Broadcast" from
 `assets/design/menu/SPEC.md` (user's pick): one band of controls in the thumb arc under full-bleed key art.
-Track select = the cards are the interface. Settings = one panel of segmented rows. No control that can be
+Track select = the pins on the tiles are the interface. Settings = one panel of segmented rows. No control that can be
 removed stays.
 
 - **Backdrop**: `b1-first-ride` loaded and held in the `menu` phase (nothing ticks, renderer's idle 3/4
@@ -306,7 +306,7 @@ removed stays.
     honest note). The band covers the plate's floor, not its hero.
   - *Lower third* (`.menu-band`): a dark slab in the bottom quarter (`--tab-h` = clamp 52–92 px by 15 vh
     + `--ticker-h` 24–30 px + safe-area bottom; 92 / 84 / 122 px at 932×430 / 844×390 / 1280×720), a 2 px
-    amber top edge, left inset 7 vw. The `FocusList` renders horizontally (`axis 'x'`): **PLAY · GARAGE ·
+    amber top edge, left inset 7 vw. The `FocusList` renders horizontally (`axis 'x'`): **PLAY · GARAGE · REVIEW ·
     SETTINGS** in the display face (clamp 1.7–2.6 rem, 1.45–2.1 rem short; the rule is `#ui .menu-item` —
     `#ui button { font: inherit }` outranks a bare class), each tab ≥ 88 × 44 (measured 93 × 65 / 89 × 59 /
     119 × 92 for PLAY), gap 40 px (24 px short) so one thumb never spans two; CREDITS as a `minor` item in
@@ -339,15 +339,19 @@ removed stays.
     evaluate, PLAY is not inside a `.live` element, a tap at its point (dispatched at the hit-tested element,
     as a finger would land) leaves `screen === 'menu'`, PLAY is ≥ 88 × 44 and its centre is below 70 % of
     the height; once `.menu-screen.live`, the hit at PLAY's centre is PLAY at opacity 1.
-- **Track select** (`TrackSelectScreen`): tier rows as text headings (label, blurb, done/total, padlock
-  line when locked) over horizontal card carousels. Card = art (`kind:'track-card'`, fallback tier card,
-  fallback biome-tinted gradient with a ghosted tier badge), medal disc (manifest icon, tinted disc, or a
-  dashed empty ring), "PB ghost" tag when a recording exists and Ghost is on, name, technique, best vs
-  target (green under target). Focus = (row, column) with per-row memory; focused card scales 1.06 with an
-  amber ring; locked rows sit at 62 % grey; confirming a locked card shakes it. Lock rule
+- **Track select** (`TrackSelectScreen` over `src/ui/trackMap.ts`, v0.2.2): one horizontal snap scroller
+  (`.tmap`) of six isometric night pages (`PAGE_ORDER`: the proving-ground island — Lab + playgrounds, no
+  medals — then Industrial, Canyon, Snow, Night City, Foundry), each a `.tpage` with a generated tile plate,
+  the tier's tracks as `.tpin` posts (code, name plate, medal disc, Ghost / Pro tags; locked = padlock +
+  `unlockRule`) at `pinAnchors` in tile space, the amber route through the campaign pins with the cleared
+  part lit, the next tier gate stub (`nextGate`), a 44 px miniature row (`.tmini .tm`) that snaps between
+  pages, and the focused pin's rising card (`.tcard`: RIDE, GHOST, REVIEW, top-5). Opens on `nextTrack()`'s
+  page at `defaultPin` (UP NEXT, else the first open pin); ←→ steps the pins (past the last: the next page),
+  ↓ reaches the card's actions then the next page, a swipe snaps pages; confirming the focused pin launches
+  (`play()` at 180 ms, screen gone at 420 ms), a locked one shakes and states its rule. Lock rule
   (`src/ui/progress.ts`, tested): a tier opens when every authored track of every earlier tier holds a
-  medal. Confirm: launch cue, card flies up 400 ms (`cardgo`), `play()` at 180 ms so the new track is
-  under the fading screen, screen gone at 420 ms — the countdown starts in the same scene.
+  medal. The page model is pure data (`buildPages`, `trackMap.test.ts`); `docs/evidence/level-select` holds
+  the measurements (one scroll axis, 0 px vertical overflow, every tappable ≥ 44 px, B1 in two taps).
 - **Settings** (`SettingsScreen`): one column of rows — Quality, Sound, Volume (−/+ 10 %), Ghost,
   Rider / Bike (only when the renderer exports `setModels`; feature-detected in `main.ts`), Reset progress
   (two presses within 3 s). Up/down = row, left/right = value, confirm = cycle / fire. Footer: one quiet
@@ -723,7 +727,7 @@ Two numbers, DOWNLOAD and SETUP (the user's decision: "B Odometer" with both tra
 - **Results panel** (`DomHud.renderBoard`, `.results .board`, top-right of the title band, revealed with the medals
   at stage 3): `TOP 5 · ROOKIE · #2`, rows `n · medal dot · time · faults✕`, this run's row marked `.you`. The HUD gets
   the source as `new DomHud(ui, bestOf, (id, bike) => bestTimes.board(id, bike))` (`main.ts`).
-- **Track card** (`TrackSelectScreen.boardHtml`, `.card .board`): the class the next launch rides
+- **Track card** (`TrackSelectScreen.boardHtml`, `.tcard .board` — the focused pin's card): the class the next launch rides
   (`FrontState.bikeClass`) as up to five medal-coloured chips `1 0:42.36 · 2 0:44.10 …`; hidden when the board is empty;
   lab cards carry none. There is no Watch popover on the card (the `▶ PB` tag opens the replay viewer directly), so no
   "your runs" list was added there; the `LastRuns` store (§16) still holds the last finished run for the viewer.

@@ -211,6 +211,14 @@ interface GameRenderer {                 // existing +
   // v2 additive: perf (PERF.md §3.1). The app tells the renderer the device class once at boot; `high` on a
   // phone is its own pass list (LDR at DPR 2, emissive-only bloom, no SSAO, 1024² shadow). Never inferred from DPR.
   setDeviceClass?(c: 'phone' | 'desktop'): void;
+  // v0.2.2 additive: render (garage round). `true` hides the world's meshes (lights stay: no program re-key),
+  // swaps the lighting rig to the stage key / fill and puts the procedural workshop set (src/render/world/
+  // garageStage.ts, ≤ 20 draws, no lights of its own) at the hero's feet; `false` restores the track exactly.
+  setGarageStage?(on: boolean): void;
+  // rendering.md § setCameraOverride / § orbit. Modes game | fixed | follow-wide | free | orbit; `orbit` (garage) =
+  // { yaw, pitch, dist, screenX, screenY } — src/render/camera/rig.ts ORBIT clamps pitch / dist, screenX / screenY
+  // (0..1) slide the aim across the frame; null restores the rig exactly (every smoother integrates underneath).
+  setCameraOverride?(o: CameraOverride | null): void;
 }
 interface AudioSystem {                  // existing +
   update(state: PhysicsState, dt: number, input: InputFrame): void;

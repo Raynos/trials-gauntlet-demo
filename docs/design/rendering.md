@@ -1616,6 +1616,19 @@ mode and the override is applied after the compose + clamp, so restoring is exac
 replay viewer (`src/game/replay.ts applyCamera`) already calls it when present; the level reviewer's pan hack
 (`review.ts` teleports the parked bike) can move to `free`. `debugInfo().occluder.override` names the live mode.
 
+### `orbit` + `setGarageStage` (garage round) — `CameraRig` `ORBIT`, `ThreeRenderer.setGarageStage`, `world/garageStage.ts`
+
+`CameraOverride.mode` gains `'orbit'`: a turntable about the hero's centre (aim `x` / `y`, default bike x, bike y +
+0.45) with `yaw` (about +y, 0 = the side view from +z), `pitch` (clamped `ORBIT.pitchMin..pitchMax`) and `dist` (clamped
+3–8 m) at the idle fov, and `screenX` / `screenY` (0..1) sliding the aim across the frame so a rail or panel can sit
+beside the hero; no bounds clamp (`camera/rig.ts` `ORBIT`, the `orbit` branch of `update`). The garage screen owns the
+gesture (drag / pinch / wheel, inertia); the rig integrates underneath, so `setOverride(null)` restores the game frame
+exactly (tested). `GameRenderer.setGarageStage?(on)` hides the world's meshes one by one (lights stay — no program is
+re-keyed), swaps `LightingRig.setStage` (sodium key = a parked follow spot, the sun as cool dusk fill, fog out, dark
+background) and places `buildGarageStage()` (`world/garageStage.ts`: set E shutter door at BE3 dusk, one mesh per
+element, ≤ 20 draws, four 512² canvas maps, mirrored twins under a 75 % floor for the wet look) at the hero's feet;
+`false` reverses every step and `applyTierVisibility` recomputes the tier hides.
+
 ### The camera that owes the bike something (item 1, parked) — `camera/rig.ts MOTION`, `camera/occluders.ts`
 
 Every new beat is a named constant in `MOTION` (`rig.ts`): **LEAD** `{gainS 0.22, capFrac 0.12, capM 3.0, omega 6.5,
