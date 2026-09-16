@@ -1,6 +1,6 @@
 # R15 integration update — September 16, 2026
 
-Latest user authorization: merge verified asset branch into trunk; keep the fresh garage production effort separate.
+Completed local integration: main fast-forwarded `998c429` → `62c003d`, with its unrelated capture edit preserved. User-authorized asset merge is done; no game deployment or remote push.
 `blender-work` now contains main through `998c429`. `src/physics/**`, main game/track/bot/golden state and main performance work are preserved. Five-outfit assets and selection are ready: 814 checks, 20 outfit combinations/outage/retry, WebKit byte-identical flat/B1 clear/crash/restart. Detailed reports and exclusions: `docs/BLENDER_HANDOFF.md` and `docs/evidence/hero-r15/`.
 
 **Do not interpret this as a pose/AAA sign-off.** The shared seated profile produced 15 handling failures and is retained only as a rejected-candidate patch/evidence. Retuning must use the physics-owner protocol below. Metal shader-query initialization remains a documented browser-specific issue; desktop WebKit passes do not establish real iOS performance.

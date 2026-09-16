@@ -16,3 +16,7 @@ Live physics was concurrently edited beginning run05. Runs06+ explicitly set `di
 No shader errors were suppressed and no getError drains were used in reduced run07 or synchronous-link run08. No product build was made.
 
 Run09: unmodified GL query behavior on SwiftShader; launched with `unmodified-gl.mts` against same frozen build. At handoff it is still running (session99295), with no result/error report; no alternate-backend pass claimed. The software full4836tick clear can take substantially longer than Metal. Output will be `run-09/report.json` or `failure.json`.
+
+## Final disposition of SwiftShader diagnostic
+
+Run09 was explicitly stopped by parent request after the frozen baseline WebKit gates passed (`r15-final-ship-webkit`, flat1012ticks; `r15-final-b1-webkit`, B14836ticks). Sent Ctrl-C to owned session99295; process exited130. SwiftShader diagnostic is INCOMPLETE/cancelled for excessive duration, not a pass or renderer failure. No source changes.

@@ -1,6 +1,6 @@
 # R15 integration decision — September 16, 2026
 
-User authorized merging verified branch work into trunk and a separate high-fidelity garage production plan. **The merge does not finish the rider pose or AAA goal.**
+User authorized merging verified branch work into trunk and a separate high-fidelity garage production plan. Local main was fast-forwarded from `998c429` to `62c003d`; unrelated uncommitted `harness/capture.ts` was preserved byte-identically. No game deployment or remote push was performed. **The merge does not finish the rider pose or AAA goal.**
 
 - Current candidate is byte-identical to main `998c429` under `src/physics/**`; main performance work retained. All five presets and distinct small openface helmet are included.
 - `pnpm check`: 814/814 tests, typecheck, lint and production build pass. Outfit integration: 20 combinations plus two-file outage/retry pass.
