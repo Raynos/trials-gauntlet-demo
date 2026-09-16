@@ -25,7 +25,13 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 13 | Which repos have the **session brief** / **human review** flow; we need that here too | **done** | found: `games/kami-kakushi` (origin, 372-line brief), `kami-kakushi2`, `house` (`.claude/hooks/session-brief.sh` + `project/human-in-the-loop/`), `vibe-demos/fe-shooter-prototype-fable` (54-line port + `QUEUE.md`); ported the light version here: `project/human-in-the-loop/QUEUE.md`, `.claude/hooks/session-brief.sh`, `.claude/settings.json` SessionStart |
 | 14 | **Update AGENTS.md** with the asks system; document undocumented processes — terse, pointers only | **done** | six pointer bullets appended (asks, human queue, session brief, design rounds, pins/evidence/device, harness docs) |
 | 15 | **Before-and-after videos** of the 0.1.0 vs 0.2.1 Blender models | **done** | `docs/evidence/hero-delta-v010-v021/{rider,bike}-turntable-before-after.mp4` (360°, 6 s, side by side); sent |
-| 16 | Garage: **UI layout = B**, **set = E**; three new mockups combining them | **in flight** | design owner → `assets/design/garage/round2/` BE1–BE3; the builder was told B layout + E set |
+| 16 | Garage: **UI layout = B**, **set = E**; three new mockups combining them | **done** | `c3fc76f` `assets/design/garage/round2/` BE1–BE3 + SPEC; sent |
+| 17 | **BE3 dusk** for the garage | **in flight** | the garage builder was told: B layout, E set, dusk sodium key, wet floor (cheap trick, perf caps hold) |
+| 18 | Process, run by me: AGENTS.md trimmed to 3 bullets; queue delete-on-decision; **80/20 markdown budget** with a commit guard (refuse > 40 % unless Design:/Docs:) | **done** | `d788414`; `.githooks/commit-msg` → `.claude/hooks/md-ratio.sh`; the brief prints the tree's share (13 % today) |
+| 19 | Port from FF15: **in-game review inbox + drain skill** — Vercel function + Blob, **password entered once, kept in localStorage** | **in flight** | inbox owner (subagent): `api/inbox.ts`, `src/ui/inbox.ts`, `scripts/inbox-pull.ts`, `.claude/skills/drain-inbox`; preview deploy proves the loop |
+| 20 | Hero art (HR-02): the user takes it to Codex themselves | **dropped** (user-owned) | not an agent item here; `prototypes/hero-garage` stays the user's |
+| 21 | **v0.2.2 when the garage lands**; **deploy on green**, review live on the phone | **open** | pin recipe in `RELEASES.md`; HR-04 is the review |
+| 22 | **5 variants of A3 isometric diorama** for the level select | **in flight** | track-select mockup owner → `assets/design/tracks/round3/` A3a–A3e |
 
 ## Standing items the asks imply (parent's list, not the user's words)
 
