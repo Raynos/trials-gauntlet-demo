@@ -286,3 +286,7 @@ The earlier data-map rebake remains an unadopted candidate. Its UV check found 5
 ### Round 22 — rejected neck-fit trial
 
 A bounded taper of the portrait shoulder edge below source Y1.590 preserved face/hair/beard/body attributes but did not visibly resolve the jagged pale neck patch. Parent rejected it after matched portraits and sequential decoded forward-rise frames; the prior assembly SHA `500990e54f6d3c7b5c413ef99e9292fa761e16a8712d71744eb6742a798bfd82` is restored in public and both local previews. Trial recipe and review are preserved. Correct next diagnosis is component-level old/new neck separation, not another broad taper.
+
+### Round 23 — neck component attribution
+
+A reversible false-color diagnostic replaced only the attached portrait skin material with green; geometry, motion and binary payload stayed identical. The pale jagged rear-neck patches remained pale in the matched portrait and sequential decoded forward-rise orbit frames. This isolates the defect away from the new portrait skin and points to retained original rider-neck surfaces. The production asset was untouched and the disposable preview restored byte-for-byte. Next work is source-face/UV identification of the old neck followed by targeted removal and collar review, not another portrait taper. Exact offending triangles remain unidentified. Evidence: `reports/neck-component-round23-review.json` under the prototype.

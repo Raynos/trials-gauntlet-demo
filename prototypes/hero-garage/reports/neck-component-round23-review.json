@@ -1,0 +1,19 @@
+{
+  "round": 23,
+  "decision": "Diagnosis accepted; no appearance change adopted",
+  "evidence": [
+    "captures/neck-component-round23/webkit-face.png",
+    "captures/neck-component-round23/webkit-orbit-relight.webm",
+    "reports/neck-component-round23-build.json"
+  ],
+  "reviewMethod": "Parent inspected matched portrait and sequential decoded frames from actual forward-rise orbit recording; not continuous playback.",
+  "finding": "Attached portrait skin material was replaced with unlit green. Pale jagged patches at the rear neckline remain pale and distinct from the green neck. This attributes those patches to other geometry, consistent with retained original rider neck faces, not the attached portrait shoulder flange.",
+  "nextAction": "Identify retained original body neck triangles by source geometry/UV correspondence, remove only residual exposed skin, then review collar seam through all clips. Do not taper the new portrait again.",
+  "limits": [
+    "Exact old-body triangle set not yet isolated.",
+    "Degenerate collar UVs remain a separate known defect.",
+    "No final art, mobile or integration acceptance."
+  ],
+  "productionAppearanceChanged": false,
+  "sourceSHA256": "500990e54f6d3c7b5c413ef99e9292fa761e16a8712d71744eb6742a798bfd82"
+}

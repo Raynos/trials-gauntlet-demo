@@ -1,0 +1,12 @@
+{
+  "purpose": "Component attribution only; false-color diagnostic is not an art candidate.",
+  "sourceSHA256": "500990e54f6d3c7b5c413ef99e9292fa761e16a8712d71744eb6742a798bfd82",
+  "diagnosticSHA256": "5baecc810a89bb669d783fa5466a1014ef94be6a5042a5fa44c91edfd2c2dc05",
+  "changedMaterials": [
+    4
+  ],
+  "binaryChunkIdentical": true,
+  "productionSourceUnchanged": true,
+  "previewRestored": true,
+  "captureExitCode": 0
+}

@@ -28,7 +28,9 @@ Round 20 adopts verified mobile KTX2/UASTC exports: all-image 4x4-block estimate
 
 Round 22 rejected a lower-neck taper after rendered comparison showed no convincing seam improvement. The prior saved-face/curls/beard assembly is restored byte-for-byte; [review](../../prototypes/hero-garage/reports/identity-neck-fit-review.json). Next fit work must isolate residual old-neck geometry rather than keep guessing broad shape changes.
 
-The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The earlier hourly automation remains paused; this goal is actively progressing through whole-scene work. Latest checked allowance is 22% remaining. Final visual approval stays with the user. Better body/clothing sources are being assessed without changing target01 identity. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
+Round 23 isolates the neck defect with a [false-color component diagnostic](../../prototypes/hero-garage/reports/neck-component-round23-review.json): the new portrait turns green, but pale rear-neck patches remain. Targeted old-body neck cleanup is next; the saved identity and normal preview remain unchanged.
+
+The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The earlier hourly automation remains paused; this goal is actively progressing through whole-scene work. Latest checked allowance is 21% remaining. Final visual approval stays with the user. Better body/clothing sources are being assessed without changing target01 identity. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
 
 ## Independent audit — 2026-09-15
 
