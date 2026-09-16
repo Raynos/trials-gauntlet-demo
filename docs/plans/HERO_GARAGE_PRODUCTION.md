@@ -260,3 +260,11 @@ The frozen existing game passes WebKit cold boot, 1,038 byte-identical replay ti
 ### Round 17 — complete scene first
 
 The user reaffirmed breadth before hair/beard polish. Those studies stay paused. A 14-file, 20,191,930-byte local runtime package contains the full current rider/bike, desktop/mobile textures and six clips. The recorded packaged WebKit run renders without errors and repeats the canvas byte-identically. Parent inspected sequential frames decoded from the real recording: complete assembly remains visible through orbit and landing motion; clothing, anatomy and detached-looking shadows remain provisional. This is no final-art, physics or iPhone-performance pass. Evidence: `prototypes/hero-garage/reports/whole-package-round17.json`. No new external source was adopted.
+
+### Round 18 — coordinated rider and bike motion
+
+The bike now articulates during the compression and landing clips instead of remaining rigid. A standalone garage driver solves chassis pitch, a 25 mm fork stroke and rear swingarm closure with stationary tyre contacts; the rider shares the chassis transform. Shock, chain and constant-length brake hose follow the existing exported pivots. Motion timing follows the rider clip keys. No production physics imports or changes were made.
+
+Actual exported meshes pass 101 stroke samples with exact neutral restoration; 18 rider clip/time samples preserve existing grip/sole offset baselines. A WebKit sweep covers all 750 clip frames, with axle/hinge errors below 1 micrometre and no browser errors. Parent inspected sequential decoded frames of the recorded full-scene orbit: no gross detachment or assembly break is visible; rider deformation, clothing, shadow appearance and final motion quality remain provisional. Evidence: `reports/bike-fit-review.json`, `reports/suspension-browser-round18.json` and `reports/whole-suspension-round18.json` under the prototype. The 10-second recording's p95 is 25 ms (video enabled); it is not the 30-second performance gate.
+
+The frozen round-18 game ship gate passes 1,038 identical ticks, 8.65-second clear and one-tick crash restart. This validates the frozen game only, not integration of the new prototype driver. Hair and beard remain paused.

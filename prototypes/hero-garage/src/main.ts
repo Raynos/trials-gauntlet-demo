@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import './style.css';
+import { createBikeSuspension } from './bikeSuspension';
+import { suspensionEnvelope } from './suspensionEnvelope';
 
 type CameraName = 'face' | 'full' | 'bike' | 'reference';
 type LightingName = 'neutral' | 'garage';
@@ -78,6 +80,7 @@ const environment = pmrem.fromScene(room,.04);
 scene.environment = environment.texture; scene.environmentIntensity=.45;
 room.dispose(); pmrem.dispose();
 const loaded: Loaded[]=[];
+let suspension: ReturnType<typeof createBikeSuspension> | null = null;
 let catalog: Catalog | null = null;
 let ready=false, error:string|null=null, selectedCamera:CameraName='face', lighting:LightingName='garage';
 let activeClip:string|null=null, duration=0, time=0, playing=false, orbitAngle=0;
@@ -143,6 +146,7 @@ function setLighting(name:LightingName){
 function updateTime(seconds:number){
   time=duration>0?((seconds%duration)+duration)%duration:Math.max(seconds,0);
   for(const item of loaded)item.mixer.setTime(time);
+  suspension?.setAmount(suspensionEnvelope(activeClip,time));
   $<HTMLInputElement>('#timeline').value=String(time);
   $('#time').textContent=duration?`${time.toFixed(2)} / ${duration.toFixed(2)} s`:'No motion loaded';
 }
@@ -162,7 +166,7 @@ function setFrame(frame:{time:number;orbit:number;lighting?:LightingName}){
 }
 function diagnostics(){
   const sizes=renderer.getDrawingBufferSize(new THREE.Vector2());const sorted=[...frameTimes].sort((a,b)=>a-b);
-  return {ready,error,quality,qualitySelection:requestedQuality==='desktop'||requestedQuality==='mobile'?'query':'pointer capability',grounding,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
+  return {ready,error,quality,suspension:suspension?.getDiagnostics()??null,qualitySelection:requestedQuality==='desktop'||requestedQuality==='mobile'?'query':'pointer capability',grounding,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
 }
 const api={get ready(){return ready;},get error(){return error;},setCamera,setComparison,setLighting,setTime,setOrbit,setFrame,setClip,setPlaying,getDiagnostics:diagnostics,get state(){return diagnostics();}};
 Object.assign(window,{__garage:api,__heroGarage:api});
@@ -209,11 +213,13 @@ async function boot(){
     // Set the assembled bike's lowest geometry on the floor without changing rider/bike alignment.
     const bikeRoot=loaded.find(item=>item.asset.kind==='bike')?.root;
     if(bikeRoot){const coarseMinY=new THREE.Box3().setFromObject(bikeRoot).min.y;const preciseMinY=new THREE.Box3().setFromObject(bikeRoot,true).min.y;hero.position.y-=preciseMinY;hero.updateMatrixWorld(true);grounding={coarseMinY,preciseMinY,assemblyOffsetY:hero.position.y,finalMinY:new THREE.Box3().setFromObject(bikeRoot,true).min.y};}
+    const riderRoot=loaded.find(item=>item.asset.kind==='rider')?.root;
+    if(bikeRoot&&riderRoot)suspension=createBikeSuspension(bikeRoot,riderRoot);
     fitAssetShadows();
     const motionOrder=['sit_cruise','forward_attack','hang_back','compression','extension','landing_absorption'];
     const clipNames=[...new Set(loaded.flatMap(item=>item.clips.map(c=>c.name)))].sort((a,b)=>{const rank=(name:string)=>motionOrder.includes(name)?motionOrder.indexOf(name):motionOrder.length;return rank(a)-rank(b)||a.localeCompare(b);});
     for(const name of clipNames){const button=document.createElement('button');button.dataset.clip=name;button.textContent=({sit_cruise:'Seated neutral',forward_attack:'Forward rise',hang_back:'Rearward shift',compression:'Compression',extension:'Extension',landing_absorption:'Landing absorption'} as Record<string,string>)[name]??name.replaceAll('_',' ');button.setAttribute('aria-pressed','false');$('#clips').append(button);}
-    $('#motion-note').textContent=clipNames.length?'Playback uses exported GLB animation clips.':'No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.';
+    $('#motion-note').textContent=clipNames.length?'Authored rider clips; compression and landing include a kinematic suspension preview.':'No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.';
     if(clipNames.length)setClip(clipNames.includes('sit_cruise')?'sit_cruise':clipNames[0]);
     $('#asset-label').textContent=loaded.map(item=>item.asset.label).join(' + ');
     $<HTMLButtonElement>('[data-camera="bike"]').disabled=!loaded.some(item=>item.asset.kind==='bike');

@@ -14,9 +14,9 @@
       "sha256": "31b47e3d688543a583df0c2b7da25f2c0a1817f9573aca01d3d584eabf8f4f88"
     },
     {
-      "path": "assets/index-BrBFQuDp.js",
-      "bytes": 698852,
-      "sha256": "8076f2e0c365f9bb931a3f6c37a59bcac15854a2e4734ade8ca4060790a89e7b"
+      "path": "assets/index-BfCfGsTS.js",
+      "bytes": 707988,
+      "sha256": "165a7d6f2d9eb11276e6bae49c1318cdd265d56eeec52b2a6fc873b98dcfd198"
     },
     {
       "path": "assets/street01-bike-materials.glb",
@@ -46,7 +46,7 @@
     {
       "path": "index.html",
       "bytes": 439,
-      "sha256": "8d441d16e7cb78ccf689481dc8fdc361d15fee7b5a5976118195b6c97d638a24"
+      "sha256": "50445792619f6416681c05fbf3421b0fbcf2157e8b82658c0ff4be12bdac6717"
     },
     {
       "path": "licenses/meshoptimizer.txt",
@@ -74,8 +74,8 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 20191930,
-  "sourceDistBytes": 230364446,
+  "totalBytes": 20201066,
+  "sourceDistBytes": 230373582,
   "excludedFiles": [
     {
       "path": "assets/street01-bike.glb",
@@ -124,7 +124,7 @@
   ],
   "verifiedLocalUrls": [
     "assets/index-B2aW2QAt.css",
-    "assets/index-BrBFQuDp.js",
+    "assets/index-BfCfGsTS.js",
     "assets/street01-bike-materials.glb",
     "assets/street01-bike-mobile.glb",
     "assets/street01-rider-garment-repair.glb",

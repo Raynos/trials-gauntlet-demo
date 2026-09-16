@@ -1,0 +1,6834 @@
+{
+  "scope": "Headless WebKit exported-scene kinematic suspension sweep; not physics, art acceptance or iPhone validation",
+  "errors": [],
+  "clips": [
+    {
+      "clip": "compression",
+      "samples": [
+        {
+          "frame": 0,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 1,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 2,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 3,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 4,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 5,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 6,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 7,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 8,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 9,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 10,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 11,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 12,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 13,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 14,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 15,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 16,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 17,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 18,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 19,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 20,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 21,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 22,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 23,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 24,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 25,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 26,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 27,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 28,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 29,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 30,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 31,
+          "amount": 0.005063657407407373,
+          "stroke": 0.0001265914351851843,
+          "chassisPitch": 0.00007968689242472435,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 4.868067754459915e-17
+        },
+        {
+          "frame": 32,
+          "amount": 0.01967592592592579,
+          "stroke": 0.0004918981481481448,
+          "chassisPitch": 0.0003116913978517393,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.451652162532847e-16
+        },
+        {
+          "frame": 33,
+          "amount": 0.04296874999999961,
+          "stroke": 0.0010742187499999903,
+          "chassisPitch": 0.000687919071263455,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.4663834382866447e-16
+        },
+        {
+          "frame": 34,
+          "amount": 0.07407407407407358,
+          "stroke": 0.0018518518518518398,
+          "chassisPitch": 0.0012029179919698985,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 9.465084965798454e-17
+        },
+        {
+          "frame": 35,
+          "amount": 0.11212384259259287,
+          "stroke": 0.0028030960648148216,
+          "chassisPitch": 0.001853162445515809,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.218643241873707e-16
+        },
+        {
+          "frame": 36,
+          "amount": 0.1562500000000003,
+          "stroke": 0.003906250000000008,
+          "chassisPitch": 0.002636443157570434,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 5.0090140368830305e-17
+        },
+        {
+          "frame": 37,
+          "amount": 0.20558449074074078,
+          "stroke": 0.00513961226851852,
+          "chassisPitch": 0.0035513188802946596,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 9.367506770274758e-17
+        },
+        {
+          "frame": 38,
+          "amount": 0.25925925925925924,
+          "stroke": 0.006481481481481481,
+          "chassisPitch": 0.004596593211338582,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.6740081543176188e-16
+        },
+        {
+          "frame": 39,
+          "amount": 0.3164062499999996,
+          "stroke": 0.007910156249999991,
+          "chassisPitch": 0.005770785294568562,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.8449465006019636e-16
+        },
+        {
+          "frame": 40,
+          "amount": 0.376157407407407,
+          "stroke": 0.009403935185185175,
+          "chassisPitch": 0.007071564870917279,
+          "armLengthError": 2.220446049250313e-16,
+          "frontAxleError": 0,
+          "rearAxleError": 2.645453300864631e-16
+        },
+        {
+          "frame": 41,
+          "amount": 0.43764467592592676,
+          "stroke": 0.01094111689814817,
+          "chassisPitch": 0.00849512195691845,
+          "armLengthError": 2.220446049250313e-16,
+          "frontAxleError": 0,
+          "rearAxleError": 1.717376241217039e-16
+        },
+        {
+          "frame": 42,
+          "amount": 0.5000000000000008,
+          "stroke": 0.01250000000000002,
+          "chassisPitch": 0.010035440116013868,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 7.892991815694472e-17
+        },
+        {
+          "frame": 43,
+          "amount": 0.5623553240740745,
+          "stroke": 0.014058883101851863,
+          "chassisPitch": 0.011683441089311165,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 7.546047120499111e-17
+        },
+        {
+          "frame": 44,
+          "amount": 0.6238425925925927,
+          "stroke": 0.015596064814814818,
+          "chassisPitch": 0.013425969608481133,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 3.0010716134398763e-16
+        },
+        {
+          "frame": 45,
+          "amount": 0.68359375,
+          "stroke": 0.01708984375,
+          "chassisPitch": 0.015244594417477617,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 4.163336342344337e-17
+        },
+        {
+          "frame": 46,
+          "amount": 0.7407407407407407,
+          "stroke": 0.018518518518518517,
+          "chassisPitch": 0.017114221759323204,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.3418766925686896e-16
+        },
+        {
+          "frame": 47,
+          "amount": 0.794415509259259,
+          "stroke": 0.019860387731481476,
+          "chassisPitch": 0.019001562161307207,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.203098814490545e-16
+        },
+        {
+          "frame": 48,
+          "amount": 0.8437499999999994,
+          "stroke": 0.021093749999999988,
+          "chassisPitch": 0.020863576815114703,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.7520707107365752e-16
+        },
+        {
+          "frame": 49,
+          "amount": 0.8878761574074068,
+          "stroke": 0.02219690393518517,
+          "chassisPitch": 0.022646175264848797,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.3704315460216776e-16
+        },
+        {
+          "frame": 50,
+          "amount": 0.9259259259259262,
+          "stroke": 0.023148148148148154,
+          "chassisPitch": 0.02428365089509819,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.2551405187698492e-17
+        },
+        {
+          "frame": 51,
+          "amount": 0.9570312500000002,
+          "stroke": 0.023925781250000007,
+          "chassisPitch": 0.025699594153459227,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 8.847089727481716e-17
+        },
+        {
+          "frame": 52,
+          "amount": 0.9803240740740741,
+          "stroke": 0.024508101851851854,
+          "chassisPitch": 0.02681019417878981,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.1622647289044608e-16
+        },
+        {
+          "frame": 53,
+          "amount": 0.9949363425925927,
+          "stroke": 0.02487340856481482,
+          "chassisPitch": 0.027530678522382637,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.5500435096859064e-16
+        },
+        {
+          "frame": 54,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 55,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 56,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 57,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 58,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 59,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 60,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 61,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 62,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 63,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 64,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 65,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 66,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 67,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 68,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 69,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 70,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 71,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 72,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 73,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 74,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 75,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 76,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 77,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 78,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 79,
+          "amount": 0.9956759217114248,
+          "stroke": 0.02489189804278562,
+          "chassisPitch": 0.027567654799689457,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.185751579730777e-16
+        },
+        {
+          "frame": 80,
+          "amount": 0.9831588529813384,
+          "stroke": 0.02457897132453346,
+          "chassisPitch": 0.026948490872678775,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.249000902703301e-16
+        },
+        {
+          "frame": 81,
+          "amount": 0.9631315430131998,
+          "stroke": 0.024078288575329995,
+          "chassisPitch": 0.02598611861577684,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.1102230246251565e-16
+        },
+        {
+          "frame": 82,
+          "amount": 0.9362767410104688,
+          "stroke": 0.023406918525261722,
+          "chassisPitch": 0.02474671128025891,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.8735013540549517e-16
+        },
+        {
+          "frame": 83,
+          "amount": 0.9032771961766044,
+          "stroke": 0.022581929904415113,
+          "chassisPitch": 0.023297106992216765,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.5269508632971126e-16
+        },
+        {
+          "frame": 84,
+          "amount": 0.864815657715066,
+          "stroke": 0.02162039144287665,
+          "chassisPitch": 0.0216998912687978,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 6.938893903907228e-18
+        },
+        {
+          "frame": 85,
+          "amount": 0.8215748748293121,
+          "stroke": 0.020539371870732806,
+          "chassisPitch": 0.020010510125326942,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 5.551115123125783e-17
+        },
+        {
+          "frame": 86,
+          "amount": 0.7742375967228031,
+          "stroke": 0.01935593991807008,
+          "chassisPitch": 0.018276076226996237,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 7.28583859910259e-17
+        },
+        {
+          "frame": 87,
+          "amount": 0.7234865725989978,
+          "stroke": 0.018087164314974948,
+          "chassisPitch": 0.01653534192914691,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.3332030751888055e-16
+        },
+        {
+          "frame": 88,
+          "amount": 0.6700045516613564,
+          "stroke": 0.016750113791533912,
+          "chassisPitch": 0.014819350531519112,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3877787807814457e-17
+        },
+        {
+          "frame": 89,
+          "amount": 0.6144742831133364,
+          "stroke": 0.015361857077833411,
+          "chassisPitch": 0.013152404216921567,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.214306433183765e-16
+        },
+        {
+          "frame": 90,
+          "amount": 0.5575785161583978,
+          "stroke": 0.013939462903959947,
+          "chassisPitch": 0.011553119079796708,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 3.174543961037557e-16
+        },
+        {
+          "frame": 91,
+          "amount": 0.5,
+          "stroke": 0.0125,
+          "chassisPitch": 0.010035440116013787,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 8.933825901280557e-17
+        },
+        {
+          "frame": 92,
+          "amount": 0.4424214838416022,
+          "stroke": 0.011060537096040055,
+          "chassisPitch": 0.008609557174763546,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 3.903127820947816e-17
+        },
+        {
+          "frame": 93,
+          "amount": 0.38552571688666437,
+          "stroke": 0.00963814292216661,
+          "chassisPitch": 0.007282703421261169,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.1622647289044608e-16
+        },
+        {
+          "frame": 94,
+          "amount": 0.32999544833864436,
+          "stroke": 0.008249886208466109,
+          "chassisPitch": 0.006059839668738609,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 6.938893903907228e-17
+        },
+        {
+          "frame": 95,
+          "amount": 0.27651342740100204,
+          "stroke": 0.006912835685025051,
+          "chassisPitch": 0.004944238310860679,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.708702623837155e-16
+        },
+        {
+          "frame": 96,
+          "amount": 0.22576240327719754,
+          "stroke": 0.005644060081929939,
+          "chassisPitch": 0.003937984576125407,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 3.204901621867151e-16
+        },
+        {
+          "frame": 97,
+          "amount": 0.1784251251706861,
+          "stroke": 0.004460628129267153,
+          "chassisPitch": 0.0030424136099693267,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.3357370765021415e-16
+        },
+        {
+          "frame": 98,
+          "amount": 0.13518434228493514,
+          "stroke": 0.0033796085571233788,
+          "chassisPitch": 0.0022585013466841198,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 6.310056643865636e-17
+        },
+        {
+          "frame": 99,
+          "amount": 0.09672280382339449,
+          "stroke": 0.0024180700955848625,
+          "chassisPitch": 0.0015872263397676036,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.6458188978329957e-16
+        },
+        {
+          "frame": 100,
+          "amount": 0.0637232589895308,
+          "stroke": 0.00159308147473827,
+          "chassisPitch": 0.0010299193072593688,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 8.4893030105615e-17
+        },
+        {
+          "frame": 101,
+          "amount": 0.03686845698679986,
+          "stroke": 0.0009217114246699965,
+          "chassisPitch": 0.0005886175415040017,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.7267684638010437e-16
+        },
+        {
+          "frame": 102,
+          "amount": 0.016841147018661573,
+          "stroke": 0.00042102867546653936,
+          "chassisPitch": 0.00026644291223777624,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.713215936644975e-17
+        },
+        {
+          "frame": 103,
+          "amount": 0.004324078288575395,
+          "stroke": 0.00010810195721438488,
+          "chassisPitch": 0.00006802543446172929,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.1263915107871956e-17
+        },
+        {
+          "frame": 104,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 105,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 106,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 107,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 108,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 109,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 110,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 111,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 112,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 113,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 114,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 115,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 116,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 117,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 118,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 119,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 120,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 121,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 122,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 123,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 124,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 125,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 126,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 127,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 128,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 129,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 130,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 131,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 132,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 133,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 134,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 135,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 136,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 137,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 138,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 139,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 140,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 141,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 142,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 143,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 144,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 145,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 146,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 147,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 148,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 149,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        }
+      ],
+      "neutral": {
+        "amount": 0,
+        "stroke": 0,
+        "chassisPitch": 0,
+        "armLengthError": 0,
+        "frontAxleError": 0,
+        "rearAxleError": 0
+      }
+    },
+    {
+      "clip": "extension",
+      "samples": [
+        {
+          "frame": 0,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 1,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 2,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 3,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 4,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 5,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 6,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 7,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 8,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 9,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 10,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 11,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 12,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 13,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 14,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 15,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 16,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 17,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 18,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 19,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 20,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 21,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 22,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 23,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 24,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 25,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 26,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 27,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 28,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 29,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 30,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 31,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 32,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 33,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 34,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 35,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 36,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 37,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 38,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 39,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 40,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 41,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 42,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 43,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 44,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 45,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 46,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 47,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 48,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 49,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 50,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 51,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 52,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 53,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 54,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 55,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 56,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 57,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 58,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 59,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 60,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 61,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 62,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 63,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 64,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 65,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 66,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 67,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 68,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 69,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 70,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 71,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 72,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 73,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 74,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 75,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 76,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 77,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 78,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 79,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 80,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 81,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 82,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 83,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 84,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 85,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 86,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 87,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 88,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 89,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 90,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 91,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 92,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 93,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 94,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 95,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 96,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 97,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 98,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 99,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 100,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 101,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 102,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 103,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 104,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 105,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 106,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 107,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 108,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 109,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 110,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 111,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 112,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 113,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 114,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 115,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 116,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 117,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 118,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 119,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 120,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 121,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 122,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 123,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 124,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 125,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 126,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 127,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 128,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 129,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 130,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 131,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 132,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 133,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 134,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 135,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 136,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 137,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 138,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 139,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 140,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 141,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 142,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 143,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 144,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 145,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 146,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 147,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 148,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 149,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        }
+      ],
+      "neutral": {
+        "amount": 0,
+        "stroke": 0,
+        "chassisPitch": 0,
+        "armLengthError": 0,
+        "frontAxleError": 0,
+        "rearAxleError": 0
+      }
+    },
+    {
+      "clip": "forward_attack",
+      "samples": [
+        {
+          "frame": 0,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 1,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 2,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 3,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 4,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 5,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 6,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 7,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 8,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 9,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 10,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 11,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 12,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 13,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 14,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 15,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 16,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 17,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 18,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 19,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 20,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 21,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 22,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 23,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 24,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 25,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 26,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 27,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 28,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 29,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 30,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 31,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 32,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 33,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 34,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 35,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 36,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 37,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 38,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 39,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 40,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 41,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 42,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 43,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 44,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 45,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 46,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 47,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 48,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 49,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 50,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 51,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 52,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 53,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 54,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 55,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 56,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 57,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 58,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 59,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 60,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 61,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 62,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 63,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 64,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 65,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 66,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 67,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 68,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 69,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 70,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 71,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 72,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 73,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 74,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 75,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 76,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 77,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 78,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 79,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 80,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 81,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 82,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 83,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 84,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 85,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 86,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 87,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 88,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 89,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 90,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 91,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 92,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 93,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 94,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 95,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 96,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 97,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 98,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 99,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 100,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 101,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 102,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 103,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 104,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 105,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 106,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 107,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 108,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 109,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 110,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 111,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 112,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 113,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 114,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 115,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 116,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 117,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 118,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 119,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        }
+      ],
+      "neutral": {
+        "amount": 0,
+        "stroke": 0,
+        "chassisPitch": 0,
+        "armLengthError": 0,
+        "frontAxleError": 0,
+        "rearAxleError": 0
+      }
+    },
+    {
+      "clip": "hang_back",
+      "samples": [
+        {
+          "frame": 0,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 1,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 2,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 3,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 4,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 5,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 6,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 7,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 8,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 9,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 10,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 11,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 12,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 13,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 14,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 15,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 16,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 17,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 18,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 19,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 20,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 21,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 22,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 23,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 24,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 25,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 26,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 27,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 28,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 29,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 30,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 31,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 32,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 33,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 34,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 35,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 36,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 37,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 38,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 39,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 40,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 41,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 42,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 43,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 44,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 45,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 46,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 47,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 48,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 49,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 50,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 51,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 52,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 53,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 54,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 55,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 56,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 57,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 58,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 59,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 60,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 61,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 62,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 63,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 64,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 65,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 66,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 67,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 68,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 69,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 70,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 71,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 72,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 73,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 74,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 75,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 76,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 77,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 78,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 79,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 80,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 81,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 82,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 83,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 84,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 85,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 86,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 87,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 88,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 89,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 90,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 91,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 92,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 93,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 94,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 95,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 96,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 97,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 98,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 99,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 100,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 101,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 102,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 103,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 104,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 105,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 106,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 107,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 108,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 109,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 110,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 111,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 112,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 113,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 114,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 115,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 116,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 117,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 118,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 119,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        }
+      ],
+      "neutral": {
+        "amount": 0,
+        "stroke": 0,
+        "chassisPitch": 0,
+        "armLengthError": 0,
+        "frontAxleError": 0,
+        "rearAxleError": 0
+      }
+    },
+    {
+      "clip": "landing_absorption",
+      "samples": [
+        {
+          "frame": 0,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 1,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 2,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 3,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 4,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 5,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 6,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 7,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 8,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 9,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 10,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 11,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 12,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 13,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 14,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 15,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 16,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 17,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 18,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 19,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 20,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 21,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 22,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 23,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 24,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 25,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 26,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 27,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 28,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 29,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 30,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 31,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 32,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 33,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 34,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 35,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 36,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 37,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 38,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 39,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 40,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 41,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 42,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 43,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 44,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 45,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 46,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 47,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 48,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 49,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 50,
+          "amount": 6.731613057885965e-31,
+          "stroke": 1.6829032644714915e-32,
+          "chassisPitch": 1.0675221623026575e-16,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.1592544776028574e-32
+        },
+        {
+          "frame": 51,
+          "amount": 0.012740740740740915,
+          "stroke": 0.0003185185185185229,
+          "chassisPitch": 0.00020119727734229086,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.791644090032296e-17
+        },
+        {
+          "frame": 52,
+          "amount": 0.0485925925925926,
+          "stroke": 0.001214814814814815,
+          "chassisPitch": 0.0007799536060785864,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 3.2807957739411364e-16
+        },
+        {
+          "frame": 53,
+          "amount": 0.10400000000000002,
+          "stroke": 0.0026000000000000007,
+          "chassisPitch": 0.0017124143723623482,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 8.782037597132586e-17
+        },
+        {
+          "frame": 54,
+          "amount": 0.1754074074074069,
+          "stroke": 0.0043851851851851725,
+          "chassisPitch": 0.0029866689334235126,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.489693784995083e-16
+        },
+        {
+          "frame": 55,
+          "amount": 0.25925925925925863,
+          "stroke": 0.0064814814814814666,
+          "chassisPitch": 0.004596593211338583,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.734723475976807e-16
+        },
+        {
+          "frame": 56,
+          "amount": 0.35200000000000137,
+          "stroke": 0.008800000000000035,
+          "chassisPitch": 0.006536265295112072,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 3.0357660829594124e-18
+        },
+        {
+          "frame": 57,
+          "amount": 0.45007407407407546,
+          "stroke": 0.011251851851851888,
+          "chassisPitch": 0.008794085196947054,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.196959198423997e-16
+        },
+        {
+          "frame": 58,
+          "amount": 0.5499259259259265,
+          "stroke": 0.013748148148148162,
+          "chassisPitch": 0.011345789913640316,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.968911145233676e-16
+        },
+        {
+          "frame": 59,
+          "amount": 0.648,
+          "stroke": 0.016200000000000003,
+          "chassisPitch": 0.014145528012846053,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.7954387976359953e-16
+        },
+        {
+          "frame": 60,
+          "amount": 0.7407407407407407,
+          "stroke": 0.018518518518518517,
+          "chassisPitch": 0.017114221759323204,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.3418766925686896e-16
+        },
+        {
+          "frame": 61,
+          "amount": 0.8245925925925925,
+          "stroke": 0.020614814814814815,
+          "chassisPitch": 0.020125012746794235,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.8214596497756474e-16
+        },
+        {
+          "frame": 62,
+          "amount": 0.8959999999999996,
+          "stroke": 0.02239999999999999,
+          "chassisPitch": 0.022987583791043133,
+          "armLengthError": 5.551115123125783e-17,
+          "frontAxleError": 0,
+          "rearAxleError": 1.7520707107365752e-16
+        },
+        {
+          "frame": 63,
+          "amount": 0.9514074074074067,
+          "stroke": 0.02378518518518517,
+          "chassisPitch": 0.025438086380680222,
+          "armLengthError": 2.220446049250313e-16,
+          "frontAxleError": 0,
+          "rearAxleError": 1.5612511283791264e-17
+        },
+        {
+          "frame": 64,
+          "amount": 0.987259259259259,
+          "stroke": 0.024681481481481474,
+          "chassisPitch": 0.027149778736474197,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 5.551115123125783e-17
+        },
+        {
+          "frame": 65,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 66,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 67,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 68,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 69,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 70,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 71,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 72,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 73,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 74,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 75,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 76,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 77,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 78,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 79,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 80,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 81,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 82,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 83,
+          "amount": 1,
+          "stroke": 0.025,
+          "chassisPitch": 0.027784850276647174,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.3183898417423734e-16
+        },
+        {
+          "frame": 84,
+          "amount": 0.995328,
+          "stroke": 0.0248832,
+          "chassisPitch": 0.02755025374170081,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 5.204170427930421e-18
+        },
+        {
+          "frame": 85,
+          "amount": 0.9818239999999997,
+          "stroke": 0.024545599999999994,
+          "chassisPitch": 0.026883281918684252,
+          "armLengthError": 2.220446049250313e-16,
+          "frontAxleError": 0,
+          "rearAxleError": 1.734723475976807e-18
+        },
+        {
+          "frame": 86,
+          "amount": 0.9602559999999997,
+          "stroke": 0.024006399999999994,
+          "chassisPitch": 0.025850682593763906,
+          "armLengthError": 1.6653345369377348e-16,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 1.5785983631388945e-16
+        },
+        {
+          "frame": 87,
+          "amount": 0.9313919999999996,
+          "stroke": 0.02328479999999999,
+          "chassisPitch": 0.02452720309028871,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.734723475976807e-17
+        },
+        {
+          "frame": 88,
+          "amount": 0.896,
+          "stroke": 0.022400000000000003,
+          "chassisPitch": 0.022987583791043133,
+          "armLengthError": 5.551115123125783e-17,
+          "frontAxleError": 0,
+          "rearAxleError": 1.700029006457271e-16
+        },
+        {
+          "frame": 89,
+          "amount": 0.854848,
+          "stroke": 0.021371200000000003,
+          "chassisPitch": 0.02130092776570178,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 3.5561831257524545e-16
+        },
+        {
+          "frame": 90,
+          "amount": 0.808704,
+          "stroke": 0.020217600000000002,
+          "chassisPitch": 0.0195275923444641,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.1449174941446927e-16
+        },
+        {
+          "frame": 91,
+          "amount": 0.758336,
+          "stroke": 0.0189584,
+          "chassisPitch": 0.01771809390463233,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 3.2959746043559335e-17
+        },
+        {
+          "frame": 92,
+          "amount": 0.704512,
+          "stroke": 0.0176128,
+          "chassisPitch": 0.0159133317761012,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.214306433183765e-17
+        },
+        {
+          "frame": 93,
+          "amount": 0.6480000000000008,
+          "stroke": 0.01620000000000002,
+          "chassisPitch": 0.014145528012846053,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.8821749714348357e-16
+        },
+        {
+          "frame": 94,
+          "amount": 0.5895680000000008,
+          "stroke": 0.01473920000000002,
+          "chassisPitch": 0.012439461377337016,
+          "armLengthError": 2.220446049250313e-16,
+          "frontAxleError": 0,
+          "rearAxleError": 1.3010426069826053e-16
+        },
+        {
+          "frame": 95,
+          "amount": 0.5299840000000009,
+          "stroke": 0.013249600000000023,
+          "chassisPitch": 0.010813743349121541,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.862293735361732e-17
+        },
+        {
+          "frame": 96,
+          "amount": 0.47001600000000165,
+          "stroke": 0.011750400000000043,
+          "chassisPitch": 0.009282006899934171,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.240327285323417e-16
+        },
+        {
+          "frame": 97,
+          "amount": 0.41043199999999824,
+          "stroke": 0.010260799999999957,
+          "chassisPitch": 0.007853955795986316,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 9.454242944073599e-17
+        },
+        {
+          "frame": 98,
+          "amount": 0.35200000000000164,
+          "stroke": 0.008800000000000042,
+          "chassisPitch": 0.006536265295112072,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 5.637851296924623e-18
+        },
+        {
+          "frame": 99,
+          "amount": 0.2954879999999984,
+          "stroke": 0.007387199999999961,
+          "chassisPitch": 0.005333346617507563,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 3.7730235602495554e-17
+        },
+        {
+          "frame": 100,
+          "amount": 0.2416639999999992,
+          "stroke": 0.00604159999999998,
+          "chassisPitch": 0.004247996687468461,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 2.0513105103425744e-16
+        },
+        {
+          "frame": 101,
+          "amount": 0.19129599999999936,
+          "stroke": 0.004782399999999984,
+          "chassisPitch": 0.0032819573302665856,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 9.75781955236954e-18
+        },
+        {
+          "frame": 102,
+          "amount": 0.14515199999999928,
+          "stroke": 0.0036287999999999824,
+          "chassisPitch": 0.0024364079145823003,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 1.0213184464813452e-16
+        },
+        {
+          "frame": 103,
+          "amount": 0.10399999999999987,
+          "stroke": 0.002599999999999997,
+          "chassisPitch": 0.0017124143723623482,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 8.608565249534905e-17
+        },
+        {
+          "frame": 104,
+          "amount": 0.06860800000000011,
+          "stroke": 0.0017152000000000029,
+          "chassisPitch": 0.0011113567424351515,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 7.784571598445922e-17
+        },
+        {
+          "frame": 105,
+          "amount": 0.039744,
+          "stroke": 0.0009936,
+          "chassisPitch": 0.0006353575756306159,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 3.1929753979698106e-17
+        },
+        {
+          "frame": 106,
+          "amount": 0.01817599999999997,
+          "stroke": 0.0004543999999999993,
+          "chassisPitch": 0.0002877352754192635,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 3.1170812458958252e-18
+        },
+        {
+          "frame": 107,
+          "amount": 0.0046720000000000095,
+          "stroke": 0.00011680000000000024,
+          "chassisPitch": 0.00007351038965786125,
+          "armLengthError": 0,
+          "frontAxleError": 2.220446049250313e-16,
+          "rearAxleError": 3.670701980221236e-17
+        },
+        {
+          "frame": 108,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 109,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 110,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 111,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 112,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 113,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 114,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 115,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 116,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 117,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 118,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 119,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 120,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 121,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 122,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 123,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 124,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 125,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 126,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 127,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 128,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 129,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 130,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 131,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 132,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 133,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 134,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 135,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 136,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 137,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 138,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 139,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 140,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 141,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 142,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 143,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 144,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 145,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 146,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 147,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 148,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 149,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        }
+      ],
+      "neutral": {
+        "amount": 0,
+        "stroke": 0,
+        "chassisPitch": 0,
+        "armLengthError": 0,
+        "frontAxleError": 0,
+        "rearAxleError": 0
+      }
+    },
+    {
+      "clip": "sit_cruise",
+      "samples": [
+        {
+          "frame": 0,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 1,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 2,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 3,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 4,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 5,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 6,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 7,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 8,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 9,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 10,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 11,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 12,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 13,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 14,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 15,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 16,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 17,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 18,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 19,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 20,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 21,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 22,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 23,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 24,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 25,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 26,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 27,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 28,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 29,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 30,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 31,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 32,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 33,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 34,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 35,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 36,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 37,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 38,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 39,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 40,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 41,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 42,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 43,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 44,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 45,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 46,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 47,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 48,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 49,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 50,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 51,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 52,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 53,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 54,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 55,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 56,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 57,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 58,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        {
+          "frame": 59,
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        }
+      ],
+      "neutral": {
+        "amount": 0,
+        "stroke": 0,
+        "chassisPitch": 0,
+        "armLengthError": 0,
+        "frontAxleError": 0,
+        "rearAxleError": 0
+      }
+    }
+  ]
+}
