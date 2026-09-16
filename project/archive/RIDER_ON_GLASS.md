@@ -1,5 +1,17 @@
 # Rider on Glass — the second mega plan
 
+**Closed: 2026-09-16 · `f00724e` live at https://trials-gauntlet-demo.vercel.app.** Pillar G (glass) closed 2026-09-15 at
+100 % (touch-navigation invariant, `?bench=1` + device report #1, 60-cap governor + phone-high tier, commit-stamped
+deploys, ship-gate G11 device/hero rows). Pillar H (the hero) closed on the user's decision of 2026-09-15 — "the
+critic bar is dead; once the whole Astra branch is merged, mark it good enough" — and the branch is now entirely on
+`main`: merge #3 (`12e818b`, hero / assets / garage / outfits), Astra's own rebase (`afeb5c9…3e05e58`), the render
+perf layer (r15 `5b56431`), and the physics (R9 `f00724e`: hinged rear path + fork line, elbow stop, brake lift
+control, the seated pose as the drawn/physical split; the mass frame rejected by measurement, hop 0.596 → 0.481).
+Record, not a bar: the last blind critic round on the body-driven hero read 2 / 12 (statue tells gone; landing punch
+and camera named), harness-metrics.md Round 13b. What is still open on the hero is Astra's
+`docs/plans/HERO_OPEN_WORK.md`; the unclosable bars stay in `docs/mission.md` §2–3.
+
+
 Two themes from the outside review (Fable 5.1, 2026-09-14 evening), built in parallel with
 `project/archive/MEGA_PLAN.md` (v0.2.0) and `project/archive/physics-v2.md`: **the rider and bike are the hero**, and
 **the game is proven on a phone, not a laptop**. "Rider on Glass": the thing in the middle of the

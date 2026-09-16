@@ -235,7 +235,7 @@ verdict ("rider and bike stay one rigid object") did not. Confidences 0.55–0.8
 
 ## Round 13 (physics R7) — strangers on the held rider: b1–e3 on the Rookie (the tier's default), src 605a8174, one fresh stranger per track
 
-Rule 1 of `docs/tasks/blender-branch-merge.md`: a dynamics change needs a stranger re-run on b1–e3 in band. Physics R7
+Rule 1 of `project/archive/blender-branch-merge.md`: a dynamics change needs a stranger re-run on b1–e3 in band. Physics R7
 (the linkage couple that holds the rider body, the exported `riderBody`, the intent gates (a)–(d); `physics.md` v2 status
 R7) is that change. Six sessions, `prep --round r13 --agents s1`, prompt = `run-stranger.md` block verbatim, spawned in
 parallel (loadavg ~10); every session cleared, 0.8–2.9 min wall, 11–22 calls. **n = 1 per track, so every verdict is

@@ -6,7 +6,7 @@ Round 12. The bars this plan could not close — wowed against the real thing (b
 as a person, sound as a recording, fun — live in `docs/mission.md`; the next build starts from those numbers, not from
 this file. What remains actionable from here went to owners: track sinks (h2 255–265 m, h3 505 m, x3 505–525 m) to
 tracks; the camera that owes nothing to the bike, the landing settle and the statue rider to render / hero (Astra,
-`docs/tasks/blender-branch-merge.md`); the engine loop to audio; the perf remainder to `docs/plans/PERF-BACKLOG.md`.
+`project/archive/blender-branch-merge.md`); the engine loop to audio; the perf remainder to `docs/plans/PERF-BACKLOG.md`.
 
 
 Safety net: **v0.1.0** is pinned at https://trials-gauntlet-v0-1-0.vercel.app (tag `v0.1.0`,

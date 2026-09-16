@@ -11,6 +11,6 @@
 - Never announce completion while budget remains.
 - This game should be playable on mobile iOS safari & desktop.
 - Favor subagents over workflows where possible, as subagents are resumable.
-- Plans and their status live in `docs/plans/README.md` (kept current by the parent at every commit); the plans themselves: `docs/plans/RIDER_ON_GLASS.md` (Pillar H, Astra), `docs/plans/PERF-BACKLOG.md` (closed plans — `MEGA_PLAN.md`, `physics-v2.md`, `PERF.md` — are in `project/archive/`).
+- Plans and their status live in `docs/plans/README.md` (kept current by the parent at every commit); live plans: `docs/plans/PERF-BACKLOG.md`, Astra's `docs/plans/HERO_OPEN_WORK.md` / `HERO_GARAGE_PRODUCTION.md`, and the proposed `docs/plans/USE_A_REAL_PHYSICS_LIBRARY.md`; the four closed plans (`MEGA_PLAN.md`, `physics-v2.md`, `PERF.md`, `RIDER_ON_GLASS.md`) are in `project/archive/`.
 - Completed plans and permanently stale docs are archived under `project/archive/` (rules in its README); status docs never move.
 - `docs/mission.md` holds the bars no plan can close; plans carry measurable proxies and may cite a mission line as their bar.

@@ -322,7 +322,7 @@ body it exports now tracks its pose: on every bot golden of both classes the rot
 pose on ≥ 94 % of riding ticks, and **one second after the last tick on which the pose target asked more of the servo
 than it has (F_max / m_R = 4.35 g) the body is within 0.15 m and 0.35 rad of its pose on every tick** (measured max
 0.128 m / 0.17 rad; the band and its distribution under "COM band" below; `r7.test.ts`, permanent). It did not before, and that is the
-merge-#3 finding (`docs/tasks/blender-branch-merge.md`, blind critic 0/6, "rider bolted to the frame"): the merged
+merge-#3 finding (`project/archive/blender-branch-merge.md`, blind critic 0/6, "rider bolted to the frame"): the merged
 hero rig (`GltfRider.chainFromBody`) was dormant because the body was never exported, and it was never exported because
 **the body wound up** — on the E2 Rookie bot it left the pose band at tick 110, spun at 7 rad/s by tick 120 and reached
 834 rad (Pro: 245 rad) with its COM 1.4 m from the target while `riding`.

@@ -19,4 +19,5 @@ Contents
 - `CLOSEOUT.md` — the 3-hour close-out contract of 2026-09-15; ran to its outcome.
 - `BLENDER_HERO.md` — Astra's branch plan; the branch is on `main`, the open remainder is `docs/plans/HERO_OPEN_WORK.md`.
 - `loading-progress-invariant.md`, `touch-navigation-invariant.md` — the two P0 task docs, both landed and holding.
-- (next: `docs/plans/RIDER_ON_GLASS.md` and `docs/tasks/blender-branch-merge.md` when physics R8 + render r15 land)
+- `RIDER_ON_GLASS.md` — the second mega plan, closed 2026-09-16 at `f00724e` (G 100 %; H on the user's decision with the whole Astra branch merged).
+- `blender-branch-merge.md` — the merge rules and the three test merges; the branch is on `main` in full.

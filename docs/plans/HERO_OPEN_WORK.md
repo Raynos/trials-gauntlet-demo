@@ -76,11 +76,11 @@ The back target moved the center of mass up about 10 cm and forward about 8.5 cm
 4. Match physics, collision sensors and the exported rider rig to the same geometry. The physical riding path currently overrides Blender animation clips; editing those clips alone will not fix it.
 5. Play neutral/forward/back transitions, hops, landing impacts and crash/restart on both bike classes and every rider family/LOD. Parent review must judge moving clips.
 
-**Done when:** the user's four pose requirements are visibly met in played clips; ordinary contacts remain believable; impact reach behavior is explicit; handling tests pass; changed physics has fresh goldens, byte-identical browser replay and bot/stranger attempts-to-clear evidence. Follow the [physics merge protocol](../tasks/blender-branch-merge.md). Static poses or geometry checks alone cannot close this item.
+**Done when:** the user's four pose requirements are visibly met in played clips; ordinary contacts remain believable; impact reach behavior is explicit; handling tests pass; changed physics has fresh goldens, byte-identical browser replay and bot/stranger attempts-to-clear evidence. Follow the [physics merge protocol](../../project/archive/blender-branch-merge.md). Static poses or geometry checks alone cannot close this item.
 
 ## 2. Finish the active landing and camera work — coordinate, do not duplicate
 
-Main's latest critic round preferred the game in only 2/12 comparisons, both crash cells. The remaining reported problems include the rider collapsing onto/through the tank during landing and camera framing/occlusion. See [Rider on Glass](RIDER_ON_GLASS.md).
+Main's latest critic round preferred the game in only 2/12 comparisons, both crash cells. The remaining reported problems include the rider collapsing onto/through the tank during landing and camera framing/occlusion. See [Rider on Glass](../../project/archive/RIDER_ON_GLASS.md).
 
 - [ ] Physics R8: seat/tank/reach constraints, thrown-rider fault, braking stability, refreshed goldens and stranger coverage — **running**, and it now carries Astra's `405f894` mechanisms + the §1 seated candidate (see the status update).
 - [x] ~~Render r15: verify camera lead, landing framing, foreground occlusion and near-plane popping.~~ **Dropped** by the user's decision (critic bar removed); r15 now ports Astra's perf layer + the free camera + playground set pieces.
