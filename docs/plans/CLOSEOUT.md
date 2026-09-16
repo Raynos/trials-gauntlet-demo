@@ -41,3 +41,13 @@ already parallel. Targets: `--refresh-goldens` ≤ 5 min, reflex matrix ≤ 10 m
 16:30 spawn: harness-parallelism owner · playgrounds (tracks) · trailer v0.2.0 · (running) harness #11,
 core #9, perf #4b · 17:30 core #10 level reviewer (after core #9) · 18:00 physics tag + archive ·
 18:30 PERF archive + backlog · 19:00 battery + strangers + audio in → pin v0.2.0, RELEASES, montage, trailer.
+
+## After the pin (18:45 →)
+
+Three plans archived; **Rider on Glass H** is the last open line. Rather than wait on the branch, a **merge owner** is
+building `astra-merge` in a scratch clone on `main`'s terms (`main`'s physics / perf cuts / menu+reviewer; the branch's
+hero, assets, garage), proving it (typecheck, lint, vitest, hero-webkit, md5 captures, e2e front/run) and running the
+6-pair blind critic round that closes H at ≥ 2/6. In parallel: **tracks r11** re-authors the three stranger sinks
+(h2 255–265 m, h3 505 m, x3 505–525 m) with reflex + stranger numbers; **level-selector mockups** (five Codex directions
+A–E, `assets/design/tracks/`) for the user to choose from. Queued behind the merge (same render paths): the render
+round the playgrounds and the reviewer owe (`tracks.md` §7.3 set pieces / arches / tunnels; `setCameraOverride`).
