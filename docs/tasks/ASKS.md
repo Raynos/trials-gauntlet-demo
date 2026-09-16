@@ -15,7 +15,7 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 3 | I need to actually **see the model in the garage** / the hero is **blocked by buttons** | **in flight** | garage owner (subagent): hero unobstructed, ≥ 45 % of viewport height |
 | 4 | The garage should **look like a garage**, the hero **bigger**, a **model-explorer view I can rotate** | **in flight** | same owner: garage set (floor, tool wall, key lamp), `orbit` camera override, touch-drag rotate + pinch/wheel zoom |
 | 5 | **No outfit / Classic-Blender-Img2 selectors on the main menu or pause menu** — all in the garage | **in flight** | same owner |
-| 6 | **5 Codex image mockups of a new garage** | **in flight** | design owner (subagent) → `assets/design/garage/` (A pit box, B tool wall, C showroom spot, D workbench, E shutter door) + contact sheet + SPEC |
+| 6 | **5 Codex image mockups of a new garage** | **needs pick** | `assets/design/garage/` A pit box · B tool wall · C showroom spot · D workbench · E shutter door + contact sheet + SPEC (recommends C); sent to the user |
 | 7 | Did we have 5 mockups of a new **level select**? | **done** | yes — `assets/design/tracks/` A–E (`3351dbb`), never picked; sent to the user |
 | 8 | **What mockups are lying around not built** | **done** | tracks A–E (the only orphan); menu B, loading B, controls G, pause chosen direction are built; `hero-targets` are art targets, not UI |
 | 9 | Show me all the level-select ones | **done** | sent contact sheet + A–E + current |
