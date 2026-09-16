@@ -1,0 +1,3 @@
+## VARIANT BE3 — "Dusk"
+Evening: the shutter HALF open as in IMAGE 3, but the light outside is DUSK — a deep blue-orange evening sky low over the apron, cool blue ambient spilling in across the floor. The KEY light is a warm sodium / tungsten work lamp on the left wall (orange, strong) on the bike's near side; the daylight is now the cool rim from behind. The concrete floor is WET-LOOK — a dark, slightly reflective floor mirroring the shutter opening and the bike's underside — with more contrast overall: deep shadows in the bay, bright warm highlights on the tank and forks. Prop placement as IMAGE 3 (bench with vice left, NORDVIK drum right). The tags and the clipboard keep their own readable exposure.
+Output path: assets/design/garage/round2/BE3-dusk.png

@@ -1,0 +1,3 @@
+## VARIANT BE1 — "E as drawn"
+Time of day and lighting exactly as IMAGE 3: overcast midday, the shutter HALF open (the opening's top edge at about the rider's shoulder height), cool near-white daylight as the KEY coming from behind-left through the opening, a warm tungsten work lamp on the left wall as the FILL on the bike's near side, the bike's long shadow toward the camera, the closed upper half of the shutter dim grey. Prop placement as IMAGE 3: the workbench with the vice left (behind the tag rail), the NORDVIK drum and jerry can right (under the clipboard). Concrete floor matte, light grey where the daylight lands.
+Output path: assets/design/garage/round2/BE1-e-as-drawn.png
