@@ -1,0 +1,19 @@
+{
+  "milestone": "A",
+  "candidate": "head correction02",
+  "verdict": "FAIL \u2014 change art method/source",
+  "evidence": "captures/head-a3-art/webkit-orbit-relight.webm",
+  "videoSha256": "ee905086da78e6f2ae39587d0218beb9d128e58520731b171ba167d48836d3b3",
+  "reviewMethod": "Parent inspected sequential1fps decoded completed orbit/relight video covering both profiles, rear and frontal views.",
+  "visibleDefects": [
+    "Nose shaping became exaggerated and caricature-like rather than the target mature facial anatomy.",
+    "Hair still reads as disconnected noodle-like strips over wide bald scalp areas.",
+    "Beard is mottled patches without believable stubble/strand detail or the target distribution."
+  ],
+  "improvements": [
+    "Side/rear hair coverage broader.",
+    "Geometry reduced to73496triangles with14primitives."
+  ],
+  "decision": "Stop coordinate-tuning the generic head. Trial licensed textured scan anatomy plus a changed layered/card groom method. Do not use texture alone to disguise the current caricature.",
+  "finalUserApproval": "pending"
+}

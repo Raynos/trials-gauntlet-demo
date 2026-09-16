@@ -1,12 +1,21 @@
 # High-fidelity rider and bike: fresh garage production plan
 
-Status: proposed production plan, September 16, 2026. No prototype or new asset is claimed complete.
+Status: in progress, September 16, 2026. Independent viewer and source intake built; head candidates are under review. No visual milestone or new production asset is accepted.
+
+## Confirmed user decisions
+
+- **Visual approval:** the user approves the identity board and each major visual milestone, but explicitly authorizes provisional parent approval and continued overnight work while asleep. Preserve the board and milestone evidence for final user review; do not label provisional review as final user acceptance.
+- **Sources and spending:** start with free licensed assets and local Blender tools. Free personal-use/noncommercial assets are allowed for this personal laptop project; CC0 is not required. Record exact terms and keep restricted assets local where required. Ask before spending on assets, tools, hosted services or specialist work.
+- **Usage floor:** stop sustained work at 20% weekly allowance remaining, replacing the older 30% floor in the handoff. Check account usage during the run.
+- **Stalled likeness:** after two head-and-hair correction attempts with no visible improvement, change the free asset or method. Bring the user a concrete decision if still blocked.
+- **Fixed design:** retain target 01's mustard hoodie, exposed face, tousled dark curls and blue/white bike, with seated neutral, forward rise and rearward hip shift. Develop missing angles while preserving that design, then submit the identity board for approval.
+- **Mobile garage:** target 30 fps to preserve more detail, verified on an actual iPhone/Safari. This decision applies to the garage; gameplay performance requirements remain separate.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)
 
 Start with one mustard-hoodie, bareheaded rider and one bike, using target 01. Do not expand to five outfits before the first character passes visual review.
 
-- [ ] Create the independent `prototypes/hero-garage/` Three.js viewer with fixed comparison cameras and a simple garage lighting setup.
+- [x] Create the independent `prototypes/hero-garage/` Three.js viewer with fixed comparison cameras and a simple garage lighting setup. TypeScript/build and frozen-build WebKit load/orbit/error/touch smoke checks pass; visual acceptance remains separate.
 - [ ] Establish the recognizable face and tousled curly hair in the actual browser first: anatomy, eyes/lids, jaw, ears, beard and authored curl clumps.
 - [ ] Build the dressed body: tailored hoodie and jeans, convincing folds/seams, hands and footwear, coherent proportions.
 - [ ] Finish the hero bike's silhouette, mechanical details and materials at the same viewing scale.
@@ -172,7 +181,7 @@ Initial garage target at 1920×1080: rider including clothes 80–120k triangles
 
 Start with separate face, garment and bike texture sets; allow 4K face/detail sources for close inspection, then measure whether 2K runtime maps retain the required appearance. Keep a texture-memory ledger, including mipmaps and GPU format, rather than reporting compressed download size as memory use. Initial resident-texture target: ≤128 MiB for the desktop hero scene; leaner mobile tier to be measured.
 
-Prototype performance target: p95 frame time ≤16.7ms over a 30-second scripted orbit/animation at the declared desktop configuration. Record GPU, browser, resolution, DPR, shader warmup and memory. Mobile is a separate measured target on an actual iPhone/Safari at a declared internal resolution; reduce hair overdraw, texture residency and expensive shading based on measured costs. A desktop garage pass does not prove the game or iOS performance.
+Prototype performance target: p95 frame time ≤16.7ms over a 30-second scripted orbit/animation at the declared desktop configuration. Record GPU, browser, resolution, DPR, shader warmup and memory. The user-selected mobile garage target is 30 fps, measured on an actual iPhone/Safari at a declared internal resolution; reduce hair overdraw, texture residency and expensive shading based on measured costs. A desktop garage pass does not prove the game or iOS performance.
 
 Create LODs after the approved high-detail asset. Preserve face/hair silhouette and pose deformation; review transitions in motion. Optimization must not erase the identity we just approved.
 

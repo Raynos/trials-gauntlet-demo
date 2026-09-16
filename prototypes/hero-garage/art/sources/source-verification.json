@@ -1,0 +1,103 @@
+{
+  "blender": "5.2.1 LTS",
+  "objects": [
+    {
+      "name": "GEO-head_sculpting_realistic.sclera.R",
+      "control_vertices": 546,
+      "evaluated_vertices": 546,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-head_sculpting_realistic.sclera.L",
+      "control_vertices": 546,
+      "evaluated_vertices": 546,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-head_sculpting_realistic.iris.R",
+      "control_vertices": 400,
+      "evaluated_vertices": 400,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-head_sculpting_realistic.iris.L",
+      "control_vertices": 400,
+      "evaluated_vertices": 400,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-head_sculpting_realistic",
+      "control_vertices": 3307,
+      "evaluated_vertices": 13212,
+      "uv_layers": 1,
+      "multires_levels": [
+        1
+      ]
+    },
+    {
+      "name": "GEO-head_animation_realistic.sclera.R",
+      "control_vertices": 546,
+      "evaluated_vertices": 546,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-head_animation_realistic.sclera.L",
+      "control_vertices": 546,
+      "evaluated_vertices": 546,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-head_animation_realistic.iris.R",
+      "control_vertices": 400,
+      "evaluated_vertices": 400,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-head_animation_realistic.iris.L",
+      "control_vertices": 400,
+      "evaluated_vertices": 400,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-head_animation_realistic",
+      "control_vertices": 3242,
+      "evaluated_vertices": 12950,
+      "uv_layers": 1,
+      "multires_levels": [
+        1
+      ]
+    },
+    {
+      "name": "GEO-body_male_realistic.eye.R",
+      "control_vertices": 546,
+      "evaluated_vertices": 546,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-body_male_realistic.eye.L",
+      "control_vertices": 546,
+      "evaluated_vertices": 546,
+      "uv_layers": 1,
+      "multires_levels": []
+    },
+    {
+      "name": "GEO-body_male_realistic",
+      "control_vertices": 10582,
+      "evaluated_vertices": 42342,
+      "uv_layers": 1,
+      "multires_levels": [
+        3
+      ]
+    }
+  ],
+  "passed": true
+}

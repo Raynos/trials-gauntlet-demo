@@ -12,6 +12,12 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 
 [HERO_OPEN_WORK.md](HERO_OPEN_WORK.md) lists the remaining pose/elbow fixes, coordination with active R8/render-r15 work, Chromium/Metal issue, garage production milestones and acceptance gates. The five-outfit merge does not close these items.
 
+## Garage production — overnight build, September 16
+
+`prototypes/hero-garage/` now contains an independent Three.js viewer, provisional identity board, source/license ledger, editable Blender anatomy and a head/groom candidate. Frozen-build WebKit orbit/relight, byte-identical canvas repeat, missing-asset errors and touch controls are checked. **Milestone A is not accepted:** three completed head orbit reviews reject sparse hair, incorrect face identity and inadequate beard/material detail. The generic-head coordinate-shaping route is stopped; a licensed textured-scan route is being tried before body/outfit multiplication. Reports and clips live in the prototype. No garment/bike/rig/game integration or actual iPhone performance pass is claimed.
+
+The user authorizes provisional visual decisions while asleep, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. Final visual approval remains with the user. An hourly continuation is attached to the task and must pause at the usage floor or a genuine blocker. Existing gameplay/physics working-tree changes belong to other ongoing work and are preserved.
+
 ## Independent audit — 2026-09-15
 
 The [game audit](../reviews/game-audit-2026-09-15.md) and separate [physics-library review](../reviews/physics-library-audit-2026-09-15.md) describe the earlier `56e3883` working tree (`a6d63cfd`). **Their defect list is historical:** the loader replacement bug is fixed, Auto now caps at 60, and the original finish/fault and reflex regressions pass the latest targeted check. The user's real-device report measured 59.5 fps on low; it does not establish current-build high at 60. The v0.2.0 release and later hero work supersede the original visual/audio counts; see `RELEASES.md` and the dated critic records.

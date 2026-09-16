@@ -1,0 +1,21 @@
+{
+  "provider": "Blender Studio and community contributors",
+  "source_page": "https://www.blender.org/download/demo-files/",
+  "download": "https://download.blender.org/demo/asset-bundles/human-base-meshes/human-base-meshes-bundle-v1.4.1.zip",
+  "license": "CC0",
+  "license_evidence": "Official source page Human Base Meshes card and embedded bundle README",
+  "files": {
+    "raw/human-base-meshes-bundle-v1.4.1.zip": {
+      "bytes": 50643039,
+      "sha256": "811f43accbb31a88266d932f8f5563b2d13586fca0ba2693aad1f5fe582b3515"
+    },
+    "blender-realistic-anatomy.blend": {
+      "bytes": 14200411,
+      "sha256": "a8359027630b7ecc2f62ed49a4656902750a5974a5ae446a84a918c836b89377"
+    },
+    "raw/blender-demo-files.html": {
+      "bytes": 177601,
+      "sha256": "52d48285a00777862ed2abc1f18a98d94e53476ea6882a596b98600b30c83ea2"
+    }
+  }
+}

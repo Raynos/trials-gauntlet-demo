@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "authority": "Original source files remain authoritative; public copies are disposable build inputs.",
+  "records": [
+    {
+      "id": "target01",
+      "source": "../../assets/design/hero-targets/01-street-barehead.png",
+      "output": "target01.png",
+      "role": "Original AI concept: primary design authority",
+      "admission": "approved design by user; not a runtime render",
+      "sha256": "5be089f06ef2dded75fb7491602bd580b299b30a271c8c7a334a96915f92b0c0"
+    },
+    {
+      "id": "turnaround",
+      "source": "../../assets/design/hero-targets/reconstruction/street-mustard-turnaround.png",
+      "output": "turnaround.png",
+      "role": "Existing generated supplementary front/profile/back design",
+      "admission": "provisionally admitted by parent: front and hidden surfaces only; original profile has priority; not recovered geometry or rendered evidence",
+      "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
+    }
+  ]
+}

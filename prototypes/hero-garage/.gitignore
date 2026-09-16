@@ -1,0 +1,12 @@
+node_modules/
+dist/
+public/references/
+art/sources/downloads/
+art/sources/local-only/
+captures/frames/
+*.blend1
+*.blend2
+# Raw recorder duplicates and failed/concurrent exploratory capture media remain local.
+captures/**/page@*.webm
+captures/head-a1-first/
+captures/head-candidate01/

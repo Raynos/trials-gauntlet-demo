@@ -1,0 +1,49 @@
+{
+  "blender": "5.2.1 LTS",
+  "meshes": [
+    {
+      "name": "LeePerrySmith",
+      "vertices": 9279,
+      "triangles": 17684,
+      "uvLayers": [
+        "UVMap"
+      ],
+      "materials": [
+        "Material.002"
+      ],
+      "dimensions": [
+        8.552641868591309,
+        5.180736541748047,
+        7.945094108581543
+      ],
+      "shapeKeys": 0
+    }
+  ],
+  "images": [
+    {
+      "file": "Map-COL.jpg",
+      "width": 1024,
+      "height": 1024,
+      "channels": 4
+    },
+    {
+      "file": "Map-SPEC.jpg",
+      "width": 1024,
+      "height": 1024,
+      "channels": 4
+    },
+    {
+      "file": "Infinite-Level_02_Tangent_SmoothUV.jpg",
+      "width": 1024,
+      "height": 1024,
+      "channels": 4
+    },
+    {
+      "file": "Infinite-Level_02_Disp_NoSmoothUV-4096.jpg",
+      "width": 4096,
+      "height": 4096,
+      "channels": 4
+    }
+  ],
+  "armatures": 0
+}

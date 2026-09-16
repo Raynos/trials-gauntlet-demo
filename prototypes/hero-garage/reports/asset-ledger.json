@@ -1,0 +1,69 @@
+{
+  "createdAt": "2026-09-16T03:39:08.415Z",
+  "scope": "GLB structure; no art or deformation acceptance",
+  "assets": [
+    {
+      "file": "public/assets/street01-head.glb",
+      "sha256": "f1b0dc0758647be0c366cc63e81a937c7a07c14cddcfb4aba46acd50c1c5cf88",
+      "bytes": 2080396,
+      "generator": "Khronos glTF Blender I/O v5.2.40",
+      "triangles": 73496,
+      "primitives": 14,
+      "materials": [
+        {
+          "name": "Corneal glint",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Dark brown iris",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Eye sclera • warm white",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Pupil",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Olive skin and short beard • vertex color",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Dark brown locks 0",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Dark brown locks 1",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Dark brown locks 2",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Dark brown locks 3",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        }
+      ],
+      "uvPrimitives": 10,
+      "normalPrimitives": 14,
+      "skins": [],
+      "animations": [],
+      "morphPrimitiveCount": 0,
+      "textures": [],
+      "estimatedImageResidencyBytes": 0,
+      "limits": "RGBA8 full-mip image estimate excludes render targets, shadow maps, buffers, duplicate uploads, driver allocations. No compressed GPU format assumed. UV presence does not establish unwrap quality."
+    }
+  ]
+}

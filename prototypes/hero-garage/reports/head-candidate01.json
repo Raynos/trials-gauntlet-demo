@@ -1,0 +1,503 @@
+{
+  "createdAt": "2026-09-16T03:32:08.452Z",
+  "base": "http://127.0.0.1:4178",
+  "results": [
+    {
+      "engine": "webkit",
+      "headless": true,
+      "host": {
+        "platform": "darwin",
+        "release": "25.5.0",
+        "arch": "arm64"
+      },
+      "actualIPhone": false,
+      "errors": [],
+      "status": "failed",
+      "browserVersion": "26.5",
+      "loadToReadyMs": 1803,
+      "initial": {
+        "ready": true,
+        "error": null,
+        "stage": "Milestone A candidate \u2014 provisional review",
+        "assets": [
+          {
+            "id": "street01-head",
+            "url": "/assets/street01-head.glb",
+            "kind": "head",
+            "clips": []
+          }
+        ],
+        "camera": "face",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 0,
+        "activeClip": null,
+        "playing": false,
+        "orbitAngle": 0,
+        "cameraPosition": [
+          0.2725849904209213,
+          1.6483140267467467,
+          1.0517143253689654
+        ],
+        "cameraTarget": [
+          0.00011876150651080054,
+          1.5972266088252947,
+          0.02996596693992615
+        ],
+        "render": {
+          "triangles": 566672,
+          "calls": 241,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 81,
+          "textures": 5,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 59,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "motionControls": {
+        "playDisabled": true,
+        "timelineDisabled": true,
+        "note": "No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.",
+        "clipButtons": 0,
+        "honestAbsentClips": true
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "dpr": 1,
+        "viewport": [
+          1920,
+          1080
+        ],
+        "drawingBuffer": [
+          1640,
+          934
+        ],
+        "gpu": "Apple GPU",
+        "vendor": "Apple Inc.",
+        "webglVersion": "WebGL 2.0",
+        "contextLost": false,
+        "jsHeap": null
+      },
+      "shaderWarmupMs": 2000,
+      "frames": [
+        "webkit-face.png",
+        "webkit-reference.png",
+        "webkit-full.png",
+        "webkit-bike.png"
+      ],
+      "deterministicCanvas": {
+        "a": "8ac3ce346da681b71b116385b087270cd51d9593cc560fb45596c43040139e63",
+        "b": "8ac3ce346da681b71b116385b087270cd51d9593cc560fb45596c43040139e63",
+        "byteIdentical": true,
+        "scope": "same engine, camera, orbit and animation time; not game physics replay"
+      },
+      "failure": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation"
+    },
+    {
+      "engine": "chromium",
+      "headless": true,
+      "host": {
+        "platform": "darwin",
+        "release": "25.5.0",
+        "arch": "arm64"
+      },
+      "actualIPhone": false,
+      "errors": [],
+      "status": "rendered",
+      "browserVersion": "151.0.7922.34",
+      "loadToReadyMs": 4071,
+      "initial": {
+        "ready": true,
+        "error": null,
+        "stage": "Milestone A candidate \u2014 provisional review",
+        "assets": [
+          {
+            "id": "street01-head",
+            "url": "/assets/street01-head.glb",
+            "kind": "head",
+            "clips": []
+          }
+        ],
+        "camera": "face",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 0,
+        "activeClip": null,
+        "playing": false,
+        "orbitAngle": 0,
+        "cameraPosition": [
+          0.2725849904209213,
+          1.6483140267467467,
+          1.0517143253689654
+        ],
+        "cameraTarget": [
+          0.00011876150651080054,
+          1.5972266088252947,
+          0.02996596693992615
+        ],
+        "render": {
+          "triangles": 566672,
+          "calls": 241,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 81,
+          "textures": 5,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 1065.7000000476837,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "motionControls": {
+        "playDisabled": true,
+        "timelineDisabled": true,
+        "note": "No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.",
+        "clipButtons": 0,
+        "honestAbsentClips": true
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36",
+        "dpr": 1,
+        "viewport": [
+          1920,
+          1080
+        ],
+        "drawingBuffer": [
+          1640,
+          934
+        ],
+        "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+        "vendor": "Google Inc. (Google)",
+        "webglVersion": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "contextLost": false,
+        "jsHeap": {
+          "used": 29400000,
+          "limit": 3760000000
+        }
+      },
+      "shaderWarmupMs": 2000,
+      "frames": [
+        "chromium-face.png",
+        "chromium-reference.png",
+        "chromium-full.png",
+        "chromium-bike.png"
+      ],
+      "deterministicCanvas": {
+        "a": "ddbfb2ac0d044ac3316eb159d5f01c60a64a7d791706e12172c1fb48fc74fea2",
+        "b": "ddbfb2ac0d044ac3316eb159d5f01c60a64a7d791706e12172c1fb48fc74fea2",
+        "byteIdentical": true,
+        "scope": "same engine, camera, orbit and animation time; not game physics replay"
+      },
+      "trace": {
+        "durationSeconds": 30,
+        "measuredDurationMs": 30591.8,
+        "frames": [
+          {
+            "elapsedMs": 1625,
+            "deltaMs": 1625
+          },
+          {
+            "elapsedMs": 2641.5999999999985,
+            "deltaMs": 1016.5999999999985
+          },
+          {
+            "elapsedMs": 3608.399999999998,
+            "deltaMs": 966.7999999999993
+          },
+          {
+            "elapsedMs": 4550,
+            "deltaMs": 941.6000000000022
+          },
+          {
+            "elapsedMs": 5483.399999999998,
+            "deltaMs": 933.3999999999978
+          },
+          {
+            "elapsedMs": 6391.5999999999985,
+            "deltaMs": 908.2000000000007
+          },
+          {
+            "elapsedMs": 7275,
+            "deltaMs": 883.4000000000015
+          },
+          {
+            "elapsedMs": 8150.0999999999985,
+            "deltaMs": 875.0999999999985
+          },
+          {
+            "elapsedMs": 9041.599999999999,
+            "deltaMs": 891.5
+          },
+          {
+            "elapsedMs": 9925,
+            "deltaMs": 883.4000000000015
+          },
+          {
+            "elapsedMs": 10808.399999999998,
+            "deltaMs": 883.3999999999978
+          },
+          {
+            "elapsedMs": 11675,
+            "deltaMs": 866.6000000000022
+          },
+          {
+            "elapsedMs": 12507.599999999999,
+            "deltaMs": 832.5999999999985
+          },
+          {
+            "elapsedMs": 13383.399999999998,
+            "deltaMs": 875.7999999999993
+          },
+          {
+            "elapsedMs": 14233.399999999998,
+            "deltaMs": 850
+          },
+          {
+            "elapsedMs": 15075.099999999999,
+            "deltaMs": 841.7000000000007
+          },
+          {
+            "elapsedMs": 16225.099999999999,
+            "deltaMs": 1150
+          },
+          {
+            "elapsedMs": 17083.399999999998,
+            "deltaMs": 858.2999999999993
+          },
+          {
+            "elapsedMs": 17966.7,
+            "deltaMs": 883.3000000000029
+          },
+          {
+            "elapsedMs": 18849.999999999996,
+            "deltaMs": 883.2999999999956
+          },
+          {
+            "elapsedMs": 21933.499999999996,
+            "deltaMs": 3083.5
+          },
+          {
+            "elapsedMs": 23283.3,
+            "deltaMs": 1349.800000000003
+          },
+          {
+            "elapsedMs": 24325.100000000002,
+            "deltaMs": 1041.800000000003
+          },
+          {
+            "elapsedMs": 25341.399999999998,
+            "deltaMs": 1016.2999999999956
+          },
+          {
+            "elapsedMs": 26383.399999999998,
+            "deltaMs": 1042
+          },
+          {
+            "elapsedMs": 27458.100000000002,
+            "deltaMs": 1074.7000000000044
+          },
+          {
+            "elapsedMs": 28508.600000000002,
+            "deltaMs": 1050.5
+          },
+          {
+            "elapsedMs": 29533.499999999996,
+            "deltaMs": 1024.8999999999942
+          },
+          {
+            "elapsedMs": 30591.8,
+            "deltaMs": 1058.300000000003
+          }
+        ],
+        "p50Ms": 933.3999999999978,
+        "p95Ms": 1625,
+        "maxMs": 3083.5,
+        "meanMs": 1054.8896551724138,
+        "relit": true
+      },
+      "desktopBudget": {
+        "targetP95Ms": 16.7,
+        "full30SecondTrace": true,
+        "met": false,
+        "scope": "Headless desktop wall-clock rAF including harness setters and video recording; not GPU timer queries or physical device performance"
+      },
+      "final": {
+        "ready": true,
+        "error": null,
+        "stage": "Milestone A candidate \u2014 provisional review",
+        "assets": [
+          {
+            "id": "street01-head",
+            "url": "/assets/street01-head.glb",
+            "kind": "head",
+            "clips": []
+          }
+        ],
+        "camera": "face",
+        "lighting": "garage",
+        "time": 30.5918,
+        "duration": 0,
+        "activeClip": null,
+        "playing": false,
+        "orbitAngle": 6.407131609339215,
+        "cameraPosition": [
+          0.39681268161925426,
+          1.6483140267467467,
+          1.0101911898335532
+        ],
+        "cameraTarget": [
+          0.00011876150651080056,
+          1.5972266088252947,
+          0.029965966939926154
+        ],
+        "render": {
+          "triangles": 566672,
+          "calls": 241,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 81,
+          "textures": 5,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 1065.7000000476837,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "mobileSmoke": {
+        "physicalDevice": false,
+        "initial": {
+          "error": null,
+          "diagnostics": {
+            "ready": true,
+            "error": null,
+            "stage": "Milestone A candidate \u2014 provisional review",
+            "assets": [
+              {
+                "id": "street01-head",
+                "url": "/assets/street01-head.glb",
+                "kind": "head",
+                "clips": []
+              }
+            ],
+            "camera": "face",
+            "lighting": "garage",
+            "time": 0,
+            "duration": 0,
+            "activeClip": null,
+            "playing": false,
+            "orbitAngle": 0,
+            "cameraPosition": [
+              0.2725849904209213,
+              1.6483140267467467,
+              1.0517143253689654
+            ],
+            "cameraTarget": [
+              0.00011876150651080054,
+              1.5972266088252947,
+              0.02996596693992615
+            ],
+            "render": {
+              "triangles": 566672,
+              "calls": 241,
+              "width": 585,
+              "height": 621,
+              "dpr": 1.5
+            },
+            "memory": {
+              "geometries": 81,
+              "textures": 5,
+              "note": "Object counts, not GPU byte residency"
+            },
+            "loadMilliseconds": 1058.8999998569489,
+            "targetFps": 30,
+            "frameSamples": 0,
+            "p95FrameMilliseconds": null,
+            "captureMode": true
+          },
+          "touch": 1,
+          "overflow": false
+        },
+        "landscape": {
+          "diagnostics": {
+            "ready": true,
+            "error": null,
+            "stage": "Milestone A candidate \u2014 provisional review",
+            "assets": [
+              {
+                "id": "street01-head",
+                "url": "/assets/street01-head.glb",
+                "kind": "head",
+                "clips": []
+              }
+            ],
+            "camera": "face",
+            "lighting": "garage",
+            "time": 0,
+            "duration": 0,
+            "activeClip": null,
+            "playing": false,
+            "orbitAngle": 0,
+            "cameraPosition": [
+              0.2725849904209213,
+              1.6483140267467467,
+              1.0517143253689654
+            ],
+            "cameraTarget": [
+              0.00011876150651080054,
+              1.5972266088252947,
+              0.02996596693992615
+            ],
+            "render": {
+              "triangles": 566672,
+              "calls": 241,
+              "width": 846,
+              "height": 366,
+              "dpr": 1.5
+            },
+            "memory": {
+              "geometries": 81,
+              "textures": 5,
+              "note": "Object counts, not GPU byte residency"
+            },
+            "loadMilliseconds": 1058.8999998569489,
+            "targetFps": 30,
+            "frameSamples": 0,
+            "p95FrameMilliseconds": null,
+            "captureMode": true
+          },
+          "overflow": false
+        }
+      },
+      "missingAsset": {
+        "error": "fetch for \"http://127.0.0.1:4178/assets/street01-head.glb\" responded with 404: Not Found",
+        "text": "HERO / GARAGE\nTARGET 01 \u00b7 PRODUCTION STUDY\nMILESTONE A CANDIDATE \u2014 PROVISIONAL REVIEW\nFace study\n\nIndependent Three.js review\n\nfetch for \"http://127.0.0.1:4178/assets/street01-head.glb\" responded with 404: Not Found\nDrag to orbit \u00b7 Scroll or pinch to inspect\n\nCOMPARISON CAMERA\n\nFace\nFull rider\nBike\nReference\n\nLIGHT STUDY\n\nGarage\nNeutral\n\nAUTHORED MOTION\n\nNo playable motion available.\n\nDESIGN REFERENCE \u00b7 CONCEPT\n\nTarget 01 \u00b7 AI design concept\nAnatomy source adapted from Blender Human Base Meshes.\n\nHead and groom are candidates; visual acceptance is pending.\n\nNo finished rider, bike or riding clips are claimed.\nOpen identity board \u2197\nProvisional production work. Asset loading and renderer checks do not establish likeness or milestone acceptance. Mobile target: 30 fps; actual iPhone validation pending.\nPlay\nNo motion loaded\n4 triangles \u00b7 2 draws \u00b7 1640 \u00d7 934"
+      },
+      "video": "captures/head-candidate01/chromium-orbit-relight.webm"
+    }
+  ],
+  "artVerdict": "Parent review required; harness never judges likeness.",
+  "iPhoneValidation": "Not performed. Desktop WebKit and touch emulation cannot satisfy actual iPhone/Safari gate.",
+  "validationLimitations": [
+    "WebKit trace interrupted by Vite HMR navigation; no completed WebKit clip in this run.",
+    "Initial part overlapped a second headless capture; performance not a clean isolated benchmark.",
+    "This run predates single-render setFrame API; repeated setters trigger multiple renders per recorded frame.",
+    "Chromium selected SwiftShader software renderer. These values do not represent hardware Chromium or Safari."
+  ]
+}

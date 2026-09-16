@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "stage": "Milestone A candidate — provisional review",
+  "reference": {"url": "/references/target01.png", "label": "Target 01 · AI design concept"},
+  "assets": [{"id": "street01-head", "label": "Street 01 · head study", "url": "/assets/street01-head.glb", "kind": "head"}],
+  "notes": ["Anatomy source adapted from Blender Human Base Meshes.", "Head and groom are candidates; visual acceptance is pending.", "No finished rider, bike or riding clips are claimed."]
+}
