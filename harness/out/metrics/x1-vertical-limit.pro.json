@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "x1-vertical-limit",
   "bike": "pro",
-  "updatedAt": "2026-09-15T21:09:47.222Z",
+  "updatedAt": "2026-09-16T01:08:58.292Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     30,
@@ -21,7 +21,7 @@
       ],
       "median": 2,
       "finishTimes": [
-        60.916666666666664
+        57.7
       ]
     }
   ],
@@ -32,6 +32,8 @@
     "share": 1
   },
   "runs": [
-    "20260915-160750-be1063"
+    "20260915-160750-be1063",
+    "20260915-195849-bafadb",
+    "20260915-200657-9a8f45"
   ]
 }

@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "p5-foundry-floor",
+  "bike": "pro",
+  "updatedAt": "2026-09-16T01:08:58.306Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "targetAttempts": 2,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        1610333913
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        29.65
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260915-200004-bfeab6",
+    "20260915-200811-c6bd84"
+  ]
+}

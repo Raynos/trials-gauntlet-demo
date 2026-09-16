@@ -7,9 +7,9 @@
     4
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "65175e2d",
-  "updatedAt": "2026-09-15T19:32:09.395Z",
-  "includeStale": true,
+  "srcFingerprint": "605a8174",
+  "updatedAt": "2026-09-16T01:40:52.819Z",
+  "includeStale": false,
   "sessions": [
     {
       "sessionId": "e1-uphill-weight-20260914-051942",
@@ -428,6 +428,47 @@
       ]
     },
     {
+      "sessionId": "e1-uphill-weight-r13-s1-20260915-203701",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "605a8174",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 66.7667,
+      "calls": 22,
+      "wallMs": 172580,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 543.892,
+        "startTick": 1145,
+        "endTick": 8272,
+        "recordingFile": "harness/inputs/e1-uphill-weight/stranger-e1-uphill-weight-r13-s1-20260915-203701.json"
+      },
+      "recordingFile": "harness/inputs/e1-uphill-weight/stranger-e1-uphill-weight-r13-s1-20260915-203701.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 85.512,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 4
+        }
+      ]
+    },
+    {
       "sessionId": "e1-uphill-weight-r3-s1-20260914-113731",
       "agent": "s1",
       "bike": "rookie",
@@ -628,7 +669,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 78584522,
+      "wallMs": 100707947,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -723,7 +764,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 78584509,
+      "wallMs": 100707934,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -800,14 +841,14 @@
     }
   ],
   "bike": "rookie",
-  "completed": 8,
-  "clearedCount": 8,
-  "medianAttempts": 7,
-  "medianFinishTime": 99.1833,
-  "medianCalls": 34,
-  "medianWallMs": 737588,
+  "completed": 1,
+  "clearedCount": 1,
+  "medianAttempts": 2,
+  "medianFinishTime": 66.7667,
+  "medianCalls": 22,
+  "medianWallMs": 172580,
   "census": {
-    "n": 8,
+    "n": 1,
     "minSessions": 2,
     "censored": [
       {
@@ -823,7 +864,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 0,
+    "staleExcluded": 8,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -834,179 +875,28 @@
     "factor": 1.5,
     "limit": 6
   },
-  "verdict": "FAIL",
-  "pass": false,
+  "verdict": "INSUFFICIENT",
+  "pass": null,
   "deaths": {
-    "total": 55,
+    "total": 1,
     "byReason": {
-      "crash": 53,
-      "restart": 2
+      "crash": 1
     },
     "byObstacle": [
       {
         "obstacle": "ground",
-        "count": 12,
-        "xs": [
-          26.1,
-          83.8,
-          215.7,
-          291.6,
-          26.1,
-          158.6,
-          216,
-          291.5,
-          236.5,
-          319.9,
-          77.2,
-          525.6
-        ]
-      },
-      {
-        "obstacle": "ramp @ 300.0 m",
-        "count": 7,
-        "xs": [
-          297.7,
-          298.4,
-          299.1,
-          297.7,
-          299.7,
-          299.5,
-          300.1
-        ]
-      },
-      {
-        "obstacle": "ramp @ 309.7 m",
-        "count": 5,
-        "xs": [
-          305.8,
-          306.9,
-          311.2,
-          308.1,
-          310.8
-        ]
-      },
-      {
-        "obstacle": "ramp @ 211.0 m",
-        "count": 5,
-        "xs": [
-          210.5,
-          210.5,
-          210.4,
-          211.9,
-          210.6
-        ]
-      },
-      {
-        "obstacle": "box @ 441.3 m",
-        "count": 5,
-        "xs": [
-          443.2,
-          442.1,
-          442.2,
-          441.4,
-          442.5
-        ]
-      },
-      {
-        "obstacle": "ramp @ 75.2 m",
-        "count": 4,
-        "xs": [
-          71.5,
-          70.5,
-          71.5,
-          70.5
-        ]
-      },
-      {
-        "obstacle": "plank @ 62.0 m",
-        "count": 3,
-        "xs": [
-          62.4,
-          61.9,
-          60.6
-        ]
-      },
-      {
-        "obstacle": "plank @ 436.5 m",
-        "count": 2,
-        "xs": [
-          436.2,
-          437.4
-        ]
-      },
-      {
-        "obstacle": "plank @ 201.0 m",
-        "count": 2,
-        "xs": [
-          200.7,
-          200.9
-        ]
-      },
-      {
-        "obstacle": "ramp @ 200.2 m",
-        "count": 2,
-        "xs": [
-          197.2,
-          198.7
-        ]
-      },
-      {
-        "obstacle": "ramp @ 449.9 m",
-        "count": 2,
-        "xs": [
-          443.7,
-          444.6
-        ]
-      },
-      {
-        "obstacle": "box @ 205.0 m",
         "count": 1,
         "xs": [
-          205.2
-        ]
-      },
-      {
-        "obstacle": "box @ 303.7 m",
-        "count": 1,
-        "xs": [
-          303.8
-        ]
-      },
-      {
-        "obstacle": "plank @ 300.8 m",
-        "count": 1,
-        "xs": [
-          301.9
-        ]
-      },
-      {
-        "obstacle": "ramp @ 435.7 m",
-        "count": 1,
-        "xs": [
-          435.7
-        ]
-      },
-      {
-        "obstacle": "ramp @ 133.2 m",
-        "count": 1,
-        "xs": [
-          128.8
-        ]
-      },
-      {
-        "obstacle": "ramp @ 265.0 m",
-        "count": 1,
-        "xs": [
-          257.2
+          85.5
         ]
       }
     ],
     "byCheckpoint": [
-      2,
-      10,
-      11,
-      9,
-      23
+      0,
+      1,
+      0,
+      0,
+      0
     ]
   }
 }

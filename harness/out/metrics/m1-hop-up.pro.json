@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "m1-hop-up",
   "bike": "pro",
-  "updatedAt": "2026-09-15T21:08:55.288Z",
+  "updatedAt": "2026-09-16T01:08:58.269Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     5,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        32.766666666666666
+        31.975
       ]
     }
   ],
@@ -30,6 +30,8 @@
   "singleWall": null,
   "runs": [
     "20260914-221209-213117",
-    "20260915-160750-df34d7"
+    "20260915-160750-df34d7",
+    "20260915-195849-6a6783",
+    "20260915-200657-b5fd65"
   ]
 }

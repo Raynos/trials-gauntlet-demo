@@ -130,6 +130,7 @@ export const F_SLOTS = [
   'rearSlip',
   'targetMove',
   'airLimit',
+  'leanEdgeAir',
 ] as const;
 const S_TICK = 0;
 const S_TIME = 1;
@@ -158,7 +159,8 @@ const S_IN_L = 31;
 const S_REAR_SLIP = 32; // output
 const S_TGT_MOVE = 33; // R3 intent: decaying memory (tau servoIntentTau) of the pose target's own travel, metres
 const S_AIR_LIMIT = 34; // R5 air limit blend 0..1 (both wheels off the ground, +-dt/airRateBlend per tick)
-export const NSCALAR = F_SLOTS.length; // 35
+const S_LEAN_EDGE_AIR = 35; // R7: 1 when the last lean edge was made with both wheels off the ground (its travel earns no intent once a wheel is down)
+export const NSCALAR = F_SLOTS.length; // 36
 
 /** Flags (physics-v2.md §12). */
 export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid'] as const;
@@ -413,6 +415,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     if (!input.restart) U[U_RESTART_LATCH] = 0;
 
     // 1 input (already quantised by the caller; stored as applied)
+    const leanEdge = F[S_IN_L] !== input.lean;
     F[S_IN_T] = input.throttle;
     F[S_IN_B] = input.brake;
     F[S_IN_L] = input.lean;
@@ -452,6 +455,15 @@ class WorldV2 implements BikePhysicsWorldV2 {
       // snap, and a landing out of a limited flight keeps the cap. The Pro (gain 0) counts as R3.
       const mdx = this.poseTmp.x - F[S_TGT_X]!;
       const mdy = this.poseTmp.y - F[S_TGT_Y]!;
+      // R7 edge gate - the R5 air rule completed: under `airRateGain` the travel COMMANDED with both wheels off the
+      // ground earns no intent, in the air (R5) or after touchdown (R7). A lean edge made in the air is remembered
+      // (`leanEdgeAir`) until the next lean edge; while it stands, the target's remaining travel counts nothing once
+      // a wheel is down (m2 Rookie golden: a -1 pressed in flight crawled under the air limit, the rear wheel landed,
+      // the limit blended out and the last 0.08 m of travel ran at the ground rate, read intent 1 and fired `push`
+      // 26 ticks after touchdown with no input edge - a coasting hop). Gain 0 (the Pro): raw, as R3 - his pre-snap
+      // an edge before touchdown is a real push and counts.
+      if (leanEdge) F[S_LEAN_EDGE_AIR] = bothAir;
+      const airCommanded = bothAir ? 1 : F[S_LEAN_EDGE_AIR]!;
       // R6 preload gate (servoIntentBackM > 0): travel counts only while the rider body is behind the neutral pose
       let preload = 1;
       if (r.servoIntentBackM > 0) {
@@ -463,7 +475,30 @@ class WorldV2 implements BikePhysicsWorldV2 {
         poseAt(r.poses, 0, this.poseTmp2);
         preload = bodyX <= this.poseTmp2.x - r.servoIntentBackM ? 1 : 0;
       }
-      F[S_TGT_MOVE] = F[S_TGT_MOVE]! * (1 - dt / r.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy) * (1 - r.airRateGain * bothAir) * preload;
+      // R7 settled gate (servoIntentSettleM > 0): travel counts only while the body sits within M of its target. A
+      // snap starts from a settled body (the crouch's target reached); a lean released while the body is still
+      // sagged by a landing is an eccentric leg absorbing an impact, not a jump, so the sag is repaid under the
+      // concentric cap (harness r11 x3 summit: the release at touchdown repaid 0.28 m at F_max = a coasting hop).
+      let settled = 1;
+      if (r.servoIntentSettleM > 0) {
+        const c0 = cos(this.an[CHASSIS]!);
+        const s0 = sin(this.an[CHASSIS]!);
+        const rx = this.px[RIDER]! - this.px[CHASSIS]!;
+        const ry = this.py[RIDER]! - this.py[CHASSIS]!;
+        const lx = rx * c0 + ry * s0 - F[S_TGT_X]!;
+        const ly = -rx * s0 + ry * c0 - F[S_TGT_Y]!;
+        // continuous (§14.1 bounded response): 1 inside M, 0 beyond 5/3 M, linear between
+        const m = r.servoIntentSettleM;
+        settled = clamp((m * (5 / 3) - Math.sqrt(lx * lx + ly * ly)) / (m * (2 / 3)), 0, 1);
+      }
+      {
+        // the memory saturates smoothly at servoIntentMaxM: linear to half of it, then a quadratic knee into the cap
+        // (a hard min passed the 30-tick divergence row at 0.55 against 0.5)
+        const raw = F[S_TGT_MOVE]! * (1 - dt / r.servoIntentTau) + Math.sqrt(mdx * mdx + mdy * mdy) * (1 - r.airRateGain * airCommanded) * preload * settled;
+        const cap = r.servoIntentMaxM;
+        const knee = 0.5 * cap;
+        F[S_TGT_MOVE] = raw <= knee ? raw : raw >= cap + knee ? cap : cap - ((cap + knee - raw) * (cap + knee - raw)) / (2 * cap);
+      }
       F[S_TGT_X] = this.poseTmp.x;
       F[S_TGT_Y] = this.poseTmp.y;
       F[S_TGT_PSI] = this.poseTmp.psi;
@@ -472,6 +507,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
       F[S_BRAKE_EFF] = 1;
       F[S_TGT_MOVE] = 0;
       F[S_AIR_LIMIT] = 0;
+      F[S_LEAN_EDGE_AIR] = 0;
       this.airLim = 0;
       U[U_LIMITER] = 0;
     }
@@ -532,6 +568,10 @@ class WorldV2 implements BikePhysicsWorldV2 {
         front: { pos: { x: px[FRONT]!, y: py[FRONT]! }, spin: -an[FRONT]!, spinVel: -av[FRONT]!, compression: F[S_FRONT_COMP]!, grounded: U[U_FRONT_GND] === 1 },
       },
       rider: pose,
+      // R7: the simulated rider body (world SI: COM position, angle psi_R, velocities) - the hero rig poses from it
+      // (`render/frame.ts` derives the chassis-relative values); frozen at the crash pose once the ragdoll owns the
+      // rider (im = 0). Part of the replay contract: `hashPhysicsState` hashes it whenever present.
+      riderBody: { pos: { x: px[RIDER]!, y: py[RIDER]! }, angle: an[RIDER]!, vel: { x: this.vx[RIDER]!, y: this.vy[RIDER]! }, angVel: av[RIDER]! },
       checkpoint: F[S_CHECKPOINT]!,
       finished: U[U_FINISHED] === 1,
       faulted: fault,
@@ -1085,16 +1125,13 @@ class WorldV2 implements BikePhysicsWorldV2 {
       const vrx = vRx0 - vtx;
       const vry = vRy0 - vty;
       const mRed = im[RIDER]! + im[CHASSIS]!;
-      const rpx = pegx - fx;
-      const rpy = pegy - fy;
-      const rgx = gripx - fx;
-      const rgy = gripy - fy;
-      // torque on C per unit F: q . F with q = -(r_peg x (u u^T .)) - (r_grip x ((I - u u^T) .))
-      const cpu = rpx * uy - rpy * ux; // r_peg x u
-      const cgu = rgx * uy - rgy * ux; // r_grip x u
-      // r_grip x F = rgx Fy - rgy Fx ; F_arm = F - u (u.F)
-      const qx = -(cpu * ux + (-rgy - cgu * ux));
-      const qy = -(cpu * uy + (rgx - cgu * uy));
+      // torque on C per unit F (R7): with the linkage couple below the pair acts on the chassis as if at the
+      // rider COM, q . F = -(r_R x F). The linearisation takes the lever at the TARGET point (q = p below), so
+      // A = mRed I + kI p p^T is symmetric positive-definite for any lag: with q at the body, p q^T lost
+      // definiteness once the body was ~1 m off target, det crossed zero and the implicit force flipped sign
+      // tick to tick (h3 Rookie golden: the body driven 7 m from the bike at +-F_max). Exact when tracking.
+      const qx = rty;
+      const qy = -rtx;
       // v_T change per unit torque impulse: omega x r_T = (-rty, rtx); v_rel = v_R - v_T loses it
       const pxx = rty;
       const pyy = -rtx;
@@ -1141,6 +1178,14 @@ class WorldV2 implements BikePhysicsWorldV2 {
       this.forceAt(CHASSIS, pegx, pegy, -legx, -legy);
       this.forceAt(RIDER, gripx, gripy, armx, army);
       this.forceAt(CHASSIS, gripx, gripy, -armx, -army);
+      // linkage couple (R7): the pair's moment about the rider COM (up to 0.55 m x F_max = 1 700 N m at the grip)
+      // is reacted by the closed chain hands-bars / feet-pegs, not by the torso muscles - it goes back to the
+      // chassis as a couple (a pair torque: angular momentum stays exact), so the body's rotation is driven by
+      // the angular servo alone and the servo force acts on the chassis as if at the rider COM (§9.3). Without
+      // it the 300 N m angular servo lost to the 1 700 N m moment and the body wound up (E2 bot: 834 rad).
+      const mPair = (pegx - px[RIDER]!) * legy - (pegy - py[RIDER]!) * legx + (gripx - px[RIDER]!) * army - (gripy - py[RIDER]!) * armx;
+      av[RIDER] = av[RIDER]! - mPair * dt * ii[RIDER]!;
+      av[CHASSIS] = av[CHASSIS]! + mPair * dt * ii[CHASSIS]!;
       // angular servo
       const errA = this.an[CHASSIS]! + F[S_TGT_PSI]! - this.an[RIDER]!;
       const tq = clamp(r.kpsi * errA + r.cpsi * (wC0 - wR0), -r.tauMax, r.tauMax);
@@ -1858,11 +1903,18 @@ class WorldV2 implements BikePhysicsWorldV2 {
     {
       let hop = 0;
       if (riding) {
-        const relVy = -(this.vx[RIDER]! - this.vx[CHASSIS]!) * s + (this.vy[RIDER]! - this.vy[CHASSIS]!) * c;
+        // the body's velocity relative to the chassis AT the body (the chassis's rotation about its COM removed -
+        // R7: a bike pitching at 4 rad/s carried a 2.5 m/s tangential term and read 'push' on a landing), chassis-up
+        const rrx = this.px[RIDER]! - this.px[CHASSIS]!;
+        const rry = this.py[RIDER]! - this.py[CHASSIS]!;
+        const wc = this.av[CHASSIS]!;
+        const relVy = -(this.vx[RIDER]! - this.vx[CHASSIS]! + wc * rry) * s + (this.vy[RIDER]! - this.vy[CHASSIS]! - wc * rrx) * c;
         poseAt(t.rider.poses, 0, this.poseTmp);
         const rearAir = F[S_REAR_AIR]!;
         const frontAir = F[S_FRONT_AIR]!;
-        if (relVy > 0.5) hop = 2;
+        // push = the rider extending on purpose: the body leaving the chassis at > 0.5 m/s WITH intent (R7; a chassis
+        // dropping under a settled body on a front slam is not a push, and a hop needs an input edge within ~0.3 s)
+        if (relVy > 0.5 && F[S_TGT_MOVE]! >= 0.5 * t.rider.servoIntentM) hop = 2;
         else if (F[S_TGT_Y]! < this.poseTmp.y - 0.01 && F[S_REAR_COMP]! > prevRearComp) hop = 1;
         else if (rearAir > 0 && frontAir > 0 && (rearAir < frontAir ? frontAir : rearAir) <= RECOVER_TICKS) hop = 3;
       }

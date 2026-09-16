@@ -106,6 +106,18 @@ export interface TuningV2 {
      */
     servoIntentBackM: number;
     /**
+     * R7 settled gate: the pose target's travel counts toward intent only while the rider body is within this
+     * distance (m) of its target - a snap starts from a settled body; a lean released while the body is still
+     * sagged by a landing is absorption, repaid under the concentric cap. 0 = R3 (all travel counts).
+     */
+    servoIntentSettleM: number;
+    /**
+     * R7: the intent memory saturates at this much travel (m) - a gesture certifies F_max for a window of order
+     * servoIntentTau after it ends, not for tau x ln(travel / servoIntentM) (a -1 -> 0 release is 0.39 m = 0.4 s of
+     * F_max after a landing). 2 x servoIntentM leaves the R2 hop untouched (0.618 m at 1e9 / 4x / 2x; 0.596 at 1.5x).
+     */
+    servoIntentMaxM: number;
+    /**
      * R5 Rookie air limit: with BOTH wheels off the ground the pose target's travel rate falls from
      * `targetRateLin` / `targetRateAng` to `airRateLin` / `airRateAng` (a rider in the air has no ground reaction to
      * brace against; the 5 m/s hop throw is a grounded motion). The limit blends in and out over `airRateBlend` s
@@ -227,6 +239,8 @@ const ROOKIE: TuningV2 = {
     servoIntentTau: 0.2,
     servoIntentM: 0.05,
     servoIntentBackM: 0,
+    servoIntentSettleM: 0.12,
+    servoIntentMaxM: 0.1,
     // R5: in free air the full -1 -> 0 pose release is a 0.5 s move (0.39 m at 0.8 m/s) instead of 0.08 s; the swing's
     // kick on the chassis falls 245 -> ~95 deg/s (physics.md v2 status R5). The blend is 0.1 s each way.
     airRateLin: 0.8,

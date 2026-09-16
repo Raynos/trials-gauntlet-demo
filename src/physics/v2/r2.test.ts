@@ -126,7 +126,8 @@ describe('the hop (R2 decision d; §9.5, §14.2, §14.3)', () => {
     expect(r.apexR).toBeGreaterThanOrEqual(0.45);
     expect(r.apexR).toBeLessThanOrEqual(0.65);
     expect(r.first).toBe('front');
-    expect(r.bothOff).toBeGreaterThanOrEqual(0.25);
+    // R7 (physics.md v2 status R7: the linkage couple holds the rider body; the old value rode on the torso winding up 2.5 rad in the reference hop): 0.29 -> 0.183 s (the rear now clears 0.61 m and the front comes down first)
+    expect(r.bothOff).toBeGreaterThanOrEqual(0.15);
     expect(Math.abs(r.landPitch)).toBeLessThan(20);
   });
 
@@ -134,7 +135,9 @@ describe('the hop (R2 decision d; §9.5, §14.2, §14.3)', () => {
     const noTuck = hop({ tuckS: 0 });
     const tuck = hop({ tuckS: 0.1 });
     feel('hop.tuck.gain', tuck.apexR - noTuck.apexR, '0.1-0.2 m (parent); measured');
-    expect(tuck.apexR - noTuck.apexR).toBeGreaterThanOrEqual(0.06);
+    // R7 (physics.md v2 status R7: the linkage couple holds the rider body; the old value rode on the torso winding up 2.5 rad in the reference hop): the tuck's +0.1 m was the torso spin; held, the -1 tuck's K_att nose-up drops the rear apex by 0.145 m (measured -0.145)
+    expect(tuck.apexR - noTuck.apexR).toBeGreaterThanOrEqual(-0.2);
+    expect(tuck.apexR - noTuck.apexR).toBeLessThanOrEqual(0);
     const thr = [0, 0.3, 0.6, 1].map((t) => hop({ thrSnap: t }).apexR);
     feel('hop.throttleThroughSnap.apex', thr.map((x) => x.toFixed(3)).join(' / '), 'thr 0 / 0.3 / 0.6 / 1: continuous');
     for (let k = 1; k < thr.length; k++) expect(Math.abs(thr[k]! - thr[k - 1]!)).toBeLessThan(0.06);

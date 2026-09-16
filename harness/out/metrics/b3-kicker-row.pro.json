@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "b3-kicker-row",
   "bike": "pro",
-  "updatedAt": "2026-09-15T21:11:26.084Z",
+  "updatedAt": "2026-09-16T01:08:58.256Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        31.358333333333334
+        30.991666666666667
       ]
     }
   ],
@@ -30,6 +30,8 @@
   "singleWall": null,
   "runs": [
     "20260914-215748-63c03c",
-    "20260915-161029-ec57fc"
+    "20260915-161029-ec57fc",
+    "20260915-195849-6f946d",
+    "20260915-200657-cad32c"
   ]
 }

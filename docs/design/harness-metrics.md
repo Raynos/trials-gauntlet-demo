@@ -87,6 +87,34 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 13 (physics R7) — strangers on the held rider: b1–e3 on the Rookie (the tier's default), src 605a8174, one fresh stranger per track
+
+Rule 1 of `docs/tasks/blender-branch-merge.md`: a dynamics change needs a stranger re-run on b1–e3 in band. Physics R7
+(the linkage couple that holds the rider body, the exported `riderBody`, the intent gates (a)–(d); `physics.md` v2 status
+R7) is that change. Six sessions, `prep --round r13 --agents s1`, prompt = `run-stranger.md` block verbatim, spawned in
+parallel (loadavg ~10); every session cleared, 0.8–2.9 min wall, 11–22 calls. **n = 1 per track, so every verdict is
+INSUFFICIENT** (min 2) — the numbers are attempts vs `meta.attemptsBand`, not a judgment; the parent decides whether to
+run the second stranger.
+
+| track | band | asserted | attempts | vs band | time | calls | died at | what the stranger said |
+|---|---|---|---:|---|---:|---:|---|---|
+| b1-first-ride | 1–1 | 1 ≤ med ≤ 1.5 | **2** | **above the limit** | 51.4 s | 15 | 485 m | the "brake before the hump" hint: a plain `b` from 15 m/s on the flat pitched the bike over the bars in half a second (the only fault); the hump was harmless at 9 m/s braking with the weight back |
+| b2-lean-back | 1–2 | 1 ≤ med ≤ 3 | 3 | at the limit (above the authored top) | 55.1 s | 21 | 27 m (drum), 288 m | leaning back into the first drum row at 12 m/s looped; leaning back off a drop while the nose was still up from the two-tier step-up looped — shove the nose down after each step-up, take the drops on plain coast |
+| b3-kicker-row | 1–2 | 1 ≤ med ≤ 3 | 2 | in band | 45.7 s | 20 | 243 m | the bumpy run-in to the big kicker at ~220 m: the rollers pitched the nose up and a held lean-forward carried into the air flipped it; on the Rookie the lean-forward swung the nose past level on every longer flight — one tap at most, then coast |
+| e1-uphill-weight | 2–4 | 2 ≤ med ≤ 6 | 2 | in band | 66.8 s | 22 | 86 m | holding lean-forward past the first crest launched a nose-down full flip; every later climb gas-to-the-face, lean-forward on the slope, released at the crest; the fourth hill still lands at −54° |
+| e2-rear-wheel-first | 3–5 | 3 ≤ med ≤ 7.5 | 2 | **under band** | 51.3 s | 21 | 320 m (ramp) | the 1.5 m drop-gap lip after CP2 (~305 m): a lean-back on the slot the bike left the kicker with the nose already 20° up spun a 129° loop; ride the lip weight-forward, coast off, lean back one slot once airborne |
+| e3-stairway | 3–6 | 3 ≤ med ≤ 9 | 1 | **under band** | 40.8 s | 11 | — | trusting the briefing over the card's "brake down": plain full gas neutral through every stair flight, hump and the hazard pit cleared it first time |
+
+Against round 3 / 4 / 6 on the same tracks (Rookie, R3–R5 physics): e1 5–15 → 2, e2 4–7 → 2, e3 1–20 → 1, b-tracks 1–3 → 2–3.
+Three of the six first attempts were lost to the same thing — a lean held through a lip or a drop looping the bike
+(b3 243 m, e1 86 m, e2 320 m) — which is R7's envelope change (2) ("a hop must finish with its tuck; a +1 held through the
+flight noses over") read by players; b1's one fault, a plain brake from 15 m/s on the flat going over the bars, is not
+R7's: benched on HEAD's R6 physics (`git archive` copy) and on R7, full brake at lean 0 from 10 / 15 m/s on the flat
+endos in 1.5 / 1.4 s on both classes (R6 1.48 / 1.36 s, R7 1.47 / 1.37 s; −117° / −135°), lean −0.5 or −1 stops in
+1.0–1.7 s at ≤ 8° nose-down — a standing envelope item for the physics owner (the card's hint says "brake", the bike
+needs the weight back). Recordings: `harness/inputs/<track>/stranger-<track>-r13-s1-20260915-203701.json`
+(not browser-replayed this round); reports `harness/out/metrics/<track>.stranger.{json,md}`.
+
 ## Round 12 status — the v0.2.0 candidate battery is run: ours 5 / 36 (manoeuvre 2 / 22, world 1 / 8, audio 2 / 6; two climb cells unfillable), the tell on 18 pairs is a camera that owes nothing to the bike; the R6 Pro re-proved on 17 of 19 goldens (x1 / x3 cracked, e1 / x2 wall the bot); strangers on the R6 Pro: h1 8 · h3 10 UNDER band, x1 34.5 PASS, h2 and x3 FAIL on one DNF each; the fingerprint hashes only what the sim imports
 
 **Finding.** The P5 proxy for v0.2.0 ran for the first time, on HEAD 682d05c at `high` against the reference corpus, 36 of 38 pairs

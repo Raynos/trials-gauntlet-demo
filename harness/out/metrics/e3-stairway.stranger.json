@@ -7,10 +7,41 @@
     6
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "65175e2d",
-  "updatedAt": "2026-09-15T19:32:09.420Z",
-  "includeStale": true,
+  "srcFingerprint": "605a8174",
+  "updatedAt": "2026-09-16T01:40:52.828Z",
+  "includeStale": false,
   "sessions": [
+    {
+      "sessionId": "e3-stairway-r13-s1-20260915-203701",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "605a8174",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 40.75,
+      "calls": 11,
+      "wallMs": 45894,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5238,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r13-s1-20260915-203701.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r13-s1-20260915-203701.json",
+      "deaths": []
+    },
     {
       "sessionId": "e3-stairway-r3-s1-20260914-113731",
       "agent": "s1",
@@ -212,7 +243,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 78584504,
+      "wallMs": 100707914,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -433,7 +464,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 78584501,
+      "wallMs": 100707910,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -707,14 +738,14 @@
     }
   ],
   "bike": "rookie",
-  "completed": 8,
-  "clearedCount": 7,
-  "medianAttempts": 5.5,
-  "medianFinishTime": 54.975,
-  "medianCalls": 24.5,
-  "medianWallMs": 462652.5,
+  "completed": 1,
+  "clearedCount": 1,
+  "medianAttempts": 1,
+  "medianFinishTime": 40.75,
+  "medianCalls": 11,
+  "medianWallMs": 45894,
   "census": {
-    "n": 8,
+    "n": 1,
     "minSessions": 2,
     "censored": [
       {
@@ -730,7 +761,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 0,
+    "staleExcluded": 8,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -741,128 +772,18 @@
     "factor": 1.5,
     "limit": 9
   },
-  "verdict": "FAIL",
-  "pass": false,
+  "verdict": "INSUFFICIENT",
+  "pass": null,
   "deaths": {
-    "total": 45,
-    "byReason": {
-      "crash": 37,
-      "restart": 5,
-      "hazard": 3
-    },
-    "byObstacle": [
-      {
-        "obstacle": "ground",
-        "count": 12,
-        "xs": [
-          170.4,
-          271,
-          275.8,
-          82.8,
-          69.6,
-          71.9,
-          66.2,
-          64.3,
-          167.6,
-          277,
-          78.3,
-          71.5
-        ]
-      },
-      {
-        "obstacle": "ramp @ 178.8 m",
-        "count": 7,
-        "xs": [
-          175.9,
-          174.2,
-          173.5,
-          173.9,
-          177.3,
-          177.5,
-          176.1
-        ]
-      },
-      {
-        "obstacle": "gap @ 422.2 m",
-        "count": 7,
-        "xs": [
-          422.2,
-          416.1,
-          414.6,
-          414.6,
-          420.2,
-          417.9,
-          415
-        ]
-      },
-      {
-        "obstacle": "ramp @ 431.7 m",
-        "count": 5,
-        "xs": [
-          430,
-          430.7,
-          429.8,
-          431.2,
-          430.3
-        ]
-      },
-      {
-        "obstacle": "stair @ 412.2 m",
-        "count": 4,
-        "xs": [
-          413.6,
-          413.5,
-          411.1,
-          411.9
-        ]
-      },
-      {
-        "obstacle": "stair @ 165.2 m",
-        "count": 4,
-        "xs": [
-          164.5,
-          164.8,
-          166.4,
-          165.9
-        ]
-      },
-      {
-        "obstacle": "box @ 427.7 m",
-        "count": 3,
-        "xs": [
-          427.5,
-          426.8,
-          427.1
-        ]
-      },
-      {
-        "obstacle": "stair @ 266.8 m",
-        "count": 1,
-        "xs": [
-          267.2
-        ]
-      },
-      {
-        "obstacle": "stair @ 400.2 m",
-        "count": 1,
-        "xs": [
-          401.7
-        ]
-      },
-      {
-        "obstacle": "box @ 408.2 m",
-        "count": 1,
-        "xs": [
-          409.1
-        ]
-      }
-    ],
+    "total": 0,
+    "byReason": {},
+    "byObstacle": [],
     "byCheckpoint": [
       0,
-      7,
-      13,
-      4,
-      21
+      0,
+      0,
+      0,
+      0
     ]
   }
 }

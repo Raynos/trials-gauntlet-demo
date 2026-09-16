@@ -7,9 +7,9 @@
     2
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "65175e2d",
-  "updatedAt": "2026-09-15T19:32:09.375Z",
-  "includeStale": true,
+  "srcFingerprint": "605a8174",
+  "updatedAt": "2026-09-16T01:40:52.801Z",
+  "includeStale": false,
   "sessions": [
     {
       "sessionId": "b2-lean-back-20260914-051941",
@@ -108,6 +108,56 @@
           "checkpoint": 0,
           "obstacle": "ramp @ 60.6 m",
           "calls": 10
+        }
+      ]
+    },
+    {
+      "sessionId": "b2-lean-back-r13-s1-20260915-203701",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "605a8174",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 55.0917,
+      "calls": 21,
+      "wallMs": 170847,
+      "firstCheckpointCalls": 4,
+      "faultsByCheckpoint": [
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 592.2,
+        "startTick": 3512,
+        "endTick": 6949,
+        "recordingFile": "harness/inputs/b2-lean-back/stranger-b2-lean-back-r13-s1-20260915-203701.json"
+      },
+      "recordingFile": "harness/inputs/b2-lean-back/stranger-b2-lean-back-r13-s1-20260915-203701.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 27.3,
+          "checkpoint": -1,
+          "obstacle": "drum @ 27.0 m",
+          "calls": 2
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 288.037,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 11
         }
       ]
     },
@@ -231,7 +281,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 78584549,
+      "wallMs": 100707976,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -290,7 +340,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 78584534,
+      "wallMs": 100707961,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -431,14 +481,14 @@
     }
   ],
   "bike": "rookie",
-  "completed": 8,
-  "clearedCount": 8,
-  "medianAttempts": 2.5,
-  "medianFinishTime": 53.5,
-  "medianCalls": 23.5,
-  "medianWallMs": 310959,
+  "completed": 1,
+  "clearedCount": 1,
+  "medianAttempts": 3,
+  "medianFinishTime": 55.0917,
+  "medianCalls": 21,
+  "medianWallMs": 170847,
   "census": {
-    "n": 8,
+    "n": 1,
     "minSessions": 2,
     "censored": [
       {
@@ -454,7 +504,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 0,
+    "staleExcluded": 8,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -465,64 +515,34 @@
     "factor": 1.5,
     "limit": 3
   },
-  "verdict": "PASS",
-  "pass": true,
+  "verdict": "INSUFFICIENT",
+  "pass": null,
   "deaths": {
-    "total": 14,
+    "total": 2,
     "byReason": {
-      "crash": 14
+      "crash": 2
     },
     "byObstacle": [
-      {
-        "obstacle": "ground",
-        "count": 9,
-        "xs": [
-          35.8,
-          311.6,
-          369.4,
-          125.9,
-          432.8,
-          117.9,
-          304.3,
-          309.3,
-          286.2
-        ]
-      },
-      {
-        "obstacle": "drum @ 18.0 m",
-        "count": 2,
-        "xs": [
-          11.5,
-          17.5
-        ]
-      },
-      {
-        "obstacle": "ramp @ 322.2 m",
-        "count": 1,
-        "xs": [
-          321.7
-        ]
-      },
-      {
-        "obstacle": "ramp @ 60.6 m",
-        "count": 1,
-        "xs": [
-          57.4
-        ]
-      },
       {
         "obstacle": "drum @ 27.0 m",
         "count": 1,
         "xs": [
-          25.8
+          27.3
+        ]
+      },
+      {
+        "obstacle": "ground",
+        "count": 1,
+        "xs": [
+          288
         ]
       }
     ],
     "byCheckpoint": [
-      4,
-      3,
-      4,
-      3,
+      1,
+      0,
+      1,
+      0,
       0
     ]
   }

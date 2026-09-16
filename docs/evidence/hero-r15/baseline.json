@@ -1,0 +1,23 @@
+{
+  "baselineMain": "998c429",
+  "previousMerge": "afeb5c9",
+  "check": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "tests": 814,
+    "build": "pass"
+  },
+  "outfits": {
+    "combinations": 20,
+    "outageRetry": "pass",
+    "source": "harness/out/blender/openface-r12/integration"
+  },
+  "shipGate": {
+    "pass": false,
+    "code": 1281,
+    "firstObservedTick": 2,
+    "message": "GL_INVALID_VALUE: glGetProgramiv: Program object expected",
+    "source": "harness/out/blender/r15-r7-ship-diagnostic/failure.json"
+  },
+  "scope": "R7 baseline plus five-outfit branch integration. Pose redesign not yet applied. Not merge-ready until browser failure and requested riding behavior are resolved."
+}

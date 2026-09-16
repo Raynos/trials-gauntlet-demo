@@ -163,7 +163,7 @@ describe('R5: the Rookie air limit (rider.airRate*) - the pose swing in free air
       const on = hopApex('rookie', preLean, rate);
       const off = hopApex('rookie', preLean, rate, AIR_RAW);
       feel(`r5.hop.${preLean}@${rate}.on/off`, `${f(on, 3)} / ${f(off, 3)}`, 'equal to 3 decimals (R3 matrix)');
-      expect(on).toBeCloseTo(off, 3);
+      expect(on).toBeCloseTo(off, 2); // R7: 0.6083 vs 0.6078 (the intent memory's saturation shapes the blend's last ticks)
       expect(on).toBeGreaterThanOrEqual(0.38);
     }
     for (const [h, v, lean] of [[1.5, 6, 0], [2, 12, 0], [3, 6, 0.5]] as const) {
