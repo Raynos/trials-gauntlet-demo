@@ -1,0 +1,12 @@
+{
+  "candidate": "Male Hoodie Standing",
+  "page": "https://www.blendkit.com/asset-gallery-detail/18c3e1a7-459a-42fb-9a01-e97fb9873f0f/",
+  "assetBaseId": "18c3e1a7-459a-42fb-9a01-e97fb9873f0f",
+  "investigation": "Official BlenderKit add-on search.py and bk_client download.go inspected; attempted one unauthenticated search request using the documented query convention.",
+  "requestResult": "HTTP 403 Forbidden",
+  "downloaded": false,
+  "adopted": false,
+  "limitations": "No geometry, rig, textures or deformation inspected; cannot claim this is an improvement. No authentication bypass attempted.",
+  "nextStep": "Acquire through the official authorized download flow before any adoption decision. Existing complete rider remains active.",
+  "otherSearch": "No suitable directly downloadable MakeHuman hoodie was established in the bounded search."
+}

@@ -20,6 +20,8 @@ Round 17 verifies the complete rider and bike from a dedicated 20.19 MB runtime 
 
 Round 18 adds coordinated 25 mm fork/swingarm/shock motion during compression and landing. Both tyres stay fixed and existing rider grip/sole offsets are preserved; chain and brake hose follow their endpoints. The actual-GLB sweep, 750-frame browser sweep, recorded orbit and frozen game ship gate pass their scoped checks. [Motion evidence](../../prototypes/hero-garage/captures/whole-suspension-round18/webkit-orbit-relight.webm). This is authored garage kinematics, not game physics integration or final motion/art approval. Hair/beard remain paused.
 
+Round 19 derives the [rig/socket contract](../../prototypes/hero-garage/art/rig-contract/README.md) from the actual exports: 19 bones, 26 sockets, six clips and all 750 frames, including raw-to-Three.js name mapping. Contact-offset drift stays below 2.3 micrometres; the existing 11 mm sole/peg offset is documented, not called a surface-contact pass. A better clothing-source investigation reached an HTTP 403 on the official anonymous asset query; no replacement was downloaded or adopted.
+
 The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The hourly continuation is **paused for the art-quality blocker**, with 34% remaining at the stop; final visual approval stays with the user. Next decision: a source/artist capable of the same identity, or explicit revision toward a finished licensed character. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
 
 ## Independent audit — 2026-09-15
