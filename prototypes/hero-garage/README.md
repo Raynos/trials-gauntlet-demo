@@ -30,7 +30,7 @@ npm run capture -- --engine webkit --seconds 30 --camera full --clip landing_abs
 npm run capture -- --engine webkit --seconds 30 --camera full --clip forward_attack --name whole-scene-timing --no-video
 ```
 
-The viewer supports touch orbit/pinch and responsive controls. Coarse-pointer devices render at a 30 fps cap; desktop caps at 60. Internal DPR caps are 1.5 for narrow viewports and 2 for desktop. These are chosen settings, not evidence of actual iPhone performance. Performance acceptance still requires the declared real device.
+The viewer supports touch orbit/pinch and responsive controls. Coarse-pointer devices render at a 30 fps cap; desktop caps at 60. Internal DPR caps are 1.5 for the mobile tier in either orientation and 2 for desktop. The mobile tier retains full geometry and clips while reducing bike texture dimensions; the all-image RGBA8 plus mip estimate is 34.76 MiB versus 98.76 MiB for desktop, excluding renderer allocations. These are chosen settings, not evidence of actual iPhone performance. Performance acceptance still requires the declared real device.
 
 ## Catalog contract
 
@@ -46,7 +46,7 @@ The viewer supports touch orbit/pinch and responsive controls. Coarse-pointer de
 }
 ```
 
-Asset kinds are `head`, `rider`, and `bike`. Optional `position` and `rotation` are three-number arrays; rotation uses radians. Optional `scale` is a uniform number. GLB coordinates are Y-up and meters. The active rider/bike assembly faces +X, with wheel axles along Z; the older isolated portrait studies face +Z. Assets share one coordinate space; do not normalize each body component independently. The first head should be centered near `(0, 1.65, 0)`. Face framing fits head bounds, full/reference fit all assets, and bike fits bike bounds. Without a separate head, face framing selects the upper portion of the rider bounds. Bike UI is disabled when no bike exists.
+Asset kinds are `head`, `rider`, and `bike`. Optional `mobileUrl` selects a lighter export on coarse-pointer devices; `?quality=desktop` or `?quality=mobile` overrides selection for comparison. Diagnostics record the selected tier and actual loaded URLs. Optional `position` and `rotation` are three-number arrays; rotation uses radians. Optional `scale` is a uniform number. GLB coordinates are Y-up and meters. The active rider/bike assembly faces +X, with wheel axles along Z; the older isolated portrait studies face +Z. Assets share one coordinate space; do not normalize each body component independently. The first head should be centered near `(0, 1.65, 0)`. Face framing fits head bounds, full/reference fit all assets, and bike fits bike bounds. Without a separate head, face framing selects the upper portion of the rider bounds. Bike UI is disabled when no bike exists.
 
 Use glTF PBR-compatible exported materials. GLTFLoader preserves appropriate texture color spaces; renderer output is sRGB with ACES filmic tone mapping and fixed exposure. Garage and neutral lighting both use the same environment and no post-processing. Unsupported compression requires adding and validating the appropriate decoder before cataloging those exports.
 

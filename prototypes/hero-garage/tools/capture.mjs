@@ -13,6 +13,9 @@ const comparison=process.argv.includes('--comparison');
 const recordVideo=!process.argv.includes('--no-video');
 const reviewCamera=arg('camera','face');
 const reviewClip=arg('clip',null);
+const quality=arg('quality','auto');
+if(!['auto','desktop','mobile'].includes(quality))throw new Error('--quality must be auto, desktop or mobile');
+const captureUrl=base+'/?capture=1'+(quality==='auto'?'':'&quality='+quality);
 if(!Number.isFinite(seconds)||seconds<=0) throw new Error('--seconds must be positive');
 const stamp=arg('name',new Date().toISOString().replace(/[:.]/g,'-'));
 const out=path.join(root,'captures',stamp);fs.mkdirSync(out,{recursive:true});
@@ -20,7 +23,7 @@ const engines=arg('engine','both')==='both'?['webkit','chromium']:[arg('engine',
 const results=[];
 for(const engine of engines){
   if(!['webkit','chromium'].includes(engine)) throw new Error('Unsupported engine');
-  const row={engine,headless:true,host:{platform:os.platform(),release:os.release(),arch:os.arch()},actualIPhone:false,recordVideo,errors:[],status:'started'};
+  const row={engine,headless:true,host:{platform:os.platform(),release:os.release(),arch:os.arch()},actualIPhone:false,recordVideo,quality,errors:[],status:'started'};
   results.push(row);
   let browser,context;
   try{
@@ -40,7 +43,7 @@ for(const engine of engines){
     page.on('pageerror',e=>row.errors.push(String(e)));
     page.on('console',m=>{if(m.type()==='error') row.errors.push(m.text());});
     const loaded=Date.now();
-    await page.goto(base+'/?capture=1',{waitUntil:'networkidle',timeout:45000});
+    await page.goto(captureUrl,{waitUntil:'networkidle',timeout:45000});
     await page.waitForFunction(()=>window.__heroGarage?.ready||window.__heroGarage?.error,{},{timeout:45000});
     row.loadToReadyMs=Date.now()-loaded;
     row.assetResponses=await Promise.all(assetResponses);
@@ -96,21 +99,21 @@ for(const engine of engines){
     row.final=await page.evaluate(()=>window.__heroGarage.getDiagnostics());
     // Mobile geometry/touch is a smoke check only; physical iPhone remains untested.
     const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true});
-    const mp=await mobile.newPage();await mp.goto(base+'/?capture=1',{waitUntil:'networkidle'});
+    const mp=await mobile.newPage();await mp.goto(captureUrl,{waitUntil:'networkidle'});
     await mp.waitForFunction(()=>window.__heroGarage?.ready||window.__heroGarage?.error);
     row.mobileSmoke={physicalDevice:false,initial:await mp.evaluate(()=>({error:window.__heroGarage.error,diagnostics:window.__heroGarage.getDiagnostics(),touch:navigator.maxTouchPoints,overflow:document.documentElement.scrollWidth>innerWidth}))};
     await mp.locator('[data-light="neutral"]').tap();
     await mp.locator('[data-camera="reference"]').tap();
     row.mobileSmoke.taps=await mp.evaluate(()=>({camera:window.__heroGarage.getDiagnostics().camera,lighting:window.__heroGarage.getDiagnostics().lighting}));
     row.mobileSmoke.taps.passed=row.mobileSmoke.taps.camera==='reference'&&row.mobileSmoke.taps.lighting==='neutral';
-    await mp.locator('[data-camera="face"]').tap();
+    await mp.locator('[data-camera="full"]').tap();
     await mp.screenshot({path:path.join(out,`${engine}-touch-portrait.png`)});
     await mp.setViewportSize({width:844,height:390});await mp.waitForTimeout(250);
     row.mobileSmoke.landscape=await mp.evaluate(()=>({diagnostics:window.__heroGarage.getDiagnostics(),overflow:document.documentElement.scrollWidth>innerWidth}));
     await mp.screenshot({path:path.join(out,`${engine}-touch-landscape.png`)});await mobile.close();
     const missing=await context.newPage();
     await missing.route('**/*.glb',route=>route.fulfill({status:404,body:'Deliberate missing asset probe'}));
-    await missing.goto(base+'/?capture=1',{waitUntil:'networkidle'});
+    await missing.goto(captureUrl,{waitUntil:'networkidle'});
     await missing.waitForFunction(()=>window.__heroGarage?.error,{},{timeout:10000});
     row.missingAsset={error:await missing.evaluate(()=>window.__heroGarage.error),text:await missing.locator('body').innerText()};await missing.close();
     row.status=row.errors.length?'rendered-with-errors':'rendered';
@@ -122,4 +125,4 @@ for(const engine of engines){
   fs.writeFileSync(path.join(root,'reports',`${stamp}.json`),JSON.stringify({createdAt:new Date().toISOString(),base,results,artVerdict:'Parent review required; harness never judges likeness.',iPhoneValidation:'Not performed. Desktop WebKit and touch emulation cannot satisfy actual iPhone/Safari gate.'},null,2)+'\n');
   console.log(JSON.stringify({engine:row.engine,status:row.status,failure:row.failure,errors:row.errors,gpu:row.environment?.gpu,deterministicCanvas:row.deterministicCanvas?.byteIdentical,trace:row.trace?{seconds:row.trace.measuredDurationMs/1000,frames:row.trace.frames.length,p95Ms:row.trace.p95Ms}:undefined,video:row.video,report:`reports/${stamp}.json`},null,2));
 }
-if(results.some(r=>r.status!=='rendered'||!r.deterministicCanvas?.byteIdentical||r.motionControls?.honestAbsentClips===false))process.exitCode=1;
+if(results.some(r=>r.status!=='rendered'||!r.deterministicCanvas?.byteIdentical||r.motionControls?.honestAbsentClips===false||r.mobileSmoke?.initial?.error||!r.mobileSmoke?.taps?.passed||r.mobileSmoke?.initial?.overflow||r.mobileSmoke?.landscape?.overflow))process.exitCode=1;

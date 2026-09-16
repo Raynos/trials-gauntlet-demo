@@ -1,0 +1,282 @@
+{
+  "rider": {
+    "source": "street01-rider-garment-repair.glb",
+    "output": "street01-rider-mobile.glb",
+    "sourceSHA256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262",
+    "outputSHA256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262",
+    "sourceBytes": 2760380,
+    "outputBytes": 2760380,
+    "images": [
+      {
+        "name": "rider-street_normal",
+        "before": [
+          512,
+          512
+        ],
+        "after": [
+          512,
+          512
+        ],
+        "rgba8BeforeBytes": 1048576,
+        "rgba8AfterBytes": 1048576,
+        "changed": false
+      },
+      {
+        "name": "rider-street_orm",
+        "before": [
+          512,
+          512
+        ],
+        "after": [
+          512,
+          512
+        ],
+        "rgba8BeforeBytes": 1048576,
+        "rgba8AfterBytes": 1048576,
+        "changed": false
+      },
+      {
+        "name": "rider-street_rookie_albedo",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          1024,
+          1024
+        ],
+        "rgba8BeforeBytes": 4194304,
+        "rgba8AfterBytes": 4194304,
+        "changed": false
+      },
+      {
+        "name": "rider-street_pro_albedo",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          1024,
+          1024
+        ],
+        "rgba8BeforeBytes": 4194304,
+        "rgba8AfterBytes": 4194304,
+        "changed": false
+      }
+    ],
+    "baseRGBA8BeforeBytes": 10485760,
+    "baseRGBA8AfterBytes": 10485760,
+    "verifiedNonImagePayloads": 197,
+    "geometryAnimationPayloadError": 0,
+    "triangles": 45317,
+    "extensionsPreserved": [
+      "KHR_materials_variants"
+    ],
+    "notes": [
+      "Only embedded image buffer views changed; meshopt compressed streams and animation/accessor/node data preserved exactly.",
+      "RGBA8 is base-level image memory estimate, excluding mipmaps and renderer allocations.",
+      "Normal/ORM maps resized directly as linear data, PNG encoded. Color maps use Pillow Lanczos interpolation."
+    ],
+    "reimportContactVerification": {
+      "compression": {
+        "sampledFrames": 150,
+        "maxContactErrorM": 1.5102457355642232e-06
+      },
+      "extension": {
+        "sampledFrames": 150,
+        "maxContactErrorM": 1.6691961246657903e-06
+      },
+      "forward_attack": {
+        "sampledFrames": 120,
+        "maxContactErrorM": 1.7287915959683867e-06
+      },
+      "hang_back": {
+        "sampledFrames": 120,
+        "maxContactErrorM": 2.6468757761924885e-06
+      },
+      "landing_absorption": {
+        "sampledFrames": 150,
+        "maxContactErrorM": 1.8344775910988323e-06
+      },
+      "sit_cruise": {
+        "sampledFrames": 60,
+        "maxContactErrorM": 1.0995666199028613e-06
+      }
+    }
+  },
+  "bike": {
+    "source": "street01-bike-materials.glb",
+    "output": "street01-bike-mobile.glb",
+    "sourceSHA256": "e8ea68d5a6ad504b0e969cd716e957bcac3f436acd3c9eac1357ee722cf05b43",
+    "outputSHA256": "7aae3f7c237d0dc5ceff2157527c0ace7b9adae2103b4b0aea434a3c6adedd93",
+    "sourceBytes": 6053376,
+    "outputBytes": 3645880,
+    "images": [
+      {
+        "name": "bike_body_normal",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ],
+        "rgba8BeforeBytes": 4194304,
+        "rgba8AfterBytes": 1048576,
+        "changed": true
+      },
+      {
+        "name": "bike_body_orm",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ],
+        "rgba8BeforeBytes": 4194304,
+        "rgba8AfterBytes": 1048576,
+        "changed": true
+      },
+      {
+        "name": "bike_body_rookie_albedo",
+        "before": [
+          2048,
+          2048
+        ],
+        "after": [
+          1024,
+          1024
+        ],
+        "rgba8BeforeBytes": 16777216,
+        "rgba8AfterBytes": 4194304,
+        "changed": true
+      },
+      {
+        "name": "bike_body_pro_albedo",
+        "before": [
+          2048,
+          2048
+        ],
+        "after": [
+          1024,
+          1024
+        ],
+        "rgba8BeforeBytes": 16777216,
+        "rgba8AfterBytes": 4194304,
+        "changed": true
+      },
+      {
+        "name": "bike_mech_normal",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ],
+        "rgba8BeforeBytes": 4194304,
+        "rgba8AfterBytes": 1048576,
+        "changed": true
+      },
+      {
+        "name": "bike_mech_orm",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ],
+        "rgba8BeforeBytes": 4194304,
+        "rgba8AfterBytes": 1048576,
+        "changed": true
+      },
+      {
+        "name": "bike_mech_albedo",
+        "before": [
+          2048,
+          2048
+        ],
+        "after": [
+          1024,
+          1024
+        ],
+        "rgba8BeforeBytes": 16777216,
+        "rgba8AfterBytes": 4194304,
+        "changed": true
+      },
+      {
+        "name": "chain_links",
+        "before": [
+          64,
+          32
+        ],
+        "after": [
+          64,
+          32
+        ],
+        "rgba8BeforeBytes": 8192,
+        "rgba8AfterBytes": 8192,
+        "changed": false
+      },
+      {
+        "name": "bike_spokecard",
+        "before": [
+          128,
+          128
+        ],
+        "after": [
+          128,
+          128
+        ],
+        "rgba8BeforeBytes": 65536,
+        "rgba8AfterBytes": 65536,
+        "changed": false
+      }
+    ],
+    "baseRGBA8BeforeBytes": 67182592,
+    "baseRGBA8AfterBytes": 16850944,
+    "verifiedNonImagePayloads": 91,
+    "geometryAnimationPayloadError": 0,
+    "triangles": 29940,
+    "extensionsPreserved": [
+      "EXT_meshopt_compression",
+      "KHR_materials_variants",
+      "KHR_texture_transform"
+    ],
+    "notes": [
+      "Only embedded image buffer views changed; meshopt compressed streams and animation/accessor/node data preserved exactly.",
+      "RGBA8 is base-level image memory estimate, excluding mipmaps and renderer allocations.",
+      "Normal/ORM maps resized directly as linear data, PNG encoded. Color maps use Pillow Lanczos interpolation."
+    ],
+    "blenderReimportSuccess": true,
+    "reimportMeshObjects": 23,
+    "reimportSockets": {
+      "attach_grip_L": [
+        0.9200000166893005,
+        -0.33000001311302185,
+        0.7799999713897705
+      ],
+      "attach_grip_R": [
+        0.9200000166893005,
+        0.33000001311302185,
+        0.7799999713897705
+      ],
+      "attach_peg_L": [
+        0.5099999904632568,
+        -0.20000000298023224,
+        0.019999999552965164
+      ],
+      "attach_peg_R": [
+        0.5099999904632568,
+        0.20000000298023224,
+        0.019999999552965164
+      ]
+    }
+  }
+}

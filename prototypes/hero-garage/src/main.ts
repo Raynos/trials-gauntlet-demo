@@ -7,7 +7,7 @@ import './style.css';
 
 type CameraName = 'face' | 'full' | 'bike' | 'reference';
 type LightingName = 'neutral' | 'garage';
-interface Asset { id: string; label: string; url: string; kind: 'head' | 'rider' | 'bike'; position?: [number,number,number]; rotation?: [number,number,number]; scale?: number }
+interface Asset { id: string; label: string; url: string; mobileUrl?: string; kind: 'head' | 'rider' | 'bike'; position?: [number,number,number]; rotation?: [number,number,number]; scale?: number }
 interface Catalog { version: 1; stage: string; reference: {url: string; label: string}; assets: Asset[]; notes?: string[] }
 interface Loaded { asset: Asset; root: THREE.Group; mixer: THREE.AnimationMixer; clips: THREE.AnimationClip[] }
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -28,13 +28,15 @@ const cropCanvas=conceptPanel.querySelector('canvas')!;
 const cropImage=new Image();
 let comparison=false;
 const headFrame={min:[-.115,1.580,-.10],max:[.115,1.833,.19],sourceCrop:{x:694,y:128,width:111,height:118}};
+const requestedQuality=new URLSearchParams(location.search).get('quality');
+const quality: 'desktop'|'mobile'=requestedQuality==='desktop'||requestedQuality==='mobile'?requestedQuality:matchMedia('(pointer:coarse)').matches?'mobile':'desktop';
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, matchMedia('(max-width:740px)').matches ? 1.5 : 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality==='mobile' ? 1.5 : 2));
 runtimeSurface.prepend(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#252e29');
@@ -160,7 +162,7 @@ function setFrame(frame:{time:number;orbit:number;lighting?:LightingName}){
 }
 function diagnostics(){
   const sizes=renderer.getDrawingBufferSize(new THREE.Vector2());const sorted=[...frameTimes].sort((a,b)=>a-b);
-  return {ready,error,grounding,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
+  return {ready,error,quality,qualitySelection:requestedQuality==='desktop'||requestedQuality==='mobile'?'query':'pointer capability',grounding,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
 }
 const api={get ready(){return ready;},get error(){return error;},setCamera,setComparison,setLighting,setTime,setOrbit,setFrame,setClip,setPlaying,getDiagnostics:diagnostics,get state(){return diagnostics();}};
 Object.assign(window,{__garage:api,__heroGarage:api});
@@ -198,10 +200,11 @@ async function boot(){
     for(const asset of catalog.assets){
       if(!asset.url||!asset.id)throw new Error('Every catalog asset requires an id and URL.');
       setStatus(`Loading ${asset.label}…`);
-      const gltf=await loader.loadAsync(asset.url);
+      const selectedAsset={...asset,url:quality==='mobile'&&asset.mobileUrl?asset.mobileUrl:asset.url};
+      const gltf=await loader.loadAsync(selectedAsset.url);
       const root=gltf.scene;if(asset.position)root.position.fromArray(asset.position);if(asset.rotation)root.rotation.set(...asset.rotation);if(asset.scale!==undefined)root.scale.setScalar(asset.scale);
       root.traverse(object=>{if(object instanceof THREE.Mesh){object.castShadow=true;object.receiveShadow=true;if(asset.kind==='bike'&&object.name.endsWith('_blur'))object.visible=false;}});
-      hero.add(root);loaded.push({asset,root,mixer:new THREE.AnimationMixer(root),clips:gltf.animations});
+      hero.add(root);loaded.push({asset:selectedAsset,root,mixer:new THREE.AnimationMixer(root),clips:gltf.animations});
     }
     // Set the assembled bike's lowest geometry on the floor without changing rider/bike alignment.
     const bikeRoot=loaded.find(item=>item.asset.kind==='bike')?.root;

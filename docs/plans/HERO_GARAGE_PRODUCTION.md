@@ -27,6 +27,8 @@ Round 14 corrects an earlier misleading contact metric: saddle-region gaps were 
 
 Round 15 reconstructs the existing open neckline rim into a connected collar (+583 net triangles). Full-scene neutral/landing review shows reduced gaping, but the 10.15 mm front seam, collar UV stretch and shoulder shape remain provisional. [Review](../../prototypes/hero-garage/reports/whole-collar-round15-review.json) includes the passing frozen game ship gate: 1,038 identical ticks, 8.65-second clear, one-tick restart.
 
+Round 16 adds a mobile texture tier with unchanged geometry and all six clips. The all-image RGBA8+mip estimate falls from 98.76 to 34.76 MiB. Automatic touch selection, portrait/landscape DPR1.5, loading and tap checks pass in desktop WebKit emulation. [Comparison review](../../prototypes/hero-garage/reports/mobile-round16-review.json) records no obvious whole-scene regression; actual iPhone performance remains unmeasured.
+
 Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest user-reported allowance is 27% remaining, with the 20% reserve unchanged.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)
