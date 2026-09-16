@@ -95,6 +95,8 @@ export class DomHud implements Hud {
   private pendingCrashAt = -1;
   private crashBanner: Banner | null = null;
   private phase: RunInfo['phase'] = 'menu';
+  /** Review inbox control (`src/ui/inbox.ts`, lazy): only built when a review password is stored or the URL has `?review=1`. */
+  private readonly noteBtn: HTMLButtonElement | null = null;
   private lastCheckpoint = -1;
   private lastStripX = Number.NaN;
 
@@ -206,6 +208,24 @@ export class DomHud implements Hud {
 
     this.flashEl = el('div', 'flash');
     this.root.append(this.flashEl, top, this.bannersEl, this.hintsEl, this.results);
+    if (reviewEnabled()) {
+      this.noteBtn = document.createElement('button');
+      this.noteBtn.type = 'button';
+      this.noteBtn.className = 'hud-note';
+      this.noteBtn.innerHTML = '<span>✎</span><small>Note</small>';
+      this.noteBtn.addEventListener('click', () => {
+        void import('./inbox').then((m) =>
+          m.openInbox({
+            hud: () => ({ trackName: this.track?.name ?? '', device: this.device }),
+            // Pause through the ordinary HUD action (a no-op outside a run); never touches physics.
+            pause: () => {
+              if (!this.root.classList.contains('under-overlay')) this.onAction?.('pause');
+            },
+          }),
+        );
+      });
+      this.root.appendChild(this.noteBtn);
+    }
     parent.appendChild(this.root);
   }
 
@@ -252,6 +272,7 @@ export class DomHud implements Hud {
     if (info.phase !== this.phase) {
       this.phase = info.phase;
       this.root.classList.toggle('hidden', info.phase === 'menu');
+      if (this.noteBtn) (info.phase === 'menu' ? conceal : reveal)(this.noteBtn);
       // Finish: the timer freezes green, the progress strip fades, no split / delta floats under the
       // timer (the PB delta is stated once, inside the results panel).
       const fin = info.phase === 'finished';
@@ -535,6 +556,7 @@ export class DomHud implements Hud {
     this.root.style.transition = '';
     for (const b of this.banners) this.retire(b);
     this.pendingCrashAt = -1;
+    if (this.noteBtn) conceal(this.noteBtn);
     this.hideResults();
   }
 
@@ -707,6 +729,15 @@ function el<K extends 'div'>(tag: K, className: string): HTMLDivElement {
   const d = document.createElement(tag);
   d.className = className;
   return d;
+}
+
+/** Mirrors `reviewEnabled` in src/ui/inbox.ts without importing it (that module stays a lazy chunk). */
+function reviewEnabled(): boolean {
+  try {
+    return /[?&]review=1(&|$)/.test(location.search) || !!localStorage.getItem('trials.reviewPassword');
+  } catch {
+    return false;
+  }
 }
 
 function escapeHtml(s: string): string {

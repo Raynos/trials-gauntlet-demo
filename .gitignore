@@ -15,3 +15,6 @@ harness/out/bench/*
 !harness/out/bench/latest.md
 !harness/out/bench/ledger.jsonl
 !harness/out/bench/profile-latest.md
+.env*
+.review/
+.vercel/

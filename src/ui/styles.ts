@@ -841,3 +841,128 @@ export function injectStyles(): void {
   el.textContent = UI_CSS;
   document.head.appendChild(el);
 }
+
+/* ---- track select — diorama (assets/design/tracks/round3/SPEC.md §5: A3b one tile, A3e night) ----------------
+ * Owned by src/ui/trackMap.ts / TrackSelectScreen; injected by `injectTrackMapStyles()` as its own <style>.
+ * The old `.tiers` / `.carousel` / `.card` rules above are kept untouched (other screens' cards reuse them).   */
+export const TRACK_MAP_CSS = /* css */ `
+.tracks-screen { --tm-top: calc(var(--s5) + var(--sat) + 2.7rem); --tm-bottom: calc(var(--s3) + var(--sab) + 44px + var(--s2)); --tm-x: calc(calc(5 * var(--vw)) + var(--sal)); --tm-xr: calc(calc(5 * var(--vw)) + var(--sar)); }
+.tracks-screen .legend { right: auto; left: var(--tm-x); bottom: calc(var(--tm-bottom) + var(--s1)); font-size: .68rem; text-shadow: var(--outline); z-index: 3; }
+.tmap { position: absolute; left: 0; right: 0; top: var(--tm-top); bottom: var(--tm-bottom); display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x; }
+.tmap::-webkit-scrollbar { display: none; }
+.tpage { position: relative; flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; align-items: flex-end; gap: var(--s4); padding: 0 var(--tm-xr) 0 var(--tm-x); container-type: size; }
+/* The tile: as wide as the page's left 58 % or as tall as the page, whichever fits (a 3:2 plate). */
+.tile { position: relative; flex: 0 0 auto; width: min(58cqw, 150cqh); aspect-ratio: 3 / 2; --lamp: var(--amber); }
+.tile .glow { position: absolute; left: 10%; right: 10%; top: 30%; bottom: 0; border-radius: 50%; background: radial-gradient(closest-side, var(--lamp), transparent 70%); opacity: .16; filter: blur(12px); pointer-events: none; }
+.tile .plate { position: absolute; inset: 0; background: center bottom / contain no-repeat; opacity: 0; transition: opacity var(--t3) var(--ease); }
+.tile .plate.loaded { opacity: 1; }
+/* Fallback slab until the plate decodes (or when it never does): a biome-tinted isometric diamond with a front face. */
+.tile .slab { position: absolute; left: 3%; right: 3%; top: 8%; bottom: 6%; background: var(--tint, #333); clip-path: polygon(50% 0, 100% 44%, 100% 62%, 50% 100%, 0 62%, 0 44%); opacity: .85; filter: saturate(.7) brightness(.8); }
+.tile .slab::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 100%; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%, rgba(0,0,0,.6)); }
+.tile .plate.loaded ~ .slab, .tile .plate.loaded + .slab { display: none; }
+.tile .route { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.tile .route .dim { fill: none; stroke: rgba(255,176,32,.35); stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; stroke-width: 3px; }
+.tile .route .lit { fill: none; stroke: var(--amber); vector-effect: non-scaling-stroke; stroke-width: 3px; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(255,176,32,.9)) drop-shadow(0 0 10px rgba(255,138,31,.6)); }
+.tile .title { position: absolute; left: 6%; bottom: 3%; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1rem, 4.2cqh, 1.7rem); line-height: 1; text-transform: uppercase; letter-spacing: .04em; color: rgba(255,255,255,.55); text-shadow: 0 1px 0 rgba(255,255,255,.12), 0 -1px 0 rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.8); pointer-events: none; white-space: nowrap; }
+.tile .title b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.tile .title small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .58rem; letter-spacing: .22em; color: var(--ink-dim); margin-top: .25em; }
+/* Trophy ledge on the front face: one pedestal per campaign track — a lit medal, an empty ring, or a padlock. */
+.tile .ledge { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); display: flex; gap: 6px; pointer-events: none; }
+.tile .ledge i { display: block; width: 14px; height: 14px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor, 0 2px 0 rgba(0,0,0,.6); }
+.tile .ledge i.open { background: transparent; border: 1.5px dashed rgba(255,176,32,.7); box-shadow: none; }
+.tile .ledge i.locked { background: rgba(255,255,255,.14); box-shadow: none; -webkit-mask: none; }
+.tile .ledge i.locked::after { content: ""; display: block; width: 100%; height: 100%; background: rgba(255,255,255,.6); -webkit-mask: var(--padlock) center / 70% no-repeat; mask: var(--padlock) center / 70% no-repeat; }
+.tile .ledge i.platinum { color: var(--plat); } .tile .ledge i.gold { color: var(--gold); } .tile .ledge i.silver { color: var(--silver); } .tile .ledge i.bronze { color: var(--bronze); }
+.tracks-screen { --padlock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E"); }
+/* Pins: a post with the code, the 44 px medal disc, a name plate and the Best / Target line; anchored at the disc's centre. */
+#ui .pin { position: absolute; left: var(--px); top: var(--py); transform: translate(-50%, -36px); display: flex; flex-direction: column; align-items: center; gap: 2px; width: max-content; max-width: 5.8rem; min-width: 44px; padding: 0 2px 4px; border: 0; background: transparent; color: var(--ink); cursor: pointer; z-index: 2; transition: transform var(--t2) var(--ease); }
+#ui .pin .code { font-size: .6rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); text-shadow: var(--outline); height: 12px; line-height: 12px; }
+#ui .pin .disc { position: relative; width: 44px; height: 44px; border-radius: 50%; background: var(--slab-2) center / 78% no-repeat; box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 6px 14px rgba(0,0,0,.7); }
+#ui .pin .disc::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 8px; margin-left: -1px; background: rgba(255,255,255,.35); }
+#ui .pin .disc.plain::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: currentColor; box-shadow: inset 0 -3px 0 rgba(0,0,0,.35); }
+#ui .pin .disc.none::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; border: 2px dashed rgba(255,255,255,.45); }
+#ui .pin .disc.locked::before { content: ""; position: absolute; inset: 9px; background: rgba(255,255,255,.7); -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
+#ui .pin .disc.platinum { color: var(--plat); } #ui .pin .disc.gold { color: var(--gold); } #ui .pin .disc.silver { color: var(--silver); } #ui .pin .disc.bronze { color: var(--bronze); }
+#ui .pin .disc.gold, #ui .pin .disc.silver, #ui .pin .disc.bronze, #ui .pin .disc.platinum { box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 0 14px -2px currentColor, 0 6px 14px rgba(0,0,0,.7); }
+#ui .pin .plate { margin-top: 8px; max-width: 100%; padding: 2px 6px; border-radius: 3px; background: var(--slab-2); border: 1px solid var(--line-2); font-family: var(--display); font-style: italic; font-weight: 900; font-size: .8rem; line-height: 1.05; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+#ui .pin .times { font-size: .6rem; letter-spacing: .06em; color: var(--ink-dim); font-variant-numeric: tabular-nums; text-shadow: var(--outline); white-space: nowrap; }
+#ui .pin .times b { color: var(--ink); font-weight: 700; } #ui .pin .times b.ahead { color: var(--green); }
+#ui .pin .rule { font-size: .52rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); text-shadow: var(--outline); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+#ui .pin .flag { position: absolute; left: 50%; top: -14px; transform: translateX(-50%) rotate(-4deg); padding: 1px 5px; background: var(--amber); color: var(--amber-ink); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; border-radius: 2px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+#ui .pin .tag { position: absolute; left: calc(50% + 18px); top: 14px; padding: 1px 4px; border-radius: 3px; font-size: .5rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+#ui .pin .tag.ghost { background: rgba(255,255,255,.16); color: var(--ink); }
+#ui .pin .tag.pro { background: var(--blue); color: #0b1a2e; top: 28px; }
+#ui .pin.locked { opacity: .6; cursor: default; }
+#ui .pin.locked .plate { filter: grayscale(1); }
+#ui .pin.on { z-index: 4; transform: translate(-50%, -40px); }
+#ui .pin.on .disc { box-shadow: 0 0 0 3px var(--amber), 0 0 22px -2px rgba(255,176,32,.85), 0 6px 14px rgba(0,0,0,.7); }
+#ui .pin.on .plate { border-color: var(--amber); color: var(--amber); }
+#ui .pin.on .code { color: var(--amber); }
+#ui .pin.go { animation: pingo var(--t3) var(--ease) both; z-index: 5; }
+@keyframes pingo { 0% { transform: translate(-50%, -40px); opacity: 1; } 100% { transform: translate(-50%, calc(-40px - 14 * var(--vh))) scale(1.12); opacity: 0; } }
+/* Next tier gate stub, back-right of the tile: the next locked track and its rule (a tap flies to it). */
+#ui .gate { position: absolute; right: 2%; top: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-height: 44px; min-width: 44px; padding: 4px 8px 4px 8px; border: 0; border-left: 3px solid var(--amber); border-radius: 0 var(--r1) var(--r1) 0; background: var(--slab-2); color: var(--ink); text-align: left; cursor: pointer; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,.6); }
+#ui .gate::before { content: ""; position: absolute; left: -3px; right: 0; top: -4px; height: 4px; background: repeating-linear-gradient(-45deg, var(--amber) 0 6px, #111 6px 12px); border-radius: 2px 2px 0 0; }
+#ui .gate b { font-size: .56rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--amber); }
+#ui .gate span { font-family: var(--display); font-style: italic; font-weight: 900; font-size: .8rem; text-transform: uppercase; line-height: 1; }
+#ui .gate small { font-size: .5rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); display: inline-flex; align-items: center; gap: .35em; }
+#ui .gate small::before { content: ""; width: 1em; height: 1em; background: currentColor; -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
+/* The rising card (A3d): one element, moved into the focused page's slot; RIDE · ▶ GHOST · REVIEW live on it. */
+.tslot { position: relative; flex: 1 1 auto; align-self: stretch; min-width: 0; display: flex; align-items: flex-end; }
+.tcard { width: 100%; padding: var(--s3) var(--s4) var(--s3); border: 1px solid var(--line-2); border-top: 2px solid var(--amber); border-radius: var(--r2); background: var(--slab-2); box-shadow: 0 10px 30px rgba(0,0,0,.6); display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
+.tcard.rise { animation: tcrise var(--t2) var(--ease) both; }
+@keyframes tcrise { from { transform: translateY(12px); opacity: .2; } to { transform: none; opacity: 1; } }
+.tcard .tc-head { display: flex; align-items: center; gap: var(--s2); font-size: .64rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-dim); }
+.tcard .tc-head b { color: var(--amber); }
+.tcard .tc-head .tc-medal { margin-left: auto; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: currentColor center / cover no-repeat; box-shadow: inset 0 -3px 0 rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.6); }
+.tcard .tc-head .tc-medal.img { background-color: transparent; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+.tcard .tc-head .tc-medal.none { background: rgba(255,255,255,.06); border: 1px dashed var(--line); box-shadow: none; }
+.tcard .tc-head .tc-medal.platinum { color: var(--plat); } .tcard .tc-head .tc-medal.gold { color: var(--gold); } .tcard .tc-head .tc-medal.silver { color: var(--silver); } .tcard .tc-head .tc-medal.bronze { color: var(--bronze); }
+.tcard .tc-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1.3rem, 5.6cqh, 1.9rem); line-height: .95; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tcard .tc-tech { font-size: .76rem; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tcard .tc-times { display: flex; gap: var(--s4); font-size: .76rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.tcard .tc-times b { color: var(--ink); font-weight: 700; } .tcard .tc-times b.ahead { color: var(--green); }
+.tcard .tc-rule { display: inline-flex; align-items: center; gap: .45em; font-size: .64rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--amber); }
+.tcard .tc-rule::before { content: ""; width: 1em; height: 1em; background: currentColor; -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
+.tcard .board { display: flex; gap: 3px; flex-wrap: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
+.tcard .board span { font-size: .58rem; font-weight: 700; line-height: 1; padding: 2px 3px; border-radius: 3px; background: rgba(0,0,0,.45); color: var(--ink); border-left: 3px solid currentColor; white-space: nowrap; }
+.tcard .board span.platinum { color: var(--plat); } .tcard .board span.gold { color: var(--gold); } .tcard .board span.silver { color: var(--silver); } .tcard .board span.bronze { color: var(--bronze); }
+.tcard .board span b { color: var(--ink); font-weight: 700; }
+.tcard .tc-actions { display: flex; gap: var(--s2); margin-top: var(--s1); }
+#ui .tcard .tc-actions button { -webkit-appearance: none; appearance: none; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: .35em; min-height: 44px; min-width: 44px; padding: 0 var(--s4); border: 1px solid var(--line); border-radius: var(--r1); background: rgba(255,255,255,.06); color: var(--ink); font: 700 .78rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
+#ui .tcard .tc-actions button.tc-ride { flex: 1 1 auto; background: var(--amber); color: var(--amber-ink); border-color: transparent; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.05rem; letter-spacing: .04em; }
+#ui .tcard .tc-actions button.tc-ride:disabled { background: rgba(255,255,255,.1); color: var(--ink-dim); cursor: default; }
+#ui .tcard .tc-actions button[hidden] { display: none; }
+#ui .tcard .tc-actions button.on { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* Miniature row: six tiles, the current one underlined amber; a tap snaps the scroller. */
+.tmini { position: absolute; left: var(--tm-x); right: var(--tm-xr); bottom: calc(var(--s3) + var(--sab)); height: 44px; display: flex; gap: var(--s2); z-index: 3; }
+#ui .tm { -webkit-appearance: none; appearance: none; position: relative; flex: 1 1 0; min-width: 44px; min-height: 44px; display: flex; align-items: center; gap: 6px; padding: 0 6px 0 4px; border: 1px solid var(--line-2); border-radius: var(--r1); background: var(--slab); color: var(--ink-dim); cursor: pointer; text-align: left; overflow: hidden; }
+#ui .tm .tm-art { flex: 0 0 auto; width: 44px; height: 32px; background: var(--tint, #222) center / contain no-repeat; border-radius: 3px; opacity: .9; }
+#ui .tm .tm-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+#ui .tm .tm-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: .74rem; line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#ui .tm .tm-dots { display: flex; align-items: center; gap: 3px; font-size: .56rem; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+#ui .tm .tm-dots i { display: block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+#ui .tm .tm-dots i.open { background: transparent; border: 1px dashed rgba(255,255,255,.5); }
+#ui .tm .tm-dots i.locked { background: rgba(255,255,255,.55); -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; border-radius: 0; }
+#ui .tm .tm-dots i.platinum { color: var(--plat); } #ui .tm .tm-dots i.gold { color: var(--gold); } #ui .tm .tm-dots i.silver { color: var(--silver); } #ui .tm .tm-dots i.bronze { color: var(--bronze); }
+#ui .tm.locked .tm-art { filter: grayscale(.8) brightness(.7); }
+#ui .tm.on { color: var(--ink); border-color: var(--amber); box-shadow: inset 0 -3px 0 var(--amber); }
+#ui .tm.on .tm-art { opacity: 1; }
+#ui .tm .tm-txt .tm-blurb { display: none; }
+.tracks-screen.leave .tmap, .tracks-screen.leave .tmini { transition: opacity var(--t3) var(--ease); opacity: 0; }
+html.short .tracks-screen { --tm-top: calc(var(--s4) + var(--sat) + 2.5rem); }
+html.short .tracks-head { top: calc(var(--s4) + var(--sat)); }
+html.short .tcard { padding: var(--s2) var(--s3); gap: 2px; }
+html.short .tcard .tc-tech { display: none; }
+`;
+
+let trackMapInjected = false;
+/** One extra <style> for the diorama track select (kept out of UI_CSS so this block stays a self-contained append). */
+export function injectTrackMapStyles(): void {
+  if (trackMapInjected || typeof document === 'undefined') return;
+  trackMapInjected = true;
+  const el = document.createElement('style');
+  el.id = 'trackmap-css';
+  el.textContent = TRACK_MAP_CSS;
+  document.head.appendChild(el);
+}

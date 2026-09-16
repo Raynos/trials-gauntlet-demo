@@ -1,0 +1,2 @@
+# Vercel builds every file under api/ into a function; the vitest beside the handler is not one.
+api/*.test.ts
