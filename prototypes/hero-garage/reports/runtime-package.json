@@ -1,0 +1,142 @@
+{
+  "source": "dist",
+  "output": "runtime-dist",
+  "command": "node tools/package-runtime.mjs",
+  "files": [
+    {
+      "path": "assets/catalog.json",
+      "bytes": 1198,
+      "sha256": "bf71ee698ea92a598681bb4efa5043a5f56dc6f157a3269fbf278ec8f8484a0a"
+    },
+    {
+      "path": "assets/index-B2aW2QAt.css",
+      "bytes": 4944,
+      "sha256": "31b47e3d688543a583df0c2b7da25f2c0a1817f9573aca01d3d584eabf8f4f88"
+    },
+    {
+      "path": "assets/index-BrBFQuDp.js",
+      "bytes": 698852,
+      "sha256": "8076f2e0c365f9bb931a3f6c37a59bcac15854a2e4734ade8ca4060790a89e7b"
+    },
+    {
+      "path": "assets/street01-bike-materials.glb",
+      "bytes": 6053376,
+      "sha256": "e8ea68d5a6ad504b0e969cd716e957bcac3f436acd3c9eac1357ee722cf05b43"
+    },
+    {
+      "path": "assets/street01-bike-mobile.glb",
+      "bytes": 3645880,
+      "sha256": "7aae3f7c237d0dc5ceff2157527c0ace7b9adae2103b4b0aea434a3c6adedd93"
+    },
+    {
+      "path": "assets/street01-rider-garment-repair.glb",
+      "bytes": 2760380,
+      "sha256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262"
+    },
+    {
+      "path": "assets/street01-rider-mobile.glb",
+      "bytes": 2760380,
+      "sha256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262"
+    },
+    {
+      "path": "identity.html",
+      "bytes": 2797,
+      "sha256": "8ab1c5cd9366f367fa6ff4f70c6f50c93b3ca310de4d1351e5c022a844ab9d77"
+    },
+    {
+      "path": "index.html",
+      "bytes": 439,
+      "sha256": "8d441d16e7cb78ccf689481dc8fdc361d15fee7b5a5976118195b6c97d638a24"
+    },
+    {
+      "path": "licenses/meshoptimizer.txt",
+      "bytes": 1079,
+      "sha256": "f03037ca7bad1e3eb7f4a63fa6084a8baabd5ba30d3c239a9a7f35705d873e26"
+    },
+    {
+      "path": "licenses/NOTICE.txt",
+      "bytes": 404,
+      "sha256": "14ec2ad292e465f3c36c6c3c3655acd8ad6f1092c09aee8b7fc4b9e3eff58178"
+    },
+    {
+      "path": "licenses/three.txt",
+      "bytes": 1081,
+      "sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+    },
+    {
+      "path": "references/target01.png",
+      "bytes": 2268900,
+      "sha256": "5be089f06ef2dded75fb7491602bd580b299b30a271c8c7a334a96915f92b0c0"
+    },
+    {
+      "path": "references/turnaround.png",
+      "bytes": 1992220,
+      "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
+    }
+  ],
+  "totalBytes": 20191930,
+  "sourceDistBytes": 230364446,
+  "excludedFiles": [
+    {
+      "path": "assets/street01-bike.glb",
+      "bytes": 1394072
+    },
+    {
+      "path": "assets/street01-head-authored.glb",
+      "bytes": 8783492
+    },
+    {
+      "path": "assets/street01-head-groom.glb",
+      "bytes": 91811840
+    },
+    {
+      "path": "assets/street01-head-regroom.glb",
+      "bytes": 91811840
+    },
+    {
+      "path": "assets/street01-head-scan.glb",
+      "bytes": 2203452
+    },
+    {
+      "path": "assets/street01-head.glb",
+      "bytes": 2080396
+    },
+    {
+      "path": "assets/street01-rider-cloth.glb",
+      "bytes": 2578868
+    },
+    {
+      "path": "assets/street01-rider-motion.glb",
+      "bytes": 2740896
+    },
+    {
+      "path": "assets/street01-rider-posed.glb",
+      "bytes": 2552976
+    },
+    {
+      "path": "assets/street01-rider-seat.glb",
+      "bytes": 2740448
+    },
+    {
+      "path": "assets/street01-rider.glb",
+      "bytes": 1476800
+    }
+  ],
+  "verifiedLocalUrls": [
+    "assets/index-B2aW2QAt.css",
+    "assets/index-BrBFQuDp.js",
+    "assets/street01-bike-materials.glb",
+    "assets/street01-bike-mobile.glb",
+    "assets/street01-rider-garment-repair.glb",
+    "assets/street01-rider-mobile.glb",
+    "index.html",
+    "references/target01.png",
+    "references/turnaround.png"
+  ],
+  "notes": [
+    "Deterministic file contents and manifest; no timestamp fields.",
+    "Current desktop/mobile catalog GLBs, HTML, bundled code, identity references and runtime licenses only.",
+    "All catalog URLs reject external schemes, protocol-relative paths, backslashes and traversal.",
+    "This is a local prototype package, not a deployment or production completion claim."
+  ]
+}

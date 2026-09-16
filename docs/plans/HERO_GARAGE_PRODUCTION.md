@@ -256,3 +256,7 @@ The existing game again passes frozen WebKit cold boot, 1,038 byte-identical rep
 ### Round 9 technical verification
 
 The frozen existing game passes WebKit cold boot, 1,038 byte-identical replay ticks to an 8.65s clear, crash and one-tick restart. Evidence: `prototypes/hero-garage/reports/round9-ship/report.json`. Portrait key-light shadows now fit asset bounds instead of using a six-metre region and 15mm normal offset. A same-asset orbit retains all art failures; this is a renderer correction, not milestone approval. Large-GLB capture now hashes the upstream bytes forwarded unchanged to WebKit, avoiding inspector-cache eviction.
+
+### Round 17 — complete scene first
+
+The user reaffirmed breadth before hair/beard polish. Those studies stay paused. A 14-file, 20,191,930-byte local runtime package contains the full current rider/bike, desktop/mobile textures and six clips. The recorded packaged WebKit run renders without errors and repeats the canvas byte-identically. Parent inspected sequential frames decoded from the real recording: complete assembly remains visible through orbit and landing motion; clothing, anatomy and detached-looking shadows remain provisional. This is no final-art, physics or iPhone-performance pass. Evidence: `prototypes/hero-garage/reports/whole-package-round17.json`. No new external source was adopted.

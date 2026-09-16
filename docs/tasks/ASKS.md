@@ -35,6 +35,8 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 23 | "Enough questions — **build autonomously**: new garage, new levels, all the little asks; leave the physics-library plan for another agent" | **in flight** | level-select owner spawned on the round-3 default **A3b one tile lit like A3e** (parent's call, reversible); garage + inbox owners running; physics library untouched |
 | 24 | Next after the garage = **level select**; keep all five outfits + three models; physics-library toggle off the main menu when built; stray `0` deleted | **done** | recorded; `0` removed in `d01c42d` |
 
+| HG-01 | Full person + full bike, screenshot in Three.js; work breadth first, pause hair/beard depth | **in flight** | Codex hero owner: complete scene and six poses present; packaged runtime verified, screenshot/recording in captures/whole-package-round17; hair/beard paused, production plan remains open |
+
 ## Standing items the asks imply (parent's list, not the user's words)
 
 - Production deploy after the garage round lands (the v0.2.1 pin stays where it is; production moves).

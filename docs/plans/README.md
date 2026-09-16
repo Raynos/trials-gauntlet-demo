@@ -12,9 +12,11 @@ https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger. **Eve
 
 [HERO_OPEN_WORK.md](HERO_OPEN_WORK.md) lists the remaining pose/elbow fixes, coordination with active R8/render-r15 work, Chromium/Metal issue, garage production milestones and acceptance gates. The five-outfit merge does not close these items.
 
-## Garage production — paused at art gate, September 16
+## Garage production — breadth-first assembly active, September 16
 
 `prototypes/hero-garage/` contains the independent Three.js viewer and preserved head studies. **Latest user direction: breadth first.** Assemble the full mustard Street rider and full blue/white bike, deliver a real Three.js screenshot, then polish individual elements. Head/hair acceptance no longer blocks this assembly. Existing authored project GLBs and their seated/forward/back clips provide the initial whole-scene baseline. Final art, contacts, performance, variants, integration and actual iPhone validation remain open. Hunyuan is an isolated rejected experiment; TRELLIS is paused.
+
+Round 17 verifies the complete rider and bike from a dedicated 20.19 MB runtime package (previous build 230.36 MB, including paused studies). Recorded WebKit full-scene orbit and landing animation render without errors; deterministic canvas replay matches. [Screenshot](../../prototypes/hero-garage/captures/whole-package-round17/webkit-full.png) · [recording](../../prototypes/hero-garage/captures/whole-package-round17/webkit-orbit-relight.webm). **Hair/beard refinement remains paused.** Whole-body proportions, clothing, contacts and bike motion precede detail polish. Art approval and actual iPhone performance remain open. Latest allowance: 23% remaining, 20% floor.
 
 The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The hourly continuation is **paused for the art-quality blocker**, with 34% remaining at the stop; final visual approval stays with the user. Next decision: a source/artist capable of the same identity, or explicit revision toward a finished licensed character. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
 
