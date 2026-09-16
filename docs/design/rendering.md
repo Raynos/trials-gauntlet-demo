@@ -1746,7 +1746,7 @@ owner's scratchpad (`scratchpad/render2/*.mts`), not in the repo.
 ## 14. Blender branch round 1 — the rig drifted and the V2 animation path was never active
 
 2026-09-15, baseline `56e3883`, branch `blender-work`. Full audit and next work:
-`docs/plans/BLENDER_HERO.md`. This is an integration repair, not a hero-art completion.
+`project/archive/BLENDER_HERO.md`. This is an integration repair, not a hero-art completion.
 
 **Correction to round 13's H2 claims:** V2's getter did not publish `riderBody`,
 although the type and render consumer existed. Real V2 play therefore took the

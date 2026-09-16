@@ -1,5 +1,7 @@
 # Close-out — the shortest path to archiving every plan (2026-09-15, 16:30 → 19:30)
 
+**Closed: 2026-09-15 evening.** The window's outcome: Physics v2 (tag `physics-v2-final`), PERF (cut #4b) and the mega plan (v0.2.0 = `b52dfd0`) archived; Rider on Glass G closed, H redefined by the user as "the whole Astra branch merged" (physics R8 + render r15 port the last two pieces). Live status is `docs/plans/PLANS.md`.
+
 The user: "get them all done in the next three hours; biggest-impact things; stop the inky-dinky waves".
 This page is the contract for that. Everything below runs **in parallel**, one owner each, one commit each,
 and the parent pins at the end. Done lines are the plans' own, restated as the *minimum true statement*.

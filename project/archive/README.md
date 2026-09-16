@@ -16,4 +16,7 @@ Contents
 - `PERF.md` — the perf plan, closed 2026-09-15 at cut #4b (`831e9c4`); the live remainder is `docs/plans/PERF-BACKLOG.md`.
 - `physics-v2.md` — the physics v2 design, closed 2026-09-15 at tag `physics-v2-final` (R6); status lives on in `docs/design/physics.md`.
 - `MEGA_PLAN.md` — the v0.1.0 → v0.2.0 mega build, closed 2026-09-15 at tag `v0.2.0` (`b52dfd0`); the numbers are in `RELEASES.md`.
-- (next: `docs/tasks/touch-navigation-invariant.md` once the user confirms it on the phone)
+- `CLOSEOUT.md` — the 3-hour close-out contract of 2026-09-15; ran to its outcome.
+- `BLENDER_HERO.md` — Astra's branch plan; the branch is on `main`, the open remainder is `docs/plans/HERO_OPEN_WORK.md`.
+- `loading-progress-invariant.md`, `touch-navigation-invariant.md` — the two P0 task docs, both landed and holding.
+- (next: `docs/plans/RIDER_ON_GLASS.md` and `docs/tasks/blender-branch-merge.md` when physics R8 + render r15 land)

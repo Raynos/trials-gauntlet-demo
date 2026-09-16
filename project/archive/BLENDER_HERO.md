@@ -1,5 +1,7 @@
 # Blender hero — rider, bike, and Three.js integration
 
+**Closed: 2026-09-15.** The `blender-work` branch is on `main` (merge #3 `12e818b` on main's terms, then Astra's rebase `afeb5c9…3e05e58`). What is still open on the hero is `docs/plans/HERO_OPEN_WORK.md`; the art track is `docs/plans/HERO_GARAGE_PRODUCTION.md`.
+
 Owner: Codex Blender session. Branch: `blender-work`, in the explicitly authorized
 `trials-gauntlet-blender` worktree. Baseline: `56e3883` (2026-09-15).
 

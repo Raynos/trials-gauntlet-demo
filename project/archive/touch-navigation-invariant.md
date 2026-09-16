@@ -1,5 +1,7 @@
 # Task: touch navigation — nothing is tappable unless it is drawn
 
+**Closed: 2026-09-15.** `.live` rule + NavLog + the 5184-tap grid (0 ghosts) landed in `18df821`; the user then cleared 6 / 15 tracks on the phone with no further button reports — taken as the phone confirmation. The rule lives on in `src/ui/live.ts` and `harness/e2e/touch.mts --only=grid`.
+
 Status: FIXED IN CODE, AWAITING THE PHONE (2026-09-14, core-game). Instrument, helper, five instances and the grid test are in; the human's confirmation on the iPhone is the open item.
 Owner: core-game. Priority: P0 — the human tester cannot play through a run on the phone.
 

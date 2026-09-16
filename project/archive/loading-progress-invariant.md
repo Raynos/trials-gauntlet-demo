@@ -1,5 +1,7 @@
 # Task: loading progress — the number is the boot sequence's own declaration, never an observation
 
+**Closed: 2026-09-15.** Built as the typed boot plan + two-track B Odometer loader; boot e2e 8/8 (LTE/3G × SW × art, monotone to 100/100) holds through the hero merge (`bdba62d`). The invariant lives on in `src/boot/*` and `harness/e2e/boot.mts`.
+
 Status: DONE (2026-09-15, core-game) — built as §4 with two fractions (the user's B Odometer decision), see §7 Result; the phone clip is the one item of §6 not yet taken.
 Owner: core-game. Priority: P0 — the first thing every phone tester sees has been wrong six times today,
 and the seventh is on screen now.

@@ -451,7 +451,7 @@ only).
 ## 12. Loading screen (`src/boot/**`, `index.html`, `vite.config.ts` `trials:load-manifest`)
 
 > **Progress is the boot sequence's own declaration of work done over work declared, and the loader can
-> only display it.** (docs/tasks/loading-progress-invariant.md — the seven-incident review that led here.)
+> only display it.** (project/archive/loading-progress-invariant.md — the seven-incident review that led here.)
 
 Two numbers, DOWNLOAD and SETUP (the user's decision: "B Odometer" with both tracks kept, `assets/design/loading/SPEC.md`
 §B), each an arithmetic identity over one typed table, each non-decreasing by construction and each exactly 1 when

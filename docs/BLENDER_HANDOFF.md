@@ -122,7 +122,7 @@ These are aspirational targets, not implemented screenshots. The user is choosin
 Street 1 (bare head / mustard), 2 (small open-face helmet / charcoal), or 4 (bare
 head / charcoal). Parent recommends 1, with 3/5 for Race. Do not keep refining the
 rejected Street helmet while this decision is pending. Builders are parked.
-The explicit finish checklist is in `docs/plans/BLENDER_HERO.md`.
+The explicit finish checklist is in `project/archive/BLENDER_HERO.md`.
 
 ### Actual progress and remaining visual problems
 
@@ -253,7 +253,7 @@ the deterministic harness still owns physics replay and capture evidence.
 Latest user steering: zoom out and build a coherent AAA visual upgrade instead
 of spending more rounds on small repairs. Physics investigation is paused with
 all failures preserved. Two builders now own the complete outfit and bike visual
-rebuild; see the Visual mega build section in `docs/plans/BLENDER_HERO.md`.
+rebuild; see the Visual mega build section in `project/archive/BLENDER_HERO.md`.
 The curved helmet now has valid Street/Race v2 scratch sources, awaiting parent
 played review, with no export/promotion. `author_helmet.py` remains outside this
 checkpoint; read `harness/out/blender/r8-helmet/HANDOFF.md`.
