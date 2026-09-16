@@ -15,3 +15,5 @@ Head/groom provenance is inherited from `art/sources/replacement-hair/` and `art
 Parent verified real Three.js full/portrait captures and inspected sequential decoded frames of a forward-rise orbit. The head remains attached in sampled motion. All six clips load; no browser errors; deterministic canvas replay matches. Evidence: `reports/full-rider-saved-identity-a1.json` and `reports/full-rider-saved-identity-motion.json`.
 
 Round 24 removes the pale old-neck overlays while preserving all 244 non-index accessor payloads, scene nodes, materials and animations. Matched portrait and decoded forward-rise orbit review support adoption; the ragged collar remains open. Evidence: `reports/neck-cleanup-round24-review.json`.
+
+The active catalog now uses the derivative `street01-rider-collar-uv.glb`. After this identity builder, run `art/collar-uv-repair/build.py` with background Blender from the repository root, then build/package the viewer. This applies the round-25 texture-only collar repair; the identity source stays reproducible and unchanged.

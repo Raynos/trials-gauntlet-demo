@@ -1,0 +1,12 @@
+{
+  "renderedTriangleCornerAttributesIdentical": {
+    "POSITION": true,
+    "NORMAL": true,
+    "JOINTS_0": true,
+    "WEIGHTS_0": true
+  },
+  "changedUVTriangles": 584,
+  "minimumRepairedUVArea": 3.10810464725364e-05,
+  "nonBodyAccessorBytesIdentical": true,
+  "animationsSkinNodesMaterialsTexturesImagesIdentical": true
+}

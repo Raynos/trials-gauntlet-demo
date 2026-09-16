@@ -32,6 +32,8 @@ Round 23 isolates the neck defect with a [false-color component diagnostic](../.
 
 Round 24 removes the 347 identified old-neck triangles: pale overlays disappear while saved face/curls/beard and all six clip payloads remain unchanged. [Review](../../prototypes/hero-garage/reports/neck-cleanup-round24-review.json). Ragged collar shape/UVs remain. Fresh frozen game ship gate passes cold boot, exact replay, clear, crash and one-tick restart.
 
+Round 25 repairs 584 collapsed collar UV triangles; dark texture streaks improve, while geometry, skinning and saved identity remain unchanged. [Review](../../prototypes/hero-garage/reports/collar-uv-round25-review.json). Active catalog now uses the reproducible collar-UV derivative. Ragged collar shape and final continuous unwrap remain open.
+
 The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The earlier hourly automation remains paused; this goal is actively progressing through whole-scene work. Latest checked allowance is 21% remaining. Final visual approval stays with the user. Better body/clothing sources are being assessed without changing target01 identity. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
 
 ## Independent audit — 2026-09-15

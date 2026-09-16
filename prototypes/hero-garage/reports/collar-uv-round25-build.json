@@ -1,0 +1,12 @@
+{
+  "sourceSHA256": "4ab4c5863ddc738c9254eca945e85ec7d6c0d0df1078d5a6b8d3c085db17bc11",
+  "outputSHA256": "67302f649eff8f536e17f99c55c15c673503bf3ccdf8e64f97ca87ec41d69e3c",
+  "repairedTriangles": 584,
+  "duplicatedVertices": 1752,
+  "originalBinaryPrefixUnchanged": true,
+  "method": "Inset heavy-cotton atlas triangle reused per collar triangle; UV-only trial, original vertices preserved.",
+  "limitations": [
+    "Repeated triangle patch is provisional, not a continuous production unwrap.",
+    "Shape and weights unchanged; ragged collar geometry remains."
+  ]
+}

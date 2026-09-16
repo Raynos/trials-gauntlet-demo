@@ -22,3 +22,6 @@ runtime-dist/
 
 # Local appearance assembly (>100 MB), reproducible from retained source GLBs.
 public/assets/street01-rider-identity.glb
+
+# Reproducible local dense identity with collar UV repair.
+public/assets/street01-rider-collar-uv.glb

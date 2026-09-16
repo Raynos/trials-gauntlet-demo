@@ -10,8 +10,8 @@
     },
     {
       "path": "assets/catalog.json",
-      "bytes": 1187,
-      "sha256": "b493da28657bcf82508ec861b365e6250b0b78bcee44d606634d81db1e0578ed"
+      "bytes": 1189,
+      "sha256": "de3248d26b84ccb226edb2d52506535fd9086b9e091676d2a734f307466b807e"
     },
     {
       "path": "assets/index-B2aW2QAt.css",
@@ -34,9 +34,9 @@
       "sha256": "da0347ff994e06943f494a411caba4c6dc8cd0c78eff6cc0251dd1d5657f112a"
     },
     {
-      "path": "assets/street01-rider-identity.glb",
-      "bytes": 173117400,
-      "sha256": "4ab4c5863ddc738c9254eca945e85ec7d6c0d0df1078d5a6b8d3c085db17bc11"
+      "path": "assets/street01-rider-collar-uv.glb",
+      "bytes": 175062870,
+      "sha256": "67302f649eff8f536e17f99c55c15c673503bf3ccdf8e64f97ca87ec41d69e3c"
     },
     {
       "path": "decoders/basis/basis_transcoder.js",
@@ -89,8 +89,8 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 188129575,
-  "sourceDistBytes": 416701561,
+  "totalBytes": 190075047,
+  "sourceDistBytes": 591764433,
   "excludedFiles": [
     {
       "path": "assets/basis_transcoder-VXdx5NbI.wasm",
@@ -137,6 +137,10 @@
       "bytes": 2760380
     },
     {
+      "path": "assets/street01-rider-identity.glb",
+      "bytes": 173117400
+    },
+    {
       "path": "assets/street01-rider-mobile-ktx.glb",
       "bytes": 4179220
     },
@@ -166,7 +170,7 @@
     "assets/index-BnIdGVnQ.js",
     "assets/street01-bike-materials.glb",
     "assets/street01-bike-mobile-ktx.glb",
-    "assets/street01-rider-identity.glb",
+    "assets/street01-rider-collar-uv.glb",
     "index.html",
     "references/target01.png",
     "references/turnaround.png"

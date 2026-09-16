@@ -1,0 +1,16 @@
+{
+  "round": 25,
+  "decision": "Adopt corrected collar UV repair provisionally",
+  "outputSHA256": "67302f649eff8f536e17f99c55c15c673503bf3ccdf8e64f97ca87ec41d69e3c",
+  "reviewMethod": "Matched portrait plus sequential decoded frames from actual forward-rise orbit; not continuous playback.",
+  "finding": "Correct glTF V conversion restores mustard cloth and reduces the dark stretched collar streaks. Ragged silhouette and front seam remain.",
+  "rejectedAttempt": "Initial atlas coordinates omitted Blender-to-glTF vertical conversion and sampled black/white texels; not adopted.",
+  "preservationReport": "collar-uv-round25-preservation.json",
+  "renderReport": "collar-uv-round25-a2.json",
+  "activeAsset": "/assets/street01-rider-collar-uv.glb",
+  "limitations": [
+    "Per-triangle patch reuse is interim; continuous production unwrap remains open.",
+    "Geometry and deformation unchanged; collar shape still visibly rough.",
+    "No final art, iPhone performance or game integration approval."
+  ]
+}
