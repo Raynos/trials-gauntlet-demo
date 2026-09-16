@@ -1,0 +1,409 @@
+{
+  "pass": true,
+  "source": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/createStreetMustard.ts",
+  "sourceHash": "a303b69015d7a97cc97e091f8f3206aa401a515a78fca9fbb5b5d5c339ed4acc",
+  "backend": "metal",
+  "browserVersion": "151.0.7922.34",
+  "config": {
+    "scalpApproved": true,
+    "neutral": true,
+    "camera": {
+      "id": "front",
+      "azimuthDegrees": 0,
+      "position": [
+        0.008539445628997867,
+        0.8805117270788912,
+        5.273445632271392
+      ],
+      "target": [
+        0.008539445628997867,
+        0.8805117270788912,
+        0
+      ],
+      "fovDegrees": 20,
+      "aspect": 0.5051020408163265,
+      "near": 0.01,
+      "far": 100,
+      "viewport": {
+        "width": 495,
+        "height": 980,
+        "deviceScaleFactor": 1
+      },
+      "referenceOverlayApplicable": true
+    },
+    "module": "/assets/design/hero-targets/reconstruction/createStreetMustard.ts",
+    "options": {},
+    "pose": {},
+    "azimuth": 0,
+    "elevation": 8,
+    "zoom": 1
+  },
+  "stats": {
+    "allTriangles": 316996,
+    "allMeshes": 33,
+    "excludedInvisible": [
+      "Semantic rider root; invisible selection proxy",
+      "Dropped hood with thick folded rim and open interior",
+      "Semantic paired gripping gloves; no additional visible palm",
+      "Semantic paired high-top shoe assembly",
+      "Padded shoe tongue l behind lacing",
+      "Padded shoe tongue r behind lacing",
+      "Sleeve l tapered upper arm continuous at shoulder",
+      "Rolled sleeve cuff l with a sewn folded edge",
+      "Jeans thigh l continuous crotch to precurved knee",
+      "Jeans lower leg l taper and ankle stack",
+      "Sleeve r tapered upper arm continuous at shoulder",
+      "Rolled sleeve cuff r with a sewn folded edge",
+      "Jeans thigh r continuous crotch to precurved knee",
+      "Jeans lower leg r taper and ankle stack"
+    ],
+    "unboundSkinBasePreview": [
+      "Connected mustard torso shell with shaped shoulder armholes",
+      "Connected indigo pelvis crotch and waistband shell",
+      "Glove palm l contacting cylindrical grip",
+      "Glove palm r contacting cylindrical grip",
+      "High-top upper l with separate tongue and heel counter",
+      "High-top upper r with separate tongue and heel counter",
+      "Sleeve l tapered upper arm continuous at shoulder",
+      "Exposed forearm l radius-ulna taper toward glove",
+      "Jeans thigh l continuous crotch to precurved knee",
+      "Jeans lower leg l taper and ankle stack",
+      "Sleeve r tapered upper arm continuous at shoulder",
+      "Exposed forearm r radius-ulna taper toward glove",
+      "Jeans thigh r continuous crotch to precurved knee",
+      "Jeans lower leg r taper and ankle stack"
+    ],
+    "skinScope": "Unbound skins shown as unchanged base mesh geometry; no rig or animation acceptance.",
+    "optimizationStatus": "unoptimized; triangle budget acceptance not claimed",
+    "module": "/assets/design/hero-targets/reconstruction/createStreetMustard.ts",
+    "factory": "createStreetMustardBareheadRiderModel",
+    "exports": [
+      "configureStreetMustardBareheadRiderRenderer",
+      "createStreetMustardBareheadRiderEnvironment",
+      "createStreetMustardBareheadRiderInspectControls",
+      "createStreetMustardBareheadRiderLookDevLights",
+      "createStreetMustardBareheadRiderModel",
+      "createStreetMustardBareheadRiderPresentationComposer",
+      "frameStreetMustardBareheadRiderCamera"
+    ],
+    "triangles": 292804,
+    "meshes": 19,
+    "materials": 19,
+    "finite": true,
+    "bounds": {
+      "min": [
+        -0.39301174226403235,
+        0.009999999776482582,
+        -0.18469306826591492
+      ],
+      "max": [
+        0.39301174226403235,
+        1.7589625435471536,
+        0.20688222348690033
+      ]
+    },
+    "nodes": [
+      "Street mustard barehead rider",
+      "Semantic rider root; invisible selection proxy__pivot",
+      "Semantic rider root; invisible selection proxy",
+      "Anatomical cranial face and jaw field__pivot",
+      "Neck embedded in collar, continuous lower jaw transition__pivot",
+      "Scalp-conforming swept dark hair shell__pivot",
+      "Scalp-conforming swept dark hair shell",
+      "Ear l helix and recessed concha__pivot",
+      "Ear l helix and recessed concha",
+      "Eye l behind eyelid opening__pivot",
+      "Eye l behind eyelid opening",
+      "Ear r helix and recessed concha__pivot",
+      "Ear r helix and recessed concha",
+      "Eye r behind eyelid opening__pivot",
+      "Eye r behind eyelid opening",
+      "Connected mustard torso shell with shaped shoulder armholes__pivot",
+      "Connected mustard torso shell with shaped shoulder armholes",
+      "Dropped hood with thick folded rim and open interior__pivot",
+      "Dropped hood with thick folded rim and open interior",
+      "Connected indigo pelvis crotch and waistband shell__pivot",
+      "Rear jean pocket l sewn onto hip curve__pivot",
+      "Rear jean pocket l sewn onto hip curve",
+      "Rear jean pocket r sewn onto hip curve__pivot",
+      "Rear jean pocket r sewn onto hip curve",
+      "Connected indigo pelvis crotch and waistband shell",
+      "Semantic paired gripping gloves; no additional visible palm__pivot",
+      "Semantic paired gripping gloves; no additional visible palm",
+      "Glove palm l contacting cylindrical grip__pivot",
+      "Glove palm l contacting cylindrical grip",
+      "Glove palm r contacting cylindrical grip__pivot",
+      "Glove palm r contacting cylindrical grip",
+      "Semantic paired high-top shoe assembly__pivot",
+      "Semantic paired high-top shoe assembly",
+      "High-top upper l with separate tongue and heel counter__pivot",
+      "Off-white rubber sole l with two narrow bands__pivot",
+      "Off-white rubber sole l with two narrow bands",
+      "Padded shoe tongue l behind lacing__pivot",
+      "Padded shoe tongue l behind lacing",
+      "High-top upper l with separate tongue and heel counter",
+      "High-top upper r with separate tongue and heel counter__pivot",
+      "Off-white rubber sole r with two narrow bands__pivot",
+      "Off-white rubber sole r with two narrow bands",
+      "Padded shoe tongue r behind lacing__pivot",
+      "Padded shoe tongue r behind lacing",
+      "High-top upper r with separate tongue and heel counter",
+      "Sleeve l tapered upper arm continuous at shoulder__pivot",
+      "Sleeve l tapered upper arm continuous at shoulder",
+      "Rolled sleeve cuff l with a sewn folded edge__pivot",
+      "Rolled sleeve cuff l with a sewn folded edge",
+      "Exposed forearm l radius-ulna taper toward glove__pivot",
+      "Exposed forearm l radius-ulna taper toward glove",
+      "Jeans thigh l continuous crotch to precurved knee__pivot",
+      "Jeans thigh l continuous crotch to precurved knee",
+      "Jeans lower leg l taper and ankle stack__pivot",
+      "Jeans lower leg l taper and ankle stack",
+      "Sleeve r tapered upper arm continuous at shoulder__pivot",
+      "Sleeve r tapered upper arm continuous at shoulder",
+      "Rolled sleeve cuff r with a sewn folded edge__pivot",
+      "Rolled sleeve cuff r with a sewn folded edge",
+      "Exposed forearm r radius-ulna taper toward glove__pivot",
+      "Exposed forearm r radius-ulna taper toward glove",
+      "Jeans thigh r continuous crotch to precurved knee__pivot",
+      "Jeans thigh r continuous crotch to precurved knee",
+      "Jeans lower leg r taper and ankle stack__pivot",
+      "Jeans lower leg r taper and ankle stack",
+      "pelvis",
+      "spine",
+      "chest",
+      "neck",
+      "head",
+      "shoulder.L",
+      "upperArm.L",
+      "forearm.L",
+      "hand.L",
+      "shoulder.R",
+      "upperArm.R",
+      "forearm.R",
+      "hand.R",
+      "thigh.L",
+      "shin.L",
+      "foot.L",
+      "thigh.R",
+      "shin.R",
+      "foot.R",
+      "Neck embedded in collar, continuous lower jaw transition",
+      "Anatomical cranial face and jaw field"
+    ],
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+    "view": {
+      "azimuth": 0,
+      "elevation": 8,
+      "zoom": 1
+    },
+    "errors": []
+  },
+  "frames": 180,
+  "fps": 30,
+  "seconds": 6,
+  "width": 495,
+  "height": 980,
+  "loadedModules": {
+    "/harness/out/blender/img2-preview/main.ts": "9039b4763788cd912a31bfbb9a8c5b418513a936fa396cef705edc8f7f1a44d5",
+    "/assets/design/hero-targets/reconstruction/createStreetMustard.ts": "4b0aea5f4399bfe1e5c2e69375ddaa661ecc379e6c62dca3b13caee02270529c"
+  },
+  "errors": [],
+  "scalpGate": {
+    "path": "harness/out/blender/img2-preview/scalp-blockout-05/scalp-report.json",
+    "verdict": "pass",
+    "sourceHash": "a303b69015d7a97cc97e091f8f3206aa401a515a78fca9fbb5b5d5c339ed4acc"
+  },
+  "cameraManifest": {
+    "version": 1,
+    "status": "initial-construction-framing-not-calibrated",
+    "solved": false,
+    "finalIdentityReference": "../01-street-barehead.png",
+    "constructionReference": "turnaround-front.png",
+    "sourceSha256": "5c948a7794ec6b5ac4f4e57656ec7b48871e2f03235ebd43eb3e743c74395cae",
+    "mask": "turnaround-front-reviewed-mask.png",
+    "maskSha256": "c83c56dfed60893c5046eef580b32e87734aaf2a791780bdc2c4ecd30499f88f",
+    "maskReview": "front-mask-review.json",
+    "maskBoundingBoxExclusive": [
+      24,
+      16,
+      462,
+      954
+    ],
+    "maskUse": "silhouette geometry overlay only; not authorization to sample reference RGB as albedo",
+    "designAssumptions": {
+      "statureMetres": 1.78,
+      "statureSource": "selected existing consumer scaffold, not measured likeness",
+      "fovDegrees": 20,
+      "projection": "perspective weak-perspective hypothesis",
+      "worldForward": "+Z",
+      "worldUp": "+Y",
+      "characterLeft": "+X"
+    },
+    "framing": {
+      "worldUnitsPerPixelAtZ0": 0.0018976545842217484,
+      "verticalSpanAtZ0": 1.8597014925373134,
+      "distance": 5.273445632271392
+    },
+    "views": [
+      {
+        "id": "front",
+        "azimuthDegrees": 0,
+        "position": [
+          0.008539445628997867,
+          0.8805117270788912,
+          5.273445632271392
+        ],
+        "target": [
+          0.008539445628997867,
+          0.8805117270788912,
+          0
+        ],
+        "fovDegrees": 20,
+        "aspect": 0.5051020408163265,
+        "near": 0.01,
+        "far": 100,
+        "viewport": {
+          "width": 495,
+          "height": 980,
+          "deviceScaleFactor": 1
+        },
+        "referenceOverlayApplicable": true
+      },
+      {
+        "id": "front-right",
+        "azimuthDegrees": 35,
+        "position": [
+          3.033263598678212,
+          0.8805117270788912,
+          4.319753770121966
+        ],
+        "target": [
+          0.008539445628997867,
+          0.8805117270788912,
+          0
+        ],
+        "fovDegrees": 20,
+        "aspect": 0.5051020408163265,
+        "near": 0.01,
+        "far": 100,
+        "viewport": {
+          "width": 495,
+          "height": 980,
+          "deviceScaleFactor": 1
+        },
+        "referenceOverlayApplicable": false
+      },
+      {
+        "id": "front-left",
+        "azimuthDegrees": -35,
+        "position": [
+          -3.016184707420216,
+          0.8805117270788912,
+          4.319753770121966
+        ],
+        "target": [
+          0.008539445628997867,
+          0.8805117270788912,
+          0
+        ],
+        "fovDegrees": 20,
+        "aspect": 0.5051020408163265,
+        "near": 0.01,
+        "far": 100,
+        "viewport": {
+          "width": 495,
+          "height": 980,
+          "deviceScaleFactor": 1
+        },
+        "referenceOverlayApplicable": false
+      },
+      {
+        "id": "right",
+        "azimuthDegrees": 90,
+        "position": [
+          5.28198507790039,
+          0.8805117270788912,
+          3.2290541570193755e-16
+        ],
+        "target": [
+          0.008539445628997867,
+          0.8805117270788912,
+          0
+        ],
+        "fovDegrees": 20,
+        "aspect": 0.5051020408163265,
+        "near": 0.01,
+        "far": 100,
+        "viewport": {
+          "width": 495,
+          "height": 980,
+          "deviceScaleFactor": 1
+        },
+        "referenceOverlayApplicable": false
+      },
+      {
+        "id": "back",
+        "azimuthDegrees": 180,
+        "position": [
+          0.008539445628998513,
+          0.8805117270788912,
+          -5.273445632271392
+        ],
+        "target": [
+          0.008539445628997867,
+          0.8805117270788912,
+          0
+        ],
+        "fovDegrees": 20,
+        "aspect": 0.5051020408163265,
+        "near": 0.01,
+        "far": 100,
+        "viewport": {
+          "width": 495,
+          "height": 980,
+          "deviceScaleFactor": 1
+        },
+        "referenceOverlayApplicable": false
+      },
+      {
+        "id": "left",
+        "azimuthDegrees": 270,
+        "position": [
+          -5.264906186642395,
+          0.8805117270788912,
+          -9.687162471058125e-16
+        ],
+        "target": [
+          0.008539445628997867,
+          0.8805117270788912,
+          0
+        ],
+        "fovDegrees": 20,
+        "aspect": 0.5051020408163265,
+        "near": 0.01,
+        "far": 100,
+        "viewport": {
+          "width": 495,
+          "height": 980,
+          "deviceScaleFactor": 1
+        },
+        "referenceOverlayApplicable": false
+      }
+    ],
+    "projection": {
+      "enabled": false,
+      "readiness": "projection-readiness.json"
+    },
+    "requiredNextEvidence": [
+      "render procedural blockout front with this fixed camera; inspect overlay against reviewed mask",
+      "capture fixed ±35/90/180/270 degree views with identical camera distance/FOV and no per-view auto-framing",
+      "refine shape, pose and camera together against front/side/back construction refs; do not infer a true lens from silhouette bounds",
+      "later pose against target01 original gameplay identity and validate rig/socket compatibility",
+      "review accepted de-lit per-region imagery and calibrated overlay before enabling any projected albedo"
+    ]
+  },
+  "videoEncodedWidth": 496,
+  "videoEncodedHeight": 980,
+  "clipSha256": "b677fbd28f94869fff50c7feb723d615901a663579653bb4deaec5189463ecaf",
+  "scope": "Standalone Group inspection; fixed pose, orbiting camera. Not gameplay, rig animation validation, or visual approval."
+}

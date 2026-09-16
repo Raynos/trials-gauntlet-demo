@@ -2286,9 +2286,9 @@
       "role": "shell",
       "importance": 0.95,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Connected mustard torso shell with shaped shoulder armholes; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "Connected mustard torso shell with shaped shoulder armholes",
         "edgeTreatment": {
@@ -2298,29 +2298,478 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.1634,
-              -0.275
-            ],
-            [
-              0.215,
-              -0.11000000000000001
-            ],
-            [
-              0.1935,
-              0.165
-            ],
-            [
-              0.1376,
-              0.275
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "abdomen",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                1.119,
+                0.007
+              ],
+              "radii": [
+                0.2,
+                0.231,
+                0.12
+              ]
+            },
+            {
+              "id": "ribcage",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                1.298,
+                0.003
+              ],
+              "radii": [
+                0.191,
+                0.204,
+                0.121
+              ]
+            },
+            {
+              "id": "shoulder-yoke",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                1.394,
+                -0.004
+              ],
+              "radii": [
+                0.205,
+                0.065,
+                0.113
+              ]
+            },
+            {
+              "id": "hem",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.98,
+                0.003
+              ],
+              "radii": [
+                0.193,
+                0.065,
+                0.113
+              ]
+            },
+            {
+              "id": "shoulder-cap-l",
+              "type": "ellipsoid",
+              "center": [
+                0.175,
+                1.411,
+                0
+              ],
+              "radii": [
+                0.09,
+                0.08,
+                0.092
+              ]
+            },
+            {
+              "id": "upper-sleeve-l-cone",
+              "type": "cone",
+              "radius": 0.083,
+              "height": 1.0971925481219427,
+              "transform": {
+                "position": [
+                  0.37136111111111114,
+                  0.900861111111111,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -2.7852813979374185
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.04
+                ]
+              }
+            },
+            {
+              "id": "upper-sleeve-l-clip",
+              "type": "box",
+              "size": [
+                0.246,
+                0.23794537188186712,
+                0.246
+              ],
+              "transform": {
+                "position": [
+                  0.2215,
+                  1.3035,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -2.7852813979374185
+                ]
+              }
+            },
+            {
+              "id": "lower-sleeve-l-cone",
+              "type": "cone",
+              "radius": 0.066,
+              "height": 0.49648600477876154,
+              "transform": {
+                "position": [
+                  0.3289411764705882,
+                  0.9632352941176471,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -2.8643671080276754
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.03
+                ]
+              }
+            },
+            {
+              "id": "lower-sleeve-l-clip",
+              "type": "box",
+              "size": [
+                0.21200000000000002,
+                0.1278827588066507,
+                0.21200000000000002
+              ],
+              "transform": {
+                "position": [
+                  0.27849999999999997,
+                  1.1404999999999998,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -2.8643671080276754
+                ]
+              }
+            },
+            {
+              "id": "cuff-l",
+              "type": "ellipsoid",
+              "center": [
+                0.296,
+                1.087,
+                0
+              ],
+              "radii": [
+                0.051,
+                0.029,
+                0.052
+              ]
+            },
+            {
+              "id": "shoulder-cap-r",
+              "type": "ellipsoid",
+              "center": [
+                -0.175,
+                1.411,
+                0
+              ],
+              "radii": [
+                0.09,
+                0.08,
+                0.092
+              ]
+            },
+            {
+              "id": "upper-sleeve-r-cone",
+              "type": "cone",
+              "radius": 0.083,
+              "height": 1.0971925481219427,
+              "transform": {
+                "position": [
+                  -0.37136111111111114,
+                  0.900861111111111,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  2.7852813979374185
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.04
+                ]
+              }
+            },
+            {
+              "id": "upper-sleeve-r-clip",
+              "type": "box",
+              "size": [
+                0.246,
+                0.23794537188186712,
+                0.246
+              ],
+              "transform": {
+                "position": [
+                  -0.2215,
+                  1.3035,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  2.7852813979374185
+                ]
+              }
+            },
+            {
+              "id": "lower-sleeve-r-cone",
+              "type": "cone",
+              "radius": 0.066,
+              "height": 0.49648600477876154,
+              "transform": {
+                "position": [
+                  -0.3289411764705882,
+                  0.9632352941176471,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  2.8643671080276754
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.03
+                ]
+              }
+            },
+            {
+              "id": "lower-sleeve-r-clip",
+              "type": "box",
+              "size": [
+                0.21200000000000002,
+                0.1278827588066507,
+                0.21200000000000002
+              ],
+              "transform": {
+                "position": [
+                  -0.27849999999999997,
+                  1.1404999999999998,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  2.8643671080276754
+                ]
+              }
+            },
+            {
+              "id": "cuff-r",
+              "type": "ellipsoid",
+              "center": [
+                -0.296,
+                1.087,
+                0
+              ],
+              "radii": [
+                0.051,
+                0.029,
+                0.052
+              ]
+            },
+            {
+              "id": "dropped-hood",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                1.444,
+                -0.084
+              ],
+              "radii": [
+                0.144,
+                0.102,
+                0.101
+              ]
+            },
+            {
+              "id": "hood-opening",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                1.538,
+                0.016
+              ],
+              "radii": [
+                0.088,
+                0.145,
+                0.113
+              ]
+            },
+            {
+              "id": "hem-plane",
+              "type": "box",
+              "center": [
+                0,
+                1.3,
+                0
+              ],
+              "size": [
+                1,
+                0.708,
+                1
+              ]
+            }
           ],
-          "segments": 32
-        }
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "smooth-union",
+              "left": "abdomen",
+              "right": "ribcage",
+              "radius": 0.025
+            },
+            {
+              "id": "op-1",
+              "type": "smooth-union",
+              "left": "op-0",
+              "right": "shoulder-yoke",
+              "radius": 0.028
+            },
+            {
+              "id": "op-2",
+              "type": "smooth-union",
+              "left": "op-1",
+              "right": "hem",
+              "radius": 0.018
+            },
+            {
+              "id": "op-3",
+              "type": "smooth-union",
+              "left": "op-2",
+              "right": "shoulder-cap-l",
+              "radius": 0.02
+            },
+            {
+              "id": "op-4",
+              "type": "intersect",
+              "left": "upper-sleeve-l-cone",
+              "right": "upper-sleeve-l-clip"
+            },
+            {
+              "id": "op-5",
+              "type": "smooth-union",
+              "left": "op-3",
+              "right": "op-4",
+              "radius": 0.025
+            },
+            {
+              "id": "op-6",
+              "type": "intersect",
+              "left": "lower-sleeve-l-cone",
+              "right": "lower-sleeve-l-clip"
+            },
+            {
+              "id": "op-7",
+              "type": "smooth-union",
+              "left": "op-5",
+              "right": "op-6",
+              "radius": 0.016
+            },
+            {
+              "id": "op-8",
+              "type": "smooth-union",
+              "left": "op-7",
+              "right": "cuff-l",
+              "radius": 0.011
+            },
+            {
+              "id": "op-9",
+              "type": "smooth-union",
+              "left": "op-8",
+              "right": "shoulder-cap-r",
+              "radius": 0.02
+            },
+            {
+              "id": "op-10",
+              "type": "intersect",
+              "left": "upper-sleeve-r-cone",
+              "right": "upper-sleeve-r-clip"
+            },
+            {
+              "id": "op-11",
+              "type": "smooth-union",
+              "left": "op-9",
+              "right": "op-10",
+              "radius": 0.025
+            },
+            {
+              "id": "op-12",
+              "type": "intersect",
+              "left": "lower-sleeve-r-cone",
+              "right": "lower-sleeve-r-clip"
+            },
+            {
+              "id": "op-13",
+              "type": "smooth-union",
+              "left": "op-11",
+              "right": "op-12",
+              "radius": 0.016
+            },
+            {
+              "id": "op-14",
+              "type": "smooth-union",
+              "left": "op-13",
+              "right": "cuff-r",
+              "radius": 0.011
+            },
+            {
+              "id": "op-15",
+              "type": "smooth-union",
+              "left": "op-14",
+              "right": "dropped-hood",
+              "radius": 0.02
+            },
+            {
+              "id": "op-16",
+              "type": "subtract",
+              "left": "op-15",
+              "right": "hood-opening"
+            },
+            {
+              "id": "op-17",
+              "type": "intersect",
+              "left": "op-16",
+              "right": "hem-plane"
+            }
+          ],
+          "resolution": 64,
+          "bounds": {
+            "min": [
+              -0.375,
+              0.936,
+              -0.205
+            ],
+            "max": [
+              0.375,
+              1.558,
+              0.15
+            ]
+          }
+        },
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "root",
       "attachment": {
@@ -2346,17 +2795,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.43,
-        "height": 0.55,
-        "depth": 0.245,
+        "width": 0.75,
+        "height": 0.622,
+        "depth": 0.355,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
           0,
-          1.17,
+          0,
           0
         ],
         "rotation": [
@@ -2367,7 +2816,7 @@
         "scale": [
           1,
           1,
-          0.5697674418604651
+          1
         ]
       },
       "actionProfile": {
@@ -2637,9 +3086,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Dropped hood with thick folded rim and open interior; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Dropped hood with thick folded rim and open interior",
         "edgeTreatment": {
@@ -2651,29 +3100,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0969,
-              -0.115
-            ],
-            [
-              0.1275,
-              -0.046000000000000006
-            ],
-            [
-              0.11475,
-              0.069
-            ],
-            [
-              0.0816,
-              0.115
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.255,
+            "height": 0.23,
+            "depth": 0.12,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Dropped hood with thick folded rim and open interior",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.0969,
+                  -0.115
+                ],
+                [
+                  0.1275,
+                  -0.046000000000000006
+                ],
+                [
+                  0.11475,
+                  0.069
+                ],
+                [
+                  0.0816,
+                  0.115
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "cotton",
+          "materialLayers": [
+            "cotton"
+          ]
         }
       },
-      "parent": "hoodie",
+      "parent": "root",
       "attachment": {
         "parentSocket": "hoodie-to-hood",
         "localStart": [
@@ -2697,9 +3180,9 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.255,
-        "height": 0.23,
-        "depth": 0.12,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
@@ -2707,8 +3190,8 @@
       "transform": {
         "position": [
           0,
-          0.215,
-          -0.13
+          1.444,
+          -0.084
         ],
         "rotation": [
           0,
@@ -2716,9 +3199,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          0.47058823529411764
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -2773,9 +3256,9 @@
           "debrisMaterial": "cotton"
         }
       },
-      "material": "cotton",
+      "material": "hidden",
       "materialLayers": [
-        "cotton"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -2843,9 +3326,9 @@
       "role": "shell",
       "importance": 0.95,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Connected indigo pelvis crotch and waistband shell; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "Connected indigo pelvis crotch and waistband shell",
         "edgeTreatment": {
@@ -2855,29 +3338,446 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.1254,
-              -0.135
-            ],
-            [
-              0.165,
-              -0.054000000000000006
-            ],
-            [
-              0.14850000000000002,
-              0.081
-            ],
-            [
-              0.10560000000000001,
-              0.135
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "pelvis",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.892,
+                -0.009
+              ],
+              "radii": [
+                0.181,
+                0.117,
+                0.116
+              ]
+            },
+            {
+              "id": "thigh-l-cone",
+              "type": "cone",
+              "radius": 0.091,
+              "height": 1.6485642575013915,
+              "transform": {
+                "position": [
+                  0.18516666666666676,
+                  0.08099999999999963,
+                  -0.005
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -3.028322956501558
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.14
+                ]
+              }
+            },
+            {
+              "id": "thigh-l-clip",
+              "type": "box",
+              "size": [
+                0.262,
+                0.380437905577244,
+                0.262
+              ],
+              "transform": {
+                "position": [
+                  0.1135,
+                  0.7110000000000001,
+                  -0.0015
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -3.028322956501558
+                ]
+              }
+            },
+            {
+              "id": "calf-l-cone",
+              "type": "cone",
+              "radius": 0.071,
+              "height": 1.770111284263701,
+              "transform": {
+                "position": [
+                  0.24695454545454548,
+                  -0.33781818181818213,
+                  0.002
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -3.0136194025579317
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.12
+                ]
+              }
+            },
+            {
+              "id": "calf-l-clip",
+              "type": "box",
+              "size": [
+                0.22199999999999998,
+                0.27424259333662965,
+                0.22199999999999998
+              ],
+              "transform": {
+                "position": [
+                  0.15150000000000002,
+                  0.404,
+                  -0.001
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -3.0136194025579317
+                ]
+              }
+            },
+            {
+              "id": "ankle-l-cone",
+              "type": "cone",
+              "radius": 0.061,
+              "height": 1.126157228723515,
+              "transform": {
+                "position": [
+                  0.22899999999999995,
+                  -0.27076470588235274,
+                  -0.004
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -3.0330466185826053
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.1
+                ]
+              }
+            },
+            {
+              "id": "ankle-l-clip",
+              "type": "box",
+              "size": [
+                0.202,
+                0.15692354826475213,
+                0.202
+              ],
+              "transform": {
+                "position": [
+                  0.1765,
+                  0.211,
+                  -0.006
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -3.0330466185826053
+                ]
+              }
+            },
+            {
+              "id": "ankle-stack-l",
+              "type": "ellipsoid",
+              "center": [
+                0.181,
+                0.169,
+                -0.008
+              ],
+              "radii": [
+                0.055,
+                0.042,
+                0.061
+              ]
+            },
+            {
+              "id": "thigh-r-cone",
+              "type": "cone",
+              "radius": 0.091,
+              "height": 1.6485642575013915,
+              "transform": {
+                "position": [
+                  -0.18516666666666676,
+                  0.08099999999999963,
+                  -0.005
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  3.028322956501558
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.14
+                ]
+              }
+            },
+            {
+              "id": "thigh-r-clip",
+              "type": "box",
+              "size": [
+                0.262,
+                0.380437905577244,
+                0.262
+              ],
+              "transform": {
+                "position": [
+                  -0.1135,
+                  0.7110000000000001,
+                  -0.0015
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  3.028322956501558
+                ]
+              }
+            },
+            {
+              "id": "calf-r-cone",
+              "type": "cone",
+              "radius": 0.071,
+              "height": 1.770111284263701,
+              "transform": {
+                "position": [
+                  -0.24695454545454548,
+                  -0.33781818181818213,
+                  0.002
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  3.0136194025579317
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.12
+                ]
+              }
+            },
+            {
+              "id": "calf-r-clip",
+              "type": "box",
+              "size": [
+                0.22199999999999998,
+                0.27424259333662965,
+                0.22199999999999998
+              ],
+              "transform": {
+                "position": [
+                  -0.15150000000000002,
+                  0.404,
+                  -0.001
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  3.0136194025579317
+                ]
+              }
+            },
+            {
+              "id": "ankle-r-cone",
+              "type": "cone",
+              "radius": 0.061,
+              "height": 1.126157228723515,
+              "transform": {
+                "position": [
+                  -0.22899999999999995,
+                  -0.27076470588235274,
+                  -0.004
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  3.0330466185826053
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1.1
+                ]
+              }
+            },
+            {
+              "id": "ankle-r-clip",
+              "type": "box",
+              "size": [
+                0.202,
+                0.15692354826475213,
+                0.202
+              ],
+              "transform": {
+                "position": [
+                  -0.1765,
+                  0.211,
+                  -0.006
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  3.0330466185826053
+                ]
+              }
+            },
+            {
+              "id": "ankle-stack-r",
+              "type": "ellipsoid",
+              "center": [
+                -0.181,
+                0.169,
+                -0.008
+              ],
+              "radii": [
+                0.055,
+                0.042,
+                0.061
+              ]
+            },
+            {
+              "id": "waist-plane",
+              "type": "box",
+              "center": [
+                0,
+                0.5,
+                0
+              ],
+              "size": [
+                1,
+                0.954,
+                1
+              ]
+            }
           ],
-          "segments": 32
-        }
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "intersect",
+              "left": "thigh-l-cone",
+              "right": "thigh-l-clip"
+            },
+            {
+              "id": "op-1",
+              "type": "smooth-union",
+              "left": "pelvis",
+              "right": "op-0",
+              "radius": 0.017
+            },
+            {
+              "id": "op-2",
+              "type": "intersect",
+              "left": "calf-l-cone",
+              "right": "calf-l-clip"
+            },
+            {
+              "id": "op-3",
+              "type": "smooth-union",
+              "left": "op-1",
+              "right": "op-2",
+              "radius": 0.014
+            },
+            {
+              "id": "op-4",
+              "type": "intersect",
+              "left": "ankle-l-cone",
+              "right": "ankle-l-clip"
+            },
+            {
+              "id": "op-5",
+              "type": "smooth-union",
+              "left": "op-3",
+              "right": "op-4",
+              "radius": 0.012
+            },
+            {
+              "id": "op-6",
+              "type": "smooth-union",
+              "left": "op-5",
+              "right": "ankle-stack-l",
+              "radius": 0.01
+            },
+            {
+              "id": "op-7",
+              "type": "intersect",
+              "left": "thigh-r-cone",
+              "right": "thigh-r-clip"
+            },
+            {
+              "id": "op-8",
+              "type": "smooth-union",
+              "left": "op-6",
+              "right": "op-7",
+              "radius": 0.017
+            },
+            {
+              "id": "op-9",
+              "type": "intersect",
+              "left": "calf-r-cone",
+              "right": "calf-r-clip"
+            },
+            {
+              "id": "op-10",
+              "type": "smooth-union",
+              "left": "op-8",
+              "right": "op-9",
+              "radius": 0.014
+            },
+            {
+              "id": "op-11",
+              "type": "intersect",
+              "left": "ankle-r-cone",
+              "right": "ankle-r-clip"
+            },
+            {
+              "id": "op-12",
+              "type": "smooth-union",
+              "left": "op-10",
+              "right": "op-11",
+              "radius": 0.012
+            },
+            {
+              "id": "op-13",
+              "type": "smooth-union",
+              "left": "op-12",
+              "right": "ankle-stack-r",
+              "radius": 0.01
+            },
+            {
+              "id": "op-14",
+              "type": "intersect",
+              "left": "op-13",
+              "right": "waist-plane"
+            }
+          ],
+          "resolution": 64,
+          "bounds": {
+            "min": [
+              -0.255,
+              0.12,
+              -0.143
+            ],
+            "max": [
+              0.255,
+              0.989,
+              0.13
+            ]
+          }
+        },
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "root",
       "attachment": {
@@ -2903,17 +3803,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.33,
-        "height": 0.27,
-        "depth": 0.23,
+        "width": 0.51,
+        "height": 0.869,
+        "depth": 0.273,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
           0,
-          0.85,
+          0,
           0
         ],
         "rotation": [
@@ -2924,7 +3824,7 @@
         "scale": [
           1,
           1,
-          0.696969696969697
+          1
         ]
       },
       "actionProfile": {
@@ -4213,9 +5113,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Sleeve l tapered upper arm continuous at shoulder; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Sleeve l tapered upper arm continuous at shoulder",
         "edgeTreatment": {
@@ -4227,29 +5127,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0475,
-              -0.15
-            ],
-            [
-              0.0625,
-              -0.06
-            ],
-            [
-              0.05625,
-              0.09
-            ],
-            [
-              0.04,
-              0.15
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.125,
+            "height": 0.3,
+            "depth": 0.13,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Sleeve l tapered upper arm continuous at shoulder",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.0475,
+                  -0.15
+                ],
+                [
+                  0.0625,
+                  -0.06
+                ],
+                [
+                  0.05625,
+                  0.09
+                ],
+                [
+                  0.04,
+                  0.15
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "cotton",
+          "materialLayers": [
+            "cotton"
+          ]
         }
       },
-      "parent": "hoodie",
+      "parent": "root",
       "attachment": {
         "parentSocket": "hoodie-to-sleeve-l",
         "localStart": [
@@ -4273,17 +5207,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.125,
-        "height": 0.3,
-        "depth": 0.13,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
       },
       "transform": {
         "position": [
-          0.235,
-          0.025,
+          0.23,
+          1.295,
           0
         ],
         "rotation": [
@@ -4292,9 +5226,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1.04
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -4349,9 +5283,9 @@
           "debrisMaterial": "cotton"
         }
       },
-      "material": "cotton",
+      "material": "hidden",
       "materialLayers": [
-        "cotton"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -4394,9 +5328,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Rolled sleeve cuff l with a sewn folded edge; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Rolled sleeve cuff l with a sewn folded edge",
         "edgeTreatment": {
@@ -4408,29 +5342,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0437,
-              -0.0215
-            ],
-            [
-              0.0575,
-              -0.0086
-            ],
-            [
-              0.051750000000000004,
-              0.012899999999999998
-            ],
-            [
-              0.0368,
-              0.0215
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.115,
+            "height": 0.043,
+            "depth": 0.115,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Rolled sleeve cuff l with a sewn folded edge",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.0437,
+                  -0.0215
+                ],
+                [
+                  0.0575,
+                  -0.0086
+                ],
+                [
+                  0.051750000000000004,
+                  0.012899999999999998
+                ],
+                [
+                  0.0368,
+                  0.0215
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "cotton",
+          "materialLayers": [
+            "cotton"
+          ]
         }
       },
-      "parent": "sleeve-l",
+      "parent": "root",
       "attachment": {
         "parentSocket": "sleeve-l-to-cuff-l",
         "localStart": [
@@ -4454,17 +5422,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.115,
-        "height": 0.043,
-        "depth": 0.115,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
       },
       "transform": {
         "position": [
-          0,
-          -0.137,
+          0.296,
+          1.087,
           0
         ],
         "rotation": [
@@ -4473,9 +5441,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1.0
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -4530,9 +5498,9 @@
           "debrisMaterial": "cotton"
         }
       },
-      "material": "cotton",
+      "material": "hidden",
       "materialLayers": [
-        "cotton"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -4575,9 +5543,9 @@
       "role": "body",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "continuous-sculpt",
-      "topologyRationale": "Exposed forearm l radius-ulna taper toward glove; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "Exposed forearm l radius-ulna taper toward glove",
         "edgeTreatment": {
@@ -4587,29 +5555,99 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.031920000000000004,
-              -0.1275
-            ],
-            [
-              0.042,
-              -0.051000000000000004
-            ],
-            [
-              0.0378,
-              0.0765
-            ],
-            [
-              0.02688,
-              0.1275
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "forearm-cone",
+              "type": "cone",
+              "radius": 0.041,
+              "height": 0.514531541501588,
+              "transform": {
+                "position": [
+                  0.38027999999999995,
+                  0.8592799999999999,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -2.803714465349515
+                ],
+                "scale": [
+                  1,
+                  1,
+                  0.96
+                ]
+              }
+            },
+            {
+              "id": "forearm-clip",
+              "type": "box",
+              "size": [
+                0.162,
+                0.15686937240902074,
+                0.162
+              ],
+              "transform": {
+                "position": [
+                  0.32099999999999995,
+                  1.028,
+                  0.0015
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  -2.803714465349515
+                ]
+              }
+            },
+            {
+              "id": "wrist",
+              "type": "ellipsoid",
+              "center": [
+                0.345,
+                0.961,
+                0.003
+              ],
+              "radii": [
+                0.029,
+                0.025,
+                0.028
+              ]
+            }
           ],
-          "segments": 32
-        }
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "intersect",
+              "left": "forearm-cone",
+              "right": "forearm-clip"
+            },
+            {
+              "id": "op-1",
+              "type": "smooth-union",
+              "left": "op-0",
+              "right": "wrist",
+              "radius": 0.008
+            }
+          ],
+          "resolution": 48,
+          "bounds": {
+            "min": [
+              0.244,
+              0.925,
+              -0.05
+            ],
+            "max": [
+              0.398,
+              1.127,
+              0.052
+            ]
+          }
+        },
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "root",
       "attachment": {
@@ -4635,17 +5673,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.084,
-        "height": 0.255,
-        "depth": 0.077,
+        "width": 0.15400000000000003,
+        "height": 0.20199999999999996,
+        "depth": 0.10200000000000001,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
-          0.285,
-          1.02,
+          0,
+          0,
           0
         ],
         "rotation": [
@@ -4656,7 +5694,7 @@
         "scale": [
           1,
           1,
-          0.9166666666666666
+          1
         ]
       },
       "actionProfile": {
@@ -4756,9 +5794,9 @@
       "role": "body",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "continuous-sculpt",
-      "topologyRationale": "Glove palm l contacting cylindrical grip; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "Glove palm l contacting cylindrical grip",
         "edgeTreatment": {
@@ -4768,29 +5806,84 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0342,
-              -0.055
-            ],
-            [
-              0.045,
-              -0.022000000000000002
-            ],
-            [
-              0.0405,
-              0.033
-            ],
-            [
-              0.0288,
-              0.055
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "palm",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.007,
+                0
+              ],
+              "radii": [
+                0.035,
+                0.066,
+                0.023
+              ]
+            },
+            {
+              "id": "fingers",
+              "type": "ellipsoid",
+              "center": [
+                0.004,
+                -0.055,
+                0.006
+              ],
+              "radii": [
+                0.031,
+                0.049,
+                0.022
+              ]
+            },
+            {
+              "id": "thumb",
+              "type": "ellipsoid",
+              "center": [
+                -0.035,
+                -0.008,
+                0.012
+              ],
+              "radii": [
+                0.018,
+                0.045,
+                0.02
+              ]
+            }
           ],
-          "segments": 32
-        }
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "smooth-union",
+              "left": "palm",
+              "right": "fingers",
+              "radius": 0.01
+            },
+            {
+              "id": "op-1",
+              "type": "smooth-union",
+              "left": "op-0",
+              "right": "thumb",
+              "radius": 0.008
+            }
+          ],
+          "resolution": 48,
+          "bounds": {
+            "min": [
+              -0.06,
+              -0.115,
+              -0.033
+            ],
+            "max": [
+              0.06,
+              0.084,
+              0.043
+            ]
+          }
+        },
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "gloves",
       "attachment": {
@@ -4816,18 +5909,18 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.09,
-        "height": 0.11,
-        "depth": 0.037,
+        "width": 0.12,
+        "height": 0.199,
+        "depth": 0.076,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
-          0.29,
-          0.825,
-          0
+          0.358,
+          0.885,
+          0.004
         ],
         "rotation": [
           0,
@@ -4837,7 +5930,7 @@
         "scale": [
           1,
           1,
-          0.4111111111111111
+          1
         ]
       },
       "actionProfile": {
@@ -5842,9 +6935,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Jeans thigh l continuous crotch to precurved knee; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Jeans thigh l continuous crotch to precurved knee",
         "edgeTreatment": {
@@ -5856,29 +6949,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0608,
-              -0.2125
-            ],
-            [
-              0.08,
-              -0.085
-            ],
-            [
-              0.07200000000000001,
-              0.1275
-            ],
-            [
-              0.0512,
-              0.2125
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.16,
+            "height": 0.425,
+            "depth": 0.18,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Jeans thigh l continuous crotch to precurved knee",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.0608,
+                  -0.2125
+                ],
+                [
+                  0.08,
+                  -0.085
+                ],
+                [
+                  0.07200000000000001,
+                  0.1275
+                ],
+                [
+                  0.0512,
+                  0.2125
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "denim",
+          "materialLayers": [
+            "denim"
+          ]
         }
       },
-      "parent": "jeans",
+      "parent": "root",
       "attachment": {
         "parentSocket": "jeans-to-thigh-l",
         "localStart": [
@@ -5902,17 +7029,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.16,
-        "height": 0.425,
-        "depth": 0.18,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
       },
       "transform": {
         "position": [
-          0.085,
-          -0.285,
+          0.112,
+          0.713,
           0
         ],
         "rotation": [
@@ -5921,9 +7048,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1.125
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -5978,9 +7105,9 @@
           "debrisMaterial": "denim"
         }
       },
-      "material": "denim",
+      "material": "hidden",
       "materialLayers": [
-        "denim"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -6023,9 +7150,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Jeans lower leg l taper and ankle stack; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Jeans lower leg l taper and ankle stack",
         "edgeTreatment": {
@@ -6037,29 +7164,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.04256,
-              -0.2025
-            ],
-            [
-              0.056,
-              -0.08100000000000002
-            ],
-            [
-              0.0504,
-              0.1215
-            ],
-            [
-              0.035840000000000004,
-              0.2025
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.112,
+            "height": 0.405,
+            "depth": 0.13,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Jeans lower leg l taper and ankle stack",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.04256,
+                  -0.2025
+                ],
+                [
+                  0.056,
+                  -0.08100000000000002
+                ],
+                [
+                  0.0504,
+                  0.1215
+                ],
+                [
+                  0.035840000000000004,
+                  0.2025
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "denim",
+          "materialLayers": [
+            "denim"
+          ]
         }
       },
-      "parent": "thigh-l",
+      "parent": "root",
       "attachment": {
         "parentSocket": "thigh-l-to-shin-l",
         "localStart": [
@@ -6083,17 +7244,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.112,
-        "height": 0.405,
-        "depth": 0.13,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
       },
       "transform": {
         "position": [
-          0,
-          -0.395,
+          0.16,
+          0.33,
           0
         ],
         "rotation": [
@@ -6102,9 +7263,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1.1607142857142858
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -6159,9 +7320,9 @@
           "debrisMaterial": "denim"
         }
       },
-      "material": "denim",
+      "material": "hidden",
       "materialLayers": [
-        "denim"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -6290,9 +7451,9 @@
       },
       "transform": {
         "position": [
-          0.082,
-          -0.005,
-          -0.116
+          0.084,
+          0.889,
+          -0.117
         ],
         "rotation": [
           0,
@@ -6402,9 +7563,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "extrude",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "High-top upper l with separate tongue and heel counter; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "High-top upper l with separate tongue and heel counter",
         "edgeTreatment": {
@@ -6414,46 +7575,105 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "profile2D": {
-          "points": [
-            [
-              -0.05184,
-              -0.0525
-            ],
-            [
-              -0.04104,
-              -0.075
-            ],
-            [
-              0.04104,
-              -0.075
-            ],
-            [
-              0.054,
-              -0.042
-            ],
-            [
-              0.04752,
-              0.0555
-            ],
-            [
-              0,
-              0.075
-            ],
-            [
-              -0.04752,
-              0.0555
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "ankle-upper",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.111,
+                -0.028
+              ],
+              "radii": [
+                0.047,
+                0.073,
+                0.06
+              ]
+            },
+            {
+              "id": "vamp",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.066,
+                0.065
+              ],
+              "radii": [
+                0.053,
+                0.046,
+                0.112
+              ]
+            },
+            {
+              "id": "toe",
+              "type": "ellipsoid",
+              "center": [
+                0.003,
+                0.05,
+                0.145
+              ],
+              "radii": [
+                0.055,
+                0.027,
+                0.062
+              ]
+            },
+            {
+              "id": "upper-sole-interface",
+              "type": "box",
+              "center": [
+                0,
+                0.19,
+                0.06
+              ],
+              "size": [
+                0.3,
+                0.319,
+                0.5
+              ]
+            }
           ],
-          "depth": 0.265,
-          "bevelEnabled": true,
-          "bevelThickness": 0.003,
-          "bevelSize": 0.003,
-          "bevelSegments": 3
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "smooth-union",
+              "left": "ankle-upper",
+              "right": "vamp",
+              "radius": 0.012
+            },
+            {
+              "id": "op-1",
+              "type": "smooth-union",
+              "left": "op-0",
+              "right": "toe",
+              "radius": 0.01
+            },
+            {
+              "id": "op-2",
+              "type": "intersect",
+              "left": "op-1",
+              "right": "upper-sole-interface"
+            }
+          ],
+          "resolution": 56,
+          "bounds": {
+            "min": [
+              -0.067,
+              0.024,
+              -0.1
+            ],
+            "max": [
+              0.067,
+              0.195,
+              0.22
+            ]
+          }
         },
-        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form."
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "shoes",
       "attachment": {
@@ -6479,18 +7699,18 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.108,
-        "height": 0.15,
-        "depth": 0.265,
+        "width": 0.134,
+        "height": 0.171,
+        "depth": 0.32,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
-          0.085,
-          0.09,
-          0.055
+          0.19,
+          0,
+          0
         ],
         "rotation": [
           0,
@@ -6600,9 +7820,9 @@
       "role": "body",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "extrude",
-      "topologyClass": "continuous-sculpt",
-      "topologyRationale": "Off-white rubber sole l with two narrow bands; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "Off-white rubber sole l with two narrow bands",
         "edgeTreatment": {
@@ -6612,46 +7832,63 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "profile2D": {
-          "points": [
-            [
-              -0.05424,
-              -0.009099999999999999
-            ],
-            [
-              -0.04294,
-              -0.013
-            ],
-            [
-              0.04294,
-              -0.013
-            ],
-            [
-              0.0565,
-              -0.00728
-            ],
-            [
-              0.04972,
-              0.00962
-            ],
-            [
-              0,
-              0.013
-            ],
-            [
-              -0.04972,
-              0.00962
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "sole-plan",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.023,
+                0.051
+              ],
+              "radii": [
+                0.06,
+                0.1,
+                0.153
+              ]
+            },
+            {
+              "id": "sole-slab",
+              "type": "box",
+              "center": [
+                0,
+                0.023,
+                0.051
+              ],
+              "size": [
+                0.2,
+                0.026,
+                0.4
+              ]
+            }
           ],
-          "depth": 0.277,
-          "bevelEnabled": true,
-          "bevelThickness": 0.003,
-          "bevelSize": 0.003,
-          "bevelSegments": 3
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "intersect",
+              "left": "sole-plan",
+              "right": "sole-slab"
+            }
+          ],
+          "resolution": 48,
+          "bounds": {
+            "min": [
+              -0.07,
+              0.008,
+              -0.11
+            ],
+            "max": [
+              0.07,
+              0.038,
+              0.215
+            ]
+          }
         },
-        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form."
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "upper-l",
       "attachment": {
@@ -6677,17 +7914,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.113,
-        "height": 0.026,
-        "depth": 0.277,
+        "width": 0.14,
+        "height": 0.03,
+        "depth": 0.325,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
           0,
-          -0.065,
+          0,
           0
         ],
         "rotation": [
@@ -6823,9 +8060,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "extrude",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Padded shoe tongue l behind lacing; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Padded shoe tongue l behind lacing",
         "edgeTreatment": {
@@ -6837,44 +8074,79 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "profile2D": {
-          "points": [
-            [
-              -0.024,
-              -0.033249999999999995
-            ],
-            [
-              -0.019000000000000003,
-              -0.0475
-            ],
-            [
-              0.019000000000000003,
-              -0.0475
-            ],
-            [
-              0.025,
-              -0.026600000000000002
-            ],
-            [
-              0.022000000000000002,
-              0.03515
-            ],
-            [
-              0,
-              0.0475
-            ],
-            [
-              -0.022000000000000002,
-              0.03515
-            ]
-          ],
-          "depth": 0.006,
-          "bevelEnabled": true,
-          "bevelThickness": 0.0012000000000000001,
-          "bevelSize": 0.0025000000000000005,
-          "bevelSegments": 3
-        },
-        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form."
+        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form.",
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "extrude",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.05,
+            "height": 0.095,
+            "depth": 0.006,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Padded shoe tongue l behind lacing",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "profile2D": {
+              "points": [
+                [
+                  -0.024,
+                  -0.033249999999999995
+                ],
+                [
+                  -0.019000000000000003,
+                  -0.0475
+                ],
+                [
+                  0.019000000000000003,
+                  -0.0475
+                ],
+                [
+                  0.025,
+                  -0.026600000000000002
+                ],
+                [
+                  0.022000000000000002,
+                  0.03515
+                ],
+                [
+                  0,
+                  0.0475
+                ],
+                [
+                  -0.022000000000000002,
+                  0.03515
+                ]
+              ],
+              "depth": 0.006,
+              "bevelEnabled": true,
+              "bevelThickness": 0.0012000000000000001,
+              "bevelSize": 0.0025000000000000005,
+              "bevelSegments": 3
+            },
+            "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form.",
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "shoe",
+          "materialLayers": [
+            "shoe"
+          ]
+        }
       },
       "parent": "upper-l",
       "attachment": {
@@ -6900,9 +8172,9 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.05,
-        "height": 0.095,
-        "depth": 0.006,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
@@ -6910,8 +8182,8 @@
       "transform": {
         "position": [
           0,
-          0.025,
-          0.081
+          0.112,
+          0.023
         ],
         "rotation": [
           0,
@@ -6919,9 +8191,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -6976,9 +8248,9 @@
           "debrisMaterial": "shoe"
         }
       },
-      "material": "shoe",
+      "material": "hidden",
       "materialLayers": [
-        "shoe"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -7568,9 +8840,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Sleeve r tapered upper arm continuous at shoulder; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Sleeve r tapered upper arm continuous at shoulder",
         "edgeTreatment": {
@@ -7582,29 +8854,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0475,
-              -0.15
-            ],
-            [
-              0.0625,
-              -0.06
-            ],
-            [
-              0.05625,
-              0.09
-            ],
-            [
-              0.04,
-              0.15
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.125,
+            "height": 0.3,
+            "depth": 0.13,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Sleeve r tapered upper arm continuous at shoulder",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.0475,
+                  -0.15
+                ],
+                [
+                  0.0625,
+                  -0.06
+                ],
+                [
+                  0.05625,
+                  0.09
+                ],
+                [
+                  0.04,
+                  0.15
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "cotton",
+          "materialLayers": [
+            "cotton"
+          ]
         }
       },
-      "parent": "hoodie",
+      "parent": "root",
       "attachment": {
         "parentSocket": "hoodie-to-sleeve-r",
         "localStart": [
@@ -7628,17 +8934,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.125,
-        "height": 0.3,
-        "depth": 0.13,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
       },
       "transform": {
         "position": [
-          -0.235,
-          0.025,
+          -0.23,
+          1.295,
           0
         ],
         "rotation": [
@@ -7647,9 +8953,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1.04
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -7704,9 +9010,9 @@
           "debrisMaterial": "cotton"
         }
       },
-      "material": "cotton",
+      "material": "hidden",
       "materialLayers": [
-        "cotton"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -7749,9 +9055,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Rolled sleeve cuff r with a sewn folded edge; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Rolled sleeve cuff r with a sewn folded edge",
         "edgeTreatment": {
@@ -7763,29 +9069,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0437,
-              -0.0215
-            ],
-            [
-              0.0575,
-              -0.0086
-            ],
-            [
-              0.051750000000000004,
-              0.012899999999999998
-            ],
-            [
-              0.0368,
-              0.0215
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.115,
+            "height": 0.043,
+            "depth": 0.115,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Rolled sleeve cuff r with a sewn folded edge",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.0437,
+                  -0.0215
+                ],
+                [
+                  0.0575,
+                  -0.0086
+                ],
+                [
+                  0.051750000000000004,
+                  0.012899999999999998
+                ],
+                [
+                  0.0368,
+                  0.0215
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "cotton",
+          "materialLayers": [
+            "cotton"
+          ]
         }
       },
-      "parent": "sleeve-r",
+      "parent": "root",
       "attachment": {
         "parentSocket": "sleeve-r-to-cuff-r",
         "localStart": [
@@ -7809,17 +9149,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.115,
-        "height": 0.043,
-        "depth": 0.115,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
       },
       "transform": {
         "position": [
-          0,
-          -0.137,
+          -0.296,
+          1.087,
           0
         ],
         "rotation": [
@@ -7828,9 +9168,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1.0
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -7885,9 +9225,9 @@
           "debrisMaterial": "cotton"
         }
       },
-      "material": "cotton",
+      "material": "hidden",
       "materialLayers": [
-        "cotton"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -7930,9 +9270,9 @@
       "role": "body",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "continuous-sculpt",
-      "topologyRationale": "Exposed forearm r radius-ulna taper toward glove; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "Exposed forearm r radius-ulna taper toward glove",
         "edgeTreatment": {
@@ -7942,29 +9282,99 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.031920000000000004,
-              -0.1275
-            ],
-            [
-              0.042,
-              -0.051000000000000004
-            ],
-            [
-              0.0378,
-              0.0765
-            ],
-            [
-              0.02688,
-              0.1275
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "forearm-cone",
+              "type": "cone",
+              "radius": 0.041,
+              "height": 0.514531541501588,
+              "transform": {
+                "position": [
+                  -0.38027999999999995,
+                  0.8592799999999999,
+                  0.0
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  2.803714465349515
+                ],
+                "scale": [
+                  1,
+                  1,
+                  0.96
+                ]
+              }
+            },
+            {
+              "id": "forearm-clip",
+              "type": "box",
+              "size": [
+                0.162,
+                0.15686937240902074,
+                0.162
+              ],
+              "transform": {
+                "position": [
+                  -0.32099999999999995,
+                  1.028,
+                  0.0015
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  2.803714465349515
+                ]
+              }
+            },
+            {
+              "id": "wrist",
+              "type": "ellipsoid",
+              "center": [
+                -0.345,
+                0.961,
+                0.003
+              ],
+              "radii": [
+                0.029,
+                0.025,
+                0.028
+              ]
+            }
           ],
-          "segments": 32
-        }
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "intersect",
+              "left": "forearm-cone",
+              "right": "forearm-clip"
+            },
+            {
+              "id": "op-1",
+              "type": "smooth-union",
+              "left": "op-0",
+              "right": "wrist",
+              "radius": 0.008
+            }
+          ],
+          "resolution": 48,
+          "bounds": {
+            "min": [
+              -0.398,
+              0.925,
+              -0.05
+            ],
+            "max": [
+              -0.244,
+              1.127,
+              0.052
+            ]
+          }
+        },
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "root",
       "attachment": {
@@ -7990,17 +9400,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.084,
-        "height": 0.255,
-        "depth": 0.077,
+        "width": 0.15400000000000003,
+        "height": 0.20199999999999996,
+        "depth": 0.10200000000000001,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
-          -0.285,
-          1.02,
+          0,
+          0,
           0
         ],
         "rotation": [
@@ -8011,7 +9421,7 @@
         "scale": [
           1,
           1,
-          0.9166666666666666
+          1
         ]
       },
       "actionProfile": {
@@ -8111,9 +9521,9 @@
       "role": "body",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "continuous-sculpt",
-      "topologyRationale": "Glove palm r contacting cylindrical grip; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "Glove palm r contacting cylindrical grip",
         "edgeTreatment": {
@@ -8123,29 +9533,84 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0342,
-              -0.055
-            ],
-            [
-              0.045,
-              -0.022000000000000002
-            ],
-            [
-              0.0405,
-              0.033
-            ],
-            [
-              0.0288,
-              0.055
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "palm",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.007,
+                0
+              ],
+              "radii": [
+                0.035,
+                0.066,
+                0.023
+              ]
+            },
+            {
+              "id": "fingers",
+              "type": "ellipsoid",
+              "center": [
+                -0.004,
+                -0.055,
+                0.006
+              ],
+              "radii": [
+                0.031,
+                0.049,
+                0.022
+              ]
+            },
+            {
+              "id": "thumb",
+              "type": "ellipsoid",
+              "center": [
+                0.035,
+                -0.008,
+                0.012
+              ],
+              "radii": [
+                0.018,
+                0.045,
+                0.02
+              ]
+            }
           ],
-          "segments": 32
-        }
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "smooth-union",
+              "left": "palm",
+              "right": "fingers",
+              "radius": 0.01
+            },
+            {
+              "id": "op-1",
+              "type": "smooth-union",
+              "left": "op-0",
+              "right": "thumb",
+              "radius": 0.008
+            }
+          ],
+          "resolution": 48,
+          "bounds": {
+            "min": [
+              -0.06,
+              -0.115,
+              -0.033
+            ],
+            "max": [
+              0.06,
+              0.084,
+              0.043
+            ]
+          }
+        },
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "gloves",
       "attachment": {
@@ -8171,18 +9636,18 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.09,
-        "height": 0.11,
-        "depth": 0.037,
+        "width": 0.12,
+        "height": 0.199,
+        "depth": 0.076,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
-          -0.29,
-          0.825,
-          0
+          -0.358,
+          0.885,
+          0.004
         ],
         "rotation": [
           0,
@@ -8192,7 +9657,7 @@
         "scale": [
           1,
           1,
-          0.4111111111111111
+          1
         ]
       },
       "actionProfile": {
@@ -9197,9 +10662,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Jeans thigh r continuous crotch to precurved knee; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Jeans thigh r continuous crotch to precurved knee",
         "edgeTreatment": {
@@ -9211,29 +10676,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.0608,
-              -0.2125
-            ],
-            [
-              0.08,
-              -0.085
-            ],
-            [
-              0.07200000000000001,
-              0.1275
-            ],
-            [
-              0.0512,
-              0.2125
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.16,
+            "height": 0.425,
+            "depth": 0.18,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Jeans thigh r continuous crotch to precurved knee",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.0608,
+                  -0.2125
+                ],
+                [
+                  0.08,
+                  -0.085
+                ],
+                [
+                  0.07200000000000001,
+                  0.1275
+                ],
+                [
+                  0.0512,
+                  0.2125
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "denim",
+          "materialLayers": [
+            "denim"
+          ]
         }
       },
-      "parent": "jeans",
+      "parent": "root",
       "attachment": {
         "parentSocket": "jeans-to-thigh-r",
         "localStart": [
@@ -9257,17 +10756,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.16,
-        "height": 0.425,
-        "depth": 0.18,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
       },
       "transform": {
         "position": [
-          -0.085,
-          -0.285,
+          -0.112,
+          0.713,
           0
         ],
         "rotation": [
@@ -9276,9 +10775,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1.125
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -9333,9 +10832,9 @@
           "debrisMaterial": "denim"
         }
       },
-      "material": "denim",
+      "material": "hidden",
       "materialLayers": [
-        "denim"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -9378,9 +10877,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "lathe",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Jeans lower leg r taper and ankle stack; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Jeans lower leg r taper and ankle stack",
         "edgeTreatment": {
@@ -9392,29 +10891,63 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "latheProfile": {
-          "points": [
-            [
-              0.04256,
-              -0.2025
-            ],
-            [
-              0.056,
-              -0.08100000000000002
-            ],
-            [
-              0.0504,
-              0.1215
-            ],
-            [
-              0.035840000000000004,
-              0.2025
-            ]
-          ],
-          "segments": 32
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "lathe",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.112,
+            "height": 0.405,
+            "depth": 0.13,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Jeans lower leg r taper and ankle stack",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "latheProfile": {
+              "points": [
+                [
+                  0.04256,
+                  -0.2025
+                ],
+                [
+                  0.056,
+                  -0.08100000000000002
+                ],
+                [
+                  0.0504,
+                  0.1215
+                ],
+                [
+                  0.035840000000000004,
+                  0.2025
+                ]
+              ],
+              "segments": 32
+            },
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "denim",
+          "materialLayers": [
+            "denim"
+          ]
         }
       },
-      "parent": "thigh-r",
+      "parent": "root",
       "attachment": {
         "parentSocket": "thigh-r-to-shin-r",
         "localStart": [
@@ -9438,17 +10971,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.112,
-        "height": 0.405,
-        "depth": 0.13,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
       },
       "transform": {
         "position": [
-          0,
-          -0.395,
+          -0.16,
+          0.33,
           0
         ],
         "rotation": [
@@ -9457,9 +10990,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1.1607142857142858
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -9514,9 +11047,9 @@
           "debrisMaterial": "denim"
         }
       },
-      "material": "denim",
+      "material": "hidden",
       "materialLayers": [
-        "denim"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -9645,9 +11178,9 @@
       },
       "transform": {
         "position": [
-          -0.082,
-          -0.005,
-          -0.116
+          -0.084,
+          0.889,
+          -0.117
         ],
         "rotation": [
           0,
@@ -9757,9 +11290,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "extrude",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "High-top upper r with separate tongue and heel counter; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "High-top upper r with separate tongue and heel counter",
         "edgeTreatment": {
@@ -9769,46 +11302,105 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "profile2D": {
-          "points": [
-            [
-              -0.05184,
-              -0.0525
-            ],
-            [
-              -0.04104,
-              -0.075
-            ],
-            [
-              0.04104,
-              -0.075
-            ],
-            [
-              0.054,
-              -0.042
-            ],
-            [
-              0.04752,
-              0.0555
-            ],
-            [
-              0,
-              0.075
-            ],
-            [
-              -0.04752,
-              0.0555
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "ankle-upper",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.111,
+                -0.028
+              ],
+              "radii": [
+                0.047,
+                0.073,
+                0.06
+              ]
+            },
+            {
+              "id": "vamp",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.066,
+                0.065
+              ],
+              "radii": [
+                0.053,
+                0.046,
+                0.112
+              ]
+            },
+            {
+              "id": "toe",
+              "type": "ellipsoid",
+              "center": [
+                -0.003,
+                0.05,
+                0.145
+              ],
+              "radii": [
+                0.055,
+                0.027,
+                0.062
+              ]
+            },
+            {
+              "id": "upper-sole-interface",
+              "type": "box",
+              "center": [
+                0,
+                0.19,
+                0.06
+              ],
+              "size": [
+                0.3,
+                0.319,
+                0.5
+              ]
+            }
           ],
-          "depth": 0.265,
-          "bevelEnabled": true,
-          "bevelThickness": 0.003,
-          "bevelSize": 0.003,
-          "bevelSegments": 3
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "smooth-union",
+              "left": "ankle-upper",
+              "right": "vamp",
+              "radius": 0.012
+            },
+            {
+              "id": "op-1",
+              "type": "smooth-union",
+              "left": "op-0",
+              "right": "toe",
+              "radius": 0.01
+            },
+            {
+              "id": "op-2",
+              "type": "intersect",
+              "left": "op-1",
+              "right": "upper-sole-interface"
+            }
+          ],
+          "resolution": 56,
+          "bounds": {
+            "min": [
+              -0.067,
+              0.024,
+              -0.1
+            ],
+            "max": [
+              0.067,
+              0.195,
+              0.22
+            ]
+          }
         },
-        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form."
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "shoes",
       "attachment": {
@@ -9834,18 +11426,18 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.108,
-        "height": 0.15,
-        "depth": 0.265,
+        "width": 0.134,
+        "height": 0.171,
+        "depth": 0.32,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
-          -0.085,
-          0.09,
-          0.055
+          -0.19,
+          0,
+          0
         ],
         "rotation": [
           0,
@@ -9955,9 +11547,9 @@
       "role": "body",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "extrude",
-      "topologyClass": "continuous-sculpt",
-      "topologyRationale": "Off-white rubber sole r with two narrow bands; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "ellipsoid",
+      "topologyClass": "implicit",
+      "topologyRationale": "Single sampled continuous field; constituent cone/ellipsoid volumes are unioned before meshing, not separate overlapping visible meshes.",
       "geometryDescriptor": {
         "topologyIntent": "Off-white rubber sole r with two narrow bands",
         "edgeTreatment": {
@@ -9967,46 +11559,63 @@
         },
         "deformationStack": [],
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
-        "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
-        "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "profile2D": {
-          "points": [
-            [
-              -0.05424,
-              -0.009099999999999999
-            ],
-            [
-              -0.04294,
-              -0.013
-            ],
-            [
-              0.04294,
-              -0.013
-            ],
-            [
-              0.0565,
-              -0.00728
-            ],
-            [
-              0.04972,
-              0.00962
-            ],
-            [
-              0,
-              0.013
-            ],
-            [
-              -0.04972,
-              0.00962
-            ]
+        "normalStrategy": "Gradient-consistent smooth normals on a single connected garment field",
+        "joinPolicy": "Union all listed garment regions before extraction; no detached sleeve/thigh/shin render meshes. Separate cloth/skin/shoe material interfaces embed at measured silhouette boundaries.",
+        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form.",
+        "sdf": {
+          "primitives": [
+            {
+              "id": "sole-plan",
+              "type": "ellipsoid",
+              "center": [
+                0,
+                0.023,
+                0.051
+              ],
+              "radii": [
+                0.06,
+                0.1,
+                0.153
+              ]
+            },
+            {
+              "id": "sole-slab",
+              "type": "box",
+              "center": [
+                0,
+                0.023,
+                0.051
+              ],
+              "size": [
+                0.2,
+                0.026,
+                0.4
+              ]
+            }
           ],
-          "depth": 0.277,
-          "bevelEnabled": true,
-          "bevelThickness": 0.003,
-          "bevelSize": 0.003,
-          "bevelSegments": 3
+          "operations": [
+            {
+              "id": "op-0",
+              "type": "intersect",
+              "left": "sole-plan",
+              "right": "sole-slab"
+            }
+          ],
+          "resolution": 48,
+          "bounds": {
+            "min": [
+              -0.07,
+              0.008,
+              -0.11
+            ],
+            "max": [
+              0.07,
+              0.038,
+              0.215
+            ]
+          }
         },
-        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form."
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json"
       },
       "parent": "upper-r",
       "attachment": {
@@ -10032,17 +11641,17 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.113,
-        "height": 0.026,
-        "depth": 0.277,
+        "width": 0.14,
+        "height": 0.03,
+        "depth": 0.325,
         "units": "meters",
         "confidence": 0.45,
-        "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+        "inference": "Sampling bounds, not normalized geometry dimensions. Transform scale remains exactly one."
       },
       "transform": {
         "position": [
           0,
-          -0.065,
+          0,
           0
         ],
         "rotation": [
@@ -10153,9 +11762,9 @@
       "role": "shell",
       "importance": 0.8,
       "confidence": 0.5,
-      "primitive": "extrude",
-      "topologyClass": "conforming-shell",
-      "topologyRationale": "Padded shoe tongue r behind lacing; continuous shaped surface, never visible capsule/box junctions.",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden 1mm semantic region marker; visible garment volume lives in the continuous owner field, original region evidence retained.",
       "geometryDescriptor": {
         "topologyIntent": "Padded shoe tongue r behind lacing",
         "edgeTreatment": {
@@ -10167,44 +11776,79 @@
         "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
         "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
         "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
-        "profile2D": {
-          "points": [
-            [
-              -0.024,
-              -0.033249999999999995
-            ],
-            [
-              -0.019000000000000003,
-              -0.0475
-            ],
-            [
-              0.019000000000000003,
-              -0.0475
-            ],
-            [
-              0.025,
-              -0.026600000000000002
-            ],
-            [
-              0.022000000000000002,
-              0.03515
-            ],
-            [
-              0,
-              0.0475
-            ],
-            [
-              -0.022000000000000002,
-              0.03515
-            ]
-          ],
-          "depth": 0.006,
-          "bevelEnabled": true,
-          "bevelThickness": 0.0012000000000000001,
-          "bevelSize": 0.0025000000000000005,
-          "bevelSegments": 3
-        },
-        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form."
+        "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form.",
+        "semanticGroupOnly": true,
+        "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+        "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh.",
+        "semanticRegionEvidence": {
+          "primitive": "extrude",
+          "topologyClass": "conforming-shell",
+          "dimensions": {
+            "width": 0.05,
+            "height": 0.095,
+            "depth": 0.006,
+            "units": "meters",
+            "confidence": 0.45,
+            "inference": "unmeasured metric scaffold; fit before geometry acceptance"
+          },
+          "geometryDescriptor": {
+            "topologyIntent": "Padded shoe tongue r behind lacing",
+            "edgeTreatment": {
+              "type": "none",
+              "bevelRadius": 0,
+              "segments": 1
+            },
+            "deformationStack": [],
+            "uvStrategy": "continuous surface UV; parent reference projection evidence pending",
+            "normalStrategy": "smooth profile with explicit non-axisymmetric form displacements in feature-placement pass",
+            "joinPolicy": "Shared boundary vertices/weights with same garment or anatomical host; no floating visible end caps.",
+            "profile2D": {
+              "points": [
+                [
+                  -0.024,
+                  -0.033249999999999995
+                ],
+                [
+                  -0.019000000000000003,
+                  -0.0475
+                ],
+                [
+                  0.019000000000000003,
+                  -0.0475
+                ],
+                [
+                  0.025,
+                  -0.026600000000000002
+                ],
+                [
+                  0.022000000000000002,
+                  0.03515
+                ],
+                [
+                  0,
+                  0.0475
+                ],
+                [
+                  -0.022000000000000002,
+                  0.03515
+                ]
+              ],
+              "depth": 0.006,
+              "bevelEnabled": true,
+              "bevelThickness": 0.0012000000000000001,
+              "bevelSize": 0.0025000000000000005,
+              "bevelSegments": 3
+            },
+            "fitRequirement": "Conform patch vertices to host and heel-to-toe profile; unresolved template volume is not final shoe form.",
+            "semanticGroupOnly": true,
+            "shapeFitEvidence": "reconstruction/shape-fit-r12.json",
+            "note": "Region anchor retained; visible surface is part of the parent continuous garment field, not an extra mesh."
+          },
+          "material": "shoe",
+          "materialLayers": [
+            "shoe"
+          ]
+        }
       },
       "parent": "upper-r",
       "attachment": {
@@ -10230,9 +11874,9 @@
         "note": "Local extent is component design scaffold, socket frame unresolved pending consumer fit; not a measured attachment."
       },
       "dimensions": {
-        "width": 0.05,
-        "height": 0.095,
-        "depth": 0.006,
+        "width": 0.001,
+        "height": 0.001,
+        "depth": 0.001,
         "units": "meters",
         "confidence": 0.45,
         "inference": "unmeasured metric scaffold; fit before geometry acceptance"
@@ -10240,8 +11884,8 @@
       "transform": {
         "position": [
           0,
-          0.025,
-          0.081
+          0.112,
+          0.023
         ],
         "rotation": [
           0,
@@ -10249,9 +11893,9 @@
           0
         ],
         "scale": [
-          1,
-          1,
-          1
+          0.001,
+          0.001,
+          0.001
         ]
       },
       "actionProfile": {
@@ -10306,9 +11950,9 @@
           "debrisMaterial": "shoe"
         }
       },
-      "material": "shoe",
+      "material": "hidden",
       "materialLayers": [
-        "shoe"
+        "hidden"
       ],
       "deformations": [],
       "joints": [],
@@ -13619,6 +15263,21 @@
       "cameraView": "",
       "notes": "",
       "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-09-16T00:16:04.673912+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.25,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "referenceScreenshot": "assets/design/hero-targets/reconstruction/turnaround-front.png",
+      "renderScreenshot": "harness/out/blender/img2-preview/neutral-blockout-04/views/azimuth-000.png",
+      "comparisonImage": "",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": ""
     }
   ],
   "reviewHistory": [
@@ -13640,6 +15299,30 @@
       "visualEvidence": {
         "referenceScreenshot": "assets/design/hero-targets/reconstruction/turnaround-front.png",
         "renderScreenshot": "harness/out/blender/img2-preview/neutral-blockout-03/views/azimuth-000.png",
+        "comparisonImage": "",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-09-16T00:16:04.673912+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.25,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "refine-spec",
+      "summary": "Neutral04 deterministic silhouette fails (IoU .345); body has disconnected shoulder/waist, detached hood and wrong arm stance. Correct complete garment/body proportions and articulation placement as one silhouette group; preserve head and later detail/material gates.",
+      "matched": [],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/design/hero-targets/reconstruction/turnaround-front.png",
+        "renderScreenshot": "harness/out/blender/img2-preview/neutral-blockout-04/views/azimuth-000.png",
         "comparisonImage": "",
         "cameraView": "",
         "notes": "",
@@ -14642,6 +16325,212 @@
       "maskWarnings": [],
       "renderHash": "d349ce9ceaab2277",
       "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.345,
+        "aspectRatioDelta": 0.0432,
+        "scaleDelta": 0.7888,
+        "bilateralSymmetryError": 0.0134,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 63.57,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 63.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 63.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 63.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 48.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.86
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 31.6
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 31.6
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.86
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 31.6
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 31.6
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.97
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.345 is below threshold 0.85",
+        "scale delta 0.789 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [
+        "render: 52.2% of foreground cells lie outside the largest connected blob and were excluded from the bounding box; if the subject really has separated parts in this projection, they are not being measured"
+      ],
+      "renderHash": "08c5ce71add45241",
+      "passId": "blockout",
+      "mapStrippedRender": "harness/out/blender/img2-preview/neutral-blockout-04/views/azimuth-000.png"
     }
   ]
 }

@@ -1,0 +1,11 @@
+{
+  "input": "harness/out/blender/openface-r12/source/rider-openface.blend",
+  "inputSha256": "dfebc11696bf50c49554bc339aa62f376d681f7fa0b758bf068ed5bf67428c61",
+  "output": "assets/blender/source/rider-openface.blend",
+  "outputSha256": "926665fc242a4599d1e71389c1672143e43275f1601df7b4667b27c850198d29",
+  "onlyChanges": [
+    "scene.heroOutfit",
+    "scene.heroDesign"
+  ],
+  "meshWeightsMaterialsRigActionsSocketsParity": true
+}

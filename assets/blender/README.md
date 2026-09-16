@@ -13,18 +13,19 @@ assets/blender/
   build_bike.py    -> public/models/bike.glb  (+ `-- --lod` -> bike-lod.glb), bike.blend, textures/bike_*.jpg
   build_rider.py   -> public/models/rider.glb (+ `-- --lod` -> rider-lod.glb), rider.blend, textures/rider_*.jpg
   rider_asset.py   protected rider seed/export commands; street is the default outfit
-  source/         rider-street.blend / rider-race.blend / bike.blend: editable masters
-  generated/      rider-{street,race}[-lod].blend: packed, baked export copies
+  source/         rider-street.blend / rider-openface.blend / rider-race.blend / bike.blend: editable masters
+  generated/      rider-{street,openface,race}[-lod].blend: packed, baked export copies
   verify_rider_asset.mjs  production meshopt decoder checks before output publication
   preview.py       Eevee renders of the EXPORTED .glb files -> previews/*.png (per colourway / LOD)
   textures/        baked atlases (JPEG), decals.png, chain_links.png, bike_spokecard.png
   previews/        turntables, rider-poses, composite-*, garage-*, compare-reference (suffix -pro / -lod)
 ```
 
-## Current authored package (R10 integration)
+## Current authored package (R12 openface integration)
 
-The canonical sources are `source/rider-street.blend`, `source/rider-race.blend`, and
-`source/bike.blend`. Street uses a visible human head and fitted cotton/denim; Race uses the
+The canonical sources are `source/rider-street.blend`, `source/rider-openface.blend`,
+`source/rider-race.blend`, and `source/bike.blend`. Street uses a visible human head and fitted
+cotton/denim; openface adds compact original headgear to that body; Race uses the
 compact helmet and fitted technical outfit. The bike source retains the rebuilt engine/body
 and a translucent spinning-spoke card. Both garage bike classes share geometry and select
 independent Rookie/Pro material variants.
@@ -52,7 +53,7 @@ motion/contact issues are open; source promotion is not goal completion.
 
 Create each source once, then edit its parts, material graphs, and actions in Blender. `seed`
 refuses to overwrite an existing source. Only an intentional `seed --replace-source` replaces it.
-Street and race sources are separate; the selected outfit must match the source's saved metadata.
+Street, openface and race sources are separate; the selected outfit must match the source's saved metadata.
 
 ```sh
 blender -b --python-exit-code 1 --python assets/blender/rider_asset.py -- seed --outfit street
@@ -64,8 +65,14 @@ blender -b --python-exit-code 1 --python assets/blender/rider_asset.py -- export
 ```
 
 Omitting `--outfit` selects `street`. Runtime paths are `public/models/rider-street.glb`,
-`rider-street-lod.glb`, `rider-race.glb`, and `rider-race-lod.glb`. Both outfits keep the
+`rider-street-lod.glb`, `rider-openface.glb`, `rider-openface-lod.glb`, `rider-race.glb`, and `rider-race-lod.glb`. All families keep the
 `rider_rookie` / `rider_pro` material variants, independently of the outfit selection.
+
+Openface is an original headgear derivative of the packed Street source, authored with
+`openface_candidate.py -- --output-dir <fresh-scratch-directory>` rather than `seed`.
+Export its canonical source with `rider_asset.py -- export --outfit openface` (add `--lod`
+for the companion file). Its selected preset is fixed charcoal (`rider_pro`), independently
+of bike class. See [R12 provenance](../../docs/evidence/hero-r12-openface/README.md).
 
 The authoring source retains separate material regions, procedural material graphs, packed image
 dependencies, all eight actions, normalized weights, and a clean rest pose with animation disabled.

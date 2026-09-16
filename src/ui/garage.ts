@@ -168,14 +168,6 @@ export class GarageScreen {
     outfitRow.setAttribute('role', 'group');
     outfitRow.setAttribute('aria-label', 'Rider outfit');
     for (const preset of RIDER_PRESETS) {
-      if (!preset.available) {
-        const unavailable = h('button', 'outfit-button', `<strong>${preset.label}</strong><span>${preset.detail}</span>`);
-        unavailable.type = 'button';
-        unavailable.disabled = true;
-        unavailable.dataset['design'] = preset.id;
-        outfitRow.appendChild(unavailable);
-        continue;
-      }
       const outfit = preset.id;
       const button = h('button', 'outfit-button', `<strong>${OUTFIT_LABEL[outfit]}</strong><span>${OUTFIT_DETAIL[outfit]}</span>`);
       button.type = 'button';

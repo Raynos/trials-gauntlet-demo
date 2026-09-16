@@ -1,0 +1,246 @@
+{
+  "source": "assets/blender/source/rider-street.blend",
+  "sourceSha256": "5b5effde064171323313198d4eceafb89b2d0128ddd19d30ab873ef1022adf01",
+  "candidate": "harness/out/blender/openface-r12/source/rider-openface.blend",
+  "candidateSha256": "dfebc11696bf50c49554bc339aa62f376d681f7fa0b758bf068ed5bf67428c61",
+  "recipeSha256": "66d1b4bbd3344ef75c6af0be0a3c86b446ce701c6bbb29b769246fc2ed320bc0",
+  "reference": "assets/design/hero-targets/02-street-openface.png",
+  "headgearAuthoring": "Original procedural geometry, no new third-party geometry",
+  "inheritedLicenses": "docs/evidence/hero-r9-inputs/THIRD-PARTY.md",
+  "preservedBodyMeshes": [
+    "rider:anatomical sweatshirt",
+    "rider:anatomical sweatshirt pocket",
+    "rider:constructed jean pockets",
+    "rider:cotton_laces",
+    "rider:denim",
+    "rider:folded hood",
+    "rider:glove_top",
+    "rider:gloves",
+    "rider:hero footwear construction",
+    "rider:hero glove construction",
+    "rider:human eyebrows",
+    "rider:human head and neck",
+    "rider:iris.L",
+    "rider:iris.R",
+    "rider:sclera.L",
+    "rider:sclera.R",
+    "rider:trainer_rubber",
+    "rider:trainer_upper"
+  ],
+  "bodyMeshWeightAndOriginalMaterialParity": true,
+  "rigActionsSocketsParity": true,
+  "scalpHairHiddenUnderShell": [
+    "rider:short hair prototype",
+    "rider:short hair directional clumps"
+  ],
+  "headgearDimensionsMetres": [
+    0.2527105212211609,
+    0.21663908660411835,
+    0.2693610191345215
+  ],
+  "parts": [
+    {
+      "name": "continuous open-face shell and inner foam",
+      "vertices": 2432,
+      "triangles": 4860
+    },
+    {
+      "name": "rolled aperture edge",
+      "vertices": 512
+    },
+    {
+      "name": "short curved eyebrow peak",
+      "vertices": 150,
+      "triangles": 296
+    },
+    {
+      "name": "ear mounting recess",
+      "vertices": 48
+    },
+    {
+      "name": "ear hardware ring",
+      "vertices": 192
+    },
+    {
+      "name": "small shell rivet",
+      "vertices": 52
+    },
+    {
+      "name": "small shell rivet",
+      "vertices": 52
+    },
+    {
+      "name": "chin retention webbing",
+      "vertices": 80
+    },
+    {
+      "name": "ear mounting recess",
+      "vertices": 48
+    },
+    {
+      "name": "ear hardware ring",
+      "vertices": 192
+    },
+    {
+      "name": "small shell rivet",
+      "vertices": 52
+    },
+    {
+      "name": "small shell rivet",
+      "vertices": 52
+    },
+    {
+      "name": "chin retention webbing",
+      "vertices": 80
+    }
+  ],
+  "topology": {
+    "vertices": 3942,
+    "faces": 3854,
+    "components": [
+      48,
+      48,
+      52,
+      52,
+      52,
+      52,
+      80,
+      80,
+      150,
+      192,
+      192,
+      512,
+      2432
+    ],
+    "boundary_edges": 0,
+    "boundary_loops": [],
+    "nonmanifold_interior_edges": 0,
+    "degenerate_faces": 0,
+    "minimum_face_area": 4.770186592395476e-07
+  },
+  "restHeadCrossingPairs": 0,
+  "crossingCentersHeadFrame": [],
+  "poseSamples": [
+    {
+      "action": "crouch",
+      "frame": 1,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "crouch",
+      "frame": 15,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "crouch",
+      "frame": 30,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 1,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 10,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 20,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 1,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 15,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 30,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 1,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 15,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 30,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 1,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 61,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 121,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 1,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 15,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 30,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 1,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 15,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 30,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 1,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 15,
+      "helmetHeadTriangleCrossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 30,
+      "helmetHeadTriangleCrossings": 0
+    }
+  ],
+  "visualStatus": "Candidate only; parent must play and judge; no runtime fifth-preset activation"
+}

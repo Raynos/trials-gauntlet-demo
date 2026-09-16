@@ -1,0 +1,60 @@
+{
+  "status": "captures complete; parent played visual judgment pending",
+  "candidateBuild": "harness/out/blender/openface-r12-preview-dist",
+  "stageReport": "harness/out/blender/openface-r12-preview-build/report.json",
+  "stageRestoredExact": true,
+  "captures": [
+    {
+      "clip": "harness/out/blender/openface-r12/played-hop-full/clip.mp4",
+      "sha256": "a5b2067e1257cd3432aa43b92cfea5bd4e5d00e1587e45fd13a1a6223587621a",
+      "evidence": "harness/out/blender/openface-r12/played-hop-full/evidence.json",
+      "frames": 90,
+      "fps": 60,
+      "from": 180,
+      "to": 360,
+      "prefixRendered": true,
+      "camera": "production gameplay",
+      "finalHeroDoc": "bike rider",
+      "firstCrashInputTick": null,
+      "restartInputTicks": [],
+      "consoleMessages": []
+    },
+    {
+      "clip": "harness/out/blender/openface-r12/played-hop-lod-close/clip.mp4",
+      "sha256": "5ab230e1a6b3c87b2acd16bb81ac4cb6621c0a4f41b8408066158dce46459d62",
+      "evidence": "harness/out/blender/openface-r12/played-hop-lod-close/evidence.json",
+      "frames": 90,
+      "fps": 60,
+      "from": 180,
+      "to": 360,
+      "prefixRendered": true,
+      "camera": "labelled moving inspection",
+      "finalHeroDoc": "bike-lod rider-lod",
+      "firstCrashInputTick": null,
+      "restartInputTicks": [],
+      "consoleMessages": []
+    },
+    {
+      "clip": "harness/out/blender/openface-r12/played-crash-full-close/clip.mp4",
+      "sha256": "154ac498a5c157ee5d971be62c32fbeb83ac4ee34262103bb123347b80bafaf4",
+      "evidence": "harness/out/blender/openface-r12/played-crash-full-close/evidence.json",
+      "frames": 120,
+      "fps": 60,
+      "from": 300,
+      "to": 540,
+      "prefixRendered": true,
+      "camera": "labelled moving inspection",
+      "finalHeroDoc": "bike rider",
+      "firstCrashInputTick": 378,
+      "restartInputTicks": [
+        498
+      ],
+      "consoleMessages": [
+        "warning: [render] track budget: 14 calls / 146344 tris (cap 20 / 80k)"
+      ]
+    }
+  ],
+  "hopFullLODPhysicsStatesByteIdentical": true,
+  "warningScope": "Crash track has existing 146344-triangle budget warning; capture completed with no execution failure. Do not interpret this as passing that track geometry budget.",
+  "activation": "none; fifth preset still unavailable"
+}

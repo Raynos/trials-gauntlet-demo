@@ -16,6 +16,16 @@ export const MODEL_ASSETS = {
     "bytes": 464152,
     "sha256": "f88a6b9f9b86f2bb320035e2ef87e444f12fb1616d77977aef83208770fec652"
   },
+  "models/rider-openface-lod.glb": {
+    "url": "models/435e43242ffc8d11/rider-openface-lod-759a8ca70c7efab9.glb",
+    "bytes": 544248,
+    "sha256": "759a8ca70c7efab97b41d8c5c64b58d0ce281074a2cd331706e69807ad3c8cef"
+  },
+  "models/rider-openface.glb": {
+    "url": "models/435e43242ffc8d11/rider-openface-38c5291255c5b7b8.glb",
+    "bytes": 1566532,
+    "sha256": "38c5291255c5b7b860b7acc78658d1865d98be6f2be6fa9c853eaf05d650a67d"
+  },
   "models/rider-race-lod.glb": {
     "url": "models/41d6d32f2f06b0d1/rider-race-lod-e095ee00a701cf80.glb",
     "bytes": 571952,

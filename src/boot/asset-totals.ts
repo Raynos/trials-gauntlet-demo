@@ -18,6 +18,7 @@ export function declaredBootTotals(bytes: (key: BootAssetKey) => number): Declar
   };
   return {
     heroModels: {
+      openface: HERO_FILES_BY_OUTFIT['street-openface'].reduce((sum, file) => sum + need(file), 0),
       street: HERO_FILES_BY_OUTFIT['street-mustard'].reduce((sum, file) => sum + need(file), 0),
       race: HERO_FILES_BY_OUTFIT['race-bluewhite'].reduce((sum, file) => sum + need(file), 0),
     },

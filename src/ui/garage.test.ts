@@ -36,16 +36,13 @@ function fixture() {
 }
 
 describe('garage rider outfits', () => {
-  it('shows an unavailable openface design and navigates only the four working choices', () => {
+  it('navigates all five independently selectable designs', () => {
     const { garage, outfit, cb, makeLive } = fixture();
     garage.show('rookie', 'street-mustard');
     makeLive();
-    const unavailable = garage.root.querySelector<HTMLButtonElement>('[data-design="street-openface"]')!;
-    expect(unavailable.disabled).toBe(true);
-    unavailable.click();
-    expect(cb.setOutfit).not.toHaveBeenCalled();
+    expect(outfit('street-openface').disabled).toBe(false);
     outfit('street-mustard').focus();
-    for (const id of ['race-bluewhite', 'street-charcoal', 'race-charcoalyellow', 'street-mustard']) {
+    for (const id of ['street-openface', 'race-bluewhite', 'street-charcoal', 'race-charcoalyellow', 'street-mustard']) {
       garage.nav(1, 0);
       expect(document.activeElement).toBe(outfit(id));
     }
@@ -123,11 +120,11 @@ describe('garage rider outfits', () => {
     garage.nav(0, 1); // outfit section
     expect(document.activeElement).toBe(outfit('street-mustard'));
     garage.nav(1, 0);
-    expect(document.activeElement).toBe(outfit('race-bluewhite'));
+    expect(document.activeElement).toBe(outfit('street-openface'));
     expect(cb.setOutfit).not.toHaveBeenCalled();
     expect(outfit('street-mustard').getAttribute('aria-pressed')).toBe('true');
     garage.confirm();
-    expect(cb.setOutfit).toHaveBeenCalledExactlyOnceWith('race-bluewhite');
+    expect(cb.setOutfit).toHaveBeenCalledExactlyOnceWith('street-openface');
     garage.setDevice('keyboard');
     garage.nav(0, -1); // bike section
     garage.nav(1, 0);

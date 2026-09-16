@@ -1,0 +1,54 @@
+{
+  "method": "Threshold128, original fixed camera and full resolution; no alignment/warping",
+  "limitation": "Reference is a reviewed heuristic mask with annotated shoes. Diagnostic of projected envelope only; not likeness, anatomy, materials, or rig acceptance.",
+  "referenceSha256": "c83c56dfed60893c5046eef580b32e87734aaf2a791780bdc2c4ecd30499f88f",
+  "renderSha256": "c5e56f8f258344d9ebab4699be484503a52b1a931a9d98da676c5e971d31be27",
+  "size": [
+    495,
+    980
+  ],
+  "whole": {
+    "iou": 0.8673822084773513,
+    "referencePixels": 178798,
+    "renderPixels": 180477,
+    "missingPixels": 11918,
+    "excessPixels": 13597
+  },
+  "regions": {
+    "head": {
+      "iou": 0.7937191249117854,
+      "referencePixels": 13992,
+      "renderPixels": 11425,
+      "missingPixels": 2745,
+      "excessPixels": 178
+    },
+    "torso-arms": {
+      "iou": 0.9052407658093212,
+      "referencePixels": 80787,
+      "renderPixels": 86697,
+      "missingPixels": 1210,
+      "excessPixels": 7120
+    },
+    "waist-hands": {
+      "iou": 0.8513225479576505,
+      "referencePixels": 27237,
+      "renderPixels": 25746,
+      "missingPixels": 2873,
+      "excessPixels": 1382
+    },
+    "legs": {
+      "iou": 0.8810466620236792,
+      "referencePixels": 47357,
+      "renderPixels": 47175,
+      "missingPixels": 3080,
+      "excessPixels": 2898
+    },
+    "shoes": {
+      "iou": 0.6479377839916113,
+      "referencePixels": 9425,
+      "renderPixels": 9434,
+      "missingPixels": 2010,
+      "excessPixels": 2019
+    }
+  }
+}

@@ -5,6 +5,8 @@ import { loadGltf } from './hero/gltf';
 import { GltfRider } from './hero/gltfRider';
 import type { RiderOutfit } from '../core/types';
 import * as THREE from 'three';
+import { AVAILABLE_RIDER_PRESETS } from '../core/riderPresets';
+import { riderUrl, lodUrl } from './hero/urls';
 import { prepareHero } from './hero/lod';
 
 vi.mock('./hero/gltf', async (original) => ({
@@ -40,6 +42,19 @@ async function materialDocument(names = ['rider_rookie', 'rider_pro']): Promise<
 }
 
 describe('outfit documents are installed before selection succeeds', () => {
+  it.each(AVAILABLE_RIDER_PRESETS)('$id resolves its genuine family and exact palette at both details', async preset => {
+    const { renderer } = fixture();
+    delete (renderer as unknown as { validateRiderPreset?: unknown }).validateRiderPreset;
+    const api = renderer as unknown as { validateRiderPreset(doc: GLTF, outfit: RiderOutfit): void };
+    expect(riderUrl(preset.id)).toBe(`models/rider-${preset.family}.glb`);
+    expect(lodUrl(riderUrl(preset.id))).toBe(`models/rider-${preset.family}-lod.glb`);
+    for (const _detail of ['full', 'lod']) {
+      const correct = await materialDocument([preset.variant]);
+      const wrong = await materialDocument([preset.variant === 'rider_pro' ? 'rider_rookie' : 'rider_pro']);
+      expect(() => api.validateRiderPreset(correct, preset.id)).not.toThrow();
+      expect(() => api.validateRiderPreset(wrong, preset.id)).toThrow(`lacks ${preset.variant}`);
+    }
+  });
   it('validates exact document variants and rebuilds either detail with the installed palette while another is pending', async () => {
     const { renderer } = fixture();
     delete (renderer as unknown as { validateRiderPreset?: unknown }).validateRiderPreset;
@@ -66,7 +81,7 @@ describe('outfit documents are installed before selection succeeds', () => {
     expect(state.riderDocumentOutfit).toBe('street-charcoal');
     expect(state.validateRiderPreset).toHaveBeenCalledTimes(2);
     expect(state.applyModels).toHaveBeenCalledOnce();
-    expect(await renderer.setRiderOutfit('street-openface' as RiderOutfit)).toBe(false);
+    expect(await renderer.setRiderOutfit('unbuilt-design' as RiderOutfit)).toBe(false);
     expect(state.riderDocumentOutfit).toBe('street-charcoal');
   });
 
@@ -105,21 +120,21 @@ describe('outfit documents are installed before selection succeeds', () => {
     expect((live as { setMaterialVariant: ReturnType<typeof vi.fn> }).setMaterialVariant).toHaveBeenCalledTimes(1);
     expect(bike.setLivery).toHaveBeenLastCalledWith('rookie');
   });
-  it('retains both previous documents when either detail level fails and retries', async () => {
+  it.each(['race-bluewhite', 'street-openface'] as const)('retains both previous documents when %s LOD fails and retries', async (outfit) => {
     const { renderer, state, street, streetLod } = fixture();
     const race = {} as GLTF, raceLod = {} as GLTF;
     vi.mocked(loadGltf).mockImplementation(async (url) => url.endsWith('-lod.glb') ? null : race);
-    expect(await renderer.setRiderOutfit('race-bluewhite')).toBe(false);
+    expect(await renderer.setRiderOutfit(outfit)).toBe(false);
     expect(state.gltf.rider).toBe(street);
     expect(state.gltf.riderLod).toBe(streetLod);
     expect(state.riderDocumentOutfit).toBe('street-mustard');
     expect(state.riderOutfit).toBe('street-mustard');
     expect(state.applyModels).not.toHaveBeenCalled();
     vi.mocked(loadGltf).mockImplementation(async (url) => url.endsWith('-lod.glb') ? raceLod : race);
-    expect(await renderer.setRiderOutfit('race-bluewhite')).toBe(true);
+    expect(await renderer.setRiderOutfit(outfit)).toBe(true);
     expect(state.gltf.rider).toBe(race);
     expect(state.gltf.riderLod).toBe(raceLod);
-    expect(state.riderDocumentOutfit).toBe('race-bluewhite');
+    expect(state.riderDocumentOutfit).toBe(outfit);
     expect(state.applyModels).toHaveBeenCalledTimes(1);
   });
 

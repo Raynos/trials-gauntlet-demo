@@ -1,0 +1,119 @@
+{
+  "acceptance": "Parent played: compact openface implementation only; not overall AAA/physics acceptance",
+  "files": [
+    {
+      "path": "assets/blender/source/rider-openface.blend",
+      "bytes": 32847806,
+      "sha256": "926665fc242a4599d1e71389c1672143e43275f1601df7b4667b27c850198d29"
+    },
+    {
+      "path": "assets/blender/openface_candidate.py",
+      "bytes": 9092,
+      "sha256": "3e2f559dd7b4cd970866caba4032127482cb3bdfa39855e9961417112b4237cb"
+    },
+    {
+      "path": "assets/blender/rider_asset.py",
+      "bytes": 13813,
+      "sha256": "5de2b124e1ca38d3c47131e22a7352784685e3416cf210bb37679182ae6971dc"
+    },
+    {
+      "path": "public/models/rider-openface.glb",
+      "bytes": 1566532,
+      "sha256": "38c5291255c5b7b860b7acc78658d1865d98be6f2be6fa9c853eaf05d650a67d"
+    },
+    {
+      "path": "public/models/rider-openface-lod.glb",
+      "bytes": 544248,
+      "sha256": "759a8ca70c7efab97b41d8c5c64b58d0ce281074a2cd331706e69807ad3c8cef"
+    },
+    {
+      "path": "assets/design/hero-targets/02-street-openface.png",
+      "bytes": 2234139,
+      "sha256": "546b6e37715d925dd172c644457ff95ee248efbb07fcc5db6fb70c861547e6fe"
+    },
+    {
+      "path": "harness/out/blender/openface-r12/played-hop-full/clip.mp4",
+      "bytes": 2771786,
+      "sha256": "a5b2067e1257cd3432aa43b92cfea5bd4e5d00e1587e45fd13a1a6223587621a"
+    },
+    {
+      "path": "harness/out/blender/openface-r12/played-hop-full/evidence.json",
+      "bytes": 678796,
+      "sha256": "e055f46a3ef29ff2fb3d7250b86d12c83e7a32baa4ffd2cef8fd962277f8e5ef"
+    },
+    {
+      "path": "harness/out/blender/openface-r12/played-hop-lod-close/clip.mp4",
+      "bytes": 2904688,
+      "sha256": "5ab230e1a6b3c87b2acd16bb81ac4cb6621c0a4f41b8408066158dce46459d62"
+    },
+    {
+      "path": "harness/out/blender/openface-r12/played-hop-lod-close/evidence.json",
+      "bytes": 818416,
+      "sha256": "c95998f2232fcfb2c4d60a6b671aeb8c1fb0a752c592605d0847b4b37ec4a0b3"
+    },
+    {
+      "path": "harness/out/blender/openface-r12/played-crash-full-close/clip.mp4",
+      "bytes": 5011064,
+      "sha256": "154ac498a5c157ee5d971be62c32fbeb83ac4ee34262103bb123347b80bafaf4"
+    },
+    {
+      "path": "harness/out/blender/openface-r12/played-crash-full-close/evidence.json",
+      "bytes": 1217597,
+      "sha256": "3aeba398008c1de58bf082ff70f2d2881a3a136eccaabf150fe9ec8e50491f37"
+    }
+  ],
+  "existingStreetRaceParity": [
+    {
+      "path": "assets/blender/source/rider-street.blend",
+      "sha256": "5b5effde064171323313198d4eceafb89b2d0128ddd19d30ab873ef1022adf01",
+      "byteIdenticalToHead": true
+    },
+    {
+      "path": "assets/blender/source/rider-race.blend",
+      "sha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2",
+      "byteIdenticalToHead": true
+    },
+    {
+      "path": "public/models/rider-street.glb",
+      "sha256": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f",
+      "byteIdenticalToHead": true
+    },
+    {
+      "path": "public/models/rider-street-lod.glb",
+      "sha256": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3",
+      "byteIdenticalToHead": true
+    },
+    {
+      "path": "public/models/rider-race.glb",
+      "sha256": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33",
+      "byteIdenticalToHead": true
+    },
+    {
+      "path": "public/models/rider-race-lod.glb",
+      "sha256": "e095ee00a701cf806d875f1725c4fcc536a6676eeb1db5879f36967de6894aab",
+      "byteIdenticalToHead": true
+    }
+  ],
+  "validation": {
+    "typecheck": "pass",
+    "vitest": {
+      "files": 9,
+      "tests": 80,
+      "status": "pass"
+    },
+    "build": "pass",
+    "inlineLoaderBytes": 8190,
+    "inlineCap": 8192,
+    "mainBundleGzipKB": 460.9,
+    "headlessCombinations": 20,
+    "openfaceRetry": {
+      "failedRequests": 2,
+      "successfulRequests": 2
+    },
+    "runtimeErrors": []
+  },
+  "license": "../hero-r9-inputs/THIRD-PARTY.md",
+  "sourcePromotion": "source-promotion.json",
+  "exportVerification": "export-check.json",
+  "reproduction": "README.md"
+}

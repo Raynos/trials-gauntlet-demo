@@ -1,0 +1,217 @@
+{
+  "correction": "R12 blockout correction2, complete silhouette group",
+  "reference": "turnaround-front.png + turnaround-side.png + turnaround-back.png",
+  "priorRender": "harness/out/blender/img2-preview/neutral-blockout-04",
+  "coordinateConvention": "+Y up, +Z forward, character left +X",
+  "cameraScaleMetresPerPixel": 0.0018976545842217484,
+  "observedFrontLandmarksPixels": {
+    "shoulder": [
+      155,
+      201
+    ],
+    "elbow": [
+      105,
+      350
+    ],
+    "cuff": [
+      87,
+      384
+    ],
+    "wrist": [
+      60,
+      447
+    ],
+    "handTip": [
+      52,
+      549
+    ],
+    "hem": [
+      243,
+      455
+    ],
+    "knee": [
+      176,
+      677
+    ],
+    "ankle": [
+      145,
+      884
+    ]
+  },
+  "limitation": "Pixel landmarks are hand observations. Metric positions/depth are construction inferences, not calibrated final likeness. Source01 remains final gameplay identity.",
+  "continuousOwners": {
+    "hoodie": [
+      "torso",
+      "both shoulders",
+      "both sleeves",
+      "cuffs",
+      "dropped hood"
+    ],
+    "jeans": [
+      "pelvis",
+      "crotch",
+      "both thighs",
+      "both shins",
+      "ankle stacks"
+    ]
+  },
+  "removedDuplicateMeshIds": [
+    "sleeve-l",
+    "cuff-l",
+    "sleeve-r",
+    "cuff-r",
+    "hood",
+    "thigh-l",
+    "shin-l",
+    "thigh-r",
+    "shin-r",
+    "tongue-l",
+    "tongue-r"
+  ],
+  "ownedComponents": [
+    "cuff-l",
+    "cuff-r",
+    "forearm-l",
+    "forearm-r",
+    "hood",
+    "hoodie",
+    "jeans",
+    "palm-l",
+    "palm-r",
+    "shin-l",
+    "shin-r",
+    "sleeve-l",
+    "sleeve-r",
+    "sole-l",
+    "sole-r",
+    "thigh-l",
+    "thigh-r",
+    "tongue-l",
+    "tongue-r",
+    "upper-l",
+    "upper-r"
+  ],
+  "samplingBounds": {
+    "hoodie": {
+      "min": [
+        -0.375,
+        0.936,
+        -0.205
+      ],
+      "max": [
+        0.375,
+        1.558,
+        0.15
+      ]
+    },
+    "jeans": {
+      "min": [
+        -0.255,
+        0.12,
+        -0.143
+      ],
+      "max": [
+        0.255,
+        0.989,
+        0.13
+      ]
+    },
+    "forearm-l": {
+      "min": [
+        0.244,
+        0.925,
+        -0.05
+      ],
+      "max": [
+        0.398,
+        1.127,
+        0.052
+      ]
+    },
+    "palm-l": {
+      "min": [
+        -0.06,
+        -0.115,
+        -0.033
+      ],
+      "max": [
+        0.06,
+        0.084,
+        0.043
+      ]
+    },
+    "upper-l": {
+      "min": [
+        -0.067,
+        0.024,
+        -0.1
+      ],
+      "max": [
+        0.067,
+        0.195,
+        0.22
+      ]
+    },
+    "sole-l": {
+      "min": [
+        -0.07,
+        0.008,
+        -0.11
+      ],
+      "max": [
+        0.07,
+        0.038,
+        0.215
+      ]
+    },
+    "forearm-r": {
+      "min": [
+        -0.398,
+        0.925,
+        -0.05
+      ],
+      "max": [
+        -0.244,
+        1.127,
+        0.052
+      ]
+    },
+    "palm-r": {
+      "min": [
+        -0.06,
+        -0.115,
+        -0.033
+      ],
+      "max": [
+        0.06,
+        0.084,
+        0.043
+      ]
+    },
+    "upper-r": {
+      "min": [
+        -0.067,
+        0.024,
+        -0.1
+      ],
+      "max": [
+        0.067,
+        0.195,
+        0.22
+      ]
+    },
+    "sole-r": {
+      "min": [
+        -0.07,
+        0.008,
+        -0.11
+      ],
+      "max": [
+        0.07,
+        0.038,
+        0.215
+      ]
+    }
+  },
+  "next": "Strict validation, coordinated generation, actual field mesh bounds/connectedness, scalp gate and neutral rendered parent review. No review or material acceptance is recorded."
+}

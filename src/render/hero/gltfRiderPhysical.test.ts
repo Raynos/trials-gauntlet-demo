@@ -97,7 +97,7 @@ function poseFrame(hipX: number, hipY: number, torsoDegrees: number, angle: numb
   return f;
 }
 
-describe.each(['rider-street.glb', 'rider-street-lod.glb', 'rider-race.glb', 'rider-race-lod.glb'])('%s physical pose', file => {
+describe.each(['rider-openface.glb', 'rider-openface-lod.glb', 'rider-street.glb', 'rider-street-lod.glb', 'rider-race.glb', 'rider-race-lod.glb'])('%s physical pose', file => {
   let gltf: GLTF;
   beforeAll(async () => { gltf = await loadRig(file); });
 

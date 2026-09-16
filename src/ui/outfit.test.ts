@@ -8,13 +8,13 @@ beforeEach(() => localStorage.clear());
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe('committed rider outfit', () => {
-  it('migrates legacy names and excludes the unbuilt design from selection', () => {
+  it('migrates legacy names and persists all five designs', () => {
     expect(RIDER_PRESETS).toHaveLength(5);
-    expect(AVAILABLE_RIDER_PRESETS).toHaveLength(4);
+    expect(AVAILABLE_RIDER_PRESETS).toHaveLength(5);
     localStorage.setItem(RIDER_OUTFIT_KEY, 'race');
     expect(loadRiderOutfit()).toBe('race-bluewhite');
     expect(loadRiderOutfit('street')).toBe('street-mustard');
-    expect(loadRiderOutfit('street-openface')).toBe('race-bluewhite');
+    expect(loadRiderOutfit('street-openface')).toBe('street-openface');
     expect(localStorage.getItem(RIDER_OUTFIT_KEY)).toBe('race');
     for (const preset of AVAILABLE_RIDER_PRESETS) {
       saveRiderOutfit(preset.id);

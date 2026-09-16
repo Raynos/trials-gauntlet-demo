@@ -22,7 +22,8 @@ const DIGITS = '0123456789'.replace(/./g, '<b>$&</b>');
 export function createLoaderRenderer(root: HTMLElement, build: string, now: () => number = () => performance.now()): LoaderRenderer {
   const q = <T extends Element = HTMLElement>(sel: string): T => root.querySelector<T>(sel)!;
   const t0 = now();
-  const buildEl = root.querySelector('.build');
+  const elapsed = () => `${((now() - t0) / 1000).toFixed(1)} s`;
+  const buildEl = q('.build');
   if (buildEl) buildEl.textContent = `build ${build}`;
 
   interface Track {
@@ -115,7 +116,7 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
     }
     if (view.done) {
       left = true;
-      tEl.textContent = `${((t - t0) / 1000).toFixed(1)} s`;
+      tEl.textContent = elapsed();
       root.classList.add('out');
       setTimeout(() => root.remove(), 300); // the 240 ms crossfade; nothing about progress waits on it
     }
@@ -124,7 +125,7 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
   // The footer clock — the one thing that moves on its own, and it is a clock.
   const tick = setInterval(() => {
     if (left || !root.isConnected) return void clearInterval(tick);
-    tEl.textContent = `${((now() - t0) / 1000).toFixed(1)} s`;
+    tEl.textContent = elapsed();
   }, 100);
 
   // Long tasks (Chromium): a red mark on the row of the step that was running — it annotates, it counts nothing.

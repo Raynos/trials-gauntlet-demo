@@ -190,7 +190,7 @@ export async function buildInline(root: string, core: LoadItem[], totals: Declar
 function loadManifest(id: string): Plugin[] {
   let root = process.cwd();
   let coreItems: LoadItem[] = [];
-  let totals: DeclaredBootTotals = { heroModels: { street: 0, race: 0 }, bootArt: 0 };
+  let totals: DeclaredBootTotals = { heroModels: { street: 0, race: 0, openface: 0 }, bootArt: 0 };
   const required = [...new Set(Object.values(HERO_FILES_BY_OUTFIT).flat())];
   const modelAssets = modelAssetsPlugin(required, (assets, catalogRoot) => { totals = writeBootPlanTable(catalogRoot, assets); });
   return [modelAssets, {

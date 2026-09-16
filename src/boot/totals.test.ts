@@ -13,6 +13,8 @@ vi.mock('./plan.generated', async () => {
     'models/bike-lod.glb': 30,
     'models/rider-street.glb': 70,
     'models/rider-street-lod.glb': 20,
+    'models/rider-openface.glb': 105,
+    'models/rider-openface-lod.glb': 25,
     'models/rider-race.glb': 90,
     'models/rider-race-lod.glb': 25,
     ...Object.fromEntries(BOOT_IDS.map(id => [`art:${id}`, 10])),
@@ -31,6 +33,7 @@ describe('declared byte totals', () => {
   it('counts only the chosen full/LOD rider pair and the shared bike pair', () => {
     expect(bootByteTotals('street-charcoal')).toEqual(bootByteTotals('street-mustard'));
     expect(bootByteTotals('race-charcoalyellow')).toEqual(bootByteTotals('race-bluewhite'));
+    expect(bootByteTotals('street-openface').heroModels).toBe(260);
     expect(bootByteTotals('street-mustard').heroModels).toBe(220);
     expect(bootByteTotals('race-bluewhite').heroModels).toBe(245);
     expect(bootByteTotals('street-mustard').bootArt).toBe(bootByteTotals('race-bluewhite').bootArt);

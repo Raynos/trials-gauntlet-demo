@@ -249,7 +249,7 @@ def publish(outputs, source):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("seed", "export"))
-    parser.add_argument("--outfit", choices=("street", "race"), default="street")
+    parser.add_argument("--outfit", choices=("street", "race", "openface"), default="street")
     parser.add_argument("--source", type=Path)
     parser.add_argument("--replace-source", action="store_true")
     parser.add_argument("--lod", action="store_true")
@@ -261,6 +261,8 @@ def main():
     arguments = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     args = parser.parse_args(arguments)
     args.source = args.source or HERE / "source" / f"rider-{args.outfit}.blend"
+    if args.action == "seed" and args.outfit == "openface":
+        parser.error("Openface is authored with openface_candidate.py; export its packed source.")
     if args.action == "seed" and args.lod:
         parser.error("The source is full detail; LOD is derived by export.")
     if args.size is not None and args.size not in (256, 512, 1024, 2048):
