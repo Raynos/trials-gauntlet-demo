@@ -5,7 +5,7 @@
 set -uo pipefail
 mode="${1:-tree}"
 excl='^(docs/evidence|docs/research|project/archive|reference|prototypes|assets|public|harness/out|tmp)/'
-count() { awk -v md=0 -v code=0 '{ if ($2 ~ /\.md$/) md += $1; else if ($2 ~ /\.(ts|tsx|js|mjs|mts|html|css|sh|glsl)$/) code += $1 } END { printf "%d %d\n", md, code }'; }
+count() { awk -v md=0 -v code=0 '{ if ($2 ~ /\.md$/) md += $1; else if ($2 ~ /\.(ts|tsx|js|mjs|mts|py|html|css|sh|glsl|json)$/) code += $1 } END { printf "%d %d\n", md, code }'; }
 if [ "$mode" = "tree" ]; then
   read -r md code < <(git ls-files | grep -vE "$excl" | grep -E '\.(md|ts|tsx|js|mjs|mts|html|css|sh|glsl)$' | xargs wc -l 2>/dev/null | grep -v ' total$' | count)
   total=$((md + code)); pct=$(( total > 0 ? md * 100 / total : 0 ))
