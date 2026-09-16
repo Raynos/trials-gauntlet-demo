@@ -30,6 +30,8 @@ Round 22 rejected a lower-neck taper after rendered comparison showed no convinc
 
 Round 23 isolates the neck defect with a [false-color component diagnostic](../../prototypes/hero-garage/reports/neck-component-round23-review.json): the new portrait turns green, but pale rear-neck patches remain. Targeted old-body neck cleanup is next; the saved identity and normal preview remain unchanged.
 
+Round 24 removes the 347 identified old-neck triangles: pale overlays disappear while saved face/curls/beard and all six clip payloads remain unchanged. [Review](../../prototypes/hero-garage/reports/neck-cleanup-round24-review.json). Ragged collar shape/UVs remain. Fresh frozen game ship gate passes cold boot, exact replay, clear, crash and one-tick restart.
+
 The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The earlier hourly automation remains paused; this goal is actively progressing through whole-scene work. Latest checked allowance is 21% remaining. Final visual approval stays with the user. Better body/clothing sources are being assessed without changing target01 identity. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
 
 ## Independent audit — 2026-09-15

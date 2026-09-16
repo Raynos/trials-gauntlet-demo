@@ -35,8 +35,8 @@
     },
     {
       "path": "assets/street01-rider-identity.glb",
-      "bytes": 173119480,
-      "sha256": "500990e54f6d3c7b5c413ef99e9292fa761e16a8712d71744eb6742a798bfd82"
+      "bytes": 173117400,
+      "sha256": "4ab4c5863ddc738c9254eca945e85ec7d6c0d0df1078d5a6b8d3c085db17bc11"
     },
     {
       "path": "decoders/basis/basis_transcoder.js",
@@ -89,8 +89,8 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 188131655,
-  "sourceDistBytes": 416703641,
+  "totalBytes": 188129575,
+  "sourceDistBytes": 416701561,
   "excludedFiles": [
     {
       "path": "assets/basis_transcoder-VXdx5NbI.wasm",

@@ -1,0 +1,17 @@
+{
+  "round": 24,
+  "decision": "Adopt targeted old-neck removal",
+  "removedTriangles": 347,
+  "method": "Exact-position welded connected components seeded by old head-weighted faces. Only one seeded component had residual triangles; its 347 retained faces are bounded around the neck. No distance weld or garment reshaping.",
+  "reviewMethod": "Parent inspected matched Three.js portraits and sequential decoded frames of actual forward-rise orbit recording; not continuous playback.",
+  "finding": "Pale jagged rear-neck overlays disappear. Saved portrait, curls and beard preserved. No gross detachment seen in sampled motion. Ragged collar geometry and stretched UVs remain.",
+  "preservationReport": "neck-cleanup-round24-preservation.json",
+  "captureReport": "neck-cleanup-round24.json",
+  "shipGate": "round24-ship/report.json",
+  "limits": [
+    "All six animations unchanged and loaded, but this visual review samples forward_attack only.",
+    "No final collar/art acceptance.",
+    "Dense appearance asset remains unoptimized; actual iPhone validation and final game integration remain open."
+  ],
+  "outputSHA256": "4ab4c5863ddc738c9254eca945e85ec7d6c0d0df1078d5a6b8d3c085db17bc11"
+}

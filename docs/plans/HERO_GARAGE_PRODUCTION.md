@@ -290,3 +290,9 @@ A bounded taper of the portrait shoulder edge below source Y1.590 preserved face
 ### Round 23 — neck component attribution
 
 A reversible false-color diagnostic replaced only the attached portrait skin material with green; geometry, motion and binary payload stayed identical. The pale jagged rear-neck patches remained pale in the matched portrait and sequential decoded forward-rise orbit frames. This isolates the defect away from the new portrait skin and points to retained original rider-neck surfaces. The production asset was untouched and the disposable preview restored byte-for-byte. Next work is source-face/UV identification of the old neck followed by targeted removal and collar review, not another portrait taper. Exact offending triangles remain unidentified. Evidence: `reports/neck-component-round23-review.json` under the prototype.
+
+### Round 24 — residual old neck removed
+
+Exact-position component analysis isolated 347 old-neck triangles surviving the head-weight threshold. Removing that remainder clears the pale overlays in the matched portrait and sampled forward-rise orbit. All 244 non-index accessor payloads, scene nodes, materials and six animation definitions stay identical; the saved face/curls/beard are unchanged. The active generated asset and both previews now use SHA `4ab4c5863ddc738c9254eca945e85ec7d6c0d0df1078d5a6b8d3c085db17bc11`. Collar shape/UVs remain visibly provisional. See `reports/neck-cleanup-round24-review.json` under the prototype.
+
+The fresh frozen game ship gate passes cold boot, 1,038 byte-identical replay ticks, an 8.65-second clear, crash and one-tick restart with no browser errors (`reports/round24-ship/report.json`). This checks the frozen game, not production integration of the dense prototype identity.
