@@ -1,0 +1,53 @@
+{
+  "type": 1,
+  "name": "Cotton Jersey",
+  "authors": {
+    "colormass": "Photography",
+    "Rico Cilliers": "Processing"
+  },
+  "max_resolution": [
+    8018,
+    8024
+  ],
+  "dimensions": [
+    263.6027473872483,
+    263.7999951839447
+  ],
+  "staging": null,
+  "files_hash": "de468d9c53b8a1aaa40a37664f778bb44f9effdf",
+  "tags": [
+    "beige",
+    "rough",
+    "fabric",
+    "textile ",
+    "matte",
+    "woven",
+    "weave",
+    "cotton",
+    "jersey",
+    "ribbed"
+  ],
+  "sponsors": [
+    "84390067"
+  ],
+  "description": "Free cotton jersey PBR texture: beige, matte ribbed knit with subtle roughness and stretch - great for garments, upholstery and realistic cloth shading.",
+  "date_published": 1757078158,
+  "categories": [
+    "fabric",
+    "cotton",
+    "stretchy"
+  ],
+  "category_id": "419cb9b0-5706-59c9-804b-aa3a6b6069d1",
+  "category": "Textiles & Leather/Knit/Jersey & Stretch Knit",
+  "attributes": {
+    "surface_use": "object",
+    "origin": "man_made",
+    "condition": [
+      "clean"
+    ]
+  },
+  "vault": "fabric",
+  "img_version": "98e20451",
+  "download_count": 36030,
+  "thumbnail_url": "https://cdn.polyhaven.com/asset_img/thumbs/cotton_jersey.png?width=256&height=256&v=98e20451"
+}

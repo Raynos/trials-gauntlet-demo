@@ -1,0 +1,10 @@
+{
+  "models": [
+    "harness/out/blender/mega-bike/final-candidate/models/bike.glb",
+    "harness/out/blender/mega-bike/final-candidate/models/bike-lod.glb",
+    "harness/out/blender/street-head/finished-street/models-standard/rider-street.glb",
+    "harness/out/blender/street-head/finished-street/models-standard/rider-street-lod.glb",
+    "harness/out/blender/race-head/finished-race/models/rider-race.glb",
+    "harness/out/blender/race-head/finished-race/models/rider-race-lod.glb"
+  ]
+}

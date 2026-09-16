@@ -120,8 +120,12 @@ function probeInPage([inputs, MASK_PX]: [unknown[], number]): Row {
   rider.scene.updateMatrixWorld(true);
   const hand: [number, number] = [0, 0];
   for (let i = 0; i < 2; i++) {
-    const hb = rider.bones.get('hand.' + (i === 0 ? 'L' : 'R'));
+    const side = i === 0 ? 'L' : 'R';
+    // Merge #3 (blender-work rider): the grip is held by `gripSocket.<side>` (palm, a child of the hand bone) and the hand
+    // bone sits at the wrist, |wristFromGrip| = 6.04 cm from the grip by design; measure the contact point the rig has.
+    const hb = rider.scene.getObjectByName('gripSocket.' + side) ?? rider.scene.getObjectByName('gripSocket' + side) ?? rider.bones.get('hand.' + side);
     const p = new THREE.Vector3();
+    hb.updateWorldMatrix(true, false);
     hb.getWorldPosition(p);
     bike.frame.worldToLocal(p);
     hand[i] = +p.distanceTo(rider.chain.hand[i]).toFixed(4);

@@ -380,7 +380,17 @@ html.short .bc-art { display: none; }
 .garage-head h1 small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .34em; color: var(--amber); margin-bottom: .35em; }
 .garage-sub { font-size: .82rem; letter-spacing: .08em; color: var(--ink-mute); }
 .garage-tip { font-size: .74rem; letter-spacing: .04em; color: var(--ink-mute); margin-top: 2px; font-variant-numeric: tabular-nums; }
-.garage-cards { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat) + 5.6rem); bottom: calc(var(--s6) + var(--sab)); width: min(40rem, calc(50 * var(--vw))); display: flex; gap: var(--s4); align-items: flex-start; }
+.garage-customize { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat) + 5.6rem); bottom: calc(var(--s6) + var(--sab)); width: min(40rem, calc(50 * var(--vw))); display: flex; flex-direction: column; gap: var(--s4); overflow-y: auto; padding: var(--s2); margin-left: calc(-1 * var(--s2)); overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; }
+.garage-cards { display: flex; flex: 0 0 auto; gap: var(--s4); align-items: stretch; }
+.garage-outfits { flex: 0 0 auto; display: flex; flex-direction: column; gap: var(--s2); padding-bottom: var(--s2); }
+.outfit-heading { display: flex; justify-content: space-between; gap: var(--s2); font-size: .8rem; letter-spacing: .08em; }
+.outfit-current { color: var(--amber); }
+.outfit-options { display: flex; gap: var(--s2); }
+.outfit-button { display: flex; flex: 1 1 0; flex-direction: column; gap: var(--s1); min-width: 0; min-height: 48px; padding: var(--s2) var(--s3); text-align: left; color: var(--ink); background: var(--slab-3); border: 1px solid var(--line-2); border-radius: var(--r2); cursor: pointer; font: inherit; }
+.outfit-button strong { font-size: .9rem; }
+.outfit-button span { font-size: .72rem; line-height: 1.3; color: var(--ink-dim); }
+.outfit-button.selected { border-color: var(--amber); background: color-mix(in srgb, var(--amber) 12%, var(--slab-3)); }
+.outfit-button.on, .garage-screen button:focus-visible, .garage-screen .backbtn.on { outline: 2px solid var(--amber); outline-offset: 2px; }
 .bike-card { position: relative; flex: 1 1 0; min-width: 0; max-height: 100%; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4) var(--s4) var(--s3); border-radius: var(--r3); border: 1px solid var(--line-2); background: linear-gradient(180deg, rgba(16,19,25,.96), rgba(9,11,15,.92)); box-shadow: var(--plate); color: var(--ink); text-align: left; cursor: pointer; overflow: hidden; transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease), border-color var(--t1); }
 .bike-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--tint); opacity: .55; transition: opacity var(--t1); }
 .bike-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(80% 60% at 100% 0%, color-mix(in srgb, var(--tint) 22%, transparent), transparent 70%); opacity: 0; transition: opacity var(--t2); }
@@ -458,7 +468,10 @@ html.short .bc-art { display: none; }
 .ob-hop { font-size: .82rem; color: var(--ink-mute); border-top: 1px solid var(--line-2); padding-top: var(--s3); }
 .ob-tip { font-size: .74rem; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
 .ob-card .btn { align-self: flex-end; min-height: 48px; }
-html.short .garage-cards { top: calc(var(--s3) + var(--sat) + 3.4rem); bottom: calc(var(--s4) + var(--sab)); width: min(32rem, calc(54 * var(--vw))); gap: var(--s2); }
+html.short .garage-customize { top: calc(var(--s3) + var(--sat) + 3.4rem); bottom: calc(var(--s6) + var(--sab)); width: min(32rem, calc(54 * var(--vw))); gap: var(--s3); }
+html.short .garage-cards { gap: var(--s2); }
+html.short .outfit-button span { font-size: .66rem; }
+html.short .garage-screen .legend { gap: var(--s2); font-size: .66rem; }
 html.short /* Garage framing is the renderer's job (a camera preset), never a CSS transform on the canvas. */
 html.short .garage-head { top: calc(var(--s3) + var(--sat)); }
 html.short .garage-head h1 { font-size: 1.6rem; }

@@ -1,0 +1,48 @@
+{
+  "rider-race-lod.glb": {
+    "images": 4,
+    "materials": [
+      {
+        "name": "rider_rookie",
+        "aoTexture": {
+          "index": 1
+        },
+        "ormTexture": {
+          "index": 1
+        }
+      },
+      {
+        "name": "rider_pro",
+        "aoTexture": {
+          "index": 4
+        },
+        "ormTexture": {
+          "index": 4
+        }
+      }
+    ]
+  },
+  "rider-race.glb": {
+    "images": 4,
+    "materials": [
+      {
+        "name": "rider_rookie",
+        "aoTexture": {
+          "index": 1
+        },
+        "ormTexture": {
+          "index": 1
+        }
+      },
+      {
+        "name": "rider_pro",
+        "aoTexture": {
+          "index": 4
+        },
+        "ormTexture": {
+          "index": 4
+        }
+      }
+    ]
+  }
+}

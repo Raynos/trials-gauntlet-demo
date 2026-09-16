@@ -1,0 +1,38 @@
+[
+  {
+    "file": "harness/out/blender/hero-r10-race/models/rider-race-lod.glb",
+    "sha256": "7fd860d0a56c1c8503af6ef615e3c5363274ea5273dfc50910e1b03acb146190",
+    "bytes": 616700,
+    "images": 4,
+    "bindings": [
+      {
+        "material": "rider_rookie",
+        "ao": 1,
+        "orm": 1
+      },
+      {
+        "material": "rider_pro",
+        "ao": 4,
+        "orm": 4
+      }
+    ]
+  },
+  {
+    "file": "harness/out/blender/hero-r10-race/models/rider-race.glb",
+    "sha256": "c3b5aec7b20ef808d7cbba4e6e6308a5a91f9c545a0f64e839df3bb7fdc485b0",
+    "bytes": 1736300,
+    "images": 4,
+    "bindings": [
+      {
+        "material": "rider_rookie",
+        "ao": 1,
+        "orm": 1
+      },
+      {
+        "material": "rider_pro",
+        "ao": 4,
+        "orm": 4
+      }
+    ]
+  }
+]

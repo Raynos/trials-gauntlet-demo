@@ -1,0 +1,89 @@
+{
+  "license": "CC0-1.0",
+  "license_url": "https://polyhaven.com/license",
+  "source": "Poly Haven",
+  "assets": {
+    "cotton_jersey": {
+      "url": "https://polyhaven.com/a/cotton_jersey",
+      "authors": {
+        "colormass": "Photography",
+        "Rico Cilliers": "Processing"
+      },
+      "dimensions_mm": [
+        263.6027473872483,
+        263.7999951839447
+      ],
+      "maps": {
+        "Diffuse": {
+          "path": "cotton_jersey/cotton_jersey_diff_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/cotton_jersey/cotton_jersey_diff_2k.png",
+          "bytes": 22809359,
+          "sha256": "56318041eea71a67fc45900885006c7f60555343d1786959e149f1bee6ec0ef3",
+          "source_md5": "c423d3614901685c3eb9a73b5b1e6a71"
+        },
+        "Displacement": {
+          "path": "cotton_jersey/cotton_jersey_disp_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/cotton_jersey/cotton_jersey_disp_2k.png",
+          "bytes": 7856739,
+          "sha256": "817cca5cda0ad26dd7b17c1e204d05ec6486b50bcaac0a11d954b0c19977957b",
+          "source_md5": "f8eed820e1b6ec1f312bfd57ac417424"
+        },
+        "Rough": {
+          "path": "cotton_jersey/cotton_jersey_rough_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/cotton_jersey/cotton_jersey_rough_2k.png",
+          "bytes": 8082759,
+          "sha256": "cdb70e71b0b0eab3792d98a862cf38ae5f5ac272bc102ceab0c29fd877195b91",
+          "source_md5": "b37edf4a4c140c53689883d15875fba9"
+        },
+        "nor_gl": {
+          "path": "cotton_jersey/cotton_jersey_nor_gl_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/cotton_jersey/cotton_jersey_nor_gl_2k.png",
+          "bytes": 22097465,
+          "sha256": "fea9a168b27ce3532b02c327ad7b61efa35a1e0f6abbd8c5ab7734ef3c24f053",
+          "source_md5": "ca8a966851d8e258fd18e16207dda50f"
+        }
+      }
+    },
+    "denim_fabric_03": {
+      "url": "https://polyhaven.com/a/denim_fabric_03",
+      "authors": {
+        "colormass": "Photography",
+        "Rico Cilliers": "Processing"
+      },
+      "dimensions_mm": [
+        271.42801281852286,
+        270.9999978542328
+      ],
+      "maps": {
+        "Diffuse": {
+          "path": "denim_fabric_03/denim_fabric_03_diff_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/denim_fabric_03/denim_fabric_03_diff_2k.png",
+          "bytes": 23200557,
+          "sha256": "015d41739d4aabf01b4a9935074a76330499e829c037ccbb2e2a854ee37eda75",
+          "source_md5": "813c16a8601f91fc9662b8a916285cb4"
+        },
+        "Displacement": {
+          "path": "denim_fabric_03/denim_fabric_03_disp_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/denim_fabric_03/denim_fabric_03_disp_2k.png",
+          "bytes": 7765768,
+          "sha256": "162f70b291823bc252c29c1f59d5a6b3958911380c810d90a1616f46f12f139d",
+          "source_md5": "9e37660942ee5ab944d61f2661b61287"
+        },
+        "Rough": {
+          "path": "denim_fabric_03/denim_fabric_03_rough_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/denim_fabric_03/denim_fabric_03_rough_2k.png",
+          "bytes": 7953668,
+          "sha256": "be6b5b36dc0ad0183a2c0659ce03f65aa9290cf304694e3e534f4c1e48758c46",
+          "source_md5": "add0541282262cbdcb0fef4a831b3203"
+        },
+        "nor_gl": {
+          "path": "denim_fabric_03/denim_fabric_03_nor_gl_2k.png",
+          "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/denim_fabric_03/denim_fabric_03_nor_gl_2k.png",
+          "bytes": 22517958,
+          "sha256": "ea2843a37e2f065275f67fd1725d58d6c7e14081a0cac7033960fb4e1f1de714",
+          "source_md5": "7b78ea01bb5293405ef396cd53bd664a"
+        }
+      }
+    }
+  }
+}

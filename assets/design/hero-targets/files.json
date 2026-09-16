@@ -1,0 +1,37 @@
+[
+  {
+    "name": "01-street-barehead",
+    "source": "/Users/raynos/.codex/generated_images/01a0a5e2-f41b-7732-9cd3-743e4022941a/exec-4e364052-021d-4922-bba0-6c5aa6129d44.png",
+    "destination": "assets/design/hero-targets/01-street-barehead.png",
+    "reference": "harness/out/blender/mega-v4-close-street/frames/frame-00040.png",
+    "sha256": "5be089f06ef2dded75fb7491602bd580b299b30a271c8c7a334a96915f92b0c0"
+  },
+  {
+    "name": "02-street-openface",
+    "source": "/Users/raynos/.codex/generated_images/01a0a5e2-f41b-7732-9cd3-743e4022941a/exec-7763ffa9-4871-48d5-a5c0-d73127847225.png",
+    "destination": "assets/design/hero-targets/02-street-openface.png",
+    "reference": "harness/out/blender/mega-v4-close-street/frames/frame-00040.png",
+    "sha256": "546b6e37715d925dd172c644457ff95ee248efbb07fcc5db6fb70c861547e6fe"
+  },
+  {
+    "name": "03-race-rookie",
+    "source": "/Users/raynos/.codex/generated_images/01a0a5e2-f41b-7732-9cd3-743e4022941a/exec-2b8e798a-ed5f-46b5-873b-627b37fba009.png",
+    "destination": "assets/design/hero-targets/03-race-rookie.png",
+    "reference": "harness/out/blender/mega-v4-close-race/frames/frame-00040.png",
+    "sha256": "a6caafe0abd2f14c82ba9703e8d7a14762bc1f2aaaa086b75ecf8531ecb3e7ba"
+  },
+  {
+    "name": "04-street-pro-gameplay",
+    "source": "/Users/raynos/.codex/generated_images/01a0a5e2-f41b-7732-9cd3-743e4022941a/exec-772a42d5-fbdc-4fbe-8c49-30f7340ae7b0.png",
+    "destination": "assets/design/hero-targets/04-street-pro-gameplay.png",
+    "reference": "harness/out/blender/mega-v3-street-rookie/frames/frame-00040.png",
+    "sha256": "852479a88ed2cc5ed43c0648fd603218044f5f3940f9ac978fd10afc76d99776"
+  },
+  {
+    "name": "05-race-pro-hop",
+    "source": "/Users/raynos/.codex/generated_images/01a0a5e2-f41b-7732-9cd3-743e4022941a/exec-90f74886-d193-4cd2-add9-d7a2ea881f42.png",
+    "destination": "assets/design/hero-targets/05-race-pro-hop.png",
+    "reference": "harness/out/blender/mega-v4-close-race/frames/frame-00075.png",
+    "sha256": "a70a20ac103bf1ca5b2860d37652f21470abfd19eb9b1df5f85a70fecac13207"
+  }
+]

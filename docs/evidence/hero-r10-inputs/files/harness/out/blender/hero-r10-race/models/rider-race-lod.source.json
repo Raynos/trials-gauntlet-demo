@@ -1,0 +1,34 @@
+{
+  "source": "harness/out/blender/hero-r10-race/race-surface-v2.blend",
+  "sourceSha256": "7cc326b400630bb3b4fecb7b5c2829e0fd92a470db9fa6dd31387610b5c34d51",
+  "exportSha256": "7fd860d0a56c1c8503af6ef615e3c5363274ea5273dfc50910e1b03acb146190",
+  "outfit": "race",
+  "lod": true,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "verified": {
+    "bytes": 616700,
+    "triangles": 5871,
+    "vertices": 9379,
+    "bones": 19,
+    "clips": [
+      "crouch",
+      "extend",
+      "forward_attack",
+      "hang_back",
+      "idle_breathe",
+      "land_absorb",
+      "sit_cruise",
+      "stand_attack"
+    ],
+    "variants": [
+      "rider_rookie",
+      "rider_pro"
+    ],
+    "maxWeightError": 1.1741940397769213e-07,
+    "loadedWeightError": 3.364402800798416e-08
+  }
+}

@@ -9,6 +9,7 @@
  *   ?audio=0        NullAudio (the hook then has no renderOffline)
  *   ?ghost=1        run the PB ghost world in harness mode too (off by default there: one world per µs/tick)
  *   ?rider=gltf|proc, ?bike=gltf|proc   rider / bike model (default gltf; a stored settings choice otherwise)
+ *   ?outfit=street|race   cosmetic rider outfit (default street; stored garage choice otherwise)
  *   ?touchdebug=1   overlay showing active touch pointers and the live InputFrame
  *   ?track=<id>     start straight into a track (skips the menu)
  *   ?dev=1          unlock every tier in track select and list the harness test strips
@@ -40,6 +41,8 @@ import { streamBytes } from './boot/stream';
 import { PREPARE_STEPS } from './boot/steps';
 import { delegate, type ByteProgress, type StepRunner } from './boot/plan';
 import type { PrepareStep } from './boot/steps';
+import type { RiderOutfit, RiderOutfitRenderer } from './core/types';
+import { loadRiderOutfit } from './ui/outfit';
 
 type AnyModule = Record<string, unknown>;
 
@@ -91,10 +94,10 @@ interface RendererBootHooks {
   onTrackArt: (done: number, total: number, label: string) => void;
 }
 
-function makeRenderer(parent: HTMLElement, harness: boolean, models: ModelChoices, boot?: RendererBootHooks): { renderer: GameRenderer; kind: string } {
+function makeRenderer(parent: HTMLElement, harness: boolean, models: ModelChoices, riderOutfit: RiderOutfit, boot?: RendererBootHooks): { renderer: GameRenderer; kind: string } {
   const m = renderMod as AnyModule;
   // riderModel / bikeModel: 'proc' | 'gltf' — the render owner reads them; unknown keys are ignored today.
-  const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness, ...models, ...(boot ?? {}) };
+  const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness, ...models, riderOutfit, ...(boot ?? {}) };
   const create = m['createRenderer'];
   if (typeof create === 'function') {
     return { renderer: (create as (p: HTMLElement, o: typeof opts) => GameRenderer)(parent, opts), kind: 'createRenderer' };
@@ -155,12 +158,13 @@ function boot(): void {
   const extras: HookExtras = {};
   const initialTrack = route.track ?? undefined;
   const models = modelChoices(params);
+  const riderOutfit = loadRiderOutfit(params.get('outfit'));
 
   let composed: Composed | null = null;
   const compose = (): Composed => {
     if (composed) return composed;
     const t0 = performance.now();
-    const { renderer, kind: renderKind } = makeRenderer(app, harness, models);
+    const { renderer, kind: renderKind } = makeRenderer(app, harness, models, riderOutfit);
     const tRender = performance.now();
     const { make: makePhysics, kind: physicsKind, version: physicsVersion } = physicsFactory(params.get('physics'));
     const physics = makePhysics(physicsHz);
@@ -233,7 +237,7 @@ function boot(): void {
         await nextPaint();
         // The two downloads boot awaits (hero glTF, boot art set) start in the renderer's constructor, each with its
         // DOWNLOAD reader; per-track art after the boot set is an `after` item.
-        return makeRenderer(appRoot, false, models, { heroBytes: plan.reader('heroModels'), artBytes: plan.reader('bootArt'), onTrackArt: (done, total) => plan.after('trackArt', done, total) });
+        return makeRenderer(appRoot, false, models, riderOutfit, { heroBytes: plan.reader('heroModels'), artBytes: plan.reader('bootArt'), onTrackArt: (done, total) => plan.after('trackArt', done, total) });
       });
       const { renderer, kind: renderKind } = sRenderer.value;
       const sPhysics = await sRenderer.step('physics', async () => {
@@ -294,6 +298,8 @@ function boot(): void {
           resize: (w, h, dpr) => renderer.resize(w, h, dpr),
           initialTrack,
           models: { rider: models.riderModel, bike: models.bikeModel },
+          riderOutfit,
+          onRiderOutfitChange: (outfit) => (renderer as RiderOutfitRenderer).setRiderOutfit?.(outfit) ?? Promise.resolve(false),
           touchDebug: params.get('touchdebug') === '1',
           modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
           applyModels: (m) => {

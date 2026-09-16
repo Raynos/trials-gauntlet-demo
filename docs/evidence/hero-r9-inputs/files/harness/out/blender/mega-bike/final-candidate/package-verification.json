@@ -1,0 +1,29 @@
+{
+  "fullEmbeddedImagesIdenticalToPlayedAOCandidate": true,
+  "assets": [
+    {
+      "name": "bike",
+      "occlusionMaterials": 3,
+      "sourceUnchanged": true,
+      "images": 9,
+      "textures": 11,
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      }
+    },
+    {
+      "name": "bike-lod",
+      "occlusionMaterials": 3,
+      "sourceUnchanged": true,
+      "images": 9,
+      "textures": 11,
+      "localAO": {
+        "distance": 0.025,
+        "samples": 32,
+        "strength": 0.8
+      }
+    }
+  ]
+}

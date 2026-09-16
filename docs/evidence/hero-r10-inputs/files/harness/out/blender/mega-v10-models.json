@@ -1,0 +1,10 @@
+{
+  "models": [
+    "harness/out/blender/hero-r10-bike/models/bike.glb",
+    "harness/out/blender/hero-r10-bike/models/bike-lod.glb",
+    "harness/out/blender/hero-r10-street/models/rider-street.glb",
+    "harness/out/blender/hero-r10-street/models/rider-street-lod.glb",
+    "harness/out/blender/hero-r10-race/models/rider-race.glb",
+    "harness/out/blender/hero-r10-race/models/rider-race-lod.glb"
+  ]
+}

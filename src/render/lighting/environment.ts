@@ -369,6 +369,11 @@ export class LightingRig {
   }
 
   dispose(): void {
+    this.sun.shadow.map?.dispose();
+    this.sun.shadow.mapPass?.dispose();
+    this.sun.shadow.map = null;
+    this.sun.shadow.mapPass = null;
+    this.scene.remove(this.sun, this.sun.target, this.hemi);
     this.sky?.dispose();
     this.envRT?.dispose();
     this.pmrem.dispose();

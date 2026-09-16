@@ -586,6 +586,7 @@ export class PostChain {
     this.ao.dispose();
     this.bloom.dispose();
     this.emissive?.dispose();
+    this.composite.dispose(); // merge #3 (blender-work): the composite ShaderPass material was never released
     this.renderer.setRenderTarget(null);
   }
 }

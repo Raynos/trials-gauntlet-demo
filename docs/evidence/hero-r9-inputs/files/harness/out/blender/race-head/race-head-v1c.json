@@ -1,0 +1,263 @@
+{
+  "source": "harness/out/blender/mega-outfits/anatomy-v3/race-lower/race-lower-v2.blend",
+  "source_sha256": "6504a87540cf37f0702d5deb5c23f4965fbbc81eca974639f7357003db58920e",
+  "head_source": "harness/out/blender/street-head/street-head-v1.blend",
+  "head_source_sha256": "3a370e96380f2c428a640371a135e59ac960e1b791d36d50565fec1c68f17614",
+  "output_sha256": "93dcfe655b3a042079e46af56b697025ec638028ab2072ba5ac54cac8e93d45a",
+  "script_sha256": "7bd3e54f13a219e62bcbd22fece6289ff453ecc843f89d02a8306052955b059f",
+  "old_helmet_head_axes_m": {
+    "min": [
+      -0.1553657054901123,
+      -0.14800000190734863,
+      -0.023521244525909424
+    ],
+    "max": [
+      0.26223504543304443,
+      0.14990006387233734,
+      0.3128754794597626
+    ],
+    "dimensions": [
+      0.41760075092315674,
+      0.297900065779686,
+      0.336396723985672
+    ]
+  },
+  "new_helmet_head_axes_m": {
+    "min": [
+      -0.10000348091125488,
+      -0.11680000275373459,
+      -0.003229200839996338
+    ],
+    "max": [
+      0.2106150984764099,
+      0.11992005258798599,
+      0.26877257227897644
+    ],
+    "dimensions": [
+      0.3106185793876648,
+      0.23672005534172058,
+      0.2720017731189728
+    ]
+  },
+  "anatomical_chin_to_crown_m": 0.23344024,
+  "head_above_chin_axes_m": {
+    "min": [
+      -0.0680035948753357,
+      -0.08818919211626053,
+      0.0011001825332641602
+    ],
+    "max": [
+      0.14383608102798462,
+      0.08687536418437958,
+      0.23432037234306335
+    ],
+    "dimensions": [
+      0.2118396759033203,
+      0.1750645563006401,
+      0.2332201898097992
+    ]
+  },
+  "nonhead_geometry_unchanged": true,
+  "rig_actions_sockets_unchanged": true,
+  "copied_head_objects": [
+    "rider:human head and neck",
+    "rider:human eyebrows",
+    "rider:sclera.L",
+    "rider:sclera.R",
+    "rider:iris.L",
+    "rider:iris.R"
+  ],
+  "scalp_hair_omitted": true,
+  "helmet_human_crossing_triangle_pairs": 0,
+  "crossing_centers_head_axes_m": [],
+  "sampled_surface_clearance": {
+    "crown": {
+      "sampled_vertices": 49,
+      "minimum_surface_distance_m": 0.014993705786764622,
+      "maximum_surface_distance_m": 0.025182826444506645
+    },
+    "jaw": {
+      "sampled_vertices": 251,
+      "minimum_surface_distance_m": 0.018076330423355103,
+      "maximum_surface_distance_m": 0.060362279415130615
+    },
+    "temples": {
+      "sampled_vertices": 488,
+      "minimum_surface_distance_m": 0.010753332637250423,
+      "maximum_surface_distance_m": 0.03404218703508377
+    }
+  },
+  "pose_samples": [
+    {
+      "action": "crouch",
+      "frame": 1,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "crouch",
+      "frame": 15,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "crouch",
+      "frame": 30,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 1,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 10,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "extend",
+      "frame": 20,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 1,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 15,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "forward_attack",
+      "frame": 30,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 1,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 15,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "hang_back",
+      "frame": 30,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 1,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 61,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 121,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 1,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 15,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "land_absorb",
+      "frame": 30,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 1,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 15,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 30,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 1,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 15,
+      "finite": true,
+      "helmet_head_crossings": 0
+    },
+    {
+      "action": "stand_attack",
+      "frame": 30,
+      "finite": true,
+      "helmet_head_crossings": 0
+    }
+  ],
+  "max_rigid_head_local_drift_m": 4.840584358805652e-07,
+  "triangles": 37332,
+  "topology": {
+    "vertices": 1647,
+    "faces": 1534,
+    "components": [
+      4,
+      4,
+      6,
+      6,
+      82,
+      91,
+      156,
+      1298
+    ],
+    "boundary_edges": 108,
+    "boundary_loops": [
+      4,
+      4,
+      18,
+      82
+    ],
+    "nonmanifold_interior_edges": 0,
+    "degenerate_faces": 0,
+    "minimum_face_area": 3.592252323869616e-05
+  },
+  "visual_verdict": "Parent must judge played clip"
+}

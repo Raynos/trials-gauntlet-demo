@@ -9,7 +9,7 @@ import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { prepareHero } from './lod';
 import { fogify } from '../lighting/environment';
-import { HERO_URLS, lodUrl } from './urls';
+import { HERO_URLS, lodUrl, modelAssetUrl } from './urls';
 import type { ByteProgress } from '../../boot/plan';
 
 export { HERO_URLS, lodUrl };
@@ -28,6 +28,7 @@ const cache = new Map<string, Promise<GLTF | null>>();
  * without `<wheel>_spokes`, `KHR_materials_variants` table) runs before anyone clones the document.
  */
 export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Promise<GLTF | null> {
+  url = modelAssetUrl(url);
   let p = cache.get(url);
   if (!p) {
     const loader = new GLTFLoader();
@@ -59,6 +60,12 @@ export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Prom
       );
     });
     cache.set(url, p);
+    // Share in-flight work and successful documents, but let an explicit retry fetch a
+    // failed file again. Caching null made a transient network error permanent for the page.
+    const request = p;
+    void request.then((g) => {
+      if (!g && cache.get(url) === request) cache.delete(url);
+    });
   }
   return p;
 }
@@ -105,7 +112,7 @@ export function shrinkTextures(root: THREE.Object3D, albedoMax = 1024, otherMax 
   });
 }
 
-/** Every mesh casts + receives; materials get the library's neutral map set so they share the standard program. */
+/** Hero surfaces cast and receive the scene light's shadow; materials share the standard program. */
 export function prepareHeroMaterials(root: THREE.Object3D, complete: (m: THREE.MeshStandardMaterial) => void): THREE.MeshStandardMaterial[] {
   const out: THREE.MeshStandardMaterial[] = [];
   const seen = new Set<THREE.Material>();
@@ -113,7 +120,9 @@ export function prepareHeroMaterials(root: THREE.Object3D, complete: (m: THREE.M
     const m = o as THREE.Mesh;
     if (!m.isMesh) return;
     m.castShadow = true;
-    m.receiveShadow = false;
+    // A rider's arms must shade the torso, and the frame must shade the motor.
+    // Without this the assembled hero stays uniformly lit despite its construction.
+    m.receiveShadow = true;
     m.frustumCulled = false;
     const mats = Array.isArray(m.material) ? m.material : [m.material];
     for (const mat of mats) {

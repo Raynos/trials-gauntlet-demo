@@ -1,0 +1,40 @@
+{
+  "source": "assets/blender/source/rider-race.blend",
+  "sourceSha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2",
+  "exportSha256": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33",
+  "outfit": "race",
+  "lod": false,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "verified": {
+    "bytes": 1514536,
+    "triangles": 44796,
+    "vertices": 31288,
+    "bones": 19,
+    "clips": [
+      "crouch",
+      "extend",
+      "forward_attack",
+      "hang_back",
+      "idle_breathe",
+      "land_absorb",
+      "sit_cruise",
+      "stand_attack"
+    ],
+    "variants": [
+      "rider_rookie",
+      "rider_pro"
+    ],
+    "maxWeightError": 8.85920599102974e-08,
+    "loadedWeightError": 4.304456524550915e-08
+  },
+  "reviewedExportSource": "harness/out/blender/race-head/finished-race/race-assembled-v1.blend",
+  "promotionAudit": {
+    "originalReport": "harness/out/blender/race-head/finished-race/models/rider-race.source.json",
+    "originalReportSha256": "fab1e39dfe81c7496c92d6c1ce834f02c44e4ef062fecedd6b4d5ca219a8eb7f",
+    "method": "Reviewed bytes copied unchanged; canonical source path relabeled."
+  }
+}

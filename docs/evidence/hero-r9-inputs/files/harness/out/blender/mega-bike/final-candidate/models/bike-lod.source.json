@@ -1,0 +1,31 @@
+{
+  "source": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/out/blender/mega-bike/final-candidate/source/bike.blend",
+  "sourceSha256": "498c778ae2e496fd0d9af2a71a27340c0173117951a50d1ea6f15e1007b49025",
+  "exportSha256": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3",
+  "lod": true,
+  "localAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "lodBudget": 6000,
+  "verified": {
+    "triangles": 5710,
+    "meshes": 23,
+    "maxPositionError": 5.0215969990711564e-08,
+    "occlusionMaterials": 3,
+    "bounds": {
+      "min": [
+        -0.40008029341697693,
+        -0.33818328380584717,
+        -0.4374558627605438
+      ],
+      "max": [
+        1.6525742709636688,
+        0.8612913712859154,
+        0.4374558627605438
+      ]
+    },
+    "bytes": 506428
+  }
+}

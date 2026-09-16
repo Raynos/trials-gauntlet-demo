@@ -1,0 +1,60 @@
+{
+  "rider-street": {
+    "sourceExact": true,
+    "oneSkinnedPrimitive": true,
+    "imageCount": 4,
+    "sharedORM": true,
+    "verified": {
+      "bytes": 1575688,
+      "triangles": 47838,
+      "vertices": 34504,
+      "bones": 19,
+      "clips": [
+        "crouch",
+        "extend",
+        "forward_attack",
+        "hang_back",
+        "idle_breathe",
+        "land_absorb",
+        "sit_cruise",
+        "stand_attack"
+      ],
+      "variants": [
+        "rider_rookie",
+        "rider_pro"
+      ],
+      "maxWeightError": 8.870847523212433e-08,
+      "loadedWeightError": 4.1211023926734924e-08
+    },
+    "sha256": "45b228d094234adcd0d08d2bd2a1429678f7adf29426b84b75555ed090d385ae"
+  },
+  "rider-street-lod": {
+    "sourceExact": true,
+    "oneSkinnedPrimitive": true,
+    "imageCount": 4,
+    "sharedORM": true,
+    "verified": {
+      "bytes": 555996,
+      "triangles": 5879,
+      "vertices": 7431,
+      "bones": 19,
+      "clips": [
+        "crouch",
+        "extend",
+        "forward_attack",
+        "hang_back",
+        "idle_breathe",
+        "land_absorb",
+        "sit_cruise",
+        "stand_attack"
+      ],
+      "variants": [
+        "rider_rookie",
+        "rider_pro"
+      ],
+      "maxWeightError": 8.870847523212433e-08,
+      "loadedWeightError": 3.329478204250336e-08
+    },
+    "sha256": "1ec3ba061c2c194e368917bfab75a9f88792e6b3f0a4949927f85cb5ab5dbd06"
+  }
+}

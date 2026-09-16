@@ -1,0 +1,140 @@
+{
+  "round": 8,
+  "status": "WIP design target selection; canonical assets remain Round7",
+  "baselineCommit": "2691c97",
+  "weeklyRemainingLastRead": 59,
+  "generatedTargets": "assets/design/hero-targets/files.json",
+  "candidates": {
+    "harness/out/blender/mega-bike/source-v2/bike-hero.blend": {
+      "sha256": "3ce5217b9e298a7cffb4259619f166da5ad64c4cf55193843a959893b66a46ae",
+      "bytes": 985752
+    },
+    "harness/out/blender/mega-bike/protected-source/bike.blend": {
+      "sha256": "460b8815dd3106fcf12d091675d893ba0a8d09da08c017f160778f520937a034",
+      "bytes": 985907
+    },
+    "harness/out/blender/mega-bike/protected-models/bike.glb": {
+      "sha256": "52f2e5f58313df7deb4671346fd8c30f55cd679cc82ee17e044214b04e46f5a1",
+      "bytes": 1354144
+    },
+    "harness/out/blender/mega-bike/protected-models/bike-lod.glb": {
+      "sha256": "dfba957dc6e9d8483086096f7ef347dc77cd33671bcbf272d29473055d297646",
+      "bytes": 491608
+    },
+    "harness/out/blender/mega-bike/ao-models/bike.glb": {
+      "sha256": "ea83248366122edbee4549dd536c432973b40ff2269721d966f7946e4818d5f2",
+      "bytes": 1414772
+    },
+    "harness/out/blender/mega-outfits/anatomy-v3/street-anatomy-v3d.blend": {
+      "sha256": "43d181790444374d6b94dc1555eaf7d64bd59bdc0ba3deec1a3331c8a6225af6",
+      "bytes": 1387063
+    },
+    "harness/out/blender/mega-outfits/anatomy-v3/models-fit/rider-street.glb": {
+      "sha256": "aac49ec2d66d0a9d3f85e32af0d144e977c8cc5ead3538a7d0a26ff143d68d23",
+      "bytes": 1317740
+    },
+    "harness/out/blender/mega-outfits/anatomy-v3/race-lower/race-lower-v1.blend": {
+      "sha256": "d8bdc099ca88d05fd639ccd1d67174107770a87cea5b0f8077b57dabd0c82223",
+      "bytes": 1267035
+    },
+    "harness/out/blender/mega-outfits/anatomy-v3/race-lower/models/rider-race.glb": {
+      "sha256": "2c8829ec551567779b5d777131bf187393b4d38f70c568375e5e2319072398b4",
+      "bytes": 1293244
+    },
+    "harness/out/blender/mega-outfits/anatomy-v3/race-lower/race-lower-v2.blend": {
+      "sha256": "6504a87540cf37f0702d5deb5c23f4965fbbc81eca974639f7357003db58920e",
+      "bytes": 1247263
+    },
+    "harness/out/blender/mega-outfits/anatomy-v3/race-lower/models-v2/rider-race.glb": {
+      "sha256": "46f54699b1eefa41e09a78a574cc4371ee171de41d10a74204b7bef5b3661dfd",
+      "bytes": 1281824
+    },
+    "harness/out/blender/hero-fabrics/fabrics.py": {
+      "sha256": "4ab72f36b8fcae0c26eb4852bc2b33a2690c44dda7d7226f3aa9551bbd28970e",
+      "bytes": 5006
+    },
+    "harness/out/blender/hero-fabrics/license-manifest.json": {
+      "sha256": "a4ee243ce97c224e37baaeb3d17bfa091f53e9315e1be0a395b2e58b7c3f73a2",
+      "bytes": 3841
+    }
+  },
+  "clips": {
+    "mega-v2-race-rookie": {
+      "clipSha256": "44c8c677a0cec1f8648b47f5fcaecd2ac4077d5f7455bbe3005bec2898465c7f",
+      "evidenceSha256": "9b4de3b0b6dd638ffc4473dbb2818ce5ff441e329223444b1be3cef80ea058dc",
+      "frames": 190,
+      "fps": 60,
+      "sampledPhysicsClocksPhasesExactVsR7": true,
+      "inspectionCamera": null,
+      "renderAlpha": 1,
+      "prefixRendered": true
+    },
+    "mega-v3-street-rookie": {
+      "clipSha256": "10e9643e316c853b52b54b1a4cca20c348514b4153595a7f9c6e7b2fc804b5d1",
+      "evidenceSha256": "81ad728b6e674f2591f5894ff336171b9af057f2a62bfb80b5b887b12ee00770",
+      "frames": 190,
+      "fps": 60,
+      "sampledPhysicsClocksPhasesExactVsR7": true,
+      "inspectionCamera": null,
+      "renderAlpha": 1,
+      "prefixRendered": true
+    },
+    "mega-v3-shadow-street-rookie": {
+      "clipSha256": "48c3be6db80bff1784082660acf3edfde3c3e4083dc97aeba91edff82c4816e3",
+      "evidenceSha256": "a44850abee9b76ee59221bd75a250c5eb3aa14940e1bddc0507606c5388df22a",
+      "frames": 190,
+      "fps": 60,
+      "sampledPhysicsClocksPhasesExactVsR7": true,
+      "inspectionCamera": null,
+      "renderAlpha": 1,
+      "prefixRendered": true
+    },
+    "mega-v4-close-street": {
+      "clipSha256": "70c215b7774e11c0bd1eac457f8c36099c00805a39ae106c5271c0f155918bb5",
+      "evidenceSha256": "d7a97b2afa14d229eaab5510c54b0cd79c7b9c6c9f092318068ecfa8b6c7a341",
+      "frames": 190,
+      "fps": 60,
+      "sampledPhysicsClocksPhasesExactVsR7": true,
+      "inspectionCamera": "current skinned hero bounds; target 72% width, maximum 86% height; fixed slight three-quarter view; production pose/material/light unchanged",
+      "renderAlpha": 1,
+      "prefixRendered": true
+    },
+    "mega-v4-close-race": {
+      "clipSha256": "bf5959807f0bcc095a474e02e4ee71accfcb9387ff5d4aa496278e3f775dceb2",
+      "evidenceSha256": "8032843aa0d66bbe2f5c89b241fde3698e6618ec487cbabc5496ecdf7d998c42",
+      "frames": 190,
+      "fps": 60,
+      "sampledPhysicsClocksPhasesExactVsR7": true,
+      "inspectionCamera": "current skinned hero bounds; target 72% width, maximum 86% height; fixed slight three-quarter view; production pose/material/light unchanged",
+      "renderAlpha": 1,
+      "prefixRendered": true
+    }
+  },
+  "canonicalModels": {
+    "public/models/bike-lod.glb": "c614c99f1956b359c4c56ac9d5180a1938ff5a21d0f42eeb02ab2b0f23937db1",
+    "public/models/bike.glb": "60ce3998f3204b888eb300608534f567ac3e7a8d79d17b277c99d7ad51839b37",
+    "public/models/rider-lod.glb": "f88a6b9f9b86f2bb320035e2ef87e444f12fb1616d77977aef83208770fec652",
+    "public/models/rider-race-lod.glb": "cf2cb35c140a7ea7495eb90731d5ce7d030b832378d48a1a405ea234e8d33a0e",
+    "public/models/rider-race.glb": "0ec93e0225a2f1c8fc840c02128eada3da6a4df0bdc312c576c6ba3ebf74d172",
+    "public/models/rider-street-lod.glb": "1ee21f29d89680af8ef570acb9252c856c1092a1d36ada8f66d04c0f676bf6ad",
+    "public/models/rider-street.glb": "7c73f2794995ce5c68f6390daf7cf4865be3e595346ed9d16244f0171220d878",
+    "public/models/rider.glb": "158f2dbd9ac845c2d9df6588df7bfebcf42434a8206f7febab33fa0e97f349aa"
+  },
+  "verification": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "pythonSyntax": "pass",
+    "build": "all staged preview builds pass with exact restoration",
+    "physics": "unchanged; Round7 failures remain open",
+    "actualIOS": "not tested here"
+  },
+  "open": [
+    "Street head design selection",
+    "anatomical shoulder bulk",
+    "Street face/hair implementation",
+    "Race lower-v2 playback",
+    "whole rider scanned fabric/AO integration",
+    "accepted full/LOD source promotion and integrated gate",
+    "user visual approval"
+  ]
+}

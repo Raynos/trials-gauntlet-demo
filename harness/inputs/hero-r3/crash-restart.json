@@ -1,0 +1,1 @@
+{"magic":"TRIN","header":{"version":1,"trackId":"flat-test","seed":3277865877,"physicsHz":120,"note":"V2 crash/restart fixture derived from the legacy gas-back input pattern; explicitly reinterpreted on V2, not a v1 golden.","physics":"v2","bike":"rookie"},"runs":[[348,255,0,-127,0],[120,0,0,0,0]]}

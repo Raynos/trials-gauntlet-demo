@@ -1,0 +1,70 @@
+[
+  {
+    "name": "bike",
+    "bytes": 1414848,
+    "sha256": "f18bfc01cb478a79555a2c4096342fe0b827670271f6c8ce7e0c3d42a1cb33d2",
+    "triangles": 29940,
+    "meshCount": 23,
+    "bounds": {
+      "min": [
+        -0.4000000059604645,
+        -0.3408759534358978,
+        -0.43760812282562256
+      ],
+      "max": [
+        1.6599665880203247,
+        0.85916668176651,
+        0.43760812282562256
+      ]
+    },
+    "nodeNamesEqual": true,
+    "maxMarkerError": 0,
+    "finite": true,
+    "geometryEqual": true,
+    "variants": [
+      "bike_rookie",
+      "bike_pro"
+    ],
+    "hoseStations": 25,
+    "hoseLength": 0.7626067472886668,
+    "extensions": [
+      "EXT_meshopt_compression",
+      "KHR_materials_variants",
+      "KHR_texture_transform"
+    ]
+  },
+  {
+    "name": "bike-lod",
+    "bytes": 506428,
+    "sha256": "7a31cd455aba85cfccaf08e0dccd740d7a21a89dd8281b3865d50e02e7d10fa3",
+    "triangles": 5710,
+    "meshCount": 23,
+    "bounds": {
+      "min": [
+        -0.40008029341697693,
+        -0.33818328380584717,
+        -0.4374558627605438
+      ],
+      "max": [
+        1.6525742709636688,
+        0.8612913712859154,
+        0.4374558627605438
+      ]
+    },
+    "nodeNamesEqual": true,
+    "maxMarkerError": 0,
+    "finite": true,
+    "geometryEqual": true,
+    "variants": [
+      "bike_rookie",
+      "bike_pro"
+    ],
+    "hoseStations": 25,
+    "hoseLength": 0.7626067472886668,
+    "extensions": [
+      "EXT_meshopt_compression",
+      "KHR_materials_variants",
+      "KHR_texture_transform"
+    ]
+  }
+]

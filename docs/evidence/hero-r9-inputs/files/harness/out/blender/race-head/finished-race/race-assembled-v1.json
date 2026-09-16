@@ -1,0 +1,185 @@
+{
+  "source": "harness/out/blender/race-head/race-head-v1c.blend",
+  "source_sha256": "93dcfe655b3a042079e46af56b697025ec638028ab2072ba5ac54cac8e93d45a",
+  "anatomical_top_source": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
+  "anatomical_top_source_sha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220",
+  "output_sha256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2",
+  "script_sha256": "746f96188dba136daf0d31808087d06366d2f77c8c8b41a3b85cc279c8e8fee3",
+  "nonupper_meshes_unchanged": [
+    "rider:articulated race boots",
+    "rider:constructed_helmet",
+    "rider:glove_top",
+    "rider:gloves",
+    "rider:hero glove construction",
+    "rider:human eyebrows",
+    "rider:human head and neck",
+    "rider:iris.L",
+    "rider:iris.R",
+    "rider:pants",
+    "rider:race articulated knee panels",
+    "rider:sclera.L",
+    "rider:sclera.R"
+  ],
+  "rig_actions_sockets_unchanged": true,
+  "original_material_graphs_unchanged_before_class_application": true,
+  "removed_upper_objects": [
+    "rider:upper-garment",
+    "rider:hero garment construction",
+    "rider:armour"
+  ],
+  "street_hood_pouch_details_not_imported": true,
+  "upperarm_radius_before_max_m": 0.07127189184494019,
+  "upperarm_radius_after_max_m": 0.06424079404424012,
+  "jersey_topology": {
+    "vertices": 8352,
+    "faces": 8178,
+    "components": [
+      8352
+    ],
+    "boundary_edges": 308,
+    "boundary_loops": [
+      44,
+      44,
+      72,
+      148
+    ],
+    "nonmanifold_interior_edges": 0,
+    "degenerate_faces": 0,
+    "minimum_face_area": 3.0022652026673313e-06
+  },
+  "panel_polygon_counts": {
+    "race jersey main": 4112,
+    "race jersey contrast": 1236,
+    "race jersey stretch gusset": 1979,
+    "race jersey collar cuff": 851
+  },
+  "heroLocalAO": {
+    "distance": 0.025,
+    "samples": 32,
+    "strength": 0.8
+  },
+  "pose_checks": [
+    {
+      "action": "crouch",
+      "frame": 1,
+      "finite": true
+    },
+    {
+      "action": "crouch",
+      "frame": 15,
+      "finite": true
+    },
+    {
+      "action": "crouch",
+      "frame": 30,
+      "finite": true
+    },
+    {
+      "action": "extend",
+      "frame": 1,
+      "finite": true
+    },
+    {
+      "action": "extend",
+      "frame": 10,
+      "finite": true
+    },
+    {
+      "action": "extend",
+      "frame": 20,
+      "finite": true
+    },
+    {
+      "action": "forward_attack",
+      "frame": 1,
+      "finite": true
+    },
+    {
+      "action": "forward_attack",
+      "frame": 15,
+      "finite": true
+    },
+    {
+      "action": "forward_attack",
+      "frame": 30,
+      "finite": true
+    },
+    {
+      "action": "hang_back",
+      "frame": 1,
+      "finite": true
+    },
+    {
+      "action": "hang_back",
+      "frame": 15,
+      "finite": true
+    },
+    {
+      "action": "hang_back",
+      "frame": 30,
+      "finite": true
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 1,
+      "finite": true
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 61,
+      "finite": true
+    },
+    {
+      "action": "idle_breathe",
+      "frame": 121,
+      "finite": true
+    },
+    {
+      "action": "land_absorb",
+      "frame": 1,
+      "finite": true
+    },
+    {
+      "action": "land_absorb",
+      "frame": 15,
+      "finite": true
+    },
+    {
+      "action": "land_absorb",
+      "frame": 30,
+      "finite": true
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 1,
+      "finite": true
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 15,
+      "finite": true
+    },
+    {
+      "action": "sit_cruise",
+      "frame": 30,
+      "finite": true
+    },
+    {
+      "action": "stand_attack",
+      "frame": 1,
+      "finite": true
+    },
+    {
+      "action": "stand_attack",
+      "frame": 15,
+      "finite": true
+    },
+    {
+      "action": "stand_attack",
+      "frame": 30,
+      "finite": true
+    }
+  ],
+  "triangles": 44796,
+  "visual_verdict": "Parent plays and judges"
+}

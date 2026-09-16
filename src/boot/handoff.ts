@@ -5,7 +5,8 @@
  */
 import { createBootPlan, type Plan } from './plan';
 import type { ModuleStep } from './steps';
-import { BOOT_BYTE_TOTALS } from './totals';
+import { DECLARED_BOOT_TOTALS } from './totals';
+import { selectedBootTotals } from './outfit';
 
 export interface BootHandoff {
   /** Ends the `evaluate` step and resolves with the plan minus the inline steps. */
@@ -21,6 +22,6 @@ export type BootWindow = Window & { __boot?: BootHandoff };
 export function takeBootPlan(): Promise<Plan<ModuleStep>> {
   const w = window as BootWindow;
   if (w.__boot) return w.__boot.take();
-  const plan = createBootPlan(() => undefined, { totals: { core: 0, ...BOOT_BYTE_TOTALS } });
+  const plan = createBootPlan(() => undefined, { totals: { core: 0, ...selectedBootTotals(DECLARED_BOOT_TOTALS, location.search) } });
   return plan.step('core', () => undefined).then((p) => p.step('evaluate', () => undefined));
 }

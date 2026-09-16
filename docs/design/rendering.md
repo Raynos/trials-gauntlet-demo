@@ -1,5 +1,7 @@
 # Rendering design — Trials Rising-on-PS4 look in Three.js at 60 fps
 
+Current hero findings and corrections to older reports: **§14, Blender branch round 1**.
+
 Scope: `src/render/**` only. Consumes `CompiledTrack`, `PhysicsState`, `GameEvent`
 from `src/core/types.ts`; implements CONTRACT §2.7 `GameRenderer` in `src/render/index.ts`
 (`setTrack(CompiledTrack)`, `render(state, alpha)`, `onEvent`, `setQuality`, `camera()`,
@@ -1550,6 +1552,71 @@ skeleton, decoded skin weights, buffer layout), `chain14.sh` (serial captures).
 
 ## 12. Known gaps after round 11 (what still reads non-AAA)
 
+### Blender branch round 6 — restored motion and knee diagnosis, 2026-09-15
+
+Parent played high Street and low Race hops through an explicit context loss at
+input 370. Both resume with coherent assets, lighting and motion, GL0 and 190
+unique simulation frames. Restoration wall time is omitted from those fixed-rate
+clips; they do not measure interruption length or actual iOS presentation.
+Repeated-generation, real loading interruption and disposal-while-lost controls
+now pass. Normal asynchronous program retirement retains its prior stress gates.
+
+The connected Street trouser candidate has smoother knee folds through native
+landing and seated animation, but still reads as smooth tubes around the waist
+and legs. It is not promoted: 801 sampled gameplay poses self-intersect, and fresh
+production/GLB/Blender checks trace extreme cases to the shared inward knee pole.
+Round 7 must repair the shared body geometry and mass map before garment approval.
+The existing helmet/material/detail and reference-comparison gaps remain.
+See [Round 6 evidence](../evidence/blender-r6.json).
+
+### Blender branch round 5 — played hero review, 2026-09-15
+
+The compact Street hood now folds below the helmet and keeps a coherent back
+silhouette through crouch, extension and landing. Connected shoulders/elbows
+remain intact. Authored control cables add a small mechanical detail; the front
+brake hose follows suspension travel without visible popping. Parent played
+scratch full/LOD and final high Street / low Race clips before this checkpoint.
+The Race clip includes an endo, ragdoll and return to attached riding after
+checkpoint restart. These are incremental improvements, not a reference win.
+
+The strongest remaining tells are smooth cloth with shallow folds, unresolved
+jeans/crotch/knee construction and waistband silhouette, and simplified helmet,
+glove/boot forms and material detail. The camera pulls away markedly during
+riding. World/track complexity remains trunk scope; low M1 still reports 146,344
+track triangles against 80,000. Actual iOS performance remains unmeasured.
+The final 38-pair/reference battery has not been run for this branch.
+
+All 340,983 corpus ticks repeat exactly with finite actual full/LOD models;
+worst rendered COM mismatch is 0.115 micrometres and grip/sole errors stay below
+0.256/0.189 micrometres. Decoded hose endpoints stay below 1.39 micrometres.
+These numerical contracts support attachment; they do not establish art quality.
+See [Round 5 evidence](../evidence/blender-r5.json) for hashes and played windows.
+
+Normal pending-program retirement now passes Metal and SwiftShader stress with
+complete reclamation. Whole-renderer context restoration remains faulty because
+some surviving resources retain disposal listeners for the lost GL generation.
+Both baseline and candidate reproduce this distinct failure. The headless
+desktop WebKit control does not establish actual-iOS or pending-link race coverage.
+
+### Blender branch round 3 — played hero review, 2026-09-15
+
+The final-solver street hop and crash/restart clips were played at 60 fps, followed
+by the Rising canyon start/launch at its native 60000/1001 cadence (source seconds
+719–727). This is a parent review, not a blind-critic score. Rider contacts now
+remain attached through the hop and restore on restart. The reference still
+reads more convincingly as clothing: shoulder, cuff and waist folds retain
+distinct planes while ours remains smooth and tubular at riding distance. The
+hood/neck overlap and elbow folds remain visible construction limits. The
+reference bike also has stronger seat/panel shapes and clearer material contrast;
+our reflective mechanical pieces do not yet produce the same finish.
+
+Connected torso/sleeve street v6 was played in native Blender through hang-back
+and landing absorption. Its armholes stay continuous, but this prototype is not
+yet in the public GLBs and does not close the art gate. Next: accept/reject the
+final street/race topology in motion, export through the protected sources,
+then judge garment folds and materials in the actual game. Evidence identity and
+remaining physical/phone gaps: `docs/evidence/blender-r3.json`.
+
 - **Industrial mids / highlights**: p50 0.20 vs 0.284, p99 0.53 vs 0.876 — with the high camera the
   window bank is out of frame and nothing pale is lit by the key; the far stacks (z −15 / −25) are a flat
   blue-grey wash. Wants pale lit surfaces at deck level and a far tier with structure. The b1 jib gantry
@@ -1675,3 +1742,101 @@ pnpm harness:perf                                                        # calls
 ```
 Scratch scripts (snap / probe / timing / ghost / biome grid / camera curve) live in the render
 owner's scratchpad (`scratchpad/render2/*.mts`), not in the repo.
+
+## 14. Blender branch round 1 — the rig drifted and the V2 animation path was never active
+
+2026-09-15, baseline `56e3883`, branch `blender-work`. Full audit and next work:
+`docs/plans/BLENDER_HERO.md`. This is an integration repair, not a hero-art completion.
+
+**Correction to round 13's H2 claims:** V2's getter did not publish `riderBody`,
+although the type and render consumer existed. Real V2 play therefore took the
+legacy spring/timed-clip path. The getter now copies the existing rider SoA
+values; no physics solver, tuning, snapshot layout or hash algorithm changed.
+
+The real compressed rider exposed errors that the procedural chain tests missed:
+tiny shoulder translation samples accumulated to 27.4 cm over a minute; landing
+layers moved ankle anchors 13.9 cm off their targets. Fixed joint translations
+now reset from the bind rig and only pelvis translation is layered. Rotations
+are normalized. Full-pose landing and extension clips now use `stand_attack` as
+their common additive reference, rather than subtracting their crouch/extension
+opening poses. Both arms and legs solve with actual exported segment lengths;
+unreachable extra motion is attenuated toward the base pose. `ankleErr` and
+`additiveWeight` expose the result instead of hard-coding successful contacts.
+
+Independent review also reproduced false extension during rigid chassis
+rotation: local X -0.28 m at -6 rad/s yielded 1.68 m/s of apparent upward motion.
+`FrameBuilder` now subtracts angular point velocity; finite-difference trajectory
+tests verify zero extension for rigid motion and retain real relative movement.
+
+Validation: **40 test files, 596 passed, 11 todo**, with typecheck/lint/build
+passing. New tests load both committed GLBs through MeshoptDecoder and check
+bone matrices across 30/60/120 fps histories, 60-second idle, repeated timestamps,
+ragdoll/reset, actual wrist/ankle origins, bind-derived segment lengths, scales
+and transient-reference semantics. An independent reviewer scanned 23,100 pose
+combinations without contact errors over 0.1 mm.
+
+An independent browser comparison of the actual compiled **Game** checked
+**23,017 V2 input ticks** across b1/b3/e2/m1 Rookie, b3 Pro and two crash/restart
+patterns. Every solver snapshot byte, Game counter, clock byte, phase and fault
+count matched baseline. The published state differs only by `riderBody`;
+canonical hashes intentionally change because the hasher already includes that
+optional field. Old hash pins require an explicit schema-aware migration, not
+blind regeneration. Run-clock finish values remain byte-identical. B3's physics
+finish field and Game run clock differ by one ULP in **both** versions because
+one multiplies by 1/120 and the other divides by 120; compare like fields.
+
+The inherited evidence harness also has proven clock/history, fault-counter,
+solver-selection, fallback and frame-padding defects; a passing old gate is not
+used as proof of this repair. The ignored `harness/out/blender` probes serve
+frozen content-hashed builds, verify consumed model bytes and actual glTF
+instances, preserve the rendered lead-in and explicitly sample alpha=1 at
+30 fps. They record state time, displayed time and actual rig anchors. These
+are controlled renderer checks, not proof of production interpolation, glove/
+boot surface contact, blind AAA preference, or iOS device performance.
+
+The played landing comparison still shows the rounded helmet/brace, simplified
+garments and limited physical pose read. Art, mechanical attachment defects,
+physical-to-visual pose mapping, actual-device validation and a trustworthy
+blind comparison pipeline remain open. No H5 win-rate increase is claimed.
+
+## 15. Blender branch round 4 — connected sleeves and physical attachment
+
+The parent played native Blender hang-back/landing actions and actual exported
+Street/Race hop clips. Connected armholes remove the former overlapping sleeve
+join. Wider graded elbow loops keep a continuous bend through compression and
+extension. These are accepted incremental improvements and are now in both
+protected rider sources plus all four full/LOD exports. Nineteen bones, eight
+actions and four sockets retain exact bind/action data. The game still needs
+cloth folds, material variation, a better hood/neck overlap, waist and knee work;
+this is not an AAA verdict or a new blind-critic score.
+
+The parent's played Pro Rear Wheel First finish (42.425 s, zero faults) keeps
+normal arm attachment through the result-camera move. The 35-degree physical
+elbow stop excludes the earlier fixed-pole singularity. Across 58 recordings /
+255,345 ticks, actual full/LOD rendered COM mismatch is at most 0.114 micrometres;
+hand/sole errors stay below 0.256 / 0.189 micrometres. The exact user's older
+78.433 s / four-fault finish still lacks matching inputs.
+
+The bike pad previously disappeared into the blue body. Raising its loft makes
+the black seat readable during played takeoff/landing without moving mechanical
+markers. Full/LOD geometry tests retain their original physical tolerances.
+
+Connected trouser prototypes remain rejected: landing still has four street /
+seven race saddle crossing pairs, and inherited knees fold through themselves.
+The promoted rider sources retain the previous trousers. Reference cloth planes
+and detailed bike material separation still set the visual target.
+
+Shader warmup now builds actual two-material batches, preserving skinning,
+instancing and real scene lighting. It no longer leaves live visibility or the
+render target changed over asynchronous waits; jobs serialize. The three new
+deferred regressions fail against the old implementation and pass with this
+change. Rapid transitions still produce Metal invalid-program warnings in all
+three runs of each frozen build. Raw WebGL controls identify pending parallel
+link/deletion as a sufficient trigger; diagnostic deletion deferral prevents
+all warnings in six game stress runs. That workaround is not in production.
+Capture records the actual GPU/backend, awaits settled
+setup and rejects WebGL errors; headless desktop evidence is not an iOS result.
+
+Exact source/model/build hashes, played clips and open limits are in
+`docs/evidence/blender-r4.json`. Full check: 18 failed / 686 passed / 11 todo;
+typecheck, lint and separate build pass.

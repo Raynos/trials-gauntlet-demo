@@ -353,6 +353,15 @@ export type BikeClass = 'rookie' | 'pro';
 export const BIKE_CLASSES: readonly BikeClass[] = ['rookie', 'pro'];
 export const DEFAULT_BIKE: BikeClass = 'rookie';
 
+/** Cosmetic rider clothing, independent of bike class and physics state. */
+export type RiderOutfit = 'street' | 'race';
+
+/** Optional renderer capability for changing clothing without loading a different track. */
+export interface RiderOutfitRenderer {
+  /** True only after the requested outfit is available for both detail levels. */
+  setRiderOutfit?(outfit: RiderOutfit): Promise<boolean>;
+}
+
 /**
  * Bike solver a recording / PB / run-log entry was produced on (physics.md "v2 status"; CONTRACT §2.5 v2
  * block). Stamped into `RecordingHeader.physics`; a recording without the stamp predates the v2 flip and
