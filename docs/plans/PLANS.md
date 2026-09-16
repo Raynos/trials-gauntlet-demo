@@ -6,6 +6,10 @@ One page, kept current by the parent at every commit. The bars no plan can close
 "done" lines, not a feeling. Live build: https://trials-gauntlet-demo.vercel.app · pinned v0.1.0:
 https://trials-gauntlet-v0-1-0.vercel.app · `RELEASES.md` has the ledger.
 
+## Hero follow-up handoff
+
+[HERO_OPEN_WORK.md](HERO_OPEN_WORK.md) lists the remaining pose/elbow fixes, coordination with active R8/render-r15 work, Chromium/Metal issue, garage production milestones and acceptance gates. The five-outfit merge does not close these items.
+
 ## Independent audit — 2026-09-15
 
 The [game audit](../reviews/game-audit-2026-09-15.md) and separate [physics-library review](../reviews/physics-library-audit-2026-09-15.md) review `56e3883` plus the existing working-tree changes, physics/track fingerprint `a6d63cfd`. **Release readiness is blocked:** a fresh production build emits an invalid inline loader (`vite.config.ts:228`), and the required test suite has one reflex-memory failure. Development-harness replay passes 9/9 determinism checks; flat-test and b1 clear on both bikes; manual restart returns to riding in one tick. No game fixes landed in this audit round.
