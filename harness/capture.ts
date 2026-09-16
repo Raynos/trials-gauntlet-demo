@@ -4,7 +4,8 @@
  *
  *   pnpm harness:capture <input-file> [--out harness/out/capture/<name>/clip.mp4]
  *        [--fps 60] [--width 1280] [--height 720] [--tail 1] [--no-stop-on-finish]
- *        [--mode screenshot|canvas] [--keep-frames] [--dev]
+ *        [--mode screenshot|canvas] [--keep-frames] [--dev] [--quality high] [--from-tick N] [--to-tick N]
+ *        [--rider-probe]   (round 13b: per-frame simulated-vs-drawn rider torso → rider-probe.json, summary in capture.json)
  *
  * Emits: clip.mp4 (h264 yuv420p), sheet.jpg (4x2 contact sheet), capture.json.
  * `screenshot` mode includes the DOM HUD; `canvas` mode grabs the WebGL
@@ -51,6 +52,46 @@ export interface CaptureOptions {
   sheetRows?: number;
   /** Per-frame `camera()` check (default on): bike inside the CAMERA_BOX, |roll| < 1e-6, clamped-frame count. */
   cameraCheck?: boolean;
+  /**
+   * Round 13b (Rider on Glass H): per rendered frame, read the simulated rider body against the drawn one —
+   * physics `riderBody.angle − chassis angle`, the hero chain's `torsoAngle`, the chest bone's world pitch in
+   * the bike frame and `GltfRider.debug.physicalPose` — through `window.__render`. Off by default; `--rider-probe`.
+   */
+  riderProbe?: boolean;
+}
+
+/** One rendered frame of the rider probe (`CaptureOptions.riderProbe`). Angles in radians. */
+export interface RiderProbeRow {
+  frame: number;
+  tick: number;
+  phase: string;
+  /** `PhysicsState.riderBody` was present this tick. */
+  present: boolean;
+  /** Physics: rider body angle minus chassis angle (the lag the hero is meant to draw). */
+  physRel: number;
+  /** Render: the hero chain's torso angle (bike frame; `GltfRider.chain.torsoAngle`), NaN without a chain. */
+  chainTorso: number;
+  /** Render: the skinned chest bone's up axis, expressed in the bike frame, as a lean from the frame's up (NaN when no bone). */
+  meshTorso: number;
+  /** `GltfRider.debug.physicalPose` — the body-driven path (chainFromBody) posed this frame. */
+  physicalPose: boolean;
+  additiveWeight: number;
+}
+
+export interface RiderProbe {
+  rows: RiderProbeRow[];
+  /** Frames on which `physicalPose` was true / riderBody was present. */
+  physicalPoseFrames: number;
+  presentFrames: number;
+  /** Population std-dev over the clip, radians. */
+  stdPhysRel: number;
+  stdChainTorso: number;
+  stdMeshTorso: number;
+  /** Pearson r between physRel and chainTorso / meshTorso over frames where both are finite. */
+  rChainPhys: number;
+  rMeshPhys: number;
+  min: { physRel: number; meshTorso: number };
+  max: { physRel: number; meshTorso: number };
 }
 
 /** The screen-space band the followed bike must stay in (rig.ts: "the bike stays inside the central [0.2, 0.8] box"). */
@@ -109,6 +150,49 @@ export interface CaptureResult {
   wallMs: number;
   /** Null when the renderer has no `camera()` or the check was turned off. */
   camera: CameraCheck | null;
+  /** Null unless `riderProbe` was requested (and the page exposes `window.__render`). */
+  rider: RiderProbe | null;
+}
+
+type RiderSample = { present: boolean; physRel: number; chainTorso: number; meshTorso: number; physicalPose: boolean; additiveWeight: number } | null;
+
+function stats(xs: number[]): { mean: number; std: number } {
+  const n = xs.length;
+  if (n === 0) return { mean: NaN, std: NaN };
+  const mean = xs.reduce((a, b) => a + b, 0) / n;
+  const v = xs.reduce((a, b) => a + (b - mean) * (b - mean), 0) / n;
+  return { mean, std: Math.sqrt(v) };
+}
+
+function pearson(xs: number[], ys: number[]): number {
+  const pairs = xs.map((x, i) => [x, ys[i]!] as const).filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+  if (pairs.length < 3) return NaN;
+  const a = stats(pairs.map((p) => p[0]));
+  const b = stats(pairs.map((p) => p[1]));
+  if (a.std === 0 || b.std === 0) return NaN;
+  let c = 0;
+  for (const [x, y] of pairs) c += (x - a.mean) * (y - b.mean);
+  return c / pairs.length / (a.std * b.std);
+}
+
+function finishRider(rows: RiderProbeRow[]): RiderProbe {
+  const phys = rows.map((r) => r.physRel);
+  const chain = rows.map((r) => r.chainTorso);
+  const mesh = rows.map((r) => r.meshTorso);
+  const fin = (xs: number[]) => xs.filter((x) => Number.isFinite(x));
+  const r4 = (x: number) => (Number.isFinite(x) ? +x.toFixed(4) : x);
+  return {
+    rows,
+    physicalPoseFrames: rows.filter((r) => r.physicalPose).length,
+    presentFrames: rows.filter((r) => r.present).length,
+    stdPhysRel: r4(stats(fin(phys)).std),
+    stdChainTorso: r4(stats(fin(chain)).std),
+    stdMeshTorso: r4(stats(fin(mesh)).std),
+    rChainPhys: r4(pearson(phys, chain)),
+    rMeshPhys: r4(pearson(phys, mesh)),
+    min: { physRel: r4(Math.min(...fin(phys))), meshTorso: r4(Math.min(...fin(mesh))) },
+    max: { physRel: r4(Math.max(...fin(phys))), meshTorso: r4(Math.max(...fin(mesh))) },
+  };
 }
 
 type CamSample = { bikeScreenX: number; bikeScreenY: number; roll?: number | undefined; state?: string | undefined; clamped?: boolean | undefined; phase?: string | undefined } | null;
@@ -217,6 +301,8 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
     let lastState: PhysicsState | null = null;
     const cameraCheck = o.cameraCheck ?? true;
     let camera: CameraCheck | null = cameraCheck ? newCameraCheck() : null;
+    const riderRows: RiderProbeRow[] = [];
+    const riderProbe = o.riderProbe ?? false;
     const firstVideoFrame = startTick / ticksPerFrame;
     const totalVideoFrames = Math.ceil(endTick / ticksPerFrame);
     // Run the recording to its end; when the run finishes early (and
@@ -227,7 +313,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
       const slice: InputFrame[] = frames.slice(k * ticksPerFrame, (k + 1) * ticksPerFrame);
       // Step this frame's ticks and render in one round trip.
       const res = await page.evaluate(
-        ([inputs, n, grab, cam]) => {
+        ([inputs, n, grab, cam, rp]) => {
           const t = window.__trials!;
           for (const f of inputs) {
             t.setInput(f);
@@ -242,10 +328,41 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
             const c = t.camera() as { bikeScreenX: number; bikeScreenY: number; roll?: number; state?: string; clamped?: boolean };
             camera = { bikeScreenX: c.bikeScreenX, bikeScreenY: c.bikeScreenY, roll: c.roll ?? 0, state: c.state ?? 'n/a', clamped: c.clamped === true, phase: t.phase() };
           }
-          return { state, dataUrl, camera };
+          let rider: RiderSample = null;
+          if (rp) {
+            /* eslint-disable @typescript-eslint/no-explicit-any -- the renderer's private handles through window.__render (as hero-webkit.mts) */
+            const r = (window as any).__render;
+            const rb = state.riderBody;
+            const physRel = rb ? Math.atan2(Math.sin(rb.angle - state.bike.angle), Math.cos(rb.angle - state.bike.angle)) : NaN;
+            let chainTorso = NaN, meshTorso = NaN, physicalPose = false, additiveWeight = NaN;
+            const hero = r?.riderRef;
+            const bike = r?.bikeRef;
+            if (hero && hero.chain) chainTorso = hero.chain.torsoAngle;
+            if (hero && hero.debug) {
+              physicalPose = hero.debug.physicalPose === true;
+              additiveWeight = hero.debug.additiveWeight;
+            }
+            const chest = hero?.bones?.get?.('chest');
+            if (chest && bike?.frame && r.debug?.THREE) {
+              const THREE = r.debug.THREE;
+              chest.updateWorldMatrix(true, false);
+              bike.frame.updateWorldMatrix(true, false);
+              const q = new THREE.Quaternion();
+              chest.getWorldQuaternion(q);
+              const up = new THREE.Vector3(0, 1, 0).applyQuaternion(q);
+              const qb = new THREE.Quaternion();
+              bike.frame.getWorldQuaternion(qb);
+              up.applyQuaternion(qb.invert());
+              meshTorso = Math.atan2(up.x, up.y);
+            }
+            rider = { present: !!rb, physRel, chainTorso, meshTorso, physicalPose, additiveWeight };
+            /* eslint-enable @typescript-eslint/no-explicit-any */
+          }
+          return { state, dataUrl, camera, rider };
         },
-        [slice, ticksPerFrame, mode === 'canvas', cameraCheck] as const,
+        [slice, ticksPerFrame, mode === 'canvas', cameraCheck, riderProbe] as const,
       );
+      if (riderProbe && res.rider) riderRows.push({ frame: k - firstVideoFrame, tick: res.state.tick, phase: res.camera?.phase ?? 'n/a', ...res.rider });
       lastState = res.state;
       if (camera && res.camera) accumulateCamera(camera, res.camera, k - firstVideoFrame, res.state.tick, startTick > 0 && k - firstVideoFrame < Math.round(CAMERA_SETTLE_S * fps));
       else if (camera && cameraCheck && k === firstVideoFrame) camera = null; // renderer without camera(): nothing to assert
@@ -279,6 +396,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
       probe,
       wallMs: performance.now() - t0,
       camera: finishCamera(camera),
+      rider: riderProbe ? finishRider(riderRows) : null,
     };
   } finally {
     await launched.close();
@@ -309,9 +427,15 @@ async function main(): Promise<void> {
     dev: flagBool(flags, 'dev'),
     build: flagBool(flags, 'build'),
     verbose: flagBool(flags, 'verbose'),
+    ...(flagStr(flags, 'quality', '') ? { quality: flagStr(flags, 'quality', '') as QualityTier } : {}),
+    ...(flags['from-tick'] !== undefined ? { startTick: flagNum(flags, 'from-tick', 0) } : {}),
+    ...(flags['to-tick'] !== undefined ? { endTick: flagNum(flags, 'to-tick', 0) } : {}),
+    riderProbe: flagBool(flags, 'rider-probe'),
   });
   const reportFile = path.join(path.dirname(outMp4), 'capture.json');
-  writeJson(reportFile, { input: path.resolve(inputFile), header: recording.header, ...result });
+  const { rider, ...rest } = result;
+  writeJson(reportFile, { input: path.resolve(inputFile), header: recording.header, ...rest, rider: rider ? { ...rider, rows: undefined, rowsFile: 'rider-probe.json' } : null });
+  if (rider) writeJson(path.join(path.dirname(outMp4), 'rider-probe.json'), rider);
   if (flagBool(flags, 'json')) console.log(JSON.stringify(result));
   else {
     printKV('capture', {
@@ -324,6 +448,16 @@ async function main(): Promise<void> {
       'final hash (end of clip)': result.finalHash,
       'wall ms': Math.round(result.wallMs),
     });
+    if (result.rider) {
+      const r = result.rider;
+      printKV('rider probe', {
+        'frames present / physicalPose / total': `${r.presentFrames} / ${r.physicalPoseFrames} / ${r.rows.length}`,
+        'std physRel / chainTorso / meshTorso (rad)': `${r.stdPhysRel} / ${r.stdChainTorso} / ${r.stdMeshTorso}`,
+        'r(chain,phys) / r(mesh,phys)': `${r.rChainPhys} / ${r.rMeshPhys}`,
+        'physRel range': `${r.min.physRel} .. ${r.max.physRel}`,
+        'meshTorso range': `${r.min.meshTorso} .. ${r.max.meshTorso}`,
+      });
+    }
     if (result.probe) {
       printKV('ffprobe', {
         codec: result.probe.codec,

@@ -87,6 +87,89 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 13b (critic r4, body-driven hero) — the rig is live (chest bone = physics body to 1e-9 rad, std 0.09–0.18 rad per clip) and the blind critic still takes the reference 10 of 12: r4 1 / 6, r4b 1 / 6, both wins on crash cells; the round-12 statue tells are gone from every riding cell and the new rider tell is the R8 punch ("collapses onto the tank in 2 frames", "sinks below the bars")
+
+**Finding.** Physics R7 (`fe50df5`) exports `riderBody` every tick and the merged hero's `GltfRider.chainFromBody` takes over: on
+every rendered frame of every capture this round `PhysicsState.riderBody` is present and `GltfRider.debug.physicalPose` is true
+(b1 360 / 360; the twelve battery cells 240–259 / 240–259 each), `additiveWeight` is 0 (no timer clip touches the body path), and
+the skinned chest bone's pitch in the bike frame equals the chain's `torsoAngle` to 1.8e-9 rad. The drawn torso moves with the
+simulated body: on the 6 s b1 clip (932×430, `high`, ticks 1800–2520) `riderBody.angle − bike.angle` has std **0.085 rad**, range
+−0.263 … +0.271 rad (18.12 s / 20.55 s run clock), 95 of 360 frames beyond 0.1 rad, and the chest bone tracks it at **r = −0.98**
+(the sign is the frame convention: chain torso is measured from the bike's up, physics from +x). Across the twelve cells the std is
+0.086–0.18 rad riding (world-industrial 0.086, hop 0.15, see-saw 0.18) and the correlation −0.98 … −0.996 on every non-crash cell.
+Pillar H's bar is not met: **r4 (the merge #3 six) ours 1 / 6, r4b (six body cells) ours 1 / 6, 2 / 12**, both wins fault-respawn
+cells where the reference window mis-fires (round 10 and round 12 won the same way). What changed in the tells: **round 12 / merge #3's
+"rider is a frozen pose welded to a bike", "rider and bike stay one rigid object", "no lag, no lean-back" are not said of any riding
+cell** — the crash critics now score `bike-becomes-debris` 5 / 4 for ours and write "rider ejects forward and tumbles as a separate
+body while the bike slides ~20 frames to rest with its own momentum"; the one "rider pose is frozen" left is world-canyon-1, a top-down
+frame where the bike is ~30 px and the critic also wrote "torso hung off the side". **The new rider tell is the landing punch**, R8's
+item, named on four cells: "rider body collapses flat onto the tank within 2 frames of touchdown and stays draped until snapping
+upright at 1.6 s, then does it again" (landing-snow), "goes from crouched-forward to thrown-back between 0.97 and 1.07 s, a 3-frame
+pose change that reads as snap rather than lag" (rear-wheel-landing-e2), "the rider's head and torso sink below the bars into the
+bike geometry and pop back up at 2.8–3.05 s" (face-x1: body −0.48 rad for 8 frames after the crest landing), "rider goes from seated
+to on the ground in ~2 frames" (tabletop-e1: +0.44 rad for 6 frames at touchdown, no fault — every probe frame is `riding`). The
+camera tells are unchanged from round 12 (named on 9 of 12: "bike is ~30 px", "distant, non-committal", "swings down and back in
+~10 frames at the roof exit", "yaws ~40° in 0.3 s with a foreground tree wiping across the rider", "passes straight through a
+foreground tree for ~4 frames", "bolted flat, no pullback or push-in") and so is the two-frame near-plane pop (b3 wheelie, b3 crash);
+the "wheelie locked to a fixed angle" tell is named twice (b3 hold after the landing, x1's 606 m hold: "near-fixed angle for two
+seconds like a locked pose"; the physics hold is 32° for 1.4 s). Rig proof and clips: `harness/out/capture/r13b-hero-b1/`
+(`clip.mp4` 932×430 @ 60, 6.0 s, `rider-probe.json` 360 rows, `capture.json` summary), `harness/out/capture/r13b/<cell>/`
+(twelve 1280×720 @ 60 clips, each with `rider-probe.json`), pairs `harness/out/compare/pair-<id>*`, verdicts `critic-r4-*` /
+`critic-r4b-*` in `harness/out/metrics/compare.jsonl`.
+
+| piece | as built |
+|---|---|
+| **rider probe** (`capture.ts` `--rider-probe`, `CaptureOptions.riderProbe`) | per rendered frame, through `window.__render`: `physRel` = `riderBody.angle − bike.angle` (wrapped), `chainTorso` = `GltfRider.chain.torsoAngle`, `meshTorso` = the chest bone's world up axis in the bike frame (atan2 x / y), `physicalPose`, `additiveWeight`, `present`; `rider-probe.json` (rows) next to the clip and a summary in `capture.json` (`presentFrames`, `physicalPoseFrames`, std of the three angles, Pearson r chain / mesh vs physics, ranges). `--quality`, `--from-tick`, `--to-tick` now reach `harness:capture` directly (they were `harness:clip`-only). The in-page closure holds no inner arrow (tsx's `__name` helper is undefined in `page.evaluate`, the hero-webkit gotcha). |
+| **cells** (`harness/out/compare/r13b/plan.json` (+ `pairs.tsv`); anchors from `battery.mts` on the R7 goldens) | r4: wheelie-industrial b3 tick 1503 (the R7 golden's 0.82 s / 50° hold at 174 m — round 12's 253 m wheelie is not in the R7 recording), **crash: the R7 m2 golden has 0 faults, so the round-12 crash-snow cell (m2 attempt 1 of 2) cannot be rebuilt; substituted the r13 b3 stranger's flip off the big kicker at 243 m (tick 2147)** against the same Evolution tumble hard-cut, landing-snow m2 tick 3038 (0.97 s air, 0.88 m; round 12 tick 4152), hop-nightcity h2 tick 4636 (0.42 s, 0.43 m; round 12 tick 4768), world-industrial-1 b1 1800–2280 and world-canyon-1 e1 1080–1560 unchanged. r4b: rear-wheel-landing e2 tick 2553 (1.11 s air into a 0.58 s wheelie hold) vs Rising canyon-sunset-air; **the h1 golden holds no ≥ 20° wheelie for 0.5 s (the Rookie bot rides the wire flat) — the hold cell is x1's 606 m hold (0.78 s @ 45° + 1.40 s @ 32°)** vs wheelie-sustain-over-bumps; see-saw m3 tick 3135 (touchdown onto the 336 m board, tip, exit) vs seesaw-tip-and-exit @ 3.8 s; crash-ragdoll = the r13 b2 stranger's loop off the 288 m drop (tick 3392) vs crash-ragdoll-instant-respawn; face-x1 tick 486 (the 45° plank at 30.8 m onto the 3.6 m box, 1.60 s flight) vs near-vertical-ramp-climb; tabletop-canyon e1 tick 2001 (2.10 s air, 4.15 m) vs giga-sand-dunes. All twelve captures `high` 1280×720 @ 60, 4.0–4.3 s, camera PASS 0 riding frames out of box, three at a time (2.3 min per three). Pairs `pair.ts --mask --seed 401–406 / 411–416 --align before:refAnchor`; ours sat on A 8 times, B 4 times. |
+| **critics** | twelve fresh sub-agents, one pair each, the `harness:critic-prompt` text verbatim; every verdict validated (0 invalid), logged `harness:log-verdict --critic critic-r4-<cell>` / `critic-r4b-<cell>`. |
+
+### The twelve pairs (ours side sealed until logging; pick → unmasked; `nonAAA` verbatim, abridged)
+
+| set | pair (ours cell vs reference) | ours | pick | conf | the tell | merge #3 |
+|---|---|---|---|---:|---|---|
+| r4 | wheelie-launch (b3 wheelie-industrial vs Evolution gold run) | A | **ref** | 0.85 | "A never shows the launch: the bike is airborne at frame 0, lands, and then eases into a shallow wheelie whose angle sits almost fixed with no visible counter-inputs; a two-frame geometry pop at t≈0.37 s breaks continuity, and the distant, non-committal camera leaves the landing and wheelie without weight"; `rider-lean-lags`: "A rider lean-back is not separable from bike pitch at this scale" | ref 0.86 "frozen pose welded to a bike" |
+| r4 | fault-respawn (b3 r13 stranger flip vs Evolution tumble hard-cut) | B | **ours** | 0.62 | of the reference: "A's crash never becomes debris: rider and bike stay glued and slither down the ramp, then freeze for a third of a second before the cut, with no impact dust"; of ours: "rider ejects forward and tumbles as a separate body while the bike slides ~20 frames to rest with its own momentum", "small tan dust puffs within 2–3 frames", `bike-becomes-debris` A 2 / **B 5**; against ours: "a large black foreground shape whips across the frame for 2 frames at 0.3 s", post-cut camera "still easing wider", back-in-control ~1.5 s | ref 0.60 "rider and bike stay one rigid object" |
+| r4 | big-jump-landing (m2 landing-snow vs Evolution A-licence descent) | A | **ref** | 0.75 | "A's rider pose snaps between draped-on-tank and upright in 1–2 frames instead of lagging and settling, and the camera makes a fast, unmotivated yaw that drives a foreground tree straight through the rider on the landing run-out; the touchdown itself is a single pitch with no rebound and dust that fires with the front wheel rather than after the rear" | ref 0.60 "over-rotates … no suspension settle" |
+| r4 | bunny-hop (h2 hop-nightcity vs drum-spool hop) | A | **ref** | 0.60 | "A's bunny-hop is filmed from so far away that the manoeuvre has no visible preload, apex or settle; it reads as a small object sliding over boxes" (B "throws it away with a mid-air cut into a cramped, near-frozen framing") | ref 0.62 "camera hides the manoeuvre" |
+| r4 | world-industrial (b1 riding vs Evolution warehouse) | B | **ref** | 0.55 | "B's bike cruises a flat track with almost no load change visible: no compression, no settle, no pitch overshoot, so the run reads as a smooth glide rather than a weighty machine"; credited: "rider leans forward and the bike pitches to match the grade, camera pans smoothly with a gentle roll as the track curves; very clean" | ref 0.60 "rider locked in one pose" |
+| r4 | world-canyon (e1 riding vs Rising canyon) | A | **ref** | 0.85 | "A's bike behaves like a sprite dragged across the terrain: constant pitch, constant ride height over visibly bumpy geometry, a frozen rider, and a camera bolted to the bike's screen position — no load changes, so nothing ever settles" ("rider pose is frozen for the whole clip (torso hung off the side, arms locked)") | ref 0.80 "rider frozen" |
+| r4b | big-jump-landing (e2 rear-wheel landing vs Rising canyon-sunset-air) | A | **ref** | 0.74 | "A's post-landing settle is too fast and the rider pose flips in ~3 frames while the camera stays bolted flat with no pullback or push-in, so the hop reads as a light object on a rail"; credited `rear-wheel-first` A 4 / B 2 ("rear at 0.80 s, front ~3 frames later") | — |
+| r4b | wheelie-launch (x1 606 m hold vs wheelie-sustain-over-bumps) | A | **ref** | 0.60 | "A's wheelie holds a near-fixed angle for two seconds like a locked pose, then the camera swings down and back in ~10 frames at the roof exit with no ease-in, and the front wheel touches down without any suspension settle; the launch itself is fine"; `rider-lean-lags`: "A rider extends arms in step with the bike rather than trailing" | — |
+| r4b | seesaw (m3 336 m board vs seesaw-tip-and-exit) | A | **ref** | 0.55 | "A's plank sits still after the mass crosses the pivot and then snaps through most of its rotation in ~3 frames, while its camera swings framing size and the ground texture shimmers"; "A rider unreadable at that scale" | — |
+| r4b | fault-respawn (b2 r13 stranger loop vs crash-ragdoll-instant-respawn) | A | **ours** | 0.82 | of ours: "rider is thrown off at 0.95 s, CRASH card at 1.2 s, single hard cut at 2.00 s; bike and camera dead still on the first post-cut frame; the bike keeps tumbling end-over-end up the slope for ~1 s with its own momentum while the rider ragdolls and slides to a stop", `bike-becomes-debris` **A 5** / B 4; of the reference: "never cuts back to the checkpoint … lies still for over 2.5 seconds while the camera drifts on a blurry close-up" | — |
+| r4b | steep-climb (x1 45° plank vs near-vertical-ramp-climb) | B | **ref** | 0.85 | "B's camera clipping through a tree in the first 6 frames and the rider collapsing through the bike after landing are hard continuity breaks; the manoeuvre itself never loads the rear on the incline, it just launches and floats" ("rider's head and torso sink below the bars into the bike geometry and pop back up at 2.8–3.05 s") | — |
+| r4b | flight-airtime (e1 table-top vs giga-sand-dunes) | B | **ref** | 0.60 | "B's landing-to-crash transition: ragdoll and bike topple resolve in 2–3 frames with no damped settle or slide"; credited: "ballistic arc reads as gravity, nose-up hold then slow nose-down drift; camera pans with an eased lead", "pitch rises gradually on the ramp face rather than popping at the lip". No fault occurs in the window (probe: 253 / 253 frames `riding`); the body's +0.44 rad excursion for 6 frames at touchdown is what read as "rider goes from seated to on the ground in ~2 frames" | — |
+
+**Tally: r4 1 / 6 (merge #3: 0 / 6, round 12: 0 / 6), r4b 1 / 6, 2 / 12.** Both wins are crash cells and both are the critic reading a
+flaw in the reference window (a ragdoll that "stays glued", a respawn that never comes) — the pattern of rounds 10 and 12 — but on
+both the critic also scored our crash as the more physical one (`bike-becomes-debris` 5 vs 2 and 5 vs 4), which merge #3's crash
+verdict ("rider and bike stay one rigid object") did not. Confidences 0.55–0.85; ours A 8 (won 1), B 4 (won 1).
+
+### Tells: round 12 / merge #3 vs this round
+
+| tell | merge #3 (0 / 6) | r4 / r4b |
+|---|---|---|
+| "rider is a frozen pose welded to a bike" / "fixed pose bolted to the frame" (wheelie) | named | **gone** — "rider lean-back is not separable from bike pitch at this scale" (a camera-distance statement) |
+| "rider and bike stay one rigid object … nothing tumbles" (crash) | named | **gone** — "rider ejects forward and tumbles as a separate body", `bike-becomes-debris` 5 |
+| "rider locked in one pose, zero pitch or suspension response" (world-industrial) | named | **gone** — "rider leans forward and the bike pitches to match the grade"; what remains is "no compression, no settle, no pitch overshoot" |
+| "rider frozen" (world-canyon) | named | **still named** ("frozen for the whole clip, torso hung off the side") on the 30 px top-down frame; the probe has the body at std 0.105 rad on this window |
+| no settle / no compression / "pitch that parks" | named | **still named** on 8 of 12 (landing, hop, world ×2, wheelie hold ×2, climb, table-top) |
+| camera: distant, bolted, unmotivated swing, geometry through the frame | named | **still named** on 9 of 12, plus the two-frame near-plane pop on both b3 cells |
+| **new: the landing punch** — "collapses flat onto the tank within 2 frames … snapping upright", "flips in ~3 frames", "sinks below the bars into the bike geometry", "seated to on the ground in ~2 frames" | — | **4 of 12** (landing-snow, e2, face-x1, table-top) — R8's over-F_max excursion (≤ 1.33 s, max 0.128 m / 0.48 rad here) is now the rider tell |
+| wheelie "locked to a fixed angle" | (round 12) | still named ×2 (b3 post-landing hold, x1 32° / 1.4 s hold) |
+
+### Open
+
+- **Pillar H stays open at 2 / 12 (1 / 6 on the merge #3 cells).** The rider is no longer the statue; the rider is now the punch. R8's
+  item (the thrown-rider excursion after over-F_max landings) is named on every landing-class cell, and the see-saw / climb critics
+  could not read the rider at all at 640 px. Camera is the majority tell for the third round (10, 12, 13b).
+- **Two round-12 cells could not be rebuilt on R7**: crash-snow (the m2 golden no longer faults) and the h1 wheelie hold (the Rookie
+  bot never lifts ≥ 20° for 0.5 s on the wire). The substitutes are stranger crashes (r13 b3 / b2) and x1's hold; re-runs should keep
+  these recordings (`harness/out/compare/r13b/plan.json`) so the count stays comparable.
+- The b3 wheelie anchor (tick 1503) is a landing that becomes a hold: the critic read "no throttle frame". `battery.mts` reports a
+  wheelie whose lift tick equals a touchdown tick; the wheelie-launch cell should exclude those (a `--wheelie-from-ground` filter).
+- The two-frame near-plane pop at ~0.37 s / 0.3 s on both b3 windows (x ≈ 165 m and 230 m) is the round-12 tell (4), still present.
+
 ## Round 13 (physics R7) — strangers on the held rider: b1–e3 on the Rookie (the tier's default), src 605a8174, one fresh stranger per track
 
 Rule 1 of `docs/tasks/blender-branch-merge.md`: a dynamics change needs a stranger re-run on b1–e3 in band. Physics R7
