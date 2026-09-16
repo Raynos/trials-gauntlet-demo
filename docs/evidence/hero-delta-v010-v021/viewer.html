@@ -1,0 +1,35 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#1b1d22}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"/v0.2.1/node_modules/three/build/three.module.js","three/addons/":"/v0.2.1/node_modules/three/examples/jsm/"}}</script></head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+const W = 960, H = 720;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H); renderer.setPixelRatio(1); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x1b1d22);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+const key = new THREE.DirectionalLight(0xfff1dc, 2.2); key.position.set(3, 5, 4); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.camera.left = key.shadow.camera.bottom = -3; key.shadow.camera.right = key.shadow.camera.top = 3; scene.add(key);
+scene.add(new THREE.DirectionalLight(0xcfe0ff, 0.6).translateX(-4).translateY(2).translateZ(-2));
+const floor = new THREE.Mesh(new THREE.CircleGeometry(4, 64), new THREE.MeshStandardMaterial({ color: 0x2a2d33, roughness: 0.9 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+const camera = new THREE.PerspectiveCamera(30, W / H, 0.05, 100);
+const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder); loader.setKTX2Loader(new KTX2Loader().setTranscoderPath('/v0.2.1/node_modules/three/examples/jsm/libs/basis/').detectSupport(renderer));
+let current = null;
+window.__load = async (url) => {
+  if (current) scene.remove(current);
+  const g = await loader.loadAsync(url);
+  current = g.scene; current.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false; } });
+  // rest the model on the floor: shift by bbox min y
+  const box = new THREE.Box3().setFromObject(current); current.position.y -= box.min.y; scene.add(current);
+  const b = new THREE.Box3().setFromObject(current);
+  let tris = 0, meshes = 0, mats = new Set(), texs = new Set(), skinned = 0, bones = 0;
+  current.traverse(o => { if (o.isMesh) { meshes++; const g = o.geometry; tris += (g.index ? g.index.count : g.getAttribute('position').count) / 3; for (const m of Array.isArray(o.material) ? o.material : [o.material]) { mats.add(m); for (const k of ['map','normalMap','roughnessMap','metalnessMap','aoMap','emissiveMap']) if (m[k]) texs.add(m[k]); } if (o.isSkinnedMesh) skinned++; } if (o.isBone) bones++; });
+  const texRes = [...texs].map(t => t.image ? `${t.image.width}` : '?');
+  return { size: b.getSize(new THREE.Vector3()).toArray().map(v => +v.toFixed(3)), center: b.getCenter(new THREE.Vector3()).toArray().map(v => +v.toFixed(3)), tris: Math.round(tris), meshes, materials: mats.size, textures: texs.size, texRes: [...new Set(texRes)], skinned, bones, matTypes: [...new Set([...mats].map(m => m.type))] };
+};
+window.__shot = (cx, cy, cz, tx, ty, tz, fov = 30) => { camera.fov = fov; camera.updateProjectionMatrix(); camera.position.set(cx, cy, cz); camera.lookAt(tx, ty, tz); renderer.render(scene, camera); return true; };
+window.__ready = true;
+</script></body></html>

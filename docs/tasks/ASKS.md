@@ -19,9 +19,13 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 7 | Did we have 5 mockups of a new **level select**? | **done** | yes — `assets/design/tracks/` A–E (`3351dbb`), never picked; sent to the user |
 | 8 | **What mockups are lying around not built** | **done** | tracks A–E (the only orphan); menu B, loading B, controls G, pause chosen direction are built; `hero-targets` are art targets, not UI |
 | 9 | Show me all the level-select ones | **done** | sent contact sheet + A–E + current |
-| 10 | **Delta image, 0.1.0 Blender hero vs 0.2.1** / 3 before-and-after shots of just the hero | **done** | scratch `hero-delta/` sheets sent: rider ×3, bike ×3 (+ |diff| ×3), the three outfits; rider 11 718 → 44 734 tris + real head + 3 outfits, bike 29 356 → 29 940 tris (livery + parts only). **Not yet in the repo** — file under `docs/evidence/hero-delta-v010-v021/` when the garage round commits |
-| 11 | **Build A biome map**; new mockups of **A+D**, **A+E**, and **A1 / A2 / A3** | **in flight** (mockups) · **open** (build) | track-select mockup owner (subagent) → `assets/design/tracks/round2/`; the build waits on the user's pick from that round |
-| 12 | Are we keeping a **durable task list of all my asks**? | **done** | this file; linked from `docs/plans/README.md` |
+| 10 | **Delta image, 0.1.0 Blender hero vs 0.2.1** / 3 before-and-after shots of just the hero | **done** | `docs/evidence/hero-delta-v010-v021/`: rider ×3, bike ×3 (+ |diff| ×3), the three outfits; rider 11 718 → 44 734 tris + real head + 3 outfits, bike 29 356 → 29 940 tris (livery + parts only); verdict = HR-02 |
+| 11 | **Build A biome map**; new mockups of **A+D**, **A+E**, and **A1 / A2 / A3** | **needs pick** (mockups done `a67512d`) · **open** (build) | `assets/design/tracks/round2/` A1 / A2 / A3 / AD / AE + contact sheet + SPEC (recommends A2 skeleton + AE road + AD shelf); sent; build = HD-01 |
+| 12 | Are we keeping a **durable task list of all my asks**? | **done** | this file; linked from `docs/plans/README.md` and `AGENTS.md` |
+| 13 | Which repos have the **session brief** / **human review** flow; we need that here too | **done** | found: `games/kami-kakushi` (origin, 372-line brief), `kami-kakushi2`, `house` (`.claude/hooks/session-brief.sh` + `project/human-in-the-loop/`), `vibe-demos/fe-shooter-prototype-fable` (54-line port + `QUEUE.md`); ported the light version here: `project/human-in-the-loop/QUEUE.md`, `.claude/hooks/session-brief.sh`, `.claude/settings.json` SessionStart |
+| 14 | **Update AGENTS.md** with the asks system; document undocumented processes — terse, pointers only | **done** | six pointer bullets appended (asks, human queue, session brief, design rounds, pins/evidence/device, harness docs) |
+| 15 | **Before-and-after videos** of the 0.1.0 vs 0.2.1 Blender models | **done** | `docs/evidence/hero-delta-v010-v021/{rider,bike}-turntable-before-after.mp4` (360°, 6 s, side by side); sent |
+| 16 | Garage: **UI layout = B**, **set = E**; three new mockups combining them | **in flight** | design owner → `assets/design/garage/round2/` BE1–BE3; the builder was told B layout + E set |
 
 ## Standing items the asks imply (parent's list, not the user's words)
 

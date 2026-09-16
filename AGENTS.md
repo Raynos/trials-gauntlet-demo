@@ -14,3 +14,9 @@
 - Plans and their status live in `docs/plans/README.md` (kept current by the parent at every commit); live plans: `docs/plans/PERF-BACKLOG.md`, Astra's `docs/plans/HERO_OPEN_WORK.md` / `HERO_GARAGE_PRODUCTION.md`, and the proposed `docs/plans/USE_A_REAL_PHYSICS_LIBRARY.md`; the four closed plans (`MEGA_PLAN.md`, `physics-v2.md`, `PERF.md`, `RIDER_ON_GLASS.md`) are in `project/archive/`.
 - Completed plans and permanently stale docs are archived under `project/archive/` (rules in its README); status docs never move.
 - `docs/mission.md` holds the bars no plan can close; plans carry measurable proxies and may cite a mission line as their bar.
+- Every user ask → a row in `docs/tasks/ASKS.md` before you start it; flip it when it lands; rows never leave.
+- Only a human can call it → `project/human-in-the-loop/QUEUE.md` (HD decisions, HR reviews; "Waiting on: you — …"). File, don't block.
+- Session start: `.claude/hooks/session-brief.sh` prints the human queue + open asks — relay them first, zero tool calls.
+- Design rounds: Codex mockups + contact sheet + SPEC under `assets/design/<screen>/`; recipe in `assets/design/tracks/SPEC.md`. The user picks.
+- Pins: `RELEASES.md` (tag, alias, the deploy recipe). Evidence for a claim: `docs/evidence/<topic>/README.md`. Device reports: `docs/device/`.
+- Harness docs: `harness/README.md`; stranger protocol `harness/stranger/PROTOCOL.md`; blind battery rubric `harness/compare/RUBRIC.md`; design canon `docs/design/CONTRACT.md`.
