@@ -169,14 +169,17 @@ describe('launch, top speed, the lean ladder (§7, §10, §14.2)', () => {
     feel('snap.from30.throttle0.pitchAt1.0s', cut30.at10, '< 15 deg');
     feel('snap.from30.throttle0.3.pitchAt0.5s', half30.at05, 'info (hovers near the throttle-0.3 balance ~27 deg first)');
     feel('snap.from40.throttle0.loops', cut40.loop ? 1 : 0, 'info (1 = loops: past the recovery envelope)');
-    expect(held20.loop).toBe(false);
+    // R7: with the rider body held by the linkage couple the snap from 20 deg WITH THE THROTTLE HELD no longer saves it (44.6 deg
+    // at 0.5 s, then a loop; R3's 24.6 came from the torso spinning 2.5 rad back while the rider snapped forward). Closing the
+    // throttle with the snap recovers from 30 deg as before (-6.6 deg at 1.0 s). Envelope change for the parent, physics.md R7.
+    expect(held20.loop).toBe(true);
     // R3: 24.6 deg at 0.5 s (R2: 3.2). The Rookie's 0.15 s throttle no longer matters here (the throttle is held) - the
     // low-speed knot 1.07 pushes the nose harder through the correction; the snap still brings it down and never loops
-    expect(held20.at05).toBeLessThan(30);
+    expect(held20.at05).toBeGreaterThan(30); // R7: 44.6 (was 24.6) - the held-throttle snap correction is gone with the torso spin; see the R7 note above
     expect(cut30.loop).toBe(false);
     // R3: 24.6 at 0.5 s (R2: 0.0): the Rookie's 0.15 s throttle lag keeps the thrust on for ~0.3 s after the cut, so
     // the 30 deg save is slower - it still comes down and never loops (the cost of the forgiving throttle)
-    expect(cut30.at05).toBeLessThan(30);
+    expect(cut30.at05).toBeLessThan(60); // R7: 51.2 at 0.5 s (was < 30), still -6.6 at 1.0 s and no loop - the mass shift + K_att alone, no torso spin
     expect(cut30.at10).toBeLessThan(15);
   });
 });

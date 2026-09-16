@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "h2-gap-chain",
   "bike": "rookie",
-  "updatedAt": "2026-09-15T23:50:10.771Z",
+  "updatedAt": "2026-09-16T01:21:28.256Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     14,
@@ -17,23 +17,23 @@
         4247919438
       ],
       "attempts": [
-        2
+        1
       ],
-      "median": 2,
+      "median": 1,
       "finishTimes": [
-        51.3
+        45.891666666666666
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": {
-    "checkpoint": 2,
-    "share": 1
-  },
+  "singleWall": null,
   "runs": [
     "20260914-200231-3c552f",
     "20260915-184559-e2608c",
-    "20260915-184850-6142be"
+    "20260915-184850-6142be",
+    "20260915-195652-8b9312",
+    "20260915-200454-934b70",
+    "20260915-201932-b485a4"
   ]
 }

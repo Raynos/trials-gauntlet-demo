@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "p4-night-circuit",
+  "bike": "pro",
+  "updatedAt": "2026-09-16T01:08:58.304Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "targetAttempts": 2,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        1052590580
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        31.983333333333334
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260915-200000-f7388f",
+    "20260915-200803-b82aaa"
+  ]
+}

@@ -7,10 +7,51 @@
     5
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "65175e2d",
-  "updatedAt": "2026-09-15T19:32:09.412Z",
-  "includeStale": true,
+  "srcFingerprint": "605a8174",
+  "updatedAt": "2026-09-16T01:40:52.823Z",
+  "includeStale": false,
   "sessions": [
+    {
+      "sessionId": "e2-rear-wheel-first-r13-s1-20260915-203701",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "605a8174",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 51.3333,
+      "calls": 21,
+      "wallMs": 174351,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 616.1,
+        "startTick": 3152,
+        "endTick": 6495,
+        "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r13-s1-20260915-203701.json"
+      },
+      "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r13-s1-20260915-203701.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 319.785,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 322.2 m",
+          "calls": 9
+        }
+      ]
+    },
     {
       "sessionId": "e2-rear-wheel-first-r3-s1-20260914-113731",
       "agent": "s1",
@@ -149,7 +190,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 78584513,
+      "wallMs": 100707925,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -253,7 +294,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 78584501,
+      "wallMs": 100707913,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -339,14 +380,14 @@
     }
   ],
   "bike": "rookie",
-  "completed": 4,
-  "clearedCount": 4,
-  "medianAttempts": 5.5,
-  "medianFinishTime": 82.5125,
-  "medianCalls": 41.5,
-  "medianWallMs": 704357.5,
+  "completed": 1,
+  "clearedCount": 1,
+  "medianAttempts": 2,
+  "medianFinishTime": 51.3333,
+  "medianCalls": 21,
+  "medianWallMs": 174351,
   "census": {
-    "n": 4,
+    "n": 1,
     "minSessions": 2,
     "censored": [
       {
@@ -362,7 +403,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 0,
+    "staleExcluded": 4,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -373,93 +414,28 @@
     "factor": 1.5,
     "limit": 7.5
   },
-  "verdict": "PASS",
-  "pass": true,
+  "verdict": "INSUFFICIENT",
+  "pass": null,
   "deaths": {
-    "total": 18,
+    "total": 1,
     "byReason": {
-      "crash": 18
+      "crash": 1
     },
     "byObstacle": [
-      {
-        "obstacle": "ground",
-        "count": 8,
-        "xs": [
-          80.7,
-          86.2,
-          195.7,
-          279.6,
-          198.6,
-          537.2,
-          278.2,
-          193.8
-        ]
-      },
-      {
-        "obstacle": "box @ 72.0 m",
-        "count": 2,
-        "xs": [
-          71.6,
-          68.9
-        ]
-      },
-      {
-        "obstacle": "ramp @ 57.0 m",
-        "count": 2,
-        "xs": [
-          55.3,
-          54.7
-        ]
-      },
-      {
-        "obstacle": "box @ 525.4 m",
-        "count": 1,
-        "xs": [
-          520.8
-        ]
-      },
-      {
-        "obstacle": "box @ 183.2 m",
-        "count": 1,
-        "xs": [
-          180.1
-        ]
-      },
-      {
-        "obstacle": "ramp @ 517.4 m",
-        "count": 1,
-        "xs": [
-          517.7
-        ]
-      },
       {
         "obstacle": "ramp @ 322.2 m",
         "count": 1,
         "xs": [
-          323.9
-        ]
-      },
-      {
-        "obstacle": "ramp @ 76.0 m",
-        "count": 1,
-        "xs": [
-          74.8
-        ]
-      },
-      {
-        "obstacle": "ramp @ 531.4 m",
-        "count": 1,
-        "xs": [
-          531.4
+          319.8
         ]
       }
     ],
     "byCheckpoint": [
       0,
-      7,
-      6,
+      0,
+      0,
       1,
-      4
+      0
     ]
   }
 }

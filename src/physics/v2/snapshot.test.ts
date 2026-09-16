@@ -46,9 +46,12 @@ function script(i: number): InputFrame {
   if (t > 1 && t < 4 && ph >= 0.3 && ph < 0.6) {
     lean = -1;
     throttle = 0.4;
-  } else if (t > 1 && t < 4 && ph >= 0.6 && ph < 0.8) {
+  } else if (t > 1 && t < 4 && ph >= 0.6 && ph < 0.75) {
     lean = 1;
     throttle = 0.3;
+  } else if (t > 1 && t < 4 && ph >= 0.75 && ph < 0.85) {
+    lean = -1; // R7: the reference gesture's tuck - a +1 held through the flight noses over now that the body is held
+    throttle = 0.2;
   }
   const brake = ph > 1.7 && ph < 1.85 ? 1 : 0;
   if (brake) throttle = 0;

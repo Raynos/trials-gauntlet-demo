@@ -252,8 +252,11 @@ describe('landing (R3 decision 1): the intent gate separates a landing recovery 
     const off3 = drop('rookie', 3, 6, 0, CAP_OFF);
     feel('land.capOff.2m.rebound', off2.rebound, '> 0.4 (the R2 pogo)');
     feel('land.capOff.3m.result', off3.fault ?? 'rides away', 'crash (the R2 loop)');
-    expect(off2.rebound).toBeGreaterThan(0.4);
-    expect(off3.fault).toBe('crash');
+    // R7: with the rider body held (linkage couple) the cap-off pogo is 0.247 m at 2 m and the 3 m drop rides away (R3 measured
+    // 0.4+ and a loop: the torso wind-up fed the R2 pogo). The cap still separates a landing from a hop (the on-rows and the
+    // R7 coasting-push row); the control arm is re-derived
+    expect(off2.rebound).toBeGreaterThan(0.2);
+    expect(off3.fault).toBeNull();
     const on = hop('rookie').apexR;
     const off = hop('rookie', {}, CAP_OFF).apexR;
     feel('hop.capOn.apex', on, '>= 0.45');
@@ -265,7 +268,11 @@ describe('landing (R3 decision 1): the intent gate separates a landing recovery 
     stepN(w, { lean: -1 }, 36);
     stepN(w, { lean: 1 }, 3);
     expect(w.debug().rider.intent).toBeCloseTo(1, 3);
-    stepN(w, { lean: 1 }, 240);
+    // R7: the gesture completes as the reference hop does (snap 0.22 s, tuck, neutral); a +1 held at a standstill with the
+    // throttle closed now noses the bike over at 0.86 s (the torso spin used to absorb the lunge) and a fault freezes the slot
+    stepN(w, { lean: 1 }, 24);
+    stepN(w, { lean: -1, throttle: 0.2 }, 12);
+    stepN(w, { lean: 0, throttle: 0.2 }, 240);
     expect(w.debug().rider.intent).toBeLessThan(0.02);
   });
 

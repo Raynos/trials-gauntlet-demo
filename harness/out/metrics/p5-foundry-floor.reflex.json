@@ -5,9 +5,9 @@
   "bike": "rookie",
   "tier": "beginner",
   "technique": "the foundry kit at beginner pace",
-  "updatedAt": "2026-09-15T22:02:16.024Z",
+  "updatedAt": "2026-09-16T01:36:31.111Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "d3f20790",
+  "srcFingerprint": "605a8174",
   "attemptsBand": [
     1,
     2
@@ -15,7 +15,7 @@
   "finishX": 442.547477,
   "bySkill": [
     {
-      "skill": "novice",
+      "skill": "average",
       "seeds": [
         1610333913,
         1610333914,
@@ -29,34 +29,45 @@
       ],
       "attempts": [
         1,
-        2,
+        1,
         2,
         1,
+        2,
         3,
-        1,
-        1,
+        2,
         2,
         1
       ],
-      "medianAttempts": 1,
+      "medianAttempts": 2,
       "clears": 9,
       "finishTimes": [
-        50.075,
-        61.3,
-        54.15,
-        50.18333333333333,
-        67.46666666666667,
-        50.36666666666667,
-        51.391666666666666,
-        63.608333333333334,
-        50.49166666666667
+        43.46666666666667,
+        44.05,
+        53.125,
+        44.891666666666666,
+        56.575,
+        57.475,
+        46.358333333333334,
+        46.1,
+        44.55
       ],
-      "medianFinishTime": 51.391666666666666,
-      "bestX": 447.19082811807505,
+      "medianFinishTime": 46.1,
+      "bestX": 447.83229972804594,
       "deaths": [
         {
-          "obstacle": "ground @ 140 m",
-          "x": 140,
+          "obstacle": "ground @ 175 m",
+          "x": 175,
+          "count": 2,
+          "reasons": {
+            "crash": 2
+          },
+          "rules": {
+            "nose-low": 2
+          }
+        },
+        {
+          "obstacle": "ground @ 130 m",
+          "x": 130,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -66,19 +77,19 @@
           }
         },
         {
-          "obstacle": "ground @ 170 m",
-          "x": 170,
+          "obstacle": "ground @ 135 m",
+          "x": 135,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "air-short": 1
+            "touchdown": 1
           }
         },
         {
-          "obstacle": "ramp @ 190.0 m",
-          "x": 190,
+          "obstacle": "ground @ 170 m",
+          "x": 170,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -88,19 +99,8 @@
           }
         },
         {
-          "obstacle": "ramp @ 304.7 m",
-          "x": 304.747477,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 310 m",
-          "x": 310,
+          "obstacle": "ground @ 285 m",
+          "x": 285,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -111,55 +111,15 @@
         }
       ],
       "runs": [
-        "20260915-170209-8ee11e",
-        "20260915-170210-270362",
-        "20260915-170211-229ce6",
-        "20260915-170211-0b149c",
-        "20260915-170211-d03c5b",
-        "20260915-170212-34781d",
-        "20260915-170212-b612b3",
-        "20260915-170212-3db291",
-        "20260915-170212-cbc749"
-      ]
-    },
-    {
-      "skill": "average",
-      "seeds": [
-        1610333913,
-        1610333914,
-        1610333915
-      ],
-      "attempts": [
-        3,
-        1,
-        1
-      ],
-      "medianAttempts": 1,
-      "clears": 3,
-      "finishTimes": [
-        67.61666666666666,
-        44.391666666666666,
-        44.016666666666666
-      ],
-      "medianFinishTime": 44.391666666666666,
-      "bestX": 447.75631571658613,
-      "deaths": [
-        {
-          "obstacle": "ground @ 170 m",
-          "x": 170,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "nose-low": 2
-          }
-        }
-      ],
-      "runs": [
-        "20260915-170215-0c3218",
-        "20260915-170215-87e4dd",
-        "20260915-170215-a357db"
+        "20260915-203631-67ef39",
+        "20260915-203631-1abaf1",
+        "20260915-203631-f9fea3",
+        "20260915-203631-0a51e5",
+        "20260915-203631-4a424c",
+        "20260915-203631-732f73",
+        "20260915-203631-2245bd",
+        "20260915-203631-ec4962",
+        "20260915-203631-95fb49"
       ]
     }
   ]

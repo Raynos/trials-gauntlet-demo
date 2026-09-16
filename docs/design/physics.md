@@ -5,6 +5,205 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R7 (the rider body is held by the linkage, exported, and a coasting bike never hops)
+
+**Finding.** `PhysicsState.riderBody` is exported (world SI: COM `pos`, `angle` ψ_R, `vel`, `angVel`; hashed) and the
+body it exports now tracks its pose: on every bot golden of both classes the rotation stays within ±0.35 rad of the
+pose on ≥ 94 % of riding ticks, and **one second after the last tick on which the pose target asked more of the servo
+than it has (F_max / m_R = 4.35 g) the body is within 0.15 m and 0.35 rad of its pose on every tick** (measured max
+0.128 m / 0.17 rad; the band and its distribution under "COM band" below; `r7.test.ts`, permanent). It did not before, and that is the
+merge-#3 finding (`docs/tasks/blender-branch-merge.md`, blind critic 0/6, "rider bolted to the frame"): the merged
+hero rig (`GltfRider.chainFromBody`) was dormant because the body was never exported, and it was never exported because
+**the body wound up** — on the E2 Rookie bot it left the pose band at tick 110, spun at 7 rad/s by tick 120 and reached
+834 rad (Pro: 245 rad) with its COM 1.4 m from the target while `riding`.
+
+**The wind-up cause (one line).** Deviation 4 (R1) applies the servo force's arm remainder at the **grip point on the
+rider body too** (a collinear pair, for exact angular-momentum conservation); that remainder has a 0.55 m lever about
+the rider COM, so at F_max it is a **1 700 N m moment on a body whose angular servo caps at 300 N m** — the servo lost,
+`errA` is unwrapped, `k_ψ · errA` saturated for good and the body spun. Nothing was drawn from it (the pose spring path
+never read the body) so the R2–R6 hop and snap tables were tuned *on top of the spin*: in the R2 reference hop the
+torso pitched **2.48 rad (142°) back** at 8.4 rad/s while the rider snapped forward, and that angular-momentum exchange
+is what held the nose up through the flight, what levelled a 20° wheelie under full throttle, and what absorbed the
+snap's 290 J at a standstill.
+
+**The fix (physics, not a clamp): the linkage couple.** The pair's moment about the rider COM (pegs + grip) is reacted
+by the closed chain hands–bars / feet–pegs, not by the torso muscles: it goes back to the chassis as a couple
+(`mPair` on the rider, `−mPair` on the chassis: a pair torque, angular momentum exact). The body's rotation is then
+driven by the angular servo alone (k_ψ 2 500, c_ψ 180, τ_max 300 as before) and the servo force acts on the chassis
+**as if applied at the rider COM** — §9.3's statement, now a true pair. The implicit-damping response matrix uses the
+same lever (`q = −r_R ×`). This is forced, not chosen: any model that holds the torso gives the chassis exactly
+−τ − r_R × F (a rigid rider on a linkage), so no choice of application point recovers the old behaviour — it *was* the
+spin. Measured on the R2 reference hop before → after: rear apex 0.462 → 0.608 m, both-wheels-off 0.292 → 0.183 s,
+land pitch −12 → +3.7°, torso excursion 2.48 → 0.36 rad; the tuck's +0.1 m becomes −0.145 m (K_att's nose-up drops the
+rear); one-quantum bounded response per tick 0.066 → 0.083 rad/s (the 180 N step now acts 0.62 m above the chassis COM;
+deviation 8 becomes 0.09).
+
+**Three envelope changes for the parent (all honest consequences of a held torso):** (1) the snap-forward correction
+from a 20° wheelie **with the throttle held** is gone: 44.6° at 0.5 s then a loop (R3: 24.6°); with the throttle
+closed the 30° recovery stands (51° at 0.5 s, **−6.6° at 1.0 s**, no loop). (2) A hop must finish with its tuck: a +1
+held through the flight noses over (the property / snapshot helpers now use the R2 gesture — snap 0.22 s + 0.1 s
+tuck — and pass: delayed 1/2/4/8 ticks 0.640 flat, half-rate 71 % in the 55–75 band, knife-edge sweep continuous).
+(3) At a **standstill** with the throttle closed, lean −1 for 0.3 s then +1 held pole-vaults the bike over the front
+wheel and crashes at 0.86 s (the torso spin used to absorb the 75 kg × 3 m/s lunge). The stranger instrument says the
+trade is right: reflex `average` × 3 seeds, 24 tracks, before → after medians (attempts): b1 1 → 1, b2 2 → 2,
+b3 4 → 4, e1 8 → 6, **e2 17 → 3**, e3 2 → 3, m1 10 → 9, m2 8 → 4, **m3 32 → 17**, **h1 25 → 13**, h2 28 → 15,
+**h3 22 → 7**, x1 21 → 13, **x2 51 → 11**, **x3 24 → 10**, p1 2 → 3, p2 2 → 2, p3 1 → 2, p4 2 → 2, p5 1 → 3; clears
+3/3 on every track after (before: m3 2/3, h2 1/3, h3 2/3, x2 1/3). Nine seeds on the beginner/easy tracks that moved:
+b3 6 → 4, e1 11 → 6, e3 2 → 2, p1 2 → 3, p3 2 → 2, p5 2 → 3 — no beginner/easy median moves by more than 1 the wrong
+way (the 3-seed p5 1 → 3 was noise).
+**Reflex after the edge gate (R7b; `harness:reflex --all-tracks --seeds 3 --jobs 16`, then `--seeds 9` — the committed
+`reflex.md` / `<track>.reflex.json` hold the 9-seed run):** medians R7 (3 seeds) → R7b 3 seeds / 9 seeds: b1 1 → 2 / **1**,
+b2 2 → 2 / 2, b3 4 → 2 / 3, e1 6 → 3 / 7, e2 3 → 2 / 3, e3 3 → 2 / 2, m1 9 → 8 / 10, m2 4 → 4 / 4, **m3 17 → 2 / 3**,
+h1 13 → 11 / 12, **h2 15 → 5 / 6**, h3 7 → 4 / 5, x1 13 → 15 / 11, x2 11 → 5 / 9, x3 10 → 15 / 15, p1 3 → 2 / 2,
+p2 2 → 3 / 2, p3 2 → 6 / 3, p4 2 → 3 / 2, p5 3 → 1 / 2, flat / gap / lab-flat 1, lab-physics 1; clears 3/3 and 9/9 on
+every track. Against R7's own 9-seed beginner / easy numbers (b3 4, e1 6, e3 2, p1 3, p3 2, p5 3 → b3 3, e1 7, e3 2,
+p1 2, p3 3, p5 2) no median moves by more than 1; the 3-seed b1 2 and p3 6 were noise (9 seeds: 1 and 3). e1's 9-seed
+median 7 sits above its band's 1.5 × 4 (it was 6 on R7's 9 seeds; the reflex bot is not the stranger — the R13 stranger
+row is in `harness-metrics.md`).
+
+**The coasting hop (harness r11, x3 summit tick 18585 — the second cause).** A hang-back (−1) front-wheel-first
+landing at −6.5 m/s on the summit box; the lean is released at touchdown (the only input edge); the release's 0.39 m of
+target travel saturates the R3 intent memory **8× over `servoIntentM`** (it decays over τ · ln 8 = 0.42 s) while the
+landing has pushed the body 0.28 m below its target — so the body is repaid at F_max with the angular servo pinned
+(the wind-up again), overshoots, and 34 ticks after the last input `relVy > 0.5` reads `push` and the bike leaves the
+box. Three changes: **(a) the settled gate** `servoIntentSettleM` 0.12 m — target travel counts toward intent only
+while the body is within 0.12 m of its target (linear to 0 at 0.20 m, §14.1-continuous): a snap starts from a settled
+body; a lean released while the body is still sagged by a landing is an eccentric leg absorbing an impact, not a jump,
+so the sag is repaid under the R3 concentric cap; **(b) the memory saturates** at `servoIntentMaxM` 0.10 m (a smooth
+knee from 0.05): a gesture certifies F_max for a window of order τ after it ends, not for half a second (the R2 hop is
+unchanged at 0.618 / 0.618 / 0.618 m for cap ∞ / 4× / 2×, 0.596 at 1.5×); **(c) `hopPhase` `push` = the body leaving
+the chassis at > 0.5 m/s *with intent* (`S_TGT_MOVE` ≥ ½ `servoIntentM`)**, the relative velocity taken at the body
+with the chassis's rotation removed (a bike pitching at 4 rad/s carried a 2.5 m/s tangential term and read `push` on a
+front slam). On the x3 stranger session the coasting-push count (a `push` with ≥ 20 unchanged input ticks) goes
+11 → 0 beyond 0.33 s of the last edge; the permanent row asserts **no `push` after 60 unchanged input ticks** on every
+golden of both classes.
+
+**The third coasting hop (R7b, the m2 Rookie golden, tick 3065) and (d) the edge gate.** With (a)–(c) in, the row still
+failed on one golden: a −1 pressed **in flight** (tick 3001, the only edge) crawls the target under the Rookie's R5 air
+limit; the rear wheel lands at tick 3039 (a rear-wheel-first landing, so `bothAir` is 0 at once), the limit blends out
+over `airRateBlend` and the **last 0.08 m of that travel runs at the ground rate**, past the settled gate (the body had
+followed the crawl), reads intent 1 and `push` fires 26 ticks after touchdown with no input edge — the same F_max repay
+of a landing, arriving through the pose target's speed-up instead of its distance. The rule that closes it is R5's air
+rule completed, not a new one: **under `airRateGain`, travel *commanded* with both wheels off the ground earns no
+intent — in the air (R5) or after touchdown (R7).** One flag slot, `leanEdgeAir` (F slot 35, `NSCALAR` 36): set on every
+lean edge to whether both wheels were off the ground; while it stands and a wheel is down the target's remaining travel
+counts `1 − airRateGain` (Rookie 0, Pro 1: his pre-snap an edge before touchdown is a real push and still counts, and
+the 24 Pro goldens replay byte-identical). The Rookie can still snap after landing — with an edge made on the ground.
+This is a dynamics change for the Rookie, so all 24 Rookie goldens were re-searched (below); the bench rows of
+`r2/r3/r5/r6/feel/property/snapshot` do not move (their gestures are grounded). What the gate removed was not one
+golden's hop: the reflex bot changes lean in the air on nearly every jump, so every Rookie landing after an air lean
+carried an F_max repay — the reflex medians below (R7 3-seed → R7b 3-seed / 9-seed: m3 17 → 2 / 3, h2 15 → 5 / 6,
+h3 7 → 4 / 5, x2 11 → 5 / 9) are that pogo leaving.
+
+**Export contract.** `PhysicsState.riderBody: { pos: Vec2, angle, vel: Vec2, angVel }` — world frame, SI, the rider
+COM (`pos` *is* the COM; hips = COM − R(ψ_R) · `comFromHips`), ψ_R the body angle with ψ_R − θ_C − ψ_t the lag behind
+the pose; present on every v2 tick, frozen at the crash pose once the ragdoll owns the rider (`im` 0). Hashed by
+`hashPhysicsState` whenever present (`core/hash.ts`, unchanged: it already hashed the optional field) — the hero is a
+function of it, so it is part of the replay contract; two replays hash tick-identical (`r7.test.ts`). `render/frame.ts`
+derives `relX / relY / relAngle / relUp` from it and `GltfRider.chainFromBody` reads `f.riderBody.present` — no render
+change is needed to switch the physical-pose path on.
+
+### Tests (R7)
+
+`pnpm vitest run src/physics`: **157 → 160** (3 new rows in `r7.test.ts`: the band + coasting-push row over every
+golden of both classes, the golden list, the two-replay hash identity; `world.test.ts`'s slot list gains `leanEdgeAir`,
+`NSCALAR` 36). Whole tree `pnpm vitest run` **784 / 784** (63 files; `src/game/bench.test.ts` pins
+`public/bench/b1-bot-3.json` as a copy of the b1 Rookie golden, so the golden refresh re-copies it). Re-derived rows (each carries the R7 note):
+`r2` both-wheels-off ≥ 0.25 → ≥ 0.15 s (0.183), tuck gain ≥ 0.06 → [−0.2, 0] (−0.145); `r3` cap-off control arm
+rebound > 0.4 → > 0.2 (0.247) and the 3 m cap-off drop rides away instead of looping (the wind-up fed the R2 pogo), the
+intent-decay row completes its gesture (a held +1 at a standstill now crashes); `r5` hop on/off closeTo 3 → 2 digits
+(0.6083 / 0.6078); `r6` lean-0 keys `pushTicks` > 0 → **= 0** (a throttle key is not a hop gesture), pulse-train
+gate tolerance 0.01 → 0.04 (0.026); `feel` snap from 20° throttle held: `loop` false → true, at 0.5 s < 30 → > 30
+(44.6); snap from 30° throttle closed at 0.5 s < 30 → < 60 (51.2; 1.0 s −6.6 unchanged); `property` bounded response
+|dω| ≤ 0.06 → 0.09 per tick; the property and snapshot hop helpers use the R2 gesture. All 24 landing rows (`land.*`)
+unchanged: rides away, rebound ≤ 0.04.
+
+### Deviations (R7)
+
+10. **Deviation 4 is withdrawn**: the servo pairs stay collinear at the pegs and the grip, and the linkage couple
+    returns the pair's moment about the rider COM to the chassis — so the force acts on the chassis as if at the
+    rider COM, which is §9.3's statement made a true pair. The consequence listed under 4 (lean +1 sitting ~1° above
+    +0.5 at part throttle through the arms) no longer applies.
+11. **Deviation 8 (ε_ω 0.05 → 0.06) becomes 0.09**: the one-quantum 180 N step acts at the rider COM, 0.62 m above the
+    chassis COM (0.084 rad/s per tick on 11 kg m²).
+12. **Intent (R3) is gated and bounded**: `servoIntentSettleM` 0.12 m (ramp to 0.20), `servoIntentMaxM` 0.10 m; `push`
+    requires intent. R3's "all travel counts" is what launched a coasting bike off the x3 summit.
+13. **The R5 air rule covers commanded travel (R7b)**: under `airRateGain`, target travel commanded by a lean edge made
+    with both wheels off the ground earns no intent after touchdown either; one flag slot `leanEdgeAir` (F 35,
+    `NSCALAR` 36 — physics-v2.md §12's list grows by one, justified in `world.test.ts`). The Pro (gain 0) is untouched.
+14. **The COM band is a recovery band, not a per-tick one** (below): the body leaves 0.15 m on 11 % of the bot's riding
+    ticks and by up to 2.6 m without a fault. Holding it on every tick needs a fault when the body leaves the reach
+    (§9.3's thrown rider) or a servo the impact cannot outrun — R8, not tuned here.
+
+### Golden table (R7)
+
+Every golden was re-searched (`harness:bot --all-tracks --skill 3`, both classes) because the dynamics changed: the R6
+recordings no longer finish under R7 (a held torso is a different bike), so no finish time carries over. The Pro set is
+the linkage-couple search (24 / 24 cleared, 21 at 1 attempt, 3 at 2); the Rookie set was searched again after the edge
+gate (d), which the Pro does not feel (24 / 24 cleared, 23 at 1 attempt, h3 at 2; wall 116 s). Node == browser
+(`harness:bot --refresh-goldens --jobs 5`: fresh 24 / restamped 24 / stale 0 — the Pro recordings replay byte-identical
+under the gate, restamped `aa4ce7e9 → 605a8174`), `harness:determinism` D1–D8 green on flat-test Rookie
+(`c0e96dfa44fda59a`, finish 8.433) and Pro (`f835e96a03c744fa`, 8.058), `gate/expected.json` re-pinned
+(`harness:gate --quick --pin`: `clear.hashOk` `c0e96dfa44fda59a`, `clear.pro.flat` `f835e96a03c744fa`, `clear.pro.b1`
+`ccdd746d430da232` / 38.542 s); the verifying `harness:gate --quick` is **27 / 30** with `boot.firstFrameMs` (5 451 ms),
+`restart.frameMsP95` (192 ms) and `perf.renderSyncedMsP95` (1 664 ms) failing — SwiftShader timing rows, informational
+on this machine (`boot.readyP50Ms` passed on that run, `heap.growthMBPer60s` too). `src/tracks/golden.json` is not
+written by the refresh tooling (unchanged).
+
+**COM band (R7b) — the distribution and the bound.** Over the 48 goldens (196 443 riding ticks) the rotation is outside
+±0.35 rad on 1.3 % of ticks (worst golden 5.2 %) and the COM is **outside 0.15 m on 11.0 %** (worst x3 Pro 21 %),
+max 2.59 m (m3 Pro tick 2025) — and the previous paragraph's reading of that ("a few ticks at ≥ 10 g") was wrong. The
+big residuals are not lag at high g: per-tick chassis acceleration is a poor conditioner (contact impulses read
+45–56 g for one tick, > 3 g ticks recur every ~0.1 s), and the maxima sit at *low* g — m3 Pro 2.59 m at 0.7 g, e1 Pro
+2.14 m at 1.2 g. What happens on m3 Pro: an 8 g landing (ticks 1956–1972) punches the body 1.25 m **through the chassis**
+(chassis-frame y −0.88 m, below the bike), the bike upends to 95–120° at a standstill and the body hangs 2 m from the
+chassis on the leg cap (`legFrac` 0.30, ~960 N) for 0.6 s **with no fault** — the sensors ride the IK-clamped drawn
+chain, not the body — until the bot's in-band restart. The honest conditioner is the **servo demand**: the specific force
+|a_T − g| the pose target's own world motion (chassis COM + rotation + the target's travel) asks of the rider mass,
+over a 50 ms window; the servo can supply F_max / m_R = **4.35 g**. Demand exceeds that on 28.6 % of the bot's riding
+ticks (p50 1.8 g, p90 8.7 g; a flip whirls the target at 9 m/s at 14.5 rad/s). Bucketed by time since the last
+over-demand tick (COM p50 / p95 / p99 / max, m): 0–0.1 s (56 % of ticks) 0.060 / 0.638 / 1.394 / 2.593; 0.1–0.25 s
+0.019 / 0.220 / 1.266 / 2.305; 0.25–0.5 s 0.018 / 0.036 / 0.631 / 1.686; 0.5–1 s 0.017 / 0.029 / 0.041 / 0.748 (13 ticks
+of h3 Rookie above 0.15); **≥ 1 s (10 687 ticks, 5.4 %) 0.017 / 0.026 / 0.102 / 0.128**, ψ max 0.170 rad. Excursions of
+the COM beyond 0.35 m: 334 episodes, p50 0.17 s, p90 0.68 s, **max 1.33 s** (e1 Rookie tick 2262, 1.75 m), 3 end in a
+fault; every one above 0.5 m follows an over-demand tick. **The permanent row asserts (`r7.test.ts`):** rotation within
+0.35 rad on ≥ 94 % of riding ticks per golden; **COM ≤ 0.15 m and ψ ≤ 0.35 rad on every riding tick ≥ 1.0 s after the
+last over-demand tick (zero violations, over ≥ 5 000 such ticks)**; **no COM excursion > 0.35 m longer than 1.5 s**; no
+coasting push; every golden finishing; the two-replay hash identity. That is what the hero owner can rely on: after a
+second of riding the rig draws the body on its pose; inside an impact it draws the excursion, never longer than 1.5 s.
+**Open for R8:** the thrown rider — a fault when the body leaves the reach envelope (§9.3), or a servo the impact
+cannot outrun; the m3 Pro sequence above is the reference case. Also open, and **not R7's** (identical on the R6
+physics from a `git archive HEAD` copy): full brake at lean 0 from 10 / 15 m/s on the flat endos in 1.5 / 1.4 s on
+both classes (−117° / −135°); lean −0.5 or −1 stops in 1.0–1.7 s at ≤ 8° nose-down — the R13 b1 stranger's only fault
+(`harness-metrics.md`), and the b1 card says "brake before the hump".
+
+| track | Rookie finish (s) / attempts | Pro finish (s) / attempts |
+|---|---|---|
+| b1-first-ride | 40.300 / 1 | 38.542 / 1 |
+| b2-lean-back | 37.950 / 1 | 36.783 / 1 |
+| b3-kicker-row | 32.250 / 1 | 30.992 / 1 |
+| e1-uphill-weight | 42.983 / 1 | 39.700 / 1 |
+| e2-rear-wheel-first | 42.758 / 1 | 40.933 / 1 |
+| e3-stairway | 39.692 / 1 | 35.908 / 1 |
+| flat-test | 8.433 / 1 | 8.058 / 1 |
+| gap-test | 5.483 / 1 | 5.467 / 1 |
+| h1-wheelie-wire | 46.417 / 1 | 43.992 / 1 |
+| h2-gap-chain | 45.892 / 1 | 43.608 / 1 |
+| h3-fire-line | 51.717 / 2 | 43.833 / 1 |
+| lab-flat-200 | 12.467 / 1 | 11.875 / 1 |
+| lab-physics-test | 7.900 / 1 | 7.708 / 1 |
+| m1-hop-up | 33.958 / 1 | 31.975 / 1 |
+| m2-drum-roll | 39.733 / 1 | 34.433 / 1 |
+| m3-see-saw | 39.100 / 1 | 41.358 / 2 |
+| p1-container-yard | 35.592 / 1 | 31.933 / 1 |
+| p2-canyon-run | 33.992 / 1 | 32.375 / 1 |
+| p3-snow-line | 34.325 / 1 | 31.600 / 1 |
+| p4-night-circuit | 34.400 / 1 | 31.983 / 1 |
+| p5-foundry-floor | 31.108 / 1 | 29.650 / 1 |
+| x1-vertical-limit | 55.642 / 1 | 57.700 / 2 |
+| x2-pipe-dream | 45.250 / 1 | 46.267 / 2 |
+| x3-gauntlet | 42.983 / 1 | 40.458 / 1 |
+
 ## v2 status — R6 (the line is crossed upright, the Pro lifts and does not loop, the suite says what it asserts)
 
 **Finding.** Three things the audit and harness r11 named are now defined and measured instead of assumed. **(1) A fault
