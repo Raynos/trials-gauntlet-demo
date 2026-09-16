@@ -23,6 +23,8 @@ Round 12 adds looping forward/rear motion, a bounded garment surface correction,
 
 Round 13 adds compression, extension and landing-absorption clips with seated returns, verified contact markers across all 750 exported frames. [Motion review](../../prototypes/hero-garage/reports/whole-motion-round13-review.json) retains them provisionally; the stationary bike has no physical suspension response. Timing diagnosis records 18 ms p95 both for the scene without video and for an empty page; the 16.7 ms runtime gate remains unproven rather than relaxed.
 
+Round 14 corrects an earlier misleading contact metric: saddle-region gaps were 33–45 mm despite a 0.6 mm minimum elsewhere. The new seat-fit candidate reduces central gaps to 2–3.54 mm; uneven side support and a measured 0.05 mm rearward grazing intersection remain. The bike receives source-derived 2K color/1K lossless data maps. [Review and resource limits](../../prototypes/hero-garage/reports/whole-seat-materials-review.json) retain both provisionally; estimated active image residency is 98.76 MiB before renderer allocations.
+
 Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest user-reported allowance is 27% remaining, with the 20% reserve unchanged.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)

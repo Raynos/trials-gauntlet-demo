@@ -9,7 +9,7 @@
     {
       "id": "street01-rider",
       "label": "Mustard Street rider",
-      "url": "/assets/street01-rider-motion.glb",
+      "url": "/assets/street01-rider-seat.glb",
       "kind": "rider",
       "position": [
         0,
@@ -20,7 +20,7 @@
     {
       "id": "street01-bike",
       "label": "Blue/white trials bike",
-      "url": "/assets/street01-bike.glb",
+      "url": "/assets/street01-bike-materials.glb",
       "kind": "bike",
       "position": [
         0,
