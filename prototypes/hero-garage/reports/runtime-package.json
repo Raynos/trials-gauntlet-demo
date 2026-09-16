@@ -4,9 +4,14 @@
   "command": "node tools/package-runtime.mjs",
   "files": [
     {
+      "path": "assets/basis_transcoder-o4Hde_L7.js",
+      "bytes": 57529,
+      "sha256": "8478b5b6d6b74e7d3082b89f6417321d8d1dc0307f2b30d4484bb11b441696a1"
+    },
+    {
       "path": "assets/catalog.json",
-      "bytes": 1198,
-      "sha256": "bf71ee698ea92a598681bb4efa5043a5f56dc6f157a3269fbf278ec8f8484a0a"
+      "bytes": 1206,
+      "sha256": "db2e7d1c5bbb3ee6469ac07251a31316650ce201afd48bdb849be510332d4d76"
     },
     {
       "path": "assets/index-B2aW2QAt.css",
@@ -14,9 +19,9 @@
       "sha256": "31b47e3d688543a583df0c2b7da25f2c0a1817f9573aca01d3d584eabf8f4f88"
     },
     {
-      "path": "assets/index-BfCfGsTS.js",
-      "bytes": 707988,
-      "sha256": "165a7d6f2d9eb11276e6bae49c1318cdd265d56eeec52b2a6fc873b98dcfd198"
+      "path": "assets/index-BnIdGVnQ.js",
+      "bytes": 768943,
+      "sha256": "ef77df99e661d25a08103848de5772e6d7662a1230e332ab29d8200ced3efb12"
     },
     {
       "path": "assets/street01-bike-materials.glb",
@@ -24,9 +29,9 @@
       "sha256": "e8ea68d5a6ad504b0e969cd716e957bcac3f436acd3c9eac1357ee722cf05b43"
     },
     {
-      "path": "assets/street01-bike-mobile.glb",
-      "bytes": 3645880,
-      "sha256": "7aae3f7c237d0dc5ceff2157527c0ace7b9adae2103b4b0aea434a3c6adedd93"
+      "path": "assets/street01-bike-mobile-ktx.glb",
+      "bytes": 3263048,
+      "sha256": "da0347ff994e06943f494a411caba4c6dc8cd0c78eff6cc0251dd1d5657f112a"
     },
     {
       "path": "assets/street01-rider-garment-repair.glb",
@@ -34,9 +39,24 @@
       "sha256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262"
     },
     {
-      "path": "assets/street01-rider-mobile.glb",
-      "bytes": 2760380,
-      "sha256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262"
+      "path": "assets/street01-rider-mobile-ktx.glb",
+      "bytes": 4179220,
+      "sha256": "7a2289b59f59fbb455aa5f7cb2edcec7ea4ccde0f54f3ce2b85a89807da3742c"
+    },
+    {
+      "path": "decoders/basis/basis_transcoder.js",
+      "bytes": 57529,
+      "sha256": "8478b5b6d6b74e7d3082b89f6417321d8d1dc0307f2b30d4484bb11b441696a1"
+    },
+    {
+      "path": "decoders/basis/basis_transcoder.wasm",
+      "bytes": 527333,
+      "sha256": "6cf17dc889352c42e9acf8897107978d127005fe3386c36a0e3845e27967630a"
+    },
+    {
+      "path": "decoders/basis/LICENSE.txt",
+      "bytes": 11347,
+      "sha256": "065fcf48d6af21c0b75e23be5ed5753aee75c892e1c2cf178fa6736305614a5c"
     },
     {
       "path": "identity.html",
@@ -46,7 +66,7 @@
     {
       "path": "index.html",
       "bytes": 439,
-      "sha256": "50445792619f6416681c05fbf3421b0fbcf2157e8b82658c0ff4be12bdac6717"
+      "sha256": "8c160e9edc98599a1b51c2a9b44086213d12a94b85416c34ca0b5c4efe741ace"
     },
     {
       "path": "licenses/meshoptimizer.txt",
@@ -55,8 +75,8 @@
     },
     {
       "path": "licenses/NOTICE.txt",
-      "bytes": 404,
-      "sha256": "14ec2ad292e465f3c36c6c3c3655acd8ad6f1092c09aee8b7fc4b9e3eff58178"
+      "bytes": 423,
+      "sha256": "224d41976b08e0b945bc8bf4e06bc4602683dcbccc70bede6e912b6ccb92838f"
     },
     {
       "path": "licenses/three.txt",
@@ -74,9 +94,17 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 20201066,
-  "sourceDistBytes": 230373582,
+  "totalBytes": 21951794,
+  "sourceDistBytes": 239057884,
   "excludedFiles": [
+    {
+      "path": "assets/basis_transcoder-VXdx5NbI.wasm",
+      "bytes": 527333
+    },
+    {
+      "path": "assets/street01-bike-mobile.glb",
+      "bytes": 3645880
+    },
     {
       "path": "assets/street01-bike.glb",
       "bytes": 1394072
@@ -106,6 +134,10 @@
       "bytes": 2578868
     },
     {
+      "path": "assets/street01-rider-mobile.glb",
+      "bytes": 2760380
+    },
+    {
       "path": "assets/street01-rider-motion.glb",
       "bytes": 2740896
     },
@@ -124,11 +156,11 @@
   ],
   "verifiedLocalUrls": [
     "assets/index-B2aW2QAt.css",
-    "assets/index-BfCfGsTS.js",
+    "assets/index-BnIdGVnQ.js",
     "assets/street01-bike-materials.glb",
-    "assets/street01-bike-mobile.glb",
+    "assets/street01-bike-mobile-ktx.glb",
     "assets/street01-rider-garment-repair.glb",
-    "assets/street01-rider-mobile.glb",
+    "assets/street01-rider-mobile-ktx.glb",
     "index.html",
     "references/target01.png",
     "references/turnaround.png"

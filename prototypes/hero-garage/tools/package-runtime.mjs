@@ -7,7 +7,7 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const source=path.join(root,'dist');
 const output=path.join(root,'runtime-dist');
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
-const selected=new Set(['index.html','identity.html','assets/catalog.json']);
+const selected=new Set(['index.html','identity.html','assets/catalog.json','decoders/basis/basis_transcoder.js','decoders/basis/basis_transcoder.wasm','decoders/basis/LICENSE.txt']);
 const verifiedUrls=new Set();
 function localPath(raw,from='index.html') {
   if(typeof raw!=='string'||!raw||/^[a-z][a-z\d+.-]*:/i.test(raw)||raw.startsWith('//')||raw.includes('\\'))throw new Error(`Unsupported external/path URL: ${raw}`);
@@ -48,7 +48,7 @@ for(const rel of [...selected].sort()){
 for(const [name,rel] of [['three','node_modules/three/LICENSE'],['meshoptimizer','node_modules/meshoptimizer/LICENSE.md']]){
  const bytes=await fs.readFile(path.join(root,rel));files.push({path:`licenses/${name}.txt`,bytes:bytes.length,sha256:sha(bytes),data:bytes});
 }
-const notice=Buffer.from('Hero Garage prototype runtime package.\n\nThis package contains the current project-authored rider and bike, design reference images, and bundled Three.js / meshoptimizer code. Library licenses are retained beside this notice. Paused external head/hair studies are excluded. This package is for local prototype review; it does not assert final art approval, mobile-device validation, or public deployment.\n');
+const notice=Buffer.from('Hero Garage prototype runtime package.\n\nThis package contains the current project-authored rider and bike, design reference images, and bundled Three.js / meshoptimizer / Basis transcoder code. Library licenses are retained beside this notice. Paused external head/hair studies are excluded. This package is for local prototype review; it does not assert final art approval, mobile-device validation, or public deployment.\n');
 files.push({path:'licenses/NOTICE.txt',bytes:notice.length,sha256:sha(notice),data:notice});
 files.sort((a,b)=>a.path.localeCompare(b.path,'en'));
 const staging=path.join(root,'.runtime-dist-staging');

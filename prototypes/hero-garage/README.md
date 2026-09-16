@@ -4,7 +4,7 @@ Independent Three.js production viewer for target 01. This package imports no ga
 
 ## Current milestone
 
-The user requested breadth-first work: the complete person and bike in Three.js, followed by individual polish. The viewer now loads the complete existing Blender-authored Street rider and trials bike, with `sit_cruise` as the default clip and full-scene framing. Six authored clips cover seated, forward, rearward, compression, extension and landing absorption. These rider motions run on a stationary bike; suspension and game-physics integration are separate open work. Head-only studies are preserved and paused. This assembled baseline is not final art acceptance or iPhone/runtime proof.
+The user requested breadth-first work: the complete person and bike in Three.js, followed by individual polish. The viewer now loads the complete existing Blender-authored Street rider and trials bike, with `sit_cruise` as the default clip and full-scene framing. Six authored clips cover seated, forward, rearward, compression, extension and landing absorption. Compression and landing now include coordinated fork, swingarm, shock, chain and hose motion with fixed tyres. This is prescribed garage kinematics; game-physics integration remains open. Head-only studies are preserved and paused. This assembled baseline is not final art acceptance or iPhone/runtime proof.
 
 ## Run and build
 
@@ -30,7 +30,7 @@ npm run capture -- --engine webkit --seconds 30 --camera full --clip landing_abs
 npm run capture -- --engine webkit --seconds 30 --camera full --clip forward_attack --name whole-scene-timing --no-video
 ```
 
-The viewer supports touch orbit/pinch and responsive controls. Coarse-pointer devices render at a 30 fps cap; desktop caps at 60. Internal DPR caps are 1.5 for the mobile tier in either orientation and 2 for desktop. The mobile tier retains full geometry and clips while reducing bike texture dimensions; the all-image RGBA8 plus mip estimate is 34.76 MiB versus 98.76 MiB for desktop, excluding renderer allocations. These are chosen settings, not evidence of actual iPhone performance. Performance acceptance still requires the declared real device.
+The viewer supports touch orbit/pinch and responsive controls. Coarse-pointer devices render at a 30 fps cap; desktop caps at 60. Internal DPR caps are 1.5 for the mobile tier in either orientation and 2 for desktop. The mobile tier retains full geometry and clips while reducing bike texture dimensions; mobile KTX2/UASTC textures estimate 8.69 MiB at 4x4/16-byte GPU blocks, versus 34.76 MiB for the prior mobile RGBA8 tier and 98.76 MiB desktop. Device transcode/fallback and renderer allocations affect actual residency. Combined mobile assets download as 7.44 MB versus 6.41 MB previously. These are chosen settings, not evidence of actual iPhone performance. Performance acceptance still requires the declared real device.
 
 ## Catalog contract
 
@@ -74,3 +74,5 @@ No visual milestone is accepted solely by the viewer. The parent reviews played 
 The touch-accessible **Compare head at equal scale** button opens the original concept crop beside the live GLB. It does not replace the runtime render. `setComparison(true | false)` exposes the same toggle to the harness; diagnostics report the framing contract. The original target image remains unchanged: the viewer samples pixel rectangle `(694,128,111,118)` and enlarges it without generative reconstruction.
 
 For the current Street01 source, face framing uses a fixed Y-up head envelope from `(-0.115,1.528,-0.10)` to `(0.115,1.805,0.19)` meters, excluding the bust. In comparison, the reference camera fits this envelope and the concept crop height follows the projected crown-to-chin height. Both panes therefore show the declared head height at the same pixel scale, including after responsive resizing; the reference retains its own head-width ratio. This is a framing comparison, not a pixel-registered overlay or a claim that the two designs have matching anatomy. New asset proportions require an explicit framing-contract review. Orbit and relighting remain live.
+
+KTX2 decoders are copied from the pinned Three.js dependency by `tools/prepare-decoders.mjs`; Apache 2.0 attribution ships with them. `art/ktx-mobile/build.py` reproduces mobile compression. `reports/ktx-round20-review.json` records scoped comparison/adoption evidence.

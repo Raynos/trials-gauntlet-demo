@@ -272,3 +272,7 @@ The frozen round-18 game ship gate passes 1,038 identical ticks, 8.65-second cle
 ### Round 19 — exported rig contract and source investigation
 
 `reports/rig-contract.json` now captures actual GLB hashes, initial local transforms, inverse bind matrices, exported/runtime name mappings, sockets, clip channels and contact measurements across all 750 frames. Repeat generation is byte-identical. This supplies the current export contract while final rig quality and physical pose integration stay open. `reports/body-source-round19.json` records the bounded better-clothing search: official anonymous asset query returned 403; no candidate geometry was acquired or admitted. Hair/beard remain paused.
+
+### Round 20 — GPU-compressed mobile textures
+
+Mobile now uses KTX2/UASTC with complete mip chains, sRGB color and linear data maps, plus local Three.js Basis decoders and license. All 288 nonimage payloads remain byte-identical. Parent matched full-scene renders and decoded recorded orbit frames before provisional adoption. WebKit loads actual ASTC 4x4 textures; automatic mobile selection/touch/layout checks pass. Estimated all-image texture storage falls 34.76 → 8.69 MiB; asset download increases 6.41 → 7.44 MB. This does not close art approval, the 30-second desktop budget or actual iPhone validation. See `reports/ktx-round20-review.json` and `reports/mobile-ktx-ledger.json` in the prototype.

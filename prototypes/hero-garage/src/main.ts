@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -164,9 +165,21 @@ function setFrame(frame:{time:number;orbit:number;lighting?:LightingName}){
   try{setTime(frame.time);setOrbit(frame.orbit);if(frame.lighting)setLighting(frame.lighting);}finally{renderSuppressed=false;}
   render();
 }
+function textureStorage(){
+  const textures=new Map<THREE.Texture,Set<string>>();
+  for(const item of loaded)item.root.traverse(o=>{
+    if(!(o instanceof THREE.Mesh))return;
+    for(const material of (Array.isArray(o.material)?o.material:[o.material])){
+      for(const [slot,value] of Object.entries(material))if(value instanceof THREE.Texture){
+        if(!textures.has(value))textures.set(value,new Set());textures.get(value)!.add(slot);
+      }
+    }
+  });
+  return {scope:'Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.',textures:[...textures].map(([t,slots])=>({name:t.name,slots:[...slots],format:t.format,colorSpace:t.colorSpace,compressed:t instanceof THREE.CompressedTexture,width:(t.image as {width?:number})?.width??null,height:(t.image as {height?:number})?.height??null,mips:t.mipmaps.length,compressedPayloadBytes:t instanceof THREE.CompressedTexture?t.mipmaps.reduce((sum,mip)=>sum+(mip.data?.byteLength??0),0):null}))};
+}
 function diagnostics(){
   const sizes=renderer.getDrawingBufferSize(new THREE.Vector2());const sorted=[...frameTimes].sort((a,b)=>a-b);
-  return {ready,error,quality,suspension:suspension?.getDiagnostics()??null,qualitySelection:requestedQuality==='desktop'||requestedQuality==='mobile'?'query':'pointer capability',grounding,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
+  return {ready,error,quality,textureStorage:textureStorage(),suspension:suspension?.getDiagnostics()??null,qualitySelection:requestedQuality==='desktop'||requestedQuality==='mobile'?'query':'pointer capability',grounding,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
 }
 const api={get ready(){return ready;},get error(){return error;},setCamera,setComparison,setLighting,setTime,setOrbit,setFrame,setClip,setPlaying,getDiagnostics:diagnostics,get state(){return diagnostics();}};
 Object.assign(window,{__garage:api,__heroGarage:api});
@@ -200,7 +213,8 @@ async function boot(){
       cropImage.onload=()=>{const whole=catalog!.assets.some(asset=>asset.kind==='rider');const crop=whole?{x:465,y:115,width:800,height:680}:headFrame.sourceCrop;cropCanvas.width=crop.width*4;cropCanvas.height=crop.height*4;const ctx=cropCanvas.getContext('2d')!;ctx.imageSmoothingEnabled=true;ctx.drawImage(cropImage,crop.x,crop.y,crop.width,crop.height,0,0,cropCanvas.width,cropCanvas.height);updateComparisonScale();};cropImage.src=catalog.reference.url;
       const img=$<HTMLImageElement>('#reference-image');img.src=catalog.reference.url;img.onerror=()=>{$('#reference-caption').textContent='Reference image unavailable. Check the catalog reference URL.';};$('#reference-caption').textContent=catalog.reference.label;$('#reference').classList.remove('hidden');}
     if(!catalog.assets.length)throw new Error('No exported hero asset is registered yet. This garage is ready for the first head GLB; character production remains open.');
-    const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+    const ktx2=new KTX2Loader().setTranscoderPath('/decoders/basis/').detectSupport(renderer);
+    const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).setKTX2Loader(ktx2);
     for(const asset of catalog.assets){
       if(!asset.url||!asset.id)throw new Error('Every catalog asset requires an id and URL.');
       setStatus(`Loading ${asset.label}…`);

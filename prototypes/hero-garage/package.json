@@ -8,9 +8,9 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview --host 127.0.0.1 --port 4178",
-    "predev": "node tools/prepare-references.mjs",
-    "prebuild": "node tools/prepare-references.mjs",
-    "prepreview": "node tools/prepare-references.mjs",
+    "predev": "node tools/prepare-references.mjs && node tools/prepare-decoders.mjs",
+    "prebuild": "node tools/prepare-references.mjs && node tools/prepare-decoders.mjs",
+    "prepreview": "node tools/prepare-references.mjs && node tools/prepare-decoders.mjs",
     "capture": "node tools/capture.mjs",
     "verify:assets": "node tools/verify-assets.mjs"
   },

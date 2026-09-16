@@ -15,3 +15,7 @@ __pycache__/
 
 # Preliminary capture used old scan catalog; final comparison is head-authored-a1-final.
 captures/head-authored-a1/
+# Rebuilt from pinned dependencies / runtime packaging recipes.
+public/decoders/
+runtime-dist/
+.runtime-dist-staging/

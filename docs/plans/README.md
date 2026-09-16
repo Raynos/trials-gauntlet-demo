@@ -22,6 +22,8 @@ Round 18 adds coordinated 25 mm fork/swingarm/shock motion during compression an
 
 Round 19 derives the [rig/socket contract](../../prototypes/hero-garage/art/rig-contract/README.md) from the actual exports: 19 bones, 26 sockets, six clips and all 750 frames, including raw-to-Three.js name mapping. Contact-offset drift stays below 2.3 micrometres; the existing 11 mm sole/peg offset is documented, not called a surface-contact pass. A better clothing-source investigation reached an HTTP 403 on the official anonymous asset query; no replacement was downloaded or adopted.
 
+Round 20 adopts verified mobile KTX2/UASTC exports: all-image 4x4-block estimate **8.69 MiB**, down from 34.76 MiB RGBA8; download grows 6.41 → 7.44 MB. WebKit actually transcodes to ASTC 4x4, normal mobile selection loads the compressed assets, and matched full-scene review shows no obvious regression. Geometry and all motion buffers are unchanged. [Review](../../prototypes/hero-garage/reports/ktx-round20-review.json); actual iPhone and final art remain open.
+
 The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The hourly continuation is **paused for the art-quality blocker**, with 34% remaining at the stop; final visual approval stays with the user. Next decision: a source/artist capable of the same identity, or explicit revision toward a finished licensed character. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
 
 ## Independent audit — 2026-09-15

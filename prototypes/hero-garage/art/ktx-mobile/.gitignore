@@ -1,0 +1,5 @@
+# Reproducible extracted image inputs and intermediate encoder outputs.
+*.jpg
+*.png
+*.ktx2
+*.log

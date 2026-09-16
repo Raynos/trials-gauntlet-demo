@@ -16,7 +16,7 @@
         0.34,
         0
       ],
-      "mobileUrl": "/assets/street01-rider-mobile.glb"
+      "mobileUrl": "/assets/street01-rider-mobile-ktx.glb"
     },
     {
       "id": "street01-bike",
@@ -28,7 +28,7 @@
         0.34,
         0
       ],
-      "mobileUrl": "/assets/street01-bike-mobile.glb"
+      "mobileUrl": "/assets/street01-bike-mobile-ktx.glb"
     }
   ],
   "notes": [

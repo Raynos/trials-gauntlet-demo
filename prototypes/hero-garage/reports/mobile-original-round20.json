@@ -1,0 +1,3672 @@
+{
+  "createdAt": "2026-09-16T13:44:02.520Z",
+  "base": "http://127.0.0.1:4182",
+  "results": [
+    {
+      "engine": "webkit",
+      "headless": true,
+      "host": {
+        "platform": "darwin",
+        "release": "25.5.0",
+        "arch": "arm64"
+      },
+      "actualIPhone": false,
+      "recordVideo": true,
+      "quality": "mobile",
+      "textures": "default",
+      "errors": [],
+      "status": "rendered",
+      "browserVersion": "26.5",
+      "loadToReadyMs": 738,
+      "assetResponses": [
+        {
+          "url": "http://127.0.0.1:4182/assets/street01-rider-mobile.glb",
+          "status": 200,
+          "bytes": 2760380,
+          "sha256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262",
+          "proof": "upstream response bytes forwarded unchanged through request interception"
+        },
+        {
+          "url": "http://127.0.0.1:4182/assets/street01-bike-mobile.glb",
+          "status": 200,
+          "bytes": 3645880,
+          "sha256": "7aae3f7c237d0dc5ceff2157527c0ace7b9adae2103b4b0aea434a3c6adedd93",
+          "proof": "upstream response bytes forwarded unchanged through request interception"
+        }
+      ],
+      "initial": {
+        "ready": true,
+        "error": null,
+        "quality": "mobile",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + bike — breadth-first assembly",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-mobile.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-mobile.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "full",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 1.9666666984558105,
+        "activeClip": "sit_cruise",
+        "playing": false,
+        "orbitAngle": 0,
+        "cameraPosition": [
+          1.740180626392572,
+          1.1256143142497534,
+          4.1631791828079425
+        ],
+        "cameraTarget": [
+          0.6299832910299301,
+          0.9174523138692581,
+          -0.00006082480196475948
+        ],
+        "render": {
+          "triangles": 150006,
+          "calls": 46,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 24,
+          "textures": 15,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 247,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "motionControls": {
+        "playDisabled": false,
+        "timelineDisabled": false,
+        "note": "Authored rider clips; compression and landing include a kinematic suspension preview.",
+        "clipButtons": 6,
+        "honestAbsentClips": null
+      },
+      "comparison": false,
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "dpr": 1,
+        "viewport": [
+          1920,
+          1080
+        ],
+        "drawingBuffer": [
+          1640,
+          934
+        ],
+        "gpu": "Apple GPU",
+        "vendor": "Apple Inc.",
+        "webglVersion": "WebGL 2.0",
+        "contextLost": false,
+        "jsHeap": null
+      },
+      "shaderWarmupMs": 2000,
+      "frames": [
+        "webkit-face.png",
+        "webkit-reference.png",
+        "webkit-full.png",
+        "webkit-bike.png"
+      ],
+      "deterministicCanvas": {
+        "a": "477b181cee2ac6a8aaa9e90bf1f777a6d8e31ea6016b173b296902e71a685141",
+        "b": "477b181cee2ac6a8aaa9e90bf1f777a6d8e31ea6016b173b296902e71a685141",
+        "byteIdentical": true,
+        "scope": "same engine, camera, orbit and animation time; not game physics replay"
+      },
+      "trace": {
+        "renderSubmitP95Ms": 1,
+        "renderSubmitScope": "Synchronous CPU scene update and WebGL submission only; not GPU completion",
+        "durationSeconds": 8,
+        "measuredDurationMs": 8016,
+        "frames": [
+          {
+            "elapsedMs": 16,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 39,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 50,
+            "deltaMs": 11,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 66,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 91,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 100,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 115,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 140,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 150,
+            "deltaMs": 10,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 166,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 191,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 199,
+            "deltaMs": 8,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 216,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 241,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 250,
+            "deltaMs": 9,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 266,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 291,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 300,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 317,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 341,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 350,
+            "deltaMs": 9,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 366,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 391,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 400,
+            "deltaMs": 9,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 416,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 443,
+            "deltaMs": 27,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 450,
+            "deltaMs": 7,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 466,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 483,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 500,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 516,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 533,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 550,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 567,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 583,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 601,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 616,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 633,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 654,
+            "deltaMs": 21,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 666,
+            "deltaMs": 12,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 683,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 707,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 716,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 733,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 758,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 767,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 783,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 809,
+            "deltaMs": 26,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 816,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 833,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 850,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 867,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 883,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 898,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 917,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 933,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 950,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 967,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 983,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1000,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1018,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1033,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1050,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1072,
+            "deltaMs": 22,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1083,
+            "deltaMs": 11,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1099,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1122,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1133,
+            "deltaMs": 11,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1149,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1174,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1181,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1200,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1224,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1233,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1248,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1274,
+            "deltaMs": 26,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1283,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1300,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1324,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1333,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1350,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1374,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1383,
+            "deltaMs": 9,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1400,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1424,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1433,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1448,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1473,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1482,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1499,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1524,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1533,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1550,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1573,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1583,
+            "deltaMs": 10,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1600,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1623,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1633,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1650,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1674,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1683,
+            "deltaMs": 9,
+            "renderSubmitMs": 2
+          },
+          {
+            "elapsedMs": 1700,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1723,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1733,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1750,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1774,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1783,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1800,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1823,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1833,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1848,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1874,
+            "deltaMs": 26,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1882,
+            "deltaMs": 8,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 1898,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1924,
+            "deltaMs": 26,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1933,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1950,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1974,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 1983,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2000,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2025,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2033,
+            "deltaMs": 8,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2049,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2075,
+            "deltaMs": 26,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2083,
+            "deltaMs": 8,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2100,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2116,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2133,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2150,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2167,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2183,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2200,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2215,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2233,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2249,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2266,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2283,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2300,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2316,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2333,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2350,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2366,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2384,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2400,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2416,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2433,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2451,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2466,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2483,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2499,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2516,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2533,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2550,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2566,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2584,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2600,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2616,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2635,
+            "deltaMs": 19,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2649,
+            "deltaMs": 14,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2666,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2690,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2700,
+            "deltaMs": 10,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2717,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2741,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2748,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2766,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2791,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2800,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2815,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2840,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2850,
+            "deltaMs": 10,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2866,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2891,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2900,
+            "deltaMs": 9,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2916,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2941,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 2948,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2966,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2992,
+            "deltaMs": 26,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 2998,
+            "deltaMs": 6,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3015,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3033,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3048,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3066,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3083,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3098,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3115,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3133,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3150,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3166,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3183,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3200,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3216,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3233,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3250,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3266,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3283,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3301,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3317,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3333,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3350,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3366,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3381,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3400,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3417,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3435,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3450,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3466,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3484,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3500,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3516,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3533,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3550,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3567,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3582,
+            "deltaMs": 15,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3600,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3616,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3633,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3650,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3665,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3682,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3699,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3716,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3733,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3749,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3766,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3782,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3800,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3816,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 3832,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3851,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3867,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3884,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3906,
+            "deltaMs": 22,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3918,
+            "deltaMs": 12,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3933,
+            "deltaMs": 15,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3958,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3965,
+            "deltaMs": 7,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 3983,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4007,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4017,
+            "deltaMs": 10,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4031,
+            "deltaMs": 14,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4058,
+            "deltaMs": 27,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4066,
+            "deltaMs": 8,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4083,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4100,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4115,
+            "deltaMs": 15,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4133,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4150,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4166,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4183,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4199,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4216,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4231,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4250,
+            "deltaMs": 19,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4266,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4283,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4301,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4316,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4334,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4350,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4366,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4382,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4400,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4416,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4433,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4448,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4467,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4483,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4500,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4518,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4533,
+            "deltaMs": 15,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4550,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4568,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4584,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4600,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4623,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4632,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4650,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4673,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4685,
+            "deltaMs": 12,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4700,
+            "deltaMs": 15,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4723,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4733,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4750,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4773,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4781,
+            "deltaMs": 8,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4800,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4824,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4831,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4848,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4873,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4884,
+            "deltaMs": 11,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4900,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 4923,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4933,
+            "deltaMs": 10,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4950,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4974,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 4983,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5000,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5024,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5033,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5050,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5074,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5081,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5100,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5123,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5133,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5150,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5174,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5183,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5200,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5223,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5232,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5250,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5273,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5283,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5300,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5325,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5332,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5349,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5374,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5383,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5400,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5423,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5434,
+            "deltaMs": 11,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5448,
+            "deltaMs": 14,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5475,
+            "deltaMs": 27,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5481,
+            "deltaMs": 6,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5498,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5523,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5533,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5550,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5573,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5583,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5600,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5624,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5633,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5650,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5674,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5683,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5700,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5724,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5733,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5750,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5773,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5784,
+            "deltaMs": 11,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5798,
+            "deltaMs": 14,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5824,
+            "deltaMs": 26,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5831,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5850,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5873,
+            "deltaMs": 23,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5885,
+            "deltaMs": 12,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5900,
+            "deltaMs": 15,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5924,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5933,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5950,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 5974,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 5983,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6000,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6024,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6033,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6049,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6073,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6083,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6100,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6124,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6133,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6149,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6174,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6183,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6199,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6224,
+            "deltaMs": 25,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6233,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6250,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6274,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6282,
+            "deltaMs": 8,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6300,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6324,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6333,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6350,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6374,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6383,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6398,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6424,
+            "deltaMs": 26,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6431,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6450,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6474,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6483,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6498,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6526,
+            "deltaMs": 28,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6533,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6548,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6566,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6583,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6598,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6616,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6633,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6650,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6667,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6683,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6699,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6716,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6733,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6749,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6766,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6783,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6800,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6816,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6833,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6851,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6866,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6884,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6900,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6916,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6933,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6950,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 6966,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 6985,
+            "deltaMs": 19,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7000,
+            "deltaMs": 15,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7016,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7040,
+            "deltaMs": 24,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7051,
+            "deltaMs": 11,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7066,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7091,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7100,
+            "deltaMs": 9,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7116,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7141,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7148,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7165,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7191,
+            "deltaMs": 26,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7198,
+            "deltaMs": 7,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7216,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7242,
+            "deltaMs": 26,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7250,
+            "deltaMs": 8,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7266,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7283,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7301,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7316,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7333,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7350,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7367,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7383,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7400,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7416,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7433,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7450,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7466,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7482,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7500,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7516,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7533,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7550,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7566,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7583,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7599,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7615,
+            "deltaMs": 16,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7633,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7650,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7666,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7682,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7700,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7717,
+            "deltaMs": 17,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7733,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7750,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7766,
+            "deltaMs": 16,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7783,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7802,
+            "deltaMs": 19,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7816,
+            "deltaMs": 14,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7833,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7856,
+            "deltaMs": 23,
+            "renderSubmitMs": 0
+          },
+          {
+            "elapsedMs": 7866,
+            "deltaMs": 10,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7883,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7907,
+            "deltaMs": 24,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7915,
+            "deltaMs": 8,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7933,
+            "deltaMs": 18,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7958,
+            "deltaMs": 25,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7966,
+            "deltaMs": 8,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7983,
+            "deltaMs": 17,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 7998,
+            "deltaMs": 15,
+            "renderSubmitMs": 1
+          },
+          {
+            "elapsedMs": 8016,
+            "deltaMs": 18,
+            "renderSubmitMs": 0
+          }
+        ],
+        "p50Ms": 17,
+        "p95Ms": 25,
+        "maxMs": 28,
+        "meanMs": 16.665280665280665,
+        "relit": true
+      },
+      "desktopBudget": {
+        "targetP95Ms": 16.7,
+        "full30SecondTrace": false,
+        "met": false,
+        "scope": "Headless desktop wall-clock rAF with one batched setFrame render; video recording enabled; not GPU timer queries or physical device performance"
+      },
+      "final": {
+        "ready": true,
+        "error": null,
+        "quality": "mobile",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0.7328845558783421,
+          "stroke": 0.018322113896958554,
+          "chassisPitch": 0.016849045509578754,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 7.609091204154493e-17
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + bike — breadth-first assembly",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-mobile.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-mobile.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "full",
+        "lighting": "garage",
+        "time": 3.0493333015441895,
+        "duration": 4.9666666984558105,
+        "activeClip": "landing_absorption",
+        "playing": false,
+        "orbitAngle": 6.2957516777939455,
+        "cameraPosition": [
+          1.792408409857632,
+          1.1256143142497534,
+          4.148899686883879
+        ],
+        "cameraTarget": [
+          0.6299832910299301,
+          0.9174523138692581,
+          -0.00006082480196475948
+        ],
+        "render": {
+          "triangles": 150006,
+          "calls": 46,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 24,
+          "textures": 15,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 247,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "mobileSmoke": {
+        "physicalDevice": false,
+        "initial": {
+          "error": null,
+          "diagnostics": {
+            "ready": true,
+            "error": null,
+            "quality": "mobile",
+            "textureStorage": {
+              "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+              "textures": [
+                {
+                  "name": "rider-street_rookie_albedo",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 1024,
+                  "height": 1024,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "rider-street_orm",
+                  "slots": [
+                    "aoMap",
+                    "roughnessMap",
+                    "metalnessMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "rider-street_normal",
+                  "slots": [
+                    "normalMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_body_rookie_albedo",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 1024,
+                  "height": 1024,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_body_orm",
+                  "slots": [
+                    "aoMap",
+                    "roughnessMap",
+                    "metalnessMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_body_normal",
+                  "slots": [
+                    "normalMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_mech_albedo",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 1024,
+                  "height": 1024,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_mech_orm",
+                  "slots": [
+                    "aoMap",
+                    "roughnessMap",
+                    "metalnessMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_mech_normal",
+                  "slots": [
+                    "normalMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "chain_links",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 64,
+                  "height": 32,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_spokecard",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 128,
+                  "height": 128,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                }
+              ]
+            },
+            "suspension": {
+              "amount": 0,
+              "stroke": 0,
+              "chassisPitch": 0,
+              "armLengthError": 0,
+              "frontAxleError": 0,
+              "rearAxleError": 0
+            },
+            "qualitySelection": "query",
+            "grounding": {
+              "coarseMinY": -0.0008759534358978027,
+              "preciseMinY": -0.0008203124999999756,
+              "assemblyOffsetY": 0.0008203124999999756,
+              "finalMinY": 0
+            },
+            "shadow": {
+              "target": [
+                0.6299832910299301,
+                0.9174523138692581,
+                -0.00006082480196475948
+              ],
+              "normalBias": 0.001826304315391865,
+              "bias": -0.00005,
+              "near": 2.5348513822138625,
+              "far": 9.840068643781322,
+              "width": 3.6526086307837295,
+              "mapSize": [
+                2048,
+                2048
+              ]
+            },
+            "comparison": {
+              "enabled": false,
+              "mode": "whole-scene",
+              "headFrame": {
+                "min": [
+                  -0.115,
+                  1.58,
+                  -0.1
+                ],
+                "max": [
+                  0.115,
+                  1.833,
+                  0.19
+                ],
+                "sourceCrop": {
+                  "x": 694,
+                  "y": 128,
+                  "width": 111,
+                  "height": 118
+                }
+              },
+              "sourceCropUnmodified": true
+            },
+            "stage": "Full rider + bike — breadth-first assembly",
+            "assets": [
+              {
+                "id": "street01-rider",
+                "url": "/assets/street01-rider-mobile.glb",
+                "kind": "rider",
+                "clips": [
+                  {
+                    "name": "compression",
+                    "duration": 4.9666666984558105
+                  },
+                  {
+                    "name": "extension",
+                    "duration": 4.9666666984558105
+                  },
+                  {
+                    "name": "forward_attack",
+                    "duration": 3.9666666984558105
+                  },
+                  {
+                    "name": "hang_back",
+                    "duration": 3.9666666984558105
+                  },
+                  {
+                    "name": "landing_absorption",
+                    "duration": 4.9666666984558105
+                  },
+                  {
+                    "name": "sit_cruise",
+                    "duration": 1.9666666984558105
+                  }
+                ]
+              },
+              {
+                "id": "street01-bike",
+                "url": "/assets/street01-bike-mobile.glb",
+                "kind": "bike",
+                "clips": []
+              }
+            ],
+            "camera": "full",
+            "lighting": "garage",
+            "time": 0,
+            "duration": 1.9666666984558105,
+            "activeClip": "sit_cruise",
+            "playing": false,
+            "orbitAngle": 0,
+            "cameraPosition": [
+              1.9339660582439755,
+              1.1619490827218915,
+              4.889874552250705
+            ],
+            "cameraTarget": [
+              0.6299832910299301,
+              0.9174523138692581,
+              -0.00006082480196475948
+            ],
+            "render": {
+              "triangles": 150006,
+              "calls": 46,
+              "width": 585,
+              "height": 621,
+              "dpr": 1.5
+            },
+            "memory": {
+              "geometries": 24,
+              "textures": 15,
+              "note": "Object counts, not GPU byte residency"
+            },
+            "loadMilliseconds": 174,
+            "targetFps": 30,
+            "frameSamples": 0,
+            "p95FrameMilliseconds": null,
+            "captureMode": true
+          },
+          "touch": 0,
+          "overflow": false
+        },
+        "taps": {
+          "camera": "reference",
+          "lighting": "neutral",
+          "passed": true
+        },
+        "landscape": {
+          "diagnostics": {
+            "ready": true,
+            "error": null,
+            "quality": "mobile",
+            "textureStorage": {
+              "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+              "textures": [
+                {
+                  "name": "rider-street_rookie_albedo",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 1024,
+                  "height": 1024,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "rider-street_orm",
+                  "slots": [
+                    "aoMap",
+                    "roughnessMap",
+                    "metalnessMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "rider-street_normal",
+                  "slots": [
+                    "normalMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_body_rookie_albedo",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 1024,
+                  "height": 1024,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_body_orm",
+                  "slots": [
+                    "aoMap",
+                    "roughnessMap",
+                    "metalnessMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_body_normal",
+                  "slots": [
+                    "normalMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_mech_albedo",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 1024,
+                  "height": 1024,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_mech_orm",
+                  "slots": [
+                    "aoMap",
+                    "roughnessMap",
+                    "metalnessMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_mech_normal",
+                  "slots": [
+                    "normalMap"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "",
+                  "compressed": false,
+                  "width": 512,
+                  "height": 512,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "chain_links",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 64,
+                  "height": 32,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                },
+                {
+                  "name": "bike_spokecard",
+                  "slots": [
+                    "map"
+                  ],
+                  "format": 1023,
+                  "colorSpace": "srgb",
+                  "compressed": false,
+                  "width": 128,
+                  "height": 128,
+                  "mips": 0,
+                  "compressedPayloadBytes": null
+                }
+              ]
+            },
+            "suspension": {
+              "amount": 0,
+              "stroke": 0,
+              "chassisPitch": 0,
+              "armLengthError": 0,
+              "frontAxleError": 0,
+              "rearAxleError": 0
+            },
+            "qualitySelection": "query",
+            "grounding": {
+              "coarseMinY": -0.0008759534358978027,
+              "preciseMinY": -0.0008203124999999756,
+              "assemblyOffsetY": 0.0008203124999999756,
+              "finalMinY": 0
+            },
+            "shadow": {
+              "target": [
+                0.6299832910299301,
+                0.9174523138692581,
+                -0.00006082480196475948
+              ],
+              "normalBias": 0.001826304315391865,
+              "bias": -0.00005,
+              "near": 2.5348513822138625,
+              "far": 9.840068643781322,
+              "width": 3.6526086307837295,
+              "mapSize": [
+                2048,
+                2048
+              ]
+            },
+            "comparison": {
+              "enabled": false,
+              "mode": "whole-scene",
+              "headFrame": {
+                "min": [
+                  -0.115,
+                  1.58,
+                  -0.1
+                ],
+                "max": [
+                  0.115,
+                  1.833,
+                  0.19
+                ],
+                "sourceCrop": {
+                  "x": 694,
+                  "y": 128,
+                  "width": 111,
+                  "height": 118
+                }
+              },
+              "sourceCropUnmodified": true
+            },
+            "stage": "Full rider + bike — breadth-first assembly",
+            "assets": [
+              {
+                "id": "street01-rider",
+                "url": "/assets/street01-rider-mobile.glb",
+                "kind": "rider",
+                "clips": [
+                  {
+                    "name": "compression",
+                    "duration": 4.9666666984558105
+                  },
+                  {
+                    "name": "extension",
+                    "duration": 4.9666666984558105
+                  },
+                  {
+                    "name": "forward_attack",
+                    "duration": 3.9666666984558105
+                  },
+                  {
+                    "name": "hang_back",
+                    "duration": 3.9666666984558105
+                  },
+                  {
+                    "name": "landing_absorption",
+                    "duration": 4.9666666984558105
+                  },
+                  {
+                    "name": "sit_cruise",
+                    "duration": 1.9666666984558105
+                  }
+                ]
+              },
+              {
+                "id": "street01-bike",
+                "url": "/assets/street01-bike-mobile.glb",
+                "kind": "bike",
+                "clips": []
+              }
+            ],
+            "camera": "full",
+            "lighting": "neutral",
+            "time": 0,
+            "duration": 1.9666666984558105,
+            "activeClip": "sit_cruise",
+            "playing": false,
+            "orbitAngle": 0,
+            "cameraPosition": [
+              1.740180626392572,
+              1.1256143142497534,
+              4.1631791828079425
+            ],
+            "cameraTarget": [
+              0.6299832910299301,
+              0.9174523138692581,
+              -0.00006082480196475948
+            ],
+            "render": {
+              "triangles": 150006,
+              "calls": 46,
+              "width": 846,
+              "height": 439,
+              "dpr": 1.5
+            },
+            "memory": {
+              "geometries": 24,
+              "textures": 15,
+              "note": "Object counts, not GPU byte residency"
+            },
+            "loadMilliseconds": 174,
+            "targetFps": 30,
+            "frameSamples": 0,
+            "p95FrameMilliseconds": null,
+            "captureMode": true
+          },
+          "overflow": false
+        }
+      },
+      "missingAsset": {
+        "error": "fetch for \"http://127.0.0.1:4182/assets/street01-rider-mobile.glb\" responded with 404: Not Found",
+        "text": "HERO / GARAGE\nTARGET 01 · PRODUCTION STUDY\nFULL RIDER + BIKE — BREADTH-FIRST ASSEMBLY\nFace study\n\nIndependent Three.js review\n\nfetch for \"http://127.0.0.1:4182/assets/street01-rider-mobile.glb\" responded with 404: Not FoundDrag to orbit · Scroll or pinch to inspect\n\nCOMPARISON CAMERA\n\nFace\nRider + bike\nBike\nReference\nCompare rider + bike\n\nLIGHT STUDY\n\nGarage\nNeutral\n\nAUTHORED MOTION\n\nNo playable motion available.\n\nDESIGN REFERENCE · CONCEPT\n\n\nTarget 01 · design reference\nComplete existing Blender-authored rider and bike assembled for whole-scene review.\n\nSix authored clips cover seated neutral, forward rise, rearward shift, compression, extension and landing absorption. Whole-body art and physical response remain provisional.\n\nBreadth-first work in progress. Hair, face, tailoring, contacts and mechanical detail can be polished after reviewing the whole scene.\nOpen identity board ↗\nProvisional production work. Asset loading and renderer checks do not establish likeness or milestone acceptance. Mobile target: 30 fps; actual iPhone validation pending.\nPlay\nNo motion loaded\n4 triangles · 2 draws · 1640 × 934"
+      },
+      "video": "captures/mobile-original-round20/webkit-orbit-relight.webm"
+    }
+  ],
+  "artVerdict": "Parent review required; harness never judges likeness.",
+  "iPhoneValidation": "Not performed. Desktop WebKit and touch emulation cannot satisfy actual iPhone/Safari gate."
+}

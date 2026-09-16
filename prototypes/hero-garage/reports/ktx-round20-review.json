@@ -1,0 +1,26 @@
+{
+  "round": 20,
+  "verdict": "adopt KTX2 mobile exports provisionally",
+  "visualEvidence": [
+    "mobile-ktx-round20",
+    "mobile-original-round20"
+  ],
+  "visualMethod": "Matched full-scene rendered stills and sequential decoded frames from actual orbit/landing recording; no continuous-playback claim.",
+  "visualFindings": [
+    "No obvious whole-scene color, silhouette or contact regression at review framing",
+    "Fine mechanical texture detail remains limited by original mobile resolution",
+    "Character art defects remain unchanged and unaccepted"
+  ],
+  "technical": {
+    "allEmbeddedImageBlockEstimateBytes": 9112592,
+    "previousRGBA8EstimateBytes": 36448924,
+    "encodedAssetsBytes": 7442268,
+    "previousEncodedAssetsBytes": 6406260,
+    "webkitTranscodeFormat": 37808,
+    "formatMeaning": "RGBA ASTC 4x4 (Three.js constant)",
+    "allActiveHeroTexturesCompressed": true,
+    "geometryAndAnimationNonImagePayloadsPreserved": 288,
+    "autoMobileSelectionVerified": true
+  },
+  "scope": "Actual iPhone performance and driver residency unmeasured. Eight-second recorded timing is not the 30-second desktop gate. Baseline source assets retained."
+}
