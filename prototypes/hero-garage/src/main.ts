@@ -26,7 +26,7 @@ const runtimeLabel=document.createElement('span');runtimeLabel.className='pane-l
 const cropCanvas=conceptPanel.querySelector('canvas')!;
 const cropImage=new Image();
 let comparison=false;
-const headFrame={min:[-.115,1.528,-.10],max:[.115,1.805,.19],sourceCrop:{x:694,y:128,width:111,height:118}};
+const headFrame={min:[-.115,1.580,-.10],max:[.115,1.833,.19],sourceCrop:{x:694,y:128,width:111,height:118}};
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;

@@ -12,3 +12,6 @@ captures/head-a1-first/
 captures/head-candidate01/
 __pycache__/
 *.py[cod]
+
+# Preliminary capture used old scan catalog; final comparison is head-authored-a1-final.
+captures/head-authored-a1/

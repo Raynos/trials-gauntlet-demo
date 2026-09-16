@@ -1,7 +1,101 @@
 {
-  "createdAt": "2026-09-16T03:53:32.902Z",
+  "createdAt": "2026-09-16T04:06:59.418Z",
   "scope": "GLB structure; no art or deformation acceptance",
   "assets": [
+    {
+      "file": "public/assets/street01-head-authored.glb",
+      "sha256": "0b62c01e2319c1134e0f439495baf1b9abac7f15ce65cd576d859a1610b64892",
+      "bytes": 8010448,
+      "generator": "Khronos glTF Blender I/O v5.2.40",
+      "triangles": 38836,
+      "primitives": 5,
+      "materials": [
+        {
+          "name": "MPFB_AdultMale_SourceProbe.eyebrow001",
+          "alphaMode": "MASK",
+          "doubleSided": true
+        },
+        {
+          "name": "MPFB_AdultMale_SourceProbe.eyelashes01",
+          "alphaMode": "MASK",
+          "doubleSided": true
+        },
+        {
+          "name": "MPFB_AdultMale_SourceProbe.high-poly",
+          "alphaMode": "MASK",
+          "doubleSided": false
+        },
+        {
+          "name": "Street01_Authored_EditableBody.body",
+          "alphaMode": "OPAQUE",
+          "doubleSided": false
+        },
+        {
+          "name": "Street01_Authored_EditableBody.cortu_short_messy_hair",
+          "alphaMode": "MASK",
+          "doubleSided": true
+        }
+      ],
+      "uvPrimitives": 5,
+      "normalPrimitives": 5,
+      "skins": [],
+      "animations": [],
+      "morphPrimitiveCount": 0,
+      "textures": [
+        {
+          "index": 0,
+          "name": "eyebrow001",
+          "encodedBytes": 89619,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 1,
+          "name": "eyelashes01",
+          "encodedBytes": 91600,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 2,
+          "name": "brown_eye",
+          "encodedBytes": 610817,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 3,
+          "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+          "encodedBytes": 5615645,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 4,
+          "name": "short_messy_diff",
+          "encodedBytes": 530185,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 1398100
+        }
+      ],
+      "estimatedImageResidencyBytes": 32156324,
+      "limits": "RGBA8 full-mip image estimate excludes render targets, shadow maps, buffers, duplicate uploads, driver allocations. No compressed GPU format assumed. UV presence does not establish unwrap quality."
+    },
     {
       "file": "public/assets/street01-head-scan.glb",
       "sha256": "8aac5801e2a311375777ba1477549cba9c1c754c575b8043cf433453efd50f1b",

@@ -1,6 +1,6 @@
 # High-fidelity rider and bike: fresh garage production plan
 
-Status: blocked at Milestone A, September 16, 2026. Independent viewer and source intake built. Generic-head and textured-scan routes were rejected in recorded browser review; autonomous art and its continuation are paused pending a next-route decision. No visual milestone or new production asset is accepted.
+Status: Milestone A in progress, September 16, 2026. Independent viewer and source intake built. Generic-head and textured-scan routes were rejected in recorded browser review. The MPFB authored-source trial improved open eyes/topology but was rejected for identity, hair and skin/beard. User requested local TRELLIS.2/Hunyuan investigation; TRELLIS.2 Apple Silicon port setup is next. No visual milestone or new production asset is accepted.
 
 ## Confirmed user decisions
 
@@ -15,7 +15,7 @@ Status: blocked at Milestone A, September 16, 2026. Independent viewer and sourc
 
 The standalone viewer builds and its headless WebKit loading, deterministic canvas repeat, missing-file and touch-control checks pass. The original anatomy route failed likeness/groom review; a licensed textured scan improved surface credibility but its eye reconstruction and hair cards still fail after a fresh-owner correction. See [final parent review](../../prototypes/hero-garage/reports/parent-review-scan-a2.json), [recorded comparison](../../prototypes/hero-garage/captures/head-scan-a2-review/webkit-orbit-relight.webm), and the [art handoff](../../prototypes/hero-garage/reports/ART-HANDOFF.md).
 
-The agreed changed-source/method stop rule applies. The hourly continuation is paused with 34% weekly allowance remaining, above the 20% floor. The next decision is an art-capable source/owner that can preserve the target identity, or an explicit target revision to a finished licensed character. No spending or specialist contact has occurred. Body, bike, rig, variants and integration remain open. The initial desktop recording trace missed the p95 budget, and no physical iPhone was connected; neither runtime/device gate passed.
+The agreed changed-source/method stop rule applies to the rejected routes. Active goal execution has resumed with a materially different free source: MPFB authored facial morphs, fitted open eyes and male skin textures; its Blender 5.2.1 import works. The completed [browser trial](../../prototypes/hero-garage/reports/parent-review-authored-a1.json) still fails identity, ribbon-like hair and skin/beard quality. The user now requests downloading/running neural generation locally. TRELLIS.2 Apple Silicon ports are being evaluated; Hunyuan3D 2.1 is excluded because the user confirmed use within a territory excluded by its license. The hourly heartbeat remains paused while this active goal runs. Last usage check: 33% remaining, above the 20% floor. No spending or specialist contact has occurred. Body, bike, rig, variants and integration remain open. The initial desktop recording trace missed the p95 budget, and no physical iPhone was connected; neither runtime/device gate passed.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)
 
@@ -226,3 +226,7 @@ Final handoff contains editable packed Blender sources, source/texture licenses,
 5. Proceed through dressed rider/bike, movement, optimization and variants only when that visual foundation is convincing.
 
 The requested result is not “we have a pipeline.” It is a rider and bike that survive close inspection, motion and comparison with the approved image.
+
+### Round 3 verification
+
+The unchanged existing game passes frozen-build headless WebKit cold boot, 1,038 byte-identical replay ticks to an 8.65s clear, crash and one-tick restart. See `prototypes/hero-garage/reports/round3-ship/report.json`. This does not accept the independent head study or count as game integration/iPhone evidence.

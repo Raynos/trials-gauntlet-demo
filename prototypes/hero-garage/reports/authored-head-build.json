@@ -1,0 +1,138 @@
+{
+  "status": "unaccepted first authored-source head candidate",
+  "source": "art/street01-head-authored.blend",
+  "runtime": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-head-authored.glb",
+  "targets": {
+    "head/head-rectangular": 0.24,
+    "head/head-fat-decr": 0.2,
+    "chin/chin-bones-incr": 0.25,
+    "chin/chin-width-incr": 0.12,
+    "chin/chin-prominent-incr": 0.18,
+    "nose/nose-scale-depth-incr": 0.18,
+    "nose/nose-greek-incr": 0.18,
+    "nose/nose-point-down": 0.12,
+    "cheek/l-cheek-bones-incr": 0.16,
+    "cheek/r-cheek-bones-incr": 0.16,
+    "cheek/l-cheek-volume-decr": 0.1,
+    "cheek/r-cheek-volume-decr": 0.1
+  },
+  "materials": [
+    {
+      "object": "MPFB_AdultMale_SourceProbe.eyebrow001",
+      "material": "MPFB_AdultMale_SourceProbe.eyebrow001",
+      "color_image": "eyebrow001.png",
+      "alpha": "MASK",
+      "omitted_maps": [],
+      "previous_nodes": [
+        "ShaderNodeOutputMaterial",
+        "ShaderNodeBsdfPrincipled",
+        "ShaderNodeBump",
+        "ShaderNodeTexImage",
+        "ShaderNodeMixRGB",
+        "ShaderNodeTexImage"
+      ]
+    },
+    {
+      "object": "MPFB_AdultMale_SourceProbe.eyelashes01",
+      "material": "MPFB_AdultMale_SourceProbe.eyelashes01",
+      "color_image": "eyelashes01.png",
+      "alpha": "MASK",
+      "omitted_maps": [],
+      "previous_nodes": [
+        "ShaderNodeOutputMaterial",
+        "ShaderNodeBsdfPrincipled",
+        "ShaderNodeMixRGB",
+        "ShaderNodeTexImage"
+      ]
+    },
+    {
+      "object": "MPFB_AdultMale_SourceProbe.high-poly",
+      "material": "MPFB_AdultMale_SourceProbe.high-poly",
+      "color_image": "brown_eye.png",
+      "alpha": "MASK",
+      "omitted_maps": [],
+      "previous_nodes": [
+        "ShaderNodeOutputMaterial",
+        "ShaderNodeBsdfPrincipled",
+        "ShaderNodeMixRGB",
+        "ShaderNodeTexImage"
+      ]
+    },
+    {
+      "object": "Street01_Authored_EditableBody",
+      "material": "Street01_Authored_EditableBody.body",
+      "color_image": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter.png",
+      "alpha": "OPAQUE",
+      "omitted_maps": [],
+      "previous_nodes": [
+        "ShaderNodeOutputMaterial",
+        "ShaderNodeBsdfPrincipled",
+        "ShaderNodeTexImage",
+        "ShaderNodeTexImage"
+      ]
+    },
+    {
+      "object": "Street01_Cortu_AuthoredHair",
+      "material": "Street01_Authored_EditableBody.cortu_short_messy_hair",
+      "color_image": "short_messy_diff.png",
+      "alpha": "MASK",
+      "omitted_maps": [
+        "short_messy_objnorm.png"
+      ],
+      "previous_nodes": [
+        "ShaderNodeOutputMaterial",
+        "ShaderNodeBsdfPrincipled",
+        "ShaderNodeBump",
+        "ShaderNodeMixRGB",
+        "ShaderNodeTexImage",
+        "ShaderNodeNormalMap",
+        "ShaderNodeTexImage"
+      ]
+    }
+  ],
+  "uniform_scale": 1.024496101158774,
+  "source_crop_min_z": 1.445,
+  "runtime_y_bounds": [
+    1.531,
+    1.833
+  ],
+  "runtime_objects": [
+    {
+      "name": "Street01_Authored_HeadRuntime_Runtime",
+      "vertices": 17574,
+      "triangles": 35144,
+      "uv_layers": 1
+    },
+    {
+      "name": "MPFB_AdultMale_SourceProbe.high-poly_Runtime",
+      "vertices": 1064,
+      "triangles": 2040,
+      "uv_layers": 1
+    },
+    {
+      "name": "MPFB_AdultMale_SourceProbe.eyebrow001_Runtime",
+      "vertices": 124,
+      "triangles": 192,
+      "uv_layers": 1
+    },
+    {
+      "name": "MPFB_AdultMale_SourceProbe.eyelashes01_Runtime",
+      "vertices": 250,
+      "triangles": 368,
+      "uv_layers": 1
+    },
+    {
+      "name": "Street01_Cortu_AuthoredHair_Runtime",
+      "vertices": 832,
+      "triangles": 1092,
+      "uv_layers": 1
+    }
+  ],
+  "notes": [
+    "No procedural face displacements or replacement eye reconstruction.",
+    "Fitted Cortu short messy authored hair; no new procedural groom.",
+    "Body/helpers cropped only after official mask modifier evaluation on export copy.",
+    "Imported object-space hair normal deliberately omitted rather than mislabeled tangent.",
+    "Beard from jartur69 authored middleage Slavic male skin; unmodified source UV texture."
+  ]
+}

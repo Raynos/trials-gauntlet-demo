@@ -1,21 +1,21 @@
 {
   "version": 1,
-  "stage": "Milestone A blocked \u2014 rejected art study",
+  "stage": "Milestone A unaccepted \u2014 authored-source study",
   "reference": {
     "url": "/references/target01.png",
     "label": "Target 01 \u00b7 AI design concept"
   },
   "assets": [
     {
-      "id": "street01-head-scan",
-      "label": "Street 01 \u00b7 scan-source trial",
-      "url": "/assets/street01-head-scan.glb",
+      "id": "street01-head-authored",
+      "label": "Street 01 \u00b7 MPFB authored-source trial",
+      "url": "/assets/street01-head-authored.glb",
       "kind": "head"
     }
   ],
   "notes": [
-    "Adapted from Infinite, 3D Head Scan by Lee Perry-Smith, CC BY3.0; source credited in reports.",
-    "Rejected in parent orbit review: eyelids, ribbon-like hair and target identity remain unresolved.",
-    "Autonomous art is paused; this viewer preserves evidence for the next decision."
+    "MPFB authored facial morphs and fitted open eyes; CC0 MakeHuman assets.",
+    "Cortu Johnstone authored short messy hair; jartur69 subtle-beard skin.",
+    "Parent rejected hair, face identity and skin/beard. Local neural source evaluation is next."
   ]
 }

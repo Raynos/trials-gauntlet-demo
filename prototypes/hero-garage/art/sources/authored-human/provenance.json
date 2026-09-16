@@ -1,0 +1,33 @@
+{
+  "retrieved": "2026-09-16",
+  "mpfb_commit": "80919fa4682335c41847f761a4d79dcad4124732",
+  "sources": [
+    {
+      "file": "raw/mpfb-v2.0.17.zip",
+      "url": "https://codeload.github.com/makehumancommunity/mpfb2/zip/refs/tags/v2.0.17",
+      "bytes": 44643182,
+      "sha256": "d08e726c798fdc4eefb02b06b6c4efe37d40b5439777e53cf96dce0e5073297d"
+    },
+    {
+      "file": "raw/system-assets.zip",
+      "url": "https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "bytes": 280737770,
+      "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107"
+    },
+    {
+      "file": "raw/skins02.zip",
+      "url": "https://files.makehumancommunity.org/asset_packs/skins02/skins02_cc0.zip",
+      "bytes": 76112708,
+      "sha256": "1613f1ef3afca53094511d26620ed7cf1d2dedc29ed3d384d60bdebe250698ae",
+      "selected_asset": "jartur69_middleage_slavic_male_with_genitals_and_beard",
+      "author": "jartur69",
+      "license": "CC0-1.0",
+      "license_page": "https://static.makehumancommunity.org/assets/assetpacks/skins02.html"
+    }
+  ],
+  "licenses": {
+    "mpfb_source": "GPL-3.0-or-later",
+    "core_data_and_generated_output": "CC0-1.0"
+  },
+  "source_probe_sha256": "5a0e500147d830b4a0cf5c179aa15688c27df50defd02700db921e3b9a11de9b"
+}
