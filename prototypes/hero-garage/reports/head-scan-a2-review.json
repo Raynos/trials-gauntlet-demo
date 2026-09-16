@@ -1,0 +1,2309 @@
+{
+  "createdAt": "2026-09-16T03:51:12.752Z",
+  "base": "http://127.0.0.1:4179",
+  "results": [
+    {
+      "engine": "webkit",
+      "headless": true,
+      "host": {
+        "platform": "darwin",
+        "release": "25.5.0",
+        "arch": "arm64"
+      },
+      "actualIPhone": false,
+      "errors": [],
+      "status": "rendered",
+      "browserVersion": "26.5",
+      "loadToReadyMs": 632,
+      "assetResponses": [
+        {
+          "url": "http://127.0.0.1:4179/assets/street01-head-scan.glb",
+          "bytes": 2203452,
+          "sha256": "8aac5801e2a311375777ba1477549cba9c1c754c575b8043cf433453efd50f1b"
+        }
+      ],
+      "initial": {
+        "ready": true,
+        "error": null,
+        "comparison": {
+          "enabled": false,
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.528,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.805,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Milestone A — alternate scan-source trial",
+        "assets": [
+          {
+            "id": "street01-head-scan",
+            "url": "/assets/street01-head-scan.glb",
+            "kind": "head",
+            "clips": []
+          }
+        ],
+        "camera": "face",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 0,
+        "activeClip": null,
+        "playing": false,
+        "orbitAngle": 0,
+        "cameraPosition": [
+          0.1824722989473795,
+          1.7007135560526339,
+          0.7292711210526732
+        ],
+        "cameraTarget": [
+          0,
+          1.6665,
+          0.045
+        ],
+        "render": {
+          "triangles": 90400,
+          "calls": 21,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 11,
+          "textures": 7,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 45,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "motionControls": {
+        "playDisabled": true,
+        "timelineDisabled": true,
+        "note": "No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.",
+        "clipButtons": 0,
+        "honestAbsentClips": true
+      },
+      "comparison": true,
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "dpr": 1,
+        "viewport": [
+          1920,
+          1080
+        ],
+        "drawingBuffer": [
+          820,
+          934
+        ],
+        "gpu": "Apple GPU",
+        "vendor": "Apple Inc.",
+        "webglVersion": "WebGL 2.0",
+        "contextLost": false,
+        "jsHeap": null
+      },
+      "shaderWarmupMs": 2000,
+      "frames": [
+        "webkit-face.png",
+        "webkit-reference.png",
+        "webkit-full.png",
+        "webkit-bike.png"
+      ],
+      "deterministicCanvas": {
+        "a": "990d3dc10eff62d669491154e0bdf4a87d2f7a50cc4131c1d6d73519596fb1f8",
+        "b": "990d3dc10eff62d669491154e0bdf4a87d2f7a50cc4131c1d6d73519596fb1f8",
+        "byteIdentical": true,
+        "scope": "same engine, camera, orbit and animation time; not game physics replay"
+      },
+      "trace": {
+        "durationSeconds": 8,
+        "measuredDurationMs": 8005,
+        "frames": [
+          {
+            "elapsedMs": 16,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 43,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 50,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 67,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 93,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 100,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 117,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 134,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 151,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 168,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 184,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 200,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 217,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 234,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 250,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 267,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 284,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 300,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 317,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 334,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 353,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 367,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 384,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 407,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 414,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 430,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 446,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 463,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 479,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 496,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 514,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 528,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 546,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 568,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 579,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 596,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 620,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 626,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 642,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 655,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 672,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 681,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 694,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 708,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 727,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 738,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 754,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 780,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 787,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 804,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 832,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 837,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 854,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 871,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 887,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 904,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 921,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 940,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 954,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 971,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 993,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 1004,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 1021,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1049,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 1054,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 1071,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1088,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1106,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 1121,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1137,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1161,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 1171,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 1188,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1215,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 1221,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 1237,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1254,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1271,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1288,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1304,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1324,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 1338,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 1354,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1379,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 1387,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 1403,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1431,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 1438,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 1454,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1471,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1488,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1504,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1521,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1538,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1554,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1571,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1588,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1604,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1621,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1638,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1654,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1671,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1688,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1704,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1721,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1738,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1754,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1771,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1788,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1804,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1821,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1838,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1854,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1871,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1889,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 1904,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1921,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1940,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 1954,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 1971,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1992,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 2004,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 2021,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2045,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 2054,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 2071,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2097,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 2104,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 2120,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2138,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 2154,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2171,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2188,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2204,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2221,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2238,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2254,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2271,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2288,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2304,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2320,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2338,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 2354,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2371,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2388,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2404,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2421,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2438,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2455,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2471,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2488,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2507,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 2520,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 2538,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 2558,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 2571,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 2587,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2611,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 2621,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 2638,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2667,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 2671,
+            "deltaMs": 4
+          },
+          {
+            "elapsedMs": 2688,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2705,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2724,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 2738,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 2754,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2780,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 2787,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 2804,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2821,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2838,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2854,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2871,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2893,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 2904,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 2921,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2956,
+            "deltaMs": 35
+          },
+          {
+            "elapsedMs": 2958,
+            "deltaMs": 2
+          },
+          {
+            "elapsedMs": 2971,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 2988,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3004,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3021,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3037,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3054,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3070,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3088,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3104,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3121,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3137,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3155,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3171,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3188,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3207,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 3221,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 3238,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3259,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 3271,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 3288,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3313,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 3320,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 3337,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3365,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 3371,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 3388,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3404,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3421,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3438,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3455,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3471,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3487,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3504,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3521,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3538,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3554,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3571,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3588,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3604,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3621,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3638,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3654,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3671,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3688,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3704,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3722,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3738,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3754,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3772,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3788,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3804,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3825,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 3838,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 3854,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3877,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 3888,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 3904,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3928,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 3938,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 3955,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3978,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 3988,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 4004,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4029,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 4038,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 4054,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4078,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 4088,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 4104,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4129,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 4138,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 4154,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4182,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 4188,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 4204,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4221,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4238,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4254,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4271,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4288,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4304,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4321,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4338,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4355,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4371,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4388,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4404,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4421,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4438,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4455,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4471,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4488,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4504,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4521,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4537,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4555,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 4570,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 4589,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 4605,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4621,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4640,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 4654,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 4671,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4690,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 4705,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 4721,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4741,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 4754,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 4771,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4792,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 4804,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 4820,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4846,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 4854,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 4871,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4896,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 4904,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 4921,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4948,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 4954,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 4971,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4988,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5004,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5021,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5038,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5054,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5071,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5088,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5106,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 5121,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 5138,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5158,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 5171,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 5188,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5212,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 5221,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 5238,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5262,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 5272,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 5288,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5313,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 5321,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 5338,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5363,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 5371,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 5388,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5413,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 5420,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 5438,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 5463,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 5471,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 5488,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5515,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 5521,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 5538,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5554,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5571,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5587,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5604,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5621,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5638,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5654,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5671,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5688,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5705,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5721,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5738,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5755,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5774,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 5788,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 5805,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5825,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 5837,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 5855,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 5879,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 5888,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 5905,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5929,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 5938,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 5954,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5979,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 5988,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 6005,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6029,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 6038,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 6054,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6078,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 6088,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 6104,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6128,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 6138,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 6154,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6180,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 6187,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 6205,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 6232,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 6238,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 6255,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6271,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6288,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6304,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6321,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6339,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 6354,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 6371,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6392,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 6405,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 6420,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 6446,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 6455,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 6471,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6500,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 6504,
+            "deltaMs": 4
+          },
+          {
+            "elapsedMs": 6521,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6538,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6554,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6571,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6588,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6605,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6621,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6638,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6655,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6671,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6688,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6705,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6721,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6738,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6755,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6771,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 6788,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6807,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 6821,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 6838,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6858,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 6870,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 6888,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 6912,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 6921,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 6938,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 6963,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 6971,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 6988,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7013,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 7021,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 7038,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7061,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 7071,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7088,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7111,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 7121,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7138,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7161,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 7171,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7188,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7211,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 7221,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7238,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7261,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 7271,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7288,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7312,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 7321,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 7338,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7360,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 7371,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 7388,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7410,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 7421,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 7439,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 7461,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 7471,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7488,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7510,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 7521,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 7538,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7561,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 7571,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7588,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7611,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 7621,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7638,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7660,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 7671,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 7688,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7711,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 7721,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 7738,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7762,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 7771,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 7788,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7815,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 7821,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 7838,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7855,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 7870,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 7888,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 7904,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 7922,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 7938,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 7954,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 7973,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 7988,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 8005,
+            "deltaMs": 17
+          }
+        ],
+        "p50Ms": 17,
+        "p95Ms": 25,
+        "maxMs": 35,
+        "meanMs": 16.607883817427386,
+        "relit": true
+      },
+      "desktopBudget": {
+        "targetP95Ms": 16.7,
+        "full30SecondTrace": false,
+        "met": false,
+        "scope": "Headless desktop wall-clock rAF with one batched setFrame render and video recording; not GPU timer queries or physical device performance"
+      },
+      "final": {
+        "ready": true,
+        "error": null,
+        "comparison": {
+          "enabled": true,
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.528,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.805,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Milestone A — alternate scan-source trial",
+        "assets": [
+          {
+            "id": "street01-head-scan",
+            "url": "/assets/street01-head-scan.glb",
+            "kind": "head",
+            "clips": []
+          }
+        ],
+        "camera": "face",
+        "lighting": "garage",
+        "time": 8.005,
+        "duration": 0,
+        "activeClip": null,
+        "playing": false,
+        "orbitAngle": 6.287112297996574,
+        "cameraPosition": [
+          0.21496640485709428,
+          1.706221560430517,
+          0.8385931587763162
+        ],
+        "cameraTarget": [
+          0,
+          1.6665,
+          0.045
+        ],
+        "render": {
+          "triangles": 90400,
+          "calls": 21,
+          "width": 820,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 11,
+          "textures": 7,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 45,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "mobileSmoke": {
+        "physicalDevice": false,
+        "initial": {
+          "error": null,
+          "diagnostics": {
+            "ready": true,
+            "error": null,
+            "comparison": {
+              "enabled": false,
+              "headFrame": {
+                "min": [
+                  -0.115,
+                  1.528,
+                  -0.1
+                ],
+                "max": [
+                  0.115,
+                  1.805,
+                  0.19
+                ],
+                "sourceCrop": {
+                  "x": 694,
+                  "y": 128,
+                  "width": 111,
+                  "height": 118
+                }
+              },
+              "sourceCropUnmodified": true
+            },
+            "stage": "Milestone A — alternate scan-source trial",
+            "assets": [
+              {
+                "id": "street01-head-scan",
+                "url": "/assets/street01-head-scan.glb",
+                "kind": "head",
+                "clips": []
+              }
+            ],
+            "camera": "face",
+            "lighting": "garage",
+            "time": 0,
+            "duration": 0,
+            "activeClip": null,
+            "playing": false,
+            "orbitAngle": 0,
+            "cameraPosition": [
+              0.19946755547057485,
+              1.703900166650733,
+              0.7930033330146558
+            ],
+            "cameraTarget": [
+              0,
+              1.6665,
+              0.045
+            ],
+            "render": {
+              "triangles": 90400,
+              "calls": 21,
+              "width": 585,
+              "height": 621,
+              "dpr": 1.5
+            },
+            "memory": {
+              "geometries": 11,
+              "textures": 7,
+              "note": "Object counts, not GPU byte residency"
+            },
+            "loadMilliseconds": 48,
+            "targetFps": 30,
+            "frameSamples": 0,
+            "p95FrameMilliseconds": null,
+            "captureMode": true
+          },
+          "touch": 0,
+          "overflow": false
+        },
+        "taps": {
+          "camera": "reference",
+          "lighting": "neutral",
+          "passed": true
+        },
+        "landscape": {
+          "diagnostics": {
+            "ready": true,
+            "error": null,
+            "comparison": {
+              "enabled": false,
+              "headFrame": {
+                "min": [
+                  -0.115,
+                  1.528,
+                  -0.1
+                ],
+                "max": [
+                  0.115,
+                  1.805,
+                  0.19
+                ],
+                "sourceCrop": {
+                  "x": 694,
+                  "y": 128,
+                  "width": 111,
+                  "height": 118
+                }
+              },
+              "sourceCropUnmodified": true
+            },
+            "stage": "Milestone A — alternate scan-source trial",
+            "assets": [
+              {
+                "id": "street01-head-scan",
+                "url": "/assets/street01-head-scan.glb",
+                "kind": "head",
+                "clips": []
+              }
+            ],
+            "camera": "face",
+            "lighting": "neutral",
+            "time": 0,
+            "duration": 0,
+            "activeClip": null,
+            "playing": false,
+            "orbitAngle": 0,
+            "cameraPosition": [
+              0.1824722989473795,
+              1.7007135560526339,
+              0.7292711210526732
+            ],
+            "cameraTarget": [
+              0,
+              1.6665,
+              0.045
+            ],
+            "render": {
+              "triangles": 90400,
+              "calls": 21,
+              "width": 846,
+              "height": 366,
+              "dpr": 1.5
+            },
+            "memory": {
+              "geometries": 11,
+              "textures": 7,
+              "note": "Object counts, not GPU byte residency"
+            },
+            "loadMilliseconds": 48,
+            "targetFps": 30,
+            "frameSamples": 0,
+            "p95FrameMilliseconds": null,
+            "captureMode": true
+          },
+          "overflow": false
+        }
+      },
+      "missingAsset": {
+        "error": "fetch for \"http://127.0.0.1:4179/assets/street01-head-scan.glb\" responded with 404: Not Found",
+        "text": "HERO / GARAGE\nTARGET 01 · PRODUCTION STUDY\nMILESTONE A — ALTERNATE SCAN-SOURCE TRIAL\nFace study\n\nIndependent Three.js review\n\nfetch for \"http://127.0.0.1:4179/assets/street01-head-scan.glb\" responded with 404: Not FoundDrag to orbit · Scroll or pinch to inspect\n\nCOMPARISON CAMERA\n\nFace\nFull rider\nBike\nReference\nCompare head at equal scale\n\nLIGHT STUDY\n\nGarage\nNeutral\n\nAUTHORED MOTION\n\nNo playable motion available.\n\nDESIGN REFERENCE · CONCEPT\n\n\nTarget 01 · AI design concept\nAdapted from Infinite, 3D Head Scan by Lee Perry-Smith, CC BY3.0; source credited in reports.\n\nChanged source and layered hair-card method; likeness and eyes remain under review.\n\nNo finished rider, bike or riding clips are claimed.\nOpen identity board ↗\nProvisional production work. Asset loading and renderer checks do not establish likeness or milestone acceptance. Mobile target: 30 fps; actual iPhone validation pending.\nPlay\nNo motion loaded\n4 triangles · 2 draws · 1640 × 934"
+      },
+      "video": "captures/head-scan-a2-review/webkit-orbit-relight.webm"
+    }
+  ],
+  "artVerdict": "Parent review required; harness never judges likeness.",
+  "iPhoneValidation": "Not performed. Desktop WebKit and touch emulation cannot satisfy actual iPhone/Safari gate."
+}

@@ -1,0 +1,87 @@
+{
+  "status": "changed-source correction 1; unaccepted; builder reports unresolved eyelid and ribbon-hair defects",
+  "source": "Lee Perry-Smith Infinite head scan, CC BY 3.0",
+  "method": "genuine scan color/tangent normal; atlas-traced source lid seam split and opening+recessed separate eyes; fitted scalp mesh; Blender-rendered alpha haircards",
+  "removed_lid_faces": 0,
+  "source_lid_topology": [
+    {
+      "side": "left",
+      "seam_source_vertices": [
+        5060,
+        5059,
+        5030,
+        5028,
+        5027,
+        5054,
+        5051,
+        5050,
+        5038,
+        5044,
+        5043,
+        4991,
+        4989,
+        4964,
+        4965,
+        4966,
+        5302,
+        4984
+      ],
+      "seam_edges": 17,
+      "deformed_source_vertices": 603,
+      "eye_center": [
+        -0.027576889842748642,
+        -0.08798198993206024,
+        1.6684626992013718
+      ],
+      "radius": 0.017684724032878876
+    },
+    {
+      "side": "right",
+      "seam_source_vertices": [
+        828,
+        606,
+        604,
+        302,
+        303,
+        298,
+        297,
+        299,
+        348,
+        347,
+        346,
+        343,
+        339,
+        324,
+        325,
+        336,
+        334,
+        333,
+        481,
+        486
+      ],
+      "seam_edges": 19,
+      "deformed_source_vertices": 644,
+      "eye_center": [
+        0.04189534578472376,
+        -0.0889234710380435,
+        1.6677104442119597
+      ],
+      "radius": 0.017367050237953666
+    }
+  ],
+  "hair_card_groups": 655,
+  "triangles": 43936,
+  "primitives": 9,
+  "bytes": 2203452,
+  "sha256": "8aac5801e2a311375777ba1477549cba9c1c754c575b8043cf433453efd50f1b",
+  "limitations": [
+    "Authoring diagnostic still shows closed-lid appearance above eye fragments. Source crease opening is not a successful eyelid reconstruction. Parent browser clip is acceptance authority.",
+    "Raised cards improve volume mechanically but still appear ribbon-like; no convincing target curl groom achieved.",
+    "Scan identity not yet sculpted into target; no acceptance claimed",
+    "Eyelid openings require orbit inspection; no facial deformation rig",
+    "Scanned color may retain photographed light, evaluate relight",
+    "Hair atlas is rendered from editable Blender strands; hair still needs provisional art acceptance",
+    "Displacement4K retained as external source, not applied or baked in this trial",
+    "No high-to-low transfer or roughness map authored; constant skin roughness"
+  ]
+}

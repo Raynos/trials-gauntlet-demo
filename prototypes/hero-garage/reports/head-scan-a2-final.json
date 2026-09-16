@@ -1,0 +1,24 @@
+{
+  "createdAt": "2026-09-16T03:50:14.485Z",
+  "base": "http://127.0.0.1:4179",
+  "results": [
+    {
+      "engine": "webkit",
+      "headless": true,
+      "host": {
+        "platform": "darwin",
+        "release": "25.5.0",
+        "arch": "arm64"
+      },
+      "actualIPhone": false,
+      "errors": [
+        "Failed to load resource: Could not connect to the server."
+      ],
+      "status": "failed",
+      "browserVersion": "26.5",
+      "failure": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4179/?capture=1\", waiting until \"networkidle\"\u001b[22m\n"
+    }
+  ],
+  "artVerdict": "Parent review required; harness never judges likeness.",
+  "iPhoneValidation": "Not performed. Desktop WebKit and touch emulation cannot satisfy actual iPhone/Safari gate."
+}

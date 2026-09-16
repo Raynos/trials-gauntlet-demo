@@ -10,3 +10,5 @@ captures/frames/
 captures/**/page@*.webm
 captures/head-a1-first/
 captures/head-candidate01/
+__pycache__/
+*.py[cod]

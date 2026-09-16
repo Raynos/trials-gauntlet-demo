@@ -9,6 +9,7 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const arg=(key,fallback)=>{const i=process.argv.indexOf('--'+key);return i<0?fallback:process.argv[i+1];};
 const base=arg('url','http://127.0.0.1:4178');
 const seconds=Number(arg('seconds','30'));
+const comparison=process.argv.includes('--comparison');
 if(!Number.isFinite(seconds)||seconds<=0) throw new Error('--seconds must be positive');
 const stamp=arg('name',new Date().toISOString().replace(/[:.]/g,'-'));
 const out=path.join(root,'captures',stamp);fs.mkdirSync(out,{recursive:true});
@@ -38,6 +39,8 @@ for(const engine of engines){
     row.motionControls.honestAbsentClips=row.initial.assets?.some(a=>a.clips.length)?null:row.motionControls.playDisabled&&row.motionControls.timelineDisabled&&row.motionControls.clipButtons===0;
     const fatal=await page.evaluate(()=>window.__heroGarage.error);
     if(fatal)throw new Error(fatal);
+    if(comparison)await page.evaluate(()=>window.__heroGarage.setComparison(true));
+    row.comparison=comparison;
     row.environment=await page.evaluate(()=>{
       const c=document.querySelector('canvas'),gl=c.getContext('webgl2')||c.getContext('webgl');
       const ext=gl?.getExtension('WEBGL_debug_renderer_info');

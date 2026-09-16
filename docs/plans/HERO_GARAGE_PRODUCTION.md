@@ -1,6 +1,6 @@
 # High-fidelity rider and bike: fresh garage production plan
 
-Status: in progress, September 16, 2026. Independent viewer and source intake built; head candidates are under review. No visual milestone or new production asset is accepted.
+Status: blocked at Milestone A, September 16, 2026. Independent viewer and source intake built. Generic-head and textured-scan routes were rejected in recorded browser review; autonomous art and its continuation are paused pending a next-route decision. No visual milestone or new production asset is accepted.
 
 ## Confirmed user decisions
 
@@ -10,6 +10,12 @@ Status: in progress, September 16, 2026. Independent viewer and source intake bu
 - **Stalled likeness:** after two head-and-hair correction attempts with no visible improvement, change the free asset or method. Bring the user a concrete decision if still blocked.
 - **Fixed design:** retain target 01's mustard hoodie, exposed face, tousled dark curls and blue/white bike, with seated neutral, forward rise and rearward hip shift. Develop missing angles while preserving that design, then submit the identity board for approval.
 - **Mobile garage:** target 30 fps to preserve more detail, verified on an actual iPhone/Safari. This decision applies to the garage; gameplay performance requirements remain separate.
+
+## Latest execution result
+
+The standalone viewer builds and its headless WebKit loading, deterministic canvas repeat, missing-file and touch-control checks pass. The original anatomy route failed likeness/groom review; a licensed textured scan improved surface credibility but its eye reconstruction and hair cards still fail after a fresh-owner correction. See [final parent review](../../prototypes/hero-garage/reports/parent-review-scan-a2.json), [recorded comparison](../../prototypes/hero-garage/captures/head-scan-a2-review/webkit-orbit-relight.webm), and the [art handoff](../../prototypes/hero-garage/reports/ART-HANDOFF.md).
+
+The agreed changed-source/method stop rule applies. The hourly continuation is paused with 34% weekly allowance remaining, above the 20% floor. The next decision is an art-capable source/owner that can preserve the target identity, or an explicit target revision to a finished licensed character. No spending or specialist contact has occurred. Body, bike, rig, variants and integration remain open. The initial desktop recording trace missed the p95 budget, and no physical iPhone was connected; neither runtime/device gate passed.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)
 

@@ -2,6 +2,10 @@
 
 Independent Three.js production viewer for target 01. This package imports no game boot, gameplay physics, rider factories or model-selection code. It presents actual exported GLBs only; missing assets produce a visible error. Current assets and their provisional status are declared in `public/assets/catalog.json`. Loading successfully is not an art acceptance gate.
 
+## Current milestone
+
+Paused at Milestone A: the viewer works, but both art-source routes failed parent review. The current catalog deliberately loads a rejected study for inspection. [Final comparison clip](captures/head-scan-a2-review/webkit-orbit-relight.webm), [parent verdict](reports/parent-review-scan-a2.json), and [art handoff](reports/ART-HANDOFF.md) describe the blocker. No body, bike, authored riding motion, runtime budget or actual iPhone pass is claimed. The hourly continuation is paused; the user’s next art-route decision is pending.
+
 ## Run and build
 
 From this directory:

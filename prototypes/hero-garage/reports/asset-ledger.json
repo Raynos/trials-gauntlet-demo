@@ -1,7 +1,86 @@
 {
-  "createdAt": "2026-09-16T03:39:08.415Z",
+  "createdAt": "2026-09-16T03:53:32.902Z",
   "scope": "GLB structure; no art or deformation acceptance",
   "assets": [
+    {
+      "file": "public/assets/street01-head-scan.glb",
+      "sha256": "8aac5801e2a311375777ba1477549cba9c1c754c575b8043cf433453efd50f1b",
+      "bytes": 2203452,
+      "generator": "Khronos glTF Blender I/O v5.2.40",
+      "triangles": 43936,
+      "primitives": 9,
+      "materials": [
+        {
+          "name": "Brown irises",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Pupils",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Soft scalp root coverage",
+          "alphaMode": "BLEND",
+          "doubleSided": true
+        },
+        {
+          "name": "Warm recessed sclera",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Scan color + authored tangent normal",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Rendered strand group • alpha coverage",
+          "alphaMode": "MASK",
+          "doubleSided": true
+        }
+      ],
+      "uvPrimitives": 8,
+      "normalPrimitives": 9,
+      "skins": [],
+      "animations": [],
+      "morphPrimitiveCount": 0,
+      "textures": [
+        {
+          "index": 0,
+          "name": "Infinite-Level_02_Tangent_SmoothUV",
+          "encodedBytes": 146793,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 1,
+          "name": "Map-COL",
+          "encodedBytes": 148269,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 2,
+          "name": "hair-strand-atlas",
+          "encodedBytes": 720364,
+          "width": 512,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 2796204
+        }
+      ],
+      "estimatedImageResidencyBytes": 13981012,
+      "limits": "RGBA8 full-mip image estimate excludes render targets, shadow maps, buffers, duplicate uploads, driver allocations. No compressed GPU format assumed. UV presence does not establish unwrap quality."
+    },
     {
       "file": "public/assets/street01-head.glb",
       "sha256": "f1b0dc0758647be0c366cc63e81a937c7a07c14cddcfb4aba46acd50c1c5cf88",

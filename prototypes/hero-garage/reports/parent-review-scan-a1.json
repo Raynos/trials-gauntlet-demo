@@ -1,0 +1,19 @@
+{
+  "milestone": "A",
+  "candidate": "scan-source01 MASK",
+  "verdict": "FAIL \u2014 credible skin source, eye topology and groom require correction",
+  "evidence": "captures/head-scan-a1-mask/webkit-orbit-relight.webm",
+  "videoSha256": "bcaafb9d6e55a855f69fb4a239b54addd7bbdb577424dde39e5bf398be17c3b7",
+  "reviewMethod": "Parent inspected sequential1fps decoded complete browser orbit/relight video, covering both profiles, rear and front.",
+  "improvements": [
+    "Actual scan skin-color/normal detail and facial structure are more credible than the generic coordinate-shaped head.",
+    "MASK hair coverage avoids the semitransparent card outlines of the earlier BLEND diagnostic."
+  ],
+  "visibleDefects": [
+    "Protruding eyeballs lie below the original closed scanned eyelids instead of within modeled sockets.",
+    "Hard polygonal cap dominates the scalp silhouette; isolated wavy cards do not create target tousled volume.",
+    "Scan identity and short stubble differ from target strong bearded jaw, brow/nose and warm complexion."
+  ],
+  "decision": "Fresh owner gets one deliberate source-topology/coverage correction with actual eyelid landmarks, not another guessed sphere placement. Original scan/source evidence retained.",
+  "finalUserApproval": "pending"
+}
