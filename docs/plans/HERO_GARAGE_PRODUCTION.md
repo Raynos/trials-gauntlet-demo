@@ -1,8 +1,10 @@
 # High-fidelity rider and bike: fresh garage production plan
 
-Status: Milestone A in progress, September 16, 2026. Main production uses local Blender and licensed authored assets, with no neural dependency. Bystedt groom correction2 fixes measured penetration and strand conversion, but parent orbit still rejects crown gaps and the target silhouette. Conversion-only tuning has stopped; a separate authored-guide regroom is underway. The Hunyuan experiment finished without a usable mesh; TRELLIS is paused. No visual milestone is accepted.
+Status: Breadth-first assembly in progress, September 16, 2026. The user explicitly changed execution order: show the full person and full bike together in Three.js now, then polish individual elements. Head, hair and beard studies are paused and are no longer prerequisites for assembling the whole scene. The full original quality, motion, runtime and integration scope remains open.
 
 ## Confirmed user decisions
+
+- **Latest priority — breadth first:** assemble a complete person and complete bike, provide a real Three.js screenshot of both, then refine individual elements. This supersedes every earlier head-first dependency in this plan. Reuse existing authored project assets for the whole-scene baseline and label their quality honestly.
 
 - **Visual approval:** the user approves the identity board and each major visual milestone, but explicitly authorizes provisional parent approval and continued overnight work while asleep. Preserve the board and milestone evidence for final user review; do not label provisional review as final user acceptance.
 - **Sources and spending:** start with free licensed assets and local Blender tools. Free personal-use/noncommercial assets are allowed for this personal laptop project; CC0 is not required. Record exact terms and keep restricted assets local where required. Ask before spending on assets, tools, hosted services or specialist work.
@@ -13,9 +15,9 @@ Status: Milestone A in progress, September 16, 2026. Main production uses local 
 
 ## Latest execution result
 
-The independent viewer builds and headless WebKit loading, deterministic canvas repeat, missing-file and touch-control checks pass. Generic-head and scan routes were rejected. MPFB provides fitted open eyes but face identity and beard variation remain unaccepted. The licensed Bystedt groom now uses measured scalp alignment, smooth authored strands, local root frames, verified collision clearance and three-sided strand geometry. The [correction2 orbit](../../prototypes/hero-garage/reports/parent-review-groom-a3.json) still exposes rear/right crown gaps and a swept/wide hairstyle. Further conversion-only tuning is stopped. The next bounded trial edits actual authored guide placement and combing. Its predecessor remains an explicitly oversized appearance trial: 91.8MB and 3.456 million hair triangles. No body or outfit multiplication begins before Milestone A passes.
+The independent viewer now renders the complete existing Blender-authored mustard Street rider and blue/white bike together. The exported `sit_cruise` clip supplies seated neutral, with forward/back clips available for review. The requested [browser screenshot](../../prototypes/hero-garage/captures/full-rider-bike-a2/webkit-full.png) and [full-scene orbit](../../prototypes/hero-garage/captures/full-rider-bike-a2/webkit-orbit-relight.webm) are captured. Whole-scene priorities are seating/contact, relaxed elbows, proportions and clothing. These assets establish breadth; they are not a claim that the requested final character fidelity is complete.
 
-The user explicitly directed the main plan to proceed without waiting on neural models. Hunyuan remains a separate local experiment with no authority to change the main asset catalog or count as a production pass. TRELLIS setup is preserved but paused. All original body, bike, rig, variants, integration and device requirements remain open. The hourly heartbeat remains paused while the active goal runs. Last allowance check:28% remaining; floor20%. No spending or specialist contact has occurred.
+Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest user-reported allowance is 27% remaining, with the 20% reserve unchanged.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)
 
@@ -35,7 +37,7 @@ Start with one mustard-hoodie, bareheaded rider and one bike, using target 01. D
 
 ## The decision
 
-Build a standalone Three.js garage prototype around **one excellent rider and one excellent bike**. Start with the mustard hoodie, exposed face and tousled curly hair from [target 01](../../assets/design/hero-targets/01-street-barehead.png). Establish convincing character art in the actual browser before expanding to the other four outfits or integrating the game.
+Build a standalone Three.js garage prototype around **one excellent rider and one excellent bike**. Start with the mustard hoodie, exposed face and tousled curly hair from [target 01](../../assets/design/hero-targets/01-street-barehead.png). Establish the complete rider and bike in the browser first, then refine character art, outfits and integration through whole-scene reviews.
 
 The recommended route is **an editable anatomical base → reference-driven Blender sculpt → authored hair and clothing → animation topology and UVs → texture baking/painting → rig and corrective deformation → Three.js look development**. AI mesh generation is an optional source of raw material, not the production pipeline or its acceptance authority.
 
@@ -133,7 +135,7 @@ Paint skin color variation, beard distribution, lips, eyelids and ears using ref
 
 Do not assume Blender subsurface or complex node graphs export identically. Begin with a verified glTF-compatible material; only add a documented Three.js skin approximation if the simpler version demonstrably lacks the required response.
 
-**Milestone A deliverable:** head + hair portrait in Three.js, original reference beside it, three-quarter orbit, and a relighting clip. If this does not look like the approved character, stop body/outfit multiplication. Fix the art route or use specialist help. An attractive Blender-only render is insufficient.
+**Milestone A deliverable:** head + hair portrait in Three.js, original reference beside it, three-quarter orbit, and a relighting clip. If this does not look like the approved character, record the defect for targeted polish while continuing the complete rider/bike assembly. An attractive Blender-only render is insufficient.
 
 ## 5. Tailor the body, clothing and hands
 
@@ -207,7 +209,7 @@ These are milestones, not arbitrary percent-complete scores. Report which artifa
 
 At each art review select at most three **visible, named** defects and address them as one meaningful correction. After two attempts with no visible improvement, change the method or artist/source—not another scorecard. Do not impose an unrelated plugin's reconstruction loop on this Blender production workflow. Do not silently change that plugin's stopped run either.
 
-The first major checkpoint is **the head and hair in the browser**. If we cannot make those convincing, state that plainly before creating an entire cast. We should not spend down the weekly usage floor to manufacture activity.
+The next major checkpoint is **the complete rider and bike together in the browser**, per the latest user direction. Review the whole before allocating more time to head, hair or beard polish. Preserve the weekly usage floor.
 
 ## 11. Practical staffing, effort and delivery
 
@@ -222,8 +224,8 @@ Final handoff contains editable packed Blender sources, source/texture licenses,
 1. Freeze target01 face/hair identity and the seated/forward/back brief.
 2. Create the minimal isolated garage and reference-matched cameras.
 3. Select an editable anatomical base; optionally evaluate one bounded neural-mesh experiment.
-4. Sculpt and groom **only the head first**, export it, and review it in Three.js.
-5. Proceed through dressed rider/bike, movement, optimization and variants only when that visual foundation is convincing.
+4. Assemble the complete dressed rider and bike with the seated neutral clip; capture a real Three.js screenshot and orbit.
+5. Improve proportions, contacts, clothing, face/hair and bike details from whole-scene review, then complete movement, optimization, variants and integration.
 
 The requested result is not “we have a pipeline.” It is a rider and bike that survive close inspection, motion and comparison with the approved image.
 

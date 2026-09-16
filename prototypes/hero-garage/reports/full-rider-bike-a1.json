@@ -1,0 +1,117 @@
+{
+  "createdAt": "2026-09-16T12:25:06.491Z",
+  "base": "http://127.0.0.1:4179",
+  "results": [
+    {
+      "engine": "webkit",
+      "headless": true,
+      "host": {
+        "platform": "darwin",
+        "release": "25.5.0",
+        "arch": "arm64"
+      },
+      "actualIPhone": false,
+      "errors": [],
+      "status": "failed",
+      "browserVersion": "26.5",
+      "loadToReadyMs": 672,
+      "assetResponses": [
+        {
+          "url": "http://127.0.0.1:4179/assets/street01-rider.glb",
+          "status": 200,
+          "bytes": 1476800,
+          "sha256": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f",
+          "proof": "upstream response bytes forwarded unchanged through request interception"
+        }
+      ],
+      "initial": {
+        "ready": false,
+        "error": "THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files",
+        "shadow": {
+          "target": [
+            0,
+            0,
+            0
+          ],
+          "normalBias": 0.015,
+          "bias": 0,
+          "near": 0.5,
+          "far": 500,
+          "width": 6,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + bike — breadth-first assembly",
+        "assets": [],
+        "camera": "face",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 0,
+        "activeClip": null,
+        "playing": false,
+        "orbitAngle": 0,
+        "cameraPosition": [
+          0.26636174905093535,
+          1.6519428279470503,
+          0.9988565589410074
+        ],
+        "cameraTarget": [
+          0,
+          1.6019999999999999,
+          0
+        ],
+        "render": {
+          "triangles": 4,
+          "calls": 2,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 2,
+          "textures": 4,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 55,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "motionControls": {
+        "playDisabled": true,
+        "timelineDisabled": true,
+        "note": "No playable motion available.",
+        "clipButtons": 0,
+        "honestAbsentClips": true
+      },
+      "failure": "Error: THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files"
+    }
+  ],
+  "artVerdict": "Parent review required; harness never judges likeness.",
+  "iPhoneValidation": "Not performed. Desktop WebKit and touch emulation cannot satisfy actual iPhone/Safari gate."
+}

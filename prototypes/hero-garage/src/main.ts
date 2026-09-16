@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import './style.css';
 
@@ -186,7 +187,7 @@ async function boot(){
       cropImage.onload=()=>{const crop=headFrame.sourceCrop;cropCanvas.width=crop.width*4;cropCanvas.height=crop.height*4;const ctx=cropCanvas.getContext('2d')!;ctx.imageSmoothingEnabled=true;ctx.drawImage(cropImage,crop.x,crop.y,crop.width,crop.height,0,0,cropCanvas.width,cropCanvas.height);updateComparisonScale();};cropImage.src=catalog.reference.url;
       const img=$<HTMLImageElement>('#reference-image');img.src=catalog.reference.url;img.onerror=()=>{$('#reference-caption').textContent='Reference image unavailable. Check the catalog reference URL.';};$('#reference-caption').textContent=catalog.reference.label;$('#reference').classList.remove('hidden');}
     if(!catalog.assets.length)throw new Error('No exported hero asset is registered yet. This garage is ready for the first head GLB; character production remains open.');
-    const loader=new GLTFLoader();
+    const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
     for(const asset of catalog.assets){
       if(!asset.url||!asset.id)throw new Error('Every catalog asset requires an id and URL.');
       setStatus(`Loading ${asset.label}…`);
@@ -199,10 +200,10 @@ async function boot(){
     const clipNames=[...new Set(loaded.flatMap(item=>item.clips.map(c=>c.name)))];
     for(const name of clipNames){const button=document.createElement('button');button.dataset.clip=name;button.textContent=name;button.setAttribute('aria-pressed','false');$('#clips').append(button);}
     $('#motion-note').textContent=clipNames.length?'Playback uses exported GLB animation clips.':'No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.';
-    if(clipNames.length)setClip(clipNames[0]);
+    if(clipNames.length)setClip(clipNames.includes('sit_cruise')?'sit_cruise':clipNames[0]);
     $('#asset-label').textContent=loaded.map(item=>item.asset.label).join(' + ');
     $<HTMLButtonElement>('[data-camera="bike"]').disabled=!loaded.some(item=>item.asset.kind==='bike');
-    setStatus('');loadMilliseconds=performance.now()-started;ready=true;setCamera('face');render();
+    setStatus('');loadMilliseconds=performance.now()-started;ready=true;setCamera(loaded.some(item=>item.asset.kind==='rider')?'full':'face');render();
   }catch(cause){error=cause instanceof Error?cause.message:String(cause);loadMilliseconds=performance.now()-started;setStatus(error,true);$('#stage').textContent=catalog?.stage??'Asset unavailable';$('#motion-note').textContent='No playable motion available.';render();}
 }
 void boot();

@@ -10,6 +10,8 @@ const arg=(key,fallback)=>{const i=process.argv.indexOf('--'+key);return i<0?fal
 const base=arg('url','http://127.0.0.1:4178');
 const seconds=Number(arg('seconds','30'));
 const comparison=process.argv.includes('--comparison');
+const reviewCamera=arg('camera','face');
+const reviewClip=arg('clip',null);
 if(!Number.isFinite(seconds)||seconds<=0) throw new Error('--seconds must be positive');
 const stamp=arg('name',new Date().toISOString().replace(/[:.]/g,'-'));
 const out=path.join(root,'captures',stamp);fs.mkdirSync(out,{recursive:true});
@@ -46,6 +48,7 @@ for(const engine of engines){
     row.motionControls.honestAbsentClips=row.initial.assets?.some(a=>a.clips.length)?null:row.motionControls.playDisabled&&row.motionControls.timelineDisabled&&row.motionControls.clipButtons===0;
     const fatal=await page.evaluate(()=>window.__heroGarage.error);
     if(fatal)throw new Error(fatal);
+    if(reviewClip)await page.evaluate(name=>window.__heroGarage.setClip(name),reviewClip);
     if(comparison)await page.evaluate(()=>window.__heroGarage.setComparison(true));
     row.comparison=comparison;
     row.environment=await page.evaluate(()=>{
@@ -68,8 +71,8 @@ for(const engine of engines){
     const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
     row.deterministicCanvas={a:hash(a),b:hash(b),byteIdentical:a.equals(b),scope:'same engine, camera, orbit and animation time; not game physics replay'};
     // Real wall-clock orbit, interpolated time, relighting midway. Every evidence frame is rendered.
-    row.trace=await page.evaluate(async duration=>{
-      const g=window.__heroGarage;g.setCamera('face');g.setLighting('neutral');
+    row.trace=await page.evaluate(async ({duration,reviewCamera})=>{
+      const g=window.__heroGarage;g.setCamera(reviewCamera);g.setLighting('neutral');
       const frames=[];let prior=null,start=null,relit=false;
       await new Promise(resolve=>{
         function frame(now){
@@ -83,7 +86,7 @@ for(const engine of engines){
       });
       const d=frames.map(x=>x.deltaMs).sort((a,b)=>a-b);
       return {durationSeconds:duration,measuredDurationMs:frames.at(-1)?.elapsedMs,frames,p50Ms:d[Math.floor(d.length*.5)],p95Ms:d[Math.floor(d.length*.95)],maxMs:d.at(-1),meanMs:d.reduce((a,b)=>a+b,0)/d.length,relit};
-    },seconds);
+    },{duration:seconds,reviewCamera});
     row.desktopBudget={targetP95Ms:16.7,full30SecondTrace:seconds>=30,met:seconds>=30&&row.trace.p95Ms<=16.7,scope:'Headless desktop wall-clock rAF with one batched setFrame render and video recording; not GPU timer queries or physical device performance'};
     await page.screenshot({path:path.join(out,`${engine}-orbit-end.png`)});
     row.final=await page.evaluate(()=>window.__heroGarage.getDiagnostics());

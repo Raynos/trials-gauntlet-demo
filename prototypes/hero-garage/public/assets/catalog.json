@@ -1,21 +1,37 @@
 {
   "version": 1,
-  "stage": "Milestone A unaccepted \u2014 authored curl-groom trial",
+  "stage": "Full rider + bike \u2014 breadth-first assembly",
   "reference": {
     "url": "/references/target01.png",
-    "label": "Target 01 \u00b7 AI design concept"
+    "label": "Target 01 \u00b7 design reference"
   },
   "assets": [
     {
-      "id": "street01-head-groom",
-      "label": "Street01 \u00b7 authored curl-groom trial",
-      "url": "/assets/street01-head-groom.glb",
-      "kind": "head"
+      "id": "street01-rider",
+      "label": "Mustard Street rider",
+      "url": "/assets/street01-rider.glb",
+      "kind": "rider",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
+    },
+    {
+      "id": "street01-bike",
+      "label": "Blue/white trials bike",
+      "url": "/assets/street01-bike.glb",
+      "kind": "bike",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
     }
   ],
   "notes": [
-    "MPFB face and fitted eyes retained from correction2.",
-    "Daniel Bystedt authored curl groom, CC BY-SA; source and fit recorded.",
-    "Unaccepted trial: orbit review must establish hair quality and identity. Main production is independent of neural experiments."
+    "Complete existing Blender-authored rider and bike assembled for whole-scene review.",
+    "Seated neutral uses the exported sit_cruise clip. Forward and back clips are available below.",
+    "Breadth-first work in progress. Hair, face, tailoring, contacts and mechanical detail can be polished after reviewing the whole scene."
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "scope": "Whole-scene assembly from existing project Blender exports; not a new high-fidelity completion claim",
+  "sources": [
+    {
+      "source": "public/models/rider-street.glb",
+      "copy": "public/assets/street01-rider.glb",
+      "sha256": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f",
+      "bytes": 1476800
+    },
+    {
+      "source": "public/models/bike.glb",
+      "copy": "public/assets/street01-bike.glb",
+      "sha256": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+      "bytes": 1394072
+    }
+  ]
+}
