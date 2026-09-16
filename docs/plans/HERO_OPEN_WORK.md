@@ -98,19 +98,9 @@ Evidence: [GL investigation](../evidence/hero-r15/gl-investigation.md), [flat We
 
 ## 4. Build the high-fidelity garage prototype — separate art milestone
 
-Follow [HERO_GARAGE_PRODUCTION.md](HERO_GARAGE_PRODUCTION.md). Start with one mustard-hoodie, bareheaded rider and one bike, using target 01. Do not expand to five outfits before the first character passes visual review.
-
-- [ ] Create the independent `prototypes/hero-garage/` Three.js viewer with fixed comparison cameras and a simple garage lighting setup.
-- [ ] Establish the recognizable face and tousled curly hair in the actual browser first: anatomy, eyes/lids, jaw, ears, beard and authored curl clumps.
-- [ ] Build the dressed body: tailored hoodie and jeans, convincing folds/seams, hands and footwear, coherent proportions.
-- [ ] Finish the hero bike's silhouette, mechanical details and materials at the same viewing scale.
-- [ ] Produce editable Blender sources, retopologized meshes, UVs, baked/painted textures, rig and corrective deformation; export verified runtime GLBs.
-- [ ] Prove orbit quality and animation, then measure load cost, rendering and memory against the production plan's budgets.
-- [ ] After the first hero is accepted, derive the remaining outfits and integrate with the game's physical pose system.
-
-**Pipeline clarification:** current game assets are real Blender-exported GLBs, many authored through Python; the old procedural fallback/toggle remains. The separate img2threejs reconstruction experiment never shipped and is stopped. A Blender file or high triangle count does not by itself create high-fidelity character art. The new route requires deliberate sculpting, grooming, clothing, texturing and deformation review. Image-to-mesh may provide raw material, but is not the acceptance criterion.
-
-**Done when:** the browser-rendered hero convincingly matches the reference's identity, hair, clothing and bike design at comparable framing, also holds up from other angles and in motion, and meets the agreed runtime budgets. An AI mockup, procedural stand-in or larger screenshot is not completion. Use the staged acceptance gates in the production plan.
+Tracked in [HERO_GARAGE_PRODUCTION.md](HERO_GARAGE_PRODUCTION.md) ("Status checklist" at the top) — one place, no
+duplicate list here. Start with one mustard-hoodie, bareheaded rider and one bike (target 01); do not expand to five
+outfits before the first character passes visual review.
 
 ## 5. Release and evidence follow-through
 

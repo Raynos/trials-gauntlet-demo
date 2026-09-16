@@ -2,6 +2,22 @@
 
 Status: proposed production plan, September 16, 2026. No prototype or new asset is claimed complete.
 
+## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)
+
+Start with one mustard-hoodie, bareheaded rider and one bike, using target 01. Do not expand to five outfits before the first character passes visual review.
+
+- [ ] Create the independent `prototypes/hero-garage/` Three.js viewer with fixed comparison cameras and a simple garage lighting setup.
+- [ ] Establish the recognizable face and tousled curly hair in the actual browser first: anatomy, eyes/lids, jaw, ears, beard and authored curl clumps.
+- [ ] Build the dressed body: tailored hoodie and jeans, convincing folds/seams, hands and footwear, coherent proportions.
+- [ ] Finish the hero bike's silhouette, mechanical details and materials at the same viewing scale.
+- [ ] Produce editable Blender sources, retopologized meshes, UVs, baked/painted textures, rig and corrective deformation; export verified runtime GLBs.
+- [ ] Prove orbit quality and animation, then measure load cost, rendering and memory against the production plan's budgets.
+- [ ] After the first hero is accepted, derive the remaining outfits and integrate with the game's physical pose system.
+
+**Pipeline clarification:** current game assets are real Blender-exported GLBs, many authored through Python; the old procedural fallback/toggle remains. The separate img2threejs reconstruction experiment never shipped and is stopped. A Blender file or high triangle count does not by itself create high-fidelity character art. The new route requires deliberate sculpting, grooming, clothing, texturing and deformation review. Image-to-mesh may provide raw material, but is not the acceptance criterion.
+
+**Done when:** the browser-rendered hero convincingly matches the reference's identity, hair, clothing and bike design at comparable framing, also holds up from other angles and in motion, and meets the agreed runtime budgets. An AI mockup, procedural stand-in or larger screenshot is not completion. Use the staged acceptance gates in the production plan.
+
 ## The decision
 
 Build a standalone Three.js garage prototype around **one excellent rider and one excellent bike**. Start with the mustard hoodie, exposed face and tousled curly hair from [target 01](../../assets/design/hero-targets/01-street-barehead.png). Establish convincing character art in the actual browser before expanding to the other four outfits or integrating the game.
