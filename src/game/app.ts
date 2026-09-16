@@ -10,7 +10,7 @@
  * results. The menu renders over the live 3D scene with `BACKDROP_TRACK`
  * loaded in the `menu` phase (the key art plate covers it once decoded).
  */
-import type { BikeClass, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RiderOutfit, RunResult, TrackDef, TrialsHook } from '../core/types';
+import type { BikeClass, CameraOverride, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RiderOutfit, RunResult, TrackDef, TrialsHook } from '../core/types';
 import type { AudioScene, AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
 import {
@@ -112,6 +112,10 @@ export interface AppOptions {
   riderOutfit?: RiderOutfit | undefined;
   /** A committed cosmetic choice; changes clothing without restarting the bike or track. */
   onRiderOutfitChange?: ((outfit: RiderOutfit) => Promise<boolean>) | undefined;
+  /** Garage round: stage the hero on the renderer's workshop set while the garage screen is up (`setGarageStage`). */
+  onGarageStage?: ((on: boolean) => void) | undefined;
+  /** Garage round: the model explorer's orbit camera (`setCameraOverride`); null = the menu framing. */
+  setCameraOverride?: ((o: CameraOverride | null) => void) | undefined;
   /** `?trace=1`: live InputFrame bars under the HUD timer (filming the phone). */
   trace?: boolean | undefined;
   /** `?lab=1`: the physics lab HUD on every track (it is automatic on `lab-*` tracks). */
@@ -395,6 +399,10 @@ export class App {
       setBike: (b) => this.applyBike(b, true),
       setOutfit: (outfit) => cb.outfits!.set(outfit),
       back: () => this.goto('menu'),
+      // The rider model row lives here alone now (garage round): the same persisted choice (`trials.riderModel`).
+      ...(o.modelsSupported ? { models: { get: () => o.models.rider, set: (v: ModelChoice) => cb.setModel('rider', v) } } : {}),
+      stage: (on) => o.onGarageStage?.(on),
+      orbit: (view) => o.setCameraOverride?.(view ? { mode: 'orbit', yaw: view.yaw, pitch: view.pitch, dist: view.dist, screenY: view.screenY } : null),
     });
     this.onboard = new OnboardingCard(o.uiRoot, () => {
       saveOnboarded();
@@ -459,18 +467,6 @@ export class App {
         this.fullRestart('pause:restart');
       },
       quit: () => this.quit('pause:quit'),
-      outfits: cb.outfits!,
-      ...(o.modelsSupported
-        ? {
-            models: {
-              get: () => ({ rider: o.models.rider, bike: o.models.bike }),
-              set: (which: 'rider' | 'bike', v: ModelChoice) => {
-                this.sfx.tick();
-                cb.setModel(which, v);
-              },
-            },
-          }
-        : {}),
     });
     mountRotatePrompt(o.uiRoot);
     this.menu.setTracks(shipTracks(this.tracks, o.dev ?? false));

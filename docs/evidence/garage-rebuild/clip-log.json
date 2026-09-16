@@ -1,0 +1,33 @@
+{
+  "engine": "webkit",
+  "log": [
+    "2.7s booted (menu) [medium/governor start medium calls=280 tris=343805 rt=2.48]",
+    "5.3s garage up {\"x\":3.030287965879445,\"z\":5.4602235637631376,\"fov\":29.999999999999996,\"dist\":6} [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=74 tris=162843 rt=0.66]",
+    "7.4s drag 180° {\"x\":0.7822959752783928,\"z\":-5.976915383655969,\"fov\":29.999999999999996,\"dist\":6} [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=72 tris=162829 rt=0.66]",
+    "10.1s pinch zoom in {\"x\":-2.0846573363368552,\"z\":1.1950957908730284,\"fov\":29.999999999999996,\"dist\":3} [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=75 tris=163025 rt=0.66]",
+    "11.5s pinch zoom out {\"x\":-5.143582321552226,\"z\":2.5609195518707755,\"fov\":29.999999999999996,\"dist\":6.428571428571428} [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=75 tris=163025 rt=0.66]",
+    "13.2s Pro picked bike-lod rider [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=74 tris=163025 rt=0.66]",
+    "14.2s outfit race-bluewhite bike-lod rider [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=74 tris=163211 rt=0.66]",
+    "19.0s Img2 picked bike-lod rider-img2-experimental [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=116 tris=657365 rt=0.66]",
+    "19.1s garage stats {\"calls\":116,\"tris\":657365,\"rtMpx\":0.66,\"tier\":\"low\",\"garage\":{\"on\":true,\"draws\":17,\"hidden\":1199,\"textureMB\":4.15,\"reflection\":false},\"quality\":\"low\",\"why\":\"governor ↓ low (p95 22.5 ms, drops 4 %)\"} [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=116 tris=657365 rt=0.66]",
+    "19.9s back to menu {\"garage\":false,\"override\":null} [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=116 tris=657365 rt=0.66]",
+    "23.7s b1 riding [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=156 tris=718157 rt=0.66]",
+    "26.7s b1 3 s {\"x\":6.69,\"tick\":360} [low/governor ↓ low (p95 22.5 ms, drops 4 %) calls=161 tris=720283 rt=0.66]"
+  ],
+  "errors": [],
+  "stats": {
+    "calls": 116,
+    "tris": 657365,
+    "rtMpx": 0.66,
+    "tier": "low",
+    "garage": {
+      "on": true,
+      "draws": 17,
+      "hidden": 1199,
+      "textureMB": 4.15,
+      "reflection": false
+    },
+    "quality": "low",
+    "why": "governor ↓ low (p95 22.5 ms, drops 4 %)"
+  }
+}

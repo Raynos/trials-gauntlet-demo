@@ -30,66 +30,41 @@ function fixture() {
   } as unknown as FrontCallbacks;
   const menu = new MainMenuScreen(document.body, { tick: vi.fn(), confirm: vi.fn() } as unknown as UiSfx,
     { whenReady: () => undefined } as unknown as ArtManifest, cb, () => null, () => state);
-  const outfit = (id: string) => menu.root.querySelector<HTMLButtonElement>(`[data-outfit="${id}"]`)!;
   const makeLive = () => { tickLive(now); now += LIVE_DELAY_MS; tickLive(now); };
   menu.show();
-  return { menu, outfit, set, cb, makeLive };
+  return { menu, set, cb, makeLive };
 }
 
-describe('main menu customization', () => {
-  it('offers five outfits and switches experimental rider without choosing an outfit', () => {
-    const { menu, cb, set, makeLive } = fixture();
-    expect(menu.root.querySelectorAll('[data-outfit]')).toHaveLength(5);
-    const experiment = menu.root.querySelector<HTMLButtonElement>('[data-model="img2"]')!;
-    experiment.click();
+describe('main menu (garage round: customisation lives in the garage)', () => {
+  it('offers no outfit or rider-model rows even when the renderer supports models and outfits', () => {
+    const { menu, cb, set } = fixture();
+    expect(menu.root.querySelectorAll('[data-outfit], [data-model], .menu-customize')).toHaveLength(0);
+    expect(menu.root.querySelector('[role="status"]')).toBeNull();
     expect(cb.setModel).not.toHaveBeenCalled();
-    makeLive();
-    experiment.click();
-    expect(cb.setModel).toHaveBeenCalledExactlyOnceWith('rider', 'img2');
-    expect(experiment.getAttribute('aria-pressed')).toBe('true');
-    expect(menu.root.querySelector('[data-outfit][aria-pressed="true"]')).toBeNull();
-    expect(menu.root.querySelector('[role="status"]')?.textContent).toBe('Img2 experiment · choose an outfit to use Blender');
     expect(set).not.toHaveBeenCalled();
-    menu.root.querySelector<HTMLButtonElement>('[data-model="proc"]')!.click();
-    expect(menu.root.querySelector('[role="status"]')?.textContent).toBe('Classic rider · choose an outfit to use Blender');
-    menu.root.querySelector<HTMLButtonElement>('[data-model="gltf"]')!.click();
-    expect(menu.root.querySelector('[data-outfit="street-mustard"]')?.getAttribute('aria-pressed')).toBe('true');
+    // The band keeps its five tabs, Garage second.
+    expect([...menu.root.querySelectorAll<HTMLElement>('.menu-item')].map((b) => b.dataset['id'])).toEqual(['play', 'garage', 'review', 'settings', 'credits']);
   });
 
-  it('keeps the committed outfit through loading and failure, then allows retry', async () => {
-    const { menu, outfit, set, makeLive } = fixture();
-    let finish!: (ok: boolean) => void;
-    set.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  it('steps along the tabs on either axis and confirms the focused one', () => {
+    const { menu, cb, makeLive } = fixture();
     makeLive();
-    outfit('race-bluewhite').click();
-    outfit('race-bluewhite').click();
-    expect(set).toHaveBeenCalledTimes(1);
-    expect(outfit('street-mustard').getAttribute('aria-pressed')).toBe('true');
-    expect(outfit('race-bluewhite').getAttribute('aria-busy')).toBe('true');
-    expect(menu.root.querySelector('[role="status"]')?.textContent).toContain('Loading');
-    finish(false);
-    await vi.waitFor(() => expect(menu.root.querySelector('[role="status"]')?.textContent).toContain('Select it to retry'));
-    outfit('race-bluewhite').click();
-    await vi.waitFor(() => expect(outfit('race-bluewhite').getAttribute('aria-pressed')).toBe('true'));
-    menu.hide();
-    outfit('street-mustard').click();
-    expect(set).toHaveBeenCalledTimes(2);
-    menu.show();
-    expect(outfit('race-bluewhite').getAttribute('aria-pressed')).toBe('true');
+    menu.nav(1, 0);
+    menu.confirm();
+    expect(cb.goto).toHaveBeenLastCalledWith('garage');
+    menu.nav(0, 1);
+    menu.confirm();
+    expect(cb.goto).toHaveBeenLastCalledWith('review');
+    menu.nav(-1, 0);
+    menu.nav(-1, 0);
+    menu.confirm();
+    expect(cb.goto).toHaveBeenLastCalledWith('tracks');
   });
 
-  it('navigates from tabs through outfits to models and confirms the focused control', async () => {
-    const { menu, outfit, set, cb, makeLive } = fixture();
-    makeLive();
-    menu.nav(0, -1);
-    expect(document.activeElement).toBe(outfit('street-mustard'));
-    menu.nav(1, 0);
-    expect(document.activeElement).toBe(outfit('street-openface'));
-    menu.confirm();
-    await vi.waitFor(() => expect(set).toHaveBeenCalledExactlyOnceWith('street-openface'));
-    menu.nav(0, -1);
+  it('ignores input before the screen is live', () => {
+    const { menu, cb } = fixture();
     menu.nav(1, 0);
     menu.confirm();
-    expect(cb.setModel).toHaveBeenCalledExactlyOnceWith('rider', 'img2');
+    expect(cb.goto).not.toHaveBeenCalled();
   });
 });

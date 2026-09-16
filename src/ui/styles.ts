@@ -124,13 +124,6 @@ export const FRONT_CSS = /* css */ `
 /* Bike-class chip top-right: information, not a control (the Garage tab changes it). */
 .menu-chip { position: absolute; right: calc(var(--s4) + var(--sar)); top: calc(var(--s4) + var(--sat)); display: inline-flex; align-items: center; gap: .6em; min-height: 32px; padding: 0 1.1em 0 1em; background: rgba(9,11,15,.88); clip-path: polygon(.5em 0, 100% 0, calc(100% - .5em) 100%, 0 100%); font-size: .78rem; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--ink); pointer-events: none; }
 .menu-chip i { width: .55em; height: .55em; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: pulse 1.6s ease-in-out infinite; }
-.menu-customize { position: absolute; left: calc(var(--s4) + var(--sal)); right: calc(var(--s4) + var(--sar)); bottom: calc(var(--tab-h) + var(--ticker-h) + var(--sab) + var(--s3)); max-height: calc(100% - var(--tab-h) - var(--ticker-h) - var(--sab) - 90px); overflow-y: auto; padding: var(--s2); background: rgba(9,11,15,.9); border: 1px solid var(--line-2); border-radius: var(--r2); }
-.menu-customize .outfit-heading { margin: 0 3px var(--s1); }
-.menu-customize .outfit-options + .outfit-heading { margin-top: var(--s2); }
-.menu-customize .outfit-button { min-height: 44px; }
-.menu-customize .outfit-current { display: block; padding: var(--s1) 3px 0; }
-.menu-customize button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-.menu-customize, .menu-customize .outfit-options { overscroll-behavior: contain; }
 /* Lower third: the slab, an amber top edge, the tabs; the ticker sits in its bottom strip. */
 .menu-band { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--tab-h) + var(--ticker-h) + var(--sab)); padding: 0 calc(var(--s4) + var(--sar)) calc(var(--ticker-h) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); background: linear-gradient(180deg, rgba(9,11,15,.84), rgba(9,11,15,.95)); border-top: 2px solid var(--amber); box-shadow: 0 -14px 34px rgba(0,0,0,.4); display: flex; align-items: stretch; }
 .menu-list.tabs { position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--s6); width: 100%; height: var(--tab-h); }
@@ -281,30 +274,9 @@ export const FRONT_CSS = /* css */ `
 .ov-reload.focus, .ov-reload:hover { color: var(--ink); }
 .ov-reload.armed { color: var(--amber); }
 .overlay.focus-reload .ov-reload { box-shadow: inset 0 0 0 1px var(--line); }
-/* Visuals chip row (pause only): VISUALS · RIDER [seg] · BIKE [seg]; live preview behind the scrim. */
-.visuals { display: inline-flex; align-items: center; gap: var(--s3); padding: 6px 12px; background: var(--slab); border: 1px solid var(--line-2); border-radius: var(--r2); min-height: 44px; flex: 0 0 auto; }
-.visuals .vtitle { font-weight: 700; font-size: .66rem; letter-spacing: .3em; text-transform: uppercase; color: var(--amber); }
-.visuals .vlab { font-weight: 700; font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); }
-.visuals .vsep { width: 1px; height: 20px; background: var(--line); }
-.visuals .mini-seg { margin: 0; cursor: pointer; border-color: var(--line-2); transition: box-shadow var(--t1); }
-.visuals .mini-seg b { min-width: 44px; padding: 8px 10px; text-align: center; font-size: .66rem; }
 .pause-overlay .ov-head { flex-wrap: wrap; }
-.pause-overlay.has-outfits { grid-template-rows: auto auto minmax(0, 1fr) auto auto; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
-.pause-overlay .visuals { flex-wrap: wrap; flex-shrink: 1; gap: var(--s2); }
-.pause-overlay .mini-seg button { min-width: 44px; min-height: 44px; padding: 6px 10px; border: 0; background: transparent; color: var(--ink-dim); font: inherit; font-size: .72rem; cursor: pointer; }
-.pause-overlay .mini-seg button.on { background: var(--amber); color: var(--amber-ink); }
 .pause-overlay button:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
-.pause-outfits { flex: 0 1 auto; min-height: 100px; overflow-y: auto; padding: var(--s2); background: var(--slab); border: 1px solid var(--line-2); border-radius: var(--r2); }
-.pause-outfits .outfit-heading { margin-bottom: var(--s1); }
-.pause-outfits .outfit-current { display: block; padding: var(--s1) 3px 0; }
-.pause-outfits, .pause-outfits .outfit-options { overscroll-behavior: contain; }
-.pause-outfits .outfit-options { touch-action: pan-x; }
 html.short .pause-overlay { gap: var(--s1); }
-html.short .pause-overlay .visuals { padding: 0 var(--s2); }
-html.short .pause-outfits { padding: var(--s1); }
-html.short .pause-outfits .outfit-button { min-height: 44px; }
-html.short .pause-outfits .outfit-button span { display: none; }
-.visuals .mini-seg.focus { box-shadow: 0 0 0 2px var(--ink); }
 /* Action tiles: 240×128 desktop / 160×92 phone; exactly one is amber (the focused one). */
 .tiles { display: flex; justify-content: center; gap: var(--s4); width: 100%; }
 .tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 240px; height: 128px; min-height: 44px; padding: 0 var(--s3); border-radius: var(--r2); border: 1px solid var(--line); background: var(--slab-3); box-shadow: var(--plate); color: var(--ink); cursor: pointer; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.25rem; letter-spacing: .02em; text-transform: uppercase; line-height: 1; white-space: nowrap; transition: background var(--t1), color var(--t1), border-color var(--t1), box-shadow var(--t1), transform var(--t1) var(--ease); }
@@ -317,9 +289,9 @@ html.short .pause-outfits .outfit-button span { display: none; }
 .tile[disabled] svg { color: var(--ink-mute); }
 .overlay.show .tile { animation: rise var(--t2) var(--ease) both; }
 .overlay.show .tile:nth-child(2) { animation-delay: 40ms; } .overlay.show .tile:nth-child(3) { animation-delay: 80ms; }
-.overlay.show .visuals, .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) 120ms both; }
+.overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) 120ms both; }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
-.overlay.leaving .tile, .overlay.leaving .visuals, .overlay.leaving .ov-foot { animation: none; }
+.overlay.leaving .tile, .overlay.leaving .ov-foot { animation: none; }
 @supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) { html:not(.short) .pause-overlay.show { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); } }
 
 /* ---- replay viewer (docs/design/game.md §16): kicker top-left, transport bar in the lower band ---- */
@@ -388,52 +360,79 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 .card.lab-card { --tint: #1e3a4a; }
 .card .top em.watch:hover { color: var(--amber-ink); background: var(--amber); }
 
-/* ---- art plates behind a screen (garage / credits): cover, masked clear where the live scene should show ---- */
+/* ---- art plates behind a screen (credits): cover, masked clear where the live scene should show ---- */
 .plate-bg { position: absolute; inset: 0; pointer-events: none; background-size: cover; background-position: 50% 50%; opacity: 0; transition: opacity var(--t3) var(--ease); }
 .plate-bg.loaded { opacity: .55; }
-.garage-plate { -webkit-mask-image: linear-gradient(90deg, #000 40%, transparent 62%); mask-image: linear-gradient(90deg, #000 40%, transparent 62%); }
 .credits-screen .plate-bg.loaded { opacity: .35; }
-.bc-art { position: relative; width: calc(100% + 2 * var(--s4)); margin: calc(-1 * var(--s4)) calc(-1 * var(--s4)) 0; aspect-ratio: 3 / 2; max-height: 34%; background-size: cover; background-position: 50% 45%; opacity: 0; transition: opacity var(--t3) var(--ease); -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 100%); mask-image: linear-gradient(180deg, #000 60%, transparent 100%); }
-.bc-art.loaded { opacity: 1; }
-.bc-art:not(.loaded) { display: none; }
-html.short .bc-art { display: none; }
-/* ---- garage (two bike cards left, the live 3D bike is the preview on the right) ---- */
-.garage-screen { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.86) 38%, rgba(6,7,9,.25) 62%, rgba(6,7,9,.1) 100%); }
-/* Garage framing is the renderer's job (a camera preset), never a CSS transform on the canvas. */
-.garage-head { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat)); display: flex; flex-direction: column; gap: var(--s1); }
-.garage-head h1 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.2rem; line-height: .9; text-transform: uppercase; letter-spacing: .01em; }
-.garage-head h1 small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .34em; color: var(--amber); margin-bottom: .35em; }
-.garage-sub { font-size: .82rem; letter-spacing: .08em; color: var(--ink-mute); }
-.garage-tip { font-size: .74rem; letter-spacing: .04em; color: var(--ink-mute); margin-top: 2px; font-variant-numeric: tabular-nums; }
-.garage-customize { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat) + 5.6rem); bottom: calc(var(--s6) + var(--sab)); width: min(40rem, calc(50 * var(--vw))); display: flex; flex-direction: column; gap: var(--s4); overflow-y: auto; padding: var(--s2); margin-left: calc(-1 * var(--s2)); overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; }
-.garage-cards { display: flex; flex: 0 0 auto; gap: var(--s4); align-items: stretch; }
-.garage-outfits { flex: 0 0 auto; display: flex; flex-direction: column; gap: var(--s2); padding-bottom: var(--s2); }
-.outfit-heading { display: flex; justify-content: space-between; gap: var(--s2); font-size: .8rem; letter-spacing: .08em; }
-.outfit-current { color: var(--amber); }
-.outfit-options { display: flex; gap: var(--s2); overflow-x: auto; padding: 3px; }
-.outfit-button:disabled { opacity: .55; cursor: not-allowed; }
-.outfit-button { display: flex; flex: 1 0 150px; flex-direction: column; gap: var(--s1); min-width: 150px; min-height: 48px; padding: var(--s2) var(--s3); text-align: left; color: var(--ink); background: var(--slab-3); border: 1px solid var(--line-2); border-radius: var(--r2); cursor: pointer; font: inherit; }
-.outfit-button strong { font-size: .9rem; }
-.outfit-button span { font-size: .72rem; line-height: 1.3; color: var(--ink-dim); }
-.outfit-button.selected { border-color: var(--amber); background: color-mix(in srgb, var(--amber) 12%, var(--slab-3)); }
-.outfit-button.on, .garage-screen button:focus-visible, .garage-screen .backbtn.on { outline: 2px solid var(--amber); outline-offset: 2px; }
-.bike-card { position: relative; flex: 1 1 0; min-width: 0; max-height: 100%; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4) var(--s4) var(--s3); border-radius: var(--r3); border: 1px solid var(--line-2); background: linear-gradient(180deg, rgba(16,19,25,.96), rgba(9,11,15,.92)); box-shadow: var(--plate); color: var(--ink); text-align: left; cursor: pointer; overflow: hidden; transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease), border-color var(--t1); }
-.bike-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--tint); opacity: .55; transition: opacity var(--t1); }
-.bike-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(80% 60% at 100% 0%, color-mix(in srgb, var(--tint) 22%, transparent), transparent 70%); opacity: 0; transition: opacity var(--t2); }
-.bike-card.on { transform: scale(1.03); border-color: var(--tint); box-shadow: 0 0 0 2px var(--tint), 0 14px 30px rgba(0,0,0,.6); }
-.bike-card.on::before, .bike-card.on::after { opacity: 1; }
-.bc-top { display: flex; justify-content: space-between; align-items: center; font-size: .68rem; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-dim); font-weight: 700; }
-.bc-sel { visibility: hidden; color: var(--amber-ink); background: var(--amber); border-radius: 3px; padding: 2px 8px; letter-spacing: .14em; }
-.bike-card.selected .bc-sel { visibility: visible; }
-.bc-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 2.6rem; line-height: .9; text-transform: uppercase; color: var(--tint); text-shadow: 0 2px 10px rgba(0,0,0,.6); }
-.bc-line { font-size: .92rem; line-height: 1.35; color: var(--ink-dim); min-height: 2.7em; }
-.bc-stats { display: flex; flex-direction: column; gap: 6px; margin-top: var(--s2); }
-.bc-stats .stat { display: grid; grid-template-columns: 4.2em 1fr 4.6em; align-items: center; gap: var(--s2); font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-dim); font-weight: 700; }
-.bc-stats .stat i { display: block; height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
-.bc-stats .stat b { display: block; height: 100%; width: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--tint) 70%, #000), var(--tint)); transition: width var(--t3) var(--ease); }
-.bc-stats .stat em { font-style: normal; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
-.bc-note { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); padding-top: var(--s2); border-top: 1px solid var(--line-2); }
-.bike-card.on .bc-note { color: var(--ink-dim); }
+/* ---- garage: the model explorer (garage round) — layout B "tool wall" on set E "shutter door" (assets/design/garage/SPEC.md) ---- */
+/* The screen itself is clear: the renderer's garage set is the backdrop. Framing is the renderer's orbit camera, never a CSS transform on the canvas.
+   Rail of tags down the left edge (rider · outfit · bike, bike lowest), the metadata panel on the right, badge top-left, ‹ MENU top-right, the hero between. */
+.garage-screen { --rail-w: 244px; --panel-w: 178px; background: none; }
+.garage-stage { position: absolute; inset: 0; cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; }
+.garage-stage.grabbing { cursor: grabbing; }
+/* Badge plate top-left: wordmark + GARAGE on the slanted plate, the build stamp under it (menu B's badge, one line). */
+.garage-badge { position: absolute; left: calc(var(--s4) + var(--sal)); top: calc(var(--s3) + var(--sat)); display: flex; flex-direction: column; align-items: flex-start; gap: 3px; pointer-events: none; }
+.garage-plate { display: flex; align-items: baseline; gap: .6em; background: rgba(9,11,15,.92); box-shadow: inset 4px 0 0 var(--amber), 0 6px 20px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, calc(100% - .6em) 100%, 0 100%); padding: .28em 1.3em .22em .9em; font-size: 1.15rem; }
+.garage-plate .wordmark { font-size: 1em; line-height: .9; white-space: nowrap; filter: drop-shadow(0 .03em 0 #6b3a05); }
+.garage-title { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.1em; line-height: .9; text-transform: uppercase; color: var(--ink); letter-spacing: .01em; }
+.garage-build { font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ink); opacity: .55; text-shadow: var(--outline); padding-left: .3rem; font-variant-numeric: tabular-nums; }
+/* Gesture hint under the hero (fades after the first drag). */
+.garage-hint { position: absolute; left: calc(var(--rail-w) + var(--sal) + (100% - var(--rail-w) - var(--panel-w) - var(--sal) - var(--sar)) / 2); bottom: calc(var(--s3) + var(--sab)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: .5em; padding: 6px 12px; font-size: .66rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-dim); background: rgba(9,11,15,.66); clip-path: polygon(.5em 0, 100% 0, calc(100% - .5em) 100%, 0 100%); pointer-events: none; white-space: nowrap; transition: opacity var(--t3) var(--ease); }
+.garage-hint i { width: 1.1em; height: 1.1em; border: 2px solid currentColor; border-radius: 50%; border-right-color: transparent; opacity: .8; }
+.garage-hint.used { opacity: 0; }
+/* The rail: groups stacked from the bottom edge, a stencilled spine label beside each 2-column grid of tags. */
+.garage-rail { position: absolute; left: calc(var(--s4) + var(--sal)); top: calc(var(--s3) + var(--sat) + 64px); bottom: calc(var(--s2) + var(--sab)); width: var(--rail-w); display: flex; flex-direction: column; justify-content: flex-end; gap: var(--s2); }
+.rail-group { display: grid; grid-template-columns: 14px 1fr; gap: var(--s1); align-items: end; }
+.rail-head { writing-mode: vertical-rl; transform: rotate(180deg); align-self: end; max-height: 100%; overflow: hidden; font-size: .6rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--amber); text-shadow: var(--outline); line-height: 14px; }
+.rail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s1); }
+#ui .chip { position: relative; display: flex; align-items: center; gap: .45em; min-height: 44px; min-width: 44px; padding: 0 .8em 0 .7em; border: 1px solid var(--line-2); background: rgba(12,14,18,.9); color: var(--ink-dim); font: 700 .8rem/1 var(--font); letter-spacing: .08em; text-transform: uppercase; text-align: left; white-space: nowrap; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, 100% calc(100% - .5em), calc(100% - .5em) 100%, 0 100%); transition: background var(--t1), color var(--t1); }
+#ui .chip > b, #ui .chip > em { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#ui .chip .txt { display: contents; }
+#ui .chip b { font-weight: 700; }
+#ui .chip em { font-style: normal; font-size: .6rem; letter-spacing: .16em; color: var(--ink-mute); }
+/* Outfit tags read in mixed case (mockup B): the five labels fit two per row without truncation. */
+#ui .chip.outfit-button { text-transform: none; letter-spacing: .01em; font-size: .8rem; padding-top: 4px; padding-bottom: 4px; }
+#ui .chip.outfit-button > b { white-space: normal; line-height: 1.02; }
+#ui .chip.outfit-button em { text-transform: none; letter-spacing: .02em; font-size: .68rem; }
+#ui .chip b + em { margin-left: 0; }
+#ui .chip.selected { background: var(--amber); color: var(--amber-ink); border-color: var(--amber); }
+#ui .chip.selected em { color: rgba(26,18,6,.72); }
+#ui .chip.on:not(.selected) { color: var(--ink); background: rgba(255,255,255,.12); }
+#ui .chip.on, .garage-screen button:focus-visible, .garage-screen .backbtn.on { outline: 2px solid var(--ink); outline-offset: 2px; }
+#ui .chip[aria-busy="true"] { opacity: .6; }
+#ui .chip:disabled { opacity: .55; cursor: not-allowed; }
+/* Two-line tags: the label stacks over its detail. */
+#ui .chip { flex-wrap: wrap; row-gap: 1px; column-gap: .45em; padding-top: 5px; padding-bottom: 5px; }
+#ui .chip > b { flex: 1 1 100%; }
+#ui .chip > em { flex: 1 1 100%; }
+#ui .chip > .swatch, #ui .chip > .chip-tint, #ui .chip > .chip-art { flex: 0 0 auto; }
+#ui .chip > .swatch + b, #ui .chip > .chip-art + b { flex: 1 1 calc(100% - 2.2em); }
+#ui .chip > .swatch ~ em, #ui .chip > .chip-art ~ em { margin-left: 2.2em; }
+.swatch { width: 1.6em; height: 1.6em; border: 1px solid rgba(0,0,0,.5); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+.bike-chip { --tint: var(--amber); }
+.bike-chip .chip-tint { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--tint); opacity: .9; }
+.bike-chip.selected .chip-tint { background: var(--amber-ink); opacity: .35; }
+.bike-chip .chip-art { width: 2.1em; height: 1.4em; margin-left: 2px; background-size: cover; background-position: 50% 45%; opacity: 0; transition: opacity var(--t3); border-radius: 2px; }
+.bike-chip .chip-art.loaded { opacity: 1; }
+.bike-chip .chip-art:not(.loaded) { display: none; }
+/* The panel: the chosen bike's sheet — class, bars, character, note — then the outfit / rider lines and the load status. */
+.garage-panel { position: absolute; right: calc(var(--s4) + var(--sar)); top: calc(var(--s4) + var(--sat) + 52px); width: var(--panel-w); display: flex; flex-direction: column; gap: var(--s2); padding: var(--s3) var(--s3) var(--s2); background: rgba(9,11,15,.88); border: 1px solid var(--line-2); border-top: 2px solid var(--amber); box-shadow: 0 8px 24px rgba(0,0,0,.5); pointer-events: none; }
+.gp-sheet { display: flex; flex-direction: column; gap: 6px; }
+.gp-name { display: flex; align-items: baseline; gap: .5em; }
+.gp-name b { font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.5rem; line-height: .9; text-transform: uppercase; color: var(--tint, var(--amber)); text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+.gp-name small { font-size: .62rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--ink-dim); }
+.gp-stats { display: flex; flex-direction: column; gap: 4px; }
+.gp-stats .stat { display: grid; grid-template-columns: 3.6em 1fr 3.9em; align-items: center; gap: 6px; font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); font-weight: 700; }
+.gp-stats .stat i { display: block; height: 5px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
+.gp-stats .stat b { display: block; height: 100%; width: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--amber) 70%, #000), var(--amber)); transition: width var(--t3) var(--ease); }
+.gp-stats .stat em { font-style: normal; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.gp-line { font-size: .72rem; line-height: 1.3; color: var(--ink-dim); }
+.gp-note { font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); padding-top: 4px; border-top: 1px solid var(--line-2); }
+.gp-kv { display: flex; justify-content: space-between; gap: var(--s2); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); }
+.gp-kv b { color: var(--ink); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.outfit-current { color: var(--amber); font-size: .66rem; letter-spacing: .04em; line-height: 1.3; }
+.garage-screen .legend { top: calc(var(--s4) + var(--sat) + 56px); right: calc(var(--s4) + var(--sar) + var(--panel-w) + var(--s3)); bottom: auto; font-size: .66rem; gap: var(--s3); }
+.garage-screen .legend.hide { display: none; }
 .card .top em.bike { font-style: normal; color: #0b1a2e; background: var(--blue); border-radius: 3px; padding: 1px 6px; margin-right: 2.1rem; letter-spacing: .1em; font-weight: 700; white-space: nowrap; }
 .card .top em.ghost + em.bike { margin-left: -1.9rem; }
 .card .lockline { position: absolute; left: var(--s3); right: var(--s3); top: 36%; transform: translateY(-50%); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); font-weight: 700; text-shadow: var(--outline); display: flex; align-items: center; gap: .45em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -494,20 +493,16 @@ html.short .bc-art { display: none; }
 .ob-hop { font-size: .82rem; color: var(--ink-mute); border-top: 1px solid var(--line-2); padding-top: var(--s3); }
 .ob-tip { font-size: .74rem; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
 .ob-card .btn { align-self: flex-end; min-height: 48px; }
-html.short .garage-customize { top: calc(var(--s3) + var(--sat) + 3.4rem); bottom: calc(var(--s6) + var(--sab)); width: min(32rem, calc(54 * var(--vw))); gap: var(--s3); }
-html.short .garage-cards { gap: var(--s2); }
-html.short .outfit-button span { font-size: .66rem; }
-html.short .garage-screen .legend { gap: var(--s2); font-size: .66rem; }
-html.short /* Garage framing is the renderer's job (a camera preset), never a CSS transform on the canvas. */
-html.short .garage-head { top: calc(var(--s3) + var(--sat)); }
-html.short .garage-head h1 { font-size: 1.6rem; }
-html.short .garage-sub { display: none; }
-html.short .garage-tip { display: none; }
-html.short .bike-card { padding: var(--s3) var(--s3) var(--s2); gap: var(--s1); }
-html.short .bc-name { font-size: 1.8rem; }
-html.short .bc-line { font-size: .78rem; min-height: 0; }
-html.short .bc-note { display: none; }
-html.short .bc-stats { gap: 3px; }
+html.short .garage-screen { --rail-w: 236px; --panel-w: 172px; }
+html.short .garage-plate { font-size: 1rem; }
+html.short .garage-rail { top: calc(var(--s3) + var(--sat) + 58px); gap: 6px; }
+html.short .rail-group, html.short .rail-grid { gap: 3px; }
+html.short #ui .chip { font-size: .74rem; padding-left: .55em; padding-right: .5em; }
+html.short #ui .chip.outfit-button { font-size: .78rem; }
+html.short .garage-panel { top: calc(var(--s4) + var(--sat) + 50px); gap: 6px; padding: var(--s2) var(--s2) 6px; }
+html.short .gp-name b { font-size: 1.3rem; }
+html.short .gp-line { display: none; }
+html.short .garage-hint { font-size: .6rem; padding: 5px 10px; }
 html.short .ob-card { padding: var(--s4); gap: var(--s2); }
 html.short .ob-card h2 { font-size: 1.6rem; }
 html.short .ob-lines { font-size: .82rem; gap: var(--s1); }
@@ -731,8 +726,6 @@ html.short .ov-name { font-size: 2.2rem; }
 html.short .tile { width: 160px; height: 92px; gap: 8px; font-size: 1.05rem; }
 html.short .tile svg { width: 22px; height: 22px; }
 html.short .tiles { gap: var(--s3); }
-html.short .visuals { min-height: 40px; padding: 4px 10px; gap: var(--s2); }
-html.short .visuals .mini-seg b { padding: 6px 8px; }
 html.short .ov-foot { min-height: 36px; }
 html.short .results .time { font-size: 4.4rem; }
 html.short .results .faults { font-size: 1.05rem; }
@@ -751,7 +744,7 @@ html.narrow .banner.go { font-size: 8rem; }
 html.narrow .banner.finish { font-size: 3rem; }
 html.narrow .settings-wrap { grid-template-columns: 1fr; }
 @media (prefers-reduced-motion: reduce) {
-  .overlay.show .tile, .overlay.show .visuals, .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) both; }
+  .overlay.show .tile, .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) both; }
   .results .time, .results .faults, .results .medals, .results .pb, .results .tiles, .results .ov-foot { transform: none; }
   .menu-keyart.loaded, .menu-chip i { animation: none; }
   .menu-ticker.scroll .menu-ticker-track { animation: none; }
@@ -889,62 +882,63 @@ export function injectStyles(): void {
  * Owned by src/ui/trackMap.ts / TrackSelectScreen; injected by `injectTrackMapStyles()` as its own <style>.
  * The old `.tiers` / `.carousel` / `.card` rules above are kept untouched (other screens' cards reuse them).   */
 export const TRACK_MAP_CSS = /* css */ `
-.tracks-screen { --tm-top: calc(var(--s5) + var(--sat) + 2.7rem); --tm-bottom: calc(var(--s3) + var(--sab) + 44px + var(--s2)); --tm-x: calc(calc(5 * var(--vw)) + var(--sal)); --tm-xr: calc(calc(5 * var(--vw)) + var(--sar)); }
-.tracks-screen .legend { right: auto; left: var(--tm-x); bottom: calc(var(--tm-bottom) + var(--s1)); font-size: .68rem; text-shadow: var(--outline); z-index: 3; }
+.tracks-screen { background: linear-gradient(180deg, rgba(6,7,9,.86) 0%, rgba(6,7,9,.8) 100%); --tm-top: calc(var(--s5) + var(--sat) + 2.7rem); --tm-bottom: calc(var(--s3) + var(--sab) + 44px + var(--s2)); --tm-x: calc(calc(5 * var(--vw)) + var(--sal)); --tm-xr: calc(calc(5 * var(--vw)) + var(--sar)); }
+.tracks-screen .legend { bottom: auto; top: calc(var(--s4) + var(--sat) + 44px + 1.4rem); /* under the MENU pill and the fps meter */ right: calc(var(--s5) + var(--sar)); font-size: .68rem; text-shadow: var(--outline); z-index: 3; }
 .tmap { position: absolute; left: 0; right: 0; top: var(--tm-top); bottom: var(--tm-bottom); display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x; }
 .tmap::-webkit-scrollbar { display: none; }
-.tpage { position: relative; flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; align-items: flex-end; gap: var(--s4); padding: 0 var(--tm-xr) 0 var(--tm-x); container-type: size; }
-/* The tile: as wide as the page's left 58 % or as tall as the page, whichever fits (a 3:2 plate). */
-.tile { position: relative; flex: 0 0 auto; width: min(58cqw, 150cqh); aspect-ratio: 3 / 2; --lamp: var(--amber); }
-.tile .glow { position: absolute; left: 10%; right: 10%; top: 30%; bottom: 0; border-radius: 50%; background: radial-gradient(closest-side, var(--lamp), transparent 70%); opacity: .16; filter: blur(12px); pointer-events: none; }
-.tile .plate { position: absolute; inset: 0; background: center bottom / contain no-repeat; opacity: 0; transition: opacity var(--t3) var(--ease); }
-.tile .plate.loaded { opacity: 1; }
+.tpage { position: relative; flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; align-items: flex-end; gap: var(--s4); padding: 0 var(--tm-xr) 0 var(--tm-x); }
+/* The tile: as wide as the page's left 58 % or as tall as the page, whichever fits (a 3:2 plate); --tile-w is set by layout() from the map's box. */
+.ttile { position: relative; flex: 0 0 auto; width: var(--tile-w, 60%); aspect-ratio: 3 / 2; --lamp: var(--amber); }
+.ttile .glow { position: absolute; left: 10%; right: 10%; top: 30%; bottom: 0; border-radius: 50%; background: radial-gradient(closest-side, var(--lamp), transparent 70%); opacity: .16; filter: blur(12px); pointer-events: none; }
+.ttile .tart { position: absolute; inset: 0; background: center bottom / contain no-repeat; opacity: 0; transition: opacity var(--t3) var(--ease); }
+.ttile .tart.loaded { opacity: 1; }
 /* Fallback slab until the plate decodes (or when it never does): a biome-tinted isometric diamond with a front face. */
-.tile .slab { position: absolute; left: 3%; right: 3%; top: 8%; bottom: 6%; background: var(--tint, #333); clip-path: polygon(50% 0, 100% 44%, 100% 62%, 50% 100%, 0 62%, 0 44%); opacity: .85; filter: saturate(.7) brightness(.8); }
-.tile .slab::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 100%; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%, rgba(0,0,0,.6)); }
-.tile .plate.loaded ~ .slab, .tile .plate.loaded + .slab { display: none; }
-.tile .route { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.tile .route .dim { fill: none; stroke: rgba(255,176,32,.35); stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; stroke-width: 3px; }
-.tile .route .lit { fill: none; stroke: var(--amber); vector-effect: non-scaling-stroke; stroke-width: 3px; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(255,176,32,.9)) drop-shadow(0 0 10px rgba(255,138,31,.6)); }
-.tile .title { position: absolute; left: 6%; bottom: 3%; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1rem, 4.2cqh, 1.7rem); line-height: 1; text-transform: uppercase; letter-spacing: .04em; color: rgba(255,255,255,.55); text-shadow: 0 1px 0 rgba(255,255,255,.12), 0 -1px 0 rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.8); pointer-events: none; white-space: nowrap; }
-.tile .title b { color: var(--ink); font-variant-numeric: tabular-nums; }
-.tile .title small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .58rem; letter-spacing: .22em; color: var(--ink-dim); margin-top: .25em; }
+.ttile .slab { position: absolute; left: 3%; right: 3%; top: 8%; bottom: 6%; background: var(--tint, #333); clip-path: polygon(50% 0, 100% 44%, 100% 62%, 50% 100%, 0 62%, 0 44%); opacity: .85; filter: saturate(.7) brightness(.8); }
+.ttile .slab::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 100%; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%, rgba(0,0,0,.6)); }
+.ttile .tart.loaded + .slab { display: none; }
+.ttile .route { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.ttile .route .dim { fill: none; stroke: rgba(255,176,32,.35); stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; stroke-width: 3px; }
+.ttile .route .lit { fill: none; stroke: var(--amber); vector-effect: non-scaling-stroke; stroke-width: 3px; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(255,176,32,.9)) drop-shadow(0 0 10px rgba(255,138,31,.6)); }
+.ttile .title { position: absolute; left: 6%; bottom: 3%; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1rem, calc(4.2 * var(--vh)), 1.7rem); line-height: 1; text-transform: uppercase; letter-spacing: .04em; color: rgba(255,255,255,.55); text-shadow: 0 1px 0 rgba(255,255,255,.12), 0 -1px 0 rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.8); pointer-events: none; white-space: nowrap; }
+.ttile .title b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.ttile .title small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .58rem; letter-spacing: .22em; color: var(--ink-dim); margin-top: .25em; }
 /* Trophy ledge on the front face: one pedestal per campaign track — a lit medal, an empty ring, or a padlock. */
-.tile .ledge { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); display: flex; gap: 6px; pointer-events: none; }
-.tile .ledge i { display: block; width: 14px; height: 14px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor, 0 2px 0 rgba(0,0,0,.6); }
-.tile .ledge i.open { background: transparent; border: 1.5px dashed rgba(255,176,32,.7); box-shadow: none; }
-.tile .ledge i.locked { background: rgba(255,255,255,.14); box-shadow: none; -webkit-mask: none; }
-.tile .ledge i.locked::after { content: ""; display: block; width: 100%; height: 100%; background: rgba(255,255,255,.6); -webkit-mask: var(--padlock) center / 70% no-repeat; mask: var(--padlock) center / 70% no-repeat; }
-.tile .ledge i.platinum { color: var(--plat); } .tile .ledge i.gold { color: var(--gold); } .tile .ledge i.silver { color: var(--silver); } .tile .ledge i.bronze { color: var(--bronze); }
+.ttile .ledge { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); display: flex; gap: 6px; pointer-events: none; }
+.ttile .ledge i { display: block; width: 14px; height: 14px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor, 0 2px 0 rgba(0,0,0,.6); }
+.ttile .ledge i.open { background: transparent; border: 1.5px dashed rgba(255,176,32,.7); box-shadow: none; }
+.ttile .ledge i.locked { background: rgba(255,255,255,.14); box-shadow: none; -webkit-mask: none; }
+.ttile .ledge i.locked::after { content: ""; display: block; width: 100%; height: 100%; background: rgba(255,255,255,.6); -webkit-mask: var(--padlock) center / 70% no-repeat; mask: var(--padlock) center / 70% no-repeat; }
+.ttile .ledge i.platinum { color: var(--plat); } .ttile .ledge i.gold { color: var(--gold); } .ttile .ledge i.silver { color: var(--silver); } .ttile .ledge i.bronze { color: var(--bronze); }
 .tracks-screen { --padlock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E"); }
 /* Pins: a post with the code, the 44 px medal disc, a name plate and the Best / Target line; anchored at the disc's centre. */
-#ui .pin { position: absolute; left: var(--px); top: var(--py); transform: translate(-50%, -36px); display: flex; flex-direction: column; align-items: center; gap: 2px; width: max-content; max-width: 5.8rem; min-width: 44px; padding: 0 2px 4px; border: 0; background: transparent; color: var(--ink); cursor: pointer; z-index: 2; transition: transform var(--t2) var(--ease); }
-#ui .pin .code { font-size: .6rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); text-shadow: var(--outline); height: 12px; line-height: 12px; }
-#ui .pin .disc { position: relative; width: 44px; height: 44px; border-radius: 50%; background: var(--slab-2) center / 78% no-repeat; box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 6px 14px rgba(0,0,0,.7); }
-#ui .pin .disc::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 8px; margin-left: -1px; background: rgba(255,255,255,.35); }
-#ui .pin .disc.plain::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: currentColor; box-shadow: inset 0 -3px 0 rgba(0,0,0,.35); }
-#ui .pin .disc.none::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; border: 2px dashed rgba(255,255,255,.45); }
-#ui .pin .disc.locked::before { content: ""; position: absolute; inset: 9px; background: rgba(255,255,255,.7); -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
-#ui .pin .disc.platinum { color: var(--plat); } #ui .pin .disc.gold { color: var(--gold); } #ui .pin .disc.silver { color: var(--silver); } #ui .pin .disc.bronze { color: var(--bronze); }
-#ui .pin .disc.gold, #ui .pin .disc.silver, #ui .pin .disc.bronze, #ui .pin .disc.platinum { box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 0 14px -2px currentColor, 0 6px 14px rgba(0,0,0,.7); }
-#ui .pin .plate { margin-top: 8px; max-width: 100%; padding: 2px 6px; border-radius: 3px; background: var(--slab-2); border: 1px solid var(--line-2); font-family: var(--display); font-style: italic; font-weight: 900; font-size: .8rem; line-height: 1.05; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
-#ui .pin .times { font-size: .6rem; letter-spacing: .06em; color: var(--ink-dim); font-variant-numeric: tabular-nums; text-shadow: var(--outline); white-space: nowrap; }
-#ui .pin .times b { color: var(--ink); font-weight: 700; } #ui .pin .times b.ahead { color: var(--green); }
-#ui .pin .rule { font-size: .52rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); text-shadow: var(--outline); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-#ui .pin .flag { position: absolute; left: 50%; top: -14px; transform: translateX(-50%) rotate(-4deg); padding: 1px 5px; background: var(--amber); color: var(--amber-ink); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; border-radius: 2px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
-#ui .pin .tag { position: absolute; left: calc(50% + 18px); top: 14px; padding: 1px 4px; border-radius: 3px; font-size: .5rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
-#ui .pin .tag.ghost { background: rgba(255,255,255,.16); color: var(--ink); }
-#ui .pin .tag.pro { background: var(--blue); color: #0b1a2e; top: 28px; }
-#ui .pin.locked { opacity: .6; cursor: default; }
-#ui .pin.locked .plate { filter: grayscale(1); }
-#ui .pin.on { z-index: 4; transform: translate(-50%, -40px); }
-#ui .pin.on .disc { box-shadow: 0 0 0 3px var(--amber), 0 0 22px -2px rgba(255,176,32,.85), 0 6px 14px rgba(0,0,0,.7); }
-#ui .pin.on .plate { border-color: var(--amber); color: var(--amber); }
-#ui .pin.on .code { color: var(--amber); }
-#ui .pin.go { animation: pingo var(--t3) var(--ease) both; z-index: 5; }
+#ui .tpin { position: absolute; left: var(--px); top: var(--py); transform: translate(-50%, -36px); display: flex; flex-direction: column; align-items: center; gap: 2px; width: max-content; max-width: 5.8rem; min-width: 44px; padding: 0 2px 4px; border: 0; background: transparent; color: var(--ink); cursor: pointer; z-index: 2; transition: transform var(--t2) var(--ease); }
+#ui .tpin .code { font-size: .6rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); text-shadow: var(--outline); height: 12px; line-height: 12px; }
+#ui .tpin .disc { position: relative; width: 44px; height: 44px; border-radius: 50%; background: var(--slab-2) center / 78% no-repeat; box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 6px 14px rgba(0,0,0,.7); }
+#ui .tpin .disc::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 8px; margin-left: -1px; background: rgba(255,255,255,.35); }
+#ui .tpin .disc.plain::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: currentColor; box-shadow: inset 0 -3px 0 rgba(0,0,0,.35); }
+#ui .tpin .disc.none::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; border: 2px dashed rgba(255,255,255,.45); }
+#ui .tpin .disc.locked::before { content: ""; position: absolute; inset: 9px; background: rgba(255,255,255,.7); -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
+#ui .tpin .disc.platinum { color: var(--plat); } #ui .tpin .disc.gold { color: var(--gold); } #ui .tpin .disc.silver { color: var(--silver); } #ui .tpin .disc.bronze { color: var(--bronze); }
+#ui .tpin .disc.gold, #ui .tpin .disc.silver, #ui .tpin .disc.bronze, #ui .tpin .disc.platinum { box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 0 14px -2px currentColor, 0 6px 14px rgba(0,0,0,.7); }
+#ui .tpin .plate { margin-top: 8px; max-width: 100%; padding: 2px 6px; border-radius: 3px; background: var(--slab-2); border: 1px solid var(--line-2); font-family: var(--display); font-style: italic; font-weight: 900; font-size: .8rem; line-height: 1.05; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+#ui .tpin .times { font-size: .6rem; letter-spacing: .06em; color: var(--ink-dim); font-variant-numeric: tabular-nums; text-shadow: var(--outline); white-space: nowrap; }
+#ui .tpin .times b { color: var(--ink); font-weight: 700; } #ui .tpin .times b.ahead { color: var(--green); }
+#ui .tpin .rule { font-size: .52rem; line-height: 1.15; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); text-shadow: var(--outline); white-space: normal; text-align: center; max-width: 100%; }
+#ui .tpin.proving { max-width: 5rem; }
+#ui .tpin .flag { position: absolute; left: 50%; top: -14px; transform: translateX(-50%) rotate(-4deg); padding: 1px 5px; background: var(--amber); color: var(--amber-ink); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; border-radius: 2px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+#ui .tpin .tag { position: absolute; left: calc(50% + 18px); top: 14px; padding: 1px 4px; border-radius: 3px; font-size: .5rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+#ui .tpin .tag.ghost { background: rgba(255,255,255,.16); color: var(--ink); }
+#ui .tpin .tag.pro { background: var(--blue); color: #0b1a2e; top: 28px; }
+#ui .tpin.locked { opacity: .6; cursor: default; }
+#ui .tpin.locked .plate { filter: grayscale(1); }
+#ui .tpin.on { z-index: 4; transform: translate(-50%, -40px); }
+#ui .tpin.on .disc { box-shadow: 0 0 0 3px var(--amber), 0 0 22px -2px rgba(255,176,32,.85), 0 6px 14px rgba(0,0,0,.7); }
+#ui .tpin.on .plate { border-color: var(--amber); color: var(--amber); }
+#ui .tpin.on .code { color: var(--amber); }
+#ui .tpin.go { animation: pingo var(--t3) var(--ease) both; z-index: 5; }
 @keyframes pingo { 0% { transform: translate(-50%, -40px); opacity: 1; } 100% { transform: translate(-50%, calc(-40px - 14 * var(--vh))) scale(1.12); opacity: 0; } }
 /* Next tier gate stub, back-right of the tile: the next locked track and its rule (a tap flies to it). */
-#ui .gate { position: absolute; right: 2%; top: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-height: 44px; min-width: 44px; padding: 4px 8px 4px 8px; border: 0; border-left: 3px solid var(--amber); border-radius: 0 var(--r1) var(--r1) 0; background: var(--slab-2); color: var(--ink); text-align: left; cursor: pointer; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,.6); }
+#ui .gate { position: absolute; left: 2%; top: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-height: 44px; min-width: 44px; padding: 4px 8px 4px 8px; border: 0; border-left: 3px solid var(--amber); border-radius: 0 var(--r1) var(--r1) 0; background: var(--slab-2); color: var(--ink); text-align: left; cursor: pointer; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,.6); }
 #ui .gate::before { content: ""; position: absolute; left: -3px; right: 0; top: -4px; height: 4px; background: repeating-linear-gradient(-45deg, var(--amber) 0 6px, #111 6px 12px); border-radius: 2px 2px 0 0; }
 #ui .gate b { font-size: .56rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--amber); }
 #ui .gate span { font-family: var(--display); font-style: italic; font-weight: 900; font-size: .8rem; text-transform: uppercase; line-height: 1; }
@@ -961,7 +955,7 @@ export const TRACK_MAP_CSS = /* css */ `
 .tcard .tc-head .tc-medal.img { background-color: transparent; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
 .tcard .tc-head .tc-medal.none { background: rgba(255,255,255,.06); border: 1px dashed var(--line); box-shadow: none; }
 .tcard .tc-head .tc-medal.platinum { color: var(--plat); } .tcard .tc-head .tc-medal.gold { color: var(--gold); } .tcard .tc-head .tc-medal.silver { color: var(--silver); } .tcard .tc-head .tc-medal.bronze { color: var(--bronze); }
-.tcard .tc-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1.3rem, 5.6cqh, 1.9rem); line-height: .95; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tcard .tc-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1.3rem, calc(5.6 * var(--vh)), 1.9rem); line-height: .95; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tcard .tc-tech { font-size: .76rem; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tcard .tc-times { display: flex; gap: var(--s4); font-size: .76rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
 .tcard .tc-times b { color: var(--ink); font-weight: 700; } .tcard .tc-times b.ahead { color: var(--green); }
@@ -983,7 +977,7 @@ export const TRACK_MAP_CSS = /* css */ `
 #ui .tm .tm-art { flex: 0 0 auto; width: 44px; height: 32px; background: var(--tint, #222) center / contain no-repeat; border-radius: 3px; opacity: .9; }
 #ui .tm .tm-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 #ui .tm .tm-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: .74rem; line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#ui .tm .tm-dots { display: flex; align-items: center; gap: 3px; font-size: .56rem; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+#ui .tm .tm-dots { display: flex; align-items: center; gap: 3px; font-size: .56rem; font-variant-numeric: tabular-nums; letter-spacing: .08em; white-space: nowrap; }
 #ui .tm .tm-dots i { display: block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 #ui .tm .tm-dots i.open { background: transparent; border: 1px dashed rgba(255,255,255,.5); }
 #ui .tm .tm-dots i.locked { background: rgba(255,255,255,.55); -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; border-radius: 0; }
@@ -994,6 +988,7 @@ export const TRACK_MAP_CSS = /* css */ `
 #ui .tm .tm-txt .tm-blurb { display: none; }
 .tracks-screen.leave .tmap, .tracks-screen.leave .tmini { transition: opacity var(--t3) var(--ease); opacity: 0; }
 html.short .tracks-screen { --tm-top: calc(var(--s4) + var(--sat) + 2.5rem); }
+html.short .tracks-screen .legend { bottom: auto; font-size: .66rem; }
 html.short .tracks-head { top: calc(var(--s4) + var(--sat)); }
 html.short .tcard { padding: var(--s2) var(--s3); gap: 2px; }
 html.short .tcard .tc-tech { display: none; }

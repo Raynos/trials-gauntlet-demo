@@ -13,6 +13,17 @@ import type { RenderFrame } from '../frame';
 
 const DEG = Math.PI / 180;
 const RIDER_HEIGHT = 1.9;
+/** Garage orbit (`CameraOverride.mode === 'orbit'`): defaults and clamps — the screen owns the gesture, the rig owns the limits. */
+export const ORBIT = {
+  yaw: 0.42,
+  pitch: 0.14,
+  dist: 6.0,
+  pitchMin: -0.06,
+  pitchMax: 0.55,
+  distMin: 3.0,
+  distMax: 8.0,
+  fov: 30 * (Math.PI / 180),
+} as const;
 
 class Smooth {
   x = 0;
@@ -587,6 +598,32 @@ export class CameraRig {
         const d = this.dist / 0.76;
         cp.copy(this.aim).addScaledVector(this.dir, -d);
         if (B) cp.set(Math.min(B.maxX, Math.max(B.minX, cp.x)), Math.min(B.maxY, Math.max(B.minY, cp.y)), Math.min(B.maxZ, Math.max(B.minZ, cp.z)));
+        this.dist = d;
+      } else if (ov.mode === 'orbit') {
+        // Garage model explorer: a turntable orbit about the hero's centre. Yaw / pitch / distance are the
+        // screen's (drag / pinch); the fov is the idle one (ORBIT.fov) so the hero's frame share is
+        // RIDER_HEIGHT / (2 · dist · tan(fov / 2)) — dist 6.0 m ≈ 0.59 of the height (bbox ≈ 0.6). `screenX` / `screenY` slide the
+        // aim across the frame (a rail on the left, a panel on the right, nothing over the hero). No bounds clamp: the stage
+        // is its own room. The rig integrated above, so `setOverride(null)` restores the menu frame exactly.
+        const O = ORBIT;
+        const yaw = ov.yaw ?? O.yaw;
+        const pitch = Math.min(O.pitchMax, Math.max(O.pitchMin, ov.pitch ?? O.pitch));
+        const d = Math.min(O.distMax, Math.max(O.distMin, ov.dist ?? O.dist));
+        this.aim.set(ov.x ?? f.bikeX, ov.y ?? f.bikeY + 0.45, 0);
+        const cp2 = Math.cos(pitch);
+        this.dir.set(-Math.sin(yaw) * cp2, -Math.sin(pitch), -Math.cos(yaw) * cp2); // camera → aim
+        this.e.set(-pitch, yaw, 0, 'YXZ');
+        this.q.setFromEuler(this.e);
+        this.right.set(1, 0, 0).applyQuaternion(this.q);
+        this.up.set(0, 1, 0).applyQuaternion(this.q);
+        fovOut = O.fov;
+        const sy = Math.min(0.9, Math.max(0.1, ov.screenY ?? 0.5));
+        const sx = Math.min(0.9, Math.max(0.1, ov.screenX ?? 0.5));
+        const halfHOrbit = d * Math.tan(fovOut / 2);
+        this.aim.addScaledVector(this.up, -(1 - 2 * sy) * halfHOrbit);
+        this.aim.addScaledVector(this.right, -(2 * sx - 1) * halfHOrbit * this.aspect);
+        cp.copy(this.aim).addScaledVector(this.dir, -d);
+        this.camera.quaternion.copy(this.q);
         this.dist = d;
       }
     }

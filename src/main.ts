@@ -300,6 +300,14 @@ function boot(): void {
           models: { rider: models.riderModel, bike: models.bikeModel },
           riderOutfit,
           onRiderOutfitChange: (outfit) => (renderer as RiderOutfitRenderer).setRiderOutfit?.(outfit) ?? Promise.resolve(false),
+          // Garage round: the workshop set + orbit camera behind the garage screen (render exports both).
+          onGarageStage: (on) => {
+            const r = renderer as Partial<{ setGarageStage(on: boolean): void }>;
+            if (typeof r.setGarageStage === 'function') r.setGarageStage(on);
+          },
+          setCameraOverride: (o) => {
+            if (typeof renderer.setCameraOverride === 'function') renderer.setCameraOverride(o);
+          },
           touchDebug: params.get('touchdebug') === '1',
           modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
           applyModels: (m) => {

@@ -245,6 +245,25 @@ export function buildSkyTexture(b: Biome, width = 256, height = 128): THREE.Data
 // Rig
 // ---------------------------------------------------------------------------
 
+/**
+ * Garage stage lighting (set E "shutter door", variant BE3 "dusk"): the sun is the cool blue DUSK SPILL coming
+ * in low through the half-open shutter behind the hero (elevation ≈ 16°, from behind-left, so its shadow falls
+ * toward the camera and the closed upper half of the door shadows the room's top) — the fill; the KEY is the
+ * warm sodium work lamp, one of the hall's follow spots parked by the renderer (`world/garageStage.ts
+ * GARAGE_LAMPS`). The hemisphere is a dim dusk ambient. No fog inside the room.
+ */
+export const STAGE_LIGHT = {
+  sunDir: [-0.3, 0.27, -0.92] as const,
+  sunColor: 0x7f8fc8,
+  sunIntensity: 1.1,
+  hemiSky: 0x3f4f80,
+  hemiGround: 0x33231a,
+  hemiIntensity: 0.55,
+  fogColor: 0x0b0c10,
+  fogNear: 60,
+  fogFar: 400,
+} as const;
+
 export class LightingRig {
   readonly sun: THREE.DirectionalLight;
   readonly hemi: THREE.HemisphereLight;
@@ -265,7 +284,7 @@ export class LightingRig {
   setFloor(y: number): void {
     this.floorY = y;
     const b = this.biome;
-    if (!b) return;
+    if (!b || this.staged) return;
     const ff = b.floorFog;
     fogUniforms.uFogFloor.value.set((ff?.h0 ?? 0) + y, ff?.hs ?? 1, ff?.density ?? 0, b.fogTiers[1]);
   }
@@ -313,18 +332,7 @@ export class LightingRig {
 
   apply(b: Biome): void {
     this.biome = b;
-    this.sunDir.set(b.sunDir[0], b.sunDir[1], b.sunDir[2]).normalize();
-    this.sun.color.setHex(b.sunColor);
-    this.sun.intensity = b.sunIntensity;
-    this.hemi.color.setHex(b.hemiSky);
-    this.hemi.groundColor.setHex(b.hemiGround);
-    this.hemi.intensity = b.hemiIntensity;
-
-    const fog = this.scene.fog as THREE.Fog;
-    fog.color.setHex(b.fogColor);
-    fog.near = b.fogTiers[0];
-    fog.far = b.fogTiers[2];
-    this.setFloor(this.floorY);
+    this.applyLights();
 
     this.sky?.dispose();
     this.envRT?.dispose();
@@ -334,6 +342,55 @@ export class LightingRig {
     this.scene.environmentIntensity = b.envIntensity;
     this.scene.background = this.sky;
     this.scene.backgroundIntensity = 1;
+  }
+
+  /**
+   * Garage stage (render, garage round): the same two lights re-aimed and re-coloured — a warm key from
+   * high front-left and a cool hemisphere fill — with the aerial and floor fog pushed out past the room.
+   * Uniform changes only: no light is added or removed, so no program in the scene recompiles when the
+   * stage comes and goes. `null` restores the biome's rig.
+   */
+  setStage(on: boolean): void {
+    if (this.staged === on) return;
+    this.staged = on;
+    this.applyLights();
+    this.frustumW = 0; // the frustum re-centres on the next follow
+  }
+
+  get isStaged(): boolean {
+    return this.staged;
+  }
+
+  private staged = false;
+
+  private applyLights(): void {
+    const b = this.biome;
+    if (!b) return;
+    const fog = this.scene.fog as THREE.Fog;
+    if (this.staged) {
+      const S = STAGE_LIGHT;
+      this.sunDir.set(S.sunDir[0], S.sunDir[1], S.sunDir[2]).normalize();
+      this.sun.color.setHex(S.sunColor);
+      this.sun.intensity = S.sunIntensity;
+      this.hemi.color.setHex(S.hemiSky);
+      this.hemi.groundColor.setHex(S.hemiGround);
+      this.hemi.intensity = S.hemiIntensity;
+      fog.color.setHex(S.fogColor);
+      fog.near = S.fogNear;
+      fog.far = S.fogFar;
+      fogUniforms.uFogFloor.value.set(this.floorY - 100, 1, 0, S.fogNear);
+      return;
+    }
+    this.sunDir.set(b.sunDir[0], b.sunDir[1], b.sunDir[2]).normalize();
+    this.sun.color.setHex(b.sunColor);
+    this.sun.intensity = b.sunIntensity;
+    this.hemi.color.setHex(b.hemiSky);
+    this.hemi.groundColor.setHex(b.hemiGround);
+    this.hemi.intensity = b.hemiIntensity;
+    fog.color.setHex(b.fogColor);
+    fog.near = b.fogTiers[0];
+    fog.far = b.fogTiers[2];
+    this.setFloor(this.floorY);
   }
 
   /** Estimated bytes of the env textures (for stats). */

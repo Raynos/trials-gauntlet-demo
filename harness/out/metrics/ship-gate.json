@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260915-230830-321140",
-  "startedAt": "2026-09-16T04:08:30.987Z",
-  "wallMs": 105898,
-  "git": "1308fbf",
+  "runId": "20260916-092633-92f70f",
+  "startedAt": "2026-09-16T14:26:33.954Z",
+  "wallMs": 111108,
+  "git": "8aceca4",
   "srcFingerprint": "24a246e0",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
@@ -12,8 +12,8 @@
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": true,
   "build": {
-    "distBytes": 43080618,
-    "jsGzipBytes": 585304,
+    "distBytes": 43840102,
+    "jsGzipBytes": 602928,
     "buildMs": 0
   },
   "browser": {
@@ -24,15 +24,15 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 273.56166700000006,
+      "value": 86.16154199999801,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 274/518/95 min 95 loadavg 13.47/18"
+      "note": "runs 83/637/86 min 83 loadavg 11.77/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 7130.414999961853,
+      "value": 6182.1900000572205,
       "limit": 4000,
       "pass": false,
       "unit": "ms",
@@ -100,14 +100,14 @@
     },
     {
       "id": "restart.wallMsP95",
-      "value": 0.1549999713897705,
+      "value": 0.13000011444091797,
       "limit": 5,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "restart.frameMsP95",
-      "value": 522.164999961853,
+      "value": 206.7350001335144,
       "limit": 150,
       "pass": false,
       "unit": "ms",
@@ -125,7 +125,7 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": 3.767230987548828,
+      "value": 1.2331619262695312,
       "limit": 5,
       "pass": true,
       "unit": "MB",
@@ -152,21 +152,21 @@
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 32.50002861022949,
+      "value": 39.999961853027344,
       "limit": 60,
       "pass": true,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 1.8899998664855957,
+      "value": 1.6100001335144043,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 1446.7249999046326,
+      "value": 572.329999923706,
       "limit": 250,
       "pass": false,
       "unit": "ms",
@@ -176,11 +176,11 @@
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 571.5859375,
+      "value": 588.796875,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 42071 KB raw"
+      "note": "dist 42813 KB raw"
     },
     {
       "id": "determinism.pass",
@@ -205,10 +205,10 @@
     },
     {
       "id": "reflex.medianAttempts",
-      "value": "b1 -/1.5 (0 fresh) · b2 -/3 (0 fresh) · b3 -/3 (0 fresh) · e1 -/6 (0 fresh)",
+      "value": "b1 1/1.5 · b2 2/3 · b3 2/3 · e1 5/6",
       "limit": 1.5,
       "pass": true,
-      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 24a246e0; informational until every track has >= 3 seeds on this src (pnpm harness:reflex --all-tracks --seeds 3)"
+      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 24a246e0; armed: all four within band"
     },
     {
       "id": "reflex.medianAttempts.pro",
@@ -222,7 +222,7 @@
       "value": 59.5,
       "limit": 55,
       "pass": true,
-      "note": "b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md (report build 5649aa6, HEAD 1308fbf)); informational until 3 reports exist (1 filed)"
+      "note": "b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md (report build 5649aa6, HEAD 8aceca4)); informational until 3 reports exist (1 filed)"
     },
     {
       "id": "device.thermalDropPct",
@@ -250,19 +250,19 @@
   "pass": false,
   "boot": {
     "runs": [
-      273.56166700000006,
-      517.8014170000006,
-      94.54650000000038
+      83.45300000000134,
+      636.7695420000018,
+      86.16154199999801
     ],
-    "p50": 273.56166700000006,
-    "min": 94.54650000000038,
-    "max": 517.8014170000006,
+    "p50": 86.16154199999801,
+    "min": 83.45300000000134,
+    "max": 636.7695420000018,
     "firstFrameMs": [
-      9134.619999885559,
-      7130.414999961853,
-      6762.1849999427795
+      6182.1900000572205,
+      6154.5650000572205,
+      6470.610000133514
     ],
-    "loadavg1": 13.47,
+    "loadavg1": 11.77,
     "cores": 18,
     "retried": false
   },
@@ -284,48 +284,48 @@
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0.21000003814697266,
-      0.1549999713897705,
+      0.2049999237060547,
       0.13000011444091797,
+      0.13000011444091797,
+      0.07500004768371582,
+      0.08500003814697266,
       0.07000017166137695,
-      0.09499979019165039,
-      0.07999992370605469,
-      0.06999993324279785,
-      0.07999992370605469,
-      0.06499981880187988,
-      0.06500005722045898,
-      0.05499982833862305,
-      0.04999995231628418,
+      0.09000015258789062,
+      0.07500004768371582,
       0.059999942779541016,
+      0.04500007629394531,
+      0.04999995231628418,
+      0.039999961853027344,
       0.05500006675720215,
       0.04499983787536621,
-      0.04999995231628418,
-      0.04999995231628418,
-      0.059999942779541016,
-      0.05500006675720215,
-      0.05500006675720215
+      0.040000200271606445,
+      0.04500007629394531,
+      0.039999961853027344,
+      0.039999961853027344,
+      0.04500007629394531,
+      0.039999961853027344
     ],
     "frameMs": [
-      1547.8849999904633,
-      257.80999994277954,
-      522.164999961853,
-      236.3050000667572,
-      232.30999994277954,
-      237.98499989509583,
-      241.82999992370605,
-      239.56500005722046,
-      249.5199999809265,
-      234.0699999332428,
-      245.75499987602234,
-      250.82000017166138,
-      254.15499997138977,
-      255.2150001525879,
-      255.78999996185303,
-      268.20499992370605,
-      260.54500007629395,
-      265.875,
-      249.13000011444092,
-      246.3550000190735
+      1339.4199998378754,
+      206.7350001335144,
+      188.6949999332428,
+      189.90000009536743,
+      186.625,
+      184.2300000190735,
+      188.02999997138977,
+      191.38499999046326,
+      190.7300000190735,
+      189.75999999046326,
+      184.33500003814697,
+      188.22000002861023,
+      190.4300000667572,
+      188.56499981880188,
+      188.3600001335144,
+      190.30999994277954,
+      186.4800000190735,
+      186.80499982833862,
+      193.5550000667572,
+      194.7300000190735
     ],
     "noCountdown": true,
     "movesOnFirstTick": true,
@@ -338,26 +338,26 @@
     "autoRespawnMs": 1041.6666666666667
   },
   "heap": {
-    "beforeMB": 12.7001953125,
-    "afterMB": 16.467426300048828,
-    "growthMB": 3.767230987548828,
+    "beforeMB": 15.84722900390625,
+    "afterMB": 17.08039093017578,
+    "growthMB": 1.2331619262695312,
     "seconds": 10
   },
   "perf": {
     "drawCalls": 174,
     "triangles": 244203,
     "texturesMB": 76.92539831542967,
-    "physicsUsPerTickP95": 32.50002861022949,
-    "renderSubmitMsP95": 1.8899998664855957,
-    "renderSyncedMsP95": 1446.7249999046326
+    "physicsUsPerTickP95": 39.999961853027344,
+    "renderSubmitMsP95": 1.6100001335144043,
+    "renderSyncedMsP95": 572.329999923706
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260915-230831-ed986d",
-    "startedAt": "2026-09-16T04:08:31.228Z",
-    "wallMs": 33685,
-    "git": "1308fbf",
+    "runId": "20260916-092634-1ded14",
+    "startedAt": "2026-09-16T14:26:34.195Z",
+    "wallMs": 12285,
+    "git": "8aceca4",
     "srcFingerprint": "24a246e0",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
@@ -726,7 +726,7 @@
   },
   "reflex": {
     "srcFingerprint": "24a246e0",
-    "armed": false,
+    "armed": true,
     "minSeeds": 3,
     "rows": [
       {
@@ -737,13 +737,13 @@
           1
         ],
         "limit": 1.5,
-        "srcFingerprint": "089e0885",
-        "seedsFresh": 0,
-        "medianAttempts": null,
-        "medianFinishTime": null,
-        "allCleared": false,
-        "pass": null,
-        "deadliest": null
+        "srcFingerprint": "24a246e0",
+        "seedsFresh": 9,
+        "medianAttempts": 1,
+        "medianFinishTime": 56.583333333333336,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ground @ 90 m ×1"
       },
       {
         "trackId": "b2-lean-back",
@@ -753,13 +753,13 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "089e0885",
-        "seedsFresh": 0,
-        "medianAttempts": null,
-        "medianFinishTime": null,
-        "allCleared": false,
-        "pass": null,
-        "deadliest": null
+        "srcFingerprint": "24a246e0",
+        "seedsFresh": 9,
+        "medianAttempts": 2,
+        "medianFinishTime": 62.80833333333333,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ground @ 35 m ×6"
       },
       {
         "trackId": "b3-kicker-row",
@@ -769,13 +769,13 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "089e0885",
-        "seedsFresh": 0,
-        "medianAttempts": null,
-        "medianFinishTime": null,
-        "allCleared": false,
-        "pass": null,
-        "deadliest": null
+        "srcFingerprint": "24a246e0",
+        "seedsFresh": 9,
+        "medianAttempts": 2,
+        "medianFinishTime": 61.45,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ramp @ 409.8 m ×3"
       },
       {
         "trackId": "e1-uphill-weight",
@@ -785,13 +785,13 @@
           4
         ],
         "limit": 6,
-        "srcFingerprint": "089e0885",
-        "seedsFresh": 0,
-        "medianAttempts": null,
-        "medianFinishTime": null,
-        "allCleared": false,
-        "pass": null,
-        "deadliest": null
+        "srcFingerprint": "24a246e0",
+        "seedsFresh": 9,
+        "medianAttempts": 5,
+        "medianFinishTime": 101.7,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ramp @ 75.2 m ×7"
       }
     ]
   },

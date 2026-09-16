@@ -439,13 +439,25 @@ export type ReplayCameraMode = 'game' | 'follow-wide' | 'fixed';
  * `setKeys` through `renderer.debug.rig` (src/game/replay.ts).
  */
 export interface CameraOverride {
-  /** `free` (render r15, the level reviewer's pan / zoom): aim at world (x, y), `dist` m back along the rig's view. */
-  mode: ReplayCameraMode | 'free';
-  /** `fixed`: world x/y the camera holds; `free`: the aim point. */
+  /**
+   * `free` (render r15, the level reviewer's pan / zoom): aim at world (x, y), `dist` m back along the rig's view.
+   * `orbit` (garage model explorer): the camera circles the hero — `yaw` about +y (0 = the side view from +z,
+   * positive = round to the bike's front), `pitch` above the horizontal (rad, positive = looking down), `dist` m
+   * from the aim; the aim defaults to the hero's centre (bike x, bike y + 0.45) and `screenX` / `screenY` place it
+   * on the frame (0..1, default 0.5) so controls can sit beside or under it.
+   */
+  mode: ReplayCameraMode | 'free' | 'orbit';
+  /** `fixed`: world x/y the camera holds; `free` / `orbit`: the aim point. */
   x?: number;
   y?: number;
-  /** `free`: camera distance from the aim (m). */
+  /** `free` / `orbit`: camera distance from the aim (m). */
   dist?: number;
+  /** `orbit`: yaw / pitch (rad). */
+  yaw?: number;
+  pitch?: number;
+  /** `orbit`: where the aim lands on the frame (0..1 from the left / the top; default 0.5) — room for a rail or a panel beside the hero. */
+  screenX?: number;
+  screenY?: number;
 }
 
 export interface RunTelemetry {

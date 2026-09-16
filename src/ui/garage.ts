@@ -1,16 +1,21 @@
 /**
- * Garage (MEGA_PLAN P4): choose the bike class. Two cards — Rookie / Pro — each with a
- * one-line character, a stat strip (power / grip / weight feel) and a rule note; the live 3D
- * bike behind the screen is the preview (the menu backdrop reloads with the chosen class via
- * `Game.setBike`, whose `loadTrack` repaints the hero through `renderer.setBikeClass` — render
- * round 11 liveries; a renderer without it leaves the card tint as the only colour difference).
- * Copy states the physics v2 R3 numbers (physics.md "v2 status — R3"). Selection persists
- * (`trials.bikeClass`); the per-tier default applies only until the player has picked once (rules.ts).
+ * Garage (MEGA_PLAN P4; garage round): the model explorer, layout B "tool wall" on set E "shutter door"
+ * (assets/design/garage/SPEC.md). The live 3D hero is the centrepiece — the renderer stages it in the
+ * shutter-door bay (`setGarageStage`) and the screen drives an orbit camera (`setCameraOverride({ mode:
+ * 'orbit' })`): one-finger / mouse drag rotates, pinch / wheel zooms, a short inertia settles the turn.
+ * Nothing overlaps the hero: the controls hang as tags on a rail down the LEFT edge (rider model, outfit,
+ * bike class — bike lowest, under the thumb; every tag ≥ 44 px, two per row, no scrolling), the metadata
+ * sits in a panel on the RIGHT (the chosen bike's class, POWER / GRIP / WEIGHT bars and note, the outfit and
+ * rider lines, the load status), badge plate top-left, ‹ MENU top-right, the gesture hint under the hero.
+ * Bike class previews on focus and commits on select (`trials.bikeClass`); the rider model and outfit
+ * commit at once (`trials.riderModel`, `trials.riderOutfit`) — the main menu and the pause overlay no
+ * longer carry these rows. Copy states the physics v2 R3 numbers (physics.md "v2 status — R3").
  */
 import type { BikeClass, RiderOutfit } from '../core/types';
 import { RIDER_PRESETS } from '../core/riderPresets';
 import type { ArtManifest } from './art';
-import { escapeHtml } from './front';
+import type { ModelChoice } from './best';
+import { BUILD_STAMP_SHORT, GAME_NAME, escapeHtml } from './front';
 import type { UiSfx } from './sfx';
 import { conceal, isLiveTarget, reveal } from './live';
 import { DEFAULT_RIDER_OUTFIT, OUTFIT_DETAIL, OUTFIT_LABEL, RIDER_OUTFITS } from './outfit';
@@ -62,12 +67,53 @@ export const BIKE_SPECS: Record<BikeClass, BikeSpec> = {
 
 export const BIKE_LABEL: Record<BikeClass, string> = { rookie: 'Rookie', pro: 'Pro' };
 
+/** Rider model chips (the garage is the only place these live now). */
+export const RIDER_MODEL_OPTIONS: readonly { v: ModelChoice; l: string }[] = [
+  { v: 'proc', l: 'Classic' },
+  { v: 'gltf', l: 'Blender' },
+  { v: 'img2', l: 'Img2 experiment' },
+];
+
 /**
  * The one place a player reads the wheelie balance point (physics.md R3 coasting-balance row, Rookie:
- * lean −1 / 0 / +1 → 24 / 50 / 69°; the Pro is within 3°). Garage footer + the first-run card; never
+ * lean −1 / 0 / +1 → 24 / 50 / 69°; the Pro is within 3°). Garage detail line + the first-run card; never
  * floated during play.
  */
 export const BALANCE_HINT = 'Wheelie balance point: ~50° at neutral · lean back and it moves to 69°, forward to 24°';
+
+/** Orbit view the explorer opens on and the gesture limits (the renderer's rig clamps the same way). */
+export const GARAGE_VIEW = {
+  yaw: 0.42,
+  pitch: 0.12,
+  dist: 6.0,
+  /** Where the hero's centre lands on the frame: between the rail (left ~27 %) and the panel (right ~23 %), mid-height. */
+  screenX: 0.52,
+  screenY: 0.44,
+  pitchMin: -0.06,
+  pitchMax: 0.55,
+  distMin: 3.0,
+  distMax: 8.0,
+  /** Radians per CSS px of drag. */
+  yawPerPx: (2 * Math.PI) / 640,
+  pitchPerPx: 0.006,
+} as const;
+
+export interface GarageView {
+  yaw: number;
+  pitch: number;
+  dist: number;
+  screenX: number;
+  screenY: number;
+}
+
+/** Outfit swatches for the tags (CSS backgrounds keyed by preset id). */
+export const OUTFIT_SWATCH: Record<RiderOutfit, string> = {
+  'street-mustard': '#d6a021',
+  'street-openface': 'linear-gradient(135deg, #3a3d44 60%, #d9dde3 60%)',
+  'race-bluewhite': 'linear-gradient(135deg, #2e6fd8 50%, #f2f2f2 50%)',
+  'street-charcoal': '#2a2c31',
+  'race-charcoalyellow': 'linear-gradient(135deg, #2a2c31 50%, #f5c518 50%)',
+};
 
 export interface GarageCallbacks {
   /** Focus moved: swap the live preview (not persisted). */
@@ -77,6 +123,12 @@ export interface GarageCallbacks {
   /** Load and commit clothing; false leaves the existing outfit selected. */
   setOutfit(outfit: RiderOutfit): Promise<boolean>;
   back(): void;
+  /** Rider model (renderer `setModels`); the row exists only when given. */
+  models?: { get(): ModelChoice; set(v: ModelChoice): void };
+  /** Model explorer: stage the hero on the garage set (renderer `setGarageStage`). */
+  stage?(on: boolean): void;
+  /** Model explorer: orbit camera (`setCameraOverride({ mode: 'orbit', … })`); null restores the menu framing. */
+  orbit?(view: GarageView | null): void;
 }
 
 function h<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, html?: string): HTMLElementTagNameMap[K] {
@@ -86,26 +138,46 @@ function h<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, html?: s
   return e;
 }
 
+const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
+
 function bar(label: string, v: number, text?: string): string {
   const n = Math.round(v * 100);
   return `<div class="stat"><span>${label}</span><i><b style="width:${n}%"></b></i><em>${text ? escapeHtml(text) : `${n}`}</em></div>`;
 }
 
+type Group = 'bike' | 'model' | 'outfit' | 'back';
+
 export class GarageScreen {
   readonly root: HTMLDivElement;
+  /** The explorer surface (drag / pinch / wheel), under every control. */
+  readonly stage: HTMLDivElement;
   private readonly cards = new Map<BikeClass, HTMLButtonElement>();
+  private readonly models = new Map<ModelChoice, HTMLButtonElement>();
   private readonly outfits = new Map<RiderOutfit, HTMLButtonElement>();
   private readonly outfitStatus: HTMLSpanElement;
+  private readonly detail: HTMLDivElement;
+  private readonly hint: HTMLDivElement;
   private readonly backButton: HTMLButtonElement;
   private readonly legend: HTMLDivElement;
   private focus: BikeClass = 'rookie';
   private current: BikeClass = 'rookie';
-  private focusGroup: 'bike' | 'outfit' | 'back' = 'bike';
+  private focusGroup: Group = 'bike';
+  private modelFocus: ModelChoice = 'gltf';
   private outfitFocus: RiderOutfit = DEFAULT_RIDER_OUTFIT;
   private currentOutfit: RiderOutfit = DEFAULT_RIDER_OUTFIT;
   private pendingOutfit: RiderOutfit | null = null;
   private failedOutfit: RiderOutfit | null = null;
   private outfitRequest = 0;
+  // --- explorer
+  private readonly view: GarageView = { yaw: GARAGE_VIEW.yaw, pitch: GARAGE_VIEW.pitch, dist: GARAGE_VIEW.dist, screenX: GARAGE_VIEW.screenX, screenY: GARAGE_VIEW.screenY };
+  private readonly pointers = new Map<number, { x: number; y: number }>();
+  private pinch0 = 0;
+  private pinchDist0 = 0;
+  private yawVel = 0;
+  private lastMoveAt = 0;
+  private inertia = 0;
+  private staged = false;
+  private touched = false;
 
   constructor(
     parent: HTMLElement,
@@ -116,79 +188,108 @@ export class GarageScreen {
     this.root = h('div', 'screen garage-screen');
     this.root.inert = true;
     this.root.setAttribute('aria-hidden', 'true');
-    // Art round 2: garage plate behind the card column (masked clear on the live-bike side), bike renders in the cards.
-    const plate = h('div', 'plate-bg garage-plate');
-    this.root.appendChild(plate);
-    art.whenReady(() => art.applyBackground(plate, art.byId('garage-plate') ?? art.byId('results-garage')));
-    const head = h('div', 'garage-head', `<h1><small>Garage</small>Customize your ride</h1><div class="garage-sub">Applies to every track · change it here any time</div><div class="garage-tip">${escapeHtml(BALANCE_HINT)}</div>`);
-    const customize = h('div', 'garage-customize');
-    const row = h('div', 'garage-cards');
-    row.setAttribute('role', 'group');
-    row.setAttribute('aria-label', 'Bike class');
-    for (const spec of [BIKE_SPECS.rookie, BIKE_SPECS.pro]) {
-      const el = h('button', 'bike-card');
-      el.type = 'button';
-      el.dataset['bike'] = spec.id;
-      el.style.setProperty('--tint', spec.tint);
-      el.innerHTML = `<div class="bc-art"></div><div class="bc-top"><span class="bc-kicker">${spec.id === 'rookie' ? 'Class A' : 'Class P'}</span><span class="bc-sel">Selected</span></div>
-        <div class="bc-name">${escapeHtml(spec.name)}</div>
-        <div class="bc-line">${escapeHtml(spec.line)}</div>
-        <div class="bc-stats">${bar('Power', spec.power)}${bar('Grip', spec.grip)}${bar('Weight', spec.weight, spec.weightFeel)}</div>
-        <div class="bc-note">${escapeHtml(spec.note)}</div>`;
-      el.addEventListener('pointerenter', (e) => {
-        if (e.pointerType !== 'touch' && this.canAct(el)) this.setFocus(spec.id, true);
-      });
-      el.addEventListener('focus', () => {
-        if (!this.visible) return;
-        if (this.canAct(el)) this.setFocus(spec.id, false);
-        else {
-          // Tab may move while the screen is fading in. Remember its target, but wait for live
-          // activation before changing a preview or committing anything.
-          this.focusGroup = 'bike';
-          this.focus = spec.id;
-          this.paint();
-        }
-      });
-      el.addEventListener('click', () => {
-        if (!this.canAct(el)) return;
-        this.setFocus(spec.id, false);
-        this.confirm();
-      });
-      const artEl = el.querySelector<HTMLDivElement>('.bc-art')!;
-      art.whenReady(() => art.applyBackground(artEl, art.bikeArt(spec.id)));
-      row.appendChild(el);
-      this.cards.set(spec.id, el);
+    // The explorer surface: full-bleed under the badge / rail / panel; the live scene shows through the screen.
+    this.stage = h('div', 'garage-stage');
+    this.stage.setAttribute('aria-label', 'Model explorer: drag to rotate, pinch or scroll to zoom');
+    this.bindExplorer();
+    const badge = h('div', 'garage-badge', `<div class="garage-plate"><span class="wordmark">${escapeHtml(GAME_NAME)}</span><span class="garage-title">Garage</span></div><div class="garage-build">${escapeHtml(BUILD_STAMP_SHORT)}</div>`);
+    this.hint = h('div', 'garage-hint', '<i></i>Drag to rotate · pinch to zoom');
+    // --- The rail (left edge): rider model, outfit, bike class — bike lowest (SPEC §5: under the thumb).
+    const rail = h('div', 'garage-rail');
+    const group = (id: string, label: string, head: string): HTMLDivElement => {
+      const g = h('div', 'rail-group');
+      g.dataset['group'] = id;
+      const grid = h('div', 'rail-grid');
+      grid.setAttribute('role', 'group');
+      grid.setAttribute('aria-label', label);
+      g.append(h('span', 'rail-head', escapeHtml(head)), grid);
+      rail.appendChild(g);
+      return grid;
+    };
+    if (cb.models) {
+      const grid = group('rider', 'Rider model', 'Rider');
+      for (const o of RIDER_MODEL_OPTIONS) {
+        const [first, rest] = o.l.split(' ');
+        const el = h('button', 'chip', `<b>${escapeHtml(first ?? o.l)}</b>${rest ? `<em>${escapeHtml(rest)}</em>` : ''}`);
+        el.type = 'button';
+        el.dataset['model'] = o.v;
+        el.addEventListener('pointerenter', (e) => {
+          if (e.pointerType !== 'touch' && this.canAct(el)) this.setModelFocus(o.v, true);
+        });
+        el.addEventListener('focus', () => { if (this.visible) this.setModelFocus(o.v, false); });
+        el.addEventListener('click', () => {
+          if (!this.canAct(el)) return;
+          this.setModelFocus(o.v, false);
+          this.confirm();
+        });
+        grid.appendChild(el);
+        this.models.set(o.v, el);
+      }
     }
-    const outfitPanel = h('div', 'garage-outfits');
-    const outfitHeading = h('div', 'outfit-heading', '<strong>Rider outfit</strong>');
+    {
+      const grid = group('outfit', 'Rider outfit', 'Outfit');
+      for (const preset of RIDER_PRESETS) {
+        const outfit = preset.id;
+        const [colour, style] = OUTFIT_LABEL[outfit].split(' · ');
+        const button = h('button', 'chip outfit-button', `<i class="swatch"></i><b>${escapeHtml(colour ?? OUTFIT_LABEL[outfit])}</b>${style ? `<em>${escapeHtml(style)}</em>` : ''}`);
+        button.type = 'button';
+        button.dataset['outfit'] = outfit;
+        button.title = `${OUTFIT_LABEL[outfit]} — ${OUTFIT_DETAIL[outfit]}`;
+        button.querySelector<HTMLElement>('.swatch')!.style.background = OUTFIT_SWATCH[outfit];
+        button.addEventListener('pointerenter', (event) => {
+          if (event.pointerType !== 'touch' && this.canAct(button)) this.setOutfitFocus(outfit, true);
+        });
+        button.addEventListener('focus', () => { if (this.visible) this.setOutfitFocus(outfit, false); });
+        button.addEventListener('click', () => {
+          if (!this.canAct(button)) return;
+          this.setOutfitFocus(outfit, false);
+          this.confirm();
+        });
+        grid.appendChild(button);
+        this.outfits.set(outfit, button);
+      }
+    }
+    {
+      const grid = group('bike', 'Bike class', 'Bike');
+      for (const spec of [BIKE_SPECS.rookie, BIKE_SPECS.pro]) {
+        const el = h('button', 'chip bike-chip', `<i class="chip-tint"></i><i class="chip-art"></i><b>${escapeHtml(spec.name)}</b><em>${spec.id === 'rookie' ? 'Class A' : 'Class P'}</em>`);
+        el.type = 'button';
+        el.dataset['bike'] = spec.id;
+        el.style.setProperty('--tint', spec.tint);
+        const artEl = el.querySelector<HTMLElement>('.chip-art')!;
+        art.whenReady(() => art.applyBackground(artEl, art.bikeArt(spec.id))); // the tag's bike icon (menu art pack)
+        el.addEventListener('pointerenter', (e) => {
+          if (e.pointerType !== 'touch' && this.canAct(el)) this.setFocus(spec.id, true);
+        });
+        el.addEventListener('focus', () => {
+          if (!this.visible) return;
+          if (this.canAct(el)) this.setFocus(spec.id, false);
+          else {
+            // Tab may move while the screen is fading in. Remember its target, but wait for live
+            // activation before changing a preview or committing anything.
+            this.focusGroup = 'bike';
+            this.focus = spec.id;
+            this.paint();
+          }
+        });
+        el.addEventListener('click', () => {
+          if (!this.canAct(el)) return;
+          this.setFocus(spec.id, false);
+          this.confirm();
+        });
+        grid.appendChild(el);
+        this.cards.set(spec.id, el);
+      }
+    }
+    // --- The panel (right edge, under ‹ MENU): the chosen bike's sheet + the outfit / rider lines + the load status.
+    const panel = h('div', 'garage-panel');
+    this.detail = h('div', 'gp-sheet');
     this.outfitStatus = h('span', 'outfit-current');
     this.outfitStatus.setAttribute('role', 'status');
-    outfitHeading.appendChild(this.outfitStatus);
-    const outfitRow = h('div', 'outfit-options');
-    outfitRow.setAttribute('role', 'group');
-    outfitRow.setAttribute('aria-label', 'Rider outfit');
-    for (const preset of RIDER_PRESETS) {
-      const outfit = preset.id;
-      const button = h('button', 'outfit-button', `<strong>${OUTFIT_LABEL[outfit]}</strong><span>${OUTFIT_DETAIL[outfit]}</span>`);
-      button.type = 'button';
-      button.dataset['outfit'] = outfit;
-      button.addEventListener('pointerenter', (event) => {
-        if (event.pointerType !== 'touch' && this.canAct(button)) this.setOutfitFocus(outfit, true);
-      });
-      button.addEventListener('focus', () => { if (this.visible) this.setOutfitFocus(outfit, false); });
-      button.addEventListener('click', () => {
-        if (!this.canAct(button)) return;
-        this.setOutfitFocus(outfit, false);
-        this.confirm();
-      });
-      outfitRow.appendChild(button);
-      this.outfits.set(outfit, button);
-    }
-    outfitPanel.append(outfitHeading, outfitRow);
-    customize.append(row, outfitPanel);
+    panel.append(this.detail, this.outfitStatus);
     this.legend = h('div', 'legend');
     this.setDevice('keyboard');
-    this.root.append(h('div', 'grain'), head, customize, this.legend);
+    this.root.append(this.stage, h('div', 'grain'), badge, this.hint, rail, panel, this.legend);
     this.backButton = h('button', 'backbtn', '<span>‹</span>Menu');
     this.backButton.type = 'button';
     this.backButton.addEventListener('click', () => { if (this.canAct(this.backButton)) this.back(); });
@@ -210,12 +311,19 @@ export class GarageScreen {
     this.current = current;
     this.focus = current;
     this.currentOutfit = this.outfitFocus = outfit;
+    this.modelFocus = this.cb.models?.get() ?? 'gltf';
     this.focusGroup = 'bike';
+    this.resetView();
     this.paint();
     this.root.inert = false;
     this.root.setAttribute('aria-hidden', 'false');
     this.root.classList.add('show');
     reveal(this.root);
+    if (!this.staged) {
+      this.staged = true;
+      this.cb.stage?.(true);
+    }
+    this.pushView();
   }
 
   hide(): void {
@@ -223,22 +331,180 @@ export class GarageScreen {
     this.root.inert = true;
     this.root.setAttribute('aria-hidden', 'true');
     this.root.classList.remove('show');
+    this.stopInertia();
+    this.pointers.clear();
+    if (this.staged) {
+      this.staged = false;
+      this.cb.orbit?.(null);
+      this.cb.stage?.(false);
+    }
   }
 
   setDevice(d: 'keyboard' | 'gamepad' | 'touch' | null): void {
     this.legend.innerHTML =
       d === 'gamepad'
-        ? `<span><i class="pad">✚</i>Choose bike / outfit</span><span><i class="pad a">A</i>Select</span><span><i class="pad b">B</i>Back</span>`
+        ? `<span><i class="pad">✚</i>Choose</span><span><i class="pad a">A</i>Select</span><span><i class="pad b">B</i>Back</span>`
         : d === 'touch'
-          ? `<span>Tap a bike or outfit</span>`
-          : `<span><kbd>↑↓</kbd>Section</span><span><kbd>←→</kbd>Option</span><span><kbd>Enter</kbd>Select</span><span><kbd>Esc</kbd>Back</span>`;
+          ? `<span>Tap a chip to choose</span>`
+          : `<span><kbd>↑↓</kbd>Row</span><span><kbd>←→</kbd>Option</span><span><kbd>Enter</kbd>Select</span><span><kbd>Esc</kbd>Back</span>`;
+    this.legend.classList.toggle('hide', d === 'touch'); // a thumb needs no key legend; the hint carries the gesture
+    this.hint.innerHTML = `<i></i>${d === 'touch' ? 'Drag to rotate · pinch to zoom' : 'Drag to rotate · scroll to zoom'}`;
+  }
+
+  /** The orbit the explorer is showing (tests / harness). */
+  currentView(): GarageView {
+    return { ...this.view };
   }
 
   private canAct(target: HTMLElement = this.root): boolean {
     return this.visible && isLiveTarget(target);
   }
 
-  /** Focus moves the preview too (the backdrop bike swaps class), so the player sees before they commit. */
+  // -- explorer --------------------------------------------------------------------------
+
+  private resetView(): void {
+    this.view.yaw = GARAGE_VIEW.yaw;
+    this.view.pitch = GARAGE_VIEW.pitch;
+    this.view.dist = GARAGE_VIEW.dist;
+    this.view.screenX = GARAGE_VIEW.screenX;
+    this.view.screenY = GARAGE_VIEW.screenY;
+    this.yawVel = 0;
+    this.stopInertia();
+    this.touched = false;
+    this.hint.classList.remove('used');
+  }
+
+  private pushView(): void {
+    if (!this.staged) return;
+    this.cb.orbit?.({ ...this.view });
+  }
+
+  /** Programmatic turn / zoom (keyboard, harness): radians and a distance factor. */
+  rotate(dYaw: number, dPitch = 0, zoom = 1): void {
+    if (!this.canAct()) return;
+    this.view.yaw += dYaw;
+    this.view.pitch = clamp(this.view.pitch + dPitch, GARAGE_VIEW.pitchMin, GARAGE_VIEW.pitchMax);
+    this.view.dist = clamp(this.view.dist * zoom, GARAGE_VIEW.distMin, GARAGE_VIEW.distMax);
+    this.markUsed();
+    this.pushView();
+  }
+
+  private markUsed(): void {
+    if (this.touched) return;
+    this.touched = true;
+    this.hint.classList.add('used');
+  }
+
+  private bindExplorer(): void {
+    const el = this.stage;
+    el.addEventListener('pointerdown', (e) => {
+      if (!this.canAct(el)) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      e.preventDefault();
+      this.stopInertia();
+      try { el.setPointerCapture(e.pointerId); } catch { /* jsdom */ }
+      this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (this.pointers.size === 2) {
+        this.pinch0 = this.pinchSpan();
+        this.pinchDist0 = this.view.dist;
+      }
+      this.yawVel = 0;
+      this.lastMoveAt = performance.now();
+      el.classList.add('grabbing');
+    });
+    el.addEventListener('pointermove', (e) => {
+      const p = this.pointers.get(e.pointerId);
+      if (!p) return;
+      const dx = e.clientX - p.x;
+      const dy = e.clientY - p.y;
+      p.x = e.clientX;
+      p.y = e.clientY;
+      if (this.pointers.size === 1) {
+        const dYaw = -dx * GARAGE_VIEW.yawPerPx;
+        this.view.yaw += dYaw;
+        this.view.pitch = clamp(this.view.pitch + dy * GARAGE_VIEW.pitchPerPx, GARAGE_VIEW.pitchMin, GARAGE_VIEW.pitchMax);
+        const now = performance.now();
+        const dt = Math.max(1, now - this.lastMoveAt);
+        this.lastMoveAt = now;
+        // Angular velocity in rad/ms, lightly smoothed, for the release inertia.
+        this.yawVel = 0.6 * this.yawVel + 0.4 * (dYaw / dt);
+        if (dx || dy) this.markUsed();
+      } else if (this.pointers.size === 2 && this.pinch0 > 0) {
+        const span = this.pinchSpan();
+        if (span > 0) {
+          this.view.dist = clamp((this.pinchDist0 * this.pinch0) / span, GARAGE_VIEW.distMin, GARAGE_VIEW.distMax);
+          this.markUsed();
+        }
+      }
+      this.pushView();
+    });
+    const release = (e: PointerEvent): void => {
+      if (!this.pointers.delete(e.pointerId)) return;
+      try { el.releasePointerCapture(e.pointerId); } catch { /* not captured */ }
+      if (this.pointers.size === 1) {
+        // Back to one finger: the survivor becomes the drag origin, no pinch state.
+        this.pinch0 = 0;
+      } else if (this.pointers.size === 0) {
+        el.classList.remove('grabbing');
+        if (performance.now() - this.lastMoveAt < 80 && Math.abs(this.yawVel) > 0.0004) this.startInertia();
+      }
+    };
+    el.addEventListener('pointerup', release);
+    el.addEventListener('pointercancel', release);
+    el.addEventListener('wheel', (e) => {
+      if (!this.canAct(el)) return;
+      e.preventDefault();
+      const f = Math.exp(clamp(e.deltaY, -240, 240) * 0.0012);
+      this.view.dist = clamp(this.view.dist * f, GARAGE_VIEW.distMin, GARAGE_VIEW.distMax);
+      this.markUsed();
+      this.pushView();
+    }, { passive: false });
+    // Two-finger trackpad pinch on macOS Safari arrives as a gesture event, not a wheel.
+    let gestureDist = 0;
+    el.addEventListener('gesturestart', (e) => { e.preventDefault(); gestureDist = this.view.dist; });
+    el.addEventListener('gesturechange', (e) => {
+      e.preventDefault();
+      const scale = (e as Event & { scale?: number }).scale ?? 1;
+      if (!this.canAct(el) || !gestureDist || !scale) return;
+      this.view.dist = clamp(gestureDist / scale, GARAGE_VIEW.distMin, GARAGE_VIEW.distMax);
+      this.markUsed();
+      this.pushView();
+    });
+  }
+
+  private pinchSpan(): number {
+    const [a, b] = [...this.pointers.values()];
+    return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0;
+  }
+
+  private startInertia(): void {
+    this.stopInertia();
+    if (typeof requestAnimationFrame !== 'function') return;
+    let last = performance.now();
+    const step = (): void => {
+      const now = performance.now();
+      const dt = Math.min(50, now - last);
+      last = now;
+      this.yawVel *= Math.pow(0.9, dt / 16.7);
+      this.view.yaw += this.yawVel * dt;
+      this.pushView();
+      if (Math.abs(this.yawVel) < 0.00003 || !this.visible) {
+        this.inertia = 0;
+        return;
+      }
+      this.inertia = requestAnimationFrame(step);
+    };
+    this.inertia = requestAnimationFrame(step);
+  }
+
+  private stopInertia(): void {
+    if (this.inertia && typeof cancelAnimationFrame === 'function') cancelAnimationFrame(this.inertia);
+    this.inertia = 0;
+  }
+
+  // -- choices --------------------------------------------------------------------------
+
+  /** Focus moves the preview too (the staged bike swaps class), so the player sees before they commit. */
   private setFocus(b: BikeClass, tick: boolean): void {
     const changed = b !== this.focus;
     const moved = changed || this.focusGroup !== 'bike';
@@ -246,6 +512,14 @@ export class GarageScreen {
     this.focus = b;
     if (tick && moved) this.sfx.tick();
     if (changed) this.cb.previewBike(b);
+    this.paint();
+  }
+
+  private setModelFocus(v: ModelChoice, tick: boolean): void {
+    const moved = this.modelFocus !== v || this.focusGroup !== 'model';
+    this.focusGroup = 'model';
+    this.modelFocus = v;
+    if (tick && moved) this.sfx.tick();
     this.paint();
   }
 
@@ -264,38 +538,78 @@ export class GarageScreen {
       el.classList.toggle('selected', id === this.current);
       el.setAttribute('aria-pressed', String(id === this.current));
     }
+    const rider = this.cb.models?.get() ?? 'gltf';
+    for (const [v, el] of this.models) {
+      el.classList.toggle('on', this.focusGroup === 'model' && v === this.modelFocus);
+      el.classList.toggle('selected', v === rider);
+      el.setAttribute('aria-pressed', String(v === rider));
+    }
+    const blender = rider === 'gltf';
     for (const [outfit, button] of this.outfits) {
       button.classList.toggle('on', this.focusGroup === 'outfit' && outfit === this.outfitFocus);
-      button.classList.toggle('selected', outfit === this.currentOutfit);
-      button.setAttribute('aria-pressed', String(outfit === this.currentOutfit));
+      button.classList.toggle('selected', blender && outfit === this.currentOutfit);
+      button.setAttribute('aria-pressed', String(blender && outfit === this.currentOutfit));
       button.setAttribute('aria-busy', String(outfit === this.pendingOutfit));
     }
+    const active = !blender
+      ? `${rider === 'img2' ? 'Img2 experiment' : 'Classic rider'} · pick an outfit for the Blender rider`
+      : `${OUTFIT_LABEL[this.currentOutfit]} selected`;
     const status = this.pendingOutfit
       ? `Loading ${OUTFIT_LABEL[this.pendingOutfit]}…`
       : this.failedOutfit
-        ? `Could not load ${OUTFIT_LABEL[this.failedOutfit]}. Select it to retry. ${OUTFIT_LABEL[this.currentOutfit]} selected.`
-        : `${OUTFIT_LABEL[this.currentOutfit]} selected`;
+        ? `Could not load ${OUTFIT_LABEL[this.failedOutfit]}. Select it to retry. ${active}`
+        : active;
     if (this.outfitStatus.textContent !== status) this.outfitStatus.textContent = status;
+    // The sheet: the focused bike's class, bars, character and note (the preview follows the focus, so the copy
+    // does too), then the outfit and rider lines. The balance hint rides as the sheet's title.
+    const spec = BIKE_SPECS[this.focusGroup === 'bike' ? this.focus : this.current];
+    const riderLabel = RIDER_MODEL_OPTIONS.find((o) => o.v === rider)?.l ?? 'Blender';
+    const sheet = `<div class="gp-name" style="--tint:${spec.tint}"><b>${escapeHtml(spec.name)}</b><small>${spec.id === 'rookie' ? 'Class A' : 'Class P'}</small></div>
+      <div class="gp-stats">${bar('Power', spec.power)}${bar('Grip', spec.grip)}${bar('Weight', spec.weight, spec.weightFeel)}</div>
+      <div class="gp-line">${escapeHtml(spec.line)}</div>
+      <div class="gp-note">${escapeHtml(spec.note)}</div>
+      <div class="gp-kv"><span>Outfit</span><b>${escapeHtml(blender ? OUTFIT_LABEL[this.currentOutfit] : '—')}</b></div>
+      <div class="gp-kv"><span>Rider</span><b>${escapeHtml(riderLabel)}</b></div>`;
+    if (this.detail.innerHTML !== sheet) this.detail.innerHTML = sheet;
+    this.detail.title = BALANCE_HINT;
     this.backButton.classList.toggle('on', this.focusGroup === 'back');
+  }
+
+  /** Focus rows in rail order (top → bottom), then the ‹ MENU pill. */
+  private groups(): Group[] {
+    return this.cb.models ? ['model', 'outfit', 'bike', 'back'] : ['outfit', 'bike', 'back'];
   }
 
   nav(dx: number, dy: number): void {
     if (!this.canAct() || (!dx && !dy)) return;
     if (dy) {
-      const groups = ['bike', 'outfit', 'back'] as const;
+      const groups = this.groups();
       const index = groups.indexOf(this.focusGroup);
-      this.focusGroup = groups[(index + (dy > 0 ? 1 : 2)) % groups.length]!;
+      this.focusGroup = groups[(index + (dy > 0 ? 1 : groups.length - 1)) % groups.length]!;
       this.sfx.tick();
       this.paint();
     } else if (this.focusGroup === 'bike') this.setFocus(this.focus === 'rookie' ? 'pro' : 'rookie', true);
-    else if (this.focusGroup === 'outfit') this.setOutfitFocus(RIDER_OUTFITS[(RIDER_OUTFITS.indexOf(this.outfitFocus) + (dx > 0 ? 1 : -1) + RIDER_OUTFITS.length) % RIDER_OUTFITS.length]!, true);
-    const target = this.focusGroup === 'bike' ? this.cards.get(this.focus) : this.focusGroup === 'outfit' ? this.outfits.get(this.outfitFocus) : this.backButton;
-    target?.focus();
+    else if (this.focusGroup === 'model') {
+      const i = RIDER_MODEL_OPTIONS.findIndex((o) => o.v === this.modelFocus);
+      this.setModelFocus(RIDER_MODEL_OPTIONS[(i + (dx > 0 ? 1 : -1) + RIDER_MODEL_OPTIONS.length) % RIDER_MODEL_OPTIONS.length]!.v, true);
+    } else if (this.focusGroup === 'outfit') this.setOutfitFocus(RIDER_OUTFITS[(RIDER_OUTFITS.indexOf(this.outfitFocus) + (dx > 0 ? 1 : -1) + RIDER_OUTFITS.length) % RIDER_OUTFITS.length]!, true);
+    const target = this.focusGroup === 'bike' ? this.cards.get(this.focus) : this.focusGroup === 'model' ? this.models.get(this.modelFocus) : this.focusGroup === 'outfit' ? this.outfits.get(this.outfitFocus) : this.backButton;
+    target?.focus({ preventScroll: true });
   }
 
   confirm(): void {
     if (!this.canAct()) return;
     if (this.focusGroup === 'back') return this.back();
+    if (this.focusGroup === 'model') {
+      const m = this.cb.models;
+      if (!m) return;
+      if (m.get() !== this.modelFocus) {
+        m.set(this.modelFocus);
+        this.sfx.confirm();
+      }
+      this.paint();
+      return;
+    }
     if (this.focusGroup === 'outfit') {
       const outfit = this.outfitFocus;
       if (this.pendingOutfit === outfit) return;

@@ -1,0 +1,202 @@
+{
+  "932x430": {
+    "heroShareH": 0.6108638218677228,
+    "heroShareW": 0.33046807618671215,
+    "heroTop": 0.18842882892173352,
+    "heroBottom": 0.7992926507894563,
+    "heroLeft": 0.33870240037856125,
+    "heroRight": 0.6691704765652734,
+    "calls": 73,
+    "tris": 162843,
+    "rtMpx": 0.66,
+    "tier": "low",
+    "profile": "low",
+    "heroDoc": "bike-lod rider",
+    "override": "orbit",
+    "canvas": [
+      932,
+      430
+    ],
+    "tappables": [
+      {
+        "cls": "chip",
+        "x": 33,
+        "y": 127,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.selected",
+        "x": 144,
+        "y": 127,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip",
+        "x": 33,
+        "y": 174,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 33,
+        "y": 224,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 144,
+        "y": 224,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 33,
+        "y": 271,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 144,
+        "y": 271,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 33,
+        "y": 318,
+        "w": 108,
+        "h": 47
+      },
+      {
+        "cls": "chip.bike-chip",
+        "x": 33,
+        "y": 371,
+        "w": 108,
+        "h": 51
+      },
+      {
+        "cls": "chip.bike-chip",
+        "x": 144,
+        "y": 371,
+        "w": 108,
+        "h": 51
+      },
+      {
+        "cls": "backbtn",
+        "x": 825,
+        "y": 16,
+        "w": 83,
+        "h": 44
+      }
+    ],
+    "errors": [],
+    "file": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/1e182bc7-5cf2-4e60-9e21-0ab5b46f5a7d/scratchpad/garage/final-chromium-932x430.png"
+  },
+  "844x390": {
+    "heroShareH": 0.6108638218677228,
+    "heroShareW": 0.3309780015770587,
+    "heroTop": 0.18842882892173352,
+    "heroBottom": 0.7992926507894563,
+    "heroLeft": 0.3384535117645747,
+    "heroRight": 0.6694315133416334,
+    "calls": 73,
+    "tris": 162843,
+    "rtMpx": 0.59,
+    "tier": "low",
+    "profile": "low",
+    "heroDoc": "bike-lod rider",
+    "override": "orbit",
+    "canvas": [
+      844,
+      390
+    ],
+    "tappables": [
+      {
+        "cls": "chip",
+        "x": 33,
+        "y": 92,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.selected",
+        "x": 144,
+        "y": 92,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip",
+        "x": 33,
+        "y": 139,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 33,
+        "y": 189,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 144,
+        "y": 189,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 33,
+        "y": 236,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 144,
+        "y": 236,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.outfit-button",
+        "x": 33,
+        "y": 283,
+        "w": 108,
+        "h": 44
+      },
+      {
+        "cls": "chip.bike-chip",
+        "x": 33,
+        "y": 333,
+        "w": 108,
+        "h": 49
+      },
+      {
+        "cls": "chip.bike-chip",
+        "x": 144,
+        "y": 333,
+        "w": 108,
+        "h": 49
+      },
+      {
+        "cls": "backbtn",
+        "x": 743,
+        "y": 16,
+        "w": 77,
+        "h": 44
+      }
+    ],
+    "errors": [],
+    "file": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/1e182bc7-5cf2-4e60-9e21-0ab5b46f5a7d/scratchpad/garage/final-chromium-844x390.png"
+  }
+}

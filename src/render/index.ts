@@ -38,6 +38,7 @@ import { groundFloorY, profileY } from './world/track';
 import { stabilizePrograms, type MaterialKindsReport } from './util/materialKinds';
 import { tagBloomers } from './post/emissiveBloom';
 import { HALL } from './world/hall';
+import { buildGarageStage, GARAGE_LAMPS, type GarageStage } from './world/garageStage';
 import { buildRideSurfaces } from './world/deck';
 
 /** One frame later (rAF, or a macrotask without one) — the ≤ 16 ms task boundary for `prepare()` and track entry. */
@@ -82,6 +83,11 @@ export interface GameRenderer {
   setRiderOutfit?(outfit: RiderOutfit): Promise<boolean>;
   /** CONTRACT §2.7 (perf cut #3): the app's device class — `high` on a phone is the phone-high pass list (docs/plans/PERF.md §3.1). */
   setDeviceClass?(c: 'phone' | 'desktop'): void;
+  /**
+   * Garage round: stage the hero on the workshop set (world meshes hidden, stage lighting) while the garage
+   * screen is up; `false` restores the track exactly. Pair with `setCameraOverride({ mode: 'orbit', … })`.
+   */
+  setGarageStage?(on: boolean): void;
 }
 
 export interface ThreeRendererOptions {
@@ -113,6 +119,10 @@ const WORLD_MESH = /^(props:|deck:|obstacles:|ribbon:)/;
 /** The surfaces the bike rides — the only shadow receivers on `low` (the deck AO skirt excluded). */
 const RIDE_SURFACE = /^(deck:(?!ao)|obstacles:|ribbon:)/;
 /** Hero parts too small to change the 512² silhouette on `low` (chain, sprockets, shock, pegs, spokes): no shadow draw there. */
+/** Garage round: the mirrored hero (BE3 wet floor) is built only under this many hero triangles. */
+const REFLECTION_MAX_TRIS = 150_000;
+/** Garage round: the sky is replaced by the room's own dark while the stage is up (the shell encloses the orbit). */
+const STAGE_BACKGROUND = new THREE.Color(0x0b0c10);
 /** Perf cut #1: consecutive identical frames skipped before one is drawn anyway (a valve for mutations the key cannot see). */
 const SKIP_MAX = 30;
 const HERO_SMALL = /^(chain|sprocket_(front|rear)|shock_(body|spring|shaft|clevis)|pegs|wheel_(front|rear)(_spokes|:spokes))$/;
@@ -193,6 +203,7 @@ export class ThreeRenderer implements GameRenderer {
       if (this.track) this.lighting.setFloor(groundFloorY(this.track.def.profile, this.biome.interior));
       if (this.artBackground) this.scene.background = this.artBackground;
       if (this.track) this.beginEntry();
+      if (this.stageOn) this.applyGarageStage();
     }
     this.resolveRestored?.();
     this.resolveRestored = null;
@@ -218,6 +229,18 @@ export class ThreeRenderer implements GameRenderer {
   private postRef: PostChain | null = null;
   private readonly frames = new FrameBuilder();
   private world: World | null = null;
+  /** Garage round: the workshop set (built once, `world/garageStage.ts`), whether it is up, and the world meshes it hid. */
+  private stage: GarageStage | null = null;
+  private stageOn = false;
+  private readonly stageHidden = new Set<THREE.Object3D>();
+  private stageX = NaN;
+  private stageSavedBackground: THREE.Scene['background'] = null;
+  /**
+   * Garage round (BE3 wet floor): the hero mirrored in the floor plane — one mirror mesh per hero mesh under a
+   * y-flipped group, its local matrix copied from the real mesh's world matrix each drawn frame (skinned parts
+   * share the live skeleton), materials darkened copies of the real ones, seen through the 76 % floor.
+   */
+  private reflection: { mirror: THREE.Group; pairs: { real: THREE.Mesh; copy: THREE.Mesh }[]; mats: Map<THREE.Material, THREE.Material>; roots: THREE.Object3D[] } | null = null;
   /** Round 15: last frame's foreground occluder query (ms), `debugInfo().occluderMs`. */
   private occluderMs = 0;
   private track: CompiledTrack | null = null;
@@ -624,6 +647,11 @@ export class ThreeRenderer implements GameRenderer {
       this.retireObject(old.root, () => { old.bike.dispose(); old.rider.dispose(); for (const mat of old.mats) mat.dispose(); });
       this.ghost = this.buildGhost();
       this.ghost.root.visible = gs !== null;
+    }
+    if (changed && this.stageOn) {
+      // The garage's mirrored hero follows the swap too (outfit / rider model picked in the garage).
+      this.dropReflection();
+      if (this.reflectable()) this.reflection = this.buildReflection();
     }
   }
 
@@ -1124,7 +1152,183 @@ export class ThreeRenderer implements GameRenderer {
     if (this.world.trackCalls > 20 || this.world.trackTris > 80_000) {
       console.warn(`[render] track budget: ${this.world.trackCalls} calls / ${Math.round(this.world.trackTris)} tris (cap 20 / 80k)`);
     }
+    if (this.stageOn) this.applyGarageStage(); // a garage bike-class swap reloads the track under the stage
     this.beginEntry();
+  }
+
+  // -- garage stage ------------------------------------------------------------------
+
+  /**
+   * Garage round: put the hero on the workshop set. The world's meshes are hidden one by one (its lights
+   * stay visible, so no program is re-keyed by a light-count change), the lighting rig swaps to the stage
+   * key / fill with the fog pushed out, the sky background goes dark, and the set is placed at the hero's
+   * feet. `false` reverses every step; `applyTierVisibility` then recomputes the tier hides.
+   */
+  setGarageStage(on: boolean): void {
+    if (this.disposed || this.stageOn === on) return;
+    this.stageOn = on;
+    if (on) this.applyGarageStage();
+    else this.clearGarageStage();
+    this.invalidate();
+  }
+
+  private applyGarageStage(): void {
+    if (!this.stage) {
+      const art = this.art.ok && this.art.settled ? this.art : null;
+      this.stage = buildGarageStage(this.lib, art);
+      // Compile the set's handful of programs off the first garage frame (best effort; never awaited).
+      void this.compileMaterials(this.collectMaterials(this.stage.group)).catch(() => undefined);
+    }
+    if (!this.stage.group.parent) this.scene.add(this.stage.group);
+    this.stage.shafts.visible = this.tier !== 'low'; // the additive daylight shafts are overdraw a tile GPU skips
+    if (!this.reflection && this.bikeRef && this.riderRef && this.reflectable()) this.reflection = this.buildReflection();
+    this.hideWorldMeshes();
+    this.lightingRig?.setStage(true);
+    if (this.scene.background !== STAGE_BACKGROUND) this.stageSavedBackground = this.scene.background; // the sky / art panorama the track had
+    this.scene.background = STAGE_BACKGROUND;
+    this.stageX = NaN; // re-place at the hero on the next frame
+    this.invalidate();
+  }
+
+  private clearGarageStage(): void {
+    if (this.stage?.group.parent) this.scene.remove(this.stage.group);
+    this.dropReflection();
+    for (const o of this.stageHidden) o.visible = true;
+    this.stageHidden.clear();
+    this.lightingRig?.setStage(false);
+    if (this.scene.background === STAGE_BACKGROUND) this.scene.background = this.stageSavedBackground;
+    this.stageSavedBackground = null;
+    if (this.world) this.applyTierVisibility();
+    this.invalidate();
+  }
+
+  /** Every drawable under the world group, hidden and remembered (lights and groups are left alone). */
+  private hideWorldMeshes(): void {
+    const w = this.world;
+    if (!w) return;
+    w.group.traverse((o) => {
+      const d = o as THREE.Mesh & { isPoints?: boolean; isLine?: boolean; isSprite?: boolean };
+      if (!(d.isMesh || d.isPoints || d.isLine || d.isSprite) || !o.visible) return;
+      o.visible = false;
+      this.stageHidden.add(o);
+    });
+  }
+
+  /** The set sits at the hero's rear-wheel contact (profile y under the bike); re-placed when the bike x changes. */
+  private placeGarageStage(bikeX: number, bikeY: number): void {
+    const st = this.stage;
+    if (!st || bikeX === this.stageX) return;
+    this.stageX = bikeX;
+    const gy = this.rig.ground ? this.rig.ground(bikeX) : bikeY - 0.55;
+    st.group.position.set(bikeX, gy, 0);
+    st.group.updateMatrixWorld(true);
+    if (this.reflection) this.reflection.mirror.position.y = 2 * gy; // y → 2·floor − y
+    this.invalidate();
+  }
+
+  /**
+   * The mirrored hero (garage round, BE3): for every mesh of the bike and the rider a twin under a group
+   * scaled −1 in y about the floor plane (three flips the winding for a negative-determinant matrix). Twins
+   * carry no logic: `syncReflection` copies each real mesh's world matrix into the twin's local matrix every
+   * drawn frame, so the bike's own world-space placement math is never run under the mirror; skinned twins
+   * share the live skeleton (bind matrix as the local matrix, bind mode detached → M_mirror · Σ bones · B).
+   * Materials are darkened copies of whatever the real mesh wears on that frame (liveries and outfit variants
+   * follow). Rebuilt with the hero on a model / LOD swap (`applyModels`), dropped with the stage.
+   */
+  private buildReflection(): NonNullable<ThreeRenderer['reflection']> {
+    const mirror = new THREE.Group();
+    mirror.name = 'reflection:mirror';
+    mirror.scale.set(1, -1, 1);
+    mirror.position.y = 2 * (this.stage?.group.position.y ?? 0);
+    const pairs: { real: THREE.Mesh; copy: THREE.Mesh }[] = [];
+    const skip = new Set<THREE.Object3D>(this.bike.contacts);
+    const roots = [this.bike.root, this.rider.root];
+    for (const root of roots) {
+      root.traverse((o) => {
+        const real = o as THREE.Mesh;
+        if (!real.isMesh) return;
+        for (let a: THREE.Object3D | null = o; a; a = a.parent) if (skip.has(a)) return;
+        let copy: THREE.Mesh;
+        const sk = real as THREE.SkinnedMesh;
+        const inst = real as THREE.InstancedMesh;
+        if (sk.isSkinnedMesh) {
+          const c = new THREE.SkinnedMesh(real.geometry, real.material);
+          c.bindMode = THREE.DetachedBindMode;
+          c.bind(sk.skeleton, sk.bindMatrix);
+          c.matrix.copy(sk.bindMatrix);
+          copy = c;
+        } else if (inst.isInstancedMesh) {
+          const c = new THREE.InstancedMesh(real.geometry, real.material, inst.count);
+          c.instanceMatrix = inst.instanceMatrix;
+          if (inst.instanceColor) c.instanceColor = inst.instanceColor;
+          copy = c;
+        } else copy = new THREE.Mesh(real.geometry, real.material);
+        copy.name = `reflection:${real.name}`;
+        copy.matrixAutoUpdate = false;
+        copy.frustumCulled = false;
+        copy.castShadow = false;
+        copy.receiveShadow = false;
+        copy.renderOrder = -1;
+        if (real.morphTargetInfluences) {
+          copy.morphTargetInfluences = real.morphTargetInfluences;
+          copy.morphTargetDictionary = real.morphTargetDictionary;
+        }
+        mirror.add(copy);
+        pairs.push({ real, copy });
+      });
+    }
+    const r = { mirror, pairs, mats: new Map<THREE.Material, THREE.Material>(), roots };
+    this.syncReflection(r);
+    this.scene.add(mirror);
+    this.invalidate();
+    return r;
+  }
+
+  /** Per drawn frame: matrices, visibility and (darkened) materials of the twins follow the real hero. */
+  private syncReflection(r: NonNullable<ThreeRenderer['reflection']>): void {
+    const dark = (src: THREE.Material): THREE.Material => {
+      let g = r.mats.get(src);
+      if (g) return g;
+      g = src.clone();
+      const gs = g as THREE.MeshStandardMaterial;
+      if (gs.isMeshStandardMaterial) {
+        gs.color.multiplyScalar(0.55); // wet concrete returns a darker image
+        gs.envMapIntensity = 0.5;
+        gs.emissiveIntensity *= 0.6;
+      } else if ((g as THREE.MeshBasicMaterial).isMeshBasicMaterial) (g as THREE.MeshBasicMaterial).color.multiplyScalar(0.55);
+      r.mats.set(src, g);
+      return g;
+    };
+    for (const { real, copy } of r.pairs) {
+      let vis = true;
+      for (let a: THREE.Object3D | null = real; a && vis; a = a.parent) {
+        vis = a.visible;
+        if (r.roots.includes(a)) break;
+      }
+      copy.visible = vis;
+      if (!vis) continue;
+      if (!(copy as THREE.SkinnedMesh).isSkinnedMesh) copy.matrix.copy(real.matrixWorld);
+      copy.matrixWorldNeedsUpdate = true;
+      const m = real.material;
+      if (Array.isArray(m)) {
+        const cm = copy.material as THREE.Material[];
+        if (!Array.isArray(cm) || cm.length !== m.length) copy.material = m.map(dark);
+        else for (let i = 0; i < m.length; i++) if (r.mats.get(m[i]!) !== cm[i]) cm[i] = dark(m[i]!);
+      } else if (r.mats.get(m) !== copy.material) copy.material = dark(m);
+    }
+  }
+
+  /** The cheap trick stays cheap: no mirror twin for a hero over 150 k triangles (the Img2 experiment's 480 k would double the frame). */
+  private reflectable(): boolean {
+    return (this.bikeRef?.triangles ?? 0) + (this.riderRef?.triangles ?? 0) <= REFLECTION_MAX_TRIS;
+  }
+
+  private dropReflection(): void {
+    const r = this.reflection;
+    if (!r) return;
+    this.reflection = null;
+    this.scene.remove(r.mirror);
+    this.retireObject(r.mirror, () => { for (const mat of r.mats.values()) mat.dispose(); });
   }
 
   onEvent(e: GameEvent): void {
@@ -1240,6 +1444,7 @@ export class ThreeRenderer implements GameRenderer {
     this.lightingRig?.setQuality(this.shadowTier);
     this.emitters.countScale = tier === 'low' ? 0.5 : 1;
     this.emitters.ambientEnabled = tier !== 'low';
+    if (this.stage) this.stage.shafts.visible = tier !== 'low';
     // Round 12: the tier owns the canvas resolution (low ≤ 1.0 DPR / 1600 px, medium ≤ 1.25, high ≤ 2).
     this.resize(this.width, this.height);
     // Round 13 (H3): the shadow map stays on for every tier — `low` runs the hero-only 512² map
@@ -1304,6 +1509,7 @@ export class ThreeRenderer implements GameRenderer {
     // Perf cut #0: no per-frame program re-acquisition (single-pass transparents, per-kind clones, per-kind depth materials).
     this.programReport = stabilizePrograms(this.scene, this.lib);
     if (phoneHigh) this.bloomers = tagBloomers(this.scene); // perf cut #3: the emissive-only bloom's sources
+    if (this.stageOn) this.hideWorldMeshes(); // the tier rules above may have re-shown a batch under the garage stage
     this.invalidate(); // perf cut #1: a build / hero swap / tier change reaches the pixels
   }
 
@@ -1379,6 +1585,7 @@ export class ThreeRenderer implements GameRenderer {
     }
     const f = this.frames.build(state, alpha);
     this.lastTSim = f.tSim;
+    if (this.stageOn) this.placeGarageStage(f.bikeX, f.bikeY);
 
     this.rig.update(f);
     const cam = this.rig.camera;
@@ -1402,6 +1609,7 @@ export class ThreeRenderer implements GameRenderer {
 
     this.bike.update(f);
     this.rider.update(f);
+    if (this.reflection) this.syncReflection(this.reflection); // garage round: the twins follow the hero's matrices
     // Ghost: same interpolation, its own state history; capped at 35 % opacity.
     if (this.ghost) {
       const gs = this.ghostState;
@@ -1454,8 +1662,28 @@ export class ThreeRenderer implements GameRenderer {
           pl.intensity = M.intensity * flick;
         }
       }
-      if (w.lampLights.length) {
+      if (w.lampLights.length && this.stageOn && this.stage) {
+        // Garage round: the hall's follow spots are the stage's work lamp (warm, front-left) and a soft cool
+        // right fill — parked at `GARAGE_LAMPS` in the room, aimed at the hero; no light is added or removed.
+        const o = this.stage.group.position;
+        for (let k = 0; k < w.lampLights.length; k++) {
+          const sl = w.lampLights[k]!;
+          const L = GARAGE_LAMPS[k];
+          if (!L) {
+            sl.intensity = 0;
+            continue;
+          }
+          sl.position.set(o.x + L.x, o.y + L.y, o.z + L.z);
+          sl.target.position.set(f.bikeX, f.bikeY + 0.3, 0);
+          sl.target.updateMatrixWorld();
+          sl.color.setHex(L.color);
+          sl.intensity = L.intensity;
+          sl.angle = L.angle;
+          sl.penumbra = L.penumbra;
+        }
+      } else if (w.lampLights.length) {
         nearestK(w.lamps, this.rig.targetX, w.lampLights.length, this.nearestScratch);
+        const L = this.biome.lampLights!;
         for (let k = 0; k < w.lampLights.length; k++) {
           const sl = w.lampLights[k]!;
           const idx = this.nearestScratch[k]!;
@@ -1467,7 +1695,13 @@ export class ThreeRenderer implements GameRenderer {
           sl.position.set(l.x, l.y - 0.2, l.z);
           sl.target.position.set(l.x, l.y - 8, l.z + 0.6);
           sl.target.updateMatrixWorld();
-          sl.intensity = this.biome.lampLights!.intensity;
+          sl.intensity = L.intensity;
+          if (sl.angle !== L.angle) {
+            // Back from the garage stage: the biome's cone and colour again.
+            sl.angle = L.angle;
+            sl.penumbra = L.penumbra;
+            sl.color.setHex(L.color);
+          }
         }
       }
       // Crowd: cheer for 3.5 s after GO and through the finish; sway otherwise.
@@ -1665,6 +1899,8 @@ export class ThreeRenderer implements GameRenderer {
     prepare: { step: string; ms: number; bytes: number }[];
     /** Round 15: foreground occluder query — last frame ms, instances tested / hit, registered count, override mode. */
     occluder: { ms: number; tested: number; hits: number; count: number; override: string | null };
+    /** Garage round: the workshop set — up or not, its draws, the world drawables it hides. */
+    garage: { on: boolean; draws: number; hidden: number; textureMB: number; reflection: boolean };
   } {
     const writes: PassWrite[] = this.postRef ? this.postRef.passWrites() : [];
     const shadowMap = this.renderer.shadowMap.enabled && this.lightingRig ? this.lightingRig.shadowMapSize : 0;
@@ -1680,6 +1916,7 @@ export class ThreeRenderer implements GameRenderer {
       biome: this.biome.id,
       zoom: this.rig.zoomState,
       occluder: { ms: +this.occluderMs.toFixed(4), tested: this.world?.occluders.lastTested ?? 0, hits: this.world?.occluders.lastHits ?? 0, count: this.world?.occluders.count ?? 0, override: this.rig.overrideMode },
+      garage: { on: this.stageOn, draws: this.stage?.draws ?? 0, hidden: this.stageHidden.size, textureMB: +((this.stage?.textureBytes ?? 0) / 1048576).toFixed(2), reflection: !!this.reflection },
       phase: this.phase,
       tier: this.tier,
       dpr: +this.pixelRatio.toFixed(3),
@@ -1738,6 +1975,14 @@ export class ThreeRenderer implements GameRenderer {
       this.scene.remove(ghost.root);
       this.retireObject(ghost.root, () => { ghost.bike.dispose(); ghost.rider.dispose(); for (const mat of ghost.mats) mat.dispose(); });
     }
+    this.dropReflection();
+    const stage = this.stage;
+    if (stage) {
+      this.stage = null;
+      this.stageOn = false;
+      if (stage.group.parent) this.scene.remove(stage.group);
+      this.retireObject(stage.group, () => stage.dispose());
+    }
     this.canvas.remove();
     this.disposal = (async () => {
       // Source epochs and disposed guards stop queued batches and late boot/model callbacks.
@@ -1778,6 +2023,7 @@ export class ThreeRenderer implements GameRenderer {
     if (!w) return;
     this.scene.remove(w.group);
     this.world = null;
+    this.stageHidden.clear(); // garage round: the meshes the stage hid go with the world (the new world is hidden afresh in setTrack)
     const owned = this.collectMaterials(w.group).filter((material) => !material.name);
     this.retirement.retire(materialPrograms(this.renderer, owned), () => w.group.traverse((o) => {
       const m = o as THREE.Mesh;

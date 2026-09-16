@@ -3,35 +3,21 @@
  * navigation helper, and the rotate prompt.
  * Every target ≥ 44 px; mouse, touch, keyboard and pad via `confirm()`/`move()`.
  */
-import type { QualityTier, RiderOutfit } from '../core/types';
-import type { ModelChoice } from './best';
+import type { QualityTier } from '../core/types';
 import { formatTime } from './format';
 import { BUILD_STAMP, GAME_NAME, escapeHtml, hardReload } from './front';
 import { TileRow } from './tiles';
 import { logicalRect } from './orientation';
 import type { UiSfx } from './sfx';
 import { conceal, reveal, isLiveTarget } from './live';
-import { RIDER_OUTFITS, OUTFIT_LABEL, OUTFIT_DETAIL } from './outfit';
 
 export type QualityChoice = QualityTier | 'auto';
 
 export interface PauseCallbacks {
-  outfits?: { get(): RiderOutfit; set(outfit: RiderOutfit): Promise<boolean> };
   resume(): void;
   restartTrack(): void;
   quit(): void;
-  /** Live rider / bike model swap (renderer `setModels`); rows exist only when `models` is given. */
-  models?: {
-    get(): { rider: ModelChoice; bike: ModelChoice };
-    set(which: 'rider' | 'bike', v: ModelChoice): void;
-  };
 }
-
-const MODEL_OPTIONS = [
-  { v: 'proc', l: 'Procedural' },
-  { v: 'gltf', l: 'Modelled' },
-];
-const RIDER_MODEL_OPTIONS = [{ v: 'proc', l: 'Classic' }, { v: 'gltf', l: 'Blender' }, { v: 'img2', l: 'Img2 experiment' }];
 
 /**
  * Spatial focus navigation over the visible buttons of `root`: pick the nearest
@@ -92,31 +78,22 @@ const RELOAD_ARM_MS = 2000;
 
 /**
  * Pause overlay (assets/design/pause/SPEC.md, direction A "low action bar"):
- * title block top-left (kicker · title · stats), Visuals chip row top-right
- * (only with `cb.models`, live preview behind the flat 50 % scrim), three
- * tiles RESUME / RESTART / QUIT centred in the lower third for landscape-phone
- * thumbs, Reload as an armed two-press corner link, device legend bottom-right.
- * Focus ring: seg row ⇅ tiles ⇅ reload; left/right on a segment flips it.
+ * title block top-left (kicker · title · stats), three tiles RESUME / RESTART /
+ * QUIT centred in the lower third for landscape-phone thumbs, Reload as an
+ * armed two-press corner link, device legend bottom-right. The rider model /
+ * outfit rows moved to the Garage (garage round): nothing cosmetic is chosen
+ * mid-run. Focus ring: tiles ⇅ reload.
  */
 export class PauseMenu {
   readonly root: HTMLDivElement;
   private readonly kicker: HTMLDivElement;
   private readonly title: HTMLDivElement;
   private readonly stats: HTMLDivElement;
-  private readonly visuals: HTMLDivElement | null = null;
-  private readonly segs: Record<'rider' | 'bike', HTMLElement[]> = { rider: [], bike: [] };
   private readonly tiles: TileRow;
   private readonly reload: HTMLButtonElement;
   private readonly legend: HTMLDivElement;
-  /** Focus rows: rider, bike, outfits, action tiles, reload. */
-  private row: 0 | 1 | 2 | 3 | 4 = 1;
-  private seg: 'rider' | 'bike' = 'rider';
-  private readonly outfitButtons = new Map<RiderOutfit, HTMLButtonElement>();
-  private readonly outfitStatus = document.createElement('div');
-  private outfitFocus = 0;
-  private pendingOutfit: RiderOutfit | null = null;
-  private failedOutfit: RiderOutfit | null = null;
-  private outfitRequest = 0;
+  /** Focus rows: action tiles, reload. */
+  private row: 1 | 2 = 1;
   private reloadArmedAt = -1;
   private reloadTimer = 0;
   private short = false;
@@ -136,45 +113,6 @@ export class PauseMenu {
     this.stats.className = 'ov-stats';
     block.append(this.kicker, this.title, this.stats);
     head.appendChild(block);
-    if (cb.models) {
-      const v = document.createElement('div');
-      v.className = 'visuals';
-      const seg = (which: 'rider' | 'bike', label: string) =>
-        `<span class="vlab">${label}</span><span class="mini-seg" role="group" aria-label="${label} model" data-which="${which}">${(which === 'rider' ? RIDER_MODEL_OPTIONS : MODEL_OPTIONS).map((o) => `<button type="button" data-v="${o.v}">${o.l}</button>`).join('')}</span>`;
-      v.innerHTML = `<span class="vtitle">Visuals</span>${seg('rider', 'Rider')}<i class="vsep"></i>${seg('bike', 'Bike')}`;
-      for (const which of ['rider', 'bike'] as const) this.segs[which] = [...v.querySelectorAll<HTMLElement>(`.mini-seg[data-which="${which}"] button`)];
-      v.addEventListener('click', (e) => {
-        const b = (e.target as HTMLElement).closest<HTMLElement>('.mini-seg button');
-        if (!b || !this.visible || !isLiveTarget(b)) return;
-        const which = b.parentElement!.dataset['which'] as 'rider' | 'bike';
-        const v2 = b.dataset['v'] as ModelChoice;
-        this.row = which === 'rider' ? 0 : 4;
-        this.seg = which;
-        if (cb.models!.get()[which] !== v2) cb.models!.set(which, v2);
-        this.paintModels();
-        this.paintOutfits();
-        this.paintFocus();
-      });
-      v.addEventListener('pointermove', (e) => {
-        const seg2 = (e.target as HTMLElement).closest<HTMLElement>('.mini-seg');
-        if (!seg2) return;
-        const which = seg2.dataset['which'] as 'rider' | 'bike';
-        if (this.row !== 0 || this.seg !== which) {
-          this.row = which === 'rider' ? 0 : 4;
-          this.seg = which;
-          this.paintFocus();
-        }
-      });
-      v.addEventListener('focusin', (event) => {
-        const group = (event.target as HTMLElement).closest<HTMLElement>('.mini-seg');
-        if (!group) return;
-        this.seg = group.dataset['which'] as 'rider' | 'bike';
-        this.row = this.seg === 'rider' ? 0 : 4;
-        this.paintFocus();
-      });
-      head.appendChild(v);
-      this.visuals = v;
-    }
     const free = document.createElement('div');
     free.className = 'ov-free';
     this.tiles = new TileRow(this.root, sfx);
@@ -190,36 +128,6 @@ export class PauseMenu {
     };
     this.root.insertBefore(free, this.tiles.root);
     this.root.insertBefore(head, free);
-    if (cb.outfits) {
-      this.root.classList.add('has-outfits');
-      const panel = document.createElement('div');
-      panel.className = 'pause-outfits';
-      panel.innerHTML = '<div class="outfit-heading"><strong>Rider outfit</strong></div>';
-      const options = document.createElement('div');
-      options.className = 'outfit-options';
-      options.setAttribute('role', 'group');
-      options.setAttribute('aria-label', 'Rider outfit');
-      for (const [index, outfit] of RIDER_OUTFITS.entries()) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'outfit-button';
-        button.dataset['outfit'] = outfit;
-        button.innerHTML = `<strong>${escapeHtml(OUTFIT_LABEL[outfit])}</strong><span>${escapeHtml(OUTFIT_DETAIL[outfit])}</span>`;
-        button.addEventListener('focus', () => { this.row = 3; this.outfitFocus = index; this.paintFocus(); });
-        button.addEventListener('click', () => {
-          if (!this.visible || !isLiveTarget(button)) return;
-          this.row = 3;
-          this.outfitFocus = index;
-          void this.selectOutfit(outfit);
-        });
-        this.outfitButtons.set(outfit, button);
-        options.appendChild(button);
-      }
-      this.outfitStatus.className = 'outfit-current';
-      this.outfitStatus.setAttribute('role', 'status');
-      panel.append(options, this.outfitStatus);
-      this.root.insertBefore(panel, free);
-    }
     const foot = document.createElement('div');
     foot.className = 'ov-foot';
     this.reload = document.createElement('button');
@@ -279,8 +187,6 @@ export class PauseMenu {
     this.row = 1;
     this.tiles.focusId('resume');
     this.disarmReload();
-    this.paintModels();
-    this.paintOutfits();
     this.paintFocus();
   }
 
@@ -325,108 +231,27 @@ export class PauseMenu {
     if (this.row === 1) {
       this.tiles.press();
       this.tiles.pick();
-    } else if (this.row === 0 || this.row === 4) {
-      const focused = document.activeElement as HTMLElement | null;
-      if (focused && this.segs[this.seg].includes(focused)) focused.click();
-      else this.cycleModel(this.seg, 1);
-    } else if (this.row === 3) void this.selectOutfit(RIDER_OUTFITS[this.outfitFocus]!);
-    else this.pressReload();
+    } else this.pressReload();
   }
 
-  /** Up/down moves between the seg row, the tiles and reload; left/right moves tiles or flips the focused segment. */
+  /** Up/down moves between the tiles and reload; left/right moves along the tiles. */
   move(dx: number, dy: number): void {
     if (!this.visible || !isLiveTarget(this.root)) return;
     if (dy) {
-      const rows: Array<0 | 1 | 2 | 3 | 4> = [...(this.visuals ? [0, 4] as const : []), ...(this.cb.outfits ? [3] as const : []), 1, 2];
-      const i = rows.indexOf(this.row);
-      const j = Math.min(rows.length - 1, Math.max(0, i + dy));
-      if (rows[j] !== this.row) {
-        this.row = rows[j]!;
-        if (this.row === 0 || this.row === 4) this.seg = this.row === 0 ? 'rider' : 'bike';
-        if (this.row === 3) this.outfitButtons.get(RIDER_OUTFITS[this.outfitFocus]!)?.focus({ preventScroll: true });
+      const next: 1 | 2 = dy > 0 ? 2 : 1;
+      if (next !== this.row) {
+        this.row = next;
         this.paintFocus();
       }
       return;
     }
     if (!dx) return;
     if (this.row === 1) this.tiles.move(dx);
-    else if (this.row === 0 || this.row === 4) this.cycleModel(this.seg, dx);
-    else if (this.row === 3) {
-      this.outfitFocus = (this.outfitFocus + Math.sign(dx) + RIDER_OUTFITS.length) % RIDER_OUTFITS.length;
-      const button = this.outfitButtons.get(RIDER_OUTFITS[this.outfitFocus]!)!;
-      button.focus({ preventScroll: true });
-      // Scroll only the choices row: scrollIntoView can move the entire HUD root.
-      const options = button.parentElement!;
-      const rect = button.getBoundingClientRect();
-      const bounds = options.getBoundingClientRect();
-      if (rect.left < bounds.left) options.scrollLeft += rect.left - bounds.left;
-      else if (rect.right > bounds.right) options.scrollLeft += rect.right - bounds.right;
-      this.paintFocus();
-    }
-  }
-
-  private cycleModel(which: 'rider' | 'bike', d: number): void {
-    const m = this.cb.models;
-    if (!m) return;
-    const cur = m.get()[which];
-    const options = which === 'rider' ? RIDER_MODEL_OPTIONS : MODEL_OPTIONS;
-    const i = options.findIndex((o) => o.v === cur);
-    const next = options[(i + d + options.length) % options.length]!.v as ModelChoice;
-    m.set(which, next);
-    this.paintModels();
-    this.paintOutfits();
-    this.segs[which].find(button => button.dataset['v'] === next)?.focus({ preventScroll: true });
-  }
-
-  private paintModels(): void {
-    const m = this.cb.models;
-    if (!m) return;
-    const cur = m.get();
-    for (const which of ['rider', 'bike'] as const) for (const b of this.segs[which]) {
-      b.classList.toggle('on', b.dataset['v'] === cur[which]);
-      b.setAttribute('aria-pressed', String(b.dataset['v'] === cur[which]));
-    }
-  }
-
-  private paintOutfits(): void {
-    const current = this.cb.outfits?.get();
-    const rider = this.cb.models?.get().rider ?? 'gltf';
-    const blender = rider === 'gltf';
-    for (const [outfit, button] of this.outfitButtons) {
-      button.classList.toggle('selected', blender && outfit === current);
-      button.setAttribute('aria-pressed', String(blender && outfit === current));
-      button.setAttribute('aria-busy', String(outfit === this.pendingOutfit));
-    }
-    const active = !blender ? `${rider === 'img2' ? 'Img2 experiment' : 'Classic rider'} · choose an outfit to use Blender`
-      : current ? `${OUTFIT_LABEL[current]} selected` : '';
-    const status = this.pendingOutfit ? `Loading ${OUTFIT_LABEL[this.pendingOutfit]}…`
-      : this.failedOutfit ? `Could not load ${OUTFIT_LABEL[this.failedOutfit]}. Select it to retry. ${active}` : active;
-    if (this.outfitStatus.textContent !== status) this.outfitStatus.textContent = status;
-  }
-
-  private async selectOutfit(outfit: RiderOutfit): Promise<void> {
-    const outfits = this.cb.outfits;
-    if (!outfits || this.pendingOutfit === outfit) return;
-    const request = ++this.outfitRequest;
-    this.pendingOutfit = outfit;
-    this.failedOutfit = null;
-    this.paintOutfits();
-    this.paintFocus();
-    let loaded = false;
-    try { loaded = await outfits.set(outfit); } catch { /* Preserve the current outfit on failure. */ }
-    if (request !== this.outfitRequest) return;
-    this.pendingOutfit = null;
-    this.failedOutfit = loaded ? null : outfit;
-    this.paintOutfits();
-    this.paintModels();
   }
 
   private paintFocus(): void {
-    this.root.classList.toggle('focus-visuals', this.row === 0 || this.row === 4);
     this.root.classList.toggle('focus-tiles', this.row === 1);
     this.root.classList.toggle('focus-reload', this.row === 2);
-    if (this.visuals) for (const which of ['rider', 'bike'] as const) this.visuals.querySelector(`.mini-seg[data-which="${which}"]`)!.classList.toggle('focus', (this.row === 0 || this.row === 4) && this.seg === which);
-    for (const [index, button] of [...this.outfitButtons.values()].entries()) button.classList.toggle('on', this.row === 3 && index === this.outfitFocus);
     this.reload.classList.toggle('focus', this.row === 2);
   }
 
