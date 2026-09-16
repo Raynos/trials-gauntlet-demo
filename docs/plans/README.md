@@ -26,6 +26,8 @@ Round 20 adopts verified mobile KTX2/UASTC exports: all-image 4x4-block estimate
 
 **Round 21 / latest user correction:** attach the saved curly hair and beard to the complete rider now. That assembly is active and [rendered in Three.js](../../prototypes/hero-garage/captures/full-rider-saved-identity-a1/webkit-full.png), including the saved face. Source groom identity matches the earlier portrait. The 173 MB local appearance GLB follows the existing head joint; neck/collar fit and mobile optimization remain open. The earlier mobile-memory ledger does not describe this dense preview. Hunyuan produced rejected raw geometry; TRELLIS never demonstrated inference; neither has a running process.
 
+Round 22 rejected a lower-neck taper after rendered comparison showed no convincing seam improvement. The prior saved-face/curls/beard assembly is restored byte-for-byte; [review](../../prototypes/hero-garage/reports/identity-neck-fit-review.json). Next fit work must isolate residual old-neck geometry rather than keep guessing broad shape changes.
+
 The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The earlier hourly automation remains paused; this goal is actively progressing through whole-scene work. Latest checked allowance is 22% remaining. Final visual approval stays with the user. Better body/clothing sources are being assessed without changing target01 identity. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
 
 ## Independent audit — 2026-09-15
