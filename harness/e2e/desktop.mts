@@ -99,6 +99,16 @@ class Flow {
     return this.page.waitForFunction(src, null, { timeout, polling: 30 }).then(() => true).catch(() => false);
   }
 
+  /**
+   * A screen takes keys only once live.ts has seen it drawn for LIVE_DELAY_MS (the invariant: `.live` lands from
+   * the app's rAF tick, which SwiftShader stalls for seconds on the first frames of an uncovered canvas) — so a
+   * confirm / back after a screen change waits for `.live`, then the SCREEN_GRACE_MS after the show.
+   */
+  private async waitLive(screen: string): Promise<void> {
+    await this.waitFor(`!!document.querySelector('${screen}.show.live')`, 30000);
+    await this.page.waitForTimeout(350);
+  }
+
   private async screens(): Promise<string[]> {
     return this.page.evaluate(() =>
       [...document.querySelectorAll<HTMLElement>('.screen')]
@@ -196,22 +206,26 @@ class Flow {
     await this.waitFor(`!!document.querySelector('.menu-screen.live')`, 10000);
     await this.page.waitForTimeout(300); // SCREEN_GRACE_MS after the menu shows
 
-    // Menu → Settings (two right, confirm) → legend shows this device → back → menu.
-    await this.press('right');
-    await this.page.waitForTimeout(80);
-    await this.press('right');
-    await this.page.waitForTimeout(80);
-    const focused = await this.page.evaluate(`(document.querySelector('.menu-screen .menu-item.on') || { dataset: {} }).dataset.id || ''`) as string;
-    this.expect(/settings/i.test(focused), 'menu-nav', `two nav-right presses should focus Settings, focused '${focused}'`);
+    // Menu → Settings (PLAY · GARAGE · REVIEW · SETTINGS · credits: three right, each press moving the focus one tab,
+    // confirm) → legend shows this device → back → menu.
+    const tabs = await this.page.evaluate(`[...document.querySelectorAll('.menu-screen .menu-item')].map((b) => b.dataset.id)`) as string[];
+    this.expect(tabs.join() === 'play,garage,review,settings,credits', 'menu-tabs', `menu tabs ${tabs}`);
+    const settingsAt = tabs.indexOf('settings');
+    for (let i = 1; i <= settingsAt; i++) {
+      await this.press('right');
+      await this.page.waitForTimeout(80);
+      const focused = await this.page.evaluate(`(document.querySelector('.menu-screen .menu-item.on') || { dataset: {} }).dataset.id || ''`) as string;
+      this.expect(focused === tabs[i], 'menu-nav', `nav-right press ${i} should focus '${tabs[i]}', focused '${focused}'`);
+    }
     await this.press('confirm');
     this.expect(await this.waitFor(`!!document.querySelector('.settings-screen.show')`, 10000), 'menu→settings', 'settings screen did not show after confirm on Settings');
-    await this.page.waitForTimeout(300);
+    await this.waitLive('.settings-screen');
     await this.expectScreens(['settings'], 'settings-alone');
     await this.expectLegend('.settings-screen .legend', 'D3-settings-legend');
     await this.expectNoTouch('D2-settings');
     await this.press('back');
     this.expect(await this.waitFor(`!!document.querySelector('.menu-screen.show') && !document.querySelector('.settings-screen.show')`, 10000), 'settings→menu', 'back from settings did not return to the menu');
-    await this.page.waitForTimeout(350);
+    await this.waitLive('.menu-screen');
     await this.expectScreens(['menu'], 'menu-again');
 
     // Menu → Play (focus resets to Play on show) → tracks.
@@ -219,17 +233,17 @@ class Flow {
     this.expect(/play/i.test(focusedPlay), 'menu-focus-play', `menu should re-focus Play on show, focused '${focusedPlay}'`);
     await this.press('confirm');
     this.expect(await this.waitFor(`!!document.querySelector('.tracks-screen.show')`, 10000), 'menu→tracks', 'track select did not show after confirm on Play');
-    await this.page.waitForTimeout(350);
+    await this.waitLive('.tracks-screen');
     await this.expectScreens(['tracks'], 'tracks-alone');
     await this.expectLegend('.tracks-screen .legend', 'D3-tracks-legend');
     await this.expectNoTouch('D2-tracks');
     // The focused pin is the first campaign track (B1) on the Industrial page.
     await this.waitFor(`!!document.querySelector('.tracks-screen.live .tpin.on')`, 10000);
     const card = await this.page.evaluate(`(() => { const c = document.querySelector('.tracks-screen .tpin.on'); return c ? { text: c.textContent, disabled: c.disabled, cls: c.className } : null; })()`) as { text: string; disabled: boolean; cls: string } | null;
-    this.expect(card && !card.disabled && !/locked/.test(card.cls), 'tracks-focus', `focused card ${JSON.stringify(card)}`);
+    this.expect(card && !card.disabled && !/locked/.test(card.cls), 'tracks-focus', `focused pin ${JSON.stringify(card)}`);
     await this.press('confirm');
     // SwiftShader stalls the main thread for seconds on the run's first frames: wait for the handoff, don't time it.
-    this.expect(await this.waitFor(`window.__trials.app.screen() === 'run' && ![...document.querySelectorAll('.screen')].some((el) => el.classList.contains('show'))`, 60000), 'card→run', `run did not start after confirm on the card: screens [${await this.screens()}]`);
+    this.expect(await this.waitFor(`window.__trials.app.screen() === 'run' && ![...document.querySelectorAll('.screen')].some((el) => el.classList.contains('show'))`, 60000), 'card→run', `run did not start after confirm on the focused pin: screens [${await this.screens()}]`);
     await this.expectScreens([], 'run-no-screens');
     const track0 = await this.page.evaluate(`window.__trials.info().trackId`) as string;
     this.log(`in run on ${track0}`);
@@ -275,7 +289,9 @@ class Flow {
     // Crash through the hook (gas + lean back), then the auto-respawn: riding again with a fault.
     const crash = await this.page.evaluate(CRASH_SRC) as { phase: string; n: number; faults: number };
     this.expect(crash.phase === 'crashed', 'crash', `expected crashed after gas+lean back, got ${JSON.stringify(crash)}`);
-    this.expect(await this.waitFor(`window.__trials.phase() === 'riding' && window.__trials.faults() >= 1`, 15000), 'respawn', `no auto-respawn with a fault: ${JSON.stringify(await this.state())}`);
+    // The 1 s auto-respawn runs on the app's rAF clock: under a loaded SwiftShader that is tens of wall seconds. Poll, then judge the state itself.
+    const respawned = (await this.waitFor(`window.__trials.phase() === 'riding' && window.__trials.faults() >= 1`, 30000)) || (await this.state().then((s) => s.phase === 'riding' && s.faults >= 1));
+    this.expect(respawned, 'respawn', `no auto-respawn with a fault: ${JSON.stringify(await this.state())}`);
 
     // Full restart: R / B held ≥ 0.6 s → faults 0, countdown / riding from the start.
     await this.hold('restart', true);

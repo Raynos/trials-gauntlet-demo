@@ -662,7 +662,9 @@ export interface TrialsHook {
   app?: {
     frame(): void;
     play(trackId: string): void;
-    goto(screen: 'menu' | 'tracks' | 'settings' | 'garage' | 'credits'): void;
+    goto(screen: 'menu' | 'tracks' | 'settings' | 'garage' | 'credits' | 'review'): void;
+    /** The player's way out of a run (pause QUIT / results MENU): the sim parked in phase `menu` under the backdrop, then the menu — `goto('menu')` alone leaves a run ticking under the front end. */
+    quit(): void;
     togglePause(): void;
     screen(): string;
     paused(): boolean;

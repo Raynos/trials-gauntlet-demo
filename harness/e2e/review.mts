@@ -61,6 +61,17 @@ const VIEW = `window.__trials.review.view()`;
 type View = { trackId: string; seg: number; x: number; dist: number; flying: boolean; riding: boolean; segments: { i: number; from: number; to: number; label: string; kinds: Record<string, number> }[] };
 const view = (page: Page): Promise<View> => page.evaluate(VIEW) as Promise<View>;
 const camX = (page: Page): Promise<number> => page.evaluate(`window.__trials.camera().pos.x`) as Promise<number>;
+/** The camera moves only when a frame renders: wait for one rendered frame (SwiftShader next to 15 other pages starves rAF for seconds), then read it. */
+async function camXRendered(page: Page, timeout = 10000): Promise<number> {
+  const n0 = (await page.evaluate(`window.__trials.renderedFrames()`)) as number;
+  await page.waitForFunction((n) => (window as unknown as { __trials: { renderedFrames(): number } }).__trials.renderedFrames() > n, n0, { timeout, polling: 30 }).catch(() => undefined);
+  return camX(page);
+}
+/** The camera x once it has followed the pan past `c0 + 0.5` (a rendered frame after the pan), else its value at the timeout — the assertion stays `> c0 + 0.5`. */
+async function camXMoved(page: Page, c0: number, timeout = 10000): Promise<number> {
+  await page.waitForFunction((c) => (window as unknown as { __trials: { camera(): { pos: { x: number } } } }).__trials.camera().pos.x > c + 0.5, c0, { timeout, polling: 30 }).catch(() => undefined);
+  return camX(page);
+}
 
 /** A CDP touch drag: touchStart, N moves, touchEnd (Playwright's touchscreen only taps). */
 async function touchDrag(ctx: BrowserContext, page: Page, from: { x: number; y: number }, to: { x: number; y: number }, steps = 12): Promise<void> {
@@ -218,11 +229,11 @@ async function phoneFlow(ctx: BrowserContext, url: string, g: { name: string; wi
 
   // Pan: a one-finger drag to the left moves the probe (and the camera) to +x.
   const x0 = (await view(page)).x;
-  const c0 = await camX(page);
+  const c0 = await camXRendered(page);
   await touchDrag(ctx, page, { x: g.width * 0.7, y: g.height * 0.5 }, { x: g.width * 0.4, y: g.height * 0.5 });
   await page.waitForTimeout(500);
   const x1 = (await view(page)).x;
-  const c1 = await camX(page);
+  const c1 = await camXMoved(page, c0);
   expect(x1 > x0 + 1, 'pan-probe', `probe x ${x0.toFixed(2)} → ${x1.toFixed(2)}`);
   expect(c1 > c0 + 0.5, 'pan-camera', `camera x ${c0.toFixed(2)} → ${c1.toFixed(2)}`);
   // Fly: the probe advances on its own.
@@ -286,7 +297,7 @@ async function desktopFlow(ctx: BrowserContext, url: string, expect: Expect, sti
   const page = await boot(ctx, url, `&review=${TRACK}`, expect);
   expect(await waitLive(page, '.review-ui.show.live', 20000), 'review-live', 'the review UI did not show / go live');
   const x0 = (await view(page)).x;
-  const c0 = await camX(page);
+  const c0 = await camXRendered(page);
   await page.mouse.move(900, 360);
   await page.mouse.down();
   for (let i = 1; i <= 10; i++) {
@@ -296,7 +307,7 @@ async function desktopFlow(ctx: BrowserContext, url: string, expect: Expect, sti
   await page.mouse.up();
   await page.waitForTimeout(400);
   const x1 = (await view(page)).x;
-  const c1 = await camX(page);
+  const c1 = await camXMoved(page, c0);
   expect(x1 > x0 + 1, 'mouse-pan-probe', `probe x ${x0.toFixed(2)} → ${x1.toFixed(2)}`);
   expect(c1 > c0 + 0.5, 'mouse-pan-camera', `camera x ${c0.toFixed(2)} → ${c1.toFixed(2)}`);
   const d0 = (await view(page)).dist;

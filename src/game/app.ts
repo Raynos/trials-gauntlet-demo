@@ -735,6 +735,7 @@ export class App {
       },
       play: (id) => this.play(id),
       goto: (s) => this.goto(s),
+      quit: () => this.quit('hook'),
       togglePause: () => this.togglePause('hook'),
       screen: () => this.screen,
       paused: () => this.game.paused(),

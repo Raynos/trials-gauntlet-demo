@@ -5,7 +5,7 @@
  *
  *   pnpm harness:e2e            all flows, both geometries (the transition grid on the first geometry; --grid=all for both)
  *   pnpm harness:e2e --only=run --geom=iphone15promax
- *   pnpm harness:e2e --only=grid
+ *   pnpm harness:e2e --only=grid       (--jobs=1 --transition=menu→tracks --instances=2 --verbose=1: one transition, serial, logged)
  *   pnpm harness:e2e --only=entry       track entry hold on e1 (canyon): no frame after GO with the placeholder, `?perf=1` overlay fields + rate
  *   pnpm harness:e2e --only=boot        the loading screen at LTE / 3G × SW × art pack (harness/e2e/boot.mts)
  *   pnpm harness:e2e --only=bench       `?bench=1&quick=1`: the on-device benchmark's instrument, report and toggles (harness/e2e/bench.mts)
@@ -52,8 +52,9 @@ const onlyList = only ? only.split(',').filter(Boolean) : null;
 const wants = (k: string): boolean => !onlyList || onlyList.includes(k);
 const geomFilter = args.get('geom');
 const gridScope = args.get('grid') ?? 'first';
-/** Debug: cap the transition instances per transition (`--instances=2`) and log every establish step (`--verbose=1`). */
+/** Debug: cap the transition instances per transition (`--instances=2`), run one transition by name substring (`--transition=menu`) and log every establish step (`--verbose=1`). */
 const gridInstances = Number(args.get('instances') ?? 0) || 0;
+const gridTransition = args.get('transition') ?? '';
 /** Parallel contexts (round 12): `--jobs=N`, default (cores - 2) / 3 — a SwiftShader page is ~3 cores. */
 const jobs = defaultBrowserJobs(64, { ...(args.has('jobs') ? { jobs: args.get('jobs')! } : {}) });
 const verbose = args.get('verbose') === '1';
@@ -116,8 +117,18 @@ async function tapSel(page: Page, flow: string, selector: string): Promise<boole
   return true;
 }
 
-/** Every tappable on the current screen: size ≥ 44 and no overlap between distinct tappables. */
+/**
+ * Every tappable on the current screen: size ≥ 44 and no overlap between distinct tappables. Measured once the
+ * screen's entrance has settled: a `rise` (translateY) mid-flight reports a 44 px button as 43.99 through the
+ * animated matrix, and under a loaded SwiftShader the 300 ms after a screen change is not always the whole rise.
+ */
 async function checkTargets(page: Page, flow: string): Promise<void> {
+  await page.waitForFunction(() => [...document.querySelectorAll<HTMLElement>('.screen.show, .overlay.show, .results.show, .onboard.show')].every((scr) =>
+    scr.getAnimations({ subtree: true }).every((a) => {
+      if (a.playState !== 'running') return true;
+      const t = a.effect?.getTiming();
+      return !t || t.iterations === Infinity || Number(t.duration) >= 3000; // the ticker loop / key-art Ken Burns are the page's idle, not an entrance
+    })), null, { timeout: 5000, polling: 50 }).catch(() => undefined);
   const rects = await page.evaluate(() => {
     const out: { sel: string; x: number; y: number; w: number; h: number }[] = [];
     const seen = new Set<Element>();
@@ -476,6 +487,7 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   await still(page, g, 'idle');
   // Hold gas on the right for 1 s: the bike must move.
   const x0 = await page.evaluate(() => (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1);
+  const rt0 = (await page.evaluate(`window.__trials.phase() === 'riding' ? window.__trials.runTime() : 0`)) as number;
   const cdp = await ctx.newCDPSession(page);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g.width * 0.9, y: g.height * 0.6, id: 1 }] });
   // Held GAS: the key lights green and its whole quarter carries the wash; the three idle keys do not.
@@ -484,7 +496,11 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   expect(gasHeld.throttle.held && greenish(gasHeld.throttle.bg) && !gasHeld.brake.held && !gasHeld.back.held && !gasHeld.fwd.held, flow, 'R7-gas-key', `held right quarter: ${JSON.stringify(gasHeld)}`);
   expect(gasHeld.throttle.wash && !gasHeld.brake.wash, flow, 'R7-gas-wash', `column wash gas=${gasHeld.throttle.wash} brake=${gasHeld.brake.wash} (${gasHeld.throttle.colBg})`);
   expect(gasHeld.throttle.scale < 1 && gasHeld.brake.scale === 1, flow, 'R7-gas-press', `press scale gas=${gasHeld.throttle.scale} brake=${gasHeld.brake.scale}`);
-  const moved = await page.waitForFunction((x) => ((window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1) > x + 1, x0, { timeout: 15000 }).then(() => true).catch(() => false);
+  // The bike must move ≥ 1 m — judged on the sim clock, not the wall clock: a loaded SwiftShader draws the run at
+  // one or two frames a second, so 15 wall seconds can be under a sim second (the countdown alone is three).
+  // The wait ends when it has moved, or once 2.5 s of riding have elapsed without it (then `moved` is a real fail).
+  await page.waitForFunction(([x, rt]) => { const t = (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } }; phase(): string; runTime(): number } }).__trials; if (!t) return false; return t.getState().bike.pos.x > x + 1 || (t.phase() === 'riding' && t.runTime() > rt + 2.5); }, [x0, rt0] as [number, number], { timeout: 60000, polling: 100 }).catch(() => undefined);
+  const moved = ((await page.evaluate(() => (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1)) as number) > x0 + 1;
   // Second finger: LEAN BACK with GAS still down (the multi-touch P0) — both keys lit, then the still.
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g.width * 0.9, y: g.height * 0.6, id: 1 }, { x: g.width * 0.1, y: g.height * 0.6, id: 2 }] });
   await page.waitForTimeout(150);
@@ -761,18 +777,35 @@ function transitions(page: Page, g: Geom): Transition[] {
       name: 'menu→tracks',
       perSlot: GRID_PER_SLOT * 2,
       establish: async () => {
-        if ((await sig(page)).screen !== 'menu') await page.evaluate(`window.__trials.app.goto('menu')`);
-        if (!(await waitFor(page, `!!document.querySelector('.menu-screen.live')`))) return false;
-        const c = await page.evaluate(() => {
-          for (const b of document.querySelectorAll<HTMLButtonElement>('.menu-screen.live .menu-item')) {
-            if (b.textContent?.trim().toLowerCase().startsWith('play')) { const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
-          }
-          return null;
-        });
-        if (!c) return false;
-        await tap(page, c.x, c.y);
-        await page.evaluate(`window.__trials.app.frame()`);
-        return (await sig(page)).screen === 'tracks';
+        // A grid tap on the focused pin launches through the level select's deferred timers (`play()` at 180 ms,
+        // the screen gone at 420 ms) — under a loaded SwiftShader those fire whenever the main thread frees, so a
+        // wall-clock wait cannot order them. A page timer queued now fires after every timer queued before it: drain
+        // them, then read the state. Back to the menu the player's way: `quit` parks the sim (phase `menu`) under
+        // the backdrop — `goto('menu')` from a run leaves it ticking under the front end, and its countdown running
+        // out 3 s later reads as a ghost phase change on the track select. Two attempts, the second from a fresh menu.
+        for (let attempt = 0; attempt < 2; attempt++) {
+          await page.evaluate(`new Promise((r) => setTimeout(r, 450))`);
+          const s0 = await sig(page);
+          if (s0.phase !== 'menu') await page.evaluate(`window.__trials.app.quit()`);
+          else if (s0.screen !== 'menu') await page.evaluate(`window.__trials.app.goto('menu')`);
+          if (!(await waitFor(page, `!!document.querySelector('.menu-screen.live')`))) return false;
+          await page.waitForTimeout(250);
+          const s1 = await sig(page);
+          if (s1.screen !== 'menu' || s1.phase !== 'menu') { log(`menu→tracks: the menu was left under us (${sigKey(s1)}); re-opening`); continue; }
+          const c = await page.evaluate(() => {
+            for (const b of document.querySelectorAll<HTMLButtonElement>('.menu-screen.live .menu-item')) {
+              if (b.textContent?.trim().toLowerCase().startsWith('play')) { const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+            }
+            return null;
+          });
+          if (!c) return false;
+          await tap(page, c.x, c.y);
+          await page.evaluate(`window.__trials.app.frame()`);
+          const s = await sig(page);
+          if (s.screen === 'tracks') return true;
+          log(`menu→tracks: PLAY tap landed in ${sigKey(s)}; retrying`);
+        }
+        return false;
       },
     },
   ].map((t) => ({ ...t, name: `${t.name}@${g.name}` }));
@@ -794,6 +827,7 @@ async function flowGrid(ctx: BrowserContext, url: string, g: Geom, shard: { k: n
   const stats: GridStats = { taps: 0, changes: 0, legit: 0, violations: 0 };
   for (const [ti, tr] of transitions(page, g).entries()) {
     if (ti % shard.of !== shard.k) continue;
+    if (gridTransition && !tr.name.includes(gridTransition)) continue;
     // Pairs (point, offset), each once; an instance serves one slot per offset with GRID_PER_SLOT points.
     const pairs: { p: number; o: number }[] = [];
     for (let o = 0; o < GRID_OFFSETS.length; o++) for (let p = 0; p < points.length; p++) pairs.push({ p: (p + o * 5) % points.length, o });
@@ -810,15 +844,40 @@ async function flowGrid(ctx: BrowserContext, url: string, g: Geom, shard: { k: n
       established++;
       let t0 = Date.now();
       let before = await sig(page);
+      /** The last two slots' probes: a page reload lands a beat after the tap that caused it (the pause overlay's armed reload corner). */
+      let recent: (Probe & { x: number; y: number })[][] = [];
       for (let o = 0; o < GRID_OFFSETS.length; o++) {
         const slot = bySlot[o]!.slice(inst * perSlot, (inst + 1) * perSlot);
         if (slot.length === 0) continue;
         const wait = GRID_OFFSETS[o]! - (Date.now() - t0);
         if (wait > 0) await page.waitForTimeout(wait);
         const pts = slot.map((pi) => points[pi]!);
-        const res = await tapSlot(page, pts);
+        let res: { probes: Probe[]; sig: Sig };
+        try {
+          res = await tapSlot(page, pts);
+        } catch (e) {
+          // `__e2eTap` gone / context destroyed = the page reloaded: two live taps on the pause overlay's `⟳ RELOAD`
+          // corner within 2 s (one arms, the next reloads — a legitimate navigation, the grid's own doing). Boot
+          // again, re-install the tap, and account for it as the invariant does; anything else is the throw it was.
+          const reloaded = await page.evaluate(`typeof window.__e2eTap !== 'function'`).catch(() => true);
+          if (!reloaded) throw e;
+          await page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 180000 });
+          await waitFor(page, `!!(window.__trials && window.__trials.app)`);
+          await page.evaluate(E2E_TAP_SRC);
+          stats.changes++;
+          const armed = recent.flat().filter((p) => p.live && /ov-reload/.test(p.el));
+          if (armed.length > 0) { stats.legit++; log(`${tr.name}: the page reloaded after live taps on the reload corner (${armed.map((p) => `${p.x},${p.y}`).join(' ')})`); }
+          else { stats.violations++; expect(false, tr.name, 'R6-ghost-nav', `+${GRID_OFFSETS[o]} ms: the page reloaded with no live tap on the reload corner in the last two slots (${recent.flat().map((p) => p.el).join(' | ')})`); }
+          ok = await tr.establish();
+          if (!ok) { expect(false, tr.name, 'R6-establish', 're-establish after a page reload failed'); break; }
+          t0 = Date.now();
+          before = await sig(page);
+          recent = [];
+          continue;
+        }
         stats.taps += pts.length;
         const probes = res.probes.map((p, i) => ({ ...p, x: pts[i]!.x, y: pts[i]!.y }));
+        recent = [...recent.slice(-1), probes];
         const after = res.sig;
         log(`+${GRID_OFFSETS[o]} ms slot: ${probes.map((p) => `${p.x},${p.y} ${p.el} op${p.opacity}${p.live ? ' LIVE' : ''}`).join(' | ')} → ${sigKey(after)}`);
         if (sigKey(after) !== sigKey(before)) {
