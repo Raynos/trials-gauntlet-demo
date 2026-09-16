@@ -234,3 +234,9 @@ The unchanged existing game passes frozen-build headless WebKit cold boot, 1,038
 ### User-directed neural route preflight
 
 TRELLIS.2 Apple Silicon dependency installation and Metal capability checks now pass locally; public model weights are downloading outside the repo. DINOv3 generation access awaits user license acceptance/local Hugging Face login. Two experimental MLX parity tests fail, so the selected route is explicitly MPS. Hunyuan3D2.1 will not run because the user confirmed an excluded territory under its license. [Full preflight and retained local proof](../../prototypes/hero-garage/reports/local-neural-preflight.md). No neural output or visual acceptance is claimed.
+
+### Latest steering — both requested neural models
+
+The user explicitly directed trials of Hunyuan3D2.1 and TRELLIS.2. Hunyuan’s MLX port is now being installed locally; this supersedes the earlier decision to omit that trial, not the recorded license terms. TRELLIS2 public weights are downloaded and DINOv3 access is pending review by its repository authors after successful local login. No alternative model is silently substituted and neither neural pipeline has generated a hero asset yet.
+
+Hunyuan MLX now imports shape and paint and passes40 renderer checks. Its ungated weights are downloading, and the first target-head input/seed/settings are frozen. This is setup progress, not Milestone A acceptance; the actual generated shape, PBR export and browser orbit remain pending.

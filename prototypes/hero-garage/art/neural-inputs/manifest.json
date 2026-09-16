@@ -1,0 +1,19 @@
+{
+  "source": "assets/design/hero-targets/reconstruction/street-mustard-turnaround.png",
+  "sourceSha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2",
+  "cropXYXY": [
+    250,
+    8,
+    403,
+    182
+  ],
+  "output": "head-front-reference.png",
+  "outputSha256": "44e47aa11405235c2fc971d08d5b0735b79033c0a7bb0547200d0919b75d882e",
+  "operation": "Crop only; original pixel resolution retained. No retouching, synthesis or upscale.",
+  "authority": "Existing provisionally admitted generated front-view design. Original target01 profile remains the identity authority.",
+  "limitations": [
+    "Small source crop cannot establish pores or recover hidden surfaces.",
+    "Crop includes neck and gray backdrop; model input behavior must be checked.",
+    "Not a production render or an accepted model."
+  ]
+}
