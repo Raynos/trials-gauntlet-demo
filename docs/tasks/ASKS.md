@@ -51,3 +51,4 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 27 | "Rescue the subagents, resume and continue" (×2, after the lid-close) | **done** | garage owner + harness owner resumed with re-orientation messages; both had intact uncommitted work |
 
 | HG-05 | Finish Blender art to highest achievable quality; flexible two-pass allowance, stop at 2%; Claude + Opus own integration | **in flight** | Art-only rider/bike refinement and asset handoff; saved identity preserved, no game integration |
+| 28 | (parent's item) harness debt after the three UI rounds — full e2e back to green | **done** | `6ad…`/`fa4b440`: 724/765 → **1249/1249**; expectations updated to the shipped UI, timing made robust, `app.quit()` hook added; CONTRACT/rendering/game docs carry `setGarageStage` + `orbit` + the trackMap pages |
