@@ -75,6 +75,29 @@ describe('img2threejs runtime adapter', () => {
       }
       expect(Math.max(...rider.debug.ankleErr)).toBeLessThan(.001);
       expect(Math.max(...rider.debug.gripErr)).toBeLessThan(.001);
+      // Measure the visible continuous garments, not the millimetre-sized semantic
+      // thigh/sleeve meshes or just bone endpoints. A pelvis-only pants bind passes
+      // all contact checks above while drawing both trouser legs straight backward.
+      frame.traverse(o => {
+        const skin = o as THREE.SkinnedMesh;
+        if (!skin.isSkinnedMesh || !/Connected (indigo|mustard)/.test(skin.name)) return;
+        const jeans = skin.name.includes('indigo');
+        const rest = skin.geometry.getAttribute('position');
+        for (const [sign, side] of [[1, 'R'], [-1, 'L']] as const) {
+          const center = new THREE.Vector3();
+          let count = 0;
+          for (let v = 0; v < rest.count; v++) {
+            if (rest.getX(v) * sign <= (jeans ? .06 : .25)) continue;
+            if (rest.getY(v) >= (jeans ? .21 : 1.22)) continue;
+            center.add(skin.getVertexPosition(v, new THREE.Vector3()).applyMatrix4(skin.matrixWorld));
+            count++;
+          }
+          expect(count).toBeGreaterThan(20);
+          center.divideScalar(count);
+          const joint = frame.getObjectByName(`${jeans ? 'foot' : 'forearm'}.${side}`)!;
+          expect(center.distanceTo(joint.getWorldPosition(new THREE.Vector3())), `${skin.name} cuff follows joint`).toBeLessThan(.22);
+        }
+      });
     }
     expect(poses[0]).not.toEqual(poses[2]);
   });

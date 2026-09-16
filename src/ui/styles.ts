@@ -55,9 +55,11 @@ export const TOKENS_CSS = /* css */ `
   --vw: 1vw; --vh: 1vh;
 }
 html { font-size: clamp(13px, calc(1.25 * var(--vw)) + 4px, 18px); }
+/* The viewport cannot become a focus-driven scroll container; panels own scrolling. */
+html, body { overflow: clip; }
 #ui, #ui * { box-sizing: border-box; }
 #ui {
-  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  position: absolute; inset: 0; pointer-events: none; overflow: clip;
   font-family: var(--font); color: var(--ink); font-weight: 500;
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; touch-action: none;
   text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased;
@@ -122,6 +124,13 @@ export const FRONT_CSS = /* css */ `
 /* Bike-class chip top-right: information, not a control (the Garage tab changes it). */
 .menu-chip { position: absolute; right: calc(var(--s4) + var(--sar)); top: calc(var(--s4) + var(--sat)); display: inline-flex; align-items: center; gap: .6em; min-height: 32px; padding: 0 1.1em 0 1em; background: rgba(9,11,15,.88); clip-path: polygon(.5em 0, 100% 0, calc(100% - .5em) 100%, 0 100%); font-size: .78rem; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--ink); pointer-events: none; }
 .menu-chip i { width: .55em; height: .55em; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: pulse 1.6s ease-in-out infinite; }
+.menu-customize { position: absolute; left: calc(var(--s4) + var(--sal)); right: calc(var(--s4) + var(--sar)); bottom: calc(var(--tab-h) + var(--ticker-h) + var(--sab) + var(--s3)); max-height: calc(100% - var(--tab-h) - var(--ticker-h) - var(--sab) - 90px); overflow-y: auto; padding: var(--s2); background: rgba(9,11,15,.9); border: 1px solid var(--line-2); border-radius: var(--r2); }
+.menu-customize .outfit-heading { margin: 0 3px var(--s1); }
+.menu-customize .outfit-options + .outfit-heading { margin-top: var(--s2); }
+.menu-customize .outfit-button { min-height: 44px; }
+.menu-customize .outfit-current { display: block; padding: var(--s1) 3px 0; }
+.menu-customize button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.menu-customize, .menu-customize .outfit-options { overscroll-behavior: contain; }
 /* Lower third: the slab, an amber top edge, the tabs; the ticker sits in its bottom strip. */
 .menu-band { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--tab-h) + var(--ticker-h) + var(--sab)); padding: 0 calc(var(--s4) + var(--sar)) calc(var(--ticker-h) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); background: linear-gradient(180deg, rgba(9,11,15,.84), rgba(9,11,15,.95)); border-top: 2px solid var(--amber); box-shadow: 0 -14px 34px rgba(0,0,0,.4); display: flex; align-items: stretch; }
 .menu-list.tabs { position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--s6); width: 100%; height: var(--tab-h); }
@@ -279,6 +288,22 @@ export const FRONT_CSS = /* css */ `
 .visuals .vsep { width: 1px; height: 20px; background: var(--line); }
 .visuals .mini-seg { margin: 0; cursor: pointer; border-color: var(--line-2); transition: box-shadow var(--t1); }
 .visuals .mini-seg b { min-width: 44px; padding: 8px 10px; text-align: center; font-size: .66rem; }
+.pause-overlay .ov-head { flex-wrap: wrap; }
+.pause-overlay.has-outfits { grid-template-rows: auto auto minmax(0, 1fr) auto auto; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
+.pause-overlay .visuals { flex-wrap: wrap; flex-shrink: 1; gap: var(--s2); }
+.pause-overlay .mini-seg button { min-width: 44px; min-height: 44px; padding: 6px 10px; border: 0; background: transparent; color: var(--ink-dim); font: inherit; font-size: .72rem; cursor: pointer; }
+.pause-overlay .mini-seg button.on { background: var(--amber); color: var(--amber-ink); }
+.pause-overlay button:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.pause-outfits { flex: 0 1 auto; min-height: 100px; overflow-y: auto; padding: var(--s2); background: var(--slab); border: 1px solid var(--line-2); border-radius: var(--r2); }
+.pause-outfits .outfit-heading { margin-bottom: var(--s1); }
+.pause-outfits .outfit-current { display: block; padding: var(--s1) 3px 0; }
+.pause-outfits, .pause-outfits .outfit-options { overscroll-behavior: contain; }
+.pause-outfits .outfit-options { touch-action: pan-x; }
+html.short .pause-overlay { gap: var(--s1); }
+html.short .pause-overlay .visuals { padding: 0 var(--s2); }
+html.short .pause-outfits { padding: var(--s1); }
+html.short .pause-outfits .outfit-button { min-height: 44px; }
+html.short .pause-outfits .outfit-button span { display: none; }
 .visuals .mini-seg.focus { box-shadow: 0 0 0 2px var(--ink); }
 /* Action tiles: 240×128 desktop / 160×92 phone; exactly one is amber (the focused one). */
 .tiles { display: flex; justify-content: center; gap: var(--s4); width: 100%; }
@@ -541,6 +566,9 @@ export const HUD_CSS = /* css */ `
   repeating-conic-gradient(#fff 0 25%, #111 0 50%) 0 0 / .35rem .35rem; border-radius: 2px; }
 .strip .pin.ghost { background: rgba(255,255,255,.55); border-color: rgba(0,0,0,.5); opacity: 0; top: .15rem; width: .75rem; height: .75rem; margin-left: -.37rem; }
 .strip .pin { position: absolute; top: .05rem; width: .9rem; height: .9rem; margin-left: -.45rem; background: var(--amber); border: 2px solid #1a1206; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 1px 3px rgba(0,0,0,.6); }
+
+/* Countdown/GO must not cover pause-menu customization controls. */
+.under-overlay .banners { visibility: hidden; }
 
 /* ---- kinetic banners ------------------------------------------------ */
 .banners { position: absolute; left: 0; right: 0; top: 30%; height: 0; display: flex; justify-content: center; pointer-events: none; }

@@ -37,6 +37,8 @@ parent); §2 — first bullet in R8, second bullet **dropped**, third bullet **d
 
 ## Current state — read this first
 
+**Menu integration update:** both main and pause menus now expose the existing img2 mustard rider experiment, Classic and Blender, plus all five Blender outfits. Outfit selection switches to Blender. The generated source is preserved and its clothing is bound to the runtime rig. [Evidence](../evidence/hero-img2-menu/README.md) covers persistence, every outfit in both menus, mobile pause and resumed gameplay. This rescues the experiment for selection; it does not establish target-image fidelity or close the pose checklist below.
+
 The five-outfit asset integration landed on local main in `62c003d`, with handoff updates in `3e05e58`. That integration passed 814 tests, 20 outfit/bike/LOD combinations with missing-file recovery, and desktop WebKit flat/B1 byte-identical replay, clear, crash and next-tick restart checks. These results describe that revision, not later uncommitted changes.
 
 Main has since advanced to `e59d00b` at the start of this handoff. Its physics R8 and render r15 work is actively changing the working tree. Coordinate with those owners; do not replace their files or apply the saved pose patch wholesale. Their new work has not been independently accepted by this document.

@@ -6,18 +6,21 @@
  * exposes `nav / confirm / back` for the app shell. Targets ≥ 44 px, safe-area
  * aware, tokens from styles.ts only.
  */
-import type { BikeClass, BiomeId, Medal, TrackDef, TrackTier } from '../core/types';
+import type { BikeClass, BiomeId, Medal, RiderOutfit, TrackDef, TrackTier } from '../core/types';
 import { BIOME_TINT, type ArtManifest } from './art';
 import type { BestEntry, BoardEntry, FpsChoice, ModelChoice } from './best';
 import { formatTime } from './format';
 import type { QualityChoice } from './menu';
 import { labTracks, medalTotals, nextTrack, playgroundTracks, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
-import { conceal, reveal } from './live';
+import { conceal, reveal, isLiveTarget } from './live';
+import { RIDER_OUTFITS, OUTFIT_LABEL, OUTFIT_DETAIL } from './outfit';
 
 export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits' | 'review';
 
 export interface FrontCallbacks {
+  /** Commits and persists a loaded outfit; false preserves the current choice. */
+  outfits?: { get(): RiderOutfit; set(outfit: RiderOutfit): Promise<boolean> };
   /** Track select confirmed a card (called ≈180 ms into the card's fly-up so the scene swaps under it). */
   play(trackId: string): void;
   /** Time attack: the last played (or next) track, straight in. */
@@ -310,6 +313,14 @@ export class MainMenuScreen extends Screen {
   private tracks: TrackDef[] = [];
   /** One copy of the ticker row; layout() doubles it only while it scrolls. */
   private tickerHtml = '';
+  private readonly outfitStatus = h('div', 'outfit-current');
+  private readonly outfitButtons = new Map<RiderOutfit, HTMLButtonElement>();
+  private readonly modelButtons = new Map<ModelChoice, HTMLButtonElement>();
+  private focusRow = 0;
+  private focusCol = 0;
+  private pendingOutfit: RiderOutfit | null = null;
+  private failedOutfit: RiderOutfit | null = null;
+  private outfitRequest = 0;
 
   constructor(
     parent: HTMLElement,
@@ -341,6 +352,20 @@ export class MainMenuScreen extends Screen {
       { id: 'settings', label: 'Settings' },
       { id: 'credits', label: 'Credits', minor: true },
     ]);
+    this.list.root.addEventListener('focusin', (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('.menu-item');
+      if (!button) return;
+      this.focusRow = 0;
+      this.focusCol = Number(button.dataset['i']);
+      this.list.focusId(button.dataset['id']!);
+      this.paintChoices();
+    });
+    this.list.root.addEventListener('pointermove', () => {
+      this.focusRow = 0;
+      this.focusCol = [...this.list.root.querySelectorAll<HTMLButtonElement>('.menu-item')].findIndex(button => button.dataset['id'] === this.list.current());
+      this.paintChoices();
+    });
+    this.mountChoices();
     this.list.onPick = (id) => {
       if (id === 'play') this.cb.goto('tracks');
       else if (id === 'garage') this.cb.goto('garage');
@@ -367,6 +392,8 @@ export class MainMenuScreen extends Screen {
     super.show();
     const s = this.state();
     this.setBike(s.bikeClass);
+    this.focusRow = this.focusCol = 0;
+    this.paintChoices();
     // Ticker: the shipped tracks in tier order, each with its best time or a dash; never a control.
     const cells = shipTracks(this.tracks).map((t) => {
       const b = this.bestOf(t.id);
@@ -394,12 +421,125 @@ export class MainMenuScreen extends Screen {
     }
   }
 
+  private mountChoices(): void {
+    const panel = h('div', 'menu-customize');
+    this.outfitStatus.setAttribute('role', 'status');
+    const addRow = (label: string) => {
+      const row = h('div', 'outfit-options');
+      row.setAttribute('role', 'group');
+      row.setAttribute('aria-label', label);
+      panel.append(h('div', 'outfit-heading', `<strong>${label}</strong>`), row);
+      return row;
+    };
+    const wireFocus = (button: HTMLButtonElement) => {
+      button.addEventListener('focus', () => {
+        const rows = this.controlRows();
+        this.focusRow = rows.findIndex(row => row.includes(button));
+        this.focusCol = rows[this.focusRow]?.indexOf(button) ?? 0;
+        this.paintChoices();
+      });
+    };
+    if (this.state().models) {
+      const row = addRow('Rider model');
+      for (const [value, label] of [['gltf', 'Blender'], ['proc', 'Classic'], ['img2', 'Img2 experiment']] as const) {
+        const button = h('button', 'outfit-button', `<strong>${label}</strong>`);
+        button.type = 'button';
+        button.dataset['model'] = value;
+        button.addEventListener('click', () => {
+          if (!this.visible || !isLiveTarget(button)) return;
+          this.cb.setModel('rider', value);
+          this.paintChoices();
+        });
+        wireFocus(button);
+        this.modelButtons.set(value, button);
+        row.appendChild(button);
+      }
+    }
+    if (this.cb.outfits) {
+      const row = addRow('Rider outfit');
+      for (const outfit of RIDER_OUTFITS) {
+        const button = h('button', 'outfit-button', `<strong>${escapeHtml(OUTFIT_LABEL[outfit])}</strong><span>${escapeHtml(OUTFIT_DETAIL[outfit])}</span>`);
+        button.type = 'button';
+        button.dataset['outfit'] = outfit;
+        wireFocus(button);
+        button.addEventListener('click', () => {
+          if (this.visible && isLiveTarget(button)) void this.selectOutfit(outfit);
+        });
+        this.outfitButtons.set(outfit, button);
+        row.appendChild(button);
+      }
+      panel.appendChild(this.outfitStatus);
+    }
+    if (panel.childElementCount) this.root.appendChild(panel);
+  }
+
+  private controlRows(): HTMLButtonElement[][] {
+    return [
+      [...this.list.root.querySelectorAll<HTMLButtonElement>('.menu-item')],
+      [...this.outfitButtons.values()],
+      [...this.modelButtons.values()],
+    ].filter(row => row.length > 0);
+  }
+
+  private paintChoices(): void {
+    const current = this.cb.outfits?.get();
+    const rider = this.state().rider;
+    const blender = rider === 'gltf';
+    for (const [outfit, button] of this.outfitButtons) {
+      button.classList.toggle('selected', blender && outfit === current);
+      button.setAttribute('aria-pressed', String(blender && outfit === current));
+      button.setAttribute('aria-busy', String(outfit === this.pendingOutfit));
+    }
+    for (const [model, button] of this.modelButtons) {
+      button.classList.toggle('selected', model === this.state().rider);
+      button.setAttribute('aria-pressed', String(model === this.state().rider));
+    }
+    for (const [row, buttons] of this.controlRows().entries()) {
+      if (row === 0) continue;
+      buttons.forEach((button, col) => button.classList.toggle('on', row === this.focusRow && col === this.focusCol));
+    }
+    const active = !blender ? `${rider === 'img2' ? 'Img2 experiment' : 'Classic rider'} · choose an outfit to use Blender`
+      : current ? `${OUTFIT_LABEL[current]} selected` : '';
+    const status = this.pendingOutfit ? `Loading ${OUTFIT_LABEL[this.pendingOutfit]}…`
+      : this.failedOutfit ? `Could not load ${OUTFIT_LABEL[this.failedOutfit]}. Select it to retry. ${active}` : active;
+    if (this.outfitStatus.textContent !== status) this.outfitStatus.textContent = status;
+  }
+
+  private async selectOutfit(outfit: RiderOutfit): Promise<void> {
+    const outfits = this.cb.outfits;
+    if (!outfits || this.pendingOutfit === outfit) return;
+    const request = ++this.outfitRequest;
+    this.pendingOutfit = outfit;
+    this.failedOutfit = null;
+    this.paintChoices();
+    let loaded = false;
+    try { loaded = await outfits.set(outfit); } catch { /* Keep the committed choice and offer retry. */ }
+    if (request !== this.outfitRequest) return;
+    this.pendingOutfit = null;
+    this.failedOutfit = loaded ? null : outfit;
+    this.paintChoices();
+  }
+
   nav(dx: number, dy: number): void {
-    // Tabs run left → right; up/down walk them too so a d-pad in either habit works.
-    this.list.move(dx || dy);
+    if (!this.visible || !isLiveTarget(this.root)) return;
+    const rows = this.controlRows();
+    if (dy && rows.length > 1) {
+      // The main tabs are below the outfit and model rows.
+      this.focusRow = (this.focusRow - Math.sign(dy) + rows.length) % rows.length;
+      this.focusCol = Math.min(this.focusCol, rows[this.focusRow]!.length - 1);
+    } else {
+      const row = rows[this.focusRow]!;
+      this.focusCol = (this.focusCol + Math.sign(dx || dy) + row.length) % row.length;
+    }
+    const button = rows[this.focusRow]![this.focusCol]!;
+    button.focus({ preventScroll: true });
+    button.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+    this.paintChoices();
   }
   confirm(): void {
-    this.list.pick();
+    if (!this.visible || !isLiveTarget(this.root)) return;
+    if (this.focusRow === 0) this.list.pick();
+    else this.controlRows()[this.focusRow]?.[this.focusCol]?.click();
   }
   /** Boot screen: Esc / B has nowhere further back to go. */
   back(): void {}
@@ -766,7 +906,7 @@ export class SettingsScreen extends Screen {
 
     seg('ghost', 'Ghost', 'Your personal-best run rides alongside', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().ghost ? 'on' : 'off'), (v) => this.cb.setGhost(v === 'on'));
     if (s().models) {
-      seg('rider', 'Rider', 'Applies on the next track load', [{ v: 'proc', l: 'Procedural' }, { v: 'gltf', l: 'Modelled' }], () => s().rider, (v) => this.cb.setModel('rider', v as ModelChoice));
+      seg('rider', 'Rider', 'Choose a rider model', [{ v: 'proc', l: 'Classic' }, { v: 'gltf', l: 'Blender' }, { v: 'img2', l: 'Img2 experiment' }], () => s().rider, (v) => this.cb.setModel('rider', v as ModelChoice));
       seg('bike', 'Bike', 'Applies on the next track load', [{ v: 'proc', l: 'Procedural' }, { v: 'gltf', l: 'Modelled' }], () => s().bike, (v) => this.cb.setModel('bike', v as ModelChoice));
     }
 

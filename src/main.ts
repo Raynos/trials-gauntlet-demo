@@ -82,7 +82,7 @@ export interface ModelChoices {
 function modelChoices(params: URLSearchParams): ModelChoices {
   const pick = (v: string | null, stored: ModelChoice): ModelChoice => (v === 'gltf' || v === 'proc' ? v : stored);
   return {
-    riderModel: pick(params.get('rider'), loadModelChoice('rider')),
+    riderModel: params.get('rider') === 'img2' ? 'img2' : pick(params.get('rider'), loadModelChoice('rider')),
     bikeModel: pick(params.get('bike'), loadModelChoice('bike')),
   };
 }

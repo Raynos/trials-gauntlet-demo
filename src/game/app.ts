@@ -62,6 +62,7 @@ import {
   type FrontScreen,
   type FrontState,
   type ModelChoice,
+  type FrontCallbacks,
   type QualityChoice,
 } from '../ui';
 import { tickLive } from '../ui/live';
@@ -303,7 +304,7 @@ export class App {
       canShare: typeof navigator !== 'undefined' && typeof navigator.share === 'function',
       ...(o.physics ? { physics: o.physics } : {}),
     });
-    const cb = {
+    const cb: FrontCallbacks = {
       play: (id: string) => this.play(id),
       timeAttack: (id: string) => {
         this.sfx.launch();
@@ -373,6 +374,18 @@ export class App {
       },
     };
 
+    cb.outfits = {
+      get: () => this.riderOutfit,
+      set: async (outfit) => {
+        if (!await this.o.onRiderOutfitChange?.(outfit)) return false;
+        this.riderOutfit = outfit;
+        saveRiderOutfit(outfit);
+        o.models.rider = 'gltf';
+        saveModelChoice('rider', 'gltf');
+        return true;
+      },
+    };
+
     this.menu = new MainMenuScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
     this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state, (id, bike) => this.bestTimes.board(id, bike));
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
@@ -380,12 +393,7 @@ export class App {
     this.garage = new GarageScreen(o.uiRoot, this.sfx, this.art, {
       previewBike: (b) => this.applyBike(b, false),
       setBike: (b) => this.applyBike(b, true),
-      setOutfit: async (outfit) => {
-        if (!await this.o.onRiderOutfitChange?.(outfit)) return false;
-        this.riderOutfit = outfit;
-        saveRiderOutfit(outfit);
-        return true;
-      },
+      setOutfit: (outfit) => cb.outfits!.set(outfit),
       back: () => this.goto('menu'),
     });
     this.onboard = new OnboardingCard(o.uiRoot, () => {
@@ -451,6 +459,7 @@ export class App {
         this.fullRestart('pause:restart');
       },
       quit: () => this.quit('pause:quit'),
+      outfits: cb.outfits!,
       ...(o.modelsSupported
         ? {
             models: {

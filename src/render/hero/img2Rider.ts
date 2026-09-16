@@ -34,7 +34,31 @@ function document(): GLTF {
     mesh.position.set(0, 0, 0); mesh.quaternion.identity(); mesh.scale.set(1, 1, 1);
     const count = mesh.geometry.getAttribute('position').count;
     const indices = new Uint16Array(count * 4), weights = new Float32Array(count * 4);
-    for (let v = 0; v < count; v++) { indices[v * 4] = index; weights[v * 4] = 1; }
+    const position = mesh.geometry.getAttribute('position');
+    const point = new THREE.Vector3();
+    const smooth = (a: number, b: number, x: number) => {
+      const t = THREE.MathUtils.clamp((x - a) / (b - a), 0, 1);
+      return t * t * (3 - 2 * t);
+    };
+    for (let v = 0; v < count; v++) {
+      point.fromBufferAttribute(position, v);
+      let influences: [string, number][] = [[owner, 1]];
+      const s = point.x >= 0 ? 'L' : 'R';
+      // These are continuous garments. The separate sleeve/thigh/shin meshes are
+      // only tiny semantic markers, so weighting the whole shell to its root fails.
+      if (part === 'jeans') {
+        const pelvis = smooth(.76, .91, point.y);
+        const thigh = smooth(.36, .49, point.y);
+        influences = [['pelvis', pelvis], [`thigh.${s}`, (1 - pelvis) * thigh], [`shin.${s}`, (1 - pelvis) * (1 - thigh)]];
+      } else if (part === 'hoodie') {
+        const arm = smooth(.14, .24, Math.abs(point.x));
+        influences = [['chest', 1 - arm], [`upperArm.${s}`, arm]];
+      }
+      for (const [slot, [name, weight]] of influences.entries()) {
+        indices[v * 4 + slot] = rig.skeleton.bones.indexOf(rig.bones[name]!);
+        weights[v * 4 + slot] = weight;
+      }
+    }
     mesh.geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(indices, 4));
     mesh.geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(weights, 4));
     mesh.bind(rig.skeleton, new THREE.Matrix4());

@@ -1,0 +1,156 @@
+{
+  "pass": true,
+  "checks": [
+    "main selects experimental rider",
+    "experimental selection survives reload",
+    "main outfit street-mustard",
+    "main outfit street-openface",
+    "main outfit race-bluewhite",
+    "main outfit street-charcoal",
+    "main outfit race-charcoalyellow",
+    "pause outfit street-mustard",
+    "pause outfit street-openface",
+    "pause outfit race-bluewhite",
+    "pause outfit street-charcoal",
+    "pause outfit race-charcoalyellow",
+    "mobile pause outfit selectable; paused physics unchanged"
+  ],
+  "errors": [],
+  "missing": [],
+  "debug": {
+    "prepare": [
+      {
+        "step": "art:start",
+        "ms": 46.7,
+        "bytes": 0
+      },
+      {
+        "step": "hero:bike",
+        "ms": 105.3,
+        "bytes": 0
+      },
+      {
+        "step": "hero:rider",
+        "ms": 2.4,
+        "bytes": 0
+      },
+      {
+        "step": "lighting",
+        "ms": 10.6,
+        "bytes": 0
+      },
+      {
+        "step": "post:create",
+        "ms": 13.1,
+        "bytes": 0
+      },
+      {
+        "step": "materials",
+        "ms": 533.5,
+        "bytes": 27256160.255999994
+      },
+      {
+        "step": "hero:gltf",
+        "ms": 0.1,
+        "bytes": 0
+      },
+      {
+        "step": "art:settled",
+        "ms": 0.1,
+        "bytes": 1280650
+      },
+      {
+        "step": "shaders",
+        "ms": 949.7,
+        "bytes": 0
+      },
+      {
+        "step": "firstframe:world",
+        "ms": 285.3,
+        "bytes": 0
+      },
+      {
+        "step": "firstframe:post",
+        "ms": 24,
+        "bytes": 0
+      }
+    ],
+    "biome": "industrial",
+    "zoom": "riding",
+    "occluder": {
+      "ms": 0,
+      "tested": 5,
+      "hits": 0,
+      "count": 6,
+      "override": null
+    },
+    "phase": "riding",
+    "tier": "low",
+    "dpr": 1,
+    "devicePixelRatio": 1,
+    "canvasW": 1280,
+    "canvasH": 720,
+    "calls": 153,
+    "tris": 693119,
+    "rtMpx": 1.18,
+    "rtMB": 9,
+    "rtPasses": "shadow 512×512 | scene→canvas 1280×720",
+    "shadowMap": 512,
+    "heroTris": 322702,
+    "heroDoc": "bike-lod rider-img2-experimental",
+    "riderOutfit": null,
+    "riderMaterialVariant": null,
+    "heroShadow": "hero-only",
+    "trackCalls": 11,
+    "trackTris": 177888,
+    "textureGenMs": 319.12000000000035,
+    "passes": 1,
+    "stalePrograms": 39,
+    "stabilized": {
+      "singlePass": 0,
+      "split": 6,
+      "depth": 33
+    },
+    "skippedFrames": 35,
+    "deviceClass": "desktop",
+    "profile": "low",
+    "bloomers": 0,
+    "entryMs": 759,
+    "entry": {
+      "biome": "industrial",
+      "ms": 759,
+      "compileMs": 133.94000000000324,
+      "textureMs": 14.079999999999927,
+      "warmMs": 51,
+      "textures": 55,
+      "texturesMB": 74.4,
+      "materials": 73,
+      "programs": 43,
+      "programsBefore": 32
+    },
+    "entering": false,
+    "retirement": {
+      "requested": 19,
+      "released": 19,
+      "deferred": 0,
+      "pending": 0,
+      "maxPending": 0,
+      "contextLosses": 0
+    },
+    "terminalPrograms": {
+      "deleted": 0,
+      "contextReleased": 0
+    },
+    "art": {
+      "settled": true,
+      "ok": true,
+      "loadMs": 92,
+      "deliveredMB": 1.22,
+      "inWorld": true,
+      "trackComplete": true,
+      "trackIds": 29,
+      "builtAtFrame": 0,
+      "frames": 301
+    }
+  }
+}
