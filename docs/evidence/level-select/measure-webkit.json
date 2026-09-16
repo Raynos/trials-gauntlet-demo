@@ -1,0 +1,552 @@
+{
+ "open@932x430": {
+  "page": "tracks",
+  "scrollLeft": 932,
+  "pageW": 932,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 14,
+  "small": [],
+  "overlaps": [],
+  "focused": "m1-hop-up",
+  "nodesPerPage": [
+   7,
+   35,
+   18,
+   16,
+   12,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "snap@932x430": {
+  "page": "tracks",
+  "scrollLeft": 1864,
+  "pageW": 932,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focused": "e1-uphill-weight",
+  "nodesPerPage": [
+   7,
+   19,
+   37,
+   16,
+   12,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "locked@932x430": {
+  "page": "tracks",
+  "scrollLeft": 3728,
+  "pageW": 932,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 11,
+  "small": [],
+  "overlaps": [],
+  "focused": "h1-wheelie-wire",
+  "nodesPerPage": [
+   7,
+   19,
+   18,
+   16,
+   24,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "card@932x430": {
+  "page": "tracks",
+  "scrollLeft": 932,
+  "pageW": 932,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 14,
+  "small": [],
+  "overlaps": [],
+  "focused": "b2-lean-back",
+  "nodesPerPage": [
+   7,
+   38,
+   18,
+   16,
+   12,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "island@932x430": {
+  "page": "tracks",
+  "scrollLeft": 0,
+  "pageW": 932,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 16,
+  "small": [],
+  "overlaps": [],
+  "focused": "lab-flat-200",
+  "nodesPerPage": [
+   19,
+   19,
+   18,
+   16,
+   12,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "open@844x390": {
+  "page": "tracks",
+  "scrollLeft": 844,
+  "pageW": 844,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 14,
+  "small": [],
+  "overlaps": [],
+  "focused": "m1-hop-up",
+  "nodesPerPage": [
+   7,
+   35,
+   18,
+   16,
+   12,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "snap@844x390": {
+  "page": "tracks",
+  "scrollLeft": 1688,
+  "pageW": 844,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focused": "e1-uphill-weight",
+  "nodesPerPage": [
+   7,
+   19,
+   37,
+   16,
+   12,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "locked@844x390": {
+  "page": "tracks",
+  "scrollLeft": 3376,
+  "pageW": 844,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 11,
+  "small": [],
+  "overlaps": [],
+  "focused": "h1-wheelie-wire",
+  "nodesPerPage": [
+   7,
+   19,
+   18,
+   16,
+   24,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "card@844x390": {
+  "page": "tracks",
+  "scrollLeft": 844,
+  "pageW": 844,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 14,
+  "small": [],
+  "overlaps": [],
+  "focused": "b2-lean-back",
+  "nodesPerPage": [
+   7,
+   38,
+   18,
+   16,
+   12,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ },
+ "island@844x390": {
+  "page": "tracks",
+  "scrollLeft": 0,
+  "pageW": 844,
+  "axes": [
+   "x:tmap"
+  ],
+  "overflowY": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tileOverflow": [
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   },
+   {
+    "top": 0,
+    "bottom": 0
+   }
+  ],
+  "targets": 16,
+  "small": [],
+  "overlaps": [],
+  "focused": "lab-flat-200",
+  "nodesPerPage": [
+   19,
+   19,
+   18,
+   16,
+   12,
+   18
+  ],
+  "totals": "6/15 cleared0132"
+ }
+}

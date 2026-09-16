@@ -1,0 +1,19 @@
+{
+ "menuLive": 13731,
+ "tracksLive": 16539,
+ "opening": "industrial / m1-hop-up",
+ "totals": "6/15 cleared0132",
+ "afterSnap": "canyon / e1-uphill-weight @ 1864",
+ "tapM1": 20419,
+ "runScreen": 21262,
+ "tapsMenuToM1": 2,
+ "riding": 26388,
+ "track": "m1-hop-up",
+ "runTimeAfter3s": 2.625,
+ "bikeX": 14.68,
+ "rideEnd": 29647,
+ "backInMenu": 31115,
+ "taps": 6,
+ "navLog": "[{\"at\":3757,\"kind\":\"goto\",\"to\":\"menu\",\"trigger\":\"direct\",\"screen\":\"menu\",\"phase\":\"menu\",\"stage\":-1,\"sinceScreenMs\":3757,\"down\":null,\"opacity\":1,\"targetLive\":true},{\"at\":14506,\"kind\":\"goto\",\"to\":\"tracks\",\"trigger\":\"click button.menu-item.on[play]\",\"screen\":\"menu\",\"phase\":\"menu\",\"stage\":-1,\"sinceScreenMs\":10748,\"down\":{\"x\":109,\"y\":372,\"agoMs\":97,\"target\":\"button.menu-item.on[play]\"},\"opacity\":1,\"targetLive\":true},{\"at\":30031,\"kind\":\"pause\",\"trigger\":\"poll:touch:pause\",\"screen\":\"run\",\"phase\":\"riding\",\"stage\":-1,\"sinceScreenMs\":8791,\"down\":{\"x\":41,\"y\":33,\"agoMs\":94,\"target\":\"div.touch-layer.visible.on\"},\"opacity\":1,\"targetLive\":true},{\"at\":30395,\"kind\":\"quit\",\"trigger\":\"click button.tile.on[quit] (pause:quit)\",\"screen\":\"run\",\"phase\":\"riding\",\"stage\":-1,\"sinceScreenMs\":364,\"down\":{\"x\":638,\"y\":320,\"agoMs\":1,\"target\":\"button.tile.on[quit]\"},\"opacity\":1,\"targetLive\":true},{\"at\":30910,\"kind\":\"goto\",\"to\":\"menu\",\"trigger\":\"click button.tile.on[quit]\",\"screen\":\"run\",\"phase\":\"menu\",\"stage\":-1,\"sinceScreenMs\":879,\"down\":{\"x\":638,\"y\":320,\"agoMs\":516,\"target\":\"button.tile.on[quit]\"},\"opacity\":0,\"targetLive\":false}]",
+ "clip": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/1e182bc7-5cf2-4e60-9e21-0ab5b46f5a7d/scratchpad/levelselect/clip/chromium-932x430-clip.webm"
+}

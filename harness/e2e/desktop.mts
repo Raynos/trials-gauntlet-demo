@@ -223,9 +223,9 @@ class Flow {
     await this.expectScreens(['tracks'], 'tracks-alone');
     await this.expectLegend('.tracks-screen .legend', 'D3-tracks-legend');
     await this.expectNoTouch('D2-tracks');
-    // The focused card is the first non-lab track (B1).
-    await this.waitFor(`!!document.querySelector('.tracks-screen.live .card.on')`, 10000);
-    const card = await this.page.evaluate(`(() => { const c = document.querySelector('.tracks-screen .card.on'); return c ? { text: c.textContent, disabled: c.disabled, cls: c.className } : null; })()`) as { text: string; disabled: boolean; cls: string } | null;
+    // The focused pin is the first campaign track (B1) on the Industrial page.
+    await this.waitFor(`!!document.querySelector('.tracks-screen.live .tpin.on')`, 10000);
+    const card = await this.page.evaluate(`(() => { const c = document.querySelector('.tracks-screen .tpin.on'); return c ? { text: c.textContent, disabled: c.disabled, cls: c.className } : null; })()`) as { text: string; disabled: boolean; cls: string } | null;
     this.expect(card && !card.disabled && !/locked/.test(card.cls), 'tracks-focus', `focused card ${JSON.stringify(card)}`);
     await this.press('confirm');
     // SwiftShader stalls the main thread for seconds on the run's first frames: wait for the handoff, don't time it.

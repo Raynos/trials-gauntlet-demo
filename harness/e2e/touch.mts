@@ -239,13 +239,12 @@ async function still(page: Page, g: Geom, name: string): Promise<void> {
   await page.screenshot({ path: `${stillsDir}/${g.name}-${name}.png` });
 }
 
-async function scrollGesture(ctx: BrowserContext, page: Page, x: number, y0: number, dy: number): Promise<void> {
+async function scrollGesture(ctx: BrowserContext, page: Page, x: number, y0: number, dy: number, dx = 0, steps = 12, stepMs = 16): Promise<void> {
   const cdp = await ctx.newCDPSession(page);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: y0 }] });
-  const steps = 12;
   for (let i = 1; i <= steps; i++) {
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y0 + (dy * i) / steps }] });
-    await page.waitForTimeout(16);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x + (dx * i) / steps, y: y0 + (dy * i) / steps }] });
+    await page.waitForTimeout(stepMs);
   }
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await cdp.detach();
@@ -374,14 +373,65 @@ async function flowFront(ctx: BrowserContext, url: string, g: Geom): Promise<voi
   await page.waitForTimeout(300);
   expect((await visibleScreens(page)).join() === 'menu', flow, 'settings→menu(pill)', `got ${await visibleScreens(page)}`);
 
-  // Garage and credits round-trips.
+  // Garage (garage round: the model explorer — rail of tags left, hero centre, panel right) and credits round-trips.
   await menuItem(page, flow, 'Garage');
   expect((await visibleScreens(page)).join() === 'garage', flow, 'menu→garage', `got ${await visibleScreens(page)}`);
   await checkTargets(page, flow + ':garage');
+  await checkIsolation(page, flow + ':garage');
+  {
+    // G1: the stage + orbit camera are up, the hero is ≥ 45 % of the height and no tappable overlaps its box.
+    // Measured on an orbit frame: the rig adopts the orbit (fov 30°, the menu rig sits at 28°) on the first draw after the screen shows.
+    await page.waitForFunction(`window.__render && Math.abs(window.__render.debug.rig.camera.fov - 30) < 0.01`, null, { timeout: 20000, polling: 200 }).catch(() => undefined);
+    const g1 = await page.evaluate(`(function () {
+      var r = window.__render; if (!r) return null; var T = r.debug.THREE; var cam = r.debug.rig.camera; var info = r.debugInfo();
+      var box = new T.Box3(); var tmp = new T.Box3();
+      [r.debug.bike.root, r.debug.rider.root].forEach(function (o) { if (o && o.visible) { tmp.setFromObject(o); box.union(tmp); } });
+      var xs = [], ys = [];
+      for (var i = 0; i < 8; i++) { var v = new T.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).project(cam); xs.push((v.x + 1) / 2 * innerWidth); ys.push((1 - v.y) / 2 * innerHeight); }
+      var hero = { l: Math.min.apply(null, xs), r: Math.max.apply(null, xs), t: Math.min.apply(null, ys), b: Math.max.apply(null, ys) };
+      var overlaps = [];
+      document.querySelectorAll('.garage-screen button').forEach(function (el) { var q = el.getBoundingClientRect(); if (q.width < 2) return; var ox = Math.min(hero.r, q.right) - Math.max(hero.l, q.left); var oy = Math.min(hero.b, q.bottom) - Math.max(hero.t, q.top); if (ox > 4 && oy > 4) overlaps.push(el.className.split(' ')[0] + ' ' + Math.round(ox) + 'x' + Math.round(oy)); });
+      return { on: info.garage.on, mode: info.occluder.override, share: (hero.b - hero.t) / innerHeight, overlaps: overlaps };
+    })()`) as { on: boolean; mode: string | null; share: number; overlaps: string[] } | null;
+    expect(g1 && g1.on && g1.mode === 'orbit', flow, 'G1-stage', `garage stage/orbit: ${JSON.stringify(g1)}`);
+    expect(g1 && g1.share >= 0.45, flow, 'G1-hero-share', `hero is ${g1 ? (g1.share * 100).toFixed(0) : '?'} % of the height (< 45)`);
+    expect(g1 && g1.overlaps.length === 0, flow, 'G1-hero-clear', `tappables over the hero: ${g1?.overlaps.join(', ')}`);
+    // G2: a one-finger drag across the hero rotates the orbit and never leaves the screen; the tags still tap.
+    // Let the first garage frames (the stage's programs compile on first draw — seconds under SwiftShader) go by:
+    // a busy main thread coalesces touch moves away and the drag would arrive as a bare start/end.
+    await page.waitForFunction(`new Promise(function (res) { var t0 = performance.now(); requestAnimationFrame(function () { var t1 = performance.now(); requestAnimationFrame(function () { res(performance.now() - t1 < 120 && t1 - t0 < 120); }); }); })`, null, { timeout: 20000, polling: 250 }).catch(() => undefined);
+    const yaw0 = await page.evaluate(`window.__render.debug.rig.camera.position.x`);
+    await page.evaluate(`(function(){ window.__pe = []; document.addEventListener('pointerdown', function(e){ window.__pe.push(e.target.className || e.target.tagName); }, true); })()`);
+    // Up to three tries: under SwiftShader with parallel contexts the compositor's touch hit-test can lag the
+    // `.live` flip by a frame or two and hand the first touchStart to the canvas under the screen (target logged).
+    let yaw1 = yaw0 as number;
+    for (let attempt = 0; attempt < 3 && Math.abs(yaw1 - (yaw0 as number)) <= 0.2; attempt++) {
+      await scrollGesture(ctx, page, g.width * 0.5, g.height * 0.45, 0, g.width * 0.25, 20, 40);
+      // The camera moves on the next drawn frame — a second away on a loaded SwiftShader.
+      await page.waitForFunction(`Math.abs(window.__render.debug.rig.camera.position.x - (${yaw0 as number})) > 0.2`, null, { timeout: 6000 }).catch(() => undefined);
+      yaw1 = (await page.evaluate(`window.__render.debug.rig.camera.position.x`)) as number;
+    }
+    expect((await visibleScreens(page)).join() === 'garage', flow, 'G2-drag-stays', `drag left the garage: ${await visibleScreens(page)}`);
+    const pe = await page.evaluate(`'targets=' + window.__pe.join(',')`);
+    expect(Math.abs(yaw1 - (yaw0 as number)) > 0.2, flow, 'G2-drag-rotates', `camera x ${yaw0} → ${yaw1} (${pe})`);
+    await tapSel(page, flow, '.garage-screen.live button[data-outfit="street-openface"]');
+    await page.waitForTimeout(300);
+    expect((await visibleScreens(page)).join() === 'garage', flow, 'G2-tag-stays', `outfit tap left the garage: ${await visibleScreens(page)}`);
+    await tapSel(page, flow, '.garage-screen.live button[data-bike="pro"]');
+    await page.waitForTimeout(300);
+    const pro = await page.evaluate(`document.querySelector('.garage-screen button[data-bike="pro"]').getAttribute('aria-pressed')`);
+    expect(pro === 'true', flow, 'G2-bike-tap', `Pro tag aria-pressed ${pro}`);
+    await tapSel(page, flow, '.garage-screen.live button[data-bike="rookie"]');
+    await page.waitForTimeout(300);
+  }
   await tapSel(page, flow, '.garage-screen.live .backbtn');
   await waitFor(page, `!!document.querySelector('.menu-screen.show')`, 10000);
   await page.waitForTimeout(300);
   expect((await visibleScreens(page)).join() === 'menu', flow, 'garage→menu(pill)', `got ${await visibleScreens(page)}`);
+  {
+    const off = await page.evaluate(`(function () { var r = window.__render; if (!r) return null; var i = r.debugInfo(); return { on: i.garage.on, mode: i.occluder.override }; })()`) as { on: boolean; mode: string | null } | null;
+    expect(off && !off.on && off.mode === null, flow, 'G3-stage-off', `stage/orbit after leaving the garage: ${JSON.stringify(off)}`);
+  }
   await menuItem(page, flow, 'Credits');
   expect((await visibleScreens(page)).join() === 'credits', flow, 'menu→credits', `got ${await visibleScreens(page)}`);
   await tapSel(page, flow, '.credits-screen.live .backbtn');
@@ -398,8 +448,8 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   const tl0 = await touchLayer(page);
   expect(!tl0.on, flow, 'R4-off-in-menus', `touch layer on in the menu`);
   await menuItem(page, flow, 'Play');
-  // Tap the focused card (B1) — the first non-lab card.
-  const ok = await tapSel(page, flow, '.tracks-screen.live .card.on');
+  // Tap the focused pin (B1, the opening focus on a fresh profile): the focused pin launches.
+  const ok = await tapSel(page, flow, '.tracks-screen.live .tpin.on');
   if (!ok) return page.close();
   // SwiftShader stalls the main thread for seconds on the run's first frames: wait for the handoff, don't time it.
   await page.waitForFunction(() => ![...document.querySelectorAll('.screen')].some((el) => el.classList.contains('show')), null, { timeout: 60000 }).catch(() => undefined);

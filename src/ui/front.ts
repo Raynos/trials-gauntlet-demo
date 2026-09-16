@@ -6,12 +6,14 @@
  * exposes `nav / confirm / back` for the app shell. Targets ≥ 44 px, safe-area
  * aware, tokens from styles.ts only.
  */
-import type { BikeClass, BiomeId, Medal, RiderOutfit, TrackDef, TrackTier } from '../core/types';
+import type { BikeClass, Medal, RiderOutfit, TrackDef } from '../core/types';
 import { BIOME_TINT, type ArtManifest } from './art';
 import type { BestEntry, BoardEntry, FpsChoice, ModelChoice } from './best';
 import { formatTime } from './format';
 import type { QualityChoice } from './menu';
-import { labTracks, medalTotals, nextTrack, playgroundTracks, shipTracks, TIER_BLURB, TIER_LABEL, TIER_ORDER, tierUnlocked, tracksInTier, type MedalOf } from './progress';
+import { isLabTrack, medalTotals, nextTrack, shipTracks, TIER_LABEL, type MedalOf } from './progress';
+import { injectTrackMapStyles } from './styles';
+import { buildPages, codeOf, defaultPin, locate, nextGate, pageDots, tilePlateSrc, type Page, type PageId, type Pin } from './trackMap';
 import type { UiSfx } from './sfx';
 import { conceal, reveal, isLiveTarget } from './live';
 import { RIDER_OUTFITS, OUTFIT_LABEL, OUTFIT_DETAIL } from './outfit';
@@ -546,22 +548,45 @@ export class MainMenuScreen extends Screen {
 }
 
 // ---------------------------------------------------------------------------
-// Track select
+// Track select — the isometric diorama (assets/design/tracks/round3/SPEC.md §5: A3b lit like A3e)
 // ---------------------------------------------------------------------------
 
-interface CardRef {
+interface PinRef {
   el: HTMLButtonElement;
-  track: TrackDef;
-  locked: boolean;
+  pin: Pin;
 }
 
+interface PageRef {
+  page: Page;
+  el: HTMLDivElement;
+  slot: HTMLDivElement;
+  pins: PinRef[];
+}
+
+/**
+ * One horizontal snap scroller of six pages — the proving-ground island, then the five biome tiles — each
+ * page an isometric night diorama plate (`art/tiles/`) with the tier's tracks as pins on it, the amber route
+ * through the pins (the cleared part lit), the medals as lit trophies on the front ledge, and the next tier
+ * gate as a stub carrying the next locked track and its rule. A 44 px miniature row along the bottom snaps
+ * between pages. The focused pin's card (A3d's rising card) carries RIDE · ▶ GHOST · REVIEW and the top-5
+ * board. One scroll axis; every tappable ≥ 44 px; the screen opens on `nextTrack()`'s page, focused on it.
+ *
+ * Taps: an unfocused pin focuses (the card rises); the focused pin, or RIDE, launches — PLAY then the opening
+ * pin is 2 taps to B1. A locked pin shakes and states its rule. Keys / pad: ←→ pins then pages, ↑↓ pages,
+ * Enter launches, V / Y watches the PB, Esc / B back.
+ */
 export class TrackSelectScreen extends Screen {
-  private readonly tiers: HTMLDivElement;
+  private readonly map: HTMLDivElement;
+  private readonly mini: HTMLDivElement;
   private readonly totalsEl: HTMLDivElement;
-  private rows: { tier: TrackTier; el: HTMLDivElement; cards: CardRef[]; locked: boolean }[] = [];
-  private row = 0;
-  private col: number[] = [];
+  private readonly card: HTMLDivElement;
+  private pages: PageRef[] = [];
+  private page = 0;
+  private pinIndex: number[] = [];
   private launching = false;
+  private snapTimer = 0;
+  /** Card actions get keyboard focus after the pins (↓ from a pin, ↑ back). */
+  private action = -1;
 
   constructor(
     parent: HTMLElement,
@@ -574,142 +599,175 @@ export class TrackSelectScreen extends Screen {
     private readonly boardOf?: (id: string, bike: BikeClass) => BoardEntry[],
   ) {
     super(parent, 'tracks-screen');
+    injectTrackMapStyles();
     const head = h('div', 'tracks-head');
     head.innerHTML = `<h1>Select track</h1>`;
     this.totalsEl = h('div', 'tracks-totals');
     head.appendChild(this.totalsEl);
-    this.tiers = h('div', 'tiers');
+    this.map = h('div', 'tmap');
+    this.mini = h('div', 'tmini');
+    this.card = h('div', 'tcard');
     this.legend = h('div', 'legend', LEGEND_KB);
-    this.root.append(h('div', 'grain'), head, this.tiers, this.legend);
+    this.root.append(h('div', 'grain'), head, this.map, this.mini, this.legend);
     this.addBackButton('Menu');
-    this.tiers.addEventListener('pointermove', (e) => {
+    this.map.addEventListener('pointermove', (e) => {
       if (e.pointerType === 'touch') return;
-      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.card');
-      if (b) this.focusCard(Number(b.dataset['r']), Number(b.dataset['c']), true);
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.tpin');
+      if (b && Number(b.dataset['p']) === this.page) this.focusPin(this.page, Number(b.dataset['i']), true, false);
     });
-    this.tiers.addEventListener('click', (e) => {
-      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.card');
-      if (!b) return;
-      this.focusCard(Number(b.dataset['r']), Number(b.dataset['c']), false);
-      if ((e.target as HTMLElement).closest('.watch')) this.alt(); // "Watch PB" tag: the replay viewer, not a launch
-      else this.confirm();
+    this.map.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const pin = t.closest<HTMLButtonElement>('.tpin');
+      if (pin) {
+        const p = Number(pin.dataset['p']);
+        const i = Number(pin.dataset['i']);
+        const already = p === this.page && i === this.pinIndex[p] && this.action < 0;
+        this.focusPin(p, i, false, true);
+        if (already || this.current()?.pin.locked) this.confirm(); // the focused pin launches; a locked pin shakes and states its rule
+        return;
+      }
+      const gate = t.closest<HTMLButtonElement>('.gate');
+      if (gate) {
+        const at = locate(this.pages.map((x) => x.page), gate.dataset['track']);
+        if (at) this.focusPin(at.page, at.pin, true, true);
+        return;
+      }
+      const act = t.closest<HTMLButtonElement>('.tc-actions button');
+      if (act) {
+        if (act.classList.contains('tc-ride')) this.confirm();
+        else if (act.classList.contains('tc-ghost')) this.alt();
+        else if (act.classList.contains('tc-review')) this.review();
+      }
     });
+    this.mini.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.tm');
+      if (b) this.gotoPage(Number(b.dataset['p']), true, true);
+    });
+    // Swipe: the scroller snaps by itself; the focus follows the page it settled on (no per-frame work — one timer per scroll burst).
+    this.map.addEventListener('scroll', () => {
+      if (this.snapTimer) clearTimeout(this.snapTimer);
+      this.snapTimer = window.setTimeout(() => {
+        this.snapTimer = 0;
+        const w = this.map.clientWidth || 1;
+        const p = Math.max(0, Math.min(this.pages.length - 1, Math.round(this.map.scrollLeft / w)));
+        if (p !== this.page) this.gotoPage(p, true, false);
+      }, 120);
+    }, { passive: true });
+    window.addEventListener('resize', () => {
+      if (this.visible) this.layout();
+    });
+  }
+
+  /** The tile's width from the map's box: the page's left 58 % or the page's height × 3/2, whichever fits. Called on build, show and resize (never per frame). */
+  private layout(): void {
+    const first = this.pages[0]?.el;
+    if (!first) return;
+    const cs = getComputedStyle(first);
+    const inner = this.map.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+    const w = Math.max(120, Math.floor(Math.min(inner * 0.58, this.map.clientHeight * 1.5)));
+    this.map.style.setProperty('--tile-w', `${w}px`);
+    this.map.scrollLeft = this.page * this.map.clientWidth;
   }
 
   build(tracks: TrackDef[]): void {
     const s = this.state();
     const medalOf: MedalOf = (t) => this.bestOf(t)?.medal ?? null;
     const ship = shipTracks(tracks, s.dev);
-    this.tiers.innerHTML = '';
-    this.rows = [];
-    // Lab (MEGA_PLAN P0 §3): the physics test levels, first (the user's proving ground), always open, outside medals and progression.
-    const lab = labTracks(tracks);
-    if (lab.length > 0) {
-      const rowEl = h('div', 'tier-row lab-row');
-      rowEl.innerHTML = `<div class="tier-head"><b>Lab</b><span>Physics proving ground · live physics HUD · no medals</span></div>`;
-      const car = h('div', 'carousel');
-      const cards: CardRef[] = [];
-      const r = this.rows.length;
-      lab.forEach((t, c) => {
-        const el = this.card(t, false, r, c, true);
-        car.appendChild(el);
-        cards.push({ el, track: t, locked: false });
+    const pages = buildPages(tracks, medalOf, s.dev);
+    const gate = nextGate(tracks, medalOf, s.dev);
+    this.map.innerHTML = '';
+    this.mini.innerHTML = '';
+    this.pages = [];
+    this.action = -1;
+    for (const page of pages) {
+      const el = h('div', 'tpage');
+      el.dataset['page'] = page.id;
+      const tile = h('div', 'ttile');
+      tile.style.setProperty('--lamp', page.lamp);
+      tile.style.setProperty('--tint', page.id === 'island' ? '#2a3440' : BIOME_TINT[page.id]);
+      const plate = h('div', 'tart');
+      const done = page.id === 'island' ? `<small>${escapeHtml(page.blurb)}</small>` : `<b>${page.done} / ${page.total}</b>`;
+      tile.innerHTML = `<div class="glow"></div>`;
+      tile.appendChild(plate);
+      tile.appendChild(h('div', 'slab'));
+      if (page.route) {
+        tile.insertAdjacentHTML('beforeend', `<svg class="route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="dim" d="${page.route}"/>${page.routeLit ? `<path class="lit" d="${page.routeLit}"/>` : ''}</svg>`);
+      }
+      tile.insertAdjacentHTML('beforeend', `<div class="title">${escapeHtml(page.label)}${page.id === 'island' ? '' : ' · '}${done}</div>`);
+      if (page.total > 0) tile.insertAdjacentHTML('beforeend', `<div class="ledge">${pageDots(page).map((d) => `<i class="${d}"></i>`).join('')}</div>`);
+      const pins: PinRef[] = page.pins.map((pin, i) => {
+        const b = this.pinEl(pin, page.index, i);
+        tile.appendChild(b);
+        return { el: b, pin };
       });
-      rowEl.appendChild(car);
-      this.tiers.appendChild(rowEl);
-      this.rows.push({ tier: lab[0]!.tier, el: rowEl, cards, locked: false });
-    }
-    // Playgrounds (tracks round 10): one beginner course per biome, right after Lab so every biome is reachable without finishing anything.
-    const playgrounds = playgroundTracks(tracks);
-    if (playgrounds.length > 0) {
-      const rowEl = h('div', 'tier-row playground-row');
-      rowEl.innerHTML = `<div class="tier-head"><b>Playgrounds</b><span>One beginner course per biome · every asset · always open · no medals</span></div>`;
-      const car = h('div', 'carousel');
-      const cards: CardRef[] = [];
-      const r = this.rows.length;
-      playgrounds.forEach((t, c) => {
-        const el = this.card(t, false, r, c, true);
-        car.appendChild(el);
-        cards.push({ el, track: t, locked: false });
+      // The gate stub: on every campaign page that does not itself hold the gate track.
+      if (gate && page.id !== 'island' && !page.pins.some((p) => p.track.id === gate.track.id)) {
+        const g = h('button', 'gate', `<b>Next tier gate → ${escapeHtml(TIER_LABEL[gate.tier])}</b><span>${escapeHtml(codeOf(gate.track))} ${escapeHtml(gate.track.name)}</span><small>${escapeHtml(gate.rule)}</small>`);
+        g.type = 'button';
+        g.dataset['track'] = gate.track.id;
+        tile.appendChild(g);
+      }
+      const slot = h('div', 'tslot');
+      el.append(tile, slot);
+      this.map.appendChild(el);
+      this.pages.push({ page, el, slot, pins });
+      const src = tilePlateSrc(page.id);
+      void this.art.probe(src).then((ok) => {
+        if (!ok || !plate.isConnected) return;
+        plate.style.backgroundImage = `url("${src}")`;
+        plate.classList.add('loaded');
+        const m = this.mini.querySelector<HTMLElement>(`.tm[data-p="${page.index}"] .tm-art`);
+        if (m) m.style.backgroundImage = `url("${src}")`;
       });
-      rowEl.appendChild(car);
-      this.tiers.appendChild(rowEl);
-      this.rows.push({ tier: playgrounds[0]!.tier, el: rowEl, cards, locked: false });
+      // Miniature.
+      const tm = h('button', `tm${page.locked ? ' locked' : ''}`);
+      tm.type = 'button';
+      tm.dataset['p'] = String(page.index);
+      tm.dataset['id'] = page.id;
+      const dots = page.id === 'island' ? `<span>No medals</span>` : `${pageDots(page).map((d) => `<i class="${d}"></i>`).join('')}<span>${page.done}/${page.total}</span>`;
+      tm.innerHTML = `<span class="tm-art" style="--tint:${page.id === 'island' ? '#2a3440' : BIOME_TINT[page.id]}"></span><span class="tm-txt"><span class="tm-name">${escapeHtml(page.short)}</span><span class="tm-dots">${dots}</span></span>`;
+      this.mini.appendChild(tm);
     }
-    for (const tier of TIER_ORDER) {
-      const list = tracksInTier(ship, tier);
-      if (list.length === 0) continue;
-      const locked = !tierUnlocked(ship, tier, medalOf, s.dev);
-      const rowEl = h('div', `tier-row${locked ? ' locked' : ''}`);
-      const done = list.filter((t) => medalOf(t.id)).length;
-      const prev = TIER_ORDER[TIER_ORDER.indexOf(tier) - 1];
-      rowEl.innerHTML = `<div class="tier-head"><b>${TIER_LABEL[tier]}</b><span>${escapeHtml(TIER_BLURB[tier])} · ${done}/${list.length}</span>${locked && prev ? `<span class="lock">Medal every ${TIER_LABEL[prev]} track</span>` : ''}</div>`;
-      const car = h('div', 'carousel');
-      const cards: CardRef[] = [];
-      const r = this.rows.length;
-      list.forEach((t, c) => {
-        const el = this.card(t, locked, r, c);
-        car.appendChild(el);
-        cards.push({ el, track: t, locked });
-      });
-      rowEl.appendChild(car);
-      this.tiers.appendChild(rowEl);
-      this.rows.push({ tier, el: rowEl, cards, locked });
-    }
-    this.col = this.rows.map(() => 0);
+    this.pinIndex = this.pages.map((p) => defaultPin(p.page));
     const totals = medalTotals(ship, medalOf);
     const dot = (m: Medal, n: number): string => `<span style="color:var(--${m === 'platinum' ? 'plat' : m})"><i></i>${n}</span>`;
     this.totalsEl.innerHTML = `<span>${totals.cleared}/${totals.total} cleared</span>${dot('platinum', totals.platinum)}${dot('gold', totals.gold)}${dot('silver', totals.silver)}${dot('bronze', totals.bronze)}`;
-    // Initial focus: last played, else the next unfinished track.
+    // Opening focus: last played if still open, else the first unridden track of the highest open tier (`nextTrack`).
     const target = nextTrack(ship, medalOf, s.dev, s.lastPlayed);
-    for (let r = 0; r < this.rows.length; r++) {
-      const c = this.rows[r]!.cards.findIndex((x) => x.track.id === target?.id);
-      if (c >= 0) {
-        this.row = r;
-        this.col[r] = c;
-      }
-    }
+    const at = locate(pages, target?.id) ?? { page: 1, pin: 0 };
+    this.page = at.page;
+    this.pinIndex[at.page] = at.pin;
     this.applyFocus(false);
+    this.layout();
   }
 
-  private card(t: TrackDef, locked: boolean, r: number, c: number, lab = false): HTMLButtonElement {
+  private pinEl(pin: Pin, p: number, i: number): HTMLButtonElement {
+    const t = pin.track;
     const best = this.bestOf(t.id);
     const target = t.meta?.targetTimeS;
-    const biome: BiomeId = t.meta?.biome ?? 'industrial';
-    const el = h('button', `card${locked ? ' locked' : ''}`);
-    el.type = 'button';
-    el.dataset['r'] = String(r);
-    el.dataset['c'] = String(c);
-    el.dataset['track'] = t.id;
-    el.style.setProperty('--tint', BIOME_TINT[biome]);
-    const medal = best?.medal;
     const ahead = best && target ? best.time <= target : false;
-    // A stored PB recording: the ghost tag doubles as the "Watch PB" control (click / V / pad Y opens the replay viewer).
-    const ghost = best?.recording ? `<em class="ghost watch" title="Watch the personal best">▶ ${this.state().ghost ? 'Ghost' : 'PB'}</em>` : '';
-    const prev = TIER_ORDER[TIER_ORDER.indexOf(t.tier) - 1];
-    const bikeTag = best?.bike === 'pro' ? '<em class="bike">Pro</em>' : '';
-    // Locked: the card itself states the unlock rule (the row head says it too, but a thumb lands on the card).
-    const lockLine = locked && prev ? `<div class="lockline">Locked · medal every ${TIER_LABEL[prev]} track</div>` : '';
-    if (lab) el.classList.add('lab-card');
-    el.innerHTML = `<div class="tint" data-badge="${lab ? 'Physics test' : TIER_LABEL[t.tier]}"></div><div class="art"></div><div class="veil"></div>
-      <div class="top"><span>${lab ? 'LAB' : escapeHtml(t.id.split('-')[0]!.toUpperCase())}</span>${ghost}${bikeTag}</div>
-      ${lab ? '' : `<div class="medal ${medal ?? 'none'}${medal ? ' plain' : ''}" title="${medal ?? 'no medal'}"></div>`}${lockLine}
-      <div class="body"><div class="name">${escapeHtml(t.name)}</div><div class="tech">${escapeHtml(t.meta?.technique ?? '')}</div>
-      <div class="times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div>${lab ? '' : this.boardHtml(t.id)}</div>`;
-    const artEl = el.querySelector<HTMLDivElement>('.art')!;
-    const medalEl = el.querySelector<HTMLDivElement>('.medal')!;
-    this.art.whenReady(() => {
-      this.art.applyBackground(artEl, this.art.trackThumb(t.id) ?? this.art.trackCard(t.id) ?? this.art.tierCard(t.tier));
-      if (medal) {
-        const m = this.art.medal(medal);
-        if (m)
-          void this.art.probe(m.src).then((ok) => {
-            if (!ok) return;
-            medalEl.classList.remove('plain');
-            medalEl.style.backgroundImage = `url("${m.src}")`;
-          });
-      }
-    });
+    const el = h('button', `tpin${pin.locked ? ' locked' : ''}${pin.proving ? ' proving' : ''}`);
+    el.type = 'button';
+    el.dataset['p'] = String(p);
+    el.dataset['i'] = String(i);
+    el.dataset['track'] = t.id;
+    el.style.setProperty('--px', `${pin.x}%`);
+    el.style.setProperty('--py', `${pin.y}%`);
+    const disc = pin.locked ? 'locked' : pin.medal ? `${pin.medal} plain` : pin.proving ? 'none proving' : 'none';
+    const ghost = best?.recording && !pin.locked ? `<em class="tag ghost">▶ ${this.state().ghost ? 'Ghost' : 'PB'}</em>` : '';
+    const pro = best?.bike === 'pro' ? '<em class="tag pro">Pro</em>' : '';
+    const times = pin.proving ? '' : pin.locked ? `<span class="rule">${escapeHtml(pin.rule ?? '')}</span>` : `<span class="times"><b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b> / ${target ? formatTime(target) : '—'}</span>`;
+    el.innerHTML = `${pin.upNext ? '<em class="flag">Up next</em>' : ''}<span class="code">${escapeHtml(pin.code)}</span><span class="disc ${disc}" title="${pin.medal ?? (pin.locked ? 'locked' : 'no medal')}"></span>${ghost}${pro}<span class="plate">${escapeHtml(t.name)}</span>${times}`;
+    if (pin.medal) {
+      const discEl = el.querySelector<HTMLSpanElement>('.disc')!;
+      const m = this.art.medal(pin.medal);
+      if (m)
+        void this.art.probe(m.src).then((ok) => {
+          if (!ok) return;
+          discEl.classList.remove('plain');
+          discEl.style.backgroundImage = `url("${m.src}")`;
+        });
+    }
     return el;
   }
 
@@ -728,61 +786,168 @@ export class TrackSelectScreen extends Screen {
     return `<div class="board" data-bike="${bike}" data-rows="${rows.length}">${chips}</div>`;
   }
 
-  private focusCard(r: number, c: number, tick: boolean): void {
-    if (this.launching) return;
-    if (!this.rows[r] || !this.rows[r]!.cards[c]) return;
-    if (r === this.row && c === this.col[r]) return;
-    this.row = r;
-    this.col[r] = c;
-    if (tick) this.sfx.tick();
-    this.applyFocus(true);
+  /** The rising card for the focused pin: moved into its page's slot and re-rendered. */
+  private renderCard(ref: PageRef, cur: PinRef, animate: boolean): void {
+    const { pin } = cur;
+    const t = pin.track;
+    const best = this.bestOf(t.id);
+    const target = t.meta?.targetTimeS;
+    const ahead = best && target ? best.time <= target : false;
+    const kind = pin.proving ? (isLabTrack(t) ? 'Lab · physics proving ground' : 'Playground · always open') : `${TIER_LABEL[t.tier]} · ${ref.page.label}`;
+    const medal = pin.proving ? '' : `<i class="tc-medal ${pin.locked ? 'none' : (pin.medal ?? 'none')}" title="${pin.medal ?? 'no medal'}"></i>`;
+    const times = pin.proving ? `<div class="tc-times"><span>No medals</span></div>` : pin.locked ? `<div class="tc-rule">Locked · ${escapeHtml(pin.rule ?? '')}</div>` : `<div class="tc-times"><span>Best <b class="${ahead ? 'ahead' : ''}">${best ? formatTime(best.time) : '—'}</b></span><span>Target <b>${target ? formatTime(target) : '—'}</b></span></div>`;
+    this.card.innerHTML = `<div class="tc-head"><b>${escapeHtml(pin.code)}</b><span>${escapeHtml(kind)}</span>${medal}</div>
+      <div class="tc-name">${escapeHtml(t.name)}</div><div class="tc-tech">${escapeHtml(t.meta?.technique ?? '')}</div>${times}${pin.proving || pin.locked ? '' : this.boardHtml(t.id)}
+      <div class="tc-actions"><button type="button" class="tc-ride"${pin.locked ? ' disabled' : ''}>${pin.locked ? 'Locked' : 'Ride'}</button><button type="button" class="tc-ghost"${best?.recording && !pin.locked ? '' : ' hidden'}>▶ ${this.state().ghost ? 'Ghost' : 'Watch PB'}</button><button type="button" class="tc-review">Review</button></div>`;
+    if (pin.medal && !pin.locked) {
+      const m = this.art.medal(pin.medal);
+      const el = this.card.querySelector<HTMLElement>('.tc-medal');
+      if (m && el)
+        void this.art.probe(m.src).then((ok) => {
+          if (!ok || !el.isConnected) return;
+          el.classList.add('img');
+          el.style.backgroundImage = `url("${m.src}")`;
+        });
+    }
+    if (this.card.parentElement !== ref.slot) ref.slot.appendChild(this.card);
+    this.card.classList.remove('rise');
+    if (animate) {
+      void this.card.offsetWidth;
+      this.card.classList.add('rise');
+    }
+    this.applyAction();
   }
 
-  private applyFocus(scroll: boolean): void {
-    for (const row of this.rows) for (const card of row.cards) card.el.classList.remove('on');
-    const cur = this.rows[this.row]?.cards[this.col[this.row] ?? 0];
-    if (!cur) return;
-    cur.el.classList.add('on');
-    if (scroll) {
-      cur.el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+  private applyAction(): void {
+    const buttons = [...this.card.querySelectorAll<HTMLButtonElement>('.tc-actions button')].filter((b) => !b.hidden);
+    buttons.forEach((b, i) => b.classList.toggle('on', i === this.action));
+  }
+
+  private focusPin(p: number, i: number, tick: boolean, snap: boolean): void {
+    if (this.launching) return;
+    const ref = this.pages[p];
+    if (!ref || !ref.pins[i]) return;
+    const moved = p !== this.page || i !== this.pinIndex[p] || this.action >= 0;
+    this.page = p;
+    this.pinIndex[p] = i;
+    this.action = -1;
+    if (tick && moved) this.sfx.tick();
+    this.applyFocus(moved);
+    if (snap) this.snapTo(p, true);
+  }
+
+  private gotoPage(p: number, tick: boolean, snap: boolean): void {
+    if (this.launching) return;
+    if (!this.pages[p]) return;
+    this.focusPin(p, this.pinIndex[p] ?? 0, tick, snap);
+  }
+
+  private snapTo(p: number, smooth: boolean): void {
+    const left = p * this.map.clientWidth;
+    if (Math.abs(this.map.scrollLeft - left) < 1) return;
+    try {
+      this.map.scrollTo({ left, behavior: smooth ? 'smooth' : 'auto' });
+    } catch {
+      this.map.scrollLeft = left;
     }
   }
 
-  current(): CardRef | null {
-    return this.rows[this.row]?.cards[this.col[this.row] ?? 0] ?? null;
+  private applyFocus(animate: boolean): void {
+    for (const ref of this.pages) for (const pin of ref.pins) pin.el.classList.remove('on');
+    const ref = this.pages[this.page];
+    const cur = ref?.pins[this.pinIndex[this.page] ?? 0];
+    if (!ref || !cur) return;
+    cur.el.classList.add('on');
+    this.mini.querySelectorAll<HTMLButtonElement>('.tm').forEach((b, i) => b.classList.toggle('on', i === this.page));
+    this.renderCard(ref, cur, animate);
+  }
+
+  current(): PinRef | null {
+    return this.pages[this.page]?.pins[this.pinIndex[this.page] ?? 0] ?? null;
+  }
+
+  override setDevice(d: 'keyboard' | 'gamepad' | 'touch' | null): void {
+    if (!this.legend) return;
+    this.legend.innerHTML =
+      d === 'touch'
+        ? '<span>Tap a pin</span><span>Swipe tiles</span>'
+        : d === 'gamepad'
+          ? '<span><i class="pad">✚</i>Pins · tiles</span><span><i class="pad a">A</i>Ride</span><span><i class="pad b">B</i>Back</span>'
+          : '<span><kbd>←→</kbd>Pins · tiles</span><span><kbd>Enter</kbd>Ride</span><span><kbd>V</kbd>Ghost</span><span><kbd>Esc</kbd>Back</span>';
+  }
+
+  /** The page in view (the harness reads it). */
+  currentPage(): PageId | null {
+    return this.pages[this.page]?.page.id ?? null;
   }
 
   override show(): void {
     this.launching = false;
     super.show();
-    requestAnimationFrame(() => this.current()?.el.scrollIntoView({ block: 'nearest', inline: 'nearest' }));
+    this.layout();
+    requestAnimationFrame(() => this.layout());
   }
 
   nav(dx: number, dy: number): void {
     if (this.launching) return;
+    const ref = this.pages[this.page];
+    if (!ref) return;
     if (dy) {
-      const r = Math.max(0, Math.min(this.rows.length - 1, this.row + dy));
-      this.focusCard(r, Math.min(this.col[r] ?? 0, this.rows[r]!.cards.length - 1), true);
-    } else if (dx) {
-      const row = this.rows[this.row];
-      if (!row) return;
-      const c = Math.max(0, Math.min(row.cards.length - 1, (this.col[this.row] ?? 0) + dx));
-      this.focusCard(this.row, c, true);
+      // ↓ from the pins reaches the card's actions; ↓ again steps the page; ↑ climbs back.
+      const buttons = [...this.card.querySelectorAll<HTMLButtonElement>('.tc-actions button')].filter((b) => !b.hidden);
+      if (dy > 0 && this.action < 0 && buttons.length > 0) {
+        this.action = 0;
+        this.sfx.tick();
+        this.applyAction();
+        return;
+      }
+      if (dy < 0 && this.action >= 0) {
+        this.action = -1;
+        this.sfx.tick();
+        this.applyAction();
+        return;
+      }
+      const p = Math.max(0, Math.min(this.pages.length - 1, this.page + dy));
+      if (p !== this.page) this.gotoPage(p, true, true);
+      return;
+    }
+    if (!dx) return;
+    if (this.action >= 0) {
+      const buttons = [...this.card.querySelectorAll<HTMLButtonElement>('.tc-actions button')].filter((b) => !b.hidden);
+      this.action = Math.max(0, Math.min(buttons.length - 1, this.action + dx));
+      this.sfx.tick();
+      this.applyAction();
+      return;
+    }
+    const i = (this.pinIndex[this.page] ?? 0) + dx;
+    if (i >= 0 && i < ref.pins.length) this.focusPin(this.page, i, true, true);
+    else {
+      // Past the page's last pin: the next page (its first pin), or the previous page (its last pin).
+      const p = this.page + dx;
+      const next = this.pages[p];
+      if (!next) return;
+      this.focusPin(p, dx > 0 ? 0 : next.pins.length - 1, true, true);
     }
   }
 
   confirm(): void {
     const cur = this.current();
     if (!cur || this.launching) return;
-    if (cur.locked) {
+    if (this.action >= 0) {
+      const buttons = [...this.card.querySelectorAll<HTMLButtonElement>('.tc-actions button')].filter((b) => !b.hidden);
+      const b = buttons[this.action];
+      if (b?.classList.contains('tc-ghost')) return this.alt();
+      if (b?.classList.contains('tc-review')) return this.review();
+    }
+    if (cur.pin.locked) {
       this.sfx.back();
-      cur.el.animate([{ transform: 'scale(1.06) translateX(0)' }, { transform: 'scale(1.06) translateX(-6px)' }, { transform: 'scale(1.06) translateX(6px)' }, { transform: 'scale(1.06) translateX(0)' }], { duration: 240, easing: 'ease-out' });
+      cur.el.animate?.([{ translate: '0 0' }, { translate: '-6px 0' }, { translate: '6px 0' }, { translate: '0 0' }], { duration: 240, easing: 'ease-out' });
       return;
     }
     this.launching = true;
     this.sfx.launch();
     cur.el.classList.add('go');
-    setTimeout(() => this.cb.play(cur.track.id), 180);
+    setTimeout(() => this.cb.play(cur.pin.track.id), 180);
     setTimeout(() => {
       this.root.classList.add('leave');
     }, 200);
@@ -799,13 +964,20 @@ export class TrackSelectScreen extends Screen {
     this.cb.goto('menu');
   }
 
-  /** `V` / pad Y / the card's watch tag: replay viewer on the focused card's PB (no-op without a recording). */
+  /** `V` / pad Y / the card's ghost button: replay viewer on the focused pin's PB (no-op without a recording). */
   override alt(): void {
     const cur = this.current();
-    if (!cur || this.launching || cur.locked) return;
-    if (!this.bestOf(cur.track.id)?.recording) return;
+    if (!cur || this.launching || cur.pin.locked) return;
+    if (!this.bestOf(cur.pin.track.id)?.recording) return;
     this.sfx.confirm();
-    this.cb.watchPb(cur.track.id);
+    this.cb.watchPb(cur.pin.track.id);
+  }
+
+  /** The card's REVIEW: the review picker (the inbox owner's screen), as the menu's REVIEW tab does. */
+  private review(): void {
+    if (this.launching) return;
+    this.sfx.confirm();
+    this.cb.goto('review');
   }
 }
 
@@ -905,9 +1077,10 @@ export class SettingsScreen extends Screen {
     }
 
     seg('ghost', 'Ghost', 'Your personal-best run rides alongside', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().ghost ? 'on' : 'off'), (v) => this.cb.setGhost(v === 'on'));
+    // The rider model (Classic / Blender / Img2) and the outfit live in the Garage only (garage round); the bike
+    // mesh choice stays here because it applies on the next track load.
     if (s().models) {
-      seg('rider', 'Rider', 'Choose a rider model', [{ v: 'proc', l: 'Classic' }, { v: 'gltf', l: 'Blender' }, { v: 'img2', l: 'Img2 experiment' }], () => s().rider, (v) => this.cb.setModel('rider', v as ModelChoice));
-      seg('bike', 'Bike', 'Applies on the next track load', [{ v: 'proc', l: 'Procedural' }, { v: 'gltf', l: 'Modelled' }], () => s().bike, (v) => this.cb.setModel('bike', v as ModelChoice));
+      seg('bike', 'Bike model', 'Applies on the next track load', [{ v: 'proc', l: 'Procedural' }, { v: 'gltf', l: 'Modelled' }], () => s().bike, (v) => this.cb.setModel('bike', v as ModelChoice));
     }
 
     seg('telemetry', 'Run log', 'Keeps attempts, faults and crash spots on this device only', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().telemetry ? 'on' : 'off'), (v) => this.cb.setTelemetry(v === 'on'));
