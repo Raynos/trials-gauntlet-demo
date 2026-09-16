@@ -25,19 +25,20 @@ import { canvas, tex } from './canvasTex';
 /** Room extents (m) around the hero at the group origin: x ∈ ±halfW, z ∈ [backZ, frontZ], y ∈ [0, height]. */
 export const GARAGE_ROOM = { halfW: 10, backZ: -6, frontZ: 10, height: 6.4 } as const;
 /** The shutter opening in the back wall and how far the door is down (its bottom edge above the floor). */
-export const GARAGE_SHUTTER = { width: 6.6, height: 4.0, openTo: 2.4, x: 0 } as const;
+export const GARAGE_SHUTTER = { width: 6.6, height: 4.0, openTo: 2.2, x: 0 } as const;
 /**
  * Where the renderer parks the hall's follow spots while the stage is up (room-local): the sodium work lamp
- * front-left is the KEY (BE3), a faint cool spot on the right lifts the far side. Spot intensity is candela
- * (decay 2): 110 cd at 5 m ≈ 4.4 lx on the tank against the dusk sun's 1.3 — the hall's own lamps' order, so the chrome's
- * highlights stay under the bloom's reach (a 400 cd lamp blew the medium tier's bloom mips into blocks).
+ * front-left is the KEY (BE3), aimed at the hero (`aim` null = the bike); a second, dimmer sodium over the bench
+ * lights the pegboard and the vice so the left pier reads. Spot intensity is candela (decay 2): 170 cd at 5 m
+ * ≈ 6.8 lx on the tank against the dusk sun's 0.8 — the hall's own lamps' order, so the chrome's highlights stay
+ * under the bloom's reach (a 400 cd lamp blew the medium tier's bloom mips into blocks).
  */
-export const GARAGE_LAMPS = [
-  { x: -3.6, y: 3.1, z: 3.2, color: 0xffb060, intensity: 110, angle: 0.62, penumbra: 0.6 },
-  { x: 5.2, y: 3.0, z: 3.0, color: 0x9fb4ff, intensity: 40, angle: 0.7, penumbra: 0.8 },
-] as const;
+export const GARAGE_LAMPS: readonly { x: number; y: number; z: number; color: number; intensity: number; angle: number; penumbra: number; aim: readonly [number, number, number] | null }[] = [
+  { x: -3.6, y: 3.1, z: 3.2, color: 0xffb060, intensity: 170, angle: 0.8, penumbra: 0.55, aim: null },
+  { x: -5.4, y: 3.9, z: -2.6, color: 0xffc38a, intensity: 90, angle: 0.75, penumbra: 0.6, aim: [-6.6, 1.0, -5.5] },
+];
 /** The floor's blend: what shows through to the mirror world under it. */
-export const GARAGE_FLOOR_OPACITY = 0.76;
+export const GARAGE_FLOOR_OPACITY = 0.8;
 
 export interface GarageStage {
   group: THREE.Group;
@@ -166,40 +167,65 @@ function shutterMap(): THREE.CanvasTexture {
 }
 
 function daylightMap(): THREE.CanvasTexture {
-  // Outside the opening at dusk, on an 8 m tall card standing on the floor line (the horizon 1 m up, v = 224/256
-  // from the top): deep blue overhead into an orange band at the horizon, a far fence line and container
-  // silhouettes against it, a wet concrete apron carrying the sky's colour in the bottom metre.
+  // Outside the opening at dusk, on a 2:1 card standing on the floor line, 16 m tall (the horizon 1 m up, v = 240/256
+  // from the top): navy overhead into a thin orange band at the horizon; against it a yard skyline — container
+  // stacks, a gantry crane, poles, the fence — small, so it reads as distance through the opening; a dark wet
+  // apron carrying the band's colour as a sheen. Nothing here is bright: the card is unlit at 1.0.
   const [c, ctx] = canvas(512, 256);
-  const H = 224;
+  const H = 240;
   const sky = ctx.createLinearGradient(0, 0, 0, H);
-  sky.addColorStop(0, '#152040');
-  sky.addColorStop(0.5, '#33456f');
-  sky.addColorStop(0.82, '#8a6a6a');
-  sky.addColorStop(0.95, '#e08a3a');
+  sky.addColorStop(0, '#080d1e');
+  sky.addColorStop(0.55, '#16224a');
+  sky.addColorStop(0.86, '#3d3a5c');
+  sky.addColorStop(0.95, '#8a5a48');
+  sky.addColorStop(0.985, '#e07a2e');
   sky.addColorStop(1, '#ffb15a');
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, 512, H);
-  ctx.fillStyle = '#1a1c24';
-  for (let x = 20; x < 512; x += 90) ctx.fillRect(x, H - 42, 60, 42);
-  ctx.fillStyle = 'rgba(16,16,20,0.95)';
-  ctx.fillRect(0, H - 2, 512, 3);
-  for (let x = 0; x < 512; x += 24) ctx.fillRect(x, H - 30, 2, 30);
-  // A few sodium yard lights on the fence line.
-  for (const x of [70, 250, 430]) {
-    const g = ctx.createRadialGradient(x + 1, H - 34, 0, x + 1, H - 34, 16);
-    g.addColorStop(0, 'rgba(255,190,110,0.6)');
+  let s = 5;
+  const rnd = (): number => ((s = (s * 16807) % 2147483647) / 2147483647);
+  // Skyline: container stacks 1–3 high (each 12 × 6 px ≈ 0.75 × 0.4 m at 16 m per 256 px), a gantry, poles.
+  ctx.fillStyle = '#0c0f18';
+  for (let x = 4; x < 512; x += 14 + Math.floor(rnd() * 22)) {
+    const n = 1 + Math.floor(rnd() * 3);
+    const w = 10 + Math.floor(rnd() * 6);
+    for (let k = 0; k < n; k++) ctx.fillRect(x, H - 6 * (k + 1), w, 6);
+  }
+  // Gantry crane right of centre.
+  ctx.fillRect(330, H - 34, 3, 34);
+  ctx.fillRect(392, H - 34, 3, 34);
+  ctx.fillRect(322, H - 36, 80, 3);
+  ctx.fillRect(360, H - 33, 2, 14);
+  // Poles with sodium heads along the yard.
+  for (const x of [60, 150, 250, 300, 450]) {
+    ctx.fillRect(x, H - 24, 2, 24);
+    const g = ctx.createRadialGradient(x + 1, H - 25, 0, x + 1, H - 25, 9);
+    g.addColorStop(0, 'rgba(255,190,110,0.75)');
     g.addColorStop(1, 'rgba(255,190,110,0)');
     ctx.fillStyle = g;
-    ctx.fillRect(x - 16, H - 50, 34, 34);
+    ctx.fillRect(x - 9, H - 34, 20, 20);
     ctx.fillStyle = '#ffc070';
-    ctx.fillRect(x, H - 35, 3, 3);
+    ctx.fillRect(x, H - 26, 2, 2);
+    ctx.fillStyle = '#0c0f18';
   }
+  // Fence line.
+  ctx.fillStyle = 'rgba(10,10,14,0.95)';
+  ctx.fillRect(0, H - 1, 512, 2);
+  for (let x = 0; x < 512; x += 8) ctx.fillRect(x, H - 8, 1, 8);
+  // Apron: dark wet concrete, the band's colour as a sheen just under the horizon, faint light streaks.
   const apron = ctx.createLinearGradient(0, H, 0, 256);
-  apron.addColorStop(0, '#7a6660');
-  apron.addColorStop(0.5, '#3a3c48');
-  apron.addColorStop(1, '#22242c');
+  apron.addColorStop(0, '#3a2c2a');
+  apron.addColorStop(0.3, '#1b1c24');
+  apron.addColorStop(1, '#0e0f14');
   ctx.fillStyle = apron;
   ctx.fillRect(0, H, 512, 256 - H);
+  for (const x of [60, 150, 250, 300, 450]) {
+    const g = ctx.createLinearGradient(0, H, 0, 256);
+    g.addColorStop(0, 'rgba(255,170,90,0.35)');
+    g.addColorStop(1, 'rgba(255,170,90,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x - 1, H, 4, 16);
+  }
   return tex(c, true, false);
 }
 
@@ -272,17 +298,20 @@ function floorGeometry(): THREE.BufferGeometry {
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
     const z = pos.getZ(i);
-    const r = Math.hypot((x + 1.2) / 6.0, (z - 1.2) / 5.0); // the lamp pool sits under the lamp side of the hero
-    const pool = 0.32 + 0.42 * Math.max(0, 1 - r * r);
-    // Daylight patch: a trapezoid from the opening toward the camera, fading over ~7 m.
+    const r = Math.hypot((x + 1.2) / 5.5, (z - 1.0) / 4.5); // the lamp pool sits under the lamp side of the hero
+    const pool = 0.3 + 0.5 * Math.max(0, 1 - r * r);
+    // Dusk spill: a faint blue trapezoid from the opening toward the camera, fading over ~6 m.
     const dz = z - R.backZ;
     const half = S.width / 2 + dz * 0.35;
     const inX = Math.max(0, 1 - Math.max(0, Math.abs(x - S.x) - half + 0.8) / 1.6);
-    const day = Math.max(0, 1 - dz / 7.5) * inX;
-    // Dusk: the spill from the opening is blue, the pool warm.
-    col[i * 3] = pool + day * 0.06;
-    col[i * 3 + 1] = pool * 0.97 + day * 0.1;
-    col[i * 3 + 2] = pool * 0.9 + day * 0.2;
+    const day = Math.max(0, 1 - dz / 6) * inX;
+    // Contact occlusion where the floor meets the walls (the last metre darkens).
+    const edge = Math.min(R.halfW - Math.abs(x), z - R.backZ, R.frontZ - z);
+    const ao = 0.45 + 0.55 * Math.min(1, Math.max(0, edge) / 1.2);
+    // The pool is sodium-warm, the spill blue.
+    col[i * 3] = (pool * 1.04 + day * 0.02) * ao;
+    col[i * 3 + 1] = (pool * 0.96 + day * 0.06) * ao;
+    col[i * 3 + 2] = (pool * 0.82 + day * 0.16) * ao;
     uv.setXY(i, (x + R.halfW) / 2, (z - R.backZ) / 2); // 2 m per map tile, on whole metres
   }
   g.setAttribute('color', new THREE.BufferAttribute(col, 3));
@@ -437,15 +466,16 @@ export function buildGarageStage(lib: MaterialLibrary, art: ArtLibrary | null): 
   {
     const m = lib.derive('concrete');
     m.map = map(floorMap());
-    m.color.setHex(0x6c6e76);
+    m.color.setHex(0x54565e);
     m.vertexColors = true;
-    // BE3 wet-look: low roughness under the PMREM sky (kept quiet: the hall's sky is a grey dome), drawn at 76 % over the mirror world beneath it.
-    // Roughness .45, not the mockup's .25: at .34 the work lamp's own highlight on the floor (a 160 cd spot's
-    // lobe) went past the bloom threshold and the medium tier's mips blew it into blocks across the opening.
-    m.roughness = 0.45;
+    // BE3 wet-look, read at desktop width too: a concrete slab first, a mirror second — roughness .62 (the mockup's
+    // .25 read as open water at 2000 px, and at .34 the work lamp's lobe on the floor blew the medium tier's bloom
+    // into blocks), the concrete set's normals at .12 (its tiling is 2 m — any stronger and the slab ripples),
+    // the sky dome at .25, and the mirror world under it at 20 % (GARAGE_FLOOR_OPACITY).
+    m.roughness = 0.62;
     m.metalness = 0.0;
-    m.envMapIntensity = 0.5;
-    m.normalScale.set(0.3, 0.3); // the concrete set's normals at a wet roughness glitter — most of them go
+    m.envMapIntensity = 0.15;
+    m.normalScale.set(0.12, 0.12);
     m.transparent = true;
     m.opacity = GARAGE_FLOOR_OPACITY;
     const floor = mesh('floor', own(floorGeometry()), mat(m), false, true);
@@ -474,14 +504,15 @@ export function buildGarageStage(lib: MaterialLibrary, art: ArtLibrary | null): 
   }
   // --- Daylight: an unlit apron / fence / sky plate outside the opening (bigger than the opening for any orbit angle).
   {
-    // An 8 m card standing on the floor line (its mirror hangs below it — the two never overlap, which is
-    // what z-fought as a mosaic when the card ran through the floor plane); the horizon 1 m up.
-    const g = new THREE.PlaneGeometry(24, 8);
-    g.translate(S.x, 4, R.backZ - 5.5);
+    // A 32 × 16 m card standing on the floor line 9 m behind the wall (its mirror hangs below it — the two
+    // never overlap, which is what z-fought as a mosaic when the card ran through the floor plane); the
+    // horizon 1 m up, so through the opening the eye sees the band and the skyline, never a flat slab.
+    const g = new THREE.PlaneGeometry(32, 16);
+    g.translate(S.x, 8, R.backZ - 9);
     // Unlit through the standard program (black albedo, the dusk map as emissive): the same variant as every
     // other lit material here, no MeshBasicMaterial program — and WebKit's GL drew a MeshBasicMaterial map
     // as a mosaic of other textures' mips in the opening.
-    const m = fogify(new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffffff, emissiveMap: map(daylightMap()), emissiveIntensity: 1.15, roughness: 1, metalness: 0 }));
+    const m = fogify(new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffffff, emissiveMap: map(daylightMap()), emissiveIntensity: 1.0, roughness: 1, metalness: 0 }));
     mesh('daylight', own(withMirror(g)), mat(m));
   }
   // --- Daylight shafts: two additive quads leaning in from the opening (hidden on `low` by the renderer).
@@ -516,7 +547,7 @@ export function buildGarageStage(lib: MaterialLibrary, art: ArtLibrary | null): 
     steel.push(box(0.3, 0.24, 0.22, x - 0.8, 1.08, R.backZ + 0.5)); // vice
     steel.push(cylinder(0.025, 0.5, x - 0.8, 1.1, R.backZ + 0.5, Math.PI / 2, 8)); // vice bar
     // Work lamp stand front-left (the renderer parks the warm spot at its head).
-    const L = GARAGE_LAMPS[0];
+    const L = GARAGE_LAMPS[0]!;
     steel.push(cylinder(0.03, L.y - 0.3, L.x, (L.y - 0.3) / 2, L.z + 0.2, 0, 8));
     steel.push(cylinder(0.32, 0.04, L.x, 0.02, L.z + 0.2, 0, 16));
     steel.push(box(0.4, 0.28, 0.3, L.x, L.y - 0.05, L.z + 0.05, 0.6));
@@ -574,7 +605,7 @@ export function buildGarageStage(lib: MaterialLibrary, art: ArtLibrary | null): 
   }
   // --- Emissives: two ceiling tube fixtures + the work lamp's face (bloom picks them up on the HDR tiers).
   {
-    const L = GARAGE_LAMPS[0];
+    const L = GARAGE_LAMPS[0]!;
     const parts: THREE.BufferGeometry[] = [];
     for (const x of [-4.0, 4.0]) parts.push(box(2.4, 0.08, 0.22, x, R.height - 0.12, 1.0));
     const face = new THREE.PlaneGeometry(0.3, 0.2);
@@ -584,25 +615,19 @@ export function buildGarageStage(lib: MaterialLibrary, art: ArtLibrary | null): 
     const m = fogify(new THREE.MeshStandardMaterial({ color: 0xffe2b0, emissive: 0xffc070, emissiveIntensity: 2.2, roughness: 0.6, side: THREE.DoubleSide }));
     mesh('tubes', own(withMirror(merged(parts))), mat(m));
   }
-  // --- Bay marking: a hazard-tape rectangle on the floor around the bike.
+  // --- Bay marks: four aged-yellow corner brackets on the floor around the bike (a full box read as a
+  //     giant yellow frame at desktop width).
   {
-    const ring = new THREE.Shape();
-    ring.moveTo(-2.6, -1.6);
-    ring.lineTo(2.6, -1.6);
-    ring.lineTo(2.6, 1.6);
-    ring.lineTo(-2.6, 1.6);
-    ring.closePath();
-    const hole = new THREE.Path();
-    hole.moveTo(-2.5, -1.5);
-    hole.lineTo(-2.5, 1.5);
-    hole.lineTo(2.5, 1.5);
-    hole.lineTo(2.5, -1.5);
-    hole.closePath();
-    ring.holes.push(hole);
-    const g = new THREE.ShapeGeometry(ring);
-    g.rotateX(-Math.PI / 2);
-    g.translate(0, 0.006, 0);
-    mesh('bayline', own(g), mat(fogify(new THREE.MeshStandardMaterial({ color: 0xe8b21c, roughness: 0.7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }))));
+    const parts: THREE.BufferGeometry[] = [];
+    const t = 0.07;
+    const L = 0.7;
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      const cx = sx * 2.4;
+      const cz = sz * 1.5;
+      parts.push(new THREE.PlaneGeometry(L, t).rotateX(-Math.PI / 2).translate(cx - (sx * L) / 2 + (sx * t) / 2, 0.006, cz));
+      parts.push(new THREE.PlaneGeometry(t, L).rotateX(-Math.PI / 2).translate(cx, 0.006, cz - (sz * L) / 2 + (sz * t) / 2));
+    }
+    mesh('bayline', merged(parts), mat(fogify(new THREE.MeshStandardMaterial({ color: 0x9a7a1c, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }))));
   }
   // --- Art pack decals when the pack has them (never awaited: the set reads without them).
   if (art) {

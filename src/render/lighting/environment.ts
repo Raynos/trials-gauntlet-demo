@@ -255,7 +255,7 @@ export function buildSkyTexture(b: Biome, width = 256, height = 128): THREE.Data
 export const STAGE_LIGHT = {
   sunDir: [-0.3, 0.27, -0.92] as const,
   sunColor: 0x7f8fc8,
-  sunIntensity: 1.1,
+  sunIntensity: 0.8,
   hemiSky: 0x3f4f80,
   hemiGround: 0x33231a,
   hemiIntensity: 0.55,

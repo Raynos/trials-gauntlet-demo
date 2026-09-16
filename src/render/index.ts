@@ -1674,7 +1674,8 @@ export class ThreeRenderer implements GameRenderer {
             continue;
           }
           sl.position.set(o.x + L.x, o.y + L.y, o.z + L.z);
-          sl.target.position.set(f.bikeX, f.bikeY + 0.3, 0);
+          if (L.aim) sl.target.position.set(o.x + L.aim[0], o.y + L.aim[1], o.z + L.aim[2]);
+          else sl.target.position.set(f.bikeX, f.bikeY + 0.3, 0);
           sl.target.updateMatrixWorld();
           sl.color.setHex(L.color);
           sl.intensity = L.intensity;
