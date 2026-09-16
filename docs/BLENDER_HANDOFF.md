@@ -107,7 +107,7 @@ for this checkpoint. The 12-hour follow-up automation is paused.
 - The latest instruction is to read this handoff and continue. The persistent
   rider/bike/animation/texture goal is active; the old follow-up automation remains paused.
 
-Read [the plan](plans/BLENDER_HERO.md), [plan status](plans/PLANS.md),
+Read [the plan](../project/archive/BLENDER_HERO.md), [plan status](plans/README.md),
 `AGENTS.md` and `docs/mission.md` before resuming. The user supplied
 [this finish-screen bug](evidence/rear-wheel-first-finish-arms.jpg): arms folded
 backward on Rear Wheel First, 1:18.433 and four faults. It is a symptom to

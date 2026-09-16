@@ -184,7 +184,7 @@ re-opened it, because nothing made the constants agree.
 - **Time:** 17:13 → 22:09, just under five hours of the user's evening in which every phone session began with
   this screen wrong; seven screenshots and four separate written complaints about one component.
 - **Share of the day:** 7 of the 55 screenshots the user uploaded today are the loader (13 %); of the ten rows in
-  `docs/plans/PLANS.md` "Field reports from the phone", the loader row alone cites four commits and is the only
+  `docs/plans/README.md` "Field reports from the phone", the loader row alone cites four commits and is the only
   one that came back after being marked fixed — twice.
 - **What it displaced:** the ship gate runs with `?harness=1`, so "cold boot" in the gate has never included
   the screen a stranger boots through. The one metric the project says it cares about — attempts-to-clear and

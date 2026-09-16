@@ -1,6 +1,6 @@
 # Hero work still open after the branch merge
 
-Updated September 16, 2026. Scope: the rider/bike visual-quality work, riding feedback, and fresh garage prototype requested by the user. This is the actionable handoff; [PLANS.md](PLANS.md) remains the project-wide status index.
+Updated September 16, 2026. Scope: the rider/bike visual-quality work, riding feedback, and fresh garage prototype requested by the user. This is the actionable handoff; [docs/plans/README.md](README.md) remains the project-wide status index.
 
 ## Current state — read this first
 
@@ -85,7 +85,7 @@ Follow [HERO_GARAGE_PRODUCTION.md](HERO_GARAGE_PRODUCTION.md). Start with one mu
 - [ ] Capture fresh actual-game clips/stills for the five outfits, both bike classes and relevant LODs. Label concept art separately and update the shareable gallery only with accepted results.
 - [ ] Verify the selected release on actual iOS Safari and desktop; keep device performance and touch behavior distinct from desktop WebKit automation.
 - [ ] Coordinate any remote push/game deployment with the main release owner. This hero integration task performed neither; inspect current release state before repeating anything.
-- [ ] Keep [PLANS.md](PLANS.md), [BLENDER_HANDOFF.md](../BLENDER_HANDOFF.md) and release evidence current as these items close.
+- [ ] Keep [docs/plans/README.md](README.md), [BLENDER_HANDOFF.md](../BLENDER_HANDOFF.md) and release evidence current as these items close.
 
 ## Recommended order and stopping point
 

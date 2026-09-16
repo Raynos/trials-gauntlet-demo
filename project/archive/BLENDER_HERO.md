@@ -18,7 +18,7 @@ crash and move one tick after restart. Typecheck, lint and build pass; tests
 **19 failed, 714 passed, 11 todo** include two new, unwaived hop regressions.
 Cloth/helmet/material quality, physics behavior/cost and actual iOS remain open.
 See [handoff](../BLENDER_HANDOFF.md) and [evidence](../evidence/blender-r7.json).
-No merge or deployment. Track this plan in `PLANS.md` at every commit.
+No merge or deployment. Track this plan in `docs/plans/README.md` at every commit.
 
 ## Visual mega build — user direction, September 15
 

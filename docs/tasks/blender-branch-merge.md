@@ -33,7 +33,7 @@ agent working there. Rounds 3–4 are committed (`e3eef69`); round 5 is in progr
 - `blender-work` is **35 commits behind `main`** and has never merged it. The merge now **conflicts in 16 files**:
   `src/game/app.ts`, `src/physics/v2/{bike,tuning}.ts`, `src/physics/v2/feel.test.ts`, `src/render/index.ts`,
   `src/render/post/chain.ts`, `src/render/hero/gltfRider.test.ts`, `harness/stranger/{cli,report}.ts`,
-  `docs/plans/PLANS.md` and six stranger metrics files.
+  `docs/plans/README.md` and six stranger metrics files.
 - The branch's physics footprint grew to **18 files, +6 704 / −415** in `src/physics/v2` (bike.ts, rider.ts, tuning.ts
   rewritten; `feel`/`r2`/`r3`/`r4` tests edited — a test edit is a numbered deviation under rule 1, not a merge).
   With the conflicts left unresolved, 15 of 21 physics test files fail on the merged tree.
@@ -54,7 +54,7 @@ every conflict and every out-of-contract file resolved by side, then the hero fi
 
 | side | paths |
 |---|---|
-| **`main`, wholesale** | `src/physics/**` (byte-identical; the branch's 12 new physics tests / fixtures dropped — they test dynamics `main` does not have), `harness/bot/**`, `harness/stranger/**` (the branch's `controls.ts` / `provenance.ts` / `session.test.ts` and 14 stranger recordings dropped), `harness/out/metrics/**`, `harness/inputs/{b1,b3,m1}/**`, `harness/gate/expected.json`, `src/tracks/golden.json`, `docs/plans/PLANS.md`, `src/game/**`, `src/ui/**` except the garage / outfit files, `src/render/index.ts`, `src/render/post/chain.ts`, `src/render/world/**` |
+| **`main`, wholesale** | `src/physics/**` (byte-identical; the branch's 12 new physics tests / fixtures dropped — they test dynamics `main` does not have), `harness/bot/**`, `harness/stranger/**` (the branch's `controls.ts` / `provenance.ts` / `session.test.ts` and 14 stranger recordings dropped), `harness/out/metrics/**`, `harness/inputs/{b1,b3,m1}/**`, `harness/gate/expected.json`, `src/tracks/golden.json`, `docs/plans/README.md`, `src/game/**`, `src/ui/**` except the garage / outfit files, `src/render/index.ts`, `src/render/post/chain.ts`, `src/render/world/**` |
 | **branch, wholesale** | `src/render/hero/**` (12 files rewritten + 9 new tests / utils), `assets/blender/**` (37 MB), `assets/design/hero-targets/**` (10.7 MB), `public/models/**` (bike + bike-lod re-exported, `rider-{street,race}[-lod].glb` + `.source.json`: 2.8 → 7.0 MB), `src/ui/{garage,outfit}*`, `src/boot/{asset-totals,model-catalog,outfit}*` + `plan.generated.ts` / `totals.ts` / `handoff.ts` / `inline.ts`, `vite.config.ts` (the model catalog plugin, content-hashed model URLs, per-outfit hero totals), `harness/hero-{browser,capture,contracts,play,ship}.*`, `harness/lib/production-sim*`, `harness/inputs/hero-r*/**`, `harness/e2e/{engine-replay,outfits}.mts`, `docs/BLENDER_HANDOFF.md`, `project/archive/BLENDER_HERO.md`, `docs/evidence/**`, `src/render/frame.ts` (`relUp` now subtracts the chassis's rotation at the rider, + `frame.test.ts`), `src/render/lighting/environment.ts` (shadow-map dispose), `src/render/art/library.ts` (`releaseGPU`) |
 | **`main` + the branch's hooks re-applied by hand** | `src/render/index.ts`: `RiderOutfit` option, `setRiderOutfit()`, `setModels()` loading `riderUrl(outfit)` for both detail levels, `riderDocumentOutfit` + `riderOutfit` in `debugInfo()`, `HERO_SMALL` gaining `shock_(shaft\|clevis)`. **Not taken**: the branch's `ResourceRetirement` / context-loss / `sceneEpoch` / `compileAsync` layer (`resourceRetirement.ts`, `contextResources.ts`, `compilation.test.ts`, `harness/e2e/render-{context-loss,retirement}.mts` dropped) — it rewrote the `compileMaterials` that perf cut #1 / round 14 made synchronous and is not hero work. `src/render/post/chain.ts`: `main`'s + one line, `this.composite.dispose()` (the composite ShaderPass was never released). `src/game/app.ts` / `src/main.ts` / `src/core/types.ts` / `src/ui/styles.ts`: `main`'s + the additive outfit plumbing (`RiderOutfit`, `riderOutfit` / `onRiderOutfitChange` options, `garage.show(bike, outfit)`, the garage outfit CSS) |
 | **new, render-side** | `src/render/hero/riderRig.ts` — the branch's rider anatomy profile and forward / inverse COM ↔ hips map, moved out of `physics/v2/rider.ts` unchanged (pure geometry); `src/render/hero/assetFrame.ts` — the branch's `BIKE_GEOMETRY_V2` (the glb's authored attachment frame) + a straight-axis `suspensionPoint`, moved out of `physics/v2/tuning.ts`; `src/render/hero/gltfRiderAdditive.test.ts` — `main`'s arms-regression test kept under its own name next to the branch's `gltfRider.test.ts` |
@@ -132,7 +132,7 @@ owner's `riderBody` export (with the E2 wind-up understood) plus the camera item
 - [ ] Physics owner: export `riderBody` in `getState()` (one line, re-hash the v2 goldens, strangers unchanged) **after** the rider body's
       wind-up / sink on E2 (gap 1) is understood — then the hero's physical-pose path switches on by itself (`frame.ts` already reads it).
 - [ ] Physics owner, optional: a hinged rear wheel (gap 3) closes the 29 mm arm-length error; a Pro wheelbase of 1.30 or a Pro glb closes the 1 cm.
-- [ ] Parent: fast-forward `main` to `astra-merge`; record the merge commit and the critic verdict in `docs/plans/PLANS.md`.
+- [ ] Parent: fast-forward `main` to `astra-merge`; record the merge commit and the critic verdict in `docs/plans/README.md`.
 
 ## Rules for the merge (so the hero work lands without losing the physics evidence)
 
@@ -156,4 +156,4 @@ owner's `riderBody` export (with the E2 wind-up understood) plus the camera item
 - [ ] Astra: split the physics changes into (a) export-only (merge) and (b) dynamics (a physics-owner
       round with the R-tables re-run), or drop (b).
 - [ ] Parent: merge the render/asset/garage set; run the gate and a critic round on the merged hero.
-- [ ] Record the merge commit and the critic verdict in `docs/plans/PLANS.md`.
+- [ ] Record the merge commit and the critic verdict in `docs/plans/README.md`.

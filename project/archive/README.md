@@ -5,7 +5,7 @@ with `git mv` so history follows them. Nothing in this folder is a source of tru
 is needed again it moves back out.
 
 Rules
-- A plan moves here when its tracker row in `docs/plans/PLANS.md` reads done and the pin/tag that
+- A plan moves here when its tracker row in `docs/plans/README.md` reads done and the pin/tag that
   closed it is named at the top of the file (add a one-line "Closed: <date> · <commit/tag>" header).
 - A design or research doc moves here when the thing it describes is gone from the code (not when
   it is merely old); leave a one-line pointer in the doc that superseded it.

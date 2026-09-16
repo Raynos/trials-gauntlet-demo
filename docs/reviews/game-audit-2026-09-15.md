@@ -139,4 +139,4 @@ Selected logs and machine-readable results are in [evidence](evidence/). Full sc
 5. Compare the same manoeuvres in motion against Trials after each meaningful change, including audio; complete the release battery.
 6. Run the bounded physics-library experiment in the separate review. Migrate only if it improves these outcomes and reduces maintenance.
 
-No game code, existing recordings, expected hashes, or pre-existing working-tree changes were modified by the audit. The review adds reports and evidence only, plus a dated status note in PLANS.md.
+No game code, existing recordings, expected hashes, or pre-existing working-tree changes were modified by the audit. The review adds reports and evidence only, plus a dated status note in docs/plans/README.md (then PLANS.md).

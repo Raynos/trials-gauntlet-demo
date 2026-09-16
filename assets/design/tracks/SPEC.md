@@ -17,7 +17,7 @@ Note on "next": with Beginner and Easy medalled, the *Medium* tier is open and u
 
 Measured in the seeded state: `.tiers` scroll height **1170 px against a 344 px viewport** at 932×430 (3.4 screens), 1090 / 307 at 844×390 (3.6 screens). 22 cards, all the same rectangle. Two scroll axes (`overflow-y` on `.tiers`, `overflow-x` on every `.carousel`).
 
-Why it fails the phone reports (`PLANS.md` field table): a long same-looking scroll; the tier headings and medal totals sat under the fixed MENU pill until `8efc682`; Lab, Playgrounds and the medal tiers are the same row type, so a stranger cannot tell the proving ground from the campaign; nothing shows a track's biome or shape before the tap (the art is a tinted plate, the biome is only the tint); no sense of progression or "what's next" beyond the initial focus.
+Why it fails the phone reports (`docs/plans/README.md` field table): a long same-looking scroll; the tier headings and medal totals sat under the fixed MENU pill until `8efc682`; Lab, Playgrounds and the medal tiers are the same row type, so a stranger cannot tell the proving ground from the campaign; nothing shows a track's biome or shape before the tap (the art is a tinted plate, the biome is only the tint); no sense of progression or "what's next" beyond the initial focus.
 
 Tap count today, from the menu: **PLAY → card = 2 taps to start B1** (a click on a card both focuses and confirms), **plus one vertical scroll** when the screen opened on E3 and B1's row is above the fold; **H1 = 2 taps + scroll** (locked: the card shakes and states the rule).
 
