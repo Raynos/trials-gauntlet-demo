@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "stage": "Full rider + bike \u2014 breadth-first assembly",
+  "stage": "Full rider + saved curly hair and beard",
   "reference": {
     "url": "/references/target01.png",
     "label": "Target 01 \u00b7 design reference"
@@ -8,15 +8,15 @@
   "assets": [
     {
       "id": "street01-rider",
-      "label": "Mustard Street rider",
-      "url": "/assets/street01-rider-garment-repair.glb",
+      "label": "Mustard rider with saved curly hair and beard",
+      "url": "/assets/street01-rider-identity.glb",
       "kind": "rider",
       "position": [
         0,
         0.34,
         0
       ],
-      "mobileUrl": "/assets/street01-rider-mobile-ktx.glb"
+      "mobileUrl": "/assets/street01-rider-identity.glb"
     },
     {
       "id": "street01-bike",
@@ -32,8 +32,8 @@
     }
   ],
   "notes": [
-    "Complete existing Blender-authored rider and bike assembled for whole-scene review.",
-    "Six authored clips cover seated neutral, forward rise, rearward shift, compression, extension and landing absorption. Whole-body art and physical response remain provisional.",
-    "Breadth-first work in progress. Hair, face, tailoring, contacts and mechanical detail can be polished after reviewing the whole scene."
+    "Saved authored face, curly groom and beard attached to the complete rider. Existing riding clips and bike retained.",
+    "Local appearance assembly for whole-scene review. Dense original groom retained; mobile performance and final fit remain provisional.",
+    "Hair: Daniel Bystedt authored curly groom; existing face/beard source provenance retained in the local art records."
   ]
 }

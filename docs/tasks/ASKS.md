@@ -37,6 +37,10 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 
 | HG-01 | Full person + full bike, screenshot in Three.js; work breadth first, pause hair/beard depth | **in flight** | Codex hero owner: complete scene and six poses present; packaged runtime verified, screenshot/recording in captures/whole-package-round17; hair/beard paused, production plan remains open |
 
+| HG-02 | Show latest images; prioritize the last 2% working allowance | **done** | Latest full/mobile Three.js images shown; identity assembly now takes priority over materials and collar repair |
+| HG-03 | Put the saved curly hair and beard onto the full rider and show it | **done** | Actual full/portrait Three.js renders in captures/full-rider-saved-identity-a1; original saved head attached, neck fit provisional |
+| HG-04 | What happened to local Hunyuan/TRELLIS generation? | **done** | Hunyuan generated rejected malformed mesh; TRELLIS no successful inference, DINOv3 blocked; both stopped, status relayed |
+
 ## Standing items the asks imply (parent's list, not the user's words)
 
 - Production deploy after the garage round lands (the v0.2.1 pin stays where it is; production moves).

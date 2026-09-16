@@ -1,6 +1,6 @@
 # High-fidelity rider and bike: fresh garage production plan
 
-Status: Breadth-first assembly in progress, September 16, 2026. The user explicitly changed execution order: show the full person and full bike together in Three.js now, then polish individual elements. Head, hair and beard studies are paused and are no longer prerequisites for assembling the whole scene. The full original quality, motion, runtime and integration scope remains open.
+Status: Breadth-first assembly in progress, September 16, 2026. The user explicitly changed execution order: show the full person and full bike together in Three.js now, then polish individual elements. The user subsequently asked to attach the saved face, curly hair and beard to the full rider immediately; that existing identity assembly is now active, without a new grooming pass. The full original quality, motion, runtime and integration scope remains open.
 
 ## Confirmed user decisions
 
@@ -29,7 +29,7 @@ Round 15 reconstructs the existing open neckline rim into a connected collar (+5
 
 Round 16 adds a mobile texture tier with unchanged geometry and all six clips. The all-image RGBA8+mip estimate falls from 98.76 to 34.76 MiB. Automatic touch selection, portrait/landscape DPR1.5, loading and tap checks pass in desktop WebKit emulation. [Comparison review](../../prototypes/hero-garage/reports/mobile-round16-review.json) records no obvious whole-scene regression; actual iPhone performance remains unmeasured.
 
-Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest user-reported allowance is 27% remaining, with the 20% reserve unchanged.
+Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest checked allowance is 22% remaining, with the 20% reserve unchanged.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)
 
@@ -123,7 +123,7 @@ If trying neural generation, compare at most two candidate routes on the **same 
 
 Examples worth evaluating, not installed or endorsed as proven here: [TRELLIS.2](https://github.com/microsoft/TRELLIS.2) exports PBR assets; [Hunyuan3D-2.1](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) separates shape and texture generation. Neither repository's output claim establishes hero likeness or animation readiness. Check hardware support and the exact code/weights/output terms before choosing; open weights do not automatically mean unrestricted use. Do not assume their GPU workflows run on this Mac. No purchases, hosted jobs or paid services are initiated by this plan.
 
-## 4. Make the face and hair first—the decisive milestone
+## 4. Face and hair quality — after whole-scene assembly review
 
 ### Face sculpt
 
@@ -276,3 +276,9 @@ The frozen round-18 game ship gate passes 1,038 identical ticks, 8.65-second cle
 ### Round 20 — GPU-compressed mobile textures
 
 Mobile now uses KTX2/UASTC with complete mip chains, sRGB color and linear data maps, plus local Three.js Basis decoders and license. All 288 nonimage payloads remain byte-identical. Parent matched full-scene renders and decoded recorded orbit frames before provisional adoption. WebKit loads actual ASTC 4x4 textures; automatic mobile selection/touch/layout checks pass. Estimated all-image texture storage falls 34.76 → 8.69 MiB; asset download increases 6.41 → 7.44 MB. This does not close art approval, the 30-second desktop budget or actual iPhone validation. See `reports/ktx-round20-review.json` and `reports/mobile-ktx-ledger.json` in the prototype.
+
+### Round 21 — saved face, curls and beard attached
+
+At the user's explicit request, the full rider now uses the saved authored-groom head rather than the older cap-haired head. The exact prior head GLB is fitted at 0.9 scale and weighted to the existing head joint; the old head-weighted faces are removed. Body attributes and six clip payloads remain identical. Real Three.js full/portrait renders and forward-rise orbit show the combined assembly; no browser errors and deterministic canvas replay matches. Neck seams remain visible. The generated 173 MB asset is local and reproducible, not committed or deployed; previous mobile budgets are superseded for this appearance preview. See `art/full-rider-identity/README.md` and `reports/full-rider-identity.json`.
+
+The earlier data-map rebake remains an unadopted candidate. Its UV check found 584 zero-area collar triangles; a collar repair probe was stopped when the user reprioritized identity. Frozen game ship gate passes 1,038 identical ticks, 8.65-second clear and one-tick restart (`reports/round21-ship/report.json`). No physical iPhone was connected. Final production acceptance remains open.

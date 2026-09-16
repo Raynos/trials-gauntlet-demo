@@ -10,8 +10,8 @@
     },
     {
       "path": "assets/catalog.json",
-      "bytes": 1206,
-      "sha256": "db2e7d1c5bbb3ee6469ac07251a31316650ce201afd48bdb849be510332d4d76"
+      "bytes": 1187,
+      "sha256": "b493da28657bcf82508ec861b365e6250b0b78bcee44d606634d81db1e0578ed"
     },
     {
       "path": "assets/index-B2aW2QAt.css",
@@ -34,14 +34,9 @@
       "sha256": "da0347ff994e06943f494a411caba4c6dc8cd0c78eff6cc0251dd1d5657f112a"
     },
     {
-      "path": "assets/street01-rider-garment-repair.glb",
-      "bytes": 2760380,
-      "sha256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262"
-    },
-    {
-      "path": "assets/street01-rider-mobile-ktx.glb",
-      "bytes": 4179220,
-      "sha256": "7a2289b59f59fbb455aa5f7cb2edcec7ea4ccde0f54f3ce2b85a89807da3742c"
+      "path": "assets/street01-rider-identity.glb",
+      "bytes": 173119480,
+      "sha256": "500990e54f6d3c7b5c413ef99e9292fa761e16a8712d71744eb6742a798bfd82"
     },
     {
       "path": "decoders/basis/basis_transcoder.js",
@@ -94,8 +89,8 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 21951794,
-  "sourceDistBytes": 239057884,
+  "totalBytes": 188131655,
+  "sourceDistBytes": 416703641,
   "excludedFiles": [
     {
       "path": "assets/basis_transcoder-VXdx5NbI.wasm",
@@ -134,6 +129,18 @@
       "bytes": 2578868
     },
     {
+      "path": "assets/street01-rider-data-maps.glb",
+      "bytes": 4526296
+    },
+    {
+      "path": "assets/street01-rider-garment-repair.glb",
+      "bytes": 2760380
+    },
+    {
+      "path": "assets/street01-rider-mobile-ktx.glb",
+      "bytes": 4179220
+    },
+    {
       "path": "assets/street01-rider-mobile.glb",
       "bytes": 2760380
     },
@@ -159,8 +166,7 @@
     "assets/index-BnIdGVnQ.js",
     "assets/street01-bike-materials.glb",
     "assets/street01-bike-mobile-ktx.glb",
-    "assets/street01-rider-garment-repair.glb",
-    "assets/street01-rider-mobile-ktx.glb",
+    "assets/street01-rider-identity.glb",
     "index.html",
     "references/target01.png",
     "references/turnaround.png"

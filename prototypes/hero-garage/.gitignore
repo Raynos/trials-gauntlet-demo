@@ -19,3 +19,6 @@ captures/head-authored-a1/
 public/decoders/
 runtime-dist/
 .runtime-dist-staging/
+
+# Local appearance assembly (>100 MB), reproducible from retained source GLBs.
+public/assets/street01-rider-identity.glb

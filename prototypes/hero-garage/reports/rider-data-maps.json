@@ -1,0 +1,65 @@
+{
+  "unmatchedMaxCornerDistance": 2.9802322387695312e-08,
+  "unmatchedMaxUVArea": 0.0,
+  "unmatchedDegenerateUVTriangles": 584,
+  "sourceSHA256": "5b5effde064171323313198d4eceafb89b2d0128ddd19d30ab873ef1022adf01",
+  "runtimeSHA256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262",
+  "sourceTriangles": 44734,
+  "runtimeTriangles": 45317,
+  "matchingUVTriangles": 44733,
+  "unmatchedUVTriangles": 584,
+  "maxMatchedUVError": 2.9802322387695312e-08,
+  "uvTolerance": 2e-05,
+  "firstUnmatchedTriangles": [
+    32058,
+    32059,
+    44735,
+    44736,
+    44737,
+    44738,
+    44739,
+    44740,
+    44741,
+    44742,
+    44743,
+    44744,
+    44745,
+    44746,
+    44747,
+    44748,
+    44749,
+    44750,
+    44751,
+    44752
+  ],
+  "result": "compatible",
+  "bake": {
+    "dimensions": [
+      1024,
+      1024
+    ],
+    "normal": "tangent",
+    "dataColorSpace": "Non-Color",
+    "format": "PNG",
+    "localAO": {
+      "distance": 0.025,
+      "samples": 32,
+      "strength": 0.8
+    },
+    "sourceUnchanged": true,
+    "note": "Baked from procedural source floats; JPEG outputs are intermediate and never used."
+  },
+  "repack": {
+    "outputSHA256": "d9328f093c1ea7b1ad704a5aecd97d498b1d3d0029383a388ce64096314eb088",
+    "outputBytes": 4526296,
+    "sourceBytes": 2760380,
+    "nonReplacedBufferViewsByteIdentical": 199,
+    "replacedImageBufferViews": [
+      5,
+      6
+    ],
+    "allSceneAnimationMeshMaterialAccessorJSONIdentical": true,
+    "albedoPayloadsByteIdentical": true,
+    "limitation": "584 added/repaired collar UV triangles are degenerate and extend neighbouring texels. Their source detail is not independently verified; no collar repair is claimed. Source-baked AO retains original unposed geometry; current bounded cloth/seat geometry edits are not rebaked."
+  }
+}

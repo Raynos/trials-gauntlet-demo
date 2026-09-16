@@ -1,0 +1,54 @@
+{
+  "sourceSHA256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262",
+  "headSHA256": "de45a4ce9abbf2b8a5039e1bc3b08d1e1a742136cf6105c82126b05c2c664a64",
+  "outputSHA256": "500990e54f6d3c7b5c413ef99e9292fa761e16a8712d71744eb6742a798bfd82",
+  "outputBytes": 173119480,
+  "removedOldHeadTriangles": 11341,
+  "remainingBodyTriangles": 33976,
+  "attachedMeshVertices": [
+    124,
+    1076,
+    23740,
+    1755000,
+    423,
+    81
+  ],
+  "headSkinJoint": 4,
+  "sourceBodyBinaryPrefixIdentical": true,
+  "bodyAttributesIdentical": true,
+  "sixAnimationsAndSkinJSONIdentical": true,
+  "animationCount": 6,
+  "uniformScale": 0.9,
+  "sourcePivot": [
+    0.0,
+    1.531,
+    0.0
+  ],
+  "riderRestAnchor": [
+    0.79,
+    1.235,
+    0.0
+  ],
+  "rotationMatrix": [
+    [
+      0.0,
+      0.4067366430758002,
+      0.9135454576426009
+    ],
+    [
+      0.0,
+      0.9135454576426009,
+      -0.4067366430758002
+    ],
+    [
+      -1.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "limitations": [
+    "Local appearance assembly only; unoptimized original groom retained.",
+    "Old head-weighted faces removed; neck joining and fit need whole-scene visual review.",
+    "No mobile/deployment or final target likeness claim."
+  ]
+}

@@ -4,7 +4,8 @@ Independent Three.js production viewer for target 01. This package imports no ga
 
 ## Current milestone
 
-The user requested breadth-first work: the complete person and bike in Three.js, followed by individual polish. The viewer now loads the complete existing Blender-authored Street rider and trials bike, with `sit_cruise` as the default clip and full-scene framing. Six authored clips cover seated, forward, rearward, compression, extension and landing absorption. Compression and landing now include coordinated fork, swingarm, shock, chain and hose motion with fixed tyres. This is prescribed garage kinematics; game-physics integration remains open. Head-only studies are preserved and paused. This assembled baseline is not final art acceptance or iPhone/runtime proof.
+The full rider now wears the saved authored face, curly hair and beard at the user's explicit request. The complete bike and six motion clips remain. This local appearance assembly uses the original dense groom; the 173 MB generated rider is deliberately not a finished mobile asset. Neck/collar fit and final art remain provisional. Rebuild the ignored assembled GLB using `art/full-rider-identity/README.md` before the normal viewer build. The prior compressed mobile body remains preserved but is not the currently displayed rider.
+
 
 ## Run and build
 
