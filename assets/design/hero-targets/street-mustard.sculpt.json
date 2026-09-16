@@ -1226,7 +1226,7 @@
         "normal gameplay camera with Pro bike class",
         "separately labelled moving whole-hero close inspection capture"
       ],
-      "framingContract": "Use actual track camera keys and dynamic safety clamp. Baseline menu/countdown fov28 yaw20 pitch11, height fraction.4; riding baseline fov28\u201334 yaw18\u201320 pitch11\u201322, height fraction.16\u2013.4 before track/air/framing clamps. These are controller settings, not reference photo measurements. Record resulting camera/debug framing; do not substitute a posed beauty camera.",
+      "framingContract": "Use actual track camera keys and dynamic safety clamp. Baseline menu/countdown fov28 yaw20 pitch11, height fraction.4; riding baseline fov28–34 yaw18–20 pitch11–22, height fraction.16–.4 before track/air/framing clamps. These are controller settings, not reference photo measurements. Record resulting camera/debug framing; do not substitute a posed beauty camera.",
       "acceptance": "Parent judges played clips: face/hair silhouette, cloth tension, glove grip, shoe-to-peg contact, palette stable across bike classes, normal-camera readability; inspect full and LOD. Neutral/grazing material views supplement, never replace, played evidence.",
       "status": "contract specified; no capture or visual pass claimed"
     }
@@ -2920,7 +2920,7 @@
           "status": "specified-not-built",
           "kind": "ridge",
           "geometryEffect": {
-            "method": "2\u20133 tapered asymmetric compression ridges local to flexion",
+            "method": "2–3 tapered asymmetric compression ridges local to flexion",
             "amplitudeMetres": 0.003,
             "units": "meters",
             "parameterEvidence": "design inference from visible construction; camera-scaled measurement pending"
@@ -15278,6 +15278,21 @@
       "cameraView": "",
       "notes": "",
       "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-09-16T00:42:21.045208+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.4,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "referenceScreenshot": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/01-street-barehead.png",
+      "renderScreenshot": "harness/out/blender/img2-preview/neutral-blockout-06/views/azimuth-000.png",
+      "comparisonImage": "",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": ""
     }
   ],
   "reviewHistory": [
@@ -15323,6 +15338,32 @@
       "visualEvidence": {
         "referenceScreenshot": "assets/design/hero-targets/reconstruction/turnaround-front.png",
         "renderScreenshot": "harness/out/blender/img2-preview/neutral-blockout-04/views/azimuth-000.png",
+        "comparisonImage": "",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-09-16T00:42:21.045208+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.4,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "refine-spec",
+      "summary": "Continuous garment fields remain visibly seamed at capped-cone joins, shoulder volumes are inflated, and waist underlap is insufficient. Reliable independent binary silhouette IoU 0.867 does not validate interior anatomy. Geometry diagnosis requires longer internal taper overlap and a supported waistband; no visual acceptance.",
+      "matched": [],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/evidence/hero-r12-reconstruction/front-matte-diagnostic.json"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/01-street-barehead.png",
+        "renderScreenshot": "harness/out/blender/img2-preview/neutral-blockout-06/views/azimuth-000.png",
         "comparisonImage": "",
         "cameraView": "",
         "notes": "",
@@ -15480,7 +15521,7 @@
       {
         "record_id": "core.measurement-source-text",
         "file_path": "grimoire/intake/image_analysis.md",
-        "heading": "Layer 2 \u2014 Overall form & silhouette",
+        "heading": "Layer 2 — Overall form & silhouette",
         "key_path": null,
         "score": 5.268490296339,
         "snippets": [
@@ -15489,7 +15530,7 @@
         "source_refs": [
           {
             "path": "grimoire/intake/image_analysis.md",
-            "heading": "Layer 2 \u2014 Overall form & silhouette",
+            "heading": "Layer 2 — Overall form & silhouette",
             "key_path": null
           },
           {
@@ -15517,7 +15558,7 @@
         "key_path": null,
         "score": 4.20187819032,
         "snippets": [
-          "Roughness is microfacet scatter: high roughness reads matte and low roughness reads glossy. Recognition cues: low roughness reads as a sharp, mirror-like, tight specular highlight; high roughness reads as a blurry, wide, dim highlight and matte appearance; worn/scratched regions show broken-up, uneven highlight shapes versus the smooth highlight of pristine areas. D\u1ea5u hi\u1ec7u nh\u1eadn di\u1ec7n: \u0111\u1ed9 nh\u00e1m th\u1ea5p = \u0111i\u1ec3m s\u00e1ng specular s\u1eafc n\u00e9t, gi\u1ed1ng g\u01b0\u01a1ng; \u0111\u1ed9 nh\u00e1m cao = \u0111i\u1ec3m s\u00e1ng m\u1edd, r\u1ed9ng, t\u1ed1i, b\u1ec1 m\u1eb7t tr\u00f4ng ..."
+          "Roughness is microfacet scatter: high roughness reads matte and low roughness reads glossy. Recognition cues: low roughness reads as a sharp, mirror-like, tight specular highlight; high roughness reads as a blurry, wide, dim highlight and matte appearance; worn/scratched regions show broken-up, uneven highlight shapes versus the smooth highlight of pristine areas. Dấu hiệu nhận diện: độ nhám thấp = điểm sáng specular sắc nét, giống gương; độ nhám cao = điểm sáng mờ, rộng, tối, bề mặt trông ..."
         ],
         "source_refs": [
           {
@@ -15527,7 +15568,7 @@
           },
           {
             "path": "grimoire/intake/image_analysis.md",
-            "heading": "Layer 5 \u2014 Materials & surface (PBR)",
+            "heading": "Layer 5 — Materials & surface (PBR)",
             "key_path": null
           },
           {
@@ -15549,7 +15590,7 @@
           {
             "kind": "source",
             "ref": "docs/raw/img2threejs-skill-dataset.json",
-            "note": "img2threejs NotebookLM research distillation \u2014 merged recognition cues + Three.js target instead of duplicating this entity."
+            "note": "img2threejs NotebookLM research distillation — merged recognition cues + Three.js target instead of duplicating this entity."
           }
         ]
       }
@@ -16531,6 +16572,213 @@
       "renderHash": "08c5ce71add45241",
       "passId": "blockout",
       "mapStrippedRender": "harness/out/blender/img2-preview/neutral-blockout-04/views/azimuth-000.png"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.3887,
+        "aspectRatioDelta": 1.2194,
+        "scaleDelta": 0.6024,
+        "bilateralSymmetryError": 0.0303,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 63.78,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 63.78
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.86
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.86
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 63.78
+            },
+            {
+              "componentId": null,
+              "deltaE": 63.78
+            },
+            {
+              "componentId": null,
+              "deltaE": 48.68
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.86
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.86
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 31.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 31.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.87
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.86
+            },
+            {
+              "componentId": null,
+              "deltaE": 51.86
+            },
+            {
+              "componentId": null,
+              "deltaE": 22.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 50.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 31.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 31.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.87
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.389 is below threshold 0.85",
+        "aspect-ratio delta 1.219 exceeds threshold 0.05",
+        "scale delta 0.602 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [
+        "render: 43.8% of foreground cells lie outside the largest connected blob and were excluded from the bounding box; if the subject really has separated parts in this projection, they are not being measured"
+      ],
+      "renderHash": "cd1586b2f5400198",
+      "passId": "blockout"
     }
   ]
 }

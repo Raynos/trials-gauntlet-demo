@@ -1,0 +1,42 @@
+{
+  "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/harness/inputs/hero-r3/hop-binary.json",
+  "recordingSha256": "3f51d7016f60dfd7425c03b09655e5b10647ba6dd7cdbe0a18e76b8e4c98b06e",
+  "assetBytes": {
+    "models/f52d537f93059e68/rider-street-656728388735525f.glb": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f",
+    "models/f52d537f93059e68/rider-street-lod-a209dd19ab7b5cb8.glb": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3",
+    "models/d783c6febf29d309/bike-7f849529195be0ac.glb": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+    "models/d783c6febf29d309/bike-lod-411a91f17e606143.glb": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502"
+  },
+  "physics": "v2",
+  "hz": 120,
+  "fps": 60,
+  "from": 180,
+  "to": 360,
+  "frames": 90,
+  "prefixRendered": true,
+  "quality": "high",
+  "outfit": "street-mustard",
+  "width": 1280,
+  "height": 720,
+  "graphics": {
+    "requestedBackend": "metal",
+    "launchArgs": [
+      "--use-angle=metal",
+      "--enable-webgl",
+      "--ignore-gpu-blocklist",
+      "--mute-audio"
+    ],
+    "browser": "chromium",
+    "browserVersion": "151.0.7922.34",
+    "chromium": "151.0.7922.34",
+    "hostPlatform": "darwin",
+    "vendor": "Google Inc. (Apple)",
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36"
+  },
+  "errors": [],
+  "evidence": "harness/out/blender/arms-r13/before-hop/evidence.json",
+  "clip": "harness/out/blender/arms-r13/before-hop/clip.mp4",
+  "scope": "Baseline for one sleeve candidate, not candidate acceptance"
+}

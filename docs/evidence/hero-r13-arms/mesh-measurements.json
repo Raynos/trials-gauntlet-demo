@@ -1,0 +1,202 @@
+{
+  "status": "Rejected fairing study; no export/capture/promotion",
+  "scope": "Sampled poses only. Broad linear-blend collapse not observed here; this does not establish quality across all animations.",
+  "measurement": "Canonical Street source CPU-skinned by exact production decoded bone transforms. BVH counts exclude shared vertices and coincident vertices; diagnostic nonadjacent triangle pairs, not visually weighted severity. Determinant is local transform volume scale, not measured watertight garment volume.",
+  "samples": [
+    {
+      "tick": 242,
+      "pose": {
+        "tick": 242,
+        "elbowInteriorDegrees": 79.04978032637338,
+        "shoulderSagittalDegrees": 114.93701483986133,
+        "upperAnterior": 0.18879875694989187,
+        "wristAnterior": 0.3450862972452208,
+        "elbowOutward": 0.24299941838602082,
+        "wristDistance": 0.3774593594155672,
+        "poleLength": 0.2247310957489108,
+        "gripError": 2.1916109429357962e-07,
+        "physicalPose": true
+      },
+      "maxBindMatrixError": 3.8743019104003906e-07,
+      "vertices": 1695,
+      "minimumBlendDeterminant": 0.9980959892272949,
+      "before": {
+        "bandTriangles": 3218,
+        "restNonadjacentCrossings": 251,
+        "posedNonadjacentCrossings": 261,
+        "triangleAreaRatio": {
+          "min": 0.9034699559273962,
+          "p05": 0.9909173081817056,
+          "median": 1.0000073583660931,
+          "p95": 1.015047947710596,
+          "max": 1.0490301054595914
+        }
+      },
+      "after": {
+        "bandTriangles": 3218,
+        "restNonadjacentCrossings": 244,
+        "posedNonadjacentCrossings": 250,
+        "triangleAreaRatio": {
+          "min": 0.8989747529027466,
+          "p05": 0.991599048538403,
+          "median": 1.0000073917400574,
+          "p95": 1.015721223911369,
+          "max": 1.0614903939143414
+        }
+      }
+    },
+    {
+      "tick": 292,
+      "pose": {
+        "tick": 292,
+        "elbowInteriorDegrees": 55.91885700297995,
+        "shoulderSagittalDegrees": 142.33063969908702,
+        "upperAnterior": 0.11327979409857893,
+        "wristAnterior": 0.250166257143708,
+        "elbowOutward": 0.26084154158186873,
+        "wristDistance": 0.28012260236553915,
+        "poleLength": 0.25546074884852266,
+        "gripError": 2.0227292269751317e-07,
+        "physicalPose": true
+      },
+      "maxBindMatrixError": 3.8743019104003906e-07,
+      "vertices": 1695,
+      "minimumBlendDeterminant": 0.9458515048027039,
+      "before": {
+        "bandTriangles": 3218,
+        "restNonadjacentCrossings": 251,
+        "posedNonadjacentCrossings": 279,
+        "triangleAreaRatio": {
+          "min": 0.4757388219690476,
+          "p05": 0.9174602515858253,
+          "median": 1.000003454038923,
+          "p95": 1.1123123959867054,
+          "max": 1.868793304431731
+        }
+      },
+      "after": {
+        "bandTriangles": 3218,
+        "restNonadjacentCrossings": 244,
+        "posedNonadjacentCrossings": 274,
+        "triangleAreaRatio": {
+          "min": 0.45345791763305465,
+          "p05": 0.9219230287123859,
+          "median": 1.000003454038923,
+          "p95": 1.1131171524549357,
+          "max": 2.770814034611802
+        }
+      }
+    },
+    {
+      "tick": 316,
+      "pose": {
+        "tick": 316,
+        "elbowInteriorDegrees": 66.17091399722176,
+        "shoulderSagittalDegrees": 176.32209942747485,
+        "upperAnterior": 0.013017673271768615,
+        "wristAnterior": 0.24891806513173323,
+        "elbowOutward": 0.24742255153695003,
+        "wristDistance": 0.32478778452929136,
+        "poleLength": 0.24334283915357036,
+        "gripError": 2.1443538645183477e-07,
+        "physicalPose": true
+      },
+      "maxBindMatrixError": 3.8743019104003906e-07,
+      "vertices": 1695,
+      "minimumBlendDeterminant": 0.8940877914428711,
+      "before": {
+        "bandTriangles": 3218,
+        "restNonadjacentCrossings": 251,
+        "posedNonadjacentCrossings": 329,
+        "triangleAreaRatio": {
+          "min": 0.25156070016518733,
+          "p05": 0.9366769246083537,
+          "median": 1.000008777946793,
+          "p95": 1.1080668619749425,
+          "max": 1.4492989754812122
+        }
+      },
+      "after": {
+        "bandTriangles": 3218,
+        "restNonadjacentCrossings": 244,
+        "posedNonadjacentCrossings": 321,
+        "triangleAreaRatio": {
+          "min": 0.2281327552562911,
+          "p05": 0.9458768946397144,
+          "median": 1.0000097107517645,
+          "p95": 1.114210519754381,
+          "max": 2.3618076190656496
+        }
+      }
+    },
+    {
+      "tick": 336,
+      "pose": {
+        "tick": 336,
+        "elbowInteriorDegrees": 96.67027632161135,
+        "shoulderSagittalDegrees": 88.3336661467813,
+        "upperAnterior": 0.2282213162838703,
+        "wristAnterior": 0.3685908733499411,
+        "elbowOutward": 0.2242119078228892,
+        "wristDistance": 0.44200863357553266,
+        "poleLength": 0.19414810599735136,
+        "gripError": 2.265233471981379e-07,
+        "physicalPose": true
+      },
+      "maxBindMatrixError": 3.8743019104003906e-07,
+      "vertices": 1695,
+      "minimumBlendDeterminant": 0.9838771224021912,
+      "before": {
+        "bandTriangles": 3218,
+        "restNonadjacentCrossings": 251,
+        "posedNonadjacentCrossings": 227,
+        "triangleAreaRatio": {
+          "min": 0.6500103175809134,
+          "p05": 0.9467878826597945,
+          "median": 0.9999977852958533,
+          "p95": 1.0417150465640381,
+          "max": 1.3430146478408853
+        }
+      },
+      "after": {
+        "bandTriangles": 3218,
+        "restNonadjacentCrossings": 244,
+        "posedNonadjacentCrossings": 221,
+        "triangleAreaRatio": {
+          "min": 0.6486796232908694,
+          "p05": 0.9490465033686294,
+          "median": 0.9999976347607288,
+          "p95": 1.0422592652327378,
+          "max": 1.2962788965255685
+        }
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "harness/out/blender/arms-r13/street-elbow-v1.blend",
+      "sha256": "23790a848acc4c1afda43604c3dabb7e5f965cdd059941903209f6a3b2d35fde",
+      "bytes": 32764432
+    },
+    {
+      "path": "harness/out/blender/arms-r13/inspection.json",
+      "sha256": "026bf6f1b98693ce7cd37a18170e468bcfabb0ad38d751ccbd7a6482e072ac63",
+      "bytes": 3384378
+    },
+    {
+      "path": "harness/out/blender/arms-r13/after-inspection.json",
+      "sha256": "acd6e9eaa887691c81ad312155ec334eaf38d947d69a61a9ee08eeed97d74432",
+      "bytes": 3384439
+    },
+    {
+      "path": "harness/out/blender/arms-r13/before-hop/evidence.json",
+      "sha256": "b19c4b6e1662551fbc14478ff7d5d6bf0879aca8876a51866dea5cf331f9e6e8",
+      "bytes": 679456
+    },
+    {
+      "path": "harness/out/blender/arms-r13/before-hop/clip.mp4",
+      "sha256": "70058eff3c42db0d4800227339c266f243d7c55db14e9dd8bae21c2a1e1d5524",
+      "bytes": 2783303
+    }
+  ]
+}

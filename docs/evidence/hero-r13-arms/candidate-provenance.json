@@ -1,0 +1,13 @@
+{
+  "source": "assets/blender/source/rider-street.blend",
+  "sourceSha256": "5b5effde064171323313198d4eceafb89b2d0128ddd19d30ab873ef1022adf01",
+  "candidate": "harness/out/blender/arms-r13/street-elbow-v1.blend",
+  "candidateSha256": "23790a848acc4c1afda43604c3dabb7e5f965cdd059941903209f6a3b2d35fde",
+  "recipeSha256": "5706979120dbcc9174bab0943a73e449b8e7fd94810a2de4d37b142e087b1b42",
+  "changedVertices": 1137,
+  "maxDisplacement": 0.0030000389715972653,
+  "onlyRegion": "sweatshirt vertices within90mm of elbow joint, upperArm+forearm weight>=.95",
+  "rigActionsSocketsMaterialsWeightsOtherMeshesOutsideRegionParity": true,
+  "status": "Rejected: marginal intersection reduction with worsened worst triangle distortion; not exported, played or promoted",
+  "licenses": "docs/evidence/hero-r9-inputs/THIRD-PARTY.md"
+}

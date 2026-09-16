@@ -1,0 +1,77 @@
+{
+  "url": "https://trials-rider-progress.vercel.app/",
+  "deployment": "dpl_Hd4iwwPHvDJn6kM27GLez3vMNRTu",
+  "anonymousHttp": 200,
+  "htmlSha256": "6995b930aaf6ca781a1cd9e6fbc2c6be3c01db693aea1bf1b20ee31395a36607",
+  "media": [
+    {
+      "path": "media/0e8f333a9028401f8939.png",
+      "sha256": "0e8f333a9028401f89393f93d981146635a44dd4a05b917c41541878dca8825f"
+    },
+    {
+      "path": "media/1023f06e15e7ee07fe94.png",
+      "sha256": "1023f06e15e7ee07fe94ebcdc0605e7b46261bb88e065385b46d6dc862968a41"
+    },
+    {
+      "path": "media/1caf08cca8501280f3d7.png",
+      "sha256": "1caf08cca8501280f3d749a5102dd895fc699152ec0d7b6334dec412f8259e7c"
+    },
+    {
+      "path": "media/2de5b42ea993bf0cfaf3.png",
+      "sha256": "2de5b42ea993bf0cfaf3326544cf83c57715d3be78797deb28bd29b7d118799b"
+    },
+    {
+      "path": "media/3f159e98ec6dac0bfcbf.png",
+      "sha256": "3f159e98ec6dac0bfcbfe1ac5a1d29e0f499f721527e658d4add14074609b4b1"
+    },
+    {
+      "path": "media/49dbcda51af95f8a3139.png",
+      "sha256": "49dbcda51af95f8a3139673a5f5a018a56a1af083d08bbc5dcba6b63db359980"
+    },
+    {
+      "path": "media/546b6e37715d925dd172.png",
+      "sha256": "546b6e37715d925dd172c644457ff95ee248efbb07fcc5db6fb70c861547e6fe"
+    },
+    {
+      "path": "media/5be089f06ef2dded75fb.png",
+      "sha256": "5be089f06ef2dded75fb7491602bd580b299b30a271c8c7a334a96915f92b0c0"
+    },
+    {
+      "path": "media/7bbcefeae0f2272119d3.png",
+      "sha256": "7bbcefeae0f2272119d3c8a22764dcac90f01f0d073472a76113462f7076b6a1"
+    },
+    {
+      "path": "media/852479a88ed2cc5ed43c.png",
+      "sha256": "852479a88ed2cc5ed43c0648fd603218044f5f3940f9ac978fd10afc76d99776"
+    },
+    {
+      "path": "media/9ca05c1f14bf3d322446.png",
+      "sha256": "9ca05c1f14bf3d3224469745a34e25fac7710f12fef7d766cbece701f1ecb619"
+    },
+    {
+      "path": "media/a6caafe0abd2f14c82ba.png",
+      "sha256": "a6caafe0abd2f14c82ba9703e8d7a14762bc1f2aaaa086b75ecf8531ecb3e7ba"
+    },
+    {
+      "path": "media/a70a20ac103bf1ca5b28.png",
+      "sha256": "a70a20ac103bf1ca5b2860d37652f21470abfd19eb9b1df5f85a70fecac13207"
+    },
+    {
+      "path": "media/cbda379462b4e8c31401.png",
+      "sha256": "cbda379462b4e8c31401d11987fb0caf879a2fa9386f922103f67540206a4036"
+    },
+    {
+      "path": "media/edf92826956dd44115f7.png",
+      "sha256": "edf92826956dd44115f7f848e22b982f7d43136f1224ec56e7cd378c62e690b5"
+    },
+    {
+      "path": "media/f4eecb262da2226000d6.mp4",
+      "sha256": "f4eecb262da2226000d63b6cc403f33b99208a6e3a4d391546add45c0cc76898"
+    },
+    {
+      "path": "media/fb4a984d5efeb227157e.mp4",
+      "sha256": "fb4a984d5efeb227157eb65ace16236f1f4fb36a5fedfccf714dc8f464cc3643"
+    }
+  ],
+  "scope": "Five gameplay outfit captures, R10 before/after, wheel videos, explicitly labeled AI targets. Gallery only; no game deployment."
+}

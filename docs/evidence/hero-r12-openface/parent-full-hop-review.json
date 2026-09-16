@@ -1,0 +1,14 @@
+{
+  "clip": "harness/out/blender/openface-r12/played-hop-full/clip.mp4",
+  "sha256": "a5b2067e1257cd3432aa43b92cfea5bd4e5d00e1587e45fd13a1a6223587621a",
+  "reviewMethod": "Native QuickTime playback from start to end; screenshots observed during playback at game1.917s and endpoint3.000s",
+  "scope": "Full-detail normal-gameplay camera hop, complements prior LOD/crash review",
+  "observations": [
+    "Compact open-face helmet remains seated on head through hop",
+    "Face opening preserved; no oversized full-face shell",
+    "Arms remain conspicuously angular and cramped near bars at start",
+    "Character clothing and face still below approved concepts"
+  ],
+  "decision": "Accept compact helmet integration only; reject overall AAA quality claim",
+  "next": "Measure actual runtime bone motion against mesh deformation before proposing arm correction"
+}
