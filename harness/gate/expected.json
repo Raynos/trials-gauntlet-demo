@@ -1,7 +1,7 @@
 {
   "flat-test": {
     "canonical1200": {
-      "hash": "0c71973b36a15a2a",
+      "hash": "ff119f990e56af57",
       "physics": "bikePhysicsFactory-v2"
     },
     "golden": {
@@ -28,9 +28,9 @@
   "b1-first-ride:pro": {
     "golden": {
       "file": "bot-3-pro.json",
-      "finishTime": 38.541666666666664,
-      "hash": "ccdd746d430da232",
-      "ticks": 4625,
+      "finishTime": 38.141666666666666,
+      "hash": "4b69a80de766a325",
+      "ticks": 4577,
       "physics": "bikePhysicsFactory-v2"
     }
   }

@@ -1,0 +1,370 @@
+diff -ruN base/src/physics/v2/bike.ts tree/src/physics/v2/bike.ts
+--- base/src/physics/v2/bike.ts	2026-09-15 21:59:28
++++ tree/src/physics/v2/bike.ts	2026-09-15 22:07:42
+@@ -17,7 +17,7 @@
+ import { CollisionWorld, circleVsPrim, PrimKind, type Manifold, type Prim } from '../collision';
+ import { SURFACES } from '../tuning';
+ import { atan2, clamp, cos, sin, wrapAngle, HALF_PI } from '../dmath';
+-import { bikeTuningV2, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
++import { bikeTuningV2, suspensionPoint, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
+ import { driveTorque, lag, limiterLatch, reportRpm, thrustFrac, wheelieTrim } from './engine';
+ import { brushImpulse, tyreMu } from './tyre';
+ import { advanceTarget, buildChain, canonicalPose, GRIP_X, GRIP_Y, leanFromX, PEG_X, PEG_Y, poseAt, type ChainOut } from './rider';
+@@ -624,8 +624,8 @@
+     const [cr, cf] = this.staticSags();
+     const sr = t.suspension.rear;
+     const sf = t.suspension.front;
+-    const rear = { x: sr.axle.x + sr.axis.x * cr, y: sr.axle.y + sr.axis.y * cr };
+-    const front = { x: sf.axle.x + sf.axis.x * cf, y: sf.axle.y + sf.axis.y * cf };
++    const rear = suspensionPoint(sr, cr);
++    const front = suspensionPoint(sf, cf);
+     poseAt(t.rider.poses, lean, this.poseTmp);
+     const M = this.totalMass();
+     const cx = (t.wheel.rearMass * rear.x + t.wheel.frontMass * front.x + t.rider.mass * this.poseTmp.x) / M;
+@@ -780,44 +780,54 @@
+     }
+   }
+ 
+-  /** Static vertical ground load on wheel 0 (rear) / 1 (front): neutral pose, level, zero-compression geometry. */
+-  private staticLoad(which: number): number {
+-    const t = this.tuning;
+-    const sr = t.suspension.rear;
+-    const sf = t.suspension.front;
+-    const L = sf.axle.x - sr.axle.x;
+-    const M = this.totalMass();
+-    const W = M * this.g;
+-    poseAt(t.rider.poses, 0, this.poseTmp);
+-    const cx = (t.wheel.rearMass * sr.axle.x + t.wheel.frontMass * sf.axle.x + t.rider.mass * this.poseTmp.x) / M - sr.axle.x;
+-    const nf = (W * cx) / L;
+-    return which === 0 ? W - nf : nf;
+-  }
+-
+   /**
+    * Static sag of a wheel's spring under a vertical ground load `N`: the unsprung wheel carries its own
+    * weight, and on a tilted slider the spring sees `axis.y` of the sprung share (the slider's
+-   * perpendicular constraint carries the rest).
++   * perpendicular constraint carries the rest). On the hinge (R8 Astra port) the axis is the arc's tangent AT
++   * the sag, so the sag is iterated (8 fixed-point steps from `guess`; the tangent turns 0.2 rad over the travel).
+    */
+-  private staticSag(s: SuspensionV2, N: number, wheelMass: number): number {
+-    const sprung = (N - wheelMass * this.g) * s.axis.y;
+-    return clamp(sprung / s.k - s.preload, 0, s.travel);
++  private staticSag(s: SuspensionV2, N: number, wheelMass: number, guess = 0): number {
++    let compression = guess;
++    for (let i = 0; i < 8; i++) {
++      const vertical = s.hinge ? -cos(s.hinge.droopAngle - compression / s.hinge.radius) : s.axis.y;
++      compression = clamp(((N - wheelMass * this.g) * vertical) / s.k - s.preload, 0, s.travel);
++    }
++    return compression;
+   }
+ 
+-  /** Static sags (m) of rear / front at the neutral pose. */
++  /**
++   * Static sags (m) of rear / front at the neutral pose: the wheel loads from the moment balance about the SAGGED
++   * axles (level ground through both contacts), iterated with the sags (R8 Astra port, 405f894; before, the split
++   * was taken on the zero-compression geometry, 1-2 % off on a 26 cm arc).
++   */
+   private staticSags(): [number, number] {
+     const t = this.tuning;
+-    return [this.staticSag(t.suspension.rear, this.staticLoad(0), t.wheel.rearMass), this.staticSag(t.suspension.front, this.staticLoad(1), t.wheel.frontMass)];
++    const mass = this.totalMass();
++    poseAt(t.rider.poses, 0, this.poseTmp);
++    let rear = 0;
++    let front = 0;
++    for (let i = 0; i < 16; i++) {
++      const r = suspensionPoint(t.suspension.rear, rear);
++      const f = suspensionPoint(t.suspension.front, front);
++      const angle = atan2(r.y - f.y, f.x - r.x);
++      const mx = (t.wheel.rearMass * r.x + t.wheel.frontMass * f.x + t.rider.mass * this.poseTmp.x) / mass;
++      const my = (t.wheel.rearMass * r.y + t.wheel.frontMass * f.y + t.rider.mass * this.poseTmp.y) / mass;
++      const width = Math.sqrt((f.x - r.x) ** 2 + (f.y - r.y) ** 2);
++      const frontLoad = (mass * this.g * ((mx - r.x) * cos(angle) - (my - r.y) * sin(angle))) / width;
++      rear = this.staticSag(t.suspension.rear, mass * this.g - frontLoad, t.wheel.rearMass, rear);
++      front = this.staticSag(t.suspension.front, frontLoad, t.wheel.frontMass, front);
++    }
++    return [rear, front];
+   }
+ 
+   /** Render axle frame origin in the chassis frame (axle midpoint at static sag), as v1. */
+   private axleOrigin(): void {
+     const t = this.tuning;
+-    const sr = t.suspension.rear;
+-    const sf = t.suspension.front;
+     const [cr, cf] = this.staticSags();
+-    this.axleOrgX = 0.5 * (sr.axle.x + sr.axis.x * cr + sf.axle.x + sf.axis.x * cf);
+-    this.axleOrgY = 0.5 * (sr.axle.y + sr.axis.y * cr + sf.axle.y + sf.axis.y * cf);
++    const rear = suspensionPoint(t.suspension.rear, cr);
++    const front = suspensionPoint(t.suspension.front, cf);
++    this.axleOrgX = 0.5 * (rear.x + front.x);
++    this.axleOrgY = 0.5 * (rear.y + front.y);
+   }
+ 
+   /**
+@@ -831,10 +841,12 @@
+     const sr = t.suspension.rear;
+     const sf = t.suspension.front;
+     const [cr, cf] = this.staticSags();
+-    const rlx = sr.axle.x + sr.axis.x * cr;
+-    const rly = sr.axle.y + sr.axis.y * cr;
+-    const flx = sf.axle.x + sf.axis.x * cf;
+-    const fly = sf.axle.y + sf.axis.y * cf;
++    const rearPoint = suspensionPoint(sr, cr);
++    const frontPoint = suspensionPoint(sf, cf);
++    const rlx = rearPoint.x;
++    const rly = rearPoint.y;
++    const flx = frontPoint.x;
++    const fly = frontPoint.y;
+     // chassis angle that puts both axles on the ground line
+     const a = angle + atan2(rly - fly, flx - rlx);
+     const c = cos(a);
+@@ -952,6 +964,47 @@
+     this.av[b] = this.av[b]! + this.ii[b]! * (rx * fy - ry * fx) * dt;
+   }
+ 
++  /**
++   * Suspension geometry of wheel `w` from the current positions (R8 Astra port, 405f894): the compression
++   * coordinate `sComp`, the direction it grows along `sA` (world), the bilateral constraint's direction `sN` and
++   * its error `sPerp`. Straight slider: `sA` the axis, `sN` its perpendicular, `sPerp` the drift off the line. Hinge
++   * (the rear swingarm): `sA` the arc's tangent, `sN` the radial direction from the pivot and `sPerp` the arm-length
++   * error `d - radius`, `sComp` the arc length from full droop. One function for the force pass, the velocity
++   * solve, the position pass and derive(), so every phase sees the same path.
++   */
++  private suspensionGeometry(w: number): void {
++    const st = w === 0 ? this.tuning.suspension.rear : this.tuning.suspension.front;
++    const body = w === 0 ? REAR : FRONT;
++    const angle = this.an[CHASSIS]!;
++    const c = cos(angle);
++    const s = sin(angle);
++    const local = st.hinge ? st.hinge.pivot : st.axle;
++    const x = this.px[CHASSIS]! + local.x * c - local.y * s;
++    const y = this.py[CHASSIS]! + local.x * s + local.y * c;
++    const dx = this.px[body]! - x;
++    const dy = this.py[body]! - y;
++    if (st.hinge) {
++      const d2 = Math.max(1e-12, dx * dx + dy * dy);
++      const d = Math.sqrt(d2);
++      this.sNx[w] = dx / d;
++      this.sNy[w] = dy / d;
++      // tangent in the sense of growing compression (the arm angle falls as the wheel rises)
++      this.sAx[w] = (st.hinge.radius * dy) / d2;
++      this.sAy[w] = (-st.hinge.radius * dx) / d2;
++      this.sComp[w] = st.hinge.radius * wrapAngle(st.hinge.droopAngle - atan2(dy, dx) + angle);
++      this.sPerp[w] = d - st.hinge.radius;
++    } else {
++      const ax = st.axis.x * c - st.axis.y * s;
++      const ay = st.axis.x * s + st.axis.y * c;
++      this.sAx[w] = ax;
++      this.sAy[w] = ay;
++      this.sNx[w] = -ay;
++      this.sNy[w] = ax;
++      this.sComp[w] = dx * ax + dy * ay;
++      this.sPerp[w] = -dx * ay + dy * ax;
++    }
++  }
++
+   private forces(riding: boolean): void {
+     const F = this.F;
+     const U = this.U;
+@@ -986,25 +1039,15 @@
+ 
+     // suspension pass 1: geometry and rates from pre-impulse velocities (both wheels first)
+     for (let w = 0; w < 2; w++) {
+-      const st = w === 0 ? t.suspension.rear : t.suspension.front;
+       const wb = w === 0 ? REAR : FRONT;
+-      const ax = st.axis.x * c - st.axis.y * s;
+-      const ay = st.axis.x * s + st.axis.y * c;
+-      const arx = fx + st.axle.x * c - st.axle.y * s;
+-      const ary = fy + st.axle.x * s + st.axle.y * c;
+-      const dx = px[wb]! - arx;
+-      const dy = py[wb]! - ary;
++      this.suspensionGeometry(w);
++      const ax = this.sAx[w]!;
++      const ay = this.sAy[w]!;
+       const rx = px[wb]! - fx;
+       const ry = py[wb]! - fy;
+       const wf = av[CHASSIS]!;
+       const relx = vx[wb]! - (vx[CHASSIS]! - wf * ry);
+       const rely = vy[wb]! - (vy[CHASSIS]! + wf * rx);
+-      this.sAx[w] = ax;
+-      this.sAy[w] = ay;
+-      this.sNx[w] = -ay;
+-      this.sNy[w] = ax;
+-      this.sComp[w] = dx * ax + dy * ay;
+-      this.sPerp[w] = -dx * ay + dy * ax;
+       this.sRate[w] = relx * ax + rely * ay;
+     }
+     // suspension pass 2: spring + damper + cubic bump stop as an impulse pair; rolling resistance
+@@ -1898,26 +1941,17 @@
+     const slop = t.solver.slop;
+     const beta = t.solver.posBeta;
+     for (let it = 0; it < t.solver.posIters; it++) {
+-      const c = cos(an[CHASSIS]!);
+-      const s = sin(an[CHASSIS]!);
+-      const fx = px[CHASSIS]!;
+-      const fy = py[CHASSIS]!;
+       for (let w = 0; w < 2; w++) {
+         const st = w === 0 ? t.suspension.rear : t.suspension.front;
+         const wb = w === 0 ? REAR : FRONT;
+-        const ax = st.axis.x * c - st.axis.y * s;
+-        const ay = st.axis.x * s + st.axis.y * c;
+-        const nx = -ay;
+-        const ny = ax;
+-        const arx = fx + st.axle.x * c - st.axle.y * s;
+-        const ary = fy + st.axle.x * s + st.axle.y * c;
+-        const dx = px[wb]! - arx;
+-        const dy = py[wb]! - ary;
+-        const rx = px[wb]! - fx;
+-        const ry = py[wb]! - fy;
+-        // perpendicular drift: remove it fully
++        // perpendicular drift (the arm-length error on the hinge): remove it fully
++        this.suspensionGeometry(w);
+         {
+-          const perp = dx * nx + dy * ny;
++          const nx = this.sNx[w]!;
++          const ny = this.sNy[w]!;
++          const rx = px[wb]! - px[CHASSIS]!;
++          const ry = py[wb]! - py[CHASSIS]!;
++          const perp = this.sPerp[w]!;
+           const rn = rx * ny - ry * nx;
+           const mass = 1 / (im[wb]! + im[CHASSIS]! + ii[CHASSIS]! * rn * rn);
+           const lambda = -perp * mass;
+@@ -1927,9 +1961,14 @@
+           py[CHASSIS] = py[CHASSIS]! - lambda * ny * im[CHASSIS]!;
+           an[CHASSIS] = an[CHASSIS]! - ii[CHASSIS]! * rn * lambda;
+         }
+-        // travel
++        // travel (re-read after the drift fix: on the hinge the tangent turned with it)
++        this.suspensionGeometry(w);
+         {
+-          const comp = dx * ax + dy * ay;
++          const ax = this.sAx[w]!;
++          const ay = this.sAy[w]!;
++          const rx = px[wb]! - px[CHASSIS]!;
++          const ry = py[wb]! - py[CHASSIS]!;
++          const comp = this.sComp[w]!;
+           const ra = rx * ay - ry * ax;
+           const massA = 1 / (im[wb]! + im[CHASSIS]! + ii[CHASSIS]! * ra * ra);
+           let err = 0;
+@@ -1996,13 +2035,8 @@
+     const prevRearComp = F[S_REAR_COMP]!;
+     for (let w = 0; w < 2; w++) {
+       const st = w === 0 ? t.suspension.rear : t.suspension.front;
+-      const wb = w === 0 ? REAR : FRONT;
+-      const ax = st.axis.x * c - st.axis.y * s;
+-      const ay = st.axis.x * s + st.axis.y * c;
+-      const arx = this.px[CHASSIS]! + st.axle.x * c - st.axle.y * s;
+-      const ary = this.py[CHASSIS]! + st.axle.x * s + st.axle.y * c;
+-      const comp = (this.px[wb]! - arx) * ax + (this.py[wb]! - ary) * ay;
+-      F[w === 0 ? S_REAR_COMP : S_FRONT_COMP] = clamp(comp / st.travel, 0, 1);
++      this.suspensionGeometry(w);
++      F[w === 0 ? S_REAR_COMP : S_FRONT_COMP] = clamp(this.sComp[w]! / st.travel, 0, 1);
+     }
+ 
+     let rearLn = 0;
+diff -ruN base/src/physics/v2/tuning.ts tree/src/physics/v2/tuning.ts
+--- base/src/physics/v2/tuning.ts	2026-09-15 21:59:28
++++ tree/src/physics/v2/tuning.ts	2026-09-15 22:06:43
+@@ -4,12 +4,43 @@
+  * Units SI. Chassis frame: origin at the chassis COM, x along the frame axis.
+  */
+ import type { SurfaceKind, Vec2 } from '../../core/types';
++import { atan2, cos, sin } from '../dmath';
+ 
++/**
++ * The bike glb's authored attachment frame (Astra, 405f894 `BIKE_GEOMETRY_V2`; on main it lived in
++ * `src/render/hero/assetFrame.ts` as a description of the asset only). Coordinates are in the asset's reference
++ * (axle) frame; `chassisToAxle` places that frame on the chassis COM. R8 Astra port: the solver is built from it
++ * again - the rear wheel swings on `swingPivot` / `swingRadius` (a true circle, the swingarm's arc; before this the
++ * rear moved on the straight axis (0.12, 0.99), a chord of that arc, and the wheel left the arm's end by up to
++ * 27-37 mm over a golden - docs/tasks/blender-branch-merge.md merge #3) and the fork slides on `forkAxis` through
++ * the asset's fork marker. Deviation from Astra: compression 0 (full droop) stays at the asset's reference axle
++ * markers (main's rest axles, Rookie rear (-0.585, -0.21) exact), not `rearReferenceCompression` along the arc past
++ * them, so the rest geometry, the spring rates and the static sag of R8 are kept and only the PATH changes.
++ */
++export const BIKE_GEOMETRY_V2 = {
++  chassisToAxle: { x: 0.065, y: -0.21 },
++  wheelbase: 1.3,
++  rear: { x: -0.65, y: 0 },
++  front: { x: 0.65, y: 0 },
++  swingPivot: { x: -0.22, y: 0.1 },
++  swingRadius: Math.sqrt(0.43 ** 2 + 0.1 ** 2),
++  rearReferenceCompression: 0.07,
++  frontReferenceCompression: 0.05,
++  forkAxis: { x: -0.22 / Math.sqrt(0.22 ** 2 + 0.5 ** 2), y: 0.5 / Math.sqrt(0.22 ** 2 + 0.5 ** 2) },
++} as const;
++
+ export interface SuspensionV2 {
+   /** Chassis-frame axle rest point (compression 0). */
+   axle: Vec2;
+-  /** Chassis-frame unit direction the wheel moves when compressing. */
++  /** Chassis-frame unit direction the wheel moves when compressing (for a hinge: the arc's tangent at compression 0). */
+   axis: Vec2;
++  /**
++   * Rear wheel path as a true circle about the swingarm pivot (Astra, 405f894): compression is the arc length from
++   * full droop (`droopAngle`, the arm's angle at compression 0); the wheel's chassis-frame centre is
++   * `suspensionPoint()`. The slider's bilateral constraint becomes the arm's length, its travel limits act along the
++   * tangent. Absent = a straight axis from `axle` along `axis`.
++   */
++  hinge?: { pivot: Vec2; radius: number; droopAngle: number };
+   travel: number;
+   k: number;
+   /** Metres of extra compression the spring is preloaded by. */
+@@ -21,6 +52,22 @@
+   stopStart: number;
+ }
+ 
++/** Chassis-local wheel centre for a suspension coordinate (metres of fork / arc travel). Astra, 405f894. */
++export function suspensionPoint(s: SuspensionV2, compression: number): Vec2 {
++  if (s.hinge) {
++    const angle = s.hinge.droopAngle - compression / s.hinge.radius;
++    return { x: s.hinge.pivot.x + s.hinge.radius * cos(angle), y: s.hinge.pivot.y + s.hinge.radius * sin(angle) };
++  }
++  return { x: s.axle.x + s.axis.x * compression, y: s.axle.y + s.axis.y * compression };
++}
++
++/** The asset's swingarm as the rear suspension's hinge, in the chassis frame: pivot, arm length, droop at compression 0 = the reference axle. */
++const REAR_HINGE = {
++  pivot: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.swingPivot.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.swingPivot.y },
++  radius: BIKE_GEOMETRY_V2.swingRadius,
++  droopAngle: atan2(BIKE_GEOMETRY_V2.rear.y - BIKE_GEOMETRY_V2.swingPivot.y, BIKE_GEOMETRY_V2.rear.x - BIKE_GEOMETRY_V2.swingPivot.x),
++};
++
+ export interface PoseRow {
+   lean: number;
+   /** Rider COM offset from the chassis COM, chassis frame. */
+@@ -199,8 +246,21 @@
+   },
+   wheel: { radius: 0.34, rearMass: 8, rearInertia: 0.55, frontMass: 7, frontInertia: 0.45, wheelbase: 1.3 },
+   suspension: {
+-    rear: { axle: { x: -0.585, y: -0.21 }, axis: { x: 0.12, y: 0.99 }, travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85 },
+-    front: { axle: { x: 0.715, y: -0.215 }, axis: { x: -0.4, y: 0.92 }, travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85 },
++    // R8 Astra port (405f894): the rear wheel on the asset's swingarm arc (rest axle (-0.585, -0.21) = the reference
++    // marker, the arc's tangent there (-0.23, 0.97) - the old straight axis (0.12, 0.99) was a chord of this arc),
++    // the front on the asset's fork line through its marker (0.715, -0.21) along forkAxis (-0.403, 0.915; was
++    // (0.715, -0.215) / (-0.4, 0.92): 5 mm and 0.26 deg off the glb). Rates, travel, damping: R7's.
++    rear: {
++      axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.rear.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.rear.y },
++      axis: { x: sin(REAR_HINGE.droopAngle), y: -cos(REAR_HINGE.droopAngle) },
++      hinge: { pivot: { ...REAR_HINGE.pivot }, radius: REAR_HINGE.radius, droopAngle: REAR_HINGE.droopAngle },
++      travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85,
++    },
++    front: {
++      axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.front.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.front.y },
++      axis: { ...BIKE_GEOMETRY_V2.forkAxis },
++      travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85,
++    },
+   },
+   tyre: {
+     Cs: 9000,
+@@ -335,8 +395,9 @@
+   // (F(4-8) 0.85 loops at 1.0 s, 0.80 lifts 8 deg) and a speed fade of the trim loops at the release (R6 status).
+   pro: {
+     chassis: { mass: 54 },
+-    wheel: { wheelbase: 1.28 },
+-    suspension: { rear: { axle: { x: -0.575, y: -0.21 }, k: 12000 }, front: { axle: { x: 0.705, y: -0.215 }, k: 9000 } },
++    // R8 Astra port: one asset, one geometry - the Pro rides the same swingarm arc and fork line (wheelbase 1.30;
++    // R3's 1.28 put its axles 1.0 / 1.1 cm inboard of the glb's markers and its rear 37 mm off the arm's end).
++    suspension: { rear: { k: 12000 }, front: { k: 9000 } },
+     engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
+     rider: { Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
+   },

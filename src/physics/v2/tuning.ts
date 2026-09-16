@@ -90,6 +90,16 @@ export interface TuningV2 {
     comFromHips: Vec2;
     targetRateLin: number;
     targetRateAng: number;
+    /**
+     * R8 brake brace (the pose table's brake row): under braking the rider's mass moves back - the pose lean is
+     * `lean - brakeBrace x brakeEff x (1 - max(0, lean))`, so a full brake at lean 0 is ridden from the -0.5 pose
+     * (the neutral rider's 1.1 g of brake endos a 0.8 g stoppie threshold on the flat; the R13 b1 stranger's only
+     * fault), while a forward lean keeps the deliberate stoppie (brake + lean +1 braces nothing). Continuous in both
+     * inputs, and exactly 0 with both wheels off the ground (a brace reacts to the deceleration through the wheels;
+     * the R4 / R5 air-brake nudges are untouched); the declared attitude torque, the ECU assist and the air gates
+     * still read the raw lean. 0 = R7.
+     */
+    brakeBrace: number;
     kp: number;
     kd: number;
     Fmax: number;
@@ -147,6 +157,19 @@ export interface TuningV2 {
     cAtt: number;
     headRadius: number;
     torsoRadius: number;
+    /**
+     * R8 hold envelope (physics.md v2 status R8): the rider's contact with the bike is not only the servo. Feet on
+     * pegs and hands on grips are hard, one-sided limits solved as impulses with restitution 0 between the rider
+     * body and the chassis, every velocity iteration: the hips stay within `legReach` of the pegs and above the
+     * `seatY` line (chassis frame, m above the chassis COM: the seat under the rider) and behind the `tankX` line
+     * (chassis frame, m ahead of the chassis COM: the tank / steering head the hips cannot pass), and the chest point
+     * (`chest`, body frame from the COM) stays within `armReach` of the grip. `posBeta` = the fraction of a
+     * penetration removed per tick. The two REACH limits are held by the hands and feet: the reach impulse averaged
+     * over `gripTau` s (one F slot, `gripJ`) above `gripN` newtons is the hands leaving the grips - the thrown-rider
+     * fault (`crashCause` 'thrown'). The two compression limits (seat, tank) never fault: a hard landing sits the
+     * rider down.
+     */
+    hold: { legReach: number; armReach: number; seatY: number; tankX: number; chest: Vec2; posBeta: number; /** Coulomb friction on the seat and tank contacts (the knees clamp the bike; the body does not slide along the seat it is pressed onto). */ mu: number; gripN: number; gripTau: number };
   };
   solver: {
     velIters: number;
@@ -227,6 +250,7 @@ const ROOKIE: TuningV2 = {
     comFromHips: { x: 0.03, y: 0.1 },
     targetRateLin: 5.0,
     targetRateAng: 6.0,
+    brakeBrace: 0.5,
     kp: 45000,
     kd: 4200,
     Fmax: 3200,
@@ -259,6 +283,12 @@ const ROOKIE: TuningV2 = {
     cAtt: 33,
     headRadius: 0.15,
     torsoRadius: 0.13,
+    // R8: leg 0.985 x (thigh 0.46 + shin 0.43) = the drawn chain's LEG_REACH; arm 0.62 = upper arm 0.32 + forearm 0.30
+    // straight; seatY 0.20 = 6.6 cm under the hang-back hips (0.266), 0.32 m of leg travel under the neutral stance
+    // (0.52); tankX 0.25 = 0.24 m ahead of the +1 hips (0.007), 8 cm behind the grip (0.33). chest = hips + 0.52 m of
+    // torso at the canonical 40 deg, body frame. gripN 2500 N over 50 ms: a rider hangs on at 3.4 g of steady pull, and
+    // is torn off by a 1.7 m/s snap of the reach (75 kg x 1.7 m/s / 0.05 s).
+    hold: { legReach: 0.876, armReach: 0.62, seatY: 0.2, tankX: 0.25, chest: { x: 0.368, y: 0.234 }, posBeta: 0.4, mu: 0.8, gripN: 2500, gripTau: 0.05 },
   },
   solver: { velIters: 6, posIters: 2, slop: 0.005, specMargin: 0.02, posBeta: 0.5, jointBaumgarte: 0.3 },
   ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },

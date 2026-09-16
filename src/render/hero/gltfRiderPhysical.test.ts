@@ -203,10 +203,11 @@ describe.each(['rider-openface.glb', 'rider-openface-lod.glb', 'rider-street.glb
     expect(reachable).toBeGreaterThan(400); // measured 528 (Rookie) / 523 (Pro) of 900
     // main's `riderBody` COM is the pose-table COM, not this mass map's; the inverse map still lands on it (1e-9).
     expect(worstResidual).toBeLessThan(1e-6);
-    // The recorded worst cases (see above): the body does leave reach on these recordings. When main gives the
-    // body joint stops these three flip and the bounds passed to expectContactsAndMass above tighten to 1e-5.
-    expect(worst.grip).toBeGreaterThan(0.5);
-    expect(worst.sole).toBeGreaterThan(0.1);
-    expect(worst.com).toBeGreaterThan(0.01);
+    // Physics R8 gave the body its hard seat / tank / reach limits (`solveHold`), so the recorded worst cases flipped:
+    // the body stays within the rig's reach on both classes (measured worst grip shortfall 0.111 / 0.118 m, the
+    // 50 ms impact ticks before the thrown-rider fault). Before R8 these read > 0.5 / > 0.1 / > 0.01.
+    expect(worst.grip).toBeLessThan(0.2);
+    expect(worst.sole).toBeLessThan(0.1);
+    expect(worst.com).toBeLessThan(0.1);
   });
 });

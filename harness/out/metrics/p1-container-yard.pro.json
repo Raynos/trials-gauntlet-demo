@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "p1-container-yard",
   "bike": "pro",
-  "updatedAt": "2026-09-16T01:08:58.299Z",
+  "updatedAt": "2026-09-16T03:08:06.250Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        31.933333333333334
+        33.53333333333333
       ]
     }
   ],
@@ -30,6 +30,8 @@
   "singleWall": null,
   "runs": [
     "20260915-195855-a695f0",
-    "20260915-200703-b7ea14"
+    "20260915-200703-b7ea14",
+    "20260915-214329-1e16f2",
+    "20260915-220134-2ab50d"
   ]
 }

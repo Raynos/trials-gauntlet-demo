@@ -5,6 +5,183 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R8 (the rider sits on the bike: the hold envelope, the thrown-rider fault, the brake brace)
+
+**Finding.** The rider's contact with the bike is no longer only the servo. Feet on the pegs and hands on the grips are
+**hard, one-sided limits** — the hips within 0.876 m of the pegs and the chest within 0.62 m of the grip (the reach), the
+hips above the **seat line** (chassis frame y ≥ 0.20 m) and behind the **tank line** (x ≤ 0.25 m), Coulomb friction μ 0.8
+on the seat and tank — solved as impulses between the rider body and the chassis every velocity iteration with
+restitution 0 (`solveHold`, after the sliders, before the contacts). A hard landing now **sits the rider onto the seat and
+he stays on top**: over the 48 R8 goldens (196 483 riding ticks) the hips never go more than 4.6 cm below the seat line
+(min 0.154 m), never past the tank line (max x 0.278 m), the leg never beyond 0.812 m and the arm never beyond 0.660 m
+(4.0 cm over the reach: the steady penetration of a velocity-bias constraint under F_max is F dt² / (m β) ≈ 1.4–2.8 cm —
+the ligament). Before R8 the same bot put the hips **1.96 m below the chassis** (x2 Rookie tick 4155), the body 2.59 m
+from its pose, the leg 2.08 m and the arm 2.51 m "long". The COM residual distribution before → after (the R7 conditioner:
+time since the last tick on which the pose target's own motion demanded more than F_max / m_R = 4.35 g of the servo; COM
+p50 / p95 / p99 / max, m): **all ticks** 0.025 / 0.417 / 1.242 / 2.593 → 0.024 / 0.170 / 0.433 / 0.826, outside 0.15 m
+11.0 % → 6.2 %; 0–0.1 s 0.060 / 0.638 / 1.394 / 2.593 → 0.050 / 0.242 / 0.512 / 0.826; 0.1–0.25 s 0.019 / 0.225 / 1.266 /
+2.305 → 0.019 / 0.048 / 0.349 / 0.760; 0.25–0.5 s 0.018 / 0.036 / 0.631 / 1.686 → 0.017 / 0.034 / 0.045 / 0.615; **0.5–1 s
+0.017 / 0.029 / 0.041 / 0.748 → 0.017 / 0.029 / 0.043 / 0.101**; ≥ 1 s 0.017 / 0.024 / 0.032 / 0.076 → 0.017 / 0.024 /
+0.033 / 0.065. Excursions of the COM beyond 0.35 m: 334 → 228 episodes, p50 0.17 → 0.05 s, p90 0.68 → 0.13 s, **max 1.33 →
+0.47 s** (p3 Rookie tick 1336). The R7 recovery band tightens from 1.0 s to **0.5 s** and is asserted on every golden
+(28 814 ticks, zero outside; `r8.test.ts`). The parent's per-tick target ("within 0.15 m on every tick with |a_T − g| ≤
+4.35 g") is **not** met and cannot be by any servo: 2.6 % of low-demand ticks are outside 0.15 m (max 0.83 m) because the
+conditioner reads the *target's* motion, and a body thrown back along the seat by a 17 g rear-first slam (h3 Rookie,
+tick 827: rel. velocity −2.2 m/s, held by the arms at 1.4–1.8 kN, coming home at 2.9 g while the bike loops) is 0.3–0.4 s
+of low-demand ticks with a large honest residual — the impact happened, the demand did not. The bound is the envelope
+(above), the 0.5 s band and the 0.5 s excursion cap; the hero draws the excursion inside them.
+
+**The thrown-rider fault (the crash rule, not a sensor).** The two *reach* limits are what the hands and feet hold. Their
+impulse, averaged over `gripTau` 50 ms (one F slot `gripJ`, exponential), above `gripN` **2 500 N** is the hands leaving the
+grips: fault `crash`, `crashCause` `'thrown'`, ragdoll as any crash. 2 500 N is 3.4 g of steady pull (a rider hangs on
+through a 3 g whip) and a 1.7 m/s snap of the reach (75 kg × 1.7 / 0.05 s). The seat and tank limits (compression) never
+fault: a case landing is a heavy sit, not a crash. Measured: a rear-wheel-first slam at 50° nose-up, 3 rad/s, −8 m/s
+(a 3.3 m fall) at 10 m/s whips the body back off the seat and throws the rider at 0.22 s on both classes (grip 2.7 /
+4.8 kN), before any sensor reads the ground; the same slam at 40° / 2 rad/s is ridden (grip 1.6 / 1.3 kN). Every flat
+loop reaches the head sensor first (scan: 45–70°, 3–7 rad/s, 0.14–0.44 s), so the fault fires only where the body is
+whipped harder than the bike turns — the m3 Pro case R7 named (upended, body 2 m off on the Hill cap for 0.6 s with no
+fault) is now a throw. No R8 golden faults (48 / 48 finish, 0 faults of any kind).
+
+**Why seat friction.** Without it a 15 g rear-first landing at 45° (e2 Rookie, R7 recording tick 660) sat the body down
+and then slid it 0.2 m back along a frictionless seat until the arms snapped taut at 2.6 kN — a thrown rider that was not.
+μ 0.8 (the knees clamp the bike) holds it; the R7 recordings then throw on 2 of 48 goldens, both loops with the rear
+bottomed (m3 Rookie tick 788: 69° nose-up at 4.7 rad/s, 10 m/s, arms at 7 kN for three ticks — a loop-out).
+
+**The 15 m/s brake endo (the R13 b1 stranger's only fault) — cause and fix.** The brakes are 560 N m at 0.55 front:
+906 N front + 741 N rear = 1 647 N on 148 kg = **1.11 g**, against a flat stoppie threshold of d / h ≈ 0.8 g for the
+combined COM at the neutral pose — a plain full brake at lean 0 *must* endo above ~10 m/s (R6 and R7 identical: 15 m/s
+endos in 1.36–1.47 s on both classes, the Pro at 10 m/s in 1.87 s). v1 stopped it with a front-torque cap fed forward from
+the COM geometry (§7.6); v2 (§8) has no caps while riding, so the rider does what a rider does: **braces**. `rider.brakeBrace`
+0.5 — the pose lean is `lean − 0.5 · brakeEff · (1 − max(0, lean)) · (1 − bothAir)`: a full brake at lean 0 is ridden from
+the −0.5 pose (R7 already measured −0.5 stopping upright from 15 m/s), a forward lean braces nothing (brake + lean +1 is
+the stoppie, byte-identical), and with both wheels off the ground the brace is exactly 0 (a brace reacts to the
+deceleration through the wheels; the R4 / R5 air-brake nudges — the declared air control, identical per class — do not
+move; without that gate the air-brake nudge went −50 → −70 deg/s and the R5 class identity broke). Continuous in both
+inputs through the lagged brake (τ 30 ms). The declared attitude torque, the ECU assist and the intent gates still read
+the raw lean.
+
+| full brake on the flat, lean 0 | brace 0 (R7) | brace 0.5 (R8) |
+|---|---|---|
+| Rookie 6 m/s | stop 0.89 s, −12°, rear off 0.73 s | stop 0.74 s, −8°, rear off 0.14 s |
+| Rookie 10 m/s | stop 1.47 s, −15°, rear off 1.18 s | stop 1.21 s, −8°, rear off 0.15 s |
+| Rookie 15 m/s | **endo, crash 1.62 s** (−128°) | stop 1.74 s, −8°, rear off 0.16 s |
+| Pro 6 m/s | stop 0.92 s, −13°, rear off 1.02 s | stop 0.73 s, −7°, rear off 0.17 s |
+| Pro 10 m/s | **endo, crash 1.87 s** (−115°) | stop 1.21 s, −7°, rear off 0.17 s |
+| Pro 15 m/s | **endo, crash 1.39 s** (−134°) | stop 1.74 s, −7°, rear off 0.18 s |
+| brake + lean +1 from 10 m/s, 0.2 s then release (the stoppie) | rear lifts 0.11 s, off 0.79 / 0.93 s, −33 / −35°, rides away | identical (0.80 / 0.92 s) |
+| brake + lean +1 held | over the bars 0.76 / 0.97 s | identical |
+
+Lean −0.5 with the brake: 1.06–1.48 s, ≤ 9° (R7 1.11–1.62 s). The permanent rows are in `r8.test.ts`; the stoppie row
+asserts the rear off ≥ 0.5 s within 0.02 s of the brace-off value.
+
+### Tests (R8)
+
+`pnpm vitest run src/physics`: **160 → 164** (`r8.test.ts`, 4 rows: the envelope + 0.5 s band + 0.5 s excursion cap over
+every golden of both classes; the landing punch — 3 m flat drops at lean 0 / +0.5, 6 / 12 m/s, both classes sit onto the
+seat (hips 0.187–0.198 vs 0.20, seat impulse 70–240 N s) and ride away; the thrown rider; the brake table). `world.test.ts`
+slot list gains `gripJ` (`NSCALAR` 37). Re-derived rows (each carries the R8 note): `r6` seesaw landing lift ≤ 0.3 F_max +
+80 → ≤ 0.5 F_max (the seat catches the body, so the rebound starts from rest and the Hill cap is F_max for the first
+centimetre — measured 1 399 N, Rookie v5 thr 0; deviation 16). FEEL rows that moved (HEAD → R8, everything else identical to the printed
+digit): all 24 `land.*` rows still ride away with rebound ≤ 0.04; the 3 m lean +0.5 drops now bottom the rear at 100 % (was
+76–89 %) and pitch less nose-up (max +8.6° → +2.5°) — the body's momentum reaches the chassis through the seat instead of
+passing through it; `land.2m.lean0.reboundM` 0.000 → 0.006; kicker 17° @ 14 m/s held-lean air 1.27 → 1.33 s; climb tables
+60 @ 8 stall 26 → 27 % (Pro) / 20 → 21 % (Rookie); cost 2.6 → 3.0 µs/tick p50 (four more constraints per iteration). The
+hop rows (R2 reference 0.608, matrix, quantum, surfaces, seated) print identically: no hold limit engages in a hop (the
+arm reaches 0.44 of 0.62 at the top of the snap).
+
+### Deviations (R8)
+
+15. **The hold envelope and `gripJ`** (physics-v2.md §12's F list grows by one, justified in `world.test.ts`): four one-sided
+    rider–chassis limits with Coulomb friction on the two compression ones, solved in the velocity pass with a
+    position bias `posBeta` 0.4 (steady penetration under F_max 1.4–2.8 cm). Deviation 14 (the recovery band) is
+    withdrawn: the band is 0.5 s and the excursion cap 0.5 s, asserted every tick on every golden.
+16. **The thrown rider is a grip-strength rule on the reach impulse**, not a sensor and not a reach *distance*: `gripN`
+    2 500 N over `gripTau` 50 ms. A first version failed the seat without friction (above) and threw a survivable
+    landing; friction, not a bigger grip number, is the fix. The R6 seesaw lift bound becomes 0.5 F_max (the seat catch).
+17. **The brake row of the pose table is a brace, `brakeBrace` 0.5**, ground-only. The 15 m/s endo is not a brake-power
+    bug (1.11 g is what the brakes are; the rider was the missing part), so the brake torques and the front bias are
+    untouched and the deliberate stoppie is byte-identical. `hopPhase` reads `preload` during a braking compression (the
+    target sits below neutral): cosmetic, unchanged sensor semantics.
+18. **The chest point is fixed in the body frame** (`hold.chest` = hips + 0.52 m of torso at the canonical 40°); the drawn
+    chain's shoulders follow the lean's canonical torso angle, so the two differ by up to ~10° of torso pitch. A first
+    version used the chest for an arm-*compression* limit (0.12 m) and it fired in the middle of the R2 snap (apex 0.608
+    → 0.557); the compression side of the envelope is the tank line instead, which no hop touches.
+19. **A first brace was not gated on ground contact** and changed the R4 air-brake nudge (−50 → −70 deg/s peak) and
+    broke the R5 class identity of the air nudges; the gate `(1 − bothAir)` restores both byte-for-byte. The goldens were
+    searched twice because of it (the bot brakes in the air on most tracks).
+
+### Golden table (R8)
+
+Every golden was re-searched (`harness:bot --all-tracks --skill 3 --track-wall-s 400`, both classes) because the dynamics
+changed (a rider on a seat is a different landing; the R7 recordings finish on 8 of 48 under R8). Rookie **24 / 24 cleared, all at 1 attempt** (x1 needed 122 s of wall on the loaded box); Pro **22 / 24 at 1 attempt** — **x1 and x3
+Pro are NOT cleared under R8**: with a 600 s wall the Pro bot exhausts its 300 s sim budget at 599.7 m (x1, 81 %; 1 930
+plans, 198 M ticks) and 530.7 m (x3, 92 %) where R7 cleared them at 2 / 1 attempts. The two R7 recordings were reported STALE by the refresh and removed from `harness/inputs/` (a stale golden is not a
+golden; R7's copies are in git at 845df15 for the reproduction) (fresh 46, restamped 0, stale 2; tracks with a proven golden
+24 / 24 through the Rookie set; the whole-tree suite otherwise reads 46 goldens). Also for the render owner:
+`src/render/hero/gltfRiderPhysical.test.ts:208-210` asserts `worst.grip > 0.5` / `worst.sole > 0.1` / `worst.com > 0.01` over
+the E2 impact window as a record of main's rider leaving the rig's reach; under R8 the worst grip shortfall is 0.111 m
+(Rookie) / 0.118 m (Pro) and those three bounds invert (12 rows red until they do). This is the "bot cannot clear a track it clears today" signal for the extreme Pro
+tracks, written down, not tuned away — the candidates are the thrown-rider fault on a whip the Pro used to survive and
+the seat taking a body that used to pass through the chassis on a slam; **open for R9** (reproduce from the R7 x1 / x3
+Pro recordings at the stall x, read `crashCause` / the hold impulses). Node == browser on the 46 (`harness:bot
+--refresh-goldens --jobs 5`), `harness:determinism` D1–D8 **9 / 9** on flat-test Rookie (`c0e96dfa44fda59a`, finish
+8.433 — the flat-test Rookie recording is byte-identical to R7's: no hold limit and no brace engages on it) and Pro
+(`f835e96a03c744fa`, 8.058), D8 re-pinned `ff119f990e56af57`, `gate/expected.json` re-pinned (`harness:gate --quick
+--pin`: `clear.pro.b1` `4b69a80de766a325` / 38.142 s); the verifying `harness:gate --quick` is **27 / 30** with
+`boot.firstFrameMs` (6 058 ms), `restart.frameMsP95` (298 ms) and `perf.renderSyncedMsP95` (935 ms) failing — the same
+three SwiftShader timing rows as R7, informational on this machine; physics 30 µs/tick p95. `public/bench/b1-bot-3.json`
+re-copied from the b1 Rookie golden. Reflex (`harness:reflex --all-tracks --seeds 9 --jobs 16`), R7b 9-seed → R8 medians:
+b1 1 → 1, b2 2 → 2, b3 3 → 2, e1 7 → 8, e2 3 → 4, e3 2 → 3, m1 10 → 7, m2 4 → 5, m3 3 → 3, h1 12 → 15, h2 6 → 10,
+h3 5 → 3, x1 11 → 7, x2 9 → 5, x3 15 → 15, p1 2 → 2, p2 2 → 2, p3 2 → 2, p4 2 → 3, p5 2 → 2, flat / gap / lab-flat 1,
+lab-physics 1; **clears 9 / 9 on every track**; no beginner / easy median moves by more than 1 (e1, e2, e3, p4 each +1).
+Strangers n = 2 on b1–e3: `harness-metrics.md` Round 14.
+
+| track | Rookie finish (s) / attempts | Pro finish (s) / attempts |
+|---|---|---|
+| b1-first-ride | 41.258 / 1 | 38.142 / 1 |
+| b2-lean-back | 39.025 / 1 | 37.642 / 1 |
+| b3-kicker-row | 32.783 / 1 | 30.933 / 1 |
+| e1-uphill-weight | 43.667 / 1 | 42.533 / 1 |
+| e2-rear-wheel-first | 43.017 / 1 | 40.475 / 1 |
+| e3-stairway | 39.608 / 1 | 36.883 / 1 |
+| flat-test | 8.433 / 1 | 8.058 / 1 |
+| gap-test | 5.492 / 1 | 5.467 / 1 |
+| h1-wheelie-wire | 46.142 / 1 | 43.583 / 1 |
+| h2-gap-chain | 46.142 / 1 | 43.200 / 1 |
+| h3-fire-line | 46.608 / 1 | 42.583 / 1 |
+| lab-flat-200 | 12.467 / 1 | 11.875 / 1 |
+| lab-physics-test | 7.908 / 1 | 7.725 / 1 |
+| m1-hop-up | 32.458 / 1 | 30.933 / 1 |
+| m2-drum-roll | 40.083 / 1 | 37.067 / 1 |
+| m3-see-saw | 39.275 / 1 | 36.942 / 1 |
+| p1-container-yard | 35.817 / 1 | 33.533 / 1 |
+| p2-canyon-run | 33.783 / 1 | 32.658 / 1 |
+| p3-snow-line | 34.517 / 1 | 31.817 / 1 |
+| p4-night-circuit | 34.942 / 1 | 33.233 / 1 |
+| p5-foundry-floor | 30.458 / 1 | 29.250 / 1 |
+| x1-vertical-limit | 54.592 / 1 | **STALE (R7 57.700 / 2): bot stuck at 599.7 m, 81 %** |
+| x2-pipe-dream | 43.117 / 1 | 42.275 / 1 |
+| x3-gauntlet | 42.933 / 1 | **STALE (R7 40.458 / 1): bot stuck at 530.7 m, 92 %** |
+
+**Astra's physics (`405f894`) and the seated-pose candidate (`docs/evidence/hero-r15/seated-candidate.patch`).** The
+coordinator's mid-round directive (adopt Astra's hinged rear path + fork axis, rider mass frame, elbow stop, Rookie brake
+lift control, and the seated profile, ported onto R7, measured, credited) arrived with the goldens and strangers of this
+round already in flight on the R8 physics; it is being ported and measured in a scratch copy of this tree by a builder,
+and its ledger is below. **The builder's ledger (scratch tree = HEAD + this round's `src/physics`; nothing applied to the checkout; patches preserved
+under `docs/evidence/physics-r8/`: `astra-port.patch` (578 lines, `bike.ts` + `tuning.ts` only, `git apply --check -p1`
+passes on this tree), `patch-1-hinge.patch`, `patch-3-elbow.patch`, `patch-4-liftcontrol.patch`, `feel-diff-base-final.txt`
+(every FEEL row base → final), `m4-brake-bench.txt`, `final-vitest.log`).**
+
+| # | Astra mechanism (`405f894`) | verdict | the numbers |
+|---|---|---|---|
+| 1 | hinged rear-wheel path + fork axis (`BIKE_GEOMETRY_V2`, `suspensionPoint`, `hinge`): rear wheel on a true circle about the asset's swingarm pivot (chassis (−0.155, −0.11), r 0.4415 m), front on the asset's fork axis through (0.715, −0.21) | **ADOPT** (R9 lands it) | arc mismatch, merge-#3 method, worst / mean / p99 / ticks > 5 mm: b3 Rookie 27.14 / 13.88 / 26.63 mm / 2 815 → **8.69 / 0.04 / 0.43 mm / 7**; b3 Pro 36.70 / 23.55 / 36.55 / 3 804 → 11.52 / 0.08 / 2.83 / 15; e2 Rookie 27.35 / 14.26 → 5.22 / 0.04; front 2.2–11.2 → ≤ 0.44 mm (the residual spikes are single impact ticks). No wind-up (max unwrapped ψ lag 0.42 rad E2 Rookie, band ≥ 99.7 %); node == browser; bot clears b1 / e2 / m3 both classes at 1 attempt (m3 Pro 2 → 1). Rows that move: hop.ref rearApex 0.603 → 0.596, both-off 0.175 → 0.092 (base's 0.175 was 0.067 s of flight + a front-wheel bounce off a −13° touchdown; the hinge lands at −7° and does not bounce — the r2 ≥ 0.15 row must be re-derived), Pro hop 0.70 → 0.77; balance pitch +1–2°; snap from 20° held 45 → 31°; touchdown peak +25 %; **the R7 endo control row (brace 0, 15 m/s) becomes upright on the hinge** (the swingarm angle turns 23 % of the rear brake force into compression and moves the reaction to the pivot) so `r8.test.ts`'s brace-off assert must become informational; climb.rookie 45@5 / 50@6 stall → FAULT; goldens need a full re-search; `src/render/hero/gltfBike.test.ts`'s two "until main gains the hinge" bounds flip. Deviations from Astra kept: rest compression at main's axles, main's spring rates / damping / velIters, the Pro loses its 1.28 wheelbase override (same asset arc). |
+| 2 | rider mass frame as the physical target table (`RIDER_PROFILE`, mass-map COM) | **REJECT** as the servo target (the mass-map functions already drive the drawn frame on main, `src/render/hero/riderRig.ts`) | de Leva COM at lean 0 (0.017, 0.658) vs the table's (−0.12, 0.62): 13.7 cm forward, 3.8 cm up; back → forward travel 0.34 vs 0.48 m; with the servo unchanged: reference hop 0.596 → 0.481, matrix −1 row 0.26 / 0.53 / 0.64 / 0.60 → 0.20 / 0.45 / 0.50 / 0.48, tuck gain positive, **lab ledge hop at 8–9 m/s crashes**, 15 m/s stop 1.92 s — the forward table R3 rejected. |
+| 3 | elbow stop (arm minimum length) as a fifth hold limit, C = ǀchest − gripǀ − armMin, no friction, not in `gripJ` | **ADOPT at 0.10 m** (Astra's IK-singularity point; R9) | at the anatomical 0.144 m it fires in the R2 snap (reference hop 0.596 → 0.535, r5 on/off identity split) on 1 969 golden ticks; at 0.10 m the hop rows are untouched, it engages on 582 / 139 930 golden ticks (slams where the chest had passed inside the grip — the "collapses onto the tank" frames), land.capOff.2m rebound 0.204 → 0.176 (the r3 control-arm > 0.2 row re-derives), seesaw Pro v5 lift 1 847 → 1 287 N, climb.rookie 50@6 FAULT → stall 44 %. |
+| 4 | Rookie brake lift control (front caliper cap from the live lift margin, `brakes.liftControl` 1 / `liftLookahead` 0.15, Pro 0) | **ADOPT** alongside the brace (R9) | Rookie full brake lean 0, stop / min pitch / rear-off / distance: lift alone 0.90 s / −10.5° / 0.54 s / 2.81 m at 6 m/s, 2.07 / −13.1 / 1.01 / 15.34 at 15 (no endo, rides the lift edge); brace alone (R8) 0.74 / −8.1 / 0.14 / 2.42 and 1.74 / −8.2 / 0.16 / 12.80; both 0.77 / −7.2 / 0.15 / 2.53 and 1.77 / −7.3 / 0.16 / 13.09 (+2.3 % distance: 0.45 of the front caliper trimmed at 10 m/s by the 10 % margin + lookahead); the stoppie ends 0.06–0.08 s sooner; no other row moves. |
+| 5 | the seated-pose candidate (`docs/evidence/hero-r15/seated-candidate.patch`) | **NOT LANDED** — needs the drawn / physical table split | mass-map COM rows −1 (−0.334, 0.479), 0 (−0.086, 0.605), +1 (0.098, 0.667): verbatim, matrix −1 row 0.086 / 0.247 / 0.410 / 0.515 (half-rate 48 %, non-monotone), lab hop@8 crash, 3 m cap-off drop crash; retune 1 (hang-back COM (−0.342, 0.358)) apex 0.582 but lab hop crash (−32°), wheelie hold 9.3 s, Pro loop 1.62 s; retune 2 (main's ψ column) apex 0.595 = base but lab hop crash (−26°), 3 m landing −35.3°, wheelie-hold crash, the punch row loses seat contact. None of the four pose requirements is met in a landable form; the deviation to write in R9 is `rider.poses` (physical, R8's) separate from a drawn hip-pose table for the rig. |
+
+Reflex on the adopted tree (`average`): b1 3 seeds 1 → 2, 9 seeds **1** (9 / 9 clears); e1 3 seeds 2 → 4 (noise level per R7b; 9 seeds not run). Final scratch-tree suite 154 / 164: the rows above plus the golden "finishes" rows (re-search needed). **R9's first item:** apply `astra-port.patch`, re-derive the five rows named, re-search + browser-prove the goldens, re-pin the gate, flip the two render-side hinge bounds (render owner), then the seated split.
+
 ## v2 status — R7 (the rider body is held by the linkage, exported, and a coasting bike never hops)
 
 **Finding.** `PhysicsState.riderBody` is exported (world SI: COM `pos`, `angle` ψ_R, `vel`, `angVel`; hashed) and the

@@ -1,0 +1,142 @@
+diff -ruN m14/src/physics/v2/bike.ts tree/src/physics/v2/bike.ts
+--- m14/src/physics/v2/bike.ts	2026-09-15 22:23:03
++++ tree/src/physics/v2/bike.ts	2026-09-15 22:15:23
+@@ -43,10 +43,11 @@
+   bodies: ({ id: string } & BodyDebug)[];
+   contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; mu: number; surface: SurfaceKind }[];
+   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
++  /** R8 Astra port: the brake torques applied this tick (N m) and the front caliper's lift-control trim 0..1 (Rookie assist; 0 on the Pro). */
+   brakes: { rearTorqueNm: number; frontTorqueNm: number; assist: number };
+   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
+   /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
+-  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number; /** R8 hold envelope: this tick's constraint impulses (N s) on the four one-sided limits and the grip force they imply (`gripJ` / gripTau, N; a fault above hold.gripN) */ hold: { legJ: number; armJ: number; seatJ: number; tankJ: number; gripF: number } };
++  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number; /** R8 hold envelope: this tick's constraint impulses (N s) on the four one-sided limits and the grip force they imply (`gripJ` / gripTau, N; a fault above hold.gripN) */ hold: { legJ: number; armJ: number; seatJ: number; tankJ: number; /** R8 Astra port: the elbow stop's impulse (the arm's minimum length) */ elbowJ: number; gripF: number } };
+   /** The declared attitude torque applied this tick (N m). */
+   attTorque: number;
+   /** Pose target in the chassis frame. */
+@@ -300,9 +301,9 @@
+   private dLegFrac = 1;
+   private dIntent = 0;
+   // R8 hold envelope: accumulated impulses this tick (leg reach, arm reach, seat, tank)
+-  private readonly holdLam = new Float64Array(4);
++  private readonly holdLam = new Float64Array(5);
+   // seat / tank friction impulses (Coulomb, hold.mu x the normal impulse)
+-  private readonly holdLamT = new Float64Array(4);
++  private readonly holdLamT = new Float64Array(5);
+   // this tick's air limit (gain x blend x (1 - intent)), derived in step() from F; read by forces() and debug()
+   private airLim = 0;
+   private dAtt = 0;
+@@ -719,7 +720,7 @@
+         legFrac: this.dLegFrac,
+         intent: this.dIntent,
+         airLimited: this.airLim,
+-        hold: { legJ: this.holdLam[0]!, armJ: this.holdLam[1]!, seatJ: this.holdLam[2]!, tankJ: this.holdLam[3]!, gripF: F[S_GRIP_J]! / t.rider.hold.gripTau },
++        hold: { legJ: this.holdLam[0]!, armJ: this.holdLam[1]!, seatJ: this.holdLam[2]!, tankJ: this.holdLam[3]!, elbowJ: this.holdLam[4]!, gripF: F[S_GRIP_J]! / t.rider.hold.gripTau },
+         poseTargetWorld: { x: this.dTgtWx, y: this.dTgtWy },
+         lag: { x: this.px[RIDER]! - this.dTgtWx, y: this.py[RIDER]! - this.dTgtWy },
+       },
+@@ -1692,7 +1693,12 @@
+         }
+       }
+ 
+-      // --- brakes: torque-capped spin locks wheel <-> chassis (§8: no caps of any kind while riding)
++      // --- brakes: torque-capped spin locks wheel <-> chassis (§8: no caps of any kind while riding). R8 Astra port
++      // (405f894): the Rookie's rear-lift protection trims the front caliper from the same contact loads the tyres
++      // see - the total braking force that would lift the rear about the front contact patch (gravity's righting
++      // moment M g x the COM's lever behind the patch over the COM's height above it, 10 % margin, the nose-down
++      // rate anticipated over `liftLookahead`), less the rear tyre's braking force, is the front caliper's ceiling;
++      // faded out with |lean| 0.5 -> 0.8 (brake + lean +1 is still the stoppie). Pro: liftControl 0.
+       if (brakeIn > 0) {
+         let frontLimit = Infinity;
+         const assist = riding ? t.brakes.liftControl * clamp((0.8 - Math.abs(this.F[S_IN_L]!)) / 0.3, 0, 1) : 0;
+@@ -1781,7 +1787,7 @@
+     // seat and tank: the hips in the chassis frame
+     const hipLx = (hipx - fx) * c + (hipy - fy) * s;
+     const hipLy = -(hipx - fx) * s + (hipy - fy) * c;
+-    for (let k = 0; k < 4; k++) {
++    for (let k = 0; k < 5; k++) {
+       // rider anchor (ax, ay), chassis anchor (bx, by), the direction n along which the gap C grows, and C itself
+       let ax: number;
+       let ay: number;
+@@ -1803,6 +1809,21 @@
+         nx = -dx / d;
+         ny = -dy / d;
+         C = (k === 0 ? h.legReach : h.armReach) - d;
++      } else if (k === 4) {
++        // elbow stop (R8 Astra port, 405f894): C = |chest - grip| - armMin, grows as the chest moves away from the grip -
++        // the folded arm is a strut; the hands push on the bars (a front slam pitching the body onto the bars)
++        if (h.armMin <= 0) continue;
++        ax = chx;
++        ay = chy;
++        bx = gripx;
++        by = gripy;
++        const dx = ax - bx;
++        const dy = ay - by;
++        const d = Math.sqrt(dx * dx + dy * dy);
++        if (d < 1e-6) continue;
++        nx = dx / d;
++        ny = dy / d;
++        C = d - h.armMin;
+       } else if (k === 2) {
+         // seat: C = hips height above the seat line, chassis up; the reaction on the chassis at the seat under the hips
+         ax = hipx;
+@@ -1845,7 +1866,7 @@
+       vx[CHASSIS] = vx[CHASSIS]! - lambda * nx * im[CHASSIS]!;
+       vy[CHASSIS] = vy[CHASSIS]! - lambda * ny * im[CHASSIS]!;
+       av[CHASSIS] = av[CHASSIS]! - ii[CHASSIS]! * rnb * lambda;
+-      if (k < 2 || acc <= 0) continue;
++      if (k < 2 || k === 4 || acc <= 0) continue;
+       // seat / tank friction: the body does not slide along the seat it is pressed onto (a 15 g rear-first landing
+       // slid the hips 0.2 m back along a frictionless seat until the arms snapped taut - a thrown rider that was not)
+       {
+diff -ruN m14/src/physics/v2/tuning.ts tree/src/physics/v2/tuning.ts
+--- m14/src/physics/v2/tuning.ts	2026-09-15 22:23:03
++++ tree/src/physics/v2/tuning.ts	2026-09-15 22:21:24
+@@ -126,7 +126,22 @@
+      */
+     wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number; /** R6: trim multiplier with both wheels off the ground (Rookie 1: the assist bounds the throttle nose-up in the air; Pro 0: the air is raw). */ airGain: number };
+   };
+-  brakes: { totalNm: number; frontFrac: number; brakeTau: number; liftControl: number; liftLookahead: number };
++  brakes: {
++    totalNm: number;
++    frontFrac: number;
++    brakeTau: number;
++    /**
++     * R8 Astra port (405f894 "rookie brake lift control"): the Rookie's front caliper is trimmed against rear lift
++     * every velocity iteration from the live loads - the combined COM's lever behind the front contact patch
++     * (gravity's righting moment) against the braking force's lever (the COM height above the patch), less what the
++     * rear tyre already brakes, with a 10 % margin; the trim fades out with |lean| from 0.5 to 0.8 (a deliberate
++     * full lean is the rider taking over: brake + lean +1 is still the stoppie). An ECU/ABS-like assist, like
++     * `engine.wheelieControl`; the physics' own brace (`rider.brakeBrace`) is the rider moving back. Pro = 0.
++     */
++    liftControl: number;
++    /** Seconds of nose-down pitch rate anticipated by the caliper trim (the rate term the static margin cannot see). */
++    liftLookahead: number;
++  };
+   aero: { cda: number; rho: number; chassisShare: number };
+   rider: {
+     mass: number;
+@@ -214,7 +229,7 @@
+      * fault (`crashCause` 'thrown'). The two compression limits (seat, tank) never fault: a hard landing sits the
+      * rider down.
+      */
+-    hold: { legReach: number; armReach: number; seatY: number; tankX: number; chest: Vec2; posBeta: number; /** Coulomb friction on the seat and tank contacts (the knees clamp the bike; the body does not slide along the seat it is pressed onto). */ mu: number; gripN: number; gripTau: number };
++    hold: { legReach: number; armReach: number; /** R8 Astra port (405f894 `RIDER_ELBOW_MIN`, "an elbow stop removed singular poses"): the arm's minimum length, chest (shoulders) to grip, as a fifth one-sided limit - the elbows fold to 35 deg interior at most (145 deg of flexion), the hands push on the bars beyond that. 0 = off. */ armMin: number; seatY: number; tankX: number; chest: Vec2; posBeta: number; /** Coulomb friction on the seat and tank contacts (the knees clamp the bike; the body does not slide along the seat it is pressed onto). */ mu: number; gripN: number; gripTau: number };
+   };
+   solver: {
+     velIters: number;
+@@ -346,7 +361,13 @@
+     // (0.52); tankX 0.25 = 0.24 m ahead of the +1 hips (0.007), 8 cm behind the grip (0.33). chest = hips + 0.52 m of
+     // torso at the canonical 40 deg, body frame. gripN 2500 N over 50 ms: a rider hangs on at 3.4 g of steady pull, and
+     // is torn off by a 1.7 m/s snap of the reach (75 kg x 1.7 m/s / 0.05 s).
+-    hold: { legReach: 0.876, armReach: 0.62, seatY: 0.2, tankX: 0.25, chest: { x: 0.368, y: 0.234 }, posBeta: 0.4, mu: 0.8, gripN: 2500, gripTau: 0.05 },
++    // armMin: the anatomical 35 deg elbow is 0.144 m planar (3D 0.187 m with main's 0.32 / 0.30 arm, the 0.12 m grip-to-shoulder
++    // side offset removed) but main's pose table already folds the neutral elbow to 52 deg (shoulders 0.245 m from the grip) and the
++    // R2 snap to +1 swings the chest under 0.144 m: at 0.144 the stop cut the reference hop 0.596 -> 0.535 m and split the r5
++    // hop on/off identity (0.535 / 0.556). 0.10 m = Astra's IK-singularity guard (the elbow pole flips at 0.152 m 3D = 0.093 m
++    // planar): the hop and snap rows are untouched, the shoulders never pass through the bars (0.4 % of golden riding ticks,
++    // slams; before, those ticks put the chest inside the grip point - the "collapses onto the tank" tell).
++    hold: { legReach: 0.876, armReach: 0.62, armMin: 0.1, seatY: 0.2, tankX: 0.25, chest: { x: 0.368, y: 0.234 }, posBeta: 0.4, mu: 0.8, gripN: 2500, gripTau: 0.05 },
+   },
+   solver: { velIters: 6, posIters: 2, slop: 0.005, specMargin: 0.02, posBeta: 0.5, jointBaumgarte: 0.3 },
+   ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },

@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260915-203248-21f866",
-  "startedAt": "2026-09-16T01:32:48.516Z",
-  "wallMs": 84971,
-  "git": "35f8cbf",
-  "srcFingerprint": "605a8174",
+  "runId": "20260915-222253-8f551a",
+  "startedAt": "2026-09-16T03:22:53.752Z",
+  "wallMs": 93458,
+  "git": "5b56431",
+  "srcFingerprint": "089e0885",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
   "trackId": "flat-test",
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": true,
   "build": {
-    "distBytes": 29958801,
-    "jsGzipBytes": 505827,
+    "distBytes": 43056103,
+    "jsGzipBytes": 583832,
     "buildMs": 0
   },
   "browser": {
@@ -24,15 +24,15 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 86.58241699999962,
+      "value": 127.15108299999997,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 254/87/77 min 77 loadavg 8.07/18"
+      "note": "runs 127/508/87 min 87 loadavg 11.7/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 5456.590000152588,
+      "value": 6058.079999923706,
       "limit": 4000,
       "pass": false,
       "unit": "ms",
@@ -73,7 +73,7 @@
       "value": true,
       "limit": true,
       "pass": true,
-      "note": "bot-3-pro.json (src matches) finish=38.541666666666664 faults=0 hash ccdd746d430da232 vs pinned ccdd746d430da232 (expected finish 38.541666666666664)"
+      "note": "bot-3-pro.json (src matches) finish=38.141666666666666 faults=0 hash 4b69a80de766a325 vs pinned 4b69a80de766a325 (expected finish 38.141666666666666)"
     },
     {
       "id": "crash.faultWithinS",
@@ -100,14 +100,14 @@
     },
     {
       "id": "restart.wallMsP95",
-      "value": 0.11500000953674316,
+      "value": 0.11999988555908203,
       "limit": 5,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "restart.frameMsP95",
-      "value": 192.16499996185303,
+      "value": 298.4099998474121,
       "limit": 150,
       "pass": false,
       "unit": "ms",
@@ -125,7 +125,7 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": 4.134860992431641,
+      "value": 0.19718551635742188,
       "limit": 5,
       "pass": true,
       "unit": "MB",
@@ -133,13 +133,13 @@
     },
     {
       "id": "perf.drawCallsMax",
-      "value": 147,
+      "value": 149,
       "limit": 300,
       "pass": true
     },
     {
       "id": "perf.trianglesMax",
-      "value": 219701,
+      "value": 219737,
       "limit": 500000,
       "pass": true
     },
@@ -152,21 +152,21 @@
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 34.999966621398926,
+      "value": 29.999971389770508,
       "limit": 60,
       "pass": true,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 1.5750000476837158,
+      "value": 1.7349998950958252,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 1644.25,
+      "value": 934.7400000095367,
       "limit": 250,
       "pass": false,
       "unit": "ms",
@@ -176,11 +176,11 @@
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 493.9716796875,
+      "value": 570.1484375,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 29257 KB raw"
+      "note": "dist 42047 KB raw"
     },
     {
       "id": "determinism.pass",
@@ -198,17 +198,17 @@
     },
     {
       "id": "stranger.medianAttempts",
-      "value": "no armed track",
+      "value": "b1 1/1.5 (n=2, 2 censored) · b2 1/3 (n=2, 2 censored) · b3 2/3 (n=2, 2 censored) · e1 2/6 (n=2, 2 censored) · e2 1.5/7.5 (n=2, 2 censored, under band) · e3 1/9 (n=2, 2 censored, under band)",
       "limit": 1.5,
       "pass": true,
-      "note": "median attempts / (1.5 x band top), every counted session cleared, on src 605a8174 and the tier's default bike; armed 0/15 tracks (>= 2 completed); informational (unarmed): b1 0 fresh+2 censored, b2 0 fresh+2 censored, b3 0 fresh+2 censored, e1 0 fresh+2 censored, e2 0 fresh+2 censored, e3 0 fresh+2 censored, m1 0 fresh, m2 0 fresh, m3 0 fresh, h1 0 fresh, h2 0 fresh, h3 0 fresh, x1 0 fresh+1 censored, x2 no report, x3 0 fresh+2 censored"
+      "note": "median attempts / (1.5 x band top), every counted session cleared, on src 089e0885 and the tier's default bike; armed 6/15 tracks (>= 2 completed): all armed within the limit; informational (unarmed): m1 0 fresh, m2 0 fresh, m3 0 fresh, h1 0 fresh, h2 0 fresh, h3 0 fresh, x1 0 fresh+1 censored, x2 no report, x3 0 fresh+2 censored"
     },
     {
       "id": "reflex.medianAttempts",
       "value": "b1 -/1.5 (0 fresh) · b2 -/3 (0 fresh) · b3 -/3 (0 fresh) · e1 -/6 (0 fresh)",
       "limit": 1.5,
       "pass": true,
-      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 605a8174; informational until every track has >= 3 seeds on this src (pnpm harness:reflex --all-tracks --seeds 3)"
+      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 089e0885; informational until every track has >= 3 seeds on this src (pnpm harness:reflex --all-tracks --seeds 3)"
     },
     {
       "id": "reflex.medianAttempts.pro",
@@ -222,7 +222,7 @@
       "value": 59.5,
       "limit": 55,
       "pass": true,
-      "note": "b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md (report build 5649aa6, HEAD 35f8cbf)); informational until 3 reports exist (1 filed)"
+      "note": "b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md (report build 5649aa6, HEAD 5b56431)); informational until 3 reports exist (1 filed)"
     },
     {
       "id": "device.thermalDropPct",
@@ -240,29 +240,29 @@
     },
     {
       "id": "hero.webkit.driftMaxMm",
-      "value": 2.1,
+      "value": 0,
       "limit": 5,
       "pass": true,
-      "note": "rider bone-position drift over the bench flow in WebKit (ANGLE-on-Metal), worst of 4 runs at 2026-09-15T22:43:56Z: 2.1 mm (the arms bug 2b48370 read 2 600 mm); reach 12.53 cm, overhang 0.5 px (harness/out/hero-webkit/hero-webkit-2026-09-15T22-43-56.json)"
+      "note": "rider bone-position drift over the bench flow in WebKit (ANGLE-on-Metal), worst of 4 runs at 2026-09-16T03:09:02Z: 0 mm (the arms bug 2b48370 read 2 600 mm); reach 11.12 cm, overhang 0.5 px (harness/out/hero-webkit/hero-webkit-2026-09-16T03-09-02.json)"
     }
   ],
   "failed": 3,
   "pass": false,
   "boot": {
     "runs": [
-      254.17283299999997,
-      86.58241699999962,
-      76.77379199999996
+      127.15108299999997,
+      508.18233300000065,
+      86.9240000000027
     ],
-    "p50": 86.58241699999962,
-    "min": 76.77379199999996,
-    "max": 254.17283299999997,
+    "p50": 127.15108299999997,
+    "min": 86.9240000000027,
+    "max": 508.18233300000065,
     "firstFrameMs": [
-      7856.285000085831,
-      5456.590000152588,
-      5277.099999904633
+      7709.8150000572205,
+      6058.079999923706,
+      5933.0650000572205
     ],
-    "loadavg1": 8.07,
+    "loadavg1": 11.7,
     "cores": 18,
     "retried": false
   },
@@ -284,48 +284,48 @@
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0.1700000762939453,
-      0.11500000953674316,
-      0.09999990463256836,
+      0.17499995231628418,
+      0.11999988555908203,
+      0.10500001907348633,
+      0.07499980926513672,
       0.07500004768371582,
-      0.07499980926513672,
-      0.06499981880187988,
-      0.07499980926513672,
-      0.06500005722045898,
-      0.04500007629394531,
+      0.06999993324279785,
+      0.06999993324279785,
+      0.06999993324279785,
+      0.05500006675720215,
+      0.059999942779541016,
       0.04999995231628418,
-      0.04500007629394531,
-      0.039999961853027344,
-      0.039999961853027344,
-      0.039999961853027344,
-      0.03500008583068848,
-      0.039999961853027344,
-      0.039999961853027344,
-      0.039999961853027344,
-      0.03500008583068848,
+      0.04499983787536621,
+      0.05500006675720215,
+      0.05500006675720215,
+      0.04999995231628418,
+      0.06500005722045898,
+      0.059999942779541016,
+      0.05499982833862305,
+      0.06000018119812012,
       0.039999961853027344
     ],
     "frameMs": [
-      817.920000076294,
-      192.16499996185303,
-      175.75999999046326,
-      174.97500014305115,
-      174.5,
-      180.8199999332428,
-      174.18999981880188,
-      174.61500000953674,
-      177.11500000953674,
-      180.11500000953674,
-      178.44500017166138,
-      177.15000009536743,
-      175.8199999332428,
-      178.4799997806549,
-      176.34500002861023,
-      179.7150001525879,
-      175.93499994277954,
-      174.69000005722046,
-      175.5550000667572,
-      175.57499980926514
+      1414.7999999523163,
+      198.77999997138977,
+      182.39999985694885,
+      177.91499996185303,
+      183.36999988555908,
+      178.74000000953674,
+      190.61999988555908,
+      189.14000010490417,
+      184.74000000953674,
+      192.14000010490417,
+      195.10999989509583,
+      193.52499985694885,
+      218.65000009536743,
+      216.81500005722046,
+      216.34500002861023,
+      240.50999999046326,
+      219.57499980926514,
+      298.4099998474121,
+      185.86500000953674,
+      199.1599998474121
     ],
     "noCountdown": true,
     "movesOnFirstTick": true,
@@ -338,27 +338,27 @@
     "autoRespawnMs": 1041.6666666666667
   },
   "heap": {
-    "beforeMB": 23.269081115722656,
-    "afterMB": 27.403942108154297,
-    "growthMB": 4.134860992431641,
+    "beforeMB": 15.742237091064453,
+    "afterMB": 15.939422607421875,
+    "growthMB": 0.19718551635742188,
     "seconds": 10
   },
   "perf": {
-    "drawCalls": 147,
-    "triangles": 219701,
+    "drawCalls": 149,
+    "triangles": 219737,
     "texturesMB": 76.92539831542967,
-    "physicsUsPerTickP95": 34.999966621398926,
-    "renderSubmitMsP95": 1.5750000476837158,
-    "renderSyncedMsP95": 1644.25
+    "physicsUsPerTickP95": 29.999971389770508,
+    "renderSubmitMsP95": 1.7349998950958252,
+    "renderSyncedMsP95": 934.7400000095367
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260915-203248-43ca8d",
-    "startedAt": "2026-09-16T01:32:48.716Z",
-    "wallMs": 27901,
-    "git": "35f8cbf",
-    "srcFingerprint": "605a8174",
+    "runId": "20260915-222253-46de4c",
+    "startedAt": "2026-09-16T03:22:53.979Z",
+    "wallMs": 30528,
+    "git": "5b56431",
+    "srcFingerprint": "089e0885",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
     "physics": "bikePhysicsFactory-v2",
@@ -402,7 +402,7 @@
           "a11d28caba6be1fe",
           "851b4862e797759a",
           "e19f312fc2c79c00",
-          "424708af48c7ef7e"
+          "2f9864e2350334f6"
         ]
       },
       {
@@ -413,7 +413,7 @@
           "a11d28caba6be1fe",
           "851b4862e797759a",
           "e19f312fc2c79c00",
-          "424708af48c7ef7e"
+          "2f9864e2350334f6"
         ]
       },
       {
@@ -453,8 +453,8 @@
         "name": "pinned-hash",
         "pass": true,
         "hashes": [
-          "0c71973b36a15a2a",
-          "0c71973b36a15a2a"
+          "ff119f990e56af57",
+          "ff119f990e56af57"
         ],
         "note": "pinned physics=bikePhysicsFactory-v2"
       }
@@ -462,8 +462,8 @@
     "pass": true
   },
   "stranger": {
-    "srcFingerprint": "605a8174",
-    "armed": false,
+    "srcFingerprint": "089e0885",
+    "armed": true,
     "minSessions": 2,
     "rows": [
       {
@@ -474,14 +474,17 @@
           1
         ],
         "limit": 1.5,
-        "completedFresh": 0,
-        "completedAny": 11,
+        "completedFresh": 2,
+        "completedAny": 16,
         "censored": 2,
-        "medianAttempts": null,
-        "allCleared": false,
-        "pass": null,
+        "medianAttempts": 1,
+        "allCleared": true,
+        "pass": true,
         "belowBand": false,
-        "sessions": []
+        "sessions": [
+          "b1-first-ride-r14b-s1-20260915-220131",
+          "b1-first-ride-r14b-s2-20260915-220131"
+        ]
       },
       {
         "trackId": "b2-lean-back",
@@ -491,14 +494,17 @@
           2
         ],
         "limit": 3,
-        "completedFresh": 0,
-        "completedAny": 8,
+        "completedFresh": 2,
+        "completedAny": 13,
         "censored": 2,
-        "medianAttempts": null,
-        "allCleared": false,
-        "pass": null,
+        "medianAttempts": 1,
+        "allCleared": true,
+        "pass": true,
         "belowBand": false,
-        "sessions": []
+        "sessions": [
+          "b2-lean-back-r14b-s1-20260915-220131",
+          "b2-lean-back-r14b-s2-20260915-220131"
+        ]
       },
       {
         "trackId": "b3-kicker-row",
@@ -508,14 +514,17 @@
           2
         ],
         "limit": 3,
-        "completedFresh": 0,
-        "completedAny": 10,
+        "completedFresh": 2,
+        "completedAny": 15,
         "censored": 2,
-        "medianAttempts": null,
-        "allCleared": false,
-        "pass": null,
+        "medianAttempts": 2,
+        "allCleared": true,
+        "pass": true,
         "belowBand": false,
-        "sessions": []
+        "sessions": [
+          "b3-kicker-row-r14b-s1-20260915-220131",
+          "b3-kicker-row-r14b-s2-20260915-220131"
+        ]
       },
       {
         "trackId": "e1-uphill-weight",
@@ -525,14 +534,17 @@
           4
         ],
         "limit": 6,
-        "completedFresh": 0,
-        "completedAny": 8,
+        "completedFresh": 2,
+        "completedAny": 13,
         "censored": 2,
-        "medianAttempts": null,
-        "allCleared": false,
-        "pass": null,
+        "medianAttempts": 2,
+        "allCleared": true,
+        "pass": true,
         "belowBand": false,
-        "sessions": []
+        "sessions": [
+          "e1-uphill-weight-r14b-s1-20260915-220131",
+          "e1-uphill-weight-r14b-s2-20260915-220131"
+        ]
       },
       {
         "trackId": "e2-rear-wheel-first",
@@ -542,14 +554,17 @@
           5
         ],
         "limit": 7.5,
-        "completedFresh": 0,
-        "completedAny": 4,
+        "completedFresh": 2,
+        "completedAny": 9,
         "censored": 2,
-        "medianAttempts": null,
-        "allCleared": false,
-        "pass": null,
-        "belowBand": false,
-        "sessions": []
+        "medianAttempts": 1.5,
+        "allCleared": true,
+        "pass": true,
+        "belowBand": true,
+        "sessions": [
+          "e2-rear-wheel-first-r14b-s1-20260915-220131",
+          "e2-rear-wheel-first-r14b-s2-20260915-220131"
+        ]
       },
       {
         "trackId": "e3-stairway",
@@ -559,14 +574,17 @@
           6
         ],
         "limit": 9,
-        "completedFresh": 0,
-        "completedAny": 8,
+        "completedFresh": 2,
+        "completedAny": 13,
         "censored": 2,
-        "medianAttempts": null,
-        "allCleared": false,
-        "pass": null,
-        "belowBand": false,
-        "sessions": []
+        "medianAttempts": 1,
+        "allCleared": true,
+        "pass": true,
+        "belowBand": true,
+        "sessions": [
+          "e3-stairway-r14b-s1-20260915-220131",
+          "e3-stairway-r14b-s2-20260915-220131"
+        ]
       },
       {
         "trackId": "m1-hop-up",
@@ -707,7 +725,7 @@
     ]
   },
   "reflex": {
-    "srcFingerprint": "605a8174",
+    "srcFingerprint": "089e0885",
     "armed": false,
     "minSeeds": 3,
     "rows": [
@@ -719,7 +737,7 @@
           1
         ],
         "limit": 1.5,
-        "srcFingerprint": "701e049c",
+        "srcFingerprint": "605a8174",
         "seedsFresh": 0,
         "medianAttempts": null,
         "medianFinishTime": null,
@@ -735,7 +753,7 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "701e049c",
+        "srcFingerprint": "605a8174",
         "seedsFresh": 0,
         "medianAttempts": null,
         "medianFinishTime": null,
@@ -751,7 +769,7 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "701e049c",
+        "srcFingerprint": "605a8174",
         "seedsFresh": 0,
         "medianAttempts": null,
         "medianFinishTime": null,
@@ -767,7 +785,7 @@
           4
         ],
         "limit": 6,
-        "srcFingerprint": "701e049c",
+        "srcFingerprint": "605a8174",
         "seedsFresh": 0,
         "medianAttempts": null,
         "medianFinishTime": null,
@@ -778,7 +796,7 @@
     ]
   },
   "reflexPro": {
-    "srcFingerprint": "605a8174",
+    "srcFingerprint": "089e0885",
     "armed": false,
     "minSeeds": 3,
     "rows": [
@@ -923,11 +941,11 @@
       }
     },
     "hero": {
-      "file": "harness/out/hero-webkit/hero-webkit-2026-09-15T22-43-56.json",
-      "at": "2026-09-15T22:43:56Z",
+      "file": "harness/out/hero-webkit/hero-webkit-2026-09-16T03-09-02.json",
+      "at": "2026-09-16T03:09:02Z",
       "track": "b1-first-ride",
-      "driftMaxMm": 2.1,
-      "worstReachCm": 12.53,
+      "driftMaxMm": 0,
+      "worstReachCm": 11.12,
       "worstOverhangPx": 0.5,
       "results": 4
     }
@@ -946,10 +964,10 @@
     {
       "trackId": "b1-first-ride",
       "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/b1-first-ride/bot-3-pro.json",
-      "finishTime": 38.541666666666664,
-      "expected": 38.541666666666664,
-      "hash": "ccdd746d430da232",
-      "expectedHash": "ccdd746d430da232",
+      "finishTime": 38.141666666666666,
+      "expected": 38.141666666666666,
+      "hash": "4b69a80de766a325",
+      "expectedHash": "4b69a80de766a325",
       "faults": 0,
       "fresh": true
     }

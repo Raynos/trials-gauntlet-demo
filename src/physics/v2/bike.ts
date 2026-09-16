@@ -45,7 +45,7 @@ export interface PhysicsDebugV2 {
   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
   /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
-  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number };
+  rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number; /** R8 hold envelope: this tick's constraint impulses (N s) on the four one-sided limits and the grip force they imply (`gripJ` / gripTau, N; a fault above hold.gripN) */ hold: { legJ: number; armJ: number; seatJ: number; tankJ: number; gripF: number } };
   /** The declared attitude torque applied this tick (N m). */
   attTorque: number;
   /** Pose target in the chassis frame. */
@@ -54,7 +54,7 @@ export interface PhysicsDebugV2 {
   comDH: { d: number; h: number };
   balancePitch: number;
   riderChain: { hips: Vec2; shoulders: Vec2; head: Vec2; elbow: Vec2; hand: Vec2; knee: Vec2; foot: Vec2; torsoDir: Vec2; headDir: Vec2 };
-  crashCause: 'sensor' | 'oob' | 'hazard' | null;
+  crashCause: 'sensor' | 'thrown' | 'oob' | 'hazard' | null;
   /** R6 (physics.md §8.1): true when the run faulted in the tick the front wheel crossed the finish line with the wheel no more than one radius past it - the crossing did not count (no `finish` event, `finishTime` null). */
   finishVoided: boolean;
 }
@@ -131,6 +131,7 @@ export const F_SLOTS = [
   'targetMove',
   'airLimit',
   'leanEdgeAir',
+  'gripJ',
 ] as const;
 const S_TICK = 0;
 const S_TIME = 1;
@@ -160,7 +161,8 @@ const S_REAR_SLIP = 32; // output
 const S_TGT_MOVE = 33; // R3 intent: decaying memory (tau servoIntentTau) of the pose target's own travel, metres
 const S_AIR_LIMIT = 34; // R5 air limit blend 0..1 (both wheels off the ground, +-dt/airRateBlend per tick)
 const S_LEAN_EDGE_AIR = 35; // R7: 1 when the last lean edge was made with both wheels off the ground (its travel earns no intent once a wheel is down)
-export const NSCALAR = F_SLOTS.length; // 36
+const S_GRIP_J = 36; // R8: the reach-limit (hands + feet) impulse, N s, averaged over hold.gripTau (exponential memory); / gripTau > gripN = thrown
+export const NSCALAR = F_SLOTS.length; // 37
 
 /** Flags (physics-v2.md §12). */
 export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid'] as const;
@@ -175,14 +177,14 @@ const U_FRONT_SURF = 7;
 const U_RAGDOLL = 8;
 const U_ASLEEP = 9;
 const U_CRASH_PENDING = 10; // written and read inside one step (collide -> derive)
-const U_CRASH_CAUSE = 11; // 1 sensor, 4 oob, 5 hazard
+const U_CRASH_CAUSE = 11; // 1 sensor, 2 thrown (R8), 4 oob, 5 hazard
 const U_HOP = 12; // derived output: 0 idle 1 preload 2 push 3 recover
 const U_FINISH_VOID = 13; // R6 physics.md §8.1: 1 when a fault in the crossing tick (front wheel <= R past the line) voided the finish
 export const NU = U_SLOTS.length; // 14
 
 const FAULTS: (FaultReason | null)[] = [null, 'crash', 'out-of-bounds', 'restart', 'timeout', 'hazard'];
 const HOPS: HopPhase[] = ['idle', 'preload', 'push', 'recover'];
-const CAUSES: PhysicsDebugV2['crashCause'][] = [null, 'sensor', null, null, 'oob', 'hazard'];
+const CAUSES: PhysicsDebugV2['crashCause'][] = [null, 'sensor', 'thrown', null, 'oob', 'hazard'];
 
 const MAX_CONTACTS = 128;
 const EMPTY_SEESAWS: PhysicsState['seesaws'] = Object.freeze([]) as unknown as PhysicsState['seesaws'];
@@ -295,6 +297,10 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private dLegLen = 0;
   private dLegFrac = 1;
   private dIntent = 0;
+  // R8 hold envelope: accumulated impulses this tick (leg reach, arm reach, seat, tank)
+  private readonly holdLam = new Float64Array(4);
+  // seat / tank friction impulses (Coulomb, hold.mu x the normal impulse)
+  private readonly holdLamT = new Float64Array(4);
   // this tick's air limit (gain x blend x (1 - intent)), derived in step() from F; read by forces() and debug()
   private airLim = 0;
   private dAtt = 0;
@@ -447,7 +453,12 @@ class WorldV2 implements BikePhysicsWorldV2 {
       F[S_AIR_LIMIT] = clamp(bothAir, F[S_AIR_LIMIT]! - dLim, F[S_AIR_LIMIT]! + dLim);
       const lim = r.airRateGain * F[S_AIR_LIMIT]! * (1 - clamp(F[S_TGT_MOVE]! / r.servoIntentM, 0, 1));
       this.airLim = lim;
-      advanceTarget(r, dt, F[S_TGT_X]!, F[S_TGT_Y]!, F[S_TGT_PSI]!, input.lean, this.poseTmp, r.targetRateLin + (r.airRateLin - r.targetRateLin) * lim, r.targetRateAng + (r.airRateAng - r.targetRateAng) * lim);
+      // R8 brake brace: the rider's mass moves back under braking (the pose table's brake row); a forward lean
+      // braces nothing, so brake + lean forward is still the stoppie. Reads the lagged brake so a tap is continuous.
+      // A brace is a reaction to the deceleration through the wheels: with both wheels off the ground there is none,
+      // and the brace is exactly 0 (the R4 / R5 air-brake nudges stay the declared air control, identical per class).
+      const poseLean = input.lean - r.brakeBrace * F[S_BRAKE_EFF]! * (1 - Math.max(0, input.lean)) * (1 - bothAir);
+      advanceTarget(r, dt, F[S_TGT_X]!, F[S_TGT_Y]!, F[S_TGT_PSI]!, poseLean, this.poseTmp, r.targetRateLin + (r.airRateLin - r.targetRateLin) * lim, r.targetRateAng + (r.airRateAng - r.targetRateAng) * lim);
       // intent (R3): how far the target itself has travelled lately. A rider who is MOVING his pose (the hop's
       // snap) may push at F_max whichever way the gap is closing; a rider holding a pose (a landing) has only the
       // concentric cap (servoMinFrac at servoCloseV0) on the way back up, so the legs absorb instead of pogoing.
@@ -707,6 +718,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
         legFrac: this.dLegFrac,
         intent: this.dIntent,
         airLimited: this.airLim,
+        hold: { legJ: this.holdLam[0]!, armJ: this.holdLam[1]!, seatJ: this.holdLam[2]!, tankJ: this.holdLam[3]!, gripF: F[S_GRIP_J]! / t.rider.hold.gripTau },
         poseTargetWorld: { x: this.dTgtWx, y: this.dTgtWy },
         lag: { x: this.px[RIDER]! - this.dTgtWx, y: this.py[RIDER]! - this.dTgtWy },
       },
@@ -1454,6 +1466,8 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const rag = this.U[U_RAGDOLL] === 1;
     if (rag) this.ragLambda.fill(0);
     this.seesawLambda.fill(0);
+    this.holdLam.fill(0);
+    this.holdLamT.fill(0);
 
     const fx = this.px[CHASSIS]!;
     const fy = this.py[CHASSIS]!;
@@ -1520,6 +1534,16 @@ class WorldV2 implements BikePhysicsWorldV2 {
           av[CHASSIS] = av[CHASSIS]! + ii[CHASSIS]! * ra * lambda;
         }
       }
+
+      // --- R8 hold envelope: the rider on the bike is a closed chain with hard, one-sided ends. Four limits between the
+      // rider body and the chassis, solved as impulses with restitution 0 (accumulated, clamped >= 0, a velocity bias
+      // that lets a limit be reached exactly and pushes a penetration out at hold.posBeta per tick): the hips within
+      // legReach of the pegs, above the seat line and behind the tank line, the chest within armReach of the grip.
+      // The servo (forces) is the muscles; these are the bones, the seat and the bars. Before R8 an 8 g landing put the
+      // body 1.25 m through the chassis and a whipped bike left it hanging 2 m off on the servo's Hill cap (physics.md
+      // R7 "COM band"). The reach impulses (leg, arm) are what the hands and feet hold: summed into S_GRIP_J for the
+      // thrown-rider fault in derive().
+      if (riding) this.solveHold();
 
       // --- seesaw angle limits
       for (let sI = 0; sI < this.nSeesaw; sI++) {
@@ -1644,6 +1668,132 @@ class WorldV2 implements BikePhysicsWorldV2 {
 
       // --- ragdoll joints (as v1)
       if (rag) this.solveRagdollJoints(it === 0);
+    }
+  }
+
+  /** One velocity iteration of the four hold limits (R8). */
+  private solveHold(): void {
+    const t = this.tuning;
+    const r = t.rider;
+    const h = r.hold;
+    const dt = this.dt;
+    const vx = this.vx;
+    const vy = this.vy;
+    const av = this.av;
+    const im = this.im;
+    const ii = this.ii;
+    const c = cos(this.an[CHASSIS]!);
+    const s = sin(this.an[CHASSIS]!);
+    const cr = cos(this.an[RIDER]!);
+    const sr = sin(this.an[RIDER]!);
+    const fx = this.px[CHASSIS]!;
+    const fy = this.py[CHASSIS]!;
+    const rx0 = this.px[RIDER]!;
+    const ry0 = this.py[RIDER]!;
+    // anchors: hips and chest on the body, pegs and grip on the chassis (world)
+    const hipx = rx0 - (r.comFromHips.x * cr - r.comFromHips.y * sr);
+    const hipy = ry0 - (r.comFromHips.x * sr + r.comFromHips.y * cr);
+    const chx = rx0 + h.chest.x * cr - h.chest.y * sr;
+    const chy = ry0 + h.chest.x * sr + h.chest.y * cr;
+    const plx = r.peg.x + this.axleOrgX;
+    const ply = r.peg.y + this.axleOrgY;
+    const pegx = fx + plx * c - ply * s;
+    const pegy = fy + plx * s + ply * c;
+    const glx = r.grip.x + this.axleOrgX;
+    const gly = r.grip.y + this.axleOrgY;
+    const gripx = fx + glx * c - gly * s;
+    const gripy = fy + glx * s + gly * c;
+    // seat and tank: the hips in the chassis frame
+    const hipLx = (hipx - fx) * c + (hipy - fy) * s;
+    const hipLy = -(hipx - fx) * s + (hipy - fy) * c;
+    for (let k = 0; k < 4; k++) {
+      // rider anchor (ax, ay), chassis anchor (bx, by), the direction n along which the gap C grows, and C itself
+      let ax: number;
+      let ay: number;
+      let bx: number;
+      let by: number;
+      let nx: number;
+      let ny: number;
+      let C: number;
+      if (k === 0 || k === 1) {
+        // reach: C = L - |a - b|, grows as the rider anchor moves toward the chassis anchor
+        ax = k === 0 ? hipx : chx;
+        ay = k === 0 ? hipy : chy;
+        bx = k === 0 ? pegx : gripx;
+        by = k === 0 ? pegy : gripy;
+        const dx = ax - bx;
+        const dy = ay - by;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 1e-6) continue;
+        nx = -dx / d;
+        ny = -dy / d;
+        C = (k === 0 ? h.legReach : h.armReach) - d;
+      } else if (k === 2) {
+        // seat: C = hips height above the seat line, chassis up; the reaction on the chassis at the seat under the hips
+        ax = hipx;
+        ay = hipy;
+        bx = hipx;
+        by = hipy;
+        nx = -s;
+        ny = c;
+        C = hipLy - h.seatY;
+      } else {
+        // tank: C = the hips' room behind the tank line, chassis backward; the reaction on the chassis at the hips
+        ax = hipx;
+        ay = hipy;
+        bx = hipx;
+        by = hipy;
+        nx = -c;
+        ny = -s;
+        C = h.tankX - hipLx;
+      }
+      if (C >= 0.03) continue;
+      const rax = ax - rx0;
+      const ray = ay - ry0;
+      const rbx = bx - fx;
+      const rby = by - fy;
+      const rna = rax * ny - ray * nx;
+      const rnb = rbx * ny - rby * nx;
+      const mass = 1 / (im[RIDER]! + im[CHASSIS]! + ii[RIDER]! * rna * rna + ii[CHASSIS]! * rnb * rnb);
+      const relx = vx[RIDER]! - av[RIDER]! * ray - (vx[CHASSIS]! - av[CHASSIS]! * rby);
+      const rely = vy[RIDER]! + av[RIDER]! * rax - (vy[CHASSIS]! + av[CHASSIS]! * rbx);
+      const vn = relx * nx + rely * ny;
+      const vnMin = C > 0 ? -C / dt : (-C * h.posBeta) / dt;
+      let lambda = -mass * (vn - vnMin);
+      const old = this.holdLam[k]!;
+      const acc = Math.max(0, old + lambda);
+      lambda = acc - old;
+      this.holdLam[k] = acc;
+      vx[RIDER] = vx[RIDER]! + lambda * nx * im[RIDER]!;
+      vy[RIDER] = vy[RIDER]! + lambda * ny * im[RIDER]!;
+      av[RIDER] = av[RIDER]! + ii[RIDER]! * rna * lambda;
+      vx[CHASSIS] = vx[CHASSIS]! - lambda * nx * im[CHASSIS]!;
+      vy[CHASSIS] = vy[CHASSIS]! - lambda * ny * im[CHASSIS]!;
+      av[CHASSIS] = av[CHASSIS]! - ii[CHASSIS]! * rnb * lambda;
+      if (k < 2 || acc <= 0) continue;
+      // seat / tank friction: the body does not slide along the seat it is pressed onto (a 15 g rear-first landing
+      // slid the hips 0.2 m back along a frictionless seat until the arms snapped taut - a thrown rider that was not)
+      {
+        const tx = -ny;
+        const ty = nx;
+        const rta = rax * ty - ray * tx;
+        const rtb = rbx * ty - rby * tx;
+        const massT = 1 / (im[RIDER]! + im[CHASSIS]! + ii[RIDER]! * rta * rta + ii[CHASSIS]! * rtb * rtb);
+        const rvx = vx[RIDER]! - av[RIDER]! * ray - (vx[CHASSIS]! - av[CHASSIS]! * rby);
+        const rvy = vy[RIDER]! + av[RIDER]! * rax - (vy[CHASSIS]! + av[CHASSIS]! * rbx);
+        const vt = rvx * tx + rvy * ty;
+        const maxF = h.mu * acc;
+        const oldT = this.holdLamT[k]!;
+        const accT = clamp(oldT - massT * vt, -maxF, maxF);
+        const lt = accT - oldT;
+        this.holdLamT[k] = accT;
+        vx[RIDER] = vx[RIDER]! + lt * tx * im[RIDER]!;
+        vy[RIDER] = vy[RIDER]! + lt * ty * im[RIDER]!;
+        av[RIDER] = av[RIDER]! + ii[RIDER]! * rta * lt;
+        vx[CHASSIS] = vx[CHASSIS]! - lt * tx * im[CHASSIS]!;
+        vy[CHASSIS] = vy[CHASSIS]! - lt * ty * im[CHASSIS]!;
+        av[CHASSIS] = av[CHASSIS]! - ii[CHASSIS]! * rtb * lt;
+      }
     }
   }
 
@@ -1937,6 +2087,16 @@ class WorldV2 implements BikePhysicsWorldV2 {
       if (U[U_CRASH_PENDING] === 1) {
         fault = 1;
         cause = 1;
+      }
+      // R8 thrown rider: the reach impulses (hands on the grips, feet on the pegs) averaged over hold.gripTau exceed
+      // the grip strength - the hands leave the bars. The seat and the bars (compression) never fault.
+      {
+        const h = t.rider.hold;
+        F[S_GRIP_J] = F[S_GRIP_J]! * (1 - dt / h.gripTau) + this.holdLam[0]! + this.holdLam[1]!;
+        if (fault === 0 && F[S_GRIP_J]! / h.gripTau > h.gripN) {
+          fault = 1;
+          cause = 2;
+        }
       }
       if (fault === 0) {
         for (let b = 0; b <= RIDER; b++) {

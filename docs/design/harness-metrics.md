@@ -87,6 +87,40 @@ clips the camera rides up into the skylights after the 133 m kicker and shows on
 ~3.4 s flight (s1 17.2–19.0 s, s2 14.3–15.1 s run clock), the bike out of frame exactly while the hint says
 "Level the bike in the air"; the next frame is a top-down view of the landing.
 
+## Round 14 (physics R8) — strangers on the rider who sits on the bike: b1–e3 on the Rookie (the tier's default), src 089e0885, two fresh strangers per track, 12 / 12 cleared; b1 back in band (the R13 brake endo is gone from a stranger's hands), e2 / e3 UNDER band as in R13
+
+Physics R8 (`physics.md` v2 status R8: the hold envelope — seat, tank, leg and arm reach as hard one-sided limits with
+seat friction — the thrown-rider fault, and the brake brace) is a dynamics change, so rule 1 of the merge doc applies:
+b1–e3 re-run with strangers, this time **n = 2 per track** (the R13 verdicts were INSUFFICIENT at n = 1). Twelve sessions,
+`prep --round r14b --agents s1,s2`, prompt = `run-stranger.md` block verbatim, spawned in parallel (the box also carried
+two golden sweeps and the Astra port builder; 1.7–5.1 min wall, 11–24 calls). A first twelve (round `r14`, src
+2503f384) were played before the brace's air gate landed (`physics.md` deviation 19) and are `stale src` in the report,
+listed for the record: b1 1 / 1, b2 1 / 1, b3 2 / 2, e1 1 / 2, e2 2 / 2, e3 1 / 1 — the same medians as the counted round.
+**Every session cleared; verdicts from `harness:stranger report` (n = 2, censored = the two abandoned r4 shells per track):**
+
+| track | band | asserted | attempts (s1, s2) | median | verdict | time to clear | calls | died at | what the strangers said |
+|---|---|---|---|---:|---|---|---:|---|---|
+| b1-first-ride | 1–1 | 1 ≤ med ≤ 1.5 | 1, 1 | **1** | **PASS** (R13: 2, above) | 42.9 / 40.8 s | 12 / 12 | — | both name braking before the hump at 480–510 m from 16 m/s as the hardest part — and both stop upright on a plain / one-slot weight-back brake; the R13 fault ("a plain `b` from 15 m/s pitched the bike over the bars") does not recur |
+| b2-lean-back | 1–2 | 1 ≤ med ≤ 3 | 1, 1 | **1** | PASS (R13: 3) | 43.8 / 46.2 s | 21 / 17 | — | the knee-high ledge at x ≈ 68 read from the 0.5 m/row view (brake + hop; one landed −58° and was saved with `gb`) |
+| b3-kicker-row | 1–2 | 1 ≤ med ≤ 3 | 2, 2 | **2** | PASS (R13: 2) | 42.4 / 44.5 s | 13 / 16 | 94 m, 94 m | both lost attempt 1 to the same thing: lean-forward held through the second kicker's lip → nose-down flip; both then rode every kicker on plain gas and coasted the flights |
+| e1-uphill-weight | 2–4 | 2 ≤ med ≤ 6 | 3, 1 | **2** | PASS (R13: 2) | 63.8 / 52.0 s | 24 / 13 | 227 m, 211 m (ramp) | the convex 45° faces launch nose-up; holding the lean into the air front-flips; release at the lip and one-slot correction in flight |
+| e2-rear-wheel-first | 3–5 | 3 ≤ med ≤ 7.5 | 1, 2 | **1.5** | **UNDER-BAND** (R13: 2, under) | 45.4 / 52.2 s | 21 / 22 | 324 m | the lean-back release in the air (`lb2` off a kicker swung the nose 30° further on release into a loop-out); the gaps were safest on `gf` up the ramp and plain `g` in flight |
+| e3-stairway | 3–6 | 3 ≤ med ≤ 9 | 1, 1 | **1** | **UNDER-BAND** (R13: 1, under) | 41.7 / 40.8 s | 15 / 11 | — | plain full gas through every stair flight, both ways (both distrusted the card's "brake down" and were right) |
+
+Census: 12 / 12 cleared, medians b1 1 · b2 1 · b3 2 · e1 2 · e2 1.5 · e3 1 against bands 1–1 · 1–2 · 1–2 · 2–4 · 3–5 · 3–6.
+**e2 and e3 are outside (under) their authored bands after n = 2, as they were at n = 1 in R13** — easier than authored,
+within the ship limit; a tracks note, not a physics one (nothing was tuned to a band this round). The gate's
+`stranger.medianAttempts` row reads the same census (PASS). Recordings
+`harness/inputs/<track>/stranger-<track>-r14b-s{1,2}-20260915-220131.json` (not browser-replayed this round); reports
+`harness/out/metrics/<track>.stranger.{json,md}`; the r14 (stale) set `…-r14-s{1,2}-20260915-214558.json`.
+
+Alongside, on the same src: goldens 46 / 48 browser-proved (Pro x1 / x3 stale — the Pro bot stalls at 81 % / 92 % under
+R8, `physics.md` R8 golden table), determinism 9 / 9 (D8 `ff119f990e56af57`), gate `--quick` 27 / 30 (the three
+SwiftShader timing rows), reflex 9 seeds clears 9 / 9 on every track with no beginner / easy median moving by more than 1
+(`physics.md` R8). The R13b tells this round was built for — "collapses onto the tank in 2 frames", "sinks below the bars
+into the bike geometry" — are now bounded by the envelope (hips never > 4.6 cm below the seat line on any golden tick);
+whether the critic reads it is the next critic round's question, not this one's.
+
 ## Round 13b (critic r4, body-driven hero) — the rig is live (chest bone = physics body to 1e-9 rad, std 0.09–0.18 rad per clip) and the blind critic still takes the reference 10 of 12: r4 1 / 6, r4b 1 / 6, both wins on crash cells; the round-12 statue tells are gone from every riding cell and the new rider tell is the R8 punch ("collapses onto the tank in 2 frames", "sinks below the bars")
 
 **Finding.** Physics R7 (`fe50df5`) exports `riderBody` every tick and the merged hero's `GltfRider.chainFromBody` takes over: on

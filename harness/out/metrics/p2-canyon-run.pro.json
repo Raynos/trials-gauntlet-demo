@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "p2-canyon-run",
   "bike": "pro",
-  "updatedAt": "2026-09-16T01:08:58.300Z",
+  "updatedAt": "2026-09-16T03:08:06.252Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        32.375
+        32.65833333333333
       ]
     }
   ],
@@ -30,6 +30,8 @@
   "singleWall": null,
   "runs": [
     "20260915-195943-1c4432",
-    "20260915-200752-31e18f"
+    "20260915-200752-31e18f",
+    "20260915-214433-7759b4",
+    "20260915-220340-5bad56"
   ]
 }

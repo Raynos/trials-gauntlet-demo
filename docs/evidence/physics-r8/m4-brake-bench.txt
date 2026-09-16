@@ -1,0 +1,40 @@
+rookie R7 (none)   v6 lean0 : v0 6.0 stop 0.85 s dist 2.66 m pitch min -11.2 rear-off 0.53 s (first 0.13) trim max 0.00 upright
+rookie R7 (none)   v10 lean0 : v0 9.9 stop 1.39 s dist 7.10 m pitch min -12.6 rear-off 0.72 s (first 0.13) trim max 0.00 upright
+rookie R7 (none)   v15 lean0 : v0 14.4 stop 2.02 s dist 14.99 m pitch min -14.8 rear-off 1.08 s (first 0.13) trim max 0.00 upright
+rookie R7 (none)   stoppie 10 lean+1 0.2s: v0 9.9 stop NaN s dist 0.00 m pitch min -32.6 rear-off 0.82 s (first 0.11) trim max 0.00 upright
+rookie R7 (none)   held +1 from 10  : v0 9.9 stop NaN s dist 0.00 m pitch min -163.7 rear-off 0.65 s (first 0.11) trim max 0.00 crash@0.76s
+rookie R8 brace    v6 lean0 : v0 6.0 stop 0.74 s dist 2.41 m pitch min -7.8 rear-off 0.14 s (first 0.04) trim max 0.00 upright
+rookie R8 brace    v10 lean0 : v0 9.9 stop 1.20 s dist 6.19 m pitch min -7.9 rear-off 0.15 s (first 0.04) trim max 0.00 upright
+rookie R8 brace    v15 lean0 : v0 14.4 stop 1.73 s dist 12.73 m pitch min -7.8 rear-off 0.16 s (first 0.04) trim max 0.00 upright
+rookie R8 brace    stoppie 10 lean+1 0.2s: v0 9.9 stop NaN s dist 0.00 m pitch min -32.9 rear-off 0.82 s (first 0.11) trim max 0.00 upright
+rookie R8 brace    held +1 from 10  : v0 9.9 stop NaN s dist 0.00 m pitch min -163.7 rear-off 0.65 s (first 0.11) trim max 0.00 crash@0.76s
+rookie Astra lift  v6 lean0 : v0 6.0 stop 0.88 s dist 2.75 m pitch min -9.5 rear-off 0.38 s (first 0.16) trim max 0.57 upright
+rookie Astra lift  v10 lean0 : v0 9.9 stop 1.42 s dist 7.25 m pitch min -10.7 rear-off 0.52 s (first 0.16) trim max 0.66 upright
+rookie Astra lift  v15 lean0 : v0 14.4 stop 2.03 s dist 15.02 m pitch min -11.8 rear-off 0.72 s (first 0.16) trim max 0.83 upright
+rookie Astra lift  stoppie 10 lean+1 0.2s: v0 9.9 stop NaN s dist 0.00 m pitch min -30.6 rear-off 0.76 s (first 0.11) trim max 1.00 upright
+rookie Astra lift  held +1 from 10  : v0 9.9 stop NaN s dist 0.00 m pitch min -163.7 rear-off 0.65 s (first 0.11) trim max 0.00 crash@0.76s
+rookie brace+lift  v6 lean0 : v0 6.0 stop 0.77 s dist 2.50 m pitch min -7.1 rear-off 0.14 s (first 0.04) trim max 0.45 upright
+rookie brace+lift  v10 lean0 : v0 9.9 stop 1.23 s dist 6.35 m pitch min -7.2 rear-off 0.15 s (first 0.04) trim max 0.46 upright
+rookie brace+lift  v15 lean0 : v0 14.4 stop 1.75 s dist 12.93 m pitch min -7.1 rear-off 0.16 s (first 0.04) trim max 0.44 upright
+rookie brace+lift  stoppie 10 lean+1 0.2s: v0 9.9 stop NaN s dist 0.00 m pitch min -31.1 rear-off 0.75 s (first 0.11) trim max 1.00 upright
+rookie brace+lift  held +1 from 10  : v0 9.9 stop NaN s dist 0.00 m pitch min -163.7 rear-off 0.65 s (first 0.11) trim max 0.00 crash@0.76s
+pro R7 (none)   v6 lean0 : v0 6.0 stop 0.83 s dist 2.63 m pitch min -9.2 rear-off 0.53 s (first 0.13) trim max 0.00 upright
+pro R7 (none)   v10 lean0 : v0 9.9 stop 1.38 s dist 7.04 m pitch min -10.3 rear-off 0.75 s (first 0.13) trim max 0.00 upright
+pro R7 (none)   v15 lean0 : v0 14.5 stop 2.02 s dist 15.01 m pitch min -13.7 rear-off 1.22 s (first 0.13) trim max 0.00 upright
+pro R7 (none)   stoppie 10 lean+1 0.2s: v0 9.9 stop NaN s dist 0.00 m pitch min -32.7 rear-off 0.92 s (first 0.10) trim max 0.00 upright
+pro R7 (none)   held +1 from 10  : v0 9.9 stop NaN s dist 0.00 m pitch min -231.0 rear-off 0.87 s (first 0.10) trim max 0.00 crash@0.97s
+pro R8 brace    v6 lean0 : v0 6.0 stop 0.73 s dist 2.39 m pitch min -6.2 rear-off 0.16 s (first 0.03) trim max 0.00 upright
+pro R8 brace    v10 lean0 : v0 9.9 stop 1.19 s dist 6.16 m pitch min -6.2 rear-off 0.17 s (first 0.03) trim max 0.00 upright
+pro R8 brace    v15 lean0 : v0 14.5 stop 1.72 s dist 12.73 m pitch min -6.1 rear-off 0.17 s (first 0.04) trim max 0.00 upright
+pro R8 brace    stoppie 10 lean+1 0.2s: v0 9.9 stop NaN s dist 0.00 m pitch min -32.6 rear-off 0.90 s (first 0.10) trim max 0.00 upright
+pro R8 brace    held +1 from 10  : v0 9.9 stop NaN s dist 0.00 m pitch min -231.0 rear-off 0.87 s (first 0.10) trim max 0.00 crash@0.97s
+pro Astra lift  v6 lean0 : v0 6.0 stop 0.87 s dist 2.71 m pitch min -7.8 rear-off 0.39 s (first 0.14) trim max 0.58 upright
+pro Astra lift  v10 lean0 : v0 9.9 stop 1.40 s dist 7.19 m pitch min -8.7 rear-off 0.55 s (first 0.14) trim max 0.63 upright
+pro Astra lift  v15 lean0 : v0 14.5 stop 2.02 s dist 14.99 m pitch min -9.7 rear-off 0.75 s (first 0.14) trim max 0.81 upright
+pro Astra lift  stoppie 10 lean+1 0.2s: v0 9.9 stop NaN s dist 0.00 m pitch min -30.4 rear-off 0.85 s (first 0.10) trim max 1.00 upright
+pro Astra lift  held +1 from 10  : v0 9.9 stop NaN s dist 0.00 m pitch min -231.0 rear-off 0.87 s (first 0.10) trim max 0.00 crash@0.97s
+pro brace+lift  v6 lean0 : v0 6.0 stop 0.76 s dist 2.51 m pitch min -5.6 rear-off 0.22 s (first 0.03) trim max 0.58 upright
+pro brace+lift  v10 lean0 : v0 9.9 stop 1.22 s dist 6.38 m pitch min -5.7 rear-off 0.22 s (first 0.03) trim max 0.61 upright
+pro brace+lift  v15 lean0 : v0 14.5 stop 1.74 s dist 13.02 m pitch min -6.0 rear-off 0.19 s (first 0.04) trim max 0.48 upright
+pro brace+lift  stoppie 10 lean+1 0.2s: v0 9.9 stop NaN s dist 0.00 m pitch min -30.8 rear-off 0.84 s (first 0.10) trim max 1.00 upright
+pro brace+lift  held +1 from 10  : v0 9.9 stop NaN s dist 0.00 m pitch min -231.0 rear-off 0.87 s (first 0.10) trim max 0.00 crash@0.97s

@@ -1,0 +1,107 @@
+diff -ruN base/src/physics/v2/bike.ts m4only/src/physics/v2/bike.ts
+--- base/src/physics/v2/bike.ts	2026-09-15 21:59:28
++++ m4only/src/physics/v2/bike.ts	2026-09-15 22:13:59
+@@ -43,6 +43,7 @@
+   bodies: ({ id: string } & BodyDebug)[];
+   contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; mu: number; surface: SurfaceKind }[];
+   engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
++  brakes: { rearTorqueNm: number; frontTorqueNm: number; assist: number };
+   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
+   /** The rider rigid body (the spec's additive `PhysicsState.rider.body` request, on debug() until core adds the type). */
+   rider: { body: BodyDebug; servoForce: Vec2; servoTorque: number; poseTargetWorld: Vec2; lag: Vec2; /** hips -> pegs distance (m) and the force-length fraction of F_max it allows (R2) */ legLen: number; legFrac: number; /** R3: the intent memory 0..1 (1 = the pose target moved >= servoIntentM in the last ~servoIntentTau) */ intent: number; /** R5: the air rate limit in effect, gain x blend 0..1 (Rookie: 1 after 0.1 s with both wheels off the ground; Pro 0). */ airLimited: number; /** R8 hold envelope: this tick's constraint impulses (N s) on the four one-sided limits and the grip force they imply (`gripJ` / gripTau, N; a fault above hold.gripN) */ hold: { legJ: number; armJ: number; seatJ: number; tankJ: number; gripF: number } };
+@@ -290,6 +291,7 @@
+   // debug scratch of the last force pass
+   private dEngineTq = 0;
+   private dAssist = 0;
++  private dBrakeAssist = 0;
+   private dThrust = 0;
+   private dServoFx = 0;
+   private dServoFy = 0;
+@@ -704,6 +706,7 @@
+       bodies,
+       contacts,
+       engine: { rpm: reportRpm(t.engine, R, vRim, F[S_THROTTLE_EFF]!), torqueNm: this.dEngineTq, thrustN: this.dThrust, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]!, brakeEff: F[S_BRAKE_EFF]!, assist: this.dAssist },
++      brakes: { rearTorqueNm: this.sBrake[0]! / this.dt, frontTorqueNm: this.sBrake[1]! / this.dt, assist: this.dBrakeAssist },
+       suspension: {
+         rear: { compression: this.sComp[0]!, rate: this.sRate[0]!, force: this.sForce[0]! },
+         front: { compression: this.sComp[1]!, rate: this.sRate[1]!, force: this.sForce[1]! },
+@@ -1471,6 +1474,7 @@
+     const fy = this.py[CHASSIS]!;
+     const wheelB = WHEEL_BODIES;
+     const brakeIn = riding ? this.F[S_BRAKE_EFF]! : 1;
++    this.dBrakeAssist = 0;
+ 
+     for (let it = 0; it < iters; it++) {
+       // --- sliders: bilateral perpendicular constraint, then travel limits (no restitution, no Baumgarte)
+@@ -1647,11 +1651,41 @@
+ 
+       // --- brakes: torque-capped spin locks wheel <-> chassis (§8: no caps of any kind while riding)
+       if (brakeIn > 0) {
++        let frontLimit = Infinity;
++        const assist = riding ? t.brakes.liftControl * clamp((0.8 - Math.abs(this.F[S_IN_L]!)) / 0.3, 0, 1) : 0;
++        if (assist > 0) {
++          let frontContact = -1;
++          let rearBrake = 0;
++          for (let i = 0; i < nC; i++) {
++            if (this.cA[i] === FRONT && this.cLn[i]! > 0 && (frontContact < 0 || this.cLn[i]! > this.cLn[frontContact]!)) frontContact = i;
++            if (this.cA[i] === REAR) rearBrake += Math.max(0, this.cLt[i]!) / dt;
++          }
++          if (frontContact >= 0) {
++            const mass = this.totalMass();
++            const mx = (t.chassis.mass * this.px[CHASSIS]! + t.wheel.rearMass * this.px[REAR]! + t.wheel.frontMass * this.px[FRONT]! + t.rider.mass * this.px[RIDER]!) / mass;
++            const my = (t.chassis.mass * this.py[CHASSIS]! + t.wheel.rearMass * this.py[REAR]! + t.wheel.frontMass * this.py[FRONT]! + t.rider.mass * this.py[RIDER]!) / mass;
++            const nx = this.cNx[frontContact]!;
++            const ny = this.cNy[frontContact]!;
++            const dx = mx - this.px[FRONT]! - this.cRAx[frontContact]!;
++            const dy = my - this.py[FRONT]! - this.cRAy[frontContact]!;
++            const height = dx * nx + dy * ny;
++            if (height > 0.1) {
++              const margin = -dx + Math.min(0, av[CHASSIS]!) * height * t.brakes.liftLookahead;
++              const safeForce = Math.max(0, (0.9 * mass * this.g * margin) / height);
++              frontLimit = Math.max(0, safeForce - rearBrake) * t.wheel.radius;
++            }
++          }
++        }
+         for (let w = 0; w < 2; w++) {
+           const wb = wheelB[w]!;
+           let maxNm = t.brakes.totalNm * (w === 0 ? 1 - t.brakes.frontFrac : t.brakes.frontFrac);
+           if (!riding) maxNm *= w === 0 ? t.ragdoll.crashRearBrake : t.ragdoll.crashFrontBrake;
+-          const maxJ = brakeIn * maxNm * dt;
++          let maxJ = brakeIn * maxNm * dt;
++          if (w === 1 && Number.isFinite(frontLimit)) {
++            const trim = assist * Math.max(0, maxJ - frontLimit * dt);
++            this.dBrakeAssist = maxJ > 0 ? trim / maxJ : 0;
++            maxJ -= trim;
++          }
+           const rel = av[wb]! - av[CHASSIS]!;
+           const mass = 1 / (ii[wb]! + ii[CHASSIS]!);
+           let lambda = -mass * rel;
+diff -ruN base/src/physics/v2/tuning.ts m4only/src/physics/v2/tuning.ts
+--- base/src/physics/v2/tuning.ts	2026-09-15 21:59:28
++++ m4only/src/physics/v2/tuning.ts	2026-09-15 22:13:59
+@@ -79,7 +79,7 @@
+      */
+     wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number; /** R6: trim multiplier with both wheels off the ground (Rookie 1: the assist bounds the throttle nose-up in the air; Pro 0: the air is raw). */ airGain: number };
+   };
+-  brakes: { totalNm: number; frontFrac: number; brakeTau: number };
++  brakes: { totalNm: number; frontFrac: number; brakeTau: number; liftControl: number; liftLookahead: number };
+   aero: { cda: number; rho: number; chassisShare: number };
+   rider: {
+     mass: number;
+@@ -225,7 +225,7 @@
+     clutchSpeed: 7,
+     wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
+   },
+-  brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03 },
++  brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03, liftControl: 1, liftLookahead: 0.15 },
+   aero: { cda: 0.75, rho: 1.225, chassisShare: 0.6 },
+   rider: {
+     mass: 75,
+@@ -334,6 +334,7 @@
+   // at -1 / -0.5 / -0.25). No open-loop lever gives "lifts hard, does not loop": the thrust curve is a knife edge
+   // (F(4-8) 0.85 loops at 1.0 s, 0.80 lifts 8 deg) and a speed fade of the trim loops at the release (R6 status).
+   pro: {
++    brakes: { liftControl: 0 },
+     chassis: { mass: 54 },
+     wheel: { wheelbase: 1.28 },
+     suspension: { rear: { axle: { x: -0.575, y: -0.21 }, k: 12000 }, front: { axle: { x: 0.705, y: -0.215 }, k: 9000 } },

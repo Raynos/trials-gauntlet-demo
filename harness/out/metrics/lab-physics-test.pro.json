@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "lab-physics-test",
   "bike": "pro",
-  "updatedAt": "2026-09-16T01:08:58.306Z",
+  "updatedAt": "2026-09-16T03:08:06.258Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     3,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        7.708333333333333
+        7.725
       ]
     }
   ],
@@ -31,6 +31,8 @@
   "runs": [
     "20260915-161924-d8460c",
     "20260915-200013-85b8e5",
-    "20260915-200814-cfd3a4"
+    "20260915-200814-cfd3a4",
+    "20260915-214504-ed098c",
+    "20260915-220502-c11445"
   ]
 }

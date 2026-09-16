@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "p3-snow-line",
   "bike": "pro",
-  "updatedAt": "2026-09-16T01:08:58.302Z",
+  "updatedAt": "2026-09-16T03:08:06.254Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        31.6
+        31.816666666666666
       ]
     }
   ],
@@ -30,6 +30,8 @@
   "singleWall": null,
   "runs": [
     "20260915-195956-b623f0",
-    "20260915-200801-f573ed"
+    "20260915-200801-f573ed",
+    "20260915-214454-786f3b",
+    "20260915-220401-d170f2"
   ]
 }

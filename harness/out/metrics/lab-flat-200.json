@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "lab-flat-200",
   "bike": "rookie",
-  "updatedAt": "2026-09-16T01:21:28.279Z",
+  "updatedAt": "2026-09-16T03:06:03.851Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -31,6 +31,8 @@
   "runs": [
     "20260915-195806-3b983d",
     "20260915-200613-7a64fc",
-    "20260915-202043-41ed11"
+    "20260915-202043-41ed11",
+    "20260915-214216-f688df",
+    "20260915-220439-91f4aa"
   ]
 }

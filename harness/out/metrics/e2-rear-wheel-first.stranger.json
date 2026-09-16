@@ -7,8 +7,8 @@
     5
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "605a8174",
-  "updatedAt": "2026-09-16T01:40:52.823Z",
+  "srcFingerprint": "089e0885",
+  "updatedAt": "2026-09-16T03:24:27.626Z",
   "includeStale": false,
   "sessions": [
     {
@@ -16,7 +16,7 @@
       "agent": "s1",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "605a8174",
       "strangerAttempts": 2,
       "cleared": true,
@@ -49,6 +49,160 @@
           "checkpoint": 2,
           "obstacle": "ramp @ 322.2 m",
           "calls": 9
+        }
+      ]
+    },
+    {
+      "sessionId": "e2-rear-wheel-first-r14-s1-20260915-214558",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "2503f384",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 51.0667,
+      "calls": 21,
+      "wallMs": 207521,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 616.1,
+        "startTick": 1934,
+        "endTick": 6452,
+        "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r14-s1-20260915-214558.json"
+      },
+      "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r14-s1-20260915-214558.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 190.352,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 191.2 m",
+          "calls": 6
+        }
+      ]
+    },
+    {
+      "sessionId": "e2-rear-wheel-first-r14-s2-20260915-214558",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "2503f384",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 51.8417,
+      "calls": 17,
+      "wallMs": 131952,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 616.1,
+        "startTick": 1930,
+        "endTick": 6539,
+        "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r14-s2-20260915-214558.json"
+      },
+      "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r14-s2-20260915-214558.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 188.631,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 191.2 m",
+          "calls": 5
+        }
+      ]
+    },
+    {
+      "sessionId": "e2-rear-wheel-first-r14b-s1-20260915-220131",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "089e0885",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 45.4417,
+      "calls": 21,
+      "wallMs": 236031,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 616.1,
+        "startTick": 0,
+        "endTick": 5770,
+        "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r14b-s1-20260915-220131.json"
+      },
+      "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r14b-s1-20260915-220131.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e2-rear-wheel-first-r14b-s2-20260915-220131",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "089e0885",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 52.2167,
+      "calls": 22,
+      "wallMs": 235881,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 616.1,
+        "startTick": 3246,
+        "endTick": 6587,
+        "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r14b-s2-20260915-220131.json"
+      },
+      "recordingFile": "harness/inputs/e2-rear-wheel-first/stranger-e2-rear-wheel-first-r14b-s2-20260915-220131.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 324.375,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 11
         }
       ]
     },
@@ -190,7 +344,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 100707925,
+      "wallMs": 106922727,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -294,7 +448,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 100707913,
+      "wallMs": 106922716,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -380,14 +534,14 @@
     }
   ],
   "bike": "rookie",
-  "completed": 1,
-  "clearedCount": 1,
-  "medianAttempts": 2,
-  "medianFinishTime": 51.3333,
-  "medianCalls": 21,
-  "medianWallMs": 174351,
+  "completed": 2,
+  "clearedCount": 2,
+  "medianAttempts": 1.5,
+  "medianFinishTime": 48.8292,
+  "medianCalls": 21.5,
+  "medianWallMs": 235956,
   "census": {
-    "n": 1,
+    "n": 2,
     "minSessions": 2,
     "censored": [
       {
@@ -403,7 +557,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 4,
+    "staleExcluded": 7,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -414,8 +568,8 @@
     "factor": 1.5,
     "limit": 7.5
   },
-  "verdict": "INSUFFICIENT",
-  "pass": null,
+  "verdict": "UNDER-BAND",
+  "pass": false,
   "deaths": {
     "total": 1,
     "byReason": {
@@ -423,10 +577,10 @@
     },
     "byObstacle": [
       {
-        "obstacle": "ramp @ 322.2 m",
+        "obstacle": "ground",
         "count": 1,
         "xs": [
-          319.8
+          324.4
         ]
       }
     ],

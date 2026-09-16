@@ -7,8 +7,8 @@
     2
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "605a8174",
-  "updatedAt": "2026-09-16T01:40:52.804Z",
+  "srcFingerprint": "089e0885",
+  "updatedAt": "2026-09-16T03:24:27.595Z",
   "includeStale": false,
   "sessions": [
     {
@@ -387,7 +387,7 @@
       "agent": "s1",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "605a8174",
       "strangerAttempts": 2,
       "cleared": true,
@@ -420,6 +420,170 @@
           "checkpoint": 1,
           "obstacle": null,
           "calls": 8
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r14-s1-20260915-214558",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "2503f384",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 42.4167,
+      "calls": 14,
+      "wallMs": 139939,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 795,
+        "endTick": 5407,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14-s1-20260915-214558.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14-s1-20260915-214558.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 60.879,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 3
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r14-s2-20260915-214558",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "2503f384",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 42.7833,
+      "calls": 11,
+      "wallMs": 101218,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 1064,
+        "endTick": 5452,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14-s2-20260915-214558.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14-s2-20260915-214558.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 91.844,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 3
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r14b-s1-20260915-220131",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "089e0885",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 42.4417,
+      "calls": 13,
+      "wallMs": 160038,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 1072,
+        "endTick": 5412,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14b-s1-20260915-220131.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14b-s1-20260915-220131.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 94.197,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 4
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r14b-s2-20260915-220131",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "089e0885",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 44.45,
+      "calls": 16,
+      "wallMs": 197979,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 1073,
+        "endTick": 5649,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14b-s2-20260915-220131.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14b-s2-20260915-220131.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 94.373,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 3
         }
       ]
     },
@@ -534,7 +698,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 100707944,
+      "wallMs": 106922734,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -611,7 +775,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 100707937,
+      "wallMs": 106922727,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -761,14 +925,14 @@
     }
   ],
   "bike": "rookie",
-  "completed": 1,
-  "clearedCount": 1,
+  "completed": 2,
+  "clearedCount": 2,
   "medianAttempts": 2,
-  "medianFinishTime": 45.7,
-  "medianCalls": 20,
-  "medianWallMs": 158259,
+  "medianFinishTime": 43.44585,
+  "medianCalls": 14.5,
+  "medianWallMs": 179008.5,
   "census": {
-    "n": 1,
+    "n": 2,
     "minSessions": 2,
     "censored": [
       {
@@ -784,7 +948,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 10,
+    "staleExcluded": 13,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -795,26 +959,27 @@
     "factor": 1.5,
     "limit": 3
   },
-  "verdict": "INSUFFICIENT",
-  "pass": null,
+  "verdict": "PASS",
+  "pass": true,
   "deaths": {
-    "total": 1,
+    "total": 2,
     "byReason": {
-      "crash": 1
+      "crash": 2
     },
     "byObstacle": [
       {
         "obstacle": "ground",
-        "count": 1,
+        "count": 2,
         "xs": [
-          243.3
+          94.2,
+          94.4
         ]
       }
     ],
     "byCheckpoint": [
       0,
+      2,
       0,
-      1,
       0,
       0
     ]

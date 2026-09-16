@@ -249,7 +249,10 @@ describe('R6: the hop machine on planks (harness r11 m3 @ 410 / x3 @ 280 traces)
           expect(r.maxIntent).toBeLessThan(0.01);
           expect(r.fault).toBeNull();
           expect(r.pushTicks).toBe(0); // R7: `push` needs intent - a throttle key on the board is not a hop gesture
-          expect(r.maxLift).toBeLessThanOrEqual(0.3 * 3200 + 80);
+          // R8 (physics.md v2 status R8, deviation 16): the seat catches the body, so the rebound starts from rest and the
+          // Hill cap is F_max for the first centimetre (0.3 F_max only past 1 m/s of closing) - measured 1 399 N (Rookie
+          // v5 thr0); the row's meaning (a readout, not a throw: intent 0, no push, no fault) stands at 0.5 F_max
+          expect(r.maxLift).toBeLessThanOrEqual(0.5 * 3200);
         }
       }
     }

@@ -7,8 +7,8 @@
     6
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "605a8174",
-  "updatedAt": "2026-09-16T01:40:52.828Z",
+  "srcFingerprint": "089e0885",
+  "updatedAt": "2026-09-16T03:24:27.641Z",
   "includeStale": false,
   "sessions": [
     {
@@ -16,7 +16,7 @@
       "agent": "s1",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "605a8174",
       "strangerAttempts": 1,
       "cleared": true,
@@ -40,6 +40,130 @@
         "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r13-s1-20260915-203701.json"
       },
       "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r13-s1-20260915-203701.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e3-stairway-r14-s1-20260915-214558",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "2503f384",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 41.9417,
+      "calls": 11,
+      "wallMs": 54181,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5355,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r14-s1-20260915-214558.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r14-s1-20260915-214558.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e3-stairway-r14-s2-20260915-214558",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "2503f384",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 40.75,
+      "calls": 11,
+      "wallMs": 58702,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5221,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r14-s2-20260915-214558.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r14-s2-20260915-214558.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e3-stairway-r14b-s1-20260915-220131",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "089e0885",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 41.725,
+      "calls": 15,
+      "wallMs": 153146,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5339,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r14b-s1-20260915-220131.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r14b-s1-20260915-220131.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e3-stairway-r14b-s2-20260915-220131",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "089e0885",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 40.75,
+      "calls": 11,
+      "wallMs": 101586,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5221,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r14b-s2-20260915-220131.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-r14b-s2-20260915-220131.json",
       "deaths": []
     },
     {
@@ -243,7 +367,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 100707914,
+      "wallMs": 106922726,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -464,7 +588,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 100707910,
+      "wallMs": 106922722,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -738,14 +862,14 @@
     }
   ],
   "bike": "rookie",
-  "completed": 1,
-  "clearedCount": 1,
+  "completed": 2,
+  "clearedCount": 2,
   "medianAttempts": 1,
-  "medianFinishTime": 40.75,
-  "medianCalls": 11,
-  "medianWallMs": 45894,
+  "medianFinishTime": 41.2375,
+  "medianCalls": 13,
+  "medianWallMs": 127366,
   "census": {
-    "n": 1,
+    "n": 2,
     "minSessions": 2,
     "censored": [
       {
@@ -761,7 +885,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 8,
+    "staleExcluded": 11,
     "otherBikeExcluded": 0
   },
   "asserted": {
@@ -772,8 +896,8 @@
     "factor": 1.5,
     "limit": 9
   },
-  "verdict": "INSUFFICIENT",
-  "pass": null,
+  "verdict": "UNDER-BAND",
+  "pass": false,
   "deaths": {
     "total": 0,
     "byReason": {},
