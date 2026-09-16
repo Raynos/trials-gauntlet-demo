@@ -1,0 +1,555 @@
+{
+  "version": "5.2.1 LTS",
+  "objects": [
+    {
+      "name": "back",
+      "type": "LIGHT",
+      "data": "Area.002",
+      "modifiers": []
+    },
+    {
+      "name": "Braids growth mesh",
+      "type": "MESH",
+      "data": "scalp growth mesh.001",
+      "modifiers": [],
+      "vertices": 818,
+      "faces": 740
+    },
+    {
+      "name": "Braids hair head",
+      "type": "EMPTY",
+      "data": null,
+      "modifiers": []
+    },
+    {
+      "name": "curly growth mesh",
+      "type": "MESH",
+      "data": "curly growth mesh",
+      "modifiers": [],
+      "vertices": 876,
+      "faces": 796
+    },
+    {
+      "name": "curly hair",
+      "type": "CURVES",
+      "data": "Curves.009",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform"
+        },
+        {
+          "name": "Curly hair",
+          "type": "NODES",
+          "node_group": "curly hair"
+        }
+      ],
+      "curves": 303,
+      "points": 3636,
+      "surface": "curly growth mesh"
+    },
+    {
+      "name": "braided hair",
+      "type": "CURVES",
+      "data": "Curves.004",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.003"
+        },
+        {
+          "name": "GeometryNodes",
+          "type": "NODES",
+          "node_group": "Braided hair"
+        }
+      ],
+      "curves": 137,
+      "points": 2740,
+      "surface": "Braids growth mesh"
+    },
+    {
+      "name": "Curly hair head",
+      "type": "EMPTY",
+      "data": null,
+      "modifiers": []
+    },
+    {
+      "name": "cyber punk growth mesh",
+      "type": "MESH",
+      "data": "cyber punk growth mesh",
+      "modifiers": [],
+      "vertices": 876,
+      "faces": 796
+    },
+    {
+      "name": "cyberpunk hair",
+      "type": "CURVES",
+      "data": "Curves.006",
+      "modifiers": [
+        {
+          "name": "Set Hair Curve Profile",
+          "type": "NODES",
+          "node_group": "Set Hair Curve Profile"
+        },
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform"
+        },
+        {
+          "name": "Interpolate Hair Curves",
+          "type": "NODES",
+          "node_group": "Interpolate Hair Curves"
+        },
+        {
+          "name": "Clump Hair Curves",
+          "type": "NODES",
+          "node_group": "Clump Hair Curves"
+        },
+        {
+          "name": "Trim Hair Curves",
+          "type": "NODES",
+          "node_group": "Trim Hair Curves"
+        }
+      ],
+      "curves": 1744,
+      "points": 9656,
+      "surface": "cyber punk growth mesh"
+    },
+    {
+      "name": "Cyberpunk hair head",
+      "type": "EMPTY",
+      "data": null,
+      "modifiers": []
+    },
+    {
+      "name": "Eyebrows growth mesh",
+      "type": "MESH",
+      "data": "Eyebrows growth mesh",
+      "modifiers": [],
+      "vertices": 150,
+      "faces": 112
+    },
+    {
+      "name": "Eyebrows growth mesh.001",
+      "type": "MESH",
+      "data": "Eyebrows growth mesh",
+      "modifiers": [],
+      "vertices": 150,
+      "faces": 112
+    },
+    {
+      "name": "Eyebrows growth mesh.002",
+      "type": "MESH",
+      "data": "Eyebrows growth mesh",
+      "modifiers": [],
+      "vertices": 150,
+      "faces": 112
+    },
+    {
+      "name": "Eyebrows growth mesh.003",
+      "type": "MESH",
+      "data": "Eyebrows growth mesh",
+      "modifiers": [],
+      "vertices": 150,
+      "faces": 112
+    },
+    {
+      "name": "eyebrows.001",
+      "type": "CURVES",
+      "data": "Eyebrows",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.001"
+        },
+        {
+          "name": "Eeybrows",
+          "type": "NODES",
+          "node_group": "Eeybrows"
+        }
+      ],
+      "curves": 88,
+      "points": 386,
+      "surface": "Eyebrows growth mesh"
+    },
+    {
+      "name": "eyebrows.002",
+      "type": "CURVES",
+      "data": "Eyebrows",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.001"
+        },
+        {
+          "name": "Eeybrows",
+          "type": "NODES",
+          "node_group": "Eeybrows"
+        }
+      ],
+      "curves": 88,
+      "points": 386,
+      "surface": "Eyebrows growth mesh"
+    },
+    {
+      "name": "eyebrows.003",
+      "type": "CURVES",
+      "data": "Eyebrows",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.001"
+        },
+        {
+          "name": "Eeybrows",
+          "type": "NODES",
+          "node_group": "Eeybrows"
+        }
+      ],
+      "curves": 88,
+      "points": 386,
+      "surface": "Eyebrows growth mesh"
+    },
+    {
+      "name": "eyebrows.004",
+      "type": "CURVES",
+      "data": "Eyebrows",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.001"
+        },
+        {
+          "name": "Eeybrows",
+          "type": "NODES",
+          "node_group": "Eeybrows"
+        }
+      ],
+      "curves": 88,
+      "points": 386,
+      "surface": "Eyebrows growth mesh"
+    },
+    {
+      "name": "eyelashes",
+      "type": "CURVES",
+      "data": "Eyelashes",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.001"
+        },
+        {
+          "name": "GeometryNodes",
+          "type": "NODES",
+          "node_group": "eyelashes"
+        }
+      ],
+      "curves": 60,
+      "points": 480,
+      "surface": "Eyelashes growth mesh"
+    },
+    {
+      "name": "Eyelashes growth mesh",
+      "type": "MESH",
+      "data": "Eyelashes growth mesh",
+      "modifiers": [],
+      "vertices": 96,
+      "faces": 44
+    },
+    {
+      "name": "Eyelashes growth mesh.001",
+      "type": "MESH",
+      "data": "Eyelashes growth mesh",
+      "modifiers": [],
+      "vertices": 96,
+      "faces": 44
+    },
+    {
+      "name": "Eyelashes growth mesh.002",
+      "type": "MESH",
+      "data": "Eyelashes growth mesh",
+      "modifiers": [],
+      "vertices": 96,
+      "faces": 44
+    },
+    {
+      "name": "Eyelashes growth mesh.003",
+      "type": "MESH",
+      "data": "Eyelashes growth mesh",
+      "modifiers": [],
+      "vertices": 96,
+      "faces": 44
+    },
+    {
+      "name": "eyelashes.001",
+      "type": "CURVES",
+      "data": "Eyelashes",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.001"
+        },
+        {
+          "name": "GeometryNodes",
+          "type": "NODES",
+          "node_group": "eyelashes"
+        }
+      ],
+      "curves": 60,
+      "points": 480,
+      "surface": "Eyelashes growth mesh"
+    },
+    {
+      "name": "eyelashes.002",
+      "type": "CURVES",
+      "data": "Eyelashes",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.001"
+        },
+        {
+          "name": "GeometryNodes",
+          "type": "NODES",
+          "node_group": "eyelashes"
+        }
+      ],
+      "curves": 60,
+      "points": 480,
+      "surface": "Eyelashes growth mesh"
+    },
+    {
+      "name": "eyelashes.003",
+      "type": "CURVES",
+      "data": "Eyelashes",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.001"
+        },
+        {
+          "name": "GeometryNodes",
+          "type": "NODES",
+          "node_group": "eyelashes"
+        }
+      ],
+      "curves": 60,
+      "points": 480,
+      "surface": "Eyelashes growth mesh"
+    },
+    {
+      "name": "eyes",
+      "type": "MESH",
+      "data": "eyes",
+      "modifiers": [],
+      "vertices": 1028,
+      "faces": 1088
+    },
+    {
+      "name": "hairband",
+      "type": "CURVE",
+      "data": "BezierCircle",
+      "modifiers": []
+    },
+    {
+      "name": "head",
+      "type": "MESH",
+      "data": "female head",
+      "modifiers": [],
+      "vertices": 51257,
+      "faces": 51152
+    },
+    {
+      "name": "Info text.001",
+      "type": "FONT",
+      "data": "Text",
+      "modifiers": []
+    },
+    {
+      "name": "Info text.002",
+      "type": "FONT",
+      "data": "Text.003",
+      "modifiers": []
+    },
+    {
+      "name": "Info text.003",
+      "type": "FONT",
+      "data": "Text.001",
+      "modifiers": []
+    },
+    {
+      "name": "key",
+      "type": "LIGHT",
+      "data": "Area",
+      "modifiers": []
+    },
+    {
+      "name": "long hair growth mesh",
+      "type": "MESH",
+      "data": "long hair growth mesh",
+      "modifiers": [],
+      "vertices": 876,
+      "faces": 796
+    },
+    {
+      "name": "Long hair head",
+      "type": "EMPTY",
+      "data": null,
+      "modifiers": []
+    },
+    {
+      "name": "long hair main",
+      "type": "CURVES",
+      "data": "long hair",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.002"
+        },
+        {
+          "name": "Long hair",
+          "type": "NODES",
+          "node_group": "hair"
+        }
+      ],
+      "curves": 346,
+      "points": 6770,
+      "surface": "long hair growth mesh"
+    },
+    {
+      "name": "long hair strands",
+      "type": "CURVES",
+      "data": "Curves",
+      "modifiers": [
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform.004"
+        },
+        {
+          "name": "GeometryNodes",
+          "type": "NODES",
+          "node_group": "Set Hair Curve Profile"
+        }
+      ],
+      "curves": 30,
+      "points": 360,
+      "surface": "long hair growth mesh"
+    },
+    {
+      "name": "new hair",
+      "type": "CURVES",
+      "data": "Curves.003",
+      "modifiers": [
+        {
+          "name": "GeometryNodes.001",
+          "type": "NODES",
+          "node_group": "curves to hair DABY"
+        },
+        {
+          "name": "Surface Deform",
+          "type": "NODES",
+          "node_group": "Surface Deform"
+        },
+        {
+          "name": "GeometryNodes",
+          "type": "NODES",
+          "node_group": "hair"
+        },
+        {
+          "name": "Redistribute Curve Points",
+          "type": "NODES",
+          "node_group": "Redistribute Curve Points"
+        }
+      ],
+      "curves": 19,
+      "points": 285,
+      "surface": "long hair growth mesh"
+    },
+    {
+      "name": "Plane",
+      "type": "MESH",
+      "data": "Plane.004",
+      "modifiers": [
+        {
+          "name": "Auto Smooth",
+          "type": "NODES",
+          "node_group": "Auto Smooth"
+        }
+      ],
+      "vertices": 485,
+      "faces": 0
+    },
+    {
+      "name": "rim",
+      "type": "LIGHT",
+      "data": "Area.001",
+      "modifiers": []
+    },
+    {
+      "name": "Info text",
+      "type": "FONT",
+      "data": "Text.002",
+      "modifiers": []
+    }
+  ],
+  "texts": {
+    "Braid hair curves": "Braid hair curves\n\nBraids require quite a lot of points per curve in order to create the shape of a braid. Find the lowest possible subdivision in the node to create a nice shape buyt also keeping the hairstyle optimized for viewport display. \n\nShape controls if the braid should be more thin at the root or at the tip\n\nThe Hair Tie parameter points to an object (hairband) that is instanced at the end of each braid.\n\n",
+    "Clump hair curves (small clumps)": "Clump hair curves (small clumps)\n\nThis node creates smaller clumps out of the existing clumps. \n\nThe Guide Distance parameter has a smaller value than the previous Clump Hair Curves node in order to create smaller clumps.\n\nBy setting Existing Guide Map to FALSE and setting Clump Offset to another value than zero, the clumps start diverging from their original direction. This is a good way of breaking up the shape of the hair.",
+    "Curl Hair Curves": "Curl Hair Curves\n\nGuide Index ha no incoming data in order to control the size of the curls with the parameter Guide Distance. \n\nAdding some subdivision is useful since curls ususally need more hair points in order to create the curled shape.\n\nCurl Start is set to 1 so that the curl does not start directly at the root.\n\nFactor Start and End controls the radius of the curl\n\nFrequency controls the amount of curls along the hair strands.\n\nRandom Offset controls the thickness of the curl \"band\". By using a Spline Parameter node and a color ramp it is possible to control how much offset there should be along each hair curve.\n",
+    "Displace Hair Curves": "Displace Hair Curves\n\nWhen creating braids, the interpolation of the hairs can cause intersection wit the scalp, which makes the character look a bit bald. This issue is fixed by pushing out the hair closest to the root from the scalp.\n\nThis node is much faster to use compared to Shrinkwrap Hair Curves when you know exactly which part of the hair you want to deform.",
+    "Duplicate Hair Curves": "Duplicate Hair Curves\n\nThis node will duplicate the hair curves to a single strand of hair. This is useful when you want to be very specific about how the hair should be shaped. \n\nSince it only spawns a couple of hairs around each hair curve it is very cheap to compute. \n\n",
+    "Hair Curve Noise": "Hair Curve Noise\n\nThe purpose of this setup is to create some fly away hairs. By changing the value of the parameter Offset per Curve, each hair gets an unique noise shape. \n\nDistance controls how much the hairs should deform.\n\nIt is important to set a fairly low frequency of the noise for the hair in order to get bigger noise shapes.\n\n",
+    "Hair demo file info": "Hair Demo File\n\n------------------------------\nCredits:\nDaniel Bystedt. CC BY-SA license\n\nwww.twitter.com/3dbystedt\nwww.artstation.com/artist/dbystedt\n------------------------------\n\nContent:\n\nCyberpunk hair\nThis setup is intended to showcase the workflow of creating a hair setup in the modifier tab. It uses some vertex groups to control hair parameters. This can be useful for artist that are not familiar with node graphs, but gives less detailed control compared to to the geometry nodes setups.\n    \nLong hair\nThis hairstyle uses two separate hair objects in order to separate the grooming in different parts. Look at the notes in the geometry nodes tab to get more insight about the hair setup. \n\nCurly hair\nLook at the notes in the geometry nodes tab to get more insight about the hair setup.\n\nBraids hair\nLook at the notes in the geometry nodes tab to get more insight about the hair setup. \n------------------------------\n\nNotes:\n\nWhen grooming, it is best to turn off all other hair collections in order to get a responsive grooming experience. You can do that with the little checkbox to the right of the collection in the outliner.\n    \nIn order to groom a hair object, select it and then choose \"Sculpt Mode\" from the object interaction mode menu in the top left corner.\n\nWhen testing the nodes in the Geometry Nodes workspace (tab at the top of the UI), you can mute nodes witht the hotkey \"M\" to see the influence they have on the hairstyle.\n\nHairstyles like braids and curls requires addition subdivision of the curves. Default is 1, but has been changed to 3 in Properties > Render Properties > Curves.\n\nEach hairstyle is attached to a growth mesh, which is just a single sided haircap. The growth mesh is separated in two mesh island. The hairs will interpolate based on which mesh island the guide hairs belong to. It also has a vertex group called \"parting\". This is used to move hairs closer to the parting line in order to avoid a \"bald look\" at the parting line.\n\nIn Eevee, the best display mode of curves are Strip instead of Strand, which is default. This can be changed in Properties > Render Properties > Curves.\n\nThe human haid normally has 90,000-150,000 hairs. The amount of hair has been kept less than that to keep the viewport and grooming running smoothly since there are multiple hairstyles in this file.\n\n",
+    "Interpolate hair curves": "Interpolate hair curves\n\nThis node generates more hair curves that aligns to the shape of the guide curves. Surface object and Surface UV Map parameters are important in order for the node to generate the hair curves correctly. \n\nThe part by mesh island parameter is important for hairstyles that requires hair parting. The growth mesh should be separate in multiple mesh island. Each hair curve will interpolate per each mesh island. \n\nThe Guide index output is used by other nodes (such as Clump hair curves) in order to interpolate hair curves correctly.\n\nPosson Disk Distribution will generate hair with more even spacing, but will take longer time to calculate.\n\nViewport Amount is connected to the Group Input, which makes the user able to control the parameter from the modifier.",
+    "Long hair clumping": "Clump hair curves\n\nClumping is very useful for creating a natural look for the hair. \n\nThe Guide Distance parameter sets the size of each clump.\n\nShape parameter < 0 affects more of the root and values > 0 affects the tip more.\n\nTip spread parameter controls the width of the tip.\n\nThe Guide Index parameter needs data from the Interpolate Hair Curves node in order to interpolate hair to the correct guide hair. When the data is disconnected, the hairs starts intersecting with the head. This is most notably when using local view on the hair.",
+    "Notes": "Curl\n\n\nNeed to have random direction of curl per curl (i.e. clockwise or counter clockwise)\n\nWhen Guide Index is plugged into Curl Hair Curves, it seems that it is not possible to edit the size of the curls with Guide Distance\n\n------\n\nto do\n\nInterpolation is really weird when mesh island overlaps. Is the uv transfered by position somehow?\n\nClump does not seem to respect parting. ",
+    "Notes on fly away hair": "Separate geometry\n\nIn order to increase performance this nodes separates out the hair that will be deformed. This makes it faster to calculate, but changes the hair index order of the hair. \n\nBy changing the index order, nodes that requires Guide Index data (such as Clump Hair Curves) will not work properly.",
+    "Roll hair curves info": "Roll hair curves info\n\n\nRoll hair curves is useful for creating a bend at the end of the hair curve. \n\nBy placing the node before Interpolate hair curves, it becomes much faster to calculate",
+    "Set hair curve profile info": "Set hair curve profile \n\nThis node sets the radius (thickness) of each hair. The shape parameter controls if the root or the tip should be more thin",
+    "set node color": "import bpy\n\nnode_tree_name = 'hair'\n\nfor node in bpy.data.node_groups[node_tree_name].nodes:\n    if not node.select:\n        continue\n    node.use_custom_color = True\n    node.color = (0.20666, 0.154987, 0.0521326)\n\n",
+    "Shrinkwrap Hair Curves": "Shrinkwrap Hair Curves\n\nThe purpose of this node is iterate over any hair point that is intersecting with the head and push it outside of the head surface in order to avoid intersection.\n\nBy setting the parameter Above Surface to 0, only points that are below the surface is affected.",
+    "Smooth Hair Curves": "Smooth Hair Curves\n\nSince the flare ends can be a bit noisy in the shape, it is useful to take the FlareParameter output from the Braid Hair Curves and plug it into a Smooth Hair Curve node.\n\nPreserve Length takes some extra time to calculate, so only Lock Tips are activated in this setup.",
+    "Snap hair to parting edges": "Snap hair to parting edges\n\nThis is a custom node group created to minimize the scalp visibility at the hair parting\n\nThe growth mesh should contain a vertex group that defines the parting area and defined in the \"Parting Attribute\" parameter. The hair curves within the proximity will snap to the partin area.\n\nSince the hair shader has some tranaparency in the root, the effect of this node is more visible with solid viewport shading.\n\n",
+    "Text": "",
+    "Trim Hair Curves": "Trim Hair Curves\n\nThis node will shrink or grow each hair curve. By using the parameter \"Random offset\", the length of each hair curve will differ. This will give the hair a more natural look in combination with Clump hair Curves.\n"
+  },
+  "images": [
+    {
+      "name": "cyber punk hair color",
+      "size": [
+        512,
+        512
+      ],
+      "packed": true
+    },
+    {
+      "name": "hair ID",
+      "size": [
+        512,
+        512
+      ],
+      "packed": true
+    },
+    {
+      "name": "hair side parting density",
+      "size": [
+        512,
+        512
+      ],
+      "packed": true
+    }
+  ]
+}

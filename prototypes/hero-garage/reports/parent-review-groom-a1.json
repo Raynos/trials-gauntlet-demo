@@ -1,0 +1,17 @@
+{
+  "verdict": "FAIL \u2014 changed authored groom aligns but remains sparse and wiry",
+  "sha256": "a4aec27eb4716d5dd55c1d75276ee7d056e938619ca274904e038cba6a01eeb3",
+  "video": "captures/head-groom-a1/webkit-orbit-relight.webm",
+  "reviewMethod": "Sequential 1fps decoded frames05\u201312 from completed8.001-second WebKit orbit/relight; both sides and rear assessed. Sparse review cannot exclude every transient artifact.",
+  "visibleDefects": [
+    "Large scalp patches across crown, rear and right side read as thinning hair.",
+    "Fine angular wire loops do not form target broad loose curl groups.",
+    "Side/nape silhouette remains fuzzy and long while frontal fringe is recessed."
+  ],
+  "improvements": [
+    "Actual authored 3D strand paths replace broad flat atlas panels.",
+    "Measured evaluated-scalp alignment fixes initial48mm placement error."
+  ],
+  "next": "One bounded groom correction retaining more evaluated strands, smooth centerlines, source clump relations and deliberate short-nape/fringe shape. Face remains separately unaccepted.",
+  "performance": "8-second p95 26ms is not desktop30-second budget pass; no actualiPhone proof."
+}

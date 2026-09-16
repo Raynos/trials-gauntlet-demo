@@ -4,7 +4,7 @@ Independent Three.js production viewer for target 01. This package imports no ga
 
 ## Current milestone
 
-Milestone A remains unaccepted. Main production proceeds through local Blender and licensed authored assets independently of neural generation. MPFB correction2 improves beard fit and eyes but still fails hair and identity; a replacement authored hair source is being investigated. See [previous comparison clip](captures/head-authored-a3/webkit-orbit-relight.webm) and [parent verdict](reports/parent-review-authored-a3.json). Hunyuan is a separate parallel experiment and TRELLIS work is paused. No body, bike, riding motion, runtime budget or actual iPhone pass is claimed. The hourly heartbeat is paused while the active goal runs.
+Milestone A remains unaccepted. Main production proceeds through local Blender and licensed authored assets independently of neural generation. MPFB correction2 improves beard fit and eyes but still fails hair and identity; a Bystedt authored curl groom is fitted, but its first orbit still fails sparse coverage and wiry curl grouping; correction1 is underway. See [previous comparison clip](captures/head-groom-a1/webkit-orbit-relight.webm) and [parent verdict](reports/parent-review-groom-a1.json). Hunyuan is a separate parallel experiment and TRELLIS work is paused. No body, bike, riding motion, runtime budget or actual iPhone pass is claimed. The hourly heartbeat is paused while the active goal runs.
 
 ## Run and build
 

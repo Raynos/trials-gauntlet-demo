@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-09-16T11:50:36.927Z",
+  "createdAt": "2026-09-16T12:01:51.730Z",
   "scope": "GLB structure; no art or deformation acceptance",
   "assets": [
     {
@@ -109,6 +109,105 @@
         }
       ],
       "estimatedImageResidencyBytes": 41943032,
+      "limits": "RGBA8 full-mip image estimate excludes render targets, shadow maps, buffers, duplicate uploads, driver allocations. No compressed GPU format assumed. UV presence does not establish unwrap quality."
+    },
+    {
+      "file": "public/assets/street01-head-groom.glb",
+      "sha256": "a4aec27eb4716d5dd55c1d75276ee7d056e938619ca274904e038cba6a01eeb3",
+      "bytes": 11157420,
+      "generator": "Khronos glTF Blender I/O v5.2.40",
+      "triangles": 117444,
+      "primitives": 6,
+      "materials": [
+        {
+          "name": "MPFB_AdultMale_SourceProbe.eyebrow001",
+          "alphaMode": "MASK",
+          "doubleSided": true
+        },
+        {
+          "name": "MPFB_AdultMale_SourceProbe.high-poly",
+          "alphaMode": "MASK",
+          "doubleSided": false
+        },
+        {
+          "name": "Street01_Authored_EditableBody.body",
+          "alphaMode": "OPAQUE",
+          "doubleSided": false
+        },
+        {
+          "name": "Bystedt_DarkBrownStrands",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Street01_Authored_EditableBody.grinsegold_full_beard",
+          "alphaMode": "BLEND",
+          "doubleSided": false
+        },
+        {
+          "name": "Street01_Authored_EditableBody.grinsegold_moustache",
+          "alphaMode": "BLEND",
+          "doubleSided": false
+        }
+      ],
+      "uvPrimitives": 5,
+      "normalPrimitives": 6,
+      "skins": [],
+      "animations": [],
+      "morphPrimitiveCount": 0,
+      "textures": [
+        {
+          "index": 0,
+          "name": "eyebrow001",
+          "encodedBytes": 89619,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 1,
+          "name": "brown_eye",
+          "encodedBytes": 610817,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 2,
+          "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+          "encodedBytes": 5615645,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 3,
+          "name": "Full_beard_black_diff",
+          "encodedBytes": 583303,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 4,
+          "name": "Moustache_black_diff",
+          "encodedBytes": 268833,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        }
+      ],
+      "estimatedImageResidencyBytes": 40544932,
       "limits": "RGBA8 full-mip image estimate excludes render targets, shadow maps, buffers, duplicate uploads, driver allocations. No compressed GPU format assumed. UV presence does not establish unwrap quality."
     },
     {

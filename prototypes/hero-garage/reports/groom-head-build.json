@@ -1,0 +1,79 @@
+{
+  "status": "unaccepted changed-source groom trial",
+  "attribution": "Daniel Bystedt, Hair Styles demo, CC BY-SA (version unspecified upstream)",
+  "original_sha256": "1ad6202095c1793678fee7d69a7e9f8b5fdb6e5c293d300eb1062d2d437e8d48",
+  "source_evaluated_strands": 22418,
+  "runtime_strands": 1800,
+  "runtime_hair_triangles": 79200,
+  "runtime_hair_bounds_xyz": [
+    [
+      -0.12132825702428818,
+      0.11131731420755386
+    ],
+    [
+      -0.17179419100284576,
+      0.09392672032117844
+    ],
+    [
+      1.6069599390029907,
+      1.834916591644287
+    ]
+  ],
+  "runtime_sha256": "a4aec27eb4716d5dd55c1d75276ee7d056e938619ca274904e038cba6a01eeb3",
+  "runtime_bytes": 11157420,
+  "head_transform_scale_from_a3": 1.0242583433062717,
+  "fit": {
+    "source_crown": [
+      -8.294358849525452e-05,
+      -0.651103675365448,
+      16.400089263916016
+    ],
+    "target_evaluated_crown": [
+      -1.5501657249505918e-11,
+      -0.06116550788283348,
+      1.7190157175064087
+    ],
+    "source_top_band_width": 1.4710763692855835,
+    "target_top_band_width": 0.14054510742425919,
+    "uniform_scale": 0.09553896069482361,
+    "translation": [
+      7.924328739478496e-06,
+      0.001040260566161244,
+      0.15216823392953782
+    ],
+    "source_curve_to_scalp_relative_matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "root_projection_offset_m": 0.0008,
+  "uniform_authored_strand_length_factor": 0.7,
+  "limitations": [
+    "1800 sampled actual strands replace 22418 originals; portrait density and silhouette need played review.",
+    "Thin double-sided ribbons follow full 3D curls; still not hair-card atlas baking or full production groom optimization.",
+    "Face, skin, beard and eyes are frozen A3 source; no visual acceptance implied.",
+    "CC BY-SA version unspecified upstream; retain attribution/share-alike for derivative groom."
+  ]
+}
