@@ -64,7 +64,7 @@ function playground(id: string, name: string, build: (b: CourseBuilder, seg: (la
  * 1.0 m drop off its 8 x h ramp, a 0.4 m kerb hop, a scaffold tunnel under the stacks, and the wave home
  * under the crowd bridge.
  */
-export const P1 = playground('p1-container-yard', 'Container Yard', (b, seg) => {
+export const P1 = playground('p1-container-yard', 'Yard Playground', (b, seg) => {
   b.meta({
     biome: 'industrial',
     technique: 'the industrial kit at beginner pace',

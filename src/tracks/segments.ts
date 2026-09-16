@@ -101,21 +101,21 @@ export const SHIP_SEGMENTS: Readonly<Record<string, readonly TrackSegment[]>> = 
   ],
   // h2-gap-chain: Container Yard
   'h2-gap-chain': [
-    { from: 0, to: 95, label: 'Container Yard gantry; chain A: 4 x 1.0 kicker, 3 m gaps onto three 0.8 m platforms' },
-    { from: 95, to: 199, label: 'Rollers; Under the Stacks: 30 m concrete tunnel over a 28 m wave, hump row to checkpoint 1' },
-    { from: 199, to: 296, label: 'Chain B: 4 m gap, platforms stepping up 1.2 -> 2.1 (rear first), 2.4 m box, curved ramp' },
-    { from: 296, to: 378, label: 'Hump row, up the stack (+2.4 m) onto the crane apron' },
-    { from: 378, to: 508, label: 'The 30 m apron; The Crane Jump: 6 x 1.5 over 5 m of water onto the gapLanding; down, crowd' },
-    { from: 508, to: 637, label: 'Chain C, the demand: three 8 m platforms at 1.0 with 3 m gaps, last gap onto the incline' },
+    { from: 0, to: 107, label: 'Container Yard gantry; chain A: 4 x 1.0 kicker, 3 m gaps onto three 12 m platforms at 0.8 (round 11: 8 -> 12 m)' },
+    { from: 107, to: 211, label: 'Rollers; Under the Stacks: 30 m concrete tunnel over a 28 m wave, hump row to checkpoint 1' },
+    { from: 211, to: 324, label: 'Chain B: 4 m gap, 12 m platforms stepping up 1.2 -> 1.8 by 0.2 (rear first), 2.2 m box, curved ramp' },
+    { from: 324, to: 406, label: 'Hump row, up the stack (+2.4 m) onto the crane apron' },
+    { from: 406, to: 536, label: 'The 30 m apron; The Crane Jump: 6 x 1.5 over 5 m of water onto the gapLanding; down, crowd' },
+    { from: 536, to: 665, label: 'Chain C, the demand: three 8 m platforms at 1.0 with 3 m gaps, last gap onto the incline' },
   ],
   // h3-fire-line: The Pour
   'h3-fire-line': [
     { from: 0, to: 82, label: 'The Hall Door; Ladle 1: 22 deg kicker over four burning barrels onto the 14 deg ramp' },
     { from: 82, to: 201, label: 'Rollers, hump row, 28 m wave, tabletop to checkpoint 1' },
-    { from: 201, to: 334, label: 'Ladle 2: five barrels, then the 8 m brake zone and 0.45 m kerb hop; wave, into the tunnel' },
-    { from: 334, to: 447, label: 'The Pour: 60 m foundry tunnel, two fire rows 22 m apart, no brake between; crowd, rollers' },
-    { from: 447, to: 518, label: 'Ladle 4, the demand: six barrels into the 8 m brake zone, hump, 0.45 / 0.7 m kerbs, ramp' },
-    { from: 518, to: 615, label: '40 m glide down to the yard, hump row, finish' },
+    { from: 201, to: 338, label: 'Ladle 2: five barrels, then the 12 m brake zone and the 8 m x 0.45 m kerb hop; wave, into the tunnel' },
+    { from: 338, to: 455, label: 'The Pour: 60 m foundry tunnel, two fire rows with 16 m of flat between, no brake; crowd, rollers' },
+    { from: 455, to: 532, label: 'Ladle 4, the demand: six barrels into the 12 m brake zone, hump, 6 m, the 0.5 m kerb under the gantry, ramp' },
+    { from: 532, to: 629, label: '40 m glide down to the yard, hump row, finish' },
   ],
   // x1-vertical-limit: The Ascent
   'x1-vertical-limit': [
@@ -139,9 +139,9 @@ export const SHIP_SEGMENTS: Readonly<Record<string, readonly TrackSegment[]>> = 
   'x3-gauntlet': [
     { from: 0, to: 116, label: 'The Stack gantry; 45 deg plank onto the 12 m box, 22 m ramp to the 1.5 / 1.0 / 0.5 cascade' },
     { from: 116, to: 187, label: 'Rollers; 8 x 0.15 m stairs onto the 1.2 m box and down into the 2 m gap' },
-    { from: 187, to: 248, label: 'Hall Two: 50 m tunnel, 0.5 m hop ledge and 1.5 m hop across, the spinning shelf drum' },
-    { from: 248, to: 327, label: '3 m gap onto the 22 deg see-saw; 1.4 m lip climb into four kill slots at 2.0 m' },
-    { from: 327, to: 471, label: 'Two 5.5 m platforms at 1.0 with 2.5 m gaps; crowd; The Pour: 22 deg kicker over 6 barrels' },
-    { from: 471, to: 569, label: 'The Stack: 45 deg / 4.5 m from 30 m onto the 16 m box, three chimney caps, 24 m ramp home' },
+    { from: 187, to: 248, label: 'Hall Two: 50 m tunnel, 8 m x 0.5 m hop ledge and 1.5 m hop across, the spinning shelf drum' },
+    { from: 248, to: 333, label: '3 m gap onto the 22 deg see-saw; 1.4 m lip climb, 8 m top, four kill slots at 2.0 m' },
+    { from: 333, to: 477, label: 'Two 5.5 m platforms at 1.0 with 2.5 m gaps; crowd; The Pour: 22 deg kicker over 6 barrels' },
+    { from: 477, to: 575, label: 'The Stack: 45 deg / 4.5 m from 30 m onto the 16 m box, three chimney caps, 24 m ramp home' },
   ],
 };

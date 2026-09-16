@@ -7,10 +7,87 @@
     22
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "7e836cbe",
-  "updatedAt": "2026-09-15T22:34:53.932Z",
+  "srcFingerprint": "6040701b",
+  "updatedAt": "2026-09-16T00:11:28.297Z",
   "includeStale": false,
   "sessions": [
+    {
+      "sessionId": "h2-gap-chain-20260915-185758",
+      "agent": "t11b",
+      "bike": "pro",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "00359fe4",
+      "strangerAttempts": 6,
+      "cleared": true,
+      "finishTime": 90.4167,
+      "calls": 43,
+      "wallMs": 786596,
+      "firstCheckpointCalls": 4,
+      "faultsByCheckpoint": [
+        0,
+        4,
+        0,
+        0,
+        1
+      ],
+      "bestAttempt": {
+        "n": 6,
+        "cleared": true,
+        "x": 664.8,
+        "startTick": 9338,
+        "endTick": 11206,
+        "recordingFile": "harness/inputs/h2-gap-chain/stranger-h2-gap-chain-20260915-185758.json"
+      },
+      "recordingFile": "harness/inputs/h2-gap-chain/stranger-h2-gap-chain-20260915-185758.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 88.237,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 91.0 m",
+          "calls": 5
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 72.171,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 76.0 m",
+          "calls": 7
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 71.685,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 76.0 m",
+          "calls": 9
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 71.003,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 76.0 m",
+          "calls": 13
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 582.61,
+          "checkpoint": 3,
+          "obstacle": "box @ 583.6 m",
+          "calls": 37
+        }
+      ]
+    },
     {
       "sessionId": "h2-gap-chain-r7-p1-20260915-021350",
       "agent": "p1",
@@ -65,7 +142,7 @@
           "reason": "crash",
           "x": 84.219,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "box @ 84.0 m",
           "calls": 8
         },
         {
@@ -83,7 +160,7 @@
           "reason": "crash",
           "x": 258.757,
           "checkpoint": 1,
-          "obstacle": "box @ 258.8 m",
+          "obstacle": "ramp @ 260.8 m",
           "calls": 24
         },
         {
@@ -92,7 +169,7 @@
           "reason": "crash",
           "x": 247.966,
           "checkpoint": 1,
-          "obstacle": "box @ 248.8 m",
+          "obstacle": "gap @ 247.8 m",
           "calls": 27
         },
         {
@@ -101,7 +178,7 @@
           "reason": "crash",
           "x": 264.251,
           "checkpoint": 1,
-          "obstacle": "gap @ 263.8 m",
+          "obstacle": "gap @ 262.8 m",
           "calls": 33
         },
         {
@@ -110,7 +187,7 @@
           "reason": "crash",
           "x": 266.742,
           "checkpoint": 1,
-          "obstacle": "ramp @ 266.8 m",
+          "obstacle": "ramp @ 265.8 m",
           "calls": 37
         },
         {
@@ -119,7 +196,7 @@
           "reason": "crash",
           "x": 266.282,
           "checkpoint": 1,
-          "obstacle": "ramp @ 266.8 m",
+          "obstacle": "ramp @ 265.8 m",
           "calls": 43
         },
         {
@@ -128,7 +205,7 @@
           "reason": "crash",
           "x": 421.572,
           "checkpoint": 2,
-          "obstacle": "box @ 424.6 m",
+          "obstacle": null,
           "calls": 52
         },
         {
@@ -196,7 +273,7 @@
           "reason": "crash",
           "x": 66.366,
           "checkpoint": 0,
-          "obstacle": "box @ 65.0 m",
+          "obstacle": "ramp @ 66.0 m",
           "calls": 5
         },
         {
@@ -205,7 +282,7 @@
           "reason": "crash",
           "x": 72.407,
           "checkpoint": 0,
-          "obstacle": "ramp @ 73.0 m",
+          "obstacle": "ramp @ 76.0 m",
           "calls": 9
         },
         {
@@ -214,7 +291,7 @@
           "reason": "crash",
           "x": 63.489,
           "checkpoint": 0,
-          "obstacle": "ramp @ 62.0 m",
+          "obstacle": "gap @ 63.0 m",
           "calls": 11
         },
         {
@@ -223,7 +300,7 @@
           "reason": "crash",
           "x": 86.48,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "ramp @ 91.0 m",
           "calls": 16
         },
         {
@@ -232,7 +309,7 @@
           "reason": "crash",
           "x": 236.52,
           "checkpoint": 1,
-          "obstacle": "box @ 237.8 m",
+          "obstacle": "ramp @ 235.8 m",
           "calls": 29
         },
         {
@@ -241,7 +318,7 @@
           "reason": "crash",
           "x": 266.403,
           "checkpoint": 1,
-          "obstacle": "ramp @ 266.8 m",
+          "obstacle": "ramp @ 265.8 m",
           "calls": 35
         },
         {
@@ -250,7 +327,7 @@
           "reason": "crash",
           "x": 266.291,
           "checkpoint": 1,
-          "obstacle": "ramp @ 266.8 m",
+          "obstacle": "ramp @ 265.8 m",
           "calls": 39
         }
       ]
@@ -309,7 +386,7 @@
           "reason": "crash",
           "x": 66.48,
           "checkpoint": 0,
-          "obstacle": "box @ 65.0 m",
+          "obstacle": "ramp @ 66.0 m",
           "calls": 5
         },
         {
@@ -318,7 +395,7 @@
           "reason": "crash",
           "x": 74.169,
           "checkpoint": 0,
-          "obstacle": "ramp @ 73.0 m",
+          "obstacle": "ramp @ 76.0 m",
           "calls": 7
         },
         {
@@ -327,7 +404,7 @@
           "reason": "crash",
           "x": 84.427,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "box @ 84.0 m",
           "calls": 9
         },
         {
@@ -377,7 +454,7 @@
           "reason": "crash",
           "x": 64.964,
           "checkpoint": 0,
-          "obstacle": "box @ 65.0 m",
+          "obstacle": "ramp @ 66.0 m",
           "calls": 3
         },
         {
@@ -395,7 +472,7 @@
           "reason": "crash",
           "x": 567.372,
           "checkpoint": 3,
-          "obstacle": "box @ 569.6 m",
+          "obstacle": "gap @ 566.6 m",
           "calls": 26
         }
       ]
@@ -436,7 +513,7 @@
           "reason": "crash",
           "x": 563.437,
           "checkpoint": 3,
-          "obstacle": "ramp @ 563.6 m",
+          "obstacle": "ramp @ 564.6 m",
           "calls": 19
         }
       ]
@@ -483,7 +560,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 28,
-      "wallMs": 54381053,
+      "wallMs": 60175419,
       "firstCheckpointCalls": 2,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -495,7 +572,7 @@
           "reason": "crash",
           "x": 86.851,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "ramp @ 91.0 m",
           "calls": 6
         }
       ]
@@ -505,7 +582,7 @@
       "agent": "p1",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "817dddd2",
       "strangerAttempts": 4,
       "cleared": true,
@@ -564,7 +641,7 @@
       "agent": "p2",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "6f0cbe22",
       "strangerAttempts": 3,
       "cleared": true,
@@ -595,7 +672,7 @@
           "reason": "crash",
           "x": 80.152,
           "checkpoint": 0,
-          "obstacle": "gap @ 81.0 m",
+          "obstacle": "ramp @ 81.0 m",
           "calls": 4
         },
         {
@@ -604,7 +681,7 @@
           "reason": "crash",
           "x": 267.103,
           "checkpoint": 1,
-          "obstacle": "ramp @ 266.8 m",
+          "obstacle": "ramp @ 265.8 m",
           "calls": 13
         }
       ]
@@ -614,7 +691,7 @@
       "agent": "p3",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "817dddd2",
       "strangerAttempts": 3,
       "cleared": true,
@@ -645,7 +722,7 @@
           "reason": "crash",
           "x": 89.571,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "ramp @ 91.0 m",
           "calls": 3
         },
         {
@@ -654,7 +731,7 @@
           "reason": "crash",
           "x": 86.401,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "ramp @ 91.0 m",
           "calls": 6
         }
       ]
@@ -664,7 +741,7 @@
       "agent": "p1",
       "bike": "pro",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "817dddd2",
       "strangerAttempts": 6,
       "cleared": false,
@@ -695,7 +772,7 @@
           "reason": "crash",
           "x": 80.803,
           "checkpoint": 0,
-          "obstacle": "gap @ 81.0 m",
+          "obstacle": "ramp @ 81.0 m",
           "calls": 4
         },
         {
@@ -704,7 +781,7 @@
           "reason": "crash",
           "x": 73.453,
           "checkpoint": 0,
-          "obstacle": "ramp @ 73.0 m",
+          "obstacle": "ramp @ 76.0 m",
           "calls": 9
         },
         {
@@ -713,7 +790,7 @@
           "reason": "crash",
           "x": 266.243,
           "checkpoint": 1,
-          "obstacle": "ramp @ 266.8 m",
+          "obstacle": "ramp @ 265.8 m",
           "calls": 33
         },
         {
@@ -722,7 +799,7 @@
           "reason": "hazard",
           "x": 265.015,
           "checkpoint": 1,
-          "obstacle": "gap @ 263.8 m",
+          "obstacle": "ramp @ 265.8 m",
           "calls": 44
         },
         {
@@ -741,7 +818,7 @@
       "agent": "p2",
       "bike": "pro",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "817dddd2",
       "strangerAttempts": 10,
       "cleared": true,
@@ -772,7 +849,7 @@
           "reason": "crash",
           "x": 85.915,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "box @ 84.0 m",
           "calls": 7
         },
         {
@@ -781,7 +858,7 @@
           "reason": "crash",
           "x": 85.662,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "box @ 84.0 m",
           "calls": 13
         },
         {
@@ -790,7 +867,7 @@
           "reason": "crash",
           "x": 84.31,
           "checkpoint": 0,
-          "obstacle": null,
+          "obstacle": "box @ 84.0 m",
           "calls": 16
         },
         {
@@ -835,7 +912,7 @@
           "reason": "crash",
           "x": 253.75,
           "checkpoint": 1,
-          "obstacle": "gap @ 253.8 m",
+          "obstacle": "box @ 253.8 m",
           "calls": 59
         },
         {
@@ -844,7 +921,7 @@
           "reason": "crash",
           "x": 256.653,
           "checkpoint": 1,
-          "obstacle": "ramp @ 255.8 m",
+          "obstacle": "ramp @ 260.8 m",
           "calls": 62
         }
       ]
@@ -854,7 +931,7 @@
       "agent": "p3",
       "bike": "pro",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "817dddd2",
       "strangerAttempts": 5,
       "cleared": true,
@@ -885,7 +962,7 @@
           "reason": "crash",
           "x": 256.699,
           "checkpoint": 1,
-          "obstacle": "ramp @ 255.8 m",
+          "obstacle": "ramp @ 260.8 m",
           "calls": 6
         },
         {
@@ -894,7 +971,7 @@
           "reason": "crash",
           "x": 260.143,
           "checkpoint": 1,
-          "obstacle": "box @ 258.8 m",
+          "obstacle": "ramp @ 260.8 m",
           "calls": 8
         },
         {
@@ -903,7 +980,7 @@
           "reason": "crash",
           "x": 267.371,
           "checkpoint": 1,
-          "obstacle": "ramp @ 266.8 m",
+          "obstacle": "box @ 268.8 m",
           "calls": 10
         },
         {
@@ -912,24 +989,74 @@
           "reason": "crash",
           "x": 284.914,
           "checkpoint": 1,
-          "obstacle": null,
+          "obstacle": "ramp @ 289.8 m",
           "calls": 16
+        }
+      ]
+    },
+    {
+      "sessionId": "h2-gap-chain-tracks11-t11-20260915-184628",
+      "agent": "t11",
+      "bike": "pro",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "87f52698",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 70.975,
+      "calls": 31,
+      "wallMs": 627502,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 664.8,
+        "startTick": 7014,
+        "endTick": 8885,
+        "recordingFile": "harness/inputs/h2-gap-chain/stranger-h2-gap-chain-tracks11-t11-20260915-184628.json"
+      },
+      "recordingFile": "harness/inputs/h2-gap-chain/stranger-h2-gap-chain-tracks11-t11-20260915-184628.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 570.628,
+          "checkpoint": 3,
+          "obstacle": "ramp @ 569.6 m",
+          "calls": 24
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 596.657,
+          "checkpoint": 3,
+          "obstacle": "box @ 597.6 m",
+          "calls": 26
         }
       ]
     }
   ],
   "bike": "pro",
-  "completed": 3,
-  "clearedCount": 2,
-  "medianAttempts": 6,
-  "medianFinishTime": 122.45,
-  "medianCalls": 54,
-  "medianWallMs": 1052610,
+  "completed": 0,
+  "clearedCount": 0,
+  "medianAttempts": null,
+  "medianFinishTime": null,
+  "medianCalls": null,
+  "medianWallMs": null,
   "census": {
-    "n": 3,
+    "n": 0,
     "minSessions": 2,
     "censored": [],
-    "staleExcluded": 3,
+    "staleExcluded": 8,
     "otherBikeExcluded": 6
   },
   "asserted": {
@@ -940,92 +1067,16 @@
     "factor": 1.5,
     "limit": 33
   },
-  "verdict": "FAIL",
-  "pass": false,
+  "verdict": "INSUFFICIENT",
+  "pass": null,
   "deaths": {
-    "total": 18,
-    "byReason": {
-      "crash": 17,
-      "hazard": 1
-    },
-    "byObstacle": [
-      {
-        "obstacle": "ground",
-        "count": 8,
-        "xs": [
-          85.9,
-          85.7,
-          84.3,
-          99.7,
-          97,
-          355.4,
-          360.9,
-          284.9
-        ]
-      },
-      {
-        "obstacle": "ramp @ 266.8 m",
-        "count": 2,
-        "xs": [
-          266.2,
-          267.4
-        ]
-      },
-      {
-        "obstacle": "ramp @ 255.8 m",
-        "count": 2,
-        "xs": [
-          256.7,
-          256.7
-        ]
-      },
-      {
-        "obstacle": "gap @ 81.0 m",
-        "count": 1,
-        "xs": [
-          80.8
-        ]
-      },
-      {
-        "obstacle": "ramp @ 73.0 m",
-        "count": 1,
-        "xs": [
-          73.5
-        ]
-      },
-      {
-        "obstacle": "gap @ 263.8 m",
-        "count": 1,
-        "xs": [
-          265
-        ]
-      },
-      {
-        "obstacle": "ramp @ 245.8 m",
-        "count": 1,
-        "xs": [
-          245.2
-        ]
-      },
-      {
-        "obstacle": "gap @ 253.8 m",
-        "count": 1,
-        "xs": [
-          253.8
-        ]
-      },
-      {
-        "obstacle": "box @ 258.8 m",
-        "count": 1,
-        "xs": [
-          260.1
-        ]
-      }
-    ],
+    "total": 0,
+    "byReason": {},
+    "byObstacle": [],
     "byCheckpoint": [
       0,
-      7,
-      11,
+      0,
+      0,
       0,
       0
     ]

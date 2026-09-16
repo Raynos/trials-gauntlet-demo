@@ -105,14 +105,18 @@ export const H2 = course('h2-gap-chain', 'Container Yard', 'hard')
   .endSetPiece()
   .checkpoint() // 28 m
   .flat(16) // 15 m from the spawn (checkpoint rule)
-  // chain A: 8 m platforms with landing lips, every one ending in a straight 2 x 0.4 kicker; gaps 3 / 3 / 3 / 2
+  // chain A: 12 m platforms with landing lips, every one ending in a straight 2 x 0.4 kicker; gaps 3 / 3 / 3 / 2.
+  // Round 11: 8 -> 12 m (3 m landing + 7 m flat + 2 m kicker; was 3 + 3 + 2). On 8 m the rider touched down and was on the
+  // gas OVER the next lip 1 m later at 5-7 m/s, the v2 "gas through the lip at <= 10 m/s loops the Pro" case (r12 strangers:
+  // 75-85 m x5, 245-265 m x7 + the DNF; p2 "any lean tap or full gas at low speed after a landing swung the nose into a loop");
+  // 7 m of flat lets the rider land, settle and gas to 8-10 before coasting the lip, and a 14 m/s overfly lands on the flat, not the kicker face.
   .ramp({ length: 4, height: 1.0 })
   .gap({ width: 3 })
-  .platform(8, 0.8, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
+  .platform(12, 0.8, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
   .gap({ width: 3 })
-  .platform(8, 0.8, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
+  .platform(12, 0.8, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
   .gap({ width: 3 })
-  .platform(8, 0.8, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
+  .platform(12, 0.8, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
   .gap({ width: 2 })
   .flat(12)
   .camera({ mode: 'side' })
@@ -129,20 +133,24 @@ export const H2 = course('h2-gap-chain', 'Container Yard', 'hard')
   .checkpoint() // ~210 m
   .flat(16)
   .camera({ mode: 'high34' })
-  // chain B: landing 0.3 above launch every time -> rear first mandatory; 8 m platforms with lips, straight kickers
+  // chain B: the climbing chain, landing above launch every time -> rear first mandatory; 12 m platforms with lips, straight kickers.
+  // Round 11: 8 -> 12 m platforms and the step 0.3 -> 0.2 (1.2 / 1.4 / 1.6 / 1.8, exit box 2.2): the r12 strangers' deepest sink
+  // (255-265 m x7, the DNF "6 m platforms too short to rebuild speed, the bike bounces airborne 2-3 slots after every touchdown so
+  // any lean-forward under gas nose-dives"; p3 "at 14 m/s a flight overshot onto the next kicker's face"). Replayed: every death is
+  // gas on the 2 m kicker at 5-7 m/s (pitch 43 -> 88 -> 140) or a 14 m/s flight landing on the next lip. Gaps 4 / 3 / 3 / 2 / 3 unchanged.
   .ramp({ length: 5, height: 1.2 })
   .gap({ width: 4 })
-  .platform(8, 1.2, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
+  .platform(12, 1.2, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
   .gap({ width: 3 })
-  .platform(8, 1.5, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
+  .platform(12, 1.4, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
   .gap({ width: 3 })
-  .platform(8, 1.8, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
+  .platform(12, 1.6, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
   .gap({ width: 2 })
-  .platform(8, 2.1, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
+  .platform(12, 1.8, { landing: 0.4, landingLength: 3, length: 2, curve: 0 })
   .gap({ width: 3 })
-  .ramp({ length: 2, height: 0.4 }, { base: 2.0 })
-  .box({ width: 5, height: 2.4 })
-  .ramp({ length: 10, height: 2.4, curve: 0.3, direction: 'down' })
+  .ramp({ length: 2, height: 0.4 }, { base: 1.8 })
+  .box({ width: 5, height: 2.2 })
+  .ramp({ length: 10, height: 2.2, curve: 0.3, direction: 'down' })
   .flat(12)
   .camera({ mode: 'side' })
   .bumpRow(3, 0.3, 16)
@@ -199,7 +207,7 @@ export const H3 = course('h3-fire-line', 'The Pour', 'hard')
   .meta({
     biome: 'foundry',
     technique: 'commit at speed over fire, then stop hard',
-    demands: 'two fire rows 22 m apart inside the pour tunnel without a brake between them; then six barrels straight into an 8 m brake zone, a hump and a 0.45 + 0.25 m stepped kerb',
+    demands: 'two fire rows inside the pour tunnel without a brake between them; then six barrels straight into a 12 m brake zone, a hump and a 0.5 m kerb',
     attemptsBand: [18, 25],
     targetTimeS: 85, // round 9 gold: skill-3 bot 47.1 s x 1.6, rounded up to 5 s, non-decreasing through the tier (tracks.md round-9 table); platinum = 0.85 x this (core rules)
   })
@@ -238,9 +246,9 @@ export const H3 = course('h3-fire-line', 'The Pour', 'hard')
   .flat(2)
   .ramp({ length: 8, height: 2.0, direction: 'down' })
   .endSetPiece()
-  .flat(8) // brake zone: v2 measured 5.9 m from 10 m/s hard-back (7.1 neutral), authored 8
-  .ledge({ height: 0.45, length: 4 }) // the stop-and-hop (round 9 probe: 8 m + 0.45 kerb, reflex `good` 2 attempts 9/9)
-  .flat(12)
+  .flat(12) // brake zone: round 11, 8 -> 12 m — the landing off Ladle 2's ramp is 12-13 m/s and hard-back from 13 is ~10 m (the same fault as the demand stop: the r12 strangers 250-260 m x3, the tracks11 stranger x5)
+  .ledge({ height: 0.45, length: 8 }) // the stop-and-hop (round 9 probe: 8 m + 0.45 kerb, reflex `good` 2 attempts 9/9); round 11: top 4 -> 8 m — the tracks11 Pro stranger landed the hop and looped on the 4 m top three times (254 / 256 / 258 m, "the Pro's post-hop nose-up swing")
+  .flat(8)
   .wave(28, 1.5, 16)
   .flat(4)
   .smooth(28, -2) // beat 5: down into the casting tunnel mouth (a descent is flow: credited run-up)
@@ -256,7 +264,7 @@ export const H3 = course('h3-fire-line', 'The Pour', 'hard')
   .barrel({ count: 5, spacing: 0.8 })
   .flat(2)
   .ramp({ length: 8, height: 2.0, direction: 'down' })
-  .flat(12) // land, do NOT brake: 12 m of flat from a rolling ~8 m/s exit is enough for the second lip
+  .flat(16) // land, do NOT brake: 16 m of flat from a rolling ~8 m/s exit is enough for the second lip. Round 11: 12 -> 16 m — the r12 Pro strangers took lip 2 with lip 1's rear-first landing pitch still on (32 deg nose-up ON the 22 deg ramp face, then a full backflip: 405 / 410 m x4, "thrown into a violent pitch rotation no lean or brake counters"); 4 more m of flat is where that pitch damps out
   .ramp({ length: 5, height: 2.0 })
   .flat(1)
   .barrel({ count: 6, spacing: 0.8 })
@@ -279,12 +287,18 @@ export const H3 = course('h3-fire-line', 'The Pour', 'hard')
   .flat(2)
   .ramp({ length: 8, height: 2.0, direction: 'down' })
   .camera({ mode: 'side-tight' })
-  .flat(8) // brake zone
-  .hump(0.3, 3) // speed hump at the end of the brake zone
-  .flat(3)
-  .ledge({ height: 0.45, length: 3 }) // the stepped kerb: 0.45 now, 0.25 more in 3 m
-  .ledge({ height: 0.7, length: 4 })
-  .ramp({ length: 6, height: 0.7, direction: 'down' })
+  // Round 11: the stop is re-authored on the r12 replay. The 8 m "brake zone" followed a landing at 12-13 m/s (hard-back from 13 m/s
+  // is ~10 m), so no stranger was slow at the hump; the hump launched the still-fast bike and the 0.45 face 3 m later took the front
+  // wheel nose-first (505 m x6 + 510 / 515: pitch -146 at 12 m/s), and from a crawl the 0.45 + 0.25 pair was two hops 3 m apart whose
+  // second gas loops the Pro (pitch 140-166 at 1 m/s). The two tiers were also below the stranger view's 0.5 m row ("invisible at the
+  // ASCII row resolution"). Now: 12 m of brake zone, the hump, 6 m to recover from it, ONE 0.5 m kerb 6 m long (the hop band is
+  // 0.3-0.6 at 5 m/s, 0.45-0.7 at 8) under a girder gantry so the render lights the edge, and a 6 m down-ramp.
+  .flat(12) // brake zone: 13 m/s hard-back = 10 m
+  .hump(0.3, 3) // speed hump: a bike still fast here gets air and 6 m to land it before the kerb, not 3
+  .flat(6)
+  .arch({ style: 'girder', span: 6, height: 4 }) // the gantry over the kerb's approach: the lit edge
+  .ledge({ height: 0.5, length: 6 }) // the stop-and-hop: one readable step (was 0.45 x 3 + 0.7 x 4)
+  .ramp({ length: 6, height: 0.5, direction: 'down' })
   .endSetPiece()
   .camera({ mode: 'side' })
   .flat(12)

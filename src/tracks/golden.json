@@ -84,18 +84,18 @@
     "finishX": 622.3
   },
   "h2-gap-chain": {
-    "hash": "6f7110fcbf6e4b15",
+    "hash": "98647438be6695da",
     "colliders": 64,
     "hazards": 14,
     "obstacles": 63,
-    "finishX": 636.8
+    "finishX": 664.8
   },
   "h3-fire-line": {
-    "hash": "b3304725886fc03f",
-    "colliders": 63,
+    "hash": "e761dd99b994ee19",
+    "colliders": 62,
     "hazards": 26,
     "obstacles": 30,
-    "finishX": 615.2
+    "finishX": 629.2
   },
   "x1-vertical-limit": {
     "hash": "cd1451008b6850dd",
@@ -112,11 +112,11 @@
     "finishX": 563.6
   },
   "x3-gauntlet": {
-    "hash": "dcb0df6b032a98af",
+    "hash": "570081114fc3f8c5",
     "colliders": 67,
     "hazards": 17,
     "obstacles": 56,
-    "finishX": 569.048486
+    "finishX": 575.048486
   },
   "p1-container-yard": {
     "hash": "ff682526064d0601",
