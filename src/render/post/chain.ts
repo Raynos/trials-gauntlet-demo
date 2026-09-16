@@ -317,6 +317,20 @@ class AOPass extends Pass {
  * full-frame HalfFloat read + write fewer). `render` is the addon's body minus that blend.
  */
 class BloomPass extends UnrealBloomPass {
+  constructor(resolution: THREE.Vector2, strength: number, radius: number, threshold: number) {
+    super(resolution, strength, radius, threshold);
+    // One NaN texel in the HDR scene (a material whose tangent frame degenerates, a shader
+    // dividing by zero on a single pixel) would otherwise ride the blur across every mip and the
+    // composite adds NaN to the whole frame: the canvas goes black with the HUD still live. The
+    // high-pass is the one place every scene texel enters the chain, so it drops such texels here.
+    const hp = this.materialHighPassFilter;
+    hp.fragmentShader = hp.fragmentShader.replace(
+      'vec4 texel = texture2D( tDiffuse, vUv );',
+      'vec4 texel = texture2D( tDiffuse, vUv );\n\t\t\tif ( any( isnan( texel ) ) || any( isinf( texel ) ) ) texel = vec4( 0.0 );',
+    );
+    hp.needsUpdate = true;
+  }
+
   /** The mip composite (strength + radius applied), at half the bloom input size. */
   get texture(): THREE.Texture {
     return this.renderTargetsHorizontal[0]!.texture;

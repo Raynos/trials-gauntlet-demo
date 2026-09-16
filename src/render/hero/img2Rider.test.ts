@@ -18,6 +18,19 @@ beforeAll(() => {
 afterAll(() => vi.restoreAllMocks());
 
 describe('img2threejs runtime adapter', () => {
+  it('never draws an anisotropic material on a mesh without uv (a NaN tangent frame blacked the whole frame through the bloom)', () => {
+    let uvless = 0;
+    rider.source.scene.traverse(o => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || mesh.geometry.getAttribute('uv')) return;
+      uvless++;
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        expect((m as THREE.MeshPhysicalMaterial).anisotropy ?? 0, mesh.name).toBe(0);
+      }
+    });
+    expect(uvless).toBeGreaterThan(0); // the hair shell — the case this guards
+  });
+
   it('retains generated skins and aligns limb bind axes with their actual children', () => {
     expect(rider.debug.bones).toBe(19);
     expect(rider.triangles).toBeGreaterThan(1000);

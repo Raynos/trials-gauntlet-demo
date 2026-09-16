@@ -105,6 +105,23 @@ function document(): GLTF {
   for (const skeleton of new Set(skins.map(m => m.skeleton))) skeleton.calculateInverses();
   for (const skin of skins) skin.bind(skin.skeleton, skin.matrixWorld);
   for (const b of bones) b.name = b.name.replace(/\.([LR])$/, (_, s: string) => s === 'L' ? '.R' : '.L');
+  // The generator hands anisotropic MeshPhysicalMaterials to meshes it built without a `uv`
+  // attribute (the hair shell: 22 040 vertices, position + normal only). three derives the
+  // anisotropy tangent frame from dFdx/dFdy of vUv; with no uv that frame is normalize(0) and the
+  // hair's fragments come out NaN in the HDR target — the bloom blur spread them over every
+  // texel and the whole frame composited black (the phone's "img2 rider = black screen").
+  // A NaN is a game-wide fault, not a rider blemish, so the adapter strips the term.
+  model.traverse(o => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh || mesh.geometry.getAttribute('uv')) return;
+    for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+      const physical = m as THREE.MeshPhysicalMaterial;
+      if (physical.isMeshPhysicalMaterial && physical.anisotropy > 0) {
+        physical.anisotropy = 0;
+        physical.needsUpdate = true;
+      }
+    }
+  });
   // Authoring metadata contains live Object3Ds and skeletons (cyclic); SkeletonUtils clones
   // userData through JSON. Runtime animation needs only the actual hierarchy and skin data.
   model.traverse(o => { o.userData = {}; });
