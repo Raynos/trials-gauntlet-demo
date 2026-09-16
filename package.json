@@ -1,7 +1,7 @@
 {
   "name": "trials-gauntlet-demo",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "2.5D physics trials-bike game (Three.js + TypeScript) with a headless evidence harness",
   "scripts": {
