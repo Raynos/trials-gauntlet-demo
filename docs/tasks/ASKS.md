@@ -12,9 +12,9 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 |---|---|---|---|
 | 1 | Deploy latest and make it officially **0.2.1** in the releases | **done** | tag `v0.2.1` = `c7a82e8`, pin `613f6bf`, https://trials-gauntlet-v0-2-1.vercel.app, `RELEASES.md` row; gate 27/30 on the export, live pin replays the b1 Pro golden bit-equal |
 | 2 | **Selecting img2threejs is completely broken** (black scene, HUD alive) | **done** | `b06f9ed` — the generator's uv-less hair shell carried an anisotropic material → NaN → bloom spread it over the frame; adapter zeroes anisotropy on uv-less meshes, the bloom high-pass drops NaN/Inf; reproduced + verified headless on Chromium and WebKit; deployed to production |
-| 3 | I need to actually **see the model in the garage** / the hero is **blocked by buttons** | **in flight** | garage owner (subagent): hero unobstructed, ≥ 45 % of viewport height |
-| 4 | The garage should **look like a garage**, the hero **bigger**, a **model-explorer view I can rotate** | **in flight** | same owner: garage set (floor, tool wall, key lamp), `orbit` camera override, touch-drag rotate + pinch/wheel zoom |
-| 5 | **No outfit / Classic-Blender-Img2 selectors on the main menu or pause menu** — all in the garage | **in flight** | same owner |
+| 3 | I need to actually **see the model in the garage** / the hero is **blocked by buttons** | **done** | `2c1cfe9` — hero 61 % of the viewport, 0 tappables over it (was 92 % covered); v0.2.2 |
+| 4 | The garage should **look like a garage**, the hero **bigger**, a **model-explorer view I can rotate** | **done** | `2c1cfe9` — BE3 dusk shutter-door set, orbit camera, drag/pinch; clip in `docs/evidence/garage-rebuild/`; v0.2.2 |
+| 5 | **No outfit / Classic-Blender-Img2 selectors on the main menu or pause menu** — all in the garage | **done** | `2c1cfe9`; experimental-rider e2e proves both menus carry no rows; v0.2.2 |
 | 6 | **5 Codex image mockups of a new garage** | **needs pick** | `assets/design/garage/` A pit box · B tool wall · C showroom spot · D workbench · E shutter door + contact sheet + SPEC (recommends C); sent to the user |
 | 7 | Did we have 5 mockups of a new **level select**? | **done** | yes — `assets/design/tracks/` A–E (`3351dbb`), never picked; sent to the user |
 | 8 | **What mockups are lying around not built** | **done** | tracks A–E (the only orphan); menu B, loading B, controls G, pause chosen direction are built; `hero-targets` are art targets, not UI |
@@ -26,13 +26,13 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 14 | **Update AGENTS.md** with the asks system; document undocumented processes — terse, pointers only | **done** | six pointer bullets appended (asks, human queue, session brief, design rounds, pins/evidence/device, harness docs) |
 | 15 | **Before-and-after videos** of the 0.1.0 vs 0.2.1 Blender models | **done** | `docs/evidence/hero-delta-v010-v021/{rider,bike}-turntable-before-after.mp4` (360°, 6 s, side by side); sent |
 | 16 | Garage: **UI layout = B**, **set = E**; three new mockups combining them | **done** | `c3fc76f` `assets/design/garage/round2/` BE1–BE3 + SPEC; sent |
-| 17 | **BE3 dusk** for the garage | **in flight** | the garage builder was told: B layout, E set, dusk sodium key, wet floor (cheap trick, perf caps hold) |
+| 17 | **BE3 dusk** for the garage | **done** | `2c1cfe9`; draws down (WebKit medium 148 → 101), synced frame 3.6 → 2.3 ms |
 | 18 | Process, run by me: AGENTS.md trimmed to 3 bullets; queue delete-on-decision; **80/20 markdown budget** with a commit guard (refuse > 40 % unless Design:/Docs:) | **done** | `d788414`; `.githooks/commit-msg` → `.claude/hooks/md-ratio.sh`; the brief prints the tree's share (13 % today) |
 | 19 | Port from FF15: **in-game review inbox + drain skill** — Vercel function + Blob, **password entered once, kept in localStorage** | **done** | `70c5d47`, live on production (`?review=1` shows the ✎ NOTE pill; password in chat + scratch); `pnpm inbox:pull`, `/drain-inbox`; 874/874; HR-05 = the first real note |
 | 20 | Hero art (HR-02): the user takes it to Codex themselves | **dropped** (user-owned) | not an agent item here; `prototypes/hero-garage` stays the user's |
-| 21 | **v0.2.2 when the garage lands**; **deploy on green**, review live on the phone | **open** | pin recipe in `RELEASES.md`; HR-04 is the review |
+| 21 | **v0.2.2 when the garage lands**; **deploy on green**, review live on the phone | **done** | tag `v0.2.2` = `d8d5886`, https://trials-gauntlet-v0-2-2.vercel.app, production moved; HR-04 is the review |
 | 22 | **5 variants of A3 isometric diorama** for the level select | **done** | `d01c42d` `assets/design/tracks/round3/` A3a–A3e + SPEC; sent |
-| 23 | "Enough questions — **build autonomously**: new garage, new levels, all the little asks; leave the physics-library plan for another agent" | **in flight** | **level select landed** `a302e62` (A3b lit like A3e), live on production; **inbox landed** `70c5d47`; **garage** still building; physics library untouched |
+| 23 | "Enough questions — **build autonomously**: new garage, new levels, all the little asks; leave the physics-library plan for another agent" | **done** | **all landed**: level select `a302e62`, inbox `70c5d47`, garage `2c1cfe9`; pinned **v0.2.2**; physics library untouched |
 | 24 | Next after the garage = **level select**; keep all five outfits + three models; physics-library toggle off the main menu when built; stray `0` deleted | **done** | recorded; `0` removed in `d01c42d` |
 
 | HG-01 | Full person + full bike, screenshot in Three.js; work breadth first, pause hair/beard depth | **in flight** | Codex hero owner: complete scene and six poses present; packaged runtime verified, screenshot/recording in captures/whole-package-round17; hair/beard paused, production plan remains open |
