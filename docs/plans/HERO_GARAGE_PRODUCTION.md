@@ -8,7 +8,7 @@ Status: Breadth-first assembly in progress, September 16, 2026. The user explici
 
 - **Visual approval:** the user approves the identity board and each major visual milestone, but explicitly authorizes provisional parent approval and continued overnight work while asleep. Preserve the board and milestone evidence for final user review; do not label provisional review as final user acceptance.
 - **Sources and spending:** start with free licensed assets and local Blender tools. Free personal-use/noncommercial assets are allowed for this personal laptop project; CC0 is not required. Record exact terms and keep restricted assets local where required. Ask before spending on assets, tools, hosted services or specialist work.
-- **Usage floor:** stop sustained work at 20% weekly allowance remaining, replacing the older 30% floor in the handoff. Check account usage during the run.
+- **Usage floor:** stop sustained work at 2% weekly allowance remaining under the latest approved art-only finishing plan, replacing the earlier 20% floor. Check account usage during the run.
 - **Stalled likeness:** after two head-and-hair correction attempts with no visible improvement, change the free asset or method. Bring the user a concrete decision if still blocked.
 - **Fixed design:** retain target 01's mustard hoodie, exposed face, tousled dark curls and blue/white bike, with seated neutral, forward rise and rearward hip shift. Develop missing angles while preserving that design, then submit the identity board for approval.
 - **Mobile garage:** target 30 fps to preserve more detail, verified on an actual iPhone/Safari. This decision applies to the garage; gameplay performance requirements remain separate.
@@ -300,3 +300,11 @@ The fresh frozen game ship gate passes cold boot, 1,038 byte-identical replay ti
 ### Round 25 — collar texture coordinates repaired
 
 All 584 zero-area collar UV triangles now map inside an existing heavy-cotton atlas triangle, with explicit Blender-to-glTF V conversion. Duplicate vertices isolate the edit from neighboring garment UVs. Verified rendered triangle-corner positions, normals, joints and weights are identical; non-body accessor bytes and all six animations are unchanged. Matched portrait and decoded forward-rise orbit frames show reduced dark stretching. The corrected derivative is active in the catalog and both previews, SHA `67302f649eff8f536e17f99c55c15c673503bf3ccdf8e64f97ca87ec41d69e3c`. Per-triangle texture reuse is provisional; continuous unwrap, rough collar shape and seam remain open. See `reports/collar-uv-round25-review.json` in the prototype.
+
+### Approved art-only finishing push
+
+User authorizes flexible use of remaining allowance to a hard 2% floor. Two roughly equal passes guide priorities without fixed allocations: largest whole-rider/bike visual improvements, then refinement/verification/export. Preserve saved identity. Claude + Opus own game integration; this push changes only prototype art and asset delivery. No spending, neural detours, new outfits or deployment.
+
+### Round26 — bike finish adopted; collar method rejected
+
+Adopted the blue front fender and satin engine-edge materials. Geometry/attachments remain unchanged and suspension/contact verification passes. Six-strip collar candidates with continuous UVs and closed front strip seam passed contact checks but failed appearance review; retain the round25 rider. Next clothing work must rebuild the joined shoulder/hoodie surface. `reports/art-round26-review.json` records evidence and `art/ART_HANDOFF.md` identifies active assets, recipes and limitations. Repeated usage-monitor calls fail with Transport closed; current allowance is unknown, so no extended unattended run is justified against the hard2% floor.

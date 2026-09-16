@@ -21,14 +21,14 @@
     {
       "id": "street01-bike",
       "label": "Blue/white trials bike",
-      "url": "/assets/street01-bike-materials.glb",
+      "url": "/assets/street01-bike-refined.glb",
       "kind": "bike",
       "position": [
         0,
         0.34,
         0
       ],
-      "mobileUrl": "/assets/street01-bike-mobile-ktx.glb"
+      "mobileUrl": "/assets/street01-bike-refined.glb"
     }
   ],
   "notes": [

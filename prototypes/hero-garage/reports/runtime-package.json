@@ -10,8 +10,8 @@
     },
     {
       "path": "assets/catalog.json",
-      "bytes": 1189,
-      "sha256": "de3248d26b84ccb226edb2d52506535fd9086b9e091676d2a734f307466b807e"
+      "bytes": 1184,
+      "sha256": "b70ef1c66422da0960cedf1c15b3244dc703de8e7809d6b85165ebe3a40611c8"
     },
     {
       "path": "assets/index-B2aW2QAt.css",
@@ -24,14 +24,9 @@
       "sha256": "ef77df99e661d25a08103848de5772e6d7662a1230e332ab29d8200ced3efb12"
     },
     {
-      "path": "assets/street01-bike-materials.glb",
-      "bytes": 6053376,
-      "sha256": "e8ea68d5a6ad504b0e969cd716e957bcac3f436acd3c9eac1357ee722cf05b43"
-    },
-    {
-      "path": "assets/street01-bike-mobile-ktx.glb",
-      "bytes": 3263048,
-      "sha256": "da0347ff994e06943f494a411caba4c6dc8cd0c78eff6cc0251dd1d5657f112a"
+      "path": "assets/street01-bike-refined.glb",
+      "bytes": 6057044,
+      "sha256": "5fac61e4fb12a2425bb3d3f519fe90d8047c593f99096da5fed71b595771b012"
     },
     {
       "path": "assets/street01-rider-collar-uv.glb",
@@ -89,12 +84,20 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 190075047,
-  "sourceDistBytes": 591764433,
+  "totalBytes": 186815662,
+  "sourceDistBytes": 770981452,
   "excludedFiles": [
     {
       "path": "assets/basis_transcoder-VXdx5NbI.wasm",
       "bytes": 527333
+    },
+    {
+      "path": "assets/street01-bike-materials.glb",
+      "bytes": 6053376
+    },
+    {
+      "path": "assets/street01-bike-mobile-ktx.glb",
+      "bytes": 3263048
     },
     {
       "path": "assets/street01-bike-mobile.glb",
@@ -137,6 +140,10 @@
       "bytes": 2760380
     },
     {
+      "path": "assets/street01-rider-hoodie-refine.glb",
+      "bytes": 173159980
+    },
+    {
       "path": "assets/street01-rider-identity.glb",
       "bytes": 173117400
     },
@@ -168,8 +175,7 @@
   "verifiedLocalUrls": [
     "assets/index-B2aW2QAt.css",
     "assets/index-BnIdGVnQ.js",
-    "assets/street01-bike-materials.glb",
-    "assets/street01-bike-mobile-ktx.glb",
+    "assets/street01-bike-refined.glb",
     "assets/street01-rider-collar-uv.glb",
     "index.html",
     "references/target01.png",

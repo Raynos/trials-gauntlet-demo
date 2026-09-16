@@ -34,7 +34,9 @@ Round 24 removes the 347 identified old-neck triangles: pale overlays disappear 
 
 Round 25 repairs 584 collapsed collar UV triangles; dark texture streaks improve, while geometry, skinning and saved identity remain unchanged. [Review](../../prototypes/hero-garage/reports/collar-uv-round25-review.json). Active catalog now uses the reproducible collar-UV derivative. Ragged collar shape and final continuous unwrap remain open.
 
-The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **20% weekly allowance floor**. The earlier hourly automation remains paused; this goal is actively progressing through whole-scene work. Latest checked allowance is 21% remaining. Final visual approval stays with the user. Better body/clothing sources are being assessed without changing target01 identity. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
+Round 26 begins the approved art-only finishing push (hard2% reserve; flexible passes; Claude + Opus own integration). Blue fender/satin engine materials are adopted after recorded review and mechanical checks. Two collar transition candidates failed visual review; the active rider is preserved and next work changes method to joined hoodie reconstruction. [Art handoff](../../prototypes/hero-garage/art/ART_HANDOFF.md). Usage service currently returns `Transport closed`, so extended work awaits restored budget monitoring.
+
+The user authorized provisional overnight visual decisions, free personal/noncommercial licensed assets, a **30 fps mobile garage** and a **2% weekly allowance floor**. The earlier hourly automation remains paused; this goal is actively progressing through whole-scene work. Latest checked allowance is 21% remaining. Final visual approval stays with the user. Better body/clothing sources are being assessed without changing target01 identity. No spending/contact/publishing occurred. Existing concurrent gameplay/physics changes are preserved.
 
 ## Independent audit — 2026-09-15
 

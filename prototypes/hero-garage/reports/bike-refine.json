@@ -1,0 +1,20 @@
+{
+  "sourceHashes": {
+    "assets/blender/source/bike.blend": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b",
+    "prototypes/hero-garage/art/street01-bike-materials.blend": "9cd4fb8b1ad58e513d50588d2dcbf2a48f9373a3b2f81307487fbc0d0ae1e1ad"
+  },
+  "sourceUnchanged": true,
+  "geometryTransformsHierarchyUnchanged": true,
+  "materialPolygonCounts": {
+    "fork_lower": 86,
+    "engine": 196
+  },
+  "changes": [
+    "Front fender blue clearcoat matches target01 blue front mudguard rather than black generic panel.",
+    "Engine machined edges use satin dark aluminium rather than overbright atlas metal."
+  ],
+  "output": "prototypes/hero-garage/public/assets/street01-bike-refined.glb",
+  "outputBytes": 6057044,
+  "outputSHA256": "5fac61e4fb12a2425bb3d3f519fe90d8047c593f99096da5fed71b595771b012",
+  "acceptance": "Candidate only; parent must review recorded orbit and suspension movement. No dimensional/contact changes."
+}

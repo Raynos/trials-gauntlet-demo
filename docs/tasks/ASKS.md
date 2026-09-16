@@ -47,3 +47,5 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 - `docs/plans/README.md` line "pinned v0.1.0" still names only v0.1.0 / v0.2.0 — update when that file is next quiet (another owner is editing it).
 - The stray untracked file `0` in the repo root (a shell-redirect typo) — the user's call to delete.
 | 25 | Garage on desktop (2000×1015, tier L): "look at this, it's so dumb" — rider corrupted (patches through the hoodie, hands missing), the set crude (white backdrop slab, floor reads as water, huge hazard line) | **in flight** | reproduced headless on production at that geometry; garage owner resumed: mirrored skinned twins drawn on the hero (hypothesis), set re-dressed to the BE3 mockup at desktop width; desktop is now a first-class geometry |
+
+| HG-05 | Finish Blender art to highest achievable quality; flexible two-pass allowance, stop at 2%; Claude + Opus own integration | **in flight** | Art-only rider/bike refinement and asset handoff; saved identity preserved, no game integration |
