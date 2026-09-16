@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "reference",
+    "sourcePath": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/01-street-barehead.png",
+    "width": 1672,
+    "height": 941,
+    "foregroundCoverage": 0.7855,
+    "largestComponentFraction": 0.999,
+    "pHash": 11090064161332820440,
+    "duplicateOfHash": null
+  }
+}

@@ -1,3 +1,4 @@
+import { normalizeRiderOutfit, riderPreset } from '../src/core/riderPresets';
 import type { SkinnedMesh } from 'three';
 import { decodeJSON, iterateFrames } from '../src/core/replay';
 import type { QualityTier } from '../src/core/types';
@@ -13,7 +14,8 @@ import { chromium, webkit } from 'playwright';
 
 const [buildArg, recordingArg, outArg, fromArg, toArg, quality = 'high', outfit = 'street', fpsArg = '60', size = '1280x720', angleBackend = 'swiftshader'] = process.argv.slice(2);
 if (!buildArg || !recordingArg || !outArg) throw new Error('build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal|webkit]');
-if (!['street', 'race'].includes(outfit) || !['low', 'medium', 'high'].includes(quality)) throw new Error('invalid outfit or quality');
+const normalizedOutfit = normalizeRiderOutfit(outfit);
+if (!normalizedOutfit || !['low', 'medium', 'high'].includes(quality)) throw new Error('invalid outfit or quality');
 if (!['swiftshader', 'metal', 'webkit'].includes(angleBackend)) throw new Error('unsupported graphics backend');
 const [width, height] = size.split('x').map(Number);
 if (!width || !height || ![width, height].every(Number.isSafeInteger)) throw new Error('integer widthxheight required');
@@ -43,7 +45,7 @@ async function inventory(dir: string): Promise<void> {
 }
 await inventory(build);
 const catalog = JSON.parse(await readFile(path.join(build, 'model-catalog.json'), 'utf8')) as { models: { logical: string; url: string; bytes: number; sha256: string }[] };
-const logicalFiles = [`models/rider-${outfit}.glb`, `models/rider-${outfit}-lod.glb`, 'models/bike.glb', 'models/bike-lod.glb'];
+const logicalFiles = [`models/rider-${riderPreset(normalizedOutfit!).family}.glb`, `models/rider-${riderPreset(normalizedOutfit!).family}-lod.glb`, 'models/bike.glb', 'models/bike-lod.glb'];
 const assetBytes: Record<string, string> = {};
 for (const logical of logicalFiles) {
   const entry = catalog.models.find(m => m.logical === logical);

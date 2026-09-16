@@ -345,7 +345,8 @@ def configure_outfit(name):
     OUTFIT = name
     COLOURWAYS = copy.deepcopy(RACE_COLOURWAYS)
     if name == "street":
-        for cls, hoodie in (("rookie", (0.48, 0.24, 0.055)), ("pro", (0.045, 0.17, 0.145))):
+        # R11 target04: neutral warm charcoal; the former pro dye was visibly teal.
+        for cls, hoodie in (("rookie", (0.48, 0.24, 0.055)), ("pro", (0.045, 0.043, 0.041))):
             COLOURWAYS[cls].update(
                 JA=hoodie, JB=hoodie, PA=(0.045, 0.09, 0.15), PB=(0.14, 0.20, 0.26),
                 LOGO_A=(0.72, 0.69, 0.60), LOGO_B=(0.035, 0.035, 0.035),

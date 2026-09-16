@@ -1,0 +1,420 @@
+{
+  "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/01-street-barehead.png",
+  "zonesDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/detail-inventory",
+  "detailInventory": {
+    "scanMethod": "grid-3x3",
+    "targetMinDetails": 16,
+    "details": [
+      {
+        "id": "hair-locks",
+        "kind": "ridge",
+        "description": "Overlapping swept dark hair masses",
+        "region": {
+          "x": 0.41566985645933013,
+          "y": 0.14133900106269925,
+          "width": 0.06160287081339713,
+          "height": 0.06057385759829968,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hair.hair-locks"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "ear-rim",
+        "kind": "ridge",
+        "description": "Raised helix framing the visible ear",
+        "region": {
+          "x": 0.43480861244019137,
+          "y": 0.19341126461211477,
+          "width": 0.013157894736842105,
+          "height": 0.02763018065887354,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "head.ear-rim"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "brow",
+        "kind": "ridge",
+        "description": "Brow projects above visible eye socket",
+        "region": {
+          "x": 0.4605263157894737,
+          "y": 0.19341126461211477,
+          "width": 0.01375598086124402,
+          "height": 0.011689691817215728,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "head.brow"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "nose",
+        "kind": "ridge",
+        "description": "Projecting nose bridge and tip",
+        "region": {
+          "x": 0.4677033492822967,
+          "y": 0.20191285866099895,
+          "width": 0.01076555023923445,
+          "height": 0.024442082890541977,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "head.nose"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "lip-division",
+        "kind": "groove",
+        "description": "Dark division between upper/lower lip",
+        "region": {
+          "x": 0.465311004784689,
+          "y": 0.22848034006376194,
+          "width": 0.009569377990430622,
+          "height": 0.009564293304994687,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "head.lip-division"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "beard",
+        "kind": "stain",
+        "description": "Dark beard transition over lower cheeks and jaw",
+        "region": {
+          "x": 0.4461722488038278,
+          "y": 0.21785334750265675,
+          "width": 0.02751196172248804,
+          "height": 0.03506907545164718,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "albedo/roughness",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "skin.beard"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "hood-rim",
+        "kind": "ridge",
+        "description": "Folded rim around dropped hood",
+        "region": {
+          "x": 0.388755980861244,
+          "y": 0.2051009564293305,
+          "width": 0.037679425837320576,
+          "height": 0.06376195536663125,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hood.hood-rim"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "sleeve-roll",
+        "kind": "ridge",
+        "description": "Rolled cuff exposes forearm",
+        "region": {
+          "x": 0.47188995215311,
+          "y": 0.29968119022316686,
+          "width": 0.0215311004784689,
+          "height": 0.0563230605738576,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hoodie.sleeve-roll"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "elbow-folds",
+        "kind": "ridge",
+        "description": "Asymmetric sleeve compression folds",
+        "region": {
+          "x": 0.4264354066985646,
+          "y": 0.28905419766206164,
+          "width": 0.05263157894736842,
+          "height": 0.05844845908607864,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hoodie.elbow-folds"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "hoodie-seam",
+        "kind": "seam",
+        "description": "Curving shoulder-to-underarm construction seam",
+        "region": {
+          "x": 0.38995215311004783,
+          "y": 0.2454835281615303,
+          "width": 0.04366028708133971,
+          "height": 0.07863974495217853,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hoodie.hoodie-seam"
+        },
+        "evidenceRef": "detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "hem",
+        "kind": "ridge",
+        "description": "Thick ribbed waistband below torso",
+        "region": {
+          "x": 0.36004784688995217,
+          "y": 0.3942614240170032,
+          "width": 0.056818181818181816,
+          "height": 0.040382571732199786,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hoodie.hem"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "drawstring",
+        "kind": "ridge",
+        "description": "Thin hanging cord from hood neck",
+        "region": {
+          "x": 0.44198564593301437,
+          "y": 0.33049946865037194,
+          "width": 0.008971291866028708,
+          "height": 0.06588735387885228,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hoodie.drawstring"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.7
+      },
+      {
+        "id": "pouch",
+        "kind": "seam",
+        "description": "Curved pouch opening and sewn edge",
+        "region": {
+          "x": 0.3833732057416268,
+          "y": 0.3475026567481403,
+          "width": 0.05382775119617225,
+          "height": 0.0563230605738576,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hoodie.pouch"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "glove-panels",
+        "kind": "seam",
+        "description": "Curved panels over gripping knuckles",
+        "region": {
+          "x": 0.5113636363636364,
+          "y": 0.3145589798087141,
+          "width": 0.05083732057416268,
+          "height": 0.05100956429330499,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "gloves.glove-panels"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.7
+      },
+      {
+        "id": "jeans-pocket",
+        "kind": "seam",
+        "description": "Rear pocket stitching follows hip curve",
+        "region": {
+          "x": 0.36483253588516745,
+          "y": 0.43783209351753455,
+          "width": 0.03588516746411483,
+          "height": 0.04782146652497343,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "jeans.jeans-pocket"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "denim-fade",
+        "kind": "stain",
+        "description": "Lighter seam/thigh fold ridges",
+        "region": {
+          "x": 0.388755980861244,
+          "y": 0.42401700318809776,
+          "width": 0.08911483253588516,
+          "height": 0.0669500531349628,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "albedo/roughness",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "denim.denim-fade"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "knee-folds",
+        "kind": "ridge",
+        "description": "Diagonal compression ridges behind bent knee",
+        "region": {
+          "x": 0.4449760765550239,
+          "y": 0.46971307120085015,
+          "width": 0.04007177033492823,
+          "height": 0.07332624867162593,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "jeans.knee-folds"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "ankle-stack",
+        "kind": "ridge",
+        "description": "Compressed denim folds above shoe collar",
+        "region": {
+          "x": 0.43480861244019137,
+          "y": 0.5844845908607864,
+          "width": 0.034688995215311005,
+          "height": 0.05844845908607864,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "jeans.ankle-stack"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "laces",
+        "kind": "ridge",
+        "description": "Light diagonal crossing laces on shoe tongue",
+        "region": {
+          "x": 0.45753588516746413,
+          "y": 0.6344314558979809,
+          "width": 0.025717703349282296,
+          "height": 0.02975557917109458,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "shoes.laces"
+        },
+        "evidenceRef": "detail-inventory/zone-r1c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "sole-bands",
+        "kind": "ridge",
+        "description": "Two light horizontal bands on shoe sole",
+        "region": {
+          "x": 0.43301435406698563,
+          "y": 0.667375132837407,
+          "width": 0.0687799043062201,
+          "height": 0.022316684378320937,
+          "units": "normalized"
+        },
+        "scale": "source footprint recorded; physical scale awaits pose/camera fit",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "shoes.sole-bands"
+        },
+        "evidenceRef": "detail-inventory/zone-r2c1.png",
+        "confidence": 0.85
+      }
+    ]
+  },
+  "authoringInstruction": "Bind each planned mapsTo entry to real spec localFeatures/localOverrides. Keep this stage pending until links resolve.",
+  "scanNotes": {
+    "r0c0": "crowd/HUD only",
+    "r0c2": "crowd/HUD only",
+    "r1c0": "banners/bike only",
+    "r1c2": "banners/bike only",
+    "r2c0": "ground/bike only",
+    "r2c2": "ground/bike only"
+  },
+  "mappingStatus": "Planned component/material IDs; must resolve against authored spec before strict-quality. No implemented feature claim."
+}

@@ -1,0 +1,104 @@
+{
+  "source": "turnaround-front.png",
+  "originalMask": "turnaround-front-mask.png",
+  "method": "official heuristic above y874; parent-annotated shoe polygons below",
+  "shoePolygonsPixels": [
+    [
+      [
+        115,
+        870
+      ],
+      [
+        174,
+        870
+      ],
+      [
+        168,
+        934
+      ],
+      [
+        155,
+        942
+      ],
+      [
+        153,
+        950
+      ],
+      [
+        119,
+        952
+      ],
+      [
+        92,
+        949
+      ],
+      [
+        91,
+        935
+      ],
+      [
+        99,
+        918
+      ],
+      [
+        110,
+        899
+      ]
+    ],
+    [
+      [
+        308,
+        870
+      ],
+      [
+        367,
+        870
+      ],
+      [
+        369,
+        899
+      ],
+      [
+        381,
+        920
+      ],
+      [
+        392,
+        934
+      ],
+      [
+        394,
+        949
+      ],
+      [
+        374,
+        954
+      ],
+      [
+        343,
+        954
+      ],
+      [
+        331,
+        950
+      ],
+      [
+        329,
+        943
+      ],
+      [
+        315,
+        938
+      ]
+    ]
+  ],
+  "changedPixels": 5987,
+  "originalStats": {
+    "backgroundColor": "#C6C6C8",
+    "backgroundNoise": 3.0,
+    "transparentPixelFraction": 0.0,
+    "foregroundCoverage": 0.3726
+  },
+  "warnings": [],
+  "limitation": "Hand annotation at source resolution; hair fringe and contour uncertainty remain. Not ground-truth geometry."
+}

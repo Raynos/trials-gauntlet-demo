@@ -1,0 +1,44 @@
+[
+  {
+    "view": "front",
+    "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/turnaround-front.png",
+    "bbox": {
+      "x": 75,
+      "y": 0,
+      "width": 495,
+      "height": 980
+    },
+    "sourceWidth": 1536,
+    "sourceHeight": 1024,
+    "loaderWarnings": [],
+    "coverage": 0.3084
+  },
+  {
+    "view": "side",
+    "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/turnaround-side.png",
+    "bbox": {
+      "x": 630,
+      "y": 0,
+      "width": 275,
+      "height": 980
+    },
+    "sourceWidth": 1536,
+    "sourceHeight": 1024,
+    "loaderWarnings": [],
+    "coverage": 0.1713
+  },
+  {
+    "view": "back",
+    "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/turnaround-back.png",
+    "bbox": {
+      "x": 965,
+      "y": 0,
+      "width": 480,
+      "height": 980
+    },
+    "sourceWidth": 1536,
+    "sourceHeight": 1024,
+    "loaderWarnings": [],
+    "coverage": 0.2991
+  }
+]

@@ -1,0 +1,224 @@
+{
+  "command": "pnpm exec tsx harness/e2e/outfits.mts",
+  "mode": "preview",
+  "failed": {
+    "saved": null,
+    "rendered": "street-mustard",
+    "status": "Could not load Blue & white \u00b7 Race. Select it to retry. Mustard \u00b7 barehead selected."
+  },
+  "retry": {
+    "saved": "race-bluewhite",
+    "rendered": "race-bluewhite",
+    "heroDoc": "bike rider"
+  },
+  "low": {
+    "riderOutfit": "race-bluewhite",
+    "heroDoc": "bike-lod rider-lod"
+  },
+  "paletteChecks": [
+    {
+      "preset": "street-mustard",
+      "bike": "rookie",
+      "lod": false,
+      "saved": "street-mustard",
+      "rendered": "street-mustard",
+      "variant": "rider_rookie",
+      "heroDoc": "bike rider",
+      "materials": [
+        "rider_rookie"
+      ]
+    },
+    {
+      "preset": "street-mustard",
+      "bike": "rookie",
+      "lod": true,
+      "saved": "street-mustard",
+      "rendered": "street-mustard",
+      "variant": "rider_rookie",
+      "heroDoc": "bike-lod rider-lod",
+      "materials": [
+        "rider_rookie"
+      ]
+    },
+    {
+      "preset": "street-mustard",
+      "bike": "pro",
+      "lod": false,
+      "saved": "street-mustard",
+      "rendered": "street-mustard",
+      "variant": "rider_rookie",
+      "heroDoc": "bike rider",
+      "materials": [
+        "rider_rookie"
+      ]
+    },
+    {
+      "preset": "street-mustard",
+      "bike": "pro",
+      "lod": true,
+      "saved": "street-mustard",
+      "rendered": "street-mustard",
+      "variant": "rider_rookie",
+      "heroDoc": "bike-lod rider-lod",
+      "materials": [
+        "rider_rookie"
+      ]
+    },
+    {
+      "preset": "race-bluewhite",
+      "bike": "rookie",
+      "lod": false,
+      "saved": "race-bluewhite",
+      "rendered": "race-bluewhite",
+      "variant": "rider_rookie",
+      "heroDoc": "bike rider",
+      "materials": [
+        "rider_rookie"
+      ]
+    },
+    {
+      "preset": "race-bluewhite",
+      "bike": "rookie",
+      "lod": true,
+      "saved": "race-bluewhite",
+      "rendered": "race-bluewhite",
+      "variant": "rider_rookie",
+      "heroDoc": "bike-lod rider-lod",
+      "materials": [
+        "rider_rookie"
+      ]
+    },
+    {
+      "preset": "race-bluewhite",
+      "bike": "pro",
+      "lod": false,
+      "saved": "race-bluewhite",
+      "rendered": "race-bluewhite",
+      "variant": "rider_rookie",
+      "heroDoc": "bike rider",
+      "materials": [
+        "rider_rookie"
+      ]
+    },
+    {
+      "preset": "race-bluewhite",
+      "bike": "pro",
+      "lod": true,
+      "saved": "race-bluewhite",
+      "rendered": "race-bluewhite",
+      "variant": "rider_rookie",
+      "heroDoc": "bike-lod rider-lod",
+      "materials": [
+        "rider_rookie"
+      ]
+    },
+    {
+      "preset": "street-charcoal",
+      "bike": "rookie",
+      "lod": false,
+      "saved": "street-charcoal",
+      "rendered": "street-charcoal",
+      "variant": "rider_pro",
+      "heroDoc": "bike rider",
+      "materials": [
+        "rider_pro"
+      ]
+    },
+    {
+      "preset": "street-charcoal",
+      "bike": "rookie",
+      "lod": true,
+      "saved": "street-charcoal",
+      "rendered": "street-charcoal",
+      "variant": "rider_pro",
+      "heroDoc": "bike-lod rider-lod",
+      "materials": [
+        "rider_pro"
+      ]
+    },
+    {
+      "preset": "street-charcoal",
+      "bike": "pro",
+      "lod": false,
+      "saved": "street-charcoal",
+      "rendered": "street-charcoal",
+      "variant": "rider_pro",
+      "heroDoc": "bike rider",
+      "materials": [
+        "rider_pro"
+      ]
+    },
+    {
+      "preset": "street-charcoal",
+      "bike": "pro",
+      "lod": true,
+      "saved": "street-charcoal",
+      "rendered": "street-charcoal",
+      "variant": "rider_pro",
+      "heroDoc": "bike-lod rider-lod",
+      "materials": [
+        "rider_pro"
+      ]
+    },
+    {
+      "preset": "race-charcoalyellow",
+      "bike": "rookie",
+      "lod": false,
+      "saved": "race-charcoalyellow",
+      "rendered": "race-charcoalyellow",
+      "variant": "rider_pro",
+      "heroDoc": "bike rider",
+      "materials": [
+        "rider_pro"
+      ]
+    },
+    {
+      "preset": "race-charcoalyellow",
+      "bike": "rookie",
+      "lod": true,
+      "saved": "race-charcoalyellow",
+      "rendered": "race-charcoalyellow",
+      "variant": "rider_pro",
+      "heroDoc": "bike-lod rider-lod",
+      "materials": [
+        "rider_pro"
+      ]
+    },
+    {
+      "preset": "race-charcoalyellow",
+      "bike": "pro",
+      "lod": false,
+      "saved": "race-charcoalyellow",
+      "rendered": "race-charcoalyellow",
+      "variant": "rider_pro",
+      "heroDoc": "bike rider",
+      "materials": [
+        "rider_pro"
+      ]
+    },
+    {
+      "preset": "race-charcoalyellow",
+      "bike": "pro",
+      "lod": true,
+      "saved": "race-charcoalyellow",
+      "rendered": "race-charcoalyellow",
+      "variant": "rider_pro",
+      "heroDoc": "bike-lod rider-lod",
+      "materials": [
+        "rider_pro"
+      ]
+    }
+  ],
+  "unavailableOpenface": true,
+  "failedRequests": 2,
+  "successfulRequests": 2,
+  "errors": [],
+  "evidenceScope": "Headless production garage interaction and live material observations; screenshot is UI evidence, not played riding acceptance.",
+  "parentReview": {
+    "status": "mechanics-pass-visual-color-fail",
+    "method": "QuickTime actual playback of mustard and charcoal clips, observed during playback and at end",
+    "finding": "street-charcoal installs rider_pro correctly but rider_pro is teal/green, not approved charcoal target. Material-name checks do not prove palette fidelity.",
+    "motionScope": "1.5 second normal-camera hop only; not all animation/contact/device acceptance",
+    "nextAction": "Correct source palettes, recapture and parent review; full garment/face quality still below target"
+  }
+}

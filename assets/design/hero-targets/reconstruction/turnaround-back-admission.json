@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "back",
+    "sourcePath": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/turnaround-back.png",
+    "width": 480,
+    "height": 980,
+    "foregroundCoverage": 0.3941,
+    "largestComponentFraction": 1.0,
+    "pHash": 12371294900613319338,
+    "duplicateOfHash": null
+  }
+}

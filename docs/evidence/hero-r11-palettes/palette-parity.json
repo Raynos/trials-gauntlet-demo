@@ -1,0 +1,34 @@
+[
+  {
+    "model": "harness/out/blender/five-presets-palettes/models/rider-street.glb",
+    "sha256": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f",
+    "original": "public/models/rider-street.glb",
+    "originalSha256": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853",
+    "sourceBake": "harness/out/blender/five-presets-palettes/rebaked-models/rider-street.glb",
+    "sourceBakeSha256": "0e64460647a8ed40ffc03f0acb670e7642a94cd6202cad9a469f47ef2f0b2504",
+    "changedImage": "rider-street_pro_albedo",
+    "allOtherBufferPayloadsByteIdentical": true,
+    "accessorsMeshesNodesSkinsAnimationsExact": true,
+    "unchangedImagePayloads": [
+      "rider-street_normal",
+      "rider-street_orm",
+      "rider-street_rookie_albedo"
+    ]
+  },
+  {
+    "model": "harness/out/blender/five-presets-palettes/models/rider-street-lod.glb",
+    "sha256": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3",
+    "original": "public/models/rider-street-lod.glb",
+    "originalSha256": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e",
+    "sourceBake": "harness/out/blender/five-presets-palettes/rebaked-models/rider-street-lod.glb",
+    "sourceBakeSha256": "47ef847e570c841e243e056331adb370b0998958ba4791586cfdb1114b9e4401",
+    "changedImage": "rider-street-lod_pro_albedo",
+    "allOtherBufferPayloadsByteIdentical": true,
+    "accessorsMeshesNodesSkinsAnimationsExact": true,
+    "unchangedImagePayloads": [
+      "rider-street-lod_normal",
+      "rider-street-lod_orm",
+      "rider-street-lod_rookie_albedo"
+    ]
+  }
+]

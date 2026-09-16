@@ -1,0 +1,14 @@
+{
+  "status": "candidate ready for parent played palette judgment; no canonical promotion",
+  "normalCameraFull": "harness/out/blender/five-presets-palettes/played-charcoal-full/clip.mp4",
+  "inspectionCameraLOD": "harness/out/blender/five-presets-palettes/played-charcoal-lod-close/clip.mp4",
+  "errors": [],
+  "framesEach": 90,
+  "physicsStateSamplesPerRun": 180,
+  "allStateSamplesEqualToOldTealRun": true,
+  "fullHeroDoc": "bike rider",
+  "lodHeroDoc": "bike-lod rider-lod",
+  "sourceReport": "harness/out/blender/five-presets-palettes/source-palette-report.json",
+  "payloadParityReport": "harness/out/blender/five-presets-palettes/palette-parity.json",
+  "race": "unchanged; broad charcoal/yellow family confirmed by parent; no final realism acceptance"
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/eye-closeup.png",
+    "bbox": {
+      "x": 272,
+      "y": 363,
+      "width": 29,
+      "height": 20
+    },
+    "sourceWidth": 1536,
+    "sourceHeight": 1024,
+    "loaderWarnings": [],
+    "coverage": 0.0004
+  },
+  {
+    "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/thread-closeup.png",
+    "bbox": {
+      "x": 977,
+      "y": 274,
+      "width": 51,
+      "height": 13
+    },
+    "sourceWidth": 1536,
+    "sourceHeight": 1024,
+    "loaderWarnings": [],
+    "coverage": 0.0004
+  }
+]

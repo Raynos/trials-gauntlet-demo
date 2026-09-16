@@ -1,0 +1,10 @@
+{
+  "stats": {
+    "backgroundColor": "#C6C6C8",
+    "backgroundNoise": 3.0,
+    "transparentPixelFraction": 0.0,
+    "foregroundCoverage": 0.3726
+  },
+  "warnings": [],
+  "method": "official foreground heuristic; parent review required"
+}

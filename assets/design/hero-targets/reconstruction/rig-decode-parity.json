@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "clips": 8,
+  "bones": 19,
+  "attributes": [
+    "position",
+    "normal",
+    "uv",
+    "skinIndex",
+    "skinWeight"
+  ],
+  "scope": "Production GLTFLoader decoded attribute/index buffers, inverse bind matrices and all animation track arrays exactly equal; clip UUID ignored"
+}

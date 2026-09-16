@@ -1,0 +1,88 @@
+{
+  "ok": true,
+  "verdict": "pass",
+  "confidence": 0.742,
+  "estimatedFidelity": 0.742,
+  "targetThreshold": 0.7,
+  "materialId": "thread",
+  "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/thread-interior.png",
+  "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/thread-pbr",
+  "palette": [
+    "#F0E8E1",
+    "#B6ABA6",
+    "#CABEB8",
+    "#E5DCD5",
+    "#D7CBC5"
+  ],
+  "maps": {
+    "albedo": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/thread-pbr/thread_albedo.png",
+      "url": "thread_albedo.png",
+      "channel": "albedo",
+      "source": "reference-pixel-extraction"
+    },
+    "roughness": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/thread-pbr/thread_roughness.png",
+      "url": "thread_roughness.png",
+      "channel": "roughness",
+      "source": "reference-pixel-extraction"
+    },
+    "height": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/thread-pbr/thread_height.png",
+      "url": "thread_height.png",
+      "channel": "height",
+      "source": "reference-pixel-extraction"
+    },
+    "normal": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/thread-pbr/thread_normal.png",
+      "url": "thread_normal.png",
+      "channel": "normal",
+      "source": "reference-pixel-extraction"
+    },
+    "ao": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/thread-pbr/thread_ao.png",
+      "url": "thread_ao.png",
+      "channel": "ao",
+      "source": "reference-pixel-extraction"
+    }
+  },
+  "diagnostics": {
+    "sourceWidth": 22,
+    "sourceHeight": 8,
+    "mapSize": 1024,
+    "cropBBoxPixels": {
+      "x": 0,
+      "y": 0,
+      "width": 22,
+      "height": 8
+    },
+    "mask": {
+      "backgroundColor": "#D9CFCB",
+      "backgroundNoise": 48.01,
+      "transparentPixelFraction": 0.0,
+      "foregroundCoverage": 1.0
+    },
+    "mapStats": {
+      "valueRange": 0.2728,
+      "heightP90Gradient": 0.03503,
+      "roughnessBase": 0.701,
+      "roughnessVariation": 0.066,
+      "normalStrength": 0.197,
+      "blurRadius": 21
+    },
+    "palette": [
+      "#F0E8E1",
+      "#B6ABA6",
+      "#CABEB8",
+      "#E5DCD5",
+      "#D7CBC5"
+    ]
+  },
+  "warnings": [
+    "foreground mask is tiny; material extraction is likely unreliable",
+    "image is not clearly isolated from background; using most pixels as material evidence",
+    "object/background separation is weak",
+    "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+  ],
+  "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+}

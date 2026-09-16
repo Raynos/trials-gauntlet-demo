@@ -1,0 +1,63 @@
+[
+  {
+    "command": [
+      "node",
+      "assets/blender/verify_rider_asset.mjs",
+      "public/models/rider-street.glb"
+    ],
+    "result": {
+      "bytes": 1476800,
+      "triangles": 44734,
+      "vertices": 31437,
+      "bones": 19,
+      "clips": [
+        "crouch",
+        "extend",
+        "forward_attack",
+        "hang_back",
+        "idle_breathe",
+        "land_absorb",
+        "sit_cruise",
+        "stand_attack"
+      ],
+      "variants": [
+        "rider_rookie",
+        "rider_pro"
+      ],
+      "maxWeightError": 8.870847523212433e-08,
+      "loadedWeightError": 4.1211023926734924e-08
+    },
+    "sha256": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f"
+  },
+  {
+    "command": [
+      "node",
+      "assets/blender/verify_rider_asset.mjs",
+      "public/models/rider-street-lod.glb",
+      "--lod"
+    ],
+    "result": {
+      "bytes": 546220,
+      "triangles": 5880,
+      "vertices": 7129,
+      "bones": 19,
+      "clips": [
+        "crouch",
+        "extend",
+        "forward_attack",
+        "hang_back",
+        "idle_breathe",
+        "land_absorb",
+        "sit_cruise",
+        "stand_attack"
+      ],
+      "variants": [
+        "rider_rookie",
+        "rider_pro"
+      ],
+      "maxWeightError": 8.870847523212433e-08,
+      "loadedWeightError": 3.329478204250336e-08
+    },
+    "sha256": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3"
+  }
+]

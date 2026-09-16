@@ -348,7 +348,8 @@ export const BIKE_CLASSES: readonly BikeClass[] = ['rookie', 'pro'];
 export const DEFAULT_BIKE: BikeClass = 'rookie';
 
 /** Cosmetic rider clothing, independent of bike class and physics state. */
-export type RiderOutfit = 'street' | 'race';
+import type { RiderOutfit } from './riderPresets';
+export type { RiderOutfit } from './riderPresets';
 
 /** Optional renderer capability for changing clothing without loading a different track. */
 export interface RiderOutfitRenderer {

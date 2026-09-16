@@ -1,0 +1,8 @@
+{
+  "source": "public/models/rider-street.glb",
+  "sourceSha256": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853",
+  "decodedSha256": "d664cf33d2f066e8567345a4e8bcc076a4752bb1ab16854da75ffa79050871bf",
+  "method": "413 meshopt views decoded with the production Three.js MeshoptDecoder; no node/skin/animation index changes",
+  "reference": "baseline-rig-decoded.json",
+  "warning": "Compressed direct probe reports ok despite456 unsupported channel warnings. Use decoded reference with zero warnings. Evidence preparation only; no baseline geometry may be copied into the procedural factory."
+}

@@ -29,10 +29,12 @@ describe('declared byte totals', () => {
   });
 
   it('counts only the chosen full/LOD rider pair and the shared bike pair', () => {
-    expect(bootByteTotals('street').heroModels).toBe(220);
-    expect(bootByteTotals('race').heroModels).toBe(245);
-    expect(bootByteTotals('street').bootArt).toBe(bootByteTotals('race').bootArt);
-    expect(BOOT_BYTE_TOTALS).toEqual(bootByteTotals('street'));
+    expect(bootByteTotals('street-charcoal')).toEqual(bootByteTotals('street-mustard'));
+    expect(bootByteTotals('race-charcoalyellow')).toEqual(bootByteTotals('race-bluewhite'));
+    expect(bootByteTotals('street-mustard').heroModels).toBe(220);
+    expect(bootByteTotals('race-bluewhite').heroModels).toBe(245);
+    expect(bootByteTotals('street-mustard').bootArt).toBe(bootByteTotals('race-bluewhite').bootArt);
+    expect(BOOT_BYTE_TOTALS).toEqual(bootByteTotals('street-mustard'));
   });
 
   it('rejects a missing declared model instead of shrinking the denominator', () => {

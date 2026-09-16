@@ -1,0 +1,129 @@
+{
+  "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/01-street-barehead.png",
+  "overlayImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/landmarks.png",
+  "overlayLegend": {
+    "C": "center symmetry axis",
+    "1..N": "head-unit horizontal ticks (blue, dashed)",
+    "H": "hairline guide (default fraction of the first head-unit band)",
+    "E": "eye line guide",
+    "N": "nose base guide",
+    "M": "mouth line guide",
+    "S": "shoulder line guide (default fraction, adjust to observed pose)",
+    "P": "hip line guide (default fraction, adjust to observed pose)",
+    "grayDashed": "rule-of-thirds compositional grid"
+  },
+  "anatomy": {
+    "styleHeads": 7.5,
+    "proportions": {
+      "headUnit": 0.11370882040382571,
+      "torso": null,
+      "legs": null,
+      "shoulderWidth": null,
+      "hipWidth": null
+    },
+    "pose": {
+      "type": "seated forward ride, hands gripping bars, feet on pegs",
+      "landmarksPixels": {
+        "crown": [
+          746,
+          132
+        ],
+        "chin": [
+          778,
+          237
+        ],
+        "nearShoulder": [
+          710,
+          254
+        ],
+        "nearElbow": [
+          795,
+          310
+        ],
+        "nearWrist": [
+          884,
+          322
+        ],
+        "nearHip": [
+          659,
+          415
+        ],
+        "nearKnee": [
+          788,
+          449
+        ],
+        "nearAnkle": [
+          752,
+          591
+        ]
+      },
+      "jointAngles": {
+        "nearElbow": {
+          "projectedInteriorDegrees": 154.3,
+          "not3DRotation": true
+        },
+        "nearKnee": {
+          "projectedInteriorDegrees": 90.54,
+          "not3DRotation": true
+        }
+      },
+      "confidence": 0.72,
+      "coordinateNote": "2D source pixels, not world joints or solved Euler angles; preserve occlusion uncertainty",
+      "unobserved": [
+        "far hip/knee/ankle centers",
+        "depth coordinates",
+        "rest-relative joint rotations"
+      ]
+    },
+    "faceLandmarks": {
+      "hairline": 0.3925233644859813,
+      "eyeLine": 0.5420560747663551,
+      "eyeSpacing": null,
+      "noseBase": 0.719626168224299,
+      "mouthLine": 0.8130841121495327,
+      "earTop": 0.48598130841121495,
+      "earBottom": 0.7009345794392523
+    },
+    "features": [
+      "exposed face and beard",
+      "scalp-bound dark hair",
+      "dropped mustard hood",
+      "rolled sleeves",
+      "blue denim",
+      "gloves wrapped around grips",
+      "high-top shoes on pegs"
+    ],
+    "confidence": 0.7,
+    "styleHeadsEvidence": {
+      "kind": "design-assumption",
+      "reason": "Requested realistic adult; standing height not observable in seated view"
+    },
+    "proportionEvidence": {
+      "headUnit": {
+        "boxPixels": [
+          694,
+          132,
+          803,
+          239
+        ],
+        "confidence": 0.8
+      },
+      "unmeasured": [
+        "torso and leg lengths foreshortened by seated pose",
+        "shoulder and hip widths hidden by three-quarter side view"
+      ]
+    },
+    "faceLandmarkEvidence": {
+      "sourceRegionPixels": [
+        694,
+        132,
+        803,
+        239
+      ],
+      "method": "parent vision estimate on native reference; normalized relative to head bbox including hair",
+      "confidence": 0.65,
+      "eyeSpacing": "far eye occluded; not measured"
+    }
+  },
+  "authoringInstruction": "Observed landmarks replace scaffold guesses; null values are intentionally unobservable, never default facial measurements. Solve pose/camera using these observations and game contact geometry."
+}

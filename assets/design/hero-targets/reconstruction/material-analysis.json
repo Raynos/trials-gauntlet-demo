@@ -1,0 +1,2299 @@
+{
+  "schemaVersion": 1,
+  "kind": "img2threejs.material-analysis",
+  "referenceId": "street-mustard",
+  "manifest": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-regions.json",
+  "registry": "/Users/raynos/.agents/skills/img2threejs/docs/materials/material-reference.json",
+  "targetThreshold": 0.7,
+  "notObservedMaterials": [],
+  "unresolvedNotObservedMaterials": [],
+  "regions": [
+    {
+      "componentId": "hoodie",
+      "regionId": "cotton",
+      "materialSpecId": "cotton",
+      "hypothesis": {
+        "componentId": "hoodie",
+        "regionId": "cotton",
+        "materialId": "fabric.woven-matte",
+        "family": null,
+        "subtype": null,
+        "finish": null,
+        "aliases": [],
+        "confidence": 0.794,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "fabric.woven-matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 1.0,
+        "method": "explicit-material-id",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/00-cotton.png",
+            "bbox": {
+              "x": 686,
+              "y": 256,
+              "width": 54,
+              "height": 32
+            },
+            "sourceWidth": 1672,
+            "sourceHeight": 941,
+            "loaderWarnings": [],
+            "coverage": 0.0011
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.794,
+            "estimatedFidelity": 0.794,
+            "targetThreshold": 0.7,
+            "materialId": "cotton",
+            "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/00-cotton.png",
+            "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton",
+            "palette": [
+              "#C89248",
+              "#B6813E",
+              "#D8A657",
+              "#9A6933",
+              "#E8BC6C"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_albedo.png",
+                "url": "cotton_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_roughness.png",
+                "url": "cotton_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_height.png",
+                "url": "cotton_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_normal.png",
+                "url": "cotton_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_ao.png",
+                "url": "cotton_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 54,
+              "sourceHeight": 32,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 54,
+                "height": 32
+              },
+              "mask": {
+                "backgroundColor": "#BB8441",
+                "backgroundNoise": 39.345,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.3381,
+                "heightP90Gradient": 0.04174,
+                "roughnessBase": 0.72,
+                "roughnessVariation": 0.075,
+                "normalStrength": 0.205,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#C89248",
+                "#B6813E",
+                "#D8A657",
+                "#9A6933",
+                "#E8BC6C"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#AB7A3E",
+              "#CC9B51",
+              "#C49149",
+              "#C79148",
+              "#C28C46"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 153.2,
+              "meanSaturation": 0.626,
+              "gradientStrength": 0.241,
+              "mottle": 0.015,
+              "streakRatio": 0.98,
+              "hueSpread": 0.001,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "fabric.woven-matte",
+        "family": "fabric",
+        "subtype": "woven",
+        "finish": "matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.85,
+          "sheen": 0.65,
+          "sheenRoughness": 0.75
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "sheenColorMap",
+          "sheenRoughnessMap",
+          "aoMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.texture",
+          "khronos.sheen",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "diffuse body with grazing-angle sheen",
+          "woven directional microstructure",
+          "soft broad highlights"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/00-cotton.png",
+        "bbox": {
+          "x": 686,
+          "y": 256,
+          "width": 54,
+          "height": 32
+        },
+        "sourceWidth": 1672,
+        "sourceHeight": 941,
+        "loaderWarnings": [],
+        "coverage": 0.0011
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#AB7A3E",
+          "#CC9B51",
+          "#C49149",
+          "#C79148",
+          "#C28C46"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 153.2,
+          "meanSaturation": 0.626,
+          "gradientStrength": 0.241,
+          "mottle": 0.015,
+          "streakRatio": 0.98,
+          "hueSpread": 0.001,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.794,
+        "estimatedFidelity": 0.794,
+        "targetThreshold": 0.7,
+        "materialId": "cotton",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/00-cotton.png",
+        "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton",
+        "palette": [
+          "#C89248",
+          "#B6813E",
+          "#D8A657",
+          "#9A6933",
+          "#E8BC6C"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_albedo.png",
+            "url": "cotton_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_roughness.png",
+            "url": "cotton_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_height.png",
+            "url": "cotton_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_normal.png",
+            "url": "cotton_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_ao.png",
+            "url": "cotton_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 54,
+          "sourceHeight": 32,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 54,
+            "height": 32
+          },
+          "mask": {
+            "backgroundColor": "#BB8441",
+            "backgroundNoise": 39.345,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.3381,
+            "heightP90Gradient": 0.04174,
+            "roughnessBase": 0.72,
+            "roughnessVariation": 0.075,
+            "normalStrength": 0.205,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#C89248",
+            "#B6813E",
+            "#D8A657",
+            "#9A6933",
+            "#E8BC6C"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/00-cotton.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.794,
+        "estimatedFidelity": 0.794,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_albedo.png",
+            "url": "cotton_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_roughness.png",
+            "url": "cotton_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_height.png",
+            "url": "cotton_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_normal.png",
+            "url": "cotton_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_ao.png",
+            "url": "cotton_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 54,
+          "sourceHeight": 32,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 54,
+            "height": 32
+          },
+          "mask": {
+            "backgroundColor": "#BB8441",
+            "backgroundNoise": 39.345,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.3381,
+            "heightP90Gradient": 0.04174,
+            "roughnessBase": 0.72,
+            "roughnessVariation": 0.075,
+            "normalStrength": 0.205,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#C89248",
+            "#B6813E",
+            "#D8A657",
+            "#9A6933",
+            "#E8BC6C"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_albedo.png",
+          "url": "cotton_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_roughness.png",
+          "url": "cotton_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_height.png",
+          "url": "cotton_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_normal.png",
+          "url": "cotton_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-00-cotton/cotton_ao.png",
+          "url": "cotton_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "jeans",
+      "regionId": "denim",
+      "materialSpecId": "denim",
+      "hypothesis": {
+        "componentId": "jeans",
+        "regionId": "denim",
+        "materialId": "fabric.woven-matte",
+        "family": null,
+        "subtype": null,
+        "finish": null,
+        "aliases": [],
+        "confidence": 0.831,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "fabric.woven-matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 1.0,
+        "method": "explicit-material-id",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/01-denim.png",
+            "bbox": {
+              "x": 666,
+              "y": 424,
+              "width": 52,
+              "height": 27
+            },
+            "sourceWidth": 1672,
+            "sourceHeight": 941,
+            "loaderWarnings": [],
+            "coverage": 0.0009
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.831,
+            "estimatedFidelity": 0.831,
+            "targetThreshold": 0.7,
+            "materialId": "denim",
+            "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/01-denim.png",
+            "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim",
+            "palette": [
+              "#262831",
+              "#2A2C37",
+              "#2F323D",
+              "#21232B",
+              "#383B46"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_albedo.png",
+                "url": "denim_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_roughness.png",
+                "url": "denim_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_height.png",
+                "url": "denim_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_normal.png",
+                "url": "denim_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_ao.png",
+                "url": "denim_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 52,
+              "sourceHeight": 27,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 52,
+                "height": 27
+              },
+              "mask": {
+                "backgroundColor": "#282935",
+                "backgroundNoise": 14.731,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.8148
+              },
+              "mapStats": {
+                "valueRange": 0.0908,
+                "heightP90Gradient": 0.08047,
+                "roughnessBase": 0.746,
+                "roughnessVariation": 0.155,
+                "normalStrength": 0.251,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#262831",
+                "#2A2C37",
+                "#2F323D",
+                "#21232B",
+                "#383B46"
+              ]
+            },
+            "warnings": [
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+              "low value range weakens height/roughness inference"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#303340",
+              "#2B2E39",
+              "#282A33",
+              "#26282E",
+              "#232429"
+            ],
+            "paletteHueRisk": [
+              {
+                "stop": "#303340",
+                "hueRisk": "blue-collapse",
+                "suggestedRgb": [
+                  64,
+                  51,
+                  48
+                ]
+              },
+              {
+                "stop": "#2B2E39",
+                "hueRisk": "blue-collapse",
+                "suggestedRgb": [
+                  57,
+                  46,
+                  43
+                ]
+              },
+              {
+                "stop": "#282A33",
+                "hueRisk": "blue-collapse",
+                "suggestedRgb": [
+                  51,
+                  42,
+                  40
+                ]
+              },
+              {
+                "stop": "#26282E",
+                "hueRisk": "blue-collapse",
+                "suggestedRgb": [
+                  46,
+                  40,
+                  38
+                ]
+              }
+            ],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 43.8,
+              "meanSaturation": 0.21,
+              "gradientStrength": 0.061,
+              "mottle": 0.011,
+              "streakRatio": 1.76,
+              "hueSpread": 0.004,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "fabric.woven-matte",
+        "family": "fabric",
+        "subtype": "woven",
+        "finish": "matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.85,
+          "sheen": 0.65,
+          "sheenRoughness": 0.75
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "sheenColorMap",
+          "sheenRoughnessMap",
+          "aoMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.texture",
+          "khronos.sheen",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "diffuse body with grazing-angle sheen",
+          "woven directional microstructure",
+          "soft broad highlights"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/01-denim.png",
+        "bbox": {
+          "x": 666,
+          "y": 424,
+          "width": 52,
+          "height": 27
+        },
+        "sourceWidth": 1672,
+        "sourceHeight": 941,
+        "loaderWarnings": [],
+        "coverage": 0.0009
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#303340",
+          "#2B2E39",
+          "#282A33",
+          "#26282E",
+          "#232429"
+        ],
+        "paletteHueRisk": [
+          {
+            "stop": "#303340",
+            "hueRisk": "blue-collapse",
+            "suggestedRgb": [
+              64,
+              51,
+              48
+            ]
+          },
+          {
+            "stop": "#2B2E39",
+            "hueRisk": "blue-collapse",
+            "suggestedRgb": [
+              57,
+              46,
+              43
+            ]
+          },
+          {
+            "stop": "#282A33",
+            "hueRisk": "blue-collapse",
+            "suggestedRgb": [
+              51,
+              42,
+              40
+            ]
+          },
+          {
+            "stop": "#26282E",
+            "hueRisk": "blue-collapse",
+            "suggestedRgb": [
+              46,
+              40,
+              38
+            ]
+          }
+        ],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 43.8,
+          "meanSaturation": 0.21,
+          "gradientStrength": 0.061,
+          "mottle": 0.011,
+          "streakRatio": 1.76,
+          "hueSpread": 0.004,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.831,
+        "estimatedFidelity": 0.831,
+        "targetThreshold": 0.7,
+        "materialId": "denim",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/01-denim.png",
+        "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim",
+        "palette": [
+          "#262831",
+          "#2A2C37",
+          "#2F323D",
+          "#21232B",
+          "#383B46"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_albedo.png",
+            "url": "denim_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_roughness.png",
+            "url": "denim_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_height.png",
+            "url": "denim_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_normal.png",
+            "url": "denim_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_ao.png",
+            "url": "denim_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 52,
+          "sourceHeight": 27,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 52,
+            "height": 27
+          },
+          "mask": {
+            "backgroundColor": "#282935",
+            "backgroundNoise": 14.731,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.8148
+          },
+          "mapStats": {
+            "valueRange": 0.0908,
+            "heightP90Gradient": 0.08047,
+            "roughnessBase": 0.746,
+            "roughnessVariation": 0.155,
+            "normalStrength": 0.251,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#262831",
+            "#2A2C37",
+            "#2F323D",
+            "#21232B",
+            "#383B46"
+          ]
+        },
+        "warnings": [
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/01-denim.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.831,
+        "estimatedFidelity": 0.831,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_albedo.png",
+            "url": "denim_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_roughness.png",
+            "url": "denim_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_height.png",
+            "url": "denim_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_normal.png",
+            "url": "denim_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_ao.png",
+            "url": "denim_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 52,
+          "sourceHeight": 27,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 52,
+            "height": 27
+          },
+          "mask": {
+            "backgroundColor": "#282935",
+            "backgroundNoise": 14.731,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.8148
+          },
+          "mapStats": {
+            "valueRange": 0.0908,
+            "heightP90Gradient": 0.08047,
+            "roughnessBase": 0.746,
+            "roughnessVariation": 0.155,
+            "normalStrength": 0.251,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#262831",
+            "#2A2C37",
+            "#2F323D",
+            "#21232B",
+            "#383B46"
+          ]
+        },
+        "warnings": [
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_albedo.png",
+          "url": "denim_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_roughness.png",
+          "url": "denim_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_height.png",
+          "url": "denim_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_normal.png",
+          "url": "denim_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-01-denim/denim_ao.png",
+          "url": "denim_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "head",
+      "regionId": "skin",
+      "materialSpecId": "skin",
+      "hypothesis": {
+        "componentId": "head",
+        "regionId": "skin",
+        "materialId": "skin.human",
+        "family": null,
+        "subtype": null,
+        "finish": null,
+        "aliases": [],
+        "confidence": 0.781,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "skin.human",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 1.0,
+        "method": "explicit-material-id",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/02-skin.png",
+            "bbox": {
+              "x": 758,
+              "y": 193,
+              "width": 20,
+              "height": 16
+            },
+            "sourceWidth": 1672,
+            "sourceHeight": 941,
+            "loaderWarnings": [],
+            "coverage": 0.0002
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.781,
+            "estimatedFidelity": 0.781,
+            "targetThreshold": 0.7,
+            "materialId": "skin",
+            "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/02-skin.png",
+            "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin",
+            "palette": [
+              "#AC7B62",
+              "#885942",
+              "#9E6950",
+              "#6D4836",
+              "#B98B74"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_albedo.png",
+                "url": "skin_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_roughness.png",
+                "url": "skin_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_height.png",
+                "url": "skin_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_normal.png",
+                "url": "skin_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_ao.png",
+                "url": "skin_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 20,
+              "sourceHeight": 16,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 20,
+                "height": 16
+              },
+              "mask": {
+                "backgroundColor": "#9E6852",
+                "backgroundNoise": 65.062,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.2879,
+                "heightP90Gradient": 0.02699,
+                "roughnessBase": 0.7,
+                "roughnessVariation": 0.05,
+                "normalStrength": 0.188,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#AC7B62",
+                "#885942",
+                "#9E6950",
+                "#6D4836",
+                "#B98B74"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#936750",
+              "#AA7B63",
+              "#A9755C",
+              "#865841",
+              "#724C3A"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 116.0,
+              "meanSaturation": 0.467,
+              "gradientStrength": 0.219,
+              "mottle": 0.005,
+              "streakRatio": 0.82,
+              "hueSpread": 0.0,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "skin.human",
+        "family": "skin",
+        "subtype": "human",
+        "finish": "natural",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.52,
+          "clearcoat": 0.12,
+          "clearcoatRoughness": 0.35,
+          "ior": 1.4
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "aoMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.mesh-standard",
+          "nvidia.faceworks",
+          "activision.separable-sss",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "warm dielectric diffuse response",
+          "broad soft highlights",
+          "pores and wrinkles at micro scale"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/02-skin.png",
+        "bbox": {
+          "x": 758,
+          "y": 193,
+          "width": 20,
+          "height": 16
+        },
+        "sourceWidth": 1672,
+        "sourceHeight": 941,
+        "loaderWarnings": [],
+        "coverage": 0.0002
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#936750",
+          "#AA7B63",
+          "#A9755C",
+          "#865841",
+          "#724C3A"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 116.0,
+          "meanSaturation": 0.467,
+          "gradientStrength": 0.219,
+          "mottle": 0.005,
+          "streakRatio": 0.82,
+          "hueSpread": 0.0,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.781,
+        "estimatedFidelity": 0.781,
+        "targetThreshold": 0.7,
+        "materialId": "skin",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/02-skin.png",
+        "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin",
+        "palette": [
+          "#AC7B62",
+          "#885942",
+          "#9E6950",
+          "#6D4836",
+          "#B98B74"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_albedo.png",
+            "url": "skin_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_roughness.png",
+            "url": "skin_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_height.png",
+            "url": "skin_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_normal.png",
+            "url": "skin_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_ao.png",
+            "url": "skin_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 20,
+          "sourceHeight": 16,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 20,
+            "height": 16
+          },
+          "mask": {
+            "backgroundColor": "#9E6852",
+            "backgroundNoise": 65.062,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.2879,
+            "heightP90Gradient": 0.02699,
+            "roughnessBase": 0.7,
+            "roughnessVariation": 0.05,
+            "normalStrength": 0.188,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#AC7B62",
+            "#885942",
+            "#9E6950",
+            "#6D4836",
+            "#B98B74"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/02-skin.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.781,
+        "estimatedFidelity": 0.781,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_albedo.png",
+            "url": "skin_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_roughness.png",
+            "url": "skin_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_height.png",
+            "url": "skin_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_normal.png",
+            "url": "skin_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_ao.png",
+            "url": "skin_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 20,
+          "sourceHeight": 16,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 20,
+            "height": 16
+          },
+          "mask": {
+            "backgroundColor": "#9E6852",
+            "backgroundNoise": 65.062,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.2879,
+            "heightP90Gradient": 0.02699,
+            "roughnessBase": 0.7,
+            "roughnessVariation": 0.05,
+            "normalStrength": 0.188,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#AC7B62",
+            "#885942",
+            "#9E6950",
+            "#6D4836",
+            "#B98B74"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_albedo.png",
+          "url": "skin_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_roughness.png",
+          "url": "skin_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_height.png",
+          "url": "skin_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_normal.png",
+          "url": "skin_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-02-skin/skin_ao.png",
+          "url": "skin_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "gloves",
+      "regionId": "glove",
+      "materialSpecId": "glove",
+      "hypothesis": {
+        "componentId": "gloves",
+        "regionId": "glove",
+        "materialId": "leather.matte",
+        "family": null,
+        "subtype": null,
+        "finish": null,
+        "aliases": [],
+        "confidence": 0.86,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "leather.matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 1.0,
+        "method": "explicit-material-id",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/03-glove.png",
+            "bbox": {
+              "x": 875,
+              "y": 315,
+              "width": 20,
+              "height": 16
+            },
+            "sourceWidth": 1672,
+            "sourceHeight": 941,
+            "loaderWarnings": [],
+            "coverage": 0.0002
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.86,
+            "estimatedFidelity": 0.86,
+            "targetThreshold": 0.7,
+            "materialId": "glove",
+            "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/03-glove.png",
+            "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove",
+            "palette": [
+              "#38332F",
+              "#0A0809",
+              "#4C443F",
+              "#A7A3A0",
+              "#827C7A"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_albedo.png",
+                "url": "glove_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_roughness.png",
+                "url": "glove_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_height.png",
+                "url": "glove_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_normal.png",
+                "url": "glove_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_ao.png",
+                "url": "glove_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 20,
+              "sourceHeight": 16,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 1,
+                "y": 0,
+                "width": 19,
+                "height": 16
+              },
+              "mask": {
+                "backgroundColor": "#322E2E",
+                "backgroundNoise": 49.699,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.2281
+              },
+              "mapStats": {
+                "valueRange": 0.6577,
+                "heightP90Gradient": 0.04056,
+                "roughnessBase": 0.68,
+                "roughnessVariation": 0.083,
+                "normalStrength": 0.204,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#38332F",
+                "#0A0809",
+                "#4C443F",
+                "#A7A3A0",
+                "#827C7A"
+              ]
+            },
+            "warnings": [
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "worn-composite",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.9,
+              "clearcoat": 0.0,
+              "clearcoatRoughness": 0.0,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 0.5,
+              "anisotropy": 0.0,
+              "procedural": "mottle"
+            },
+            "palette": [
+              "#453D3A",
+              "#302C2B",
+              "#1B1A1A",
+              "#605B5C",
+              "#4D4A4B"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 61.0,
+              "meanSaturation": 0.104,
+              "gradientStrength": 0.307,
+              "mottle": 0.018,
+              "streakRatio": 1.06,
+              "hueSpread": 0.372,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "leather.matte",
+        "family": "leather",
+        "subtype": "natural-or-synthetic",
+        "finish": "matte-worn",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.62,
+          "clearcoat": 0.08,
+          "clearcoatRoughness": 0.45
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "aoMap",
+          "clearcoatMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.mesh-standard",
+          "adobe.pbr-guide-2",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "irregular grain",
+          "worn edges become smoother",
+          "creases darken without becoming metallic"
+        ]
+      },
+      "observations": [
+        "near-neutral colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/03-glove.png",
+        "bbox": {
+          "x": 875,
+          "y": 315,
+          "width": 20,
+          "height": 16
+        },
+        "sourceWidth": 1672,
+        "sourceHeight": 941,
+        "loaderWarnings": [],
+        "coverage": 0.0002
+      },
+      "textureAnalysis": {
+        "finishClass": "worn-composite",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.9,
+          "clearcoat": 0.0,
+          "clearcoatRoughness": 0.0,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 0.5,
+          "anisotropy": 0.0,
+          "procedural": "mottle"
+        },
+        "palette": [
+          "#453D3A",
+          "#302C2B",
+          "#1B1A1A",
+          "#605B5C",
+          "#4D4A4B"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 61.0,
+          "meanSaturation": 0.104,
+          "gradientStrength": 0.307,
+          "mottle": 0.018,
+          "streakRatio": 1.06,
+          "hueSpread": 0.372,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.86,
+        "estimatedFidelity": 0.86,
+        "targetThreshold": 0.7,
+        "materialId": "glove",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/03-glove.png",
+        "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove",
+        "palette": [
+          "#38332F",
+          "#0A0809",
+          "#4C443F",
+          "#A7A3A0",
+          "#827C7A"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_albedo.png",
+            "url": "glove_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_roughness.png",
+            "url": "glove_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_height.png",
+            "url": "glove_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_normal.png",
+            "url": "glove_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_ao.png",
+            "url": "glove_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 20,
+          "sourceHeight": 16,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 1,
+            "y": 0,
+            "width": 19,
+            "height": 16
+          },
+          "mask": {
+            "backgroundColor": "#322E2E",
+            "backgroundNoise": 49.699,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.2281
+          },
+          "mapStats": {
+            "valueRange": 0.6577,
+            "heightP90Gradient": 0.04056,
+            "roughnessBase": 0.68,
+            "roughnessVariation": 0.083,
+            "normalStrength": 0.204,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#38332F",
+            "#0A0809",
+            "#4C443F",
+            "#A7A3A0",
+            "#827C7A"
+          ]
+        },
+        "warnings": [
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/03-glove.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.86,
+        "estimatedFidelity": 0.86,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_albedo.png",
+            "url": "glove_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_roughness.png",
+            "url": "glove_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_height.png",
+            "url": "glove_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_normal.png",
+            "url": "glove_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_ao.png",
+            "url": "glove_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 20,
+          "sourceHeight": 16,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 1,
+            "y": 0,
+            "width": 19,
+            "height": 16
+          },
+          "mask": {
+            "backgroundColor": "#322E2E",
+            "backgroundNoise": 49.699,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.2281
+          },
+          "mapStats": {
+            "valueRange": 0.6577,
+            "heightP90Gradient": 0.04056,
+            "roughnessBase": 0.68,
+            "roughnessVariation": 0.083,
+            "normalStrength": 0.204,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#38332F",
+            "#0A0809",
+            "#4C443F",
+            "#A7A3A0",
+            "#827C7A"
+          ]
+        },
+        "warnings": [
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_albedo.png",
+          "url": "glove_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_roughness.png",
+          "url": "glove_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_height.png",
+          "url": "glove_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_normal.png",
+          "url": "glove_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-03-glove/glove_ao.png",
+          "url": "glove_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "shoes",
+      "regionId": "shoe",
+      "materialSpecId": "shoe",
+      "hypothesis": {
+        "componentId": "shoes",
+        "regionId": "shoe",
+        "materialId": "fabric.woven-matte",
+        "family": null,
+        "subtype": null,
+        "finish": null,
+        "aliases": [],
+        "confidence": 0.85,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "fabric.woven-matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 1.0,
+        "method": "explicit-material-id",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/04-shoe.png",
+            "bbox": {
+              "x": 727,
+              "y": 608,
+              "width": 32,
+              "height": 20
+            },
+            "sourceWidth": 1672,
+            "sourceHeight": 941,
+            "loaderWarnings": [],
+            "coverage": 0.0004
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.85,
+            "estimatedFidelity": 0.85,
+            "targetThreshold": 0.7,
+            "materialId": "shoe",
+            "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/04-shoe.png",
+            "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe",
+            "palette": [
+              "#635750",
+              "#554C46",
+              "#48403B",
+              "#776960",
+              "#2F2927"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_albedo.png",
+                "url": "shoe_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_roughness.png",
+                "url": "shoe_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_height.png",
+                "url": "shoe_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_normal.png",
+                "url": "shoe_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_ao.png",
+                "url": "shoe_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 32,
+              "sourceHeight": 20,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 32,
+                "height": 20
+              },
+              "mask": {
+                "backgroundColor": "#5C4E47",
+                "backgroundNoise": 46.195,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.4641
+              },
+              "mapStats": {
+                "valueRange": 0.2422,
+                "heightP90Gradient": 0.0614,
+                "roughnessBase": 0.706,
+                "roughnessVariation": 0.117,
+                "normalStrength": 0.228,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#635750",
+                "#554C46",
+                "#48403B",
+                "#776960",
+                "#2F2927"
+              ]
+            },
+            "warnings": [
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "worn-composite",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.9,
+              "clearcoat": 0.0,
+              "clearcoatRoughness": 0.0,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 0.5,
+              "anisotropy": 0.0,
+              "procedural": "mottle"
+            },
+            "palette": [
+              "#6D5E56",
+              "#524A45",
+              "#453E3A",
+              "#453F3A",
+              "#4E4642"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "horizontal",
+            "stats": {
+              "meanLum": 72.4,
+              "meanSaturation": 0.161,
+              "gradientStrength": 0.145,
+              "mottle": 0.012,
+              "streakRatio": 1.09,
+              "hueSpread": 0.003,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "fabric.woven-matte",
+        "family": "fabric",
+        "subtype": "woven",
+        "finish": "matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.85,
+          "sheen": 0.65,
+          "sheenRoughness": 0.75
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "sheenColorMap",
+          "sheenRoughnessMap",
+          "aoMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.texture",
+          "khronos.sheen",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "diffuse body with grazing-angle sheen",
+          "woven directional microstructure",
+          "soft broad highlights"
+        ]
+      },
+      "observations": [
+        "near-neutral colour response",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/04-shoe.png",
+        "bbox": {
+          "x": 727,
+          "y": 608,
+          "width": 32,
+          "height": 20
+        },
+        "sourceWidth": 1672,
+        "sourceHeight": 941,
+        "loaderWarnings": [],
+        "coverage": 0.0004
+      },
+      "textureAnalysis": {
+        "finishClass": "worn-composite",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.9,
+          "clearcoat": 0.0,
+          "clearcoatRoughness": 0.0,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 0.5,
+          "anisotropy": 0.0,
+          "procedural": "mottle"
+        },
+        "palette": [
+          "#6D5E56",
+          "#524A45",
+          "#453E3A",
+          "#453F3A",
+          "#4E4642"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "horizontal",
+        "stats": {
+          "meanLum": 72.4,
+          "meanSaturation": 0.161,
+          "gradientStrength": 0.145,
+          "mottle": 0.012,
+          "streakRatio": 1.09,
+          "hueSpread": 0.003,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.85,
+        "estimatedFidelity": 0.85,
+        "targetThreshold": 0.7,
+        "materialId": "shoe",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/04-shoe.png",
+        "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe",
+        "palette": [
+          "#635750",
+          "#554C46",
+          "#48403B",
+          "#776960",
+          "#2F2927"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_albedo.png",
+            "url": "shoe_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_roughness.png",
+            "url": "shoe_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_height.png",
+            "url": "shoe_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_normal.png",
+            "url": "shoe_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_ao.png",
+            "url": "shoe_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 32,
+          "sourceHeight": 20,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 20
+          },
+          "mask": {
+            "backgroundColor": "#5C4E47",
+            "backgroundNoise": 46.195,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.4641
+          },
+          "mapStats": {
+            "valueRange": 0.2422,
+            "heightP90Gradient": 0.0614,
+            "roughnessBase": 0.706,
+            "roughnessVariation": 0.117,
+            "normalStrength": 0.228,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#635750",
+            "#554C46",
+            "#48403B",
+            "#776960",
+            "#2F2927"
+          ]
+        },
+        "warnings": [
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/04-shoe.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.85,
+        "estimatedFidelity": 0.85,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_albedo.png",
+            "url": "shoe_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_roughness.png",
+            "url": "shoe_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_height.png",
+            "url": "shoe_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_normal.png",
+            "url": "shoe_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_ao.png",
+            "url": "shoe_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 32,
+          "sourceHeight": 20,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 20
+          },
+          "mask": {
+            "backgroundColor": "#5C4E47",
+            "backgroundNoise": 46.195,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.4641
+          },
+          "mapStats": {
+            "valueRange": 0.2422,
+            "heightP90Gradient": 0.0614,
+            "roughnessBase": 0.706,
+            "roughnessVariation": 0.117,
+            "normalStrength": 0.228,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#635750",
+            "#554C46",
+            "#48403B",
+            "#776960",
+            "#2F2927"
+          ]
+        },
+        "warnings": [
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_albedo.png",
+          "url": "shoe_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_roughness.png",
+          "url": "shoe_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_height.png",
+          "url": "shoe_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_normal.png",
+          "url": "shoe_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-evidence/pbr-04-shoe/shoe_ao.png",
+          "url": "shoe_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    }
+  ],
+  "status": "proceed",
+  "limitations": [
+    "PBR extraction is reference-derived inference, not inverse rendering.",
+    "A crop must be checked against the component visible footprint before accepting material scores."
+  ],
+  "artifact": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/material-analysis.json"
+}

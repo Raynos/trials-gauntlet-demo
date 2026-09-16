@@ -1,7 +1,7 @@
 {
   "source": "assets/blender/source/rider-street.blend",
-  "sourceSha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220",
-  "exportSha256": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e",
+  "sourceSha256": "5b5effde064171323313198d4eceafb89b2d0128ddd19d30ab873ef1022adf01",
+  "exportSha256": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3",
   "outfit": "street",
   "lod": true,
   "localAO": {
@@ -10,7 +10,7 @@
     "strength": 0.8
   },
   "verified": {
-    "bytes": 549956,
+    "bytes": 546220,
     "triangles": 5880,
     "vertices": 7129,
     "bones": 19,
@@ -31,10 +31,11 @@
     "maxWeightError": 8.870847523212433e-08,
     "loadedWeightError": 3.329478204250336e-08
   },
-  "reviewedExportSource": "harness/out/blender/street-head/finished-street/street-assembled-v3.blend",
   "promotionAudit": {
-    "originalReport": "harness/out/blender/street-head/finished-street/models-standard/rider-street-lod.source.json",
-    "originalReportSha256": "5881ce08d174d1643d0ef88edcbdcccd40979ca177b78487a10912c063f8428a",
-    "method": "Reviewed bytes copied unchanged; canonical source path relabeled."
+    "acceptedScope": "Street charcoal palette only; anatomy and realism not accepted",
+    "review": "Parent played full normal-camera and forced-LOD inspection hop clips in QuickTime",
+    "recipe": "docs/evidence/hero-r11-palettes/README.md",
+    "parity": "docs/evidence/hero-r11-palettes/palette-parity.json",
+    "method": "Accepted source copied unchanged; only source-baked pro albedo transplanted into original full/LOD GLBs; all other payloads byte-identical."
   }
 }

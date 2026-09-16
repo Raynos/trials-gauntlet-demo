@@ -191,7 +191,7 @@ function loadManifest(id: string): Plugin[] {
   let root = process.cwd();
   let coreItems: LoadItem[] = [];
   let totals: DeclaredBootTotals = { heroModels: { street: 0, race: 0 }, bootArt: 0 };
-  const required = [...new Set([...HERO_FILES_BY_OUTFIT.street, ...HERO_FILES_BY_OUTFIT.race])];
+  const required = [...new Set(Object.values(HERO_FILES_BY_OUTFIT).flat())];
   const modelAssets = modelAssetsPlugin(required, (assets, catalogRoot) => { totals = writeBootPlanTable(catalogRoot, assets); });
   return [modelAssets, {
     name: 'trials:load-manifest',
@@ -232,7 +232,8 @@ function loadManifest(id: string): Plugin[] {
         // The inline loader: TypeScript, bundled; minified with the core list compiled in for the build (≤ 8 KB budget asserted).
         const code = await buildInline(root, ctx.bundle ? coreItems : [], totals, !!ctx.bundle, id);
         if (!html.includes('<script id="boot"></script>')) throw new Error('index.html: <script id="boot"></script> missing');
-        html = html.replace('<script id="boot"></script>', `<script>${code}</script>`);
+        // A callback keeps JS replacement tokens such as "$&" literal inside the bundle.
+        html = html.replace('<script id="boot"></script>', () => `<script>${code}</script>`);
         // Take over the entry: the loader inserts it once the core set is in cache (dev: straight away).
         let entry: string | null = null;
         html = html.replace(/\s*<script type="module"[^>]*src="([^"]+)"[^>]*><\/script>/g, (m, src: string) => {

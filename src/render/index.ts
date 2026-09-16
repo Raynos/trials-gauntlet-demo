@@ -14,7 +14,8 @@ import { BikeModel, type HeroBike } from './bike/bikeModel';
 import { HERO_URLS, loadGltf, lodUrl, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
 import type { ByteProgress, StepProgress, StepRunner } from '../boot/plan';
 import type { PrepareStep } from '../boot/steps';
-import { isRiderLodEnabled, lodChoice, setRiderLodEnabled } from './hero/lod';
+import { isRiderLodEnabled, lodChoice, setRiderLodEnabled, variantMaterialsFor } from './hero/lod';
+import { DEFAULT_RIDER_OUTFIT, normalizeRiderOutfit, riderPreset } from '../core/riderPresets';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
 import { riderUrl } from './hero/urls';
@@ -189,7 +190,7 @@ export class ThreeRenderer implements GameRenderer {
   private models: ModelChoices = { riderModel: 'proc', bikeModel: 'proc' };
   private readonly nearestScratch: number[] = [];
   private bikeClass: BikeClass = 'rookie';
-  private riderOutfit: RiderOutfit = 'street';
+  private riderOutfit: RiderOutfit = DEFAULT_RIDER_OUTFIT;
   private riderDocumentOutfit: RiderOutfit | null = null;
   /** Parsed hero documents: the authored files and (round 13) their `-lod.glb` twins for `low` / `medium`. */
   private readonly gltf: { bike: GLTF | null; rider: GLTF | null; bikeLod: GLTF | null; riderLod: GLTF | null } = { bike: null, rider: null, bikeLod: null, riderLod: null };
@@ -288,7 +289,7 @@ export class ThreeRenderer implements GameRenderer {
     // meshes, the post chain, the procedural textures and the art pack are built by
     // `prepare()` in ≤ 16 ms tasks (or lazily by the first call that needs them).
     {
-      this.riderOutfit = options.riderOutfit ?? 'street';
+      this.riderOutfit = normalizeRiderOutfit(options.riderOutfit) ?? DEFAULT_RIDER_OUTFIT;
       const riderModel: ModelChoice = options.riderModel ?? 'gltf';
       const bikeModel: ModelChoice = options.bikeModel ?? 'gltf';
       if (riderModel === 'gltf' || bikeModel === 'gltf') this.setModels({ riderModel, bikeModel }, options.heroBytes);
@@ -413,20 +414,33 @@ export class ThreeRenderer implements GameRenderer {
         want.bikeModel === 'gltf' && !this.gltf.bike
           ? Promise.all([loadGltf(HERO_URLS.bike, false, bytes), loadGltf(lodUrl(HERO_URLS.bike), true, bytes)])
           : Promise.resolve([this.gltf.bike, this.gltf.bikeLod]),
-        want.riderModel === 'gltf' && (!this.gltf.rider || this.riderDocumentOutfit !== outfit)
+        want.riderModel === 'gltf' && (!this.gltf.rider || !this.riderDocumentOutfit || riderUrl(this.riderDocumentOutfit) !== url)
           ? Promise.all([loadGltf(url, false, bytes), loadGltf(lodUrl(url), true, bytes)])
           : Promise.resolve([this.gltf.rider, this.gltf.riderLod]),
       ]);
       // A superseded outfit request must not even overwrite the stored documents: a later
       // quality change could otherwise resurrect the old outfit despite its swap being skipped.
       if (this.disposed || want !== this.models || outfit !== this.riderOutfit) return;
-      [this.gltf.bike, this.gltf.bikeLod] = [bike[0] ?? null, bike[1] ?? null];
       if (want.riderModel === 'gltf') {
         if (!rider[0] || !rider[1]) throw new Error(`Could not load both detail levels of ${outfit} rider outfit`);
-        [this.gltf.rider, this.gltf.riderLod] = [rider[0], rider[1]];
+        // Validate both documents before any installed identity or live material changes.
+        this.validateRiderPreset(rider[0], outfit);
+        this.validateRiderPreset(rider[1], outfit);
+      }
+      [this.gltf.bike, this.gltf.bikeLod] = [bike[0] ?? null, bike[1] ?? null];
+      const previousRider = [this.gltf.rider, this.gltf.riderLod] as const;
+      const previousOutfit = this.riderDocumentOutfit;
+      if (want.riderModel === 'gltf') {
+        [this.gltf.rider, this.gltf.riderLod] = [rider[0]!, rider[1]!];
         this.riderDocumentOutfit = outfit;
       }
-      this.applyModels();
+      try {
+        this.applyModels();
+      } catch (error) {
+        [this.gltf.rider, this.gltf.riderLod] = previousRider;
+        this.riderDocumentOutfit = previousOutfit;
+        throw error;
+      }
     };
     this.heroPending = run()
       .catch((e) => console.warn('[render] setModels failed', e))
@@ -437,6 +451,9 @@ export class ThreeRenderer implements GameRenderer {
 
   async setRiderOutfit(outfit: RiderOutfit): Promise<boolean> {
     if (this.disposed) return false;
+    const canonical = normalizeRiderOutfit(outfit);
+    if (!canonical) return false;
+    outfit = canonical;
     const previous = this.riderDocumentOutfit ?? this.riderOutfit;
     this.riderOutfit = outfit;
     // The procedural debug model has no clothing variants. Keep the preference honest.
@@ -482,7 +499,23 @@ export class ThreeRenderer implements GameRenderer {
 
   private makeRider(choice: ModelChoice): HeroRider {
     const doc = this.riderDoc();
-    return choice === 'gltf' && doc ? new GltfRider(doc, this.lib) : new RiderModel(this.lib);
+    if (choice !== 'gltf' || !doc) return new RiderModel(this.lib);
+    const rider = new GltfRider(doc, this.lib);
+    rider.setMaterialVariant(riderPreset(this.riderDocumentOutfit ?? this.riderOutfit).variant);
+    return rider;
+  }
+
+  private validateRiderPreset(doc: GLTF, outfit: RiderOutfit): void {
+    const variant = riderPreset(outfit).variant;
+    let mappedMeshes = 0;
+    doc.scene.traverse(o => {
+      if (!(o as THREE.Mesh).isMesh) return;
+      const table = variantMaterialsFor(doc, o.name);
+      if (!table.size) return;
+      mappedMeshes++;
+      if (!table.has(variant)) throw new Error(`Rider mesh ${o.name} lacks ${variant}`);
+    });
+    if (!mappedMeshes) throw new Error(`Rider document lacks material variants for ${outfit}`);
   }
 
   private kindOfBike(b: HeroBike): ModelChoice {
@@ -519,16 +552,19 @@ export class ThreeRenderer implements GameRenderer {
     if (this.kindOfRider(this.rider) !== wantRider || riderStale) {
       this.sceneEpoch++;
       const old = this.rider;
+      const next = this.makeRider(wantRider);
       old.detach();
       this.scene.remove(old.root);
-      const next = this.makeRider(wantRider);
-      if (next instanceof GltfRider) next.setLivery(this.bikeClass);
       next.attach(this.bike);
       if (this.tier === 'low') shrinkTextures(this.bike.root, 512, 256); // after attach: the glTF rider hangs under the bike frame
       this.scene.add(next.root);
       this.rider = next;
       this.retireObject(old.root, () => old.dispose());
       changed = true;
+    }
+    // Palette siblings reuse the same GLTF document and live skeleton.
+    if (this.rider instanceof GltfRider && this.riderDocumentOutfit) {
+      this.rider.setMaterialVariant(riderPreset(this.riderDocumentOutfit).variant);
     }
     if (changed) this.applyTierVisibility(); // round 13: the new hero instance takes the tier's shadow roles
     if (changed && this.ghost) {
@@ -1098,7 +1134,6 @@ export class ThreeRenderer implements GameRenderer {
     // The hero may not exist yet (built lazily by `ensureHero` / swapped by `applyModels`): both
     // paths read `bikeClass`, so a call before the first frame still lands.
     this.bikeRef?.setLivery(this.bikeClass);
-    if (this.riderRef instanceof GltfRider) this.riderRef.setLivery(this.bikeClass);
   }
 
   setQuality(tier: QualityTier): void {
@@ -1435,6 +1470,7 @@ export class ThreeRenderer implements GameRenderer {
     heroDoc: string;
     heroShadow: 'hero-only' | 'world';
     riderOutfit: RiderOutfit | null;
+    riderMaterialVariant: string | null;
     trackCalls: number;
     trackTris: number;
     textureGenMs: number;
@@ -1478,6 +1514,7 @@ export class ThreeRenderer implements GameRenderer {
       heroTris: (this.bikeRef?.triangles ?? 0) + (this.riderRef?.triangles ?? 0),
       heroDoc: `${this.bikeRef instanceof GltfBike ? (this.bikeRef.source === this.gltf.bikeLod ? 'bike-lod' : 'bike') : 'bike-proc'} ${this.riderRef instanceof GltfRider ? (this.riderRef.source === this.gltf.riderLod ? 'rider-lod' : 'rider') : 'rider-proc'}`,
       riderOutfit: this.riderRef instanceof GltfRider ? this.riderDocumentOutfit : null,
+      riderMaterialVariant: this.riderRef instanceof GltfRider && this.riderDocumentOutfit ? riderPreset(this.riderDocumentOutfit).variant : null,
       heroShadow: this.lightingRig?.isHeroShadow ? 'hero-only' : 'world',
       trackCalls: this.world?.trackCalls ?? 0,
       trackTris: Math.round(this.world?.trackTris ?? 0),

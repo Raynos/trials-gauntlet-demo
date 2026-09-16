@@ -131,9 +131,9 @@ export const PUBLIC_BYTES = {
   "models/rider-race-lod.source.json": 1193,
   "models/rider-race.glb": 1514536,
   "models/rider-race.source.json": 1192,
-  "models/rider-street-lod.glb": 549956,
-  "models/rider-street-lod.source.json": 1218,
-  "models/rider-street.glb": 1488288,
-  "models/rider-street.source.json": 1219,
+  "models/rider-street-lod.glb": 546220,
+  "models/rider-street-lod.source.json": 1289,
+  "models/rider-street.glb": 1476800,
+  "models/rider-street.source.json": 1294,
   "models/rider.glb": 865088,
 } as const;

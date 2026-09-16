@@ -14,12 +14,12 @@ import { declaredBootTotals } from './asset-totals';
 import type { ByteKey } from './steps';
 
 /** The glTF files `setModels` awaits (`Promise.all([full, lod])` per hero, src/render/index.ts). */
-export const HERO_FILES = HERO_FILES_BY_OUTFIT.street;
+export const HERO_FILES = HERO_FILES_BY_OUTFIT['street-mustard'];
 
 export const DECLARED_BOOT_TOTALS = declaredBootTotals((file) => PUBLIC_BYTES[file]);
 
 export function bootByteTotals(outfit: RiderOutfit): Readonly<Record<Exclude<ByteKey, 'core'>, number>> {
-  return { heroModels: DECLARED_BOOT_TOTALS.heroModels[outfit], bootArt: DECLARED_BOOT_TOTALS.bootArt };
+  return { heroModels: DECLARED_BOOT_TOTALS.heroModels[outfit.startsWith('race-') ? 'race' : 'street'], bootArt: DECLARED_BOOT_TOTALS.bootArt };
 }
 
-export const BOOT_BYTE_TOTALS = bootByteTotals('street');
+export const BOOT_BYTE_TOTALS = bootByteTotals('street-mustard');

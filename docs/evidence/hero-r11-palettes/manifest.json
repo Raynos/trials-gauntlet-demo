@@ -1,0 +1,89 @@
+{
+  "acceptedScope": "palette correction only",
+  "rejectedScope": "realism/anatomy and complete AI target reconstruction",
+  "reviewMethod": "Parent played both complete hop clips in QuickTime",
+  "oldTealMaterialNameTests": "mechanics evidence only, explicitly rejected as final charcoal target evidence",
+  "inputsAndOutputs": [
+    {
+      "path": "assets/blender/source/rider-street.blend",
+      "sha256": "5b5effde064171323313198d4eceafb89b2d0128ddd19d30ab873ef1022adf01",
+      "bytes": 32764417
+    },
+    {
+      "path": "assets/blender/build_rider.py",
+      "sha256": "ffdb58e9bb0e65b414375699eaa78b7d30aaacb0309a000ce767bbacff66b2db",
+      "bytes": 54803
+    },
+    {
+      "path": "public/models/rider-street.glb",
+      "sha256": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f",
+      "bytes": 1476800
+    },
+    {
+      "path": "public/models/rider-street-lod.glb",
+      "sha256": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3",
+      "bytes": 546220
+    },
+    {
+      "path": "harness/out/blender/five-presets-palettes/originals/public/models/rider-street-lod.glb",
+      "sha256": "f6772e5459a5cb0b13a01e688dd6013f6cc8a8801af1ca067a4de5190d20e45e",
+      "bytes": 549956
+    },
+    {
+      "path": "harness/out/blender/five-presets-palettes/originals/public/models/rider-street.glb",
+      "sha256": "df6f3d4cf513dc9df54da0f95a656e8bdbec6bcfe5691da9a05c22a03d300853",
+      "bytes": 1488288
+    },
+    {
+      "path": "harness/out/blender/five-presets-palettes/originals/assets/blender/source/rider-street.blend",
+      "sha256": "673617def879f5615a4ea72120705fd5be2c7e77d694d474bd30fae3d2971220",
+      "bytes": 32761780
+    },
+    {
+      "path": "harness/out/blender/five-presets-palettes/played-charcoal-full/clip.mp4",
+      "sha256": "95da7117c21f6884ef1075f56326732e88de8a9b91fb0485b6e80317637fb198",
+      "bytes": 2771410
+    },
+    {
+      "path": "harness/out/blender/five-presets-palettes/played-charcoal-lod-close/clip.mp4",
+      "sha256": "60f6aee5eb44e3b748b71d44c829ee34daa225d4a9f5a88b9491a8df7ac4db61",
+      "bytes": 2913893
+    },
+    {
+      "path": "harness/out/blender/five-presets-palettes/played-charcoal-full/evidence.json",
+      "sha256": "d322e8b795f09b5614856d762e560f14365d73c43da9a3dd2b7c323f3f93f609",
+      "bytes": 678791
+    },
+    {
+      "path": "harness/out/blender/five-presets-palettes/played-charcoal-lod-close/evidence.json",
+      "sha256": "cf93e439a8428e68a3393a7cccb195e3f68513a4e29b7c7541450793e383663c",
+      "bytes": 818364
+    },
+    {
+      "path": "src/render/hero/models.generated.ts",
+      "sha256": "7aa8cf24895860a521ccc2a49853d4b0bbfcc00ac628beb7616e5e8a48777b4d",
+      "bytes": 1834
+    },
+    {
+      "path": "src/boot/plan.generated.ts",
+      "sha256": "327ebda15319c904f48a70abfc9dbae13a65d63727e584cd1e98ceab38b539f7",
+      "bytes": 4786
+    },
+    {
+      "path": "public/models/rider-street.source.json",
+      "sha256": "1252052baed665765257b09c0d83661f02cd671b522af2369f7e7a7049d67527",
+      "bytes": 1294
+    },
+    {
+      "path": "public/models/rider-street-lod.source.json",
+      "sha256": "0b554e0fdf56864ac47242d8296e081d82f271ba356a764adefeac3b439709a6",
+      "bytes": 1289
+    }
+  ],
+  "validation": {
+    "build": "pnpm build \u2014 PASS; generated catalog includes promoted SHA256 files",
+    "tests": "pnpm exec vitest run src/render/hero/gltfRiderMaterials.test.ts src/render/hero/gltfRider.test.ts src/render/hero/gltfRiderPhysical.test.ts src/render/outfitLoading.test.ts src/ui/outfit.test.ts src/boot/totals.test.ts src/boot/model-catalog.test.ts \u2014 59 passed",
+    "typecheck": "pnpm typecheck \u2014 PASS",
+    "assetVerification": "Both promoted full/LOD passed verify_rider_asset.mjs; exact output in promoted-verification.json"
+  }
+}

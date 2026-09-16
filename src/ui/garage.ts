@@ -8,6 +8,7 @@
  * (`trials.bikeClass`); the per-tier default applies only until the player has picked once (rules.ts).
  */
 import type { BikeClass, RiderOutfit } from '../core/types';
+import { RIDER_PRESETS } from '../core/riderPresets';
 import type { ArtManifest } from './art';
 import { escapeHtml } from './front';
 import type { UiSfx } from './sfx';
@@ -166,7 +167,16 @@ export class GarageScreen {
     const outfitRow = h('div', 'outfit-options');
     outfitRow.setAttribute('role', 'group');
     outfitRow.setAttribute('aria-label', 'Rider outfit');
-    for (const outfit of RIDER_OUTFITS) {
+    for (const preset of RIDER_PRESETS) {
+      if (!preset.available) {
+        const unavailable = h('button', 'outfit-button', `<strong>${preset.label}</strong><span>${preset.detail}</span>`);
+        unavailable.type = 'button';
+        unavailable.disabled = true;
+        unavailable.dataset['design'] = preset.id;
+        outfitRow.appendChild(unavailable);
+        continue;
+      }
+      const outfit = preset.id;
       const button = h('button', 'outfit-button', `<strong>${OUTFIT_LABEL[outfit]}</strong><span>${OUTFIT_DETAIL[outfit]}</span>`);
       button.type = 'button';
       button.dataset['outfit'] = outfit;
@@ -251,6 +261,7 @@ export class GarageScreen {
     const moved = this.outfitFocus !== outfit || this.focusGroup !== 'outfit';
     this.focusGroup = 'outfit';
     this.outfitFocus = outfit;
+    this.outfits.get(outfit)?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     if (tick && moved) this.sfx.tick();
     this.paint();
   }
@@ -285,7 +296,7 @@ export class GarageScreen {
       this.sfx.tick();
       this.paint();
     } else if (this.focusGroup === 'bike') this.setFocus(this.focus === 'rookie' ? 'pro' : 'rookie', true);
-    else if (this.focusGroup === 'outfit') this.setOutfitFocus(this.outfitFocus === 'street' ? 'race' : 'street', true);
+    else if (this.focusGroup === 'outfit') this.setOutfitFocus(RIDER_OUTFITS[(RIDER_OUTFITS.indexOf(this.outfitFocus) + (dx > 0 ? 1 : -1) + RIDER_OUTFITS.length) % RIDER_OUTFITS.length]!, true);
     const target = this.focusGroup === 'bike' ? this.cards.get(this.focus) : this.focusGroup === 'outfit' ? this.outfits.get(this.outfitFocus) : this.backButton;
     target?.focus();
   }

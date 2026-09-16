@@ -28,6 +28,9 @@ import { countTriangles, prepareHeroMaterials } from './gltf';
 import { variantMaterialsFor } from './lod';
 import { makeRiderRigPose, riderRigFromCOM, RIDER_PROFILE, RIDER_TORSO_REST } from '../../physics/v2/rider';
 
+/** Asset material names; deliberately independent of bike physics class. */
+export type RiderMaterialVariant = 'rider_rookie' | 'rider_pro';
+
 const SHIFT = 0.65; // axle-midpoint frame → file frame (rear axle origin)
 /** Landing squash weight from the summed grounded compression: 0 at the ridden sag, `max` at sag + span. */
 const LAND = { sag: 0.9, span: 0.7, max: 0.9 };
@@ -116,8 +119,8 @@ export class GltfRider {
   /** The parsed document this instance was cloned from (`rider.glb` or `rider-lod.glb`). */
   readonly source: GLTF;
   /** Round 13 (H1 colourways): `rider_rookie` / `rider_pro` variant materials per mesh, own completed clones. */
-  private readonly variants: { mesh: THREE.Mesh; byClass: Partial<Record<BikeClass, THREE.Material>> }[] = [];
-  private livery: BikeClass = 'rookie';
+  private readonly variants: { mesh: THREE.Mesh; byVariant: Partial<Record<RiderMaterialVariant, THREE.Material>> }[] = [];
+  private materialVariant: RiderMaterialVariant | null = null;
   /** v1 / mock physics only (no `riderBody`): the additive clips run on these timers. */
   private landT = -1;
   private landW = 0.45;
@@ -156,10 +159,9 @@ export class GltfRider {
       if (!mesh.isMesh) return;
       const table = variantMaterialsFor(gltf, mesh.name);
       if (!table.size) return;
-      const byClass: Partial<Record<BikeClass, THREE.Material>> = {};
+      const byVariant: Partial<Record<RiderMaterialVariant, THREE.Material>> = {};
       for (const [name, src] of table) {
-        const cls = /_pro$/.test(name) ? 'pro' : /_rookie$/.test(name) ? 'rookie' : null;
-        if (!cls) continue;
+        if (name !== 'rider_rookie' && name !== 'rider_pro') continue;
         const own = src.clone();
         const std = own as THREE.MeshStandardMaterial;
         if (std.isMeshStandardMaterial) {
@@ -168,11 +170,11 @@ export class GltfRider {
           std.envMapIntensity = 0.8;
           this.materials.push(std);
         }
-        byClass[cls] = own;
+        byVariant[name] = own;
       }
-      if (byClass.rookie && byClass.pro) this.variants.push({ mesh, byClass });
+      this.variants.push({ mesh, byVariant });
     });
-    this.setLivery('rookie', true);
+    if (this.variants.length) this.setMaterialVariant('rider_rookie', true);
     this.scene.position.set(-SHIFT, 0, 0);
     this.root.name = 'rider:gltf';
     this.triangles = countTriangles(this.scene);
@@ -258,14 +260,25 @@ export class GltfRider {
     }
   }
 
-  /** Round 13 (H1): the suit colourway is the file's `KHR_materials_variants` material (`rider_rookie` / `rider_pro`). */
-  setLivery(cls: BikeClass, force = false): void {
-    if (cls === this.livery && !force) return;
-    this.livery = cls;
-    for (const v of this.variants) {
-      const m = v.byClass[cls];
-      if (m) v.mesh.material = m;
+  /** Select an exact asset palette. Validate every participating mesh before changing any. */
+  setMaterialVariant(variant: RiderMaterialVariant, force = false): void {
+    if (variant !== 'rider_rookie' && variant !== 'rider_pro') {
+      throw new Error(`Unknown rider material variant: ${String(variant)}`);
     }
+    if (!this.variants.length) throw new Error(`Rider has no material variants; requested ${variant}`);
+    for (const entry of this.variants) {
+      if (!entry.byVariant[variant]) throw new Error(`Rider mesh ${entry.mesh.name} is missing material variant ${variant}`);
+    }
+    if (variant === this.materialVariant && !force) return;
+    for (const entry of this.variants) entry.mesh.material = entry.byVariant[variant]!;
+    this.materialVariant = variant;
+  }
+
+  /** @deprecated Compatibility for existing callers; presets should use setMaterialVariant.
+   * Variant-free legacy/debug documents retain their original material, as before. */
+  setLivery(cls: BikeClass, force = false): void {
+    if (!this.variants.length) return;
+    this.setMaterialVariant(cls === 'pro' ? 'rider_pro' : 'rider_rookie', force);
   }
 
   attach(bike: HeroBike): void {

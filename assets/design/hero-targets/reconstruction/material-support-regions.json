@@ -1,0 +1,31 @@
+{
+  "referenceId": "street-mustard-supporting",
+  "regions": [
+    {
+      "componentId": "hair",
+      "regionId": "hair",
+      "materialSpecId": "hair",
+      "materialId": "hair.human",
+      "sourceImage": "../01-street-barehead.png",
+      "bbox": {
+        "x": 714,
+        "y": 144,
+        "width": 38,
+        "height": 31
+      }
+    },
+    {
+      "componentId": "sole-l",
+      "regionId": "rubber",
+      "materialSpecId": "rubber",
+      "materialId": "rubber.matte",
+      "sourceImage": "../01-street-barehead.png",
+      "bbox": {
+        "x": 756,
+        "y": 637,
+        "width": 45,
+        "height": 9
+      }
+    }
+  ]
+}

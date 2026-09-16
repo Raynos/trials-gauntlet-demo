@@ -1,0 +1,85 @@
+{
+  "ok": true,
+  "verdict": "pass",
+  "confidence": 0.854,
+  "estimatedFidelity": 0.854,
+  "targetThreshold": 0.7,
+  "materialId": "eye",
+  "sourceImage": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/eye-closeup.png",
+  "outDir": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/eye-pbr",
+  "palette": [
+    "#402B1F",
+    "#523A2B",
+    "#1A110E",
+    "#2B201C",
+    "#9D8277"
+  ],
+  "maps": {
+    "albedo": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/eye-pbr/eye_albedo.png",
+      "url": "eye_albedo.png",
+      "channel": "albedo",
+      "source": "reference-pixel-extraction"
+    },
+    "roughness": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/eye-pbr/eye_roughness.png",
+      "url": "eye_roughness.png",
+      "channel": "roughness",
+      "source": "reference-pixel-extraction"
+    },
+    "height": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/eye-pbr/eye_height.png",
+      "url": "eye_height.png",
+      "channel": "height",
+      "source": "reference-pixel-extraction"
+    },
+    "normal": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/eye-pbr/eye_normal.png",
+      "url": "eye_normal.png",
+      "channel": "normal",
+      "source": "reference-pixel-extraction"
+    },
+    "ao": {
+      "path": "/Users/raynos/projects/game-demos/trials-gauntlet-blender/assets/design/hero-targets/reconstruction/eye-pbr/eye_ao.png",
+      "url": "eye_ao.png",
+      "channel": "ao",
+      "source": "reference-pixel-extraction"
+    }
+  },
+  "diagnostics": {
+    "sourceWidth": 29,
+    "sourceHeight": 20,
+    "mapSize": 1024,
+    "cropBBoxPixels": {
+      "x": 0,
+      "y": 0,
+      "width": 29,
+      "height": 20
+    },
+    "mask": {
+      "backgroundColor": "#3C2927",
+      "backgroundNoise": 150.828,
+      "transparentPixelFraction": 0.0,
+      "foregroundCoverage": 0.8086
+    },
+    "mapStats": {
+      "valueRange": 0.259,
+      "heightP90Gradient": 0.02863,
+      "roughnessBase": 0.695,
+      "roughnessVariation": 0.052,
+      "normalStrength": 0.19,
+      "blurRadius": 21
+    },
+    "palette": [
+      "#402B1F",
+      "#523A2B",
+      "#1A110E",
+      "#2B201C",
+      "#9D8277"
+    ]
+  },
+  "warnings": [
+    "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+  ],
+  "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+}

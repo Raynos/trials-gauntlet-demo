@@ -17,7 +17,7 @@ export interface LoaderRenderer {
   readonly shown: { download: number; setup: number };
 }
 
-const DIGITS = '<b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b>';
+const DIGITS = '0123456789'.replace(/./g, '<b>$&</b>');
 
 export function createLoaderRenderer(root: HTMLElement, build: string, now: () => number = () => performance.now()): LoaderRenderer {
   const q = <T extends Element = HTMLElement>(sel: string): T => root.querySelector<T>(sel)!;
@@ -34,9 +34,9 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
   const track = (cls: string): Track => {
     const g = q(`.gauge.${cls}`);
     const drum = g.querySelector<HTMLElement>('.drum')!;
-    drum.innerHTML = `<span class="col h"></span><span class="col">${DIGITS}</span><span class="col">${DIGITS}</span><em>%</em>`;
+    const digitColumn = `<span class="col">${DIGITS}</span>`;
+    drum.innerHTML = `<span class="col h"><b> </b><b>1</b></span>${digitColumn.repeat(2)}<em>%</em>`;
     const cols = [...drum.querySelectorAll<HTMLElement>('.col')];
-    cols[0]!.innerHTML = '<b> </b><b>1</b>';
     return { ring: g.querySelector<SVGPathElement>('.ring')!, cols, line: g.querySelector<HTMLElement>('.line')!, value: -1 };
   };
   const dl = track('dl');
@@ -58,9 +58,9 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
     const h = v >= 100 ? 1 : 0;
     const tens = Math.floor((v % 100) / 10);
     const ones = v % 10;
-    t.cols[0]!.style.transform = `translateY(${-h}em)`;
-    t.cols[1]!.style.transform = `translateY(${-tens}em)`;
-    t.cols[2]!.style.transform = `translateY(${-ones}em)`;
+    [h, tens, ones].forEach((digit, index) => {
+      t.cols[index]!.style.transform = `translateY(${-digit}em)`;
+    });
     return v;
   }
 

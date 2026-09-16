@@ -384,8 +384,9 @@ html.short .bc-art { display: none; }
 .garage-outfits { flex: 0 0 auto; display: flex; flex-direction: column; gap: var(--s2); padding-bottom: var(--s2); }
 .outfit-heading { display: flex; justify-content: space-between; gap: var(--s2); font-size: .8rem; letter-spacing: .08em; }
 .outfit-current { color: var(--amber); }
-.outfit-options { display: flex; gap: var(--s2); }
-.outfit-button { display: flex; flex: 1 1 0; flex-direction: column; gap: var(--s1); min-width: 0; min-height: 48px; padding: var(--s2) var(--s3); text-align: left; color: var(--ink); background: var(--slab-3); border: 1px solid var(--line-2); border-radius: var(--r2); cursor: pointer; font: inherit; }
+.outfit-options { display: flex; gap: var(--s2); overflow-x: auto; padding: 3px; }
+.outfit-button:disabled { opacity: .55; cursor: not-allowed; }
+.outfit-button { display: flex; flex: 1 0 150px; flex-direction: column; gap: var(--s1); min-width: 150px; min-height: 48px; padding: var(--s2) var(--s3); text-align: left; color: var(--ink); background: var(--slab-3); border: 1px solid var(--line-2); border-radius: var(--r2); cursor: pointer; font: inherit; }
 .outfit-button strong { font-size: .9rem; }
 .outfit-button span { font-size: .72rem; line-height: 1.3; color: var(--ink-dim); }
 .outfit-button.selected { border-color: var(--amber); background: color-mix(in srgb, var(--amber) 12%, var(--slab-3)); }

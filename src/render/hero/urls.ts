@@ -3,13 +3,14 @@
  * the logical names, while the model loader resolves the generated paths at the fetch boundary.
  */
 import type { RiderOutfit } from '../../core/types';
+import { riderPreset } from '../../core/riderPresets';
 import { MODEL_ASSETS } from './models.generated';
 
 export const RIDER_URLS = { street: 'models/rider-street.glb', race: 'models/rider-race.glb' } as const;
 export const HERO_URLS = { bike: 'models/bike.glb', rider: RIDER_URLS.street } as const;
 
-export function riderUrl(outfit: RiderOutfit): (typeof RIDER_URLS)[RiderOutfit] {
-  return RIDER_URLS[outfit];
+export function riderUrl(outfit: RiderOutfit): (typeof RIDER_URLS)[keyof typeof RIDER_URLS] {
+  return RIDER_URLS[riderPreset(outfit).family];
 }
 
 /** Resolve a logical model name to the exact full/LOD byte snapshot compiled with this application. */
@@ -26,6 +27,8 @@ export function lodUrl<U extends string>(url: U): LodUrl<U> {
 }
 
 export const HERO_FILES_BY_OUTFIT = {
-  street: [HERO_URLS.bike, lodUrl(HERO_URLS.bike), RIDER_URLS.street, lodUrl(RIDER_URLS.street)],
-  race: [HERO_URLS.bike, lodUrl(HERO_URLS.bike), RIDER_URLS.race, lodUrl(RIDER_URLS.race)],
+  'street-mustard': [HERO_URLS.bike, lodUrl(HERO_URLS.bike), RIDER_URLS.street, lodUrl(RIDER_URLS.street)],
+  'street-charcoal': [HERO_URLS.bike, lodUrl(HERO_URLS.bike), RIDER_URLS.street, lodUrl(RIDER_URLS.street)],
+  'race-bluewhite': [HERO_URLS.bike, lodUrl(HERO_URLS.bike), RIDER_URLS.race, lodUrl(RIDER_URLS.race)],
+  'race-charcoalyellow': [HERO_URLS.bike, lodUrl(HERO_URLS.bike), RIDER_URLS.race, lodUrl(RIDER_URLS.race)],
 } as const;

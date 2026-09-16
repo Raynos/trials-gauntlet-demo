@@ -1,0 +1,10 @@
+# Supplemental turnaround intake
+
+1. Identification: generated fictional adult human, three views of one mustard hoodie/denim/glove/high-top design. The rider is now isolated; bike/HUD/environment excluded. Confidence .95 for garment identity, not exact face likeness.
+2. Form: front crown approximately(324,22), chin(326,153), soles y954; figure height932px, head including hair131px, ratio7.11. Shoulder span approximately x211–434 at y194, ratio1.70 head units. Neutral A-pose; profile and rear have similar crown/sole alignment. These are measurements of generated DESIGN, not recovered physical anatomy from the game image.
+3. Hierarchy: head→face/ears/hair; hoodie→hood/cuffs/pouch/hem/drawstrings; gloves→palm/fingers/pads; denim→waist/pockets/legs/seams; shoes→upper/tongue/laces/sole. Same macro inventory as target01.
+4. Attachments: hood sits over upper back, cuffs overlap forearms, gloves overlap wrists, trousers overlap shoe collars. Front and rear glove fingers have plausible separation but individual digit anatomy is too small to accept without model orbit review.
+5. Materials: matte cotton/denim, dark gloves, warm skin, brown hair, charcoal canvas, pale rubber and lace. Diffuse studio illumination still carries residual form shadows; not unlit albedo.
+6. Finish: mustard yellow-orange, desaturated dark blue jeans, nearly black gloves, warm brown hair. Face/garment shade differs with neutral lighting; preserve original game concept as final playing-view identity target.
+7. Identity: bare exposed bearded face, dropped hood, rolled sleeves, fitted denim and high-top silhouette preserved. New rear pocket stitching and hood central seam are synthesized design completion, not source-observed facts.
+8. Uncertainty/verdict: conditional supplemental design reference. Three views do not prove a consistent 3D volume; projection and orbit must verify. Useful for standing ratios, unseen rear construction and cleaner silhouette. Original target01 remains final game-view target. Front/profile/back crops carry explicit source pixel transforms. Do not count this generated sheet as implemented visual progress.
