@@ -830,7 +830,50 @@ html.short .rv-kinds { max-height: 2.6em; overflow: hidden; }
 html.short #ui .rv-comment { font-size: .85rem; }
 `;
 
-export const UI_CSS = TOKENS_CSS + FRONT_CSS + HUD_CSS + REVIEW_CSS;
+
+/* ---- review inbox (src/ui/inbox.ts): the HUD "✎ Note" control + the note sheet ---- */
+export const INBOX_CSS = /* css */ `
+/* Right edge under the top band (below the restart button / progress strip and the touch fps meter at 4.2rem), clear of the timer and the bottom touch strip; ≥ 44 pt. */
+.hud-note { position: absolute; right: calc(.8rem + var(--sar)); top: calc(5.3rem + var(--sat)); z-index: 3; display: inline-flex; align-items: center; gap: .35em; min-width: 44px; min-height: 44px; padding: 0 .75rem; border: 1px solid var(--line); border-radius: 999px; background: var(--slab); color: var(--ink); font: 700 .78rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; box-shadow: var(--plate); cursor: pointer; pointer-events: none; opacity: .85; transition: opacity var(--t2) var(--ease); -webkit-tap-highlight-color: transparent; }
+.hud-note span { font-size: 1.05rem; line-height: 1; }
+.hud-note.live { pointer-events: auto; }
+.hud-note:hover, .hud-note:focus-visible { opacity: 1; border-color: var(--amber); }
+.hud.results-on .hud-note, .hud.replay-on .hud-note, .hud.review-on .hud-note { opacity: 0; pointer-events: none; }
+.inbox { position: absolute; inset: 0; z-index: 29; /* above .rotate (28), below .toast (30) */ display: flex; align-items: center; justify-content: center; padding: calc(var(--s3) + var(--sat)) calc(var(--s4) + var(--sar)) calc(var(--s3) + var(--sab)) calc(var(--s4) + var(--sal)); background: rgba(6,7,9,.6); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
+.inbox.show { opacity: 1; visibility: visible; transition: opacity var(--t2) var(--ease); }
+.inbox.live { pointer-events: auto; }
+.inbox:not(.live) * { pointer-events: none !important; }
+.inbox-card { width: min(100%, 44rem); max-height: 100%; display: flex; flex-direction: column; background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--plate), 0 18px 40px rgba(0,0,0,.6); overflow: hidden; }
+.inbox-head { display: flex; align-items: center; justify-content: space-between; padding: var(--s2) var(--s2) var(--s2) var(--s4); font-size: .9rem; letter-spacing: .12em; text-transform: uppercase; color: var(--amber); border-bottom: 1px solid var(--line); }
+.inbox-close { min-width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--ink); font-size: 1rem; cursor: pointer; }
+.inbox-body { display: grid; grid-template-columns: 9rem 1fr; grid-auto-rows: min-content; gap: var(--s2) var(--s3); padding: var(--s3) var(--s4); overflow: auto; -webkit-overflow-scrolling: touch; min-height: 0; }
+.inbox-shot { grid-row: 1 / span 2; width: 9rem; max-width: 100%; border-radius: var(--r1); border: 1px solid var(--line); background: #000; align-self: start; }
+.inbox-shot[hidden] { display: none; }
+.inbox-text { grid-column: 2; width: 100%; min-height: 4.6rem; resize: vertical; padding: var(--s2) var(--s3); border: 1px solid var(--line); border-radius: var(--r1); background: rgba(255,255,255,.06); color: var(--ink); font: 400 1rem/1.35 var(--font); letter-spacing: .01em; -webkit-user-select: text; user-select: text; }
+.inbox-text:focus { outline: 2px solid var(--amber); outline-offset: -1px; }
+.inbox-chips { grid-column: 2; display: flex; flex-wrap: wrap; gap: .3rem; }
+.inbox-chips .chip { display: inline-flex; align-items: baseline; gap: .35em; padding: .2rem .5rem; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.05); font: 600 .72rem/1.2 var(--mono); color: var(--ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inbox-chips .chip i { font-style: normal; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .1em; font-size: .62rem; }
+.inbox-pw { grid-column: 1 / -1; display: flex; flex-direction: column; gap: .3rem; }
+.inbox-pw[hidden] { display: none; }
+.inbox-pw label { display: flex; align-items: center; gap: var(--s3); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; color: var(--ink-dim); }
+.inbox-pw input { flex: 1; min-height: 44px; padding: 0 var(--s3); border: 1px solid var(--line); border-radius: var(--r1); background: rgba(255,255,255,.06); color: var(--ink); font: 400 1rem/1 var(--mono); -webkit-user-select: text; user-select: text; }
+.inbox-pw small { color: var(--ink-mute); font-size: .74rem; }
+.inbox-status { grid-column: 1 / -1; min-height: 1.1em; font-size: .8rem; color: var(--ink-mute); }
+.inbox-status.bad { color: #ff7a6a; }
+.inbox-status.good { color: #8fe38f; }
+.inbox-foot { display: flex; justify-content: flex-end; gap: var(--s2); padding: var(--s2) var(--s4) calc(var(--s2)); border-top: 1px solid var(--line); }
+.inbox-toast { position: absolute; z-index: 30; left: 50%; bottom: calc(var(--s5) + var(--sab)); transform: translate(-50%, 140%); padding: var(--s2) var(--s4); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); font-weight: 700; letter-spacing: .06em; white-space: nowrap; opacity: 0; transition: transform var(--t3) var(--ease), opacity var(--t3) var(--ease); pointer-events: none; }
+.inbox-toast.show { transform: translate(-50%, 0); opacity: 1; }
+.inbox-toast.good { border-color: #4caf50; }
+.inbox-toast.bad { border-color: #ff7a6a; }
+html.short .inbox-body { grid-template-columns: 6.5rem 1fr; padding: var(--s2) var(--s3); }
+html.short .inbox-shot { width: 6.5rem; }
+html.short .inbox-text { min-height: 3.2rem; }
+html.short .inbox-chips .chip { font-size: .64rem; }
+`;
+
+export const UI_CSS = TOKENS_CSS + FRONT_CSS + HUD_CSS + REVIEW_CSS + INBOX_CSS;
 
 let injected = false;
 export function injectStyles(): void {
