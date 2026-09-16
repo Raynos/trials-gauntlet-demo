@@ -207,7 +207,8 @@ async function boot(){
     const bikeRoot=loaded.find(item=>item.asset.kind==='bike')?.root;
     if(bikeRoot){const coarseMinY=new THREE.Box3().setFromObject(bikeRoot).min.y;const preciseMinY=new THREE.Box3().setFromObject(bikeRoot,true).min.y;hero.position.y-=preciseMinY;hero.updateMatrixWorld(true);grounding={coarseMinY,preciseMinY,assemblyOffsetY:hero.position.y,finalMinY:new THREE.Box3().setFromObject(bikeRoot,true).min.y};}
     fitAssetShadows();
-    const clipNames=[...new Set(loaded.flatMap(item=>item.clips.map(c=>c.name)))];
+    const motionOrder=['sit_cruise','forward_attack','hang_back','compression','extension','landing_absorption'];
+    const clipNames=[...new Set(loaded.flatMap(item=>item.clips.map(c=>c.name)))].sort((a,b)=>{const rank=(name:string)=>motionOrder.includes(name)?motionOrder.indexOf(name):motionOrder.length;return rank(a)-rank(b)||a.localeCompare(b);});
     for(const name of clipNames){const button=document.createElement('button');button.dataset.clip=name;button.textContent=({sit_cruise:'Seated neutral',forward_attack:'Forward rise',hang_back:'Rearward shift',compression:'Compression',extension:'Extension',landing_absorption:'Landing absorption'} as Record<string,string>)[name]??name.replaceAll('_',' ');button.setAttribute('aria-pressed','false');$('#clips').append(button);}
     $('#motion-note').textContent=clipNames.length?'Playback uses exported GLB animation clips.':'No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.';
     if(clipNames.length)setClip(clipNames.includes('sit_cruise')?'sit_cruise':clipNames[0]);

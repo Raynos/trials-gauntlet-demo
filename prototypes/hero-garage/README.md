@@ -4,7 +4,7 @@ Independent Three.js production viewer for target 01. This package imports no ga
 
 ## Current milestone
 
-The user requested breadth-first work: the complete person and bike in Three.js, followed by individual polish. The viewer now loads the complete existing Blender-authored Street rider and trials bike, with `sit_cruise` as the default clip and full-scene framing. Head-only studies are preserved and paused. This assembled baseline is not final art acceptance or iPhone/runtime proof.
+The user requested breadth-first work: the complete person and bike in Three.js, followed by individual polish. The viewer now loads the complete existing Blender-authored Street rider and trials bike, with `sit_cruise` as the default clip and full-scene framing. Six authored clips cover seated, forward, rearward, compression, extension and landing absorption. These rider motions run on a stationary bike; suspension and game-physics integration are separate open work. Head-only studies are preserved and paused. This assembled baseline is not final art acceptance or iPhone/runtime proof.
 
 ## Run and build
 
@@ -25,7 +25,9 @@ Use the repository's headless harness only; do not launch an interactive browser
 ```sh
 npm exec playwright install webkit chromium
 npm run verify:assets
-npm run capture -- --engine webkit --seconds 30 --name head-candidate01
+npm run capture -- --engine webkit --seconds 30 --camera full --clip landing_absorption --name whole-scene-review
+# Timing diagnosis without video; use recorded runs for art judgment.
+npm run capture -- --engine webkit --seconds 30 --camera full --clip forward_attack --name whole-scene-timing --no-video
 ```
 
 The viewer supports touch orbit/pinch and responsive controls. Coarse-pointer devices render at a 30 fps cap; desktop caps at 60. Internal DPR caps are 1.5 for narrow viewports and 2 for desktop. These are chosen settings, not evidence of actual iPhone performance. Performance acceptance still requires the declared real device.
@@ -44,7 +46,7 @@ The viewer supports touch orbit/pinch and responsive controls. Coarse-pointer de
 }
 ```
 
-Asset kinds are `head`, `rider`, and `bike`. Optional `position` and `rotation` are three-number arrays; rotation uses radians. Optional `scale` is a uniform number. GLB coordinates are Y-up, meters, face forward along +Z. Assets share one coordinate space; do not normalize each body component independently. The first head should be centered near `(0, 1.65, 0)`. Face framing fits head bounds, full/reference fit all assets, and bike fits bike bounds. Without a separate head, face framing selects the upper portion of the rider bounds. Bike UI is disabled when no bike exists.
+Asset kinds are `head`, `rider`, and `bike`. Optional `position` and `rotation` are three-number arrays; rotation uses radians. Optional `scale` is a uniform number. GLB coordinates are Y-up and meters. The active rider/bike assembly faces +X, with wheel axles along Z; the older isolated portrait studies face +Z. Assets share one coordinate space; do not normalize each body component independently. The first head should be centered near `(0, 1.65, 0)`. Face framing fits head bounds, full/reference fit all assets, and bike fits bike bounds. Without a separate head, face framing selects the upper portion of the rider bounds. Bike UI is disabled when no bike exists.
 
 Use glTF PBR-compatible exported materials. GLTFLoader preserves appropriate texture color spaces; renderer output is sRGB with ACES filmic tone mapping and fixed exposure. Garage and neutral lighting both use the same environment and no post-processing. Unsupported compression requires adding and validating the appropriate decoder before cataloging those exports.
 

@@ -25,6 +25,8 @@ Round 13 adds compression, extension and landing-absorption clips with seated re
 
 Round 14 corrects an earlier misleading contact metric: saddle-region gaps were 33–45 mm despite a 0.6 mm minimum elsewhere. The new seat-fit candidate reduces central gaps to 2–3.54 mm; uneven side support and a measured 0.05 mm rearward grazing intersection remain. The bike receives source-derived 2K color/1K lossless data maps. [Review and resource limits](../../prototypes/hero-garage/reports/whole-seat-materials-review.json) retain both provisionally; estimated active image residency is 98.76 MiB before renderer allocations.
 
+Round 15 reconstructs the existing open neckline rim into a connected collar (+583 net triangles). Full-scene neutral/landing review shows reduced gaping, but the 10.15 mm front seam, collar UV stretch and shoulder shape remain provisional. [Review](../../prototypes/hero-garage/reports/whole-collar-round15-review.json) includes the passing frozen game ship gate: 1,038 identical ticks, 8.65-second clear, one-tick restart.
+
 Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest user-reported allowance is 27% remaining, with the 20% reserve unchanged.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)

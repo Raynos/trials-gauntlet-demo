@@ -1,13 +1,13 @@
 {
-  "createdAt": "2026-09-16T12:53:20.491Z",
+  "createdAt": "2026-09-16T13:04:19.365Z",
   "scope": "GLB structure; no art or deformation acceptance",
   "assets": [
     {
-      "file": "public/assets/street01-rider-seat.glb",
-      "sha256": "7f12c9afcab9e94e3646af56dbf2f898c3c68baac76d24695fcf8f98159659c3",
-      "bytes": 2740448,
+      "file": "public/assets/street01-rider-garment-repair.glb",
+      "sha256": "16bf738f00bddead6552bb53cf23b7a121dcaf7f5c15f623d0c0838c3b2a4262",
+      "bytes": 2760380,
       "generator": "Khronos glTF Blender I/O v5.2.40",
-      "triangles": 44734,
+      "triangles": 45317,
       "primitives": 1,
       "materials": [
         {
