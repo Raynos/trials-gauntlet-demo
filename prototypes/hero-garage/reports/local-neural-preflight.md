@@ -1,6 +1,12 @@
-# Local neural 3D route — September 16, 2026
+# Separate neural 3D experiment — September 16, 2026
+
+Current scope: the user directed the original Blender/licensed-asset production plan to proceed without either neural model. Hunyuan is a separate parallel experiment only. TRELLIS is paused. This report preserves setup history; none of these results is a dependency or acceptance gate for the main build.
 
 The user requested downloading/running TRELLIS.2 and/or Hunyuan3D on this laptop for the existing HERO_GARAGE production goal. This investigation does not change target01 or accept generated assets automatically.
+
+## Latest isolated result
+
+Hunyuan shape inference succeeded in 75.0 seconds (77.35 seconds total, nonisolated timing), exporting 226,686 vertices and 454,454 faces. Evidence: `/Users/raynos/ai-tools/Hunyuan3D-2.1-mlx/outputs/hero-head-a1/shape-report.json` and `shape.glb`. The first attempt failed in empty SDF refinement; a documented local scheduler fix changes the final sigma from 0 to 1 to match the bundled PyTorch implementation. Original failure and `local-scheduler-fix.patch` are preserved. PBR is queued behind verified paint-weight downloads under the bounded supervisor. No visual acceptance or main-catalog integration is claimed. The setup statements below are historical.
 
 ## Machine and selected route
 

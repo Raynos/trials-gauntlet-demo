@@ -1,18 +1,27 @@
 {
-  "status": "unaccepted first authored-source head candidate",
+  "status": "unaccepted correction 2 authored-source head candidate",
+  "normal_conversion": {
+    "status": "disabled after parent observed mottled plate shading",
+    "prior_inference": "card-space normal interpretation remains unverified"
+  },
   "source": "art/street01-head-authored.blend",
   "runtime": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-head-authored.glb",
   "targets": {
-    "head/head-rectangular": 0.24,
-    "head/head-fat-decr": 0.2,
-    "chin/chin-bones-incr": 0.25,
-    "chin/chin-width-incr": 0.12,
-    "chin/chin-prominent-incr": 0.18,
-    "nose/nose-scale-depth-incr": 0.18,
-    "nose/nose-greek-incr": 0.18,
-    "nose/nose-point-down": 0.12,
-    "cheek/l-cheek-bones-incr": 0.16,
-    "cheek/r-cheek-bones-incr": 0.16,
+    "head/head-rectangular": 0.42,
+    "head/head-fat-decr": 0.3,
+    "head/head-age-incr": 0.2,
+    "eyebrows/eyebrows-trans-forward": 0.42,
+    "eyebrows/eyebrows-trans-down": 0.19,
+    "eyes/l-eye-push2-in": 0.18,
+    "eyes/r-eye-push2-in": 0.18,
+    "chin/chin-bones-incr": 0.42,
+    "chin/chin-width-incr": 0.23,
+    "chin/chin-prominent-incr": 0.24,
+    "nose/nose-scale-depth-incr": 0.08,
+    "nose/nose-greek-incr": 0.1,
+    "nose/nose-point-down": 0.09,
+    "cheek/l-cheek-bones-incr": 0.25,
+    "cheek/r-cheek-bones-incr": 0.25,
     "cheek/l-cheek-volume-decr": 0.1,
     "cheek/r-cheek-volume-decr": 0.1
   },
@@ -22,6 +31,7 @@
       "material": "MPFB_AdultMale_SourceProbe.eyebrow001",
       "color_image": "eyebrow001.png",
       "alpha": "MASK",
+      "normal_map": null,
       "omitted_maps": [],
       "previous_nodes": [
         "ShaderNodeOutputMaterial",
@@ -33,23 +43,11 @@
       ]
     },
     {
-      "object": "MPFB_AdultMale_SourceProbe.eyelashes01",
-      "material": "MPFB_AdultMale_SourceProbe.eyelashes01",
-      "color_image": "eyelashes01.png",
-      "alpha": "MASK",
-      "omitted_maps": [],
-      "previous_nodes": [
-        "ShaderNodeOutputMaterial",
-        "ShaderNodeBsdfPrincipled",
-        "ShaderNodeMixRGB",
-        "ShaderNodeTexImage"
-      ]
-    },
-    {
       "object": "MPFB_AdultMale_SourceProbe.high-poly",
       "material": "MPFB_AdultMale_SourceProbe.high-poly",
       "color_image": "brown_eye.png",
       "alpha": "MASK",
+      "normal_map": null,
       "omitted_maps": [],
       "previous_nodes": [
         "ShaderNodeOutputMaterial",
@@ -63,6 +61,7 @@
       "material": "Street01_Authored_EditableBody.body",
       "color_image": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter.png",
       "alpha": "OPAQUE",
+      "normal_map": null,
       "omitted_maps": [],
       "previous_nodes": [
         "ShaderNodeOutputMaterial",
@@ -76,6 +75,7 @@
       "material": "Street01_Authored_EditableBody.cortu_short_messy_hair",
       "color_image": "short_messy_diff.png",
       "alpha": "MASK",
+      "normal_map": null,
       "omitted_maps": [
         "short_messy_objnorm.png"
       ],
@@ -88,9 +88,45 @@
         "ShaderNodeNormalMap",
         "ShaderNodeTexImage"
       ]
+    },
+    {
+      "object": "Street01_grinsegold_full_beard",
+      "material": "Street01_Authored_EditableBody.grinsegold_full_beard",
+      "color_image": "Full_beard_black_diff.png",
+      "alpha": "BLEND",
+      "normal_map": null,
+      "omitted_maps": [
+        "Full_beard_black_diff_hn.png"
+      ],
+      "previous_nodes": [
+        "ShaderNodeOutputMaterial",
+        "ShaderNodeBsdfPrincipled",
+        "ShaderNodeBump",
+        "ShaderNodeTexImage",
+        "ShaderNodeMixRGB",
+        "ShaderNodeTexImage"
+      ]
+    },
+    {
+      "object": "Street01_grinsegold_moustache",
+      "material": "Street01_Authored_EditableBody.grinsegold_moustache",
+      "color_image": "Moustache_black_diff.png",
+      "alpha": "BLEND",
+      "normal_map": null,
+      "omitted_maps": [
+        "Moustache_black_diff_hn.png"
+      ],
+      "previous_nodes": [
+        "ShaderNodeOutputMaterial",
+        "ShaderNodeBsdfPrincipled",
+        "ShaderNodeBump",
+        "ShaderNodeTexImage",
+        "ShaderNodeMixRGB",
+        "ShaderNodeTexImage"
+      ]
     }
   ],
-  "uniform_scale": 1.024496101158774,
+  "uniform_scale": 1.0242583433062717,
   "source_crop_min_z": 1.445,
   "runtime_y_bounds": [
     1.531,
@@ -116,23 +152,130 @@
       "uv_layers": 1
     },
     {
-      "name": "MPFB_AdultMale_SourceProbe.eyelashes01_Runtime",
-      "vertices": 250,
-      "triangles": 368,
-      "uv_layers": 1
-    },
-    {
       "name": "Street01_Cortu_AuthoredHair_Runtime",
       "vertices": 832,
       "triangles": 1092,
+      "uv_layers": 1
+    },
+    {
+      "name": "Street01_grinsegold_full_beard_Runtime",
+      "vertices": 423,
+      "triangles": 748,
+      "uv_layers": 1
+    },
+    {
+      "name": "Street01_grinsegold_moustache_Runtime",
+      "vertices": 81,
+      "triangles": 120,
       "uv_layers": 1
     }
   ],
   "notes": [
     "No procedural face displacements or replacement eye reconstruction.",
-    "Fitted Cortu short messy authored hair; no new procedural groom.",
+    "Fitted Cortu short messy authored hair; original strand coverage retained, broad atlas panels remain a source limitation.",
     "Body/helpers cropped only after official mask modifier evaluation on export copy.",
-    "Imported object-space hair normal deliberately omitted rather than mislabeled tangent.",
-    "Beard from jartur69 authored middleage Slavic male skin; unmodified source UV texture."
-  ]
+    "Unverified hair and beard normal interpretation disabled after parent observed mottled plates; no normal map in this candidate.",
+    "Skin from jartur69 plus fitted grinsegold full beard and moustache; authored geometry/textures. Local personal trial only pending conflicting CC-BY/AGPL metadata resolution."
+  ],
+  "runtime_sha256": "53f37cabb06df9d9cb788dbbd6c5cceb9061019e4f83ae9783938670f5eaabc0",
+  "runtime_bytes": 8783492,
+  "beard_fit_verification": [
+    {
+      "name": "Street01_grinsegold_full_beard",
+      "distance_m_percentiles": [
+        0.0009971903637051582,
+        0.0009999291505664587,
+        0.0010000143432989717,
+        0.0010001001646742225
+      ],
+      "modifier_offset_m": 0.0010000000474974513
+    },
+    {
+      "name": "Street01_grinsegold_moustache",
+      "distance_m_percentiles": [
+        0.000986853614449501,
+        0.0009996751323342323,
+        0.0010000030742958188,
+        0.0010000410256907344
+      ],
+      "modifier_offset_m": 0.0010000000474974513
+    }
+  ],
+  "gltf_material_verification": [
+    {
+      "name": "MPFB_AdultMale_SourceProbe.eyebrow001",
+      "alphaMode": "MASK",
+      "alphaCutoff": 0.35,
+      "normalTexture": null,
+      "baseColorFactor": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "MPFB_AdultMale_SourceProbe.high-poly",
+      "alphaMode": "MASK",
+      "alphaCutoff": 0.35,
+      "normalTexture": null,
+      "baseColorFactor": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "Street01_Authored_EditableBody.body",
+      "alphaMode": "OPAQUE",
+      "alphaCutoff": null,
+      "normalTexture": null,
+      "baseColorFactor": [
+        0.78,
+        0.66,
+        0.53,
+        1
+      ]
+    },
+    {
+      "name": "Street01_Authored_EditableBody.cortu_short_messy_hair",
+      "alphaMode": "MASK",
+      "alphaCutoff": 0.12,
+      "normalTexture": null,
+      "baseColorFactor": [
+        0.065,
+        0.033,
+        0.017,
+        1
+      ]
+    },
+    {
+      "name": "Street01_Authored_EditableBody.grinsegold_full_beard",
+      "alphaMode": "BLEND",
+      "alphaCutoff": null,
+      "normalTexture": null,
+      "baseColorFactor": [
+        1,
+        0.72,
+        0.5,
+        0.58
+      ]
+    },
+    {
+      "name": "Street01_Authored_EditableBody.grinsegold_moustache",
+      "alphaMode": "BLEND",
+      "alphaCutoff": null,
+      "normalTexture": null,
+      "baseColorFactor": [
+        1,
+        0.72,
+        0.5,
+        0.58
+      ]
+    }
+  ],
+  "hair_source_limit": "Cortu shared broad strand panels cannot become target irregular curl groups by material adjustments; parent must judge in played orbit. No further source correction authorized in this round.",
+  "beard_transparency_limit": "BLEND near-surface single-sided mesh; motion sorting requires browser orbit review. Not claimed sorted from static source diagnostic.",
+  "license_scope": "Grinsegold local personal trial; official CC-BY pack vs embedded AGPL header remains unresolved for public release."
 }

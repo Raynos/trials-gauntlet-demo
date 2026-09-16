@@ -1,6 +1,6 @@
 # High-fidelity rider and bike: fresh garage production plan
 
-Status: Milestone A in progress, September 16, 2026. Independent viewer and source intake built. Generic-head and textured-scan routes were rejected in recorded browser review. The MPFB authored-source trial improved open eyes/topology but was rejected for identity, hair and skin/beard. User requested local TRELLIS.2/Hunyuan investigation; TRELLIS.2 Apple Silicon port setup is next. No visual milestone or new production asset is accepted.
+Status: Milestone A in progress, September 16, 2026. Main production uses local Blender and licensed authored assets, with no Hunyuan or TRELLIS dependency. The MPFB head has completed two corrections; parent orbit review still rejects hair, identity and beard variation. The exhausted Cortu hair source is being replaced. A separate Hunyuan experiment runs in parallel; TRELLIS work is paused. No visual milestone is accepted yet.
 
 ## Confirmed user decisions
 
@@ -13,9 +13,9 @@ Status: Milestone A in progress, September 16, 2026. Independent viewer and sour
 
 ## Latest execution result
 
-The standalone viewer builds and its headless WebKit loading, deterministic canvas repeat, missing-file and touch-control checks pass. The original anatomy route failed likeness/groom review; a licensed textured scan improved surface credibility but its eye reconstruction and hair cards still fail after a fresh-owner correction. See [final parent review](../../prototypes/hero-garage/reports/parent-review-scan-a2.json), [recorded comparison](../../prototypes/hero-garage/captures/head-scan-a2-review/webkit-orbit-relight.webm), and the [art handoff](../../prototypes/hero-garage/reports/ART-HANDOFF.md).
+The independent viewer builds and its headless WebKit loading, deterministic canvas repeat, missing-file and touch-control checks pass. Generic-head and scan routes were rejected. MPFB correction2 improves beard fit and eye clarity but still fails the target curls, facial identity and beard variation in the [recorded parent review](../../prototypes/hero-garage/reports/parent-review-authored-a3.json). The Cortu hair correction loop is stopped; a replacement authored curly-hair source is being investigated. No body or outfit multiplication begins before Milestone A passes.
 
-The agreed changed-source/method stop rule applies to the rejected routes. Active goal execution has resumed with a materially different free source: MPFB authored facial morphs, fitted open eyes and male skin textures; its Blender 5.2.1 import works. The completed [browser trial](../../prototypes/hero-garage/reports/parent-review-authored-a1.json) still fails identity, ribbon-like hair and skin/beard quality. The user now requests downloading/running neural generation locally. TRELLIS.2 Apple Silicon ports are being evaluated; Hunyuan3D 2.1 is excluded because the user confirmed use within a territory excluded by its license. The hourly heartbeat remains paused while this active goal runs. Last usage check: 33% remaining, above the 20% floor. No spending or specialist contact has occurred. Body, bike, rig, variants and integration remain open. The initial desktop recording trace missed the p95 budget, and no physical iPhone was connected; neither runtime/device gate passed.
+The user explicitly directed the main plan to proceed without waiting on neural models. Hunyuan remains a separate local experiment with no authority to change the main asset catalog or count as a production pass. TRELLIS setup is preserved but paused. All original body, bike, rig, variants, integration and device requirements remain open. The hourly heartbeat remains paused while the active goal runs. Last allowance check:30% remaining; floor20%. No spending or specialist contact has occurred.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)
 
@@ -240,3 +240,7 @@ TRELLIS.2 Apple Silicon dependency installation and Metal capability checks now 
 The user explicitly directed trials of Hunyuan3D2.1 and TRELLIS.2. Hunyuan’s MLX port is now being installed locally; this supersedes the earlier decision to omit that trial, not the recorded license terms. TRELLIS2 public weights are downloaded and DINOv3 access is pending review by its repository authors after successful local login. No alternative model is silently substituted and neither neural pipeline has generated a hero asset yet.
 
 Hunyuan MLX now imports shape and paint and passes40 renderer checks. Its ungated weights are downloading, and the first target-head input/seed/settings are frozen. This is setup progress, not Milestone A acceptance; the actual generated shape, PBR export and browser orbit remain pending.
+
+### Round 6 verification and isolated experiment
+
+The existing game again passes frozen WebKit cold boot, 1,038 byte-identical replay ticks to an 8.65s clear, crash and one-tick restart; see `prototypes/hero-garage/reports/round6-ship/report.json`. This does not accept the garage artwork or prove iPhone performance. Hunyuan separately generated a raw head in 75 seconds after a documented scheduler-port fix; paint is queued behind remaining weights. It has not entered the main catalog. Earlier neural setup paragraphs below the main plan are historical, superseded by this status and the scope at the top.

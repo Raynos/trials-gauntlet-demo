@@ -1,0 +1,18 @@
+{
+  "verdict": "FAIL \u2014 correction2 improves beard fit and eye clarity but does not establish target identity or curls",
+  "sha256": "53f37cabb06df9d9cb788dbbd6c5cceb9061019e4f83ae9783938670f5eaabc0",
+  "video": "captures/head-authored-a3/webkit-orbit-relight.webm",
+  "reviewMethod": "Sequential 1fps decoded frames 05\u201312 from completed 8-second WebKit orbit/relight recording, original reference visible beside runtime. Sparse frame review cannot exclude transient sorting faults.",
+  "visibleDefects": [
+    "Hair reads as wide flat ribbons with exposed gaps, floating strips and a hard nape boundary, not the target curl groups.",
+    "Beard fits closer but retains a uniform dark painted region and abrupt cheek boundary instead of varied short stubble.",
+    "Face remains smooth and youthful with insufficient cheek/brow structure; target identity is not established."
+  ],
+  "improvements": [
+    "Beard no longer projects as a thick shell",
+    "Eyes clearer after removing heavy lash overlay",
+    "Spurious mottled normal highlights removed"
+  ],
+  "next": "Stop Cortu correction loop and source a different authored curly groom. Main plan remains independent of Hunyuan and TRELLIS.",
+  "performance": "p95 26ms on 8-second desktop trace is not the required 30-second desktop budget pass or an actual iPhone result."
+}

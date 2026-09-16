@@ -1,0 +1,34 @@
+[
+  {
+    "asset": "grinsegold_full_beard",
+    "file": "prototypes/hero-garage/art/sources/authored-beard/raw/bodyparts06/clothes/grinsegold_full_beard/Full_beard_black_diff_hn.png",
+    "RGB_mean": [
+      0.4968138102269858,
+      0.49739838464347996,
+      0.7360186771238455
+    ],
+    "vector_length_percentiles": [
+      1.0285804420471663,
+      1.1352450861001644,
+      1.2333132436370473
+    ],
+    "positive_normal_z_fraction": 0.9998826603604132,
+    "note": "Inferred tangent normal from blue-biased RGB vector encoding; source mhmat incorrectly or ambiguously labels bumpTexture. Not upstream-documented."
+  },
+  {
+    "asset": "grinsegold_moustache",
+    "file": "prototypes/hero-garage/art/sources/authored-beard/raw/bodyparts06/clothes/grinsegold_moustache/Moustache_black_diff_hn.png",
+    "RGB_mean": [
+      0.49931563920068234,
+      0.4962872918054956,
+      0.7752271383831699
+    ],
+    "vector_length_percentiles": [
+      1.0273836284225473,
+      1.1167249584315828,
+      1.214211720603672
+    ],
+    "positive_normal_z_fraction": 0.9999935603109081,
+    "note": "Inferred tangent normal from blue-biased RGB vector encoding; source mhmat incorrectly or ambiguously labels bumpTexture. Not upstream-documented."
+  }
+]
