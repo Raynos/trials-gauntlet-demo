@@ -1,0 +1,64 @@
+certifi==2026.7.22
+charset-normalizer==3.5.1
+cumesh @ file:///Users/raynos/ai-tools/TRELLIS.2-apple/source-deps/mtlmesh-212079e55772cff3d648a21372392c37e0643f3b
+dataclasses-json==0.6.7
+Deprecated==1.3.1
+easydict==1.13
+einops==0.8.2
+fast_simplification==0.1.13
+filelock==3.32.7
+flex_gemm @ file:///Users/raynos/ai-tools/TRELLIS.2-apple/source-deps/mtlgemm-867aec8234299a7fe1ede7f802c8debe5a939a82
+fsspec==2026.7.0
+glcontext==3.0.0
+hf-xet==1.6.0
+huggingface-hub==0.36.0
+idna==3.19
+ImageIO==2.37.3
+imageio-ffmpeg==0.6.0
+iniconfig==2.3.0
+Jinja2==3.1.6
+kornia==0.8.3
+kornia_rs==0.1.14
+MarkupSafe==3.0.3
+marshmallow==3.26.2
+mlx==0.32.0
+mlx-metal==0.32.0
+moderngl==5.12.0
+mpmath==1.3.0
+mtlbvh @ file:///Users/raynos/ai-tools/TRELLIS.2-apple/source-deps/mtlbvh-23f441c470ce1f537e1fd836f3ffb5b8245f7975
+mtldiffrast @ file:///Users/raynos/ai-tools/TRELLIS.2-apple/source-deps/mtldiffrast-4668cd91cb6d27f5e264731f94a06841fbf7aab8
+mypy_extensions==1.1.0
+networkx==3.6.1
+ninja==1.13.0
+numpy==2.2.6
+-e git+https://github.com/Jourloy/TRELLIS.2.git@2ddae4f97d7ab3e9a64374bcaa459a3c82d0ea4b#egg=o_voxel&subdirectory=o-voxel
+opencv-python-headless==4.12.0.88
+packaging==26.3
+pillow==12.3.0
+pluggy==1.6.0
+plyfile==1.1.3
+psutil==7.2.2
+pybind11==3.0.1
+pygltflib==1.16.5
+Pygments==2.21.0
+pytest==9.1.1
+PyYAML==6.0.3
+regex==2026.9.10
+requests==2.34.2
+safetensors==0.8.0
+scipy==1.17.1
+sympy==1.14.0
+timm==1.0.28
+tokenizers==0.22.2
+torch==2.13.0
+torchvision==0.28.0
+tqdm==4.68.4
+transformers==4.57.6
+trimesh==4.12.2
+typing-inspect==0.9.0
+typing_extensions==4.16.0
+urllib3==2.8.0
+utils3d @ git+https://github.com/EasternJournalist/utils3d.git@9a4eb15e4021b67b12c460c7057d642626897ec8
+wrapt==2.4.1
+xatlas==0.0.11
+zstandard==0.25.0

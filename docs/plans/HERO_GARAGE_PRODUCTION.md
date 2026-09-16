@@ -230,3 +230,7 @@ The requested result is not “we have a pipeline.” It is a rider and bike tha
 ### Round 3 verification
 
 The unchanged existing game passes frozen-build headless WebKit cold boot, 1,038 byte-identical replay ticks to an 8.65s clear, crash and one-tick restart. See `prototypes/hero-garage/reports/round3-ship/report.json`. This does not accept the independent head study or count as game integration/iPhone evidence.
+
+### User-directed neural route preflight
+
+TRELLIS.2 Apple Silicon dependency installation and Metal capability checks now pass locally; public model weights are downloading outside the repo. DINOv3 generation access awaits user license acceptance/local Hugging Face login. Two experimental MLX parity tests fail, so the selected route is explicitly MPS. Hunyuan3D2.1 will not run because the user confirmed an excluded territory under its license. [Full preflight and retained local proof](../../prototypes/hero-garage/reports/local-neural-preflight.md). No neural output or visual acceptance is claimed.
