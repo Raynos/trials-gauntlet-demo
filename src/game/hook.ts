@@ -7,7 +7,7 @@ import type { InputFrame, PhysicsSnapshot, TrialsHook } from '../core/types';
 import { listTrackIds } from '../tracks';
 import type { Game, GameCounters } from './game';
 
-export const GAME_VERSION = '0.2.1-core';
+export const GAME_VERSION = '0.2.2-core';
 
 export interface HookExtras {
   /** Present when the audio module exports an offline renderer. */
