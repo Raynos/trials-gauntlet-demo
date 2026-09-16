@@ -7,12 +7,24 @@ from mathutils.bvhtree import BVHTree
 HERE=Path(__file__).resolve().parent;ART=HERE.parent
 source=ART/'sources/replacement-hair/raw/bystedt-hair-styles.blend'
 bpy.ops.wm.open_mainfile(filepath=str(source))
-authored=bpy.data.objects['curly hair'];ev=authored.evaluated_get(bpy.context.evaluated_depsgraph_get())
+authored=bpy.data.objects['curly hair']
+# Use the author's own groom controls, retaining guide/clump relationships.
+author_settings={}
+for node in bpy.data.node_groups['curly hair'].nodes:
+ if node.type=='GROUP' and node.node_tree.name=='Curl Hair Curves':
+  node.inputs['Radius'].default_value=.15;node.inputs['Frequency'].default_value=.65;author_settings['curl_radius_source_units']=.15;author_settings['curl_frequency']=.65
+ if node.type=='GROUP' and node.node_tree.name=='Hair Curves Noise':
+  node.inputs['Distance'].default_value=.10;author_settings['noise_distance_source_units']=.10
+# Evaluate native spline interpolation rather than joining its control points linearly.
+g=bpy.data.node_groups.new('Runtime smooth native curves','GeometryNodeTree');g.interface.new_socket(name='Geometry',in_out='INPUT',socket_type='NodeSocketGeometry');g.interface.new_socket(name='Geometry',in_out='OUTPUT',socket_type='NodeSocketGeometry')
+a=g.nodes.new('NodeGroupInput');z=g.nodes.new('NodeGroupOutput');res=g.nodes.new('GeometryNodeResampleCurve');res.inputs['Mode'].default_value='Count';res.inputs['Count'].default_value=65;g.links.new(a.outputs['Geometry'],res.inputs['Curve']);g.links.new(res.outputs['Curve'],z.inputs['Geometry'])
+m=authored.modifiers.new('Runtime native spline resample','NODES');m.node_group=g
+bpy.context.view_layer.update();ev=authored.evaluated_get(bpy.context.evaluated_depsgraph_get())
 fullcount=len(ev.data.curves)
 growth=bpy.data.objects['curly growth mesh'];relative=authored.matrix_world.inverted()@growth.matrix_world
 source_scalp=np.array([list(relative@v.co) for v in growth.data.vertices]);source_top=source_scalp[:,2].max();source_crown=np.median(source_scalp[source_scalp[:,2]>source_top-.03],axis=0);source_crown[2]=source_top
 # Deterministic distributed subset of actual evaluated strands, not synthesized coils.
-indices=[int(i*(fullcount-1)/1799) for i in range(1800)]
+indices=[int(i*(fullcount-1)/8999) for i in range(9000)]
 strands=[[Vector(p.position) for p in ev.data.curves[i].points] for i in indices]
 guides=[[Vector(p.position) for p in c.points] for c in authored.data.curves]
 bpy.ops.wm.open_mainfile(filepath=str(ART/'street01-head-authored.blend'))
@@ -31,7 +43,10 @@ def fit(points):
  transformed=[Vector(np.asarray(p)*fit_scale+fit_translation) for p in points]
  root=transformed[0];hit,n,idx,dist=bvh.find_nearest(root)
  fittedroot=hit+n*.0008
- return [fittedroot+(p-root)*.70 for p in transformed]
+ # Blend source-guide length by anatomical root region: short nape/sides, longer fringe.
+ factor=.35+.55*max(0.,min(1.,(fittedroot.z-1.59)/.105))
+ if fittedroot.y<-.105 and fittedroot.z>1.665:factor=1.0
+ return [fittedroot+(p-root)*factor for p in transformed]
 strands=[fit(p) for p in strands];guides=[fit(p) for p in guides]
 # Editable authored guides retained independently of selected runtime strand mesh.
 curvedata=bpy.data.curves.new('Bystedt_303_AuthoredGuides','CURVE');curvedata.dimensions='3D'
@@ -50,7 +65,7 @@ for i,pts in enumerate(strands):
   radial=(p-Vector((0,-.025,1.615))).normalized()
   side=tangent.cross(radial)
   if side.length<.01:side=tangent.cross(Vector((1,0,0)))
-  side.normalize();t=j/(len(pts)-1);width=.00058*(.22+.78*(1-t)**.35)
+  side.normalize();t=j/(len(pts)-1);width=.00026*(.12+.88*(1-t)**.4)
   verts.extend([p-side*width,p+side*width])
  for j in range(len(pts)-1):faces.append((offset+j*2,offset+j*2+1,offset+j*2+3,offset+j*2+2))
 mesh=bpy.data.meshes.new('Bystedt_EvaluatedStrandRibbons');mesh.from_pydata(verts,[],faces);mesh.update()
@@ -89,7 +104,7 @@ for m in doc['materials']:
  if 'grinsegold' in m['name']:m['alphaMode']='BLEND';m.pop('alphaCutoff',None);m['doubleSided']=False;m['pbrMetallicRoughness']['baseColorFactor']=[1,.72,.5,.58]
 j=json.dumps(doc,separators=(',',':')).encode();j+=b' '*((-len(j))%4);out.write_bytes(struct.pack('<III',0x46546c67,2,20+len(j)+len(tail))+struct.pack('<II',len(j),0x4e4f534a)+j+tail)
 hairruntime=next(o for o in copies if 'Bystedt' in o.name)
-report={'status':'unaccepted changed-source groom trial','attribution':guideobj['attribution'],'original_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'source_evaluated_strands':fullcount,'runtime_strands':len(strands),'runtime_hair_triangles':len(faces)*2,'runtime_hair_bounds_xyz':[[min(v.co[i] for v in hairruntime.data.vertices),max(v.co[i] for v in hairruntime.data.vertices)] for i in range(3)],'runtime_sha256':hashlib.sha256(out.read_bytes()).hexdigest(),'runtime_bytes':out.stat().st_size,'head_transform_scale_from_a3':scale,'fit':fit_evidence,'root_projection_offset_m':.0008,'uniform_authored_strand_length_factor':.70,'limitations':['1800 sampled actual strands replace 22418 originals; portrait density and silhouette need played review.','Thin double-sided ribbons follow full 3D curls; still not hair-card atlas baking or full production groom optimization.','Face, skin, beard and eyes are frozen A3 source; no visual acceptance implied.','CC BY-SA version unspecified upstream; retain attribution/share-alike for derivative groom.']}
+report={'status':'unaccepted changed-source groom correction1','attribution':guideobj['attribution'],'original_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'source_evaluated_strands':fullcount,'runtime_strands':len(strands),'runtime_hair_triangles':len(faces)*2,'runtime_hair_bounds_xyz':[[min(v.co[i] for v in hairruntime.data.vertices),max(v.co[i] for v in hairruntime.data.vertices)] for i in range(3)],'runtime_sha256':hashlib.sha256(out.read_bytes()).hexdigest(),'runtime_bytes':out.stat().st_size,'head_transform_scale_from_a3':scale,'fit':fit_evidence,'root_projection_offset_m':.0008,'author_groom_controls':author_settings,'native_curve_resample_points':65,'regional_curve_length_factor':{'nape':.35,'crown':.9,'fringe':1.0},'limitations':['9000 sampled actual strands replace 22418 originals; appearance trial exceeds final hair triangle budget and needs later baking/reduction only if art improves.','Thin double-sided ribbons follow full 3D curls; still not hair-card atlas baking or full production groom optimization.','Face, skin, beard and eyes are frozen A3 source; no visual acceptance implied.','CC BY-SA version unspecified upstream; retain attribution/share-alike for derivative groom.']}
 (ART.parent/'reports/groom-head-build.json').write_text(json.dumps(report,indent=2)+'\n')
 # Source diagnostic, using identical camera/light to A3.
 for o in list(bpy.context.scene.objects):
@@ -99,4 +114,6 @@ cd=bpy.data.cameras.new('diagnostic');cam=bpy.data.objects.new('diagnostic',cd);
 for name,loc,power,size in [('key',(-.3,-.5,2.2),35,.5),('fill',(.5,-.2,1.85),15,.4),('rim',(0,.3,1.9),25,.3)]:
  d=bpy.data.lights.new(name,'AREA');d.energy=power;d.shape='DISK';d.size=size;o=bpy.data.objects.new(name,d);scene.collection.objects.link(o);o.location=loc;o.rotation_euler=(look-o.location).to_track_quat('-Z','Y').to_euler()
 scene.render.filepath=str(HERE/'source-diagnostic.png');bpy.ops.render.render(write_still=True)
+for label,position in [('left',(-.6,-.2,1.72)),('right',(.6,-.2,1.72)),('rear',(0,.65,1.72))]:
+ cam.location=position;cam.rotation_euler=(look-cam.location).to_track_quat('-Z','Y').to_euler();scene.render.filepath=str(HERE/('source-'+label+'.png'));bpy.ops.render.render(write_still=True)
 print('GROOM_BUILD_PASS',report['runtime_sha256'])

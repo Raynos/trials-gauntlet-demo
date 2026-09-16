@@ -1,0 +1,22 @@
+{
+  "verdict": "FAIL \u2014 clear strand/clump improvement, persistent crown gap and wrong silhouette",
+  "sha256": "3f7d16b21501d9713e4fc1a6f6f840acfa8e5d83c7f3a957144a287dff60efea",
+  "video": "captures/head-groom-a2/webkit-orbit-relight.webm",
+  "reviewMethod": "Sequential1fps decoded frames05\u201312 from completed8.016-second WebKit orbit/relight; sparse sampling cannot exclude transient artifacts.",
+  "visibleDefects": [
+    "Large rear/right crown scalp patch persists despite5xretainedstrands.",
+    "Fringe sweeps upward/back and side volume flares wide, missing compact target tousled shape.",
+    "Fine flyaways and fuzzy highlights weaken broad curl-clump hierarchy."
+  ],
+  "improvements": [
+    "Substantially denser side coverage",
+    "Smooth source curve resampling produces readable locks rather than angular wire loops",
+    "Shorter nape"
+  ],
+  "next": "Second bounded groom correction: measure full-curve scalp penetration and retargeting, improve crown coverage and compact fringe/side silhouette. Do not increase density blindly.",
+  "limits": [
+    "Face/skin/beard remain separately unaccepted",
+    "1,152,000hairtriangles and50.1MBGLB exceed planned runtime envelope",
+    "8secondp9526ms does not establish30second desktop budget or actualiPhone performance"
+  ]
+}

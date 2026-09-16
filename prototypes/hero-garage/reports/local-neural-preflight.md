@@ -6,6 +6,8 @@ The user requested downloading/running TRELLIS.2 and/or Hunyuan3D on this laptop
 
 ## Latest isolated result
 
+All required shape and paint files have finished downloading and match the pinned manifest file sizes. `download-final-verification.json` records the check; this is not a cryptographic verification claim. The repository-only `.gitattributes` file was not requested. The downloader exited; no inference supervisor remains active.
+
 Hunyuan shape inference succeeded in 75.0 seconds (77.35 seconds total, nonisolated timing), exporting 226,686 vertices and 454,454 faces. Evidence: `/Users/raynos/ai-tools/Hunyuan3D-2.1-mlx/outputs/hero-head-a1/shape-report.json` and `shape.glb`. The first attempt failed in empty SDF refinement; a documented local scheduler fix changes the final sigma from 0 to 1 to match the bundled PyTorch implementation. Original failure and `local-scheduler-fix.patch` are preserved. An isolated 8-second WebKit orbit exposes large rear cut planes, perforated spiky hair and fused facial detail. The raw geometry is rejected in its current state; the bounded diagnosis is complete and painting is stopped. Exact repetition and saved-latent fp32 decoding retain the defects, with 1,637 zero-crossing endpoints adjacent to undefined field samples. An aspect-ratio/border preprocessing mismatch was identified but not causally tested. Details: `/Users/raynos/ai-tools/Hunyuan3D-2.1-mlx/outputs/hero-head-diagnostic/DIAGNOSIS.md`. Evidence stays outside the game in `outputs/hero-head-a1/review/parent-review.json`. No visual acceptance or main-catalog integration is claimed. The setup statements below are historical.
 
 ## Machine and selected route
