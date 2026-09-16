@@ -10,6 +10,7 @@ const arg=(key,fallback)=>{const i=process.argv.indexOf('--'+key);return i<0?fal
 const base=arg('url','http://127.0.0.1:4178');
 const seconds=Number(arg('seconds','30'));
 const comparison=process.argv.includes('--comparison');
+const recordVideo=!process.argv.includes('--no-video');
 const reviewCamera=arg('camera','face');
 const reviewClip=arg('clip',null);
 if(!Number.isFinite(seconds)||seconds<=0) throw new Error('--seconds must be positive');
@@ -19,13 +20,13 @@ const engines=arg('engine','both')==='both'?['webkit','chromium']:[arg('engine',
 const results=[];
 for(const engine of engines){
   if(!['webkit','chromium'].includes(engine)) throw new Error('Unsupported engine');
-  const row={engine,headless:true,host:{platform:os.platform(),release:os.release(),arch:os.arch()},actualIPhone:false,errors:[],status:'started'};
+  const row={engine,headless:true,host:{platform:os.platform(),release:os.release(),arch:os.arch()},actualIPhone:false,recordVideo,errors:[],status:'started'};
   results.push(row);
   let browser,context;
   try{
     browser=await ({webkit,chromium}[engine]).launch({headless:true});
     row.browserVersion=browser.version();
-    context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,recordVideo:{dir:out,size:{width:1920,height:1080}}});
+    context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,...(recordVideo?{recordVideo:{dir:out,size:{width:1920,height:1080}}}:{})});
     const page=await context.newPage();
     const assetResponses=[];
     // WebKit evicts large GLBs from its inspector response cache. Hash the
@@ -80,14 +81,17 @@ for(const engine of engines){
           const elapsed=now-start;
           if(prior!==null)frames.push({elapsedMs:elapsed,deltaMs:now-prior});prior=now;
           if(elapsed>=duration*500)relit=true;
+          const renderStart=performance.now();
           g.setFrame({time:elapsed/1000,orbit:elapsed/(duration*1000)*Math.PI*2,lighting:relit?'garage':'neutral'});
+          if(frames.length)frames.at(-1).renderSubmitMs=performance.now()-renderStart;
           if(elapsed>=duration*1000)resolve();else requestAnimationFrame(frame);
         }requestAnimationFrame(frame);
       });
       const d=frames.map(x=>x.deltaMs).sort((a,b)=>a-b);
-      return {durationSeconds:duration,measuredDurationMs:frames.at(-1)?.elapsedMs,frames,p50Ms:d[Math.floor(d.length*.5)],p95Ms:d[Math.floor(d.length*.95)],maxMs:d.at(-1),meanMs:d.reduce((a,b)=>a+b,0)/d.length,relit};
+      const submit=frames.map(f=>f.renderSubmitMs).filter(Number.isFinite).sort((a,b)=>a-b);
+      return {renderSubmitP95Ms:submit[Math.floor(submit.length*.95)],renderSubmitScope:'Synchronous CPU scene update and WebGL submission only; not GPU completion',durationSeconds:duration,measuredDurationMs:frames.at(-1)?.elapsedMs,frames,p50Ms:d[Math.floor(d.length*.5)],p95Ms:d[Math.floor(d.length*.95)],maxMs:d.at(-1),meanMs:d.reduce((a,b)=>a+b,0)/d.length,relit};
     },{duration:seconds,reviewCamera});
-    row.desktopBudget={targetP95Ms:16.7,full30SecondTrace:seconds>=30,met:seconds>=30&&row.trace.p95Ms<=16.7,scope:'Headless desktop wall-clock rAF with one batched setFrame render and video recording; not GPU timer queries or physical device performance'};
+    row.desktopBudget={targetP95Ms:16.7,full30SecondTrace:seconds>=30,met:seconds>=30&&row.trace.p95Ms<=16.7,scope:`Headless desktop wall-clock rAF with one batched setFrame render; video recording ${recordVideo?'enabled':'disabled'}; not GPU timer queries or physical device performance`};
     await page.screenshot({path:path.join(out,`${engine}-orbit-end.png`)});
     row.final=await page.evaluate(()=>window.__heroGarage.getDiagnostics());
     // Mobile geometry/touch is a smoke check only; physical iPhone remains untested.
@@ -111,7 +115,7 @@ for(const engine of engines){
     row.missingAsset={error:await missing.evaluate(()=>window.__heroGarage.error),text:await missing.locator('body').innerText()};await missing.close();
     row.status=row.errors.length?'rendered-with-errors':'rendered';
     const video=page.video();await context.close();context=null;
-    const videoPath=path.join(out,`${engine}-orbit-relight.webm`);await video.saveAs(videoPath);row.video=path.relative(root,videoPath);
+    if(video){const videoPath=path.join(out,`${engine}-orbit-relight.webm`);await video.saveAs(videoPath);row.video=path.relative(root,videoPath);}else row.video=null;
   }catch(e){row.status='failed';row.failure=String(e);}
   finally{await context?.close();await browser?.close();}
   fs.mkdirSync(path.join(root,'reports'),{recursive:true});

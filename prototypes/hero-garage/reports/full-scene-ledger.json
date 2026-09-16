@@ -1,11 +1,11 @@
 {
-  "createdAt": "2026-09-16T12:41:43.422Z",
+  "createdAt": "2026-09-16T12:47:09.497Z",
   "scope": "GLB structure; no art or deformation acceptance",
   "assets": [
     {
-      "file": "public/assets/street01-rider-cloth.glb",
-      "sha256": "4311175fbae4844beb093762fa5c9964ce58e356ac0f39f0928c8d99d91663ed",
-      "bytes": 2578868,
+      "file": "public/assets/street01-rider-motion.glb",
+      "sha256": "f9cb8e7aaf5a78436f2143006dd7e8f9eb729a218d8c10776bb9efde2219aab0",
+      "bytes": 2740896,
       "generator": "Khronos glTF Blender I/O v5.2.40",
       "triangles": 44734,
       "primitives": 1,
@@ -31,11 +31,23 @@
       ],
       "animations": [
         {
+          "name": "compression",
+          "channels": 57
+        },
+        {
+          "name": "extension",
+          "channels": 57
+        },
+        {
           "name": "forward_attack",
           "channels": 57
         },
         {
           "name": "hang_back",
+          "channels": 57
+        },
+        {
+          "name": "landing_absorption",
           "channels": 57
         },
         {

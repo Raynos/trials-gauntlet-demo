@@ -21,6 +21,8 @@ Round 11 adds a [whole-body pose review](../../prototypes/hero-garage/reports/fu
 
 Round 12 adds looping forward/rear motion, a bounded garment surface correction, precise floor alignment, and parked wheel cleanup. The [whole-scene review](../../prototypes/hero-garage/reports/whole-scene-round12-review.json) keeps garment/seat quality open. A 30-second WebKit orbit records **p95 26 ms**, failing the 16.7 ms desktop target. The frozen game ship gate passes 1,038 identical replay ticks, an 8.65-second clear and one-tick restart.
 
+Round 13 adds compression, extension and landing-absorption clips with seated returns, verified contact markers across all 750 exported frames. [Motion review](../../prototypes/hero-garage/reports/whole-motion-round13-review.json) retains them provisionally; the stationary bike has no physical suspension response. Timing diagnosis records 18 ms p95 both for the scene without video and for an empty page; the 16.7 ms runtime gate remains unproven rather than relaxed.
+
 Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest user-reported allowance is 27% remaining, with the 20% reserve unchanged.
 
 ## Status checklist (moved here from HERO_OPEN_WORK.md §4 — the one list for this milestone)

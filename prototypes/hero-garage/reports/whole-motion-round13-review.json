@@ -1,0 +1,44 @@
+{
+  "round": 13,
+  "decision": "Retain six-clip breadth-first motion candidate; motion and art milestones remain open.",
+  "riderSHA256": "f9cb8e7aaf5a78436f2143006dd7e8f9eb729a218d8c10776bb9efde2219aab0",
+  "newClips": [
+    "compression",
+    "extension",
+    "landing_absorption"
+  ],
+  "evidence": [
+    "motion-compression-a1.json",
+    "motion-extension-a1.json",
+    "motion-landing-a1.json",
+    "rider-motion.json"
+  ],
+  "reviewMethod": "Parent inspected recorded browser videos via sequential decoded2fps frames: compression9,10,11,13,16; extension10,12,16; landing10,11,13. No continuous-playback claim.",
+  "findings": [
+    "New clips visibly raise/compress/extend torso and hips and return to neutral.",
+    "Complete rider and bike remain framed. No gross grip release seen in sampled frames; every-frame marker verification recorded separately.",
+    "Clothing neckline/shoulder openings, stiff torso and imperfect seated support persist.",
+    "Stationary bike has no suspension response: these are authored rider performances, not physical landing proof."
+  ],
+  "timingInvestigation": {
+    "scope": "Same WebKit26.5 host and1920x1080 viewport; no-video scene uses frozen cloth predecessor, not a new motion export performance acceptance.",
+    "recordedSceneP95Ms": 26,
+    "noVideoSceneP95Ms": 18,
+    "noVideoSceneMeanMs": 16.666666666666668,
+    "noVideoCpuSubmissionP95Ms": 1,
+    "emptyPageP95Ms": 18,
+    "interpretation": "Recording adds observed overhead. Empty page matches remaining scheduling p95; this test cannot resolve the16.7ms target. No GPU completion measurement, performance gate remains unproven.",
+    "reports": [
+      "whole-no-video-profile-a2.json",
+      "empty-page-timing-control.json"
+    ]
+  },
+  "remaining": [
+    "Final character and bike art",
+    "Garment topology/correctives and convincing seated support",
+    "Suspension/physical pose integration",
+    "Grip release/crash transition after riding acceptance",
+    "Compressed runtime comparison, desktop timing and actual iPhone validation",
+    "Other approved outfits and final user visual approval"
+  ]
+}
