@@ -9,7 +9,7 @@
     {
       "id": "street01-rider",
       "label": "Mustard Street rider",
-      "url": "/assets/street01-rider.glb",
+      "url": "/assets/street01-rider-posed.glb",
       "kind": "rider",
       "position": [
         0,
@@ -31,7 +31,7 @@
   ],
   "notes": [
     "Complete existing Blender-authored rider and bike assembled for whole-scene review.",
-    "Seated neutral uses the exported sit_cruise clip. Forward and back clips are available below.",
+    "Seated neutral, forward rise and rearward hip shift are authored in the exported rider rig. Whole-body fit remains under visual review.",
     "Breadth-first work in progress. Hair, face, tailoring, contacts and mechanical detail can be polished after reviewing the whole scene."
   ]
 }

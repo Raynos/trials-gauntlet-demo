@@ -13,7 +13,7 @@ interface Loaded { asset: Asset; root: THREE.Group; mixer: THREE.AnimationMixer;
 const app = document.querySelector<HTMLDivElement>('#app')!;
 app.innerHTML = `<header class="topbar"><div><div class="brand">HERO / GARAGE</div><div class="subhead">TARGET 01 · PRODUCTION STUDY</div></div><div class="stage" id="stage">Loading asset catalog</div></header>
 <main><section class="viewport" aria-label="Interactive three dimensional asset viewer"><div class="caption"><h1 id="camera-label">Face study</h1><p id="asset-label">Independent Three.js review</p></div><div class="status" role="status" id="status">Loading the exported asset catalog…</div><div class="hint">Drag to orbit · Scroll or pinch to inspect</div></section><aside>
-<div class="control-group"><p class="label">Comparison camera</p><div class="buttons" id="cameras"><button data-camera="face" aria-pressed="true">Face</button><button data-camera="full" aria-pressed="false">Full rider</button><button data-camera="bike" aria-pressed="false">Bike</button><button data-camera="reference" aria-pressed="false">Reference</button></div><button id="compare" aria-pressed="false" class="compare-toggle">Compare head at equal scale</button></div>
+<div class="control-group"><p class="label">Comparison camera</p><div class="buttons" id="cameras"><button data-camera="face" aria-pressed="true">Face</button><button data-camera="full" aria-pressed="false">Rider + bike</button><button data-camera="bike" aria-pressed="false">Bike</button><button data-camera="reference" aria-pressed="false">Reference</button></div><button id="compare" aria-pressed="false" class="compare-toggle">Compare head at equal scale</button></div>
 <div class="control-group"><p class="label">Light study</p><div class="buttons" id="lights"><button data-light="garage" aria-pressed="true">Garage</button><button data-light="neutral" aria-pressed="false">Neutral</button></div></div>
 <div class="control-group"><p class="label">Authored motion</p><div class="buttons" id="clips"></div><p class="notes" id="motion-note">Checking exported animation clips.</p></div>
 <figure class="reference hidden" id="reference"><p class="label">Design reference · concept</p><img id="reference-image" alt="Target 01 rider and bike design reference"/><figcaption id="reference-caption"></figcaption></figure>
@@ -88,6 +88,10 @@ const targetFps=matchMedia('(pointer:coarse)').matches?30:60;
 function setStatus(message:string,isError=false){$('#status').textContent=message;$('#status').classList.toggle('error',isError);}
 function updateComparisonScale(){
   if(!comparison)return;
+  if(catalog?.assets.some(asset=>asset.kind==='rider')){
+    const width=Math.min(conceptPanel.clientWidth-24,(conceptPanel.clientHeight-90)*800/680);
+    cropCanvas.style.width=`${width}px`;cropCanvas.style.height=`${width*680/800}px`;return;
+  }
   const centerZ=(headFrame.min[2]+headFrame.max[2])/2;
   const low=new THREE.Vector3(0,headFrame.min[1],centerZ).project(camera);
   const high=new THREE.Vector3(0,headFrame.max[1],centerZ).project(camera);
@@ -114,7 +118,7 @@ function setCamera(name:CameraName){
   const direction = name==='reference'?new THREE.Vector3(-2.8,.08,1.7):name==='bike'?new THREE.Vector3(2.8,.8,3):new THREE.Vector3(.8,.15,3);
   presetOffset=direction.normalize().multiplyScalar(Math.max(distance,.25));
   controls.target.copy(center);camera.position.copy(center).add(presetOffset);controls.update();
-  $('#camera-label').textContent={face:'Face study',full:'Full rider',bike:'Bike study',reference:'Reference comparison'}[name];
+  $('#camera-label').textContent={face:'Face study',full:'Full rider + bike',bike:'Bike study',reference:'Reference comparison'}[name];
   document.querySelectorAll<HTMLButtonElement>('[data-camera]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.camera===name)));
   render();
 }
@@ -155,7 +159,7 @@ function setFrame(frame:{time:number;orbit:number;lighting?:LightingName}){
 }
 function diagnostics(){
   const sizes=renderer.getDrawingBufferSize(new THREE.Vector2());const sorted=[...frameTimes].sort((a,b)=>a-b);
-  return {ready,error,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
+  return {ready,error,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
 }
 const api={get ready(){return ready;},get error(){return error;},setCamera,setComparison,setLighting,setTime,setOrbit,setFrame,setClip,setPlaying,getDiagnostics:diagnostics,get state(){return diagnostics();}};
 Object.assign(window,{__garage:api,__heroGarage:api});
@@ -183,8 +187,10 @@ async function boot(){
     catalog=await response.json() as Catalog;
     if(catalog.version!==1||!Array.isArray(catalog.assets))throw new Error('Unsupported asset catalog. Expected version 1 and an assets array.');
     $('#stage').textContent=catalog.stage;$('#notes').textContent=(catalog.notes??[]).join('\n\n');
+    const wholeScene=catalog.assets.some(asset=>asset.kind==='rider');
+    if(wholeScene){$('#compare').textContent='Compare rider + bike';cropCanvas.setAttribute('aria-label','Unmodified crop of target 01 full rider and bike');}
     if(catalog.reference?.url){
-      cropImage.onload=()=>{const crop=headFrame.sourceCrop;cropCanvas.width=crop.width*4;cropCanvas.height=crop.height*4;const ctx=cropCanvas.getContext('2d')!;ctx.imageSmoothingEnabled=true;ctx.drawImage(cropImage,crop.x,crop.y,crop.width,crop.height,0,0,cropCanvas.width,cropCanvas.height);updateComparisonScale();};cropImage.src=catalog.reference.url;
+      cropImage.onload=()=>{const whole=catalog!.assets.some(asset=>asset.kind==='rider');const crop=whole?{x:465,y:115,width:800,height:680}:headFrame.sourceCrop;cropCanvas.width=crop.width*4;cropCanvas.height=crop.height*4;const ctx=cropCanvas.getContext('2d')!;ctx.imageSmoothingEnabled=true;ctx.drawImage(cropImage,crop.x,crop.y,crop.width,crop.height,0,0,cropCanvas.width,cropCanvas.height);updateComparisonScale();};cropImage.src=catalog.reference.url;
       const img=$<HTMLImageElement>('#reference-image');img.src=catalog.reference.url;img.onerror=()=>{$('#reference-caption').textContent='Reference image unavailable. Check the catalog reference URL.';};$('#reference-caption').textContent=catalog.reference.label;$('#reference').classList.remove('hidden');}
     if(!catalog.assets.length)throw new Error('No exported hero asset is registered yet. This garage is ready for the first head GLB; character production remains open.');
     const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
@@ -196,9 +202,12 @@ async function boot(){
       root.traverse(object=>{if(object instanceof THREE.Mesh){object.castShadow=true;object.receiveShadow=true;}});
       hero.add(root);loaded.push({asset,root,mixer:new THREE.AnimationMixer(root),clips:gltf.animations});
     }
+    // Set the assembled bike's lowest geometry on the floor without changing rider/bike alignment.
+    const bikeRoot=loaded.find(item=>item.asset.kind==='bike')?.root;
+    if(bikeRoot){const bikeBounds=new THREE.Box3().setFromObject(bikeRoot);hero.position.y-=bikeBounds.min.y;hero.updateMatrixWorld(true);}
     fitAssetShadows();
     const clipNames=[...new Set(loaded.flatMap(item=>item.clips.map(c=>c.name)))];
-    for(const name of clipNames){const button=document.createElement('button');button.dataset.clip=name;button.textContent=name;button.setAttribute('aria-pressed','false');$('#clips').append(button);}
+    for(const name of clipNames){const button=document.createElement('button');button.dataset.clip=name;button.textContent=({sit_cruise:'Seated neutral',forward_attack:'Forward rise',hang_back:'Rearward shift'} as Record<string,string>)[name]??name.replaceAll('_',' ');button.setAttribute('aria-pressed','false');$('#clips').append(button);}
     $('#motion-note').textContent=clipNames.length?'Playback uses exported GLB animation clips.':'No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.';
     if(clipNames.length)setClip(clipNames.includes('sit_cruise')?'sit_cruise':clipNames[0]);
     $('#asset-label').textContent=loaded.map(item=>item.asset.label).join(' + ');

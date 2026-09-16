@@ -1,0 +1,1974 @@
+{
+  "createdAt": "2026-09-16T12:35:53.886Z",
+  "base": "http://127.0.0.1:4179",
+  "results": [
+    {
+      "engine": "webkit",
+      "headless": true,
+      "host": {
+        "platform": "darwin",
+        "release": "25.5.0",
+        "arch": "arm64"
+      },
+      "actualIPhone": false,
+      "errors": [],
+      "status": "rendered",
+      "browserVersion": "26.5",
+      "loadToReadyMs": 706,
+      "assetResponses": [
+        {
+          "url": "http://127.0.0.1:4179/assets/street01-rider-posed.glb",
+          "status": 200,
+          "bytes": 2552976,
+          "sha256": "dc1ea7a77a840281a3bfb6f015d47fb3fa687233fbc1ddf4c17081ebd70f6834",
+          "proof": "upstream response bytes forwarded unchanged through request interception"
+        },
+        {
+          "url": "http://127.0.0.1:4179/assets/street01-bike.glb",
+          "status": 200,
+          "bytes": 1394072,
+          "sha256": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+          "proof": "upstream response bytes forwarded unchanged through request interception"
+        }
+      ],
+      "initial": {
+        "ready": true,
+        "error": null,
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9175082799114689,
+            2.5046321316946063e-7
+          ],
+          "normalBias": 0.0018266336555587239,
+          "bias": -0.00005,
+          "near": 2.53411629115606,
+          "far": 9.840650913390956,
+          "width": 3.653267311117448,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + bike — breadth-first assembly",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-posed.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "forward_attack",
+                "duration": 1.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 1.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "full",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 1.9666666984558105,
+        "activeClip": "sit_cruise",
+        "playing": false,
+        "orbitAngle": 0,
+        "cameraPosition": [
+          1.7403452961241936,
+          1.1257011558666432,
+          4.1638577695667
+        ],
+        "cameraTarget": [
+          0.6299832910299302,
+          0.9175082799114689,
+          2.5046321316946063e-7
+        ],
+        "render": {
+          "triangles": 149608,
+          "calls": 52,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 26,
+          "textures": 16,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 192,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "motionControls": {
+        "playDisabled": false,
+        "timelineDisabled": false,
+        "note": "Playback uses exported GLB animation clips.",
+        "clipButtons": 3,
+        "honestAbsentClips": null
+      },
+      "comparison": true,
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "dpr": 1,
+        "viewport": [
+          1920,
+          1080
+        ],
+        "drawingBuffer": [
+          820,
+          934
+        ],
+        "gpu": "Apple GPU",
+        "vendor": "Apple Inc.",
+        "webglVersion": "WebGL 2.0",
+        "contextLost": false,
+        "jsHeap": null
+      },
+      "shaderWarmupMs": 2000,
+      "frames": [
+        "webkit-face.png",
+        "webkit-reference.png",
+        "webkit-full.png",
+        "webkit-bike.png"
+      ],
+      "deterministicCanvas": {
+        "a": "341e78b9707b66afb7cb36c9d6ac96ac290d32a0fe2483192221477436105ca5",
+        "b": "341e78b9707b66afb7cb36c9d6ac96ac290d32a0fe2483192221477436105ca5",
+        "byteIdentical": true,
+        "scope": "same engine, camera, orbit and animation time; not game physics replay"
+      },
+      "trace": {
+        "durationSeconds": 6,
+        "measuredDurationMs": 6000,
+        "frames": [
+          {
+            "elapsedMs": 29,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 34,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 50,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 66,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 84,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 100,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 116,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 141,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 150,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 166,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 193,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 198,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 216,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 231,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 250,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 266,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 283,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 301,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 316,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 334,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 361,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 367,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 383,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 400,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 419,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 433,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 448,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 473,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 483,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 500,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 526,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 533,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 550,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 566,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 583,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 600,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 616,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 636,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 650,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 666,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 694,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 698,
+            "deltaMs": 4
+          },
+          {
+            "elapsedMs": 717,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 733,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 751,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 767,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 783,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 803,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 816,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 833,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 859,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 866,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 883,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 898,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 916,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 933,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 949,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 967,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 983,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1000,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1021,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 1033,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 1050,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1075,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 1083,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 1100,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1115,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1133,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 1150,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1166,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1183,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1200,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1215,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1236,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 1251,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1266,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1295,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 1300,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 1316,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1333,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1351,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 1366,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1383,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1408,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 1416,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 1433,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1448,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1466,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 1482,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1498,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1518,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 1533,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1550,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1570,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 1583,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 1600,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1624,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 1633,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 1651,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 1676,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 1683,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 1700,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1716,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1733,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 1751,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 1766,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 1784,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 1800,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1816,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1837,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 1850,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 1866,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1890,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 1900,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 1916,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1943,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 1950,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 1966,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 1983,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2000,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2016,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2033,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2050,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2066,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2083,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2102,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 2115,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 2133,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 2159,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 2166,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 2183,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2212,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 2216,
+            "deltaMs": 4
+          },
+          {
+            "elapsedMs": 2233,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2250,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2271,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 2283,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 2299,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2324,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 2333,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 2350,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2375,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 2381,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 2399,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 2416,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2433,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2450,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2465,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 2485,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 2500,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 2516,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2541,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 2550,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 2566,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2593,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 2601,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 2616,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 2633,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2650,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2666,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2682,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2703,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 2716,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 2733,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2759,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 2768,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 2783,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 2812,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 2817,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 2833,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 2850,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2867,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2882,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 2900,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 2923,
+            "deltaMs": 23
+          },
+          {
+            "elapsedMs": 2933,
+            "deltaMs": 10
+          },
+          {
+            "elapsedMs": 2950,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 2974,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 2983,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 3000,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3026,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 3033,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 3050,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3066,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3083,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3100,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3116,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3134,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3150,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3166,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3187,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 3198,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 3216,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3244,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 3251,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 3266,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 3284,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3300,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3316,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3333,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3353,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 3366,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 3383,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3409,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 3416,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 3433,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3461,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 3467,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 3483,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3500,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3519,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 3533,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 3550,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3578,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 3583,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 3600,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3616,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3634,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3650,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3666,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3691,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 3700,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 3716,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3743,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 3750,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 3768,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3797,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 3800,
+            "deltaMs": 3
+          },
+          {
+            "elapsedMs": 3816,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 3833,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3850,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3868,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 3883,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 3904,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 3916,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 3933,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 3962,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 3967,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 3983,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4000,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4017,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4032,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 4050,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 4071,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 4083,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 4098,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 4124,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 4133,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 4150,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4177,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 4183,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 4201,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 4216,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 4233,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4250,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4266,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4287,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 4300,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 4316,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4341,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 4350,
+            "deltaMs": 9
+          },
+          {
+            "elapsedMs": 4366,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4395,
+            "deltaMs": 29
+          },
+          {
+            "elapsedMs": 4399,
+            "deltaMs": 4
+          },
+          {
+            "elapsedMs": 4415,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4433,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 4450,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4466,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4483,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4503,
+            "deltaMs": 20
+          },
+          {
+            "elapsedMs": 4516,
+            "deltaMs": 13
+          },
+          {
+            "elapsedMs": 4531,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 4558,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 4566,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 4583,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4610,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 4615,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 4631,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4650,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 4666,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4683,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4700,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4717,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4733,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4750,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4769,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 4783,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 4800,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4826,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 4833,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 4850,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4866,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4883,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4900,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4916,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 4934,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 4948,
+            "deltaMs": 14
+          },
+          {
+            "elapsedMs": 4965,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 4987,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 4998,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 5016,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 5042,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 5050,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 5066,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5083,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5099,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5116,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5133,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5151,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 5166,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 5183,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5209,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 5216,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 5231,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 5250,
+            "deltaMs": 19
+          },
+          {
+            "elapsedMs": 5266,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5284,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 5300,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5321,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 5333,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 5350,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5375,
+            "deltaMs": 25
+          },
+          {
+            "elapsedMs": 5383,
+            "deltaMs": 8
+          },
+          {
+            "elapsedMs": 5400,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5430,
+            "deltaMs": 30
+          },
+          {
+            "elapsedMs": 5434,
+            "deltaMs": 4
+          },
+          {
+            "elapsedMs": 5450,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5466,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5488,
+            "deltaMs": 22
+          },
+          {
+            "elapsedMs": 5500,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 5516,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5544,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 5550,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 5566,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5583,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5599,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5617,
+            "deltaMs": 18
+          },
+          {
+            "elapsedMs": 5633,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5650,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5666,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5681,
+            "deltaMs": 15
+          },
+          {
+            "elapsedMs": 5705,
+            "deltaMs": 24
+          },
+          {
+            "elapsedMs": 5716,
+            "deltaMs": 11
+          },
+          {
+            "elapsedMs": 5733,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5760,
+            "deltaMs": 27
+          },
+          {
+            "elapsedMs": 5766,
+            "deltaMs": 6
+          },
+          {
+            "elapsedMs": 5783,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5800,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5816,
+            "deltaMs": 16
+          },
+          {
+            "elapsedMs": 5833,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5850,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5871,
+            "deltaMs": 21
+          },
+          {
+            "elapsedMs": 5883,
+            "deltaMs": 12
+          },
+          {
+            "elapsedMs": 5900,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5926,
+            "deltaMs": 26
+          },
+          {
+            "elapsedMs": 5933,
+            "deltaMs": 7
+          },
+          {
+            "elapsedMs": 5950,
+            "deltaMs": 17
+          },
+          {
+            "elapsedMs": 5978,
+            "deltaMs": 28
+          },
+          {
+            "elapsedMs": 5983,
+            "deltaMs": 5
+          },
+          {
+            "elapsedMs": 6000,
+            "deltaMs": 17
+          }
+        ],
+        "p50Ms": 17,
+        "p95Ms": 27,
+        "maxMs": 30,
+        "meanMs": 16.666666666666668,
+        "relit": true
+      },
+      "desktopBudget": {
+        "targetP95Ms": 16.7,
+        "full30SecondTrace": false,
+        "met": false,
+        "scope": "Headless desktop wall-clock rAF with one batched setFrame render and video recording; not GPU timer queries or physical device performance"
+      },
+      "final": {
+        "ready": true,
+        "error": null,
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9175082799114689,
+            2.5046321316946063e-7
+          ],
+          "normalBias": 0.0018266336555587239,
+          "bias": -0.00005,
+          "near": 2.53411629115606,
+          "far": 9.840650913390956,
+          "width": 3.653267311117448,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": true,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + bike — breadth-first assembly",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-posed.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "forward_attack",
+                "duration": 1.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 1.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "full",
+        "lighting": "garage",
+        "time": 0.09999990463256836,
+        "duration": 1.9666666984558105,
+        "activeClip": "hang_back",
+        "playing": false,
+        "orbitAngle": 6.283185307179586,
+        "cameraPosition": [
+          2.0220750803097642,
+          1.1785254904014377,
+          5.220344460262595
+        ],
+        "cameraTarget": [
+          0.6299832910299303,
+          0.9175082799114689,
+          2.5046321316946063e-7
+        ],
+        "render": {
+          "triangles": 149608,
+          "calls": 52,
+          "width": 820,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 26,
+          "textures": 16,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 192,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      },
+      "mobileSmoke": {
+        "physicalDevice": false,
+        "initial": {
+          "error": null,
+          "diagnostics": {
+            "ready": true,
+            "error": null,
+            "shadow": {
+              "target": [
+                0.6299832910299301,
+                0.9175082799114689,
+                2.5046321316946063e-7
+              ],
+              "normalBias": 0.0018266336555587239,
+              "bias": -0.00005,
+              "near": 2.53411629115606,
+              "far": 9.840650913390956,
+              "width": 3.653267311117448,
+              "mapSize": [
+                2048,
+                2048
+              ]
+            },
+            "comparison": {
+              "enabled": false,
+              "mode": "whole-scene",
+              "headFrame": {
+                "min": [
+                  -0.115,
+                  1.58,
+                  -0.1
+                ],
+                "max": [
+                  0.115,
+                  1.833,
+                  0.19
+                ],
+                "sourceCrop": {
+                  "x": 694,
+                  "y": 128,
+                  "width": 111,
+                  "height": 118
+                }
+              },
+              "sourceCropUnmodified": true
+            },
+            "stage": "Full rider + bike — breadth-first assembly",
+            "assets": [
+              {
+                "id": "street01-rider",
+                "url": "/assets/street01-rider-posed.glb",
+                "kind": "rider",
+                "clips": [
+                  {
+                    "name": "forward_attack",
+                    "duration": 1.9666666984558105
+                  },
+                  {
+                    "name": "hang_back",
+                    "duration": 1.9666666984558105
+                  },
+                  {
+                    "name": "sit_cruise",
+                    "duration": 1.9666666984558105
+                  }
+                ]
+              },
+              {
+                "id": "street01-bike",
+                "url": "/assets/street01-bike.glb",
+                "kind": "bike",
+                "clips": []
+              }
+            ],
+            "camera": "full",
+            "lighting": "garage",
+            "time": 0,
+            "duration": 1.9666666984558105,
+            "activeClip": "sit_cruise",
+            "playing": false,
+            "orbitAngle": 0,
+            "cameraPosition": [
+              1.9341303697289773,
+              1.16203585716754,
+              4.890551795584639
+            ],
+            "cameraTarget": [
+              0.6299832910299302,
+              0.9175082799114689,
+              2.5046321316946063e-7
+            ],
+            "render": {
+              "triangles": 149608,
+              "calls": 52,
+              "width": 585,
+              "height": 621,
+              "dpr": 1.5
+            },
+            "memory": {
+              "geometries": 26,
+              "textures": 16,
+              "note": "Object counts, not GPU byte residency"
+            },
+            "loadMilliseconds": 117,
+            "targetFps": 30,
+            "frameSamples": 0,
+            "p95FrameMilliseconds": null,
+            "captureMode": true
+          },
+          "touch": 0,
+          "overflow": false
+        },
+        "taps": {
+          "camera": "reference",
+          "lighting": "neutral",
+          "passed": true
+        },
+        "landscape": {
+          "diagnostics": {
+            "ready": true,
+            "error": null,
+            "shadow": {
+              "target": [
+                0.6299832910299301,
+                0.9175082799114689,
+                2.5046321316946063e-7
+              ],
+              "normalBias": 0.0018266336555587239,
+              "bias": -0.00005,
+              "near": 2.53411629115606,
+              "far": 9.840650913390956,
+              "width": 3.653267311117448,
+              "mapSize": [
+                2048,
+                2048
+              ]
+            },
+            "comparison": {
+              "enabled": false,
+              "mode": "whole-scene",
+              "headFrame": {
+                "min": [
+                  -0.115,
+                  1.58,
+                  -0.1
+                ],
+                "max": [
+                  0.115,
+                  1.833,
+                  0.19
+                ],
+                "sourceCrop": {
+                  "x": 694,
+                  "y": 128,
+                  "width": 111,
+                  "height": 118
+                }
+              },
+              "sourceCropUnmodified": true
+            },
+            "stage": "Full rider + bike — breadth-first assembly",
+            "assets": [
+              {
+                "id": "street01-rider",
+                "url": "/assets/street01-rider-posed.glb",
+                "kind": "rider",
+                "clips": [
+                  {
+                    "name": "forward_attack",
+                    "duration": 1.9666666984558105
+                  },
+                  {
+                    "name": "hang_back",
+                    "duration": 1.9666666984558105
+                  },
+                  {
+                    "name": "sit_cruise",
+                    "duration": 1.9666666984558105
+                  }
+                ]
+              },
+              {
+                "id": "street01-bike",
+                "url": "/assets/street01-bike.glb",
+                "kind": "bike",
+                "clips": []
+              }
+            ],
+            "camera": "face",
+            "lighting": "neutral",
+            "time": 0,
+            "duration": 1.9666666984558105,
+            "activeClip": "sit_cruise",
+            "playing": false,
+            "orbitAngle": 0,
+            "cameraPosition": [
+              0.9015267468143012,
+              1.6840791362019845,
+              1.0182882096546049
+            ],
+            "cameraTarget": [
+              0.6299832910299301,
+              1.6331647382424146,
+              2.5046321316946063e-7
+            ],
+            "render": {
+              "triangles": 124688,
+              "calls": 30,
+              "width": 846,
+              "height": 366,
+              "dpr": 1.5
+            },
+            "memory": {
+              "geometries": 26,
+              "textures": 16,
+              "note": "Object counts, not GPU byte residency"
+            },
+            "loadMilliseconds": 117,
+            "targetFps": 30,
+            "frameSamples": 0,
+            "p95FrameMilliseconds": null,
+            "captureMode": true
+          },
+          "overflow": false
+        }
+      },
+      "missingAsset": {
+        "error": "fetch for \"http://127.0.0.1:4179/assets/street01-rider-posed.glb\" responded with 404: Not Found",
+        "text": "HERO / GARAGE\nTARGET 01 · PRODUCTION STUDY\nFULL RIDER + BIKE — BREADTH-FIRST ASSEMBLY\nFace study\n\nIndependent Three.js review\n\nfetch for \"http://127.0.0.1:4179/assets/street01-rider-posed.glb\" responded with 404: Not FoundDrag to orbit · Scroll or pinch to inspect\n\nCOMPARISON CAMERA\n\nFace\nRider + bike\nBike\nReference\nCompare rider + bike\n\nLIGHT STUDY\n\nGarage\nNeutral\n\nAUTHORED MOTION\n\nNo playable motion available.\n\nDESIGN REFERENCE · CONCEPT\n\n\nTarget 01 · design reference\nComplete existing Blender-authored rider and bike assembled for whole-scene review.\n\nSeated neutral, forward rise and rearward hip shift are authored in the exported rider rig. Whole-body fit remains under visual review.\n\nBreadth-first work in progress. Hair, face, tailoring, contacts and mechanical detail can be polished after reviewing the whole scene.\nOpen identity board ↗\nProvisional production work. Asset loading and renderer checks do not establish likeness or milestone acceptance. Mobile target: 30 fps; actual iPhone validation pending.\nPlay\nNo motion loaded\n4 triangles · 2 draws · 1640 × 934"
+      },
+      "video": "captures/full-rider-rear-a1/webkit-orbit-relight.webm"
+    }
+  ],
+  "artVerdict": "Parent review required; harness never judges likeness.",
+  "iPhoneValidation": "Not performed. Desktop WebKit and touch emulation cannot satisfy actual iPhone/Safari gate."
+}

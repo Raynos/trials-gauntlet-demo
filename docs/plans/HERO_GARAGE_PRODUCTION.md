@@ -15,7 +15,9 @@ Status: Breadth-first assembly in progress, September 16, 2026. The user explici
 
 ## Latest execution result
 
-The independent viewer now renders the complete existing Blender-authored mustard Street rider and blue/white bike together. The exported `sit_cruise` clip supplies seated neutral, with forward/back clips available for review. The requested [browser screenshot](../../prototypes/hero-garage/captures/full-rider-bike-a2/webkit-full.png) and [full-scene orbit](../../prototypes/hero-garage/captures/full-rider-bike-a2/webkit-orbit-relight.webm) are captured. Whole-scene priorities are seating/contact, relaxed elbows, proportions and clothing. These assets establish breadth; they are not a claim that the requested final character fidelity is complete.
+The independent viewer now renders the complete existing Blender-authored mustard Street rider and blue/white bike together. The original `sit_cruise` began standing; the breadth-first pose pass now exports a seated start, forward rise and rearward shift, with lowered elbows and measured hand/foot markers. The requested [browser screenshot](../../prototypes/hero-garage/captures/full-rider-bike-a2/webkit-full.png) and [full-scene orbit](../../prototypes/hero-garage/captures/full-rider-bike-a2/webkit-orbit-relight.webm) are captured. Whole-scene priorities are seating/contact, relaxed elbows, proportions and clothing. These assets establish breadth; they are not a claim that the requested final character fidelity is complete.
+
+Round 11 adds a [whole-body pose review](../../prototypes/hero-garage/reports/full-rider-pose-review.json) and [updated full-scene screenshot](../../prototypes/hero-garage/captures/full-rider-bike-a4/webkit-full.png). All three motion clips load and repeat deterministically in headless WebKit. Lowered elbows improve the pose; seated support, garment deformation and contact shadows remain provisional.
 
 Head-only studies, source files and their rejected reviews are preserved. They do not block body, bike or scene work. Hunyuan's isolated experiment finished without a usable mesh, and TRELLIS is paused. No paid work has been commissioned. The latest user-reported allowance is 27% remaining, with the 20% reserve unchanged.
 
@@ -24,7 +26,7 @@ Head-only studies, source files and their rejected reviews are preserved. They d
 Start with one mustard-hoodie, bareheaded rider and one bike, using target 01. Do not expand to five outfits before the first character passes visual review.
 
 - [x] Create the independent `prototypes/hero-garage/` Three.js viewer with fixed comparison cameras and a simple garage lighting setup. TypeScript/build and frozen-build WebKit load/orbit/error/touch smoke checks pass; visual acceptance remains separate.
-- [ ] Establish the recognizable face and tousled curly hair in the actual browser first: anatomy, eyes/lids, jaw, ears, beard and authored curl clumps.
+- [ ] After whole-scene review, establish the recognizable face and tousled curly hair in the actual browser: anatomy, eyes/lids, jaw, ears, beard and authored curl clumps.
 - [ ] Build the dressed body: tailored hoodie and jeans, convincing folds/seams, hands and footwear, coherent proportions.
 - [ ] Finish the hero bike's silhouette, mechanical details and materials at the same viewing scale.
 - [ ] Produce editable Blender sources, retopologized meshes, UVs, baked/painted textures, rig and corrective deformation; export verified runtime GLBs.
