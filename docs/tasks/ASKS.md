@@ -31,7 +31,9 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 19 | Port from FF15: **in-game review inbox + drain skill** — Vercel function + Blob, **password entered once, kept in localStorage** | **in flight** | inbox owner (subagent): `api/inbox.ts`, `src/ui/inbox.ts`, `scripts/inbox-pull.ts`, `.claude/skills/drain-inbox`; preview deploy proves the loop |
 | 20 | Hero art (HR-02): the user takes it to Codex themselves | **dropped** (user-owned) | not an agent item here; `prototypes/hero-garage` stays the user's |
 | 21 | **v0.2.2 when the garage lands**; **deploy on green**, review live on the phone | **open** | pin recipe in `RELEASES.md`; HR-04 is the review |
-| 22 | **5 variants of A3 isometric diorama** for the level select | **in flight** | track-select mockup owner → `assets/design/tracks/round3/` A3a–A3e |
+| 22 | **5 variants of A3 isometric diorama** for the level select | **done** | `d01c42d` `assets/design/tracks/round3/` A3a–A3e + SPEC; sent |
+| 23 | "Enough questions — **build autonomously**: new garage, new levels, all the little asks; leave the physics-library plan for another agent" | **in flight** | level-select owner spawned on the round-3 default **A3b one tile lit like A3e** (parent's call, reversible); garage + inbox owners running; physics library untouched |
+| 24 | Next after the garage = **level select**; keep all five outfits + three models; physics-library toggle off the main menu when built; stray `0` deleted | **done** | recorded; `0` removed in `d01c42d` |
 
 ## Standing items the asks imply (parent's list, not the user's words)
 

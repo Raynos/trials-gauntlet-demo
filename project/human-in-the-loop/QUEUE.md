@@ -4,8 +4,6 @@ Things that need **you**, not an agent. Everything else is `docs/tasks/ASKS.md`.
 decided** — the decision lands in the thing it changed (the plan, the SPEC, the ASKS row). Each line leads with what it is
 waiting on. IDs never reused. Ported from the FF15 demo's `HUMAN_REVIEW.md`.
 
-- **HD-01 — Level-select variant.** Waiting on: you — `assets/design/tracks/round3/` (five A3 diorama variants) when it lands, then
-  A1 / A2 / A3 / AD / AE in `round2/`. The build is parked until you pick.
 - **HR-03 — img2 fix on the phone.** Waiting on: you — https://trials-gauntlet-demo.vercel.app on iOS Safari, garage → Img2 experiment
   → play b1. Headless Chromium + WebKit render it (`b06f9ed`); a real-device look closes it.
 - **HR-04 — The garage rebuild, played.** Waiting on: you — it deploys to production on green; play it on the phone: hero
