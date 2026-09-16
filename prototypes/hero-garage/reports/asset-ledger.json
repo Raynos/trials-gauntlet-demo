@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-09-16T12:07:25.715Z",
+  "createdAt": "2026-09-16T12:17:46.410Z",
   "scope": "GLB structure; no art or deformation acceptance",
   "assets": [
     {
@@ -113,10 +113,10 @@
     },
     {
       "file": "public/assets/street01-head-groom.glb",
-      "sha256": "3f7d16b21501d9713e4fc1a6f6f840acfa8e5d83c7f3a957144a287dff60efea",
-      "bytes": 50123836,
+      "sha256": "de45a4ce9abbf2b8a5039e1bc3b08d1e1a742136cf6105c82126b05c2c664a64",
+      "bytes": 91811840,
       "generator": "Khronos glTF Blender I/O v5.2.40",
-      "triangles": 1190244,
+      "triangles": 3494244,
       "primitives": 6,
       "materials": [
         {

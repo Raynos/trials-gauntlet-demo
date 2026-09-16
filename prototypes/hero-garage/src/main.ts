@@ -50,6 +50,23 @@ wall.position.set(0,4,-4); wall.receiveShadow=true; scene.add(wall);
 const hemi = new THREE.HemisphereLight('#f4f4ec','#4d5144',1); scene.add(hemi);
 const key = new THREE.DirectionalLight('#fff1d7',3.1); key.position.set(3,5,4); key.castShadow=true;
 key.shadow.mapSize.set(2048,2048); key.shadow.camera.left=-3; key.shadow.camera.right=3; key.shadow.camera.top=4; key.shadow.camera.bottom=-1; key.shadow.normalBias=.015; scene.add(key);
+scene.add(key.target);
+function fitAssetShadows(){
+  const bounds=new THREE.Box3().setFromObject(hero);
+  if(bounds.isEmpty())return;
+  const sphere=bounds.getBoundingSphere(new THREE.Sphere());
+  const radius=Math.max(sphere.radius*1.25,.05);
+  key.target.position.copy(sphere.center);
+  key.target.updateMatrixWorld();
+  const distance=key.position.distanceTo(sphere.center),shadowCamera=key.shadow.camera;
+  shadowCamera.left=shadowCamera.bottom=-radius;
+  shadowCamera.right=shadowCamera.top=radius;
+  shadowCamera.near=Math.max(.01,distance-radius*2);
+  shadowCamera.far=distance+radius*2;
+  key.shadow.normalBias=radius*.001;
+  key.shadow.bias=-.00005;
+  shadowCamera.updateProjectionMatrix();
+}
 const fill = new THREE.DirectionalLight('#b9d5ea',1.2);fill.position.set(-4,3,1);scene.add(fill);
 const rim = new THREE.DirectionalLight('#e8dab8',2);rim.position.set(1,4,-3);scene.add(rim);
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -137,7 +154,7 @@ function setFrame(frame:{time:number;orbit:number;lighting?:LightingName}){
 }
 function diagnostics(){
   const sizes=renderer.getDrawingBufferSize(new THREE.Vector2());const sorted=[...frameTimes].sort((a,b)=>a-b);
-  return {ready,error,comparison: {enabled:comparison,headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
+  return {ready,error,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
 }
 const api={get ready(){return ready;},get error(){return error;},setCamera,setComparison,setLighting,setTime,setOrbit,setFrame,setClip,setPlaying,getDiagnostics:diagnostics,get state(){return diagnostics();}};
 Object.assign(window,{__garage:api,__heroGarage:api});
@@ -178,6 +195,7 @@ async function boot(){
       root.traverse(object=>{if(object instanceof THREE.Mesh){object.castShadow=true;object.receiveShadow=true;}});
       hero.add(root);loaded.push({asset,root,mixer:new THREE.AnimationMixer(root),clips:gltf.animations});
     }
+    fitAssetShadows();
     const clipNames=[...new Set(loaded.flatMap(item=>item.clips.map(c=>c.name)))];
     for(const name of clipNames){const button=document.createElement('button');button.dataset.clip=name;button.textContent=name;button.setAttribute('aria-pressed','false');$('#clips').append(button);}
     $('#motion-note').textContent=clipNames.length?'Playback uses exported GLB animation clips.':'No authored motion in this export. Orbit inspects geometry; motion acceptance remains open.';

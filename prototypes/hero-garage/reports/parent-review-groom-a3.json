@@ -1,0 +1,21 @@
+{
+  "verdict": "FAIL \u2014 conversion fixes improve compactness and strand visibility but not crown coverage or target style",
+  "sha256": "de45a4ce9abbf2b8a5039e1bc3b08d1e1a742136cf6105c82126b05c2c664a64",
+  "video": "captures/head-groom-a3/webkit-orbit-relight.webm",
+  "reviewMethod": "Sequential 1fps decoded frames05\u201313 from completed8.001second WebKit orbit/relight; response payload hash verified after forwarding upstreambytes unchanged. Sparse sampling cannot exclude transient faults.",
+  "visibleDefects": [
+    "Rear/right crown scalp patch remains visible through both lighting states.",
+    "Fringe remains swept away from forehead and sides retain excess wing-like volume.",
+    "Dense dark curls lack the target hierarchy of broad loose locks with subordinate strands."
+  ],
+  "improvements": [
+    "More compact lower side and nape silhouette",
+    "Zero buried strand centres measured by builder",
+    "Three-sided strands retain coverage more consistently than single ribbons"
+  ],
+  "unchangedFailures": [
+    "Face identity, cheek/brow anatomy and abrupt beard region remain unaccepted."
+  ],
+  "next": "Stop conversion-only tuning. Change method to deliberate authored-guide redistribution and combing, owned separately in art/head-regroom.",
+  "budgets": "91.8MB GLB and3.456million hair triangles are appearance-only; no runtime acceptance. Desktop8secondp9527ms and no actualiPhone evidence."
+}

@@ -1,26 +1,27 @@
 {
-  "status": "unaccepted changed-source groom correction1",
+  "status": "unaccepted changed-source groom correction2",
   "attribution": "Daniel Bystedt, Hair Styles demo, CC BY-SA (version unspecified upstream)",
   "original_sha256": "1ad6202095c1793678fee7d69a7e9f8b5fdb6e5c293d300eb1062d2d437e8d48",
   "source_evaluated_strands": 22418,
   "runtime_strands": 9000,
-  "runtime_hair_triangles": 1152000,
+  "strand_cross_section_vertices": 3,
+  "runtime_hair_triangles": 3456000,
   "runtime_hair_bounds_xyz": [
     [
-      -0.15375089645385742,
-      0.13764140009880066
+      -0.11682933568954468,
+      0.11682926118373871
     ],
     [
-      -0.19393278658390045,
-      0.10149294883012772
+      -0.18509608507156372,
+      0.09103311598300934
     ],
     [
-      1.6251599788665771,
-      1.8449509143829346
+      1.621944785118103,
+      1.8393807411193848
     ]
   ],
-  "runtime_sha256": "3f7d16b21501d9713e4fc1a6f6f840acfa8e5d83c7f3a957144a287dff60efea",
-  "runtime_bytes": 50123836,
+  "runtime_sha256": "de45a4ce9abbf2b8a5039e1bc3b08d1e1a742136cf6105c82126b05c2c664a64",
+  "runtime_bytes": 91811840,
   "head_transform_scale_from_a3": 1.0242583433062717,
   "fit": {
     "source_crown": [
@@ -70,20 +71,89 @@
   },
   "root_projection_offset_m": 0.0008,
   "author_groom_controls": {
-    "noise_distance_source_units": 0.1,
+    "roll_factor": 0.35,
+    "noise_distance_source_units": 0.035,
     "curl_radius_source_units": 0.15,
     "curl_frequency": 0.65
   },
   "native_curve_resample_points": 65,
   "regional_curve_length_factor": {
     "nape": 0.35,
-    "crown": 0.9,
-    "fringe": 1.0
+    "crown": 0.74,
+    "side_limit": 0.62,
+    "fringe": 0.82
+  },
+  "surface_transfer": {
+    "points_tested": 588636,
+    "inside_before": 37217,
+    "clearance_projected": 54209,
+    "worst_inside_m": -0.02801516279578209,
+    "root_normal_rotation_degrees": [
+      0.3115327187288036,
+      10.320467062308042,
+      17.569838602062816,
+      70.01275163437815
+    ]
   },
   "limitations": [
     "9000 sampled actual strands replace 22418 originals; appearance trial exceeds final hair triangle budget and needs later baking/reduction only if art improves.",
-    "Thin double-sided ribbons follow full 3D curls; still not hair-card atlas baking or full production groom optimization.",
+    "Three-sided strand cross-sections fix edge-on ribbon loss; 3.456M hairtriangles are appearance-only and not runtime production budget.",
     "Face, skin, beard and eyes are frozen A3 source; no visual acceptance implied.",
     "CC BY-SA version unspecified upstream; retain attribution/share-alike for derivative groom."
-  ]
+  ],
+  "penetration_before": {
+    "source": "prototypes/hero-garage/art/head-groom/attempts/a2/street01-head-groom.blend",
+    "all": {
+      "points": 585000,
+      "buried_count": 25000,
+      "buried_fraction": 0.042735042735042736,
+      "signed_distance_m_percentiles": [
+        -0.023724274127744138,
+        -0.0053570954783549495,
+        0.000591887671623681,
+        0.013476947293384,
+        0.039499474083640955
+      ]
+    },
+    "crown": {
+      "points": 208926,
+      "buried_count": 4146,
+      "buried_fraction": 0.019844346802217052,
+      "signed_distance_m_percentiles": [
+        -0.023724274127744138,
+        -0.0029429968350314084,
+        0.0011827323723423433,
+        0.017762273200787604,
+        0.04057348537025973
+      ]
+    }
+  },
+  "penetration_after": {
+    "source": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/street01-head-groom.blend",
+    "all": {
+      "points": 585000,
+      "buried_count": 0,
+      "buried_fraction": 0.0,
+      "signed_distance_m_percentiles": [
+        0.0003710810997290537,
+        0.0009973483903422675,
+        0.0009999062856422825,
+        0.010394467371952487,
+        0.029308540351031778
+      ]
+    },
+    "crown": {
+      "points": 217999,
+      "buried_count": 0,
+      "buried_fraction": 0.0,
+      "signed_distance_m_percentiles": [
+        0.0009782776833162643,
+        0.000999637811996763,
+        0.0009999617820540152,
+        0.01360967376967892,
+        0.03195863009314052
+      ]
+    }
+  },
+  "remaining_source_diagnostic_observation": "Rear/right crown scalp visibility persists even after zero buried points and 3-sided cross-sections. Current transferred clump layout/coverage is insufficient; no further density or shading iteration proposed before parent review."
 }

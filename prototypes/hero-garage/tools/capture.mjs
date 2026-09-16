@@ -26,7 +26,14 @@ for(const engine of engines){
     context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,recordVideo:{dir:out,size:{width:1920,height:1080}}});
     const page=await context.newPage();
     const assetResponses=[];
-    page.on('response',response=>{if(new URL(response.url()).pathname.endsWith('.glb'))assetResponses.push(response.body().then(bytes=>({url:response.url(),bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')})).catch(error=>({url:response.url(),error:String(error)})));});
+    // WebKit evicts large GLBs from its inspector response cache. Hash the
+    // upstream bytes and forward that exact payload to the browser, unchanged.
+    await page.route('**/*.glb',async route=>{
+      const response=await route.fetch();
+      const bytes=await response.body();
+      assetResponses.push(Promise.resolve({url:route.request().url(),status:response.status(),bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex'),proof:'upstream response bytes forwarded unchanged through request interception'}));
+      await route.fulfill({response,body:bytes});
+    });
     page.on('pageerror',e=>row.errors.push(String(e)));
     page.on('console',m=>{if(m.type()==='error') row.errors.push(m.text());});
     const loaded=Date.now();
