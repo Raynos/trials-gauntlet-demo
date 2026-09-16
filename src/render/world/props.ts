@@ -3,6 +3,8 @@
  * Every prop type is one InstancedMesh; placement is seeded from the track.
  */
 import * as THREE from 'three';
+import { fadeMaterial, type OccluderSet } from '../camera/occluders';
+import { MOTION } from '../camera/rig';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { fogify } from '../lighting/environment';
 import { canvas, tex } from './canvasTex';
@@ -174,14 +176,90 @@ const MERGE_MAX_TRIS = 60_000;
  * kept. Batches hidden or shadow-gated by name (`tierHides` / `tierCasts`) merge only with batches
  * of the same rule, under a name the rules recognise (`props:merged:cast:*` casts on medium).
  */
-export function buildBatches(batches: PropBatch[]): { objects: THREE.Object3D[]; merged: number; mergedDraws: number } {
+/**
+ * Round 15 (camera 1d): foreground instances that could sit between the camera and the bike are
+ * pulled out of a batch before it bakes and drawn as their own fade-capable `InstancedMesh` per
+ * chunk (`props:<name>:fg:<k>`), each instance registered with its world AABB in `set`.
+ * `couldOcclude(x, top)` is the kit's height test (top of the instance above the deck + 1 m).
+ */
+export interface OccluderHook {
+  set: OccluderSet;
+  couldOcclude: (x: number, top: number) => boolean;
+}
+
+function extractForeground(b: PropBatch, hook: OccluderHook): THREE.Object3D[] {
+  const minZ = MOTION.OCCLUDE.minZ;
+  if (!b.geometry.boundingBox) b.geometry.computeBoundingBox();
+  const bb = b.geometry.boundingBox!;
+  const box = new THREE.Box3();
+  const fg: { m: THREE.Matrix4; c: THREE.Color | null; box: THREE.Box3 }[] = [];
+  const keep: PropBatch['items'] = [];
+  for (const it of b.items) {
+    const e = it.m.elements;
+    if (e[14]! < minZ) {
+      keep.push(it);
+      continue;
+    }
+    box.copy(bb).applyMatrix4(it.m);
+    if (box.max.z < minZ || !hook.couldOcclude(e[12]!, box.max.y)) {
+      keep.push(it);
+      continue;
+    }
+    fg.push({ m: it.m, c: it.c, box: box.clone() });
+  }
+  if (fg.length === 0) return [];
+  b.items.length = 0;
+  b.items.push(...keep);
+  const chunks = new Map<number, typeof fg>();
+  for (const it of fg) {
+    const k = Math.floor(it.m.elements[12]! / PropBatch.CHUNK_M);
+    let list = chunks.get(k);
+    if (!list) chunks.set(k, (list = []));
+    list.push(it);
+  }
+  const out: THREE.Object3D[] = [];
+  const white = new THREE.Color(0xffffff);
+  const mat = fadeMaterial(b.material);
+  for (const [k, items] of [...chunks.entries()].sort((a, c) => a[0] - c[0])) {
+    // Own geometry per mesh: the `aFade` instanced attribute is per mesh, the source geometry is shared.
+    const geo = b.geometry.clone();
+    if (!geo.getAttribute('color') && (b.material as THREE.MeshStandardMaterial).vertexColors) {
+      geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(geo.getAttribute('position').count * 3).fill(1), 3));
+    }
+    const mesh = new THREE.InstancedMesh(geo, mat, items.length);
+    mesh.name = `props:${b.name}:fg:${k}`;
+    items.forEach((it, i) => {
+      mesh.setMatrixAt(i, it.m);
+      mesh.setColorAt(i, it.c ?? white);
+      hook.set.add(mesh, i, it.box);
+    });
+    mesh.instanceColor!.needsUpdate = true;
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.castShadow = b.shadows;
+    mesh.receiveShadow = b.shadows;
+    mesh.computeBoundingSphere();
+    mesh.frustumCulled = true;
+    out.push(mesh);
+  }
+  return out;
+}
+
+export function buildBatches(batches: PropBatch[], occluders: OccluderHook | null = null): { objects: THREE.Object3D[]; merged: number; mergedDraws: number; foreground: number } {
   const objects: THREE.Object3D[] = [];
+  let foreground = 0;
+  if (occluders) {
+    for (const b of batches) {
+      const fg = extractForeground(b, occluders);
+      foreground += fg.length;
+      objects.push(...fg);
+    }
+  }
   if (!PropBatch.MERGE) {
     for (const b of batches) {
       const g = b.build();
       if (g) objects.push(g);
     }
-    return { objects, merged: 0, mergedDraws: 0 };
+    return { objects, merged: 0, mergedDraws: 0, foreground };
   }
   const groups = new Map<string, PropBatch[]>();
   for (const b of batches) {
@@ -265,7 +343,7 @@ export function buildBatches(batches: PropBatch[]): { objects: THREE.Object3D[];
     merged += list.length;
     mergedDraws += built.length;
   }
-  return { objects, merged, mergedDraws };
+  return { objects, merged, mergedDraws, foreground };
 }
 
 /** Triangles in a geometry. */

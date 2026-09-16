@@ -8,7 +8,7 @@
  * simulated time, so the rig is a pure function of the state history.
  */
 import * as THREE from 'three';
-import type { CameraDebug, CameraKey, GamePhase } from '../../core/types';
+import type { CameraDebug, CameraKey, CameraOverride, GamePhase } from '../../core/types';
 import type { RenderFrame } from '../frame';
 
 const DEG = Math.PI / 180;
@@ -26,6 +26,49 @@ class Smooth {
     this.x = v;
   }
 }
+
+/**
+ * Critically-damped second-order follower (round 15, lead): no overshoot, and unlike the
+ * exponential `Smooth` its velocity is continuous, so the bike does not jerk in the frame when the
+ * lead target steps (throttle on / off, a landing).
+ */
+class Spring {
+  x = 0;
+  v = 0;
+  constructor(public omega: number) {}
+  follow(target: number, dt: number): number {
+    if (dt <= 0) return this.x;
+    // Semi-implicit Euler on x'' = ω²(t − x) − 2ωx', sub-stepped so a 1/20 s harness frame is stable.
+    const n = Math.max(1, Math.ceil(dt / (1 / 120)));
+    const h = dt / n;
+    for (let i = 0; i < n; i++) {
+      this.v += (this.omega * this.omega * (target - this.x) - 2 * this.omega * this.v) * h;
+      this.x += this.v * h;
+    }
+    return this.x;
+  }
+  snap(v: number): void {
+    this.x = v;
+    this.v = 0;
+  }
+}
+
+/**
+ * Round 15 motion table — the camera owes the bike something (docs/design/rendering.md §11j). Every
+ * state-driven beat is a named constant here; the speed / air / key table stays in `update()`.
+ */
+export const MOTION = {
+  /** (a) Lead: look-ahead = LEAD.gainS × velX (m), capped at LEAD.capFrac of the visible width at the target frame (LEAD.capM hard cap); followed by a critically-damped spring at LEAD.omega rad/s (settles in ≈ 4/ω = 0.6 s). Airborne the cap grows by LEAD.airGain (the landing zone enters by look-ahead, not distance — round 14). */
+  LEAD: { gainS: 0.22, capFrac: 0.12, capM: 3.0, omega: 6.5, airGain: 1.0 },
+  /** (b) Landing tighten: on touchdown after ≥ minAir s of air the distance closes by `dist` (×0.85) over `inS`, holds, and opens back over `outS`; the bike rises `screenY` in the frame (the camera drops). Scaled by min(1, air / fullAir). */
+  LAND: { minAir: 0.4, fullAir: 1.0, dist: 0.15, inS: 0.3, outS: 0.6, screenY: 0.03 },
+  /** (c) Apex hold: airborne the aim rises with the bike (y dead-zone 0, follow ×2.5 faster), the distance grows at most ×distCap (the user's rule: a smaller range of zoom-out) and pitch / roll are untouched — the horizon does not tilt unless the hall roof clamps the camera (last resort, b3 apex). */
+  AIR: { distCap: 1.2, followMul: 2.5, riseFrac: 0.5 },
+  /** Facing hysteresis: yaw / screenX mirror only after the bike has moved backwards faster than `speed` m/s for `holdS` s (was an instant flip at −0.5 m/s: a 36° yaw swing in 0.3 s on every stall / roll-back). */
+  FACING: { speed: 1.2, holdS: 0.3 },
+  /** (d) Foreground occluders (camera/occluders.ts): props whose bounding sphere crosses the camera → rider segment fade out over `frames` frames (dithered discard, no transparency queue) and back in over the same; queried against z > `minZ` instances only. */
+  OCCLUDE: { frames: 4, minZ: 1.0, radiusPad: 1.0 },
+} as const;
 
 function smoothstep(a: number, b: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -96,7 +139,16 @@ export class CameraRig {
   // Followed bike point.
   private readonly fx = new Smooth(0.12);
   private readonly fy = new Smooth(0.18);
-  private readonly look = new Smooth(0.25);
+  private readonly look = new Spring(MOTION.LEAD.omega);
+  /** Round 15: facing with hysteresis (see MOTION.FACING). */
+  private facing: 1 | -1 = 1;
+  private facingT = -1;
+  /** Round 15 (b): landing tighten clock / weight. */
+  private landT = -1;
+  private landW = 0;
+  private lastAirTime = 0;
+  /** Round 15 (2): replay / reviewer override; the rig keeps integrating underneath so `null` restores it exactly. */
+  private override: CameraOverride | null = null;
   private readonly heightFrac = new Smooth(0.35);
   private readonly screenX = new Smooth(0.5);
   private readonly screenY = new Smooth(0.5);
@@ -155,6 +207,20 @@ export class CameraRig {
     return this.state;
   }
 
+  /**
+   * Round 15: replay / reviewer camera override (`GameRenderer.setCameraOverride`). `free` holds the aim
+   * at world (x, y) `dist` m back along the rig's current view direction; `fixed` pins the camera position;
+   * `follow-wide` widens ×1/0.76. `null` = the game camera — the rig integrates underneath every mode,
+   * so restoring is exact (no cut, no re-settle).
+   */
+  setOverride(o: CameraOverride | null): void {
+    this.override = o;
+  }
+
+  get overrideMode(): string | null {
+    return this.override?.mode ?? null;
+  }
+
   /** Distance from camera to the aim plane (for shadow frustum sizing). */
   get distance(): number {
     return this.dist;
@@ -185,14 +251,28 @@ export class CameraRig {
     // flights the rig pulled back until the bike was 4 % of the frame; the reference barely changes
     // distance in the air and lets the bike rise. Air handling is the aim + a ≤ 20 % pull-back below.
     const wideT = fastT;
-    const moving = Math.abs(f.velX) > 0.5 ? Math.sign(f.velX) : 1;
+    // Round 15: facing flips only after a sustained roll-back (MOTION.FACING), and snaps on a cut.
+    if (cut) {
+      this.facing = f.velX < -MOTION.FACING.speed ? -1 : 1;
+      this.facingT = -1;
+    } else if (Math.sign(f.velX) === -this.facing && Math.abs(f.velX) > MOTION.FACING.speed) {
+      if (this.facingT < 0) this.facingT = t;
+      else if (t - this.facingT >= MOTION.FACING.holdS) {
+        this.facing = this.facing === 1 ? -1 : 1;
+        this.facingT = -1;
+      }
+    } else this.facingT = -1;
+    const moving = this.facing;
     const p: Params = {
       // Round 11: the pull-back floor rises 0.14 → 0.16 (a 16 m/s bot frame read the bike at
       // 13 % of frame height against the reference's ≈ 20 % at speed).
-      heightFrac: lerp(lerp(0.4, 0.26, zoomT), 0.16, wideT),
+      // Round 15: the pull-back floor 0.16 → 0.18 (the reference sits ≈ 0.20 at speed; r4 critic: "distant, non-committal", "filmed from so far away").
+      heightFrac: lerp(lerp(0.4, 0.26, zoomT), 0.18, wideT),
       // Round 11: 0.30/0.28 put the bike itself (followed point minus the lookahead) on the 0.20
       // edge of the gate box in every fast frame (b1 bot-3 at 16.6 m/s: bx 0.20). 0.34 → 0.36.
-      screenX: moving > 0 ? lerp(0.45, 0.34, zoomT) + 0.02 * wideT : lerp(0.55, 0.66, zoomT),
+      // Round 15: the static offset eases (0.34 → 0.40 riding); the speed-proportional lead spring
+      // (MOTION.LEAD) carries the bike back of centre at speed and lets it sit centred at rest.
+      screenX: moving > 0 ? lerp(0.45, 0.4, zoomT) + 0.02 * wideT : lerp(0.55, 0.6, zoomT),
       screenY: lerp(0.55, 0.56, zoomT) - 0.03 * airT,
       // Idle is a 3/4 view (reference start frames sit ≈20° round and ≈10° down), so depth reads before GO.
       // Round 10: the riding pitch goes 11° → 15° and the yaw 15° → 18° (reference riding
@@ -297,11 +377,12 @@ export class CameraRig {
     // --- Followed point: lookahead in x, dead-zone in y.
     // Lookahead: ≤ 2.5 m and ≤ 8 % of the visible width at the target frame (round 11: in the
     // wide frame 2.5 m was 12 % of the width and pushed the bike onto the box edge).
-    const lookCap = Math.min(2.5, 0.08 * (RIDER_HEIGHT / Math.max(0.03, p.heightFrac)) * this.aspect);
-    // Round 14: in the air the look-ahead doubles (≤ 16 % of the width) — the landing zone enters
-    // the frame by looking ahead, not by pulling back.
+    // Round 15 (a): lead = LEAD.gainS × velX, capped at LEAD.capFrac of the visible width (LEAD.capM);
+    // airborne the cap grows by LEAD.airGain (round 14: the landing zone enters by look-ahead).
+    const L = MOTION.LEAD;
+    const lookCap = Math.min(L.capM, L.capFrac * (RIDER_HEIGHT / Math.max(0.03, p.heightFrac)) * this.aspect);
     const airLook = f.airborne && !f.crashed ? smoothstep(0, 0.3, f.airTime) : 0;
-    const lookTarget = f.finished ? 0 : Math.min(lookCap * (1 + airLook), Math.max(-1.5, f.velX * (0.15 + 0.15 * airLook)));
+    const lookTarget = f.finished ? 0 : Math.min(lookCap * (1 + L.airGain * airLook), Math.max(-lookCap, f.velX * L.gainS * (1 + L.airGain * airLook)));
     const fxT = followTarget.x;
     // In the air (round 5, critic: "ground leaves the frame"): aim between the bike and the
     // landing zone and pull back with height, so the ground line stays in the bottom third.
@@ -313,10 +394,10 @@ export class CameraRig {
       const airQ = smoothstep(0, 0.2, f.airTime);
       const gy = this.ground(f.bikeX + Math.max(0, f.velX) * 0.6);
       const above = Math.max(0, f.bikeY - 0.55 - gy);
-      fyT -= 0.5 * above * airQ;
+      fyT -= MOTION.AIR.riseFrac * above * airQ;
       // Round 14: distance grows ≤ 20 % in the air (was ≤ 3.3×); the bike climbs toward the top of
       // the [0.2, 0.8] box and the box clamp slides the aim up after it instead of widening.
-      p.heightFrac *= Math.max(1 / 1.2, 1.9 / (1.9 + 1.1 * above * airQ));
+      p.heightFrac *= Math.max(1 / MOTION.AIR.distCap, 1.9 / (1.9 + 1.1 * above * airQ));
     }
     if (cut) {
       this.fx.snap(fxT);
@@ -336,7 +417,7 @@ export class CameraRig {
       const dy = fyT - this.fy.x;
       const dead = f.airborne || f.crashed || f.finished ? 0 : 0.6;
       // Airborne: the y follow and the pull-back tighten (a 0.35 s half-life lags an 8 m/s launch by 3 m).
-      const airDt = f.airborne && !f.crashed ? dt * 2.5 : dt;
+      const airDt = f.airborne && !f.crashed ? dt * MOTION.AIR.followMul : dt;
       if (Math.abs(dy) > dead) this.fy.follow(fyT - Math.sign(dy) * dead, airDt);
       this.look.follow(lookTarget, dt);
       this.heightFrac.follow(p.heightFrac, airDt);
@@ -348,11 +429,27 @@ export class CameraRig {
       this.fov.follow(p.fov, dt);
     }
 
-    // --- Landing shake.
+    // --- Landing shake + round 15 (b) landing tighten (MOTION.LAND): armed by the air time of the
+    // flight that just ended (`f.airTime` is already 0 on the touchdown frame).
     if (f.justLanded && !cut) {
       this.shakeT = t;
       this.shakeAmp = Math.min(0.12, Math.max(0, f.landImpulse * 0.02));
+      if (this.lastAirTime >= MOTION.LAND.minAir && !f.crashed && !f.finished) {
+        this.landT = t;
+        this.landW = Math.min(1, this.lastAirTime / MOTION.LAND.fullAir);
+      }
     }
+    if (cut) this.landT = -1;
+    this.lastAirTime = f.airborne ? f.airTime : 0;
+    let landEnv = 0;
+    if (this.landT >= 0) {
+      const lt = t - this.landT;
+      const LD = MOTION.LAND;
+      if (lt < LD.inS + LD.outS) landEnv = this.landW * (lt < LD.inS ? smoothstep(0, LD.inS, lt) : 1 - smoothstep(LD.inS, LD.inS + LD.outS, lt));
+      else this.landT = -1;
+      if (f.airborne && f.airTime > 0.15) this.landT = -1; // the next flight cancels the settle
+    }
+    const landTight = 1 / (1 - MOTION.LAND.dist * landEnv);
     let shakeY = 0;
     let shakeRoll = 0;
     if (this.shakeT >= 0) {
@@ -366,7 +463,9 @@ export class CameraRig {
 
     // --- Compose the camera.
     const fov = this.fov.x;
-    const hf = Math.max(0.03, this.heightFrac.x);
+    const hfBase = Math.max(0.03, this.heightFrac.x);
+    let hf = hfBase * landTight;
+    const screenYc = this.screenY.x - MOTION.LAND.screenY * landEnv;
     const visibleH = RIDER_HEIGHT / hf;
     const dist = visibleH / 2 / Math.tan(fov / 2);
     this.dist = dist;
@@ -393,20 +492,21 @@ export class CameraRig {
       let du = ((bcx - bx) * Math.cos(yaw)) / (2 * halfW);
       let dv = ((bcy - by) * Math.cos(pitch)) / (2 * halfH);
       let su = this.screenX.x + du;
-      let sv = this.screenY.x - dv;
+      let sv = screenYc - dv;
       // First widen: a bike more than 0.3 off the aim point wants a wider frame, not a slide.
       const over = Math.max(Math.abs(su - 0.5), Math.abs(sv - 0.5)) - 0.3;
       // Round 14: airborne the widen is skipped (the slide below keeps the bike on the band); on the
       // ground it stays (a wall of obstacles ahead reads better wide than slid).
       if (over > 0 && !(f.airborne && !f.crashed)) {
         const k = Math.min(2.5, 1 + over * 4);
-        this.heightFrac.snap(Math.max(0.03, hf / k));
+        this.heightFrac.snap(Math.max(0.03, hfBase / k));
+        hf /= k;
         halfH *= k;
         halfW *= k;
         du /= k;
         dv /= k;
         su = this.screenX.x + du;
-        sv = this.screenY.x - dv;
+        sv = screenYc - dv;
       }
       if (sv < BAND_LO) this.fy.snap(this.fy.x + ((BAND_LO - sv) * 2 * halfH) / Math.cos(pitch));
       else if (sv > BAND_HI) this.fy.snap(this.fy.x - ((sv - BAND_HI) * 2 * halfH) / Math.cos(pitch));
@@ -418,7 +518,7 @@ export class CameraRig {
     const dist2 = halfH / Math.tan(fov / 2);
     this.dist = dist2;
     const ox = (2 * this.screenX.x - 1) * halfW;
-    const oy = (1 - 2 * this.screenY.x) * halfH;
+    const oy = (1 - 2 * screenYc) * halfH;
     this.aim.set(bx2, by2, 0).addScaledVector(this.right, -ox).addScaledVector(this.up, -oy);
     this.camera.position.copy(this.aim).addScaledVector(this.dir, -dist2);
     this.camera.quaternion.copy(this.q);
@@ -470,6 +570,26 @@ export class CameraRig {
       }
     }
     this.fovBoost = fovOut - fov;
+    // --- Round 15 (2): override (replay viewer / level reviewer). Applied after the rig has fully
+    // integrated, so `setOverride(null)` returns the exact rig frame on the next update.
+    const ov = this.override;
+    if (ov) {
+      const cp = this.camera.position;
+      if (ov.mode === 'free') {
+        const d = ov.dist ?? this.dist;
+        this.aim.set(ov.x ?? this.aim.x, ov.y ?? this.aim.y, 0);
+        cp.copy(this.aim).addScaledVector(this.dir, -d);
+        this.dist = d;
+      } else if (ov.mode === 'fixed') {
+        cp.set(ov.x ?? cp.x, ov.y ?? cp.y, cp.z);
+      } else if (ov.mode === 'follow-wide') {
+        // ×0.76 height fraction = ×1/0.76 distance from the same aim, inside the track bounds.
+        const d = this.dist / 0.76;
+        cp.copy(this.aim).addScaledVector(this.dir, -d);
+        if (B) cp.set(Math.min(B.maxX, Math.max(B.minX, cp.x)), Math.min(B.maxY, Math.max(B.minY, cp.y)), Math.min(B.maxZ, Math.max(B.minZ, cp.z)));
+        this.dist = d;
+      }
+    }
     if (Math.abs(this.camera.fov - fovOut / DEG) > 1e-3) {
       this.camera.fov = fovOut / DEG;
       this.camera.updateProjectionMatrix();

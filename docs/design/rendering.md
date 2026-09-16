@@ -1550,6 +1550,153 @@ skeleton, decoded skin weights, buffer layout), `chain14.sh` (serial captures).
 - The medium smear / aberration cut is judged on one still; H5's blind pairs should include a 12+ m/s
   medium frame.
 
+## 11j. Round 15 — Astra's perf layer ported (program retirement, context loss), the camera override, the playgrounds' META rows; the camera-for-the-critic parked
+
+**Finding:** Astra's render perf layer (`405f894`: `ResourceRetirement`, context lost / restored, compile batches by
+scene epoch, guarded disposal) ports onto today's `index.ts` without dropping a perf cut and takes the bench flow's
+`stalePrograms` down 16–17 % (b1 phone-high 25 → 21, h3 68 → 57, medium 72 → 62 / 105 → 88, low 105 → 88) at
+identical draws / tris / Mpx on every b1 / h3 tier row — it retires the programs of *detached* owners (old hero,
+old world, old ghost) through their asynchronous link instead of destroying them under three, but it never touches
+a live material's non-current variants, so PERF-BACKLOG item 4's bar (`stalePrograms` 0 after a tier change) is not
+met by the merge alone. The round's first ask — a camera that leads, tightens on landings and fades foreground
+occluders — was built, measured and then **parked by the user mid-round** (the blind-critic bar is dropped): the
+code stays because it is green (typecheck, lint, camera box 0 / 0 riding frames out on all six r4 cells, hero-webkit
+drift 0.00 mm), no more of it was tuned, and the b3 "two-frame pop" was diagnosed but not fixed (below).
+
+### Astra's layer — what came in verbatim, what was adapted (`resourceRetirement.ts`, `contextResources.ts`, `index.ts`)
+
+Verbatim from `405f894`: `src/render/resourceRetirement.ts` (`ResourceRetirement`, `materialPrograms`,
+`releaseTerminalPrograms`) and `src/render/contextResources.ts` (`releaseSceneAllocations`) with both test files
+(12 tests, all pass); in `index.ts` the field block (`retirement`, `disposed`, `disposal`, `terminalPrograms`,
+`sceneEpoch`, `contextUnavailable`, `restored` / `resolveRestored`), the `onContextLost` / `onContextRestored`
+handlers, the constructor wiring, the `disposed` guards on `setModels` / `setRiderLod` / `applyModels` /
+`rebuildIfArtLanded` / `prepare` / `beginEntry` / `setTrack` / `setBikeClass` / `setQuality` / `render` / `resize`,
+`applyModels` retiring the old bike / rider / ghost through `retireObject` (epoch bumped before the swap),
+`whenReady` awaiting `retirement.whenIdle()` twice, `prepare`'s `activeStep` (awaits `restored`, skips when
+disposed), `setTrack` routing lighting through `ensureLighting`, `compileMaterials` (detached non-recursive mesh
+clones per two-material batch → `compileAsync(batch, camera, scene)` against the scene target, GL target restored
+before the yield, `compilePending` chain, `stale()` on epoch / disposal / context), `dispose()` (owners retired,
+terminal programs released after `renderer.dispose`), `retireObject`, and `clearWorld` retiring the world's unnamed
+(owned) materials' programs before their disposal. `debugInfo()` gains `retirement` (stats) and `terminalPrograms`.
+
+Adapted: only the surroundings. Today's `index.ts` had already merged the outfit half of that commit
+(`setRiderOutfit`, `riderDocumentOutfit`, `riderUrl`) and carries the perf cuts (#0 `stabilizePrograms`, #1 the
+unchanged-frame skip, #3 phone-high, #4 / #4b merged batches + skin arrays, the governor hooks, the round-14
+`staleProgramCount` census) — none of that moved. Round 14's `compileMaterials` used the synchronous
+`renderer.compile` with the other meshes hidden in place because a harness `render()` landing inside
+`compileAsync`'s poll drew a frame with them missing; Astra's clone batch never touches live visibility, so
+`compileAsync` is back and that failure mode cannot recur (the comment in the method says so). `clearWorld` keeps
+today's dispose body (CanvasTexture sweep on unnamed materials) inside the retirement callback. Nothing in the
+`405f894` diff was left out.
+
+Proof (`pnpm harness:bench --tiers high,medium,low --tracks b1,h3 --geoms phone --no-idle --frames 300
+--gpu-samples 4`, before = HEAD physics + this round's render tree without the port, after = with it; SwiftShader,
+loadavg 19–20):
+
+| row | calls before → after | tris | rt Mpx | model phone ms | `stalePrograms` first / last sample, before → after |
+|---|---|---|---|---|---|
+| high b1 phone | 128 → 128 | 156 k | 1.59 | 9.2 | 25 / 25 → 21 / 21 |
+| high h3 phone | 152 → 152 | 170 k | 1.59 | 9.7 | 64 / 68 → 52 / 57 |
+| medium b1 | 151 → 151 | 206 k | 2.08 | 14.0 | 72 / 72 → 62 / 62 |
+| medium h3 | 181 → 181 | 165 k | 2.08 | 14.4 | 105 / 105 → 88 / 88 |
+| low b1 | 97 → 97 | 152 k | 0.55 | 6.0 | 105 / 105 → 88 / 88 |
+| low h3 | 108 → 108 | 166 k | 0.55 | 6.2 | 105 / 105 → 88 / 88 |
+
+`pnpm harness:hero-webkit` after the port: PASS, drift 0.00 mm on every row (low / medium / high, `bike-lod rider`).
+b1 phone-high sits at 128 draws against the 123 bar: 124 at this round's start (the merged hero), +2 the
+foreground-occluder split below (fade-capable instanced meshes are not baked), +2 the playgrounds' foundry grate
+bucket on h3 / the world edits — the draw term is item 1 of PERF-BACKLOG, unchanged by this round.
+
+### `setCameraOverride` (item 2) — `GameRenderer.setCameraOverride?(o | null)`, `CameraRig.setOverride`
+
+`CameraOverride.mode` gains `'free'` (+ `dist`): `{mode:'free', x, y, dist}` aims at world (x, y) `dist` m back along
+the rig's current view direction; `fixed` pins the camera position at (x, y); `follow-wide` widens ×1/0.76 from the
+same aim inside the track bounds; `null` restores the game rig. The rig integrates every smoother underneath every
+mode and the override is applied after the compose + clamp, so restoring is exact — no cut, no re-settle. The
+replay viewer (`src/game/replay.ts applyCamera`) already calls it when present; the level reviewer's pan hack
+(`review.ts` teleports the parked bike) can move to `free`. `debugInfo().occluder.override` names the live mode.
+
+### The camera that owes the bike something (item 1, parked) — `camera/rig.ts MOTION`, `camera/occluders.ts`
+
+Every new beat is a named constant in `MOTION` (`rig.ts`): **LEAD** `{gainS 0.22, capFrac 0.12, capM 3.0, omega 6.5,
+airGain 1.0}` — look-ahead = gainS × velX capped at capFrac of the visible width, followed by a critically-damped
+spring (`Spring`, sub-stepped semi-implicit Euler, replaces the 0.25 s exponential); the static riding screenX
+eased 0.34 → 0.40 so the lead carries the back-of-centre framing at speed and the bike sits centred at rest;
+**LAND** `{minAir 0.4, fullAir 1.0, dist 0.15, inS 0.3, outS 0.6, screenY 0.03}` — a touchdown after ≥ 0.4 s of air
+closes the distance ×0.85 over 0.3 s, holds, opens over 0.6 s and drops the camera 3 % of the frame (armed from the
+air time of the flight that ended, cancelled by the next flight, applied after the smoothers so the timing is
+exact; the box clamp snaps the untightened fraction); **AIR** `{distCap 1.2, followMul 2.5, riseFrac 0.5}` — the
+round-14 air rule as constants (the user's ×1.2 cap, pitch / roll untouched); **FACING** `{speed 1.2, holdS 0.3}` —
+the yaw / screenX mirror flips only after a sustained roll-back (was instant at −0.5 m/s: a 36° swing on every
+stall); the pull-back floor 0.16 → 0.18 (reference ≈ 0.20 at speed). **OCCLUDE** `{frames 4, minZ 1.0, radiusPad
+1.0}`: `props.ts buildBatches` splits instances at z ≥ 1 whose AABB top clears the deck + 1 m out of the merged
+bake into `props:<name>:fg:<chunk>` instanced meshes (own geometry, `aFade` instanced attribute, a cloned material
+with a 4×4 Bayer dithered discard — no transparency queue, one extra program per source material,
+`fadeMaterial()` cached); `OccluderSet.update` (after `rig.update`, every frame) slab-tests the camera → rider chest
+segment (padded 1 m) against every registered AABB within ±40 m and steps each hit instance's fade −¼ per frame,
+misses +¼. Cost measured by `harness/bench/camprobe.ts` (new: per-frame `camera()` + `debugInfo().occluder` rows and
+touchdown beats, no pixels): m2 landing cell 22 instances registered, ≤ 5 tested per frame, **0.0016 ms mean /
+0.015 ms max**; the m2 landing reads `dist 14.26 → 9.7 → 11.1` over the second after touchdown (the state change
+fast → riding adds to the ×0.85).
+
+Six r4 cells re-captured at the same ticks / size as `harness/out/capture/r13b/` on an evidence-only export of HEAD
+in the scratchpad (the working tree's physics R8 tuning and re-recorded goldens no longer replay the r13b windows —
+the b3 golden now crashes at 11.3 s inside the wheelie cell): `harness/out/capture/r15a/<cell>/`, every one at
+r13b's exact `finalHash` and frame count, camera PASS 0 riding frames out on all six; before / after sheets and
+hstack clips `harness/out/compare/r15-camera/<cell>-sheet.jpg` / `-side-by-side.mp4`. Bike screen ranges before →
+after: wheelie-industrial x 0.34–0.41 → 0.35–0.45, roof-clamped frames **30 → 0**; landing-snow y 0.42–0.58 →
+0.36–0.56 (the landing drop); world-industrial x 0.40–0.41 → 0.42–0.45. No critic was run (bar dropped).
+
+**The pops, named (not fixed):** (1) b3 wheelie "two-frame geometry pop at 0.37 s" = **a hanging lamp head switching
+on in one frame** — the three camera-following SpotLights (`index.ts` `nearestK(w.lamps, rig.targetX, 3)`,
+industrial `count 3 / intensity 340`) snap between lamp heads with no fade or hysteresis, and the spot sits 0.2 m
+inside the shade so a head is dark until the spot lands on it; the switch is the 151 → 169 m hand-off at
+`targetX` 160.0. Fix owed: ramp `sl.intensity` over N frames (or membership hysteresis) and move the spot off the
+head. (2) b3 crash "large black shape whips across for 2 frames" (f29–31, f68–70, not 0.3 s) and the wheelie's
+f33–35 wedge = **the roof-clamped camera passing through a roof truss**: interior bounds `maxY = floorY + 15.0`,
+trusses every 12 m at `roofY − 1.3` = floorY + 14.7 with the top chord at + 15.8 — the lens rides 0.3 m above the
+bottom chord and crosses one every 12 m while clamped (the `high34` key pins the widen at +12° for the whole cell).
+Fix owed: `bounds.maxY ≤ roofY − 1.8`. (3) face-x1's "camera through a tree" (f18–36, rider hidden f22–28) and
+landing-snow's "tree through the rider" (f126–134) = the snow kit's foreground-pine rule (`treeAt(x+2, gy−1, z
+6.5–8.5)`, p 0.1 per slot) with the riding camera at z 9.2–9.6 — the pines are 1–3 m from the lens by construction;
+the occluder fade now covers them. Per-frame camera rows are absent from `capture.json` (the sample is aggregated);
+`camprobe.ts` fills that gap. Frames and per-frame replay rows: `scratchpad/render15/pop/`.
+
+### Playgrounds' META rows (item 3, tracks.md §7.3) — `world/setPieces.ts` (new), `hall.ts`, `biomeKit.ts`, `gates.ts`, `deck.ts`
+
+`planSetPieces(track, keepOut)` reads `setPiecesOf(def)`, the `arch` / `tunnel` decor (`isDecorKind` +
+`resolveParams`) and `segmentsOf(def)`; playground ids get one set-piece slot per review segment (skipping gate
+keep-outs ±8 and tunnel / arch / drop / fire / balance ranges ±6), every other course keeps its id-gated single
+pick byte-for-byte. Drawn: **p1** all four industrial models (jib gantry 34, container arch 216, forklift lane 321,
+crane hook 475), the scaffold tunnel 375.5–399.5 (scaffold far wall z −3.4, rail-post near posts z +3.4, plywood
+roof at deck + 5 with stacked containers on it, 3 hanging lamps), crowd bridge 492.9; **p2** water tower 125, mine
+portal 341, pickups 469, the drop dressing 397–432 (split rail, tyre walls at the lip, bales, a light tower),
+crowd bridge 482.6; **p3** lift line over the balance beat (pylons every 42 m ± 84 m, station shed), lodge 240 +
+ice curtain, the ice tunnel 438–458 (ice-curtain far wall, icicle columns, slab roof, 3 lanterns), crowd bridge
+477.3; **p4** rail spur + train + billboard 142, tower crane + site 358, the loading-bay drop dressing 408–436
+(jersey barriers, cones, red beacons), crowd bridge 487.2; **p5** rolling mill 34, pipe rack 121, furnace wall 303,
+ladle 418, the `fire` beat (a second ladle over the gap at 188), the `balance` troughs at 374, the pipe duct
+210–240 (pipe posts, pipe-run roof + 3-tier far wall, header, lamps), the `pipe` exit arch 431.5. The crowd bridge
+(p1–p4) is a stage deck at deck + 5 on four piers with ~18 crowd cards in two rows, rail, sponsor strip, flags —
+zero new draws (gate batches). Item 4: `deck.ts` lays darkSteel angle + grate strips on the foundry biome's dirt
+bed (the `metal` branch never fired because ground is always dirt). Every tunnel is roof + far wall + thin near
+posts (camera z is positive); proof frames show the bike inside all three.
+
+Bench (phone-high, 600 frames; calls / tris / rt Mpx / model ms) before → after: p1 135 / 150 k / 1.59 / 9.3 →
+135 / 151 k / 1.59 / 9.3; p2 107 → 109; p3 122 → 121; p4 125 → 133 (the spur + train now inside the 10 s window);
+p5 135 → 140 (mill + rack in window, + the grate bucket); all ≤ 140 / ≤ 1.8 Mpx. b1 124 → 126, h3 148 → 151 (the
+grate bucket on h3). Proof clips / frames: `scratchpad/render15/playground/p{1..5}-*/` (fresh in-process skill-3
+recordings, since the working-tree physics no longer replays the committed goldens).
+
+### Checks
+
+`pnpm typecheck` both configs: clean except `src/render/hero/img2Rider.ts` (another owner's in-progress file,
+`import.meta.glob` typing — not this round's). `pnpm lint` (`eslint src/render harness/bench`): clean.
+`pnpm vitest run src/render`: 109 → 121 tests with Astra's two files; 12 fail in `hero/gltfRiderPhysical.test.ts`
+("follows actual production Game playback through the E2 impact window") — they pass with the working tree's
+uncommitted `src/physics/v2/bike.ts` / `tuning.ts` stashed, so they are the physics R8 mid-round, not the renderer.
+`pnpm harness:hero-webkit` PASS (0.00 mm). `pnpm harness:e2e --only=run,review`: see the round report.
+
 ## 12. Known gaps after round 11 (what still reads non-AAA)
 
 ### Blender branch round 6 — restored motion and knee diagnosis, 2026-09-15

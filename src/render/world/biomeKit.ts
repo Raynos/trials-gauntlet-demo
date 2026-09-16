@@ -13,6 +13,8 @@ import { groundFloorY, profileY } from './track';
 import { canvas, tex } from './canvasTex';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildHall, foregroundKeepOut } from './hall';
+import { assignSlots, planSetPieces } from './setPieces';
+import { OccluderSet } from '../camera/occluders';
 import type { ArtLibrary } from '../art/library';
 import {
   PropBatch,
@@ -74,6 +76,8 @@ export interface BiomeKit {
   fountains: { x: number; y: number; z: number }[];
   /** High-bay lamp heads (interior kits, round 10): the renderer's two follow spots park on the nearest. */
   lamps: { x: number; y: number; z: number }[];
+  /** Round 15: foreground instances the camera may fade (`camera/occluders.ts`); queried every frame by the renderer. */
+  occluders: OccluderSet;
 }
 
 // ---------------------------------------------------------------------------
@@ -758,6 +762,7 @@ function citySilhouette(rng: Rng): THREE.CanvasTexture {
 export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, art: ArtLibrary | null = null, detail: WorldDetail = 'high'): BiomeKit {
   const group = new THREE.Group();
   const keepOut = foregroundKeepOut(track);
+  const plan = planSetPieces(track, keepOut); // round 15: the playgrounds' tunnels / beats / every set piece (tracks.md §7.3)
   group.name = `biome:${biome.id}`;
   const rng = new Rng((track.def.seed ^ 0x5bd1e995) >>> 0);
   const flicker: THREE.MeshStandardMaterial[] = [];
@@ -1148,29 +1153,42 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
         m.receiveShadow = true;
         meshes.push(m);
       };
-      if (setKind === 0) {
+      // The three canyon models, each a function of its x (round 15: a playground places all
+      // three, one per free review segment; every other course keeps its seeded single pick).
+      const waterTower = (setX: number): void => {
         singleMesh(bakeAO(waterTowerGeometry(), 3, 0.3), lib.get('rustSteel'), setX, gyAt(setX, -9) - 0.2, -9, 0.3);
         shadowAt(setX, gyAt(setX, -9), -9, 3.2);
         const wx = setX + 70;
         singleMesh(bakeAO(windmillGeometry(), 2, 0.3), lib.get('darkSteel'), wx, gyAt(wx, -8) - 0.1, -8, 0.2);
         shadowAt(wx, gyAt(wx, -8), -8, 1.2);
-      } else if (setKind === 1) {
-        const pk = PB('pickup', pickupGeometry(), lib.get('rustSteel'));
-        pk.add(setX, gyAt(setX, -6.5), -6.5, 0.35, 1, 0xa86a3a);
+      };
+      const pickups = PB('pickup', pickupGeometry(), lib.get('rustSteel'));
+      const pickupDump = (setX: number): void => {
+        pickups.add(setX, gyAt(setX, -6.5), -6.5, 0.35, 1, 0xa86a3a);
         shadowAt(setX, gyAt(setX, -6.5), -6.5, 2.6, 1.4);
         const px = setX + 60;
-        if (!keepOut(px, 3)) {
-          pk.add(px, gyAt(px, 7) - 0.4, 7, -2.6, 1, 0x6a7a80);
+        if (!keepOut(px, 3) && !(plan.playground && plan.blocked(px, 3))) {
+          pickups.add(px, gyAt(px, 7) - 0.4, 7, -2.6, 1, 0x6a7a80);
           shadowAt(px, gyAt(px, 7) - 0.4, 7, 2.6, 1.4);
         }
         for (let i = 0; i < 7; i++) drums.add(setX - 5 + i * 0.75 + rng.range(-0.2, 0.2), gyAt(setX - 5 + i * 0.75, -5.5), -5.5 + rng.range(-0.4, 0.4), rng.range(0, 6), 1, i % 3 === 0 ? 0xd8d2c4 : i % 3 === 1 ? 0x2a4f7a : null);
-        batches.push(pk);
-      } else {
+      };
+      const minePortal = (setX: number): void => {
         singleMesh(minePortalGeometry(), lib.get('pallet'), setX, gyAt(setX, -7.5), -7.5, 0, 1.15);
         shadowAt(setX, gyAt(setX, -7.5), -7.5, 2.2);
         pick().add(setX, gyAt(setX, -12) - 1.5, -12, rng.range(0, 6), 12, null, 0, 6, 8);
         for (let i = 0; i < 4; i++) spools.add(setX + 4 + i * 1.4, gyAt(setX + 4 + i * 1.4, -5), -5 + rng.range(-0.3, 0.3), rng.range(-0.3, 0.3));
-      }
+      };
+      if (plan.playground && plan.slots.length) {
+        // p2-canyon-run: the mine portal prefers the mine-stairs segment (291–391), the rest spread.
+        const [xTower, xPortal, xDump] = assignSlots(plan.slots, [null, 340, null]) as [number, number, number];
+        waterTower(xTower);
+        minePortal(xPortal);
+        pickupDump(xDump);
+      } else if (setKind === 0) waterTower(setX);
+      else if (setKind === 1) pickupDump(setX);
+      else minePortal(setX);
+      batches.push(pickups);
       // Start / finish as an event: light towers (real follow spots via `kit.lamps`), a generator,
       // fire barrels (`kit.fountains` + `meltLights`), bleachers behind the crowd.
       const towers = PB('lighttower', lightTowerGeometry(), lib.get('darkSteel'));
@@ -1183,6 +1201,29 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       const fires = PB('brazierfire', brazierFireGeometry(), fireMat, false);
       const bleacherGeo = bakeAO(mergeGeometries([0, 1, 2].map((i) => new THREE.BoxGeometry(1, 0.45, 0.9).translate(0, 0.225 + i * 0.45, -i * 0.9)), false)!, 1.4, 0.35);
       const bleachers = PB('bleacher', bleacherGeo, lib.get('darkSteel'));
+      // Round 15, `drop` beat ("The Tower Deck", 397–432): the drop-edge dressing — a split-rail
+      // run on the far shoulder along the up-ramp and along the far edge of the deck box's top to
+      // the lip, tyre walls at the lip on both shoulders, a bale pair past the landing, and a light
+      // tower on it (a real follow spot via `lamps`, like the gates).
+      for (const d of plan.playground ? plan.drops : []) {
+        const box = track.placed.find((o) => o.kind === 'box' && o.pos.x >= d.x - 0.5 && o.pos.x <= d.x1);
+        const lip = box ? box.pos.x + Number(box.params['width'] ?? 4) : (d.x + d.x1) / 2;
+        const top = box ? profileY(profile, lip - 1) + Number(box.params['height'] ?? 1) : profileY(profile, lip - 1);
+        // Split rail along the far edge of the deck box (on its top: at ground level it hides behind the box).
+        if (box) for (let x = box.pos.x + 1.25; x < lip - 1; x += 2.5) fence.add(x, top, -1.3, 0);
+        for (let x = d.x - 3; x < (box ? box.pos.x : lip) - 0.5; x += 2.5) fence.add(x, gyAt(x, -3.3), -3.3, 0);
+        for (const [dx, z] of [[-1.0, -3.6], [1.0, -3.6], [-0.4, 3.6]] as const) tyreWalls.add(lip + dx, gyAt(lip + dx, z), z, rng.range(-0.05, 0.05));
+        const land = d.x1 + 2;
+        bales.add(land, gyAt(land, -4.4), -4.4, 0.2);
+        bales.add(land + 1.3, gyAt(land + 1.3, -4.6), -4.6, -0.3);
+        const tx = lip + 6;
+        const tz = -6.5;
+        const ty = gyAt(tx, tz);
+        towers.add(tx, ty, tz, 0);
+        towerHeads.add(tx, ty, tz, 0);
+        lamps.push({ x: tx, y: ty + 6.6, z: tz + 0.4 });
+        shadowAt(tx, ty, tz, 1.1);
+      }
       for (const ex of [track.def.start.pos.x, track.def.finishX]) {
         for (const dx of [-7, 7]) {
           const tx = ex + dx;
@@ -1309,13 +1350,15 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
       const isX1 = track.def.id.startsWith('x1');
       const isM2 = track.def.id.startsWith('m2');
       const setX = track.bounds.minX + (track.bounds.maxX - track.bounds.minX) * 0.5;
-      if (isM2 || (!isX1 && track.def.seed % 2 === 0)) {
+      // The two snow models (round 15: a playground places both — the lift line over its
+      // `balance` beat, the lodge at a free segment slot; every other course keeps its seeded pick).
+      const liftLine = (xa: number, xb: number, stationX: number): void => {
         const pylons = PB('liftpylon', liftPylonGeometry(), lib.get('darkSteel'));
         const chairs = PB('liftchair', liftChairGeometry(), lib.get('darkSteel'), false);
         const cableGeos: THREE.BufferGeometry[] = [];
         const pz = -8.5;
         let prev: [number, number] | null = null;
-        for (let x = track.bounds.minX + 12; x < track.bounds.maxX + 10; x += 42) {
+        for (let x = xa; x < xb; x += 42) {
           const gy = gyAt(x, pz);
           pylons.add(x, gy - 0.2, pz, 0);
           shadowAt(x, gy, pz, 1.4);
@@ -1341,25 +1384,80 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
           meshes.push(m);
         }
         // Lift station: a wide low shed at the bottom pylon with a lit interior.
-        const sx = track.bounds.minX + 12;
-        cabinAt(sx + 6, -14, 12, 3.6, 7, 0.05, true);
+        cabinAt(stationX, -14, 12, 3.6, 7, 0.05, true);
         batches.push(pylons, chairs);
-      } else {
+      };
+      const iceSolid = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.18, metalness: 0.02, vertexColors: true }));
+      lib.complete(iceSolid);
+      const curtain = PB('icecurtain', iceCurtainGeometry(track.def.seed ^ 0x1ce), iceSolid);
+      const lodge = (lx: number, cx: number): void => {
         // Lodge with two rows of windows and a frozen waterfall further on.
-        cabinAt(setX, -17, 18, 6.2, 9, 0.06, true);
-        const iceSolid = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.18, metalness: 0.02, vertexColors: true }));
-        lib.complete(iceSolid);
-        const curtain = PB('icecurtain', iceCurtainGeometry(track.def.seed ^ 0x1ce), iceSolid);
-        const cx = track.bounds.minX + (track.bounds.maxX - track.bounds.minX) * 0.72;
+        cabinAt(lx, -17, 18, 6.2, 9, 0.06, true);
         curtain.add(cx, gyAt(cx, -11) - 0.6, -11, 0, 9, null, 0, 10, 9);
         curtain.add(cx + 7, gyAt(cx + 7, -12) - 0.6, -12, 0.3, 5, null, 0, 6, 5);
         pinesFar[0]!.add(cx - 8, gyAt(cx - 8, -14) - 0.6, -14, 0, 1.4);
         capsFar[0]!.add(cx - 8, gyAt(cx - 8, -14) - 0.6, -14, 0, 1.4);
+      };
+      /** x-stretches the cabins skip (the set pieces' own ground). */
+      const cabinSkip: number[] = [];
+      if (plan.playground && plan.slots.length) {
+        // p3-snow-line: the lift line runs over the see-saw ("The Lift Line", the `balance` beat)
+        // with its station beside it; the lodge takes the middle free slot, its waterfall 22 m on.
+        const bal = plan.balances[0]?.x ?? track.bounds.minX + (track.bounds.maxX - track.bounds.minX) * 0.5;
+        liftLine(bal - 84, bal + 85, bal + 8);
+        cabinSkip.push(bal + 8);
+        const [lx] = assignSlots(plan.slots, [null]) as [number];
+        lodge(lx, lx + 22);
+        cabinSkip.push(lx, lx + 22);
+        // The ice tunnel ("The Ice Cave", 438–458, tracks.md §7.3 item 1): a covered stretch open
+        // on the camera side (+z) — the ice curtain scaled up makes the far wall (z −depth/2 − 1)
+        // and single icicle columns the near posts (z +depth/2 + 0.6, every 5 m), a snow-capped
+        // ice slab is the roof at deck + `height`, and lanterns hang under it (`lit`).
+        for (const t of plan.tunnels.filter((t) => t.style === 'ice')) {
+          const len = t.x1 - t.x0;
+          const cx = (t.x0 + t.x1) / 2;
+          const deck = Math.max(profileY(profile, t.x0), profileY(profile, cx), profileY(profile, t.x1));
+          const roof = deck + t.height;
+          const hz = t.depth / 2 + 0.6;
+          for (let x = t.x0 + 2; x < t.x1; x += 4) {
+            const gy = gyAt(x, -hz - 0.4);
+            curtain.add(x, gy - 0.4, -hz - 0.4, rng.range(-0.2, 0.2), 4.6, null, 0, (roof + 0.6 - gy) / 1.0, 3.2);
+          }
+          // Near posts: slim icicle columns (≈ 0.45 m) every 6 m — the camera looks in between them.
+          const nPost = Math.max(2, Math.round(len / 6));
+          for (let i = 0; i <= nPost; i++) {
+            const x = t.x0 + (len * i) / nPost;
+            const gy = gyAt(x, hz);
+            curtain.add(x, gy - 0.3, hz, rng.range(-0.3, 0.3), 0.5, null, 0, (roof + 0.5 - gy) / 1.0, 0.5);
+          }
+          const slab = new THREE.Mesh(bakeAO(new THREE.BoxGeometry(1, 0.6, 1).translate(0, 0.3, 0), 0.6, 0.25), iceSolid);
+          slab.position.set(cx, roof, 0);
+          slab.scale.set(len + 3, 1, hz * 2 + 1.6);
+          slab.castShadow = true;
+          slab.receiveShadow = true;
+          meshes.push(slab);
+          const cap = new THREE.Mesh(vc(snowBankGeometry(track.def.seed ^ 0x1ce)), bankMat);
+          cap.position.set(cx, roof + 0.55, -1.0);
+          cap.scale.set(len + 3, 1.6, hz * 1.4);
+          meshes.push(cap);
+          if (t.lit) {
+            for (let x = t.x0 + 3; x < t.x1 - 1; x += 6) {
+              lanterns.add(x, roof - 0.9, -1.8, 0);
+              glass.add(x, roof - 0.9, -1.8, 0);
+              lamps.push({ x, y: roof - 1.2, z: -1.8 }); // the follow spot parks 0.2 m under this: below the cage, like the lantern posts
+            }
+          }
+        }
+        batches.push(curtain);
+      } else if (isM2 || (!isX1 && track.def.seed % 2 === 0)) {
+        liftLine(track.bounds.minX + 12, track.bounds.maxX + 10, track.bounds.minX + 18);
+      } else {
+        lodge(setX, track.bounds.minX + (track.bounds.maxX - track.bounds.minX) * 0.72);
         batches.push(curtain);
       }
       // Cabins every 24–40 m in the mid tier (skipping the set piece's stretch).
       for (let x = x0 + 18; x < x1 - 10; x += rng.range(24, 40)) {
-        if (Math.abs(x - setX) < 16) continue;
+        if (Math.abs(x - setX) < 16 || cabinSkip.some((sx) => Math.abs(x - sx) < 16)) continue;
         const z = rng.range(-13, -27);
         cabinAt(x, z, rng.range(5, 8.5), rng.range(2.8, 3.5), rng.range(4, 6), rng.range(-0.25, 0.25));
       }
@@ -1880,10 +1978,10 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
           for (const dz of [-1.2, 1.2]) piers.add(x, gy, z + dz, 0, 1, null, 0, 8.5, 1);
         }
       }
-      if (setPiece === 'rail') {
+      // The two nightCity models, each a function of its x (round 15: a playground places both,
+      // one per free review segment; every other course keeps its id-gated single pick).
+      const railSpur = (bx: number): void => {
         // h1: the viaduct spurs across the line on a bridge at mid-course; a four-car train sits on the viaduct beside it; a neon billboard hangs on the bridge side.
-        let bx = x0 + span * 0.55;
-        while (keepOut(bx, 4) && bx < x1 - 20) bx += 8;
         const gy = gy0(bx);
         // The spur stops at the kerb (z −6): a deck over the ride line hid the rider from the riding camera.
         for (let z = -30; z <= -18; z += 12) viaduct.add(bx, gy + 8.5, z + 6, Math.PI / 2);
@@ -1902,10 +2000,9 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
         singles.push(board);
         for (const dx of [-4.3, 4.3]) poles.add(bx + dx, gy + 9.9, -13.5, 0, 0.6, null, 0, 2.6, 0.6);
         beacons.add(bx, gy + 12.6, -13.5);
-      } else {
+      };
+      const towerCrane = (cx: number): void => {
         // h2: a tower crane over a hoarded site at 45 % of the course, aviation beacon flickering; barriers and cones round its foot.
-        let cx = x0 + span * 0.45;
-        while (keepOut(cx, 6) && cx < x1 - 30) cx += 8;
         const z = -17;
         const gy = gyAt(cx, z);
         const H = 30;
@@ -1923,6 +2020,37 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
           jerseys.add(cx - 8 + k * 4, gyAt(cx, -8.2), -8.2, 0);
           cones.add(cx - 9 + k * 4, gy0(cx), -4.5, rng.range(0, 6));
         }
+      };
+      if (plan.playground && plan.slots.length) {
+        // p4-night-circuit: both models, spread over the free segments.
+        const [xRail, xCrane] = assignSlots(plan.slots, [null, null]) as [number, number];
+        railSpur(xRail);
+        towerCrane(xCrane);
+        // `drop` beat ("The Loading Bay", 408–436): the drop-edge dressing — jersey barriers along
+        // the far kerb and the container top up to the lip (the end of the bay container), a cone line on the near kerb,
+        // two red beacons on short posts at the lip, and a cone pair past the landing.
+        for (const d of plan.drops) {
+          const box = track.placed.find((o) => o.kind === 'box' && o.pos.x >= d.x - 0.5 && o.pos.x <= d.x1);
+          const lip = box ? box.pos.x + Number(box.params['width'] ?? 4) : (d.x + d.x1) / 2;
+          const top = box ? profileY(profile, lip - 1) + Number(box.params['height'] ?? 1) : gy0(lip);
+          // Jersey barriers along the far edge of the bay container's top (at ground level they hide behind it) and the far kerb of the up-ramp.
+          if (box) for (let x = box.pos.x + 1.1; x < lip - 0.9; x += 2.2) jerseys.add(x, top, -1.2, 0);
+          for (let x = d.x - 2; x < (box ? box.pos.x : lip) - 1; x += 2.6) jerseys.add(x, gy0(x) - 0.02, -3.5, 0);
+          for (let x = d.x - 2; x < lip; x += 2.2) cones.add(x, gy0(x), 3.6, rng.range(0, 6));
+          for (const z of [-3.5, 3.5]) {
+            poles.add(lip + 0.4, gy0(lip), z, 0, 0.35, null, 0, 1.6, 0.35);
+            beacons.add(lip + 0.4, gy0(lip) + 1.6, z);
+          }
+          for (const dx of [2.5, 4]) cones.add(d.x1 + dx, gy0(d.x1 + dx), -3.6, rng.range(0, 6));
+        }
+      } else if (setPiece === 'rail') {
+        let bx = x0 + span * 0.55;
+        while (keepOut(bx, 4) && bx < x1 - 20) bx += 8;
+        railSpur(bx);
+      } else {
+        let cx = x0 + span * 0.45;
+        while (keepOut(cx, 6) && cx < x1 - 30) cx += 8;
+        towerCrane(cx);
       }
       // Neon signs: alternating the two panels of the sheet, hung on posts at z −7..−11, with reflections.
       const reflGeos: THREE.BufferGeometry[] = [];
@@ -2001,7 +2129,12 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
     triangles += 2;
   }
   // Perf cut #4: batches sharing a material bake into one mesh per chunk (`buildBatches`).
-  const built = buildBatches(batches);
+  // Round 15 (camera 1d): foreground instances that could cross the camera → rider line are split
+  // out as fade-capable draws and registered for the per-frame occluder query.
+  const occluders = new OccluderSet();
+  const built = buildBatches(batches, { set: occluders, couldOcclude: (x, top) => top > profileY(profile, x) + 1.0 });
+  occluders.seal();
+  drawCalls += built.foreground;
   for (const o of built.objects) group.add(o);
   for (const b of batches) {
     if (b.count === 0) continue;
@@ -2010,5 +2143,5 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
   }
   drawCalls -= Math.max(0, built.merged - built.mergedDraws);
   for (const l of lights) group.add(l);
-  return { group, drawCalls, triangles, textureBytes, flicker, lights, scroll, fountains, lamps };
+  return { group, drawCalls, triangles, textureBytes, flicker, lights, scroll, fountains, lamps, occluders };
 }

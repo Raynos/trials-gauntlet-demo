@@ -290,7 +290,13 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     if (surf === 'dirt' && interior) {
       // Contained dirt bed: worn line down the middle, plywood edge boards.
       push(buckets, 'dirt', ribbonWithShade(pl, BED_SECTION, tile, 0, (z, drop) => (Math.abs(z) < 0.32 ? 0.62 : 1) * (1 + drop * 1.5)));
-      edging(pl, 'plywood', 0.12, 0.16, 1.62, 0.02, 0.75, 0.66, 0.52, buckets);
+      if (biome.id === 'foundry' && ground) {
+        // Round 15 (tracks.md §7.3 item 4): the foundry bed is retained by angle iron with grating
+        // strips inside the lip (z 0.95–1.45, lifted 1 cm). The `metal` branch below carried these
+        // strips but the ground polyline is always dirt, so they never placed on any foundry course.
+        edging(pl, 'darkSteel', 0.1, 0.16, 1.62, 0.02, 0.6, 0.6, 0.6, buckets);
+        edging(pl, 'grate', 0.5, 0.03, 1.2, 0.012, 0.8, 0.8, 0.8, buckets);
+      } else edging(pl, 'plywood', 0.12, 0.16, 1.62, 0.02, 0.75, 0.66, 0.52, buckets);
       continue;
     }
     if (surf === 'dirt') {
@@ -326,7 +332,8 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     if (surf === 'metal' || surf === 'grate') {
       push(buckets, SURFACE_MATERIAL[surf], ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.7 + 0.3 * (1 - Math.min(1, -drop))));
       edging(pl, 'darkSteel', 0.08, 0.08, 1.52, 0.03, 0.6, 0.6, 0.6, buckets);
-      // Foundry: grating strips along both edges of the plate (z 0.95–1.45), lifted 1 cm.
+      // Foundry: grating strips along both edges of a steel plate (z 0.95–1.45), lifted 1 cm. The
+      // ground bed is dirt (its strips are in the interior-dirt branch above); this covers a metal ground polyline.
       if (biome.id === 'foundry' && ground) edging(pl, 'grate', 0.5, 0.03, 1.2, 0.012, 0.8, 0.8, 0.8, buckets);
       continue;
     }

@@ -238,13 +238,13 @@ export function saveOnboarded(): void {
 const GHOST_KEY = 'trials.ghost';
 const MODEL_KEYS = { rider: 'trials.riderModel', bike: 'trials.bikeModel' } as const;
 
-export type ModelChoice = 'proc' | 'gltf';
+export type ModelChoice = 'proc' | 'gltf' | 'img2';
 
 /** glTF hero is the default (MEGA_PLAN P1: procedural retired from the UI, kept as the load-failure fallback and a stored 'proc' choice). */
 export function loadModelChoice(which: 'rider' | 'bike'): ModelChoice {
   try {
     const v = store()?.getItem(MODEL_KEYS[which]);
-    return v === 'proc' ? 'proc' : 'gltf';
+    return which === 'rider' && v === 'img2' ? 'img2' : v === 'proc' ? 'proc' : 'gltf';
   } catch {
     return 'gltf';
   }
@@ -252,7 +252,7 @@ export function loadModelChoice(which: 'rider' | 'bike'): ModelChoice {
 
 export function saveModelChoice(which: 'rider' | 'bike', v: ModelChoice): void {
   try {
-    store()?.setItem(MODEL_KEYS[which], v);
+    store()?.setItem(MODEL_KEYS[which], which === 'bike' && v === 'img2' ? 'gltf' : v);
   } catch {
     /* storage unavailable */
   }

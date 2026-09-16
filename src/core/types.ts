@@ -418,10 +418,13 @@ export type ReplayCameraMode = 'game' | 'follow-wide' | 'fixed';
  * `setKeys` through `renderer.debug.rig` (src/game/replay.ts).
  */
 export interface CameraOverride {
-  mode: ReplayCameraMode;
-  /** `fixed`: world x/y the camera holds. */
+  /** `free` (render r15, the level reviewer's pan / zoom): aim at world (x, y), `dist` m back along the rig's view. */
+  mode: ReplayCameraMode | 'free';
+  /** `fixed`: world x/y the camera holds; `free`: the aim point. */
   x?: number;
   y?: number;
+  /** `free`: camera distance from the aim (m). */
+  dist?: number;
 }
 
 export interface RunTelemetry {

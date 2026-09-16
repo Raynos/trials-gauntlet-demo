@@ -19,6 +19,7 @@ import { fogify } from '../lighting/environment';
 import { canvas, tex } from './canvasTex';
 import { profileY } from './track';
 import { SUPPORT_SLOT, supportLedgeY } from './deck';
+import { assignSlots, planSetPieces } from './setPieces';
 import { drawArt, pickId, tintMask, type ArtLibrary } from '../art/library';
 import type { WorldDetail } from './props';
 import { applySkinArray, skinArrayTexture, withSkinIndex } from './skinArray';
@@ -359,6 +360,7 @@ function roofTexture(foundry: boolean): THREE.CanvasTexture {
 
 export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, rng: Rng, floorY: number, x0: number, x1: number, art: ArtLibrary | null = null, detail: WorldDetail = 'high'): HallOut {
   const keepOut = foregroundKeepOut(track);
+  const plan = planSetPieces(track, keepOut); // round 15: the playgrounds' tunnels / beats / every set piece (tracks.md §7.3)
   const foundry = biome.id === 'foundry';
   const out: HallOut = { meshes: [], singles: [], batches: [], flicker: [], lights: [], scroll: [], fountains: [], lamps: [], textureBytes: 0 };
   const span = x1 - x0;
@@ -720,14 +722,17 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       return mesh;
     };
     const drumSet = new PropBatch('setdrum', drumGeo, vc('barrelRed'));
-    if (id === 'b2-lean-back') {
+    // The four industrial models, each a function of its x (round 15: a playground places all
+    // four, one per free review segment; every other course keeps its id-gated single pick).
+    const containerArch = (setX: number): void => {
       // Stacked-container arch behind the line: two 3-high piers at z −5.5 and z −12 with a
       // turned unit bridging them 7.8 m up.
       for (const pz of [-5.5, -12]) for (let k = 0; k < 3; k++) skinBatches[(k * 3 + (pz < -8 ? 1 : 0)) % 8]!.add(setX + (pz < -8 ? 0.2 : -0.2), floorY + k * 2.59, pz, Math.PI / 2 + rng.range(-0.02, 0.02), 1, pick());
       skinBatches[5]!.add(setX, floorY + 3 * 2.59, -8.75, Math.PI / 2, 1, 0xa8722a);
       hangLamp(setX - 4, floorY + 6.2, -3.9);
       hangLamp(setX + 4, floorY + 6.2, -3.9);
-    } else if (id === 'b3-kicker-row') {
+    };
+    const craneHook = (setX: number): void => {
       // Shipping-crane hook over the far ledge holding a sling of three drums at deck + 3.
       const hy = deckY + 4.6;
       const cableMesh = single(chainGeometry(), steel, setX, roofY - 1.4, -2.6, false);
@@ -735,7 +740,8 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       single(hookBlockGeometry(), rustVc, setX, hy - 0.7, -2.6);
       for (const [dx, dz] of [[-0.36, 0.15], [0.36, 0.15], [0, -0.32]] as const) drumSet.add(setX + dx, hy - 0.7 - 1.2, -2.6 + dz, rng.range(0, 6), 1, [0xa42a1e, 0x244d8a, 0xd8d2c4][Math.round(dx * 3 + 2) % 3]!);
       hangLamp(setX, floorY + 6.4, -3.9);
-    } else if (id === 'm1-hop-up') {
+    };
+    const forkliftLane = (setX: number): void => {
       // Forklift lane: four forklifts nose to tail on a hazard-taped lane at z −6 with pallet loads.
       const lane = new PropBatch('lanetape', new THREE.BoxGeometry(1, 0.01, 0.12), lib.get('hazardTape'), false);
       for (const lz of [-4.6, -7.4]) lane.add(setX, floorY + 0.006, lz, 0, 22, null, 0, 1, 1);
@@ -748,7 +754,8 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       out.batches.push(lane);
       hangLamp(setX - 3, floorY + 6.0, -3.9);
       hangLamp(setX + 5, floorY + 6.0, -3.9);
-    } else {
+    };
+    const jibGantry = (setX: number): void => {
       // b1-first-ride (default): a jib gantry — a leg at z −6.5 carrying a beam out over the
       // line to z +2 at floor + 10.5, a tie back to the roof truss, hook block over the deck,
       // banners hung from the beam behind the line.
@@ -761,6 +768,58 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       for (const bz of [-5.5, -4.0]) tarps.add(setX + (bz < -5 ? -1.2 : 1.2), floorY + 10.3, bz, 0, 1, bz < -5 ? 0xd8a020 : 0xa42a1e, 0, 0.8, 1);
       hangLamp(setX - 4, floorY + 6.2, -3.9);
       hangLamp(setX + 4, floorY + 6.2, -3.9);
+    };
+    if (plan.playground && plan.slots.length) {
+      // p1-container-yard: every industrial model. The container arch prefers the container-row
+      // segment (the doc's 160–272 "kicker 2 through the container rows"); the rest spread.
+      const [xJib, xArch, xFork, xHook] = assignSlots(plan.slots, [null, 216, null, null]) as [number, number, number, number];
+      jibGantry(xJib);
+      containerArch(xArch);
+      forkliftLane(xFork);
+      craneHook(xHook);
+    } else if (id === 'b2-lean-back') containerArch(setX);
+    else if (id === 'b3-kicker-row') craneHook(setX);
+    else if (id === 'm1-hop-up') forkliftLane(setX);
+    else jibGantry(setX);
+    // Round 15: the scaffold tunnel ("Under the Stacks", tracks.md §7.3 item 1) — a covered
+    // stretch open on the camera side (+z): two-high scaffold towers make the far wall at z −3.4
+    // and single near posts at z +3.4 every 6 m, a plywood roof deck at deck + `height` with
+    // steel ledgers and a hazard-taped near edge, containers stacked on the roof (the stacks) and
+    // hanging lamps under it (`lit`). The camera sits at +z looking in, so the bike stays visible.
+    for (const t of plan.playground ? plan.tunnels.filter((t) => t.style === 'scaffold') : []) {
+      const len = t.x1 - t.x0;
+      const cx = (t.x0 + t.x1) / 2;
+      const deck = Math.max(profileY(profile, t.x0), profileY(profile, cx), profileY(profile, t.x1));
+      const roof = deck + t.height;
+      const hz = t.depth / 2 + 0.4;
+      const towers = new PropBatch('tunnelscaffold', bakeAO(scaffoldGeo, 4, 0.3), steel, false);
+      const nTow = Math.max(2, Math.round(len / 6));
+      for (let i = 0; i <= nTow; i++) {
+        const x = t.x0 + (len * i) / nTow;
+        // Far wall: towers stacked from the hall floor to the roof; near side: one thin post per bay.
+        for (let y = floorY; y < roof - 0.5; y += 4) towers.add(x, y, -hz, 0, 1, null, 0, Math.min(1, (roof - y) / 4), 1);
+        railPost.add(x, deck - 0.02, hz, 0, 1, null, 0, (roof - deck) / 1.1, 1);
+      }
+      const plank = single(bakeAO(new THREE.BoxGeometry(1, 0.08, 1), 0.08, 0.2), lib.get('plywood'), cx, roof, 0);
+      plank.scale.set(len + 1.2, 1, hz * 2 + 0.6);
+      for (const bz of [-hz, 0, hz]) {
+        const ledger = single(bakeAO(beamGeometry(0.16, 0.22), 0.22, 0.2), steel, cx, roof - 0.15, bz, false);
+        ledger.scale.set(len + 1.2, 1, 1);
+      }
+      railTape.add(cx, roof + 0.05, hz + 0.12, 0, len + 1.2, null, 0, 1, 1);
+      // The stacks: containers lengthwise on the roof, two rows, a turned one on top.
+      for (let x = t.x0 + 3.5, k = 0; x < t.x1 - 2.5; x += 6.5, k++) {
+        skinBatches[(k * 5 + 1) % 8]!.add(x, roof + 0.04, -2.2, rng.range(-0.02, 0.02), 1, pick());
+        if (k % 2 === 0) skinBatches[(k * 3 + 4) % 8]!.add(x + 0.3, roof + 0.04, 0.9, rng.range(-0.02, 0.02), 1, pick());
+        if (k % 2 === 1) skinBatches[(k * 7 + 2) % 8]!.add(x, roof + 2.63, -1.0, rng.range(-0.02, 0.02), 1, pick());
+      }
+      if (t.lit) {
+        for (let x = t.x0 + 4; x < t.x1 - 2; x += 8) {
+          chains.add(x, roof, -1.8, 0, 1, null, 0, 0.9, 1);
+          lampAt(x, roof - 0.9, -1.8);
+        }
+      }
+      out.batches.push(towers);
     }
     // Start / finish as an event: a scaffold stand with a tarp banner behind each gate at
     // z −5.5, cones along the far ledge, a lamp over each gate, drums as barrier weights.
@@ -963,7 +1022,9 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       }
     }
     out.batches.push(beacons, beaconPost);
-    if (id === 'm3-see-saw') {
+    // The four foundry models, each a function of its x (round 15: a playground places all four,
+    // one per free review segment; every other course keeps its id-gated single pick).
+    const rollingMill = (setX: number): void => {
       // Rolling mill: a housing either side of the line at z −8 with two big rollers and a
       // glowing slab coming through at deck height.
       const housing = new THREE.Mesh(bakeAO(new THREE.BoxGeometry(2.2, 5.2, 3.6).translate(0, 2.6, 0), 5.2, 0.35), rust);
@@ -982,12 +1043,12 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       slab.position.set(setX, floorY + 2.65, -8);
       out.meshes.push(slab);
       for (const dx of [-9, -3, 3, 9]) out.fountains.push({ x: setX + dx, y: floorY + 2.9, z: -8 });
-    } else if (id === 'x2-pipe-dream') {
-      // Pipe rack: five big pipes on A-frames running 48 m behind the line at z −6.5, with a
+    };
+    const pipeRack = (setX: number, len = 48): void => {
+      // Pipe rack: five big pipes on A-frames running `len` m behind the line at z −6.5, with a
       // glowing melt launder on top.
       const rack = new PropBatch('piperack', bakeAO(mergeGeometries([new THREE.BoxGeometry(0.2, 4.6, 0.2).translate(-1.4, 2.3, 0), new THREE.BoxGeometry(0.2, 4.6, 0.2).translate(1.4, 2.3, 0), new THREE.BoxGeometry(3.2, 0.18, 0.24).translate(0, 4.5, 0), new THREE.BoxGeometry(3.2, 0.18, 0.24).translate(0, 2.9, 0)], false)!, 4.6, 0.3), rust, false);
       const bigPipe = new PropBatch('bigpipe', new THREE.CylinderGeometry(0.34, 0.34, 1, 12).rotateZ(Math.PI / 2).translate(0.5, 0, 0), rust, false);
-      const len = 48;
       for (let x = setX - len / 2; x <= setX + len / 2; x += 6) rack.add(x, floorY, -6.5, 0);
       for (const [py, pz] of [[4.9, -7.4], [4.9, -6.6], [4.9, -5.8], [3.3, -7.2], [3.3, -6.0]] as const) bigPipe.add(setX - len / 2, floorY + py, pz, 0, len, [0x6b5a4c, 0x4a4a48, 0x7a3a2a, 0x5a5a52, 0x6b5a4c][Math.round(pz * 10) % 5]!, 0, 1, 1);
       const launder = new THREE.Mesh(new THREE.BoxGeometry(len, 0.08, 0.5), molten);
@@ -995,7 +1056,8 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       out.meshes.push(launder);
       for (let dx = -len / 2 + 6; dx < len / 2; dx += 12) out.fountains.push({ x: setX + dx, y: floorY + 5.5, z: -6.6 });
       out.batches.push(rack, bigPipe);
-    } else if (id === 'x3-gauntlet') {
+    };
+    const furnaceWall = (setX: number): void => {
       // Furnace wall: three furnaces shoulder to shoulder at z −8, mouths open to the line.
       for (const dx of [-6.5, 0, 6.5]) {
         const py = deckY - 1.6;
@@ -1005,7 +1067,8 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
         mouthPool.add(setX + dx, py, -8);
         out.fountains.push({ x: setX + dx, y: py + 1.0, z: -5.9 });
       }
-    } else {
+    };
+    const ladleOverLine = (setX: number): void => {
       // h3-fire-line (and any other foundry course): a pouring ladle hung over the line from
       // the crane rail, its stream landing in a mould just behind the far ledge.
       const ly = profileY(profile, setX) + 3.6;
@@ -1018,7 +1081,94 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       moulds.add(px, floorY, -3.6, 0, 1.3);
       mouldMelt.add(px, floorY, -3.6, 0, 1.3);
       out.fountains.push({ x: px, y: floorY + 0.8, z: -3.6 }, { x: setX, y: ly + 1.9, z: -1.4 });
-    }
+    };
+    if (plan.playground && plan.slots.length) {
+      // p5-foundry-floor: every foundry model, one per free review segment; the ladle wants the
+      // finale ("the wave home under the pour"), the 48 m rack a long clear stretch.
+      const [xMill, xRack, xWall, xLadle] = assignSlots(plan.slots, [null, null, null, track.def.finishX - 25]) as [number, number, number, number];
+      rollingMill(xMill);
+      pipeRack(xRack, 36);
+      furnaceWall(xWall);
+      ladleOverLine(xLadle);
+      // `fire` beat ("The Melt", 190–196): the melt emphasis over the fire gap — a second ladle
+      // pouring over the line 5 m before the gap (its two spark sources are what the camera-following
+      // melt lights park on there). No deck-level sources: a 140 cd point 1 m from the line blows
+      // the bike out to white (the slag-pot lesson above).
+      for (const f of plan.fires) ladleOverLine(f.x - 5);
+      // `balance` beat ("The Trough", 370–379): the molten channel the see-saw bridges — a short
+      // trough on both support ledges (≤ 0.6 m proud, so the near one never reaches the wheels),
+      // with the kit's raised steel edges, and melt sources at its ends.
+      for (const b of plan.balances) {
+        const len = Math.max(10, b.x1 - (2 * b.x - b.x1) + 6);
+        const deck = profileY(profile, b.x);
+        const ledge = supportLedgeY(profile, floorY, b.x);
+        for (const z of [-2.4, 2.4]) {
+          const ty = ledge ?? deck - 0.6;
+          const channel = new THREE.Mesh(new THREE.PlaneGeometry(len, 1.0, Math.max(2, Math.round(len / 4)), 1), molten);
+          channel.rotation.x = -Math.PI / 2;
+          channel.position.set(b.x, ty + 0.22, z);
+          const uv = channel.geometry.getAttribute('uv') as THREE.BufferAttribute;
+          for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) * len) / 6, uv.getY(i));
+          out.meshes.push(channel);
+          for (const side of [-1, 1]) {
+            const edge = new THREE.Mesh(bakeAO(new THREE.BoxGeometry(len, 0.35, 0.3).translate(0, 0.175, 0), 0.35, 0.2), rust);
+            edge.position.set(b.x, ty, z + side * 0.65);
+            out.meshes.push(edge);
+          }
+          if (z < 0) for (const dx of [-len / 2 + 1, len / 2 - 1]) out.fountains.push({ x: b.x + dx, y: ty + 0.4, z });
+        }
+      }
+      // The pipe duct ("The Duct", 210–240, tracks.md §7.3 item 1): a covered stretch open on the
+      // camera side (+z) — vertical pipes as posts at z ±(depth/2 + 0.4) every 6 m, the kit's
+      // 8 m pipe runs side by side as the roof at deck + `height`, a far wall of pipe runs at
+      // half height, and the hall lamps under the roof (`lit`) in the foundry's orange.
+      for (const t of plan.tunnels.filter((t) => t.style === 'pipe')) {
+        const len = t.x1 - t.x0;
+        const cx = (t.x0 + t.x1) / 2;
+        const deck = Math.max(profileY(profile, t.x0), profileY(profile, cx), profileY(profile, t.x1));
+        const roof = deck + t.height;
+        const hz = t.depth / 2 + 0.4;
+        const nBay = Math.max(2, Math.round(len / 6));
+        for (let i = 0; i <= nBay; i++) {
+          const x = t.x0 + (len * i) / nBay;
+          pipeV.add(x, floorY, -hz, 0, 1, null, 0, roof + 0.35 - floorY, 1);
+          pipeV.add(x, deck - 0.3, hz, 0, 0.6, null, 0, roof + 0.35 - (deck - 0.3), 0.6);
+        }
+        // Roof: pipe runs along x, 0.8 m apart across the depth, chained end to end in 8 m units.
+        for (let z = -hz + 0.4; z <= hz - 0.3; z += 0.8) {
+          for (let x = t.x0 + 4; x < t.x1 + 4; x += 8) pipes.add(Math.min(x, t.x1 - 4), roof + 0.35, z, 0, 1, [0x6b5a4c, 0x4a4a48, 0x7a3a2a][Math.round(z * 2.5 + 20) % 3]!);
+        }
+        // Far wall: two tiers of pipe runs behind the posts.
+        for (const y of [deck + 1.2, deck + 2.6, deck + 4.0]) for (let x = t.x0 + 4; x < t.x1 + 4; x += 8) pipes.add(Math.min(x, t.x1 - 4), y, -hz - 0.5, 0);
+        const beam = new THREE.Mesh(bakeAO(beamGeometry(0.2, 0.3), 0.3, 0.2), steel);
+        beam.position.set(cx, roof + 0.05, hz + 0.1);
+        beam.scale.set(len + 1, 1, 1);
+        out.meshes.push(beam);
+        if (t.lit) {
+          for (let x = t.x0 + 4; x < t.x1 - 2; x += 8) {
+            chains.add(x, roof, -1.6, 0, 1, null, 0, 0.8, 1);
+            lampAt(x, roof - 0.8, -1.6);
+          }
+        }
+      }
+      // `pipe` arch (the exit duct at 432): a short duct portal over the line — two pipe posts
+      // and three pipe runs crossing the deck along z on a steel header, no walls.
+      for (const a of plan.arches.filter((a) => a.style === 'pipe')) {
+        const gy = profileY(profile, a.x);
+        const hz = a.depth / 2 + 0.4;
+        pipeV.add(a.x, floorY, -hz, 0, 1, null, 0, gy + a.height + 0.4 - floorY, 1);
+        pipeV.add(a.x, gy - 0.3, hz, 0, 0.6, null, 0, a.height + 0.7, 0.6);
+        for (const dx of [-0.8, 0, 0.8]) pipes.add(a.x + dx, gy + a.height + 0.35, 0, Math.PI / 2, 1, [0x6b5a4c, 0x4a4a48, 0x7a3a2a][Math.round(dx * 1.25 + 1)]!, 0, 1, 1);
+        const header = new THREE.Mesh(bakeAO(beamGeometry(0.2, 0.3), 0.3, 0.2), steel);
+        header.position.set(a.x, gy + a.height + 0.05, 0);
+        header.rotation.y = Math.PI / 2;
+        header.scale.set(hz * 2 + 0.6, 1, 1);
+        out.meshes.push(header);
+      }
+    } else if (id === 'm3-see-saw') rollingMill(setX);
+    else if (id === 'x2-pipe-dream') pipeRack(setX);
+    else if (id === 'x3-gauntlet') furnaceWall(setX);
+    else ladleOverLine(setX);
     out.batches.push(ladles, melt, pours, moulds, mouldMelt, cables, plinth, furnace, mouth, mouthPool, stacks, pipes, pipeV);
     // Round 11: bake the melt's up-light into the per-instance colour of everything within
     // 10 m of a source (GI stand-in; the four camera-following melt lights do the real work).

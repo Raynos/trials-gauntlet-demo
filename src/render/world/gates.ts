@@ -18,6 +18,8 @@ import { canvas, tex } from './canvasTex';
 import { PropBatch, bakeAO, triCount, trussGeometry, lightConeGeometry } from './props';
 import { drawArt, type ArtLibrary } from '../art/library';
 import { groundFloorY, profileY } from './track';
+import { foregroundKeepOut } from './hall';
+import { planSetPieces } from './setPieces';
 
 export interface Gates {
   group: THREE.Group;
@@ -570,6 +572,48 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
   drawCalls += 7;
   triangles += 900;
   crowdZone(fx - 7, fx + 9, 34, true);
+
+  // --- Round 15: the spectator bridge (`arch` decor, style `crowd`; tracks.md §7.3 item 2) on the
+  // playgrounds — a steel deck `height` m over the line from behind the crowd zone (z −7) to the
+  // camera-side kerb (z +3.4) on two piers (the near one slim — it crosses the bike for ~0.15 s
+  // at speed, the bridge read), a two-row crowd on it facing the camera, a barrier rail and the
+  // sponsor strip hung on the front face, flags at both ends. Everything sits in the existing
+  // gate batches (crowd / rails / posts / stage / flags / banners): no new draw calls.
+  {
+    const plan = planSetPieces(track, foregroundKeepOut(track));
+    for (const a of plan.playground ? plan.arches.filter((a) => a.style === 'crowd') : []) {
+      const w = Math.max(8, a.span + 2);
+      const by = profileY(profile, a.x) + a.height; // deck underside
+      const zBack = -7;
+      const zFront = a.depth / 2 + 0.4;
+      const footY = (z: number): number => (interior ? floorY : gyAt(a.x, z));
+      stage.add(a.x - w / 2, by, zBack, 0, w, null, 0, 0.5, zFront - zBack);
+      stage.add(a.x - w / 2 - 0.35, footY(zBack + 0.35), zBack, 0, 0.7, null, 0, by - footY(zBack + 0.35), 0.7);
+      stage.add(a.x + w / 2 - 0.35, footY(zBack + 0.35), zBack, 0, 0.7, null, 0, by - footY(zBack + 0.35), 0.7);
+      stage.add(a.x - w / 2 - 0.2, footY(zFront - 0.4), zFront - 0.4, 0, 0.4, null, 0, by - footY(zFront - 0.4), 0.4);
+      stage.add(a.x + w / 2 - 0.2, footY(zFront - 0.4), zFront - 0.4, 0, 0.4, null, 0, by - footY(zFront - 0.4), 0.4);
+      const top = by + 0.5;
+      const n = Math.round(w * 2.2);
+      for (let i = 0; i < n; i++) {
+        const row = i % 2;
+        const x = a.x - w / 2 + 0.6 + ((i + 0.5) / n) * (w - 1.2) + rng.range(-0.2, 0.2);
+        const z = zFront - 1.3 - row * 0.9 - rng.range(0, 0.3);
+        const sc = rng.range(0.92, 1.08);
+        crowd.add(x, top + row * 0.02, z, yawToCam + rng.range(-0.15, 0.15), sc, null, 0, sc, rng.int(1, sheet.cells / sheet.poses));
+      }
+      rails.add(a.x, top, zFront - 0.5, 0, w, null, 0, 1, 1);
+      for (let x = a.x - w / 2; x <= a.x + w / 2 + 0.01; x += 2) railPosts.add(x, top, zFront - 0.5);
+      const strip = new THREE.PlaneGeometry(w, 0.8, Math.max(2, Math.round(w / 2)), 1);
+      strip.translate(a.x, by + 0.1, zFront + 0.02); // hung on the deck face, under the rail: the crowd stays clear
+      const u = strip.getAttribute('uv') as THREE.BufferAttribute;
+      for (let i = 0; i < u.count; i++) u.setX(i, (u.getX(i) * w) / 8);
+      strips.push(strip);
+      for (const x of [a.x - w / 2 + 0.3, a.x + w / 2 - 0.3]) {
+        poles.add(x, top, zFront - 0.8, 0, 1, null, 0, 3.2, 1);
+        flags.add(x + 0.03, top + 3.15, zFront - 0.8, yawToCam, 1, null, 0, 1, rng.int(1, 4));
+      }
+    }
+  }
 
   // --- Round 11 nightCity dressing (builder "city"): the start and the finish as a street event ---
   // A lighting truss over each gate with four par cans (magenta / cyan, bulbs bloom, additive beams
