@@ -1,0 +1,19 @@
+{
+  "sourceSHA256": "4a0d36b6914902abe297894d7ce460e564ccdaf3af1e2ae9be262201facd7bb5",
+  "outputSHA256": "b47ddca110e4e999a1dbe6c116a8ceca060f71b463ea5936f2a52ac33b88ab62",
+  "bytes": 1199864,
+  "palmCuffAndFingerUndersidesIdentical": true,
+  "changedDorsalVertices": 264,
+  "protectedContactVertices": 580,
+  "maxDorsalMoveM": 0.003600017880876978,
+  "shortProtectionReliefM": [
+    0.00045,
+    0.001
+  ],
+  "maxProtectionMoveM": 0.008115006353905186,
+  "diagnosis": "Long ridges are source finger tubes: reduce only radially outward halves45percent, retain inward gripcontact halves and thumbs exactly; soften textile material and flatten separate short pads.",
+  "limits": [
+    "Parent visual acceptance required.",
+    "Actual sixclip contact surface verification required before acceptance."
+  ]
+}

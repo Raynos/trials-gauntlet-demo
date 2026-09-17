@@ -1,8 +1,12 @@
-# Art handoff — round 29
+# Art handoff — round 30
 
 This task owns Blender art and review exports. Claude + Opus own game integration. The catalog selects the provisionally accepted assets; final visual approval belongs to the user.
 
-## Current round29 delivery
+## Current round30 delivery
+
+Catalog: `street01-rider-round30-lossless.glb` and `street01-bike-contours.glb`; exact hashes in `reports/art-round30-review.json`. Current raw source is `street01-rider-indigo-study.glb`, incorporating cotton, glove-surface and denim-finish recipes. See each component folder for editable Blender sources. Twelve packed/raw views match exactly. Full rebuild equivalence is under repeat verification after a deterministic cuff ordering fix; do not claim all future Blender bakes are byte-identical.
+
+## Previous round29 delivery
 
 The catalog now selects `street01-rider-sleeve-lossless.glb` (66,121,572bytes; SHA `0d79f561139b2c8cdba9f7ba2f79909e6bcba5642e6360f588e257d5934db868`) and `street01-bike-paint.glb` (SHA `7e1ec906808165210dbdde9cd9834f516b3d7387db28ad9fddf74248844f24ab`). Sleeve recipe/source: `art/sleeve-continuity/`; bike recipe/source: `art/bike-paint/`. Both are provisionally accepted from recorded motion. The sleeve assembler uses the R28 raw candidate; canonical runner extension is in progress.
 

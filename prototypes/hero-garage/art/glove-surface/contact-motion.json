@@ -1,0 +1,259 @@
+{
+  "source": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-cloth28.glb",
+  "sourceSHA256": "f749bcd591df88054dd746b5da673ccc5b6bffe912b4b976964b1f3a952f8d64",
+  "method": "580 original/candidate actual finger underside and thumb surface vertices animated with identical preserved weights under accepted sixclip rig; nine time samples per clip, not sockets.",
+  "clips": [
+    {
+      "clip": "compression",
+      "samples": [
+        {
+          "frame": 0.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 18.625,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 37.25,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 55.875,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 74.5,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 93.125,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 111.75,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 130.375,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 149.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        }
+      ]
+    },
+    {
+      "clip": "extension",
+      "samples": [
+        {
+          "frame": 0.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 18.625,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 37.25,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 55.875,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 74.5,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 93.125,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 111.75,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 130.375,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 149.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        }
+      ]
+    },
+    {
+      "clip": "forward_attack",
+      "samples": [
+        {
+          "frame": 0.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 14.875,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 29.75,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 44.625,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 59.5,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 74.375,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 89.25,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 104.125,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 119.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        }
+      ]
+    },
+    {
+      "clip": "hang_back",
+      "samples": [
+        {
+          "frame": 0.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 14.875,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 29.75,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 44.625,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 59.5,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 74.375,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 89.25,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 104.125,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 119.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        }
+      ]
+    },
+    {
+      "clip": "landing_absorption",
+      "samples": [
+        {
+          "frame": 0.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 18.625,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 37.25,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 55.875,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 74.5,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 93.125,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 111.75,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 130.375,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 149.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        }
+      ]
+    },
+    {
+      "clip": "sit_cruise",
+      "samples": [
+        {
+          "frame": 0.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 7.375,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 14.75,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 22.125,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 29.5,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 36.875,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 44.25,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 51.625,
+          "maxContactSurfaceDisplacementM": 0.0
+        },
+        {
+          "frame": 59.0,
+          "maxContactSurfaceDisplacementM": 0.0
+        }
+      ]
+    }
+  ],
+  "contactVertexCount": 580,
+  "maxContactSurfaceDisplacementM": 0.0,
+  "limitations": [
+    "Preservation audit, not collision/contact pressure proof.",
+    "Parent visual acceptance of dorsal silhouette required."
+  ]
+}

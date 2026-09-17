@@ -1,0 +1,55 @@
+{
+  "sourceSHA256": "f4eb083cf39508262202ddbe2fb62a2c231b01296372a9b5df55fcf135974d02",
+  "outputSHA256": "e4ef68f290239ea478551db36f4d59313b533962be2f38f37f6d5993a2bd50a6",
+  "geometryTopologyUVSkinExactlyPreserved": true,
+  "geometrySignature": "d3035f7a0c390a9e27b766c9567f052313aa303cd92bf98eebaa79eb5d1d14c7",
+  "changes": [
+    {
+      "material": "hero heavy cotton",
+      "node": "Bump",
+      "oldStrengthDistance": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "newStrengthDistance": [
+        0.10000000149011612,
+        9.999999747378752e-05
+      ]
+    },
+    {
+      "material": "hero heavy cotton",
+      "node": "PHOTO_image-derived micro normal",
+      "oldStrengthDistance": [
+        0.6499999761581421,
+        0.00018000000272877514
+      ],
+      "newStrengthDistance": [
+        0.10000000149011612,
+        4.999999873689376e-05
+      ]
+    },
+    {
+      "material": "hero knitted rib",
+      "node": "Bump",
+      "oldStrengthDistance": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "newStrengthDistance": [
+        0.10000000149011612,
+        9.999999747378752e-05
+      ]
+    }
+  ],
+  "baseColor": "Original CW_JA mustard connected directly; removed macro noise/color mixing",
+  "roughness": 0.88,
+  "allMapsLosslessPNG": true,
+  "textures": {
+    "normal": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_normal.png",
+    "orm": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_orm.png",
+    "albedo": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_albedo.png"
+  },
+  "limitations": [
+    "Material-only candidate; geometry shadows and actual folds remain. Parent must judge visual change and motion."
+  ]
+}

@@ -324,3 +324,9 @@ The15-step Blender rebuild produced the exact same raw rider SHA as the reviewed
 ## Art round 29 — sleeve continuity and cleaner bike paint
 
 Accepted provisionally after six-clip motion review:331 localized sleeve controls preserve elbow volume (minimum sampled section8.575→22.488mm), with cuff/neck controls and weights retained. Blue/white bike panels now use cleaner plastic shading with original decals; geometry and mechanical checks remain unchanged. Packed rider66.1MB;12 matched renders remain byte identical to raw. Blender master import now explicitly decodes the authoritative packed catalog, preserving six action durations. [Review](../../prototypes/hero-garage/reports/art-round29-review.json). Cloth surface and glove finish remain in progress;13% usage remains, hard stop2%.
+
+## Art round 30 — cotton, glove profile and target colors
+
+Provisionally accepted after recorded full/detail review: subdued cotton surface, slimmer dorsal gloves with all580contact points preserved, darkindigo jeans with unchanged geometry, and a smoother frontfender arc with exactendpoints. Sixclips/twolights reviewed; packed-vs-raw renders match exactly. Frozen game shipgate passes1038 identicalticks,8.65sclear and1tickrestart. [Review](../../prototypes/hero-garage/reports/art-round30-review.json).
+
+Rebuild investigation found nondeterministic cuff ring ordering causing small UV/bake differences; stableordering is implemented, repeatverification remains open. Current catalog remains the reviewed export. Further work: hood/folds, shoe/exhaust colors and a bounded seatedposture study.11% allowance remains; hardstop2%. Finalvisual approval and actualiPhone gate remainopen.

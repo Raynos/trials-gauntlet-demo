@@ -1,0 +1,13 @@
+{
+  "independentWorldRestMatrixMaxDelta": 2.4437904357910156e-06,
+  "oldBinaryPrefixIdentical": true,
+  "oldMeshesUnchanged": true,
+  "sixAnimationsAndSkinJSONIdentical": true,
+  "replacedNodes": [
+    "rider:glove_top",
+    "rider:gloves",
+    "rider:hero glove construction"
+  ],
+  "outputSHA256": "ae333c1ac79d42a70b435e02159a7048f5cf3b3d10f302cbe1c7ab68ae61bdd5",
+  "outputBytes": 202424476
+}

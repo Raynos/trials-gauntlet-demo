@@ -10,8 +10,8 @@
   "assets": [
     {
       "id": "street01-rider",
-      "url": "/assets/street01-rider-sleeve-lossless.glb",
-      "sha256": "0d79f561139b2c8cdba9f7ba2f79909e6bcba5642e6360f588e257d5934db868",
+      "url": "/assets/street01-rider-round30-lossless.glb",
+      "sha256": "45a4a388755af78eeb8c1ef5ed9b6303fa96a55c2f83a09b5a96b3b23805d2dd",
       "placement": {
         "position": [
           0,
@@ -219,8 +219,8 @@
     },
     {
       "id": "street01-bike",
-      "url": "/assets/street01-bike-paint.glb",
-      "sha256": "7e1ec906808165210dbdde9cd9834f516b3d7387db28ad9fddf74248844f24ab",
+      "url": "/assets/street01-bike-contours.glb",
+      "sha256": "d5022a9a49139b7c70b3775636d4afec5a060a78682daa802b95a92963f064b4",
       "placement": {
         "position": [
           0,
