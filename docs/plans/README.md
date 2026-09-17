@@ -133,6 +133,7 @@ Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF-BACKLOG.m
 | 09-15 | Astra's `blender-work` hero merged on main's terms (merge #3: main's physics/perf/menu, the branch's hero/assets/garage/outfits; 781/781, hero-webkit PASS, e2e 399/399); critic 0/6 → the `riderBody` export is the blocker | physics R7 | `bdba62d` |
 | 09-14 | taps on invisible buttons navigate (results Menu under the gas thumb) | the `.live` invariant, 5184-tap grid | `18df821` |
 | 09-16 | garage flashes grey on every card hover / rookie↔pro swap | a menu-phase `setBike` swaps livery only; the physics row reloads on the next arm; e2e G4 asserts 0 `setTrack` per swap | ask 29 |
+| 09-17 | (live `b0985ee`) garage click-only sheet · reverse gear (R10) · img2 gone · B2 main menu · C Ascent world map — gate 27/30 on the clean export (the three SwiftShader rows) | one deploy | `2d98a48` `dc450e0` `45f4afd` `b715d2e` `b0985ee` |
 
 ## Art round 27 — source garment repair and bike connections
 
