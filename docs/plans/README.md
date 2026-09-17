@@ -143,6 +143,7 @@ Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF-BACKLOG.m
 | 09-17 | (live `cb9ab93`, on v0.3.0) the painted C Ascent mountain (ask 44) · fps meter off the title menu, stamp-only badge (ask 45) — gate 27/30 on the clean export (the three SwiftShader rows) | one deploy, `--archive=tgz` | `6cb3cd4` `d062aa6` |
 | 09-17 | (live `a32d7e0`) **the painted world map is the level select** (ask 54 R1+R2, `ddad17f`) + the sibling's one-frame garage swaps — gate 26/30 on the clean export: the three SwiftShader rows + `boot.readyP50Ms` 608 ms (ask 57, to re-measure) | `--archive=tgz` | `ddad17f` `a32d7e0` |
 | 09-17 | (live `125e490`) world map R3 — opens framing the region like the mockup, road on the switchbacks, smaller plates; gate 27/30 (the three SwiftShader rows; the 608 ms boot read was noise) | `--archive=tgz` | `125e490` |
+| 09-17 | **Offline PWA decisions (ask 58):** cache **everything** (~34 MB, all five outfits + both liveries) — *"just offline everything as much as possible"*; **garage swaps must never need the network** ("that's a bug anyway; it should behave like an iOS game: download once, instant after"); headers — **version / content-hash the models and art** and cache them long, `max-age` about **one month** so stale copies are eventually collected, not `max-age=0`; **iOS's 7-day eviction is accepted** ("we can't do anything about that"); faster load / start is welcome, a **benchmark spike is a separate task later** |
 
 ## Art round 27 — source garment repair and bike connections
 
