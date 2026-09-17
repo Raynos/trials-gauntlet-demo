@@ -29,7 +29,7 @@ export interface Hud {
 export { formatTime, formatDelta } from './format';
 export { DomHud } from './hud';
 export { PauseMenu, mountRotatePrompt, spatialMove, type PauseCallbacks, type QualityChoice } from './menu';
-export { MainMenuScreen, menuPlate, TrackSelectScreen, SettingsScreen, CreditsScreen, FocusList, GAME_NAME, BIKE_NAME, BUILD_STAMP, BUILD_STAMP_SHORT, hardReload, controlsReferenceHtml, type FrontCallbacks, type FrontScreen, type FrontState } from './front';
+export { MainMenuScreen, menuPlate, SettingsScreen, CreditsScreen, FocusList, GAME_NAME, BIKE_NAME, BUILD_STAMP, BUILD_STAMP_SHORT, hardReload, controlsReferenceHtml, type FrontCallbacks, type FrontScreen, type FrontState } from './front';
 export { GarageScreen, BIKE_SPECS, BIKE_LABEL, type BikeSpec, type GarageCallbacks } from './garage';
 export { PerfOverlay, type PerfSample } from './perf';
 export { ReplayBar, type ReplayBarState, type ReplayBarCallbacks } from './replay';
@@ -74,3 +74,4 @@ export {
 export { injectStyles, UI_CSS, TOKENS_CSS } from './styles';
 export { applyOrientation, isForcedLandscape, isTouchDevice, toLogical, toPhysical, logicalRect, type LogicalSize } from './orientation';
 export { ReviewPickScreen, ReviewPanel, type ReviewPickCallbacks, type ReviewPanelCallbacks } from './review';
+export { WorldMapScreen } from './worldMapScreen';

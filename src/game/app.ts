@@ -29,7 +29,7 @@ import {
   ReviewPickScreen,
   SettingsScreen,
   TraceBars,
-  TrackSelectScreen,
+  WorldMapScreen,
   UiSfx,
   UpdateToast,
   loadBikeChoice,
@@ -164,7 +164,8 @@ export class App {
   private readonly sfx: UiSfx;
   private readonly art: ArtManifest;
   private readonly menu: MainMenuScreen;
-  private readonly tracksScreen: TrackSelectScreen;
+  /** The level select: the painted world map (docs/plans/WORLD_MAP.md). */
+  private readonly tracksScreen: WorldMapScreen;
   private readonly settings: SettingsScreen;
   private readonly credits: CreditsScreen;
   private readonly pause: PauseMenu;
@@ -389,7 +390,7 @@ export class App {
     };
 
     this.menu = new MainMenuScreen(o.uiRoot, this.sfx, this.art, cb); // the title menu reads no state (ask 42: it leaks nothing)
-    this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state, (id, bike) => this.bestTimes.board(id, bike));
+    this.tracksScreen = new WorldMapScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state, (id, bike) => this.bestTimes.board(id, bike));
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
     this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb, this.art);
     this.garage = new GarageScreen(o.uiRoot, this.sfx, this.art, {

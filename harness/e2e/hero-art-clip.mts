@@ -46,7 +46,7 @@ const RIDES: { outfit: RiderOutfit; bike: BikeClass; golden: string; pinKey: str
   { outfit: 'race-bluewhite', bike: 'pro', golden: 'bot-3-pro.json', pinKey: 'b1-first-ride:pro' },
 ];
 
-interface SwapFrame { i: number; ms: number; heroDoc: string; outfit: string | null; garageOn: boolean; hidden: number; calls: number; tris: number; status: string; entering: boolean }
+interface SwapFrame { i: number; ms: number; heroDoc: string; outfit: string | null; garageOn: boolean; hidden: number; calls: number; tris: number; status: string; entering: boolean; stageClip: string | null; stanceOn: boolean | null }
 interface Swap { kind: 'outfit' | 'bike'; target: string; tapMs: number; settledMs: number; frames: SwapFrame[]; flash: string[] }
 
 const server = await startServer({ freeze: true });
@@ -78,8 +78,10 @@ const PROBE_SRC = `window.__swapProbe = (function () {
   var frames = [], on = true, i = 0, start = performance.now();
   function snap() {
     var r = window.__render, d = r.debugInfo();
+    var rd = r.debug && r.debug.rider && r.debug.rider.debug ? r.debug.rider.debug : null;
     frames.push({ i: i++, ms: Math.round(performance.now() - start), heroDoc: d.heroDoc, outfit: d.riderOutfit, garageOn: d.garage.on, hidden: d.garage.hidden,
-      calls: d.calls, tris: d.tris, status: (document.querySelector('.outfit-current') || {}).textContent || '', entering: d.entering });
+      calls: d.calls, tris: d.tris, status: (document.querySelector('.outfit-current') || {}).textContent || '', entering: d.entering,
+      stageClip: rd ? (rd.stageClip === undefined ? null : rd.stageClip) : null, stanceOn: rd && rd.stance ? !!rd.stance.on : null });
     if (on) requestAnimationFrame(snap);
   }
   requestAnimationFrame(snap);
@@ -113,12 +115,18 @@ async function swapTo(kind: 'outfit' | 'bike', target: string): Promise<void> {
     if (/proc/.test(f.heroDoc)) flash.push(`frame ${f.i} (${f.ms} ms): procedural stand-in ${f.heroDoc}`);
     if (f.outfit === null) flash.push(`frame ${f.i} (${f.ms} ms): no glTF rider`);
   }
+  // Ask 51: the garage plays the authored `sit_cruise` clip on every frame once the hero is settled (the tail after the swap).
+  const tail = frames.filter((f) => f.ms >= (settledMs - tapMs) + 100);
+  const notCruise = tail.filter((f) => f.stageClip !== 'sit_cruise');
+  if (notCruise.length) flash.push(`${notCruise.length}/${tail.length} settled frames not on sit_cruise (first: frame ${notCruise[0]!.i}, stageClip ${notCruise[0]!.stageClip})`);
   swaps.push({ kind, target, tapMs, settledMs, frames, flash });
   console.log(`swap ${kind} ${target}: ${settledMs - tapMs} ms to settle, ${frames.length} frames probed${flash.length ? `, FLASH: ${flash[0]}` : ''}`);
 }
 
 interface RideSample { tick: number; x: number; phase: string; heroDoc: string; calls: number; tris: number; ms: number }
-interface RideResult { outfit: RiderOutfit; bike: BikeClass; golden: string; ticks: number; frames: number; wallMs: number; finishTime: number | null; nodeFinishTime: number | null; hashAt1200: string | null; hashEnd: string; nodeHash: string; nodeMatch: boolean; pin: string | null; pinMatch: boolean | null; samples: RideSample[]; heroDocs: string[] }
+/** Ask 51: per rendered frame — the stance the level pose is on, its blend, and the hand-to-grip residual. */
+interface PoseFrame { tick: number; stanceOn: boolean; pose: string; blend: number; wristErr: [number, number]; stageClip: string | null }
+interface RideResult { outfit: RiderOutfit; bike: BikeClass; golden: string; ticks: number; frames: number; wallMs: number; finishTime: number | null; nodeFinishTime: number | null; hashAt1200: string | null; hashEnd: string; nodeHash: string; nodeMatch: boolean; pin: string | null; pinMatch: boolean | null; samples: RideSample[]; heroDocs: string[]; pose: { frames: number; stanceOnFrames: number; stanceOffFrames: number[]; maxWristErr: number; wristOver1cm: number[]; poses: Record<string, number>; stageClipFrames: number } }
 
 async function ride(spec: typeof RIDES[number]): Promise<RideResult> {
   const rec = loadRecording(path.join(REPO_ROOT, 'harness', 'inputs', 'b1-first-ride', spec.golden));
@@ -146,16 +154,20 @@ async function ride(spec: typeof RIDES[number]): Promise<RideResult> {
   const samples: RideSample[] = [];
   const heroDocs = new Set<string>();
   let hashAt1200: string | null = null, frames = 0;
+  const poseFrames: PoseFrame[] = [];
   for (let tick = 0; tick < total; tick += ticksPerFrame) {
     const s = await page.evaluate(({ batch, sample }) => {
       const w = window as unknown as { __trials: { setInput(f: unknown): void; step(n: number): void; render(sync: boolean): void; getState(): { tick: number; bike: { pos: { x: number } } }; phase(): string; hashState(): string }; __render: { debugInfo(): { heroDoc: string; calls: number; tris: number; profile: string; tier: string } } };
       for (const f of batch) { w.__trials.setInput(f); w.__trials.step(1); }
       w.__trials.render(true);
       const st = w.__trials.getState(), d = w.__render.debugInfo();
-      return { tick: st.tick, x: Math.round(st.bike.pos.x * 100) / 100, phase: w.__trials.phase(), heroDoc: d.heroDoc, calls: d.calls, tris: d.tris, hash: sample || st.tick === 1200 ? w.__trials.hashState() : null, profile: d.profile, tier: d.tier };
+      const rd = (w.__render as unknown as { debug?: { rider?: { debug?: { stance?: { on: boolean; pose: string; blend: number }; wristErr: number[]; stageClip: string | null } } } }).debug?.rider?.debug;
+      const pose = rd ? { stanceOn: !!rd.stance?.on, pose: rd.stance?.pose ?? '-', blend: rd.stance?.blend ?? 0, wristErr: [rd.wristErr[0] ?? 0, rd.wristErr[1] ?? 0] as [number, number], stageClip: rd.stageClip ?? null } : null;
+      return { tick: st.tick, x: Math.round(st.bike.pos.x * 100) / 100, phase: w.__trials.phase(), heroDoc: d.heroDoc, calls: d.calls, tris: d.tris, hash: sample || st.tick === 1200 ? w.__trials.hashState() : null, profile: d.profile, tier: d.tier, pose };
     }, { batch: inputs.slice(tick, tick + ticksPerFrame), sample: frames % 60 === 0 });
     frames++;
     heroDocs.add(s.heroDoc);
+    if (s.pose) poseFrames.push({ tick: s.tick, ...s.pose });
     // Real-time pacing: the video is wall-clock, so a frame may not land before its 60 fps slot (`--fast` skips this).
     if (!fast) { const ahead = frames * (1000 / 60) - (now() - started); if (ahead > 2) await page.waitForTimeout(ahead); }
     if (s.tick === 1200) hashAt1200 = s.hash;
@@ -166,8 +178,13 @@ async function ride(spec: typeof RIDES[number]): Promise<RideResult> {
   // The gate's golden pin (finish hash) when the whole golden was ridden and a pin exists for this class.
   const pin = total === inputs.length && expected[spec.pinKey]?.['golden']?.file === spec.golden ? expected[spec.pinKey]!['golden']!.hash : null;
   const pinMatch = pin ? end.hash === pin : null;
-  const result: RideResult = { outfit: spec.outfit, bike: spec.bike, golden: spec.golden, ticks: total, frames, wallMs: now() - started, finishTime: end.finishTime, nodeFinishTime, hashAt1200, hashEnd: end.hash, nodeHash: node.hash, nodeMatch: end.hash === node.hash, pin, pinMatch, samples, heroDocs: [...heroDocs] };
-  console.log(`ride ${spec.outfit}/${spec.bike}: ${frames} frames of ${total} ticks in ${(result.wallMs / 1000).toFixed(1)} s, phase ${end.phase} finish ${end.finishTime} (node ${nodeFinishTime}), hash ${end.hash} node ${node.hash} match=${result.nodeMatch}${pin ? ` pin ${pin} match=${pinMatch}` : ''}, heroDoc ${[...heroDocs].join(' | ')}`);
+  const riding = poseFrames.filter((f) => f.tick > 0);
+  const poses: Record<string, number> = {};
+  for (const f of riding) poses[f.pose] = (poses[f.pose] ?? 0) + 1;
+  const poseSummary = { frames: riding.length, stanceOnFrames: riding.filter((f) => f.stanceOn).length, stanceOffFrames: riding.filter((f) => !f.stanceOn).map((f) => f.tick).slice(0, 40), maxWristErr: riding.reduce((m, f) => Math.max(m, f.wristErr[0], f.wristErr[1]), 0), wristOver1cm: riding.filter((f) => Math.max(f.wristErr[0], f.wristErr[1]) > 0.01).map((f) => f.tick).slice(0, 60), poses, stageClipFrames: riding.filter((f) => f.stageClip !== null).length };
+  const result: RideResult = { outfit: spec.outfit, bike: spec.bike, golden: spec.golden, ticks: total, frames, wallMs: now() - started, finishTime: end.finishTime, nodeFinishTime, hashAt1200, hashEnd: end.hash, nodeHash: node.hash, nodeMatch: end.hash === node.hash, pin, pinMatch, samples, heroDocs: [...heroDocs], pose: poseSummary };
+  fs.writeFileSync(path.join(out, `pose-${spec.outfit}-${spec.bike}.json`), JSON.stringify(poseFrames));
+  console.log(`ride ${spec.outfit}/${spec.bike}: ${frames} frames of ${total} ticks in ${(result.wallMs / 1000).toFixed(1)} s, phase ${end.phase} finish ${end.finishTime} (node ${nodeFinishTime}), hash ${end.hash} node ${node.hash} match=${result.nodeMatch}${pin ? ` pin ${pin} match=${pinMatch}` : ''}, heroDoc ${[...heroDocs].join(' | ')}; pose: stance on ${result.pose.stanceOnFrames}/${result.pose.frames} frames (${JSON.stringify(result.pose.poses)}), max wristErr ${(result.pose.maxWristErr * 100).toFixed(2)} cm, ${result.pose.wristOver1cm.length} frames > 1 cm, stageClip on ${result.pose.stageClipFrames} frames`);
   return result;
 }
 

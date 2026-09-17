@@ -1,0 +1,1 @@
+Saved the 1536 × 1024 PNG to `assets/design/worldmap/build/regions/foundry.png`.

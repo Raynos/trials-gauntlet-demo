@@ -237,10 +237,10 @@ class Flow {
     await this.expectScreens(['tracks'], 'tracks-alone');
     await this.expectLegend('.tracks-screen .legend', 'D3-tracks-legend');
     await this.expectNoTouch('D2-tracks');
-    // The focused pin is the first campaign track (B1) on the Industrial page.
-    await this.waitFor(`!!document.querySelector('.tracks-screen.live .tpin.on')`, 10000);
-    const card = await this.page.evaluate(`(() => { const c = document.querySelector('.tracks-screen .tpin.on'); return c ? { text: c.textContent, disabled: c.disabled, cls: c.className } : null; })()`) as { text: string; disabled: boolean; cls: string } | null;
-    this.expect(card && !card.disabled && !/locked/.test(card.cls), 'tracks-focus', `focused pin ${JSON.stringify(card)}`);
+    // The focused marker is the first campaign track (B1) in the Industrial region of the world map, and RIDE is enabled.
+    await this.waitFor(`!!document.querySelector('.tracks-screen.live .wm-marker.on')`, 10000);
+    const card = await this.page.evaluate(`(() => { const c = document.querySelector('.tracks-screen .wm-marker.on'); const r = document.querySelector('.tracks-screen .wm-ride'); return c ? { text: c.textContent, disabled: !!(r && r.disabled), cls: c.className, track: c.dataset.track } : null; })()`) as { text: string; disabled: boolean; cls: string; track: string } | null;
+    this.expect(card && !card.disabled && !/locked/.test(card.cls), 'tracks-focus', `focused marker ${JSON.stringify(card)}`);
     await this.press('confirm');
     // SwiftShader stalls the main thread for seconds on the run's first frames: wait for the handoff, don't time it.
     this.expect(await this.waitFor(`window.__trials.app.screen() === 'run' && ![...document.querySelectorAll('.screen')].some((el) => el.classList.contains('show'))`, 60000), 'card→run', `run did not start after confirm on the focused pin: screens [${await this.screens()}]`);
