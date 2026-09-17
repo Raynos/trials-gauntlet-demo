@@ -1,0 +1,74 @@
+{
+  "sourceAssetHashes": [
+    {
+      "source": "/assets/variants/race-bluewhite.glb",
+      "sha256": "a20663e0002ef4c98ae48ccb6864540397d3a07678656c6e7b567ee12db72e91",
+      "matches": true
+    },
+    {
+      "source": "/assets/variants/bike-rookie-art.glb",
+      "sha256": "7877404ef7e9e2f5f25550a7d979b8f62e6e20774109294221a14e9877c8d9de",
+      "matches": true
+    }
+  ],
+  "source": "prototypes/hero-garage/art/delivery/race-bluewhite-master.blend",
+  "sha256": "4ecc30850566565484da01fdedebc765c88da426a78830c7843de186ba62f436",
+  "defaultAction": "sit_cruise",
+  "allSixActionsRetainedWithFakeUsers": true,
+  "rigBones": 19,
+  "fps": 30,
+  "placements": [
+    {
+      "asset": "race-bluewhite",
+      "blenderLocation": [
+        0.0,
+        0.0,
+        0.3400000035762787
+      ]
+    },
+    {
+      "asset": "bike-rookie-art",
+      "blenderLocation": [
+        0.0,
+        0.0,
+        0.3400000035762787
+      ]
+    }
+  ],
+  "packedFileImages": 17,
+  "unpackedFileImages": [],
+  "clips": [
+    {
+      "clip": "compression",
+      "durationSeconds": 4.9666666984558105,
+      "sampledFrames": 150
+    },
+    {
+      "clip": "extension",
+      "durationSeconds": 4.9666666984558105,
+      "sampledFrames": 150
+    },
+    {
+      "clip": "forward_attack",
+      "durationSeconds": 3.9666666984558105,
+      "sampledFrames": 120
+    },
+    {
+      "clip": "hang_back",
+      "durationSeconds": 3.9666666984558105,
+      "sampledFrames": 120
+    },
+    {
+      "clip": "landing_absorption",
+      "durationSeconds": 4.9666666984558105,
+      "sampledFrames": 150
+    },
+    {
+      "clip": "sit_cruise",
+      "durationSeconds": 1.9666666984558105,
+      "sampledFrames": 60
+    }
+  ],
+  "savedFileUnchanged": true,
+  "scope": "Reopened saved Blender scene; retained actions, durations, packed images, placement and finite bone matrices over750frames. This is not rendered Blender or Three.js visual acceptance."
+}

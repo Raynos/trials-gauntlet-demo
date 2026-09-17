@@ -1,0 +1,189 @@
+{
+  "schema": "hero-garage.variants.v1",
+  "scope": "Local art delivery; game integration remains Claude + Opus owned",
+  "riders": [
+    {
+      "id": "street-mustard",
+      "url": "/assets/street01-rider-round33-lossless.glb",
+      "bytes": 60161596,
+      "sha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
+    },
+    {
+      "id": "street-charcoal",
+      "url": "/assets/variants/street-charcoal.glb",
+      "bytes": 60394920,
+      "sha256": "570e2bc135aaf977c2850a7af2cbabdfeffcd0f5eae73803533886e39400d90d",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
+    },
+    {
+      "id": "street-openface",
+      "url": "/assets/variants/street-openface.glb",
+      "bytes": 60500484,
+      "sha256": "42a675592aa6fdefb8d279f6875b76b563a163a0750badfdfeebe5946e56b884",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
+    },
+    {
+      "id": "race-bluewhite",
+      "url": "/assets/variants/race-bluewhite.glb",
+      "bytes": 5952352,
+      "sha256": "a20663e0002ef4c98ae48ccb6864540397d3a07678656c6e7b567ee12db72e91",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
+    },
+    {
+      "id": "race-charcoalyellow",
+      "url": "/assets/variants/race-charcoalyellow.glb",
+      "bytes": 5887688,
+      "sha256": "5a7682d8d5bb6aaa0caaa960c3eef7d9b7617e35c4b0169c8f70f6a91cac65cf",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
+    }
+  ],
+  "bikes": [
+    {
+      "id": "rookie",
+      "url": "/assets/variants/bike-rookie-art.glb",
+      "bytes": 5682208,
+      "sha256": "7877404ef7e9e2f5f25550a7d979b8f62e6e20774109294221a14e9877c8d9de",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
+    },
+    {
+      "id": "pro",
+      "url": "/assets/variants/bike-pro-art.glb",
+      "bytes": 6560588,
+      "sha256": "187514df4677c40063856f4d5e955311820f872866f60b49c450428bcf84e48e",
+      "position": [
+        0,
+        0.34,
+        0
+      ]
+    }
+  ],
+  "additionalBikeDesigns": "Three requested skins not found in source; awaiting user identification",
+  "masters": [
+    {
+      "id": "street-charcoal",
+      "path": "art/delivery/street-charcoal-master.blend",
+      "bytes": 130913797,
+      "sha256": "ee5b8d9bbe249570450dd693e201f46827ff9ae4691258c5f10fe15e5e56b294",
+      "report": "reports/street-charcoal-master.json"
+    },
+    {
+      "id": "street-openface",
+      "path": "art/delivery/street-openface-master.blend",
+      "bytes": 27417197,
+      "sha256": "3028d06171800d0477e2259bf7a2b9b27aff79e499d760cae9e42c08c3d0765d",
+      "report": "reports/street-openface-master.json"
+    },
+    {
+      "id": "race-bluewhite",
+      "path": "art/delivery/race-bluewhite-master.blend",
+      "bytes": 12709547,
+      "sha256": "4ecc30850566565484da01fdedebc765c88da426a78830c7843de186ba62f436",
+      "report": "reports/race-bluewhite-master.json"
+    },
+    {
+      "id": "race-charcoalyellow",
+      "path": "art/delivery/race-charcoalyellow-master.blend",
+      "bytes": 12631236,
+      "sha256": "967159709963e17cb332fa86d8888bc900c50a9c2141f2e5da7ff236c7abcff4",
+      "report": "reports/race-charcoalyellow-master.json"
+    }
+  ],
+  "evidence": [
+    "art/ART_HANDOFF.md",
+    "art/bike-variants/README.md",
+    "art/bike-variants/bake-report.json",
+    "art/bike-variants/bake.py",
+    "art/bike-variants/build.py",
+    "art/bike-variants/digit-verification.json",
+    "art/bike-variants/pro-mechanics.json",
+    "art/bike-variants/pro-rig-contract.json",
+    "art/bike-variants/report.json",
+    "art/bike-variants/rookie-mechanics.json",
+    "art/bike-variants/verify-source.py",
+    "art/bike-variants/verify.mjs",
+    "art/delivery/requirements-images.txt",
+    "art/race-variants/README.md",
+    "art/race-variants/attach-motion.py",
+    "art/race-variants/build-report.json",
+    "art/race-variants/build.py",
+    "art/race-variants/correction-history.json",
+    "art/race-variants/fit-collar.py",
+    "art/race-variants/initial-build-report.json",
+    "art/race-variants/motion-attachment-report.json",
+    "art/race-variants/race-bluewhite-motion.json",
+    "art/race-variants/race-charcoalyellow-motion.json",
+    "art/race-variants/shoulder-attempt1-report.json",
+    "art/race-variants/verify-motion.py",
+    "art/street-variants/README.md",
+    "art/street-variants/build-report.json",
+    "art/street-variants/build.py",
+    "art/street-variants/helmet-report.json",
+    "art/street-variants/helmet.py",
+    "art/street-variants/pack.mjs",
+    "art/street-variants/review-report.json",
+    "art/street-variants/street-charcoal-master-reopen.json",
+    "art/street-variants/street-charcoal.glb.pack.json",
+    "art/street-variants/street-openface-master-reopen.json",
+    "art/street-variants/street-openface.glb.pack.json",
+    "art/street-variants/verify_master.py",
+    "art/variants/build-review-master.py",
+    "art/variants/race-bluewhite-master-reopen.json",
+    "art/variants/race-charcoalyellow-master-reopen.json",
+    "art/variants/verify-master.py",
+    "captures/delivery-stills/rider-bike-neutral.png",
+    "captures/race-bluewhite-collar-final/six-clips.webm",
+    "captures/race-bluewhite-final/face-curls-beard.png",
+    "captures/race-bluewhite-final/rider-bike-neutral.png",
+    "captures/race-charcoalyellow-collar-final/six-clips.webm",
+    "captures/race-charcoalyellow-final/face-curls-beard.png",
+    "captures/race-charcoalyellow-final/rider-bike-neutral.png",
+    "captures/street-charcoal-final/face-curls-beard.png",
+    "captures/street-charcoal-final/rider-bike-neutral.png",
+    "captures/street-charcoal-review/six-clips.webm",
+    "captures/street-openface-final/face-curls-beard.png",
+    "captures/street-openface-final/rider-bike-neutral.png",
+    "captures/street-openface-review/six-clips.webm",
+    "captures/variants-bike-pro-motion/six-clips.webm",
+    "captures/variants-bike-pro/complete-bike.png",
+    "reports/art-round34-review.json",
+    "reports/race-bluewhite-collar-final.json",
+    "reports/race-bluewhite-master.json",
+    "reports/race-bluewhite-rig-contract.json",
+    "reports/race-charcoalyellow-collar-final.json",
+    "reports/race-charcoalyellow-master.json",
+    "reports/race-charcoalyellow-rig-contract.json",
+    "reports/street-charcoal-master.json",
+    "reports/street-charcoal-review.json",
+    "reports/street-charcoal-rig.json",
+    "reports/street-openface-master.json",
+    "reports/street-openface-review.json",
+    "reports/street-openface-rig.json",
+    "reports/variants-bike-pro-motion.json"
+  ],
+  "approval": "Provisional parent review; final user visual and iPhone approval open"
+}

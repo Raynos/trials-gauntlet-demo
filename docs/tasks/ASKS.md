@@ -52,3 +52,9 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 
 | HG-05 | Finish Blender art to highest achievable quality; flexible two-pass allowance, stop at 2%; Claude + Opus own integration | **in flight** | R33 art provisionally accepted; complete rider/bike, editable master, reproducible exports and motion evidence delivered; final visual approval, AAA sculpt quality and actual iPhone remain open; no game integration |
 | 28 | (parent's item) harness debt after the three UI rounds — full e2e back to green | **done** | `6ad…`/`fa4b440`: 724/765 → **1249/1249**; expectations updated to the shipped UI, timing made robust, `app.quit()` hook added; CONTRACT/rendering/game docs carry `setGarageStage` + `orbit` + the trackMap pages |
+
+| HG-06 | Upgrade all five existing rider outfits and five bike skins with remaining usage | **in flight** | R34 delivers five outfit exports and two canonical bike skins with recorded motion and editable masters; three further bike designs await identification. Final art/device approval open; no integration; hard stop at 2% |
+| 29 | "Every time I hover over a card in the garage, the whole screen flashes gray and shows me different stats" | **in flight** | hover → `previewBike` → `game.setBike` did a full `loadTrack` under the stage (world torn down + rebuilt = the flash); stats swap is the intended preview |
+| 30 | "Remove the classic model from the garage" | **in flight** | rider-model row: Classic chip goes |
+| 31 | "img2threejs is a disaster, remove that too" | **in flight** | Img2 chip goes → only Blender left → the rider-model row leaves the garage; `?rider=` stays for the harness; stored proc/img2 choice clamps to Blender |
+| 32 | "Garage doesn't need any keyboard controls, just mouse and esc" | **in flight** | arrow / WASD / Enter navigation, the keyboard legend and the Tab-focus preview leave; Esc still backs out |

@@ -1,0 +1,441 @@
+{
+  "sourceSHA256": "a20663e0002ef4c98ae48ccb6864540397d3a07678656c6e7b567ee12db72e91",
+  "samples": [
+    {
+      "clip": "compression",
+      "frame": 0.0,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6922483396292396
+    },
+    {
+      "clip": "compression",
+      "frame": 14.899999618530273,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7785841585323103
+    },
+    {
+      "clip": "compression",
+      "frame": 29.799999237060547,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7829285793645013
+    },
+    {
+      "clip": "compression",
+      "frame": 44.69999885559082,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6731353358739318
+    },
+    {
+      "clip": "compression",
+      "frame": 59.599998474121094,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6731353358739318
+    },
+    {
+      "clip": "compression",
+      "frame": 74.49999809265137,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.761332044429992
+    },
+    {
+      "clip": "compression",
+      "frame": 89.39999771118164,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7952753659118923
+    },
+    {
+      "clip": "compression",
+      "frame": 104.29999732971191,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7003853312120203
+    },
+    {
+      "clip": "compression",
+      "frame": 119.19999694824219,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6922483396292396
+    },
+    {
+      "clip": "extension",
+      "frame": 0.0,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6922483396292396
+    },
+    {
+      "clip": "extension",
+      "frame": 14.899999618530273,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7785841585323103
+    },
+    {
+      "clip": "extension",
+      "frame": 29.799999237060547,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.8365051528262268
+    },
+    {
+      "clip": "extension",
+      "frame": 44.69999885559082,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.9310124748109643
+    },
+    {
+      "clip": "extension",
+      "frame": 59.599998474121094,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.9310124748109643
+    },
+    {
+      "clip": "extension",
+      "frame": 74.49999809265137,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.8675337434500758
+    },
+    {
+      "clip": "extension",
+      "frame": 89.39999771118164,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7981891636278098
+    },
+    {
+      "clip": "extension",
+      "frame": 104.29999732971191,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7007480272895377
+    },
+    {
+      "clip": "extension",
+      "frame": 119.19999694824219,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6922483396292396
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 0.0,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 11.899999618530273,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7388005713177896
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 23.799999237060547,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7989374017813837
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 35.69999885559082,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.8137076070972311
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 47.599998474121094,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.8136299162954554
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 59.49999809265137,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7819291710622334
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 71.39999771118164,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7164844493389395
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 83.29999732971191,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6949242353807596
+    },
+    {
+      "clip": "forward_attack",
+      "frame": 95.19999694824219,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "hang_back",
+      "frame": 0.0,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "hang_back",
+      "frame": 11.899999618530273,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6655415064943027
+    },
+    {
+      "clip": "hang_back",
+      "frame": 23.799999237060547,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6207169428061936
+    },
+    {
+      "clip": "hang_back",
+      "frame": 35.69999885559082,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6010436729595825
+    },
+    {
+      "clip": "hang_back",
+      "frame": 47.599998474121094,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6011514089578942
+    },
+    {
+      "clip": "hang_back",
+      "frame": 59.49999809265137,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6344116538698834
+    },
+    {
+      "clip": "hang_back",
+      "frame": 71.39999771118164,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.680453086081301
+    },
+    {
+      "clip": "hang_back",
+      "frame": 83.29999732971191,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6949242353807596
+    },
+    {
+      "clip": "hang_back",
+      "frame": 95.19999694824219,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 0.0,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6922483396292396
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 14.899999618530273,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7785841585323103
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 29.799999237060547,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.8479863007107895
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 44.69999885559082,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.8434497621124875
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 59.599998474121094,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6638501887030357
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 74.49999809265137,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7183169773123854
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 89.39999771118164,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.8062869823854406
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 104.29999732971191,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.7020801874113884
+    },
+    {
+      "clip": "landing_absorption",
+      "frame": 119.19999694824219,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.6922483396292396
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 0.0,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 5.900000095367432,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 11.800000190734863,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 17.700000286102295,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 23.600000381469727,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 29.500000476837158,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 35.40000057220459,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 41.30000066757202,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    },
+    {
+      "clip": "sit_cruise",
+      "frame": 47.20000076293945,
+      "vertices": 65778,
+      "nonfiniteVertices": 0,
+      "degenerateTriangles": 0,
+      "maximumDistanceFromOriginM": 1.692248216351681
+    }
+  ],
+  "limitations": [
+    "Finite/degenerate measurement and separate750-frame socket proof are not whole-body collision proof.",
+    "Parent judges recorded motion; preserved source geometry retains original panel faceting."
+  ]
+}

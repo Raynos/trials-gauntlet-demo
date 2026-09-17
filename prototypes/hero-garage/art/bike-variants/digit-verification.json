@@ -1,0 +1,21 @@
+{
+  "canonicalDigit": "1",
+  "sheetCellOrigin": [
+    0.25,
+    0.25
+  ],
+  "selectedFrontPlateSourceMaterials": [
+    {
+      "material": "plate.002",
+      "allThreeDigitProjections": {
+        "CW_num_u": 0.25,
+        "CW_num_v": 0.25,
+        "CW_num_u.001": 0.25,
+        "CW_num_v.001": 0.25,
+        "CW_num_u.002": 0.25,
+        "CW_num_v.002": 0.25
+      }
+    }
+  ],
+  "cause": "Common apply_colourway ignores Blender .001/.002 node suffixes; local recipe explicitly sets all digit-cell nodes."
+}

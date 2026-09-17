@@ -1,0 +1,205 @@
+{
+  "sourceSHA256": "55e182127b465ded031c618f1ea56d37e5ae1134bdd44ae838d7fc7bce58a8c2",
+  "sourceImmutable": true,
+  "geometryTopologyWeightsExact": true,
+  "atlasRepacked": true,
+  "albedoResolution": 2048,
+  "normalORMResolution": 1024,
+  "changes": [
+    {
+      "material": "glove_top",
+      "node": "Bump",
+      "before": [
+        0.11999999731779099,
+        0.00039999998989515007
+      ],
+      "after": [
+        0.11999999731779099,
+        0.0001500000071246177
+      ]
+    },
+    {
+      "material": "gloves",
+      "node": "Bump",
+      "before": [
+        0.15000000596046448,
+        0.00039999998989515007
+      ],
+      "after": [
+        0.15000000596046448,
+        0.0001500000071246177
+      ]
+    },
+    {
+      "material": "hero moulded protection",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.11999999731779099,
+        0.00019999999494757503
+      ]
+    },
+    {
+      "material": "race ankle accordion",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.11999999731779099,
+        0.00019999999494757503
+      ]
+    },
+    {
+      "material": "race boot grip rubber",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.11999999731779099,
+        0.00019999999494757503
+      ]
+    },
+    {
+      "material": "race boot synthetic shell",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.11999999731779099,
+        0.00019999999494757503
+      ]
+    },
+    {
+      "material": "race class protection inset",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.11999999731779099,
+        0.00019999999494757503
+      ]
+    },
+    {
+      "material": "race jersey collar cuff",
+      "node": "Bump",
+      "before": [
+        0.11999999731779099,
+        2.9999999242136255e-05
+      ],
+      "after": [
+        0.11999999731779099,
+        2.9999999242136255e-05
+      ]
+    },
+    {
+      "material": "race jersey contrast",
+      "node": "Bump",
+      "before": [
+        0.11999999731779099,
+        2.9999999242136255e-05
+      ],
+      "after": [
+        0.11999999731779099,
+        2.9999999242136255e-05
+      ]
+    },
+    {
+      "material": "race jersey main",
+      "node": "Bump",
+      "before": [
+        0.11999999731779099,
+        2.9999999242136255e-05
+      ],
+      "after": [
+        0.11999999731779099,
+        2.9999999242136255e-05
+      ]
+    },
+    {
+      "material": "race jersey stretch gusset",
+      "node": "Bump",
+      "before": [
+        0.11999999731779099,
+        2.9999999242136255e-05
+      ],
+      "after": [
+        0.11999999731779099,
+        2.9999999242136255e-05
+      ]
+    },
+    {
+      "material": "race pant stretch gusset",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.1599999964237213,
+        0.0001500000071246177
+      ]
+    },
+    {
+      "material": "race shaped knee textile",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.1599999964237213,
+        0.0001500000071246177
+      ]
+    },
+    {
+      "material": "race shin moulding",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.11999999731779099,
+        0.00019999999494757503
+      ]
+    },
+    {
+      "material": "race technical pant body",
+      "node": "Bump",
+      "before": [
+        0.23000000417232513,
+        0.0006500000017695129
+      ],
+      "after": [
+        0.1599999964237213,
+        0.0001500000071246177
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "path": "public/assets/variants/race-bluewhite-geometry.glb",
+      "sha256": "079a55368fd38acc0d8a9d3ff04c391a782cae8561572cbbf56bb673b6bc8c50"
+    },
+    {
+      "path": "public/assets/variants/race-charcoalyellow-geometry.glb",
+      "sha256": "7fcb5859481a25f4f7da28d0c25cf7362a995d9da4be5cab508d5437faefc1d1"
+    }
+  ],
+  "limits": [
+    "Preserves existing fitted helmet and anatomical source head; saved curly groom not forced inside helmet.",
+    "Source race boot/glove constructions retained; no street footwear substitution.",
+    "Material and motion upgrade, not a new anatomy sculpt or reference-parity claim."
+  ]
+}

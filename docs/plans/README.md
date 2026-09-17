@@ -165,3 +165,13 @@ Two full stage 41 builds produce the same60.16 MB packed rider; two full bike bu
 **Still open:** final user visual approval, more natural shoulder/elbow folds and glove anatomy, residual hidden waist/contact refinements, and actual iPhone 30 fps/memory validation. This is a materially improved stylized art delivery, not an AAA-completion claim. No game integration, spending or public deployment. Latest checked allowance 6%; the 2% floor was preserved.
 
 Final runtime qualification: the 30-second desktop WebKit mobile proxy has no rendering errors and deterministic canvas replay, but 18 ms p95 does not meet the separate 16.7 ms desktop wall-clock gate. It is not an actual iPhone 30 fps pass. See `prototypes/hero-garage/reports/delivery-mobile-proxy.json`.
+
+### Hero art R34 — five outfit variants (in progress)
+
+User expanded scope to all five existing outfits and five bike skins. Street, open-face and Race art passes run in parallel; only two bike liveries exist in the current source, so the other three await design identification. Variant delivery remains separate from game integration and the target01 master. Usage 6%; hard stop 2%.
+
+### R34 provisional variant delivery
+
+All five existing outfit IDs now have art exports: accepted mustard; charcoal Street; genuine open-face Street; blue/white Race; charcoal/yellow Race. Race receives continuous upper shoulder colour, a subdivided jersey and a low collar fitted to the actual race neck after rejecting the first raised collar. Original helmet, technical pants and articulated boots remain. Both canonical bike liveries inherit accepted mechanical detail; Pro front/side plates now show red1. Three additional requested bike skins were not found in source and await user identification.
+
+Parent reviewed decoded sequential frames from84 timed variant views across six clips/two lights, plus detail stills. Four new rider rig audits each cover750frames; race checks cover54poses; four editable masters reopen with all six actions and packed images. [Variant handoff](../../prototypes/hero-garage/art/variants/README.md) and [review](../../prototypes/hero-garage/reports/art-round34-review.json). This is provisional art delivery, not AAA completion; race collar/panels, Street garment/anatomy refinement, user approval and physical iPhone validation remain. Game integration is unchanged. Latest allowance4%, hard stop2%.

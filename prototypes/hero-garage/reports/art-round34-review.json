@@ -1,0 +1,70 @@
+{
+  "round": 34,
+  "status": "Provisional parent art acceptance; final user approval open",
+  "scope": "Five genuine existing outfit designs and two canonical bike liveries; three requested bike designs awaiting identification. No game integration.",
+  "evidence": [
+    {
+      "report": "reports/street-charcoal-review.json",
+      "segments": 12,
+      "frames": 1509,
+      "currentAssetHashesVerified": true
+    },
+    {
+      "report": "reports/street-openface-review.json",
+      "segments": 12,
+      "frames": 1511,
+      "currentAssetHashesVerified": true
+    },
+    {
+      "report": "reports/race-bluewhite-collar-final.json",
+      "segments": 24,
+      "frames": 3025,
+      "currentAssetHashesVerified": true
+    },
+    {
+      "report": "reports/race-charcoalyellow-collar-final.json",
+      "segments": 24,
+      "frames": 3022,
+      "currentAssetHashesVerified": true
+    },
+    {
+      "report": "reports/variants-bike-pro-motion.json",
+      "segments": 12,
+      "frames": 1511,
+      "currentAssetHashesVerified": true
+    }
+  ],
+  "parentReview": "Decoded sequential frames/contact sheets from all five recorded variant sequences plus full/detail stills; not human continuous playback. Original mustard R33 evidence remains applicable.",
+  "improvements": [
+    "R33 garment, gloves, denim, shoes and saved identity carried to charcoal Street",
+    "Authored open-face helmet fitted; only scalp groom hidden; face and beard preserved",
+    "Genuine race jersey/pants/boots/helmet materials refined, six accepted clips transferred with matching bind rig",
+    "Race serrated shoulder panels blended, jersey subdivided and low collar refitted after rejecting the first high-front collar",
+    "Pro bike uses improved mechanical geometry, authored charcoal/yellow surfaces and corrected front/side red1"
+  ],
+  "verification": {
+    "newRiders": 4,
+    "bikeLiveries": 2,
+    "riderClipsEach": 6,
+    "contactSampleFramesEach": 750,
+    "maxContactDriftMeters": 2.52e-06,
+    "raceGeometryPosesEach": 54,
+    "raceDegenerateOrNonfiniteVertices": 0,
+    "editableVariantMasters": 4,
+    "masterReopenBoneFramesEach": 750,
+    "gameIntegrationChanged": false,
+    "actualIPhoneValidated": false
+  },
+  "remaining": [
+    "Race rear collar edge and angular lower clothing panels remain visible; further tailoring required",
+    "Street raglan streaks and existing cloth/hand/anatomy limits remain",
+    "Dense Street groom remains expensive; hidden open-face groom payload not pruned",
+    "Final user visual approval and actual iPhone performance/memory validation open",
+    "Three additional bike skins not present in repository sources; awaiting user identification"
+  ],
+  "budget": {
+    "latestRemainingPercent": 4,
+    "hardStopPercent": 2
+  },
+  "qualityClaim": "Broader improved art coverage, not AAA completion or parity across families"
+}

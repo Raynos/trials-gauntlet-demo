@@ -1,7 +1,7 @@
 /** Clean canvas evidence from actual catalog geometry, never composited art. */
 import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import{fileURLToPath}from'node:url';import{webkit}from'playwright';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),arg=(k,d)=>{const i=process.argv.indexOf('--'+k);return i<0?d:process.argv[i+1]},name=arg('name','delivery-stills'),out=path.join(root,'captures',name);fs.mkdirSync(out,{recursive:true});
-const catalog=JSON.parse(fs.readFileSync(path.join(root,'public/assets/catalog.json'),'utf8'));for(const a of catalog.assets){const v=arg(a.kind,null);if(v)a.url=a.mobileUrl='/assets/'+v;}
+const catalog=JSON.parse(fs.readFileSync(path.join(root,'public/assets/catalog.json'),'utf8'));for(const a of catalog.assets){const v=arg(a.kind,null);if(v){a.url=a.mobileUrl='/assets/'+v;a.label=arg(a.kind+'-label',path.basename(v,'.glb').replaceAll('-',' '));}}
 const assets=catalog.assets.map(a=>({kind:a.kind,url:a.url,sha256:crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'public',a.url))).digest('hex')}));
 const browser=await webkit.launch({headless:true}),page=await browser.newPage({viewport:{width:2240,height:1440},deviceScaleFactor:1}),errors=[],shots=[];page.on('pageerror',e=>errors.push(String(e)));
 await page.route('**/assets/catalog.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify(catalog)}));await page.route('**/*.glb',r=>r.fulfill({contentType:'model/gltf-binary',body:fs.readFileSync(path.join(root,'public',new URL(r.request().url()).pathname))}));

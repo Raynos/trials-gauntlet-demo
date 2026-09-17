@@ -8,7 +8,9 @@ import * as T from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const arg=(key,fallback)=>{const i=process.argv.indexOf('--'+key);return i<0?fallback:process.argv[i+1];};
 const catalog=JSON.parse(await fs.readFile(path.join(root,'public/assets/catalog.json'),'utf8'));
+for(const asset of catalog.assets){const override=arg(asset.kind,null);if(override)asset.url='/assets/'+override;}
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 async function load(kind){
  const asset=catalog.assets.find(a=>a.kind===kind);assert(asset);
@@ -45,5 +47,5 @@ for(const clip of rider.gltf.animations){
 }
 const report={schema:'hero-garage.rig-contract.v1',units:'metres',coordinates:{up:'+Y',bikeForward:'+X',depth:'Z; left/right are named sockets, never inferred from screen direction',transforms:'Local TRS and inverse bind matrices from GLBs; world positions include catalog placement, exclude shared floor offset and garage suspension. Bind data is captured before mixer evaluation.'},assets:[rider,bike].map(a=>({id:a.asset.id,url:a.asset.url,sha256:sha(a.bytes),placement:transform(a.scene),nodeNames:a.nodeNames})),jointNames:joints,meshBindings,sockets,clips:rider.gltf.animations.map(c=>({name:c.name,duration:c.duration,tracks:c.tracks.map(t=>({name:t.name,type:t.ValueTypeName,keys:t.times.length}))})),contactSamples,driverOrder:['AnimationMixer evaluates selected rider clip at absolute time','Garage suspension transforms rider and bike together, then solves wheel/fork/swingarm/shock/chain/hose','Common floor offset inherited from hero parent','Render'],integrationConstraints:['Game physics pose remains authoritative; clips must not move visible mass independently of the shared physical mass/pose mapping.','Current 19 deform bones lack finger and forearm twist chains; facial/garment corrective approval is not implied.','Socket distances do not prove glove/sole surface fit or collision clearance.','Prescribed garage kinematics do not validate weight transfer, impact response or game integration.']};
 for(const row of contactSamples)for(const c of row.contacts){assert(Number.isFinite(c.maxDistanceMeters));assert(c.maxOffsetVariationMeters<1e-4,`${row.clip} ${c.rider} drifts`);}
-await fs.writeFile(path.join(root,'reports/rig-contract.json'),JSON.stringify(report,null,2)+'\n');
+await fs.writeFile(path.join(root,arg('out','reports/rig-contract.json')),JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify({joints:joints.length,skinnedMeshes:meshBindings.length,sockets:sockets.length,clips:contactSamples.length,frames:contactSamples.reduce((n,c)=>n+c.samples,0),maxContactDriftMeters:Math.max(...contactSamples.flatMap(c=>c.contacts.map(p=>p.maxOffsetVariationMeters)))}));
