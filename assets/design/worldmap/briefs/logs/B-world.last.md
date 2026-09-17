@@ -1,0 +1,1 @@
+Saved to `assets/design/worldmap/B-sheet-world.png` (1536 × 1024).

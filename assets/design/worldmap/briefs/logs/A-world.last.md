@@ -1,0 +1,1 @@
+Saved the generated PNG (1536 × 1024) to `assets/design/worldmap/A-painted-world.png`.

@@ -1,0 +1,9 @@
+A-region exit=0 seconds=125
+C-region exit=0 seconds=132
+B-region exit=0 seconds=184
+A-world exit=0 seconds=199
+B-world exit=0 seconds=200
+C-world exit=0 seconds=201
+C-region-retry exit=0 seconds=107
+B-world-retry exit=0 seconds=138
+C-world-retry exit=0 seconds=198

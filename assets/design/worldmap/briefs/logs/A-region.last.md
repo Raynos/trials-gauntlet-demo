@@ -1,0 +1,1 @@
+Saved: [assets/design/worldmap/A-painted-region.png](/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/design/worldmap/A-painted-region.png) (1536 × 1024 PNG).

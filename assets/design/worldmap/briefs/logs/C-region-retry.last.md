@@ -1,0 +1,1 @@
+Saved: [assets/design/worldmap/C-nodes-region.png](assets/design/worldmap/C-nodes-region.png)

@@ -1,0 +1,1 @@
+Saved: [assets/design/worldmap/C-nodes-world.png](/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/design/worldmap/C-nodes-world.png) — 1536 × 1024 PNG.
