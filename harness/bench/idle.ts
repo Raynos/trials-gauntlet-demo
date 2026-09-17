@@ -165,6 +165,8 @@ export async function runIdle(browser: Browser, url: string, opts: IdleOptions, 
         await page.evaluate((q) => window.__trials!.setQuality(q), tier);
         // The app's resize/fit path owns the canvas size; force the phone DPR through the renderer like the device would (dprCap → 3 → tier cap).
         await page.evaluate(() => (window as unknown as { __render: { resize(w: number, h: number, d: number): void } }).__render.resize(innerWidth, innerHeight, 3));
+        // Render round 4: a tier change may load the tier's hero pair; the row is that pair's only once it is installed.
+        await page.evaluate(async () => { await (window as unknown as { __render: { whenReady?(): Promise<void> } }).__render.whenReady?.(); });
         await page.waitForTimeout(600);
         await page.evaluate(() => (window.__rafLog!.length = 0));
         await page.waitForTimeout(opts.liveMs);

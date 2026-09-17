@@ -9,7 +9,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { createBootPlan, delegate, type Plan, type ProgressView, type StepProgress } from './plan';
-import { AFTER_KEYS, BOOT_STEPS, BYTE_INFO, BYTE_SOURCES, STEP_INFO, type BootStep } from './steps';
+import { AFTER_KEYS, BOOT_STEPS, BYTE_SOURCES, STEP_INFO, closedBy, type BootStep } from './steps';
 
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
@@ -199,7 +199,7 @@ describe('boot plan invariant (property)', () => {
     const loose = plan as unknown as { step(k: BootStep, w: () => void): Promise<unknown>; done(): void };
     expect(() => loose.done()).toThrow(/not complete/);
     await loose.step('core', () => undefined);
-    await expect(loose.step('core', () => undefined)).rejects.toThrow(/already complete/);
+    await expect(loose.step('core', () => undefined)).rejects.toThrow(/already ok/);
     const p = plan as unknown as Plan<BootStep>;
     await expect(delegate(p, ['renderer', 'physics'] as const, async (run) => { await run('renderer', () => undefined); })).rejects.toThrow(/without completing physics/);
     await expect(delegate(p, ['audio'] as const, async (run) => { await (run as unknown as (k: string, w: () => void) => Promise<void>)('game', () => undefined); })).rejects.toThrow(/outside \[audio\]/);
@@ -219,13 +219,13 @@ describe('boot plan invariant (property)', () => {
     loose.done();
     expect(views.at(-1)!.download).toBe(1);
     expect(views.at(-1)!.setup).toBe(1);
-    // A source the reader never touched is still 1 at done(): closed by its step (BYTE_INFO), by arithmetic.
+    // A source the reader never touched is still 1 at done(): closed by its step (closedBy), by arithmetic.
     const v2: ProgressView[] = [];
     const p2 = createBootPlan((v) => v2.push({ ...v }), { totals: { core: 10, heroModels: 10, bootArt: 10 } });
     const l2 = p2 as unknown as { step(k: BootStep, w: () => void): Promise<unknown>; done(): void };
     for (const k of BOOT_STEPS) {
       await l2.step(k, () => undefined);
-      for (const b of BYTE_SOURCES) if (BYTE_INFO[b].closedBy === k) expect(v2.at(-1)!.download).toBeGreaterThanOrEqual(1 / 3 - 1e-9);
+      for (const b of BYTE_SOURCES) if (closedBy(b) === k) expect(v2.at(-1)!.download).toBeGreaterThanOrEqual(1 / 3 - 1e-9);
     }
     l2.done();
     expect(v2.at(-1)!.download).toBe(1);

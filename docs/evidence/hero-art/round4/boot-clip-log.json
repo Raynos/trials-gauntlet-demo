@@ -1,0 +1,383 @@
+{
+ "engine": "webkit",
+ "geom": "874x330@3",
+ "track": "b1-first-ride",
+ "sha": "4f27f47",
+ "menuDocs": {
+  "ms": 557,
+  "phase": "menu",
+  "screen": "menu",
+  "bike": false,
+  "bikeLod": true,
+  "rider": false,
+  "riderLod": true,
+  "twinPending": true,
+  "heroDoc": "bike-lod rider-lod"
+ },
+ "ride": {
+  "runTime": 38.975,
+  "faults": 0,
+  "finishTime": 38.975,
+  "x": 587.4
+ },
+ "garage": {
+  "heroDoc": "bike-lod rider",
+  "tier": "low",
+  "calls": 88,
+  "tris": 206117,
+  "heroTris": 64769
+ },
+ "garageFetches": [],
+ "marks": {
+  "menuLive": 824,
+  "menuHeld": 6827,
+  "riding": 10545,
+  "finished": 49868,
+  "resultsHeld": 53870,
+  "garageLive": 56038
+ },
+ "readyAtMs": 361,
+ "requests": [
+  {
+   "name": "assets/three-CGwyv1Ha.js",
+   "kind": "chunk",
+   "startMs": 8,
+   "endMs": 30,
+   "bytes": 746502,
+   "status": 200,
+   "phaseAtStart": "boot",
+   "screenAtStart": "loader",
+   "afterReady": false
+  },
+  {
+   "name": "assets/index-vHaYKezf.js",
+   "kind": "chunk",
+   "startMs": 8,
+   "endMs": 39,
+   "bytes": 1065200,
+   "status": 200,
+   "phaseAtStart": "boot",
+   "screenAtStart": "loader",
+   "afterReady": false
+  },
+  {
+   "name": "assets/index-vHaYKezf.js",
+   "kind": "chunk",
+   "startMs": 30,
+   "endMs": 68,
+   "bytes": 1065200,
+   "status": 200,
+   "phaseAtStart": "boot",
+   "screenAtStart": "loader",
+   "afterReady": false
+  },
+  {
+   "name": "assets/three-CGwyv1Ha.js",
+   "kind": "chunk",
+   "startMs": 59,
+   "endMs": 82,
+   "bytes": 746502,
+   "status": 200,
+   "phaseAtStart": "boot",
+   "screenAtStart": "loader",
+   "afterReady": false
+  },
+  {
+   "name": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+   "kind": "model",
+   "startMs": 107,
+   "endMs": 131,
+   "bytes": 870440,
+   "status": 200,
+   "phaseAtStart": "boot",
+   "screenAtStart": "loader",
+   "afterReady": false
+  },
+  {
+   "name": "models/2d50a456a6b80a77/rider-street-mustard-lod-78458d1a8d92b4d3.glb",
+   "kind": "model",
+   "startMs": 107,
+   "endMs": 135,
+   "bytes": 1608420,
+   "status": 200,
+   "phaseAtStart": "boot",
+   "screenAtStart": "loader",
+   "afterReady": false
+  },
+  {
+   "name": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+   "kind": "model",
+   "startMs": 367,
+   "endMs": 586,
+   "bytes": 2283040,
+   "status": 200,
+   "phaseAtStart": "menu",
+   "screenAtStart": "menu",
+   "afterReady": true
+  },
+  {
+   "name": "models/2d50a456a6b80a77/rider-street-mustard-122c1d06e3834afc.glb",
+   "kind": "model",
+   "startMs": 367,
+   "endMs": 598,
+   "bytes": 3267248,
+   "status": 200,
+   "phaseAtStart": "menu",
+   "screenAtStart": "menu",
+   "afterReady": true
+  },
+  {
+   "name": "assets/worklet-Vg1LRsTe.js",
+   "kind": "chunk",
+   "startMs": 10592,
+   "endMs": 10599,
+   "bytes": 130,
+   "status": 200,
+   "phaseAtStart": "riding",
+   "screenAtStart": "run",
+   "afterReady": true
+  },
+  {
+   "name": "assets/worklet-DGoGEqnF.js",
+   "kind": "chunk",
+   "startMs": 10599,
+   "endMs": 10603,
+   "bytes": 44301,
+   "status": 200,
+   "phaseAtStart": "riding",
+   "screenAtStart": "run",
+   "afterReady": true
+  },
+  {
+   "name": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+   "kind": "model",
+   "startMs": 49528,
+   "endMs": 49561,
+   "bytes": 2283040,
+   "status": 200,
+   "phaseAtStart": "finished",
+   "screenAtStart": "run",
+   "afterReady": true
+  },
+  {
+   "name": "models/2d50a456a6b80a77/rider-street-mustard-122c1d06e3834afc.glb",
+   "kind": "model",
+   "startMs": 49529,
+   "endMs": 49592,
+   "bytes": 3267248,
+   "status": 200,
+   "phaseAtStart": "finished",
+   "screenAtStart": "run",
+   "afterReady": true
+  }
+ ],
+ "docs": [
+  {
+   "ms": 17,
+   "phase": "boot",
+   "screen": "loader",
+   "bike": false,
+   "bikeLod": false,
+   "rider": false,
+   "riderLod": false,
+   "twinPending": false,
+   "heroDoc": "-"
+  },
+  {
+   "ms": 237,
+   "phase": "boot",
+   "screen": "loader",
+   "bike": false,
+   "bikeLod": true,
+   "rider": false,
+   "riderLod": true,
+   "twinPending": false,
+   "heroDoc": "bike-lod rider-lod"
+  },
+  {
+   "ms": 557,
+   "phase": "menu",
+   "screen": "menu",
+   "bike": false,
+   "bikeLod": true,
+   "rider": false,
+   "riderLod": true,
+   "twinPending": true,
+   "heroDoc": "bike-lod rider-lod"
+  },
+  {
+   "ms": 49596,
+   "phase": "finished",
+   "screen": "run",
+   "bike": false,
+   "bikeLod": true,
+   "rider": false,
+   "riderLod": true,
+   "twinPending": false,
+   "heroDoc": "bike-lod rider-lod"
+  },
+  {
+   "ms": 49612,
+   "phase": "finished",
+   "screen": "run",
+   "bike": true,
+   "bikeLod": true,
+   "rider": true,
+   "riderLod": true,
+   "twinPending": false,
+   "heroDoc": "bike-lod rider-lod"
+  }
+ ],
+ "hitches": [
+  {
+   "ms": 60,
+   "gapMs": 43,
+   "phase": "boot",
+   "screen": "loader",
+   "heroDoc": "-",
+   "docsBefore": "----",
+   "docsAfter": "----"
+  },
+  {
+   "ms": 237,
+   "gapMs": 64,
+   "phase": "boot",
+   "screen": "loader",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "----",
+   "docsAfter": "-b-r"
+  },
+  {
+   "ms": 277,
+   "gapMs": 40,
+   "phase": "boot",
+   "screen": "loader",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r",
+   "docsAfter": "-b-r"
+  },
+  {
+   "ms": 361,
+   "gapMs": 61,
+   "phase": "menu",
+   "screen": "menu",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r",
+   "docsAfter": "-b-r"
+  },
+  {
+   "ms": 557,
+   "gapMs": 188,
+   "phase": "menu",
+   "screen": "menu",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r",
+   "docsAfter": "-b-r+"
+  },
+  {
+   "ms": 625,
+   "gapMs": 46,
+   "phase": "menu",
+   "screen": "menu",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r+",
+   "docsAfter": "-b-r+"
+  },
+  {
+   "ms": 822,
+   "gapMs": 197,
+   "phase": "menu",
+   "screen": "menu",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r+",
+   "docsAfter": "-b-r+"
+  },
+  {
+   "ms": 2512,
+   "gapMs": 170,
+   "phase": "menu",
+   "screen": "menu",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r+",
+   "docsAfter": "-b-r+"
+  },
+  {
+   "ms": 3336,
+   "gapMs": 106,
+   "phase": "menu",
+   "screen": "menu",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r+",
+   "docsAfter": "-b-r+"
+  },
+  {
+   "ms": 6996,
+   "gapMs": 157,
+   "phase": "countdown",
+   "screen": "run",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r+",
+   "docsAfter": "-b-r+"
+  },
+  {
+   "ms": 7046,
+   "gapMs": 50,
+   "phase": "countdown",
+   "screen": "run",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r+",
+   "docsAfter": "-b-r+"
+  },
+  {
+   "ms": 49596,
+   "gapMs": 70,
+   "phase": "finished",
+   "screen": "run",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "-b-r+",
+   "docsAfter": "-b-r"
+  },
+  {
+   "ms": 54038,
+   "gapMs": 142,
+   "phase": "menu",
+   "screen": "menu",
+   "heroDoc": "bike-lod rider-lod",
+   "docsBefore": "BbRr",
+   "docsAfter": "BbRr"
+  },
+  {
+   "ms": 55880,
+   "gapMs": 131,
+   "phase": "menu",
+   "screen": "garage",
+   "heroDoc": "bike-lod rider",
+   "docsBefore": "BbRr",
+   "docsAfter": "BbRr"
+  }
+ ],
+ "errors": [],
+ "verdict": {
+  "bootFetchedOnlyLod": true,
+  "bootModels": [
+   "bike-rookie-lod-cdb09ff4e7cafa79.glb 870440 B @107→131 ms",
+   "rider-street-mustard-lod-78458d1a8d92b4d3.glb 1608420 B @107→135 ms"
+  ],
+  "twinAfterReady": [
+   "bike-rookie-51f26d6c05b91a68.glb 2283040 B @367→586 ms (menu/menu)",
+   "rider-street-mustard-122c1d06e3834afc.glb 3267248 B @367→598 ms (menu/menu)",
+   "bike-rookie-51f26d6c05b91a68.glb 2283040 B @49528→49561 ms (finished/run)",
+   "rider-street-mustard-122c1d06e3834afc.glb 3267248 B @49529→49592 ms (finished/run)"
+  ],
+  "docFills": [
+   "237 ms boot/loader: -b-r heroDoc bike-lod rider-lod",
+   "49612 ms finished/run: BbRr heroDoc bike-lod rider-lod"
+  ],
+  "midRunFill": 0,
+  "midRunHitchesOver100ms": 0,
+  "garageFetches": 0
+ },
+ "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/hero-boot-clip/round4/clip.webm",
+ "mp4": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/hero-boot-clip/round4/clip.mp4",
+ "sheet": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/hero-boot-clip/round4/sheet.jpg"
+}

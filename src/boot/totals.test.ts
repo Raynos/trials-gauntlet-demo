@@ -4,7 +4,7 @@ import { PUBLIC_BYTES } from './plan.generated';
 import { BOOT_BYTE_TOTALS, HERO_FILES, bootByteTotals } from './totals';
 import { BOOT_IDS } from '../render/art/boot-set';
 import { declaredBootTotals, emptyBootTotals } from './asset-totals';
-import { HERO_FILES_BY_OUTFIT_CLASS } from '../render/hero/urls';
+import { HERO_FILES_BY_OUTFIT_CLASS, heroPair } from '../render/hero/urls';
 
 // Distinct fixture sizes make selecting the wrong outfit, the wrong class or counting both pairs observable.
 vi.mock('./plan.generated', async () => {
@@ -30,21 +30,25 @@ describe('declared byte totals', () => {
     expect(BOOT_BYTE_TOTALS.bootArt).toBeGreaterThan(0);
   });
 
-  it('counts exactly the chosen outfit pair and the chosen class pair (ask 43: one file per outfit and per class)', () => {
-    expect(bootByteTotals('street-mustard', 'rookie').heroModels).toBe(220);
-    expect(bootByteTotals('street-mustard', 'pro').heroModels).toBe(235);
-    expect(bootByteTotals('street-charcoal', 'rookie').heroModels).toBe(223);
-    expect(bootByteTotals('street-openface', 'rookie').heroModels).toBe(260);
-    expect(bootByteTotals('race-bluewhite', 'rookie').heroModels).toBe(245);
-    expect(bootByteTotals('race-charcoalyellow', 'pro').heroModels).toBe(263);
-    expect(bootByteTotals('street-mustard').heroModels).toBe(bootByteTotals('street-mustard', 'rookie').heroModels);
-    expect(bootByteTotals('street-mustard').bootArt).toBe(bootByteTotals('race-bluewhite', 'pro').bootArt);
-    expect(BOOT_BYTE_TOTALS).toEqual(bootByteTotals('street-mustard', 'rookie'));
+  it('counts exactly the chosen outfit file and the chosen class file at the first-drawn detail (ask 43 round 4)', () => {
+    // fixture: mustard [20 lod, 70 full], rookie bike [30 lod, 100 full]
+    expect(bootByteTotals('street-mustard', 'rookie', 'lod').heroModels).toBe(50);
+    expect(bootByteTotals('street-mustard', 'rookie', 'full').heroModels).toBe(170);
+    expect(bootByteTotals('street-mustard', 'pro', 'full').heroModels).toBe(180);
+    expect(bootByteTotals('street-charcoal', 'rookie', 'lod').heroModels).toBe(51);
+    expect(bootByteTotals('street-openface', 'rookie', 'full').heroModels).toBe(205);
+    expect(bootByteTotals('race-bluewhite', 'rookie', 'lod').heroModels).toBe(55);
+    expect(bootByteTotals('race-charcoalyellow', 'pro', 'full').heroModels).toBe(202);
+    expect(bootByteTotals('street-mustard').heroModels).toBe(bootByteTotals('street-mustard', 'rookie', 'lod').heroModels);
+    expect(bootByteTotals('street-mustard').bootArt).toBe(bootByteTotals('race-bluewhite', 'pro', 'full').bootArt);
+    expect(BOOT_BYTE_TOTALS).toEqual(bootByteTotals('street-mustard', 'rookie', 'lod'));
     const table = PUBLIC_BYTES as Readonly<Record<string, number>>;
-    for (const [outfit, classes] of Object.entries(HERO_FILES_BY_OUTFIT_CLASS)) {
-      for (const [cls, files] of Object.entries(classes)) {
-        expect(files).toHaveLength(4);
-        expect(bootByteTotals(outfit as 'street-mustard', cls as 'rookie').heroModels).toBe((files as readonly string[]).reduce((n, f) => n + table[f]!, 0));
+    for (const outfit of Object.keys(HERO_FILES_BY_OUTFIT_CLASS) as (keyof typeof HERO_FILES_BY_OUTFIT_CLASS)[]) {
+      for (const cls of ['rookie', 'pro'] as const) {
+        for (const detail of ['lod', 'full'] as const) {
+          const [bike, rider] = heroPair(outfit, cls, detail);
+          expect(bootByteTotals(outfit, cls, detail).heroModels).toBe(table[bike]! + table[rider]!);
+        }
       }
     }
   });
@@ -57,7 +61,8 @@ describe('declared byte totals', () => {
   it('has an all-zero shape for the build before the catalog is read', () => {
     const empty = emptyBootTotals();
     expect(empty.bootArt).toBe(0);
-    for (const classes of Object.values(empty.heroModels)) expect(classes).toEqual([0, 0]);
-    expect(Object.keys(empty.heroModels).sort()).toEqual(Object.keys(HERO_FILES_BY_OUTFIT_CLASS).sort());
+    for (const pair of Object.values(empty.riders)) expect(pair).toEqual([0, 0]);
+    expect(empty.bikes).toEqual({ rookie: [0, 0], pro: [0, 0] });
+    expect(Object.keys(empty.riders).sort()).toEqual(Object.keys(HERO_FILES_BY_OUTFIT_CLASS).sort());
   });
 });

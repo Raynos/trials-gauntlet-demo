@@ -3,6 +3,7 @@
  * exit code = number of failed checks.
  *
  *   pnpm harness:gate [--track flat-test] [--build] [--dev] [--heap-seconds 60] [--quick] [--pin]
+ *   pnpm harness:gate --only=camera[,clear,...]   one or more sections alone (a row's re-proof); PARTIAL verdict, ship-gate.partial.json
  *
  *   G1 cold boot        3 fresh contexts: nav -> __trials.ready p50; ready -> first synced frame
  *   G2 clear a track    golden replay (inputs/<track>/bot-oracle.json): finishTime bit-equal + hash vs expected.json
@@ -599,6 +600,7 @@ async function main(): Promise<void> {
       const clipDir = path.join(HARNESS_DIR, 'out', 'gate', 'clip-' + camTrack);
       const args = [path.join(HARNESS_DIR, 'clip.ts'), camTrack, '--out', clipDir, '--fps', '20', '--quality', 'low', ...(g ? ['--recording', g.file] : [])];
       const t0 = performance.now();
+      const wallStart = Date.now();
       const r = await new Promise<{ code: number | null; out: string }>((resolve) => {
         const child = spawn(path.join(REPO_ROOT, 'node_modules', '.bin', 'tsx'), args, { cwd: REPO_ROOT, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
         let out = '';
@@ -611,12 +613,28 @@ async function main(): Promise<void> {
         });
       });
       // clip.ts prints the assertion both as a `camera: ...` line and as the `camera  PASS/FAIL ...` row of its summary table.
-      const line = /^camera: .*$/m.exec(r.out)?.[0] ?? /camera\s+(?:PASS|FAIL) out-of-box[^\n]*/.exec(r.out)?.[0]?.replace(/^camera\s+/, 'camera: ') ?? null;
+      let line = /^camera: .*$/m.exec(r.out)?.[0] ?? /camera\s+(?:PASS|FAIL) out-of-box[^\n]*/.exec(r.out)?.[0]?.replace(/^camera\s+/, 'camera: ') ?? null;
+      let source = '';
+      if (line === null) {
+        // Ship round r3 (ask 43): the child once lost its stdout on teardown (a pipe error after the clip was written) and
+        // the row failed with "no camera line" although clip.json held a clean camera. The file is the record: read it
+        // when THIS run wrote it (mtime after the spawn); the exit code alone never fails the row.
+        const clipJson = path.join(clipDir, 'clip.json');
+        try {
+          if (fs.statSync(clipJson).mtimeMs >= wallStart) {
+            const c = (JSON.parse(fs.readFileSync(clipJson, 'utf8')) as { camera?: { pass: boolean; outOfBox: number; outOfBoxRiding: number; frames: number; clamped: number; clampedPct: number; maxAbsRoll: number; rollViolations: number } | null }).camera;
+            if (c) {
+              line = `camera: ${c.pass ? 'PASS' : 'FAIL'} out-of-box ${c.outOfBox}/${c.frames} (riding ${c.outOfBoxRiding}), clamped ${c.clamped} (${c.clampedPct}%), max|roll| ${c.maxAbsRoll.toExponential(1)}${c.rollViolations ? ` ROLL x${c.rollViolations}` : ''}`;
+              source = `from clip.json (stdout lost, clip exit ${r.code}); `;
+            }
+          }
+        } catch { /* no clip.json from this run: the row fails below with the child's tail */ }
+      }
       const riding = line ? Number(/riding (\d+)/.exec(line)?.[1] ?? NaN) : NaN;
       const clampedPct = line ? Number(/clamped \d+ \(([\d.]+)%\)/.exec(line)?.[1] ?? NaN) : NaN;
       const rollOk = line ? !/ROLL x/.test(line) : false;
       const pass = line !== null && riding === 0 && rollOk;
-      check({ id: 'camera.box', value: Number.isFinite(riding) ? riding : null, limit: 0, pass, unit: 'frames out of box while riding', note: line ? `${g ? path.basename(g.file) : 'no golden'}; clamped ${Number.isFinite(clampedPct) ? clampedPct : '?'} % (reported); ${((performance.now() - t0) / 1000).toFixed(0)} s; ${line.slice(0, 200)}` : `no camera line; clip exit ${r.code}: ${r.out.trim().split('\n').slice(-2).join(' | ').slice(0, 200)}` });
+      check({ id: 'camera.box', value: Number.isFinite(riding) ? riding : null, limit: 0, pass, unit: 'frames out of box while riding', note: line ? `${g ? path.basename(g.file) : 'no golden'}; clamped ${Number.isFinite(clampedPct) ? clampedPct : '?'} % (reported); ${((performance.now() - t0) / 1000).toFixed(0)} s; ${source}${line.slice(0, 200)}` : `no camera line; clip exit ${r.code}: ${r.out.trim().split('\n').slice(-2).join(' | ').slice(0, 200)}` });
     }
     })();
 
@@ -682,22 +700,37 @@ async function main(): Promise<void> {
     // next to it by default (their notes carry the loadavg), or after it with --quiet-timing.
     const jobs = defaultBrowserJobs(6, flags);
     const quietTiming = flagBool(flags, 'quiet-timing');
-    console.log(`sections: pool of ${jobs} (clear, clearPro, crash, determinism, camera, bundle) ${quietTiming ? 'then' : '+'} timing chain (boot, restart, heap); ${loadLine()}`);
+    // `--only=camera,clear`: run those sections alone (a row's re-proof after a harness fix); the rows print and
+    // `out/metrics/ship-gate.partial.json` gets them — the full report and its exit code need every section.
+    const onlyList = flagStr(flags, 'only', '').split(',').filter(Boolean) as SectionName[];
+    const wanted = (n: SectionName): boolean => onlyList.length === 0 || onlyList.includes(n);
+    console.log(`sections: pool of ${jobs} (clear, clearPro, crash, determinism, camera, bundle) ${quietTiming ? 'then' : '+'} timing chain (boot, restart, heap)${onlyList.length ? ` — only ${onlyList.join(', ')}` : ''}; ${loadLine()}`);
     const tGate = performance.now();
+    const poolSections: [SectionName, (check: (c: GateCheck) => void) => Promise<void>][] = [['camera', runCamera], ['determinism', runDet], ['clear', runClear], ['clearPro', runClearPro], ['crash', runCrash], ['bundle', runBundle]];
     const pool = mapPool<[SectionName, (check: (c: GateCheck) => void) => Promise<void>], void>(
-      [['camera', runCamera], ['determinism', runDet], ['clear', runClear], ['clearPro', runClearPro], ['crash', runCrash], ['bundle', runBundle]],
+      poolSections.filter(([n]) => wanted(n)),
       jobs,
       ([name, fn]) => section(name, fn),
     );
     const timing = async (): Promise<void> => {
-      await section('boot', runBoot);
-      await section('restart', runRestart);
-      await section('heap', runHeap);
+      if (wanted('boot')) await section('boot', runBoot);
+      if (wanted('restart')) await section('restart', runRestart);
+      if (wanted('heap')) await section('heap', runHeap);
     };
     if (quietTiming) {
       await pool;
       await timing();
     } else await Promise.all([pool, timing()]);
+    if (onlyList.length) {
+      const partial: GateCheck[] = SECTION_ORDER.flatMap((n) => sections.get(n)!);
+      for (const c of partial) console.log(fmtCheck(c));
+      const failedPartial = partial.filter((c) => !c.pass).length;
+      const outPartial = path.join(HARNESS_DIR, 'out', 'metrics', 'ship-gate.partial.json');
+      writeJson(outPartial, { ...runMeta('gate', started, { chromium: launched.browser.version() }), kind: 'gate-partial', only: onlyList, checks: partial, failed: failedPartial });
+      console.log(`\nPARTIAL (${onlyList.join(', ')}): ${partial.length - failedPartial}/${partial.length} checks pass — not a ship verdict; report: ${outPartial}`);
+      process.exitCode = failedPartial;
+      return;
+    }
     await section('stranger', runRows);
     // `runRows` emits the stranger, reflex, reflexPro and device rows in one go; split them back into their sections for the order.
     const rowChecks = sections.get('stranger')!.splice(0);

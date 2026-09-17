@@ -87,7 +87,8 @@ declare global {
   interface Window {
     __bench?: {
       install(): void;
-      setTier(tier: string, w: number, h: number, dpr: number, device?: 'phone' | 'desktop'): void;
+      /** Resolves once the tier's hero pair is installed (render round 4: a phone-high switch is an async hero load). */
+      setTier(tier: string, w: number, h: number, dpr: number, device?: 'phone' | 'desktop'): Promise<void>;
       warm(frames: number): void;
       cpuPass(inputs: unknown[], ticksPerFrame: number, frames: number, drainEvery: number, sampleEvery: number, blockedMs: number): CpuPassResult;
       gpuPass(inputs: unknown[], ticksPerFrame: number, sampleFrames: number[]): GpuPassResult;
@@ -140,6 +141,9 @@ export const PAGE_BENCH_SRC = `window.__bench = (function () {
     if (device && typeof r.setDeviceClass === 'function') r.setDeviceClass(device);
     t.setQuality(tier);
     r.resize(w, h, dpr);
+    // Render round 4 (ask 43): the tier's hero documents (authored / LOD pair) load asynchronously on a class or tier
+    // change; a row measured before whenReady() resolves is the previous pair's. Resolve once the renderer is settled.
+    return typeof r.whenReady === 'function' ? r.whenReady() : Promise.resolve();
   }
   function feed(inputs, from, to) {
     var t = T();

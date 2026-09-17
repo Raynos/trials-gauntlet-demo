@@ -1,0 +1,120 @@
+{
+ "pass": true,
+ "browser": "webkit",
+ "browserVersion": "26.5",
+ "backend": "webkit",
+ "renderer": "Apple Inc. / Apple GPU",
+ "build": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/058e8d84-1c67-4da2-aed9-3b0994fdd51d/scratchpad/frozen-4f27f47/dist",
+ "servedFiles": {
+  "index.html": "6b3b4c45c62547c97f2060122ef1c5ff2180a49459a0a960b5629e9c77cb9376",
+  "manifest.webmanifest": "ab1315c46a69c33839955ccba821970a219e19bf360f405a3c025f546c4a04ca",
+  "assets/index-Cfo4IyhZ.js": "16c95952f9950c9f5e8f68ec65683f5dde1a1a4e5ad33653060154d947c70741",
+  "assets/three-CGwyv1Ha.js": "8429d100c1bc19b624ac29ee417fc65f08bd63aaaee6ee76a1d42d37b85a7865",
+  "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+  "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+  "models/2d50a456a6b80a77/rider-street-mustard-lod-78458d1a8d92b4d3.glb": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4",
+  "models/2d50a456a6b80a77/rider-street-mustard-122c1d06e3834afc.glb": "122c1d06e3834afc339ebd15d4a95fc75cb35a0ea07db1e7d623e3093b2c00ac",
+  "art/manifest.json": "fdca2c3af06901da80d6e790097e0455113c5d11aa372b1b5bb781d9c4516475",
+  "fonts/BarlowCondensed-Bold.woff2": "e3e520cb7468f2efd60bc2ce96694567c3312f4ef414fffbe605e3ad146b24e6",
+  "fonts/BarlowCondensed-Medium.woff2": "31ff5e6e96a096fde4d78bc838719e69b093db2d0b062b96e423c065a6d1b2b1",
+  "fonts/BarlowCondensed-BlackItalic.woff2": "83282bcfc9df534b070d8231f10e511ba0c60ae63af9b5e096e4de089454bc88",
+  "art/world/banner-vortex-oil.webp": "2fea659f77c0b2f7a0320451af2ee2be4f0209a93cf7e8f357d6bb62dbf51f56",
+  "art/world/banner-kestrel-tyres.webp": "9e22bb9741e8b5e37d684734612e8d8f4968dfa8679dce5ed0be9e63e68e6468",
+  "art/world/banner-nordvik.webp": "bdd15aa45d2d21214bc2e4c24a351c345869819321f53a667ee6019d6211e424",
+  "art/world/banner-apex-suspension.webp": "1a7dd09b2dd8ab3de22751a56334e8793e188bd406a39e9909f858de39e1b282",
+  "art/world/banner-bolt-energy.webp": "130c65d046130e7cadc52fb8d2ceb54aba1c34ce4da2052b189cb881f321c3c3",
+  "art/world/banner-ironworks-series.webp": "a4361a0b8c8118d049ac3a094017f993e6a67f1604ffc934bd9c8ab30f90e1c9",
+  "art/world/tyremark-arc.webp": "925fae78ab1bc39cc535757da3e1e8e79651cbc1d4c6177c2b34592a7bf9cb1b",
+  "art/world/stencil-hkr.webp": "481d1378596de6787b99eb03709f845c6ef8323ada137127e0ce469e79f4d29d",
+  "art/world/stencil-nordvik.webp": "95925305aa7a7dcef5b7cf60bc2359dd3521113589770c1bbafc820a62c69521",
+  "art/world/crowd-day.webp": "aec9d62002fda6897eb78666ff76fbe6ea8846991dcbbefc53e54f6f5c02732c",
+  "art/world/stencil-weights.webp": "ff5a353824ec0bbbf7edd83e2c4c7c44fbe20789e4ac733df5c240f1e3aa2065",
+  "art/world/stencil-hazard.webp": "0148c9937e3377033bfe97ea14bf48ebd9faa7491c9acf6c7e8e096f57d9348a",
+  "art/world/stencil-serial.webp": "c3539b3920bd9b26ef47982033f45aa1fe3c01c0ea3f59c95c60e54c1425ab74",
+  "art/world/stencil-arrows.webp": "a0c7300aff015ea18a5e9b593b7108555d8be8f70dcd6297545d0b2a02605a8d",
+  "art/world/mask-edge-grime.webp": "5512e0a93eeeb2eb4642ee9226d9fb5e03df86ee218e5061291a2718c3bf7806",
+  "art/plates/plate-industrial.webp": "dee7b119a7c41d9b305265178698e44b5ae7464f0d5fa2c63274954518733cf5",
+  "art/world/mask-grime-spatter.webp": "1ffdb30c0b4684c93c9696a8a1957ef232e70f1cb24f2639c407f54572fa0e79",
+  "art/world/poster-tyres.webp": "9fe1b890bc51d033ccab0c1bf55584880adc8980116098b33189b2f89e4bcb4d",
+  "art/world/poster-trials-night.webp": "be7251ac3acc36d455136c9f34a8ae779c959da089564c692713465717fb6a14",
+  "art/world/sign-overhead-crane.webp": "ebba5c576c4b32c52d46f3d0dfcb7afbd638b4fc156673bda1c596086c0f29ed",
+  "art/world/sign-hard-hat.webp": "b710c9868379ee3d7323c9dec0f575cc9101f123ec78a7311adc25f09f35086f",
+  "art/world/sign-forklift.webp": "674eadbd3dbe9b0f58e11d8c446e743abf69f00bb960b5471323023d9c8fe76e",
+  "art/world/sign-exit.webp": "160bed9f19c006c3070a0a16260d9b75d044a9fe01e87c632ebb733229639825",
+  "art/world/graffiti-rise.webp": "b3b865f7e8c3dafc50bb886ec71ed14abaa0c5fcabca7062ee6cf58dfd77b484",
+  "art/world/graffiti-grind.webp": "1f75a1ce90f7d5393b39796b2dd12341b4d3258e08e3aa0e6f3bd1695bc2b01f",
+  "art/world/graffiti-skull.webp": "b10d2418cc34353f13e037c65ce7e78eccefda003b7f710e3770bf15ce29b449",
+  "art/world/graffiti-nofear.webp": "672578e679a1a2044de87f234a8edf3e6a43b07d80dbf915332841cd1c905c1a",
+  "art/world/graffiti-tag-wall.webp": "d9f5531e47b1799133aa17d0a9de66356f3d66e44cf38ac07d892433833c1e5d",
+  "art/world/graffiti-wheel.webp": "1a1b02decbaa81fecdfbf4c827a9b5e0cce8817de37ed142cc29bbbdbd517a2f"
+ },
+ "models": [
+  {
+   "logical": "models/bike-rookie-lod.glb",
+   "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+   "bytes": 870440,
+   "sha256": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e"
+  },
+  {
+   "logical": "models/bike-rookie.glb",
+   "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+   "bytes": 2283040,
+   "sha256": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666"
+  },
+  {
+   "logical": "models/rider-street-mustard-lod.glb",
+   "url": "models/2d50a456a6b80a77/rider-street-mustard-lod-78458d1a8d92b4d3.glb",
+   "bytes": 1608420,
+   "sha256": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4"
+  },
+  {
+   "logical": "models/rider-street-mustard.glb",
+   "url": "models/2d50a456a6b80a77/rider-street-mustard-122c1d06e3834afc.glb",
+   "bytes": 3267248,
+   "sha256": "122c1d06e3834afc339ebd15d4a95fc75cb35a0ea07db1e7d623e3093b2c00ac"
+  }
+ ],
+ "assetProof": {
+  "hashes": {
+   "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+   "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+   "models/2d50a456a6b80a77/rider-street-mustard-lod-78458d1a8d92b4d3.glb": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4",
+   "models/2d50a456a6b80a77/rider-street-mustard-122c1d06e3834afc.glb": "122c1d06e3834afc339ebd15d4a95fc75cb35a0ea07db1e7d623e3093b2c00ac"
+  },
+  "errors": []
+ },
+ "unchanged": true,
+ "inputFile": "harness/inputs/b1-first-ride/bot-3.json",
+ "inputSha256": "9085276b4b1510eed01a0332ca95fc35467f68871b7bf0b270add3405ee470a1",
+ "inputTicks": 4867,
+ "mismatchedTick": null,
+ "coldBootMs": 4225.7859579999995,
+ "clear": {
+  "cleared": true,
+  "time": 40.55833333333333,
+  "faults": 0
+ },
+ "restart": {
+  "crashTick": 92,
+  "crashToRestartTicks": 1,
+  "restartStateTick": 0,
+  "restartPhase": "riding",
+  "faultsBefore": 1,
+  "faultsAfter": 1,
+  "commandMs": 0.3000000000029104,
+  "frameMs": 18.69999999999709,
+  "movesAfterTicks": 1,
+  "glError": 0,
+  "heroDoc": "bike rider"
+ },
+ "errors": [],
+ "warnings": [
+  "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+ ],
+ "snapshotScope": "Every physics F64/U8 byte and serialized complete Game counter; counters use existing JSON wire representation.",
+ "renderCadence": "Full clear and crash prefix rendered every 2 ticks at 120 Hz using production interpolation; no fixed-alpha override.",
+ "note": "Headless desktop browser; frameMs is CPU submission latency, not GPU completion or actual iOS presentation. Played capture is separate.",
+ "buildFileCount": 219,
+ "compiledSourceCount": 142,
+ "indexHtmlSha256": "6b3b4c45c62547c97f2060122ef1c5ff2180a49459a0a960b5629e9c77cb9376"
+}

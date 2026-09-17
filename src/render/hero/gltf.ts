@@ -73,6 +73,28 @@ export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Prom
 }
 
 /**
+ * Ask 43 round 4: pull a model's bytes into the HTTP cache (the catalog URLs are immutable, `Cache-Control` a year)
+ * without parsing it — the pair the first frame does not draw streams this way after `ready`, its bytes on the boot
+ * plan's `after` list, and `loadGltf` parses it only when a tier or the garage asks (a screen transition), never on
+ * arrival mid-ride: a 3 MB Meshopt decode + `prepareHero` is a 100–400 ms main-thread task.
+ */
+export async function prefetchModel(url: string, bytes?: ByteProgress): Promise<void> {
+  const res = await fetch(modelAssetUrl(url));
+  if (!res.ok) throw new Error(`${res.status} ${url}`);
+  if (!res.body) {
+    const buffer = await res.arrayBuffer();
+    bytes?.add(buffer.byteLength);
+    return;
+  }
+  const reader = res.body.getReader();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    bytes?.add(value.byteLength);
+  }
+}
+
+/**
  * Round 10 (texture budget): the hero ships 2048² albedo + 1024² normal / ORM sets (bike 32 MB,
  * rider 16 MB at RGBA8 + mips — half the 96 MB cap for a hero that is ≈ 180 px tall at the
  * riding zoom). Albedo is capped at 1024², normal / ORM at 512², by a canvas downsample at load

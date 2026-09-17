@@ -36,7 +36,7 @@ describe('lodChoice', () => {
 describe('ThreeRenderer.riderDoc', () => {
   function fixture(tier: 'low' | 'medium' | 'high', deviceClass: 'phone' | 'desktop') {
     const rider = { name: 'authored' } as unknown as GLTF, riderLod = { name: 'lod' } as unknown as GLTF;
-    const fields = { tier, deviceClass, stageOn: false, gltf: { bike: null, bikeLod: null, rider, riderLod } };
+    const fields = { tier, deviceClass, stageOn: false, disposed: false, gltf: { bike: null, bikeLod: null, rider, riderLod }, models: { bikeModel: 'proc', riderModel: 'proc' } };
     const renderer = Object.assign(Object.create(ThreeRenderer.prototype) as object, fields) as unknown as { stageOn: boolean; riderDoc(): GLTF | null; setGarageStage(on: boolean): void };
     return { renderer, rider, riderLod };
   }

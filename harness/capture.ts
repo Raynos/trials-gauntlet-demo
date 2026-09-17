@@ -399,8 +399,9 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
       rider: riderProbe ? finishRider(riderRows) : null,
     };
   } finally {
-    await launched.close();
-    await server.close();
+    // The clip is already on disk here; a teardown failure (browser pipe, preview server socket) is not a capture failure.
+    await launched.close().catch((e: unknown) => console.error(`capture: browser close failed (ignored): ${e instanceof Error ? e.message : String(e)}`));
+    await server.close().catch((e: unknown) => console.error(`capture: server close failed (ignored): ${e instanceof Error ? e.message : String(e)}`));
   }
 }
 

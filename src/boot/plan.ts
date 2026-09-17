@@ -14,7 +14,7 @@
  * so a running step can report every unit and still not read complete (no "100 % but not done");
  * 0 before it starts. Sub-progress is clamped and monotone within the step. A byte source's `read` grows only by the deltas the reader
  * that reads the bytes adds (`reader(key).add(n)`), and is set to `total` by the completion of the
- * step that awaited it (`BYTE_INFO[key].closedBy`). `done()` requires every step complete, so both
+ * step that awaited it (`closedBy(key)`). `done()` requires every step complete, so both
  * sums are Σx/Σx = 1 exactly — there is no reclassification, cap, timer or "need" flag anywhere.
  *
  * Exhaustiveness is static: `Plan<Remaining>` loses each key as `step()` runs it, and `done` is
@@ -25,7 +25,7 @@
  * Shared by the ≤ 8 KB inline loader (steps `core`, `evaluate`) and `main.ts` (the rest): keep it
  * small and dependency-free.
  */
-import { AFTER_LABELS, BOOT_STEPS, BYTE_INFO, BYTE_SOURCES, STEP_INFO, byteLabel, type AfterKey, type BootStep, type ByteKey } from './steps';
+import { AFTER_LABELS, BOOT_STEPS, BYTE_SOURCES, STEP_INFO, byteLabel, closedBy, type AfterKey, type BootStep, type ByteKey } from './steps';
 
 /** Sub-progress of one step, bound to that step: reports after the step completed are ignored. */
 export interface StepProgress {
@@ -205,7 +205,7 @@ export function createBootPlan(sink: Sink, options: PlanOptions): Plan<BootStep>
 
   async function run<T>(key: BootStep, work: (p: StepProgress) => T | Promise<T>): Promise<T> {
     const s = steps.get(key);
-    if (!s || s.state !== 'todo' || finished) throw new Error(`boot plan: ${key} ${!s ? 'unknown' : finished ? 'after done()' : `already ${s.state === 'on' ? 'running' : 'complete'}`}`);
+    if (!s || s.state !== 'todo' || finished) throw new Error(`boot plan: ${key} ${!s ? 'unknown' : finished ? 'after done()' : 'already ' + s.state}`);
     s.state = 'on';
     s.t0 = now();
     current = key;
@@ -215,7 +215,7 @@ export function createBootPlan(sink: Sink, options: PlanOptions): Plan<BootStep>
     s.fraction = 1;
     s.sub = 1;
     s.ms = now() - s.t0;
-    for (const bk of BYTE_SOURCES) if (BYTE_INFO[bk].closedBy === key) sources.get(bk)!.closed = true;
+    for (const bk of BYTE_SOURCES) if (closedBy(bk) === key) sources.get(bk)!.closed = true;
     publish();
     return value;
   }

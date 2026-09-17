@@ -79,6 +79,7 @@ import { ReplaySession, type ReplaySource } from './replay';
 import { ReviewSession } from './review';
 import { defaultBikeForTier } from './rules';
 import { BenchLog, RunCollector, RunLog } from './telemetry';
+import { isPhone, startTier } from './startTier';
 
 export interface AppOptions {
   game: Game;
@@ -135,10 +136,7 @@ const TOUCH_SETTLE_S = 3;
 /** Grace after a screen change during which the polled menu buttons (keyboard / pad confirm, back, nav) are ignored: the edge that changed screens must not act twice. */
 const SCREEN_GRACE_MS = 250;
 
-export function isPhone(): boolean {
-  const coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
-  return coarse && Math.min(window.innerWidth, window.innerHeight) < 500;
-}
+export { isPhone } from './startTier';
 
 export function dprCap(): number {
   const dpr = window.devicePixelRatio || 1;
@@ -527,16 +525,13 @@ export class App {
     };
 
     this.game.setGhostEnabled(this.ghostOn);
-    if (this.qualityChoice !== 'auto') {
-      this.game.setQuality(this.qualityChoice);
-    } else {
-      // Auto is a governor, not a one-shot probe (the user: "auto shifts around based on FPS; high if
-      // possible"). Start at the tier this device last held for 30 s, else medium on a phone / high on
-      // desktop; the governor climbs to high while the frame holds and steps down the moment it does not.
-      const start = loadHeldTier() ?? (isPhone() ? 'medium' : 'high');
-      this.game.setQuality(start);
-      this.qualityWhy = `governor start ${start}${loadHeldTier() ? ' (held last session)' : ''}`;
-    }
+    // Auto is a governor, not a one-shot probe (the user: "auto shifts around based on FPS; high if possible").
+    // Start at the tier this device last held for 30 s, else medium on a phone / high on desktop; the governor
+    // climbs to high while the frame holds and steps down the moment it does not. The rule is `startTier`
+    // (src/game/startTier.ts): the boot inline declared the hero pair that tier draws first, so it must agree.
+    const start = startTier(this.qualityChoice, loadHeldTier(), isPhone());
+    this.game.setQuality(start);
+    if (this.qualityChoice === 'auto') this.qualityWhy = `governor start ${start}${loadHeldTier() ? ' (held last session)' : ''}`;
 
     const unlock = (): void => {
       if (this.audioUnlocked) return;

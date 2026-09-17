@@ -107,3 +107,16 @@ owner joins when there is a file to play. Prototype retirement is the last round
   authored on desktop-high) and streams the twin after `ready` — next round.
 - Garage on every tier draws the authored rider (hero 65 k); `pnpm harness:e2e --only=heroart` is the opt-in played
   flow. Heap growth 6.11 MB / 60 s repeats on the gate (limit 5) — A/B against `LEGACY_HERO` next round.
+
+### Round 3 (2026-09-17 02:40) — boot on the first-drawn pair, ship gate, the twin off-track
+
+- `src/game/startTier.ts` is the one tier rule (boot inline, renderer and app agree); boot fetches only the pair the
+  first frame draws — LOD on phones and desktop low/medium (2.48 MB, was 7.54), authored on desktop-high — and the twin
+  is prefetched after `ready` and parsed only off-track (menu, finish, crash, garage entry). `boot 3g` B3 green, loader
+  gone at 64.8 s (was 123), boot matrix 8/8, inline 8190 / 8192 B. Played on WebKit at phone geometry: 0 fills / 0 gaps
+  ≥ 100 ms while riding, garage entry 0 fetches, authored rider up (`docs/evidence/hero-art/round4/`).
+- Ship gate on the frozen `4f27f47` build: PASS on WebKit and Chromium/Metal (cold boot 4.2 / 3.5 s, b1 40.558 s, crash
+  → restart next tick). Heap growth is GC timing, not the hero: 60 s rows read −6.61, +5.68 (Astra) vs +9.81 (legacy).
+- Bench b1 phone-high with the bench awaiting the async tier load: 142 calls / 85 k tris / 52 programs / model 9.2 ms
+  (baseline 128 / 156 k / 9.2); garage·high 208 k / 8.9–13.3 ms by canvas size.
+- Harness: `--only=camera`, `clip.json` fallback when a child's stdout is lost, frozen-build recipe (`VERCEL_GIT_COMMIT_SHA`).

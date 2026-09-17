@@ -10,12 +10,12 @@ import type { BikeClass, CameraDebug, CameraOverride, CompiledTrack, GameEvent, 
 import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
-import { loadGltf, lodUrl, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
+import { loadGltf, prefetchModel, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
 import type { ByteProgress, StepProgress, StepRunner } from '../boot/plan';
 import type { PrepareStep } from '../boot/steps';
 import { isRiderLodEnabled, lodChoice, setRiderLodEnabled, variantMaterialsFor } from './hero/lod';
 import { DEFAULT_RIDER_OUTFIT, normalizeRiderOutfit } from '../core/riderPresets';
-import { bikeUrl, riderPalette, riderUrl } from './hero/urls';
+import { bikeUrl, heroPair, modelAssetBytes, riderPalette, riderUrl, type HeroDetail } from './hero/urls';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -110,6 +110,15 @@ export interface ThreeRendererOptions {
    * file on top (the legacy family has one bike file; there the class is a variant swap and this is cosmetic).
    */
   bikeClass?: BikeClass;
+  /**
+   * Ask 43 round 4: with `quality`, decides the hero pair the constructor fetches before `ready` — the authored bike +
+   * rider on desktop-high, the LOD twins everywhere else (`hero/lod.ts lodChoice`; main.ts derives both from the
+   * shared `src/game/startTier.ts` rule the boot inline declared). The other pair streams after `ready`
+   * (`onHeroTwin`) and is swapped in by `applyModels` when a tier or the garage asks for it.
+   */
+  deviceClass?: 'phone' | 'desktop';
+  /** Boot plan `after` list: the hero pair the first frame does not draw, streamed after `ready` (never in a number). */
+  onHeroTwin?: (done: number, total: number) => void;
   /** Boot plan: the DOWNLOAD counter for the hero glTF files the constructor starts fetching (docs/tasks/loading-progress-invariant.md). */
   heroBytes?: ByteProgress;
   /** Boot plan: the DOWNLOAD counter for the art pack's boot set; given, the constructor starts `art.load()` at once (the `bootArt` step awaits it). */
@@ -119,6 +128,8 @@ export interface ThreeRendererOptions {
 }
 
 type HeroRider = RiderModel | GltfRider;
+/** One file of the hero pair the first frame does not draw (`scheduleTwin`). */
+interface TwinFile { file: string; kind: 'bike' | 'rider'; detail: HeroDetail }
 
 /** World meshes whose shadow roles the tier rules manage (round 13): props, deck, obstacles, ribbons. */
 const WORLD_MESH = /^(props:|deck:|obstacles:|ribbon:)/;
@@ -227,7 +238,10 @@ export class ThreeRenderer implements GameRenderer {
   private riderDocumentOutfit: RiderOutfit | null = null;
   /** The class whose bike file `gltf.bike` holds (ask 43: per-livery files — a class change is a document swap when the URL differs). */
   private bikeDocumentClass: BikeClass | null = null;
-  /** Parsed hero documents: the authored files and (round 13) their `-lod.glb` twins for `low` / `medium`. */
+  private onHeroTwin: ((done: number, total: number) => void) | null = null;
+  /** A prefetched twin waiting for an off-track moment to be parsed (`parseTwinIfIdle`). */
+  private twinPending: { outfit: RiderOutfit; cls: BikeClass; files: TwinFile[] } | null = null;
+  /** Parsed hero documents: the authored files and (round 13) their `-lod.glb` twins for `low` / `medium`; ask 43 round 4: either slot may still be empty (the twin streams after `ready`). */
   private readonly gltf: { bike: GLTF | null; rider: GLTF | null; bikeLod: GLTF | null; riderLod: GLTF | null } = { bike: null, rider: null, bikeLod: null, riderLod: null };
   /** In-flight setModels (glTF load + swap); `whenReady` waits for it. */
   private heroPending: Promise<void> = Promise.resolve();
@@ -276,7 +290,8 @@ export class ThreeRenderer implements GameRenderer {
   /** What the host handed `resize()` (its own DPR cap); the tier caps it further. */
   private devicePixelRatio: number;
   private readonly bikeUV = { x: 0.3, y: 0.55 };
-  private phase: GamePhase = 'riding';
+  /** Seeded `menu`: `Game.render` returns before `setRunInfo` while the menu covers the canvas, so nothing else says "off the track" before the first run (`parseTwinIfIdle`). */
+  private phase: GamePhase = 'menu';
   private runTime = 0;
   private flashT = -1;
   private lastTSim = 0;
@@ -357,6 +372,8 @@ export class ThreeRenderer implements GameRenderer {
     {
       this.riderOutfit = normalizeRiderOutfit(options.riderOutfit) ?? DEFAULT_RIDER_OUTFIT;
       this.bikeClass = options.bikeClass === 'pro' ? 'pro' : 'rookie';
+      if (options.deviceClass) this.deviceClass = options.deviceClass;
+      this.onHeroTwin = options.onHeroTwin ?? null;
       const riderModel: ModelChoice = options.riderModel ?? 'gltf';
       const bikeModel: ModelChoice = options.bikeModel ?? 'gltf';
       if (riderModel !== 'proc' || bikeModel === 'gltf') this.setModels({ riderModel, bikeModel }, options.heroBytes);
@@ -481,44 +498,45 @@ export class ThreeRenderer implements GameRenderer {
     const want = this.models;
     const outfit = this.riderOutfit;
     const cls = this.bikeClass;
+    // Ask 43 round 4: only the pair the current tier draws is awaited (and, at boot, counted) — the authored bike +
+    // rider on desktop-high, the LOD twins otherwise (the same `startTier` rule main.ts and the boot inline used);
+    // the other pair streams after `ready` through `scheduleTwin`.
+    const detail = this.heroDetail();
+    const riderDetail = this.riderDetail();
+    const [bikeFile] = heroPair(outfit, cls, detail);
+    const [, riderFile] = heroPair(outfit, cls, riderDetail);
     this.heroLoading++;
     const run = async (): Promise<void> => {
-      const url = riderUrl(outfit);
-      const bikeFile = bikeUrl(cls);
+      const bikeStale = this.bikeDocumentClass === null || bikeUrl(this.bikeDocumentClass) !== bikeUrl(cls);
+      const riderStale = !this.riderDocumentOutfit || riderUrl(this.riderDocumentOutfit) !== riderUrl(outfit);
       const [bike, rider] = await Promise.all([
-        want.bikeModel === 'gltf' && (!this.gltf.bike || this.bikeDocumentClass === null || bikeUrl(this.bikeDocumentClass) !== bikeFile)
-          ? Promise.all([loadGltf(bikeFile, false, bytes), loadGltf(lodUrl(bikeFile), true, bytes)])
-          : Promise.resolve([this.gltf.bike, this.gltf.bikeLod]),
-        want.riderModel === 'gltf' && (!this.gltf.rider || !this.riderDocumentOutfit || riderUrl(this.riderDocumentOutfit) !== url)
-          ? Promise.all([loadGltf(url, false, bytes), loadGltf(lodUrl(url), true, bytes)])
-          : Promise.resolve([this.gltf.rider, this.gltf.riderLod]),
+        want.bikeModel === 'gltf' && (bikeStale || !this.bikeDocAt(detail)) ? loadGltf(bikeFile, false, bytes) : Promise.resolve(this.bikeDocAt(detail)),
+        want.riderModel === 'gltf' && (riderStale || !this.riderDocAt(riderDetail)) ? loadGltf(riderFile, false, bytes) : Promise.resolve(this.riderDocAt(riderDetail)),
       ]);
       // A superseded request (models, outfit or bike class) must not even overwrite the stored documents: a later
       // quality change could otherwise resurrect the old outfit despite its swap being skipped.
       if (want !== this.models || outfit !== this.riderOutfit || cls !== this.bikeClass) return;
       const palette = riderPalette(outfit);
       if (want.riderModel === 'gltf') {
-        if (!rider[0] || !rider[1]) throw new Error(`Could not load both detail levels of ${outfit} rider outfit`);
-        // Validate both documents before any installed identity or live material changes (the legacy family only:
+        if (!rider) throw new Error(`Could not load the ${riderDetail} ${outfit} rider`);
+        // Validate the document before any installed identity or live material changes (the legacy family only:
         // a per-outfit file has no palette to check — the outfit is the URL).
-        if (palette) {
-          this.validateRiderPreset(rider[0], outfit);
-          this.validateRiderPreset(rider[1], outfit);
-        }
+        if (palette) this.validateRiderPreset(rider, outfit);
       }
       // A livery swap whose file failed keeps the installed bike (and its class) rather than dropping to the
       // procedural kit; a failed boot load still leaves null (the procedural fallback) and retries on the next call.
-      if (bike[0]) {
-        [this.gltf.bike, this.gltf.bikeLod] = [bike[0], bike[1] ?? null];
+      if (bike) {
+        if (bikeStale) this.gltf.bike = this.gltf.bikeLod = null;
+        this.setBikeDoc(detail, bike);
         this.bikeDocumentClass = cls;
-      } else if (!this.gltf.bike) {
-        this.gltf.bikeLod = null;
+      } else if (!this.gltf.bike && !this.gltf.bikeLod) {
         this.bikeDocumentClass = null;
       }
       const previousRider = [this.gltf.rider, this.gltf.riderLod] as const;
       const previousOutfit = this.riderDocumentOutfit;
       if (want.riderModel === 'gltf') {
-        [this.gltf.rider, this.gltf.riderLod] = [rider[0]!, rider[1]!];
+        if (riderStale) this.gltf.rider = this.gltf.riderLod = null;
+        this.setRiderDoc(riderDetail, rider!);
         this.riderDocumentOutfit = outfit;
       }
       try {
@@ -528,6 +546,7 @@ export class ThreeRenderer implements GameRenderer {
         this.riderDocumentOutfit = previousOutfit;
         throw error;
       }
+      this.scheduleTwin(outfit, cls, detail === 'lod' ? 'full' : 'lod', riderDetail === 'lod' ? 'full' : 'lod');
     };
     this.heroPending = run()
       .catch((e) => console.warn('[render] setModels failed', e))
@@ -554,19 +573,114 @@ export class ThreeRenderer implements GameRenderer {
       await pending;
     } while (outfit === this.riderOutfit && pending !== this.heroPending);
     const loaded = outfit === this.riderOutfit && this.models.riderModel === 'gltf'
-      && this.riderDocumentOutfit === outfit && !!this.gltf.rider && !!this.gltf.riderLod;
+      && this.riderDocumentOutfit === outfit && !!this.riderDocAt(this.riderDetail());
     if (!loaded && outfit === this.riderOutfit) this.riderOutfit = previous;
     return loaded;
   }
 
-  /** The document the tier draws: `high` the authored file, `low` / `medium` the LOD twin when it loaded. */
+  /** The detail the tier draws in level: authored on desktop-high, the LOD twins otherwise (`hero/lod.ts lodChoice`). */
+  private heroDetail(): HeroDetail {
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier);
+  }
+
+  /** The rider's detail: the garage shows the authored rider on every tier (`riderDoc`). */
+  private riderDetail(): HeroDetail {
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier, 'rider', this.stageOn);
+  }
+
+  /**
+   * A tier or garage change that asks for a detail not yet parsed fetches it as a hero load (from the HTTP cache
+   * when `scheduleTwin` got there first) — awaited by `whenReady`, so a harness that sets a tier and waits gets that
+   * document, and the garage on a phone gets its authored rider — while `riderDoc` / `bikeDoc` draw the pair on hand.
+   */
+  private ensureHeroDetail(): void {
+    if (this.disposed) return;
+    const missingBike = this.models.bikeModel === 'gltf' && this.bikeDocumentClass !== null && !this.bikeDocAt(this.heroDetail());
+    const missingRider = this.models.riderModel === 'gltf' && this.riderDocumentOutfit !== null && !this.riderDocAt(this.riderDetail());
+    if (missingBike || missingRider) this.setModels(this.models);
+  }
+
+  private bikeDocAt(detail: HeroDetail): GLTF | null {
+    return detail === 'lod' ? this.gltf.bikeLod : this.gltf.bike;
+  }
+
+  private riderDocAt(detail: HeroDetail): GLTF | null {
+    return detail === 'lod' ? this.gltf.riderLod : this.gltf.rider;
+  }
+
+  private setBikeDoc(detail: HeroDetail, doc: GLTF): void {
+    if (detail === 'lod') this.gltf.bikeLod = doc;
+    else this.gltf.bike = doc;
+  }
+
+  private setRiderDoc(detail: HeroDetail, doc: GLTF): void {
+    if (detail === 'lod') this.gltf.riderLod = doc;
+    else this.gltf.rider = doc;
+  }
+
+  /** The document the tier draws: `high` the authored file, `low` / `medium` the LOD twin — whichever of the pair has arrived when the wanted one has not. */
   private bikeDoc(): GLTF | null {
-    return lodChoice(this.phoneHigh ? 'medium' : this.tier) === 'lod' ? this.gltf.bikeLod ?? this.gltf.bike : this.gltf.bike;
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier) === 'lod' ? this.gltf.bikeLod ?? this.gltf.bike : this.gltf.bike ?? this.gltf.bikeLod;
   }
 
   /** The garage keeps the authored rider on every tier (`hero/lod.ts lodChoice`); `setGarageStage` rebuilds the hero when that flips the document. */
   private riderDoc(): GLTF | null {
-    return lodChoice(this.phoneHigh ? 'medium' : this.tier, 'rider', this.stageOn) === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier, 'rider', this.stageOn) === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider ?? this.gltf.riderLod;
+  }
+
+  /**
+   * Ask 43 round 4: the pair the first frame does not draw. Its bytes are pulled into the HTTP cache after `ready`
+   * (never before: on 3G it would share the line with the declared boot bytes), counted on the boot plan's `after`
+   * list (`onHeroTwin`); it is PARSED at the next moment the game is not riding (`parseTwinIfIdle`: the menu,
+   * a finish, a crash — a 3 MB Meshopt decode + `prepareHero` is a 100–400 ms main-thread task that must never land
+   * mid-run), then installed beside the drawn pair, and `applyModels` swaps only if the tier or the garage asks for
+   * that detail (a phone in level keeps riding the LOD; its garage finds the authored rider already parsed). A tier
+   * or garage change that arrives first parses it on demand (`ensureHeroDetail`). A superseded outfit or class never
+   * installs; a failed prefetch costs nothing but the later on-demand fetch.
+   */
+  private scheduleTwin(outfit: RiderOutfit, cls: BikeClass, bikeDetail: HeroDetail, riderDetail: HeroDetail): void {
+    const [bikeFile] = heroPair(outfit, cls, bikeDetail);
+    const [, riderFile] = heroPair(outfit, cls, riderDetail);
+    const files: TwinFile[] = [];
+    if (this.models.bikeModel === 'gltf' && !this.bikeDocAt(bikeDetail)) files.push({ file: bikeFile, kind: 'bike', detail: bikeDetail });
+    if (this.models.riderModel === 'gltf' && !this.riderDocAt(riderDetail)) files.push({ file: riderFile, kind: 'rider', detail: riderDetail });
+    this.twinPending = null;
+    if (!files.length) return;
+    const total = files.reduce((n, f) => n + modelAssetBytes(f.file), 0);
+    let done = 0;
+    const progress: ByteProgress = { add: (n) => { done = Math.min(total, done + n); this.onHeroTwin?.(done, total); } };
+    this.onHeroTwin?.(0, total);
+    void Promise.resolve()
+      .then(() => this.whenReady())
+      .then(() => { if (!this.disposed) return Promise.all(files.map((f) => prefetchModel(f.file, progress))); })
+      .then(() => {
+        this.onHeroTwin?.(total, total);
+        if (this.disposed || outfit !== this.riderOutfit || cls !== this.bikeClass) return;
+        this.twinPending = { outfit, cls, files };
+        this.parseTwinIfIdle();
+      })
+      .catch((e) => console.warn('[render] hero twin prefetch failed', e));
+  }
+
+  /** The cached twin, parsed once the game is off the track (`setRunInfo`) — see `scheduleTwin`. */
+  private parseTwinIfIdle(): void {
+    const twin = this.twinPending;
+    if (!twin || this.disposed || this.phase === 'riding' || this.phase === 'countdown') return;
+    this.twinPending = null;
+    const { outfit, cls, files } = twin;
+    void Promise.all(files.map((f) => loadGltf(f.file, true)))
+      .then((docs) => {
+        if (this.disposed || outfit !== this.riderOutfit || cls !== this.bikeClass) return;
+        let installed = false;
+        docs.forEach((doc, i) => {
+          const f = files[i]!;
+          if (!doc) return;
+          if (f.kind === 'bike' && this.bikeDocumentClass === cls && !this.bikeDocAt(f.detail)) { this.setBikeDoc(f.detail, doc); installed = true; }
+          if (f.kind === 'rider' && this.riderDocumentOutfit === outfit && !this.riderDocAt(f.detail)) { this.setRiderDoc(f.detail, doc); installed = true; }
+        });
+        if (installed && this.bikeRef && this.riderRef) this.applyModels();
+      })
+      .catch((e) => console.warn('[render] hero twin parse failed', e));
   }
 
   /** Rider LOD override for `low` / `medium` (default on — see `hero/lod.ts lodChoice`); rebuilds the hero when the document changes. */
@@ -574,7 +688,8 @@ export class ThreeRenderer implements GameRenderer {
     if (this.disposed) return;
     if (on === isRiderLodEnabled()) return;
     setRiderLodEnabled(on);
-    if (this.bikeRef && this.riderRef && this.gltf.rider) this.applyModels();
+    if (this.bikeRef && this.riderRef && (this.gltf.rider || this.gltf.riderLod)) this.applyModels();
+    this.ensureHeroDetail();
   }
 
   private makeBike(choice: ModelChoice): HeroBike {
@@ -615,8 +730,8 @@ export class ThreeRenderer implements GameRenderer {
 
   private applyModels(): void {
     if (this.disposed) return;
-    const wantBike = this.models.bikeModel === 'gltf' && this.gltf.bike ? 'gltf' : 'proc';
-    const wantRider = this.models.riderModel === 'gltf' && this.gltf.rider ? 'gltf' : 'proc';
+    const wantBike = this.models.bikeModel === 'gltf' && (this.gltf.bike || this.gltf.bikeLod) ? 'gltf' : 'proc';
+    const wantRider = this.models.riderModel === 'gltf' && (this.gltf.rider || this.gltf.riderLod) ? 'gltf' : 'proc';
     let changed = false;
     // Round 13: a tier change swaps the document (authored ↔ LOD) — same rebuild as a model change.
     const bikeStale = this.bike instanceof GltfBike && this.bike.source !== this.bikeDoc();
@@ -1186,7 +1301,8 @@ export class ThreeRenderer implements GameRenderer {
     // Ask 43 round 2: the garage shows the authored rider on every tier while the level rides the LOD — the
     // document changes with the stage on the phone tiers, so the hero is rebuilt (the same swap as a tier change;
     // desktop-high draws the authored file in both and rebuilds nothing).
-    if (this.bikeRef && this.riderRef && this.gltf.rider) this.applyModels();
+    if (this.bikeRef && this.riderRef && (this.gltf.rider || this.gltf.riderLod)) this.applyModels();
+    this.ensureHeroDetail();
     if (on) this.applyGarageStage();
     else this.clearGarageStage();
     this.invalidate();
@@ -1363,7 +1479,9 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   setRunInfo(info: { runTime: number; phase: GamePhase }): void {
+    const left = this.phase !== info.phase && (info.phase === 'menu' || info.phase === 'finished' || info.phase === 'crashed');
     this.phase = info.phase;
+    if (left) this.parseTwinIfIdle();
     this.runTime = info.runTime;
     this.rig.setPhase(info.phase);
   }
@@ -1478,7 +1596,8 @@ export class ThreeRenderer implements GameRenderer {
     // a program on `receiveShadow`, so no material flag is needed.
     this.applyTierVisibility();
     // Round 13 (G3): the hero draws the LOD document on low / medium (rebuilt here when it differs).
-    if (this.bikeRef && this.riderRef && (this.gltf.bike || this.gltf.rider)) this.applyModels();
+    if (this.bikeRef && this.riderRef && (this.gltf.bike || this.gltf.bikeLod || this.gltf.rider || this.gltf.riderLod)) this.applyModels();
+    this.ensureHeroDetail();
     if (tier === 'low') {
       // Texture budget on low (≤ 40 MB): halve the hero atlases and the world's art / skins in
       // place. Not undone by a later step-up — the phone's medium runs on the same bitmaps, and a

@@ -322,8 +322,15 @@ async function main(): Promise<void> {
 
 const isEntry = process.argv[1] !== undefined && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isEntry) {
-  main().catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+  // Ship round r3 (ask 43): once the report is printed, the exit code is the camera's — a late socket / pipe error from
+  // the browser or preview-server teardown (seen once under load: exit 1 with a node:net stack after clip.json was
+  // written) is logged, not a verdict. Before the report it is still fatal.
+  let reported = false;
+  const late = (what: string) => (err: unknown): void => {
+    if (reported) console.error(`clip: ${what} after the report (ignored): ${err instanceof Error ? err.message : String(err)}`);
+    else { console.error(err); process.exit(1); }
+  };
+  process.on('uncaughtException', late('uncaught exception'));
+  process.on('unhandledRejection', late('unhandled rejection'));
+  main().then(() => { reported = true; process.exitCode ??= 0; }, late('failure'));
 }

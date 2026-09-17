@@ -46,7 +46,7 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
   const list = q<HTMLOListElement>('ol');
   const errEl = q('.err span');
   const tEl = q('.foot .t');
-  const rows = new Map<string, { li: HTMLLIElement; a: HTMLElement; b: HTMLElement; at: number }>();
+  const rows = new Map<string, { li: HTMLLIElement; a: HTMLElement; b: HTMLElement }>();
   const shown = { download: 0, setup: 0 };
   let left = false;
 
@@ -65,14 +65,14 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
     return v;
   }
 
-  function row(key: string, label: string): { li: HTMLLIElement; a: HTMLElement; b: HTMLElement; at: number } {
+  function row(key: string, label: string): { li: HTMLLIElement; a: HTMLElement; b: HTMLElement } {
     let r = rows.get(key);
     if (!r) {
       const li = document.createElement('li');
       li.innerHTML = '<span></span><span></span>';
       li.dataset['key'] = key;
       list.appendChild(li);
-      r = { li, a: li.children[0] as HTMLElement, b: li.children[1] as HTMLElement, at: 0 };
+      r = { li, a: li.children[0] as HTMLElement, b: li.children[1] as HTMLElement };
       rows.set(key, r);
     }
     if (r.a.textContent !== label) r.a.textContent = label;
@@ -94,16 +94,13 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
     su.line.textContent = view.error ? 'could not start' : view.done ? 'ready' : `${view.label}${view.detail ? ` · ${view.detail}` : ''}${pct}`;
     countEl.textContent = `✓ ${view.doneCount} of ${view.rows.length} done`;
 
-    const t = now();
     for (const r of view.rows) {
       const el = row(r.key, r.label);
-      if (r.state === 'on' && !el.at) el.at = t;
       el.b.textContent = r.state === 'ok' ? `${Math.round(r.ms)} ms` : r.state === 'on' ? (r.detail ? `${r.detail} · ` : '') + (r.sub > 0 ? `${Math.floor(r.sub * 100)} %` : '…') : '';
-      const cls = r.state + (el.li.classList.contains('slow') ? ' slow' : '');
-      if (el.li.className !== cls) el.li.className = cls;
+      if (el.li.className !== r.state) el.li.className = r.state;
     }
     if (view.after.length) {
-      row('after', 'Streams in after start').li.className = 'bghead';
+      row('after', 'After start').li.className = 'bghead';
       for (const a of view.after) {
         const el = row(`after:${a.key}`, a.label);
         el.b.textContent = a.total ? `${formatBytes(Math.min(a.done, a.total))} / ${formatBytes(a.total)}` : formatBytes(a.done);
@@ -128,18 +125,6 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
     tEl.textContent = elapsed();
   }, 100);
 
-  // Long tasks (Chromium): a red mark on the row of the step that was running — it annotates, it counts nothing.
-  try {
-    new PerformanceObserver((l) => {
-      for (const e of l.getEntries()) {
-        let hit: HTMLLIElement | undefined;
-        for (const r of rows.values()) if (r.at && r.at <= e.startTime) hit = r.li;
-        if (e.duration > 100) hit?.classList.add('slow');
-      }
-    }).observe({ type: 'longtask', buffered: true });
-  } catch {
-    /* no longtask support */
-  }
 
   return { paint, shown };
 }

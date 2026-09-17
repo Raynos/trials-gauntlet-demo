@@ -10,7 +10,7 @@ import { riderUrl, lodUrl, type LEGACY_HERO } from './hero/urls';
 import { prepareHero } from './hero/lod';
 
 vi.mock('./hero/gltf', async (original) => ({
-  ...await original<Record<string, unknown>>(), loadGltf: vi.fn(),
+  ...await original<Record<string, unknown>>(), loadGltf: vi.fn(), prefetchModel: vi.fn(async () => undefined),
 }));
 // The LEGACY hero family (one file per outfit family, palettes by `KHR_materials_variants`): these rows prove the
 // palette validation / sibling paths that stay in `index.ts` while the live table is Astra's per-outfit one
@@ -23,9 +23,11 @@ vi.mock('./hero/urls', async (original) => {
     bikeUrl: (cls: 'rookie' | 'pro') => real.LEGACY_HERO.bike[cls],
     riderPalette: (outfit: RiderOutfit) => riderPreset(outfit).variant,
     heroHasVariants: () => true,
+    modelAssetBytes: () => 1000,
   };
 });
 afterEach(() => vi.restoreAllMocks());
+const twinLanded = async (): Promise<void> => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
 
 function fixture() {
   // Exercise the production asynchronous loader without allocating a WebGL context.
@@ -33,6 +35,7 @@ function fixture() {
   const fields = {
     models: { bikeModel: 'gltf', riderModel: 'gltf' },
     riderOutfit: 'street-mustard', riderDocumentOutfit: 'street-mustard', bikeClass: 'rookie', bikeDocumentClass: 'rookie',
+    tier: 'high', deviceClass: 'desktop', stageOn: false, disposed: false, phase: 'riding', twinPending: null, whenReady: () => Promise.resolve(), riderRef: {}, bikeRef: {},
     gltf: { bike: {} as GLTF, bikeLod: {} as GLTF, rider: street, riderLod: streetLod },
     heroLoading: 0, heroPending: Promise.resolve(), applyModels: vi.fn(), validateRiderPreset: vi.fn(),
   };
@@ -92,7 +95,7 @@ describe('outfit documents are installed before selection succeeds (legacy famil
     expect(loadGltf).not.toHaveBeenCalled();
     expect(state.gltf.rider).toBe(street);
     expect(state.riderDocumentOutfit).toBe('street-charcoal');
-    expect(state.validateRiderPreset).toHaveBeenCalledTimes(2);
+    expect(state.validateRiderPreset).toHaveBeenCalledTimes(1);
     expect(state.applyModels).toHaveBeenCalledOnce();
     expect(await renderer.setRiderOutfit('unbuilt-design' as RiderOutfit)).toBe(false);
     expect(state.riderDocumentOutfit).toBe('street-charcoal');
@@ -100,7 +103,7 @@ describe('outfit documents are installed before selection succeeds (legacy famil
 
   it('keeps both installed documents and identity when a requested variant is missing', async () => {
     const { renderer, state, street, streetLod } = fixture();
-    state.validateRiderPreset.mockImplementationOnce(() => undefined).mockImplementationOnce(() => { throw new Error('missing LOD variant'); });
+    state.validateRiderPreset.mockImplementationOnce(() => { throw new Error('missing variant'); });
     expect(await renderer.setRiderOutfit('street-charcoal')).toBe(false);
     expect(state.gltf.rider).toBe(street);
     expect(state.gltf.riderLod).toBe(streetLod);
@@ -133,21 +136,24 @@ describe('outfit documents are installed before selection succeeds (legacy famil
     expect((live as { setMaterialVariant: ReturnType<typeof vi.fn> }).setMaterialVariant).toHaveBeenCalledTimes(1);
     expect(bike.setLivery).toHaveBeenLastCalledWith('rookie');
   });
-  it.each(['race-bluewhite', 'street-openface'] as const)('retains both previous documents when %s LOD fails and retries', async (outfit) => {
+  it.each(['race-bluewhite', 'street-openface'] as const)('retains both previous documents when the %s file fails and retries; the LOD twin is only prefetched', async (outfit) => {
     const { renderer, state, street, streetLod } = fixture();
-    const race = {} as GLTF, raceLod = {} as GLTF;
-    vi.mocked(loadGltf).mockImplementation(async (url) => url.endsWith('-lod.glb') ? null : race);
+    const race = {} as GLTF;
+    vi.mocked(loadGltf).mockImplementation(async (url) => url.endsWith('-lod.glb') ? null : null);
     expect(await renderer.setRiderOutfit(outfit)).toBe(false);
     expect(state.gltf.rider).toBe(street);
     expect(state.gltf.riderLod).toBe(streetLod);
     expect(state.riderDocumentOutfit).toBe('street-mustard');
     expect(state.riderOutfit).toBe('street-mustard');
     expect(state.applyModels).not.toHaveBeenCalled();
-    vi.mocked(loadGltf).mockImplementation(async (url) => url.endsWith('-lod.glb') ? raceLod : race);
+    vi.mocked(loadGltf).mockImplementation(async (url) => url.endsWith('-lod.glb') ? null : race);
     expect(await renderer.setRiderOutfit(outfit)).toBe(true);
     expect(state.gltf.rider).toBe(race);
-    expect(state.gltf.riderLod).toBe(raceLod);
+    expect(state.gltf.riderLod).toBeNull(); // the twin is cached, not parsed
     expect(state.riderDocumentOutfit).toBe(outfit);
+    expect(state.applyModels).toHaveBeenCalledTimes(1);
+    await twinLanded();
+    expect(state.gltf.riderLod).toBeNull();
     expect(state.applyModels).toHaveBeenCalledTimes(1);
   });
 
@@ -156,7 +162,7 @@ describe('outfit documents are installed before selection succeeds (legacy famil
     const resolve: ((g: GLTF) => void)[] = [];
     vi.mocked(loadGltf).mockImplementation(() => new Promise((done) => { resolve.push(done); }));
     const raceRequest = renderer.setRiderOutfit('race-bluewhite');
-    expect(resolve).toHaveLength(2);
+    expect(resolve).toHaveLength(1);
     expect(await renderer.setRiderOutfit('street-mustard')).toBe(true);
     for (const done of resolve) done({} as GLTF);
     expect(await raceRequest).toBe(false);
@@ -172,9 +178,8 @@ describe('outfit documents are installed before selection succeeds (legacy famil
     vi.mocked(loadGltf).mockImplementation(() => new Promise((done) => { resolve.push(done); }));
     const outfitRequest = renderer.setRiderOutfit('race-bluewhite');
     renderer.setModels({ bikeModel: 'gltf', riderModel: 'gltf' });
-    expect(resolve).toHaveLength(4);
+    expect(resolve).toHaveLength(2);
     resolve[0]!({} as GLTF); resolve[1]!({} as GLTF);
-    resolve[2]!({} as GLTF); resolve[3]!({} as GLTF);
     expect(await outfitRequest).toBe(true);
     expect(state.riderDocumentOutfit).toBe('race-bluewhite');
     expect(state.heroLoading).toBe(0);

@@ -8,19 +8,21 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
 import { ThreeRenderer } from './index';
-import { loadGltf } from './hero/gltf';
+import { loadGltf, prefetchModel } from './hero/gltf';
 import { GltfRider } from './hero/gltfRider';
 import { AVAILABLE_RIDER_PRESETS } from '../core/riderPresets';
 import { heroHasVariants, lodUrl, riderPalette, riderUrl } from './hero/urls';
 
-vi.mock('./hero/gltf', async (original) => ({ ...await original<Record<string, unknown>>(), loadGltf: vi.fn() }));
+vi.mock('./hero/gltf', async (original) => ({ ...await original<Record<string, unknown>>(), loadGltf: vi.fn(), prefetchModel: vi.fn(async () => undefined) }));
 afterEach(() => vi.restoreAllMocks());
+const twinLanded = async (): Promise<void> => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
 
 function fixture() {
   const mustard = {} as GLTF, mustardLod = {} as GLTF;
   const fields = {
     models: { bikeModel: 'gltf', riderModel: 'gltf' },
     riderOutfit: 'street-mustard', riderDocumentOutfit: 'street-mustard', bikeClass: 'rookie', bikeDocumentClass: 'rookie',
+    tier: 'medium', deviceClass: 'phone', stageOn: false, disposed: false, phase: 'riding', twinPending: null, whenReady: () => Promise.resolve(), riderRef: {}, bikeRef: {},
     gltf: { bike: {} as GLTF, bikeLod: {} as GLTF, rider: mustard, riderLod: mustardLod },
     heroLoading: 0, heroPending: Promise.resolve(), applyModels: vi.fn(),
   };
@@ -38,21 +40,37 @@ describe('per-outfit rider files (live family)', () => {
     }
   });
 
-  it('fetches a sibling outfit\'s own documents and installs them without palette validation or a variant select', async () => {
+  it('on a phone fetches a sibling outfit\'s LOD file only, installs it without palette validation, and prefetches the authored twin', async () => {
     const { renderer, state } = fixture();
-    const charcoal = {} as GLTF, charcoalLod = {} as GLTF;
-    vi.mocked(loadGltf).mockImplementation(async (url) => url === riderUrl('street-charcoal') ? charcoal : url === lodUrl(riderUrl('street-charcoal')) ? charcoalLod : null);
+    vi.mocked(prefetchModel).mockClear();
+    const charcoalLod = {} as GLTF;
+    vi.mocked(loadGltf).mockImplementation(async (url) => url === lodUrl(riderUrl('street-charcoal')) ? charcoalLod : null);
     const validate = vi.spyOn(renderer as unknown as { validateRiderPreset(doc: GLTF, outfit: string): void }, 'validateRiderPreset');
     expect(await renderer.setRiderOutfit('street-charcoal')).toBe(true);
-    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/rider-street-charcoal.glb', 'models/rider-street-charcoal-lod.glb']);
-    expect(state.gltf.rider).toBe(charcoal);
+    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/rider-street-charcoal-lod.glb']);
     expect(state.gltf.riderLod).toBe(charcoalLod);
+    expect(state.gltf.rider).toBeNull();
     expect(state.riderDocumentOutfit).toBe('street-charcoal');
     expect(validate).not.toHaveBeenCalled();
-    expect(state.applyModels).toHaveBeenCalledOnce();
+    await twinLanded();
+    expect(vi.mocked(prefetchModel).mock.calls.map(([url]) => url)).toEqual(['models/rider-street-charcoal.glb']);
+    expect(state.applyModels).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps the installed outfit when a sibling\'s LOD fails, then installs on retry', async () => {
+  it('the garage on a phone asks for the authored rider: a missing twin is fetched as a hero load and awaited', async () => {
+    const { renderer, state } = fixture();
+    state.gltf.rider = null as unknown as GLTF; // the twin has not landed
+    const mustardFull = {} as GLTF;
+    vi.mocked(loadGltf).mockImplementation(async (url) => url === riderUrl('street-mustard') ? mustardFull : null);
+    Object.assign(renderer, { applyGarageStage: vi.fn(), clearGarageStage: vi.fn(), invalidate: vi.fn() });
+    renderer.setGarageStage(true);
+    expect(state.heroLoading).toBe(1);
+    await state.heroPending;
+    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/rider-street-mustard.glb']);
+    expect(state.gltf.rider).toBe(mustardFull);
+  });
+
+  it('keeps the installed outfit when a sibling\'s drawn file fails, then installs on retry', async () => {
     const { renderer, state, mustard, mustardLod } = fixture();
     const race = {} as GLTF, raceLod = {} as GLTF;
     vi.mocked(loadGltf).mockImplementation(async (url) => url.endsWith('-lod.glb') ? null : race);
@@ -63,7 +81,7 @@ describe('per-outfit rider files (live family)', () => {
     expect(state.riderOutfit).toBe('street-mustard');
     vi.mocked(loadGltf).mockImplementation(async (url) => url.endsWith('-lod.glb') ? raceLod : race);
     expect(await renderer.setRiderOutfit('race-bluewhite')).toBe(true);
-    expect(state.gltf.rider).toBe(race);
+    expect(state.gltf.riderLod).toBe(raceLod);
     expect(state.riderDocumentOutfit).toBe('race-bluewhite');
   });
 

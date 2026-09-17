@@ -48,15 +48,15 @@ describe('loader renderer (Odometer, two tracks)', () => {
     const loose = plan as unknown as { step(k: BootStep, w: (p: { set(d: number, t: number, s?: string): void }) => unknown): Promise<unknown>; done(): void };
     core.add(333);
     expect(root.dataset['download']).toBe('5'); // 333 / 6000
-    expect(root.querySelector('.gauge.dl .line')!.textContent).toBe('core bundle · 0 KB / 1 KB');
+    expect(root.querySelector('.gauge.dl .line')!.textContent).toBe('core · 0 KB / 1 KB');
     for (const k of BOOT_STEPS) {
       await loose.step(k, (p) => {
         p.set(1, 2, 'half');
         if (k === 'materials') {
-          expect(root.querySelector('.gauge.su .line')!.textContent).toBe('World textures · half · 50 %');
+          expect(root.querySelector('.gauge.su .line')!.textContent).toBe('Textures · half · 50 %');
         }
       });
-      if (k === 'core') expect(root.querySelector('.gauge.dl .line')!.textContent).toBe('core bundle · 1 KB / 1 KB');
+      if (k === 'core') expect(root.querySelector('.gauge.dl .line')!.textContent).toBe('core · 1 KB / 1 KB');
     }
     plan.after('keyArt', 100, 1000);
     const after = root.querySelector('li[data-key="after:keyArt"]')!;

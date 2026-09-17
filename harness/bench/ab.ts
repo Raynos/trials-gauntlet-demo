@@ -45,8 +45,8 @@ try {
     page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(m.text().slice(0, 200)); });
     await openGame(page, server.url);
     const hook = new HookClient(page);
-    type Render = { setDeviceClass?(c: string): void; resize(w: number, h: number, d: number): void; debugInfo(): { calls: number; tris: number }; renderer: { getContext(): WebGL2RenderingContext }; canvas: HTMLCanvasElement };
-    const setTier = () => page.evaluate(([t, w, h, d, dc]) => { const R = (window as unknown as { __render: Render }).__render; R.setDeviceClass?.(dc as string); window.__trials!.setQuality(t as QualityTier); R.resize(w as number, h as number, d as number); }, [tier, geom.cssW, geom.cssH, geom.dpr, geom.cssW < 1000 ? 'phone' : 'desktop'] as const);
+    type Render = { setDeviceClass?(c: string): void; whenReady?(): Promise<void>; resize(w: number, h: number, d: number): void; debugInfo(): { calls: number; tris: number }; renderer: { getContext(): WebGL2RenderingContext }; canvas: HTMLCanvasElement };
+    const setTier = () => page.evaluate(([t, w, h, d, dc]) => { const R = (window as unknown as { __render: Render }).__render; R.setDeviceClass?.(dc as string); window.__trials!.setQuality(t as QualityTier); R.resize(w as number, h as number, d as number); return R.whenReady?.(); }, [tier, geom.cssW, geom.cssH, geom.dpr, geom.cssW < 1000 ? 'phone' : 'desktop'] as const);
     const pass = async (on: boolean) => {
       await page.evaluate(([name, on]) => (window as unknown as Record<string, (v: boolean) => void>)[name as string]!(on as boolean), [setter, on] as const);
       // Tier + device class BEFORE the build (chunk size / detail follow the tier), then the build, then the tier again (the low texture shrink).
