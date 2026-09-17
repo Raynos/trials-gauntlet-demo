@@ -213,6 +213,8 @@ export class Game {
   private track: TrackDef | null = null;
   private seed = 0;
   private bike: BikeClass = DEFAULT_BIKE;
+  /** The class the physics was last loaded with; a menu-phase `setBike` may leave it behind until the next arm. */
+  private loadedBike: BikeClass = DEFAULT_BIKE;
   /** `?perf=1`: time each physics step (µs) for the overlay. Off by default — no per-tick `performance.now`. */
   perfTiming = false;
   readonly physicsUs = new Percentiles(240);
@@ -358,10 +360,16 @@ export class Game {
   setBike(bike: BikeClass): void {
     if (bike === this.bike) return;
     this.bike = bike;
-    if (this.track && (this.phaseValue === 'menu' || this.phaseValue === 'countdown')) {
-      const phase = this.phaseValue;
+    if (!this.track) return;
+    if (this.phaseValue === 'countdown') {
       this.loadTrack(this.track.id, this.seed);
-      if (phase === 'menu') this.toMenu();
+    } else if (this.phaseValue === 'menu') {
+      // Garage preview (ask 29): nothing ticks under the menus, so the physics row waits for the next arm
+      // (`startRun` / `loadTrack` reload it when the class moved). Only the hero's livery and the engine
+      // voice change now — a full `loadTrack` here tore the world down under the garage stage, and the
+      // stage lost its hidden meshes / background for a frame: the grey flash on every card hover.
+      this.renderer.setBikeClass?.(this.bike);
+      this.audio?.setBike?.(this.bike);
     }
   }
 
@@ -375,6 +383,7 @@ export class Game {
     const compiled = compileTrack(track);
     this.compiled = compiled;
     this.physics.loadTrack(compiled, this.seed, { bike: this.bike });
+    this.loadedBike = this.bike;
     this.renderer.setTrack(compiled);
     // CONTRACT §2.7 `setBikeClass` (render round 11): the hero wears the class livery on every load path —
     // garage preview (`setBike` reload), track launch, `hook.setBike`, a replay's `header.bike`. Optional: a
@@ -430,6 +439,11 @@ export class Game {
   /** Re-arm the current track from its start (used by the menu's Play). */
   startRun(): void {
     if (!this.track) return;
+    if (this.loadedBike !== this.bike) {
+      // A garage preview moved the class while the menu was up: the physics row is loaded now, not then.
+      this.loadTrack(this.track.id, this.seed);
+      return;
+    }
     this.physics.reset(-1);
     this.physics.drainEvents();
     this.lastState = null;

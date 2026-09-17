@@ -85,6 +85,8 @@ The [game audit](../reviews/game-audit-2026-09-15.md) and separate [physics-libr
 | 09-15 | Loading screen → **B Odometer**, but keeping **two bars with two percentages** (DOWNLOAD / SETUP as parallel tracks) and **two detail lines**, one per track; both numbers monotone and ending at 100 by the loader invariant (`project/archive/loading-progress-invariant.md`) |
 | 09-15 | **Level review is a top-level REVIEW button on the main menu** (next to PLAY / GARAGE / SETTINGS) that opens a review level picker → the review UI (free camera, six segments, comments, Copy review); `?review=<track>` survives only as a deep link for e2e. Core #10 builds it. |
 | 09-14 | Phones are **not** pinned to low in Auto — a perf owner makes the tiers fast instead (60 on high is the goal) |
+| 09-16 | **Garage: the Classic and Img2 rider models are out** (the Blender rider is the rider; `?rider=` stays a harness override) and **the garage is pointer + Esc only** (no key rows) — asks 30–32 |
+| 09-16 | Design rounds open for the user to pick: **home screen** `assets/design/menu/round2/` (A–E) → more of B Lobby in `round3/` (ask 36); **continuous world-map level select** `assets/design/tracks/round4/` (A ribbon / B chart / C ascent) |
 
 ## Parallel branch — `blender-work` (Codex Astra 6, since 2026-09-15)
 
@@ -124,6 +126,7 @@ Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF-BACKLOG.m
 | 09-15 | MENU pill over the medal totals | header inset | `8efc682` |
 | 09-15 | Astra's `blender-work` hero merged on main's terms (merge #3: main's physics/perf/menu, the branch's hero/assets/garage/outfits; 781/781, hero-webkit PASS, e2e 399/399); critic 0/6 → the `riderBody` export is the blocker | physics R7 | `bdba62d` |
 | 09-14 | taps on invisible buttons navigate (results Menu under the gas thumb) | the `.live` invariant, 5184-tap grid | `18df821` |
+| 09-16 | garage flashes grey on every card hover / rookie↔pro swap | a menu-phase `setBike` swaps livery only; the physics row reloads on the next arm; e2e G4 asserts 0 `setTrack` per swap | ask 29 |
 
 ## Art round 27 — source garment repair and bike connections
 

@@ -240,11 +240,16 @@ const MODEL_KEYS = { rider: 'trials.riderModel', bike: 'trials.bikeModel' } as c
 
 export type ModelChoice = 'proc' | 'gltf' | 'img2';
 
-/** glTF hero is the default (MEGA_PLAN P1: procedural retired from the UI, kept as the load-failure fallback and a stored 'proc' choice). */
+/**
+ * glTF hero is the default (MEGA_PLAN P1: procedural retired from the UI, kept as the load-failure fallback and a
+ * stored 'proc' bike choice). The rider is always the Blender model (asks 30 / 31: the Classic and Img2 chips left
+ * the garage); a stored 'proc' / 'img2' rider from before is read as 'gltf' so nobody stays stranded on a model with
+ * no chip to leave it. `?rider=proc|img2` (main.ts) remains the harness / debug override.
+ */
 export function loadModelChoice(which: 'rider' | 'bike'): ModelChoice {
   try {
     const v = store()?.getItem(MODEL_KEYS[which]);
-    return which === 'rider' && v === 'img2' ? 'img2' : v === 'proc' ? 'proc' : 'gltf';
+    return which === 'rider' ? 'gltf' : v === 'proc' ? 'proc' : 'gltf';
   } catch {
     return 'gltf';
   }

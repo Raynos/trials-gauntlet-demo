@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArtManifest } from './art';
 import type { RiderOutfit } from '../core/types';
 import { GARAGE_VIEW, GarageScreen, type GarageCallbacks, type GarageView } from './garage';
-import type { ModelChoice } from './best';
 import { LIVE_DELAY_MS, resetLive, setLiveClock, tickLive } from './live';
 import type { UiSfx } from './sfx';
 
@@ -27,29 +26,34 @@ function fixture() {
   const garage = new GarageScreen(document.body, sfx as unknown as UiSfx, art, cb);
   const outfit = (name: string) => garage.root.querySelector<HTMLButtonElement>(`button[data-outfit="${name}"]`)!;
   const bike = (name: string) => garage.root.querySelector<HTMLButtonElement>(`button[data-bike="${name}"]`)!;
+  const hover = (el: HTMLElement, pointerType = 'mouse') => {
+    const e = new MouseEvent('pointerenter', { bubbles: false }) as MouseEvent & { pointerType: string };
+    Object.defineProperty(e, 'pointerType', { value: pointerType });
+    el.dispatchEvent(e);
+  };
   const makeLive = () => {
     tickLive(now);
     now += LIVE_DELAY_MS;
     tickLive(now);
     expect(garage.root.classList.contains('live')).toBe(true);
   };
-  return { garage, cb, outfit, bike, makeLive };
+  return { garage, cb, outfit, bike, hover, makeLive };
 }
 
 describe('garage rider outfits', () => {
-  it('navigates all five independently selectable designs', () => {
-    const { garage, outfit, cb, makeLive } = fixture();
+  it('offers all five designs; the pointer highlights one without committing (ask 32: no key rows)', () => {
+    const { garage, outfit, cb, hover, makeLive } = fixture();
     garage.show('rookie', 'street-mustard');
     makeLive();
     expect(outfit('street-openface').disabled).toBe(false);
-    outfit('street-mustard').focus();
     for (const id of ['street-openface', 'race-bluewhite', 'street-charcoal', 'race-charcoalyellow', 'street-mustard']) {
-      garage.nav(1, 0);
-      expect(document.activeElement).toBe(outfit(id));
+      hover(outfit(id));
+      expect(garage.root.querySelector('[data-outfit].on')).toBe(outfit(id));
     }
-    garage.nav(-1, 0);
-    expect(document.activeElement).toBe(outfit('race-charcoalyellow'));
+    expect(outfit('street-mustard').getAttribute('aria-pressed')).toBe('true');
     expect(cb.setOutfit).not.toHaveBeenCalled();
+    expect('nav' in garage).toBe(false);
+    expect('confirm' in garage).toBe(false);
   });
   it('exposes both named choices and the current selection separately from bike class', () => {
     const { garage, outfit, bike } = fixture();
@@ -115,53 +119,52 @@ describe('garage rider outfits', () => {
     expect(outfit('race-bluewhite').getAttribute('aria-busy')).toBe('false');
   });
 
-  it('shares directional and confirm navigation for keyboard/gamepad without committing focus', () => {
-    const { garage, outfit, bike, cb, makeLive } = fixture();
+  it('a bike chip previews under the pointer (once per change, no commit); Esc/back restores the committed class', () => {
+    const { garage, bike, cb, hover, makeLive } = fixture();
     garage.show('rookie', 'street-mustard');
     makeLive();
-    garage.setDevice('gamepad');
-    garage.nav(0, -1); // up the rail: bike (lowest) → outfit
-    expect(document.activeElement).toBe(outfit('street-mustard'));
-    garage.nav(1, 0);
-    expect(document.activeElement).toBe(outfit('street-openface'));
-    expect(cb.setOutfit).not.toHaveBeenCalled();
-    expect(outfit('street-mustard').getAttribute('aria-pressed')).toBe('true');
-    garage.confirm();
-    expect(cb.setOutfit).toHaveBeenCalledExactlyOnceWith('street-openface');
-    garage.setDevice('keyboard');
-    garage.nav(0, 1); // back down to the bike row
-    garage.nav(1, 0);
-    expect(document.activeElement).toBe(bike('pro'));
+    hover(bike('pro'));
     expect(cb.previewBike).toHaveBeenCalledExactlyOnceWith('pro');
+    expect(bike('pro').classList.contains('on')).toBe(true);
+    expect(bike('rookie').getAttribute('aria-pressed')).toBe('true'); // still the committed class
+    expect(garage.root.querySelector('.gp-name b')?.textContent).toBe('Pro'); // the sheet follows the preview
+    hover(bike('pro')); // re-entering the same chip is not a second preview
+    expect(cb.previewBike).toHaveBeenCalledTimes(1);
+    hover(bike('rookie'), 'touch'); // a finger passing over a chip is not a hover
+    expect(cb.previewBike).toHaveBeenCalledTimes(1);
     garage.back();
     expect(cb.previewBike).toHaveBeenLastCalledWith('rookie');
     expect(cb.setBike).not.toHaveBeenCalled();
-    expect(cb.setOutfit).toHaveBeenCalledTimes(1);
+    expect(cb.back).toHaveBeenCalledTimes(1);
   });
 
-  it('synchronizes native tab focus with confirm, including the menu button', () => {
-    const { garage, outfit, cb, makeLive } = fixture();
+  it('a click commits the bike; the legend names only the way out', () => {
+    const { garage, bike, cb, makeLive } = fixture();
     garage.show('rookie', 'street-mustard');
     makeLive();
-    outfit('race-bluewhite').focus();
-    garage.confirm();
-    expect(cb.setOutfit).toHaveBeenCalledExactlyOnceWith('race-bluewhite');
-    garage.root.querySelector<HTMLButtonElement>('.backbtn')!.focus();
-    garage.confirm();
+    bike('pro').click();
+    expect(cb.setBike).toHaveBeenCalledExactlyOnceWith('pro');
+    expect(bike('pro').getAttribute('aria-pressed')).toBe('true');
+    garage.setDevice('keyboard');
+    expect(garage.root.querySelector('.legend')?.textContent).toBe('EscBack');
+    garage.setDevice('gamepad');
+    expect(garage.root.querySelector('.legend')?.textContent).toBe('BBack');
+    garage.root.querySelector<HTMLButtonElement>('.backbtn')!.click();
     expect(cb.back).toHaveBeenCalledTimes(1);
-    expect(cb.setBike).not.toHaveBeenCalled();
   });
 
-  it('retains focus taken during the reveal without acting before the live gate', () => {
-    const { garage, outfit, cb, makeLive } = fixture();
+  it('native focus (Tab) neither previews nor commits before or after the live gate', () => {
+    const { garage, outfit, bike, cb, makeLive } = fixture();
     garage.show('rookie', 'street-mustard');
     outfit('race-bluewhite').focus();
-    garage.confirm();
+    bike('pro').focus();
     expect(cb.setOutfit).not.toHaveBeenCalled();
     expect(cb.previewBike).not.toHaveBeenCalled();
     makeLive();
-    garage.confirm();
-    expect(cb.setOutfit).toHaveBeenCalledExactlyOnceWith('race-bluewhite');
+    outfit('race-bluewhite').focus();
+    bike('pro').focus();
+    expect(cb.setOutfit).not.toHaveBeenCalled();
+    expect(cb.previewBike).not.toHaveBeenCalled();
     expect(cb.setBike).not.toHaveBeenCalled();
   });
 
@@ -170,8 +173,6 @@ describe('garage rider outfits', () => {
     outfit('race-bluewhite').click();
     garage.show('rookie', 'street-mustard');
     outfit('race-bluewhite').click();
-    garage.nav(0, 1);
-    garage.confirm();
     garage.back();
     expect(cb.setOutfit).not.toHaveBeenCalled();
     expect(cb.setBike).not.toHaveBeenCalled();
@@ -181,7 +182,6 @@ describe('garage rider outfits', () => {
     expect(garage.root.inert).toBe(true);
     expect(garage.root.getAttribute('aria-hidden')).toBe('true');
     outfit('race-bluewhite').click();
-    garage.confirm();
     garage.show('rookie', 'street-mustard');
     outfit('race-bluewhite').click();
     expect(cb.setOutfit).not.toHaveBeenCalled();
@@ -191,18 +191,15 @@ describe('garage rider outfits', () => {
   });
 });
 
-/** Garage round: rider model chips + the model explorer (stage / orbit callbacks, drag / pinch / wheel). */
-function explorer(opts: { models?: boolean } = {}) {
-  let rider: ModelChoice = 'gltf';
+/** Garage round: the model explorer (stage / orbit callbacks, drag / pinch / wheel). */
+function explorer() {
   const orbit = vi.fn<(view: GarageView | null) => void>();
   const stage = vi.fn<(on: boolean) => void>();
-  const setModel = vi.fn<(v: ModelChoice) => void>().mockImplementation((v) => { rider = v; });
   const cb: GarageCallbacks = {
     previewBike: vi.fn(),
     setBike: vi.fn(),
     setOutfit: vi.fn<(outfit: RiderOutfit) => Promise<boolean>>().mockResolvedValue(true),
     back: vi.fn(),
-    ...(opts.models === false ? {} : { models: { get: () => rider, set: setModel } }),
     stage,
     orbit,
   };
@@ -213,17 +210,16 @@ function explorer(opts: { models?: boolean } = {}) {
     now += LIVE_DELAY_MS;
     tickLive(now);
   };
-  const model = (v: string) => garage.root.querySelector<HTMLButtonElement>(`button[data-model="${v}"]`)!;
   const pointer = (type: string, id: number, x: number, y: number, pointerType = 'touch') => {
     const e = new MouseEvent(type, { bubbles: true, clientX: x, clientY: y, button: 0 }) as MouseEvent & { pointerId: number; pointerType: string };
     Object.defineProperty(e, 'pointerId', { value: id });
     Object.defineProperty(e, 'pointerType', { value: pointerType });
     garage.stage.dispatchEvent(e);
   };
-  return { garage, cb, orbit, stage, setModel, model, pointer, makeLive, rider: () => rider };
+  return { garage, cb, orbit, stage, pointer, makeLive };
 }
 
-describe('garage rider model + model explorer', () => {
+describe('garage model explorer', () => {
   it('stages the hero and opens on the default orbit; hiding releases both', () => {
     const { garage, orbit, stage } = explorer();
     expect(stage).not.toHaveBeenCalled();
@@ -284,61 +280,12 @@ describe('garage rider model + model explorer', () => {
     expect(orbit).not.toHaveBeenCalled();
   });
 
-  it('offers Classic / Blender / Img2 chips, commits the rider model once, and shows outfits as Blender-only', () => {
-    const { garage, model, setModel, cb, makeLive, rider } = explorer();
+  it('carries no rider-model row (asks 30 / 31): the rail is outfit then bike, the sheet has no rider line', () => {
+    const { garage } = explorer();
     garage.show('rookie', 'street-mustard');
-    expect(model('gltf').getAttribute('aria-pressed')).toBe('true');
-    model('img2').click(); // not live yet
-    expect(setModel).not.toHaveBeenCalled();
-    makeLive();
-    model('img2').click();
-    expect(setModel).toHaveBeenCalledExactlyOnceWith('img2');
-    expect(model('img2').getAttribute('aria-pressed')).toBe('true');
-    expect(garage.root.querySelector('[data-outfit][aria-pressed="true"]')).toBeNull();
-    expect(garage.root.querySelector('[role="status"]')?.textContent).toBe('Img2 experiment · pick an outfit for the Blender rider');
-    model('img2').click(); // already current: no second commit
-    expect(setModel).toHaveBeenCalledTimes(1);
-    model('proc').click();
-    expect(rider()).toBe('proc');
-    expect(garage.root.querySelector('[role="status"]')?.textContent).toBe('Classic rider · pick an outfit for the Blender rider');
-    // Picking an outfit brings the Blender rider back (the app flips the model on a loaded outfit).
-    (cb.setOutfit as ReturnType<typeof vi.fn>).mockImplementationOnce(async () => { setModel('gltf'); return true; });
-    garage.root.querySelector<HTMLButtonElement>('button[data-outfit="race-bluewhite"]')!.click();
-    return vi.waitFor(() => {
-      expect(garage.root.querySelector('[data-outfit="race-bluewhite"]')?.getAttribute('aria-pressed')).toBe('true');
-      expect(model('gltf').getAttribute('aria-pressed')).toBe('true');
-    });
-  });
-
-  it('keyboard rows run up the rail bike → outfit → rider (and down to ‹ MENU) when models are offered, and skip the rider row otherwise', () => {
-    const a = explorer();
-    a.garage.show('rookie', 'street-mustard');
-    a.makeLive();
-    // The rail reads rider / outfit / bike top → bottom; focus opens on the bike row (lowest, under the thumb).
-    expect([...a.garage.root.querySelectorAll<HTMLElement>('.rail-group')].map((g) => g.dataset['group'])).toEqual(['rider', 'outfit', 'bike']);
-    a.garage.nav(0, -1);
-    expect(document.activeElement?.getAttribute('data-outfit')).toBe('street-mustard');
-    a.garage.nav(0, -1);
-    expect(document.activeElement).toBe(a.model('gltf'));
-    a.garage.nav(1, 0);
-    expect(document.activeElement).toBe(a.model('img2'));
-    a.garage.confirm();
-    expect(a.setModel).toHaveBeenCalledExactlyOnceWith('img2');
-    a.garage.nav(0, -1); // wraps past the top to ‹ MENU
-    expect(document.activeElement).toBe(a.garage.root.querySelector('.backbtn'));
-    a.garage.nav(0, 1);
-    expect(document.activeElement).toBe(a.model('img2'));
-    a.garage.hide();
-    document.body.innerHTML = '';
-    resetLive();
-    const b = explorer({ models: false });
-    expect(b.garage.root.querySelector('[data-model]')).toBeNull();
-    expect([...b.garage.root.querySelectorAll<HTMLElement>('.rail-group')].map((g) => g.dataset['group'])).toEqual(['outfit', 'bike']);
-    b.garage.show('rookie', 'street-mustard');
-    b.makeLive();
-    b.garage.nav(0, -1);
-    expect(document.activeElement?.getAttribute('data-outfit')).toBe('street-mustard');
-    b.garage.nav(0, -1);
-    expect(document.activeElement).toBe(b.garage.root.querySelector('.backbtn'));
+    expect(garage.root.querySelector('[data-model]')).toBeNull();
+    expect([...garage.root.querySelectorAll<HTMLElement>('.rail-group')].map((g) => g.dataset['group'])).toEqual(['outfit', 'bike']);
+    expect([...garage.root.querySelectorAll('.gp-kv span')].map((e) => e.textContent)).toEqual(['Outfit']);
+    expect(garage.root.querySelector('[role="status"]')?.textContent).toBe('Mustard · barehead selected');
   });
 });

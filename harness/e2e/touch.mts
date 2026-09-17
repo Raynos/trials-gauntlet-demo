@@ -428,12 +428,22 @@ async function flowFront(ctx: BrowserContext, url: string, g: Geom): Promise<voi
     await tapSel(page, flow, '.garage-screen.live button[data-outfit="street-openface"]');
     await page.waitForTimeout(300);
     expect((await visibleScreens(page)).join() === 'garage', flow, 'G2-tag-stays', `outfit tap left the garage: ${await visibleScreens(page)}`);
+    // G4 (ask 29): a class swap under the stage is a livery change, never a track reload — `setTrack` would tear
+    // the world down (stage hides lost, background reset) and the whole garage flashed grey on every hover.
+    await page.evaluate(`(function () { var r = window.__render; window.__setTrackCalls = 0; window.__liveryCalls = 0; var orig = r.setTrack; r.setTrack = function () { window.__setTrackCalls++; return orig.apply(this, arguments); }; var origL = r.setBikeClass; r.setBikeClass = function () { window.__liveryCalls++; return origL.apply(this, arguments); }; window.__hidden0 = r.debugInfo().garage.hidden; })()`);
+    await page.evaluate(`(function () { var el = document.querySelector('.garage-screen button[data-bike="pro"]'); var e = new PointerEvent('pointerenter', { pointerType: 'mouse', bubbles: false }); el.dispatchEvent(e); })()`);
+    await page.waitForTimeout(150);
     await tapSel(page, flow, '.garage-screen.live button[data-bike="pro"]');
     await page.waitForTimeout(300);
     const pro = await page.evaluate(`document.querySelector('.garage-screen button[data-bike="pro"]').getAttribute('aria-pressed')`);
     expect(pro === 'true', flow, 'G2-bike-tap', `Pro tag aria-pressed ${pro}`);
     await tapSel(page, flow, '.garage-screen.live button[data-bike="rookie"]');
     await page.waitForTimeout(300);
+    const g4 = await page.evaluate(`(function () { var r = window.__render; var i = r.debugInfo(); return { setTrack: window.__setTrackCalls, livery: window.__liveryCalls, hidden0: window.__hidden0, hidden: i.garage.hidden, on: i.garage.on }; })()`) as { setTrack: number; livery: number; hidden0: number; hidden: number; on: boolean } | null;
+    log(`G4 ${JSON.stringify(g4)}`);
+    expect(g4 && g4.livery >= 2, flow, 'G4-swap-livery', `bike class swaps (hover pro, tap pro, tap rookie) reached setBikeClass ${g4?.livery} times (expected ≥ 2)`);
+    expect(g4 && g4.setTrack === 0, flow, 'G4-swap-no-reload', `bike class swaps (hover pro, tap pro, tap rookie) called setTrack ${g4?.setTrack} times (expected 0)`);
+    expect(g4 && g4.on && g4.hidden === g4.hidden0 && g4.hidden > 0, flow, 'G4-stage-intact', `stage after the swaps: ${JSON.stringify(g4)}`);
   }
   await tapSel(page, flow, '.garage-screen.live .backbtn');
   await waitFor(page, `!!document.querySelector('.menu-screen.show')`, 10000);

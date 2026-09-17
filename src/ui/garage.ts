@@ -3,22 +3,22 @@
  * (assets/design/garage/SPEC.md). The live 3D hero is the centrepiece — the renderer stages it in the
  * shutter-door bay (`setGarageStage`) and the screen drives an orbit camera (`setCameraOverride({ mode:
  * 'orbit' })`): one-finger / mouse drag rotates, pinch / wheel zooms, a short inertia settles the turn.
- * Nothing overlaps the hero: the controls hang as tags on a rail down the LEFT edge (rider model, outfit,
- * bike class — bike lowest, under the thumb; every tag ≥ 44 px, two per row, no scrolling), the metadata
- * sits in a panel on the RIGHT (the chosen bike's class, POWER / GRIP / WEIGHT bars and note, the outfit and
- * rider lines, the load status), badge plate top-left, ‹ MENU top-right, the gesture hint under the hero.
- * Bike class previews on focus and commits on select (`trials.bikeClass`); the rider model and outfit
- * commit at once (`trials.riderModel`, `trials.riderOutfit`) — the main menu and the pause overlay no
- * longer carry these rows. Copy states the physics v2 R3 numbers (physics.md "v2 status — R3").
+ * Nothing overlaps the hero: the controls hang as tags on a rail down the LEFT edge (outfit, bike class —
+ * bike lowest, under the thumb; every tag ≥ 44 px, two per row, no scrolling), the metadata sits in a panel
+ * on the RIGHT (the chosen bike's class, POWER / GRIP / WEIGHT bars and note, the outfit line, the load
+ * status), badge plate top-left, ‹ MENU top-right, the gesture hint under the hero.
+ * Pointer + Esc only (ask 32): a bike chip previews under the pointer (the staged hero swaps livery, no
+ * track reload — ask 29) and commits on click (`trials.bikeClass`); an outfit commits on click
+ * (`trials.riderOutfit`). The rider-model row is gone (asks 30 / 31): the Blender rider is the rider;
+ * `?rider=` stays a harness / debug override. Copy states the physics v2 R3 numbers (physics.md "v2 status — R3").
  */
 import type { BikeClass, RiderOutfit } from '../core/types';
 import { RIDER_PRESETS } from '../core/riderPresets';
 import type { ArtManifest } from './art';
-import type { ModelChoice } from './best';
 import { BUILD_STAMP_SHORT, GAME_NAME, escapeHtml } from './front';
 import type { UiSfx } from './sfx';
 import { conceal, isLiveTarget, reveal } from './live';
-import { DEFAULT_RIDER_OUTFIT, OUTFIT_DETAIL, OUTFIT_LABEL, RIDER_OUTFITS } from './outfit';
+import { DEFAULT_RIDER_OUTFIT, OUTFIT_DETAIL, OUTFIT_LABEL } from './outfit';
 
 export interface BikeSpec {
   id: BikeClass;
@@ -66,13 +66,6 @@ export const BIKE_SPECS: Record<BikeClass, BikeSpec> = {
 };
 
 export const BIKE_LABEL: Record<BikeClass, string> = { rookie: 'Rookie', pro: 'Pro' };
-
-/** Rider model chips (the garage is the only place these live now). */
-export const RIDER_MODEL_OPTIONS: readonly { v: ModelChoice; l: string }[] = [
-  { v: 'proc', l: 'Classic' },
-  { v: 'gltf', l: 'Blender' },
-  { v: 'img2', l: 'Img2 experiment' },
-];
 
 /**
  * The one place a player reads the wheelie balance point (physics.md R3 coasting-balance row, Rookie:
@@ -123,8 +116,6 @@ export interface GarageCallbacks {
   /** Load and commit clothing; false leaves the existing outfit selected. */
   setOutfit(outfit: RiderOutfit): Promise<boolean>;
   back(): void;
-  /** Rider model (renderer `setModels`); the row exists only when given. */
-  models?: { get(): ModelChoice; set(v: ModelChoice): void };
   /** Model explorer: stage the hero on the garage set (renderer `setGarageStage`). */
   stage?(on: boolean): void;
   /** Model explorer: orbit camera (`setCameraOverride({ mode: 'orbit', … })`); null restores the menu framing. */
@@ -145,24 +136,20 @@ function bar(label: string, v: number, text?: string): string {
   return `<div class="stat"><span>${label}</span><i><b style="width:${n}%"></b></i><em>${text ? escapeHtml(text) : `${n}`}</em></div>`;
 }
 
-type Group = 'bike' | 'model' | 'outfit' | 'back';
-
 export class GarageScreen {
   readonly root: HTMLDivElement;
   /** The explorer surface (drag / pinch / wheel), under every control. */
   readonly stage: HTMLDivElement;
   private readonly cards = new Map<BikeClass, HTMLButtonElement>();
-  private readonly models = new Map<ModelChoice, HTMLButtonElement>();
   private readonly outfits = new Map<RiderOutfit, HTMLButtonElement>();
   private readonly outfitStatus: HTMLSpanElement;
   private readonly detail: HTMLDivElement;
   private readonly hint: HTMLDivElement;
   private readonly backButton: HTMLButtonElement;
   private readonly legend: HTMLDivElement;
+  /** The bike under the pointer: the staged hero and the sheet follow it (ask 29); a click commits it. */
   private focus: BikeClass = 'rookie';
   private current: BikeClass = 'rookie';
-  private focusGroup: Group = 'bike';
-  private modelFocus: ModelChoice = 'gltf';
   private outfitFocus: RiderOutfit = DEFAULT_RIDER_OUTFIT;
   private currentOutfit: RiderOutfit = DEFAULT_RIDER_OUTFIT;
   private pendingOutfit: RiderOutfit | null = null;
@@ -194,7 +181,8 @@ export class GarageScreen {
     this.bindExplorer();
     const badge = h('div', 'garage-badge', `<div class="garage-plate"><span class="wordmark">${escapeHtml(GAME_NAME)}</span><span class="garage-title">Garage</span></div><div class="garage-build">${escapeHtml(BUILD_STAMP_SHORT)}</div>`);
     this.hint = h('div', 'garage-hint', '<i></i>Drag to rotate · pinch to zoom');
-    // --- The rail (left edge): rider model, outfit, bike class — bike lowest (SPEC §5: under the thumb).
+    // --- The rail (left edge): outfit, bike class — bike lowest (SPEC §5: under the thumb). Pointer + Esc only
+    // (ask 32): a chip previews under the pointer and commits on click; no key rows, no Tab-follow.
     const rail = h('div', 'garage-rail');
     const group = (id: string, label: string, head: string): HTMLDivElement => {
       const g = h('div', 'rail-group');
@@ -206,26 +194,6 @@ export class GarageScreen {
       rail.appendChild(g);
       return grid;
     };
-    if (cb.models) {
-      const grid = group('rider', 'Rider model', 'Rider');
-      for (const o of RIDER_MODEL_OPTIONS) {
-        const [first, rest] = o.l.split(' ');
-        const el = h('button', 'chip', `<b>${escapeHtml(first ?? o.l)}</b>${rest ? `<em>${escapeHtml(rest)}</em>` : ''}`);
-        el.type = 'button';
-        el.dataset['model'] = o.v;
-        el.addEventListener('pointerenter', (e) => {
-          if (e.pointerType !== 'touch' && this.canAct(el)) this.setModelFocus(o.v, true);
-        });
-        el.addEventListener('focus', () => { if (this.visible) this.setModelFocus(o.v, false); });
-        el.addEventListener('click', () => {
-          if (!this.canAct(el)) return;
-          this.setModelFocus(o.v, false);
-          this.confirm();
-        });
-        grid.appendChild(el);
-        this.models.set(o.v, el);
-      }
-    }
     {
       const grid = group('outfit', 'Rider outfit', 'Outfit');
       for (const preset of RIDER_PRESETS) {
@@ -239,11 +207,10 @@ export class GarageScreen {
         button.addEventListener('pointerenter', (event) => {
           if (event.pointerType !== 'touch' && this.canAct(button)) this.setOutfitFocus(outfit, true);
         });
-        button.addEventListener('focus', () => { if (this.visible) this.setOutfitFocus(outfit, false); });
         button.addEventListener('click', () => {
           if (!this.canAct(button)) return;
           this.setOutfitFocus(outfit, false);
-          this.confirm();
+          this.commitOutfit(outfit);
         });
         grid.appendChild(button);
         this.outfits.set(outfit, button);
@@ -261,21 +228,10 @@ export class GarageScreen {
         el.addEventListener('pointerenter', (e) => {
           if (e.pointerType !== 'touch' && this.canAct(el)) this.setFocus(spec.id, true);
         });
-        el.addEventListener('focus', () => {
-          if (!this.visible) return;
-          if (this.canAct(el)) this.setFocus(spec.id, false);
-          else {
-            // Tab may move while the screen is fading in. Remember its target, but wait for live
-            // activation before changing a preview or committing anything.
-            this.focusGroup = 'bike';
-            this.focus = spec.id;
-            this.paint();
-          }
-        });
         el.addEventListener('click', () => {
           if (!this.canAct(el)) return;
           this.setFocus(spec.id, false);
-          this.confirm();
+          this.commitBike();
         });
         grid.appendChild(el);
         this.cards.set(spec.id, el);
@@ -293,11 +249,6 @@ export class GarageScreen {
     this.backButton = h('button', 'backbtn', '<span>‹</span>Menu');
     this.backButton.type = 'button';
     this.backButton.addEventListener('click', () => { if (this.canAct(this.backButton)) this.back(); });
-    this.backButton.addEventListener('focus', () => {
-      if (!this.visible) return;
-      this.focusGroup = 'back';
-      this.paint();
-    });
     this.root.appendChild(this.backButton);
     parent.appendChild(this.root);
     this.paint();
@@ -311,8 +262,6 @@ export class GarageScreen {
     this.current = current;
     this.focus = current;
     this.currentOutfit = this.outfitFocus = outfit;
-    this.modelFocus = this.cb.models?.get() ?? 'gltf';
-    this.focusGroup = 'bike';
     this.resetView();
     this.paint();
     this.root.inert = false;
@@ -340,13 +289,14 @@ export class GarageScreen {
     }
   }
 
+  /** Ask 32: the garage is pointer-driven; the legend only names the way out (Esc / B). */
   setDevice(d: 'keyboard' | 'gamepad' | 'touch' | null): void {
     this.legend.innerHTML =
       d === 'gamepad'
-        ? `<span><i class="pad">✚</i>Choose</span><span><i class="pad a">A</i>Select</span><span><i class="pad b">B</i>Back</span>`
+        ? `<span><i class="pad b">B</i>Back</span>`
         : d === 'touch'
           ? `<span>Tap a chip to choose</span>`
-          : `<span><kbd>↑↓</kbd>Row</span><span><kbd>←→</kbd>Option</span><span><kbd>Enter</kbd>Select</span><span><kbd>Esc</kbd>Back</span>`;
+          : `<span><kbd>Esc</kbd>Back</span>`;
     this.legend.classList.toggle('hide', d === 'touch'); // a thumb needs no key legend; the hint carries the gesture
     this.hint.innerHTML = `<i></i>${d === 'touch' ? 'Drag to rotate · pinch to zoom' : 'Drag to rotate · scroll to zoom'}`;
   }
@@ -504,28 +454,17 @@ export class GarageScreen {
 
   // -- choices --------------------------------------------------------------------------
 
-  /** Focus moves the preview too (the staged bike swaps class), so the player sees before they commit. */
+  /** The pointer moves the preview too (the staged bike swaps livery), so the player sees before they commit. */
   private setFocus(b: BikeClass, tick: boolean): void {
     const changed = b !== this.focus;
-    const moved = changed || this.focusGroup !== 'bike';
-    this.focusGroup = 'bike';
     this.focus = b;
-    if (tick && moved) this.sfx.tick();
+    if (tick && changed) this.sfx.tick();
     if (changed) this.cb.previewBike(b);
     this.paint();
   }
 
-  private setModelFocus(v: ModelChoice, tick: boolean): void {
-    const moved = this.modelFocus !== v || this.focusGroup !== 'model';
-    this.focusGroup = 'model';
-    this.modelFocus = v;
-    if (tick && moved) this.sfx.tick();
-    this.paint();
-  }
-
   private setOutfitFocus(outfit: RiderOutfit, tick: boolean): void {
-    const moved = this.outfitFocus !== outfit || this.focusGroup !== 'outfit';
-    this.focusGroup = 'outfit';
+    const moved = this.outfitFocus !== outfit;
     this.outfitFocus = outfit;
     this.outfits.get(outfit)?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     if (tick && moved) this.sfx.tick();
@@ -534,101 +473,54 @@ export class GarageScreen {
 
   private paint(): void {
     for (const [id, el] of this.cards) {
-      el.classList.toggle('on', this.focusGroup === 'bike' && id === this.focus);
+      el.classList.toggle('on', id === this.focus);
       el.classList.toggle('selected', id === this.current);
       el.setAttribute('aria-pressed', String(id === this.current));
     }
-    const rider = this.cb.models?.get() ?? 'gltf';
-    for (const [v, el] of this.models) {
-      el.classList.toggle('on', this.focusGroup === 'model' && v === this.modelFocus);
-      el.classList.toggle('selected', v === rider);
-      el.setAttribute('aria-pressed', String(v === rider));
-    }
-    const blender = rider === 'gltf';
     for (const [outfit, button] of this.outfits) {
-      button.classList.toggle('on', this.focusGroup === 'outfit' && outfit === this.outfitFocus);
-      button.classList.toggle('selected', blender && outfit === this.currentOutfit);
-      button.setAttribute('aria-pressed', String(blender && outfit === this.currentOutfit));
+      button.classList.toggle('on', outfit === this.outfitFocus);
+      button.classList.toggle('selected', outfit === this.currentOutfit);
+      button.setAttribute('aria-pressed', String(outfit === this.currentOutfit));
       button.setAttribute('aria-busy', String(outfit === this.pendingOutfit));
     }
-    const active = !blender
-      ? `${rider === 'img2' ? 'Img2 experiment' : 'Classic rider'} · pick an outfit for the Blender rider`
-      : `${OUTFIT_LABEL[this.currentOutfit]} selected`;
+    const active = `${OUTFIT_LABEL[this.currentOutfit]} selected`;
     const status = this.pendingOutfit
       ? `Loading ${OUTFIT_LABEL[this.pendingOutfit]}…`
       : this.failedOutfit
         ? `Could not load ${OUTFIT_LABEL[this.failedOutfit]}. Select it to retry. ${active}`
         : active;
     if (this.outfitStatus.textContent !== status) this.outfitStatus.textContent = status;
-    // The sheet: the focused bike's class, bars, character and note (the preview follows the focus, so the copy
-    // does too), then the outfit and rider lines. The balance hint rides as the sheet's title.
-    const spec = BIKE_SPECS[this.focusGroup === 'bike' ? this.focus : this.current];
-    const riderLabel = RIDER_MODEL_OPTIONS.find((o) => o.v === rider)?.l ?? 'Blender';
+    // The sheet: the previewed bike's class, bars, character and note (the preview follows the pointer, so the
+    // copy does too), then the outfit line. The balance hint rides as the sheet's title.
+    const spec = BIKE_SPECS[this.focus];
     const sheet = `<div class="gp-name" style="--tint:${spec.tint}"><b>${escapeHtml(spec.name)}</b><small>${spec.id === 'rookie' ? 'Class A' : 'Class P'}</small></div>
       <div class="gp-stats">${bar('Power', spec.power)}${bar('Grip', spec.grip)}${bar('Weight', spec.weight, spec.weightFeel)}</div>
       <div class="gp-line">${escapeHtml(spec.line)}</div>
       <div class="gp-note">${escapeHtml(spec.note)}</div>
-      <div class="gp-kv"><span>Outfit</span><b>${escapeHtml(blender ? OUTFIT_LABEL[this.currentOutfit] : '—')}</b></div>
-      <div class="gp-kv"><span>Rider</span><b>${escapeHtml(riderLabel)}</b></div>`;
+      <div class="gp-kv"><span>Outfit</span><b>${escapeHtml(OUTFIT_LABEL[this.currentOutfit])}</b></div>`;
     if (this.detail.innerHTML !== sheet) this.detail.innerHTML = sheet;
     this.detail.title = BALANCE_HINT;
-    this.backButton.classList.toggle('on', this.focusGroup === 'back');
   }
 
-  /** Focus rows in rail order (top → bottom), then the ‹ MENU pill. */
-  private groups(): Group[] {
-    return this.cb.models ? ['model', 'outfit', 'bike', 'back'] : ['outfit', 'bike', 'back'];
-  }
-
-  nav(dx: number, dy: number): void {
-    if (!this.canAct() || (!dx && !dy)) return;
-    if (dy) {
-      const groups = this.groups();
-      const index = groups.indexOf(this.focusGroup);
-      this.focusGroup = groups[(index + (dy > 0 ? 1 : groups.length - 1)) % groups.length]!;
-      this.sfx.tick();
-      this.paint();
-    } else if (this.focusGroup === 'bike') this.setFocus(this.focus === 'rookie' ? 'pro' : 'rookie', true);
-    else if (this.focusGroup === 'model') {
-      const i = RIDER_MODEL_OPTIONS.findIndex((o) => o.v === this.modelFocus);
-      this.setModelFocus(RIDER_MODEL_OPTIONS[(i + (dx > 0 ? 1 : -1) + RIDER_MODEL_OPTIONS.length) % RIDER_MODEL_OPTIONS.length]!.v, true);
-    } else if (this.focusGroup === 'outfit') this.setOutfitFocus(RIDER_OUTFITS[(RIDER_OUTFITS.indexOf(this.outfitFocus) + (dx > 0 ? 1 : -1) + RIDER_OUTFITS.length) % RIDER_OUTFITS.length]!, true);
-    const target = this.focusGroup === 'bike' ? this.cards.get(this.focus) : this.focusGroup === 'model' ? this.models.get(this.modelFocus) : this.focusGroup === 'outfit' ? this.outfits.get(this.outfitFocus) : this.backButton;
-    target?.focus({ preventScroll: true });
-  }
-
-  confirm(): void {
-    if (!this.canAct()) return;
-    if (this.focusGroup === 'back') return this.back();
-    if (this.focusGroup === 'model') {
-      const m = this.cb.models;
-      if (!m) return;
-      if (m.get() !== this.modelFocus) {
-        m.set(this.modelFocus);
+  private commitOutfit(outfit: RiderOutfit): void {
+    if (this.pendingOutfit === outfit) return;
+    const request = ++this.outfitRequest;
+    this.pendingOutfit = outfit;
+    this.failedOutfit = null;
+    this.paint();
+    void this.cb.setOutfit(outfit).catch(() => false).then((loaded) => {
+      if (request !== this.outfitRequest) return;
+      this.pendingOutfit = null;
+      this.failedOutfit = loaded ? null : outfit;
+      if (loaded) {
+        this.currentOutfit = outfit;
         this.sfx.confirm();
       }
       this.paint();
-      return;
-    }
-    if (this.focusGroup === 'outfit') {
-      const outfit = this.outfitFocus;
-      if (this.pendingOutfit === outfit) return;
-      const request = ++this.outfitRequest;
-      this.pendingOutfit = outfit;
-      this.failedOutfit = null;
-      this.paint();
-      void this.cb.setOutfit(outfit).catch(() => false).then((loaded) => {
-        if (request !== this.outfitRequest) return;
-        this.pendingOutfit = null;
-        this.failedOutfit = loaded ? null : outfit;
-        if (loaded) {
-          this.currentOutfit = outfit;
-          this.sfx.confirm();
-        }
-        this.paint();
-      });
-      return;
-    }
+    });
+  }
+
+  private commitBike(): void {
     this.current = this.focus;
     this.cb.setBike(this.focus);
     this.sfx.confirm();

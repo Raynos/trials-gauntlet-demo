@@ -399,8 +399,6 @@ export class App {
       setBike: (b) => this.applyBike(b, true),
       setOutfit: (outfit) => cb.outfits!.set(outfit),
       back: () => this.goto('menu'),
-      // The rider model row lives here alone now (garage round): the same persisted choice (`trials.riderModel`).
-      ...(o.modelsSupported ? { models: { get: () => o.models.rider, set: (v: ModelChoice) => cb.setModel('rider', v) } } : {}),
       stage: (on) => o.onGarageStage?.(on),
       orbit: (view) => o.setCameraOverride?.(view ? { mode: 'orbit', yaw: view.yaw, pitch: view.pitch, dist: view.dist, screenY: view.screenY } : null),
     });
@@ -1208,8 +1206,11 @@ export class App {
       this.game.advance(0);
       return;
     }
-    if (this.screen !== 'run') {
-      const s = this.screen === 'menu' ? this.menu : this.screen === 'garage' ? this.garage : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.screen === 'review' ? this.reviewPick : this.credits;
+    if (this.screen === 'garage') {
+      // Ask 32: the garage is pointer-driven (chips preview under the pointer, click commits); keys only back out.
+      if (meta.back || meta.pause) this.garage.back();
+    } else if (this.screen !== 'run') {
+      const s = this.screen === 'menu' ? this.menu : this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.screen === 'review' ? this.reviewPick : this.credits;
       if (meta.navX || meta.navY) s.nav(meta.navX, meta.navY);
       if (meta.confirm) s.confirm();
       else if (meta.back || meta.pause) s.back();
