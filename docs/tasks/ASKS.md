@@ -58,3 +58,9 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 30 | "Remove the classic model from the garage" | **in flight** | rider-model row: Classic chip goes |
 | 31 | "img2threejs is a disaster, remove that too" | **in flight** | Img2 chip goes → only Blender left → the rider-model row leaves the garage; `?rider=` stays for the harness; stored proc/img2 choice clamps to Blender |
 | 32 | "Garage doesn't need any keyboard controls, just mouse and esc" | **in flight** | arrow / WASD / Enter navigation, the keyboard legend and the Tab-focus preview leave; Esc still backs out |
+| 33 | "Home screen feels stale & old next to the garage & new level select — 5 new mockups of a remastered home screen in that style, via the codex cli img gen" | **in flight** | design round `assets/design/home/` per the `tracks/SPEC.md` recipe; the user picks |
+| 34 | "The dioramas in the level select are individual islands / pages, left-right to switch — I prefer a continuous flow, one continuous beautiful world map of these biomes combined; start with 3 codex mockups" | **in flight** | design round `assets/design/tracks/round4/`, three directions; the user picks |
+| 35 | "You can't drive the bike backwards — the brake button just stops the bike, it doesn't reverse" | **in flight** | physics v2: brake held at (near) standstill drives a slow reverse, Trials-style; goldens that brake at rest re-searched + re-pinned, the rest byte-identical |
+| 36 | "Can we break hero open work md into multiple smaller plans" → "yes I think splitting it out would be great" | **done** | `HERO_OPEN_WORK.md` → `project/archive/`; successors `docs/plans/RIDING_POSES.md`, `CHROMIUM_METAL_SHADER_INIT.md`, `HERO_ART_INTEGRATION.md`; README tracker rows + AGENTS pointer updated (this commit) |
+
+| HG-07 | Remaster the helmet | **in flight** | Open-face modeling candidate in progress; asked whether Race helmet is also intended; art-only and 2% usage floor |
