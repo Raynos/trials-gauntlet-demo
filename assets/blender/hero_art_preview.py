@@ -29,6 +29,8 @@ def args():
     p.add_argument("--size", type=int, default=768)
     p.add_argument("--frame", type=int, default=40)
     p.add_argument("--samples", type=int, default=16)
+    p.add_argument("--turntable", type=int, default=0, help="also render N head-camera frames sweeping 360 deg")
+    p.add_argument("--head-only", action="store_true")
     p.add_argument("files", nargs="+")
     return p.parse_args(argv)
 
@@ -116,10 +118,13 @@ def main():
         centre = (lo + hi) / 2
         extent = max(hi - lo)
         stem = Path(file).stem
-        render(scene, str(Path(a.out) / f"{stem}.png"), centre, extent * 1.9, -35, 12, a.size)
+        if not a.head_only:
+            render(scene, str(Path(a.out) / f"{stem}.png"), centre, extent * 1.9, -35, 12, a.size)
         if arms:
             head = arm.matrix_world @ arm.pose.bones["head"].head
             render(scene, str(Path(a.out) / f"{stem}-head.png"), head + Vector((0, 0, 0.05)), 0.55, -40, 8, a.size)
+            for i in range(a.turntable):
+                render(scene, str(Path(a.out) / f"{stem}-tt-{i:02d}.png"), head + Vector((0, 0, 0.05)), 0.55, -40 + 360.0 * i / a.turntable, 8, a.size)
         else:
             render(scene, str(Path(a.out) / f"{stem}-rear.png"), centre, extent * 1.9, 145, 15, a.size)
         C.log(f"rendered {stem}")

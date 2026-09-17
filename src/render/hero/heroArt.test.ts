@@ -21,6 +21,7 @@ import { deliveredHeroUrl, loadRigAt } from './gltfTestUtils';
 import { mergeSkinnedByMaterial, prepareHero, variantMaterialsFor } from './lod';
 
 const RIDER = deliveredHeroUrl('rider-race-bluewhite.glb', 'race-bluewhite.glb');
+const STREET = deliveredHeroUrl('rider-street-mustard.glb', 'nothing-the-60-MB-delivery-is-not-read-here.glb');
 const BIKES = { rookie: deliveredHeroUrl('bike-rookie.glb', 'bike-rookie-art.glb'), pro: deliveredHeroUrl('bike-pro.glb', 'bike-pro-art.glb') };
 const lib = { complete() {} } as unknown as MaterialLibrary;
 const ORDER = ['pelvis', 'spine', 'chest', 'neck', 'head', 'shoulder.L', 'upperArm.L', 'forearm.L', 'hand.L', 'shoulder.R', 'upperArm.R', 'forearm.R', 'hand.R', 'thigh.L', 'shin.L', 'foot.L', 'thigh.R', 'shin.R', 'foot.R'];
@@ -68,6 +69,12 @@ describe('mergeSkinnedByMaterial', () => {
       return m;
     };
     make('a1', a, 3); make('a2', a, 6); make('b1', b, 3); make('a3-nouv', a, 3, false);
+    // a2's normals arrive as a Meshopt stream: normalized Int8, 3 of every 4 bytes (the street riders' layout).
+    const a2 = scene.getObjectByName('a2') as THREE.SkinnedMesh;
+    const packed = new Int8Array(6 * 4);
+    for (let i = 0; i < 6; i++) packed.set([127, 0, -127, 0], i * 4);
+    a2.geometry.setAttribute('normal', new THREE.InterleavedBufferAttribute(new THREE.InterleavedBuffer(packed, 4), 3, 0, true));
+    (scene.getObjectByName('a1') as THREE.SkinnedMesh).geometry.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(3 * 3).fill(127), 3, true));
     mergeSkinnedByMaterial(scene);
     const meshes: THREE.SkinnedMesh[] = [];
     scene.traverse((o) => { if ((o as THREE.SkinnedMesh).isSkinnedMesh) meshes.push(o as THREE.SkinnedMesh); });
@@ -77,6 +84,11 @@ describe('mergeSkinnedByMaterial', () => {
     expect(merged.geometry.getAttribute('position').count).toBe(9);
     expect(Array.from(merged.geometry.index!.array)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
     expect(merged.geometry.getAttribute('position').getX(8)).toBe(15); // a2's last vertex (x = 5·3) follows a1's three
+    const normal = merged.geometry.getAttribute('normal');
+    expect(normal.array).toBeInstanceOf(Int8Array);
+    expect(normal.array.length).toBe(9 * 3);
+    expect([normal.getX(2), normal.getY(2), normal.getZ(2)].map((v) => +v.toFixed(3))).toEqual([1, 1, 1]);
+    expect([normal.getX(8), normal.getY(8), normal.getZ(8)].map((v) => +v.toFixed(3))).toEqual([1, 0, -1]);
     expect(merged.skeleton).toBe(skeleton);
   });
 });
@@ -196,6 +208,25 @@ describe.skipIf(!RIDER)('Astra rider (race-bluewhite) through the game loader', 
     expect(Math.abs(pelvis.position.y - baseY)).toBeLessThan(1e-3);
     // No torso-offset double application: the spine moves by the cycle's own few degrees, never the 10° entry ease.
     expect(maxSpine).toBeLessThan(0.06);
+  });
+});
+
+describe.skipIf(!STREET)('Astra street rider (mustard, stage-0 file) through prepareHero', () => {
+  it('merges the fourteen skinned parts down to one draw per material, keeps every triangle and leaves no physical / blended material', async () => {
+    const gltf = await loadRigAt(STREET!, true);
+    const raw = countMeshes(gltf.scene);
+    await prepareHero(gltf);
+    const after = countMeshes(gltf.scene);
+    const materials = new Set<THREE.Material>();
+    gltf.scene.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) for (const mat of Array.isArray(m.material) ? m.material : [m.material]) { materials.add(mat); expect(mat.transparent).toBe(false); expect(mat.side).toBe(THREE.DoubleSide); } });
+    expect(after.tris).toBe(raw.tris);
+    expect(after.meshes).toBeLessThanOrEqual(raw.meshes); // the stage file arrives part-joined by the art build; what is left shares no material
+    expect(after.meshes).toBeLessThanOrEqual(materials.size);
+    expect(after.physical).toBe(0);
+    expect(raw.physical).toBeGreaterThan(0); // KHR_materials_specular on the skin / hair
+    const rider = new GltfRider(gltf, lib);
+    expect(rider.debug.bones).toBe(19);
+    expect(rider.debug.clips).toContain('land_absorb');
   });
 });
 

@@ -439,7 +439,7 @@ The verifier decodes delivery and export with the production GLTFLoader + Meshop
 exactly 59/119/119/149/149/149 frames at 30 fps with every 1/30 s world pose within 1 mm / 1 mrad of the delivery
 (measured 0.19 mm); finite samples; normalized weights; tri/draw budgets. Bikes: 23 parts + 22 `attach_*` markers
 with equal transforms and extras, chain/hose vertex order exact, other protected surfaces position-identical. Each
-`.source.json` records the sha256s, what was dropped/joined/decimated/rescaled, hand floors, hair bake, atlas size.
+`.source.json` records sha256s, what was dropped/joined/decimated/rescaled, hand floors, hair bake, atlas size.
 Pipeline: `unpack_meshopt.mjs` decodes the delivery (the 5.2 importer cannot read it); `hero_art_import.py` in
 Blender drops the dead 0-triangle prototype mesh and the groom, derives the hair shell, welds + collapses each part
 to its share of the budget (LOD: hand parts, found by over 50 % `hand.*` weight, keep at least 400 tris so fingers
@@ -457,11 +457,11 @@ to a 12-bit shared exponent; the clips moved up to 3 cm / 1.8 deg at the hands a
 stream is decoded back and compared before writing. (2) The delivered garments are split along every panel seam
 (46 k boundary edges on the sweatshirt) and collapse never removes boundary edges, so the LOD bottomed out at 6.8 k
 tris; a 1e-5 m weld before decimation fixed it.
-
 Hair: the 3,456,000-triangle groom is 9,000 strands x 65 rings x 3 verts, all weighted 1.0 to `head`. `hero_art_hair.py`
-turns the strand cloud into a closed shell (Geometry Nodes Mesh to Points, Points to Volume at 4.5 mm radius / 3 mm
-voxel, Volume to Mesh), collapses it (8 k full / 1.2 k LOD), smart-unwraps it and bakes tangent normal + AO from the
-real strands (selected-to-active, 512 px), folding the AO into a lifted dark-brown albedo (roughness 0.9, specular
-0.15). Alternative not built: ribbon strips along `strand_centrelines()` with an alpha-tested strand texture over the
-shell for a wispier silhouette (up to 7 k tris). Open-face drops the groom (hidden in the delivery). Attribution
-(Bystedt CC BY-SA groom, beard licence ambiguity) carries over from ART_HANDOFF.md.
+turns the strand cloud into a closed shell (Geometry Nodes Points to Volume, 4.5 mm radius / 3 mm voxel, Volume to
+Mesh), shrinks it 2 mm along its normals, collapses it (8 k full / 1.2 k LOD) with two smooth passes and true smooth
+vertex normals, unwraps it and bakes tangent normal (strength 0.35) + AO from the real strands (512 px); albedo =
+delivered strand colour x6 + 0.12 grey sheen (matched on rendered stills), AO floor 0.45, skin tint where the shell
+is < 12 mm from the scalp; roughness 0.9, specular 0.08. `--hair-v1` rebuilds the round-1 shell (inflated, flat-shaded,
+jet black); `docs/evidence/hero-art/hair-options/` holds the matched stills; ribbons (`--ribbons N`, option c there)
+read as texture and are not shipped. Open-face drops the groom. Bystedt CC BY-SA / beard licence notes: ART_HANDOFF.md.

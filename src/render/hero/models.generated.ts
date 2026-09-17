@@ -77,14 +77,14 @@ export const MODEL_ASSETS = {
     "sha256": "f660ac40b063d2a317502c27827dca834c4d9efd32751c1a54efa3e4dbc12c33"
   },
   "models/rider-street-charcoal-lod.glb": {
-    "url": "models/16776c5b25d408d2/rider-street-charcoal-lod-db444fb573e3ab86.glb",
-    "bytes": 1534364,
-    "sha256": "db444fb573e3ab865cd8bfcd1170eb0cef27bd1ee1ec3c7873bf77db9ac27159"
+    "url": "models/9ca551ed8de4fa1a/rider-street-charcoal-lod-8d3dc8e6f51a6eb4.glb",
+    "bytes": 1561328,
+    "sha256": "8d3dc8e6f51a6eb4c3faa3ddb2ba8b1749012f5a7e6b4023ea1b2f19bf86b739"
   },
   "models/rider-street-charcoal.glb": {
-    "url": "models/16776c5b25d408d2/rider-street-charcoal-453b38d4955f62df.glb",
-    "bytes": 3050004,
-    "sha256": "453b38d4955f62dfea9ae8f1bd71323719c04f12d5e3b2142f3792cda17c9a32"
+    "url": "models/9ca551ed8de4fa1a/rider-street-charcoal-7f18c17e3933ae0e.glb",
+    "bytes": 3145616,
+    "sha256": "7f18c17e3933ae0e602050ccc01100b5fe206155e9002e5b88fbda9614ec9410"
   },
   "models/rider-street-lod.glb": {
     "url": "models/f52d537f93059e68/rider-street-lod-a209dd19ab7b5cb8.glb",
@@ -92,14 +92,14 @@ export const MODEL_ASSETS = {
     "sha256": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3"
   },
   "models/rider-street-mustard-lod.glb": {
-    "url": "models/625e93f1e17e18c7/rider-street-mustard-lod-bebc0fbecc65a75f.glb",
-    "bytes": 1581456,
-    "sha256": "bebc0fbecc65a75f51670829c9601c547617f8755d2ed4a35b05e547f9e9d2f9"
+    "url": "models/2d50a456a6b80a77/rider-street-mustard-lod-78458d1a8d92b4d3.glb",
+    "bytes": 1608420,
+    "sha256": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4"
   },
   "models/rider-street-mustard.glb": {
-    "url": "models/625e93f1e17e18c7/rider-street-mustard-e188c6931621f9bd.glb",
-    "bytes": 3171116,
-    "sha256": "e188c6931621f9bd9a3f8437c349ab77794602b6fcba85c3c44c95260722f6cd"
+    "url": "models/2d50a456a6b80a77/rider-street-mustard-122c1d06e3834afc.glb",
+    "bytes": 3267248,
+    "sha256": "122c1d06e3834afc339ebd15d4a95fc75cb35a0ea07db1e7d623e3093b2c00ac"
   },
   "models/rider-street-openface-lod.glb": {
     "url": "models/922c290afefbf12c/rider-street-openface-lod-6765b5f93710302c.glb",

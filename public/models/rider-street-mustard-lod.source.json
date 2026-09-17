@@ -2,7 +2,7 @@
   "source": "prototypes/hero-garage/public/assets/street01-rider-round33-lossless.glb",
   "sourceSha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a",
   "decodedSha256": "ec0a08fd24b588b34372583ace39a67ee001a12e55315cf1a2c5c611f2f74c1f",
-  "exportSha256": "bebc0fbecc65a75f51670829c9601c547617f8755d2ed4a35b05e547f9e9d2f9",
+  "exportSha256": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4",
   "kind": "rider",
   "lod": true,
   "stage": 1,
@@ -500,15 +500,26 @@
       }
     },
     "hair": {
+      "version": 2,
       "shellRawTris": 91632,
       "shellTris": 1004,
+      "verts": 858,
       "voxel": 0.003,
       "radius": 0.0045,
+      "shrink": 0.002,
+      "smooth": 2,
       "bake": {
         "normal": "hair_shell_normal",
         "albedo": "hair_shell_albedo",
         "size": 256,
-        "samples": 16
+        "samples": 16,
+        "version": 2,
+        "lift": 6,
+        "grey": 0.12,
+        "roughness": 0.9,
+        "specular": 0.08,
+        "normalStrength": 0.35,
+        "scalpTint": true
       }
     },
     "handFloors": {
@@ -534,20 +545,20 @@
       "inverse binds",
       "clip times"
     ],
-    "rawBytes": 2385088,
-    "packedBytes": 1581456
+    "rawBytes": 2404704,
+    "packedBytes": 1608420
   },
   "verified": {
-    "bytes": 1581456,
-    "sha256": "bebc0fbecc65a75f51670829c9601c547617f8755d2ed4a35b05e547f9e9d2f9",
+    "bytes": 1608420,
+    "sha256": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4",
     "triangles": 7836,
-    "vertices": 9371,
+    "vertices": 9206,
     "draws": 6,
     "meshes": 6,
     "materials": 6,
     "images": 9,
     "maxTexture": 1024,
-    "imageBytes": 1184917,
+    "imageBytes": 1213089,
     "bones": 19,
     "clips": {
       "compression": {
@@ -608,14 +619,14 @@
         "kind": "png",
         "w": 256,
         "h": 256,
-        "bytes": 145741
+        "bytes": 154583
       },
       {
         "name": "hair_shell_albedo",
         "kind": "png",
         "w": 256,
         "h": 256,
-        "bytes": 67348
+        "bytes": 86678
       },
       {
         "name": "eyebrow001",
@@ -671,7 +682,7 @@
       {
         "name": "hair_shell",
         "tris": 1004,
-        "verts": 1942,
+        "verts": 1777,
         "primitives": 1,
         "instances": 1,
         "materials": [
@@ -730,5 +741,5 @@
       }
     ]
   },
-  "blenderSeconds": 10.052
+  "blenderSeconds": 17.925
 }

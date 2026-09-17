@@ -56,6 +56,8 @@ def args():
     p.add_argument("--atlas", type=int, default=None, help="stage>=1: body atlas size (default 2048, LOD 1024)")
     p.add_argument("--bake-dir", default=None, help="stage>=1: where baked atlas JPEGs are written (default: temp dir)")
     p.add_argument("--hair-bake", type=int, default=None, help="stage>=1: hair bake size (default 512, LOD 256)")
+    p.add_argument("--hair-v1", action="store_true", help="the round-1 shell recipe (inflated, flat-shaded, full-strength normal)")
+    p.add_argument("--ribbons", type=int, default=0, help="stage>=1 comparison: add silhouette ribbons with this triangle budget")
     return p.parse_args(argv)
 
 
@@ -100,7 +102,7 @@ def cap_images(max_color, max_data, jpeg_color=True):
             continue
         role = image_role(img)
         cap = max_color if role == "color" else max_data
-        if img.name.startswith(("rider_body", "hair_shell", "bike_atlas")):
+        if img.name.startswith(("rider_body", "hair_shell", "hair_ribbon", "bike_atlas")):
             cap = max(img.size)  # baked at the intended size already
         if any(k in img.name.lower() for k in SMALL_IMAGE):
             cap = min(cap, 512)
@@ -424,12 +426,18 @@ def main():
             if scene.world is None:
                 scene.world = bpy.data.worlds.new("bake")
             hair_budget = a.hair_tris or (1200 if a.lod else 8000)
-            shell, report["hair"] = H.build_hair(groom, arm, budget=hair_budget, bake_size=a.hair_bake or (256 if a.lod else 512))
+            scalp = next((o for o in scene_objects() if o.type == "MESH" and o.name.startswith("Street01_Authored_EditableBody")), None)
+            shell, report["hair"] = H.build_hair(groom, arm, budget=hair_budget, bake_size=a.hair_bake or (256 if a.lod else 512),
+                                                 version=1 if a.hair_v1 else 2, scalp=scalp)
             report["dropped"].append({"object": groom.name, "mesh": groom.data.name, "tris": C.tri_count(groom), "replacedBy": shell.name})
+            protected = (shell.name,)
+            if a.ribbons > 0:
+                alpha_like = next((m for m in bpy.data.materials if "eyebrow" in m.name), None)
+                ribbons, report["ribbons"] = H.build_ribbons(groom, arm, shell, budget=a.ribbons, alpha_like=alpha_like)
+                protected = (shell.name, ribbons.name)
             delete_objects([groom])
             for me in [m for m in bpy.data.meshes if m.users == 0]:
                 bpy.data.meshes.remove(me)
-            protected = (shell.name,)
     else:
         protected = BIKE_PROTECTED
         budget = a.tris or (6000 if a.lod else 33500)

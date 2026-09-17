@@ -10,9 +10,10 @@
  *   gate proves; the hero is render-only and any drift is a finding.
  * WebKit here is Playwright's macOS build: WebKit + ANGLE-on-Metal, the iOS Safari stack (harness/hero-webkit.mts).
  *   npx tsx harness/e2e/hero-art-clip.mts [--out=DIR] [--engine=webkit|chromium] [--geom=874x330] [--dpr=3]
- *                                         [--ride-ticks=N (per ride; default the whole golden)] [--quality=high] [--fast]
+ *                                         [--ride-ticks=N (per ride; default the whole golden)] [--quality=high] [--garage-quality=high] [--fast]
  * Writes <out>/clip.webm (+ clip.mp4 when ffmpeg is present), sheet.jpg, log.json (every swap's frames, the ride
- * samples, the hashes) — evidence is judged from the clip, the JSON only says what to look at.
+ * samples, the hashes) and one device-pixel still per settled swap (`garage-<outfit>[-<bike>].png`, DPR × viewport)
+ * — evidence is judged from the clip, the JSON only says what to look at, the stills are for pixel-level inspection.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -35,6 +36,8 @@ const DPR = Number(args.get('dpr') ?? 3);
 const rideTicksCap = Number(args.get('ride-ticks') ?? 0);
 const quality = args.get('quality') ?? 'high';
 const fast = args.has('fast');
+/** `--garage-quality=high`: pin the garage tier for pixel inspection of the authored rider (the phone's own tier is the governor's; say so in the evidence). */
+const garageQuality = args.get('garage-quality');
 fs.mkdirSync(out, { recursive: true });
 
 const expected = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'harness', 'gate', 'expected.json'), 'utf8')) as Record<string, Record<string, { hash: string; file?: string; finishTime?: number; ticks?: number }>>;
@@ -84,6 +87,7 @@ const PROBE_SRC = `window.__swapProbe = (function () {
 })();`;
 
 const swaps: Swap[] = [];
+let currentOutfit = 'boot';
 async function swapTo(kind: 'outfit' | 'bike', target: string): Promise<void> {
   await page.evaluate(PROBE_SRC);
   const tapMs = now();
@@ -100,6 +104,9 @@ async function swapTo(kind: 'outfit' | 'bike', target: string): Promise<void> {
   // Hold the settled hero for a beat so the clip shows it, and the probe gets its tail frames.
   await page.waitForTimeout(700);
   const frames = await page.evaluate(() => (window as unknown as { __swapProbe: { stop(): SwapFrame[] } }).__swapProbe.stop());
+  // A device-pixel still of the settled hero (DPR × viewport): the close-up the video (CSS px) cannot give — mirror twin, hair shell, beard edges.
+  if (kind === 'outfit') currentOutfit = target;
+  await page.screenshot({ path: path.join(out, `garage-${currentOutfit}${kind === 'bike' ? `-${target}` : ''}.png`), animations: 'disabled' });
   const flash: string[] = [];
   for (const f of frames) {
     if (!f.garageOn) flash.push(`frame ${f.i} (${f.ms} ms): garage stage OFF`);
@@ -174,7 +181,8 @@ try {
   await page.waitForSelector('.garage-screen.live', { timeout: 30_000 });
   await page.evaluate(async () => { await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); });
   mark('garageLive');
-  log['garageBoot'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], garage: d['garage'], tier: d['tier'], profile: d['profile'] }; });
+  if (garageQuality) await page.evaluate(async (q) => { (window as unknown as { __trials: { setQuality(t: string): void } }).__trials.setQuality(q); await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); }, garageQuality);
+  log['garageBoot'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], heroTris: d['heroTris'], garage: d['garage'], tier: d['tier'], profile: d['profile'], dpr: d['dpr'], canvas: `${d['canvasW']}x${d['canvasH']}` }; });
   await page.waitForTimeout(1000);
   // Every outfit; on each, Pro then Rookie so both liveries are seen under every outfit (15 swaps).
   for (const preset of AVAILABLE_RIDER_PRESETS) {
@@ -183,7 +191,7 @@ try {
     await swapTo('bike', 'rookie');
   }
   mark('garageDone');
-  log['garageStats'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], heroTris: d['heroTris'], garage: d['garage'], tier: d['tier'], profile: d['profile'] }; });
+  log['garageStats'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], heroTris: d['heroTris'], garage: d['garage'], tier: d['tier'], profile: d['profile'], dpr: d['dpr'], canvas: `${d['canvasW']}x${d['canvasH']}` }; });
   await tap('.garage-screen.live .backbtn');
   await page.waitForFunction(() => !!document.querySelector('.menu-screen.live'), null, { timeout: 20_000 });
   mark('backInMenu');

@@ -90,3 +90,20 @@ owner joins when there is a file to play. Prototype retirement is the last round
 - Open from the frames: hand-to-grip residual up to 11.8 / 14.6 cm in hang-back / launch and elbows above the helmet
   in attack — to be measured against the legacy rider before calling it the art's; the phone-proxy garage clip predates
   the `lodChoice` rule (it shows the LOD hero) and is re-cut next round.
+
+### Round 2 (2026-09-17 01:25) — hair shell v2, the street merge that never ran, the boot bytes
+
+- Hair: ribbons judged against the delivered groom and rejected (they read as texture); the gap was the shell itself —
+  flat facets from split vertices, jet-black gloss, an inflated volume. Shell v2 (smooth normals, strand albedo ×6 +
+  sheen matched to the reference's crown mean sRGB 0.229/0.182/0.159 → 0.223/0.161/0.137, roughness 0.9, −2 mm) ships
+  for mustard and charcoal at the same 7.7 k / 1 draw; stills a/b/c/d in `docs/evidence/hero-art/hair-options/`.
+- `prepareHero` threw on every Street rider (Meshopt's stride-padded Int8 normals are interleaved) and the loader
+  swallowed it — the merge, physical flatten and cut-out normalisation only ever ran on the Race path. Fixed
+  component-wise; `heroArt.test.ts` runs the mustard document end to end.
+- Hands on grips: the Astra and legacy riders pose to the identical `wristErr` per tick (worst 11.80 cm @ tick 1374
+  Rookie, 14.62 cm @ 1518 Pro, max |Δ| 0.01 cm) — the residual is the rider body vs arm reach, `RIDING_POSES.md`'s.
+- 3G boot B3: not a freeze — 1 % of a 10.1 MB boot is 101 KB ≈ 2.1 s at 48 KB/s, because both twins are fetched
+  (hero 3.9 → 7.5 MB). Decision: boot fetches the pair the first frame draws (LOD on phones / desktop low-medium,
+  authored on desktop-high) and streams the twin after `ready` — next round.
+- Garage on every tier draws the authored rider (hero 65 k); `pnpm harness:e2e --only=heroart` is the opt-in played
+  flow. Heap growth 6.11 MB / 60 s repeats on the gate (limit 5) — A/B against `LEGACY_HERO` next round.

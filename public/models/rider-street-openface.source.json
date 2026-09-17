@@ -279,6 +279,7 @@
       }
     },
     "hair": null,
+    "handFloors": null,
     "atlas": {
       "size": 2048,
       "parts": null
@@ -469,5 +470,5 @@
       }
     ]
   },
-  "blenderSeconds": 5.271
+  "blenderSeconds": 10.69
 }

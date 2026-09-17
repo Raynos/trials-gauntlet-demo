@@ -2,7 +2,7 @@
   "source": "prototypes/hero-garage/public/assets/street01-rider-round33-lossless.glb",
   "sourceSha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a",
   "decodedSha256": "ec0a08fd24b588b34372583ace39a67ee001a12e55315cf1a2c5c611f2f74c1f",
-  "exportSha256": "e188c6931621f9bd9a3f8437c349ab77794602b6fcba85c3c44c95260722f6cd",
+  "exportSha256": "122c1d06e3834afc339ebd15d4a95fc75cb35a0ea07db1e7d623e3093b2c00ac",
   "kind": "rider",
   "lod": false,
   "stage": 1,
@@ -19,9 +19,9 @@
   "reduced": {
     "triangles": {
       "budget": 60000,
-      "before": 213309,
+      "before": 213321,
       "after": 58976,
-      "ratio": 0.2447752842971207
+      "ratio": 0.24469967336075488
     },
     "dropped": [
       {
@@ -69,7 +69,7 @@
       {
         "object": "Street01_Authored_EditableBody_Runtime",
         "before": 34358,
-        "after": 8239
+        "after": 8237
       },
       {
         "object": "Street01_grinsegold_full_beard_Runtime",
@@ -79,7 +79,7 @@
       {
         "object": "rider:anatomical sweatshirt",
         "before": 132256,
-        "after": 31724
+        "after": 31714
       },
       {
         "object": "rider:folded hood",
@@ -274,17 +274,29 @@
       }
     },
     "hair": {
+      "version": 2,
       "shellRawTris": 91632,
-      "shellTris": 7677,
+      "shellTris": 7689,
+      "verts": 4190,
       "voxel": 0.003,
       "radius": 0.0045,
+      "shrink": 0.002,
+      "smooth": 2,
       "bake": {
         "normal": "hair_shell_normal",
         "albedo": "hair_shell_albedo",
         "size": 512,
-        "samples": 16
+        "samples": 16,
+        "version": 2,
+        "lift": 6,
+        "grey": 0.12,
+        "roughness": 0.9,
+        "specular": 0.08,
+        "normalStrength": 0.35,
+        "scalpTint": true
       }
     },
+    "handFloors": null,
     "atlas": {
       "size": 2048,
       "parts": null
@@ -303,20 +315,20 @@
       "inverse binds",
       "clip times"
     ],
-    "rawBytes": 5453028,
-    "packedBytes": 3171116
+    "rawBytes": 5474056,
+    "packedBytes": 3267248
   },
   "verified": {
-    "bytes": 3171116,
-    "sha256": "e188c6931621f9bd9a3f8437c349ab77794602b6fcba85c3c44c95260722f6cd",
+    "bytes": 3267248,
+    "sha256": "122c1d06e3834afc339ebd15d4a95fc75cb35a0ea07db1e7d623e3093b2c00ac",
     "triangles": 58976,
-    "vertices": 47158,
+    "vertices": 45412,
     "draws": 6,
     "meshes": 6,
     "materials": 6,
     "images": 9,
     "maxTexture": 2048,
-    "imageBytes": 1981023,
+    "imageBytes": 2092817,
     "bones": 19,
     "clips": {
       "compression": {
@@ -377,14 +389,14 @@
         "kind": "png",
         "w": 512,
         "h": 512,
-        "bytes": 317700
+        "bytes": 418897
       },
       {
         "name": "hair_shell_albedo",
         "kind": "jpeg",
         "w": 512,
         "h": 512,
-        "bytes": 12199
+        "bytes": 25114
       },
       {
         "name": "eyebrow001",
@@ -405,21 +417,21 @@
         "kind": "jpeg",
         "w": 2048,
         "h": 2048,
-        "bytes": 99060
+        "bytes": 98322
       },
       {
         "name": "rider_body_orm",
         "kind": "jpeg",
         "w": 1024,
         "h": 1024,
-        "bytes": 382544
+        "bytes": 380372
       },
       {
         "name": "rider_body_albedo",
         "kind": "jpeg",
         "w": 2048,
         "h": 2048,
-        "bytes": 600334
+        "bytes": 600926
       },
       {
         "name": "Full_beard_black_diff",
@@ -439,8 +451,8 @@
     "meshList": [
       {
         "name": "hair_shell",
-        "tris": 7677,
-        "verts": 11100,
+        "tris": 7689,
+        "verts": 9360,
         "primitives": 1,
         "instances": 1,
         "materials": [
@@ -469,8 +481,8 @@
       },
       {
         "name": "rider_body",
-        "tris": 50107,
-        "verts": 35318,
+        "tris": 50095,
+        "verts": 35312,
         "primitives": 1,
         "instances": 1,
         "materials": [
@@ -499,5 +511,5 @@
       }
     ]
   },
-  "blenderSeconds": 12.395
+  "blenderSeconds": 20.148
 }

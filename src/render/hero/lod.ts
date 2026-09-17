@@ -182,14 +182,17 @@ export function mergeSkinnedByMaterial(root: THREE.Object3D): void {
       const src = first.geometry.getAttribute(name) as THREE.BufferAttribute;
       const total = list.reduce((n, m) => n + m.geometry.getAttribute(name).count, 0);
       const Arr = src.array.constructor as new (n: number) => typeof src.array;
-      const out = new Arr(total * src.itemSize);
+      const out = new THREE.BufferAttribute(new Arr(total * src.itemSize), src.itemSize, src.normalized);
+      // Component-wise through the accessors, never `array.set`: a Meshopt-decoded stream keeps its byte stride (the
+      // street riders' Int8 normals are 3 of 4 bytes — `InterleavedBufferAttribute`), and `get/setComponent` also
+      // carry the normalisation both ways.
       let offset = 0;
       for (const m of list) {
-        const a = m.geometry.getAttribute(name) as THREE.BufferAttribute;
-        out.set(a.array as ArrayLike<number>, offset);
-        offset += a.array.length;
+        const a = m.geometry.getAttribute(name);
+        for (let i = 0; i < a.count; i++) for (let c = 0; c < a.itemSize; c++) out.setComponent(offset + i, c, a.getComponent(i, c));
+        offset += a.count;
       }
-      merged.setAttribute(name, new THREE.BufferAttribute(out, src.itemSize, src.normalized));
+      merged.setAttribute(name, out);
     }
     const verts = merged.getAttribute('position').count;
     if (first.geometry.index) {

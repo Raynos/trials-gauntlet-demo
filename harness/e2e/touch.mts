@@ -18,6 +18,7 @@
  *                                       runs alone before the pool. The check and failure totals do not depend on N; the
  *                                       per-flow lines interleave by completion.
  *   pnpm harness:e2e --only=review      the level reviewer: REVIEW tab → picker → segments / note / Copy review / pan / fly / ride (harness/e2e/review.mts)
+ *   pnpm harness:e2e --only=heroart     opt-in (~2 min, WebKit): the played hero-art clip — garage outfit / livery swaps flash-probed, b1 on both goldens hash-checked (harness/e2e/hero-art-clip.mts)
  *
  * Rules the suite enforces (each is a past phone bug):
  *   R1  after a screen change, only the new screen's elements are hit-testable (visibility isolation);
@@ -1046,6 +1047,25 @@ if (onlyList?.includes('benchfull')) {
         fs.writeFileSync('harness/out/bench/device-full.json', JSON.stringify(r.report, null, 1));
         console.log(`  bench full run ${(r.ms / 1000).toFixed(1)} s → harness/out/bench/device-full.{md,json}`);
       }
+    },
+  });
+}
+/**
+ * Opt-in like benchfull: `--only=heroart` runs harness/e2e/hero-art-clip.mts (ask 43) as a child — its own WebKit
+ * (the iOS Safari stack, not this file's SwiftShader Chromium), its own frozen server, a video recorder and two
+ * real-time b1 rides (~2 min). Exit 1 there = a grey-flash frame, a page error or a hash drift; the child's stdout
+ * is the flow's log and `harness/out/hero-art-clip/` holds the clip, sheet, stills and log.json.
+ */
+if (onlyList?.includes('heroart')) {
+  tasks.push({
+    name: 'heroart',
+    run: async () => {
+      console.log('== heroart (hero-art-clip.mts: WebKit, garage swaps + b1 on both goldens)');
+      const { spawnSync } = await import('node:child_process');
+      const r = spawnSync('node_modules/.bin/tsx', ['harness/e2e/hero-art-clip.mts', '--out=harness/out/hero-art-clip'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+      checks += 1;
+      for (const line of r.stdout.split('\n')) if (/^(swap|ride) /.test(line)) console.log(`  ${line}`);
+      if (r.status !== 0) fails.push({ flow: 'heroart', rule: 'heroart', detail: `hero-art-clip exit ${r.status}: ${(r.stdout + r.stderr).split('\n').filter((l) => /FLASH|failure|match=false|Error/.test(l)).slice(0, 5).join(' | ') || 'see harness/out/hero-art-clip/log.json'}` });
     },
   });
 }

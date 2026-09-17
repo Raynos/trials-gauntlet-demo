@@ -77,3 +77,35 @@ Nothing in the run raised a page error; the only console warning was the known `
 - `pnpm exec tsx harness/e2e/outfits.mts` (Chromium): PASS — outage / retry on `rider-street-openface`, five presets ×
   two classes × full / LOD, live material names (`rider_body` on Street, `race-<outfit> technical fabric…` on Race),
   every outfit's and class's own full + LOD file fetched (14 model files).
+
+## Round 2 re-cut on `3af533e` (`lodChoice`: authored rider in the garage on every tier, LOD in-level on phone tiers)
+
+Same tool, `dist/` rebuilt 2026-09-17 01:02; files suffixed `-r2`. `pnpm harness:e2e --only=heroart` now runs the same
+clip as an opt-in flow (1/1 pass, 129 s). Both rides still hash to the node replay (`389a5dc6c07ab8c3` /
+`f0549ee508d870ed`), no flash on any of the 15 swaps (probe: stage on, `hidden` 575, never procedural).
+
+| where | tier / profile | canvas | heroDoc | calls | tris (hero) |
+| --- | --- | --- | --- | --- | --- |
+| garage, phone proxy (governor) | `low` / `low` | 874×330 @ dpr 1 (upscaled ×3 by the phone) | **`bike-lod rider`** (authored rider, LOD bike) | 88 Street / 73 Race | 206 117 (**64 769** Street) / 161 468 (**49 886** Race) |
+| garage, `--garage-quality=high` (inspection, first outfit only — the governor dropped it to `low` within the run) | `high` / `phone-high` | 1311×495 @ dpr 1.5 | `bike-lod rider` | 88 | 206 117 (64 769) |
+| b1 ride, `high` (the evidence clip) | `high` / `high` | 874×330 | `bike rider` | 200 / 196 | 297 603 / 264 303 |
+| b1 ride, `medium` (= phone-high's document choice; `--quality=medium --ride-ticks=600`) | `medium` / `medium` | 874×330 | **`bike-lod rider-lod`** | 166 / 157 | 121 857 / 122 203 |
+
+Round 1 had `bike-lod rider-lod` / 13.6 k hero tris in the garage; the authored rider is now up there on `low`.
+
+**DPR-3 inspection of the authored rider in the garage** (`still-garage-mustard-dpr3-low-r2.jpg` = the whole 2622×990
+screenshot; `zoom-garage-heads-dpr3-low-r2.jpg` = mustard / open-face / charcoal / blue-white heads ×2;
+`zoom-garage-mirror-low-r2.jpg` and `zoom-garage-mirror-phonehigh-r2.jpg` = the floor under the pro bike, mustard;
+`zoom-garage-head-phonehigh-r2.jpg` = mustard head ×3 nearest-neighbour at phone-high):
+
+1. **The phone's own garage tier renders at dpr 1** (874×330 backing store on a 2622×990 screen): every device-pixel
+   still is a ×3 upscale, so hair-shell / beard alpha edges and mirror z-fighting cannot be judged at DPR 3 on the
+   tier the phone actually runs — they are 3-px blocks. At phone-high (dpr 1.5) it is ×2. Finding for the render
+   owner: the garage close-up is a 1× canvas on the phone.
+2. Hair shell: at both tiers the hair reads as a solid dark cap with a blocky silhouette (mustard, charcoal,
+   open-face all in `zoom-garage-heads-dpr3-low-r2.jpg`); no light halo or sorting popping against the sky window
+   in any of the 15 stills; the beard / moustache are not distinguishable from the jaw shadow at this resolution.
+3. Mirror floor: the reflection is a soft blurred twin (rookie blue / pro yellow follow the livery); no striping or
+   z-fight banding in either mirror crop; the reflection sits offset below the bike by ~40 css px (a gap between the
+   tyre and its twin) in both tiers — a stage / mirror-plane offset, not a fight.
+4. The pro / rookie taps still repaint the livery only (`zoom-phone-garage-livery.jpg` behaviour unchanged).
