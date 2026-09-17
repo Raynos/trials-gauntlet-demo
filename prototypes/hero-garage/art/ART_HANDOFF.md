@@ -1,8 +1,14 @@
-# Art handoff — round 27
+# Art handoff — round 28
 
 This task owns Blender art and review exports. Claude + Opus own game integration. The catalog selects the provisionally accepted assets; final visual approval belongs to the user.
 
-## Active assets and rebuild
+## Current delivery
+
+Catalog rider: `street01-rider-delivery-lossless.glb` (61,517,796bytes), SHA `73dc56a34474203f9a5abbe4a31d39d0b7399ab2c296c20c2a642f45777764fe`. Bike: `street01-bike-finish.glb`, SHA `212cab964c9264942d2e2b96a9790c608fe6c31a96e4adc41590177f9c78f511`. Rebuild rider with `python3 tools/build-art-delivery.py --stage 29 --execute --pack` from this prototype; see `art/delivery/REBUILD.md`. Bike source/recipe: `art/bike-finish/`. The packed rider requires EXT_meshopt_compression and MeshoptDecoder. It retains all dense geometry; no mobile performance claim. Raw reproduction is SHA-exact;12 render comparisons are byte identical.
+
+Round28 resolves shoe panel intersection, preserves accepted saddle geometry, adds dedicated denim UV/textures and fitted cuffs, and removes only786 buried neck flange triangles. Face/groom attributes remain intact. Remaining: elbow pinching, broad garment shape, noisy bike paint, physical iPhone validation and final user approval. Review `reports/art-round28-review.json`. Usage14% remaining.
+
+## Previous accepted baseline and provenance
 
 - Rider: `/assets/street01-rider-tailored.glb`, SHA `d6122a389e38cf7ea209b00b386efe6f12a8d48357fef1f969345ccc90938bec`. The dense local GLB is ignored by Git. From repository root, run background Blender with `art/full-rider-identity/build.py`, then `art/hoodie-shell/build.py`, then `art/hoodie-shell/assemble.py` (all under this prototype). The saved face, curls and beard are retained. Editable clothing: `art/hoodie-shell/hoodie-source.blend`; supporting recipes preserve the original source and use a continuous control cage.
 - Bike: `/assets/street01-bike-detail.glb`, SHA `dc70ee964be894777a344a8c343cdeec42e81dfd0f5fa5a2055c695037b96cf9`. Editable `art/bike-detail/bike-detail.blend`; `art/bike-detail/build.py` derives it from the previous refined bike. Clamp shells rotate around fixed fork centres; number-board mounts are added. Joint hierarchy and attachment transforms are preserved.

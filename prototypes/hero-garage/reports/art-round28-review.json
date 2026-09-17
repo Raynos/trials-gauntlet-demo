@@ -1,0 +1,27 @@
+{
+  "round": 28,
+  "status": "provisionally-accepted; final user approval open",
+  "rider": "73dc56a34474203f9a5abbe4a31d39d0b7399ab2c296c20c2a642f45777764fe",
+  "bike": "212cab964c9264942d2e2b96a9790c608fe6c31a96e4adc41590177f9c78f511",
+  "changes": [
+    "Continuous shirt UVs, cloth thickness and fitted cords",
+    "Neckline fit and buried bust flange trim; face/curls/beard preserved",
+    "Fitted glove cuffs and shoe panels",
+    "Accepted-contact denim with dedicated texture",
+    "Satin bike structure and smoother static control tubes"
+  ],
+  "evidence": [
+    "art-round28-final.json:48 timed views, six clips, two lights",
+    "bike-finish-review.json:12 timed views",
+    "art-lossless-render-compare.json:12 byte-identical PNGs",
+    "art/delivery/runs/20260917T013250Z-ec1daec8/manifest.json:exact raw SHA reproduction"
+  ],
+  "remaining": [
+    "Elbow pinching reads disconnected in some poses; correction in progress",
+    "Garment folds and silhouette still stylized, not AAA acceptance",
+    "Bike panels still show noisy atlas finish",
+    "Dense geometry remains costly despite transfer compression",
+    "Physical iPhone validation and final user approval open"
+  ],
+  "usageRemainingPercent": 14
+}

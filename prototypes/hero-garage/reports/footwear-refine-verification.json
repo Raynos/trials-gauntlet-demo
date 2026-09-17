@@ -1,0 +1,8 @@
+{
+  "verticesVerified": 8774,
+  "skinJoints": 19,
+  "rigidFootWeightsVerified": true,
+  "finitePositionsVerified": true,
+  "textures": "Three lossless PNG maps",
+  "status": "static invariants pass; assembled motion and visual acceptance parent-owned"
+}

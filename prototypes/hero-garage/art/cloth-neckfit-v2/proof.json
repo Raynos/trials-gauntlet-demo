@@ -1,0 +1,62 @@
+{
+  "assembly": {
+    "removedSourceClothAndHighDrawcordTriangles": 19929,
+    "removedInterimCollarTriangles": 584,
+    "sourceClothTriangles": 19930,
+    "oldBodyBinaryPrefixIdentical": true,
+    "headTrim": {
+      "cutAxialHeightM": 0.018,
+      "removedTriangles": 786,
+      "keptTriangles": 34358,
+      "allTrianglesTouchingAboveCutRetainedExact": true,
+      "headAttributesByteExact": true,
+      "maximumRemovedVertexHeightM": 0.01798491716314668,
+      "rimAxialHeightM": 0.02641853784,
+      "minimumAxialCutToRimGapM": 0.00843362067685332
+    },
+    "faceAttributesAndGroomMeshesPreserved": true,
+    "sixAnimationsAndSkinJSONIdentical": true,
+    "outputSHA256": "e6b28b3c79bd89e555e583ddb1b5218fb9518cde197bd192d432d399548a241c",
+    "outputBytes": 181369072
+  },
+  "garmentFit": {
+    "rimVertices": 148,
+    "rimClearanceM": 0.003,
+    "weightMethod": "100% head at rim, smoothstep fade into original weights over70mm geodesic",
+    "harmonicAnnulus": {
+      "method": "Dirichlet discrete harmonic annulus, positive uniform edge weights; fixed fitted neck and fixed outer cage",
+      "radiusM": 0.07,
+      "solvedVertices": 559,
+      "iterations": 186,
+      "lastIterationMaxDeltaM": 1.9070408585619703e-09,
+      "maximumInnerDihedralDegrees": 25.194759555594278,
+      "innerEdgesOver120Degrees": 0,
+      "neck80mmMaxDihedralDegrees": 25.194759555594278,
+      "neck80mmEdgesOver120Degrees": 0,
+      "maximumAdditionalMoveM": 0.00493220940712478,
+      "distalMaximumMoveM": 0.0,
+      "degenerateFaces": 0,
+      "nonmanifoldInteriorEdges": 0,
+      "boundaryEdges": 308,
+      "limitations": "No guarantee of whole-surface absence of intersections; parent must review motion and silhouette."
+    },
+    "bustProjectionPerformed": false,
+    "maximumControlDisplacementM": 0.018534295304464737,
+    "protectedHead": "Unchanged; only sampled original saved head mesh",
+    "limitations": [
+      "Control-surface rest clearance is not evaluated subdivision motion proof. Parent must review candidate through all clips."
+    ]
+  },
+  "motionSamples": 54,
+  "newCutBoundaryVertices": 98,
+  "minimumAxialCutToRimGapM": 0.008430064016622385,
+  "maximumRimInsideVertices": 0,
+  "maximumEvaluatedCrossingsAboveRim": 0,
+  "maximumEvaluatedCrossingsBelowRim": 431,
+  "R28EditableSourceUnchanged": true,
+  "limitations": [
+    "Cut remains axially below moving collar; this does not independently prove it is hidden from every viewing direction. Parent recorded-motion visual review required.",
+    "Below-rim head/cloth intersection pairs remain and are explicitly counted.",
+    "Head is changed only by hiding786wholly-below-cut triangles; all attribute payloads and all triangles touching the above-cut face/neck are retained exactly."
+  ]
+}

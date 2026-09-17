@@ -1,0 +1,10 @@
+{
+  "removedSourceClothAndHighDrawcordTriangles": 19929,
+  "removedInterimCollarTriangles": 584,
+  "sourceClothTriangles": 19930,
+  "oldBodyBinaryPrefixIdentical": true,
+  "savedHeadMeshesAndAttributesIdentical": true,
+  "sixAnimationsAndSkinJSONIdentical": true,
+  "outputSHA256": "f749bcd591df88054dd746b5da673ccc5b6bffe912b4b976964b1f3a952f8d64",
+  "outputBytes": 180829400
+}

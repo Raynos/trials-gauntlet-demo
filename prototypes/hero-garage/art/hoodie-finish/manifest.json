@@ -1,0 +1,66 @@
+{
+  "files": {
+    "art/hoodie-shell/hoodie-source.blend": {
+      "bytes": 32370435,
+      "sha256": "62f9313349236aa2d66c6ab536dca7e74c689945a530358494f2bbab8bffe299"
+    },
+    "public/assets/street01-hoodie-shell.glb": {
+      "bytes": 4996712,
+      "sha256": "292445d069f9ff84d536d6ae5acf4d563300ef6b7698f360be858ab30645f6f3"
+    },
+    "public/assets/street01-rider-tailored.glb": {
+      "bytes": 178374120,
+      "sha256": "d6122a389e38cf7ea209b00b386efe6f12a8d48357fef1f969345ccc90938bec"
+    },
+    "art/hoodie-finish/cloth28-source.blend": {
+      "bytes": 32332123,
+      "sha256": "2b79bc33b91bb4878f059941c81b9c85927c519a4da318054529044097ec39f4"
+    },
+    "public/assets/street01-cloth28-donor.glb": {
+      "bytes": 7298524,
+      "sha256": "4b68046e516370d797a9eb818d4705e1ffd4ebdaad51e840d2568cf1a108b483"
+    },
+    "public/assets/street01-rider-cloth28.glb": {
+      "bytes": 180829400,
+      "sha256": "f749bcd591df88054dd746b5da673ccc5b6bffe912b4b976964b1f3a952f8d64"
+    }
+  },
+  "donor": {
+    "animationCount": 0,
+    "skinCount": 1,
+    "jointNames": [
+      [
+        "pelvis",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.L",
+        "upperArm.L",
+        "forearm.L",
+        "hand.L",
+        "shoulder.R",
+        "upperArm.R",
+        "forearm.R",
+        "hand.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R"
+      ]
+    ],
+    "meshes": [
+      "collar eyelet 1",
+      "collar eyelet -1",
+      "fitted drawcord 1",
+      "fitted drawcord -1",
+      "CC0 anatomical cotton shell",
+      "rider:anatomical sweatshirt pocket.001",
+      "tailored folded hood"
+    ],
+    "maximumWeightSumError": 1.1920928955078125e-07
+  },
+  "r27RestoredExactly": true
+}

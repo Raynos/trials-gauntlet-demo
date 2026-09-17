@@ -32,3 +32,14 @@ public/assets/street01-rider-hoodie-refine.glb
 # Dense reproducible art assemblies; retained locally with build recipes.
 public/assets/street01-rider-tailored*.glb
 public/assets/street01-rider-art27*.glb
+
+# Consolidated dense review scene, regenerated from the catalog.
+art/delivery/hero-garage-master.blend
+public/assets/street01-rider-cloth28*.glb
+public/assets/street01-rider-art28*.glb
+
+# Dense rebuild intermediates; packed delivery is retained.
+public/assets/street01-rider-delivery-raw.glb
+public/assets/street01-rider-delivery-29-*.glb
+public/assets/street01-rider-neckfit*.glb
+public/assets/street01-rider-art29*.glb

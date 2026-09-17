@@ -1,0 +1,11 @@
+{
+  "independentWorldRestMatrixMaxDelta": 2.4437904357910156e-06,
+  "inverseBindMatchTolerance": 1e-05,
+  "removedSourceFootwearTriangles": 1964,
+  "sourceFootwearTriangles": 1964,
+  "oldBodyBinaryPrefixIdentical": true,
+  "savedHeadAndHoodieMeshesAndAttributesIdentical": true,
+  "sixAnimationsAndSkinJSONIdentical": true,
+  "outputSHA256": "7f1581873dc6654ddb823cf7166c92ddc69041968d67adc3f60a5b61349b089e",
+  "outputBytes": 183066364
+}

@@ -1,0 +1,12 @@
+{
+  "source": "public/assets/street01-denim-refined-accepted.glb",
+  "candidate": "public/assets/street01-denim-textured.glb",
+  "sourceSHA256": "edcc683a16ba1c5559731b9f57dfecfbffb636c3856dc44887a669c31f759a9f",
+  "outputSHA256": "f8761a020d36d47c39a40a6f11aac89c83f6b5e6cea31344ac9b4f8668f6700f",
+  "triangles": 8068,
+  "triangleCornerPositionsNormalsJointNamesWeightsExactlyIdentical": true,
+  "donorJointCount": 19,
+  "donorAnimationCount": 0,
+  "pngImages": 3,
+  "scope": "All 24,204 triangle corners compared after canonical triangle/corner ordering; UV/material changes intentionally excluded. Exact skinned geometry means accepted saddle audit remains applicable."
+}

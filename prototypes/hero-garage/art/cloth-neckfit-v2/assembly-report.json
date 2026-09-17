@@ -1,0 +1,20 @@
+{
+  "removedSourceClothAndHighDrawcordTriangles": 19929,
+  "removedInterimCollarTriangles": 584,
+  "sourceClothTriangles": 19930,
+  "oldBodyBinaryPrefixIdentical": true,
+  "headTrim": {
+    "cutAxialHeightM": 0.018,
+    "removedTriangles": 786,
+    "keptTriangles": 34358,
+    "allTrianglesTouchingAboveCutRetainedExact": true,
+    "headAttributesByteExact": true,
+    "maximumRemovedVertexHeightM": 0.01798491716314668,
+    "rimAxialHeightM": 0.02641853784,
+    "minimumAxialCutToRimGapM": 0.00843362067685332
+  },
+  "faceAttributesAndGroomMeshesPreserved": true,
+  "sixAnimationsAndSkinJSONIdentical": true,
+  "outputSHA256": "e6b28b3c79bd89e555e583ddb1b5218fb9518cde197bd192d432d399548a241c",
+  "outputBytes": 181369072
+}

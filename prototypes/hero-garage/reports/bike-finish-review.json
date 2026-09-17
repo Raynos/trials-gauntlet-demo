@@ -1,0 +1,6247 @@
+{
+  "assets": [
+    {
+      "kind": "rider",
+      "url": "/assets/street01-rider-art28-final.glb",
+      "sha256": "0e91958095b7df6961c6cc60eec166ac29913d929c9762305fd9fc62b25b0ad4"
+    },
+    {
+      "kind": "bike",
+      "url": "/assets/street01-bike-finish.glb",
+      "sha256": "212cab964c9264942d2e2b96a9790c608fe6c31a96e4adc41590177f9c78f511"
+    }
+  ],
+  "errors": [],
+  "actualIPhone": false,
+  "method": "Timed real WebKit rendering, all six clips at full and portrait scale; no performance-gate claim.",
+  "samples": [
+    {
+      "camera": "bike",
+      "lighting": "neutral",
+      "clip": "compression",
+      "frames": 300,
+      "elapsedMilliseconds": 4972,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "neutral",
+        "time": 0,
+        "duration": 4.9666666984558105,
+        "activeClip": "compression",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          3.2270368802144045,
+          1.1589202738546027,
+          -1.2124094810121155
+        ],
+        "cameraTarget": [
+          0.6299832910299301,
+          0.6001763790845871,
+          0
+        ],
+        "render": {
+          "triangles": 3919200,
+          "calls": 103,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "bike",
+      "lighting": "neutral",
+      "clip": "forward_attack",
+      "frames": 240,
+      "elapsedMilliseconds": 3971,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "neutral",
+        "time": 0,
+        "duration": 3.9666666984558105,
+        "activeClip": "forward_attack",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          3.2270368802144045,
+          1.1589202738546027,
+          -1.2124094810121155
+        ],
+        "cameraTarget": [
+          0.6299832910299301,
+          0.6001763790845871,
+          0
+        ],
+        "render": {
+          "triangles": 3919200,
+          "calls": 103,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "bike",
+      "lighting": "neutral",
+      "clip": "hang_back",
+      "frames": 240,
+      "elapsedMilliseconds": 3970,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "neutral",
+        "time": 0,
+        "duration": 3.9666666984558105,
+        "activeClip": "hang_back",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          3.2270368802144045,
+          1.1589202738546027,
+          -1.2124094810121155
+        ],
+        "cameraTarget": [
+          0.6299832910299301,
+          0.6001763790845871,
+          0
+        ],
+        "render": {
+          "triangles": 3919200,
+          "calls": 103,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "hands",
+      "lighting": "neutral",
+      "clip": "compression",
+      "frames": 300,
+      "elapsedMilliseconds": 4971,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "neutral",
+        "time": 0,
+        "duration": 4.9666666984558105,
+        "activeClip": "compression",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          1.8592146513538026,
+          1.2933870769264049,
+          -0.007129944006406366
+        ],
+        "cameraTarget": [
+          0.9200001612975728,
+          1.1508202330481292,
+          4.161798214386003e-8
+        ],
+        "render": {
+          "triangles": 3876978,
+          "calls": 97,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "hands",
+      "lighting": "neutral",
+      "clip": "forward_attack",
+      "frames": 240,
+      "elapsedMilliseconds": 3979,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "neutral",
+        "time": 0,
+        "duration": 3.9666666984558105,
+        "activeClip": "forward_attack",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          1.8592143040357447,
+          1.2933872533958009,
+          -0.007129481329960236
+        ],
+        "cameraTarget": [
+          0.9199998139795151,
+          1.1508204095175254,
+          5.042944282718231e-7
+        ],
+        "render": {
+          "triangles": 3876978,
+          "calls": 97,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "hands",
+      "lighting": "neutral",
+      "clip": "hang_back",
+      "frames": 240,
+      "elapsedMilliseconds": 3971,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "neutral",
+        "time": 0,
+        "duration": 3.9666666984558105,
+        "activeClip": "hang_back",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          1.8592143040357447,
+          1.2933872533958009,
+          -0.007129481329960236
+        ],
+        "cameraTarget": [
+          0.9199998139795151,
+          1.1508204095175254,
+          5.042944282718231e-7
+        ],
+        "render": {
+          "triangles": 3876978,
+          "calls": 97,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "bike",
+      "lighting": "garage",
+      "clip": "compression",
+      "frames": 300,
+      "elapsedMilliseconds": 4970,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 4.9666666984558105,
+        "activeClip": "compression",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          3.2270368802144045,
+          1.1589202738546027,
+          -1.2124094810121155
+        ],
+        "cameraTarget": [
+          0.6299832910299301,
+          0.6001763790845871,
+          0
+        ],
+        "render": {
+          "triangles": 3919200,
+          "calls": 103,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "bike",
+      "lighting": "garage",
+      "clip": "forward_attack",
+      "frames": 240,
+      "elapsedMilliseconds": 3984,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 3.9666666984558105,
+        "activeClip": "forward_attack",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          3.2270368802144045,
+          1.1589202738546027,
+          -1.2124094810121155
+        ],
+        "cameraTarget": [
+          0.6299832910299301,
+          0.6001763790845871,
+          0
+        ],
+        "render": {
+          "triangles": 3919200,
+          "calls": 103,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "bike",
+      "lighting": "garage",
+      "clip": "hang_back",
+      "frames": 239,
+      "elapsedMilliseconds": 3970,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 3.9666666984558105,
+        "activeClip": "hang_back",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          3.2270368802144045,
+          1.1589202738546027,
+          -1.2124094810121155
+        ],
+        "cameraTarget": [
+          0.6299832910299301,
+          0.6001763790845871,
+          0
+        ],
+        "render": {
+          "triangles": 3919200,
+          "calls": 103,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "hands",
+      "lighting": "garage",
+      "clip": "compression",
+      "frames": 300,
+      "elapsedMilliseconds": 4977,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 4.9666666984558105,
+        "activeClip": "compression",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          1.8592146513538026,
+          1.2933870769264049,
+          -0.007129944006406366
+        ],
+        "cameraTarget": [
+          0.9200001612975728,
+          1.1508202330481292,
+          4.161798214386003e-8
+        ],
+        "render": {
+          "triangles": 3876978,
+          "calls": 97,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "hands",
+      "lighting": "garage",
+      "clip": "forward_attack",
+      "frames": 240,
+      "elapsedMilliseconds": 3979,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 3.9666666984558105,
+        "activeClip": "forward_attack",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          1.8592143040357447,
+          1.2933872533958009,
+          -0.007129481329960236
+        ],
+        "cameraTarget": [
+          0.9199998139795151,
+          1.1508204095175254,
+          5.042944282718231e-7
+        ],
+        "render": {
+          "triangles": 3876978,
+          "calls": 97,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    },
+    {
+      "camera": "hands",
+      "lighting": "garage",
+      "clip": "hang_back",
+      "frames": 240,
+      "elapsedMilliseconds": 3978,
+      "diagnostics": {
+        "ready": true,
+        "error": null,
+        "quality": "desktop",
+        "textureStorage": {
+          "scope": "Active hero material textures only; compressed mip payload bytes, not driver residency. Excludes environment, shadows and inactive variants.",
+          "textures": [
+            {
+              "name": "rider-street_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "rider-street_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "eyebrow001",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 512,
+              "height": 512,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "brown_eye",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Full_beard_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "Moustache_black_diff",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "cloth28_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "footwear_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "glove_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "denim_orm",
+              "slots": [
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_rookie_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_body_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_albedo",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 2048,
+              "height": 2048,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_orm",
+              "slots": [
+                "aoMap",
+                "roughnessMap",
+                "metalnessMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_mech_normal",
+              "slots": [
+                "normalMap"
+              ],
+              "format": 1023,
+              "colorSpace": "",
+              "compressed": false,
+              "width": 1024,
+              "height": 1024,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "chain_links",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 64,
+              "height": 32,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            },
+            {
+              "name": "bike_spokecard",
+              "slots": [
+                "map"
+              ],
+              "format": 1023,
+              "colorSpace": "srgb",
+              "compressed": false,
+              "width": 128,
+              "height": 128,
+              "mips": 0,
+              "compressedPayloadBytes": null
+            }
+          ]
+        },
+        "suspension": {
+          "amount": 0,
+          "stroke": 0,
+          "chassisPitch": 0,
+          "armLengthError": 0,
+          "frontAxleError": 0,
+          "rearAxleError": 0
+        },
+        "qualitySelection": "query",
+        "grounding": {
+          "coarseMinY": -0.0008759534358978027,
+          "preciseMinY": -0.0008203124999999756,
+          "assemblyOffsetY": 0.0008203124999999756,
+          "finalMinY": 0
+        },
+        "shadow": {
+          "target": [
+            0.6299832910299301,
+            0.9174523138692581,
+            -0.00006082480196475948
+          ],
+          "normalBias": 0.001826304315391865,
+          "bias": -0.00005,
+          "near": 2.5348513822138625,
+          "far": 9.840068643781322,
+          "width": 3.6526086307837295,
+          "mapSize": [
+            2048,
+            2048
+          ]
+        },
+        "comparison": {
+          "enabled": false,
+          "mode": "whole-scene",
+          "headFrame": {
+            "min": [
+              -0.115,
+              1.58,
+              -0.1
+            ],
+            "max": [
+              0.115,
+              1.833,
+              0.19
+            ],
+            "sourceCrop": {
+              "x": 694,
+              "y": 128,
+              "width": 111,
+              "height": 118
+            }
+          },
+          "sourceCropUnmodified": true
+        },
+        "stage": "Full rider + saved curly hair and beard",
+        "assets": [
+          {
+            "id": "street01-rider",
+            "url": "/assets/street01-rider-art28-final.glb",
+            "kind": "rider",
+            "clips": [
+              {
+                "name": "compression",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "extension",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "forward_attack",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "hang_back",
+                "duration": 3.9666666984558105
+              },
+              {
+                "name": "landing_absorption",
+                "duration": 4.9666666984558105
+              },
+              {
+                "name": "sit_cruise",
+                "duration": 1.9666666984558105
+              }
+            ]
+          },
+          {
+            "id": "street01-bike",
+            "url": "/assets/street01-bike-finish.glb",
+            "kind": "bike",
+            "clips": []
+          }
+        ],
+        "camera": "bike",
+        "lighting": "garage",
+        "time": 0,
+        "duration": 3.9666666984558105,
+        "activeClip": "hang_back",
+        "playing": false,
+        "orbitAngle": 1.2566370614359172,
+        "cameraPosition": [
+          1.8592143040357447,
+          1.2933872533958009,
+          -0.007129481329960236
+        ],
+        "cameraTarget": [
+          0.9199998139795151,
+          1.1508204095175254,
+          5.042944282718231e-7
+        ],
+        "render": {
+          "triangles": 3876978,
+          "calls": 97,
+          "width": 1640,
+          "height": 934,
+          "dpr": 1
+        },
+        "memory": {
+          "geometries": 56,
+          "textures": 32,
+          "note": "Object counts, not GPU byte residency"
+        },
+        "loadMilliseconds": 3176,
+        "targetFps": 60,
+        "frameSamples": 0,
+        "p95FrameMilliseconds": null,
+        "captureMode": true
+      }
+    }
+  ]
+}
