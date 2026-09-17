@@ -1,0 +1,175 @@
+{
+  "geometry": [
+    {
+      "node": "rider:glove_top",
+      "orientedTriangleCornerPositionNormalJointWeightMultisetExact": false,
+      "maxNearestPositionDistanceM": 1.6858739115832577e-07,
+      "positionUniqueSetsExact": false
+    },
+    {
+      "node": "rider:gloves",
+      "orientedTriangleCornerPositionNormalJointWeightMultisetExact": true,
+      "maxNearestPositionDistanceM": 0.0,
+      "positionUniqueSetsExact": true
+    },
+    {
+      "node": "rider:hero glove construction",
+      "orientedTriangleCornerPositionNormalJointWeightMultisetExact": true,
+      "maxNearestPositionDistanceM": 0.0,
+      "positionUniqueSetsExact": true
+    }
+  ],
+  "decodedChangedImages": [
+    {
+      "index": 15,
+      "name": "glove_normal",
+      "size": [
+        1024,
+        1024
+      ],
+      "maxChannelDifference8bit": 255,
+      "meanAbsoluteChannelDifference8bit": 0.682823657989502,
+      "changedPixels": 547389
+    },
+    {
+      "index": 16,
+      "name": "glove_albedo",
+      "size": [
+        1024,
+        1024
+      ],
+      "maxChannelDifference8bit": 89,
+      "meanAbsoluteChannelDifference8bit": 4.262185573577881,
+      "changedPixels": 152287
+    },
+    {
+      "index": 17,
+      "name": "glove_orm",
+      "size": [
+        1024,
+        1024
+      ],
+      "maxChannelDifference8bit": 199,
+      "meanAbsoluteChannelDifference8bit": 5.39773416519165,
+      "changedPixels": 147086
+    },
+    {
+      "index": 21,
+      "name": "cloth28_normal",
+      "size": [
+        1024,
+        1024
+      ],
+      "maxChannelDifference8bit": 1,
+      "meanAbsoluteChannelDifference8bit": 2.384185791015625e-07,
+      "changedPixels": 1
+    }
+  ],
+  "renderPixelDifferences": [
+    {
+      "camera": "full",
+      "clip": "compression",
+      "maxChannelDifference8bit": 8,
+      "meanAbsoluteChannelDifference8bit": 0.0003667076167076167,
+      "changedPixels": 503,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "full",
+      "clip": "extension",
+      "maxChannelDifference8bit": 5,
+      "meanAbsoluteChannelDifference8bit": 0.00030866093366093366,
+      "changedPixels": 509,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "full",
+      "clip": "forward_attack",
+      "maxChannelDifference8bit": 5,
+      "meanAbsoluteChannelDifference8bit": 0.0003068181818181818,
+      "changedPixels": 504,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "full",
+      "clip": "hang_back",
+      "maxChannelDifference8bit": 6,
+      "meanAbsoluteChannelDifference8bit": 0.00029791154791154793,
+      "changedPixels": 476,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "full",
+      "clip": "landing_absorption",
+      "maxChannelDifference8bit": 6,
+      "meanAbsoluteChannelDifference8bit": 0.0003415233415233415,
+      "changedPixels": 505,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "full",
+      "clip": "sit_cruise",
+      "maxChannelDifference8bit": 12,
+      "meanAbsoluteChannelDifference8bit": 0.00033323095823095824,
+      "changedPixels": 502,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "face",
+      "clip": "compression",
+      "maxChannelDifference8bit": 34,
+      "meanAbsoluteChannelDifference8bit": 0.0008387592137592138,
+      "changedPixels": 1519,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "face",
+      "clip": "extension",
+      "maxChannelDifference8bit": 0,
+      "meanAbsoluteChannelDifference8bit": 0.0,
+      "changedPixels": 0,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "face",
+      "clip": "forward_attack",
+      "maxChannelDifference8bit": 14,
+      "meanAbsoluteChannelDifference8bit": 0.0006904176904176904,
+      "changedPixels": 1332,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "face",
+      "clip": "hang_back",
+      "maxChannelDifference8bit": 0,
+      "meanAbsoluteChannelDifference8bit": 0.0,
+      "changedPixels": 0,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "face",
+      "clip": "landing_absorption",
+      "maxChannelDifference8bit": 0,
+      "meanAbsoluteChannelDifference8bit": 0.0,
+      "changedPixels": 0,
+      "pixelCount": 814000
+    },
+    {
+      "camera": "face",
+      "clip": "sit_cruise",
+      "maxChannelDifference8bit": 0,
+      "meanAbsoluteChannelDifference8bit": 0.0,
+      "changedPixels": 0,
+      "pixelCount": 814000
+    }
+  ],
+  "suspectedCause": "cuff3 extract.py starts boundary ring traversal from next(iter(set)); order/start can change, regenerating cuff vertices and UV packing despite equivalent geometric surface. Exact triangle comparison above is the deciding evidence, not assumption.",
+  "gloveTopNearestCoordinateCorrespondence": {
+    "matchedVertices": 2812,
+    "positionMaxM": 1.6858739115832577e-07,
+    "normalVectorMaxEuclideanDifference": 0.0005064794677309692,
+    "skinWeightMaxDifference": 0.0,
+    "positionToleranceM": 2e-07,
+    "limitation": "Nearest-coordinate correspondence with normal/skin tie break; not a claim of byte identity."
+  }
+}

@@ -1,8 +1,12 @@
-# Art handoff — round 30
+# Art handoff — round 31
 
 This task owns Blender art and review exports. Claude + Opus own game integration. The catalog selects the provisionally accepted assets; final visual approval belongs to the user.
 
-## Current round30 delivery
+## Current round31 delivery
+
+Catalog now selects `street01-rider-round31-lossless.glb` and `street01-bike-exhaust.glb`; SHA identities in `reports/art-round31-review.json`. New source folders: `art/garment-shape/`, `art/footwear-finish/`, `art/bike-exhaust/`, `art/seated-posture/family/`. Stage36 rebuild includes the final shape and settledclipfamily. Two stage34completebuilds are byteidentical; fullstage36 hasexecutedsuccessfully. The recorded review contains48views under2lights. Allsixclips nowshare the10degree settledneutral andpreserve originaltargetphases. Rearhem correction remainsinprogress.
+
+## Previous round30 delivery
 
 Catalog: `street01-rider-round30-lossless.glb` and `street01-bike-contours.glb`; exact hashes in `reports/art-round30-review.json`. Current raw source is `street01-rider-indigo-study.glb`, incorporating cotton, glove-surface and denim-finish recipes. See each component folder for editable Blender sources. Twelve packed/raw views match exactly. Full rebuild equivalence is under repeat verification after a deterministic cuff ordering fix; do not claim all future Blender bakes are byte-identical.
 

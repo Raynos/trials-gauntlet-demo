@@ -1,0 +1,37 @@
+{
+  "stage": 34,
+  "firstManifest": "art/delivery/runs/20260917T015429Z-3ca595de/manifest.json",
+  "secondManifest": "art/delivery/runs/20260917T015543Z-81f8df65/manifest.json",
+  "elapsedSeconds": [
+    64.373,
+    64.261
+  ],
+  "rawByteIdentical": true,
+  "packedByteIdentical": true,
+  "firstRaw": {
+    "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb",
+    "bytes": 206245116,
+    "sha256": "3e6d0b658db56145427a0570c16db73d06f6c91e395f25fc3327e29533caaa67"
+  },
+  "secondRaw": {
+    "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb",
+    "bytes": 206245116,
+    "sha256": "3e6d0b658db56145427a0570c16db73d06f6c91e395f25fc3327e29533caaa67"
+  },
+  "firstPacked": {
+    "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-lossless.glb",
+    "bytes": 73407252,
+    "sha256": "6e86f2c893b712b720816096400e47f7ed9cfec67373a69b4cd7aee81504793b"
+  },
+  "secondPacked": {
+    "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-lossless.glb",
+    "bytes": 73407252,
+    "sha256": "6e86f2c893b712b720816096400e47f7ed9cfec67373a69b4cd7aee81504793b"
+  },
+  "activeComparison": "reports/delivery-stage34-repeat-comparison.json",
+  "activeGeometryUVsNormalsSkinAnimationsMaterialsAndImagePayloadsIdentical": true,
+  "limitations": [
+    "Two consecutive rebuilds on this pinned local Blender/runtime, not cross-version or cross-machine determinism proof.",
+    "Build repeatability does not establish visual acceptance."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "sourceSHA256": "b86ba60d8baeeeafb7b81668514208f3af657fa053b3c7a21138b095d47e1482",
+  "sourceUnchanged": true,
+  "weightsExact": true,
+  "uvExact": true,
+  "neckAndCuffControlsExact": true,
+  "hoodSupportedHalfExact": true,
+  "changes": {
+    "rider:anatomical sweatshirt": {
+      "vertices": 2446,
+      "maxDisplacementM": 0.004500031128615327
+    },
+    "rider:folded hood": {
+      "vertices": 460,
+      "maxDisplacementM": 0.03393538993003285
+    },
+    "rider:anatomical sweatshirt pocket": {
+      "vertices": 0,
+      "maxDisplacementM": 0.0
+    }
+  },
+  "existingCottonAtlasRetained": true,
+  "outputSHA256": "292288a7cd6b0c420e07dc4bb86b776263d55ed9d7c86bfd728c9e18157d0d44",
+  "limitations": [
+    "Parent must judge motion appearance; geometry changes retain existing atlas and skin weights.",
+    "Broad sleeve ridges limited to noncontact upper/forearm regions; torso remains unchanged."
+  ]
+}

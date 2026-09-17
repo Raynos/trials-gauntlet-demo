@@ -1,0 +1,29 @@
+{
+  "source": "public/assets/street01-rider-round31-study.glb",
+  "sourceSHA256": "4b1d022ddc081fd69e1c53bea4109ea135115a22fd6d81f12babdca1e9a4dde7",
+  "clips": 6,
+  "poses": 54,
+  "hoodShirtCrossingsMax": 0,
+  "hoodShirtMinGapM": 0.0013274308294057846,
+  "degenerateShirtTrianglesMax": 0,
+  "degenerateHoodTrianglesMax": 0,
+  "nonfiniteMax": 0,
+  "cords": {
+    "fitted drawcord -1": {
+      "crossingsMax": 0,
+      "minGapM": 0.00045928286272101104
+    },
+    "fitted drawcord 1": {
+      "crossingsMax": 0,
+      "minGapM": 0.00045770450378768146
+    },
+    "collar eyelet -1": {
+      "crossingsMax": 0,
+      "minGapM": 0.0007167155272327363
+    },
+    "collar eyelet 1": {
+      "crossingsMax": 0,
+      "minGapM": 0.0007235478842630982
+    }
+  }
+}

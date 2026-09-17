@@ -10,8 +10,8 @@
   "assets": [
     {
       "id": "street01-rider",
-      "url": "/assets/street01-rider-round30-lossless.glb",
-      "sha256": "45a4a388755af78eeb8c1ef5ed9b6303fa96a55c2f83a09b5a96b3b23805d2dd",
+      "url": "/assets/street01-rider-round31-lossless.glb",
+      "sha256": "5f246ee760616c242707ff4515bb095bcb58080f8690116cc567819985329142",
       "placement": {
         "position": [
           0,
@@ -219,8 +219,8 @@
     },
     {
       "id": "street01-bike",
-      "url": "/assets/street01-bike-contours.glb",
-      "sha256": "d5022a9a49139b7c70b3775636d4afec5a060a78682daa802b95a92963f064b4",
+      "url": "/assets/street01-bike-exhaust.glb",
+      "sha256": "7877404ef7e9e2f5f25550a7d979b8f62e6e20774109294221a14e9877c8d9de",
       "placement": {
         "position": [
           0,
@@ -20915,12 +20915,12 @@
         {
           "name": "spine.position",
           "type": "vector",
-          "keys": 2
+          "keys": 150
         },
         {
           "name": "spine.quaternion",
           "type": "quaternion",
-          "keys": 2
+          "keys": 150
         },
         {
           "name": "spine.scale",
@@ -21206,12 +21206,12 @@
         {
           "name": "spine.position",
           "type": "vector",
-          "keys": 2
+          "keys": 150
         },
         {
           "name": "spine.quaternion",
           "type": "quaternion",
-          "keys": 2
+          "keys": 150
         },
         {
           "name": "spine.scale",
@@ -21497,12 +21497,12 @@
         {
           "name": "spine.position",
           "type": "vector",
-          "keys": 2
+          "keys": 120
         },
         {
           "name": "spine.quaternion",
           "type": "quaternion",
-          "keys": 2
+          "keys": 120
         },
         {
           "name": "spine.scale",
@@ -21788,12 +21788,12 @@
         {
           "name": "spine.position",
           "type": "vector",
-          "keys": 2
+          "keys": 120
         },
         {
           "name": "spine.quaternion",
           "type": "quaternion",
-          "keys": 2
+          "keys": 120
         },
         {
           "name": "spine.scale",
@@ -22079,12 +22079,12 @@
         {
           "name": "spine.position",
           "type": "vector",
-          "keys": 2
+          "keys": 150
         },
         {
           "name": "spine.quaternion",
           "type": "quaternion",
-          "keys": 2
+          "keys": 150
         },
         {
           "name": "spine.scale",
@@ -22648,49 +22648,49 @@
         {
           "rider": "gripSocket.L",
           "bike": "attach_grip_L",
-          "minDistanceMeters": 1.742123602892976e-7,
-          "maxDistanceMeters": 9.535152277433181e-7,
-          "maxOffsetVariationMeters": 0.0000010605963425962495,
+          "minDistanceMeters": 4.995329898048877e-7,
+          "maxDistanceMeters": 0.0000019893388212949067,
+          "maxOffsetVariationMeters": 0.0000016562169742510043,
           "firstOffset": [
-            -8.713123544890067e-8,
-            4.1414663431993404e-7,
-            -2.49445199829168e-7
+            -2.41598358430295e-7,
+            7.962677057715695e-7,
+            -4.0415399077398106e-7
           ]
         },
         {
           "rider": "gripSocket.R",
           "bike": "attach_grip_R",
-          "minDistanceMeters": 5.229066945181139e-7,
-          "maxDistanceMeters": 0.0000015179521472849458,
-          "maxOffsetVariationMeters": 9.028823518563148e-7,
+          "minDistanceMeters": 1.9431147747034242e-7,
+          "maxDistanceMeters": 0.0000013294725639278094,
+          "maxOffsetVariationMeters": 9.96881723040933e-7,
           "firstOffset": [
-            6.671279969561184e-7,
-            3.8170023586303614e-8,
-            1.3591067188345463e-7
+            5.819368447124162e-7,
+            -2.8400515494908518e-8,
+            1.601497577330413e-7
           ]
         },
         {
           "rider": "soleSocket.L",
           "bike": "attach_peg_L",
-          "minDistanceMeters": 0.011000354685937535,
-          "maxDistanceMeters": 0.011000781552768492,
-          "maxOffsetVariationMeters": 9.134724027178452e-7,
+          "minDistanceMeters": 0.011000368616352231,
+          "maxDistanceMeters": 0.011000907384498954,
+          "maxOffsetVariationMeters": 0.0000010228555660413286,
           "firstOffset": [
-            -2.4596761327710936e-7,
-            0.011000455537631959,
-            -4.2227590812959903e-7
+            -1.0768213754008826e-7,
+            0.011000540566344252,
+            -3.1471659078796677e-7
           ]
         },
         {
           "rider": "soleSocket.R",
           "bike": "attach_peg_R",
-          "minDistanceMeters": 0.011000416447952294,
-          "maxDistanceMeters": 0.011000802950871446,
-          "maxOffsetVariationMeters": 7.167948983131148e-7,
+          "minDistanceMeters": 0.011000246455104204,
+          "maxDistanceMeters": 0.011000648021089672,
+          "maxOffsetVariationMeters": 6.351452555652983e-7,
           "firstOffset": [
-            -4.687646000256507e-7,
-            0.01100041643583255,
-            -2.165738249848559e-7
+            -1.7066695889855765e-7,
+            0.011000252541215283,
+            -2.1089910343108365e-7
           ]
         }
       ]
@@ -22702,49 +22702,49 @@
         {
           "rider": "gripSocket.L",
           "bike": "attach_grip_L",
-          "minDistanceMeters": 1.5460112352931972e-7,
-          "maxDistanceMeters": 9.232486088124601e-7,
-          "maxOffsetVariationMeters": 0.0000010223206641148703,
+          "minDistanceMeters": 4.995329898048877e-7,
+          "maxDistanceMeters": 0.0000020560700043047507,
+          "maxOffsetVariationMeters": 0.0000015743334369786175,
           "firstOffset": [
-            -8.713123544890067e-8,
-            4.1414663431993404e-7,
-            -2.49445199829168e-7
+            -2.41598358430295e-7,
+            7.962677057715695e-7,
+            -4.0415399077398106e-7
           ]
         },
         {
           "rider": "gripSocket.R",
           "bike": "attach_grip_R",
-          "minDistanceMeters": 5.229066945181139e-7,
-          "maxDistanceMeters": 0.0000014284081413316176,
-          "maxOffsetVariationMeters": 9.243210352794189e-7,
+          "minDistanceMeters": 2.0231248510524848e-7,
+          "maxDistanceMeters": 0.0000011570969939451722,
+          "maxOffsetVariationMeters": 9.96881723040933e-7,
           "firstOffset": [
-            6.671279969561184e-7,
-            3.8170023586303614e-8,
-            1.3591067188345463e-7
+            5.819368447124162e-7,
+            -2.8400515494908518e-8,
+            1.601497577330413e-7
           ]
         },
         {
           "rider": "soleSocket.L",
           "bike": "attach_peg_L",
-          "minDistanceMeters": 0.011000404421162626,
-          "maxDistanceMeters": 0.011000884844831152,
-          "maxOffsetVariationMeters": 0.0000010091522548796126,
+          "minDistanceMeters": 0.011000511996817957,
+          "maxDistanceMeters": 0.01100103101188092,
+          "maxOffsetVariationMeters": 0.0000010517799251588623,
           "firstOffset": [
-            -2.4596761327710936e-7,
-            0.011000455537631959,
-            -4.2227590812959903e-7
+            -1.0768213754008826e-7,
+            0.011000540566344252,
+            -3.1471659078796677e-7
           ]
         },
         {
           "rider": "soleSocket.R",
           "bike": "attach_peg_R",
-          "minDistanceMeters": 0.011000404541360188,
-          "maxDistanceMeters": 0.01100083331528563,
-          "maxOffsetVariationMeters": 6.311991839792956e-7,
+          "minDistanceMeters": 0.011000099310813017,
+          "maxDistanceMeters": 0.011000679404704823,
+          "maxOffsetVariationMeters": 8.579392620068892e-7,
           "firstOffset": [
-            -4.687646000256507e-7,
-            0.01100041643583255,
-            -2.165738249848559e-7
+            -1.7066695889855765e-7,
+            0.011000252541215283,
+            -2.1089910343108365e-7
           ]
         }
       ]
@@ -22756,49 +22756,49 @@
         {
           "rider": "gripSocket.L",
           "bike": "attach_grip_L",
-          "minDistanceMeters": 4.3185952928505013e-7,
-          "maxDistanceMeters": 0.000001529982907047707,
-          "maxOffsetVariationMeters": 8.928069014184826e-7,
+          "minDistanceMeters": 8.697328907381489e-7,
+          "maxDistanceMeters": 0.0000023236490124430342,
+          "maxOffsetVariationMeters": 0.000001442540163253371,
           "firstOffset": [
-            -1.849803026310326e-7,
-            6.629128483925939e-7,
-            3.309754487701433e-7
+            -6.67439792323421e-7,
+            9.118095256610559e-7,
+            -8.853440758294084e-9
           ]
         },
         {
           "rider": "gripSocket.R",
           "bike": "attach_grip_R",
-          "minDistanceMeters": 3.3505248913161473e-7,
-          "maxDistanceMeters": 0.000001430687517603022,
-          "maxOffsetVariationMeters": 0.0000011216769968845304,
+          "minDistanceMeters": 3.5584874765752696e-7,
+          "maxDistanceMeters": 0.0000017096137196973436,
+          "maxOffsetVariationMeters": 0.0000013673594911633657,
           "firstOffset": [
-            1.3006601506937443e-7,
-            1.576372550271543e-7,
-            5.278105146278023e-7
+            1.9945147000655084e-7,
+            2.6848163248160972e-8,
+            6.26126756886336e-7
           ]
         },
         {
           "rider": "soleSocket.L",
           "bike": "attach_peg_L",
-          "minDistanceMeters": 0.0110004022180248,
-          "maxDistanceMeters": 0.011000818248073196,
-          "maxOffsetVariationMeters": 7.671151455453444e-7,
+          "minDistanceMeters": 0.011000992604040515,
+          "maxDistanceMeters": 0.011001403724886054,
+          "maxOffsetVariationMeters": 8.52634374644984e-7,
           "firstOffset": [
-            2.9234697218605277e-8,
-            0.011000507057861209,
-            -1.764175156238057e-7
+            -1.1114292408631599e-7,
+            0.011001051237149895,
+            -1.0451469611982844e-7
           ]
         },
         {
           "rider": "soleSocket.R",
           "bike": "attach_peg_R",
-          "minDistanceMeters": 0.01099961539816613,
-          "maxDistanceMeters": 0.010999975517060709,
-          "maxOffsetVariationMeters": 6.394024824101002e-7,
+          "minDistanceMeters": 0.010999870909186032,
+          "maxDistanceMeters": 0.011000468129483174,
+          "maxOffsetVariationMeters": 7.708637225512225e-7,
           "firstOffset": [
-            -0.0000010074732322840063,
-            0.010999794489345072,
-            8.5877690375602e-8
+            -7.809661566327009e-7,
+            0.011000229680456941,
+            2.570537977475418e-7
           ]
         }
       ]
@@ -22810,49 +22810,49 @@
         {
           "rider": "gripSocket.L",
           "bike": "attach_grip_L",
-          "minDistanceMeters": 4.2350690484633484e-7,
-          "maxDistanceMeters": 0.000002597985613302852,
-          "maxOffsetVariationMeters": 0.0000022264734730822134,
+          "minDistanceMeters": 9.495268735063031e-7,
+          "maxDistanceMeters": 0.0000033218219053845198,
+          "maxOffsetVariationMeters": 0.000002519859784423485,
           "firstOffset": [
-            -1.849803026310326e-7,
-            6.629128483925939e-7,
-            3.309754487701433e-7
+            -6.67439792323421e-7,
+            9.118095256610559e-7,
+            -8.853440758294084e-9
           ]
         },
         {
           "rider": "gripSocket.R",
           "bike": "attach_grip_R",
-          "minDistanceMeters": 2.964269734229926e-7,
-          "maxDistanceMeters": 0.0000012052020136762526,
-          "maxOffsetVariationMeters": 9.46197960054402e-7,
+          "minDistanceMeters": 4.4310854348427453e-7,
+          "maxDistanceMeters": 0.0000016975539332059744,
+          "maxOffsetVariationMeters": 0.0000014391144532397075,
           "firstOffset": [
-            1.3006601506937443e-7,
-            1.576372550271543e-7,
-            5.278105146278023e-7
+            1.9945147000655084e-7,
+            2.6848163248160972e-8,
+            6.26126756886336e-7
           ]
         },
         {
           "rider": "soleSocket.L",
           "bike": "attach_peg_L",
-          "minDistanceMeters": 0.0110004022180248,
-          "maxDistanceMeters": 0.011000902846158208,
-          "maxOffsetVariationMeters": 7.65200009981438e-7,
+          "minDistanceMeters": 0.011000937586123126,
+          "maxDistanceMeters": 0.0110014448896712,
+          "maxOffsetVariationMeters": 0.0000010913265141412047,
           "firstOffset": [
-            2.9234697218605277e-8,
-            0.011000507057861209,
-            -1.764175156238057e-7
+            -1.1114292408631599e-7,
+            0.011001051237149895,
+            -1.0451469611982844e-7
           ]
         },
         {
           "rider": "soleSocket.R",
           "bike": "attach_peg_R",
-          "minDistanceMeters": 0.010999508932338602,
-          "maxDistanceMeters": 0.011000013239017059,
-          "maxOffsetVariationMeters": 0.000001106134334896726,
+          "minDistanceMeters": 0.01099985750672794,
+          "maxDistanceMeters": 0.011000467666718014,
+          "maxOffsetVariationMeters": 0.0000013029001410339303,
           "firstOffset": [
-            -0.0000010074732322840063,
-            0.010999794489345072,
-            8.5877690375602e-8
+            -7.809661566327009e-7,
+            0.011000229680456941,
+            2.570537977475418e-7
           ]
         }
       ]
@@ -22864,49 +22864,49 @@
         {
           "rider": "gripSocket.L",
           "bike": "attach_grip_L",
-          "minDistanceMeters": 1.6927465435935164e-7,
-          "maxDistanceMeters": 9.981131420290086e-7,
-          "maxOffsetVariationMeters": 0.0000010571908008462,
+          "minDistanceMeters": 4.995329898048877e-7,
+          "maxDistanceMeters": 0.0000019614469755041568,
+          "maxOffsetVariationMeters": 0.0000018166880994917836,
           "firstOffset": [
-            -8.713123544890067e-8,
-            4.1414663431993404e-7,
-            -2.49445199829168e-7
+            -2.41598358430295e-7,
+            7.962677057715695e-7,
+            -4.0415399077398106e-7
           ]
         },
         {
           "rider": "gripSocket.R",
           "bike": "attach_grip_R",
-          "minDistanceMeters": 5.229066945181139e-7,
-          "maxDistanceMeters": 0.0000015681530151506664,
-          "maxOffsetVariationMeters": 9.193058381692058e-7,
+          "minDistanceMeters": 3.6487063395940333e-7,
+          "maxDistanceMeters": 0.0000014001385445671269,
+          "maxOffsetVariationMeters": 0.0000010073855761956897,
           "firstOffset": [
-            6.671279969561184e-7,
-            3.8170023586303614e-8,
-            1.3591067188345463e-7
+            5.819368447124162e-7,
+            -2.8400515494908518e-8,
+            1.601497577330413e-7
           ]
         },
         {
           "rider": "soleSocket.L",
           "bike": "attach_peg_L",
-          "minDistanceMeters": 0.011000404421162626,
-          "maxDistanceMeters": 0.011000806078469738,
-          "maxOffsetVariationMeters": 8.358558078124594e-7,
+          "minDistanceMeters": 0.011000488956750213,
+          "maxDistanceMeters": 0.011001030969655424,
+          "maxOffsetVariationMeters": 9.742136031482655e-7,
           "firstOffset": [
-            -2.4596761327710936e-7,
-            0.011000455537631959,
-            -4.2227590812959903e-7
+            -1.0768213754008826e-7,
+            0.011000540566344252,
+            -3.1471659078796677e-7
           ]
         },
         {
           "rider": "soleSocket.R",
           "bike": "attach_peg_R",
-          "minDistanceMeters": 0.011000416447908539,
-          "maxDistanceMeters": 0.011000891777237124,
-          "maxOffsetVariationMeters": 6.714554802134544e-7,
+          "minDistanceMeters": 0.011000152694634974,
+          "maxDistanceMeters": 0.011000804665067157,
+          "maxOffsetVariationMeters": 8.579378809553083e-7,
           "firstOffset": [
-            -4.687646000256507e-7,
-            0.01100041643583255,
-            -2.165738249848559e-7
+            -1.7066695889855765e-7,
+            0.011000252541215283,
+            -2.1089910343108365e-7
           ]
         }
       ]
@@ -22918,49 +22918,49 @@
         {
           "rider": "gripSocket.L",
           "bike": "attach_grip_L",
-          "minDistanceMeters": 6.679882244092776e-7,
-          "maxDistanceMeters": 6.679882244092776e-7,
+          "minDistanceMeters": 0.000001049774774529983,
+          "maxDistanceMeters": 0.000001049774774529983,
           "maxOffsetVariationMeters": 0,
           "firstOffset": [
-            -1.0934934713269229e-7,
-            5.945089240899648e-7,
-            2.8427122156227114e-7
+            -6.019264350287656e-7,
+            8.575225221019167e-7,
+            -6.608152647302745e-8
           ]
         },
         {
           "rider": "gripSocket.R",
           "bike": "attach_grip_R",
-          "minDistanceMeters": 5.682928549203971e-7,
-          "maxDistanceMeters": 5.682928549203971e-7,
+          "minDistanceMeters": 6.56399384077489e-7,
+          "maxDistanceMeters": 6.56399384077489e-7,
           "maxOffsetVariationMeters": 0,
           "firstOffset": [
-            1.373994221731678e-7,
-            1.5170571976419467e-7,
-            5.301542627678124e-7
+            1.9383607341438847e-7,
+            -1.4235203682488873e-8,
+            6.269649807100208e-7
           ]
         },
         {
           "rider": "soleSocket.L",
           "bike": "attach_peg_L",
-          "minDistanceMeters": 0.0110004022180248,
-          "maxDistanceMeters": 0.0110004022180248,
+          "minDistanceMeters": 0.011000992604040515,
+          "maxDistanceMeters": 0.011000992604040515,
           "maxOffsetVariationMeters": 0,
           "firstOffset": [
-            -4.312944945628061e-8,
-            0.011000402217241578,
-            -1.2398135607050165e-7
+            -1.2612800193156914e-7,
+            0.011000992602979875,
+            -8.61851591760221e-8
           ]
         },
         {
           "rider": "soleSocket.R",
           "bike": "attach_peg_R",
-          "minDistanceMeters": 0.010999774982408584,
-          "maxDistanceMeters": 0.010999774982408584,
+          "minDistanceMeters": 0.011000200043526082,
+          "maxDistanceMeters": 0.011000200043526082,
           "maxOffsetVariationMeters": 0,
           "firstOffset": [
-            -0.0000010069541638291213,
-            0.010999774935949502,
-            9.012324012069861e-8
+            -8.150930302930348e-7,
+            0.011000200010539585,
+            2.4766810566290154e-7
           ]
         }
       ]

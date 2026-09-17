@@ -26,7 +26,7 @@ bm=bmesh.new();bm.from_mesh(top.data);skin=bm.verts.layers.deform.verify()
 forearm_ids={g.index for g in top.vertex_groups if g.name.startswith('forearm.')}
 remove=[v for v in bm.verts if any(v[skin].get(i,0)>.1 for i in forearm_ids)];cuff_count=len(remove);bmesh.ops.delete(bm,geom=remove,context='VERTS')
 cuff_sections=[];boundary_data=json.loads((D/'sleeve-boundaries.json').read_text())
-for boundary in boundary_data:
+for boundary in sorted(boundary_data,key=lambda row:row['side']):
  side=boundary['side'];sg=-1 if side=='L' else 1;bone=arm.data.bones['forearm.'+side];axis=(bone.tail_local-bone.head_local).normalized();center=Vector(boundary['center']);end=Vector((.883,sg*.33,.80));u=Vector((0,1,0));u=(u-axis*u.dot(axis)).normalized();v=axis.cross(u).normalized();rings=[];rows=12;N=len(boundary['vertices']);rear=[]
  for row in range(rows+1):
   t=row/rows;ring=[]
@@ -65,7 +65,7 @@ for ob in obs:
 assert contact_before==[tuple(v.co) for v in obs[1].data.vertices]
 assert contact_weights==[[(g.group,g.weight) for g in v.groups] for v in obs[1].data.vertices]
 colors={'glove_top':(.045,.052,.055,1),'gloves':(.016,.020,.022,1),'hero moulded protection':(.028,.034,.037,1),'hero reflective binding':(.09,.10,.10,1)}
-for mat in {m for o in obs for m in o.data.materials}:
+for mat in sorted({m for o in obs for m in o.data.materials},key=lambda m:m.name):
  mat.use_nodes=True;nt=mat.node_tree;nt.nodes.clear();out=nt.nodes.new('ShaderNodeOutputMaterial');out.name='OUT';bs=nt.nodes.new('ShaderNodeBsdfPrincipled');bs.name='BSDF';nt.links.new(bs.outputs[0],out.inputs[0]);base=colors[mat.name];bs.inputs['Base Color'].default_value=base;bs.inputs['Roughness'].default_value=.78 if mat.name=='glove_top' else .67
  tc=nt.nodes.new('ShaderNodeTexCoord');noise=nt.nodes.new('ShaderNodeTexNoise');noise.inputs['Scale'].default_value=650 if 'rubber' not in mat.name else 350;noise.inputs['Detail'].default_value=2;nt.links.new(tc.outputs['Object'],noise.inputs['Vector']);bump=nt.nodes.new('ShaderNodeBump');bump.inputs['Strength'].default_value=.28;bump.inputs['Distance'].default_value=.00035;nt.links.new(noise.outputs['Fac'],bump.inputs['Height']);nt.links.new(bump.outputs['Normal'],bs.inputs['Normal'])
 # Preserve source weights, including cuff forearm/hand blend; no finger-contact drift.

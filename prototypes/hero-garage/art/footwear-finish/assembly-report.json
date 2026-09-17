@@ -1,0 +1,14 @@
+{
+  "independentWorldRestMatrixMaxDelta": 2.4437904357910156e-06,
+  "oldBinaryPrefixIdentical": true,
+  "oldMeshesUnchanged": true,
+  "sixAnimationsAndSkinJSONIdentical": true,
+  "replacedNodes": [
+    "rider:cotton_laces",
+    "rider:hero footwear construction",
+    "rider:trainer_rubber",
+    "rider:trainer_upper"
+  ],
+  "outputSHA256": "f2a7478fe573bcfe6b917ac77203957719e5188092a327ea90c01a200bd40f1e",
+  "outputBytes": 206245116
+}

@@ -1,0 +1,83 @@
+{
+  "source": "prototypes/hero-garage/public/assets/street01-rider-footwear-finish.glb",
+  "candidate": "prototypes/hero-garage/public/assets/street01-rider-seated-family.glb",
+  "totalFramesVerified": 750,
+  "protectedWorldMatrices": [
+    "pelvis",
+    "hand.L",
+    "hand.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R"
+  ],
+  "clips": [
+    {
+      "clip": "compression",
+      "framesVerified": 150,
+      "maxProtectedWorldMatrixDifference": 1.5497207641601562e-06,
+      "maxGripSoleWorldDisplacementM": 1.3341325095653171e-06,
+      "unchangedTargetFramesVerified": 120,
+      "maxUnchangedTargetMatrixDifference": 1.430511474609375e-06,
+      "initialSharedNeutralMatrixDifference": 2.6971101760864258e-06,
+      "endingSharedNeutralMatrixDifference": 2.6971101760864258e-06
+    },
+    {
+      "clip": "extension",
+      "framesVerified": 150,
+      "maxProtectedWorldMatrixDifference": 1.5497207641601562e-06,
+      "maxGripSoleWorldDisplacementM": 1.569085905681632e-06,
+      "unchangedTargetFramesVerified": 120,
+      "maxUnchangedTargetMatrixDifference": 1.430511474609375e-06,
+      "initialSharedNeutralMatrixDifference": 2.6971101760864258e-06,
+      "endingSharedNeutralMatrixDifference": 2.6971101760864258e-06
+    },
+    {
+      "clip": "forward_attack",
+      "framesVerified": 120,
+      "maxProtectedWorldMatrixDifference": 1.8477439880371094e-06,
+      "maxGripSoleWorldDisplacementM": 1.6060106259950971e-06,
+      "unchangedTargetFramesVerified": 90,
+      "maxUnchangedTargetMatrixDifference": 1.8477439880371094e-06,
+      "initialSharedNeutralMatrixDifference": 0.0,
+      "endingSharedNeutralMatrixDifference": 0.0
+    },
+    {
+      "clip": "hang_back",
+      "framesVerified": 120,
+      "maxProtectedWorldMatrixDifference": 1.7881393432617188e-06,
+      "maxGripSoleWorldDisplacementM": 2.065625602145607e-06,
+      "unchangedTargetFramesVerified": 90,
+      "maxUnchangedTargetMatrixDifference": 1.7285346984863281e-06,
+      "initialSharedNeutralMatrixDifference": 0.0,
+      "endingSharedNeutralMatrixDifference": 0.0
+    },
+    {
+      "clip": "landing_absorption",
+      "framesVerified": 150,
+      "maxProtectedWorldMatrixDifference": 1.5497207641601562e-06,
+      "maxGripSoleWorldDisplacementM": 1.526914651089847e-06,
+      "unchangedTargetFramesVerified": 120,
+      "maxUnchangedTargetMatrixDifference": 1.430511474609375e-06,
+      "initialSharedNeutralMatrixDifference": 2.6971101760864258e-06,
+      "endingSharedNeutralMatrixDifference": 2.6971101760864258e-06
+    },
+    {
+      "clip": "sit_cruise",
+      "framesVerified": 60,
+      "maxProtectedWorldMatrixDifference": 1.5497207641601562e-06,
+      "maxGripSoleWorldDisplacementM": 8.539288510021211e-07,
+      "unchangedTargetFramesVerified": 0,
+      "maxUnchangedTargetMatrixDifference": 0,
+      "initialSharedNeutralMatrixDifference": 0.0,
+      "endingSharedNeutralMatrixDifference": 0.0
+    }
+  ],
+  "method": "Actual source/candidate exported GLB animations imported at30fps. All750frames checked for hand/sole/pelvis and lowerbody world matrix preservation, every zero-offset target frame checked across all bones, all six initial poses agree, only measured neutral-ending clips return to sharedneutral.",
+  "limitations": [
+    "No collision simulation.",
+    "Parent visual acceptance remains required."
+  ]
+}

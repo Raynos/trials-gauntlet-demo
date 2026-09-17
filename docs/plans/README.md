@@ -141,3 +141,9 @@ Accepted provisionally after six-clip motion review:331 localized sleeve control
 Provisionally accepted after recorded full/detail review: subdued cotton surface, slimmer dorsal gloves with all580contact points preserved, darkindigo jeans with unchanged geometry, and a smoother frontfender arc with exactendpoints. Sixclips/twolights reviewed; packed-vs-raw renders match exactly. Frozen game shipgate passes1038 identicalticks,8.65sclear and1tickrestart. [Review](../../prototypes/hero-garage/reports/art-round30-review.json).
 
 Rebuild investigation found nondeterministic cuff ring ordering causing small UV/bake differences; stableordering is implemented, repeatverification remains open. Current catalog remains the reviewed export. Further work: hood/folds, shoe/exhaust colors and a bounded seatedposture study.11% allowance remains; hardstop2%. Finalvisual approval and actualiPhone gate remainopen.
+
+## Art round 31 — fuller hood and settled riding posture
+
+Provisionally accepted from48timed full/detail views across6clips and2lights: fuller foldedhood, broad sleevefolds, neutralgrey footwear, warmsteel exhaust, and10degree forwardsettled seatedpose. Allsixclips share easedneutral entry/exit while originaltargetphases remain. Actual750frame audit holds grip/sole displacement below2.07micrometres;54pose newfamilycloth audit finds0hood/shirt orcord crossings. [Review](../../prototypes/hero-garage/reports/art-round31-review.json).
+
+Two fullstage34rebuilds now produce byte-identical rawandpacked GLBs afterdeterministic cuffordering fix. Stage36 completepipeline includesgarment andclipfamily andhas run successfully. The reviewed catalog remains separatelyhashed. Rearhemflare is underboundedcorrection; finalsourcebundle/phonevalidation remainopen.10%allowance remains; hardstop2%.

@@ -1,0 +1,2785 @@
+{
+  "input": "public/assets/street01-rider-delivery-raw.glb",
+  "output": "public/assets/street01-rider-delivery-lossless.glb",
+  "sourceSHA256": "8536b9cbc408da5275110d46bd9ee86c71d9f4e6cfa47b02429b3959536626e8",
+  "outputSHA256": "54e17d16fc18bde269ff066ca18cbda0e78776bab8e81dcb434e2771e49310c7",
+  "sourceBytes": 212877668,
+  "outputBytes": 76938936,
+  "reductionPercent": 63.85767623121463,
+  "originalAccessors": 2172,
+  "retainedAccessors": 466,
+  "originalBufferViews": 2211,
+  "retainedBufferViews": 505,
+  "compressedCount": 394,
+  "independentlyDecodedExactBytes": 148750020,
+  "retainedRawViewsExact": true,
+  "accessorMetadataExactAfterReferenceRemap": true,
+  "meshTopologyAndAllAttributesExact": true,
+  "animationsAndSkinExact": true,
+  "materialsTexturesImagesNodesScenesExact": true,
+  "encoding": "Blender bundled meshopt raw ATTRIBUTES/NONE and order-preserving INDICES/NONE; independently verified Three.js MeshoptDecoder, no floating point filtering/quantization",
+  "checks": [
+    {
+      "originalBufferView": 0,
+      "decodedBytes": 381288,
+      "encodedBytes": 184560,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1,
+      "decodedBytes": 381288,
+      "encodedBytes": 308463,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2,
+      "decodedBytes": 254192,
+      "encodedBytes": 198529,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 3,
+      "decodedBytes": 127096,
+      "encodedBytes": 9107,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 4,
+      "decodedBytes": 508384,
+      "encodedBytes": 67524,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 10,
+      "decodedBytes": 1216,
+      "encodedBytes": 966,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 11,
+      "decodedBytes": 600,
+      "encodedBytes": 425,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 12,
+      "decodedBytes": 1800,
+      "encodedBytes": 982,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 13,
+      "decodedBytes": 2400,
+      "encodedBytes": 1205,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 17,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 20,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 23,
+      "decodedBytes": 2400,
+      "encodedBytes": 854,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 26,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 28,
+      "decodedBytes": 1800,
+      "encodedBytes": 848,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 29,
+      "decodedBytes": 2400,
+      "encodedBytes": 1224,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 31,
+      "decodedBytes": 2400,
+      "encodedBytes": 1189,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 34,
+      "decodedBytes": 2400,
+      "encodedBytes": 1251,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 37,
+      "decodedBytes": 2400,
+      "encodedBytes": 1356,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 39,
+      "decodedBytes": 1800,
+      "encodedBytes": 850,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 40,
+      "decodedBytes": 2400,
+      "encodedBytes": 1250,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 43,
+      "decodedBytes": 2400,
+      "encodedBytes": 1239,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 46,
+      "decodedBytes": 2400,
+      "encodedBytes": 1232,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 49,
+      "decodedBytes": 2400,
+      "encodedBytes": 1316,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 52,
+      "decodedBytes": 2400,
+      "encodedBytes": 1168,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 55,
+      "decodedBytes": 2400,
+      "encodedBytes": 1216,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 57,
+      "decodedBytes": 2400,
+      "encodedBytes": 1117,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 60,
+      "decodedBytes": 2400,
+      "encodedBytes": 1188,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 63,
+      "decodedBytes": 2400,
+      "encodedBytes": 1222,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 66,
+      "decodedBytes": 2400,
+      "encodedBytes": 1112,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 68,
+      "decodedBytes": 1800,
+      "encodedBytes": 981,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 69,
+      "decodedBytes": 2400,
+      "encodedBytes": 1188,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 70,
+      "decodedBytes": 2400,
+      "encodedBytes": 1135,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 71,
+      "decodedBytes": 1800,
+      "encodedBytes": 838,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 72,
+      "decodedBytes": 2400,
+      "encodedBytes": 1241,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 73,
+      "decodedBytes": 2400,
+      "encodedBytes": 1166,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 74,
+      "decodedBytes": 2400,
+      "encodedBytes": 1237,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 75,
+      "decodedBytes": 2400,
+      "encodedBytes": 1349,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 76,
+      "decodedBytes": 1800,
+      "encodedBytes": 843,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 77,
+      "decodedBytes": 2400,
+      "encodedBytes": 1196,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 78,
+      "decodedBytes": 2400,
+      "encodedBytes": 1271,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 79,
+      "decodedBytes": 2400,
+      "encodedBytes": 1249,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 80,
+      "decodedBytes": 2400,
+      "encodedBytes": 1319,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 81,
+      "decodedBytes": 2400,
+      "encodedBytes": 1175,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 82,
+      "decodedBytes": 2400,
+      "encodedBytes": 1239,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 83,
+      "decodedBytes": 2400,
+      "encodedBytes": 1158,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 84,
+      "decodedBytes": 2400,
+      "encodedBytes": 1200,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 85,
+      "decodedBytes": 2400,
+      "encodedBytes": 1240,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 86,
+      "decodedBytes": 2400,
+      "encodedBytes": 1143,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 87,
+      "decodedBytes": 480,
+      "encodedBytes": 354,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 88,
+      "decodedBytes": 1440,
+      "encodedBytes": 755,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 89,
+      "decodedBytes": 1920,
+      "encodedBytes": 912,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 92,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 95,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 98,
+      "decodedBytes": 1920,
+      "encodedBytes": 922,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 100,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 102,
+      "decodedBytes": 1440,
+      "encodedBytes": 680,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 103,
+      "decodedBytes": 1920,
+      "encodedBytes": 952,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 106,
+      "decodedBytes": 1920,
+      "encodedBytes": 964,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 109,
+      "decodedBytes": 1920,
+      "encodedBytes": 940,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 111,
+      "decodedBytes": 1920,
+      "encodedBytes": 1004,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 113,
+      "decodedBytes": 1440,
+      "encodedBytes": 672,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 114,
+      "decodedBytes": 1920,
+      "encodedBytes": 974,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 117,
+      "decodedBytes": 1920,
+      "encodedBytes": 973,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 120,
+      "decodedBytes": 1920,
+      "encodedBytes": 948,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 123,
+      "decodedBytes": 1920,
+      "encodedBytes": 975,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 126,
+      "decodedBytes": 1920,
+      "encodedBytes": 875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 129,
+      "decodedBytes": 1920,
+      "encodedBytes": 894,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 132,
+      "decodedBytes": 1920,
+      "encodedBytes": 843,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 135,
+      "decodedBytes": 1920,
+      "encodedBytes": 847,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 138,
+      "decodedBytes": 1920,
+      "encodedBytes": 904,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 141,
+      "decodedBytes": 1920,
+      "encodedBytes": 824,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 143,
+      "decodedBytes": 1440,
+      "encodedBytes": 754,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 144,
+      "decodedBytes": 1920,
+      "encodedBytes": 807,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 145,
+      "decodedBytes": 1920,
+      "encodedBytes": 732,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 146,
+      "decodedBytes": 1440,
+      "encodedBytes": 548,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 147,
+      "decodedBytes": 1920,
+      "encodedBytes": 805,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 148,
+      "decodedBytes": 1920,
+      "encodedBytes": 949,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 149,
+      "decodedBytes": 1920,
+      "encodedBytes": 973,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 150,
+      "decodedBytes": 1920,
+      "encodedBytes": 1006,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 151,
+      "decodedBytes": 1440,
+      "encodedBytes": 569,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 152,
+      "decodedBytes": 1920,
+      "encodedBytes": 788,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 153,
+      "decodedBytes": 1920,
+      "encodedBytes": 967,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 154,
+      "decodedBytes": 1920,
+      "encodedBytes": 964,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 155,
+      "decodedBytes": 1920,
+      "encodedBytes": 973,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 156,
+      "decodedBytes": 1920,
+      "encodedBytes": 860,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 157,
+      "decodedBytes": 1920,
+      "encodedBytes": 866,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 158,
+      "decodedBytes": 1920,
+      "encodedBytes": 892,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 159,
+      "decodedBytes": 1920,
+      "encodedBytes": 890,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 160,
+      "decodedBytes": 1920,
+      "encodedBytes": 878,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 161,
+      "decodedBytes": 1920,
+      "encodedBytes": 906,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 162,
+      "decodedBytes": 1800,
+      "encodedBytes": 1048,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 163,
+      "decodedBytes": 2400,
+      "encodedBytes": 1264,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 164,
+      "decodedBytes": 2400,
+      "encodedBytes": 1164,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 165,
+      "decodedBytes": 1800,
+      "encodedBytes": 887,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 166,
+      "decodedBytes": 2400,
+      "encodedBytes": 1308,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 167,
+      "decodedBytes": 2400,
+      "encodedBytes": 1254,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 168,
+      "decodedBytes": 2400,
+      "encodedBytes": 1329,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 169,
+      "decodedBytes": 2400,
+      "encodedBytes": 1445,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 170,
+      "decodedBytes": 1800,
+      "encodedBytes": 891,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 171,
+      "decodedBytes": 2400,
+      "encodedBytes": 1287,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 172,
+      "decodedBytes": 2400,
+      "encodedBytes": 1338,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 173,
+      "decodedBytes": 2400,
+      "encodedBytes": 1337,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 174,
+      "decodedBytes": 2400,
+      "encodedBytes": 1419,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 175,
+      "decodedBytes": 2400,
+      "encodedBytes": 1249,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 176,
+      "decodedBytes": 2400,
+      "encodedBytes": 1331,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 177,
+      "decodedBytes": 2400,
+      "encodedBytes": 1207,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 178,
+      "decodedBytes": 2400,
+      "encodedBytes": 1281,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 179,
+      "decodedBytes": 2400,
+      "encodedBytes": 1336,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 180,
+      "decodedBytes": 2400,
+      "encodedBytes": 1208,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 183,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 184,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 186,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 187,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 188,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 189,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 191,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 192,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 193,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 194,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 195,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 196,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 197,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 198,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 199,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 200,
+      "decodedBytes": 32,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 204,
+      "decodedBytes": 992,
+      "encodedBytes": 802,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 205,
+      "decodedBytes": 1152,
+      "encodedBytes": 598,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 209,
+      "decodedBytes": 8608,
+      "encodedBytes": 5798,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 210,
+      "decodedBytes": 12240,
+      "encodedBytes": 6185,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 214,
+      "decodedBytes": 189920,
+      "encodedBytes": 119948,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 219,
+      "decodedBytes": 41472000,
+      "encodedBytes": 10368005,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 222,
+      "decodedBytes": 3384,
+      "encodedBytes": 2663,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 223,
+      "decodedBytes": 4488,
+      "encodedBytes": 2561,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 227,
+      "decodedBytes": 648,
+      "encodedBytes": 519,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 228,
+      "decodedBytes": 720,
+      "encodedBytes": 371,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 230,
+      "decodedBytes": 1488,
+      "encodedBytes": 1019,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 231,
+      "decodedBytes": 1488,
+      "encodedBytes": 1353,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 232,
+      "decodedBytes": 496,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 233,
+      "decodedBytes": 1984,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 234,
+      "decodedBytes": 12912,
+      "encodedBytes": 8059,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 235,
+      "decodedBytes": 12912,
+      "encodedBytes": 10735,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 236,
+      "decodedBytes": 4304,
+      "encodedBytes": 30,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 237,
+      "decodedBytes": 17216,
+      "encodedBytes": 45,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 238,
+      "decodedBytes": 284880,
+      "encodedBytes": 168772,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 239,
+      "decodedBytes": 284880,
+      "encodedBytes": 210556,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 240,
+      "decodedBytes": 94960,
+      "encodedBytes": 118,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 241,
+      "decodedBytes": 379840,
+      "encodedBytes": 397,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 242,
+      "decodedBytes": 21060000,
+      "encodedBytes": 11802031,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 243,
+      "decodedBytes": 21060000,
+      "encodedBytes": 20827031,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 244,
+      "decodedBytes": 7020000,
+      "encodedBytes": 6881,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 245,
+      "decodedBytes": 28080000,
+      "encodedBytes": 27449,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 246,
+      "decodedBytes": 5076,
+      "encodedBytes": 3597,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 247,
+      "decodedBytes": 5076,
+      "encodedBytes": 4366,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 248,
+      "decodedBytes": 1692,
+      "encodedBytes": 27,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 249,
+      "decodedBytes": 6768,
+      "encodedBytes": 33,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 250,
+      "decodedBytes": 972,
+      "encodedBytes": 711,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 251,
+      "decodedBytes": 972,
+      "encodedBytes": 830,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 252,
+      "decodedBytes": 324,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 253,
+      "decodedBytes": 1296,
+      "encodedBytes": 29,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 255,
+      "decodedBytes": 412296,
+      "encodedBytes": 231628,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 256,
+      "decodedBytes": 1152,
+      "encodedBytes": 655,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 257,
+      "decodedBytes": 1152,
+      "encodedBytes": 1080,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 259,
+      "decodedBytes": 1536,
+      "encodedBytes": 798,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 260,
+      "decodedBytes": 1152,
+      "encodedBytes": 581,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 262,
+      "decodedBytes": 1152,
+      "encodedBytes": 660,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 263,
+      "decodedBytes": 1152,
+      "encodedBytes": 1079,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 265,
+      "decodedBytes": 1536,
+      "encodedBytes": 797,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 266,
+      "decodedBytes": 2400,
+      "encodedBytes": 1452,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 267,
+      "decodedBytes": 2400,
+      "encodedBytes": 2160,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 269,
+      "decodedBytes": 3200,
+      "encodedBytes": 875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 270,
+      "decodedBytes": 2376,
+      "encodedBytes": 1193,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 271,
+      "decodedBytes": 2400,
+      "encodedBytes": 1443,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 272,
+      "decodedBytes": 2400,
+      "encodedBytes": 2157,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 274,
+      "decodedBytes": 3200,
+      "encodedBytes": 877,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 275,
+      "decodedBytes": 1023384,
+      "encodedBytes": 648031,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 276,
+      "decodedBytes": 1023384,
+      "encodedBytes": 759944,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 277,
+      "decodedBytes": 682256,
+      "encodedBytes": 463616,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 279,
+      "decodedBytes": 1364512,
+      "encodedBytes": 393846,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 280,
+      "decodedBytes": 1587072,
+      "encodedBytes": 935691,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 284,
+      "decodedBytes": 4080,
+      "encodedBytes": 1875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 285,
+      "decodedBytes": 4080,
+      "encodedBytes": 2518,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 286,
+      "decodedBytes": 2720,
+      "encodedBytes": 2101,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 288,
+      "decodedBytes": 5440,
+      "encodedBytes": 356,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 289,
+      "decodedBytes": 2076,
+      "encodedBytes": 1044,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 290,
+      "decodedBytes": 14088,
+      "encodedBytes": 7998,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 291,
+      "decodedBytes": 14088,
+      "encodedBytes": 9846,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 292,
+      "decodedBytes": 9392,
+      "encodedBytes": 6479,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 294,
+      "decodedBytes": 18784,
+      "encodedBytes": 4267,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 295,
+      "decodedBytes": 11496,
+      "encodedBytes": 5809,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 296,
+      "decodedBytes": 384,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 297,
+      "decodedBytes": 384,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 298,
+      "decodedBytes": 800,
+      "encodedBytes": 56,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 299,
+      "decodedBytes": 800,
+      "encodedBytes": 56,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 300,
+      "decodedBytes": 341128,
+      "encodedBytes": 68858,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 301,
+      "decodedBytes": 1360,
+      "encodedBytes": 65,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 302,
+      "decodedBytes": 4696,
+      "encodedBytes": 305,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 304,
+      "decodedBytes": 14208,
+      "encodedBytes": 6475,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 305,
+      "decodedBytes": 14208,
+      "encodedBytes": 9943,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 306,
+      "decodedBytes": 9472,
+      "encodedBytes": 6767,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 308,
+      "decodedBytes": 18944,
+      "encodedBytes": 45,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 309,
+      "decodedBytes": 9600,
+      "encodedBytes": 4812,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 314,
+      "decodedBytes": 54576,
+      "encodedBytes": 24490,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 315,
+      "decodedBytes": 54576,
+      "encodedBytes": 36567,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 316,
+      "decodedBytes": 36384,
+      "encodedBytes": 27374,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 318,
+      "decodedBytes": 72768,
+      "encodedBytes": 97,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 319,
+      "decodedBytes": 35712,
+      "encodedBytes": 17877,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 320,
+      "decodedBytes": 6096,
+      "encodedBytes": 3325,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 321,
+      "decodedBytes": 6096,
+      "encodedBytes": 4275,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 322,
+      "decodedBytes": 4064,
+      "encodedBytes": 3373,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 324,
+      "decodedBytes": 8128,
+      "encodedBytes": 33,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 325,
+      "decodedBytes": 4176,
+      "encodedBytes": 2121,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 326,
+      "decodedBytes": 30408,
+      "encodedBytes": 18665,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 327,
+      "decodedBytes": 30408,
+      "encodedBytes": 23315,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 328,
+      "decodedBytes": 20272,
+      "encodedBytes": 15418,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 330,
+      "decodedBytes": 40544,
+      "encodedBytes": 65,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 331,
+      "decodedBytes": 25344,
+      "encodedBytes": 14849,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 739,
+      "decodedBytes": 4736,
+      "encodedBytes": 37,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 740,
+      "decodedBytes": 18192,
+      "encodedBytes": 50,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 741,
+      "decodedBytes": 2032,
+      "encodedBytes": 34,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 742,
+      "decodedBytes": 10136,
+      "encodedBytes": 66,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 744,
+      "decodedBytes": 33744,
+      "encodedBytes": 18277,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 745,
+      "decodedBytes": 33744,
+      "encodedBytes": 24803,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 746,
+      "decodedBytes": 22496,
+      "encodedBytes": 14916,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 748,
+      "decodedBytes": 44992,
+      "encodedBytes": 745,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 749,
+      "decodedBytes": 27600,
+      "encodedBytes": 13905,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 754,
+      "decodedBytes": 19536,
+      "encodedBytes": 8387,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 755,
+      "decodedBytes": 19536,
+      "encodedBytes": 11554,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 756,
+      "decodedBytes": 13024,
+      "encodedBytes": 10895,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 758,
+      "decodedBytes": 26048,
+      "encodedBytes": 53,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 759,
+      "decodedBytes": 9888,
+      "encodedBytes": 4958,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 760,
+      "decodedBytes": 10992,
+      "encodedBytes": 4032,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 761,
+      "decodedBytes": 10992,
+      "encodedBytes": 6754,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 762,
+      "decodedBytes": 7328,
+      "encodedBytes": 5972,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 764,
+      "decodedBytes": 14656,
+      "encodedBytes": 41,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 765,
+      "decodedBytes": 5736,
+      "encodedBytes": 2952,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1173,
+      "decodedBytes": 11248,
+      "encodedBytes": 116,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1174,
+      "decodedBytes": 6512,
+      "encodedBytes": 39,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1175,
+      "decodedBytes": 3664,
+      "encodedBytes": 36,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1188,
+      "decodedBytes": 1152,
+      "encodedBytes": 655,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1189,
+      "decodedBytes": 1152,
+      "encodedBytes": 1080,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1191,
+      "decodedBytes": 1536,
+      "encodedBytes": 798,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1192,
+      "decodedBytes": 1152,
+      "encodedBytes": 581,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1194,
+      "decodedBytes": 1152,
+      "encodedBytes": 660,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1195,
+      "decodedBytes": 1152,
+      "encodedBytes": 1079,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1197,
+      "decodedBytes": 1536,
+      "encodedBytes": 797,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1198,
+      "decodedBytes": 2400,
+      "encodedBytes": 1452,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1199,
+      "decodedBytes": 2400,
+      "encodedBytes": 2160,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1201,
+      "decodedBytes": 3200,
+      "encodedBytes": 875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1202,
+      "decodedBytes": 2376,
+      "encodedBytes": 1193,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1203,
+      "decodedBytes": 2400,
+      "encodedBytes": 1443,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1204,
+      "decodedBytes": 2400,
+      "encodedBytes": 2157,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1206,
+      "decodedBytes": 3200,
+      "encodedBytes": 877,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1207,
+      "decodedBytes": 1008336,
+      "encodedBytes": 646142,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1208,
+      "decodedBytes": 1008336,
+      "encodedBytes": 757857,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1209,
+      "decodedBytes": 672224,
+      "encodedBytes": 456477,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1211,
+      "decodedBytes": 1344448,
+      "encodedBytes": 392720,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1212,
+      "decodedBytes": 1587072,
+      "encodedBytes": 935488,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1216,
+      "decodedBytes": 4080,
+      "encodedBytes": 1875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1217,
+      "decodedBytes": 4080,
+      "encodedBytes": 2518,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1218,
+      "decodedBytes": 2720,
+      "encodedBytes": 2201,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1220,
+      "decodedBytes": 5440,
+      "encodedBytes": 356,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1221,
+      "decodedBytes": 2076,
+      "encodedBytes": 1044,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1222,
+      "decodedBytes": 14088,
+      "encodedBytes": 7998,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1223,
+      "decodedBytes": 14088,
+      "encodedBytes": 9846,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1224,
+      "decodedBytes": 9392,
+      "encodedBytes": 6671,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1226,
+      "decodedBytes": 18784,
+      "encodedBytes": 4267,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1227,
+      "decodedBytes": 11496,
+      "encodedBytes": 5809,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1228,
+      "decodedBytes": 384,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1229,
+      "decodedBytes": 384,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1230,
+      "decodedBytes": 800,
+      "encodedBytes": 56,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1231,
+      "decodedBytes": 800,
+      "encodedBytes": 56,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1232,
+      "decodedBytes": 336112,
+      "encodedBytes": 68533,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1233,
+      "decodedBytes": 1360,
+      "encodedBytes": 65,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1234,
+      "decodedBytes": 4696,
+      "encodedBytes": 305,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1235,
+      "decodedBytes": 1152,
+      "encodedBytes": 655,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1236,
+      "decodedBytes": 1152,
+      "encodedBytes": 1080,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1238,
+      "decodedBytes": 1536,
+      "encodedBytes": 798,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1239,
+      "decodedBytes": 1152,
+      "encodedBytes": 581,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1241,
+      "decodedBytes": 1152,
+      "encodedBytes": 660,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1242,
+      "decodedBytes": 1152,
+      "encodedBytes": 1079,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1244,
+      "decodedBytes": 1536,
+      "encodedBytes": 797,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1245,
+      "decodedBytes": 2400,
+      "encodedBytes": 1452,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1246,
+      "decodedBytes": 2400,
+      "encodedBytes": 2160,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1248,
+      "decodedBytes": 3200,
+      "encodedBytes": 875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1249,
+      "decodedBytes": 2376,
+      "encodedBytes": 1193,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1250,
+      "decodedBytes": 2400,
+      "encodedBytes": 1443,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1251,
+      "decodedBytes": 2400,
+      "encodedBytes": 2157,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1253,
+      "decodedBytes": 3200,
+      "encodedBytes": 877,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1254,
+      "decodedBytes": 1008336,
+      "encodedBytes": 646142,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1255,
+      "decodedBytes": 1008336,
+      "encodedBytes": 757857,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1256,
+      "decodedBytes": 672224,
+      "encodedBytes": 456477,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1258,
+      "decodedBytes": 1344448,
+      "encodedBytes": 392720,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1259,
+      "decodedBytes": 1587072,
+      "encodedBytes": 935488,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1263,
+      "decodedBytes": 4080,
+      "encodedBytes": 1875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1264,
+      "decodedBytes": 4080,
+      "encodedBytes": 2518,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1265,
+      "decodedBytes": 2720,
+      "encodedBytes": 2201,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1267,
+      "decodedBytes": 5440,
+      "encodedBytes": 356,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1268,
+      "decodedBytes": 2076,
+      "encodedBytes": 1044,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1269,
+      "decodedBytes": 14088,
+      "encodedBytes": 7998,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1270,
+      "decodedBytes": 14088,
+      "encodedBytes": 9846,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1271,
+      "decodedBytes": 9392,
+      "encodedBytes": 6671,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1273,
+      "decodedBytes": 18784,
+      "encodedBytes": 4267,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1274,
+      "decodedBytes": 11496,
+      "encodedBytes": 5809,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1275,
+      "decodedBytes": 384,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1276,
+      "decodedBytes": 384,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1277,
+      "decodedBytes": 800,
+      "encodedBytes": 56,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1278,
+      "decodedBytes": 800,
+      "encodedBytes": 56,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1279,
+      "decodedBytes": 336112,
+      "encodedBytes": 68533,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1280,
+      "decodedBytes": 1360,
+      "encodedBytes": 65,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1281,
+      "decodedBytes": 4696,
+      "encodedBytes": 305,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1282,
+      "decodedBytes": 33744,
+      "encodedBytes": 18277,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1283,
+      "decodedBytes": 33744,
+      "encodedBytes": 24803,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1284,
+      "decodedBytes": 22496,
+      "encodedBytes": 15132,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1286,
+      "decodedBytes": 44992,
+      "encodedBytes": 745,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1287,
+      "decodedBytes": 27600,
+      "encodedBytes": 13905,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1292,
+      "decodedBytes": 19656,
+      "encodedBytes": 8318,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1293,
+      "decodedBytes": 19656,
+      "encodedBytes": 11547,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1294,
+      "decodedBytes": 13104,
+      "encodedBytes": 10885,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1296,
+      "decodedBytes": 26208,
+      "encodedBytes": 53,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1297,
+      "decodedBytes": 9888,
+      "encodedBytes": 4958,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1298,
+      "decodedBytes": 10080,
+      "encodedBytes": 4259,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1299,
+      "decodedBytes": 10080,
+      "encodedBytes": 6728,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1300,
+      "decodedBytes": 6720,
+      "encodedBytes": 5534,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1302,
+      "decodedBytes": 13440,
+      "encodedBytes": 41,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1303,
+      "decodedBytes": 5736,
+      "encodedBytes": 2941,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1711,
+      "decodedBytes": 11248,
+      "encodedBytes": 116,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1712,
+      "decodedBytes": 6552,
+      "encodedBytes": 39,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1713,
+      "decodedBytes": 3360,
+      "encodedBytes": 36,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1714,
+      "decodedBytes": 73356,
+      "encodedBytes": 41709,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1715,
+      "decodedBytes": 73356,
+      "encodedBytes": 54318,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1716,
+      "decodedBytes": 48904,
+      "encodedBytes": 39600,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1718,
+      "decodedBytes": 97808,
+      "encodedBytes": 22947,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1719,
+      "decodedBytes": 48408,
+      "encodedBytes": 38974,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1724,
+      "decodedBytes": 24452,
+      "encodedBytes": 1521,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1725,
+      "decodedBytes": 14208,
+      "encodedBytes": 6475,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1726,
+      "decodedBytes": 14208,
+      "encodedBytes": 9943,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1727,
+      "decodedBytes": 9472,
+      "encodedBytes": 6767,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1729,
+      "decodedBytes": 18944,
+      "encodedBytes": 45,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1730,
+      "decodedBytes": 9600,
+      "encodedBytes": 4812,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1735,
+      "decodedBytes": 54576,
+      "encodedBytes": 24490,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1736,
+      "decodedBytes": 54576,
+      "encodedBytes": 36567,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1737,
+      "decodedBytes": 36384,
+      "encodedBytes": 27374,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1739,
+      "decodedBytes": 72768,
+      "encodedBytes": 97,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1740,
+      "decodedBytes": 35712,
+      "encodedBytes": 17877,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1741,
+      "decodedBytes": 6096,
+      "encodedBytes": 3325,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1742,
+      "decodedBytes": 6096,
+      "encodedBytes": 4275,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1743,
+      "decodedBytes": 4064,
+      "encodedBytes": 3373,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1745,
+      "decodedBytes": 8128,
+      "encodedBytes": 33,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1746,
+      "decodedBytes": 4176,
+      "encodedBytes": 2121,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1747,
+      "decodedBytes": 30408,
+      "encodedBytes": 18665,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1748,
+      "decodedBytes": 30408,
+      "encodedBytes": 23315,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1749,
+      "decodedBytes": 20272,
+      "encodedBytes": 15418,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1751,
+      "decodedBytes": 40544,
+      "encodedBytes": 65,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 1752,
+      "decodedBytes": 25344,
+      "encodedBytes": 14849,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2160,
+      "decodedBytes": 4736,
+      "encodedBytes": 37,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2161,
+      "decodedBytes": 18192,
+      "encodedBytes": 50,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2162,
+      "decodedBytes": 2032,
+      "encodedBytes": 34,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2163,
+      "decodedBytes": 10136,
+      "encodedBytes": 66,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2164,
+      "decodedBytes": 1152,
+      "encodedBytes": 655,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2165,
+      "decodedBytes": 1152,
+      "encodedBytes": 1080,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2167,
+      "decodedBytes": 1536,
+      "encodedBytes": 798,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2168,
+      "decodedBytes": 1152,
+      "encodedBytes": 581,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2170,
+      "decodedBytes": 1152,
+      "encodedBytes": 660,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2171,
+      "decodedBytes": 1152,
+      "encodedBytes": 1079,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2173,
+      "decodedBytes": 1536,
+      "encodedBytes": 797,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2174,
+      "decodedBytes": 2400,
+      "encodedBytes": 1452,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2175,
+      "decodedBytes": 2400,
+      "encodedBytes": 2160,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2177,
+      "decodedBytes": 3200,
+      "encodedBytes": 875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2178,
+      "decodedBytes": 2376,
+      "encodedBytes": 1193,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2179,
+      "decodedBytes": 2400,
+      "encodedBytes": 1443,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2180,
+      "decodedBytes": 2400,
+      "encodedBytes": 2157,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2182,
+      "decodedBytes": 3200,
+      "encodedBytes": 877,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2183,
+      "decodedBytes": 1008336,
+      "encodedBytes": 646279,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2184,
+      "decodedBytes": 1008336,
+      "encodedBytes": 760295,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2185,
+      "decodedBytes": 672224,
+      "encodedBytes": 456477,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2187,
+      "decodedBytes": 1344448,
+      "encodedBytes": 392720,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2188,
+      "decodedBytes": 1587072,
+      "encodedBytes": 935488,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2192,
+      "decodedBytes": 4080,
+      "encodedBytes": 1875,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2193,
+      "decodedBytes": 4080,
+      "encodedBytes": 2518,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2194,
+      "decodedBytes": 2720,
+      "encodedBytes": 2201,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2196,
+      "decodedBytes": 5440,
+      "encodedBytes": 356,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2197,
+      "decodedBytes": 2076,
+      "encodedBytes": 1044,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2198,
+      "decodedBytes": 14088,
+      "encodedBytes": 8076,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2199,
+      "decodedBytes": 14088,
+      "encodedBytes": 9780,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2200,
+      "decodedBytes": 9392,
+      "encodedBytes": 6671,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2202,
+      "decodedBytes": 18784,
+      "encodedBytes": 4267,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2203,
+      "decodedBytes": 11496,
+      "encodedBytes": 5807,
+      "mode": "INDICES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2204,
+      "decodedBytes": 384,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2205,
+      "decodedBytes": 384,
+      "encodedBytes": 26,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2206,
+      "decodedBytes": 800,
+      "encodedBytes": 56,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2207,
+      "decodedBytes": 800,
+      "encodedBytes": 56,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2208,
+      "decodedBytes": 336112,
+      "encodedBytes": 68533,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2209,
+      "decodedBytes": 1360,
+      "encodedBytes": 65,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    },
+    {
+      "originalBufferView": 2210,
+      "decodedBytes": 4696,
+      "encodedBytes": 305,
+      "mode": "ATTRIBUTES",
+      "exact": true
+    }
+  ],
+  "limitations": [
+    "Required EXT_meshopt_compression; no uncompressed fallback copy.",
+    "Parent must verify actual Three.js load and matched rendered motion before adoption."
+  ]
+}

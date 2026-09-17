@@ -1,0 +1,1144 @@
+{
+  "first": "prototypes/hero-garage/art/delivery/runs/20260917T015429Z-3ca595de/delivery-raw.glb",
+  "second": "prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb",
+  "firstSHA256": "3e6d0b658db56145427a0570c16db73d06f6c91e395f25fc3327e29533caaa67",
+  "secondSHA256": "3e6d0b658db56145427a0570c16db73d06f6c91e395f25fc3327e29533caaa67",
+  "fileByteDifference": 0,
+  "activeMeshAttributes": [
+    {
+      "node": "rider",
+      "nodeIndex": 23,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 381288
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 381288
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 254192
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 127096
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 508384
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 0
+        }
+      ]
+    },
+    {
+      "node": "MPFB_AdultMale_SourceProbe.eyebrow001_Runtime",
+      "nodeIndex": 25,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 1488
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 1488
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 992
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 496
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 1984
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 1152
+        }
+      ]
+    },
+    {
+      "node": "MPFB_AdultMale_SourceProbe.high-poly_Runtime",
+      "nodeIndex": 26,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 12912
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 12912
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 8608
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 4304
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 17216
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 12240
+        }
+      ]
+    },
+    {
+      "node": "Street01_Authored_EditableBody_Runtime",
+      "nodeIndex": 27,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 284880
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 284880
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 189920
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 94960
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 379840
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 412296
+        }
+      ]
+    },
+    {
+      "node": "Street01_Bystedt_CurlyGroom_Runtime",
+      "nodeIndex": 28,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 21060000
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 21060000
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 7020000
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 28080000
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 41472000
+        }
+      ]
+    },
+    {
+      "node": "Street01_grinsegold_full_beard_Runtime",
+      "nodeIndex": 29,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 5076
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 5076
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 3384
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 1692
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 6768
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 4488
+        }
+      ]
+    },
+    {
+      "node": "Street01_grinsegold_moustache_Runtime",
+      "nodeIndex": 30,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 972
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 972
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 648
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 324
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 1296
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 720
+        }
+      ]
+    },
+    {
+      "node": "collar eyelet 1",
+      "nodeIndex": 31,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 1152
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 1152
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 384
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 1536
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 1152
+        }
+      ]
+    },
+    {
+      "node": "collar eyelet -1",
+      "nodeIndex": 32,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 1152
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 1152
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 384
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 1536
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 1152
+        }
+      ]
+    },
+    {
+      "node": "fitted drawcord 1",
+      "nodeIndex": 33,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 2400
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 2400
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 800
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 3200
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 2376
+        }
+      ]
+    },
+    {
+      "node": "fitted drawcord -1",
+      "nodeIndex": 34,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 2400
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 2400
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 800
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 3200
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 2376
+        }
+      ]
+    },
+    {
+      "node": "rider:anatomical sweatshirt",
+      "nodeIndex": 35,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 1008336
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 1008336
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 672224
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 336112
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 1344448
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 1587072
+        }
+      ]
+    },
+    {
+      "node": "rider:anatomical sweatshirt pocket",
+      "nodeIndex": 36,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 4080
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 4080
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 2720
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 1360
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 5440
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 2076
+        }
+      ]
+    },
+    {
+      "node": "rider:folded hood",
+      "nodeIndex": 37,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 14088
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 14088
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 9392
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 4696
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 18784
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 11496
+        }
+      ]
+    },
+    {
+      "node": "rider:cotton_laces",
+      "nodeIndex": 38,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 14208
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 14208
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 9472
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 4736
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 18944
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 9600
+        }
+      ]
+    },
+    {
+      "node": "rider:hero footwear construction",
+      "nodeIndex": 39,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 54576
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 54576
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 36384
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 18192
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 72768
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 35712
+        }
+      ]
+    },
+    {
+      "node": "rider:trainer_rubber",
+      "nodeIndex": 40,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 6096
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 6096
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 4064
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 2032
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 8128
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 4176
+        }
+      ]
+    },
+    {
+      "node": "rider:trainer_upper",
+      "nodeIndex": 41,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 30408
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 30408
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 20272
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 10136
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 40544
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 25344
+        }
+      ]
+    },
+    {
+      "node": "rider:glove_top",
+      "nodeIndex": 42,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 33744
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 33744
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 22496
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 11248
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 44992
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 27600
+        }
+      ]
+    },
+    {
+      "node": "rider:gloves",
+      "nodeIndex": 43,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 19656
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 19656
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 13104
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 6552
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 26208
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 9888
+        }
+      ]
+    },
+    {
+      "node": "rider:hero glove construction",
+      "nodeIndex": 44,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 10080
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 10080
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 6720
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 3360
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 13440
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 5736
+        }
+      ]
+    },
+    {
+      "node": "rider",
+      "nodeIndex": 45,
+      "attributes": [
+        {
+          "semantic": "POSITION",
+          "exact": true,
+          "bytes": 73356
+        },
+        {
+          "semantic": "NORMAL",
+          "exact": true,
+          "bytes": 73356
+        },
+        {
+          "semantic": "TEXCOORD_0",
+          "exact": true,
+          "bytes": 48904
+        },
+        {
+          "semantic": "JOINTS_0",
+          "exact": true,
+          "bytes": 24452
+        },
+        {
+          "semantic": "WEIGHTS_0",
+          "exact": true,
+          "bytes": 97808
+        },
+        {
+          "semantic": "indices",
+          "exact": true,
+          "bytes": 48408
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "index": 0,
+      "firstName": "rider-street_normal",
+      "secondName": "rider-street_normal",
+      "firstBytes": 18105,
+      "secondBytes": 18105,
+      "exact": true,
+      "firstSHA256": "6d102459cc5993d1d4b769e47d57ef631885b62a2d94c1ae8c51a35922457e52",
+      "secondSHA256": "6d102459cc5993d1d4b769e47d57ef631885b62a2d94c1ae8c51a35922457e52"
+    },
+    {
+      "index": 1,
+      "firstName": "rider-street_orm",
+      "secondName": "rider-street_orm",
+      "firstBytes": 123838,
+      "secondBytes": 123838,
+      "exact": true,
+      "firstSHA256": "e4c2d59e5d5729f4fb87ffc0fb39ec3670a19ac4da2784ae5d3d4fad3318bb72",
+      "secondSHA256": "e4c2d59e5d5729f4fb87ffc0fb39ec3670a19ac4da2784ae5d3d4fad3318bb72"
+    },
+    {
+      "index": 2,
+      "firstName": "rider-street_rookie_albedo",
+      "secondName": "rider-street_rookie_albedo",
+      "firstBytes": 225620,
+      "secondBytes": 225620,
+      "exact": true,
+      "firstSHA256": "7072de1602fb325a1b079b62b08c7b9b7bd3d831e4d58158c3650ce46b09f274",
+      "secondSHA256": "7072de1602fb325a1b079b62b08c7b9b7bd3d831e4d58158c3650ce46b09f274"
+    },
+    {
+      "index": 3,
+      "firstName": "rider-street_pro_albedo",
+      "secondName": "rider-street_pro_albedo",
+      "firstBytes": 195424,
+      "secondBytes": 195424,
+      "exact": true,
+      "firstSHA256": "71b28aa5914fda550981155c7ed8b9e96bc656ff943f94610ca4939965bd17ec",
+      "secondSHA256": "71b28aa5914fda550981155c7ed8b9e96bc656ff943f94610ca4939965bd17ec"
+    },
+    {
+      "index": 4,
+      "firstName": "eyebrow001",
+      "secondName": "eyebrow001",
+      "firstBytes": 89619,
+      "secondBytes": 89619,
+      "exact": true,
+      "firstSHA256": "9940f7d0b1b223709a19b05156ba6f6e9e4dbdbced02d7574f4d51d72c58967b",
+      "secondSHA256": "9940f7d0b1b223709a19b05156ba6f6e9e4dbdbced02d7574f4d51d72c58967b"
+    },
+    {
+      "index": 5,
+      "firstName": "brown_eye",
+      "secondName": "brown_eye",
+      "firstBytes": 610817,
+      "secondBytes": 610817,
+      "exact": true,
+      "firstSHA256": "4659691c7295ad6206c78b003e5fd0e5f91dcd53032fa914a229bb48cabe424b",
+      "secondSHA256": "4659691c7295ad6206c78b003e5fd0e5f91dcd53032fa914a229bb48cabe424b"
+    },
+    {
+      "index": 6,
+      "firstName": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+      "secondName": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+      "firstBytes": 5615645,
+      "secondBytes": 5615645,
+      "exact": true,
+      "firstSHA256": "0f1a86d78af8bc1e55ae21cfaca0e7308384f789796adc77a78e4d22ccaf419c",
+      "secondSHA256": "0f1a86d78af8bc1e55ae21cfaca0e7308384f789796adc77a78e4d22ccaf419c"
+    },
+    {
+      "index": 7,
+      "firstName": "Full_beard_black_diff",
+      "secondName": "Full_beard_black_diff",
+      "firstBytes": 583303,
+      "secondBytes": 583303,
+      "exact": true,
+      "firstSHA256": "633a8f48877fbd983b09015f396f98c48fea8001503a59b60d53af0fcd7c9850",
+      "secondSHA256": "633a8f48877fbd983b09015f396f98c48fea8001503a59b60d53af0fcd7c9850"
+    },
+    {
+      "index": 8,
+      "firstName": "Moustache_black_diff",
+      "secondName": "Moustache_black_diff",
+      "firstBytes": 268833,
+      "secondBytes": 268833,
+      "exact": true,
+      "firstSHA256": "da83aece065cfaf99f9a888bdeff520c7e508ebe6d622ef514c4e89204fdec0f",
+      "secondSHA256": "da83aece065cfaf99f9a888bdeff520c7e508ebe6d622ef514c4e89204fdec0f"
+    },
+    {
+      "index": 9,
+      "firstName": "cloth28_normal",
+      "secondName": "cloth28_normal",
+      "firstBytes": 1029067,
+      "secondBytes": 1029067,
+      "exact": true,
+      "firstSHA256": "e7a0f8341d14e5633c6b38b31cd386d010f36b036b2a8cf7e77684888c99585e",
+      "secondSHA256": "e7a0f8341d14e5633c6b38b31cd386d010f36b036b2a8cf7e77684888c99585e"
+    },
+    {
+      "index": 10,
+      "firstName": "cloth28_albedo",
+      "secondName": "cloth28_albedo",
+      "firstBytes": 181768,
+      "secondBytes": 181768,
+      "exact": true,
+      "firstSHA256": "0decde178f6e4cc5bb19120ae572f85181ece0819e5af285726bcf78cfaa8bd6",
+      "secondSHA256": "0decde178f6e4cc5bb19120ae572f85181ece0819e5af285726bcf78cfaa8bd6"
+    },
+    {
+      "index": 11,
+      "firstName": "cloth28_orm",
+      "secondName": "cloth28_orm",
+      "firstBytes": 45827,
+      "secondBytes": 45827,
+      "exact": true,
+      "firstSHA256": "df67aebc96c784ed89c454451306f01176e31e5f3b91f37ac222e7842aaa039b",
+      "secondSHA256": "df67aebc96c784ed89c454451306f01176e31e5f3b91f37ac222e7842aaa039b"
+    },
+    {
+      "index": 12,
+      "firstName": "footwear_normal",
+      "secondName": "footwear_normal",
+      "firstBytes": 730284,
+      "secondBytes": 730284,
+      "exact": true,
+      "firstSHA256": "4f49bd7b7f441ecb2a63c475aebfd4931450bbf54e038a632853224da2c15b63",
+      "secondSHA256": "4f49bd7b7f441ecb2a63c475aebfd4931450bbf54e038a632853224da2c15b63"
+    },
+    {
+      "index": 13,
+      "firstName": "footwear_albedo",
+      "secondName": "footwear_albedo",
+      "firstBytes": 99803,
+      "secondBytes": 99803,
+      "exact": true,
+      "firstSHA256": "8f4ca4ebda38398afb79389d44a13674730396e3461fd3c4971803a4978f6e26",
+      "secondSHA256": "8f4ca4ebda38398afb79389d44a13674730396e3461fd3c4971803a4978f6e26"
+    },
+    {
+      "index": 14,
+      "firstName": "footwear_orm",
+      "secondName": "footwear_orm",
+      "firstBytes": 85339,
+      "secondBytes": 85339,
+      "exact": true,
+      "firstSHA256": "189d9dbb8e1673dea448b027cd10a4eee023262ac711bdb26ebfcc20d842ab5d",
+      "secondSHA256": "189d9dbb8e1673dea448b027cd10a4eee023262ac711bdb26ebfcc20d842ab5d"
+    },
+    {
+      "index": 15,
+      "firstName": "glove_normal",
+      "secondName": "glove_normal",
+      "firstBytes": 787567,
+      "secondBytes": 787567,
+      "exact": true,
+      "firstSHA256": "d8ebb0407045dac470f6ae55fe8f983172808273664488699b724e1e8aba700a",
+      "secondSHA256": "d8ebb0407045dac470f6ae55fe8f983172808273664488699b724e1e8aba700a"
+    },
+    {
+      "index": 16,
+      "firstName": "glove_albedo",
+      "secondName": "glove_albedo",
+      "firstBytes": 103197,
+      "secondBytes": 103197,
+      "exact": true,
+      "firstSHA256": "c0798c46ae78bc49fe1d1f0c55984af28b226250dbc47d5e6897c939cce8f8ff",
+      "secondSHA256": "c0798c46ae78bc49fe1d1f0c55984af28b226250dbc47d5e6897c939cce8f8ff"
+    },
+    {
+      "index": 17,
+      "firstName": "glove_orm",
+      "secondName": "glove_orm",
+      "firstBytes": 91797,
+      "secondBytes": 91797,
+      "exact": true,
+      "firstSHA256": "7569a47671b1abaafb362df7671302d115fb9a82f91f3f311c74f2af406c43d0",
+      "secondSHA256": "7569a47671b1abaafb362df7671302d115fb9a82f91f3f311c74f2af406c43d0"
+    },
+    {
+      "index": 18,
+      "firstName": "denim_normal",
+      "secondName": "denim_normal",
+      "firstBytes": 691553,
+      "secondBytes": 691553,
+      "exact": true,
+      "firstSHA256": "1f31fd6e78472318e4b6bb1482a18843c0931a4ff33026ef3ef6c6678ec05bac",
+      "secondSHA256": "1f31fd6e78472318e4b6bb1482a18843c0931a4ff33026ef3ef6c6678ec05bac"
+    },
+    {
+      "index": 19,
+      "firstName": "denim_albedo",
+      "secondName": "denim_albedo",
+      "firstBytes": 585737,
+      "secondBytes": 585737,
+      "exact": true,
+      "firstSHA256": "f87b65ac69ca2506ebfcd5d3000b0b3052c4f9282508cc509cb347e2cf1a5f94",
+      "secondSHA256": "f87b65ac69ca2506ebfcd5d3000b0b3052c4f9282508cc509cb347e2cf1a5f94"
+    },
+    {
+      "index": 20,
+      "firstName": "denim_orm",
+      "secondName": "denim_orm",
+      "firstBytes": 656620,
+      "secondBytes": 656620,
+      "exact": true,
+      "firstSHA256": "0682a442de68e09b76f136bcf5ec821a6fea35a7380fe5f18ce64774fca881eb",
+      "secondSHA256": "0682a442de68e09b76f136bcf5ec821a6fea35a7380fe5f18ce64774fca881eb"
+    },
+    {
+      "index": 21,
+      "firstName": "cloth28_normal",
+      "secondName": "cloth28_normal",
+      "firstBytes": 1047081,
+      "secondBytes": 1047081,
+      "exact": true,
+      "firstSHA256": "d131180bd175a8bf092185c55a9ffe06aea2a0418b03bccce56816e4fae372d8",
+      "secondSHA256": "d131180bd175a8bf092185c55a9ffe06aea2a0418b03bccce56816e4fae372d8"
+    },
+    {
+      "index": 22,
+      "firstName": "cloth28_albedo",
+      "secondName": "cloth28_albedo",
+      "firstBytes": 181971,
+      "secondBytes": 181971,
+      "exact": true,
+      "firstSHA256": "5d08211b71a9ec0621765c6ebfc092f79c8df37ef6fef0a85afb954f0f4d0d6e",
+      "secondSHA256": "5d08211b71a9ec0621765c6ebfc092f79c8df37ef6fef0a85afb954f0f4d0d6e"
+    },
+    {
+      "index": 23,
+      "firstName": "cloth28_orm",
+      "secondName": "cloth28_orm",
+      "firstBytes": 44926,
+      "secondBytes": 44926,
+      "exact": true,
+      "firstSHA256": "138dc42653e2d935da43b2e5ff289bfb6c4fee9dbd481f4ac69a24c3aa9279bf",
+      "secondSHA256": "138dc42653e2d935da43b2e5ff289bfb6c4fee9dbd481f4ac69a24c3aa9279bf"
+    },
+    {
+      "index": 24,
+      "firstName": "cotton_normal",
+      "secondName": "cotton_normal",
+      "firstBytes": 23523,
+      "secondBytes": 23523,
+      "exact": true,
+      "firstSHA256": "46b9f58690585e746db832c606f39033251694818a101e19403938b0eaf795d5",
+      "secondSHA256": "46b9f58690585e746db832c606f39033251694818a101e19403938b0eaf795d5"
+    },
+    {
+      "index": 25,
+      "firstName": "cotton_albedo",
+      "secondName": "cotton_albedo",
+      "firstBytes": 130871,
+      "secondBytes": 130871,
+      "exact": true,
+      "firstSHA256": "6a9b8d90e4570fa61a829ee00e77ba2f120a56f588d882b593c8fb367c9e760b",
+      "secondSHA256": "6a9b8d90e4570fa61a829ee00e77ba2f120a56f588d882b593c8fb367c9e760b"
+    },
+    {
+      "index": 26,
+      "firstName": "cotton_orm",
+      "secondName": "cotton_orm",
+      "firstBytes": 44926,
+      "secondBytes": 44926,
+      "exact": true,
+      "firstSHA256": "138dc42653e2d935da43b2e5ff289bfb6c4fee9dbd481f4ac69a24c3aa9279bf",
+      "secondSHA256": "138dc42653e2d935da43b2e5ff289bfb6c4fee9dbd481f4ac69a24c3aa9279bf"
+    },
+    {
+      "index": 27,
+      "firstName": "glove_normal",
+      "secondName": "glove_normal",
+      "firstBytes": 486159,
+      "secondBytes": 486159,
+      "exact": true,
+      "firstSHA256": "a734286fca40e5763a8e26b29e45ccb6ae7b9aab12429ada3973db3c72696f2d",
+      "secondSHA256": "a734286fca40e5763a8e26b29e45ccb6ae7b9aab12429ada3973db3c72696f2d"
+    },
+    {
+      "index": 28,
+      "firstName": "glove_albedo",
+      "secondName": "glove_albedo",
+      "firstBytes": 103440,
+      "secondBytes": 103440,
+      "exact": true,
+      "firstSHA256": "9005e67b7dfc6677597bd1df8600b93139b7c009dd4d16e9c6ed1fefcb007d43",
+      "secondSHA256": "9005e67b7dfc6677597bd1df8600b93139b7c009dd4d16e9c6ed1fefcb007d43"
+    },
+    {
+      "index": 29,
+      "firstName": "glove_orm",
+      "secondName": "glove_orm",
+      "firstBytes": 91803,
+      "secondBytes": 91803,
+      "exact": true,
+      "firstSHA256": "c297fbc55dcbd47ac19ad27fa398e3db8eef9ea7461a1cf0bfe0bf079170b513",
+      "secondSHA256": "c297fbc55dcbd47ac19ad27fa398e3db8eef9ea7461a1cf0bfe0bf079170b513"
+    },
+    {
+      "index": 30,
+      "firstName": "denim_normal",
+      "secondName": "denim_normal",
+      "firstBytes": 691553,
+      "secondBytes": 691553,
+      "exact": true,
+      "firstSHA256": "1f31fd6e78472318e4b6bb1482a18843c0931a4ff33026ef3ef6c6678ec05bac",
+      "secondSHA256": "1f31fd6e78472318e4b6bb1482a18843c0931a4ff33026ef3ef6c6678ec05bac"
+    },
+    {
+      "index": 31,
+      "firstName": "denim_albedo",
+      "secondName": "denim_albedo",
+      "firstBytes": 449277,
+      "secondBytes": 449277,
+      "exact": true,
+      "firstSHA256": "f0143f9affb9d82963cec13216931d27cf949217be577c78eca364a49e2d9f59",
+      "secondSHA256": "f0143f9affb9d82963cec13216931d27cf949217be577c78eca364a49e2d9f59"
+    },
+    {
+      "index": 32,
+      "firstName": "denim_orm",
+      "secondName": "denim_orm",
+      "firstBytes": 656620,
+      "secondBytes": 656620,
+      "exact": true,
+      "firstSHA256": "0682a442de68e09b76f136bcf5ec821a6fea35a7380fe5f18ce64774fca881eb",
+      "secondSHA256": "0682a442de68e09b76f136bcf5ec821a6fea35a7380fe5f18ce64774fca881eb"
+    },
+    {
+      "index": 33,
+      "firstName": "footwear_normal",
+      "secondName": "footwear_normal",
+      "firstBytes": 730288,
+      "secondBytes": 730288,
+      "exact": true,
+      "firstSHA256": "84711ed667911f669bfc3c7a325e6475fc23fde38cbcfd2c2026079953a61e6f",
+      "secondSHA256": "84711ed667911f669bfc3c7a325e6475fc23fde38cbcfd2c2026079953a61e6f"
+    },
+    {
+      "index": 34,
+      "firstName": "footwear_albedo",
+      "secondName": "footwear_albedo",
+      "firstBytes": 98646,
+      "secondBytes": 98646,
+      "exact": true,
+      "firstSHA256": "c52e1e167a89deb918808d114e034db4d2b7ae45beb29366a803bcec322e4c99",
+      "secondSHA256": "c52e1e167a89deb918808d114e034db4d2b7ae45beb29366a803bcec322e4c99"
+    },
+    {
+      "index": 35,
+      "firstName": "footwear_orm",
+      "secondName": "footwear_orm",
+      "firstBytes": 85339,
+      "secondBytes": 85339,
+      "exact": true,
+      "firstSHA256": "189d9dbb8e1673dea448b027cd10a4eee023262ac711bdb26ebfcc20d842ab5d",
+      "secondSHA256": "189d9dbb8e1673dea448b027cd10a4eee023262ac711bdb26ebfcc20d842ab5d"
+    }
+  ],
+  "differences": [],
+  "limitations": [
+    "Raw GLBs only; fails rather than treating compressed accessor bytes as decoded geometry.",
+    "Image encoding differences are reported by payload hash; pixel decoding is a separate verification step.",
+    "Node/material metadata compared directly, not silently discarded."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "round": 31,
+  "status": "provisional parent acceptance",
+  "rider": {
+    "file": "street01-rider-round31-lossless.glb",
+    "sha256": "5f246ee760616c242707ff4515bb095bcb58080f8690116cc567819985329142"
+  },
+  "bike": {
+    "file": "street01-bike-exhaust.glb",
+    "sha256": "7877404ef7e9e2f5f25550a7d979b8f62e6e20774109294221a14e9877c8d9de"
+  },
+  "changes": [
+    "Fuller hood volume and broad sleeve folds preserve neck/cuff controls",
+    "Darkneutral shoe canvas and warmsteel exhaust replace palegreen/gold tones",
+    "10degree settled seated lean; allsixclips share easedneutralentry/exit; original targetphases preserved"
+  ],
+  "checks": [
+    "750 actual exportedframes: grip/sole drift<2.07micrometres",
+    "Newfamily54pose cloth audit:0hood/shirt+cordcrossings,0degenerates; minimumhoodgap1.327mm",
+    "48 timedfull/detailviews across6clips2lights; parentinspecteddecodedsequence andcloseups",
+    "12 packed/raw PNGsbyteidentical",
+    "Stage34twofullrebuilds raw+packedbyteidentical; stage36fullrebuildsuccess"
+  ],
+  "remaining": [
+    "Rearhem stillflareslikecape; boundedcorrectionpending",
+    "Target01fidelity, naturalclothfolds andcloseupfinish remainbelowAAAbar",
+    "ActualiPhoneSafari performance notvalidated"
+  ],
+  "usageRemainingPercent": 10
+}

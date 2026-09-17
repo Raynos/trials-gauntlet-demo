@@ -9,26 +9,26 @@
     {
       "id": "street01-rider",
       "label": "Mustard rider with saved curly hair and beard",
-      "url": "/assets/street01-rider-round30-lossless.glb",
+      "url": "/assets/street01-rider-round31-lossless.glb",
       "kind": "rider",
       "position": [
         0,
         0.34,
         0
       ],
-      "mobileUrl": "/assets/street01-rider-round30-lossless.glb"
+      "mobileUrl": "/assets/street01-rider-round31-lossless.glb"
     },
     {
       "id": "street01-bike",
       "label": "Blue/white trials bike",
-      "url": "/assets/street01-bike-contours.glb",
+      "url": "/assets/street01-bike-exhaust.glb",
       "kind": "bike",
       "position": [
         0,
         0.34,
         0
       ],
-      "mobileUrl": "/assets/street01-bike-contours.glb"
+      "mobileUrl": "/assets/street01-bike-exhaust.glb"
     }
   ],
   "notes": [

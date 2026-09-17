@@ -34,3 +34,36 @@ Stage29 was executed successfully on September17UTC. Its raw output SHA256 exact
 ## Stage 30: accepted sleeve continuity
 
 `--stage 30` preserves the full stage29 chain, stores its result as `street01-rider-delivery-30-before-sleeves.glb`, then builds the editable sleeve source/donor and redirects matching cloth nodes into the final raw delivery. The sleeve assembler accepts explicit `--base` and `--out`. Stage29 behavior remains unchanged. The separate cloth-surface shading experiment is deliberately not included until parent visual approval.
+
+## Stage 31: subdued cotton finish
+
+`--stage 31` runs stage30's component chain, retains its result as `street01-rider-delivery-31-before-cotton.glb`, then rebuilds the approved subdued cotton donor from the freshly regenerated sleeve source and assembles it into the canonical raw delivery. The cotton assembler receives explicit base/output arguments. Stages29/30 remain independently selectable with their previous behavior. Texture/bake metadata may differ between builds; compare decoded active scene content and matched rendered motion before calling a rebuild equivalent.
+
+## Stage32 and repeatability
+
+`--stage 32` adds the accepted glove-surface donor after stage31 cotton, with explicit base/output assembly. The cuff3 extractor now uses deterministic vertex-index boundary starts and traversal, sorted left/right loops and reproducible coordinate summation; cuff material construction also uses sorted names. This removes the identified unordered-set input to mesh construction and smart UV packing.
+
+The earlier stage30 rebuild was not byte-identical: glove UV/rebakes differed and one cotton-normal pixel differed by1/255. Geometry outside gloves, rig and animations matched exactly. See rebuild-semantic-comparison.json and rebuild-detailed-diagnosis.json. Stable traversal has been implemented but repeated complete outputs have not yet been proven; parent must run repeated builds and compare. Residual CPU bake rounding may still produce1LSB normal-map differences, which must be measured rather than silently accepted as exact.
+
+## Stages 33–34: dark indigo and charcoal footwear
+
+`--stage 33` runs the complete cotton and glove-surface chain, then builds the dark-indigo denim donor and replaces only the unique accepted denim payload. `--stage 34` additionally rebuilds the charcoal footwear finish from the freshly generated fitted footwear source and replaces those footwear payloads. Both replacement assemblers receive explicit `--base` and `--out`; the review catalog and named reviewed study exports are not changed.
+
+```sh
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 34 --pack
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 34 --execute --pack
+```
+
+The first command is a read-only preflight. The second regenerates all 25 ordered steps, then losslessly packs the final rider. Generated material source files and reused normal/ORM maps are declared as dependencies. Each step and the whole run record elapsed wall time. The final outputs remain `street01-rider-delivery-raw.glb` and `street01-rider-delivery-lossless.glb`; they do not include the separately built bike.
+
+Run sequentially while all other source builders are stopped. A second full run is needed to measure repeatability; a successful single run does not prove byte-identical regeneration. Compare active geometry/UV/skin/motion payloads and decoded image pixels if file hashes differ. Never label a residual one-channel bake rounding difference byte-identical.
+
+### Verified stage34 repeatability
+
+Two complete serial stage34 builds with lossless packing finished on 2026-09-17 UTC in **64.373 s** and **64.261 s**. Both raw files and both packed files were byte-identical. The independent active-payload comparison also found zero differences in geometry, UVs, normals, skins, clips, material descriptors and embedded image bytes.
+
+- Raw: 206,245,116 bytes; SHA256 `3e6d0b658db56145427a0570c16db73d06f6c91e395f25fc3327e29533caaa67`.
+- Packed: 73,407,252 bytes; SHA256 `6e86f2c893b712b720816096400e47f7ed9cfec67373a69b4cd7aee81504793b`.
+- Evidence: `reports/delivery-stage34-repeatability.json` and `reports/delivery-stage34-repeat-comparison.json`; manifests/logs under the run directories named in that report.
+
+This proves repeatability for these two runs on the recorded local Blender/runtime. It does not claim cross-machine or cross-version determinism, or replace final rendered review.

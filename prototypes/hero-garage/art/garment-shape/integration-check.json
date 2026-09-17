@@ -1,0 +1,9 @@
+{
+  "stage34RecipeUnchanged": true,
+  "stage35PreflightMissing": [],
+  "stage35Steps": 27,
+  "regeneratedCottonSourceBuildPassed": true,
+  "regeneratedCottonSHA256": "d3e21e4332358be8a273e425b931d858bb57da59198bbbd5a0c38895648ad686",
+  "garmentDonorSHA256": "292288a7cd6b0c420e07dc4bb86b776263d55ed9d7c86bfd728c9e18157d0d44",
+  "fullStage35Executed": false
+}

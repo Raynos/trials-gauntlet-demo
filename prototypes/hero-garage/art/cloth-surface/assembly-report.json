@@ -1,5 +1,5 @@
 {
-  "sourceSHA256": "70f95e1a20c3b4241c741b3bb73aa380121839e5ae5544c3dbe7ec045e5c0dd8",
+  "sourceSHA256": "e98f71c7ae0ba7bc3fdc2c07821b9879d4fac9448a41e9211c974b008c72ecb8",
   "donorSHA256": "e4ef68f290239ea478551db36f4d59313b533962be2f38f37f6d5993a2bd50a6",
   "originalBinaryPrefixIdentical": true,
   "originalMeshesAndMotionUnmodified": true,
@@ -12,6 +12,6 @@
     "rider:anatomical sweatshirt pocket",
     "rider:folded hood"
   ],
-  "outputSHA256": "991edd830d8e07bc9bb4fe1f1c697fda825c30225fbec2faf28ded45222eebf3",
+  "outputSHA256": "b00469273452ed9141849b7524317f7420565382019c2e5fff9bff728da83ea5",
   "outputBytes": 201255980
 }
