@@ -1574,6 +1574,7 @@ export class CreditsScreen extends Screen {
         <dt>Design</dt><dd>Attempts-to-clear and restart latency, measured by a bot and a stranger every round.</dd>
         <dt>Type</dt><dd>Barlow Condensed by Jeremy Tribby (SIL OFL 1.1).</dd>
         <dt>Art</dt><dd>Key art, track cards and medals generated for this build; procedural biomes in-engine.</dd>
+        <dt>Hero</dt><dd>Rider and bike authored in Blender by Astra (five outfits, two liveries). Body and skin from <b>MPFB / MakeHuman</b> system assets (CC0) and the Blender Studio human base meshes (CC0); hair from <b>Daniel Bystedt</b>'s Hair Styles demo (CC BY-SA), baked to a curl shell for the game; beard and moustache by <b>grinsegold</b> (MakeHuman bodyparts06, CC-BY); the study head <b>Infinite, 3D Head Scan by Lee Perry-Smith</b> (CC BY 3.0, via three.js); cotton and denim from <b>Poly Haven</b> (CC0). Full provenance and licences ship with the source.</dd>
         <dt>Thanks</dt><dd>Trials Evolution and Trials Rising for the read-outs, the crash stamp and the checkpoint restart.</dd>
       </dl>`;
     this.root.append(h('div', 'grain'), wrap);
