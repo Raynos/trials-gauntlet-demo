@@ -22,6 +22,6 @@ export type BootWindow = Window & { __boot?: BootHandoff };
 export function takeBootPlan(): Promise<Plan<ModuleStep>> {
   const w = window as BootWindow;
   if (w.__boot) return w.__boot.take();
-  const plan = createBootPlan(() => undefined, { totals: { core: 0, ...selectedBootTotals(DECLARED_BOOT_TOTALS, location.search) } });
+  const plan = createBootPlan(() => undefined, { totals: { core: 0, ...selectedBootTotals(DECLARED_BOOT_TOTALS) } });
   return plan.step('core', () => undefined).then((p) => p.step('evaluate', () => undefined));
 }

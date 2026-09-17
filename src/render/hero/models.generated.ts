@@ -22,53 +22,53 @@ export const MODEL_ASSETS = {
     "sha256": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666"
   },
   "models/rider-race-bluewhite-lod.glb": {
-    "url": "models/39c39f0e6e03a3c8/rider-race-bluewhite-lod-401e3e9035cb3814.glb",
-    "bytes": 769020,
-    "sha256": "401e3e9035cb3814adf8fd69ee71455bfe80e927f5b70f00fccc9b7b377a967d"
+    "url": "models/739f850f433241c1/rider-race-bluewhite-lod-87d274ff164ce7be.glb",
+    "bytes": 793600,
+    "sha256": "87d274ff164ce7bedff8a717ef77bcccc47bb8444d54f3ac9c2a070f005175a5"
   },
   "models/rider-race-bluewhite.glb": {
-    "url": "models/39c39f0e6e03a3c8/rider-race-bluewhite-130d9e639a286455.glb",
-    "bytes": 2091492,
-    "sha256": "130d9e639a286455e321dbefa508f465dfbb95a1ab29f5c2c08d8e5a2de507f1"
+    "url": "models/739f850f433241c1/rider-race-bluewhite-ca251b8b632bc214.glb",
+    "bytes": 2153696,
+    "sha256": "ca251b8b632bc214c2c60f0d762062e0594e79b007cdf3bbe2242e65895882d2"
   },
   "models/rider-race-charcoalyellow-lod.glb": {
-    "url": "models/d5cba9e2fe07069f/rider-race-charcoalyellow-lod-4f7c9cfb86f2f526.glb",
-    "bytes": 762628,
-    "sha256": "4f7c9cfb86f2f52668ef1ff4ff69bdcd609d6db86fb52199b5c8f837b7e338c5"
+    "url": "models/e407eb0572ddfd88/rider-race-charcoalyellow-lod-307489a78ff8481e.glb",
+    "bytes": 761460,
+    "sha256": "307489a78ff8481e14cc459c25f06492c1f2a636253a34908505e3e9f6285682"
   },
   "models/rider-race-charcoalyellow.glb": {
-    "url": "models/d5cba9e2fe07069f/rider-race-charcoalyellow-efbc49a43cc1882c.glb",
-    "bytes": 2075576,
-    "sha256": "efbc49a43cc1882cf925fb131b47e0496891c00f09c478220abed00e4426d9de"
+    "url": "models/e407eb0572ddfd88/rider-race-charcoalyellow-75fe31c60716ac52.glb",
+    "bytes": 2062928,
+    "sha256": "75fe31c60716ac5246d46ab42c15ec85cc29ade9fb69e2b8dc423273755a4af0"
   },
   "models/rider-street-charcoal-lod.glb": {
-    "url": "models/9ca551ed8de4fa1a/rider-street-charcoal-lod-8d3dc8e6f51a6eb4.glb",
+    "url": "models/8ccf5deb254032f5/rider-street-charcoal-lod-8d3dc8e6f51a6eb4.glb",
     "bytes": 1561328,
     "sha256": "8d3dc8e6f51a6eb4c3faa3ddb2ba8b1749012f5a7e6b4023ea1b2f19bf86b739"
   },
   "models/rider-street-charcoal.glb": {
-    "url": "models/9ca551ed8de4fa1a/rider-street-charcoal-7f18c17e3933ae0e.glb",
-    "bytes": 3145616,
-    "sha256": "7f18c17e3933ae0e602050ccc01100b5fe206155e9002e5b88fbda9614ec9410"
+    "url": "models/8ccf5deb254032f5/rider-street-charcoal-c04ab875e2a2e0b5.glb",
+    "bytes": 3176424,
+    "sha256": "c04ab875e2a2e0b59f1f74b95cedf3072d9a42d8c26f632587eda30326e88de0"
   },
   "models/rider-street-mustard-lod.glb": {
-    "url": "models/2d50a456a6b80a77/rider-street-mustard-lod-78458d1a8d92b4d3.glb",
+    "url": "models/c7f50b1229b56f79/rider-street-mustard-lod-78458d1a8d92b4d3.glb",
     "bytes": 1608420,
     "sha256": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4"
   },
   "models/rider-street-mustard.glb": {
-    "url": "models/2d50a456a6b80a77/rider-street-mustard-122c1d06e3834afc.glb",
-    "bytes": 3267248,
-    "sha256": "122c1d06e3834afc339ebd15d4a95fc75cb35a0ea07db1e7d623e3093b2c00ac"
+    "url": "models/c7f50b1229b56f79/rider-street-mustard-109ad4584a21f3ac.glb",
+    "bytes": 3305688,
+    "sha256": "109ad4584a21f3acd3848e2bfa170a6abcc470bfdc2a701445de0a086a0a8505"
   },
   "models/rider-street-openface-lod.glb": {
-    "url": "models/922c290afefbf12c/rider-street-openface-lod-6765b5f93710302c.glb",
+    "url": "models/0f0aca1ae81c2214/rider-street-openface-lod-6765b5f93710302c.glb",
     "bytes": 1322188,
     "sha256": "6765b5f93710302c7286a545fd5cc399908083fd361e64e2ea71a534f51c0d00"
   },
   "models/rider-street-openface.glb": {
-    "url": "models/922c290afefbf12c/rider-street-openface-9bc82a2021a7e8d7.glb",
-    "bytes": 2693556,
-    "sha256": "9bc82a2021a7e8d7954fd761c5716f80ef66b71b9b7f38d03546300bcfb1c14b"
+    "url": "models/0f0aca1ae81c2214/rider-street-openface-95f6a2eb0e0f3d91.glb",
+    "bytes": 2717272,
+    "sha256": "95f6a2eb0e0f3d910916df06fab12bbd94372cd64d2ff681a84f9a9c644efb34"
   }
 } as const;

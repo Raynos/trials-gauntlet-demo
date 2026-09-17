@@ -44,7 +44,15 @@ export interface RenderFrame {
    * `relUp` = rider velocity relative to the rotating chassis at the rider's position, along
    * chassis up (m/s, + = rising off the bike); `angVel` = body angular velocity (rad/s, world).
    */
-  riderBody: { present: boolean; relX: number; relY: number; relAngle: number; relUp: number; angVel: number };
+  riderBody: {
+    present: boolean; relX: number; relY: number; relAngle: number; relUp: number; angVel: number;
+    /**
+     * Ask 51: physics R9's DRAWN pose (`RiderBody.drawn`) — the lean as a stance id + 0..1 blend from seated, and the
+     * drawn hip height / torso angle (axle frame, radians) that carry the physical body's excursion. The glTF rider
+     * blends Astra's authored stances by it (`gltfRider.ts poseFromStance`); `present` false on v1 / mock physics.
+     */
+    drawn: { present: boolean; pose: 'seated' | 'back' | 'forward'; blend: number; hipY: number; torso: number };
+  };
   /** Physics hop state machine (glTF rider plays `extend` on 'push'). */
   hopPhase: 'idle' | 'preload' | 'push' | 'recover';
   throttle: number;
@@ -98,7 +106,7 @@ export class FrameBuilder {
     rear: { x: 0, y: 0, spin: 0, spinVel: 0, compression: 0, grounded: true },
     front: { x: 0, y: 0, spin: 0, spinVel: 0, compression: 0, grounded: true },
     rider: { lean: 0, crouch: 0, torsoPitch: 0, armExtend: 0 },
-    riderBody: { present: false, relX: 0, relY: 0, relAngle: 0, relUp: 0, angVel: 0 },
+    riderBody: { present: false, relX: 0, relY: 0, relAngle: 0, relUp: 0, angVel: 0, drawn: { present: false, pose: 'seated', blend: 0, hipY: 0, torso: 0 } },
     hopPhase: 'idle',
     throttle: 0,
     throttleEff: 0,
@@ -179,9 +187,19 @@ export class FrameBuilder {
       // carried through a wheelie has no relative extension: d(localY)/dt includes -omega*localX.
       rb.relUp = -rvx * s + rvy * c - lerp(prev.bike.angVel, cur.bike.angVel, a) * rb.relX;
       rb.angVel = lerp(pb.angVel, cb.angVel, a);
+      const dd = rb.drawn, cd = cb.drawn, pd = pb.drawn ?? cd;
+      if (cd && pd) {
+        dd.present = true;
+        dd.pose = cd.pose;
+        // Across the seated crossing the previous blend runs to 0 (seated IS blend 0), so the two ids never mix.
+        dd.blend = lerp(pd.pose === cd.pose ? pd.blend : 0, cd.blend, a);
+        dd.hipY = lerp(pd.hips.y, cd.hips.y, a);
+        dd.torso = lerp(pd.torso, cd.torso, a);
+      } else dd.present = false;
     } else {
       rb.present = false;
       rb.relX = rb.relY = rb.relAngle = rb.relUp = rb.angVel = 0;
+      rb.drawn.present = false;
     }
 
     f.throttle = cur.input?.throttle ?? 0;

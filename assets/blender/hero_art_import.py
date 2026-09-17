@@ -24,6 +24,7 @@ from mathutils import Matrix
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common as C  # noqa: E402
 import hero_art_hair as H  # noqa: E402
+import hero_art_helmet as HELMET  # noqa: E402
 
 GROOM_NAMES = {"Street01_Bystedt_CurlyGroom_Runtime"}
 # The delivered bike keeps the game's 23 parts; these keep their exact topology (chain/hose are
@@ -56,6 +57,7 @@ def args():
     p.add_argument("--atlas", type=int, default=None, help="stage>=1: body atlas size (default 2048, LOD 1024)")
     p.add_argument("--bake-dir", default=None, help="stage>=1: where baked atlas JPEGs are written (default: temp dir)")
     p.add_argument("--hair-bake", type=int, default=None, help="stage>=1: hair bake size (default 512, LOD 256)")
+    p.add_argument("--race-helmet", choices=["v1", "v2"], default="v2", help="v1 = Astra's constructed helmet as delivered; v2 = the MX full-face remaster (ask 49)")
     p.add_argument("--hair-v1", action="store_true", help="the round-1 shell recipe (inflated, flat-shaded, full-strength normal)")
     p.add_argument("--ribbons", type=int, default=0, help="stage>=1 comparison: add silhouette ribbons with this triangle budget")
     return p.parse_args(argv)
@@ -259,6 +261,7 @@ def join_by_material(meshes, exclude=()):
 
 
 HAND_FLOOR = 400  # LOD: fingers collapse into spikes below this; keep hand parts at >= 400 triangles each
+HAND_KEEP_FULL = 0.85  # full: the delivered fingers are 4-ring tubes already; collapsing them further makes slabs (ask 49 item 2)
 
 
 def is_hand_part(ob):
@@ -422,6 +425,16 @@ def main():
                 raise RuntimeError(f"clip {name} spans {frames} frames, expected {RIDER_CLIPS[name]}")
         protected = ()
         budget = a.tris or (8000 if a.lod else 45000)
+        old_helmet = bpy.data.objects.get("rider:constructed_helmet")
+        if old_helmet is not None and a.race_helmet == "v2" and a.stage >= 1:
+            head_ob = bpy.data.objects.get("rider:human head and neck")
+            eyes = [o for o in scene_objects() if o.name in ("rider:iris.L", "rider:iris.R")]
+            if head_ob is None or len(eyes) != 2:
+                raise RuntimeError("race helmet v2 needs the head mesh and both irises")
+            helmet_ob, lens_ob, report["raceHelmet"] = HELMET.build_race_helmet(arm, head_ob, eyes, old_helmet, livery=Path(a.input).stem)
+            delete_objects([old_helmet])
+            for me in [m for m in bpy.data.meshes if m.users == 0]:
+                bpy.data.meshes.remove(me)
         if groom is not None:
             if scene.world is None:
                 scene.world = bpy.data.worlds.new("bake")
@@ -455,8 +468,9 @@ def main():
 
     # 3. decimate to budget (per part; hands keep a floor at the LOD so fingers survive)
     floors = {}
-    if a.kind == "rider" and a.lod:
-        floors = {ob.name: HAND_FLOOR for ob in meshes if ob.name not in protected and is_hand_part(ob)}
+    if a.kind == "rider":
+        hands = [ob for ob in meshes if ob.name not in protected and is_hand_part(ob)]
+        floors = {ob.name: (HAND_FLOOR if a.lod else int(C.tri_count(ob) * HAND_KEEP_FULL)) for ob in hands}
         report["handFloors"] = floors
     targets, total_before, ratio = allocate(meshes, budget, a.min_tris, protected, floors)
     for ob in meshes:

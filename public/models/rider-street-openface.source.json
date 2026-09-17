@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/street-openface-remaster.glb",
   "sourceSha256": "f01c3abc274d457a812af51753ba1ed54e7ad979f7c60a8564c2f08f359ee7df",
   "decodedSha256": "21275ff4c9e372e334dd98f6c4344eee4bdd9998480fbc79909b7647f0ec0ece",
-  "exportSha256": "9bc82a2021a7e8d7954fd761c5716f80ef66b71b9b7f38d03546300bcfb1c14b",
+  "exportSha256": "95f6a2eb0e0f3d910916df06fab12bbd94372cd64d2ff681a84f9a9c644efb34",
   "kind": "rider",
   "lod": false,
   "stage": 1,
@@ -20,8 +20,8 @@
     "triangles": {
       "budget": 60000,
       "before": 219340,
-      "after": 58820,
-      "ratio": 0.2648575489958867
+      "after": 58816,
+      "ratio": 0.24538017178804739
     },
     "dropped": [
       {
@@ -41,18 +41,18 @@
         "from": [
           "rider:anatomical sweatshirt",
           "Street01_Authored_EditableBody_Runtime",
+          "rider:glove_top",
           "rider:openface helmet",
           "rider.001",
           "rider:cotton_laces",
           "rider:hero footwear construction",
-          "rider:glove_top",
-          "rider:trainer_upper",
-          "rider:folded hood",
           "rider:gloves",
+          "rider:trainer_upper",
+          "rider:hero glove construction",
+          "rider:folded hood",
           "fitted drawcord 1",
           "fitted drawcord -1",
           "rider:trainer_rubber",
-          "rider:hero glove construction",
           "rider:anatomical sweatshirt pocket",
           "collar eyelet 1",
           "collar eyelet -1"
@@ -64,12 +64,12 @@
       {
         "object": "MPFB_AdultMale_SourceProbe.high-poly_Runtime",
         "before": 2040,
-        "after": 528
+        "after": 490
       },
       {
         "object": "Street01_Authored_EditableBody_Runtime",
         "before": 34358,
-        "after": 8917
+        "after": 8261
       },
       {
         "object": "Street01_grinsegold_full_beard_Runtime",
@@ -79,22 +79,22 @@
       {
         "object": "rider:anatomical sweatshirt",
         "before": 132256,
-        "after": 34326
+        "after": 31802
       },
       {
         "object": "rider:folded hood",
         "before": 1916,
-        "after": 496
+        "after": 460
       },
       {
         "object": "rider:cotton_laces",
         "before": 6336,
-        "after": 1644
+        "after": 1522
       },
       {
         "object": "rider:hero footwear construction",
         "before": 5952,
-        "after": 1544
+        "after": 1430
       },
       {
         "object": "rider:trainer_rubber",
@@ -104,32 +104,32 @@
       {
         "object": "rider:trainer_upper",
         "before": 4224,
-        "after": 1094
+        "after": 1014
       },
       {
         "object": "rider:glove_top",
         "before": 4600,
-        "after": 1193
+        "after": 3830
       },
       {
         "object": "rider:gloves",
         "before": 1648,
-        "after": 426
+        "after": 1372
       },
       {
         "object": "rider:hero glove construction",
         "before": 956,
-        "after": 386
+        "after": 784
       },
       {
         "object": "rider.001",
         "before": 8068,
-        "after": 2092
+        "after": 1939
       },
       {
         "object": "rider:openface helmet",
         "before": 13708,
-        "after": 3556
+        "after": 3294
       }
     ],
     "images": [
@@ -279,7 +279,12 @@
       }
     },
     "hair": null,
-    "handFloors": null,
+    "handFloors": {
+      "rider:glove_top": 3910,
+      "rider:gloves": 1400,
+      "rider:hero glove construction": 812
+    },
+    "raceHelmet": null,
     "atlas": {
       "size": 2048,
       "parts": null
@@ -298,20 +303,20 @@
       "inverse binds",
       "clip times"
     ],
-    "rawBytes": 4715944,
-    "packedBytes": 2693556
+    "rawBytes": 4786316,
+    "packedBytes": 2717272
   },
   "verified": {
-    "bytes": 2693556,
-    "sha256": "9bc82a2021a7e8d7954fd761c5716f80ef66b71b9b7f38d03546300bcfb1c14b",
-    "triangles": 58820,
-    "vertices": 41137,
+    "bytes": 2717272,
+    "sha256": "95f6a2eb0e0f3d910916df06fab12bbd94372cd64d2ff681a84f9a9c644efb34",
+    "triangles": 58816,
+    "vertices": 41917,
     "draws": 5,
     "meshes": 5,
     "materials": 5,
     "images": 7,
     "maxTexture": 2048,
-    "imageBytes": 1559692,
+    "imageBytes": 1589533,
     "bones": 19,
     "clips": {
       "compression": {
@@ -386,21 +391,21 @@
         "kind": "jpeg",
         "w": 2048,
         "h": 2048,
-        "bytes": 97532
+        "bytes": 97396
       },
       {
         "name": "rider_body_orm",
         "kind": "jpeg",
         "w": 1024,
         "h": 1024,
-        "bytes": 401737
+        "bytes": 417987
       },
       {
         "name": "rider_body_albedo",
         "kind": "jpeg",
         "w": 2048,
         "h": 2048,
-        "bytes": 491237
+        "bytes": 504964
       },
       {
         "name": "Full_beard_black_diff",
@@ -430,8 +435,8 @@
       },
       {
         "name": "high-poly.001",
-        "tris": 528,
-        "verts": 316,
+        "tris": 490,
+        "verts": 291,
         "primitives": 1,
         "instances": 1,
         "materials": [
@@ -440,8 +445,8 @@
       },
       {
         "name": "rider_body",
-        "tris": 57588,
-        "verts": 40371,
+        "tris": 57622,
+        "verts": 41176,
         "primitives": 1,
         "instances": 1,
         "materials": [
@@ -470,5 +475,5 @@
       }
     ]
   },
-  "blenderSeconds": 3.7
+  "blenderSeconds": 5.646
 }

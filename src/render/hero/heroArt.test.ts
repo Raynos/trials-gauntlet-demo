@@ -106,7 +106,9 @@ describe.skipIf(!RIDER)('Astra rider (race-bluewhite) through the game loader', 
     // The prototype export is 14 skinned meshes on one material (93 908 tris); the art owner's stage-0 file under
     // public/models arrives already joined (44 099). Either way one material = one draw, and no triangle is lost.
     const after = countMeshes(gltf.scene);
-    expect(after.meshes).toBe(1);
+    const materials = new Set<THREE.Material>();
+    gltf.scene.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) for (const mat of Array.isArray(m.material) ? m.material : [m.material]) materials.add(mat); });
+    expect(after.meshes).toBeLessThanOrEqual(materials.size); // one draw per material (the hair shell is its own material since round 2)
     expect(after.tris).toBe(raw.tris);
     expect(after.physical).toBe(0);
     const mesh = gltf.scene.getObjectByProperty('isSkinnedMesh', true) as THREE.SkinnedMesh;

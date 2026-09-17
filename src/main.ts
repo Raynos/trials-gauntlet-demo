@@ -93,7 +93,6 @@ interface RendererBootHooks {
   heroBytes: ByteProgress;
   artBytes: ByteProgress;
   onTrackArt: (done: number, total: number, label: string) => void;
-  onHeroTwin: (done: number, total: number) => void;
 }
 
 /** What the renderer is constructed with, beyond the model choice: the same outfit, class and start tier the boot inline declared (ask 43). */
@@ -102,9 +101,8 @@ interface HeroStart { riderOutfit: RiderOutfit; bikeClass: BikeClass; quality: Q
 function makeRenderer(parent: HTMLElement, harness: boolean, models: ModelChoices, start: HeroStart, boot?: RendererBootHooks): { renderer: GameRenderer; kind: string } {
   const m = renderMod as AnyModule;
   // riderModel / bikeModel: 'proc' | 'gltf' — the render owner reads them; unknown keys are ignored today.
-  // riderOutfit / bikeClass / quality / deviceClass (ask 43): the boot inline declared the hero pair that outfit, class
-  // and first tier draw (src/boot/outfit.ts, src/game/startTier.ts); the renderer fetches exactly that pair before
-  // `ready` and streams the other after. The app's tier default, if it differs, swaps the livery after `ready`.
+  // riderOutfit / bikeClass / quality / deviceClass: what the first frame draws (src/game/startTier.ts); every hero
+  // file is fetched before `ready` whatever they are (ask 50), so a later outfit / class / tier is a resident swap.
   const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness, ...models, ...start, ...(boot ?? {}) };
   const create = m['createRenderer'];
   if (typeof create === 'function') {
@@ -247,7 +245,7 @@ function boot(): void {
         await nextPaint();
         // The two downloads boot awaits (hero glTF, boot art set) start in the renderer's constructor, each with its
         // DOWNLOAD reader; per-track art after the boot set is an `after` item.
-        return makeRenderer(appRoot, false, models, start, { heroBytes: plan.reader('heroModels'), artBytes: plan.reader('bootArt'), onTrackArt: (done, total) => plan.after('trackArt', done, total), onHeroTwin: (done, total) => plan.after('heroTwin', done, total) });
+        return makeRenderer(appRoot, false, models, start, { heroBytes: plan.reader('heroModels'), artBytes: plan.reader('bootArt'), onTrackArt: (done, total) => plan.after('trackArt', done, total) });
       });
       const { renderer, kind: renderKind } = sRenderer.value;
       const sPhysics = await sRenderer.step('physics', async () => {

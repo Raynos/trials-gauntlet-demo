@@ -45,3 +45,29 @@ describe('rider extension in the rotating bike frame', () => {
     }
   });
 });
+
+describe('the drawn pose (ask 51)', () => {
+  const withDrawn = (pose: 'seated' | 'back' | 'forward', blend: number, hipY: number, torso: number, tick: number): PhysicsState => {
+    const st = movingPoint(0, 0, 0);
+    st.tick = tick;
+    st.time = tick / 120;
+    st.riderBody!.drawn = { pose, blend, hips: { x: -0.3, y: hipY }, torso, head: torso + 0.3 };
+    return st;
+  };
+
+  it('is absent on a body without one and interpolated (blend, hip height, torso) between two states of the same stance', () => {
+    const b = new FrameBuilder();
+    expect(b.build(movingPoint(0, 0, 0), 1).riderBody.drawn.present).toBe(false);
+    b.build(withDrawn('forward', 0.2, 0.75, 1.0, 1), 1);
+    const f = b.build(withDrawn('forward', 0.6, 0.85, 0.8, 2), 0.25);
+    expect(f.riderBody.drawn).toEqual({ present: true, pose: 'forward', blend: 0.3, hipY: 0.775, torso: 0.95 });
+  });
+
+  it('never mixes two stance ids across the seated crossing: the previous blend runs from 0', () => {
+    const b = new FrameBuilder();
+    b.build(withDrawn('back', 0.8, 0.65, 0.9, 1), 1);
+    const f = b.build(withDrawn('forward', 0.4, 0.8, 0.7, 2), 0.5);
+    expect(f.riderBody.drawn.pose).toBe('forward');
+    expect(f.riderBody.drawn.blend).toBeCloseTo(0.2, 12);
+  });
+});

@@ -510,6 +510,7 @@
       "rider:gloves": 400,
       "rider:hero glove construction": 400
     },
+    "raceHelmet": null,
     "atlas": {
       "size": 1024,
       "parts": null
@@ -700,5 +701,5 @@
       }
     ]
   },
-  "blenderSeconds": 2.944
+  "blenderSeconds": 5.138
 }

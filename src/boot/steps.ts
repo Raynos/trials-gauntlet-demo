@@ -62,6 +62,6 @@ export const closedBy = (key: ByteKey): BootStep => key;
 export const byteLabel = (key: ByteKey): string => STEP_INFO[closedBy(key)].label.toLowerCase();
 
 /** Background items: shown under "streams in after start", never in a number, and there is no flag that could promote one. */
-export const AFTER_KEYS = ['keyArt', 'trackArt', 'heroTwin'] as const;
+export const AFTER_KEYS = ['keyArt', 'trackArt'] as const;
 export type AfterKey = (typeof AFTER_KEYS)[number];
-export const AFTER_LABELS: Record<AfterKey, string> = { keyArt: 'Key art', trackArt: 'Track art', heroTwin: 'Hero detail' };
+export const AFTER_LABELS: Record<AfterKey, string> = { keyArt: 'Key art', trackArt: 'Track art' };

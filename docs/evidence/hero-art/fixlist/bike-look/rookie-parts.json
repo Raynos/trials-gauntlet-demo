@@ -1,0 +1,432 @@
+{
+  "delivered": {
+    "materials": 16,
+    "materialList": [
+      {
+        "name": "bike_body_rookie",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 1,
+        "roughness": 1,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": true,
+        "rmMap": true,
+        "aoMap": true,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "Clean blue white plastics with original decals",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 1,
+        "roughness": 1,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": true,
+        "rmMap": true,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "bike_mech",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 1,
+        "roughness": 1,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": true,
+        "rmMap": true,
+        "aoMap": true,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "chain_links",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 1,
+        "roughness": 0.44999998807907104,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "hero_refine_satin_engine_edges",
+        "type": "MeshStandardMaterial",
+        "color": "6f7479",
+        "metalness": 0.8500000238418579,
+        "roughness": 0.3799999952316284,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "Tempered warm steel header atlas",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 1,
+        "roughness": 1,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": true,
+        "rmMap": true,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "hero_refine_blue_front_fender",
+        "type": "MeshPhysicalMaterial",
+        "color": "2457c2",
+        "metalness": 0.11999999731779099,
+        "roughness": 0.28999999165534973,
+        "clearcoat": 0.2800000011920929,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "numberboard_mount_rubber",
+        "type": "MeshStandardMaterial",
+        "color": "1f2326",
+        "metalness": 0,
+        "roughness": 0.6899999976158142,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "numberboard_mount_satin_alloy",
+        "type": "MeshStandardMaterial",
+        "color": "84898e",
+        "metalness": 0.8199999928474426,
+        "roughness": 0.3400000035762787,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "numberboard_recess",
+        "type": "MeshStandardMaterial",
+        "color": "121618",
+        "metalness": 0.20000000298023224,
+        "roughness": 0.550000011920929,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "stable satin structural aluminium",
+        "type": "MeshStandardMaterial",
+        "color": "99a0a4",
+        "metalness": 0.8799999952316284,
+        "roughness": 0.38999998569488525,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "stable blue graphite frame paint",
+        "type": "MeshStandardMaterial",
+        "color": "354a55",
+        "metalness": 0.25,
+        "roughness": 0.38999998569488525,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "stable satin handlebar alloy",
+        "type": "MeshStandardMaterial",
+        "color": "aaadaf",
+        "metalness": 0.9200000166893005,
+        "roughness": 0.3400000035762787,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "smooth control cable rubber",
+        "type": "MeshStandardMaterial",
+        "color": "1e2326",
+        "metalness": 0,
+        "roughness": 0.7799999713897705,
+        "map": false,
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "stable satin swingarm with original logo",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 0.8600000143051147,
+        "roughness": 0.4399999976158142,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": true,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "bike_spokecard",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 0.6000000238418579,
+        "roughness": 0.5,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": true,
+        "opacity": 1
+      }
+    ],
+    "parts": {
+      "bodywork": {
+        "r": 0.5172755011660695,
+        "g": 0.593727602935082,
+        "b": 0.8185669128820199,
+        "pixels": 19304
+      },
+      "frame": {
+        "r": 0.5045249436446939,
+        "g": 0.5082089997053799,
+        "b": 0.5557260453760265,
+        "pixels": 34541
+      },
+      "engine": {
+        "r": 0.324359339364161,
+        "g": 0.33293984989259817,
+        "b": 0.3500914828590817,
+        "pixels": 19215
+      },
+      "fork_upper": {
+        "r": 0.7746531599472777,
+        "g": 0.7080415256885845,
+        "b": 0.6603053279523867,
+        "pixels": 11544
+      },
+      "fork_lower": {
+        "r": 0.35693247680948015,
+        "g": 0.3554114013448559,
+        "b": 0.4881526452367675,
+        "pixels": 18671
+      },
+      "swingarm": {
+        "r": 0.721751793261546,
+        "g": 0.6514001945425689,
+        "b": 0.686196010170822,
+        "pixels": 6894
+      },
+      "wheel_front": {
+        "r": 0.555953393754196,
+        "g": 0.2814061885084612,
+        "b": 0.5578907389402042,
+        "pixels": 54208
+      },
+      "wheel_rear": {
+        "r": 0.4232934747186082,
+        "g": 0.3225874331081609,
+        "b": 0.42528994451055596,
+        "pixels": 26594
+      },
+      "exhaust": {
+        "r": 0.5179234904188948,
+        "g": 0.4931288992869875,
+        "b": 0.5074295343137255,
+        "pixels": 11264
+      },
+      "handlebar": {
+        "r": 0.42562364883579556,
+        "g": 0.33511390246797673,
+        "b": 0.43811784849694785,
+        "pixels": 5451
+      },
+      "shock_spring": {
+        "r": 0.5262635701316559,
+        "g": 0.38022198418305714,
+        "b": 0.5449643321102172,
+        "pixels": 2581
+      },
+      "pegs": {
+        "r": 0.2319001450318042,
+        "g": 0.16938572750008565,
+        "b": 0.2430047849075565,
+        "pixels": 1717
+      }
+    }
+  },
+  "shipped": {
+    "materials": 4,
+    "materialList": [
+      {
+        "name": "bike_atlas",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 1,
+        "roughness": 1,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": true,
+        "rmMap": true,
+        "aoMap": true,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "bike_mech",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 1,
+        "roughness": 1,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": true,
+        "rmMap": true,
+        "aoMap": true,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "chain_links",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 1,
+        "roughness": 0.44999998807907104,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": false,
+        "opacity": 1
+      },
+      {
+        "name": "bike_spokecard",
+        "type": "MeshStandardMaterial",
+        "color": "ffffff",
+        "metalness": 0.6000000238418579,
+        "roughness": 0.5,
+        "map": true,
+        "mapColorSpace": "srgb",
+        "normalMap": false,
+        "rmMap": false,
+        "aoMap": false,
+        "transparent": true,
+        "opacity": 1
+      }
+    ],
+    "parts": {
+      "bodywork": {
+        "r": 0.4947088076838692,
+        "g": 0.572957347049885,
+        "b": 0.8040186733624242,
+        "pixels": 19304
+      },
+      "frame": {
+        "r": 0.4885851483119521,
+        "g": 0.4935733663489425,
+        "b": 0.5397515087213773,
+        "pixels": 34541
+      },
+      "engine": {
+        "r": 0.31123662579786016,
+        "g": 0.3189530238324838,
+        "b": 0.3360248580306439,
+        "pixels": 19215
+      },
+      "fork_upper": {
+        "r": 0.770256682021388,
+        "g": 0.7031171442936149,
+        "b": 0.6554726672373732,
+        "pixels": 11544
+      },
+      "fork_lower": {
+        "r": 0.3460425678492703,
+        "g": 0.34973435788540685,
+        "b": 0.48717808155879777,
+        "pixels": 18671
+      },
+      "swingarm": {
+        "r": 0.7179758471418739,
+        "g": 0.6480207284538416,
+        "b": 0.6827710370484138,
+        "pixels": 6894
+      },
+      "wheel_front": {
+        "r": 0.5502610858392943,
+        "g": 0.2756726450910943,
+        "b": 0.5523553429636318,
+        "pixels": 54208
+      },
+      "wheel_rear": {
+        "r": 0.4140680412948815,
+        "g": 0.31326511803488033,
+        "b": 0.41640765202824753,
+        "pixels": 26594
+      },
+      "exhaust": {
+        "r": 0.5137989499777184,
+        "g": 0.49040009469696966,
+        "b": 0.5024311358065954,
+        "pixels": 11264
+      },
+      "handlebar": {
+        "r": 0.41606181272729237,
+        "g": 0.3253477505476599,
+        "b": 0.42944090129172197,
+        "pixels": 5451
+      },
+      "shock_spring": {
+        "r": 0.5129779459245922,
+        "g": 0.36524374957266903,
+        "b": 0.529385934924144,
+        "pixels": 2581
+      },
+      "pegs": {
+        "r": 0.2326903970673884,
+        "g": 0.17071956330581153,
+        "b": 0.2426462023364966,
+        "pixels": 1717
+      }
+    }
+  }
+}

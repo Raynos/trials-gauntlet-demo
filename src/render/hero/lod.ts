@@ -244,19 +244,22 @@ export function flattenPhysicalMaterials(gltf: GLTF): void {
 }
 
 /**
- * Which document a tier instantiates: `high` the authored file, `low` / `medium` (and phone-high, which passes
- * `medium`) the LOD twin. Round 14 gated the rider LOD off after the phone showed the `medium` rider with rigid
+ * Which document a tier instantiates: the authored file on `high` and `medium` (phone-high asks as `medium`), the LOD
+ * twin on `low` only (ask 60). Round 14 gated the rider LOD off after the phone showed the `medium` rider with rigid
  * bind-pose arms — the renderer's program prune, not the asset; the prune is gone (r15 retirement). Ask 43 round 2
  * turns it back on, measured on Astra's 7.8 k LOD riders (b1 phone-high 185 k → 82 k tris, model 9.5 → 9.1 ms;
  * medium 14.2 → 13.6; low 6.3 → 5.9) with `hero-webkit` hands-on-grips on both engines — IN LEVEL. The garage stage
- * (`garage`) keeps the authored rider on every tier: it is the close-up showcase, its 8.9 ms is inside the 30 fps
- * bar, and the mirror-twin gate (`reflectable()`) already counts the authored triangles. `setRiderLod(false)`
- * (or `?riderlod=0`) is the escape hatch, never the rule.
+ * (`garage`) draws the authored rider AND bike on every tier (ask 52: the phone's garage showed the 5.8 k bike-lod
+ * and "the new bike isn't in the game"): it is the close-up showcase, its 8.9 ms is inside the 30 fps bar, and the
+ * mirror-twin gate (`reflectable()`) already counts the authored triangles. `setRiderLod(false)` (or `?riderlod=0`)
+ * is the escape hatch, never the rule.
  */
 export function lodChoice(tier: 'low' | 'medium' | 'high', kind: 'bike' | 'rider' = 'bike', garage = false): 'full' | 'lod' {
-  if (tier === 'high') return 'full';
+  // Ask 60 (an outside review of phone gameplay): the authored bike AND rider in level on every tier; the LOD pair
+  // only when the governor sits on `low`. Ask 52: the garage is the showcase on every tier.
+  if (tier !== 'low' || garage) return 'full';
   if (kind !== 'rider') return 'lod';
-  return riderLodEnabled && !garage ? 'lod' : 'full';
+  return riderLodEnabled ? 'lod' : 'full';
 }
 
 let riderLodEnabled = true;

@@ -24,6 +24,10 @@ export interface ModelChoices {
 
 const cache = new Map<string, Promise<GLTF | null>>();
 
+/** Ask 50: where a hero document's wall time goes, one row per fetched file (read by `debugInfo().heroLoads`). */
+export interface HeroLoadTiming { url: string; bytes: number; fetchMs: number; parseMs: number; prepareMs: number; at: number }
+export const heroLoads: HeroLoadTiming[] = [];
+
 /**
  * Load + parse once; a failed load resolves null (the caller keeps the procedural model, or — for a
  * `-lod.glb` — the authored file on every tier). Round 13: `prepareHero` (spoke split for files
@@ -38,23 +42,32 @@ export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Prom
     // Boot plan (docs/tasks/loading-progress-invariant.md): the reader — three's FileLoader — reports its own
     // bytes, forwarded as deltas; nothing observes the network after the fact.
     let reported = 0;
+    const t0 = performance.now();
+    let tFetched = t0;
+    let total = 0;
     p = new Promise<GLTF | null>((resolve) => {
       loader.load(
         url,
         (g) => {
+          const tParsed = performance.now();
           shrinkTextures(g.scene);
           prepareHero(g)
             .catch((err: unknown) => console.warn(`[render] hero prepare for ${url} failed:`, err))
-            .then(() => resolve(g));
+            .then(() => {
+              heroLoads.push({ url, bytes: total, fetchMs: tFetched - t0, parseMs: tParsed - tFetched, prepareMs: performance.now() - tParsed, at: t0 });
+              if (heroLoads.length > 40) heroLoads.shift();
+              resolve(g);
+            });
         },
-        bytes
-          ? (e) => {
-              if (e.loaded > reported) {
-                bytes.add(e.loaded - reported);
-                reported = e.loaded;
-              }
-            }
-          : undefined,
+        (e) => {
+          // The last progress event is the end of the bytes; what follows until `onLoad` is the parse (+ Meshopt).
+          if (e.loaded >= e.total && e.total > 0) tFetched = performance.now();
+          total = Math.max(total, e.loaded);
+          if (bytes && e.loaded > reported) {
+            bytes.add(e.loaded - reported);
+            reported = e.loaded;
+          }
+        },
         (err) => {
           if (!quiet) console.warn(`[render] glTF ${url} failed:`, err);
           resolve(null);
@@ -70,28 +83,6 @@ export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Prom
     });
   }
   return p;
-}
-
-/**
- * Ask 43 round 4: pull a model's bytes into the HTTP cache (the catalog URLs are immutable, `Cache-Control` a year)
- * without parsing it — the pair the first frame does not draw streams this way after `ready`, its bytes on the boot
- * plan's `after` list, and `loadGltf` parses it only when a tier or the garage asks (a screen transition), never on
- * arrival mid-ride: a 3 MB Meshopt decode + `prepareHero` is a 100–400 ms main-thread task.
- */
-export async function prefetchModel(url: string, bytes?: ByteProgress): Promise<void> {
-  const res = await fetch(modelAssetUrl(url));
-  if (!res.ok) throw new Error(`${res.status} ${url}`);
-  if (!res.body) {
-    const buffer = await res.arrayBuffer();
-    bytes?.add(buffer.byteLength);
-    return;
-  }
-  const reader = res.body.getReader();
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    bytes?.add(value.byteLength);
-  }
 }
 
 /**

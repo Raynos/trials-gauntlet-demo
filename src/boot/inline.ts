@@ -39,7 +39,7 @@ declare const __BOOT_BUILD__: string;
 
   const core = __BOOT_CORE__;
   const coreTotal = core.reduce((sum, item) => sum + item[1], 0);
-  const plan = createBootPlan(createLoaderRenderer(root, __BOOT_BUILD__).paint, { totals: { core: coreTotal, ...selectedBootTotals(__BOOT_TOTALS__, location.search) } });
+  const plan = createBootPlan(createLoaderRenderer(root, __BOOT_BUILD__).paint, { totals: { core: coreTotal, ...selectedBootTotals(__BOOT_TOTALS__) } });
   const fail = (m: string): void => {
     if (!plan.view.done && !plan.view.error) plan.fail(m);
   };

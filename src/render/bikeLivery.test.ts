@@ -1,156 +1,124 @@
 /**
- * Ask 43: under a per-livery hero family (`ASTRA_HERO` in hero/urls.ts) the bike class is a document swap through
- * `setModels`, on the outfit swap's no-flash path: the installed bike stays until the other file has parsed, a
- * superseded class never installs, a failed file keeps the installed livery, and the same URL loads nothing.
- * Round 4: only the pair the tier draws is awaited (desktop-high → the authored file); its LOD twin is prefetched
- * into the HTTP cache after `ready` and parsed off the track (the menu / a finish) or when a tier asks for it.
- * 
+ * Ask 50: the hero set is resident — `setModels` fetches every hero file once, one instance per document is built
+ * once and never disposed, and an outfit / class / tier / garage change is a detach / attach of pooled instances:
+ * no fetch, no new instance, no dispose (a disposed instance dropped the hero-only program variants to refcount 0 and
+ * the next frame relinked them). A missing file leaves its slot to the other detail and is retried by the next call.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { ThreeRenderer } from './index';
-import { loadGltf, prefetchModel } from './hero/gltf';
+import { loadGltf } from './hero/gltf';
+import { GltfBike } from './hero/gltfBike';
+import { GltfRider } from './hero/gltfRider';
+import { HERO_FILES_BY_OUTFIT_CLASS } from './hero/urls';
 
-vi.mock('./hero/gltf', async (original) => ({ ...await original<Record<string, unknown>>(), loadGltf: vi.fn(), prefetchModel: vi.fn(async (_url: string, bytes?: { add(n: number): void }) => { bytes?.add(1000); }) }));
-vi.mock('./hero/urls', async (original) => ({
-  ...await original<Record<string, unknown>>(),
-  bikeUrl: (cls: 'rookie' | 'pro') => `models/bike-${cls}.glb`,
-  riderUrl: () => 'models/rider-street-mustard.glb',
-  modelAssetBytes: () => 1000,
-}));
+vi.mock('./hero/gltf', async (original) => ({ ...await original<Record<string, unknown>>(), loadGltf: vi.fn() }));
 afterEach(() => vi.restoreAllMocks());
 
-function fixture(tier: 'high' | 'medium' = 'high', phase: 'riding' | 'menu' = 'riding') {
-  vi.mocked(prefetchModel).mockClear();
-  const rookie = { name: 'rookie' } as unknown as GLTF, rookieLod = { name: 'rookie-lod' } as unknown as GLTF;
-  const bike = { setLivery: vi.fn() };
-  const twin = vi.fn();
+const ALL = [...new Set(Object.values(HERO_FILES_BY_OUTFIT_CLASS).flatMap((c) => [...c.rookie, ...c.pro]))];
+
+/** A stub instance standing in for `new GltfBike` / `new GltfRider` (the constructors need decoded geometry). */
+function stubInstance(kind: 'bike' | 'rider', doc: GLTF) {
+  const proto = kind === 'bike' ? GltfBike.prototype : GltfRider.prototype;
+  return Object.assign(Object.create(proto) as object, {
+    source: doc, root: { name: `${kind}:gltf` }, materials: [], placer: { copyFrom() {} }, ground: null, contacts: [],
+    setLivery: vi.fn(), attach: vi.fn(), detach: vi.fn(), setStage: vi.fn(), dispose: vi.fn(),
+  });
+}
+
+function fixture(tier: 'high' | 'medium' | 'low' = 'medium', deviceClass: 'phone' | 'desktop' = 'phone') {
+  const docs = new Map<string, GLTF>(ALL.map((f) => [f, { name: f } as unknown as GLTF]));
+  const built: string[] = [];
+  const scene = { add: vi.fn(), remove: vi.fn() };
   const fields = {
-    models: { bikeModel: 'gltf', riderModel: 'gltf' }, tier, deviceClass: 'desktop', stageOn: false, disposed: false, phase, twinPending: null,
-    riderOutfit: 'street-mustard', riderDocumentOutfit: 'street-mustard', bikeClass: 'rookie', bikeDocumentClass: 'rookie',
-    gltf: { bike: rookie, bikeLod: rookieLod, rider: {} as GLTF, riderLod: {} as GLTF },
-    heroLoading: 0, heroPending: Promise.resolve(), applyModels: vi.fn(), invalidate: vi.fn(), bikeRef: bike, riderRef: {},
-    whenReady: () => Promise.resolve(), onHeroTwin: twin,
+    models: { bikeModel: 'gltf', riderModel: 'gltf' }, tier, deviceClass, stageOn: false, disposed: false, phase: 'menu',
+    riderOutfit: 'street-mustard', riderDocumentOutfit: null, bikeClass: 'rookie', bikeDocumentClass: null,
+    heroDocs: new Map<string, GLTF>(), heroDocUrl: new Map<GLTF, string>(), heroPool: new Map<GLTF, unknown>(),
+    heroLoading: 0, heroPending: Promise.resolve(), invalidate: vi.fn(), scene, sceneEpoch: 0,
+    bike: { root: { name: 'bike:proc' }, placer: {}, ground: null, dispose: vi.fn() }, rider: { root: { name: 'rider:proc' }, detach: vi.fn(), attach: vi.fn(), dispose: vi.fn() },
+    bikeRef: null as unknown, riderRef: null as unknown, ghost: null, retireObject: vi.fn(), applyTierVisibility: vi.fn(), swapPendingFrame: null,
+    heroSwaps: [] as unknown[],
   };
+  fields.bikeRef = fields.bike; fields.riderRef = fields.rider;
   const renderer = Object.assign(Object.create(ThreeRenderer.prototype) as object, fields) as unknown as ThreeRenderer;
+  // The pool builds through the real `pooled()`, whose constructors need geometry: intercept at the instance level.
+  const r = renderer as unknown as { pooled(doc: GLTF, kind: 'bike' | 'rider'): unknown };
+  r.pooled = (doc, kind) => {
+    let i = fields.heroPool.get(doc);
+    if (!i) { i = stubInstance(kind, doc); fields.heroPool.set(doc, i); built.push((doc as unknown as { name: string }).name); }
+    return i;
+  };
+  vi.mocked(loadGltf).mockImplementation(async (url) => docs.get(url) ?? null);
   vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-  return { renderer, state: renderer as unknown as typeof fields, rookie, rookieLod, bike, twin };
+  return { renderer, state: renderer as unknown as typeof fields, docs, built, scene };
 }
 
 const settle = async (renderer: ThreeRenderer): Promise<void> => {
   const r = renderer as unknown as { heroPending: Promise<void> };
   let pending: Promise<void>;
   do { pending = r.heroPending; await pending; } while (pending !== r.heroPending);
-  for (let i = 0; i < 8; i++) await Promise.resolve(); // the twin's microtasks
 };
+const drawn = (state: unknown) => { const s = state as { bike: { source?: { name: string } }; rider: { source?: { name: string } } }; return [s.bike.source?.name, s.rider.source?.name]; };
 
-describe('per-livery bike files', () => {
-  it('swaps the drawn document on a class change, then prefetches its twin after ready; a repeat loads nothing', async () => {
-    const { renderer, state, bike, rookie, twin } = fixture();
-    const pro = { name: 'pro' } as unknown as GLTF;
-    vi.mocked(loadGltf).mockImplementation(async (url) => url === 'models/bike-pro.glb' ? pro : null);
-    renderer.setBikeClass('pro');
-    expect(bike.setLivery).toHaveBeenLastCalledWith('pro');
-    expect(state.gltf.bike).toBe(rookie); // still up while the pro file parses
+describe('resident hero set', () => {
+  it('boot fetches all fourteen files once and draws the first pair from the pool; later swaps fetch nothing and build nothing new', async () => {
+    const { renderer, state, built } = fixture();
+    renderer.setModels({ bikeModel: 'gltf', riderModel: 'gltf' });
     await settle(renderer);
-    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/bike-pro.glb']);
-    expect(vi.mocked(prefetchModel).mock.calls.map(([url]) => url)).toEqual(['models/bike-pro-lod.glb']); // cached, not parsed
-    expect(state.gltf.bike).toBe(pro);
-    expect(state.gltf.bikeLod).toBeNull(); // riding: the cached twin waits
-    expect(state.bikeDocumentClass).toBe('pro');
-    expect(state.applyModels).toHaveBeenCalledTimes(1);
-    expect(twin).toHaveBeenLastCalledWith(1000, 1000);
+    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url).sort()).toEqual([...ALL].sort());
+    expect(state.heroDocs.size).toBe(14);
+    expect(drawn(state)).toEqual(['models/bike-rookie.glb', 'models/rider-street-mustard.glb']); // phone medium: the authored pair in level (ask 60)
+    expect(built).toEqual(['models/bike-rookie.glb', 'models/rider-street-mustard.glb']);
+    expect(state.retireObject).toHaveBeenCalledTimes(2); // the procedural kit, once
     vi.mocked(loadGltf).mockClear();
+    // Outfit, class, garage, tier: detach / attach of pooled instances — no fetch, and a revisited document is the same instance.
+    expect(await renderer.setRiderOutfit('race-bluewhite')).toBe(true);
+    expect(drawn(state)[1]).toBe('models/rider-race-bluewhite.glb');
     renderer.setBikeClass('pro');
-    await settle(renderer);
+    expect(drawn(state)[0]).toBe('models/bike-pro.glb');
+    state.tier = 'low'; // the governor on low: the LOD pair in level
+    (renderer as unknown as { applyModels(): void }).applyModels();
+    expect(drawn(state)).toEqual(['models/bike-pro-lod.glb', 'models/rider-race-bluewhite-lod.glb']);
+    Object.assign(renderer, { applyGarageStage: vi.fn(), clearGarageStage: vi.fn(), dropReflection: vi.fn(), reflectable: () => false });
+    renderer.setGarageStage(true);
+    expect(drawn(state)).toEqual(['models/bike-pro.glb', 'models/rider-race-bluewhite.glb']); // ask 52: the garage draws the authored bike and rider
+    renderer.setGarageStage(false);
+    expect(drawn(state)).toEqual(['models/bike-pro-lod.glb', 'models/rider-race-bluewhite-lod.glb']);
+    const first = state.heroPool.get(state.heroDocs.get('models/rider-street-mustard-lod.glb')!);
+    expect(await renderer.setRiderOutfit('street-mustard')).toBe(true);
+    expect(state.rider).not.toBe(first); // low: the LOD instance, built now
+    state.tier = 'medium';
+    (renderer as unknown as { applyModels(): void }).applyModels();
+    expect(state.rider).toBe(state.heroPool.get(state.heroDocs.get('models/rider-street-mustard.glb')!)); // the boot instance, resident
     expect(loadGltf).not.toHaveBeenCalled();
-    // Off the track the twin parses (from the cache) and lands beside the drawn document; nothing to swap on desktop-high.
-    const proLod = { name: 'pro-lod' } as unknown as GLTF;
-    vi.mocked(loadGltf).mockImplementation(async (url) => url === 'models/bike-pro-lod.glb' ? proLod : null);
-    Object.assign(renderer, { rig: { setPhase() {} } });
-    renderer.setRunInfo({ runTime: 0, phase: 'finished' });
-    await settle(renderer);
-    expect(vi.mocked(loadGltf).mock.calls.map(([url, quiet]) => [url, quiet])).toEqual([['models/bike-pro-lod.glb', true]]);
-    expect(state.gltf.bikeLod).toBe(proLod);
-    expect(state.applyModels).toHaveBeenCalledTimes(2);
+    expect(state.retireObject).toHaveBeenCalledTimes(2); // never a pooled instance
+    for (const i of state.heroPool.values()) expect((i as { dispose: ReturnType<typeof vi.fn> }).dispose).not.toHaveBeenCalled();
+    expect(state.heroPool.size).toBe(7); // rookie + pro bikes, mustard + bluewhite riders, their LOD twins at low, the authored mustard once
   });
 
-  it('a fresh renderer counts as off the track: boot → menu parses the twin before any run; a ride never parses it mid-run', async () => {
-    // Boot → menu: the menu covers the canvas and `setRunInfo` has never been called — `index.ts` seeds `phase = 'menu'`.
-    const { renderer, state } = fixture('medium', 'menu');
-    const pro = { name: 'pro' } as unknown as GLTF, proLod = { name: 'pro-lod' } as unknown as GLTF;
-    vi.mocked(loadGltf).mockImplementation(async (url) => url === 'models/bike-pro.glb' ? pro : url === 'models/bike-pro-lod.glb' ? proLod : null);
-    renderer.setBikeClass('pro');
+  it('desktop-high draws the authored pair in level; a missing file falls back to its twin and is retried by the next setModels', async () => {
+    const { renderer, state, docs } = fixture('high', 'desktop');
+    docs.delete('models/rider-street-mustard.glb');
+    renderer.setModels({ bikeModel: 'gltf', riderModel: 'gltf' });
     await settle(renderer);
-    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/bike-pro-lod.glb', 'models/bike-pro.glb']);
-    expect(state.gltf.bike).toBe(pro);
-    // Boot → ride: the twin is cached and waits for the finish.
-    const ride = fixture('medium', 'riding');
+    expect(state.heroDocs.size).toBe(13);
+    expect(drawn(state)).toEqual(['models/bike-rookie.glb', 'models/rider-street-mustard-lod.glb']);
+    docs.set('models/rider-street-mustard.glb', { name: 'models/rider-street-mustard.glb' } as unknown as GLTF);
     vi.mocked(loadGltf).mockClear();
-    ride.renderer.setBikeClass('pro');
-    await settle(ride.renderer);
-    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/bike-pro-lod.glb']);
-    expect(ride.state.gltf.bike).toBeNull();
-    expect(ride.state.twinPending).not.toBeNull();
+    renderer.setModels({ bikeModel: 'gltf', riderModel: 'gltf' });
+    await settle(renderer);
+    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/rider-street-mustard.glb']); // only the missing one
+    expect(drawn(state)[1]).toBe('models/rider-street-mustard.glb');
   });
 
-  it('on the menu the prefetched twin parses at once', async () => {
-    const { renderer, state } = fixture('high', 'menu');
-    const pro = { name: 'pro' } as unknown as GLTF, proLod = { name: 'pro-lod' } as unknown as GLTF;
-    vi.mocked(loadGltf).mockImplementation(async (url) => url === 'models/bike-pro.glb' ? pro : url === 'models/bike-pro-lod.glb' ? proLod : null);
-    renderer.setBikeClass('pro');
+  it('a superseded model choice leaves the swap to the later request', async () => {
+    const { renderer, state } = fixture();
+    renderer.setModels({ bikeModel: 'gltf', riderModel: 'gltf' });
+    renderer.setModels({ bikeModel: 'gltf', riderModel: 'proc' });
     await settle(renderer);
-    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/bike-pro.glb', 'models/bike-pro-lod.glb']);
-    expect(state.gltf.bike).toBe(pro);
-    expect(state.gltf.bikeLod).toBe(proLod);
-  });
-
-  it('on a phone tier the LOD file is the one awaited and the authored file the prefetched twin; a tier step-up then parses it as a hero load', async () => {
-    const { renderer, state } = fixture('medium');
-    const pro = { name: 'pro' } as unknown as GLTF, proLod = { name: 'pro-lod' } as unknown as GLTF;
-    vi.mocked(loadGltf).mockImplementation(async (url) => url === 'models/bike-pro.glb' ? pro : url === 'models/bike-pro-lod.glb' ? proLod : null);
-    renderer.setBikeClass('pro');
-    await settle(renderer);
-    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/bike-pro-lod.glb']);
-    expect(vi.mocked(prefetchModel).mock.calls.map(([url]) => url)).toEqual(['models/bike-pro.glb']);
-    expect(state.gltf.bikeLod).toBe(proLod);
-    expect(state.gltf.bike).toBeNull(); // riding: cached, not parsed
-    // desktop-high asks for the authored bike: fetched (from the cache) and parsed now, awaited through heroPending.
-    state.tier = 'high';
-    (renderer as unknown as { ensureHeroDetail(): void }).ensureHeroDetail();
-    expect(state.heroLoading).toBe(1);
-    await settle(renderer);
-    expect(vi.mocked(loadGltf).mock.calls.map(([url]) => url)).toEqual(['models/bike-pro-lod.glb', 'models/bike-pro.glb']);
-    expect(state.gltf.bike).toBe(pro);
-  });
-
-  it('keeps the installed livery when the other file fails, and retries on the next request', async () => {
-    const { renderer, state, rookie, rookieLod } = fixture();
-    vi.mocked(loadGltf).mockResolvedValue(null);
-    renderer.setBikeClass('pro');
-    await settle(renderer);
-    expect(state.gltf.bike).toBe(rookie);
-    expect(state.gltf.bikeLod).toBe(rookieLod);
-    expect(state.bikeDocumentClass).toBe('rookie');
-    const pro = { name: 'pro' } as unknown as GLTF;
-    vi.mocked(loadGltf).mockResolvedValue(pro);
-    renderer.setBikeClass('pro');
-    await settle(renderer);
-    expect(state.gltf.bike).toBe(pro);
-    expect(state.bikeDocumentClass).toBe('pro');
-  });
-
-  it('a class request superseded before its file parsed never installs', async () => {
-    const { renderer, state, rookie } = fixture();
-    const release: ((g: GLTF) => void)[] = [];
-    const pro = { name: 'pro' } as unknown as GLTF;
-    vi.mocked(loadGltf).mockImplementation((url) => url.startsWith('models/bike-pro') ? new Promise<GLTF | null>((resolve) => { release.push(resolve); }) : Promise.resolve(rookie));
-    renderer.setBikeClass('pro');
-    renderer.setBikeClass('rookie'); // same URL as the installed document: nothing to load, the pro request is stale
-    expect(release).toHaveLength(1); // only the drawn file was requested; the twin never was
-    for (const resolve of release) resolve(pro);
-    await settle(renderer);
-    expect(state.gltf.bike).toBe(rookie);
-    expect(state.bikeDocumentClass).toBe('rookie');
+    expect(state.heroDocs.size).toBe(14);
+    expect(drawn(state)[0]).toBe('models/bike-rookie.glb');
+    expect(state.rider.root.name).toBe('rider:proc');
+    expect(state.riderDocumentOutfit).toBeNull();
   });
 });

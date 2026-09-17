@@ -1,23 +1,17 @@
 /** Small shared boot vocabulary; the inline receives just these computed totals. */
-import type { BikeClass, RiderOutfit } from '../core/types';
+import type { RiderOutfit } from '../core/types';
 import { BOOT_IDS } from '../render/art/boot-set';
-import { HERO_FILES_BY_OUTFIT_CLASS, lodUrl, type HERO_FILES_BY_OUTFIT } from '../render/hero/urls';
+import { HERO_FILES_BY_OUTFIT_CLASS, type HERO_FILES_BY_OUTFIT } from '../render/hero/urls';
 
 export type BootAssetKey = (typeof HERO_FILES_BY_OUTFIT)[RiderOutfit][number] | `art:${(typeof BOOT_IDS)[number]}`;
-/** `[lod, full]` bytes: boot declares ONE detail of ONE rider + ONE bike (ask 43 round 4, `src/game/startTier.ts firstHeroDetail`; the slot is `heroTotal.ts`). */
-export type DetailBytes = readonly [lod: number, full: number];
-/**
- * Ask 43: the hero total is the sum of the chosen outfit's file and the chosen class's file at the detail the first
- * frame draws — riders by outfit, bikes by class, `[lod, full]` tuples: this object is compiled into the 8 KB boot
- * inline verbatim, so it is 14 numbers, not 20 keyed pairs.
- */
+/** Ask 50: the boot bar covers EVERY hero file (five outfits, two classes, authored + LOD) — one number, nothing streams after. */
 export interface DeclaredBootTotals {
-  riders: Record<RiderOutfit, DetailBytes>;
-  bikes: Record<BikeClass, DetailBytes>;
+  heroModels: number;
   bootArt: number;
 }
 
-export const RIDER_OUTFITS = Object.keys(HERO_FILES_BY_OUTFIT_CLASS) as readonly RiderOutfit[];
+/** Every hero file, once (the same set `src/render/index.ts setModels` fetches). */
+export const HERO_FILE_SET: readonly BootAssetKey[] = [...new Set(Object.values(HERO_FILES_BY_OUTFIT_CLASS).flatMap((c) => [...c.rookie, ...c.pro]))];
 
 export function declaredBootTotals(bytes: (key: BootAssetKey) => number): DeclaredBootTotals {
   const need = (key: BootAssetKey): number => {
@@ -25,21 +19,10 @@ export function declaredBootTotals(bytes: (key: BootAssetKey) => number): Declar
     if (!Number.isFinite(size) || size <= 0) throw new Error(`boot plan: missing or empty asset ${key}`);
     return size;
   };
-  const riders = {} as Record<RiderOutfit, DetailBytes>;
-  for (const outfit of RIDER_OUTFITS) {
-    const [, , full, lod] = HERO_FILES_BY_OUTFIT_CLASS[outfit].rookie; // the rider's files are the same on both classes
-    riders[outfit] = [need(lod), need(full)];
-  }
-  const [bikeRookie, bikePro] = [HERO_FILES_BY_OUTFIT_CLASS['street-mustard'].rookie[0], HERO_FILES_BY_OUTFIT_CLASS['street-mustard'].pro[0]];
-  const bikes: Record<BikeClass, DetailBytes> = { rookie: [need(lodUrl(bikeRookie)), need(bikeRookie)], pro: [need(lodUrl(bikePro)), need(bikePro)] };
-  return { riders, bikes, bootArt: BOOT_IDS.reduce((sum, id) => sum + need(`art:${id}`), 0) };
+  return { heroModels: HERO_FILE_SET.reduce((sum, file) => sum + need(file), 0), bootArt: BOOT_IDS.reduce((sum, id) => sum + need(`art:${id}`), 0) };
 }
 
 /** The shape before the catalog has been read (vite.config.ts holds one until `writeBootPlanTable` runs). */
 export function emptyBootTotals(): DeclaredBootTotals {
-  const t = declaredBootTotals(() => 1);
-  for (const outfit of RIDER_OUTFITS) t.riders[outfit] = [0, 0];
-  t.bikes = { rookie: [0, 0], pro: [0, 0] };
-  t.bootArt = 0;
-  return t;
+  return { heroModels: 0, bootArt: 0 };
 }

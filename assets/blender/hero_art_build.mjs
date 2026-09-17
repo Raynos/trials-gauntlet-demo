@@ -94,6 +94,7 @@ export async function build(name, { lod, stage = 0, scratch, dry = false }) {
       clips: reduce.clips ?? null,
       hair: reduce.hair ?? null,
       handFloors: reduce.handFloors ?? null,
+      raceHelmet: reduce.raceHelmet ?? null,
       atlas: reduce.atlas ? { size: reduce.atlas.size, parts: reduce.atlas.parts ?? null } : null,
     },
     compression: { positionBits: packReport.positionBits, normalBits: packReport.normalBits, quatBits: packReport.quatBits, lossless: ['indices (triangle order/winding)', 'UV', 'joints', 'weights', 'scale', 'inverse binds', 'clip times'], rawBytes: packReport.inputBytes, packedBytes: packReport.outputBytes },

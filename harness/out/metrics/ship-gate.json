@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260917-011014-f0d28f",
-  "startedAt": "2026-09-17T06:10:14.879Z",
-  "wallMs": 618923,
-  "git": "3af533e",
+  "runId": "20260917-071248-ed3101",
+  "startedAt": "2026-09-17T12:12:48.432Z",
+  "wallMs": 168799,
+  "git": "7573b06",
   "srcFingerprint": "4b9bc981",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
@@ -12,9 +12,9 @@
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": true,
   "build": {
-    "distBytes": 86425622,
-    "jsGzipBytes": 545861,
-    "buildMs": 0
+    "distBytes": 69131540,
+    "jsGzipBytes": 546993,
+    "buildMs": 3051.034209
   },
   "browser": {
     "version": "151.0.7922.34",
@@ -24,15 +24,15 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 154.36854099999618,
+      "value": 173.92870799999946,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 335/114/555/154/144 min 114 loadavg 16.7/18"
+      "note": "runs 404/122/174 min 122 loadavg 15.07/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 11967.66000008583,
+      "value": 11377.81500005722,
       "limit": 4000,
       "pass": false,
       "unit": "ms",
@@ -100,14 +100,14 @@
     },
     {
       "id": "restart.wallMsP95",
-      "value": 0.19000005722045898,
+      "value": 0.21000003814697266,
       "limit": 5,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "restart.frameMsP95",
-      "value": 806.3499999046326,
+      "value": 566.1899998188019,
       "limit": 150,
       "pass": false,
       "unit": "ms",
@@ -125,21 +125,21 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": 6.1085357666015625,
+      "value": -15.239494323730469,
       "limit": 5,
-      "pass": false,
+      "pass": true,
       "unit": "MB",
-      "note": "over 60s of play"
+      "note": "over 10s of play (--quick: shorter than the 60 s the threshold is written for)"
     },
     {
       "id": "perf.drawCallsMax",
-      "value": 174,
+      "value": 184,
       "limit": 300,
       "pass": true
     },
     {
       "id": "perf.trianglesMax",
-      "value": 266333,
+      "value": 279197,
       "limit": 500000,
       "pass": true
     },
@@ -152,21 +152,21 @@
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 44.99995708465576,
+      "value": 85.00003814697266,
       "limit": 60,
-      "pass": true,
+      "pass": false,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 3.1549999713897705,
+      "value": 2.819999933242798,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 11254.810000181198,
+      "value": 3163.375,
       "limit": 250,
       "pass": false,
       "unit": "ms",
@@ -176,11 +176,11 @@
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 533.0673828125,
+      "value": 534.1728515625,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 84400 KB raw"
+      "note": "dist 67511 KB raw"
     },
     {
       "id": "determinism.pass",
@@ -191,11 +191,10 @@
     },
     {
       "id": "camera.box",
-      "value": 0,
+      "value": null,
       "limit": 0,
       "pass": true,
-      "unit": "frames out of box while riding",
-      "note": "bot-3.json; clamped 18.9 % (reported); 384 s; camera: PASS out-of-box 0/672 (riding 0), clamped 127 (18.9%), max|roll| 2.8e-17"
+      "note": "skipped with --quick"
     },
     {
       "id": "stranger.medianAttempts",
@@ -206,7 +205,7 @@
     },
     {
       "id": "reflex.medianAttempts",
-      "value": "b1 -/1.5 (0 fresh) · b2 -/3 (0 fresh) · b3 -/3 (0 fresh) · e1 -/6 (0 fresh)",
+      "value": "b1 1.5/1.5 (2 fresh) · b2 2/3 (2 fresh) · b3 2.5/3 (2 fresh) · e1 5.5/6 (2 fresh)",
       "limit": 1.5,
       "pass": true,
       "note": "reflex bot (average) median attempts / (1.5 x band top) on src 4b9bc981; informational until every track has >= 3 seeds on this src (pnpm harness:reflex --all-tracks --seeds 3)"
@@ -223,7 +222,7 @@
       "value": 59.5,
       "limit": 55,
       "pass": true,
-      "note": "b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md (report build 5649aa6, HEAD 3af533e)); informational until 3 reports exist (1 filed)"
+      "note": "b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md (report build 5649aa6, HEAD 7573b06)); informational until 3 reports exist (1 filed)"
     },
     {
       "id": "device.thermalDropPct",
@@ -244,30 +243,26 @@
       "value": 0,
       "limit": 5,
       "pass": true,
-      "note": "rider bone-position drift over the bench flow in WebKit (ANGLE-on-Metal), worst of 4 runs at 2026-09-16T03:09:02Z: 0 mm (the arms bug 2b48370 read 2 600 mm); reach 11.12 cm, overhang 0.5 px (harness/out/hero-webkit/hero-webkit-2026-09-16T03-09-02.json)"
+      "note": "rider bone-position drift over the bench flow in WebKit (ANGLE-on-Metal), worst of 2 runs at 2026-09-17T12:15:08Z: 0 mm (the arms bug 2b48370 read 2 600 mm); reach 11.38 cm, overhang 0.5 px (harness/out/hero-webkit/hero-webkit-2026-09-17T12-15-08.json)"
     }
   ],
   "failed": 4,
   "pass": false,
   "boot": {
     "runs": [
-      335.23237500000005,
-      113.96087500000067,
-      555.0932089999988,
-      154.36854099999618,
-      144.11124999999447
+      404.38337500000034,
+      122.43879199999719,
+      173.92870799999946
     ],
-    "p50": 154.36854099999618,
-    "min": 113.96087500000067,
-    "max": 555.0932089999988,
+    "p50": 173.92870799999946,
+    "min": 122.43879199999719,
+    "max": 404.38337500000034,
     "firstFrameMs": [
-      11967.66000008583,
-      8604.120000123978,
-      13519.829999923706,
-      12313.044999837875,
-      11380.399999856949
+      12780.014999866486,
+      8753.81500005722,
+      11377.81500005722
     ],
-    "loadavg1": 16.7,
+    "loadavg1": 15.07,
     "cores": 18,
     "retried": false
   },
@@ -289,48 +284,48 @@
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0.2950000762939453,
-      0.19000005722045898,
-      0.18000006675720215,
-      0.11500000953674316,
+      0.2799999713897705,
+      0.14499998092651367,
+      0.21000003814697266,
+      0.125,
       0.14499998092651367,
       0.13499999046325684,
       0.10500001907348633,
-      0.09999990463256836,
-      0.09999990463256836,
-      0.11500000953674316,
-      0.08500003814697266,
-      0.06999993324279785,
-      0.09500002861022949,
-      0.06500005722045898,
-      0.07499980926513672,
-      0.06999993324279785,
+      0.10500001907348633,
       0.08999991416931152,
+      0.18499994277954102,
+      0.1099998950958252,
+      0.07999992370605469,
+      0.08999991416931152,
+      0.08999991416931152,
+      0.08000016212463379,
+      0.06999993324279785,
+      0.06500005722045898,
       0.06500005722045898,
       0.07500004768371582,
-      0.07999992370605469
+      0.06999993324279785
     ],
     "frameMs": [
-      2958.6500000953674,
-      542.2999999523163,
-      556.5,
-      570.2349998950958,
-      556.039999961853,
-      411.74500012397766,
-      806.3499999046326,
-      606.460000038147,
-      574.4249999523163,
-      734.8949999809265,
-      793.9950001239777,
-      740.6399998664856,
-      677.7449998855591,
-      655.1950001716614,
-      729.1699998378754,
-      600.1600000858307,
-      577.2649998664856,
-      605.6600000858307,
-      565.4350001811981,
-      548.75
+      1982.4750001430511,
+      265.5750000476837,
+      280.3800001144409,
+      341.61500000953674,
+      394.72000002861023,
+      428.2999999523163,
+      399.8699998855591,
+      439.6050000190735,
+      456.7099997997284,
+      445.1400001049042,
+      566.1899998188019,
+      360.47499990463257,
+      414.125,
+      409.75999999046326,
+      454.1400001049042,
+      425.4449999332428,
+      427.15499997138977,
+      414.80999994277954,
+      420.84999990463257,
+      423.5050001144409
     ],
     "noCountdown": true,
     "movesOnFirstTick": true,
@@ -343,26 +338,26 @@
     "autoRespawnMs": 1041.6666666666667
   },
   "heap": {
-    "beforeMB": 15.466197967529297,
-    "afterMB": 21.57473373413086,
-    "growthMB": 6.1085357666015625,
-    "seconds": 60
+    "beforeMB": 36.29131317138672,
+    "afterMB": 21.05181884765625,
+    "growthMB": -15.239494323730469,
+    "seconds": 10
   },
   "perf": {
-    "drawCalls": 174,
-    "triangles": 266333,
+    "drawCalls": 184,
+    "triangles": 279197,
     "texturesMB": 77.92514831542965,
-    "physicsUsPerTickP95": 44.99995708465576,
-    "renderSubmitMsP95": 3.1549999713897705,
-    "renderSyncedMsP95": 11254.810000181198
+    "physicsUsPerTickP95": 85.00003814697266,
+    "renderSubmitMsP95": 2.819999933242798,
+    "renderSyncedMsP95": 3163.375
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260917-011015-151f9d",
-    "startedAt": "2026-09-17T06:10:15.160Z",
-    "wallMs": 46103,
-    "git": "3af533e",
+    "runId": "20260917-071251-38dcd8",
+    "startedAt": "2026-09-17T12:12:51.838Z",
+    "wallMs": 45043,
+    "git": "7573b06",
     "srcFingerprint": "4b9bc981",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
@@ -724,13 +719,13 @@
           1
         ],
         "limit": 1.5,
-        "srcFingerprint": "24a246e0",
-        "seedsFresh": 0,
-        "medianAttempts": null,
-        "medianFinishTime": null,
-        "allCleared": false,
-        "pass": null,
-        "deadliest": null
+        "srcFingerprint": "4b9bc981",
+        "seedsFresh": 2,
+        "medianAttempts": 1.5,
+        "medianFinishTime": 58.85,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ground @ 90 m ×1"
       },
       {
         "trackId": "b2-lean-back",
@@ -740,13 +735,13 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "24a246e0",
-        "seedsFresh": 0,
-        "medianAttempts": null,
-        "medianFinishTime": null,
-        "allCleared": false,
-        "pass": null,
-        "deadliest": null
+        "srcFingerprint": "4b9bc981",
+        "seedsFresh": 2,
+        "medianAttempts": 2,
+        "medianFinishTime": 62.4375,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ground @ 30 m ×1"
       },
       {
         "trackId": "b3-kicker-row",
@@ -756,13 +751,13 @@
           2
         ],
         "limit": 3,
-        "srcFingerprint": "24a246e0",
-        "seedsFresh": 0,
-        "medianAttempts": null,
-        "medianFinishTime": null,
-        "allCleared": false,
-        "pass": null,
-        "deadliest": null
+        "srcFingerprint": "4b9bc981",
+        "seedsFresh": 2,
+        "medianAttempts": 2.5,
+        "medianFinishTime": 64.79583333333333,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ground @ 125 m ×1"
       },
       {
         "trackId": "e1-uphill-weight",
@@ -772,13 +767,13 @@
           4
         ],
         "limit": 6,
-        "srcFingerprint": "24a246e0",
-        "seedsFresh": 0,
-        "medianAttempts": null,
-        "medianFinishTime": null,
-        "allCleared": false,
-        "pass": null,
-        "deadliest": null
+        "srcFingerprint": "4b9bc981",
+        "seedsFresh": 2,
+        "medianAttempts": 5.5,
+        "medianFinishTime": 112.825,
+        "allCleared": true,
+        "pass": true,
+        "deadliest": "ramp @ 149.2 m ×2"
       }
     ]
   },
@@ -928,13 +923,13 @@
       }
     },
     "hero": {
-      "file": "harness/out/hero-webkit/hero-webkit-2026-09-16T03-09-02.json",
-      "at": "2026-09-16T03:09:02Z",
+      "file": "harness/out/hero-webkit/hero-webkit-2026-09-17T12-15-08.json",
+      "at": "2026-09-17T12:15:08Z",
       "track": "b1-first-ride",
       "driftMaxMm": 0,
-      "worstReachCm": 11.12,
+      "worstReachCm": 11.38,
       "worstOverhangPx": 0.5,
-      "results": 4
+      "results": 2
     }
   },
   "clearPro": [

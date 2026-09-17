@@ -3,10 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { PUBLIC_BYTES } from './plan.generated';
 import { BOOT_BYTE_TOTALS, HERO_FILES, bootByteTotals } from './totals';
 import { BOOT_IDS } from '../render/art/boot-set';
-import { declaredBootTotals, emptyBootTotals } from './asset-totals';
-import { HERO_FILES_BY_OUTFIT_CLASS, heroPair } from '../render/hero/urls';
+import { declaredBootTotals, emptyBootTotals, HERO_FILE_SET } from './asset-totals';
+import { HERO_FILES_BY_OUTFIT_CLASS } from '../render/hero/urls';
 
-// Distinct fixture sizes make selecting the wrong outfit, the wrong class or counting both pairs observable.
+// Distinct fixture sizes make a missed or double-counted file observable.
 vi.mock('./plan.generated', async () => {
   const { BOOT_IDS } = await import('../render/art/boot-set');
   return { PUBLIC_BYTES: {
@@ -22,7 +22,7 @@ vi.mock('./plan.generated', async () => {
 });
 
 describe('declared byte totals', () => {
-  it('sum the generated table over the hero files and the boot art set, and are positive', () => {
+  it('sum the generated table over every hero file and the boot art set, and are positive', () => {
     const table = PUBLIC_BYTES as Readonly<Record<string, number>>;
     expect(BOOT_BYTE_TOTALS.heroModels).toBe(HERO_FILES.reduce((n, f) => n + table[f]!, 0));
     expect(BOOT_BYTE_TOTALS.bootArt).toBe(BOOT_IDS.reduce((n, id) => n + table[`art:${id}`]!, 0));
@@ -30,27 +30,13 @@ describe('declared byte totals', () => {
     expect(BOOT_BYTE_TOTALS.bootArt).toBeGreaterThan(0);
   });
 
-  it('counts exactly the chosen outfit file and the chosen class file at the first-drawn detail (ask 43 round 4)', () => {
-    // fixture: mustard [20 lod, 70 full], rookie bike [30 lod, 100 full]
-    expect(bootByteTotals('street-mustard', 'rookie', 'lod').heroModels).toBe(50);
-    expect(bootByteTotals('street-mustard', 'rookie', 'full').heroModels).toBe(170);
-    expect(bootByteTotals('street-mustard', 'pro', 'full').heroModels).toBe(180);
-    expect(bootByteTotals('street-charcoal', 'rookie', 'lod').heroModels).toBe(51);
-    expect(bootByteTotals('street-openface', 'rookie', 'full').heroModels).toBe(205);
-    expect(bootByteTotals('race-bluewhite', 'rookie', 'lod').heroModels).toBe(55);
-    expect(bootByteTotals('race-charcoalyellow', 'pro', 'full').heroModels).toBe(202);
-    expect(bootByteTotals('street-mustard').heroModels).toBe(bootByteTotals('street-mustard', 'rookie', 'lod').heroModels);
-    expect(bootByteTotals('street-mustard').bootArt).toBe(bootByteTotals('race-bluewhite', 'pro', 'full').bootArt);
-    expect(BOOT_BYTE_TOTALS).toEqual(bootByteTotals('street-mustard', 'rookie', 'lod'));
-    const table = PUBLIC_BYTES as Readonly<Record<string, number>>;
-    for (const outfit of Object.keys(HERO_FILES_BY_OUTFIT_CLASS) as (keyof typeof HERO_FILES_BY_OUTFIT_CLASS)[]) {
-      for (const cls of ['rookie', 'pro'] as const) {
-        for (const detail of ['lod', 'full'] as const) {
-          const [bike, rider] = heroPair(outfit, cls, detail);
-          expect(bootByteTotals(outfit, cls, detail).heroModels).toBe(table[bike]! + table[rider]!);
-        }
-      }
-    }
+  it('counts all fourteen hero files exactly once (ask 50: every outfit, class and detail is in the one bar)', () => {
+    expect(HERO_FILE_SET).toHaveLength(14);
+    expect(new Set(HERO_FILE_SET).size).toBe(14);
+    const every = new Set(Object.values(HERO_FILES_BY_OUTFIT_CLASS).flatMap((c) => [...c.rookie, ...c.pro]));
+    expect(new Set(HERO_FILE_SET)).toEqual(every);
+    expect(bootByteTotals().heroModels).toBe(821); // the fixture's fourteen sizes
+    expect(BOOT_BYTE_TOTALS).toEqual(bootByteTotals());
   });
 
   it('rejects a missing declared model instead of shrinking the denominator', () => {
@@ -59,10 +45,6 @@ describe('declared byte totals', () => {
   });
 
   it('has an all-zero shape for the build before the catalog is read', () => {
-    const empty = emptyBootTotals();
-    expect(empty.bootArt).toBe(0);
-    for (const pair of Object.values(empty.riders)) expect(pair).toEqual([0, 0]);
-    expect(empty.bikes).toEqual({ rookie: [0, 0], pro: [0, 0] });
-    expect(Object.keys(empty.riders).sort()).toEqual(Object.keys(HERO_FILES_BY_OUTFIT_CLASS).sort());
+    expect(emptyBootTotals()).toEqual({ heroModels: 0, bootArt: 0 });
   });
 });

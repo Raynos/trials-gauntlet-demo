@@ -31,14 +31,20 @@ def args():
     p.add_argument("--samples", type=int, default=16)
     p.add_argument("--turntable", type=int, default=0, help="also render N head-camera frames sweeping 360 deg")
     p.add_argument("--head-only", action="store_true")
+    p.add_argument("--head-dist", type=float, default=0.55, help="head camera distance (m)")
+    p.add_argument("--bone", default="head", help="bone the close-up camera targets (head, hand.L, ...)")
+    p.add_argument("--bone-lift", type=float, default=0.05)
     p.add_argument("files", nargs="+")
     return p.parse_args(argv)
 
 
 def decoded_copy(src, out_dir):
+    import struct
     with open(src, "rb") as f:
-        head = f.read(8192)
-    if b"EXT_meshopt_compression" not in head[:8192] and b"EXT_meshopt" not in head:
+        header = f.read(20)
+        json_length = struct.unpack("<I", header[12:16])[0]
+        chunk = f.read(json_length)
+    if b"EXT_meshopt_compression" not in chunk:
         return src
     dst = Path(out_dir) / (Path(src).stem + ".decoded.glb")
     subprocess.run(["node", str(HERE / "unpack_meshopt.mjs"), str(src), str(dst)], check=True, capture_output=True, cwd=ROOT)
@@ -121,10 +127,12 @@ def main():
         if not a.head_only:
             render(scene, str(Path(a.out) / f"{stem}.png"), centre, extent * 1.9, -35, 12, a.size)
         if arms:
-            head = arm.matrix_world @ arm.pose.bones["head"].head
-            render(scene, str(Path(a.out) / f"{stem}-head.png"), head + Vector((0, 0, 0.05)), 0.55, -40, 8, a.size)
+            pb = arm.pose.bones[a.bone]
+            head = arm.matrix_world @ ((pb.head + pb.tail) / 2 if a.bone != "head" else pb.head)
+            tag = "head" if a.bone == "head" else a.bone.replace(".", "")
+            render(scene, str(Path(a.out) / f"{stem}-{tag}.png"), head + Vector((0, 0, a.bone_lift)), a.head_dist, -40, 8, a.size)
             for i in range(a.turntable):
-                render(scene, str(Path(a.out) / f"{stem}-tt-{i:02d}.png"), head + Vector((0, 0, 0.05)), 0.55, -40 + 360.0 * i / a.turntable, 8, a.size)
+                render(scene, str(Path(a.out) / f"{stem}-tt-{i:02d}.png"), head + Vector((0, 0, a.bone_lift)), a.head_dist, -40 + 360.0 * i / a.turntable, 8, a.size)
         else:
             render(scene, str(Path(a.out) / f"{stem}-rear.png"), centre, extent * 1.9, 145, 15, a.size)
         C.log(f"rendered {stem}")
