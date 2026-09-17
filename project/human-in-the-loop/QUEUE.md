@@ -8,3 +8,5 @@ waiting on. IDs never reused. Ported from the FF15 demo's `HUMAN_REVIEW.md`.
   I pull it and the loop is proven.
 
 - **HR-10 — The hero art build, on your iPhone.** Waiting on: you — open v0.3.0 (link in `RELEASES.md`) in Safari: menu → GARAGE, cycle the five outfits and both bikes, then b1. Two readings: is the garage smooth (the 30 fps bar; `?bench=1` is not needed — just say), and does the hair read right at arm's length? A fix list goes to ask 46's row.
+
+- **HR-11 — The repo cannot be pushed to GitHub (ask 56, nobody's).** Waiting on: you — `git push origin main` is rejected (pack > 2 GB; a 135 MB mp4 at HEAD is over the 100 MB blob limit). Main's history carries 4.27 GB of blobs, 2.48 GB of it the retired `prototypes/hero-garage`. The only fix is a history rewrite of `main` (strip the prototype + the `harness/out` video cuts, LFS or drop the mp4) — destructive, every clone re-based, both live sessions must stop first. Say go and name the session that does it; nothing rewrites history until then.
