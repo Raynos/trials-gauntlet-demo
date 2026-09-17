@@ -25,7 +25,7 @@
  * Shared by the ≤ 8 KB inline loader (steps `core`, `evaluate`) and `main.ts` (the rest): keep it
  * small and dependency-free.
  */
-import { AFTER_LABELS, BOOT_STEPS, BYTE_INFO, BYTE_SOURCES, STEP_INFO, type AfterKey, type BootStep, type ByteKey } from './steps';
+import { AFTER_LABELS, BOOT_STEPS, BYTE_INFO, BYTE_SOURCES, STEP_INFO, byteLabel, type AfterKey, type BootStep, type ByteKey } from './steps';
 
 /** Sub-progress of one step, bound to that step: reports after the step completed are ignored. */
 export interface StepProgress {
@@ -173,7 +173,7 @@ export function createBootPlan(sink: Sink, options: PlanOptions): Plan<BootStep>
       step: current,
       label: STEP_INFO[current].label,
       detail: steps.get(current)!.detail,
-      bytes: lastRead && last ? { key: lastRead, label: BYTE_INFO[lastRead].label, done: credited(last), total: last.total } : null,
+      bytes: lastRead && last ? { key: lastRead, label: byteLabel(lastRead), done: credited(last), total: last.total } : null,
       bytesTotal: total,
       doneCount,
       rows,
@@ -249,7 +249,7 @@ export function createBootPlan(sink: Sink, options: PlanOptions): Plan<BootStep>
     done() {
       if (finished) return;
       const missed = BOOT_STEPS.filter((k) => steps.get(k)!.state !== 'ok');
-      if (missed.length) throw new Error(`boot plan: done() with ${missed.join(',')} not complete`);
+      if (missed.length) throw new Error(`boot plan: ${missed.join(',')} not complete`);
       finished = true;
       publish();
       // Arithmetic, not policy: Σw·1/Σw and ΣT/ΣT. The throw is the assertion that this file's math was not edited into a lie.
@@ -273,12 +273,12 @@ export async function delegate<R extends BootStep, KS extends readonly R[], T>(p
   const allowed = new Set<BootStep>(keys);
   const loose = plan as unknown as Plan<BootStep>;
   const run: StepRunner<KS[number]> = async (key, work) => {
-    if (!allowed.has(key)) throw new Error(`boot plan: delegate ran ${key} outside [${keys.join(',')}]`);
+    if (!allowed.has(key)) throw new Error(`boot plan: ${key} outside [${keys.join(',')}]`);
     return (await loose.step(key, work)).value;
   };
   const value = await body(run);
   const missed = keys.filter((k) => plan.view.rows.find((r) => r.key === k)!.state !== 'ok');
-  if (missed.length) throw new Error(`boot plan: delegate resolved without completing ${missed.join(',')}`);
+  if (missed.length) throw new Error(`boot plan: without completing ${missed.join(',')}`);
   return Object.assign(Object.create(plan) as Plan<Exclude<R, KS[number]>>, { value }) as Plan<Exclude<R, KS[number]>> & { readonly value: T };
 }
 

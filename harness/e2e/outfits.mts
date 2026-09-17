@@ -3,18 +3,33 @@ import type { HeroHarnessWindow } from '../hero-browser';
 import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { startServer } from '../lib/server';
-import { AVAILABLE_RIDER_PRESETS } from '../../src/core/riderPresets';
+import { AVAILABLE_RIDER_PRESETS, type RiderOutfit } from '../../src/core/riderPresets';
+import { bikeUrl, lodUrl, riderPalette, riderUrl } from '../../src/render/hero/urls';
+
+/**
+ * Ask 43 (Astra's family, src/render/hero/urls.ts): the outfit IS the file — no `KHR_materials_variants`, so the live
+ * material name is the file's own. Street files carry the body under `rider_body` (plus hair / brow / beard shells);
+ * a Race file carries one material named after its outfit. The proof that the RIGHT file is installed is the request
+ * log below: every outfit's full + LOD file and both bike classes' files must have been fetched by the time they show.
+ */
+function liveMaterialOf(outfit: RiderOutfit, materials: string[]): string | undefined {
+  return materials.find(m => m === 'rider_body' || m.startsWith(outfit));
+}
+const basename = (url: string): string => url.slice(url.lastIndexOf('/') + 1);
 
 const server = await startServer({ freeze: true });
 const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--mute-audio'] });
 const output = 'harness/out/blender/openface-r12/integration';
 const errors: string[] = [];
+const fetchedModels = new Set<string>();
 try {
   const page = await browser.newPage({ viewport: { width: 1100, height: 720 }, deviceScaleFactor: 1 });
   page.setDefaultTimeout(30_000);
   page.on('pageerror', error => errors.push(error.message));
+  // Byte-snapshot URLs are `models/<hash>/<name>-<hash>.glb`; log them by their logical basename.
+  page.on('request', request => { const m = /\/models\/[0-9a-f]+\/(.+?)-[0-9a-f]{16}\.glb$/.exec(request.url()); if (m) fetchedModels.add(`${m[1]}.glb`); });
   let failOpenface = true, failedRequests = 0, successfulRequests = 0;
-  await page.route('**/models/**/rider-openface*.glb', async route => {
+  await page.route('**/models/**/rider-street-openface*.glb', async route => {
     if (failOpenface) { failedRequests++; await route.fulfill({ status: 503, body: 'Temporary test outage' }); }
     else { successfulRequests++; await route.continue(); }
   });
@@ -66,18 +81,21 @@ try {
           const debug = r.debugInfo();
           return { saved: localStorage.getItem('trials.riderOutfit'), rendered: debug.riderOutfit, variant: debug.riderMaterialVariant, heroDoc: debug.heroDoc, materials: [...new Set(materials)] };
         }, { lod });
-        if (observation.saved !== preset.id || observation.rendered !== preset.id || observation.variant !== preset.variant
-          || observation.materials.length !== 1 || observation.materials[0] !== preset.variant
+        const liveMaterial = liveMaterialOf(preset.id, observation.materials);
+        const files = { rider: basename(riderUrl(preset.id)), riderLod: basename(lodUrl(riderUrl(preset.id))), bike: basename(bikeUrl(bike)), bikeLod: basename(lodUrl(bikeUrl(bike))) };
+        const missing = Object.values(files).filter(f => !fetchedModels.has(f));
+        if (observation.saved !== preset.id || observation.rendered !== preset.id || observation.variant !== riderPalette(preset.id)
+          || !liveMaterial || missing.length
           || observation.heroDoc.split(' ').includes('rider-lod') !== lod) {
-          throw new Error(`Palette/LOD mismatch: ${JSON.stringify({ preset: preset.id, bike, lod, observation })}`);
+          throw new Error(`Outfit/LOD mismatch: ${JSON.stringify({ preset: preset.id, bike, lod, liveMaterial, missing, observation })}`);
         }
-        paletteChecks.push({ preset: preset.id, bike, lod, ...observation });
+        paletteChecks.push({ preset: preset.id, bike, lod, liveMaterial, files, ...observation });
       }
     }
   }
   if (errors.length) throw new Error(errors.join('\n'));
   await mkdir(output, { recursive: true });
   await page.screenshot({ path: `${output}/garage.png` });
-  await writeFile(`${output}/report.json`, JSON.stringify({ command: 'pnpm exec tsx harness/e2e/outfits.mts', mode: server.mode, failed, retry, low: { riderOutfit: low.riderOutfit, heroDoc: low.heroDoc }, paletteChecks, modelFamilies: 3, failedRequests, successfulRequests, errors, evidenceScope: 'Headless production garage interaction and live material observations; screenshot is UI evidence, not played riding acceptance.' }, null, 2) + '\n');
-  console.log(`PASS: outage/retry, five presets × two bike classes × full/LOD, exact live material names; new openface family retry. ${output}/report.json`);
+  await writeFile(`${output}/report.json`, JSON.stringify({ command: 'pnpm exec tsx harness/e2e/outfits.mts', mode: server.mode, failed, retry, low: { riderOutfit: low.riderOutfit, heroDoc: low.heroDoc }, paletteChecks, heroFamily: 'ASTRA_HERO (one file per outfit, one per bike class; no material variants)', modelFiles: [...fetchedModels].sort(), failedRequests, successfulRequests, errors, evidenceScope: 'Headless production garage interaction, live material names and the per-outfit / per-class model requests; screenshot is UI evidence, not played riding acceptance.' }, null, 2) + '\n');
+  console.log(`PASS: outage/retry, five presets × two bike classes × full/LOD, live material names, every outfit's and class's own files fetched (${fetchedModels.size} model files). ${output}/report.json`);
 } finally { await browser.close(); await server.close(); }

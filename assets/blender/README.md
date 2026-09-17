@@ -404,3 +404,64 @@ Lighting in previews: one 4 W/m² sun + fill, AgX; the game's own grade will dif
   so a few island edges show a dark seam on the LOD at 512².
 * Decal sheet is 1024² for 14 cells: the 4-tile logo strips are ~460 px wide, so a 3 cm sponsor
   (boot plate, fork guard) is legible only in the garage view.
+
+## Hero art from Astra's delivery (ask 43)
+
+Inputs (`prototypes/hero-garage/public/assets/`, OPUS_HANDOFF.md "Exact selections"; full sha256 in each `.source.json`):
+
+| delivery | sha256 (first 16) | output | delivered tris / MB |
+|---|---|---|---|
+| `street01-rider-round33-lossless.glb` | `989d1d3c4d963e73` | rider-street-mustard | 3,661,632 / 60.2 |
+| `variants/street-charcoal.glb` | `570e2bc135aaf977` | rider-street-charcoal | 3,661,632 / 60.2 |
+| `variants/street-openface-remaster.glb` | `f01c3abc274d457a` | rider-street-openface | 3.66 M (groom hidden) / 60.4 |
+| `variants/race-bluewhite.glb` / `race-charcoalyellow.glb` | `a20663e0002ef4c9` / `5a7682d8d5bb6aaa` | rider-race-* | 93,908 / 6.0 |
+| `variants/bike-rookie-art.glb` / `bike-pro-art.glb` | `7877404ef7e9e2f5` / `187514df4677c400` | bike-rookie / bike-pro | 33,204 / 5.7-6.6 |
+
+```sh
+node assets/blender/hero_art_build.mjs                      # all 14 files into public/models, stage 1, ~100 s, deterministic
+node assets/blender/hero_art_build.mjs bike-pro --lod-only  # one output; glb_stats.mjs measures, hero_art_preview.py renders
+```
+
+Measured outputs (`verify_hero_art.mjs`; every `X.glb` has the `X-lod.glb` twin the model catalog requires):
+
+| output | bytes | tris | draws | images (max px) |
+|---|---|---|---|---|
+| rider-street-mustard / -charcoal | 3,171,116 / 3,050,004 | 58,976 (hair shell 7,677) | 6 | 9 (2048) |
+| rider-street-mustard-lod / -charcoal-lod | 1,581,456 / 1,534,364 | 7,836 (hair 1,196) | 6 | 9 (1024) |
+| rider-street-openface / -lod | 2,693,556 / 1,322,188 | 58,820 / 7,806 | 5 | 7 (2048 / 1024) |
+| rider-race-bluewhite / -charcoalyellow | 2,091,492 / 2,075,576 | 44,093 | 1 | 3 (1024) |
+| rider-race-*-lod | 769,020 / 762,628 | 7,817 | 1 | 3 (512) |
+| bike-rookie / bike-pro | 2,283,040 / 2,270,544 | 33,204 | 23 | 8 (2048 colour, 1024 ORM) |
+| bike-*-lod | 870,440 / 864,848 | 5,793 | 23 | 8 (1024) |
+
+The verifier decodes delivery and export with the production GLTFLoader + MeshoptDecoder (no browser) and asserts:
+19 exact joints; rest transforms, inverse binds and the 4 sockets equal within 2e-5 (measured 8e-7); the six clips at
+exactly 59/119/119/149/149/149 frames at 30 fps with every 1/30 s world pose within 1 mm / 1 mrad of the delivery
+(measured 0.19 mm); finite samples; normalized weights; tri/draw budgets. Bikes: 23 parts + 22 `attach_*` markers
+with equal transforms and extras, chain/hose vertex order exact, other protected surfaces position-identical. Each
+`.source.json` records the sha256s, what was dropped/joined/decimated/rescaled, hand floors, hair bake, atlas size.
+Pipeline: `unpack_meshopt.mjs` decodes the delivery (the 5.2 importer cannot read it); `hero_art_import.py` in
+Blender drops the dead 0-triangle prototype mesh and the groom, derives the hair shell, welds + collapses each part
+to its share of the budget (LOD: hand parts, found by over 50 % `hand.*` weight, keep at least 400 tris so fingers
+survive), joins every opaque part and bakes it to one atlas with `common.bake_atlas` (2048 albedo/normal, 1024 ORM,
+local AO 2.5 cm; LOD 1024/512), caps the remaining textures (colour 1024 JPEG, data PNG; bike data 512; eyes/beard
+512) and exports uncompressed; `hero_art_pack.mjs` compresses; `verify_hero_art.mjs` gates the copy + audit. Bikes
+keep their 23 named parts (the runtime mechanism looks them up); one atlas material takes them from 36 to 23 draws;
+chain, hose and the two blur cards keep their own materials (scrolling / coverage), the hose's leftover `bike_mech`
+textures drop to 256 px. `--stage 0` is the quick export (groom removed, per-material draws, no bakes).
+
+Findings that shaped it: (1) Blender 5.2's own EXT_meshopt export quantizes rotations to 8 bits and times/positions
+to a 12-bit shared exponent; the clips moved up to 3 cm / 1.8 deg at the hands and durations by 2 ms. `hero_art_pack.mjs`
+(meshoptimizer@1.1.1 root devDependency) packs instead: 16-bit exponent positions/translations, 16-bit quaternions,
+8-bit octahedral normals, everything else (indices, UV, joints, weights, scale, inverse binds, times) lossless; every
+stream is decoded back and compared before writing. (2) The delivered garments are split along every panel seam
+(46 k boundary edges on the sweatshirt) and collapse never removes boundary edges, so the LOD bottomed out at 6.8 k
+tris; a 1e-5 m weld before decimation fixed it.
+
+Hair: the 3,456,000-triangle groom is 9,000 strands x 65 rings x 3 verts, all weighted 1.0 to `head`. `hero_art_hair.py`
+turns the strand cloud into a closed shell (Geometry Nodes Mesh to Points, Points to Volume at 4.5 mm radius / 3 mm
+voxel, Volume to Mesh), collapses it (8 k full / 1.2 k LOD), smart-unwraps it and bakes tangent normal + AO from the
+real strands (selected-to-active, 512 px), folding the AO into a lifted dark-brown albedo (roughness 0.9, specular
+0.15). Alternative not built: ribbon strips along `strand_centrelines()` with an alpha-tested strand texture over the
+shell for a wispier silhouette (up to 7 k tris). Open-face drops the groom (hidden in the delivery). Attribution
+(Bystedt CC BY-SA groom, beard licence ambiguity) carries over from ART_HANDOFF.md.

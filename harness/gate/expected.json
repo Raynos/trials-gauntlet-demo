@@ -32,6 +32,10 @@
       "hash": "f0549ee508d870ed",
       "ticks": 4556,
       "physics": "bikePhysicsFactory-v2"
+    },
+    "canonical1200": {
+      "hash": "0779c85170cde8e2",
+      "physics": "bikePhysicsFactory-v2"
     }
   },
   "b1-first-ride": {

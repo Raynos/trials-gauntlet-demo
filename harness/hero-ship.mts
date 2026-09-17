@@ -33,8 +33,9 @@ for (const file of Object.keys(buildFiles).filter(file => file.endsWith('.js.map
   });
 }
 const catalog = JSON.parse(await readFile(path.join(build, 'model-catalog.json'), 'utf8')) as { models: { logical: string; url: string; bytes: number; sha256: string }[] };
-const models = catalog.models.filter(m => /models\/(bike|rider-street)(-lod)?\.glb$/.test(m.logical));
-if (models.length !== 4) throw new Error('Missing full/LOD Street and bike catalog');
+// Ask 43: the boot hero under the live family — the rookie bike and the mustard Street rider, full + LOD (src/render/hero/urls.ts HERO_URLS).
+const models = catalog.models.filter(m => /models\/(bike-rookie|rider-street-mustard)(-lod)?\.glb$/.test(m.logical));
+if (models.length !== 4) throw new Error('Missing full/LOD Street-mustard rider and rookie bike catalog');
 for (const m of models) {
   const bytes = await readFile(path.join(build, m.url));
   if (sha(bytes) !== m.sha256 || bytes.length !== m.bytes) throw new Error(`Catalog mismatch: ${m.logical}`);

@@ -5,13 +5,26 @@ import { loadGltf } from './hero/gltf';
 import { GltfRider } from './hero/gltfRider';
 import type { RiderOutfit } from '../core/types';
 import * as THREE from 'three';
-import { AVAILABLE_RIDER_PRESETS } from '../core/riderPresets';
-import { riderUrl, lodUrl } from './hero/urls';
+import { AVAILABLE_RIDER_PRESETS, riderPreset } from '../core/riderPresets';
+import { riderUrl, lodUrl, type LEGACY_HERO } from './hero/urls';
 import { prepareHero } from './hero/lod';
 
 vi.mock('./hero/gltf', async (original) => ({
   ...await original<Record<string, unknown>>(), loadGltf: vi.fn(),
 }));
+// The LEGACY hero family (one file per outfit family, palettes by `KHR_materials_variants`): these rows prove the
+// palette validation / sibling paths that stay in `index.ts` while the live table is Astra's per-outfit one
+// (ask 43; the live path is `outfitFiles.test.ts`, the class swap `bikeLivery.test.ts`).
+vi.mock('./hero/urls', async (original) => {
+  const real = await original<{ LEGACY_HERO: typeof LEGACY_HERO }>();
+  return {
+    ...real,
+    riderUrl: (outfit: RiderOutfit) => real.LEGACY_HERO.rider[outfit],
+    bikeUrl: (cls: 'rookie' | 'pro') => real.LEGACY_HERO.bike[cls],
+    riderPalette: (outfit: RiderOutfit) => riderPreset(outfit).variant,
+    heroHasVariants: () => true,
+  };
+});
 afterEach(() => vi.restoreAllMocks());
 
 function fixture() {
@@ -19,7 +32,7 @@ function fixture() {
   const street = {} as GLTF, streetLod = {} as GLTF;
   const fields = {
     models: { bikeModel: 'gltf', riderModel: 'gltf' },
-    riderOutfit: 'street-mustard', riderDocumentOutfit: 'street-mustard',
+    riderOutfit: 'street-mustard', riderDocumentOutfit: 'street-mustard', bikeClass: 'rookie', bikeDocumentClass: 'rookie',
     gltf: { bike: {} as GLTF, bikeLod: {} as GLTF, rider: street, riderLod: streetLod },
     heroLoading: 0, heroPending: Promise.resolve(), applyModels: vi.fn(), validateRiderPreset: vi.fn(),
   };
@@ -41,7 +54,7 @@ async function materialDocument(names = ['rider_rookie', 'rider_pro']): Promise<
   return doc;
 }
 
-describe('outfit documents are installed before selection succeeds', () => {
+describe('outfit documents are installed before selection succeeds (legacy family)', () => {
   it.each(AVAILABLE_RIDER_PRESETS)('$id resolves its genuine family and exact palette at both details', async preset => {
     const { renderer } = fixture();
     delete (renderer as unknown as { validateRiderPreset?: unknown }).validateRiderPreset;

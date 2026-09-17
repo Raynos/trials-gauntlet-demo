@@ -1,8 +1,13 @@
 /** Cosmetic designs are independent of bike physics. Unbuilt designs have no loadable family. */
 export type RiderOutfit = 'street-openface' | 'street-mustard' | 'street-charcoal' | 'race-bluewhite' | 'race-charcoalyellow';
 export type RiderDesign = RiderOutfit;
+/** Boot's download-total bucket (src/boot/asset-totals.ts keys `heroModels` by it) and, in the legacy hero family, the shared file. */
 export type RiderModelFamily = 'street' | 'race' | 'openface';
 export type RiderPalette = 'rider_rookie' | 'rider_pro';
+/**
+ * `variant` is the outfit's `KHR_materials_variants` palette in the LEGACY hero family only (src/render/hero/urls.ts);
+ * Astra's per-outfit files carry no palette table — `riderPalette()` there returns null and the row's `variant` is unread.
+ */
 interface AvailablePreset { id: RiderOutfit; available: true; family: RiderModelFamily; variant: RiderPalette; label: string; detail: string; reference: string }
 export const RIDER_PRESETS: readonly AvailablePreset[] = [
   { id: 'street-mustard', available: true, family: 'street', variant: 'rider_rookie', label: 'Mustard · barehead', detail: 'Hoodie, jeans & trainers', reference: '01' },
@@ -24,8 +29,9 @@ export function riderPreset(id: RiderOutfit): AvailablePreset {
   if (!preset) throw new Error(`Unavailable rider preset: ${id}`);
   return preset;
 }
+/** Self-contained (no `normalizeRiderFamily`): the 8 KB boot inline bundles this one and nothing else of the table. */
 export function normalizeRiderOutfit(value: unknown): RiderOutfit | null {
   if (value === 'street') return 'street-mustard';
   if (value === 'race') return 'race-bluewhite';
-  return typeof value === 'string' && normalizeRiderFamily(value) ? value as RiderOutfit : null;
+  return /^(street-(openface|mustard|charcoal)|race-(bluewhite|charcoalyellow))$/.test(value as string) ? value as RiderOutfit : null;
 }

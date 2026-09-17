@@ -10,12 +10,12 @@ import type { BikeClass, CameraDebug, CameraOverride, CompiledTrack, GameEvent, 
 import { ArtLibrary, idsFor } from './art/library';
 import { biomeFor, type Biome } from './biomes';
 import { BikeModel, type HeroBike } from './bike/bikeModel';
-import { HERO_URLS, loadGltf, lodUrl, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
+import { loadGltf, lodUrl, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
 import type { ByteProgress, StepProgress, StepRunner } from '../boot/plan';
 import type { PrepareStep } from '../boot/steps';
 import { isRiderLodEnabled, lodChoice, setRiderLodEnabled, variantMaterialsFor } from './hero/lod';
-import { DEFAULT_RIDER_OUTFIT, normalizeRiderOutfit, riderPreset } from '../core/riderPresets';
-import { riderUrl } from './hero/urls';
+import { DEFAULT_RIDER_OUTFIT, normalizeRiderOutfit } from '../core/riderPresets';
+import { bikeUrl, riderPalette, riderUrl } from './hero/urls';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -104,6 +104,12 @@ export interface ThreeRendererOptions {
   bikeModel?: ModelChoice;
   /** Rider clothing (`street` default; the garage / `?outfit=` choice). */
   riderOutfit?: RiderOutfit;
+  /**
+   * Ask 43: the saved bike class, so the constructor fetches that livery's file (Astra's family: one bike per class).
+   * Without it the boot fetches the rookie bike and a `setBikeClass('pro')` before the first frame fetches the pro
+   * file on top (the legacy family has one bike file; there the class is a variant swap and this is cosmetic).
+   */
+  bikeClass?: BikeClass;
   /** Boot plan: the DOWNLOAD counter for the hero glTF files the constructor starts fetching (docs/tasks/loading-progress-invariant.md). */
   heroBytes?: ByteProgress;
   /** Boot plan: the DOWNLOAD counter for the art pack's boot set; given, the constructor starts `art.load()` at once (the `bootArt` step awaits it). */
@@ -219,6 +225,8 @@ export class ThreeRenderer implements GameRenderer {
   private bikeClass: BikeClass = 'rookie';
   private riderOutfit: RiderOutfit = DEFAULT_RIDER_OUTFIT;
   private riderDocumentOutfit: RiderOutfit | null = null;
+  /** The class whose bike file `gltf.bike` holds (ask 43: per-livery files — a class change is a document swap when the URL differs). */
+  private bikeDocumentClass: BikeClass | null = null;
   /** Parsed hero documents: the authored files and (round 13) their `-lod.glb` twins for `low` / `medium`. */
   private readonly gltf: { bike: GLTF | null; rider: GLTF | null; bikeLod: GLTF | null; riderLod: GLTF | null } = { bike: null, rider: null, bikeLod: null, riderLod: null };
   /** In-flight setModels (glTF load + swap); `whenReady` waits for it. */
@@ -348,6 +356,7 @@ export class ThreeRenderer implements GameRenderer {
     // `prepare()` in ≤ 16 ms tasks (or lazily by the first call that needs them).
     {
       this.riderOutfit = normalizeRiderOutfit(options.riderOutfit) ?? DEFAULT_RIDER_OUTFIT;
+      this.bikeClass = options.bikeClass === 'pro' ? 'pro' : 'rookie';
       const riderModel: ModelChoice = options.riderModel ?? 'gltf';
       const bikeModel: ModelChoice = options.bikeModel ?? 'gltf';
       if (riderModel !== 'proc' || bikeModel === 'gltf') this.setModels({ riderModel, bikeModel }, options.heroBytes);
@@ -471,27 +480,41 @@ export class ThreeRenderer implements GameRenderer {
     this.models = { riderModel: m.riderModel === 'gltf' ? 'gltf' : 'proc', bikeModel: m.bikeModel === 'gltf' ? 'gltf' : 'proc' };
     const want = this.models;
     const outfit = this.riderOutfit;
+    const cls = this.bikeClass;
     this.heroLoading++;
     const run = async (): Promise<void> => {
       const url = riderUrl(outfit);
+      const bikeFile = bikeUrl(cls);
       const [bike, rider] = await Promise.all([
-        want.bikeModel === 'gltf' && !this.gltf.bike
-          ? Promise.all([loadGltf(HERO_URLS.bike, false, bytes), loadGltf(lodUrl(HERO_URLS.bike), true, bytes)])
+        want.bikeModel === 'gltf' && (!this.gltf.bike || this.bikeDocumentClass === null || bikeUrl(this.bikeDocumentClass) !== bikeFile)
+          ? Promise.all([loadGltf(bikeFile, false, bytes), loadGltf(lodUrl(bikeFile), true, bytes)])
           : Promise.resolve([this.gltf.bike, this.gltf.bikeLod]),
         want.riderModel === 'gltf' && (!this.gltf.rider || !this.riderDocumentOutfit || riderUrl(this.riderDocumentOutfit) !== url)
           ? Promise.all([loadGltf(url, false, bytes), loadGltf(lodUrl(url), true, bytes)])
           : Promise.resolve([this.gltf.rider, this.gltf.riderLod]),
       ]);
-      // A superseded request (models or outfit) must not even overwrite the stored documents: a later
+      // A superseded request (models, outfit or bike class) must not even overwrite the stored documents: a later
       // quality change could otherwise resurrect the old outfit despite its swap being skipped.
-      if (want !== this.models || outfit !== this.riderOutfit) return;
+      if (want !== this.models || outfit !== this.riderOutfit || cls !== this.bikeClass) return;
+      const palette = riderPalette(outfit);
       if (want.riderModel === 'gltf') {
         if (!rider[0] || !rider[1]) throw new Error(`Could not load both detail levels of ${outfit} rider outfit`);
-        // Validate both documents before any installed identity or live material changes.
-        this.validateRiderPreset(rider[0], outfit);
-        this.validateRiderPreset(rider[1], outfit);
+        // Validate both documents before any installed identity or live material changes (the legacy family only:
+        // a per-outfit file has no palette to check — the outfit is the URL).
+        if (palette) {
+          this.validateRiderPreset(rider[0], outfit);
+          this.validateRiderPreset(rider[1], outfit);
+        }
       }
-      [this.gltf.bike, this.gltf.bikeLod] = [bike[0] ?? null, bike[1] ?? null];
+      // A livery swap whose file failed keeps the installed bike (and its class) rather than dropping to the
+      // procedural kit; a failed boot load still leaves null (the procedural fallback) and retries on the next call.
+      if (bike[0]) {
+        [this.gltf.bike, this.gltf.bikeLod] = [bike[0], bike[1] ?? null];
+        this.bikeDocumentClass = cls;
+      } else if (!this.gltf.bike) {
+        this.gltf.bikeLod = null;
+        this.bikeDocumentClass = null;
+      }
       const previousRider = [this.gltf.rider, this.gltf.riderLod] as const;
       const previousOutfit = this.riderDocumentOutfit;
       if (want.riderModel === 'gltf') {
@@ -541,11 +564,12 @@ export class ThreeRenderer implements GameRenderer {
     return lodChoice(this.phoneHigh ? 'medium' : this.tier) === 'lod' ? this.gltf.bikeLod ?? this.gltf.bike : this.gltf.bike;
   }
 
+  /** The garage keeps the authored rider on every tier (`hero/lod.ts lodChoice`); `setGarageStage` rebuilds the hero when that flips the document. */
   private riderDoc(): GLTF | null {
-    return lodChoice(this.phoneHigh ? 'medium' : this.tier, 'rider') === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
+    return lodChoice(this.phoneHigh ? 'medium' : this.tier, 'rider', this.stageOn) === 'lod' ? this.gltf.riderLod ?? this.gltf.rider : this.gltf.rider;
   }
 
-  /** Round 14: rider LOD gate for `low` / `medium` (default off — see `hero/lod.ts lodChoice`); rebuilds the hero when the document changes. */
+  /** Rider LOD override for `low` / `medium` (default on — see `hero/lod.ts lodChoice`); rebuilds the hero when the document changes. */
   setRiderLod(on: boolean): void {
     if (this.disposed) return;
     if (on === isRiderLodEnabled()) return;
@@ -562,12 +586,14 @@ export class ThreeRenderer implements GameRenderer {
     const doc = this.riderDoc();
     if (choice !== 'gltf' || !doc) return new RiderModel(this.lib);
     const rider = new GltfRider(doc, this.lib);
-    rider.setMaterialVariant(riderPreset(this.riderDocumentOutfit ?? this.riderOutfit).variant);
+    const palette = riderPalette(this.riderDocumentOutfit ?? this.riderOutfit);
+    if (palette) rider.setMaterialVariant(palette);
     return rider;
   }
 
   private validateRiderPreset(doc: GLTF, outfit: RiderOutfit): void {
-    const variant = riderPreset(outfit).variant;
+    const variant = riderPalette(outfit);
+    if (!variant) return;
     let mappedMeshes = 0;
     doc.scene.traverse(o => {
       if (!(o as THREE.Mesh).isMesh) return;
@@ -623,9 +649,10 @@ export class ThreeRenderer implements GameRenderer {
       this.retireObject(old.root, () => old.dispose());
       changed = true;
     }
-    // Palette siblings reuse the same GLTF document and live skeleton.
+    // Palette siblings reuse the same GLTF document and live skeleton (legacy family; per-outfit files swap documents above).
     if (this.kindOfRider(this.rider) === 'gltf' && this.rider instanceof GltfRider && this.riderDocumentOutfit) {
-      this.rider.setMaterialVariant(riderPreset(this.riderDocumentOutfit).variant);
+      const palette = riderPalette(this.riderDocumentOutfit);
+      if (palette) this.rider.setMaterialVariant(palette);
     }
     if (changed) this.applyTierVisibility(); // round 13: the new hero instance takes the tier's shadow roles
     if (changed && this.ghost) {
@@ -1156,6 +1183,10 @@ export class ThreeRenderer implements GameRenderer {
   setGarageStage(on: boolean): void {
     if (this.disposed || this.stageOn === on) return;
     this.stageOn = on;
+    // Ask 43 round 2: the garage shows the authored rider on every tier while the level rides the LOD — the
+    // document changes with the stage on the phone tiers, so the hero is rebuilt (the same swap as a tier change;
+    // desktop-high draws the authored file in both and rebuilds nothing).
+    if (this.bikeRef && this.riderRef && this.gltf.rider) this.applyModels();
     if (on) this.applyGarageStage();
     else this.clearGarageStage();
     this.invalidate();
@@ -1396,6 +1427,12 @@ export class ThreeRenderer implements GameRenderer {
     // The hero may not exist yet (built lazily by `ensureHero` / swapped by `applyModels`): both
     // paths read `bikeClass`, so a call before the first frame still lands.
     this.bikeRef?.setLivery(this.bikeClass);
+    // Ask 43: a class whose livery is its own file (Astra's family) is a document swap through `setModels` — the
+    // old bike stays up until the new one has parsed (the same no-flash path as an outfit swap, ask 29 / 40), and
+    // a request still in flight for the other class is superseded rather than installed. Same URL: nothing to load.
+    if (this.models.bikeModel === 'gltf' && (this.bikeDocumentClass === null || bikeUrl(this.bikeDocumentClass) !== bikeUrl(this.bikeClass))) {
+      this.setModels(this.models);
+    }
   }
 
   setQuality(tier: QualityTier): void {
@@ -1922,7 +1959,7 @@ export class ThreeRenderer implements GameRenderer {
       heroTris: (this.bikeRef?.triangles ?? 0) + (this.riderRef?.triangles ?? 0),
       heroDoc: `${this.bikeRef instanceof GltfBike ? (this.bikeRef.source === this.gltf.bikeLod ? 'bike-lod' : 'bike') : 'bike-proc'} ${this.riderRef instanceof GltfRider ? (this.riderRef.source === this.gltf.riderLod ? 'rider-lod' : 'rider') : 'rider-proc'}`,
       riderOutfit: this.riderRef && this.kindOfRider(this.riderRef) === 'gltf' ? this.riderDocumentOutfit : null,
-      riderMaterialVariant: this.riderRef && this.kindOfRider(this.riderRef) === 'gltf' && this.riderDocumentOutfit ? riderPreset(this.riderDocumentOutfit).variant : null,
+      riderMaterialVariant: this.riderRef && this.kindOfRider(this.riderRef) === 'gltf' && this.riderDocumentOutfit ? riderPalette(this.riderDocumentOutfit) : null,
       heroShadow: this.lightingRig?.isHeroShadow ? 'hero-only' : 'world',
       trackCalls: this.world?.trackCalls ?? 0,
       trackTris: Math.round(this.world?.trackTris ?? 0),

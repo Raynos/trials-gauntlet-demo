@@ -4,25 +4,24 @@
  * is a compile error (`pnpm typecheck`), not a 44 %. `core` is the bundle's own size, compiled into the
  * inline script by the build (it is only known after the bundle exists).
  *
- * The inline loader receives one hero total per outfit and the shared art total as `__BOOT_TOTALS__` (vite.config.ts computes them from
- * the same lists and the same file sizes; `totals.test.ts` holds the two equal) so it need not bundle the table.
+ * The inline loader receives one hero total per outfit x bike class and the shared art total as `__BOOT_TOTALS__`
+ * (vite.config.ts computes them from the same lists and the same file sizes; `totals.test.ts` holds the two equal)
+ * so it need not bundle the table.
  */
-import { normalizeRiderFamily } from '../core/riderPresets';
 import { PUBLIC_BYTES } from './plan.generated';
-import { HERO_FILES_BY_OUTFIT } from '../render/hero/urls';
-import type { RiderOutfit } from '../core/types';
-import { declaredBootTotals } from './asset-totals';
+import { HERO_FILES_BY_OUTFIT_CLASS } from '../render/hero/urls';
+import type { BikeClass, RiderOutfit } from '../core/types';
+import { CLASS_SLOT, declaredBootTotals } from './asset-totals';
 import type { ByteKey } from './steps';
 
-/** The glTF files `setModels` awaits (`Promise.all([full, lod])` per hero, src/render/index.ts). */
-export const HERO_FILES = HERO_FILES_BY_OUTFIT['street-mustard'];
+/** The glTF files `setModels` awaits (`Promise.all([full, lod])` per hero, src/render/index.ts) for the default pair. */
+export const HERO_FILES = HERO_FILES_BY_OUTFIT_CLASS['street-mustard'].rookie;
 
 export const DECLARED_BOOT_TOTALS = declaredBootTotals((file) => PUBLIC_BYTES[file]);
 
-export function bootByteTotals(outfit: RiderOutfit): Readonly<Record<Exclude<ByteKey, 'core'>, number>> {
-  // `normalizeRiderFamily`, not `riderPreset(...).family`: the preset table (labels, details, references) must stay out of
-  // the inline loader's 8 KB (it pushed the loader to 8 232 B after the hero merge).
-  return { heroModels: DECLARED_BOOT_TOTALS.heroModels[normalizeRiderFamily(outfit) ?? 'street'], bootArt: DECLARED_BOOT_TOTALS.bootArt };
+/** Ask 43: the pair the renderer is constructed with (main.ts passes both) is the pair boot declares - nothing else is fetched before `ready`. */
+export function bootByteTotals(outfit: RiderOutfit, cls: BikeClass = 'rookie'): Readonly<Record<Exclude<ByteKey, 'core'>, number>> {
+  return { heroModels: DECLARED_BOOT_TOTALS.heroModels[outfit][CLASS_SLOT[cls]], bootArt: DECLARED_BOOT_TOTALS.bootArt };
 }
 
-export const BOOT_BYTE_TOTALS = bootByteTotals('street-mustard');
+export const BOOT_BYTE_TOTALS = bootByteTotals('street-mustard', 'rookie');

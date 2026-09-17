@@ -1,0 +1,740 @@
+{
+  "source": "prototypes/hero-garage/public/assets/variants/bike-pro-art.glb",
+  "sourceSha256": "187514df4677c40063856f4d5e955311820f872866f60b49c450428bcf84e48e",
+  "decodedSha256": "1ec25ad166c1fc961bbc56d527911261e5b61f3eb1246d95f01c5a38776b1071",
+  "exportSha256": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b",
+  "kind": "bike",
+  "lod": true,
+  "stage": 1,
+  "recipe": "node assets/blender/hero_art_build.mjs bike-pro --lod-only --stage 1",
+  "tools": {
+    "blender": "Blender 5.2.1 (io_scene_gltf2 import/export, uncompressed)",
+    "pack": "assets/blender/hero_art_pack.mjs (meshoptimizer JS encoder)",
+    "verify": "assets/blender/verify_hero_art.mjs (three GLTFLoader + MeshoptDecoder, no browser)"
+  },
+  "budgets": {
+    "tris": 6000,
+    "draws": 24
+  },
+  "reduced": {
+    "triangles": {
+      "budget": 6000,
+      "before": 33204,
+      "after": 5793,
+      "ratio": 0.1319702602230483
+    },
+    "dropped": [],
+    "joined": [],
+    "decimated": [
+      {
+        "object": "bodywork",
+        "before": 1076,
+        "after": 126
+      },
+      {
+        "object": "engine",
+        "before": 2704,
+        "after": 316
+      },
+      {
+        "object": "exhaust",
+        "before": 1148,
+        "after": 139
+      },
+      {
+        "object": "fork_lower",
+        "before": 1340,
+        "after": 172
+      },
+      {
+        "object": "fork_upper",
+        "before": 920,
+        "after": 110
+      },
+      {
+        "object": "frame",
+        "before": 2296,
+        "after": 272
+      },
+      {
+        "object": "handlebar",
+        "before": 4408,
+        "after": 568
+      },
+      {
+        "object": "pegs",
+        "before": 544,
+        "after": 48
+      },
+      {
+        "object": "shock_body",
+        "before": 244,
+        "after": 30
+      },
+      {
+        "object": "shock_clevis",
+        "before": 96,
+        "after": 22
+      },
+      {
+        "object": "shock_shaft",
+        "before": 36,
+        "after": 22
+      },
+      {
+        "object": "shock_spring",
+        "before": 1160,
+        "after": 148
+      },
+      {
+        "object": "sprocket_front",
+        "before": 144,
+        "after": 22
+      },
+      {
+        "object": "swingarm",
+        "before": 1080,
+        "after": 138
+      },
+      {
+        "object": "wheel_front",
+        "before": 6628,
+        "after": 856
+      },
+      {
+        "object": "wheel_rear",
+        "before": 7156,
+        "after": 924
+      },
+      {
+        "object": "sprocket_rear",
+        "before": 392,
+        "after": 48
+      }
+    ],
+    "images": [
+      {
+        "image": "bike_body_normal",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "bike_body_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "header_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "header_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "original_pro_body",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          2048,
+          2048
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "paint_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          2048,
+          2048
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "paint_normal",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "paint_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      }
+    ],
+    "clips": null,
+    "hair": null,
+    "handFloors": null,
+    "atlas": {
+      "size": 1024,
+      "parts": [
+        "bodywork",
+        "engine",
+        "exhaust",
+        "fork_lower",
+        "fork_upper",
+        "frame",
+        "handlebar",
+        "pegs",
+        "shock_body",
+        "shock_clevis",
+        "shock_shaft",
+        "shock_spring",
+        "sprocket_front",
+        "swingarm",
+        "wheel_front",
+        "wheel_front_spokes",
+        "wheel_rear",
+        "sprocket_rear",
+        "wheel_rear_spokes"
+      ]
+    }
+  },
+  "compression": {
+    "positionBits": 16,
+    "normalBits": 8,
+    "quatBits": 16,
+    "lossless": [
+      "indices (triangle order/winding)",
+      "UV",
+      "joints",
+      "weights",
+      "scale",
+      "inverse binds",
+      "clip times"
+    ],
+    "rawBytes": 1048540,
+    "packedBytes": 864848
+  },
+  "verified": {
+    "bytes": 864848,
+    "sha256": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b",
+    "triangles": 5793,
+    "vertices": 8918,
+    "draws": 23,
+    "meshes": 23,
+    "materials": 4,
+    "images": 8,
+    "maxTexture": 1024,
+    "imageBytes": 701863,
+    "parts": 23,
+    "markers": 22,
+    "transformError": 5.960464477539063e-8,
+    "protectedError": 0,
+    "extras": {
+      "frame": [
+        "name"
+      ],
+      "bodywork": [
+        "name"
+      ],
+      "engine": [
+        "name"
+      ],
+      "exhaust": [
+        "name"
+      ],
+      "handlebar": [
+        "name"
+      ],
+      "pegs": [
+        "name"
+      ],
+      "fork_upper": [
+        "name"
+      ],
+      "fork_lower": [
+        "name"
+      ],
+      "swingarm": [
+        "name"
+      ],
+      "shock_body": [
+        "name"
+      ],
+      "shock_shaft": [
+        "name"
+      ],
+      "shock_clevis": [
+        "name"
+      ],
+      "shock_spring": [
+        "name"
+      ],
+      "wheel_front": [
+        "name"
+      ],
+      "wheel_front_spokes": [
+        "name"
+      ],
+      "wheel_front_blur": [
+        "name"
+      ],
+      "wheel_rear": [
+        "name"
+      ],
+      "wheel_rear_spokes": [
+        "name"
+      ],
+      "wheel_rear_blur": [
+        "name"
+      ],
+      "sprocket_front": [
+        "name"
+      ],
+      "sprocket_rear": [
+        "name"
+      ],
+      "chain": [
+        "name",
+        "tube_radius",
+        "link_pitch",
+        "rest_length"
+      ],
+      "brake_hose": [
+        "name",
+        "hose_stations",
+        "hose_length",
+        "hose_segments",
+        "hose_radius"
+      ],
+      "attach_frame_origin": [
+        "name"
+      ],
+      "attach_chassis_com": [
+        "name"
+      ],
+      "attach_swing_pivot": [
+        "name"
+      ],
+      "attach_swing_axle": [
+        "name"
+      ],
+      "attach_shock_link": [
+        "name"
+      ],
+      "attach_fork_top": [
+        "name"
+      ],
+      "attach_front_axle_rest": [
+        "name"
+      ],
+      "attach_rear_axle_rest": [
+        "name"
+      ],
+      "attach_shock_top": [
+        "name"
+      ],
+      "attach_shock_upper_seat": [
+        "name"
+      ],
+      "attach_shock_lower_seat": [
+        "name"
+      ],
+      "attach_shock_rod_top": [
+        "name"
+      ],
+      "attach_shock_eye": [
+        "name"
+      ],
+      "attach_countershaft": [
+        "name"
+      ],
+      "attach_front_pitch": [
+        "name"
+      ],
+      "attach_rear_sprocket": [
+        "name"
+      ],
+      "attach_rear_pitch": [
+        "name"
+      ],
+      "attach_exhaust_outlet": [
+        "name"
+      ],
+      "attach_grip_L": [
+        "name"
+      ],
+      "attach_grip_R": [
+        "name"
+      ],
+      "attach_peg_L": [
+        "name"
+      ],
+      "attach_peg_R": [
+        "name"
+      ]
+    },
+    "extensions": [
+      "KHR_texture_transform",
+      "EXT_meshopt_compression"
+    ],
+    "bounds": {
+      "min": [
+        -0.39996522665023804,
+        -0.3410491943359375,
+        -0.437408447265625
+      ],
+      "max": [
+        1.6615874767303467,
+        0.8586344718933105,
+        0.43741029500961304
+      ]
+    },
+    "imageList": [
+      {
+        "name": "bike_atlas_normal",
+        "kind": "jpeg",
+        "w": 1024,
+        "h": 1024,
+        "bytes": 116300
+      },
+      {
+        "name": "bike_atlas_orm",
+        "kind": "jpeg",
+        "w": 512,
+        "h": 512,
+        "bytes": 131675
+      },
+      {
+        "name": "bike_atlas_albedo",
+        "kind": "jpeg",
+        "w": 1024,
+        "h": 1024,
+        "bytes": 256385
+      },
+      {
+        "name": "bike_mech_normal",
+        "kind": "png",
+        "w": 256,
+        "h": 256,
+        "bytes": 46604
+      },
+      {
+        "name": "bike_mech_orm",
+        "kind": "png",
+        "w": 256,
+        "h": 256,
+        "bytes": 122922
+      },
+      {
+        "name": "bike_mech_albedo",
+        "kind": "jpeg",
+        "w": 256,
+        "h": 256,
+        "bytes": 19394
+      },
+      {
+        "name": "chain_links",
+        "kind": "png",
+        "w": 64,
+        "h": 32,
+        "bytes": 450
+      },
+      {
+        "name": "bike_spokecard",
+        "kind": "png",
+        "w": 128,
+        "h": 128,
+        "bytes": 8133
+      }
+    ],
+    "meshList": [
+      {
+        "name": "bodywork",
+        "tris": 126,
+        "verts": 220,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "brake_hose",
+        "tris": 296,
+        "verts": 264,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_mech"
+        ]
+      },
+      {
+        "name": "chain",
+        "tris": 768,
+        "verts": 388,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "chain_links"
+        ]
+      },
+      {
+        "name": "engine",
+        "tris": 316,
+        "verts": 572,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "exhaust",
+        "tris": 139,
+        "verts": 202,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "fork_lower",
+        "tris": 172,
+        "verts": 272,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "fork_upper",
+        "tris": 110,
+        "verts": 254,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "frame",
+        "tris": 272,
+        "verts": 576,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "handlebar",
+        "tris": 568,
+        "verts": 818,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "pegs",
+        "tris": 48,
+        "verts": 120,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "shock_body",
+        "tris": 30,
+        "verts": 70,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "shock_clevis",
+        "tris": 22,
+        "verts": 46,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "shock_shaft",
+        "tris": 22,
+        "verts": 34,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "shock_spring",
+        "tris": 148,
+        "verts": 363,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "sprocket_front",
+        "tris": 22,
+        "verts": 40,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "swingarm",
+        "tris": 138,
+        "verts": 282,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "wheel_front_blur",
+        "tris": 128,
+        "verts": 224,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_spokecard"
+        ]
+      },
+      {
+        "name": "wheel_front_spokes",
+        "tris": 256,
+        "verts": 512,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "wheel_front",
+        "tris": 856,
+        "verts": 1345,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "sprocket_rear",
+        "tris": 48,
+        "verts": 64,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "wheel_rear_blur",
+        "tris": 128,
+        "verts": 272,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_spokecard"
+        ]
+      },
+      {
+        "name": "wheel_rear_spokes",
+        "tris": 256,
+        "verts": 512,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      },
+      {
+        "name": "wheel_rear",
+        "tris": 924,
+        "verts": 1468,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "bike_atlas"
+        ]
+      }
+    ]
+  },
+  "blenderSeconds": 4.822
+}

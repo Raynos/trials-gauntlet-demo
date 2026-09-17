@@ -54,11 +54,13 @@ export type ModuleStep = Exclude<BootStep, InlineStep>;
  */
 export const BYTE_SOURCES = ['core', 'heroModels', 'bootArt'] as const;
 export type ByteKey = (typeof BYTE_SOURCES)[number];
-export const BYTE_INFO: Record<ByteKey, { readonly label: string; readonly closedBy: BootStep }> = {
-  core: { label: 'core bundle', closedBy: 'core' },
-  heroModels: { label: 'hero models', closedBy: 'heroModels' },
-  bootArt: { label: 'world art', closedBy: 'bootArt' },
+/** A byte source's label is its closing step's, lower-cased (`core bundle`, `hero models`, `world art`) — the 8 KB inline carries one table. */
+export const BYTE_INFO: Record<ByteKey, { readonly closedBy: BootStep }> = {
+  core: { closedBy: 'core' },
+  heroModels: { closedBy: 'heroModels' },
+  bootArt: { closedBy: 'bootArt' },
 };
+export const byteLabel = (key: ByteKey): string => STEP_INFO[BYTE_INFO[key].closedBy].label.toLowerCase();
 
 /** Background items: shown under "streams in after start", never in a number, and there is no flag that could promote one. */
 export const AFTER_KEYS = ['keyArt', 'trackArt'] as const;

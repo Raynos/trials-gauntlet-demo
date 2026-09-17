@@ -1,0 +1,704 @@
+{
+  "source": "prototypes/hero-garage/public/assets/variants/street-openface-remaster.glb",
+  "sourceSha256": "f01c3abc274d457a812af51753ba1ed54e7ad979f7c60a8564c2f08f359ee7df",
+  "decodedSha256": "21275ff4c9e372e334dd98f6c4344eee4bdd9998480fbc79909b7647f0ec0ece",
+  "exportSha256": "6765b5f93710302c7286a545fd5cc399908083fd361e64e2ea71a534f51c0d00",
+  "kind": "rider",
+  "lod": true,
+  "stage": 1,
+  "recipe": "node assets/blender/hero_art_build.mjs rider-street-openface --lod-only --stage 1",
+  "tools": {
+    "blender": "Blender 5.2.1 (io_scene_gltf2 import/export, uncompressed)",
+    "pack": "assets/blender/hero_art_pack.mjs (meshoptimizer JS encoder)",
+    "verify": "assets/blender/verify_hero_art.mjs (three GLTFLoader + MeshoptDecoder, no browser)"
+  },
+  "budgets": {
+    "tris": 8000,
+    "draws": 8
+  },
+  "reduced": {
+    "triangles": {
+      "budget": 8000,
+      "before": 219340,
+      "after": 7806,
+      "ratio": 0.026720904911686424
+    },
+    "dropped": [
+      {
+        "object": "rider",
+        "mesh": "rider",
+        "tris": 0
+      },
+      {
+        "object": "Street01_Bystedt_CurlyGroom_Runtime",
+        "mesh": null,
+        "tris": 0
+      }
+    ],
+    "joined": [
+      {
+        "into": "rider_body",
+        "from": [
+          "rider:anatomical sweatshirt",
+          "Street01_Authored_EditableBody_Runtime",
+          "rider:glove_top",
+          "rider:gloves",
+          "rider:hero glove construction",
+          "rider:openface helmet",
+          "rider.001",
+          "rider:cotton_laces",
+          "rider:hero footwear construction",
+          "rider:anatomical sweatshirt pocket",
+          "collar eyelet 1",
+          "collar eyelet -1",
+          "fitted drawcord 1",
+          "fitted drawcord -1",
+          "rider:folded hood",
+          "rider:trainer_rubber",
+          "rider:trainer_upper"
+        ],
+        "materials": "opaque set -> rider_body atlas"
+      }
+    ],
+    "decimated": [
+      {
+        "object": "MPFB_AdultMale_SourceProbe.eyebrow001_Runtime",
+        "before": 192,
+        "after": 116
+      },
+      {
+        "object": "MPFB_AdultMale_SourceProbe.high-poly_Runtime",
+        "before": 2040,
+        "after": 116
+      },
+      {
+        "object": "Street01_Authored_EditableBody_Runtime",
+        "before": 34358,
+        "after": 899
+      },
+      {
+        "object": "Street01_grinsegold_full_beard_Runtime",
+        "before": 748,
+        "after": 116
+      },
+      {
+        "object": "collar eyelet 1",
+        "before": 192,
+        "after": 116
+      },
+      {
+        "object": "collar eyelet -1",
+        "before": 192,
+        "after": 116
+      },
+      {
+        "object": "fitted drawcord 1",
+        "before": 396,
+        "after": 116
+      },
+      {
+        "object": "fitted drawcord -1",
+        "before": 396,
+        "after": 116
+      },
+      {
+        "object": "rider:anatomical sweatshirt",
+        "before": 132256,
+        "after": 3462
+      },
+      {
+        "object": "rider:anatomical sweatshirt pocket",
+        "before": 346,
+        "after": 117
+      },
+      {
+        "object": "rider:folded hood",
+        "before": 1916,
+        "after": 116
+      },
+      {
+        "object": "rider:cotton_laces",
+        "before": 6336,
+        "after": 164
+      },
+      {
+        "object": "rider:hero footwear construction",
+        "before": 5952,
+        "after": 152
+      },
+      {
+        "object": "rider:trainer_rubber",
+        "before": 696,
+        "after": 116
+      },
+      {
+        "object": "rider:trainer_upper",
+        "before": 4224,
+        "after": 116
+      },
+      {
+        "object": "rider:glove_top",
+        "before": 4600,
+        "after": 392
+      },
+      {
+        "object": "rider:gloves",
+        "before": 1648,
+        "after": 392
+      },
+      {
+        "object": "rider:hero glove construction",
+        "before": 956,
+        "after": 386
+      },
+      {
+        "object": "rider.001",
+        "before": 8068,
+        "after": 210
+      },
+      {
+        "object": "rider:openface helmet",
+        "before": 13708,
+        "after": 352
+      }
+    ],
+    "images": [
+      {
+        "image": "brown_eye",
+        "role": "color",
+        "alpha": true,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "Charcoal cotton_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          2048,
+          2048
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "Charcoal cuff_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          2048,
+          2048
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "Charcoal rib_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          2048,
+          2048
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "cotton_normal",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "cotton_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "cuff_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "denim_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          2048,
+          2048
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "denim_normal",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "denim_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "footwear_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "footwear_normal",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "footwear_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "Full_beard_black_diff",
+        "role": "color",
+        "alpha": true,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "glove_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "glove_normal",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "glove_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          2048,
+          2048
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "Moustache_black_diff",
+        "role": "color",
+        "alpha": true,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "rib_orm",
+        "role": "data",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "PNG"
+      },
+      {
+        "image": "rider-street_pro_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      },
+      {
+        "image": "rider-street_rookie_albedo",
+        "role": "color",
+        "alpha": false,
+        "from": [
+          1024,
+          1024
+        ],
+        "to": [
+          512,
+          512
+        ],
+        "format": "JPEG"
+      }
+    ],
+    "clips": {
+      "sit_cruise": {
+        "frames": 59,
+        "start": 0,
+        "end": 59
+      },
+      "landing_absorption": {
+        "frames": 149,
+        "start": 0,
+        "end": 149
+      },
+      "hang_back": {
+        "frames": 119,
+        "start": 0,
+        "end": 119
+      },
+      "forward_attack": {
+        "frames": 119,
+        "start": 0,
+        "end": 119
+      },
+      "extension": {
+        "frames": 149,
+        "start": 0,
+        "end": 149
+      },
+      "compression": {
+        "frames": 149,
+        "start": 0,
+        "end": 149
+      }
+    },
+    "hair": null,
+    "handFloors": {
+      "rider:glove_top": 400,
+      "rider:gloves": 400,
+      "rider:hero glove construction": 400
+    },
+    "atlas": {
+      "size": 1024,
+      "parts": null
+    }
+  },
+  "compression": {
+    "positionBits": 16,
+    "normalBits": 8,
+    "quatBits": 16,
+    "lossless": [
+      "indices (triangle order/winding)",
+      "UV",
+      "joints",
+      "weights",
+      "scale",
+      "inverse binds",
+      "clip times"
+    ],
+    "rawBytes": 2086032,
+    "packedBytes": 1322188
+  },
+  "verified": {
+    "bytes": 1322188,
+    "sha256": "6765b5f93710302c7286a545fd5cc399908083fd361e64e2ea71a534f51c0d00",
+    "triangles": 7806,
+    "vertices": 8467,
+    "draws": 5,
+    "meshes": 5,
+    "materials": 5,
+    "images": 7,
+    "maxTexture": 1024,
+    "imageBytes": 934759,
+    "bones": 19,
+    "clips": {
+      "compression": {
+        "duration": 4.966667,
+        "durationError": 3.1789143761784544e-8,
+        "frames": 150,
+        "worstWorldError": 0.00018458795163082568
+      },
+      "extension": {
+        "duration": 4.966667,
+        "durationError": 3.1789143761784544e-8,
+        "frames": 150,
+        "worstWorldError": 0.00018458795163082568
+      },
+      "forward_attack": {
+        "duration": 3.966667,
+        "durationError": 3.1789143761784544e-8,
+        "frames": 120,
+        "worstWorldError": 0.00017645024387439643
+      },
+      "hang_back": {
+        "duration": 3.966667,
+        "durationError": 3.1789143761784544e-8,
+        "frames": 120,
+        "worstWorldError": 0.00016884506277089809
+      },
+      "landing_absorption": {
+        "duration": 4.966667,
+        "durationError": 3.1789143761784544e-8,
+        "frames": 150,
+        "worstWorldError": 0.00018889420935734637
+      },
+      "sit_cruise": {
+        "duration": 1.966667,
+        "durationError": 3.178914398382915e-8,
+        "frames": 60,
+        "worstWorldError": 0.00011555552572505991
+      }
+    },
+    "restError": 4.172325134277344e-7,
+    "bindError": 7.748603820800781e-7,
+    "socketError": 2.8312206268310547e-7,
+    "clipError": 0.00018889420935734637,
+    "rawWeightError": 1.1827796697616577e-7,
+    "extensions": [
+      "KHR_materials_specular",
+      "EXT_meshopt_compression"
+    ],
+    "socketNames": [
+      "gripSocket.L",
+      "gripSocket.R",
+      "soleSocket.L",
+      "soleSocket.R"
+    ],
+    "imageList": [
+      {
+        "name": "eyebrow001",
+        "kind": "png",
+        "w": 512,
+        "h": 512,
+        "bytes": 89619
+      },
+      {
+        "name": "brown_eye",
+        "kind": "png",
+        "w": 512,
+        "h": 512,
+        "bytes": 246812
+      },
+      {
+        "name": "rider_body_normal",
+        "kind": "jpeg",
+        "w": 1024,
+        "h": 1024,
+        "bytes": 36660
+      },
+      {
+        "name": "rider_body_orm",
+        "kind": "jpeg",
+        "w": 512,
+        "h": 512,
+        "bytes": 130701
+      },
+      {
+        "name": "rider_body_albedo",
+        "kind": "jpeg",
+        "w": 1024,
+        "h": 1024,
+        "bytes": 198212
+      },
+      {
+        "name": "Full_beard_black_diff",
+        "kind": "png",
+        "w": 512,
+        "h": 512,
+        "bytes": 151652
+      },
+      {
+        "name": "Moustache_black_diff",
+        "kind": "png",
+        "w": 512,
+        "h": 512,
+        "bytes": 81103
+      }
+    ],
+    "meshList": [
+      {
+        "name": "eyebrow001.001",
+        "tris": 116,
+        "verts": 85,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "MPFB_AdultMale_SourceProbe.eyebrow001"
+        ]
+      },
+      {
+        "name": "high-poly.001",
+        "tris": 116,
+        "verts": 75,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "MPFB_AdultMale_SourceProbe.high-poly"
+        ]
+      },
+      {
+        "name": "rider_body",
+        "tris": 7338,
+        "verts": 8132,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "rider_body"
+        ]
+      },
+      {
+        "name": "full_beard.001",
+        "tris": 116,
+        "verts": 94,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "Street01_Authored_EditableBody.grinsegold_full_beard"
+        ]
+      },
+      {
+        "name": "moustache.001",
+        "tris": 120,
+        "verts": 81,
+        "primitives": 1,
+        "instances": 1,
+        "materials": [
+          "Street01_Authored_EditableBody.grinsegold_moustache"
+        ]
+      }
+    ]
+  },
+  "blenderSeconds": 3.85
+}

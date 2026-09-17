@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260916-181338-0244a0",
-  "startedAt": "2026-09-16T23:13:38.809Z",
-  "wallMs": 107972,
-  "git": "3a14409",
-  "srcFingerprint": "24a246e0",
+  "runId": "20260917-002906-567a36",
+  "startedAt": "2026-09-17T05:29:06.302Z",
+  "wallMs": 413416,
+  "git": "384d102",
+  "srcFingerprint": "4b9bc981",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
   "trackId": "flat-test",
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": true,
   "build": {
-    "distBytes": 43845107,
-    "jsGzipBytes": 603185,
+    "distBytes": 86424594,
+    "jsGzipBytes": 545779,
     "buildMs": 0
   },
   "browser": {
@@ -24,15 +24,15 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 261.291167,
+      "value": 164.46141700000044,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 261/94/619 min 94 loadavg 19.15/18"
+      "note": "runs 1879/164/126/611/107 min 107 loadavg 12.78/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 6899.27999997139,
+      "value": 8568.109999895096,
       "limit": 4000,
       "pass": false,
       "unit": "ms",
@@ -100,14 +100,14 @@
     },
     {
       "id": "restart.wallMsP95",
-      "value": 0.125,
+      "value": 0.13000011444091797,
       "limit": 5,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "restart.frameMsP95",
-      "value": 280.75499987602234,
+      "value": 424.25,
       "limit": 150,
       "pass": false,
       "unit": "ms",
@@ -125,11 +125,11 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": 1.4102897644042969,
+      "value": 5.3858489990234375,
       "limit": 5,
-      "pass": true,
+      "pass": false,
       "unit": "MB",
-      "note": "over 10s of play (--quick: shorter than the 60 s the threshold is written for)"
+      "note": "over 60s of play"
     },
     {
       "id": "perf.drawCallsMax",
@@ -139,34 +139,34 @@
     },
     {
       "id": "perf.trianglesMax",
-      "value": 244203,
+      "value": 266333,
       "limit": 500000,
       "pass": true
     },
     {
       "id": "perf.texturesMBMax",
-      "value": 76.92539831542967,
+      "value": 77.92514831542965,
       "limit": 96,
       "pass": true,
       "unit": "MB"
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 40.000081062316895,
+      "value": 32.49990940093994,
       "limit": 60,
       "pass": true,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 1.9449999332427979,
+      "value": 2.255000114440918,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 743.1000001430511,
+      "value": 6358.795000076294,
       "limit": 250,
       "pass": false,
       "unit": "ms",
@@ -176,11 +176,11 @@
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 589.0478515625,
+      "value": 532.9873046875,
       "limit": 600,
       "pass": true,
       "unit": "KB",
-      "note": "dist 42817 KB raw"
+      "note": "dist 84399 KB raw"
     },
     {
       "id": "determinism.pass",
@@ -191,24 +191,25 @@
     },
     {
       "id": "camera.box",
-      "value": null,
+      "value": 0,
       "limit": 0,
       "pass": true,
-      "note": "skipped with --quick"
+      "unit": "frames out of box while riding",
+      "note": "bot-3.json; clamped 18.9 % (reported); 273 s; camera: PASS out-of-box 0/672 (riding 0), clamped 127 (18.9%), max|roll| 2.8e-17"
     },
     {
       "id": "stranger.medianAttempts",
-      "value": "b1 1/1.5 (n=2, 2 censored) · b2 1/3 (n=2, 2 censored) · b3 1.5/3 (n=2, 2 censored) · e1 2.5/6 (n=2, 2 censored) · e2 3/7.5 (n=2, 2 censored) · e3 1/9 (n=2, 2 censored, under band)",
+      "value": "no armed track",
       "limit": 1.5,
       "pass": true,
-      "note": "median attempts / (1.5 x band top), every counted session cleared, on src 24a246e0 and the tier's default bike; armed 6/15 tracks (>= 2 completed): all armed within the limit; informational (unarmed): m1 0 fresh, m2 0 fresh, m3 0 fresh, h1 0 fresh, h2 0 fresh, h3 0 fresh, x1 0 fresh+1 censored, x2 no report, x3 0 fresh+2 censored"
+      "note": "median attempts / (1.5 x band top), every counted session cleared, on src 4b9bc981 and the tier's default bike; armed 0/15 tracks (>= 2 completed); informational (unarmed): b1 0 fresh+2 censored, b2 0 fresh+2 censored, b3 0 fresh+2 censored, e1 0 fresh+2 censored, e2 0 fresh+2 censored, e3 0 fresh+2 censored, m1 0 fresh, m2 0 fresh, m3 0 fresh, h1 0 fresh, h2 0 fresh, h3 0 fresh, x1 0 fresh+1 censored, x2 no report, x3 0 fresh+2 censored"
     },
     {
       "id": "reflex.medianAttempts",
-      "value": "b1 1/1.5 · b2 2/3 · b3 2/3 · e1 5/6",
+      "value": "b1 -/1.5 (0 fresh) · b2 -/3 (0 fresh) · b3 -/3 (0 fresh) · e1 -/6 (0 fresh)",
       "limit": 1.5,
       "pass": true,
-      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 24a246e0; armed: all four within band"
+      "note": "reflex bot (average) median attempts / (1.5 x band top) on src 4b9bc981; informational until every track has >= 3 seeds on this src (pnpm harness:reflex --all-tracks --seeds 3)"
     },
     {
       "id": "reflex.medianAttempts.pro",
@@ -222,7 +223,7 @@
       "value": 59.5,
       "limit": 55,
       "pass": true,
-      "note": "b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md (report build 5649aa6, HEAD 3a14409)); informational until 3 reports exist (1 filed)"
+      "note": "b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md (report build 5649aa6, HEAD 384d102)); informational until 3 reports exist (1 filed)"
     },
     {
       "id": "device.thermalDropPct",
@@ -246,23 +247,27 @@
       "note": "rider bone-position drift over the bench flow in WebKit (ANGLE-on-Metal), worst of 4 runs at 2026-09-16T03:09:02Z: 0 mm (the arms bug 2b48370 read 2 600 mm); reach 11.12 cm, overhang 0.5 px (harness/out/hero-webkit/hero-webkit-2026-09-16T03-09-02.json)"
     }
   ],
-  "failed": 3,
+  "failed": 4,
   "pass": false,
   "boot": {
     "runs": [
-      261.291167,
-      94.12624999999935,
-      618.7667499999989
+      1879.35275,
+      164.46141700000044,
+      126.22554200000013,
+      610.8039169999975,
+      106.55137499999546
     ],
-    "p50": 261.291167,
-    "min": 94.12624999999935,
-    "max": 618.7667499999989,
+    "p50": 164.46141700000044,
+    "min": 106.55137499999546,
+    "max": 1879.35275,
     "firstFrameMs": [
-      10299.625,
-      6899.27999997139,
-      6199.060000181198
+      8808.069999933243,
+      8049.054999828339,
+      8468.950000047684,
+      8568.109999895096,
+      12437.505000114441
     ],
-    "loadavg1": 19.15,
+    "loadavg1": 12.78,
     "cores": 18,
     "retried": false
   },
@@ -284,48 +289,48 @@
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0.19499993324279785,
-      0.125,
-      0.1099998950958252,
-      0.06999993324279785,
-      0.08000016212463379,
-      0.08999991416931152,
-      0.06999993324279785,
+      0.2200000286102295,
+      0.13000011444091797,
+      0.11500000953674316,
+      0.08500003814697266,
+      0.10500001907348633,
+      0.12999987602233887,
+      0.10500001907348633,
+      0.09500002861022949,
+      0.07999992370605469,
       0.07500004768371582,
+      0.07999992370605469,
+      0.06999993324279785,
+      0.09000015258789062,
+      0.06499981880187988,
       0.059999942779541016,
-      0.059999942779541016,
-      0.05000019073486328,
-      0.04999995231628418,
-      0.059999942779541016,
-      0.05500006675720215,
-      0.039999961853027344,
-      0.039999961853027344,
-      0.04499983787536621,
-      0.039999961853027344,
-      0.04500007629394531,
-      0.04500007629394531
+      0.06500005722045898,
+      0.06500005722045898,
+      0.06999993324279785,
+      0.06500005722045898,
+      0.06999993324279785
     ],
     "frameMs": [
-      1461.1499998569489,
-      280.75499987602234,
-      252.91999983787537,
-      252.9100000858307,
-      214.9800000190735,
-      215.52500009536743,
-      253.5199999809265,
-      215.73499989509583,
-      246.46000003814697,
-      215.0699999332428,
-      177.83500003814697,
-      233.52500009536743,
-      219.2350001335144,
-      224.6949999332428,
-      183.42499995231628,
-      187.8050000667572,
-      176.43999981880188,
-      213.06500005722046,
-      238.58500003814697,
-      183.9449999332428
+      1799.7249999046326,
+      276.1050000190735,
+      320.3949999809265,
+      279.625,
+      250.82000017166138,
+      327.75499987602234,
+      342.6949999332428,
+      296.5750000476837,
+      325.22500014305115,
+      417.039999961853,
+      377.40499997138977,
+      313.3699998855591,
+      419.1800000667572,
+      407.4249999523163,
+      344.45499992370605,
+      359.1050000190735,
+      424.25,
+      380.8550000190735,
+      302.20499992370605,
+      393.70499992370605
     ],
     "noCountdown": true,
     "movesOnFirstTick": true,
@@ -338,27 +343,27 @@
     "autoRespawnMs": 1041.6666666666667
   },
   "heap": {
-    "beforeMB": 15.80594253540039,
-    "afterMB": 17.216232299804688,
-    "growthMB": 1.4102897644042969,
-    "seconds": 10
+    "beforeMB": 16.051013946533203,
+    "afterMB": 21.43686294555664,
+    "growthMB": 5.3858489990234375,
+    "seconds": 60
   },
   "perf": {
     "drawCalls": 174,
-    "triangles": 244203,
-    "texturesMB": 76.92539831542967,
-    "physicsUsPerTickP95": 40.000081062316895,
-    "renderSubmitMsP95": 1.9449999332427979,
-    "renderSyncedMsP95": 743.1000001430511
+    "triangles": 266333,
+    "texturesMB": 77.92514831542965,
+    "physicsUsPerTickP95": 32.49990940093994,
+    "renderSubmitMsP95": 2.255000114440918,
+    "renderSyncedMsP95": 6358.795000076294
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260916-181339-ef946b",
-    "startedAt": "2026-09-16T23:13:39.068Z",
-    "wallMs": 32784,
-    "git": "3a14409",
-    "srcFingerprint": "24a246e0",
+    "runId": "20260917-002906-98a45d",
+    "startedAt": "2026-09-17T05:29:06.552Z",
+    "wallMs": 36309,
+    "git": "384d102",
+    "srcFingerprint": "4b9bc981",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
     "physics": "bikePhysicsFactory-v2",
@@ -462,8 +467,8 @@
     "pass": true
   },
   "stranger": {
-    "srcFingerprint": "24a246e0",
-    "armed": true,
+    "srcFingerprint": "4b9bc981",
+    "armed": false,
     "minSessions": 2,
     "rows": [
       {
@@ -474,17 +479,14 @@
           1
         ],
         "limit": 1.5,
-        "completedFresh": 2,
+        "completedFresh": 0,
         "completedAny": 18,
         "censored": 2,
-        "medianAttempts": 1,
-        "allCleared": true,
-        "pass": true,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
         "belowBand": false,
-        "sessions": [
-          "b1-first-ride-r15-s1-20260915-225608",
-          "b1-first-ride-r15-s2-20260915-225608"
-        ]
+        "sessions": []
       },
       {
         "trackId": "b2-lean-back",
@@ -494,17 +496,14 @@
           2
         ],
         "limit": 3,
-        "completedFresh": 2,
+        "completedFresh": 0,
         "completedAny": 15,
         "censored": 2,
-        "medianAttempts": 1,
-        "allCleared": true,
-        "pass": true,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
         "belowBand": false,
-        "sessions": [
-          "b2-lean-back-r15-s1-20260915-225608",
-          "b2-lean-back-r15-s2-20260915-225608"
-        ]
+        "sessions": []
       },
       {
         "trackId": "b3-kicker-row",
@@ -514,17 +513,14 @@
           2
         ],
         "limit": 3,
-        "completedFresh": 2,
+        "completedFresh": 0,
         "completedAny": 17,
         "censored": 2,
-        "medianAttempts": 1.5,
-        "allCleared": true,
-        "pass": true,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
         "belowBand": false,
-        "sessions": [
-          "b3-kicker-row-r15-s1-20260915-225608",
-          "b3-kicker-row-r15-s2-20260915-225608"
-        ]
+        "sessions": []
       },
       {
         "trackId": "e1-uphill-weight",
@@ -534,17 +530,14 @@
           4
         ],
         "limit": 6,
-        "completedFresh": 2,
+        "completedFresh": 0,
         "completedAny": 15,
         "censored": 2,
-        "medianAttempts": 2.5,
-        "allCleared": true,
-        "pass": true,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
         "belowBand": false,
-        "sessions": [
-          "e1-uphill-weight-r15-s1-20260915-225608",
-          "e1-uphill-weight-r15-s2-20260915-225608"
-        ]
+        "sessions": []
       },
       {
         "trackId": "e2-rear-wheel-first",
@@ -554,17 +547,14 @@
           5
         ],
         "limit": 7.5,
-        "completedFresh": 2,
+        "completedFresh": 0,
         "completedAny": 11,
         "censored": 2,
-        "medianAttempts": 3,
-        "allCleared": true,
-        "pass": true,
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
         "belowBand": false,
-        "sessions": [
-          "e2-rear-wheel-first-r15-s1-20260915-225608",
-          "e2-rear-wheel-first-r15-s2-20260915-225608"
-        ]
+        "sessions": []
       },
       {
         "trackId": "e3-stairway",
@@ -574,17 +564,14 @@
           6
         ],
         "limit": 9,
-        "completedFresh": 2,
+        "completedFresh": 0,
         "completedAny": 15,
         "censored": 2,
-        "medianAttempts": 1,
-        "allCleared": true,
-        "pass": true,
-        "belowBand": true,
-        "sessions": [
-          "e3-stairway-r15-s1-20260915-225608",
-          "e3-stairway-r15-s2-20260915-225608"
-        ]
+        "medianAttempts": null,
+        "allCleared": false,
+        "pass": null,
+        "belowBand": false,
+        "sessions": []
       },
       {
         "trackId": "m1-hop-up",
@@ -725,8 +712,8 @@
     ]
   },
   "reflex": {
-    "srcFingerprint": "24a246e0",
-    "armed": true,
+    "srcFingerprint": "4b9bc981",
+    "armed": false,
     "minSeeds": 3,
     "rows": [
       {
@@ -738,12 +725,12 @@
         ],
         "limit": 1.5,
         "srcFingerprint": "24a246e0",
-        "seedsFresh": 9,
-        "medianAttempts": 1,
-        "medianFinishTime": 56.583333333333336,
-        "allCleared": true,
-        "pass": true,
-        "deadliest": "ground @ 90 m ×1"
+        "seedsFresh": 0,
+        "medianAttempts": null,
+        "medianFinishTime": null,
+        "allCleared": false,
+        "pass": null,
+        "deadliest": null
       },
       {
         "trackId": "b2-lean-back",
@@ -754,12 +741,12 @@
         ],
         "limit": 3,
         "srcFingerprint": "24a246e0",
-        "seedsFresh": 9,
-        "medianAttempts": 2,
-        "medianFinishTime": 62.80833333333333,
-        "allCleared": true,
-        "pass": true,
-        "deadliest": "ground @ 35 m ×6"
+        "seedsFresh": 0,
+        "medianAttempts": null,
+        "medianFinishTime": null,
+        "allCleared": false,
+        "pass": null,
+        "deadliest": null
       },
       {
         "trackId": "b3-kicker-row",
@@ -770,12 +757,12 @@
         ],
         "limit": 3,
         "srcFingerprint": "24a246e0",
-        "seedsFresh": 9,
-        "medianAttempts": 2,
-        "medianFinishTime": 61.45,
-        "allCleared": true,
-        "pass": true,
-        "deadliest": "ramp @ 409.8 m ×3"
+        "seedsFresh": 0,
+        "medianAttempts": null,
+        "medianFinishTime": null,
+        "allCleared": false,
+        "pass": null,
+        "deadliest": null
       },
       {
         "trackId": "e1-uphill-weight",
@@ -786,17 +773,17 @@
         ],
         "limit": 6,
         "srcFingerprint": "24a246e0",
-        "seedsFresh": 9,
-        "medianAttempts": 5,
-        "medianFinishTime": 101.7,
-        "allCleared": true,
-        "pass": true,
-        "deadliest": "ramp @ 75.2 m ×7"
+        "seedsFresh": 0,
+        "medianAttempts": null,
+        "medianFinishTime": null,
+        "allCleared": false,
+        "pass": null,
+        "deadliest": null
       }
     ]
   },
   "reflexPro": {
-    "srcFingerprint": "24a246e0",
+    "srcFingerprint": "4b9bc981",
     "armed": false,
     "minSeeds": 3,
     "rows": [

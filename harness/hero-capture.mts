@@ -1,4 +1,5 @@
-import { normalizeRiderOutfit, riderPreset } from '../src/core/riderPresets';
+import { normalizeRiderOutfit } from '../src/core/riderPresets';
+import { heroFiles } from '../src/render/hero/urls';
 import type { SkinnedMesh } from 'three';
 import { decodeJSON, iterateFrames } from '../src/core/replay';
 import type { QualityTier } from '../src/core/types';
@@ -45,7 +46,8 @@ async function inventory(dir: string): Promise<void> {
 }
 await inventory(build);
 const catalog = JSON.parse(await readFile(path.join(build, 'model-catalog.json'), 'utf8')) as { models: { logical: string; url: string; bytes: number; sha256: string }[] };
-const logicalFiles = [`models/rider-${riderPreset(normalizedOutfit!).family}.glb`, `models/rider-${riderPreset(normalizedOutfit!).family}-lod.glb`, 'models/bike.glb', 'models/bike-lod.glb'];
+// Ask 43: the live hero family (src/render/hero/urls.ts) names the files — one per outfit, one per bike class, each with its LOD twin.
+const logicalFiles: readonly string[] = heroFiles(normalizedOutfit!, recording.header.bike ?? 'rookie');
 const assetBytes: Record<string, string> = {};
 for (const logical of logicalFiles) {
   const entry = catalog.models.find(m => m.logical === logical);

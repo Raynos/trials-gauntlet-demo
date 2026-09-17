@@ -53,3 +53,40 @@ The catalog rider and bike ride in the game and stand in the garage with every d
 phone-high rows hold in-level (≤ 123 draws, model ≤ 8.8 ms) and the garage holds 30 fps on the user's iPhone; the
 loader invariant, replay determinism and the ship gate are unchanged; `RELEASES.md` carries the pin. Astra's
 "final user visual approval" (HR-07) is a precondition, not a row here.
+
+## Status (ask 43, opened 2026-09-16 23:15)
+
+The user's `/goal`: integrate all of it and retire the prototype once trunk holds every asset, model and recipe. Findings
+from the parent's own measurement of the seven selected files before the first round:
+
+- The three Street riders are 3.66 M tris **because of one mesh** — `Bystedt_EvaluatedStrandCrossSections.001`, the strand
+  groom, 3,456,000 tris. Without it a Street rider is ≈ 205 k (cotton shell 132 k). The Race riders are 94 k, 6 MB,
+  one material; the bikes 33 k with the same mesh names the game's `gltfBike.ts` already drives. So the plan's step 3 is
+  really "replace the groom and decimate", not a generic LOD chain.
+- The delivered clip set (`sit_cruise, forward_attack, hang_back, compression, extension, landing_absorption`) is not the
+  set `gltfRider.ts` weights (`stand_attack, crouch, extend, land_absorb, idle_breathe` + the three shared) — an alias /
+  derivation layer in the loader, physics still the pose authority.
+- Per-outfit files replace family + palette variant; per-livery bike files replace `bike_rookie / bike_pro` variants.
+- The prototype holds no physics; "improved physics" in the ask is physics R10 (`dc450e0`, ask 35), already on trunk.
+
+Owners: art-pipeline (`assets/blender/**`, `public/models/**`), render (`src/render/**`, `riderPresets.ts`); harness
+owner joins when there is a file to play. Prototype retirement is the last round: recipes and evidence move under
+`assets/blender/` / `docs/evidence/hero-art/`, the 22 GB of untracked intermediates are the user's call.
+
+### Round 1 (2026-09-17 00:40) — the family is live
+
+- Art: `assets/blender/hero_art_build.mjs` regenerates all 14 files from the delivery in ~100 s (recipe + findings in
+  `assets/blender/README.md`); riders 44–59 k tris / 1–6 draws / 2–3 MB, LOD 7.8 k with a 400-tri glove floor, bikes 33 k /
+  23 draws; rig, sockets and the six clips verified against the delivery (≤ 0.19 mm / 0.2 mrad over every frame). The
+  strand groom is a baked shell (7.7 k tris) — puffier than Astra's; ribbons are the alternative, the user judges.
+- Render: `ASTRA_HERO` table in `urls.ts`, per-outfit riders + per-class bikes, `clipAliases.ts` windows the delivered
+  cycles into the driver's clips (physics stays the authority), `prepareHero` merges skinned draws and flattens
+  clearcoat/specular (programs 61 → 53), `lodChoice` = LOD rider on low/medium/phone-high in-level, authored in the
+  garage on every tier. b1 phone-high: 139 calls / 82 k tris / model 9.1 ms (baseline 128 / 156 k / 9.2). Boot totals
+  keyed by outfit × class; `main.ts` passes the saved class so a Pro boot fetches `bike-pro.glb` once.
+- Evidence: hero-webkit PASS, outfits e2e PASS (14 files fetched), D1–D8 PASS with the new `b1:pro` pin, no flash on 15
+  garage swaps; gate 26/30 (the three SwiftShader timing rows + heap growth 5.39 vs 5, one run); e2e 1153/1154 — the
+  `boot 3g` B3 download held at 58 % for 2 s (new; the hero decode is bigger) — open.
+- Open from the frames: hand-to-grip residual up to 11.8 / 14.6 cm in hang-back / launch and elbows above the helmet
+  in attack — to be measured against the legacy rider before calling it the art's; the phone-proxy garage clip predates
+  the `lodChoice` rule (it shows the LOD hero) and is re-cut next round.

@@ -34,14 +34,14 @@ import { parseBenchParams } from './game/bench';
 import { resolveBoot } from './game/flow';
 import { registerServiceWorker } from './game/pwa';
 import { getTrack } from './tracks';
-import { ArtManifest, BestTimes, DomHud, injectStyles, loadModelChoice, menuPlate, type ModelChoice } from './ui';
+import { ArtManifest, BestTimes, DomHud, injectStyles, loadBikeChoice, loadModelChoice, menuPlate, type ModelChoice } from './ui';
 import { nextPaint } from './ui/loader';
 import { takeBootPlan } from './boot/handoff';
 import { streamBytes } from './boot/stream';
 import { PREPARE_STEPS } from './boot/steps';
 import { delegate, type ByteProgress, type StepRunner } from './boot/plan';
 import type { PrepareStep } from './boot/steps';
-import type { RiderOutfit, RiderOutfitRenderer } from './core/types';
+import type { BikeClass, RiderOutfit, RiderOutfitRenderer } from './core/types';
 import { loadRiderOutfit } from './ui/outfit';
 
 type AnyModule = Record<string, unknown>;
@@ -94,10 +94,12 @@ interface RendererBootHooks {
   onTrackArt: (done: number, total: number, label: string) => void;
 }
 
-function makeRenderer(parent: HTMLElement, harness: boolean, models: ModelChoices, riderOutfit: RiderOutfit, boot?: RendererBootHooks): { renderer: GameRenderer; kind: string } {
+function makeRenderer(parent: HTMLElement, harness: boolean, models: ModelChoices, riderOutfit: RiderOutfit, bikeClass: BikeClass, boot?: RendererBootHooks): { renderer: GameRenderer; kind: string } {
   const m = renderMod as AnyModule;
   // riderModel / bikeModel: 'proc' | 'gltf' — the render owner reads them; unknown keys are ignored today.
-  const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness, ...models, riderOutfit, ...(boot ?? {}) };
+  // bikeClass (ask 43): the saved Garage class, so the boot fetches that livery's bike file — the same class the boot
+  // inline declared (src/boot/outfit.ts); the app's tier default, if it differs, swaps the livery after `ready`.
+  const opts = { ...(harness ? { pixelRatio: 1 } : {}), preserveDrawingBuffer: harness, ...models, riderOutfit, bikeClass, ...(boot ?? {}) };
   const create = m['createRenderer'];
   if (typeof create === 'function') {
     return { renderer: (create as (p: HTMLElement, o: typeof opts) => GameRenderer)(parent, opts), kind: 'createRenderer' };
@@ -159,12 +161,13 @@ function boot(): void {
   const initialTrack = route.track ?? undefined;
   const models = modelChoices(params);
   const riderOutfit = loadRiderOutfit(params.get('outfit'));
+  const bikeClass: BikeClass = loadBikeChoice() ?? 'rookie';
 
   let composed: Composed | null = null;
   const compose = (): Composed => {
     if (composed) return composed;
     const t0 = performance.now();
-    const { renderer, kind: renderKind } = makeRenderer(app, harness, models, riderOutfit);
+    const { renderer, kind: renderKind } = makeRenderer(app, harness, models, riderOutfit, bikeClass);
     const tRender = performance.now();
     const { make: makePhysics, kind: physicsKind, version: physicsVersion } = physicsFactory(params.get('physics'));
     const physics = makePhysics(physicsHz);
@@ -237,7 +240,7 @@ function boot(): void {
         await nextPaint();
         // The two downloads boot awaits (hero glTF, boot art set) start in the renderer's constructor, each with its
         // DOWNLOAD reader; per-track art after the boot set is an `after` item.
-        return makeRenderer(appRoot, false, models, riderOutfit, { heroBytes: plan.reader('heroModels'), artBytes: plan.reader('bootArt'), onTrackArt: (done, total) => plan.after('trackArt', done, total) });
+        return makeRenderer(appRoot, false, models, riderOutfit, bikeClass, { heroBytes: plan.reader('heroModels'), artBytes: plan.reader('bootArt'), onTrackArt: (done, total) => plan.after('trackArt', done, total) });
       });
       const { renderer, kind: renderKind } = sRenderer.value;
       const sPhysics = await sRenderer.step('physics', async () => {

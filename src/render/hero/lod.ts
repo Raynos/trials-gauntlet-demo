@@ -70,9 +70,18 @@ export function wheelParts(wheel: THREE.Object3D): { spokes: THREE.Mesh | null; 
  * Once per parsed document: wheels of a file without an authored `<wheel>_spokes` child are split
  * (the spokes become a child mesh named `<wheel>:spokes`), and the `KHR_materials_variants` table is
  * resolved — per mesh name, variant name → material — so instances can swap synchronously.
+ *
+ * Ask 43 (Astra's files): empty meshes are dropped (the street exports keep a 0-triangle `rider` whose only content
+ * is a stale variants table), skinned meshes that share a material, skeleton and bind are merged into one draw
+ * (the race rider is 14 meshes on ONE material = 14 draws and 14 mirror twins for nothing; the street rider ≈ 24 on
+ * 17), and `MeshPhysicalMaterial`s (`KHR_materials_clearcoat` on a bike fender, `KHR_materials_specular` on the
+ * street skin / hair) are flattened to the standard material so the hero stays on the one program variant
+ * (docs/design/rendering.md §5) — the clearcoat is a finding for a desktop-high opt-in, not a tier feature yet.
  */
 export async function prepareHero(gltf: GLTF): Promise<void> {
   const root = gltf.scene;
+  dropEmptyMeshes(root);
+  mergeSkinnedByMaterial(root);
   const meshes: THREE.Mesh[] = [];
   root.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh);
@@ -88,6 +97,156 @@ export async function prepareHero(gltf: GLTF): Promise<void> {
     mesh.geometry = withIndex(mesh.geometry, split.body);
   }
   await resolveVariants(gltf);
+  flattenPhysicalMaterials(gltf);
+  normalizeHeroMaterials(gltf);
+}
+
+/**
+ * One fragment variant per hero surface (docs/design/rendering.md §5, PERF-BACKLOG #9): Astra's street riders mix
+ * front-sided skin, alpha-MASK eyebrows and BLENDED beard cards, and Three keys a program (and its shadow-depth twin)
+ * on `side`, `alphaTest` and opacity — measured +10 programs on b1 phone-high for the mustard rider alone. Every
+ * hero material is double-sided like the rest of the kit, and a blended card becomes a cut-out at the same
+ * threshold (the beard's soft edge is a 120-triangle card seen 180 px tall; the program is worth more than the
+ * feather). The only variants left are skinned / static and cut-out / opaque.
+ */
+function normalizeHeroMaterials(gltf: GLTF): void {
+  const seen = new Set<THREE.Material>();
+  const fix = (m: THREE.Material): void => {
+    if (seen.has(m)) return;
+    seen.add(m);
+    m.side = THREE.DoubleSide;
+    if (m.transparent) {
+      m.transparent = false;
+      m.depthWrite = true;
+      if (!(m.alphaTest > 0)) m.alphaTest = 0.5;
+      m.needsUpdate = true;
+    }
+  };
+  gltf.scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh || /_blur$/.test(mesh.name)) return; // the spoke blur cards are the one authored blend (SpokeBlur owns them)
+    for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) fix(m);
+  });
+  const table = variantTable.get(gltf);
+  if (table) for (const row of table.values()) for (const m of row.values()) fix(m);
+}
+
+/** Meshes with no vertices draw nothing and still cost a traversal, a mirror twin and a shadow submit. */
+function dropEmptyMeshes(root: THREE.Object3D): void {
+  const empty: THREE.Mesh[] = [];
+  root.traverse((o) => {
+    const m = o as THREE.Mesh;
+    if (m.isMesh && (m.geometry.index ? m.geometry.index.count : m.geometry.getAttribute('position')?.count ?? 0) === 0) empty.push(m);
+  });
+  for (const m of empty) m.removeFromParent();
+}
+
+/** The attribute layout a geometry must share to be concatenated: name, item size, array type, normalisation. */
+function attributeLayout(g: THREE.BufferGeometry): string {
+  return Object.entries(g.attributes)
+    .map(([name, a]) => `${name}:${a.itemSize}:${a.array.constructor.name}:${a.normalized ? 1 : 0}`)
+    .sort()
+    .join('|');
+}
+
+/**
+ * Skinned meshes sharing a material, skeleton, bind matrix and attribute layout become one `SkinnedMesh` (named after
+ * the first, keeping its parent and name — the garage rail and the mirror twin see one hero mesh per material as
+ * before). Morph targets and multi-material meshes are left alone. Legacy documents (one skinned mesh) are untouched.
+ */
+export function mergeSkinnedByMaterial(root: THREE.Object3D): void {
+  const groups = new Map<string, THREE.SkinnedMesh[]>();
+  const keys = new Map<THREE.SkinnedMesh, string>();
+  let skeletons = 0;
+  const skeletonIds = new Map<THREE.Skeleton, number>();
+  const materialIds = new Map<THREE.Material, number>();
+  root.updateMatrixWorld(true);
+  root.traverse((o) => {
+    const m = o as THREE.SkinnedMesh;
+    if (!m.isSkinnedMesh || Array.isArray(m.material) || Object.keys(m.geometry.morphAttributes).length) return;
+    if (!skeletonIds.has(m.skeleton)) skeletonIds.set(m.skeleton, skeletons++);
+    if (!materialIds.has(m.material)) materialIds.set(m.material, materialIds.size);
+    // The skinned vertex is bindMatrixInverse · bones · bindMatrix · p, then the node's own world matrix: both must agree.
+    const bind = [...m.bindMatrix.elements, ...m.matrixWorld.elements].map((e) => e.toFixed(5)).join(',');
+    const key = `${skeletonIds.get(m.skeleton)}/${materialIds.get(m.material)}/${bind}/${attributeLayout(m.geometry)}/${m.geometry.index ? 'i' : 'n'}`;
+    keys.set(m, key);
+    const list = groups.get(key) ?? [];
+    list.push(m);
+    groups.set(key, list);
+  });
+  for (const list of groups.values()) {
+    if (list.length < 2) continue;
+    const first = list[0]!;
+    const merged = new THREE.BufferGeometry();
+    for (const name of Object.keys(first.geometry.attributes)) {
+      const src = first.geometry.getAttribute(name) as THREE.BufferAttribute;
+      const total = list.reduce((n, m) => n + m.geometry.getAttribute(name).count, 0);
+      const Arr = src.array.constructor as new (n: number) => typeof src.array;
+      const out = new Arr(total * src.itemSize);
+      let offset = 0;
+      for (const m of list) {
+        const a = m.geometry.getAttribute(name) as THREE.BufferAttribute;
+        out.set(a.array as ArrayLike<number>, offset);
+        offset += a.array.length;
+      }
+      merged.setAttribute(name, new THREE.BufferAttribute(out, src.itemSize, src.normalized));
+    }
+    const verts = merged.getAttribute('position').count;
+    if (first.geometry.index) {
+      const total = list.reduce((n, m) => n + m.geometry.index!.count, 0);
+      const out = verts < 65536 ? new Uint16Array(total) : new Uint32Array(total);
+      let offset = 0;
+      let base = 0;
+      for (const m of list) {
+        const idx = m.geometry.index!.array;
+        for (let i = 0; i < idx.length; i++) out[offset + i] = idx[i]! + base;
+        offset += idx.length;
+        base += m.geometry.getAttribute('position').count;
+      }
+      merged.setIndex(new THREE.BufferAttribute(out, 1));
+    }
+    merged.computeBoundingSphere();
+    merged.computeBoundingBox();
+    merged.name = first.geometry.name;
+    const mesh = new THREE.SkinnedMesh(merged, first.material);
+    mesh.name = first.name;
+    mesh.userData = first.userData;
+    mesh.frustumCulled = first.frustumCulled;
+    mesh.castShadow = first.castShadow;
+    mesh.receiveShadow = first.receiveShadow;
+    mesh.position.copy(first.position);
+    mesh.quaternion.copy(first.quaternion);
+    mesh.scale.copy(first.scale);
+    mesh.bind(first.skeleton, first.bindMatrix);
+    first.parent!.add(mesh);
+    for (const m of list) {
+      m.removeFromParent();
+      m.geometry.dispose();
+    }
+  }
+}
+
+/** The standard subset of a physical material, so clearcoat / specular files share the hero's one program. */
+export function flattenPhysicalMaterials(gltf: GLTF): void {
+  const flat = new Map<THREE.Material, THREE.MeshStandardMaterial>();
+  const standard = (m: THREE.Material): THREE.Material => {
+    if (!(m as THREE.MeshPhysicalMaterial).isMeshPhysicalMaterial) return m;
+    let s = flat.get(m);
+    if (!s) {
+      s = new THREE.MeshStandardMaterial();
+      // `copy` from the physical superset: MeshStandardMaterial.copy reads only the standard fields.
+      s.copy(m as THREE.MeshStandardMaterial);
+      flat.set(m, s);
+    }
+    return s;
+  };
+  gltf.scene.traverse((o) => {
+    const m = o as THREE.Mesh;
+    if (!m.isMesh) return;
+    m.material = Array.isArray(m.material) ? m.material.map(standard) : standard(m.material);
+  });
+  const table = variantTable.get(gltf);
+  if (table) for (const row of table.values()) for (const [name, m] of row) row.set(name, standard(m));
 }
 
 type VariantExt = { variants?: { name: string }[] };
@@ -128,21 +287,23 @@ export function variantMaterialsFor(gltf: GLTF, meshName: string): Map<string, T
 }
 
 /**
- * Which document a tier instantiates: `high` the authored file, `low` / `medium` the LOD twin.
- * Round 14: the rider LOD is gated (`riderLodEnabled`, default off) after the phone showed the
- * `medium` rider with rigid bind-pose arms. The cause was the renderer's program prune, not the
- * asset (`rider-lod.glb` carries the same 19-joint skeleton, bind pose, inverse bind matrices and
- * clips as `rider.glb`, and the hands-on-grips probe holds ≤ 0.5 cm on it at low and medium), but
- * the LOD returns to the phone tiers only once a device report confirms the fix; the bike LOD has
- * no skin and stays on. `ThreeRenderer.setRiderLod(true)` (or `?riderlod=1` through the app) turns it on.
+ * Which document a tier instantiates: `high` the authored file, `low` / `medium` (and phone-high, which passes
+ * `medium`) the LOD twin. Round 14 gated the rider LOD off after the phone showed the `medium` rider with rigid
+ * bind-pose arms — the renderer's program prune, not the asset; the prune is gone (r15 retirement). Ask 43 round 2
+ * turns it back on, measured on Astra's 7.8 k LOD riders (b1 phone-high 185 k → 82 k tris, model 9.5 → 9.1 ms;
+ * medium 14.2 → 13.6; low 6.3 → 5.9) with `hero-webkit` hands-on-grips on both engines — IN LEVEL. The garage stage
+ * (`garage`) keeps the authored rider on every tier: it is the close-up showcase, its 8.9 ms is inside the 30 fps
+ * bar, and the mirror-twin gate (`reflectable()`) already counts the authored triangles. `setRiderLod(false)`
+ * (or `?riderlod=0`) is the escape hatch, never the rule.
  */
-export function lodChoice(tier: 'low' | 'medium' | 'high', kind: 'bike' | 'rider' = 'bike'): 'full' | 'lod' {
+export function lodChoice(tier: 'low' | 'medium' | 'high', kind: 'bike' | 'rider' = 'bike', garage = false): 'full' | 'lod' {
   if (tier === 'high') return 'full';
-  return kind === 'rider' && !riderLodEnabled ? 'full' : 'lod';
+  if (kind !== 'rider') return 'lod';
+  return riderLodEnabled && !garage ? 'lod' : 'full';
 }
 
-let riderLodEnabled = false;
-/** Gate for the rider LOD on `low` / `medium` (see `lodChoice`). */
+let riderLodEnabled = true;
+/** Override for the rider LOD on `low` / `medium` (see `lodChoice`); the default is on. */
 export function setRiderLodEnabled(on: boolean): void {
   riderLodEnabled = on;
 }

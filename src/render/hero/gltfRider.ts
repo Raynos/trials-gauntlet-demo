@@ -1,6 +1,8 @@
 /**
- * glTF rider (round 8): `public/models/rider.glb` — one skinned mesh, 19 joints, 8 clips —
- * posed from the SAME chain as the procedural kit (`solveChain`, later the pose owner's
+ * glTF rider (round 8): `public/models/rider.glb` — one skinned mesh, 19 joints, 8 clips — and (ask 43) Astra's
+ * per-outfit files: the same 19-joint rig and sockets, several skinned meshes merged by `prepareHero`, six reference
+ * cycles read through `clipAliases.ts` windows so the game's clip names still exist — posed from the SAME chain as
+ * the procedural kit (`solveChain`, later the pose owner's
  * `rider/pose.ts`), per the README bone recipe: each bone's world rotation is
  * `setFromUnitVectors(restDir, targetDir) · restWorldQ`, converted to parent space in
  * hierarchy order; the pelvis (root) carries the hips position. Rest directions come from the
@@ -27,6 +29,7 @@ import { newChain, solveChain, type Chain } from '../rider/riderModel';
 import { countTriangles, prepareHeroMaterials } from './gltf';
 import { variantMaterialsFor } from './lod';
 import { makeRiderRigPose, riderRigFromCOM, RIDER_PROFILE, RIDER_TORSO_REST } from './riderRig';
+import { clipWindows, type ClipWindow } from './clipAliases';
 
 /** Asset material names; deliberately independent of bike physics class. */
 export type RiderMaterialVariant = 'rider_rookie' | 'rider_pro';
@@ -43,7 +46,12 @@ const CONTACT_ROOTS = ['upperArm.L', 'upperArm.R', 'thigh.L', 'thigh.R'] as cons
 type BoneName = (typeof ORDER)[number];
 
 interface ClipSampler {
+  /** Length of the window the driver plays (the whole clip for an authored game clip). */
   duration: number;
+  /** Source-clip time of the window's start: sampled time = `from + t`. */
+  from: number;
+  /** Window time the physics-weighted path samples — the clip's held target pose. */
+  poseT: number;
   rot: Map<string, { interp: THREE.Interpolant; rest: THREE.Quaternion; out: THREE.Quaternion }>;
   pos: Map<string, { interp: THREE.Interpolant; rest: THREE.Vector3; out: THREE.Vector3 }>;
 }
@@ -58,18 +66,19 @@ export function boneName(raw: string): string {
   return m ? `${m[1]}.${m[2]}` : raw;
 }
 
-function sampler(clip: THREE.AnimationClip): ClipSampler {
-  const s: ClipSampler = { duration: clip.duration, rot: new Map(), pos: new Map() };
+/** A clip read through a window (`clipAliases.ts`): its rest is the window's reference frame, not frame 0. */
+function sampler(clip: THREE.AnimationClip, w: ClipWindow): ClipSampler {
+  const s: ClipSampler = { duration: Math.max(1e-3, w.to - w.from), from: w.from, poseT: w.pose, rot: new Map(), pos: new Map() };
   for (const t of clip.tracks) {
     const dot = t.name.lastIndexOf('.');
     const node = boneName(t.name.slice(0, dot));
     const prop = t.name.slice(dot + 1);
     const interp = (t as unknown as { createInterpolant(): THREE.Interpolant }).createInterpolant();
     if (prop === 'quaternion') {
-      const r = interp.evaluate(0) as Float32Array;
+      const r = interp.evaluate(w.ref) as Float32Array;
       s.rot.set(node, { interp, rest: new THREE.Quaternion(r[0], r[1], r[2], r[3]).normalize(), out: new THREE.Quaternion() });
     } else if (prop === 'position') {
-      const r = interp.evaluate(0) as Float32Array;
+      const r = interp.evaluate(w.ref) as Float32Array;
       s.pos.set(node, { interp, rest: new THREE.Vector3(r[0], r[1], r[2]), out: new THREE.Vector3() });
     }
   }
@@ -237,13 +246,17 @@ export class GltfRider {
     holder.remove(this.scene);
     this.scene.position.set(-SHIFT, 0, 0);
     this.debug.bones = this.bones.size;
-    for (const c of gltf.animations) {
-      this.clips.set(c.name, sampler(c));
-      this.debug.clips.push(c.name);
+    // Ask 43: the game's clip names are windows of whatever the file authored (`clipAliases.ts`) — the legacy
+    // eight pass through whole; Astra's six cycles also yield stand_attack / crouch / extend / land_absorb.
+    const byName = new Map(gltf.animations.map((c) => [c.name, c]));
+    for (const [name, w] of clipWindows(gltf.animations)) {
+      this.clips.set(name, sampler(byName.get(w.source)!, w));
+      this.debug.clips.push(name);
     }
     // These are full pose clips, with crouch/extension as their opening poses. Subtracting those
     // openings adds a whole crouch->extension or extension->landing transition to an unrelated
     // live pose. Both layers need the same neutral reference; idle keeps its authored zero frame.
+    // (On Astra's family every window already rests on the stance frame this clip IS — a no-op there.)
     const neutral = this.clips.get('stand_attack');
     if (neutral) {
       for (const name of ['land_absorb', 'extend']) {
@@ -258,6 +271,11 @@ export class GltfRider {
         if (pelvis && reference) pelvis.rest.copy(reference.rest);
       }
     }
+  }
+
+  /** Whether the document carries `rider_rookie` / `rider_pro` palettes (the legacy family; Astra's per-outfit files do not). */
+  get hasMaterialVariants(): boolean {
+    return this.variants.length > 0;
   }
 
   /** Select an exact asset palette. Validate every participating mesh before changing any. */
@@ -388,16 +406,16 @@ export class GltfRider {
     const land = this.clips.get('land_absorb');
     const ext = this.clips.get('extend');
     if (sim) {
-      // Landing squash ← the suspension compression spike: the clip's absorb pose (its frame 8 of
-      // 30) weighted by the summed compression above the ridden sag — it deepens as the springs
-      // load and recovers as they rebound, on physics' own timeline.
+      // Landing squash ← the suspension compression spike: the clip's absorb pose (`poseT`: frame 8 of
+      // 30 authored, the 2.5 s hold of Astra's cycle) weighted by the summed compression above the ridden
+      // sag — it deepens as the springs load and recovers as they rebound, on physics' own timeline.
       const load = (f.rear.grounded ? f.rear.compression : 0) + (f.front.grounded ? f.front.compression : 0);
       const wLand = Math.min(1, Math.max(0, (load - LAND.sag) / LAND.span)) * LAND.max;
-      if (land && wLand > 0.005) this.additive('land_absorb', land.duration * (8 / 30), wLand, false);
+      if (land && wLand > 0.005) this.additive('land_absorb', land.poseT, wLand, false);
       // Hop extension ← the rider body rising off the chassis (relative velocity along the bike's up
-      // axis): the clip's extended pose (frame 8 of 20) weighted by that speed.
+      // axis): the clip's extended pose (`poseT`) weighted by that speed.
       const wExt = Math.min(1, Math.max(0, (f.riderBody.relUp - EXTEND.v0) / EXTEND.span)) * EXTEND.max;
-      if (ext && wExt > 0.005) this.additive('extend', ext.duration * (8 / 20), wExt, false);
+      if (ext && wExt > 0.005) this.additive('extend', ext.poseT, wExt, false);
       if (rest > 0.01 || wLand > 0.005 || wExt > 0.005) this.resolveContacts(c);
       return;
     }
@@ -695,7 +713,7 @@ export class GltfRider {
   private additive(name: string, t: number, w: number, loop: boolean): void {
     const s = this.clips.get(name);
     if (!s || w <= 0) return;
-    const tt = loop ? t % s.duration : Math.min(t, s.duration - 1e-4);
+    const tt = s.from + (loop ? t % s.duration : Math.min(t, s.duration - 1e-4));
     for (const [node, r] of s.rot) {
       if (ARM_CHAIN.test(node)) continue;
       const b = this.bones.get(node);

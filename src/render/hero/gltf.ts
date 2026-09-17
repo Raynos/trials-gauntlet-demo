@@ -1,6 +1,8 @@
 /**
  * glTF hero assets (round 8): `public/models/{bike,rider}.glb` built by assets/blender
- * (meshopt-compressed; see assets/blender/README.md for the node / bone contract).
+ * (meshopt-compressed; see assets/blender/README.md for the node / bone contract), and (ask 43) Astra's per-outfit
+ * / per-livery files behind the same names in `urls.ts` (Meshopt on the bikes and street riders, clearcoat /
+ * specular flattened and skinned parts merged by `prepareHero`).
  * One loader, one parsed document per file, cloned per instance (live + ghost).
  * `?rider=gltf&bike=gltf` (or the settings menu) selects them through `setModels`.
  */

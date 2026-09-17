@@ -13,7 +13,8 @@ import { FrameBuilder, type RenderFrame } from '../frame';
 import type { GameRenderer } from '../index';
 import type { MaterialLibrary } from '../materials/library';
 import { boneName, GltfRider } from './gltfRider';
-import { loadRig } from './gltfTestUtils';
+import { deliveredHeroUrl, loadRig, loadRigAt } from './gltfTestUtils';
+import { prepareHero } from './lod';
 
 function fixture(gltf: GLTF, cls: BikeClass) {
   const frame = new THREE.Group();
@@ -112,9 +113,17 @@ function poseFrame(hipX: number, hipY: number, torsoDegrees: number, angle: numb
   return f;
 }
 
-describe.each(['rider-openface.glb', 'rider-openface-lod.glb', 'rider-street.glb', 'rider-street-lod.glb', 'rider-race.glb', 'rider-race-lod.glb'])('%s physical pose', file => {
+// Ask 43: Astra's per-outfit riders (read in place from the tracked delivery until they land under public/models; the
+// 60 MB street files are not read here) go through the same grid — same 19-joint rig, sockets and anatomy as rider.glb.
+const delivered = [['rider-race-bluewhite.glb', 'race-bluewhite.glb'], ['rider-race-charcoalyellow.glb', 'race-charcoalyellow.glb']] as const;
+const subjects: { file: string; load: () => Promise<GLTF> }[] = [
+  ...['rider-openface.glb', 'rider-openface-lod.glb', 'rider-street.glb', 'rider-street-lod.glb', 'rider-race.glb', 'rider-race-lod.glb'].map(file => ({ file, load: () => loadRig(file) })),
+  ...delivered.flatMap(([final, art]) => { const url = deliveredHeroUrl(final, art); return url ? [{ file: `astra:${final}`, load: async () => { const g = await loadRigAt(url); await prepareHero(g); return g; } }] : []; }),
+];
+
+describe.each(subjects)('$file physical pose', ({ file, load }) => {
   let gltf: GLTF;
-  beforeAll(async () => { gltf = await loadRig(file); });
+  beforeAll(async () => { gltf = await load(); });
 
   it.each(['rookie', 'pro'] as const)('%s retains real sockets, lengths, elbow side and independent COM through a pose grid', cls => {
     const rig = fixture(gltf, cls);

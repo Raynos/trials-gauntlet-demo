@@ -32,7 +32,11 @@ async function sourceFiles(dir: string): Promise<string[]> {
   }
   return result;
 }
-const assets = ['bike.glb', 'bike-lod.glb', 'rider-street.glb', 'rider-street-lod.glb', 'rider-race.glb', 'rider-race-lod.glb'];
+// Ask 43: the live hero family (src/render/hero/urls.ts) — a file per bike class and per outfit; the census takes the
+// class the recording names and one Street + one Race outfit (the Street files share a rig, so do the Race ones).
+const bikeAssets = { rookie: ['bike-rookie.glb', 'bike-rookie-lod.glb'], pro: ['bike-pro.glb', 'bike-pro-lod.glb'] } as const;
+const riderAssets = ['rider-street-mustard.glb', 'rider-street-mustard-lod.glb', 'rider-race-bluewhite.glb', 'rider-race-bluewhite-lod.glb'] as const;
+const assets = [...bikeAssets.rookie, ...bikeAssets.pro, ...riderAssets];
 let inputs: string[] = [];
 for (const dir of await readdir('harness/inputs', { withFileTypes: true })) if (dir.isDirectory()) {
   for (const file of await readdir(`harness/inputs/${dir.name}`)) if (/^bot-3(?:-pro)?\.json$/.test(file)) inputs.push(`harness/inputs/${dir.name}/${file}`);
@@ -105,7 +109,7 @@ for (const input of inputs) {
   const game = new Game({ physics: createBikePhysicsV2(120), renderer: { setTrack() {}, onEvent() {}, setQuality() {}, setBikeClass() {} } as unknown as GameRenderer,
     physicsHz: 120, autoSkipCountdown: true, autoRecord: false, ghostEnabled: false });
   game.loadTrack(rec.header.trackId, rec.header.seed, cls);
-  const bikes = ['bike.glb', 'bike-lod.glb'].map(asset => {
+  const bikes = bikeAssets[cls].map(asset => {
     const gltf = documents.get(asset)!;
     const chain = gltf.scene.getObjectByName('chain') as THREE.Mesh;
     chain.material = new THREE.MeshStandardMaterial({ map: new THREE.Texture() });
@@ -113,7 +117,7 @@ for (const input of inputs) {
     const axis = point(bike.root, 'attach_fork_top').sub(point(bike.root, 'attach_front_axle_rest')).normalize();
     return { asset, bike, axis, metrics: { wheel: metric(), wheelAngle: metric(), swingAxle: metric(), shockEye: metric(), fork: metric(), rearPhysical: metric(), frontPhysical: metric() } };
   });
-  const riders = ['rider-street.glb', 'rider-street-lod.glb', 'rider-race.glb', 'rider-race-lod.glb'].map(asset => {
+  const riders = riderAssets.map(asset => {
     const bike = bikes[asset.includes('-lod') ? 1 : 0]!.bike;
     const rider = new GltfRider(documents.get(asset)!, lib); rider.attach(bike); rider.setLivery(cls);
     return { asset, rider, bike, measure: riderMeter(bike), metrics: { grip: metric(), sole: metric(), length: metric(), com: metric(), elbowBackwards: metric() } };
