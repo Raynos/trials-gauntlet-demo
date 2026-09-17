@@ -1,0 +1,169 @@
+{
+  "output": "prototypes/hero-garage/art/delivery/hero-garage-master.blend",
+  "bytes": 132003087,
+  "sha256": "723edacf39beac856eb9da44da546ab41143196f14eee95ad0ee6ca7bb22737e",
+  "assets": [
+    {
+      "kind": "rider",
+      "source": "/assets/street01-rider-delivery-lossless.glb",
+      "sha256": "73dc56a34474203f9a5abbe4a31d39d0b7399ab2c296c20c2a642f45777764fe",
+      "decodedImport": {
+        "input": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-lossless.glb",
+        "output": "/var/folders/fj/nk4z2jhn4rj0kq09f047sl180000gn/T/hero-art-import-iz51sox_/street01-rider-delivery-lossless-decoded.glb",
+        "sourceSHA256": "73dc56a34474203f9a5abbe4a31d39d0b7399ab2c296c20c2a642f45777764fe",
+        "decodedSHA256": "3e7735c903f1babada0924fb916574ef10c6548cd90cf4cabbfef63b65f5bc08",
+        "sourceBytes": 61517796,
+        "decodedBytes": 142583824,
+        "decodedBufferViews": 244,
+        "retainedBufferViews": 93,
+        "bufferViewsVerified": 337,
+        "sceneAndAccessorMetadataUnchanged": true,
+        "animations": [
+          {
+            "name": "compression",
+            "startSeconds": 0,
+            "endSeconds": 4.9666666984558105,
+            "durationSeconds": 4.9666666984558105
+          },
+          {
+            "name": "extension",
+            "startSeconds": 0,
+            "endSeconds": 4.9666666984558105,
+            "durationSeconds": 4.9666666984558105
+          },
+          {
+            "name": "forward_attack",
+            "startSeconds": 0,
+            "endSeconds": 3.9666666984558105,
+            "durationSeconds": 3.9666666984558105
+          },
+          {
+            "name": "hang_back",
+            "startSeconds": 0,
+            "endSeconds": 3.9666666984558105,
+            "durationSeconds": 3.9666666984558105
+          },
+          {
+            "name": "landing_absorption",
+            "startSeconds": 0,
+            "endSeconds": 4.9666666984558105,
+            "durationSeconds": 4.9666666984558105
+          },
+          {
+            "name": "sit_cruise",
+            "startSeconds": 0,
+            "endSeconds": 1.9666666984558105,
+            "durationSeconds": 1.9666666984558105
+          }
+        ]
+      },
+      "objects": 28,
+      "rigs": [
+        "rider_rig"
+      ]
+    },
+    {
+      "kind": "bike",
+      "source": "/assets/street01-bike-finish.glb",
+      "sha256": "212cab964c9264942d2e2b96a9790c608fe6c31a96e4adc41590177f9c78f511",
+      "decodedImport": {
+        "input": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-bike-finish.glb",
+        "output": "/var/folders/fj/nk4z2jhn4rj0kq09f047sl180000gn/T/hero-art-import-2q84obrh/street01-bike-finish-decoded.glb",
+        "sourceSHA256": "212cab964c9264942d2e2b96a9790c608fe6c31a96e4adc41590177f9c78f511",
+        "decodedSHA256": "8b50e6f583da88c40971df63e3dc2ec82c0140ea6341822acab8ef5024b757d7",
+        "sourceBytes": 5403680,
+        "decodedBytes": 6086368,
+        "decodedBufferViews": 135,
+        "retainedBufferViews": 8,
+        "bufferViewsVerified": 143,
+        "sceneAndAccessorMetadataUnchanged": true,
+        "animations": []
+      },
+      "objects": 46,
+      "rigs": []
+    }
+  ],
+  "sixClipDurationChecks": [
+    {
+      "name": "compression",
+      "catalogDurationSeconds": 4.9666666984558105,
+      "blenderDurationSeconds": 4.966666666666667
+    },
+    {
+      "name": "extension",
+      "catalogDurationSeconds": 4.9666666984558105,
+      "blenderDurationSeconds": 4.966666666666667
+    },
+    {
+      "name": "forward_attack",
+      "catalogDurationSeconds": 3.9666666984558105,
+      "blenderDurationSeconds": 3.966666666666667
+    },
+    {
+      "name": "hang_back",
+      "catalogDurationSeconds": 3.9666666984558105,
+      "blenderDurationSeconds": 3.966666666666667
+    },
+    {
+      "name": "landing_absorption",
+      "catalogDurationSeconds": 4.9666666984558105,
+      "blenderDurationSeconds": 4.966666666666667
+    },
+    {
+      "name": "sit_cruise",
+      "catalogDurationSeconds": 1.9666666984558105,
+      "blenderDurationSeconds": 1.9666666666666666
+    }
+  ],
+  "temporaryDecodedFilesCleaned": true,
+  "actions": [
+    {
+      "name": "compression",
+      "frames": [
+        0.0,
+        149.0
+      ]
+    },
+    {
+      "name": "extension",
+      "frames": [
+        0.0,
+        149.0
+      ]
+    },
+    {
+      "name": "forward_attack",
+      "frames": [
+        0.0,
+        119.0
+      ]
+    },
+    {
+      "name": "hang_back",
+      "frames": [
+        0.0,
+        119.0
+      ]
+    },
+    {
+      "name": "landing_absorption",
+      "frames": [
+        0.0,
+        149.0
+      ]
+    },
+    {
+      "name": "sit_cruise",
+      "frames": [
+        0.0,
+        59.0
+      ]
+    }
+  ],
+  "coordinateSpace": "Blender Z up, meters, +X forward. Catalog glTF Y placement converted to Blender Z.",
+  "limitations": [
+    "Consolidated imported edit/review scene; canonical exports remain component build recipes.",
+    "Studio lighting is Blender-native and not a pixel-identical match to Three.js.",
+    "Dense groom retained without reduction."
+  ]
+}

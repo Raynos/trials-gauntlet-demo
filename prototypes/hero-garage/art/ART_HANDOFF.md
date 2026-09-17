@@ -1,8 +1,14 @@
-# Art handoff — round 28
+# Art handoff — round 29
 
 This task owns Blender art and review exports. Claude + Opus own game integration. The catalog selects the provisionally accepted assets; final visual approval belongs to the user.
 
-## Current delivery
+## Current round29 delivery
+
+The catalog now selects `street01-rider-sleeve-lossless.glb` (66,121,572bytes; SHA `0d79f561139b2c8cdba9f7ba2f79909e6bcba5642e6360f588e257d5934db868`) and `street01-bike-paint.glb` (SHA `7e1ec906808165210dbdde9cd9834f516b3d7387db28ad9fddf74248844f24ab`). Sleeve recipe/source: `art/sleeve-continuity/`; bike recipe/source: `art/bike-paint/`. Both are provisionally accepted from recorded motion. The sleeve assembler uses the R28 raw candidate; canonical runner extension is in progress.
+
+`art/delivery/build_master.py` decodes compressed catalog assets with `tools/unpack-art-lossless.mjs` before Blender import. Master source is regenerated from current catalog; its report records hashes and six action duration comparisons. The previous R28 master must be regenerated for R29.
+
+## Round28 delivery baseline
 
 Catalog rider: `street01-rider-delivery-lossless.glb` (61,517,796bytes), SHA `73dc56a34474203f9a5abbe4a31d39d0b7399ab2c296c20c2a642f45777764fe`. Bike: `street01-bike-finish.glb`, SHA `212cab964c9264942d2e2b96a9790c608fe6c31a96e4adc41590177f9c78f511`. Rebuild rider with `python3 tools/build-art-delivery.py --stage 29 --execute --pack` from this prototype; see `art/delivery/REBUILD.md`. Bike source/recipe: `art/bike-finish/`. The packed rider requires EXT_meshopt_compression and MeshoptDecoder. It retains all dense geometry; no mobile performance claim. Raw reproduction is SHA-exact;12 render comparisons are byte identical.
 

@@ -35,7 +35,7 @@ def recipe(stage):
     add('cloth-finish','hoodie-finish','build.py',[ART/'hoodie-shell/hoodie-source.blend'],[ART/'hoodie-finish/cloth28-source.blend',ASSETS/'street01-cloth28-donor.glb'])
     current=ASSETS/'street01-rider-cloth28.glb'
     add('cloth-assembly','hoodie-finish','assemble.py',[rider,identity,ASSETS/'street01-cloth28-donor.glb'],[current])
-    if stage==29:
+    if stage>=29:
         add('neck-fit','cloth-neckfit-v2','build.py',[ART/'hoodie-finish/cloth28-source.blend',current],[ART/'cloth-neckfit-v2/neckfit-source.blend',ASSETS/'street01-neckfit-v2-donor.glb'])
         current=ASSETS/'street01-rider-neckfit-v2.glb'
         add('neck-assembly','cloth-neckfit-v2','assemble.py',[rider,identity,ASSETS/'street01-neckfit-v2-donor.glb'],[current])
@@ -52,13 +52,18 @@ def recipe(stage):
         add('denim-assembly','denim-refine','assemble-accepted.py',[rider,current,ASSETS/'street01-denim-refined-accepted.glb',ART/'denim-refine/source-removal-triangles.json'],[target],['--base',current,'--out',target])
     else:
         add('denim-textures','denim-texture','build.py',[rider,ART/'denim-refine/denim-accepted-source.blend',ART/'denim-refine/source-removal-triangles.json'],[ASSETS/'street01-denim-textured.glb',ART/'denim-texture/denim-textured-source.blend'])
-        target=ASSETS/'street01-rider-delivery-raw.glb'
+        target=ASSETS/('street01-rider-delivery-30-before-sleeves.glb' if stage==30 else 'street01-rider-delivery-raw.glb')
         add('denim-texture-assembly','denim-texture','assemble.py',[rider,current,ASSETS/'street01-denim-textured.glb',ART/'denim-refine/source-removal-triangles.json'],[target],['--base',current,'--out',target])
+    if stage==30:
+        current=target
+        add('sleeve-volume','sleeve-continuity','build.py',[ART/'cloth-neckfit-v2/neckfit-source.blend'],[ART/'sleeve-continuity/sleeve-source.blend',ASSETS/'street01-sleeve-donor.glb'])
+        target=ASSETS/'street01-rider-delivery-raw.glb'
+        add('sleeve-assembly','sleeve-continuity','assemble.py',[current,ASSETS/'street01-sleeve-donor.glb'],[target],['--base',current,'--out',target])
     return steps
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--stage',type=int,choices=(28,29),required=True)
+    ap.add_argument('--stage',type=int,choices=(28,29,30),required=True)
     ap.add_argument('--blender',default=os.environ.get('BLENDER') or '/Applications/Blender.app/Contents/MacOS/Blender')
     ap.add_argument('--node',default='node')
     ap.add_argument('--pack',action='store_true',help='Also write losslessly packed delivery; currently requires Blender5.2 Mac meshopt libraries.')
@@ -77,7 +82,8 @@ def main():
         generated.update(s.outputs)
     # Include transitive project helpers in the recipe manifest, even when only imported.
     helpers=sorted((ROOT/'assets/blender').glob('*.py'))+[ART/'hoodie-shell'/n for n in ('repair_annulus.py','build_hood.py','unwrap_cloth.py')]
-    if args.stage==29:helpers.append(ART/'cloth-neckfit-v2/fit.py')
+    if args.stage>=29:helpers.append(ART/'cloth-neckfit-v2/fit.py')
+    if args.stage==30:helpers.append(ART/'sleeve-continuity/fit.py')
     for p in helpers:
         if not p.is_file():missing.append(str(p))
     if blender is None:missing.append('Blender executable: '+args.blender)

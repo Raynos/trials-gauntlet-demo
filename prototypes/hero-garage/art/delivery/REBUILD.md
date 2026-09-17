@@ -30,3 +30,7 @@ Every executed run writes `art/delivery/runs/<UTC-time>-<id>/manifest.json`, per
 A successful manifest says `built-not-visually-approved`. Re-render matched views and all six clips before accepting the delivery; numeric reconstruction and lossless packing are not visual approval. Source seeds are checked unchanged at the end.
 
 Stage29 was executed successfully on September17UTC. Its raw output SHA256 exactly matched the separately assembled and reviewed R28 candidate. All12 matched Three.js PNG comparisons (six clips, full and face views) were byte identical after lossless packing. This proves reproduction and packing preservation, not final art quality.
+
+## Stage 30: accepted sleeve continuity
+
+`--stage 30` preserves the full stage29 chain, stores its result as `street01-rider-delivery-30-before-sleeves.glb`, then builds the editable sleeve source/donor and redirects matching cloth nodes into the final raw delivery. The sleeve assembler accepts explicit `--base` and `--out`. Stage29 behavior remains unchanged. The separate cloth-surface shading experiment is deliberately not included until parent visual approval.

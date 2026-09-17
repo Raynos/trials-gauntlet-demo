@@ -1,0 +1,71 @@
+{
+  "sourceHashes": {
+    "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/bike.blend": "4a4e99f9ebc03d2f42a8c774343c0fd46806b1253f3b968875d3935e34a8129b",
+    "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/bike-finish/bike-finish.blend": "e5f2ca1047082773e3e1029901a1b8bb964c2b7df0a5953eb74622a1fa8e28c0"
+  },
+  "sourceUnchanged": true,
+  "geometryTopologyHierarchyTransformsUVsExactlyUnchanged": true,
+  "materialPolygonCounts": {
+    "bodywork": 244,
+    "fork_upper": 54
+  },
+  "changes": [
+    {
+      "material": "hero_tank_paint",
+      "noiseLinksDisabled": [
+        "Noise Texture",
+        "Noise Texture.001",
+        "Noise Texture.002"
+      ],
+      "decalImageNodesRetained": [],
+      "roughness": 0.3799999952316284,
+      "metallic": 0.05999999865889549
+    },
+    {
+      "material": "hero_factory_race_field",
+      "noiseLinksDisabled": [],
+      "decalImageNodesRetained": [
+        [
+          "Image Texture",
+          "decals.png"
+        ],
+        [
+          "Image Texture.001",
+          "decals.png"
+        ]
+      ],
+      "roughness": 0.4699999988079071,
+      "metallic": 0.0
+    },
+    {
+      "material": "plate.001",
+      "noiseLinksDisabled": [
+        "Noise Texture"
+      ],
+      "decalImageNodesRetained": [
+        [
+          "Image Texture",
+          "decals.png"
+        ],
+        [
+          "Image Texture.001",
+          "decals.png"
+        ],
+        [
+          "Image Texture.002",
+          "decals.png"
+        ]
+      ],
+      "roughness": 0.4699999988079071,
+      "metallic": 0.0
+    }
+  ],
+  "sourceDecalGraphsRetained": true,
+  "outputSHA256": "7e1ec906808165210dbdde9cd9834f516b3d7387db28ad9fddf74248844f24ab",
+  "outputBytes": 5599696,
+  "limitations": [
+    "Clean paint rebaked on existing atlas footprints; logos retain original procedural projections.",
+    "Parent neutral/garage bike camera and orbit review required.",
+    "Explicit target01 appearance only; other colorway not newly authored."
+  ]
+}

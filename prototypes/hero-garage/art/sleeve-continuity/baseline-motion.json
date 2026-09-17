@@ -1,0 +1,3307 @@
+{
+  "source": "public/assets/street01-rider-art28-final.glb",
+  "sourceSHA256": "0e91958095b7df6961c6cc60eec166ac29913d929c9762305fd9fc62b25b0ad4",
+  "sampling": "Nine evenly spaced times including endpoints in each of six actual assembled GLB actions; imported at30fps. NLA tracks muted; one imported action selected at a time.",
+  "diagnosticStripping": "Only mesh references outside sweatshirt/pocket/hood and materials/textures removed for import. Accessor bytes, rig, inverse binds and all animation data unchanged.",
+  "clips": [
+    {
+      "clip": "compression",
+      "frameRange": [
+        0.0,
+        149.0
+      ],
+      "samples": [
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160442650080477,
+              "medianRadiusM": 0.03269027464438947,
+              "maximumRadiusM": 0.059423210310094815
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121205689719702,
+              "medianRadiusM": 0.032531974511324384,
+              "maximumRadiusM": 0.05203226654370659
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214444827288389
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212356336414814
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168155862018466
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235068478621542
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814384460449
+            ],
+            [
+              0.9015368223190308,
+              0.3787919878959656,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013275484088808298,
+          "hoodMinimumSignedDistanceM": 0.0013275483890327067,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.960954235559814e-09,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 880,
+              "minimumRadiusM": 0.009550975082060322,
+              "medianRadiusM": 0.03455264668805684,
+              "maximumRadiusM": 0.06613872339552188
+            },
+            "R": {
+              "sectionSamples": 854,
+              "minimumRadiusM": 0.009506919641082467,
+              "medianRadiusM": 0.03362015590512324,
+              "maximumRadiusM": 0.062081635476477416
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005010417080484331
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004995577037334442
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007240798440761864
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007303724414668977
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.28301680088043213,
+              -0.376200407743454,
+              0.7135292887687683
+            ],
+            [
+              0.9041040539741516,
+              0.3761969208717346,
+              1.2979528903961182
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014149268390610814,
+          "hoodMinimumSignedDistanceM": 0.0014149269718988222,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.1767531981282108e-09,
+          "minimumHoodTriangleArea": 5.2443387051231996e-08,
+          "nonfiniteVertices": 0,
+          "frame": 18.625
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1080,
+              "minimumRadiusM": 0.010143191798795866,
+              "medianRadiusM": 0.038848834298088705,
+              "maximumRadiusM": 0.07053008330453565
+            },
+            "R": {
+              "sectionSamples": 1040,
+              "minimumRadiusM": 0.010095165322042774,
+              "medianRadiusM": 0.03847071765990929,
+              "maximumRadiusM": 0.07050083407296001
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.00048583780881017447
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004843151255045086
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007271838840097189
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000733268796466291
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.29008492827415466,
+              -0.37517353892326355,
+              0.7251207828521729
+            ],
+            [
+              0.9037129282951355,
+              0.37517043948173523,
+              1.2712886333465576
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422317698597908,
+          "hoodMinimumSignedDistanceM": 0.0014223176748853327,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 8.234631528975295e-09,
+          "minimumHoodTriangleArea": 5.233071807858592e-08,
+          "nonfiniteVertices": 0,
+          "frame": 37.25
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1136,
+              "minimumRadiusM": 0.012761181979860285,
+              "medianRadiusM": 0.0535096281614216,
+              "maximumRadiusM": 0.10171903470379676
+            },
+            "R": {
+              "sectionSamples": 1148,
+              "minimumRadiusM": 0.01275990271874364,
+              "medianRadiusM": 0.054173454828279635,
+              "maximumRadiusM": 0.10156643984791383
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004858699394389987
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000484391232021153
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007271512877196074
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007332228124141693
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24057379364967346,
+              -0.3841038942337036,
+              0.6509419083595276
+            ],
+            [
+              0.89621901512146,
+              0.38409724831581116,
+              1.1495651006698608
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222287572920322,
+          "hoodMinimumSignedDistanceM": 0.0014222152664977727,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.037830261030029e-09,
+          "minimumHoodTriangleArea": 5.2354922104422006e-08,
+          "nonfiniteVertices": 0,
+          "frame": 55.875
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1136,
+              "minimumRadiusM": 0.012761181979860285,
+              "medianRadiusM": 0.0535096281614216,
+              "maximumRadiusM": 0.10171903470379676
+            },
+            "R": {
+              "sectionSamples": 1148,
+              "minimumRadiusM": 0.01275990271874364,
+              "medianRadiusM": 0.054173454828279635,
+              "maximumRadiusM": 0.10156643984791383
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004858699394389987
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000484391232021153
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007271512877196074
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007332228124141693
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24057379364967346,
+              -0.3841038942337036,
+              0.6509419083595276
+            ],
+            [
+              0.89621901512146,
+              0.38409724831581116,
+              1.1495651006698608
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222287572920322,
+          "hoodMinimumSignedDistanceM": 0.0014222152664977727,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.037830261030029e-09,
+          "minimumHoodTriangleArea": 5.2354922104422006e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.5
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1114,
+              "minimumRadiusM": 0.010623831498084406,
+              "medianRadiusM": 0.039307278037826396,
+              "maximumRadiusM": 0.07578298095749113
+            },
+            "R": {
+              "sectionSamples": 1078,
+              "minimumRadiusM": 0.010574269776153809,
+              "medianRadiusM": 0.03876485469830271,
+              "maximumRadiusM": 0.07562707109357861
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.00048586848424747586
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.00048429163871333003
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007271921494975686
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007332430104725063
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.27985140681266785,
+              -0.3761967718601227,
+              0.7097638845443726
+            ],
+            [
+              0.9022642374038696,
+              0.37619277834892273,
+              1.2470145225524902
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222896425053477,
+          "hoodMinimumSignedDistanceM": 0.0014222895089450339,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.944346415336959e-09,
+          "minimumHoodTriangleArea": 5.239683889375811e-08,
+          "nonfiniteVertices": 0,
+          "frame": 93.125
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 884,
+              "minimumRadiusM": 0.009588128406800307,
+              "medianRadiusM": 0.03462327982870512,
+              "maximumRadiusM": 0.06851709756534922
+            },
+            "R": {
+              "sectionSamples": 854,
+              "minimumRadiusM": 0.009543580923909098,
+              "medianRadiusM": 0.03343813236673915,
+              "maximumRadiusM": 0.06377729532747048
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004934478201903403
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000491931801661849
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007256364915519953
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007317322888411582
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.29319339990615845,
+              -0.3751313090324402,
+              0.7293018102645874
+            ],
+            [
+              0.9049062132835388,
+              0.37512725591659546,
+              1.3014405965805054
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014223145553842187,
+          "hoodMinimumSignedDistanceM": 0.0014223144645968654,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 5.152250760450169e-09,
+          "minimumHoodTriangleArea": 5.22932130564114e-08,
+          "nonfiniteVertices": 0,
+          "frame": 111.75
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.00919214786184644,
+              "medianRadiusM": 0.03275317637053599,
+              "maximumRadiusM": 0.05966604296211219
+            },
+            "R": {
+              "sectionSamples": 766,
+              "minimumRadiusM": 0.009152501147220566,
+              "medianRadiusM": 0.03270221919656122,
+              "maximumRadiusM": 0.05266985710449995
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000521542620845139
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212718388065696
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000717204122338444
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007240957347676158
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24397683143615723,
+              -0.3787873089313507,
+              0.6519995331764221
+            ],
+            [
+              0.9016519784927368,
+              0.3787843883037567,
+              1.2727941274642944
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013312853407114744,
+          "hoodMinimumSignedDistanceM": 0.0013312853975193661,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.083693538334324e-09,
+          "minimumHoodTriangleArea": 5.2371382966013504e-08,
+          "nonfiniteVertices": 0,
+          "frame": 130.375
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160442650080477,
+              "medianRadiusM": 0.03269027464438947,
+              "maximumRadiusM": 0.059423210310094815
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121205689719702,
+              "medianRadiusM": 0.032531974511324384,
+              "maximumRadiusM": 0.05203226654370659
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214444827288389
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212356336414814
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168155862018466
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235068478621542
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814384460449
+            ],
+            [
+              0.9015368223190308,
+              0.3787919878959656,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013275484088808298,
+          "hoodMinimumSignedDistanceM": 0.0013275483890327067,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.960954235559814e-09,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 149.0
+        }
+      ]
+    },
+    {
+      "clip": "extension",
+      "frameRange": [
+        0.0,
+        149.0
+      ],
+      "samples": [
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160442650080477,
+              "medianRadiusM": 0.03269027464438947,
+              "maximumRadiusM": 0.059423210310094815
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121205689719702,
+              "medianRadiusM": 0.032531974511324384,
+              "maximumRadiusM": 0.05203226654370659
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214444827288389
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212356336414814
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168155862018466
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235068478621542
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814384460449
+            ],
+            [
+              0.9015368223190308,
+              0.3787919878959656,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013275484088808298,
+          "hoodMinimumSignedDistanceM": 0.0013275483890327067,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.960954235559814e-09,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 880,
+              "minimumRadiusM": 0.009550975082060322,
+              "medianRadiusM": 0.03455264668805684,
+              "maximumRadiusM": 0.06613872339552188
+            },
+            "R": {
+              "sectionSamples": 854,
+              "minimumRadiusM": 0.009506919641082467,
+              "medianRadiusM": 0.03362015590512324,
+              "maximumRadiusM": 0.062081635476477416
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005010417080484331
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004995577037334442
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007240798440761864
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007303724414668977
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.28301680088043213,
+              -0.376200407743454,
+              0.7135292887687683
+            ],
+            [
+              0.9041040539741516,
+              0.3761969208717346,
+              1.2979528903961182
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014149268390610814,
+          "hoodMinimumSignedDistanceM": 0.0014149269718988222,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.1767531981282108e-09,
+          "minimumHoodTriangleArea": 5.2443387051231996e-08,
+          "nonfiniteVertices": 0,
+          "frame": 18.625
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 784,
+              "minimumRadiusM": 0.00931087080288085,
+              "medianRadiusM": 0.029287902133473397,
+              "maximumRadiusM": 0.07588776075895928
+            },
+            "R": {
+              "sectionSamples": 764,
+              "minimumRadiusM": 0.009271674466507795,
+              "medianRadiusM": 0.02906320161951532,
+              "maximumRadiusM": 0.05949574463368816
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004889502888545394
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.00048738205805420876
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007265455788001418
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007326888153329492
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.31463712453842163,
+              -0.3727702498435974,
+              0.7668603658676147
+            ],
+            [
+              0.9075177907943726,
+              0.37276357412338257,
+              1.3306490182876587
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222305035218596,
+          "hoodMinimumSignedDistanceM": 0.0014222305034297476,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 6.978681334020348e-09,
+          "minimumHoodTriangleArea": 5.2291489238616085e-08,
+          "nonfiniteVertices": 0,
+          "frame": 37.25
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 696,
+              "minimumRadiusM": 0.009276699417835514,
+              "medianRadiusM": 0.031998884956516024,
+              "maximumRadiusM": 0.0833719548428986
+            },
+            "R": {
+              "sectionSamples": 700,
+              "minimumRadiusM": 0.00919249610834844,
+              "medianRadiusM": 0.031434207151606205,
+              "maximumRadiusM": 0.046373512255052575
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005015560309402645
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005000487435609102
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000723983277566731
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007303286693058908
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.35565102100372314,
+              -0.36521443724632263,
+              0.8149809837341309
+            ],
+            [
+              0.9156908988952637,
+              0.3651851415634155,
+              1.4326727390289307
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014130710624158382,
+          "hoodMinimumSignedDistanceM": 0.001413041252350311,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.5363109840496609e-09,
+          "minimumHoodTriangleArea": 5.2342251935211556e-08,
+          "nonfiniteVertices": 0,
+          "frame": 55.875
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 696,
+              "minimumRadiusM": 0.009276699417835514,
+              "medianRadiusM": 0.031998884956516024,
+              "maximumRadiusM": 0.0833719548428986
+            },
+            "R": {
+              "sectionSamples": 700,
+              "minimumRadiusM": 0.00919249610834844,
+              "medianRadiusM": 0.031434207151606205,
+              "maximumRadiusM": 0.046373512255052575
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005015560309402645
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005000487435609102
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000723983277566731
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007303286693058908
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.35565102100372314,
+              -0.36521443724632263,
+              0.8149809837341309
+            ],
+            [
+              0.9156908988952637,
+              0.3651851415634155,
+              1.4326727390289307
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014130710624158382,
+          "hoodMinimumSignedDistanceM": 0.001413041252350311,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.5363109840496609e-09,
+          "minimumHoodTriangleArea": 5.2342251935211556e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.5
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 740,
+              "minimumRadiusM": 0.009158702248003386,
+              "medianRadiusM": 0.029798641374233572,
+              "maximumRadiusM": 0.08023677363108724
+            },
+            "R": {
+              "sectionSamples": 720,
+              "minimumRadiusM": 0.009124742353630278,
+              "medianRadiusM": 0.029546537405385244,
+              "maximumRadiusM": 0.054026127010977115
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004929029964841902
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004914038581773639
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007257580291479826
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007319505093619227
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.3278946280479431,
+              -0.3710252344608307,
+              0.7929545640945435
+            ],
+            [
+              0.9095439910888672,
+              0.37101519107818604,
+              1.3641107082366943
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.00142221013084054,
+          "hoodMinimumSignedDistanceM": 0.0014221967724319384,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 5.3220099555176854e-09,
+          "minimumHoodTriangleArea": 5.2372049398515753e-08,
+          "nonfiniteVertices": 0,
+          "frame": 93.125
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 888,
+              "minimumRadiusM": 0.00959301151602615,
+              "medianRadiusM": 0.03394960701358804,
+              "maximumRadiusM": 0.06898176248570034
+            },
+            "R": {
+              "sectionSamples": 854,
+              "minimumRadiusM": 0.009548400330264016,
+              "medianRadiusM": 0.03337481618948131,
+              "maximumRadiusM": 0.063972084622008
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004921045037917793
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004906337708234787
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007258979603648186
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007320630829781294
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.2950621247291565,
+              -0.3749266564846039,
+              0.732191801071167
+            ],
+            [
+              0.9050583839416504,
+              0.374922513961792,
+              1.301966667175293
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222110621631145,
+          "hoodMinimumSignedDistanceM": 0.0014222110068535763,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 5.631622405763073e-09,
+          "minimumHoodTriangleArea": 5.239717365538493e-08,
+          "nonfiniteVertices": 0,
+          "frame": 111.75
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 794,
+              "minimumRadiusM": 0.009194403098491594,
+              "medianRadiusM": 0.03286436393362631,
+              "maximumRadiusM": 0.059682906750189814
+            },
+            "R": {
+              "sectionSamples": 766,
+              "minimumRadiusM": 0.00915446490825354,
+              "medianRadiusM": 0.032717515744351985,
+              "maximumRadiusM": 0.052710408486696496
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214376142248511
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212273099459708
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007172536570578814
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007240601698867977
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24413660168647766,
+              -0.37878623604774475,
+              0.6522550582885742
+            ],
+            [
+              0.9016600847244263,
+              0.37878286838531494,
+              1.2729415893554688
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001331554725766182,
+          "hoodMinimumSignedDistanceM": 0.0013315546242358423,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 6.97695725925243e-09,
+          "minimumHoodTriangleArea": 5.240175297499639e-08,
+          "nonfiniteVertices": 0,
+          "frame": 130.375
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160442650080477,
+              "medianRadiusM": 0.03269027464438947,
+              "maximumRadiusM": 0.059423210310094815
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121205689719702,
+              "medianRadiusM": 0.032531974511324384,
+              "maximumRadiusM": 0.05203226654370659
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214444827288389
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212356336414814
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168155862018466
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235068478621542
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814384460449
+            ],
+            [
+              0.9015368223190308,
+              0.3787919878959656,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013275484088808298,
+          "hoodMinimumSignedDistanceM": 0.0013275483890327067,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.960954235559814e-09,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 149.0
+        }
+      ]
+    },
+    {
+      "clip": "forward_attack",
+      "frameRange": [
+        0.0,
+        119.0
+      ],
+      "samples": [
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 978,
+              "minimumRadiusM": 0.009966931493256458,
+              "medianRadiusM": 0.038735877132901525,
+              "maximumRadiusM": 0.06576431831156462
+            },
+            "R": {
+              "sectionSamples": 952,
+              "minimumRadiusM": 0.009920995131769,
+              "medianRadiusM": 0.03789838858525881,
+              "maximumRadiusM": 0.06572335796916842
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005090065533295274
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005075469380244613
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007225719164125621
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000728859449736774
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.2822321057319641,
+              -0.3791882395744324,
+              0.6686510443687439
+            ],
+            [
+              0.9017980694770813,
+              0.3791843354701996,
+              1.2674610614776611
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013899985933676362,
+          "hoodMinimumSignedDistanceM": 0.001389968333024072,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.3279879127731975e-09,
+          "minimumHoodTriangleArea": 5.2220864743058844e-08,
+          "nonfiniteVertices": 0,
+          "frame": 14.875
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1216,
+              "minimumRadiusM": 0.010562865494688455,
+              "medianRadiusM": 0.03793532907449474,
+              "maximumRadiusM": 0.08090912927947556
+            },
+            "R": {
+              "sectionSamples": 1182,
+              "minimumRadiusM": 0.010512662948034735,
+              "medianRadiusM": 0.03708447930804583,
+              "maximumRadiusM": 0.08092937752480965
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004693977243732661
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.00046779715921729803
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007305406033992767
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007349871448241174
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.3550800085067749,
+              -0.3674592971801758,
+              0.7083525657653809
+            ],
+            [
+              0.9577856063842773,
+              0.3674241304397583,
+              1.2413811683654785
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221706660464406,
+          "hoodMinimumSignedDistanceM": 0.001422170764960812,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.6201031489477147e-08,
+          "minimumHoodTriangleArea": 5.236172002152787e-08,
+          "nonfiniteVertices": 0,
+          "frame": 29.75
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1302,
+              "minimumRadiusM": 0.010456156030204193,
+              "medianRadiusM": 0.03647723542361324,
+              "maximumRadiusM": 0.084860434552324
+            },
+            "R": {
+              "sectionSamples": 1286,
+              "minimumRadiusM": 0.010410603886529675,
+              "medianRadiusM": 0.03638039573038363,
+              "maximumRadiusM": 0.08489822696963399
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004592793993651867
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004577397194225341
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007326717022806406
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007346043712459505
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.37883588671684265,
+              -0.3615695834159851,
+              0.7222997546195984
+            ],
+            [
+              0.9990138411521912,
+              0.3615199327468872,
+              1.2286021709442139
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422243658453226,
+          "hoodMinimumSignedDistanceM": 0.0014222438180452168,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.117188694349482e-08,
+          "minimumHoodTriangleArea": 5.238356945330365e-08,
+          "nonfiniteVertices": 0,
+          "frame": 44.625
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1302,
+              "minimumRadiusM": 0.010457166448320333,
+              "medianRadiusM": 0.03652072991841491,
+              "maximumRadiusM": 0.0848405035121835
+            },
+            "R": {
+              "sectionSamples": 1286,
+              "minimumRadiusM": 0.010411421325679944,
+              "medianRadiusM": 0.0363900852781593,
+              "maximumRadiusM": 0.08487782732970502
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.00045933827641420066
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.00045778893399983644
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007326384074985981
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007345849880948663
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.37870079278945923,
+              -0.3616030216217041,
+              0.7222188711166382
+            ],
+            [
+              0.9987894892692566,
+              0.36155372858047485,
+              1.2286794185638428
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222771860659122,
+          "hoodMinimumSignedDistanceM": 0.0014222771623866749,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.109814514920969e-08,
+          "minimumHoodTriangleArea": 5.2424610641317724e-08,
+          "nonfiniteVertices": 0,
+          "frame": 59.5
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1146,
+              "minimumRadiusM": 0.010520331301111801,
+              "medianRadiusM": 0.03879605220633421,
+              "maximumRadiusM": 0.07639895279500812
+            },
+            "R": {
+              "sectionSamples": 1120,
+              "minimumRadiusM": 0.010470914875333326,
+              "medianRadiusM": 0.03826089223504612,
+              "maximumRadiusM": 0.07641333203585254
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004807081713806838
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000479116482893005
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000728194834664464
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007342341123148799
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.33140429854393005,
+              -0.3725737929344177,
+              0.6949695944786072
+            ],
+            [
+              0.9130870699882507,
+              0.3725672662258148,
+              1.252243995666504
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222478494048119,
+          "hoodMinimumSignedDistanceM": 0.0014222478211858777,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.1132568985071614e-08,
+          "minimumHoodTriangleArea": 5.243560008684292e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.375
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 890,
+              "minimumRadiusM": 0.009545418615493932,
+              "medianRadiusM": 0.035386495262706756,
+              "maximumRadiusM": 0.0592800839979316
+            },
+            "R": {
+              "sectionSamples": 850,
+              "minimumRadiusM": 0.009502571187712886,
+              "medianRadiusM": 0.03534811039281669,
+              "maximumRadiusM": 0.058717019828233775
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215237615630031
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213661352172494
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007196316146291792
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007262410945259035
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.2608160376548767,
+              -0.3797456920146942,
+              0.6577255725860596
+            ],
+            [
+              0.9014530777931213,
+              0.3797416687011719,
+              1.2703183889389038
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001353769563138485,
+          "hoodMinimumSignedDistanceM": 0.0013537386424875564,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.903716657264784e-09,
+          "minimumHoodTriangleArea": 5.23220511359981e-08,
+          "nonfiniteVertices": 0,
+          "frame": 89.25
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 104.125
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 119.0
+        }
+      ]
+    },
+    {
+      "clip": "hang_back",
+      "frameRange": [
+        0.0,
+        119.0
+      ],
+      "samples": [
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 702,
+              "minimumRadiusM": 0.008956036848109717,
+              "medianRadiusM": 0.032289479035006466,
+              "maximumRadiusM": 0.06044414721230759
+            },
+            "R": {
+              "sectionSamples": 702,
+              "minimumRadiusM": 0.008924793748407217,
+              "medianRadiusM": 0.032236142945918776,
+              "maximumRadiusM": 0.045519743990403046
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215149722062051
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212413961999118
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007173683843575418
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007241699495352805
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.17357125878334045,
+              -0.37516385316848755,
+              0.6451783776283264
+            ],
+            [
+              0.9022720456123352,
+              0.3751595616340637,
+              1.2661927938461304
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013323602033779025,
+          "hoodMinimumSignedDistanceM": 0.0013323287384725546,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 8.78638842791347e-09,
+          "minimumHoodTriangleArea": 5.230889507327956e-08,
+          "nonfiniteVertices": 0,
+          "frame": 14.875
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 696,
+              "minimumRadiusM": 0.008942110776339426,
+              "medianRadiusM": 0.030783736217995558,
+              "maximumRadiusM": 0.0673461199541043
+            },
+            "R": {
+              "sectionSamples": 688,
+              "minimumRadiusM": 0.008902415451810449,
+              "medianRadiusM": 0.029722743423462924,
+              "maximumRadiusM": 0.0399058119255806
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215074052102864
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212947726249695
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007183776469901204
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007250352646224201
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.05948686599731445,
+              -0.3604353964328766,
+              0.6400101184844971
+            ],
+            [
+              0.9078343510627747,
+              0.3603665828704834,
+              1.2586159706115723
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013414095155894756,
+          "hoodMinimumSignedDistanceM": 0.0013414095452866093,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.1890392900907249e-08,
+          "minimumHoodTriangleArea": 5.2316345517260956e-08,
+          "nonfiniteVertices": 0,
+          "frame": 29.75
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 696,
+              "minimumRadiusM": 0.008915327650240414,
+              "medianRadiusM": 0.030624299417439438,
+              "maximumRadiusM": 0.06691136352881162
+            },
+            "R": {
+              "sectionSamples": 688,
+              "minimumRadiusM": 0.00887596789007323,
+              "medianRadiusM": 0.02952527531273085,
+              "maximumRadiusM": 0.040039933845005614
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215047858655453
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212915129959583
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007186642033047974
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007253870135173202
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.044310182332992554,
+              -0.3604564368724823,
+              0.6244240999221802
+            ],
+            [
+              0.907399594783783,
+              0.3603854477405548,
+              1.2422411441802979
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013443018542602658,
+          "hoodMinimumSignedDistanceM": 0.0013443017813861147,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.191661803421937e-08,
+          "minimumHoodTriangleArea": 5.248326410531373e-08,
+          "nonfiniteVertices": 0,
+          "frame": 44.625
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 696,
+              "minimumRadiusM": 0.008915397708577794,
+              "medianRadiusM": 0.030625333549970112,
+              "maximumRadiusM": 0.06691483573200979
+            },
+            "R": {
+              "sectionSamples": 688,
+              "minimumRadiusM": 0.008876096171552978,
+              "medianRadiusM": 0.029525931798924182,
+              "maximumRadiusM": 0.04004052551289018
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215047858655453
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212617688812315
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007186307921074331
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007253994117490947
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.0443863570690155,
+              -0.3604561984539032,
+              0.6245123744010925
+            ],
+            [
+              0.9074026942253113,
+              0.360385000705719,
+              1.2423337697982788
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013443833449855447,
+          "hoodMinimumSignedDistanceM": 0.001344352198376697,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.1955273590866399e-08,
+          "minimumHoodTriangleArea": 5.219999978775785e-08,
+          "nonfiniteVertices": 0,
+          "frame": 59.5
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 692,
+              "minimumRadiusM": 0.008794712693795625,
+              "medianRadiusM": 0.031139817127215325,
+              "maximumRadiusM": 0.06414370745092186
+            },
+            "R": {
+              "sectionSamples": 684,
+              "minimumRadiusM": 0.008574944308309183,
+              "medianRadiusM": 0.03064812020902625,
+              "maximumRadiusM": 0.03964775153415839
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214377888478339
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212854593992233
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007181165274232626
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007248269976116717
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.09551471471786499,
+              -0.3656354248523712,
+              0.6417444944381714
+            ],
+            [
+              0.904964804649353,
+              0.365595281124115,
+              1.261134147644043
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001338475150987506,
+          "hoodMinimumSignedDistanceM": 0.0013384751836369446,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.0428993693012655e-08,
+          "minimumHoodTriangleArea": 5.229018692855193e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.375
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 748,
+              "minimumRadiusM": 0.00899284378456817,
+              "medianRadiusM": 0.03255356459923022,
+              "maximumRadiusM": 0.05968097468539965
+            },
+            "R": {
+              "sectionSamples": 744,
+              "minimumRadiusM": 0.008957313405814587,
+              "medianRadiusM": 0.03248733214807406,
+              "maximumRadiusM": 0.04873033685513461
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214989650994539
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212294054217637
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007171555771492422
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007239058031700552
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.20901533961296082,
+              -0.37753501534461975,
+              0.6467416882514954
+            ],
+            [
+              0.9017353057861328,
+              0.37753069400787354,
+              1.2684650421142578
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013300349237397313,
+          "hoodMinimumSignedDistanceM": 0.0013300349040710202,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 8.304529597826965e-09,
+          "minimumHoodTriangleArea": 5.22707450660793e-08,
+          "nonfiniteVertices": 0,
+          "frame": 89.25
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 104.125
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 119.0
+        }
+      ]
+    },
+    {
+      "clip": "landing_absorption",
+      "frameRange": [
+        0.0,
+        149.0
+      ],
+      "samples": [
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160442650080477,
+              "medianRadiusM": 0.03269027464438947,
+              "maximumRadiusM": 0.059423210310094815
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121205689719702,
+              "medianRadiusM": 0.032531974511324384,
+              "maximumRadiusM": 0.05203226654370659
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214444827288389
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212356336414814
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168155862018466
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235068478621542
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814384460449
+            ],
+            [
+              0.9015368223190308,
+              0.3787919878959656,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013275484088808298,
+          "hoodMinimumSignedDistanceM": 0.0013275483890327067,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.960954235559814e-09,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 880,
+              "minimumRadiusM": 0.009550975082060322,
+              "medianRadiusM": 0.03455264668805684,
+              "maximumRadiusM": 0.06613872339552188
+            },
+            "R": {
+              "sectionSamples": 854,
+              "minimumRadiusM": 0.009506919641082467,
+              "medianRadiusM": 0.03362015590512324,
+              "maximumRadiusM": 0.062081635476477416
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005010417080484331
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004995577037334442
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007240798440761864
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007303724414668977
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.28301680088043213,
+              -0.376200407743454,
+              0.7135292887687683
+            ],
+            [
+              0.9041040539741516,
+              0.3761969208717346,
+              1.2979528903961182
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014149268390610814,
+          "hoodMinimumSignedDistanceM": 0.0014149269718988222,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.1767531981282108e-09,
+          "minimumHoodTriangleArea": 5.2443387051231996e-08,
+          "nonfiniteVertices": 0,
+          "frame": 18.625
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 764,
+              "minimumRadiusM": 0.009222560249001302,
+              "medianRadiusM": 0.02954365998555049,
+              "maximumRadiusM": 0.07768357052224449
+            },
+            "R": {
+              "sectionSamples": 742,
+              "minimumRadiusM": 0.009185486279348535,
+              "medianRadiusM": 0.02930681673385188,
+              "maximumRadiusM": 0.057296395840401956
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004903083317913115
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004888497060164809
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007262615254148841
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007323618046939373
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.31952017545700073,
+              -0.3721923828125,
+              0.7764760255813599
+            ],
+            [
+              0.9083149433135986,
+              0.37218213081359863,
+              1.3430266380310059
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014223186299204826,
+          "hoodMinimumSignedDistanceM": 0.0014223050061885623,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 6.327503018038359e-09,
+          "minimumHoodTriangleArea": 5.252640323071958e-08,
+          "nonfiniteVertices": 0,
+          "frame": 37.25
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 760,
+              "minimumRadiusM": 0.009200920462687705,
+              "medianRadiusM": 0.029765462862800317,
+              "maximumRadiusM": 0.07660685311196501
+            },
+            "R": {
+              "sectionSamples": 738,
+              "minimumRadiusM": 0.009163734331208784,
+              "medianRadiusM": 0.029476137631475583,
+              "maximumRadiusM": 0.0565312579319971
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004987437860108912
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004972424358129501
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007245522574521601
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007308140629902482
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.30742084980010986,
+              -0.37234437465667725,
+              0.7778664827346802
+            ],
+            [
+              0.9081687331199646,
+              0.3723343312740326,
+              1.3432787656784058
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014223498292267323,
+          "hoodMinimumSignedDistanceM": 0.0014223367188783698,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.8306656856648727e-09,
+          "minimumHoodTriangleArea": 5.24563543861784e-08,
+          "nonfiniteVertices": 0,
+          "frame": 55.875
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1084,
+              "minimumRadiusM": 0.012192885390738331,
+              "medianRadiusM": 0.04846010381911317,
+              "maximumRadiusM": 0.09323835642027418
+            },
+            "R": {
+              "sectionSamples": 1064,
+              "minimumRadiusM": 0.012181312468713321,
+              "medianRadiusM": 0.04774383221041272,
+              "maximumRadiusM": 0.09314899097747871
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004934828612022102
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000492037448566407
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000725642079487443
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007317899144254625
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.21542605757713318,
+              -0.3876473307609558,
+              0.6451414227485657
+            ],
+            [
+              0.8956239223480225,
+              0.3876416087150574,
+              1.1628975868225098
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222273603081703,
+          "hoodMinimumSignedDistanceM": 0.0014222273519437102,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.6267540715207098e-09,
+          "minimumHoodTriangleArea": 5.233237272573367e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.5
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 1082,
+              "minimumRadiusM": 0.011272511980161892,
+              "medianRadiusM": 0.043315741145274485,
+              "maximumRadiusM": 0.08215257742093847
+            },
+            "R": {
+              "sectionSamples": 1086,
+              "minimumRadiusM": 0.011227912383505545,
+              "medianRadiusM": 0.04082870805563117,
+              "maximumRadiusM": 0.08204206078965542
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004907057154923677
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000489259953610599
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000726248836144805
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007322791498154402
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24719777703285217,
+              -0.3806910514831543,
+              0.6812850832939148
+            ],
+            [
+              0.8994885087013245,
+              0.3806876540184021,
+              1.2143654823303223
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221618184819818,
+          "hoodMinimumSignedDistanceM": 0.0014221485248087085,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 5.462007894736064e-09,
+          "minimumHoodTriangleArea": 5.243317362264951e-08,
+          "nonfiniteVertices": 0,
+          "frame": 93.125
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 900,
+              "minimumRadiusM": 0.009604317874671652,
+              "medianRadiusM": 0.033748738547513125,
+              "maximumRadiusM": 0.07035630172071446
+            },
+            "R": {
+              "sectionSamples": 866,
+              "minimumRadiusM": 0.009559551213442161,
+              "medianRadiusM": 0.03251731145721704,
+              "maximumRadiusM": 0.06449453478079703
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0004884303198195994
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.00048692405107431114
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007266693282872438
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.000732748827431351
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.30041569471359253,
+              -0.3743384778499603,
+              0.740463137626648
+            ],
+            [
+              0.9054871797561646,
+              0.3743337392807007,
+              1.3032888174057007
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014223548350855708,
+          "hoodMinimumSignedDistanceM": 0.0014223414878618001,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.2198613316228095e-09,
+          "minimumHoodTriangleArea": 5.244078612179335e-08,
+          "nonfiniteVertices": 0,
+          "frame": 111.75
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 794,
+              "minimumRadiusM": 0.009202060828760121,
+              "medianRadiusM": 0.03283974248159714,
+              "maximumRadiusM": 0.05974594883902747
+            },
+            "R": {
+              "sectionSamples": 766,
+              "minimumRadiusM": 0.009162200527409825,
+              "medianRadiusM": 0.032749581709378014,
+              "maximumRadiusM": 0.05286258216982826
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214322591200471
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212766118347645
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007173807243816555
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007242016727104783
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.2447252869606018,
+              -0.3787808418273926,
+              0.6531966924667358
+            ],
+            [
+              0.9016902446746826,
+              0.3787774443626404,
+              1.2734824419021606
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013326723128557205,
+          "hoodMinimumSignedDistanceM": 0.0013326723115847372,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 6.7668368142043045e-09,
+          "minimumHoodTriangleArea": 5.232236932874632e-08,
+          "nonfiniteVertices": 0,
+          "frame": 130.375
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160442650080477,
+              "medianRadiusM": 0.03269027464438947,
+              "maximumRadiusM": 0.059423210310094815
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121205689719702,
+              "medianRadiusM": 0.032531974511324384,
+              "maximumRadiusM": 0.05203226654370659
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005214444827288389
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005212356336414814
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168155862018466
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235068478621542
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814384460449
+            ],
+            [
+              0.9015368223190308,
+              0.3787919878959656,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013275484088808298,
+          "hoodMinimumSignedDistanceM": 0.0013275483890327067,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.960954235559814e-09,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 149.0
+        }
+      ]
+    },
+    {
+      "clip": "sit_cruise",
+      "frameRange": [
+        0.0,
+        59.0
+      ],
+      "samples": [
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 7.375
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 14.75
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 22.125
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 29.5
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 36.875
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 44.25
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 51.625
+        },
+        {
+          "elbowSection": {
+            "L": {
+              "sectionSamples": 788,
+              "minimumRadiusM": 0.009160231635962964,
+              "medianRadiusM": 0.03269091578613878,
+              "maximumRadiusM": 0.05942395965668188
+            },
+            "R": {
+              "sectionSamples": 762,
+              "minimumRadiusM": 0.009121478086683751,
+              "medianRadiusM": 0.032531956919410444,
+              "maximumRadiusM": 0.05203289635895273
+            }
+          },
+          "cordChecks": {
+            "fitted drawcord -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005215043784119189
+            },
+            "fitted drawcord 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0005213548429310322
+            },
+            "collar eyelet -1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007168111042119563
+            },
+            "collar eyelet 1": {
+              "shirtTriangleCrossings": 0,
+              "minimumVertexDistanceM": 0.0007235442753881216
+            }
+          },
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481815576553345
+            ],
+            [
+              0.9015370607376099,
+              0.3787917196750641,
+              1.270540475845337
+            ]
+          ],
+          "shirtTriangles": 132256,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0013274203520268202,
+          "hoodMinimumSignedDistanceM": 0.001327420448245853,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 7.85901663855856e-09,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 59.0
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Triangle edge intersection counts exclude coplanar/tangent/shared-edge special cases; zero counts would not prove no containment.",
+    "Signed distance is nearest surface normal side, not watertight signed volume.",
+    "No rendered appearance/normal-map/seam-color judgment here. Source topology verifier separately covers closed boundary loops; this motion audit measures triangles and proximity."
+  ]
+}

@@ -10,8 +10,8 @@
     },
     {
       "path": "assets/catalog.json",
-      "bytes": 1198,
-      "sha256": "712bd151d8fdfc9399fe01c2c31cba64d713804fed6f9c8733c85da6f9da9990"
+      "bytes": 1192,
+      "sha256": "bdabd9655c15f6687f67728503658c93bbd946ca66be78ae5d24678284aa91b6"
     },
     {
       "path": "assets/index-B2aW2QAt.css",
@@ -24,14 +24,14 @@
       "sha256": "3573b4d70caec0891e49a2c8b2d458ba69896d041c7b4b7205371812dce3c0a8"
     },
     {
-      "path": "assets/street01-bike-finish.glb",
-      "bytes": 5403680,
-      "sha256": "212cab964c9264942d2e2b96a9790c608fe6c31a96e4adc41590177f9c78f511"
+      "path": "assets/street01-bike-paint.glb",
+      "bytes": 5599696,
+      "sha256": "7e1ec906808165210dbdde9cd9834f516b3d7387db28ad9fddf74248844f24ab"
     },
     {
-      "path": "assets/street01-rider-delivery-lossless.glb",
-      "bytes": 61517796,
-      "sha256": "73dc56a34474203f9a5abbe4a31d39d0b7399ab2c296c20c2a642f45777764fe"
+      "path": "assets/street01-rider-sleeve-lossless.glb",
+      "bytes": 66121572,
+      "sha256": "0d79f561139b2c8cdba9f7ba2f79909e6bcba5642e6360f588e257d5934db868"
     },
     {
       "path": "decoders/basis/basis_transcoder.js",
@@ -84,8 +84,8 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 72618083,
-  "sourceDistBytes": 5185772051,
+  "totalBytes": 77417869,
+  "sourceDistBytes": 5465044657,
   "excludedFiles": [
     {
       "path": "assets/basis_transcoder-VXdx5NbI.wasm",
@@ -94,6 +94,10 @@
     {
       "path": "assets/street01-bike-detail.glb",
       "bytes": 6067796
+    },
+    {
+      "path": "assets/street01-bike-finish.glb",
+      "bytes": 5403680
     },
     {
       "path": "assets/street01-bike-materials.glb",
@@ -118,6 +122,10 @@
     {
       "path": "assets/street01-cloth28-donor.glb",
       "bytes": 7298524
+    },
+    {
+      "path": "assets/street01-cotton-donor.glb",
+      "bytes": 6294096
     },
     {
       "path": "assets/street01-denim-refined-accepted.glb",
@@ -252,6 +260,10 @@
       "bytes": 175062870
     },
     {
+      "path": "assets/street01-rider-cotton-study.glb",
+      "bytes": 201257248
+    },
+    {
       "path": "assets/street01-rider-data-maps.glb",
       "bytes": 4526296
     },
@@ -262,6 +274,10 @@
     {
       "path": "assets/street01-rider-delivery-29-gloves.glb",
       "bytes": 184589412
+    },
+    {
+      "path": "assets/street01-rider-delivery-lossless.glb",
+      "bytes": 61517796
     },
     {
       "path": "assets/street01-rider-delivery-raw.glb",
@@ -339,8 +355,8 @@
   "verifiedLocalUrls": [
     "assets/index-B2aW2QAt.css",
     "assets/index-CnZ-8Pri.js",
-    "assets/street01-bike-finish.glb",
-    "assets/street01-rider-delivery-lossless.glb",
+    "assets/street01-bike-paint.glb",
+    "assets/street01-rider-sleeve-lossless.glb",
     "index.html",
     "references/target01.png",
     "references/turnaround.png"

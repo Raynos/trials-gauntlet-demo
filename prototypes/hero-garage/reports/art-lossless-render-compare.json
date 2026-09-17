@@ -1,160 +1,160 @@
 {
   "runs": [
     {
-      "file": "street01-rider-art28-final.glb",
-      "sha256": "0e91958095b7df6961c6cc60eec166ac29913d929c9762305fd9fc62b25b0ad4",
+      "file": "street01-rider-sleeve-study.glb",
+      "sha256": "49334201195bf913d1379908d047b6ddfd761839ee3522e24d5979d68c478ff2",
       "errors": [],
       "frames": [
         {
           "camera": "full",
           "clip": "compression",
-          "sha256": "317c3cb658d94627d2a31cc6ce3bdd377f8bcf55343a0b26dcebfe947d3e41fa",
-          "file": "street01-rider-art28-final.glb-full-compression.png"
+          "sha256": "b1292950d2528bf9d9108dc92a23f28b2d79cdab4bee9e1899ed0c800f6a9287",
+          "file": "street01-rider-sleeve-study.glb-full-compression.png"
         },
         {
           "camera": "full",
           "clip": "extension",
-          "sha256": "4fe2681a7169e187c3067d5616423d1109e7198949f0c01086cd75be4741b0ba",
-          "file": "street01-rider-art28-final.glb-full-extension.png"
+          "sha256": "9dcc877c1e09a051c8d9df6e9708a5bb3e1b20de7de07a984f8975ceacc04281",
+          "file": "street01-rider-sleeve-study.glb-full-extension.png"
         },
         {
           "camera": "full",
           "clip": "forward_attack",
-          "sha256": "08fc562f1ef68a912314ade6f2201eb35bf5acdc3f80356e458854ac881ffd8f",
-          "file": "street01-rider-art28-final.glb-full-forward_attack.png"
+          "sha256": "52d14453c9eb85e04b9d1d75263aa832b2c6a867d320c137858d6a860212adff",
+          "file": "street01-rider-sleeve-study.glb-full-forward_attack.png"
         },
         {
           "camera": "full",
           "clip": "hang_back",
-          "sha256": "311fe74aa8ed68b6665925a26daca08c7b1675c0639bb18f9fbd200a7ae86796",
-          "file": "street01-rider-art28-final.glb-full-hang_back.png"
+          "sha256": "58b484a81ae2b7ae4332903388576742c724f84c3437dde2abe7aa64ec8202ca",
+          "file": "street01-rider-sleeve-study.glb-full-hang_back.png"
         },
         {
           "camera": "full",
           "clip": "landing_absorption",
-          "sha256": "d1040f8b16d1edc1384b40befa151b16efd61110ba44c5fc0d740c630a6d68f8",
-          "file": "street01-rider-art28-final.glb-full-landing_absorption.png"
+          "sha256": "b5bd762c2aca81a3c5b43658b05ba2a28240b3fe37631ec3aae71c339793642b",
+          "file": "street01-rider-sleeve-study.glb-full-landing_absorption.png"
         },
         {
           "camera": "full",
           "clip": "sit_cruise",
-          "sha256": "ad6366dccb2e7071905f648b22bfd872aec8d4f6dfc9d38256941c29b0b7c36a",
-          "file": "street01-rider-art28-final.glb-full-sit_cruise.png"
+          "sha256": "65affc8fce4e3a11e997ef1c5620689c89070b6201bf70f69d23b23db66f25de",
+          "file": "street01-rider-sleeve-study.glb-full-sit_cruise.png"
         },
         {
           "camera": "face",
           "clip": "compression",
-          "sha256": "10208bc47ebd7dacf702ef4cb29ecaf4111423610797ed8905273215c6900041",
-          "file": "street01-rider-art28-final.glb-face-compression.png"
+          "sha256": "1019da3cb3f99579e5c380d3ccf27601251ee58fd780c483d2d2518874272cfd",
+          "file": "street01-rider-sleeve-study.glb-face-compression.png"
         },
         {
           "camera": "face",
           "clip": "extension",
-          "sha256": "09e2a8aec47422505bd3b1601572b32f6c929cf108b99030c5d834dc2bdf3dd3",
-          "file": "street01-rider-art28-final.glb-face-extension.png"
+          "sha256": "4fe70b06a335e0b61bc5b6243f485ef9d1f07762a87c45163d0236329452076c",
+          "file": "street01-rider-sleeve-study.glb-face-extension.png"
         },
         {
           "camera": "face",
           "clip": "forward_attack",
-          "sha256": "83cf065cb3d50009432048dbcd327b8c3634f53cdc11ce2cc49699193c6d6abe",
-          "file": "street01-rider-art28-final.glb-face-forward_attack.png"
+          "sha256": "6dc85d1576318d314b85d46dad4f53a9994979513ba9c7bbb937a3884323d652",
+          "file": "street01-rider-sleeve-study.glb-face-forward_attack.png"
         },
         {
           "camera": "face",
           "clip": "hang_back",
-          "sha256": "9b14951ba2a89f6da8c84d5756a12303a72fd1c312a3cd009f85ae3a9204529b",
-          "file": "street01-rider-art28-final.glb-face-hang_back.png"
+          "sha256": "c06e69da5c6bd7d35a829e9d16a4e548d3c5da24867d2a6b9bca60e825b06337",
+          "file": "street01-rider-sleeve-study.glb-face-hang_back.png"
         },
         {
           "camera": "face",
           "clip": "landing_absorption",
-          "sha256": "b9c2704fa4fb6e8fcf5661953061e150a1f700ad0bed89a548c04bd243f4ea08",
-          "file": "street01-rider-art28-final.glb-face-landing_absorption.png"
+          "sha256": "f6ddaf232498061a67b7890bb3483422657237cc06f4a0a3ffb49a42cb83d21e",
+          "file": "street01-rider-sleeve-study.glb-face-landing_absorption.png"
         },
         {
           "camera": "face",
           "clip": "sit_cruise",
-          "sha256": "16847e21d955f06407165f6b2032f49afdfa81afe7c585e40e79030e68e79600",
-          "file": "street01-rider-art28-final.glb-face-sit_cruise.png"
+          "sha256": "c8b435718e4cced0c74789566aad3370781ff260d7827a6ad14c01d1eb067c7c",
+          "file": "street01-rider-sleeve-study.glb-face-sit_cruise.png"
         }
       ]
     },
     {
-      "file": "street01-rider-delivery-lossless.glb",
-      "sha256": "73dc56a34474203f9a5abbe4a31d39d0b7399ab2c296c20c2a642f45777764fe",
+      "file": "street01-rider-sleeve-lossless.glb",
+      "sha256": "0d79f561139b2c8cdba9f7ba2f79909e6bcba5642e6360f588e257d5934db868",
       "errors": [],
       "frames": [
         {
           "camera": "full",
           "clip": "compression",
-          "sha256": "317c3cb658d94627d2a31cc6ce3bdd377f8bcf55343a0b26dcebfe947d3e41fa",
-          "file": "street01-rider-delivery-lossless.glb-full-compression.png"
+          "sha256": "b1292950d2528bf9d9108dc92a23f28b2d79cdab4bee9e1899ed0c800f6a9287",
+          "file": "street01-rider-sleeve-lossless.glb-full-compression.png"
         },
         {
           "camera": "full",
           "clip": "extension",
-          "sha256": "4fe2681a7169e187c3067d5616423d1109e7198949f0c01086cd75be4741b0ba",
-          "file": "street01-rider-delivery-lossless.glb-full-extension.png"
+          "sha256": "9dcc877c1e09a051c8d9df6e9708a5bb3e1b20de7de07a984f8975ceacc04281",
+          "file": "street01-rider-sleeve-lossless.glb-full-extension.png"
         },
         {
           "camera": "full",
           "clip": "forward_attack",
-          "sha256": "08fc562f1ef68a912314ade6f2201eb35bf5acdc3f80356e458854ac881ffd8f",
-          "file": "street01-rider-delivery-lossless.glb-full-forward_attack.png"
+          "sha256": "52d14453c9eb85e04b9d1d75263aa832b2c6a867d320c137858d6a860212adff",
+          "file": "street01-rider-sleeve-lossless.glb-full-forward_attack.png"
         },
         {
           "camera": "full",
           "clip": "hang_back",
-          "sha256": "311fe74aa8ed68b6665925a26daca08c7b1675c0639bb18f9fbd200a7ae86796",
-          "file": "street01-rider-delivery-lossless.glb-full-hang_back.png"
+          "sha256": "58b484a81ae2b7ae4332903388576742c724f84c3437dde2abe7aa64ec8202ca",
+          "file": "street01-rider-sleeve-lossless.glb-full-hang_back.png"
         },
         {
           "camera": "full",
           "clip": "landing_absorption",
-          "sha256": "d1040f8b16d1edc1384b40befa151b16efd61110ba44c5fc0d740c630a6d68f8",
-          "file": "street01-rider-delivery-lossless.glb-full-landing_absorption.png"
+          "sha256": "b5bd762c2aca81a3c5b43658b05ba2a28240b3fe37631ec3aae71c339793642b",
+          "file": "street01-rider-sleeve-lossless.glb-full-landing_absorption.png"
         },
         {
           "camera": "full",
           "clip": "sit_cruise",
-          "sha256": "ad6366dccb2e7071905f648b22bfd872aec8d4f6dfc9d38256941c29b0b7c36a",
-          "file": "street01-rider-delivery-lossless.glb-full-sit_cruise.png"
+          "sha256": "65affc8fce4e3a11e997ef1c5620689c89070b6201bf70f69d23b23db66f25de",
+          "file": "street01-rider-sleeve-lossless.glb-full-sit_cruise.png"
         },
         {
           "camera": "face",
           "clip": "compression",
-          "sha256": "10208bc47ebd7dacf702ef4cb29ecaf4111423610797ed8905273215c6900041",
-          "file": "street01-rider-delivery-lossless.glb-face-compression.png"
+          "sha256": "1019da3cb3f99579e5c380d3ccf27601251ee58fd780c483d2d2518874272cfd",
+          "file": "street01-rider-sleeve-lossless.glb-face-compression.png"
         },
         {
           "camera": "face",
           "clip": "extension",
-          "sha256": "09e2a8aec47422505bd3b1601572b32f6c929cf108b99030c5d834dc2bdf3dd3",
-          "file": "street01-rider-delivery-lossless.glb-face-extension.png"
+          "sha256": "4fe70b06a335e0b61bc5b6243f485ef9d1f07762a87c45163d0236329452076c",
+          "file": "street01-rider-sleeve-lossless.glb-face-extension.png"
         },
         {
           "camera": "face",
           "clip": "forward_attack",
-          "sha256": "83cf065cb3d50009432048dbcd327b8c3634f53cdc11ce2cc49699193c6d6abe",
-          "file": "street01-rider-delivery-lossless.glb-face-forward_attack.png"
+          "sha256": "6dc85d1576318d314b85d46dad4f53a9994979513ba9c7bbb937a3884323d652",
+          "file": "street01-rider-sleeve-lossless.glb-face-forward_attack.png"
         },
         {
           "camera": "face",
           "clip": "hang_back",
-          "sha256": "9b14951ba2a89f6da8c84d5756a12303a72fd1c312a3cd009f85ae3a9204529b",
-          "file": "street01-rider-delivery-lossless.glb-face-hang_back.png"
+          "sha256": "c06e69da5c6bd7d35a829e9d16a4e548d3c5da24867d2a6b9bca60e825b06337",
+          "file": "street01-rider-sleeve-lossless.glb-face-hang_back.png"
         },
         {
           "camera": "face",
           "clip": "landing_absorption",
-          "sha256": "b9c2704fa4fb6e8fcf5661953061e150a1f700ad0bed89a548c04bd243f4ea08",
-          "file": "street01-rider-delivery-lossless.glb-face-landing_absorption.png"
+          "sha256": "f6ddaf232498061a67b7890bb3483422657237cc06f4a0a3ffb49a42cb83d21e",
+          "file": "street01-rider-sleeve-lossless.glb-face-landing_absorption.png"
         },
         {
           "camera": "face",
           "clip": "sit_cruise",
-          "sha256": "16847e21d955f06407165f6b2032f49afdfa81afe7c585e40e79030e68e79600",
-          "file": "street01-rider-delivery-lossless.glb-face-sit_cruise.png"
+          "sha256": "c8b435718e4cced0c74789566aad3370781ff260d7827a6ad14c01d1eb067c7c",
+          "file": "street01-rider-sleeve-lossless.glb-face-sit_cruise.png"
         }
       ]
     }
