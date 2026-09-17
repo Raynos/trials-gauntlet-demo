@@ -1,5 +1,5 @@
 {
-  "source": "prototypes/hero-garage/public/assets/street01-rider-round33-lossless.glb",
+  "source": "assets/blender/hero-art/delivery/street01-rider-round33-lossless.glb",
   "sourceSha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a",
   "decodedSha256": "ec0a08fd24b588b34372583ace39a67ee001a12e55315cf1a2c5c611f2f74c1f",
   "exportSha256": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4",
@@ -741,5 +741,5 @@
       }
     ]
   },
-  "blenderSeconds": 17.925
+  "blenderSeconds": 14.18
 }

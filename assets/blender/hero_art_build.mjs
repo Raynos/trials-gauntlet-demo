@@ -18,18 +18,18 @@ import { glbStats } from './glb_stats.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 const BLENDER = process.env.BLENDER ?? '/Applications/Blender.app/Contents/MacOS/Blender';
-const DELIVERY = 'prototypes/hero-garage/public/assets';
+const DELIVERY = 'assets/blender/hero-art/delivery';  // byte-for-byte copies of the selection; manifest.json has the prototype paths + sha256
 const UNPACK = 'assets/blender/unpack_meshopt.mjs';
 
-/** Game outputs -> delivery selections (OPUS_HANDOFF.md "Exact selections"). */
+/** Game outputs -> delivery selections (OPUS_HANDOFF.md "Exact selections"; manifest.json in DELIVERY maps back to the prototype). */
 export const OUTPUTS = {
   'rider-street-mustard': { kind: 'rider', source: `${DELIVERY}/street01-rider-round33-lossless.glb`, compressed: true, full: { tris: 60000, draws: 8 }, lod: { tris: 8000, draws: 8 } },
-  'rider-street-charcoal': { kind: 'rider', source: `${DELIVERY}/variants/street-charcoal.glb`, compressed: true, full: { tris: 60000, draws: 8 }, lod: { tris: 8000, draws: 8 } },
-  'rider-street-openface': { kind: 'rider', source: `${DELIVERY}/variants/street-openface-remaster.glb`, compressed: true, full: { tris: 60000, draws: 8 }, lod: { tris: 8000, draws: 8 } },
-  'rider-race-bluewhite': { kind: 'rider', source: `${DELIVERY}/variants/race-bluewhite.glb`, compressed: false, full: { tris: 45000, draws: 12 }, lod: { tris: 8000, draws: 12 } },
-  'rider-race-charcoalyellow': { kind: 'rider', source: `${DELIVERY}/variants/race-charcoalyellow.glb`, compressed: false, full: { tris: 45000, draws: 12 }, lod: { tris: 8000, draws: 12 } },
-  'bike-rookie': { kind: 'bike', source: `${DELIVERY}/variants/bike-rookie-art.glb`, compressed: true, full: { tris: 33500, draws: 24 }, lod: { tris: 6000, draws: 24 } },
-  'bike-pro': { kind: 'bike', source: `${DELIVERY}/variants/bike-pro-art.glb`, compressed: true, full: { tris: 33500, draws: 24 }, lod: { tris: 6000, draws: 24 } },
+  'rider-street-charcoal': { kind: 'rider', source: `${DELIVERY}/street-charcoal.glb`, compressed: true, full: { tris: 60000, draws: 8 }, lod: { tris: 8000, draws: 8 } },
+  'rider-street-openface': { kind: 'rider', source: `${DELIVERY}/street-openface-remaster.glb`, compressed: true, full: { tris: 60000, draws: 8 }, lod: { tris: 8000, draws: 8 } },
+  'rider-race-bluewhite': { kind: 'rider', source: `${DELIVERY}/race-bluewhite.glb`, compressed: false, full: { tris: 45000, draws: 12 }, lod: { tris: 8000, draws: 12 } },
+  'rider-race-charcoalyellow': { kind: 'rider', source: `${DELIVERY}/race-charcoalyellow.glb`, compressed: false, full: { tris: 45000, draws: 12 }, lod: { tris: 8000, draws: 12 } },
+  'bike-rookie': { kind: 'bike', source: `${DELIVERY}/bike-rookie-art.glb`, compressed: true, full: { tris: 33500, draws: 24 }, lod: { tris: 6000, draws: 24 } },
+  'bike-pro': { kind: 'bike', source: `${DELIVERY}/bike-pro-art.glb`, compressed: true, full: { tris: 33500, draws: 24 }, lod: { tris: 6000, draws: 24 } },
 };
 
 const sha256 = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');

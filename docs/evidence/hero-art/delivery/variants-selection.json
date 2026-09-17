@@ -1,0 +1,43 @@
+{
+  "riders": [
+    {
+      "id": "street-charcoal",
+      "export": "street-charcoal",
+      "stills": "street-charcoal-final",
+      "motion": "street-charcoal-review",
+      "rig": "reports/street-charcoal-rig.json",
+      "masterVerification": "art/street-variants/street-charcoal-master-reopen.json"
+    },
+    {
+      "id": "street-openface",
+      "export": "street-openface-remaster",
+      "stills": "helmet-remaster-final2",
+      "motion": "helmet-remaster-motion2",
+      "rig": "reports/street-openface-remaster-rig.json",
+      "masterVerification": "art/variants/street-openface-remaster-master-reopen.json"
+    },
+    {
+      "id": "race-bluewhite",
+      "export": "race-bluewhite",
+      "stills": "race-bluewhite-final",
+      "motion": "race-bluewhite-collar-final",
+      "rig": "reports/race-bluewhite-rig-contract.json",
+      "masterVerification": "art/variants/race-bluewhite-master-reopen.json"
+    },
+    {
+      "id": "race-charcoalyellow",
+      "export": "race-charcoalyellow",
+      "stills": "race-charcoalyellow-final",
+      "motion": "race-charcoalyellow-collar-final",
+      "rig": "reports/race-charcoalyellow-rig-contract.json",
+      "masterVerification": "art/variants/race-charcoalyellow-master-reopen.json"
+    }
+  ],
+  "sourceFolders": [
+    "street-variants",
+    "race-variants",
+    "bike-variants",
+    "helmet-remaster"
+  ],
+  "review": "reports/art-round35-review.json"
+}

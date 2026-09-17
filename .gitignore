@@ -18,3 +18,6 @@ harness/out/bench/*
 .env*
 .review/
 .vercel/
+
+# Astra's editable hero-art masters: local only (also in hero-garage-variants.zip); sha256 in the README beside them
+assets/blender/hero-art/masters/*.blend

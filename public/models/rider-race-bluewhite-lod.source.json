@@ -1,5 +1,5 @@
 {
-  "source": "prototypes/hero-garage/public/assets/variants/race-bluewhite.glb",
+  "source": "assets/blender/hero-art/delivery/race-bluewhite.glb",
   "sourceSha256": "a20663e0002ef4c98ae48ccb6864540397d3a07678656c6e7b567ee12db72e91",
   "decodedSha256": "a20663e0002ef4c98ae48ccb6864540397d3a07678656c6e7b567ee12db72e91",
   "exportSha256": "401e3e9035cb3814adf8fd69ee71455bfe80e927f5b70f00fccc9b7b377a967d",
@@ -318,5 +318,5 @@
       }
     ]
   },
-  "blenderSeconds": 2
+  "blenderSeconds": 2.715
 }

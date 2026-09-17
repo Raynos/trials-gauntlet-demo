@@ -1,5 +1,5 @@
 {
-  "source": "prototypes/hero-garage/public/assets/variants/street-charcoal.glb",
+  "source": "assets/blender/hero-art/delivery/street-charcoal.glb",
   "sourceSha256": "570e2bc135aaf977c2850a7af2cbabdfeffcd0f5eae73803533886e39400d90d",
   "decodedSha256": "69c125945f6e9d9b792c8c47430afe5d1b8046e2dd1ded89a8ad6c0a236ca7c3",
   "exportSha256": "7f18c17e3933ae0e602050ccc01100b5fe206155e9002e5b88fbda9614ec9410",
@@ -511,5 +511,5 @@
       }
     ]
   },
-  "blenderSeconds": 20.637
+  "blenderSeconds": 15.766
 }

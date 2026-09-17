@@ -1,5 +1,5 @@
 {
-  "source": "prototypes/hero-garage/public/assets/variants/street-openface-remaster.glb",
+  "source": "assets/blender/hero-art/delivery/street-openface-remaster.glb",
   "sourceSha256": "f01c3abc274d457a812af51753ba1ed54e7ad979f7c60a8564c2f08f359ee7df",
   "decodedSha256": "21275ff4c9e372e334dd98f6c4344eee4bdd9998480fbc79909b7647f0ec0ece",
   "exportSha256": "9bc82a2021a7e8d7954fd761c5716f80ef66b71b9b7f38d03546300bcfb1c14b",
@@ -470,5 +470,5 @@
       }
     ]
   },
-  "blenderSeconds": 10.69
+  "blenderSeconds": 6.939
 }

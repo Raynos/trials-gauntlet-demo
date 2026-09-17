@@ -1,5 +1,5 @@
 {
-  "source": "prototypes/hero-garage/public/assets/variants/bike-pro-art.glb",
+  "source": "assets/blender/hero-art/delivery/bike-pro-art.glb",
   "sourceSha256": "187514df4677c40063856f4d5e955311820f872866f60b49c450428bcf84e48e",
   "decodedSha256": "1ec25ad166c1fc961bbc56d527911261e5b61f3eb1246d95f01c5a38776b1071",
   "exportSha256": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
@@ -128,6 +128,7 @@
     ],
     "clips": null,
     "hair": null,
+    "handFloors": null,
     "atlas": {
       "size": 2048,
       "parts": [
@@ -635,5 +636,5 @@
       }
     ]
   },
-  "blenderSeconds": 12.157
+  "blenderSeconds": 16.478
 }

@@ -1,5 +1,5 @@
 {
-  "source": "prototypes/hero-garage/public/assets/variants/race-charcoalyellow.glb",
+  "source": "assets/blender/hero-art/delivery/race-charcoalyellow.glb",
   "sourceSha256": "5a7682d8d5bb6aaa0caaa960c3eef7d9b7617e35c4b0169c8f70f6a91cac65cf",
   "decodedSha256": "5a7682d8d5bb6aaa0caaa960c3eef7d9b7617e35c4b0169c8f70f6a91cac65cf",
   "exportSha256": "efbc49a43cc1882cf925fb131b47e0496891c00f09c478220abed00e4426d9de",
@@ -162,6 +162,7 @@
       }
     },
     "hair": null,
+    "handFloors": null,
     "atlas": null
   },
   "compression": {
@@ -280,5 +281,5 @@
       }
     ]
   },
-  "blenderSeconds": 2.33
+  "blenderSeconds": 2.392
 }

@@ -1,5 +1,5 @@
 {
-  "source": "prototypes/hero-garage/public/assets/variants/bike-rookie-art.glb",
+  "source": "assets/blender/hero-art/delivery/bike-rookie-art.glb",
   "sourceSha256": "7877404ef7e9e2f5f25550a7d979b8f62e6e20774109294221a14e9877c8d9de",
   "decodedSha256": "38c0c1f22b2ac9c165403ebe0e7ea9eaf5ee060c5caffdae8426f66053e7eca4",
   "exportSha256": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
@@ -128,6 +128,7 @@
     ],
     "clips": null,
     "hair": null,
+    "handFloors": null,
     "atlas": {
       "size": 2048,
       "parts": [
@@ -635,5 +636,5 @@
       }
     ]
   },
-  "blenderSeconds": 12.028
+  "blenderSeconds": 15.879
 }

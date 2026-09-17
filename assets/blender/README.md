@@ -407,7 +407,7 @@ Lighting in previews: one 4 W/m² sun + fill, AgX; the game's own grade will dif
 
 ## Hero art from Astra's delivery (ask 43)
 
-Inputs (`prototypes/hero-garage/public/assets/`, OPUS_HANDOFF.md "Exact selections"; full sha256 in each `.source.json`):
+Inputs: `hero-art/delivery/` (byte copies of the selection; `manifest.json` has prototype paths, sha256, Astra commits):
 
 | delivery | sha256 (first 16) | output | delivered tris / MB |
 |---|---|---|---|

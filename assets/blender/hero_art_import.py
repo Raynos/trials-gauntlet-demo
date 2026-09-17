@@ -5,7 +5,7 @@ blender -b --python-exit-code 1 --python assets/blender/hero_art_import.py -- \
     [--report <out.json>] [--drop NAME ...] [--stage 0]
 
 The input is an UNCOMPRESSED glTF binary (decode EXT_meshopt_compression deliveries first with
-prototypes/hero-garage/tools/unpack-art-lossless.mjs; the Blender importer cannot read them).
+assets/blender/unpack_meshopt.mjs; the Blender importer cannot read them).
 The driver is assets/blender/hero_art_build.mjs, which also verifies and writes the source.json.
 
 Stage 0 (quick export): drop the strand groom + dead 0-triangle meshes, join meshes that share a
