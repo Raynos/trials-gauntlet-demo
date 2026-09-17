@@ -7,8 +7,9 @@
  * bike lowest, under the thumb; every tag ≥ 44 px, two per row, no scrolling), the metadata sits in a panel
  * on the RIGHT (the chosen bike's class, POWER / GRIP / WEIGHT bars and note, the outfit line, the load
  * status), badge plate top-left, ‹ MENU top-right, the gesture hint under the hero.
- * Pointer + Esc only (ask 32): a bike chip previews under the pointer (the staged hero swaps livery, no
- * track reload — ask 29) and commits on click (`trials.bikeClass`); an outfit commits on click
+ * Pointer + Esc only (ask 32): a bike chip highlights under the pointer and commits on click (`trials.bikeClass`;
+ * the staged hero swaps livery with no track reload — ask 29; the sheet follows the click, not the pointer —
+ * ask 40); an outfit commits on click
  * (`trials.riderOutfit`). The rider-model row is gone (asks 30 / 31): the Blender rider is the rider;
  * `?rider=` stays a harness / debug override. Copy states the physics v2 R3 numbers (physics.md "v2 status — R3").
  */
@@ -109,9 +110,7 @@ export const OUTFIT_SWATCH: Record<RiderOutfit, string> = {
 };
 
 export interface GarageCallbacks {
-  /** Focus moved: swap the live preview (not persisted). */
-  previewBike(b: BikeClass): void;
-  /** Confirmed: persist. */
+  /** Clicked: the staged hero swaps livery and the choice persists (ask 40: no hover preview). */
   setBike(b: BikeClass): void;
   /** Load and commit clothing; false leaves the existing outfit selected. */
   setOutfit(outfit: RiderOutfit): Promise<boolean>;
@@ -147,7 +146,7 @@ export class GarageScreen {
   private readonly hint: HTMLDivElement;
   private readonly backButton: HTMLButtonElement;
   private readonly legend: HTMLDivElement;
-  /** The bike under the pointer: the staged hero and the sheet follow it (ask 29); a click commits it. */
+  /** The bike chip under the pointer: highlighted only — the hero and the sheet follow the click (ask 40). */
   private focus: BikeClass = 'rookie';
   private current: BikeClass = 'rookie';
   private outfitFocus: RiderOutfit = DEFAULT_RIDER_OUTFIT;
@@ -232,6 +231,9 @@ export class GarageScreen {
           if (!this.canAct(el)) return;
           this.setFocus(spec.id, false);
           this.commitBike();
+        });
+        el.addEventListener('pointerleave', () => {
+          if (this.focus === spec.id) this.setFocus(this.current, false);
         });
         grid.appendChild(el);
         this.cards.set(spec.id, el);
@@ -454,12 +456,10 @@ export class GarageScreen {
 
   // -- choices --------------------------------------------------------------------------
 
-  /** The pointer moves the preview too (the staged bike swaps livery), so the player sees before they commit. */
   private setFocus(b: BikeClass, tick: boolean): void {
     const changed = b !== this.focus;
     this.focus = b;
     if (tick && changed) this.sfx.tick();
-    if (changed) this.cb.previewBike(b);
     this.paint();
   }
 
@@ -490,9 +490,9 @@ export class GarageScreen {
         ? `Could not load ${OUTFIT_LABEL[this.failedOutfit]}. Select it to retry. ${active}`
         : active;
     if (this.outfitStatus.textContent !== status) this.outfitStatus.textContent = status;
-    // The sheet: the previewed bike's class, bars, character and note (the preview follows the pointer, so the
-    // copy does too), then the outfit line. The balance hint rides as the sheet's title.
-    const spec = BIKE_SPECS[this.focus];
+    // The sheet: the chosen bike's class, bars, character and note (ask 40: it changes on click, never under
+    // the pointer), then the outfit line. The balance hint rides as the sheet's title.
+    const spec = BIKE_SPECS[this.current];
     const sheet = `<div class="gp-name" style="--tint:${spec.tint}"><b>${escapeHtml(spec.name)}</b><small>${spec.id === 'rookie' ? 'Class A' : 'Class P'}</small></div>
       <div class="gp-stats">${bar('Power', spec.power)}${bar('Grip', spec.grip)}${bar('Weight', spec.weight, spec.weightFeel)}</div>
       <div class="gp-line">${escapeHtml(spec.line)}</div>
@@ -531,8 +531,6 @@ export class GarageScreen {
 
   back(): void {
     if (!this.canAct()) return;
-    // Leaving restores the committed class if the player only browsed.
-    if (this.focus !== this.current) this.cb.previewBike(this.current);
     this.sfx.back();
     this.cb.back();
   }

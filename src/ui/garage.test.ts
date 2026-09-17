@@ -20,7 +20,7 @@ afterEach(() => {
 });
 
 function fixture() {
-  const cb = { previewBike: vi.fn(), setBike: vi.fn(), setOutfit: vi.fn<(outfit: RiderOutfit) => Promise<boolean>>().mockResolvedValue(true), back: vi.fn() };
+  const cb = { setBike: vi.fn(), setOutfit: vi.fn<(outfit: RiderOutfit) => Promise<boolean>>().mockResolvedValue(true), back: vi.fn() };
   const sfx = { tick: vi.fn(), confirm: vi.fn(), back: vi.fn() };
   const art = { whenReady: () => undefined } as unknown as ArtManifest;
   const garage = new GarageScreen(document.body, sfx as unknown as UiSfx, art, cb);
@@ -78,7 +78,6 @@ describe('garage rider outfits', () => {
     outfit('race-bluewhite').click();
     expect(cb.setOutfit).toHaveBeenCalledExactlyOnceWith('race-bluewhite');
     expect(cb.setBike).not.toHaveBeenCalled();
-    expect(cb.previewBike).not.toHaveBeenCalled();
     await vi.waitFor(() => expect(outfit('race-bluewhite').getAttribute('aria-pressed')).toBe('true'));
     expect(outfit('race-bluewhite').getAttribute('aria-pressed')).toBe('true');
   });
@@ -119,22 +118,21 @@ describe('garage rider outfits', () => {
     expect(outfit('race-bluewhite').getAttribute('aria-busy')).toBe('false');
   });
 
-  it('a bike chip previews under the pointer (once per change, no commit); Esc/back restores the committed class', () => {
+  it('a bike chip under the pointer only highlights (ask 40): the sheet and the hero change on click', () => {
     const { garage, bike, cb, hover, makeLive } = fixture();
     garage.show('rookie', 'street-mustard');
     makeLive();
     hover(bike('pro'));
-    expect(cb.previewBike).toHaveBeenCalledExactlyOnceWith('pro');
     expect(bike('pro').classList.contains('on')).toBe(true);
     expect(bike('rookie').getAttribute('aria-pressed')).toBe('true'); // still the committed class
-    expect(garage.root.querySelector('.gp-name b')?.textContent).toBe('Pro'); // the sheet follows the preview
-    hover(bike('pro')); // re-entering the same chip is not a second preview
-    expect(cb.previewBike).toHaveBeenCalledTimes(1);
-    hover(bike('rookie'), 'touch'); // a finger passing over a chip is not a hover
-    expect(cb.previewBike).toHaveBeenCalledTimes(1);
-    garage.back();
-    expect(cb.previewBike).toHaveBeenLastCalledWith('rookie');
+    expect(garage.root.querySelector('.gp-name b')?.textContent).toBe('Rookie'); // the sheet did not move
     expect(cb.setBike).not.toHaveBeenCalled();
+    bike('pro').dispatchEvent(new MouseEvent('pointerleave'));
+    expect(bike('rookie').classList.contains('on')).toBe(true); // the highlight returns to the chosen chip
+    bike('pro').click();
+    expect(cb.setBike).toHaveBeenCalledExactlyOnceWith('pro');
+    expect(garage.root.querySelector('.gp-name b')?.textContent).toBe('Pro');
+    garage.back();
     expect(cb.back).toHaveBeenCalledTimes(1);
   });
 
@@ -153,18 +151,16 @@ describe('garage rider outfits', () => {
     expect(cb.back).toHaveBeenCalledTimes(1);
   });
 
-  it('native focus (Tab) neither previews nor commits before or after the live gate', () => {
+  it('native focus (Tab) commits nothing before or after the live gate', () => {
     const { garage, outfit, bike, cb, makeLive } = fixture();
     garage.show('rookie', 'street-mustard');
     outfit('race-bluewhite').focus();
     bike('pro').focus();
     expect(cb.setOutfit).not.toHaveBeenCalled();
-    expect(cb.previewBike).not.toHaveBeenCalled();
     makeLive();
     outfit('race-bluewhite').focus();
     bike('pro').focus();
     expect(cb.setOutfit).not.toHaveBeenCalled();
-    expect(cb.previewBike).not.toHaveBeenCalled();
     expect(cb.setBike).not.toHaveBeenCalled();
   });
 
@@ -196,7 +192,6 @@ function explorer() {
   const orbit = vi.fn<(view: GarageView | null) => void>();
   const stage = vi.fn<(on: boolean) => void>();
   const cb: GarageCallbacks = {
-    previewBike: vi.fn(),
     setBike: vi.fn(),
     setOutfit: vi.fn<(outfit: RiderOutfit) => Promise<boolean>>().mockResolvedValue(true),
     back: vi.fn(),

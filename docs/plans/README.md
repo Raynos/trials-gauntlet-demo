@@ -88,6 +88,11 @@ The [game audit](../reviews/game-audit-2026-09-15.md) and separate [physics-libr
 | 09-16 | **Garage: the Classic and Img2 rider models are out** (the Blender rider is the rider; `?rider=` stays a harness override) and **the garage is pointer + Esc only** (no key rows) — asks 30–32 |
 | 09-16 | Design rounds open for the user to pick: **home screen** `assets/design/menu/round2/` (A–E) → three B Lobby variants in `round3/` (B1 Plate / B2 Strip / B3 Glass, ask 39); **continuous world-map level select** `assets/design/tracks/round4/` (A ribbon / B chart / C ascent) |
 | 09-16 | **Level select → C Ascent** (`assets/design/tracks/round4/C-ascent.jpg`, SPEC § C): one continuous world map, **pan / drag / zoom**, a subset of levels in the viewport, opens centred on the current level — ask 38 |
+| 09-16 | World map route in **biome order** (M1 on the Industrial terrace; the tier is on the pin code and the altimeter) — no doubling-back road |
+| 09-16 | **Touch / mouse only for now — no gamepad support needed** (the garage's key rows stay out) |
+| 09-16 | Garage stats sheet changes **only on click** (no hover preview) — ask 40 |
+| 09-16 | **img2 rider code is deleted outright** (not just the chip) — ask 41 |
+| 09-16 | **Main menu → B2 Strip** (`assets/design/menu/round3/B2-strip.jpg`, SPEC § B2): wide Nalati-jump strip under a big wordmark, four huge tiles (PLAY widest, amber), nothing about progress on the title menu — ask 42 |
 
 ## Parallel branch — `blender-work` (Codex Astra 6, since 2026-09-15)
 

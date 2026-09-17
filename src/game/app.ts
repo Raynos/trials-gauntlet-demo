@@ -395,7 +395,6 @@ export class App {
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
     this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb, this.art);
     this.garage = new GarageScreen(o.uiRoot, this.sfx, this.art, {
-      previewBike: (b) => this.applyBike(b, false),
       setBike: (b) => this.applyBike(b, true),
       setOutfit: (outfit) => cb.outfits!.set(outfit),
       back: () => this.goto('menu'),
