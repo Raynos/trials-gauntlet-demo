@@ -238,13 +238,13 @@ export function saveOnboarded(): void {
 const GHOST_KEY = 'trials.ghost';
 const MODEL_KEYS = { rider: 'trials.riderModel', bike: 'trials.bikeModel' } as const;
 
-export type ModelChoice = 'proc' | 'gltf' | 'img2';
+export type ModelChoice = 'proc' | 'gltf';
 
 /**
  * glTF hero is the default (MEGA_PLAN P1: procedural retired from the UI, kept as the load-failure fallback and a
  * stored 'proc' bike choice). The rider is always the Blender model (asks 30 / 31: the Classic and Img2 chips left
- * the garage); a stored 'proc' / 'img2' rider from before is read as 'gltf' so nobody stays stranded on a model with
- * no chip to leave it. `?rider=proc|img2` (main.ts) remains the harness / debug override.
+ * the garage; ask 41: the img2 code itself is gone); a stored 'proc' / 'img2' rider from before is read as 'gltf' so
+ * nobody stays stranded on a model with no chip to leave it. `?rider=proc` (main.ts) remains the harness / debug override.
  */
 export function loadModelChoice(which: 'rider' | 'bike'): ModelChoice {
   try {
@@ -257,7 +257,7 @@ export function loadModelChoice(which: 'rider' | 'bike'): ModelChoice {
 
 export function saveModelChoice(which: 'rider' | 'bike', v: ModelChoice): void {
   try {
-    store()?.setItem(MODEL_KEYS[which], which === 'bike' && v === 'img2' ? 'gltf' : v);
+    store()?.setItem(MODEL_KEYS[which], v);
   } catch {
     /* storage unavailable */
   }

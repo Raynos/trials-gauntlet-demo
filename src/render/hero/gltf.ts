@@ -14,7 +14,7 @@ import type { ByteProgress } from '../../boot/plan';
 
 export { HERO_URLS, lodUrl };
 
-export type ModelChoice = 'proc' | 'gltf' | 'img2';
+export type ModelChoice = 'proc' | 'gltf';
 export interface ModelChoices {
   riderModel: ModelChoice;
   bikeModel: ModelChoice;

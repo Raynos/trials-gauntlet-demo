@@ -205,8 +205,8 @@ function loadManifest(id: string): Plugin[] {
         const buf = item.type === 'chunk' ? Buffer.from(item.code) : Buffer.isBuffer(item.source) ? item.source : Buffer.from(item.source);
         const gz = /\.(png|webp|jpg|woff2|glb)$/.test(name) ? buf.length : gzipSync(buf).length;
         let phase: LoadItem['phase'] = 'core';
-        // Lazy chunks (the img2 rider, the review inbox sheet) are fetched on demand, never streamed by the boot.
-        if (name === 'model-catalog.json' || /^assets\/(img2Rider|inbox)-/.test(name)) phase = 'other';
+        // Lazy chunks (the review inbox sheet) are fetched on demand, never streamed by the boot.
+        if (name === 'model-catalog.json' || /^assets\/inbox-/.test(name)) phase = 'other';
         else if (/worklet/.test(name)) phase = 'audio-worklet';
         else if (/\.(glb|gltf)$/.test(name)) phase = /-lod-[a-f0-9]{16}\.glb$/.test(name) ? 'models-lod' : 'models';
         const label = /three/.test(name) ? 'three.js' : item.type === 'chunk' && item.isEntry ? 'game (index.js)' : name.replace(/^assets\//, '');

@@ -1,8 +1,8 @@
 /**
- * Headless production rider-model and outfit switching — garage round: the five outfit tags live in the GARAGE
- * only; the main menu and the pause overlay carry none (asserted here). Asks 30 / 31: the Classic / Img2 chips
- * are gone from the garage too (asserted), and a stored `trials.riderModel = img2` from before is read as the
- * Blender rider (no chip could leave it). `?rider=img2` stays the harness override and still swaps the hero.
+ * Headless production outfit switching — garage round: the five outfit tags live in the GARAGE only; the main
+ * menu and the pause overlay carry none (asserted here). Asks 30 / 31 / 41: the rider-model row is gone from the
+ * garage (asserted) and the img2 rider code is gone from the tree; a stored `trials.riderModel = img2` from before
+ * still boots and is read as the Blender rider (no chip could leave it, no code could load it).
  * Covers: every outfit tag commits `trials.riderModel = gltf` + the outfit; a run paused mid-track has no
  * cosmetic rows and the paused physics never advances while the garage's choices are applied; the played
  * frames after resume.
@@ -14,7 +14,7 @@ import type { HeroHarnessWindow } from '../hero-browser';
 import { AVAILABLE_RIDER_PRESETS } from '../../src/core/riderPresets';
 const server = await startServer({ freeze: true });
 const browser = await webkit.launch({ headless: true });
-const out = 'harness/out/blender/img2-garage-release-v4';
+const out = 'harness/out/blender/garage-outfits-v5';
 await mkdir(out, { recursive: true });
 const errors: string[] = [], missing: string[] = [];
 const checks: string[] = [];
@@ -42,14 +42,13 @@ try {
   if (await page.locator('.garage-screen [data-model], .garage-screen [data-group="rider"]').count() !== 0) throw new Error('garage still carries the rider-model row');
   checks.push('garage has no rider-model row');
   await page.screenshot({ path: `${out}/garage.png` });
-  // A stored img2 choice from before the chips left is read as the Blender rider on the next boot.
+  // A stored img2 choice from before the chips (and the code) left still boots, as the Blender rider.
   await page.evaluate(() => localStorage.setItem('trials.riderModel', 'img2'));
   await page.reload({ waitUntil: 'domcontentloaded' }); await ready();
-  if (await page.evaluate(() => (window as unknown as HeroHarnessWindow).__render.debugInfo().heroDoc.includes('rider-img2-experimental'))) throw new Error('stored img2 rider still loads without a chip to leave it');
-  checks.push('stored img2 rider reads as Blender');
-  await page.goto(`${server.url}?sw=0&rider=img2`, { waitUntil: 'domcontentloaded' }); await ready();
-  await expectModel('rider-img2-experimental');
-  checks.push('?rider=img2 harness override still swaps the hero');
+  await expectModel(' rider');
+  const storedDoc = await page.evaluate(() => (window as unknown as HeroHarnessWindow).__render.debugInfo().heroDoc);
+  if (!/ rider(-lod)?$/.test(storedDoc)) throw new Error(`stored img2 rider did not boot as the Blender rider: ${storedDoc}`);
+  checks.push('stored img2 rider boots as Blender');
   await page.goto(`${server.url}?sw=0`, { waitUntil: 'domcontentloaded' }); await ready();
   await toGarage();
   for (const p of AVAILABLE_RIDER_PRESETS) {

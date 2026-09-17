@@ -37,10 +37,10 @@ function fetchReturning(status: number, body: unknown): typeof fetch {
 
 describe('review inbox: context capture', () => {
   it('reads the reproduction state from the hook, storage and the HUD, every field a string or number', () => {
-    localStorage.setItem('trials.riderModel', 'img2');
+    localStorage.setItem('trials.riderModel', 'gltf');
     localStorage.setItem('trials.riderOutfit', 'street-mustard');
     const c = captureContext(fakeHook(), { trackName: 'Basics', device: 'touch' }, localStorage, { userAgent: 'UA/1' }, { innerWidth: 932, innerHeight: 430, devicePixelRatio: 3, location: { href: 'http://x/?review=1' } });
-    expect(c).toMatchObject({ trackId: 'b1', trackName: 'Basics', tick: 4321, runTime: 36.017, faults: 3, phase: 'riding', checkpoint: 2, bike: 'pro', seed: 7, device: 'touch', quality: 'high', dpr: 1.5, canvas: '1398×645', tier: 'high', deviceClass: 'phone', riderModel: 'img2', riderOutfit: 'street-mustard', version: '0.2.1-core', build: 'dev', ua: 'UA/1', viewport: '932×430@3', url: 'http://x/?review=1' });
+    expect(c).toMatchObject({ trackId: 'b1', trackName: 'Basics', tick: 4321, runTime: 36.017, faults: 3, phase: 'riding', checkpoint: 2, bike: 'pro', seed: 7, device: 'touch', quality: 'high', dpr: 1.5, canvas: '1398×645', tier: 'high', deviceClass: 'phone', riderModel: 'gltf', riderOutfit: 'street-mustard', version: '0.2.1-core', build: 'dev', ua: 'UA/1', viewport: '932×430@3', url: 'http://x/?review=1' });
     for (const v of Object.values(c)) expect(['string', 'number']).toContain(typeof v);
     expect(Date.parse(c.at)).not.toBeNaN();
   });

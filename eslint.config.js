@@ -11,12 +11,6 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    // Unshipped, immutable evidence emitted by img2threejs. Its upstream material
-    // schema uses any; preserve the captured artifact hash without relaxing app code.
-    files: ['assets/design/hero-targets/reconstruction/createStreetMustard.ts'],
-    rules: { '@typescript-eslint/no-explicit-any': 'off' },
-  },
-  {
     files: ['**/*.ts'],
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
     rules: {

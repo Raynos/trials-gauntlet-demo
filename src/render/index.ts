@@ -218,7 +218,6 @@ export class ThreeRenderer implements GameRenderer {
   private readonly nearestScratch: number[] = [];
   private bikeClass: BikeClass = 'rookie';
   private riderOutfit: RiderOutfit = DEFAULT_RIDER_OUTFIT;
-  private img2Factory: ((lib: MaterialLibrary) => GltfRider) | null = null;
   private riderDocumentOutfit: RiderOutfit | null = null;
   /** Parsed hero documents: the authored files and (round 13) their `-lod.glb` twins for `low` / `medium`. */
   private readonly gltf: { bike: GLTF | null; rider: GLTF | null; bikeLod: GLTF | null; riderLod: GLTF | null } = { bike: null, rider: null, bikeLod: null, riderLod: null };
@@ -469,16 +468,11 @@ export class ThreeRenderer implements GameRenderer {
    */
   setModels(m: ModelChoices, bytes?: ByteProgress): void {
     if (this.disposed) return;
-    this.models = { riderModel: m.riderModel === 'img2' ? 'img2' : m.riderModel === 'gltf' ? 'gltf' : 'proc', bikeModel: m.bikeModel === 'gltf' ? 'gltf' : 'proc' };
+    this.models = { riderModel: m.riderModel === 'gltf' ? 'gltf' : 'proc', bikeModel: m.bikeModel === 'gltf' ? 'gltf' : 'proc' };
     const want = this.models;
     const outfit = this.riderOutfit;
     this.heroLoading++;
     const run = async (): Promise<void> => {
-      if (want.riderModel === 'img2' && !this.img2Factory) {
-        const module = await import('./hero/img2Rider');
-        if (this.disposed || want !== this.models) return;
-        this.img2Factory = module.createImg2Rider;
-      }
       const url = riderUrl(outfit);
       const [bike, rider] = await Promise.all([
         want.bikeModel === 'gltf' && !this.gltf.bike
@@ -565,11 +559,6 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   private makeRider(choice: ModelChoice): HeroRider {
-    if (choice === 'img2' && this.img2Factory) {
-      const rider = this.img2Factory(this.lib);
-      rider.root.userData.img2Experiment = true;
-      return rider;
-    }
     const doc = this.riderDoc();
     if (choice !== 'gltf' || !doc) return new RiderModel(this.lib);
     const rider = new GltfRider(doc, this.lib);
@@ -595,13 +584,13 @@ export class ThreeRenderer implements GameRenderer {
   }
 
   private kindOfRider(r: HeroRider): ModelChoice {
-    return r.root.userData.img2Experiment === true ? 'img2' : r instanceof GltfRider ? 'gltf' : 'proc';
+    return r instanceof GltfRider ? 'gltf' : 'proc';
   }
 
   private applyModels(): void {
     if (this.disposed) return;
     const wantBike = this.models.bikeModel === 'gltf' && this.gltf.bike ? 'gltf' : 'proc';
-    const wantRider = this.models.riderModel === 'img2' && this.img2Factory ? 'img2' : this.models.riderModel === 'gltf' && this.gltf.rider ? 'gltf' : 'proc';
+    const wantRider = this.models.riderModel === 'gltf' && this.gltf.rider ? 'gltf' : 'proc';
     let changed = false;
     // Round 13: a tier change swaps the document (authored ↔ LOD) — same rebuild as a model change.
     const bikeStale = this.bike instanceof GltfBike && this.bike.source !== this.bikeDoc();
@@ -1318,7 +1307,7 @@ export class ThreeRenderer implements GameRenderer {
     }
   }
 
-  /** The cheap trick stays cheap: no mirror twin for a hero over 150 k triangles (the Img2 experiment's 480 k would double the frame). */
+  /** The cheap trick stays cheap: no mirror twin for a hero over 150 k triangles (a 480 k experimental rider once doubled the frame). */
   private reflectable(): boolean {
     return (this.bikeRef?.triangles ?? 0) + (this.riderRef?.triangles ?? 0) <= REFLECTION_MAX_TRIS;
   }
@@ -1931,7 +1920,7 @@ export class ThreeRenderer implements GameRenderer {
       rtPasses: writes.map((w) => `${w.name} ${w.width}×${w.height}`).join(' | '),
       shadowMap,
       heroTris: (this.bikeRef?.triangles ?? 0) + (this.riderRef?.triangles ?? 0),
-      heroDoc: `${this.bikeRef instanceof GltfBike ? (this.bikeRef.source === this.gltf.bikeLod ? 'bike-lod' : 'bike') : 'bike-proc'} ${this.riderRef?.root.userData.img2Experiment ? 'rider-img2-experimental' : this.riderRef instanceof GltfRider ? (this.riderRef.source === this.gltf.riderLod ? 'rider-lod' : 'rider') : 'rider-proc'}`,
+      heroDoc: `${this.bikeRef instanceof GltfBike ? (this.bikeRef.source === this.gltf.bikeLod ? 'bike-lod' : 'bike') : 'bike-proc'} ${this.riderRef instanceof GltfRider ? (this.riderRef.source === this.gltf.riderLod ? 'rider-lod' : 'rider') : 'rider-proc'}`,
       riderOutfit: this.riderRef && this.kindOfRider(this.riderRef) === 'gltf' ? this.riderDocumentOutfit : null,
       riderMaterialVariant: this.riderRef && this.kindOfRider(this.riderRef) === 'gltf' && this.riderDocumentOutfit ? riderPreset(this.riderDocumentOutfit).variant : null,
       heroShadow: this.lightingRig?.isHeroShadow ? 'hero-only' : 'world',
