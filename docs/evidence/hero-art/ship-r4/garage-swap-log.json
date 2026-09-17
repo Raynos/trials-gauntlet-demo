@@ -1,0 +1,566 @@
+{
+ "engine": "webkit",
+ "geom": "874x330@3",
+ "rounds": 1,
+ "holdMs": 900,
+ "sha": "0c2f866",
+ "garageEntry": "the GARAGE tile tap did not open the garage within 10 s; opened through app.goto (a finding for the menu, not this clip)",
+ "garageBoot": {
+  "outfit": "street-mustard",
+  "cls": "rookie",
+  "heroDoc": "bike rider",
+  "tier": "low",
+  "profile": "low",
+  "dpr": 1,
+  "calls": 88,
+  "tris": 286047,
+  "heroSwapHook": true
+ },
+ "bootHeroSwap": {
+  "loads": [
+   {
+    "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+    "bytes": 870440,
+    "fetchMs": 11.88000000000001,
+    "parseMs": 117.82,
+    "prepareMs": 0.6399999999999864,
+    "at": 116.86
+   },
+   {
+    "url": "models/0f0aca1ae81c2214/rider-street-openface-lod-6765b5f93710302c.glb",
+    "bytes": 1322188,
+    "fetchMs": 25.47999999999999,
+    "parseMs": 124.41999999999999,
+    "prepareMs": 0.36000000000001364,
+    "at": 117
+   },
+   {
+    "url": "models/0f0aca1ae81c2214/rider-street-openface-95f6a2eb0e0f3d91.glb",
+    "bytes": 2717272,
+    "fetchMs": 25.519999999999996,
+    "parseMs": 179.32000000000002,
+    "prepareMs": 0.19999999999998863,
+    "at": 116.96
+   },
+   {
+    "url": "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
+    "bytes": 864848,
+    "fetchMs": 25.379999999999995,
+    "parseMs": 194.36,
+    "prepareMs": 0.12000000000000455,
+    "at": 117.12
+   },
+   {
+    "url": "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
+    "bytes": 2270544,
+    "fetchMs": 25.439999999999998,
+    "parseMs": 261.5,
+    "prepareMs": 0.13999999999998636,
+    "at": 117.06
+   },
+   {
+    "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+    "bytes": 2283040,
+    "fetchMs": 26.040000000000006,
+    "parseMs": 304.72,
+    "prepareMs": 0.15999999999996817,
+    "at": 116.48
+   },
+   {
+    "url": "models/c7f50b1229b56f79/rider-street-mustard-109ad4584a21f3ac.glb",
+    "bytes": 3305688,
+    "fetchMs": 63.68000000000001,
+    "parseMs": 546.54,
+    "prepareMs": 0.20000000000004547,
+    "at": 117.16
+   },
+   {
+    "url": "models/c7f50b1229b56f79/rider-street-mustard-lod-78458d1a8d92b4d3.glb",
+    "bytes": 1608420,
+    "fetchMs": 68.38,
+    "parseMs": 598.0799999999999,
+    "prepareMs": 0.16000000000008185,
+    "at": 117.22
+   },
+   {
+    "url": "models/8ccf5deb254032f5/rider-street-charcoal-c04ab875e2a2e0b5.glb",
+    "bytes": 3176424,
+    "fetchMs": 71.58000000000001,
+    "parseMs": 685.8,
+    "prepareMs": 0.18000000000006366,
+    "at": 117.28
+   },
+   {
+    "url": "models/8ccf5deb254032f5/rider-street-charcoal-lod-8d3dc8e6f51a6eb4.glb",
+    "bytes": 1561328,
+    "fetchMs": 76.32,
+    "parseMs": 702.78,
+    "prepareMs": 0.18000000000006366,
+    "at": 117.32
+   },
+   {
+    "url": "models/739f850f433241c1/rider-race-bluewhite-ca251b8b632bc214.glb",
+    "bytes": 2153696,
+    "fetchMs": 79.16000000000001,
+    "parseMs": 725.36,
+    "prepareMs": 0.15999999999996817,
+    "at": 117.36
+   },
+   {
+    "url": "models/739f850f433241c1/rider-race-bluewhite-lod-87d274ff164ce7be.glb",
+    "bytes": 793600,
+    "fetchMs": 91.32,
+    "parseMs": 719.9,
+    "prepareMs": 0.08000000000004093,
+    "at": 117.4
+   },
+   {
+    "url": "models/e407eb0572ddfd88/rider-race-charcoalyellow-75fe31c60716ac52.glb",
+    "bytes": 2062928,
+    "fetchMs": 94.22,
+    "parseMs": 753.96,
+    "prepareMs": 0.13999999999998636,
+    "at": 117.44
+   },
+   {
+    "url": "models/e407eb0572ddfd88/rider-race-charcoalyellow-lod-307489a78ff8481e.glb",
+    "bytes": 761460,
+    "fetchMs": 97.60000000000001,
+    "parseMs": 772.26,
+    "prepareMs": 0.12000000000000455,
+    "at": 117.48
+   }
+  ],
+  "swaps": [
+   {
+    "at": 11777.9,
+    "what": "bike:gltf/rider:gltf → street-mustard/rookie",
+    "buildMs": 1.5799999999999272,
+    "firstFrameMs": 38.340000000000146,
+    "programsAdded": 3,
+    "texturesAdded": 5
+   }
+  ]
+ },
+ "bootRequests": [
+  {
+   "name": "bike-rookie.glb",
+   "bytes": 2283040
+  },
+  {
+   "name": "bike-rookie-lod.glb",
+   "bytes": 870440
+  },
+  {
+   "name": "rider-street-openface.glb",
+   "bytes": 2717272
+  },
+  {
+   "name": "rider-street-openface-lod.glb",
+   "bytes": 1322188
+  },
+  {
+   "name": "bike-pro.glb",
+   "bytes": 2270544
+  },
+  {
+   "name": "bike-pro-lod.glb",
+   "bytes": 864848
+  },
+  {
+   "name": "rider-street-mustard.glb",
+   "bytes": 3305688
+  },
+  {
+   "name": "rider-street-mustard-lod.glb",
+   "bytes": 1608420
+  },
+  {
+   "name": "rider-street-charcoal.glb",
+   "bytes": 3176424
+  },
+  {
+   "name": "rider-street-charcoal-lod.glb",
+   "bytes": 1561328
+  },
+  {
+   "name": "rider-race-bluewhite.glb",
+   "bytes": 2153696
+  },
+  {
+   "name": "rider-race-bluewhite-lod.glb",
+   "bytes": 793600
+  },
+  {
+   "name": "rider-race-charcoalyellow.glb",
+   "bytes": 2062928
+  },
+  {
+   "name": "rider-race-charcoalyellow-lod.glb",
+   "bytes": 761460
+  }
+ ],
+ "taps": [
+  {
+   "round": 1,
+   "n": 1,
+   "kind": "outfit",
+   "target": "street-mustard",
+   "combo": "street-mustard × rookie",
+   "tapMs": 13534,
+   "installMs": 12,
+   "settleMs": 12,
+   "longestGapMs": 18.7,
+   "gapsOver34": 0,
+   "gapAtInstall": null,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": []
+   },
+   "heroDoc": "bike rider",
+   "calls": 88,
+   "tris": 286047,
+   "heroTris": 92171,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 2,
+   "kind": "outfit",
+   "target": "street-openface",
+   "combo": "street-openface × rookie",
+   "tapMs": 14451,
+   "installMs": 12,
+   "settleMs": 12,
+   "longestGapMs": 18.7,
+   "gapsOver34": 0,
+   "gapAtInstall": null,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 14453.8,
+      "what": "bike:gltf/rider:gltf → street-openface/rookie",
+      "buildMs": 0.680000000000291,
+      "firstFrameMs": 7.819999999999709,
+      "programsAdded": 1,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 85,
+   "tris": 285594,
+   "heroTris": 92020,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 3,
+   "kind": "outfit",
+   "target": "race-bluewhite",
+   "combo": "race-bluewhite × rookie",
+   "tapMs": 15374,
+   "installMs": 7,
+   "settleMs": 7,
+   "longestGapMs": 18.8,
+   "gapsOver34": 0,
+   "gapAtInstall": null,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 15378.36,
+      "what": "bike:gltf/rider:gltf → race-bluewhite/rookie",
+      "buildMs": 0.8400000000001455,
+      "firstFrameMs": 8.220000000001164,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 76,
+   "tris": 241422,
+   "heroTris": 77296,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 4,
+   "kind": "outfit",
+   "target": "street-charcoal",
+   "combo": "street-charcoal × rookie",
+   "tapMs": 16311,
+   "installMs": 18,
+   "settleMs": 18,
+   "longestGapMs": 25.9,
+   "gapsOver34": 0,
+   "gapAtInstall": 15.8,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 16315.14,
+      "what": "bike:gltf/rider:gltf → street-charcoal/rookie",
+      "buildMs": 0.9800000000013824,
+      "firstFrameMs": 12.039999999999054,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 88,
+   "tris": 286047,
+   "heroTris": 92171,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 5,
+   "kind": "outfit",
+   "target": "race-charcoalyellow",
+   "combo": "race-charcoalyellow × rookie",
+   "tapMs": 17231,
+   "installMs": 16,
+   "settleMs": 16,
+   "longestGapMs": 26.4,
+   "gapsOver34": 0,
+   "gapAtInstall": 14.8,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 17235.48,
+      "what": "bike:gltf/rider:gltf → race-charcoalyellow/rookie",
+      "buildMs": 1.4000000000014552,
+      "firstFrameMs": 14.400000000001455,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 76,
+   "tris": 241422,
+   "heroTris": 77296,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 6,
+   "kind": "bike",
+   "target": "pro",
+   "combo": "race-charcoalyellow × pro",
+   "tapMs": 18162,
+   "installMs": 18,
+   "settleMs": 18,
+   "longestGapMs": 29.6,
+   "gapsOver34": 0,
+   "gapAtInstall": 17.3,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 18167.48,
+      "what": "bike:gltf/rider:gltf → race-charcoalyellow/pro",
+      "buildMs": 1.1599999999998545,
+      "firstFrameMs": 9.719999999997526,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 78,
+   "tris": 241934,
+   "heroTris": 77296,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 7,
+   "kind": "outfit",
+   "target": "street-mustard",
+   "combo": "street-mustard × pro",
+   "tapMs": 19083,
+   "installMs": 14,
+   "settleMs": 14,
+   "longestGapMs": 26.5,
+   "gapsOver34": 0,
+   "gapAtInstall": null,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 19085.72,
+      "what": "bike:gltf/rider:gltf → street-mustard/pro",
+      "buildMs": 1.2999999999992724,
+      "firstFrameMs": 14.119999999998981,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 88,
+   "tris": 286047,
+   "heroTris": 92171,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 8,
+   "kind": "outfit",
+   "target": "street-openface",
+   "combo": "street-openface × pro",
+   "tapMs": 20002,
+   "installMs": 16,
+   "settleMs": 16,
+   "longestGapMs": 25.6,
+   "gapsOver34": 0,
+   "gapAtInstall": null,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 20005.98,
+      "what": "bike:gltf/rider:gltf → street-openface/pro",
+      "buildMs": 1.1000000000021828,
+      "firstFrameMs": 9.340000000000146,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 85,
+   "tris": 285594,
+   "heroTris": 92020,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 9,
+   "kind": "outfit",
+   "target": "race-bluewhite",
+   "combo": "race-bluewhite × pro",
+   "tapMs": 20929,
+   "installMs": 18,
+   "settleMs": 18,
+   "longestGapMs": 20.6,
+   "gapsOver34": 0,
+   "gapAtInstall": 16.4,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 20933.2,
+      "what": "bike:gltf/rider:gltf → race-bluewhite/pro",
+      "buildMs": 1.2199999999975262,
+      "firstFrameMs": 10.919999999998254,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 76,
+   "tris": 241422,
+   "heroTris": 77296,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 10,
+   "kind": "outfit",
+   "target": "street-charcoal",
+   "combo": "street-charcoal × pro",
+   "tapMs": 21853,
+   "installMs": 10,
+   "settleMs": 10,
+   "longestGapMs": 20.5,
+   "gapsOver34": 0,
+   "gapAtInstall": null,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 21856.46,
+      "what": "bike:gltf/rider:gltf → street-charcoal/pro",
+      "buildMs": 1.139999999999418,
+      "firstFrameMs": 7.419999999998254,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 88,
+   "tris": 286047,
+   "heroTris": 92171,
+   "tier": "low"
+  },
+  {
+   "round": 1,
+   "n": 11,
+   "kind": "outfit",
+   "target": "race-charcoalyellow",
+   "combo": "race-charcoalyellow × pro",
+   "tapMs": 22782,
+   "installMs": 15,
+   "settleMs": 15,
+   "longestGapMs": 18.7,
+   "gapsOver34": 0,
+   "gapAtInstall": 15.1,
+   "requests": [],
+   "bytes": 0,
+   "heroSwap": {
+    "loads": [],
+    "swaps": [
+     {
+      "at": 22785.64,
+      "what": "bike:gltf/rider:gltf → race-charcoalyellow/pro",
+      "buildMs": 1.2000000000007276,
+      "firstFrameMs": 5.06000000000131,
+      "programsAdded": 0,
+      "texturesAdded": 0
+     }
+    ]
+   },
+   "heroDoc": "bike rider",
+   "calls": 76,
+   "tris": 241422,
+   "heroTris": 77296,
+   "tier": "low"
+  }
+ ],
+ "errors": [],
+ "clip": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/garage-swap-clip/ship-r4/clip.webm",
+ "mp4": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/garage-swap-clip/ship-r4/clip.mp4",
+ "sheet": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/garage-swap-clip/ship-r4/sheet.jpg",
+ "summary": [
+  "round 1: 11 taps, install median 15 ms / max 18 ms, longest gap median 20.6 ms / max 29.6 ms, 0 requests / 0.0 MB"
+ ]
+}
