@@ -34,7 +34,7 @@ import { parseBenchParams } from './game/bench';
 import { resolveBoot } from './game/flow';
 import { registerServiceWorker } from './game/pwa';
 import { getTrack } from './tracks';
-import { ArtManifest, BestTimes, DomHud, injectStyles, loadModelChoice, type ModelChoice } from './ui';
+import { ArtManifest, BestTimes, DomHud, injectStyles, loadModelChoice, menuPlate, type ModelChoice } from './ui';
 import { nextPaint } from './ui/loader';
 import { takeBootPlan } from './boot/handoff';
 import { streamBytes } from './boot/stream';
@@ -284,7 +284,7 @@ function boot(): void {
         // Key art is background: streamed into the browser cache with its bytes on the `after` list, never awaited
         // (the menu's CSS background finishes the download on its own and hot-swaps the plate in).
         void art.load().then(() => {
-          const key = art.keyart('industrial');
+          const key = menuPlate(art); // the B2 menu's Nalati strip (ask 42), not a biome plate
           if (key) streamBytes(key.src, (_d, got, total) => plan.after('keyArt', got, total), key.bytes ?? 0).catch(() => undefined);
         });
         const shell = new App({

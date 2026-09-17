@@ -2,9 +2,9 @@
  "generatedAt": "2026-09-14T17:04:39.105Z",
  "generator": "OpenAI image generation via Codex CLI; optimised with ImageMagick + cwebp + pngquant + oxipng",
  "counts": {
-  "total": 120,
+  "total": 122,
   "byFolder": {
-   "menu": 48,
+   "menu": 50,
    "world": 36,
    "plates": 10,
    "icons": 10,
@@ -13,14 +13,14 @@
   }
  },
  "bytesByFolder": {
-  "menu": 3774584,
+  "menu": 4108516,
   "world": 1647682,
   "plates": 418176,
   "icons": 141816,
-  "root": 115027,
+  "og.jpg": 115027,
   "thumbs": 390494
  },
- "totalBytes": 6487779,
+ "totalBytes": 6821711,
  "menuCritical": {
   "note": "first menu screen: key art, wordmark plate, tier + track cards, medals",
   "count": 33,
@@ -1608,6 +1608,30 @@
    "bytes": 33760,
    "src": "thumbs.mts",
    "prompt": ""
+  },
+  {
+   "id": "keyart-nalati-1920",
+   "path": "art/menu/keyart-nalati-1920.webp",
+   "kind": "keyart",
+   "biome": "nalati",
+   "variant": "2x",
+   "w": 1920,
+   "h": 800,
+   "bytes": 236120,
+   "src": "keyart-nalati",
+   "prompt": "Clean crisp saturated game render, no text except one NORDVIK fence banner, no UI, no letterbox. Midday in the Nalati grassland: a Xinjiang-style alpine steppe, rolling bright green meadow with wildflowers, a dirt trials line, dark spruce at the treeline, two white yurts on a far ridge, snow-capped Tian Shan peaks, a huge blue sky with towering cumulus, a small lake in the valley. Hero: the garage rider (blue-and-white tank trials bike, charcoal hoodie, open-face helmet with a peak, blue jeans) mid-air off a grassy kicker flying left to right, huge in the right two-thirds of the frame, dirt and grass spraying from the rear wheel; the left 38 % open sky and peaks for a title. Camera low, three-quarter front, tracking."
+  },
+  {
+   "id": "keyart-nalati-960",
+   "path": "art/menu/keyart-nalati-960.webp",
+   "kind": "keyart",
+   "biome": "nalati",
+   "variant": "1x",
+   "w": 960,
+   "h": 400,
+   "bytes": 97812,
+   "src": "keyart-nalati",
+   "prompt": "Clean crisp saturated game render, no text except one NORDVIK fence banner, no UI, no letterbox. Midday in the Nalati grassland: a Xinjiang-style alpine steppe, rolling bright green meadow with wildflowers, a dirt trials line, dark spruce at the treeline, two white yurts on a far ridge, snow-capped Tian Shan peaks, a huge blue sky with towering cumulus, a small lake in the valley. Hero: the garage rider (blue-and-white tank trials bike, charcoal hoodie, open-face helmet with a peak, blue jeans) mid-air off a grassy kicker flying left to right, huge in the right two-thirds of the frame, dirt and grass spraying from the rear wheel; the left 38 % open sky and peaks for a title. Camera low, three-quarter front, tracking."
   }
  ]
 }

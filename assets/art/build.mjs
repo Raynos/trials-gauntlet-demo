@@ -45,9 +45,10 @@ function record(id, rel, kind, tags, name) {
 }
 
 // --- encoders -------------------------------------------------------------------------------------
-function webp(inFile, outRel, { w, q = 80, extra = [] } = {}) {
+function webp(inFile, outRel, { w, q = 80, extra = [], crop } = {}) {
   const t = join(tmp, 'w.png');
   const args = [inFile, '-strip'];
+  if (crop) args.push('-crop', crop, '+repage'); // selection.json `crop` (WxH+X+Y): the menu strip plate is a 2.4:1 cut of its raw
   if (w) args.push('-filter', 'Lanczos', '-resize', `${w}x`);
   args.push(...extra, 'PNG32:' + t);
   sh('magick', args);
@@ -131,10 +132,10 @@ function alphaFadeBottom(inFile, outPng, frac = 0.22) {
 
 // --- 1. menu ----------------------------------------------------------------------------------------
 for (const id of sel.keyart) {
-  const { file, name } = src(id);
-  webp(file, `menu/${id}-1920.webp`, { w: 1920, q: 82 });
+  const { file, name, hint } = src(id);
+  webp(file, `menu/${id}-1920.webp`, { w: 1920, q: hint.q ?? 82, crop: hint.crop });
   record(`${id}-1920`, `menu/${id}-1920.webp`, 'keyart', { biome: jobByName[name].biome, variant: '2x' }, name);
-  webp(file, `menu/${id}-960.webp`, { w: 960, q: 80 });
+  webp(file, `menu/${id}-960.webp`, { w: 960, q: hint.q ?? 80, crop: hint.crop });
   record(`${id}-960`, `menu/${id}-960.webp`, 'keyart', { biome: jobByName[name].biome, variant: '1x' }, name);
 }
 {

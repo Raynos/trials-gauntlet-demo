@@ -312,11 +312,21 @@ async function checkPlayReveal(page: Page, flow: string, g: Geom): Promise<void>
     const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
     let o = 1;
     for (let e = hit; e && e !== document.body; e = e.parentElement) { const cs = getComputedStyle(e); o *= parseFloat(cs.opacity) || 0; }
-    return { live: !!(hit && hit.closest('.live') && play.contains(hit)), opacity: o, ticker: getComputedStyle(document.querySelector('.menu-ticker')).pointerEvents };
-  })()`) as { live: boolean; opacity: number; ticker: string };
+    // Ask 42 (menu round 3 B2 "Strip"): the title menu leaks nothing — every word on the screen, the build stamp aside,
+    // and the four action tiles' heights (≥ 72 px on both phone geometries; the user's rule for this round).
+    const stamp = (document.querySelector('.menu-build') || {}).textContent || '';
+    const text = (document.querySelector('.menu-screen').innerText || '').toUpperCase().split(stamp.trim().toUpperCase()).join(' ').replace(/\\s+/g, ' ').trim(); // innerText: the CSS upper-cases everything
+    const tiles = {};
+    for (const b of document.querySelectorAll('.menu-screen .menu-item:not(.minor)')) tiles[b.dataset.id] = Math.round(b.getBoundingClientRect().height);
+    return { live: !!(hit && hit.closest('.live') && play.contains(hit)), opacity: o, text, tiles, gone: document.querySelectorAll('.menu-ticker, .menu-chip').length };
+  })()`) as { live: boolean; opacity: number; text: string; tiles: Record<string, number>; gone: number };
   expect(after.live && after.opacity >= 0.5, flow, 'R6-play-live-after-reveal', `PLAY not live once the menu is: ${JSON.stringify(after)}`);
-  expect(after.ticker === 'none', flow, 'ticker-not-tappable', `ticker pointer-events = ${after.ticker}`);
-  // The band is in the bottom quarter on every geometry (the thumb arc): PLAY's centre below 70 % of the height.
+  expect(after.gone === 0, flow, 'menu-no-ticker-chip', `the best-times ticker / bike chip are still in the menu DOM`);
+  expect(after.text === 'TRIALS GAUNTLET TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS', flow, 'menu-no-leak', `menu text is "${after.text}" — expected the title, the badge and the five actions only`);
+  expect(!/\d+:\d\d|\d+\s*\/\s*\d+|cleared|up next|last|session|best|rookie|pro bike|medal/i.test(after.text), flow, 'menu-no-progress', `progress words on the title menu: "${after.text}"`);
+  for (const id of ['play', 'garage', 'review', 'settings']) expect((after.tiles[id] ?? 0) >= 72, flow, 'menu-tile-72', `${id} tile is ${after.tiles[id]} px tall (< 72)`);
+  log(`menu tiles ${JSON.stringify(after.tiles)}`);
+  // The band is in the bottom third on every geometry (the thumb arc): PLAY's centre below 70 % of the height.
   const cy = await centre(page, '.menu-screen.live .menu-item[data-id=play]');
   expect(cy && cy.y > g.height * 0.7, flow, 'band-low', `PLAY centre at y=${cy?.y.toFixed(0)} of ${g.height}`);
   await page.waitForTimeout(300);

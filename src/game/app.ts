@@ -390,7 +390,7 @@ export class App {
       },
     };
 
-    this.menu = new MainMenuScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state);
+    this.menu = new MainMenuScreen(o.uiRoot, this.sfx, this.art, cb); // the title menu reads no state (ask 42: it leaks nothing)
     this.tracksScreen = new TrackSelectScreen(o.uiRoot, this.sfx, this.art, cb, bestOf, state, (id, bike) => this.bestTimes.board(id, bike));
     this.settings = new SettingsScreen(o.uiRoot, this.sfx, cb, state);
     this.credits = new CreditsScreen(o.uiRoot, this.sfx, cb, this.art);
@@ -466,7 +466,6 @@ export class App {
       quit: () => this.quit('pause:quit'),
     });
     mountRotatePrompt(o.uiRoot);
-    this.menu.setTracks(shipTracks(this.tracks, o.dev ?? false));
     this.bench = o.bench
       ? new Bench(
           o.uiRoot,
@@ -972,7 +971,6 @@ export class App {
       setTimeout(() => this.audio?.setMasterVolume(vol), 60);
     }
     this.o.onBikeChange?.(b);
-    this.menu.setBike(b);
   }
 
   // -- telemetry ------------------------------------------------------------------

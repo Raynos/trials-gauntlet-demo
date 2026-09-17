@@ -1,0 +1,1 @@
+Saved: [assets/design/menu/round3/build/nalati-plate.png](/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/design/menu/round3/build/nalati-plate.png) — 1536 × 1024 PNG.

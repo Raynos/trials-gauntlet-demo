@@ -109,47 +109,49 @@ export const FRONT_CSS = /* css */ `
 
 @keyframes pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 
-/* ---- main menu: direction B "Broadcast" (assets/design/menu/SPEC.md §B) ---- */
-/* Boot lands here (no title step). Key art full-bleed over the live scene; every control in the lower-third band. */
-.menu-screen { --tab-h: clamp(52px, calc(15 * var(--vh)), 92px); --ticker-h: clamp(24px, calc(6.5 * var(--vh)), 30px); }
-.menu-keyart { position: absolute; inset: 0; pointer-events: none; background-size: cover; background-position: 50% 10%; opacity: 0; transform: scaleX(-1); transition: opacity var(--t3) var(--ease); }
+/* ---- main menu: round 3 B2 "Strip" (assets/design/menu/round3/SPEC.md § B2, ask #42) ---- */
+/* Boot lands here (no title step). The Lobby split turned sideways: the Nalati jump as a wide strip across the top, the
+   big two-line title over its sky, one charcoal band of four huge tiles along the bottom (the thumb arc from either
+   corner: GARAGE under the left thumb, PLAY under the right). Nothing on the screen states progress, a track, a time or
+   a bike class: it is the title menu. The band is: --tile-h of tiles, a 44 px CREDITS row under GARAGE, the home inset. */
+.menu-screen { --tile-h: clamp(72px, calc(22 * var(--vh)), 132px); --credits-h: 44px; --band-h: calc(var(--s3) + var(--tile-h) + var(--credits-h) + var(--sab)); }
+.menu-keyart { position: absolute; left: 0; right: 0; top: 0; bottom: var(--band-h); pointer-events: none; background-size: cover; background-position: 50% 50%; transform-origin: 50% 35%; opacity: 0; transition: opacity var(--t3) var(--ease); }
 .menu-keyart.loaded { opacity: 1; animation: kenburns 28s var(--ease) infinite alternate; }
-@keyframes kenburns { from { transform: scaleX(-1) scale(1); } to { transform: scaleX(-1) scale(1.06); } }
-.menu-keyart::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6,7,9,.42), transparent 28%, transparent 72%, rgba(6,7,9,.55)); }
-/* Badge plate top-left: the wordmark on a dark slanted plate with an amber leading edge, the build stamp tiny under it. */
-.menu-badge { position: absolute; left: calc(var(--s4) + var(--sal)); top: calc(var(--s4) + var(--sat)); display: flex; flex-direction: column; align-items: flex-start; gap: var(--s1); pointer-events: none; }
-.menu-plate { background: rgba(9,11,15,.92); box-shadow: inset 5px 0 0 var(--amber), 0 6px 20px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); padding: .3em 1.5em .25em 1em; font-size: clamp(1.6rem, calc(3.4 * var(--vw)), 2.6rem); }
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.05); } }
+/* A light hand: the sky reads at the left for the title, the meadow darkens a touch toward the band. */
+.menu-keyart::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,7,9,.28), transparent 45%), linear-gradient(180deg, transparent 70%, rgba(6,7,9,.35)); }
+/* The head: the title large in two lines of the display face (near-white, outlined for the clouds) over the strip's
+   sky, then the badge plate — the same slanted plate as before, smaller — and the build stamp under it. */
+.menu-head { position: absolute; left: calc(var(--s5) + var(--sal)); top: calc(var(--s3) + var(--sat)); display: flex; flex-direction: column; align-items: flex-start; gap: var(--s2); pointer-events: none; }
+.menu-title { display: flex; flex-direction: column; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(2.4rem, calc(16 * var(--vh)), 7.5rem); line-height: .82; text-transform: uppercase; letter-spacing: -.01em; color: var(--ink); text-shadow: var(--outline-heavy); }
+.menu-title span:last-child { padding-left: .06em; }
+.menu-badge { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s1); pointer-events: none; }
+.menu-plate { background: rgba(9,11,15,.92); box-shadow: inset 5px 0 0 var(--amber), 0 6px 20px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); padding: .3em 1.5em .25em 1em; font-size: clamp(.95rem, calc(2 * var(--vw)), 1.45rem); }
 .menu-plate .wordmark { font-size: 1em; line-height: .9; white-space: nowrap; filter: drop-shadow(0 .03em 0 #6b3a05) drop-shadow(0 .05em .04em rgba(0,0,0,.5)); }
 .menu-build { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ink); opacity: .55; text-shadow: var(--outline); padding-left: .4rem; font-variant-numeric: tabular-nums; }
-/* Bike-class chip top-right: information, not a control (the Garage tab changes it). */
-.menu-chip { position: absolute; right: calc(var(--s4) + var(--sar)); top: calc(var(--s4) + var(--sat)); display: inline-flex; align-items: center; gap: .6em; min-height: 32px; padding: 0 1.1em 0 1em; background: rgba(9,11,15,.88); clip-path: polygon(.5em 0, 100% 0, calc(100% - .5em) 100%, 0 100%); font-size: .78rem; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--ink); pointer-events: none; }
-.menu-chip i { width: .55em; height: .55em; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: pulse 1.6s ease-in-out infinite; }
-/* Lower third: the slab, an amber top edge, the tabs; the ticker sits in its bottom strip. */
-.menu-band { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--tab-h) + var(--ticker-h) + var(--sab)); padding: 0 calc(var(--s4) + var(--sar)) calc(var(--ticker-h) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); background: linear-gradient(180deg, rgba(9,11,15,.84), rgba(9,11,15,.95)); border-top: 2px solid var(--amber); box-shadow: 0 -14px 34px rgba(0,0,0,.4); display: flex; align-items: stretch; }
-.menu-list.tabs { position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--s6); width: 100%; height: var(--tab-h); }
-#ui .menu-item { position: relative; display: flex; flex-direction: row; align-items: center; justify-content: center; min-height: 44px; min-width: 88px; padding: 0 var(--s4); border: 0; background: transparent; cursor: pointer; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1.7rem, calc(4.2 * var(--vw)), 2.6rem); line-height: 1; text-transform: uppercase; letter-spacing: .005em; color: var(--ink-dim); transition: color var(--t1) var(--ease); }
+/* The band: charcoal, one amber top edge, the tile row; CREDITS lives in the row below the tiles (a full 44 px target). */
+.menu-band { position: absolute; left: 0; right: 0; bottom: 0; height: var(--band-h); padding: var(--s3) calc(var(--s4) + var(--sar)) 0 calc(var(--s4) + var(--sal)); background: linear-gradient(180deg, #14171d, #0c0e12); border-top: 2px solid var(--amber); box-shadow: 0 -14px 34px rgba(0,0,0,.4); }
+.menu-list.tiles { position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--s3); width: 100%; max-width: 1400px; margin: 0 auto; height: var(--tile-h); }
+.menu-list.tiles .menu-bar { display: none; }
+#ui .menu-item { position: relative; flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .1em; min-height: 44px; min-width: 88px; padding: 0 var(--s3); border: 1px solid rgba(255,255,255,.08); border-radius: var(--r2); background: rgba(255,255,255,.05); cursor: pointer; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1.5rem, calc(4.4 * var(--vw)), 3rem); line-height: .9; text-transform: uppercase; letter-spacing: .005em; color: var(--ink-dim); transition: color var(--t1) var(--ease), background var(--t1) var(--ease), border-color var(--t1) var(--ease), box-shadow var(--t1) var(--ease); }
 #ui .menu-item small { display: none; }
-#ui .menu-item.on { color: var(--ink); text-shadow: 0 2px 10px rgba(0,0,0,.6); }
-#ui .menu-item.minor { margin-left: auto; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .78rem; letter-spacing: .3em; color: var(--ink-mute); }
-#ui .menu-item.minor.on { color: var(--ink); }
+#ui .menu-item .ico { display: block; width: clamp(22px, calc(8 * var(--vh)), 36px); height: clamp(22px, calc(8 * var(--vh)), 36px); color: var(--ink); opacity: .9; }
+#ui .menu-item .ico svg { display: block; width: 100%; height: 100%; }
+#ui .menu-item.on { color: var(--ink); background: rgba(255,255,255,.1); border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber), 0 0 18px rgba(255,176,32,.3); }
+#ui .menu-item[data-id="play"] { order: 5; flex-grow: 1.6; flex-direction: row; gap: .18em; background: linear-gradient(180deg, #ffbf3d, #f2a12c); border-color: rgba(0,0,0,.35); color: var(--amber-ink); font-size: clamp(2rem, calc(6.4 * var(--vw)), 4.2rem); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 18px rgba(0,0,0,.35); }
+#ui .menu-item[data-id="play"]::after { content: "\\25B8"; font-size: .7em; margin-top: .04em; }
+#ui .menu-item[data-id="play"].on { background: linear-gradient(180deg, #ffd166, #ffb020); color: #0c0e12; border-color: #ffe6a8; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 0 0 1px #ffe6a8, 0 0 26px rgba(255,176,32,.5); }
+#ui .menu-item.minor { position: absolute; left: 0; top: 100%; flex: none; order: 0; height: var(--credits-h); min-width: 88px; padding: 0 var(--s2); justify-content: center; align-items: flex-start; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .3em; color: var(--ink-mute); }
+#ui .menu-item.minor.on { color: var(--ink); background: transparent; box-shadow: none; }
 #ui .menu-item[disabled] { opacity: .35; cursor: default; }
 .mini-seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: var(--r1); overflow: hidden; }
 .mini-seg b { padding: 4px 8px; font-weight: 700; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); }
 .mini-seg b.on { background: var(--amber); color: var(--amber-ink); }
-/* The focus bar is the active tab's underline: slides along the row at --t1, takes the tab's width. */
+/* The focus bar (other FocusLists): an eased amber underline / column marker. */
 .menu-bar { position: absolute; left: 0; bottom: 0; width: 0; height: 4px; border-radius: 2px; background: var(--amber); box-shadow: 0 0 12px var(--amber); pointer-events: none; transition: transform var(--t1) var(--ease), width var(--t1) var(--ease), opacity var(--t2); opacity: 0; }
 .menu-bar.on { opacity: 1; }
 .menu-screen.show .menu-item { animation: rise var(--t2) var(--ease) both; }
 .menu-screen .menu-item:nth-child(3) { animation-delay: 40ms; } .menu-screen .menu-item:nth-child(4) { animation-delay: 80ms; } .menu-screen .menu-item:nth-child(5) { animation-delay: 120ms; }
-/* Ticker: best times for the shipped tracks in tier order; scrolls only when wider than the screen (the screen sets .scroll after measuring). Never a control. */
-.menu-ticker { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--ticker-h) + var(--sab)); padding-bottom: var(--sab); background: rgba(4,5,7,.96); border-top: 1px solid var(--line-2); overflow: hidden; pointer-events: none; display: flex; align-items: center; }
-.menu-ticker-track { flex: 0 0 auto; display: inline-flex; align-items: center; white-space: nowrap; padding-left: calc(calc(7 * var(--vw)) + var(--sal)); font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
-.menu-ticker-track span { display: inline-flex; align-items: center; gap: .6em; }
-.menu-ticker-track span + span::before { content: ""; width: 1px; height: 1em; background: var(--line); margin: 0 1.6em; }
-.menu-ticker-track b { color: var(--ink); font-weight: 700; }
-.menu-ticker-track .head { color: var(--amber); }
-.menu-ticker.scroll .menu-ticker-track { padding-left: 0; animation: ticker var(--ticker-s, 30s) linear infinite; }
-@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* ---- track select ----------------------------------------------------- */
 .tracks-screen { background: linear-gradient(90deg, rgba(6,7,9,.88) 0%, rgba(6,7,9,.6) 40%, rgba(6,7,9,.35) 100%); }
@@ -702,11 +704,10 @@ export const HUD_CSS = /* css */ `
 @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate.armed { display: flex; } }
 
 /* Short landscape phones (844×390): tighter type, single-row menus above the fold. html.short = logical height ≤ 500 px (orientation.ts). */
-html.short .menu-plate { font-size: clamp(1.35rem, calc(3 * var(--vw)), 2rem); }
-html.short #ui .menu-item { font-size: clamp(1.45rem, calc(3.8 * var(--vw)), 2.1rem); }
+html.short .menu-title { font-size: clamp(2.2rem, calc(15 * var(--vh)), 4rem); }
+html.short #ui .menu-item { font-size: clamp(1.4rem, calc(4 * var(--vw)), 2.4rem); }
+html.short #ui .menu-item[data-id="play"] { font-size: clamp(1.8rem, calc(5.6 * var(--vw)), 3.2rem); }
 html.short #ui .menu-item.minor { font-size: .72rem; }
-html.short .menu-list.tabs { gap: var(--s5); }
-html.short .menu-chip { min-height: 28px; font-size: .7rem; }
 html.short .tracks-head { top: calc(var(--s3) + var(--sat)); }
 html.short .tracks-head h1 { font-size: 1.8rem; }
 html.short .tiers { top: calc(var(--s3) + var(--sat) + 3.2rem); bottom: calc(var(--s5) + var(--sab)); }
@@ -746,17 +747,13 @@ html.narrow .settings-wrap { grid-template-columns: 1fr; }
 @media (prefers-reduced-motion: reduce) {
   .overlay.show .tile, .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) both; }
   .results .time, .results .faults, .results .medals, .results .pb, .results .tiles, .results .ov-foot { transform: none; }
-  .menu-keyart.loaded, .menu-chip i { animation: none; }
-  .menu-ticker.scroll .menu-ticker-track { animation: none; }
+  .menu-keyart.loaded { animation: none; }
 }
 `;
 
 
 export const REVIEW_CSS = /* css */ `
 /* ---- Level reviewer (docs/design/game.md §21) ---- */
-/* Five tabs on the menu band: a step down from the four-tab size so PLAY · GARAGE · REVIEW · SETTINGS fit at 844 px. */
-#ui .menu-list.tabs .menu-item { font-size: clamp(1.45rem, calc(3.55 * var(--vw)), 2.4rem); min-width: 88px; padding: 0 var(--s3); }
-.menu-list.tabs { gap: var(--s5); }
 .review-pick-screen { background: linear-gradient(90deg, rgba(6,7,9,.95) 0%, rgba(6,7,9,.88) 55%, rgba(6,7,9,.62) 100%); display: flex; flex-direction: column; padding: calc(var(--s4) + var(--sat)) calc(var(--s5) + var(--sar)) calc(var(--s3) + var(--sab)) calc(var(--s5) + var(--sal)); }
 .rvp-head { flex: 0 0 auto; display: flex; flex-direction: column; gap: 2px; padding-right: 8rem; }
 .rvp-head .ov-kicker { color: var(--amber); }
@@ -878,17 +875,21 @@ export function injectStyles(): void {
   document.head.appendChild(el);
 }
 
-/* ---- track select — diorama (assets/design/tracks/round3/SPEC.md §5: A3b one tile, A3e night) ----------------
+/* ---- track select — one continuous world map (assets/design/tracks/round4/SPEC.md § C "Ascent", ask #38) --------
  * Owned by src/ui/trackMap.ts / TrackSelectScreen; injected by `injectTrackMapStyles()` as its own <style>.
- * The old `.tiers` / `.carousel` / `.card` rules above are kept untouched (other screens' cards reuse them).   */
+ * The old `.tiers` / `.carousel` / `.card` rules above are kept untouched (other screens' cards reuse them).
+ * The map is a 2-D camera: one scene root (`.tscene`, WORLD px wide) moved with translate/scale; nothing scrolls.
+ * Pins and the gate counter-scale by `--inv` (1 / zoom) so they keep their 44 px at any zoom; past `.far` they fold
+ * to dots and stop taking pointers (nothing hit-testable under 44 px). */
 export const TRACK_MAP_CSS = /* css */ `
-.tracks-screen { background: linear-gradient(180deg, rgba(6,7,9,.86) 0%, rgba(6,7,9,.8) 100%); --tm-top: calc(var(--s5) + var(--sat) + 2.7rem); --tm-bottom: calc(var(--s3) + var(--sab) + 44px + var(--s2)); --tm-x: calc(calc(5 * var(--vw)) + var(--sal)); --tm-xr: calc(calc(5 * var(--vw)) + var(--sar)); }
-.tracks-screen .legend { bottom: auto; top: calc(var(--s4) + var(--sat) + 44px + 1.4rem); /* under the MENU pill and the fps meter */ right: calc(var(--s5) + var(--sar)); font-size: .68rem; text-shadow: var(--outline); z-index: 3; }
-.tmap { position: absolute; left: 0; right: 0; top: var(--tm-top); bottom: var(--tm-bottom); display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x; }
-.tmap::-webkit-scrollbar { display: none; }
-.tpage { position: relative; flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; align-items: flex-end; gap: var(--s4); padding: 0 var(--tm-xr) 0 var(--tm-x); }
-/* The tile: as wide as the page's left 58 % or as tall as the page, whichever fits (a 3:2 plate); --tile-w is set by layout() from the map's box. */
-.ttile { position: relative; flex: 0 0 auto; width: var(--tile-w, 60%); aspect-ratio: 3 / 2; --lamp: var(--amber); }
+.tracks-screen { background: linear-gradient(180deg, rgba(6,7,9,.86) 0%, rgba(6,7,9,.8) 100%); --tm-top: calc(var(--s5) + var(--sat) + 2.7rem); --tm-x: calc(calc(5 * var(--vw)) + var(--sal)); --tm-xr: calc(calc(5 * var(--vw)) + var(--sar)); --alt-w: 6.2rem; --card-w: min(17rem, 36vw); }
+.tracks-screen .legend { left: calc(var(--tm-x) + var(--card-w) + var(--s3)); right: auto; bottom: calc(var(--s3) + var(--sab)); font-size: .64rem; text-shadow: var(--outline); z-index: 3; pointer-events: none; }
+.tmap { position: absolute; left: 0; right: 0; top: var(--tm-top); bottom: 0; overflow: hidden; touch-action: none; overscroll-behavior: contain; cursor: grab; -webkit-user-select: none; user-select: none; }
+.tmap.grabbing { cursor: grabbing; }
+.tscene { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; --inv: 1; }
+/* Regions: one plate each at its world offset; the summit in front (z rises with the index) so each cut face reads as a terrace over the one below. */
+.tregion { position: absolute; width: 600px; height: 400px; pointer-events: none; }
+.ttile { position: absolute; inset: 0; --lamp: var(--amber); }
 .ttile .glow { position: absolute; left: 10%; right: 10%; top: 30%; bottom: 0; border-radius: 50%; background: radial-gradient(closest-side, var(--lamp), transparent 70%); opacity: .16; filter: blur(12px); pointer-events: none; }
 .ttile .tart { position: absolute; inset: 0; background: center bottom / contain no-repeat; opacity: 0; transition: opacity var(--t3) var(--ease); }
 .ttile .tart.loaded { opacity: 1; }
@@ -896,22 +897,36 @@ export const TRACK_MAP_CSS = /* css */ `
 .ttile .slab { position: absolute; left: 3%; right: 3%; top: 8%; bottom: 6%; background: var(--tint, #333); clip-path: polygon(50% 0, 100% 44%, 100% 62%, 50% 100%, 0 62%, 0 44%); opacity: .85; filter: saturate(.7) brightness(.8); }
 .ttile .slab::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 100%; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%, rgba(0,0,0,.6)); }
 .ttile .tart.loaded + .slab { display: none; }
-.ttile .route { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.ttile .route .dim { fill: none; stroke: rgba(255,176,32,.35); stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; stroke-width: 3px; }
-.ttile .route .lit { fill: none; stroke: var(--amber); vector-effect: non-scaling-stroke; stroke-width: 3px; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(255,176,32,.9)) drop-shadow(0 0 10px rgba(255,138,31,.6)); }
-.ttile .title { position: absolute; left: 6%; bottom: 3%; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1rem, calc(4.2 * var(--vh)), 1.7rem); line-height: 1; text-transform: uppercase; letter-spacing: .04em; color: rgba(255,255,255,.55); text-shadow: 0 1px 0 rgba(255,255,255,.12), 0 -1px 0 rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.8); pointer-events: none; white-space: nowrap; }
+/* The seam under a plate: the cliff band from this plate's front-left surface edge (18,183)→(300,335) down to the terrace below's back-right edge (18,333)→(300,484) — one iso step + CLIFF lower — in the biome's tint, strata-striped and darkening toward the foot; the plate's own cut face (art) covers its top 41 px. The quay (Industrial over the apron) is a straight wall under both front edges. */
+/* The massif under the stack (one polygon from the apron to the summit, world px): dark stone with faint strata, so the far view is one mountain. */
+.tmass { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; background: linear-gradient(180deg, #2b2e36 0%, #17191e 45%, #0a0b0e 100%), #101216; }
+.tmass::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(118deg, rgba(255,255,255,.035) 0 3px, rgba(0,0,0,0) 3px 14px, rgba(0,0,0,.2) 14px 19px, rgba(0,0,0,0) 19px 31px); }
+.tseam { position: absolute; width: 600px; height: 600px; pointer-events: none; z-index: 1; --cut: polygon(18px 183px, 300px 335px, 300px 484px, 18px 333px); }
+.tseam.quay { --cut: polygon(18px 183px, 300px 335px, 582px 183px, 582px 600px, 300px 600px, 18px 600px); }
+.tseam::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--tint, #333) 55%, #000) 30%, color-mix(in srgb, var(--tint, #333) 30%, #000) 60%, #06070a 100%); clip-path: var(--cut); filter: saturate(.55); }
+.tseam::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(118deg, rgba(255,255,255,.06) 0 2px, rgba(0,0,0,0) 2px 9px, rgba(0,0,0,.18) 9px 14px, rgba(0,0,0,0) 14px 23px), linear-gradient(180deg, rgba(0,0,0,.35) 40%, rgba(0,0,0,0) 55%, rgba(0,0,0,.6) 100%); clip-path: var(--cut); }
+.tseam.quay::after { background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 2px, rgba(0,0,0,0) 2px 40px), repeating-linear-gradient(180deg, rgba(0,0,0,.25) 0 2px, rgba(0,0,0,0) 2px 26px), linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.7)); }
+.troute, .tpins { position: absolute; inset: 0; pointer-events: none; }
+.troute { z-index: 8; }
+.tpins { z-index: 9; }
+.troute .route { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.troute .route .dim { fill: none; stroke: rgba(255,176,32,.4); stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; stroke-width: 3px; }
+.troute .route .lit { fill: none; stroke: var(--amber); vector-effect: non-scaling-stroke; stroke-width: 3px; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(255,176,32,.9)) drop-shadow(0 0 10px rgba(255,138,31,.6)); }
+/* Region name + count engraved on the plate's front-left cut face (skewed along the iso edge, 28.2° = 151 / 282), the altitude marks of SPEC § C. */
+.ttile .title { position: absolute; left: 130px; top: 272px; transform-origin: 0 0; transform: skewY(28.2deg); font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.35rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; color: rgba(255,255,255,.62); text-shadow: 0 1px 0 rgba(255,255,255,.12), 0 -1px 0 rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.8); pointer-events: none; white-space: nowrap; }
 .ttile .title b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .ttile .title small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .58rem; letter-spacing: .22em; color: var(--ink-dim); margin-top: .25em; }
 /* Trophy ledge on the front face: one pedestal per campaign track — a lit medal, an empty ring, or a padlock. */
-.ttile .ledge { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); display: flex; gap: 6px; pointer-events: none; }
+.ttile .ledge { position: absolute; left: 330px; top: 318px; transform-origin: 0 0; transform: skewY(-28.2deg); display: flex; gap: 6px; pointer-events: none; }
 .ttile .ledge i { display: block; width: 14px; height: 14px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor, 0 2px 0 rgba(0,0,0,.6); }
 .ttile .ledge i.open { background: transparent; border: 1.5px dashed rgba(255,176,32,.7); box-shadow: none; }
 .ttile .ledge i.locked { background: rgba(255,255,255,.14); box-shadow: none; -webkit-mask: none; }
 .ttile .ledge i.locked::after { content: ""; display: block; width: 100%; height: 100%; background: rgba(255,255,255,.6); -webkit-mask: var(--padlock) center / 70% no-repeat; mask: var(--padlock) center / 70% no-repeat; }
 .ttile .ledge i.platinum { color: var(--plat); } .ttile .ledge i.gold { color: var(--gold); } .ttile .ledge i.silver { color: var(--silver); } .ttile .ledge i.bronze { color: var(--bronze); }
 .tracks-screen { --padlock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E"); }
-/* Pins: a post with the code, the 44 px medal disc, a name plate and the Best / Target line; anchored at the disc's centre. */
-#ui .tpin { position: absolute; left: var(--px); top: var(--py); transform: translate(-50%, -36px); display: flex; flex-direction: column; align-items: center; gap: 2px; width: max-content; max-width: 5.8rem; min-width: 44px; padding: 0 2px 4px; border: 0; background: transparent; color: var(--ink); cursor: pointer; z-index: 2; transition: transform var(--t2) var(--ease); }
+/* Pins: a post with the code, the 44 px medal disc, a name plate and the Best / Target line; anchored at the disc's centre in world px, counter-scaled so the disc stays 44 px at any zoom. */
+#ui .tpin { position: absolute; transform: translate(-50%, -36px) scale(var(--inv)); transform-origin: 50% 36px; display: flex; flex-direction: column; align-items: center; gap: 2px; width: max-content; max-width: 5.8rem; min-width: 44px; padding: 0 2px 4px; border: 0; background: transparent; color: var(--ink); cursor: pointer; z-index: 2; pointer-events: auto; transition: transform var(--t2) var(--ease); }
+.tmap.grabbing .tpin, .tscene.far .tpin { transition: none; }
 #ui .tpin .code { font-size: .6rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); text-shadow: var(--outline); height: 12px; line-height: 12px; }
 #ui .tpin .disc { position: relative; width: 44px; height: 44px; border-radius: 50%; background: var(--slab-2) center / 78% no-repeat; box-shadow: 0 0 0 2px rgba(255,255,255,.22), 0 6px 14px rgba(0,0,0,.7); }
 #ui .tpin .disc::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 8px; margin-left: -1px; background: rgba(255,255,255,.35); }
@@ -930,68 +945,78 @@ export const TRACK_MAP_CSS = /* css */ `
 #ui .tpin .tag.ghost { background: rgba(255,255,255,.16); color: var(--ink); }
 #ui .tpin .tag.pro { background: var(--blue); color: #0b1a2e; top: 28px; }
 #ui .tpin.locked { opacity: .6; cursor: default; }
+/* Under the card / the altimeter / the MENU pill: drawn dim, takes no pointer (no tappable hides under another). */
+#ui .tpin.shaded, #ui .gate.shaded { opacity: .25; pointer-events: none; }
 #ui .tpin.locked .plate { filter: grayscale(1); }
-#ui .tpin.on { z-index: 4; transform: translate(-50%, -40px); }
+#ui .tpin.on { z-index: 4; transform: translate(-50%, -40px) scale(var(--inv)); }
 #ui .tpin.on .disc { box-shadow: 0 0 0 3px var(--amber), 0 0 22px -2px rgba(255,176,32,.85), 0 6px 14px rgba(0,0,0,.7); }
 #ui .tpin.on .plate { border-color: var(--amber); color: var(--amber); }
 #ui .tpin.on .code { color: var(--amber); }
 #ui .tpin.go { animation: pingo var(--t3) var(--ease) both; z-index: 5; }
-@keyframes pingo { 0% { transform: translate(-50%, -40px); opacity: 1; } 100% { transform: translate(-50%, calc(-40px - 14 * var(--vh))) scale(1.12); opacity: 0; } }
-/* Next tier gate stub, back-right of the tile: the next locked track and its rule (a tap flies to it). */
-#ui .gate { position: absolute; left: 2%; top: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-height: 44px; min-width: 44px; padding: 4px 8px 4px 8px; border: 0; border-left: 3px solid var(--amber); border-radius: 0 var(--r1) var(--r1) 0; background: var(--slab-2); color: var(--ink); text-align: left; cursor: pointer; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,.6); }
-#ui .gate::before { content: ""; position: absolute; left: -3px; right: 0; top: -4px; height: 4px; background: repeating-linear-gradient(-45deg, var(--amber) 0 6px, #111 6px 12px); border-radius: 2px 2px 0 0; }
-#ui .gate b { font-size: .56rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--amber); }
-#ui .gate span { font-family: var(--display); font-style: italic; font-weight: 900; font-size: .8rem; text-transform: uppercase; line-height: 1; }
-#ui .gate small { font-size: .5rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); display: inline-flex; align-items: center; gap: .35em; }
+@keyframes pingo { 0% { transform: translate(-50%, -40px) scale(var(--inv)); opacity: 1; } 100% { transform: translate(-50%, calc(-40px - 14 * var(--vh))) scale(calc(1.12 * var(--inv))); opacity: 0; } }
+/* Below ZOOM.plates (.mid): code + disc only — the name plates would collide at this scale; the card carries the name. */
+#ui .tscene.mid .tpin .plate, #ui .tscene.mid .tpin .times, #ui .tscene.mid .tpin .rule, #ui .tscene.mid .tpin .tag { display: none; }
+/* Zoomed out (.far): pins fold to a dot on a post — the plate, times, tags go; nothing here takes a pointer (a tap on the map flies in). */
+#ui .tscene.far .tpin { pointer-events: none; }
+#ui .tscene.far .tpin .plate, #ui .tscene.far .tpin .times, #ui .tscene.far .tpin .rule, #ui .tscene.far .tpin .tag, #ui .tscene.far .tpin .flag { display: none; }
+/* The tier gate: a hazard-tape barrier across the trail at the seam — the tier and its rule on the tape, the next locked track under it (a tap flies to it). Counter-scaled like a pin. */
+#ui .gate { position: absolute; transform: translate(-50%, -50%) scale(var(--inv)); transform-origin: 50% 50%; display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 44px; min-width: 44px; padding: 0 0 4px; border: 0; background: transparent; color: var(--ink); text-align: center; cursor: pointer; z-index: 3; pointer-events: auto; }
+#ui .gate b { display: block; padding: 4px 10px; background: repeating-linear-gradient(-45deg, var(--amber) 0 10px, #15120a 10px 20px); color: #fff; font-size: .56rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,.7); text-shadow: 0 0 3px #000, 0 0 3px #000, 0 1px 2px #000; border-top: 2px solid #15120a; border-bottom: 2px solid #15120a; }
+#ui .gate span { display: block; padding: 2px 6px; background: var(--slab-2); border: 1px solid var(--line-2); border-left: 3px solid var(--amber); border-radius: 0 3px 3px 0; font-family: var(--display); font-style: italic; font-weight: 900; font-size: .72rem; text-transform: uppercase; line-height: 1.05; white-space: nowrap; }
+#ui .gate small { display: inline-flex; align-items: center; gap: .35em; font-size: .5rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); text-shadow: var(--outline); }
 #ui .gate small::before { content: ""; width: 1em; height: 1em; background: currentColor; -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
-/* The rising card (A3d): one element, moved into the focused page's slot; RIDE · ▶ GHOST · REVIEW live on it. */
-.tslot { position: relative; flex: 1 1 auto; align-self: stretch; min-width: 0; display: flex; align-items: flex-end; }
-.tcard { width: 100%; padding: var(--s3) var(--s4) var(--s3); border: 1px solid var(--line-2); border-top: 2px solid var(--amber); border-radius: var(--r2); background: var(--slab-2); box-shadow: 0 10px 30px rgba(0,0,0,.6); display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
+#ui .gate::after { content: ""; position: absolute; left: -22px; right: -22px; top: 50%; height: 2px; background: repeating-linear-gradient(90deg, rgba(255,176,32,.9) 0 6px, transparent 6px 12px); z-index: -1; }
+#ui .tscene.far .gate { pointer-events: none; }
+#ui .tscene.far .gate span, #ui .tscene.far .gate small { display: none; }
+/* The rising card (A3d): the focused pin's card, bottom-left in screen space; RIDE · ▶ GHOST · REVIEW live on it. */
+.tcard { position: absolute; left: var(--tm-x); bottom: calc(var(--s3) + var(--sab)); width: var(--card-w); padding: var(--s3) var(--s4) var(--s3); border: 1px solid var(--line-2); border-top: 2px solid var(--amber); border-radius: var(--r2); background: var(--slab-2); box-shadow: 0 10px 30px rgba(0,0,0,.6); display: flex; flex-direction: column; gap: var(--s1); min-width: 0; z-index: 3; }
 .tcard.rise { animation: tcrise var(--t2) var(--ease) both; }
 @keyframes tcrise { from { transform: translateY(12px); opacity: .2; } to { transform: none; opacity: 1; } }
 .tcard .tc-head { display: flex; align-items: center; gap: var(--s2); font-size: .64rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-dim); }
 .tcard .tc-head b { color: var(--amber); }
-.tcard .tc-head .tc-medal { margin-left: auto; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: currentColor center / cover no-repeat; box-shadow: inset 0 -3px 0 rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.6); }
+.tcard .tc-head span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tcard .tc-head .tc-medal { flex: 0 0 auto; margin-left: auto; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: currentColor center / cover no-repeat; box-shadow: inset 0 -3px 0 rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.6); }
 .tcard .tc-head .tc-medal.img { background-color: transparent; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
 .tcard .tc-head .tc-medal.none { background: rgba(255,255,255,.06); border: 1px dashed var(--line); box-shadow: none; }
 .tcard .tc-head .tc-medal.platinum { color: var(--plat); } .tcard .tc-head .tc-medal.gold { color: var(--gold); } .tcard .tc-head .tc-medal.silver { color: var(--silver); } .tcard .tc-head .tc-medal.bronze { color: var(--bronze); }
-.tcard .tc-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1.3rem, calc(5.6 * var(--vh)), 1.9rem); line-height: .95; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tcard .tc-tech { font-size: .76rem; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tcard .tc-times { display: flex; gap: var(--s4); font-size: .76rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.tcard .tc-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(1.2rem, calc(5.2 * var(--vh)), 1.7rem); line-height: .95; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tcard .tc-tech { font-size: .72rem; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tcard .tc-times { display: flex; gap: var(--s4); font-size: .74rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
 .tcard .tc-times b { color: var(--ink); font-weight: 700; } .tcard .tc-times b.ahead { color: var(--green); }
-.tcard .tc-rule { display: inline-flex; align-items: center; gap: .45em; font-size: .64rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--amber); }
-.tcard .tc-rule::before { content: ""; width: 1em; height: 1em; background: currentColor; -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
+.tcard .tc-rule { display: inline-flex; align-items: center; gap: .45em; font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--amber); }
+.tcard .tc-rule::before { content: ""; flex: 0 0 auto; width: 1em; height: 1em; background: currentColor; -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
 .tcard .board { display: flex; gap: 3px; flex-wrap: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
 .tcard .board span { font-size: .58rem; font-weight: 700; line-height: 1; padding: 2px 3px; border-radius: 3px; background: rgba(0,0,0,.45); color: var(--ink); border-left: 3px solid currentColor; white-space: nowrap; }
 .tcard .board span.platinum { color: var(--plat); } .tcard .board span.gold { color: var(--gold); } .tcard .board span.silver { color: var(--silver); } .tcard .board span.bronze { color: var(--bronze); }
 .tcard .board span b { color: var(--ink); font-weight: 700; }
 .tcard .tc-actions { display: flex; gap: var(--s2); margin-top: var(--s1); }
-#ui .tcard .tc-actions button { -webkit-appearance: none; appearance: none; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: .35em; min-height: 44px; min-width: 44px; padding: 0 var(--s4); border: 1px solid var(--line); border-radius: var(--r1); background: rgba(255,255,255,.06); color: var(--ink); font: 700 .78rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
+#ui .tcard .tc-actions button { -webkit-appearance: none; appearance: none; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: .35em; min-height: 44px; min-width: 44px; padding: 0 var(--s3); border: 1px solid var(--line); border-radius: var(--r1); background: rgba(255,255,255,.06); color: var(--ink); font: 700 .74rem/1 var(--font); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
 #ui .tcard .tc-actions button.tc-ride { flex: 1 1 auto; background: var(--amber); color: var(--amber-ink); border-color: transparent; font-family: var(--display); font-style: italic; font-weight: 900; font-size: 1.05rem; letter-spacing: .04em; }
 #ui .tcard .tc-actions button.tc-ride:disabled { background: rgba(255,255,255,.1); color: var(--ink-dim); cursor: default; }
 #ui .tcard .tc-actions button[hidden] { display: none; }
 #ui .tcard .tc-actions button.on { outline: 2px solid var(--ink); outline-offset: 2px; }
-/* Miniature row: six tiles, the current one underlined amber; a tap snaps the scroller. */
-.tmini { position: absolute; left: var(--tm-x); right: var(--tm-xr); bottom: calc(var(--s3) + var(--sab)); height: 44px; display: flex; gap: var(--s2); z-index: 3; }
-#ui .tm { -webkit-appearance: none; appearance: none; position: relative; flex: 1 1 0; min-width: 44px; min-height: 44px; display: flex; align-items: center; gap: 6px; padding: 0 6px 0 4px; border: 1px solid var(--line-2); border-radius: var(--r1); background: var(--slab); color: var(--ink-dim); cursor: pointer; text-align: left; overflow: hidden; }
-#ui .tm .tm-art { flex: 0 0 auto; width: 44px; height: 32px; background: var(--tint, #222) center / contain no-repeat; border-radius: 3px; opacity: .9; }
-#ui .tm .tm-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-#ui .tm .tm-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: .74rem; line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#ui .tm .tm-dots { display: flex; align-items: center; gap: 3px; font-size: .56rem; font-variant-numeric: tabular-nums; letter-spacing: .08em; white-space: nowrap; }
-#ui .tm .tm-dots i { display: block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+/* The altimeter: the mountain's regions as rungs on the right edge, the summit at the top, the current one bracketed amber; a tap flies there. Inside the safe area, under the MENU pill, above the home indicator. */
+.tmini { position: absolute; right: calc(var(--s4) + var(--sar)); top: calc(var(--s4) + var(--sat) + 44px + var(--s2)); bottom: calc(var(--s3) + var(--sab)); width: var(--alt-w); display: flex; flex-direction: column; gap: 3px; z-index: 3; }
+.tmini::before { content: ""; position: absolute; left: -6px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.22) 50%, rgba(255,255,255,.04)); }
+#ui .tm { -webkit-appearance: none; appearance: none; position: relative; flex: 1 1 0; min-width: 44px; min-height: 44px; display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 0 6px 0 8px; border: 1px solid var(--line-2); border-radius: var(--r1); background: var(--slab); color: var(--ink-dim); cursor: pointer; text-align: left; overflow: hidden; }
+#ui .tm .tm-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+#ui .tm .tm-name { font-family: var(--display); font-style: italic; font-weight: 900; font-size: .7rem; line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#ui .tm .tm-dots { display: flex; align-items: center; gap: 3px; font-size: .54rem; font-variant-numeric: tabular-nums; letter-spacing: .06em; white-space: nowrap; }
+#ui .tm .tm-dots i { display: block; flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 #ui .tm .tm-dots i.open { background: transparent; border: 1px dashed rgba(255,255,255,.5); }
 #ui .tm .tm-dots i.locked { background: rgba(255,255,255,.55); -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; border-radius: 0; }
 #ui .tm .tm-dots i.platinum { color: var(--plat); } #ui .tm .tm-dots i.gold { color: var(--gold); } #ui .tm .tm-dots i.silver { color: var(--silver); } #ui .tm .tm-dots i.bronze { color: var(--bronze); }
-#ui .tm.locked .tm-art { filter: grayscale(.8) brightness(.7); }
-#ui .tm.on { color: var(--ink); border-color: var(--amber); box-shadow: inset 0 -3px 0 var(--amber); }
-#ui .tm.on .tm-art { opacity: 1; }
-#ui .tm .tm-txt .tm-blurb { display: none; }
-.tracks-screen.leave .tmap, .tracks-screen.leave .tmini { transition: opacity var(--t3) var(--ease); opacity: 0; }
-html.short .tracks-screen { --tm-top: calc(var(--s4) + var(--sat) + 2.5rem); }
-html.short .tracks-screen .legend { bottom: auto; font-size: .66rem; }
+#ui .tm.locked { color: rgba(255,255,255,.4); }
+#ui .tm.locked .tm-name::after { content: ""; display: inline-block; width: .8em; height: .8em; margin-left: .3em; vertical-align: -.05em; background: currentColor; -webkit-mask: var(--padlock) center / contain no-repeat; mask: var(--padlock) center / contain no-repeat; }
+#ui .tm.on { color: var(--ink); border-color: var(--amber); box-shadow: inset 3px 0 0 var(--amber); }
+.tracks-screen.leave .tmap, .tracks-screen.leave .tmini, .tracks-screen.leave .tcard { transition: opacity var(--t3) var(--ease); opacity: 0; }
+html.short .tracks-screen { --tm-top: calc(var(--s4) + var(--sat) + 2.5rem); --card-w: min(15.5rem, 34vw); }
+html.short .tracks-screen .legend { font-size: .6rem; }
 html.short .tracks-head { top: calc(var(--s4) + var(--sat)); }
 html.short .tcard { padding: var(--s2) var(--s3); gap: 2px; }
 html.short .tcard .tc-tech { display: none; }
+html.short .tmini { gap: 2px; }
+html.short #ui .tm { padding: 0 4px 0 6px; }
 `;
 
 let trackMapInjected = false;

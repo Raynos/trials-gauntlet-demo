@@ -1,7 +1,8 @@
 {
  "keyart": [
   "keyart-industrial",
-  "keyart-canyon"
+  "keyart-canyon",
+  "keyart-nalati"
  ],
  "assets": {
   "stencil-apex": {
@@ -57,6 +58,11 @@
   "app-icon": {
    "src": "icon-b-wheelie",
    "note": "round 3b: wheelie silhouette picked at 60 px over icon-a-helmet-wheel (blob at 60 px), icon-c-monogram (generic TG) and app-icon-v2 helmet-in-tyre badge (bold but could be any moto app); amber-keyed, gradient re-synthesised for the maskable pad"
+  },
+  "keyart-nalati": {
+   "crop": "1536x640+0+210",
+   "note": "ask 42: the menu strip shows the middle of the plate; rows 210-850 of the 1024 (2.4:1) keep the rider (288-634), the yurts, the peaks and the NORDVIK banner (660-780) \u2014 a centred 3.1:1 phone crop holds helmet through banner; q 74 (the wildflower field hides it) keeps the tiers under the industrial plate: 236 KB / 98 KB",
+   "q": 74
   }
  },
  "rejected": [
