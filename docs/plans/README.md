@@ -86,7 +86,7 @@ The [game audit](../reviews/game-audit-2026-09-15.md) and separate [physics-libr
 | 09-15 | **Level review is a top-level REVIEW button on the main menu** (next to PLAY / GARAGE / SETTINGS) that opens a review level picker → the review UI (free camera, six segments, comments, Copy review); `?review=<track>` survives only as a deep link for e2e. Core #10 builds it. |
 | 09-14 | Phones are **not** pinned to low in Auto — a perf owner makes the tiers fast instead (60 on high is the goal) |
 | 09-16 | **Garage: the Classic and Img2 rider models are out** (the Blender rider is the rider; `?rider=` stays a harness override) and **the garage is pointer + Esc only** (no key rows) — asks 30–32 |
-| 09-16 | Design rounds open for the user to pick: **home screen** `assets/design/menu/round2/` (A–E) → more of B Lobby in `round3/` (ask 36); **continuous world-map level select** `assets/design/tracks/round4/` (A ribbon / B chart / C ascent) |
+| 09-16 | Design rounds open for the user to pick: **home screen** `assets/design/menu/round2/` (A–E) → three B Lobby variants in `round3/` (B1 Plate / B2 Strip / B3 Glass, ask 39); **continuous world-map level select** `assets/design/tracks/round4/` (A ribbon / B chart / C ascent) |
 | 09-16 | **Level select → C Ascent** (`assets/design/tracks/round4/C-ascent.jpg`, SPEC § C): one continuous world map, **pan / drag / zoom**, a subset of levels in the viewport, opens centred on the current level — ask 38 |
 
 ## Parallel branch — `blender-work` (Codex Astra 6, since 2026-09-15)
