@@ -2,7 +2,7 @@
  * Headless stills of the main menu (the boot screen) at the three judged geometries, for the parent to judge against
  * `assets/design/menu/round3/B2-strip.jpg` (ask 42). Built page from `dist/` with `?sw=0`; waits for the menu to be live
  * and the Nalati plate to have decoded (`.menu-keyart.loaded`) so the still is the settled screen, not the fade. Prints,
- * per geometry, the strip / band / tile rects, the tile heights against the round's 72 px floor, and a leak audit: every
+ * per geometry, the strip / band / tile rects, the tile heights against the floor (72 px on desktop; 52 px on short phones since ask 48 — one thin row so the strip keeps the rider), and a leak audit: every
  * word the menu renders with the build stamp removed (must be the title and the five actions, nothing else).
  *
  *   tsx harness/e2e/menu-stills.mts --out=/path/to/dir
@@ -57,7 +57,7 @@ try {
         stamp: r(q('.menu-plate')),
         band: r(q('.menu-band')),
         tiles,
-        tilesOver72: Object.values(tiles).every((h) => h >= 72),
+        tilesOver72: Object.values(tiles).every((h) => h >= (document.documentElement.classList.contains('short') ? 52 : 72)),
         items: [...document.querySelectorAll('.menu-item')].map((b) => b.dataset.id + ' ' + r(b.getBoundingClientRect())),
         text,
         leak: text !== 'TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS' || /\\d+:\\d\\d|\\d+\\s*\\/\\s*\\d+|cleared|next|last|session|best|rookie|medal/i.test(text),
@@ -68,7 +68,7 @@ try {
     const file = path.join(out, `menu-${g.name}.png`);
     await page.screenshot({ path: file });
     console.log(`${g.name}: ${file}\n  ${JSON.stringify(info)}`);
-    if (!info.tilesOver72 || info.leak || !info.gone || !info.meterHidden) { console.error(`${g.name}: FAIL (tiles ≥ 72: ${info.tilesOver72}, leak: ${info.leak}, ticker/chip gone: ${info.gone}, fps meter hidden: ${info.meterHidden})`); process.exitCode = 1; }
+    if (!info.tilesOver72 || info.leak || !info.gone || !info.meterHidden) { console.error(`${g.name}: FAIL (tiles ≥ floor: ${info.tilesOver72}, leak: ${info.leak}, ticker/chip gone: ${info.gone}, fps meter hidden: ${info.meterHidden})`); process.exitCode = 1; }
     await ctx.close();
   }
 } finally {

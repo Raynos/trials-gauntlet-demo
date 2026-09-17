@@ -149,6 +149,19 @@ export const FRONT_CSS = /* css */ `
 /* The focus bar (other FocusLists): an eased amber underline / column marker. */
 .menu-bar { position: absolute; left: 0; bottom: 0; width: 0; height: 4px; border-radius: 2px; background: var(--amber); box-shadow: 0 0 12px var(--amber); pointer-events: none; transition: transform var(--t1) var(--ease), width var(--t1) var(--ease), opacity var(--t2); opacity: 0; }
 .menu-bar.on { opacity: 1; }
+/* Short phones (ask 48, the user's iPhone landscape shot): the round-42 band took 40 % of a 430 px screen and the cover
+   crop cut the rider's head off the strip. Here the band is one thin row — 52 px tiles (still above the 44 px touch
+   floor) with the icon beside the word, a 44 px CREDITS row (the touch floor) — so the strip keeps ~3/4 of the height, and the crop
+   window sits high (22 %) so the rider's helmet stays in frame at the strip's 3:1. Desktop keeps the big tiles. */
+html.short .menu-screen { --tile-h: 52px; --credits-h: 44px; --band-h: calc(var(--s2) + var(--tile-h) + var(--credits-h) + var(--sab)); }
+html.short .menu-keyart { background-position: 50% 22%; transform-origin: 50% 22%; }
+html.short .menu-title { font-size: clamp(2rem, calc(13 * var(--vh)), 4rem); }
+html.short .menu-band { padding-top: var(--s2); }
+html.short .menu-list.tiles { gap: var(--s2); }
+html.short #ui .menu-item { flex-direction: row; gap: .35em; padding: 0 var(--s2); font-size: clamp(1rem, calc(2.6 * var(--vw)), 1.5rem); }
+html.short #ui .menu-item .ico { width: 20px; height: 20px; }
+html.short #ui .menu-item[data-id="play"] { font-size: clamp(1.4rem, calc(3.6 * var(--vw)), 2rem); }
+html.short #ui .menu-item.minor { min-height: var(--credits-h); font-size: .62rem; padding: 0 var(--s1); }
 .menu-screen.show .menu-item { animation: rise var(--t2) var(--ease) both; }
 .menu-screen .menu-item:nth-child(3) { animation-delay: 40ms; } .menu-screen .menu-item:nth-child(4) { animation-delay: 80ms; } .menu-screen .menu-item:nth-child(5) { animation-delay: 120ms; }
 
