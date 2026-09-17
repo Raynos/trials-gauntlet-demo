@@ -86,18 +86,26 @@ def recipe(stage):
         add('garment-shape-assembly','garment-shape','assemble.py',[current,ASSETS/'street01-garment-shape-donor.glb'],[target],['--base',current,'--out',target])
     if stage>=36:
         current=target
-        target=ASSETS/'street01-rider-delivery-raw.glb'
+        target=ASSETS/(f'street01-rider-delivery-{stage}-before-fitted-hem.glb' if stage>=37 else 'street01-rider-delivery-raw.glb')
         add('settled-clip-family','seated-posture/family','build.py',[current],[target],['--base',current,'--out',target])
+    if stage>=37:
+        current=target
+        add('fitted-hem','garment-hem','build-fitted.py',[current,ART/'garment-shape/garment-source.blend',*[ART/'cloth-surface/textures'/('cotton_'+k+'.png') for k in ('albedo','normal','orm')],ART/'garment-hem/fit-denim.py'],[ART/'garment-hem/hem-fitted-source.blend',ASSETS/'street01-garment-hem-fitted-donor.glb'],['--denim-source',current])
+        target=ASSETS/'street01-rider-delivery-raw.glb'
+        add('fitted-hem-assembly','garment-hem','assemble-fitted.py',[current,ASSETS/'street01-garment-hem-fitted-donor.glb'],[target],['--base',current,'--out',target])
     return steps
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--stage',type=int,choices=(28,29,30,31,32,33,34,35,36),required=True)
+    ap.add_argument('--stage',type=int,choices=(28,29,30,31,32,33,34,35,36,37),required=True)
     ap.add_argument('--blender',default=os.environ.get('BLENDER') or '/Applications/Blender.app/Contents/MacOS/Blender')
     ap.add_argument('--node',default='node')
     ap.add_argument('--pack',action='store_true',help='Also write losslessly packed delivery; currently requires Blender5.2 Mac meshopt libraries.')
+    ap.add_argument('--prune',action='store_true',help='Requires --pack: remove unreachable descriptors before lossless packing, retaining raw delivery.')
     ap.add_argument('--execute',action='store_true',help='Run recipes; without this flag print the exact commands and preflight findings only.')
-    args=ap.parse_args();steps=recipe(args.stage)
+    args=ap.parse_args()
+    if args.prune and not args.pack:ap.error('--prune requires --pack')
+    steps=recipe(args.stage)
     blender=shutil.which(args.blender) or (str(Path(args.blender).resolve()) if Path(args.blender).is_file() else None)
     node=shutil.which(args.node)
     def command(s):return [blender or args.blender,'-b','--python-exit-code','1','--python',str(s.script)]+(['--',*s.args] if s.args else [])
@@ -113,10 +121,15 @@ def main():
     helpers=sorted((ROOT/'assets/blender').glob('*.py'))+[ART/'hoodie-shell'/n for n in ('repair_annulus.py','build_hood.py','unwrap_cloth.py')]
     if args.stage>=29:helpers.append(ART/'cloth-neckfit-v2/fit.py')
     if args.stage>=30:helpers.append(ART/'sleeve-continuity/fit.py')
+    if args.stage>=37:helpers.append(ART/'garment-hem/fit-denim.py')
     for p in helpers:
         if not p.is_file():missing.append(str(p))
     if blender is None:missing.append('Blender executable: '+args.blender)
     pack_script=P/'tools/pack-art-lossless.mjs'
+    prune_script=P/'tools/prune-art-unused.mjs'
+    if args.prune:
+        if not prune_script.is_file():missing.append(str(prune_script))
+        helpers.append(prune_script)
     if args.pack:
         libraries=[Path('/Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_meshopt_bridge.dylib'),Path('/Applications/Blender.app/Contents/Resources/lib/libmeshoptimizer.dylib')]
         for p in [pack_script,P/'node_modules/three/package.json',*libraries]:
@@ -124,6 +137,7 @@ def main():
         if node is None:missing.append('Node executable: '+args.node)
         if shutil.which('python3') is None:missing.append('python3 required by the lossless packer')
     plan={'stage':args.stage,'cwd':str(ROOT),'commands':[{'name':s.name,'argv':command(s),'inputs':[str(p)for p in s.inputs],'outputs':[str(p)for p in s.outputs]}for s in steps],'missing':sorted(set(missing)),'pack':args.pack}
+    if args.prune:plan['prune']={'argv':[node or args.node,str(prune_script),str(ASSETS/'street01-rider-delivery-raw.glb'),str(ASSETS/'street01-rider-delivery-pruned.glb')],'cwd':str(P),'proof':str(P/'reports/art-unused-prune.json')}
     if not args.execute:
         print(json.dumps(plan,indent=2));return 1 if missing else 0
     if missing:raise SystemExit('Preflight failed; no recipes executed:\n'+'\n'.join(sorted(set(missing))))
@@ -146,6 +160,14 @@ def main():
             if result.returncode:raise RuntimeError(f'{s.name} failed; see {run/row["log"]}')
             row['outputs']=[fingerprint(p)for p in s.outputs];save()
         final=ASSETS/'street01-rider-delivery-raw.glb';manifest['rawDelivery']=fingerprint(final)
+        if args.prune:
+            pruned=ASSETS/'street01-rider-delivery-pruned.glb';cmd=[node,str(prune_script),str(final),str(pruned)];row={'name':'unused-descriptor-prune','argv':cmd,'cwd':str(P),'inputs':[fingerprint(final),fingerprint(prune_script)],'log':'unused-prune.log'};manifest['steps'].append(row);save()
+            step_started=time.monotonic()
+            with (run/row['log']).open('w') as log:result=subprocess.run(cmd,cwd=P,stdout=log,stderr=subprocess.STDOUT)
+            row['elapsedSeconds']=round(time.monotonic()-step_started,3);row['exitCode']=result.returncode
+            if result.returncode:raise RuntimeError('Unused descriptor pruning failed; raw delivery remains available.')
+            proof=run/'unused-prune-proof.json';shutil.copy2(P/'reports/art-unused-prune.json',proof)
+            row['outputs']=[fingerprint(pruned)];row['proof']=fingerprint(proof);manifest['prunedDelivery']=fingerprint(pruned);save();final=pruned
         if args.pack:
             packed=ASSETS/'street01-rider-delivery-lossless.glb';cmd=[node,str(pack_script),str(final),str(packed)];row={'name':'lossless-pack','argv':cmd,'cwd':str(P),'inputs':[fingerprint(final),fingerprint(pack_script)],'log':'lossless-pack.log'};manifest['steps'].append(row);save()
             step_started=time.monotonic()

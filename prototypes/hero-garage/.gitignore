@@ -56,3 +56,11 @@ public/assets/street01-rider-seated*.glb
 art/delivery/hero-garage-handoff.zip
 art/delivery/hero-garage-handoff.zip.tmp
 art/delivery/runs/**/*.glb
+
+# Intermediate art assemblies; versioned lossless delivery is retained.
+/public/assets/street01-rider-round32-pruned.glb
+/public/assets/street01-rider-pruned-study.glb
+/public/assets/street01-rider-hem*.glb
+/public/assets/street01-rider-delivery-pruned.glb
+/public/assets/street01-rider-rib-study.glb
+/public/assets/street01-rider-lacing-study.glb

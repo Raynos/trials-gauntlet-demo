@@ -9,14 +9,14 @@
     {
       "id": "street01-rider",
       "label": "Mustard rider with saved curly hair and beard",
-      "url": "/assets/street01-rider-round31-lossless.glb",
+      "url": "/assets/street01-rider-round32-lossless.glb",
       "kind": "rider",
       "position": [
         0,
         0.34,
         0
       ],
-      "mobileUrl": "/assets/street01-rider-round31-lossless.glb"
+      "mobileUrl": "/assets/street01-rider-round32-lossless.glb"
     },
     {
       "id": "street01-bike",

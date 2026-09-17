@@ -67,3 +67,31 @@ Two complete serial stage34 builds with lossless packing finished on 2026-09-17 
 - Evidence: `reports/delivery-stage34-repeatability.json` and `reports/delivery-stage34-repeat-comparison.json`; manifests/logs under the run directories named in that report.
 
 This proves repeatability for these two runs on the recorded local Blender/runtime. It does not claim cross-machine or cross-version determinism, or replace final rendered review.
+
+## Optional unused-descriptor pruning
+
+Pass `--prune --pack` to run `tools/prune-art-unused.mjs` after the raw rider
+rebuild and before lossless packing. `--prune` requires `--pack`; using it alone
+fails argument validation before any work. Without `--prune`, packing continues
+to consume the raw delivery directly.
+
+```sh
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 37 --prune --pack
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 37 --prune --pack --execute
+```
+
+The first command performs read-only preflight. Pruning keeps the raw file and
+writes `public/assets/street01-rider-delivery-pruned.glb`; the packer then reads
+that file and writes the existing `street01-rider-delivery-lossless.glb` target.
+The pruner removes unreachable mesh/material/texture/image/sampler descriptors
+while retaining all nodes, skins, animations and the entire raw binary chunk.
+The subsequent packer removes unreachable payload bytes. Unsupported extensions
+make pruning fail rather than silently lose data.
+
+Preflight checks the pruner script and the existing packing dependencies. The
+run manifest fingerprints the pruner, records its input/output SHA256 values,
+command, elapsed time and exit code, and copies its proof to
+`unused-prune-proof.json` in the run folder. The pruned and packed deliveries
+are recorded separately from the raw delivery. A pruning failure leaves the raw
+asset available and marks the run failed; final rendered review is still
+required before promotion.

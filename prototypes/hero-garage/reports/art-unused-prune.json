@@ -1,0 +1,177 @@
+{
+  "input": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb",
+  "output": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-round32-pruned.glb",
+  "sourceSHA256": "b87df7dfd8eb3b5baa59b607f51d4d6105177cbf41f45b55653acd778fa55088",
+  "outputSHA256": "acca5b83dad6b62469ef955d1964f8dbe3cbf7456ca7cd6a4820b2e21e4c1ab5",
+  "sourceBytes": 219760200,
+  "outputBytes": 219749224,
+  "arrayCounts": {
+    "meshes": {
+      "before": 57,
+      "after": 22,
+      "removed": 35
+    },
+    "materials": {
+      "before": 29,
+      "after": 14,
+      "removed": 15
+    },
+    "textures": {
+      "before": 44,
+      "after": 23,
+      "removed": 21
+    },
+    "images": {
+      "before": 42,
+      "after": 21,
+      "removed": 21
+    },
+    "samplers": {
+      "before": 13,
+      "after": 6,
+      "removed": 7
+    }
+  },
+  "retainedOldIndices": {
+    "meshes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      21,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56
+    ],
+    "materials": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      20,
+      21,
+      22,
+      26,
+      27,
+      28
+    ],
+    "textures": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      41,
+      42,
+      43
+    ],
+    "images": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      39,
+      40,
+      41
+    ],
+    "samplers": [
+      0,
+      1,
+      8,
+      9,
+      10,
+      12
+    ]
+  },
+  "allNodesSocketsSkinsAnimationsPreservedExactlyAfterMeshReferenceRemap": true,
+  "retainedMeshMaterialsVariantMappingsTextureImageSamplerDescriptorsExactAfterIndexRemap": true,
+  "allOtherJSONExact": true,
+  "entireBinaryChunkByteIdentical": true,
+  "noGeometryDeduplicationQuantizationOrSimplification": true,
+  "inspectedExtensions": [
+    {
+      "extension": "KHR_materials_variants",
+      "path": "root"
+    },
+    {
+      "extension": "KHR_materials_specular",
+      "path": "root.materials[2]"
+    },
+    {
+      "extension": "KHR_materials_specular",
+      "path": "root.materials[3]"
+    },
+    {
+      "extension": "KHR_materials_specular",
+      "path": "root.materials[4]"
+    },
+    {
+      "extension": "KHR_materials_specular",
+      "path": "root.materials[5]"
+    },
+    {
+      "extension": "KHR_materials_specular",
+      "path": "root.materials[6]"
+    },
+    {
+      "extension": "KHR_materials_specular",
+      "path": "root.materials[7]"
+    },
+    {
+      "extension": "KHR_materials_variants",
+      "path": "root.meshes[0].primitives[0]"
+    }
+  ],
+  "limitations": [
+    "This phase intentionally retains raw BIN and accessor/bufferView arrays; run lossless packer next to discard unreachable payloads.",
+    "All nodes are retained, including nodes not used by the default scene.",
+    "Parent must verify actual Three.js rendering before adoption."
+  ]
+}

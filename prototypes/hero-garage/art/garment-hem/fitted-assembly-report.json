@@ -1,0 +1,17 @@
+{
+  "sourceSHA256": "a62efd113d8e0a03d2918b01e992c04bf5ced0fbd88924c574a0fc8122c38d84",
+  "donorSHA256": "e1b9b4aec285c3217f9bb3fe91fbdd1dbf893152abf2ef2122b82c26d7f20a66",
+  "originalBinaryPrefixIdentical": true,
+  "originalMeshesAndMotionUnmodified": true,
+  "clothingNodesRedirectedOnly": [
+    "collar eyelet 1",
+    "collar eyelet -1",
+    "fitted drawcord 1",
+    "fitted drawcord -1",
+    "rider:anatomical sweatshirt",
+    "rider:anatomical sweatshirt pocket",
+    "rider:folded hood"
+  ],
+  "outputSHA256": "b87df7dfd8eb3b5baa59b607f51d4d6105177cbf41f45b55653acd778fa55088",
+  "outputBytes": 219760200
+}

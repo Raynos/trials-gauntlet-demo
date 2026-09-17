@@ -1,0 +1,636 @@
+{
+  "stage": 37,
+  "cwd": "/Users/raynos/projects/game-demos/trials-gauntlet-demo",
+  "commands": [
+    {
+      "name": "identity",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/full-rider-identity/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-garment-repair.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-head-groom.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-identity.glb"
+      ]
+    },
+    {
+      "name": "hoodie-source",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-shell/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-shell/hoodie-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-hoodie-shell.glb"
+      ]
+    },
+    {
+      "name": "hoodie-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-shell/assemble.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-identity.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-hoodie-shell.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-tailored.glb"
+      ]
+    },
+    {
+      "name": "cloth-finish",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-finish/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-shell/hoodie-source.blend"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-finish/cloth28-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-cloth28-donor.glb"
+      ]
+    },
+    {
+      "name": "cloth-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-finish/assemble.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-identity.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-cloth28-donor.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-cloth28.glb"
+      ]
+    },
+    {
+      "name": "neck-fit",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-neckfit-v2/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-finish/cloth28-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-cloth28.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-neckfit-v2/neckfit-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-neckfit-v2-donor.glb"
+      ]
+    },
+    {
+      "name": "neck-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-neckfit-v2/assemble.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-identity.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-neckfit-v2-donor.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-neckfit-v2.glb"
+      ]
+    },
+    {
+      "name": "footwear",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-refine/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-footwear-refined.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-refine/source-removal-triangles.json",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-refine/footwear-refined-source.blend"
+      ]
+    },
+    {
+      "name": "footwear-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-refine/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-neckfit-v2.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-footwear.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-neckfit-v2.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-footwear-refined.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-refine/source-removal-triangles.json"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-footwear.glb"
+      ]
+    },
+    {
+      "name": "cuff-boundaries",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/extract.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-finish/cloth28-source.blend"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/sleeve-boundaries.json"
+      ]
+    },
+    {
+      "name": "gloves",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/sleeve-boundaries.json"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-gloves-cuff3.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/source-removal-triangles.json",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/glove-refined-source.blend"
+      ]
+    },
+    {
+      "name": "glove-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-footwear.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-gloves.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-footwear.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-gloves-cuff3.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/source-removal-triangles.json"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-gloves.glb"
+      ]
+    },
+    {
+      "name": "accepted-denim",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-refine/build-accepted.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-identity.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-refine/source-removal-triangles.json"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-refine/denim-accepted-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-denim-refined-accepted.glb"
+      ]
+    },
+    {
+      "name": "denim-textures",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-texture/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-refine/denim-accepted-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-refine/source-removal-triangles.json"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-denim-textured.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-texture/denim-textured-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-texture/denim_normal.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-texture/denim_orm.png"
+      ]
+    },
+    {
+      "name": "denim-texture-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-texture/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-gloves.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-sleeves.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/blender/source/rider-street.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-gloves.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-denim-textured.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-refine/source-removal-triangles.json"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-sleeves.glb"
+      ]
+    },
+    {
+      "name": "sleeve-volume",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/sleeve-continuity/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-neckfit-v2/neckfit-source.blend"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/sleeve-continuity/sleeve-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-sleeve-donor.glb"
+      ]
+    },
+    {
+      "name": "sleeve-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/sleeve-continuity/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-sleeves.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-cotton.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-sleeves.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-sleeve-donor.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-cotton.glb"
+      ]
+    },
+    {
+      "name": "cotton-surface",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/sleeve-continuity/sleeve-source.blend"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/cotton-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-cotton-donor.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_albedo.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_normal.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_orm.png"
+      ]
+    },
+    {
+      "name": "cotton-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-cotton.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-glove-surface.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-cotton.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-cotton-donor.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-glove-surface.glb"
+      ]
+    },
+    {
+      "name": "glove-surface",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-surface/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-refine/cuff3/glove-refined-source.blend"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-surface/glove-refined-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-gloves-surface.glb"
+      ]
+    },
+    {
+      "name": "glove-surface-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/glove-surface/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-glove-surface.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-indigo.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-glove-surface.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-gloves-surface.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-indigo.glb"
+      ]
+    },
+    {
+      "name": "denim-finish",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-finish/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-texture/denim-textured-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-texture/denim_normal.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-texture/denim_orm.png"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-finish/denim-finish-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-denim-finish.glb"
+      ]
+    },
+    {
+      "name": "denim-finish-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/denim-finish/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-indigo.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-footwear-finish.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-indigo.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-denim-finish.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-footwear-finish.glb"
+      ]
+    },
+    {
+      "name": "footwear-finish",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-finish/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-refine/footwear-refined-source.blend"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-finish/footwear-refined-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-footwear-finish.glb"
+      ]
+    },
+    {
+      "name": "footwear-finish-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/footwear-finish/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-footwear-finish.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-garment-shape.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-footwear-finish.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-footwear-finish.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-garment-shape.glb"
+      ]
+    },
+    {
+      "name": "garment-shape",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/garment-shape/build.py"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/cotton-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_albedo.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_normal.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_orm.png"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/garment-shape/garment-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-garment-shape-donor.glb"
+      ]
+    },
+    {
+      "name": "garment-shape-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/garment-shape/assemble.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-garment-shape.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-settled-family.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-garment-shape.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-garment-shape-donor.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-settled-family.glb"
+      ]
+    },
+    {
+      "name": "settled-clip-family",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/seated-posture/family/build.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-settled-family.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-fitted-hem.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-settled-family.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-fitted-hem.glb"
+      ]
+    },
+    {
+      "name": "fitted-hem",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/garment-hem/build-fitted.py",
+        "--",
+        "--denim-source",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-fitted-hem.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-fitted-hem.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/garment-shape/garment-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_albedo.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_normal.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/cloth-surface/textures/cotton_orm.png",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/garment-hem/fit-denim.py"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/garment-hem/hem-fitted-source.blend",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-garment-hem-fitted-donor.glb"
+      ]
+    },
+    {
+      "name": "fitted-hem-assembly",
+      "argv": [
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        "-b",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/garment-hem/assemble-fitted.py",
+        "--",
+        "--base",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-fitted-hem.glb",
+        "--out",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb"
+      ],
+      "inputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-fitted-hem.glb",
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-garment-hem-fitted-donor.glb"
+      ],
+      "outputs": [
+        "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb"
+      ]
+    }
+  ],
+  "missing": [],
+  "pack": false
+}

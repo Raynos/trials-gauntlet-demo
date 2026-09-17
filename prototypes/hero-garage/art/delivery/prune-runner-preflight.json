@@ -1,0 +1,9 @@
+{
+  "pruneRequiresPack": true,
+  "missingPrunerDetected": true,
+  "syntaxPassed": true,
+  "prunePackPreflightMissing": [],
+  "noPrunePreflightMissing": [],
+  "sameArtRecipeCommands": true,
+  "fullExecutionPerformed": false
+}

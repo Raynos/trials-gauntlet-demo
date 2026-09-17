@@ -336,3 +336,8 @@ Rebuild investigation found nondeterministic cuff ring ordering causing small UV
 Provisionally accepted from48timed full/detail views across6clips and2lights: fuller foldedhood, broad sleevefolds, neutralgrey footwear, warmsteel exhaust, and10degree forwardsettled seatedpose. Allsixclips share easedneutral entry/exit while originaltargetphases remain. Actual750frame audit holds grip/sole displacement below2.07micrometres;54pose newfamilycloth audit finds0hood/shirt orcord crossings. [Review](../../prototypes/hero-garage/reports/art-round31-review.json).
 
 Two fullstage34rebuilds now produce byte-identical rawandpacked GLBs afterdeterministic cuffordering fix. Stage36 completepipeline includesgarment andclipfamily andhas run successfully. The reviewed catalog remains separatelyhashed. Rearhemflare is underboundedcorrection; finalsourcebundle/phonevalidation remainopen.10%allowance remains; hardstop2%.
+
+
+## Art round32 — fitted hem and leaner delivery, September17UTC
+
+The posterior hoodie hem now follows the jeans instead of flaring outward. Across54sampled poses the repaired posterior region has no denim crossings and at least3.637mm clearance; existing hidden waist overlaps are not called fixed. The canonical stage37 export is provisionally accepted from48timed Three.js views across all6clips and2lights. Removing obsolete assembly resources and losslessly packing retains byte-identical canvas output in12/12 comparisons. [Review](../../prototypes/hero-garage/reports/art-round32-review.json). Final user approval, close-up art quality and actual iPhone validation remain open. Latest usage9%; hard stop2%. Integration remains Claude + Opus owned.
