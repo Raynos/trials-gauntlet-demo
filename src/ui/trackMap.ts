@@ -1,9 +1,11 @@
 /**
- * Track select as an isometric diorama (assets/design/tracks/round3/SPEC.md §5: A3b "one tile
- * at a time" lit like A3e "night"). Pure data for `TrackSelectScreen` (src/ui/front.ts): the six
- * snap pages (five biome tiles + the proving-ground island), the pins on each tile in tier order,
- * their anchors in tile space, the amber route through them, the next tier gate, and the tile
- * plate paths. No DOM here so every rule is unit-tested (trackMap.test.ts).
+ * Track select as one continuous world map (assets/design/tracks/round4/SPEC.md § C "Ascent", ask #38):
+ * the six isometric night plates of round 3 (the proving-ground island + five biomes) stacked as one
+ * mountain — the apron at the foot, the Foundry summit top-right — under a 2-D camera. Pure data for
+ * `TrackSelectScreen` (src/ui/front.ts): the six regions in campaign order, the pins on each plate in
+ * tier order, their anchors in tile space *and* in world space, one route polyline through every
+ * campaign pin, the tier gate (a hazard-tape barrier on the trail at the seam), the plate offsets on
+ * the mountain and the camera's fit rules. No DOM here so every rule is unit-tested (trackMap.test.ts).
  */
 import type { BiomeId, Medal, TrackDef, TrackTier } from '../core/types';
 import { isLabTrack, isPlaygroundTrack, nextTrack, shipTracks, TIER_LABEL, TIER_ORDER, tierUnlocked, type MedalOf } from './progress';
@@ -32,6 +34,91 @@ export const PAGE_ORDER: readonly PageDef[] = [
   { id: 'foundry', label: 'Foundry', short: 'Foundry', blurb: 'Molten orange on black iron', lamp: '#ff6a1a' },
 ];
 
+/** One plate's box in world units (a 3:2 plate; the camera's zoom 1 draws it at today's `--tile-w`). */
+export const TILE = { w: 600, h: 400 } as const;
+/** Padding around the mountain so the camera's min zoom shows air, not a cut edge. */
+export const WORLD_PAD = 40;
+/**
+ * The plate's top-surface diamond inside its box (the `.slab` polygon, world units): top (300, 32), right (582, 183),
+ * bottom (300, 335), left (18, 183); the cut face hangs 41 below the front edges (to 376 at the front vertex).
+ * One iso step along the back-right edge is (282, 151): a plate moved by it has its left vertex on the previous
+ * plate's top vertex.
+ */
+export const ISO_STEP = { x: 282, y: 151 } as const;
+/** The cliff between two terraces: the upper plate is lifted this much above the iso step, and the seam band fills the gap. */
+export const CLIFF = 150;
+/** The quay: Industrial stands this far above the apron's box (straight up, a little to the right). */
+export const QUAY = { x: 40, y: 380 } as const;
+/**
+ * Where each plate sits on the mountain, in world units (x right, y down, the box's top-left corner): the
+ * apron at the foot (bottom-left), Industrial straight above it over the quay wall, then the other four biomes
+ * one iso step + one cliff up-and-right each, so every cut face reads as a terrace over the one below.
+ * Biome order, per SPEC § 4: M1 stays on the Industrial terraces, M2 in Snow, M3 with the Foundry — the
+ * tier rides on the pin's code letter and the altimeter, the trail never doubles back.
+ */
+export const PLATE_OFFSET: Readonly<Record<PageId, { x: number; y: number }>> = (() => {
+  const step = { x: ISO_STEP.x, y: -(ISO_STEP.y + CLIFF) };
+  const ind = { x: WORLD_PAD + QUAY.x, y: WORLD_PAD + 4 * -step.y };
+  const at = (i: number): { x: number; y: number } => ({ x: ind.x + i * step.x, y: ind.y + i * step.y });
+  return {
+    island: { x: ind.x - QUAY.x, y: ind.y + QUAY.y },
+    industrial: at(0),
+    canyon: at(1),
+    snow: at(2),
+    nightCity: at(3),
+    foundry: at(4),
+  };
+})();
+/** The whole mountain, world units. */
+export const WORLD = (() => {
+  let right = 0;
+  let bottom = 0;
+  for (const o of Object.values(PLATE_OFFSET)) {
+    right = Math.max(right, o.x + TILE.w);
+    bottom = Math.max(bottom, o.y + TILE.h);
+  }
+  return { w: right + WORLD_PAD, h: bottom + WORLD_PAD };
+})();
+/**
+ * Camera zoom: `open` is the working zoom the screen opens at (about one biome — 4–6 pins — on a landscape phone),
+ * `max` about one biome filling the viewport. Pins keep their screen size (the 44 px disc) at every zoom down to
+ * `pinMin`; below `plates` they drop their name plates (code + disc only, round 3's A3a rule, so neighbours never
+ * collide) and below `pinMin` they fold to dots and stop taking pointers (nothing hit-testable under 44 px).
+ * Zoom 1 draws a plate at today's `--tile-w`.
+ */
+export const ZOOM = { open: 1.3, max: 2, plates: 1, pinMin: 0.62 } as const;
+
+/**
+ * The rock mass under the whole stack, as an SVG-style polygon in world units (clip-path points): up the left
+ * vertices from the apron to the summit's top vertex, then down the right vertices to the apron's bottom vertex.
+ * Drawn behind every plate so the far view reads as one massif, not six floating slabs.
+ */
+export function massPolygon(): { x: number; y: number }[] {
+  const order: PageId[] = ['island', 'industrial', 'canyon', 'snow', 'nightCity', 'foundry'];
+  const left = order.map((id) => ({ x: PLATE_OFFSET[id].x + 18, y: PLATE_OFFSET[id].y + 183 }));
+  const top = { x: PLATE_OFFSET.foundry.x + 300, y: PLATE_OFFSET.foundry.y + 32 };
+  const right = [...order].reverse().map((id) => ({ x: PLATE_OFFSET[id].x + 582, y: PLATE_OFFSET[id].y + 183 }));
+  const foot = { x: PLATE_OFFSET.island.x + 300, y: PLATE_OFFSET.island.y + 376 };
+  return [...left, top, ...right, foot];
+}
+
+/** The centre of a region's pins in world units (the opening camera frames the region when its pins fit the free box). */
+export function regionCentre(page: Page): { x: number; y: number; w: number; h: number } {
+  const xs = page.pins.map((p) => p.wx);
+  const ys = page.pins.map((p) => p.wy);
+  const l = Math.min(...xs);
+  const r = Math.max(...xs);
+  const t = Math.min(...ys);
+  const b = Math.max(...ys);
+  return { x: (l + r) / 2, y: (t + b) / 2, w: r - l, h: b - t };
+}
+
+/** Tile-space anchor (0–100) → world units. */
+export function worldOf(page: PageId, x: number, y: number): { x: number; y: number } {
+  const o = PLATE_OFFSET[page];
+  return { x: Math.round(o.x + (x / 100) * TILE.w), y: Math.round(o.y + (y / 100) * TILE.h) };
+}
+
 /** Tile plate (generated with the Codex image pipeline, cut to alpha, ≤ 1024 px, WebP ≤ 150 KB) — `art/tiles/tile-<page>.webp`. */
 export function tilePlateSrc(page: PageId): string {
   return `art/tiles/tile-${page}.webp`;
@@ -57,6 +144,9 @@ export interface Pin {
   /** Anchor of the medal disc in tile space, 0–100 (x right, y down). */
   x: number;
   y: number;
+  /** The same anchor in world units (the plate's offset applied). */
+  wx: number;
+  wy: number;
 }
 
 export interface Page extends PageDef {
@@ -67,9 +157,6 @@ export interface Page extends PageDef {
   total: number;
   /** Every campaign pin locked (Night City before Hard opens). */
   locked: boolean;
-  /** SVG path (in a 100×100 viewBox) through the campaign pins, and the part of it that is cleared (`''` when nothing is). */
-  route: string;
-  routeLit: string;
 }
 
 export interface Gate {
@@ -78,6 +165,68 @@ export interface Gate {
   track: TrackDef;
   rule: string;
   page: PageId;
+}
+
+/** The one route: every campaign pin in biome order (the regions in campaign order, tier order inside each). */
+export function routePins(pages: readonly Page[]): Pin[] {
+  return pages.flatMap((p) => p.pins.filter((x) => !x.proving));
+}
+
+/**
+ * The trail as one SVG path in world units, and its lit part: every leg that leaves a medalled pin (the cleared
+ * stretches, each running on to the next pin — so the road out of E3 glows toward M2 even while M1 waits), as
+ * one path of subpaths (`''` when nothing is medalled).
+ */
+export function worldRoute(pages: readonly Page[]): { dim: string; lit: string } {
+  const pins = routePins(pages);
+  const pts = pins.map((p) => ({ x: p.wx, y: p.wy }));
+  const legs: string[] = [];
+  let run: { x: number; y: number }[] = [];
+  const flush = (): void => {
+    if (run.length >= 2) legs.push(pathThrough(run));
+    run = [];
+  };
+  for (let i = 0; i < pins.length - 1; i++) {
+    if (pins[i]!.medal) {
+      if (run.length === 0) run.push(pts[i]!);
+      run.push(pts[i + 1]!);
+    } else flush();
+  }
+  flush();
+  return { dim: pathThrough(pts), lit: legs.join(' ') };
+}
+
+/**
+ * Where the tier barrier stands: on the trail, halfway between the gate track's pin and the pin before it
+ * (the seam below Night City in the seeded state), or at the gate pin itself when it leads the trail.
+ */
+export function gateAnchor(pages: readonly Page[], gate: Gate): { x: number; y: number } {
+  const pins = routePins(pages);
+  const i = pins.findIndex((p) => p.track.id === gate.track.id);
+  const b = pins[i] ?? pins[0];
+  if (!b) return { x: WORLD.w / 2, y: WORLD.h / 2 };
+  const a = pins[i - 1];
+  if (!a) return { x: b.wx, y: b.wy };
+  return { x: Math.round((a.wx + b.wx) / 2), y: Math.round((a.wy + b.wy) / 2 + 5) };
+}
+
+/** The zoom at which the whole mountain fits a viewport of `vw × vh` px when zoom 1 draws a plate `tileW` px wide (never above `ZOOM.pinMin`, so min is always a real overview). */
+export function fitZoom(vw: number, vh: number, tileW: number): number {
+  const s0 = Math.max(1e-6, tileW / TILE.w);
+  const z = Math.min(vw / (WORLD.w * s0), vh / (WORLD.h * s0));
+  return Math.max(0.05, Math.min(ZOOM.pinMin - 0.02, Math.round(z * 1000) / 1000));
+}
+
+/** The pins whose anchors fall inside a screen-space window, given the camera (`x, y` = the world origin's screen position, `k` = px per world unit). */
+export function pinsInView(pages: readonly Page[], cam: { x: number; y: number; k: number }, vw: number, vh: number): Pin[] {
+  const out: Pin[] = [];
+  for (const p of pages)
+    for (const pin of p.pins) {
+      const sx = cam.x + pin.wx * cam.k;
+      const sy = cam.y + pin.wy * cam.k;
+      if (sx >= 0 && sx <= vw && sy >= 0 && sy <= vh) out.push(pin);
+    }
+  return out;
 }
 
 export function unlockRule(tier: TrackTier): string {
@@ -91,9 +240,11 @@ export function codeOf(t: TrackDef): string {
 }
 
 /**
- * Disc anchors for `n` pins, tile space 0–100: a run from the tile's front-left up to its back-right along the
- * open corridor of every plate, with a zigzag so neighbouring name plates never overlap (the harness overlap rule).
- * The island (7 pins) uses the plate's own layout: the Lab at the hangar, the five practice pads along the front.
+ * Disc anchors for `n` pins, tile space 0–100: a run across the plate from its left vertex to its right vertex
+ * (the trail crosses each terrace, then switchbacks up to the next), a gentle arc with a zigzag so neighbouring
+ * name plates never overlap (the harness overlap rule) — and so the last pin of one plate clears the first pin
+ * of the plate above by more than a pin's height. The island (7 pins) uses the plate's own layout: the Lab at
+ * the hangar, the five practice pads along the front.
  */
 export function pinAnchors(n: number, page: PageId): { x: number; y: number }[] {
   if (n <= 0) return [];
@@ -113,12 +264,12 @@ export function pinAnchors(n: number, page: PageId): { x: number; y: number }[] 
     // Lab pins first (they lead the list), then the pads.
     return Array.from({ length: n }, (_, i) => (i < n - 5 ? hangar[Math.min(i, hangar.length - 1)]! : pads[Math.min(i - (n - 5), 4)]!));
   }
-  if (n === 1) return [{ x: 48, y: 48 }];
+  if (n === 1) return [{ x: 50, y: 48 }];
   const out: { x: number; y: number }[] = [];
   for (let i = 0; i < n; i++) {
     const f = i / (n - 1);
-    const x = 18 + 60 * f;
-    const y = 58 - 22 * f + (i % 2 ? -6 : 6);
+    const x = 16 + 68 * f;
+    const y = 50 - 8 * Math.sin(Math.PI * f) + (i % 2 ? -5 : 5);
     out.push({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 });
   }
   return out;
@@ -130,9 +281,9 @@ function pathThrough(points: { x: number; y: number }[]): string {
   for (let i = 1; i < points.length; i++) {
     const a = points[i - 1]!;
     const b = points[i]!;
-    // A shallow bend between posts so the route reads as a track, not a ruler.
+    // A shallow bend between posts (world units) so the route reads as a track, not a ruler.
     const cx = (a.x + b.x) / 2;
-    const cy = (a.y + b.y) / 2 + 5;
+    const cy = (a.y + b.y) / 2 + 14;
     d += ` Q ${cx} ${cy} ${b.x} ${b.y}`;
   }
   return d;
@@ -165,16 +316,11 @@ export function buildPages(tracks: readonly TrackDef[], medalOf: MedalOf, dev = 
         rule: locked ? unlockRule(t.tier) : null,
         x: anchors[i]!.x,
         y: anchors[i]!.y,
+        ...(({ x, y }) => ({ wx: x, wy: y }))(worldOf(def.id, anchors[i]!.x, anchors[i]!.y)),
       };
     });
     const campaignPins = pins.filter((p) => !p.proving);
     const done = campaignPins.filter((p) => p.medal).length;
-    let lit = 0;
-    for (const p of campaignPins) {
-      if (!p.medal) break;
-      lit++;
-    }
-    const points = campaignPins.map((p) => ({ x: p.x, y: p.y }));
     return {
       ...def,
       index,
@@ -182,8 +328,6 @@ export function buildPages(tracks: readonly TrackDef[], medalOf: MedalOf, dev = 
       done,
       total: campaignPins.length,
       locked: campaignPins.length > 0 && campaignPins.every((p) => p.locked),
-      route: pathThrough(points),
-      routeLit: pathThrough(points.slice(0, Math.max(0, Math.min(points.length, lit + (lit < points.length ? 1 : 0))))),
     };
   });
 }
@@ -219,7 +363,7 @@ export function defaultPin(page: Page): number {
   return open >= 0 ? open : 0;
 }
 
-/** Miniature-row dots: one per campaign pin in order — a medal, an empty ring, or a padlock. */
+/** Altimeter-rung dots: one per campaign pin in order — a medal, an empty ring, or a padlock. */
 export function pageDots(page: Page): ('platinum' | 'gold' | 'silver' | 'bronze' | 'open' | 'locked')[] {
   return page.pins.filter((p) => !p.proving).map((p) => p.medal ?? (p.locked ? 'locked' : 'open'));
 }

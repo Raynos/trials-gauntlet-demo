@@ -339,19 +339,39 @@ removed stays.
     evaluate, PLAY is not inside a `.live` element, a tap at its point (dispatched at the hit-tested element,
     as a finger would land) leaves `screen === 'menu'`, PLAY is ≥ 88 × 44 and its centre is below 70 % of
     the height; once `.menu-screen.live`, the hit at PLAY's centre is PLAY at opacity 1.
-- **Track select** (`TrackSelectScreen` over `src/ui/trackMap.ts`, v0.2.2): one horizontal snap scroller
-  (`.tmap`) of six isometric night pages (`PAGE_ORDER`: the proving-ground island — Lab + playgrounds, no
-  medals — then Industrial, Canyon, Snow, Night City, Foundry), each a `.tpage` with a generated tile plate,
-  the tier's tracks as `.tpin` posts (code, name plate, medal disc, Ghost / Pro tags; locked = padlock +
-  `unlockRule`) at `pinAnchors` in tile space, the amber route through the campaign pins with the cleared
-  part lit, the next tier gate stub (`nextGate`), a 44 px miniature row (`.tmini .tm`) that snaps between
-  pages, and the focused pin's rising card (`.tcard`: RIDE, GHOST, REVIEW, top-5). Opens on `nextTrack()`'s
-  page at `defaultPin` (UP NEXT, else the first open pin); ←→ steps the pins (past the last: the next page),
-  ↓ reaches the card's actions then the next page, a swipe snaps pages; confirming the focused pin launches
+- **Track select** (`TrackSelectScreen` over `src/ui/trackMap.ts`, ask 38 — round 4 C "Ascent"): one
+  continuous world map under a 2-D camera. The six isometric night plates (`PAGE_ORDER`: the proving-ground
+  apron — Lab + playgrounds, no medals — then Industrial, Canyon, Snow, Night City, Foundry) are laid out in
+  world space (`PLATE_OFFSET`, `WORLD`, 600×400 units per plate) as one mountain: the apron at the foot,
+  Industrial straight above it over a quay wall, then each biome one iso step + a cliff band (`ISO_STEP`,
+  `CLIFF`, the `.tseam` pieces and one `.tmass` under the stack) up-and-right to the Foundry summit, in
+  campaign / biome order (M1 on the Industrial terraces — the tier rides on the pin's code letter and the
+  altimeter). One scene root (`.tscene`) carries every `.tregion` plate, one trail (`worldRoute`: an SVG
+  polyline in world units through every campaign pin, every leg out of a medalled pin lit), the `.tpin`
+  posts at `worldOf(pinAnchors)` (code, name plate, 44 px medal disc, Ghost / Pro tags; locked = padlock +
+  `unlockRule`) and the tier gate as a hazard-tape barrier across the trail at the seam (`gateAnchor`,
+  `.gate`: tier + rule on the tape, the next locked track under it). The camera is one
+  `translate(...) scale(...)` on the scene root — nothing scrolls, no page scroll: one finger / the mouse
+  drags (inertia), a pinch / the wheel / a Safari gesture zooms about the pointer between the fit zoom
+  (`fitZoom`: the whole mountain) and `ZOOM.max` (about one biome). Pins counter-scale by 1 / (s0 × zoom) so
+  the disc is 44 screen px at every working zoom; below `ZOOM.plates` they drop their name plates, below
+  `ZOOM.pinMin` they fold to dots and take no pointer (a tap on the map then flies to the nearest pin), and
+  a pin under the card / the altimeter / the MENU pill is `.shaded` (dim, no pointer) so no tappable hides
+  under another. Opens on the current track (last played if open, else `nextTrack()`, `defaultPin`) with its
+  region framed at the largest zoom ≤ `ZOOM.open` at which the region's pins fit the free box between the
+  card and the altimeter (never below `ZOOM.plates`; else the pin at `ZOOM.open`) — a subset of the map,
+  never all of it. The vertical altimeter (`.tmini .tm`, the summit on top) lists every region with its
+  `n / m`, medal dots and padlocks inside the right safe area under the MENU pill; a rung flies there. The
+  focused pin's card (`.tcard`, bottom-left: RIDE, GHOST, REVIEW, top-5) is screen space. ←→ step the pins
+  along the trail (past the last: the next region), ↓ reaches the card's actions then the next region up, the
+  camera follows the focused pin into the middle 60 % of the free box; confirming the focused pin launches
   (`play()` at 180 ms, screen gone at 420 ms), a locked one shakes and states its rule. Lock rule
   (`src/ui/progress.ts`, tested): a tier opens when every authored track of every earlier tier holds a
-  medal. The page model is pure data (`buildPages`, `trackMap.test.ts`); `docs/evidence/level-select` holds
-  the measurements (one scroll axis, 0 px vertical overflow, every tappable ≥ 44 px, B1 in two taps).
+  medal. The world model is pure data (`buildPages`, `worldRoute`, `gateAnchor`, `fitZoom`, `pinsInView`;
+  `trackMap.test.ts` proves no two pins overlap at any working zoom); `docs/evidence/level-select/round4`
+  holds the played clip and the measurements (no scroll axis, 0 px page overflow, every tappable ≥ 44 px,
+  0 overlaps in every state on Chromium and WebKit at 932×430 and 844×390, 4 pins on screen at open, the
+  fit zoom 0.20, B1 in two taps once focused).
 - **Settings** (`SettingsScreen`): one column of rows — Quality, Sound, Volume (−/+ 10 %), Ghost,
   Rider / Bike (only when the renderer exports `setModels`; feature-detected in `main.ts`), Reset progress
   (two presses within 3 s). Up/down = row, left/right = value, confirm = cycle / fire. Footer: one quiet

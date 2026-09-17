@@ -1,5 +1,9 @@
 /**
- * Headless stills + measurements of the diorama track select (Chromium or WebKit, 932×430 and 844×390): opening page, a snap, a locked-pin tap, the focused card, the island; per state the scroll axes, per-page vertical overflow, tappable sizes and overlaps, nodes per page. Evidence lives in docs/evidence/level-select/.
+ * Headless stills + measurements of the world-map track select (Chromium or WebKit, 932×430 and 844×390): the opening
+ * camera (centred on the current track at the opening zoom), a drag-pan, a pinch-zoom out to the whole mountain, a zoom
+ * back in, a locked-pin tap (H1, its rule), the focused card on B1, the apron; per state the camera (zoom, bounds, pins
+ * on screen), the scroll axes (must be none — the map is a transform), tappable sizes and overlaps, nodes in the scene.
+ * Evidence lives in docs/evidence/level-select/round4/.
  *   npx tsx harness/e2e/tracks-stills.mts --url=http://127.0.0.1:4178 --out=DIR [--engine=chromium|webkit] [--geom=932x430,844x390] [--seed=1]
  * `--seed=1` writes the round-1 seeded state (6 / 15 cleared: B1 gold, B2 silver, B3 bronze, E1 silver, E2 bronze, E3 silver on Pro) before PLAY.
  */
@@ -31,6 +35,31 @@ async function boot(page: Page): Promise<void> {
   await page.waitForFunction(() => !!document.querySelector('.menu-screen.live'), null, { timeout: 60000 });
 }
 
+/** One-finger drag on the map (touch): `steps` moves over ~`ms`. */
+async function drag(page: Page, x0: number, y0: number, dx: number, dy: number, steps = 12): Promise<void> {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y: y0 }] });
+  for (let i = 1; i <= steps; i++) {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 + (dx * i) / steps, y: y0 + (dy * i) / steps }] });
+    await page.waitForTimeout(16);
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+}
+
+/** Two-finger pinch about (`cx`, `cy`): the fingers' span goes from `s0` to `s1` px. */
+async function pinch(page: Page, cx: number, cy: number, s0: number, s1: number, steps = 12): Promise<void> {
+  const cdp = await page.context().newCDPSession(page);
+  const at = (s: number) => [{ x: cx - s / 2, y: cy, id: 0 }, { x: cx + s / 2, y: cy, id: 1 }];
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: at(s0) });
+  for (let i = 1; i <= steps; i++) {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: at(s0 + ((s1 - s0) * i) / steps) });
+    await page.waitForTimeout(16);
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+}
+
 const browser = engine === 'webkit' ? await webkit.launch({ headless: true }) : await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const report: Record<string, unknown> = {};
 try {
@@ -55,7 +84,7 @@ try {
     await page.waitForTimeout(500);
     const measure = () => page.evaluate(`(() => {
       const map = document.querySelector('.tmap');
-      const pages = [...document.querySelectorAll('.tpage')];
+      const scene = document.querySelector('.tscene');
       const axes = [];
       for (const el of document.querySelectorAll('.tracks-screen *')) {
         const cs = getComputedStyle(el);
@@ -64,42 +93,78 @@ try {
         if (sx) axes.push('x:' + el.className);
         if (sy) axes.push('y:' + el.className);
       }
-      const overflowY = pages.map((p) => Math.max(0, p.scrollHeight - p.clientHeight));
-      const tileOverflow = pages.map((p) => { const t = p.querySelector('.ttile'); const r = t.getBoundingClientRect(); const m = map.getBoundingClientRect(); return { top: Math.round(m.top - r.top), bottom: Math.round(r.bottom - m.bottom) }; });
-      const targets = [...document.querySelectorAll('.tracks-screen button')].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 2 && r.right > 0 && r.left < innerWidth; }).map((b) => { const r = b.getBoundingClientRect(); return { sel: b.className.split(' ').slice(0, 2).join('.') + (b.dataset.track ? '[' + b.dataset.track + ']' : ''), w: Math.round(r.width), h: Math.round(r.height), x: Math.round(r.left), y: Math.round(r.top) }; });
+      const m = map.getBoundingClientRect();
+      const vis = (b) => { const r = b.getBoundingClientRect(); return r.width > 2 && r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight; };
+      const targets = [...document.querySelectorAll('.tracks-screen button')].filter((b) => vis(b) && getComputedStyle(b).pointerEvents !== 'none').map((b) => { const r = b.getBoundingClientRect(); return { sel: b.className.split(' ').slice(0, 2).join('.') + (b.dataset.track ? '[' + b.dataset.track + ']' : '') + (b.dataset.id ? '[' + b.dataset.id + ']' : ''), w: Math.round(r.width), h: Math.round(r.height), x: Math.round(r.left), y: Math.round(r.top) }; });
       const small = targets.filter((t) => t.w < 44 || t.h < 44);
       const overlaps = [];
-      for (let i = 0; i < targets.length; i++) for (let j = i + 1; j < targets.length; j++) { const a = targets[i], b = targets[j]; const ox = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x); const oy = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y); if (ox > 4 && oy > 4) overlaps.push(a.sel + ' x ' + b.sel + ' ' + ox + 'x' + oy); }
+      for (let i = 0; i < targets.length; i++) for (let j = i + 1; j < targets.length; j++) { const a = targets[i], b = targets[j]; const nested = (a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a.y + a.h <= b.y + b.h) || (b.x >= a.x && b.y >= a.y && b.x + b.w <= a.x + a.w && b.y + b.h <= a.y + a.h); if (nested) continue; const ox = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x); const oy = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y); if (ox > 4 && oy > 4) overlaps.push(a.sel + ' x ' + b.sel + ' ' + ox + 'x' + oy); }
       const on = document.querySelector('.tpin.on');
-      const nodes = pages.map((p) => p.querySelectorAll('*').length - p.querySelectorAll('.tpin, .tpin *').length);
-      return { page: window.__trials.app && window.__trials.app.screen(), scrollLeft: map.scrollLeft, pageW: map.clientWidth, axes, overflowY, tileOverflow, targets: targets.length, small, overlaps, focused: on && on.dataset.track, nodesPerPage: nodes, totals: document.querySelector('.tracks-totals').textContent };
+      // Pins whose disc centre is inside the map box.
+      const pinsOnScreen = [...document.querySelectorAll('.tpin')].filter((p) => { const d = p.querySelector('.disc').getBoundingClientRect(); const cx = d.left + d.width / 2, cy = d.top + d.height / 2; return cx >= m.left && cx <= m.right && cy >= m.top && cy <= m.bottom; }).map((p) => p.dataset.track);
+      const safe = { alt: document.querySelector('.tmini').getBoundingClientRect(), card: document.querySelector('.tcard').getBoundingClientRect(), menu: document.querySelector('.tracks-screen .backbtn').getBoundingClientRect() };
+      const rect = (r) => ({ x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) });
+      const gate = document.querySelector('.gate');
+      return { page: window.__trials.app && window.__trials.app.screen(), region: document.querySelector('.tm.on') && document.querySelector('.tm.on').dataset.id, camera: { zoom: Number(scene.dataset.zoom), x: Number(scene.dataset.x), y: Number(scene.dataset.y), far: scene.classList.contains('far') }, mapBox: rect(m), axes, pageOverflow: Math.max(0, document.documentElement.scrollHeight - innerHeight) + Math.max(0, document.documentElement.scrollWidth - innerWidth), targets: targets.length, small, overlaps, focused: on && on.dataset.track, pinsOnScreen, gateOnScreen: !!gate && vis(gate), gateText: gate && gate.textContent, altimeter: rect(safe.alt), card: rect(safe.card), menuPill: rect(safe.menu), sceneNodes: scene.querySelectorAll('*').length, totals: document.querySelector('.tracks-totals').textContent };
     })()`);
     const shot = async (name: string): Promise<void> => { await page.screenshot({ path: path.join(out, `${engine}-${g.name}-${name}.png`) }); };
+    // A fly is a 380 ms tween on rAF; under SwiftShader a frame can take 300+ ms, so wait until the camera has held still for 400 ms (up to 4 s).
+    const settle = async (): Promise<void> => {
+      const cam = () => page.evaluate(() => { const s = document.querySelector<HTMLElement>('.tscene')!; return `${s.dataset['zoom']}/${s.dataset['x']}/${s.dataset['y']}`; });
+      let last = await cam();
+      const t0 = Date.now();
+      while (Date.now() - t0 < 4000) {
+        await page.waitForTimeout(400);
+        const now = await cam();
+        if (now === last) return;
+        last = now;
+      }
+    };
     report[`open@${g.name}`] = await measure();
     await shot('1-open');
-    // Snap to the next page with the miniature row (Canyon = page 2).
-    await tapSel('.tmini .tm[data-p="2"]');
-    await page.waitForTimeout(700);
-    report[`snap@${g.name}`] = await measure();
-    await shot('2-snap-canyon');
-    // Locked pin: Night City page, tap its first pin.
-    await tapSel('.tmini .tm[data-p="4"]');
-    await page.waitForTimeout(700);
-    await tapSel('.tpage[data-page=nightCity] .tpin');
+    // The drag and the pinch go through CDP touch events (Chromium only; Playwright's WebKit has no multi-touch).
+    if (engine === 'chromium') {
+      // Drag-pan: one finger, up and to the left (the mountain climbs up-right, so this looks up the trail).
+      await drag(page, g.width * 0.55, g.height * 0.55, -160, 120);
+      await settle();
+      report[`pan@${g.name}`] = await measure();
+      await shot('2-pan');
+      // Pinch out to the whole mountain (the fit zoom): the pins fold to dots.
+      await pinch(page, g.width * 0.5, g.height * 0.5, 260, 40);
+      await pinch(page, g.width * 0.5, g.height * 0.5, 260, 40);
+      await settle();
+      report[`far@${g.name}`] = await measure();
+      await shot('3-far');
+      // Zoom back in: a tap on the map when far flies to the nearest pin at the opening zoom.
+      await tapSel('.tregion[data-page=canyon]');
+      await settle();
+      report[`near@${g.name}`] = await measure();
+      await shot('4-near');
+    } else {
+      // WebKit: the Canyon rung flies there (a region frame), the same camera the far tap lands on.
+      await tapSel('.tmini .tm[data-id=canyon]');
+      await settle();
+      report[`near@${g.name}`] = await measure();
+      await shot('4-near');
+    }
+    // Locked pin: the altimeter's Night City rung, then a tap on H1 — it shakes and states its rule.
+    await tapSel('.tmini .tm[data-id=nightCity]');
+    await settle();
+    await tapSel('.tpin[data-track=h1-wheelie-wire]');
     await page.waitForTimeout(150);
-    await shot('3-locked-tap');
+    await shot('5-locked-tap');
     report[`locked@${g.name}`] = await measure();
-    // Focused card: back to Industrial, tap B2 (unfocused → focuses, card rises).
-    await tapSel('.tmini .tm[data-p="1"]');
-    await page.waitForTimeout(700);
-    await tapSel('.tpin[data-track="b2-lean-back"]');
-    await page.waitForTimeout(400);
-    await shot('4-focused-card');
+    // Focused card: the Industrial rung, tap B1 (unfocused → focuses, card rises).
+    await tapSel('.tmini .tm[data-id=industrial]');
+    await settle();
+    await tapSel('.tpin[data-track="b1-first-ride"]');
+    await settle();
+    await shot('6-focused-b1');
     report[`card@${g.name}`] = await measure();
-    // Island page.
-    await tapSel('.tmini .tm[data-p="0"]');
-    await page.waitForTimeout(700);
-    await shot('5-island');
+    // The apron (Lab + pads).
+    await tapSel('.tmini .tm[data-id=island]');
+    await settle();
+    await shot('7-island');
     report[`island@${g.name}`] = await measure();
     await ctx.close();
   }

@@ -1,0 +1,51 @@
+{
+ "geom": "932x430",
+ "engine": "chromium/swiftshader",
+ "idleFrameMs": {
+  "n": 241,
+  "p50": 8.325000000000728,
+  "p90": 9.924999999999272,
+  "max": 10.31499999999869
+ },
+ "dragFrameMs": {
+  "n": 123,
+  "p50": 8.330000000001746,
+  "p90": 9.9900000000016,
+  "max": 201.2599999999984
+ },
+ "inertiaFrameMs": {
+  "n": 236,
+  "p50": 8.325000000000728,
+  "p90": 9.930000000000291,
+  "max": 131.6949999999997
+ },
+ "pushCamUs": 12,
+ "sceneNodes": 183,
+ "pins": 22,
+ "plateBytes": [
+  {
+   "file": "tile-island.webp",
+   "bytes": 76494
+  },
+  {
+   "file": "tile-industrial.webp",
+   "bytes": 81898
+  },
+  {
+   "file": "tile-canyon.webp",
+   "bytes": 92574
+  },
+  {
+   "file": "tile-snow.webp",
+   "bytes": 82818
+  },
+  {
+   "file": "tile-nightCity.webp",
+   "bytes": 87618
+  },
+  {
+   "file": "tile-foundry.webp",
+   "bytes": 125914
+  }
+ ]
+}
