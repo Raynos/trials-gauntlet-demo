@@ -11,7 +11,7 @@
 - Never announce completion while budget remains.
 - This game should be playable on mobile iOS safari & desktop.
 - Favor subagents over workflows where possible, as subagents are resumable.
-- Plans and their status live in `docs/plans/README.md` (kept current by the parent at every commit); live plans: `docs/plans/PERF-BACKLOG.md`, Astra's `docs/plans/HERO_GARAGE_PRODUCTION.md`, ours `RIDING_POSES.md` / `CHROMIUM_METAL_SHADER_INIT.md` / `HERO_ART_INTEGRATION.md`, and the proposed `docs/plans/USE_A_REAL_PHYSICS_LIBRARY.md`; the four closed plans (`MEGA_PLAN.md`, `physics-v2.md`, `PERF.md`, `RIDER_ON_GLASS.md`) are in `project/archive/`.
+- Plans and their status live in `docs/plans/README.md` (kept current by the parent at every commit); live plans: `docs/plans/PERF-BACKLOG.md`, Astra's `docs/plans/HERO_GARAGE_PRODUCTION.md`, ours `RIDING_POSES.md` / `HERO_ART_INTEGRATION.md`, and the proposed `docs/plans/USE_A_REAL_PHYSICS_LIBRARY.md`; the four closed plans (`MEGA_PLAN.md`, `physics-v2.md`, `PERF.md`, `RIDER_ON_GLASS.md`) are in `project/archive/`.
 - Completed plans and permanently stale docs are archived under `project/archive/` (rules in its README); status docs never move.
 - `docs/mission.md` holds the bars no plan can close; plans carry measurable proxies and may cite a mission line as their bar.
 - Every user ask → a row in `docs/tasks/ASKS.md` before you start; flip it when it lands; rows never leave.

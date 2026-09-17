@@ -1,0 +1,492 @@
+{
+ "date": "2026-09-16",
+ "harness": "harness/hero-ship.mts <build> harness/inputs/b1-first-ride/bot-3.json <out> metal (unmodified)",
+ "runs": [
+  {
+   "run": "run-metal-02",
+   "build": "HEAD 2720070",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 2475,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 3.6500000953674316,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-metal-03",
+   "build": "HEAD 2720070",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 3311,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 6.294999837875366,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-metal-04",
+   "build": "HEAD 2720070",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 3134,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 12.90999984741211,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-metal-05-pro",
+   "build": "HEAD 2720070",
+   "condition": "warm, idle, bot-3-pro",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 3525,
+   "clear": {
+    "cleared": true,
+    "time": 37.96666666666667,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 15.290000200271606,
+    "glError": 0
+   },
+   "inputTicks": 4556,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-head-swiftshader-bg",
+   "build": "HEAD 2720070",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 5164,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 6.979999780654907,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-pre-r15-01",
+   "build": "11eaca5 (5b56431^)",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 4747,
+   "clear": {
+    "cleared": true,
+    "time": 40.3,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 90,
+    "crashToRestartTicks": 1,
+    "frameMs": 11.025000095367432,
+    "glError": 0
+   },
+   "inputTicks": 4836,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-r15r7-today-01",
+   "build": "r15-r7-dist (original failing build)",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 3624,
+   "clear": {
+    "cleared": true,
+    "time": 40.3,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 90,
+    "crashToRestartTicks": 1,
+    "frameMs": 12.440000057220459,
+    "glError": 0
+   },
+   "inputTicks": 4836,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-r15r7-today-02",
+   "build": "r15-r7-dist",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 4907,
+   "clear": {
+    "cleared": true,
+    "time": 40.3,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 90,
+    "crashToRestartTicks": 1,
+    "frameMs": 17.329999923706055,
+    "glError": 0
+   },
+   "inputTicks": 4836,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-r15r7-today-03",
+   "build": "r15-r7-dist",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 4589,
+   "clear": {
+    "cleared": true,
+    "time": 40.3,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 90,
+    "crashToRestartTicks": 1,
+    "frameMs": 12.694999933242798,
+    "glError": 0
+   },
+   "inputTicks": 4836,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-r15r7-today-04",
+   "build": "r15-r7-dist",
+   "condition": "warm, idle",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 3785,
+   "clear": {
+    "cleared": true,
+    "time": 40.3,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 90,
+    "crashToRestartTicks": 1,
+    "frameMs": 10.990000009536743,
+    "glError": 0
+   },
+   "inputTicks": 4836,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-r15r7-today-p1",
+   "build": "r15-r7-dist",
+   "condition": "3 concurrent Metal gates",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 4605,
+   "clear": {
+    "cleared": true,
+    "time": 40.3,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 90,
+    "crashToRestartTicks": 1,
+    "frameMs": 16.850000143051147,
+    "glError": 0
+   },
+   "inputTicks": 4836,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-r15r7-today-p2",
+   "build": "r15-r7-dist",
+   "condition": "3 concurrent Metal gates",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 6037,
+   "clear": {
+    "cleared": true,
+    "time": 40.3,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 90,
+    "crashToRestartTicks": 1,
+    "frameMs": 11.475000143051147,
+    "glError": 0
+   },
+   "inputTicks": 4836,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-r15r7-today-p3",
+   "build": "r15-r7-dist",
+   "condition": "3 concurrent Metal gates",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 8856,
+   "clear": {
+    "cleared": true,
+    "time": 40.3,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 90,
+    "crashToRestartTicks": 1,
+    "frameMs": 9.644999980926514,
+    "glError": 0
+   },
+   "inputTicks": 4836,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-head-coldmetal-01",
+   "build": "HEAD 2720070",
+   "condition": "app Metal cache denied (sandbox-exec)",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 4418,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 13.225000143051147,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-head-coldmetal-02",
+   "build": "HEAD 2720070",
+   "condition": "app Metal cache denied",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 4187,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 18.53499984741211,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-head-coldmetal-03",
+   "build": "HEAD 2720070",
+   "condition": "app Metal cache denied",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 4503,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 46.174999952316284,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-head-starved-01",
+   "build": "HEAD 2720070",
+   "condition": "14 busy loops + SwiftShader gate, load avg 37-105",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 6885,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 24.72000002861023,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  },
+  {
+   "run": "run-head-starved-02",
+   "build": "HEAD 2720070",
+   "condition": "14 busy loops + SwiftShader gate, load avg 37-105",
+   "pass": true,
+   "backend": "metal",
+   "browserVersion": "151.0.7922.34",
+   "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+   "errors": [],
+   "warnings": [
+    "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+   ],
+   "coldBootMs": 5492,
+   "clear": {
+    "cleared": true,
+    "time": 40.55833333333333,
+    "faults": 0
+   },
+   "restart": {
+    "crashTick": 92,
+    "crashToRestartTicks": 1,
+    "frameMs": 24.419999837875366,
+    "glError": 0
+   },
+   "inputTicks": 4867,
+   "mismatchedTick": null
+  }
+ ]
+}

@@ -1,0 +1,74 @@
+{
+ "pass": true,
+ "browser": "chromium",
+ "browserVersion": "151.0.7922.34",
+ "backend": "metal",
+ "renderer": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+ "build": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/b5941d25-28be-4d95-8181-8de9f9947a19/scratchpad/head/dist",
+ "models": [
+  {
+   "logical": "models/bike-lod.glb",
+   "url": "models/d783c6febf29d309/bike-lod-411a91f17e606143.glb",
+   "bytes": 472872,
+   "sha256": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502"
+  },
+  {
+   "logical": "models/bike.glb",
+   "url": "models/d783c6febf29d309/bike-7f849529195be0ac.glb",
+   "bytes": 1394072,
+   "sha256": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec"
+  },
+  {
+   "logical": "models/rider-street-lod.glb",
+   "url": "models/f52d537f93059e68/rider-street-lod-a209dd19ab7b5cb8.glb",
+   "bytes": 546220,
+   "sha256": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3"
+  },
+  {
+   "logical": "models/rider-street.glb",
+   "url": "models/f52d537f93059e68/rider-street-656728388735525f.glb",
+   "bytes": 1476800,
+   "sha256": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f"
+  }
+ ],
+ "assetProof": {
+  "hashes": {
+   "models/d783c6febf29d309/bike-lod-411a91f17e606143.glb": "411a91f17e606143ff21121b58822f9ac31e8d83db8b6ce7abb65720a033d502",
+   "models/d783c6febf29d309/bike-7f849529195be0ac.glb": "7f849529195be0acb0f3031ee0defbfb6a4c93519cf7e235042757f0f94cedec",
+   "models/f52d537f93059e68/rider-street-lod-a209dd19ab7b5cb8.glb": "a209dd19ab7b5cb8676235778c8a78e38571f3f70b96a0ec4f363dd07125a9c3",
+   "models/f52d537f93059e68/rider-street-656728388735525f.glb": "656728388735525f978f737a33acb24bd4e8bc3c940feb884e362568bf24160f"
+  },
+  "errors": []
+ },
+ "unchanged": true,
+ "inputFile": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/b5941d25-28be-4d95-8181-8de9f9947a19/scratchpad/head/harness/inputs/b1-first-ride/bot-3.json",
+ "inputSha256": "c9b4293a8e8f698aaa48f6a674eef0daa470c28eb1ab921ec6b52ce5a216b8fe",
+ "inputTicks": 4867,
+ "mismatchedTick": null,
+ "coldBootMs": 2475.165458,
+ "clear": {
+  "cleared": true,
+  "time": 40.55833333333333,
+  "faults": 0
+ },
+ "restart": {
+  "crashTick": 92,
+  "crashToRestartTicks": 1,
+  "restartStateTick": 0,
+  "restartPhase": "riding",
+  "faultsBefore": 1,
+  "faultsAfter": 1,
+  "commandMs": 0.24000000953674316,
+  "frameMs": 3.6500000953674316,
+  "movesAfterTicks": 1,
+  "glError": 0,
+  "heroDoc": "bike rider"
+ },
+ "errors": [],
+ "warnings": [
+  "[render] track budget: 11 calls / 177888 tris (cap 20 / 80k)"
+ ],
+ "snapshotScope": "Every physics F64/U8 byte and serialized complete Game counter; counters use existing JSON wire representation.",
+ "renderCadence": "Full clear and crash prefix rendered every 2 ticks at 120 Hz using production interpolation; no fixed-alpha override.",
+ "note": "Headless desktop browser; frameMs is CPU submission latency, not GPU completion or actual iOS presentation. Played capture is separate."
+}
