@@ -27,8 +27,10 @@ back today.
 **Residual, untested:** a *fully* cold `MTLCompilerService` cache. The sandbox only denied the app-level cache
 (`$DARWIN_USER_CACHE_DIR/com.google.chrome.for.testing.helper/com.apple.metal`); the compiler service's own cache
 (`$DARWIN_USER_CACHE_DIR/com.apple.metal`, 1.7 GB) is a separate process and was warm for every run. Testing it means
-moving those two directories aside (they regenerate), which the commit guard refuses for an agent — the recipe is
-in `project/human-in-the-loop/QUEUE.md`. If a first-ever Chrome/macOS visit is the trigger, it would show there.
+moving those two directories aside (they regenerate), which the commit guard refuses for an agent. The user chose not to
+chase it (2026-09-16). Recipe if it ever recurs: move `$C/com.apple.metal` and
+`$C/com.google.chrome.for.testing.helper/com.apple.metal` (`C=$(getconf DARWIN_USER_CACHE_DIR)`) aside, `pnpm build`, then
+`npx tsx harness/hero-ship.mts dist harness/inputs/b1-first-ride/bot-3.json <out> metal`.
 
 The original `r15-r7-dist` and its nine diagnostic runs lived in the `trials-gauntlet-blender` worktree, which was
 removed during this session; their conclusions survive in [hero-r15/gl-investigation.md](../hero-r15/gl-investigation.md).

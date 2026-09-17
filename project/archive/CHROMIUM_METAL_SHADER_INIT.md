@@ -4,7 +4,7 @@
 Metal gate runs (HEAD, pre-r15, the exact failing `r15-r7-dist`; warm, app-cache-cold, 3× concurrent, load average 105)
 with zero GL errors: [docs/evidence/chromium-metal/](../../docs/evidence/chromium-metal/README.md). Not attributable to code —
 `5b56431^` passes and the 09-15 failing bytes pass today on the same Chromium 151. Residual: a fully cold `MTLCompilerService`
-cache is untested (HR-08 in the human queue). The gate recipe below stays the check if it ever recurs.
+cache is untested; the user closed it without chasing it (recipe in the evidence README). The gate recipe below stays the check if it ever recurs.
 
 Split out of `project/archive/HERO_OPEN_WORK.md` §3 on 2026-09-16. Owner: the perf / render owner
 (`src/render/index.ts`, `resourceRetirement.ts`). One bug with its own ship gate; closes in one round if it no longer
