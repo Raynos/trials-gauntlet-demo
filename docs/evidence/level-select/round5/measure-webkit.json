@@ -1,0 +1,497 @@
+{
+ "open@932x430": {
+  "page": "tracks",
+  "region": "industrial",
+  "camera": {
+   "zoom": 1.127,
+   "x": 169,
+   "y": -1263,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 55,
+   "w": 932,
+   "h": 375
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 14,
+  "small": [],
+  "overlaps": [],
+  "focused": "m1-hop-up",
+  "pinsOnScreen": [
+   "b1-first-ride",
+   "b2-lean-back",
+   "b3-kicker-row",
+   "m1-hop-up"
+  ],
+  "gateOnScreen": false,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 819,
+   "y": 68,
+   "w": 97,
+   "h": 350
+  },
+  "card": {
+   "x": 47,
+   "y": 286,
+   "w": 243,
+   "h": 132
+  },
+  "menuPill": {
+   "x": 825,
+   "y": 16,
+   "w": 83,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "near@932x430": {
+  "page": "tracks",
+  "region": "canyon",
+  "camera": {
+   "zoom": 1.127,
+   "x": -117,
+   "y": -956,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 55,
+   "w": 932,
+   "h": 375
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focused": "e1-uphill-weight",
+  "pinsOnScreen": [
+   "e1-uphill-weight",
+   "e2-rear-wheel-first",
+   "e3-stairway"
+  ],
+  "gateOnScreen": false,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 819,
+   "y": 68,
+   "w": 97,
+   "h": 350
+  },
+  "card": {
+   "x": 47,
+   "y": 271,
+   "w": 243,
+   "h": 147
+  },
+  "menuPill": {
+   "x": 825,
+   "y": 16,
+   "w": 83,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "locked@932x430": {
+  "page": "tracks",
+  "region": "nightCity",
+  "camera": {
+   "zoom": 1.127,
+   "x": -483,
+   "y": -382,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 55,
+   "w": 932,
+   "h": 375
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focused": "h1-wheelie-wire",
+  "pinsOnScreen": [
+   "h1-wheelie-wire"
+  ],
+  "gateOnScreen": true,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 819,
+   "y": 68,
+   "w": 97,
+   "h": 350
+  },
+  "card": {
+   "x": 47,
+   "y": 288,
+   "w": 243,
+   "h": 130
+  },
+  "menuPill": {
+   "x": 825,
+   "y": 16,
+   "w": 83,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "card@932x430": {
+  "page": "tracks",
+  "region": "industrial",
+  "camera": {
+   "zoom": 1.127,
+   "x": 233,
+   "y": -1297,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 55,
+   "w": 932,
+   "h": 375
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focused": "b1-first-ride",
+  "pinsOnScreen": [
+   "b1-first-ride",
+   "b2-lean-back",
+   "b3-kicker-row",
+   "m1-hop-up"
+  ],
+  "gateOnScreen": false,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 819,
+   "y": 68,
+   "w": 97,
+   "h": 350
+  },
+  "card": {
+   "x": 47,
+   "y": 271,
+   "w": 243,
+   "h": 147
+  },
+  "menuPill": {
+   "x": 825,
+   "y": 16,
+   "w": 83,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "island@932x430": {
+  "page": "tracks",
+  "region": "island",
+  "camera": {
+   "zoom": 1.008,
+   "x": 233,
+   "y": -1468,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 55,
+   "w": 932,
+   "h": 375
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 15,
+  "small": [],
+  "overlaps": [],
+  "focused": "lab-flat-200",
+  "pinsOnScreen": [
+   "lab-flat-200",
+   "lab-physics-test",
+   "p1-container-yard",
+   "p2-canyon-run",
+   "p3-snow-line",
+   "p4-night-circuit",
+   "p5-foundry-floor"
+  ],
+  "gateOnScreen": false,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 819,
+   "y": 68,
+   "w": 97,
+   "h": 350
+  },
+  "card": {
+   "x": 47,
+   "y": 298,
+   "w": 243,
+   "h": 120
+  },
+  "menuPill": {
+   "x": 825,
+   "y": 16,
+   "w": 83,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "open@844x390": {
+  "page": "tracks",
+  "region": "industrial",
+  "camera": {
+   "zoom": 1.065,
+   "x": 173,
+   "y": -1072,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 52,
+   "w": 844,
+   "h": 338
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 14,
+  "small": [],
+  "overlaps": [],
+  "focused": "m1-hop-up",
+  "pinsOnScreen": [
+   "b1-first-ride",
+   "b2-lean-back",
+   "b3-kicker-row",
+   "m1-hop-up"
+  ],
+  "gateOnScreen": false,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 738,
+   "y": 68,
+   "w": 90,
+   "h": 310
+  },
+  "card": {
+   "x": 42,
+   "y": 251,
+   "w": 226,
+   "h": 127
+  },
+  "menuPill": {
+   "x": 743,
+   "y": 16,
+   "w": 77,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "near@844x390": {
+  "page": "tracks",
+  "region": "canyon",
+  "camera": {
+   "zoom": 1.065,
+   "x": -72,
+   "y": -809,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 52,
+   "w": 844,
+   "h": 338
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focused": "e1-uphill-weight",
+  "pinsOnScreen": [
+   "e1-uphill-weight",
+   "e2-rear-wheel-first",
+   "e3-stairway"
+  ],
+  "gateOnScreen": false,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 738,
+   "y": 68,
+   "w": 90,
+   "h": 310
+  },
+  "card": {
+   "x": 42,
+   "y": 237,
+   "w": 226,
+   "h": 141
+  },
+  "menuPill": {
+   "x": 743,
+   "y": 16,
+   "w": 77,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "locked@844x390": {
+  "page": "tracks",
+  "region": "nightCity",
+  "camera": {
+   "zoom": 1.065,
+   "x": -387,
+   "y": -318,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 52,
+   "w": 844,
+   "h": 338
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 11,
+  "small": [],
+  "overlaps": [],
+  "focused": "h1-wheelie-wire",
+  "pinsOnScreen": [
+   "h1-wheelie-wire"
+  ],
+  "gateOnScreen": true,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 738,
+   "y": 68,
+   "w": 90,
+   "h": 310
+  },
+  "card": {
+   "x": 42,
+   "y": 253,
+   "w": 226,
+   "h": 125
+  },
+  "menuPill": {
+   "x": 743,
+   "y": 16,
+   "w": 77,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "card@844x390": {
+  "page": "tracks",
+  "region": "industrial",
+  "camera": {
+   "zoom": 1.065,
+   "x": 211,
+   "y": -1102,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 52,
+   "w": 844,
+   "h": 338
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focused": "b1-first-ride",
+  "pinsOnScreen": [
+   "b1-first-ride",
+   "b2-lean-back",
+   "b3-kicker-row",
+   "m1-hop-up"
+  ],
+  "gateOnScreen": false,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 738,
+   "y": 68,
+   "w": 90,
+   "h": 310
+  },
+  "card": {
+   "x": 42,
+   "y": 237,
+   "w": 226,
+   "h": 141
+  },
+  "menuPill": {
+   "x": 743,
+   "y": 16,
+   "w": 77,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ },
+ "island@844x390": {
+  "page": "tracks",
+  "region": "island",
+  "camera": {
+   "zoom": 1.3,
+   "x": 181,
+   "y": -1645,
+   "far": false
+  },
+  "mapBox": {
+   "x": 0,
+   "y": 52,
+   "w": 844,
+   "h": 338
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 14,
+  "small": [],
+  "overlaps": [],
+  "focused": "lab-flat-200",
+  "pinsOnScreen": [
+   "lab-flat-200",
+   "lab-physics-test",
+   "p1-container-yard",
+   "p5-foundry-floor"
+  ],
+  "gateOnScreen": false,
+  "gateText": "Hard · Medal every Medium trackNext unlock · H1 Rooftop WireMedal every Medium track",
+  "altimeter": {
+   "x": 738,
+   "y": 68,
+   "w": 90,
+   "h": 310
+  },
+  "card": {
+   "x": 42,
+   "y": 262,
+   "w": 226,
+   "h": 116
+  },
+  "menuPill": {
+   "x": 743,
+   "y": 16,
+   "w": 77,
+   "h": 44
+  },
+  "sceneNodes": 204,
+  "totals": "6/15 cleared0132"
+ }
+}

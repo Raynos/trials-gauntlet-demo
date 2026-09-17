@@ -323,6 +323,19 @@ for (const bike of ['rookie', 'pro']) {
   if (!thumbs.length) console.warn('no thumbs: run `npx tsx assets/art/thumbs.mts`');
 }
 
+{
+  // Level-select tiles (the six round-3 plates, the round-5 seam strips, massif and dressing sprites): assets/art/tiles.mjs
+  // cuts them into public/art/tiles/ and writes tiles.json; recorded here so the manifest carries their bytes and tier (lazy).
+  const meta = join(pub, 'tiles/tiles.json');
+  const tiles = existsSync(meta) ? JSON.parse(readFileSync(meta, 'utf8')).tiles : [];
+  for (const t of tiles) {
+    if (!existsSync(join(pub, t.path.replace(/^art\//, '')))) continue;
+    const { id, path, kind, src, ...tags } = t;
+    record(id, path.replace(/^art\//, ''), kind, tags, src);
+  }
+  if (!tiles.length) console.warn('no tiles: run `node assets/art/tiles.mjs`');
+}
+
 // --- manifest -----------------------------------------------------------------------------------------
 const folders = {};
 for (const m of manifest) { const f = m.path.split('/').length > 2 ? m.path.split('/')[1] : 'root'; folders[f] = (folders[f] || 0) + m.bytes; }

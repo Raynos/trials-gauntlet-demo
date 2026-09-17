@@ -119,6 +119,34 @@ export function worldOf(page: PageId, x: number, y: number): { x: number; y: num
   return { x: Math.round(o.x + (x / 100) * TILE.w), y: Math.round(o.y + (y / 100) * TILE.h) };
 }
 
+/** The seam under a biome plate (round 5, ask 44): a frontal cliff strip that blends the terrace below into this one — `art/tiles/seam-<lower>-<upper>.webp` (the quay under Industrial: `seam-quay`). */
+export function seamPlateSrc(upper: PageId): string | null {
+  const order: PageId[] = ['island', 'industrial', 'canyon', 'snow', 'nightCity', 'foundry'];
+  const i = order.indexOf(upper);
+  if (i <= 0) return null;
+  if (i === 1) return 'art/tiles/seam-quay.webp';
+  return `art/tiles/seam-${order[i - 1]!.toLowerCase()}-${upper.toLowerCase()}.webp`;
+}
+/** The rock under the whole mountain (tileable) and the dressing sprites, world-placed (the mockup's chairlift, lit cabin, waterfall). */
+export const MASSIF_SRC = 'art/tiles/massif.webp';
+export interface Dressing {
+  id: 'chairlift' | 'cabin' | 'waterfall';
+  src: string;
+  /** Which plate it sits with (drawn just above it) and where, in that plate's box (world units), the sprite's box. */
+  page: PageId;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+export const DRESSING: readonly Dressing[] = [
+  // The waterfall pours off the Canyon bench's right face down the massif.
+  { id: 'waterfall', src: 'art/tiles/sprite-waterfall.webp', page: 'canyon', x: 470, y: 200, w: 120, h: 300 },
+  // The chairlift climbs the Snow terrace's front-right face; the cabin sits at the back of the Snow plate.
+  { id: 'chairlift', src: 'art/tiles/sprite-chairlift.webp', page: 'snow', x: 380, y: 170, w: 230, h: 230 },
+  { id: 'cabin', src: 'art/tiles/sprite-cabin.webp', page: 'snow', x: 330, y: 40, w: 130, h: 130 },
+];
+
 /** Tile plate (generated with the Codex image pipeline, cut to alpha, ≤ 1024 px, WebP ≤ 150 KB) — `art/tiles/tile-<page>.webp`. */
 export function tilePlateSrc(page: PageId): string {
   return `art/tiles/tile-${page}.webp`;

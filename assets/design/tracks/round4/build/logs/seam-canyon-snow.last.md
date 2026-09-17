@@ -1,0 +1,1 @@
+Saved 1536×1024 PNG to [assets/design/tracks/round4/build/out/seam-canyon-snow.png](/Users/raynos/projects/game-demos/trials-gauntlet-demo/assets/design/tracks/round4/build/out/seam-canyon-snow.png).

@@ -1,0 +1,1 @@
+Saved: `assets/design/tracks/round4/build/out/seam-quay.png` (1536×1024 PNG).

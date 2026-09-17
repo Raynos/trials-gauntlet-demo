@@ -1,0 +1,3 @@
+## sprite-cabin
+Size: 1024x1024. Geometry: a SPRITE on a flat, pure, even chroma-key green background (#00FF00) that fills every pixel not covered by the subject — no shadow on the ground, no ground plane, no gradient in the green. The subject is centred and fills about 80 % of the image. Content: a small LIT ALPINE CABIN: a timber hut with a steep snow-laden roof, one warm yellow window and an open door spilling warm light onto the snow, a stack of firewood, a tin chimney with a wisp of smoke, three dark pines behind it, seen from the front-left isometric angle of the plates, ice-blue night light. Photoreal miniature-diorama look, same night lighting as the plates.
+Output path: assets/design/tracks/round4/build/out/sprite-cabin.png

@@ -897,14 +897,24 @@ export const TRACK_MAP_CSS = /* css */ `
 .ttile .slab::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 100%; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%, rgba(0,0,0,.6)); }
 .ttile .tart.loaded + .slab { display: none; }
 /* The seam under a plate: the cliff band from this plate's front-left surface edge (18,183)→(300,335) down to the terrace below's back-right edge (18,333)→(300,484) — one iso step + CLIFF lower — in the biome's tint, strata-striped and darkening toward the foot; the plate's own cut face (art) covers its top 41 px. The quay (Industrial over the apron) is a straight wall under both front edges. */
-/* The massif under the stack (one polygon from the apron to the summit, world px): dark stone with faint strata, so the far view is one mountain. */
+/* The massif under the stack (one polygon from the apron to the summit, world px): dark stone with faint strata, the tileable rock texture (art/tiles/massif.webp) once it decodes — so the far view is one mountain. */
 .tmass { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; background: linear-gradient(180deg, #2b2e36 0%, #17191e 45%, #0a0b0e 100%), #101216; }
 .tmass::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(118deg, rgba(255,255,255,.035) 0 3px, rgba(0,0,0,0) 3px 14px, rgba(0,0,0,.2) 14px 19px, rgba(0,0,0,0) 19px 31px); }
-.tseam { position: absolute; width: 600px; height: 600px; pointer-events: none; z-index: 1; --cut: polygon(18px 183px, 300px 335px, 300px 484px, 18px 333px); }
-.tseam.quay { --cut: polygon(18px 183px, 300px 335px, 582px 183px, 582px 600px, 300px 600px, 18px 600px); }
-.tseam::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--tint, #333) 55%, #000) 30%, color-mix(in srgb, var(--tint, #333) 30%, #000) 60%, #06070a 100%); clip-path: var(--cut); filter: saturate(.55); }
-.tseam::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(118deg, rgba(255,255,255,.06) 0 2px, rgba(0,0,0,0) 2px 9px, rgba(0,0,0,.18) 9px 14px, rgba(0,0,0,0) 14px 23px), linear-gradient(180deg, rgba(0,0,0,.35) 40%, rgba(0,0,0,0) 55%, rgba(0,0,0,.6) 100%); clip-path: var(--cut); }
-.tseam.quay::after { background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 2px, rgba(0,0,0,0) 2px 40px), repeating-linear-gradient(180deg, rgba(0,0,0,.25) 0 2px, rgba(0,0,0,0) 2px 26px), linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.7)); }
+.tmass.loaded { background-size: 512px 512px; background-repeat: repeat; }
+.tmass.loaded::after { background: linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.55)); }
+/* The seam under a plate: two faces of a cliff, each a 282×H rectangle skewed 28.2° along the iso edge (skewY keeps verticals vertical) — the front-left face from this plate's front-left surface edge (18,183)→(300,335) down 150 to the terrace below's back-right edge, the front-right face mirrored from (300,335)→(582,183) hanging over the massif (188 tall: the strip's own fade dissolves it). Until the strip (--img, art/tiles/seam-*.webp) decodes: the biome-tinted strata gradient. The quay (Industrial over the apron) is 230 tall. */
+.tseam { position: absolute; width: 600px; height: 600px; pointer-events: none; z-index: 1; --seam-h: 150px; --seam-hr: 188px; }
+.tseam.quay { --seam-h: 230px; --seam-hr: 230px; }
+.tseam .face { position: absolute; display: block; width: 282px; transform-origin: 0 0; background: linear-gradient(180deg, color-mix(in srgb, var(--tint, #333) 55%, #000) 30%, color-mix(in srgb, var(--tint, #333) 30%, #000) 60%, #06070a 100%); filter: saturate(.55); }
+.tseam .face::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 2px, rgba(0,0,0,0) 2px 9px, rgba(0,0,0,.18) 9px 14px, rgba(0,0,0,0) 14px 23px), linear-gradient(180deg, rgba(0,0,0,.35) 40%, rgba(0,0,0,0) 55%, rgba(0,0,0,.6) 100%); }
+.tseam .face.l { left: 18px; top: 183px; height: var(--seam-h); transform: skewY(28.2deg); }
+.tseam .face.r { left: 300px; top: 183px; height: var(--seam-hr); transform: translateX(282px) scaleX(-1) skewY(28.2deg); }
+.tseam.loaded .face { background: var(--img) 0 0 / 100% auto no-repeat; filter: none; }
+.tseam.loaded.quay .face { background-size: 100% 100%; }
+.tseam.loaded .face::after { background: linear-gradient(180deg, rgba(0,0,0,0) 70%, rgba(0,0,0,.35)); }
+/* Dressing sprites (chairlift, lit cabin, waterfall): alpha cut-outs at world positions on their plate; nothing until they decode. */
+.tdress { position: absolute; pointer-events: none; background: center bottom / contain no-repeat; opacity: 0; transition: opacity var(--t3) var(--ease); }
+.tdress.loaded { opacity: 1; }
 .troute, .tpins { position: absolute; inset: 0; pointer-events: none; }
 .troute { z-index: 8; }
 .tpins { z-index: 9; }

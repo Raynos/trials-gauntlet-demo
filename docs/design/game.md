@@ -344,7 +344,10 @@ removed stays.
   apron — Lab + playgrounds, no medals — then Industrial, Canyon, Snow, Night City, Foundry) are laid out in
   world space (`PLATE_OFFSET`, `WORLD`, 600×400 units per plate) as one mountain: the apron at the foot,
   Industrial straight above it over a quay wall, then each biome one iso step + a cliff band (`ISO_STEP`,
-  `CLIFF`, the `.tseam` pieces and one `.tmass` under the stack) up-and-right to the Foundry summit, in
+  `CLIFF`; the `.tseam` pieces are two skewed faces per terrace carrying a generated frontal cliff strip that
+  blends the biome below into this one — `seamPlateSrc`, `art/tiles/seam-*.webp` — over CSS strata until it
+  decodes; one `.tmass` under the stack tiles `art/tiles/massif.webp`; `DRESSING` places the chairlift, the lit
+  cabin and the waterfall sprites; all cut by `assets/art/tiles.mjs`, lazy tier) up-and-right to the Foundry summit, in
   campaign / biome order (M1 on the Industrial terraces — the tier rides on the pin's code letter and the
   altimeter). One scene root (`.tscene`) carries every `.tregion` plate, one trail (`worldRoute`: an SVG
   polyline in world units through every campaign pin, every leg out of a medalled pin lit), the `.tpin`

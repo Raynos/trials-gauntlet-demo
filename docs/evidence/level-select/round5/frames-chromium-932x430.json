@@ -1,0 +1,87 @@
+{
+ "geom": "932x430",
+ "engine": "chromium/swiftshader",
+ "idleFrameMs": {
+  "n": 266,
+  "p50": 7.669999999998254,
+  "p90": 9.264999999999418,
+  "max": 16.885000000002037
+ },
+ "dragFrameMs": {
+  "n": 129,
+  "p50": 7.694999999999709,
+  "p90": 9.130000000001019,
+  "max": 191.8000000000029
+ },
+ "inertiaFrameMs": {
+  "n": 292,
+  "p50": 7.93500000000131,
+  "p90": 9.484999999996944,
+  "max": 78.09000000000015
+ },
+ "pushCamUs": 15,
+ "sceneNodes": 196,
+ "pins": 22,
+ "plateBytes": [
+  {
+   "file": "massif.webp",
+   "bytes": 50788
+  },
+  {
+   "file": "seam-quay.webp",
+   "bytes": 100336
+  },
+  {
+   "file": "seam-industrial-canyon.webp",
+   "bytes": 102966
+  },
+  {
+   "file": "seam-canyon-snow.webp",
+   "bytes": 99150
+  },
+  {
+   "file": "seam-snow-nightcity.webp",
+   "bytes": 106858
+  },
+  {
+   "file": "seam-nightcity-foundry.webp",
+   "bytes": 111610
+  },
+  {
+   "file": "tile-island.webp",
+   "bytes": 76494
+  },
+  {
+   "file": "tile-industrial.webp",
+   "bytes": 81898
+  },
+  {
+   "file": "sprite-waterfall.webp",
+   "bytes": 48440
+  },
+  {
+   "file": "tile-canyon.webp",
+   "bytes": 92574
+  },
+  {
+   "file": "sprite-chairlift.webp",
+   "bytes": 44428
+  },
+  {
+   "file": "sprite-cabin.webp",
+   "bytes": 49604
+  },
+  {
+   "file": "tile-snow.webp",
+   "bytes": 82818
+  },
+  {
+   "file": "tile-nightCity.webp",
+   "bytes": 87618
+  },
+  {
+   "file": "tile-foundry.webp",
+   "bytes": 125914
+  }
+ ]
+}

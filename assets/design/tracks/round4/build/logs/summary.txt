@@ -1,0 +1,9 @@
+sprite-waterfall exit=0 seconds=82
+seam-snow-nightcity exit=0 seconds=88
+seam-industrial-canyon exit=0 seconds=88
+sprite-chairlift exit=0 seconds=90
+seam-quay exit=0 seconds=91
+massif exit=0 seconds=92
+seam-nightcity-foundry exit=0 seconds=92
+sprite-cabin exit=0 seconds=93
+seam-canyon-snow exit=0 seconds=98

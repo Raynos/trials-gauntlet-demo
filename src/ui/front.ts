@@ -864,19 +864,33 @@ export class TrackSelectScreen extends Screen {
     this.mini.innerHTML = '';
     this.regions = [];
     this.action = -1;
-    // The rock mass under the whole stack, then the seams (behind every plate): the quay wall under Industrial, then a cliff band under each higher biome's
-    // front-left edge (down to the terrace below's back-right edge), in the biome's tint.
+    // The rock mass under the whole stack (a tileable rock texture once it loads), then the seams (behind every
+    // plate): two faces each — the front-left face over the terrace below (the quay wall under Industrial), the
+    // front-right face mirrored over the massif — a frontal cliff strip skewed along the iso edge, the CSS strata
+    // until the strip decodes (or when it never does).
     const mass = h('div', 'tmass');
     mass.style.clipPath = `polygon(${massPolygon().map((p) => `${p.x}px ${p.y}px`).join(', ')})`;
     this.scene.appendChild(mass);
+    void this.art.probe(MASSIF_SRC).then((ok) => {
+      if (!ok || !mass.isConnected) return;
+      mass.style.backgroundImage = `url("${MASSIF_SRC}")`;
+      mass.classList.add('loaded');
+    });
     for (let i = 1; i < pages.length; i++) {
       const page = pages[i]!;
       const o = PLATE_OFFSET[page.id];
-      const seam = h('div', `tseam${i === 1 ? ' quay' : ''}`);
+      const seam = h('div', `tseam${i === 1 ? ' quay' : ''}`, '<i class="face l"></i><i class="face r"></i>');
       seam.style.setProperty('--tint', BIOME_TINT[page.id as Exclude<PageId, 'island'>]);
       seam.style.left = `${o.x}px`;
       seam.style.top = `${o.y}px`;
       this.scene.appendChild(seam);
+      const src = seamPlateSrc(page.id);
+      if (src)
+        void this.art.probe(src).then((ok) => {
+          if (!ok || !seam.isConnected) return;
+          seam.style.setProperty('--img', `url("${src}")`);
+          seam.classList.add('loaded');
+        });
     }
     for (const page of pages) {
       const el = h('div', 'tregion');
@@ -898,6 +912,21 @@ export class TrackSelectScreen extends Screen {
       el.appendChild(tile);
       this.scene.appendChild(el);
       this.regions.push({ page, el, pins: [] });
+      // Dressing sprites on this plate (the mockup's chairlift, cabin, waterfall): drawn just above the plate, hidden until they decode.
+      for (const d of DRESSING.filter((x) => x.page === page.id)) {
+        const sp = h('div', `tdress ${d.id}`);
+        sp.style.left = `${o.x + d.x}px`;
+        sp.style.top = `${o.y + d.y}px`;
+        sp.style.width = `${d.w}px`;
+        sp.style.height = `${d.h}px`;
+        sp.style.zIndex = String(2 + page.index);
+        this.scene.appendChild(sp);
+        void this.art.probe(d.src).then((ok) => {
+          if (!ok || !sp.isConnected) return;
+          sp.style.backgroundImage = `url("${d.src}")`;
+          sp.classList.add('loaded');
+        });
+      }
       const src = tilePlateSrc(page.id);
       void this.art.probe(src).then((ok) => {
         if (!ok || !plate.isConnected) return;

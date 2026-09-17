@@ -1,0 +1,8 @@
+You are generating ONE texture / sprite image with the built-in image_gen tool for the level select of "Trials Gauntlet", a Trials-style 2.5D motorbike game. Generate exactly one image at the size given below, then copy the generated PNG to the exact output path given at the end (mkdir -p the folder). Do not edit any other file. Report the saved path.
+
+Context (the attached images): the FIRST attachment is the shipped level select — six isometric NIGHT diorama plates (a concrete proving-ground apron, then Industrial, Canyon, Snow, Night City and the Foundry) stacked up-and-right as terraces of one mountain; between the terraces the cliff faces are currently plain dark CSS gradients — those are what this round paints. The SECOND attachment is the target look (the design mockup "C Ascent"): one continuous mountain whose strata blend from one biome into the next, seen from the same isometric angle (the camera looks down at about 30 degrees from the front-left; every plate's front-left edge runs down-and-right at 28 degrees), lit at night by each region's own lamps (sodium amber in Industrial, ember-red sunset in Canyon, ice-blue in Snow, cyan / magenta neon in Night City, molten orange in the Foundry), the water table dark. A THIRD attachment, when present, is the shipped screen at the exact seam this image is for.
+
+Rules for every image in this round:
+- No text, no letters, no logos, no UI, no pins, no people, no watermark, no border, no frame, no drop shadow.
+- Match the plates' rendering: photoreal miniature-diorama look, crisp, slightly tilt-shift, night lighting with small practical lamps, no daylight, no sky.
+- The image is a TEXTURE or a SPRITE that will be cut and composited into the scene by code; follow the geometry brief exactly.
