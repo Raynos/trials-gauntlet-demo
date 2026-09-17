@@ -182,3 +182,7 @@ Parent reviewed decoded sequential frames from84 timed variant views across six 
 ### R35 — helmet remaster; allowance stop
 
 Open-face helmet remastered with compact crown, recessed vents, thin level peak, rolled rim and joined chin webbing/buckle. Saved face/beard/body and six clips remain. Parent reviewed24 recorded full/face views over6clips and2lights; rest head collision test reports0crossings; rig/master checks pass. Variant handoff selects the remaster. Race R35 trim/material studies are preserved but not promoted: initial masks were too soft and final tightening was not accepted before the floor. R34 Race remains selected. Usage reached2%; sustained work stopped. Final visual approval, Race helmet/tailoring, additional bike designs and iPhone validation remain open. [Review](../../prototypes/hero-garage/reports/art-round35-review.json).
+
+### Opus integration handoff
+
+Art wrap-up: [exact selections, commits, contracts and remaining gates](../../prototypes/hero-garage/art/variants/OPUS_HANDOFF.md). Art already lives on shared main; no branch merge needed. Unaccepted R35 Race tracked edits archived locally and restored to committed recipes. Other workers’ game/UI/physics changes preserved. Sustained art remains stopped at2%.
