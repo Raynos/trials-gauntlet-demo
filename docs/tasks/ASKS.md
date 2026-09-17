@@ -64,3 +64,5 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 36 | "Can we break hero open work md into multiple smaller plans" → "yes I think splitting it out would be great" | **done** | `HERO_OPEN_WORK.md` → `project/archive/`; successors `docs/plans/RIDING_POSES.md`, `CHROMIUM_METAL_SHADER_INIT.md`, `HERO_ART_INTEGRATION.md`; README tracker rows + AGENTS pointer updated (this commit) |
 
 | HG-07 | Remaster the helmet | **in flight** | Open-face modeling candidate in progress; asked whether Race helmet is also intended; art-only and 2% usage floor |
+
+| HG-07 | Remaster the helmet | **in flight** | Open-face remaster delivered provisionally with24 recorded views and editable source; final user approval/Race scope open. Stopped sustained work at2% |

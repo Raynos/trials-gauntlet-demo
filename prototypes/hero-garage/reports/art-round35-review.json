@@ -1,0 +1,38 @@
+{
+  "round": 35,
+  "status": "Helmet provisionally accepted; Race material study not promoted",
+  "helmet": "public/assets/variants/street-openface-remaster.glb",
+  "helmetSHA256": "f01c3abc274d457a812af51753ba1ed54e7ad979f7c60a8564c2f08f359ee7df",
+  "changes": [
+    "Compact lower crown",
+    "Four recessed vent channels",
+    "Thin level short peak and rolled aperture trim",
+    "Shell-attached Y webbing and release buckle",
+    "Restrained satin surface"
+  ],
+  "evidence": [
+    "reports/helmet-remaster-motion2.json",
+    "reports/street-openface-remaster-rig.json",
+    "art/helmet-remaster/build-report.json",
+    "art/variants/street-openface-remaster-master-reopen.json"
+  ],
+  "parentReview": "Decoded sequential frames from24 full/face clip/light segments plus closeup; no claim of human continuous playback",
+  "verification": {
+    "clips": 6,
+    "lightingSetups": 2,
+    "cameraScales": 2,
+    "renderErrors": 0,
+    "headTriangleCrossingsAtRest": 0,
+    "rigFrames": 750,
+    "editableMasterReopened": true
+  },
+  "raceStudy": "Physical collar trim and smooth colour masks saved as R35 candidates. First masks were too soft; follow-up not accepted before allowance stop. R34 Race exports remain selected.",
+  "remaining": [
+    "Final user visual approval",
+    "Race helmet remaster not undertaken; open-face was stated working assumption pending clarification",
+    "Race tailoring/panels and AAA quality remain open",
+    "Actual iPhone validation remains open"
+  ],
+  "usageRemainingPercent": 2,
+  "hardStopRespected": "Sustained art work stopped; preservation and handoff only"
+}

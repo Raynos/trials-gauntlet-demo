@@ -1,6 +1,6 @@
 """Reopen the saved catalog master and inspect its editable rig, images and clips."""
 import bpy,json,hashlib,math,sys
-slug=sys.argv[sys.argv.index("--")+1];assert slug in ("street-charcoal","street-openface","race-bluewhite","race-charcoalyellow")
+slug=sys.argv[sys.argv.index("--")+1];assert slug in ("street-charcoal","street-openface","race-bluewhite","race-charcoalyellow","street-openface-satin","street-openface-remaster","race-bluewhite-r35","race-charcoalyellow-r35")
 from pathlib import Path
 R=Path.cwd();P=R/'prototypes/hero-garage';source=P/'art/delivery'/f'{slug}-master.blend';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();before=sha(source)
 bpy.ops.wm.open_mainfile(filepath=str(source));scene=bpy.context.scene

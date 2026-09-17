@@ -6,7 +6,7 @@ This is a local art handoff for Claude + Opus, who own game integration. The exi
 | --- | --- |
 | street-mustard | Accepted R33 mustard hoodie, denim, trainers, saved face/curls/beard |
 | street-charcoal | Same repaired Street geometry and identity, charcoal garment palette |
-| street-openface | Repaired charcoal Street, authored open-face helmet; scalp curls hidden beneath shell, face/beard retained |
+| street-openface | Repaired charcoal Street, remastered open-face helmet with lower crown, recessed vents, thin peak and joined webbing; scalp curls hidden beneath shell, face/beard retained |
 | race-bluewhite | Genuine jersey, technical pants, boots and full-face helmet; race materials, smoother shoulders, fitted low neckline and six accepted clips |
 | race-charcoalyellow | Same genuine Race family in its authored charcoal/yellow palette |
 
@@ -34,3 +34,5 @@ Substitute the rider/bike filenames for other masters. Original mustard master r
 These are provisional art upgrades, not AAA approval or an actual iPhone performance pass. Dense Street groom remains expensive; open-face hides the scalp mesh but retains its payload. Race tailoring, panel continuity and anatomy need further art refinement. Existing Street raglan streaks and hand/cloth limitations remain. Final user visual approval is open. Socket checks do not prove all garment/skin/helmet intersections absent.
 
 Recorded WebKit motion and exact export hashes are packaged with the delivery. Parent review uses decoded sequential video frames plus detail stills, not a claim of human continuous playback. Licensing and provenance from the original handoff continue to apply, including the beard-pack attribution/header conflict and groom attribution/share-alike requirements. Local use is the present scope; public redistribution clearance is unresolved.
+
+R35 selects the remastered open-face export. Its editable master is `street-openface-remaster-master.blend`; `selection.json` is the authoritative filename mapping. Race R35 studies are not selected: their panel transitions were too soft and the tightening follow-up was not accepted before the 2% usage stop. R34 Race remains the delivered version. See [helmet recipe](../helmet-remaster/README.md).

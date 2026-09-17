@@ -1,0 +1,110 @@
+{
+  "source": "assets/blender/source/rider-openface.blend",
+  "sourceSHA256": "926665fc242a4599d1e71389c1672143e43275f1601df7b4667b27c850198d29",
+  "headSource": "accepted R33 actual saved face triangles",
+  "headCollisionPairs": 0,
+  "headCollisionCentersLocal": [],
+  "parts": [
+    {
+      "name": "compact continuous double wall shell with four recessed vents",
+      "vertices": 4928,
+      "triangles": 9692
+    },
+    {
+      "name": "1.6mm rolled aperture trim",
+      "vertices": 768
+    },
+    {
+      "name": "thin nearly level short trials peak",
+      "vertices": 264,
+      "triangles": 524
+    },
+    {
+      "name": "flush ear mount",
+      "vertices": 64
+    },
+    {
+      "name": "flush ear alloy ring",
+      "vertices": 256
+    },
+    {
+      "name": "rear fork chin strap",
+      "vertices": 12,
+      "triangles": 20
+    },
+    {
+      "name": "front fork chin strap",
+      "vertices": 12,
+      "triangles": 20
+    },
+    {
+      "name": "chin retention strap",
+      "vertices": 12,
+      "triangles": 20
+    },
+    {
+      "name": "flat strap junction",
+      "vertices": 96
+    },
+    {
+      "name": "flush ear mount",
+      "vertices": 64
+    },
+    {
+      "name": "flush ear alloy ring",
+      "vertices": 256
+    },
+    {
+      "name": "rear fork chin strap",
+      "vertices": 12,
+      "triangles": 20
+    },
+    {
+      "name": "front fork chin strap",
+      "vertices": 12,
+      "triangles": 20
+    },
+    {
+      "name": "chin retention strap",
+      "vertices": 12,
+      "triangles": 20
+    },
+    {
+      "name": "flat strap junction",
+      "vertices": 96
+    },
+    {
+      "name": "chin strap quick release buckle",
+      "vertices": 96
+    }
+  ],
+  "vertices": 6960,
+  "rigidHeadWeight": true,
+  "shellRoughness": 0.55,
+  "headBasisBlender": [
+    [
+      0.913545548915863,
+      0.0,
+      0.40673649311065674,
+      0.809016764163971
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      -0.40673649311065674,
+      0.0,
+      0.913545548915863,
+      1.2756041288375854
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ]
+}
