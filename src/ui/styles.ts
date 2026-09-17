@@ -125,10 +125,9 @@ export const FRONT_CSS = /* css */ `
 .menu-head { position: absolute; left: calc(var(--s5) + var(--sal)); top: calc(var(--s3) + var(--sat)); display: flex; flex-direction: column; align-items: flex-start; gap: var(--s2); pointer-events: none; }
 .menu-title { display: flex; flex-direction: column; font-family: var(--display); font-style: italic; font-weight: 900; font-size: clamp(2.4rem, calc(16 * var(--vh)), 7.5rem); line-height: .82; text-transform: uppercase; letter-spacing: -.01em; color: var(--ink); text-shadow: var(--outline-heavy); }
 .menu-title span:last-child { padding-left: .06em; }
-.menu-badge { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s1); pointer-events: none; }
-.menu-plate { background: rgba(9,11,15,.92); box-shadow: inset 5px 0 0 var(--amber), 0 6px 20px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); padding: .3em 1.5em .25em 1em; font-size: clamp(.95rem, calc(2 * var(--vw)), 1.45rem); }
-.menu-plate .wordmark { font-size: 1em; line-height: .9; white-space: nowrap; filter: drop-shadow(0 .03em 0 #6b3a05) drop-shadow(0 .05em .04em rgba(0,0,0,.5)); }
-.menu-build { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ink); opacity: .55; text-shadow: var(--outline); padding-left: .4rem; font-variant-numeric: tabular-nums; }
+/* The stamp plate: the same slanted charcoal plate with the amber leading edge, now carrying only "build <sha> · <date>". */
+.menu-plate { display: inline-flex; align-items: center; min-height: 26px; background: rgba(9,11,15,.88); box-shadow: inset 4px 0 0 var(--amber), 0 4px 14px rgba(0,0,0,.4); clip-path: polygon(0 0, 100% 0, calc(100% - .6em) 100%, 0 100%); padding: 0 1.3em 0 .9em; font-size: .68rem; pointer-events: none; }
+.menu-build { font-size: 1em; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); opacity: .8; font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* The band: charcoal, one amber top edge, the tile row; CREDITS lives in the row below the tiles (a full 44 px target). */
 .menu-band { position: absolute; left: 0; right: 0; bottom: 0; height: var(--band-h); padding: var(--s3) calc(var(--s4) + var(--sar)) 0 calc(var(--s4) + var(--sal)); background: linear-gradient(180deg, #14171d, #0c0e12); border-top: 2px solid var(--amber); box-shadow: 0 -14px 34px rgba(0,0,0,.4); }
 .menu-list.tiles { position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--s3); width: 100%; max-width: 1400px; margin: 0 auto; height: var(--tile-h); }

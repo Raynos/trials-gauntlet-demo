@@ -319,11 +319,13 @@ async function checkPlayReveal(page: Page, flow: string, g: Geom): Promise<void>
     const text = (document.querySelector('.menu-screen').innerText || '').toUpperCase().split(stamp.trim().toUpperCase()).join(' ').replace(/\\s+/g, ' ').trim(); // innerText: the CSS upper-cases everything
     const tiles = {};
     for (const b of document.querySelectorAll('.menu-screen .menu-item:not(.minor)')) tiles[b.dataset.id] = Math.round(b.getBoundingClientRect().height);
-    return { live: !!(hit && hit.closest('.live') && play.contains(hit)), opacity: o, text, tiles, gone: document.querySelectorAll('.menu-ticker, .menu-chip').length };
-  })()`) as { live: boolean; opacity: number; text: string; tiles: Record<string, number>; gone: number };
+    const meter = document.querySelector('.fpsmeter');
+    return { live: !!(hit && hit.closest('.live') && play.contains(hit)), opacity: o, text, tiles, gone: document.querySelectorAll('.menu-ticker, .menu-chip').length, meterHidden: !meter || meter.hidden || getComputedStyle(meter).display === 'none' };
+  })()`) as { live: boolean; opacity: number; text: string; tiles: Record<string, number>; gone: number; meterHidden: boolean };
   expect(after.live && after.opacity >= 0.5, flow, 'R6-play-live-after-reveal', `PLAY not live once the menu is: ${JSON.stringify(after)}`);
   expect(after.gone === 0, flow, 'menu-no-ticker-chip', `the best-times ticker / bike chip are still in the menu DOM`);
-  expect(after.text === 'TRIALS GAUNTLET TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS', flow, 'menu-no-leak', `menu text is "${after.text}" — expected the title, the badge and the five actions only`);
+  expect(after.meterHidden, flow, 'menu-no-fps-meter', `the fps meter draws over the title menu (ask 45)`);
+  expect(after.text === 'TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS', flow, 'menu-no-leak', `menu text is "${after.text}" — expected the title and the five actions only`);
   expect(!/\d+:\d\d|\d+\s*\/\s*\d+|cleared|up next|last|session|best|rookie|pro bike|medal/i.test(after.text), flow, 'menu-no-progress', `progress words on the title menu: "${after.text}"`);
   for (const id of ['play', 'garage', 'review', 'settings']) expect((after.tiles[id] ?? 0) >= 72, flow, 'menu-tile-72', `${id} tile is ${after.tiles[id]} px tall (< 72)`);
   log(`menu tiles ${JSON.stringify(after.tiles)}`);

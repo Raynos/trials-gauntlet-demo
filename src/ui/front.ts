@@ -13,7 +13,7 @@ import { formatTime } from './format';
 import type { QualityChoice } from './menu';
 import { isLabTrack, medalTotals, nextTrack, shipTracks, TIER_LABEL, type MedalOf } from './progress';
 import { injectTrackMapStyles } from './styles';
-import { buildPages, codeOf, defaultPin, fitZoom, gateAnchor, locate, massPolygon, nextGate, pageDots, pinsInView, PLATE_OFFSET, regionCentre, TILE, tilePlateSrc, WORLD, worldRoute, ZOOM, type Page, type PageId, type Pin } from './trackMap';
+import { buildPages, codeOf, defaultPin, DRESSING, fitZoom, gateAnchor, locate, MASSIF_SRC, massPolygon, nextGate, pageDots, pinsInView, PLATE_OFFSET, regionCentre, seamPlateSrc, TILE, tilePlateSrc, WORLD, worldRoute, ZOOM, type Page, type PageId, type Pin } from './trackMap';
 import type { UiSfx } from './sfx';
 import { conceal, reveal, isLiveTarget } from './live';
 
@@ -325,7 +325,7 @@ export function menuPlate(art: ArtManifest): ArtEntry | null {
  * Main menu, round 3 B2 "Strip" (assets/design/menu/round3/SPEC.md § B2, ask #42): the boot screen — there is
  * no title step. The Lobby split turned sideways: a wide cinematic strip of the Nalati jump across the top
  * (the `keyart-nalati` plate, cropped by the band, a grassland tint until it decodes) with the wordmark large
- * in two lines over the sky at the left and the badge plate + build stamp under it; a charcoal band with the
+ * in two lines over the sky at the left and the build stamp on a small amber-edged plate under it; a charcoal band with the
  * amber edge along the bottom holding one row of four big tiles — GARAGE · REVIEW · SETTINGS (icon above the
  * word) and PLAY at the right, amber, 1.6× wider — and CREDITS small under GARAGE. Nothing else: this is the
  * title menu, not a status board — no track, session, progress, best time or bike class is read here
@@ -340,15 +340,13 @@ export class MainMenuScreen extends Screen {
     super(parent, 'menu-screen');
     this.keyart = h('div', 'menu-keyart');
     this.keyart.style.backgroundImage = NALATI_TINT; // never the shorthand: it would reset background-size
-    // The big title (near-white display face over the sky), then the badge: the wordmark's gradient is its own
-    // background (clip: text), so the slanted plate is a wrapper around it; the build stamp under the plate.
+    // The big title (near-white display face over the sky), then the build stamp alone on the slanted amber-edged plate
+    // (ask 45: the plate no longer repeats the name under the title).
     const head = h('div', 'menu-head');
     const title = h('div', 'menu-title', `<span>Trials</span><span>Gauntlet</span>`);
-    const badge = h('div', 'menu-badge');
     const plate = h('div', 'menu-plate');
-    plate.appendChild(h('div', 'wordmark', GAME_NAME));
-    badge.append(plate, h('div', 'menu-build', escapeHtml(BUILD_STAMP_SHORT)));
-    head.append(title, badge);
+    plate.appendChild(h('div', 'menu-build', escapeHtml(BUILD_STAMP_SHORT)));
+    head.append(title, plate);
     const band = h('div', 'menu-band');
     this.list = new FocusList(band, sfx, 'menu-list tiles', 'x');
     this.root.append(this.keyart, h('div', 'grain'), head, band);

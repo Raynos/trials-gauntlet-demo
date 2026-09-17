@@ -1,22 +1,22 @@
 {
- "menuLive": 14196,
- "plateLoaded": 14899,
- "tap-play": 15506,
- "tracksLive": 16671,
- "back-from-tracks": 18517,
- "menuLive-after-tracks": 18920,
- "tap-garage": 19638,
- "garageLive": 24509,
- "back-from-garage": 27326,
- "menuLive-after-garage": 27534,
- "tap-settings": 28241,
- "settingsLive": 28522,
- "back-from-settings": 29733,
- "menuLive-after-settings": 29943,
+ "menuLive": 13853,
+ "plateLoaded": 14558,
+ "tap-play": 16278,
+ "tracksLive": 18235,
+ "back-from-tracks": 19445,
+ "menuLive-after-tracks": 19775,
+ "tap-garage": 20497,
+ "garageLive": 25496,
+ "back-from-garage": 27207,
+ "menuLive-after-garage": 27442,
+ "tap-settings": 28153,
+ "settingsLive": 29566,
+ "back-from-settings": 30776,
+ "menuLive-after-settings": 31025,
  "audits": [
   {
    "at": "menuLive",
-   "text": "TRIALS GAUNTLET TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS",
+   "text": "TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS",
    "clean": true,
    "tiles": {
     "play": 95,
@@ -28,7 +28,7 @@
   },
   {
    "at": "menuLive-after-tracks",
-   "text": "TRIALS GAUNTLET TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS",
+   "text": "TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS",
    "clean": true,
    "tiles": {
     "play": 95,
@@ -40,7 +40,7 @@
   },
   {
    "at": "menuLive-after-garage",
-   "text": "TRIALS GAUNTLET TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS",
+   "text": "TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS",
    "clean": true,
    "tiles": {
     "play": 95,
@@ -52,7 +52,7 @@
   },
   {
    "at": "menuLive-after-settings",
-   "text": "TRIALS GAUNTLET TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS",
+   "text": "TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS",
    "clean": true,
    "tiles": {
     "play": 95,
@@ -64,5 +64,5 @@
   }
  ],
  "allClean": true,
- "clip": "docs/evidence/main-menu-b2/chromium-932x430-clip.webm"
+ "clip": "chromium-932x430-clip.webm"
 }

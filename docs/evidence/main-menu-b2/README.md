@@ -1,22 +1,22 @@
-# Main menu — round 3 B2 "Strip" built (ask 42)
+# Main menu — round 3 B2 "Strip" built (ask 42) + follow-ups (ask 45)
 
-The user picked B2 (`assets/design/menu/round3/B2-strip.jpg`, SPEC § B2) with the round's rules: the four actions large (≥ 72 px), nothing about level / session / next up / cleared on the title menu, the hero card replaced by a midair jump in the Nalati grassland. Everything here is captured headless from the built `dist/` (`?sw=0`), Chromium/SwiftShader, DPR 2, iPhone UA on the phone geometries.
+The user picked B2 (`assets/design/menu/round3/B2-strip.jpg`, SPEC § B2) with the round's rules: the four actions large (≥ 72 px), nothing about level / session / next up / cleared on the title menu, the hero card replaced by a midair jump in the Nalati grassland. Ask 45 on top: the opt-in FPS meter is hidden while `screen === 'menu'` (`App.setScreen`, every other screen keeps it) and the badge plate carries only the build stamp (the wordmark no longer repeats under the title). Everything here is captured headless from the built `dist/` (`?sw=0`), Chromium/SwiftShader, DPR 2, iPhone UA on the phone geometries.
 
 ## Stills (`harness/e2e/menu-stills.mts --out=docs/evidence/main-menu-b2`)
 
-| Geometry | Still | Strip | Band | Tile heights (PLAY · GARAGE · REVIEW · SETTINGS) | CREDITS target | Leak audit |
-|---|---|---|---|---|---|---|
-| 932×430 | `menu-932x430.png` | 932×279 (3.3:1 box, the plate at 50 % / 50 %) | 151 px | 95 · 95 · 95 · 95 | 206×44 | clean |
-| 844×390 | `menu-844x390.png` | 844×248 | 142 px | 86 · 86 · 86 · 86 | 188×44 | clean |
-| 1280×720 | `menu-1280x720.png` | 1280×532 (2.4:1: the whole plate) | 188 px | 132 · 132 · 132 · 132 | 88×44 | clean |
+| Geometry | Still | Strip | Band | Tile heights (PLAY · GARAGE · REVIEW · SETTINGS) | CREDITS target | Stamp plate | Leak audit | Meter |
+|---|---|---|---|---|---|---|---|---|
+| 932×430 | `menu-932x430.png` | 932×279 (3.3:1 box, the plate at 50 % / 50 %) | 151 px | 95 · 95 · 95 · 95 | 206×44 | 193×26 | clean | hidden |
+| 844×390 | `menu-844x390.png` | 844×248 | 142 px | 86 · 86 · 86 · 86 | 188×44 | 180×26 | clean | hidden |
+| 1280×720 | `menu-1280x720.png` | 1280×532 (2.4:1: the whole plate) | 188 px | 132 · 132 · 132 · 132 | 88×44 | 222×26 | clean | hidden |
 
 Tile height is `--tile-h: clamp(72px, 22vh, 132px)`; PLAY is `flex-grow: 1.6` (290 px wide at 932, 260 at 844, 411 at 1280) and the only amber tile. The band is `12px + --tile-h + 44px (CREDITS row) + safe-area-bottom`, so PLAY's centre sits at 79–83 % of the height on the phones (`band-low` in the e2e).
 
-**Leak audit** = the menu's rendered words (`innerText`, the build stamp removed) must equal exactly `TRIALS GAUNTLET TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS` (the big title, the badge, the five actions) and match no time (`m:ss`), count (`n / n`), or progress word (cleared, next, last, session, best, rookie, medal); `.menu-ticker` / `.menu-chip` must not exist in the DOM. It runs in three places: `menu-stills.mts` (fails the process), `harness/e2e/touch.mts` `front` flow (`menu-no-leak`, `menu-no-progress`, `menu-no-ticker-chip`, `menu-tile-72`) and the clip below (every return to the menu). Source-side, `MainMenuScreen` no longer takes `bestOf` / `state`, and `setTracks` / `setBike` / the ticker / the chip are deleted, not hidden (`src/ui/front.test.ts` pins the exact rendered text).
+**Leak audit** = the menu's rendered words (`innerText`, the build stamp removed) must equal exactly `TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS` (the big title, the five actions) and match no time (`m:ss`), count (`n / n`), or progress word (cleared, next, last, session, best, rookie, medal); `.menu-ticker` / `.menu-chip` must not exist in the DOM, and the `.fpsmeter` must be hidden. It runs in three places: `menu-stills.mts` (fails the process), `harness/e2e/touch.mts` `front` flow (`menu-no-leak`, `menu-no-progress`, `menu-no-ticker-chip`, `menu-no-fps-meter`, `menu-tile-72`) and the clip below (every return to the menu). Source-side, `MainMenuScreen` no longer takes `bestOf` / `state`, and `setTracks` / `setBike` / the ticker / the chip are deleted, not hidden (`src/ui/front.test.ts` pins the exact rendered text).
 
 ## Played clip (`clip.mts` here; also `harness/out/main-menu-b2/clip.mts`, which `harness/out/` ignores)
 
-`clip-boot-menu-play-garage-settings-932x430.mp4` (29.5 s) with `clip-timings.json`: cold boot → the loader → the title menu (the grassland tint, then the plate decodes 0.7 s after the menu is live) → PLAY (tap, the level select) → MENU → GARAGE → back → SETTINGS → back. Every tap goes through the touchscreen onto the live tile; the audit ran on all four menu visits: `allClean: true`, tiles 95 px, plate loaded. Onboarding is pre-dismissed (`trials.onboarded`) — the card shows on the first run, not over the menu, so the menu path is unchanged by it.
+`clip-boot-menu-play-garage-settings-932x430.mp4` (30.3 s) with `clip-timings.json`: cold boot → the loader → the title menu (the grassland tint, then the plate decodes 0.7 s after the menu is live) → PLAY (tap, the level select) → MENU → GARAGE → back → SETTINGS → back. Every tap goes through the touchscreen onto the live tile; the audit ran on all four menu visits: `allClean: true`, tiles 95 px, plate loaded. Onboarding is pre-dismissed (`trials.onboarded`) — the card shows on the first run, not over the menu, so the menu path is unchanged by it.
 
 ## The Nalati plate
 
@@ -31,6 +31,6 @@ The biome does not exist; the strip is a key-art plate. Brief + recipe: `assets/
 
 ## e2e
 
-- `pnpm harness:e2e --only=front` (932×430 + 844×390): 673 / 678 — the 5 fails are `front@iphone13:tracks R3-overlap` on `.tpin` / `.tm` / `.gate` (the level-select owner's world map, in flight in the same checkout); every menu check passes on both phones.
+- `pnpm harness:e2e --only=front` (932×430 + 844×390): 747 / 747 after ask 45 (the ask-42 run was 673 / 678, the 5 fails being the level-select owner's in-flight world map, since fixed).
 - `pnpm harness:e2e --only=desktop` (keys + pad at 1280×720 and 1920×1080): 188 / 188 — tab order `play,garage,review,settings,credits`, nav-right steps, focus back on Play.
-- `vitest run src/ui`: 87 / 87 at the end (a `trackSelect.test.ts` fail mid-round was the same owner's, since fixed). Menu: 6 / 6.
+- `vitest run src/ui`: 87 / 87. Menu: 6 / 6.

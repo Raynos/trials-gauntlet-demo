@@ -70,16 +70,16 @@ describe('main menu (garage round: customisation lives in the garage)', () => {
 });
 
 describe('main menu (round 3 B2 "Strip", ask 42: the title menu leaks nothing)', () => {
-  it('renders only the title, the badge + stamp, the four tiles and credits — no ticker, chip, track, time or count', () => {
+  it('renders only the title, the stamp plate, the four tiles and credits — no ticker, chip, track, time or count', () => {
     const { menu } = fixture();
     expect(menu.root.querySelectorAll('.menu-ticker, .menu-ticker-track, .menu-chip, .menu-card, .menu-next, .menu-session')).toHaveLength(0);
     expect(menu.root.querySelector('.menu-title')?.textContent).toBe('TrialsGauntlet');
-    expect(menu.root.querySelector('.menu-plate .wordmark')?.textContent).toBe('Trials Gauntlet');
-    expect(menu.root.querySelector('.menu-build')?.textContent).toMatch(/^build /);
+    expect(menu.root.querySelector('.menu-plate .wordmark')).toBeNull(); // ask 45: the plate carries the stamp only
+    expect(menu.root.querySelector('.menu-plate .menu-build')?.textContent).toMatch(/^build /);
     // Every word on the screen, with the build stamp removed: the five actions and the title only.
     const words = [...menu.root.querySelectorAll<HTMLElement>('.menu-title span, .wordmark, .menu-item')].map((el) => el.textContent?.trim());
-    expect(words).toEqual(['Trials', 'Gauntlet', 'Trials Gauntlet', 'Play', 'Garage', 'Review', 'Settings', 'Credits']);
-    expect(menu.root.textContent?.replace(/\s+/g, '')).toBe('TrialsGauntletTrialsGauntlet' + menu.root.querySelector('.menu-build')!.textContent!.replace(/\s+/g, '') + 'PlayGarageReviewSettingsCredits');
+    expect(words).toEqual(['Trials', 'Gauntlet', 'Play', 'Garage', 'Review', 'Settings', 'Credits']);
+    expect(menu.root.textContent?.replace(/\s+/g, '')).toBe('TrialsGauntlet' + menu.root.querySelector('.menu-build')!.textContent!.replace(/\s+/g, '') + 'PlayGarageReviewSettingsCredits');
     expect(menu.root.textContent).not.toMatch(/\d+:\d\d|\d+ ?\/ ?\d+|cleared|next|last|session|best|rookie|pro bike|medal/i);
   });
 

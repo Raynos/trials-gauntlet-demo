@@ -858,6 +858,8 @@ export class App {
     // the phone paid a full tier frame plus a compositor copy for an invisible canvas).
     scene?.classList.toggle('covered', screen === 'menu');
     this.game.renderEnabled = screen !== 'menu';
+    // Ask 45: the meter never draws over the title strip — the menu renders no frames anyway; every other screen keeps it.
+    this.fpsEl.hidden = screen === 'menu';
     scene?.classList.toggle('dim', screen !== 'menu' && screen !== 'garage');
     scene?.classList.toggle('garage', screen === 'garage');
     const dev = this.mux.activeDevice();

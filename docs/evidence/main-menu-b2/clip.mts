@@ -2,7 +2,7 @@
  * Played clip of the B2 "Strip" main menu (ask 42; evidence is played, never posed):
  *   cold boot → the title menu (the Nalati strip decodes over its tint) → PLAY → back → GARAGE → back → SETTINGS → back.
  * Every tap lands on the live tile through the touchscreen (the invariant: nothing is tappable before it is drawn 150 ms).
- * Also a leak audit on every return to the menu: the menu's rendered words must be the title, the badge and the five actions.
+ * Also a leak audit on every return to the menu: the menu's rendered words must be the title and the five actions.
  *   npx tsx harness/out/main-menu-b2/clip.mts [--url=http://127.0.0.1:4178] --out=DIR [--geom=932x430]   (no --url: serves the frozen dist itself)
  * Writes <out>/chromium-<geom>-clip.webm + a JSON of the timings and the audit.
  */
@@ -36,7 +36,7 @@ const AUDIT = `(() => {
   const text = (document.querySelector('.menu-screen').innerText || '').toUpperCase().split(stamp.trim().toUpperCase()).join(' ').replace(/\\s+/g, ' ').trim();
   const tiles = {};
   for (const b of document.querySelectorAll('.menu-screen .menu-item:not(.minor)')) tiles[b.dataset.id] = Math.round(b.getBoundingClientRect().height);
-  return { text, clean: text === 'TRIALS GAUNTLET TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS', tiles, plate: !!document.querySelector('.menu-keyart.loaded') };
+  return { text, clean: text === 'TRIALS GAUNTLET PLAY GARAGE REVIEW SETTINGS CREDITS', tiles, plate: !!document.querySelector('.menu-keyart.loaded') };
 })()`;
 const audits: unknown[] = [];
 const menuLive = async (k: string): Promise<void> => {
