@@ -51,6 +51,11 @@ motion/contact issues are open; source promotion is not goal completion.
 
 ## Rider authoring and export
 
+**Runtime family (ask 43):** the shipped GLBs are the hero-art set built by `hero_art_build.mjs` (section at the end).
+The `rider_asset.py` / `bike_asset.py` exports below are the base-body sources Astra's chain started from — kept
+editable, not shipped; their default `--models` is the ignored `harness/out/blender/base-body/models`, and the legacy
+`rider*.glb` / `bike*.glb` runtime files were retired from `public/models` with `LEGACY_HERO`.
+
 Create each source once, then edit its parts, material graphs, and actions in Blender. `seed`
 refuses to overwrite an existing source. Only an intentional `seed --replace-source` replaces it.
 Street, openface and race sources are separate; the selected outfit must match the source's saved metadata.

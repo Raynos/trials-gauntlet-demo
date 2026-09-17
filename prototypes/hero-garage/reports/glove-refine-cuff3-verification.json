@@ -1,9 +1,0 @@
-{
-  "inverseBindMaxDifference": 3.2782554626464844e-06,
-  "verticesVerified": 5356,
-  "skinJoints": 19,
-  "handOrCuffForearmWeightsVerified": true,
-  "finitePositionsVerified": true,
-  "textures": "Three lossless PNG maps",
-  "status": "static invariants pass; assembled motion and visual acceptance parent-owned"
-}

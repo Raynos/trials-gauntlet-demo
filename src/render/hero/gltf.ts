@@ -11,10 +11,10 @@ import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { prepareHero } from './lod';
 import { fogify } from '../lighting/environment';
-import { HERO_URLS, lodUrl, modelAssetUrl } from './urls';
+import { lodUrl, modelAssetUrl } from './urls';
 import type { ByteProgress } from '../../boot/plan';
 
-export { HERO_URLS, lodUrl };
+export { lodUrl };
 
 export type ModelChoice = 'proc' | 'gltf';
 export interface ModelChoices {

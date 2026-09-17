@@ -13,7 +13,8 @@ import { FrameBuilder, type RenderFrame } from '../frame';
 import type { GameRenderer } from '../index';
 import type { MaterialLibrary } from '../materials/library';
 import { boneName, GltfRider } from './gltfRider';
-import { deliveredHeroUrl, loadRig, loadRigAt } from './gltfTestUtils';
+import { loadRig } from './gltfTestUtils';
+import { AVAILABLE_RIDER_PRESETS } from '../../core/riderPresets';
 import { prepareHero } from './lod';
 
 function fixture(gltf: GLTF, cls: BikeClass) {
@@ -113,13 +114,10 @@ function poseFrame(hipX: number, hipY: number, torsoDegrees: number, angle: numb
   return f;
 }
 
-// Ask 43: Astra's per-outfit riders (read in place from the tracked delivery until they land under public/models; the
-// 60 MB street files are not read here) go through the same grid — same 19-joint rig, sockets and anatomy as rider.glb.
-const delivered = [['rider-race-bluewhite.glb', 'race-bluewhite.glb'], ['rider-race-charcoalyellow.glb', 'race-charcoalyellow.glb']] as const;
-const subjects: { file: string; load: () => Promise<GLTF> }[] = [
-  ...['rider-openface.glb', 'rider-openface-lod.glb', 'rider-street.glb', 'rider-street-lod.glb', 'rider-race.glb', 'rider-race-lod.glb'].map(file => ({ file, load: () => loadRig(file) })),
-  ...delivered.flatMap(([final, art]) => { const url = deliveredHeroUrl(final, art); return url ? [{ file: `astra:${final}`, load: async () => { const g = await loadRigAt(url); await prepareHero(g); return g; } }] : []; }),
-];
+// Ask 43: every shipped rider (Astra's five outfits, authored + LOD) through `prepareHero` — the same 19-joint rig,
+// sockets and anatomy as the retired rider.glb, so the grid, the finish freeze and the E2 playback hold unchanged.
+const subjects: { file: string; load: () => Promise<GLTF> }[] = AVAILABLE_RIDER_PRESETS.flatMap(p =>
+  [`rider-${p.id}.glb`, `rider-${p.id}-lod.glb`].map(file => ({ file, load: async () => { const g = await loadRig(file); await prepareHero(g); return g; } })));
 
 describe.each(subjects)('$file physical pose', ({ file, load }) => {
   let gltf: GLTF;

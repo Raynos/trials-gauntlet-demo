@@ -13,9 +13,9 @@ import { BikeModel, type HeroBike } from './bike/bikeModel';
 import { loadGltf, prefetchModel, shrinkTextures, type ModelChoice, type ModelChoices } from './hero/gltf';
 import type { ByteProgress, StepProgress, StepRunner } from '../boot/plan';
 import type { PrepareStep } from '../boot/steps';
-import { isRiderLodEnabled, lodChoice, setRiderLodEnabled, variantMaterialsFor } from './hero/lod';
+import { isRiderLodEnabled, lodChoice, setRiderLodEnabled } from './hero/lod';
 import { DEFAULT_RIDER_OUTFIT, normalizeRiderOutfit } from '../core/riderPresets';
-import { bikeUrl, heroPair, modelAssetBytes, riderPalette, riderUrl, type HeroDetail } from './hero/urls';
+import { bikeUrl, heroPair, modelAssetBytes, riderUrl, type HeroDetail } from './hero/urls';
 import { GltfBike } from './hero/gltfBike';
 import { GltfRider } from './hero/gltfRider';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -516,13 +516,7 @@ export class ThreeRenderer implements GameRenderer {
       // A superseded request (models, outfit or bike class) must not even overwrite the stored documents: a later
       // quality change could otherwise resurrect the old outfit despite its swap being skipped.
       if (want !== this.models || outfit !== this.riderOutfit || cls !== this.bikeClass) return;
-      const palette = riderPalette(outfit);
-      if (want.riderModel === 'gltf') {
-        if (!rider) throw new Error(`Could not load the ${riderDetail} ${outfit} rider`);
-        // Validate the document before any installed identity or live material changes (the legacy family only:
-        // a per-outfit file has no palette to check — the outfit is the URL).
-        if (palette) this.validateRiderPreset(rider, outfit);
-      }
+      if (want.riderModel === 'gltf' && !rider) throw new Error(`Could not load the ${riderDetail} ${outfit} rider`);
       // A livery swap whose file failed keeps the installed bike (and its class) rather than dropping to the
       // procedural kit; a failed boot load still leaves null (the procedural fallback) and retries on the next call.
       if (bike) {
@@ -700,24 +694,7 @@ export class ThreeRenderer implements GameRenderer {
   private makeRider(choice: ModelChoice): HeroRider {
     const doc = this.riderDoc();
     if (choice !== 'gltf' || !doc) return new RiderModel(this.lib);
-    const rider = new GltfRider(doc, this.lib);
-    const palette = riderPalette(this.riderDocumentOutfit ?? this.riderOutfit);
-    if (palette) rider.setMaterialVariant(palette);
-    return rider;
-  }
-
-  private validateRiderPreset(doc: GLTF, outfit: RiderOutfit): void {
-    const variant = riderPalette(outfit);
-    if (!variant) return;
-    let mappedMeshes = 0;
-    doc.scene.traverse(o => {
-      if (!(o as THREE.Mesh).isMesh) return;
-      const table = variantMaterialsFor(doc, o.name);
-      if (!table.size) return;
-      mappedMeshes++;
-      if (!table.has(variant)) throw new Error(`Rider mesh ${o.name} lacks ${variant}`);
-    });
-    if (!mappedMeshes) throw new Error(`Rider document lacks material variants for ${outfit}`);
+    return new GltfRider(doc, this.lib);
   }
 
   private kindOfBike(b: HeroBike): ModelChoice {
@@ -763,11 +740,6 @@ export class ThreeRenderer implements GameRenderer {
       this.rider = next;
       this.retireObject(old.root, () => old.dispose());
       changed = true;
-    }
-    // Palette siblings reuse the same GLTF document and live skeleton (legacy family; per-outfit files swap documents above).
-    if (this.kindOfRider(this.rider) === 'gltf' && this.rider instanceof GltfRider && this.riderDocumentOutfit) {
-      const palette = riderPalette(this.riderDocumentOutfit);
-      if (palette) this.rider.setMaterialVariant(palette);
     }
     if (changed) this.applyTierVisibility(); // round 13: the new hero instance takes the tier's shadow roles
     if (changed && this.ghost) {
@@ -2078,7 +2050,7 @@ export class ThreeRenderer implements GameRenderer {
       heroTris: (this.bikeRef?.triangles ?? 0) + (this.riderRef?.triangles ?? 0),
       heroDoc: `${this.bikeRef instanceof GltfBike ? (this.bikeRef.source === this.gltf.bikeLod ? 'bike-lod' : 'bike') : 'bike-proc'} ${this.riderRef instanceof GltfRider ? (this.riderRef.source === this.gltf.riderLod ? 'rider-lod' : 'rider') : 'rider-proc'}`,
       riderOutfit: this.riderRef && this.kindOfRider(this.riderRef) === 'gltf' ? this.riderDocumentOutfit : null,
-      riderMaterialVariant: this.riderRef && this.kindOfRider(this.riderRef) === 'gltf' && this.riderDocumentOutfit ? riderPalette(this.riderDocumentOutfit) : null,
+      riderMaterialVariant: null, // retired with the palette family (round 5); the outfit is the file — kept for the outfit e2e's shape
       heroShadow: this.lightingRig?.isHeroShadow ? 'hero-only' : 'world',
       trackCalls: this.world?.trackCalls ?? 0,
       trackTris: Math.round(this.world?.trackTris ?? 0),

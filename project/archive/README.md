@@ -23,3 +23,4 @@ Contents
 - `RIDER_ON_GLASS.md` — the second mega plan, closed 2026-09-16 at `f00724e` (G 100 %; H on the user's decision with the whole Astra branch merged).
 - `blender-branch-merge.md` — the merge rules and the three test merges; the branch is on `main` in full.
 - `CHROMIUM_METAL_SHADER_INIT.md` — the GL 1281 startup bug, closed 2026-09-16 as non-repro (18/18 clean Metal gates incl. the original failing build; evidence `docs/evidence/chromium-metal/`).
+- `HERO_GARAGE_PRODUCTION.md` — Astra's Blender art plan, closed 2026-09-17 with ask 43: delivery integrated, prototype retired; the recipe lives in `assets/blender/hero-art/`, the handoff in `docs/evidence/hero-art/delivery/`.

@@ -3,18 +3,13 @@ export type RiderOutfit = 'street-openface' | 'street-mustard' | 'street-charcoa
 export type RiderDesign = RiderOutfit;
 /** Boot's download-total bucket (src/boot/asset-totals.ts keys `heroModels` by it) and, in the legacy hero family, the shared file. */
 export type RiderModelFamily = 'street' | 'race' | 'openface';
-export type RiderPalette = 'rider_rookie' | 'rider_pro';
-/**
- * `variant` is the outfit's `KHR_materials_variants` palette in the LEGACY hero family only (src/render/hero/urls.ts);
- * Astra's per-outfit files carry no palette table — `riderPalette()` there returns null and the row's `variant` is unread.
- */
-interface AvailablePreset { id: RiderOutfit; available: true; family: RiderModelFamily; variant: RiderPalette; label: string; detail: string; reference: string }
+interface AvailablePreset { id: RiderOutfit; available: true; family: RiderModelFamily; label: string; detail: string; reference: string }
 export const RIDER_PRESETS: readonly AvailablePreset[] = [
-  { id: 'street-mustard', available: true, family: 'street', variant: 'rider_rookie', label: 'Mustard · barehead', detail: 'Hoodie, jeans & trainers', reference: '01' },
-  { id: 'street-openface', available: true, family: 'openface', variant: 'rider_pro', label: 'Charcoal · open-face', detail: 'Open-face helmet, hoodie & jeans', reference: '02' },
-  { id: 'race-bluewhite', available: true, family: 'race', variant: 'rider_rookie', label: 'Blue & white · Race', detail: 'Jersey, race pants & boots', reference: '03' },
-  { id: 'street-charcoal', available: true, family: 'street', variant: 'rider_pro', label: 'Charcoal · barehead', detail: 'Hoodie, jeans & trainers', reference: '04' },
-  { id: 'race-charcoalyellow', available: true, family: 'race', variant: 'rider_pro', label: 'Charcoal & yellow · Race', detail: 'Jersey, race pants & boots', reference: '05' },
+  { id: 'street-mustard', available: true, family: 'street', label: 'Mustard · barehead', detail: 'Hoodie, jeans & trainers', reference: '01' },
+  { id: 'street-openface', available: true, family: 'openface', label: 'Charcoal · open-face', detail: 'Open-face helmet, hoodie & jeans', reference: '02' },
+  { id: 'race-bluewhite', available: true, family: 'race', label: 'Blue & white · Race', detail: 'Jersey, race pants & boots', reference: '03' },
+  { id: 'street-charcoal', available: true, family: 'street', label: 'Charcoal · barehead', detail: 'Hoodie, jeans & trainers', reference: '04' },
+  { id: 'race-charcoalyellow', available: true, family: 'race', label: 'Charcoal & yellow · Race', detail: 'Jersey, race pants & boots', reference: '05' },
 ];
 export const AVAILABLE_RIDER_PRESETS = /* @__PURE__ */ RIDER_PRESETS.filter((p): p is AvailablePreset => p.available);
 export const DEFAULT_RIDER_OUTFIT: RiderOutfit = 'street-mustard';

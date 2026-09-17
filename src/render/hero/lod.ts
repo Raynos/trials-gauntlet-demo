@@ -7,10 +7,7 @@
  * is re-baked, so a geometry-only swap under the full atlas mis-maps every texel); `high` the
  * authored one. The tier swap rebuilds the hero instance through `applyModels`, like a model choice.
  *
- * Colourways: both files carry `KHR_materials_variants` (`rider_rookie` / `rider_pro` on `rider`;
- * `bike_rookie` / `bike_pro` → `bike_body_rookie` / `bike_body_pro` on `frame`, `bodywork`,
- * `fork_upper`). `resolveVariants` pre-resolves every variant material per document at load (the
- * parser's dependency getter is async); `variantMaterialsFor` hands an instance the per-mesh table.
+ * Colourways (ask 43): the outfit and the class are their own files (`urls.ts`); no `KHR_materials_variants`.
  *
  * Wheels: the spokes are their own child mesh (`<wheel>_spokes` from the art build, or split here
  * from the radius band when a file predates it) so their opacity can fall with the wheel's angular
@@ -68,8 +65,7 @@ export function wheelParts(wheel: THREE.Object3D): { spokes: THREE.Mesh | null; 
 
 /**
  * Once per parsed document: wheels of a file without an authored `<wheel>_spokes` child are split
- * (the spokes become a child mesh named `<wheel>:spokes`), and the `KHR_materials_variants` table is
- * resolved — per mesh name, variant name → material — so instances can swap synchronously.
+ * (the spokes become a child mesh named `<wheel>:spokes`).
  *
  * Ask 43 (Astra's files): empty meshes are dropped (the street exports keep a 0-triangle `rider` whose only content
  * is a stale variants table), skinned meshes that share a material, skeleton and bind are merged into one draw
@@ -96,7 +92,6 @@ export async function prepareHero(gltf: GLTF): Promise<void> {
     mesh.add(spokes);
     mesh.geometry = withIndex(mesh.geometry, split.body);
   }
-  await resolveVariants(gltf);
   flattenPhysicalMaterials(gltf);
   normalizeHeroMaterials(gltf);
 }
@@ -127,8 +122,6 @@ function normalizeHeroMaterials(gltf: GLTF): void {
     if (!mesh.isMesh || /_blur$/.test(mesh.name)) return; // the spoke blur cards are the one authored blend (SpokeBlur owns them)
     for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) fix(m);
   });
-  const table = variantTable.get(gltf);
-  if (table) for (const row of table.values()) for (const m of row.values()) fix(m);
 }
 
 /** Meshes with no vertices draw nothing and still cost a traversal, a mirror twin and a shadow submit. */
@@ -248,45 +241,6 @@ export function flattenPhysicalMaterials(gltf: GLTF): void {
     if (!m.isMesh) return;
     m.material = Array.isArray(m.material) ? m.material.map(standard) : standard(m.material);
   });
-  const table = variantTable.get(gltf);
-  if (table) for (const row of table.values()) for (const [name, m] of row) row.set(name, standard(m));
-}
-
-type VariantExt = { variants?: { name: string }[] };
-type MappingExt = { mappings?: { material: number; variants: number[] }[] };
-/** Per document: mesh name → variant name → resolved material. */
-const variantTable = new WeakMap<GLTF, Map<string, Map<string, THREE.Material>>>();
-
-async function resolveVariants(gltf: GLTF): Promise<void> {
-  const ext = (gltf.userData as { gltfExtensions?: { KHR_materials_variants?: VariantExt } }).gltfExtensions?.KHR_materials_variants;
-  const names = ext?.variants?.map((v) => v.name) ?? [];
-  const table = new Map<string, Map<string, THREE.Material>>();
-  variantTable.set(gltf, table);
-  if (!names.length) return;
-  const jobs: Promise<void>[] = [];
-  gltf.scene.traverse((o) => {
-    const m = o as THREE.Mesh;
-    const mappings = (m.userData as { gltfExtensions?: { KHR_materials_variants?: MappingExt } }).gltfExtensions?.KHR_materials_variants?.mappings;
-    if (!m.isMesh || !mappings) return;
-    const row = new Map<string, THREE.Material>();
-    table.set(m.name, row);
-    for (const mp of mappings) {
-      jobs.push(
-        (gltf.parser.getDependency('material', mp.material) as Promise<THREE.Material>).then((mat) => {
-          for (const vi of mp.variants) {
-            const n = names[vi];
-            if (n) row.set(n, mat);
-          }
-        }),
-      );
-    }
-  });
-  await Promise.all(jobs);
-}
-
-/** The document's variant table for `mesh.name` (empty when the file has no variants). */
-export function variantMaterialsFor(gltf: GLTF, meshName: string): Map<string, THREE.Material> {
-  return variantTable.get(gltf)?.get(meshName) ?? new Map();
 }
 
 /**

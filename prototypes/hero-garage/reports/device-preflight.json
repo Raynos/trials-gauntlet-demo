@@ -1,8 +1,0 @@
-{
-  "checkedAt": "2026-09-16",
-  "command": "xcrun devicectl list devices",
-  "connectedPhysicalDevices": 0,
-  "actualIPhoneValidation": "Not performed; no physical device is available to this local automation run.",
-  "availableEvidence": "Headless macOS WebKit with Apple GPU and touch geometry tests; these do not satisfy the actual iPhone/Safari gate.",
-  "target": "Mobile garage 30 fps; final measured resolution and memory budget remain open."
-}

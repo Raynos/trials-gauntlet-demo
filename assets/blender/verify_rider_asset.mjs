@@ -1,4 +1,6 @@
-/** Verify an actual meshopt GLB with the runtime decoder, without a browser, DOM or GPU. */
+/** Verify an actual meshopt GLB with the runtime decoder, without a browser, DOM or GPU.
+ *  Legacy base-body contract (8 clips, rider_rookie/rider_pro variants, one draw, 6 k LOD) for rider_asset.py exports;
+ *  the shipped hero-art family is verified by verify_hero_art.mjs. */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';

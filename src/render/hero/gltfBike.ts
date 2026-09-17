@@ -9,9 +9,8 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { ContactBlob, FramePlacer, type HeroBike } from '../bike/bikeModel';
 import { WHEEL_RADIUS, type RenderFrame } from '../frame';
 import type { MaterialLibrary } from '../materials/library';
-import { fogify } from '../lighting/environment';
 import { countTriangles, prepareHeroMaterials } from './gltf';
-import { SpokeBlur, variantMaterialsFor } from './lod';
+import { SpokeBlur } from './lod';
 import { BrakeHose } from './brakeHose';
 import type { BikeClass } from '../../core/types';
 
@@ -57,14 +56,6 @@ export class GltfBike implements HeroBike {
   ground: ((x: number) => { y: number; angle: number }) | null = null;
   /** Materials of this instance (for ghost tinting). */
   readonly materials: THREE.MeshStandardMaterial[];
-  /**
-   * Round 13 (H1 colourways): per mesh, the instance's own completed clone of each
-   * `KHR_materials_variants` material (`bike_rookie` / `bike_pro` → `bike_body_*` on frame,
-   * bodywork, fork_upper). `setLivery` swaps them; nothing is tinted and the plates + class digit
-   * are baked in the atlas. Empty for a file without variants (then the livery is a no-op).
-   */
-  private readonly variants: { mesh: THREE.Mesh; byClass: Partial<Record<BikeClass, THREE.Material>> }[] = [];
-  private livery: BikeClass = 'rookie';
   private readonly scene: THREE.Object3D;
   private readonly nodes: Record<string, THREE.Object3D | null>;
   private readonly marks = new Map<string, THREE.Object3D>();
@@ -119,29 +110,6 @@ export class GltfBike implements HeroBike {
       m.material = c;
     });
     this.materials = prepareHeroMaterials(this.scene, (m) => lib.complete(m));
-    // Colourways: one completed clone per (mesh, variant); the rookie slot material stays the
-    // mesh's current one so a file without variants keeps rendering as authored.
-    this.scene.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh) return;
-      const table = variantMaterialsFor(gltf, mesh.name);
-      if (!table.size) return;
-      const byClass: Partial<Record<BikeClass, THREE.Material>> = {};
-      for (const [name, src] of table) {
-        const cls = /_pro$/.test(name) ? 'pro' : /_rookie$/.test(name) ? 'rookie' : null;
-        if (!cls) continue;
-        const own = src.clone();
-        const std = own as THREE.MeshStandardMaterial;
-        if (std.isMeshStandardMaterial) {
-          lib.complete(std);
-          fogify(std);
-          std.envMapIntensity = 0.8;
-          this.materials.push(std);
-        }
-        byClass[cls] = own;
-      }
-      if (byClass.rookie && byClass.pro) this.variants.push({ mesh, byClass });
-    });
     this.scene.updateMatrixWorld(true);
     for (const name of ['frame_origin', 'chassis_com', 'swing_pivot', 'swing_axle', 'shock_link', 'fork_top', 'front_axle_rest', 'rear_axle_rest', 'shock_top', 'shock_upper_seat', 'shock_lower_seat', 'shock_rod_top', 'shock_eye', 'countershaft', 'front_pitch', 'rear_sprocket', 'rear_pitch', 'exhaust_outlet']) {
       const marker = this.scene.getObjectByName(`attach_${name}`);
@@ -202,7 +170,6 @@ export class GltfBike implements HeroBike {
       const wheel = this.nodes[key];
       if (wheel) this.blurs.push(new SpokeBlur(wheel, this.materials));
     }
-    this.setLivery('rookie', true);
     this.triangles = countTriangles(this.scene);
   }
 
@@ -307,15 +274,8 @@ export class GltfBike implements HeroBike {
     return out.set(x, y, z).applyMatrix4(this.frameLocal);
   }
 
-  /** Round 13: the class colourway is the file's `KHR_materials_variants` material (no tint, plates baked). */
-  setLivery(cls: BikeClass, force = false): void {
-    if (cls === this.livery && !force) return;
-    this.livery = cls;
-    for (const v of this.variants) {
-      const m = v.byClass[cls];
-      if (m) v.mesh.material = m;
-    }
-  }
+  /** Ask 43: the class colourway is the file (`bike-rookie.glb` / `bike-pro.glb`, swapped by `setBikeClass`); the kit's `setLivery` is a no-op here. */
+  setLivery(_cls: BikeClass): void {}
 
   dispose(): void {
     for (const b of this.blurs) b.dispose();

@@ -275,7 +275,7 @@ def main():
  parser.add_argument('--ao-samples',type=int,help='Adoption only: local AO samples (default 32).')
  parser.add_argument('--ao-strength',type=float,help='Adoption only: local AO strength (default .8).')
  parser.add_argument('--source',type=Path,default=HERE/'source/bike.blend')
- parser.add_argument('--models',type=Path,default=Path(C.MODELS))
+ parser.add_argument('--models',type=Path,default=Path(C.MODELS).parent.parent/"harness"/"out"/"blender"/"base-body"/"models", help="base-body exports are not shipped; default is an ignored scratch dir (the runtime family is hero_art_build.mjs)")
  parser.add_argument('--textures',type=Path,default=Path(C.BAKE_DIR))
  parser.add_argument('--generated',type=Path,default=HERE/'generated')
  parser.add_argument('--lod',action='store_true');parser.add_argument('--lod-tris',type=int,default=6000)

@@ -25,6 +25,9 @@ SIZE = int(ARGS[ARGS.index("--size") + 1]) if "--size" in ARGS else 900
 QUICK = "--quick" in ARGS
 VARIANT = ARGS[ARGS.index("--variant") + 1] if "--variant" in ARGS else "rookie"  # rookie | pro
 LOD = "--lod" in ARGS  # preview the *-lod.glb files
+# Legacy-family previewer (rider.glb / bike.glb with KHR_materials_variants). Those runtime files retired with the
+# hero-art set (ask 43); the shipped GLBs are rendered by hero_art_preview.py. This script still previews scratch
+# exports of the base-body sources when pointed at them via common.MODELS.
 SUFFIX = ("" if VARIANT == "rookie" else f"-{VARIANT}") + ("-lod" if LOD else "")
 
 
@@ -331,6 +334,8 @@ if __name__ == "__main__":
     os.makedirs(C.PREVIEWS, exist_ok=True)
     if WHAT in ("bike", "all"):
         preview_bike()
+    if not os.path.exists(os.path.join(C.MODELS, "rider.glb")):
+        C.log("no legacy rider.glb in", C.MODELS, "- the shipped hero-art family is previewed by hero_art_preview.py")
     if WHAT in ("rider", "all") and os.path.exists(os.path.join(C.MODELS, "rider.glb")):
         preview_rider()
     if WHAT in ("composite", "all") and os.path.exists(os.path.join(C.MODELS, "rider.glb")):

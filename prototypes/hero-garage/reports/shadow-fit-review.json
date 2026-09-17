@@ -1,9 +1,0 @@
-{
-  "change": "Fit key-light shadow camera to loaded asset bounds; scale normal offset to portrait rather than15mm; target light atassetcenter",
-  "controlAssetSha256": "3f7d16b21501d9713e4fc1a6f6f840acfa8e5d83c7f3a957144a287dff60efea",
-  "controlVideo": "captures/head-groom-a2-shadows-control/webkit-orbit-relight.webm",
-  "reviewMethod": "Decoded1fps frames05\u201313 across recorded8second orbit/relight",
-  "result": "Shadow boundaries are more localized and no gross acne observed in sampled frames. Crown gap, broadsilhouette and faceidentity defects remain. No artmilestone accepted.",
-  "captureFix": "Hash upstream GLB bytes and forward exactpayload through requestinterception; WebKit inspectorcache had evicted50MBGLBs. Load timing includes interception and is not productionnetworkbenchmark.",
-  "invalidPriorControl": "head-groom-a2-shadows.json explicitly excluded: asset export overlappedbuild."
-}

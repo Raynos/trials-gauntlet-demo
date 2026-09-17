@@ -12,17 +12,17 @@ describe('model download retries', () => {
   it('shares an in-flight request, evicts a failure, and retains a successful document', async () => {
     let fail!: (error: Error) => void;
     load.mockImplementationOnce((_url, _success, _progress, onError) => { fail = onError; });
-    const first = loadGltf('models/rider-race.glb', true);
-    expect(loadGltf('models/rider-race.glb', true)).toBe(first);
+    const first = loadGltf('models/rider-race-bluewhite.glb', true);
+    expect(loadGltf('models/rider-race-bluewhite.glb', true)).toBe(first);
     expect(load).toHaveBeenCalledTimes(1);
     fail(new Error('offline'));
     expect(await first).toBeNull();
     const document = { scene: { traverse: () => undefined } } as unknown as GLTF;
     load.mockImplementationOnce((_url, onSuccess) => { onSuccess(document); });
-    const retry = loadGltf('models/rider-race.glb', true);
+    const retry = loadGltf('models/rider-race-bluewhite.glb', true);
     expect(retry).not.toBe(first);
     expect(await retry).toBe(document);
-    expect(loadGltf('models/rider-race.glb', true)).toBe(retry);
+    expect(loadGltf('models/rider-race-bluewhite.glb', true)).toBe(retry);
     expect(load).toHaveBeenCalledTimes(2);
   });
 });

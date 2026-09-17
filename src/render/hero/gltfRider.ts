@@ -24,15 +24,10 @@ import type { BikeClass, RagdollBody } from '../../core/types';
 import type { HeroBike } from '../bike/bikeModel';
 import type { RenderFrame } from '../frame';
 import type { MaterialLibrary } from '../materials/library';
-import { fogify } from '../lighting/environment';
 import { newChain, solveChain, type Chain } from '../rider/riderModel';
 import { countTriangles, prepareHeroMaterials } from './gltf';
-import { variantMaterialsFor } from './lod';
 import { makeRiderRigPose, riderRigFromCOM, RIDER_PROFILE, RIDER_TORSO_REST } from './riderRig';
 import { clipWindows, type ClipWindow } from './clipAliases';
-
-/** Asset material names; deliberately independent of bike physics class. */
-export type RiderMaterialVariant = 'rider_rookie' | 'rider_pro';
 
 const SHIFT = 0.65; // axle-midpoint frame → file frame (rear axle origin)
 /** Landing squash weight from the summed grounded compression: 0 at the ridden sag, `max` at sag + span. */
@@ -127,9 +122,6 @@ export class GltfRider {
   private readonly lead = { lean: 0, leanV: 0, torso: 0, torsoV: 0, arm: 0, armV: 0, crouch: 0, crouchV: 0 };
   /** The parsed document this instance was cloned from (`rider.glb` or `rider-lod.glb`). */
   readonly source: GLTF;
-  /** Round 13 (H1 colourways): `rider_rookie` / `rider_pro` variant materials per mesh, own completed clones. */
-  private readonly variants: { mesh: THREE.Mesh; byVariant: Partial<Record<RiderMaterialVariant, THREE.Material>> }[] = [];
-  private materialVariant: RiderMaterialVariant | null = null;
   /** v1 / mock physics only (no `riderBody`): the additive clips run on these timers. */
   private landT = -1;
   private landW = 0.45;
@@ -163,27 +155,6 @@ export class GltfRider {
       m.material = c;
     });
     this.materials = prepareHeroMaterials(this.scene, (m) => lib.complete(m));
-    this.scene.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh) return;
-      const table = variantMaterialsFor(gltf, mesh.name);
-      if (!table.size) return;
-      const byVariant: Partial<Record<RiderMaterialVariant, THREE.Material>> = {};
-      for (const [name, src] of table) {
-        if (name !== 'rider_rookie' && name !== 'rider_pro') continue;
-        const own = src.clone();
-        const std = own as THREE.MeshStandardMaterial;
-        if (std.isMeshStandardMaterial) {
-          lib.complete(std);
-          fogify(std);
-          std.envMapIntensity = 0.8;
-          this.materials.push(std);
-        }
-        byVariant[name] = own;
-      }
-      this.variants.push({ mesh, byVariant });
-    });
-    if (this.variants.length) this.setMaterialVariant('rider_rookie', true);
     this.scene.position.set(-SHIFT, 0, 0);
     this.root.name = 'rider:gltf';
     this.triangles = countTriangles(this.scene);
@@ -273,31 +244,8 @@ export class GltfRider {
     }
   }
 
-  /** Whether the document carries `rider_rookie` / `rider_pro` palettes (the legacy family; Astra's per-outfit files do not). */
-  get hasMaterialVariants(): boolean {
-    return this.variants.length > 0;
-  }
-
-  /** Select an exact asset palette. Validate every participating mesh before changing any. */
-  setMaterialVariant(variant: RiderMaterialVariant, force = false): void {
-    if (variant !== 'rider_rookie' && variant !== 'rider_pro') {
-      throw new Error(`Unknown rider material variant: ${String(variant)}`);
-    }
-    if (!this.variants.length) throw new Error(`Rider has no material variants; requested ${variant}`);
-    for (const entry of this.variants) {
-      if (!entry.byVariant[variant]) throw new Error(`Rider mesh ${entry.mesh.name} is missing material variant ${variant}`);
-    }
-    if (variant === this.materialVariant && !force) return;
-    for (const entry of this.variants) entry.mesh.material = entry.byVariant[variant]!;
-    this.materialVariant = variant;
-  }
-
-  /** @deprecated Compatibility for existing callers; presets should use setMaterialVariant.
-   * Variant-free legacy/debug documents retain their original material, as before. */
-  setLivery(cls: BikeClass, force = false): void {
-    if (!this.variants.length) return;
-    this.setMaterialVariant(cls === 'pro' ? 'rider_pro' : 'rider_rookie', force);
-  }
+  /** Ask 43: the outfit is the file (`urls.ts`); the kit's per-class livery is a no-op on the glTF rider. */
+  setLivery(_cls: BikeClass): void {}
 
   attach(bike: HeroBike): void {
     this.bike = bike;

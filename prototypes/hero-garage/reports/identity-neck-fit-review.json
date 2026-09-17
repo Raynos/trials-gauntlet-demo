@@ -1,9 +1,0 @@
-{
-  "round": 22,
-  "verdict": "reject neck taper and restore prior assembled identity",
-  "reason": "Matched portrait view still exposes a jagged pale neck patch; no convincing seam cleanup. Full-scene forward-rise remains coherent but does not justify adopting the reshaping.",
-  "reviewMethod": "Matched rendered portraits and sequential frames decoded from actual forward-rise/orbit recording",
-  "activeRiderSHA256": "500990e54f6d3c7b5c413ef99e9292fa761e16a8712d71744eb6742a798bfd82",
-  "savedFaceHairBeard": "retained unchanged",
-  "nextStep": "Separate residual old-neck geometry from attached portrait neck and repair the join using explicit component/UV correspondence; do not continue broad numeric taper guesses."
-}

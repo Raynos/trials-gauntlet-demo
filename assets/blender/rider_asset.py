@@ -254,7 +254,7 @@ def main():
     parser.add_argument("--replace-source", action="store_true")
     parser.add_argument("--lod", action="store_true")
     parser.add_argument("--size", type=int)
-    parser.add_argument("--models", type=Path, default=Path(C.MODELS))
+    parser.add_argument("--models", type=Path, default=Path(C.MODELS).parent.parent/"harness"/"out"/"blender"/"base-body"/"models", help="base-body exports are not shipped; default is an ignored scratch dir (the runtime family is hero_art_build.mjs)")
     parser.add_argument("--textures", type=Path, default=Path(C.BAKE_DIR))
     parser.add_argument("--generated", type=Path, default=HERE / "generated")
     parser.add_argument("--node", default="node", help="Node.js executable for actual meshopt GLB verification")

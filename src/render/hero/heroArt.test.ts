@@ -18,7 +18,7 @@ import { ASTRA_CLIP_WINDOWS } from './clipAliases';
 import { GltfBike } from './gltfBike';
 import { boneName, GltfRider } from './gltfRider';
 import { deliveredHeroUrl, loadRigAt } from './gltfTestUtils';
-import { mergeSkinnedByMaterial, prepareHero, variantMaterialsFor } from './lod';
+import { mergeSkinnedByMaterial, prepareHero } from './lod';
 
 const RIDER = deliveredHeroUrl('rider-race-bluewhite.glb', 'race-bluewhite.glb');
 const STREET = deliveredHeroUrl('rider-street-mustard.glb', 'nothing-the-60-MB-delivery-is-not-read-here.glb');
@@ -135,7 +135,6 @@ describe.skipIf(!RIDER)('Astra rider (race-bluewhite) through the game loader', 
       expect(Math.abs(point(`thigh.${side}`).distanceTo(point(`shin.${side}`)) - 0.46)).toBeLessThan(1e-4);
       expect(Math.abs(point(`shin.${side}`).distanceTo(point(`foot.${side}`)) - 0.43)).toBeLessThan(1e-4);
     }
-    expect(rider.hasMaterialVariants).toBe(false);
     expect(() => rider.setLivery('pro')).not.toThrow(); // the file is the colourway
   });
 
@@ -261,7 +260,7 @@ describe.each((['rookie', 'pro'] as const).filter((cls) => BIKES[cls]))('Astra b
     chain.material = new THREE.MeshStandardMaterial({ map: new THREE.Texture() });
   });
 
-  it('flattens any physical material, keeps every mechanism part addressable by name and carries no variants table', () => {
+  it('flattens any physical material, keeps every mechanism part addressable by name', () => {
     // The prototype export is 16 materials with a clearcoat fender and multi-material parts (Groups of `<part>_n`
     // meshes); the art owner's stage-1 file is a 4-material atlas of single meshes. Both must drive the same way.
     const after = countMeshes(gltf.scene);
@@ -272,9 +271,6 @@ describe.each((['rookie', 'pro'] as const).filter((cls) => BIKES[cls]))('Astra b
       expect(part, name).toBeTruthy();
       expect((part as THREE.Mesh).isMesh || (part as THREE.Group).isGroup, name).toBe(true);
     }
-    let variantRows = 0;
-    gltf.scene.traverse((o) => { if ((o as THREE.Mesh).isMesh && variantMaterialsFor(gltf, o.name).size) variantRows++; });
-    expect(variantRows).toBe(0);
   });
 
   it('drives the fork, swingarm, shock, chain and hose from wheel states; the livery swap is a no-op on a per-livery file', () => {

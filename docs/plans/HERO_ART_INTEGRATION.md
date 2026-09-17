@@ -120,3 +120,18 @@ owner joins when there is a file to play. Prototype retirement is the last round
 - Bench b1 phone-high with the bench awaiting the async tier load: 142 calls / 85 k tris / 52 programs / model 9.2 ms
   (baseline 128 / 156 k / 9.2); garage·high 208 k / 8.9–13.3 ms by canvas size.
 - Harness: `--only=camera`, `clip.json` fallback when a child's stdout is lost, frozen-build recipe (`VERCEL_GIT_COMMIT_SHA`).
+
+### Round 4 (2026-09-17 03:30) — one family, the prototype retired
+
+- `urls.ts` is one table; `LEGACY_HERO`, the palette / `KHR_materials_variants` paths and their tests are gone; the ten
+  legacy model files left `public/models` (14 hero-art files remain, 7 full/LOD pairs). `rider_asset.py` /
+  `bike_asset.py` export to an ignored directory so a base-body export can never re-enter the catalog.
+- `prototypes/hero-garage/` (1 436 tracked files, ~50 GB local) and `assets/design/hero-targets/reconstruction/`
+  (24 MB of img2threejs analysis only the prototype read) went to the Trash; nothing in trunk referenced either. What
+  trunk needs from them lives in `assets/blender/hero-art/` (delivery + ignored masters + rebuild docs) and
+  `docs/evidence/hero-art/delivery/` (handoff, rig / material contracts, reviews, provenance).
+- Two bounded art-build findings from the repointed loader tests: decoded hose end rings sit 0.97 mm off the authored
+  `hose_stations` (bound 1 mm), 8-bit octahedral normals decode to |n| = 1 ± 0.5 %.
+- Astra's `HERO_GARAGE_PRODUCTION.md` is archived; HR-09 holds the user's three calls (iPhone 30 fps reading, the hair
+  verdict, the licence clearance before a public pin). "Improved physics" in the ask is R10 `dc450e0`; the prototype
+  held no physics.

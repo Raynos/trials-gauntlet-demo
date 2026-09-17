@@ -4,7 +4,7 @@
  * superseded class never installs, a failed file keeps the installed livery, and the same URL loads nothing.
  * Round 4: only the pair the tier draws is awaited (desktop-high → the authored file); its LOD twin is prefetched
  * into the HTTP cache after `ready` and parsed off the track (the menu / a finish) or when a tier asks for it.
- * The legacy family is `outfitLoading.test.ts`.
+ * 
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -16,8 +16,6 @@ vi.mock('./hero/urls', async (original) => ({
   ...await original<Record<string, unknown>>(),
   bikeUrl: (cls: 'rookie' | 'pro') => `models/bike-${cls}.glb`,
   riderUrl: () => 'models/rider-street-mustard.glb',
-  riderPalette: () => null,
-  heroHasVariants: () => false,
   modelAssetBytes: () => 1000,
 }));
 afterEach(() => vi.restoreAllMocks());
@@ -31,7 +29,7 @@ function fixture(tier: 'high' | 'medium' = 'high', phase: 'riding' | 'menu' = 'r
     models: { bikeModel: 'gltf', riderModel: 'gltf' }, tier, deviceClass: 'desktop', stageOn: false, disposed: false, phase, twinPending: null,
     riderOutfit: 'street-mustard', riderDocumentOutfit: 'street-mustard', bikeClass: 'rookie', bikeDocumentClass: 'rookie',
     gltf: { bike: rookie, bikeLod: rookieLod, rider: {} as GLTF, riderLod: {} as GLTF },
-    heroLoading: 0, heroPending: Promise.resolve(), applyModels: vi.fn(), validateRiderPreset: vi.fn(), invalidate: vi.fn(), bikeRef: bike, riderRef: {},
+    heroLoading: 0, heroPending: Promise.resolve(), applyModels: vi.fn(), invalidate: vi.fn(), bikeRef: bike, riderRef: {},
     whenReady: () => Promise.resolve(), onHeroTwin: twin,
   };
   const renderer = Object.assign(Object.create(ThreeRenderer.prototype) as object, fields) as unknown as ThreeRenderer;
@@ -61,7 +59,6 @@ describe('per-livery bike files', () => {
     expect(state.gltf.bikeLod).toBeNull(); // riding: the cached twin waits
     expect(state.bikeDocumentClass).toBe('pro');
     expect(state.applyModels).toHaveBeenCalledTimes(1);
-    expect(state.validateRiderPreset).not.toHaveBeenCalled();
     expect(twin).toHaveBeenLastCalledWith(1000, 1000);
     vi.mocked(loadGltf).mockClear();
     renderer.setBikeClass('pro');
