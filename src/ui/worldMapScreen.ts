@@ -17,7 +17,7 @@ import { BUILD_STAMP_SHORT, escapeHtml, Screen, type FrontCallbacks, type FrontS
 import { isLiveTarget } from './live';
 import { isLabTrack, medalTotals, nextTrack, shipTracks, TIER_LABEL, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
-import { allMarkers, buildRegions, fitZoom, FLY_MS, fogPatches, locate, MAP, nextGate, regionPlateSrc, routePath, TAP_SLOP, tierBlend, worldPlateSrc, ZOOM, type FogPatch, type Gate, type Marker, type Region, type RegionId } from './worldMap';
+import { allMarkers, buildRegions, fitZoom, FLY_MS, fogPatches, frameFor, locate, MAP, nextGate, regionPlateSrc, routePath, TAP_SLOP, tierBlend, worldPlateSrc, ZOOM, type FogPatch, type Gate, type Marker, type Region, type RegionId } from './worldMap';
 import { injectWorldMapStyles } from './worldMapStyles';
 
 interface Cam {
@@ -364,8 +364,12 @@ export class WorldMapScreen extends Screen {
   private flyTo(mx: number, my: number, k?: number, smooth = true): void {
     const fp = this.focusPoint();
     const nk = Math.max(this.kMin, Math.min(ZOOM.max, k ?? (this.far ? ZOOM.region : this.cam.k)));
-    const to = this.clampCam({ x: fp.x - mx * nk, y: fp.y - my * nk, k: nk });
-    this.anchor = { x: mx, y: my };
+    this.flyCam(this.clampCam({ x: fp.x - mx * nk, y: fp.y - my * nk, k: nk }), { x: mx, y: my }, smooth);
+  }
+
+  /** The 380 ms eased tween to camera `to`; `anchor` is the map point the view is about (a resize re-centres on it). */
+  private flyCam(to: Cam, anchor: { x: number; y: number }, smooth: boolean): void {
+    this.anchor = anchor;
     this.userMoved = false;
     this.stopInertia();
     this.stopFly();
@@ -455,9 +459,19 @@ export class WorldMapScreen extends Screen {
     }
   }
 
+  /** The card hangs to the marker's right; when the marker is in the lowest 20 % of the view it stands above it instead (never under the progress chip or the pills). */
+  private placeCard(): void {
+    const ref = this.refs[this.focus];
+    const hgt = this.view.clientHeight;
+    if (!ref || !hgt) return;
+    const sy = this.cam.y + ref.marker.y * this.cam.k;
+    this.card.classList.toggle('up', sy > hgt * 0.8);
+  }
+
   /** A marker (or the gate) whose diamond meets an overlay's box is shaded: drawn dim, no pointer — nothing tappable hides under another tappable. */
   private shade(): void {
     if (!this.view.clientWidth) return;
+    this.placeCard();
     this.measureBlocks();
     const hit = (sx: number, sy: number): boolean => {
       for (const b of this.blocks) if (sx + 23 > b.l && sx - 23 < b.r && sy + 23 > b.t && sy - 23 < b.b) return true;
@@ -481,8 +495,28 @@ export class WorldMapScreen extends Screen {
     this.kMin = fitZoom(w, hgt);
     const cur = this.refs[this.focus];
     if (this.anchor) this.flyTo(this.anchor.x, this.anchor.y, undefined, false);
-    else if (cur && !this.userMoved) this.flyTo(cur.marker.x, cur.marker.y, ZOOM.region, false);
+    else if (cur && !this.userMoved) this.frameRegion(cur.marker, false);
     else this.pushCam();
+  }
+
+  /**
+   * Open on the focused marker's region frame (the mockup's composition: the region with its neighbour beyond), the
+   * marker's card on it; when the marker would fall outside the view, centre on the marker at that zoom instead.
+   */
+  private frameRegion(m: Marker, smooth: boolean): void {
+    const w = this.view.clientWidth || 1;
+    const hgt = this.view.clientHeight || 1;
+    const region = this.regions.find((r) => r.id === m.region) ?? this.regions[0];
+    if (!region) return;
+    const f = frameFor(region, w, hgt);
+    const c = { x: w / 2 - f.x * f.k, y: hgt / 2 - f.y * f.k, k: f.k };
+    // The frame first; then the camera slides just enough that the focused marker (and its card to the right) sits
+    // inside the middle of the view — the frame's far edge gives way, never the marker.
+    const sx = c.x + m.x * f.k;
+    const sy = c.y + m.y * f.k;
+    c.x -= Math.max(0, sx - w * 0.72) - Math.max(0, w * 0.15 - sx);
+    c.y -= Math.max(0, sy - hgt * 0.68) - Math.max(0, hgt * 0.15 - sy);
+    this.flyCam(this.clampCam(c), { x: (w / 2 - c.x) / f.k, y: (hgt / 2 - c.y) / f.k }, smooth);
   }
 
   // ------------------------------------------------------------------ build
@@ -644,7 +678,7 @@ export class WorldMapScreen extends Screen {
     this.card.dataset['region'] = marker.region;
     this.card.style.left = `${marker.x}px`;
     this.card.style.top = `${marker.y}px`;
-    this.card.innerHTML = `<div class="head"><b>${escapeHtml(marker.code)}</b> · ${escapeHtml(kind)}</div><div class="name">${escapeHtml(t.name)}</div><div class="tech">${escapeHtml(t.meta?.technique ?? '')}</div>${times}${marker.proving || marker.locked ? '' : this.boardHtml(t.id)}<span class="wm-card-ghost"${canGhost ? '' : ' hidden'}>▶ ${this.state().ghost ? 'Ghost' : 'Watch PB'}</span>`;
+    this.card.innerHTML = `<div class="head"><b>${escapeHtml(marker.code)}</b> · ${escapeHtml(kind)}</div><div class="name">${escapeHtml(t.name)}</div>${times}${marker.proving || marker.locked ? '' : this.boardHtml(t.id)}<span class="wm-card-ghost"${canGhost ? '' : ' hidden'}>▶ ${this.state().ghost ? 'Ghost' : 'Watch PB'}</span>`;
     this.ride.disabled = marker.locked;
     this.ride.innerHTML = marker.locked ? `Locked <small>${escapeHtml(marker.rule ?? '')}</small>` : `Ride <small>${escapeHtml(t.name)}</small><span class="arrow">›</span>`;
     this.ghost.hidden = !canGhost;

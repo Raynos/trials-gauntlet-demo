@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Medal, TrackDef } from '../core/types';
 import { getTrack, listTrackIds } from '../tracks';
 import { isLabTrack, isPlaygroundTrack, shipTracks } from './progress';
-import { allMarkers, ANCHOR, buildRegions, CONTINENT, fitZoom, fogPatches, locate, MAP, markersInView, nextGate, REGIONS, regionDots, ROAD, routeMarkers, routePath, routeSplit, smoothPath, tierBlend, ZOOM } from './worldMap';
+import { allMarkers, ANCHOR, buildRegions, CONTINENT, fitZoom, fogPatches, frameFor, locate, MAP, markersInView, nextGate, REGIONS, regionDots, ROAD, routeMarkers, routePath, routeSplit, smoothPath, tierBlend, ZOOM } from './worldMap';
 
 const ALL: TrackDef[] = listTrackIds().map((id) => getTrack(id)!).filter((t) => !!t);
 const SEEDED: Record<string, Medal> = { 'b1-first-ride': 'gold', 'b2-lean-back': 'silver', 'b3-kicker-row': 'bronze', 'e1-uphill-weight': 'silver', 'e2-rear-wheel-first': 'bronze', 'e3-stairway': 'silver' };
@@ -160,6 +160,37 @@ describe('world map — the painted continent (data)', () => {
     expect(tierBlend(ZOOM.tier * 0.85)).toBeCloseTo(0.5, 5);
     expect(ZOOM.plates).toBeLessThan(ZOOM.region);
     expect(ZOOM.max).toBeGreaterThan(ZOOM.region);
+  });
+
+  it('frames: every region has a frame box inside the plate that holds all of its markers; Industrial\'s holds the Canyon\'s too (the mockup\'s region view); frameFor fits it between the plate zoom and 1.3', () => {
+    const regions = buildRegions(ALL, seeded);
+    for (const r of regions) {
+      const f = r.frame;
+      expect(f.x).toBeGreaterThanOrEqual(0);
+      expect(f.y).toBeGreaterThanOrEqual(0);
+      expect(f.x + f.w).toBeLessThanOrEqual(MAP.w);
+      expect(f.y + f.h).toBeLessThanOrEqual(MAP.h);
+      for (const m of r.markers) {
+        expect(m.x, `${m.track.id} in ${r.id} frame`).toBeGreaterThanOrEqual(f.x);
+        expect(m.x, `${m.track.id} in ${r.id} frame`).toBeLessThanOrEqual(f.x + f.w);
+        expect(m.y, `${m.track.id} in ${r.id} frame`).toBeGreaterThanOrEqual(f.y);
+        expect(m.y, `${m.track.id} in ${r.id} frame`).toBeLessThanOrEqual(f.y + f.h);
+      }
+    }
+    const ind = regions[0]!;
+    const canyon = regions[1]!;
+    for (const m of canyon.markers) {
+      expect(m.x).toBeGreaterThanOrEqual(ind.frame.x);
+      expect(m.x).toBeLessThanOrEqual(ind.frame.x + ind.frame.w);
+      expect(m.y).toBeGreaterThanOrEqual(ind.frame.y);
+      expect(m.y).toBeLessThanOrEqual(ind.frame.y + ind.frame.h);
+    }
+    const phone = frameFor(ind, 932, 430);
+    expect(phone.k).toBeCloseTo(Math.min(932 / ind.frame.w, 430 / ind.frame.h), 3);
+    expect(phone.k).toBeGreaterThan(ZOOM.plates);
+    expect(phone.x).toBe(ind.frame.x + ind.frame.w / 2);
+    expect(frameFor(ind, 100, 100).k).toBeCloseTo(ZOOM.plates + 0.05, 3);
+    expect(frameFor(ind, 4000, 4000).k).toBe(1.3);
   });
 
   it('markersInView / locate', () => {

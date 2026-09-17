@@ -32,6 +32,11 @@ export interface RegionDef {
    * neighbours a little so the feathered edges blend over the same terrain.
    */
   crop: Box;
+  /**
+   * What the screen frames when it opens on a track of this region (map units): the region and its neighbour on the
+   * route, the way the A region mockup shows Industrial with the Canyon beyond it — never one marker centred alone.
+   */
+  frame: Box;
   /** Fog of war when the region is locked: soft ellipses (centre + radii, map units) laid over its land. */
   fog: { x: number; y: number; rx: number; ry: number }[];
   /** Lamp colour: the region's own light (name-plate tint on the card, the marker's spire when open and medal-less). */
@@ -50,6 +55,7 @@ export const REGIONS: readonly RegionDef[] = [
     label: 'Industrial',
     name: { x: 300, y: 560 },
     crop: { x: 0, y: 460, w: 640, h: 427 },
+    frame: { x: 0, y: 250, w: 1030, h: 495 },
     fog: [{ x: 300, y: 660, rx: 330, ry: 190 }],
     lamp: '#ffb020',
   },
@@ -58,6 +64,7 @@ export const REGIONS: readonly RegionDef[] = [
     label: 'Canyon',
     name: { x: 340, y: 190 },
     crop: { x: 80, y: 150, w: 600, h: 400 },
+    frame: { x: 40, y: 120, w: 960, h: 460 },
     fog: [{ x: 380, y: 320, rx: 300, ry: 170 }],
     lamp: '#ff7a3d',
   },
@@ -66,14 +73,16 @@ export const REGIONS: readonly RegionDef[] = [
     label: 'Snow',
     name: { x: 770, y: 62 },
     crop: { x: 560, y: 50, w: 480, h: 320 },
+    frame: { x: 480, y: 30, w: 900, h: 440 },
     fog: [{ x: 790, y: 240, rx: 240, ry: 170 }],
     lamp: '#8fd3ff',
   },
   {
     id: 'nightCity',
     label: 'Night City',
-    name: { x: 1060, y: 362 },
+    name: { x: 1080, y: 612 },
     crop: { x: 800, y: 350, w: 540, h: 360 },
+    frame: { x: 700, y: 250, w: 836, h: 470 },
     fog: [
       { x: 1050, y: 500, rx: 280, ry: 160 },
       { x: 1190, y: 560, rx: 220, ry: 110 },
@@ -85,6 +94,7 @@ export const REGIONS: readonly RegionDef[] = [
     label: 'Foundry',
     name: { x: 1330, y: 112 },
     crop: { x: 1120, y: 130, w: 416, h: 277 },
+    frame: { x: 880, y: 90, w: 656, h: 430 },
     fog: [
       { x: 1340, y: 290, rx: 250, ry: 170 },
       { x: 1210, y: 240, rx: 150, ry: 110 },
@@ -104,8 +114,8 @@ export const ANCHOR: Readonly<Record<string, { x: number; y: number }>> = {
   'lab-flat-200': { x: 170, y: 640 },
   'p1-container-yard': { x: 270, y: 700 },
   'b1-first-ride': { x: 445, y: 732 },
-  'b2-lean-back': { x: 535, y: 668 },
-  'b3-kicker-row': { x: 585, y: 585 },
+  'b2-lean-back': { x: 532, y: 672 },
+  'b3-kicker-row': { x: 538, y: 596 },
   // Canyon: the highway north of the river bridge, the mesa foot, the mesa tops, the west mesas.
   'm1-hop-up': { x: 600, y: 470 },
   'e1-uphill-weight': { x: 330, y: 395 },
@@ -136,9 +146,9 @@ export const ANCHOR: Readonly<Record<string, { x: number; y: number }>> = {
  * a leg with no entry is a straight run.
  */
 export const ROAD: Readonly<Record<string, { x: number; y: number }[]>> = {
-  'b1-first-ride>b2-lean-back': [{ x: 490, y: 706 }],
-  'b2-lean-back>b3-kicker-row': [{ x: 560, y: 636 }, { x: 572, y: 608 }],
-  'b3-kicker-row>m1-hop-up': [{ x: 575, y: 545 }, { x: 555, y: 515 }, { x: 548, y: 495 }, { x: 575, y: 478 }],
+  'b1-first-ride>b2-lean-back': [{ x: 478, y: 726 }, { x: 508, y: 700 }],
+  'b2-lean-back>b3-kicker-row': [{ x: 522, y: 642 }, { x: 528, y: 616 }],
+  'b3-kicker-row>m1-hop-up': [{ x: 520, y: 578 }, { x: 490, y: 556 }, { x: 475, y: 532 }, { x: 500, y: 512 }, { x: 545, y: 505 }, { x: 566, y: 488 }],
   'm1-hop-up>e1-uphill-weight': [{ x: 540, y: 446 }, { x: 450, y: 432 }, { x: 380, y: 420 }],
   'e1-uphill-weight>e2-rear-wheel-first': [{ x: 300, y: 362 }, { x: 270, y: 322 }],
   'e2-rear-wheel-first>e3-stairway': [{ x: 330, y: 270 }, { x: 400, y: 265 }, { x: 440, y: 285 }],
@@ -409,6 +419,17 @@ export function fogPatches(regions: readonly Region[]): FogPatch[] {
 export function fitZoom(vw: number, vh: number): number {
   const z = Math.max(vw / CONTINENT.w, vh / CONTINENT.h);
   return Math.max(0.05, Math.min(ZOOM.region, Math.round(z * 1000) / 1000));
+}
+
+/**
+ * The opening camera for a region on a `vw × vh` view: its `frame` box fitted (the zoom that shows all of it, kept
+ * between the plate zoom + a margin and 1.3 so the plates read and the terrain is not a close-up), centred on the
+ * box — the region and its neighbour on the route, as the A region mockup frames Industrial with the Canyon beyond.
+ */
+export function frameFor(region: RegionDef, vw: number, vh: number): { x: number; y: number; k: number } {
+  const f = region.frame;
+  const k = Math.max(ZOOM.plates + 0.05, Math.min(1.3, Math.min(vw / f.w, vh / f.h)));
+  return { x: f.x + f.w / 2, y: f.y + f.h / 2, k: Math.round(k * 1000) / 1000 };
 }
 
 /** Region-plate opacity at zoom `k`: 0 below 70 % of the tier zoom, 1 from the tier zoom up, linear between. */

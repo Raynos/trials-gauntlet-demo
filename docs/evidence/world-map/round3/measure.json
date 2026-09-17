@@ -1,0 +1,1248 @@
+{
+ "round": 3,
+ "built": "2026-09-17T14:25:58.900Z",
+ "states": {
+  "open@932x430": {
+   "focused": "m1-hop-up",
+   "region": "industrial",
+   "zoom": 0.869,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 13,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "e1-uphill-weight",
+    "e2-rear-wheel-first",
+    "e3-stairway",
+    "h1-wheelie-wire",
+    "lab-flat-200",
+    "lab-physics-test",
+    "p1-container-yard",
+    "p3-snow-line",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride Hop Up›",
+    "disabled": false
+   },
+   "card": {
+    "x": 491,
+    "y": 182,
+    "w": 172,
+    "h": 62
+   },
+   "sceneNodes": 413
+  },
+  "pan@932x430": {
+   "focused": "m1-hop-up",
+   "region": "industrial",
+   "zoom": 0.869,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 13,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "m1-hop-up",
+    "e1-uphill-weight",
+    "e2-rear-wheel-first",
+    "e3-stairway",
+    "m2-drum-roll",
+    "x1-vertical-limit",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "p3-snow-line",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride Hop Up›",
+    "disabled": false
+   },
+   "card": {
+    "x": 413,
+    "y": 352,
+    "w": 172,
+    "h": 62
+   },
+   "sceneNodes": 413
+  },
+  "far@932x430": {
+   "focused": "m1-hop-up",
+   "region": "industrial",
+   "zoom": 0.607,
+   "far": true,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 2,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "e1-uphill-weight",
+    "e2-rear-wheel-first",
+    "e3-stairway",
+    "m2-drum-roll",
+    "x1-vertical-limit",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "m3-see-saw",
+    "h3-fire-line",
+    "x2-pipe-dream",
+    "x3-gauntlet",
+    "lab-flat-200",
+    "lab-physics-test",
+    "p1-container-yard",
+    "p2-canyon-run",
+    "p3-snow-line",
+    "p4-night-circuit",
+    "p5-foundry-floor"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 0.364,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride Hop Up›",
+    "disabled": false
+   },
+   "card": {
+    "x": 377,
+    "y": 279,
+    "w": 120,
+    "h": 44
+   },
+   "sceneNodes": 413
+  },
+  "nightcity@932x430": {
+   "focused": "h2-gap-chain",
+   "region": "nightCity",
+   "zoom": 0.8,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 15,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "e3-stairway",
+    "m2-drum-roll",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "m3-see-saw",
+    "h3-fire-line",
+    "x2-pipe-dream",
+    "x3-gauntlet",
+    "p3-snow-line",
+    "p4-night-circuit",
+    "p5-foundry-floor"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": "Locked · Medal every Medium track",
+   "plateRule": "Medal every Medium track",
+   "ride": {
+    "text": "Locked Medal every Medium track",
+    "disabled": true
+   },
+   "card": {
+    "x": 623,
+    "y": 215,
+    "w": 138,
+    "h": 60
+   },
+   "sceneNodes": 412
+  },
+  "locked@932x430": {
+   "focused": "h1-wheelie-wire",
+   "region": "nightCity",
+   "zoom": 0.8,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 14,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "e3-stairway",
+    "m2-drum-roll",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "m3-see-saw",
+    "h3-fire-line",
+    "x2-pipe-dream",
+    "x3-gauntlet",
+    "p3-snow-line",
+    "p4-night-circuit",
+    "p5-foundry-floor"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": "Locked · Medal every Medium track",
+   "plateRule": "Medal every Medium track",
+   "ride": {
+    "text": "Locked Medal every Medium track",
+    "disabled": true
+   },
+   "card": {
+    "x": 503,
+    "y": 195,
+    "w": 138,
+    "h": 60
+   },
+   "sceneNodes": 412
+  },
+  "card@932x430": {
+   "focused": "b1-first-ride",
+   "region": "industrial",
+   "zoom": 0.8,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 11,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "lab-flat-200",
+    "lab-physics-test",
+    "p1-container-yard",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": false,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride First Ride›",
+    "disabled": false
+   },
+   "card": {
+    "x": 322,
+    "y": 263,
+    "w": 138,
+    "h": 67
+   },
+   "sceneNodes": 415
+  },
+  "open@844x390": {
+   "focused": "m1-hop-up",
+   "region": "industrial",
+   "zoom": 0.788,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 12,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "e1-uphill-weight",
+    "e2-rear-wheel-first",
+    "e3-stairway",
+    "h1-wheelie-wire",
+    "lab-flat-200",
+    "lab-physics-test",
+    "p1-container-yard",
+    "p3-snow-line",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride Hop Up›",
+    "disabled": false
+   },
+   "card": {
+    "x": 447,
+    "y": 165,
+    "w": 172,
+    "h": 62
+   },
+   "sceneNodes": 413
+  },
+  "pan@844x390": {
+   "focused": "m1-hop-up",
+   "region": "industrial",
+   "zoom": 0.788,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 12,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "m1-hop-up",
+    "e1-uphill-weight",
+    "e2-rear-wheel-first",
+    "e3-stairway",
+    "m2-drum-roll",
+    "x1-vertical-limit",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "x3-gauntlet",
+    "p3-snow-line",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride Hop Up›",
+    "disabled": false
+   },
+   "card": {
+    "x": 362,
+    "y": 314,
+    "w": 172,
+    "h": 62
+   },
+   "sceneNodes": 413
+  },
+  "far@844x390": {
+   "focused": "m1-hop-up",
+   "region": "industrial",
+   "zoom": 0.549,
+   "far": true,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 2,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "e1-uphill-weight",
+    "e2-rear-wheel-first",
+    "e3-stairway",
+    "m2-drum-roll",
+    "x1-vertical-limit",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "m3-see-saw",
+    "h3-fire-line",
+    "x2-pipe-dream",
+    "x3-gauntlet",
+    "lab-flat-200",
+    "lab-physics-test",
+    "p1-container-yard",
+    "p2-canyon-run",
+    "p3-snow-line",
+    "p4-night-circuit",
+    "p5-foundry-floor"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 0.107,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride Hop Up›",
+    "disabled": false
+   },
+   "card": {
+    "x": 342,
+    "y": 252,
+    "w": 120,
+    "h": 44
+   },
+   "sceneNodes": 413
+  },
+  "nightcity@844x390": {
+   "focused": "h2-gap-chain",
+   "region": "nightCity",
+   "zoom": 0.8,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 14,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "m2-drum-roll",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "m3-see-saw",
+    "h3-fire-line",
+    "x2-pipe-dream",
+    "p3-snow-line",
+    "p4-night-circuit",
+    "p5-foundry-floor"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": "Locked · Medal every Medium track",
+   "plateRule": "Medal every Medium track",
+   "ride": {
+    "text": "Locked Medal every Medium track",
+    "disabled": true
+   },
+   "card": {
+    "x": 535,
+    "y": 195,
+    "w": 138,
+    "h": 60
+   },
+   "sceneNodes": 412
+  },
+  "locked@844x390": {
+   "focused": "h1-wheelie-wire",
+   "region": "nightCity",
+   "zoom": 0.8,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 13,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "m2-drum-roll",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "m3-see-saw",
+    "h3-fire-line",
+    "x2-pipe-dream",
+    "p3-snow-line",
+    "p4-night-circuit",
+    "p5-foundry-floor"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": "Locked · Medal every Medium track",
+   "plateRule": "Medal every Medium track",
+   "ride": {
+    "text": "Locked Medal every Medium track",
+    "disabled": true
+   },
+   "card": {
+    "x": 415,
+    "y": 175,
+    "w": 138,
+    "h": 60
+   },
+   "sceneNodes": 412
+  },
+  "card@844x390": {
+   "focused": "b1-first-ride",
+   "region": "industrial",
+   "zoom": 0.8,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 11,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "h1-wheelie-wire",
+    "lab-flat-200",
+    "p1-container-yard",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": false,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride First Ride›",
+    "disabled": false
+   },
+   "card": {
+    "x": 285,
+    "y": 243,
+    "w": 138,
+    "h": 67
+   },
+   "sceneNodes": 415
+  },
+  "open@1280x720": {
+   "focused": "m1-hop-up",
+   "region": "industrial",
+   "zoom": 1.243,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 16,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "e1-uphill-weight",
+    "e2-rear-wheel-first",
+    "e3-stairway",
+    "m2-drum-roll",
+    "h1-wheelie-wire",
+    "lab-flat-200",
+    "lab-physics-test",
+    "p1-container-yard",
+    "p2-canyon-run",
+    "p3-snow-line",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride Hop Up›",
+    "disabled": false
+   },
+   "card": {
+    "x": 669,
+    "y": 317,
+    "w": 172,
+    "h": 62
+   },
+   "sceneNodes": 413
+  },
+  "nightcity@1280x720": {
+   "focused": "h1-wheelie-wire",
+   "region": "nightCity",
+   "zoom": 1.243,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 15,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "m1-hop-up",
+    "e3-stairway",
+    "m2-drum-roll",
+    "x1-vertical-limit",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "m3-see-saw",
+    "x2-pipe-dream",
+    "x3-gauntlet",
+    "p3-snow-line",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": "Locked · Medal every Medium track",
+   "plateRule": "Medal every Medium track",
+   "ride": {
+    "text": "Locked Medal every Medium track",
+    "disabled": true
+   },
+   "card": {
+    "x": 799,
+    "y": 534,
+    "w": 214,
+    "h": 94
+   },
+   "sceneNodes": 412
+  },
+  "locked@1280x720": {
+   "focused": "h1-wheelie-wire",
+   "region": "nightCity",
+   "zoom": 1.243,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 15,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "m1-hop-up",
+    "e3-stairway",
+    "m2-drum-roll",
+    "x1-vertical-limit",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "m3-see-saw",
+    "x2-pipe-dream",
+    "x3-gauntlet",
+    "p3-snow-line",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": "Locked · Medal every Medium track",
+   "plateRule": "Medal every Medium track",
+   "ride": {
+    "text": "Locked Medal every Medium track",
+    "disabled": true
+   },
+   "card": {
+    "x": 825,
+    "y": 524,
+    "w": 172,
+    "h": 75
+   },
+   "sceneNodes": 412
+  },
+  "card@1280x720": {
+   "focused": "b1-first-ride",
+   "region": "industrial",
+   "zoom": 1.243,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 16,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "e1-uphill-weight",
+    "h1-wheelie-wire",
+    "lab-flat-200",
+    "p1-container-yard",
+    "p3-snow-line",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": true,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride First Ride›",
+    "disabled": false
+   },
+   "card": {
+    "x": 422,
+    "y": 529,
+    "w": 214,
+    "h": 104
+   },
+   "sceneNodes": 415
+  },
+  "b1-open@932x430": {
+   "focused": "b1-first-ride",
+   "region": "industrial",
+   "zoom": 0.869,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 11,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "h1-wheelie-wire",
+    "lab-flat-200",
+    "lab-physics-test",
+    "p1-container-yard",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": false,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride First Ride›",
+    "disabled": false
+   },
+   "card": {
+    "x": 357,
+    "y": 281,
+    "w": 172,
+    "h": 84
+   },
+   "sceneNodes": 415
+  },
+  "b1-open@844x390": {
+   "focused": "b1-first-ride",
+   "region": "industrial",
+   "zoom": 0.788,
+   "far": false,
+   "scrollAxes": [],
+   "pageOverflowPx": 0,
+   "targets": 11,
+   "small": [],
+   "overlaps": [],
+   "markersOnScreen": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "m1-hop-up",
+    "h1-wheelie-wire",
+    "lab-flat-200",
+    "lab-physics-test",
+    "p1-container-yard",
+    "p4-night-circuit"
+   ],
+   "gateOnScreen": false,
+   "platesDecoded": [
+    "industrial",
+    "canyon",
+    "snow",
+    "nightCity",
+    "foundry"
+   ],
+   "tierOpacity": 1,
+   "cardRule": null,
+   "plateRule": null,
+   "ride": {
+    "text": "Ride First Ride›",
+    "disabled": false
+   },
+   "card": {
+    "x": 325,
+    "y": 253,
+    "w": 172,
+    "h": 84
+   },
+   "sceneNodes": 415
+  }
+ },
+ "frames": {
+  "chromium@932x430": {
+   "engine": "chromium/swiftshader",
+   "gestures": "cdp touch",
+   "idle": {
+    "n": 166,
+    "p50": 8.330000000001746,
+    "p90": 9.475000000002183,
+    "max": 417.72499999999854
+   },
+   "drag": {
+    "n": 330,
+    "p50": 8.334999999999127,
+    "p90": 9.8650000000016,
+    "max": 158.90500000000247
+   },
+   "inertia": {
+    "n": 324,
+    "p50": 8.344999999997526,
+    "p90": 9.450000000000728,
+    "max": 166.5550000000003
+   },
+   "pinch": {
+    "n": 712,
+    "p50": 8.340000000000146,
+    "p90": 283.6899999999987,
+    "max": 642.1000000000022
+   },
+   "pushCamUs": 13
+  },
+  "webkit@844x390 (idle machine)": {
+   "engine": "webkit (playwright, software)",
+   "gestures": "synthetic pointer events, one step per rAF",
+   "idle": {
+    "n": 120,
+    "p50": 16.360000000000582,
+    "p90": 18.6200000000008,
+    "max": 18.76000000000022
+   },
+   "drag": {
+    "n": 40,
+    "p50": 16.6200000000008,
+    "p90": 18.73999999999978,
+    "max": 21.399999999999636
+   },
+   "inertia": {
+    "n": 40,
+    "p50": 16.720000000001164,
+    "p90": 18.799999999999272,
+    "max": 36.85999999999876
+   },
+   "pinch": {
+    "n": 48,
+    "p50": 17.55999999999949,
+    "p90": 34.399999999999636,
+    "max": 43.399999999999636
+   },
+   "fps30Proxy": {
+    "drag": true,
+    "pinch": false
+   },
+   "pushCamUs": 219
+  },
+  "webkit@844x390 (during the chromium runs)": {
+   "engine": "webkit (playwright, software)",
+   "gestures": "synthetic pointer events, one step per rAF",
+   "idle": {
+    "n": 120,
+    "p50": 16.519999999999527,
+    "p90": 18.67999999999938,
+    "max": 19.659999999999854
+   },
+   "drag": {
+    "n": 40,
+    "p50": 16.55999999999949,
+    "p90": 18.18000000000029,
+    "max": 20.040000000000873
+   },
+   "inertia": {
+    "n": 40,
+    "p50": 16.920000000000073,
+    "p90": 18.80000000000109,
+    "max": 36.43999999999869
+   },
+   "pinch": {
+    "n": 48,
+    "p50": 17.799999999999272,
+    "p90": 36.13999999999942,
+    "max": 48.220000000001164
+   },
+   "fps30Proxy": {
+    "drag": true,
+    "pinch": false
+   },
+   "pushCamUs": 206
+  },
+  "webkit@844x390 (first sample)": {
+   "engine": "webkit (playwright, software)",
+   "gestures": "synthetic pointer events, one step per rAF",
+   "idle": {
+    "n": 120,
+    "p50": 16.640000000000327,
+    "p90": 18.720000000000255,
+    "max": 18.76000000000022
+   },
+   "drag": {
+    "n": 40,
+    "p50": 16.55999999999949,
+    "p90": 18.700000000000728,
+    "max": 21.73999999999978
+   },
+   "inertia": {
+    "n": 40,
+    "p50": 16.81999999999971,
+    "p90": 18.73999999999978,
+    "max": 37.5
+   },
+   "pinch": {
+    "n": 48,
+    "p50": 17.720000000001164,
+    "p90": 31.839999999998327,
+    "max": 36.280000000000655
+   },
+   "fps30Proxy": {
+    "drag": true,
+    "pinch": true
+   },
+   "pushCamUs": 230
+  },
+  "note": "WebKit is the iOS proxy (Playwright, software rendering): synthetic pointer gestures one step per rAF; the 30 fps proxy is p90 <= 33.4 ms — drag / inertia clear it, the pinch (the plates re-rasterising at a new scale) sits on the bar in software (31.8 / 36.1 / 34.4 over three runs)."
+ },
+ "e2e": {
+  "front": "476/476",
+  "run": "90/90",
+  "desktop": "188/188"
+ },
+ "clip": {
+  "durationS": 138,
+  "tapsMenuToB1": 2,
+  "track": "b1-first-ride",
+  "runTimeAfter3s": 2.925,
+  "bikeX": 18.43,
+  "tapRideToRunMs": 2729,
+  "quitToMenuMs": 1561,
+  "open": {
+   "zoom": 0.869,
+   "x": -56,
+   "y": -217,
+   "far": false,
+   "region": "industrial",
+   "focused": "m1-hop-up",
+   "plates": 5
+  },
+  "afterPan": {
+   "zoom": 0.869,
+   "x": -109,
+   "y": 0,
+   "far": false,
+   "region": "industrial",
+   "focused": "m1-hop-up",
+   "plates": 5
+  },
+  "afterPinchOut": {
+   "zoom": 0.607,
+   "x": 0,
+   "y": 0,
+   "far": true,
+   "region": "industrial",
+   "focused": "m1-hop-up",
+   "plates": 5
+  },
+  "zones": {
+   "industrial": {
+    "zoom": 2.6,
+    "x": -882,
+    "y": -1605,
+    "far": false,
+    "region": "industrial",
+    "focused": "p1-container-yard",
+    "plates": 5
+   },
+   "canyon": {
+    "zoom": 2.6,
+    "x": -882,
+    "y": -539,
+    "far": false,
+    "region": "canyon",
+    "focused": "e2-rear-wheel-first",
+    "plates": 5
+   },
+   "snow": {
+    "zoom": 2.6,
+    "x": -1443,
+    "y": -484,
+    "far": false,
+    "region": "snow",
+    "focused": "x1-vertical-limit",
+    "plates": 5
+   },
+   "nightCity": {
+    "zoom": 2.6,
+    "x": -1846,
+    "y": -968,
+    "far": false,
+    "region": "nightCity",
+    "focused": "h2-gap-chain",
+    "plates": 5
+   },
+   "foundry": {
+    "zoom": 2.6,
+    "x": -1846,
+    "y": -484,
+    "far": false,
+    "region": "foundry",
+    "focused": "x3-gauntlet",
+    "plates": 5
+   }
+  },
+  "nightCity": {
+   "zoom": 0.8,
+   "x": -297,
+   "y": -149,
+   "far": false,
+   "region": "nightCity",
+   "focused": "h2-gap-chain",
+   "plates": 5
+  },
+  "lockedH1": {
+   "cardRule": "Locked · Medal every Medium track",
+   "plateRule": "Medal every Medium track",
+   "gate": "Hard · Medal every Medium trackNext unlock · Rooftop Wire",
+   "ride": "Locked Medal every Medium track",
+   "rideDisabled": true,
+   "screen": "tracks"
+  },
+  "b1": {
+   "zoom": 0.8,
+   "x": -34,
+   "y": -323,
+   "far": false,
+   "region": "industrial",
+   "focused": "b1-first-ride",
+   "plates": 5
+  },
+  "plateBytes": [
+   {
+    "name": "world-1536.webp",
+    "bytes": 339850,
+    "ms": 6
+   },
+   {
+    "name": "region-industrial-1536.webp",
+    "bytes": 291178,
+    "ms": 6
+   },
+   {
+    "name": "region-canyon-1536.webp",
+    "bytes": 303650,
+    "ms": 6
+   },
+   {
+    "name": "region-snow-1536.webp",
+    "bytes": 275468,
+    "ms": 6
+   },
+   {
+    "name": "region-nightCity-1536.webp",
+    "bytes": 285840,
+    "ms": 6
+   },
+   {
+    "name": "region-foundry-1536.webp",
+    "bytes": 249840,
+    "ms": 6
+   }
+  ]
+ },
+ "plates": [
+  {
+   "id": "world-1536",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 339850,
+   "q": 76,
+   "cap": "350KB",
+   "over": false
+  },
+  {
+   "id": "world-1024",
+   "w": 1024,
+   "h": 683,
+   "bytes": 217928,
+   "q": 82,
+   "cap": "350KB",
+   "over": false
+  },
+  {
+   "id": "region-industrial-1536",
+   "w": 1408,
+   "h": 939,
+   "bytes": 291178,
+   "q": 56,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-industrial-1024",
+   "w": 1024,
+   "h": 683,
+   "bytes": 266840,
+   "q": 80,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-canyon-1536",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 303650,
+   "q": 50,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-canyon-1024",
+   "w": 1024,
+   "h": 683,
+   "bytes": 272972,
+   "q": 80,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-snow-1536",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 275468,
+   "q": 74,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-snow-1024",
+   "w": 1024,
+   "h": 683,
+   "bytes": 192302,
+   "q": 80,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-nightCity-1536",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 285840,
+   "q": 68,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-nightCity-1024",
+   "w": 1024,
+   "h": 683,
+   "bytes": 216080,
+   "q": 80,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-foundry-1536",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 249840,
+   "q": 74,
+   "cap": "300KB",
+   "over": false
+  },
+  {
+   "id": "region-foundry-1024",
+   "w": 1024,
+   "h": 683,
+   "bytes": 170826,
+   "q": 80,
+   "cap": "300KB",
+   "over": false
+  }
+ ],
+ "platesTotalBytes": 3082774
+}

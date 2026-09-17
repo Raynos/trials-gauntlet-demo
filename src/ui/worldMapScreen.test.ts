@@ -185,10 +185,26 @@ describe('world map screen — the painted continent as the level select', () =>
     expect(document.querySelectorAll('.wm-fog ellipse[data-key="nightCity"]')).toHaveLength(0);
   });
 
+  it('the card stands above a marker in the lower part of the view (`.up`), beside one higher up', () => {
+    const { screen } = fixture({ seeded: true });
+    const view = document.querySelector<HTMLElement>('.wm-view')!;
+    Object.defineProperty(view, 'clientWidth', { value: 932, configurable: true });
+    Object.defineProperty(view, 'clientHeight', { value: 430, configurable: true });
+    const cam = screen as unknown as { cam: { x: number; y: number; k: number }; placeCard(): void };
+    const m1 = document.querySelector<HTMLElement>('.wm-marker.on')!;
+    const my = parseFloat(m1.style.top);
+    cam.cam = { x: 0, y: 40 - my * 0.8, k: 0.8 }; // M1 at 40 px from the top
+    cam.placeCard();
+    expect(document.querySelector('.wm-card')!.classList.contains('up')).toBe(false);
+    cam.cam = { x: 0, y: 400 - my * 0.8, k: 0.8 }; // M1 at 400 px: the lowest 20 %
+    cam.placeCard();
+    expect(document.querySelector('.wm-card')!.classList.contains('up')).toBe(true);
+  });
+
   it('camera(): opens at the region zoom on the focused track, reports its bounds and the focused region', () => {
     const { screen } = fixture({ seeded: true });
     const c = screen.camera();
-    expect(c.zoom).toBeCloseTo(0.8, 3);
+    expect(c.zoom).toBeCloseTo(0.8, 3); // jsdom has no box: the frame fly never runs, the zoom stays at the region default
     expect(c.zoomMax).toBeGreaterThan(c.zoom);
     expect(c.track).toBe('m1-hop-up');
     expect(c.region).toBe('industrial');

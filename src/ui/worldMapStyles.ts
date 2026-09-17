@@ -61,15 +61,15 @@ export const WORLD_MAP_CSS = `
 .wm-marker .wm-lock { position: absolute; left: 50%; top: 50%; width: 9px; height: 8px; transform: translate(-50%, -30%); display: none; border-radius: 2px; background: #1a1e26; }
 .wm-marker .wm-lock::before { content: ''; position: absolute; left: 1.5px; top: -5px; width: 4px; height: 6px; border: 1.5px solid #1a1e26; border-bottom: 0; border-radius: 4px 4px 0 0; }
 .wm-marker.locked .wm-lock { display: block; }
-.wm-marker .wm-lead { position: absolute; left: 8px; top: -9px; width: 20px; height: 1px; background: rgba(255,255,255,.75); transform-origin: 0 0; transform: rotate(-32deg); pointer-events: none; }
-.wm-marker .wm-plate { position: absolute; left: 26px; top: -33px; display: inline-flex; align-items: center; gap: .35em; height: 20px; padding: 0 8px 0 7px; border-radius: 3px; background: rgba(9,11,15,.86); box-shadow: 0 0 0 1px rgba(255,255,255,.16), 0 2px 8px rgba(0,0,0,.5); font: 700 11.5px/1 var(--font); letter-spacing: .04em; color: var(--ink); white-space: nowrap; pointer-events: none; }
+.wm-marker .wm-lead { position: absolute; left: 8px; top: -8px; width: 17px; height: 1px; background: rgba(255,255,255,.75); transform-origin: 0 0; transform: rotate(-32deg); pointer-events: none; }
+.wm-marker .wm-plate { position: absolute; left: 22px; top: -28px; display: inline-flex; align-items: center; gap: .35em; height: 17px; padding: 0 7px 0 6px; border-radius: 3px; background: rgba(9,11,15,.86); box-shadow: 0 0 0 1px rgba(255,255,255,.16), 0 2px 8px rgba(0,0,0,.5); font: 700 10px/1 var(--font); letter-spacing: .04em; color: var(--ink); white-space: nowrap; pointer-events: none; }
 .wm-marker .wm-plate b { color: var(--mk); }
 .wm-marker.locked .wm-plate { color: var(--ink-dim); }
-.wm-marker .wm-plate .tag { font-style: normal; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 5px; border-radius: 2px; margin-left: 2px; }
+.wm-marker .wm-plate .tag { font-style: normal; font-size: 8px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 5px; border-radius: 2px; margin-left: 2px; }
 .wm-marker .wm-plate .tag.next { background: var(--amber); color: var(--amber-ink); }
 .wm-marker .wm-plate .tag.pro { background: rgba(255,255,255,.18); color: var(--ink); }
 .wm-marker .wm-plate .tag.ghost { background: rgba(90,169,255,.25); color: #cfe6ff; }
-.wm-marker .wm-rule { position: absolute; left: 26px; top: -11px; height: 16px; padding: 0 6px; border-radius: 2px; background: rgba(9,11,15,.8); box-shadow: 0 0 0 1px rgba(255,176,32,.35); font: 700 9px/16px var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); white-space: nowrap; pointer-events: none; display: none; }
+.wm-marker .wm-rule { position: absolute; left: 22px; top: -10px; height: 14px; padding: 0 5px; border-radius: 2px; background: rgba(9,11,15,.8); box-shadow: 0 0 0 1px rgba(255,176,32,.35); font: 700 8px/14px var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); white-space: nowrap; pointer-events: none; display: none; }
 .wm-marker.locked .wm-rule { display: block; }
 /* The focused marker: the bike at its foot, an amber beacon rising into the sky, its plate hidden under the card. */
 .wm-marker.on { z-index: 3; --mk: #ffd25a; --mk2: #c98a10; }
@@ -90,20 +90,21 @@ export const WORLD_MAP_CSS = `
 .wm-marker.shaded .wm-hit { pointer-events: none; }
 /* Far zoom (the whole continent): plates fold away, diamonds shrink and stop taking pointers — a tap on the land flies to the nearest marker. */
 .wm-scene.far .wm-rule { display: none; }
-.wm-scene.far .wm-marker .wm-plate { transform: scale(.78); transform-origin: 0 100%; left: 20px; top: -28px; }
+.wm-scene.far .wm-marker .wm-plate { transform: scale(.8); transform-origin: 0 100%; left: 18px; top: -24px; }
 .wm-scene.far .wm-marker .wm-plate .tag { display: none; }
 .wm-scene.far .wm-lead { width: 15px; }
 .wm-scene.far .wm-hit { pointer-events: none; }
 .wm-scene.far .wm-diamond { width: 13px; height: 13px; }
 .wm-scene.far .wm-marker.on .wm-diamond { width: 16px; height: 16px; }
 .wm-scene.far .wm-spire { height: 34px; top: -34px; }
+.wm-scene.far .wm-marker .wm-beacon { height: 110px; width: 10px; left: -5px; opacity: .8; }
 /* The tier gate: three amber chevrons across the road where it enters the locked land, and the rule on a plate. */
 .wm-gate { position: absolute; width: 0; height: 0; transform: scale(var(--inv)); transform-origin: 0 0; z-index: 2; }
 .wm-gate .wm-hit { position: absolute; left: -23px; top: -23px; width: 46px; height: 46px; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; }
 .wm-gate .chev { position: absolute; left: -24px; top: -13px; width: 48px; display: flex; justify-content: center; transform-origin: 24px 13px; font: 900 26px/26px var(--display); font-style: italic; color: var(--amber); text-shadow: 0 0 8px rgba(255,176,32,1), 0 0 2px #000, 0 1px 2px #000; letter-spacing: -.12em; pointer-events: none; animation: wm-chev 1.2s ease-in-out infinite alternate; }
 @keyframes wm-chev { from { opacity: .7; } to { opacity: 1; } }
-.wm-gate .wm-plate { position: absolute; left: 26px; top: -30px; display: block; padding: 4px 8px; border-radius: 3px; background: rgba(9,11,15,.88); box-shadow: 0 0 0 1px rgba(255,176,32,.45), 0 2px 8px rgba(0,0,0,.5); font: 700 10px/1.25 var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); white-space: nowrap; pointer-events: none; }
-.wm-gate .wm-plate small { display: block; font-size: 9px; color: var(--ink-dim); letter-spacing: .08em; margin-top: 2px; }
+.wm-gate .wm-plate { position: absolute; left: 24px; top: -28px; display: block; padding: 3px 7px; border-radius: 3px; background: rgba(9,11,15,.88); box-shadow: 0 0 0 1px rgba(255,176,32,.45), 0 2px 8px rgba(0,0,0,.5); font: 700 9px/1.25 var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); white-space: nowrap; pointer-events: none; }
+.wm-gate .wm-plate small { display: block; font-size: 8px; color: var(--ink-dim); letter-spacing: .08em; margin-top: 2px; }
 .wm-gate.shaded { opacity: .35; }
 .wm-gate.shaded .wm-hit { pointer-events: none; }
 .wm-scene.far .wm-gate .wm-plate { transform: scale(.8); transform-origin: 0 100%; }
@@ -111,10 +112,12 @@ export const WORLD_MAP_CSS = `
 /* The card, attached to the focused marker: code · tier · region, the name, best / target, the local board, GHOST. */
 .wm-card { position: absolute; z-index: 4; transform: translate(26px, -14%) scale(var(--inv)); transform-origin: -26px 14%; width: 172px; padding: 7px 9px 8px; border-radius: 4px; background: rgba(9,11,15,.9); box-shadow: 0 0 0 1px rgba(255,176,32,.5), 0 6px 20px rgba(0,0,0,.55); color: var(--ink); pointer-events: none; }
 .wm-card::before { content: ''; position: absolute; left: -7px; top: 14%; width: 7px; height: 1px; background: rgba(255,200,80,.85); }
+.wm-card.up { transform: translate(26px, -90%) scale(var(--inv)); transform-origin: -26px 90%; }
+.wm-card.up::before { top: 90%; }
+.wm-scene.far .wm-card.up { transform: translate(18px, -90%) scale(calc(var(--inv) * .7)); transform-origin: -18px 90%; }
 .wm-card .head { font: 700 9.5px/1 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wm-card .head b { color: var(--amber); }
 .wm-card .name { margin-top: 3px; font: italic 900 17px/1 var(--display); text-transform: uppercase; letter-spacing: .01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wm-card .tech { margin-top: 3px; font: 500 10px/1.2 var(--font); color: var(--ink-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wm-card .times { margin-top: 4px; font: 700 12px/1 var(--mono); color: var(--ink-dim); white-space: nowrap; }
 .wm-card .times b { color: var(--green); font-size: 14px; }
 .wm-card .times b.none { color: var(--ink-mute); }
