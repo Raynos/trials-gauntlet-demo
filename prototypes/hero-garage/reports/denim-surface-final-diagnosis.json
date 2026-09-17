@@ -1,0 +1,271 @@
+{
+  "hero denim pocket": [
+    {
+      "type": "ShaderNodeTexNoise",
+      "name": "Noise Texture",
+      "inputs": {
+        "W": 0.0,
+        "Scale": 22.0,
+        "Detail": 3.0,
+        "Roughness": 0.5,
+        "Lacunarity": 2.0,
+        "Offset": 0.0,
+        "Gain": 1.0,
+        "Distortion": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math",
+      "inputs": {
+        "Value": 0.5
+      }
+    },
+    {
+      "type": "ShaderNodeTexNoise",
+      "name": "Noise Texture.001",
+      "inputs": {
+        "W": 0.0,
+        "Scale": 720.0,
+        "Detail": 2.0,
+        "Roughness": 0.5,
+        "Lacunarity": 2.0,
+        "Offset": 0.0,
+        "Gain": 1.0,
+        "Distortion": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeTexWave",
+      "name": "Wave Texture",
+      "inputs": {
+        "Scale": 273.6000061035156,
+        "Distortion": 0.0,
+        "Detail": 2.0,
+        "Detail Scale": 1.0,
+        "Detail Roughness": 0.5,
+        "Phase Offset": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math.001",
+      "inputs": {
+        "Value": 0.5
+      }
+    },
+    {
+      "type": "ShaderNodeBump",
+      "name": "Bump",
+      "inputs": {
+        "Strength": 0.23000000417232513,
+        "Distance": 0.0006500000017695129,
+        "Filter Width": 0.10000000149011612,
+        "Height": 1.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math.002",
+      "inputs": {
+        "Value": 0.800000011920929
+      }
+    },
+    {
+      "type": "ShaderNodeBump",
+      "name": "PHOTO_image-derived micro normal",
+      "inputs": {
+        "Strength": 0.6499999761581421,
+        "Distance": 0.0001500000071246177,
+        "Filter Width": 0.10000000149011612,
+        "Height": 1.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "PHOTO_cloth roughness floor",
+      "inputs": {
+        "Value": 0.5
+      }
+    }
+  ],
+  "hero indigo twill": [
+    {
+      "type": "ShaderNodeTexNoise",
+      "name": "Noise Texture",
+      "inputs": {
+        "W": 0.0,
+        "Scale": 22.0,
+        "Detail": 3.0,
+        "Roughness": 0.5,
+        "Lacunarity": 2.0,
+        "Offset": 0.0,
+        "Gain": 1.0,
+        "Distortion": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math",
+      "inputs": {
+        "Value": 0.5
+      }
+    },
+    {
+      "type": "ShaderNodeTexNoise",
+      "name": "Noise Texture.001",
+      "inputs": {
+        "W": 0.0,
+        "Scale": 720.0,
+        "Detail": 2.0,
+        "Roughness": 0.5,
+        "Lacunarity": 2.0,
+        "Offset": 0.0,
+        "Gain": 1.0,
+        "Distortion": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeTexWave",
+      "name": "Wave Texture",
+      "inputs": {
+        "Scale": 273.6000061035156,
+        "Distortion": 0.0,
+        "Detail": 2.0,
+        "Detail Scale": 1.0,
+        "Detail Roughness": 0.5,
+        "Phase Offset": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math.001",
+      "inputs": {
+        "Value": 0.5
+      }
+    },
+    {
+      "type": "ShaderNodeBump",
+      "name": "Bump",
+      "inputs": {
+        "Strength": 0.23000000417232513,
+        "Distance": 0.0006500000017695129,
+        "Filter Width": 0.10000000149011612,
+        "Height": 1.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math.002",
+      "inputs": {
+        "Value": 0.800000011920929
+      }
+    },
+    {
+      "type": "ShaderNodeBump",
+      "name": "PHOTO_image-derived micro normal",
+      "inputs": {
+        "Strength": 0.6499999761581421,
+        "Distance": 0.0001500000071246177,
+        "Filter Width": 0.10000000149011612,
+        "Height": 1.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "PHOTO_cloth roughness floor",
+      "inputs": {
+        "Value": 0.5
+      }
+    }
+  ],
+  "hero tobacco topstitch": [
+    {
+      "type": "ShaderNodeTexNoise",
+      "name": "Noise Texture",
+      "inputs": {
+        "W": 0.0,
+        "Scale": 22.0,
+        "Detail": 3.0,
+        "Roughness": 0.5,
+        "Lacunarity": 2.0,
+        "Offset": 0.0,
+        "Gain": 1.0,
+        "Distortion": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math",
+      "inputs": {
+        "Value": 0.5
+      }
+    },
+    {
+      "type": "ShaderNodeTexNoise",
+      "name": "Noise Texture.001",
+      "inputs": {
+        "W": 0.0,
+        "Scale": 650.0,
+        "Detail": 2.0,
+        "Roughness": 0.5,
+        "Lacunarity": 2.0,
+        "Offset": 0.0,
+        "Gain": 1.0,
+        "Distortion": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeTexWave",
+      "name": "Wave Texture",
+      "inputs": {
+        "Scale": 247.0,
+        "Distortion": 0.0,
+        "Detail": 2.0,
+        "Detail Scale": 1.0,
+        "Detail Roughness": 0.5,
+        "Phase Offset": 0.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math.001",
+      "inputs": {
+        "Value": 0.5
+      }
+    },
+    {
+      "type": "ShaderNodeBump",
+      "name": "Bump",
+      "inputs": {
+        "Strength": 0.23000000417232513,
+        "Distance": 0.0006500000017695129,
+        "Filter Width": 0.10000000149011612,
+        "Height": 1.0
+      }
+    },
+    {
+      "type": "ShaderNodeMath",
+      "name": "Math.002",
+      "inputs": {
+        "Value": 0.8399999737739563
+      }
+    }
+  ],
+  "normalMapAngularTiltDegreesPercentiles": {
+    "accepted": {
+      "10": 0.7104957504028006,
+      "50": 1.7106788463225062,
+      "90": 4.313811780548974,
+      "99": 8.0551110828593
+    },
+    "candidate": {
+      "10": 0.7104914312761007,
+      "50": 0.7104979099563005,
+      "90": 2.0337974576828874,
+      "99": 8.0551110828593
+    }
+  },
+  "diagnosis": "Active normal comes from PHOTO image-derived micro normal strength0.65; original procedural fine weave is disconnected. Candidate reduces photo bump strength to0.18 while preserving the weave image, 0.271m tiling, albedo and ORM.",
+  "statisticsScope": "Forward-facing non-flat normal texels including gutters; not a per-face material mask. Excludes inverse-facing/background texels. PNG read as non-color data."
+}

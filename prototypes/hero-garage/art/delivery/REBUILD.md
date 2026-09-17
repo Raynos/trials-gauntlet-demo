@@ -29,7 +29,7 @@ Every executed run writes `art/delivery/runs/<UTC-time>-<id>/manifest.json`, per
 
 A successful manifest says `built-not-visually-approved`. Re-render matched views and all six clips before accepting the delivery; numeric reconstruction and lossless packing are not visual approval. Source seeds are checked unchanged at the end.
 
-Stage29 was executed successfully on September17UTC. Its raw output SHA256 exactly matched the separately assembled and reviewed R28 candidate. All12 matched Three.js PNG comparisons (six clips, full and face views) were byte identical after lossless packing. This proves reproduction and packing preservation, not final art quality.
+Stage29 was executed successfully on September17UTC. Its raw output SHA256 exactly matched the separately assembled and reviewed R28 candidate. All 12 matched Three.js PNG comparisons (six clips, full and face views) were byte identical after lossless packing. This proves reproduction and packing preservation, not final art quality.
 
 ## Stage 30: accepted sleeve continuity
 
@@ -95,3 +95,129 @@ command, elapsed time and exit code, and copies its proof to
 are recorded separately from the raw delivery. A pruning failure leaves the raw
 asset available and marks the run failed; final rendered review is still
 required before promotion.
+
+## Stage38: knit rib finish and visible footwear lacing
+
+`--stage 38` adds four ordered steps after stage37: build the rib finish from the
+freshly regenerated fitted-hem source and three cotton atlas maps, assemble that
+cloth donor, build the visible laces from the regenerated footwear-finish source,
+and assemble only the lace donor. Both assemblers receive explicit `--base` and
+`--out` paths. The rib source and its generated albedo/ORM images, plus the lacing
+source and both donors, are recorded outputs.
+
+The stage37 portion writes
+`street01-rider-delivery-38-before-rib-finish.glb`; rib assembly writes
+`street01-rider-delivery-38-before-footwear-lacing.glb`; lace assembly writes the
+usual raw delivery. These distinct paths prevent reading and writing the same
+asset within an assembly step. Stage28–37 recipe behavior remains unchanged.
+
+```sh
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 38 --prune --pack
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 38 --prune --pack --execute
+```
+
+Stage38 has completed two serial rebuilds. The final pruned lossless GLB is
+byte-identical across those runs; the raw append-only intermediates differ in
+discarded content. See `reports/delivery-stage38-repeatability.json` for both
+manifests and hashes. This is final-packed-output repeatability on the recorded
+local runtime, not raw GLB/Blender file determinism or visual approval.
+
+## Package the reviewed catalog
+
+After final catalog promotion, regenerate the rig contract and editable master,
+then run `python3 tools/package-art-handoff.py` from the prototype directory.
+The package rejects a master whose actual `.blend` bytes differ from its report,
+a master built against a different catalog (including placements), or a rig
+contract whose asset hashes/URLs/placements are stale. No old raw fallback is
+used. The unrelated runtime-viewer package report is excluded from this editing
+archive.
+
+The ZIP contains the selected exports, master, matching rig/master reports and
+source notices, including the embedded beard/moustache AGPL3 headers alongside
+the conflicting pack-license evidence. It remains a local inspection/editing
+archive; component recipes and frozen seeds remain in the repository. Successful
+CRC/hash validation is not visual approval or public redistribution clearance.
+
+## Stage39: bounded elbow inner-shell repair
+
+`--stage 39` adds the accepted sleeve-shell repair after stage38. The builder
+receives `--source` pointing to the freshly generated packed
+`cloth-rib-finish/cloth-rib-source.blend`. It preserves the control cage, UVs,
+weights, entire outer surface and contact rims, and bounds only15 pathological
+inner elbow miter vertices to2mm. Broad angular outer sleeve junctions remain.
+
+Stage38's lacing assembly writes a distinct
+`street01-rider-delivery-39-before-sleeve-shell-fix.glb`; the shell assembler
+receives that current raw chain through explicit `--base` and writes the usual
+raw delivery through `--out`. No step reads and writes the same path. Earlier
+stages28–38 retain their existing recipe behavior.
+
+```sh
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 39 --prune --pack
+```
+
+All36 build steps pass syntax and read-only preflight. This integration does not
+execute a full rebuild; parent owns subsequent repeated builds and played review.
+
+## Stage40: finer denim surface
+
+`--stage 40` adds the accepted denim surface build and assembly after stage39.
+The build reads freshly regenerated `denim-finish-source.blend`, reuses its
+accepted `denim_albedo.png` and the generated `denim-texture/denim_orm.png`, and
+bakes the reduced-strength photo normal into a new `denim_normal.png`. The
+original photo displacement and roughness images are packed inside the source
+blend; their saved external paths are stale and are not runtime dependencies.
+No original photo download is needed.
+
+The runner declares the generated albedo as an earlier step output for stage40
+and later, and records the new editable source, normal map and donor. Assembly
+receives the current chain through explicit `--base` and `--out`, using
+`street01-rider-delivery-40-before-denim-surface.glb` as its distinct input before
+writing the usual raw delivery. Stages28–39 remain unchanged.
+
+```sh
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 40 --prune --pack
+```
+
+All38 steps pass syntax and read-only preflight with zero missing dependencies.
+No full stage40 execution was performed during integration.
+
+## Final stage 41: continuous cuff material boundary
+
+`--stage 41` appends the accepted cuff-band build and assembly after stage40.
+The builder reads freshly generated `sleeve-shape-final/sleeve-source.blend`,
+retaining the accepted15-vertex shell repair, and uses the generated cotton
+albedo/normal/ORM maps. Its `texture.py` helper and external image Python runtime
+are declared inputs; the helper is also recipe-fingerprinted. Outputs include
+editable cuff source, mask array, albedo/ORM maps and donor GLB.
+
+The image helper requires Pillow and NumPy in `ART_IMAGE_PYTHON` (default
+`prototypes/hero-garage/.venv-art-images/bin/python`). Preflight checks both executable presence and imports;
+set the variable to an existing compatible Python on another machine. The
+runtime executable is fingerprinted as an input. No image environment is silently
+installed by the runner.
+
+Stage40's final assembly writes
+`street01-rider-delivery-41-before-cuff-band.glb`; cuff assembly receives explicit
+`--base` and `--out`, writing the usual raw delivery. All40 steps have disjoint
+input/output targets, and stages28–40 remain unchanged.
+
+```sh
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 41 --prune --pack
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 41 --prune --pack --execute
+```
+
+The first command passed syntax and read-only preflight with zero missing
+requirements, including the image Python imports. No full stage 41 execution was
+performed during integration. This is the final accepted material/shape recipe;
+parent owns repeated delivery builds, comparison and final played review.
+
+
+### Image helper setup
+
+From the prototype directory, create a local Python3.14 environment with `python3.14 -m venv .venv-art-images`, then run `.venv-art-images/bin/python -m pip install -r art/delivery/requirements-images.txt`. The checked versions are pinned in that file. Alternatively set `ART_IMAGE_PYTHON` to an existing interpreter containing those packages. The virtual environment is local and Git-ignored.
+
+
+## Final local repeatability evidence
+
+Two complete stage 41 runs took 100.286 s and 105.460 s. Both produced the same 60,161,596-byte pruned/lossless rider, SHA256 `989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a`. Raw append-only intermediate files differed in discarded payloads; no raw-file or `.blend` byte-determinism claim is made. All 12 final raw-versus-packed WebKit canvas comparisons are byte-identical. See `reports/delivery-stage41-repeatability.json`, `reports/art-lossless-render-compare.json` and [REBUILD-BIKE.md](REBUILD-BIKE.md) for the independently reproduced bike.

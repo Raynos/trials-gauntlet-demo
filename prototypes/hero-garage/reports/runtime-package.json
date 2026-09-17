@@ -11,7 +11,7 @@
     {
       "path": "assets/catalog.json",
       "bytes": 1198,
-      "sha256": "5fe37ef178dd05444084a9a69556c0e0be6ca495bc526b13ab7db382e2d90b7d"
+      "sha256": "a73b33708617bc122fb7f8a9a6bfcffd0dd42fa31570f12b7a28ed7f6c849bc7"
     },
     {
       "path": "assets/index-B2aW2QAt.css",
@@ -29,9 +29,9 @@
       "sha256": "7877404ef7e9e2f5f25550a7d979b8f62e6e20774109294221a14e9877c8d9de"
     },
     {
-      "path": "assets/street01-rider-round31-lossless.glb",
-      "bytes": 76956832,
-      "sha256": "5f246ee760616c242707ff4515bb095bcb58080f8690116cc567819985329142"
+      "path": "assets/street01-rider-round33-lossless.glb",
+      "bytes": 60161596,
+      "sha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a"
     },
     {
       "path": "decoders/basis/basis_transcoder.js",
@@ -84,8 +84,8 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 88335647,
-  "sourceDistBytes": 12804799799,
+  "totalBytes": 71540411,
+  "sourceDistBytes": 22645563867,
   "excludedFiles": [
     {
       "path": "assets/basis_transcoder-VXdx5NbI.wasm",
@@ -94,6 +94,10 @@
     {
       "path": "assets/street01-bike-contours.glb",
       "bytes": 5604552
+    },
+    {
+      "path": "assets/street01-bike-delivery-decoded.glb",
+      "bytes": 6368828
     },
     {
       "path": "assets/street01-bike-detail.glb",
@@ -124,8 +128,20 @@
       "bytes": 6057044
     },
     {
+      "path": "assets/street01-bike-reviewed-backup.glb",
+      "bytes": 5682208
+    },
+    {
+      "path": "assets/street01-bike-round33-lossless.glb",
+      "bytes": 5672504
+    },
+    {
       "path": "assets/street01-bike.glb",
       "bytes": 1394072
+    },
+    {
+      "path": "assets/street01-cloth-rib-donor.glb",
+      "bytes": 6415184
     },
     {
       "path": "assets/street01-cloth28-donor.glb",
@@ -134,6 +150,10 @@
     {
       "path": "assets/street01-cotton-donor.glb",
       "bytes": 6294096
+    },
+    {
+      "path": "assets/street01-cuff-band-final-donor.glb",
+      "bytes": 6565712
     },
     {
       "path": "assets/street01-denim-finish.glb",
@@ -152,6 +172,10 @@
       "bytes": 2836816
     },
     {
+      "path": "assets/street01-denim-surface-final.glb",
+      "bytes": 1931944
+    },
+    {
       "path": "assets/street01-denim-textured.glb",
       "bytes": 2309196
     },
@@ -160,12 +184,20 @@
       "bytes": 1646712
     },
     {
+      "path": "assets/street01-footwear-lacing.glb",
+      "bytes": 312684
+    },
+    {
       "path": "assets/street01-footwear-refined.glb",
       "bytes": 1647864
     },
     {
       "path": "assets/street01-garment-hem-donor.glb",
       "bytes": 6294096
+    },
+    {
+      "path": "assets/street01-garment-hem-fitted-donor.glb",
+      "bytes": 6293592
     },
     {
       "path": "assets/street01-garment-shape-donor.glb",
@@ -292,6 +324,10 @@
       "bytes": 201257248
     },
     {
+      "path": "assets/street01-rider-cuff-band-final-study.glb",
+      "bytes": 240512460
+    },
+    {
       "path": "assets/street01-rider-data-maps.glb",
       "bytes": 4526296
     },
@@ -412,12 +448,168 @@
       "bytes": 184588144
     },
     {
+      "path": "assets/street01-rider-delivery-37-before-cotton.glb",
+      "bytes": 194623428
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-before-fitted-hem.glb",
+      "bytes": 213127648
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-before-footwear-finish.glb",
+      "bytes": 204615772
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-before-garment-shape.glb",
+      "bytes": 206245116
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-before-glove-surface.glb",
+      "bytes": 201255980
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-before-indigo.glb",
+      "bytes": 202424476
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-before-settled-family.glb",
+      "bytes": 212877668
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-before-sleeves.glb",
+      "bytes": 186916208
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-footwear.glb",
+      "bytes": 183066364
+    },
+    {
+      "path": "assets/street01-rider-delivery-37-gloves.glb",
+      "bytes": 184588144
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-cotton.glb",
+      "bytes": 194623428
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-fitted-hem.glb",
+      "bytes": 213127648
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-footwear-finish.glb",
+      "bytes": 204615772
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-footwear-lacing.glb",
+      "bytes": 226517344
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-garment-shape.glb",
+      "bytes": 206245116
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-glove-surface.glb",
+      "bytes": 201255980
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-indigo.glb",
+      "bytes": 202424476
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-rib-finish.glb",
+      "bytes": 219760200
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-settled-family.glb",
+      "bytes": 212877668
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-before-sleeves.glb",
+      "bytes": 186916208
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-footwear.glb",
+      "bytes": 183066364
+    },
+    {
+      "path": "assets/street01-rider-delivery-38-gloves.glb",
+      "bytes": 184588144
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-cotton.glb",
+      "bytes": 194623428
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-cuff-band.glb",
+      "bytes": 235551632
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-denim-surface.glb",
+      "bytes": 233601136
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-fitted-hem.glb",
+      "bytes": 213127648
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-footwear-finish.glb",
+      "bytes": 204615772
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-footwear-lacing.glb",
+      "bytes": 226517344
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-garment-shape.glb",
+      "bytes": 206245116
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-glove-surface.glb",
+      "bytes": 201255980
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-indigo.glb",
+      "bytes": 202424476
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-rib-finish.glb",
+      "bytes": 219760200
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-settled-family.glb",
+      "bytes": 212877668
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-sleeve-shell-fix.glb",
+      "bytes": 226843988
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-before-sleeves.glb",
+      "bytes": 186916208
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-footwear.glb",
+      "bytes": 183066364
+    },
+    {
+      "path": "assets/street01-rider-delivery-41-gloves.glb",
+      "bytes": 184588144
+    },
+    {
       "path": "assets/street01-rider-delivery-lossless.glb",
-      "bytes": 76957852
+      "bytes": 60161596
+    },
+    {
+      "path": "assets/street01-rider-delivery-pruned.glb",
+      "bytes": 242438844
     },
     {
       "path": "assets/street01-rider-delivery-raw.glb",
-      "bytes": 213127648
+      "bytes": 242458060
+    },
+    {
+      "path": "assets/street01-rider-denim-surface-study.glb",
+      "bytes": 228794488
     },
     {
       "path": "assets/street01-rider-footwear-finish.glb",
@@ -434,6 +626,10 @@
     {
       "path": "assets/street01-rider-glove-surface.glb",
       "bytes": 195790840
+    },
+    {
+      "path": "assets/street01-rider-hem-fitted-study.glb",
+      "bytes": 219759116
     },
     {
       "path": "assets/street01-rider-hem-study.glb",
@@ -454,6 +650,10 @@
     {
       "path": "assets/street01-rider-indigo-study.glb",
       "bytes": 204614688
+    },
+    {
+      "path": "assets/street01-rider-lacing-study.glb",
+      "bytes": 220086844
     },
     {
       "path": "assets/street01-rider-lossless-study.glb",
@@ -484,6 +684,18 @@
       "bytes": 2552976
     },
     {
+      "path": "assets/street01-rider-pruned-lossless.glb",
+      "bytes": 60029236
+    },
+    {
+      "path": "assets/street01-rider-pruned-study.glb",
+      "bytes": 213118756
+    },
+    {
+      "path": "assets/street01-rider-rib-study.glb",
+      "bytes": 226517344
+    },
+    {
       "path": "assets/street01-rider-round30-lossless.glb",
       "bytes": 72262992
     },
@@ -492,8 +704,20 @@
       "bytes": 202423392
     },
     {
+      "path": "assets/street01-rider-round31-lossless.glb",
+      "bytes": 76956832
+    },
+    {
       "path": "assets/street01-rider-round31-study.glb",
       "bytes": 213126564
+    },
+    {
+      "path": "assets/street01-rider-round32-lossless.glb",
+      "bytes": 60028772
+    },
+    {
+      "path": "assets/street01-rider-round32-pruned.glb",
+      "bytes": 219749224
     },
     {
       "path": "assets/street01-rider-seat.glb",
@@ -510,6 +734,10 @@
     {
       "path": "assets/street01-rider-sleeve-lossless.glb",
       "bytes": 66121572
+    },
+    {
+      "path": "assets/street01-rider-sleeve-shape-final-study.glb",
+      "bytes": 233601136
     },
     {
       "path": "assets/street01-rider-sleeve-study.glb",
@@ -530,13 +758,17 @@
     {
       "path": "assets/street01-sleeve-donor.glb",
       "bytes": 7368768
+    },
+    {
+      "path": "assets/street01-sleeve-shape-final-donor.glb",
+      "bytes": 6415184
     }
   ],
   "verifiedLocalUrls": [
     "assets/index-B2aW2QAt.css",
     "assets/index-CnZ-8Pri.js",
     "assets/street01-bike-exhaust.glb",
-    "assets/street01-rider-round31-lossless.glb",
+    "assets/street01-rider-round33-lossless.glb",
     "index.html",
     "references/target01.png",
     "references/turnaround.png"

@@ -1,0 +1,14 @@
+{
+  "manifest": "art/delivery/runs/20260917T022948Z-3146d165/manifest.json",
+  "raw": {
+    "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb",
+    "bytes": 226843988,
+    "sha256": "aa619ed8901ffe031c332009d7bae769fe87b43c46260a65030ff274e0dd9934"
+  },
+  "packed": {
+    "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-lossless.glb",
+    "bytes": 60282440,
+    "sha256": "f01e0433366e2b47e28ae28b7cce0a74569f3f55d4461d02faea7d28295522cd"
+  },
+  "elapsedSeconds": 84.746
+}

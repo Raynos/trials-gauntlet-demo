@@ -1,0 +1,15 @@
+{
+  "source": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-41-before-denim-surface.glb",
+  "output": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-41-before-cuff-band.glb",
+  "replacedMeshIndex": 21,
+  "nodesExactlyPreserved": true,
+  "independentWorldRestMatrixMaxDelta": 8.046627044677734e-07,
+  "inverseBindMatchTolerance": 1e-05,
+  "removedSourceDenimTriangles": 8068,
+  "sourceDenimTriangles": 8068,
+  "oldBodyBinaryPrefixIdentical": true,
+  "savedHeadHoodieAndFootwearMeshesAndAttributesIdentical": true,
+  "sixAnimationsAndSkinJSONIdentical": true,
+  "outputSHA256": "fc79ad350efd41d80d1177cf013874b8b83b0f598e4aaae0e6db1068e127f04f",
+  "outputBytes": 235551632
+}

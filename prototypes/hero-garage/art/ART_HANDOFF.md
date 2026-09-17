@@ -1,49 +1,93 @@
-# Art handoff — round 31
+# Hero garage art handoff
 
-This task owns Blender art and review exports. Claude + Opus own game integration. The catalog selects the provisionally accepted assets; final visual approval belongs to the user.
+This delivery covers Blender art, editable sources and review exports. Claude + Opus own game integration. The current catalog is round 33, provisionally accepted after the combined six-clip review. The editable master, retained actions, materials, exports and local review evidence are ready for handoff. Final visual approval belongs to the user. This document does not claim finished production quality.
 
-## Current round31 delivery
+## Find the current assets
 
-Catalog now selects `street01-rider-round31-lossless.glb` and `street01-bike-exhaust.glb`; SHA identities in `reports/art-round31-review.json`. New source folders: `art/garment-shape/`, `art/footwear-finish/`, `art/bike-exhaust/`, `art/seated-posture/family/`. Stage36 rebuild includes the final shape and settledclipfamily. Two stage34completebuilds are byteidentical; fullstage36 hasexecutedsuccessfully. The recorded review contains48views under2lights. Allsixclips nowshare the10degree settledneutral andpreserve originaltargetphases. Rearhem correction remainsinprogress.
+Use [the review catalog](../public/assets/catalog.json) as the authoritative rider/bike selection. Do not select a file merely because its name contains a later round or because a newer candidate exists. Asset identities and acceptance evidence are recorded in [the round 33 review](../reports/art-round33-review.json); subsequent accepted review reports supersede it.
 
-## Previous round30 delivery
+The generated rider filenames `street01-rider-delivery-raw.glb`, `street01-rider-delivery-pruned.glb` and `street01-rider-delivery-lossless.glb` are build outputs, not independent approval records. A later rebuild may overwrite them before catalog promotion. Dense generated assets and large Blender files may be Git-ignored; preserve local sources and reproduce them using the recorded pipeline.
 
-Catalog: `street01-rider-round30-lossless.glb` and `street01-bike-contours.glb`; exact hashes in `reports/art-round30-review.json`. Current raw source is `street01-rider-indigo-study.glb`, incorporating cotton, glove-surface and denim-finish recipes. See each component folder for editable Blender sources. Twelve packed/raw views match exactly. Full rebuild equivalence is under repeat verification after a deterministic cuff ordering fix; do not claim all future Blender bakes are byte-identical.
+The editable consolidated scene is [hero-garage-master.blend](delivery/hero-garage-master.blend). Check [delivery-master.json](../reports/delivery-master.json) against current catalog hashes before treating the master as current. Regenerate it whenever the accepted catalog changes. It contains the rider, bike, retained animation actions and a separate studio collection; exclude the studio from asset exports. Component recipes remain canonical: re-exporting this imported master is not promised to reproduce identical GLB bytes.
 
-## Previous round29 delivery
+## Rebuild and inspect
 
-The catalog now selects `street01-rider-sleeve-lossless.glb` (66,121,572bytes; SHA `0d79f561139b2c8cdba9f7ba2f79909e6bcba5642e6360f588e257d5934db868`) and `street01-bike-paint.glb` (SHA `7e1ec906808165210dbdde9cd9834f516b3d7387db28ad9fddf74248844f24ab`). Sleeve recipe/source: `art/sleeve-continuity/`; bike recipe/source: `art/bike-paint/`. Both are provisionally accepted from recorded motion. The sleeve assembler uses the R28 raw candidate; canonical runner extension is in progress.
+Run the canonical rider pipeline from the repository root. Start with read-only preflight:
 
-`art/delivery/build_master.py` decodes compressed catalog assets with `tools/unpack-art-lossless.mjs` before Blender import. Master source is regenerated from current catalog; its report records hashes and six action duration comparisons. The previous R28 master must be regenerated for R29.
+```sh
+python3 prototypes/hero-garage/tools/build-art-delivery.py --stage 41 --prune --pack
+```
 
-## Round28 delivery baseline
+Add `--execute` to rebuild. Stage 41 includes the fitted hem, settled clip family, rib trim, lacing, repaired inner sleeve shell, quieter denim normal and smooth cuff texture boundary. `--prune --pack` removes unused resources and writes the lossless Meshopt export; promotion still requires rendered review. Do not run a full rebuild while another builder is editing its component sources in this shared checkout.
 
-Catalog rider: `street01-rider-delivery-lossless.glb` (61,517,796bytes), SHA `73dc56a34474203f9a5abbe4a31d39d0b7399ab2c296c20c2a642f45777764fe`. Bike: `street01-bike-finish.glb`, SHA `212cab964c9264942d2e2b96a9790c608fe6c31a96e4adc41590177f9c78f511`. Rebuild rider with `python3 tools/build-art-delivery.py --stage 29 --execute --pack` from this prototype; see `art/delivery/REBUILD.md`. Bike source/recipe: `art/bike-finish/`. The packed rider requires EXT_meshopt_compression and MeshoptDecoder. It retains all dense geometry; no mobile performance claim. Raw reproduction is SHA-exact;12 render comparisons are byte identical.
+[REBUILD.md](delivery/REBUILD.md) documents rider stages, dependencies, frozen seeds and command behavior. [REBUILD-BIKE.md](delivery/REBUILD-BIKE.md) documents the independent bike chain: `python3 prototypes/hero-garage/tools/build-bike-delivery.py --execute`. Two complete bike rebuilds matched the reviewed GLB byte for byte. Each executed run writes a manifest, source/recipe/output hashes and logs under `art/delivery/runs/`. A failed run does not validate an older output left on disk. Two complete stage-41 runs produced byte-identical final pruned/packed GLBs. Raw append-only intermediates differed in discarded payloads. This is not a cross-machine or cross-version determinism guarantee.
 
-Round28 resolves shoe panel intersection, preserves accepted saddle geometry, adds dedicated denim UV/textures and fitted cuffs, and removes only786 buried neck flange triangles. Face/groom attributes remain intact. Remaining: elbow pinching, broad garment shape, noisy bike paint, physical iPhone validation and final user approval. Review `reports/art-round28-review.json`. Usage14% remaining.
+Editable production sources include:
 
-## Previous accepted baseline and provenance
+- [Garment shape](garment-shape/), [fitted hem](garment-hem/), [inner-shell repair](sleeve-shape-final/) and [continuous cuff bands](cuff-band-final/), derived from the continuous sweatshirt, hood and sleeve sources.
+- [Indigo denim surface](denim-surface-final/), [fitted footwear](footwear-finish/), [visible lacing](footwear-lacing/) and [glove surface](glove-surface/); their build reports identify retained geometry and contact constraints.
+- [Saved head and curls](head-groom/) and [identity assembly](full-rider-identity/). Preserve the user's preferred face, beard and curly groom.
+- [Bike exhaust finish](bike-exhaust/) and its earlier contour, paint, structural-finish and mechanical-detail source chain.
+- [Settled animation family](seated-posture/family/), with explicit base/output arguments so it can be applied to the final garment assembly.
 
-- Rider: `/assets/street01-rider-tailored.glb`, SHA `d6122a389e38cf7ea209b00b386efe6f12a8d48357fef1f969345ccc90938bec`. The dense local GLB is ignored by Git. From repository root, run background Blender with `art/full-rider-identity/build.py`, then `art/hoodie-shell/build.py`, then `art/hoodie-shell/assemble.py` (all under this prototype). The saved face, curls and beard are retained. Editable clothing: `art/hoodie-shell/hoodie-source.blend`; supporting recipes preserve the original source and use a continuous control cage.
-- Bike: `/assets/street01-bike-detail.glb`, SHA `dc70ee964be894777a344a8c343cdeec42e81dfd0f5fa5a2055c695037b96cf9`. Editable `art/bike-detail/bike-detail.blend`; `art/bike-detail/build.py` derives it from the previous refined bike. Clamp shells rotate around fixed fork centres; number-board mounts are added. Joint hierarchy and attachment transforms are preserved.
-- Build the review viewer with `npm run build` inside this prototype. `node tools/package-runtime.mjs` packages a local review bundle; it does not deploy. Tool dependencies are pinned in the package lock. Source scripts use local Blender 5.2.1, its Python/numpy, and repository `assets/blender/common.py` / `rider_asset.py`.
+Regenerate the consolidated master from the repository root:
 
-## Rig, sockets, clips and conventions
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender -b --python prototypes/hero-garage/art/delivery/build_master.py
+```
 
-`art/rig-contract/README.md` and `tools/export-rig-contract.mjs` describe and regenerate the actual catalog contract: 19 joints, inverse-bind matrices, sockets, materials, clip channels and per-frame contact samples. Earlier hashes are historical until regenerated. The six retained clips are `sit_cruise`, `forward_attack`, `hang_back`, `compression`, `extension`, `landing_absorption`.
+The recipe reads the catalog, decodes its Meshopt-compressed assets into temporary uncompressed GLBs using [unpack-art-lossless.mjs](../tools/unpack-art-lossless.mjs), imports those exact decoded assets and removes the temporary files. Direct import of the compressed rider fails in the current Blender 5.2 importer. Do not work around that failure by substituting an older raw asset. The decoder uses Three.js MeshoptDecoder, preserves retained buffer-view data and scene/accessor metadata, and records catalog and decoded hashes. The master report compares imported action durations with the actual catalog samplers.
 
-Source Blender coordinates are metres, Z up, +X forward; glTF is metres, Y up, +X forward. Both assets have catalog offset `[0, .34, 0]`. Viewer grounding and suspension are separate authored kinematics. Evaluate the rider animation before applying the shared bike/chassis motion. Grip sockets coincide closely; sole sockets intentionally sit approximately11mm above peg centres. Socket agreement is not proof of surface contact. No finger/twist chain has been added.
+For local Three.js review, run `npm run build` in the prototype. `node tools/package-runtime.mjs` creates the local review package; it does not publish or integrate the assets into the game. Use the repository's headless capture harness for recorded review.
 
-## Verification and outstanding art
+## Materials and dependencies
 
-`reports/art-round27-review.json` records adoption; `captures/art-round27-adopted/` contains all six clips under neutral and garage lighting. Hood vs sweatshirt checks sampled54poses with no segment/triangle crossings and minimum1.42mm clearance, excluding coplanar/tangent cases. Existing identity, animation and skin payloads are retained by assembly assertions. The frozen game ship check passed; this is not game integration validation.
+[material-contract.json](../reports/material-contract.json) records actual material names, PBR factors, image hashes, texture slots, color-space semantics and active mesh bindings from the catalog exports. Base color and emissive maps are color data; normals, occlusion, roughness and metallic channels are linear data. Preserve glTF texture transforms and material extensions. The Three.js loader must use MeshoptDecoder for these GLBs.
 
-Footwear and denim candidates remain unadopted: shoe reinforcement intersects the new upper, and denim changed some sampled saddle gaps. Next work: fix these, glove protection placement, continuous garment UVs, cloth thickness and materials. Final resemblance, broad folds, silhouette and close-up finish remain open. Dense hair optimization and actual iPhone performance are unproven; old mobile memory numbers do not describe this preview.
+Local recipes use Blender 5.2.1, Node with the prototype lockfile dependencies, and Python 3.14 with pinned NumPy/Pillow for the cuff texture helper. The master packs its images; the full component recipe inputs remain in the repository.
 
-## Sources and licensing
+## Rig and coordinate contract
 
-The original body/bike sources remain in `assets/blender/source/`. The MPFB-based head, skin and beard provenance is in `art/sources/authored-human/` and `art/sources/authored-beard/`; conflicting skin metadata remains restricted to the existing personal local trial. Curly hair is derived from Daniel Bystedt's Blender demo under CC-BY-SA (version unspecified in saved evidence): `art/sources/replacement-hair/provenance.json`. Preserve attribution and share-alike terms. No public distribution clearance is implied.
+The retained rider skeleton has **19 bones**, with **26 documented sockets**. [The rig contract](rig-contract/README.md) explains names, inverse binds and contact measurements. Regenerate `reports/rig-contract.json` from the current catalog with `node tools/export-rig-contract.mjs` inside the prototype; its hashes must match the assets being integrated. Three.js may sanitize punctuation in names, for example `gripSocket.L` to `gripSocketL`.
 
-## Allowance
+The six clips are:
 
-`openusage codex --force` provides fresh usage JSON even when the app usage tool is unavailable. Latest verified reading:17% weekly remaining, September17UTC. Stop sustained work at2%; do not mark the art complete merely because that floor is reached.
+| Clip | Duration at 30 fps | Purpose |
+|---|---:|---|
+| `sit_cruise` | 59/30 s | Settled seated neutral |
+| `forward_attack` | 119/30 s | Forward rise and return |
+| `hang_back` | 119/30 s | Rearward shift and return |
+| `compression` | 149/30 s | Compression cycle |
+| `extension` | 149/30 s | Extension cycle |
+| `landing_absorption` | 149/30 s | Landing absorption and recovery |
+
+The accepted settled family shares the forward-leaning neutral entry/exit pose. Its other clips ease that added torso offset away over the first 0.5 seconds and restore it over the final 0.5 seconds; existing middle target poses are preserved. The family verifier checks all 750 exported frames, protected lower-body/hand transforms and shared initial/final poses.
+
+Blender uses metres, **Z up and +X forward**. glTF uses metres, **Y up and +X forward**. Both catalog assets use placement `[0, 0.34, 0]` in glTF coordinates. Common floor grounding and garage suspension are separate viewer operations. Evaluate the rider animation before the shared chassis/suspension transformation.
+
+Grip and sole sockets describe attachment relationships. Sole sockets intentionally sit approximately **11 mm above peg centres**. Socket agreement alone does not prove that shoes, fingers, cloth or seat surfaces make correct contact or avoid penetration. Refer to the component surface/contact reports and recorded motion for those claims. The rig has no independent finger or forearm-twist chains. Existing game physics/body-mass mapping must govern integration; these preview clips are not a replacement physics system.
+
+## Verification boundaries and remaining work
+
+Accepted changes have recorded full-scene and detail reviews under garage and neutral lighting. Asset assembly, contact-preservation, suspension, packing and animation reports establish their specific measured invariants; they do not establish final art quality. Historical reports remain evidence for their recorded hashes only.
+
+Remaining quality work includes final garment silhouette/fold approval, collar and hem finish, close-up material consistency and reference resemblance. The fitted hem and final trim/surface corrections are accepted provisionally. Shoulder/elbow folds and glove/thumb shapes remain stylized; broader anatomical sculpting is still needed to approach the reference. The dense groom remains expensive; lossless packing reduces transfer/storage size without reducing its geometric workload. No actual iPhone performance pass is established for the current dense rider. The final 30-second desktop WebKit mobile proxy rendered without errors and matched deterministic canvas replay, but measured 18 ms p95 and did not meet the separate 16.7 ms desktop wall-clock gate. This is not a GPU timing or physical-device result. The garage target remains 30 fps, with physical-device validation still required. Game integration and its acceptance belong to the separate integration task.
+
+Delivery files: [local ZIP](delivery/hero-garage-handoff.zip), [full/detail screenshots](../captures/delivery-stills/), [all six clips under two lights](../captures/delivery-motion/six-clips.webm), and [chained pose transitions](../captures/delivery-transitions/transitions.webm). The ZIP includes the editable master, exports, reference, review images/video, rig/material reports and source notices. Full rebuild inputs remain in this repository.
+
+The final rider is 60,161,596 bytes; bike is 5,682,208 bytes. The selected assets total 3,694,836 triangles. The all-image RGBA8+mip estimate is about 309 MiB, excluding geometry, render targets and driver allocations; it is not measured GPU residency. The 71.54 MB local runtime package excludes the large source studies. These are dense appearance assets, with phone suitability still unproven.
+
+The reopened Blender master retains all six actions, 19 bones, the seated default and 39 packed images;750bone-frame samples are finite. See [reopen verification](../reports/delivery-master-reopen.json). Component skin/surface checks and Three.js motion evidence remain separate from that structural check.
+
+The whole production plan remains open. Preserve the distinction between a successful rebuild, a technically verified export, provisional visual acceptance and the user's final approval.
+
+## Source terms and attribution
+
+This is a local personal-project delivery. Preserve source notices and provenance alongside derivatives:
+
+- Original editable body and bike sources: `assets/blender/source/` at repository root; retain repository/source notices.
+- MPFB/MakeHuman generated head and core asset data, including the selected skin pack: **CC0-1.0**, as recorded in [authored-human provenance](sources/authored-human/provenance.json) and its asset license files. Tool/code licensing is separate from generated asset licensing.
+- Grinsegold beard and moustache: the official asset pack says **CC-BY**, while embedded MHCLO headers contain **AGPL** notices. [Authored-beard source records](sources/authored-beard/) retain that unresolved conflict. Do not infer public-distribution clearance from local use.
+- Curly hair derives from **Daniel Bystedt's Hair Styles Blender demo**, **CC BY-SA**, with the version unspecified in the saved upstream evidence. [Replacement-hair provenance](sources/replacement-hair/provenance.json) records the source. Preserve attribution and applicable share-alike obligations.
+
+Neither Hunyuan nor TRELLIS output is part of this delivery. Their stopped experiments are independent of the authored asset pipeline. No public release or blanket redistribution clearance is claimed.

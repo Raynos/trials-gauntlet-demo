@@ -1,6 +1,6 @@
 {
-  "denimSource": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-37-before-fitted-hem.glb",
-  "denimSourceSHA256": "a62efd113d8e0a03d2918b01e992c04bf5ced0fbd88924c574a0fc8122c38d84",
+  "denimSource": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-41-before-fitted-hem.glb",
+  "denimSourceSHA256": "97e0fa54f1f7650a9fff57ac7bde74eede82b0f0ec5a4aeae1f07fbbc3e95505",
   "denimFit": {
     "minimumTargetGapM": 0.006,
     "clamps": [
@@ -1367,7 +1367,7 @@
     "weightsChanged": false,
     "method": "Nearest actual rest-denim surface normal; outward signed6mm clamp after proposed posterior gathering."
   },
-  "sourceSHA256": "3192ea8825268e397f5501b1e286837f2e83a30a507910e635ddedd34c2ec25b",
+  "sourceSHA256": "e34d76e315dd8131536df8b6f28b2d0fbf4eb7ea43c47140c77e3104c1ff037d",
   "sourceUnchanged": true,
   "weightsExact": true,
   "uvExact": true,

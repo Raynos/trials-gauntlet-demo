@@ -1,0 +1,29 @@
+{
+  "sourceSHA256": "861b507007f0a87c2f3124fe56bf357ce07fd35c9a0452808cd67ebf6e81c78f",
+  "outputSHA256": "1b8b6b991a2596931402254dbfe49ecbd7e8afddb0ca1dd0f895027356b3329a",
+  "outputBytes": 1931944,
+  "changes": [
+    {
+      "material": "hero denim pocket",
+      "photoBumpStrengthBefore": 0.6499999761581421,
+      "photoBumpStrengthAfter": 0.18,
+      "heightDistanceUnchangedM": 0.0001500000071246177
+    },
+    {
+      "material": "hero indigo twill",
+      "photoBumpStrengthBefore": 0.6499999761581421,
+      "photoBumpStrengthAfter": 0.18,
+      "heightDistanceUnchangedM": 0.0001500000071246177
+    }
+  ],
+  "tobaccoTopstitchUnchanged": true,
+  "acceptedAlbedoAndORMImagesReusedExactly": {
+    "albedo": "f0143f9affb9d82963cec13216931d27cf949217be577c78eca364a49e2d9f59",
+    "orm": "0682a442de68e09b76f136bcf5ec821a6fea35a7380fe5f18ce64774fca881eb"
+  },
+  "positionsTopologyNormalsUVsSkinWeightsExact": true,
+  "reference": "public/references/target01.png",
+  "limitations": [
+    "Parent matched full-scene and close denim render judgement required."
+  ]
+}

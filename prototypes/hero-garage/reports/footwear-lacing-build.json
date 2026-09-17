@@ -1,0 +1,28 @@
+{
+  "sourceSHA256": "659f8df75b673cb5701b71dbec1648dc9700af4ed438a7ea7ae7c664e00b29f8",
+  "outputSHA256": "463a86be9423889c2d0f800aedd4cd81ba4d4e841e5083af5f08fbc3cc445dcd",
+  "bytes": 312684,
+  "untouchedUpperSolePanelPositionsNormalsUVWeightsFacesExact": true,
+  "laceCentersRelativeAnkleM": [
+    0.1,
+    0.109,
+    0.118,
+    0.127
+  ],
+  "laceXExtentM": [
+    0.0965,
+    0.1305
+  ],
+  "toeCapSeamXM": 0.143,
+  "radiusM": 0.00085,
+  "sampledCenterlineSurfaceGapM": [
+    0.0017498611705377698,
+    0.003500030841678381
+  ],
+  "crossingsPerShoe": 4,
+  "vertices": 3200,
+  "visibilityEvidence": "Exact dark-denim local cuff ray samples clear at x .10-.13 on both feet; parent camera/motion review pending.",
+  "limits": [
+    "No claim that lace/denim clearance is maintained across all poses until rendered review."
+  ]
+}

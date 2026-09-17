@@ -1,0 +1,31 @@
+{
+  "source": "prototypes/hero-garage/art/sleeve-shape-final/sleeve-source.blend",
+  "sourceSHA256": "58925fe8852284c8aaf86f72dfd915ce0c9048433e343dfe7c749c1c911271c2",
+  "geometryUVSkinModifiersExactlyPreserved": true,
+  "signature": "5050c1ee6eaf92ec1c9ca023825af6e92e4c4e98a9f2376d9a8ac7613fa750c0",
+  "boundaryDistanceFromWristMetres": {
+    "L": 0.05260295420885086,
+    "R": 0.05258116126060486
+  },
+  "authoredTransitionEdges": {
+    "L": 44,
+    "R": 44
+  },
+  "transitionWidthMetres": 0.002,
+  "cuffFacesRemapped": 624,
+  "donorSHA256": "c4b13401c6de2a222e98badb5482a5c1f3777d0c49c973fcd4df87a7e2031bb7",
+  "texture": {
+    "albedo": {
+      "affectedTexels": 43334,
+      "outsideMaskBytesExactlyPreserved": true
+    },
+    "orm": {
+      "affectedTexels": 11075,
+      "outsideMaskBytesExactlyPreserved": true
+    }
+  },
+  "limits": [
+    "Boundary is an interpolated colour/roughness transition, not an added physical seam.",
+    "Parent motion and closeup judgement required."
+  ]
+}

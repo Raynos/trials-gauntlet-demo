@@ -1,6 +1,6 @@
 {
-  "source": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-29-gloves.glb",
-  "output": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb",
+  "source": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-41-gloves.glb",
+  "output": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/public/assets/street01-rider-delivery-41-before-sleeves.glb",
   "independentWorldRestMatrixMaxDelta": 8.046627044677734e-07,
   "inverseBindMatchTolerance": 1e-05,
   "removedSourceDenimTriangles": 8068,
@@ -8,6 +8,6 @@
   "oldBodyBinaryPrefixIdentical": true,
   "savedHeadHoodieAndFootwearMeshesAndAttributesIdentical": true,
   "sixAnimationsAndSkinJSONIdentical": true,
-  "outputSHA256": "0e91958095b7df6961c6cc60eec166ac29913d929c9762305fd9fc62b25b0ad4",
-  "outputBytes": 186917476
+  "outputSHA256": "a3e43898fdd47aeac566575f6a1c79a9a896530e1a80a4e59a578ac1d570a77a",
+  "outputBytes": 186916208
 }

@@ -1,6 +1,8 @@
 # High-fidelity rider and bike: fresh garage production plan
 
-Status: Breadth-first assembly in progress, September 16, 2026. The user explicitly changed execution order: show the full person and full bike together in Three.js now, then polish individual elements. The user subsequently asked to attach the saved face, curly hair and beard to the full rider immediately; that existing identity assembly is now active, without a new grooming pass. The full original quality, motion, runtime and integration scope remains open.
+Status: Active Blender-art finishing, September 17, 2026. The latest user instruction scopes this agent to the complete rider/bike art, editable sources, exports and evidence. Claude + Opus own game integration. Round 33 is the current provisionally accepted catalog, with editable source and recorded delivery evidence. User visual approval and physical iPhone validation remain open. Historical production/integration requirements below are retained as context and are not authorization to change game integration during this art pass.
+
+Allowance: work flexibly, check fresh `openusage codex --force`, and stop sustained work at **2% remaining**. Latest reading: **6%**. Earlier historical references to a 20% reserve are superseded.
 
 ## Confirmed user decisions
 
@@ -333,11 +335,22 @@ Rebuild investigation found nondeterministic cuff ring ordering causing small UV
 
 ## Art round 31 — fuller hood and settled riding posture
 
-Provisionally accepted from48timed full/detail views across6clips and2lights: fuller foldedhood, broad sleevefolds, neutralgrey footwear, warmsteel exhaust, and10degree forwardsettled seatedpose. Allsixclips share easedneutral entry/exit while originaltargetphases remain. Actual750frame audit holds grip/sole displacement below2.07micrometres;54pose newfamilycloth audit finds0hood/shirt orcord crossings. [Review](../../prototypes/hero-garage/reports/art-round31-review.json).
+Provisionally accepted from48 timed full/detail views across6clips and2lights: fuller foldedhood, broad sleevefolds, neutralgrey footwear, warmsteel exhaust, and10degree forwardsettled seatedpose. Allsixclips share easedneutral entry/exit while originaltargetphases remain. Actual750frame audit holds grip/sole displacement below2.07micrometres;54pose newfamilycloth audit finds0hood/shirt orcord crossings. [Review](../../prototypes/hero-garage/reports/art-round31-review.json).
 
 Two fullstage34rebuilds now produce byte-identical rawandpacked GLBs afterdeterministic cuffordering fix. Stage36 completepipeline includesgarment andclipfamily andhas run successfully. The reviewed catalog remains separatelyhashed. Rearhemflare is underboundedcorrection; finalsourcebundle/phonevalidation remainopen.10%allowance remains; hardstop2%.
 
 
 ## Art round32 — fitted hem and leaner delivery, September17UTC
 
-The posterior hoodie hem now follows the jeans instead of flaring outward. Across54sampled poses the repaired posterior region has no denim crossings and at least3.637mm clearance; existing hidden waist overlaps are not called fixed. The canonical stage37 export is provisionally accepted from48timed Three.js views across all6clips and2lights. Removing obsolete assembly resources and losslessly packing retains byte-identical canvas output in12/12 comparisons. [Review](../../prototypes/hero-garage/reports/art-round32-review.json). Final user approval, close-up art quality and actual iPhone validation remain open. Latest usage9%; hard stop2%. Integration remains Claude + Opus owned.
+The posterior hoodie hem now follows the jeans instead of flaring outward. Across54sampled poses the repaired posterior region has no denim crossings and at least3.637mm clearance; existing hidden waist overlaps are not called fixed. The canonical stage37 export is provisionally accepted from48 timed Three.js views across all6clips and2lights. Removing obsolete assembly resources and losslessly packing retains byte-identical canvas output in12/12 comparisons. [Review](../../prototypes/hero-garage/reports/art-round32-review.json). Final user approval, close-up art quality and actual iPhone validation remain open. Latest usage9%; hard stop2%. Integration remains Claude + Opus owned.
+
+
+## Art round 33 — provisional delivery, September 17 UTC
+
+The complete rider and bike are delivered for final user visual review. This round adds continuous cuff trim, visible fitted laces, quieter denim normals and a targeted repair of15 inner sleeve-shell spikes (worst148 mm → 2 mm). It preserves the saved face/curls/beard, outer garment controls, UVs, skin weights and riding contacts. Parent review used decoded sequential frames from48 timed views across all six clips/two lights, plus recorded neutral-to-action transitions; it is not claimed as human continuous playback. [Review](../../prototypes/hero-garage/reports/art-round33-review.json).
+
+Two full stage 41 builds produce the same60.16 MB packed rider; two full bike builds match the reviewed5.68 MB GLB exactly. All 12 raw/packed renderer comparisons pass. The reopened editable master retains all six actions, 19 bones and 39 packed images. Rig/socket verification spans 750 frames; the frozen game gate passes 1,038 identical ticks, 8.65 s clear and one-tick restart. [Handoff and remaining work](../../prototypes/hero-garage/art/ART_HANDOFF.md).
+
+**Still open:** final user visual approval, more natural shoulder/elbow folds and glove anatomy, residual hidden waist/contact refinements, and actual iPhone 30 fps/memory validation. This is a materially improved stylized art delivery, not an AAA-completion claim. No game integration, spending or public deployment. Latest checked allowance 6%; the 2% floor was preserved.
+
+Final runtime qualification: the 30-second desktop WebKit mobile proxy has no rendering errors and deterministic canvas replay, but 18 ms p95 does not meet the separate 16.7 ms desktop wall-clock gate. It is not an actual iPhone 30 fps pass. See `prototypes/hero-garage/reports/delivery-mobile-proxy.json`.

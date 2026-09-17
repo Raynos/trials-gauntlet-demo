@@ -1,0 +1,341 @@
+{
+  "method": "Rest-space vertical rays into exact accepted upper and dark-denim cuff faces entirely below ankle Z +70mm, excluding overhanging thigh; final posed camera visibility still parent-owned",
+  "samples": [
+    {
+      "side": "L",
+      "xFromAnkle": 0.02,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.05672965943813324,
+        -0.059294357895851135,
+        -0.05672489106655121
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.04,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        0.01863555610179901,
+        0.02089284360408783,
+        0.018717169761657715
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.05,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        0.012528583407402039,
+        0.014605507254600525,
+        0.012569844722747803
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.06,
+      "denimOccludesAtSidesAndCenter": [
+        true,
+        true,
+        true
+      ],
+      "shoeTopZFromAnkle": [
+        0.0065680742263793945,
+        0.008512631058692932,
+        0.0066464245319366455
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.07,
+      "denimOccludesAtSidesAndCenter": [
+        true,
+        true,
+        true
+      ],
+      "shoeTopZFromAnkle": [
+        0.0007425099611282349,
+        0.002515047788619995,
+        0.0007792860269546509
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.08,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        true,
+        true
+      ],
+      "shoeTopZFromAnkle": [
+        -0.004744574427604675,
+        -0.0030849426984786987,
+        -0.004674986004829407
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.09,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        true,
+        true
+      ],
+      "shoeTopZFromAnkle": [
+        -0.010011479258537292,
+        -0.008504286408424377,
+        -0.009980723261833191
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.1,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.01473991572856903,
+        -0.013318195939064026,
+        -0.014684423804283142
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.11,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.019172504544258118,
+        -0.01787354052066803,
+        -0.019148781895637512
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.12,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.022946670651435852,
+        -0.02170442044734955,
+        -0.022911563515663147
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.13,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.02639813721179962,
+        -0.025238171219825745,
+        -0.026382610201835632
+      ]
+    },
+    {
+      "side": "L",
+      "xFromAnkle": 0.14,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.029374435544013977,
+        -0.028251126408576965,
+        -0.029362156987190247
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.02,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.05672968924045563,
+        -0.05929432809352875,
+        -0.05672489106655121
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.04,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        0.018635526299476624,
+        0.020892813801765442,
+        0.01871718466281891
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.05,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        0.012528598308563232,
+        0.014605507254600525,
+        0.01256987452507019
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.06,
+      "denimOccludesAtSidesAndCenter": [
+        true,
+        true,
+        true
+      ],
+      "shoeTopZFromAnkle": [
+        0.0065680742263793945,
+        0.008512616157531738,
+        0.0066464245319366455
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.07,
+      "denimOccludesAtSidesAndCenter": [
+        true,
+        true,
+        true
+      ],
+      "shoeTopZFromAnkle": [
+        0.0007425099611282349,
+        0.002515062689781189,
+        0.0007793009281158447
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.08,
+      "denimOccludesAtSidesAndCenter": [
+        true,
+        true,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.004744574427604675,
+        -0.0030849426984786987,
+        -0.004674956202507019
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.09,
+      "denimOccludesAtSidesAndCenter": [
+        true,
+        true,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.010011479258537292,
+        -0.00850425660610199,
+        -0.009980723261833191
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.1,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.014739945530891418,
+        -0.013318255543708801,
+        -0.014684423804283142
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.11,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.01917247474193573,
+        -0.01787354052066803,
+        -0.0191488116979599
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.12,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.02294670045375824,
+        -0.02170442044734955,
+        -0.022911563515663147
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.13,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.026398107409477234,
+        -0.025238201022148132,
+        -0.026382669806480408
+      ]
+    },
+    {
+      "side": "R",
+      "xFromAnkle": 0.14,
+      "denimOccludesAtSidesAndCenter": [
+        false,
+        false,
+        false
+      ],
+      "shoeTopZFromAnkle": [
+        -0.02937440574169159,
+        -0.028251126408576965,
+        -0.02936212718486786
+      ]
+    }
+  ]
+}

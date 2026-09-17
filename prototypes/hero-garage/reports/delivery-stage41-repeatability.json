@@ -1,0 +1,31 @@
+{
+  "first": {
+    "manifest": "art/delivery/runs/20260917T025130Z-68e7afd1/manifest.json",
+    "raw": {
+      "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb",
+      "bytes": 242458060,
+      "sha256": "35a589e9b5808356d2ceb06678bb9b2104031e41d5ddca1d7dd66a07a2bbe043"
+    },
+    "packed": {
+      "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-lossless.glb",
+      "bytes": 60161596,
+      "sha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a"
+    },
+    "elapsedSeconds": 100.286
+  },
+  "secondManifest": "art/delivery/runs/20260917T025409Z-d6a66c83/manifest.json",
+  "secondRaw": {
+    "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-raw.glb",
+    "bytes": 242458060,
+    "sha256": "aa5588e66ab86a6ca14bc4bce0b866cea6818f80d1fb72b0a1285125f3d159cf"
+  },
+  "secondPacked": {
+    "path": "prototypes/hero-garage/public/assets/street01-rider-delivery-lossless.glb",
+    "bytes": 60161596,
+    "sha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a"
+  },
+  "secondElapsedSeconds": 105.46,
+  "rawByteIdentical": false,
+  "packedByteIdentical": true,
+  "scope": "Two complete local rebuilds; no cross-version or cross-machine guarantee. Blender files may contain non-deterministic metadata."
+}

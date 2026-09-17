@@ -1,0 +1,629 @@
+{
+  "createdAt": "2026-09-17T02:55:17.115Z",
+  "scope": "GLB structure; no art or deformation acceptance",
+  "assets": [
+    {
+      "file": "public/assets/street01-rider-round33-lossless.glb",
+      "sha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a",
+      "bytes": 60161596,
+      "generator": "Khronos glTF Blender I/O v5.2.40",
+      "triangles": 3661632,
+      "primitives": 24,
+      "materials": [
+        {
+          "name": "rider_rookie",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "rider_pro",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "MPFB_AdultMale_SourceProbe.eyebrow001",
+          "alphaMode": "MASK",
+          "doubleSided": true
+        },
+        {
+          "name": "MPFB_AdultMale_SourceProbe.high-poly",
+          "alphaMode": "MASK",
+          "doubleSided": false
+        },
+        {
+          "name": "Street01_Authored_EditableBody.body",
+          "alphaMode": "OPAQUE",
+          "doubleSided": false
+        },
+        {
+          "name": "Bystedt_DarkBrownStrands",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Street01_Authored_EditableBody.grinsegold_full_beard",
+          "alphaMode": "BLEND",
+          "doubleSided": false
+        },
+        {
+          "name": "Street01_Authored_EditableBody.grinsegold_moustache",
+          "alphaMode": "BLEND",
+          "doubleSided": false
+        },
+        {
+          "name": "Glove textile rubber",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Footwear canvas suede rubber",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Ivory woven trainer laces",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Target01 dark indigo denim and tobacco stitching",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "muted antique eyelet.002",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "warm ivory cotton cord.002",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Smooth continuous wrist rib boundary",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Darker gathered mustard knit",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Existing subdued mustard cotton",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        }
+      ],
+      "uvPrimitives": 19,
+      "normalPrimitives": 24,
+      "skins": [
+        {
+          "name": "rider_rig",
+          "joints": 19
+        }
+      ],
+      "animations": [
+        {
+          "name": "compression",
+          "channels": 57
+        },
+        {
+          "name": "extension",
+          "channels": 57
+        },
+        {
+          "name": "forward_attack",
+          "channels": 57
+        },
+        {
+          "name": "hang_back",
+          "channels": 57
+        },
+        {
+          "name": "landing_absorption",
+          "channels": 57
+        },
+        {
+          "name": "sit_cruise",
+          "channels": 57
+        }
+      ],
+      "morphPrimitiveCount": 0,
+      "textures": [
+        {
+          "index": 0,
+          "name": "rider-street_normal",
+          "encodedBytes": 18105,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 1,
+          "name": "rider-street_orm",
+          "encodedBytes": 123838,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 2,
+          "name": "rider-street_rookie_albedo",
+          "encodedBytes": 225620,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 3,
+          "name": "rider-street_pro_albedo",
+          "encodedBytes": 195424,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 4,
+          "name": "eyebrow001",
+          "encodedBytes": 89619,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 5,
+          "name": "brown_eye",
+          "encodedBytes": 610817,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 6,
+          "name": "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter",
+          "encodedBytes": 5615645,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 7,
+          "name": "Full_beard_black_diff",
+          "encodedBytes": 583303,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 8,
+          "name": "Moustache_black_diff",
+          "encodedBytes": 268833,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 9,
+          "name": "glove_normal",
+          "encodedBytes": 486159,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 10,
+          "name": "glove_albedo",
+          "encodedBytes": 103440,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 11,
+          "name": "glove_orm",
+          "encodedBytes": 91803,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 12,
+          "name": "footwear_normal",
+          "encodedBytes": 730288,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 13,
+          "name": "footwear_albedo",
+          "encodedBytes": 98646,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 14,
+          "name": "footwear_orm",
+          "encodedBytes": 85339,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 15,
+          "name": "denim_normal",
+          "encodedBytes": 450754,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 16,
+          "name": "denim_albedo",
+          "encodedBytes": 449277,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 17,
+          "name": "denim_orm",
+          "encodedBytes": 656620,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 18,
+          "name": "cotton_normal",
+          "encodedBytes": 23523,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 19,
+          "name": "cuff_albedo",
+          "encodedBytes": 77045,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 20,
+          "name": "cuff_orm",
+          "encodedBytes": 27405,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 21,
+          "name": "rib_albedo",
+          "encodedBytes": 154271,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 22,
+          "name": "rib_orm",
+          "encodedBytes": 20725,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 23,
+          "name": "cotton_albedo",
+          "encodedBytes": 130871,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 24,
+          "name": "cotton_orm",
+          "encodedBytes": 44926,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        }
+      ],
+      "estimatedImageResidencyBytes": 211113268,
+      "limits": "Per-image full-mip estimates use RGBA8 for PNG/JPEG and 4x4 16-byte blocks for UASTC. Device fallback may use RGBA8. Excludes render targets, shadows, buffers, duplicate uploads and driver allocations. UV presence does not establish unwrap quality."
+    },
+    {
+      "file": "public/assets/street01-bike-exhaust.glb",
+      "sha256": "7877404ef7e9e2f5f25550a7d979b8f62e6e20774109294221a14e9877c8d9de",
+      "bytes": 5682208,
+      "generator": "Khronos glTF Blender I/O v5.2.40",
+      "triangles": 33204,
+      "primitives": 37,
+      "materials": [
+        {
+          "name": "bike_body_rookie",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Clean blue white plastics with original decals",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "bike_mech",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "chain_links",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "hero_refine_satin_engine_edges",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "Tempered warm steel header atlas",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "hero_refine_blue_front_fender",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "numberboard_mount_rubber",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "numberboard_mount_satin_alloy",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "numberboard_recess",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "stable satin structural aluminium",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "stable blue graphite frame paint",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "stable satin handlebar alloy",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "smooth control cable rubber",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "stable satin swingarm with original logo",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true
+        },
+        {
+          "name": "bike_spokecard",
+          "alphaMode": "BLEND",
+          "doubleSided": true
+        }
+      ],
+      "uvPrimitives": 37,
+      "normalPrimitives": 37,
+      "skins": [],
+      "animations": [],
+      "morphPrimitiveCount": 0,
+      "textures": [
+        {
+          "index": 0,
+          "name": "bike_body_normal",
+          "encodedBytes": 321583,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 1,
+          "name": "bike_body_orm",
+          "encodedBytes": 1070435,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 2,
+          "name": "bike_body_rookie_albedo",
+          "encodedBytes": 707879,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 3,
+          "name": "paint_normal",
+          "encodedBytes": 15960,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 4,
+          "name": "paint_albedo",
+          "encodedBytes": 132946,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 5,
+          "name": "paint_orm",
+          "encodedBytes": 43507,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 6,
+          "name": "bike_mech_normal",
+          "encodedBytes": 515148,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 7,
+          "name": "bike_mech_orm",
+          "encodedBytes": 1243787,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 8,
+          "name": "bike_mech_albedo",
+          "encodedBytes": 917164,
+          "width": 2048,
+          "height": 2048,
+          "sourceFormat": "JPEG",
+          "gpuEstimateFormat": "RGBA8 (conservative)",
+          "residentBytesWithMipmaps": 22369620
+        },
+        {
+          "index": 9,
+          "name": "chain_links",
+          "encodedBytes": 450,
+          "width": 64,
+          "height": 32,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 10924
+        },
+        {
+          "index": 10,
+          "name": "header_normal",
+          "encodedBytes": 4588,
+          "width": 512,
+          "height": 512,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 1398100
+        },
+        {
+          "index": 11,
+          "name": "header_albedo",
+          "encodedBytes": 37257,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 12,
+          "name": "header_orm",
+          "encodedBytes": 33626,
+          "width": 1024,
+          "height": 1024,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 5592404
+        },
+        {
+          "index": 13,
+          "name": "bike_spokecard",
+          "encodedBytes": 8133,
+          "width": 128,
+          "height": 128,
+          "sourceFormat": "PNG",
+          "gpuEstimateFormat": "RGBA8",
+          "residentBytesWithMipmaps": 87380
+        }
+      ],
+      "estimatedImageResidencyBytes": 113344496,
+      "limits": "Per-image full-mip estimates use RGBA8 for PNG/JPEG and 4x4 16-byte blocks for UASTC. Device fallback may use RGBA8. Excludes render targets, shadows, buffers, duplicate uploads and driver allocations. UV presence does not establish unwrap quality."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "sourceBytes": 5682208,
+  "repackedBytes": 5672504,
+  "method": "Decode existing compressed bike then losslessly repack without pruning; unsupported material extensions preclude descriptor pruning.",
+  "matchedCanvasFrames": 12,
+  "allMatched": true,
+  "adopted": false,
+  "reason": "Reviewed bike already uses meshopt; 9704-byte reduction does not justify replacing an otherwise identical reviewed artifact."
+}

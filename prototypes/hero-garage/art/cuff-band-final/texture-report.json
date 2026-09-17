@@ -1,0 +1,10 @@
+{
+  "albedo": {
+    "affectedTexels": 43334,
+    "outsideMaskBytesExactlyPreserved": true
+  },
+  "orm": {
+    "affectedTexels": 11075,
+    "outsideMaskBytesExactlyPreserved": true
+  }
+}

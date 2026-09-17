@@ -1,0 +1,17 @@
+{
+  "baselineSHA256": "2dcdfcbd25a591779e243e2fe0384e75c0eab65bd2fce4ccf1476edf56689645",
+  "candidateSHA256": "1fa7f59b4a2af319463054959389b53d6a0ea9fd8119b24de3f788d0ae3cd398",
+  "poses": 54,
+  "denimCrossingDeltaRange": [
+    0,
+    0
+  ],
+  "hoodCrossingsMax": 0,
+  "shirtDegenerateMax": 0,
+  "nonfiniteMax": 0,
+  "cordCrossingsMax": 0,
+  "limitations": [
+    "Audits garment versus denim, hood and drawcords; no all-scene or self-intersection proof.",
+    "All outer coordinates remain exact;15 pathological inner shell vertices corrected only."
+  ]
+}

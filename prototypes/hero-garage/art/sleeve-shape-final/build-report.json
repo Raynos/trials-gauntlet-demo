@@ -1,0 +1,149 @@
+{
+  "sourceSHA256": "c26ad3b9e547e498aa68fb3b96ce92b3ec404eabd25610679041f8eac5a8417a",
+  "sourceImmutable": true,
+  "controlPositionsUVWeightsExact": true,
+  "allUnselectedEvaluatedVerticesExact": true,
+  "outerSurfaceAndEveryContactRimExact": true,
+  "correctedInnerVertices": [
+    {
+      "index": 33873,
+      "originalOffsetM": 0.085009123439872,
+      "correctionM": [
+        -0.02763921022415161,
+        -0.039565473794937134,
+        0.0675363540649414
+      ]
+    },
+    {
+      "index": 35281,
+      "originalOffsetM": 0.11633601812083393,
+      "correctionM": [
+        0.10029667615890503,
+        0.05420282483100891,
+        0.008680939674377441
+      ]
+    },
+    {
+      "index": 36352,
+      "originalOffsetM": 0.026129118288192418,
+      "correctionM": [
+        0.02111142873764038,
+        -0.010751485824584961,
+        0.0045746564865112305
+      ]
+    },
+    {
+      "index": 40339,
+      "originalOffsetM": 0.009662718533388234,
+      "correctionM": [
+        -0.002672135829925537,
+        0.003748565912246704,
+        0.006125807762145996
+      ]
+    },
+    {
+      "index": 41767,
+      "originalOffsetM": 0.008708981166384067,
+      "correctionM": [
+        0.005894005298614502,
+        0.002620100975036621,
+        0.001845717430114746
+      ]
+    },
+    {
+      "index": 42485,
+      "originalOffsetM": 0.05440771749504105,
+      "correctionM": [
+        -0.016346633434295654,
+        -0.03408557176589966,
+        -0.03629779815673828
+      ]
+    },
+    {
+      "index": 45808,
+      "originalOffsetM": 0.006027822600358659,
+      "correctionM": [
+        -0.0020392537117004395,
+        0.002412140369415283,
+        -0.0024993419647216797
+      ]
+    },
+    {
+      "index": 47796,
+      "originalOffsetM": 0.018186590917821373,
+      "correctionM": [
+        -0.004273355007171631,
+        0.011122524738311768,
+        -0.01095592975616455
+      ]
+    },
+    {
+      "index": 48161,
+      "originalOffsetM": 0.014833864853962424,
+      "correctionM": [
+        0.011114895343780518,
+        -0.004576325416564941,
+        0.004497170448303223
+      ]
+    },
+    {
+      "index": 52254,
+      "originalOffsetM": 0.006063944156930233,
+      "correctionM": [
+        0.0015041828155517578,
+        -3.0249357223510742e-05,
+        0.0037752389907836914
+      ]
+    },
+    {
+      "index": 56113,
+      "originalOffsetM": 0.005439021097907389,
+      "correctionM": [
+        0.0016379952430725098,
+        0.00037157535552978516,
+        0.003000974655151367
+      ]
+    },
+    {
+      "index": 62529,
+      "originalOffsetM": 0.1482322871912955,
+      "correctionM": [
+        -0.029751837253570557,
+        -0.11736103892326355,
+        0.08200669288635254
+      ]
+    },
+    {
+      "index": 62552,
+      "originalOffsetM": 0.007391594645538777,
+      "correctionM": [
+        0.0033012032508850098,
+        -0.0029383599758148193,
+        0.003088235855102539
+      ]
+    },
+    {
+      "index": 65430,
+      "originalOffsetM": 0.01621924390370383,
+      "correctionM": [
+        -0.001429140567779541,
+        0.011613965034484863,
+        0.008078336715698242
+      ]
+    },
+    {
+      "index": 65454,
+      "originalOffsetM": 0.005227625766574394,
+      "correctionM": [
+        0.0021114349365234375,
+        0.0017279386520385742,
+        0.0017243623733520508
+      ]
+    }
+  ],
+  "outputSHA256": "f670daeea4ed3e89be8c6ac1c23792b8e328a335dd2305163671b59a6049afad",
+  "limits": [
+    "Repairs only pathological inner shell miters. Angular broad outer silhouette is unchanged.",
+    "Parent must judge played motion; source edits are geometry-node offsets after shell, before armature."
+  ]
+}

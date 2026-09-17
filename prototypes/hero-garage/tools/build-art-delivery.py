@@ -71,7 +71,7 @@ def recipe(stage):
         add('glove-surface-assembly','glove-surface','assemble.py',[current,ASSETS/'street01-gloves-surface.glb'],[target],['--base',current,'--out',target])
     if stage>=33:
         current=target
-        add('denim-finish','denim-finish','build.py',[ART/'denim-texture/denim-textured-source.blend',ART/'denim-texture/denim_normal.png',ART/'denim-texture/denim_orm.png'],[ART/'denim-finish/denim-finish-source.blend',ASSETS/'street01-denim-finish.glb'])
+        add('denim-finish','denim-finish','build.py',[ART/'denim-texture/denim-textured-source.blend',ART/'denim-texture/denim_normal.png',ART/'denim-texture/denim_orm.png'],[ART/'denim-finish/denim-finish-source.blend',ASSETS/'street01-denim-finish.glb']+([ART/'denim-finish/denim_albedo.png'] if stage>=40 else []))
         target=ASSETS/(f'street01-rider-delivery-{stage}-before-footwear-finish.glb' if stage>=34 else 'street01-rider-delivery-raw.glb')
         add('denim-finish-assembly','denim-finish','assemble.py',[current,ASSETS/'street01-denim-finish.glb'],[target],['--base',current,'--out',target])
     if stage>=34:
@@ -91,13 +91,40 @@ def recipe(stage):
     if stage>=37:
         current=target
         add('fitted-hem','garment-hem','build-fitted.py',[current,ART/'garment-shape/garment-source.blend',*[ART/'cloth-surface/textures'/('cotton_'+k+'.png') for k in ('albedo','normal','orm')],ART/'garment-hem/fit-denim.py'],[ART/'garment-hem/hem-fitted-source.blend',ASSETS/'street01-garment-hem-fitted-donor.glb'],['--denim-source',current])
-        target=ASSETS/'street01-rider-delivery-raw.glb'
+        target=ASSETS/(f'street01-rider-delivery-{stage}-before-rib-finish.glb' if stage>=38 else 'street01-rider-delivery-raw.glb')
         add('fitted-hem-assembly','garment-hem','assemble-fitted.py',[current,ASSETS/'street01-garment-hem-fitted-donor.glb'],[target],['--base',current,'--out',target])
+    if stage>=38:
+        current=target
+        add('cloth-rib-finish','cloth-rib-finish','build.py',[ART/'garment-hem/hem-fitted-source.blend',*[ART/'cloth-surface/textures'/('cotton_'+k+'.png') for k in ('albedo','normal','orm')]],[ART/'cloth-rib-finish/cloth-rib-source.blend',ART/'cloth-rib-finish/rib_albedo.png',ART/'cloth-rib-finish/rib_orm.png',ASSETS/'street01-cloth-rib-donor.glb'])
+        target=ASSETS/f'street01-rider-delivery-{stage}-before-footwear-lacing.glb'
+        add('cloth-rib-assembly','cloth-rib-finish','assemble.py',[current,ASSETS/'street01-cloth-rib-donor.glb'],[target],['--base',current,'--out',target])
+        current=target
+        add('footwear-lacing','footwear-lacing','build.py',[ART/'footwear-finish/footwear-refined-source.blend'],[ART/'footwear-lacing/footwear-lacing-source.blend',ASSETS/'street01-footwear-lacing.glb'])
+        target=ASSETS/(f'street01-rider-delivery-{stage}-before-sleeve-shell-fix.glb' if stage>=39 else 'street01-rider-delivery-raw.glb')
+        add('footwear-lacing-assembly','footwear-lacing','assemble.py',[current,ASSETS/'street01-footwear-lacing.glb'],[target],['--base',current,'--out',target])
+    if stage>=39:
+        current=target
+        source=ART/'cloth-rib-finish/cloth-rib-source.blend'
+        add('sleeve-shell-fix','sleeve-shape-final','build.py',[source],[ART/'sleeve-shape-final/sleeve-source.blend',ASSETS/'street01-sleeve-shape-final-donor.glb'],['--source',source])
+        target=ASSETS/(f'street01-rider-delivery-{stage}-before-denim-surface.glb' if stage>=40 else 'street01-rider-delivery-raw.glb')
+        add('sleeve-shell-fix-assembly','sleeve-shape-final','assemble.py',[current,ASSETS/'street01-sleeve-shape-final-donor.glb'],[target],['--base',current,'--out',target])
+    if stage>=40:
+        current=target
+        add('denim-surface-final','denim-surface-final','build.py',[ART/'denim-finish/denim-finish-source.blend',ART/'denim-finish/denim_albedo.png',ART/'denim-texture/denim_orm.png'],[ART/'denim-surface-final/denim-surface-final-source.blend',ART/'denim-surface-final/denim_normal.png',ASSETS/'street01-denim-surface-final.glb'])
+        target=ASSETS/(f'street01-rider-delivery-{stage}-before-cuff-band.glb' if stage>=41 else 'street01-rider-delivery-raw.glb')
+        add('denim-surface-final-assembly','denim-surface-final','assemble.py',[current,ASSETS/'street01-denim-surface-final.glb'],[target],['--base',current,'--out',target])
+    if stage>=41:
+        current=target
+        image_python=os.environ.get('ART_IMAGE_PYTHON',str(P/'.venv-art-images/bin/python'))
+        image_runtime=Path(shutil.which(image_python) or image_python).resolve()
+        add('continuous-cuff-band','cuff-band-final','build.py',[ART/'sleeve-shape-final/sleeve-source.blend',*[ART/'cloth-surface/textures'/('cotton_'+k+'.png') for k in ('albedo','normal','orm')],ART/'cuff-band-final/texture.py',image_runtime],[ART/'cuff-band-final/cuff-band-source.blend',ART/'cuff-band-final/cuff-mask.npy',ART/'cuff-band-final/cuff_albedo.png',ART/'cuff-band-final/cuff_orm.png',ASSETS/'street01-cuff-band-final-donor.glb'])
+        target=ASSETS/'street01-rider-delivery-raw.glb'
+        add('continuous-cuff-band-assembly','cuff-band-final','assemble.py',[current,ASSETS/'street01-cuff-band-final-donor.glb'],[target],['--base',current,'--out',target])
     return steps
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--stage',type=int,choices=(28,29,30,31,32,33,34,35,36,37),required=True)
+    ap.add_argument('--stage',type=int,choices=(28,29,30,31,32,33,34,35,36,37,38,39,40,41),required=True)
     ap.add_argument('--blender',default=os.environ.get('BLENDER') or '/Applications/Blender.app/Contents/MacOS/Blender')
     ap.add_argument('--node',default='node')
     ap.add_argument('--pack',action='store_true',help='Also write losslessly packed delivery; currently requires Blender5.2 Mac meshopt libraries.')
@@ -122,6 +149,13 @@ def main():
     if args.stage>=29:helpers.append(ART/'cloth-neckfit-v2/fit.py')
     if args.stage>=30:helpers.append(ART/'sleeve-continuity/fit.py')
     if args.stage>=37:helpers.append(ART/'garment-hem/fit-denim.py')
+    if args.stage>=41:
+        helpers.append(ART/'cuff-band-final/texture.py')
+        image_python=os.environ.get('ART_IMAGE_PYTHON',str(P/'.venv-art-images/bin/python'))
+        try:
+            check=subprocess.run([image_python,'-c','import PIL, numpy'],capture_output=True,text=True)
+            if check.returncode:missing.append('ART_IMAGE_PYTHON requires Pillow and NumPy: '+image_python)
+        except OSError:missing.append('ART_IMAGE_PYTHON executable: '+image_python)
     for p in helpers:
         if not p.is_file():missing.append(str(p))
     if blender is None:missing.append('Blender executable: '+args.blender)
@@ -182,4 +216,4 @@ def main():
     except BaseException as e:
         manifest['status']='failed';manifest['error']=str(e);save();raise
 
-if __name__=='__main__':main()
+if __name__=='__main__':raise SystemExit(main())

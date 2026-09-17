@@ -64,3 +64,11 @@ art/delivery/runs/**/*.glb
 /public/assets/street01-rider-delivery-pruned.glb
 /public/assets/street01-rider-rib-study.glb
 /public/assets/street01-rider-lacing-study.glb
+
+/.venv-art-images/
+/public/assets/street01-bike-delivery-decoded.glb
+/public/assets/street01-bike-delivery-pruned.glb
+/public/assets/street01-rider-*-study.glb
+
+/public/assets/street01-bike-round33-lossless.glb
+/public/assets/street01-bike-reviewed-backup.glb
