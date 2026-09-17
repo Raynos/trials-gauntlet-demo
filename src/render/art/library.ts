@@ -6,9 +6,9 @@
  * Round 9 (user on 3G saw the title at ~70 s: the constructor fetched all 2.8 MB): the pack
  * loads in tiers. `load()` fetches the manifest and the **boot set** — only what the showcase
  * biome (industrial: the title's backdrop) shows near the start gate (plate, stencils, grime,
- * banners, crowd, tyre mark; ≈ 0.9 MB). `request(ids)` fetches anything else on demand; the
+ * banners, tyre mark; ≈ 0.8 MB). `request(ids)` fetches anything else on demand; the
  * renderer asks for `idsFor(biome)` in `setTrack` (the other biomes' plates + skies, the wall
- * decals, the night crowd) and `whenReady()` waits for that request, so frame 0 of a run is
+ * decals) and `whenReady()` waits for that request, so frame 0 of a run is
  * art-complete while the title never waits for canyon's sky. Every fetch is one `fetch` +
  * `createImageBitmap` (decode off the main thread); a failure just keeps that item
  * procedural. The world is (re)built from whatever is present, so a capture is either
@@ -49,19 +49,19 @@ const REJECTED = new Set(['stencil-apex', 'stencil-taro', 'tyremark-straight', '
 /** Back-wall decals (industrial + foundry): not needed for the title, requested with the track. */
 const HALL_DECAL_IDS = ['poster-trials-night', 'poster-tyres', 'sign-hard-hat', 'sign-overhead-crane', 'sign-forklift', 'sign-exit', 'graffiti-rise', 'graffiti-grind', 'graffiti-nofear', 'graffiti-skull', 'graffiti-tag-wall', 'graffiti-wheel'];
 
-/** Ids a biome's world draws (loaded ones are used; missing ones fall back to procedural). */
+/** Ids a biome's world draws (loaded ones are used; missing ones fall back to procedural). Ask 62: `crowd-night` is no longer requested (the crowd is painted; see `world/gates.ts` CROWD_PHOTO_SHEET). */
 export function idsFor(biome: string): string[] {
   switch (biome) {
     case 'industrial':
       return [...COMMON_IDS, ...HALL_SKIN_IDS, 'plate-industrial', ...HALL_DECAL_IDS];
     case 'foundry':
-      return [...COMMON_IDS, 'crowd-night', ...HALL_SKIN_IDS, 'plate-foundry', ...HALL_DECAL_IDS];
+      return [...COMMON_IDS, ...HALL_SKIN_IDS, 'plate-foundry', ...HALL_DECAL_IDS];
     case 'canyon':
       return [...COMMON_IDS, 'plate-canyon', 'sky-canyon'];
     case 'snow':
       return [...COMMON_IDS, 'plate-snow', 'sky-snow'];
     case 'nightCity':
-      return [...COMMON_IDS, 'crowd-night', 'plate-nightcity', 'sky-nightcity'];
+      return [...COMMON_IDS, 'plate-nightcity', 'sky-nightcity'];
     default:
       return [...COMMON_IDS];
   }

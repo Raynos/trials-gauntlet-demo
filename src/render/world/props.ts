@@ -605,6 +605,227 @@ export function fencePanelGeometry(): THREE.BufferGeometry {
   return mergeGeometries(parts, false)!;
 }
 
+/**
+ * Hung tarp (ask 61 — "in-run you get a floating placeholder quad"): the hall's `tarp` batch was a
+ * flat `PlaneGeometry(3, 2.4)` in one flat colour, and at the roof it read exactly like an untextured
+ * stand-in. This is the real prop: a `w` × `h` sheet hung by its two top corners (origin at the middle
+ * of the top edge, the corners at y = 0 so a tie can end on them). The top edge sags between the ties,
+ * the sheet bellies toward the camera and hangs in vertical folds that fan open toward the free hem
+ * (pinned at the ties, so the corners stay crisp), the normals follow the folds so the key light
+ * shades them, and the vertex colour darkens the fold valleys and the hem (grime) — the instance colour
+ * tints the whole thing. 16 × 10 segments = 320 tris per instance; a hall places ~10.
+ */
+export function tarpGeometry(w = 3, h = 2.4, seed = 1): THREE.BufferGeometry {
+  const g = new THREE.PlaneGeometry(w, h, 16, 10).translate(0, -h / 2, 0);
+  const p = g.getAttribute('position') as THREE.BufferAttribute;
+  const uv = g.getAttribute('uv') as THREE.BufferAttribute;
+  const rnd = lcgExt(seed);
+  const folds = 3.5;
+  const ph = rnd() * Math.PI * 2;
+  const col = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i++) {
+    const u = uv.getX(i);
+    const v = uv.getY(i); // 0 at the hem, 1 at the tied top edge
+    const mid = 4 * u * (1 - u); // 0 at the ties, 1 midway
+    const down = 1 - v;
+    // Sag: 9 % of the height at the middle of the top edge, less further down (the hem hangs free).
+    const y = p.getY(i) - h * 0.09 * mid * (0.45 + 0.55 * v);
+    // Folds: none on the tied edge (the corners stay at the origin plane for the ties), opening fast
+    // below it and fanning out from the ties toward the free hem; a finer ripple; a slow belly to +z.
+    const amp = Math.pow(down, 0.6) * Math.min(1, mid * 2 + 0.15 + down);
+    const fold = Math.sin(u * Math.PI * 2 * folds + ph) * amp;
+    const fine = Math.sin(u * Math.PI * 2 * folds * 2.6 + ph * 1.7) * down * 0.35 * amp;
+    p.setXYZ(i, p.getX(i), y, 0.075 * fold + 0.02 * fine + 0.06 * mid * down);
+    // Valleys (folded away from the camera) and the hem carry the grime; ridges stay clean.
+    const s = (0.8 + 0.2 * (0.5 + 0.5 * Math.sin(u * Math.PI * 2 * folds + ph))) * (0.86 + 0.14 * v);
+    col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = s;
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  g.computeVertexNormals();
+  return g;
+}
+
+/**
+ * Tarp albedo (256², tinted by the instance colour): woven noise, a hemmed band with six eyelets
+ * along the tied top edge and a stitched hem at the foot, rust runs under the eyelets and grime
+ * pooling toward the hem. Neutral light grey so the instance colours read as the cloth colour.
+ */
+export function tarpTexture(seed = 1): THREE.CanvasTexture {
+  const S = 256;
+  const [c, g] = canvas(S, S);
+  const rnd = lcgExt(seed ^ 0x7a2b);
+  const img = g.createImageData(S, S);
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      // Weave: a 2-px check ± the per-pixel noise; broad blotches from three low-frequency waves.
+      const weave = ((x >> 1) + (y >> 1)) % 2 === 0 ? 4 : -4;
+      const blotch = 6 * Math.sin(x * 0.045 + y * 0.03) * Math.sin(y * 0.07 - x * 0.02) + 3 * Math.sin(x * 0.19 + y * 0.11);
+      const v = 206 + weave + blotch + (rnd() - 0.5) * 10;
+      const k = (y * S + x) * 4;
+      img.data[k] = Math.round(v);
+      img.data[k + 1] = Math.round(v);
+      img.data[k + 2] = Math.round(v * 0.985);
+      img.data[k + 3] = 255;
+    }
+  }
+  g.putImageData(img, 0, 0);
+  // Grime pooling toward the hem (canvas bottom = the sheet's foot).
+  const grime = g.createLinearGradient(0, S * 0.45, 0, S);
+  grime.addColorStop(0, 'rgba(40,32,22,0)');
+  grime.addColorStop(1, 'rgba(40,32,22,0.34)');
+  g.fillStyle = grime;
+  g.fillRect(0, 0, S, S);
+  // Hem bands: a doubled-over strip along the top (tied edge) and the foot, each with a stitch line.
+  g.fillStyle = 'rgba(255,255,255,0.16)';
+  g.fillRect(0, 0, S, 20);
+  g.fillRect(0, S - 16, S, 16);
+  g.strokeStyle = 'rgba(60,50,40,0.75)';
+  g.lineWidth = 1.5;
+  g.setLineDash([4, 3]);
+  for (const y of [20.5, S - 16.5]) {
+    g.beginPath();
+    g.moveTo(0, y);
+    g.lineTo(S, y);
+    g.stroke();
+  }
+  g.setLineDash([]);
+  // Six eyelets along the tied edge, each with a rust run below it.
+  for (let k = 0; k < 6; k++) {
+    const x = ((k + 0.5) / 6) * S;
+    const run = g.createLinearGradient(0, 14, 0, 14 + 40 + rnd() * 50);
+    run.addColorStop(0, 'rgba(120,60,20,0.45)');
+    run.addColorStop(1, 'rgba(120,60,20,0)');
+    g.fillStyle = run;
+    g.fillRect(x - 3, 14, 6, 100);
+    g.beginPath();
+    g.arc(x, 10, 5, 0, Math.PI * 2);
+    g.fillStyle = '#2a2a2c';
+    g.fill();
+    g.beginPath();
+    g.arc(x, 10, 5, 0, Math.PI * 2);
+    g.strokeStyle = '#8a8a86';
+    g.lineWidth = 2.5;
+    g.stroke();
+  }
+  return tex(c, true, false);
+}
+
+/**
+ * Site sign board (ask 61 follow-up): the hall's `sign` batch was a bare `hazardTape` box floating
+ * 2 m up in front of the back wall — a flat yellow board at distance. The board is now a printed
+ * face (`siteSignTexture`) at 1.55–2.55 m, front-only (the riding camera never sees the wall side),
+ * with a slight AO toward the posts; the two posts come from the hall's steel batches.
+ */
+export function signBoardGeometry(): THREE.BufferGeometry {
+  const g = new THREE.PlaneGeometry(1.6, 1.0).translate(0, 2.05, 0);
+  return setColors(g, (x) => {
+    const s = 0.86 + 0.14 * Math.min(1, (0.8 - Math.abs(x)) * 6);
+    return [s, s, s];
+  });
+}
+
+const SIGN_LEGENDS: [string, string][] = [
+  ['CAUTION', 'FORKLIFTS OPERATING'],
+  ['DANGER', 'HARD HAT AREA'],
+  ['NOTICE', 'KEEP CLEAR · LOADING BAY'],
+  ['CAUTION', 'PEDESTRIANS KEEP LEFT'],
+];
+
+/**
+ * Printed site sign, 512 × 320: yellow field with a black hazard-stripe border in a dark steel frame,
+ * a warning triangle, a two-line legend (seeded from four), four bolt heads with rust runs, scratches
+ * and grime. Neutral enough to sit in the hall's key; the frame is in the print so the board is 2 tris.
+ */
+export function siteSignTexture(seed = 1): THREE.CanvasTexture {
+  const W = 512;
+  const H = 320;
+  const [c, g] = canvas(W, H);
+  const rnd = lcgExt(seed ^ 0x5197);
+  const legend = SIGN_LEGENDS[Math.floor(rnd() * SIGN_LEGENDS.length)]!;
+  // Steel frame, then the yellow field with a hazard-stripe border.
+  g.fillStyle = '#2a2b2e';
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = '#e2ad1e';
+  g.fillRect(10, 10, W - 20, H - 20);
+  g.save();
+  g.beginPath();
+  g.rect(10, 10, W - 20, H - 20);
+  g.rect(40, 40, W - 80, H - 80);
+  g.clip('evenodd');
+  g.fillStyle = '#141416';
+  for (let x = -H; x < W + H; x += 56) {
+    g.beginPath();
+    g.moveTo(x, 0);
+    g.lineTo(x + 28, 0);
+    g.lineTo(x + 28 + H, H);
+    g.lineTo(x + H, H);
+    g.closePath();
+    g.fill();
+  }
+  g.restore();
+  // Warning triangle, left.
+  g.fillStyle = '#141416';
+  g.beginPath();
+  g.moveTo(112, 70);
+  g.lineTo(178, 186);
+  g.lineTo(46, 186);
+  g.closePath();
+  g.fill();
+  g.fillStyle = '#e2ad1e';
+  g.beginPath();
+  g.moveTo(112, 92);
+  g.lineTo(162, 176);
+  g.lineTo(62, 176);
+  g.closePath();
+  g.fill();
+  g.fillStyle = '#141416';
+  g.font = 'bold 74px Impact, "Arial Black", Helvetica, sans-serif';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillText('!', 112, 142);
+  // Legend, right of the triangle.
+  g.font = 'bold 82px Impact, "Arial Black", Helvetica, sans-serif';
+  g.textAlign = 'left';
+  g.fillText(legend[0], 196, 118);
+  g.font = 'bold 30px Impact, "Arial Black", Helvetica, sans-serif';
+  g.fillText(legend[1], 196, 186);
+  g.font = 'bold 22px Helvetica, Arial, sans-serif';
+  g.textAlign = 'center';
+  g.fillText('AUTHORISED PERSONNEL ONLY BEYOND THIS POINT', W / 2, 250);
+  // Bolt heads in the corners with rust runs; scratches; grime toward the foot.
+  for (const [bx, by] of [[24, 24], [W - 24, 24], [24, H - 24], [W - 24, H - 24]] as const) {
+    const run = g.createLinearGradient(0, by, 0, by + 40 + rnd() * 60);
+    run.addColorStop(0, 'rgba(120,60,20,0.55)');
+    run.addColorStop(1, 'rgba(120,60,20,0)');
+    g.fillStyle = run;
+    g.fillRect(bx - 5, by, 10, 110);
+    g.fillStyle = '#4a4a4e';
+    g.beginPath();
+    g.arc(bx, by, 6, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = '#1c1c1e';
+    g.beginPath();
+    g.arc(bx - 1.5, by - 1.5, 2.5, 0, Math.PI * 2);
+    g.fill();
+  }
+  g.strokeStyle = 'rgba(255,255,255,0.35)';
+  g.lineWidth = 1.2;
+  for (let i = 0; i < 9; i++) {
+    const x = 40 + rnd() * (W - 80);
+    const y = 40 + rnd() * (H - 80);
+    g.beginPath();
+    g.moveTo(x, y);
+    g.lineTo(x + (rnd() - 0.5) * 90, y + (rnd() - 0.5) * 30);
+    g.stroke();
+  }
+  const grime = g.createLinearGradient(0, H * 0.55, 0, H);
+  grime.addColorStop(0, 'rgba(40,32,22,0)');
+  grime.addColorStop(1, 'rgba(40,32,22,0.4)');
+  g.fillStyle = grime;
+  g.fillRect(0, 0, W, H);
+  return tex(c, true, false);
+}
+
 /** Rock: displaced icosphere, radius 1, origin centre. */
 export function rockGeometry(seed: number, detail = 2): THREE.BufferGeometry {
   const g = new THREE.IcosahedronGeometry(1, detail);

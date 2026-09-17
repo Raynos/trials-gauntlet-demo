@@ -39,6 +39,10 @@ import {
   pipeGeometry,
   rackGeometry,
   reflectionMaskTexture,
+  signBoardGeometry,
+  siteSignTexture,
+  tarpGeometry,
+  tarpTexture,
   trussGeometry,
   tyreStackGeometry,
   palletLowGeometry,
@@ -668,23 +672,47 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
     return mergeGeometries(parts, false)!;
   })();
   const scaffolds = new PropBatch('scaffold', bakeAO(scaffoldGeo, 4, 0.3), steel, false);
-  const tarpMat = fogify(new THREE.MeshStandardMaterial({ color: 0x2a4d8a, roughness: 0.9, side: THREE.DoubleSide }));
-  const tarps = new PropBatch('tarp', new THREE.PlaneGeometry(3, 2.4, 6, 4).translate(0, -1.2, 0), tarpMat, true);
+  // Ask 61 ("in-run you get a floating placeholder quad"): the tarp was a flat 3 × 2.4 plane in one
+  // flat colour, hung 3–6 m under the roof with nothing holding it — a placeholder to any eye. Now
+  // it is the real prop (`tarpGeometry`: sag, folds, hem; `tarpTexture`: weave, eyelets, grime),
+  // front-faced (every placement faces the camera) and completed with the library's neutral map
+  // set so it shares the container skins' program instead of owning a DoubleSide / no-map variant.
+  const tarpMat = fogify(new THREE.MeshStandardMaterial({ map: tarpTexture(track.def.seed), roughness: 0.92, vertexColors: true }));
+  lib.complete(tarpMat);
+  out.textureBytes += 256 * 256 * 4 * 1.33;
+  const tarps = new PropBatch('tarp', tarpGeometry(3, 2.4, track.def.seed), tarpMat, true);
   const forkliftGeo = bakeAO((() => {
     const parts: THREE.BufferGeometry[] = [new THREE.BoxGeometry(1.1, 0.9, 1.0).translate(0, 0.75, 0), new THREE.BoxGeometry(0.9, 0.5, 0.9).translate(-0.2, 1.4, 0), new THREE.BoxGeometry(0.08, 2.6, 0.9).translate(0.75, 1.3, 0), new THREE.BoxGeometry(1.0, 0.05, 0.15).translate(1.3, 0.1, 0.3), new THREE.BoxGeometry(1.0, 0.05, 0.15).translate(1.3, 0.1, -0.3)];
     for (const x of [-0.35, 0.4]) for (const z of [-0.5, 0.5]) parts.push(new THREE.CylinderGeometry(0.3, 0.3, 0.2, 12).rotateX(Math.PI / 2).translate(x, 0.3, z));
     return mergeGeometries(parts, false)!;
   })(), 2.5, 0.35);
   const forklifts = new PropBatch('forklift', forkliftGeo, fogify(new THREE.MeshStandardMaterial({ color: 0xd8a020, roughness: 0.5, metalness: 0.3 })));
-  const signMat = lib.get('hazardTape');
-  const signs = new PropBatch('sign', new THREE.BoxGeometry(1.6, 1.0, 0.05).translate(0, 2.0, 0), signMat);
+  // Ask 61 follow-up: the sign was a bare `hazardTape` box floating 2 m up — a flat yellow board at
+  // distance. Now a printed board (`siteSignTexture`: frame, hazard border, legend, bolts, grime)
+  // on two steel posts (`railPost`, merged into the steel draw). Its own batch as before: no new draw.
+  const signMat = fogify(new THREE.MeshStandardMaterial({ map: siteSignTexture(track.def.seed), roughness: 0.55, vertexColors: true }));
+  lib.complete(signMat);
+  out.textureBytes += 512 * 320 * 4 * 1.33;
+  const signs = new PropBatch('sign', signBoardGeometry(), signMat);
   for (let x = x0 + 10; x < x1 - 10; x += rng.range(9, 16)) {
     const r = rng.next();
     if (r < 0.25) reels.add(x, floorY, rng.range(-12, -6), rng.range(0, 6), rng.range(0.6, 1.0));
     else if (r < 0.45) scaffolds.add(x, floorY, rng.range(-14, -9), rng.range(-0.2, 0.2));
-    else if (r < 0.65) tarps.add(x, roofY - 3 - rng.range(0, 3), rng.range(-16, -8), rng.range(-0.4, 0.4), 1, [0x2a4d8a, 0x8a6a2a, 0x5a5a5a][rng.int(0, 2)]!);
+    else if (r < 0.65) {
+      // Ask 61: hung from the truss line on two chains to its top corners (a tarp tied up out of
+      // the way), not floating 3–6 m below the roof. The chains join the `chains` batch: no draw.
+      const ty = roofY - 2.0 - rng.range(0.4, 1.6);
+      const tz = rng.range(-16, -8);
+      const ry = rng.range(-0.4, 0.4);
+      tarps.add(x, ty, tz, ry, 1, [0x2a4d8a, 0x8a6a2a, 0x5a5a5a][rng.int(0, 2)]!);
+      // A yaw of `ry` about y maps the corner at local +x to (cos ry, 0, −sin ry).
+      for (const s of [-1, 1]) chains.add(x + s * 1.46 * Math.cos(ry), roofY - 1.4, tz - s * 1.46 * Math.sin(ry), 0, 1, null, 0, roofY - 1.4 - ty, 1);
+    }
     else if (r < 0.8) forklifts.add(x, floorY, rng.range(-9, -5), rng.range(-0.5, 0.5) + (rng.next() < 0.5 ? Math.PI : 0));
-    else signs.add(x, floorY, wallZ + 2.2, 0);
+    else {
+      signs.add(x, floorY, wallZ + 2.2, 0);
+      for (const dx of [-0.7, 0.7]) railPost.add(x + dx, floorY, wallZ + 2.17, 0, 1.6, null, 0, 2.55 / 1.1, 1.6); // posts to the board's top edge
+    }
   }
   out.batches.push(racks, pallets, drums, tyres, palletsFar, drumsFar, tyresFar, cones, railTape, railPost, catwalk, reels, scaffolds, tarps, forklifts, signs);
 

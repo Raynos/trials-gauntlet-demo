@@ -3,8 +3,9 @@
  * sponsor barriers and team flags, checkpoint gates (steel posts, numbered
  * plaque that lights green on pass, lamp, a small crowd cluster), and the
  * finish arch (checkered banner, crowd, flags). The crowd is an instanced
- * billboard kit: one atlas of 8 painted figures × 2 poses; the vertex shader
- * picks the pose and bobs each figure on `uCheer` (GO / finish), clocked from
+ * billboard kit: one atlas of 16 painted figures × 2 rows (idle | cheer, five
+ * pose kinds each — `world/crowd.ts`); the vertex shader picks the row, mirrors
+ * half the cards and bobs each figure on `uCheer` (GO / finish), clocked from
  * simulated time so every capture is identical.
  */
 import * as THREE from 'three';
@@ -17,6 +18,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { canvas, tex } from './canvasTex';
 import { PropBatch, bakeAO, triCount, trussGeometry, lightConeGeometry } from './props';
 import { drawArt, type ArtLibrary } from '../art/library';
+import { CROWD_ATLAS_BYTES, CROWD_CELLS, CROWD_CELL_H, CROWD_CELL_W, castCrowd, crowdTint, paintCrowd } from './crowd';
 import { groundFloorY, profileY } from './track';
 import { foregroundKeepOut } from './hall';
 import { planSetPieces } from './setPieces';
@@ -139,110 +141,28 @@ function sponsorStrip(rng: Rng, art: ArtLibrary | null): { tex: THREE.CanvasText
 }
 
 /**
- * Crowd sheet. Art pack: the keyed photo row of 8 spectators (`crowd-day` for daylit biomes,
- * `crowd-night` for nightCity / foundry) — 8 cells, one pose (the cheer is the bob).
- * Fallback: 8 painted figures × 2 poses (arms down | arms up), 64×256 px per cell.
+ * Ask 62: the art pack's keyed photo row (`crowd-day` / `crowd-night`: 8 spectators, one pose) read
+ * as pasted cut-outs cloned along the gates. Off by default; the painted crowd is the game's own.
+ * Turning it back on also needs `crowd-day` in `art/boot-set.ts` COMMON_IDS and `crowd-night` in
+ * `library.ts` idsFor (they are no longer fetched).
  */
-function crowdSheet(rng: Rng, art: ArtLibrary | null, night: boolean): { tex: THREE.Texture; cells: number; poses: number; aspect: number; bytes: number } {
+const CROWD_PHOTO_SHEET = false;
+
+/**
+ * Crowd sheet: the painted atlas (`world/crowd.ts`: 16 figures × idle / cheer rows) — `rows` = 2,
+ * the shader picks the row on cheer. The photo sheet (8 cells, one pose, `rows` = 1: the cheer is
+ * the bob alone) only when `CROWD_PHOTO_SHEET` is on and the plate loaded.
+ */
+function crowdSheet(rng: Rng, art: ArtLibrary | null, night: boolean): { tex: THREE.Texture; cells: number; rows: number; aspect: number; bytes: number } {
   const id = night ? 'crowd-night' : 'crowd-day';
-  const t = art?.texture(id, true, false) ?? null;
-  const e = art?.entry(id);
+  const t = CROWD_PHOTO_SHEET ? (art?.texture(id, true, false) ?? null) : null;
+  const e = CROWD_PHOTO_SHEET ? art?.entry(id) : null;
   if (t && e) {
     t.minFilter = THREE.LinearMipmapLinearFilter;
     t.anisotropy = 8;
-    return { tex: t, cells: 8, poses: 1, aspect: e.w / 8 / e.h, bytes: e.bytes };
+    return { tex: t, cells: 8, rows: 1, aspect: e.w / 8 / e.h, bytes: e.bytes };
   }
-  return { tex: crowdAtlas(rng), cells: 16, poses: 2, aspect: 64 / 256, bytes: 1024 * 256 * 4 * 1.33 };
-}
-
-function crowdAtlas(rng: Rng): THREE.CanvasTexture {
-  const W = 1024;
-  const H = 256;
-  const [c, g] = canvas(W, H);
-  g.clearRect(0, 0, W, H);
-  const skins = ['#e8b990', '#c98d63', '#8d5a3b', '#f0c9a8', '#5c3a26'];
-  const figs: { skin: string; shirt: string; pants: string; cap: string | null; w: number; h: number; hair: string }[] = [];
-  for (let i = 0; i < 8; i++) {
-    figs.push({
-      skin: skins[rng.int(0, skins.length - 1)]!,
-      shirt: TEAM[rng.int(0, TEAM.length - 1)]!,
-      pants: ['#22252c', '#2b3a5a', '#4a4640', '#1a1a1c'][rng.int(0, 3)]!,
-      cap: rng.next() < 0.5 ? TEAM[rng.int(0, TEAM.length - 1)]! : null,
-      w: rng.range(0.85, 1.15),
-      h: rng.range(0.9, 1.05),
-      hair: ['#2a1a10', '#4a3020', '#c8a060', '#101010'][rng.int(0, 3)]!,
-    });
-  }
-  for (let pose = 0; pose < 2; pose++) {
-    for (let i = 0; i < 8; i++) {
-      const f = figs[i]!;
-      const x0 = (pose * 8 + i) * 64 + 32;
-      const s = f.h;
-      const base = 250;
-      const legH = 92 * s;
-      const torsoH = 76 * s;
-      const headR = 13;
-      // Legs
-      g.fillStyle = f.pants;
-      g.fillRect(x0 - 13 * f.w, base - legH, 11 * f.w, legH);
-      g.fillRect(x0 + 2 * f.w, base - legH, 11 * f.w, legH);
-      // Shoes
-      g.fillStyle = '#111';
-      g.fillRect(x0 - 15 * f.w, base - 6, 14 * f.w, 6);
-      g.fillRect(x0 + 1 * f.w, base - 6, 14 * f.w, 6);
-      // Torso
-      const ty = base - legH - torsoH;
-      g.fillStyle = f.shirt;
-      g.beginPath();
-      g.roundRect(x0 - 17 * f.w, ty, 34 * f.w, torsoH + 4, 6);
-      g.fill();
-      // Arms
-      g.strokeStyle = f.shirt;
-      g.lineCap = 'round';
-      g.lineWidth = 9 * f.w;
-      g.beginPath();
-      if (pose === 0) {
-        g.moveTo(x0 - 19 * f.w, ty + 8);
-        g.lineTo(x0 - 24 * f.w, ty + torsoH - 4);
-        g.moveTo(x0 + 19 * f.w, ty + 8);
-        g.lineTo(x0 + 24 * f.w, ty + torsoH - 4);
-      } else {
-        g.moveTo(x0 - 19 * f.w, ty + 8);
-        g.lineTo(x0 - 27 * f.w, ty - 44);
-        g.moveTo(x0 + 19 * f.w, ty + 8);
-        g.lineTo(x0 + 27 * f.w, ty - 44);
-      }
-      g.stroke();
-      // Hands
-      g.fillStyle = f.skin;
-      for (const sx of [-1, 1]) {
-        g.beginPath();
-        g.arc(x0 + sx * (pose === 0 ? 24 : 27) * f.w, pose === 0 ? ty + torsoH - 2 : ty - 48, 5, 0, Math.PI * 2);
-        g.fill();
-      }
-      // Head + hair / cap
-      const hy = ty - headR - 3;
-      g.beginPath();
-      g.arc(x0, hy, headR, 0, Math.PI * 2);
-      g.fill();
-      if (f.cap) {
-        g.fillStyle = f.cap;
-        g.beginPath();
-        g.arc(x0, hy - 1, headR + 1, Math.PI, 0);
-        g.fill();
-        g.fillRect(x0 - headR - 6, hy - 3, headR * 2 + 6, 4);
-      } else {
-        g.fillStyle = f.hair;
-        g.beginPath();
-        g.arc(x0, hy - 2, headR, Math.PI * 1.05, Math.PI * 1.95);
-        g.fill();
-      }
-    }
-  }
-  const t = tex(c, true, false);
-  t.minFilter = THREE.LinearMipmapLinearFilter;
-  t.anisotropy = 4;
-  return t;
+  return { tex: paintCrowd(castCrowd(rng, night), night), cells: CROWD_CELLS, rows: 2, aspect: CROWD_CELL_W / CROWD_CELL_H, bytes: CROWD_ATLAS_BYTES };
 }
 
 /** 2×2 team-flag atlas: the art pack's sponsor banners (square centre crop) or painted team flags. */
@@ -292,9 +212,12 @@ function flagAtlas(rng: Rng, art: ArtLibrary | null): THREE.CanvasTexture {
 /**
  * Animated-card material: instanced planes whose atlas cell comes from the
  * instance's z-scale (1..N) and whose motion is driven by uTime / uCheer.
- * mode 0 = crowd (16-cell strip, pose switch + bob), 1 = flag (2×2 atlas, wave).
+ * mode 0 = crowd (`cells` columns × `rows` rows: row 0 idle, row 1 cheer — a
+ * figure whose bob phase is on the up-beat switches row while `uCheer` is on;
+ * half the cards are mirrored by a hash of their position, so a repeated cell
+ * reads as a different person), 1 = flag (2×2 atlas, wave).
  */
-function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim'], cells = 16, poses = 2): THREE.MeshStandardMaterial {
+function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim'], cells = 16, rows = 2): THREE.MeshStandardMaterial {
   const m = new THREE.MeshStandardMaterial({ map, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide, vertexColors: true });
   fogify(m);
   const prev = m.onBeforeCompile;
@@ -304,7 +227,7 @@ function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim'], cell
     shader.uniforms.uCheer = anim.uCheer;
     shader.uniforms.uMode = { value: mode };
     shader.uniforms.uCells = { value: cells };
-    shader.uniforms.uPoseShift = { value: poses > 1 ? cells / poses : 0 };
+    shader.uniforms.uRows = { value: rows };
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
@@ -313,7 +236,7 @@ function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim'], cell
         uniform float uCheer;
         uniform float uMode;
         uniform float uCells;
-        uniform float uPoseShift;`,
+        uniform float uRows;`,
       )
       .replace(
         '#include <uv_vertex>',
@@ -323,8 +246,10 @@ function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim'], cell
         float cardS = sin(uTime * 7.0 + cardPh);
         #ifdef USE_MAP
         if (uMode < 0.5) {
-          float up = step(0.0, cardS) * step(0.5, uCheer);
-          vMapUv.x = (vMapUv.x + cardCell + up * uPoseShift) / uCells;
+          float up = step(0.0, cardS) * step(0.5, uCheer) * step(1.5, uRows);
+          float flip = step(0.5, fract(sin(cardPh * 12.9898) * 43758.5453));
+          vMapUv.x = (mix(vMapUv.x, 1.0 - vMapUv.x, flip) + cardCell) / uCells;
+          vMapUv.y = (vMapUv.y + up) / uRows;
         } else {
           vMapUv = (vMapUv + vec2(mod(cardCell, 2.0), floor(cardCell / 2.0))) * 0.5;
         }
@@ -364,13 +289,14 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
   const gyAt = (x: number, z: number): number => (interior ? floorY : profileY(profile, x) - 0.42 - Math.min(1, (Math.abs(z) - 3) / 30) ** 2 * 2.5);
 
   // --- Shared kit -----------------------------------------------------------
-  const sheet = crowdSheet(rng, art, biome.id === 'nightCity' || biome.id === 'foundry');
+  const night = biome.id === 'nightCity' || biome.id === 'foundry';
+  const sheet = crowdSheet(rng, art, night);
   textureBytes += sheet.bytes;
   const flagTex = flagAtlas(rng, art);
   textureBytes += 512 * 512 * 4 * 1.33;
-  const crowdMat = cardMaterial(sheet.tex, 0, anim, sheet.cells, sheet.poses);
-  const flagMat = cardMaterial(flagTex, 1, anim);
-  // Card = one figure, 1.9 m tall (photo sheet: 1024/8 × 478 → 0.51 m wide; painted: 0.62).
+  const crowdMat = cardMaterial(sheet.tex, 0, anim, sheet.cells, sheet.rows);
+  const flagMat = cardMaterial(flagTex, 1, anim, 4, 1);
+  // Card = one figure, 1.9 m tall (painted: 80 × 256 px cells → 0.59 m wide; photo sheet: 0.51).
   const card = new THREE.PlaneGeometry(1.9 * sheet.aspect, 1.9).translate(0, 0.95, 0);
   const cardUV = card.getAttribute('uv') as THREE.BufferAttribute;
   const cardCol = new Float32Array(cardUV.count * 3);
@@ -414,9 +340,10 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
       const x = xa + ((i + 0.5) / n) * (xb - xa) + rng.range(-0.25, 0.25);
       const z = zFront - row * 0.9 - rng.range(0, 0.3);
       const sc = rng.range(0.92, 1.08);
-      const fig = rng.int(1, sheet.cells / sheet.poses);
-      // z-scale carries the atlas cell (1..8); the plane has no depth so it costs nothing.
-      crowd.add(x, baseY(x, z) + row * 0.25, z, yawToCam + rng.range(-0.15, 0.15), sc, null, 0, sc, fig);
+      const fig = rng.int(1, sheet.cells);
+      // z-scale carries the atlas cell (1..16); the plane has no depth so it costs nothing. The
+      // instance colour is a per-person exposure wobble (ask 62: no two clones of one cell alike).
+      crowd.add(x, baseY(x, z) + row * 0.25, z, yawToCam + rng.range(-0.15, 0.15), sc, crowdTint(rng, night), 0, sc, fig);
     }
     // Barrier with sponsor boards along the front row.
     const len = xb - xa;
@@ -599,7 +526,7 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
         const x = a.x - w / 2 + 0.6 + ((i + 0.5) / n) * (w - 1.2) + rng.range(-0.2, 0.2);
         const z = zFront - 1.3 - row * 0.9 - rng.range(0, 0.3);
         const sc = rng.range(0.92, 1.08);
-        crowd.add(x, top + row * 0.02, z, yawToCam + rng.range(-0.15, 0.15), sc, null, 0, sc, rng.int(1, sheet.cells / sheet.poses));
+        crowd.add(x, top + row * 0.02, z, yawToCam + rng.range(-0.15, 0.15), sc, crowdTint(rng, night), 0, sc, rng.int(1, sheet.cells));
       }
       rails.add(a.x, top, zFront - 0.5, 0, w, null, 0, 1, 1);
       for (let x = a.x - w / 2; x <= a.x + w / 2 + 0.01; x += 2) railPosts.add(x, top, zFront - 0.5);
