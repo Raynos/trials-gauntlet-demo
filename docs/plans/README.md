@@ -93,6 +93,8 @@ The [game audit](../reviews/game-audit-2026-09-15.md) and separate [physics-libr
 | 09-16 | Garage stats sheet changes **only on click** (no hover preview) — ask 40 |
 | 09-16 | **img2 rider code is deleted outright** (not just the chip) — ask 41 |
 | 09-16 | **Main menu → B2 Strip** (`assets/design/menu/round3/B2-strip.jpg`, SPEC § B2): wide Nalati-jump strip under a big wordmark, four huge tiles (PLAY widest, amber), nothing about progress on the title menu — ask 42 |
+| 09-17 | **Hero art licence (HR-09): ship as is on the CC-BY reading** — the beard pack's README is taken as authoritative over the AGPL headers in its files, the Bystedt curls are CC BY-SA; both attributed in CREDITS. The hair keep / redo and the phone 30 fps check stay on HR-09 |
+| 09-17 | World map art pass (ask 44) — go; fps meter hidden on the main menu; badge plate → stamp only (ask 45) |
 
 ## Parallel branch — `blender-work` (Codex Astra 6, since 2026-09-15)
 
