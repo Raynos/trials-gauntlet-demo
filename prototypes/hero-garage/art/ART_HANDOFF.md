@@ -1,25 +1,29 @@
-# Art handoff — round 26
+# Art handoff — round 27
 
-Owner split: this task produces Blender art and review exports. Claude + Opus own game integration. Current catalog is authoritative.
+This task owns Blender art and review exports. Claude + Opus own game integration. The catalog selects the provisionally accepted assets; final visual approval belongs to the user.
 
-## Active assets
+## Active assets and rebuild
 
-- Rider: `public/assets/street01-rider-collar-uv.glb`, SHA `67302f649eff8f536e17f99c55c15c673503bf3ccdf8e64f97ca87ec41d69e3c`. Rebuild using `art/full-rider-identity/build.py`, then `art/collar-uv-repair/build.py`, with background Blender from repository root. Dense local file is ignored; saved face, curls and beard preserved.
-- Bike: `public/assets/street01-bike-refined.glb`, SHA `5fac61e4fb12a2425bb3d3f519fe90d8047c593f99096da5fed71b595771b012`. Editable `art/bike-refine/bike-refined.blend`; recipe in that directory. Both review tiers currently use this bike.
-- Viewer rebuild: run `npm run build` inside the prototype, then `node tools/package-runtime.mjs`. This packages local assets; it does not deploy.
+- Rider: `/assets/street01-rider-tailored.glb`, SHA `d6122a389e38cf7ea209b00b386efe6f12a8d48357fef1f969345ccc90938bec`. The dense local GLB is ignored by Git. From repository root, run background Blender with `art/full-rider-identity/build.py`, then `art/hoodie-shell/build.py`, then `art/hoodie-shell/assemble.py` (all under this prototype). The saved face, curls and beard are retained. Editable clothing: `art/hoodie-shell/hoodie-source.blend`; supporting recipes preserve the original source and use a continuous control cage.
+- Bike: `/assets/street01-bike-detail.glb`, SHA `dc70ee964be894777a344a8c343cdeec42e81dfd0f5fa5a2055c695037b96cf9`. Editable `art/bike-detail/bike-detail.blend`; `art/bike-detail/build.py` derives it from the previous refined bike. Clamp shells rotate around fixed fork centres; number-board mounts are added. Joint hierarchy and attachment transforms are preserved.
+- Build the review viewer with `npm run build` inside this prototype. `node tools/package-runtime.mjs` packages a local review bundle; it does not deploy. Tool dependencies are pinned in the package lock. Source scripts use local Blender 5.2.1, its Python/numpy, and repository `assets/blender/common.py` / `rider_asset.py`.
 
-## Rig and mechanics
+## Rig, sockets, clips and conventions
 
-See `art/rig-contract/README.md` and `reports/rig-contract.json` for the original body contract; its declared source hash is historical, not a verification of the latest assembled rider. Six clips: sit_cruise, forward_attack, hang_back, compression, extension, landing_absorption. glTF is Y-up; saved portrait faces +X after assembly. Root placement and asset transforms are recorded in the catalog. Existing prototype suspension is authored kinematics, not game physics. Bike material changes preserve geometry, nodes and attachments; `reports/bike-refine-mechanics.json` verifies suspension and contacts.
+`art/rig-contract/README.md` and `tools/export-rig-contract.mjs` describe and regenerate the actual catalog contract: 19 joints, inverse-bind matrices, sockets, materials, clip channels and per-frame contact samples. Earlier hashes are historical until regenerated. The six retained clips are `sit_cruise`, `forward_attack`, `hang_back`, `compression`, `extension`, `landing_absorption`.
 
-## Art still required
+Source Blender coordinates are metres, Z up, +X forward; glTF is metres, Y up, +X forward. Both assets have catalog offset `[0, .34, 0]`. Viewer grounding and suspension are separate authored kinematics. Evaluate the rider animation before applying the shared bike/chassis motion. Grip sockets coincide closely; sole sockets intentionally sit approximately11mm above peg centres. Socket agreement is not proof of surface contact. No finger/twist chain has been added.
 
-The hoodie remains the largest visible weakness. Two new collar-transition attempts did not pass visual review. Rebuild the joined shoulder/hood/neck surface from editable source, rather than another collar-only patch. Clothing folds, hands, shoes, materials and final reference fidelity remain open. Dense groom optimization, final continuous garment unwrap and actual iPhone performance are unproven.
+## Verification and outstanding art
 
-## Provenance and delivery
+`reports/art-round27-review.json` records adoption; `captures/art-round27-adopted/` contains all six clips under neutral and garage lighting. Hood vs sweatshirt checks sampled54poses with no segment/triangle crossings and minimum1.42mm clearance, excluding coplanar/tangent cases. Existing identity, animation and skin payloads are retained by assembly assertions. The frozen game ship check passed; this is not game integration validation.
 
-Saved head/groom terms remain in `art/sources/replacement-hair/` and `art/head-authored/`; existing local/personal-use restrictions remain. No public distribution clearance is implied. No game files were changed in this art round.
+Footwear and denim candidates remain unadopted: shoe reinforcement intersects the new upper, and denim changed some sampled saddle gaps. Next work: fix these, glove protection placement, continuous garment UVs, cloth thickness and materials. Final resemblance, broad folds, silhouette and close-up finish remain open. Dense hair optimization and actual iPhone performance are unproven; old mobile memory numbers do not describe this preview.
+
+## Sources and licensing
+
+The original body/bike sources remain in `assets/blender/source/`. The MPFB-based head, skin and beard provenance is in `art/sources/authored-human/` and `art/sources/authored-beard/`; conflicting skin metadata remains restricted to the existing personal local trial. Curly hair is derived from Daniel Bystedt's Blender demo under CC-BY-SA (version unspecified in saved evidence): `art/sources/replacement-hair/provenance.json`. Preserve attribution and share-alike terms. No public distribution clearance is implied.
 
 ## Allowance
 
-Latest user authorization lowers the floor to2% and gives flexible art-first priorities. Account usage monitoring currently fails with Transport closed; last verified20% reading predates this push. Resume sustained work when a fresh reading is available.
+`openusage codex --force` provides fresh usage JSON even when the app usage tool is unavailable. Latest verified reading:17% weekly remaining, September17UTC. Stop sustained work at2%; do not mark the art complete merely because that floor is reached.

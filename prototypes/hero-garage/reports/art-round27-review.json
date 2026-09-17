@@ -1,0 +1,57 @@
+{
+  "round": 27,
+  "status": "provisional parent acceptance; final user visual approval outstanding",
+  "adopted": [
+    "Continuous source sweatshirt neckline reconstructed to remove doubled-back lip",
+    "Two-panel hood fitted to evaluated back; all six clips preserved",
+    "Bike clamp rotation and number-board mounts corrected"
+  ],
+  "held": [
+    "Footwear: intersecting reinforcement panels visible in close-up; refit required",
+    "Denim: new seat surface distribution differs substantially; alternative subdivision method under review"
+  ],
+  "visualReview": "Sequential decoded frames from timed WebKit orbit/clip recordings, full scene and portrait under neutral/garage lighting; no claim of human continuous playback. Detail screenshots examined.",
+  "verified": {
+    "hoodMotionSamples": 54,
+    "hoodShirtCrossings": 0,
+    "minimumHoodGapM": 0.00142189,
+    "headIdentity": "Saved head mesh descriptors and binary prefix unchanged",
+    "frozenGameShipGate": "Pass: 1038 replay ticks, 8.65-second clear, 92-tick crash, one-tick restart; not art integration"
+  },
+  "remaining": [
+    "Natural connected UV pattern and cloth thickness",
+    "Glove pad placement correction",
+    "Footwear panel refit",
+    "Denim smoothing without seat-regression",
+    "Cloth detail, source consolidation, export packaging, final user approval",
+    "Actual iPhone performance unverified"
+  ],
+  "assets": [
+    {
+      "id": "street01-rider",
+      "label": "Mustard rider with saved curly hair and beard",
+      "url": "/assets/street01-rider-tailored.glb",
+      "kind": "rider",
+      "position": [
+        0,
+        0.34,
+        0
+      ],
+      "mobileUrl": "/assets/street01-rider-tailored.glb",
+      "sha256": "d6122a389e38cf7ea209b00b386efe6f12a8d48357fef1f969345ccc90938bec"
+    },
+    {
+      "id": "street01-bike",
+      "label": "Blue/white trials bike",
+      "url": "/assets/street01-bike-detail.glb",
+      "kind": "bike",
+      "position": [
+        0,
+        0.34,
+        0
+      ],
+      "mobileUrl": "/assets/street01-bike-detail.glb",
+      "sha256": "dc70ee964be894777a344a8c343cdeec42e81dfd0f5fa5a2055c695037b96cf9"
+    }
+  ]
+}

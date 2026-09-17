@@ -1,0 +1,17 @@
+{
+  "method": "Dirichlet discrete harmonic annulus, positive uniform edge weights; fixed fitted neck and fixed outer cage",
+  "radiusM": 0.18,
+  "solvedVertices": 1906,
+  "iterations": 1577,
+  "lastIterationMaxDeltaM": 1.9996577726999476e-09,
+  "maximumInnerDihedralDegrees": 36.64189193470531,
+  "innerEdgesOver120Degrees": 0,
+  "neck80mmMaxDihedralDegrees": 36.64189193470531,
+  "neck80mmEdgesOver120Degrees": 0,
+  "maximumAdditionalMoveM": 0.08955312690700933,
+  "distalMaximumMoveM": 0.0,
+  "degenerateFaces": 0,
+  "nonmanifoldInteriorEdges": 0,
+  "boundaryEdges": 308,
+  "limitations": "No guarantee of whole-surface absence of intersections; parent must review motion and silhouette."
+}

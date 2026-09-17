@@ -10,8 +10,8 @@
     },
     {
       "path": "assets/catalog.json",
-      "bytes": 1184,
-      "sha256": "b70ef1c66422da0960cedf1c15b3244dc703de8e7809d6b85165ebe3a40611c8"
+      "bytes": 1180,
+      "sha256": "f972b00e9b6d594044b877aa39a43d08c32ec91b028a0beda907a8c040127753"
     },
     {
       "path": "assets/index-B2aW2QAt.css",
@@ -19,19 +19,19 @@
       "sha256": "31b47e3d688543a583df0c2b7da25f2c0a1817f9573aca01d3d584eabf8f4f88"
     },
     {
-      "path": "assets/index-BnIdGVnQ.js",
-      "bytes": 768943,
-      "sha256": "ef77df99e661d25a08103848de5772e6d7662a1230e332ab29d8200ced3efb12"
+      "path": "assets/index-CnZ-8Pri.js",
+      "bytes": 769788,
+      "sha256": "3573b4d70caec0891e49a2c8b2d458ba69896d041c7b4b7205371812dce3c0a8"
     },
     {
-      "path": "assets/street01-bike-refined.glb",
-      "bytes": 6057044,
-      "sha256": "5fac61e4fb12a2425bb3d3f519fe90d8047c593f99096da5fed71b595771b012"
+      "path": "assets/street01-bike-detail.glb",
+      "bytes": 6067796,
+      "sha256": "dc70ee964be894777a344a8c343cdeec42e81dfd0f5fa5a2055c695037b96cf9"
     },
     {
-      "path": "assets/street01-rider-collar-uv.glb",
-      "bytes": 175062870,
-      "sha256": "67302f649eff8f536e17f99c55c15c673503bf3ccdf8e64f97ca87ec41d69e3c"
+      "path": "assets/street01-rider-tailored.glb",
+      "bytes": 178374120,
+      "sha256": "d6122a389e38cf7ea209b00b386efe6f12a8d48357fef1f969345ccc90938bec"
     },
     {
       "path": "decoders/basis/basis_transcoder.js",
@@ -56,7 +56,7 @@
     {
       "path": "index.html",
       "bytes": 439,
-      "sha256": "8c160e9edc98599a1b51c2a9b44086213d12a94b85416c34ca0b5c4efe741ace"
+      "sha256": "3d4206a30fd00e2fe8e525d51322ed2d68e4ff493d9396d6656c15c363cb66bf"
     },
     {
       "path": "licenses/meshoptimizer.txt",
@@ -84,8 +84,8 @@
       "sha256": "94ea8650ded70666bd8d01012db5400100145750d8c917685702c0e1380df2f2"
     }
   ],
-  "totalBytes": 186815662,
-  "sourceDistBytes": 770981452,
+  "totalBytes": 190138505,
+  "sourceDistBytes": 1516672105,
   "excludedFiles": [
     {
       "path": "assets/basis_transcoder-VXdx5NbI.wasm",
@@ -104,8 +104,28 @@
       "bytes": 3645880
     },
     {
+      "path": "assets/street01-bike-refined.glb",
+      "bytes": 6057044
+    },
+    {
       "path": "assets/street01-bike.glb",
       "bytes": 1394072
+    },
+    {
+      "path": "assets/street01-denim-refined-v2.glb",
+      "bytes": 2716748
+    },
+    {
+      "path": "assets/street01-denim-refined.glb",
+      "bytes": 2836816
+    },
+    {
+      "path": "assets/street01-footwear-refined.glb",
+      "bytes": 1647864
+    },
+    {
+      "path": "assets/street01-gloves-refined.glb",
+      "bytes": 1318992
     },
     {
       "path": "assets/street01-head-authored.glb",
@@ -128,8 +148,24 @@
       "bytes": 2080396
     },
     {
+      "path": "assets/street01-hoodie-shell.glb",
+      "bytes": 4996712
+    },
+    {
+      "path": "assets/street01-rider-art27-denim2.glb",
+      "bytes": 182533992
+    },
+    {
+      "path": "assets/street01-rider-art27.glb",
+      "bytes": 182656512
+    },
+    {
       "path": "assets/street01-rider-cloth.glb",
       "bytes": 2578868
+    },
+    {
+      "path": "assets/street01-rider-collar-uv.glb",
+      "bytes": 175062870
     },
     {
       "path": "assets/street01-rider-data-maps.glb",
@@ -138,6 +174,10 @@
     {
       "path": "assets/street01-rider-garment-repair.glb",
       "bytes": 2760380
+    },
+    {
+      "path": "assets/street01-rider-hoodie-refine-body.glb",
+      "bytes": 2806472
     },
     {
       "path": "assets/street01-rider-hoodie-refine.glb",
@@ -168,15 +208,19 @@
       "bytes": 2740448
     },
     {
+      "path": "assets/street01-rider-tailored-footwear.glb",
+      "bytes": 179733788
+    },
+    {
       "path": "assets/street01-rider.glb",
       "bytes": 1476800
     }
   ],
   "verifiedLocalUrls": [
     "assets/index-B2aW2QAt.css",
-    "assets/index-BnIdGVnQ.js",
-    "assets/street01-bike-refined.glb",
-    "assets/street01-rider-collar-uv.glb",
+    "assets/index-CnZ-8Pri.js",
+    "assets/street01-bike-detail.glb",
+    "assets/street01-rider-tailored.glb",
     "index.html",
     "references/target01.png",
     "references/turnaround.png"

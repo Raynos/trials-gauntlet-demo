@@ -1,0 +1,47 @@
+{
+  "sourceSHA256": "5b5effde064171323313198d4eceafb89b2d0128ddd19d30ab873ef1022adf01",
+  "changedSweatshirtVertices": 2054,
+  "neckBoundaryVertices": 148,
+  "sourceControlCageTopologyRetained": true,
+  "evaluatedSubdivisionLevels": 1,
+  "hoodConstruction": {
+    "vertices": 960,
+    "quads": 912,
+    "supportGapM": 0.0015,
+    "clothThicknessM": 0.0018,
+    "method": "Two cloth panels, rolled mouth, tapered crown, supported on evaluated back"
+  },
+  "annulusRepair": {
+    "method": "Dirichlet discrete harmonic annulus, positive uniform edge weights; fixed fitted neck and fixed outer cage",
+    "radiusM": 0.18,
+    "solvedVertices": 1906,
+    "iterations": 1577,
+    "lastIterationMaxDeltaM": 1.9996577726999476e-09,
+    "maximumInnerDihedralDegrees": 36.64189193470531,
+    "innerEdgesOver120Degrees": 0,
+    "neck80mmMaxDihedralDegrees": 36.64189193470531,
+    "neck80mmEdgesOver120Degrees": 0,
+    "maximumAdditionalMoveM": 0.08955312690700933,
+    "distalMaximumMoveM": 0.0,
+    "degenerateFaces": 0,
+    "nonmanifoldInteriorEdges": 0,
+    "boundaryEdges": 308,
+    "limitations": "No guarantee of whole-surface absence of intersections; parent must review motion and silhouette."
+  },
+  "distalClothOutsideGeodesic18cmUnchanged": true,
+  "fittedNeckCenter": [
+    0.828000009059906,
+    0.0,
+    1.246999979019165
+  ],
+  "neckRadii": [
+    0.076,
+    0.059
+  ],
+  "textures": {
+    "normal": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-shell/textures/hoodie_normal.png",
+    "orm": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-shell/textures/hoodie_orm.png",
+    "albedo": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/prototypes/hero-garage/art/hoodie-shell/textures/hoodie_albedo.jpg"
+  },
+  "status": "candidate; parent visual and rig review required"
+}

@@ -1,0 +1,1579 @@
+{
+  "source": "public/assets/street01-rider-tailored-footwear.glb",
+  "sourceSHA256": "90467a61f4c5167a94bd3b23d0ff250a3d4211e2968bf3d12101042b2a56c3d5",
+  "sampling": "Nine evenly spaced times including endpoints in each of six actual assembled GLB actions; imported at30fps. NLA tracks muted; one imported action selected at a time.",
+  "diagnosticStripping": "Only mesh references outside sweatshirt/pocket/hood and materials/textures removed for import. Accessor bytes, rig, inverse binds and all animation data unchanged.",
+  "clips": [
+    {
+      "clip": "compression",
+      "frameRange": [
+        0.0,
+        149.0
+      ],
+      "samples": [
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814980506897
+            ],
+            [
+              0.9015367031097412,
+              0.3787919878959656,
+              1.269433617591858
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422013039700687,
+          "hoodMinimumSignedDistanceM": 0.0014220130004972322,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.0408396834848037e-07,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.28301680088043213,
+              -0.376200407743454,
+              0.7135292887687683
+            ],
+            [
+              0.9041040539741516,
+              0.3761969208717346,
+              1.298454761505127
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014219186268746853,
+          "hoodMinimumSignedDistanceM": 0.0014219055421902382,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.9896625615391847e-07,
+          "minimumHoodTriangleArea": 5.2443387051231996e-08,
+          "nonfiniteVertices": 0,
+          "frame": 18.625
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.29008492827415466,
+              -0.37517353892326355,
+              0.7251208424568176
+            ],
+            [
+              0.9037129282951355,
+              0.37517043948173523,
+              1.2720892429351807
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220813754945993,
+          "hoodMinimumSignedDistanceM": 0.0014220681039640581,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.506922663516814e-07,
+          "minimumHoodTriangleArea": 5.233071807858592e-08,
+          "nonfiniteVertices": 0,
+          "frame": 37.25
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24057379364967346,
+              -0.3841038942337036,
+              0.6509419083595276
+            ],
+            [
+              0.8961589336395264,
+              0.38409724831581116,
+              1.1506004333496094
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422119210474193,
+          "hoodMinimumSignedDistanceM": 0.0014221190302428112,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.6425363167951643e-07,
+          "minimumHoodTriangleArea": 5.2354922104422006e-08,
+          "nonfiniteVertices": 0,
+          "frame": 55.875
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24057379364967346,
+              -0.3841038942337036,
+              0.6509419083595276
+            ],
+            [
+              0.8961589336395264,
+              0.38409724831581116,
+              1.1506004333496094
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422119210474193,
+          "hoodMinimumSignedDistanceM": 0.0014221190302428112,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.6425363167951643e-07,
+          "minimumHoodTriangleArea": 5.2354922104422006e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.5
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.27985140681266785,
+              -0.3761967718601227,
+              0.7097639441490173
+            ],
+            [
+              0.9022642374038696,
+              0.37619277834892273,
+              1.2478646039962769
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220650773495436,
+          "hoodMinimumSignedDistanceM": 0.0014220650078499205,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.590742079048414e-07,
+          "minimumHoodTriangleArea": 5.239683889375811e-08,
+          "nonfiniteVertices": 0,
+          "frame": 93.125
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.29319339990615845,
+              -0.3751313090324402,
+              0.7293018698692322
+            ],
+            [
+              0.9049062132835388,
+              0.37512725591659546,
+              1.3020975589752197
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220819575712085,
+          "hoodMinimumSignedDistanceM": 0.0014220687696369083,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.399370486033169e-07,
+          "minimumHoodTriangleArea": 5.22932130564114e-08,
+          "nonfiniteVertices": 0,
+          "frame": 111.75
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24397683143615723,
+              -0.3787873089313507,
+              0.6519995927810669
+            ],
+            [
+              0.9016518592834473,
+              0.3787843883037567,
+              1.2718265056610107
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014219869626685977,
+          "hoodMinimumSignedDistanceM": 0.0014219868705402216,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.0417954134325925e-07,
+          "minimumHoodTriangleArea": 5.2371382966013504e-08,
+          "nonfiniteVertices": 0,
+          "frame": 130.375
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814980506897
+            ],
+            [
+              0.9015367031097412,
+              0.3787919878959656,
+              1.269433617591858
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422013039700687,
+          "hoodMinimumSignedDistanceM": 0.0014220130004972322,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.0408396834848037e-07,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 149.0
+        }
+      ]
+    },
+    {
+      "clip": "extension",
+      "frameRange": [
+        0.0,
+        149.0
+      ],
+      "samples": [
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814980506897
+            ],
+            [
+              0.9015367031097412,
+              0.3787919878959656,
+              1.269433617591858
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422013039700687,
+          "hoodMinimumSignedDistanceM": 0.0014220130004972322,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.0408396834848037e-07,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.28301680088043213,
+              -0.376200407743454,
+              0.7135292887687683
+            ],
+            [
+              0.9041040539741516,
+              0.3761969208717346,
+              1.298454761505127
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014219186268746853,
+          "hoodMinimumSignedDistanceM": 0.0014219055421902382,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.9896625615391847e-07,
+          "minimumHoodTriangleArea": 5.2443387051231996e-08,
+          "nonfiniteVertices": 0,
+          "frame": 18.625
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.31463712453842163,
+              -0.3727702498435974,
+              0.7668604254722595
+            ],
+            [
+              0.9075177907943726,
+              0.37276357412338257,
+              1.3313615322113037
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221222372725606,
+          "hoodMinimumSignedDistanceM": 0.001422122280219434,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.1516605785739205e-07,
+          "minimumHoodTriangleArea": 5.2291489238616085e-08,
+          "nonfiniteVertices": 0,
+          "frame": 37.25
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.35565102100372314,
+              -0.36521443724632263,
+              0.8149809837341309
+            ],
+            [
+              0.9156908988952637,
+              0.3651851415634155,
+              1.4331609010696411
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222034951671958,
+          "hoodMinimumSignedDistanceM": 0.001422203404009996,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.829023129282022e-07,
+          "minimumHoodTriangleArea": 5.2342251935211556e-08,
+          "nonfiniteVertices": 0,
+          "frame": 55.875
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.35565102100372314,
+              -0.36521443724632263,
+              0.8149809837341309
+            ],
+            [
+              0.9156908988952637,
+              0.3651851415634155,
+              1.4331609010696411
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014222034951671958,
+          "hoodMinimumSignedDistanceM": 0.001422203404009996,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.829023129282022e-07,
+          "minimumHoodTriangleArea": 5.2342251935211556e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.5
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.3278946280479431,
+              -0.3710252344608307,
+              0.7929546236991882
+            ],
+            [
+              0.9095439910888672,
+              0.37101519107818604,
+              1.3647762537002563
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001421988825313747,
+          "hoodMinimumSignedDistanceM": 0.001421988690609533,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.042248692505139e-07,
+          "minimumHoodTriangleArea": 5.2372049398515753e-08,
+          "nonfiniteVertices": 0,
+          "frame": 93.125
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.2950621247291565,
+              -0.3749266564846039,
+              0.7321918606758118
+            ],
+            [
+              0.9050583839416504,
+              0.374922513961792,
+              1.3026429414749146
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220777666196227,
+          "hoodMinimumSignedDistanceM": 0.0014220777873673023,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.0512718163531614e-07,
+          "minimumHoodTriangleArea": 5.239717365538493e-08,
+          "nonfiniteVertices": 0,
+          "frame": 111.75
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24413660168647766,
+              -0.37878623604774475,
+              0.6522551774978638
+            ],
+            [
+              0.9016599655151367,
+              0.37878286838531494,
+              1.2719831466674805
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422095694579184,
+          "hoodMinimumSignedDistanceM": 0.0014220825172812646,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.042425319124974e-07,
+          "minimumHoodTriangleArea": 5.240175297499639e-08,
+          "nonfiniteVertices": 0,
+          "frame": 130.375
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814980506897
+            ],
+            [
+              0.9015367031097412,
+              0.3787919878959656,
+              1.269433617591858
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422013039700687,
+          "hoodMinimumSignedDistanceM": 0.0014220130004972322,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.0408396834848037e-07,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 149.0
+        }
+      ]
+    },
+    {
+      "clip": "forward_attack",
+      "frameRange": [
+        0.0,
+        119.0
+      ],
+      "samples": [
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.2822321057319641,
+              -0.3791882395744324,
+              0.6686511039733887
+            ],
+            [
+              0.9017980098724365,
+              0.3791843354701996,
+              1.2676435708999634
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221873134374619,
+          "hoodMinimumSignedDistanceM": 0.0014221874353146403,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 9.999542464295217e-08,
+          "minimumHoodTriangleArea": 5.2220864743058844e-08,
+          "nonfiniteVertices": 0,
+          "frame": 14.875
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.3550800085067749,
+              -0.3674592971801758,
+              0.7083526849746704
+            ],
+            [
+              0.9613614082336426,
+              0.3674241304397583,
+              1.2419521808624268
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014219451695680618,
+          "hoodMinimumSignedDistanceM": 0.0014219452174230804,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.185095291895514e-07,
+          "minimumHoodTriangleArea": 5.236172002152787e-08,
+          "nonfiniteVertices": 0,
+          "frame": 29.75
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.37883588671684265,
+              -0.3615695834159851,
+              0.7222998142242432
+            ],
+            [
+              1.002895474433899,
+              0.3615199327468872,
+              1.228834629058838
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014218974392861128,
+          "hoodMinimumSignedDistanceM": 0.0014218974453642777,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.0600344620787608e-07,
+          "minimumHoodTriangleArea": 5.238356945330365e-08,
+          "nonfiniteVertices": 0,
+          "frame": 44.625
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.37870079278945923,
+              -0.3616030216217041,
+              0.722218930721283
+            ],
+            [
+              1.0026702880859375,
+              0.36155372858047485,
+              1.228914499282837
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220463344827294,
+          "hoodMinimumSignedDistanceM": 0.0014220464477469573,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.0737349637739596e-07,
+          "minimumHoodTriangleArea": 5.2424610641317724e-08,
+          "nonfiniteVertices": 0,
+          "frame": 59.5
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.33140429854393005,
+              -0.3725737929344177,
+              0.694969654083252
+            ],
+            [
+              0.9160472750663757,
+              0.3725672662258148,
+              1.252935767173767
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220128068700433,
+          "hoodMinimumSignedDistanceM": 0.0014219997376518911,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 9.807318462502566e-08,
+          "minimumHoodTriangleArea": 5.243560008684292e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.375
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.2608160376548767,
+              -0.3797456920146942,
+              0.6577256321907043
+            ],
+            [
+              0.9014529585838318,
+              0.3797416687011719,
+              1.269925594329834
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221095480024815,
+          "hoodMinimumSignedDistanceM": 0.001422096363735026,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040973914884921e-07,
+          "minimumHoodTriangleArea": 5.23220511359981e-08,
+          "nonfiniteVertices": 0,
+          "frame": 89.25
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 104.125
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 119.0
+        }
+      ]
+    },
+    {
+      "clip": "hang_back",
+      "frameRange": [
+        0.0,
+        119.0
+      ],
+      "samples": [
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.17357125878334045,
+              -0.37516385316848755,
+              0.6451783776283264
+            ],
+            [
+              0.9022719264030457,
+              0.3751595616340637,
+              1.265219807624817
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221052406355739,
+          "hoodMinimumSignedDistanceM": 0.0014221052604894459,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.3445569477932446e-07,
+          "minimumHoodTriangleArea": 5.230889507327956e-08,
+          "nonfiniteVertices": 0,
+          "frame": 14.875
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.05948686599731445,
+              -0.3604353964328766,
+              0.6400101780891418
+            ],
+            [
+              0.9078343510627747,
+              0.3603665828704834,
+              1.2578561305999756
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220710145309567,
+          "hoodMinimumSignedDistanceM": 0.0014220579288033441,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.7610926817781333e-07,
+          "minimumHoodTriangleArea": 5.2316345517260956e-08,
+          "nonfiniteVertices": 0,
+          "frame": 29.75
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.044310182332992554,
+              -0.3604564368724823,
+              0.624424159526825
+            ],
+            [
+              0.907399594783783,
+              0.3603854477405548,
+              1.2415446043014526
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220207231119275,
+          "hoodMinimumSignedDistanceM": 0.0014220207428222442,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.299007896895711e-07,
+          "minimumHoodTriangleArea": 5.248326410531373e-08,
+          "nonfiniteVertices": 0,
+          "frame": 44.625
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.0443863570690155,
+              -0.3604561984539032,
+              0.6245124340057373
+            ],
+            [
+              0.9074026942253113,
+              0.360385000705719,
+              1.241636872291565
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014218908036127687,
+          "hoodMinimumSignedDistanceM": 0.0014218907651003358,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.3033650332072654e-07,
+          "minimumHoodTriangleArea": 5.219999978775785e-08,
+          "nonfiniteVertices": 0,
+          "frame": 59.5
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.09551471471786499,
+              -0.3656354248523712,
+              0.6417446136474609
+            ],
+            [
+              0.904964804649353,
+              0.365595281124115,
+              1.2603081464767456
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014219890581443906,
+          "hoodMinimumSignedDistanceM": 0.0014219890184175576,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.5178549011291149e-07,
+          "minimumHoodTriangleArea": 5.229018692855193e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.375
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.20901533961296082,
+              -0.37753501534461975,
+              0.6467417478561401
+            ],
+            [
+              0.9017353057861328,
+              0.37753069400787354,
+              1.2674229145050049
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221345772966743,
+          "hoodMinimumSignedDistanceM": 0.0014221347104073374,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.6950831452848467e-07,
+          "minimumHoodTriangleArea": 5.22707450660793e-08,
+          "nonfiniteVertices": 0,
+          "frame": 89.25
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 104.125
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 119.0
+        }
+      ]
+    },
+    {
+      "clip": "landing_absorption",
+      "frameRange": [
+        0.0,
+        149.0
+      ],
+      "samples": [
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814980506897
+            ],
+            [
+              0.9015367031097412,
+              0.3787919878959656,
+              1.269433617591858
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422013039700687,
+          "hoodMinimumSignedDistanceM": 0.0014220130004972322,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.0408396834848037e-07,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.28301680088043213,
+              -0.376200407743454,
+              0.7135292887687683
+            ],
+            [
+              0.9041040539741516,
+              0.3761969208717346,
+              1.298454761505127
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014219186268746853,
+          "hoodMinimumSignedDistanceM": 0.0014219055421902382,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.9896625615391847e-07,
+          "minimumHoodTriangleArea": 5.2443387051231996e-08,
+          "nonfiniteVertices": 0,
+          "frame": 18.625
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.31952017545700073,
+              -0.3721923828125,
+              0.7764760851860046
+            ],
+            [
+              0.9083149433135986,
+              0.37218213081359863,
+              1.3437249660491943
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422077533788979,
+          "hoodMinimumSignedDistanceM": 0.00142206429023517,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.1602876503684525e-07,
+          "minimumHoodTriangleArea": 5.252640323071958e-08,
+          "nonfiniteVertices": 0,
+          "frame": 37.25
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.30742084980010986,
+              -0.37234437465667725,
+              0.777866542339325
+            ],
+            [
+              0.9081687331199646,
+              0.3723343312740326,
+              1.344048023223877
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221086166799068,
+          "hoodMinimumSignedDistanceM": 0.001422095466680151,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 2.6812307665297736e-07,
+          "minimumHoodTriangleArea": 5.24563543861784e-08,
+          "nonfiniteVertices": 0,
+          "frame": 55.875
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.21542605757713318,
+              -0.3876473307609558,
+              0.6451414823532104
+            ],
+            [
+              0.8955330848693848,
+              0.3876416087150574,
+              1.164047360420227
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220156008377671,
+          "hoodMinimumSignedDistanceM": 0.0014220156054559046,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 1.0477006570253297e-07,
+          "minimumHoodTriangleArea": 5.233237272573367e-08,
+          "nonfiniteVertices": 0,
+          "frame": 74.5
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24719777703285217,
+              -0.3806910514831543,
+              0.6812851428985596
+            ],
+            [
+              0.8994885087013245,
+              0.3806876540184021,
+              1.215335488319397
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001421928871423006,
+          "hoodMinimumSignedDistanceM": 0.001421928973081292,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 9.661798668964377e-08,
+          "minimumHoodTriangleArea": 5.243317362264951e-08,
+          "nonfiniteVertices": 0,
+          "frame": 93.125
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.30041569471359253,
+              -0.3743384778499603,
+              0.7404631972312927
+            ],
+            [
+              0.9054871797561646,
+              0.3743337392807007,
+              1.30400550365448
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014221055898815393,
+          "hoodMinimumSignedDistanceM": 0.0014221056403132416,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.92997940763557e-08,
+          "minimumHoodTriangleArea": 5.244078612179335e-08,
+          "nonfiniteVertices": 0,
+          "frame": 111.75
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.2447252869606018,
+              -0.3787808418273926,
+              0.6531966924667358
+            ],
+            [
+              0.9016901254653931,
+              0.3787774443626404,
+              1.272557258605957
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220508746802807,
+          "hoodMinimumSignedDistanceM": 0.0014220510113899885,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.0411695829567636e-07,
+          "minimumHoodTriangleArea": 5.232236932874632e-08,
+          "nonfiniteVertices": 0,
+          "frame": 130.375
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159562587738037,
+              -0.37879520654678345,
+              0.6481814980506897
+            ],
+            [
+              0.9015367031097412,
+              0.3787919878959656,
+              1.269433617591858
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.001422013039700687,
+          "hoodMinimumSignedDistanceM": 0.0014220130004972322,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.0408396834848037e-07,
+          "minimumHoodTriangleArea": 5.240350638558667e-08,
+          "nonfiniteVertices": 0,
+          "frame": 149.0
+        }
+      ]
+    },
+    {
+      "clip": "sit_cruise",
+      "frameRange": [
+        0.0,
+        59.0
+      ],
+      "samples": [
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 0.0
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 7.375
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 14.75
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 22.125
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 29.5
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 36.875
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 44.25
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 51.625
+        },
+        {
+          "shirtWorldBounds": [
+            [
+              0.24159565567970276,
+              -0.3787956237792969,
+              0.6481816172599792
+            ],
+            [
+              0.9015370011329651,
+              0.3787917196750641,
+              1.269433856010437
+            ]
+          ],
+          "shirtTriangles": 65512,
+          "hoodTriangles": 1916,
+          "broadphasePairs": 0,
+          "actualTriangleCrossings": 0,
+          "firstCrossingPairs": [],
+          "hoodMinimumDistanceM": 0.0014220204902812839,
+          "hoodMinimumSignedDistanceM": 0.0014220072543484896,
+          "hoodVerticesInsideLocalNormal": 0,
+          "shirtDegenerateTriangles": 0,
+          "hoodDegenerateTriangles": 0,
+          "minimumShirtTriangleArea": 3.040614465594126e-07,
+          "minimumHoodTriangleArea": 5.250922783286999e-08,
+          "nonfiniteVertices": 0,
+          "frame": 59.0
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Triangle edge intersection counts exclude coplanar/tangent/shared-edge special cases; zero counts would not prove no containment.",
+    "Signed distance is nearest surface normal side, not watertight signed volume.",
+    "No rendered appearance/normal-map/seam-color judgment here. Source topology verifier separately covers closed boundary loops; this motion audit measures triangles and proximity."
+  ]
+}

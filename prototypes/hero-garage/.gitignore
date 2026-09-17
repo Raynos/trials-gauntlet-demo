@@ -28,3 +28,7 @@ public/assets/street01-rider-collar-uv.glb
 
 # Unadopted dense hoodie transition study, reproducible from scripts.
 public/assets/street01-rider-hoodie-refine.glb
+
+# Dense reproducible art assemblies; retained locally with build recipes.
+public/assets/street01-rider-tailored*.glb
+public/assets/street01-rider-art27*.glb

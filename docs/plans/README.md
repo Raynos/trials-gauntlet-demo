@@ -119,3 +119,9 @@ Pillar H is now Astra's; `main`'s render owner is the perf owner (PERF-BACKLOG.m
 | 09-15 | MENU pill over the medal totals | header inset | `8efc682` |
 | 09-15 | Astra's `blender-work` hero merged on main's terms (merge #3: main's physics/perf/menu, the branch's hero/assets/garage/outfits; 781/781, hero-webkit PASS, e2e 399/399); critic 0/6 → the `riderBody` export is the blocker | physics R7 | `bdba62d` |
 | 09-14 | taps on invisible buttons navigate (results Menu under the gas thumb) | the `.live` invariant, 5184-tap grid | `18df821` |
+
+## Art round 27 — source garment repair and bike connections
+
+Provisional parent acceptance: the original continuous sweatshirt now has a reconstructed neckline without the doubled-back lip, and a fitted two-panel hood. Saved face, curls, beard and all six clips are unchanged. Bike triple clamps and number-board mounts are corrected. The hoodie clears its body surface across 54 sampled poses (minimum 1.42 mm); this does not prove all cloth intersections absent. [Review](../../prototypes/hero-garage/reports/art-round27-review.json) and [recorded six-clip review](../../prototypes/hero-garage/captures/art-round27-adopted/six-clips.webm).
+
+Footwear and denim candidates are held after close-up and saddle-surface checks exposed defects; prior shoes and jeans remain active. Frozen game ship gate passes, without game integration changes. The openusage CLI restores fresh usage monitoring: 17% remaining on September 17 UTC; hard floor remains 2%. Work continues on garment construction, gloves, shoes, jeans and delivery. Final art approval remains with the user.

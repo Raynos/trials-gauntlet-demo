@@ -86,6 +86,8 @@ let catalog: Catalog | null = null;
 let ready=false, error:string|null=null, selectedCamera:CameraName='face', lighting:LightingName='garage';
 let activeClip:string|null=null, duration=0, time=0, playing=false, orbitAngle=0;
 let presetOffset = new THREE.Vector3(1,.2,3);
+let portraitHead:THREE.Object3D|null=null;
+const portraitLast=new THREE.Vector3(),portraitNow=new THREE.Vector3(),portraitDelta=new THREE.Vector3();
 let loadMilliseconds=0;
 let grounding: {coarseMinY:number;preciseMinY:number;assemblyOffsetY:number;finalMinY:number}|null=null;
 const captureMode=new URLSearchParams(location.search).has('capture');
@@ -112,13 +114,18 @@ function visibleBounds(name:CameraName){
   const roots=loaded.filter(item=>name==='bike'?item.asset.kind==='bike':name==='face'?item.asset.kind==='head':true);
   const box=new THREE.Box3(); for(const item of roots.length?roots:loaded)box.expandByObject(item.root);
   if(box.isEmpty())box.set(new THREE.Vector3(-.5,0,-.5),new THREE.Vector3(.5,1.8,.5));
-  // For a full rider without a separate head, inspect the uppermost 22% of its bounds.
-  if(name==='face'&&!loaded.some(item=>item.asset.kind==='head')){const height=box.max.y-box.min.y;box.min.y=box.max.y-height*.22;const c=box.getCenter(new THREE.Vector3());box.min.x=c.x-height*.13;box.max.x=c.x+height*.13;box.min.z=c.z-height*.13;box.max.z=c.z+height*.13;}
+  // Frame the animated head joint, rather than the full scene's static bounds.
+  if(name==='face'&&portraitHead){
+    const center=portraitHead.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.07,0));
+    box.setFromCenterAndSize(center,new THREE.Vector3(.52,.56,.52));
+  }
   return box;
 }
 function setCamera(name:CameraName){
   if(!['face','full','bike','reference'].includes(name))throw new Error(`Unknown camera: ${name}`);
   selectedCamera=name;orbitAngle=0;
+  portraitHead=name==='face'?(loaded.find(item=>item.asset.kind==='rider')?.root.getObjectByName('head')??null):null;
+  if(portraitHead)portraitHead.getWorldPosition(portraitLast);
   const box=visibleBounds(name), center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
   const verticalFov=THREE.MathUtils.degToRad(camera.fov),horizontalFov=2*Math.atan(Math.tan(verticalFov/2)*camera.aspect);
   const distance=Math.max(size.y/(2*Math.tan(verticalFov/2)),Math.max(size.x,size.z)/(2*Math.tan(horizontalFov/2)))*1.35+size.z*.4;
@@ -128,6 +135,20 @@ function setCamera(name:CameraName){
   $('#camera-label').textContent={face:'Face study',full:'Full rider + bike',bike:'Bike study',reference:'Reference comparison'}[name];
   document.querySelectorAll<HTMLButtonElement>('[data-camera]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.camera===name)));
   render();
+}
+// Capture-only detail framing; production garage controls are unchanged.
+function setDetail(part:'footwear'|'hands'|'hoodie'){
+  const rider=loaded.find(item=>item.asset.kind==='rider');if(!rider)throw new Error('No rider loaded');
+  const names=part==='footwear'?['footL','footR']:part==='hands'?['handL','handR']:['chest'];
+  const points=names.map(name=>{const node=rider.root.getObjectByName(name);if(!node)throw new Error(`Missing ${name}`);return node.getWorldPosition(new THREE.Vector3());});
+  const center=points.reduce((a,p)=>a.add(p),new THREE.Vector3()).multiplyScalar(1/points.length);
+  if(part==='footwear')center.add(new THREE.Vector3(.07,.015,0));
+  if(part==='hands')center.add(new THREE.Vector3(.025,-.025,0));
+  if(part==='hoodie')center.add(new THREE.Vector3(.08,.10,0));
+  portraitHead=null;orbitAngle=0;controls.target.copy(center);
+  const distance=part==='hoodie'?1.2:part==='hands'?.95:.85;
+  presetOffset=new THREE.Vector3(1,.48,3).normalize().multiplyScalar(distance);
+  camera.position.copy(center).add(presetOffset);controls.update();render();
 }
 function setComparison(value:boolean){
   comparison=value;viewport.classList.toggle('comparing',value);
@@ -148,6 +169,8 @@ function updateTime(seconds:number){
   time=duration>0?((seconds%duration)+duration)%duration:Math.max(seconds,0);
   for(const item of loaded)item.mixer.setTime(time);
   suspension?.setAmount(suspensionEnvelope(activeClip,time));
+  // Keep the same portrait framing while the authored head moves through a clip.
+  if(portraitHead){portraitHead.getWorldPosition(portraitNow);portraitDelta.subVectors(portraitNow,portraitLast);controls.target.add(portraitDelta);camera.position.add(portraitDelta);portraitLast.copy(portraitNow);}
   $<HTMLInputElement>('#timeline').value=String(time);
   $('#time').textContent=duration?`${time.toFixed(2)} / ${duration.toFixed(2)} s`:'No motion loaded';
 }
@@ -181,7 +204,7 @@ function diagnostics(){
   const sizes=renderer.getDrawingBufferSize(new THREE.Vector2());const sorted=[...frameTimes].sort((a,b)=>a-b);
   return {ready,error,quality,textureStorage:textureStorage(),suspension:suspension?.getDiagnostics()??null,qualitySelection:requestedQuality==='desktop'||requestedQuality==='mobile'?'query':'pointer capability',grounding,shadow:{target:key.target.position.toArray(),normalBias:key.shadow.normalBias,bias:key.shadow.bias,near:key.shadow.camera.near,far:key.shadow.camera.far,width:key.shadow.camera.right-key.shadow.camera.left,mapSize:key.shadow.mapSize.toArray()},comparison: {enabled:comparison,mode:catalog?.assets.some(asset=>asset.kind==='rider')?'whole-scene':'head',headFrame,sourceCropUnmodified:true},stage:catalog?.stage??null,assets:loaded.map(item=>({id:item.asset.id,url:item.asset.url,kind:item.asset.kind,clips:item.clips.map(c=>({name:c.name,duration:c.duration}))})),camera:selectedCamera,lighting,time,duration,activeClip,playing,orbitAngle,cameraPosition:camera.position.toArray(),cameraTarget:controls.target.toArray(),render:{triangles:renderer.info.render.triangles,calls:renderer.info.render.calls,width:sizes.x,height:sizes.y,dpr:renderer.getPixelRatio()},memory:{geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,note:'Object counts, not GPU byte residency'},loadMilliseconds,targetFps,frameSamples:frameTimes.length,p95FrameMilliseconds:sorted.length?sorted[Math.floor((sorted.length-1)*.95)]:null,captureMode};
 }
-const api={get ready(){return ready;},get error(){return error;},setCamera,setComparison,setLighting,setTime,setOrbit,setFrame,setClip,setPlaying,getDiagnostics:diagnostics,get state(){return diagnostics();}};
+const api={setDetail,get ready(){return ready;},get error(){return error;},setCamera,setComparison,setLighting,setTime,setOrbit,setFrame,setClip,setPlaying,getDiagnostics:diagnostics,get state(){return diagnostics();}};
 Object.assign(window,{__garage:api,__heroGarage:api});
 $('#cameras').addEventListener('click',event=>{const button=(event.target as HTMLElement).closest<HTMLButtonElement>('[data-camera]');if(button)setCamera(button.dataset.camera as CameraName);});
 $('#lights').addEventListener('click',event=>{const button=(event.target as HTMLElement).closest<HTMLButtonElement>('[data-light]');if(button)setLighting(button.dataset.light as LightingName);});

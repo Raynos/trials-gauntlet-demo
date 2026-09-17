@@ -308,3 +308,9 @@ User authorizes flexible use of remaining allowance to a hard 2% floor. Two roug
 ### Round26 — bike finish adopted; collar method rejected
 
 Adopted the blue front fender and satin engine-edge materials. Geometry/attachments remain unchanged and suspension/contact verification passes. Six-strip collar candidates with continuous UVs and closed front strip seam passed contact checks but failed appearance review; retain the round25 rider. Next clothing work must rebuild the joined shoulder/hoodie surface. `reports/art-round26-review.json` records evidence and `art/ART_HANDOFF.md` identifies active assets, recipes and limitations. Repeated usage-monitor calls fail with Transport closed; current allowance is unknown, so no extended unattended run is justified against the hard2% floor.
+
+## Art round 27 — source garment repair and bike connections
+
+Provisional parent acceptance: the original continuous sweatshirt now has a reconstructed neckline without the doubled-back lip, and a fitted two-panel hood. Saved face, curls, beard and all six clips are unchanged. Bike triple clamps and number-board mounts are corrected. The hoodie clears its body surface across 54 sampled poses (minimum 1.42 mm); this does not prove all cloth intersections absent. [Review](../../prototypes/hero-garage/reports/art-round27-review.json) and [recorded six-clip review](../../prototypes/hero-garage/captures/art-round27-adopted/six-clips.webm).
+
+Footwear and denim candidates are held after close-up and saddle-surface checks exposed defects; prior shoes and jeans remain active. Frozen game ship gate passes, without game integration changes. The openusage CLI restores fresh usage monitoring: 17% remaining on September 17 UTC; hard floor remains 2%. Work continues on garment construction, gloves, shoes, jeans and delivery. Final art approval remains with the user.
