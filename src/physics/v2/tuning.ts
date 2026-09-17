@@ -124,6 +124,20 @@ export interface TuningV2 {
      * (`debug().engine.assist`), linear, the same on the ground and in the air (in the air the front is topped out
      * and the trim bounds the throttle's nose-up). `gain` 0 = raw (the Pro).
      */
+    /**
+     * R10 reverse (ask 35; physics.md "Reverse"): Trials-style creep backwards. The brake held from (near) a
+     * standstill with no throttle is reverse: after `engageS` of the gate holding (the applied brake > 0, throttle
+     * 0, the rear wheel on the ground, the chassis' forward speed under `engageV`, the run not finished) the rear wheel is driven backwards by a speed governor - `gain` N per m/s of
+     * error toward a target that ramps 0 -> -`vmax` over `rampS`, capped at +-`F` N at the rim (the same cap holds
+     * the creep against a backward over-run) - and both calipers fade out with the same ramp (a locked front
+     * cannot roll back). Throttle > 0 clears it at once; releasing the brake ramps the target back to 0 over
+     * `rampS` (the governor stops the roll). Brake while moving forward is the brake, unchanged: the gate is
+     * speed-gated, so a stop from speed is a stop, and only a hold past `engageS` after it is reverse. `engageS`
+     * makes a tap a brake (the bot's 15-tick plan quantum, 0.125 s, is under it). The calipers come back as the
+     * bike rolls back faster than the target, fully at 2 x `vmax`: downhill the brake is the reverse speed limiter.
+     * One F slot (`reverseT`).
+     */
+    reverse: { vmax: number; engageV: number; engageS: number; rampS: number; F: number; gain: number };
     wheelieControl: { gain: number; rate0: number; rate1: number; topOut: number; /** Loop margin: the live combined COM ahead of the rear axle (m); the trim ramps 0 -> 1 from `margin1` down to `margin0` (the slow drift past the balance the rate term cannot see). */ margin0: number; margin1: number; /** The assist fades with the lean: full at lean >= -leanFull (back) / <= leanFwdFull (forward), off at lean <= -leanOff / >= leanFwdOff — leaning away from neutral is the rider taking over (the wheelie at -0.5..-1; the climb throw and hop snap at +1). Forward fades later: a rider a little forward on a ramp (+0.4) is still assisted. */ leanFull: number; leanOff: number; leanFwdFull: number; leanFwdOff: number; /** R6: trim multiplier with both wheels off the ground (Rookie 1: the assist bounds the throttle nose-up in the air; Pro 0: the air is raw). */ airGain: number };
   };
   brakes: {
@@ -300,6 +314,10 @@ const ROOKIE: TuningV2 = {
     gear: 17.8,
     clutchRpm: 3500,
     clutchSpeed: 7,
+    // R10 reverse: a walking-pace creep (Trials HD / Fusion back up at ~2-3 m/s). 450 N at the rim is 0.31 g on the
+    // 148 kg Rookie - a gentle ramp that also holds the creep on a ~18 deg backward slope; engage after 0.2 s
+    // (a tap is a brake), ramp 0.6 s; steeper than that the calipers come back and cap the roll near 2 x vmax.
+    reverse: { vmax: 2.5, engageV: 0.3, engageS: 0.2, rampS: 0.6, F: 450, gain: 700 },
     wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
   },
   brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03, liftControl: 1, liftLookahead: 0.15 },
@@ -425,7 +443,7 @@ export const BIKE_PRESETS_V2: Readonly<Record<BikeClassV2, PartialTuningV2>> = O
     // R8 Astra port: one asset, one geometry - the Pro rides the same swingarm arc and fork line (wheelbase 1.30;
     // R3's 1.28 put its axles 1.0 / 1.1 cm inboard of the glb's markers and its rear 37 mm off the arm's end).
     suspension: { rear: { k: 12000 }, front: { k: 9000 } },
-    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
+    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), reverse: { vmax: 3, engageV: 0.3, engageS: 0.2, rampS: 0.5, F: 500, gain: 800 }, wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
     rider: { Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
   },
 });

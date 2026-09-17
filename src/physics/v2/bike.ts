@@ -42,7 +42,7 @@ export interface BodyDebug {
 export interface PhysicsDebugV2 {
   bodies: ({ id: string } & BodyDebug)[];
   contacts: { body: string; point: Vec2; normal: Vec2; lambdaN: number; lambdaT: number; mu: number; surface: SurfaceKind }[];
-  engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number };
+  engine: { rpm: number; torqueNm: number; thrustN: number; limiter: boolean; throttleEff: number; brakeEff: number; /** R4: wheelie-control thrust trim 0..1 (Rookie assist; 0 on the Pro). */ assist: number; /** R10: reverse engaged 0..1 (the ramp after `engine.reverse.engageS` of the brake held at a standstill); the calipers fade by the same fraction. */ reverse: number };
   /** R8 Astra port: the brake torques applied this tick (N m) and the front caliper's lift-control trim 0..1 (Rookie assist; 0 on the Pro). */
   brakes: { rearTorqueNm: number; frontTorqueNm: number; assist: number };
   suspension: { rear: { compression: number; rate: number; force: number }; front: { compression: number; rate: number; force: number } };
@@ -134,6 +134,7 @@ export const F_SLOTS = [
   'airLimit',
   'leanEdgeAir',
   'gripJ',
+  'reverseT',
 ] as const;
 const S_TICK = 0;
 const S_TIME = 1;
@@ -164,7 +165,8 @@ const S_TGT_MOVE = 33; // R3 intent: decaying memory (tau servoIntentTau) of the
 const S_AIR_LIMIT = 34; // R5 air limit blend 0..1 (both wheels off the ground, +-dt/airRateBlend per tick)
 const S_LEAN_EDGE_AIR = 35; // R7: 1 when the last lean edge was made with both wheels off the ground (its travel earns no intent once a wheel is down)
 const S_GRIP_J = 36; // R8: the reach-limit (hands + feet) impulse, N s, averaged over hold.gripTau (exponential memory); / gripTau > gripN = thrown
-export const NSCALAR = F_SLOTS.length; // 37
+const S_REVERSE_T = 37; // R10 reverse (ask 35): seconds the reverse gate has held (brake, no throttle, rear down, ~standstill), capped at engageS + rampS; decays on release
+export const NSCALAR = F_SLOTS.length; // 38
 
 /** Flags (physics-v2.md §12). */
 export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid'] as const;
@@ -294,6 +296,12 @@ class WorldV2 implements BikePhysicsWorldV2 {
   private dAssist = 0;
   private dBrakeAssist = 0;
   private dThrust = 0;
+  /** R10: this tick's reverse authority 0..1 from F[S_REVERSE_T] (set in step(), read by forces() and solve()). */
+  private dReverse = 0;
+  /** R10: this tick's governor target, m/s along the chassis (-vmax x the ramp while the gate holds; 0 on release). */
+  private dReverseV = 0;
+  /** R10: this tick's caliper factor 0..1 - the brakes fade with the authority, and come back as the bike rolls back faster than the target (fully at 2 x vmax: the brake is the reverse speed limiter downhill). */
+  private dReverseCal = 1;
   private dServoFx = 0;
   private dServoFy = 0;
   private dServoTq = 0;
@@ -441,6 +449,31 @@ class WorldV2 implements BikePhysicsWorldV2 {
       const t = this.tuning;
       F[S_THROTTLE_EFF] = lag(F[S_THROTTLE_EFF]!, input.throttle, t.engine.throttleTau, dt);
       F[S_BRAKE_EFF] = lag(F[S_BRAKE_EFF]!, input.brake, t.brakes.brakeTau, dt);
+      // R10 reverse (ask 35; physics.md "Reverse"): the brake held from a standstill is reverse. The gate reads the
+      // applied input, last derive's rear-ground flag and the chassis' forward speed at the end of the last tick;
+      // it must hold `engageS` before anything moves (a tap is a brake), then the drive ramps over `rampS`.
+      // Throttle clears it at once. A released brake sets the governor's target to 0 and keeps its authority
+      // while the bike still rolls back faster than engageV / 2 (the governor stops the roll at the same cap),
+      // then the authority fades over `rampS`. The calipers fade with the authority and come back as the bike
+      // rolls back faster than the target (fully at 2 x vmax): downhill the brake is the reverse speed limiter, and
+      // a bike already rolling back fast with the brake held is braked, not driven. Never after the line: the
+      // post-finish coast is the game's brake, not the player's.
+      {
+        const rv = t.engine.reverse;
+        const c = cos(this.an[CHASSIS]!);
+        const sn = sin(this.an[CHASSIS]!);
+        const vF = this.vx[CHASSIS]! * c + this.vy[CHASSIS]! * sn;
+        const gate = input.brake > 0 && input.throttle === 0 && U[U_REAR_GND] === 1 && U[U_FINISHED] === 0 && vF < rv.engageV;
+        const held = F[S_REVERSE_T]!;
+        const cap = rv.engageS + rv.rampS;
+        const stopping = held > rv.engageS && U[U_REAR_GND] === 1 && vF < -0.5 * rv.engageV;
+        F[S_REVERSE_T] = input.throttle > 0 ? 0 : gate ? (held + dt < cap ? held + dt : cap) : stopping ? held : held - dt > 0 ? held - dt : 0;
+        const rf = (F[S_REVERSE_T]! - rv.engageS) / rv.rampS;
+        const auth = rf <= 0 ? 0 : rf >= 1 - 1e-9 ? 1 : rf; // exactly 1 at the cap (engageS + rampS rounds)
+        this.dReverse = auth;
+        this.dReverseV = gate ? -rv.vmax * auth : 0;
+        this.dReverseCal = 1 - auth * (1 - clamp((-vF - rv.vmax * auth) / rv.vmax, 0, 1));
+      }
       // 2 pose target (reads F only). R5 air limit: with both wheels off the ground (last derive's air counters)
       // the target's travel rate blends over airRateBlend s from the ground rates to the air rates; a rider in the
       // air has nothing to brace the 5 m/s hop throw against, and the throw's reaction on the chassis (F_max x the
@@ -519,6 +552,10 @@ class WorldV2 implements BikePhysicsWorldV2 {
     } else {
       F[S_THROTTLE_EFF] = 0;
       F[S_BRAKE_EFF] = 1;
+      F[S_REVERSE_T] = 0;
+      this.dReverse = 0;
+      this.dReverseV = 0;
+      this.dReverseCal = 1;
       F[S_TGT_MOVE] = 0;
       F[S_AIR_LIMIT] = 0;
       F[S_LEAN_EDGE_AIR] = 0;
@@ -708,7 +745,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     return {
       bodies,
       contacts,
-      engine: { rpm: reportRpm(t.engine, R, vRim, F[S_THROTTLE_EFF]!), torqueNm: this.dEngineTq, thrustN: this.dThrust, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]!, brakeEff: F[S_BRAKE_EFF]!, assist: this.dAssist },
+      engine: { rpm: reportRpm(t.engine, R, vRim, F[S_THROTTLE_EFF]!), torqueNm: this.dEngineTq, thrustN: this.dThrust, limiter: this.U[U_LIMITER] === 1, throttleEff: F[S_THROTTLE_EFF]!, brakeEff: F[S_BRAKE_EFF]!, assist: this.dAssist, reverse: this.dReverse },
       brakes: { rearTorqueNm: this.sBrake[0]! / this.dt, frontTorqueNm: this.sBrake[1]! / this.dt, assist: this.dBrakeAssist },
       suspension: {
         rear: { compression: this.sComp[0]!, rate: this.sRate[0]!, force: this.sForce[0]! },
@@ -894,6 +931,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     this.F[S_REAR_AIR] = 0;
     this.F[S_FRONT_AIR] = 0;
     this.F[S_AIR_LIMIT] = 0;
+    this.F[S_REVERSE_T] = 0;
     this.F[S_PREV_RX] = rx;
     this.F[S_PREV_RY] = ry;
     this.F[S_PREV_FX] = this.px[FRONT]!;
@@ -1139,6 +1177,20 @@ class WorldV2 implements BikePhysicsWorldV2 {
       this.dThrust = U[U_LIMITER] === 1 ? 0 : (1 - trim) * te * t.engine.Fpeak * thrustFrac(t.engine, vRim);
       av[REAR] = av[REAR]! - tq * dt * ii[REAR]!;
       av[CHASSIS] = av[CHASSIS]! + tq * dt * ii[CHASSIS]!;
+      // R10 reverse: a speed governor on the rear wheel toward the target (-vmax x the ramp, or 0 on release),
+      // capped +-F x the authority at the rim, from the pre-force chassis forward speed (not the rim: a locked
+      // rear under a forward stop reads 0 at the rim).
+      const rf = this.dReverse;
+      if (rf > 0) {
+        const rv = t.engine.reverse;
+        const vF = vCx0 * c + vCy0 * s;
+        const Frev = clamp(rv.gain * (this.dReverseV - vF), -rv.F * rf, rv.F * rf);
+        const tqR = Frev * R;
+        this.dEngineTq += tqR;
+        this.dThrust += Frev;
+        av[REAR] = av[REAR]! - tqR * dt * ii[REAR]!;
+        av[CHASSIS] = av[CHASSIS]! + tqR * dt * ii[CHASSIS]!;
+      }
     }
 
     // aero: two real forces at the two COMs
@@ -1746,7 +1798,9 @@ class WorldV2 implements BikePhysicsWorldV2 {
           const wb = wheelB[w]!;
           let maxNm = t.brakes.totalNm * (w === 0 ? 1 - t.brakes.frontFrac : t.brakes.frontFrac);
           if (!riding) maxNm *= w === 0 ? t.ragdoll.crashRearBrake : t.ragdoll.crashFrontBrake;
-          let maxJ = brakeIn * maxNm * dt;
+          // R10 reverse: both calipers fade out with the reverse authority (a locked wheel cannot roll back) and come
+          // back as the bike rolls back faster than the target (the reverse speed limiter downhill)
+          let maxJ = brakeIn * maxNm * dt * this.dReverseCal;
           if (w === 1 && Number.isFinite(frontLimit)) {
             const trim = assist * Math.max(0, maxJ - frontLimit * dt);
             this.dBrakeAssist = maxJ > 0 ? trim / maxJ : 0;

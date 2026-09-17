@@ -77,7 +77,8 @@ describe('determinism (§14.1)', () => {
     // snaps the rider's rate. R7 adds ONE more, `leanEdgeAir`: whether the last lean edge was made with both wheels
     // off the ground - its travel earns no intent once a wheel is down (physics.md v2 status R7, deviation 12; the
     // m2 Rookie golden's coasting push). R8 adds `gripJ`: the reach-limit (hands + feet) impulse averaged over
-    // hold.gripTau, the thrown-rider fault's memory (physics.md v2 status R8, deviation 15). Adding a slot fails here
+    // hold.gripTau, the thrown-rider fault's memory (physics.md v2 status R8, deviation 15). R10 adds `reverseT`: seconds the
+    // reverse gate has held (physics.md "Reverse", ask 35). Adding a slot fails here
     // until it is justified in physics-v2.md / physics.md.
     expect([...F_SLOTS]).toEqual([
       'tick', 'time', 'checkpoint', 'finishTime', 'throttleEff', 'brakeEff',
@@ -85,9 +86,9 @@ describe('determinism (§14.1)', () => {
       'rng0', 'rng1', 'rng2', 'rng3', 'seed', 'crashT',
       'ragRest0', 'ragRest1', 'ragRest2', 'ragRest3', 'ragRest4', 'ragRest5',
       'prevRearX', 'prevRearY', 'prevFrontX', 'prevFrontY', 'inThrottle', 'inBrake', 'inLean', 'rearSlip',
-      'targetMove', 'airLimit', 'leanEdgeAir', 'gripJ',
+      'targetMove', 'airLimit', 'leanEdgeAir', 'gripJ', 'reverseT',
     ]);
-    expect(NSCALAR).toBe(37);
+    expect(NSCALAR).toBe(38);
     expect([...U_SLOTS]).toEqual(['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid']);
     expect(NU).toBe(14);
     const w = createBikePhysics(HZ);

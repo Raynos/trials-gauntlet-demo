@@ -13,6 +13,7 @@ import type { InputFrame } from '../../core/types';
 import { createBikePhysicsV2 as createBikePhysics, type BikePhysicsWorldV2 } from './bike';
 import { makeTrack } from '../testTracks';
 import { stepN } from '../controllers';
+import { bikeTuningV2 } from './tuning';
 
 const HZ = 120;
 const deg = (r: number): number => (r * 180) / Math.PI;
@@ -224,6 +225,116 @@ describe('brakes (§8)', () => {
     expect(b.rearOff).toBeLessThanOrEqual(0.3);
     expect(b.dist).toBeLessThanOrEqual(6);
   });
+});
+
+describe('reverse (ask 35, R10; physics.md "Reverse")', () => {
+  const REV = { rookie: { band: [2.2, 2.6], label: '2.2-2.6 (vmax 2.5)' }, pro: { band: [2.7, 3.1], label: '2.7-3.1 (vmax 3.0)' } } as const;
+  function restWorld(bike: 'rookie' | 'pro'): BikePhysicsWorldV2 {
+    const w = createBikePhysics(HZ);
+    w.loadTrack(makeTrack({ finishX: 1e9 }), 1, { bike });
+    stepN(w, {}, 240);
+    return w;
+  }
+  for (const bike of ['rookie', 'pro'] as const) {
+    const t = bikeTuningV2(bike).engine.reverse;
+    it(`${bike}: brake held from rest engages after ${t.engageS} s, creeps back, settles at -${REV[bike].label} m/s by 2.5 s; release stops it within 1.5 s; throttle overrides; never faults`, () => {
+      const w = restWorld(bike);
+      const x0 = w.getState().bike.pos.x;
+      let firstEngage = NaN;
+      let v2 = NaN;
+      let sum = 0;
+      let n = 0;
+      let maxPitch = 0;
+      for (let i = 0; i < HZ * 3; i++) {
+        w.step(quantizeInput({ brake: 1 }));
+        const s = w.getState();
+        const rev = w.debug().engine.reverse;
+        if (Number.isNaN(firstEngage) && rev > 0) firstEngage = (i + 1) / HZ;
+        if (i + 1 === HZ * 2) v2 = s.bike.vel.x;
+        if (i >= HZ * 2.5) {
+          sum += s.bike.vel.x;
+          n++;
+        }
+        maxPitch = Math.max(maxPitch, Math.abs(deg(s.bike.angle)));
+      }
+      const held = w.getState();
+      const dist = held.bike.pos.x - x0;
+      const settled = -sum / n;
+      const calipers = Math.abs(w.debug().brakes.rearTorqueNm) + Math.abs(w.debug().brakes.frontTorqueNm);
+      feel(`reverse.${bike}.engageS`, firstEngage, `${t.engageS} .. ${t.engageS + 0.15} (the gate holds engageS before anything moves)`);
+      feel(`reverse.${bike}.v2s`, -v2, '>= 1.5 (moving back by 2 s of hold)');
+      feel(`reverse.${bike}.settled`, settled, REV[bike].label);
+      feel(`reverse.${bike}.dist3s`, -dist, '>= 3 m back');
+      feel(`reverse.${bike}.maxPitchDeg`, maxPitch, '<= 8 (a creep, not a wheelie)');
+      feel(`reverse.${bike}.caliperNmAtCreep`, calipers, '0 (both calipers faded out)');
+      expect(held.faulted).toBeNull();
+      expect(firstEngage).toBeGreaterThanOrEqual(t.engageS);
+      expect(firstEngage).toBeLessThanOrEqual(t.engageS + 0.15);
+      expect(-v2).toBeGreaterThanOrEqual(1.5);
+      expect(settled).toBeGreaterThanOrEqual(REV[bike].band[0]);
+      expect(settled).toBeLessThanOrEqual(REV[bike].band[1]);
+      expect(-dist).toBeGreaterThanOrEqual(3);
+      expect(maxPitch).toBeLessThanOrEqual(8);
+      expect(calipers).toBeLessThan(1e-9);
+      // release: the governor stops the roll, then its authority fades
+      let stopT = NaN;
+      let offT = NaN;
+      for (let i = 0; i < HZ * 3; i++) {
+        w.step(quantizeInput({}));
+        const s = w.getState();
+        if (Number.isNaN(stopT) && Math.abs(s.bike.vel.x) < 0.1) stopT = (i + 1) / HZ;
+        if (Number.isNaN(offT) && w.debug().engine.reverse === 0) offT = (i + 1) / HZ;
+      }
+      const after = w.getState();
+      feel(`reverse.${bike}.releaseStopS`, stopT, '<= 1.5 s to |v| < 0.1');
+      feel(`reverse.${bike}.releaseOffS`, offT, `<= ${(1.5 + t.rampS).toFixed(1)} s to authority 0`);
+      feel(`reverse.${bike}.vAfterRelease3s`, Math.abs(after.bike.vel.x), '< 0.1');
+      expect(after.faulted).toBeNull();
+      expect(stopT).toBeLessThanOrEqual(1.5);
+      expect(offT).toBeLessThanOrEqual(1.5 + t.rampS);
+      expect(Math.abs(after.bike.vel.x)).toBeLessThan(0.1);
+      // throttle overrides: from the creep, gas clears the reverse in one tick and the bike drives forward
+      const w2 = restWorld(bike);
+      stepN(w2, { brake: 1 }, HZ * 2);
+      expect(w2.debug().engine.reverse).toBe(1);
+      w2.step(quantizeInput({ throttle: 1, brake: 1 }));
+      expect(w2.debug().engine.reverse).toBe(0);
+      stepN(w2, { throttle: 1, lean: 0.3 }, HZ * 2);
+      feel(`reverse.${bike}.throttleOverrideV2s`, w2.getState().bike.vel.x, '> 5 (forward)');
+      expect(w2.getState().bike.vel.x).toBeGreaterThan(5);
+    });
+    it(`${bike}: brake from 10 m/s is the brake - no reverse until the stop has held ${t.engageS} s, then the continued hold creeps back`, () => {
+      const w = restWorld(bike);
+      cruiseTo(w, 10);
+      const x0 = w.getState().bike.pos.x;
+      let stopTick = -1;
+      let engageTick = -1;
+      let minVBeforeStop = 99;
+      for (let i = 0; i < HZ * 6; i++) {
+        w.step(quantizeInput({ brake: 1 }));
+        const s = w.getState();
+        const rev = w.debug().engine.reverse;
+        if (stopTick < 0) {
+          if (s.bike.vel.x < t.engageV) stopTick = i;
+          else minVBeforeStop = Math.min(minVBeforeStop, s.bike.vel.x);
+        }
+        if (engageTick < 0 && rev > 0) engageTick = i;
+      }
+      const s = w.getState();
+      const dwell = (engageTick - stopTick) / HZ;
+      feel(`reverse.${bike}.fromSpeed.stopDist`, s.bike.pos.x - x0, 'info (the brake is unchanged; the neutral row asserts <= 7 m)');
+      feel(`reverse.${bike}.fromSpeed.minVBeforeStop`, minVBeforeStop, `> ${t.engageV} (never backwards mid-brake)`);
+      feel(`reverse.${bike}.fromSpeed.dwellS`, dwell, `>= ${t.engageS} (engaged only after the stop held engageS)`);
+      feel(`reverse.${bike}.fromSpeed.vAt6s`, -s.bike.vel.x, REV[bike].label);
+      expect(s.faulted).toBeNull();
+      expect(stopTick).toBeGreaterThan(0);
+      expect(engageTick).toBeGreaterThan(stopTick);
+      expect(dwell).toBeGreaterThanOrEqual(t.engageS - 1 / HZ);
+      expect(minVBeforeStop).toBeGreaterThan(t.engageV);
+      expect(-s.bike.vel.x).toBeGreaterThanOrEqual(REV[bike].band[0]);
+      expect(-s.bike.vel.x).toBeLessThanOrEqual(REV[bike].band[1]);
+    });
+  }
 });
 
 describe('air control (§9.4, §14.2)', () => {

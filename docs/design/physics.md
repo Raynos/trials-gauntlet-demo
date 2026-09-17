@@ -5,6 +5,96 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## v2 status — R10 (reverse: the brake held at a standstill backs the bike up; ask 35)
+
+**The rule.** "You can't drive the bike backwards — the brake just stops it." Trials-style reverse, physics v2 only (v1 frozen):
+the brake held with no throttle from (near) a standstill drives the rear wheel backwards at a walking-pace creep, so a player
+can back up and re-take an obstacle. The gate is read every tick from plain state — the applied input (brake > 0, throttle 0),
+last derive's rear-ground flag, the run not finished, and the chassis' forward speed (along its own x, at the end of the last
+tick; NOT the rim, which reads 0 under a locked rear mid-stop) under `engageV`. It must hold `engageS` before anything moves
+(a tap is a brake; on a slope a tap still holds the bike), then the reverse *authority* ramps 0 → 1 over `rampS`: a speed
+governor on the rear wheel (`gain` N per m/s of error toward −`vmax` × the ramp, capped ±`F` × authority at the rim, reaction on
+the chassis) and both calipers fade out by the same fraction (a locked front cannot roll back) — and **come back** as the bike
+rolls back faster than the target, fully at 2 × `vmax`: downhill the brake is the reverse speed limiter, and a bike already
+rolling back fast with the brake held is braked, not driven (caliper factor `1 − authority × (1 − clamp((−v − vmax·authority) / vmax))`).
+Brake while moving forward is the brake, unchanged: the stop from speed is byte-identical up to the tick the speed gate opens,
+and only a hold past `engageS` after it reverses (feel row: dwell 0.208 s on both classes, no backward motion mid-brake).
+Throttle > 0 clears it in one tick. Releasing the brake sets the governor's target to 0 and keeps its authority while the bike
+still rolls back faster than `engageV` / 2 — the governor stops the roll at the same cap — then the authority fades over `rampS`.
+Never after the line: the post-finish coast (`Game.stepFinishCoast`, brake 0.6 held for ever) is the game's brake, not the
+player's, gated on the physics' own `finished` flag. Grades (`docs/evidence/physics-r10-reverse/slope.mts`, bike facing uphill, brake held
+3 s): 8° creep 2.62 / 3.11 m/s (Rookie / Pro), 15° 2.75 / 3.23, 25° 2.92 / 3.41 — past the ~18° the governor can hold the
+returning calipers cap the roll; no fault, pitch ≤ 5° over the grade. A released brake on the 8° grade leaves the governor
+holding the bike to a 0.3 m/s roll-back (its authority stays while the roll is over `engageV` / 2; before R10 the bike rolled
+free at g sin 8°); a first probe with a hard `dropV` drop-out ran away at 25° with the calipers faded — that is why the
+calipers return with the over-speed instead.
+
+**Tuning** (`engine.reverse`, declared per class in `v2/tuning.ts`):
+
+| class | vmax m/s | engageV m/s | engageS s | rampS s | F N (rim) | gain N/(m/s) |
+|---|---|---|---|---|---|---|
+| Rookie | 2.5 | 0.3 | 0.2 | 0.6 | 450 (0.31 g on 148 kg; holds the creep on ≤ 18°) | 700 |
+| Pro | 3.0 | 0.3 | 0.2 | 0.5 | 500 (0.35 g on 144 kg) | 800 |
+
+**State.** One `F` slot, `reverseT` (`NSCALAR` 37 → 38): seconds the gate has held, capped at `engageS + rampS`, held while a
+released brake is still stopping the roll, decaying at 1 s/s otherwise, 0 on throttle / fault / reset; the authority is
+`(reverseT − engageS) / rampS` clamped, snapped to exactly 1 at the cap (the calipers read exactly 0 there). Three per-tick derived
+fields (`dReverse`, `dReverseV`, `dReverseCal`) are recomputed in `step()` before `forces()` / `solve()` read them, so a restored snapshot
+mid-creep continues bit-identically (the snapshot suite's restore × 13 / foreign-snapshot rows are green). `debug().engine.reverse`
+reports the authority for the HUD.
+
+**Feel** (`feel.test.ts` "reverse", flat, from a 2 s settle; `pnpm vitest run src/physics/v2/feel.test.ts -t reverse`):
+
+| row | Rookie | Pro | band |
+|---|---|---|---|
+| first authority after the press (`engageS`) | 0.292 s | 0.325 s | 0.2 – 0.35 (the 0.5 s brake-settle rocks the chassis through the speed gate once) |
+| speed at 2 s of hold | 2.38 | 2.90 | ≥ 1.5 backwards |
+| settled creep (mean 2.5 – 3 s) | **2.438** | **2.934** | 2.2 – 2.6 / 2.7 – 3.1 (vmax − the engine-brake + rolling-resistance offset over `gain`) |
+| distance at 3 s | 4.14 m | 5.12 m | ≥ 3 m back |
+| max |pitch| during the creep | 4.6° | 4.4° | ≤ 8° |
+| caliper torque at the creep | 0 | 0 | 0 |
+| release → \|v\| < 0.1 / authority 0 | 0.93 / 1.49 s | 0.95 / 1.40 s | ≤ 1.5 / ≤ 1.5 + rampS |
+| throttle over the creep: v after 2 s | +8.5 | +6.7 | > 5 forward, cleared in one tick |
+| from 10 m/s: min v before the stop / dwell / v at 6 s | 0.34 / 0.208 s / 2.44 | 0.32 / 0.208 s / 2.94 | > engageV / ≥ engageS / the creep band |
+
+**Goldens.** All **47 / 47** `bot-3*.json` replay hash- and finish-identical in node before → after (`docs/evidence/physics-r10-reverse/replay-all.mts`, `replay-before.json` → `replay-after.json`,
+baseline vs tree): every Rookie golden opens with the bot's 15-tick brake + lean-forward settle at rest and the h3 Pro golden
+brakes at rest for 15 ticks at tick 2190, and the bot's plan quantum (15 ticks = 0.125 s) is under `engageS` (0.2 s), so no
+golden ever reaches the ramp. Nothing re-pinned: `harness:gate --quick --build` on the tree reads `clear.hashOk`
+`ecdf62a55f6185a6` vs pinned `ecdf62a55f6185a6` (8.650), `clear.pro.flat` `40e2115db273b7ff` (7.900), `clear.pro.b1`
+`f0549ee508d870ed` (37.967), determinism **9 / 9** (D1 – D8 + D4c, D8 `afee0f1094a0587c` = pinned), crash 0.77 s, fault → control
+50 ms, restart 1 tick / 0.45 ms / no countdown, heap −2.5 MB, bundle 588.7 KB — **23 / 30**: the three SwiftShader timing rows
+(boot.firstFrame 23 452 ms, restart.frameMs 3 677 ms, renderSynced 4 691 ms; R9 had the same three, informational) plus four
+perf rows on a host at load 42 – 69 with two other rounds running — drawCalls 702 / 300, triangles 670 061 / 500 000,
+renderSubmit 5.43 / 4 ms (the renderer's; the tree carries uncommitted garage / hero edits) and physicsUsPerTickP95 150 / 60 µs
+(R9 32.5; the node cost rows inflate 4 – 13 × on the same load, see Tests). The D8 canonical input taps the brake at speed only.
+`harness:bot --refresh-goldens` (`--jobs 2` on this load): **fresh 11, restamped 36, stale 0; 24 / 24 tracks proven**, every
+golden node == browser at its R9 finish time — the 47 diffs are the header `note` line only (`src=4b9bc981
+restamped-from=24a246e0`; the fingerprint moved with the physics edit, the input streams and hashes did not).
+
+### Tests (R10)
+
+`pnpm vitest run src/physics`: **170 → 174** (4 reverse rows, two per class: the rest / release / throttle-override row and the
+from-10 m/s row). `world.test.ts` slot list gains `reverseT`. Every earlier row prints identically; **172 / 174** on the final
+tree at load 60 (two other agents' rounds, a headless Chromium at 270 % CPU) — the two that fail are the ≤ 5 µs/tick p50 cost
+rows (`r3` 6.6, `r5` 7.5; their own note: "2.7–3.0 alone; the full parallel suite pushes it past 5 on a shared host"; at load
+139 they read 9–40 and `world`'s ≤ 10 p95 read 14.3, and at the default 5 s timeout the two snapshot probes and the flat-dirt
+property row also time out). Not A/B'd against the pre-R10 tree (the tree carries other owners' uncommitted edits, so no
+stash); the reverse adds two trig calls and a dozen flops per tick.
+
+### Deviations (R10)
+
+24. **Reverse engages after a 0.2 s hold, not at once** (Trials HD backs up the moment the brake is held at rest). The dwell is
+    what makes a brake tap a brake and a hill-hold a hill-hold, and it is what keeps all 47 goldens byte-identical (the bot's
+    0.125 s quantum). Measured, not assumed: the from-speed row shows 0.208 s between the stop and the first authority.
+25. **A released brake in reverse stops the bike** (a coasting bike would roll on at −1.1 m/s on the flat: engine braking is
+    26 N at −2.4 m/s). The governor's authority is kept with target 0 until the roll is under `engageV` / 2, then fades.
+26. **Not the reverse's: the brake slammed on a fast backward roll crashes** (12° grade, 4 s of free roll-back to −6.3 m/s, then
+    brake held: the rear caliper locks at −251 N m, the rear un-weights at 0.8 s and the bike faults `crash` at ~1.1 s on both
+    classes — identically with the reverse disabled by `engageS: 1e9`; `docs/evidence/physics-r10-reverse/backroll.mts`). The
+    returning calipers behave as declared there (full while the roll is past 2 × vmax). The brake owner's, if anyone's; noted so
+    nobody pins it on R10.
+
 ## v2 status — R9 (Astra's physics is live: the swingarm arc, the elbow stop, the Rookie lift control; the seated pose is drawn, not held)
 
 **Finding.** Everything of Astra's `405f894` that R8 measured ADOPT is on the tree, applied from

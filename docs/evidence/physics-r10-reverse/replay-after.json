@@ -1,0 +1,575 @@
+{
+ "b1-first-ride/bot-3.json": {
+  "hash": "389a5dc6c07ab8c3",
+  "finish": 40.55833333333333,
+  "ticks": 4867,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 582.3022501997732
+ },
+ "b1-first-ride/bot-3-pro.json": {
+  "hash": "f0549ee508d870ed",
+  "finish": 37.96666666666667,
+  "ticks": 4556,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 582.3091122187814
+ },
+ "b2-lean-back/bot-3.json": {
+  "hash": "16c8baca5864586a",
+  "finish": 39.375,
+  "ticks": 4725,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 591.5461159187442
+ },
+ "b2-lean-back/bot-3-pro.json": {
+  "hash": "60575fa276719616",
+  "finish": 36.625,
+  "ticks": 4395,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 591.5155965790675
+ },
+ "b3-kicker-row/bot-3.json": {
+  "hash": "20373f73499af88e",
+  "finish": 32.625,
+  "ticks": 3915,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 471.1698792203809
+ },
+ "b3-kicker-row/bot-3-pro.json": {
+  "hash": "11c12123afe8f5e2",
+  "finish": 31.183333333333334,
+  "ticks": 3742,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 471.09316207593804
+ },
+ "e1-uphill-weight/bot-3.json": {
+  "hash": "bfbd15908ea16411",
+  "finish": 44.35,
+  "ticks": 5322,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 543.1545263110352
+ },
+ "e1-uphill-weight/bot-3-pro.json": {
+  "hash": "3332a5df6fb18210",
+  "finish": 42.25833333333333,
+  "ticks": 5071,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 543.1748339470186
+ },
+ "e2-rear-wheel-first/bot-3.json": {
+  "hash": "dee6ffc15120215c",
+  "finish": 43.75833333333333,
+  "ticks": 5251,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 615.419810876568
+ },
+ "e2-rear-wheel-first/bot-3-pro.json": {
+  "hash": "722983a168446800",
+  "finish": 39.3,
+  "ticks": 4716,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 615.3694274495742
+ },
+ "e3-stairway/bot-3.json": {
+  "hash": "48dfe74043611cd0",
+  "finish": 38.44166666666667,
+  "ticks": 4613,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 543.010531862023
+ },
+ "e3-stairway/bot-3-pro.json": {
+  "hash": "1a329b07d6a3d40b",
+  "finish": 37.40833333333333,
+  "ticks": 4489,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 542.9879536178651
+ },
+ "flat-test/bot-3.json": {
+  "hash": "ecdf62a55f6185a6",
+  "finish": 8.65,
+  "ticks": 1038,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 119.3352732151588
+ },
+ "flat-test/bot-3-pro.json": {
+  "hash": "40e2115db273b7ff",
+  "finish": 7.9,
+  "ticks": 948,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 119.31909251930338
+ },
+ "gap-test/bot-3.json": {
+  "hash": "61414fef353e0845",
+  "finish": 5.691666666666666,
+  "ticks": 683,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 56.26564447728315
+ },
+ "gap-test/bot-3-pro.json": {
+  "hash": "bbb30205b586dbdb",
+  "finish": 5.133333333333334,
+  "ticks": 616,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 56.356348516897285
+ },
+ "h1-wheelie-wire/bot-3.json": {
+  "hash": "d07967c28b8cbb66",
+  "finish": 44.858333333333334,
+  "ticks": 5383,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 621.6246999960216
+ },
+ "h1-wheelie-wire/bot-3-pro.json": {
+  "hash": "16c6c39e94bb341d",
+  "finish": 44.041666666666664,
+  "ticks": 5285,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 621.6695711492307
+ },
+ "h2-gap-chain/bot-3.json": {
+  "hash": "da89a338cb913b8c",
+  "finish": 46.733333333333334,
+  "ticks": 5608,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 664.1114357684601
+ },
+ "h2-gap-chain/bot-3-pro.json": {
+  "hash": "ea8ca428522f5fbb",
+  "finish": 42.75833333333333,
+  "ticks": 5131,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 664.074811985844
+ },
+ "h3-fire-line/bot-3.json": {
+  "hash": "812f2865e04aa855",
+  "finish": 47.608333333333334,
+  "ticks": 5713,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 628.5235674030868
+ },
+ "h3-fire-line/bot-3-pro.json": {
+  "hash": "0d1d0e48f9fbe757",
+  "finish": 44.65,
+  "ticks": 5358,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   2192,
+   2193,
+   2194,
+   2195,
+   2196
+  ],
+  "x": 628.5662822818113
+ },
+ "lab-flat-200/bot-3.json": {
+  "hash": "871e18430b025355",
+  "finish": 12.691666666666666,
+  "ticks": 1523,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 199.3091546087453
+ },
+ "lab-flat-200/bot-3-pro.json": {
+  "hash": "7508b9aa41b777a4",
+  "finish": 11.758333333333333,
+  "ticks": 1411,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 199.40794239070718
+ },
+ "lab-physics-test/bot-3.json": {
+  "hash": "51991343a68911fe",
+  "finish": 8.241666666666667,
+  "ticks": 989,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 99.2896039468367
+ },
+ "lab-physics-test/bot-3-pro.json": {
+  "hash": "73548eefbe1634ab",
+  "finish": 7.5,
+  "ticks": 900,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 99.38548603289206
+ },
+ "m1-hop-up/bot-3.json": {
+  "hash": "8f4fa498801f443e",
+  "finish": 34.55,
+  "ticks": 4146,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 480.36372452558976
+ },
+ "m1-hop-up/bot-3-pro.json": {
+  "hash": "40537253ebfba0f2",
+  "finish": 30.758333333333333,
+  "ticks": 3691,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 480.2589483716582
+ },
+ "m2-drum-roll/bot-3.json": {
+  "hash": "541ae6460e28ff1a",
+  "finish": 40.56666666666667,
+  "ticks": 4868,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 487.4760770946276
+ },
+ "m2-drum-roll/bot-3-pro.json": {
+  "hash": "30e0dc40f0dfad3f",
+  "finish": 35.34166666666667,
+  "ticks": 4241,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 487.46715244693723
+ },
+ "m3-see-saw/bot-3.json": {
+  "hash": "a6efc9a9048d36b9",
+  "finish": 39.30833333333333,
+  "ticks": 4717,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 503.45997924144876
+ },
+ "m3-see-saw/bot-3-pro.json": {
+  "hash": "f7b651c4219d514a",
+  "finish": 36.44166666666667,
+  "ticks": 4373,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 503.39553654378676
+ },
+ "p1-container-yard/bot-3.json": {
+  "hash": "a7bcc36aa5e2c9fd",
+  "finish": 36.11666666666667,
+  "ticks": 4334,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 503.1909415093891
+ },
+ "p1-container-yard/bot-3-pro.json": {
+  "hash": "bbd930151b4b6eb6",
+  "finish": 32.88333333333333,
+  "ticks": 3946,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 503.2717530676666
+ },
+ "p2-canyon-run/bot-3.json": {
+  "hash": "2d664a723032279e",
+  "finish": 34.44166666666667,
+  "ticks": 4133,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 492.9041466519159
+ },
+ "p2-canyon-run/bot-3-pro.json": {
+  "hash": "f1c9f8d4845d54b9",
+  "finish": 32.65833333333333,
+  "ticks": 3919,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 492.96908330189797
+ },
+ "p3-snow-line/bot-3.json": {
+  "hash": "52e782a6fce71d67",
+  "finish": 33.425,
+  "ticks": 4011,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 487.56594101006675
+ },
+ "p3-snow-line/bot-3-pro.json": {
+  "hash": "f85514bbc318d434",
+  "finish": 31.891666666666666,
+  "ticks": 3827,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 487.6758973611627
+ },
+ "p4-night-circuit/bot-3.json": {
+  "hash": "16b9b0b2b9cc6f5b",
+  "finish": 34.375,
+  "ticks": 4125,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 497.4808485984152
+ },
+ "p4-night-circuit/bot-3-pro.json": {
+  "hash": "ba8cafc4433358d6",
+  "finish": 32.35,
+  "ticks": 3882,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 497.5373282464132
+ },
+ "p5-foundry-floor/bot-3.json": {
+  "hash": "ec23c9157d20c393",
+  "finish": 30.816666666666666,
+  "ticks": 3698,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 441.8341996607568
+ },
+ "p5-foundry-floor/bot-3-pro.json": {
+  "hash": "615650dc73e66040",
+  "finish": 29.041666666666668,
+  "ticks": 3485,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 441.90615388859055
+ },
+ "x1-vertical-limit/bot-3.json": {
+  "hash": "f8ebd9969371f56d",
+  "finish": 55.24166666666667,
+  "ticks": 6629,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 743.5038724545758
+ },
+ "x2-pipe-dream/bot-3.json": {
+  "hash": "960bc9d874a9db83",
+  "finish": 43.68333333333333,
+  "ticks": 5242,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 562.8812930118986
+ },
+ "x2-pipe-dream/bot-3-pro.json": {
+  "hash": "c6f2be9802024745",
+  "finish": 40.7,
+  "ticks": 4884,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 562.9087689242665
+ },
+ "x3-gauntlet/bot-3.json": {
+  "hash": "8f7c8ee1172ae308",
+  "finish": 43.90833333333333,
+  "ticks": 5269,
+  "faults": 0,
+  "brakeAtRest": 8,
+  "brakeAtRestTicks": [
+   1,
+   8,
+   9,
+   10,
+   11
+  ],
+  "x": 574.3186002444959
+ },
+ "x3-gauntlet/bot-3-pro.json": {
+  "hash": "41005cc7f1aaacae",
+  "finish": 43.4,
+  "ticks": 5208,
+  "faults": 0,
+  "brakeAtRest": 0,
+  "brakeAtRestTicks": [],
+  "x": 574.3973412868419
+ }
+}
