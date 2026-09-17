@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/street01-rider-round33-lossless.glb",
   "sourceSha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a",
   "decodedSha256": "ec0a08fd24b588b34372583ace39a67ee001a12e55315cf1a2c5c611f2f74c1f",
-  "exportSha256": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4",
+  "exportSha256": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82",
   "kind": "rider",
   "lod": true,
   "stage": 1,
@@ -507,15 +507,15 @@
       "voxel": 0.003,
       "radius": 0.0045,
       "shrink": 0.002,
-      "smooth": 2,
+      "smooth": 4,
       "bake": {
         "normal": "hair_shell_normal",
         "albedo": "hair_shell_albedo",
         "size": 256,
         "samples": 16,
         "version": 2,
-        "lift": 6,
-        "grey": 0.12,
+        "lift": 5,
+        "grey": 0.16,
         "roughness": 0.9,
         "specular": 0.08,
         "normalStrength": 0.35,
@@ -528,9 +528,32 @@
       "rider:hero glove construction": 400
     },
     "raceHelmet": null,
+    "raceCollar": null,
     "atlas": {
       "size": 1024,
-      "parts": null
+      "parts": null,
+      "hiresSources": [
+        "Street01_Authored_EditableBody_Runtime:hires",
+        "collar eyelet 1:hires",
+        "collar eyelet -1:hires",
+        "fitted drawcord 1:hires",
+        "fitted drawcord -1:hires",
+        "rider:anatomical sweatshirt:hires",
+        "rider:anatomical sweatshirt pocket:hires",
+        "rider:folded hood:hires",
+        "rider:cotton_laces:hires",
+        "rider:hero footwear construction:hires",
+        "rider:trainer_rubber:hires",
+        "rider:trainer_upper:hires",
+        "rider:glove_top:hires",
+        "rider:gloves:hires",
+        "rider:hero glove construction:hires",
+        "rider.001:hires"
+      ],
+      "hiresNormal": {
+        "fallbackTexels": 53211,
+        "texels": 1048576
+      }
     }
   },
   "compression": {
@@ -546,20 +569,20 @@
       "inverse binds",
       "clip times"
     ],
-    "rawBytes": 2404704,
-    "packedBytes": 1608420
+    "rawBytes": 2544256,
+    "packedBytes": 1753256
   },
   "verified": {
-    "bytes": 1608420,
-    "sha256": "78458d1a8d92b4d3ef8ddaf5ea35861be8f02799bfedf99d07b1838bd5e3c0c4",
+    "bytes": 1753256,
+    "sha256": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82",
     "triangles": 7836,
-    "vertices": 9206,
+    "vertices": 9083,
     "draws": 6,
     "meshes": 6,
     "materials": 6,
     "images": 9,
     "maxTexture": 1024,
-    "imageBytes": 1213089,
+    "imageBytes": 1359038,
     "bones": 19,
     "clips": {
       "compression": {
@@ -620,14 +643,14 @@
         "kind": "png",
         "w": 256,
         "h": 256,
-        "bytes": 154583
+        "bytes": 154284
       },
       {
         "name": "hair_shell_albedo",
         "kind": "png",
         "w": 256,
         "h": 256,
-        "bytes": 86678
+        "bytes": 87265
       },
       {
         "name": "eyebrow001",
@@ -648,7 +671,7 @@
         "kind": "jpeg",
         "w": 1024,
         "h": 1024,
-        "bytes": 38243
+        "bytes": 183904
       },
       {
         "name": "rider_body_orm",
@@ -683,7 +706,7 @@
       {
         "name": "hair_shell",
         "tris": 1004,
-        "verts": 1777,
+        "verts": 1654,
         "primitives": 1,
         "instances": 1,
         "materials": [
@@ -742,5 +765,5 @@
       }
     ]
   },
-  "blenderSeconds": 10.088
+  "blenderSeconds": 8.898
 }

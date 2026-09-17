@@ -308,7 +308,7 @@ def bake_from_strands(shell, groom, size=512, samples=16, cage=0.012, ray=0.03, 
             "roughness": roughness, "specular": specular, "normalStrength": normal_strength, "scalpTint": thickness is not None}
 
 
-V2 = dict(voxel=0.003, radius=0.0045, shrink=0.002, smooth=2, lift=6.0, grey=0.12, roughness=0.9, specular=0.08, normal_strength=0.35, ao_floor=0.45)
+V2 = dict(voxel=0.003, radius=0.0045, shrink=0.002, smooth=4, lift=5.0, grey=0.16, roughness=0.9, specular=0.08, normal_strength=0.35, ao_floor=0.45)
 
 
 def build_hair(groom, arm, budget=5000, bake_size=512, samples=16, voxel=0.003, radius=0.0045, version=2, scalp=None):

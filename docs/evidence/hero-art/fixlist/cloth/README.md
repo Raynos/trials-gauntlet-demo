@@ -1,0 +1,11 @@
+# Fix-list item 4: cloth folds (ask 49) — what the masters allow, and what needs sculpting
+
+What the delivery contains: the Street sweatshirt is a 132,256-triangle "CC0 anatomical cotton shell" that is smooth at fold scale (the prototype's own stills show soft large folds only; there are no shoulder/elbow compression folds to recover), plus a 1024² knit normal map. The v0.3.1 atlas baked its normal from the already-collapsed 29 k mesh, so the seams, cuff bands and hem edges the collapse smoothed away were lost too.
+
+Done (`hero_art_import.py`, default on; `--no-hires-normal` reverts): the stage-1 atlas normal is now baked selected-to-active from pre-decimation copies of every opaque garment (16 sources for Street, cage 10 mm, ray 40 mm) onto the collapsed body's atlas UVs, with a fallback to the self-bake where the hi-res ray misses (rim texels whose tangent tilt exceeds 0.30; 82,844 of 4.19 M texels on mustard — cuffs and hems, which otherwise streaked). Visible gain: crisper cuff band and sleeve seam, the hem edge, the knit micro-detail from the delivered normal map carried through; no geometry change. Files grow ~0.3 MB (mustard 3,305,688 → 3,592,592 B) because the normal JPEG now has detail to encode. All five riders + LODs rebuilt, verify green, tris/draws unchanged.
+
+Tried and rejected (`--wrinkles 0.004`, `experiment-procedural-wrinkles-4mm.png`): a Clouds displacement masked to elbows/armpits (overlapping forearm/upperArm and upperArm/chest weights) on the bake sources. It reads as orange-peel mottling, not as compression folds — folds are directional (rings around the elbow, diagonal pulls from the armpit), which a scalar noise cannot give.
+
+Needs real sculpting in the masters, and why: shoulder/elbow/armpit folds and the hood drape are geometry with direction and depth (5-15 mm); no bake or wrinkle map derives them from a smooth shell. It is a Blender sculpt (cloth brush or a cloth-sim pass on the garment panels at rest, then bake to this same normal path), i.e. Astra's chain, not this pipeline.
+
+Stills from the `upperArm.L` bone at 0.6 m, same light, `sit_cruise` frame 40: `before-street-mustard-upperArmL.png` (v0.3.1), `after-street-mustard-upperArmL.png`; `turntable-before-after.mp4` 20 frames, before left, after right.

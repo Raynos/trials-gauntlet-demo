@@ -13,18 +13,21 @@ material list, collapse-decimate to the triangle budget, cap texture sizes, expo
 """
 import argparse
 import json
+import time
 import math
 import os
 import sys
 from pathlib import Path
 
 import bpy
+import numpy as np
 from mathutils import Matrix
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common as C  # noqa: E402
 import hero_art_hair as H  # noqa: E402
 import hero_art_helmet as HELMET  # noqa: E402
+import hero_art_collar as COLLAR  # noqa: E402
 
 GROOM_NAMES = {"Street01_Bystedt_CurlyGroom_Runtime"}
 # The delivered bike keeps the game's 23 parts; these keep their exact topology (chain/hose are
@@ -58,6 +61,9 @@ def args():
     p.add_argument("--bake-dir", default=None, help="stage>=1: where baked atlas JPEGs are written (default: temp dir)")
     p.add_argument("--hair-bake", type=int, default=None, help="stage>=1: hair bake size (default 512, LOD 256)")
     p.add_argument("--race-helmet", choices=["v1", "v2"], default="v2", help="v1 = Astra's constructed helmet as delivered; v2 = the MX full-face remaster (ask 49)")
+    p.add_argument("--race-collar", choices=["v1", "v2"], default="v2", help="v1 = delivered scoop neckline; v2 = lofted collar/yoke panel (ask 49 item 3)")
+    p.add_argument("--no-hires-normal", action="store_true", help="skip the pre-decimation normal bake (item 4)")
+    p.add_argument("--wrinkles", type=float, default=0.0, help="item 4 experiment: procedural fold displacement (m) at elbows/armpits on the bake sources")
     p.add_argument("--hair-v1", action="store_true", help="the round-1 shell recipe (inflated, flat-shaded, full-strength normal)")
     p.add_argument("--ribbons", type=int, default=0, help="stage>=1 comparison: add silhouette ribbons with this triangle budget")
     return p.parse_args(argv)
@@ -171,8 +177,104 @@ def merge_opaque(meshes, arm, name="rider_body"):
     return target, names
 
 
-def bake_body_atlas(body, size, out_dir, orm_size=None, ao=(0.025, 32, 0.8)):
-    """One atlas material for the joined body: albedo / normal / ORM baked from the delivered materials."""
+WRINKLE_PAIRS = (("forearm.L", "upperArm.L"), ("forearm.R", "upperArm.R"), ("upperArm.L", "chest"), ("upperArm.R", "chest"))
+
+
+def add_wrinkles(ob, strength, size=0.028):
+    """Sculpt-free compression folds on a hi-res garment copy: a Clouds displacement masked to the joints where
+    cloth bunches (elbows, armpits), found from overlapping skin weights. Bakes into the atlas normal only."""
+    groups = {g.name: g.index for g in ob.vertex_groups}
+    mask = ob.vertex_groups.new(name="wrinkles")
+    hits = 0
+    for v in ob.data.vertices:
+        w = {ob.vertex_groups[g.group].name: g.weight for g in v.groups}
+        best = 0.0
+        for a_, b_ in WRINKLE_PAIRS:
+            best = max(best, min(w.get(a_, 0.0), w.get(b_, 0.0)))
+        if best > 0.12:
+            mask.add([v.index], min(1.0, (best - 0.12) / 0.25), "REPLACE")
+            hits += 1
+    if hits == 0:
+        return 0
+    tex = bpy.data.textures.new(ob.name + ":wrinkle", "CLOUDS")
+    tex.noise_scale = size
+    tex.noise_depth = 2
+    tex.noise_basis = "IMPROVED_PERLIN"
+    mod = ob.modifiers.new("wrinkles", "DISPLACE")
+    mod.texture = tex
+    mod.texture_coords = "OBJECT"
+    mod.direction = "NORMAL"
+    mod.mid_level = 0.5
+    mod.strength = strength
+    mod.vertex_group = "wrinkles"
+    ob.modifiers.move(len(ob.modifiers) - 1, 0)
+    C.select_only([ob])
+    bpy.context.view_layer.objects.active = ob
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    if "wrinkles" in ob.vertex_groups:
+        ob.vertex_groups.remove(ob.vertex_groups["wrinkles"])  # the apply invalidates the earlier handle
+    return hits
+
+
+def bake_hires_normal(body, sources, size, path, cage=0.010, ray=0.04, jpeg_quality=90):
+    """Selected-to-active tangent normal bake from the pre-decimation garment copies onto the atlas UVs, so the
+    folds and seams the collapse smoothed away come back as normal detail (ask 49 item 4)."""
+    sc = bpy.context.scene
+    sc.render.engine = "CYCLES"
+    sc.cycles.device = "CPU"
+    sc.cycles.samples = 1
+    sc.render.bake.use_selected_to_active = True
+    sc.render.bake.use_cage = False
+    sc.render.bake.cage_extrusion = cage
+    sc.render.bake.max_ray_distance = ray
+    sc.render.bake.margin = 4
+    sc.render.bake.use_clear = True
+    sc.render.bake.normal_space = "TANGENT"
+    img = bpy.data.images.new("rider_body_hires_normal", size, size, alpha=False)
+    img.generated_color = (0.5, 0.5, 1.0, 1)
+    img.colorspace_settings.name = "Non-Color"
+    added = []
+    for m in [m for m in body.data.materials if m]:
+        n = m.node_tree.nodes.new("ShaderNodeTexImage")
+        n.image = img
+        m.node_tree.nodes.active = n
+        n.select = True
+        added.append((m, n))
+    for ob in sources:
+        ob.hide_set(False)
+        ob.hide_render = False
+    C.select_only(list(sources) + [body])
+    bpy.context.view_layer.objects.active = body
+    t0 = time.time()
+    bpy.ops.object.bake(type="NORMAL")
+    C.log(f"hi-res normal bake {size}px from {len(sources)} sources {time.time() - t0:.1f}s")
+    for m, n in added:
+        m.node_tree.nodes.remove(n)
+    sc.render.bake.use_selected_to_active = False
+    # rim misses (cuffs, hems: the low mesh pokes past the hi-res or the ray hits the inner face) give wild
+    # normals; fold detail never tilts that far, so fall back to the self-baked normal where the hi-res one does
+    self_img = bpy.data.images.load(path, check_existing=False)
+    self_img.colorspace_settings.name = "Non-Color"
+    n = size * size * 4
+    hi = np.empty(n, dtype=np.float32)
+    img.pixels.foreach_get(hi)
+    lo = np.empty(n, dtype=np.float32)
+    self_img.pixels.foreach_get(lo)
+    tilt = np.hypot(hi[0::4] - 0.5, hi[1::4] - 0.5)
+    bad = np.repeat(tilt > 0.30, 4)
+    hi[bad] = lo[bad]
+    img.pixels.foreach_set(hi)
+    bpy.data.images.remove(self_img)
+    img.filepath_raw = path
+    img.file_format = "JPEG"
+    img.save(filepath=path, quality=jpeg_quality)
+    bpy.data.images.remove(img)
+    return {"fallbackTexels": int(bad.sum() // 4), "texels": size * size}
+
+
+def bake_body_atlas(body, size, out_dir, orm_size=None, ao=(0.025, 32, 0.8), hires=None):
+    """One atlas material for the joined body: albedo / normal / ORM baked from the delivered materials.
+    `hires`: pre-decimation copies of the garments; when given the normal map is baked from them (selected to active)."""
     import tempfile
     me = body.data
     if not me.uv_layers:
@@ -186,6 +288,8 @@ def bake_body_atlas(body, size, out_dir, orm_size=None, ao=(0.025, 32, 0.8)):
     C.unwrap_all([body], angle=66.0, margin=0.004)
     C.configure_local_ao(*ao)
     paths = C.bake_atlas([body], size, out_dir, "rider_body", jpeg_quality=90, normal_size=size, orm_size=orm_size or size // 2)
+    if hires:
+        paths["hiresNormal"] = bake_hires_normal(body, hires, size, paths["normal"])
     mat = C.atlas_material("rider_body", paths)
     C.assign_atlas([body], mat)
     me.uv_layers.remove(me.uv_layers[source_uv])
@@ -435,6 +539,10 @@ def main():
             delete_objects([old_helmet])
             for me in [m for m in bpy.data.meshes if m.users == 0]:
                 bpy.data.meshes.remove(me)
+        jersey = bpy.data.objects.get("rider:anatomical race jersey")
+        neck_mesh = bpy.data.objects.get("rider:human head and neck")
+        if jersey is not None and neck_mesh is not None and a.race_collar == "v2" and a.stage >= 1:
+            collar_ob, report["raceCollar"] = COLLAR.build_race_collar(arm, jersey, neck_mesh)
         if groom is not None:
             if scene.world is None:
                 scene.world = bpy.data.worlds.new("bake")
@@ -465,6 +573,20 @@ def main():
     if not a.no_join and a.kind == "rider" and a.stage == 0:
         report["joined"] = join_by_material(meshes)
         meshes = meshes_of(a.kind)
+
+    # 2b. stage >= 1 riders: keep pre-decimation copies of the opaque garments as normal-bake sources (item 4)
+    hires = []
+    if a.kind == "rider" and a.stage >= 1 and not a.no_hires_normal:
+        for ob in meshes:
+            if ob.name in protected or not ob.data.materials or any(material_uses_alpha(m) for m in ob.data.materials):
+                continue
+            dup = ob.copy()
+            dup.data = ob.data.copy()
+            dup.name = ob.name + ":hires"
+            bpy.context.scene.collection.objects.link(dup)
+            hires.append(dup)
+            if a.wrinkles > 0:
+                add_wrinkles(dup, a.wrinkles)
 
     # 3. decimate to budget (per part; hands keep a floor at the LOD so fingers survive)
     floors = {}
@@ -509,7 +631,11 @@ def main():
         import tempfile
         bake_dir = a.bake_dir or tempfile.mkdtemp(prefix="hero-art-bake-")
         atlas_size = a.atlas or (1024 if a.lod else 2048)
-        report["atlas"] = {"size": atlas_size, "paths": bake_body_atlas(body, atlas_size, bake_dir)}
+        report["atlas"] = {"size": atlas_size, "paths": bake_body_atlas(body, atlas_size, bake_dir, hires=hires), "hiresSources": [o.name for o in hires]}
+    if hires:
+        delete_objects(hires)
+        for me in [m for m in bpy.data.meshes if m.users == 0]:
+            bpy.data.meshes.remove(me)
 
     if a.kind == "bike" and a.stage >= 1:
         import tempfile

@@ -58,27 +58,80 @@ def sample_albedo(ob, uvs):
     return (float(mean[0]), float(mean[1]), float(mean[2]), 1.0)
 
 
-def build_race_collar(arm, jersey, neck_mesh, bins=36, rows=4, pad=0.007, rise=0.045, name="rider:race collar"):
+def close_panel_gaps(jersey, origin, M, max_perimeter=0.35, max_sides=64, radius=0.32):
+    """Weld the jersey's panel seams and fill the small open loops near the neck/shoulders (the delivered jersey
+    has slits where panels do not meet); the neckline, cuffs and hem are far larger loops and stay open."""
+    inv = M.inverted()
+    bm = bmesh.new()
+    bm.from_mesh(jersey.data)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    bm.edges.ensure_lookup_table()
+    boundary = [e for e in bm.edges if e.is_boundary]
+    seen = set()
+    loops = []
+    for e in boundary:
+        if e.index in seen:
+            continue
+        loop, stack = [], [e]
+        while stack:
+            x = stack.pop()
+            if x.index in seen:
+                continue
+            seen.add(x.index)
+            loop.append(x)
+            for v in x.verts:
+                for o in v.link_edges:
+                    if o.is_boundary and o.index not in seen:
+                        stack.append(o)
+        loops.append(loop)
+    filled = 0
+    for loop in loops:
+        perimeter = sum(e.calc_length() for e in loop)
+        centre = sum((v.co for e in loop for v in e.verts), Vector()) / (2 * len(loop))
+        c = inv @ ((jersey.matrix_world @ centre) - origin)
+        if perimeter < max_perimeter and len(loop) <= max_sides and math.hypot(c.x, c.y) < radius and -0.2 < c.z < 0.15:
+            res = bmesh.ops.holes_fill(bm, edges=loop, sides=max_sides)
+            filled += len(res.get("faces", []))
+    bm.to_mesh(jersey.data)
+    bm.free()
+    jersey.data.validate(verbose=False)
+    jersey.data.update()
+    return {"loops": len(loops), "filledFaces": filled}
+
+
+def build_race_collar(arm, jersey, neck_mesh, bins=72, rows=4, pad=0.007, rise=0.045, name="rider:race collar"):
     origin, M = bone_frame(arm, "neck")
     inv = M.inverted()
     local = lambda ob, co: inv @ ((ob.matrix_world @ co) - origin)
+    gaps = close_panel_gaps(jersey, origin, M)
     # 1. the jersey's neckline: boundary vertices near the neck axis, binned by angle around it
+    # the jersey is split along every panel seam, so weld a copy first: the open edges that remain are the real
+    # neckline, cuffs and hem; weights / UVs come from the nearest original vertex
+    from mathutils.kdtree import KDTree
+    src = jersey.data
+    tree = KDTree(len(src.vertices))
+    for v in src.vertices:
+        tree.insert(v.co, v.index)
+    tree.balance()
+    vert_uv = {}
+    uv_data = src.uv_layers.active.data if src.uv_layers.active else None
+    if uv_data is not None:
+        for poly in src.polygons:
+            for li, vi in zip(poly.loop_indices, poly.vertices):
+                vert_uv.setdefault(vi, tuple(uv_data[li].uv))
     bm = bmesh.new()
-    bm.from_mesh(jersey.data)
+    bm.from_mesh(src)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
     bm.verts.ensure_lookup_table()
-    uv_layer = bm.loops.layers.uv.active
     boundary = [v for v in bm.verts if any(e.is_boundary for e in v.link_edges)]
     ring = []
     for v in boundary:
         p = local(jersey, v.co)
         r = math.hypot(p.x, p.y)
-        if -0.10 < p.z < 0.12 and r < 0.16:
-            uv = None
-            for l in v.link_loops:
-                uv = tuple(l[uv_layer].uv) if uv_layer else None
-                break
-            groups = {jersey.vertex_groups[g.group].name: g.weight for g in jersey.data.vertices[v.index].groups}
-            ring.append((math.atan2(p.y, p.x), p, uv, groups))
+        if -0.16 < p.z < 0.12 and r < 0.26:
+            _, index, _ = tree.find(v.co)
+            groups = {jersey.vertex_groups[g.group].name: g.weight for g in src.vertices[index].groups}
+            ring.append((math.atan2(p.y, p.x), p, vert_uv.get(index), groups))
     if len(ring) < bins // 2:
         raise RuntimeError(f"race collar: only {len(ring)} neckline boundary vertices found")
     per_bin = [[] for _ in range(bins)]
@@ -91,8 +144,8 @@ def build_race_collar(arm, jersey, neck_mesh, bins=36, rows=4, pad=0.007, rise=0
             bottom.append(None)
             continue
         cell.sort(key=lambda c: c[0].z)
-        p = cell[len(cell) // 2][0]  # median height in the bin (the scoop edge)
-        bottom.append((p, cell[len(cell) // 2][1], cell[len(cell) // 2][2]))
+        p = cell[0][0]  # the lowest neckline point in the bin: the yoke must reach the deepest dip of the scoop
+        bottom.append((p, cell[0][1], cell[0][2]))
     for b in range(bins):  # fill empty bins from neighbours
         if bottom[b] is None:
             k = 1
@@ -126,6 +179,9 @@ def build_race_collar(arm, jersey, neck_mesh, bins=36, rows=4, pad=0.007, rise=0
         r0 = math.hypot(p0.x, p0.y) + 0.004
         r1 = neck_r[b] + pad
         col = []
+        # a tuck row 15 mm below the neckline and 3 mm inside the jersey hides the seam under the jersey edge
+        col.append(cb.verts.new(Vector(((r0 - 0.007) * math.cos(theta), (r0 - 0.007) * math.sin(theta), p0.z - 0.015))))
+        weights.append(dict(groups))
         for i in range(rows):
             t = i / (rows - 1)
             ease = t * t * (3 - 2 * t)
@@ -139,7 +195,7 @@ def build_race_collar(arm, jersey, neck_mesh, bins=36, rows=4, pad=0.007, rise=0
         grid.append(col)
     for b in range(bins):
         nb = (b + 1) % bins
-        for i in range(rows - 1):
+        for i in range(rows):
             cb.faces.new((grid[b][i], grid[nb][i], grid[nb][i + 1], grid[b][i + 1]))
     cb.verts.index_update()
     cb.normal_update()
@@ -154,4 +210,4 @@ def build_race_collar(arm, jersey, neck_mesh, bins=36, rows=4, pad=0.007, rise=0
     am = ob.modifiers.new("Armature", "ARMATURE")
     am.object = arm
     return ob, {"tris": C.tri_count(ob), "bins": bins, "rows": rows, "rise": rise, "neckRadius": [round(r, 4) for r in neck_r[::9]],
-                "colour": [round(c, 4) for c in colour[:3]], "necklineVerts": len(ring)}
+                "colour": [round(c, 4) for c in colour[:3]], "necklineVerts": len(ring), "panelGaps": gaps}

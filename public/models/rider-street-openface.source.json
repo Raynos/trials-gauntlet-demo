@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/street-openface-remaster.glb",
   "sourceSha256": "f01c3abc274d457a812af51753ba1ed54e7ad979f7c60a8564c2f08f359ee7df",
   "decodedSha256": "21275ff4c9e372e334dd98f6c4344eee4bdd9998480fbc79909b7647f0ec0ece",
-  "exportSha256": "95f6a2eb0e0f3d910916df06fab12bbd94372cd64d2ff681a84f9a9c644efb34",
+  "exportSha256": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
   "kind": "rider",
   "lod": false,
   "stage": 1,
@@ -285,9 +285,33 @@
       "rider:hero glove construction": 812
     },
     "raceHelmet": null,
+    "raceCollar": null,
     "atlas": {
       "size": 2048,
-      "parts": null
+      "parts": null,
+      "hiresSources": [
+        "Street01_Authored_EditableBody_Runtime:hires",
+        "collar eyelet 1:hires",
+        "collar eyelet -1:hires",
+        "fitted drawcord 1:hires",
+        "fitted drawcord -1:hires",
+        "rider:anatomical sweatshirt:hires",
+        "rider:anatomical sweatshirt pocket:hires",
+        "rider:folded hood:hires",
+        "rider:cotton_laces:hires",
+        "rider:hero footwear construction:hires",
+        "rider:trainer_rubber:hires",
+        "rider:trainer_upper:hires",
+        "rider:glove_top:hires",
+        "rider:gloves:hires",
+        "rider:hero glove construction:hires",
+        "rider.001:hires",
+        "rider:openface helmet:hires"
+      ],
+      "hiresNormal": {
+        "fallbackTexels": 87483,
+        "texels": 4194304
+      }
     }
   },
   "compression": {
@@ -303,12 +327,12 @@
       "inverse binds",
       "clip times"
     ],
-    "rawBytes": 4786316,
-    "packedBytes": 2717272
+    "rawBytes": 5084164,
+    "packedBytes": 3015120
   },
   "verified": {
-    "bytes": 2717272,
-    "sha256": "95f6a2eb0e0f3d910916df06fab12bbd94372cd64d2ff681a84f9a9c644efb34",
+    "bytes": 3015120,
+    "sha256": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
     "triangles": 58816,
     "vertices": 41917,
     "draws": 5,
@@ -316,7 +340,7 @@
     "materials": 5,
     "images": 7,
     "maxTexture": 2048,
-    "imageBytes": 1589533,
+    "imageBytes": 1887378,
     "bones": 19,
     "clips": {
       "compression": {
@@ -391,7 +415,7 @@
         "kind": "jpeg",
         "w": 2048,
         "h": 2048,
-        "bytes": 97396
+        "bytes": 395241
       },
       {
         "name": "rider_body_orm",
@@ -475,5 +499,5 @@
       }
     ]
   },
-  "blenderSeconds": 5.646
+  "blenderSeconds": 5.966
 }

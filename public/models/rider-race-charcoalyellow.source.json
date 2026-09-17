@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/race-charcoalyellow.glb",
   "sourceSha256": "5a7682d8d5bb6aaa0caaa960c3eef7d9b7617e35c4b0169c8f70f6a91cac65cf",
   "decodedSha256": "5a7682d8d5bb6aaa0caaa960c3eef7d9b7617e35c4b0169c8f70f6a91cac65cf",
-  "exportSha256": "75fe31c60716ac5246d46ab42c15ec85cc29ade9fb69e2b8dc423273755a4af0",
+  "exportSha256": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5",
   "kind": "rider",
   "lod": false,
   "stage": 1,
@@ -19,9 +19,9 @@
   "reduced": {
     "triangles": {
       "budget": 45000,
-      "before": 98256,
-      "after": 44092,
-      "ratio": 0.4423015620019126
+      "before": 98832,
+      "after": 44096,
+      "ratio": 0.4379960923189644
     },
     "dropped": [],
     "joined": [
@@ -41,6 +41,7 @@
           "rider:iris.L",
           "rider:iris.R",
           "rider:race articulated knee panels",
+          "rider:race collar",
           "rider:human eyebrows"
         ],
         "materials": "opaque set -> rider_body atlas"
@@ -50,12 +51,12 @@
       {
         "object": "rider:anatomical race jersey",
         "before": 65512,
-        "after": 28396
+        "after": 28118
       },
       {
         "object": "rider:articulated race boots",
         "before": 3628,
-        "after": 1570
+        "after": 1556
       },
       {
         "object": "rider:glove_top",
@@ -75,7 +76,7 @@
       {
         "object": "rider:human head and neck",
         "before": 6274,
-        "after": 2718
+        "after": 2692
       },
       {
         "object": "rider:iris.L",
@@ -90,7 +91,7 @@
       {
         "object": "rider:pants",
         "before": 7616,
-        "after": 3300
+        "after": 3268
       },
       {
         "object": "rider:race articulated knee panels",
@@ -100,17 +101,22 @@
       {
         "object": "rider:sclera.L",
         "before": 1088,
-        "after": 470
+        "after": 466
       },
       {
         "object": "rider:sclera.R",
         "before": 1088,
-        "after": 470
+        "after": 466
       },
       {
         "object": "rider:race helmet",
         "before": 7476,
-        "after": 3238
+        "after": 3208
+      },
+      {
+        "object": "rider:race collar",
+        "before": 576,
+        "after": 392
       }
     ],
     "images": [
@@ -186,9 +192,56 @@
       "replaced": "rider:constructed_helmet",
       "replacedTris": 3166
     },
+    "raceCollar": {
+      "tris": 576,
+      "bins": 72,
+      "rows": 4,
+      "rise": 0.045,
+      "neckRadius": [
+        0.0527,
+        0.0762,
+        0.0578,
+        0.0508,
+        0.0654,
+        0.0532,
+        0.057,
+        0.0766
+      ],
+      "colour": [
+        0.0452,
+        0.0452,
+        0.0482
+      ],
+      "necklineVerts": 296,
+      "panelGaps": {
+        "loops": 4,
+        "filledFaces": 0
+      }
+    },
     "atlas": {
       "size": 2048,
-      "parts": null
+      "parts": null,
+      "hiresSources": [
+        "rider:anatomical race jersey:hires",
+        "rider:articulated race boots:hires",
+        "rider:glove_top:hires",
+        "rider:gloves:hires",
+        "rider:hero glove construction:hires",
+        "rider:human eyebrows:hires",
+        "rider:human head and neck:hires",
+        "rider:iris.L:hires",
+        "rider:iris.R:hires",
+        "rider:pants:hires",
+        "rider:race articulated knee panels:hires",
+        "rider:sclera.L:hires",
+        "rider:sclera.R:hires",
+        "rider:race helmet:hires",
+        "rider:race collar:hires"
+      ],
+      "hiresNormal": {
+        "fallbackTexels": 163213,
+        "texels": 4194304
+      }
     }
   },
   "compression": {
@@ -204,20 +257,20 @@
       "inverse binds",
       "clip times"
     ],
-    "rawBytes": 3718840,
-    "packedBytes": 2062928
+    "rawBytes": 4012368,
+    "packedBytes": 2355380
   },
   "verified": {
-    "bytes": 2062928,
-    "sha256": "75fe31c60716ac5246d46ab42c15ec85cc29ade9fb69e2b8dc423273755a4af0",
-    "triangles": 44092,
-    "vertices": 31835,
+    "bytes": 2355380,
+    "sha256": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5",
+    "triangles": 44096,
+    "vertices": 31847,
     "draws": 2,
     "meshes": 2,
     "materials": 2,
     "images": 3,
     "maxTexture": 2048,
-    "imageBytes": 1139561,
+    "imageBytes": 1432444,
     "bones": 19,
     "clips": {
       "compression": {
@@ -277,21 +330,21 @@
         "kind": "jpeg",
         "w": 2048,
         "h": 2048,
-        "bytes": 114055
+        "bytes": 417182
       },
       {
         "name": "rider_body_orm",
         "kind": "jpeg",
         "w": 1024,
         "h": 1024,
-        "bytes": 418797
+        "bytes": 417000
       },
       {
         "name": "rider_body_albedo",
         "kind": "jpeg",
         "w": 2048,
         "h": 2048,
-        "bytes": 606709
+        "bytes": 598262
       }
     ],
     "meshList": [
@@ -307,8 +360,8 @@
       },
       {
         "name": "rider_body",
-        "tris": 44054,
-        "verts": 31795,
+        "tris": 44058,
+        "verts": 31807,
         "primitives": 1,
         "instances": 1,
         "materials": [
@@ -317,5 +370,5 @@
       }
     ]
   },
-  "blenderSeconds": 3.885
+  "blenderSeconds": 4.154
 }
