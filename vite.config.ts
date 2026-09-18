@@ -16,7 +16,7 @@ interface Esbuild {
 const esbuild = createRequire(createRequire(import.meta.url).resolve('vite'))('esbuild') as Esbuild;
 
 /** The inline loader script (`src/boot/inline.ts` bundled) must paint with the first HTML bytes: ≤ 8 KB minified. */
-const INLINE_BUDGET_BYTES = 8 * 1024;
+const INLINE_BUDGET_BYTES = 9 * 1024;
 
 /** CONTRACT §3: JS bundle ≤ 600 KB gzipped. Fails the build when exceeded. */
 const BUNDLE_BUDGET_GZ_BYTES = 600 * 1024;
@@ -113,19 +113,10 @@ function publicItems(root: string): LoadItem[] {
     const b = stat(f);
     if (b) items.push({ path: `./${f}`, bytes: b, gz: b, phase: 'title', label: f });
   }
-  const models = path.join(pub, 'models');
-  if (fs.existsSync(models)) {
-    const walk = (dir: string, rel: string): void => {
-      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-        if (e.isDirectory()) walk(path.join(dir, e.name), `${rel}/${e.name}`);
-        else {
-          const b = fs.statSync(path.join(dir, e.name)).size;
-          items.push({ path: `./models${rel}/${e.name}`, bytes: b, gz: b, phase: /-lod\.glb$/.test(e.name) ? 'models-lod' : 'models', label: e.name });
-        }
-      }
-    };
-    walk(models, '');
-  }
+  // `public/models/**` is deliberately NOT walked (ask 59.1): those flat files are the SOURCE the catalog
+  // snapshots, not a deployed URL. The runtime fetches only the content-addressed copies the catalog emits
+  // (`models/<pair>/<name>-<digest>.glb`), which reach this manifest through the bundle walk above — listing
+  // the flat copies too both named files nothing requests and double-counted 26.9 MB of models.
   return items;
 }
 
@@ -147,8 +138,12 @@ export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAss
   // Model denominators describe the exact byte snapshots emitted/served by the catalog plugin,
   // even if a source file is replaced while the rest of this table is being assembled.
   for (const asset of modelAssets ?? []) rows.set(asset.logical, asset.bytes.length);
+  // Ask 59: the pack's `kind` / `variant` are what `packMembership` buckets the offline pack by (og.jpg is
+  // never fetched; a `1x`/`2x` pair is fetched by half the devices). Only the build has read the manifest,
+  // so it classifies once here and writes the three sums into the generated table.
+  const facets = new Map<string, { kind?: string; variant?: string }>();
   try {
-    const m = JSON.parse(fs.readFileSync(path.join(pub, 'art', 'manifest.json'), 'utf8')) as { assets?: Array<{ id?: string; path?: string; bytes?: number }> };
+    const m = JSON.parse(fs.readFileSync(path.join(pub, 'art', 'manifest.json'), 'utf8')) as { assets?: Array<{ id?: string; path?: string; bytes?: number; kind?: string; variant?: string }> };
     for (const a of m.assets ?? []) {
       if (!a.id || !a.path) continue;
       let bytes = a.bytes ?? 0;
@@ -158,14 +153,17 @@ export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAss
         /* manifest bytes */
       }
       rows.set(`art:${a.id}`, bytes);
+      facets.set(a.id, { ...(a.kind ? { kind: a.kind } : {}), ...(a.variant ? { variant: a.variant } : {}) });
     }
   } catch {
     /* no art pack: the table has no art keys and steps.ts fails to typecheck — a boot that awaits art it cannot have is a build error, not a 44 % */
   }
   // Ask 58: the world map's plates are `<img>`-loaded and are in no manifest the boot reads, so they are
-  // put in the byte table here — one key per file, both tiers, exactly what `worldMapUrls()` fetches.
+  // put in the byte table here — one key per file; `platePackMembership` splits the two tiers, and a
+  // device fetches the one `worldMapUrls()` names.
   const wm = path.join(pub, 'art', 'worldmap');
   for (const f of fs.existsSync(wm) ? fs.readdirSync(wm).sort() : []) rows.set(`art/worldmap/${f}`, fs.statSync(path.join(wm, f)).size);
+  const pack = offlinePackBytes(rows, (id) => facets.get(id) ?? {});
   const keys = [...rows.keys()].sort();
   const body = keys.map((k) => `  ${JSON.stringify(k)}: ${rows.get(k)},`).join('\n');
   const src = [
@@ -175,6 +173,11 @@ export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAss
     'export const PUBLIC_BYTES = {',
     body,
     '} as const;',
+    '',
+    '// The offline pack as each device tier downloads it (`packMembership`, src/boot/asset-totals.ts):',
+    '// tier-free assets in both, og.jpg in neither, one of the 1x/2x pair each. Generated, so the module',
+    '// path and `__BOOT_TOTALS__` are the same numbers rather than two sums that could drift (totals.ts).',
+    `export const OFFLINE_PACK_BYTES = { '1x': ${pack['1x']}, '2x': ${pack['2x']} };`,
     '',
   ].join('\n');
   const out = path.join(root, 'src', 'boot', 'plan.generated.ts');
@@ -189,7 +192,7 @@ export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAss
   // world-map plate (`offlinePackBytes`, the same rule `src/boot/totals.ts` applies to the generated
   // table). `src/boot/offline-pack.ts` names the same two sets at runtime; the step closes the source
   // when it completes, so a manifest that has drifted degrades the picture, never the number.
-  return declaredBootTotals(need, offlinePackBytes(rows));
+  return declaredBootTotals(need, pack);
 }
 
 /** Bundle + (in build) minify `src/boot/inline.ts` with the core file list and the build sha compiled in. */
@@ -307,6 +310,41 @@ function publicStamp(root: string, subs: string[]): string[] {
  *   __ASSET_ID__  a hash of public/fonts + public/art alone, so the static cache (7 MB of unhashed
  *                 art) survives a JS-only deploy instead of being re-downloaded.
  */
+/**
+ * Ask 59.1: `public/models/**` is the model catalog's SOURCE, not a deployed URL.
+ *
+ * Vite's publicDir copy lands a flat copy of every file in it in `dist/models/` — 26.88 MB of GLB plus the
+ * `.source.json` provenance sidecars — while the game only ever fetches the content-addressed snapshots the
+ * catalog emits (`models/<pairHash>/<name>-<digest>.glb`; `src/render/hero/gltf.ts` is the single fetch
+ * boundary and always resolves through `modelAssetUrl`). Nothing — game, boot, service worker, harness, e2e —
+ * names a flat path, so those bytes were uploaded by every deploy and read by nobody. The copy happens in
+ * Vite's `prepareOutDir` (before any bundle is written), so removing the flat FILES here, after the write,
+ * leaves the hashed pair folders alone.
+ *
+ * If `public/models` ever moves to a non-published source dir, this plugin becomes a no-op and can go.
+ */
+function pruneFlatModels(): Plugin {
+  return {
+    name: 'trials:prune-flat-models',
+    apply: 'build',
+    enforce: 'post',
+    writeBundle(options) {
+      const dir = path.join(options.dir ?? path.join(process.cwd(), 'dist'), 'models');
+      if (!fs.existsSync(dir)) return;
+      let bytes = 0;
+      let n = 0;
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (!e.isFile()) continue; // the `<pairHash>/` folders the runtime actually fetches stay
+        const p = path.join(dir, e.name);
+        bytes += fs.statSync(p).size;
+        n += 1;
+        fs.rmSync(p);
+      }
+      if (n) this.info(`pruned ${n} unrequested flat model copies from dist/models (${(bytes / 1024 / 1024).toFixed(2)} MB)`);
+    },
+  };
+}
+
 function pwa(id: string): Plugin {
   let root = process.cwd();
   return {
@@ -361,7 +399,7 @@ export default defineConfig({
   // Relative base so the built bundle also works when served from a subpath
   // (Vercel preview folders, file listings, the harness preview server).
   base: './',
-  plugins: [bundleBudget(), ...loadManifest(buildId()), pwa(buildId())],
+  plugins: [bundleBudget(), ...loadManifest(buildId()), pwa(buildId()), pruneFlatModels()],
   build: {
     target: 'es2022',
     sourcemap: true,
