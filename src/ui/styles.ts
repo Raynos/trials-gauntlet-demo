@@ -78,13 +78,13 @@ export const FRONT_CSS = /* css */ `
 /* THE INVARIANT (docs/tasks/touch-navigation-invariant.md, src/ui/live.ts): nothing is hit-testable unless it is
    drawn at >= .5 opacity and has been for >= 150 ms. .show decides what is DRAWN (the fade); .live, which only
    live.ts toggles after the reveal has been observed drawn, decides what TAKES POINTERS. Every surface that owns
-   tappables — screens, the pause overlay, the onboarding card, the results frame, the replay bar, the toast — is
+   tappables — screens, the pause overlay, the onboarding card, the results frame and the replay bar — is
    pointer-events: none (itself and, !important, every descendant) until .live. Hidden surfaces are also OUT of
    hit-testing and the accessibility tree: visibility: hidden (delayed until the fade-out ends). Opacity alone is
    never a visibility state. */
-.screen, .overlay, .onboard, .results, .replay, .toast { pointer-events: none; }
-.screen:not(.live) *, .overlay:not(.live) *, .onboard:not(.live) *, .results:not(.live) *, .replay:not(.live) *, .toast:not(.live) * { pointer-events: none !important; }
-.screen.live, .overlay.live, .onboard.live, .results.live, .replay.live, .toast.live { pointer-events: auto; }
+.screen, .overlay, .onboard, .results, .replay { pointer-events: none; }
+.screen:not(.live) *, .overlay:not(.live) *, .onboard:not(.live) *, .results:not(.live) *, .replay:not(.live) * { pointer-events: none !important; }
+.screen.live, .overlay.live, .onboard.live, .results.live, .replay.live { pointer-events: auto; }
 .screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
 .screen.show { opacity: 1; visibility: visible; transition: opacity var(--t2) var(--ease), visibility 0s; }
 .overlay:not(.show), .onboard:not(.show), .results:not(.show), .replay:not(.show) { visibility: hidden; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
@@ -414,7 +414,6 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 .perf[hidden] { display: none; }
 .perf { position: absolute; left: calc(.8rem + var(--sal)); top: calc(4.4rem + var(--sat)); margin: 0; padding: .35rem .55rem; z-index: 6; pointer-events: none; font: 11px/1.4 var(--mono); color: #cfe; background: rgba(0,0,0,.72); border: 1px solid var(--line-2); border-radius: var(--r1); white-space: pre; text-shadow: none; }
 
-/* ---- update toast (service worker has a newer build) ---- */
 /* ?bench=1 (src/game/bench.ts): START card, one status line under the meter while it runs, the report panel at the end. */
 .bench { position: absolute; inset: 0; pointer-events: none; z-index: 40; }
 .bench-card, .bench-report { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto; background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: 0 18px 50px rgba(0,0,0,.55); color: var(--ink); }
@@ -443,12 +442,6 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 .hud.touch ~ .fpsmeter, .touch-layer.on.visible ~ .fpsmeter { top: calc(4.2rem + var(--sat)); }
 /* Results on a phone: the meter leaves the top-right corner to the leaderboard (§18) and sits in the empty legend corner. */
 .hud.touch.results-on ~ .fpsmeter { top: auto; bottom: calc(.2rem + var(--sab)); }
-.toast { position: absolute; left: 50%; bottom: calc(var(--s5) + var(--sab)); transform: translate(-50%, 140%); z-index: 30; display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s2) var(--s2) var(--s4); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r2); box-shadow: var(--plate), 0 18px 40px rgba(0,0,0,.6); opacity: 0; transition: transform var(--t3) var(--ease), opacity var(--t3) var(--ease); white-space: nowrap; }
-.toast.show { transform: translate(-50%, 0); opacity: 1; }
-.toast-dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: pulse 1.6s ease-in-out infinite; }
-.toast-text { display: flex; flex-direction: column; line-height: 1.15; }
-.toast-text b { font-weight: 700; letter-spacing: .04em; }
-.toast-text small { font-size: .74rem; color: var(--ink-mute); }
 
 /* ---- onboarding card (first launch, over the first countdown, game paused) ---- */
 .onboard { position: absolute; inset: 0; z-index: 25; display: flex; align-items: center; justify-content: center; background: rgba(6,7,9,.55); opacity: 0; transition: opacity var(--t2) var(--ease); padding: var(--s4); }
@@ -660,7 +653,7 @@ export const HUD_CSS = /* css */ `
 .hud.touch .hints { bottom: calc(3.6rem + var(--sab)); }
 
 /* ---- landscape prompt (rotate-to-play) ------------------------------- */
-.rotate { position: absolute; inset: 0; z-index: 28; /* above .onboard (25) and every run overlay; below .toast (30) so an update stays reachable */ display: none; align-items: center; justify-content: center; flex-direction: column; gap: var(--s5); background: radial-gradient(120% 90% at 50% 30%, #1a1409 0%, var(--bg) 70%); color: var(--ink); text-align: center; padding: calc(var(--s6) + var(--sat)) var(--s5) calc(var(--s6) + var(--sab)); pointer-events: auto; }
+.rotate { position: absolute; inset: 0; z-index: 28; /* above .onboard (25) and every run overlay */ display: none; align-items: center; justify-content: center; flex-direction: column; gap: var(--s5); background: radial-gradient(120% 90% at 50% 30%, #1a1409 0%, var(--bg) 70%); color: var(--ink); text-align: center; padding: calc(var(--s6) + var(--sat)) var(--s5) calc(var(--s6) + var(--sab)); pointer-events: auto; }
 .rotate .wordmark { font-size: clamp(3rem, 16vw, 5rem); text-align: center; }
 .rotate .msg { font-size: 1rem; font-weight: 700; letter-spacing: .34em; text-transform: uppercase; color: var(--ink-dim); }
 .rotate i { display: block; width: 3rem; height: 5.2rem; border: 3px solid var(--amber); border-radius: var(--r2); box-shadow: 0 0 24px -6px var(--amber); animation: rot 1.6s var(--ease) infinite; }
@@ -795,7 +788,7 @@ export const INBOX_CSS = /* css */ `
 .hud-note.live { pointer-events: auto; }
 .hud-note:hover, .hud-note:focus-visible { opacity: 1; border-color: var(--amber); }
 .hud.results-on .hud-note, .hud.replay-on .hud-note, .hud.review-on .hud-note { opacity: 0; pointer-events: none; }
-.inbox { position: absolute; inset: 0; z-index: 29; /* above .rotate (28), below .toast (30) */ display: flex; align-items: center; justify-content: center; padding: calc(var(--s3) + var(--sat)) calc(var(--s4) + var(--sar)) calc(var(--s3) + var(--sab)) calc(var(--s4) + var(--sal)); background: rgba(6,7,9,.6); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
+.inbox { position: absolute; inset: 0; z-index: 29; /* above .rotate (28) */ display: flex; align-items: center; justify-content: center; padding: calc(var(--s3) + var(--sat)) calc(var(--s4) + var(--sar)) calc(var(--s3) + var(--sab)) calc(var(--s4) + var(--sal)); background: rgba(6,7,9,.6); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
 .inbox.show { opacity: 1; visibility: visible; transition: opacity var(--t2) var(--ease); }
 .inbox.live { pointer-events: auto; }
 .inbox:not(.live) * { pointer-events: none !important; }

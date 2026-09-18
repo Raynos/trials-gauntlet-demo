@@ -665,18 +665,42 @@ Two numbers, DOWNLOAD and SETUP (the user's decision: "B Odometer" with both tra
   icons from the art owner's `public/art/icons/` (`icon-192/512/1024` any, `icon-maskable-192/512`), `og.jpg` as
   the wide screenshot. `index.html`: `<link rel=manifest>`, `apple-touch-icon` (180), SVG + 32/16 favicons,
   `apple-mobile-web-app-title`, OG / Twitter card metas pointing at `https://trials-gauntlet-demo.vercel.app/art/og.jpg`.
-- Service worker source is `src/pwa/sw.js`; the `trials:pwa` Vite plugin emits `dist/sw.js` with the build id
-  baked into the cache name (`trials-<sha>-<stamp>`), so every deploy is a byte-different worker. Install
-  precaches the load manifest's `core` + `title` phases (+ index, manifest); fetch is cache-first for
-  `/assets/*-<hash>.*`, fonts, art, models; network-first with cache fallback for `index.html`,
-  `load-manifest.json`, `sw.js`, the web manifest; `?harness=1` requests and cross-origin are untouched.
-  `activate` drops every other cache and claims clients.
-- Registration (`src/game/pwa.ts`) only in production builds, never in harness mode, `?sw=0` opts out; it
-  re-checks on every return to the foreground. A worker that reaches `installed` behind a controlled page →
-  `App.showUpdate(reload)` → the **Update available → ⟳ Reload** toast (`UpdateToast`); Reload posts
-  `SKIP_WAITING`, `controllerchange` reloads once. `?updatetoast=1` shows the toast for QA. Verified
-  end-to-end against the frozen preview: install → 54 precached entries → controlled after reload → byte-different
-  `sw.js` → toast → Reload → new worker active, old cache gone.
+- Service worker source is `src/pwa/sw.js`; the `trials:pwa` Vite plugin emits `dist/sw.js` with two stamps
+  baked in (ask 58). `__BUILD_ID__` is `<git sha>-<content hash of every emitted file + public/>`, so a deploy
+  that changes bytes is a byte-different worker and a **rebuild of the same tree is the same worker** (it used
+  to carry `Date.now()`, which made every rebuild a new cache name and wiped the player's 31 MB).
+  `__ASSET_ID__` is a hash of `public/fonts` + `public/art` alone.
+- **Three caches**, because they expire on three different clocks: `trials-immutable` (the content-addressed
+  `/assets/*-<8>.*` and `/models/<16hex>/…glb` — `activate` **prunes** it to what the new build's load manifest
+  names, it never wipes it), `trials-static-<assets>` (`/fonts/**`, `/art/**` — survives a JS-only deploy) and
+  `trials-shell-<build>` (the ~25 KB that changes every build: `index.html`, `offline.html`, the two manifests).
+  Install precaches the shell **strictly** (a failed shell fails install, so the old worker keeps serving) and
+  the icons tolerantly. Fetch is cache-first for hashed assets, models, fonts and art; the **document** is
+  cache-first with a background revalidate (network-first there is the B-SLOW bug: a flapping radio holding
+  the first paint behind bytes that are already on disk), with a precached `offline.html` as the last resort;
+  `load-manifest.json` / `sw.js` / the web manifest are network-first; `/api/**`, `?harness=1` and cross-origin
+  are untouched. Every `cache.match` passes `ignoreVary` — hosts that add CORS headers answer `Vary: Origin`,
+  which otherwise makes every single match MISS (and it hides behind the HTTP disk cache until the radio is
+  actually off). It deliberately does **not** pass `ignoreSearch`: the art pack's version rides in `?v=`.
+- Registration is the **first thing the loading screen does** (`src/boot/sw.ts`, bundled into the inline loader,
+  capped at 2.5 s), not the tail of the `front` step — the worker has to be controlling before the boot asks
+  for its 27 MB, or the first visit caches nothing and offline needs a second visit. Production builds only,
+  `?sw=0` opts out, `?harness=1` never reaches it.
+- **There is no update toast.** If a newer worker is waiting when the loading screen starts, it is activated
+  (`SKIP_WAITING`) and the page reloads onto it immediately, so the player sees one loading screen and comes
+  up on the new build — the user's call: *"the update toast always felt buggy — I go to the game, it's
+  downloading everything, and then there's an update toast saying press refresh to download the new shit
+  again."* Measured cost of that reload: 39.8 KB, against 39.0 MB for a cold boot, with zero model bytes
+  re-fetched. There is never a mid-session reload.
+- **Everything is loaded up front** (the user: *"load everything up front, but aggressively cache it"*): the
+  `offlinePack` boot step (`src/boot/offline-pack.ts`) streams the whole art pack beyond the boot set, both
+  world-map tiers, and the lazy audio-worklet / review-sheet chunks, inside the loader's own DOWNLOAD bar.
+  After **one** online load Cache Storage holds 180 entries / 41.96 MB, and a cold start with the origin
+  unreachable reaches 100/100 and rides b1 to the same finish time and hash as online
+  (`harness/e2e/offline.mts`, a ship-gate row; `docs/evidence/pwa-offline/`).
+- iOS: 28 `apple-touch-startup-image` links (`assets/art/splash.mjs`) so a home-screen launch paints the dark
+  plate instead of white, and `apple-touch-icon` at 152 / 167 / 180. iOS ignores the manifest's
+  `orientation: landscape`, so the game must keep working from a portrait cold start.
 - Storage keys added: `trials.bikeClass`, `trials.telemetry`, `trials.runlog`, `trials.onboarded`,
   `trials.best.<id>@pro`. Reset progress clears `trials.best.*` (both classes) only.
 

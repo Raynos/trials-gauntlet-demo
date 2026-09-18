@@ -22,6 +22,7 @@ const STEP_ROWS = [
   ['audio', 'Audio', 1],
   ['game', 'Game + HUD', 1],
   ['front', 'Front end', 2],
+  ['offlinePack', 'Offline pack', 1],
   ['track', 'First track', 1],
   ['heroMeshes', 'Hero meshes', 1],
   ['lighting', 'Lighting', 1],
@@ -54,9 +55,9 @@ export type ModuleStep = Exclude<BootStep, InlineStep>;
  * "needed" flag: a source is in the number because it is in this table, and it is complete
  * because its step is. `done()` therefore reads 1 by arithmetic, never by reclassification.
  */
-export const BYTE_SOURCES = ['core', 'heroModels', 'bootArt'] as const;
+export const BYTE_SOURCES = ['core', 'heroModels', 'bootArt', 'offlinePack'] as const;
 export type ByteKey = (typeof BYTE_SOURCES)[number];
-/** The step whose completion closes a byte source: the step of the same name (core → core, heroModels → heroModels, bootArt → bootArt). */
+/** The step whose completion closes a byte source: the step of the same name (core → core, heroModels → heroModels, bootArt → bootArt, offlinePack → offlinePack). */
 export const closedBy = (key: ByteKey): BootStep => key;
 /** A byte source's label is its closing step's, lower-cased (`core`, `hero models`, `world art`) — the 8 KB inline carries one table. */
 export const byteLabel = (key: ByteKey): string => STEP_INFO[closedBy(key)].label.toLowerCase();

@@ -1,9 +1,9 @@
 /**
- * Two one-shot cards in the front-end language:
- *  - `UpdateToast`: "Update available → Reload" when the service worker has a new build waiting
- *    (the standalone-PWA reload problem: no browser chrome, no other way to pick it up).
- *  - `OnboardingCard`: the single first-launch card explaining gas / lean, dismissed once
- *    (`trials.onboarded`). Shown over the first countdown with the game paused.
+ * `OnboardingCard`: the single first-launch card explaining gas / lean, dismissed once
+ * (`trials.onboarded`). Shown over the first countdown with the game paused.
+ *
+ * There is no update toast. A waiting build is adopted at the very start of the loading screen
+ * (src/boot/sw.ts): one loading screen, on the new build — never a "Reload" prompt after the load.
  */
 import type { InputDevice } from '../core/types';
 import { BALANCE_HINT } from './garage';
@@ -14,38 +14,6 @@ function h<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, html?: s
   if (cls) e.className = cls;
   if (html !== undefined) e.innerHTML = html;
   return e;
-}
-
-export class UpdateToast {
-  readonly root: HTMLDivElement;
-  private readonly btn: HTMLButtonElement;
-
-  constructor(parent: HTMLElement, private readonly onReload: () => void) {
-    this.root = h('div', 'toast');
-    this.root.innerHTML = `<span class="toast-dot"></span><span class="toast-text"><b>Update available</b><small>A newer build is ready</small></span><button type="button" class="btn primary">⟳ Reload</button>`;
-    this.btn = this.root.querySelector('button') as HTMLButtonElement;
-    this.btn.addEventListener('click', () => this.reload());
-    parent.appendChild(this.root);
-  }
-
-  get visible(): boolean {
-    return this.root.classList.contains('show');
-  }
-
-  show(): void {
-    this.root.classList.add('show');
-    reveal(this.root);
-  }
-
-  hide(): void {
-    conceal(this.root);
-    this.root.classList.remove('show');
-  }
-
-  reload(): void {
-    this.btn.textContent = 'Reloading…';
-    this.onReload();
-  }
 }
 
 const ONBOARD_LINES: Record<InputDevice, string[]> = {

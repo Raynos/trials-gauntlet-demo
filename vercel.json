@@ -1,49 +1,64 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "$comment": "Cache policy (ask 58, docs/plans/PWA_OFFLINE.md §4). Vercel applies every matching rule and the LAST match wins per header key, so this file reads top to bottom: the catch-all, then the long-lived classes, then the four files that must never be cached. Cross-origin isolation (COOP same-origin + COEP require-corp) is on the catch-all and is never overridden — the harness's 5 µs performance.now() depends on it, and a response replayed from Cache Storage carries the headers it was stored with. Everything under /art/ and /models/ is versioned: models by their path (/models/<16hex>/<name>-<16hex>.glb), art by a ?v=<8 hex of the file> the manifest carries (src/ui/art.ts) and the world-map plates by the build's hash of public/art/worldmap (src/ui/worldMap.ts). The two indexes that hand out those versions revalidate every time, which is what keeps a month-long cache honest.",
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Cross-Origin-Opener-Policy",
-          "value": "same-origin"
-        },
-        {
-          "key": "Cross-Origin-Embedder-Policy",
-          "value": "require-corp"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
+        { "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
     },
     {
+      "$comment": "Content-hashed by filename: safe forever.",
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "$comment": "/models/<16hex>/<name>-<16hex>.glb — content-addressed twice over (src/boot/model-catalog.ts).",
+      "source": "/models/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "$comment": "One month, the user's call: 'maybe max-age one month, so that it does get garbage collected eventually'. Was max-age=0, must-revalidate — a conditional round trip per font on every load.",
+      "source": "/fonts/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=2592000" }]
+    },
+    {
+      "source": "/art/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=2592000" }]
+    },
+    {
+      "$comment": "The indexes that carry the ?v= versions: cached for a month, they would pin a month-old art pack.",
+      "source": "/art/manifest.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/art/worldmap/worldmap.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "$comment": "The service worker owns the document; a cached index.html would pin an old build id and an old entry chunk.",
       "source": "/",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     },
     {
       "source": "/index.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     },
     {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "source": "/offline.html",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "$comment": "sw.js and load-manifest.json are how a new build is discovered and named. A cached copy of either is an update the player can never take.",
+      "source": "/sw.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/load-manifest.json",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     }
   ]
 }

@@ -1,0 +1,51 @@
+{
+  "url": "http://127.0.0.1:45123/",
+  "updateBoot": {
+    "leaveMs": 14606,
+    "last": {
+      "d": 100,
+      "s": 100,
+      "done": true
+    },
+    "wire": 379851,
+    "requests": 15,
+    "errors": [],
+    "byUrl": {
+      "/": 7294,
+      "/sw.js": 3766,
+      "/load-manifest.json": 3895,
+      "/index.html": 7294,
+      "/offline.html": 937,
+      "/manifest.webmanifest": 1260,
+      "/art/icons/apple-touch-icon.png": 4529,
+      "/art/icons/favicon-32.png": 689,
+      "/art/icons/favicon.svg": 3156,
+      "/art/icons/icon-192.png": 4713,
+      "/art/icons/icon-maskable-192.png": 3432,
+      "/assets/index-BNJmW4z_.js": 338886
+    },
+    "dump": {
+      "caches": {
+        "trials-static-7f47de05c2": 45,
+        "trials-immutable": 16,
+        "trials-shell-c1c9ef6-8f5ad46f80": 4
+      },
+      "models": 14,
+      "assets": 2,
+      "art": 42,
+      "usage": 33519616,
+      "version": {
+        "type": "VERSION",
+        "build": "c1c9ef6-8f5ad46f80",
+        "caches": [
+          "trials-shell-c1c9ef6-8f5ad46f80",
+          "trials-static-7f47de05c2",
+          "trials-immutable"
+        ],
+        "entries": 65,
+        "models": 14,
+        "bytes": 32158162
+      }
+    }
+  }
+}

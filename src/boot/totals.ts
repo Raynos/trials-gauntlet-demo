@@ -9,16 +9,16 @@
  * so it need not bundle the table.
  */
 import { PUBLIC_BYTES } from './plan.generated';
-import { declaredBootTotals, HERO_FILE_SET } from './asset-totals';
+import { declaredBootTotals, HERO_FILE_SET, offlinePackBytes } from './asset-totals';
 import type { ByteKey } from './steps';
 
 /** The glTF files `setModels` fetches before `ready` (`src/render/index.ts`): all of them. */
 export const HERO_FILES = HERO_FILE_SET;
 
-export const DECLARED_BOOT_TOTALS = declaredBootTotals((file) => PUBLIC_BYTES[file]);
+export const DECLARED_BOOT_TOTALS = declaredBootTotals((file) => PUBLIC_BYTES[file], offlinePackBytes(Object.entries(PUBLIC_BYTES)));
 
 export function bootByteTotals(): Readonly<Record<Exclude<ByteKey, 'core'>, number>> {
-  return { heroModels: DECLARED_BOOT_TOTALS.heroModels, bootArt: DECLARED_BOOT_TOTALS.bootArt };
+  return { heroModels: DECLARED_BOOT_TOTALS.heroModels, bootArt: DECLARED_BOOT_TOTALS.bootArt, offlinePack: DECLARED_BOOT_TOTALS.offlinePack };
 }
 
 export const BOOT_BYTE_TOTALS = bootByteTotals();

@@ -7,6 +7,7 @@
  * aware, tokens from styles.ts only.
  */
 import type { BikeClass, RiderOutfit } from '../core/types';
+import { offlineHeld, offlineLine } from './offlineStatus';
 import type { ArtEntry, ArtManifest } from './art';
 import type { FpsChoice, ModelChoice } from './best';
 import type { QualityChoice } from './menu';
@@ -422,7 +423,13 @@ export class SettingsScreen extends Screen {
     wrap.innerHTML = `<h1>Settings</h1>`;
     const list = h('div', 'settings-list rise');
     const foot = h('div', 'settings-foot');
-    foot.innerHTML = `<div class="controls-line">${controlsLineHtml()}</div><div class="build">${escapeHtml(GAME_NAME)} · ${escapeHtml(BUILD_STAMP)}</div>`;
+    foot.innerHTML = `<div class="controls-line">${controlsLineHtml()}</div><div class="build">${escapeHtml(GAME_NAME)} · ${escapeHtml(BUILD_STAMP)}</div><div class="build offline-line"></div>`;
+    // What the worker actually holds, and the one thing we cannot engineer around: Safari clears an
+    // origin's storage after 7 days without a visit (ask 58 — the user accepted it; hiding it would not).
+    void offlineHeld().then((held) => {
+      const line = offlineLine(held);
+      if (line) (foot.querySelector('.offline-line') as HTMLElement).textContent = line;
+    });
     wrap.append(list, foot);
     this.legend = h('div', 'legend', `<span><kbd>↑↓</kbd>Row</span><span><kbd>←→</kbd>Change</span><span><kbd>Esc</kbd>Back</span>`);
     this.root.append(h('div', 'grain'), wrap, this.legend);

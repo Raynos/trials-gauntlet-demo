@@ -4,6 +4,7 @@
 // Reads assets/art/selection.json (which raw candidate each asset uses + per-asset crop hints) and
 // assets/art/prompts.mjs (the prompt text), writes public/art/{menu,world,plates}/* and public/art/manifest.json,
 // and copies each accepted raw PNG into assets/art/raw/.
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, statSync, readFileSync, writeFileSync, copyFileSync, existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -39,7 +40,9 @@ function record(id, rel, kind, tags, name) {
   const f = join(pub, rel);
   const [w, h] = rel.endsWith('.svg') ? [128, 128] : dims(f);
   const job = jobByName[name];
-  manifest.push({ id, path: 'art/' + rel, kind, ...tags, w, h, bytes: statSync(f).size, src: name, prompt: job ? job.prompt : sel.assets[id]?.prompt || '' });
+  // `v`: 8 hex of the file's own bytes (ask 58). The art URLs carry it as `?v=`, which is what lets
+  // vercel.json serve /art/** with a one-month cache instead of `max-age=0, must-revalidate`.
+  manifest.push({ id, path: 'art/' + rel, kind, ...tags, w, h, bytes: statSync(f).size, src: name, prompt: job ? job.prompt : sel.assets[id]?.prompt || '', v: createHash('sha256').update(readFileSync(f)).digest('hex').slice(0, 8) });
   if (job && existsSync(join(rawRoot, name, name + '.png'))) copyFileSync(join(rawRoot, name, name + '.png'), join(rawKeep, name + '.png'));
   console.log(rel.padEnd(44), `${w}x${h}`.padEnd(10), (statSync(f).size / 1024).toFixed(0) + ' KB');
 }

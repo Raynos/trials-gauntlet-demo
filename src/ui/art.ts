@@ -49,7 +49,12 @@ function normalise(raw: unknown): ArtEntry[] {
     const id = typeof o['id'] === 'string' ? o['id'] : typeof o['name'] === 'string' ? o['name'] : src;
     const kind = typeof o['kind'] === 'string' ? o['kind'] : undefined;
     if (!src || !id || !kind) continue;
-    const e: ArtEntry = { id, kind, src: /^(https?:)?\/\//.test(src) || src.startsWith('/') || src.startsWith('data:') ? src : src.startsWith(ART_BASE) ? src : ART_BASE + src };
+    // `?v=<8 hex of the file>` (ask 58): the art pack is not content-addressed by filename, so the
+    // version travels in the query. That is what makes a one-month `Cache-Control` on /art/** safe —
+    // a changed file is a changed URL, for the HTTP cache and for Cache Storage alike.
+    const v = typeof o['v'] === 'string' ? `?v=${o['v']}` : '';
+    const base = /^(https?:)?\/\//.test(src) || src.startsWith('/') || src.startsWith('data:') ? src : src.startsWith(ART_BASE) ? src : ART_BASE + src;
+    const e: ArtEntry = { id, kind, src: src.startsWith('data:') ? base : base + v };
     if (typeof o['track'] === 'string') e.track = o['track'];
     if (typeof o['tier'] === 'string') e.tier = o['tier'] as TrackTier;
     if (typeof o['biome'] === 'string') e.biome = o['biome'] as BiomeId;
@@ -84,7 +89,10 @@ export class ArtManifest {
   async load(url: string = ART_BASE + 'manifest.json'): Promise<this> {
     if (this.loaded) return this;
     try {
-      const res = await fetch(url, { cache: 'no-cache' });
+      // No `cache: 'no-cache'`: that mode says "never trust what you already have", which is exactly
+      // the B-SLOW bug (docs/plans/PWA_OFFLINE.md §5) — the art manifest is served by the worker from
+      // Cache Storage, and the host revalidates it on its own.
+      const res = await fetch(url);
       if (res.ok) this.entries = normalise(await res.json());
     } catch {
       this.entries = [];

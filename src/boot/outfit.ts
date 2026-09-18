@@ -4,6 +4,6 @@
  */
 import type { DeclaredBootTotals } from './asset-totals';
 
-export function selectedBootTotals(totals: DeclaredBootTotals): { heroModels: number; bootArt: number } {
-  return { heroModels: totals.heroModels, bootArt: totals.bootArt };
+export function selectedBootTotals(totals: DeclaredBootTotals): { heroModels: number; bootArt: number; offlinePack: number } {
+  return { heroModels: totals.heroModels, bootArt: totals.bootArt, offlinePack: totals.offlinePack };
 }

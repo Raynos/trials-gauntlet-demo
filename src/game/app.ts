@@ -31,7 +31,6 @@ import {
   TraceBars,
   WorldMapScreen,
   UiSfx,
-  UpdateToast,
   loadBikeChoice,
   loadGhostEnabled,
   loadModelChoice,
@@ -171,7 +170,6 @@ export class App {
   private readonly pause: PauseMenu;
   private readonly garage: GarageScreen;
   private readonly onboard: OnboardingCard;
-  private readonly toast: UpdateToast;
   private readonly perf: PerfOverlay | null;
   private readonly lastRuns = new LastRuns();
   private readonly replayBar: ReplayBar;
@@ -405,7 +403,6 @@ export class App {
       this.game.setPaused(false);
       this.lastNow = performance.now();
     });
-    this.toast = new UpdateToast(o.uiRoot, () => this.reloadForUpdate?.());
     this.perf = o.perf ? new PerfOverlay(o.uiRoot) : null;
     if (o.perf) this.game.perfTiming = true;
     this.labPanel = new LabPanel(o.uiRoot, this.game.physicsHz);
@@ -1001,16 +998,6 @@ export class App {
     } catch {
       return false; // AbortError (sheet dismissed) or unsupported payload
     }
-  }
-
-  // -- service-worker update toast -----------------------------------------------
-
-  private reloadForUpdate: (() => void) | null = null;
-
-  /** A newer build is installed and waiting: show "Update available → Reload"; `reload` activates it. */
-  showUpdate(reload: () => void): void {
-    this.reloadForUpdate = reload;
-    this.toast.show();
   }
 
   /**

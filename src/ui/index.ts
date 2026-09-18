@@ -35,7 +35,7 @@ export { PerfOverlay, type PerfSample } from './perf';
 export { ReplayBar, type ReplayBarState, type ReplayBarCallbacks } from './replay';
 export { LabPanel, type LabSample } from './lab';
 export { TraceBars } from './trace';
-export { UpdateToast, OnboardingCard } from './cards';
+export { OnboardingCard } from './cards';
 export { ArtManifest, BIOME_TINT, type ArtEntry } from './art';
 export { UiSfx } from './sfx';
 export { TIER_ORDER, TIER_LABEL, shipTracks, tierUnlocked, tierComplete, nextTrack, medalTotals, labTracks, isLabTrack } from './progress';

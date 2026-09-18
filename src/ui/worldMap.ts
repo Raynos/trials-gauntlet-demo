@@ -465,10 +465,25 @@ export function regionDots(region: Region): ('platinum' | 'gold' | 'silver' | 'b
   return region.markers.filter((m) => !m.proving).map((m) => m.medal ?? (m.locked ? 'locked' : 'open'));
 }
 
-/** Art-pack paths (`public/art/worldmap/`, cut by assets/art/worldmap.mjs): the world plate and the five region plates, 2x (1536 wide) for dense screens, 1x (1024) otherwise. */
+/**
+ * Art-pack paths (`public/art/worldmap/`, cut by assets/art/worldmap.mjs): the world plate and the five
+ * region plates, 2x (1536 wide) for dense screens, 1x (1024) otherwise.
+ *
+ * `?v=` is the build's hash of `public/art/worldmap/` (ask 58). These 13 files are not in the art
+ * manifest and are not content-addressed by name, so the version travels in the query — which is what
+ * lets `vercel.json` serve them with a one-month cache instead of revalidating every plate every time.
+ */
+declare const __WORLDMAP_V__: string | undefined;
+// Same shape as `BUILD_STAMP` in src/ui/front.ts: vitest.config.ts carries no `define`, so a bare
+// reference would be a ReferenceError under the unit tests.
+const PLATE_V = typeof __WORLDMAP_V__ === 'string' ? `?v=${__WORLDMAP_V__}` : '';
 export function worldPlateSrc(hi: boolean): string {
-  return `art/worldmap/world-${hi ? 1536 : 1024}.webp`;
+  return `art/worldmap/world-${hi ? 1536 : 1024}.webp${PLATE_V}`;
 }
 export function regionPlateSrc(id: RegionId, hi: boolean): string {
-  return `art/worldmap/region-${id}-${hi ? 1536 : 1024}.webp`;
+  return `art/worldmap/region-${id}-${hi ? 1536 : 1024}.webp${PLATE_V}`;
+}
+/** The plates' index (`worldmap.json`), versioned the same way. */
+export function worldMapIndexSrc(): string {
+  return `art/worldmap/worldmap.json${PLATE_V}`;
 }

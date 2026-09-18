@@ -40,11 +40,11 @@ describe('declared byte totals', () => {
   });
 
   it('rejects a missing declared model instead of shrinking the denominator', () => {
-    expect(() => declaredBootTotals(key => key === 'models/rider-race-bluewhite-lod.glb' ? Number.NaN : 10)).toThrow('models/rider-race-bluewhite-lod.glb');
-    expect(() => declaredBootTotals(key => key === 'models/bike-pro.glb' ? 0 : 10)).toThrow('models/bike-pro.glb');
+    expect(() => declaredBootTotals(key => key === 'models/rider-race-bluewhite-lod.glb' ? Number.NaN : 10, 0)).toThrow('models/rider-race-bluewhite-lod.glb');
+    expect(() => declaredBootTotals(key => key === 'models/bike-pro.glb' ? 0 : 10, 0)).toThrow('models/bike-pro.glb');
   });
 
   it('has an all-zero shape for the build before the catalog is read', () => {
-    expect(emptyBootTotals()).toEqual({ heroModels: 0, bootArt: 0 });
+    expect(emptyBootTotals()).toEqual({ heroModels: 0, bootArt: 0, offlinePack: 0 });
   });
 });

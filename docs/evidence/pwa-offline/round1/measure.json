@@ -1,0 +1,161 @@
+{
+  "url": "http://127.0.0.1:45123/",
+  "load1": {
+    "leaveMs": 15955,
+    "last": {
+      "d": 100,
+      "s": 100,
+      "done": true
+    },
+    "wire": 30766814,
+    "requests": 70,
+    "errors": [],
+    "byUrl": {
+      "/": 7291,
+      "/sw.js": 3768,
+      "/load-manifest.json": 3890,
+      "/manifest.webmanifest": 1260,
+      "/offline.html": 937,
+      "/index.html": 7291,
+      "/art/icons/apple-touch-icon.png": 4529,
+      "/art/icons/favicon-32.png": 689,
+      "/art/icons/favicon.svg": 3156,
+      "/art/icons/icon-192.png": 4713,
+      "/art/icons/icon-maskable-192.png": 3432,
+      "/fonts/BarlowCondensed-BlackItalic.woff2": 15548,
+      "/fonts/BarlowCondensed-Bold.woff2": 14888,
+      "/fonts/BarlowCondensed-Medium.woff2": 14680,
+      "/assets/three-CGwyv1Ha.js": 192100,
+      "/assets/index-DLr510Nx.js": 338883,
+      "/models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": 870440,
+      "/models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb": 864848,
+      "/models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb": 1480204,
+      "/models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": 2283040,
+      "/models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb": 2270544,
+      "/models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb": 1753256,
+      "/models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb": 3015120,
+      "/models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb": 1706124,
+      "/models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb": 946824,
+      "/models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb": 3616252,
+      "/art/manifest.json": 15257,
+      "/models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb": 2448152,
+      "/models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb": 912696,
+      "/models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb": 3486940,
+      "/models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb": 2355380,
+      "/art/world/banner-vortex-oil.webp": 47568,
+      "/art/world/banner-kestrel-tyres.webp": 46692,
+      "/art/world/banner-nordvik.webp": 40342,
+      "/art/world/banner-apex-suspension.webp": 60508,
+      "/art/world/banner-bolt-energy.webp": 53096,
+      "/art/world/banner-ironworks-series.webp": 55976,
+      "/art/world/tyremark-arc.webp": 48896,
+      "/art/world/stencil-hkr.webp": 21026,
+      "/art/world/stencil-nordvik.webp": 19792,
+      "/art/world/stencil-weights.webp": 23860,
+      "/art/world/stencil-serial.webp": 20804,
+      "/art/world/stencil-hazard.webp": 22648,
+      "/art/world/stencil-arrows.webp": 27058,
+      "/art/plates/plate-industrial.webp": 40574,
+      "/art/world/mask-edge-grime.webp": 73980,
+      "/art/world/mask-grime-spatter.webp": 118068,
+      "/art/menu/keyart-nalati-1920.webp": 236120,
+      "/art/menu/medal-bronze-512.png": 88055,
+      "/art/menu/medal-silver-512.png": 77927,
+      "/art/menu/medal-gold-512.png": 79364,
+      "/art/menu/medal-platinum-512.png": 86804,
+      "/art/menu/results-credits.webp": 40632,
+      "/art/menu/bike-rookie-1536.webp": 175102,
+      "/art/menu/bike-pro-1536.webp": 179424,
+      "/art/world/poster-trials-night.webp": 38330,
+      "/art/world/poster-tyres.webp": 38340,
+      "/art/world/sign-hard-hat.webp": 40034,
+      "/art/world/sign-overhead-crane.webp": 31352,
+      "/art/world/sign-forklift.webp": 32300,
+      "/art/world/sign-exit.webp": 29040,
+      "/art/world/graffiti-rise.webp": 37860,
+      "/art/world/graffiti-grind.webp": 40586,
+      "/art/world/graffiti-nofear.webp": 39292,
+      "/art/world/graffiti-skull.webp": 33308,
+      "/art/world/graffiti-tag-wall.webp": 40446,
+      "/art/world/graffiti-wheel.webp": 39478
+    },
+    "dump": {
+      "caches": {
+        "trials-shell-c1c9ef6-6ea04a9868": 4,
+        "trials-static-7f47de05c2": 45,
+        "trials-immutable": 16
+      },
+      "models": 14,
+      "assets": 2,
+      "art": 42,
+      "usage": 33519872,
+      "version": {
+        "type": "VERSION",
+        "build": "c1c9ef6-6ea04a9868",
+        "caches": [
+          "trials-shell-c1c9ef6-6ea04a9868",
+          "trials-static-7f47de05c2",
+          "trials-immutable"
+        ],
+        "entries": 65,
+        "models": 14,
+        "bytes": 32158162
+      }
+    },
+    "entries": 65
+  },
+  "coldOffline": {
+    "leaveMs": 13306,
+    "last": {
+      "d": 100,
+      "s": 100,
+      "done": true
+    },
+    "wire": 0,
+    "requests": 0,
+    "errors": [],
+    "byUrl": {},
+    "nav": {
+      "transferSize": 0,
+      "workerStart": 0.4799997806549072
+    }
+  },
+  "warmOnline": {
+    "leaveMs": 13768,
+    "last": {
+      "d": 100,
+      "s": 100,
+      "done": true
+    },
+    "wire": 0,
+    "requests": 3,
+    "errors": [],
+    "byUrl": {
+      "/": 0,
+      "/sw.js": 0
+    },
+    "dump": {
+      "caches": {
+        "trials-shell-c1c9ef6-6ea04a9868": 4,
+        "trials-static-7f47de05c2": 45,
+        "trials-immutable": 16
+      },
+      "models": 14,
+      "assets": 2,
+      "art": 42,
+      "usage": 33519616,
+      "version": {
+        "type": "VERSION",
+        "build": "c1c9ef6-6ea04a9868",
+        "caches": [
+          "trials-shell-c1c9ef6-6ea04a9868",
+          "trials-static-7f47de05c2",
+          "trials-immutable"
+        ],
+        "entries": 65,
+        "models": 14,
+        "bytes": 32158162
+      }
+    }
+  }
+}

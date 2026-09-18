@@ -136,7 +136,7 @@ async function drive(events: Event[], totals: Record<(typeof BYTE_SOURCES)[numbe
   return { views, fractions: views.map((v) => [v.download, v.setup]), doneThrew, lastStepFinishedAt, trace };
 }
 
-const TOTALS = { core: 1_500_000, heroModels: 2_800_000, bootArt: 900_000 };
+const TOTALS = { core: 1_500_000, heroModels: 2_800_000, bootArt: 900_000, offlinePack: 7_100_000 };
 
 describe('boot plan invariant (property)', () => {
   const N = 3000;
@@ -147,7 +147,7 @@ describe('boot plan invariant (property)', () => {
     for (let seed = 1; seed <= N; seed++) {
       const rnd = mulberry32(seed);
       const seq = sequence(rnd, true);
-      const totals = seed % 7 === 0 ? { core: 0, heroModels: 0, bootArt: 0 } : seed % 5 === 0 ? { ...TOTALS, core: 0 } : TOTALS;
+      const totals = seed % 7 === 0 ? { core: 0, heroModels: 0, bootArt: 0, offlinePack: 0 } : seed % 5 === 0 ? { ...TOTALS, core: 0 } : TOTALS;
       const run = await drive(seq, totals);
       events += seq.length;
       views += run.views.length;
@@ -208,7 +208,7 @@ describe('boot plan invariant (property)', () => {
 
   it('bytes: read is credited only up to the declared total, is closed by the awaiting step, and late reports after done() are ignored', async () => {
     const views: ProgressView[] = [];
-    const plan = createBootPlan((v) => views.push({ ...v }), { totals: { core: 1000, heroModels: 0, bootArt: 0 } });
+    const plan = createBootPlan((v) => views.push({ ...v }), { totals: { core: 1000, heroModels: 0, bootArt: 0, offlinePack: 0 } });
     const r = plan.reader('core');
     r.add(600);
     expect(views.at(-1)!.download).toBeCloseTo(0.6, 9);
@@ -221,11 +221,11 @@ describe('boot plan invariant (property)', () => {
     expect(views.at(-1)!.setup).toBe(1);
     // A source the reader never touched is still 1 at done(): closed by its step (closedBy), by arithmetic.
     const v2: ProgressView[] = [];
-    const p2 = createBootPlan((v) => v2.push({ ...v }), { totals: { core: 10, heroModels: 10, bootArt: 10 } });
+    const p2 = createBootPlan((v) => v2.push({ ...v }), { totals: { core: 10, heroModels: 10, bootArt: 10, offlinePack: 10 } });
     const l2 = p2 as unknown as { step(k: BootStep, w: () => void): Promise<unknown>; done(): void };
     for (const k of BOOT_STEPS) {
       await l2.step(k, () => undefined);
-      for (const b of BYTE_SOURCES) if (closedBy(b) === k) expect(v2.at(-1)!.download).toBeGreaterThanOrEqual(1 / 3 - 1e-9);
+      for (const b of BYTE_SOURCES) if (closedBy(b) === k) expect(v2.at(-1)!.download).toBeGreaterThanOrEqual(1 / BYTE_SOURCES.length - 1e-9);
     }
     l2.done();
     expect(v2.at(-1)!.download).toBe(1);

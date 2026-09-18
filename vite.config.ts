@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { execSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -5,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import { HERO_FILES_BY_OUTFIT } from './src/render/hero/urls';
-import { declaredBootTotals, emptyBootTotals, type DeclaredBootTotals } from './src/boot/asset-totals';
+import { declaredBootTotals, emptyBootTotals, offlinePackBytes, type DeclaredBootTotals } from './src/boot/asset-totals';
 import { modelAssetsPlugin, type ModelAsset } from './src/boot/model-catalog';
 
 /** esbuild's own API (bundling the inline loader). Not a direct dependency: resolved through Vite's, so the two never disagree. */
@@ -61,7 +62,7 @@ interface LoadItem {
   path: string;
   bytes: number;
   gz: number;
-  phase: 'core' | 'title' | 'menu' | 'world' | 'models' | 'models-lod' | 'audio-worklet' | 'other';
+  phase: 'core' | 'title' | 'menu' | 'world' | 'worldmap' | 'models' | 'models-lod' | 'audio-worklet' | 'other';
   label?: string;
 }
 
@@ -93,7 +94,22 @@ function publicItems(root: string): LoadItem[] {
   } catch {
     /* no art pack */
   }
-  for (const f of ['manifest.webmanifest', 'art/icons/icon-192.png', 'art/icons/icon-maskable-192.png', 'art/icons/apple-touch-icon.png', 'art/icons/favicon-32.png', 'art/icons/favicon.svg']) {
+  // The world map's plates are `<img>`-loaded by src/ui/worldMapScreen.ts, never listed in the art
+  // manifest — so until this walk existed the service worker could not even name them (plan §2.1(d)).
+  const wm = path.join(pub, 'art', 'worldmap');
+  for (const f of (fs.existsSync(wm) ? fs.readdirSync(wm) : []).sort()) {
+    const b = stat(`art/worldmap/${f}`);
+    if (b) items.push({ path: `./art/worldmap/${f}`, bytes: b, gz: b, phase: 'worldmap', label: `worldmap ${f}` });
+  }
+  // iOS launch images (assets/art/splash.mjs): iOS fetches these itself when the app is added to the
+  // home screen, so nothing in the page requests them -- they are listed so the worker can name them
+  // and so the deploy's byte table is honest, not so the boot spends 1.2 MB on them.
+  const splash = path.join(pub, 'art', 'splash');
+  for (const f of (fs.existsSync(splash) ? fs.readdirSync(splash) : []).sort()) {
+    const b = stat(`art/splash/${f}`);
+    if (b) items.push({ path: `./art/splash/${f}`, bytes: b, gz: b, phase: 'title', label: `splash ${f}` });
+  }
+  for (const f of ['manifest.webmanifest', 'offline.html', 'art/icons/icon-192.png', 'art/icons/icon-maskable-192.png', 'art/icons/apple-touch-icon.png', 'art/icons/apple-touch-icon-152.png', 'art/icons/apple-touch-icon-167.png', 'art/icons/favicon-32.png', 'art/icons/favicon.svg']) {
     const b = stat(f);
     if (b) items.push({ path: `./${f}`, bytes: b, gz: b, phase: 'title', label: f });
   }
@@ -146,6 +162,10 @@ export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAss
   } catch {
     /* no art pack: the table has no art keys and steps.ts fails to typecheck — a boot that awaits art it cannot have is a build error, not a 44 % */
   }
+  // Ask 58: the world map's plates are `<img>`-loaded and are in no manifest the boot reads, so they are
+  // put in the byte table here — one key per file, both tiers, exactly what `worldMapUrls()` fetches.
+  const wm = path.join(pub, 'art', 'worldmap');
+  for (const f of fs.existsSync(wm) ? fs.readdirSync(wm).sort() : []) rows.set(`art/worldmap/${f}`, fs.statSync(path.join(wm, f)).size);
   const keys = [...rows.keys()].sort();
   const body = keys.map((k) => `  ${JSON.stringify(k)}: ${rows.get(k)},`).join('\n');
   const src = [
@@ -165,7 +185,11 @@ export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAss
     if (b === undefined) throw new Error(`boot plan: ${k} is awaited by the boot but missing from public/`);
     return b;
   };
-  return declaredBootTotals(need);
+  // The offline pack's denominator: every art asset the boot set does not already cover, plus every
+  // world-map plate (`offlinePackBytes`, the same rule `src/boot/totals.ts` applies to the generated
+  // table). `src/boot/offline-pack.ts` names the same two sets at runtime; the step closes the source
+  // when it completes, so a manifest that has drifted degrades the picture, never the number.
+  return declaredBootTotals(need, offlinePackBytes(rows));
 }
 
 /** Bundle + (in build) minify `src/boot/inline.ts` with the core file list and the build sha compiled in. */
@@ -180,7 +204,7 @@ export async function buildInline(root: string, core: LoadItem[], totals: Declar
     minify,
     charset: 'utf8',
     legalComments: 'none',
-    define: { __BOOT_CORE__: JSON.stringify(core.map((i) => [i.path, i.bytes])), __BOOT_TOTALS__: JSON.stringify(totals), __BOOT_BUILD__: JSON.stringify(id) },
+    define: { __BOOT_CORE__: JSON.stringify(core.map((i) => [i.path, i.bytes])), __BOOT_TOTALS__: JSON.stringify(totals), __BOOT_BUILD__: JSON.stringify(id), __BOOT_SW__: JSON.stringify(minify) },
   });
   const code = res.outputFiles[0]?.text.trim() ?? '';
   if (minify && Buffer.byteLength(code) > INLINE_BUDGET_BYTES) throw new Error(`inline loader is ${Buffer.byteLength(code)} B, budget ${INLINE_BUDGET_BYTES} B`);
@@ -252,20 +276,55 @@ function loadManifest(id: string): Plugin[] {
   }];
 }
 
+/** `<name>:<bytes>` over a sorted file list, hashed — deterministic, and it moves only when bytes do. */
+function contentStamp(rows: string[]): string {
+  return createHash('sha256').update(rows.sort().join('\n')).digest('hex').slice(0, 10);
+}
+
+/** `<rel>:<size>` for every file under public/<sub>, sorted — the unhashed assets the static cache holds. */
+function publicStamp(root: string, subs: string[]): string[] {
+  const rows: string[] = [];
+  const walk = (dir: string, rel: string): void => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.isDirectory()) walk(path.join(dir, e.name), `${rel}${e.name}/`);
+      else rows.push(`${rel}${e.name}:${fs.statSync(path.join(dir, e.name)).size}`);
+    }
+  };
+  for (const sub of subs) {
+    const dir = path.join(root, 'public', sub);
+    if (fs.existsSync(dir)) walk(dir, `${sub}/`);
+  }
+  return rows;
+}
+
 /**
- * PWA: emit `sw.js` from `src/pwa/sw.js` with the build id baked in, so every deploy is a
- * byte-different worker (that is what makes the browser install the update and the page show
- * "Update available → Reload"). Static `public/` copies would never change between builds.
+ * PWA: emit `sw.js` from `src/pwa/sw.js` with two stamps baked in.
+ *
+ *   __BUILD_ID__  `<git sha>-<hash of every emitted file + the public assets>`. A deploy that changes
+ *                 bytes is a byte-different worker (the browser installs it and the boot adopts it);
+ *                 a REBUILD OF THE SAME TREE is the same worker. The old `Date.now()` stamp made
+ *                 every rebuild a new cache name, and `activate` then wiped the player's 31 MB.
+ *   __ASSET_ID__  a hash of public/fonts + public/art alone, so the static cache (7 MB of unhashed
+ *                 art) survives a JS-only deploy instead of being re-downloaded.
  */
 function pwa(id: string): Plugin {
+  let root = process.cwd();
   return {
     name: 'trials:pwa',
     apply: 'build',
-    generateBundle() {
-      const src = fs.readFileSync(path.join(process.cwd(), 'src', 'pwa', 'sw.js'), 'utf8');
-      const stamp = `${id}-${Date.now().toString(36)}`;
-      this.emitFile({ type: 'asset', fileName: 'sw.js', source: src.replaceAll('__BUILD_ID__', stamp) });
-      this.info(`sw.js emitted (cache trials-${stamp})`);
+    configResolved(c) {
+      root = c.root;
+    },
+    generateBundle(_o, bundle) {
+      const src = fs.readFileSync(path.join(root, 'src', 'pwa', 'sw.js'), 'utf8');
+      const assetRows = publicStamp(root, ['fonts', 'art']);
+      const assets = contentStamp(assetRows);
+      const emitted = Object.entries(bundle)
+        .filter(([name]) => !name.endsWith('.map') && name !== 'sw.js')
+        .map(([name, item]) => `${name}:${item.type === 'chunk' ? Buffer.byteLength(item.code) : Buffer.byteLength(item.source as string | Uint8Array)}`);
+      const stamp = `${id}-${contentStamp([...emitted, ...assetRows])}`;
+      this.emitFile({ type: 'asset', fileName: 'sw.js', source: src.replaceAll('__BUILD_ID__', stamp).replaceAll('__ASSET_ID__', assets) });
+      this.info(`sw.js emitted (trials-shell-${stamp}, trials-static-${assets}, trials-immutable)`);
     },
   };
 }
@@ -298,7 +357,7 @@ function buildId(): string {
 }
 
 export default defineConfig({
-  define: { __BUILD_ID__: JSON.stringify(buildId()), __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z') },
+  define: { __BUILD_ID__: JSON.stringify(buildId()), __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z'), __WORLDMAP_V__: JSON.stringify(contentStamp(publicStamp(process.cwd(), ['art/worldmap'])).slice(0, 8)) },
   // Relative base so the built bundle also works when served from a subpath
   // (Vercel preview folders, file listings, the harness preview server).
   base: './',

@@ -1,0 +1,516 @@
+{
+  "golden": "harness/inputs/b1-first-ride/bot-3.json",
+  "online": {
+    "read": {
+      "leaveMs": 13626,
+      "download": 100,
+      "setup": 100,
+      "done": true,
+      "failed": ""
+    },
+    "dump": {
+      "caches": {
+        "trials-shell-c1c9ef6-949dd04658": 4,
+        "trials-static-9ec6b2b653": 157,
+        "trials-immutable": 19
+      },
+      "entries": 180,
+      "models": 14,
+      "assets": 5,
+      "fonts": 3,
+      "art": 153,
+      "usage": 41963008,
+      "version": {
+        "type": "VERSION",
+        "build": "c1c9ef6-949dd04658",
+        "caches": [
+          "trials-shell-c1c9ef6-949dd04658",
+          "trials-static-9ec6b2b653",
+          "trials-immutable"
+        ],
+        "entries": 180,
+        "models": 14,
+        "bytes": 40453566
+      }
+    },
+    "wire": {
+      "bytes": 39010615,
+      "requests": 184
+    },
+    "ride": {
+      "hash": "389a5dc6c07ab8c3",
+      "finishTime": 40.55833333333333,
+      "faults": 0
+    }
+  },
+  "cachedUrls": [
+    "/art/icons/apple-touch-icon.png",
+    "/art/icons/apple-touch-icon.png",
+    "/art/icons/emblem-512.png",
+    "/art/icons/favicon-16.png",
+    "/art/icons/favicon-32.png",
+    "/art/icons/favicon-32.png",
+    "/art/icons/favicon.svg",
+    "/art/icons/favicon.svg",
+    "/art/icons/icon-1024.png",
+    "/art/icons/icon-192.png",
+    "/art/icons/icon-192.png",
+    "/art/icons/icon-512.png",
+    "/art/icons/icon-maskable-192.png",
+    "/art/icons/icon-maskable-192.png",
+    "/art/icons/icon-maskable-512.png",
+    "/art/manifest.json",
+    "/art/menu/bike-pro-1536.webp",
+    "/art/menu/bike-pro-768.webp",
+    "/art/menu/bike-pro-alt.webp",
+    "/art/menu/bike-rookie-1536.webp",
+    "/art/menu/bike-rookie-768.webp",
+    "/art/menu/bike-rookie-alt.webp",
+    "/art/menu/garage-plate.webp",
+    "/art/menu/keyart-canyon-1920.webp",
+    "/art/menu/keyart-canyon-960.webp",
+    "/art/menu/keyart-industrial-1920.webp",
+    "/art/menu/keyart-industrial-960.webp",
+    "/art/menu/keyart-nalati-1920.webp",
+    "/art/menu/keyart-nalati-960.webp",
+    "/art/menu/loading-plate.webp",
+    "/art/menu/medal-bronze-512.png",
+    "/art/menu/medal-bronze.png",
+    "/art/menu/medal-gold-512.png",
+    "/art/menu/medal-gold.png",
+    "/art/menu/medal-platinum-512.png",
+    "/art/menu/medal-platinum.png",
+    "/art/menu/medal-silver-512.png",
+    "/art/menu/medal-silver.png",
+    "/art/menu/results-canyon.webp",
+    "/art/menu/results-credits.webp",
+    "/art/menu/results-foundry.webp",
+    "/art/menu/results-garage.webp",
+    "/art/menu/results-industrial.webp",
+    "/art/menu/results-nightCity.webp",
+    "/art/menu/results-snow.webp",
+    "/art/menu/tier-beginner.webp",
+    "/art/menu/tier-easy.webp",
+    "/art/menu/tier-extreme.webp",
+    "/art/menu/tier-hard.webp",
+    "/art/menu/tier-medium.webp",
+    "/art/menu/track-b1-first-ride.webp",
+    "/art/menu/track-b2-lean-back.webp",
+    "/art/menu/track-b3-kicker-row.webp",
+    "/art/menu/track-e1-uphill-weight.webp",
+    "/art/menu/track-e2-rear-wheel-first.webp",
+    "/art/menu/track-e3-stairway.webp",
+    "/art/menu/track-h1-wheelie-wire.webp",
+    "/art/menu/track-h2-gap-chain.webp",
+    "/art/menu/track-h3-fire-line.webp",
+    "/art/menu/track-m1-hop-up.webp",
+    "/art/menu/track-m2-drum-roll.webp",
+    "/art/menu/track-m3-see-saw.webp",
+    "/art/menu/track-x1-vertical-limit.webp",
+    "/art/menu/track-x2-pipe-dream.webp",
+    "/art/menu/track-x3-gauntlet.webp",
+    "/art/menu/wordmark-plate.webp",
+    "/art/og.jpg",
+    "/art/plates/plate-canyon.webp",
+    "/art/plates/plate-foundry.webp",
+    "/art/plates/plate-industrial.webp",
+    "/art/plates/plate-nightcity.webp",
+    "/art/plates/plate-snow.webp",
+    "/art/plates/sky-canyon.webp",
+    "/art/plates/sky-foundry.webp",
+    "/art/plates/sky-industrial.webp",
+    "/art/plates/sky-nightcity.webp",
+    "/art/plates/sky-snow.webp",
+    "/art/thumbs/b1-first-ride.webp",
+    "/art/thumbs/b2-lean-back.webp",
+    "/art/thumbs/b3-kicker-row.webp",
+    "/art/thumbs/e1-uphill-weight.webp",
+    "/art/thumbs/e2-rear-wheel-first.webp",
+    "/art/thumbs/e3-stairway.webp",
+    "/art/thumbs/h1-wheelie-wire.webp",
+    "/art/thumbs/h2-gap-chain.webp",
+    "/art/thumbs/h3-fire-line.webp",
+    "/art/thumbs/m1-hop-up.webp",
+    "/art/thumbs/m2-drum-roll.webp",
+    "/art/thumbs/m3-see-saw.webp",
+    "/art/thumbs/x1-vertical-limit.webp",
+    "/art/thumbs/x2-pipe-dream.webp",
+    "/art/thumbs/x3-gauntlet.webp",
+    "/art/world/banner-apex-suspension.webp",
+    "/art/world/banner-bolt-energy.webp",
+    "/art/world/banner-ironworks-series.webp",
+    "/art/world/banner-kestrel-tyres.webp",
+    "/art/world/banner-nordvik.webp",
+    "/art/world/banner-vortex-oil.webp",
+    "/art/world/crowd-day.webp",
+    "/art/world/crowd-night.webp",
+    "/art/world/graffiti-grind.webp",
+    "/art/world/graffiti-grind.webp",
+    "/art/world/graffiti-nofear.webp",
+    "/art/world/graffiti-nofear.webp",
+    "/art/world/graffiti-rise.webp",
+    "/art/world/graffiti-rise.webp",
+    "/art/world/graffiti-skull.webp",
+    "/art/world/graffiti-skull.webp",
+    "/art/world/graffiti-tag-wall.webp",
+    "/art/world/graffiti-tag-wall.webp",
+    "/art/world/graffiti-wheel.webp",
+    "/art/world/graffiti-wheel.webp",
+    "/art/world/kit-pro.webp",
+    "/art/world/kit-rookie.webp",
+    "/art/world/mask-edge-grime.webp",
+    "/art/world/mask-grime-spatter.webp",
+    "/art/world/mask-rivet-drips.webp",
+    "/art/world/mask-rust-streaks.webp",
+    "/art/world/poster-trials-night.webp",
+    "/art/world/poster-trials-night.webp",
+    "/art/world/poster-tyres.webp",
+    "/art/world/poster-tyres.webp",
+    "/art/world/sign-exit.webp",
+    "/art/world/sign-exit.webp",
+    "/art/world/sign-forklift.webp",
+    "/art/world/sign-forklift.webp",
+    "/art/world/sign-hard-hat.webp",
+    "/art/world/sign-hard-hat.webp",
+    "/art/world/sign-overhead-crane.webp",
+    "/art/world/sign-overhead-crane.webp",
+    "/art/world/stencil-apex.webp",
+    "/art/world/stencil-arrows.webp",
+    "/art/world/stencil-hazard.webp",
+    "/art/world/stencil-hkr.webp",
+    "/art/world/stencil-nordvik.webp",
+    "/art/world/stencil-serial.webp",
+    "/art/world/stencil-taro.webp",
+    "/art/world/stencil-weights.webp",
+    "/art/world/tyremark-arc.webp",
+    "/art/world/tyremark-straight.webp",
+    "/art/worldmap/region-canyon-1024.webp",
+    "/art/worldmap/region-canyon-1536.webp",
+    "/art/worldmap/region-foundry-1024.webp",
+    "/art/worldmap/region-foundry-1536.webp",
+    "/art/worldmap/region-industrial-1024.webp",
+    "/art/worldmap/region-industrial-1536.webp",
+    "/art/worldmap/region-nightCity-1024.webp",
+    "/art/worldmap/region-nightCity-1536.webp",
+    "/art/worldmap/region-snow-1024.webp",
+    "/art/worldmap/region-snow-1536.webp",
+    "/art/worldmap/world-1024.webp",
+    "/art/worldmap/world-1536.webp",
+    "/art/worldmap/worldmap.json",
+    "/assets/inbox-lok2bnXA.js",
+    "/assets/index-Dr5In2G-.js",
+    "/assets/three-CGwyv1Ha.js",
+    "/assets/worklet-DGoGEqnF.js",
+    "/assets/worklet-Vg1LRsTe.js",
+    "/fonts/BarlowCondensed-BlackItalic.woff2",
+    "/fonts/BarlowCondensed-Bold.woff2",
+    "/fonts/BarlowCondensed-Medium.woff2",
+    "/index.html",
+    "/load-manifest.json",
+    "/manifest.webmanifest",
+    "/model-catalog.json",
+    "/models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb",
+    "/models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb",
+    "/models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb",
+    "/models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb",
+    "/models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb",
+    "/models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb",
+    "/models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
+    "/models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
+    "/models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb",
+    "/models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb",
+    "/models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+    "/models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+    "/models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb",
+    "/models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb",
+    "/offline.html"
+  ],
+  "offline": {
+    "read": {
+      "leaveMs": 16882,
+      "download": 100,
+      "setup": 100,
+      "done": true,
+      "failed": ""
+    },
+    "nav": {
+      "transferSize": 0,
+      "workerStart": 0.5
+    },
+    "wire": {
+      "bytes": 0,
+      "requests": 0
+    },
+    "frame": {
+      "canvas": true,
+      "drawn": true
+    },
+    "ride": {
+      "hash": "389a5dc6c07ab8c3",
+      "finishTime": 40.55833333333333,
+      "faults": 0
+    },
+    "worldMap": {
+      "screen": "tracks",
+      "world": true,
+      "regions": 5,
+      "markers": 22
+    },
+    "inbox": {
+      "before": [],
+      "err": "TypeError: Failed to fetch",
+      "queueKeys": []
+    },
+    "garage": {
+      "combos": [
+        {
+          "combo": "street-mustard x rookie",
+          "heroDoc": "bike rider [street-mustard / rookie]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Mustard · barehead selected",
+            "loading": 0,
+            "outfit": "street-mustard",
+            "bike": "rookie"
+          },
+          "ok": true
+        },
+        {
+          "combo": "street-openface x rookie",
+          "heroDoc": "bike rider [street-openface / rookie]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Charcoal · open-face selected",
+            "loading": 0,
+            "outfit": "street-openface",
+            "bike": "rookie"
+          },
+          "ok": true
+        },
+        {
+          "combo": "race-bluewhite x rookie",
+          "heroDoc": "bike rider [race-bluewhite / rookie]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Blue & white · Race selected",
+            "loading": 0,
+            "outfit": "race-bluewhite",
+            "bike": "rookie"
+          },
+          "ok": true
+        },
+        {
+          "combo": "street-charcoal x rookie",
+          "heroDoc": "bike rider [street-charcoal / rookie]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Charcoal · barehead selected",
+            "loading": 0,
+            "outfit": "street-charcoal",
+            "bike": "rookie"
+          },
+          "ok": true
+        },
+        {
+          "combo": "race-charcoalyellow x rookie",
+          "heroDoc": "bike rider [race-charcoalyellow / rookie]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Charcoal & yellow · Race selected",
+            "loading": 0,
+            "outfit": "race-charcoalyellow",
+            "bike": "rookie"
+          },
+          "ok": true
+        },
+        {
+          "combo": "street-mustard x pro",
+          "heroDoc": "bike rider [street-mustard / pro]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Mustard · barehead selected",
+            "loading": 0,
+            "outfit": "street-mustard",
+            "bike": "pro"
+          },
+          "ok": true
+        },
+        {
+          "combo": "street-openface x pro",
+          "heroDoc": "bike rider [street-openface / pro]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Charcoal · open-face selected",
+            "loading": 0,
+            "outfit": "street-openface",
+            "bike": "pro"
+          },
+          "ok": true
+        },
+        {
+          "combo": "race-bluewhite x pro",
+          "heroDoc": "bike rider [race-bluewhite / pro]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Blue & white · Race selected",
+            "loading": 0,
+            "outfit": "race-bluewhite",
+            "bike": "pro"
+          },
+          "ok": true
+        },
+        {
+          "combo": "street-charcoal x pro",
+          "heroDoc": "bike rider [street-charcoal / pro]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Charcoal · barehead selected",
+            "loading": 0,
+            "outfit": "street-charcoal",
+            "bike": "pro"
+          },
+          "ok": true
+        },
+        {
+          "combo": "race-charcoalyellow x pro",
+          "heroDoc": "bike rider [race-charcoalyellow / pro]",
+          "tapped": true,
+          "rect": {
+            "selected": "chip outfit-button on selected",
+            "status": "Charcoal & yellow · Race selected",
+            "loading": 0,
+            "outfit": "race-charcoalyellow",
+            "bike": "pro"
+          },
+          "ok": true
+        }
+      ],
+      "modelFailures": []
+    }
+  },
+  "slowStart": {
+    "leaveMs": 13436,
+    "offlineMs": 16882,
+    "wire": {
+      "bytes": 0,
+      "requests": 5
+    }
+  },
+  "updateBoot": {
+    "read": {
+      "leaveMs": 13524,
+      "download": 100,
+      "setup": 100,
+      "done": true,
+      "failed": ""
+    },
+    "dump": {
+      "caches": {
+        "trials-static-9ec6b2b653": 157,
+        "trials-immutable": 19,
+        "trials-shell-c1c9ef6-949dd04658-next": 4
+      },
+      "entries": 180,
+      "models": 14,
+      "assets": 5,
+      "fonts": 3,
+      "art": 153,
+      "usage": 41962496,
+      "version": {
+        "type": "VERSION",
+        "build": "c1c9ef6-949dd04658-next",
+        "caches": [
+          "trials-shell-c1c9ef6-949dd04658-next",
+          "trials-static-9ec6b2b653",
+          "trials-immutable"
+        ],
+        "entries": 180,
+        "models": 14,
+        "bytes": 40453566
+      }
+    },
+    "wire": {
+      "bytes": 39829,
+      "requests": 11,
+      "byUrl": {
+        "/": 8236,
+        "/sw.js": 31593,
+        "/load-manifest.json": 0,
+        "/index.html": 0,
+        "/offline.html": 0,
+        "/manifest.webmanifest": 0,
+        "/model-catalog.json": 0
+      }
+    },
+    "modelBytes": 0
+  },
+  "checks": [
+    {
+      "id": "offline.cacheAfterFirstLoad",
+      "pass": true,
+      "value": "180 entries · 14 models · 41.96 MB",
+      "note": "need ≥ 14 models, ≥ 5 assets+fonts, ≥ 27 MB; wire 39.01 MB"
+    },
+    {
+      "id": "offline.coldStartPlayable",
+      "pass": true,
+      "value": "100/100 done=true in 16882 ms",
+      "note": "0 origin requests, transferSize 0, workerStart 0.50 ms"
+    },
+    {
+      "id": "offline.firstFrame",
+      "pass": true,
+      "value": "canvas / context"
+    },
+    {
+      "id": "offline.worldMapDraws",
+      "pass": true,
+      "value": "tracks: world loaded, 5 region plates, 22 markers",
+      "note": "need the world plate + at least 5 region plates, drawn with the origin unreachable"
+    },
+    {
+      "id": "offline.inboxQueues",
+      "pass": true,
+      "value": "POST /api/inbox → TypeError: Failed to fetch",
+      "note": "the worker bypasses /api/; the queue itself is src/ui/inbox.ts NoteQueue (unit-tested)"
+    },
+    {
+      "id": "offline.garageSwapsOffline",
+      "pass": true,
+      "value": "10/10 combinations",
+      "note": "0 failed /models/ requests"
+    },
+    {
+      "id": "offline.rideFinishes",
+      "pass": true,
+      "value": "40.5583 s · 389a5dc6c07a",
+      "note": "online 40.5583 · 389a5dc6c07a"
+    },
+    {
+      "id": "offline.noPageErrors",
+      "pass": true,
+      "value": 0
+    },
+    {
+      "id": "offline.slowStart",
+      "pass": true,
+      "value": "13436 ms at 50 kbps / 400 ms RTT",
+      "note": "offline was 16882 ms; limit ×1.6 = 27011 ms; 0 B over the wire"
+    },
+    {
+      "id": "offline.updateSurvives",
+      "pass": true,
+      "value": "14 models kept · 39.8 KB re-fetched",
+      "note": "0 B of models off the wire (must be 0); loader 100/100"
+    }
+  ]
+}

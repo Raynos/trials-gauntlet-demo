@@ -19,6 +19,10 @@
  *                                       runs alone before the pool. The check and failure totals do not depend on N; the
  *                                       per-flow lines interleave by completion.
  *   pnpm harness:e2e --only=review      the level reviewer: REVIEW tab → picker → segments / note / Copy review / pan / fly / ride (harness/e2e/review.mts)
+ *   pnpm harness:e2e --only=offline     the aeroplane-mode gate (harness/e2e/offline.mts): ONE online load, then the origin is shut down and the
+ *                                       game cold-starts and rides from Cache Storage. The only suite in the tree that runs WITH the service
+ *                                       worker (everything else passes `?sw=0`), so a worker regression is invisible anywhere else — which is why
+ *                                       `offline.coldStartPlayable` is a ship-gate row. Runs alone: its own persistent profile and its own server.
  *   pnpm harness:e2e --only=heroart     opt-in (~2 min, WebKit): the played hero-art clip — garage outfit / livery swaps flash-probed, b1 on both goldens hash-checked (harness/e2e/hero-art-clip.mts)
  *
  * Rules the suite enforces (each is a past phone bug):
@@ -41,6 +45,7 @@ import { bootSuite } from './boot.mjs';
 import { benchFull, benchSuite } from './bench.mjs';
 import { desktopSuite } from './desktop.mjs';
 import { reviewSuite } from './review.mjs';
+import { offlineSuite } from './offline.mjs';
 
 type Geom = { name: string; width: number; height: number; dpr: number };
 const GEOMS: Geom[] = [
@@ -1022,6 +1027,20 @@ if (wants('boot')) {
     }
   }
   console.log(`  flow boot: ${((Date.now() - t0) / 1000).toFixed(0)} s (alone)`);
+}
+// The offline gate (docs/plans/PWA_OFFLINE.md §7): a persistent Chromium profile, the server stopped mid-suite,
+// and the service worker ON. It owns its own server and browser, so like `boot` it runs ALONE, not in the pool.
+if (wants('offline')) {
+  const t0 = Date.now();
+  console.log('== offline');
+  const report = await offlineSuite({ verbose });
+  for (const c of report.checks) {
+    checks++;
+    if (!c.pass) fails.push({ flow: 'offline', rule: c.id, detail: `${String(c.value)}${c.note ? ` — ${c.note}` : ''}` });
+  }
+  fs.mkdirSync('harness/out/offline', { recursive: true });
+  fs.writeFileSync('harness/out/offline/offline.json', JSON.stringify(report.measured, null, 2));
+  console.log(`  flow offline: ${((Date.now() - t0) / 1000).toFixed(0)} s (alone)`);
 }
 if (wants('bench')) {
   tasks.push({

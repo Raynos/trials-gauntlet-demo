@@ -41,7 +41,7 @@ describe('loader renderer (Odometer, two tracks)', () => {
         if (s === 100) expect(v.doneCount).toBe(BOOT_STEPS.length); // 100 only once every step completed
         expect(FLOAT.test(root.textContent ?? '')).toBe(false);
       },
-      { totals: { core: 1000, heroModels: 4000, bootArt: 1000 } },
+      { totals: { core: 1000, heroModels: 4000, bootArt: 1000, offlinePack: 0 } },
     );
     expect(root.querySelector('.build')!.textContent).toBe('build abc1234');
     const core = plan.reader('core');
@@ -78,7 +78,7 @@ describe('loader renderer (Odometer, two tracks)', () => {
   it('a failure paints the message and the retry button without touching the numbers', () => {
     const root = mountLoader();
     const r = createLoaderRenderer(root, 'abc1234', () => 0);
-    const plan = createBootPlan((v) => r.paint(v), { totals: { core: 10, heroModels: 0, bootArt: 0 } });
+    const plan = createBootPlan((v) => r.paint(v), { totals: { core: 10, heroModels: 0, bootArt: 0, offlinePack: 0 } });
     plan.reader('core').add(5);
     plan.fail('Startup failed: boom');
     expect(root.classList.contains('failed')).toBe(true);

@@ -22,6 +22,7 @@
   "perf.renderSubmitMsP95": 4,
   "perf.renderSyncedMsP95": 16,
   "determinism.pass": true,
+  "offline.coldStartPlayable": true,
   "stranger.attemptsBandFactor": 1.5,
   "stranger.minSessions": 2,
   "reflex.attemptsBandFactor": 1.5,

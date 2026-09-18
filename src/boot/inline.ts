@@ -11,6 +11,7 @@
 import { createBootPlan } from './plan';
 import { createLoaderRenderer } from './render';
 import { streamBytes } from './stream';
+import { swBoot } from './sw';
 import type { BootWindow } from './handoff';
 import type { DeclaredBootTotals } from './asset-totals';
 import { selectedBootTotals } from './outfit';
@@ -18,6 +19,8 @@ import { selectedBootTotals } from './outfit';
 declare const __BOOT_CORE__: [path: string, bytes: number][];
 declare const __BOOT_TOTALS__: DeclaredBootTotals;
 declare const __BOOT_BUILD__: string;
+/** Production builds only: dev has no `sw.js` and a stale worker there would serve yesterday's bundle. */
+declare const __BOOT_SW__: boolean;
 
 (function boot(): void {
   const root = document.getElementById('loader');
@@ -41,7 +44,8 @@ declare const __BOOT_BUILD__: string;
   const coreTotal = core.reduce((sum, item) => sum + item[1], 0);
   const plan = createBootPlan(createLoaderRenderer(root, __BOOT_BUILD__).paint, { totals: { core: coreTotal, ...selectedBootTotals(__BOOT_TOTALS__) } });
   const fail = (m: string): void => {
-    if (!plan.view.done && !plan.view.error) plan.fail(m);
+    // Offline with an unfinished cache: "⟳ Retry" against a dead radio is a lie, so say what happened.
+    if (!plan.view.done && !plan.view.error) plan.fail(navigator.onLine ? m : `Offline — this build was not fully downloaded. Connect once and reopen. (${m})`);
   };
   root.querySelector<HTMLButtonElement>('.err button')!.onclick = () => location.reload();
   addEventListener('error', (e) => {
@@ -62,7 +66,9 @@ declare const __BOOT_BUILD__: string;
   };
 
   plan
-    .step('core', () => Promise.all([worker(), worker(), worker(), worker()]))
+    // The worker first, capped: it must control this page before the boot asks for its 27 MB, or the
+    // first visit caches nothing and offline needs a second visit (docs/plans/PWA_OFFLINE.md §1.2.1).
+    .step('core', () => swBoot(__BOOT_SW__).then(() => Promise.all([worker(), worker(), worker(), worker()])))
     .then((afterCore) => {
       let release!: () => void;
       const evaluated = afterCore.step('evaluate', () => new Promise<void>((r) => (release = r)));

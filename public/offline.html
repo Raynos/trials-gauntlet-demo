@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <title>Trials Gauntlet — offline</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #07080a; color: #f3f5f8; font: 500 14px/1.5 -apple-system, "Helvetica Neue", Arial, system-ui, sans-serif; }
+      main { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; }
+      .plate { background: rgba(9,11,15,.92); box-shadow: inset 5px 0 0 #ffb020, 0 6px 20px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); padding: .3em 1.5em .25em 1em; font-size: clamp(24px, 6.5vmin, 38px); }
+      .wm { font-weight: 900; font-style: italic; line-height: .9; letter-spacing: -.01em; text-transform: uppercase; color: #ffb020; white-space: nowrap; }
+      p { max-width: 30em; color: rgba(243,245,248,.72); margin: 0; }
+      button { min-height: 48px; padding: 0 28px; border: 0; border-radius: 10px; background: #ffb020; color: #1a1206; font: 700 15px system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="plate"><span class="wm">Trials Gauntlet</span></div>
+      <p>You are offline and this build was never fully downloaded. Open the game once with a connection — after that it starts and plays with the radio off.</p>
+      <button type="button" onclick="location.replace('./')">⟳ Try again</button>
+    </main>
+  </body>
+</html>

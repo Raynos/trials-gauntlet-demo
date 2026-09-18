@@ -15,8 +15,7 @@
  *   ?dev=1          unlock every tier in track select and list the harness test strips
  *   ?hz=<n>         physics rate (default 120)
  *   ?perf=1         fps / frame ms / physics µs / draw-call overlay (top-left, under the pause button)
- *   ?sw=0           do not register the service worker (production builds register it; harness never does)
- *   ?updatetoast=1  show the "Update available" toast at once (capture / QA of the PWA reload path)
+ *   ?sw=0           do not register the service worker (production builds register it from the inline loader; harness never does)
  *   ?trace=1        live InputFrame bars (gas / brake / lean) under the HUD timer — for filming the phone
  *   ?lab=1          physics lab HUD + ghost of the last attempt on every track (automatic on `lab-*` tracks)
  *   ?bench=1        the on-device benchmark (src/game/bench.ts, docs/device/README.md): START card → scenarios → Copy report;
@@ -32,11 +31,11 @@ import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, installHook, isPhone, type HookExtras } from './game';
 import { parseBenchParams } from './game/bench';
 import { resolveBoot } from './game/flow';
-import { registerServiceWorker } from './game/pwa';
 import { getTrack } from './tracks';
 import { ArtManifest, BestTimes, DomHud, injectStyles, loadBikeChoice, loadHeldTier, loadModelChoice, loadQualityOverride, menuPlate, type ModelChoice } from './ui';
 import { nextPaint } from './ui/loader';
 import { takeBootPlan } from './boot/handoff';
+import { offlinePackUrls } from './boot/offline-pack';
 import { streamBytes } from './boot/stream';
 import { PREPARE_STEPS } from './boot/steps';
 import { delegate, type ByteProgress, type StepRunner } from './boot/plan';
@@ -286,9 +285,10 @@ function boot(): void {
         return { ui, bestTimes, hud, game };
       });
       const { ui, bestTimes, hud, game } = sGame.value;
+      // Hoisted out of the `front` step: the `offlinePack` step below streams every asset it names.
+      const art = new ArtManifest();
       const sFront = await sGame.step('front', async () => {
         await nextPaint();
-        const art = new ArtManifest();
         // Key art is background: streamed into the browser cache with its bytes on the `after` list, never awaited
         // (the menu's CSS background finishes the download on its own and hot-swaps the plate in).
         void art.load().then(() => {
@@ -351,12 +351,38 @@ function boot(): void {
         hook.app = shell.testApi();
         const benchApi = shell.benchApi();
         if (benchApi) hook.bench = benchApi;
-        if (import.meta.env.PROD && params.get('sw') !== '0') registerServiceWorker((reload) => shell.showUpdate(reload));
-        if (params.get('updatetoast') === '1') setTimeout(() => shell.showUpdate(() => location.reload()), 1500);
         return shell;
       });
       const shell = sFront.value;
-      const sTrack = await sFront.step('track', async (p) => {
+      // Ask 58: everything the game can show, in the first bar. The user asked for it to behave like a
+      // game — "load everything up front, but aggressively cache it" — so the rest of the art pack and
+      // both world-map tiers are streamed here, counted honestly, and kept by the service worker's
+      // cacheFirst. A file the pack has lost is a picture that degrades, never a boot that fails.
+      const sPack = await sFront.step('offlinePack', async (p) => {
+        const reader = plan.reader('offlinePack');
+        await art.load();
+        const urls = offlinePackUrls(art.all());
+        p.detail(`${urls.length} files`);
+        let i = 0;
+        const pull = async (): Promise<void> => {
+          while (i < urls.length) {
+            const item = urls[i++]!;
+            await streamBytes(item[0], reader.add, item[1]).catch(() => undefined);
+          }
+        };
+        await Promise.all([pull(), pull(), pull(), pull()]);
+        // The chunks nothing fetches until a gesture: the audio worklet (loaded on the first unlock,
+        // `src/audio/graph/webAudio.ts`) and the review sheet. Offline they were the two things that
+        // still went to the wire -- the worklet failed with "worklet timeout" and dropped the game to
+        // the fallback graph. Plain `fetch`, outside the reader: a few KB must not move a 38 MB number.
+        await fetch('./load-manifest.json')
+          .then((r) => (r.ok ? (r.json() as Promise<{ items?: { path: string; phase: string }[] }>) : null))
+          .then(async (m) => {
+            for (const item of m?.items ?? []) if (item.phase === 'audio-worklet' || item.phase === 'other') await fetch(item.path).catch(() => undefined);
+          })
+          .catch(() => undefined);
+      });
+      const sTrack = await sPack.step('track', async (p) => {
         p.detail(getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track');
         await nextPaint();
         shell.start(); // loads the track (compile + physics + renderer world) and shows the menu

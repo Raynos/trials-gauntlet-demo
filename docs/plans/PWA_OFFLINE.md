@@ -213,17 +213,29 @@ printed in the gate table like `clear.golden` / `determinism.pass`. The gate's c
 Headless Chromium is not iOS Safari. It cannot prove: the home-screen install, the standalone launch, the splash image, Safari's Cache Storage behaviour and its 7-day eviction, or WebKit's service-worker lifecycle in a standalone app. **Draft HR row (for the parent to add to `project/human-in-the-loop/QUEUE.md` — not added by this plan):**
 
 ```
-- **HR-12 — The game in aeroplane mode, on your iPhone home screen (ask 58).** Waiting on: you — after the offline
-  round ships, open the new build in Safari **once**, let it reach the menu, then Share → Add to Home Screen. Kill
-  Safari and the app from the app switcher, turn on **Aeroplane Mode** (Wi-Fi off too), and open the icon. Three
-  readings: (1) does it paint something other than white while it starts, (2) does the loader reach 100/100 and show
-  the menu, (3) can you ride B1 to the finish. If any of them fails, say what was on screen and for how long. Then
-  turn the radio back on and confirm it still updates (you should get "Update available → Reload" on the next build).
+- **HR-12 — The game in aeroplane mode, on your iPhone home screen (ask 58).** Waiting on: you. Open the new
+  build in Safari **once**, let it reach the menu (the loading bar now pulls the whole game — about 39 MB —
+  so give it the one load it asks for), then Share → Add to Home Screen. Kill Safari and the app from the
+  app switcher, turn on **Aeroplane Mode** (Wi-Fi off too), and open the icon. Four readings: (1) what is on
+  screen while it starts — it should be the dark plate with the wordmark, not white; (2) does the loader reach
+  100/100 and show the menu; (3) can you ride B1 to the finish; (4) in the garage, swap through all five
+  outfits and both bikes — every one should appear with no waiting and no grey stand-in. If any of them fails,
+  say what was on screen and for how long. Then turn the radio back on and open it again: you should get ONE
+  loading screen and come up on the new build — there is no "Update available → Reload" toast any more, on
+  purpose.
 ```
 
 ---
 
 ## 8. Rounds
+
+**What they became (2026-09-17).** R1 the bug + the update behaviour (the toast is deleted; a waiting build
+is adopted at the start of the loading screen). R2 the gate (`harness/e2e/offline.mts`, ten checks,
+`offline.coldStartPlayable` in the ship gate). R3 **everything in the first boot** — the user overruled the
+background fill: "load everything up front, but aggressively cache it" — plus the offline garage proof. R4
+the headers, the `?v=` versioning and the iOS install surface. R5 the gate run, the settings line and HR-12.
+The original text below is kept as written; where it and the rounds above disagree, the user's decisions in
+`docs/plans/README.md` win.
 
 ### R1 — one load is enough (the ask)
 - Register the service worker from the inline loader (`src/boot/inline.ts` / `index.html`) **before** the core stream starts, instead of `src/main.ts:354`; keep `?sw=0` and `?harness=1` opting out, keep `import.meta.env.PROD`.
@@ -259,19 +271,63 @@ Headless Chromium is not iOS Safari. It cannot prove: the home-screen install, t
 
 ## Done (measurable)
 
-- [ ] **One online load is enough.** After exactly one online visit that reaches `ready`, Cache Storage holds the shell + all 14 hero GLBs (≥ 27.02 MB); today it holds 4 068 352 B and 0 models. (R1 · `offline.cacheAfterFirstLoad`)
-- [ ] **Cold offline start is playable.** Browser closed, relaunched offline, cold navigate: loader `100 / 100`, `data-done = 1`, menu drawn, first frame painted, 0 page errors, and **0 bytes off the wire** (navigation `transferSize = 0`, `workerStart > 0`). (R1 · `offline.coldStartPlayable`, `offline.firstFrame`)
-- [ ] **A track is ridden offline, byte-identically.** The b1 golden replay finishes offline with the same finish time and the same hash as online. (R5 · `offline.rideFinishes`)
-- [ ] **The screens you have not opened still work.** Offline: the world map draws its plates, the menu draws its art, other biomes degrade to the tinted fallback with 0 page errors. (R2 · `offline.worldMapDraws`)
-- [ ] **A deploy does not cost the player 24.56 MB.** After a new build installs and reloads, the immutable cache still holds every model the new build names. (R4 · `offline.updateSurvives`)
-- [ ] **A bad network never blocks a warm start.** With the cache warm and the link throttled to 3G, `ready` is within ±20 % of the offline run's wall time. (R2 · `offline.slowStart`)
-- [ ] **Budget.** Cache Storage after one online load ≤ 36 MB; bundle ≤ 600 KB gz; inline loader ≤ 8 192 B; `dist/` total stated in the round and the 26.88 MB of unrequested duplicate model copies either removed or explained. (R1/R2)
-- [ ] **Offline is honest, never a lie.** No boot failure reads "Retry" against a dead radio; the review inbox queues offline and says so; best times and the garage choice survive offline. (R1 · `offline.inboxQueues`)
-- [ ] **The gate carries it.** `offline.coldStartPlayable` is a ship-gate row with a threshold in `harness/gate/thresholds.json`. (R5)
+- [x] **One online load is enough.** 180 entries, 14 hero GLBs, **41 963 008 B** after one visit (was 4 068 352 B and 0 models). (R1/R3 · `offline.cacheAfterFirstLoad`)
+- [x] **Cold offline start is playable.** Browser closed, **origin shut down**, cold navigate: `100 / 100`, `data-done = 1`, first frame painted, 0 page errors, **0 requests and 0 bytes**, `transferSize = 0`, `workerStart = 0.50 ms`, `crossOriginIsolated = true`. (R1 · `offline.coldStartPlayable`, `offline.firstFrame`)
+- [x] **A track is ridden offline, byte-identically.** b1's golden replays to `40.5583 s` / `389a5dc6c07a` offline — the same finish time and hash as the online run. (R2 · `offline.rideFinishes`)
+- [x] **The screens you have not opened still work.** Offline the world plate and all five region plates draw and the menu art is complete — they are in the first boot now, not a degrade. (R3 · `offline.worldMapDraws`)
+- [x] **A deploy does not cost the player 26.71 MB.** An update boot costs **39 829 B — 0.10 % of a cold boot** — and **0 bytes of models**. (R1/R4 · `offline.updateSurvives`)
+- [x] **A bad network never blocks a warm start.** 50 kbps / 400 ms RTT, cache warm: the loader leaves in **13 436 ms** against the offline run's 16 882 ms, with **0 bytes** over the wire. (R2 · `offline.slowStart`)
+- [~] **Budget.** Bundle **522.8 KB gz** of 600; inline loader **8 098 B** of 8 192 (94 B of headroom left — the next thing that wants to live in the loader has to buy its way in); `dist/` **82 MB**. Cache Storage after one online load is **41.96 MB**, over the ≤ 36 MB line the plan wrote before the user said "load everything up front": the offline set is now the whole game (26.71 MB of hero + 6.8 MB art + 3.08 MB of world map, both tiers). The 26.88 MB of unrequested duplicate `dist/models/*.glb` copies are still deployed and still dead — explained, not removed (§9.7).
+- [x] **Offline is honest, never a lie.** A boot failure with `navigator.onLine === false` says so instead of offering Retry against a dead radio; `/api/**` bypasses the worker and fails into the localStorage queue. (R1 · `offline.inboxQueues`)
+- [x] **The gate carries it.** `offline.coldStartPlayable` is a ship-gate row (`harness/gate/ship-gate.ts` section `offline`) with a threshold in `harness/gate/thresholds.json`. (R2)
+- [x] **A garage swap never touches the network.** Offline, origin unreachable: **10/10** outfit × livery combinations swapped with 0 model requests and no procedural stand-in. (R3 · `offline.garageSwapsOffline`)
 - [ ] **A human proved it on the actual phone.** HR-12 answered: home screen, aeroplane mode, cold start, B1 finished. (R5)
 
 ## Status
 
+- **2026-09-17 — R2–R4 built: the gate, everything-up-front, the headers and the iOS surface.**
+  Evidence: `docs/evidence/pwa-offline/round2|3|4/`. `harness/e2e/offline.mts` is **10/10** — nine of the
+  plan's checks plus `offline.garageSwapsOffline` (the user's "garage swaps needing network is a bug
+  anyway"). `--only=offline` is wired into `harness/e2e/touch.mts` and `harness/README.md`, and
+  `offline.coldStartPlayable` is a ship-gate row with a threshold.
+  **After ONE online load:** 180 cache entries (shell 4 · static 157 · immutable 19), 14 models, the whole
+  art pack, both world-map tiers, **41 963 008 B** held, 39 010 615 B over the wire in 184 requests.
+  **Cold offline start, origin unreachable:** 100/100, `data-done=1`, gone at 16 882 ms, **0 requests, 0
+  bytes**, `transferSize=0`, `workerStart=0.50 ms`, `crossOriginIsolated=true`, 0 page errors; the world
+  plate and all five region plates draw; the b1 golden replays to `40.5583 s` / `389a5dc6c07a`, identical
+  to online; the garage cycles **10/10** outfit × livery combinations with zero model requests and no
+  procedural fallback. **Update boot: 39 829 B — 0.10 % of a cold boot**, zero model bytes.
+  R3 dropped the background fill for a new `offlinePack` boot step (`src/boot/offline-pack.ts`): the user
+  asked for the game to behave like a game, so the DOWNLOAD denominator grew from 27.02 MB to 38.44 MB and
+  covers the whole offline set. R4 put `?v=<8 hex>` on every art URL (`public/art/manifest.json`,
+  `src/ui/art.ts`) and `__WORLDMAP_V__` on the 13 plates, which is what makes `vercel.json`'s one-month
+  `/art/**` and `/fonts/**` and one-year immutable `/models/**` safe; `/sw.js` and `/load-manifest.json`
+  became `no-store`; COOP/COEP survive and are now asserted on the offline cold start. 28
+  `apple-touch-startup-image` files (`assets/art/splash.mjs`, 1.16 MB, not fetched by the boot) and
+  `apple-touch-icon` 152/167 close the iOS gaps in §3.
+  **Three things the plan did not know.** (1) `Vary: Origin` breaks every `cache.match` — see R1; §1.1's
+  M4 was probably the HTTP disk cache, not the worker. (2) The **audio worklet was never in the offline
+  set**: it loads on the first gesture, so the boot never fetched it and offline it failed with
+  `worklet timeout`. (3) Playwright's `offline` flag does not reach service-worker fetches, so the gate
+  has to shut the server down — with the server up, a build that cannot boot offline passes.
+- **2026-09-17 — R1 built: one load is now enough.** Evidence: `docs/evidence/pwa-offline/round1/`.
+  After **one** online load the cache holds **65 entries / 14 models / 32 158 162 B** (was 30 / 0 / 4 068 352).
+  A cold offline start **with the origin unreachable** reaches 100/100, `data-done=1`, loader gone at 13 306 ms,
+  **0 requests, 0 bytes, `transferSize=0`, `workerStart=0.48 ms`, 0 page errors**. A warm online start spends
+  **0 body bytes** (3 requests, both 304: the document revalidate and the `sw.js` update check). An **update boot
+  costs 379 851 B — 1.2 % of a cold boot** (the entry chunk, index.html, sw.js, the manifests; three.js and all
+  14 hero GLBs survive the deploy). What changed: registration moved into the inline loader (`src/boot/sw.ts`,
+  capped at 2.5 s) so the worker controls the page before the boot asks for 27 MB; three caches
+  (`trials-shell-<build>` / `trials-static-<assets>` / `trials-immutable`) with a **pruning** `activate`; the
+  stamp is a content hash of the emitted files + `public/`, not `Date.now()`; the world-map plates and
+  `offline.html` are in `load-manifest.json`; `/api/` bypass; cache-first document with a background revalidate;
+  the loader's failure copy has an offline branch. **The update toast is deleted** (the user: "the update toast
+  always felt buggy") — a waiting build is adopted at the very start of the loading screen and the page reloads
+  onto it, so the player sees one loading screen.
+  **The finding:** `Vary: Origin` (sent by `vite preview` and by any CORS-adding host) makes every `cache.match`
+  MISS. It looked like it worked only because the browser's HTTP disk cache answered the re-request with a 304;
+  with the origin genuinely down the boot died at DOWNLOAD 0. Fixed with `{ ignoreSearch, ignoreVary }` on every
+  match. This probably also explains §1.1's M4 — that reading was taken with the preview server still running.
 - **2026-09-17 — planned, nothing built.** Investigation done against `dist/` at `58e63c7`; five headless measurements (M1–M5, §1.1) reproduce the user's failure and locate it: the worker registers too late to catch the boot's own 24.56 MB, so the first load caches 4.07 MB and 0 models, and it takes **two** online visits before an offline cold start works (M4: it then works, 18 541 ms, `27.02 MB · complete`). No code changed. Owner: unassigned.
 
 ---

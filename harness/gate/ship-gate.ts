@@ -206,7 +206,7 @@ async function main(): Promise<void> {
   /** Effective limit: the SwiftShader override when running on SwiftShader, else the ship target. */
   const num = (k: string): number => (softwareGL && k in thAll.swiftshader ? thAll.swiftshader[k]! : Number(th[k]));
   // Sections (round 12): each keeps its own check list; `checks` is assembled in SECTION_ORDER at the end.
-  const SECTION_ORDER = ['boot', 'clear', 'clearPro', 'crash', 'restart', 'heap', 'bundle', 'determinism', 'camera', 'stranger', 'reflex', 'reflexPro', 'device'] as const;
+  const SECTION_ORDER = ['boot', 'clear', 'clearPro', 'crash', 'restart', 'heap', 'bundle', 'determinism', 'offline', 'camera', 'stranger', 'reflex', 'reflexPro', 'device'] as const;
   type SectionName = (typeof SECTION_ORDER)[number];
   const sections = new Map<SectionName, GateCheck[]>(SECTION_ORDER.map((n) => [n, []]));
   const sectionMs = new Map<SectionName, number>();
@@ -696,6 +696,23 @@ async function main(): Promise<void> {
     report.device = dev.device;
     })();
 
+    /** The offline gate's nine checks; `offline.coldStartPlayable` is the judged row, the other eight are its note. */
+    const runOffline = async (check: (c: GateCheck) => void): Promise<void> => {
+      const { offlineSuite } = await import('../e2e/offline.mjs');
+      const r = await offlineSuite({});
+      writeJson(path.join(HARNESS_DIR, 'out', 'offline', 'offline.json'), r.measured);
+      const cold = r.checks.find((c) => c.id === 'offline.coldStartPlayable');
+      const others = r.checks.filter((c) => c.id !== 'offline.coldStartPlayable');
+      const failed = others.filter((c) => !c.pass);
+      check({
+        id: 'offline.coldStartPlayable',
+        value: cold ? String(cold.value) : 'suite did not run',
+        limit: th['offline.coldStartPlayable'] === undefined ? true : (th['offline.coldStartPlayable'] as boolean),
+        pass: !!cold?.pass,
+        note: `${r.checks.length - failed.length - (cold?.pass ? 0 : 1)}/${r.checks.length} offline e2e checks pass${failed.length ? `; also failing: ${failed.map((c) => c.id).join(', ')}` : ''}`,
+      });
+    };
+
     // Schedule (round 12). Correctness sections on a pool; the timing chain (boot -> restart -> heap/perf) runs
     // next to it by default (their notes carry the loadavg), or after it with --quiet-timing.
     const jobs = defaultBrowserJobs(6, flags);
@@ -704,7 +721,7 @@ async function main(): Promise<void> {
     // `out/metrics/ship-gate.partial.json` gets them — the full report and its exit code need every section.
     const onlyList = flagStr(flags, 'only', '').split(',').filter(Boolean) as SectionName[];
     const wanted = (n: SectionName): boolean => onlyList.length === 0 || onlyList.includes(n);
-    console.log(`sections: pool of ${jobs} (clear, clearPro, crash, determinism, camera, bundle) ${quietTiming ? 'then' : '+'} timing chain (boot, restart, heap)${onlyList.length ? ` — only ${onlyList.join(', ')}` : ''}; ${loadLine()}`);
+    console.log(`sections: pool of ${jobs} (clear, clearPro, crash, determinism, camera, bundle) ${quietTiming ? 'then' : '+'} timing chain (boot, restart, heap), then offline${onlyList.length ? ` — only ${onlyList.join(', ')}` : ''}; ${loadLine()}`);
     const tGate = performance.now();
     const poolSections: [SectionName, (check: (c: GateCheck) => void) => Promise<void>][] = [['camera', runCamera], ['determinism', runDet], ['clear', runClear], ['clearPro', runClearPro], ['crash', runCrash], ['bundle', runBundle]];
     const pool = mapPool<[SectionName, (check: (c: GateCheck) => void) => Promise<void>], void>(
@@ -721,6 +738,11 @@ async function main(): Promise<void> {
       await pool;
       await timing();
     } else await Promise.all([pool, timing()]);
+    // G12 offline (docs/plans/PWA_OFFLINE.md): ONE online load, then the origin is shut down and the game
+    // must still cold-start. Runs alone, after the pool — it owns a persistent Chromium profile and its own
+    // server, which it stops mid-suite. Every other harness entry runs `?sw=0`, so this is the only place a
+    // service-worker regression is visible at all.
+    if (wanted('offline')) await section('offline', runOffline);
     if (onlyList.length) {
       const partial: GateCheck[] = SECTION_ORDER.flatMap((n) => sections.get(n)!);
       for (const c of partial) console.log(fmtCheck(c));
