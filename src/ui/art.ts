@@ -7,6 +7,7 @@
  * image. Title-critical art is loaded first; cards/medals/plates lazily.
  */
 import type { BiomeId, Medal, TrackTier } from '../core/types';
+import { artTier, otherTier, type ArtTier } from '../boot/tier';
 
 export type ArtKind = 'keyart' | 'plate-menu' | 'tier-card' | 'track-card' | 'medal' | 'results-bg' | string;
 
@@ -119,14 +120,32 @@ export class ArtManifest {
     return this.entries.find(pred) ?? null;
   }
 
-  /** Key art for a biome (any biome as fallback); the `2x` variant on DPR > 1.5 or wide viewports, else `1x`. */
+  /**
+   * Pick this device's resolution tier out of a list that may hold both (ask 59). `artTier()` is the ONE
+   * such decision in the tree — the offline pack fetches the tier this returns, so a second opinion here
+   * would be a picture the device downloaded nothing for.
+   */
+  private atTier(list: readonly ArtEntry[]): ArtEntry | null {
+    if (list.length === 0) return null;
+    const tier = artTier();
+    return list.find((e) => e.variant === tier) ?? list.find((e) => !e.variant) ?? list[0]!;
+  }
+
+  /**
+   * The same picture at the other tier, when the pack ships one — what a device whose DPR changed after
+   * the download degrades to rather than showing nothing (`applyBackground` uses it automatically).
+   */
+  altVariant(entry: ArtEntry | null): ArtEntry | null {
+    if (!entry?.variant) return null;
+    const want = otherTier(entry.variant as ArtTier);
+    return this.entries.find((e) => e.kind === entry.kind && e.variant === want && e.biome === entry.biome && e.bike === entry.bike && e.medal === entry.medal) ?? null;
+  }
+
+  /** Key art for a biome (any biome as fallback), at this device's tier. */
   keyart(biome?: BiomeId): ArtEntry | null {
     const all = this.entries.filter((e) => e.kind === 'keyart');
     const pool = (biome && all.filter((e) => e.biome === biome)) || [];
-    const list = pool.length ? pool : all;
-    if (list.length === 0) return null;
-    const hi = typeof window !== 'undefined' && ((window.devicePixelRatio || 1) > 1.5 || window.innerWidth > 1400);
-    return list.find((e) => e.variant === (hi ? '2x' : '1x')) ?? list.find((e) => !e.variant) ?? list[0]!;
+    return this.atTier(pool.length ? pool : all);
   }
 
   trackCard(trackId: string): ArtEntry | null {
@@ -138,12 +157,9 @@ export class ArtManifest {
     return this.find((e) => e.kind === 'thumb' && e.track === trackId);
   }
 
-  /** Garage bike render for a class; `2x` on DPR > 1.5 or wide viewports, else `1x` (the `alt` angle only as a last resort). */
+  /** Garage bike render for a class, at this device's tier (it used to hold its own 1600 px threshold). */
   bikeArt(bike: 'rookie' | 'pro'): ArtEntry | null {
-    const list = this.entries.filter((e) => e.kind === 'bike' && e.bike === bike);
-    if (list.length === 0) return null;
-    const hi = (typeof devicePixelRatio === 'number' && devicePixelRatio > 1.5) || (typeof innerWidth === 'number' && innerWidth > 1600);
-    return list.find((e) => e.variant === (hi ? '2x' : '1x')) ?? list.find((e) => e.variant) ?? list[0]!;
+    return this.atTier(this.entries.filter((e) => e.kind === 'bike' && e.bike === bike));
   }
 
   /** Any entry by id (`garage-plate`, `results-credits`, …). */
@@ -155,8 +171,9 @@ export class ArtManifest {
     return this.find((e) => e.kind === 'tier-card' && e.tier === tier);
   }
 
+  /** The medal plate at this device's tier — it used to take whichever of the 512/256 pair came first. */
   medal(medal: Medal): ArtEntry | null {
-    return this.find((e) => e.kind === 'medal' && e.medal === medal);
+    return this.atTier(this.entries.filter((e) => e.kind === 'medal' && e.medal === medal));
   }
 
   plate(kind: 'plate-menu' | 'results-bg' | 'loading', biome?: BiomeId): ArtEntry | null {
@@ -183,12 +200,23 @@ export class ArtManifest {
     return p;
   }
 
+  /**
+   * Resolve an entry to a URL that will actually decode: its own, else the other resolution tier's
+   * (ask 59 — offline, a device that has changed DPR since the download has only the other one cached).
+   */
+  async resolve(entry: ArtEntry | null): Promise<string | null> {
+    if (!entry) return null;
+    if (await this.probe(entry.src)) return entry.src;
+    const alt = this.altVariant(entry);
+    return alt && (await this.probe(alt.src)) ? alt.src : null;
+  }
+
   /** Apply an image as a background once it has decoded; adds `loaded` so CSS can fade it in. */
   applyBackground(el: HTMLElement, entry: ArtEntry | null): void {
     if (!entry) return;
-    void this.probe(entry.src).then((ok) => {
-      if (!ok || !el.isConnected) return;
-      el.style.backgroundImage = `url("${entry.src}")`;
+    void this.resolve(entry).then((src) => {
+      if (!src || !el.isConnected) return;
+      el.style.backgroundImage = `url("${src}")`;
       el.classList.add('loaded');
     });
   }

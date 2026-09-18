@@ -4,8 +4,9 @@ import { selectedBootTotals } from './outfit';
 import { takeBootPlan, type BootWindow } from './handoff';
 import { RIDER_OUTFIT_KEY, saveRiderOutfit } from '../ui/outfit';
 
-const totals = { heroModels: 821, bootArt: 40, offlinePack: 7100 };
-vi.mock('./totals', () => ({ DECLARED_BOOT_TOTALS: { heroModels: 821, bootArt: 40, offlinePack: 7100 } }));
+const pack = { '1x': 7400, '2x': 8000 };
+const totals = { heroModels: 821, bootArt: 40, offlinePack: pack };
+vi.mock('./totals', () => ({ DECLARED_BOOT_TOTALS: { heroModels: 821, bootArt: 40, offlinePack: { '1x': 7400, '2x': 8000 } } }));
 beforeEach(() => { localStorage.clear(); history.replaceState(null, '', '/'); });
 afterEach(() => { delete (window as BootWindow).__boot; history.replaceState(null, '', '/'); });
 
@@ -19,9 +20,9 @@ describe('boot totals (ask 50: every hero file in the one bar)', () => {
       if (cls) localStorage.setItem('trials.bikeClass', cls);
       if (quality) localStorage.setItem('trials.quality', quality);
       history.replaceState(null, '', '/' + search);
-      expect(selectedBootTotals(totals)).toEqual({ heroModels: 821, bootArt: 40, offlinePack: 7100 });
+      expect(selectedBootTotals(totals)).toEqual({ heroModels: 821, bootArt: 40, offlinePack: 7400 }); // jsdom is DPR 1 / 1024 px wide → the 1x tier
       const fallback = await takeBootPlan();
-      expect(fallback.view.bytesTotal).toBe(821 + 40 + 7100);
+      expect(fallback.view.bytesTotal).toBe(821 + 40 + 7400);
     }
   });
 
@@ -30,6 +31,6 @@ describe('boot totals (ask 50: every hero file in the one bar)', () => {
     (window as BootWindow).__boot = { take: vi.fn(async () => original) };
     saveRiderOutfit('race-bluewhite');
     expect(await takeBootPlan()).toBe(original);
-    expect(original.view.bytesTotal).toBe(totals.heroModels + totals.bootArt + totals.offlinePack);
+    expect(original.view.bytesTotal).toBe(totals.heroModels + totals.bootArt + pack['1x']);
   });
 });

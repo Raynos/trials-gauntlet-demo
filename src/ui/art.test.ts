@@ -35,6 +35,24 @@ describe('art manifest', () => {
     expect(m.trackCard('b1-first-ride')?.src).toBe('art/menu/track-b1-first-ride.webp');
   });
 
+  // Ask 59: the pack fetches ONE tier, so every picker must agree on which one. jsdom is DPR 1 / 1024 px → 1x.
+  it('picks this device\'s tier for key art, bikes and medals, and names the other one for a degraded draw', () => {
+    const m = ArtManifest.from([
+      { id: 'k-hi', kind: 'keyart', biome: 'canyon', variant: '2x', src: 'k-hi.webp' },
+      { id: 'k-lo', kind: 'keyart', biome: 'canyon', variant: '1x', src: 'k-lo.webp' },
+      { id: 'b-hi', kind: 'bike', bike: 'rookie', variant: '2x', src: 'b-hi.webp' },
+      { id: 'b-lo', kind: 'bike', bike: 'rookie', variant: '1x', src: 'b-lo.webp' },
+      { id: 'm-hi', kind: 'medal', medal: 'gold', variant: '2x', src: 'm-hi.png' },
+      { id: 'm-lo', kind: 'medal', medal: 'gold', variant: '1x', src: 'm-lo.png' },
+    ]);
+    expect(m.keyart('canyon')?.id).toBe('k-lo');
+    expect(m.bikeArt('rookie')?.id).toBe('b-lo');
+    expect(m.medal('gold')?.id).toBe('m-lo');
+    expect(m.altVariant(m.keyart('canyon'))?.id).toBe('k-hi');
+    expect(m.altVariant(m.medal('gold'))?.id).toBe('m-hi');
+    expect(m.altVariant(m.trackCard('nothing'))).toBeNull();
+  });
+
   it('keyart prefers the requested biome, then any keyart', () => {
     const m = ArtManifest.from([
       { id: 'k1', kind: 'keyart', biome: 'canyon', src: 'k1.webp' },

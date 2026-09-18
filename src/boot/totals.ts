@@ -8,17 +8,25 @@
  * (vite.config.ts computes them from the same lists and the same file sizes; `totals.test.ts` holds the two equal)
  * so it need not bundle the table.
  */
-import { PUBLIC_BYTES } from './plan.generated';
-import { declaredBootTotals, HERO_FILE_SET, offlinePackBytes } from './asset-totals';
+import { OFFLINE_PACK_BYTES, PUBLIC_BYTES } from './plan.generated';
+import { declaredBootTotals, HERO_FILE_SET } from './asset-totals';
 import type { ByteKey } from './steps';
+import { selectedBootTotals } from './outfit';
 
 /** The glTF files `setModels` fetches before `ready` (`src/render/index.ts`): all of them. */
 export const HERO_FILES = HERO_FILE_SET;
 
-export const DECLARED_BOOT_TOTALS = declaredBootTotals((file) => PUBLIC_BYTES[file], offlinePackBytes(Object.entries(PUBLIC_BYTES)));
+/**
+ * Ask 59: the offline pack's per-tier sums are GENERATED (`plan.generated.ts`) rather than re-summed here.
+ * The bucketing rule needs the manifest's `kind`/`variant`, which only the build has read — so the build
+ * applies `offlinePackBytes` once and writes the two per-tier numbers down, and this path and `__BOOT_TOTALS__`
+ * are the same numbers by construction instead of by a test holding two sums equal.
+ */
+export const DECLARED_BOOT_TOTALS = declaredBootTotals((file) => PUBLIC_BYTES[file], OFFLINE_PACK_BYTES);
 
+/** The three module-side byte sources, the offline pack resolved to THIS device's tier (`selectedBootTotals`). */
 export function bootByteTotals(): Readonly<Record<Exclude<ByteKey, 'core'>, number>> {
-  return { heroModels: DECLARED_BOOT_TOTALS.heroModels, bootArt: DECLARED_BOOT_TOTALS.bootArt, offlinePack: DECLARED_BOOT_TOTALS.offlinePack };
+  return selectedBootTotals(DECLARED_BOOT_TOTALS);
 }
 
 export const BOOT_BYTE_TOTALS = bootByteTotals();

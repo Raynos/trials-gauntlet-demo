@@ -1,0 +1,38 @@
+{
+ "at": "2026-09-18T03:05:26.283Z",
+ "build": "411697e-eef943a7cc",
+ "rows": [
+  {
+   "geometry": "phone-932x430-dpr2",
+   "viewport": "430x932",
+   "dpr": 2,
+   "tierPickedInPage": "2x",
+   "bootMs": 23386,
+   "loaderDownload": 100,
+   "wireBytesAfter": 37080594,
+   "droppedFiles": 16,
+   "droppedBytes": 1930195,
+   "droppedBodyBytes": 1930195,
+   "wireBytesBefore": 39010789,
+   "savedBytes": 1930195,
+   "denominatorBefore": 39778435,
+   "denominatorAfter": 37848240
+  },
+  {
+   "geometry": "desktop-1280x720-dpr1",
+   "viewport": "1280x720",
+   "dpr": 1,
+   "tierPickedInPage": "1x",
+   "bootMs": 34278,
+   "loaderDownload": 100,
+   "wireBytesAfter": 35732176,
+   "droppedFiles": 16,
+   "droppedBytes": 3278613,
+   "droppedBodyBytes": 3278613,
+   "wireBytesBefore": 39010789,
+   "savedBytes": 3278613,
+   "denominatorBefore": 39778435,
+   "denominatorAfter": 36499822
+  }
+ ]
+}

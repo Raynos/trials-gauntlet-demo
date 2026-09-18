@@ -17,6 +17,7 @@ import { BUILD_STAMP_SHORT, escapeHtml, Screen, type FrontCallbacks, type FrontS
 import { isLiveTarget } from './live';
 import { isLabTrack, medalTotals, nextTrack, shipTracks, TIER_LABEL, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
+import { wantsHiRes } from '../boot/tier';
 import { allMarkers, buildRegions, fitZoom, FLY_MS, fogPatches, frameFor, locate, MAP, nextGate, regionPlateSrc, routePath, TAP_SLOP, tierBlend, worldPlateSrc, ZOOM, type FogPatch, type Gate, type Marker, type Region, type RegionId } from './worldMap';
 import { injectWorldMapStyles } from './worldMapStyles';
 
@@ -530,11 +531,9 @@ export class WorldMapScreen extends Screen {
     this.gate = nextGate(regions);
     this.action = -1;
     // Terrain plates: the world plate (tinted sea until it decodes), the region plates (each fades in when it decodes).
-    const hi = typeof window !== 'undefined' && (window.devicePixelRatio > 1.5 || window.innerWidth > 1400);
-    const worldSrc = worldPlateSrc(hi);
-    void this.art.probe(worldSrc).then((ok) => {
-      if (!ok) return;
-      this.world.style.backgroundImage = `url("${worldSrc}")`;
+    void this.plate((hi) => worldPlateSrc(hi)).then((src) => {
+      if (!src) return;
+      this.world.style.backgroundImage = `url("${src}")`;
       this.world.classList.add('loaded');
     });
     this.tier.innerHTML = '';
@@ -631,19 +630,30 @@ export class WorldMapScreen extends Screen {
 
   /** The region plates: the focused marker's region first, the rest when the camera settles at a zoom that shows them. */
   private loadPlates(focusedOnly: boolean): void {
-    const hi = typeof window !== 'undefined' && (window.devicePixelRatio > 1.5 || window.innerWidth > 1400);
     const want = focusedOnly ? [this.refs[this.focus]?.marker.region].filter((x): x is RegionId => !!x) : this.regions.map((r) => r.id);
     for (const id of want) {
       if (this.plates.has(id)) continue;
       this.plates.add(id);
-      const src = regionPlateSrc(id, hi);
       const p = this.tier.querySelector<HTMLElement>(`.wm-region[data-region="${id}"]`);
-      void this.art.probe(src).then((ok) => {
-        if (!ok || !p?.isConnected) return;
+      void this.plate((hi) => regionPlateSrc(id, hi)).then((src) => {
+        if (!src || !p?.isConnected) return;
         p.style.backgroundImage = `url("${src}")`;
         p.classList.add('loaded');
       });
     }
+  }
+
+  /**
+   * One plate at THIS device's tier, degrading to the other (ask 59). The offline pack downloads a single
+   * tier — the one `wantsHiRes()` picked on the load that filled the cache — so a window later dragged to a
+   * 1x monitor (or a phone mirrored to a desktop) asks for a file the cache does not have. Offline that
+   * probe fails, and the map would be a blue sea with markers on it; the second probe draws the tier the
+   * device actually has. Online the first one simply hits the network and this costs nothing.
+   */
+  private async plate(src: (hi: boolean) => string): Promise<string | null> {
+    const hi = wantsHiRes();
+    if (await this.art.probe(src(hi))) return src(hi);
+    return (await this.art.probe(src(!hi))) ? src(!hi) : null;
   }
 
   /** Top-5 chips for the class the next launch rides (`FrontState.bikeClass`), medal-coloured; nothing when the board is empty. */

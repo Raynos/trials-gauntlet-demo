@@ -13,6 +13,7 @@ import type { FpsChoice, ModelChoice } from './best';
 import type { QualityChoice } from './menu';
 import type { UiSfx } from './sfx';
 import { conceal, reveal, isLiveTarget } from './live';
+import { artTier } from '../boot/tier';
 
 export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits' | 'review';
 
@@ -308,14 +309,13 @@ const NALATI_TINT = 'linear-gradient(180deg, #3f7fc8 0%, #8fbde8 44%, #7aa63f 56
 
 /**
  * The strip's plate: `keyart-nalati-*` from the art pack (`kind: keyart`, `biome: nalati` — a key-art plate, not a
- * biome, until Nalati is built), the `2x` tier on DPR > 1.5 or wide viewports as `ArtManifest.keyart` picks; null
+ * biome, until Nalati is built), at the device's tier (`artTier()`, the one the offline pack fetched); null
  * (the tint stays) when the pack lacks it.
  */
 export function menuPlate(art: ArtManifest): ArtEntry | null {
   const list = art.all().filter((e) => e.kind === 'keyart' && (e.biome as string) === 'nalati');
   if (list.length === 0) return null;
-  const hi = (window.devicePixelRatio || 1) > 1.5 || window.innerWidth > 1400;
-  return list.find((e) => e.variant === (hi ? '2x' : '1x')) ?? list[0]!;
+  return list.find((e) => e.variant === artTier()) ?? list[0]!;
 }
 
 /**

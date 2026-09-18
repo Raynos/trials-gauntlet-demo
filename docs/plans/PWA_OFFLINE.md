@@ -277,7 +277,7 @@ The original text below is kept as written; where it and the rounds above disagr
 - [x] **The screens you have not opened still work.** Offline the world plate and all five region plates draw and the menu art is complete — they are in the first boot now, not a degrade. (R3 · `offline.worldMapDraws`)
 - [x] **A deploy does not cost the player 26.71 MB.** An update boot costs **39 829 B — 0.10 % of a cold boot** — and **0 bytes of models**. (R1/R4 · `offline.updateSurvives`)
 - [x] **A bad network never blocks a warm start.** 50 kbps / 400 ms RTT, cache warm: the loader leaves in **13 436 ms** against the offline run's 16 882 ms, with **0 bytes** over the wire. (R2 · `offline.slowStart`)
-- [~] **Budget.** Bundle **522.8 KB gz** of 600; inline loader **8 098 B** of 8 192 (94 B of headroom left — the next thing that wants to live in the loader has to buy its way in); `dist/` **82 MB**. Cache Storage after one online load is **41.96 MB**, over the ≤ 36 MB line the plan wrote before the user said "load everything up front": the offline set is now the whole game (26.71 MB of hero + 6.8 MB art + 3.08 MB of world map, both tiers). The 26.88 MB of unrequested duplicate `dist/models/*.glb` copies are still deployed and still dead — explained, not removed (§9.7).
+- [~] **Budget.** Bundle **523.3 KB gz** of 600; inline loader **8 165 B** of 8 192 (27 B of headroom — ask 59's tier pick bought its 110 B back out of `selectedBootTotals`, which now spreads `DeclaredBootTotals` instead of naming its three fields); `dist/` **82 MB**. Cache Storage after one online load is **40.01 MB** on a phone, over the ≤ 36 MB line the plan wrote before the user said "load everything up front": the offline set is the whole game, minus the tiers this device does not draw (ask 59 — one world-map tier, one art variant, no `og.jpg`: −1.93 MB on a DPR-2 phone, −3.28 MB on a 1x desktop, `docs/evidence/boot-bytes/round1/`). The 26.88 MB of unrequested duplicate `dist/models/*.glb` copies are still deployed and still dead — explained, not removed (§9.7).
 - [x] **Offline is honest, never a lie.** A boot failure with `navigator.onLine === false` says so instead of offering Retry against a dead radio; `/api/**` bypasses the worker and fails into the localStorage queue. (R1 · `offline.inboxQueues`)
 - [x] **The gate carries it.** `offline.coldStartPlayable` is a ship-gate row (`harness/gate/ship-gate.ts` section `offline`) with a threshold in `harness/gate/thresholds.json`. (R2)
 - [x] **A garage swap never touches the network.** Offline, origin unreachable: **10/10** outfit × livery combinations swapped with 0 model requests and no procedural stand-in. (R3 · `offline.garageSwapsOffline`)
@@ -299,7 +299,14 @@ The original text below is kept as written; where it and the rounds above disagr
   procedural fallback. **Update boot: 39 829 B — 0.10 % of a cold boot**, zero model bytes.
   R3 dropped the background fill for a new `offlinePack` boot step (`src/boot/offline-pack.ts`): the user
   asked for the game to behave like a game, so the DOWNLOAD denominator grew from 27.02 MB to 38.44 MB and
-  covers the whole offline set. R4 put `?v=<8 hex>` on every art URL (`public/art/manifest.json`,
+  covers the whole offline set. Ask 59 narrowed "the whole offline set" to *this device's*: the pack ships
+  two resolution tiers of the key art, the garage bikes, the medals and all 12 world-map plates, and a
+  115 KB `og.jpg` that only link previews ever see. One rule (`packMembership` + `artTier`,
+  `src/boot/asset-totals.ts` / `tier.ts`) now decides what is drawn, what is fetched and what the
+  denominator declares, and the build writes the two per-tier sums into `plan.generated.ts` so the module
+  path and `__BOOT_TOTALS__` cannot disagree. Wire bytes on a first load: **39.01 MB → 37.08 MB** at
+  932×430 DPR 2 and **→ 35.73 MB** at 1280×720 DPR 1. A device that changes DPR after the download asks
+  for a tier it has not cached, misses, and draws the one it has. R4 put `?v=<8 hex>` on every art URL (`public/art/manifest.json`,
   `src/ui/art.ts`) and `__WORLDMAP_V__` on the 13 plates, which is what makes `vercel.json`'s one-month
   `/art/**` and `/fonts/**` and one-year immutable `/models/**` safe; `/sw.js` and `/load-manifest.json`
   became `no-store`; COOP/COEP survive and are now asserted on the offline cold start. 28

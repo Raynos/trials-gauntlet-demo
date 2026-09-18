@@ -281,8 +281,8 @@ export class App {
     if (!this.art.ready) void this.art.load();
     this.art.whenReady(() => {
       for (const m of ['bronze', 'silver', 'gold', 'platinum'] as const) {
-        const e = this.art.medal(m);
-        if (e) void this.art.probe(e.src).then((ok) => ok && this.hud.setMedalArt({ [m]: e.src }));
+        // `resolve`, not `probe`: offline on a device whose DPR changed, the other tier is what is cached.
+        void this.art.resolve(this.art.medal(m)).then((src) => src && this.hud.setMedalArt({ [m]: src }));
       }
     });
 

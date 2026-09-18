@@ -16,7 +16,7 @@ interface Esbuild {
 const esbuild = createRequire(createRequire(import.meta.url).resolve('vite'))('esbuild') as Esbuild;
 
 /** The inline loader script (`src/boot/inline.ts` bundled) must paint with the first HTML bytes: ≤ 8 KB minified. */
-const INLINE_BUDGET_BYTES = 9 * 1024;
+const INLINE_BUDGET_BYTES = 8 * 1024;
 
 /** CONTRACT §3: JS bundle ≤ 600 KB gzipped. Fails the build when exceeded. */
 const BUNDLE_BUDGET_GZ_BYTES = 600 * 1024;

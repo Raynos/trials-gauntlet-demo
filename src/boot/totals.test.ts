@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { PUBLIC_BYTES } from './plan.generated';
 import { BOOT_BYTE_TOTALS, HERO_FILES, bootByteTotals } from './totals';
 import { BOOT_IDS } from '../render/art/boot-set';
-import { declaredBootTotals, emptyBootTotals, HERO_FILE_SET } from './asset-totals';
+import { declaredBootTotals, emptyBootTotals, emptyPackBytes, HERO_FILE_SET, offlinePackBytes, packMembership, platePackMembership } from './asset-totals';
 import { HERO_FILES_BY_OUTFIT_CLASS } from '../render/hero/urls';
 
 // Distinct fixture sizes make a missed or double-counted file observable.
@@ -18,7 +18,7 @@ vi.mock('./plan.generated', async () => {
     'models/rider-race-bluewhite.glb': 90, 'models/rider-race-bluewhite-lod.glb': 25,
     'models/rider-race-charcoalyellow.glb': 92, 'models/rider-race-charcoalyellow-lod.glb': 26,
     ...Object.fromEntries(BOOT_IDS.map(id => [`art:${id}`, 10])),
-  } };
+  }, OFFLINE_PACK_BYTES: { '1x': 5_000, '2x': 9_000 } };
 });
 
 describe('declared byte totals', () => {
@@ -28,6 +28,8 @@ describe('declared byte totals', () => {
     expect(BOOT_BYTE_TOTALS.bootArt).toBe(BOOT_IDS.reduce((n, id) => n + table[`art:${id}`]!, 0));
     expect(BOOT_BYTE_TOTALS.heroModels).toBeGreaterThan(0);
     expect(BOOT_BYTE_TOTALS.bootArt).toBeGreaterThan(0);
+    // Ask 59: the offline pack is the generated per-tier sum, resolved to the device (jsdom/node: 1x).
+    expect(BOOT_BYTE_TOTALS.offlinePack).toBe(5_000);
   });
 
   it('counts all fourteen hero files exactly once (ask 50: every outfit, class and detail is in the one bar)', () => {
@@ -39,12 +41,45 @@ describe('declared byte totals', () => {
     expect(BOOT_BYTE_TOTALS).toEqual(bootByteTotals());
   });
 
+  // Ask 59: the pack is bucketed by ONE rule, shared with the runtime list in `offline-pack.ts`. A device
+  // downloads `both + [its tier]`, and the denominator it is shown is that same sum.
+  it('buckets the offline pack by device tier and drops the link-preview card', () => {
+    expect(packMembership({ kind: 'social' })).toBeNull(); // og.jpg: served, in `og:image`, never downloaded
+    expect(packMembership({ kind: 'keyart', variant: '2x' })).toBe('2x');
+    expect(packMembership({ kind: 'medal', variant: '1x' })).toBe('1x');
+    expect(packMembership({ kind: 'track-card' })).toBe('both');
+    expect(platePackMembership('art/worldmap/world-1536.webp')).toBe('2x');
+    expect(platePackMembership('art/worldmap/region-snow-1024.webp?v=abc')).toBe('1x');
+    expect(platePackMembership('art/worldmap/worldmap.json')).toBe('both');
+
+    const facets: Record<string, { kind?: string; variant?: string }> = {
+      'og-card': { kind: 'social' },
+      'keyart-hi': { kind: 'keyart', variant: '2x' },
+      'keyart-lo': { kind: 'keyart', variant: '1x' },
+      'card': { kind: 'track-card' },
+    };
+    const pack = offlinePackBytes(
+      [
+        [`art:${BOOT_IDS[0]}`, 999], // the boot set is already in its own bar, never twice
+        ['art:og-card', 115_027],
+        ['art:keyart-hi', 200],
+        ['art:keyart-lo', 70],
+        ['art:card', 30],
+        ['art/worldmap/world-1536.webp', 340],
+        ['art/worldmap/world-1024.webp', 218],
+        ['art/worldmap/worldmap.json', 4],
+      ],
+      (id) => facets[id] ?? {},
+    );
+    expect(pack).toEqual({ '1x': 70 + 30 + 218 + 4, '2x': 200 + 30 + 340 + 4 }); // og.jpg in neither; the boot-set row in neither
+  });
+
   it('rejects a missing declared model instead of shrinking the denominator', () => {
-    expect(() => declaredBootTotals(key => key === 'models/rider-race-bluewhite-lod.glb' ? Number.NaN : 10, 0)).toThrow('models/rider-race-bluewhite-lod.glb');
-    expect(() => declaredBootTotals(key => key === 'models/bike-pro.glb' ? 0 : 10, 0)).toThrow('models/bike-pro.glb');
+    expect(() => declaredBootTotals(key => key === 'models/rider-race-bluewhite-lod.glb' ? Number.NaN : 10, emptyPackBytes())).toThrow('models/rider-race-bluewhite-lod.glb');
+    expect(() => declaredBootTotals(key => key === 'models/bike-pro.glb' ? 0 : 10, emptyPackBytes())).toThrow('models/bike-pro.glb');
   });
 
   it('has an all-zero shape for the build before the catalog is read', () => {
-    expect(emptyBootTotals()).toEqual({ heroModels: 0, bootArt: 0, offlinePack: 0 });
+    expect(emptyBootTotals()).toEqual({ heroModels: 0, bootArt: 0, offlinePack: { '1x': 0, '2x': 0 } });
   });
 });
