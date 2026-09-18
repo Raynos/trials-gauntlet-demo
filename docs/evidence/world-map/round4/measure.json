@@ -1,0 +1,214 @@
+{
+ "open@932x430": {
+  "page": "tracks",
+  "region": "industrial",
+  "focused": "b1-first-ride",
+  "camera": {
+   "zoom": 0.754,
+   "x": 0,
+   "y": -260,
+   "far": false
+  },
+  "world": true,
+  "plates": [
+   "industrial",
+   "canyon",
+   "snow",
+   "nightCity",
+   "foundry"
+  ],
+  "tierOpacity": 1,
+  "viewBox": {
+   "x": 0,
+   "y": 0,
+   "w": 932,
+   "h": 430
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focusedOn": "b1-first-ride",
+  "markersOnScreen": [
+   "b1-first-ride",
+   "b2-lean-back",
+   "b3-kicker-row",
+   "m1-hop-up",
+   "e1-uphill-weight",
+   "h1-wheelie-wire",
+   "h2-gap-chain",
+   "lab-flat-200",
+   "lab-physics-test",
+   "p1-container-yard",
+   "p3-snow-line",
+   "p4-night-circuit"
+  ],
+  "gateOnScreen": true,
+  "gateText": "›››Hard · Medal every Medium trackNext unlock · Rooftop Wire",
+  "card": {
+   "x": 362,
+   "y": 281,
+   "w": 172,
+   "h": 84
+  },
+  "cardText": "B1 · Beginner · IndustrialFirst Ride0:41.200 / 1:05.00041.2▶ Ghost",
+  "cardRule": null,
+  "plateRule": null,
+  "ride": {
+   "text": "Ride First Ride›",
+   "disabled": false
+  },
+  "ghost": false,
+  "sceneNodes": 415,
+  "progress": "6 / 15 cleared0 Platinum1 Gold3 Silver2 Bronze",
+  "names": [
+   "Industrial3 / 4",
+   "Canyon3 / 3",
+   "Snow0 / 2",
+   "Night City0 / 2",
+   "Foundry0 / 4"
+  ]
+ },
+ "open@844x390": {
+  "page": "tracks",
+  "region": "industrial",
+  "focused": "b1-first-ride",
+  "camera": {
+   "zoom": 0.7,
+   "x": -6,
+   "y": -247,
+   "far": false
+  },
+  "world": true,
+  "plates": [
+   "industrial",
+   "canyon",
+   "snow",
+   "nightCity",
+   "foundry"
+  ],
+  "tierOpacity": 0.778,
+  "viewBox": {
+   "x": 0,
+   "y": 0,
+   "w": 844,
+   "h": 390
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focusedOn": "b1-first-ride",
+  "markersOnScreen": [
+   "b1-first-ride",
+   "b2-lean-back",
+   "b3-kicker-row",
+   "m1-hop-up",
+   "e1-uphill-weight",
+   "h1-wheelie-wire",
+   "h2-gap-chain",
+   "lab-flat-200",
+   "lab-physics-test",
+   "p1-container-yard",
+   "p3-snow-line",
+   "p4-night-circuit"
+  ],
+  "gateOnScreen": true,
+  "gateText": "›››Hard · Medal every Medium trackNext unlock · Rooftop Wire",
+  "card": {
+   "x": 331,
+   "y": 253,
+   "w": 172,
+   "h": 84
+  },
+  "cardText": "B1 · Beginner · IndustrialFirst Ride0:41.200 / 1:05.00041.2▶ Ghost",
+  "cardRule": null,
+  "plateRule": null,
+  "ride": {
+   "text": "Ride First Ride›",
+   "disabled": false
+  },
+  "ghost": false,
+  "sceneNodes": 415,
+  "progress": "6 / 15 cleared0 Platinum1 Gold3 Silver2 Bronze",
+  "names": [
+   "Industrial3 / 4",
+   "Canyon3 / 3",
+   "Snow0 / 2",
+   "Night City0 / 2",
+   "Foundry0 / 4"
+  ]
+ },
+ "open@1280x720": {
+  "page": "tracks",
+  "region": "industrial",
+  "focused": "b1-first-ride",
+  "camera": {
+   "zoom": 1.243,
+   "x": -103,
+   "y": -420,
+   "far": false
+  },
+  "world": true,
+  "plates": [
+   "industrial",
+   "canyon",
+   "snow",
+   "nightCity",
+   "foundry"
+  ],
+  "tierOpacity": 1,
+  "viewBox": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 720
+  },
+  "axes": [],
+  "pageOverflow": 0,
+  "targets": 13,
+  "small": [],
+  "overlaps": [],
+  "focusedOn": "b1-first-ride",
+  "markersOnScreen": [
+   "b1-first-ride",
+   "b2-lean-back",
+   "b3-kicker-row",
+   "m1-hop-up",
+   "e1-uphill-weight",
+   "h1-wheelie-wire",
+   "lab-flat-200",
+   "lab-physics-test",
+   "p1-container-yard",
+   "p3-snow-line",
+   "p4-night-circuit"
+  ],
+  "gateOnScreen": true,
+  "gateText": "›››Hard · Medal every Medium trackNext unlock · Rooftop Wire",
+  "card": {
+   "x": 477,
+   "y": 478,
+   "w": 172,
+   "h": 84
+  },
+  "cardText": "B1 · Beginner · IndustrialFirst Ride0:41.200 / 1:05.00041.2▶ Ghost",
+  "cardRule": null,
+  "plateRule": null,
+  "ride": {
+   "text": "Ride First Ride›",
+   "disabled": false
+  },
+  "ghost": false,
+  "sceneNodes": 415,
+  "progress": "6 / 15 cleared0 Platinum1 Gold3 Silver2 Bronze",
+  "names": [
+   "Industrial3 / 4",
+   "Canyon3 / 3",
+   "Snow0 / 2",
+   "Night City0 / 2",
+   "Foundry0 / 4"
+  ]
+ }
+}

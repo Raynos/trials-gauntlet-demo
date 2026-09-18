@@ -55,7 +55,10 @@ export const REGIONS: readonly RegionDef[] = [
     label: 'Industrial',
     name: { x: 300, y: 560 },
     crop: { x: 0, y: 460, w: 640, h: 427 },
-    frame: { x: 0, y: 250, w: 1030, h: 495 },
+    // Up to the mesa tops (y 175), not just to the Canyon's markers: the opening camera slides down until B1 —
+    // the lowest marker on the plate — sits at the bottom of its 15–68 % band, which eats the frame's top third.
+    // The extra headroom is what the phone sees as the Canyon above the docks (ask 59; the A region mockup).
+    frame: { x: 0, y: 175, w: 1030, h: 570 },
     fog: [{ x: 300, y: 660, rx: 330, ry: 190 }],
     lamp: '#ffb020',
   },

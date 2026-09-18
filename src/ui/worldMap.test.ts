@@ -193,6 +193,52 @@ describe('world map — the painted continent (data)', () => {
     expect(frameFor(ind, 4000, 4000).k).toBe(1.3);
   });
 
+  // The opening camera as `WorldMapScreen.frameRegion` builds it: the region frame fitted and centred, then slid
+  // just enough that the focused marker sits inside 15–68 % of the view, then clamped to the plate's edges.
+  const openingCam = (region: { frame: { x: number; y: number; w: number; h: number } }, m: { x: number; y: number }, vw: number, vh: number): { x: number; y: number; k: number } => {
+    const f = frameFor(region as Parameters<typeof frameFor>[0], vw, vh);
+    const c = { x: vw / 2 - f.x * f.k, y: vh / 2 - f.y * f.k, k: f.k };
+    const sx = c.x + m.x * f.k;
+    const sy = c.y + m.y * f.k;
+    c.x -= Math.max(0, sx - vw * 0.72) - Math.max(0, vw * 0.15 - sx);
+    c.y -= Math.max(0, sy - vh * 0.68) - Math.max(0, vh * 0.15 - sy);
+    const mw = MAP.w * c.k;
+    const mh = MAP.h * c.k;
+    return {
+      x: mw <= vw ? (vw - mw) / 2 : Math.max(vw - mw, Math.min(0, c.x)),
+      y: mh <= vh ? (vh - mh) / 2 : Math.max(vh - mh, Math.min(0, c.y)),
+      k: c.k,
+    };
+  };
+
+  it('opening on B1 keeps the Canyon above the docks in frame on a landscape phone (ask 59), with B1 in its 15–68 % band and the region plates still the drawn tier', () => {
+    const ind = buildRegions(ALL, seeded)[0]!;
+    const b1 = ANCHOR['b1-first-ride']!;
+    const e1 = ANCHOR['e1-uphill-weight']!;
+    const m1 = ANCHOR['m1-hop-up']!;
+    for (const [vw, vh] of [[932, 430], [844, 390], [1280, 720]] as const) {
+      const cam = openingCam(ind, b1, vw, vh);
+      const top = (0 - cam.y) / cam.k; // the map unit at the top edge of the view
+      const bottom = (vh - cam.y) / cam.k;
+      // A slice of the Canyon above the docks: E1 (the mesa foot) and M1 (the road out) stand clear of the top
+      // edge by more than a marker's half-diamond, and B1's own neighbourhood is still on screen.
+      expect(top, `${vw}x${vh} top edge`).toBeLessThan(e1.y - 40);
+      expect(m1.y, `${vw}x${vh} M1 in view`).toBeGreaterThan(top);
+      expect(b1.y, `${vw}x${vh} B1 in view`).toBeLessThan(bottom);
+      // The focused marker stays inside the band, its card beside it.
+      const sy = cam.y + b1.y * cam.k;
+      expect(sy, `${vw}x${vh} B1 band`).toBeGreaterThanOrEqual(vh * 0.15);
+      expect(sy, `${vw}x${vh} B1 band`).toBeLessThanOrEqual(vh * 0.68 + 0.001);
+      // Still the region tier: never the far world plate, and never below the frame floor.
+      expect(cam.k, `${vw}x${vh} zoom`).toBeGreaterThanOrEqual(Math.round((ZOOM.plates + 0.05) * 1000) / 1000);
+      expect(tierBlend(cam.k), `${vw}x${vh} blend`).toBeGreaterThan(0.75);
+      // And never so far out that the opening reads as the continent view.
+      expect(cam.k, `${vw}x${vh} vs fit`).toBeGreaterThan(fitZoom(vw, vh) * 1.2);
+    }
+    // Desktop is untouched by the widened box: 1280 × 720 still fits Industrial's width, at R3's zoom.
+    expect(frameFor(ind, 1280, 720).k).toBeCloseTo(1.243, 3);
+  });
+
   it('markersInView / locate', () => {
     const regions = buildRegions(ALL, seeded);
     const b1 = ANCHOR['b1-first-ride']!;
