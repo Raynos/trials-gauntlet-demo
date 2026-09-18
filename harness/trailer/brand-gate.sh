@@ -7,7 +7,12 @@ PAT='redlynx|ubisoft|red ?bull|monster energy|rockstar|\bktm\b|yamaha|honda|kawa
 # Allowlist: the Credits panel's Thanks line names the games it learned the read-outs from (attribution, never in a
 # captured frame). Anything else matching is a fail.
 ALLOW='Thanks</dt><dd>Trials Evolution and Trials Rising for the read-outs'
-hits() { grep -rIiEo --exclude=brand-gate.sh --exclude="*.md" "$PAT" "$@" 2>/dev/null; }
+# `*.map` is excluded with `*.md`: a source map carries every code comment in the tree, including
+# the physics tuning notes that cite the genre's reference games by name (`src/physics/v2/tuning.ts`
+# R10 reverse). Those are engineering citations in a file no frame ever renders — and the same file
+# is inside the harness src fingerprint, so rewording a comment there restales all 47 committed
+# goldens. This gate is about what a captured frame can show; it reads the bundle, not its map.
+hits() { grep -rIiEo --exclude=brand-gate.sh --exclude="*.md" --exclude="*.map" "$PAT" "$@" 2>/dev/null; }
 allowed() { grep -rIiEc --exclude=brand-gate.sh "$ALLOW" "$@" 2>/dev/null | awk -F: '{s+=$NF} END {print s+0}'; }
 rc=0
 echo "== bundle (dist/assets/*.js, index.html)"

@@ -1,0 +1,328 @@
+[
+  {
+    "id": "menu",
+    "quality": "high",
+    "cssRate": 0.03,
+    "steps": [
+      {
+        "act": "wait",
+        "sel": ".menu-screen.live"
+      },
+      {
+        "act": "skip",
+        "frames": 10
+      },
+      {
+        "act": "roll",
+        "frames": 16,
+        "note": "the menu, held"
+      },
+      {
+        "act": "hover",
+        "sel": ".menu-screen.live .menu-item[data-id=play]"
+      },
+      {
+        "act": "roll",
+        "frames": 24,
+        "note": "PLAY lights up"
+      }
+    ]
+  },
+  {
+    "id": "map",
+    "quality": "high",
+    "cssRate": 0.03,
+    "steps": [
+      {
+        "act": "wait",
+        "sel": ".menu-screen.live"
+      },
+      {
+        "act": "skip",
+        "frames": 6
+      },
+      {
+        "act": "tap",
+        "sel": ".menu-screen.live .menu-item[data-id=play]"
+      },
+      {
+        "act": "waitFn",
+        "expr": "!!document.querySelector('.tracks-screen.live')",
+        "timeoutMs": 60000
+      },
+      {
+        "act": "waitFn",
+        "expr": "document.querySelectorAll('.wm-region.loaded').length >= 1",
+        "timeoutMs": 90000
+      },
+      {
+        "act": "skip",
+        "frames": 30
+      },
+      {
+        "act": "roll",
+        "frames": 18,
+        "note": "the opening frame: the painted continent at region zoom"
+      },
+      {
+        "act": "drag",
+        "from": [
+          760,
+          250
+        ],
+        "by": [
+          -210,
+          130
+        ],
+        "frames": 42
+      },
+      {
+        "act": "roll",
+        "frames": 14,
+        "note": "inertia settles"
+      },
+      {
+        "act": "wheel",
+        "at": [
+          640,
+          360
+        ],
+        "dy": 900,
+        "frames": 30
+      },
+      {
+        "act": "roll",
+        "frames": 16,
+        "note": "out to the whole continent"
+      }
+    ]
+  },
+  {
+    "id": "mapcard",
+    "quality": "high",
+    "cssRate": 0.03,
+    "steps": [
+      {
+        "act": "wait",
+        "sel": ".menu-screen.live"
+      },
+      {
+        "act": "skip",
+        "frames": 6
+      },
+      {
+        "act": "tap",
+        "sel": ".menu-screen.live .menu-item[data-id=play]"
+      },
+      {
+        "act": "waitFn",
+        "expr": "!!document.querySelector('.tracks-screen.live')",
+        "timeoutMs": 60000
+      },
+      {
+        "act": "waitFn",
+        "expr": "document.querySelectorAll('.wm-region.loaded').length >= 1",
+        "timeoutMs": 90000
+      },
+      {
+        "act": "skip",
+        "frames": 30
+      },
+      {
+        "act": "roll",
+        "frames": 8,
+        "note": "the opening frame, M1 focused"
+      },
+      {
+        "act": "key",
+        "key": "ArrowLeft",
+        "holdFrames": 3,
+        "capture": true,
+        "note": "step back along the road: the camera flies, the plate and card follow"
+      },
+      {
+        "act": "roll",
+        "frames": 24,
+        "note": "the fly and the card"
+      },
+      {
+        "act": "key",
+        "key": "ArrowLeft",
+        "holdFrames": 3,
+        "capture": true
+      },
+      {
+        "act": "roll",
+        "frames": 30,
+        "note": "one more marker down the road"
+      }
+    ]
+  },
+  {
+    "id": "garage",
+    "quality": "high",
+    "cssRate": 0.03,
+    "steps": [
+      {
+        "act": "wait",
+        "sel": ".menu-screen.live"
+      },
+      {
+        "act": "skip",
+        "frames": 6
+      },
+      {
+        "act": "tap",
+        "sel": ".menu-screen.live .menu-item[data-id=garage]"
+      },
+      {
+        "act": "waitFn",
+        "expr": "!!document.querySelector('.garage-screen.live')",
+        "timeoutMs": 60000
+      },
+      {
+        "act": "waitFn",
+        "expr": "window.__render && window.__render.riderDocumentOutfit === 'street-mustard' && window.__render.bikeDocumentClass === 'rookie' && window.__render.heroLoading === 0",
+        "timeoutMs": 90000
+      },
+      {
+        "act": "skip",
+        "frames": 30
+      },
+      {
+        "act": "roll",
+        "frames": 14,
+        "note": "Astra's authored hero on the shutter-door stage"
+      },
+      {
+        "act": "drag",
+        "from": [
+          640,
+          380
+        ],
+        "by": [
+          -150,
+          0
+        ],
+        "frames": 18,
+        "note": "orbit toward the front three-quarter, where the authored face and hands read"
+      },
+      {
+        "act": "tap",
+        "sel": "button[data-outfit=\"race-bluewhite\"]"
+      },
+      {
+        "act": "waitFn",
+        "expr": "window.__render.riderDocumentOutfit === 'race-bluewhite' && window.__render.heroLoading === 0",
+        "timeoutMs": 90000
+      },
+      {
+        "act": "roll",
+        "frames": 20,
+        "note": "Race blue/white (the full-face helmet)"
+      },
+      {
+        "act": "tap",
+        "sel": "button[data-bike=\"pro\"]"
+      },
+      {
+        "act": "waitFn",
+        "expr": "window.__render.bikeDocumentClass === 'pro' && window.__render.heroLoading === 0",
+        "timeoutMs": 90000
+      },
+      {
+        "act": "roll",
+        "frames": 20,
+        "note": "the Pro livery"
+      },
+      {
+        "act": "tap",
+        "sel": "button[data-outfit=\"street-charcoal\"]"
+      },
+      {
+        "act": "waitFn",
+        "expr": "window.__render.riderDocumentOutfit === 'street-charcoal' && window.__render.heroLoading === 0",
+        "timeoutMs": 90000
+      },
+      {
+        "act": "roll",
+        "frames": 14,
+        "note": "Street charcoal on the Pro"
+      },
+      {
+        "act": "drag",
+        "from": [
+          640,
+          380
+        ],
+        "by": [
+          150,
+          0
+        ],
+        "frames": 14,
+        "note": "orbit back"
+      }
+    ]
+  },
+  {
+    "id": "phone",
+    "geom": "932x430",
+    "dpr": 2,
+    "phone": true,
+    "quality": "high",
+    "cssRate": 0.03,
+    "steps": [
+      {
+        "act": "wait",
+        "sel": ".menu-screen.live"
+      },
+      {
+        "act": "skip",
+        "frames": 8
+      },
+      {
+        "act": "roll",
+        "frames": 14,
+        "note": "the phone menu band (ask 48)"
+      },
+      {
+        "act": "tap",
+        "sel": ".menu-screen.live .menu-item[data-id=play]"
+      },
+      {
+        "act": "waitFn",
+        "expr": "!!document.querySelector('.tracks-screen.live')",
+        "timeoutMs": 60000
+      },
+      {
+        "act": "waitFn",
+        "expr": "document.querySelectorAll('.wm-region.loaded').length >= 1",
+        "timeoutMs": 90000
+      },
+      {
+        "act": "skip",
+        "frames": 30
+      },
+      {
+        "act": "roll",
+        "frames": 12,
+        "note": "the map on the phone"
+      },
+      {
+        "act": "pinch",
+        "at": [
+          466,
+          215
+        ],
+        "from": 320,
+        "to": 60,
+        "frames": 22
+      },
+      {
+        "act": "roll",
+        "frames": 14,
+        "note": "pinched out to the continent"
+      }
+    ]
+  }
+]

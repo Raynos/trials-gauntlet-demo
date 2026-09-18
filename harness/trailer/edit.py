@@ -25,6 +25,7 @@ FPS = 30
 W, H = 1280, 720
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 FONT_DIR = os.path.join(ROOT, 'public', 'fonts')
+TTF_DIR = os.path.join(ROOT, 'harness', 'trailer', 'fonts')
 KEYART = os.path.join(ROOT, 'public', 'art', 'menu', 'keyart-industrial-1920.webp')
 AMBER = (255, 176, 32)
 AMBER2 = (255, 138, 31)
@@ -32,6 +33,7 @@ INK = (243, 245, 248)
 BG = (7, 8, 10)
 
 TIMELAPSE = None
+KEYART_FLIP = True
 BPM = 124.0
 BEAT = 60 / BPM
 BAR = 4 * BEAT
@@ -42,6 +44,14 @@ def bar(b):
 
 
 def font(name, size):
+    """The game ships .woff2, which Pillow can only open when its bundled FreeType was built
+    with brotli — the stock wheel is not, so a plain `pip install pillow` raises "unknown file
+    format" on every card. `harness/trailer/fonts/` holds the same faces converted to .ttf
+    (regenerate with `fonts/woff2ttf.py public/fonts harness/trailer/fonts`); the shipped
+    woff2 stays the fallback for a FreeType that can read it."""
+    ttf = os.path.join(TTF_DIR, name.replace('.woff2', '.ttf'))
+    if os.path.exists(ttf):
+        return ImageFont.truetype(ttf, size)
     return ImageFont.truetype(os.path.join(FONT_DIR, name), size)
 
 
@@ -115,8 +125,10 @@ def keyart_plate():
     aw, ah = art.size
     s = max(W / aw, H / ah)
     art = art.resize((int(aw * s + 0.5), int(ah * s + 0.5)), Image.LANCZOS)
-    # the hero is authored left of centre; the game mirrors it so the hero lands right of the wordmark
-    art = art.transpose(Image.FLIP_LEFT_RIGHT)
+    # The industrial plate authors the hero left of centre and the game mirrors it, so the hero
+    # lands right of the wordmark. The nalati plate is already hero-right — `--keyart-noflip`.
+    if KEYART_FLIP:
+        art = art.transpose(Image.FLIP_LEFT_RIGHT)
     x0 = (art.width - W) // 2
     art = art.crop((x0, 0, x0 + W, H))
     art = vignette(art, 0.6)
@@ -196,8 +208,13 @@ def text_card(lines, n, accent_words=(), big=140, small=None, bg=BG, reveal=0.0)
     return frames
 
 
-def overlay_text(text, accent_words=(), size=92):
-    """Transparent RGBA layer with outlined big italic text (for cards over footage)."""
+def overlay_text(text, accent_words=(), size=92, y_frac=0.68):
+    """Transparent RGBA layer with outlined big italic text (for cards over footage).
+
+    `y_frac` is the baseline band as a fraction of the height; the UI cut lifts it to the
+    top third on shots whose own UI (the world map's track card, the garage's selectors)
+    owns the bottom band.
+    """
     f = font('BarlowCondensed-BlackItalic.woff2', size)
     img = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -207,10 +224,11 @@ def overlay_text(text, accent_words=(), size=92):
     tw = sum(widths) + space * (len(words) - 1)
     x = (W - tw) / 2
     bb = d.textbbox((0, 0), text, font=f)
-    y = int(H * 0.68) - bb[1]
+    y = int(H * y_frac) - bb[1]
     # scrim band
     band = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-    ImageDraw.Draw(band).rectangle((0, int(H * 0.64), W, int(H * 0.64) + (bb[3] - bb[1]) + 70), fill=(0, 0, 0, 120))
+    band_top = int(H * (y_frac - 0.04))
+    ImageDraw.Draw(band).rectangle((0, band_top, W, band_top + (bb[3] - bb[1]) + 70), fill=(0, 0, 0, 120))
     band = band.filter(ImageFilter.GaussianBlur(18))
     img.alpha_composite(band)
     for wd, ww in zip(words, widths):
@@ -404,6 +422,29 @@ def build_timeline(cut):
         t = add(t, bar(1.5), kind='clip', beat='crash', in_s=0.1, gain=1.0, music_cut=(2.07, None))
         t = add(t, bar(0.5), kind='clip', beat='crash', in_s=3.5, gain=0.9, overlay=('EVERY CRASH IS A RESTART', ('RESTART',)))
         t = add(t, bar(1), kind='clip', beat='drop', in_s=0.2, gain=0.9)
+        t = add(t, 2.5, kind='end', fade_out=0.4)
+        return S, t
+
+    if cut == 'ui':
+        # 15 s UI cut (ask 63): every screen the game grew since the v0.2.0 trailer, in the order a
+        # player meets them — the menu, the painted world map (ask 54, the headline), the garage
+        # explorer (50/52), the results panel, and the same build on a phone (48). Sources are
+        # `capture-ui.ts` beat dirs: real screens on a paused clock, not stills. Bed: music-15
+        # (124 BPM, drops at bars 0 and 5), so every cut lands on a half-bar.
+        t = 0.0
+        t = add(t, bar(0.5), kind='title')
+        # The menu only drifts its key art, so it measures as a still: give it the push-in.
+        t = add(t, bar(0.5), kind='clip', beat='menu', in_s=0.0, gain=0.0, no_zoom=True, push=(1.0, 1.025))
+        t = add(t, bar(2), kind='clip', beat='map', in_s=0.0, gain=0.0, no_zoom=True,
+                overlay=('A HAND-PAINTED WORLD', ('WORLD',)), overlay_y=0.13, overlay_size=84)
+        t = add(t, bar(1), kind='clip', beat='mapcard', in_s=0.0, gain=0.0, no_zoom=True)
+        t = add(t, bar(1.5), kind='clip', beat='garage', in_s=0.0, gain=0.0, no_zoom=True,
+                overlay=('FIVE OUTFITS, TWO BIKES', ('FIVE', 'TWO')), overlay_y=0.13, overlay_size=84)
+        # The only beat with game audio: the finish jingle and the crowd land on the cut.
+        # The only beat with game audio: the finish jingle and the crowd land on the cut. In at 1.9 s,
+        # where the panel has finished staging (time, faults, FIRST CLEAN, medals, the four tiles).
+        t = add(t, bar(0.5), kind='clip', beat='results', in_s=1.9, gain=0.85, no_zoom=True)
+        t = add(t, bar(0.5), kind='phonecard', beat='phone', in_s=0.0, gain=0.0)
         t = add(t, 2.5, kind='end', fade_out=0.4)
         return S, t
 
@@ -602,7 +643,9 @@ def render(args):
     for s in segments:
         if s['kind'] in ('clip', 'phonecard') and s['beat'] not in beats:
             beats[s['beat']] = Beat(args.beats, s['beat'])
-    version = f'v{args.version} · {args.sha}' if args.version else None
+    # A tagged cut reads "v0.2.0 · <sha>"; a cut of whatever is at HEAD reads the build stamp the
+    # menu itself shows ("build <sha>"), so the end card never claims a release it is not.
+    version = f'v{args.version} · {args.sha}' if args.version else (f'build {args.sha}' if args.sha else None)
     nframes = int(round(total * FPS))
     print(f'timeline: {len(segments)} segments, {total:.2f} s, {nframes} frames', file=sys.stderr)
     for s in segments:
@@ -694,6 +737,14 @@ def render(args):
                 punch_center[1] += (by - punch_center[1]) * 0.15
                 punch_center[2] += (z_target - punch_center[2]) * 0.10
                 img = sample(b, src_t, blend=False, zoom=punch_center[2], center=(punch_center[0] + 0.06, punch_center[1] - 0.02))
+            elif seg.get('push'):
+                # Slow linear push-in over the segment: a beat whose own screen barely moves (the
+                # menu is a near-still) still needs to breathe. `punch` tracks the bike and needs a
+                # camera log; this is just the frame scaling.
+                z0, z1 = seg['push']
+                punch_center = None
+                u = (dt) / max(1e-6, seg['t1'] - seg['t0'])
+                img = sample(b, src_t, blend=False, zoom=z0 + (z1 - z0) * u)
             else:
                 punch_center = None
                 img = sample(b, src_t, blend=False)
@@ -703,11 +754,12 @@ def render(args):
                 img = lut[img]
             if seg.get('overlay'):
                 text, acc = seg['overlay']
-                if text not in overlay_cache:
-                    overlay_cache[text] = overlay_text(text, acc)
+                okey = (text, seg.get('overlay_y', 0.68), seg.get('overlay_size', 92))
+                if okey not in overlay_cache:
+                    overlay_cache[okey] = overlay_text(text, acc, size=okey[2], y_frac=okey[1])
                 a = min(1.0, local / 3)
                 if a > 0:
-                    ov = overlay_cache[text]
+                    ov = overlay_cache[okey]
                     base = Image.fromarray(img).convert('RGBA')
                     lay = ov.copy()
                     if a < 1:
@@ -752,15 +804,20 @@ def main():
     ap.add_argument('--beats', default='harness/out/trailer/beats')
     ap.add_argument('--music', default='harness/out/trailer/music.wav')
     ap.add_argument('--out', default='harness/out/trailer/trailer.mp4')
-    ap.add_argument('--cut', default='full', choices=['full', 'social', 'v2', 'v2-social'])
+    ap.add_argument('--cut', default='full', choices=['full', 'social', 'v2', 'v2-social', 'ui'])
     ap.add_argument('--height', type=int, default=720)
     ap.add_argument('--sheet', default=None)
+    ap.add_argument('--keyart', default=None, help='override the title-card key art (default: the industrial plate); the UI cut matches whatever the live menu is showing')
+    ap.add_argument('--keyart-noflip', action='store_true', help='do not mirror the key art (the nalati plate is already hero-right)')
     ap.add_argument('--version', default=None, help='e.g. 0.2.0: adds "v0.2.0 · <sha>" to the end card')
     ap.add_argument('--sha', default=None)
     ap.add_argument('--timelapse', default=None, help='mp4 whose last 3 s splice in before the end card (v2 cut), if it exists')
     a = ap.parse_args()
-    global TIMELAPSE
+    global TIMELAPSE, KEYART, KEYART_FLIP
     TIMELAPSE = a.timelapse if a.timelapse and os.path.exists(a.timelapse) else None
+    KEYART_FLIP = not a.keyart_noflip
+    if a.keyart:
+        KEYART = a.keyart if os.path.isabs(a.keyart) else os.path.join(ROOT, a.keyart)
     render(a)
 
 

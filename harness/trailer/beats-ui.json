@@ -1,0 +1,10 @@
+[
+  {
+    "id": "results",
+    "recording": "harness/inputs/b1-first-ride/bot-3.json",
+    "startTick": 4820,
+    "endTick": 5260,
+    "hud": true,
+    "quality": "high"
+  }
+]
