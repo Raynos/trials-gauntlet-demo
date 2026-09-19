@@ -31,15 +31,28 @@ async function main(): Promise<void> {
       const hz = rec.header.physicsHz;
       const lines: string[] = [];
       let air = -1; let maxH = 0; let airStartX = 0;
+      // Net rotation while airborne (a trailer wants the flips) and rear-wheel-only runs on the
+      // ground (the wheelies). `angle` is continuous, so the airborne delta is signed rotation:
+      // positive is nose-up / backward in this sim's convention.
+      let airStartAngle = 0;
+      let wheelie = -1; let wheelieX = 0;
       for (let i = 0; i < frames.length; i++) {
         const evs = sim.step(frames[i]!);
         const s = sim.state();
         const grounded = s.contacts.rear !== null || s.contacts.front !== null;
-        if (!grounded && air < 0) { air = i; maxH = s.bike.pos.y; airStartX = s.bike.pos.x; }
+        const onRearOnly = s.contacts.rear !== null && s.contacts.front === null;
+        if (onRearOnly && wheelie < 0) { wheelie = i; wheelieX = s.bike.pos.x; }
+        if (!onRearOnly && wheelie >= 0) {
+          const dur = (i - wheelie) / hz;
+          if (dur >= 0.6) lines.push(`  t=${(wheelie / hz).toFixed(2)}-${(i / hz).toFixed(2)} WHEELIE ${dur.toFixed(2)}s x=${wheelieX.toFixed(1)}->${s.bike.pos.x.toFixed(1)}`);
+          wheelie = -1;
+        }
+        if (!grounded && air < 0) { air = i; maxH = s.bike.pos.y; airStartX = s.bike.pos.x; airStartAngle = s.bike.angle; }
         if (!grounded) maxH = Math.max(maxH, s.bike.pos.y);
         if (grounded && air >= 0) {
           const dur = (i - air) / hz;
-          if (dur >= 0.45) lines.push(`  t=${(air / hz).toFixed(2)}-${(i / hz).toFixed(2)} AIR ${dur.toFixed(2)}s x=${airStartX.toFixed(1)}->${s.bike.pos.x.toFixed(1)} apexY=${maxH.toFixed(2)} landY=${s.bike.pos.y.toFixed(2)} v=${Math.hypot(s.bike.vel.x, s.bike.vel.y).toFixed(1)}`);
+          const deg = ((s.bike.angle - airStartAngle) * 180) / Math.PI;
+          if (dur >= 0.45) lines.push(`  t=${(air / hz).toFixed(2)}-${(i / hz).toFixed(2)} AIR ${dur.toFixed(2)}s x=${airStartX.toFixed(1)}->${s.bike.pos.x.toFixed(1)} apexY=${maxH.toFixed(2)} landY=${s.bike.pos.y.toFixed(2)} v=${Math.hypot(s.bike.vel.x, s.bike.vel.y).toFixed(1)} rot=${deg.toFixed(0)}deg${Math.abs(deg) >= 180 ? ' FLIP' : ''}`);
           air = -1;
         }
         for (const e of evs) {

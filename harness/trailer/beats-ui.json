@@ -1,9 +1,50 @@
 [
   {
+    "id": "wheelie",
+    "recording": "harness/inputs/h1-wheelie-wire/bot-3-pro.json",
+    "startTick": 0,
+    "endTick": 350,
+    "hud": true,
+    "quality": "high"
+  },
+  {
+    "id": "bigair",
+    "recording": "harness/inputs/x3-gauntlet/bot-3-pro.json",
+    "startTick": 520,
+    "endTick": 890,
+    "hud": true,
+    "quality": "high"
+  },
+  {
+    "id": "flip",
+    "recording": "harness/inputs/x1-vertical-limit/trailer-flip.json",
+    "startTick": 5140,
+    "endTick": 5500,
+    "fps": 60,
+    "hud": true,
+    "quality": "high"
+  },
+  {
+    "id": "firejump",
+    "recording": "harness/inputs/h3-fire-line/bot-3-pro.json",
+    "startTick": 500,
+    "endTick": 870,
+    "hud": true,
+    "quality": "high"
+  },
+  {
     "id": "results",
     "recording": "harness/inputs/b1-first-ride/bot-3.json",
     "startTick": 4820,
     "endTick": 5260,
+    "hud": true,
+    "quality": "high"
+  },
+  {
+    "id": "canyonair",
+    "recording": "harness/inputs/e1-uphill-weight/bot-3.json",
+    "startTick": 4212,
+    "endTick": 4610,
     "hud": true,
     "quality": "high"
   }

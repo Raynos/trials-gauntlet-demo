@@ -426,25 +426,32 @@ def build_timeline(cut):
         return S, t
 
     if cut == 'ui':
-        # 15 s UI cut (ask 63): every screen the game grew since the v0.2.0 trailer, in the order a
-        # player meets them — the menu, the painted world map (ask 54, the headline), the garage
-        # explorer (50/52), the results panel, and the same build on a phone (48). Sources are
-        # `capture-ui.ts` beat dirs: real screens on a paused clock, not stills. Bed: music-15
-        # (124 BPM, drops at bars 0 and 5), so every cut lands on a half-bar.
+        # 15 s cut (ask 63, round 2: the first pass was all front end and the reply was "shows no
+        # gameplay"). Majority riding — 4.5 of the 7.75 bars, 58 % of the runtime — with the two
+        # screens that are new since the v0.2.0 trailer carrying the rest. Bed: music-15 (124 BPM,
+        # drops at bars 0 and 5), so every cut lands on a half-bar.
         t = 0.0
         t = add(t, bar(0.5), kind='title')
-        # The menu only drifts its key art, so it measures as a still: give it the push-in.
-        t = add(t, bar(0.5), kind='clip', beat='menu', in_s=0.0, gain=0.0, no_zoom=True, push=(1.0, 1.025))
-        t = add(t, bar(2), kind='clip', beat='map', in_s=0.0, gain=0.0, no_zoom=True,
+        # H1 Pro off the start gate: 2.52 s on the rear wheel along the night-city rooftops.
+        t = add(t, bar(1), kind='clip', beat='wheelie', in_s=0.15, gain=0.85, no_zoom=True)
+        # X3 Pro: 2.33 s of air, 10.5 m apex, out over the foundry.
+        t = add(t, bar(0.5), kind='clip', beat='bigair', in_s=0.30, gain=0.85, punch=True)
+        # In on the pan, not on the held opening frame.
+        t = add(t, bar(1), kind='clip', beat='map', in_s=0.55, gain=0.0, no_zoom=True,
                 overlay=('A HAND-PAINTED WORLD', ('WORLD',)), overlay_y=0.13, overlay_size=84)
-        t = add(t, bar(1), kind='clip', beat='mapcard', in_s=0.0, gain=0.0, no_zoom=True)
-        t = add(t, bar(1.5), kind='clip', beat='garage', in_s=0.0, gain=0.0, no_zoom=True,
+        # THE BACKFLIP (make-flip.ts): 349 deg off the X1 summit at 15.1 m, landed clean. Slow to
+        # 0.45x through the rotation with the tracked punch-in, back to speed for the landing.
+        t = add(t, bar(1.5), kind='clip', beat='flip', in_s=0.35, gain=0.9, punch=True,
+                remap=[(0.0, 0.75, 1.0), (0.75, 1.25, 0.45), (1.25, 2.29, 1.0)])
+        t = add(t, bar(0.5), kind='clip', beat='garage', in_s=0.60, gain=0.0, no_zoom=True,
                 overlay=('FIVE OUTFITS, TWO BIKES', ('FIVE', 'TWO')), overlay_y=0.13, overlay_size=84)
-        # The only beat with game audio: the finish jingle and the crowd land on the cut.
-        # The only beat with game audio: the finish jingle and the crowd land on the cut. In at 1.9 s,
-        # where the panel has finished staging (time, faults, FIRST CLEAN, medals, the four tiles).
+        # Two half-bars rather than one bar on a single biome: H3 Pro over the foundry fire line
+        # (in on the landing), then E1's 2.23 s / 9.8 m gap across the canyon mesas — the one warm
+        # daylight shot in a cut that is otherwise night city, foundry and snow.
+        t = add(t, bar(0.5), kind='clip', beat='firejump', in_s=1.50, gain=0.85, lift=1.35, punch=True)
+        t = add(t, bar(0.5), kind='clip', beat='canyonair', in_s=1.70, gain=0.85, punch=True)
+        # B1 finish: TRACK FINISHED, 0:40.558, 0 faults, the medal row and the tiles.
         t = add(t, bar(0.5), kind='clip', beat='results', in_s=1.9, gain=0.85, no_zoom=True)
-        t = add(t, bar(0.5), kind='phonecard', beat='phone', in_s=0.0, gain=0.0)
         t = add(t, 2.5, kind='end', fade_out=0.4)
         return S, t
 
