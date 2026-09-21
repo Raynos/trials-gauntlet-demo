@@ -25,8 +25,10 @@ assets/blender/hero-art/masters/*.blend
 # World map region-plate crop guides: derived from build/world/world-plate.png by build/gen-regions.mjs
 assets/design/worldmap/build/guides/
 
-# Ask 63's UI trailer: captured frames and cuts stay local. `harness/out/trailer/` is otherwise
-# un-ignored, and the video blobs already there are half of why main cannot be pushed (HR-11).
+# The original 141 MB v0.2.0 master stays local after its history removal; smaller exports remain tracked.
+harness/out/trailer/trailer-v0.2.0.mp4
+
+# Ask 63's UI trailer: captured frames and cuts stay local. `harness/out/trailer/` is otherwise un-ignored.
 harness/out/trailer/beats-ui/
 harness/out/trailer/trailer-ui-*
 

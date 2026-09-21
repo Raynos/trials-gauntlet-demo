@@ -24,3 +24,4 @@ Contents
 - `blender-branch-merge.md` — the merge rules and the three test merges; the branch is on `main` in full.
 - `CHROMIUM_METAL_SHADER_INIT.md` — the GL 1281 startup bug, closed 2026-09-16 as non-repro (18/18 clean Metal gates incl. the original failing build; evidence `docs/evidence/chromium-metal/`).
 - `HERO_GARAGE_PRODUCTION.md` — Astra's Blender art plan, closed 2026-09-17 with ask 43: delivery integrated, prototype retired; the recipe lives in `assets/blender/hero-art/`, the handoff in `docs/evidence/hero-art/delivery/`.
+- `PWA_OFFLINE.md` — offline PWA plan, closed 2026-09-21 at tag `pwa-offline-complete`: origin-down headless gate proved an offline B1 finish, and the user confirmed the PWA works offline on the actual phone.

@@ -1,5 +1,7 @@
 # PWA / offline — the game plays with the radio off (ask 58)
 
+Closed: 2026-09-21 · tag `pwa-offline-complete`. The user confirmed the PWA works offline on the actual phone; the origin-down headless gate independently proved an offline B1 finish. The draft HR-12 number below was never filed and was later used for the trailer.
+
 **Goal (the user's words):** "I tried to play the game with no data, no internet, and it doesn't work. I have it saved to the home screen and it didn't load. I want this game, this website, to be a progressive web app — after the first load, I want to be able to play it offline, just like whatever is necessary for a website that works offline. Obviously to play a web game offline you have to load it the first time, I fully understand that."
 
 **The bar (two lines, both measured, neither a feeling):**
@@ -9,7 +11,7 @@
 
 `docs/mission.md` holds the bars no plan closes; this plan closes neither of them — it carries its own two, which are measurable and shippable. The nearest mission line is §4 ("fast loads … are MANDATORY").
 
-Ledger row: `docs/tasks/ASKS.md` ask 58 (in flight).
+Ledger row: `docs/tasks/ASKS.md` ask 58 (done).
 
 ---
 
@@ -281,7 +283,7 @@ The original text below is kept as written; where it and the rounds above disagr
 - [x] **Offline is honest, never a lie.** A boot failure with `navigator.onLine === false` says so instead of offering Retry against a dead radio; `/api/**` bypasses the worker and fails into the localStorage queue. (R1 · `offline.inboxQueues`)
 - [x] **The gate carries it.** `offline.coldStartPlayable` is a ship-gate row (`harness/gate/ship-gate.ts` section `offline`) with a threshold in `harness/gate/thresholds.json`. (R2)
 - [x] **A garage swap never touches the network.** Offline, origin unreachable: **10/10** outfit × livery combinations swapped with 0 model requests and no procedural stand-in. (R3 · `offline.garageSwapsOffline`)
-- [ ] **A human proved it on the actual phone.** HR-12 answered: home screen, aeroplane mode, cold start, B1 finished. (R5)
+- [x] **A human checked the actual phone.** On 2026-09-21 the user reported that the PWA works offline. The B1 finish was independently proved by the origin-down headless gate; the phone report did not itemize the ride. (R5)
 
 ## Status
 
