@@ -69,7 +69,11 @@ describe.each(subjects)('$file shared physical stances', ({ file, lod }) => {
     expect(neutral.bottom.x).toBeGreaterThan(RIDER_SEAT.rearX);
     expect(neutral.bottom.x).toBeLessThan(RIDER_SEAT.frontX);
     expect(forward.hips.y - neutral.hips.y).toBeGreaterThan(.15);
-    expect(forward.chest.x - neutral.chest.x).toBeGreaterThan(.4);
+    // User rejected the low, long chest-over-bars silhouette. The taller forward
+    // stance advances the chest while keeping the shoulder behind the grip.
+    expect(forward.chest.x - neutral.chest.x).toBeGreaterThan(.25);
+    expect(forward.chest.x).toBeLessThan(.245);
+    expect(forward.chest.y).toBeGreaterThan(1.3);
     expect(back.hips.x - neutral.hips.x).toBeLessThan(-.3);
     expect(clear.hips.x).toBeLessThan(RIDER_SEAT.rearX);
     expect(clear.hips.y).toBeGreaterThanOrEqual(neutral.hips.y - 1e-5);

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "lab-ramp-jump",
+  "bike": "rookie",
+  "updatedAt": "2026-09-21T13:20:44.022Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    2,
+    6
+  ],
+  "targetAttempts": 6,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        3682634458
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        5.508333333333334
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260921-081457-d42f4a",
+    "20260921-081602-4e4c87",
+    "20260921-082040-3f8a42"
+  ]
+}

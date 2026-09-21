@@ -39,7 +39,7 @@ export const RIDER_PROFILE = {
   poses: [
     { lean: -1, hipX: -0.66, hipY: 0.725, torso: 40, head: 66 },
     { lean: 0, hipX: -0.34, hipY: 0.732, torso: 65, head: 85 },
-    { lean: 1, hipX: -0.12, hipY: 0.94, torso: 24, head: 40 },
+    { lean: 1, hipX: -0.20, hipY: 0.974, torso: 48, head: 70.8 },
   ],
 } as const;
 
@@ -187,7 +187,13 @@ export function riderRigFromHips(hipX: number, hipY: number, torso: number, out:
   out.ankle.x = p.ankle.x;
   out.ankle.y = p.ankle.y;
   out.ankle.z = p.ankle.z;
-  out.armReach = profileJoint(sx, sy, p.shoulderHalf, out.wrist.x, out.wrist.y, out.wrist.z, p.upperArm, p.forearm, 0.3, -1, 0.15, out.elbow);
+  // The tall forward stance bends the elbow behind the wrist, so the forearm reaches
+  // toward the bars instead of hooking backward under the chest. Rearward poses keep
+  // their original pole exactly. Smooth height/position eligibility avoids a branch snap.
+  const standHeight = clamp((hipY - 0.78) / 0.14, 0, 1);
+  const standForward = clamp((hipX + 0.4) / 0.12, 0, 1);
+  const standBlend = standHeight * standHeight * (3 - 2 * standHeight) * standForward * standForward * (3 - 2 * standForward);
+  out.armReach = profileJoint(sx, sy, p.shoulderHalf, out.wrist.x, out.wrist.y, out.wrist.z, p.upperArm, p.forearm, 0.3 - 0.6 * standBlend, -1, 0.15, out.elbow);
   out.legReach = sagittalKnee(hipX, hipY, out.knee);
   const m = p.mass,
     f = p.comFraction;
@@ -315,9 +321,13 @@ export function riderPoseAtLean(lean: number, out: RiderRigPose): RiderRigPose {
     back = RIDER_PROFILE.poses[0],
     forward = RIDER_PROFILE.poses[2];
   const clear = { hipX: -0.6, hipY: neutral.hipY, torso: 40 };
-  const a = l < -0.5 ? back : l < 0 ? clear : neutral;
-  const b = l < -0.5 ? clear : l < 0 ? neutral : forward;
-  const t = l < -0.5 ? (l + 1) * 2 : l < 0 ? (l + 0.5) * 2 : l;
+  // Forward input first lifts the pelvis over the pegs, then hinges toward the bars.
+  // Almost-straight legs retain flexion and stay inside the physical 0.870 m planar
+  // stop; keeping the chest high also opens the elbows instead of folding them under it.
+  const standing = { hipX: -0.24, hipY: 0.953, torso: 50 };
+  const a = l < -0.5 ? back : l < 0 ? clear : l < 0.5 ? neutral : standing;
+  const b = l < -0.5 ? clear : l < 0 ? neutral : l < 0.5 ? standing : forward;
+  const t = l < -0.5 ? (l + 1) * 2 : l < 0 ? (l + 0.5) * 2 : l < 0.5 ? l * 2 : (l - 0.5) * 2;
   const u = t * t * (3 - 2 * t);
   return riderRigFromHips(a.hipX + (b.hipX - a.hipX) * u, a.hipY + (b.hipY - a.hipY) * u, ((a.torso + (b.torso - a.torso) * u) * PI) / 180, out);
 }

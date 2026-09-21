@@ -93,15 +93,15 @@ describe('registry', () => {
     ]);
     expect(listTrackIds()).toContain('flat-test');
     expect(listTrackIds()).toContain('gap-test');
-    expect(listTrackIds()).toHaveLength(24);
+    expect(listTrackIds()).toHaveLength(26);
     for (const id of listTrackIds()) expect(getTrack(id)?.id).toBe(id);
   });
 
   it('lists the lab tracks last (physics-v2 §15: core-game shows `lab-*` under "Lab")', () => {
     const ids = listTrackIds();
-    expect(ids.slice(-2)).toEqual(['lab-physics-test', 'lab-flat-200']);
-    expect(ids.filter(isLabTrackId)).toEqual(['lab-physics-test', 'lab-flat-200']);
-    expect(LAB_TRACKS.map((t) => t.id)).toEqual(['lab-physics-test', 'lab-flat-200']);
+    expect(ids.slice(-4)).toEqual(['lab-physics-test', 'lab-flat-200', 'lab-box-climb', 'lab-ramp-jump']);
+    expect(ids.filter(isLabTrackId)).toEqual(['lab-physics-test', 'lab-flat-200', 'lab-box-climb', 'lab-ramp-jump']);
+    expect(LAB_TRACKS.map((t) => t.id)).toEqual(['lab-physics-test', 'lab-flat-200', 'lab-box-climb', 'lab-ramp-jump']);
     expect(CURRICULUM.some((t) => isLabTrackId(t.id))).toBe(false);
     for (const t of LAB_TRACKS) expect(t.meta?.hints).toEqual(['physics']);
   });
@@ -111,7 +111,7 @@ describe('registry', () => {
     expect(PLAYGROUND_TRACKS.map((t) => t.meta?.biome)).toEqual(['industrial', 'canyon', 'snow', 'nightCity', 'foundry']);
     const ids = listTrackIds();
     expect(ids.filter(isPlaygroundTrackId)).toEqual(PLAYGROUND_TRACKS.map((t) => t.id));
-    expect(ids.slice(-7, -2)).toEqual(PLAYGROUND_TRACKS.map((t) => t.id));
+    expect(ids.slice(-9, -4)).toEqual(PLAYGROUND_TRACKS.map((t) => t.id));
     expect(CURRICULUM.some((t) => isPlaygroundTrackId(t.id))).toBe(false);
     expect(LAB_TRACKS.some((t) => isPlaygroundTrackId(t.id))).toBe(false);
     for (const t of PLAYGROUND_TRACKS) {

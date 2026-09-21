@@ -166,5 +166,19 @@
     "hazards": 0,
     "obstacles": 2,
     "finishX": 200
+  },
+  "lab-box-climb": {
+    "hash": "f0b20891910a2574",
+    "colliders": 8,
+    "hazards": 0,
+    "obstacles": 5,
+    "finishX": 33
+  },
+  "lab-ramp-jump": {
+    "hash": "22f91aa336287081",
+    "colliders": 9,
+    "hazards": 0,
+    "obstacles": 6,
+    "finishX": 38
   }
 }

@@ -6,6 +6,7 @@
  */
 import type { TrackDef } from '../../core/types';
 import { course } from '../author';
+import { LAB_BOX_CLIMB, LAB_RAMP_JUMP } from './lab-reference';
 
 /** Take-off: 6 m to +1.2 m = 11.31 deg (physics-v2 §15). */
 export const LAB_TAKEOFF = { length: 6, height: 1.2, lip: 0.3 } as const;
@@ -87,4 +88,4 @@ export const LAB_FLAT_200: TrackDef = course('lab-flat-200', 'Flat 200', 'beginn
   .flat(50)
   .finish();
 
-export const LAB_TRACKS: readonly TrackDef[] = [LAB_PHYSICS_TEST, LAB_FLAT_200];
+export const LAB_TRACKS: readonly TrackDef[] = [LAB_PHYSICS_TEST, LAB_FLAT_200, LAB_BOX_CLIMB, LAB_RAMP_JUMP];

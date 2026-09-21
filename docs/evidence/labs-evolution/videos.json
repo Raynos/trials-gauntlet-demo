@@ -1,0 +1,87 @@
+{
+  "status": "Local visual review checkpoint; not release-ready",
+  "videos": {
+    "harness/out/labs-evolution/container-step-evolution-vs-ours.mp4": {
+      "sha256": "c20cad72749eee2c96464db94f552c74d22b4e26d70a9f138185cbff80b8f291",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 960,
+            "height": 1240,
+            "nb_frames": "350"
+          }
+        ],
+        "format": {
+          "duration": "6.966667"
+        }
+      }
+    },
+    "harness/out/labs-evolution/timber-launch-evolution-vs-ours.mp4": {
+      "sha256": "e207a6b64198554fa1edb048931db1f43c6475d33ca0852964faa8a872d073d0",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 960,
+            "height": 1240,
+            "nb_frames": "327"
+          }
+        ],
+        "format": {
+          "duration": "6.520000"
+        }
+      }
+    },
+    "harness/out/pose-motion-review/forward-three-versions.mp4": {
+      "sha256": "c1dcfe495031764969734e90530c2e925612e9bc0ad55311eb8503b225a0cec2",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1200,
+            "height": 520,
+            "nb_frames": "270"
+          }
+        ],
+        "format": {
+          "duration": "9.000000"
+        }
+      }
+    },
+    "harness/out/pose-motion-review/backward-three-versions.mp4": {
+      "sha256": "b23d289a67300ac16fdd05a3d52f3c08e66b7f964031fdf91d0c04e2f657676e",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1200,
+            "height": 520,
+            "nb_frames": "270"
+          }
+        ],
+        "format": {
+          "duration": "9.000000"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "url": "https://www.youtube.com/watch?v=ytUW5r3RYw0",
+      "start": 58,
+      "end": 65,
+      "level": "Container Step"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=J7CjAdnb_O0",
+      "start": 30.5,
+      "end": 37,
+      "level": "Timber Launch"
+    }
+  ]
+}

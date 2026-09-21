@@ -70,11 +70,16 @@ export function measureContactsAndMass(rig: Rig, f: RenderFrame): PoseErrors {
     for (const [a, b, length] of [['upperArm', 'forearm', .32], ['forearm', 'hand', .27], ['thigh', 'shin', .46], ['shin', 'foot', .43]] as const) {
       e.length = Math.max(e.length, Math.abs(rig.point(`${a}.${side}`).distanceTo(rig.point(`${b}.${side}`)) - length));
     }
-    // A down/in pole: the elbow must not flip into the old chicken-wing branch.
+    // Rearward/neutral keep their original pole. In the high standing pose the
+    // elbow bends behind the wrist rather than hooking the forearm under the chest.
     const shoulder = rig.point(`upperArm.${side}`), elbow = rig.point(`forearm.${side}`), wrist = rig.point(`hand.${side}`);
     const axis = wrist.sub(shoulder).normalize(), bend = elbow.sub(shoulder);
     bend.addScaledVector(axis, -bend.dot(axis));
-    const pole = new THREE.Vector3(.3, -1, .15 * sign);
+    const hips = rig.point('pelvis').addScaledVector(rig.direction('pelvis'), .02);
+    const h = THREE.MathUtils.clamp((hips.y - .78) / .14, 0, 1);
+    const x = THREE.MathUtils.clamp((hips.x + .4) / .12, 0, 1);
+    const blend = h * h * (3 - 2 * h) * x * x * (3 - 2 * x);
+    const pole = new THREE.Vector3(.3 - .6 * blend, -1, .15 * sign);
     pole.addScaledVector(axis, -pole.dot(axis));
     e.elbowPole = Math.min(e.elbowPole, bend.dot(pole));
   }

@@ -17,7 +17,11 @@ describe('shared rider geometry replaces R9 draw/physics split', () => {
     expect(Math.abs(n.hips.y - RIDER_SEAT.pelvisDrop * Math.sin(n.torsoAngle) - RIDER_SEAT.topY)).toBeLessThan(0.02);
     expect(f.hips.y - n.hips.y).toBeGreaterThanOrEqual(0.15);
     expect(f.shoulders.x).toBeGreaterThan(n.shoulders.x);
-    expect(f.torsoAngle).toBeLessThan((45 * Math.PI) / 180);
+    // Revised from the rejected low chest-over-bars authoring target: tall stand-and-lean.
+    expect(f.torsoAngle).toBeGreaterThan((45 * Math.PI) / 180);
+    expect(f.torsoAngle).toBeLessThan((55 * Math.PI) / 180);
+    expect(f.shoulders.x).toBeLessThan(f.wrist.x);
+    expect(f.elbow.x).toBeLessThan(f.wrist.x);
     expect(n.hips.x - b.hips.x).toBeGreaterThanOrEqual(0.3);
     for (let i = 0; i <= 200; i++) {
       const p = riderPoseAtLean(-1 + i / 100, makeRiderRigPose());
@@ -29,6 +33,36 @@ describe('shared rider geometry replaces R9 draw/physics split', () => {
       expect(inverse.residual).toBeLessThan(1e-8);
       expect(Math.hypot(inverse.hips.x - p.hips.x, inverse.hips.y - p.hips.y)).toBeLessThan(1e-7);
     }
+  });
+  it.each(['rookie', 'pro'] as const)('%s rises onto the pegs before the forward hinge without flipping or losing limb reach', (cls) => {
+    const w = createBikePhysicsV2(120);
+    w.loadTrack(makeTrack({ finishX: 1e9 }), 1, { bike: cls });
+    stepN(w, {}, 240);
+    let startHipY = 0;
+    let hingeHipY = 0;
+    let lastLegReach = 0;
+    for (let i = 0; i < 360; i++) {
+      w.step(quantizeInput({ lean: 1 }));
+      const s = w.getState(), rb = s.riderBody!;
+      const c = Math.cos(s.bike.angle), sn = Math.sin(s.bike.angle);
+      const dx = rb.pos.x - s.bike.pos.x, dy = rb.pos.y - s.bike.pos.y;
+      const off = BIKE_GEOMETRY_V2.chassisToAxle;
+      const p = riderRigFromCOM(dx * c + dy * sn - off.x, -dx * sn + dy * c - off.y,
+        RIDER_TORSO_REST + rb.angle - s.bike.angle, makeRiderRigPose());
+      if (i === 0) startHipY = p.hips.y;
+      if (hingeHipY === 0 && p.torsoAngle < 50 * Math.PI / 180) hingeHipY = p.hips.y;
+      // The visible chest stays above the pelvis rather than folding flat or flipping.
+      expect(p.torsoAngle * 180 / Math.PI).toBeGreaterThan(30);
+      expect(p.torsoAngle * 180 / Math.PI).toBeLessThan(70);
+      expect(p.armReach).toBeLessThan(0.99);
+      expect(p.legReach).toBeLessThan(0.99);
+      expect(s.faulted).toBeNull();
+      lastLegReach = p.legReach;
+    }
+    expect(hingeHipY - startHipY).toBeGreaterThan(0.16);
+    expect(lastLegReach).toBeGreaterThan(0.95);
+    const target = riderPoseAtLean(1, makeRiderRigPose());
+    expect(target.legReach).toBeGreaterThan(0.975);
   });
   it.each(['rookie', 'pro'] as const)('%s sensors, exported hips and head match the physical COM inverse through lean changes and a 3m landing', (cls) => {
     const w = createBikePhysicsV2(120);

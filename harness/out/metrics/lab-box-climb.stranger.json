@@ -1,0 +1,160 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "lab-box-climb",
+  "attemptsBand": [
+    3,
+    8
+  ],
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "ad49be92",
+  "updatedAt": "2026-09-21T13:17:34.281Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "lab-box-climb-20260921-081549",
+      "agent": "labs-review",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "ad49be92",
+      "strangerAttempts": 8,
+      "cleared": false,
+      "finishTime": null,
+      "calls": 21,
+      "wallMs": 105026,
+      "firstCheckpointCalls": null,
+      "faultsByCheckpoint": [
+        7
+      ],
+      "bestAttempt": {
+        "n": 6,
+        "cleared": false,
+        "x": 15.464,
+        "startTick": 2535,
+        "endTick": 2879,
+        "recordingFile": "harness/out/stranger/lab-box-climb/lab-box-climb-20260921-081549/attempts/006.rec.json"
+      },
+      "recordingFile": "harness/inputs/lab-box-climb/stranger-lab-box-climb-20260921-081549.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 11.753,
+          "checkpoint": -1,
+          "obstacle": "box @ 12.0 m",
+          "calls": 3
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 12.298,
+          "checkpoint": -1,
+          "obstacle": "box @ 12.0 m",
+          "calls": 5
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 15.101,
+          "checkpoint": -1,
+          "obstacle": "box @ 15.0 m",
+          "calls": 8
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 14.313,
+          "checkpoint": -1,
+          "obstacle": "box @ 15.0 m",
+          "calls": 10
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 11.688,
+          "checkpoint": -1,
+          "obstacle": "box @ 12.0 m",
+          "calls": 13
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 15.464,
+          "checkpoint": -1,
+          "obstacle": "box @ 15.0 m",
+          "calls": 16
+        },
+        {
+          "n": 7,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 12.105,
+          "checkpoint": -1,
+          "obstacle": "box @ 12.0 m",
+          "calls": 18
+        }
+      ]
+    }
+  ],
+  "bike": "rookie",
+  "completed": 1,
+  "clearedCount": 0,
+  "medianAttempts": 8,
+  "medianFinishTime": null,
+  "medianCalls": 21,
+  "medianWallMs": 105026,
+  "census": {
+    "n": 1,
+    "minSessions": 2,
+    "censored": [],
+    "staleExcluded": 0,
+    "otherBikeExcluded": 0
+  },
+  "asserted": {
+    "band": [
+      3,
+      8
+    ],
+    "factor": 1.5,
+    "limit": 12
+  },
+  "verdict": "INSUFFICIENT",
+  "pass": null,
+  "deaths": {
+    "total": 7,
+    "byReason": {
+      "crash": 7
+    },
+    "byObstacle": [
+      {
+        "obstacle": "box @ 12.0 m",
+        "count": 4,
+        "xs": [
+          11.8,
+          12.3,
+          11.7,
+          12.1
+        ]
+      },
+      {
+        "obstacle": "box @ 15.0 m",
+        "count": 3,
+        "xs": [
+          15.1,
+          14.3,
+          15.5
+        ]
+      }
+    ],
+    "byCheckpoint": [
+      7
+    ]
+  }
+}

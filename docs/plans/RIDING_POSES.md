@@ -180,3 +180,5 @@ The four pose requirements are visibly met in played clips on both bike classes;
 and over-reach is explicit; the handling rows pass; changed physics carries fresh goldens, byte-identical browser
 replay and bot + stranger attempts-to-clear on b1–e3 (n ≥ 2). Static poses or geometry checks alone cannot close
 this. Physics changes go through the owner protocol (`project/archive/blender-branch-merge.md`).
+
+**Latest visual revision (asks 78–80):** two short Evolution-inspired Labs and a standing forward candidate are available for review. User rejected the previous forward pose; backward is retained. The new candidate passes the two Labs replays but causes hop/climb/recovery regressions (10 full-suite failures), so prior qualification does not apply. See [review checkpoint](../evidence/labs-evolution/README.md). Not release-ready.

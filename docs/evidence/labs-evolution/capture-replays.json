@@ -1,0 +1,29 @@
+{
+  "fingerprint": "4f12bdd4",
+  "rows": [
+    {
+      "capture": "box",
+      "checked": 173,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pose",
+      "checked": 180,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "ramp",
+      "checked": 196,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    }
+  ]
+}

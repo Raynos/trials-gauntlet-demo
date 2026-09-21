@@ -37,3 +37,15 @@ it('Snow Line retains its wood ramps, crate and plank in one material batch with
     expect(errors.mock.calls).toEqual([]);
   } finally { errors.mockRestore(); }
 });
+
+it('Container Step skins retain the exact authored collision and batch both reference colors', () => {
+  const track = compileTrack(getTrack('lab-box-climb')!);
+  const before = hashColliders(track.colliders);
+  const lib = { get: () => new THREE.MeshStandardMaterial() } as unknown as MaterialLibrary;
+  const result = buildObstacles(track, lib);
+  expect(hashColliders(track.colliders)).toBe(before);
+  expect(result.group.getObjectByName('obstacles:labContainerRed')).toBeDefined();
+  expect(result.group.getObjectByName('obstacles:labContainerIvory')).toBeDefined();
+  expect(result.group.getObjectByName('obstacles:darkSteel')).toBeDefined();
+  expect(result.drawCalls).toBeLessThan(10);
+});

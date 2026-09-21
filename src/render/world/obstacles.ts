@@ -134,7 +134,7 @@ export function buildObstacles(track: CompiledTrack, lib: MaterialLibrary): Obst
   const sideMatFor = (surface: string, kind: string): string => {
     if (kind === 'ramp' || kind === 'plank' || kind === 'stair') return surface === 'metal' ? 'rustSteel' : 'plywood';
     if (kind === 'wall' || kind === 'ledge') return surface === 'wood' ? 'plywood' : 'concrete';
-    if (kind === 'box') return surface === 'metal' ? 'container' : 'plywood';
+    if (kind === 'box') return surface === 'metal' ? (track.def.id === 'lab-box-climb' ? 'labContainerRed' : 'container') : 'plywood';
     return surface === 'wood' ? 'plywood' : surface === 'metal' ? 'rustSteel' : 'concrete';
   };
 
@@ -281,6 +281,21 @@ export function buildObstacles(track: CompiledTrack, lib: MaterialLibrary): Obst
           } else if (c.kind === 'polyline') {
             const g = skirt(c, profile, DEPTH);
             if (g) push(buckets, sideMatFor(surface, 'box'), g);
+          }
+        }
+        // Reference lab: red cargo boxes with inset ivory panels and steel ribs.
+        // These skins stay outside the riding lane; collision remains the authored box.
+        if (track.def.id === 'lab-box-climb' && surface === 'metal') {
+          const width = num(p, 'width', 1), height = num(p, 'height', 1);
+          const x = po.pos.x, y = po.pos.y;
+          for (const z of [-1.515, 1.515]) {
+            push(buckets, 'labContainerIvory', new THREE.BoxGeometry(width * 0.68, height * 0.8, 0.026), at(x + width / 2, y + height / 2, z));
+            for (let dx = 0.14; dx < width; dx += 0.3) {
+              push(buckets, 'darkSteel', new THREE.BoxGeometry(0.023, height * 0.92, 0.04), at(x + dx, y + height / 2, z));
+            }
+            for (const dy of [0.04, height - 0.04]) {
+              push(buckets, 'darkSteel', new THREE.BoxGeometry(width, 0.06, 0.05), at(x + width / 2, y + dy, z));
+            }
           }
         }
         break;

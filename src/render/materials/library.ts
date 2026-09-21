@@ -66,6 +66,8 @@ export class MaterialLibrary {
     // Props
     std('container', { color: 0xffffff, roughness: 0.5, metalness: 0.6 }); // per-instance colour
     std('containerRed', { color: 0x8a2c22, roughness: 0.5, metalness: 0.6 });
+    std('labContainerRed', { color: 0xb83d35, roughness: 0.72, metalness: 0.15 });
+    std('labContainerIvory', { color: 0xeee9dc, roughness: 0.8, metalness: 0.1 });
     std('containerBlue', { color: 0x2a4f7a, roughness: 0.5, metalness: 0.6 });
     std('rustSteel', { color: 0x6b5a4c, roughness: 0.7, metalness: 0.6 });
     std('darkSteel', { color: 0x2a2c30, roughness: 0.55, metalness: 0.8 });

@@ -115,6 +115,8 @@ export const ANCHOR: Readonly<Record<string, { x: number; y: number }>> = {
   // Industrial: the hangar on its apron, the yard, the pier's east end, the coast road, the hill road to the bridge.
   'lab-physics-test': { x: 85, y: 585 },
   'lab-flat-200': { x: 170, y: 640 },
+  'lab-box-climb': { x: 75, y: 710 },
+  'lab-ramp-jump': { x: 235, y: 555 },
   'p1-container-yard': { x: 270, y: 700 },
   'b1-first-ride': { x: 445, y: 732 },
   'b2-lean-back': { x: 532, y: 672 },

@@ -58,3 +58,5 @@ export {
   type TrackKind,
   type KindParams,
 } from './kinds';
+
+export { LAB_BOX_CLIMB, LAB_RAMP_JUMP, LAB_BOX_GEOMETRY, LAB_RAMP_GEOMETRY } from './courses/lab-reference';

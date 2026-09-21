@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "lab-box-climb",
+  "bike": "rookie",
+  "updatedAt": "2026-09-21T13:16:02.469Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    3,
+    8
+  ],
+  "targetAttempts": 8,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        3144984628
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        4.708333333333333
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260921-081455-a847ba",
+    "20260921-081559-16fdcd"
+  ]
+}

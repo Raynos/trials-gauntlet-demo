@@ -1,0 +1,74 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "lab-ramp-jump",
+  "attemptsBand": [
+    2,
+    6
+  ],
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "ad49be92",
+  "updatedAt": "2026-09-21T13:19:04.592Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "lab-ramp-jump-20260921-081737",
+      "agent": "labs-review",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "ad49be92",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 5.9083,
+      "calls": 7,
+      "wallMs": 86706,
+      "firstCheckpointCalls": null,
+      "faultsByCheckpoint": [
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 38,
+        "startTick": 0,
+        "endTick": 947,
+        "recordingFile": "harness/inputs/lab-ramp-jump/stranger-lab-ramp-jump-20260921-081737.json"
+      },
+      "recordingFile": "harness/inputs/lab-ramp-jump/stranger-lab-ramp-jump-20260921-081737.json",
+      "deaths": []
+    }
+  ],
+  "bike": "rookie",
+  "completed": 1,
+  "clearedCount": 1,
+  "medianAttempts": 1,
+  "medianFinishTime": 5.9083,
+  "medianCalls": 7,
+  "medianWallMs": 86706,
+  "census": {
+    "n": 1,
+    "minSessions": 2,
+    "censored": [],
+    "staleExcluded": 0,
+    "otherBikeExcluded": 0
+  },
+  "asserted": {
+    "band": [
+      2,
+      6
+    ],
+    "factor": 1.5,
+    "limit": 9
+  },
+  "verdict": "INSUFFICIENT",
+  "pass": null,
+  "deaths": {
+    "total": 0,
+    "byReason": {},
+    "byObstacle": [],
+    "byCheckpoint": [
+      0
+    ]
+  }
+}
