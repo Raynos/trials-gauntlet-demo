@@ -44,7 +44,10 @@ private final class ProbeBridgeViewController: CAPBridgeViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self = self else { return }
             self.attempts += 1
-            self.webView?.evaluateJavaScript("Boolean(window.__trials?.app && !document.querySelector('#loader'))") { ready, _ in
+            let observeFailedBoot = ProcessInfo.processInfo.environment["TRIALS_PROBE_ALLOW_FAILED_BOOT"] == "1"
+            let readyExpression = "Boolean(window.__trials?.app && !document.querySelector('#loader'))" +
+                (observeFailedBoot ? " || Boolean(document.querySelector('#loader.failed'))" : "")
+            self.webView?.evaluateJavaScript(readyExpression) { ready, _ in
                     if ready as? Bool == true { self.runProbe() }
                     // Keep observing through the updater's 120 s watchdog plus fallback boot.
                     else if self.attempts < 400 { self.pollReady() }

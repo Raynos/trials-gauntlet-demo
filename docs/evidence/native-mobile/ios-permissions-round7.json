@@ -1,0 +1,439 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T10:59:10.642Z",
+  "pass": true,
+  "device": {
+    "udid": "F3058DD5-DCB6-4D86-93CC-6E56A785B788",
+    "name": "trials-iphone",
+    "model": "iPhone 16 Pro",
+    "runtime": "iOS Simulator 26.5"
+  },
+  "steps": [
+    {
+      "name": "runtime",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/runtime.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/runtime.json",
+      "report": {
+        "denied": {
+          "durable": {
+            "checksum": "17259ee7",
+            "generation": 12,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "volume": "0.2"
+          },
+          "mirrorVolume": "0.6",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": true,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "5765d9ec",
+              "generation": 11,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.4"
+            },
+            {
+              "checksum": "17259ee7",
+              "generation": 12,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "nativeError": {
+          "code": "OS-PLUG-FILE-0013",
+          "message": "'writeFile' failed with: You don’t have permission to save the file “permissions-native-side-734c8ad2-d3d7-41f0-88af-daefe22833cd.txt” in the folder “Library”.",
+          "name": "Error"
+        },
+        "probeAt": 1789988365201,
+        "retried": {
+          "durable": {
+            "checksum": "48332268",
+            "generation": 13,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "volume": "0.6"
+          },
+          "mirrorVolume": "0.6",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": false,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "48332268",
+              "generation": 13,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.6"
+            },
+            {
+              "checksum": "17259ee7",
+              "generation": 12,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "seeded": {
+          "durable": {
+            "checksum": "17259ee7",
+            "generation": 12,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "volume": "0.2"
+          },
+          "mirrorVolume": "0.2",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": false,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "5765d9ec",
+              "generation": 11,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.4"
+            },
+            {
+              "checksum": "17259ee7",
+              "generation": 12,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "token": "784bf0ff-ff13-4fcb-bec1-c42d7e95942b"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "after-retry-cold",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/after-retry-cold.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/after-retry-cold.json",
+      "report": {
+        "after": {
+          "durable": {
+            "checksum": "48332268",
+            "generation": 13,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "volume": "0.6"
+          },
+          "mirrorVolume": "0.6",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": false,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "48332268",
+              "generation": 13,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.6"
+            },
+            {
+              "checksum": "17259ee7",
+              "generation": 12,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "probeAt": 1789988372531,
+        "token": "c26c0d1c-cd07-4f38-803e-5d044aa4056b"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "read-denied-boot",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/read-denied-boot.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/read-denied-boot.json",
+      "report": {
+        "failureText": "'readFile' failed with: The file “trials-save-a.json” couldn’t be opened because you don’t have permission to view it.⟳ Retry",
+        "hasGame": false,
+        "loaderFailed": true,
+        "nativeErrors": [
+          {
+            "code": "OS-PLUG-FILE-0013",
+            "message": "'readFile' failed with: The file “trials-save-a.json” couldn’t be opened because you don’t have permission to view it.",
+            "name": "Error"
+          },
+          {
+            "code": "OS-PLUG-FILE-0013",
+            "message": "'readFile' failed with: The file “trials-save-b.json” couldn’t be opened because you don’t have permission to view it.",
+            "name": "Error"
+          }
+        ],
+        "probeAt": 1789988374174,
+        "token": "b44c6435-f94f-4e9a-a7ad-a36298de97d2"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "read-recovered-boot",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/read-recovered-boot.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/read-recovered-boot.json",
+      "report": {
+        "after": {
+          "durable": {
+            "checksum": "48332268",
+            "generation": 13,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "volume": "0.6"
+          },
+          "mirrorVolume": "0.6",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": false,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "48332268",
+              "generation": 13,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.6"
+            },
+            {
+              "checksum": "17259ee7",
+              "generation": 12,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "loaderFailed": false,
+        "probeAt": 1789988381716,
+        "token": "f4a8b6b5-8224-4387-b525-f5cb9f8abe74"
+      },
+      "exitCode": 0
+    }
+  ],
+  "scope": "Real Unix permission denial inside only the task-owned app container. Native Filesystem plugin remains unmodified; no uninstall or save reset.",
+  "limits": [
+    "iOS Simulator, same-user processes; not physical-device protection classes, entitlement denial or store-distributed binary.",
+    "Plugin error code OS-PLUG-FILE-0013 is a generic operation failure, not POSIX errno13. Independent host fs syscalls on the identical permission boundary record authoritative kernel EACCES/errno=-13 separately.",
+    "Settings/Retry handlers are invoked through Debug probe; this is not native OS touch evidence.",
+    "No disk-full, future-schema or arbitrary corruption case is inferred from permission tests."
+  ],
+  "artifact": {
+    "version": "1.0.0",
+    "build": "1",
+    "id": "com.trialsgauntlet.game",
+    "indexSha256": "71099dd384cf7e0c25e2613a0cbfca569c2d7a8aa44e0f53c3a92f473470eaa2",
+    "contract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "8a70e3b3",
+      "production": false,
+      "channels": null,
+      "publicKeyFingerprint": null
+    },
+    "debugLibrarySha256": "d6ce2194cc4b0e380b66139e57471f4412a6796860370e3e9cea9f1e7b34fff3",
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-permissions/2026-09-21T10-59-10.641Z/App.app"
+  },
+  "container": "/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/6DA00643-AA86-4FE2-AEC6-5C264D30027C",
+  "originalLibraryMode": "755",
+  "ownerUid": 501,
+  "writeFault": {
+    "before": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "2e733365bc6d010879362a5aa12646b764abd7204b505fddaf8f7c44be0ab911",
+        "bytes": 17587,
+        "generation": 11,
+        "checksum": "5765d9ec",
+        "volume": "0.4",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "c46ea39816ac35fb314602567c102338bd78776eee87e6a067801f51e50d84bf",
+        "bytes": 17587,
+        "generation": 12,
+        "checksum": "17259ee7",
+        "volume": "0.2",
+        "mode": "644"
+      }
+    ],
+    "deniedMode": "500",
+    "kernelError": {
+      "code": "EACCES",
+      "errno": -13,
+      "syscall": "open",
+      "path": "/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/6DA00643-AA86-4FE2-AEC6-5C264D30027C/Library/permissions-os-side-2f0664f3-4069-4db0-a094-67c6c2c10dad.txt",
+      "message": "EACCES: permission denied, open '/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/6DA00643-AA86-4FE2-AEC6-5C264D30027C/Library/permissions-os-side-2f0664f3-4069-4db0-a094-67c6c2c10dad.txt'",
+      "uid": 501
+    },
+    "native": {
+      "phase": "denied",
+      "nativeError": {
+        "code": "OS-PLUG-FILE-0013",
+        "message": "'writeFile' failed with: You don’t have permission to save the file “permissions-native-side-734c8ad2-d3d7-41f0-88af-daefe22833cd.txt” in the folder “Library”.",
+        "name": "Error"
+      },
+      "denied": {
+        "slots": [
+          {
+            "name": "trials-save-a.json",
+            "generation": 11,
+            "valid": true,
+            "volume": "0.4",
+            "checksum": "5765d9ec"
+          },
+          {
+            "name": "trials-save-b.json",
+            "generation": 12,
+            "valid": true,
+            "volume": "0.2",
+            "checksum": "17259ee7"
+          }
+        ],
+        "durable": {
+          "name": "trials-save-b.json",
+          "generation": 12,
+          "valid": true,
+          "volume": "0.2",
+          "checksum": "17259ee7"
+        },
+        "mirrorVolume": "0.6",
+        "noticeVisible": true,
+        "noticeText": "Progress isn’t saved. Retry before closing the app.",
+        "ready": true,
+        "screen": "menu"
+      }
+    },
+    "during": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "2e733365bc6d010879362a5aa12646b764abd7204b505fddaf8f7c44be0ab911",
+        "bytes": 17587,
+        "generation": 11,
+        "checksum": "5765d9ec",
+        "volume": "0.4",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "c46ea39816ac35fb314602567c102338bd78776eee87e6a067801f51e50d84bf",
+        "bytes": 17587,
+        "generation": 12,
+        "checksum": "17259ee7",
+        "volume": "0.2",
+        "mode": "644"
+      }
+    ],
+    "after": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "6c788eb7bb8c03a9c18f2ba3aaf006c4b7e1a5cdca87062abd03ea563b588fd8",
+        "bytes": 17587,
+        "generation": 13,
+        "checksum": "48332268",
+        "volume": "0.6",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "c46ea39816ac35fb314602567c102338bd78776eee87e6a067801f51e50d84bf",
+        "bytes": 17587,
+        "generation": 12,
+        "checksum": "17259ee7",
+        "volume": "0.2",
+        "mode": "644"
+      }
+    ],
+    "pass": true
+  },
+  "readFault": {
+    "before": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "6c788eb7bb8c03a9c18f2ba3aaf006c4b7e1a5cdca87062abd03ea563b588fd8",
+        "bytes": 17587,
+        "generation": 13,
+        "checksum": "48332268",
+        "volume": "0.6",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "c46ea39816ac35fb314602567c102338bd78776eee87e6a067801f51e50d84bf",
+        "bytes": 17587,
+        "generation": 12,
+        "checksum": "17259ee7",
+        "volume": "0.2",
+        "mode": "644"
+      }
+    ],
+    "originalModes": {
+      "trials-save-a.json": "644",
+      "trials-save-b.json": "644"
+    },
+    "deniedModes": {
+      "trials-save-a.json": "0",
+      "trials-save-b.json": "0"
+    },
+    "kernelErrors": [
+      {
+        "code": "EACCES",
+        "errno": -13,
+        "syscall": "open",
+        "path": "/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/6DA00643-AA86-4FE2-AEC6-5C264D30027C/Library/trials-save-a.json",
+        "message": "EACCES: permission denied, open '/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/6DA00643-AA86-4FE2-AEC6-5C264D30027C/Library/trials-save-a.json'",
+        "uid": 501
+      },
+      {
+        "code": "EACCES",
+        "errno": -13,
+        "syscall": "open",
+        "path": "/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/6DA00643-AA86-4FE2-AEC6-5C264D30027C/Library/trials-save-b.json",
+        "message": "EACCES: permission denied, open '/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/6DA00643-AA86-4FE2-AEC6-5C264D30027C/Library/trials-save-b.json'",
+        "uid": 501
+      }
+    ],
+    "afterRestoringModes": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "6c788eb7bb8c03a9c18f2ba3aaf006c4b7e1a5cdca87062abd03ea563b588fd8",
+        "bytes": 17587,
+        "generation": 13,
+        "checksum": "48332268",
+        "volume": "0.6",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "c46ea39816ac35fb314602567c102338bd78776eee87e6a067801f51e50d84bf",
+        "bytes": 17587,
+        "generation": 12,
+        "checksum": "17259ee7",
+        "volume": "0.2",
+        "mode": "644"
+      }
+    ],
+    "pass": true
+  },
+  "modeRestoration": [],
+  "finalLibraryMode": "755",
+  "finalSlotModes": {
+    "trials-save-a.json": "644",
+    "trials-save-b.json": "644"
+  },
+  "simulatorShutdown": true,
+  "finishedAt": "2026-09-21T10:59:45.243Z"
+}

@@ -9,7 +9,11 @@ const config: CapacitorConfig = {
   backgroundColor: '#101218',
   ios: { contentInset: 'never' },
   android: { allowMixedContent: false },
-  server: { hostname: 'localhost', iosScheme: 'capacitor', androidScheme: 'https' },
+  server: {
+    hostname: 'localhost', iosScheme: 'capacitor', androidScheme: 'https',
+    // Capacitor can detect an unsupported Android WebView before game JavaScript can run.
+    errorPath: 'native-unavailable.html',
+  },
   plugins: {
     CapacitorUpdater: {
       autoUpdate: 'off',

@@ -1,0 +1,344 @@
+{
+  "schema": 1,
+  "capturedAt": "2026-09-21T10:56:29.948171+00:00",
+  "scope": "Read-only SDK/runtime availability audit. No runtime archives downloaded; no installs, license acceptance, AVD mutations or emulator starts.",
+  "project": {
+    "androidMinSdk": 24,
+    "androidTargetSdk": 36,
+    "iosMinimum": "15.0",
+    "sources": [
+      "android/variables.gradle:2",
+      "ios/App/CapApp-SPM/Package.swift:7"
+    ]
+  },
+  "host": {
+    "architecture": "arm64",
+    "macOS": "26.5",
+    "java": {
+      "vendor": "Eclipse Adoptium Temurin",
+      "version": "21.0.12.1+1-LTS",
+      "home": "~/Library/Java/JavaVirtualMachines/jdk-21.0.12.1+1/Contents/Home"
+    },
+    "sdkRoot": "~/Library/Android/sdk",
+    "emulatorVersion": "37.1.11.0",
+    "emulatorBuildId": "15917651",
+    "emulatorBinaryArchitecture": "Mach-O arm64",
+    "qemuBinaryArchitecture": "Mach-O arm64",
+    "accelCheck": {
+      "exitCode": 0,
+      "result": "Hypervisor.Framework OS X Version 26.5"
+    },
+    "existingAvds": [
+      "trials_gauntlet_api36"
+    ],
+    "installedSystemImages": [
+      {
+        "packageId": "system-images;android-36;google_apis;arm64-v8a",
+        "revision": 7,
+        "minimumEmulator": "35.4.9"
+      }
+    ]
+  },
+  "inventory": {
+    "sdkmanager": {
+      "command": "JAVA_HOME=\"$HOME/Library/Java/JavaVirtualMachines/jdk-21.0.12.1+1/Contents/Home\" \"$HOME/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager\" --sdk_root=\"$HOME/Library/Android/sdk\" --list --verbose",
+      "exitCode": 0,
+      "warning": "sdkmanager is deprecated in favor of android sdk; the existing CLI succeeded."
+    },
+    "officialRepositories": [
+      {
+        "url": "https://dl.google.com/android/repository/sys-img/google_apis/sys-img2-5.xml",
+        "status": 200,
+        "bytes": 239105,
+        "sha256": "48c64066aa7fda1e42d12214534322b61488f95d3613575ef93cb0d959190676",
+        "lastModified": "Thu, 17 Sep 2026 20:02:09 GMT",
+        "fetchedAt": "2026-09-21T10:56:29.323554+00:00"
+      },
+      {
+        "url": "https://dl.google.com/android/repository/sys-img/android/sys-img2-5.xml",
+        "status": 200,
+        "bytes": 188466,
+        "sha256": "7d0b5887108d697babee11e5b59700e6b5ca7a026486d043fd282c0be1b78309",
+        "lastModified": "Thu, 17 Sep 2026 20:02:09 GMT",
+        "fetchedAt": "2026-09-21T10:56:29.947143+00:00"
+      }
+    ],
+    "availableOlderArm64Images": [
+      {
+        "packageId": "system-images;android-24;default;arm64-v8a",
+        "apiLevel": 24,
+        "revision": 9,
+        "channel": "channel-0",
+        "downloadBytes": 305854153,
+        "downloadMiB": 291.69,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-24_r09.zip",
+        "archiveSha1": "e88ebdf4533efa0370603ee4ab0e7834e0cc364f",
+        "minimumEmulator": null,
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-24;google_apis;arm64-v8a",
+        "apiLevel": 24,
+        "revision": 29,
+        "channel": "channel-0",
+        "downloadBytes": 709604485,
+        "downloadMiB": 676.73,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-24_r29.zip",
+        "archiveSha1": "d264adca13330b5e50665ab44726e4fecc1ddd1f",
+        "minimumEmulator": null,
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-25;default;arm64-v8a",
+        "apiLevel": 25,
+        "revision": 2,
+        "channel": "channel-0",
+        "downloadBytes": 308416103,
+        "downloadMiB": 294.13,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-25_r02.zip",
+        "archiveSha1": "b39d359623323a1b4906c071dec396040016ea73",
+        "minimumEmulator": null,
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-25;google_apis;arm64-v8a",
+        "apiLevel": 25,
+        "revision": 20,
+        "channel": "channel-0",
+        "downloadBytes": 740445031,
+        "downloadMiB": 706.14,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-25_r20.zip",
+        "archiveSha1": "23162a2123e9e5cd5a7e930f8ca867676e83c0df",
+        "minimumEmulator": null,
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-26;default;arm64-v8a",
+        "apiLevel": 26,
+        "revision": 2,
+        "channel": "channel-0",
+        "downloadBytes": 330014927,
+        "downloadMiB": 314.73,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-26_r02.zip",
+        "archiveSha1": "12353141d08dd302fbebc03872f0e1ca7357c55f",
+        "minimumEmulator": "31.1.1",
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-26;google_apis;arm64-v8a",
+        "apiLevel": 26,
+        "revision": 3,
+        "channel": "channel-0",
+        "downloadBytes": 733331565,
+        "downloadMiB": 699.36,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-26_r03.zip",
+        "archiveSha1": "7a9764f1856119c4ceb311f6c76ff975a4c1e65d",
+        "minimumEmulator": "31.1.1",
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-27;default;arm64-v8a",
+        "apiLevel": 27,
+        "revision": 2,
+        "channel": "channel-0",
+        "downloadBytes": 332173536,
+        "downloadMiB": 316.79,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-27_r02.zip",
+        "archiveSha1": "e014473ac510cc9d8e9b412826332923277fa827",
+        "minimumEmulator": "31.1.1",
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-27;google_apis;arm64-v8a",
+        "apiLevel": 27,
+        "revision": 3,
+        "channel": "channel-0",
+        "downloadBytes": 730732271,
+        "downloadMiB": 696.88,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-27_r03.zip",
+        "archiveSha1": "54dd140e1dd2db0fb7879beecf1068bf476ad171",
+        "minimumEmulator": "31.1.1",
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-28;default;arm64-v8a",
+        "apiLevel": 28,
+        "revision": 2,
+        "channel": "channel-0",
+        "downloadBytes": 426760297,
+        "downloadMiB": 406.99,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-28_r02.zip",
+        "archiveSha1": "e209114dd0dfc2f4e0d328f5fd7367fec39ee1bd",
+        "minimumEmulator": "31.1.1",
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-28;google_apis;arm64-v8a",
+        "apiLevel": 28,
+        "revision": 2,
+        "channel": "channel-0",
+        "downloadBytes": 857120029,
+        "downloadMiB": 817.41,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-28_r02.zip",
+        "archiveSha1": "28f59164bdb4cb18f1a1060f1880450e06cf4d10",
+        "minimumEmulator": "31.1.1",
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-29;default;arm64-v8a",
+        "apiLevel": 29,
+        "revision": 8,
+        "channel": "channel-0",
+        "downloadBytes": 498049256,
+        "downloadMiB": 474.98,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-29_r08.zip",
+        "archiveSha1": "fa0d67d7430fcc84b2fe2508ea81e92ac644e264",
+        "minimumEmulator": null,
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-29;google_apis;arm64-v8a",
+        "apiLevel": 29,
+        "revision": 13,
+        "channel": "channel-0",
+        "downloadBytes": 1170273162,
+        "downloadMiB": 1116.06,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-29_r13.zip",
+        "archiveSha1": "f96b1ee677f1bd2ddcff0b93485e9c65db2e6160",
+        "minimumEmulator": "30.8.2",
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-arm-dbt-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-30;default;arm64-v8a",
+        "apiLevel": 30,
+        "revision": 2,
+        "channel": "channel-0",
+        "downloadBytes": 548363615,
+        "downloadMiB": 522.96,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-30_r02.zip",
+        "archiveSha1": "e96298145a5e0bfd6da4816f51b06c520d8dba72",
+        "minimumEmulator": null,
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-license",
+        "installed": false,
+        "bootValidated": false
+      },
+      {
+        "packageId": "system-images;android-30;google_apis;arm64-v8a",
+        "apiLevel": 30,
+        "revision": 16,
+        "channel": "channel-0",
+        "downloadBytes": 1244324730,
+        "downloadMiB": 1186.68,
+        "archiveUrl": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-30_r16.zip",
+        "archiveSha1": "0e66987d6b4db2e278af83d453ce5d74a7e6ced3",
+        "minimumEmulator": "30.8.0",
+        "hostOsRestriction": null,
+        "hostArchRestriction": null,
+        "licenseId": "android-sdk-arm-dbt-license",
+        "installed": false,
+        "bootValidated": false
+      }
+    ]
+  },
+  "iosInstalledRuntimes": [
+    {
+      "name": "iOS 26.5",
+      "identifier": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "version": "26.5",
+      "buildversion": "23F77",
+      "isAvailable": true,
+      "supportedArchitectures": [
+        "arm64"
+      ]
+    }
+  ],
+  "recommendation": {
+    "firstCandidate": "system-images;android-24;google_apis;arm64-v8a",
+    "reason": "Exact declared minimum is present in current stable official inventory, host-native ABI, and archive metadata/HEAD are reachable. Boot and application compatibility are not proven by metadata.",
+    "qualificationState": "available-candidate-not-installed-or-qualified",
+    "doNotRaiseMinimumFromInventoryAlone": true,
+    "nextSteps": [
+      "If installation is authorized, install exact API24 Google APIs ARM64 image using Java21 SDKmanager; review any license prompt rather than automatically accepting.",
+      "Create a separate temporary API24 AVD and boot it headlessly; capture boot logs and getprop ro.build.version.sdk / ro.product.cpu.abi. No existing AVD needs modification.",
+      "Before qualifying the app, record actual WebView provider/version and WebGL2 availability. Test cold boot, all tracks/garage, actual OS touch/restart, lifecycle/save recovery and signed OTA/failure recovery.",
+      "If API24 cannot boot on this host, distinguish emulator host/image failure from an app compatibility failure. Try API26 Google APIs ARM64 rev3 for an older-OS foothold, and qualify API24 separately on suitable hardware or an x86_64 host.",
+      "If the game fails on an otherwise supported and booted API24 configuration, establish whether a supported WebView update or game/runtime fix resolves it before proposing a higher minimum. Raising minSdk alone is not proof of JavaScript/WebGL compatibility."
+    ],
+    "fallbackCandidate": "system-images;android-26;google_apis;arm64-v8a"
+  },
+  "technicalGaps": [
+    "Only API36 is installed locally; none of API24-30 was booted by this audit.",
+    "Official ARM64 acceleration documentation allows arm64-v8a images for API21+, but this does not guarantee an individual legacy image boots on this exact macOS/emulator pair.",
+    "Native build main JS target is es2022 (vite.config.ts:418); inline loader target is es2020 (vite.config.ts:207). Android OS API level does not identify the installed WebView JavaScript capabilities.",
+    "Pinned Capacitor default minimum Android WebView is version60 (node_modules/@capacitor/android/capacitor/src/main/java/com/getcapacitor/Bridge.java:105). That gate does not by itself establish compatibility with this game bundle.",
+    "GPU/WebGL2 and actual browser provider version in each older image remain unmeasured; no assumption of runtime/performance equivalence to API36.",
+    "Only iOS26.5 build23F77 ARM64 runtime is installed; iOS15 declared minimum remains unqualified locally by this audit."
+  ],
+  "officialDocumentation": [
+    {
+      "url": "https://developer.android.com/studio/run/emulator-acceleration",
+      "supports": "ARM64 development host requires arm64-v8a image for API21 or later; Apple silicon is supported."
+    },
+    {
+      "url": "https://developer.android.com/studio/run/emulator-commandline",
+      "supports": "System image directories supply read-only API/ABI-specific images; headless command-line emulator operation."
+    }
+  ],
+  "minimumImageHead": {
+    "url": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-24_r29.zip",
+    "httpStatus": 200,
+    "contentLength": 709604485,
+    "lastModified": "Sat, 11 Jun 2022 07:03:50 GMT",
+    "bodyDownloaded": false
+  }
+}

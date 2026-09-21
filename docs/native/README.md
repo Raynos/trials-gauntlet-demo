@@ -149,6 +149,34 @@ then remove it and activate Retry save. This tests the write-error path without 
 it is not proof of OS low-storage or denied-access handling. Both change test preferences, capture a
 static warning screenshot, and clean their temporary obstruction/control files.
 
+Actual permission-denial qualification uses separate installed-app runners:
+
+```sh
+node scripts/native-ios-permissions.mjs
+node scripts/native-android-permissions.mjs --serial emulator-5554
+```
+
+The iOS runner owns the shutdown `trials-iphone` simulator; Android expects a task emulator with an
+existing seeded save and installs the specified Debug APK. These change test preferences. They temporarily
+remove write permission from only the app's save directory, then remove read permission from its two
+save slots, restoring the original modes in `finally`. Write denial must preserve both committed
+snapshots, show the warning, and recover through Retry and a cold launch. Read denial must stop startup
+without replacing existing saves; restoring access must recover the original progress. iOS control
+traffic uses Documents while Library is unwritable. Its Debug-only
+`SIMCTL_CHILD_TRIALS_PROBE_ALLOW_FAILED_BOOT=1` lets the supplied probe observe a failed loader;
+the bridge is absent from Release builds. These checks prove actual permission failures, not disk
+exhaustion or physical-device data-protection behavior. See the [iOS](../evidence/native-mobile/ios-permissions-round7.json)
+and [Android](../evidence/native-mobile/android-permissions-round7.json) reports.
+
+`node scripts/native-ios-enospc.mjs` qualifies actual save-path disk exhaustion on the shutdown task
+iPhone17e. It mounts one isolated 8 MiB HFS+ image under the app's Library, verifies a separate filesystem
+and bounded capacity before filling, and redirects only the temporary save path. Both committed saves
+must remain unchanged; removing the owned temporary link lets Retry commit normally. The runner detaches
+the volume and shuts down its simulator in `finally`. Keep the containment, device and capacity checks;
+never substitute filling the host disk. [Evidence](../evidence/native-mobile/ios-enospc-round7.json)
+records the actual ENOSPC error and cold recovery. Whole-device pressure, Android ENOSPC and low-space
+OTA remain separate gates.
+
 Graphics recovery and the native ship gate have dedicated installed-app runners:
 
 ```sh
@@ -172,6 +200,12 @@ Native icons and launch artwork reuse the existing PWA brand assets. The
 artifact metadata. A native **Release configuration** alone is not a production release: the audited
 simulator app is unsigned/non-distributable, the AAB is unsigned, and both have OTA disabled. Production
 web-bundle configuration, permanent identity, signing and store/device qualification remain required.
+
+`server.errorPath` points to the bundled `native-unavailable.html`. It requires no JavaScript, fonts,
+network or native bridge, so Capacitor can show useful update instructions when it rejects an outdated
+Android WebView. The stock API24/WebView53 failure and static error-page recovery are recorded
+in [the older-runtime report](../evidence/native-mobile/android-api24-round7.json). This does not qualify
+API24 gameplay or establish a game-compatible WebView minimum; those require a tested newer provider.
 
 ## Signed updates hosted on Vercel
 

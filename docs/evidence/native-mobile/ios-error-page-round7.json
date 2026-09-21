@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "scope": "Healthy iOS boot after adding native errorPath; no unsupported iOS runtime claim.",
+  "pass": true,
+  "artifact": ".native-build/ios-error-page-round7/App.app",
+  "indexSha256": "9c7382ff6f1923b20857b315a3f63c8c018a40302c5f691c7ca1946f5da26097",
+  "config": {
+    "appId": "com.trialsgauntlet.game",
+    "appName": "Trials Gauntlet",
+    "webDir": "dist-native",
+    "backgroundColor": "#101218",
+    "ios": {
+      "contentInset": "never"
+    },
+    "android": {
+      "allowMixedContent": false
+    },
+    "server": {
+      "hostname": "localhost",
+      "iosScheme": "capacitor",
+      "androidScheme": "https",
+      "errorPath": "native-unavailable.html"
+    },
+    "plugins": {
+      "CapacitorUpdater": {
+        "autoUpdate": "off",
+        "updateUrl": "",
+        "statsUrl": "",
+        "channelUrl": "",
+        "resetWhenUpdate": true,
+        "appReadyTimeout": 120000,
+        "autoDeletePrevious": true,
+        "autoDeleteFailed": true
+      }
+    },
+    "packageClassList": [
+      "AppPlugin",
+      "FilesystemPlugin",
+      "CapacitorUpdaterPlugin"
+    ]
+  },
+  "nativeContract": {
+    "schema": 1,
+    "target": "native",
+    "runtime": "native-v1",
+    "saveSchema": 1,
+    "sourceRevision": "157f9ed3",
+    "production": false,
+    "channels": null,
+    "publicKeyFingerprint": null
+  },
+  "probe": {
+    "boot": {
+      "hasSW": false,
+      "origin": "capacitor://localhost",
+      "ready": true,
+      "resources": [],
+      "screen": "menu"
+    },
+    "crashed": {
+      "faults": 2,
+      "phase": "riding"
+    },
+    "first": {
+      "hash": "389a5dc6c07ab8c3",
+      "phase": "finished",
+      "time": 40.55833333333333
+    },
+    "probeAt": 1789988879437,
+    "replayEqual": true,
+    "restarted": {
+      "frame": 0,
+      "phase": "riding",
+      "restartMs": 0
+    },
+    "second": {
+      "hash": "389a5dc6c07ab8c3",
+      "phase": "finished",
+      "time": 40.55833333333333
+    }
+  },
+  "cleanup": {
+    "taskSimulatorShutdown": true
+  },
+  "limits": [
+    "Simulator timing is not physical-device performance.",
+    "Permission and ENOSPC proofs use their separately frozen earlier artifacts.",
+    "Crash input incurred two faults and ended riding; this smoke is not the terminal-crash ship gate. Restart frame0 is before a subsequent simulation tick."
+  ]
+}

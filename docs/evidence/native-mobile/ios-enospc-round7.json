@@ -1,0 +1,364 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T11:06:21.518Z",
+  "pass": true,
+  "device": {
+    "udid": "4AF4B80E-8F16-4883-B556-054C7AE08C10",
+    "name": "iPhone 17e",
+    "model": "iPhone 17e",
+    "runtime": "iOS Simulator 26.5"
+  },
+  "steps": [
+    {
+      "name": "verify-native-symlink",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/verify-native-symlink.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/verify-native-symlink.json",
+      "report": {
+        "origin": "capacitor://localhost",
+        "probeAt": 1789988796827,
+        "ready": true,
+        "token": "6fb7698c-2a2e-466a-a71d-5efe7726ed7a"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "runtime",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/runtime.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/runtime.json",
+      "report": {
+        "denied": {
+          "durable": {
+            "checksum": "3ab9479d",
+            "generation": 10,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "volume": "0.2"
+          },
+          "mirrorVolume": "0.6",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": true,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "01add326",
+              "generation": 9,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.1"
+            },
+            {
+              "checksum": "3ab9479d",
+              "generation": 10,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "nativeError": {
+          "code": "OS-PLUG-FILE-0013",
+          "message": "'writeFile' failed with: You can’t save the file “enospc-side-aaa88c27-f111-4659-bb65-8c0a28e3e6de.txt” because the volume “Data” is out of space.",
+          "name": "Error"
+        },
+        "probeAt": 1789988805996,
+        "retried": {
+          "durable": {
+            "checksum": "609a01ea",
+            "generation": 11,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "volume": "0.6"
+          },
+          "mirrorVolume": "0.6",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": false,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "609a01ea",
+              "generation": 11,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.6"
+            },
+            {
+              "checksum": "3ab9479d",
+              "generation": 10,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "seeded": {
+          "durable": {
+            "checksum": "3ab9479d",
+            "generation": 10,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "volume": "0.2"
+          },
+          "mirrorVolume": "0.2",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": false,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "01add326",
+              "generation": 9,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.1"
+            },
+            {
+              "checksum": "3ab9479d",
+              "generation": 10,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "token": "42c3d157-955e-4c33-8179-ea683ddf008a"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "after-retry-cold",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/after-retry-cold.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/after-retry-cold.json",
+      "report": {
+        "after": {
+          "durable": {
+            "checksum": "609a01ea",
+            "generation": 11,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "volume": "0.6"
+          },
+          "mirrorVolume": "0.6",
+          "noticeText": "Progress isn’t saved. Retry before closing the app.",
+          "noticeVisible": false,
+          "ready": true,
+          "screen": "menu",
+          "slots": [
+            {
+              "checksum": "609a01ea",
+              "generation": 11,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "volume": "0.6"
+            },
+            {
+              "checksum": "3ab9479d",
+              "generation": 10,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "volume": "0.2"
+            }
+          ]
+        },
+        "origin": "capacitor://localhost",
+        "probeAt": 1789988814650,
+        "token": "6a508005-2012-4ced-ad16-46b2c304916f"
+      },
+      "exitCode": 0
+    }
+  ],
+  "scope": "Real ENOSPC on an isolated, fixed-size HFS+ test volume inside task17e app sandbox. Only the pending-save path is redirected; committed slots are never moved. Native plugin is unmodified.",
+  "limits": [
+    "Not global device-storage-pressure, APFS/full-device, physical-device or store-distributed qualification.",
+    "Plugin OS-PLUG-FILE-0013 is a generic operation failure. Independent real kernel syscall on the verified full volume records ENOSPC/errno=-28 separately.",
+    "Settings/Retry handlers use the Debug probe, not native OS touch input.",
+    "The task app remains on its bundled normal channel; this is not network-disabled iOS."
+  ],
+  "previousAttempt": {
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/previous-attempt.json",
+    "pass": false,
+    "error": "verify-native-symlink: {\"code\":\"OS-PLUG-FILE-0006\",\"message\":\"Invalid 'enospc-side-83ca8092-83fa-467a-9b09-aea50116fdae.txt' path.\",\"name\":\"Error\"}",
+    "cleanup": {
+      "links": [
+        {
+          "path": "/Users/raynos/Library/Developer/CoreSimulator/Devices/4AF4B80E-8F16-4883-B556-054C7AE08C10/data/Containers/Data/Application/0A92C7B6-9CEC-4A73-8AB6-B3883335402E/Library/enospc-side-83ca8092-83fa-467a-9b09-aea50116fdae.txt",
+          "removed": true
+        }
+      ],
+      "detached": true,
+      "mountpointRemoved": true,
+      "simulatorShutdown": true
+    },
+    "finding": "The actual native resolver rejected a Library symlink resolving into Documents with OS-PLUG-FILE-0006. Its canonical containment check requires the target to remain inside Library. The volume was never filled; pending-save path and settings were not modified."
+  },
+  "artifact": {
+    "version": "1.0.0",
+    "build": "1",
+    "id": "com.trialsgauntlet.game",
+    "indexSha256": "71099dd384cf7e0c25e2613a0cbfca569c2d7a8aa44e0f53c3a92f473470eaa2",
+    "contract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "8a70e3b3",
+      "production": false,
+      "channels": null,
+      "publicKeyFingerprint": null
+    },
+    "debugLibrarySha256": "d6ce2194cc4b0e380b66139e57471f4412a6796860370e3e9cea9f1e7b34fff3",
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/App.app"
+  },
+  "container": "/Users/raynos/Library/Developer/CoreSimulator/Devices/4AF4B80E-8F16-4883-B556-054C7AE08C10/data/Containers/Data/Application/D9B10DFF-ECE2-4BBE-B97B-C32AE4994E46",
+  "volume": {
+    "image": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-enospc/2026-09-21T11-06-21.518Z/bounded-8MiB.dmg",
+    "mountpoint": "/Users/raynos/Library/Developer/CoreSimulator/Devices/4AF4B80E-8F16-4883-B556-054C7AE08C10/data/Containers/Data/Application/D9B10DFF-ECE2-4BBE-B97B-C32AE4994E46/Library/enospc-volume-aaa88c27-f111-4659-bb65-8c0a28e3e6de",
+    "requestedBytes": 8388608,
+    "hardWriteCap": 16777216,
+    "before": {
+      "device": 16777264,
+      "hostDevice": 16777233,
+      "capacity": 8347648,
+      "available": 8146944,
+      "blockSize": 4096
+    },
+    "nativeSymlinkVerified": true,
+    "fillerBytes": 8142848,
+    "fillError": {
+      "code": "ENOSPC",
+      "errno": -28,
+      "syscall": "write",
+      "message": "ENOSPC: no space left on device, write"
+    },
+    "full": {
+      "device": 16777264,
+      "hostDevice": 16777233,
+      "capacity": 8347648,
+      "available": 0,
+      "blockSize": 4096
+    }
+  },
+  "fault": {
+    "before": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "7f5ff5c67f874e3e29a3db429521c560f993c88eef9500115c6c706b30980ad8",
+        "bytes": 167,
+        "generation": 9,
+        "checksum": "01add326",
+        "volume": "0.1",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "5ac8a7bac0e6c5572f7d4bde82465871424af2b7ff826952386d73268f789c5e",
+        "bytes": 168,
+        "generation": 10,
+        "checksum": "3ab9479d",
+        "volume": "0.2",
+        "mode": "644"
+      }
+    ],
+    "kernelError": {
+      "code": "ENOSPC",
+      "errno": -28,
+      "syscall": "write",
+      "message": "ENOSPC: no space left on device, write",
+      "uid": 501
+    },
+    "native": {
+      "phase": "denied",
+      "nativeError": {
+        "code": "OS-PLUG-FILE-0013",
+        "message": "'writeFile' failed with: You can’t save the file “enospc-side-aaa88c27-f111-4659-bb65-8c0a28e3e6de.txt” because the volume “Data” is out of space.",
+        "name": "Error"
+      },
+      "denied": {
+        "slots": [
+          {
+            "name": "trials-save-a.json",
+            "generation": 9,
+            "valid": true,
+            "volume": "0.1",
+            "checksum": "01add326"
+          },
+          {
+            "name": "trials-save-b.json",
+            "generation": 10,
+            "valid": true,
+            "volume": "0.2",
+            "checksum": "3ab9479d"
+          }
+        ],
+        "durable": {
+          "name": "trials-save-b.json",
+          "generation": 10,
+          "valid": true,
+          "volume": "0.2",
+          "checksum": "3ab9479d"
+        },
+        "mirrorVolume": "0.6",
+        "noticeVisible": true,
+        "noticeText": "Progress isn’t saved. Retry before closing the app.",
+        "ready": true,
+        "screen": "menu"
+      }
+    },
+    "during": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "7f5ff5c67f874e3e29a3db429521c560f993c88eef9500115c6c706b30980ad8",
+        "bytes": 167,
+        "generation": 9,
+        "checksum": "01add326",
+        "volume": "0.1",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "5ac8a7bac0e6c5572f7d4bde82465871424af2b7ff826952386d73268f789c5e",
+        "bytes": 168,
+        "generation": 10,
+        "checksum": "3ab9479d",
+        "volume": "0.2",
+        "mode": "644"
+      }
+    ],
+    "pendingLinkRemovedBeforeRetry": true,
+    "after": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "557c186a6f96231b58bd00249b2cb7a759a1a2986ad0b021f25cd681e0ecc2fa",
+        "bytes": 168,
+        "generation": 11,
+        "checksum": "609a01ea",
+        "volume": "0.6",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "5ac8a7bac0e6c5572f7d4bde82465871424af2b7ff826952386d73268f789c5e",
+        "bytes": 168,
+        "generation": 10,
+        "checksum": "3ab9479d",
+        "volume": "0.2",
+        "mode": "644"
+      }
+    ],
+    "pass": true
+  },
+  "coldBootPass": true,
+  "cleanup": {
+    "links": [
+      {
+        "path": "/Users/raynos/Library/Developer/CoreSimulator/Devices/4AF4B80E-8F16-4883-B556-054C7AE08C10/data/Containers/Data/Application/D9B10DFF-ECE2-4BBE-B97B-C32AE4994E46/Library/enospc-side-aaa88c27-f111-4659-bb65-8c0a28e3e6de.txt",
+        "removed": true
+      }
+    ],
+    "detached": true,
+    "mountpointRemoved": true,
+    "simulatorShutdown": true
+  },
+  "finishedAt": "2026-09-21T11:06:58.480Z"
+}

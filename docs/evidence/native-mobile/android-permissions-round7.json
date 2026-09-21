@@ -1,0 +1,273 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:56:13.520Z",
+  "finishedAt": "2026-09-21T10:56:49.737Z",
+  "pass": true,
+  "apkSha256": "2a0008fac4aa0b2afc8a22e5642b28d3ff0a29988b675c6edca62db8b8ea145c",
+  "identity": {
+    "shell": "uid=2000(shell) gid=2000(shell) groups=2000(shell),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),1078(ext_data_rw),1079(ext_obb_rw),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid),3012(readtracefs) context=u:r:shell:s0",
+    "app": "uid=10213(u0_a213) gid=10213(u0_a213) groups=10213(u0_a213),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),1078(ext_data_rw),1079(ext_obb_rw),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid),3012(readtracefs),50213(all_a213) context=u:r:runas_app:s0:c213,c256,c512,c768",
+    "selinux": "Enforcing",
+    "appCapabilities": [
+      "Uid:\t10213\t10213\t10213\t10213",
+      "Gid:\t10213\t10213\t10213\t10213",
+      "CapPrm:\t0000000000000000",
+      "CapEff:\t0000000000000000"
+    ]
+  },
+  "originalModes": {
+    "files": "771",
+    "files/trials-save-a.json": "600",
+    "files/trials-save-b.json": "600"
+  },
+  "restoredModes": {
+    "files": "771",
+    "files/trials-save-a.json": "600",
+    "files/trials-save-b.json": "600"
+  },
+  "writeDeniedDirectoryMode": "500",
+  "writeDiagnostic": {
+    "message": "'writeFile' failed with: Permission denied",
+    "code": "OS-PLUG-FILE-0013"
+  },
+  "writeFailure": {
+    "ready": true,
+    "screen": "settings",
+    "volume": "0.6",
+    "online": false,
+    "warningVisible": true,
+    "warning": "Progress isn\u2019t saved. Retry before closing the app.",
+    "loader": null,
+    "loaderError": null
+  },
+  "afterWriteColdLaunch": {
+    "ready": true,
+    "screen": "menu",
+    "volume": "0.6",
+    "online": false,
+    "warningVisible": false,
+    "warning": "Progress isn\u2019t saved. Retry before closing the app.",
+    "loader": null,
+    "loaderError": null
+  },
+  "readFailure": {
+    "ready": false,
+    "volume": "0.6",
+    "online": false,
+    "warningVisible": false,
+    "loader": "TRIALS GAUNTLET\nBUILD 8A70E3B3\n1\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n%\nDOWNLOAD\ncore \u00b7 1.82 MB / 1.82 MB\n1\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n%\nSETUP\ncould not start\nDETAILS\n\u2713 1 OF 18 DONE\n'readFile' failed with: /data/user/0/com.trialsgauntlet.game/files/trials-save-b.json: open failed: EACCES (Permission denied)\n\u27f3 RETRY\n0.4 S",
+    "loaderError": "'readFile' failed with: /data/user/0/com.trialsgauntlet.game/files/trials-save-b.json: open failed: EACCES (Permission denied)"
+  },
+  "readDiagnostics": [
+    {
+      "path": "trials-save-a.json",
+      "code": "OS-PLUG-FILE-0013",
+      "message": "'readFile' failed with: /data/user/0/com.trialsgauntlet.game/files/trials-save-a.json: open failed: EACCES (Permission denied)"
+    },
+    {
+      "path": "trials-save-b.json",
+      "code": "OS-PLUG-FILE-0013",
+      "message": "'readFile' failed with: /data/user/0/com.trialsgauntlet.game/files/trials-save-b.json: open failed: EACCES (Permission denied)"
+    }
+  ],
+  "afterReadColdLaunch": {
+    "ready": true,
+    "screen": "menu",
+    "volume": "0.6",
+    "online": false,
+    "warningVisible": false,
+    "warning": "Progress isn\u2019t saved. Retry before closing the app.",
+    "loader": null,
+    "loaderError": null
+  },
+  "limitations": [
+    "Headless task-owned API36 Debug emulator; no physical-device permission behavior claim.",
+    "App UID permissions are altered only on its private files directory and two save slots, then restored. EACCES is not low-storage/ENOSPC qualification.",
+    "Settings and Retry use real DOM handlers. Direct native plugin calls record actual diagnostic errors without replacing plugin behavior."
+  ],
+  "runner": "scripts/native-android-permissions.mjs",
+  "rawReport": ".native-build/permissions-round7/report.json",
+  "artifact": ".native-build/permissions-round7/app-debug.apk",
+  "sourceCandidate": "8a70e3b3 plus graphics-recovery/persisted-pagehide changes (round6 delivery APK)",
+  "device": {
+    "avd": "trials_gauntlet_api36",
+    "profile": "Pixel 7",
+    "api": 36,
+    "headless": true
+  },
+  "cases": [
+    {
+      "name": "Permission tests operate as non-root app UID",
+      "pass": true
+    },
+    {
+      "name": "Baseline Settings volume is durable",
+      "pass": true
+    },
+    {
+      "name": "Native Filesystem write reports actual EACCES",
+      "pass": true
+    },
+    {
+      "name": "Runtime write denial shows warning and preserves both committed saves",
+      "pass": true
+    },
+    {
+      "name": "Restoring permission and Retry commits only the intended setting",
+      "pass": true
+    },
+    {
+      "name": "Retried write persists on offline cold launch",
+      "pass": true
+    },
+    {
+      "name": "Denied native reads stop startup without treating saves as missing",
+      "pass": true
+    },
+    {
+      "name": "Read-denied boot leaves original save bytes untouched",
+      "pass": true
+    },
+    {
+      "name": "Restored read permissions recover existing saves offline",
+      "pass": true
+    }
+  ],
+  "snapshots": {
+    "before": [
+      {
+        "file": "files/trials-save-b.json",
+        "generation": 14,
+        "sha256": "3e1df220870b3366742d7b8ebd3e59911186eb4b3b3e447359d5aa0c94b185ae",
+        "volume": "0.5",
+        "entryCount": 17
+      },
+      {
+        "file": "files/trials-save-a.json",
+        "generation": 13,
+        "sha256": "924a94c8ff5d3d42bc79b8843e35c408c00bca862cb55aa16a4a5f9ade4b8325",
+        "volume": "0.5",
+        "entryCount": 17
+      }
+    ],
+    "duringWriteFailure": [
+      {
+        "file": "files/trials-save-b.json",
+        "generation": 14,
+        "sha256": "3e1df220870b3366742d7b8ebd3e59911186eb4b3b3e447359d5aa0c94b185ae",
+        "volume": "0.5",
+        "entryCount": 17
+      },
+      {
+        "file": "files/trials-save-a.json",
+        "generation": 13,
+        "sha256": "924a94c8ff5d3d42bc79b8843e35c408c00bca862cb55aa16a4a5f9ade4b8325",
+        "volume": "0.5",
+        "entryCount": 17
+      }
+    ],
+    "afterRetry": [
+      {
+        "file": "files/trials-save-a.json",
+        "generation": 15,
+        "sha256": "60b414fe09c749e4f4e7285e1b276683ef2051d4371b8e6c5fb1d18b3f65590a",
+        "volume": "0.6",
+        "entryCount": 17
+      },
+      {
+        "file": "files/trials-save-b.json",
+        "generation": 14,
+        "sha256": "3e1df220870b3366742d7b8ebd3e59911186eb4b3b3e447359d5aa0c94b185ae",
+        "volume": "0.5",
+        "entryCount": 17
+      }
+    ],
+    "beforeReadDenial": [
+      {
+        "file": "files/trials-save-a.json",
+        "generation": 15,
+        "sha256": "60b414fe09c749e4f4e7285e1b276683ef2051d4371b8e6c5fb1d18b3f65590a",
+        "volume": "0.6",
+        "entryCount": 17
+      },
+      {
+        "file": "files/trials-save-b.json",
+        "generation": 14,
+        "sha256": "3e1df220870b3366742d7b8ebd3e59911186eb4b3b3e447359d5aa0c94b185ae",
+        "volume": "0.5",
+        "entryCount": 17
+      }
+    ],
+    "afterReadPermissionsRestored": [
+      {
+        "file": "files/trials-save-a.json",
+        "generation": 15,
+        "sha256": "60b414fe09c749e4f4e7285e1b276683ef2051d4371b8e6c5fb1d18b3f65590a",
+        "volume": "0.6",
+        "entryCount": 17
+      },
+      {
+        "file": "files/trials-save-b.json",
+        "generation": 14,
+        "sha256": "3e1df220870b3366742d7b8ebd3e59911186eb4b3b3e447359d5aa0c94b185ae",
+        "volume": "0.5",
+        "entryCount": 17
+      }
+    ]
+  },
+  "readDeniedMetadata": {
+    "before": [
+      {
+        "file": "files/trials-save-a.json",
+        "stat": "0:19641:1789988192:573741"
+      },
+      {
+        "file": "files/trials-save-b.json",
+        "stat": "0:19641:1789988190:573801"
+      }
+    ],
+    "after": [
+      {
+        "file": "files/trials-save-a.json",
+        "stat": "0:19641:1789988192:573741"
+      },
+      {
+        "file": "files/trials-save-b.json",
+        "stat": "0:19641:1789988190:573801"
+      }
+    ],
+    "format": "mode:size:mtime:inode",
+    "unchanged": true
+  },
+  "checksSummary": {
+    "writeFailureCommittedBytesUnchanged": true,
+    "readFailureCommittedBytesUnchanged": true,
+    "allOriginalModesRestored": true
+  },
+  "enospcFeasibility": {
+    "tested": false,
+    "kernelTmpfsSupported": true,
+    "appCapEff": "0000000000000000",
+    "readOnlyRootInspection": {
+      "suAvailable": true,
+      "uid": 0,
+      "capEff": "000001ffffffffff",
+      "nsenterAvailable": true,
+      "selinux": "Enforcing"
+    },
+    "noMountsOrSecurityChanges": true,
+    "remaining": "ENOSPC left open for a separate round at parent request. No mount or quota mutation was performed; no partition was filled."
+  },
+  "cleanup": {
+    "emulatorPid": 79357,
+    "emulatorStopped": true,
+    "appDirectoryModeRestored": "771",
+    "saveSlotModesRestored": [
+      "600",
+      "600"
+    ],
+    "selinuxUnchanged": "Enforcing",
+    "normalArtifactInstalled": true,
+    "sdkAndIgnoredProofArtifactsPreserved": true
+  }
+}

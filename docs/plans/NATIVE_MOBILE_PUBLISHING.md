@@ -116,7 +116,8 @@ drafts are in [the runbook](../native/README.md). These implementation checks do
 
 The active objective remains **plan the mobile apps then build them autonomously**. Its completion
 audit must include this matrix; successful compilation or one passing emulator is insufficient.
-Inventory checked 2026-09-21: [machine-readable inventory](../evidence/native-mobile/simulators.json).
+Initial inventory checked 2026-09-21: [machine-readable inventory](../evidence/native-mobile/simulators.json).
+Round 7 also installs and boots the API24 image described below.
 Use headless runners and task-owned simulator instances; do not interrupt an already-running user simulator.
 
 | Target | Installed runtime/profile | Required coverage | Current evidence |
@@ -130,10 +131,31 @@ Use headless runners and task-owned simulator instances; do not interrupt an alr
 
 Additional installed iOS profiles: iPhone 17 Pro, iPhone 17, iPhone Air, iPad Pro 11-inch (M5), iPad Air
 11/13-inch (M4), and iPad (A16). They can support focused regressions; availability is not a pass.
-Only one OS runtime per platform is installed. The projects currently declare iOS 15.0 and Android API24
+Only iOS26.5 is installed for Apple; Android API36 and API24 are now installed. The projects declare iOS 15.0 and Android API24
 minimums; neither minimum is qualified by iOS26.5/API36 tests. Add runnable older-OS coverage or obtain
 physical-device evidence before accepting those minimums. Do not infer a simulated older device profile
 on the latest OS proves older-OS compatibility.
+
+The [round 7 runtime audit](../evidence/native-mobile/android-runtime-options-round7.json) identifies
+`system-images;android-24;google_apis;arm64-v8a` revision 29 as the first older-Android candidate
+(676.73 MiB download). The [installed API24 probe](../evidence/native-mobile/android-api24-round7.json)
+proves the ARM64 image boots and the APK installs. Its stock WebView53 cannot parse the game's JavaScript
+and has no WebGL2, so game qualification fails. This is an observed WebView capability failure, not a
+host/emulator boot failure. A newer provider still needs qualification before API24 can be advertised as
+supported. A device profile name or successful APK installation alone does not qualify the declared
+minimum. Older iOS runtime/device coverage remains open.
+
+The native shell now routes Capacitor startup errors to a bundled, script-free explanation instead of
+leaving an unsupported WebView at the loader. API24/WebView53 displays the explanation and update
+instructions with no clipped text in the native capture. This repairs the failure experience; it does
+not make that WebView playable. The same configuration retains healthy boot and deterministic gameplay
+on [API36](../evidence/native-mobile/android-error-page-round7.json) and
+[iOS26.5](../evidence/native-mobile/ios-error-page-round7.json). Those are scoped regression smokes;
+the earlier full OTA and storage suites used their separately recorded artifacts.
+
+- [ ] Qualify the declared minimum OS versions on runnable older runtimes or physical devices;
+  retain evidence of actual WebView/WebGL capabilities and distinguish host-emulator failures from
+  game failures. Any change to supported minimums must be explicit in the plan and store configuration.
 
 - [ ] Full primary-device suite: clean offline install and cold boot; every shipped track and garage asset;
   real touch navigation; deterministic clear twice; crash and restart; background/foreground, force-kill,
@@ -192,7 +214,7 @@ and [Android storage probe](../evidence/native-mobile/android-storage-round5.jso
 temporary-path filesystem obstruction, prove both committed snapshots stay unchanged, then retry and
 verify the new setting on cold launch. Static native screenshot review confirms readable, unclipped
 messages and retry targets of at least 44 CSS pixels on both tested profiles. This `EISDIR` fault is deliberately distinct
-from real disk exhaustion or denied permissions; those OS-specific cases remain open.
+from real disk exhaustion or denied permissions; round 7 qualifies denied access separately below.
 
 Round 6 audits the existing branded native icons/launch artwork and builds native Release configurations;
 [package metadata](../evidence/native-mobile/package-round6.json) confirms 1024-pixel opaque iOS art,
@@ -208,6 +230,23 @@ and [Android](../evidence/native-mobile/android-graphics-round6.json) reports re
 evidence and passing final-artifact qualification. Both also pass the sixth-round cold boot, identical
 clear pair, terminal crash and one-tick logical restart gate. Recorded launch clips and rendering diagnostics do not replace
 physical-device interruption or played-motion judgement.
+
+Round 7 qualifies actual permission denial on [iOS](../evidence/native-mobile/ios-permissions-round7.json)
+and [Android](../evidence/native-mobile/android-permissions-round7.json). Removing directory write access
+produces real native errors, leaves both committed snapshots byte-identical and shows the save warning.
+Restoring access and selecting Retry persists the pending preference across cold launch. Making both
+save slots unreadable stops boot without overwriting them; restored permissions recover the saved state.
+All original modes were restored and the owned test devices shut down. The iOS plugin's generic error
+code is recorded separately from the kernel's EACCES, not interpreted as a POSIX code. Disk exhaustion,
+physical-device data protection and store-signed artifacts remain unqualified by this test.
+
+The [iOS ENOSPC test](../evidence/native-mobile/ios-enospc-round7.json) separately fills an isolated
+8 MiB HFS+ volume inside the task app's Library, with device/capacity checks and a hard write cap. Only
+the pending-save path points into that volume. Actual kernel and native-plugin disk-full errors leave
+committed snapshots unchanged and show the warning; removing that temporary path redirection and
+selecting Retry commits the pending setting, which survives cold launch. The volume and links are
+removed afterward. This proves the native save path handles ENOSPC; it does not prove whole-device
+storage-pressure behavior, Android ENOSPC, or low-space OTA download/activation.
 
 ### P0 — Freeze scope and build requirements
 

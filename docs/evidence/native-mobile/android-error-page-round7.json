@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T11:07:30.520Z",
+  "pass": true,
+  "apkSha256": "d7ad7b0049807212cfd38ab97396b5a35371fc0f07c4e54d34ab57de8f744921",
+  "artifact": ".native-build/error-page-round7/app-debug.apk",
+  "nativeVersion": "1.0.0",
+  "versionCode": 1,
+  "serverConfig": {
+    "hostname": "localhost",
+    "iosScheme": "capacitor",
+    "androidScheme": "https",
+    "errorPath": "native-unavailable.html"
+  },
+  "nativeErrorPagePackaged": true,
+  "device": {
+    "avd": "trials_gauntlet_api36",
+    "serial": "emulator-5554",
+    "profile": "Pixel 7",
+    "api": 36,
+    "cores": 2,
+    "headless": true,
+    "gpu": "swiftshader",
+    "webView": "com.google.android.webview133.0.6943.137",
+    "physicalPixels": [
+      1080,
+      2400
+    ],
+    "overridePixels": [
+      720,
+      1280
+    ],
+    "density": 280
+  },
+  "runner": "scripts/native-android-probe.mjs",
+  "rawReport": ".native-build/error-page-round7/healthy-smoke.json",
+  "installedState": {
+    "href": "https://localhost/?track=flat-test",
+    "ready": true,
+    "viewport": {
+      "width": 690,
+      "height": 360,
+      "dpr": 1.75
+    },
+    "userAgent": "Mozilla/5.0 (Linux; Android 16; sdk_gphone64_arm64 Build/BE2A.250530.026.F3; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/133.0.6943.137 Mobile Safari/537.36",
+    "current": {
+      "checksum": "",
+      "id": "builtin",
+      "version": "1.0.0",
+      "downloaded": "1970-01-01T00:00:00.000Z",
+      "status": "success"
+    }
+  },
+  "smoke": {
+    "at": "2026-09-21T11:07:30.520Z",
+    "environment": "headless Android emulator; airplane mode",
+    "launch": "Starting: Intent { cmp=com.trialsgauntlet.game/.MainActivity }\nStatus: ok\nLaunchState: COLD\nActivity: com.trialsgauntlet.game/.MainActivity\nTotalTime: 1159\nWaitTime: 1167\nComplete",
+    "boot": {
+      "online": false,
+      "origin": "https://localhost",
+      "platform": "android",
+      "readyAtMs": 3367
+    },
+    "runs": [
+      {
+        "finishTime": 8.65,
+        "hash": "ecdf62a55f6185a6",
+        "faults": 0
+      },
+      {
+        "finishTime": 8.65,
+        "hash": "ecdf62a55f6185a6",
+        "faults": 0
+      }
+    ],
+    "crash": {
+      "phase": "riding",
+      "faults": 2
+    },
+    "restart": {
+      "wallMs": 65.60000000000582,
+      "phase": "riding",
+      "tick": 1
+    },
+    "background": {
+      "paused": true,
+      "tick": 36,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      }
+    },
+    "foreground": {
+      "paused": true,
+      "tick": 36
+    },
+    "pass": true
+  },
+  "limitations": [
+    "API36 healthy-path regression of the new native errorPath APK only. Unsupported stockAPI24 fallback is qualified independently.",
+    "Earlier OTA, binary-upgrade, graphics-loss, and storage fault suites were not repeated on this APK.",
+    "The recorded crash input incurred2faults and ended riding; this smoke does not assert terminal-crashed state immediately before restart.",
+    "Two-core software-GPU emulator timings are observations, not physical-device performance claims."
+  ],
+  "cleanup": {
+    "emulatorPid": 92818,
+    "emulatorStopped": true,
+    "normalArtifactInstalled": true,
+    "sdkAndIgnoredArtifactsPreserved": true
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T11:11:43.132Z",
+  "baseRevision": "157f9ed3",
+  "finding": "Real denied writes/reads preserve native saves and recover after access is restored. Isolated iOS ENOSPC recovers through Retry. API24 stock WebView53 cannot run the game; a script-free native error page replaces the stalled loader.",
+  "sourceHashes": {
+    "capacitor.config.ts": "90c5ab341049c297b4a9d0633b43d5018dbddc8fff39ceb9ae5096e063731000",
+    "public/native-unavailable.html": "51f3ec787dc682640e5502e72be2e0481b62ca1256a6ea21d38fb41061b12d2a",
+    "ios/App/App/SceneDelegate.swift": "51fb6784bb27c80e8cf952dfb63cb9d4d8d592d2bf65aa85fd5bdd382adb309c"
+  },
+  "permissionArtifacts": {
+    "iosIndex": "71099dd384cf7e0c25e2613a0cbfca569c2d7a8aa44e0f53c3a92f473470eaa2",
+    "iosDebugLibrary": "d6ce2194cc4b0e380b66139e57471f4412a6796860370e3e9cea9f1e7b34fff3",
+    "androidApk": "2a0008fac4aa0b2afc8a22e5642b28d3ff0a29988b675c6edca62db8b8ea145c"
+  },
+  "errorPageArtifacts": {
+    "iosIndex": "9c7382ff6f1923b20857b315a3f63c8c018a40302c5f691c7ca1946f5da26097",
+    "androidApk": "d7ad7b0049807212cfd38ab97396b5a35371fc0f07c4e54d34ab57de8f744921"
+  },
+  "validation": {
+    "builds": "Native Vite, Capacitor sync for both platforms, iOS Debug Simulator and Android Debug APK passed.",
+    "types": "App TypeScript check passed; no game or harness TypeScript source changed this round.",
+    "lint": "Changed config and all four new runners passed syntax/targeted ESLint; git diff --check passed.",
+    "permissions": "Both platforms: actual native permission errors, unchanged committed save bytes, Retry commit/cold recovery, denied-read startup stops without overwrite and recovers after permissions restore.",
+    "iosEnospc": "8 MiB isolated HFS+ volume, distinct filesystem/capacity checks, hard write cap, actual kernel ENOSPC/-28 and native out-of-space error; unchanged committed saves, warning, Retry and cold recovery.",
+    "olderAndroid": "API24 ARM64 image boots and APK installs; WebView53 lacks required JS syntax and WebGL2. Updated shell displays readable static error page. Gameplay remains unqualified.",
+    "healthyRegression": "Final errorPath config passes iOS26.5/API36 cold boot and identical replay pairs. These smoke crash inputs incur faults but end riding; not terminal-crash ship gates.",
+    "parentVisualReview": "Actual API24 native error-page screenshot has readable complete text within the viewport. Static layout verdict only; no gameplay or motion approval."
+  },
+  "evidence": [
+    "ios-permissions-round7.json",
+    "android-permissions-round7.json",
+    "ios-enospc-round7.json",
+    "android-runtime-options-round7.json",
+    "android-api24-round7.json",
+    "ios-error-page-round7.json",
+    "android-error-page-round7.json"
+  ],
+  "limitations": [
+    "Permission/ENOSPC suites used their frozen pre-errorPath artifacts. Full earlier OTA/upgrade/graphics suites were not rerun on final error-page builds.",
+    "Isolated ENOSPC is not whole-device storage pressure or low-space OTA qualification. Android ENOSPC remains open.",
+    "API24 with an updated provider, older iOS, actual devices, final production channels/signing and store acceptance remain open.",
+    "Native Release packaging was audited in round6; this round built Debug shells for installed qualification."
+  ],
+  "cleanup": {
+    "iosPermission": true,
+    "iosEnospc": {
+      "links": [
+        {
+          "path": "/Users/raynos/Library/Developer/CoreSimulator/Devices/4AF4B80E-8F16-4883-B556-054C7AE08C10/data/Containers/Data/Application/D9B10DFF-ECE2-4BBE-B97B-C32AE4994E46/Library/enospc-side-aaa88c27-f111-4659-bb65-8c0a28e3e6de.txt",
+          "removed": true
+        }
+      ],
+      "detached": true,
+      "mountpointRemoved": true,
+      "simulatorShutdown": true
+    },
+    "iosHealthy": {
+      "taskSimulatorShutdown": true
+    },
+    "androidPermission": {
+      "emulatorPid": 79357,
+      "emulatorStopped": true,
+      "appDirectoryModeRestored": "771",
+      "saveSlotModesRestored": [
+        "600",
+        "600"
+      ],
+      "selinuxUnchanged": "Enforcing",
+      "normalArtifactInstalled": true,
+      "sdkAndIgnoredProofArtifactsPreserved": true
+    },
+    "androidHealthy": {
+      "emulatorPid": 92818,
+      "emulatorStopped": true,
+      "normalArtifactInstalled": true,
+      "sdkAndIgnoredArtifactsPreserved": true
+    },
+    "userSimulatorUntouched": true
+  }
+}

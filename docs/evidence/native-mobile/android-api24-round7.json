@@ -1,0 +1,194 @@
+{
+  "schema": 2,
+  "at": "2026-09-21T11:08:18.797Z",
+  "scope": "Installed stock Android API24 runtime qualification and graceful unsupported-engine repair; not gameplay qualification.",
+  "auditComplete": true,
+  "gameplayQualified": false,
+  "gracefulUnsupportedPass": true,
+  "finding": "API24 ARM64 boots and installs the app, but its stock WebView 53 cannot parse the current game or create WebGL2. The repaired APK serves a readable script-free native error page instead of leaving the loader stalled.",
+  "device": {
+    "avd": "trials_gauntlet_api24",
+    "serial": "emulator-5556",
+    "packageId": "system-images;android-24;google_apis;arm64-v8a",
+    "revision": 29,
+    "headless": true,
+    "gpu": "swiftshader",
+    "ro.build.version.sdk": "24",
+    "ro.build.version.release": "7.0",
+    "ro.product.cpu.abi": "arm64-v8a",
+    "ro.product.cpu.abilist": "arm64-v8a",
+    "ro.kernel.qemu": "1",
+    "ro.build.fingerprint": "google/sdk_google_phone_arm64/generic_arm64:7.0/NYC/8695085:userdebug/dev-keys"
+  },
+  "provider": {
+    "package": "com.google.android.webview",
+    "version": "53.0.2785.124",
+    "versionCode": 278512450,
+    "evidence": "WebViewFactory logcat plus WebView user agent and installed package metadata. dumpsys webviewupdate returned no text."
+  },
+  "setup": {
+    "imageInstalled": true,
+    "newLicenseAccepted": false,
+    "avdCreated": "trials_gauntlet_api24",
+    "existingAcceptedLicenseUsed": true,
+    "installLog": ".native-build/android-api24-install-round7.log",
+    "avdLog": ".native-build/android-api24-avd-round7.log"
+  },
+  "before": {
+    "at": "2026-09-21T11:04:55.320Z",
+    "apk": ".native-build/graphics-round6/delivery.apk",
+    "apkSha256": "2a0008fac4aa0b2afc8a22e5642b28d3ff0a29988b675c6edca62db8b8ea145c",
+    "androidBooted": true,
+    "apkInstalled": true,
+    "appLaunched": true,
+    "gameBootPassed": false,
+    "browser": {
+      "userAgent": "Mozilla/5.0 (Linux; Android 7.0; Android SDK built for arm64 Build/NYC; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.124 Mobile Safari/537.36",
+      "origin": "https://localhost",
+      "href": "https://localhost/",
+      "webgl2": false,
+      "glVersion": null,
+      "glRenderer": null,
+      "features": {
+        "optionalChaining": "SyntaxError: Unexpected token .",
+        "nullishCoalescing": "SyntaxError: Unexpected token ?",
+        "classFields": "SyntaxError: Unexpected token =",
+        "classStaticBlock": "SyntaxError: Unexpected token {"
+      },
+      "ready": false,
+      "body": "TRIALS GAUNTLET\nBUILD\nDOWNLOAD\nconnecting…\nSETUP\nwaiting for the core\nDETAILS\n✓ 0 OF 0 DONE\n0.0 S"
+    },
+    "boot": {
+      "ready": false,
+      "loaderPresent": true,
+      "screen": null,
+      "origin": "https://localhost",
+      "body": "TRIALS GAUNTLET\nBUILD\nDOWNLOAD\nconnecting…\nSETUP\nwaiting for the core\nDETAILS\n✓ 0 OF 0 DONE\n0.0 S",
+      "errors": [
+        {
+          "type": "error",
+          "message": "Uncaught SyntaxError: Unexpected token (",
+          "filename": "https://localhost/",
+          "line": 54
+        },
+        {
+          "type": "error",
+          "message": "Uncaught SyntaxError: Unexpected token ?",
+          "filename": "https://localhost/",
+          "line": 1600
+        }
+      ]
+    },
+    "rawEvidence": ".native-build/android-api24-round7-stock.json",
+    "logcat": ".native-build/android-api24-logcat-round7-stock.log",
+    "cleanup": {
+      "ownedEmulatorStopped": true,
+      "exitCode": 0,
+      "signal": null,
+      "avdPreserved": true
+    }
+  },
+  "after": {
+    "at": "2026-09-21T11:08:03.816Z",
+    "apk": ".native-build/android-api24-unavailable-round7.apk",
+    "apkSha256": "d7ad7b0049807212cfd38ab97396b5a35371fc0f07c4e54d34ab57de8f744921",
+    "androidBooted": true,
+    "apkInstalled": true,
+    "appLaunched": true,
+    "gracefulUnsupportedPass": true,
+    "boot": {
+      "ready": false,
+      "loaderPresent": false,
+      "screen": null,
+      "origin": "https://localhost",
+      "body": "TRIALS GAUNTLET\n\nThe game couldn't start\n\nYour device's web engine may need an update. On Android, open Google Play and update Android System WebView and Google Chrome, then close and reopen the game.\n\nOn iPhone or iPad, install any available system update and reopen the game.\n\nIf the problem continues, this device may not support the game. Reopening the app does not erase your saved progress.",
+      "errors": []
+    },
+    "staticPage": {
+      "path": "/native-unavailable.html",
+      "title": "Trials Gauntlet — Unable to start",
+      "text": "TRIALS GAUNTLET\n\nThe game couldn't start\n\nYour device's web engine may need an update. On Android, open Google Play and update Android System WebView and Google Chrome, then close and reopen the game.\n\nOn iPhone or iPad, install any available system update and reopen the game.\n\nIf the problem continues, this device may not support the game. Reopening the app does not erase your saved progress.",
+      "gameAbsent": true,
+      "loaderAbsent": true,
+      "scriptElements": 0,
+      "viewport": {
+        "width": 684,
+        "height": 388
+      },
+      "content": {
+        "left": 32,
+        "right": 652,
+        "top": 40,
+        "bottom": 331.5,
+        "width": 620,
+        "height": 291.5
+      },
+      "scroll": {
+        "width": 684,
+        "height": 388
+      },
+      "horizontalClipping": false,
+      "allContentAboveFold": true
+    },
+    "rawEvidence": ".native-build/android-api24-round7-repair.json",
+    "nativeScreenshot": ".native-build/android-api24-round7-repair.png",
+    "layoutReview": "Parent inspected native screenshot and DOM geometry: all text readable within content viewport, no stalled loader. Static failure-page layout only; no motion or gameplay approval.",
+    "cleanup": {
+      "ownedEmulatorStopped": true,
+      "exitCode": 0,
+      "signal": null,
+      "avdPreserved": true
+    }
+  },
+  "healthyRuntimeRegression": {
+    "evidence": "docs/evidence/native-mobile/android-error-page-round7.json",
+    "apkSha256": "d7ad7b0049807212cfd38ab97396b5a35371fc0f07c4e54d34ab57de8f744921",
+    "performedBy": "android_build agent",
+    "scope": "Parent reports independent API36 healthy-boot smoke passed with the same APK; see that report for assertions."
+  },
+  "officialWebViewUpdateResearch": {
+    "checkedAt": "2026-09-21",
+    "readOnly": true,
+    "downloadedOrInstalledWebView": false,
+    "thirdPartyApkMirrorsUsed": false,
+    "findings": [
+      {
+        "claim": "Chromium documents that Android 5–9 devices can still update to their last supported WebView release, although further versions are unsupported. Stock WebView 53 failure does not prove every updated API24 device is incompatible.",
+        "source": "https://chromium.googlesource.com/chromium/src/+/HEAD/android_webview/docs/prerelease.md"
+      },
+      {
+        "claim": "Google Chrome team states M119 was the last Chrome release for Nougat (through API25), while M120 raised the minimum to API26. WebView documentation says Chrome for Android and WebView release together. M119 is therefore the generation to investigate for API24; no exact installable WebView APK or current Play Store delivery was independently verified here.",
+        "source": "https://groups.google.com/a/chromium.org/g/chromium-dev/c/B9AYI3WAvRo/m/tpWwhw4KBQAJ",
+        "supportingSource": "https://chromium.googlesource.com/chromium/src/+/HEAD/android_webview/docs/prerelease.md"
+      },
+      {
+        "claim": "Official WebView instructions use Google Play distribution. No Play Store update route was exercised on this AVD. The simplest remaining qualification is an API24 device with a trusted Play Store-provided final compatible WebView, verifying the active provider version and repeating installed gameplay checks.",
+        "source": "https://chromium.googlesource.com/chromium/src/+/HEAD/android_webview/docs/prerelease.md"
+      },
+      {
+        "claim": "Official Chromium source instructions document building system_webview_apk and provider package/signature constraints. A historical compatible Chromium branch could supply a separate reproducible test setup, but no build, provider replacement, writable-system change, or installation was attempted. Current Chromium main is not a compatible API24 shortcut.",
+        "source": "https://chromium.googlesource.com/chromium/src/+/HEAD/android_webview/docs/build-instructions.md"
+      }
+    ],
+    "nextQualification": "Test the actual final compatible official WebView on API24, then check WebGL2, bridge startup, saves, and real gameplay. Until then API24 gameplay remains unqualified; no minimum OS change follows solely from this stock-image result."
+  },
+  "reproduction": {
+    "script": "scripts/native-android-legacy.mjs",
+    "baseline": "node scripts/native-android-legacy.mjs --output .native-build/android-api24-baseline.json",
+    "repair": "node scripts/native-android-legacy.mjs --apk .native-build/android-api24-unavailable-round7.apk --sha256 d7ad7b0049807212cfd38ab97396b5a35371fc0f07c4e54d34ab57de8f744921 --expect unavailable --output .native-build/android-api24-round7-repair.json"
+  },
+  "limitations": [
+    "No updated WebView was installed; results describe the stock system image.",
+    "Software-emulated GPU results are not physical-device performance or visual-quality evidence.",
+    "API24 screenrecord produced no valid video duration; no clip evidence is claimed.",
+    "Baseline runner originally listed an unvalidated launchVideo path. That claim is withdrawn: screenrecord produced no valid video duration. Neither before nor after provides usable clip evidence.",
+    "No physical-device, updated-WebView, all-track, replay, save persistence, or performance qualification is claimed on API24.",
+    "Raw logs, APKs, and screenshot remain ignored local artifacts; this tracked report preserves the measured findings."
+  ],
+  "cleanup": {
+    "ownedEmulatorStopped": true,
+    "avdPreserved": true,
+    "imagePreserved": true,
+    "productionFilesChangedByRunner": false
+  }
+}
