@@ -219,6 +219,8 @@ html.short #ui .menu-item.minor { min-height: var(--credits-h); font-size: .62re
 .credits-wrap dt { color: var(--amber); letter-spacing: .2em; text-transform: uppercase; font-size: .72rem; font-weight: 700; padding-top: .3em; }
 .credits-wrap dd { margin: 0; color: var(--ink-dim); }
 .credits-wrap dd b { color: var(--ink); }
+.native-notices summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--amber); }
+.native-notices pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; line-height: 1.5; user-select: text; }
 
 /* ---- overlay frame: pause + results (assets/design/pause/SPEC.md, direction A "low action bar") ----
    Full-frame grid, flat scrim (no left-weighted gradient), safe-area padding; title block top-left,

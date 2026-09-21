@@ -20,6 +20,7 @@ export interface UpdateAdapter {
   current(): Promise<{ bundle: UpdateBundle }>;
   list(): Promise<{ bundles: UpdateBundle[] }>;
   download(options: { url: string; version: string; checksum: string }): Promise<UpdateBundle>;
+  delete(options: { id: string }): Promise<void>;
   set(options: { id: string }): Promise<void>;
   notifyAppReady(): Promise<unknown>;
 }
@@ -40,6 +41,10 @@ export interface UpdateOptions {
   now?: () => number;
 }
 export type UpdateResult = 'disabled' | 'none' | 'staged' | 'activated' | 'rejected' | 'unavailable';
+export interface UpdateCleanupResult { deleted: string[]; failed: string[]; skipped: boolean }
+
+/** Bound native filesystem work per launch; a later launch retries any remaining or failed cleanup. */
+const CLEANUP_LIMIT = 8;
 
 /** Public configuration only. Missing or malformed settings safely leave OTA disabled. */
 export function readUpdateConfig(manifestUrl: string | undefined, publicJwk: string | undefined): UpdateConfig | null {
@@ -49,7 +54,7 @@ export function readUpdateConfig(manifestUrl: string | undefined, publicJwk: str
     const key: unknown = JSON.parse(publicJwk);
     if (url.protocol !== 'https:' || url.username || url.password || !key || typeof key !== 'object') return null;
     const jwk = key as JsonWebKey;
-    if (jwk.kty !== 'RSA' || !jwk.n || !jwk.e || jwk.d || jwk.p || jwk.q) return null;
+    if (jwk.kty !== 'RSA' || typeof jwk.n !== 'string' || !jwk.n || typeof jwk.e !== 'string' || !jwk.e || ['d', 'p', 'q', 'dp', 'dq', 'qi', 'oth'].some((field) => field in jwk)) return null;
     return { manifestUrl: url.href, publicKey: jwk };
   } catch {
     return null;
@@ -116,6 +121,61 @@ export function createNativeUpdater(options: UpdateOptions) {
   let checking = false;
   let bootChecked = false;
   let ready = false;
+  let cleanupAttempts = 0;
+
+  /** Caller owns `checking`: cleanup must never race our download or pending-marker writes. */
+  const cleanup = async (): Promise<UpdateCleanupResult> => {
+    const result: UpdateCleanupResult = { deleted: [], failed: [], skipped: false };
+    try {
+      // If any prior save/marker write failed, retain all bundles until durable state catches up.
+      await storage.flush?.();
+      let pendingId: string | null = null;
+      const raw = storage.getItem(pendingKey);
+      if (raw) {
+        const pending = JSON.parse(raw) as PendingUpdate;
+        if (typeof pending.id !== 'string' || !pending.id) throw new Error('Invalid pending update');
+        pendingId = pending.id;
+        if (config) {
+          try {
+            await verify(pending.envelope);
+          } catch {
+            // An expired/incompatible/invalid signed release can no longer be activated. Retire its
+            // pointer durably, but retain the high-water sequence so it is not downloaded repeatedly.
+            storage.removeItem(pendingKey);
+            await storage.flush?.();
+            pendingId = null;
+          }
+        }
+      }
+      const { bundles } = await adapter.list();
+      for (const candidate of bundles) {
+        if (cleanupAttempts >= CLEANUP_LIMIT) break;
+        // Keep every success: the plugin's private previous-fallback pointer has no public getter.
+        // Error/deleting/deleted metadata belongs to native rollback cleanup; deleting it here would
+        // erase rejection history. Unknown and downloading statuses are deliberately left alone.
+        if (candidate.status !== 'pending' || !candidate.id || candidate.id === 'builtin' || candidate.id === pendingId) continue;
+        const { bundle: current } = await adapter.current();
+        if (candidate.id === current.id) continue;
+        const latest = (await adapter.list()).bundles;
+        const bundle = latest.find((b) => b.id === candidate.id);
+        // Android delete cancels work by version, so preserve a pending copy if another copy of that
+        // version is downloading. Re-read status just before deletion; downloads may finish natively.
+        if (!bundle || bundle.status !== 'pending' || latest.some((b) => b.version === bundle.version && b.status === 'downloading')) continue;
+        cleanupAttempts++;
+        try {
+          // Pinned native plugin also refuses current/builtin/next/preview-fallback deletion. A
+          // refusal or disk error is best effort; never modify its metadata to force a deletion.
+          await adapter.delete({ id: bundle.id });
+          result.deleted.push(bundle.id);
+        } catch {
+          result.failed.push(bundle.id);
+        }
+      }
+    } catch {
+      result.skipped = true;
+    }
+    return result;
+  };
 
   return {
     configured: config !== null,
@@ -144,17 +204,25 @@ export function createNativeUpdater(options: UpdateOptions) {
       }
     },
     async notifyReady(): Promise<void> {
-      ready = true;
       // Required even without a configured channel: the native plugin owns its rollback watchdog.
       await adapter.notifyAppReady();
+      ready = true;
+    },
+    /** Optional explicit sweep. Normal checkForUpdate also sweeps before/after its download. */
+    async cleanupAbandoned(): Promise<UpdateCleanupResult> {
+      if (!ready || checking) return { deleted: [], failed: [], skipped: true };
+      checking = true;
+      try { return await cleanup(); } finally { checking = false; }
     },
     async checkForUpdate(): Promise<UpdateResult> {
-      if (!config) return 'disabled';
-      if (!ready || checking) return 'none';
+      if (!ready || checking) return config ? 'none' : 'disabled';
       checking = true;
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 5000);
+      let timer: ReturnType<typeof setTimeout> | undefined;
       try {
+        await cleanup();
+        if (!config) return 'disabled';
+        timer = setTimeout(() => controller.abort(), 5000);
         const response = await fetcher(config.manifestUrl, { cache: 'no-store', credentials: 'omit', redirect: 'error', signal: controller.signal });
         if (!response.ok) return 'unavailable';
         const text = await response.text();
@@ -178,6 +246,7 @@ export function createNativeUpdater(options: UpdateOptions) {
         return 'unavailable';
       } finally {
         clearTimeout(timer);
+        await cleanup();
         checking = false;
       }
     },

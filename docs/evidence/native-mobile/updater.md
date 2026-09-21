@@ -26,9 +26,11 @@ Retention was checked against the installed package source, not inferred from op
 `setSuccess()`, invoked by `notifyAppReady()`. With `autoDeletePrevious: true`, a different non-builtin
 fallback is retained during unacknowledged boot and removed after successful readiness; pending/preview
 fallbacks are protected. `autoDeleteFailed` defaults true: watchdog rollback marks the failed bundle,
-returns to the good fallback, and schedules failed-file deletion with durable retry. Unreferenced staged
-downloads still need controller cleanup; these options alone do not establish bounded disk usage for all
-failure paths. [iOS retention source](https://github.com/Cap-go/capacitor-updater/blob/main/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift),
+returns to the good fallback, and schedules failed-file deletion with durable retry. The controller now sweeps orphaned `pending` bundles after readiness, with at most eight delete attempts
+per launch, excluding current/persisted pending/success/error/downloading/deleting states. It flushes before
+deletion, protects expired pointers until their removal is durable, and serializes cleanup with staging.
+Unit tests cover failed deletes/flushes and races; installed-app retention qualification is still open.
+These options and the conservative sweep do not establish a strict global quota for every native state. [iOS retention source](https://github.com/Cap-go/capacitor-updater/blob/main/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift),
 [Android retention source](https://github.com/Cap-go/capacitor-updater/blob/main/android/src/main/java/ee/forgr/capacitor_updater/CapgoUpdater.java).
 Configuration now explicitly enables both deletion options. The local healthy/bad-boot qualification
 artifacts were built with the earlier `autoDeletePrevious: false` setting, so their recovery result
@@ -55,11 +57,24 @@ the actual change, and uncertain iOS feature changes use store review. [Apple gu
 
 ## Verification
 
-- 19 controller tests: signatures, tampering, platform/native/runtime/save constraints, expiry, immutable URL, stage-only behavior, next-launch activation, checksum mismatch, failed-switch loop prevention, persistence-flush ordering/failures, offline/disabled operation and save preservation.
+- 30 controller tests: signatures, tampering, platform/native/runtime/save constraints, expiry, immutable URL, stage-only behavior, next-launch activation, checksum mismatch, failed-switch loop prevention, persistence-flush ordering/failures, offline/disabled operation, save preservation and conservative abandoned-bundle cleanup.
 - Node packager test: generated ZIP hash, RSA-PSS signature, ZIP root layout, source-map omission, public-only exported key and web-build rejection.
 - Full TypeScript check and scoped ESLint passed.
-- Integrated native and web builds pass: native HTML excludes SW registration/update/cache-failure advice; native has no `sw.js`; web retains the SW and excludes native bridge chunks. Full suite: 91 files, 1096 passed and 2 skipped; packager test passed. Full-repo lint has 9 existing errors in untouched art/evidence/harness files; scoped changed-source lint passes.
+- Integrated native and web builds pass: native HTML excludes SW registration/update/cache-failure advice; native has no `sw.js`; web retains the SW and excludes native bridge chunks. Full suite: 92 files, 1132 passed and 2 skipped; packager test passed. Full-repo lint has 9 existing errors in untouched art/evidence/harness files; scoped changed-source lint passes.
 - Healthy signed bundle B staged without switching the running game, activated after force-close/relaunch, and reached successful readiness on both iOS simulator and Android emulator. Android's [integrated report](android-integrated.json) records pending → success, removal of its pending marker, retained sequence, retained `lastTrack`, and another successful relaunch.
 - Android's same report records rejection of a wrong checksum without switching from `1.0.1-qa`, and watchdog rollback from `1.0.3-qa` to successful `1.0.1-qa` after about 128 seconds including reload. Saves and consumed pending state survived. Airplane-mode game boot, deterministic clears, crash/restart and paused background/foreground behavior also passed in that emulator.
 - [iOS local record](ios-local.json): an unacknowledged broken bundle rolled back to successful healthy B, consumed the pending marker and retained sequence2. A later corrupted seq3 archive did not stage or advance the sequence; its native rejection event was not separately captured. Sound setting restored from native snapshots after deleting its WebView mirror and force-quitting. Interrupted-download and native-version-rejection installed-app cases remain distinct gates unless a platform report explicitly proves them. Report each platform's actual outcome separately; the unit tests do not replace these checks.
-- Production follow-ups: configure and qualify real channels/key; bound abandoned-download retention; preserve compatible save schemas; measure readiness timeout on physical devices. Production channels have not been published.
+- Production follow-ups: configure and qualify real channels/key; qualify abandoned-download cleanup on installed apps; preserve compatible save schemas; measure readiness timeout on physical devices. Production channels have not been published.
+
+## Release build contract (round 2)
+
+`pnpm build:native:release` rejects missing/partial configuration, test/local channel hosts, weak RSA keys,
+and any private JWK fields before emitting a store-target web bundle. Native output includes
+`native-build.json`; the packager refuses a channel, signing key, runtime or save schema that differs from
+that build. Four Node tests cover configuration and packaging, including mismatched keys/channels.
+An actual release build without production configuration failed as intended. The regular local native
+and website builds continue to work independently.
+
+[Five-profile iOS smoke](ios-matrix-smoke.json) passed menu/repeated exact clear/crash/restart; this is not
+touch/layout/audio qualification. An unsigned arm64 iOS device archive also compiled; no DEBUG probe
+strings were found in its Release executable. It is not signed or installable through a store.

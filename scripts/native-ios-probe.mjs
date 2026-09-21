@@ -49,7 +49,7 @@ while (Date.now() < end) {
       mkdirSync('.native-build/evidence', {recursive: true});
       writeFileSync('.native-build/evidence/ios-probe.json', text);
       console.log(text);
-      if (result.error || (!process.env.TRIALS_PROBE_FILE && (!result.replayEqual || !result.crashed?.faults))) process.exitCode = 1;
+      if (result.error || result.pass === false || (!process.env.TRIALS_PROBE_FILE && (!result.replayEqual || !result.crashed?.faults))) process.exitCode = 1;
       break;
     }
   }

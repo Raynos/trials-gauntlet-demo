@@ -6,6 +6,7 @@ import os from 'node:os';
 import { createHash, createPrivateKey, createPublicKey, constants, sign } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { publicKeyFingerprint } from './mobile-config.mjs';
 
 export function signManifest(manifest, privateKey) {
   const payload = Buffer.from(JSON.stringify(manifest));
@@ -41,6 +42,14 @@ export function packageRelease(args) {
   if (privatePath === source || privatePath.startsWith(source + path.sep) || privatePath === out || privatePath.startsWith(out + path.sep)) throw new Error('Private signing key must be outside build and release output');
   const privateKey = createPrivateKey(fs.readFileSync(privatePath));
   if (privateKey.asymmetricKeyType !== 'rsa' || privateKey.asymmetricKeyDetails.modulusLength < 2048) throw new Error('Use an RSA signing key of at least 2048 bits');
+  const contractPath = path.join(source, 'native-build.json');
+  if (!fs.existsSync(contractPath)) throw new Error('Native build contract missing; rebuild with current native target');
+  const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
+  const channelUrl = new URL('manifest.json', publicBase.href.replace(/\/?$/, '/')).href;
+  const publicJwk = createPublicKey(privateKey).export({ format: 'jwk' });
+  if (contract.schema !== 1 || contract.target !== 'native' || contract.runtime !== runtime || contract.saveSchema !== saveSchema) throw new Error('Release runtime/save schema differs from the native build');
+  if (contract.channels?.[platform] !== channelUrl) throw new Error('Release channel differs from the channel compiled into the game');
+  if (contract.publicKeyFingerprint !== publicKeyFingerprint(publicJwk)) throw new Error('Signing key differs from the public key compiled into the game');
   const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'trials-mobile-release-'));
   try {
     const zipPath = path.join(temporary, 'bundle.zip');
@@ -55,7 +64,7 @@ export function packageRelease(args) {
     fs.copyFileSync(zipPath, path.join(out, sha256 + '.zip'));
     // One channel per platform/native contract; publishing this file is the final release action.
     fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify(envelope, null, 2) + '\n');
-    fs.writeFileSync(path.join(out, 'public-key.jwk.json'), JSON.stringify(createPublicKey(privateKey).export({ format: 'jwk' }), null, 2) + '\n');
+    fs.writeFileSync(path.join(out, 'public-key.jwk.json'), JSON.stringify(publicJwk, null, 2) + '\n');
     return { manifest, manifestPath: path.join(out, 'manifest.json'), zipPath: path.join(out, sha256 + '.zip') };
   } finally {
     fs.rmSync(temporary, { recursive: true, force: true });

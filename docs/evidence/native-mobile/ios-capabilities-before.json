@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T09:27:01.835Z",
+  "sections": [
+    "capabilities",
+    "tracks",
+    "garage",
+    "notices"
+  ],
+  "pass": false,
+  "failures": [
+    {
+      "message": "Requested bike did not produce an authored rendered frame",
+      "section": "bike:pro"
+    },
+    {
+      "message": "console.error: THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index 44. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.",
+      "section": "track:m2-drum-roll"
+    },
+    {
+      "message": "console.error: THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index 44. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.",
+      "section": "track:m2-drum-roll"
+    },
+    {
+      "message": "console.error: THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index 8. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.",
+      "section": "track:x2-pipe-dream"
+    },
+    {
+      "message": "console.error: THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index 4. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.",
+      "section": "track:x3-gauntlet"
+    },
+    {
+      "message": "console.error: THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index 8. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.",
+      "section": "track:p2-canyon-run"
+    },
+    {
+      "message": "console.error: THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index 8. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.",
+      "section": "track:p3-snow-line"
+    },
+    {
+      "message": "console.error: THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index 2. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.",
+      "section": "track:p5-foundry-floor"
+    }
+  ],
+  "capabilities": {
+    "audioContext": true,
+    "audioState": "suspended",
+    "audioWorklet": true,
+    "audioWorkletNode": true,
+    "contextLost": false,
+    "crossOriginIsolated": false,
+    "maxTextureSize": 8192,
+    "secureContext": true,
+    "shadingLanguage": "WebGL GLSL ES 3.00",
+    "webgl2": true,
+    "webglVersion": "WebGL 2.0"
+  },
+  "trackCoverage": {
+    "registered": [
+      "flat-test",
+      "gap-test",
+      "b1-first-ride",
+      "b2-lean-back",
+      "b3-kicker-row",
+      "e1-uphill-weight",
+      "e2-rear-wheel-first",
+      "e3-stairway",
+      "m1-hop-up",
+      "m2-drum-roll",
+      "m3-see-saw",
+      "h1-wheelie-wire",
+      "h2-gap-chain",
+      "h3-fire-line",
+      "x1-vertical-limit",
+      "x2-pipe-dream",
+      "x3-gauntlet",
+      "p1-container-yard",
+      "p2-canyon-run",
+      "p3-snow-line",
+      "p4-night-circuit",
+      "p5-foundry-floor",
+      "lab-physics-test",
+      "lab-flat-200"
+    ],
+    "requested": [
+      "flat-test",
+      "gap-test",
+      "b1-first-ride",
+      "b2-lean-back",
+      "b3-kicker-row",
+      "e1-uphill-weight",
+      "e2-rear-wheel-first",
+      "e3-stairway",
+      "m1-hop-up",
+      "m2-drum-roll",
+      "m3-see-saw",
+      "h1-wheelie-wire",
+      "h2-gap-chain",
+      "h3-fire-line",
+      "x1-vertical-limit",
+      "x2-pipe-dream",
+      "x3-gauntlet",
+      "p1-container-yard",
+      "p2-canyon-run",
+      "p3-snow-line",
+      "p4-night-circuit",
+      "p5-foundry-floor",
+      "lab-physics-test",
+      "lab-flat-200"
+    ],
+    "scope": "every registered track, including fixtures and labs"
+  },
+  "garageCoverage": {
+    "availableBikes": [
+      "rookie",
+      "pro"
+    ],
+    "availableOutfits": [
+      "street-mustard",
+      "street-openface",
+      "race-bluewhite",
+      "street-charcoal",
+      "race-charcoalyellow"
+    ],
+    "requestedBikes": [
+      "rookie",
+      "pro"
+    ],
+    "requestedOutfits": [
+      "street-mustard",
+      "street-openface",
+      "race-bluewhite",
+      "street-charcoal",
+      "race-charcoalyellow"
+    ]
+  },
+  "restoration": {
+    "bike": "rookie",
+    "changedMirrorKeys": [
+      {
+        "after": "rookie",
+        "before": null,
+        "key": "trials.bikeClass"
+      },
+      {
+        "after": "street-mustard",
+        "before": null,
+        "key": "trials.riderOutfit"
+      },
+      {
+        "after": "gltf",
+        "before": null,
+        "key": "trials.riderModel"
+      }
+    ],
+    "effectiveRestored": true,
+    "exactNativeSaveRestoration": "not asserted: UI saves native state; browser mirror is diagnostic only",
+    "riderOutfit": "street-mustard",
+    "screen": "menu",
+    "track": "b1-first-ride"
+  },
+  "scope": "Initial installed iOS26.5 all-track probe before indexed-extrusion fix; bikepro false-frame check corrected separately in harness",
+  "counts": {
+    "tracks": 24,
+    "outfits": 5,
+    "bikes": 2,
+    "exceptions": 0,
+    "consoleErrors": 7
+  }
+}

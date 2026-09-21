@@ -1,0 +1,116 @@
+{
+  "checkedAt": "2026-09-21T09:18:06.033874+00:00",
+  "xcode": "Xcode 26.6\nBuild version 17F113",
+  "iosRuntimes": [
+    {
+      "name": "iOS 26.5",
+      "version": "26.5",
+      "build": "23F77",
+      "available": true
+    }
+  ],
+  "iosDevices": [
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPhone 17 Pro",
+      "id": "CC0027AD-B264-44AD-83C8-C3B2D08B4DC2",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro",
+      "stateAtInventory": "Booted"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPhone 17 Pro Max",
+      "id": "5496C91C-D289-44D4-B357-E723FB8F7994",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPhone 17e",
+      "id": "4AF4B80E-8F16-4883-B556-054C7AE08C10",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-17e",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPhone Air",
+      "id": "CAC5D00B-13F4-42F2-9D53-EC371D66CCC2",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-Air",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPhone 17",
+      "id": "F2EE968F-25DF-4695-AF7E-0D66B3C5149B",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-17",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "trials-iphone",
+      "id": "F3058DD5-DCB6-4D86-93CC-6E56A785B788",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPad Pro 13-inch (M5)",
+      "id": "102F6390-F7D7-4139-87DE-C13A8566C556",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPad Pro 11-inch (M5)",
+      "id": "DBA31ABF-C126-42CD-8144-57AC3491EDC6",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-11-inch-M5-12GB",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPad mini (A17 Pro)",
+      "id": "4F26A738-1E6E-44F9-98BB-5E2F52227489",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPad-mini-A17-Pro",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPad Air 13-inch (M4)",
+      "id": "B7EF38C5-86AE-4B9E-B79A-E8C2FA6D84F5",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPad-Air-13-inch-M4",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPad Air 11-inch (M4)",
+      "id": "DD5A8B7B-6001-4B87-B617-9EFEA77DB2DE",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPad-Air-11-inch-M4",
+      "stateAtInventory": "Shutdown"
+    },
+    {
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "name": "iPad (A16)",
+      "id": "DA4C3709-9DE5-4741-8163-975268EC45D4",
+      "type": "com.apple.CoreSimulator.SimDeviceType.iPad-A16",
+      "stateAtInventory": "Shutdown"
+    }
+  ],
+  "android": {
+    "avd": "trials_gauntlet_api36",
+    "profile": "Pixel 7",
+    "api": 36,
+    "os": "Android 16",
+    "abi": "arm64-v8a",
+    "image": "google_apis",
+    "imageRevision": 7,
+    "emulator": "37.1.11.0",
+    "pixels": [
+      1080,
+      2400
+    ],
+    "densityDpi": 420,
+    "configuredRam": "2G",
+    "headless": true
+  },
+  "coverageNote": "Installed and available does not mean tested. Only named dated probe reports establish passing coverage. No older iOS/Android runtime installed."
+}

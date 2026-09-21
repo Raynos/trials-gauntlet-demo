@@ -40,6 +40,7 @@
     "lint:fix": "eslint . --fix",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build",
     "build:native": "vite build --mode native",
+    "build:native:release": "NATIVE_RELEASE=1 vite build --mode native",
     "native:sync": "pnpm build:native && cap sync",
     "native:ios": "pnpm native:sync && cap run ios",
     "native:android": "pnpm native:sync && cap run android",

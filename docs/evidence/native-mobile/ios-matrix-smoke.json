@@ -1,0 +1,187 @@
+{
+  "at": "2026-09-21T09:24:25.529Z",
+  "scope": "Installed normal-app menu, deterministic B1 clear twice, crash input and logical restart on five iOS26.5 profiles; no visual/touch/audio/physical-device acceptance",
+  "results": [
+    {
+      "name": "trials-iphone",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "deviceId": "F3058DD5-DCB6-4D86-93CC-6E56A785B788",
+      "status": "passed",
+      "probe": {
+        "boot": {
+          "hasSW": false,
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu"
+        },
+        "crashed": {
+          "faults": 2,
+          "phase": "riding"
+        },
+        "first": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        },
+        "probeAt": 1789982512883,
+        "replayEqual": true,
+        "restarted": {
+          "frame": 0,
+          "phase": "riding",
+          "restartMs": 0
+        },
+        "second": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "iPhone 17e",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "deviceId": "4AF4B80E-8F16-4883-B556-054C7AE08C10",
+      "status": "passed",
+      "probe": {
+        "boot": {
+          "hasSW": false,
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu"
+        },
+        "crashed": {
+          "faults": 2,
+          "phase": "riding"
+        },
+        "first": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        },
+        "probeAt": 1789982548950,
+        "replayEqual": true,
+        "restarted": {
+          "frame": 0,
+          "phase": "riding",
+          "restartMs": 0
+        },
+        "second": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "iPhone 17 Pro Max",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "deviceId": "5496C91C-D289-44D4-B357-E723FB8F7994",
+      "status": "passed",
+      "probe": {
+        "boot": {
+          "hasSW": false,
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu"
+        },
+        "crashed": {
+          "faults": 2,
+          "phase": "riding"
+        },
+        "first": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        },
+        "probeAt": 1789982586725,
+        "replayEqual": true,
+        "restarted": {
+          "frame": 0,
+          "phase": "riding",
+          "restartMs": 0
+        },
+        "second": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "iPad mini (A17 Pro)",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "deviceId": "4F26A738-1E6E-44F9-98BB-5E2F52227489",
+      "status": "passed",
+      "probe": {
+        "boot": {
+          "hasSW": false,
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu"
+        },
+        "crashed": {
+          "faults": 2,
+          "phase": "riding"
+        },
+        "first": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        },
+        "probeAt": 1789982623813,
+        "replayEqual": true,
+        "restarted": {
+          "frame": 0,
+          "phase": "riding",
+          "restartMs": 0
+        },
+        "second": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "iPad Pro 13-inch (M5)",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "deviceId": "102F6390-F7D7-4139-87DE-C13A8566C556",
+      "status": "passed",
+      "probe": {
+        "boot": {
+          "hasSW": false,
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu"
+        },
+        "crashed": {
+          "faults": 2,
+          "phase": "riding"
+        },
+        "first": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        },
+        "probeAt": 1789982661936,
+        "replayEqual": true,
+        "restarted": {
+          "frame": 0,
+          "phase": "riding",
+          "restartMs": 0
+        },
+        "second": {
+          "hash": "389a5dc6c07ab8c3",
+          "phase": "finished",
+          "time": 40.55833333333333
+        }
+      },
+      "error": null
+    }
+  ],
+  "source": "ea4ad76c plus round2 working-tree native update housekeeping/release guards/licence viewer; before final licence-file refresh and summary-label change"
+}

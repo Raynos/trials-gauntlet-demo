@@ -1,0 +1,435 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T09:32:41.533Z",
+  "sections": [
+    "capabilities",
+    "tracks",
+    "garage",
+    "notices"
+  ],
+  "pass": true,
+  "failures": [],
+  "capabilities": {
+    "audioContext": true,
+    "audioState": "suspended",
+    "audioWorklet": true,
+    "audioWorkletNode": true,
+    "contextLost": false,
+    "crossOriginIsolated": false,
+    "maxTextureSize": 8192,
+    "secureContext": true,
+    "shadingLanguage": "WebGL GLSL ES 3.00",
+    "webgl2": true,
+    "webglVersion": "WebGL 2.0"
+  },
+  "trackCoverage": {
+    "registered": [
+      "flat-test",
+      "gap-test",
+      "b1-first-ride",
+      "b2-lean-back",
+      "b3-kicker-row",
+      "e1-uphill-weight",
+      "e2-rear-wheel-first",
+      "e3-stairway",
+      "m1-hop-up",
+      "m2-drum-roll",
+      "m3-see-saw",
+      "h1-wheelie-wire",
+      "h2-gap-chain",
+      "h3-fire-line",
+      "x1-vertical-limit",
+      "x2-pipe-dream",
+      "x3-gauntlet",
+      "p1-container-yard",
+      "p2-canyon-run",
+      "p3-snow-line",
+      "p4-night-circuit",
+      "p5-foundry-floor",
+      "lab-physics-test",
+      "lab-flat-200"
+    ],
+    "requested": [
+      "flat-test",
+      "gap-test",
+      "b1-first-ride",
+      "b2-lean-back",
+      "b3-kicker-row",
+      "e1-uphill-weight",
+      "e2-rear-wheel-first",
+      "e3-stairway",
+      "m1-hop-up",
+      "m2-drum-roll",
+      "m3-see-saw",
+      "h1-wheelie-wire",
+      "h2-gap-chain",
+      "h3-fire-line",
+      "x1-vertical-limit",
+      "x2-pipe-dream",
+      "x3-gauntlet",
+      "p1-container-yard",
+      "p2-canyon-run",
+      "p3-snow-line",
+      "p4-night-circuit",
+      "p5-foundry-floor",
+      "lab-physics-test",
+      "lab-flat-200"
+    ],
+    "scope": "every registered track, including fixtures and labs"
+  },
+  "garageCoverage": {
+    "availableBikes": [
+      "rookie",
+      "pro"
+    ],
+    "availableOutfits": [
+      "street-mustard",
+      "street-openface",
+      "race-bluewhite",
+      "street-charcoal",
+      "race-charcoalyellow"
+    ],
+    "requestedBikes": [
+      "rookie",
+      "pro"
+    ],
+    "requestedOutfits": [
+      "street-mustard",
+      "street-openface",
+      "race-bluewhite",
+      "street-charcoal",
+      "race-charcoalyellow"
+    ]
+  },
+  "restoration": {
+    "bike": "rookie",
+    "changedMirrorKeys": [],
+    "effectiveRestored": true,
+    "exactNativeSaveRestoration": "not asserted: UI saves native state; browser mirror is diagnostic only",
+    "riderOutfit": "street-mustard",
+    "screen": "menu",
+    "track": "b1-first-ride"
+  },
+  "notices": {
+    "characters": 2324213,
+    "expanded": true,
+    "fontSize": "11.94px",
+    "horizontalOverflow": false,
+    "interaction": "summary.click, real toggle listener and fetch",
+    "missingTokens": [],
+    "overflowWrap": "anywhere",
+    "pass": true,
+    "present": true,
+    "summaryBounds": {
+      "bottom": 374,
+      "height": 44,
+      "right": 720.171875,
+      "width": 597,
+      "x": 123.171875,
+      "y": 330
+    },
+    "textBounds": {
+      "bottom": 730722.9375,
+      "height": 730337,
+      "right": 720.171875,
+      "width": 597,
+      "x": 123.171875,
+      "y": 385.9375
+    },
+    "whiteSpace": "pre-wrap"
+  },
+  "scope": "Installed iPhone16Pro/iOS26.5 after identity-index extrusion fix; current round2 working tree, same-source packaged assets. Asset/capability coverage, not visual/touch/audio-output/performance qualification.",
+  "tracks": [
+    {
+      "id": "flat-test",
+      "pass": true,
+      "trackId": "flat-test",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 0,
+      "framesAfter": 1
+    },
+    {
+      "id": "gap-test",
+      "pass": true,
+      "trackId": "gap-test",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 2,
+      "framesAfter": 3
+    },
+    {
+      "id": "b1-first-ride",
+      "pass": true,
+      "trackId": "b1-first-ride",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 5,
+      "framesAfter": 6
+    },
+    {
+      "id": "b2-lean-back",
+      "pass": true,
+      "trackId": "b2-lean-back",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 7,
+      "framesAfter": 8
+    },
+    {
+      "id": "b3-kicker-row",
+      "pass": true,
+      "trackId": "b3-kicker-row",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 9,
+      "framesAfter": 10
+    },
+    {
+      "id": "e1-uphill-weight",
+      "pass": true,
+      "trackId": "e1-uphill-weight",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 11,
+      "framesAfter": 12
+    },
+    {
+      "id": "e2-rear-wheel-first",
+      "pass": true,
+      "trackId": "e2-rear-wheel-first",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 13,
+      "framesAfter": 14
+    },
+    {
+      "id": "e3-stairway",
+      "pass": true,
+      "trackId": "e3-stairway",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 15,
+      "framesAfter": 16
+    },
+    {
+      "id": "m1-hop-up",
+      "pass": true,
+      "trackId": "m1-hop-up",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 18,
+      "framesAfter": 19
+    },
+    {
+      "id": "m2-drum-roll",
+      "pass": true,
+      "trackId": "m2-drum-roll",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 20,
+      "framesAfter": 21
+    },
+    {
+      "id": "m3-see-saw",
+      "pass": true,
+      "trackId": "m3-see-saw",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 23,
+      "framesAfter": 24
+    },
+    {
+      "id": "h1-wheelie-wire",
+      "pass": true,
+      "trackId": "h1-wheelie-wire",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 25,
+      "framesAfter": 26
+    },
+    {
+      "id": "h2-gap-chain",
+      "pass": true,
+      "trackId": "h2-gap-chain",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 28,
+      "framesAfter": 29
+    },
+    {
+      "id": "h3-fire-line",
+      "pass": true,
+      "trackId": "h3-fire-line",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 31,
+      "framesAfter": 32
+    },
+    {
+      "id": "x1-vertical-limit",
+      "pass": true,
+      "trackId": "x1-vertical-limit",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 34,
+      "framesAfter": 35
+    },
+    {
+      "id": "x2-pipe-dream",
+      "pass": true,
+      "trackId": "x2-pipe-dream",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 37,
+      "framesAfter": 38
+    },
+    {
+      "id": "x3-gauntlet",
+      "pass": true,
+      "trackId": "x3-gauntlet",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 39,
+      "framesAfter": 40
+    },
+    {
+      "id": "p1-container-yard",
+      "pass": true,
+      "trackId": "p1-container-yard",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 41,
+      "framesAfter": 42
+    },
+    {
+      "id": "p2-canyon-run",
+      "pass": true,
+      "trackId": "p2-canyon-run",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 44,
+      "framesAfter": 45
+    },
+    {
+      "id": "p3-snow-line",
+      "pass": true,
+      "trackId": "p3-snow-line",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 46,
+      "framesAfter": 47
+    },
+    {
+      "id": "p4-night-circuit",
+      "pass": true,
+      "trackId": "p4-night-circuit",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 49,
+      "framesAfter": 50
+    },
+    {
+      "id": "p5-foundry-floor",
+      "pass": true,
+      "trackId": "p5-foundry-floor",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 52,
+      "framesAfter": 53
+    },
+    {
+      "id": "lab-physics-test",
+      "pass": true,
+      "trackId": "lab-physics-test",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 55,
+      "framesAfter": 56
+    },
+    {
+      "id": "lab-flat-200",
+      "pass": true,
+      "trackId": "lab-flat-200",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 57,
+      "framesAfter": 58
+    }
+  ],
+  "outfits": [
+    {
+      "id": "street-mustard",
+      "pass": true,
+      "trackId": "lab-flat-200",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 80,
+      "framesAfter": 81
+    },
+    {
+      "id": "street-openface",
+      "pass": true,
+      "trackId": "lab-flat-200",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 89,
+      "framesAfter": 90
+    },
+    {
+      "id": "race-bluewhite",
+      "pass": true,
+      "trackId": "lab-flat-200",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 99,
+      "framesAfter": 100
+    },
+    {
+      "id": "street-charcoal",
+      "pass": true,
+      "trackId": "lab-flat-200",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 110,
+      "framesAfter": 111
+    },
+    {
+      "id": "race-charcoalyellow",
+      "pass": true,
+      "trackId": "lab-flat-200",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 121,
+      "framesAfter": 122
+    }
+  ],
+  "bikes": [
+    {
+      "id": "rookie",
+      "pass": true,
+      "trackId": "lab-flat-200",
+      "bike": "rookie",
+      "phase": "countdown",
+      "framesBefore": 128,
+      "framesAfter": 129
+    },
+    {
+      "id": "pro",
+      "pass": true,
+      "trackId": "lab-flat-200",
+      "bike": "pro",
+      "phase": "countdown",
+      "framesBefore": 129,
+      "framesAfter": 129
+    }
+  ],
+  "errors": {
+    "exceptions": [],
+    "consoleErrors": []
+  },
+  "requests": {
+    "count": 8,
+    "failed": []
+  }
+}

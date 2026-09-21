@@ -738,9 +738,29 @@ export class CreditsScreen extends Screen {
         <dt>Hero</dt><dd>Rider and bike authored in Blender by Astra (five outfits, two liveries). Body and skin from <b>MPFB / MakeHuman</b> system assets (CC0) and the Blender Studio human base meshes (CC0); hair from <b>Daniel Bystedt</b>'s Hair Styles demo (CC BY-SA), baked to a curl shell for the game; beard and moustache by <b>grinsegold</b> (MakeHuman bodyparts06, CC-BY); the study head <b>Infinite, 3D Head Scan by Lee Perry-Smith</b> (CC BY 3.0, via three.js); cotton and denim from <b>Poly Haven</b> (CC0). Full provenance and licences ship with the source.</dd>
         <dt>Thanks</dt><dd>Trials Evolution and Trials Rising for the read-outs, the crash stamp and the checkpoint restart.</dd>
       </dl>`;
+    if (isNativeApp()) {
+      const notices = document.createElement('details');
+      notices.className = 'native-notices';
+      notices.innerHTML = '<summary>Third-party licences</summary><pre>Loading licences…</pre>';
+      let loaded = false;
+      notices.addEventListener('toggle', () => {
+        if (!notices.open || loaded) return;
+        loaded = true;
+        void fetch('./native-notices.txt').then(async (response) => {
+          if (!response.ok) throw new Error('Licence file unavailable');
+          notices.querySelector('pre')!.textContent = await response.text();
+        }).catch(() => {
+          loaded = false;
+          notices.querySelector('pre')!.textContent = 'Could not load licences. Close and reopen to retry.';
+        });
+      });
+      wrap.appendChild(notices);
+    }
     this.root.append(h('div', 'grain'), wrap);
     this.addBackButton('Menu');
-    this.root.addEventListener('click', () => this.back());
+    this.root.addEventListener('click', (event) => {
+      if (!(event.target as Element).closest('.native-notices')) this.back();
+    });
   }
   nav(): void {}
   confirm(): void {

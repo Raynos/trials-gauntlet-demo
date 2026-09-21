@@ -104,9 +104,50 @@ from an update and may remove local saves.
 
 ## Current implementation evidence
 
-Capacitor 8.5.2 shells build for iOS Simulator and Android; native mode excludes the PWA worker. Lifecycle interruption handling, transactional native save snapshots and signed next-launch updates are implemented. Installed iOS and Android builds have staged and activated a signed healthy bundle. The native channel is disabled by default until production URLs and a public verification key are supplied. See [native runbook](../native/README.md) and [evidence](../evidence/native-mobile/). Device, store and remaining failure qualification below stay open.
+Capacitor 8.5.2 shells build for iOS Simulator and Android; native mode excludes the PWA worker. Lifecycle interruption handling, transactional native save snapshots and signed next-launch updates are implemented. Installed iOS and Android builds have staged and activated a signed healthy bundle. Five iOS profiles pass gameplay smoke; primary iOS and Android pass all24registered-track/5outfit/2bike asset sweeps after fixing mixed-index obstacle geometry. See [iOS asset report](../evidence/native-mobile/ios-capabilities.json) and [Android asset report](../evidence/native-mobile/android-capabilities.json). The native channel is disabled by default until production URLs and a public verification key are supplied. See [native runbook](../native/README.md) and [evidence](../evidence/native-mobile/). Device, store and remaining failure qualification below stay open.
+
+Release hardening now adds build-time channel/key validation, a signed-bundle build contract, and
+conservative cleanup of abandoned staged downloads. Native licence notices and publisher disclosure/listing
+drafts are in [the runbook](../native/README.md). These implementation checks do not close the store/device gates.
 
 ## Implementation phases and acceptance
+
+### Required simulator/emulator E2E matrix (ask 76; part of the active goal)
+
+The active objective remains **plan the mobile apps then build them autonomously**. Its completion
+audit must include this matrix; successful compilation or one passing emulator is insufficient.
+Inventory checked 2026-09-21: [machine-readable inventory](../evidence/native-mobile/simulators.json).
+Use headless runners and task-owned simulator instances; do not interrupt an already-running user simulator.
+
+| Target | Installed runtime/profile | Required coverage | Current evidence |
+|---|---|---|---|
+| iPhone 16 Pro (`trials-iphone`) | iOS 26.5 (23F77), Xcode 26.6 | Full native E2E + OTA/save failure suite | Initial real installed-app gameplay, signed activation, watchdog rollback and save restoration [passed locally](../evidence/native-mobile/ios-local.json); full matrix below remains open |
+| iPhone 17e | iOS 26.5 | Smaller phone layout, touch controls, safe areas, cold boot/clear/crash/restart, lifecycle and save smoke | [Menu/replay/crash/restart smoke passed](../evidence/native-mobile/ios-matrix-smoke.json); touch/layout/lifecycle qualification open |
+| iPhone 17 Pro Max | iOS 26.5 | Larger phone layout and the same smoke flow | [Menu/replay/crash/restart smoke passed](../evidence/native-mobile/ios-matrix-smoke.json); touch/layout/lifecycle qualification open |
+| iPad mini (A17 Pro) | iOS 26.5 | Tablet layout, landscape/rotation, touch and gameplay smoke | [Menu/replay/crash/restart smoke passed](../evidence/native-mobile/ios-matrix-smoke.json); tablet/rotation/touch qualification open |
+| iPad Pro 13-inch (M5) | iOS 26.5 | Large tablet layout and gameplay smoke | [Menu/replay/crash/restart smoke passed](../evidence/native-mobile/ios-matrix-smoke.json); touch/layout/lifecycle qualification open |
+| Pixel 7 (`trials_gauntlet_api36`) | Android 16 / API 36, Google APIs ARM64 image revision 7; emulator 37.1.11.0; 1080×2400, 420 dpi, 2 GB configured RAM | Full native E2E + OTA/save failure suite + Android Back | Initial offline gameplay, lifecycle, save restoration, signed activation, hash rejection and watchdog rollback [passed locally](../evidence/native-mobile/android-integrated.json); full matrix below remains open |
+
+Additional installed iOS profiles: iPhone 17 Pro, iPhone 17, iPhone Air, iPad Pro 11-inch (M5), iPad Air
+11/13-inch (M4), and iPad (A16). They can support focused regressions; availability is not a pass.
+Only one OS runtime per platform is installed. The projects currently declare iOS 15.0 and Android API24
+minimums; neither minimum is qualified by iOS26.5/API36 tests. Add runnable older-OS coverage or obtain
+physical-device evidence before accepting those minimums. Do not infer a simulated older device profile
+on the latest OS proves older-OS compatibility.
+
+- [ ] Full primary-device suite: clean offline install and cold boot; every shipped track and garage asset;
+  real touch navigation; deterministic clear twice; crash and restart; background/foreground, force-kill,
+  settings/progress persistence and native binary upgrade; Android Back; audio/worklet capability and
+  WebGL context-loss recovery.
+- [ ] Full OTA suite on both primary devices: valid signed A→B, no mid-ride activation, deliberate B→A
+  rollback with higher sequence, startup-watchdog rollback, wrong signature/hash, incompatible native
+  version, expired manifest, interrupted download, offline launch, low storage, save recovery and
+  abandoned-bundle cleanup with the final native configuration.
+- [ ] Secondary-device smoke/layout cases above, with screenshots used only for geometry and played clips
+  for motion assessment. Record build/source identity, device/runtime, commands, measurements and failure
+  cases under `docs/evidence/native-mobile/`; an unavailable or unexecuted case remains open.
+- [ ] Re-run applicable suites on final signed store candidates and keep actual-phone thermal/performance,
+  interruption and stranger-touch gates below. Simulator timings never establish phone fps or battery life.
 
 ### P0 — Freeze scope and build requirements
 
@@ -241,4 +282,5 @@ HR-14 records remaining human prerequisites: personal developer-account access/e
 
 **Plan done line:** both store-distributed apps install and play the shared TypeScript/Three.js game offline,
 preserve saves across updates, pass recorded native/device gates and have a repeatable release runbook.
+The explicit simulator/emulator matrix above is a required acceptance gate for the active mobile-app goal.
 The OTA phase must be proved with recovery evidence; iOS-ineligible changes still use store updates. Update this tracker and archive only when those outcomes are evidenced or exceptions accepted.

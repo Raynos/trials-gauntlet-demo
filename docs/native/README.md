@@ -28,6 +28,13 @@ pnpm exec cap sync
 ./scripts/native-android.sh all
 ```
 
+For store candidates, set the real public update configuration below and run
+`pnpm build:native:release` (or `NATIVE_RELEASE=1 ./scripts/native-ios.sh` /
+`NATIVE_RELEASE=1 ./scripts/native-android.sh all`). This fails early if either platform channel or
+the RSA public key is missing, malformed, private, weak, or uses a local/test hostname. Local development
+builds may omit OTA entirely; partially supplied configuration is an error in every native build.
+The release flag validates configuration, not account ownership, hosting reachability or store approval.
+
 Native web output is `dist-native/`; ordinary `pnpm build` still creates the website/PWA in `dist/`.
 Capacitor embeds the full native web output. The native target omits PWA worker registration, cache
 clearing and website-origin feedback. App pause/resume, Back, save snapshots and update selection live
@@ -46,6 +53,7 @@ remain unsigned until an upload key is configured. A simulator app is not a dist
 
 ```sh
 node scripts/native-ios-probe.mjs
+node scripts/native-ios-matrix.mjs
 ```
 
 Set `TRIALS_SIMULATOR` to another simulator UDID. The debug-only iOS bridge runs a supplied local JS
@@ -56,6 +64,20 @@ The probe copies evidence into `.native-build/evidence/`. `TRIALS_PROBE_FILE` su
 Android qualification uses an explicitly launched headless emulator and its debuggable WebView.
 Actual phones, thermal measurements and human play remain separate gates. A simulator/emulator pass
 must never be labeled a physical iPhone/Android performance result.
+
+The iOS matrix runs the five named profiles in the plan and leaves an already-running non-task simulator
+alone. It records unavailable profiles as incomplete, not passes. The default case is gameplay smoke;
+the reusable [capability probe](../evidence/native-mobile/capability-schema.md) adds all-track/garage,
+WebGL/audio capability and licence checks. For an already-booted task-owned Android emulator:
+
+```sh
+node scripts/native-android-capabilities.mjs --serial emulator-5554 \
+  --apk android/app/build/outputs/apk/debug/app-debug.apk \
+  --output .native-build/android-capabilities.json
+```
+
+That runner installs the local debug APK, enables airplane mode on the emulator, and fails on captured
+resource/render errors. These programmatic checks do not establish real-touch or visual acceptance.
 
 ## Signed updates hosted on Vercel
 
@@ -100,6 +122,12 @@ Repeat with `--platform android` and an Android path. The packager writes a SHA-
 manifest and public key; it does not upload. The ZIP includes `index.html` at its root and excludes source
 maps. The native downloader verifies its hash against the authenticated manifest.
 
+Every native build emits `native-build.json` with source revision, runtime/save contract, public channel
+URLs and public-key fingerprint. The packager checks this file before signing: a different key, destination
+channel or runtime/save schema fails. This prevents accidentally promoting an OTA game that cannot verify
+or discover its next update. Rebuild old artifacts that predate this contract; do not hand-edit the file
+to bypass a mismatch. It is build provenance inside the signed ZIP, not a substitute for the signature.
+
 Host `.native-build/mobile-site/` as a separate static Vercel deployment with the template
 [`deploy/mobile-updates/vercel.json`](../../deploy/mobile-updates/vercel.json). Copy that config to the
 site root. Choose/link the actual Vercel project and stable hostname before building store binaries.
@@ -133,8 +161,12 @@ On-device retention must also be bounded. The configuration now explicitly enabl
 `autoDeletePrevious: true` and `autoDeleteFailed: true`. The former removes an older
 successful fallback only after the new bundle acknowledges readiness; `autoDeleteFailed: true` removes
 failed bundle files after rollback. The built-in bundle remains. These switches do not clean every
-abandoned download: expired or superseded staged bundles need a separate cleanup policy before broad
-production promotion. Keep remote known-good artifacts even after on-device cleanup.
+abandoned download: the controller now removes orphaned `pending` bundles after readiness, attempting at
+most eight deletions per launch. It preserves the active bundle, durable pending pointer, all successful
+fallbacks and native-managed error/downloading/deleting states, serializes with its own downloads and
+requires a successful save flush before deleting. Deletion failures are retried on later launches.
+This is conservative housekeeping, not a hard quota for every native status. Keep remote known-good
+artifacts even after on-device cleanup.
 Local rollback qualification used the earlier `autoDeletePrevious: false` configuration; the new
 deletion behavior is source-verified and still needs an installed-app retention check.
 
@@ -149,3 +181,10 @@ JavaScript running in a WebView/interpreter from downloaded native executables, 
 runtime-loaded behavior to comply with Play policy. Neither platform promises permanent approval of
 every later update. [Apple review guidelines](https://developer.apple.com/app-store/review/guidelines/#software-requirements),
 [Google Play device and network abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646?hl=en).
+
+The mandatory simulator/emulator matrix and execution status are in the
+[publishing plan](../plans/NATIVE_MOBILE_PUBLISHING.md). Only installed-app reports prove a pass;
+device availability and unit tests do not close an E2E case.
+
+Release drafts: [privacy/network inventory](PRIVACY-AUDIT.md),
+[store copy and reviewer walkthrough](STORE-LISTINGS.md), [dependency notices](THIRD_PARTY.md).

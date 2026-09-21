@@ -50,6 +50,10 @@ function extrudePoly(poly: Vec2[], depth: number, uvScale = 0.5): THREE.BufferGe
   g.translate(0, 0, -depth / 2);
   const uv = g.getAttribute('uv') as THREE.BufferAttribute;
   for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * uvScale, uv.getY(i) * uvScale);
+  // ExtrudeGeometry is nonindexed; the boxes/cylinders sharing its material are
+  // indexed. Identity indices make the bucket mergeable without welding hard
+  // edges, changing UV seams, or disturbing the cap/side groups.
+  g.setIndex(Array.from({ length: g.getAttribute('position').count }, (_, i) => i));
   return g;
 }
 

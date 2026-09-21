@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "date": "2026-09-21T09:33:06.913Z",
+  "finishedAt": "2026-09-21T09:34:35.284Z",
+  "pass": true,
+  "environment": "headless Android emulator; airplane mode; installed debug APK; bundled assets",
+  "device": {
+    "model": "sdk_gphone64_arm64",
+    "sdk": "36",
+    "abi": "arm64-v8a"
+  },
+  "avd": "trials_gauntlet_api36",
+  "graphics": "headless emulator SwiftShader; not physical GPU performance evidence",
+  "apk": "android/app/build/outputs/apk/debug/app-debug.apk",
+  "apkSha256": "a771d0bee78ec05b10253f12fe4ccd21bbf976ad51088dfe3ff7788a71f7fbd5",
+  "command": "node scripts/native-android-capabilities.mjs --output .native-build/android-capabilities-round2-fixed.json",
+  "rawEvidence": ".native-build/android-capabilities-round2-fixed.json",
+  "boot": {
+    "origin": "https://localhost",
+    "url": "https://localhost/",
+    "online": false,
+    "platform": "android",
+    "harness": false,
+    "updater": {
+      "bundle": {
+        "checksum": "",
+        "id": "builtin",
+        "version": "1.0.0",
+        "downloaded": "1970-01-01T00:00:00.000Z",
+        "status": "success"
+      },
+      "native": "1.0.0"
+    },
+    "screen": "menu"
+  },
+  "capabilities": {
+    "webgl2": true,
+    "webglVersion": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "shadingLanguage": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)",
+    "maxTextureSize": 4096,
+    "contextLost": false,
+    "crossOriginIsolated": false,
+    "secureContext": true,
+    "audioContext": true,
+    "audioWorkletNode": true,
+    "audioWorklet": true,
+    "audioState": "running"
+  },
+  "coverage": {
+    "sections": [
+      "capabilities",
+      "tracks",
+      "garage",
+      "notices"
+    ],
+    "tracks": {
+      "scope": "every registered track, including fixtures and labs",
+      "registered": [
+        "flat-test",
+        "gap-test",
+        "b1-first-ride",
+        "b2-lean-back",
+        "b3-kicker-row",
+        "e1-uphill-weight",
+        "e2-rear-wheel-first",
+        "e3-stairway",
+        "m1-hop-up",
+        "m2-drum-roll",
+        "m3-see-saw",
+        "h1-wheelie-wire",
+        "h2-gap-chain",
+        "h3-fire-line",
+        "x1-vertical-limit",
+        "x2-pipe-dream",
+        "x3-gauntlet",
+        "p1-container-yard",
+        "p2-canyon-run",
+        "p3-snow-line",
+        "p4-night-circuit",
+        "p5-foundry-floor",
+        "lab-physics-test",
+        "lab-flat-200"
+      ],
+      "attempted": [
+        "flat-test",
+        "gap-test",
+        "b1-first-ride",
+        "b2-lean-back",
+        "b3-kicker-row",
+        "e1-uphill-weight",
+        "e2-rear-wheel-first",
+        "e3-stairway",
+        "m1-hop-up",
+        "m2-drum-roll",
+        "m3-see-saw",
+        "h1-wheelie-wire",
+        "h2-gap-chain",
+        "h3-fire-line",
+        "x1-vertical-limit",
+        "x2-pipe-dream",
+        "x3-gauntlet",
+        "p1-container-yard",
+        "p2-canyon-run",
+        "p3-snow-line",
+        "p4-night-circuit",
+        "p5-foundry-floor",
+        "lab-physics-test",
+        "lab-flat-200"
+      ],
+      "passed": 24
+    },
+    "outfits": {
+      "attempted": [
+        "street-mustard",
+        "street-openface",
+        "race-bluewhite",
+        "street-charcoal",
+        "race-charcoalyellow"
+      ],
+      "passed": 5
+    },
+    "bikes": {
+      "attempted": [
+        "rookie",
+        "pro"
+      ],
+      "passed": 2
+    },
+    "notices": {
+      "present": true,
+      "expanded": true,
+      "characters": 2324213,
+      "missingTokens": [],
+      "horizontalOverflow": false,
+      "whiteSpace": "pre-wrap",
+      "overflowWrap": "anywhere",
+      "pass": true
+    }
+  },
+  "errors": {
+    "observedRequests": 8,
+    "failedRequests": 0,
+    "uncaught": 0,
+    "consoleErrors": 0,
+    "failures": []
+  },
+  "restoration": {
+    "screen": "menu",
+    "track": "b1-first-ride",
+    "bike": "rookie",
+    "riderOutfit": "street-mustard",
+    "effectiveRestored": true,
+    "changedMirrorKeys": [
+      {
+        "key": "trials.bikeClass",
+        "before": null,
+        "after": "rookie"
+      },
+      {
+        "key": "trials.riderOutfit",
+        "before": null,
+        "after": "street-mustard"
+      },
+      {
+        "key": "trials.riderModel",
+        "before": null,
+        "after": "gltf"
+      }
+    ],
+    "exactNativeSaveRestoration": "not asserted: UI saves native state; browser mirror is diagnostic only"
+  },
+  "warnings": [
+    "Some saved keys changed; absent defaults can become explicit choices. See restoration.changedMirrorKeys."
+  ],
+  "limitations": [
+    "Track coverage is initial scene load/render smoke, not traversal or a complete texture/asset inventory.",
+    "Successful requests, GL draw calls and selection state do not prove correct visual appearance. Judge played clips separately.",
+    "Audio capability is API availability; audible output and worklet processing were not exercised.",
+    "Touch geometry and programmatic clicks do not prove physical touch, multitouch or system gesture behavior.",
+    "Cached resources and failures swallowed without console/fetch/error signals may not appear in this report.",
+    "Touch section was not requested in this run; no physical touch or audible-output test was performed.",
+    "All 24 registered initial scenes were loaded after the missing rustSteel mesh merge fix. This is functional smoke evidence, not visual approval or a complete all-camera asset inventory."
+  ]
+}

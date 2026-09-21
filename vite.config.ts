@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
+import { nativeBuildContract } from './scripts/mobile-config.mjs';
 import { HERO_FILES_BY_OUTFIT } from './src/render/hero/urls';
 import { declaredBootTotals, emptyBootTotals, offlinePackBytes, type DeclaredBootTotals } from './src/boot/asset-totals';
 import { modelAssetsPlugin, type ModelAsset } from './src/boot/model-catalog';
@@ -394,13 +395,24 @@ function buildId(): string {
   return 'dev';
 }
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  const contract = mode === 'native' ? nativeBuildContract(loadEnv(mode, process.cwd(), 'VITE_MOBILE_'), {
+    production: process.env['NATIVE_RELEASE'] === '1', sourceRevision: buildId(),
+  }) : null;
+  const nativeMetadata: Plugin[] = contract ? [{
+    name: 'trials:native-contract',
+    buildStart() { execFileSync(process.execPath, ['scripts/native-notices.mjs', '--check'], { stdio: 'inherit' }); },
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'native-build.json', source: JSON.stringify(contract, null, 2) + '\n' });
+    },
+  }] : [];
+  return ({
   define: { __NATIVE_APP__: JSON.stringify(mode === 'native'), __BUILD_ID__: JSON.stringify(buildId()), __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z'), __WORLDMAP_V__: JSON.stringify(contentStamp(publicStamp(process.cwd(), ['art/worldmap'])).slice(0, 8)) },
   // Relative base so the built bundle also works when served from a subpath
   // (Vercel preview folders, file listings, the harness preview server).
   base: './',
   // Native assets are installed with the app. Only the website uses a service worker.
-  plugins: [bundleBudget(), ...loadManifest(buildId(), mode === 'native'), ...(mode === 'native' ? [] : [pwa(buildId())]), pruneFlatModels()],
+  plugins: [bundleBudget(), ...nativeMetadata, ...loadManifest(buildId(), mode === 'native'), ...(mode === 'native' ? [] : [pwa(buildId())]), pruneFlatModels()],
   build: {
     outDir: mode === 'native' ? 'dist-native' : 'dist',
     target: 'es2022',
@@ -425,4 +437,5 @@ export default defineConfig(({ mode }) => ({
     strictPort: false,
     headers: ISOLATION_HEADERS,
   },
-}));
+  });
+});
