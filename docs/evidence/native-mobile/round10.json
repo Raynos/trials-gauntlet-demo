@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T12:06:41.799Z",
+  "baseRevision": "2829cd2ac332f74b713881ea4e450358a26e8653",
+  "finding": "Installed iOS and Android updater recovery passes. Android native ZIP-write ENOSPC preserves the healthy game and saves, then retries the identical publication. Both platforms retain failed-start quarantine after rollback and reject higher-sequence reuse.",
+  "productSource": {
+    "changed": false,
+    "updaterSha256": "bd171c731da93c7e4a88b15f872336dde948c346fcdd74c9a6c53b5ca1051a0b",
+    "sourceRevision": "2829cd2a"
+  },
+  "harnessSourceHashes": {
+    "scripts/native-ota-fixtures.mjs": "bed2da16468d9f5e171d5583e07f9d912c6fb10259501628a87772b0e7cc72fd",
+    "scripts/native-ota-fixtures.test.mjs": "6773a42266a43cdcf9b673325462fcb5b328df2eb5181183b6c47ace24c42d56",
+    "scripts/native-ota-test.mjs": "0c0616135d92c7efc3d0d16fe4b27e1195a23e056f385ca3afbbe3c58c7726c3",
+    "scripts/native-ios-ota-retry.mjs": "def6de6a6079de89419bd6e0a9c722919121e93f064c382870a058e8d6201708",
+    "scripts/native-android-ota-low-space.mjs": "8d4a91f6f4f8df5db47a1ab48d580225a2ed0299cb16fef714f8562a260bc8cb"
+  },
+  "reports": {
+    "ios-ota-round10.json": {
+      "path": "docs/evidence/native-mobile/ios-ota-round10.json",
+      "sha256": "b62a32e4e8865155069159103efbceffcdf9129f31df148fa0ce89708cae61f6"
+    },
+    "android-ota-round10.json": {
+      "path": "docs/evidence/native-mobile/android-ota-round10.json",
+      "sha256": "177db727d85166ac19334a1cda00276ffa85db2aa554cff9197935053c45be96"
+    },
+    "ota-fixtures-round10.json": {
+      "path": "docs/evidence/native-mobile/ota-fixtures-round10.json",
+      "sha256": "b1b3cf8fbd065fbfabe34380c1a49168360ea568d1f03aeab0ee0914ec1bcee3"
+    }
+  },
+  "results": {
+    "ios": {
+      "passedCases": 9,
+      "watchdogMs": 130827,
+      "samePublicationTransferRetry": true,
+      "healthyActivationLedgerObservedAndCleared": true,
+      "failedActivationJournalSurvivedNativeMetadataDeletion": true,
+      "higherSequenceSameBadVersionRejectedBeforeDownload": true,
+      "savedProgressAndPreferencesPreserved": true,
+      "normalChannelsDisabled": true,
+      "taskSimulatorShutdown": true
+    },
+    "android": {
+      "casesPassed": 12,
+      "nativeZipWriteEnospc": true,
+      "identicalPublicationRetry": true,
+      "watchdogMs": 127513,
+      "higherSequenceQuarantine": true,
+      "savesPreserved": true
+    }
+  },
+  "builds": {
+    "qaIosIndexSha256": "89ac720a6514e63f38cff96293630f1d4d598cf05c330c08cd829bc6c1fba7a7",
+    "qaAndroidApkSha256": "ff22683c247a29d2ff4a04515ea5656ee3eee2a39ca074f729d8607a0cb149c1",
+    "normalAndroidApkSha256": "1b089f3245913aad029463affa4012c4e55d84af50d9c793aaafbe428c662f7d",
+    "normalContract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "2829cd2a",
+      "production": false,
+      "channels": null,
+      "publicKeyFingerprint": null
+    },
+    "normalHasQaTrust": false,
+    "normalIosIndexSha256": "824a85715a532696ebbf8fae04a9467c79d024b78286fcae488e41349a4f4b89",
+    "qaTrustScope": "Temporary Debug APK only, existing public CA for10.0.2.2. Sources removed, normal app rebuilt; no host or emulator-system trust change."
+  },
+  "validation": {
+    "fixtureTests": {
+      "command": "NATIVE_OTA_TEST_CONFIG=.native-build/ota-test-config.json node --test scripts/native-ota-fixtures.test.mjs",
+      "testsPassed": 2,
+      "log": ".native-build/ota-fixture-tests-round10.log",
+      "logSha256": "e8a6368164499eb60547188d80042e3cf41bffbde856c4d8a7cf8dc35d42c462"
+    },
+    "lint": {
+      "command": "pnpm lint",
+      "exitCode": 0,
+      "log": ".native-build/lint-round10.log"
+    },
+    "nativeBuilds": "QA iOS/Android Debug and restored normal iOS/Android Debug builds succeeded. Product source is unchanged from round9; its 1,169 passing tests and two existing skips were not redundantly rerun."
+  },
+  "cleanup": {
+    "fixtureServerPid": 47383,
+    "serverStopped": true,
+    "port8443Closed": true,
+    "primarySimulator": "Shutdown",
+    "userSimulator": "Booted",
+    "android": {
+      "remainingOwnedMounts": [],
+      "tracerOrKeeperProcesses": [],
+      "airplane": "1",
+      "wifi": "0",
+      "selinux": "Enforcing"
+    },
+    "androidEmulatorStopped": true,
+    "normalArtifactsRestored": true,
+    "temporaryAndroidDebugSourcesAbsent": true
+  },
+  "limits": [
+    "Local fixtures and simulators, no production channel or store release.",
+    "Android qualifies bounded temporary ZIP writes, not extraction or whole-device pressure. iOS OTA ENOSPC is still untested.",
+    "Foreground watchdog recovery does not qualify backgrounding before readiness past the timeout.",
+    "Old OS/provider, remaining secondary-device touch/rotation, signed-store upgrades and physical-device performance/stranger gates remain open.",
+    "Native motion/visual/audio quality was not judged by this update suite."
+  ]
+}

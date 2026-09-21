@@ -2,7 +2,7 @@
 /** Local-only signed OTA scenarios. Never edits the input build or publishes remotely. */
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash, createPrivateKey, createPublicKey, constants, generateKeyPairSync, verify } from 'node:crypto';
+import { createHash, createPrivateKey, createPublicKey, constants, generateKeyPairSync, randomUUID, verify } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { packageRelease, signManifest } from './mobile-release.mjs';
 
@@ -120,17 +120,56 @@ export function selectFixture(args) {
   return { platform: row.platform, case: row.name, archiveOnly, manifestUrl: manifestUrl.href, sequence: row.manifest.sequence, bundleId: row.manifest.bundleId, marker: row.marker, url: row.manifest.url, checksum: row.manifest.sha256 };
 }
 
+/** Re-sign identical archive bytes/version under a higher sequence; local fixture channels only. */
+export function republishFixture(args) {
+  const config = localConfig(path.resolve(args.config ?? '.native-build/ota-test-config.json'));
+  const root = path.resolve(args.out ?? '.native-build/ota-fixtures');
+  const report = read(path.join(root, 'checks.json'));
+  const row = report.fixtures.find(r => r.platform === args.platform && r.name === args.case);
+  if (!row) throw new Error('Unknown platform/case; build fixtures first');
+  const name = args.name ?? 'brokenStartupRetry', sequence = Number(args.sequence);
+  if (!/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/.test(name) || report.fixtures.some(r => r.platform === row.platform && r.name === name)) throw new Error('Choose a fresh simple fixture name');
+  if (!Number.isSafeInteger(sequence) || sequence <= Math.max(...report.fixtures.filter(r => r.platform === row.platform).map(r => r.manifest.sequence))) throw new Error('Sequence must exceed every existing fixture for this platform');
+  const source = path.resolve(root, row.directory);
+  if (!source.startsWith(root + path.sep)) throw new Error('Fixture must remain inside fixture root');
+  const original = inspectFixture(source, config.publicJwk, report.nativeVersion);
+  if (!original.signatureValid || !original.archiveHashValid || original.expired || !original.nativeCompatible) throw new Error('Republication requires a valid unexpired source fixture');
+  const manifest = { ...original.manifest, sequence };
+  const channel = new URL('.', config[`${row.platform}Manifest`]);
+  if (manifest.url !== new URL(`${manifest.sha256}.zip`, channel).href || manifest.platform !== row.platform) throw new Error('Fixture channel/platform mismatch');
+  const directory = path.join(root, row.platform, name);
+  fs.mkdirSync(directory);
+  fs.copyFileSync(path.join(source, `${manifest.sha256}.zip`), path.join(directory, `${manifest.sha256}.zip`));
+  write(path.join(directory, 'manifest.json'), signManifest(manifest, createPrivateKey(fs.readFileSync(config.privateKeyPath))));
+  const checks = inspectFixture(directory, config.publicJwk, report.nativeVersion);
+  const published = { ...row, name, directory: path.relative(root, directory), ...checks, republishedFrom: row.name };
+  report.fixtures.push(published);
+  write(path.join(root, 'checks.json'), report);
+  return published;
+}
+
 export function setNetworkFixture(args) {
   const config = localConfig(path.resolve(args.config ?? '.native-build/ota-test-config.json'));
-  if (!['normal', 'interrupt', 'delay'].includes(args.mode)) throw new Error('Network mode must be normal, interrupt or delay');
+  if (!['normal', 'interrupt', 'delay', 'hold', 'release'].includes(args.mode)) throw new Error('Network mode must be normal, interrupt, delay, hold or release');
   if (!['ios', 'android'].includes(args.platform)) throw new Error('Choose --platform ios or android');
   const afterBytes = Number(args['after-bytes'] ?? 32768), delayMs = Number(args['delay-ms'] ?? 15000);
   if (!Number.isSafeInteger(afterBytes) || afterBytes < 1 || !Number.isSafeInteger(delayMs) || delayMs < 1 || delayMs > 60000) throw new Error('Use positive byte count and delay of at most 60000 ms');
   const fault = { mode: args.mode, pathPrefix: new URL('.', config[`${args.platform}Manifest`]).pathname, afterBytes, delayMs };
   fs.mkdirSync(config.webRoot, { recursive: true });
+  const controlPath = path.join(config.webRoot, `.fixture-network-${args.platform}.json`);
+  if (args.mode === 'hold') {
+    const timeoutMs = Number(args['timeout-ms'] ?? 60000);
+    if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 60000) throw new Error('Hold timeout must be 1 through 60000 ms');
+    if (typeof args.path !== 'string' || !args.path.startsWith(fault.pathPrefix) || !/^[a-f0-9]{64}\.zip$/.test(args.path.slice(fault.pathPrefix.length))) throw new Error('Hold path must be an exact immutable ZIP in the selected platform channel');
+    Object.assign(fault, { path: args.path, holdId: randomUUID(), timeoutMs, statusPath: path.join(config.webRoot, `.fixture-hold-${args.platform}.json`) });
+  } else if (args.mode === 'release') {
+    const previous = read(controlPath);
+    if (previous.mode !== 'hold' || !args['hold-id'] || previous.holdId !== args['hold-id']) throw new Error('Release must match the active hold ID');
+    Object.assign(fault, previous, { mode: 'release' });
+  }
   const staged = path.join(config.webRoot, `.fixture-network-${args.platform}.tmp`);
   write(staged, fault);
-  fs.renameSync(staged, path.join(config.webRoot, `.fixture-network-${args.platform}.json`));
+  fs.renameSync(staged, controlPath);
   return fault;
 }
 
@@ -142,7 +181,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
       if (!process.argv[i].startsWith('--') || !process.argv[i + 1]) throw new Error('Use --name value arguments');
       args[process.argv[i].slice(2)] = process.argv[i + 1];
     }
-    if (!['build', 'select', 'network'].includes(mode)) throw new Error('Usage: native-ota-fixtures.mjs build|select|network [--name value]');
-    console.log(JSON.stringify(mode === 'build' ? buildFixtures(args) : mode === 'select' ? selectFixture(args) : setNetworkFixture(args), null, 2));
+    if (!['build', 'select', 'network', 'republish'].includes(mode)) throw new Error('Usage: native-ota-fixtures.mjs build|select|network|republish [--name value]');
+    console.log(JSON.stringify(mode === 'build' ? buildFixtures(args) : mode === 'select' ? selectFixture(args) : mode === 'republish' ? republishFixture(args) : setNetworkFixture(args), null, 2));
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

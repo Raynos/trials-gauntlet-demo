@@ -4,7 +4,7 @@ Things that need **you**, not an agent. Everything else is `docs/tasks/ASKS.md`.
 decided** — the decision lands in the thing it changed (the plan, the SPEC, the ASKS row). Each line leads with what it is
 waiting on. IDs never reused. Ported from the FF15 demo's `HUMAN_REVIEW.md`.
 
-- **HR-14 — Native store publication prerequisites (asks 72–75).** Waiting on: you — Apple/Google personal developer-account access/enrollment, final app identifiers, target markets and actual-device/human-play acceptance before submission. Decided: iOS + Android only; personal publisher; free, no ads or purchases; eligible OTA in the first release. Development ID is `com.trialsgauntlet.game`; source/build/remote-update work proceeds autonomously. [`NATIVE_MOBILE_PUBLISHING.md`](../../docs/plans/NATIVE_MOBILE_PUBLISHING.md).
+- **HR-14 — Native store publication prerequisites (asks 72–75, 90).** Waiting on: you — Apple/Google personal developer-account access/enrollment, final app identifiers, target markets and actual-device/human-play acceptance before public submission. Private TestFlight/internal Play uploads are authorized; account access/signing and final identifiers are the immediate blockers. Decided: iOS + Android only; personal publisher; free, no ads or purchases; eligible OTA in the first release. Development ID is `com.trialsgauntlet.game`; source/build/remote-update work proceeds autonomously. [`NATIVE_MOBILE_PUBLISHING.md`](../../docs/plans/NATIVE_MOBILE_PUBLISHING.md).
 
 - **HR-05 — First review-inbox note.** Waiting on: you — when the ✎ NOTE button ships, enter the password once and send one note;
   I pull it and the loop is proven.

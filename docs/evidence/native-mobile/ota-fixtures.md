@@ -16,7 +16,7 @@ node scripts/native-ota-fixtures.mjs select \
   --out .native-build/ota-fixtures-round3 --platform ios --case validA
 ```
 
-Replace `ios` with `android` for the emulator. Keep the configured server running; restart an older server process to pick up network fault support. The simulator/emulator must trust the temporary local TLS CA. Changing the channel selection copies the ZIP first, then atomically replaces only that platform's manifest. Nothing is publicly deployed. Pick a fresh output directory and a sequence base above the installed high-water value for each repeat run; the builder refuses to overwrite a previous fixture suite.
+Replace `ios` with `android` for the emulator. Keep the configured server running; restart an older server process to pick up network fault support. The QA app must trust the temporary local TLS CA; Android uses the app-only configuration below. Changing the channel selection copies the ZIP first, then atomically replaces only that platform's manifest. Nothing is publicly deployed. Pick a fresh output directory and a sequence base above the installed high-water value for each repeat run; the builder refuses to overwrite a previous fixture suite.
 
 `checks.json` records the source revision/index hash, marker, manifest, signature validity, actual archive hash validity, expiry, native compatibility and archive size for every platform/case. All 18 cases are independently checked with the pinned public key before the builder succeeds. RSA-PSS signatures and ZIP timestamps can differ between builds; scenario behavior, markers and sequence ordering are reproducible.
 
@@ -93,3 +93,40 @@ The [Android report](android-ota-round4.json) records 18 passing checks and watc
 128.551 seconds; a later cold launch retains the failed sequence without another ZIP request.
 No production release was promoted. Low-storage, binary-upgrade, older-OS and actual-device gates
 remain separate; these runs do not establish visual quality or physical-device performance.
+
+## Local TLS trust in Android QA builds
+
+Use the existing temporary public CA from the ignored test config. For the QA APK only, add a Debug
+manifest overlay selecting a temporary network-security resource. Its `domain-config` must name only
+`10.0.2.2`, disallow cleartext, and trust the bundled public CA resource. Do not alter host trust,
+emulator system trust, release configuration or native TLS verification. Keep all private key material
+outside the app and repository. The normal app must not contain the temporary certificate or resource.
+
+Freeze the QA APK, remove the temporary Debug manifest/XML/public-certificate sources, restore the normal
+web assets and rebuild the normal Debug APK. Inspect the QA manifest/resource and the normal manifest to
+verify the difference. Round10 first retained a real certificate-rejection preflight, then built the scoped
+trusted QA APK; no app data or system trust was reset. The parent verifies normal artifacts after cleanup.
+
+## Deterministic held download and failed-version reuse
+
+`setNetworkFixture` now accepts `hold` with an exact immutable ZIP path in that platform's channel.
+It returns a fresh `holdId` and local `statusPath`. Wait until the status file reports that same ID/path
+as `held` before preparing a fault. The server has received the GET but has not sent headers or bytes.
+Release with mode `release` and the matching `hold-id`; timeout is at most60 seconds and aborts the
+connection instead of sending data. Reset to `normal` in cleanup. Duplicate requests are rejected,
+and disconnect, cancellation and server shutdown retire the hold. This replaces a timing race; it does
+not itself prove the native download path or filesystem capacity.
+
+`republish` copies an existing valid fixture's exact ZIP and signs a higher sequence without changing
+its version, hash or URL. For example, round10 republishes `brokenStartup` as `brokenStartupRetry` at
+sequence100010, after the original100008. Prepare these variants serially before platform runners start,
+because they share `checks.json`. The installed app must fetch that manifest but refuse its ZIP when
+the failed version remains in the durable activation ledger, even after native metadata auto-deletion.
+
+The updated iOS runner is `scripts/native-ios-ota-retry.mjs`; the Android bounded fault runner is
+`scripts/native-android-ota-low-space.mjs`. They preserve existing app data. Android must correlate the
+real native temporary ZIP path, bounded full filesystem and updater syscall/error; a generic WorkManager
+retry is insufficient causal evidence. Keep independent plugin preflight separate from the updater's
+write. After testing, explicitly reset the native updater to builtin before reinstalling the normal app:
+same-version APK/app replacement alone can retain downloaded QA content. Verify disabled channels,
+no QA marker, preserved saves and no leftover test mounts/processes.

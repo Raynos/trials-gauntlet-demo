@@ -1,0 +1,775 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T11:58:55.656Z",
+  "finishedAt": "2026-09-21T12:02:20.512Z",
+  "pass": true,
+  "scope": "Installed Android signed OTA ZIP-write ENOSPC/retry and failed-start journal quarantine",
+  "runner": "scripts/native-android-ota-low-space.mjs",
+  "rawReport": ".native-build/android-ota-round10/report.json",
+  "environment": {
+    "avd": "trials_gauntlet_api36",
+    "serial": "emulator-5554",
+    "api": 36,
+    "headless": true,
+    "apkSha256": "ff22683c247a29d2ff4a04515ea5656ee3eee2a39ca074f729d8607a0cb149c1",
+    "sourceRevision": "2829cd2a",
+    "sequenceBase": 100000,
+    "trust": "Existing public QA CA in temporary Debug APK domain-config for10.0.2.2 only; no host/emulator trust mutation",
+    "identity": "uid=10213(u0_a213) gid=10213(u0_a213) groups=10213(u0_a213),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),1078(ext_data_rw),1079(ext_obb_rw),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid),3012(readtracefs),50213(all_a213) context=u:r:runas_app:s0:c213,c256,c512,c768",
+    "rootPath": "/data/data/com.trialsgauntlet.game/files",
+    "selinux": "Enforcing",
+    "appNamespace": "mnt:[4026533015]",
+    "initNamespace": "mnt:[4026532292]"
+  },
+  "cases": [
+    {
+      "name": "Healthy A activates and clears its acknowledged activation journal",
+      "pass": true
+    },
+    {
+      "name": "Private OTA target is distinct tmpfs capped at256KiB",
+      "pass": true
+    },
+    {
+      "name": "Real app UID can write isolated target before filling",
+      "pass": true
+    },
+    {
+      "name": "Bounded filesystem is full with kernel ENOSPC",
+      "pass": true
+    },
+    {
+      "name": "Real app ZIP target reports ENOSPC before server release",
+      "pass": true
+    },
+    {
+      "name": "Native ZIP ENOSPC leaves healthy bundle, saves and high-water unchanged",
+      "pass": true
+    },
+    {
+      "name": "Gameplay settings remain durable while only OTA storage is full",
+      "pass": true
+    },
+    {
+      "name": "Identical signed publication stages after removing ENOSPC",
+      "pass": true
+    },
+    {
+      "name": "Retried B activates at next launch with saved preference",
+      "pass": true
+    },
+    {
+      "name": "Native watchdog rolls back while failed version remains durably quarantined",
+      "pass": true
+    },
+    {
+      "name": "Higher-sequence reuse of failed startup is blocked before archive GET",
+      "pass": true
+    },
+    {
+      "name": "OTA failure and rollback preserve all non-update gameplay entries",
+      "pass": true
+    }
+  ],
+  "boundedFault": {
+    "capacityBytes": 262144,
+    "parent": {
+      "type": "ext3/4",
+      "capacityBytes": 10411143168,
+      "availableBytes": 8628060160,
+      "device": "65077"
+    },
+    "empty": {
+      "type": "tmpfs",
+      "capacityBytes": 262144,
+      "availableBytes": 262144,
+      "device": "1048613"
+    },
+    "full": {
+      "type": "tmpfs",
+      "capacityBytes": 262144,
+      "availableBytes": 0,
+      "device": "1048613"
+    },
+    "fillDiagnostic": "dd: /data/data/com.trialsgauntlet.game/files/native-ota-enospc-bda58beb/fill: write error: No space left on device\n65+0 records in\n64+0 records out\n262144 bytes (256 K) copied, 0.001 s, 250 M/s\n",
+    "redirect": {
+      "nativeId": "T5lGXuhefy",
+      "path": "temp_T5lGXuhefy.tmp",
+      "target": "native-ota-enospc-bda58beb/download.tmp",
+      "resolved": "/data/data/com.trialsgauntlet.game/files/native-ota-enospc-bda58beb/download.tmp"
+    },
+    "heldResponse": {
+      "status": "held",
+      "holdId": "e7d760fb-5207-4da2-abd2-43c6427b445d",
+      "platform": "android",
+      "path": "/android/13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84.zip",
+      "at": "2026-09-21T11:59:17.713Z"
+    },
+    "trace": {
+      "path": ".native-build/android-ota-round10/updater-write.strace",
+      "pid": "5098",
+      "maxSeconds": 30,
+      "stringBytes": 0,
+      "scope": "existing task app PID and threads only, attached after diagnostic and before held archive release"
+    },
+    "nativeEnospc": [
+      "[pid  5080] openat(AT_FDCWD, \"/data/user/0/com.trialsgauntlet.game/files/temp_T5lGXuhefy.tmp\", O_WRONLY|O_CREAT|O_TRUNC, 0666) = 215</data/data/com.trialsgauntlet.game/files/native-ota-enospc-bda58beb/download.tmp>",
+      "[pid  5080] write(215</data/data/com.trialsgauntlet.game/files/native-ota-enospc-bda58beb/download.tmp>, \"\"..., 7993) = -1 ENOSPC (No space left on device)"
+    ]
+  },
+  "savePreservation": {
+    "before": [
+      {
+        "generation": 24,
+        "slot": "b",
+        "sha256": "28f89fb74ff5b463c0f884c3514e644ac2803b8532a162894434c9240480e1a3",
+        "volume": "0.3",
+        "gameplayKeys": [
+          "trials.best.b1-first-ride@pro",
+          "trials.best.b1-first-ride@pro#board",
+          "trials.best.flat-test",
+          "trials.best.flat-test#board",
+          "trials.bikeClass",
+          "trials.fps",
+          "trials.ghost",
+          "trials.lastrun.b1-first-ride",
+          "trials.lastrun.flat-test",
+          "trials.lastTrack",
+          "trials.onboarded",
+          "trials.quality",
+          "trials.riderModel",
+          "trials.riderOutfit",
+          "trials.runlog",
+          "trials.sound",
+          "trials.volume"
+        ],
+        "gameplaySha256": "9d30dc56067a06878ac2f7fb24c2bfec355ba8923e53cf5e8ccddb246c8e414a"
+      },
+      {
+        "generation": 23,
+        "slot": "a",
+        "sha256": "773a1477db4a7d468ada4e90857f16a1df575536deeb3e83794104adb773260e",
+        "volume": "0.3",
+        "gameplayKeys": [
+          "trials.best.b1-first-ride@pro",
+          "trials.best.b1-first-ride@pro#board",
+          "trials.best.flat-test",
+          "trials.best.flat-test#board",
+          "trials.bikeClass",
+          "trials.fps",
+          "trials.ghost",
+          "trials.lastrun.b1-first-ride",
+          "trials.lastrun.flat-test",
+          "trials.lastTrack",
+          "trials.onboarded",
+          "trials.quality",
+          "trials.riderModel",
+          "trials.riderOutfit",
+          "trials.runlog",
+          "trials.sound",
+          "trials.volume"
+        ],
+        "gameplaySha256": "9d30dc56067a06878ac2f7fb24c2bfec355ba8923e53cf5e8ccddb246c8e414a"
+      }
+    ],
+    "afterFailedDownload": [
+      {
+        "generation": 24,
+        "slot": "b",
+        "sha256": "28f89fb74ff5b463c0f884c3514e644ac2803b8532a162894434c9240480e1a3",
+        "volume": "0.3",
+        "gameplayKeys": [
+          "trials.best.b1-first-ride@pro",
+          "trials.best.b1-first-ride@pro#board",
+          "trials.best.flat-test",
+          "trials.best.flat-test#board",
+          "trials.bikeClass",
+          "trials.fps",
+          "trials.ghost",
+          "trials.lastrun.b1-first-ride",
+          "trials.lastrun.flat-test",
+          "trials.lastTrack",
+          "trials.onboarded",
+          "trials.quality",
+          "trials.riderModel",
+          "trials.riderOutfit",
+          "trials.runlog",
+          "trials.sound",
+          "trials.volume"
+        ],
+        "gameplaySha256": "9d30dc56067a06878ac2f7fb24c2bfec355ba8923e53cf5e8ccddb246c8e414a"
+      },
+      {
+        "generation": 23,
+        "slot": "a",
+        "sha256": "773a1477db4a7d468ada4e90857f16a1df575536deeb3e83794104adb773260e",
+        "volume": "0.3",
+        "gameplayKeys": [
+          "trials.best.b1-first-ride@pro",
+          "trials.best.b1-first-ride@pro#board",
+          "trials.best.flat-test",
+          "trials.best.flat-test#board",
+          "trials.bikeClass",
+          "trials.fps",
+          "trials.ghost",
+          "trials.lastrun.b1-first-ride",
+          "trials.lastrun.flat-test",
+          "trials.lastTrack",
+          "trials.onboarded",
+          "trials.quality",
+          "trials.riderModel",
+          "trials.riderOutfit",
+          "trials.runlog",
+          "trials.sound",
+          "trials.volume"
+        ],
+        "gameplaySha256": "9d30dc56067a06878ac2f7fb24c2bfec355ba8923e53cf5e8ccddb246c8e414a"
+      }
+    ],
+    "successfulSaveWhileOtaFull": {
+      "generation": 25,
+      "slot": "a",
+      "sha256": "7f545f11579e89976f992dda77fd62e9024339a580d543773a9851ef6ce5216f",
+      "volume": "0.4",
+      "gameplayKeys": [
+        "trials.best.b1-first-ride@pro",
+        "trials.best.b1-first-ride@pro#board",
+        "trials.best.flat-test",
+        "trials.best.flat-test#board",
+        "trials.bikeClass",
+        "trials.fps",
+        "trials.ghost",
+        "trials.lastrun.b1-first-ride",
+        "trials.lastrun.flat-test",
+        "trials.lastTrack",
+        "trials.onboarded",
+        "trials.quality",
+        "trials.riderModel",
+        "trials.riderOutfit",
+        "trials.runlog",
+        "trials.sound",
+        "trials.volume"
+      ],
+      "gameplaySha256": "791d8f5bfe5b1b5ad1ee782aaa11610c06e0c1b2136f82ed433daf0b6891dd54"
+    },
+    "final": {
+      "generation": 32,
+      "slot": "b",
+      "sha256": "bdfe09f9c7310f4f22ae3f7a7bea36cfd33f7c2ea8c76b11b5e9be4ad37b79f1",
+      "volume": "0.4",
+      "gameplayKeys": [
+        "trials.best.b1-first-ride@pro",
+        "trials.best.b1-first-ride@pro#board",
+        "trials.best.flat-test",
+        "trials.best.flat-test#board",
+        "trials.bikeClass",
+        "trials.fps",
+        "trials.ghost",
+        "trials.lastrun.b1-first-ride",
+        "trials.lastrun.flat-test",
+        "trials.lastTrack",
+        "trials.onboarded",
+        "trials.quality",
+        "trials.riderModel",
+        "trials.riderOutfit",
+        "trials.runlog",
+        "trials.sound",
+        "trials.volume"
+      ],
+      "gameplaySha256": "791d8f5bfe5b1b5ad1ee782aaa11610c06e0c1b2136f82ed433daf0b6891dd54"
+    }
+  },
+  "updateState": {
+    "baseline": {
+      "current": {
+        "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+        "id": "aMgIxMQfqM",
+        "version": "1.0.100001-fixture-valida",
+        "downloaded": "2026-09-21T11:56:08.253+0000",
+        "status": "success"
+      },
+      "bundles": [
+        {
+          "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+          "id": "aMgIxMQfqM",
+          "version": "1.0.100001-fixture-valida",
+          "downloaded": "2026-09-21T11:56:08.253+0000",
+          "status": "success"
+        }
+      ],
+      "rawBundles": [
+        {
+          "checksum": "",
+          "id": "QmaOOuOw3q",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:57:05.641+0000",
+          "status": "error"
+        },
+        {
+          "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+          "id": "aMgIxMQfqM",
+          "version": "1.0.100001-fixture-valida",
+          "downloaded": "2026-09-21T11:56:08.253+0000",
+          "status": "success"
+        }
+      ],
+      "marker": "validA",
+      "ready": true,
+      "pending": null,
+      "sequence": "100001",
+      "activations": null,
+      "volume": "0.3",
+      "events": []
+    },
+    "failedDownload": {
+      "current": {
+        "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+        "id": "aMgIxMQfqM",
+        "version": "1.0.100001-fixture-valida",
+        "downloaded": "2026-09-21T11:56:08.253+0000",
+        "status": "success"
+      },
+      "bundles": [
+        {
+          "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+          "id": "aMgIxMQfqM",
+          "version": "1.0.100001-fixture-valida",
+          "downloaded": "2026-09-21T11:56:08.253+0000",
+          "status": "success"
+        }
+      ],
+      "rawBundles": [
+        {
+          "checksum": "",
+          "id": "QmaOOuOw3q",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:57:05.641+0000",
+          "status": "error"
+        },
+        {
+          "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+          "id": "aMgIxMQfqM",
+          "version": "1.0.100001-fixture-valida",
+          "downloaded": "2026-09-21T11:56:08.253+0000",
+          "status": "success"
+        },
+        {
+          "checksum": "",
+          "id": "T5lGXuhefy",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:16.356+0000",
+          "status": "downloading"
+        }
+      ],
+      "marker": "validA",
+      "ready": true,
+      "pending": null,
+      "sequence": "100001",
+      "activations": null,
+      "volume": "0.3",
+      "events": []
+    },
+    "identicalPublication": {
+      "before": {
+        "platform": "android",
+        "case": "validB",
+        "archiveOnly": false,
+        "manifestUrl": "https://10.0.2.2:8443/android/manifest.json",
+        "sequence": 100002,
+        "bundleId": "1.0.100002-fixture-validb",
+        "marker": "validB",
+        "url": "https://10.0.2.2:8443/android/13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84.zip",
+        "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84"
+      },
+      "retry": {
+        "platform": "android",
+        "case": "validB",
+        "archiveOnly": false,
+        "manifestUrl": "https://10.0.2.2:8443/android/manifest.json",
+        "sequence": 100002,
+        "bundleId": "1.0.100002-fixture-validb",
+        "marker": "validB",
+        "url": "https://10.0.2.2:8443/android/13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84.zip",
+        "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84"
+      }
+    },
+    "retried": {
+      "current": {
+        "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+        "id": "aMgIxMQfqM",
+        "version": "1.0.100001-fixture-valida",
+        "downloaded": "2026-09-21T11:56:08.253+0000",
+        "status": "success"
+      },
+      "bundles": [
+        {
+          "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+          "id": "aMgIxMQfqM",
+          "version": "1.0.100001-fixture-valida",
+          "downloaded": "2026-09-21T11:56:08.253+0000",
+          "status": "success"
+        },
+        {
+          "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+          "id": "JaxLhtUDLQ",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:32.284+0000",
+          "status": "pending"
+        }
+      ],
+      "rawBundles": [
+        {
+          "checksum": "",
+          "id": "QmaOOuOw3q",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:57:05.641+0000",
+          "status": "error"
+        },
+        {
+          "checksum": "d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660",
+          "id": "aMgIxMQfqM",
+          "version": "1.0.100001-fixture-valida",
+          "downloaded": "2026-09-21T11:56:08.253+0000",
+          "status": "success"
+        },
+        {
+          "checksum": "",
+          "id": "T5lGXuhefy",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:16.356+0000",
+          "status": "downloading"
+        },
+        {
+          "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+          "id": "JaxLhtUDLQ",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:32.284+0000",
+          "status": "pending"
+        }
+      ],
+      "marker": "validA",
+      "ready": true,
+      "pending": {
+        "id": "JaxLhtUDLQ",
+        "bundleId": "1.0.100002-fixture-validb",
+        "sequence": 100002
+      },
+      "sequence": "100002",
+      "activations": null,
+      "volume": "0.4",
+      "events": [
+        {
+          "event": "downloadComplete",
+          "data": {
+            "bundle": {
+              "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+              "id": "JaxLhtUDLQ",
+              "version": "1.0.100002-fixture-validb",
+              "downloaded": "2026-09-21T11:59:32.284+0000",
+              "status": "pending"
+            }
+          },
+          "at": 1789991972286
+        }
+      ]
+    },
+    "activeB": {
+      "current": {
+        "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+        "id": "JaxLhtUDLQ",
+        "version": "1.0.100002-fixture-validb",
+        "downloaded": "2026-09-21T11:59:32.284+0000",
+        "status": "success"
+      },
+      "bundles": [
+        {
+          "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+          "id": "JaxLhtUDLQ",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:32.284+0000",
+          "status": "success"
+        }
+      ],
+      "rawBundles": [
+        {
+          "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+          "id": "JaxLhtUDLQ",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:32.284+0000",
+          "status": "success"
+        },
+        {
+          "checksum": "",
+          "id": "QmaOOuOw3q",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:57:05.641+0000",
+          "status": "error"
+        },
+        {
+          "checksum": "",
+          "id": "T5lGXuhefy",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:16.356+0000",
+          "status": "downloading"
+        }
+      ],
+      "marker": "validB",
+      "ready": true,
+      "pending": null,
+      "sequence": "100002",
+      "activations": null,
+      "volume": "0.4",
+      "events": []
+    },
+    "recovered": {
+      "current": {
+        "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+        "id": "JaxLhtUDLQ",
+        "version": "1.0.100002-fixture-validb",
+        "downloaded": "2026-09-21T11:59:32.284+0000",
+        "status": "success"
+      },
+      "bundles": [
+        {
+          "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+          "id": "JaxLhtUDLQ",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:32.284+0000",
+          "status": "success"
+        }
+      ],
+      "rawBundles": [
+        {
+          "checksum": "",
+          "id": "QmaOOuOw3q",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:57:05.641+0000",
+          "status": "error"
+        },
+        {
+          "checksum": "",
+          "id": "T5lGXuhefy",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:16.356+0000",
+          "status": "downloading"
+        },
+        {
+          "checksum": "c15ff4d61c63dac78772c6e46e63bc95986a98ec189c3750d2b9e459cfa630fa",
+          "id": "NL8psMpTUK",
+          "version": "1.0.100008-fixture-brokenstartup",
+          "downloaded": "2026-09-21T11:59:55.012+0000",
+          "status": "deleted"
+        },
+        {
+          "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+          "id": "JaxLhtUDLQ",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:32.284+0000",
+          "status": "success"
+        }
+      ],
+      "marker": "validB",
+      "ready": true,
+      "pending": null,
+      "sequence": "100008",
+      "activations": "[{\"id\":\"NL8psMpTUK\",\"version\":\"1.0.100008-fixture-brokenstartup\"}]",
+      "volume": "0.4",
+      "events": []
+    },
+    "higherSequenceReuse": {
+      "fixture": {
+        "schema": 1,
+        "platform": "android",
+        "nativeMin": "1.0.0",
+        "nativeMax": "1.0.0",
+        "runtime": "native-v1",
+        "saveSchema": 1,
+        "bundleId": "1.0.100008-fixture-brokenstartup",
+        "sequence": 100010,
+        "expiresAt": "2026-09-23T11:51:17.688Z",
+        "url": "https://10.0.2.2:8443/android/c15ff4d61c63dac78772c6e46e63bc95986a98ec189c3750d2b9e459cfa630fa.zip",
+        "sha256": "c15ff4d61c63dac78772c6e46e63bc95986a98ec189c3750d2b9e459cfa630fa"
+      },
+      "snapshot": {
+        "current": {
+          "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+          "id": "JaxLhtUDLQ",
+          "version": "1.0.100002-fixture-validb",
+          "downloaded": "2026-09-21T11:59:32.284+0000",
+          "status": "success"
+        },
+        "bundles": [
+          {
+            "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+            "id": "JaxLhtUDLQ",
+            "version": "1.0.100002-fixture-validb",
+            "downloaded": "2026-09-21T11:59:32.284+0000",
+            "status": "success"
+          }
+        ],
+        "rawBundles": [
+          {
+            "checksum": "",
+            "id": "QmaOOuOw3q",
+            "version": "1.0.100002-fixture-validb",
+            "downloaded": "2026-09-21T11:57:05.641+0000",
+            "status": "error"
+          },
+          {
+            "checksum": "",
+            "id": "T5lGXuhefy",
+            "version": "1.0.100002-fixture-validb",
+            "downloaded": "2026-09-21T11:59:16.356+0000",
+            "status": "downloading"
+          },
+          {
+            "checksum": "c15ff4d61c63dac78772c6e46e63bc95986a98ec189c3750d2b9e459cfa630fa",
+            "id": "NL8psMpTUK",
+            "version": "1.0.100008-fixture-brokenstartup",
+            "downloaded": "2026-09-21T11:59:55.012+0000",
+            "status": "deleted"
+          },
+          {
+            "checksum": "13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84",
+            "id": "JaxLhtUDLQ",
+            "version": "1.0.100002-fixture-validb",
+            "downloaded": "2026-09-21T11:59:32.284+0000",
+            "status": "success"
+          }
+        ],
+        "marker": "validB",
+        "ready": true,
+        "pending": null,
+        "sequence": "100008",
+        "activations": "[{\"id\":\"NL8psMpTUK\",\"version\":\"1.0.100008-fixture-brokenstartup\"}]",
+        "volume": "0.4",
+        "events": []
+      },
+      "requests": [
+        {
+          "at": "2026-09-21T12:02:14.223Z",
+          "method": "GET",
+          "path": "/android/manifest.json"
+        }
+      ]
+    }
+  },
+  "watchdog": {
+    "configuredMs": 120000,
+    "failedAt": "2026-09-21T11:59:56.879Z",
+    "recoveryMs": 127513,
+    "durableActivationEntry": [
+      "trials.nativeUpdates.android.1.0.0.native-v1.activations",
+      "[{\"id\":\"NL8psMpTUK\",\"version\":\"1.0.100008-fixture-brokenstartup\"}]"
+    ]
+  },
+  "cleanup": {
+    "fault": {
+      "mounted": false,
+      "directoryCreated": false,
+      "tempLinked": false,
+      "keeperPid": null,
+      "tracerPid": null,
+      "traceExitCode": 0,
+      "selinux": "Enforcing",
+      "remainingFixture": false
+    },
+    "errors": [],
+    "restore": {
+      "apk": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "apkSha256": "1b089f3245913aad029463affa4012c4e55d84af50d9c793aaafbe428c662f7d",
+      "pass": true,
+      "restored": {
+        "ready": true,
+        "marker": null,
+        "online": false,
+        "current": {
+          "checksum": "",
+          "id": "builtin",
+          "version": "1.0.0",
+          "downloaded": "1970-01-01T00:00:00.000Z",
+          "status": "success"
+        },
+        "contract": {
+          "schema": 1,
+          "target": "native",
+          "runtime": "native-v1",
+          "saveSchema": 1,
+          "sourceRevision": "2829cd2a",
+          "production": false,
+          "channels": null,
+          "publicKeyFingerprint": null
+        }
+      },
+      "gameplayPreserved": true,
+      "deletions": [
+        {
+          "id": "QmaOOuOw3q",
+          "version": "1.0.100002-fixture-validb",
+          "result": "deleted"
+        },
+        {
+          "id": "T5lGXuhefy",
+          "version": "1.0.100002-fixture-validb",
+          "result": "deleted"
+        },
+        {
+          "id": "NL8psMpTUK",
+          "version": "1.0.100008-fixture-brokenstartup",
+          "result": "deleted"
+        },
+        {
+          "id": "JaxLhtUDLQ",
+          "version": "1.0.100002-fixture-validb",
+          "result": "deleted"
+        }
+      ],
+      "afterDelete": {
+        "bundles": []
+      },
+      "noTrustResource": true
+    },
+    "deviceStopped": true,
+    "audit": {
+      "remainingOwnedMounts": [],
+      "tracerOrKeeperProcesses": [],
+      "airplane": "1",
+      "wifi": "0",
+      "selinux": "Enforcing"
+    },
+    "emulatorProcess": {
+      "pid": 46689,
+      "execSession": 9541,
+      "exitCode": 0
+    },
+    "restorationAssessmentCorrection": {
+      "originalError": "TypeError: Cannot convert undefined or null to object\n    at Object.values (<anonymous>)\n    at file:///Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/android-ota-round10/restore.mjs:27:140",
+      "reason": "Normal native-build contract uses channels:null; original restoration predicate incorrectly applied Object.values(null). Read-only installed recheck proves disabledchannels/builtin/noQA/noresidualbundles."
+    },
+    "restoredNativeRegistryEmpty": true
+  },
+  "preflights": [
+    {
+      "report": ".native-build/android-ota-round10/preflight-avd-name.json",
+      "finding": "AVD emulator-console output includes CRLF; guard normalized first line before comparing. No install/fault injection occurred."
+    },
+    {
+      "report": ".native-build/android-ota-round10/preflight-untrusted-qa.json",
+      "finding": "First QA APK lacked existing local testCA trust; manifest fetch failed secure TLS verification. Parent rebuilt QA-only domain-scoped trust, preserved separate artifact and removed temporary source. No global trust changed."
+    },
+    {
+      "report": ".native-build/android-ota-round10/preflight-suppressed-debug-log.json",
+      "finding": "Bounded fault and WorkManager retry observed, but pinned updater logger suppresses debug cause. Instrument-free stockstrace added, verified -s0 omits write strings. Explicit resume-at-A rerun preserves data/high-water; direct updater ENOSPC is proven only by final trace."
+    }
+  ],
+  "limitations": [
+    "Task-owned API36 emulator and locally signed HTTPS fixtures; production hosting, physical devices and App Store distribution are not qualified.",
+    "This exhausts only a256KiB app-namespace tmpfs at the real OTA temporary ZIP path. Saves and active/fallback bundles remain on the original filesystem.",
+    "Android native ENOSPC is classified as a WorkManager retry, not necessarily terminal bundle error. Installed recovery and durable failed-start quarantine are separate assertions.",
+    "No direct native set/next/notifyAppReady calls; the real cold-launch controller stages and activates releases.",
+    "Stock strace attaches only task-app threads after separate Filesystem diagnostic and before held ZIP response release; exact target fd write reports -1ENOSPC. Root provisions/observes isolated fixture; application UID performs the updater write.",
+    "Downloaded ZIP extraction ENOSPC is not qualified by this ZIP-write case. Background-before-ready watchdog behavior and physical-device performance remain unqualified.",
+    "WorkManager retained raw downloading/error records after interrupted attempts; final cleanup resetsbuiltin and deletes only fixtures listed in the current localchecks.",
+    "No-request quarantine assertion covers six seconds after a real higher-sequence manifest GET. No parent motion judgment is claimed."
+  ]
+}

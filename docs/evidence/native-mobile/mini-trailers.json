@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "capturedAt": "2026-09-21T12:19:40.668437+00:00",
+  "scope": "Fresh installed normal debug app screen recordings. Synthetic ArrowUp input, normal real-time RAF physics/rendering; no manual stepping, no rebuild. Not physical device performance or store acceptance.",
+  "clips": [
+    {
+      "platform": "ios",
+      "path": ".native-build/trailers/ios-10s.mp4",
+      "sha256": "cd415a2e76ca0c347b0fa5e02ae633f6666030482a7bd3310614e92e638cbb63",
+      "source": ".native-build/trailers/ios-current-raw.mp4",
+      "sourceSha256": "e177396ae7a62c054be1fdad54475fa3205d99a7c172bb22045681c1d602da56",
+      "sourceOffsetSeconds": 10.392,
+      "contract": {
+        "channels": null,
+        "production": false,
+        "publicKeyFingerprint": null,
+        "runtime": "native-v1",
+        "saveSchema": 1,
+        "schema": 1,
+        "sourceRevision": "2829cd2a",
+        "target": "native"
+      },
+      "track": "b1-first-ride",
+      "media": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 588,
+            "nb_frames": "300"
+          }
+        ],
+        "format": {
+          "duration": "10.000000",
+          "size": "7646617"
+        }
+      },
+      "decodePass": true,
+      "uniqueDecodedFrames": 300,
+      "startX": 0.5908890398095096,
+      "endX": 158.31845857583616,
+      "endPhase": "riding",
+      "faults": 0,
+      "storageChangedKeys": [
+        "CapacitorUpdater.webViewSession"
+      ],
+      "existingPersonalBestsAndPreferencesPreserved": true,
+      "notes": "iOS rotated upright and resized; Android original dimensions; no fabricated frames or audio. Frame/contact-sheet sampling used to select excerpt; parent must judge played clips."
+    },
+    {
+      "platform": "android",
+      "path": ".native-build/trailers/android-10s.mp4",
+      "sha256": "2ff98009d631489620737f08788290efd36cf435fcdbc011074190a2f557083c",
+      "source": ".native-build/trailers/android-current-raw.mp4",
+      "sourceSha256": "31ba5127939bc997b49d4d618d9a53f6199e0567e8600ab73a58ced0b1a5a385",
+      "sourceOffsetSeconds": 3.8,
+      "contract": {
+        "schema": 1,
+        "target": "native",
+        "runtime": "native-v1",
+        "saveSchema": 1,
+        "sourceRevision": "2829cd2a",
+        "production": false,
+        "channels": null,
+        "publicKeyFingerprint": null
+      },
+      "track": "flat-test",
+      "media": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 720,
+            "nb_frames": "300"
+          }
+        ],
+        "format": {
+          "duration": "10.000000",
+          "size": "4267634"
+        }
+      },
+      "decodePass": true,
+      "uniqueDecodedFrames": 300,
+      "startX": 0.5910519260802951,
+      "endX": 151.3819189784481,
+      "endPhase": "finished",
+      "faults": 0,
+      "storageChangedKeys": [
+        "CapacitorUpdater.webViewSession",
+        "trials.best.flat-test@pro",
+        "trials.best.flat-test@pro#board",
+        "trials.lastrun.flat-test",
+        "trials.runlog"
+      ],
+      "existingPersonalBestsAndPreferencesPreserved": true,
+      "notes": "iOS rotated upright and resized; Android original dimensions; no fabricated frames or audio. Frame/contact-sheet sampling used to select excerpt; parent must judge played clips."
+    }
+  ],
+  "cleanup": {
+    "taskIPhone16Pro": "Shutdown",
+    "taskAndroidEmulator": "stopped; adb devices empty",
+    "userDevices": "untouched",
+    "sourceAppRebuilt": false,
+    "storage": "No data reset or manual save rewrite; existing PBs/preferences retained. Android earned a new flat-test Pro PB/run entry during recording."
+  }
+}

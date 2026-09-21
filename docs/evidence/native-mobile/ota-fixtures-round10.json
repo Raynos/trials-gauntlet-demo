@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "round": 10,
+  "status": "Local fixture infrastructure verified; installed updater outcomes belong to the separate device reports.",
+  "paths": [
+    "scripts/native-ota-test.mjs",
+    "scripts/native-ota-fixtures.mjs",
+    "scripts/native-ota-fixtures.test.mjs"
+  ],
+  "holdProtocol": {
+    "setup": "setNetworkFixture({config, platform, mode:'hold', path:new URL(selected.url).pathname}) returns holdId and statusPath; timeout-ms defaults to60000 and cannot exceed60000.",
+    "acknowledgement": "Read statusPath until its holdId matches and status is held. The server has received the exact immutable ZIP GET but has sent no response headers or body. Native disk-space preflight has completed before this request; device runners must independently establish the native target path before modifying it.",
+    "release": "setNetworkFixture({config, platform, mode:'release', 'hold-id':holdId}) releases only the matching gate. Per-platform control files isolate iOS and Android.",
+    "termination": "Deadline aborts the connection; normal/replaced/missing control cancels; client disconnect aborts; SIGTERM/SIGINT stops pending responses and server connections. The helper does not automatically send data when the deadline expires.",
+    "guards": "Exact selected-platform path and64hex.zip required, hold UUID and timeout validated, duplicate/consumed hold requests return409, control/status files cannot be fetched over HTTP. Server ignores caller-supplied statusPath and constructs its own local path.",
+    "remaining": "The25ms control-file poll detects an explicit release; it is not a sleep-based race with native path creation. Device code must finish preparation within the bounded request window or abort/retry safely. Extraction holds still require debugger coordination and are not implemented by this HTTP gate."
+  },
+  "republishProtocol": {
+    "command": "node scripts/native-ota-fixtures.mjs republish --config .native-build/ota-test-config.json --out .native-build/ota-fixtures-round10 --platform ios --case brokenStartup --sequence 100010",
+    "behavior": "Copies the existing valid archive without repackaging and signs a higher sequence while preserving bundle version, hash and URL. Appends brokenStartupRetry to the local checks report. Rejects invalid signature/hash/expiry/native bounds, remote or mismatched channels, non-increasing sequence and unsafe/duplicate destination names.",
+    "concurrency": "Create republications serially because the fixture checks report is shared; both round10 platform variants were created before device selection began."
+  },
+  "verification": {
+    "commands": [
+      "NATIVE_OTA_TEST_CONFIG=.native-build/ota-test-config.json node --test scripts/native-ota-fixtures.test.mjs",
+      "pnpm exec eslint scripts/native-ota-test.mjs scripts/native-ota-fixtures.mjs scripts/native-ota-fixtures.test.mjs",
+      "git diff --check"
+    ],
+    "result": "Two node:test cases pass, focused lint and diff check pass.",
+    "assertions": [
+      "All original signed fixture cases preserve source build and produce expected independent signature/hash/expiry/compatibility results.",
+      "Higher-sequence retry has exactly equal archive bytes, bundle version and hash; lower sequence, path traversal and corrupt source are rejected.",
+      "HTTPS interrupted transfer rejects, delayed transfer waits, normal transfer returns full bytes, manifests remain available and controls are hidden.",
+      "Held GET has no response headers; explicit matching release returns complete100000-byte fixture; duplicate GET returns409 and wrong release ID is rejected.",
+      "Wrong platform path and timeout above60000 are rejected;100ms test deadline aborts instead of delivering the ZIP.",
+      "Client disconnect, normal-mode cancellation and server shutdown settle the corresponding status and close pending requests."
+    ],
+    "rawLog": ".native-build/ota-fixture-tests-round10.log",
+    "testScope": "Temporary local fixtures and an ephemeral loopback HTTPS port only. Existing ignored QA signing/TLS material reused, no setup command or trust changes. Existing wrong-signature fixture generation uses a transient in-memory wrong signer. No test runner changes app/device files."
+  },
+  "round10Artifacts": {
+    "input": ".native-build/ota-dist-round10",
+    "sourceRevision": "2829cd2a",
+    "inputIndexSha256": "89ac720a6514e63f38cff96293630f1d4d598cf05c330c08cd829bc6c1fba7a7",
+    "fixtures": ".native-build/ota-fixtures-round10/checks.json",
+    "fixtureCount": 20,
+    "sequenceBase": 100000,
+    "initialChannels": "validA at sequence100001 on each platform, network normal; subsequent device runners own their platform selections.",
+    "brokenStartup": {
+      "bundleId": "1.0.100008-fixture-brokenstartup",
+      "originalSequence": 100008,
+      "retrySequence": 100010,
+      "iosSha256": "2b6a491a32e1ad7a4a5a399de13f049b22b0f6758fb99ef0a617f79d21640801",
+      "androidSha256": "c15ff4d61c63dac78772c6e46e63bc95986a98ec189c3750d2b9e459cfa630fa",
+      "archiveBytesEach": 36112580
+    },
+    "server": "Task-owned loopback127.0.0.1:8443, raw log .native-build/ota-server-round10.log. Parent coordinates shutdown after both platform runs. No remote publication.",
+    "security": "Private keys, TLS configuration, certificates, public fixture archives and server logs remain ignored/outside version control. No production keys or channels were created."
+  }
+}

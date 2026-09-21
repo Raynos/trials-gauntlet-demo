@@ -16,6 +16,14 @@ change the installed apps.
 | iOS / Android app, eligible web-game update | App checks its signed channel after a healthy boot, downloads a verified ZIP, and activates it on a later game start | Complete installed bundle remains available; a network failure does not stop play |
 | iOS / Android app, native or policy-ineligible change | Publish a new signed binary through the store | New binary includes a complete game bundle |
 
+## First private store beta
+
+Follow [the private testing path](../plans/NATIVE_MOBILE_PUBLISHING.md#next-milestone-private-store-installs):
+TestFlight internal testing and Google Play internal testing. Uploads are authorized; account access,
+permanent IDs and signing remain prerequisites. The first private beta can use bundled assets with OTA
+disabled, followed by production OTA setup before public release. Native Release signing is separate
+from the web build's `NATIVE_RELEASE` flag. The simulator app and debug APK are development artifacts.
+
 ## Build
 
 Use Node ≥22, the pinned pnpm lockfile, Xcode26+ on macOS, and Android SDK36 with Java21.

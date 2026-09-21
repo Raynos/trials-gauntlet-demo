@@ -1,10 +1,57 @@
 # Publish the TypeScript / Three.js game on iOS and Android
 
-Status: **in build; autonomous implementation authorized**. Ask 72; branch `docs/native-mobile-publishing`.
+Status: **implementation built; release qualification incomplete; pause requested after round10 commit**. Ask 72; branch `docs/native-mobile-publishing`.
 Repository baseline: `7784f731`, package version `0.3.2`. Research checked **2026-09-21**.
 Ask 72 delivered the plan; ask 73 authorized autonomous implementation. Scope confirmed iOS/Android only. Parent owns integration and acceptance.
 
 **User decisions:** personal publisher accounts; free with no ads or in-app purchases; eligible remote updates included in the first release. Account access, final identifiers and actual-device/store review remain release prerequisites.
+
+**Wrap-up checkpoint — round10:** core wrappers, offline assets, lifecycle, durable saves and signed
+remote-update implementation are built. Installed updater recovery passes9 iOS cases and12 Android
+checks, including Android ZIP-write ENOSPC. This is not a completed store release. Remaining work:
+iOS OTA low-space and both platforms' extraction/background-before-readiness cases; remaining simulator,
+older-runtime and physical-device qualification; production update hosting/keys; final signing, store
+metadata/privacy/support details and submission through the user's personal accounts (HR-14). The user
+requested wrapping up with28% usage remaining and explicitly chose pause after the checkpoint commit.
+Do not start another test cycle until the user resumes the goal. Subsequent requests authorized fresh
+10-second gameplay captures and private store uploads. Both current-source clips are available under
+`.native-build/trailers/`; [capture provenance](../evidence/native-mobile/mini-trailers.json) records
+zero-fault riding, Android finish, saved-state checks and device cleanup. These are simulator debug
+builds; motion quality still needs human review.
+
+## Next milestone: private store installs
+
+The user authorized private test uploads (ask 90). Prioritize a store-installed build on their own
+iPhone and Android phone before extending the simulator edge-case matrix. Public-release gates remain.
+
+1. Confirm personal Apple Developer Program / Google Play Console enrollment and access, plus permanent
+   app name and identifiers. Current development values: Trials Gauntlet / `com.trialsgauntlet.game`.
+2. iOS: configure the Apple team and distribution signing, create the App Store Connect record,
+   archive a native Release build for physical iOS devices, upload, complete export-compliance
+   information, and assign the processed build to an internal TestFlight group containing the owner.
+   Install through TestFlight. The simulator app cannot be uploaded.
+3. Android: configure an upload key outside this repository, build and verify a signed Release AAB,
+   create the Play Console record and configure Play App Signing, release to internal testing,
+   add the owner's Google account and deliver the opt-in link for installation through Play.
+4. Recommended first private beta: the complete bundled game with OTA disabled, matching the tested
+   normal configuration. Build native Release binaries from those assets; no debug artifacts or QA
+   fixture channels. Use the ordinary native web build for this beta; `build:native:release`
+   intentionally requires production OTA configuration. Native Release signing is separate.
+5. After manual phone testing, finish production OTA channels/keys, qualification and public-store
+   metadata/review. Eligible OTA remains required for the first public release. Enabling channels in
+   an OTA-disabled beta will require a later signed binary.
+
+Upload preflight (2026-09-21): zero valid Apple signing identities, no Apple team in the project,
+and no Android release signing configuration. Account access and final identifiers are unconfirmed.
+No store upload has occurred. The broader development goal pauses after the checkpoint commit;
+requested private uploads can proceed when the missing setup is supplied, without another lab round.
+
+Apple supports [internal TestFlight groups](https://developer.apple.com/help/app-store-connect/test-a-beta-version/add-internal-testers)
+for App Store Connect users with app access. Google's [internal testing instructions](https://support.google.com/googleplay/android-developer/answer/9845334?hl=en)
+cover tester lists and opt-in links. For personal accounts created after November 13, 2023, the
+12-testers-for-14-days closed-test requirement gates production access, not this initial internal beta
+([Google requirements](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en)).
+Enrollment, verification and processing affect timing; no completion time is promised.
 
 ## Recommendation and the update answer
 
@@ -299,6 +346,27 @@ restart takes0.9ms plus49.1ms redraw. All original misses remain in evidence. Th
 sample is below the local100ms probe threshold, but does not prove physical-device restart p95≤33ms
 or sustained frame rate. Native recordings remain unjudged in motion.
 
+Round10 tests the changed updater in installed apps. The [iOS suite](../evidence/native-mobile/ios-ota-round10.json)
+passes9/9: real interrupted-transfer retry with the same publication, healthy journal creation/clearing,
+130.827-second foreground watchdog recovery, durable quarantine after native failed-bundle metadata
+deletion, and rejection of the same failed version at higher sequence100010 before a ZIP request.
+Saved progress/preferences remain intact and the normal disabled-channel app is restored.
+
+The [Android suite](../evidence/native-mobile/android-ota-round10.json) passes12/12, including real
+native ZIP-write ENOSPC on an isolated256KiB filesystem. A bounded syscall trace identifies the native
+temporary ZIP descriptor and `write = -1 ENOSPC`; an independent plugin preflight is recorded separately.
+Committed save bytes, active A and sequence stay unchanged, and normal Settings can still commit while
+the OTA target is full. Removing the fault lets the identical publication stage and activate B. The
+foreground watchdog restores B after127.513 seconds and the durable journal blocks higher-sequence reuse.
+This tests ZIP download storage, not extraction or whole-device pressure. QA trust is limited to the
+Android Debug app's local test domain; normal artifacts have no test trust configuration.
+
+Local [fixture controls](../evidence/native-mobile/ota-fixtures-round10.json) now hold a precise ZIP GET
+until explicit release, with a60-second maximum, and can re-sign unchanged bytes/version at a higher
+sequence. Real installed tests still do not qualify iOS OTA ENOSPC, either platform's extraction ENOSPC,
+backgrounding an unacknowledged startup past its watchdog deadline, production hosting, older runtimes
+or physical devices. Those gates remain open; do not infer them from foreground rollback.
+
 ### P0 — Freeze scope and build requirements
 
 - [ ] Record publisher identity, permanent bundle/application IDs, countries, device support and distribution
@@ -402,7 +470,8 @@ game build/source SHA), and **save/physics schema versions**. Track all three in
    acknowledges a healthy boot; keep failed versions blocked even after native cleanup or higher-sequence
    republication. A bounded 32-entry ledger fails closed for further updates when full or malformed.
    Transfer errors remain retryable without changing the signed publication. This distinction has unit
-   coverage; installed low-space OTA and final watchdog regression checks remain open. Historical
+   and installed retry/foreground-watchdog coverage on both platforms, including Android ZIP-write
+   ENOSPC. iOS low-space, extraction and background-before-readiness checks remain open. Historical
    development builds predate the ledger; no production native app has shipped yet.
 6. Confirm health after the real boot reaches a usable menu and the runtime assets load. If boot never acknowledges readiness, automatically revert; do not mistake a user backgrounding the app for a failed boot.
 7. Promote beta → limited cohort → stable; stop/revert promotion on failures. An offline device cannot receive

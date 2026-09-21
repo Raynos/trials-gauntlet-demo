@@ -1,0 +1,2117 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T11:52:45.949Z",
+  "device": {
+    "udid": "F3058DD5-DCB6-4D86-93CC-6E56A785B788",
+    "name": "trials-iphone",
+    "runtime": "iOS Simulator 26.5"
+  },
+  "sourceRevision": "2829cd2a",
+  "fixtureSha256": "a482152ef0e3758b1c8efc90b4bb712947d2cb93d46cdc74c48b35c8460aba2e",
+  "installed": {
+    "contract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "2829cd2a",
+      "production": false,
+      "channels": {
+        "ios": "https://localhost:8443/ios/manifest.json",
+        "android": "https://10.0.2.2:8443/android/manifest.json"
+      },
+      "publicKeyFingerprint": "f2f09ab5bbef83826c8c99d219bd01a2a01a460e7fa81c3118fba3b8996992e5"
+    },
+    "indexSha256": "89ac720a6514e63f38cff96293630f1d4d598cf05c330c08cd829bc6c1fba7a7",
+    "executableSha256": "15be6a773ae163c9c12205d7484fb3758625df58d13087dc139a3b8640c8594a",
+    "debugLibrarySha256": "d6ce2194cc4b0e380b66139e57471f4412a6796860370e3e9cea9f1e7b34fff3",
+    "nativeConfigSha256": "75dd0da9fed37ca58c261cfb8583d9362bed076771d3b5b2f87b731889e64c40"
+  },
+  "channel": "https://localhost:8443/ios/manifest.json",
+  "namespace": "trials.nativeUpdates.ios.1.0.0.native-v1",
+  "steps": [
+    {
+      "name": "baseline",
+      "startedAt": "2026-09-21T11:52:45.951Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "b",
+          "generation": 14,
+          "at": 1789991565978,
+          "sequence": 0,
+          "activations": [],
+          "rawSha256": "fc75606f46a2ec58a7b8bf00d6bc723eb827b21176f25c6262df06449152c2b8"
+        },
+        {
+          "slot": "a",
+          "generation": 15,
+          "at": 1789991573752,
+          "sequence": 0,
+          "activations": [],
+          "rawSha256": "df269db0a04e6eb7e025270c476bf802bdfce7687672b04acc84834a6d5dbe1e"
+        },
+        {
+          "slot": "b",
+          "generation": 16,
+          "at": 1789991575567,
+          "sequence": 0,
+          "activations": [],
+          "rawSha256": "799c10c37e201d7e499b4e11397e247581c8688be59fee414d613e2ef68cf911"
+        },
+        {
+          "slot": "a",
+          "generation": 17,
+          "at": 1789991577367,
+          "sequence": 0,
+          "activations": [],
+          "rawSha256": "59894aa9b962a7c3be3ba06d2e464a783dd2a3590376e1add774dcb0b3f1b91a"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 14611,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:52:53.132Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [],
+          "bundles": [],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "",
+            "downloaded": "1970-01-01T00:00:00.000Z",
+            "id": "builtin",
+            "status": "success",
+            "version": "1.0.0"
+          },
+          "durable": {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 17,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "rawSha256": "59894aa9b962a7c3be3ba06d2e464a783dd2a3590376e1add774dcb0b3f1b91a",
+            "sequence": 0,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": null,
+          "origin": "capacitor://localhost",
+          "pending": null,
+          "ready": true,
+          "screen": "menu",
+          "sequence": 0,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 17,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "59894aa9b962a7c3be3ba06d2e464a783dd2a3590376e1add774dcb0b3f1b91a",
+              "sequence": 0,
+              "valid": true
+            },
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "44d2e675ba18748c65e500a962473b12548d31cfadaaa92c9e65a3a52f844f62",
+                "sound": "0",
+                "volume": "0.6"
+              },
+              "generation": 16,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "rawSha256": "799c10c37e201d7e499b4e11397e247581c8688be59fee414d613e2ef68cf911",
+              "sequence": 0,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "clear": {
+          "faults": 0,
+          "hash": "f0549ee508d870ed",
+          "phase": "finished",
+          "time": 37.96666666666667
+        },
+        "probeAt": 1789991579862,
+        "token": "541a55f7-0804-4f50-9185-75b3e4a95105"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/baseline.log",
+      "finishedAt": "2026-09-21T11:53:00.589Z"
+    },
+    {
+      "name": "stageA",
+      "startedAt": "2026-09-21T11:53:00.589Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "a",
+          "generation": 17,
+          "at": 1789991580606,
+          "sequence": 0,
+          "activations": [],
+          "rawSha256": "59894aa9b962a7c3be3ba06d2e464a783dd2a3590376e1add774dcb0b3f1b91a"
+        },
+        {
+          "slot": "b",
+          "generation": 18,
+          "at": 1789991588001,
+          "sequence": 100001,
+          "activations": [],
+          "rawSha256": "2ba8d32d7523b9932586be6a630086379ec175a5c6d1594eff327094ca732669"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 8644,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:53:07.696Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:53:07.729Z",
+          "method": "GET",
+          "path": "/ios/a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd.zip"
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [],
+          "bundles": [
+            {
+              "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+              "downloaded": "2026-09-21T11:53:07.970Z",
+              "id": "y8tRPSd7yA",
+              "status": "pending",
+              "version": "1.0.100001-fixture-valida"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "",
+            "downloaded": "1970-01-01T00:00:00.000Z",
+            "id": "builtin",
+            "status": "success",
+            "version": "1.0.0"
+          },
+          "durable": {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 18,
+            "name": "trials-save-b.json",
+            "pending": {
+              "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+              "id": "y8tRPSd7yA",
+              "sequence": 100001,
+              "version": "1.0.100001-fixture-valida"
+            },
+            "rawSha256": "2ba8d32d7523b9932586be6a630086379ec175a5c6d1594eff327094ca732669",
+            "sequence": 100001,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": null,
+          "origin": "capacitor://localhost",
+          "pending": {
+            "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+            "id": "y8tRPSd7yA",
+            "sequence": 100001,
+            "version": "1.0.100001-fixture-valida"
+          },
+          "ready": true,
+          "screen": "menu",
+          "sequence": 100001,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 17,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "59894aa9b962a7c3be3ba06d2e464a783dd2a3590376e1add774dcb0b3f1b91a",
+              "sequence": 0,
+              "valid": true
+            },
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 18,
+              "name": "trials-save-b.json",
+              "pending": {
+                "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+                "id": "y8tRPSd7yA",
+                "sequence": 100001,
+                "version": "1.0.100001-fixture-valida"
+              },
+              "rawSha256": "2ba8d32d7523b9932586be6a630086379ec175a5c6d1594eff327094ca732669",
+              "sequence": 100001,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789991588808,
+        "token": "4073ab1b-2db2-45be-aad5-8faa8e65e002"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/stageA.log",
+      "finishedAt": "2026-09-21T11:53:09.250Z"
+    },
+    {
+      "name": "activateA",
+      "startedAt": "2026-09-21T11:53:09.251Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "b",
+          "generation": 18,
+          "at": 1789991589268,
+          "sequence": 100001,
+          "activations": [],
+          "rawSha256": "2ba8d32d7523b9932586be6a630086379ec175a5c6d1594eff327094ca732669"
+        },
+        {
+          "slot": "b",
+          "generation": 20,
+          "at": 1789991590647,
+          "sequence": 100001,
+          "activations": [
+            {
+              "id": "y8tRPSd7yA",
+              "version": "1.0.100001-fixture-valida"
+            }
+          ],
+          "rawSha256": "31b417b89d31c2d99612e18198e3a42b6aa487bef785697f03af4c984fef2f95"
+        },
+        {
+          "slot": "a",
+          "generation": 21,
+          "at": 1789991597279,
+          "sequence": 100001,
+          "activations": [],
+          "rawSha256": "5d11f8f95fac7a082bae2834c8602061d0888d05bccb1b77077234f3bedaf3d6"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 10669,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:53:17.290Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [],
+          "bundles": [
+            {
+              "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+              "downloaded": "2026-09-21T11:53:07.970Z",
+              "id": "y8tRPSd7yA",
+              "status": "success",
+              "version": "1.0.100001-fixture-valida"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+            "downloaded": "2026-09-21T11:53:07.970Z",
+            "id": "y8tRPSd7yA",
+            "status": "success",
+            "version": "1.0.100001-fixture-valida"
+          },
+          "durable": {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 21,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "rawSha256": "5d11f8f95fac7a082bae2834c8602061d0888d05bccb1b77077234f3bedaf3d6",
+            "sequence": 100001,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": "validA",
+          "origin": "capacitor://localhost",
+          "pending": null,
+          "ready": true,
+          "screen": "menu",
+          "sequence": 100001,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 21,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "5d11f8f95fac7a082bae2834c8602061d0888d05bccb1b77077234f3bedaf3d6",
+              "sequence": 100001,
+              "valid": true
+            },
+            {
+              "activations": [
+                {
+                  "id": "y8tRPSd7yA",
+                  "version": "1.0.100001-fixture-valida"
+                }
+              ],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 20,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "rawSha256": "31b417b89d31c2d99612e18198e3a42b6aa487bef785697f03af4c984fef2f95",
+              "sequence": 100001,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789991599380,
+        "token": "f6d964fe-9d49-416f-8001-10ecbfebded4"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/activateA.log",
+      "finishedAt": "2026-09-21T11:53:19.938Z"
+    },
+    {
+      "name": "interruptB",
+      "startedAt": "2026-09-21T11:53:19.938Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "a",
+          "generation": 21,
+          "at": 1789991599954,
+          "sequence": 100001,
+          "activations": [],
+          "rawSha256": "5d11f8f95fac7a082bae2834c8602061d0888d05bccb1b77077234f3bedaf3d6"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 37711,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:53:26.815Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:53:26.840Z",
+          "method": "GET",
+          "path": "/ios/f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43.zip"
+        },
+        {
+          "fault": "interrupt",
+          "path": "/ios/f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43.zip",
+          "afterBytes": 32768
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [],
+          "bundles": [
+            {
+              "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+              "downloaded": "2026-09-21T11:53:07.970Z",
+              "id": "y8tRPSd7yA",
+              "status": "success",
+              "version": "1.0.100001-fixture-valida"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+            "downloaded": "2026-09-21T11:53:07.970Z",
+            "id": "y8tRPSd7yA",
+            "status": "success",
+            "version": "1.0.100001-fixture-valida"
+          },
+          "durable": {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 21,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "rawSha256": "5d11f8f95fac7a082bae2834c8602061d0888d05bccb1b77077234f3bedaf3d6",
+            "sequence": 100001,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": "validA",
+          "origin": "capacitor://localhost",
+          "pending": null,
+          "ready": true,
+          "screen": "menu",
+          "sequence": 100001,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 21,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "5d11f8f95fac7a082bae2834c8602061d0888d05bccb1b77077234f3bedaf3d6",
+              "sequence": 100001,
+              "valid": true
+            },
+            {
+              "activations": [
+                {
+                  "id": "y8tRPSd7yA",
+                  "version": "1.0.100001-fixture-valida"
+                }
+              ],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 20,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "rawSha256": "31b417b89d31c2d99612e18198e3a42b6aa487bef785697f03af4c984fef2f95",
+              "sequence": 100001,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789991637107,
+        "token": "5b89e59a-5399-4338-ae17-b049085d20c2"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/interruptB.log",
+      "finishedAt": "2026-09-21T11:53:57.665Z"
+    },
+    {
+      "name": "retrySamePublicationB",
+      "startedAt": "2026-09-21T11:53:57.665Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "a",
+          "generation": 21,
+          "at": 1789991637683,
+          "sequence": 100001,
+          "activations": [],
+          "rawSha256": "5d11f8f95fac7a082bae2834c8602061d0888d05bccb1b77077234f3bedaf3d6"
+        },
+        {
+          "slot": "b",
+          "generation": 22,
+          "at": 1789991644668,
+          "sequence": 100002,
+          "activations": [],
+          "rawSha256": "73437f67652ae6272f9799569a8bbc4cc199104dda483fa6191df12946aba752"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 8631,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:54:04.394Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:54:04.418Z",
+          "method": "GET",
+          "path": "/ios/f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43.zip"
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [],
+          "bundles": [
+            {
+              "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+              "downloaded": "2026-09-21T11:54:04.648Z",
+              "id": "7hsiwAX9DN",
+              "status": "pending",
+              "version": "1.0.100002-fixture-validb"
+            },
+            {
+              "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+              "downloaded": "2026-09-21T11:53:07.970Z",
+              "id": "y8tRPSd7yA",
+              "status": "success",
+              "version": "1.0.100001-fixture-valida"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "a4d8b99ddf400c34ac93d23b05476c5933e1b660820ec196b279edcf4565a0cd",
+            "downloaded": "2026-09-21T11:53:07.970Z",
+            "id": "y8tRPSd7yA",
+            "status": "success",
+            "version": "1.0.100001-fixture-valida"
+          },
+          "durable": {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 22,
+            "name": "trials-save-b.json",
+            "pending": {
+              "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+              "id": "7hsiwAX9DN",
+              "sequence": 100002,
+              "version": "1.0.100002-fixture-validb"
+            },
+            "rawSha256": "73437f67652ae6272f9799569a8bbc4cc199104dda483fa6191df12946aba752",
+            "sequence": 100002,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": "validA",
+          "origin": "capacitor://localhost",
+          "pending": {
+            "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+            "id": "7hsiwAX9DN",
+            "sequence": 100002,
+            "version": "1.0.100002-fixture-validb"
+          },
+          "ready": true,
+          "screen": "menu",
+          "sequence": 100002,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 21,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "5d11f8f95fac7a082bae2834c8602061d0888d05bccb1b77077234f3bedaf3d6",
+              "sequence": 100001,
+              "valid": true
+            },
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 22,
+              "name": "trials-save-b.json",
+              "pending": {
+                "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+                "id": "7hsiwAX9DN",
+                "sequence": 100002,
+                "version": "1.0.100002-fixture-validb"
+              },
+              "rawSha256": "73437f67652ae6272f9799569a8bbc4cc199104dda483fa6191df12946aba752",
+              "sequence": 100002,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789991645501,
+        "token": "ba175243-3976-45e9-a1c6-8d81f065e328"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/retrySamePublicationB.log",
+      "finishedAt": "2026-09-21T11:54:06.313Z"
+    },
+    {
+      "name": "activateB",
+      "startedAt": "2026-09-21T11:54:06.314Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "b",
+          "generation": 22,
+          "at": 1789991646330,
+          "sequence": 100002,
+          "activations": [],
+          "rawSha256": "73437f67652ae6272f9799569a8bbc4cc199104dda483fa6191df12946aba752"
+        },
+        {
+          "slot": "b",
+          "generation": 24,
+          "at": 1789991647592,
+          "sequence": 100002,
+          "activations": [
+            {
+              "id": "7hsiwAX9DN",
+              "version": "1.0.100002-fixture-validb"
+            }
+          ],
+          "rawSha256": "1b3aff948c6b4c02c7e73a2eebd125b0b9bc12c106dc4aaa6bd249f2d1d6f402"
+        },
+        {
+          "slot": "a",
+          "generation": 25,
+          "at": 1789991653097,
+          "sequence": 100002,
+          "activations": [],
+          "rawSha256": "23d9395f15430cf1ffb9c418a1d5ee5b69b9568de0619e9f9934df515977c147"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 9624,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:54:13.114Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [],
+          "bundles": [
+            {
+              "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+              "downloaded": "2026-09-21T11:54:04.648Z",
+              "id": "7hsiwAX9DN",
+              "status": "success",
+              "version": "1.0.100002-fixture-validb"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+            "downloaded": "2026-09-21T11:54:04.648Z",
+            "id": "7hsiwAX9DN",
+            "status": "success",
+            "version": "1.0.100002-fixture-validb"
+          },
+          "durable": {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 25,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "rawSha256": "23d9395f15430cf1ffb9c418a1d5ee5b69b9568de0619e9f9934df515977c147",
+            "sequence": 100002,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": "validB",
+          "origin": "capacitor://localhost",
+          "pending": null,
+          "ready": true,
+          "screen": "menu",
+          "sequence": 100002,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 25,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "23d9395f15430cf1ffb9c418a1d5ee5b69b9568de0619e9f9934df515977c147",
+              "sequence": 100002,
+              "valid": true
+            },
+            {
+              "activations": [
+                {
+                  "id": "7hsiwAX9DN",
+                  "version": "1.0.100002-fixture-validb"
+                }
+              ],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 24,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "rawSha256": "1b3aff948c6b4c02c7e73a2eebd125b0b9bc12c106dc4aaa6bd249f2d1d6f402",
+              "sequence": 100002,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789991655211,
+        "token": "e4611359-ce17-47fc-b9b3-999c09d43cb3"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/activateB.log",
+      "finishedAt": "2026-09-21T11:54:15.955Z"
+    },
+    {
+      "name": "stageBrokenStartup",
+      "startedAt": "2026-09-21T11:54:15.955Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "a",
+          "generation": 25,
+          "at": 1789991655970,
+          "sequence": 100002,
+          "activations": [],
+          "rawSha256": "23d9395f15430cf1ffb9c418a1d5ee5b69b9568de0619e9f9934df515977c147"
+        },
+        {
+          "slot": "b",
+          "generation": 26,
+          "at": 1789991663105,
+          "sequence": 100008,
+          "activations": [],
+          "rawSha256": "8a4d9fc31098ccb107a7627e9086b43a6c60f3f26e39120f42591eb0e13d9160"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 8633,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:54:22.818Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:54:22.845Z",
+          "method": "GET",
+          "path": "/ios/2b6a491a32e1ad7a4a5a399de13f049b22b0f6758fb99ef0a617f79d21640801.zip"
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [],
+          "bundles": [
+            {
+              "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+              "downloaded": "2026-09-21T11:54:04.648Z",
+              "id": "7hsiwAX9DN",
+              "status": "success",
+              "version": "1.0.100002-fixture-validb"
+            },
+            {
+              "checksum": "2b6a491a32e1ad7a4a5a399de13f049b22b0f6758fb99ef0a617f79d21640801",
+              "downloaded": "2026-09-21T11:54:23.076Z",
+              "id": "0kFavJx13Q",
+              "status": "pending",
+              "version": "1.0.100008-fixture-brokenstartup"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+            "downloaded": "2026-09-21T11:54:04.648Z",
+            "id": "7hsiwAX9DN",
+            "status": "success",
+            "version": "1.0.100002-fixture-validb"
+          },
+          "durable": {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 26,
+            "name": "trials-save-b.json",
+            "pending": {
+              "checksum": "2b6a491a32e1ad7a4a5a399de13f049b22b0f6758fb99ef0a617f79d21640801",
+              "id": "0kFavJx13Q",
+              "sequence": 100008,
+              "version": "1.0.100008-fixture-brokenstartup"
+            },
+            "rawSha256": "8a4d9fc31098ccb107a7627e9086b43a6c60f3f26e39120f42591eb0e13d9160",
+            "sequence": 100008,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": "validB",
+          "origin": "capacitor://localhost",
+          "pending": {
+            "checksum": "2b6a491a32e1ad7a4a5a399de13f049b22b0f6758fb99ef0a617f79d21640801",
+            "id": "0kFavJx13Q",
+            "sequence": 100008,
+            "version": "1.0.100008-fixture-brokenstartup"
+          },
+          "ready": true,
+          "screen": "menu",
+          "sequence": 100008,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 25,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "23d9395f15430cf1ffb9c418a1d5ee5b69b9568de0619e9f9934df515977c147",
+              "sequence": 100002,
+              "valid": true
+            },
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 26,
+              "name": "trials-save-b.json",
+              "pending": {
+                "checksum": "2b6a491a32e1ad7a4a5a399de13f049b22b0f6758fb99ef0a617f79d21640801",
+                "id": "0kFavJx13Q",
+                "sequence": 100008,
+                "version": "1.0.100008-fixture-brokenstartup"
+              },
+              "rawSha256": "8a4d9fc31098ccb107a7627e9086b43a6c60f3f26e39120f42591eb0e13d9160",
+              "sequence": 100008,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789991663917,
+        "token": "74c5438b-1adc-4c3b-92ab-9e1dee01e626"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/stageBrokenStartup.log",
+      "finishedAt": "2026-09-21T11:54:24.603Z"
+    },
+    {
+      "name": "watchdogRecovery",
+      "startedAt": "2026-09-21T11:54:24.604Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "b",
+          "generation": 26,
+          "at": 1789991664618,
+          "sequence": 100008,
+          "activations": [],
+          "rawSha256": "8a4d9fc31098ccb107a7627e9086b43a6c60f3f26e39120f42591eb0e13d9160"
+        },
+        {
+          "slot": "b",
+          "generation": 28,
+          "at": 1789991665841,
+          "sequence": 100008,
+          "activations": [
+            {
+              "id": "0kFavJx13Q",
+              "version": "1.0.100008-fixture-brokenstartup"
+            }
+          ],
+          "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 130827,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:56:04.866Z",
+          "method": "GET",
+          "path": "/android/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:56:05.872Z",
+          "method": "GET",
+          "path": "/android/d05d65d5666410c8c046a3b53270511b58e189aee9471b186ef1d8264a71a660.zip"
+        },
+        {
+          "at": "2026-09-21T11:56:22.187Z",
+          "method": "GET",
+          "path": "/android/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:56:32.917Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:56:33.988Z",
+          "method": "GET",
+          "path": "/android/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:56:34.993Z",
+          "method": "GET",
+          "path": "/android/13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84.zip"
+        },
+        {
+          "fault": "hold",
+          "path": "/android/13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84.zip",
+          "holdId": "a7bfbabc-d877-4339-96c0-870b8cf00e6d",
+          "timeoutMs": 60000
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [
+            {
+              "id": "0kFavJx13Q",
+              "version": "1.0.100008-fixture-brokenstartup"
+            }
+          ],
+          "bundles": [
+            {
+              "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+              "downloaded": "2026-09-21T11:54:04.648Z",
+              "id": "7hsiwAX9DN",
+              "status": "success",
+              "version": "1.0.100002-fixture-validb"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+            "downloaded": "2026-09-21T11:54:04.648Z",
+            "id": "7hsiwAX9DN",
+            "status": "success",
+            "version": "1.0.100002-fixture-validb"
+          },
+          "durable": {
+            "activations": [
+              {
+                "id": "0kFavJx13Q",
+                "version": "1.0.100008-fixture-brokenstartup"
+              }
+            ],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 28,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+            "sequence": 100008,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": "validB",
+          "origin": "capacitor://localhost",
+          "pending": null,
+          "ready": true,
+          "screen": "menu",
+          "sequence": 100008,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 27,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "f8d8de81be586c9ec0ebc2b8b7d577402625eb2863892773221fbb48454ba28c",
+              "sequence": 100008,
+              "valid": true
+            },
+            {
+              "activations": [
+                {
+                  "id": "0kFavJx13Q",
+                  "version": "1.0.100008-fixture-brokenstartup"
+                }
+              ],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 28,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+              "sequence": 100008,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789991795016,
+        "token": "1924e302-f125-45e0-842e-09261932c47a"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/watchdogRecovery.log",
+      "finishedAt": "2026-09-21T11:56:35.445Z"
+    },
+    {
+      "name": "rejectHigherSequenceSameVersion",
+      "startedAt": "2026-09-21T11:56:35.446Z",
+      "pass": true,
+      "durableTimeline": [
+        {
+          "slot": "b",
+          "generation": 28,
+          "at": 1789991795462,
+          "sequence": 100008,
+          "activations": [
+            {
+              "id": "0kFavJx13Q",
+              "version": "1.0.100008-fixture-brokenstartup"
+            }
+          ],
+          "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da"
+        }
+      ],
+      "exitCode": 0,
+      "elapsedMs": 37697,
+      "serverEvents": [
+        {
+          "at": "2026-09-21T11:56:42.533Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T11:57:05.988Z",
+          "method": "GET",
+          "path": "/android/13044adf0479f69b9245a307eb2df21d2aab9375af851c71dde1dcb71cc4aa84.zip"
+        }
+      ],
+      "result": {
+        "after": {
+          "activations": [
+            {
+              "id": "0kFavJx13Q",
+              "version": "1.0.100008-fixture-brokenstartup"
+            }
+          ],
+          "bundles": [
+            {
+              "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+              "downloaded": "2026-09-21T11:54:04.648Z",
+              "id": "7hsiwAX9DN",
+              "status": "success",
+              "version": "1.0.100002-fixture-validb"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "current": {
+            "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+            "downloaded": "2026-09-21T11:54:04.648Z",
+            "id": "7hsiwAX9DN",
+            "status": "success",
+            "version": "1.0.100002-fixture-validb"
+          },
+          "durable": {
+            "activations": [
+              {
+                "id": "0kFavJx13Q",
+                "version": "1.0.100008-fixture-brokenstartup"
+              }
+            ],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 28,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+            "sequence": 100008,
+            "valid": true
+          },
+          "hasServiceWorker": false,
+          "marker": "validB",
+          "origin": "capacitor://localhost",
+          "pending": null,
+          "ready": true,
+          "screen": "menu",
+          "sequence": 100008,
+          "slots": [
+            {
+              "activations": [],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 27,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "rawSha256": "f8d8de81be586c9ec0ebc2b8b7d577402625eb2863892773221fbb48454ba28c",
+              "sequence": 100008,
+              "valid": true
+            },
+            {
+              "activations": [
+                {
+                  "id": "0kFavJx13Q",
+                  "version": "1.0.100008-fixture-brokenstartup"
+                }
+              ],
+              "content": {
+                "keys": [
+                  "trials.best.b1-first-ride@pro",
+                  "trials.best.b1-first-ride@pro#board",
+                  "trials.bikeClass",
+                  "trials.ghost",
+                  "trials.lastrun.b1-first-ride",
+                  "trials.riderModel",
+                  "trials.riderOutfit",
+                  "trials.sound",
+                  "trials.volume"
+                ],
+                "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+                "sound": "0",
+                "volume": "0.3"
+              },
+              "generation": 28,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+              "sequence": 100008,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789991832845,
+        "token": "4c4908cf-e89c-4f73-961d-d908a1b88156"
+      },
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10/rejectHigherSequenceSameVersion.log",
+      "finishedAt": "2026-09-21T11:57:13.160Z"
+    }
+  ],
+  "pass": true,
+  "scope": "Real installed controller, native plugin and durable game saves; locally signed fixture publications only.",
+  "limitations": [
+    "Simulator only; no physical phone, store distribution or motion-quality claim.",
+    "Game hooks and ordinary Settings DOM handlers establish progress/preferences; OS touch qualification is separate.",
+    "Interrupted network transfer is not ENOSPC; no low-space staging or extraction claim.",
+    "Higher-sequence rejection is observed for 30 seconds, correlated with a manifest GET and absence of ZIP GET.",
+    "Watchdog failure remains foreground; backgrounding an unacknowledged startup for longer than120 seconds is unqualified."
+  ],
+  "recording": {
+    "path": "harness/inputs/b1-first-ride/bot-3-pro.json",
+    "sha256": "7a29068d600075a6e25df69c1e50a34952670c73a3baeed4cdcaa9c0348f04ba"
+  },
+  "finishedAt": "2026-09-21T11:57:13.160Z",
+  "cleanup": {
+    "startedAt": "2026-09-21T11:57:17.103Z",
+    "normalApp": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ota-round10-normal/App.app",
+    "caTrustChanged": false,
+    "beforeReset": {
+      "after": {
+        "activations": [
+          {
+            "id": "0kFavJx13Q",
+            "version": "1.0.100008-fixture-brokenstartup"
+          }
+        ],
+        "bundles": [
+          {
+            "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+            "downloaded": "2026-09-21T11:54:04.648Z",
+            "id": "7hsiwAX9DN",
+            "status": "success",
+            "version": "1.0.100002-fixture-validb"
+          }
+        ],
+        "content": {
+          "keys": [
+            "trials.best.b1-first-ride@pro",
+            "trials.best.b1-first-ride@pro#board",
+            "trials.bikeClass",
+            "trials.ghost",
+            "trials.lastrun.b1-first-ride",
+            "trials.riderModel",
+            "trials.riderOutfit",
+            "trials.sound",
+            "trials.volume"
+          ],
+          "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+          "sound": "0",
+          "volume": "0.3"
+        },
+        "current": {
+          "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+          "downloaded": "2026-09-21T11:54:04.648Z",
+          "id": "7hsiwAX9DN",
+          "status": "success",
+          "version": "1.0.100002-fixture-validb"
+        },
+        "durable": {
+          "activations": [
+            {
+              "id": "0kFavJx13Q",
+              "version": "1.0.100008-fixture-brokenstartup"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "generation": 28,
+          "name": "trials-save-b.json",
+          "pending": null,
+          "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+          "sequence": 100008,
+          "valid": true
+        },
+        "hasServiceWorker": false,
+        "marker": "validB",
+        "origin": "capacitor://localhost",
+        "pending": null,
+        "ready": true,
+        "screen": "menu",
+        "sequence": 100008,
+        "slots": [
+          {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 27,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "rawSha256": "f8d8de81be586c9ec0ebc2b8b7d577402625eb2863892773221fbb48454ba28c",
+            "sequence": 100008,
+            "valid": true
+          },
+          {
+            "activations": [
+              {
+                "id": "0kFavJx13Q",
+                "version": "1.0.100008-fixture-brokenstartup"
+              }
+            ],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 28,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+            "sequence": 100008,
+            "valid": true
+          }
+        ],
+        "tick": 0
+      },
+      "probeAt": 1789991844183,
+      "token": "ae40ff61-1386-40dd-aef5-f0993ea4005f"
+    },
+    "builtin": {
+      "after": {
+        "activations": [
+          {
+            "id": "0kFavJx13Q",
+            "version": "1.0.100008-fixture-brokenstartup"
+          }
+        ],
+        "bundles": [
+          {
+            "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+            "downloaded": "2026-09-21T11:54:04.648Z",
+            "id": "7hsiwAX9DN",
+            "status": "success",
+            "version": "1.0.100002-fixture-validb"
+          }
+        ],
+        "content": {
+          "keys": [
+            "trials.best.b1-first-ride@pro",
+            "trials.best.b1-first-ride@pro#board",
+            "trials.bikeClass",
+            "trials.ghost",
+            "trials.lastrun.b1-first-ride",
+            "trials.riderModel",
+            "trials.riderOutfit",
+            "trials.sound",
+            "trials.volume"
+          ],
+          "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+          "sound": "0",
+          "volume": "0.3"
+        },
+        "current": {
+          "checksum": "",
+          "downloaded": "1970-01-01T00:00:00.000Z",
+          "id": "builtin",
+          "status": "success",
+          "version": "1.0.0"
+        },
+        "durable": {
+          "activations": [
+            {
+              "id": "0kFavJx13Q",
+              "version": "1.0.100008-fixture-brokenstartup"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "generation": 28,
+          "name": "trials-save-b.json",
+          "pending": null,
+          "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+          "sequence": 100008,
+          "valid": true
+        },
+        "hasServiceWorker": false,
+        "marker": null,
+        "origin": "capacitor://localhost",
+        "pending": null,
+        "ready": true,
+        "screen": "menu",
+        "sequence": 100008,
+        "slots": [
+          {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 27,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "rawSha256": "f8d8de81be586c9ec0ebc2b8b7d577402625eb2863892773221fbb48454ba28c",
+            "sequence": 100008,
+            "valid": true
+          },
+          {
+            "activations": [
+              {
+                "id": "0kFavJx13Q",
+                "version": "1.0.100008-fixture-brokenstartup"
+              }
+            ],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 28,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+            "sequence": 100008,
+            "valid": true
+          }
+        ],
+        "tick": 0
+      },
+      "probeAt": 1789991856399,
+      "token": "5c4d5178-ac44-4a99-95cf-842e03506b84"
+    },
+    "normal": {
+      "after": {
+        "activations": [
+          {
+            "id": "0kFavJx13Q",
+            "version": "1.0.100008-fixture-brokenstartup"
+          }
+        ],
+        "bundles": [
+          {
+            "checksum": "f30d7ba5c1aa62b124064b918923ca9810d95da4a8431a42e163bc822c026d43",
+            "downloaded": "2026-09-21T11:54:04.648Z",
+            "id": "7hsiwAX9DN",
+            "status": "success",
+            "version": "1.0.100002-fixture-validb"
+          }
+        ],
+        "content": {
+          "keys": [
+            "trials.best.b1-first-ride@pro",
+            "trials.best.b1-first-ride@pro#board",
+            "trials.bikeClass",
+            "trials.ghost",
+            "trials.lastrun.b1-first-ride",
+            "trials.riderModel",
+            "trials.riderOutfit",
+            "trials.sound",
+            "trials.volume"
+          ],
+          "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+          "sound": "0",
+          "volume": "0.3"
+        },
+        "current": {
+          "checksum": "",
+          "downloaded": "1970-01-01T00:00:00.000Z",
+          "id": "builtin",
+          "status": "success",
+          "version": "1.0.0"
+        },
+        "durable": {
+          "activations": [
+            {
+              "id": "0kFavJx13Q",
+              "version": "1.0.100008-fixture-brokenstartup"
+            }
+          ],
+          "content": {
+            "keys": [
+              "trials.best.b1-first-ride@pro",
+              "trials.best.b1-first-ride@pro#board",
+              "trials.bikeClass",
+              "trials.ghost",
+              "trials.lastrun.b1-first-ride",
+              "trials.riderModel",
+              "trials.riderOutfit",
+              "trials.sound",
+              "trials.volume"
+            ],
+            "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+            "sound": "0",
+            "volume": "0.3"
+          },
+          "generation": 28,
+          "name": "trials-save-b.json",
+          "pending": null,
+          "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+          "sequence": 100008,
+          "valid": true
+        },
+        "hasServiceWorker": false,
+        "marker": null,
+        "origin": "capacitor://localhost",
+        "pending": null,
+        "ready": true,
+        "screen": "menu",
+        "sequence": 100008,
+        "slots": [
+          {
+            "activations": [],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 27,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "rawSha256": "f8d8de81be586c9ec0ebc2b8b7d577402625eb2863892773221fbb48454ba28c",
+            "sequence": 100008,
+            "valid": true
+          },
+          {
+            "activations": [
+              {
+                "id": "0kFavJx13Q",
+                "version": "1.0.100008-fixture-brokenstartup"
+              }
+            ],
+            "content": {
+              "keys": [
+                "trials.best.b1-first-ride@pro",
+                "trials.best.b1-first-ride@pro#board",
+                "trials.bikeClass",
+                "trials.ghost",
+                "trials.lastrun.b1-first-ride",
+                "trials.riderModel",
+                "trials.riderOutfit",
+                "trials.sound",
+                "trials.volume"
+              ],
+              "sha256": "e2de8964dd5c7009672d68e6950986c5250798597e0bb49258a6b44a38f9d744",
+              "sound": "0",
+              "volume": "0.3"
+            },
+            "generation": 28,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "rawSha256": "58e16b2df6c9d94d9c78406763aa9c4198c0c6df5c76a4332b6f4f5627ae64da",
+            "sequence": 100008,
+            "valid": true
+          }
+        ],
+        "tick": 0
+      },
+      "probeAt": 1789991866708,
+      "token": "7f279126-36ff-4e1b-b60f-6e0a184030bf"
+    },
+    "normalContract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "2829cd2a",
+      "production": false,
+      "channels": null,
+      "publicKeyFingerprint": null
+    },
+    "normalIndexSha256": "824a85715a532696ebbf8fae04a9467c79d024b78286fcae488e41349a4f4b89",
+    "pass": true,
+    "simulatorShutdown": true,
+    "finishedAt": "2026-09-21T11:57:50.749Z"
+  },
+  "nativeAutoDeleteConfirmed": true,
+  "summary": {
+    "passedCases": 9,
+    "watchdogMs": 130827,
+    "samePublicationTransferRetry": true,
+    "healthyActivationLedgerObservedAndCleared": true,
+    "failedActivationJournalSurvivedNativeMetadataDeletion": true,
+    "higherSequenceSameBadVersionRejectedBeforeDownload": true,
+    "savedProgressAndPreferencesPreserved": true,
+    "normalChannelsDisabled": true,
+    "taskSimulatorShutdown": true
+  }
+}
